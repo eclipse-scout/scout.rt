@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueOutputToken;
 
 public class IntoModel {
   String m_filteredStatement;
-  private ValueOutputToken[] m_intoTokens;
+  private final ValueOutputToken[] m_intoTokens;
 
   public IntoModel(String filteredStatement, ValueOutputToken[] intoTokens) {
     m_filteredStatement = filteredStatement;

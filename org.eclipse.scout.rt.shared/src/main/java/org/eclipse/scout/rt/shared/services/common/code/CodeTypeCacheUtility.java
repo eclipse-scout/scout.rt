@@ -44,7 +44,7 @@ public class CodeTypeCacheUtility {
     }
     @SuppressWarnings("unchecked")
     Class<T> activeCodeTypeClass = (Class<T>) bean.getBeanClazz();
-    return (Class<T>) activeCodeTypeClass;
+    return activeCodeTypeClass;
   }
 
   protected List<Class<? extends ICodeType<?, ?>>> resolveCodeTypeClasses(List<Class<? extends ICodeType<?, ?>>> types) {

@@ -23,7 +23,7 @@ public abstract class AbstractCacheValueResolver<K, V> implements ICacheValueRes
 
   @Override
   public Map<K, V> resolveAll(Set<K> keys) {
-    Map<K, V> result = new HashMap<K, V>();
+    Map<K, V> result = new HashMap<>();
     for (K key : keys) {
       result.put(key, resolve(key));
     }

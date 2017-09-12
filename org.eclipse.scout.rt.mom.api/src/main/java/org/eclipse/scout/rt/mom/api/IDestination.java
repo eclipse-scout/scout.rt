@@ -60,7 +60,7 @@ public interface IDestination<DTO> {
      * <p>
      * See {@link IMom} documentation for more information about the difference between topic and queue based messaging.
      */
-    TOPIC;
+    TOPIC
   }
 
   /**
@@ -73,6 +73,7 @@ public interface IDestination<DTO> {
    * <li>{@link ResolveMethod#DEFINE}
    * </ul>
    */
+  @FunctionalInterface
   interface IResolveMethod {
 
     String getIdentifier();

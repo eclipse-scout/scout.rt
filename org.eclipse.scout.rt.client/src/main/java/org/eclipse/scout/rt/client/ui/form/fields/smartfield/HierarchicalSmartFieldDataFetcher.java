@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
@@ -20,7 +21,6 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IBiConsumer;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,17 +42,13 @@ public class HierarchicalSmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmart
     }
   }
 
-  private IBiConsumer<List<ILookupRow<LOOKUP_KEY>>, Throwable> updateResult(final ISmartFieldSearchParam<LOOKUP_KEY> query) {
-    return new IBiConsumer<List<ILookupRow<LOOKUP_KEY>>, Throwable>() {
-
-      @Override
-      public void accept(List<ILookupRow<LOOKUP_KEY>> rows, Throwable error) {
-        SmartFieldDataFetchResult<LOOKUP_KEY> result = new SmartFieldDataFetchResult<>(rows, error, query);
-        if (result.getException() != null) {
-          logException(result.getException());
-        }
-        setResult(result);
+  private BiConsumer<List<ILookupRow<LOOKUP_KEY>>, Throwable> updateResult(final ISmartFieldSearchParam<LOOKUP_KEY> query) {
+    return (rows, error) -> {
+      SmartFieldDataFetchResult<LOOKUP_KEY> result = new SmartFieldDataFetchResult<>(rows, error, query);
+      if (result.getException() != null) {
+        logException(result.getException());
       }
+      setResult(result);
     };
   }
 

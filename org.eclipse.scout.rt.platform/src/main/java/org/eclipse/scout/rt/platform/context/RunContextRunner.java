@@ -35,13 +35,7 @@ public class RunContextRunner<RESULT> implements ICallableInterceptor<RESULT> {
 
   @Override
   public RESULT intercept(final Chain<RESULT> chain) throws Exception {
-    return m_runContext.call(new Callable<RESULT>() {
-
-      @Override
-      public RESULT call() throws Exception {
-        return chain.continueChain();
-      }
-    }, DefaultExceptionTranslator.class);
+    return m_runContext.call(chain::continueChain, DefaultExceptionTranslator.class);
   }
 
   @Override

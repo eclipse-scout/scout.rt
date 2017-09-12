@@ -25,11 +25,11 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 public class SessionInspector {
-  private ProcessInspector m_parent;
-  private IServerSession m_session;
-  private SessionInfo m_info;
-  private Object m_callListLock = new Object();
-  private ArrayList<CallInspector> m_callList = new ArrayList<CallInspector>();
+  private final ProcessInspector m_parent;
+  private final IServerSession m_session;
+  private final SessionInfo m_info;
+  private final Object m_callListLock = new Object();
+  private final ArrayList<CallInspector> m_callList = new ArrayList<>();
 
   protected SessionInspector(ProcessInspector parent, IServerSession session) {
     m_parent = parent;

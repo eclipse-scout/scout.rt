@@ -19,8 +19,8 @@ public class ScopeStack {
   private final Deque<ExtensionScope<ExtensionRegistryItem>> m_extensionScopes;
 
   public ScopeStack(ExtensionScope<ExtensionRegistryItem> globalContributionScope, ExtensionScope<ExtensionRegistryItem> globalExtensionScope) {
-    m_contributionScopes = new LinkedList<ExtensionScope<ExtensionRegistryItem>>();
-    m_extensionScopes = new LinkedList<ExtensionScope<ExtensionRegistryItem>>();
+    m_contributionScopes = new LinkedList<>();
+    m_extensionScopes = new LinkedList<>();
     m_contributionScopes.push(globalContributionScope);
     m_extensionScopes.push(globalExtensionScope);
   }

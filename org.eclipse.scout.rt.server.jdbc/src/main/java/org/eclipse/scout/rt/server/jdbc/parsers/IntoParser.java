@@ -49,11 +49,11 @@ public class IntoParser {
     NAME_MAP = "_.0123456789{}ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
   }
 
-  private String m_str;
+  private final String m_str;
   private ParsePosition m_pos;
   //
-  private ArrayList<ValueOutputToken> m_intoList = new ArrayList<ValueOutputToken>();
-  private StringBuilder m_filteredText = new StringBuilder();
+  private final ArrayList<ValueOutputToken> m_intoList = new ArrayList<>();
+  private final StringBuilder m_filteredText = new StringBuilder();
   private int m_lastTextIndex;
 
   public IntoParser(String sqlStatement) {

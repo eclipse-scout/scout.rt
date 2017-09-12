@@ -53,7 +53,7 @@ public class ImageFieldEvent extends EventObject implements IModelEvent {
       return;
     }
     if (m_popupMenus == null) {
-      m_popupMenus = new ArrayList<IMenu>();
+      m_popupMenus = new ArrayList<>();
     }
     m_popupMenus.add(menu);
   }
@@ -66,7 +66,7 @@ public class ImageFieldEvent extends EventObject implements IModelEvent {
       return;
     }
     if (m_popupMenus == null) {
-      m_popupMenus = new ArrayList<IMenu>(menus.size());
+      m_popupMenus = new ArrayList<>(menus.size());
     }
     m_popupMenus.addAll(CollectionUtility.arrayListWithoutNullElements(menus));
   }

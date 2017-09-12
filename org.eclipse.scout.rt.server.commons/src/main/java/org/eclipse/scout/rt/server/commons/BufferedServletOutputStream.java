@@ -14,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 
 import org.eclipse.scout.rt.platform.util.Assertions;
 
@@ -32,7 +33,7 @@ public class BufferedServletOutputStream extends ServletOutputStream {
   }
 
   @Override
-  public void setWriteListener(javax.servlet.WriteListener writeListener) {
+  public void setWriteListener(WriteListener writeListener) {
     m_writeListener = Assertions.assertNotNull(writeListener);
     try {
       writeListener.onWritePossible();
@@ -48,7 +49,7 @@ public class BufferedServletOutputStream extends ServletOutputStream {
       m_buf.write(b);
     }
     catch (IOException e) {
-      javax.servlet.WriteListener listener = (javax.servlet.WriteListener) m_writeListener;
+      WriteListener listener = (WriteListener) m_writeListener;
       if (listener != null) {
         listener.onError(e);
       }

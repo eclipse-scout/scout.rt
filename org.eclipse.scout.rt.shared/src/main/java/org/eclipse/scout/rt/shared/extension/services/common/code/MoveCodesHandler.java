@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension.services.common.code;
 
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -46,7 +44,7 @@ public class MoveCodesHandler<CODE_ID, CODE extends ICode<CODE_ID>> extends Abst
   @Override
   protected void sortChildren(CODE parent) {
     List<? extends ICode<CODE_ID>> childCodes = parent.getChildCodes(false);
-    Collections.sort(childCodes, new OrderedComparator());
+    childCodes.sort(new OrderedComparator());
     int index = 0;
     for (ICode<CODE_ID> code : childCodes) {
       parent.addChildCodeInternal(index, code);
@@ -56,7 +54,7 @@ public class MoveCodesHandler<CODE_ID, CODE extends ICode<CODE_ID>> extends Abst
 
   @Override
   protected List<CODE> collectAllModelObjects() {
-    List<CODE> allCodes = new LinkedList<CODE>();
+    List<CODE> allCodes = new LinkedList<>();
     collectAllCodes(getRootModelObjects(), allCodes);
     return allCodes;
   }
@@ -65,8 +63,7 @@ public class MoveCodesHandler<CODE_ID, CODE extends ICode<CODE_ID>> extends Abst
     if (codes == null) {
       return;
     }
-    for (Iterator<? extends CODE> it = codes.iterator(); it.hasNext();) {
-      CODE code = it.next();
+    for (CODE code : codes) {
       allCodes.add(code);
       @SuppressWarnings("unchecked")
       List<? extends CODE> childCodes = (List<? extends CODE>) code.getChildCodes(false);

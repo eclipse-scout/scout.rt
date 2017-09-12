@@ -16,6 +16,8 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.server.clientnotification.ClientNotificationProperties.MaxNotificationBlockingTimeOut;
+import org.eclipse.scout.rt.server.clientnotification.ClientNotificationProperties.MaxNotificationMessages;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 
@@ -24,8 +26,8 @@ public class ClientNotificationService implements IClientNotificationService {
   private final int m_maxNotifications;
 
   public ClientNotificationService() {
-    m_blockingTimeout = Assertions.assertNotNull(CONFIG.getPropertyValue(ClientNotificationProperties.MaxNotificationBlockingTimeOut.class));
-    m_maxNotifications = Assertions.assertNotNull(CONFIG.getPropertyValue(ClientNotificationProperties.MaxNotificationMessages.class));
+    m_blockingTimeout = Assertions.assertNotNull(CONFIG.getPropertyValue(MaxNotificationBlockingTimeOut.class));
+    m_maxNotifications = Assertions.assertNotNull(CONFIG.getPropertyValue(MaxNotificationMessages.class));
   }
 
   @Override

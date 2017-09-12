@@ -43,9 +43,9 @@ public interface IComposerField extends IFormField {
    */
   List<IDataModelEntity> getEntities();
 
-  EntityNode addEntityNode(ITreeNode parentNode, IDataModelEntity e, boolean negated, List<? extends Object> values, List<String> texts);
+  EntityNode addEntityNode(ITreeNode parentNode, IDataModelEntity e, boolean negated, List<?> values, List<String> texts);
 
-  AttributeNode addAttributeNode(ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<? extends Object> values, List<String> texts);
+  AttributeNode addAttributeNode(ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<?> values, List<String> texts);
 
   EitherOrNode addEitherNode(ITreeNode parentNode, boolean negated);
 

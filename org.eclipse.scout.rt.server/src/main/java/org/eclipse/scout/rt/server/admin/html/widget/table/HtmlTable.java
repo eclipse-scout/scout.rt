@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.admin.html.widget.table;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.eclipse.scout.rt.platform.util.CompositeObject;
@@ -20,9 +21,9 @@ import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 
 @SuppressWarnings("bsiRulesDefinition:htmlInString")
 public class HtmlTable extends HtmlComponent {
-  private String m_tableId;
-  private SortInfo m_sortInfo;
-  private List<VirtualRow> m_rows;
+  private final String m_tableId;
+  private final SortInfo m_sortInfo;
+  private final List<VirtualRow> m_rows;
   // temporary
   private int m_temporaryColumn;
 
@@ -30,7 +31,7 @@ public class HtmlTable extends HtmlComponent {
     super(other);
     m_tableId = tableId;
     m_sortInfo = sortInfo;
-    m_rows = new ArrayList<VirtualRow>();
+    m_rows = new ArrayList<>();
   }
 
   @Override
@@ -93,7 +94,7 @@ public class HtmlTable extends HtmlComponent {
   }
 
   private VirtualRow[] getSortedRows() {
-    TreeMap<CompositeObject, VirtualRow> sortMap = new TreeMap<CompositeObject, VirtualRow>();
+    SortedMap<CompositeObject, VirtualRow> sortMap = new TreeMap<>();
     int rowIndex = 0;
     for (VirtualRow row : m_rows) {
       sortMap.put(new CompositeObject(row.getCellAt(m_sortInfo.getColumnIndex()), rowIndex), row);

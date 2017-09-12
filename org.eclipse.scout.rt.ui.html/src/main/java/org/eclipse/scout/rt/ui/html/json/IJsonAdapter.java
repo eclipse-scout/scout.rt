@@ -23,7 +23,7 @@ import org.json.JSONObject;
  * @param <T>
  *          Type of Scout model
  */
-public interface IJsonAdapter<T extends Object> extends IJsonObject {
+public interface IJsonAdapter<T> extends IJsonObject {
 
   IUiSession getUiSession();
 

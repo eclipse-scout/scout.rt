@@ -127,8 +127,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
     }
 
     final Set<ITreeNode> insertedTreeNodes = new HashSet<>();
-    for (Iterator<TreeEvent> it = events.iterator(); it.hasNext();) {
-      final TreeEvent event = it.next();
+    for (final TreeEvent event : events) {
       final int type = event.getType();
 
       if (!event.hasNodes()) {
@@ -192,11 +191,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
 
       // there is already an initial event.
       // check if there is already an event merger or create one
-      TreeEventMerger eventMerger = eventMergerByParent.get(parentNode);
-      if (eventMerger == null) {
-        eventMerger = new TreeEventMerger(initialEvent);
-        eventMergerByParent.put(parentNode, eventMerger);
-      }
+      TreeEventMerger eventMerger = eventMergerByParent.computeIfAbsent(parentNode, k -> new TreeEventMerger(initialEvent));
 
       // merge current event and remove it from the original event list
       eventMerger.merge(event);
@@ -210,13 +205,8 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
   }
 
   protected void removeEmptyEvents(List<TreeEvent> events) {
-    for (Iterator<TreeEvent> it = events.iterator(); it.hasNext();) {
-      TreeEvent event = it.next();
-      if (isNodesRequired(event.getType()) && !event.hasNodes()
-          || isCommonParentNodeRequired(event.getType()) && event.getCommonParentNode() == null) {
-        it.remove();
-      }
-    }
+    events.removeIf(event -> isNodesRequired(event.getType()) && !event.hasNodes()
+        || isCommonParentNodeRequired(event.getType()) && event.getCommonParentNode() == null);
   }
 
   /**
@@ -474,7 +464,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
 
     private final TreeEvent m_targetEvent;
     private Collection<ITreeNode> m_targetNodes;
-    private HashSet<ITreeNode> m_targetNodeSet;
+    private Set<ITreeNode> m_targetNodeSet;
     private List<ITreeNode> m_mergedNodes;
 
     public TreeEventMerger(TreeEvent targetEvent) {
@@ -522,13 +512,9 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
      * Merge collections, such that, if an element is in both collections, only the one of the second collection (later
      * event) is kept.
      */
-    protected <TYPE> void mergeCollections(Collection<TYPE> source, List<TYPE> target, HashSet<TYPE> targetSet) {
-      for (Iterator<TYPE> it = source.iterator(); it.hasNext();) {
-        TYPE sourceElement = it.next();
-        if (!targetSet.add(sourceElement)) { // returns true, if the sourceElement has been added; false, if it was already in the set.
-          it.remove();
-        }
-      }
+    protected <TYPE> void mergeCollections(Collection<TYPE> source, List<TYPE> target, Set<TYPE> targetSet) {
+      // returns true, if the sourceElement has been added; false, if it was already in the set.
+      source.removeIf(sourceElement -> !targetSet.add(sourceElement));
       target.addAll(0, source);
     }
   }

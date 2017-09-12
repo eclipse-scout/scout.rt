@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.composer;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.DataModelAggregationFieldChains.DataModelAggregationFieldAttributeChangedChain;
@@ -90,9 +91,9 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
   protected void execAttributeChanged(IDataModelAttribute attribute) {
     Integer newAg = null;
     if (attribute != null) {
-      HashSet<Integer> agSet = new HashSet<Integer>();
+      Set<Integer> agSet = new HashSet<>();
       for (ILookupRow<Integer> row : ((DataModelAggregationLookupCall) getLookupCall()).getLookupRows()) {
-        agSet.add((Integer) row.getKey());
+        agSet.add(row.getKey());
       }
       if (agSet.contains(DataModelConstants.AGGREGATION_NONE)) {
         newAg = DataModelConstants.AGGREGATION_NONE;
@@ -100,7 +101,7 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
       else if (agSet.contains(DataModelConstants.AGGREGATION_COUNT)) {
         newAg = DataModelConstants.AGGREGATION_COUNT;
       }
-      else if (agSet.size() > 0) {
+      else if (!agSet.isEmpty()) {
         newAg = agSet.iterator().next();
       }
     }
@@ -127,7 +128,7 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
 
   @Override
   protected IDataModelAggregationFieldExtension<? extends AbstractDataModelAggregationField> createLocalExtension() {
-    return new LocalDataModelAggregationFieldExtension<AbstractDataModelAggregationField>(this);
+    return new LocalDataModelAggregationFieldExtension<>(this);
   }
 
 }

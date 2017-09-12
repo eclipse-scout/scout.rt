@@ -26,7 +26,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
   public static final String OBJECT_TYPE = "Column";
 
   private String m_id;
-  private T m_column;
+  private final T m_column;
   private JsonTable<?> m_jsonTable;
   private int m_indexOffset;
 

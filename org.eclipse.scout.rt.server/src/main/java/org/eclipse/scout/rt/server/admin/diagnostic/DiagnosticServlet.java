@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.ServiceTunnelServlet;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
@@ -48,15 +47,12 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
 
     lazyInit(servletRequest, servletResponse);
 
-    createServletRunContext(servletRequest, servletResponse).run(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
-        serverRunContext.withUserAgent(UserAgents.createDefault());
-        serverRunContext.withSession(lookupServerSessionOnHttpSession(Sessions.randomSessionId(), serverRunContext.copy()));
+    createServletRunContext(servletRequest, servletResponse).run(() -> {
+      ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
+      serverRunContext.withUserAgent(UserAgents.createDefault());
+      serverRunContext.withSession(lookupServerSessionOnHttpSession(Sessions.randomSessionId(), serverRunContext.copy()));
 
-        invokeDiagnosticService(serverRunContext);
-      }
+      invokeDiagnosticService(serverRunContext);
     }, ServletExceptionTranslator.class);
   }
 
@@ -65,20 +61,16 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
    */
   @SuppressWarnings("squid:S00112")
   protected void invokeDiagnosticService(final ServerRunContext serverRunContext) throws Exception {
-    serverRunContext.run(new IRunnable() {
+    serverRunContext.run(() -> {
+      final HttpServletRequest servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
+      final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
 
-      @Override
-      public void run() throws Exception {
-        final HttpServletRequest servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
-        final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
-
-        DiagnosticSession diagnosticSession = (DiagnosticSession) BEANS.get(IHttpSessionCacheService.class).getAndTouch(DIAGNOSTIC_SESSION_KEY, servletRequest, servletResponse);
-        if (diagnosticSession == null) {
-          diagnosticSession = new DiagnosticSession();
-          BEANS.get(IHttpSessionCacheService.class).put(DIAGNOSTIC_SESSION_KEY, diagnosticSession, servletRequest, servletResponse);
-        }
-        diagnosticSession.serviceRequest(servletRequest, servletResponse);
+      DiagnosticSession diagnosticSession = (DiagnosticSession) BEANS.get(IHttpSessionCacheService.class).getAndTouch(DIAGNOSTIC_SESSION_KEY, servletRequest, servletResponse);
+      if (diagnosticSession == null) {
+        diagnosticSession = new DiagnosticSession();
+        BEANS.get(IHttpSessionCacheService.class).put(DIAGNOSTIC_SESSION_KEY, diagnosticSession, servletRequest, servletResponse);
       }
+      diagnosticSession.serviceRequest(servletRequest, servletResponse);
     }, DefaultExceptionTranslator.class);
   }
 }

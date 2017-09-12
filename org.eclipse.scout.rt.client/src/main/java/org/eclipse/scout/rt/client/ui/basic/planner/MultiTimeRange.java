@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -33,7 +34,7 @@ import org.slf4j.LoggerFactory;
 class MultiTimeRange {
   private static final Logger LOG = LoggerFactory.getLogger(MultiTimeRange.class);
 
-  private TreeMap<Date/* fromDate */, TimeRange> m_multipleTimeRangeMap = new TreeMap<Date, TimeRange>();
+  private TreeMap<Date/* fromDate */, TimeRange> m_multipleTimeRangeMap = new TreeMap<>();
 
   public MultiTimeRange() {
     super();
@@ -95,7 +96,7 @@ class MultiTimeRange {
   }
 
   public void setSingleTimerange(Date from, Date to) {
-    m_multipleTimeRangeMap = new TreeMap<Date, TimeRange>();
+    m_multipleTimeRangeMap = new TreeMap<>();
     internalPutNoOldEntry(from, to);
   }
 
@@ -136,7 +137,7 @@ class MultiTimeRange {
    */
   public Collection remove(Date from, Date to) {
     checkParams(from, to);
-    ArrayList<TimeRange> removedTimeRanges = new ArrayList<TimeRange>();
+    List<TimeRange> removedTimeRanges = new ArrayList<>();
     /* check overlapping */
     SortedMap<Date, TimeRange> headMap = m_multipleTimeRangeMap.headMap(to);
     boolean finished = false;

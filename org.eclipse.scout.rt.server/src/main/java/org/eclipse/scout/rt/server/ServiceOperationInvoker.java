@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.server;
 
 import java.lang.reflect.Method;
 import java.util.Date;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -20,6 +19,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.IThrowableWithContextInfo;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
@@ -57,18 +57,12 @@ public class ServiceOperationInvoker {
     final long t0 = System.nanoTime();
     ServiceTunnelResponse response;
     try {
-      response = runContext.call(new Callable<ServiceTunnelResponse>() {
-
-        @Override
-        public ServiceTunnelResponse call() throws Exception {
-          return invokeInternal(serviceReq);
-        }
-      }, DefaultExceptionTranslator.class);
+      response = runContext.call(() -> invokeInternal(serviceReq), DefaultExceptionTranslator.class);
     }
     catch (Exception e) {
       // Associate the exception with context information about the service call.
       if (e instanceof PlatformException) {
-        ((PlatformException) e)
+        ((IThrowableWithContextInfo) e)
             .withContextInfo("service.name", serviceReq.getServiceInterfaceClassName())
             .withContextInfo("service.operation", serviceReq.getOperation());
       }

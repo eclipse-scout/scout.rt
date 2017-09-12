@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.calendar;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -22,14 +21,14 @@ import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarTask;
 
 public class CalendarComponent implements Comparable<CalendarComponent> {
-  private ICalendar m_calendar;
-  private ICalendarItemProvider m_producer;
-  private ICalendarItem m_item;
+  private final ICalendar m_calendar;
+  private final ICalendarItemProvider m_producer;
+  private final ICalendarItem m_item;
   // cache
-  private Date m_fromDate;
-  private Date m_toDate;
-  private Date[] m_coveredDays;
-  private boolean m_fullDay;
+  private final Date m_fromDate;
+  private final Date m_toDate;
+  private final Date[] m_coveredDays;
+  private final boolean m_fullDay;
 
   protected CalendarComponent(ICalendar calendar, ICalendarItemProvider producer, ICalendarItem item) {
     m_calendar = calendar;
@@ -66,7 +65,6 @@ public class CalendarComponent implements Comparable<CalendarComponent> {
     }
     m_toDate = d;
     // cache covered days
-    ArrayList<Date> dayList = new ArrayList<Date>();
     Calendar a = Calendar.getInstance();
     a.setTime(m_fromDate);
     DateUtility.truncCalendar(a);
@@ -74,7 +72,6 @@ public class CalendarComponent implements Comparable<CalendarComponent> {
     b.setTime(m_toDate);
     DateUtility.truncCalendar(b);
     while (a.compareTo(b) <= 0) {
-      dayList.add(a.getTime());
       a.add(Calendar.DATE, 1);
     }
     m_coveredDays = DateUtility.getCoveredDays(m_fromDate, m_toDate);
@@ -150,7 +147,7 @@ public class CalendarComponent implements Comparable<CalendarComponent> {
         String label2 = o.getItem().getSubject();
         i = StringUtility.compareIgnoreCase(label1, label2);
         if (i == 0) {
-          i = Integer.valueOf(this.hashCode()).compareTo(o.hashCode());
+          i = Integer.compare(this.hashCode(), o.hashCode());
         }
       }
       return i;

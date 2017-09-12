@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.services.lookup;
 
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 
+@FunctionalInterface
 public interface ICodeLookupCallVisitor<KEY_TYPE> {
 
   /**

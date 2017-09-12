@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
  * <h3>{@link IFormFieldVisitor}</h3><br>
  * Visitor for {@link IFormField} trees.
  */
+@FunctionalInterface
 public interface IFormFieldVisitor {
   /**
    * Callback that is invoked for every {@link IFormField}.

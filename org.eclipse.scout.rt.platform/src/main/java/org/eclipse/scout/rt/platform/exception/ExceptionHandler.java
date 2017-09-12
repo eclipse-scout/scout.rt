@@ -63,8 +63,8 @@ public class ExceptionHandler {
   }
 
   /**
-   * Method invoked to handle a {@link FutureCancelledError}. Typically, such an exception is thrown when waiting on
-   * a cancelled job.
+   * Method invoked to handle a {@link FutureCancelledError}. Typically, such an exception is thrown when waiting on a
+   * cancelled job.
    * <p>
    * The default implementation logs it with debug level.
    */

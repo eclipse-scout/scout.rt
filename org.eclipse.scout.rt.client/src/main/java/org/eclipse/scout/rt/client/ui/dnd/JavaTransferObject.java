@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.dnd;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -23,7 +22,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  */
 
 public class JavaTransferObject extends TransferObject {
-  private Object m_localObject;
+  private final Object m_localObject;
 
   public JavaTransferObject(Object bean) {
     m_localObject = bean;
@@ -40,7 +39,7 @@ public class JavaTransferObject extends TransferObject {
 
   @SuppressWarnings("unchecked")
   public <T> List<T> getLocalObjectAsList(Class<T> type) {
-    List<T> result = new ArrayList<T>();
+    List<T> result = new ArrayList<>();
     Object localObject = getLocalObject();
     if (localObject != null) {
       if (type.isInstance(localObject)) {
@@ -49,9 +48,7 @@ public class JavaTransferObject extends TransferObject {
       else if (localObject instanceof Collection) {
         Collection c = (Collection) localObject;
         if (CollectionUtility.hasElements(c)) {
-          Iterator it = c.iterator();
-          while (it.hasNext()) {
-            Object o = it.next();
+          for (Object o : c) {
             if (type.isInstance(o)) {
               result.add((T) o);
             }

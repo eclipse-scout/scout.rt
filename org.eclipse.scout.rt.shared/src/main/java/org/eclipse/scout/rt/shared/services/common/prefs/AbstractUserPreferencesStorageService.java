@@ -42,7 +42,7 @@ public abstract class AbstractUserPreferencesStorageService implements IUserPref
         allUserPrefs = (Map<String, IPreferences>) userPrefs;
       }
       else {
-        allUserPrefs = new HashMap<String, IPreferences>();
+        allUserPrefs = new HashMap<>();
         session.setData(USER_PREF_KEY, allUserPrefs);
       }
 

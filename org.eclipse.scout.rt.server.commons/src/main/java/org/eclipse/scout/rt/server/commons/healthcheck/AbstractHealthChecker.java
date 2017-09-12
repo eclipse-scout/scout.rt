@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.server.commons.healthcheck;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -131,24 +130,21 @@ public abstract class AbstractHealthChecker implements IHealthChecker {
       if (m_future == null && isExpired()) {
         // time to refresh
         m_futureStart = System.currentTimeMillis();
-        m_future = Jobs.schedule(new Callable<Boolean>() {
-          @Override
-          public Boolean call() throws Exception {
-            LOG.debug("HealthCheck[{}] has started", getName());
-            try {
-              boolean result = execCheckHealth();
-              if (result) {
-                LOG.debug("HealthCheck[{}] was successful", getName());
-              }
-              else {
-                LOG.warn("HealthCheck[{}] failed.", getName());
-              }
-              return result;
+        m_future = Jobs.schedule(() -> {
+          LOG.debug("HealthCheck[{}] has started", getName());
+          try {
+            boolean result = execCheckHealth();
+            if (result) {
+              LOG.debug("HealthCheck[{}] was successful", getName());
             }
-            catch (InterruptedException e) {
-              LOG.debug("HealthCheck[{}] was interrupted", getName(), e);
-              return false;
+            else {
+              LOG.warn("HealthCheck[{}] failed.", getName());
             }
+            return result;
+          }
+          catch (InterruptedException e) {
+            LOG.debug("HealthCheck[{}] was interrupted", getName(), e);
+            return false;
           }
         }, Jobs.newInput()
             .withRunContext(context)

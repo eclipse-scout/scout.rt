@@ -7,6 +7,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 /**
  * @since 6.1
  */
+@FunctionalInterface
 @ApplicationScoped
 public interface IDataModelAttributeAggregationTypeProvider {
 

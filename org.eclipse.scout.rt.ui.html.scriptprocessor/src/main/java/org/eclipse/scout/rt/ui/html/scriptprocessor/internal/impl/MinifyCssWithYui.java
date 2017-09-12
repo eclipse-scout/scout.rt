@@ -21,7 +21,7 @@ public class MinifyCssWithYui {
   public String run(String content) throws IOException {
     try (
         StringReader reader = new StringReader(content);
-        StringWriter writer = new StringWriter();) {
+        StringWriter writer = new StringWriter()) {
       CssCompressor compressor = new CssCompressor(reader);
       compressor.compress(writer, -1);
       writer.flush();

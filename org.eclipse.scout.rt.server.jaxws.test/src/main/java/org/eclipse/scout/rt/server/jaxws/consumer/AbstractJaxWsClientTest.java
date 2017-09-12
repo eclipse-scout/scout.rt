@@ -45,7 +45,6 @@ import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -472,50 +471,44 @@ public abstract class AbstractJaxWsClientTest {
     final Holder<JaxWsConsumerTestServicePortType> txn2PortHolder = new Holder<>(JaxWsConsumerTestServicePortType.class);
 
     Jobs.schedule(
-        new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            JaxWsConsumerTestServicePortType port0 = BEANS
-                .get(JaxWsConsumerTestClient.class)
-                .newInvocationContext()
-                .getPort();
-            assertSendEcho(port0, 0);
-            txn1PortHolder.setValue(port0);
-            txn1InitLatch.countDown();
-            txn2InitLatch.await();
+        () -> {
+          JaxWsConsumerTestServicePortType port0 = BEANS
+              .get(JaxWsConsumerTestClient.class)
+              .newInvocationContext()
+              .getPort();
+          assertSendEcho(port0, 0);
+          txn1PortHolder.setValue(port0);
+          txn1InitLatch.countDown();
+          txn2InitLatch.await();
 
-            JaxWsConsumerTestServicePortType port1 = BEANS
-                .get(JaxWsConsumerTestClient.class)
-                .newInvocationContext()
-                .getPort();
+          JaxWsConsumerTestServicePortType port1 = BEANS
+              .get(JaxWsConsumerTestClient.class)
+              .newInvocationContext()
+              .getPort();
 
-            assertSamePort(port0, port1);
-            assertSendEcho(port1, 1);
-          }
+          assertSamePort(port0, port1);
+          assertSendEcho(port1, 1);
         }, Jobs.newInput().withRunContext(ServerRunContexts.empty()));
 
     txn1InitLatch.await();
 
     Jobs.schedule(
-        new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            JaxWsConsumerTestServicePortType port0 = BEANS
-                .get(JaxWsConsumerTestClient.class)
-                .newInvocationContext()
-                .getPort();
-            assertSendEcho(port0, 0);
-            txn2PortHolder.setValue(port0);
-            txn2InitLatch.countDown();
+        () -> {
+          JaxWsConsumerTestServicePortType port0 = BEANS
+              .get(JaxWsConsumerTestClient.class)
+              .newInvocationContext()
+              .getPort();
+          assertSendEcho(port0, 0);
+          txn2PortHolder.setValue(port0);
+          txn2InitLatch.countDown();
 
-            JaxWsConsumerTestServicePortType port1 = BEANS
-                .get(JaxWsConsumerTestClient.class)
-                .newInvocationContext()
-                .getPort();
+          JaxWsConsumerTestServicePortType port1 = BEANS
+              .get(JaxWsConsumerTestClient.class)
+              .newInvocationContext()
+              .getPort();
 
-            assertSamePort(port0, port1);
-            assertSendEcho(port1, 1);
-          }
+          assertSamePort(port0, port1);
+          assertSendEcho(port1, 1);
         }, Jobs.newInput().withRunContext(ServerRunContexts.empty()));
 
     txn2InitLatch.await();
@@ -535,29 +528,23 @@ public abstract class AbstractJaxWsClientTest {
     BEANS.get(JaxWsConsumerTestClient.class).discardAllPoolEntries();
 
     ServerRunContexts.copyCurrent().run(
-        new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            JaxWsConsumerTestServicePortType port = BEANS
-                .get(JaxWsConsumerTestClient.class)
-                .newInvocationContext()
-                .getPort();
-            assertSendEcho(port, 0);
-            txn1PortHolder.setValue(port);
-          }
+        () -> {
+          JaxWsConsumerTestServicePortType port = BEANS
+              .get(JaxWsConsumerTestClient.class)
+              .newInvocationContext()
+              .getPort();
+          assertSendEcho(port, 0);
+          txn1PortHolder.setValue(port);
         });
 
     ServerRunContexts.copyCurrent().run(
-        new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            JaxWsConsumerTestServicePortType port = BEANS
-                .get(JaxWsConsumerTestClient.class)
-                .newInvocationContext()
-                .getPort();
-            assertSendEcho(port, 0);
-            txn2PortHolder.setValue(port);
-          }
+        () -> {
+          JaxWsConsumerTestServicePortType port = BEANS
+              .get(JaxWsConsumerTestClient.class)
+              .newInvocationContext()
+              .getPort();
+          assertSendEcho(port, 0);
+          txn2PortHolder.setValue(port);
         });
 
     if (BEANS.get(JaxWsImplementorSpecifics.class).isPoolingSupported()) {
@@ -582,20 +569,17 @@ public abstract class AbstractJaxWsClientTest {
 
     final CountDownLatch requestRunningLatch = new CountDownLatch(1);
     final IFuture<Void> future = Jobs.schedule(
-        new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            JaxWsConsumerTestServicePortType port = BEANS
-                .get(JaxWsConsumerTestClient.class)
-                .newInvocationContext()
-                .getPort();
+        () -> {
+          JaxWsConsumerTestServicePortType port = BEANS
+              .get(JaxWsConsumerTestClient.class)
+              .newInvocationContext()
+              .getPort();
 
-            txn1PortHolder.setValue(port);
-            SleepRequest req = new SleepRequest();
-            req.setMillis(1000);
-            requestRunningLatch.countDown();
-            port.sleep(req);
-          }
+          txn1PortHolder.setValue(port);
+          SleepRequest req = new SleepRequest();
+          req.setMillis(1000);
+          requestRunningLatch.countDown();
+          port.sleep(req);
         }, Jobs
             .newInput()
             .withRunContext(ServerRunContexts.copyCurrent())
@@ -603,11 +587,8 @@ public abstract class AbstractJaxWsClientTest {
 
     requestRunningLatch.await();
     SleepUtil.sleepSafe(50, TimeUnit.MILLISECONDS);
-    Jobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        future.cancel(true);
-      }
+    Jobs.schedule(() -> {
+      future.cancel(true);
     }, Jobs
         .newInput()
         .withRunContext(ServerRunContexts.copyCurrent()));
@@ -621,16 +602,13 @@ public abstract class AbstractJaxWsClientTest {
     assertTrue(future.isCancelled());
 
     ServerRunContexts.copyCurrent().run(
-        new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            JaxWsConsumerTestServicePortType port = BEANS
-                .get(JaxWsConsumerTestClient.class)
-                .newInvocationContext()
-                .getPort();
-            assertSendEcho(port, 0);
-            txn2PortHolder.setValue(port);
-          }
+        () -> {
+          JaxWsConsumerTestServicePortType port = BEANS
+              .get(JaxWsConsumerTestClient.class)
+              .newInvocationContext()
+              .getPort();
+          assertSendEcho(port, 0);
+          txn2PortHolder.setValue(port);
         });
 
     assertDifferentPort(txn1PortHolder.getValue(), txn2PortHolder.getValue());

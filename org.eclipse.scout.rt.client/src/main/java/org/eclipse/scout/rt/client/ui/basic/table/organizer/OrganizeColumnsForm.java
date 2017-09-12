@@ -208,7 +208,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
           @Override
           protected void execReloadTableData() {
-            List<ITableRow> rowList = new ArrayList<ITableRow>();
+            List<ITableRow> rowList = new ArrayList<>();
             ClientUIPreferences prefs = ClientUIPreferences.getInstance();
 
             // create default config rows
@@ -308,13 +308,13 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
             @Override
             protected void execRowsSelected(List<? extends ITableRow> rows) {
-              getMenuByClass(DeleteMenu.class).setVisible(!isDefaultConfigSelected() && rows.size() > 0);
-              getMenuByClass(RenameMenu.class).setVisible(!isDefaultConfigSelected() && rows.size() > 0);
-              getMenuByClass(UpdateMenu.class).setVisible(!isDefaultConfigSelected() && rows.size() > 0);
+              getMenuByClass(DeleteMenu.class).setVisible(!isDefaultConfigSelected() && !rows.isEmpty());
+              getMenuByClass(RenameMenu.class).setVisible(!isDefaultConfigSelected() && !rows.isEmpty());
+              getMenuByClass(UpdateMenu.class).setVisible(!isDefaultConfigSelected() && !rows.isEmpty());
 
-              getMenuByClass(DeleteMenu.class).setEnabled(!isDefaultConfigSelected() && rows.size() > 0);
-              getMenuByClass(RenameMenu.class).setEnabled(!isDefaultConfigSelected() && rows.size() > 0);
-              getMenuByClass(UpdateMenu.class).setEnabled(!isDefaultConfigSelected() && rows.size() > 0);
+              getMenuByClass(DeleteMenu.class).setEnabled(!isDefaultConfigSelected() && !rows.isEmpty());
+              getMenuByClass(RenameMenu.class).setEnabled(!isDefaultConfigSelected() && !rows.isEmpty());
+              getMenuByClass(UpdateMenu.class).setEnabled(!isDefaultConfigSelected() && !rows.isEmpty());
             }
 
             @Order(10)
@@ -593,7 +593,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
         @Order(10)
         @ClassId("eefd05cf-b8b6-4c07-82c9-91aaafe9b8b6")
-        public class ColumnsTableField extends AbstractTableField<ColumnsTableField.Table> {
+        public class ColumnsTableField extends AbstractTableField<Table> {
 
           @Override
           protected int getConfiguredGridH() {
@@ -1515,7 +1515,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
       }
     }
     setEnabledAndVisible(columnsTable, AddColumnMenu.class, addEnabled);
-    setEnabledAndVisible(columnsTable, AddColumnEmptySpaceMenu.class, addEnabled && columnsTable.getSelectedRows().size() == 0);
+    setEnabledAndVisible(columnsTable, AddColumnEmptySpaceMenu.class, addEnabled && columnsTable.getSelectedRows().isEmpty());
     setEnabledAndVisible(columnsTable, ModifyCustomColumnMenu.class, modifyEnabled);
     setEnabledAndVisible(columnsTable, RemoveMenu.class, removeEnabled);
     setEnabledAndVisible(columnsTable, RemoveFilterMenu.class, removeFilterEnabled);
@@ -1646,7 +1646,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
   }
 
   protected List<ITableRow> createColumnsTableRows(Table columnsTable) {
-    List<ITableRow> rowList = new ArrayList<ITableRow>();
+    List<ITableRow> rowList = new ArrayList<>();
     for (IColumn<?> col : m_organizedTable.getColumnSet().getAllColumnsInUserOrder()) {
       if (acceptColumnForColumnsTable(col)) {
         IHeaderCell headerCell = col.getHeaderCell();
@@ -1695,7 +1695,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
   protected List<String> getVisibleColumnIds() {
     List<IColumn<?>> visibleColumns = m_organizedTable.getColumnSet().getVisibleColumns();
-    ArrayList<String> columnIds = new ArrayList<>(visibleColumns.size());
+    List<String> columnIds = new ArrayList<>(visibleColumns.size());
     for (IColumn<?> column : visibleColumns) {
       columnIds.add(column.getColumnId());
     }

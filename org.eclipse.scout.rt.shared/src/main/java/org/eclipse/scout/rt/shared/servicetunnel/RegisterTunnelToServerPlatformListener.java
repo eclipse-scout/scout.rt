@@ -15,7 +15,7 @@ import java.util.List;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
-import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -35,7 +35,7 @@ public class RegisterTunnelToServerPlatformListener implements IPlatformListener
 
   @Override
   public void stateChanged(PlatformEvent event) {
-    if (event.getState() == IPlatform.State.BeanManagerPrepared) {
+    if (event.getState() == State.BeanManagerPrepared) {
       if (!isEnabled()) {
         return;
       }

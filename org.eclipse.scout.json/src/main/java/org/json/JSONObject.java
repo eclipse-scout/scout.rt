@@ -25,8 +25,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+
+import org.json.JSONStringer.Scope;
 
 // Note: this class was written without inspecting the non-free org.json sourcecode.
 
@@ -122,7 +125,7 @@ public class JSONObject {
    * Creates a {@code JSONObject} with no name/value mappings.
    */
   public JSONObject() {
-    m_nameValuePairs = new LinkedHashMap<String, Object>();
+    m_nameValuePairs = new LinkedHashMap<>();
   }
 
   /**
@@ -138,7 +141,7 @@ public class JSONObject {
   public JSONObject(Map copyFrom) {
     this();
     Map<?, ?> contentsTyped = (Map<?, ?>) copyFrom;
-    for (Map.Entry<?, ?> entry : contentsTyped.entrySet()) {
+    for (Entry<?, ?> entry : contentsTyped.entrySet()) {
       /*
        * Deviate from the original by checking that keys are non-null and
        * of the proper type. (We still defer validating the values).
@@ -664,7 +667,7 @@ public class JSONObject {
   public JSONArray names() {
     return m_nameValuePairs.isEmpty()
         ? null
-        : new JSONArray(new ArrayList<String>(m_nameValuePairs.keySet()));
+        : new JSONArray(new ArrayList<>(m_nameValuePairs.keySet()));
   }
 
   /**
@@ -711,7 +714,7 @@ public class JSONObject {
 
   void writeTo(JSONStringer stringer) {
     stringer.object();
-    for (Map.Entry<String, Object> entry : m_nameValuePairs.entrySet()) {
+    for (Entry<String, Object> entry : m_nameValuePairs.entrySet()) {
       stringer.key(entry.getKey()).value(entry.getValue());
     }
     stringer.endObject();
@@ -756,9 +759,9 @@ public class JSONObject {
       return "\"\"";
     }
     JSONStringer stringer = new JSONStringer();
-    stringer.open(JSONStringer.Scope.NULL, "");
+    stringer.open(Scope.NULL, "");
     stringer.value(data);
-    stringer.close(JSONStringer.Scope.NULL, JSONStringer.Scope.NULL, "");
+    stringer.close(Scope.NULL, Scope.NULL, "");
     return stringer.toString();
   }
 

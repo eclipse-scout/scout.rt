@@ -16,10 +16,10 @@ import java.util.List;
 
 public class ArrayConsumer implements IDataConsumer {
 
-  private List<Object[]> m_rows;
+  private final List<Object[]> m_rows;
 
   public ArrayConsumer() {
-    m_rows = new ArrayList<Object[]>();
+    m_rows = new ArrayList<>();
   }
 
   @Override
@@ -29,8 +29,7 @@ public class ArrayConsumer implements IDataConsumer {
 
   public Object[][] getData() {
     int maxCol = 0;
-    for (int i = 0; i < m_rows.size(); i++) {
-      Object[] o = m_rows.get(i);
+    for (Object[] o : m_rows) {
       if (Array.getLength(o) > maxCol) {
         maxCol = Array.getLength(o);
       }

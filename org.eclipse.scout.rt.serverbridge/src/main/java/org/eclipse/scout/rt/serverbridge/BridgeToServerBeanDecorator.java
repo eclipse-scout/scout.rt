@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.serverbridge;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.client.clientnotification.ClientNotificationDispatcher;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -78,16 +77,13 @@ public class BridgeToServerBeanDecorator<T> implements IBeanDecorator<T> {
     if (currentSession != null) {
       bridgeSession = BEANS.get(ServerSessionProviderWithCache.class).provide(currentSession.getId(), bridgeRunContext);
     }
-    Object result = bridgeRunContext.withSession(bridgeSession).call(new Callable<Object>() {
-      @Override
-      public Object call() throws Exception {
-        try {
-          return continueCall(context);
-        }
-        catch (Exception e) {
-          ITransaction.CURRENT.get().addFailure(e);
-          throw e;
-        }
+    Object result = bridgeRunContext.withSession(bridgeSession).call(() -> {
+      try {
+        return continueCall(context);
+      }
+      catch (Exception e) {
+        ITransaction.CURRENT.get().addFailure(e);
+        throw e;
       }
     });
 

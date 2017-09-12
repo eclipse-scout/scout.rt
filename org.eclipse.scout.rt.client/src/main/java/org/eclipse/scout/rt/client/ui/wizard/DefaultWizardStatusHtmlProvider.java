@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ResourceBase;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -42,14 +43,14 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
 
     // collect attachments for HTML field
     List<BinaryResource> attachments = collectAttachments();
-    if (attachments != null && attachments.size() > 0) {
+    if (attachments != null && !attachments.isEmpty()) {
       htmlField.setAttachments(attachments);
     }
   }
 
   @Override
   public String initHtmlTemplate() {
-    try (InputStream in = org.eclipse.scout.rt.client.ResourceBase.class.getResource("html/defaultWizardStatus.html").openStream()) {
+    try (InputStream in = ResourceBase.class.getResource("html/defaultWizardStatus.html").openStream()) {
       return IOUtility.readString(in, "iso-8859-1");
     }
     catch (Exception t) {
@@ -127,7 +128,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
     buf.append(HTML
         .tr(
             td(
-                StringUtility.isNullOrEmpty(anchor) ? null : buf.append("<a name=\"" + anchor + "\"/>"),
+                StringUtility.isNullOrEmpty(anchor) ? null : buf.append("<a name=\"").append(anchor).append("\"/>"),
                 imgByBinaryResource("empty.png").addAttribute("width", "1").addAttribute("height", String.valueOf(height))).addAttribute("colspan", "5"))
         .cssClass(cssClass));
   }
@@ -136,7 +137,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
    * To be overwritten in order to provide custom attachments. <br/>
    */
   protected List<BinaryResource> collectAttachments() {
-    List<BinaryResource> attachments = new LinkedList<BinaryResource>();
+    List<BinaryResource> attachments = new LinkedList<>();
     return attachments;
   }
 

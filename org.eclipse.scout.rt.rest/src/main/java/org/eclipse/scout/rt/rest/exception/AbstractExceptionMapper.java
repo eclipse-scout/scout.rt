@@ -5,6 +5,7 @@
 package org.eclipse.scout.rt.rest.exception;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
@@ -29,9 +30,8 @@ public abstract class AbstractExceptionMapper<E extends Throwable> implements Ex
   }
 
   /**
-   * Map an exception to a {@link javax.ws.rs.core.Response}. Returning {@code null} results in a
-   * {@link javax.ws.rs.core.Response.Status#NO_CONTENT} response. Throwing a runtime exception results in a
-   * {@link javax.ws.rs.core.Response.Status#INTERNAL_SERVER_ERROR} response.
+   * Map an exception to a {@link Response}. Returning {@code null} results in a {@link Status#NO_CONTENT} response.
+   * Throwing a runtime exception results in a {@link Status#INTERNAL_SERVER_ERROR} response.
    *
    * @param exception
    *          the exception to map to a response.

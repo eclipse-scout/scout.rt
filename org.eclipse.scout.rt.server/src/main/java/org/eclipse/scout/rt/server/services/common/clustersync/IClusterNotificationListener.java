@@ -15,6 +15,7 @@ import java.util.EventListener;
 /**
  * Listener for reacting to cluster notifications
  */
+@FunctionalInterface
 public interface IClusterNotificationListener extends EventListener {
 
   /**

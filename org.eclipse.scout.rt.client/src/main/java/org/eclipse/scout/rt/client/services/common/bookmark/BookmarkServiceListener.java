@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.services.common.bookmark;
 
 import java.util.EventListener;
 
+@FunctionalInterface
 public interface BookmarkServiceListener extends EventListener {
 
   void bookmarksChanged(BookmarkServiceEvent e);

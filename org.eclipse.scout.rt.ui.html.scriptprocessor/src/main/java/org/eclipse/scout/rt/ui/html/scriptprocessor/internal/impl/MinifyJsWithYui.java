@@ -28,7 +28,7 @@ public class MinifyJsWithYui {
   public String run(String content, boolean munge) throws IOException {
     try (
         StringReader reader = new StringReader(content);
-        StringWriter writer = new StringWriter();) {
+        StringWriter writer = new StringWriter()) {
 
       // Yui uses a modified version of rhino files (org.mozilla.javascript). If you get any class incompatibility errors this may be the reason.
       ErrorReporter errorReporter = new ErrorReporter() {

@@ -81,13 +81,7 @@ public class CompositeObject implements Comparable<CompositeObject>, Serializabl
         return c;
       }
     }
-    if (me.length < other.length) {
-      return -1;
-    }
-    if (me.length > other.length) {
-      return 1;
-    }
-    return 0;
+    return Integer.compare(me.length, other.length);
   }
 
   @SuppressWarnings("unchecked")

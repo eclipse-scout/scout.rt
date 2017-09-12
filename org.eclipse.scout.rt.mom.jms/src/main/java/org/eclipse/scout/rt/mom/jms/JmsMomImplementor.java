@@ -21,7 +21,6 @@ import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
-import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
@@ -69,7 +68,6 @@ import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IFunction;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
@@ -274,21 +272,17 @@ public class JmsMomImplementor implements IMomImplementor {
     final IMarshaller marshaller = resolveMarshaller(destination);
 
     // Register transaction member for transacted publishing.
-    final JmsTransactionMember txMember = currentTransaction.registerMemberIfAbsent(m_momUid, new IFunction<String, JmsTransactionMember>() {
-
-      @Override
-      public JmsTransactionMember apply(final String memberId) {
-        try {
-          final Session transactedSession = m_connection.createSession(true, Session.SESSION_TRANSACTED);
-          return BEANS.get(JmsTransactionMember.class)
-              .withMemberId(memberId)
-              .withTransactedSession(transactedSession)
-              .withTransactedProducer(transactedSession.createProducer(null))
-              .withAutoClose(true); // close upon transaction end
-        }
-        catch (final JMSException e) {
-          throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
-        }
+    final JmsTransactionMember txMember = currentTransaction.registerMemberIfAbsent(m_momUid, memberId -> {
+      try {
+        final Session transactedSession = m_connection.createSession(true, Session.SESSION_TRANSACTED);
+        return BEANS.get(JmsTransactionMember.class)
+            .withMemberId(memberId)
+            .withTransactedSession(transactedSession)
+            .withTransactedProducer(transactedSession.createProducer(null))
+            .withAutoClose(true); // close upon transaction end
+      }
+      catch (final JMSException e) {
+        throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
       }
     });
 
@@ -418,12 +412,7 @@ public class JmsMomImplementor implements IMomImplementor {
   @Override
   public IRegistrationHandle registerMarshaller(final IDestination<?> destination, final IMarshaller marshaller) {
     m_marshallers.put(destination, marshaller);
-    return new IRegistrationHandle() {
-      @Override
-      public void dispose() {
-        m_marshallers.remove(destination);
-      }
-    };
+    return () -> m_marshallers.remove(destination);
   }
 
   /**
@@ -496,7 +485,7 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   @SuppressWarnings("squid:S1149")
-  protected Hashtable<?, ?> prepareContextEnvironment(final Map<Object, Object> properties) throws NamingException {
+  protected Hashtable<?, ?> prepareContextEnvironment(final Map<Object, Object> properties) {
     Hashtable<Object, Object> env = new Hashtable<>();
     if (properties != null) {
       for (Entry<Object, Object> entry : properties.entrySet()) {
@@ -520,12 +509,7 @@ public class JmsMomImplementor implements IMomImplementor {
     final ConnectionFactory connectionFactory = (ConnectionFactory) context.lookup(connectionFactoryName);
     final Connection connection = connectionFactory.createConnection();
     connection.setClientID(computeClientId(properties));
-    connection.setExceptionListener(new ExceptionListener() {
-      @Override
-      public void onException(final JMSException exception) {
-        BEANS.get(MomExceptionHandler.class).handle(exception);
-      }
-    });
+    connection.setExceptionListener(BEANS.get(MomExceptionHandler.class)::handle);
     return connection;
   }
 
@@ -548,7 +532,7 @@ public class JmsMomImplementor implements IMomImplementor {
    * Looks up a destination via JNDI.
    */
   protected Destination lookupJmsDestination(final IDestination<?> destination, final Session session) throws NamingException {
-    final Object object = Assertions.assertNotNull(m_context.lookup(destination.getName()));
+    final Object object = assertNotNull(m_context.lookup(destination.getName()));
     final Class<?> expectedType = (destination.getType() == DestinationType.QUEUE ? Queue.class : Topic.class);
     Assertions.assertInstance(object, expectedType, "The looked up destination is of type '{}', but expected type '{}' [{}]", object.getClass().getName(), expectedType.getName(), destination);
     return (Destination) object;

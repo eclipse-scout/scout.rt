@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.servicetunnel;
 
-import java.io.IOException;
 import java.security.Permission;
 import java.security.Permissions;
 import java.util.Date;
@@ -32,7 +31,7 @@ import org.eclipse.scout.rt.platform.util.date.UTCDate;
 public class ServiceTunnelObjectReplacer implements IObjectReplacer {
 
   @Override
-  public Object replaceObject(Object obj) throws IOException {
+  public Object replaceObject(Object obj) {
     if (obj instanceof Date && !(obj instanceof UTCDate)) {
       return new StaticDate((Date) obj);
     }
@@ -43,7 +42,7 @@ public class ServiceTunnelObjectReplacer implements IObjectReplacer {
   }
 
   @Override
-  public Object resolveObject(Object obj) throws IOException {
+  public Object resolveObject(Object obj) {
     if (obj instanceof StaticDate) {
       return ((StaticDate) obj).getDate();
     }

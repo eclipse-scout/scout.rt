@@ -10,15 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineViewButtonExtension;
 import org.eclipse.scout.rt.client.ui.action.view.AbstractViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktopExtension;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
-import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -68,36 +64,30 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
     setSelected(m_desktop.getOutline() == m_outline);
     // add selection listener
     m_desktop.addDesktopListener(
-        new DesktopListener() {
-          @Override
-          public void desktopChanged(DesktopEvent e) {
-            switch (e.getType()) {
-              case DesktopEvent.TYPE_OUTLINE_CHANGED: {
-                setSelected(e.getOutline() == m_outline);
-                break;
-              }
+        e -> {
+          switch (e.getType()) {
+            case DesktopEvent.TYPE_OUTLINE_CHANGED: {
+              setSelected(e.getOutline() == m_outline);
+              break;
             }
           }
         });
     // add change listener
     m_outline.addPropertyChangeListener(
-        new PropertyChangeListener() {
-          @Override
-          public void propertyChange(PropertyChangeEvent e) {
-            String n = e.getPropertyName();
-            Object v = e.getNewValue();
-            if (n.equals(IOutline.PROP_VISIBLE)) {
-              setVisible((Boolean) v);
-            }
-            else if (n.equals(IOutline.PROP_ENABLED)) {
-              setEnabled((Boolean) v);
-            }
-            else if (n.equals(IOutline.PROP_TITLE)) {
-              setText((String) v);
-            }
-            else if (n.equals(IOutline.PROP_ICON_ID)) {
-              setIconId((String) v);
-            }
+        e -> {
+          String n = e.getPropertyName();
+          Object v = e.getNewValue();
+          if (n.equals(IOutline.PROP_VISIBLE)) {
+            setVisible((Boolean) v);
+          }
+          else if (n.equals(IOutline.PROP_ENABLED)) {
+            setEnabled((Boolean) v);
+          }
+          else if (n.equals(IOutline.PROP_TITLE)) {
+            setText((String) v);
+          }
+          else if (n.equals(IOutline.PROP_ICON_ID)) {
+            setIconId((String) v);
           }
         });
   }
@@ -156,7 +146,7 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
 
   @Override
   protected IOutlineViewButtonExtension<? extends AbstractOutlineViewButton> createLocalExtension() {
-    return new LocalOutlineViewButtonExtension<AbstractOutlineViewButton>(this);
+    return new LocalOutlineViewButtonExtension<>(this);
   }
 
 }

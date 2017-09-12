@@ -25,11 +25,11 @@ public class TreeNodeData implements Serializable, Cloneable {
 
   private TreeNodeData m_parentNode;
   private List<TreeNodeData> m_childNodes;
-  private List<? extends Object> m_values;
+  private List<?> m_values;
   private List<String> m_texts;
 
   public TreeNodeData() {
-    m_childNodes = new ArrayList<TreeNodeData>(2);
+    m_childNodes = new ArrayList<>(2);
   }
 
   @Override
@@ -38,9 +38,9 @@ public class TreeNodeData implements Serializable, Cloneable {
     try {
       TreeNodeData copy = (TreeNodeData) super.clone();
       if (this.m_childNodes != null) {
-        copy.m_childNodes = new ArrayList<TreeNodeData>(this.m_childNodes.size());
+        copy.m_childNodes = new ArrayList<>(this.m_childNodes.size());
         for (TreeNodeData n : this.m_childNodes) {
-          copy.m_childNodes.add((TreeNodeData) n.clone());
+          copy.m_childNodes.add(n.clone());
         }
       }
       return copy;
@@ -75,7 +75,7 @@ public class TreeNodeData implements Serializable, Cloneable {
     return CollectionUtility.arrayList(m_values);
   }
 
-  public void setValues(List<? extends Object> a) {
+  public void setValues(List<?> a) {
     m_values = CollectionUtility.arrayList(a);
   }
 

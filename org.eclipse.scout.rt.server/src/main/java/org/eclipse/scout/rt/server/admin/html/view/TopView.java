@@ -18,11 +18,11 @@ import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
 @SuppressWarnings("bsiRulesDefinition:htmlInString")
 public class TopView extends DefaultView {
 
-  private MessagesView m_messagesView;
-  private GeneralView m_generalView;
-  private ServicesView m_servicesView;
-  private SessionsView m_sessionsView;
-  private CallsView m_callsView;
+  private final MessagesView m_messagesView;
+  private final GeneralView m_generalView;
+  private final ServicesView m_servicesView;
+  private final SessionsView m_sessionsView;
+  private final CallsView m_callsView;
 
   private IView m_activeView;
 

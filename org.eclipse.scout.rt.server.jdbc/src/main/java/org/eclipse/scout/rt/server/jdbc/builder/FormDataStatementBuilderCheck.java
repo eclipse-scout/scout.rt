@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.jdbc.builder;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
@@ -21,21 +22,22 @@ import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModel;
 import org.eclipse.scout.rt.shared.data.model.AttributePath;
 import org.eclipse.scout.rt.shared.data.model.EntityPath;
+import org.eclipse.scout.rt.shared.data.model.IDataModel;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
 public class FormDataStatementBuilderCheck {
   @SuppressWarnings("squid:S00116")
   protected final FormDataStatementBuilder builder;
-  private TreeSet<String> m_imports;
-  private ArrayList<String> m_body;
-  private HashSet<Class<?>> m_visited;
+  private final TreeSet<String> m_imports;
+  private final ArrayList<String> m_body;
+  private final Set<Class<?>> m_visited;
 
   public FormDataStatementBuilderCheck(FormDataStatementBuilder builder) {
     this.builder = builder;
-    m_imports = new TreeSet<String>();
-    m_body = new ArrayList<String>();
-    m_visited = new HashSet<Class<?>>();
+    m_imports = new TreeSet<>();
+    m_body = new ArrayList<>();
+    m_visited = new HashSet<>();
   }
 
   /**
@@ -55,14 +57,14 @@ public class FormDataStatementBuilderCheck {
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    if (m_imports.size() > 0) {
+    if (!m_imports.isEmpty()) {
       for (String s : m_imports) {
         buf.append(s);
         buf.append("\n");
       }
       buf.append("\n");
     }
-    if (m_body.size() > 0) {
+    if (!m_body.isEmpty()) {
       for (String s : m_body) {
         buf.append(s);
         buf.append("\n");
@@ -79,7 +81,7 @@ public class FormDataStatementBuilderCheck {
     m_body.clear();
     m_visited.clear();
     checkRec(EntityPath.EMPTY, o);
-    return m_body.size() == 0;
+    return m_body.isEmpty();
   }
 
   protected void checkRec(EntityPath parentPath, Object o) {
@@ -103,10 +105,10 @@ public class FormDataStatementBuilderCheck {
       }
     }
     else if (o instanceof AbstractDataModel) {
-      for (Object a : ((AbstractDataModel) o).getAttributes()) {
+      for (Object a : ((IDataModel) o).getAttributes()) {
         checkRec(parentPath, a);
       }
-      for (Object e : ((AbstractDataModel) o).getEntities()) {
+      for (Object e : ((IDataModel) o).getEntities()) {
         checkRec(parentPath, e);
       }
     }

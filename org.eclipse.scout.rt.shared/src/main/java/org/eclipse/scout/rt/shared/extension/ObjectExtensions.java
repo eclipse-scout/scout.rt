@@ -71,28 +71,25 @@ public class ObjectExtensions<OWNER, EXTENSION extends IExtension<? extends OWNE
       return;
     }
 
-    Runnable initConfigRunnable = new Runnable() {
-      @Override
-      public void run() {
+    Runnable initConfigRunnable = () -> {
+      try {
+        extensionRegistry.pushScope(m_owner.getClass());
+        m_extensions = loadExtensions(localExtension);
         try {
-          extensionRegistry.pushScope(m_owner.getClass());
-          m_extensions = loadExtensions(localExtension);
-          try {
-            extensionRegistry.pushExtensions(m_extensions);
-            if (backupExtensionContext) {
-              m_extensionContext = extensionRegistry.backupExtensionContext();
-            }
-            if (modelObjectInitializer != null) {
-              modelObjectInitializer.run();
-            }
+          extensionRegistry.pushExtensions(m_extensions);
+          if (backupExtensionContext) {
+            m_extensionContext = extensionRegistry.backupExtensionContext();
           }
-          finally {
-            extensionRegistry.popExtensions(m_extensions);
+          if (modelObjectInitializer != null) {
+            modelObjectInitializer.run();
           }
         }
         finally {
-          extensionRegistry.popScope();
+          extensionRegistry.popExtensions(m_extensions);
         }
+      }
+      finally {
+        extensionRegistry.popScope();
       }
     };
 

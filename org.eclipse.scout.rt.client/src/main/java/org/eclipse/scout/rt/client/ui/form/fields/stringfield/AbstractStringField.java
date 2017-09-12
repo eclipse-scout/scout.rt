@@ -50,7 +50,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
 
   @Override
   protected IStringFieldExtension<? extends AbstractStringField> createLocalExtension() {
-    return new LocalStringFieldExtension<AbstractStringField>(this);
+    return new LocalStringFieldExtension<>(this);
   }
 
   /*
@@ -431,7 +431,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   // convert string to a real string
   @Override
   protected String parseValueInternal(String text) {
-    if (text != null && text.length() == 0) {
+    if (text != null && text.isEmpty()) {
       text = null;
     }
     String fmt = getFormat();
@@ -559,7 +559,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalStringFieldExtension<OWNER_FIELD extends AbstractStringField> extends AbstractBasicField.LocalBasicFieldExtension<String, OWNER_FIELD>
+  protected static class LocalStringFieldExtension<OWNER_FIELD extends AbstractStringField> extends LocalBasicFieldExtension<String, OWNER_FIELD>
       implements IStringFieldExtension<OWNER_FIELD> {
 
     public LocalStringFieldExtension(OWNER_FIELD owner) {

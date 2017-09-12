@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.basic.table;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +22,7 @@ import org.eclipse.scout.rt.shared.extension.AbstractContributionComposite;
  *
  * @since 3.8.2
  */
-public abstract class AbstractTableRowData extends AbstractContributionComposite implements ITableBeanRowHolder, Serializable {
+public abstract class AbstractTableRowData extends AbstractContributionComposite implements ITableBeanRowHolder {
   private static final long serialVersionUID = 1L;
 
   private int m_rowState;
@@ -99,7 +98,7 @@ public abstract class AbstractTableRowData extends AbstractContributionComposite
     }
 
     if (m_customValues == null) {
-      m_customValues = new HashMap<String, Object>();
+      m_customValues = new HashMap<>();
     }
     m_customValues.put(id, value);
   }

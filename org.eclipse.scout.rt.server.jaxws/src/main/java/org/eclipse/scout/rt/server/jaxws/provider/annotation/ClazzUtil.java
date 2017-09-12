@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.server.jaxws.provider.annotation;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.server.jaxws.provider.annotation.Clazz.NullClazz;
 
 /**
  * Provides utility methods to resolve classes.
@@ -38,16 +39,16 @@ public final class ClazzUtil {
     final Class<?> clazz = annotation.value();
     final String qualifiedName = annotation.qualifiedName();
 
-    if (qualifiedName.isEmpty() && Clazz.NullClazz.class.equals(clazz)) {
+    if (qualifiedName.isEmpty() && NullClazz.class.equals(clazz)) {
       throw new PlatformException("No class specified for {}: missing 'value' or 'qualified name' attribute", source);
     }
 
     try {
       if (!qualifiedName.isEmpty()) {
-        return ClazzUtil.assertClass(expectedType, Class.forName(qualifiedName), source);
+        return assertClass(expectedType, Class.forName(qualifiedName), source);
       }
       else {
-        return ClazzUtil.assertClass(expectedType, clazz, source);
+        return assertClass(expectedType, clazz, source);
       }
     }
     catch (final ReflectiveOperationException e) {

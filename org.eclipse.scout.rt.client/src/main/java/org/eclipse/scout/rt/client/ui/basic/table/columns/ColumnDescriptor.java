@@ -10,9 +10,9 @@ public class ColumnDescriptor implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private String m_propertyName;
-  private int m_width;
-  private String m_text;
+  private final String m_propertyName;
+  private final int m_width;
+  private final String m_text;
 
   public ColumnDescriptor(String propertyName, String text, int width) {
     m_propertyName = propertyName;

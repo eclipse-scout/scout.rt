@@ -56,5 +56,5 @@ public enum JobState {
    * Indicates that a job finished execution, either normally or because it was cancelled. Use
    * {@link IFuture#isCancelled()} to check for cancellation.
    */
-  DONE;
+  DONE
 }

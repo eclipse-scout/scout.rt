@@ -23,10 +23,6 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 @ClassId("75cd4723-b739-4f65-a3ba-1793ac2cbf6f")
 public abstract class AbstractSearchForm extends AbstractForm implements ISearchForm {
 
-  public AbstractSearchForm() {
-    super();
-  }
-
   @Override
   public void initForm() {
     // form
@@ -58,6 +54,6 @@ public abstract class AbstractSearchForm extends AbstractForm implements ISearch
 
   @Override
   protected ISearchFormExtension<? extends AbstractSearchForm> createLocalExtension() {
-    return new LocalSearchFormExtension<AbstractSearchForm>(this);
+    return new LocalSearchFormExtension<>(this);
   }
 }

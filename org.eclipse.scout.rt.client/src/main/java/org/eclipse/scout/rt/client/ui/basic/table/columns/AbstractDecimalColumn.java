@@ -159,7 +159,7 @@ public abstract class AbstractDecimalColumn<NUMBER extends Number> extends Abstr
 
   @Override
   public void setPercent(boolean b) {
-    DecimalFormat percentDF = (DecimalFormat) BEANS.get(NumberFormatProvider.class).getPercentInstance(NlsLocale.get());
+    DecimalFormat percentDF = BEANS.get(NumberFormatProvider.class).getPercentInstance(NlsLocale.get());
     DecimalFormat format = getFormat();
     if (b) {
       format.setPositiveSuffix(percentDF.getPositiveSuffix());
@@ -233,6 +233,6 @@ public abstract class AbstractDecimalColumn<NUMBER extends Number> extends Abstr
 
   @Override
   protected IDecimalColumnExtension<NUMBER, ? extends AbstractDecimalColumn<NUMBER>> createLocalExtension() {
-    return new LocalDecimalColumnExtension<NUMBER, AbstractDecimalColumn<NUMBER>>(this);
+    return new LocalDecimalColumnExtension<>(this);
   }
 }

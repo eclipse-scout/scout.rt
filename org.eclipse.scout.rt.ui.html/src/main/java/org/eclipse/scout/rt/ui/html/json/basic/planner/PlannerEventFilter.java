@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.ui.html.json.AbstractEventFilter;
 
 public class PlannerEventFilter extends AbstractEventFilter<PlannerEvent, PlannerEventFilterCondition> {
 
-  private JsonPlanner<? extends IPlanner> m_jsonPlanner;
+  private final JsonPlanner<? extends IPlanner> m_jsonPlanner;
 
   public PlannerEventFilter(JsonPlanner<? extends IPlanner> jsonPlanner) {
     m_jsonPlanner = jsonPlanner;
@@ -33,11 +33,11 @@ public class PlannerEventFilter extends AbstractEventFilter<PlannerEvent, Planne
         if (condition.checkResources()) {
           List<Resource> resources = new ArrayList<>(event.getResources());
           resources.removeAll(condition.getResources());
-          if (resources.size() == 0) {
+          if (resources.isEmpty()) {
             // Ignore event if no resources remain or if the event contained no resources at all
             return null;
           }
-          PlannerEvent newEvent = new PlannerEvent((IPlanner) m_jsonPlanner.getModel(), event.getType(), resources);
+          PlannerEvent newEvent = new PlannerEvent(m_jsonPlanner.getModel(), event.getType(), resources);
           return newEvent;
         }
 

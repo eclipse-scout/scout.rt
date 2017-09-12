@@ -56,7 +56,7 @@ public class ClipboardForm extends AbstractForm {
   public void setMimeTypes(MimeType... mimeTypes) {
     m_mimeTypes = mimeTypes;
 
-    List<String> allowedMimeTypesListAsString = new ArrayList<String>();
+    List<String> allowedMimeTypesListAsString = new ArrayList<>();
     if (mimeTypes != null) {
       for (MimeType mimeType : mimeTypes) {
         allowedMimeTypesListAsString.add(mimeType.getType());

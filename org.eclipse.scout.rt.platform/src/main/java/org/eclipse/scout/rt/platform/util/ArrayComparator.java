@@ -58,13 +58,7 @@ public class ArrayComparator implements Comparator<Object[]> {
         return c;
       }
     }
-    if (a.length < b.length) {
-      return -1;
-    }
-    if (a.length > b.length) {
-      return 1;
-    }
-    return 0;
+    return Integer.compare(a.length, b.length);
   }
 
   /**
@@ -72,8 +66,8 @@ public class ArrayComparator implements Comparator<Object[]> {
    * {@link #getColumnIndex()} and {@link #getComparator()}.
    */
   public static class ColumnComparator {
-    private int m_columnIndex;
-    private Comparator<Object> m_comparator;
+    private final int m_columnIndex;
+    private final Comparator<Object> m_comparator;
 
     public ColumnComparator(int columnIndex, Comparator<Object> comparator) {
       m_columnIndex = columnIndex;
@@ -107,7 +101,7 @@ public class ArrayComparator implements Comparator<Object[]> {
   @SuppressWarnings("squid:S2063")
   public static class DefaultObjectComparator implements Comparator<Object> {
 
-    private Locale m_locale;
+    private final Locale m_locale;
 
     public DefaultObjectComparator(Locale locale) {
       m_locale = locale;

@@ -7,6 +7,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 /**
  * Notification handler that is capable of dispaching based on the {@link IClientNotificationAddress}.
  */
+@FunctionalInterface
 @ApplicationScoped
 public interface IDispatchingNotificationHandler<T extends Serializable> {
 

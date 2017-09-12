@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  * @see LookupCall
  */
 @ClassId("6a7d238a-11ab-478b-a3fb-7a99494b711d")
-@SuppressWarnings({"squid:S2057"})
+@SuppressWarnings("squid:S2057")
 public class LocalLookupCall<T> extends LookupCall<T> {
   private static final long serialVersionUID = 0L;
 
@@ -87,7 +87,7 @@ public class LocalLookupCall<T> extends LookupCall<T> {
     if (rows == null) {
       return CollectionUtility.emptyArrayList();
     }
-    ArrayList<ILookupRow<T>> list = new ArrayList<ILookupRow<T>>(rows.size());
+    List<ILookupRow<T>> list = new ArrayList<>(rows.size());
     for (ILookupRow<T> row : rows) {
       if (key.equals(row.getKey())) {
         list.add(row);
@@ -101,7 +101,7 @@ public class LocalLookupCall<T> extends LookupCall<T> {
    */
   @Override
   public List<? extends ILookupRow<T>> getDataByText() {
-    List<ILookupRow<T>> list = new ArrayList<ILookupRow<T>>();
+    List<ILookupRow<T>> list = new ArrayList<>();
     Pattern p = createSearchPattern(getText());
     List<? extends ILookupRow<T>> lookupRows = execCreateLookupRows();
     for (ILookupRow<T> row : lookupRows) {
@@ -111,7 +111,7 @@ public class LocalLookupCall<T> extends LookupCall<T> {
     }
     if (isHierarchicalLookup()) {
       Map<T, Set<ILookupRow<T>>> nodeMap = createNodeMap(lookupRows);
-      List<ILookupRow<T>> children = new ArrayList<ILookupRow<T>>();
+      List<ILookupRow<T>> children = new ArrayList<>();
       for (ILookupRow<T> res : list) {
         collectChildrenRec(nodeMap, res.getKey(), children);
       }
@@ -126,11 +126,7 @@ public class LocalLookupCall<T> extends LookupCall<T> {
   protected Map<T, Set<ILookupRow<T>>> createNodeMap(List<? extends ILookupRow<T>> lookupRows) {
     Map<T, Set<ILookupRow<T>>> nodeMap = new HashMap<>();
     for (ILookupRow<T> row : lookupRows) {
-      Set<ILookupRow<T>> node = nodeMap.get(row.getParentKey());
-      if (node == null) {
-        node = new HashSet<>();
-        nodeMap.put(row.getParentKey(), node);
-      }
+      Set<ILookupRow<T>> node = nodeMap.computeIfAbsent(row.getParentKey(), k -> new HashSet<>());
       node.add(row);
     }
     return nodeMap;
@@ -177,7 +173,7 @@ public class LocalLookupCall<T> extends LookupCall<T> {
    */
   @Override
   public List<? extends ILookupRow<T>> getDataByAll() {
-    List<ILookupRow<T>> list = new ArrayList<ILookupRow<T>>();
+    List<ILookupRow<T>> list = new ArrayList<>();
     Pattern p = createSearchPattern(getAll());
     for (ILookupRow<T> row : execCreateLookupRows()) {
       if (row.getText() != null && p.matcher(row.getText().toLowerCase()).matches()) {
@@ -192,7 +188,7 @@ public class LocalLookupCall<T> extends LookupCall<T> {
    */
   @Override
   public List<? extends ILookupRow<T>> getDataByRec() {
-    List<ILookupRow<T>> list = new ArrayList<ILookupRow<T>>();
+    List<ILookupRow<T>> list = new ArrayList<>();
     Object parentKey = getRec();
     if (parentKey == null) {
       for (ILookupRow<T> row : execCreateLookupRows()) {

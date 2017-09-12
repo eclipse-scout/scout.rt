@@ -16,13 +16,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class EventListenerSnapshot implements IEventListenerSnapshot {
-  private HashMap<String/* listenerType,context */, List<Object/* listeners */>> m_map;
+  private final Map<String/* listenerType,context */, List<Object/* listeners */>> m_map;
 
   public EventListenerSnapshot() {
-    m_map = new HashMap<String, List<Object>>();
+    m_map = new HashMap<>();
   }
 
   @Override
@@ -34,21 +36,17 @@ public class EventListenerSnapshot implements IEventListenerSnapshot {
     if (context != null) {
       key += "#" + context;
     }
-    List<Object> list = m_map.get(key);
-    if (list == null) {
-      list = new ArrayList<Object>();
-      m_map.put(key, list);
-    }
+    List<Object> list = m_map.computeIfAbsent(key, k -> new ArrayList<>());
     list.add(listener);
   }
 
   public void dump(PrintWriter out) {
     out.println("DUMP AT " + new Date());
-    for (Map.Entry<String, List<Object>> e : m_map.entrySet()) {
+    for (Entry<String, List<Object>> e : m_map.entrySet()) {
       String key = e.getKey();
       List<Object> list = e.getValue();
       out.println("TYPE " + key + " " + list.size());
-      TreeMap<String, Integer> types = new TreeMap<String, Integer>();
+      SortedMap<String, Integer> types = new TreeMap<>();
       for (Object listener : list) {
         String c = listener.getClass().getName();
         Integer i = types.get(c);
@@ -57,7 +55,7 @@ public class EventListenerSnapshot implements IEventListenerSnapshot {
         }
         types.put(c, i + 1);
       }
-      for (Map.Entry<String, Integer> entry : types.entrySet()) {
+      for (Entry<String, Integer> entry : types.entrySet()) {
         out.println("  " + entry.getKey() + ": " + entry.getValue());
       }
     }

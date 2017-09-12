@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.client.services.common.perf.internal;
 import java.util.Arrays;
 
 public class PerformanceSampleSet {
-  private Object m_samplesLock = new Object();
-  private long[] m_samples;
+  private final Object m_samplesLock = new Object();
+  private final long[] m_samples;
   private int m_samplesLastIndex;
   private long m_samplesSum;
 

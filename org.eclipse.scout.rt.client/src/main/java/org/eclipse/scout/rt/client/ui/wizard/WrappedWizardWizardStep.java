@@ -36,19 +36,16 @@ public class WrappedWizardWizardStep extends AbstractWizardStep<IForm> {
 
   @Override
   protected void execActivate(int stepKind) {
-    m_childWizard.addWizardListener(new WizardListener() {
-      @Override
-      public void wizardChanged(WizardEvent e) {
-        switch (e.getType()) {
-          case WizardEvent.TYPE_CLOSED: {
-            try {
-              m_parentWizard.doNextStep();
-            }
-            catch (RuntimeException | PlatformError t) {
-              BEANS.get(ExceptionHandler.class).handle(t);
-            }
-            break;
+    m_childWizard.addWizardListener(e -> {
+      switch (e.getType()) {
+        case WizardEvent.TYPE_CLOSED: {
+          try {
+            m_parentWizard.doNextStep();
           }
+          catch (RuntimeException | PlatformError t) {
+            BEANS.get(ExceptionHandler.class).handle(t);
+          }
+          break;
         }
       }
     });

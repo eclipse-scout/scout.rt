@@ -32,12 +32,12 @@ public class JsonCompositeField<COMPOSITE_FIELD extends ICompositeField, F exten
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    attachAdapters(getModelFields(), new DisplayableFormFieldFilter<F>());
+    attachAdapters(getModelFields(), new DisplayableFormFieldFilter<>());
   }
 
   @Override
   public JSONObject toJson() {
-    return putAdapterIdsProperty(super.toJson(), getModelFieldsPropertyName(), getModelFields(), new DisplayableFormFieldFilter<F>());
+    return putAdapterIdsProperty(super.toJson(), getModelFieldsPropertyName(), getModelFields(), new DisplayableFormFieldFilter<>());
   }
 
   @SuppressWarnings("unchecked")

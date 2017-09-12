@@ -55,12 +55,12 @@ public class DataModelAggregationLookupCall extends LocalLookupCall<Integer> {
   }
 
   protected void updateLookupRows() {
-    List<ILookupRow<Integer>> result = new ArrayList<ILookupRow<Integer>>();
+    List<ILookupRow<Integer>> result = new ArrayList<>();
     int[] ags = null;
     if (m_attribute != null) {
       if (m_attribute.getType() != DataModelConstants.TYPE_AGGREGATE_COUNT) {
         //add default entry
-        result.add(new LookupRow<Integer>(DataModelConstants.AGGREGATION_NONE, m_attribute.getText()));
+        result.add(new LookupRow<>(DataModelConstants.AGGREGATION_NONE, m_attribute.getText()));
       }
       //add valid entries
       ags = m_attribute.getAggregationTypes();
@@ -98,7 +98,7 @@ public class DataModelAggregationLookupCall extends LocalLookupCall<Integer> {
               break;
             }
           }
-          result.add(new LookupRow<Integer>(ag, text));
+          result.add(new LookupRow<>(ag, text));
         }
       }
     }

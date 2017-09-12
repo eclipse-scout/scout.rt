@@ -17,6 +17,10 @@
 bin
 classes
 
+# IDEA #
+*.iml
+/.idea
+
 # Maven #
 target/
 .surefire-*

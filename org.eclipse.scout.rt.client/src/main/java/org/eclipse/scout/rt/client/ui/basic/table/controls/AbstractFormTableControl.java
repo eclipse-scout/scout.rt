@@ -17,7 +17,6 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.controls.FormTableCo
 import org.eclipse.scout.rt.client.extension.ui.basic.table.controls.IFormTableControlExtension;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
-import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -114,13 +113,10 @@ public abstract class AbstractFormTableControl extends AbstractTableControl impl
     }
     IForm form = createForm();
     if (form != null) {
-      form.addFormListener(new FormListener() {
-        @Override
-        public void formChanged(FormEvent e) {
-          if (e.getType() == FormEvent.TYPE_CLOSED) {
-            setSelected(false);
-            setForm(null);
-          }
+      form.addFormListener(e -> {
+        if (e.getType() == FormEvent.TYPE_CLOSED) {
+          setSelected(false);
+          setForm(null);
         }
       });
       setForm(form);
@@ -142,7 +138,7 @@ public abstract class AbstractFormTableControl extends AbstractTableControl impl
 
   @Override
   protected IActionExtension<? extends AbstractAction> createLocalExtension() {
-    return new LocalTableControlExtension<AbstractFormTableControl>(this);
+    return new LocalTableControlExtension<>(this);
   }
 
   protected final void interceptInitForm() {

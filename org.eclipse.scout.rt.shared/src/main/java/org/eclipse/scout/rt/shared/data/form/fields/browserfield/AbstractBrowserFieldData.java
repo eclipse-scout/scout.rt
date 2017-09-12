@@ -10,13 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.form.fields.browserfield;
 
-import java.io.Serializable;
 import java.util.Set;
 
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 
-public abstract class AbstractBrowserFieldData extends AbstractFormFieldData implements Serializable {
+public abstract class AbstractBrowserFieldData extends AbstractFormFieldData {
   private static final long serialVersionUID = 1L;
 
   private String m_location;

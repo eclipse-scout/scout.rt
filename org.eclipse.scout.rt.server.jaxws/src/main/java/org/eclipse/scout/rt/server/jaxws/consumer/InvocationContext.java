@@ -38,7 +38,6 @@ import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -190,10 +189,10 @@ public class InvocationContext<PORT> {
    */
   public InvocationContext<PORT> withUsername(final String username) {
     if (username != null) {
-      getRequestContext().put(InvocationContext.PROP_USERNAME, username);
+      getRequestContext().put(PROP_USERNAME, username);
     }
     else {
-      getRequestContext().remove(InvocationContext.PROP_USERNAME);
+      getRequestContext().remove(PROP_USERNAME);
     }
     return this;
   }
@@ -205,10 +204,10 @@ public class InvocationContext<PORT> {
    */
   public InvocationContext<PORT> withPassword(final String password) {
     if (password != null) {
-      getRequestContext().put(InvocationContext.PROP_PASSWORD, password);
+      getRequestContext().put(PROP_PASSWORD, password);
     }
     else {
-      getRequestContext().remove(InvocationContext.PROP_PASSWORD);
+      getRequestContext().remove(PROP_PASSWORD);
     }
     return this;
   }
@@ -371,24 +370,20 @@ public class InvocationContext<PORT> {
       final RunMonitor runMonitor = runContext.getRunMonitor();
 
       // Invoke the web method in a separate, blocking job to allow cancellation.
-      final IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          try {
-            if (m_invocationHandler == null) {
-              wsResult.setValue(method.invoke(port, args)); // default: no custom InvocationHandler installed.
-            }
-            else {
-              wsResult.setValue(m_invocationHandler.invoke(port, method, args)); // Custom InvocationHandler installed.
-            }
+      final IFuture<Void> future = Jobs.schedule(() -> {
+        try {
+          if (m_invocationHandler == null) {
+            wsResult.setValue(method.invoke(port, args)); // default: no custom InvocationHandler installed.
           }
-          catch (final InvocationTargetException e) { // NOSONAR
-            wsError.setValue(e.getCause());
+          else {
+            wsResult.setValue(m_invocationHandler.invoke(port, method, args)); // Custom InvocationHandler installed.
           }
-          catch (final Throwable t) {
-            wsError.setValue(t);
-          }
+        }
+        catch (final InvocationTargetException e) { // NOSONAR
+          wsError.setValue(e.getCause());
+        }
+        catch (final Throwable t) {
+          wsError.setValue(t);
         }
       }, Jobs.newInput()
           .withRunContext(runContext)

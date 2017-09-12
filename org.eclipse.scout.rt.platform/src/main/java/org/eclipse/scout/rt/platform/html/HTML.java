@@ -330,15 +330,15 @@ public final class HTML {
     if (matcher.find()) {
       // font icon
       if (matcher.group(2) == null) {
-        return HTML.span(matcher.group(1)).cssClass("font-icon"); // icon from Scout font
+        return span(matcher.group(1)).cssClass("font-icon"); // icon from Scout font
       }
       else {
-        return HTML.span(matcher.group(2)).cssClass("font-" + matcher.group(1)); // icon from custom font
+        return span(matcher.group(2)).cssClass("font-" + matcher.group(1)); // icon from custom font
       }
     }
     else {
       // image icon
-      return HTML.imgByIconId(icon);
+      return imgByIconId(icon);
     }
   }
 

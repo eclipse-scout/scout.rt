@@ -21,7 +21,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.ServletException;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,7 +39,6 @@ import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.security.MalwareScanner;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -65,7 +63,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
   private final JsonRequestHelper m_jsonRequestHelper = BEANS.get(JsonRequestHelper.class);
 
   @Override
-  public boolean handlePost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+  public boolean handlePost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
     //serve only /upload
     String pathInfo = req.getPathInfo();
     Matcher matcher = PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH.matcher(pathInfo);
@@ -103,12 +101,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
       RunContexts.copyCurrent()
           .withThreadLocal(IUiSession.CURRENT, uiSession)
           .withDiagnostics(BEANS.all(IUiRunContextDiagnostics.class))
-          .run(new IRunnable() {
-            @Override
-            public void run() throws Exception {
-              handleUploadFileRequest(IUiSession.CURRENT.get(), req, resp, targetAdapterId);
-            }
-          }, DefaultExceptionTranslator.class);
+          .run(() -> handleUploadFileRequest(IUiSession.CURRENT.get(), req, resp, targetAdapterId), DefaultExceptionTranslator.class);
     }
     catch (Exception e) {
       LOG.error("Unexpected error while handling multipart upload request", e);
@@ -135,7 +128,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
       httpServletResponse.setContentType("text/plain");
     }
     // Read uploaded data
-    Map<String, String> uploadProperties = new HashMap<String, String>();
+    Map<String, String> uploadProperties = new HashMap<>();
     List<BinaryResource> uploadResources = new ArrayList<>();
     try {
       readUploadData(httpServletRequest, binaryResourceConsumer.getMaximumBinaryResourceUploadSize(), uploadProperties, uploadResources);

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,12 +18,12 @@ import java.util.Collections;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -201,20 +200,20 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   public AbstractTable(boolean callInitializer) {
     m_enabled = NamedBitMaskHelper.ALL_BITS_SET; // default enabled
-    m_selectedRows = new ArrayList<ITableRow>();
-    m_checkedRows = new LinkedHashSet<ITableRow>();
-    m_rowDecorationBuffer = new HashSet<ITableRow>();
+    m_selectedRows = new ArrayList<>();
+    m_checkedRows = new LinkedHashSet<>();
+    m_rowDecorationBuffer = new HashSet<>();
     m_rowValueChangeBuffer = new HashMap<>();
     m_listenerList = new EventListenerList();
     m_cachedRowsLock = new Object();
     m_cachedFilteredRowsLock = new Object();
     m_rows = Collections.synchronizedList(new ArrayList<ITableRow>(1));
-    m_deletedRows = new HashMap<CompositeObject, ITableRow>();
+    m_deletedRows = new HashMap<>();
     m_keyStrokeBuffer = new KeyStrokeBuffer(500L);
-    m_rowFilters = new ArrayList<ITableRowFilter>(1);
+    m_rowFilters = new ArrayList<>(1);
     m_attachments = new HashMap<>(0);
     m_initLock = new OptimisticLock();
-    m_objectExtensions = new ObjectExtensions<AbstractTable, ITableExtension<? extends AbstractTable>>(this, false);
+    m_objectExtensions = new ObjectExtensions<>(this, false);
     //add single observer listener
     addTableListener(new P_TableListener());
     if (callInitializer) {
@@ -228,7 +227,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   protected ITableExtension<? extends AbstractTable> createLocalExtension() {
-    return new LocalTableExtension<AbstractTable>(this);
+    return new LocalTableExtension<>(this);
   }
 
   @Override
@@ -848,12 +847,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), new Runnable() {
-      @Override
-      public void run() {
-        initConfig();
-      }
-    });
+    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), this::initConfig);
   }
 
   protected void initConfig() {
@@ -895,7 +889,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     initMenus();
     // key strokes
     List<Class<? extends IKeyStroke>> ksClasses = getConfiguredKeyStrokes();
-    List<IKeyStroke> ksList = new ArrayList<IKeyStroke>(ksClasses.size());
+    List<IKeyStroke> ksList = new ArrayList<>(ksClasses.size());
     for (Class<? extends IKeyStroke> clazz : ksClasses) {
       IKeyStroke ks = ConfigurationUtility.newInnerInstance(this, clazz);
       ks.initAction();
@@ -997,7 +991,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   protected void initMenus() {
     List<Class<? extends IMenu>> ma = getDeclaredMenus();
-    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
+    OrderedCollection<IMenu> menus = new OrderedCollection<>();
     Map<Class<?>, Class<? extends IMenu>> replacements = ConfigurationUtility.getReplacementMapping(ma);
     if (!replacements.isEmpty()) {
       m_menuReplacementMapping = replacements;
@@ -1016,7 +1010,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       menu.setContainerInternal(this);
     }
 
-    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
+    new MoveActionNodesHandler<>(menus).moveModelObjects();
     ITableContextMenu contextMenu = new TableContextMenu(this, menus.getOrderedList());
     setContextMenu(contextMenu);
   }
@@ -1048,7 +1042,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   private void createTableControlsInternal() {
     List<Class<? extends ITableControl>> tcs = getConfiguredTableControls();
-    OrderedCollection<ITableControl> tableControls = new OrderedCollection<ITableControl>();
+    OrderedCollection<ITableControl> tableControls = new OrderedCollection<>();
     for (Class<? extends ITableControl> clazz : tcs) {
       ITableControl tableControl = ConfigurationUtility.newInnerInstance(this, clazz);
       ((AbstractTableControl) tableControl).setTable(this);
@@ -1059,7 +1053,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   private void createColumnsInternal() {
     List<Class<? extends IColumn>> ca = getConfiguredColumns();
-    OrderedCollection<IColumn<?>> columns = new OrderedCollection<IColumn<?>>();
+    OrderedCollection<IColumn<?>> columns = new OrderedCollection<>();
 
     // configured columns
     for (Class<? extends IColumn> clazz : ca) {
@@ -1085,15 +1079,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       setCheckableColumn(checkableColumn);
     }
 
-    PropertyChangeListener columnVisibleListener = new PropertyChangeListener() {
-
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        // disable ui sort possible property if needed
-        checkIfColumnPreventsUiSortForTable();
-        // prevent invisible context column (because the UI does not know of invisible columns)
-        checkIfContextColumnIsVisible();
-      }
+    PropertyChangeListener columnVisibleListener = evt -> {
+      // disable ui sort possible property if needed
+      checkIfColumnPreventsUiSortForTable();
+      // prevent invisible context column (because the UI does not know of invisible columns)
+      checkIfContextColumnIsVisible();
     };
     for (IColumn column : m_columnSet.getColumns()) {
       column.addPropertyChangeListener(IColumn.PROP_VISIBLE, columnVisibleListener);
@@ -1294,10 +1284,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   private void applyRowFiltersInternal(InternalTableRow row) {
-    List<ITableRowFilter> rejectingFilters = new ArrayList<ITableRowFilter>();
+    List<ITableRowFilter> rejectingFilters = new ArrayList<>();
     row.setFilterAcceptedInternal(true);
     row.setRejectedByUser(false);
-    if (m_rowFilters.size() > 0) {
+    if (!m_rowFilters.isEmpty()) {
       for (ITableRowFilter filter : m_rowFilters) {
         if (!filter.accept(row)) {
           row.setFilterAcceptedInternal(false);
@@ -1369,7 +1359,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public List<String> getColumnNames() {
-    List<String> columnNames = new ArrayList<String>(getColumnCount());
+    List<String> columnNames = new ArrayList<>(getColumnCount());
     for (IColumn col : getColumns()) {
       columnNames.add(col.getHeaderCell().getText());
     }
@@ -1419,10 +1409,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public ICell getSummaryCell(ITableRow row) {
     List<IColumn<?>> a = getColumnSet().getSummaryColumns();
-    if (a.size() == 0) {
+    if (a.isEmpty()) {
       IColumn<?> col = getColumnSet().getFirstDefinedVisibileColumn();
       if (col != null) {
-        a = CollectionUtility.<IColumn<?>> arrayList(col);
+        a = CollectionUtility.arrayList(col);
       }
     }
     if (a.isEmpty()) {
@@ -1737,10 +1727,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   public void importFromTableRowBeanData(List<? extends AbstractTableRowData> rowDatas, Class<? extends AbstractTableRowData> rowType) {
     discardAllDeletedRows();
     int deleteCount = 0;
-    List<ITableRow> newRows = new ArrayList<ITableRow>(rowDatas.size());
+    List<ITableRow> newRows = new ArrayList<>(rowDatas.size());
     ITableRowDataMapper mapper = createTableRowDataMapper(rowType);
-    for (int i = 0, ni = rowDatas.size(); i < ni; i++) {
-      AbstractTableRowData rowData = rowDatas.get(i);
+    for (AbstractTableRowData rowData : rowDatas) {
       if (rowData.getRowState() != AbstractTableRowData.STATUS_DELETED && mapper.acceptImport(rowData)) {
         ITableRow newTableRow = new TableRow(getColumnSet());
         mapper.importTableRowData(newTableRow, rowData);
@@ -1755,8 +1744,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       try {
         setTableChanging(true);
         //
-        for (int i = 0, ni = rowDatas.size(); i < ni; i++) {
-          AbstractTableRowData rowData = rowDatas.get(i);
+        for (AbstractTableRowData rowData : rowDatas) {
           if (rowData.getRowState() == AbstractTableRowData.STATUS_DELETED && mapper.acceptImport(rowData)) {
             ITableRow newTableRow = new TableRow(getColumnSet());
             mapper.importTableRowData(newTableRow, rowData);
@@ -1807,15 +1795,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   public boolean runMenu(Class<? extends IMenu> menuType) {
     Class<? extends IMenu> c = getReplacingMenuClass(menuType);
     for (IMenu m : getMenus()) {
-      if (m.getClass() == c) {
-        if ((!m.isInheritAccessibility()) || isEnabled()) {
-          if (m.isVisible() && m.isEnabled()) {
-            m.doAction();
-            return true;
-          }
-          else {
-            return false;
-          }
+      if (m.getClass() == c && ((!m.isInheritAccessibility()) || isEnabled())) {
+        if (m.isVisible() && m.isEnabled()) {
+          m.doAction();
+          return true;
+        }
+        else {
+          return false;
         }
       }
     }
@@ -1958,7 +1944,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   private List<CompositeObject> getSelectedKeys() {
-    ArrayList<CompositeObject> selectedKeys = new ArrayList<CompositeObject>();
+    List<CompositeObject> selectedKeys = new ArrayList<>();
     for (ITableRow r : getSelectedRows()) {
       selectedKeys.add(new CompositeObject(getRowKeys(r)));
     }
@@ -1966,12 +1952,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   private void restoreSelection(List<CompositeObject> selectedKeys) {
-    ArrayList<ITableRow> selectedRows = new ArrayList<ITableRow>();
-    if (selectedKeys.size() > 0) {
+    List<ITableRow> selectedRows = new ArrayList<>();
+    if (!selectedKeys.isEmpty()) {
       for (ITableRow r : m_rows) {
         if (selectedKeys.remove(new CompositeObject(getRowKeys(r)))) {
           selectedRows.add(r);
-          if (selectedKeys.size() == 0) {
+          if (selectedKeys.isEmpty()) {
             break;
           }
         }
@@ -1991,9 +1977,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       int[] newToOld = new int[newRows.size()];
       Arrays.fill(oldToNew, -1);
       Arrays.fill(newToOld, -1);
-      HashMap<CompositeObject, Integer> newRowIndexMap = new HashMap<CompositeObject, Integer>();
+      Map<CompositeObject, Integer> newRowIndexMap = new HashMap<>();
       for (int i = newRows.size() - 1; i >= 0; i--) {
-        newRowIndexMap.put(new CompositeObject(getRowKeys(newRows.get(i))), Integer.valueOf(i));
+        newRowIndexMap.put(new CompositeObject(getRowKeys(newRows.get(i))), i);
       }
       int mappedCount = 0;
       for (int i = 0, ni = getRowCount(); i < ni; i++) {
@@ -2005,7 +1991,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           mappedCount++;
         }
       }
-      List<ITableRow> updatedRows = new ArrayList<ITableRow>(mappedCount);
+      List<ITableRow> updatedRows = new ArrayList<>(mappedCount);
       for (int i = 0; i < oldToNew.length; i++) {
         if (oldToNew[i] >= 0) {
           ITableRow existingRow = getRow(i);
@@ -2016,13 +2002,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         }
       }
 
-      List<ITableRow> deletedRows = new ArrayList<ITableRow>(getRowCount() - mappedCount);
+      List<ITableRow> deletedRows = new ArrayList<>(getRowCount() - mappedCount);
       for (int i = 0; i < oldToNew.length; i++) {
         if (oldToNew[i] < 0) {
           deletedRows.add(m_rows.get(i));
         }
       }
-      List<ITableRow> insertedRows = new ArrayList<ITableRow>(newRows.size() - mappedCount);
+      List<ITableRow> insertedRows = new ArrayList<>(newRows.size() - mappedCount);
       int[] insertedRowIndexes = new int[newRows.size() - mappedCount];
       int index = 0;
       for (int i = 0; i < newToOld.length; i++) {
@@ -2110,7 +2096,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     try {
       setTableChanging(true);
       //
-      List<ITableRow> resolvedRowList = new ArrayList<ITableRow>(rows.size());
+      List<ITableRow> resolvedRowList = new ArrayList<>(rows.size());
       for (ITableRow row : rows) {
         ITableRow resolvedRow = resolveRow(row);
         if (resolvedRow != null) {
@@ -2118,7 +2104,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           updateRowImpl(resolvedRow);
         }
       }
-      if (resolvedRowList.size() > 0) {
+      if (!resolvedRowList.isEmpty()) {
         fireRowsUpdated(resolvedRowList);
       }
       if (getColumnSet().getSortColumnCount() > 0) {
@@ -2234,7 +2220,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public void selectRows(List<? extends ITableRow> rows, boolean append) {
     rows = resolveRows(rows);
-    TreeSet<ITableRow> newSelection = new TreeSet<ITableRow>(new RowIndexComparator());
+    TreeSet<ITableRow> newSelection = new TreeSet<>(new RowIndexComparator());
     if (append) {
       newSelection.addAll(m_selectedRows);
       newSelection.addAll(rows);
@@ -2249,7 +2235,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       newSelection.add(first);
     }
     if (!CollectionUtility.equalsCollection(m_selectedRows, newSelection, true)) {
-      m_selectedRows = new ArrayList<ITableRow>(newSelection);
+      m_selectedRows = new ArrayList<>(newSelection);
       // notify menus
       List<ITableRow> notificationCopy = CollectionUtility.arrayList(m_selectedRows);
 
@@ -2300,10 +2286,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   public void deselectRows(List<? extends ITableRow> rows) {
     rows = resolveRows(rows);
     if (CollectionUtility.hasElements(rows)) {
-      TreeSet<ITableRow> newSelection = new TreeSet<ITableRow>(new RowIndexComparator());
+      TreeSet<ITableRow> newSelection = new TreeSet<>(new RowIndexComparator());
       newSelection.addAll(m_selectedRows);
       if (newSelection.removeAll(rows)) {
-        m_selectedRows = new ArrayList<ITableRow>(newSelection);
+        m_selectedRows = new ArrayList<>(newSelection);
         fireRowsSelected(m_selectedRows);
       }
     }
@@ -2321,7 +2307,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public void selectAllEnabledRows() {
-    List<ITableRow> newList = new ArrayList<ITableRow>();
+    List<ITableRow> newList = new ArrayList<>();
     for (int i = 0, ni = getRowCount(); i < ni; i++) {
       ITableRow row = getRow(i);
       if (row.isEnabled()) {
@@ -2337,7 +2323,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public void deselectAllEnabledRows() {
     List<ITableRow> selectedRows = getSelectedRows();
-    ArrayList<ITableRow> newList = new ArrayList<ITableRow>();
+    List<ITableRow> newList = new ArrayList<>();
     for (ITableRow selectedRow : selectedRows) {
       if (selectedRow.isEnabled()) {
         newList.add(selectedRow);
@@ -2390,14 +2376,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         }
       }
       else {
-        List<ITableRow> rowsUpdated = new ArrayList<ITableRow>();
+        List<ITableRow> rowsUpdated = new ArrayList<>();
         for (ITableRow row : rows) {
           if (row.isChecked() != value && (!enabledRowsOnly || row.isEnabled())) {
             checkRowImpl(row, value);
             rowsUpdated.add(row);
           }
         }
-        if (rowsUpdated.size() > 0) {
+        if (!rowsUpdated.isEmpty()) {
           if (value) {
             // sort checked rows if new checked rows have been added (not necessary if checked rows have been removed)
             sortCheckedRows();
@@ -2487,7 +2473,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public String getDefaultIconId() {
     String iconId = propertySupport.getPropertyString(PROP_DEFAULT_ICON);
-    if (iconId != null && iconId.length() == 0) {
+    if (iconId != null && iconId.isEmpty()) {
       iconId = null;
     }
     return iconId;
@@ -2582,13 +2568,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public List<ITableRow> getFilteredRows() {
     List<ITableRow> rows = getRows();
-    if (m_rowFilters.size() > 0) {
+    if (!m_rowFilters.isEmpty()) {
       //lazy create list in getter, make sure to be thread-safe since getters may be called from "wild" threads
       synchronized (m_cachedFilteredRowsLock) {
         if (m_cachedFilteredRows == null) {
           //this code must be thread-safe
-          if (m_rowFilters.size() > 0) {
-            List<ITableRow> filteredRows = new ArrayList<ITableRow>(getRowCount());
+          if (!m_rowFilters.isEmpty()) {
+            List<ITableRow> filteredRows = new ArrayList<>(getRowCount());
             for (ITableRow row : rows) {
               if (row != null && row.isFilterAccepted()) {
                 filteredRows.add(row);
@@ -2610,7 +2596,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public int getFilteredRowCount() {
-    if (m_rowFilters.size() > 0) {
+    if (!m_rowFilters.isEmpty()) {
       return getFilteredRows().size();
     }
     else {
@@ -2620,7 +2606,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public ITableRow getFilteredRow(int index) {
-    if (m_rowFilters.size() > 0) {
+    if (!m_rowFilters.isEmpty()) {
       ITableRow row = null;
       List<ITableRow> filteredRows = getFilteredRows();
       if (index >= 0 && index < filteredRows.size()) {
@@ -2640,7 +2626,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public List<ITableRow> getNotDeletedRows() {
-    List<ITableRow> notDeletedRows = new ArrayList<ITableRow>();
+    List<ITableRow> notDeletedRows = new ArrayList<>();
     for (ITableRow row : getRows()) {
       if (row.getStatus() != ITableRow.STATUS_DELETED) {
         notDeletedRows.add(row);
@@ -2675,7 +2661,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     if (rowIndexes == null) {
       return CollectionUtility.emptyArrayList();
     }
-    List<ITableRow> result = new ArrayList<ITableRow>(rowIndexes.length);
+    List<ITableRow> result = new ArrayList<>(rowIndexes.length);
     for (int rowIndex : rowIndexes) {
       ITableRow row = getRow(rowIndex);
       if (row != null) {
@@ -2707,7 +2693,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public List<ITableRow> getInsertedRows() {
-    List<ITableRow> rowList = new ArrayList<ITableRow>();
+    List<ITableRow> rowList = new ArrayList<>();
     for (ITableRow row : getRows()) {
       if (row.getStatus() == ITableRow.STATUS_INSERTED) {
         rowList.add(row);
@@ -2729,7 +2715,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public List<ITableRow> getUpdatedRows() {
-    List<ITableRow> rowList = new ArrayList<ITableRow>();
+    List<ITableRow> rowList = new ArrayList<>();
     for (ITableRow row : getRows()) {
       if (row.getStatus() == ITableRow.STATUS_UPDATED) {
         rowList.add(row);
@@ -2845,7 +2831,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       setTableChanging(false);
     }
 
-    return new ArrayList<ITableRow>(newIRows);
+    return new ArrayList<>(newIRows);
   }
 
   private ITableRow[] createSortArray(List<InternalTableRow> newIRows, int[] insertIndexes, int oldRowCount) {
@@ -2922,7 +2908,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       m_rows.add(newIRow);
     }
 
-    Set<Integer> indexes = new HashSet<Integer>();
+    Set<Integer> indexes = new HashSet<>();
     for (int idx : getColumnSet().getAllColumnIndexes()) {
       indexes.add(idx);
     }
@@ -3021,9 +3007,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public void deleteRows(int[] rowIndexes) {
-    List<ITableRow> rowList = new ArrayList<ITableRow>();
-    for (int i = 0; i < rowIndexes.length; i++) {
-      ITableRow row = getRow(rowIndexes[i]);
+    List<ITableRow> rowList = new ArrayList<>();
+    for (int rowIndexe : rowIndexes) {
+      ITableRow row = getRow(rowIndexe);
       if (row != null) {
         rowList.add(row);
       }
@@ -3062,7 +3048,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           min = Math.min(min, row.getRowIndex());
           max = Math.max(max, row.getRowIndex());
         }
-        List<ITableRow> deletedRows = new ArrayList<ITableRow>(rows);
+        List<ITableRow> deletedRows = new ArrayList<>(rows);
         // remove from selection
         deselectRows(deletedRows);
         uncheckRows(deletedRows);
@@ -3100,7 +3086,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           }
         }
         // get affected rows
-        List<ITableRow> selectionRows = new ArrayList<ITableRow>(getSelectedRows());
+        List<ITableRow> selectionRows = new ArrayList<>(getSelectedRows());
         int minAffectedIndex = Math.max(min - 1, 0);
         ITableRow[] affectedRows = new ITableRow[getRowCount() - minAffectedIndex];
         for (int i = minAffectedIndex; i < getRowCount(); i++) {
@@ -3149,7 +3135,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public void discardRows(int[] rowIndexes) {
-    List<ITableRow> rowList = new ArrayList<ITableRow>();
+    List<ITableRow> rowList = new ArrayList<>();
     for (int rIndex : rowIndexes) {
       ITableRow row = getRow(rIndex);
       if (row != null) {
@@ -3191,8 +3177,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public void discardAllDeletedRows() {
-    for (Iterator<ITableRow> it = m_deletedRows.values().iterator(); it.hasNext();) {
-      ((InternalTableRow) it.next()).setTableInternal(null);
+    for (ITableRow iTableRow : m_deletedRows.values()) {
+      ((InternalTableRow) iTableRow).setTableInternal(null);
     }
     m_deletedRows.clear();
   }
@@ -3245,10 +3231,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
 
     List<IColumn<?>> keyColumns = getColumnSet().getKeyColumns();
-    if (keyColumns.size() == 0) {
+    if (keyColumns.isEmpty()) {
       keyColumns = getColumnSet().getColumns();
     }
-    if (keyColumns.size() == 0) {
+    if (keyColumns.isEmpty()) {
       return null; // no columns in the table: cannot search by keys
     }
 
@@ -3369,8 +3355,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
           // first make sure decorations and lookups are up-to-date
           processDecorationBuffer();
-          List<ITableRow> a = new ArrayList<ITableRow>(getRows());
-          Collections.sort(a, new TableRowComparator(new ArrayList<>(sortCols)));
+          List<ITableRow> a = new ArrayList<>(getRows());
+          a.sort(new TableRowComparator(new ArrayList<>(sortCols)));
           sortInternal(a);
         }
       }
@@ -3388,10 +3374,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
     else {
       // check which rows could not be mapped
-      ArrayList<ITableRow> list = new ArrayList<ITableRow>();
-      list.addAll(m_rows);
+      List<ITableRow> list = new ArrayList<>(m_rows);
       list.removeAll(resolvedRows);
-      ArrayList<ITableRow> sortedList = new ArrayList<ITableRow>();
+      List<ITableRow> sortedList = new ArrayList<>();
       sortedList.addAll(resolvedRows);
       sortedList.addAll(list);
       sortInternal(sortedList);
@@ -3410,20 +3395,20 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       m_rows.addAll(resolvedRows);
     }
     //sort selection and checked rows without firing an event
-    if (m_selectedRows != null && m_selectedRows.size() > 0) {
-      TreeSet<ITableRow> newSelection = new TreeSet<ITableRow>(new RowIndexComparator());
+    if (m_selectedRows != null && !m_selectedRows.isEmpty()) {
+      TreeSet<ITableRow> newSelection = new TreeSet<>(new RowIndexComparator());
       newSelection.addAll(m_selectedRows);
-      m_selectedRows = new ArrayList<ITableRow>(newSelection);
+      m_selectedRows = new ArrayList<>(newSelection);
     }
     sortCheckedRows();
     fireRowOrderChanged();
   }
 
   private void sortCheckedRows() {
-    if (m_checkedRows == null || m_checkedRows.size() == 0) {
+    if (m_checkedRows == null || m_checkedRows.isEmpty()) {
       return;
     }
-    TreeSet<ITableRow> newCheckedRows = new TreeSet<ITableRow>(new RowIndexComparator());
+    TreeSet<ITableRow> newCheckedRows = new TreeSet<>(new RowIndexComparator());
     newCheckedRows.addAll(m_checkedRows);
     m_checkedRows = new LinkedHashSet<>(newCheckedRows);
   }
@@ -3435,20 +3420,17 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     try {
       setTableChanging(true);
       // save displayable state
-      HashMap<String, Boolean> displayableState = new HashMap<String, Boolean>();
+      HashMap<String, Boolean> displayableState = new HashMap<>();
       for (IColumn<?> col : getColumns()) {
         displayableState.put(col.getColumnId(), col.isDisplayable());
       }
       // reset columns
       disposeColumnsInternal();
-      m_objectExtensions.runInExtensionContext(new Runnable() {
-        @Override
-        public void run() {
-          // enforce recreation of the contributed columns so column indexes etc. will be reset
-          m_contributionHolder.resetContributionsByClass(AbstractTable.this, IColumn.class);
-          // runs within extension context, so that extensions and contributions can be created
-          createColumnsInternal();
-        }
+      m_objectExtensions.runInExtensionContext(() -> {
+        // enforce recreation of the contributed columns so column indexes etc. will be reset
+        m_contributionHolder.resetContributionsByClass(AbstractTable.this, IColumn.class);
+        // runs within extension context, so that extensions and contributions can be created
+        createColumnsInternal();
       });
       initColumnsInternal();
       // re-apply displayable
@@ -3542,7 +3524,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       setSortValid(false);
     }
     if (options.contains(IResetColumnsOption.ORDER)) {
-      TreeMap<CompositeObject, IColumn<?>> orderMap = new TreeMap<CompositeObject, IColumn<?>>();
+      SortedMap<CompositeObject, IColumn<?>> orderMap = new TreeMap<>();
       int index = 0;
       for (IColumn<?> col : getColumns()) {
         if (col.isDisplayable()) {
@@ -3554,10 +3536,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
 
     if (options.contains(IResetColumnsOption.VISIBILITY)) {
-      ArrayList<IColumn<?>> list = new ArrayList<IColumn<?>>();
+      List<IColumn<?>> list = new ArrayList<>();
       for (IColumn<?> col : getColumnSet().getAllColumnsInUserOrder()) {
         if (col.isDisplayable()) {
-          boolean configuredVisible = ((AbstractColumn<?>) col).isInitialVisible();
+          boolean configuredVisible = ((IColumn<?>) col).isInitialVisible();
           if (configuredVisible) {
             list.add(col);
           }
@@ -3605,12 +3587,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     applyRowValueChanges(changes);
 
     Set<ITableRow> set = m_rowDecorationBuffer;
-    m_rowDecorationBuffer = new HashSet<ITableRow>();
+    m_rowDecorationBuffer = new HashSet<>();
     applyRowDecorations(set);
     /*
      * check row filters
      */
-    if (m_rowFilters.size() > 0) {
+    if (!m_rowFilters.isEmpty()) {
       boolean filterChanged = false;
       for (ITableRow row : set) {
         if (row.getTable() == AbstractTable.this && row instanceof InternalTableRow) {
@@ -3721,7 +3703,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     for (Integer colIndex : valueChangedColumns) {
       Set<ITableRow> rows = m_rowValueChangeBuffer.get(colIndex);
       if (rows == null) {
-        rows = new HashSet<ITableRow>();
+        rows = new HashSet<>();
       }
       rows.add(row);
       m_rowValueChangeBuffer.put(colIndex, rows);
@@ -3760,7 +3742,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     if (rows == null) {
       rows = CollectionUtility.emptyArrayList();
     }
-    List<ITableRow> resolvedRows = new ArrayList<ITableRow>(rows.size());
+    List<ITableRow> resolvedRows = new ArrayList<>(rows.size());
     for (ITableRow row : rows) {
       if (resolveRow(row) == row) {
         resolvedRows.add(row);
@@ -4093,11 +4075,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       IColumn<?> col = getContextColumn();
       if (col == null) {
         List<IColumn<?>> sortCols = getColumnSet().getSortColumns();
-        if (sortCols.size() > 0) {
+        if (!sortCols.isEmpty()) {
           col = CollectionUtility.lastElement(sortCols);
         }
         else {
-          TreeMap<CompositeObject, IColumn<?>> sortMap = new TreeMap<CompositeObject, IColumn<?>>();
+          SortedMap<CompositeObject, IColumn<?>> sortMap = new TreeMap<>();
           int index = 0;
           for (IColumn<?> c : getColumnSet().getVisibleColumns()) {
             if (c.getDataType() == String.class) {
@@ -4111,7 +4093,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             }
             index++;
           }
-          if (sortMap.size() > 0) {
+          if (!sortMap.isEmpty()) {
             col = sortMap.get(sortMap.firstKey());
           }
         }
@@ -4177,7 +4159,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   private void addTableControlInternal(ITableControl control) {
     ((AbstractTableControl) control).setTable(this);
-    Collections.sort(m_tableControls, new OrderedComparator());
+    m_tableControls.sort(new OrderedComparator());
     propertySupport.firePropertyChange(PROP_TABLE_CONTROLS, null, getTableControls());
   }
 
@@ -4443,8 +4425,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       try {
         pushUIProcessor();
         //
-        Set<ITableRow> requestedRows = new HashSet<ITableRow>(resolveRows(rows));
-        List<ITableRow> validRows = new ArrayList<ITableRow>();
+        Set<ITableRow> requestedRows = new HashSet<>(resolveRows(rows));
+        List<ITableRow> validRows = new ArrayList<>();
         // add existing selected rows that are masked by filter
         for (ITableRow row : getSelectedRows()) {
           if (!row.isFilterAccepted()) {
@@ -4454,9 +4436,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         // remove all filtered from requested
         requestedRows.removeAll(validRows);
         // add remainder
-        for (ITableRow row : requestedRows) {
-          validRows.add(row);
-        }
+        validRows.addAll(requestedRows);
         selectRows(validRows, false);
       }
       finally {

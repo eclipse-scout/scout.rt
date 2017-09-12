@@ -15,6 +15,7 @@ package org.eclipse.scout.rt.client.ui.basic.table;
  *
  * @since 5.1
  */
+@FunctionalInterface
 public interface IReloadHandler {
 
   void reload();

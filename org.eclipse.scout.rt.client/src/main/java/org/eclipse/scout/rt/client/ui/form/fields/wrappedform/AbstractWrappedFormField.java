@@ -252,7 +252,7 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
     if (innerForm != null) {
       IGroupBox rootGroupBox = innerForm.getRootGroupBox();
       if (rootGroupBox != null) {
-        innerFormRootGroupBox = Collections.<IFormField> singletonList(rootGroupBox);
+        innerFormRootGroupBox = Collections.singletonList(rootGroupBox);
       }
     }
     IFormField thisField = null;

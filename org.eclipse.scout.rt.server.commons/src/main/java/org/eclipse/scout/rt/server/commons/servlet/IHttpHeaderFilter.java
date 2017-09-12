@@ -3,6 +3,7 @@ package org.eclipse.scout.rt.server.commons.servlet;
 /**
  * Interface for {@link HttpProxy} to support request/response header filtering.
  */
+@FunctionalInterface
 public interface IHttpHeaderFilter {
 
   /**

@@ -29,11 +29,11 @@ public final class VerboseUtility {
   }
 
   public static String dumpGenerics(Type... types) {
-    HashMap<Type, String> longDesc = new HashMap<>();
+    Map<Type, String> longDesc = new HashMap<>();
     StringBuilder buf = new StringBuilder();
-    buf.append(dumpGenericsRec(new HashMap<Type, String>(), longDesc, types));
+    buf.append(dumpGenericsRec(new HashMap<>(), longDesc, types));
     longDesc.remove(Object.class);
-    if (longDesc.size() > 0) {
+    if (!longDesc.isEmpty()) {
       buf.append(" WITH ");
       for (String s : longDesc.values()) {
         buf.append(" ");
@@ -176,7 +176,7 @@ public final class VerboseUtility {
     else if (o instanceof Subject) {
       Subject s = (Subject) o;
       Set<Principal> set = s.getPrincipals();
-      if (set.size() > 0) {
+      if (!set.isEmpty()) {
         return set.iterator().next().getName();
       }
       else {

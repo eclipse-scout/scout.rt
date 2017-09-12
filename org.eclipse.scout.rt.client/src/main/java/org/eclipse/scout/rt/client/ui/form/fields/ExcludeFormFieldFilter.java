@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields;
 
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * {@link IFormFieldFilter} implementation that allows to provide a set of excluded {@link IFormField}s.<br>
@@ -20,7 +21,7 @@ import java.util.HashSet;
  */
 public class ExcludeFormFieldFilter implements IFormFieldFilter {
 
-  private HashSet<String /* field ID */> m_excludedFields;
+  private Set<String /* field ID */> m_excludedFields;
 
   /**
    * @param fields
@@ -28,7 +29,7 @@ public class ExcludeFormFieldFilter implements IFormFieldFilter {
    */
   public ExcludeFormFieldFilter(IFormField... fields) {
     if (fields != null && fields.length > 0) {
-      m_excludedFields = new HashSet<String>(fields.length);
+      m_excludedFields = new HashSet<>(fields.length);
       for (IFormField f : fields) {
         if (f != null) {
           m_excludedFields.add(f.getFieldId());

@@ -32,7 +32,7 @@ public class SequenceBoxGrid implements ICompositeFieldGrid<ISequenceBox> {
     // reset
     m_gridColumns = 0;
     m_gridRows = 0;
-    List<IFormField> list = new ArrayList<IFormField>();
+    List<IFormField> list = new ArrayList<>();
     // filter
     for (IFormField f : sequenceBox.getFields()) {
       if (f.isVisible()) {

@@ -14,10 +14,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
-import org.eclipse.scout.rt.platform.util.concurrent.IFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +27,8 @@ public class BasicTransaction implements ITransaction {
   private static final Logger LOG = LoggerFactory.getLogger(BasicTransaction.class);
 
   private final Object m_memberMapLock = new Object();
-  private final Map<String, ITransactionMember> m_memberMap = new LinkedHashMap<String, ITransactionMember>();
-  private List<Throwable> m_failures = new ArrayList<Throwable>();
+  private final Map<String, ITransactionMember> m_memberMap = new LinkedHashMap<>();
+  private final List<Throwable> m_failures = new ArrayList<>();
   private boolean m_commitPhase;
   private boolean m_cancelled;
 
@@ -40,7 +40,7 @@ public class BasicTransaction implements ITransaction {
         LOG.debug("register transaction member {}", memberId);
       }
       // release existing
-      ITransactionMember old = (ITransactionMember) m_memberMap.get(memberId);
+      ITransactionMember old = m_memberMap.get(memberId);
       if (old != null) {
         if (LOG.isWarnEnabled()) {
           LOG.warn("releasing overwritten transaction member {} / {}.", memberId, old.getMemberId());
@@ -56,16 +56,16 @@ public class BasicTransaction implements ITransaction {
   }
 
   @Override
-  public <TRANSACTION_MEMBER extends ITransactionMember> TRANSACTION_MEMBER registerMemberIfAbsent(final String memberId, final IFunction<String, TRANSACTION_MEMBER> producer) {
+  public <TRANSACTION_MEMBER extends ITransactionMember> TRANSACTION_MEMBER registerMemberIfAbsent(final String memberId, final Function<String, TRANSACTION_MEMBER> producer) {
     return registerMemberIfAbsent(memberId, producer, true);
   }
 
   @Override
-  public <TRANSACTION_MEMBER extends ITransactionMember> TRANSACTION_MEMBER registerMemberIfAbsentAndNotCancelled(final String memberId, final IFunction<String, TRANSACTION_MEMBER> producer) {
+  public <TRANSACTION_MEMBER extends ITransactionMember> TRANSACTION_MEMBER registerMemberIfAbsentAndNotCancelled(final String memberId, final Function<String, TRANSACTION_MEMBER> producer) {
     return registerMemberIfAbsent(memberId, producer, false);
   }
 
-  protected <TRANSACTION_MEMBER extends ITransactionMember> TRANSACTION_MEMBER registerMemberIfAbsent(final String memberId, final IFunction<String, TRANSACTION_MEMBER> producer, boolean throwIfCancelled) {
+  protected <TRANSACTION_MEMBER extends ITransactionMember> TRANSACTION_MEMBER registerMemberIfAbsent(final String memberId, final Function<String, TRANSACTION_MEMBER> producer, boolean throwIfCancelled) {
     synchronized (m_memberMapLock) {
       @SuppressWarnings("unchecked")
       TRANSACTION_MEMBER member = (TRANSACTION_MEMBER) getMember(memberId);
@@ -193,7 +193,7 @@ public class BasicTransaction implements ITransaction {
 
   @Override
   public boolean hasFailures() {
-    return m_failures.size() > 0;
+    return !m_failures.isEmpty();
   }
 
   @Override

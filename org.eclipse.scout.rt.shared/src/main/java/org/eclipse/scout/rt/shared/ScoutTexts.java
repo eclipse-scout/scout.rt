@@ -58,7 +58,7 @@ public class ScoutTexts {
   }
 
   public Map<String, String> getTextMap(Locale locale) {
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     List<? extends ITextProviderService> providers = getTextProviders();
     for (int i = providers.size() - 1; i >= 0; i--) {
       map.putAll(providers.get(i).getTextMap(locale));

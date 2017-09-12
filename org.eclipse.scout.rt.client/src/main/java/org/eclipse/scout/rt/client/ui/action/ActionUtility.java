@@ -28,19 +28,9 @@ public final class ActionUtility {
   private ActionUtility() {
   }
 
-  public static final IActionFilter FALSE_FILTER = new IActionFilter() {
-    @Override
-    public boolean accept(IAction action) {
-      return false;
-    }
-  };
+  public static final IActionFilter FALSE_FILTER = action -> false;
 
-  public static final IActionFilter TRUE_FILTER = new IActionFilter() {
-    @Override
-    public boolean accept(IAction action) {
-      return true;
-    }
-  };
+  public static final IActionFilter TRUE_FILTER = action -> true;
 
   /**
    * Removes invisible actions. Also removes leading and trailing separators as well as multiple consecutive separators.
@@ -89,7 +79,7 @@ public final class ActionUtility {
 
   public static <T extends IAction> List<T> getActions(List<T> actions, final IActionFilter filter) {
     if (actions != null) {
-      List<T> result = new ArrayList<T>(actions.size());
+      List<T> result = new ArrayList<>(actions.size());
       for (T a : actions) {
         if (a.isSeparator()) {
           result.add(a);
@@ -197,17 +187,13 @@ public final class ActionUtility {
 
   public static IActionFilter createCombinedFilter(final IActionFilter... actionFilters) {
     if (actionFilters != null) {
-      return new IActionFilter() {
-
-        @Override
-        public boolean accept(IAction action) {
-          for (IActionFilter f : actionFilters) {
-            if (!f.accept(action)) {
-              return false;
-            }
+      return action -> {
+        for (IActionFilter f : actionFilters) {
+          if (!f.accept(action)) {
+            return false;
           }
-          return true;
         }
+        return true;
       };
     }
     return TRUE_FILTER;

@@ -14,11 +14,11 @@ package org.eclipse.scout.rt.server.jdbc.parsers.token;
  * Select into result can be a batch
  */
 public class ValueOutputToken implements IToken {
-  private String m_parsedToken;
+  private final String m_parsedToken;
   private String m_replaceToken;
   private String m_name;
   private boolean m_batch;
-  private boolean m_selectInto;
+  private final boolean m_selectInto;
 
   public ValueOutputToken(String parsedToken, String name, boolean selectInto) {
     m_parsedToken = parsedToken;
@@ -79,7 +79,7 @@ public class ValueOutputToken implements IToken {
   @Override
   public String toString() {
     StringBuilder b = new StringBuilder();
-    b.append(getClass().getSimpleName() + "[");
+    b.append(getClass().getSimpleName()).append("[");
     b.append(m_name);
     b.append(" ");
     b.append("parsed '");

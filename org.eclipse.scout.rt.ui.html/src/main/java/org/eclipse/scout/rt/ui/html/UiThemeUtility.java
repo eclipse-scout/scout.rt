@@ -104,7 +104,7 @@ public final class UiThemeUtility {
    *          <code>null</code> will reset the theme to the configured theme
    */
   public static void storeTheme(HttpServletResponse resp, HttpSession session, String theme) {
-    theme = ObjectUtility.nvl(theme, UiThemeUtility.getConfiguredTheme());
+    theme = ObjectUtility.nvl(theme, getConfiguredTheme());
     if (resp != null) {
       CookieUtility.addPersistentCookie(resp, THEME_COOKIE_NAME, theme);
     }

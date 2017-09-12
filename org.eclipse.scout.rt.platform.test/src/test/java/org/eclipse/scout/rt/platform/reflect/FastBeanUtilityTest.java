@@ -19,8 +19,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.eclipse.scout.rt.platform.reflect.FastBeanUtility;
-import org.eclipse.scout.rt.platform.reflect.FastPropertyDescriptor;
 import org.junit.Test;
 
 /**

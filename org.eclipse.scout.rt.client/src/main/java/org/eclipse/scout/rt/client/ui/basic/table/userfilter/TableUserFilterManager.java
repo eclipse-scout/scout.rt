@@ -32,8 +32,8 @@ import org.slf4j.LoggerFactory;
 public class TableUserFilterManager {
   private static final Logger LOG = LoggerFactory.getLogger(TableUserFilterManager.class);
 
-  private Map<Object, IUserFilterState> m_filterMap = new HashMap<Object, IUserFilterState>();
-  private AbstractTable m_table;
+  private final Map<Object, IUserFilterState> m_filterMap = new HashMap<>();
+  private final AbstractTable m_table;
 
   public TableUserFilterManager(AbstractTable table) {
     m_table = table;
@@ -74,7 +74,7 @@ public class TableUserFilterManager {
   }
 
   public List<String> getDisplayTexts() {
-    ArrayList<String> list = new ArrayList<String>();
+    List<String> list = new ArrayList<>();
     for (IUserFilterState filter : m_filterMap.values()) {
       list.add(filter.getDisplayText());
     }

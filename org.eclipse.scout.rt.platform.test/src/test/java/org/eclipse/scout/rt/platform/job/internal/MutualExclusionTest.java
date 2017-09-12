@@ -24,8 +24,8 @@ import static org.mockito.Mockito.when;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.IPermitAcquiredCallback;
 import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.QueuePosition;

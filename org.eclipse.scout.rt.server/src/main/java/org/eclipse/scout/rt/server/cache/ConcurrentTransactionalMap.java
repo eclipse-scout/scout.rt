@@ -36,12 +36,12 @@ public class ConcurrentTransactionalMap<K, V> extends AbstractTransactionalMap<K
 
   public ConcurrentTransactionalMap(String transactionMemberId, boolean fastForward) {
     super(transactionMemberId, fastForward);
-    m_sharedMap = new ConcurrentHashMap<K, V>();
+    m_sharedMap = new ConcurrentHashMap<>();
   }
 
   public ConcurrentTransactionalMap(String transactionMemberId, boolean fastForward, Map<K, V> m) {
     super(transactionMemberId, fastForward);
-    m_sharedMap = new ConcurrentHashMap<K, V>(m);
+    m_sharedMap = new ConcurrentHashMap<>(m);
   }
 
   @Override
@@ -77,10 +77,10 @@ public class ConcurrentTransactionalMap<K, V> extends AbstractTransactionalMap<K
   @Override
   @SuppressWarnings("unchecked")
   protected <TM extends Map<K, V> & ITransactionMember> TM createMapTransactionMember() {
-    return (TM) new ConcurrentMapTransactionMember<K, V>(getTransactionMemberId(), getSharedMap(), true, isFastForward());
+    return (TM) new ConcurrentMapTransactionMember<>(getTransactionMemberId(), getSharedMap(), true, isFastForward());
   }
 
-  public static class ConcurrentMapTransactionMember<K, V> extends AbstractTransactionalMap.AbstractMapTransactionMember<K, V> implements ConcurrentMap<K, V> {
+  public static class ConcurrentMapTransactionMember<K, V> extends AbstractMapTransactionMember<K, V> implements ConcurrentMap<K, V> {
 
     /**
      * shared map over all transactions
@@ -94,11 +94,11 @@ public class ConcurrentTransactionalMap<K, V> extends AbstractTransactionalMap<K
 
     public ConcurrentMapTransactionMember(String transactionMemberId, ConcurrentMap<K, V> sharedMap, boolean sharedRead, boolean fastForward) {
       // If reads should not be shared, we create a full copy of the shared map
-      this(transactionMemberId, sharedMap, sharedRead ? sharedMap : new HashMap<K, V>(sharedMap), fastForward);
+      this(transactionMemberId, sharedMap, sharedRead ? sharedMap : new HashMap<>(sharedMap), fastForward);
     }
 
     public ConcurrentMapTransactionMember(String transactionMemberId, ConcurrentMap<K, V> sharedMap, Map<K, V> readSharedMap, boolean fastForward) {
-      this(transactionMemberId, sharedMap, readSharedMap, new HashMap<K, V>(), new HashMap<K, V>(), fastForward);
+      this(transactionMemberId, sharedMap, readSharedMap, new HashMap<>(), new HashMap<>(), fastForward);
     }
 
     public ConcurrentMapTransactionMember(String transactionId, ConcurrentMap<K, V> sharedMap, Map<K, V> readSharedMap, Map<K, V> removedMap, Map<K, V> insertedMap, boolean fastForward) {
@@ -119,8 +119,8 @@ public class ConcurrentTransactionalMap<K, V> extends AbstractTransactionalMap<K
     @Override
     public void commitPhase2() {
       ConcurrentMap<K, V> sharedMap = getSharedMap();
-      Collection<K> successfulCommitedChanges = new ArrayList<K>();
-      Collection<K> failedCommitedChanges = new ArrayList<K>();
+      Collection<K> successfulCommitedChanges = new ArrayList<>();
+      Collection<K> failedCommitedChanges = new ArrayList<>();
       for (Entry<K, V> entry : getRemovedMap().entrySet()) {
         K key = entry.getKey();
         V oldValue = entry.getValue();

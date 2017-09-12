@@ -40,8 +40,8 @@ public class FormStore extends IndexedStore<IForm> {
   private final P_ExclusiveKeyViewIndex m_viewKeyIndex = registerIndex(new P_ExclusiveKeyViewIndex());
   private final P_ApplicationModalDialogIndex m_applicationModalDialogIndex = registerIndex(new P_ApplicationModalDialogIndex());
 
-  private static enum FormType {
-    VIEW, DIALOG;
+  private enum FormType {
+    VIEW, DIALOG
   }
 
   /**
@@ -110,7 +110,7 @@ public class FormStore extends IndexedStore<IForm> {
    * Returns <code>true</code> if this store contains 'application-modal' dialogs, or <code>false</code> if not.
    */
   public boolean containsApplicationModalDialogs() {
-    return m_applicationModalDialogIndex.get(Boolean.TRUE).size() > 0;
+    return !m_applicationModalDialogIndex.get(Boolean.TRUE).isEmpty();
   }
 
   // ====  Index definitions ==== //

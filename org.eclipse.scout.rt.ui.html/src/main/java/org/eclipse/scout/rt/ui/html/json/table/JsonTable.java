@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.MouseButton;
-import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -145,7 +144,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     m_tableRowIds = new HashMap<>();
     m_columns = new HashMap<>();
     m_tableEventFilter = new TableEventFilter(this);
-    m_jsonColumns = new HashMap<IColumn, JsonColumn>();
+    m_jsonColumns = new HashMap<>();
     m_eventBuffer = model.createEventBuffer();
     m_binaryResourceMediator = createBinaryResourceMediator();
   }
@@ -324,7 +323,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     putJsonProperty(new JsonAdapterProperty<ITable>(ITable.PROP_KEY_STROKES, model, getUiSession()) {
       @Override
       protected JsonAdapterPropertyConfig createConfig() {
-        return new JsonAdapterPropertyConfigBuilder().filter(new DisplayableActionFilter<IAction>()).build();
+        return new JsonAdapterPropertyConfigBuilder().filter(new DisplayableActionFilter<>()).build();
       }
 
       @Override
@@ -358,7 +357,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     attachColumns();
-    m_jsonContextMenu = new JsonContextMenu<IContextMenu>(getModel().getContextMenu(), this);
+    m_jsonContextMenu = new JsonContextMenu<>(getModel().getContextMenu(), this);
     m_jsonContextMenu.init();
   }
 
@@ -581,8 +580,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       LOG.info("Requested table-row doesn't exist anymore -> skip rowClicked event");
       return;
     }
-    ArrayList<ITableRow> rows = new ArrayList<ITableRow>();
-    rows.add(tableRow);
     MouseButton mouseButton = extractMouseButton(event.getData());
     getModel().getUIFacade().fireRowClickFromUI(tableRow, mouseButton);
   }
@@ -602,10 +599,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   protected void handleUiRowChecked(JsonEvent event) {
     CheckedInfo checkedInfo = jsonToCheckedInfo(event.getData());
     addTableEventFilterCondition(TableEvent.TYPE_ROWS_CHECKED).setCheckedRows(checkedInfo.getCheckedRows(), checkedInfo.getUncheckedRows());
-    if (checkedInfo.getCheckedRows().size() > 0) {
+    if (!checkedInfo.getCheckedRows().isEmpty()) {
       getModel().getUIFacade().setCheckedRowsFromUI(checkedInfo.getCheckedRows(), true);
     }
-    if (checkedInfo.getUncheckedRows().size() > 0) {
+    if (!checkedInfo.getUncheckedRows().isEmpty()) {
       getModel().getUIFacade().setCheckedRowsFromUI(checkedInfo.getUncheckedRows(), false);
     }
   }
@@ -1072,7 +1069,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
     // Resend filters because a column with a filter may got invisible (since the gui does not know invisible columns, the filter would fail).
     // Also necessary because column ids have changed.
-    if (getModel().getUserFilterManager() != null && getModel().getUserFilterManager().getFilters().size() > 0) {
+    if (getModel().getUserFilterManager() != null && !getModel().getUserFilterManager().getFilters().isEmpty()) {
       m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_USER_FILTER_ADDED));
     }
 
@@ -1248,7 +1245,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
    * @return the filtered row count excluding rows filtered by the user
    */
   protected int getFilteredRowCount() {
-    if (getModel().getRowFilters().size() == 0) {
+    if (getModel().getRowFilters().isEmpty()) {
       return getModel().getRowCount();
     }
     int filteredRowCount = 0;
@@ -1404,7 +1401,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected Collection<IColumn<?>> filterVisibleColumns(Collection<IColumn<?>> columns) {
-    List<IColumn<?>> visibleColumns = new LinkedList<IColumn<?>>();
+    List<IColumn<?>> visibleColumns = new LinkedList<>();
     for (IColumn<?> column : columns) {
       if (column.isVisible()) {
         visibleColumns.add(column);
@@ -1503,9 +1500,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected static class CheckedInfo {
-    private final List<ITableRow> m_allRows = new ArrayList<ITableRow>();
-    private final List<ITableRow> m_checkedRows = new ArrayList<ITableRow>();
-    private final List<ITableRow> m_uncheckedRows = new ArrayList<ITableRow>();
+    private final List<ITableRow> m_allRows = new ArrayList<>();
+    private final List<ITableRow> m_checkedRows = new ArrayList<>();
+    private final List<ITableRow> m_uncheckedRows = new ArrayList<>();
 
     public List<ITableRow> getAllRows() {
       return m_allRows;

@@ -41,6 +41,6 @@ public final class ServiceTunnelUtility {
       return bean.getInstance();
     }
 
-    return new BeanProxyImplementor<T>(bean, decorator, serviceInterfaceClass).getProxy();
+    return new BeanProxyImplementor<>(bean, decorator, serviceInterfaceClass).getProxy();
   }
 }

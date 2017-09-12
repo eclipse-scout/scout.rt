@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.PlatformEvent;
@@ -52,7 +53,7 @@ public class WebappEventListener implements ServletContextListener {
   public void contextDestroyed(ServletContextEvent sce) {
     ServletContextRegistration.servletContext = null;
     IPlatform platform = Platform.peek();
-    if (platform != null && platform.getState() != IPlatform.State.PlatformStopped) {
+    if (platform != null && platform.getState() != State.PlatformStopped) {
       platform.stop();
     }
   }

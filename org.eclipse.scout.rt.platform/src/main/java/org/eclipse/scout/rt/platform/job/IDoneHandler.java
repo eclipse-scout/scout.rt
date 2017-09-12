@@ -16,6 +16,7 @@ package org.eclipse.scout.rt.platform.job;
  * @since 5.1
  * @see IFuture#whenDone(IDoneCallback)
  */
+@FunctionalInterface
 public interface IDoneHandler<RESULT> {
 
   /**

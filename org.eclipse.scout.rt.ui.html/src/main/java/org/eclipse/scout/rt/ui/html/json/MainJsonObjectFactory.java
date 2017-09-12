@@ -42,7 +42,7 @@ public class MainJsonObjectFactory implements IJsonObjectFactory {
   }
 
   private List<IJsonObjectFactory> createFactories() {
-    List<IJsonObjectFactory> factories = new ArrayList<IJsonObjectFactory>();
+    List<IJsonObjectFactory> factories = new ArrayList<>();
     for (IJsonObjectFactory factory : BEANS.all(IJsonObjectFactory.class)) {
       if (factory != this) {
         factories.add(factory);

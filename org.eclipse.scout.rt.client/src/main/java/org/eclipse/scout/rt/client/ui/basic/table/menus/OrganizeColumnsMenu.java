@@ -39,7 +39,7 @@ public class OrganizeColumnsMenu extends AbstractFormMenu<IOrganizeColumnsForm> 
 
   @Override
   protected Set<IMenuType> getConfiguredMenuTypes() {
-    return CollectionUtility.<IMenuType> hashSet(TableMenuType.Header);
+    return CollectionUtility.hashSet(TableMenuType.Header);
   }
 
   public ITable getTable() {

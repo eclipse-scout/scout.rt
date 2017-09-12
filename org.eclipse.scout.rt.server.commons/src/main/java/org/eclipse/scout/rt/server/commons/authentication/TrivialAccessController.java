@@ -54,7 +54,7 @@ public class TrivialAccessController implements IAccessController {
 
   private TrivialAuthConfig m_config;
 
-  public TrivialAccessController init(final TrivialAuthConfig config) throws ServletException {
+  public TrivialAccessController init(final TrivialAuthConfig config) {
     m_config = config;
     return this;
   }

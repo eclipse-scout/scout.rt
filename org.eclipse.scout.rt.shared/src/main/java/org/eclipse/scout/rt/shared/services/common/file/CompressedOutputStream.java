@@ -21,11 +21,11 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
 public class CompressedOutputStream extends OutputStream {
-  private RemoteFile m_remoteFile;
-  private ByteArrayOutputStream m_buffer;
-  private Deflater m_deflater;
-  private DeflaterOutputStream m_deflaterOutputStream;
-  private CRC32 m_crc32;
+  private final RemoteFile m_remoteFile;
+  private final ByteArrayOutputStream m_buffer;
+  private final Deflater m_deflater;
+  private final DeflaterOutputStream m_deflaterOutputStream;
+  private final CRC32 m_crc32;
 
   public CompressedOutputStream(RemoteFile f) {
     m_remoteFile = f;

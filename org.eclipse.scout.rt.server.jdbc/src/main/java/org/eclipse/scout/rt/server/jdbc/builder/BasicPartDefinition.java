@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
+import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
@@ -50,7 +51,7 @@ public class BasicPartDefinition implements DataModelConstants {
    *          {@link BasicPartDefinition#createInstanceImpl(FormDataStatementBuilder, List, List, List, Map)} shoult be
    *          overridden
    * @param operator
-   *          any of the {@link org.eclipse.scout.rt.shared.data.model.DataModelConstants#OPERATOR_}* values
+   *          any of the {@link DataModelConstants#OPERATOR_}* values
    */
   public BasicPartDefinition(Class<?> valueType, String sqlAttribute, int operator) {
     this(new Class[]{valueType}, sqlAttribute, operator, false);
@@ -229,22 +230,22 @@ public class BasicPartDefinition implements DataModelConstants {
      * the form data objects containing the runtime values {@link AbstractFormFieldData} and
      * {@link AbstractPropertyData}
      */
-    ArrayList<Object> valueDatas = new ArrayList<Object>(valueTypes.length);
+    List<Object> valueDatas = new ArrayList<>(valueTypes.length);
     /**
      * by default the names "a", "b", "c", ... represent the bindValues in the same order as the values
      */
-    ArrayList<String> bindNames = new ArrayList<String>(valueTypes.length);
+    List<String> bindNames = new ArrayList<>(valueTypes.length);
     /**
      * the values of the {@link AbstractFormFieldData}s and {@link AbstractPropertyData}s in the same order
      */
-    ArrayList<Object> bindValues = new ArrayList<Object>(valueTypes.length);
+    List<Object> bindValues = new ArrayList<>(valueTypes.length);
     for (int i = 0; i < valueTypes.length; i++) {
       if (AbstractFormFieldData.class.isAssignableFrom(valueTypes[i].getLastSegment())) {
         AbstractFormFieldData field = formData.findFieldByClass(fieldsBreathFirstMap, valueTypes[i]);
         valueDatas.add(field);
         bindNames.add("" + (char) (('a') + i));
         if (field instanceof AbstractValueFieldData<?>) {
-          bindValues.add(((AbstractValueFieldData<?>) field).getValue());
+          bindValues.add(((IHolder<?>) field).getValue());
         }
         else {
           bindValues.add(null);

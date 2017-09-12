@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -37,7 +36,7 @@ import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
  * Utility class to test code that enters a blocking condition.
  *
  * @see IBlockingCondition#waitFor(String...)
- * @see IBlockingCondition#waitFor(long, java.util.concurrent.TimeUnit, String...)
+ * @see IBlockingCondition#waitFor(long, TimeUnit, String...)
  */
 public final class BlockingTestUtility {
 
@@ -73,66 +72,52 @@ public final class BlockingTestUtility {
 
     //remember the list of client jobs before blocking
     final Set<IFuture<?>> jobsBefore = new HashSet<>();
-    jobsBefore.addAll(BEANS.get(IJobManager.class).getFutures(new IFilter<IFuture<?>>() {
-      @Override
-      public boolean accept(IFuture<?> cand) {
-        final RunContext candContext = cand.getJobInput().getRunContext();
-        return candContext instanceof ClientRunContext && ((ClientRunContext) candContext).getSession() == runContext.getSession();
-      }
+    jobsBefore.addAll(BEANS.get(IJobManager.class).getFutures(cand -> {
+      final RunContext candContext = cand.getJobInput().getRunContext();
+      return candContext instanceof ClientRunContext && ((ClientRunContext) candContext).getSession() == runContext.getSession();
     }));
 
+    //end JobListener.changed
     final IRegistrationHandle listenerRegistration = IFuture.CURRENT.get().addListener(Jobs.newEventFilterBuilder()
         .andMatchEventType(JobEventType.JOB_STATE_CHANGED)
         .andMatchState(JobState.WAITING_FOR_BLOCKING_CONDITION)
         .andMatchExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)
-        .toFilter(), new IJobListener() {
-          @Override
-          public void changed(final JobEvent event) {
-            //waitFor was entered
+        .toFilter(), event -> {
+          //waitFor was entered
 
-            final IRunnable callRunnableOnceBlocked = new IRunnable() {
-              @Override
-              public void run() throws Exception {
-                try {
-                  runnableOnceBlocked.run();
-                }
-                finally {
-                  event.getData().getBlockingCondition().setBlocking(false);
-                  onceBlockedDoneCondition.setBlocking(false);
-                }
-              }
-            };
-            final JobInput jobInputForRunnableOnceBlocked = ModelJobs.newInput(runContext)
-                .withExceptionHandling(BEANS.get(JUnitExceptionHandler.class), true)
-                .withName("JUnit: Handling blocked thread because waiting for a blocking condition");
-
-            if (awaitBackgroundJobs) {
-              //wait until all background jobs finished
-              Jobs.schedule(new IRunnable() {
-                @Override
-                public void run() throws Exception {
-                  jobsBefore.add(IFuture.CURRENT.get());
-                  BEANS.get(IJobManager.class).awaitFinished(new IFilter<IFuture<?>>() {
-                    @Override
-                    public boolean accept(IFuture<?> f) {
-                      RunContext candContext = f.getJobInput().getRunContext();
-                      return candContext instanceof ClientRunContext && ((ClientRunContext) candContext).getSession() == runContext.getSession() && !jobsBefore.contains(f);
-                    }
-                  }, 5, TimeUnit.MINUTES);
-
-                  //call runnableOnceBlocked
-                  ModelJobs.schedule(callRunnableOnceBlocked, jobInputForRunnableOnceBlocked);
-
-                }
-              }, Jobs.newInput().withName("wait until background jobs finished"));
-
+          final IRunnable callRunnableOnceBlocked = () -> {
+            try {
+              runnableOnceBlocked.run();
             }
-            else {
-              //call runnableOnceBlocked directly
+            finally {
+              event.getData().getBlockingCondition().setBlocking(false);
+              onceBlockedDoneCondition.setBlocking(false);
+            }
+          };
+          final JobInput jobInputForRunnableOnceBlocked = ModelJobs.newInput(runContext)
+              .withExceptionHandling(BEANS.get(JUnitExceptionHandler.class), true)
+              .withName("JUnit: Handling blocked thread because waiting for a blocking condition");
+
+          if (awaitBackgroundJobs) {
+            //wait until all background jobs finished
+            Jobs.schedule(() -> {
+              jobsBefore.add(IFuture.CURRENT.get());
+              BEANS.get(IJobManager.class).awaitFinished(f -> {
+                RunContext candContext = f.getJobInput().getRunContext();
+                return candContext instanceof ClientRunContext && ((ClientRunContext) candContext).getSession() == runContext.getSession() && !jobsBefore.contains(f);
+              }, 5, TimeUnit.MINUTES);
+
+              //call runnableOnceBlocked
               ModelJobs.schedule(callRunnableOnceBlocked, jobInputForRunnableOnceBlocked);
-            }
 
-          }//end JobListener.changed
+            }, Jobs.newInput().withName("wait until background jobs finished"));
+
+          }
+          else {
+            //call runnableOnceBlocked directly
+            ModelJobs.schedule(callRunnableOnceBlocked, jobInputForRunnableOnceBlocked);
+          }
+
         });
 
     try {
@@ -179,7 +164,7 @@ public final class BlockingTestUtility {
     };
   }
 
-  public static interface IBlockingConditionTimeoutHandle extends IRegistrationHandle {
+  public interface IBlockingConditionTimeoutHandle extends IRegistrationHandle {
     Exception getFirstException();
   }
 
@@ -217,20 +202,17 @@ public final class BlockingTestUtility {
           "Testing detected a BlockingCondition that was not released after {} {}. Auto-unlocking the condition. Please check the test code and ensure that especially all forms are handled and closed correctly",
           m_timeout, m_unit);
 
-      Jobs.schedule(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          try {
-            blockingCondition.waitFor(m_timeout, m_unit);
+      Jobs.schedule(() -> {
+        try {
+          blockingCondition.waitFor(m_timeout, m_unit);
+        }
+        catch (TimedOutError ex) { // NOSONAR
+          //cancel future and unlock
+          if (m_firstException == null) {
+            m_firstException = callerException;
           }
-          catch (TimedOutError ex) { // NOSONAR
-            //cancel future and unlock
-            if (m_firstException == null) {
-              m_firstException = callerException;
-            }
-            future.cancel(true);
-            blockingCondition.setBlocking(false);
-          }
+          future.cancel(true);
+          blockingCondition.setBlocking(false);
         }
       }, Jobs.newInput());
     }

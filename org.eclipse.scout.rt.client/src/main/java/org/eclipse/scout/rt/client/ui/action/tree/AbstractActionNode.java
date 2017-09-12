@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.action.tree;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.action.tree.IActionNodeExtension;
@@ -74,7 +73,7 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
     super.initConfig();
     // menus
     List<Class<? extends IActionNode>> configuredChildActions = getConfiguredChildActions();
-    OrderedCollection<T> actionNodes = new OrderedCollection<T>();
+    OrderedCollection<T> actionNodes = new OrderedCollection<>();
     for (Class<? extends IActionNode> a : configuredChildActions) {
       IActionNode node = ConfigurationUtility.newInnerInstance(this, a);
       node.setParent(this);
@@ -177,10 +176,10 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
       setContainerOnActions(normalizedList);
       List<T> childList = getChildActionsInternal();
       if (childList == null) {
-        childList = new ArrayList<T>(normalizedList.size());
+        childList = new ArrayList<>(normalizedList.size());
       }
       childList.addAll(normalizedList);
-      Collections.sort(childList, new OrderedComparator());
+      childList.sort(new OrderedComparator());
       propertySupport.setPropertyAlwaysFire(PROP_CHILD_ACTIONS, childList);
     }
   }
@@ -242,7 +241,7 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
 
   @Override
   protected IActionNodeExtension<T, ? extends AbstractActionNode<T>> createLocalExtension() {
-    return new LocalActionNodeExtension<T, AbstractActionNode<T>>(this);
+    return new LocalActionNodeExtension<>(this);
   }
 
 }

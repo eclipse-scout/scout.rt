@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
  * {@link ITable#getRows()} and {@link ITable#getRowCount()} are unaffected by the filter. The UI should use
  * {@link ITreeNode#getChildNodes()}
  */
+@FunctionalInterface
 public interface ITreeNodeFilter {
 
   boolean accept(ITreeNode node, int level);

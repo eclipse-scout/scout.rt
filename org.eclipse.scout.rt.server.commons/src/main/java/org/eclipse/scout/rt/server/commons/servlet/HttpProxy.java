@@ -46,8 +46,8 @@ public class HttpProxy {
   private static final Logger LOG = LoggerFactory.getLogger(HttpProxy.class);
 
   private String m_remoteUrl;
-  private List<IHttpHeaderFilter> m_requestHeaderFilters;
-  private List<IHttpHeaderFilter> m_responseHeaderFilters;
+  private final List<IHttpHeaderFilter> m_requestHeaderFilters;
+  private final List<IHttpHeaderFilter> m_responseHeaderFilters;
 
   public HttpProxy() {
     m_requestHeaderFilters = new ArrayList<>();
@@ -76,7 +76,7 @@ public class HttpProxy {
    * parameters are used.<br>
    * Writes the returned response body of the forwarded request, the headers and the status to the response.<b>
    */
-  public void proxyGet(HttpServletRequest req, HttpServletResponse resp, HttpProxyOptions options) throws ServletException, IOException {
+  public void proxyGet(HttpServletRequest req, HttpServletResponse resp, HttpProxyOptions options) throws IOException {
     String url = StringUtility.join("", getRemoteUrl(), req.getPathInfo(), StringUtility.box("?", req.getQueryString(), ""));
     HttpRequest httpReq = BEANS.get(DefaultHttpTransportManager.class).getHttpRequestFactory().buildGetRequest(new GenericUrl(url));
     httpReq = prepareRequest(httpReq);
@@ -100,7 +100,7 @@ public class HttpProxy {
    * Adds every form parameter to the forwarded request.<br>
    * Writes the returned response body of the forwarded request, the headers and the status to the response.<b>
    */
-  public void proxyPost(HttpServletRequest req, HttpServletResponse resp, HttpProxyOptions options) throws ServletException, IOException {
+  public void proxyPost(HttpServletRequest req, HttpServletResponse resp, HttpProxyOptions options) throws IOException {
     String url = StringUtility.join("", getRemoteUrl(), req.getPathInfo());
     HttpRequest httpReq = BEANS.get(DefaultHttpTransportManager.class).getHttpRequestFactory().buildPostRequest(new GenericUrl(url), null);
     httpReq.getHeaders().setCacheControl("no-cache");
@@ -111,7 +111,7 @@ public class HttpProxy {
 
     // Payload is empty if parameters are used (usually with content type = application/x-www-form-urlencoded)
     // -> write parameters if there are any, otherwise write the raw payload
-    if (req.getParameterMap().size() > 0) {
+    if (!req.getParameterMap().isEmpty()) {
       writeRequestParameters(req, httpReq);
     }
     else {

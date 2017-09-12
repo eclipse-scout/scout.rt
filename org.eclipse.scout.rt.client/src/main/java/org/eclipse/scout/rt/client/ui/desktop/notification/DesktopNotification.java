@@ -13,7 +13,7 @@ public class DesktopNotification extends AbstractPropertyObserver implements IDe
   private final IStatus m_status;
   private final long m_duration;
   private final boolean m_closable;
-  private IDesktopNotificationUIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
+  private final IDesktopNotificationUIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
 
   /**
    * Creates a closable, simple info notification with a text and the default duration.

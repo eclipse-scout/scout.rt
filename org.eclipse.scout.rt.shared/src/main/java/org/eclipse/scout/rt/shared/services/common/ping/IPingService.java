@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.shared.services.common.ping;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
+@FunctionalInterface
 @TunnelToServer
 public interface IPingService extends IService {
 

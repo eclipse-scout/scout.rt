@@ -27,7 +27,7 @@ public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement 
   private static final long serialVersionUID = 1L;
 
   private final List<IHtmlContent> m_attributes = new ArrayList<>();
-  private String m_tag;
+  private final String m_tag;
 
   protected String getTag() {
     return m_tag;
@@ -49,7 +49,7 @@ public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement 
   @Override
   public void build() {
     appendStartTag();
-    if (getTexts().size() > 0) {
+    if (!getTexts().isEmpty()) {
       appendText();
     }
     appendEndTag();
@@ -69,7 +69,7 @@ public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement 
   }
 
   private void appendAttributes() {
-    if (m_attributes.size() > 0) {
+    if (!m_attributes.isEmpty()) {
       append(" ", false);
       append(CollectionUtility.format(m_attributes, " "), false);
     }

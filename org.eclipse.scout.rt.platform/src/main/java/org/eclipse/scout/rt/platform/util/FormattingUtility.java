@@ -30,12 +30,12 @@ public final class FormattingUtility {
    * types are:
    * <ul>
    * <li>{@link String}</li>
-   * <li>{@link java.util.Date} with empty time part is formatted using {@link java.text.DateFormat#MEDIUM}
-   * <li>{@link java.util.Date} with non-empty time part is formatted {@link java.text.DateFormat#SHORT} for date and
-   * time part, respectively</li>
-   * <li>{@link Float}, {@link Double} and {@link BigDecimal} are formatted using {@link java.text.NumberFormat} with
-   * exactly 2 fraction digits</li>
-   * <li>{@link Number} is formatted using {@link java.text.NumberFormat}</li>
+   * <li>{@link Date} with empty time part is formatted using {@link DateFormat#MEDIUM}
+   * <li>{@link Date} with non-empty time part is formatted {@link DateFormat#SHORT} for date and time part,
+   * respectively</li>
+   * <li>{@link Float}, {@link Double} and {@link BigDecimal} are formatted using {@link NumberFormat} with exactly 2
+   * fraction digits</li>
+   * <li>{@link Number} is formatted using {@link NumberFormat}</li>
    * <li>{@link Boolean} is formatted as "X" for <code>true</code>, "" for <code>false</code></li>
    * </ul>
    *

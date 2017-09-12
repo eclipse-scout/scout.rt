@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 public class HolidayCalendarService implements IHolidayCalendarService {
   private static final Logger LOG = LoggerFactory.getLogger(HolidayCalendarService.class);
 
-  private ConcurrentExpiringMap<String/* resourceFileName */, HolidayCalendarItemParser> m_holidayXmlCache = new ConcurrentExpiringMap<String, HolidayCalendarItemParser>(5, TimeUnit.MINUTES);
+  private final ConcurrentExpiringMap<String/* resourceFileName */, HolidayCalendarItemParser> m_holidayXmlCache = new ConcurrentExpiringMap<>(5, TimeUnit.MINUTES);
 
   @Override
   public Set<? extends ICalendarItem> getItems(RemoteFile spec, Date minDate, Date maxDate) {

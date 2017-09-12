@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.commons.servlet;
 
-import java.util.concurrent.Callable;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,7 +19,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.LazyValue;
-import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties;
 import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.UrlHintsEnabledProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +30,8 @@ import org.slf4j.LoggerFactory;
  * <p>
  * <b>Security considerations</b>
  * <p>
- * The URL hints can only be changed using URL parameters if the config property
- * {@link ServerCommonsConfigProperties.UrlHintsEnabledProperty} is set to true. Otherwise, the default values are used.
+ * The URL hints can only be changed using URL parameters if the config property {@link UrlHintsEnabledProperty} is set
+ * to true. Otherwise, the default values are used.
  *
  * @see UrlHints
  */
@@ -47,20 +44,12 @@ public class UrlHintsHelper {
    * <code>false</code> if URL params should <b>not</b> be evaluated to change hints (e.g. on production systems for
    * security reasons).
    */
-  private static final LazyValue<Boolean> UPDATE_ENABLED = new LazyValue<>(new Callable<Boolean>() {
-    @Override
-    public Boolean call() throws Exception {
-      return CONFIG.getPropertyValue(UrlHintsEnabledProperty.class);
-    }
-  });
+  private static final LazyValue<Boolean> UPDATE_ENABLED = new LazyValue<>(() -> CONFIG.getPropertyValue(UrlHintsEnabledProperty.class));
 
-  private static final LazyValue<UrlHints> DEFAULT_HINTS = new LazyValue<>(new Callable<UrlHints>() {
-    @Override
-    public UrlHints call() throws Exception {
-      UrlHints urlHints = BEANS.get(UrlHints.class);
-      urlHints.setReadOnly();
-      return urlHints;
-    }
+  private static final LazyValue<UrlHints> DEFAULT_HINTS = new LazyValue<>(() -> {
+    UrlHints urlHints = BEANS.get(UrlHints.class);
+    urlHints.setReadOnly();
+    return urlHints;
   });
 
   private static final String URL_HINTS_COOKIE_NAME = "scout.urlHints";

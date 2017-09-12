@@ -33,7 +33,7 @@ public class BeanAnnotations {
    * Initialize fields annotated with {@link BeanMock}
    */
   public void init(Object testObj) {
-    List<IBean<?>> regs = new ArrayList<IBean<?>>();
+    List<IBean<?>> regs = new ArrayList<>();
     Field[] fields = testObj.getClass().getDeclaredFields();
     for (Field f : fields) {
       if (isBeanMock(f)) {

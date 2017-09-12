@@ -73,8 +73,7 @@ public interface IInternalExtensionRegistry extends IExtensionRegistry {
    * @param parentModelObjectIterator
    *          Optional iterator that is going through the list of parent model objects. It is used for evaluating
    *          deep-linked move operations (i.e. those registered by
-   *          {@link IExtensionRegistry#registerMove(org.eclipse.scout.rt.platform.classid.ClassIdentifier, Double, Class)}
-   *          ). May be <code>null</code>.
+   *          {@link IExtensionRegistry#registerMove(ClassIdentifier, Double, Class)} ). May be <code>null</code>.
    * @return <code>null</code> if no move operations were registered for the given model object or one
    *         {@link MoveDescriptor}.
    */

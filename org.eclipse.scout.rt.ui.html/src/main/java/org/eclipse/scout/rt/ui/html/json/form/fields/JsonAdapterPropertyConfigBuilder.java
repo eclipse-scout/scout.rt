@@ -46,11 +46,11 @@ public class JsonAdapterPropertyConfigBuilder {
     return new JsonAdapterPropertyConfig(m_global, m_disposeOnChange, m_filter);
   }
 
-  public static final JsonAdapterPropertyConfig defaultConfig() {
+  public static JsonAdapterPropertyConfig defaultConfig() {
     return DEFAULT;
   }
 
-  public static final JsonAdapterPropertyConfig globalConfig() {
+  public static JsonAdapterPropertyConfig globalConfig() {
     return GLOBAL;
   }
 }

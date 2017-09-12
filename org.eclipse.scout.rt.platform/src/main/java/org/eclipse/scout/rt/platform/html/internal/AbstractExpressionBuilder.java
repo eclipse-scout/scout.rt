@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.platform.html.IHtmlContent;
  * Buffer for expressions</br>
  * (not thread safe)
  */
-public abstract class AbstractExpressionBuilder implements CharSequence, IHtmlContent {
+public abstract class AbstractExpressionBuilder implements IHtmlContent {
 
   private static final long serialVersionUID = 1L;
 

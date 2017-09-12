@@ -15,7 +15,7 @@ import java.io.Serializable;
 public class SharedContextChangedNotification implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private SharedVariableMap m_sharedVariableMap;
+  private final SharedVariableMap m_sharedVariableMap;
 
   public SharedContextChangedNotification(SharedVariableMap sharedVariableMap) {
     m_sharedVariableMap = sharedVariableMap;

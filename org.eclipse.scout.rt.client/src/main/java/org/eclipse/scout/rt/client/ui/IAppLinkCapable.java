@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui;
 /**
  * @since 5.1
  */
+@FunctionalInterface
 public interface IAppLinkCapable {
 
   void doAppLinkAction(String ref);

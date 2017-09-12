@@ -18,12 +18,9 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Replace;
-import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
-import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.http.HttpServiceTunnel;
@@ -97,22 +94,12 @@ public class ClientHttpServiceTunnel extends HttpServiceTunnel implements IClien
       return;
     }
     final IBlockingCondition cond = Jobs.newBlockingCondition(true);
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        ClientNotificationDispatcher notificationDispatcher = BEANS.get(ClientNotificationDispatcher.class);
-        notificationDispatcher.dispatchNotifications(notifications);
-      }
+    Jobs.schedule(() -> {
+      ClientNotificationDispatcher notificationDispatcher = BEANS.get(ClientNotificationDispatcher.class);
+      notificationDispatcher.dispatchNotifications(notifications);
     }, Jobs.newInput()
         .withRunContext(ClientRunContexts.copyCurrent()))
-        .whenDone(new IDoneHandler<Void>() {
-
-          @Override
-          public void onDone(DoneEvent<Void> event) {
-            cond.setBlocking(false);
-          }
-        }, null);
+        .whenDone(event -> cond.setBlocking(false), null);
     cond.waitFor();
   }
 }

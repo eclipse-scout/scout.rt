@@ -41,12 +41,7 @@ public class LazyValue<T> {
    * <code>BEANS.get(beanType)</code>.
    */
   public LazyValue(final Class<T> beanType) {
-    this(new Callable<T>() {
-      @Override
-      public T call() throws Exception {
-        return BEANS.get(beanType);
-      }
-    });
+    this(() -> BEANS.get(beanType));
   }
 
   public T get() {

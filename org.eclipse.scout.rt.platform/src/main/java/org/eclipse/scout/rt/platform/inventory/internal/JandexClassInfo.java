@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.AnnotationTarget;
+import org.jboss.jandex.AnnotationTarget.Kind;
 import org.jboss.jandex.AnnotationValue;
 import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
@@ -77,7 +78,7 @@ public class JandexClassInfo implements IClassInfo {
     }
     for (AnnotationInstance inst : list) {
       AnnotationTarget target = inst.target();
-      if (AnnotationTarget.Kind.METHOD != target.kind()) {
+      if (Kind.METHOD != target.kind()) {
         continue;
       }
       if (!CONSTRUCTOR_NAME.equals(target.asMethod().name())) {
@@ -101,7 +102,7 @@ public class JandexClassInfo implements IClassInfo {
       return null;
     }
     for (AnnotationInstance annotationInstance : annotationInstances) {
-      if (annotationInstance.target().kind() == AnnotationTarget.Kind.CLASS) {
+      if (annotationInstance.target().kind() == Kind.CLASS) {
         AnnotationValue annotationValue = annotationInstance.value(annotationParameterName);
         if (annotationValue != null) {
           return annotationValue.value();

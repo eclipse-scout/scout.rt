@@ -236,7 +236,7 @@ public final class NamedBitMaskHelper {
     byte result = bitMaskFor(m_nextIndex);
     m_nextIndex++;
 
-    m_masksByBitName.put(bitName, Byte.valueOf(result));
+    m_masksByBitName.put(bitName, result);
     return result;
   }
 

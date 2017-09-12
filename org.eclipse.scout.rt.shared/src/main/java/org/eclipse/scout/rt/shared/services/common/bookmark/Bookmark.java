@@ -69,7 +69,7 @@ public class Bookmark implements Serializable, IOrdered {
     this.m_keyStroke = bm.m_keyStroke;
     this.m_outlineClassName = bm.m_outlineClassName;
     if (bm.m_path != null) {
-      this.m_path = new ArrayList<AbstractPageState>();
+      this.m_path = new ArrayList<>();
       for (AbstractPageState state : bm.m_path) {
         this.m_path.add(state.copy());
       }
@@ -173,7 +173,7 @@ public class Bookmark implements Serializable, IOrdered {
 
   public void addPathElement(AbstractPageState state) {
     if (m_path == null) {
-      m_path = new ArrayList<AbstractPageState>();
+      m_path = new ArrayList<>();
     }
     m_path.add(state);
     m_serializedData = null;
@@ -246,6 +246,6 @@ public class Bookmark implements Serializable, IOrdered {
 
   @Override
   public String toString() {
-    return "Bookmark[title=" + getTitle() + ", id=" + getId() + ", kind=" + (getKind() == Bookmark.GLOBAL_BOOKMARK ? "Global" : "User") + "]";
+    return "Bookmark[title=" + getTitle() + ", id=" + getId() + ", kind=" + (getKind() == GLOBAL_BOOKMARK ? "Global" : "User") + "]";
   }
 }

@@ -22,7 +22,7 @@ public class JsonAdapterReferenceTracker {
 
   public JsonAdapterReferenceTracker() {
     m_usageMap = new HashMap<>();
-    m_unreferencedAdapters = new HashSet<IJsonAdapter<?>>();
+    m_unreferencedAdapters = new HashSet<>();
   }
 
   public void put(IJsonAdapter jsonAdapter, IJsonAdapter parent) {
@@ -44,7 +44,7 @@ public class JsonAdapterReferenceTracker {
         parents.remove(parent);
       }
     }
-    if (parents == null || parents.size() == 0) {
+    if (parents == null || parents.isEmpty()) {
       m_unreferencedAdapters.add(jsonAdapter);
     }
   }

@@ -10,9 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.lookup;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -30,7 +28,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeVisitor;
  */
 @IgnoreBean
 @ClassId("bf3702b8-ee95-4c7b-870d-105b9d0deec2")
-public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements Serializable {
+public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> {
   private static final long serialVersionUID = 0L;
 
   /**
@@ -40,7 +38,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
     return BEANS.get(ICodeLookupCallFactoryService.class).newInstance(codeTypeClass);
   }
 
-  private Class<? extends ICodeType<?, CODE_ID>> m_codeTypeClass;
+  private final Class<? extends ICodeType<?, CODE_ID>> m_codeTypeClass;
   private ICodeLookupCallVisitor<CODE_ID> m_filter;
   private Comparator<ILookupRow<CODE_ID>> m_sortComparator;
 
@@ -114,7 +112,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
    * By default calls {@link #execCreateLookupRowFromCode(ICode)}
    */
   protected List<ILookupRow<CODE_ID>> execCreateLookupRowsFromCodes(List<? extends ICode<CODE_ID>> codes) {
-    List<ILookupRow<CODE_ID>> a = new ArrayList<ILookupRow<CODE_ID>>(codes.size());
+    List<ILookupRow<CODE_ID>> a = new ArrayList<>(codes.size());
     for (ICode<CODE_ID> c : codes) {
       a.add(execCreateLookupRowFromCode(c));
     }
@@ -135,7 +133,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
    * Called by {@link #execCreateLookupRowsFromCodes(List)}.
    */
   protected <T> List<ILookupRow<T>> createCodeLookupRowList(List<? extends ICode<T>> codes) {
-    List<ILookupRow<T>> rows = new ArrayList<ILookupRow<T>>(codes.size());
+    List<ILookupRow<T>> rows = new ArrayList<>(codes.size());
     for (ICode<T> code : codes) {
       rows.add(createCodeLookupRow(code));
     }
@@ -148,7 +146,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
    * Called by {@link #createCodeLookupRowList(List)}.
    */
   protected <T> ILookupRow<T> createCodeLookupRow(ICode<T> c) {
-    return new LookupRow<T>(c.getId(), c.getText())
+    return new LookupRow<>(c.getId(), c.getText())
         .withIconId(c.getIconId())
         .withTooltipText(c.getTooltipText())
         .withBackgroundColor(c.getBackgroundColor())
@@ -179,7 +177,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
    */
   @Override
   public List<ILookupRow<CODE_ID>> getDataByKey() {
-    ArrayList<ICode<CODE_ID>> list = new ArrayList<ICode<CODE_ID>>(1);
+    List<ICode<CODE_ID>> list = new ArrayList<>(1);
     ICode<CODE_ID> c = resolveCodeByKey();
     if (c != null) {
       list.add(c);
@@ -213,7 +211,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
     if (result.size() > 1) {
       Comparator<ILookupRow<CODE_ID>> comparator = getSortComparator();
       if (comparator != null) {
-        Collections.sort(result, comparator);
+        result.sort(comparator);
       }
     }
     return result;
@@ -245,7 +243,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
     if (result.size() > 1) {
       Comparator<ILookupRow<CODE_ID>> comparator = getSortComparator();
       if (comparator != null) {
-        Collections.sort(result, comparator);
+        result.sort(comparator);
       }
     }
     return result;
@@ -284,7 +282,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
     if (result.size() > 1) {
       Comparator<ILookupRow<CODE_ID>> comparator = getSortComparator();
       if (comparator != null) {
-        Collections.sort(result, comparator);
+        result.sort(comparator);
       }
     }
     return result;
@@ -322,7 +320,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
 
   private abstract class AbstractLookupRowCollector implements ICodeVisitor<ICode<CODE_ID>> {
 
-    private List<ILookupRow<CODE_ID>> m_list = new ArrayList<ILookupRow<CODE_ID>>();
+    private final List<ILookupRow<CODE_ID>> m_list = new ArrayList<>();
 
     public AbstractLookupRowCollector() {
     }

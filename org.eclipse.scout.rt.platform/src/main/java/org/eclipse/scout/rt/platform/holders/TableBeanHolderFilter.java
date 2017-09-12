@@ -22,7 +22,7 @@ public class TableBeanHolderFilter {
 
   public TableBeanHolderFilter(ITableBeanHolder table, int... rowStates) {
     m_table = table;
-    m_rowStates = new HashSet<Integer>();
+    m_rowStates = new HashSet<>();
     if (rowStates != null) {
       for (int i : rowStates) {
         m_rowStates.add(i);

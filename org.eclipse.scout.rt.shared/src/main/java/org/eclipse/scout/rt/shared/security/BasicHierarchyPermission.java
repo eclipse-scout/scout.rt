@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
-import org.eclipse.scout.rt.shared.SharedConfigProperties;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.PermissionLevelCheckCacheTimeToLiveProperty;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.slf4j.Logger;
@@ -42,8 +41,8 @@ import org.slf4j.LoggerFactory;
  * {@link #execCalculateLevel(BasicHierarchyPermission)} does not return an higher required permission level than 'OWN',
  * the access is granted.
  * <p>
- * With the property {@link SharedConfigProperties.PermissionLevelCheckCacheTimeToLiveProperty} a caching can be
- * configured in order to reduce the calls to {@link #execCalculateLevel(BasicHierarchyPermission)}.
+ * With the property {@link PermissionLevelCheckCacheTimeToLiveProperty} a caching can be configured in order to reduce
+ * the calls to {@link #execCalculateLevel(BasicHierarchyPermission)}.
  */
 @SuppressWarnings("squid:S00118")
 public abstract class BasicHierarchyPermission extends BasicPermission {
@@ -72,15 +71,15 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
   }
 
   private List<Integer> buildLevelCache() {
-    TreeSet<Integer> set = new TreeSet<Integer>();
+    TreeSet<Integer> set = new TreeSet<>();
     Field[] f = getClass().getFields();
-    for (int i = 0; i < f.length; i++) {
-      int flags = f[i].getModifiers();
-      if (Modifier.isStatic(flags) && Modifier.isFinal(flags) && f[i].getName().startsWith("LEVEL_")) {
+    for (Field aF : f) {
+      int flags = aF.getModifiers();
+      if (Modifier.isStatic(flags) && Modifier.isFinal(flags) && aF.getName().startsWith("LEVEL_")) {
         try {
-          int value = f[i].getInt(null);
+          int value = aF.getInt(null);
           if (set.contains(value)) {
-            throw new IllegalArgumentException("level " + f[i].getName() + " has the same value (" + value + ") as another level");
+            throw new IllegalArgumentException("level " + aF.getName() + " has the same value (" + value + ") as another level");
           }
           set.add(value);
         }
@@ -89,7 +88,7 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
         }
       }
     }
-    return new ArrayList<Integer>(set);
+    return new ArrayList<>(set);
   }
 
   protected Map<BasicHierarchyPermission, Boolean> getLevelPermissionCheckCache() {
@@ -109,7 +108,7 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
     if (timeToLiveDuration == null) {
       return null;
     }
-    return new ConcurrentExpiringMap<BasicHierarchyPermission, Boolean>(timeToLiveDuration, TimeUnit.MILLISECONDS);
+    return new ConcurrentExpiringMap<>(timeToLiveDuration, TimeUnit.MILLISECONDS);
   }
 
   /**

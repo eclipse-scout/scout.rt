@@ -503,7 +503,7 @@ public class ClientUIPreferences {
       return null;
     }
     String key = TABLE_COLUMNS_CONFIGS + getTableKey(table);
-    return new LinkedHashSet<String>(m_prefs.getList(key, new ArrayList<String>()));
+    return new LinkedHashSet<>(m_prefs.getList(key, new ArrayList<>()));
   }
 
   public void removeTableColumnsConfig(ITable table, String name) {
@@ -513,7 +513,7 @@ public class ClientUIPreferences {
     String key = TABLE_COLUMNS_CONFIGS + getTableKey(table);
     Set<String> configs = getAllTableColumnsConfigs(table);
     configs.remove(name);
-    m_prefs.putList(key, new ArrayList<String>(configs));
+    m_prefs.putList(key, new ArrayList<>(configs));
     removeAllTableColumnPreferences(table, name);
     removeTableCustomizerData(table.getTableCustomizer(), name);
   }
@@ -526,7 +526,7 @@ public class ClientUIPreferences {
     Set<String> configs = getAllTableColumnsConfigs(table);
     configs.remove(oldName);
     configs.add(newName);
-    m_prefs.putList(key, new ArrayList<String>(configs));
+    m_prefs.putList(key, new ArrayList<>(configs));
     renameAllTableColumnPreferences(table, oldName, newName);
     renameTableCustomizerData(table.getTableCustomizer(), oldName, newName);
   }
@@ -538,7 +538,7 @@ public class ClientUIPreferences {
     String key = TABLE_COLUMNS_CONFIGS + getTableKey(table);
     Set<String> configs = getAllTableColumnsConfigs(table);
     configs.add(name);
-    m_prefs.putList(key, new ArrayList<String>(configs));
+    m_prefs.putList(key, new ArrayList<>(configs));
   }
 
   /**
@@ -936,9 +936,9 @@ public class ClientUIPreferences {
       int colCount = splits[0].length;
       int[] a = new int[rowCount * colCount];
       int index = 0;
-      for (int r = 0; r < rowCount; r++) {
+      for (int[] split : splits) {
         for (int c = 0; c < colCount; c++) {
-          a[index] = splits[r][c];
+          a[index] = split[c];
           index++;
         }
       }

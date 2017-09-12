@@ -40,7 +40,7 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
@@ -51,7 +51,6 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
@@ -59,7 +58,6 @@ import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.server.commons.servlet.CookieUtility;
 import org.eclipse.scout.rt.server.commons.servlet.HttpClientInfo;
@@ -108,12 +106,7 @@ public class UiSession implements IUiSession {
   // the following beans must be set lazily. See the corresponding static getters.
   private static final LazyValue<HttpSessionHelper> HTTP_SESSION_HELPER = new LazyValue<>(HttpSessionHelper.class);
   private static final LazyValue<JsonRequestHelper> JSON_REQUEST_HELPER = new LazyValue<>(JsonRequestHelper.class);
-  private static final LazyValue<SecureRandom> SECURE_RANDOM = new LazyValue<>(new Callable<SecureRandom>() {
-    @Override
-    public SecureRandom call() throws Exception {
-      return SecurityUtility.createSecureRandom();
-    }
-  });
+  private static final LazyValue<SecureRandom> SECURE_RANDOM = new LazyValue<>(SecurityUtility::createSecureRandom);
 
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
   private final JsonEventProcessor m_jsonEventProcessor;
@@ -414,13 +407,7 @@ public class UiSession implements IUiSession {
 
   protected JsonClientSession<?> createClientSessionAdapter(final IClientSession clientSession) {
     // Ensure adapter is created in model job, because the model might be accessed during the adapter's initialization
-    final IFuture<JsonClientSession<?>> future = ModelJobs.schedule(new Callable<JsonClientSession<?>>() {
-
-      @Override
-      public JsonClientSession<?> call() throws Exception {
-        return (JsonClientSession<?>) createJsonAdapter(clientSession, m_rootJsonAdapter);
-      }
-    }, ModelJobs.newInput(
+    final IFuture<JsonClientSession<?>> future = ModelJobs.schedule(() -> (JsonClientSession<?>) createJsonAdapter(clientSession, m_rootJsonAdapter), ModelJobs.newInput(
         ClientRunContexts.copyCurrent()
             .withSession(clientSession, true))
         .withName("Starting JsonClientSession")
@@ -430,21 +417,17 @@ public class UiSession implements IUiSession {
   }
 
   protected void startDesktop(Map<String, String> sessionStartupParams) {
-    final IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        IDesktop desktop = m_clientSession.getDesktop();
-        IDesktopUIFacade uiFacade = desktop.getUIFacade();
-        boolean desktopOpen = desktop.isOpened();
-        if (!desktopOpen) {
-          uiFacade.openFromUI();
-        }
-        // Don't handle deep links for persistent sessions,
-        // in that case the client state shall be recovered rather than following the deep link
-        PropertyMap.CURRENT.get().put(DeepLinkUrlParameter.HANDLE_DEEP_LINK, !isPersistent() || !desktopOpen);
-        uiFacade.fireGuiAttached();
+    final IFuture<Void> future = ModelJobs.schedule(() -> {
+      IDesktop desktop = m_clientSession.getDesktop();
+      IDesktopUIFacade uiFacade = desktop.getUIFacade();
+      boolean desktopOpen = desktop.isOpened();
+      if (!desktopOpen) {
+        uiFacade.openFromUI();
       }
+      // Don't handle deep links for persistent sessions,
+      // in that case the client state shall be recovered rather than following the deep link
+      PropertyMap.CURRENT.get().put(DeepLinkUrlParameter.HANDLE_DEEP_LINK, !isPersistent() || !desktopOpen);
+      uiFacade.fireGuiAttached();
     }, ModelJobs.newInput(
         ClientRunContexts.copyCurrent()
             .withSession(m_clientSession, true)
@@ -462,12 +445,7 @@ public class UiSession implements IUiSession {
   }
 
   protected void putInitializationStartupData(final String clientSessionAdapterId) {
-    final IFuture<Locale> future = ModelJobs.schedule(new Callable<Locale>() {
-      @Override
-      public Locale call() throws Exception {
-        return m_clientSession.getLocale();
-      }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()
+    final IFuture<Locale> future = ModelJobs.schedule(m_clientSession::getLocale, ModelJobs.newInput(ClientRunContexts.copyCurrent()
         .withSession(m_clientSession, true))
         .withName("Looking up Locale")
         .withExceptionHandling(null, false)); // exception handling done by caller
@@ -554,12 +532,7 @@ public class UiSession implements IUiSession {
       }
       else {
         final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(m_clientSession, true);
-        ModelJobs.schedule(new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            getClientSession().getDesktop().getUIFacade().fireGuiDetached();
-          }
-        }, ModelJobs.newInput(clientRunContext)
+        ModelJobs.schedule(getClientSession().getDesktop().getUIFacade()::fireGuiDetached, ModelJobs.newInput(clientRunContext)
             .withName("Detaching Gui")
             .withExceptionHandling(null, false)); // Propagate exception to caller (UIServlet)
       }
@@ -686,13 +659,7 @@ public class UiSession implements IUiSession {
       m_processingJsonRequest = true;
       try {
         // 1. Process the JSON request.
-        ModelJobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            processJsonRequestInternal();
-          }
-        }, createJsonRequestModelJobInput(jsonRequest, clientRunContext));
+        ModelJobs.schedule(this::processJsonRequestInternal, createJsonRequestModelJobInput(jsonRequest, clientRunContext));
 
         // 2. Wait for all model jobs of the session.
         BEANS.get(UiJobs.class).awaitModelJobs(m_clientSession, ExceptionHandler.class);
@@ -795,22 +762,19 @@ public class UiSession implements IUiSession {
    *         json response for future jobs. The callable <b>must</b> be called from a model job.
    */
   protected Callable<JSONObject> newResponseToJsonTransformer() {
-    return new Callable<JSONObject>() {
-      @Override
-      public JSONObject call() throws Exception {
-        try {
-          return responseToJsonInternal();
-        }
-        catch (RuntimeException e) {
-          LOG.warn("Error while transforming response to JSON: {}", m_currentJsonResponse, e);
-          // Return UI error, with same sequenceNo to keep response queue order consistent
-          return getJsonRequestHelper().createUnrecoverableFailureResponse(m_currentJsonResponse.getSequenceNo());
-        }
-        finally {
-          // Create a new JSON response for future jobs. This is also done in case of an exception, because apparently the
-          // response is corrupt and the exception is likely to happen again.
-          m_currentJsonResponse = createJsonResponse();
-        }
+    return () -> {
+      try {
+        return responseToJsonInternal();
+      }
+      catch (RuntimeException e) {
+        LOG.warn("Error while transforming response to JSON: {}", m_currentJsonResponse, e);
+        // Return UI error, with same sequenceNo to keep response queue order consistent
+        return getJsonRequestHelper().createUnrecoverableFailureResponse(m_currentJsonResponse.getSequenceNo());
+      }
+      finally {
+        // Create a new JSON response for future jobs. This is also done in case of an exception, because apparently the
+        // response is corrupt and the exception is likely to happen again.
+        m_currentJsonResponse = createJsonResponse();
       }
     };
   }
@@ -824,13 +788,7 @@ public class UiSession implements IUiSession {
       m_processingJsonRequest = true;
       try {
         // 1. Process the JSON request.
-        ModelJobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            resourceConsumer.consumeBinaryResource(uploadResources, uploadProperties);
-          }
-        }, createFileUploadModelJobInput(clientRunContext));
+        ModelJobs.schedule(() -> resourceConsumer.consumeBinaryResource(uploadResources, uploadProperties), createFileUploadModelJobInput(clientRunContext));
 
         // 2. Wait for all model jobs of the session.
         BEANS.get(UiJobs.class).awaitModelJobs(m_clientSession, ExceptionHandler.class);
@@ -894,7 +852,7 @@ public class UiSession implements IUiSession {
 
     // Redirect client to "you are now logged out" screen
     if (isProcessingJsonRequest()) {
-      boolean platformValid = (Platform.get() != null && Platform.get().getState() == IPlatform.State.PlatformStarted);
+      boolean platformValid = (Platform.get() != null && Platform.get().getState() == State.PlatformStarted);
       if (m_currentJsonResponse != null && platformValid) {
         m_currentJsonResponse.addActionEvent(getUiSessionId(), "logout", createLogoutEventData());
       }
@@ -1015,22 +973,15 @@ public class UiSession implements IUiSession {
             .andMatchNotExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST) // events for poll-requests are not of interest
             .andMatchNotExecutionHint(UiJobs.EXECUTION_HINT_RESPONSE_TO_JSON) // events for response-to-json are not of interest
             .andMatch(newUiDataAvailableFilter()) // filter which evaluates to 'true' once possible UI data is available
-            .andMatch(new IFilter<JobEvent>() {
-
-              @Override
-              public boolean accept(JobEvent event) {
-                // Release poll-request only if there is currently no regular request processing.
-                // If such a request is available, the result of the event's model job will be included in the response of that request.
-                return !isProcessingJsonRequest();
-              }
+            .andMatch(event -> {
+              // Release poll-request only if there is currently no regular request processing.
+              // If such a request is available, the result of the event's model job will be included in the response of that request.
+              return !isProcessingJsonRequest();
             })
             .toFilter(),
-        new IJobListener() {
-          @Override
-          public void changed(JobEvent event) {
-            LOG.trace("Model job finished. Wake up 'poll-request'. [job={}, eventType={}]", event.getData().getFuture().getJobInput().getName(), event.getType());
-            signalPoller();
-          }
+        event -> {
+          LOG.trace("Model job finished. Wake up 'poll-request'. [job={}, eventType={}]", event.getData().getFuture().getJobInput().getName(), event.getType());
+          signalPoller();
         });
   }
 
@@ -1165,7 +1116,7 @@ public class UiSession implements IUiSession {
 
   protected JSONObject getTextMap(Locale locale) {
     // Collect textKeys
-    Set<String> textKeys = new TreeSet<String>();
+    Set<String> textKeys = new TreeSet<>();
     for (IUiTextContributor contributor : BEANS.all(IUiTextContributor.class)) {
       contributor.contributeUiTextKeys(textKeys);
       LOG.debug("Gathered UI text keys from contributor {}", contributor);

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.zip.CRC32;
 
@@ -31,7 +32,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.fields.pagefield.AbstractPageField;
+import org.eclipse.scout.rt.client.ui.form.fields.pagefield.AbstractPageField.SimpleOutline;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
@@ -55,8 +56,8 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
   }
 
   private boolean m_active;
-  private final WeakHashMap<IForm, String> m_formToIdentifierMap;
-  private final WeakHashMap<ITable, String> m_tableToIdentifierMap;
+  private final Map<IForm, String> m_formToIdentifierMap;
+  private final Map<ITable, String> m_tableToIdentifierMap;
   private final MemoryPolicyListener m_memoryPolicyListener;
 
   private final FormListener m_formListener = new FormListener() {
@@ -99,8 +100,8 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
   };
 
   public AbstractMemoryPolicy() {
-    m_formToIdentifierMap = new WeakHashMap<IForm, String>();
-    m_tableToIdentifierMap = new WeakHashMap<ITable, String>();
+    m_formToIdentifierMap = new WeakHashMap<>();
+    m_tableToIdentifierMap = new WeakHashMap<>();
     m_memoryPolicyListener = new MemoryPolicyListener();
   }
 
@@ -135,7 +136,7 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
 
   @Override
   public void pageSearchFormStarted(IPageWithTable<?> p) {
-    if (p.getOutline() instanceof AbstractPageField.SimpleOutline) {
+    if (p.getOutline() instanceof SimpleOutline) {
       return;
     }
     IForm f = p.getSearchFormInternal();

@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
 public class PermissionServiceClientProxy implements IPermissionService {
 
   private final Object m_stateLock = new Object();
-  private final Map<Object, ServiceState> m_stateMap = new HashMap<Object, ServiceState>();
+  private final Map<Object, ServiceState> m_stateMap = new HashMap<>();
 
   private ServiceState getServiceState() {
     IClientSession session = ClientSessionProvider.currentSession();
@@ -37,11 +37,7 @@ public class PermissionServiceClientProxy implements IPermissionService {
       key = session.getClass();
     }
     synchronized (m_stateLock) {
-      ServiceState data = (ServiceState) m_stateMap.get(key);
-      if (data == null) {
-        data = new ServiceState();
-        m_stateMap.put(key, data);
-      }
+      ServiceState data = m_stateMap.computeIfAbsent(key, k -> new ServiceState());
       return data;
     }
   }

@@ -17,14 +17,13 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
-import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * This service stores the bookmark data's 3 root folders as individial data records
  */
-public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmarkStorageService implements IBookmarkStorageService {
+public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmarkStorageService {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractSqlBookmarkStorageService.class);
 
   /**
@@ -156,8 +155,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
   @Override
   protected BookmarkFolder readUserFolder(Object userId) {
     Object[][] data = execSelectUserBookmarkFolder(userId);
-    for (int r = 0; r < data.length; r++) {
-      Object[] row = data[r];
+    for (Object[] row : data) {
       long id = ((Number) row[0]).longValue();
       try {
         BookmarkFolder folder = execResolveBookmarkFolder(id, row[1]);
@@ -176,8 +174,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
   @Override
   protected BookmarkFolder readGlobalFolder() {
     Object[][] data = execSelectGlobalBookmarkFolder();
-    for (int r = 0; r < data.length; r++) {
-      Object[] row = data[r];
+    for (Object[] row : data) {
       long id = ((Number) row[0]).longValue();
       try {
         BookmarkFolder folder = execResolveBookmarkFolder(id, row[1]);

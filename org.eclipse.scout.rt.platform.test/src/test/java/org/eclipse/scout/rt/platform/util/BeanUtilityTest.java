@@ -19,7 +19,6 @@ import static org.junit.Assert.fail;
 
 import java.lang.reflect.Constructor;
 
-import org.eclipse.scout.rt.platform.util.BeanUtility;
 import org.junit.Test;
 
 /**

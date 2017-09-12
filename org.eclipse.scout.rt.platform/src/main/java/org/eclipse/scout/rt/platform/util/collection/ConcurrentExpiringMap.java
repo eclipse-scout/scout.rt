@@ -17,6 +17,7 @@ import java.util.AbstractSet;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
@@ -89,7 +90,7 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
    *          unit of timeToLive
    */
   public ConcurrentExpiringMap(long timeToLiveDuration, TimeUnit timeToLiveUnit) {
-    this(new ConcurrentHashMap<K, ExpiringElement<V>>(), timeToLiveUnit.toMillis(timeToLiveDuration), false, false, 0, 0);
+    this(new ConcurrentHashMap<>(), timeToLiveUnit.toMillis(timeToLiveDuration), false, false, 0, 0);
   }
 
   /**
@@ -107,7 +108,7 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
    *          if greater than zero, entries may be evicted at a put operation until the map reaches this size
    */
   public ConcurrentExpiringMap(long timeToLiveDuration, TimeUnit timeToLiveUnit, int targetSize) {
-    this(new ConcurrentHashMap<K, ExpiringElement<V>>(), timeToLiveUnit.toMillis(timeToLiveDuration), true, false, targetSize, defaultOverflowSize(targetSize));
+    this(new ConcurrentHashMap<>(), timeToLiveUnit.toMillis(timeToLiveDuration), true, false, targetSize, defaultOverflowSize(targetSize));
   }
 
   /**
@@ -184,7 +185,7 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
     m_overflowSize = overflowSize;
   }
 
-  private static final int defaultOverflowSize(int targetSize) {
+  private static int defaultOverflowSize(int targetSize) {
     if (targetSize == 1) {
       // special case for targetSize == 1; return then 2 in order to be strictly greater
       return 2;
@@ -294,7 +295,7 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
 
   @Override
   public void putAll(Map<? extends K, ? extends V> m) {
-    for (Map.Entry<? extends K, ? extends V> e : m.entrySet()) {
+    for (Entry<? extends K, ? extends V> e : m.entrySet()) {
       m_elementMap.put(e.getKey(), createElement(e.getValue()));
     }
     validateSize();
@@ -357,12 +358,12 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
   }
 
   @Override
-  public Set<Map.Entry<K, V>> entrySet() {
+  public Set<Entry<K, V>> entrySet() {
     return new EntrySet();
   }
 
   protected ExpiringElement<V> createElement(V value) {
-    return new ExpiringElement<V>(value);
+    return new ExpiringElement<>(value);
   }
 
   protected ExpiringElement<V> getElement(Object key) {
@@ -430,7 +431,7 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
   }
 
   protected void evictOldestEntries() {
-    TreeSet<Entry<K, ExpiringElement<V>>> set = new TreeSet<Entry<K, ExpiringElement<V>>>(new StableTimestampComparator<K, V>());
+    NavigableSet<Entry<K, ExpiringElement<V>>> set = new TreeSet<>(new StableTimestampComparator<>());
 
     int counter = 0;
     for (Entry<K, ExpiringElement<V>> entry : m_elementMap.entrySet()) {
@@ -480,19 +481,19 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
     // hook method for subclasses
   }
 
-  private final class EntrySet extends AbstractSet<Map.Entry<K, V>> {
+  private final class EntrySet extends AbstractSet<Entry<K, V>> {
 
     @Override
-    public Iterator<Map.Entry<K, V>> iterator() {
+    public Iterator<Entry<K, V>> iterator() {
       return newEntryIterator(m_touchOnIterate);
     }
 
     @Override
     public boolean contains(Object o) {
-      if (!(o instanceof Map.Entry)) {
+      if (!(o instanceof Entry)) {
         return false;
       }
-      Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
+      Entry<?, ?> e = (Entry<?, ?>) o;
       V currentValue = ConcurrentExpiringMap.this.get(e.getKey());
       Object value = e.getValue();
       return currentValue == value || (currentValue != null && currentValue.equals(value));
@@ -500,10 +501,10 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
 
     @Override
     public boolean remove(Object o) {
-      if (!(o instanceof Map.Entry)) {
+      if (!(o instanceof Entry)) {
         return false;
       }
-      Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
+      Entry<?, ?> e = (Entry<?, ?>) o;
       return ConcurrentExpiringMap.this.remove(e.getKey()) != null;
     }
 
@@ -518,15 +519,15 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
     }
   }
 
-  protected Iterator<Map.Entry<K, V>> newEntryIterator(boolean touchOnAccess) {
+  protected Iterator<Entry<K, V>> newEntryIterator(boolean touchOnAccess) {
     return new EntryIterator(touchOnAccess);
   }
 
-  private final class EntryIterator implements Iterator<Map.Entry<K, V>> {
+  private final class EntryIterator implements Iterator<Entry<K, V>> {
     private final boolean m_touchOnAccess;
     private final Iterator<K> m_elementMapIterator;
-    private Map.Entry<K, V> m_nextEntry;
-    private Map.Entry<K, V> m_lastReturned;
+    private Entry<K, V> m_nextEntry;
+    private Entry<K, V> m_lastReturned;
 
     public EntryIterator(boolean touchOnAccess) {
       m_touchOnAccess = touchOnAccess;
@@ -542,7 +543,7 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
           // If we do not, we do not remove entries or update access time in an atomic operation which
           // in turn could remove a new value in case of a bad timing.
           // In contrast to other maps, we can update the map during iterating
-          ConcurrentExpiringMap.ExpiringElement<V> element = getElement(key, m_touchOnAccess);
+          ExpiringElement<V> element = getElement(key, m_touchOnAccess);
           if (element != null) {
             m_nextEntry = new WriteThroughEntry(key, element.getValue());
             break;
@@ -561,7 +562,7 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
     }
 
     @Override
-    public Map.Entry<K, V> next() {
+    public Entry<K, V> next() {
       if (m_nextEntry == null) {
         throw new NoSuchElementException();
       }
@@ -580,7 +581,7 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
     }
   }
 
-  private final class WriteThroughEntry extends AbstractMap.SimpleEntry<K, V> {
+  private final class WriteThroughEntry extends SimpleEntry<K, V> {
     private static final long serialVersionUID = 1L;
 
     WriteThroughEntry(K k, V v) {

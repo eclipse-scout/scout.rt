@@ -15,8 +15,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.status.IStatus;
-import org.eclipse.scout.rt.platform.status.Status;
 import org.junit.Before;
 import org.junit.Test;
 

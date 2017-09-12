@@ -27,10 +27,6 @@ public abstract class AbstractPropertyData<T> implements IHolder<T>, Serializabl
   private T m_value;
   private boolean m_valueSet;
 
-  public AbstractPropertyData() {
-    super();
-  }
-
   @Override
   public T getValue() {
     return m_value;

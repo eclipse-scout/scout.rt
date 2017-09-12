@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.platform.util.collection;
 import java.util.Collection;
 import java.util.EventListener;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -91,8 +90,7 @@ public class LRUCache<K, V> extends ConcurrentExpiringMap<K, V> {
 
   @Override
   public void clear() {
-    for (Iterator<Entry<K, V>> iterator = entrySet().iterator(); iterator.hasNext();) {
-      Entry<K, V> entry = iterator.next();
+    for (Entry<K, V> entry : entrySet()) {
       // we must use remove(K, V) in order to call fireValueDisposed(K, V) safely
       remove(entry.getKey(), entry.getValue());
     }
@@ -101,6 +99,7 @@ public class LRUCache<K, V> extends ConcurrentExpiringMap<K, V> {
   /**
    * Dispose observer
    */
+  @FunctionalInterface
   public interface DisposeListener extends EventListener {
     void valueDisposed(Object key, Object value);
   }
@@ -115,8 +114,8 @@ public class LRUCache<K, V> extends ConcurrentExpiringMap<K, V> {
 
   private void fireValueDisposed(Object key, Object value) {
     EventListener[] a = m_listenerList.getListeners(DisposeListener.class);
-    for (int i = 0; i < a.length; i++) {
-      ((DisposeListener) a[i]).valueDisposed(key, value);
+    for (EventListener anA : a) {
+      ((DisposeListener) anA).valueDisposed(key, value);
     }
   }
 }

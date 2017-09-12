@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.html.json;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
 
 public class JsonByteArray implements IJsonObject {
-  private byte[] m_bytes;
+  private final byte[] m_bytes;
 
   public JsonByteArray(byte[] bytes) {
     m_bytes = bytes;
@@ -32,7 +32,7 @@ public class JsonByteArray implements IJsonObject {
     if (m_bytes == null) {
       return null;
     }
-    return Base64Utility.encode((byte[]) m_bytes);
+    return Base64Utility.encode(m_bytes);
   }
 
 }

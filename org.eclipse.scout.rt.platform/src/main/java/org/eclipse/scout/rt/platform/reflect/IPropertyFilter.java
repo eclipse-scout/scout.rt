@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.reflect;
 
+@FunctionalInterface
 public interface IPropertyFilter {
 
   /**

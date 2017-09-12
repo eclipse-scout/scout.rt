@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.treebox;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
@@ -66,35 +65,32 @@ public abstract class AbstractTreeBoxFilterBox extends AbstractGroupBox {
   @Override
   protected void execInitField() {
     if (m_treeBoxPropertyListener == null) {
-      m_treeBoxPropertyListener = new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent e) {
-          String name = e.getPropertyName();
-          if (ITreeBox.PROP_FILTER_CHECKED_NODES.equals(name)) {
-            updateVisibilities();
-          }
-          else if (ITreeBox.PROP_FILTER_ACTIVE_NODES.equals(name)) {
-            updateVisibilities();
-          }
-          else if (ITreeBox.PROP_FILTER_CHECKED_NODES_VALUE.equals(name)) {
-            try {
-              if (m_treeBoxSyncLock.acquire()) {
-                getCheckedStateRadioButtonGroup().setValue(getTreeBox().getFilterCheckedNodesValue());
-              }
-            }
-            finally {
-              m_treeBoxSyncLock.release();
+      m_treeBoxPropertyListener = e -> {
+        String name = e.getPropertyName();
+        if (ITreeBox.PROP_FILTER_CHECKED_NODES.equals(name)) {
+          updateVisibilities();
+        }
+        else if (ITreeBox.PROP_FILTER_ACTIVE_NODES.equals(name)) {
+          updateVisibilities();
+        }
+        else if (ITreeBox.PROP_FILTER_CHECKED_NODES_VALUE.equals(name)) {
+          try {
+            if (m_treeBoxSyncLock.acquire()) {
+              getCheckedStateRadioButtonGroup().setValue(getTreeBox().getFilterCheckedNodesValue());
             }
           }
-          else if (ITreeBox.PROP_FILTER_ACTIVE_NODES_VALUE.equals(name)) {
-            try {
-              if (m_treeBoxSyncLock.acquire()) {
-                getActiveStateRadioButtonGroup().setValue(getTreeBox().getFilterActiveNodesValue());
-              }
+          finally {
+            m_treeBoxSyncLock.release();
+          }
+        }
+        else if (ITreeBox.PROP_FILTER_ACTIVE_NODES_VALUE.equals(name)) {
+          try {
+            if (m_treeBoxSyncLock.acquire()) {
+              getActiveStateRadioButtonGroup().setValue(getTreeBox().getFilterActiveNodesValue());
             }
-            finally {
-              m_treeBoxSyncLock.release();
-            }
+          }
+          finally {
+            m_treeBoxSyncLock.release();
           }
         }
       };

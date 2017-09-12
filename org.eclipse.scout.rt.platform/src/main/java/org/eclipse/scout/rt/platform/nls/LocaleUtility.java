@@ -20,7 +20,7 @@ public final class LocaleUtility {
    * @return the parsed locale such as created by {@link Locale#toString()}
    */
   public static Locale parse(String s) {
-    if (s == null || s.length() == 0) {
+    if (s == null || s.isEmpty()) {
       return null;
     }
     int a = s.indexOf('_');

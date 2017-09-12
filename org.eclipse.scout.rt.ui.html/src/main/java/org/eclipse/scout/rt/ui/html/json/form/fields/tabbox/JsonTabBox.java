@@ -58,7 +58,7 @@ public class JsonTabBox<TAB_BOX extends ITabBox> extends JsonCompositeField<TAB_
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    m_jsonContextMenu = new JsonContextMenu<IContextMenu>(getModel().getContextMenu(), this);
+    m_jsonContextMenu = new JsonContextMenu<>(getModel().getContextMenu(), this);
     m_jsonContextMenu.init();
   }
 

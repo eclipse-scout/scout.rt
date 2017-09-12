@@ -16,7 +16,7 @@ import java.security.Principal;
 public class SimplePrincipal implements Principal, Serializable {
   private static final long serialVersionUID = 1L;
 
-  private String m_name;
+  private final String m_name;
 
   public SimplePrincipal(String name) {
     if (name == null) {
@@ -47,7 +47,7 @@ public class SimplePrincipal implements Principal, Serializable {
       return false;
     }
     String myFullName = getName();
-    String otherFullName = ((SimplePrincipal) other).getName();
+    String otherFullName = ((Principal) other).getName();
     return myFullName.equals(otherFullName);
   }
 

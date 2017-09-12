@@ -87,13 +87,13 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
      * after field creation. -> all fields would have the enabled state of the MainBox.
      */
     m_fields = CollectionUtility.emptyArrayList();
-    m_movedFormFieldsByClass = new HashMap<Class<? extends IFormField>, IFormField>();
+    m_movedFormFieldsByClass = new HashMap<>();
     m_fieldPropertyChangeListener = new P_FieldPropertyChangeListener();
     super.initConfig();
     // prepare injected fields
     DefaultFormFieldInjection injectedFields = null;
     List<Class<IFormField>> declaredFields = getConfiguredFields();
-    List<Class<? extends IFormField>> configuredFields = new ArrayList<Class<? extends IFormField>>(declaredFields.size());
+    List<Class<? extends IFormField>> configuredFields = new ArrayList<>(declaredFields.size());
     for (Class<? extends IFormField> clazz : declaredFields) {
       if (ConfigurationUtility.isInjectFieldAnnotationPresent(clazz)) {
         if (injectedFields == null) {
@@ -115,7 +115,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
       filterFieldsInternal(configuredFields);
 
       // create instances
-      OrderedCollection<IFormField> fields = new OrderedCollection<IFormField>();
+      OrderedCollection<IFormField> fields = new OrderedCollection<>();
       for (Class<? extends IFormField> clazz : configuredFields) {
         IFormField f = ConfigurationUtility.newInnerInstance(this, clazz);
         fields.addOrdered(f);
@@ -316,7 +316,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
       return;
     }
     if (m_formFieldReplacements == null) {
-      m_formFieldReplacements = new HashMap<Class<?>, Class<? extends IFormField>>();
+      m_formFieldReplacements = new HashMap<>();
     }
     m_formFieldReplacements.putAll(replacements);
   }
@@ -508,6 +508,6 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
 
   @Override
   protected ICompositeFieldExtension<? extends AbstractCompositeField> createLocalExtension() {
-    return new LocalCompositeFieldExtension<AbstractCompositeField>(this);
+    return new LocalCompositeFieldExtension<>(this);
   }
 }

@@ -14,7 +14,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectInputStream.GetField;
 import java.io.ObjectOutputStream;
+import java.io.ObjectOutputStream.PutField;
 import java.io.Serializable;
 import java.security.Permission;
 import java.security.Permissions;
@@ -54,16 +56,12 @@ public class LenientPermissionWrapper implements Serializable {
   private void writeObject(ObjectOutputStream out) throws IOException {
     //no call to defaultWriteObject
     ByteArrayOutputStream bout = new ByteArrayOutputStream();
-    ObjectOutputStream localOut = new ObjectOutputStream(bout);
-    try {
+    try (ObjectOutputStream localOut = new ObjectOutputStream(bout)) {
       localOut.writeObject(m_permission);
-    }
-    finally {
-      localOut.close();
     }
     byte[] data = bout.toByteArray();
     //
-    ObjectOutputStream.PutField pfields = out.putFields();
+    PutField pfields = out.putFields();
     pfields.put("m_className", m_className);
     pfields.put("m_permission", data);
     out.writeFields();
@@ -73,16 +71,12 @@ public class LenientPermissionWrapper implements Serializable {
   private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
     //no call to defaultReadObject
     try {
-      ObjectInputStream.GetField gfields = in.readFields();
-      m_className = (String) gfields.get("m_className", (String) null);
-      byte[] data = (byte[]) gfields.get("m_permission", (byte[]) null);
+      GetField gfields = in.readFields();
+      m_className = (String) gfields.get("m_className", null);
+      byte[] data = (byte[]) gfields.get("m_permission", null);
 
-      ObjectInputStream localIn = new ObjectInputStream(new ByteArrayInputStream(data));
-      try {
+      try (ObjectInputStream localIn = new ObjectInputStream(new ByteArrayInputStream(data))) {
         m_permission = (Permission) localIn.readObject();
-      }
-      finally {
-        localIn.close();
       }
     }
     catch (Throwable t) {

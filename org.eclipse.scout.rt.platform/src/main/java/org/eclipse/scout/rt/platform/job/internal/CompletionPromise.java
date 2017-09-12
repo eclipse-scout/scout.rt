@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.FinalValue;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +76,7 @@ class CompletionPromise<RESULT> {
     // Release any thread waiting for a future to become 'done'.
     m_lock.lock();
     try {
-      m_doneEvent.set(CompletionPromise.newDoneEvent(m_future));
+      m_doneEvent.set(newDoneEvent(m_future));
       m_doneCondition.signalAll();
     }
     finally {
@@ -86,15 +85,11 @@ class CompletionPromise<RESULT> {
 
     // Notify registered handlers asynchronously.
     if (!m_handlers.isEmpty()) {
-      m_executor.execute(new Runnable() {
-
-        @Override
-        public void run() {
-          final Iterator<PromiseHandler<RESULT>> iterator = m_handlers.iterator();
-          while (iterator.hasNext()) {
-            iterator.next().notifySafe(m_doneEvent.get());
-            iterator.remove();
-          }
+      m_executor.execute(() -> {
+        final Iterator<PromiseHandler<RESULT>> iterator = m_handlers.iterator();
+        while (iterator.hasNext()) {
+          iterator.next().notifySafe(m_doneEvent.get());
+          iterator.remove();
         }
       });
     }
@@ -168,7 +163,7 @@ class CompletionPromise<RESULT> {
       m_lock.unlock();
     }
 
-    return CompletionPromise.retrieveFinalValue(m_future);
+    return retrieveFinalValue(m_future);
   }
 
   /**
@@ -207,7 +202,7 @@ class CompletionPromise<RESULT> {
       m_lock.unlock();
     }
 
-    return CompletionPromise.retrieveFinalValue(m_future);
+    return retrieveFinalValue(m_future);
   }
 
   /**
@@ -323,13 +318,7 @@ class CompletionPromise<RESULT> {
           m_callback.onDone(doneEvent);
         }
         else {
-          m_runContext.run(new IRunnable() {
-
-            @Override
-            public void run() throws Exception {
-              m_callback.onDone(doneEvent);
-            }
-          });
+          m_runContext.run(() -> m_callback.onDone(doneEvent));
         }
       }
       catch (final Throwable t) {// NOSONAR
@@ -343,22 +332,10 @@ class CompletionPromise<RESULT> {
   /**
    * Matches futures in 'done' state.
    */
-  static final IFilter<JobFutureTask<?>> FUTURE_DONE_MATCHER = new IFilter<JobFutureTask<?>>() {
-
-    @Override
-    public boolean accept(final JobFutureTask<?> future) {
-      return future.isDone();
-    }
-  };
+  static final IFilter<JobFutureTask<?>> FUTURE_DONE_MATCHER = FutureTask::isDone;
 
   /**
    * Matches futures in 'done' state, and for which the 'done' event was fired.
    */
-  static final IFilter<JobFutureTask<?>> PROMISE_DONE_MATCHER = new IFilter<JobFutureTask<?>>() {
-
-    @Override
-    public boolean accept(final JobFutureTask<?> future) {
-      return future.getCompletionPromise().isDone();
-    }
-  };
+  static final IFilter<JobFutureTask<?>> PROMISE_DONE_MATCHER = future -> future.getCompletionPromise().isDone();
 }

@@ -31,7 +31,7 @@ class CollectionHolderOutput implements IBindOutput {
   public CollectionHolderOutput(IHolder<?> holder, ValueOutputToken source) {
     m_holder = holder;
     m_source = source;
-    m_accumulator = new ArrayList<Object>();
+    m_accumulator = new ArrayList<>();
     m_batchIndex = -1;
     m_jdbcBindIndex = -1;
   }

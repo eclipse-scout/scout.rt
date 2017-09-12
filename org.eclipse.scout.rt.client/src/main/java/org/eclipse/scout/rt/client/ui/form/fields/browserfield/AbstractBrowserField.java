@@ -82,8 +82,8 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
    * <p>
    * This property is only relevant when sandbox is enabled (see {@link #getConfiguredSandboxEnabled()}).
    *
-   * @return Sandbox permissions to enabled or {@code null} / {@link IBrowserField.SandboxPermission#none()} if no
-   *         permissions should be enabled.
+   * @return Sandbox permissions to enabled or {@code null} / {@link SandboxPermission#none()} if no permissions should
+   *         be enabled.
    */
   @Order(220)
   @ConfigProperty(ConfigProperty.OBJECT)
@@ -247,8 +247,8 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   protected void fireBrowserFieldEvent(BrowserFieldEvent e) {
     EventListener[] listeners = m_listenerList.getListeners(BrowserFieldListener.class);
     if (listeners != null && listeners.length > 0) {
-      for (int i = 0; i < listeners.length; i++) {
-        ((BrowserFieldListener) listeners[i]).browserFieldChanged(e);
+      for (EventListener listener : listeners) {
+        ((BrowserFieldListener) listener).browserFieldChanged(e);
       }
     }
   }
@@ -487,6 +487,6 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
 
   @Override
   protected IBrowserFieldExtension<? extends AbstractBrowserField> createLocalExtension() {
-    return new LocalBrowserFieldExtension<AbstractBrowserField>(this);
+    return new LocalBrowserFieldExtension<>(this);
   }
 }

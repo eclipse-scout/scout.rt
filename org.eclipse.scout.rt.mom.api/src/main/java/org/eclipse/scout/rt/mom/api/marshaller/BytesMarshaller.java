@@ -23,12 +23,12 @@ public class BytesMarshaller implements IMarshaller {
       return null;
     }
 
-    return (byte[]) assertInstance(transferObject, byte[].class, "bytes array expected [actual={}]", transferObject.getClass().getSimpleName());
+    return assertInstance(transferObject, byte[].class, "bytes array expected [actual={}]", transferObject.getClass().getSimpleName());
   }
 
   @Override
   public Object unmarshall(final Object data, final Map<String, String> context) {
-    return (byte[]) data;
+    return data;
   }
 
   @Override

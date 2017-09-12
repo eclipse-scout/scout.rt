@@ -59,7 +59,7 @@ public class TableRow implements ITableRow {
     m_customValues = new HashMap<>(0);
 
     int colCount = columnSet != null ? columnSet.getColumnCount() : 0;
-    m_cells = new ArrayList<Cell>(colCount);
+    m_cells = new ArrayList<>(colCount);
     setEnabled(true);
     addCells(colCount);
   }
@@ -69,12 +69,12 @@ public class TableRow implements ITableRow {
     m_customValues = new HashMap<>(row.getCustomValues());
 
     int colCount = columnSet != null ? columnSet.getColumnCount() : 0;
-    m_cells = new ArrayList<Cell>(colCount);
+    m_cells = new ArrayList<>(colCount);
     setEnabled(true);
     copyCells(row);
   }
 
-  public TableRow(ColumnSet columnSet, List<? extends Object> values) {
+  public TableRow(ColumnSet columnSet, List<?> values) {
     this(columnSet);
     if (CollectionUtility.hasElements(values)) {
       for (int i = 0; i < values.size(); i++) {
@@ -267,7 +267,7 @@ public class TableRow implements ITableRow {
     if (keyColumns.length == 0) {
       keyColumns = m_columnSet.getAllColumnIndexes();
     }
-    List<Object> pk = new ArrayList<Object>(keyColumns.length);
+    List<Object> pk = new ArrayList<>(keyColumns.length);
     for (int keyIndex : keyColumns) {
       pk.add(getCellValue(keyIndex));
     }
@@ -312,7 +312,7 @@ public class TableRow implements ITableRow {
   }
 
   @Override
-  public boolean setCellValues(List<? extends Object> values) {
+  public boolean setCellValues(List<?> values) {
     try {
       setRowChanging(true);
       //
@@ -345,23 +345,23 @@ public class TableRow implements ITableRow {
 
   @Override
   public void setBackgroundColor(String c) {
-    for (int i = 0; i < m_cells.size(); i++) {
-      m_cells.get(i).setBackgroundColor(c);
+    for (Cell m_cell : m_cells) {
+      m_cell.setBackgroundColor(c);
     }
   }
 
   @Override
   public void setForegroundColor(String c) {
-    for (int i = 0; i < m_cells.size(); i++) {
-      m_cells.get(i).setForegroundColor(c);
+    for (Cell m_cell : m_cells) {
+      m_cell.setForegroundColor(c);
     }
   }
 
   @Override
   public void setCssClass(String cssClass) {
     m_cssClass = cssClass;
-    for (int i = 0; i < m_cells.size(); i++) {
-      m_cells.get(i).setCssClass(cssClass);
+    for (Cell m_cell : m_cells) {
+      m_cell.setCssClass(cssClass);
     }
   }
 
@@ -372,15 +372,15 @@ public class TableRow implements ITableRow {
 
   @Override
   public void setFont(FontSpec f) {
-    for (int i = 0; i < m_cells.size(); i++) {
-      m_cells.get(i).setFont(f);
+    for (Cell m_cell : m_cells) {
+      m_cell.setFont(f);
     }
   }
 
   @Override
   public void setTooltipText(String s) {
-    for (int i = 0; i < m_cells.size(); i++) {
-      m_cells.get(i).setTooltipText(s);
+    for (Cell m_cell : m_cells) {
+      m_cell.setTooltipText(s);
     }
   }
 
@@ -439,9 +439,8 @@ public class TableRow implements ITableRow {
     return getClass().getSimpleName() + m_cells;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public Set<Integer> getUpdatedColumnIndexes(int changedBit) {
-    return Collections.EMPTY_SET;
+    return Collections.emptySet();
   }
 }

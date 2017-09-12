@@ -30,7 +30,6 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Test;
 
 /**

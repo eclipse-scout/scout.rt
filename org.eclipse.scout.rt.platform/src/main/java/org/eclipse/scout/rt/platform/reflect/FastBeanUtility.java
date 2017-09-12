@@ -30,14 +30,14 @@ public final class FastBeanUtility {
   }
 
   public static String capitalize(String s) {
-    if (s == null || s.length() == 0) {
+    if (s == null || s.isEmpty()) {
       return "";
     }
     return Character.toUpperCase(s.charAt(0)) + s.substring(1);
   }
 
   public static String decapitalize(String s) {
-    if (s == null || s.length() == 0) {
+    if (s == null || s.isEmpty()) {
       return "";
     }
     if (s.length() >= 2 && Character.isUpperCase(s.charAt(0)) && Character.isUpperCase(s.charAt(1))) {
@@ -93,27 +93,15 @@ public final class FastBeanUtility {
           Class<?> retType = m.getReturnType();
           //
           if ("get".equals(kind) && paramTypes.length == 0 && retType != null && retType != Void.TYPE) {
-            FastPropertyDescriptor desc = contributeMap.get(name);
-            if (desc == null) {
-              desc = new FastPropertyDescriptor(beanClazz, name);
-              contributeMap.put(name, desc);
-            }
+            FastPropertyDescriptor desc = contributeMap.computeIfAbsent(name, n -> new FastPropertyDescriptor(beanClazz, n));
             desc.addReadMethod(m);
           }
           else if ("is".equals(kind) && paramTypes.length == 0 && retType != null && retType == boolean.class) {
-            FastPropertyDescriptor desc = contributeMap.get(name);
-            if (desc == null) {
-              desc = new FastPropertyDescriptor(beanClazz, name);
-              contributeMap.put(name, desc);
-            }
+            FastPropertyDescriptor desc = contributeMap.computeIfAbsent(name, n -> new FastPropertyDescriptor(beanClazz, n));
             desc.addReadMethod(m);
           }
           else if ("set".equals(kind) && paramTypes.length == 1 && (retType == null || retType == Void.TYPE)) {
-            FastPropertyDescriptor desc = contributeMap.get(name);
-            if (desc == null) {
-              desc = new FastPropertyDescriptor(beanClazz, name);
-              contributeMap.put(name, desc);
-            }
+            FastPropertyDescriptor desc = contributeMap.computeIfAbsent(name, n -> new FastPropertyDescriptor(beanClazz, n));
             desc.addWriteMethod(m);
           }
         }
@@ -124,17 +112,11 @@ public final class FastBeanUtility {
   public static Method[] getDeclaredPublicMethods(Class c) {
     Method[] methods = null;
     final Class fc = c;
-    methods = AccessController.doPrivileged(new PrivilegedAction<Method[]>() {
-      @Override
-      public Method[] run() {
-        return fc.getDeclaredMethods();
-      }
-    });
+    methods = AccessController.doPrivileged((PrivilegedAction<Method[]>) fc::getDeclaredMethods);
     //clear non-public methods:
     List<Method> methodsList = new ArrayList<>();
     if (methods != null) {
-      for (int i = 0; i < methods.length; i++) {
-        Method method = methods[i];
+      for (Method method : methods) {
         int mods = method.getModifiers();
         if (Modifier.isPublic(mods)) {
           methodsList.add(method);

@@ -69,10 +69,10 @@ public abstract class AbstractLookupService<LOOKUP_ROW_KEY_TYPE> implements ILoo
    *          type parameter of the lookup service.
    */
   public static <KEY_TYPE> List<ILookupRow<KEY_TYPE>> createLookupRowArray(Object[][] data, int maxColumnIndex, ILookupCall<KEY_TYPE> call, Class<?> keyClass) {
-    List<ILookupRow<KEY_TYPE>> list = new ArrayList<ILookupRow<KEY_TYPE>>(data.length);
+    List<ILookupRow<KEY_TYPE>> list = new ArrayList<>(data.length);
     Boolean active = call.getActive().getBooleanValue();
-    for (int i = 0; i < data.length; i++) {
-      LookupRow<KEY_TYPE> row = new LookupRow<KEY_TYPE>(data[i], maxColumnIndex, keyClass);
+    for (Object[] aData : data) {
+      LookupRow<KEY_TYPE> row = new LookupRow<>(aData, maxColumnIndex, keyClass);
       // check active flag
       if (active == null || active.booleanValue() == row.isActive()) {
         list.add(row);

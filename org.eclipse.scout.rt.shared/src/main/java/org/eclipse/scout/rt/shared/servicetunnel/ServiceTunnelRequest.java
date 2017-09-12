@@ -136,7 +136,7 @@ public class ServiceTunnelRequest implements Serializable {
     if (m_args != null && m_args.length > 0) {
       for (int i = 0; i < m_args.length; i++) {
         buf.append("\t\n");
-        buf.append("arg[" + i + "]=" + VerboseUtility.dumpObject(m_args[i]));
+        buf.append("arg[").append(i).append("]=").append(VerboseUtility.dumpObject(m_args[i]));
       }
     }
     return buf.toString();

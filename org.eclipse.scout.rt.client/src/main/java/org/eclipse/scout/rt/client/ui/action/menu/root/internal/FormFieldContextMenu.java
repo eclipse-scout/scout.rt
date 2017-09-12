@@ -14,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractContextMenu;
@@ -53,17 +52,14 @@ public class FormFieldContextMenu<T extends IFormField> extends AbstractContextM
   protected void handleOwnerEnabledChanged() {
     if (getContainer() != null) {
       final boolean enabled = getContainer().isEnabled();
-      acceptVisitor(new IActionVisitor() {
-        @Override
-        public int visit(IAction action) {
-          if (action instanceof IMenu) {
-            IMenu menu = (IMenu) action;
-            if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
-              menu.setEnabledInheritAccessibility(enabled);
-            }
+      acceptVisitor(action -> {
+        if (action instanceof IMenu) {
+          IMenu menu = (IMenu) action;
+          if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
+            menu.setEnabledInheritAccessibility(enabled);
           }
-          return CONTINUE;
         }
+        return IActionVisitor.CONTINUE;
       });
     }
   }

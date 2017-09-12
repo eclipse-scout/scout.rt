@@ -20,7 +20,7 @@ public enum JsonEventType {
   SELECT("select"),
   APP_LINK_ACTION("appLinkAction");
 
-  private String m_eventType;
+  private final String m_eventType;
 
   JsonEventType(String eventType) {
     m_eventType = eventType;

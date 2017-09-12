@@ -34,7 +34,7 @@ public class KeyStrokeNormalizer {
   /**
    * the original Scout Keystroke passed to the constructor
    */
-  private String m_originalKeyStroke;
+  private final String m_originalKeyStroke;
 
   /**
    * defines if the normalized Keystroke has a SHIFT modifier

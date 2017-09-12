@@ -20,8 +20,9 @@ package org.eclipse.scout.rt.platform.classid;
  * inner classes.
  * </p>
  *
- * @see org.eclipse.scout.rt.platform.classid.ClassId ClassId
+ * @see ClassId ClassId
  */
+@FunctionalInterface
 public interface ITypeWithClassId {
 
   String ID_CONCAT_SYMBOL = "_";

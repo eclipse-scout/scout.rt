@@ -103,7 +103,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    m_jsonContextMenu = new JsonContextMenu<IContextMenu>(getModel().getContextMenu(), this);
+    m_jsonContextMenu = new JsonContextMenu<>(getModel().getContextMenu(), this);
     m_jsonContextMenu.init();
   }
 
@@ -472,7 +472,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
     JSONObject selectionRange = data.optJSONObject("selectionRange");
     Date fromDate = toJavaDate(selectionRange, "from");
     Date toDate = toJavaDate(selectionRange, "to");
-    return new Range<Date>(fromDate, toDate);
+    return new Range<>(fromDate, toDate);
   }
 
   protected void handleUiDisplayModeChange(JSONObject data) {
@@ -492,7 +492,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
     JSONObject range = data.optJSONObject("viewRange");
     Date fromDate = toJavaDate(range, "from");
     Date toDate = toJavaDate(range, "to");
-    return new Range<Date>(fromDate, toDate);
+    return new Range<>(fromDate, toDate);
   }
 
   protected Date toJavaDate(JSONObject data, String propertyName) {

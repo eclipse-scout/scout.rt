@@ -35,7 +35,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
   private final ObjectExtensions<AbstractFormHandler, IFormHandlerExtension<? extends AbstractFormHandler>> m_objectExtensions;
 
   public AbstractFormHandler() {
-    m_objectExtensions = new ObjectExtensions<AbstractFormHandler, IFormHandlerExtension<? extends AbstractFormHandler>>(this, true);
+    m_objectExtensions = new ObjectExtensions<>(this, true);
     interceptInitConfig();
   }
 
@@ -139,12 +139,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
    * Runtime
    */
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
-      @Override
-      public void run() {
-        initConfig();
-      }
-    });
+    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
   protected void initConfig() {
@@ -152,7 +147,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
   }
 
   protected IFormHandlerExtension<? extends AbstractFormHandler> createLocalExtension() {
-    return new LocalFormHandlerExtension<AbstractFormHandler>(this);
+    return new LocalFormHandlerExtension<>(this);
   }
 
   @Override

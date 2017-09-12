@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.exception;
 
-import java.io.Serializable;
-
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -21,7 +19,7 @@ import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 /**
  * A Status for processing results.
  */
-public class ProcessingStatus extends Status implements IProcessingStatus, Serializable {
+public class ProcessingStatus extends Status implements IProcessingStatus {
   private static final long serialVersionUID = 1L;
 
   @SuppressWarnings("squid:S2387")

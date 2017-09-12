@@ -40,10 +40,10 @@ import java.lang.annotation.Target;
  * Wherever now an IUserPreferencesService is used the custom instance is returned. <br>
  * <h3>Usage on form fields</h3> If this annotation is added to a form field in an extended form, it works like the
  * {@link org.eclipse.scout.rt.platform.extension.InjectFieldTo} annotation except that the original field is removed.
- * The replaced field's container is used by the replacing field as well. If the
- * {@link org.eclipse.scout.rt.platform.Order} annotation is missing on the replacing class, the order of the extended
- * class is used. Finally, the {@link org.eclipse.scout.rt.client.dto.FormData} annotation is inherited form the
- * replaced field. If the replaced field does not have a form field data, the replacing field may crate on using
+ * The replaced field's container is used by the replacing field as well. If the {@link Order} annotation is missing on
+ * the replacing class, the order of the extended class is used. Finally, the
+ * {@link org.eclipse.scout.rt.client.dto.FormData} annotation is inherited form the replaced field. If the replaced
+ * field does not have a form field data, the replacing field may crate on using
  * {@link org.eclipse.scout.rt.client.dto.FormData.SdkCommand#CREATE} or
  * {@link org.eclipse.scout.rt.client.dto.FormData.SdkCommand#USE}.
  * <p>

@@ -6,8 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.commons.servlet.HttpClientInfo;
 import org.eclipse.scout.rt.server.commons.servlet.ContentSecurityPolicy;
+import org.eclipse.scout.rt.server.commons.servlet.HttpClientInfo;
 import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResponseInterceptor;
 import org.eclipse.scout.rt.ui.html.IUiSession;

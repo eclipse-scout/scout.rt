@@ -6,7 +6,7 @@ import org.json.JSONObject;
 
 public class JsonBrowserHistoryEntry implements IJsonObject {
 
-  private BrowserHistoryEntry m_browserHistoryEntry;
+  private final BrowserHistoryEntry m_browserHistoryEntry;
 
   public JsonBrowserHistoryEntry(BrowserHistoryEntry browserHistoryEntry) {
     m_browserHistoryEntry = browserHistoryEntry;

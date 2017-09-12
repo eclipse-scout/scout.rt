@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.wizard;
 
+@FunctionalInterface
 public interface IWizardProgressFieldUIFacade {
 
   void stepActionFromUI(int stepIndex);

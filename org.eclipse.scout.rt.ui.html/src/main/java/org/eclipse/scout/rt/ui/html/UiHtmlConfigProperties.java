@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.client.ClientConfigProperties.JobCompletionDelayOnSessionShutdown;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
@@ -137,7 +138,7 @@ public final class UiHtmlConfigProperties {
 
     @Override
     protected Long getDefaultValue() {
-      return Long.valueOf(TimeUnit.HOURS.toSeconds(4));
+      return TimeUnit.HOURS.toSeconds(4);
     }
 
     @Override
@@ -157,7 +158,7 @@ public final class UiHtmlConfigProperties {
 
     @Override
     protected Long getDefaultValue() {
-      return Long.valueOf(TimeUnit.SECONDS.toSeconds(60));
+      return TimeUnit.SECONDS.toSeconds(60);
     }
 
     @Override
@@ -174,7 +175,7 @@ public final class UiHtmlConfigProperties {
 
     @Override
     protected Long getDefaultValue() {
-      return Long.valueOf(TimeUnit.HOURS.toSeconds(1));
+      return TimeUnit.HOURS.toSeconds(1);
     }
 
     @Override
@@ -202,7 +203,7 @@ public final class UiHtmlConfigProperties {
   /**
    * Maximum time in seconds to wait for a client session to be stopped by the housekeeping job.<br/>
    * The value should be smaller than the session timeout (typically defined in the web.xml) and greater than
-   * {@link org.eclipse.scout.rt.client.ClientConfigProperties.JobCompletionDelayOnSessionShutdown}.
+   * {@link JobCompletionDelayOnSessionShutdown}.
    */
   public static class SessionStoreHousekeepingMaxWaitShutdownProperty extends AbstractPositiveIntegerConfigProperty {
 

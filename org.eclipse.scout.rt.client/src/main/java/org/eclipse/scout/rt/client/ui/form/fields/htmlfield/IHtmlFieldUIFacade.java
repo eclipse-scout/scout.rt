@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.htmlfield;
 
+@FunctionalInterface
 public interface IHtmlFieldUIFacade {
 
   void fireAppLinkActionFromUI(String ref);

@@ -44,9 +44,9 @@ public final class KeyCacheEntryFilter<K, V> implements ICacheEntryFilter<K, V> 
   @Override
   public ICacheEntryFilter<K, V> coalesce(ICacheEntryFilter<K, V> other) {
     if (other instanceof KeyCacheEntryFilter) {
-      HashSet<K> newKeySet = new HashSet<K>(m_keys);
+      HashSet<K> newKeySet = new HashSet<>(m_keys);
       newKeySet.addAll(((KeyCacheEntryFilter<K, V>) other).m_keys);
-      return new KeyCacheEntryFilter<K, V>(newKeySet);
+      return new KeyCacheEntryFilter<>(newKeySet);
     }
     return null;
   }

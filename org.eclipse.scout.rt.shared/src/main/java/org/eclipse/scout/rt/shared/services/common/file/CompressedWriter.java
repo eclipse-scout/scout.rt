@@ -23,11 +23,11 @@ import java.util.zip.DeflaterOutputStream;
 
 public class CompressedWriter extends Writer {
   private static final String DEFAULT_CHARSETNAME = StandardCharsets.UTF_8.name();
-  private RemoteFile m_remoteFile;
-  private ByteArrayOutputStream m_buffer;
-  private Deflater m_deflater;
-  private DeflaterOutputStream m_deflaterOutputStream;
-  private CRC32 m_crc32;
+  private final RemoteFile m_remoteFile;
+  private final ByteArrayOutputStream m_buffer;
+  private final Deflater m_deflater;
+  private final DeflaterOutputStream m_deflaterOutputStream;
+  private final CRC32 m_crc32;
   private String m_charsetName = DEFAULT_CHARSETNAME;
 
   public CompressedWriter(RemoteFile f) {

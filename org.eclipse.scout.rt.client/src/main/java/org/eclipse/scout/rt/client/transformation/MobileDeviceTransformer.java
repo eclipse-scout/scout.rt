@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
-import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
@@ -53,7 +52,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
 
   @Override
   protected void initTransformationConfig() {
-    List<IDeviceTransformation> transformations = new LinkedList<IDeviceTransformation>();
+    List<IDeviceTransformation> transformations = new LinkedList<>();
 
     transformations.add(MobileDeviceTransformation.MOVE_FIELD_LABEL_TO_TOP);
     transformations.add(MobileDeviceTransformation.MOVE_FIELD_STATUS_TO_TOP);
@@ -151,7 +150,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     // Remove empty space menus of the current detail table which are already defined on the parent detail table as single selection menus
     // This prevents duplicate menus because the ui concatenates these menus when a node is shown
     // It is important to only remove outline wrapper menus which are defined on the parent table because the menu could be defined on a page and therefore needs to be displayed
-    List<IMenu> newMenus = new ArrayList<IMenu>();
+    List<IMenu> newMenus = new ArrayList<>();
     for (IMenu menu : table.getMenus()) {
       if ((menu instanceof OutlineMenuWrapper)) {
         OutlineMenuWrapper menuWrapper = (OutlineMenuWrapper) menu;
@@ -180,12 +179,9 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
       return;
     }
     ISearchForm searchForm = page.getSearchFormInternal();
-    searchForm.addFormListener(new FormListener() {
-      @Override
-      public void formChanged(FormEvent e) {
-        if (FormEvent.TYPE_STORE_AFTER == e.getType()) {
-          onSearchFormStored(page);
-        }
+    searchForm.addFormListener(e -> {
+      if (FormEvent.TYPE_STORE_AFTER == e.getType()) {
+        onSearchFormStored(page);
       }
     });
   }

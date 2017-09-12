@@ -15,6 +15,7 @@ import java.lang.reflect.Method;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.IThrowableWithContextInfo;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.INode;
@@ -30,9 +31,6 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractServiceTunnel implements IServiceTunnel {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractServiceTunnel.class);
-
-  public AbstractServiceTunnel() {
-  }
 
   @Override
   public Object invokeService(Class<?> serviceInterfaceClass, Method operation, Object[] callerArgs) {
@@ -56,7 +54,7 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
       // Associate the exception with context information about the service call (without arg values due to security reasons).
       RuntimeException serviceException = interceptException(t);
       if (serviceException instanceof PlatformException) {
-        ((PlatformException) serviceException)
+        ((IThrowableWithContextInfo) serviceException)
             .withContextInfo("remote-service.name", request.getServiceInterfaceClassName())
             .withContextInfo("remote-service.operation", request.getOperation());
       }

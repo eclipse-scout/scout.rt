@@ -84,7 +84,7 @@ public class RemoteFileServlet extends HttpServlet {
     handleHttpRequest(req, res);
   }
 
-  protected void handleHttpRequest(final HttpServletRequest req, final HttpServletResponse res) throws ServletException, IOException {
+  protected void handleHttpRequest(final HttpServletRequest req, final HttpServletResponse res) {
     BEANS.get(HttpServletControl.class).doDefaults(this, req, res);
 
     String pathInfo = extractPathInfo(req);
@@ -121,7 +121,7 @@ public class RemoteFileServlet extends HttpServlet {
       }
     }
     catch (Exception ex) {
-      if (("" + ex.toString()).indexOf("Connection reset by peer: socket write error") >= 0) {
+      if (("" + ex.toString()).contains("Connection reset by peer: socket write error")) {
         // ignore it
       }
       else {

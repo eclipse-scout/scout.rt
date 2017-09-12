@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.shared.services.common.code;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -83,7 +82,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
    */
   public AbstractCode(ICodeRow<T> row, boolean callInitializer) {
     m_row = row;
-    m_objectExtensions = new ObjectExtensions<AbstractCode<T>, ICodeExtension<T, ? extends AbstractCode<T>>>(this, false);
+    m_objectExtensions = new ObjectExtensions<>(this, false);
     if (callInitializer) {
       callInitializer();
     }
@@ -181,7 +180,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
     if (viewOrder == IOrdered.DEFAULT_ORDER) {
       while (cls != null && ICode.class.isAssignableFrom(cls)) {
         if (cls.isAnnotationPresent(Order.class)) {
-          Order order = (Order) cls.getAnnotation(Order.class);
+          Order order = cls.getAnnotation(Order.class);
           return order.value();
         }
         cls = cls.getSuperclass();
@@ -196,17 +195,12 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
   }
 
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
-      @Override
-      public void run() {
-        initConfig();
-      }
-    });
+    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
   protected void initConfig() {
     if (m_row == null) {
-      m_row = interceptCodeRow(new CodeRow<T>(
+      m_row = interceptCodeRow(new CodeRow<>(
           getId(),
           getConfiguredText(),
           getConfiguredIconId(),
@@ -230,7 +224,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
   }
 
   protected ICodeExtension<T, ? extends AbstractCode<T>> createLocalExtension() {
-    return new LocalCodeExtension<T, AbstractCode<T>>(this);
+    return new LocalCodeExtension<>(this);
   }
 
   @Override
@@ -253,7 +247,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
     List<Class<ICode>> configuredCodes = getConfiguredCodes();
     List<ICode> contributedCodes = m_contributionHolder.getContributionsByClass(ICode.class);
 
-    List<ICode<T>> codes = new ArrayList<ICode<T>>(configuredCodes.size() + contributedCodes.size());
+    List<ICode<T>> codes = new ArrayList<>(configuredCodes.size() + contributedCodes.size());
     for (Class<? extends ICode> codeClazz : configuredCodes) {
       ICode<T> code = ConfigurationUtility.newInnerInstance(this, codeClazz);
       codes.add(code);
@@ -261,7 +255,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
     for (ICode<?> c : contributedCodes) {
       codes.add((ICode<T>) c);
     }
-    Collections.sort(codes, new OrderedComparator());
+    codes.sort(new OrderedComparator());
 
     return codes;
   }
@@ -279,7 +273,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
 
   @Override
   public T getId() {
-    return (T) m_row.getKey();
+    return m_row.getKey();
   }
 
   @Override
@@ -382,15 +376,11 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
   @Override
   public List<? extends ICode<T>> getChildCodes(boolean activeOnly) {
     if (m_codeList == null) {
-      return new ArrayList<ICode<T>>(0);
+      return new ArrayList<>(0);
     }
-    List<ICode<T>> result = new ArrayList<ICode<T>>(m_codeList);
+    List<ICode<T>> result = new ArrayList<>(m_codeList);
     if (activeOnly) {
-      for (Iterator<ICode<T>> it = result.iterator(); it.hasNext();) {
-        if (!it.next().isActive()) {
-          it.remove();
-        }
-      }
+      result.removeIf(tiCode -> !tiCode.isActive());
     }
     return result;
   }
@@ -405,8 +395,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
       if (m_codeList == null) {
         return null;
       }
-      for (Iterator<ICode<T>> it = m_codeList.iterator(); it.hasNext();) {
-        ICode<T> childCode = it.next();
+      for (ICode<T> childCode : m_codeList) {
         c = childCode.getChildCode(id);
         if (c != null) {
           return c;
@@ -422,8 +411,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
       return null;
     }
     ICode<T> c = null;
-    for (Iterator<ICode<T>> it = m_codeList.iterator(); it.hasNext();) {
-      ICode<T> childCode = it.next();
+    for (ICode<T> childCode : m_codeList) {
       if (extKey.equals(childCode.getExtKey())) {
         return childCode;
       }
@@ -452,10 +440,10 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
       index = oldIndex;
     }
     if (m_codeMap == null) {
-      m_codeMap = new HashMap<T, ICode<T>>();
+      m_codeMap = new HashMap<>();
     }
     if (m_codeList == null) {
-      m_codeList = new ArrayList<ICode<T>>();
+      m_codeList = new ArrayList<>();
     }
     code.setCodeTypeInternal(m_codeType);
     code.setParentCodeInternal(this);
@@ -529,9 +517,9 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
   }
 
   protected Object readResolve() throws ObjectStreamException {
-    m_codeMap = new HashMap<T, ICode<T>>();
+    m_codeMap = new HashMap<>();
     if (m_codeList == null) {
-      m_codeList = new ArrayList<ICode<T>>();
+      m_codeList = new ArrayList<>();
     }
     else {
       for (ICode<T> c : m_codeList) {
@@ -544,7 +532,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
 
   @Override
   public ICodeRow<T> toCodeRow() {
-    return new CodeRow<T>(m_row);
+    return new CodeRow<>(m_row);
   }
 
   @Override
@@ -571,7 +559,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
 
   protected final List<? extends ICode<T>> interceptCreateChildCodes() {
     List<? extends ICodeExtension<T, ? extends AbstractCode<T>>> extensions = getAllExtensions();
-    CodeCreateChildCodesChain<T> chain = new CodeCreateChildCodesChain<T>(extensions);
+    CodeCreateChildCodesChain<T> chain = new CodeCreateChildCodesChain<>(extensions);
     return chain.execCreateChildCodes();
   }
 }

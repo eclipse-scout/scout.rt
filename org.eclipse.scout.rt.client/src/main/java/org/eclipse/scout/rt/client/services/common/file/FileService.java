@@ -112,13 +112,13 @@ public class FileService implements IFileService {
       return new String[][]{};
     }
 
-    List<String> dirList = new ArrayList<String>();
-    List<String> fileList = new ArrayList<String>();
-    for (int i = 0; i < dirs.length; i++) {
+    List<String> dirList = new ArrayList<>();
+    List<String> fileList = new ArrayList<>();
+    for (String dir : dirs) {
       try {
-        File file = new File(path.getCanonicalPath() + "/" + dirs[i]);
+        File file = new File(path.getCanonicalPath() + "/" + dir);
         if (file.isDirectory()) {
-          String[][] tmp = getFiles((folderBase == null ? dirs[i] : folderBase + "/" + dirs[i]), filter, true);
+          String[][] tmp = getFiles((folderBase == null ? dir : folderBase + "/" + dir), filter, true);
           for (String[] f : tmp) {
             dirList.add(f[0]);
             fileList.add(f[1]);
@@ -126,7 +126,7 @@ public class FileService implements IFileService {
         }
         else {
           dirList.add(folderBase);
-          fileList.add(dirs[i]);
+          fileList.add(dir);
         }
       }
       catch (IOException e) {

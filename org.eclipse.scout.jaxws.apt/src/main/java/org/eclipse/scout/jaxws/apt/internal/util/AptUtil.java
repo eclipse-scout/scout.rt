@@ -46,7 +46,7 @@ public final class AptUtil {
     jCodeModel.build(new CodeWriter() {
 
       @Override
-      public OutputStream openBinary(final JPackage pkg, final String fileName) throws IOException {
+      public OutputStream openBinary(final JPackage pkg, final String fileName) {
         final String fqn = StringUtility.join(".", pkg.name(), fileName.substring(0, fileName.length() - ".java".length()));
 
         return new ByteArrayOutputStream() {
@@ -63,7 +63,7 @@ public final class AptUtil {
       }
 
       @Override
-      public void close() throws IOException {
+      public void close() {
         // NOOP
       }
     });

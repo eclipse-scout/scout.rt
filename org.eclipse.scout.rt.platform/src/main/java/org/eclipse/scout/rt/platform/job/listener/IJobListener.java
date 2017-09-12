@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
  * @since 5.1
  * @see JobEvent
  */
+@FunctionalInterface
 public interface IJobListener extends EventListener {
 
   /**

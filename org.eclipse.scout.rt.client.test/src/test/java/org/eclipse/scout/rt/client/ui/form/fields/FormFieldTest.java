@@ -76,7 +76,6 @@ public class FormFieldTest {
 
   /**
    * Tests that {@link AbstractFormField#classId()} returns the annotation value for {@link ClassId}.
-   *
    */
   @Test
   public void testClassIdAnnotatedInForm() {
@@ -111,7 +110,6 @@ public class FormFieldTest {
 
   /**
    * Tests the generated {@link AbstractFormField#classId()} for injected sibling fields.
-   *
    */
   @Test
   public void testClassIdInjectedFields() {
@@ -120,7 +118,6 @@ public class FormFieldTest {
 
   /**
    * Tests the generated {@link AbstractFormField#classId()} for injected sibling fields.
-   *
    */
   @Test
   public void testClassIdTemplateGroupBox() {

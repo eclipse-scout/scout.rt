@@ -25,7 +25,7 @@ public class DebugOutputStream extends OutputStream {
   private int m_lastWrittenCharacter;
   private Throwable m_lastThrownException;
 
-  public DebugOutputStream(OutputStream out) throws IOException {
+  public DebugOutputStream(OutputStream out) {
     m_out = out;
     m_debugOut = new ByteArrayOutputStream();
   }

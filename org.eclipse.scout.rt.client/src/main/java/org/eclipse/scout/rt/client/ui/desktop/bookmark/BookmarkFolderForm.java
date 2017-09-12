@@ -24,10 +24,6 @@ import org.eclipse.scout.rt.shared.TEXTS;
 @ClassId("605749af-29e7-47a8-a929-5102da1ab6b4")
 public class BookmarkFolderForm extends AbstractForm {
 
-  public BookmarkFolderForm() {
-    super();
-  }
-
   @Override
   protected String getConfiguredTitle() {
     return TEXTS.get("Folders");

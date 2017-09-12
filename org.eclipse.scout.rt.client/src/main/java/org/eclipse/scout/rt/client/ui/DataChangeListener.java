@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
  * {@link IDesktop#addDataChangeListener(DataChangeListener, Object...)} and
  * {@link IDesktop#removeDataChangeListener(DataChangeListener, Object...)}
  */
+@FunctionalInterface
 public interface DataChangeListener extends EventListener {
 
   void dataChanged(Object... dataTypes);

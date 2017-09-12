@@ -1,5 +1,6 @@
 package org.eclipse.scout.rt.client.ui.desktop.notification;
 
+@FunctionalInterface
 public interface IDesktopNotificationUIFacade {
 
   /**

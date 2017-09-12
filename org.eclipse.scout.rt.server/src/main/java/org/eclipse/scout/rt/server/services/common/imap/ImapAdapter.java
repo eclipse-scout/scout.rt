@@ -22,7 +22,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.mail.AuthenticationFailedException;
-import javax.mail.Flags;
+import javax.mail.Flags.Flag;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -50,10 +50,10 @@ public class ImapAdapter implements IImapAdapter {
   private String m_password;
   private String m_defaultFolderName;
   private Store m_store;
-  private Map<String, Folder> m_cachedFolders;
+  private final Map<String, Folder> m_cachedFolders;
 
   public ImapAdapter() {
-    m_cachedFolders = new HashMap<String, Folder>();
+    m_cachedFolders = new HashMap<>();
   }
 
   public ImapAdapter(String host, int port, String username, String password) {
@@ -78,7 +78,7 @@ public class ImapAdapter implements IImapAdapter {
   @Override
   public Message[] getUnseenMessages(String folderName) {
     connect();
-    ArrayList<Message> messages = new ArrayList<Message>();
+    ArrayList<Message> messages = new ArrayList<>();
     Folder folder = null;
     try {
       folder = findFolder(folderName);
@@ -87,7 +87,7 @@ public class ImapAdapter implements IImapAdapter {
         Message[] m = folder.getMessages();
         for (int i = 0; i < Array.getLength(m); i++) {
           item = m[i];
-          if (!item.isSet(Flags.Flag.SEEN)) {
+          if (!item.isSet(Flag.SEEN)) {
             messages.add(item);
           }
 
@@ -166,7 +166,7 @@ public class ImapAdapter implements IImapAdapter {
    * @return the messages grouped by source folder
    */
   protected Map<Folder, Set<Message>> groupMessagesBySourceFolder(Message[] messages) {
-    Map<Folder, Set<Message>> messagesByFolder = new HashMap<Folder, Set<Message>>();
+    Map<Folder, Set<Message>> messagesByFolder = new HashMap<>();
     if (messages == null || messages.length == 0) {
       return messagesByFolder;
     }
@@ -181,7 +181,7 @@ public class ImapAdapter implements IImapAdapter {
         continue;
       }
       if (!messagesByFolder.containsKey(message.getFolder())) {
-        messagesByFolder.put(message.getFolder(), new HashSet<Message>());
+        messagesByFolder.put(message.getFolder(), new HashSet<>());
       }
       messagesByFolder.get(message.getFolder()).add(message);
     }
@@ -194,11 +194,11 @@ public class ImapAdapter implements IImapAdapter {
   @Override
   public void deleteMessagesPermanently(Message[] messages) {
     connect();
-    Set<Folder> folders = new HashSet<Folder>();
+    Set<Folder> folders = new HashSet<>();
     try {
       for (Message msg : messages) {
         folders.add(msg.getFolder());
-        msg.setFlag(Flags.Flag.DELETED, true);
+        msg.setFlag(Flag.DELETED, true);
       }
       for (Folder f : folders) {
         if (f.isOpen()) {
@@ -326,7 +326,7 @@ public class ImapAdapter implements IImapAdapter {
   @Override
   public void closeConnection() {
     if (isConnected()) {
-      List<MessagingException> exceptions = new ArrayList<MessagingException>();
+      List<MessagingException> exceptions = new ArrayList<>();
       for (Folder folder : m_cachedFolders.values()) {
         try {
           if (folder.isOpen()) {

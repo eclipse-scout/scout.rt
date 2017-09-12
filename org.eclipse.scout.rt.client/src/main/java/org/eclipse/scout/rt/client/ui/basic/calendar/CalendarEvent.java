@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.basic.calendar;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.EventObject;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.IModelEvent;
@@ -20,7 +21,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 @SuppressWarnings({"serial", "squid:S2057"})
-public class CalendarEvent extends java.util.EventObject implements IModelEvent {
+public class CalendarEvent extends EventObject implements IModelEvent {
 
   /**
    * valid properties: component
@@ -74,7 +75,7 @@ public class CalendarEvent extends java.util.EventObject implements IModelEvent 
       return;
     }
     if (m_popupMenus == null) {
-      m_popupMenus = new ArrayList<IMenu>();
+      m_popupMenus = new ArrayList<>();
     }
     m_popupMenus.add(menu);
   }
@@ -87,7 +88,7 @@ public class CalendarEvent extends java.util.EventObject implements IModelEvent 
       return;
     }
     if (m_popupMenus == null) {
-      m_popupMenus = new ArrayList<IMenu>(menus.size());
+      m_popupMenus = new ArrayList<>(menus.size());
     }
     m_popupMenus.addAll(menus);
   }
@@ -116,21 +117,21 @@ public class CalendarEvent extends java.util.EventObject implements IModelEvent 
     // decode type
     try {
       Field[] f = getClass().getDeclaredFields();
-      for (int i = 0; i < f.length; i++) {
-        if (Modifier.isPublic(f[i].getModifiers())
-            && Modifier.isStatic(f[i].getModifiers())
-            && f[i].getName().startsWith("TYPE_")
-            && ((Number) f[i].get(null)).intValue() == m_type) {
-          buf.append(f[i].getName());
+      for (Field aF : f) {
+        if (Modifier.isPublic(aF.getModifiers())
+            && Modifier.isStatic(aF.getModifiers())
+            && aF.getName().startsWith("TYPE_")
+            && ((Number) aF.get(null)).intValue() == m_type) {
+          buf.append(aF.getName());
           break;
         }
       }
     }
     catch (Exception t) { // NOSONAR
-      buf.append("#" + m_type);
+      buf.append("#").append(m_type);
     }
     if (m_component != null) {
-      buf.append(", component=" + m_component.getItem().getSubject());
+      buf.append(", component=").append(m_component.getItem().getSubject());
     }
     buf.append("]");
     return buf.toString();

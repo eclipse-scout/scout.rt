@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -27,7 +28,7 @@ public abstract class AbstractTreeNodeBuilder<LOOKUP_ROW_TYPE> {
   protected abstract ITreeNode createEmptyTreeNode();
 
   public ITreeNode createTreeNode(LOOKUP_ROW_TYPE primaryKey, String text, int nodeStatus, boolean markChildrenLoaded) {
-    return createTreeNode(new LookupRow<LOOKUP_ROW_TYPE>(primaryKey, text), nodeStatus, markChildrenLoaded);
+    return createTreeNode(new LookupRow<>(primaryKey, text), nodeStatus, markChildrenLoaded);
   }
 
   public List<ITreeNode> createTreeNodes(List<? extends ILookupRow<LOOKUP_ROW_TYPE>> lookupRows, int nodeStatus, boolean markChildrenLoaded) {
@@ -40,11 +41,7 @@ public abstract class AbstractTreeNodeBuilder<LOOKUP_ROW_TYPE> {
         nodeMap.put(node.getPrimaryKey(), node);
         if (row.getParentKey() != null) {
           // child
-          ArrayList<ITreeNode> list = parentChildMap.get(row.getParentKey());
-          if (list == null) {
-            list = new ArrayList<>();
-            parentChildMap.put(row.getParentKey(), list);
-          }
+          List<ITreeNode> list = parentChildMap.computeIfAbsent(row.getParentKey(), k -> new ArrayList<>());
           list.add(node);
         }
         else {
@@ -53,7 +50,7 @@ public abstract class AbstractTreeNodeBuilder<LOOKUP_ROW_TYPE> {
         }
       }
     }
-    for (Map.Entry<LOOKUP_ROW_TYPE, ArrayList<ITreeNode>> e : parentChildMap.entrySet()) {
+    for (Entry<LOOKUP_ROW_TYPE, ArrayList<ITreeNode>> e : parentChildMap.entrySet()) {
       Object parentKey = e.getKey();
       ITreeNode parentNode = nodeMap.get(parentKey);
       if (parentNode instanceof AbstractTreeNode) {

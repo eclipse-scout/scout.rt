@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jaxws.provider.annotation;
 
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -32,7 +33,7 @@ import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsHandlerSubje
  *
  * @since 5.1
  */
-@Target(java.lang.annotation.ElementType.TYPE)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface Handler {
@@ -69,7 +70,7 @@ public @interface Handler {
    */
   HandlerType handlerType() default HandlerType.SOAP;
 
-  public static enum HandlerType {
+  enum HandlerType {
     /**
      * SOAP protocol-specific handler type.
      */
@@ -77,6 +78,6 @@ public @interface Handler {
     /**
      * Protocol-agnostic handler type.
      */
-    LOGICAL;
+    LOGICAL
   }
 }

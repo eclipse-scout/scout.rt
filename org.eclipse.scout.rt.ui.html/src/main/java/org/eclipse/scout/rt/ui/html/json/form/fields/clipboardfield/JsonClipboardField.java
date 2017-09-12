@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.clipboardfield;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -48,9 +49,8 @@ public class JsonClipboardField<T extends IClipboardField> extends JsonValueFiel
       }
 
       @Override
-      @SuppressWarnings("unchecked")
       public Object prepareValueForToJson(Object value) {
-        return new JSONArray((List<String>) value); // Do NOT remove the cast! It is required to use the correct constructor.
+        return new JSONArray((Collection) value); // Do NOT remove the cast! It is required to use the correct constructor.
       }
     });
     putJsonProperty(new JsonProperty<IClipboardField>(IClipboardField.PROP_MAXIMUM_SIZE, model) {
@@ -75,7 +75,7 @@ public class JsonClipboardField<T extends IClipboardField> extends JsonValueFiel
 
   @Override
   public void consumeBinaryResource(List<BinaryResource> binaryResources, Map<String, String> uploadProperties) {
-    binaryResources = new ArrayList<BinaryResource>(binaryResources);
+    binaryResources = new ArrayList<>(binaryResources);
     // IE9 does not support java script Blob objects (legacy support for text transfer)
     for (Entry<String, String> property : uploadProperties.entrySet()) {
       if (property.getKey().matches("textTransferObject\\d+")) {

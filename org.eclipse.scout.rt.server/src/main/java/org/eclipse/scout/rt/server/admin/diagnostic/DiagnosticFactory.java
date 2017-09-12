@@ -12,10 +12,8 @@ package org.eclipse.scout.rt.server.admin.diagnostic;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 public final class DiagnosticFactory {
 
@@ -30,8 +28,8 @@ public final class DiagnosticFactory {
   private static final Map<String/*action*/, IDiagnostic> DIAGNOSTIC_STATUS_PROVIDER_ACTION_MAP;
 
   static {
-    DIAGNOSTIC_STATUS_PROVIDERS = new ArrayList<IDiagnostic>();
-    DIAGNOSTIC_STATUS_PROVIDER_ACTION_MAP = new HashMap<String, IDiagnostic>();
+    DIAGNOSTIC_STATUS_PROVIDERS = new ArrayList<>();
+    DIAGNOSTIC_STATUS_PROVIDER_ACTION_MAP = new HashMap<>();
   }
 
   private DiagnosticFactory() {
@@ -48,12 +46,7 @@ public final class DiagnosticFactory {
       DIAGNOSTIC_STATUS_PROVIDERS.remove(statusProvider);
     }
     synchronized (DIAGNOSTIC_STATUS_PROVIDER_ACTION_MAP) {
-      for (Iterator<Entry<String, IDiagnostic>> it = DIAGNOSTIC_STATUS_PROVIDER_ACTION_MAP.entrySet().iterator(); it.hasNext();) {
-        Entry<String, IDiagnostic> entry = it.next();
-        if (entry.getValue() == statusProvider) {
-          it.remove();
-        }
-      }
+      DIAGNOSTIC_STATUS_PROVIDER_ACTION_MAP.entrySet().removeIf(entry -> entry.getValue() == statusProvider);
     }
   }
 
@@ -77,7 +70,7 @@ public final class DiagnosticFactory {
   }
 
   public static void addDiagnosticItemToList(List<List<String>> list, String attribute, String value, String status) {
-    List<String> newItem = new ArrayList<String>();
+    List<String> newItem = new ArrayList<>();
     newItem.add(attribute);
     newItem.add(value);
     newItem.add(status);

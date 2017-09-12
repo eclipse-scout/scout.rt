@@ -47,7 +47,7 @@ public class FastBeanInfo {
    */
   public FastPropertyDescriptor getPropertyDescriptor(String name) {
     FastPropertyDescriptor p = m_propertyMap.get(name);
-    if (p == null && name.length() > 0) {
+    if (p == null && !name.isEmpty()) {
       //be lenient with uppercase/lowercase names
       if (Character.isUpperCase(name.charAt(0))) {
         p = m_propertyMap.get(Character.toLowerCase(name.charAt(0)) + name.substring(1));

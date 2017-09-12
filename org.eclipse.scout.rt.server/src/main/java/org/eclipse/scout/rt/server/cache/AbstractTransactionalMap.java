@@ -173,7 +173,7 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
   }
 
   @Override
-  public Set<Map.Entry<K, V>> entrySet() {
+  public Set<Entry<K, V>> entrySet() {
     return getTransactionMap(false).entrySet();
   }
 
@@ -337,7 +337,7 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
       if (m_removedMap.containsValue(null)) {
         // If a value in the removed map is null, then there was no entry in the shared map, at the time when remove was called.
         // Now there could be an entry in the shared map. Therefore we have now to carefully compute the sizes.
-        Set<K> keys = new HashSet<K>(getReadSharedMap().keySet());
+        Set<K> keys = new HashSet<>(getReadSharedMap().keySet());
         keys.removeAll(m_removedMap.keySet());
         keys.addAll(m_insertedMap.keySet());
         return keys.size();
@@ -348,27 +348,27 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
     }
 
     @Override
-    public Set<Map.Entry<K, V>> entrySet() {
+    public Set<Entry<K, V>> entrySet() {
       return new EntrySet();
     }
 
-    protected Iterator<Map.Entry<K, V>> newEntryIterator() {
+    protected Iterator<Entry<K, V>> newEntryIterator() {
       return new EntryIterator();
     }
 
-    private final class EntrySet extends AbstractSet<Map.Entry<K, V>> {
+    private final class EntrySet extends AbstractSet<Entry<K, V>> {
 
       @Override
-      public Iterator<Map.Entry<K, V>> iterator() {
+      public Iterator<Entry<K, V>> iterator() {
         return newEntryIterator();
       }
 
       @Override
       public boolean contains(Object o) {
-        if (!(o instanceof Map.Entry)) {
+        if (!(o instanceof Entry)) {
           return false;
         }
-        Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
+        Entry<?, ?> e = (Entry<?, ?>) o;
         V v = AbstractMapTransactionMember.this.get(e.getKey());
         if (v == null) {
           return e.getValue() == null;
@@ -380,10 +380,10 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
 
       @Override
       public boolean remove(Object o) {
-        if (!(o instanceof Map.Entry)) {
+        if (!(o instanceof Entry)) {
           return false;
         }
-        Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
+        Entry<?, ?> e = (Entry<?, ?>) o;
         return AbstractMapTransactionMember.this.remove(e.getKey()) != null;
       }
 
@@ -398,26 +398,26 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
       }
     }
 
-    private final class EntryIterator implements Iterator<Map.Entry<K, V>> {
+    private final class EntryIterator implements Iterator<Entry<K, V>> {
       private final Map<K, V> m_readSharedMap;
-      private final Iterator<Map.Entry<K, V>> m_sharedIterator;
-      private final Iterator<Map.Entry<K, V>> m_insertedIterator;
-      private Map.Entry<K, V> m_nextEntry;
-      private Map.Entry<K, V> m_lastReturned;
+      private final Iterator<Entry<K, V>> m_sharedIterator;
+      private final Iterator<Entry<K, V>> m_insertedIterator;
+      private Entry<K, V> m_nextEntry;
+      private Entry<K, V> m_lastReturned;
 
       public EntryIterator() {
         m_readSharedMap = getReadSharedMap();
         m_sharedIterator = m_readSharedMap.entrySet().iterator();
         // we must create a copy of the inserted map at iterator construction else
         // ConcurrentModificationException might be thrown
-        m_insertedIterator = new HashMap<K, V>(m_insertedMap).entrySet().iterator();
+        m_insertedIterator = new HashMap<>(m_insertedMap).entrySet().iterator();
         advance();
       }
 
       void advance() {
         while (true) {
           if (m_sharedIterator.hasNext()) {
-            Map.Entry<K, V> entry = m_sharedIterator.next();
+            Entry<K, V> entry = m_sharedIterator.next();
             if (!m_removedMap.containsKey(entry.getKey())) {
               m_nextEntry = new TransactionalWriteEntry(entry.getKey(), entry.getValue());
               break;
@@ -432,7 +432,7 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
           }
           else {
             if (m_insertedIterator.hasNext()) {
-              Map.Entry<K, V> entry = m_insertedIterator.next();
+              Entry<K, V> entry = m_insertedIterator.next();
               if (!m_removedMap.containsKey(entry.getKey()) || !m_readSharedMap.containsKey(entry.getKey())) {
                 // else entry already visited
                 m_nextEntry = new TransactionalWriteEntry(entry.getKey(), entry.getValue());
@@ -453,7 +453,7 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
       }
 
       @Override
-      public Map.Entry<K, V> next() {
+      public Entry<K, V> next() {
         if (m_nextEntry == null) {
           throw new NoSuchElementException();
         }
@@ -472,7 +472,7 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
       }
     }
 
-    private final class TransactionalWriteEntry extends AbstractMap.SimpleEntry<K, V> {
+    private final class TransactionalWriteEntry extends SimpleEntry<K, V> {
       private static final long serialVersionUID = 1L;
 
       TransactionalWriteEntry(K k, V v) {

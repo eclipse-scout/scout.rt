@@ -6,8 +6,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.rt.platform.interceptor.DecoratingProxy;
-import org.eclipse.scout.rt.platform.interceptor.IInstanceInvocationHandler;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;

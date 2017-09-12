@@ -17,6 +17,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
@@ -57,12 +59,12 @@ public class ColumnSet {
   /**
    * class to model
    */
-  private final Map<Class, IColumn> m_classIndexes = new HashMap<Class, IColumn>();
+  private final Map<Class, IColumn> m_classIndexes = new HashMap<>();
 
   /**
    * ID to model
    */
-  private final Map<String, IColumn> m_idIndexes = new HashMap<String, IColumn>();
+  private final Map<String, IColumn> m_idIndexes = new HashMap<>();
 
   private final Map<Class<?>, Class<? extends IColumn>> m_columnReplacements;
 
@@ -70,7 +72,7 @@ public class ColumnSet {
 
   public ColumnSet(AbstractTable table, List<IColumn<?>> columns) {
     // process @Replace annotations
-    List<Class<? extends IColumn>> columnArray = new ArrayList<Class<? extends IColumn>>(columns.size());
+    List<Class<? extends IColumn>> columnArray = new ArrayList<>(columns.size());
     for (IColumn c : columns) {
       columnArray.add(c.getClass());
     }
@@ -81,10 +83,10 @@ public class ColumnSet {
     m_columnReplacements = replacements;
     //
     m_table = table;
-    m_columns = new ArrayList<IColumn<?>>(columns.size());
-    m_userSortColumns = new ArrayList<IColumn<?>>();
-    m_permanentHeadSortColumns = new ArrayList<IColumn<?>>();
-    m_permanentTailSortColumns = new ArrayList<IColumn<?>>();
+    m_columns = new ArrayList<>(columns.size());
+    m_userSortColumns = new ArrayList<>();
+    m_permanentHeadSortColumns = new ArrayList<>();
+    m_permanentTailSortColumns = new ArrayList<>();
 
     int index = 0;
     for (IColumn col : columns) {
@@ -105,7 +107,7 @@ public class ColumnSet {
     ClientUIPreferences prefs = ClientUIPreferences.getInstance();
     //clean up visible column index hints, make as permutation of model indices
     int n = getColumnCount();
-    TreeMap<CompositeObject, IColumn> sortMap = new TreeMap<CompositeObject, IColumn>();
+    SortedMap<CompositeObject, IColumn> sortMap = new TreeMap<>();
     int viewIndex = 0;
     for (int modelIndex = 0; modelIndex < n; modelIndex++) {
       IColumn col = getColumn(modelIndex);
@@ -121,7 +123,7 @@ public class ColumnSet {
       viewIndex++;
     }
     viewIndex = 0;
-    for (Map.Entry<CompositeObject, IColumn> e : sortMap.entrySet()) {
+    for (Entry<CompositeObject, IColumn> e : sortMap.entrySet()) {
       e.getValue().setVisibleColumnIndexHint(viewIndex);
       viewIndex++;
     }
@@ -246,7 +248,7 @@ public class ColumnSet {
   }
 
   private void applySortingAndGroupingInternal(Map<IColumn, P_SortingAndGroupingConfig> columnConfigs) {
-    TreeMap<CompositeObject, IColumn> sortMap = new TreeMap<CompositeObject, IColumn>();
+    SortedMap<CompositeObject, IColumn> sortMap = new TreeMap<>();
     int index = 0;
     for (IColumn col : getColumns()) {
 
@@ -412,7 +414,7 @@ public class ColumnSet {
     List<IColumn<?>> visibleCols = getVisibleColumns();
 
     int counter = 0;
-    TreeMap<CompositeObject, IColumn<?>> sortMap = new TreeMap<CompositeObject, IColumn<?>>();
+    SortedMap<CompositeObject, IColumn<?>> sortMap = new TreeMap<>();
     for (IColumn col : visibleCols) {
       counter++;
       sortMap.put(new CompositeObject(col.getVisibleColumnIndexHint(), counter), col);
@@ -518,25 +520,25 @@ public class ColumnSet {
   }
 
   public List<IColumn<?>> getKeyColumns() {
-    List<IColumn<?>> keyColumns = new ArrayList<IColumn<?>>(m_keyIndexes.length);
-    for (int i = 0; i < m_keyIndexes.length; i++) {
-      keyColumns.add(getColumn(m_keyIndexes[i]));
+    List<IColumn<?>> keyColumns = new ArrayList<>(m_keyIndexes.length);
+    for (int m_keyIndexe : m_keyIndexes) {
+      keyColumns.add(getColumn(m_keyIndexe));
     }
     return keyColumns;
   }
 
   public List<IColumn<?>> getDisplayableColumns() {
-    List<IColumn<?>> a = new ArrayList<IColumn<?>>(m_displayableIndexes.length);
-    for (int i = 0; i < m_displayableIndexes.length; i++) {
-      a.add(getColumn(m_displayableIndexes[i]));
+    List<IColumn<?>> a = new ArrayList<>(m_displayableIndexes.length);
+    for (int m_displayableIndexe : m_displayableIndexes) {
+      a.add(getColumn(m_displayableIndexe));
     }
     return a;
   }
 
   public List<IColumn<?>> getVisibleColumns() {
-    List<IColumn<?>> a = new ArrayList<IColumn<?>>(m_visibleIndexes.length);
-    for (int i = 0; i < m_visibleIndexes.length; i++) {
-      a.add(getColumn(m_visibleIndexes[i]));
+    List<IColumn<?>> a = new ArrayList<>(m_visibleIndexes.length);
+    for (int m_visibleIndexe : m_visibleIndexes) {
+      a.add(getColumn(m_visibleIndexe));
     }
     return a;
   }
@@ -552,9 +554,9 @@ public class ColumnSet {
 
   public IColumn getFirstDefinedVisibileColumn() {
     int colIdx = m_columns.size();
-    for (int i = 0; i < m_visibleIndexes.length; i++) {
-      if (Integer.compare(m_visibleIndexes[i], colIdx) < 0) {
-        colIdx = m_visibleIndexes[i];
+    for (int m_visibleIndexe : m_visibleIndexes) {
+      if (Integer.compare(m_visibleIndexe, colIdx) < 0) {
+        colIdx = m_visibleIndexe;
       }
     }
     if (colIdx != m_columns.size()) {
@@ -566,7 +568,7 @@ public class ColumnSet {
   }
 
   public List<IColumn<?>> getSummaryColumns() {
-    List<IColumn<?>> summaryColumns = new ArrayList<IColumn<?>>();
+    List<IColumn<?>> summaryColumns = new ArrayList<>();
     for (IColumn c : getColumns()) {
       if (c.isSummary()) {
         summaryColumns.add(c);
@@ -593,7 +595,7 @@ public class ColumnSet {
       IColumn toCol = getVisibleColumn(toVisibleIndex);
       if (fromCol != null && toCol != null) {
         boolean traversedFrom = false;
-        ArrayList<IColumn<?>> list = new ArrayList<IColumn<?>>();
+        List<IColumn<?>> list = new ArrayList<>();
         for (IColumn c : getAllColumnsInUserOrder()) {
           if (c == fromCol) {
             traversedFrom = true;
@@ -635,8 +637,8 @@ public class ColumnSet {
       if (columns == null) {
         columns = CollectionUtility.hashSet();
       }
-      if (resolvedColumns.size() > 0 || columns.size() == 0) {
-        List<IColumn<?>> newColumns = new ArrayList<IColumn<?>>();
+      if (!resolvedColumns.isEmpty() || columns.isEmpty()) {
+        List<IColumn<?>> newColumns = new ArrayList<>();
         for (IColumn col : columns) {
           if (col.isDisplayable()) {
             // sanity check
@@ -698,7 +700,7 @@ public class ColumnSet {
 
   public List<IColumn<?>> resolveColumns(Collection<? extends IColumn> columns) {
     if (columns != null) {
-      List<IColumn<?>> result = new ArrayList<IColumn<?>>(columns.size());
+      List<IColumn<?>> result = new ArrayList<>(columns.size());
       for (IColumn col : columns) {
         IColumn resolvedCol = resolveColumn(col);
         if (resolvedCol != null) {
@@ -1018,7 +1020,7 @@ public class ColumnSet {
    * @return all sort columns including permanent-head, user, permanent-tail
    */
   public List<IColumn<?>> getSortColumns() {
-    List<IColumn<?>> list = new ArrayList<IColumn<?>>(getSortColumnCount());
+    List<IColumn<?>> list = new ArrayList<>(getSortColumnCount());
     list.addAll(m_permanentHeadSortColumns);
     list.addAll(m_userSortColumns);
     list.addAll(m_permanentTailSortColumns);
@@ -1067,11 +1069,9 @@ public class ColumnSet {
   }
 
   public SortSpec getSortSpec() {
-    ArrayList<IColumn<?>> sortColumns = new ArrayList<IColumn<?>>();
-    for (IColumn c : getSortColumns()) {
-      sortColumns.add(c);
-    }
-    if (sortColumns.size() > 0) {
+    List<IColumn<?>> sortColumns = new ArrayList<>();
+    sortColumns.addAll(getSortColumns());
+    if (!sortColumns.isEmpty()) {
       int[] indexes = new int[sortColumns.size()];
       boolean[] asc = new boolean[sortColumns.size()];
       for (int i = 0; i < sortColumns.size(); i++) {
@@ -1093,7 +1093,7 @@ public class ColumnSet {
         cell.setSortAscending(false);
       }
       m_userSortColumns.clear();
-      List<IColumn<?>> colList = new ArrayList<IColumn<?>>();
+      List<IColumn<?>> colList = new ArrayList<>();
       for (int i = 0; i < spec.size(); i++) {
         IColumn col = getColumn(spec.getColumnIndex(i));
         if (col != null && (!isSortColumn(col))) {
@@ -1257,10 +1257,10 @@ public class ColumnSet {
    * see also {@link #clearPermanentHeadSortColumns()} and {@link #clearPermanentTailSortColumns()}
    */
   public void clearSortColumns() {
-    if (m_userSortColumns.size() == 0) {
+    if (m_userSortColumns.isEmpty()) {
       return;
     }
-    List<IColumn<?>> userSortColumnsBackup = new ArrayList<IColumn<?>>(m_userSortColumns);
+    List<IColumn<?>> userSortColumnsBackup = new ArrayList<>(m_userSortColumns);
     m_userSortColumns.clear();
     for (IColumn col : userSortColumnsBackup) {
       HeaderCell cell = (HeaderCell) col.getHeaderCell();
@@ -1274,10 +1274,10 @@ public class ColumnSet {
   }
 
   public void clearPermanentHeadSortColumns() {
-    if (m_permanentHeadSortColumns.size() == 0) {
+    if (m_permanentHeadSortColumns.isEmpty()) {
       return;
     }
-    List<IColumn<?>> currentColumnList = new ArrayList<IColumn<?>>(m_permanentHeadSortColumns);
+    List<IColumn<?>> currentColumnList = new ArrayList<>(m_permanentHeadSortColumns);
     m_permanentHeadSortColumns.clear();
     for (IColumn col : currentColumnList) {
       HeaderCell cell = (HeaderCell) col.getHeaderCell();
@@ -1292,10 +1292,10 @@ public class ColumnSet {
   }
 
   public void clearPermanentTailSortColumns() {
-    if (m_permanentTailSortColumns.size() == 0) {
+    if (m_permanentTailSortColumns.isEmpty()) {
       return;
     }
-    List<IColumn<?>> currentColumnList = new ArrayList<IColumn<?>>(m_permanentTailSortColumns);
+    List<IColumn<?>> currentColumnList = new ArrayList<>(m_permanentTailSortColumns);
     m_permanentTailSortColumns.clear();
     for (IColumn col : currentColumnList) {
       HeaderCell cell = (HeaderCell) col.getHeaderCell();
@@ -1350,7 +1350,7 @@ public class ColumnSet {
 
   private void calculateDisplayableIndexes() {
     int viewIndex = 0;
-    Map<CompositeObject, Integer> displayableMap = new TreeMap<CompositeObject, Integer>();
+    Map<CompositeObject, Integer> displayableMap = new TreeMap<>();
     for (int modelIndex = 0; modelIndex < getColumnCount(); modelIndex++) {
       IColumn col = getColumn(modelIndex);
       if (col.isDisplayable()) {
@@ -1366,7 +1366,7 @@ public class ColumnSet {
 
   private void calculateVisibleIndexes() {
     int viewIndex = 0;
-    Map<CompositeObject, Integer> visibleMap = new TreeMap<CompositeObject, Integer>();
+    Map<CompositeObject, Integer> visibleMap = new TreeMap<>();
     for (int modelIndex = 0; modelIndex < getColumnCount(); modelIndex++) {
       IColumn col = getColumn(modelIndex);
       if (col.isDisplayable() && col.isVisible()) {
@@ -1389,7 +1389,7 @@ public class ColumnSet {
   }
 
   private void calculateKeyIndexes() {
-    List<Integer> keyIndexes = new ArrayList<Integer>();
+    List<Integer> keyIndexes = new ArrayList<>();
     for (int modelIndex = 0; modelIndex < getColumnCount(); modelIndex++) {
       IColumn col = getColumn(modelIndex);
       if (col.isPrimaryKey()) {

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.services.common.icon;
 
 import java.net.URL;
 
+import org.eclipse.scout.rt.client.ResourceBase;
 import org.eclipse.scout.rt.platform.Order;
 
 @Order(5500)
@@ -19,6 +20,6 @@ public class ScoutIconProviderService extends AbstractIconProviderService {
 
   @Override
   protected URL findResource(String relativePath) {
-    return org.eclipse.scout.rt.client.ResourceBase.class.getResource("icons/" + relativePath);
+    return ResourceBase.class.getResource("icons/" + relativePath);
   }
 }

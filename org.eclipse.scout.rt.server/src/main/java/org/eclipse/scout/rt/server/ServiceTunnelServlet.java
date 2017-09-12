@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
@@ -90,14 +89,11 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
 
     lazyInit(servletRequest, servletResponse);
 
-    createServletRunContext(servletRequest, servletResponse).run(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
-        serverRunContext.withUserAgent(UserAgents.createDefault());
-        serverRunContext.withSession(lookupServerSessionOnHttpSession(Sessions.randomSessionId(), serverRunContext));
-        invokeAdminService(serverRunContext);
-      }
+    createServletRunContext(servletRequest, servletResponse).run(() -> {
+      ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
+      serverRunContext.withUserAgent(UserAgents.createDefault());
+      serverRunContext.withSession(lookupServerSessionOnHttpSession(Sessions.randomSessionId(), serverRunContext));
+      invokeAdminService(serverRunContext);
     }, ServletExceptionTranslator.class);
   }
 
@@ -113,21 +109,18 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
     lazyInit(servletRequest, servletResponse);
 
     try {
-      createServletRunContext(servletRequest, servletResponse).run(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          ServiceTunnelRequest serviceRequest = deserializeServiceRequest();
-          ServiceTunnelResponse serviceResponse = doPost(serviceRequest);
+      createServletRunContext(servletRequest, servletResponse).run(() -> {
+        ServiceTunnelRequest serviceRequest = deserializeServiceRequest();
+        ServiceTunnelResponse serviceResponse = doPost(serviceRequest);
 
-          // Clear the current thread's interruption status before writing the response to the output stream.
-          // Otherwise, the stream gets silently corrupted, which triggers  a repetition of the current request by Java connection mechanism.
-          IRestorer interruption = ThreadInterruption.clear();
-          try {
-            serializeServiceResponse(serviceResponse);
-          }
-          finally {
-            interruption.restore();
-          }
+        // Clear the current thread's interruption status before writing the response to the output stream.
+        // Otherwise, the stream gets silently corrupted, which triggers  a repetition of the current request by Java connection mechanism.
+        IRestorer interruption = ThreadInterruption.clear();
+        try {
+          serializeServiceResponse(serviceResponse);
+        }
+        finally {
+          interruption.restore();
         }
       }, DefaultExceptionTranslator.class);
     }
@@ -179,22 +172,18 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
    */
   @SuppressWarnings("squid:S00112")
   protected void invokeAdminService(final ServerRunContext serverRunContext) throws Exception {
-    serverRunContext.run(new IRunnable() {
+    serverRunContext.run(() -> {
+      final HttpServletRequest servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
+      final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
 
-      @Override
-      public void run() throws Exception {
-        final HttpServletRequest servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
-        final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
+      BEANS.get(HttpServletControl.class).doDefaults(ServiceTunnelServlet.this, servletRequest, servletResponse);
 
-        BEANS.get(HttpServletControl.class).doDefaults(ServiceTunnelServlet.this, servletRequest, servletResponse);
-
-        AdminSession adminSession = (AdminSession) BEANS.get(IHttpSessionCacheService.class).getAndTouch(ADMIN_SESSION_KEY, servletRequest, servletResponse);
-        if (adminSession == null) {
-          adminSession = new AdminSession();
-          BEANS.get(IHttpSessionCacheService.class).put(ADMIN_SESSION_KEY, adminSession, servletRequest, servletResponse);
-        }
-        adminSession.serviceRequest(servletRequest, servletResponse);
+      AdminSession adminSession = (AdminSession) BEANS.get(IHttpSessionCacheService.class).getAndTouch(ADMIN_SESSION_KEY, servletRequest, servletResponse);
+      if (adminSession == null) {
+        adminSession = new AdminSession();
+        BEANS.get(IHttpSessionCacheService.class).put(ADMIN_SESSION_KEY, adminSession, servletRequest, servletResponse);
       }
+      adminSession.serviceRequest(servletRequest, servletResponse);
     }, DefaultExceptionTranslator.class);
   }
 
@@ -234,7 +223,7 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
    * Method invoked by 'HTTP-GET' and 'HTTP-POST' to identify the session-class and to initialize the content handler
    * for serialization/deserialization.
    */
-  protected void lazyInit(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws ServletException {
+  protected void lazyInit(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
     m_contentHandler = createContentHandler();
   }
 
@@ -251,7 +240,7 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
 
   // === SESSION LOOKUP ===
 
-  protected IServerSession lookupServerSessionOnHttpSession(final String sessionId, final ServerRunContext serverRunContext) throws ServletException {
+  protected IServerSession lookupServerSessionOnHttpSession(final String sessionId, final ServerRunContext serverRunContext) {
     //create, only, if no serverSession available for sessionId
     Assertions.assertNotNull(sessionId, "sessionId must not be null");
     Assertions.assertNotNull(serverRunContext, "serverRunContext must not be null");

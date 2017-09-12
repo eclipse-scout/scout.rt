@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings({"serial", "squid:S2057"})
 public class TreeEvent extends EventObject implements IModelEvent {
 
-  private static Logger LOG = LoggerFactory.getLogger(TreeEvent.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TreeEvent.class);
 
   /**
    * valid attributes are parentNode,childNodes
@@ -302,7 +302,7 @@ public class TreeEvent extends EventObject implements IModelEvent {
   public void addPopupMenu(IMenu menu) {
     if (menu != null) {
       if (m_popupMenus == null) {
-        m_popupMenus = new ArrayList<IMenu>();
+        m_popupMenus = new ArrayList<>();
       }
       m_popupMenus.add(menu);
     }
@@ -314,7 +314,7 @@ public class TreeEvent extends EventObject implements IModelEvent {
   public void addPopupMenus(List<IMenu> menus) {
     if (menus != null) {
       if (m_popupMenus == null) {
-        m_popupMenus = new ArrayList<IMenu>();
+        m_popupMenus = new ArrayList<>();
       }
       m_popupMenus.addAll(menus);
     }
@@ -372,7 +372,7 @@ public class TreeEvent extends EventObject implements IModelEvent {
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    buf.append(getClass().getSimpleName() + "[");
+    buf.append(getClass().getSimpleName()).append("[");
     buf.append(getTypeName());
     // nodes
     if (getCommonParentNode() != null) {
@@ -381,7 +381,7 @@ public class TreeEvent extends EventObject implements IModelEvent {
     if (CollectionUtility.hasElements(m_nodes) && getTree() != null) {
       buf.append(" ");
       if (m_nodes.size() == 1) {
-        buf.append("\"" + CollectionUtility.firstElement(m_nodes) + "\"");
+        buf.append("\"").append(CollectionUtility.firstElement(m_nodes)).append("\"");
       }
       else {
         buf.append("{");
@@ -404,10 +404,10 @@ public class TreeEvent extends EventObject implements IModelEvent {
   private String getTypeName() {
     try {
       Field[] f = getClass().getDeclaredFields();
-      for (int i = 0; i < f.length; i++) {
-        if (Modifier.isPublic(f[i].getModifiers()) && Modifier.isStatic(f[i].getModifiers()) && f[i].getName().startsWith("TYPE_")
-            && ((Number) f[i].get(null)).intValue() == m_type) {
-          return (f[i].getName());
+      for (Field aF : f) {
+        if (Modifier.isPublic(aF.getModifiers()) && Modifier.isStatic(aF.getModifiers()) && aF.getName().startsWith("TYPE_")
+            && ((Number) aF.get(null)).intValue() == m_type) {
+          return (aF.getName());
         }
       }
     }

@@ -39,7 +39,7 @@ public interface IBeanArrayHolder<T> {
   /**
    * States a bean in an {@link IBeanArrayHolder} can have.
    */
-  public enum State {
+  enum State {
     NON_CHANGED,
     INSERTED,
     UPDATED,

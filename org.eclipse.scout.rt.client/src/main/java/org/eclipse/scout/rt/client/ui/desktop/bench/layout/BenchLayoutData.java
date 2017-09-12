@@ -11,7 +11,7 @@ public class BenchLayoutData {
   public static final int EAST = 2;
 
   private String m_cacheKey;
-  private BenchColumnData[] m_columns = {
+  private final BenchColumnData[] m_columns = {
       new BenchColumnData(),
       new BenchColumnData(),
       new BenchColumnData(),

@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.treefield;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.List;
 
@@ -178,15 +176,12 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
     }
     setTreeInternal(tree);
     // local enabled listener
-    addPropertyChangeListener(PROP_ENABLED_COMPUTED, new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent e) {
-        if (m_tree == null) {
-          return;
-        }
-        boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
-        m_tree.setEnabled(newEnabled);
+    addPropertyChangeListener(PROP_ENABLED_COMPUTED, e -> {
+      if (m_tree == null) {
+        return;
       }
+      boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
+      m_tree.setEnabled(newEnabled);
     });
   }
 
@@ -339,15 +334,12 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
       try {
         m_tree.setTreeChanging(true);
         //
-        ITreeVisitor v = new ITreeVisitor() {
-          @Override
-          public boolean visit(ITreeNode node) {
-            if (!node.isStatusNonchanged()) {
-              node.setStatusInternal(ITreeNode.STATUS_NON_CHANGED);
-              m_tree.updateNode(node);
-            }
-            return true;
+        ITreeVisitor v = node -> {
+          if (!node.isStatusNonchanged()) {
+            node.setStatusInternal(ITreeNode.STATUS_NON_CHANGED);
+            m_tree.updateNode(node);
           }
+          return true;
         };
         m_tree.visitNode(m_tree.getRootNode(), v);
         m_tree.clearDeletedNodes();
@@ -470,7 +462,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
 
   @Override
   protected ITreeFieldExtension<? extends AbstractTreeField> createLocalExtension() {
-    return new LocalTreeFieldExtension<AbstractTreeField>(this);
+    return new LocalTreeFieldExtension<>(this);
   }
 
   protected final void interceptSave(Collection<? extends ITreeNode> insertedNodes, Collection<? extends ITreeNode> updatedNodes, Collection<? extends ITreeNode> deletedNodes) {

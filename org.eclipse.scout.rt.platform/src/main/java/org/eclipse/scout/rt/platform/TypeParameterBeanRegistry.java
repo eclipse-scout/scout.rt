@@ -67,13 +67,9 @@ public class TypeParameterBeanRegistry<BEAN> {
       registrations.add(registerBean(bean));
     }
 
-    return new IRegistrationHandle() {
-
-      @Override
-      public void dispose() {
-        for (final IRegistrationHandle registration : registrations) {
-          registration.dispose();
-        }
+    return () -> {
+      for (final IRegistrationHandle registration : registrations) {
+        registration.dispose();
       }
     };
   }
@@ -95,13 +91,7 @@ public class TypeParameterBeanRegistry<BEAN> {
       // Add the bean to the inventory. Thereby, the indexes are computed for that element.
       m_inventory.add(beanRegistration);
 
-      return new IRegistrationHandle() {
-
-        @Override
-        public void dispose() {
-          m_inventory.remove(beanRegistration);
-        }
-      };
+      return () -> m_inventory.remove(beanRegistration);
     }
     finally {
       m_lock.writeLock().unlock();

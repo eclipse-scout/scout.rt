@@ -3,6 +3,7 @@ package org.eclipse.scout.rt.mom.api;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.Bean;
@@ -41,10 +42,10 @@ public class PublishInput {
 
   private final Map<String, String> m_properties = new HashMap<>();
 
-  private int m_deliveryMode = PublishInput.DELIVERY_MODE_PERSISTENT;
-  private int m_priority = PublishInput.PRIORITY_NORMAL;
-  private long m_timeToLive = PublishInput.INFINITELY;
-  private long m_requestReplyTimeout = PublishInput.INFINITELY;
+  private int m_deliveryMode = DELIVERY_MODE_PERSISTENT;
+  private int m_priority = PRIORITY_NORMAL;
+  private long m_timeToLive = INFINITELY;
+  private long m_requestReplyTimeout = INFINITELY;
   private boolean m_transactional = false;
   private IDestination<?> m_replyTo;
 
@@ -125,7 +126,7 @@ public class PublishInput {
    */
   public PublishInput withProperties(final Map<String, String> props) {
     if (props != null) {
-      for (Map.Entry<String, String> e : props.entrySet()) {
+      for (Entry<String, String> e : props.entrySet()) {
         withProperty(e.getKey(), e.getValue());
       }
     }

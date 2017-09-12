@@ -21,7 +21,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 public class CharsetSafeMimeMessage extends MimeMessage {
-  private String m_charset;
+  private final String m_charset;
 
   public CharsetSafeMimeMessage() {
     super((Session) null);
@@ -112,7 +112,7 @@ public class CharsetSafeMimeMessage extends MimeMessage {
   private Address encodeAddress(Address address) throws MessagingException {
     if (address instanceof InternetAddress) {
       InternetAddress inet = (InternetAddress) address;
-      if (inet.getPersonal() != null && inet.getPersonal().length() > 0) {
+      if (inet.getPersonal() != null && !inet.getPersonal().isEmpty()) {
         try {
           inet.setPersonal(inet.getPersonal(), m_charset);
         }

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.composer;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -29,6 +28,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerVal
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.IComposerValueBoxExtension;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
@@ -111,20 +111,17 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   protected void initConfig() {
     super.initConfig();
 
-    HashMap<Integer, Map<Integer, IComposerValueField>> operatorTypeToFieldMap = new HashMap<Integer, Map<Integer, IComposerValueField>>();
+    Map<Integer, Map<Integer, IComposerValueField>> operatorTypeToFieldMap = new HashMap<>();
     interceptInitOperatorToFieldMap(operatorTypeToFieldMap);
     m_operatorTypeToFieldMap = operatorTypeToFieldMap;
 
-    m_valueChangedListener = new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent e) {
-        if (IValueField.PROP_VALUE.equals(e.getPropertyName())) {
-          try {
-            interceptChangedValue();
-          }
-          catch (Exception ex) {
-            LOG.error("fire value change on {}", e.getSource(), ex);
-          }
+    m_valueChangedListener = e -> {
+      if (IValueField.PROP_VALUE.equals(e.getPropertyName())) {
+        try {
+          interceptChangedValue();
+        }
+        catch (Exception ex) {
+          LOG.error("fire value change on {}", e.getSource(), ex);
         }
       }
     };
@@ -134,7 +131,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
       f.setLabel(TEXTS.get("Value"));
       f.setVisible(false);
       if (f instanceof ISequenceBox) {
-        List<IFormField> sequenceBoxChildFields = ((ISequenceBox) f).getFields();
+        List<IFormField> sequenceBoxChildFields = ((ICompositeField) f).getFields();
         if (CollectionUtility.hasElements(sequenceBoxChildFields)) {
           IFormField firstField = CollectionUtility.firstElement(sequenceBoxChildFields);
           firstField.setLabelVisible(false);
@@ -152,7 +149,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
    */
   protected void execInitOperatorToFieldMap(Map<Integer /* operator */, Map<Integer /* field type */, IComposerValueField>> operatorTypeToFieldMap) {
     // specific operators
-    HashMap<Integer, IComposerValueField> betweenMap = new HashMap<Integer, IComposerValueField>();
+    Map<Integer, IComposerValueField> betweenMap = new HashMap<>();
     betweenMap.put(IDataModelAttribute.TYPE_DATE, getFieldByClass(BetweenDateField.class));
     betweenMap.put(IDataModelAttribute.TYPE_DATE_TIME, getFieldByClass(BetweenDateTimeField.class));
     betweenMap.put(IDataModelAttribute.TYPE_BIG_DECIMAL, getFieldByClass(BetweenBigDecimalField.class));
@@ -170,7 +167,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     operatorTypeToFieldMap.put(DataModelConstants.OPERATOR_DATE_TIME_BETWEEN, betweenMap);
 
     // type defaults
-    HashMap<Integer, IComposerValueField> defaultMap = new HashMap<Integer, IComposerValueField>();
+    Map<Integer, IComposerValueField> defaultMap = new HashMap<>();
     defaultMap.put(IDataModelAttribute.TYPE_DATE, getFieldByClass(DateField.class));
     defaultMap.put(IDataModelAttribute.TYPE_DATE_TIME, getFieldByClass(DateTimeField.class));
     defaultMap.put(IDataModelAttribute.TYPE_BIG_DECIMAL, getFieldByClass(BigDecimalField.class));
@@ -473,7 +470,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     @Override
     public List<Object> getValues() {
       if (getValue() != null) {
-        return Collections.singletonList((Object) getValue());
+        return Collections.singletonList(getValue());
       }
       else {
         return null;
@@ -538,7 +535,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
       if (getValue() == null) {
         return null;
       }
-      return Collections.singletonList((Object) getValue());
+      return Collections.singletonList(getValue());
     }
 
     @Override
@@ -595,7 +592,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
       if (getValue() == null) {
         return null;
       }
-      return Collections.singletonList((Object) getValue());
+      return Collections.singletonList(getValue());
     }
 
     @Override
@@ -656,7 +653,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
       if (getValue() == null) {
         return null;
       }
-      return Collections.singletonList((Object) getValue());
+      return Collections.singletonList(getValue());
     }
 
     @Override
@@ -717,7 +714,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
       if (getValue() == null) {
         return null;
       }
-      return Collections.singletonList((Object) getValue());
+      return Collections.singletonList(getValue());
     }
 
     @Override
@@ -785,7 +782,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
       if (getValue() == null) {
         return null;
       }
-      return Collections.singletonList((Object) getValue());
+      return Collections.singletonList(getValue());
     }
 
     @Override
@@ -836,7 +833,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
       if (getValue() == null) {
         return null;
       }
-      return Collections.singletonList((Object) getValue());
+      return Collections.singletonList(getValue());
     }
 
     @Override
@@ -877,7 +874,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
         setLookupCall(newCall);
       }
       try {
-        setValue(CollectionUtility.<Object> firstElement(values));
+        setValue(CollectionUtility.firstElement(values));
       }
       catch (Exception e) { // NOSONAR
         // nop
@@ -895,7 +892,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
       if (getValue() == null) {
         return null;
       }
-      return Collections.singletonList((Object) getValue());
+      return Collections.singletonList(getValue());
     }
 
     @Override
@@ -935,15 +932,15 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, List<?> values) {
       try {
-        getFieldByClass(BetweenDateField.DateFromField.class).setValue(null);
-        getFieldByClass(BetweenDateField.DateToField.class).setValue(null);
+        getFieldByClass(DateFromField.class).setValue(null);
+        getFieldByClass(DateToField.class).setValue(null);
 
         if (values != null && values.size() == 2) {
           if (values.get(0) instanceof Date) {
-            getFieldByClass(BetweenDateField.DateFromField.class).setValue((Date) values.get(0));
+            getFieldByClass(DateFromField.class).setValue((Date) values.get(0));
           }
           if (values.get(1) instanceof Date) {
-            getFieldByClass(BetweenDateField.DateToField.class).setValue((Date) values.get(1));
+            getFieldByClass(DateToField.class).setValue((Date) values.get(1));
           }
         }
       }
@@ -954,14 +951,14 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
 
     @Override
     public void clearSelectionContext() {
-      getFieldByClass(BetweenDateField.DateFromField.class).setValue(null);
-      getFieldByClass(BetweenDateField.DateToField.class).setValue(null);
+      getFieldByClass(DateFromField.class).setValue(null);
+      getFieldByClass(DateToField.class).setValue(null);
     }
 
     @Override
     public List<Object> getValues() {
-      Object a = getFieldByClass(BetweenDateField.DateFromField.class).getValue();
-      Object b = getFieldByClass(BetweenDateField.DateToField.class).getValue();
+      Object a = getFieldByClass(DateFromField.class).getValue();
+      Object b = getFieldByClass(DateToField.class).getValue();
       if (a == null && b == null) {
         return null;
       }
@@ -970,8 +967,8 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
 
     @Override
     public List<String> getTexts() {
-      String a = getFieldByClass(BetweenDateField.DateFromField.class).getDisplayText();
-      String b = getFieldByClass(BetweenDateField.DateToField.class).getDisplayText();
+      String a = getFieldByClass(DateFromField.class).getDisplayText();
+      String b = getFieldByClass(DateToField.class).getDisplayText();
       return CollectionUtility.arrayList(a, b);
     }
   }
@@ -1007,20 +1004,20 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, List values) {
       try {
-        getFieldByClass(BetweenTimeField.TimeFromField.class).setValue(null);
-        getFieldByClass(BetweenTimeField.TimeToField.class).setValue(null);
+        getFieldByClass(TimeFromField.class).setValue(null);
+        getFieldByClass(TimeToField.class).setValue(null);
         if (values != null && values.size() == 2) {
           if (values.get(0) instanceof Double) {
-            getFieldByClass(BetweenTimeField.TimeFromField.class).setTimeValue((Double) values.get(0));
+            getFieldByClass(TimeFromField.class).setTimeValue((Double) values.get(0));
           }
           else if (values.get(0) instanceof Date) {
-            getFieldByClass(BetweenTimeField.TimeFromField.class).setValue((Date) values.get(0));
+            getFieldByClass(TimeFromField.class).setValue((Date) values.get(0));
           }
           if (values.get(1) instanceof Double) {
-            getFieldByClass(BetweenTimeField.TimeToField.class).setTimeValue((Double) values.get(1));
+            getFieldByClass(TimeToField.class).setTimeValue((Double) values.get(1));
           }
           else if (values.get(1) instanceof Date) {
-            getFieldByClass(BetweenTimeField.TimeToField.class).setValue((Date) values.get(1));
+            getFieldByClass(TimeToField.class).setValue((Date) values.get(1));
           }
         }
       }
@@ -1031,14 +1028,14 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
 
     @Override
     public void clearSelectionContext() {
-      getFieldByClass(BetweenTimeField.TimeFromField.class).setValue(null);
-      getFieldByClass(BetweenTimeField.TimeToField.class).setValue(null);
+      getFieldByClass(TimeFromField.class).setValue(null);
+      getFieldByClass(TimeToField.class).setValue(null);
     }
 
     @Override
     public List<Object> getValues() {
-      Object a = getFieldByClass(BetweenTimeField.TimeFromField.class).getValue();
-      Object b = getFieldByClass(BetweenTimeField.TimeToField.class).getValue();
+      Object a = getFieldByClass(TimeFromField.class).getValue();
+      Object b = getFieldByClass(TimeToField.class).getValue();
       if (a == null && b == null) {
         return null;
       }
@@ -1047,8 +1044,8 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
 
     @Override
     public List<String> getTexts() {
-      String a = getFieldByClass(BetweenTimeField.TimeFromField.class).getDisplayText();
-      String b = getFieldByClass(BetweenTimeField.TimeToField.class).getDisplayText();
+      String a = getFieldByClass(TimeFromField.class).getDisplayText();
+      String b = getFieldByClass(TimeToField.class).getDisplayText();
       return CollectionUtility.arrayList(a, b);
     }
   }
@@ -1092,14 +1089,14 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, List values) {
       try {
-        getFieldByClass(BetweenDateTimeField.DateTimeFromField.class).setValue(null);
-        getFieldByClass(BetweenDateTimeField.DateTimeToField.class).setValue(null);
+        getFieldByClass(DateTimeFromField.class).setValue(null);
+        getFieldByClass(DateTimeToField.class).setValue(null);
         if (values != null && values.size() == 2) {
           if (values.get(0) instanceof Date) {
-            getFieldByClass(BetweenDateTimeField.DateTimeFromField.class).setValue((Date) values.get(0));
+            getFieldByClass(DateTimeFromField.class).setValue((Date) values.get(0));
           }
           if (values.get(1) instanceof Date) {
-            getFieldByClass(BetweenDateTimeField.DateTimeToField.class).setValue((Date) values.get(1));
+            getFieldByClass(DateTimeToField.class).setValue((Date) values.get(1));
           }
         }
       }
@@ -1110,14 +1107,14 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
 
     @Override
     public void clearSelectionContext() {
-      getFieldByClass(BetweenDateTimeField.DateTimeFromField.class).setValue(null);
-      getFieldByClass(BetweenDateTimeField.DateTimeToField.class).setValue(null);
+      getFieldByClass(DateTimeFromField.class).setValue(null);
+      getFieldByClass(DateTimeToField.class).setValue(null);
     }
 
     @Override
     public List<Object> getValues() {
-      Object a = getFieldByClass(BetweenDateTimeField.DateTimeFromField.class).getValue();
-      Object b = getFieldByClass(BetweenDateTimeField.DateTimeToField.class).getValue();
+      Object a = getFieldByClass(DateTimeFromField.class).getValue();
+      Object b = getFieldByClass(DateTimeToField.class).getValue();
       if (a == null && b == null) {
         return null;
       }
@@ -1126,8 +1123,8 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
 
     @Override
     public List<String> getTexts() {
-      String a = getFieldByClass(BetweenDateTimeField.DateTimeFromField.class).getDisplayText();
-      String b = getFieldByClass(BetweenDateTimeField.DateTimeToField.class).getDisplayText();
+      String a = getFieldByClass(DateTimeFromField.class).getDisplayText();
+      String b = getFieldByClass(DateTimeToField.class).getDisplayText();
       return CollectionUtility.arrayList(a, b);
     }
   }
@@ -1163,14 +1160,14 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, List values) {
       try {
-        getFieldByClass(BetweenIntegerField.IntegerFromField.class).setValue(null);
-        getFieldByClass(BetweenIntegerField.IntegerToField.class).setValue(null);
+        getFieldByClass(IntegerFromField.class).setValue(null);
+        getFieldByClass(IntegerToField.class).setValue(null);
         if (values != null && values.size() == 2) {
           if (values.get(0) instanceof Integer) {
-            getFieldByClass(BetweenIntegerField.IntegerFromField.class).setValue((Integer) values.get(0));
+            getFieldByClass(IntegerFromField.class).setValue((Integer) values.get(0));
           }
           if (values.get(1) instanceof Integer) {
-            getFieldByClass(BetweenIntegerField.IntegerToField.class).setValue((Integer) values.get(1));
+            getFieldByClass(IntegerToField.class).setValue((Integer) values.get(1));
           }
         }
       }
@@ -1181,14 +1178,14 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
 
     @Override
     public void clearSelectionContext() {
-      getFieldByClass(BetweenIntegerField.IntegerFromField.class).setValue(null);
-      getFieldByClass(BetweenIntegerField.IntegerToField.class).setValue(null);
+      getFieldByClass(IntegerFromField.class).setValue(null);
+      getFieldByClass(IntegerToField.class).setValue(null);
     }
 
     @Override
     public List<Object> getValues() {
-      Object a = getFieldByClass(BetweenIntegerField.IntegerFromField.class).getValue();
-      Object b = getFieldByClass(BetweenIntegerField.IntegerToField.class).getValue();
+      Object a = getFieldByClass(IntegerFromField.class).getValue();
+      Object b = getFieldByClass(IntegerToField.class).getValue();
       if (a == null && b == null) {
         return null;
       }
@@ -1197,8 +1194,8 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
 
     @Override
     public List<String> getTexts() {
-      String a = getFieldByClass(BetweenIntegerField.IntegerFromField.class).getDisplayText();
-      String b = getFieldByClass(BetweenIntegerField.IntegerToField.class).getDisplayText();
+      String a = getFieldByClass(IntegerFromField.class).getDisplayText();
+      String b = getFieldByClass(IntegerToField.class).getDisplayText();
       return CollectionUtility.arrayList(a, b);
     }
   }
@@ -1234,14 +1231,14 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, List values) {
       try {
-        getFieldByClass(BetweenLongField.LongFromField.class).setValue(null);
-        getFieldByClass(BetweenLongField.LongToField.class).setValue(null);
+        getFieldByClass(LongFromField.class).setValue(null);
+        getFieldByClass(LongToField.class).setValue(null);
         if (values != null && values.size() == 2) {
           if (values.get(0) instanceof Long) {
-            getFieldByClass(BetweenLongField.LongFromField.class).setValue((Long) values.get(0));
+            getFieldByClass(LongFromField.class).setValue((Long) values.get(0));
           }
           if (values.get(1) instanceof Long) {
-            getFieldByClass(BetweenLongField.LongToField.class).setValue((Long) values.get(1));
+            getFieldByClass(LongToField.class).setValue((Long) values.get(1));
           }
         }
       }
@@ -1252,14 +1249,14 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
 
     @Override
     public void clearSelectionContext() {
-      getFieldByClass(BetweenLongField.LongFromField.class).setValue(null);
-      getFieldByClass(BetweenLongField.LongToField.class).setValue(null);
+      getFieldByClass(LongFromField.class).setValue(null);
+      getFieldByClass(LongToField.class).setValue(null);
     }
 
     @Override
     public List<Object> getValues() {
-      Object a = getFieldByClass(BetweenLongField.LongFromField.class).getValue();
-      Object b = getFieldByClass(BetweenLongField.LongToField.class).getValue();
+      Object a = getFieldByClass(LongFromField.class).getValue();
+      Object b = getFieldByClass(LongToField.class).getValue();
       if (a == null && b == null) {
         return null;
       }
@@ -1268,8 +1265,8 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
 
     @Override
     public List<String> getTexts() {
-      String a = getFieldByClass(BetweenLongField.LongFromField.class).getDisplayText();
-      String b = getFieldByClass(BetweenLongField.LongToField.class).getDisplayText();
+      String a = getFieldByClass(LongFromField.class).getDisplayText();
+      String b = getFieldByClass(LongToField.class).getDisplayText();
       return CollectionUtility.arrayList(a, b);
     }
   }
@@ -1305,14 +1302,14 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, List values) {
       try {
-        getFieldByClass(BetweenBigDecimalField.BigDecimalFromField.class).setValue(null);
-        getFieldByClass(BetweenBigDecimalField.BigDecimalToField.class).setValue(null);
+        getFieldByClass(BigDecimalFromField.class).setValue(null);
+        getFieldByClass(BigDecimalToField.class).setValue(null);
         if (values != null && values.size() == 2) {
           if (values.get(0) instanceof BigDecimal) {
-            getFieldByClass(BetweenBigDecimalField.BigDecimalFromField.class).setValue((BigDecimal) values.get(0));
+            getFieldByClass(BigDecimalFromField.class).setValue((BigDecimal) values.get(0));
           }
           if (values.get(1) instanceof BigDecimal) {
-            getFieldByClass(BetweenBigDecimalField.BigDecimalToField.class).setValue((BigDecimal) values.get(1));
+            getFieldByClass(BigDecimalToField.class).setValue((BigDecimal) values.get(1));
           }
         }
       }
@@ -1323,14 +1320,14 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
 
     @Override
     public void clearSelectionContext() {
-      getFieldByClass(BetweenBigDecimalField.BigDecimalFromField.class).setValue(null);
-      getFieldByClass(BetweenBigDecimalField.BigDecimalToField.class).setValue(null);
+      getFieldByClass(BigDecimalFromField.class).setValue(null);
+      getFieldByClass(BigDecimalToField.class).setValue(null);
     }
 
     @Override
     public List<Object> getValues() {
-      Object a = getFieldByClass(BetweenBigDecimalField.BigDecimalFromField.class).getValue();
-      Object b = getFieldByClass(BetweenBigDecimalField.BigDecimalToField.class).getValue();
+      Object a = getFieldByClass(BigDecimalFromField.class).getValue();
+      Object b = getFieldByClass(BigDecimalToField.class).getValue();
       if (a == null && b == null) {
         return null;
       }
@@ -1339,8 +1336,8 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
 
     @Override
     public List<String> getTexts() {
-      String a = getFieldByClass(BetweenBigDecimalField.BigDecimalFromField.class).getDisplayText();
-      String b = getFieldByClass(BetweenBigDecimalField.BigDecimalToField.class).getDisplayText();
+      String a = getFieldByClass(BigDecimalFromField.class).getDisplayText();
+      String b = getFieldByClass(BigDecimalToField.class).getDisplayText();
       return CollectionUtility.arrayList(a, b);
     }
   }
@@ -1376,6 +1373,6 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
 
   @Override
   protected IComposerValueBoxExtension<? extends AbstractComposerValueBox> createLocalExtension() {
-    return new LocalComposerValueBoxExtension<AbstractComposerValueBox>(this);
+    return new LocalComposerValueBoxExtension<>(this);
   }
 }

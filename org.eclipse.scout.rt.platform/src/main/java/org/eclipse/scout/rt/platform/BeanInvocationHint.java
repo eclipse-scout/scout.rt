@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
  * This is similar to interceptors.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.ANNOTATION_TYPE})
+@Target(ElementType.ANNOTATION_TYPE)
 @Documented
 public @interface BeanInvocationHint {
 }

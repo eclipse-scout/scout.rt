@@ -8,6 +8,7 @@ import com.google.api.client.http.HttpTransport;
  * Factory (helper) for {@link IHttpTransportManager} (especially {@link AbstractHttpTransportManager}) classes to
  * create new instances of {@link HttpTransport}.
  */
+@FunctionalInterface
 @ApplicationScoped
 public interface IHttpTransportFactory {
 

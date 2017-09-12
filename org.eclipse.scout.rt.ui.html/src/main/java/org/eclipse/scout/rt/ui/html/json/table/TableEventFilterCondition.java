@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public class TableEventFilterCondition {
 
-  private int m_type;
+  private final int m_type;
   private List<ITableRow> m_rows;
   private List<ITableRow> m_checkedRows;
   private List<ITableRow> m_uncheckedRows;
@@ -39,8 +39,8 @@ public class TableEventFilterCondition {
    */
   public TableEventFilterCondition(int type) {
     m_type = type;
-    m_rows = new ArrayList<ITableRow>();
-    m_columns = new ArrayList<IColumn<?>>();
+    m_rows = new ArrayList<>();
+    m_columns = new ArrayList<>();
   }
 
   public int getType() {

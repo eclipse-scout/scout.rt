@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.platform.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.junit.Test;
 
 /**

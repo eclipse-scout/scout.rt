@@ -19,8 +19,8 @@ import java.util.Date;
  */
 class TimeRange {
 
-  private Date m_from;
-  private Date m_to;
+  private final Date m_from;
+  private final Date m_to;
 
   public TimeRange(Date from, Date to) {
     m_from = from;

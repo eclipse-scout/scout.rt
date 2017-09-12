@@ -56,7 +56,7 @@ public abstract class AbstractAddAttributeMenu extends AbstractMenu {
     else {
       attributes = m_field.getAttributes();
     }
-    setVisible(attributes.size() > 0);
+    setVisible(!attributes.isEmpty());
   }
 
   @Override

@@ -16,8 +16,8 @@ import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueOutputToken;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 
 class BeanArrayHolderOutput implements IBindOutput {
-  private IBeanArrayHolder m_holder;
-  private AbstractBeanPropertyOutput m_delegate;
+  private final IBeanArrayHolder m_holder;
+  private final AbstractBeanPropertyOutput m_delegate;
 
   public BeanArrayHolderOutput(IBeanArrayHolder holder, String propertyName, ValueOutputToken source) {
     m_holder = holder;

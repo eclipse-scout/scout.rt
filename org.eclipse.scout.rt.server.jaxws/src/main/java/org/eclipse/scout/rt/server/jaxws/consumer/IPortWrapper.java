@@ -15,6 +15,7 @@ package org.eclipse.scout.rt.server.jaxws.consumer;
  *
  * @since 6.0.300
  */
+@FunctionalInterface
 public interface IPortWrapper<PORT> {
 
   /**

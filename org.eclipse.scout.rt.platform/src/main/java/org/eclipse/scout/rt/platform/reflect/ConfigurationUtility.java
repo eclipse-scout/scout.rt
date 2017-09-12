@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -58,7 +59,7 @@ public final class ConfigurationUtility {
    */
   @SuppressWarnings("unchecked")
   public static <T> List<Class<? extends T>> sortFilteredClassesByOrderAnnotation(List<? extends Class> classes, Class<T> filter) {
-    TreeMap<CompositeObject, Class<? extends T>> orderedClassesMap = new TreeMap<CompositeObject, Class<? extends T>>();
+    SortedMap<CompositeObject, Class<? extends T>> orderedClassesMap = new TreeMap<>();
     int i = 0;
     for (Class candidate : classes) {
       if (filter.isAssignableFrom(candidate)) {
@@ -121,7 +122,7 @@ public final class ConfigurationUtility {
    */
   @SuppressWarnings("unchecked")
   public static <T> List<Class<T>> filterClasses(Class[] classes, Class<T> filter) {
-    List<Class<T>> result = new ArrayList<Class<T>>(classes.length);
+    List<Class<T>> result = new ArrayList<>(classes.length);
     for (Class c : classes) {
       if (filter.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
         result.add(c);
@@ -138,7 +139,7 @@ public final class ConfigurationUtility {
    */
   @SuppressWarnings("unchecked")
   public static <T> List<Class<T>> filterClassesIgnoringInjectFieldAnnotation(Class[] classes, Class<T> filter) {
-    List<Class<T>> list = new ArrayList<Class<T>>(classes.length);
+    List<Class<T>> list = new ArrayList<>(classes.length);
     for (Class c : classes) {
       if (filter.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers()) && !isInjectFieldAnnotationPresent(c)) {
         list.add(c);
@@ -155,7 +156,7 @@ public final class ConfigurationUtility {
    */
   @SuppressWarnings("unchecked")
   public static <T> List<Class<T>> filterClassesWithInjectFieldAnnotation(Class[] classes, Class<T> filter) {
-    List<Class<T>> list = new ArrayList<Class<T>>(classes.length);
+    List<Class<T>> list = new ArrayList<>(classes.length);
     for (Class c : classes) {
       if (filter.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers()) && isInjectFieldAnnotationPresent(c)) {
         list.add(c);
@@ -254,10 +255,8 @@ public final class ConfigurationUtility {
     }
 
     // compute resulting list of ordered classes
-    List<Class<? extends T>> list = new ArrayList<Class<? extends T>>(classes.size());
-    for (Class<? extends T> c : classes) {
-      list.add(c);
-    }
+    List<Class<? extends T>> list = new ArrayList<>(classes.size());
+    list.addAll(classes);
 
     for (Class<? extends T> replacingClass : replacingClasses) {
       boolean reorder = !replacingClass.isAnnotationPresent(Order.class);
@@ -310,11 +309,11 @@ public final class ConfigurationUtility {
     Set<Class<? extends T>> replacingClasses = getReplacingLeafClasses(classes);
     if (replacingClasses.isEmpty()) {
       // there are no replacing classes
-      return new HashMap<Class<?>, Class<? extends T>>(0);
+      return new HashMap<>(0);
     }
 
     // compute resulting replacement mapping
-    Map<Class<?>, Class<? extends T>> mappings = new HashMap<Class<?>, Class<? extends T>>();
+    Map<Class<?>, Class<? extends T>> mappings = new HashMap<>();
     for (Class<? extends T> c : replacingClasses) {
       Class<?> tmpClass = c;
       do {
@@ -351,8 +350,8 @@ public final class ConfigurationUtility {
    */
   public static <T> Set<Class<? extends T>> getReplacingLeafClasses(List<? extends Class<? extends T>> classes) {
     // gather all replacing and replaced classes (i.e. those annotated with @Replace and their super classes)
-    Set<Class<? extends T>> replacingClasses = new HashSet<Class<? extends T>>(classes.size());
-    Set<Class<?>> replacedClasses = new HashSet<Class<?>>();
+    Set<Class<? extends T>> replacingClasses = new HashSet<>(classes.size());
+    Set<Class<?>> replacedClasses = new HashSet<>();
     for (Class<? extends T> c : classes) {
       if (c.isAnnotationPresent(Replace.class)) {
         replacingClasses.add(c);

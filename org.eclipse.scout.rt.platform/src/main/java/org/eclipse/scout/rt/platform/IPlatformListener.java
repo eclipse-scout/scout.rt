@@ -17,6 +17,7 @@ import java.util.EventListener;
  *
  * @since 5.1
  */
+@FunctionalInterface
 @ApplicationScoped
 public interface IPlatformListener extends EventListener {
 

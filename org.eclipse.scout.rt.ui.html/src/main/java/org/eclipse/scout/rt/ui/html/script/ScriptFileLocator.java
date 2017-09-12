@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 public class ScriptFileLocator {
   private static final Logger LOG = LoggerFactory.getLogger(ScriptFileLocator.class);
 
-  private IWebContentService m_resourceLocator;
+  private final IWebContentService m_resourceLocator;
 
   public ScriptFileLocator(IWebContentService resourceLocator) {
     m_resourceLocator = resourceLocator;
@@ -43,10 +43,10 @@ public class ScriptFileLocator {
 
     // only (external) libraries are available minified and non-minified
     // all other files are always non-minified on the classpath
-    FileLookup library = new FileLookup(true, parent + fileName + "." + fileExtension, ScriptSource.NodeType.LIBRARY);
-    FileLookup libraryMinified = new FileLookup(true, parent + fileName + ".min." + fileExtension, ScriptSource.NodeType.LIBRARY_MINIFIED);
+    FileLookup library = new FileLookup(true, parent + fileName + "." + fileExtension, NodeType.LIBRARY);
+    FileLookup libraryMinified = new FileLookup(true, parent + fileName + ".min." + fileExtension, NodeType.LIBRARY_MINIFIED);
 
-    List<FileLookup> lookups = new ArrayList<ScriptFileLocator.FileLookup>(5);
+    List<FileLookup> lookups = new ArrayList<>(5);
     lookups.add(macro);
     lookups.addAll(modules);
     lookups.add(minified ? libraryMinified : library);
@@ -72,7 +72,7 @@ public class ScriptFileLocator {
     else {
       lookupFileName = parent + fileName + "-macro." + fileExtension;
     }
-    return new FileLookup(true, lookupFileName, ScriptSource.NodeType.MACRO);
+    return new FileLookup(true, lookupFileName, NodeType.MACRO);
   }
 
   /**
@@ -97,7 +97,7 @@ public class ScriptFileLocator {
     else {
       lookupFileName = fileName + "-module." + fileExtension;
     }
-    return new FileLookup(false, lookupFileName, ScriptSource.NodeType.SRC_MODULE);
+    return new FileLookup(false, lookupFileName, NodeType.SRC_MODULE);
   }
 
   /**
@@ -119,7 +119,7 @@ public class ScriptFileLocator {
   protected class FileLookup {
     private final boolean m_webContent;
     private final String m_fileName;
-    private final ScriptSource.NodeType m_nodeType;
+    private final NodeType m_nodeType;
     private URL m_url;
 
     protected FileLookup(boolean webContent, String fileName, NodeType nodeType) {

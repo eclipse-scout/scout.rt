@@ -15,7 +15,7 @@ import org.json.JSONObject;
 
 public class JsonGridData implements IJsonObject {
 
-  private GridData m_gridData;
+  private final GridData m_gridData;
 
   public JsonGridData(GridData gridData) {
     m_gridData = gridData;

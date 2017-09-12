@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
  * Interceptor that is called before the HTTP response is sent back to the client. This can be useful to alter the
  * answer, e.g. to add HTTP response headers.
  */
+@FunctionalInterface
 public interface IHttpResponseInterceptor extends Serializable {
 
   /**

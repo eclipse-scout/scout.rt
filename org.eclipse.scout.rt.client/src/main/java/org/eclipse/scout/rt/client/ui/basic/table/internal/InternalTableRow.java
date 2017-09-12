@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 /**
  * Internal representation of a Table row. Contains some more information than {@link TableRow} like validation.
  */
-public class InternalTableRow extends TableRow implements ITableRow, ICellObserver {
+public class InternalTableRow extends TableRow implements ICellObserver {
 
   private ITable m_table;
   private int m_rowIndex;
@@ -213,7 +213,7 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
 
   @Override
   public List<Object> getKeyValues() {
-    List<Object> pk = new ArrayList<Object>();
+    List<Object> pk = new ArrayList<>();
     if (getTable() != null) {
       int[] keyColumns = getTable().getColumnSet().getKeyColumnIndexes();
       if (keyColumns.length == 0) {
@@ -257,7 +257,7 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
   }
 
   @Override
-  public boolean setCellValues(List<? extends Object> values) {
+  public boolean setCellValues(List<?> values) {
     boolean changed = false;
     for (int i = 0; i < values.size(); i++) {
       boolean b = setCellValue(i, values.get(i));
@@ -458,14 +458,14 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
   private void setCellChanged(ICell cell, int changeBit) {
     Set<Integer> updatedBits = m_updatedCells.get(cell);
     if (updatedBits == null) {
-      updatedBits = new HashSet<Integer>();
+      updatedBits = new HashSet<>();
     }
     updatedBits.add(changeBit);
     m_updatedCells.put(cell, updatedBits);
   }
 
   private List<ICell> getChangedCells(int changedBit) {
-    ArrayList<ICell> cells = new ArrayList<ICell>();
+    List<ICell> cells = new ArrayList<>();
     for (Entry<ICell, Set<Integer>> e : m_updatedCells.entrySet()) {
       Set<Integer> value = e.getValue();
       if (value != null && value.contains(changedBit)) {
@@ -476,7 +476,7 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
   }
 
   private List<ICell> getChangedCells() {
-    ArrayList<ICell> cells = new ArrayList<ICell>();
+    List<ICell> cells = new ArrayList<>();
     for (Entry<ICell, Set<Integer>> e : m_updatedCells.entrySet()) {
       Set<Integer> changedBits = e.getValue();
       if (changedBits != null) {

@@ -187,6 +187,6 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
 
   @Override
   protected IBooleanColumnExtension<? extends AbstractBooleanColumn> createLocalExtension() {
-    return new LocalBooleanColumnExtension<AbstractBooleanColumn>(this);
+    return new LocalBooleanColumnExtension<>(this);
   }
 }

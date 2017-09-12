@@ -15,7 +15,7 @@ package org.eclipse.scout.rt.client.ui.dnd;
  */
 
 public class TextTransferObject extends TransferObject {
-  private String m_plainText;
+  private final String m_plainText;
 
   public TextTransferObject(String plainText) {
     m_plainText = plainText;

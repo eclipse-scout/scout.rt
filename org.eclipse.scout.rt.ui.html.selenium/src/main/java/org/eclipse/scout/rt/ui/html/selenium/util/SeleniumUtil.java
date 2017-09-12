@@ -134,7 +134,7 @@ public final class SeleniumUtil {
       return attributeValue;
     }
     // if not found, check if the parent has the attribute (required for form-fields)
-    return SeleniumUtil.getParent(element).getAttribute(attributeName);
+    return getParent(element).getAttribute(attributeName);
   }
 
   public static String getAttributeModelClass(WebElement element) {
@@ -254,8 +254,8 @@ public final class SeleniumUtil {
   }
 
   public static void sendKeysDelayed(WebElement element, Keys... keys) {
-    for (int i = 0; i < keys.length; i++) {
-      element.sendKeys(keys[i]);
+    for (Keys key : keys) {
+      element.sendKeys(key);
       SleepUtil.sleepSafe(100, TimeUnit.MILLISECONDS);
     }
   }

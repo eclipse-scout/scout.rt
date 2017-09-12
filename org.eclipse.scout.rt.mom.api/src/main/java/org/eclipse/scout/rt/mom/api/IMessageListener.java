@@ -12,6 +12,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
  * @see IMom#subscribe(IDestination, IMessageListener, RunContext)
  * @since 6.1
  */
+@FunctionalInterface
 public interface IMessageListener<DTO> {
 
   /**

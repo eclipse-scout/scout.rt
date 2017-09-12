@@ -25,7 +25,7 @@ public final class TestingClientConfigProperties {
 
     @Override
     public Long getDefaultValue() {
-      return Long.valueOf(TimeUnit.DAYS.toMillis(1));
+      return TimeUnit.DAYS.toMillis(1);
     }
 
     @Override

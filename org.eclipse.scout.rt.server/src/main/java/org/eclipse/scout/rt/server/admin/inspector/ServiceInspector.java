@@ -41,7 +41,7 @@ public class ServiceInspector {
   }
 
   public void changeProperty(PropertyDescriptor propDesc, String propText) throws IllegalAccessException, InvocationTargetException {
-    if (propText != null && propText.length() == 0) {
+    if (propText != null && propText.isEmpty()) {
       propText = null;
     }
     Method setterMethod = propDesc.getWriteMethod();

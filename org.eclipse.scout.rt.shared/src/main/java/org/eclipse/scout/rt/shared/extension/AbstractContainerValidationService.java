@@ -24,8 +24,8 @@ public abstract class AbstractContainerValidationService implements IExtensionRe
   private final Map<Class<? extends IOrdered>, Set<Class<? extends IOrdered>>> m_possibleMovesByContainer;
 
   protected AbstractContainerValidationService() {
-    m_possibleContributionsByContainer = new HashMap<Class<?>, Set<Class<?>>>();
-    m_possibleMovesByContainer = new HashMap<Class<? extends IOrdered>, Set<Class<? extends IOrdered>>>();
+    m_possibleContributionsByContainer = new HashMap<>();
+    m_possibleMovesByContainer = new HashMap<>();
   }
 
   private static <T> void removeFromMap(Class<? extends T> key, Class<? extends T> value, Map<Class<? extends T>, Set<Class<? extends T>>> map) {
@@ -39,11 +39,7 @@ public abstract class AbstractContainerValidationService implements IExtensionRe
   }
 
   private static <T> void addToMap(Class<? extends T> key, Class<? extends T> value, Map<Class<? extends T>, Set<Class<? extends T>>> map) {
-    Set<Class<? extends T>> values = map.get(key);
-    if (values == null) {
-      values = new HashSet<Class<? extends T>>();
-      map.put(key, values);
-    }
+    Set<Class<? extends T>> values = map.computeIfAbsent(key, k -> new HashSet<>());
     values.add(value);
   }
 

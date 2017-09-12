@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.svg.client.svgfield;
 
 import java.util.EventListener;
 
+@FunctionalInterface
 public interface ISvgFieldListener extends EventListener {
 
   void handleSvgFieldEvent(SvgFieldEvent e);

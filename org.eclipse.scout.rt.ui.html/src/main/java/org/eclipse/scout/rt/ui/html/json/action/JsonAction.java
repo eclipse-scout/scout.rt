@@ -132,7 +132,7 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonPro
     putJsonProperty(new JsonAdapterProperty<ACTION>(IActionNode.PROP_CHILD_ACTIONS, model, getUiSession()) {
       @Override
       protected JsonAdapterPropertyConfig createConfig() {
-        return new JsonAdapterPropertyConfigBuilder().filter(new DisplayableActionFilter<IAction>()).build();
+        return new JsonAdapterPropertyConfigBuilder().filter(new DisplayableActionFilter<>()).build();
       }
 
       @Override

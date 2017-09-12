@@ -10,14 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.bookmark;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
 
-public class TablePageState extends AbstractPageState implements Serializable {
+public class TablePageState extends AbstractPageState {
   private static final long serialVersionUID = 1L;
 
   private CompositeObject m_expandedChildPrimaryKey;
@@ -43,7 +42,7 @@ public class TablePageState extends AbstractPageState implements Serializable {
   protected TablePageState(TablePageState state) {
     super(state);
     if (state.m_selectedChildrenPrimaryKeys != null) {
-      this.m_selectedChildrenPrimaryKeys = new ArrayList<CompositeObject>(state.m_selectedChildrenPrimaryKeys);
+      this.m_selectedChildrenPrimaryKeys = new ArrayList<>(state.m_selectedChildrenPrimaryKeys);
     }
     this.m_expandedChildPrimaryKey = state.m_expandedChildPrimaryKey;
     this.m_searchFormState = state.m_searchFormState;
@@ -52,13 +51,13 @@ public class TablePageState extends AbstractPageState implements Serializable {
     this.m_tableCustomizerData = state.m_tableCustomizerData;
     this.m_userFilterData = state.m_userFilterData;
     if (state.m_visibleColumns != null) {
-      this.m_visibleColumns = new ArrayList<TableColumnState>();
+      this.m_visibleColumns = new ArrayList<>();
       for (TableColumnState col : state.m_visibleColumns) {
         this.m_visibleColumns.add(new TableColumnState(col));
       }
     }
     if (state.m_availableColumns != null) {
-      this.m_availableColumns = new ArrayList<TableColumnState>();
+      this.m_availableColumns = new ArrayList<>();
       for (TableColumnState col : state.m_availableColumns) {
         this.m_availableColumns.add(new TableColumnState(col));
       }
@@ -74,7 +73,7 @@ public class TablePageState extends AbstractPageState implements Serializable {
       m_selectedChildrenPrimaryKeys = null;
     }
     else {
-      m_selectedChildrenPrimaryKeys = new ArrayList<CompositeObject>(list);
+      m_selectedChildrenPrimaryKeys = new ArrayList<>(list);
     }
   }
 
@@ -132,7 +131,7 @@ public class TablePageState extends AbstractPageState implements Serializable {
       m_availableColumns = null;
     }
     else {
-      m_availableColumns = new ArrayList<TableColumnState>(cols);
+      m_availableColumns = new ArrayList<>(cols);
     }
   }
 

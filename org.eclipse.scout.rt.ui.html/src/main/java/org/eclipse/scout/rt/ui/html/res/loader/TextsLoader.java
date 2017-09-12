@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiLocalesProperty;
 import org.json.JSONObject;
 
 public class TextsLoader extends AbstractResourceLoader {
-  private Map<String, Map<String, String>> m_textsByLanguageTag = new LinkedHashMap<String, Map<String, String>>();
+  private final Map<String, Map<String, String>> m_textsByLanguageTag = new LinkedHashMap<>();
 
   @Override
   public BinaryResource loadResource(String pathInfo) throws IOException {
@@ -40,11 +40,7 @@ public class TextsLoader extends AbstractResourceLoader {
           continue;
         }
 
-        Map<String, String> map = m_textsByLanguageTag.get(tag);
-        if (map == null) {
-          map = new TreeMap<String, String>();
-          m_textsByLanguageTag.put(tag, map);
-        }
+        Map<String, String> map = m_textsByLanguageTag.computeIfAbsent(tag, k -> new TreeMap<>());
         putTextsFromBundle(bundle, map);
       }
     }
@@ -124,7 +120,7 @@ public class TextsLoader extends AbstractResourceLoader {
     }
 
     // Create a new list including the missing language tags
-    languageTags = new ArrayList<String>();
+    languageTags = new ArrayList<>();
     for (Set<String> tags : languages.values()) {
       languageTags.addAll(tags);
     }

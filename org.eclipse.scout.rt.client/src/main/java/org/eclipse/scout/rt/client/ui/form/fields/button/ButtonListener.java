@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.button;
 
 import java.util.EventListener;
 
+@FunctionalInterface
 public interface ButtonListener extends EventListener {
   void buttonChanged(ButtonEvent e);
 }

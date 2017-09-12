@@ -12,12 +12,15 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectInputStream.GetField;
 import java.io.ObjectOutputStream;
+import java.io.ObjectOutputStream.PutField;
 import java.io.Serializable;
 import java.security.Permission;
 import java.security.Permissions;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 /**
  * Wrapper for {@link Permissions} that is serialize safe. This is useful to transfer permission collections that may
@@ -44,10 +47,10 @@ public class LenientPermissionsWrapper implements Serializable {
    */
   private void writeObject(ObjectOutputStream out) throws IOException {
     //no call to defaultWriteObject
-    ObjectOutputStream.PutField pfields = out.putFields();
-    ArrayList<LenientPermissionWrapper> list = null;
+    PutField pfields = out.putFields();
+    List<LenientPermissionWrapper> list = null;
     if (m_permissions != null) {
-      list = new ArrayList<LenientPermissionWrapper>();
+      list = new ArrayList<>();
       for (Enumeration<Permission> en = m_permissions.elements(); en.hasMoreElements();) {
         Permission perm = en.nextElement();
         if (perm != null) {
@@ -63,8 +66,8 @@ public class LenientPermissionsWrapper implements Serializable {
   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
     //no call to defaultReadObject
     m_permissions = new Permissions();
-    ObjectInputStream.GetField gfields = in.readFields();
-    ArrayList<LenientPermissionWrapper> list = (ArrayList<LenientPermissionWrapper>) gfields.get("m_permissions", (ArrayList<LenientPermissionWrapper>) null);
+    GetField gfields = in.readFields();
+    Iterable<LenientPermissionWrapper> list = (ArrayList<LenientPermissionWrapper>) gfields.get("m_permissions", null);
     if (list != null) {
       for (LenientPermissionWrapper w : list) {
         if (w.getPermission() != null) {

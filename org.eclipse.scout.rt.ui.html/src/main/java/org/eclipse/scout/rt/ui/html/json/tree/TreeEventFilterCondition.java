@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public class TreeEventFilterCondition {
 
-  private int m_type;
+  private final int m_type;
   private List<ITreeNode> m_nodes;
   private List<ITreeNode> m_checkedNodes;
   private List<ITreeNode> m_uncheckedNodes;

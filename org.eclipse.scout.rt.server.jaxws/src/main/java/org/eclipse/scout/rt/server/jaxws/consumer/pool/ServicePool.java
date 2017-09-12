@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.server.jaxws.consumer.pool;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.URL;
@@ -19,7 +18,6 @@ import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
@@ -27,9 +25,7 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.HandlerResolver;
 import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.PortInfo;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -74,21 +70,17 @@ public class ServicePool<SERVICE extends Service> extends AbstractNonBlockingPoo
       final SERVICE service = (SERVICE) constructor.newInstance(m_wsdlLocation, new QName(m_targetNamespace, m_serviceName));
 
       // Install the handler chain
-      service.setHandlerResolver(new HandlerResolver() {
+      service.setHandlerResolver(portInfo -> {
+        final List<Handler<? extends MessageContext>> handlerChain = new ArrayList<>();
+        m_initializer.initHandlers(handlerChain);
 
-        @Override
-        public List<Handler> getHandlerChain(final PortInfo portInfo) {
-          final List<Handler<? extends MessageContext>> handlerChain = new ArrayList<>();
-          m_initializer.initHandlers(handlerChain);
-
-          for (int i = 0; i < handlerChain.size(); i++) {
-            handlerChain.set(i, proxyHandler(handlerChain.get(i)));
-          }
-
-          @SuppressWarnings("unchecked")
-          final List<Handler> handlers = TypeCastUtility.castValue(handlerChain, List.class);
-          return handlers;
+        for (int i = 0; i < handlerChain.size(); i++) {
+          handlerChain.set(i, proxyHandler(handlerChain.get(i)));
         }
+
+        @SuppressWarnings("unchecked")
+        final List<Handler> handlers = TypeCastUtility.castValue(handlerChain, List.class);
+        return handlers;
       });
 
       return service;
@@ -114,22 +106,12 @@ public class ServicePool<SERVICE extends Service> extends AbstractNonBlockingPoo
     }
 
     final RunContextProducer runContextProducer = BEANS.get(handleWithRunContext.value());
-    return (Handler<?>) Proxy.newProxyInstance(handler.getClass().getClassLoader(), handler.getClass().getInterfaces(), new InvocationHandler() {
-
-      @Override
-      public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
-        if (PROXIED_HANDLER_METHODS.contains(method)) {
-          return runContextProducer.produce(Subject.getSubject(AccessController.getContext())).call(new Callable<Object>() {
-
-            @Override
-            public Object call() throws Exception {
-              return method.invoke(handler, args);
-            }
-          }, DefaultExceptionTranslator.class);
-        }
-        else {
-          return method.invoke(handler, args);
-        }
+    return (Handler<?>) Proxy.newProxyInstance(handler.getClass().getClassLoader(), handler.getClass().getInterfaces(), (proxy, method, args) -> {
+      if (PROXIED_HANDLER_METHODS.contains(method)) {
+        return runContextProducer.produce(Subject.getSubject(AccessController.getContext())).call(() -> method.invoke(handler, args), DefaultExceptionTranslator.class);
+      }
+      else {
+        return method.invoke(handler, args);
       }
     });
   }

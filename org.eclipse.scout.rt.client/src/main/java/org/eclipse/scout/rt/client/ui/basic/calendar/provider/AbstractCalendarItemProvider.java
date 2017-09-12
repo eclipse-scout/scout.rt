@@ -70,7 +70,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   }
 
   public AbstractCalendarItemProvider(boolean callInitializer) {
-    m_objectExtensions = new ObjectExtensions<AbstractCalendarItemProvider, ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider>>(this, false);
+    m_objectExtensions = new ObjectExtensions<>(this, false);
     if (callInitializer) {
       callInitializer();
     }
@@ -148,12 +148,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   @ConfigOperation
   @Order(40)
   protected void execLoadItemsInBackground(final IClientSession session, final Date minDate, final Date maxDate, final Set<ICalendarItem> result) {
-    ModelJobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        interceptLoadItems(minDate, maxDate, result);
-      }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(session, true))).awaitDone();
+    ModelJobs.schedule(() -> interceptLoadItems(minDate, maxDate, result), ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(session, true))).awaitDone();
   }
 
   @ConfigOperation
@@ -175,12 +170,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   }
 
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
-      @Override
-      public void run() {
-        initConfig();
-      }
-    });
+    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
   protected void initConfig() {
@@ -189,7 +179,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     setRefreshIntervalMillis(getConfiguredRefreshIntervallMillis());
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
-    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
+    OrderedCollection<IMenu> menus = new OrderedCollection<>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
       IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
       menu.initAction();
@@ -204,7 +194,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     catch (Exception e) {
       LOG.error("error occured while dynamically contribute menus.", e);
     }
-    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
+    new MoveActionNodesHandler<>(menus).moveModelObjects();
     m_menus = menus.getOrderedList();
   }
 
@@ -214,7 +204,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   }
 
   protected ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider> createLocalExtension() {
-    return new LocalCalendarItemProviderExtension<AbstractCalendarItemProvider>(this);
+    return new LocalCalendarItemProviderExtension<>(this);
   }
 
   @Override
@@ -251,7 +241,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     ensureItemsLoadedInternal(minDate, maxDate);
     Set<ICalendarItem> allItems = propertySupport.getPropertySet(PROP_ITEMS);
     if (CollectionUtility.hasElements(allItems)) {
-      Set<ICalendarItem> list = new HashSet<ICalendarItem>(allItems.size());
+      Set<ICalendarItem> list = new HashSet<>(allItems.size());
       for (ICalendarItem item : allItems) {
         if (item.isIntersecting(minDate, maxDate)) {
           list.add(item);
@@ -301,11 +291,8 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     }
     else {
       try {
-        ModelJobs.schedule(new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            propertySupport.setPropertyBool(PROP_LOAD_IN_PROGRESS, loadInProgress);
-          }
+        ModelJobs.schedule(() -> {
+          propertySupport.setPropertyBool(PROP_LOAD_IN_PROGRESS, loadInProgress);
         }, ModelJobs.newInput(ClientRunContexts.copyCurrent()))
             .awaitDone();
       }
@@ -411,13 +398,10 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
           LOG.error("Failed to reload calendar items", e);
         }
 
-        ModelJobs.schedule(new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            synchronized (AbstractCalendarItemProvider.this) {
-              if (!RunMonitor.CURRENT.get().isCancelled()) {
-                setItemsInternal(m_loadingMinDate, m_loadingMaxDate, m_result);
-              }
+        ModelJobs.schedule(() -> {
+          synchronized (AbstractCalendarItemProvider.this) {
+            if (!RunMonitor.CURRENT.get().isCancelled()) {
+              setItemsInternal(m_loadingMinDate, m_loadingMaxDate, m_result);
             }
           }
         }, ModelJobs.newInput(ClientRunContexts.copyCurrent())).awaitDone();

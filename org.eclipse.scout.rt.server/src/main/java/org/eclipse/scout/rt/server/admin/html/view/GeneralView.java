@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.server.admin.html.view;
 import java.security.AccessController;
 import java.security.Principal;
 import java.util.Date;
-import java.util.Iterator;
 
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpSession;
@@ -101,8 +100,7 @@ public class GeneralView extends DefaultView {
       p.br();
       if (subject != null) {
         int i1 = 0;
-        for (Iterator it1 = subject.getPrincipals().iterator(); it1.hasNext();) {
-          Principal principal = (Principal) it1.next();
+        for (Principal principal : subject.getPrincipals()) {
           if (principal != null) {
             p.print("&nbsp;&nbsp;&nbsp;&nbsp;principal[" + i1 + "]=" + principal.getName() + " [" + principal.getClass().getName() + "]");
             p.br();
@@ -177,7 +175,7 @@ public class GeneralView extends DefaultView {
   }
 
   private class P_EnableAction extends AbstractHtmlAction {
-    private boolean m_enabled;
+    private final boolean m_enabled;
 
     public P_EnableAction(boolean b) {
       super("mon.enabled." + b);
@@ -191,7 +189,7 @@ public class GeneralView extends DefaultView {
   }
 
   private class P_SetTimeoutAction extends AbstractHtmlAction {
-    private long m_minutes;
+    private final long m_minutes;
 
     public P_SetTimeoutAction(long minutes) {
       super("mon.cache." + minutes);

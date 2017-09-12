@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.clientnotification;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,6 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.IDispatchingNotificationHandler;
@@ -127,9 +127,7 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
         @SuppressWarnings("unchecked")
         INotificationListener<T>[] notificationListeners = listeners.getListeners(INotificationListener.class);
         if (notificationListeners != null) {
-          for (INotificationListener<T> notificationListener : notificationListeners) {
-            res.add(notificationListener);
-          }
+          Collections.addAll(res, notificationListeners);
         }
       }
       return res;
@@ -184,16 +182,12 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
     }
   }
 
+  @SuppressWarnings("unchecked")
   protected void scheduleHandlingNotifications(final T notification, final EventListenerList list, final IClientSession session) {
-    Jobs.schedule(new IRunnable() {
-
-      @SuppressWarnings("unchecked")
-      @Override
-      public void run() throws Exception {
-        if (list != null && list.getListenerCount(INotificationListener.class) > 0) {
-          for (INotificationListener<T> l : list.getListeners(INotificationListener.class)) {
-            l.handleNotification(notification);
-          }
+    Jobs.schedule(() -> {
+      if (list != null && list.getListenerCount(INotificationListener.class) > 0) {
+        for (INotificationListener<T> l : list.getListeners(INotificationListener.class)) {
+          l.handleNotification(notification);
         }
       }
     }, Jobs

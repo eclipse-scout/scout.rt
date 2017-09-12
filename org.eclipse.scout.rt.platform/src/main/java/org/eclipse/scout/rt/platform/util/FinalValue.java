@@ -60,12 +60,7 @@ public class FinalValue<VALUE> {
    * @return the final value.
    */
   public VALUE setIfAbsentAndGet(final VALUE value) {
-    return setIfAbsentAndGet(new Callable<VALUE>() {
-      @Override
-      public VALUE call() {
-        return value;
-      }
-    });
+    return setIfAbsentAndGet(() -> value);
   }
 
   /**
@@ -92,12 +87,7 @@ public class FinalValue<VALUE> {
    *         exited.
    */
   public boolean setIfAbsent(final VALUE value) {
-    return setIfAbsent(new Callable<VALUE>() {
-      @Override
-      public VALUE call() {
-        return value;
-      }
-    });
+    return setIfAbsent(() -> value);
   }
 
   /**

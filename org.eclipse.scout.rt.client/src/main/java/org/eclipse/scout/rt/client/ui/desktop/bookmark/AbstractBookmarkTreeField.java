@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.client.ui.desktop.bookmark;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,7 +29,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.view.IOpenBookmarkCommand;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.view.IPublishBookmarkCommand;
@@ -236,42 +233,34 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
    * The structure of the folders has changed, completely rebuild the model
    */
   private void rebuildBookmarkModel() {
-    getTree().visitTree(new ITreeVisitor() {
-      @Override
-      public boolean visit(ITreeNode node) {
-        BookmarkFolder bmFolder = null;
-        if (node == getTree().getRootNode()) {
-          bmFolder = getBookmarkRootFolder();
-        }
-        else if (isFolderNode(node)) {
-          bmFolder = (BookmarkFolder) node.getCell().getValue();
-        }
-        if (bmFolder != null) {
-          bmFolder.getFolders().clear();
-          bmFolder.getBookmarks().clear();
-          //sort folders
-          ArrayList<BookmarkFolder> folderList = new ArrayList<BookmarkFolder>();
-          for (ITreeNode n : node.getChildNodes()) {
-            if (isFolderNode(n)) {
-              BookmarkFolder f = (BookmarkFolder) n.getCell().getValue();
-              folderList.add(f);
-            }
-          }
-          Collections.sort(folderList, new Comparator<BookmarkFolder>() {
-            @Override
-            public int compare(BookmarkFolder f1, BookmarkFolder f2) {
-              return StringUtility.compareIgnoreCase(f1.getTitle(), f2.getTitle());
-            }
-          });
-          bmFolder.getFolders().addAll(folderList);
-          for (ITreeNode n : node.getChildNodes()) {
-            if (isBookmarkNode(n)) {
-              bmFolder.getBookmarks().add((Bookmark) n.getCell().getValue());
-            }
-          }
-        }
-        return true;
+    getTree().visitTree(node -> {
+      BookmarkFolder bmFolder = null;
+      if (node == getTree().getRootNode()) {
+        bmFolder = getBookmarkRootFolder();
       }
+      else if (isFolderNode(node)) {
+        bmFolder = (BookmarkFolder) node.getCell().getValue();
+      }
+      if (bmFolder != null) {
+        bmFolder.getFolders().clear();
+        bmFolder.getBookmarks().clear();
+        //sort folders
+        List<BookmarkFolder> folderList = new ArrayList<>();
+        for (ITreeNode n : node.getChildNodes()) {
+          if (isFolderNode(n)) {
+            BookmarkFolder f = (BookmarkFolder) n.getCell().getValue();
+            folderList.add(f);
+          }
+        }
+        folderList.sort((f1, f2) -> StringUtility.compareIgnoreCase(f1.getTitle(), f2.getTitle()));
+        bmFolder.getFolders().addAll(folderList);
+        for (ITreeNode n : node.getChildNodes()) {
+          if (isBookmarkNode(n)) {
+            bmFolder.getBookmarks().add((Bookmark) n.getCell().getValue());
+          }
+        }
+      }
+      return true;
     });
     //save
     BEANS.get(IBookmarkService.class).storeBookmarks();
@@ -281,30 +270,27 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
    * Only some values have changed, just save the model
    */
   private void refreshBookmarkModel() {
-    getTree().visitTree(new ITreeVisitor() {
-      @Override
-      public boolean visit(ITreeNode node) {
-        BookmarkFolder bmFolder = null;
-        if (node == getTree().getRootNode()) {
-          bmFolder = getBookmarkRootFolder();
-        }
-        else if (isFolderNode(node)) {
-          bmFolder = (BookmarkFolder) node.getCell().getValue();
-        }
-        if (bmFolder != null) {
-          bmFolder.getFolders().clear();
-          bmFolder.getBookmarks().clear();
-          for (ITreeNode n : node.getChildNodes()) {
-            if (isFolderNode(n)) {
-              bmFolder.getFolders().add((BookmarkFolder) n.getCell().getValue());
-            }
-            else if (isBookmarkNode(n)) {
-              bmFolder.getBookmarks().add((Bookmark) n.getCell().getValue());
-            }
+    getTree().visitTree(node -> {
+      BookmarkFolder bmFolder = null;
+      if (node == getTree().getRootNode()) {
+        bmFolder = getBookmarkRootFolder();
+      }
+      else if (isFolderNode(node)) {
+        bmFolder = (BookmarkFolder) node.getCell().getValue();
+      }
+      if (bmFolder != null) {
+        bmFolder.getFolders().clear();
+        bmFolder.getBookmarks().clear();
+        for (ITreeNode n : node.getChildNodes()) {
+          if (isFolderNode(n)) {
+            bmFolder.getFolders().add((BookmarkFolder) n.getCell().getValue());
+          }
+          else if (isBookmarkNode(n)) {
+            bmFolder.getBookmarks().add((Bookmark) n.getCell().getValue());
           }
         }
-        return true;
       }
+      return true;
     });
     //save
     BEANS.get(IBookmarkService.class).storeBookmarks();
@@ -352,7 +338,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
           List<ITreeNode> elements = ((JavaTransferObject) transfer).getLocalObjectAsList(ITreeNode.class);
           if (CollectionUtility.hasElements(elements)) {
             boolean updateTree = false;
-            HashSet<ITreeNode> draggedFolders = new HashSet<ITreeNode>();
+            Set<ITreeNode> draggedFolders = new HashSet<>();
             for (ITreeNode source : elements) {
               if (source != dropNode && source.getTree() == getTree()) {
                 ITreeNode target = dropNode;
@@ -599,18 +585,18 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       @Override
       protected void execAction() {
         ITree tree = getTree();
-        Set<ITreeNode> folders = new HashSet<ITreeNode>();
-        Set<ITreeNode> bookmarks = new HashSet<ITreeNode>();
+        Set<ITreeNode> folders = new HashSet<>();
+        Set<ITreeNode> bookmarks = new HashSet<>();
         for (ITreeNode node : tree.getSelectedNodes()) {
           addNodeFoldersToSet(folders, node);
           addNodeBookmarksToSet(bookmarks, node);
         }
-        ArrayList<String> names = new ArrayList<String>();
+        ArrayList<String> names = new ArrayList<>();
         for (ITreeNode folder : folders) {
           names.add(((BookmarkFolder) folder.getCell().getValue()).getTitle());
         }
         for (ITreeNode bookmark : bookmarks) {
-          ArrayList<Bookmark> check = new ArrayList<Bookmark>();
+          List<Bookmark> check = new ArrayList<>();
           check.add(((Bookmark) bookmark.getCell().getValue()));
           if (ACCESS.check(getDeletePermission(check))) {
             names.add(((Bookmark) bookmark.getCell().getValue()).getTitle());
@@ -715,7 +701,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
       @Override
       protected void execOwnerValueChanged(Object newOwnerValue) {
-        List<Bookmark> bookmarks = new ArrayList<Bookmark>();
+        List<Bookmark> bookmarks = new ArrayList<>();
         ITree tree = getTree();
         for (ITreeNode node : tree.getSelectedNodes()) {
           if (isBookmarkNode(node)) {
@@ -760,16 +746,13 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
           final BookmarkFolder newBmFolder = form.getFolder() != null ? form.getFolder() : form.getBookmarkRootFolder();
           if (ObjectUtility.notEquals(oldBmFolder, newBmFolder)) {
             //find new folder node
-            final AtomicReference<ITreeNode> newContainerNode = new AtomicReference<ITreeNode>(getTree().getRootNode());
-            tree.visitTree(new ITreeVisitor() {
-              @Override
-              public boolean visit(ITreeNode n) {
-                if (isFolderNode(n) && newBmFolder.equals(n.getCell().getValue())) {
-                  newContainerNode.set(n);
-                  return false;
-                }
-                return true;
+            final AtomicReference<ITreeNode> newContainerNode = new AtomicReference<>(getTree().getRootNode());
+            tree.visitTree(n -> {
+              if (isFolderNode(n) && newBmFolder.equals(n.getCell().getValue())) {
+                newContainerNode.set(n);
+                return false;
               }
+              return true;
             });
             tree.removeNode(node);
             tree.addChildNode(newContainerNode.get(), node);
@@ -799,7 +782,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       protected void execOwnerValueChanged(Object newOwnerValue) {
         // The permission to use the "update bookmark" function
         // is the same as to delete one:
-        ArrayList<Bookmark> bookmarks = new ArrayList<Bookmark>();
+        List<Bookmark> bookmarks = new ArrayList<>();
         ITree tree = getTree();
         for (ITreeNode node : tree.getSelectedNodes()) {
           if (isBookmarkNode(node)) {
@@ -835,7 +818,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
       @Override
       protected void execOwnerValueChanged(Object newOwnerValue) {
-        List<Bookmark> bookmarks = new ArrayList<Bookmark>();
+        List<Bookmark> bookmarks = new ArrayList<>();
         ITree tree = getTree();
         for (ITreeNode node : tree.getSelectedNodes()) {
           if (isBookmarkNode(node)) {
@@ -847,8 +830,8 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
       @Override
       protected void execAction() {
-        ArrayList<String> items = new ArrayList<String>();
-        ArrayList<ITreeNode> filteredNodes = new ArrayList<ITreeNode>();
+        ArrayList<String> items = new ArrayList<>();
+        List<ITreeNode> filteredNodes = new ArrayList<>();
         ITree tree = getTree();
         for (ITreeNode node : tree.getSelectedNodes()) {
           if (isBookmarkNode(node)) {

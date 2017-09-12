@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.datefield;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -39,12 +40,11 @@ import org.slf4j.LoggerFactory;
 /**
  * A Value field for date and time values.
  * <p>
- * <strong>Note:</strong> By default, all {@link java.util.Date} objects are converted to
+ * <strong>Note:</strong> By default, all {@link Date} objects are converted to
  * {@link org.eclipse.scout.rt.shared.servicetunnel.StaticDate StaticDate} during serialization and converted back to
  * <code>Date</code> objects during de-serialization in order to be independent of time zone and daylight saving time.
  * I.e. the string representation of a date stays the same when it is sent through the service tunnel, but not the date
- * itself. {@link org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractUTCDateField AbstractUTCDateField} can be
- * used instead, if this is not the desired behavior.
+ * itself. {@link AbstractUTCDateField AbstractUTCDateField} can be used instead, if this is not the desired behavior.
  * <p>
  * <strong>Example:</strong>
  * </p>
@@ -173,7 +173,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     setDateFormatPattern(getConfiguredDateFormatPattern());
     setTimeFormatPattern(getConfiguredTimeFormatPattern());
     setFormat(getConfiguredFormat());
-    setAllowedDates(Collections.<Date> emptyList());
+    setAllowedDates(Collections.emptyList());
   }
 
   @Override
@@ -342,7 +342,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     }
 
     // Check if date is allowed (if allowed dates are set)
-    if (getAllowedDates().size() > 0) {
+    if (!getAllowedDates().isEmpty()) {
       Date truncDate = DateUtility.truncDate(rawValue);
       boolean found = false;
       for (Date allowedDate : getAllowedDates()) {
@@ -446,7 +446,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   @Override
   @SuppressWarnings("unchecked")
   public List<Date> getAllowedDates() {
-    return new ArrayList<>((List<Date>) propertySupport.getProperty(PROP_ALLOWED_DATES));
+    return new ArrayList<>((Collection<? extends Date>) propertySupport.getProperty(PROP_ALLOWED_DATES));
   }
 
   protected class P_UIFacade implements IDateFieldUIFacade {
@@ -486,6 +486,6 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
 
   @Override
   protected IDateFieldExtension<? extends AbstractDateField> createLocalExtension() {
-    return new LocalDateFieldExtension<AbstractDateField>(this);
+    return new LocalDateFieldExtension<>(this);
   }
 }

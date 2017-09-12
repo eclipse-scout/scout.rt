@@ -14,6 +14,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.slf4j.Logger;
@@ -28,9 +29,9 @@ import org.slf4j.LoggerFactory;
 public class BatchLookupResultCache {
   private static final Logger LOG = LoggerFactory.getLogger(BatchLookupResultCache.class);
   private static final Object globalCacheableLock = new Object();
-  private static final HashMap<Class<? extends ILookupCall>, Boolean> globalCacheable = new HashMap<Class<? extends ILookupCall>, Boolean>();
+  private static final Map<Class<? extends ILookupCall>, Boolean> globalCacheable = new HashMap<>();
 
-  private HashMap<ILookupCall, List<ILookupRow<?>>> m_cache = new HashMap<ILookupCall, List<ILookupRow<?>>>();
+  private final Map<ILookupCall, List<ILookupRow<?>>> m_cache = new HashMap<>();
 
   /**
    * reset the result cache
@@ -122,11 +123,7 @@ public class BatchLookupResultCache {
       return false;
     }
     synchronized (globalCacheableLock) {
-      Boolean b = globalCacheable.get(clazz);
-      if (b == null) {
-        b = verifyLookupCallBeanQuality(clazz);
-        globalCacheable.put(clazz, b);
-      }
+      Boolean b = globalCacheable.computeIfAbsent(clazz, k -> verifyLookupCallBeanQuality(clazz));
       return b.booleanValue();
     }
   }

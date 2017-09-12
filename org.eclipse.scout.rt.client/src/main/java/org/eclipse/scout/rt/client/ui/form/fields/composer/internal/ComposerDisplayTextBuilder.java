@@ -44,7 +44,7 @@ public class ComposerDisplayTextBuilder {
         visitAttributeNode((AttributeNode) node, buf, prefix);
       }
       else if (node instanceof EitherOrNode) {
-        List<EitherOrNode> eitherOrNodes = new ArrayList<EitherOrNode>();
+        List<EitherOrNode> eitherOrNodes = new ArrayList<>();
         eitherOrNodes.add((EitherOrNode) node);
         while (nodeIt.hasNext()) {
           node = nodeIt.next();

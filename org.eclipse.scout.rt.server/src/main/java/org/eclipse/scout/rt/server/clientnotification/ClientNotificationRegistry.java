@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.server.clientnotification.ClientNotificationProperties.NotificationQueueExpireTime;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
@@ -54,7 +55,7 @@ public class ClientNotificationRegistry {
   private final int m_queueExpireTime;
 
   public ClientNotificationRegistry() {
-    this(Assertions.assertNotNull(CONFIG.getPropertyValue(ClientNotificationProperties.NotificationQueueExpireTime.class)));
+    this(Assertions.assertNotNull(CONFIG.getPropertyValue(NotificationQueueExpireTime.class)));
   }
 
   public ClientNotificationRegistry(int queueRemoveTimeout) {
@@ -404,7 +405,7 @@ public class ClientNotificationRegistry {
    * Publish messages to other cluster nodes. Message not foreseen for cluster distributions are filtered.
    */
   private void publishClusterInternal(Collection<? extends ClientNotificationMessage> messages) {
-    Collection<ClientNotificationMessage> filteredMessages = new LinkedList<ClientNotificationMessage>();
+    Collection<ClientNotificationMessage> filteredMessages = new LinkedList<>();
     for (ClientNotificationMessage message : messages) {
       if (message.isDistributeOverCluster()) {
         filteredMessages.add(message);

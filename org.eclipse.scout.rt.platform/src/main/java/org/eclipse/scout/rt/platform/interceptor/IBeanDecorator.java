@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 /**
  * Interface for bean decorations used in {@link IBeanDecorationFactory}.
  */
+@FunctionalInterface
 public interface IBeanDecorator<T> {
 
   /**

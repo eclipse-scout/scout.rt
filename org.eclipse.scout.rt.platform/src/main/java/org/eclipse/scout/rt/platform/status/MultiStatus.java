@@ -47,7 +47,7 @@ public class MultiStatus extends Status implements IMultiStatus {
 
   @Override
   public int getSeverity() {
-    if (m_children.size() > 0) {
+    if (!m_children.isEmpty()) {
       return m_children.first().getSeverity();
     }
     return IStatus.OK;
@@ -55,7 +55,7 @@ public class MultiStatus extends Status implements IMultiStatus {
 
   @Override
   public double getOrder() {
-    if (m_children.size() > 0) {
+    if (!m_children.isEmpty()) {
       return m_children.first().getOrder();
     }
     return IOrdered.DEFAULT_ORDER;
@@ -71,7 +71,7 @@ public class MultiStatus extends Status implements IMultiStatus {
 
   @Override
   public int getCode() {
-    if (m_children.size() > 0) {
+    if (!m_children.isEmpty()) {
       return m_children.first().getCode();
     }
     return super.getCode();

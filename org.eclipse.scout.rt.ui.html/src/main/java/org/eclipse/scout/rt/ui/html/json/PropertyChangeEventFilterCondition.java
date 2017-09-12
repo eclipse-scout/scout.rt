@@ -14,7 +14,7 @@ import java.beans.PropertyChangeEvent;
 
 public class PropertyChangeEventFilterCondition implements IPropertyChangeEventFilterCondition {
 
-  private String m_propertyName;
+  private final String m_propertyName;
   private Object m_value;
 
   public PropertyChangeEventFilterCondition(String propertyName, Object value) {

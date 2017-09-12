@@ -235,7 +235,7 @@ public class PlatformImplementor implements IPlatform {
   }
 
   protected void startCreateImmediatelyBeans() {
-    ((BeanManagerImplementor) m_beanManager).startCreateImmediatelyBeans();
+    m_beanManager.startCreateImmediatelyBeans();
   }
 
   @Override
@@ -268,7 +268,7 @@ public class PlatformImplementor implements IPlatform {
     }
 
     EnumSet<State> possibleExpectedCurrentStates = getPreviousStates(newState);
-    if (possibleExpectedCurrentStates == null || possibleExpectedCurrentStates.size() == 0) {
+    if (possibleExpectedCurrentStates == null || possibleExpectedCurrentStates.isEmpty()) {
       throw new IllegalStateException("Unknown state transition: '" + newState + "' has no preceeding state defined.");
     }
 

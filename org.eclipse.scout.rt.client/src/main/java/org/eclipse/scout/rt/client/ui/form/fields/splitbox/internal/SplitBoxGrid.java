@@ -31,7 +31,7 @@ public class SplitBoxGrid implements ICompositeFieldGrid<ISplitBox> {
     // reset
     m_gridColumns = 2;
     m_gridRows = 1;
-    ArrayList<IFormField> list = new ArrayList<IFormField>();
+    ArrayList<IFormField> list = new ArrayList<>();
     // filter
     for (IFormField f : splitBox.getFields()) {
       if (f.isVisible()) {
@@ -48,14 +48,14 @@ public class SplitBoxGrid implements ICompositeFieldGrid<ISplitBox> {
 
   private void layoutStatic() {
     int x = 0;
-    for (int i = 0; i < m_fields.length; i++) {
-      GridData data = GridDataBuilder.createFromHints(m_fields[i], 1);
+    for (IFormField m_field : m_fields) {
+      GridData data = GridDataBuilder.createFromHints(m_field, 1);
       data.x = x;
       data.y = 0;
       if (data.weightX < 0) {
         data.weightX = data.w;
       }
-      m_fields[i].setGridDataInternal(data);
+      m_field.setGridDataInternal(data);
       x = x + data.w;
       m_gridRows = Math.max(m_gridRows, data.h);
     }

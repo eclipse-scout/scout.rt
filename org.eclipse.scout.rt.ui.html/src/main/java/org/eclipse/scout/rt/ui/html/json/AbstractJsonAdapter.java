@@ -31,7 +31,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   private final String m_id;
   private boolean m_initialized;
   private boolean m_disposed;
-  private IJsonAdapter<?> m_parent;
+  private final IJsonAdapter<?> m_parent;
 
   public AbstractJsonAdapter(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     if (model == null) {
@@ -378,7 +378,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getObjectType());
-    sb.append("[id=" + getId());
+    sb.append("[id=").append(getId());
     sb.append(", modelClass=");
     sb.append(getModel() == null ? "null" : getModel().getClass().getName());
     sb.append(", parentId=");

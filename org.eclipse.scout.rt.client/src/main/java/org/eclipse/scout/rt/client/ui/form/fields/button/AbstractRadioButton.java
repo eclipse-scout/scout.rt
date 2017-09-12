@@ -83,6 +83,6 @@ public abstract class AbstractRadioButton<T> extends AbstractButton implements I
 
   @Override
   protected IRadioButtonExtension<T, ? extends AbstractRadioButton<T>> createLocalExtension() {
-    return new LocalRadioButtonExtension<T, AbstractRadioButton<T>>(this);
+    return new LocalRadioButtonExtension<>(this);
   }
 }

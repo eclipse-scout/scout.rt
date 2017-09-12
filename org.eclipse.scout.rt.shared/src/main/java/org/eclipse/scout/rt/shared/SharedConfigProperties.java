@@ -63,7 +63,7 @@ public final class SharedConfigProperties {
 
     @Override
     protected Long getDefaultValue() {
-      return Long.valueOf(TimeUnit.MINUTES.toMillis(10));
+      return TimeUnit.MINUTES.toMillis(10);
     }
 
     @Override
@@ -200,7 +200,7 @@ public final class SharedConfigProperties {
     @Override
     public Boolean getDefaultValue() {
       // if no backend url is set proxy instances will not be created by default
-      return Boolean.valueOf(StringUtility.hasText(BEANS.get(ServiceTunnelTargetUrlProperty.class).getValue()));
+      return StringUtility.hasText(BEANS.get(ServiceTunnelTargetUrlProperty.class).getValue());
     }
   }
 

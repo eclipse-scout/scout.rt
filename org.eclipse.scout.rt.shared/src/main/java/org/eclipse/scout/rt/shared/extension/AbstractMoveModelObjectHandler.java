@@ -143,7 +143,7 @@ public abstract class AbstractMoveModelObjectHandler<ORDERED extends IOrdered> {
     if (CollectionUtility.isEmpty(orderedObjects)) {
       return null;
     }
-    Set<MoveDescriptor<ORDERED>> moveDescriptors = new HashSet<MoveDescriptor<ORDERED>>();
+    Set<MoveDescriptor<ORDERED>> moveDescriptors = new HashSet<>();
     for (ORDERED o : orderedObjects) {
       MoveDescriptor<ORDERED> moveDesc = m_extensionRegistry.createModelMoveDescriptorFor(o, null);
       if (moveDesc != null) {

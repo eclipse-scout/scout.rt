@@ -20,6 +20,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.zip.CRC32;
 
@@ -122,7 +125,7 @@ public final class BookmarkUtility {
     if (className == null) {
       return null;
     }
-    TreeMap<CompositeObject, IPage> sortMap = new TreeMap<CompositeObject, IPage>();
+    TreeMap<CompositeObject, IPage> sortMap = new TreeMap<>();
     String simpleClassName = className.replaceAll("^.*\\.", "");
     int index = 0;
     for (IPage<?> p : pages) {
@@ -183,14 +186,14 @@ public final class BookmarkUtility {
       return o;
     }
     else if (o instanceof Collection) {
-      List<Object> result = new ArrayList<Object>();
-      for (Object oi : (Collection) o) {
+      List<Object> result = new ArrayList<>();
+      for (Object oi : (Iterable) o) {
         result.add(makeSerializableKey(oi, useLegacySupport));
       }
       return result;
     }
     else if (o.getClass().isArray()) {
-      ArrayList<Integer> dimList = new ArrayList<Integer>();
+      ArrayList<Integer> dimList = new ArrayList<>();
       Class xc = o.getClass();
       Object xo = o;
       while (xc.isArray()) {
@@ -291,7 +294,7 @@ public final class BookmarkUtility {
     if (bm.getOutlineClassName() == null) {
       return;
     }
-    IOutline outline = BookmarkUtility.resolveOutline(desktop.getAvailableOutlines(), bm.getOutlineClassName());
+    IOutline outline = resolveOutline(desktop.getAvailableOutlines(), bm.getOutlineClassName());
     if (outline == null) {
       throw new ProcessingException("outline '" + bm.getOutlineClassName() + "' was not found");
     }
@@ -381,7 +384,7 @@ public final class BookmarkUtility {
    *         {@link #restoreTableColumns(ITable, List)}
    */
   public static List<TableColumnState> backupTableColumns(ITable table) {
-    ArrayList<TableColumnState> allColumns = new ArrayList<TableColumnState>();
+    List<TableColumnState> allColumns = new ArrayList<>();
     ColumnSet columnSet = table.getColumnSet();
     //add all columns but in user order
     for (IColumn<?> c : columnSet.getAllColumnsInUserOrder()) {
@@ -422,10 +425,10 @@ public final class BookmarkUtility {
    *          {@link #backupTableColumns(ITable)} method.
    */
   public static void restoreTableColumns(ITable table, List<TableColumnState> oldColumns) {
-    if (oldColumns != null && oldColumns.size() > 0 && table != null) {
+    if (oldColumns != null && !oldColumns.isEmpty() && table != null) {
       ColumnSet columnSet = table.getColumnSet();
       // visible columns and width
-      ArrayList<IColumn> visibleColumns = new ArrayList<IColumn>();
+      List<IColumn> visibleColumns = new ArrayList<>();
       for (TableColumnState colState : oldColumns) {
         //legacy support: null=true
         if (colState.getVisible() == null || colState.getVisible()) {
@@ -446,7 +449,7 @@ public final class BookmarkUtility {
       //aggregation functions and background effect:
       for (TableColumnState colState : oldColumns) {
 
-        IColumn<?> col = BookmarkUtility.resolveColumn(columnSet.getColumns(), colState.getClassName());
+        IColumn<?> col = resolveColumn(columnSet.getColumns(), colState.getClassName());
         if (col instanceof INumberColumn) {
           if (colState.getAggregationFunction() != null) {
             ((INumberColumn<?>) col).setAggregationFunction(colState.getAggregationFunction());
@@ -457,12 +460,12 @@ public final class BookmarkUtility {
 
       //sort order (only respect visible and user-sort columns)
       boolean userSortValid = true;
-      TreeMap<Integer, IColumn> sortColMap = new TreeMap<Integer, IColumn>();
-      HashMap<IColumn<?>, TableColumnState> sortColToColumnState = new HashMap<>();
+      SortedMap<Integer, IColumn> sortColMap = new TreeMap<>();
+      Map<IColumn<?>, TableColumnState> sortColToColumnState = new HashMap<>();
       HashSet<IColumn<?>> groupedCols = new HashSet<>();
       for (TableColumnState colState : oldColumns) {
         if (colState.getSortOrder() >= 0) {
-          IColumn col = BookmarkUtility.resolveColumn(columnSet.getColumns(), colState.getClassName());
+          IColumn col = resolveColumn(columnSet.getColumns(), colState.getClassName());
           if (col != null) {
             sortColMap.put(colState.getSortOrder(), col);
             sortColToColumnState.put(col, colState);
@@ -486,7 +489,7 @@ public final class BookmarkUtility {
       }
 
       if (userSortValid) {
-        HashSet<IColumn<?>> existingGroupedUserSortCols = new HashSet<>();
+        Set<IColumn<?>> existingGroupedUserSortCols = new HashSet<>();
         //check if grouping is valid also:
         for (IColumn<?> c : columnSet.getUserSortColumns()) {
           if (c.isGroupingActive()) {
@@ -561,8 +564,8 @@ public final class BookmarkUtility {
     b.setIconId(bookmarkAdapter.getIconId());
     // outline
     b.setOutlineClassName(bookmarkAdapter.getOutlineClassName());
-    ArrayList<IPage<?>> path = new ArrayList<IPage<?>>();
-    ArrayList<String> titleSegments = new ArrayList<String>();
+    List<IPage<?>> path = new ArrayList<>();
+    List<String> titleSegments = new ArrayList<>();
     while (page != null) {
       IBookmarkAdapter currentBookmarkAdapter = getBookmarkAdapter(page);
       path.add(0, page);
@@ -578,7 +581,7 @@ public final class BookmarkUtility {
     }
     // title
     int len = 0;
-    if (titleSegments.size() > 0) {
+    if (!titleSegments.isEmpty()) {
       len += titleSegments.get(0).length();
     }
     if (titleSegments.size() > 1) {
@@ -612,7 +615,7 @@ public final class BookmarkUtility {
       page = path.get(i);
       IBookmarkAdapter currentBookmarkAdapter = getBookmarkAdapter(page);
       if (i > 0 || outline.isRootNodeVisible()) {
-        text.append(prefix + currentBookmarkAdapter.getText());
+        text.append(prefix).append(currentBookmarkAdapter.getText());
         text.append("\n");
         if (page instanceof IPageWithTable) {
           IPageWithTable tablePage = (IPageWithTable) page;
@@ -622,8 +625,8 @@ public final class BookmarkUtility {
               if (s != null) {
                 String indent = prefix + "  ";
                 s = s.trim().replaceAll("[\\n]", "\n" + indent);
-                if (s.length() > 0) {
-                  text.append(indent + s);
+                if (!s.isEmpty()) {
+                  text.append(indent).append(s);
                   text.append("\n");
                 }
               }
@@ -728,8 +731,8 @@ public final class BookmarkUtility {
       CompositeObject childPk = tablePageState.getExpandedChildPrimaryKey();
       if (childPk != null) {
         for (int r = 0; r < table.getRowCount(); r++) {
-          CompositeObject testPkLegacy = new CompositeObject(BookmarkUtility.makeSerializableKeys(table.getRowKeys(r), true));
-          CompositeObject testPk = new CompositeObject(BookmarkUtility.makeSerializableKeys(table.getRowKeys(r), false));
+          CompositeObject testPkLegacy = new CompositeObject(makeSerializableKeys(table.getRowKeys(r), true));
+          CompositeObject testPk = new CompositeObject(makeSerializableKeys(table.getRowKeys(r), false));
           if (testPk.equals(childPk) || testPkLegacy.equals(childPk)) {
             if (r < tablePage.getChildNodeCount()) {
               childPage = tablePage.getChildPage(r);
@@ -740,7 +743,7 @@ public final class BookmarkUtility {
       }
       else {
         List<ITreeNode> filteredChildNodes = tablePage.getFilteredChildNodes();
-        if (filteredChildNodes.size() > 0) {
+        if (!filteredChildNodes.isEmpty()) {
           childPage = (IPage) CollectionUtility.firstElement(filteredChildNodes);
         }
         else if (tablePage.getChildNodeCount() > 0) {
@@ -750,19 +753,19 @@ public final class BookmarkUtility {
     }
     // load selections
     if (leafState) {
-      if (tablePageState.getSelectedChildrenPrimaryKeys().size() > 0) {
+      if (!tablePageState.getSelectedChildrenPrimaryKeys().isEmpty()) {
         tablePage.ensureChildrenLoaded();
-        HashSet<CompositeObject> selectionSet = new HashSet<CompositeObject>(tablePageState.getSelectedChildrenPrimaryKeys());
-        ArrayList<ITableRow> rowList = new ArrayList<ITableRow>();
+        Set<CompositeObject> selectionSet = new HashSet<>(tablePageState.getSelectedChildrenPrimaryKeys());
+        List<ITableRow> rowList = new ArrayList<>();
         for (ITableRow row : table.getRows()) {
-          CompositeObject testPkLegacy = new CompositeObject(BookmarkUtility.makeSerializableKeys(row.getKeyValues(), true));
-          CompositeObject testPk = new CompositeObject(BookmarkUtility.makeSerializableKeys(row.getKeyValues(), false));
+          CompositeObject testPkLegacy = new CompositeObject(makeSerializableKeys(row.getKeyValues(), true));
+          CompositeObject testPk = new CompositeObject(makeSerializableKeys(row.getKeyValues(), false));
           if ((selectionSet.contains(testPk) || selectionSet.contains(testPkLegacy))
               && row.isFilterAccepted()) {
             rowList.add(row);
           }
         }
-        if (rowList.size() > 0) {
+        if (!rowList.isEmpty()) {
           table.selectRows(rowList);
         }
       }
@@ -800,7 +803,7 @@ public final class BookmarkUtility {
     IPage<?> childPage = null;
     if (childState != null) {
       nodePage.ensureChildrenLoaded();
-      IPage<?> p = BookmarkUtility.resolvePage(nodePage.getChildPages(), childState.getPageClassName(), childState.getBookmarkIdentifier());
+      IPage<?> p = resolvePage(nodePage.getChildPages(), childState.getPageClassName(), childState.getBookmarkIdentifier());
       if (p != null) {
         ITable table = nodePage.getTable();
         // reset table column filter if requested
@@ -843,9 +846,9 @@ public final class BookmarkUtility {
     List<TableColumnState> allColumns = backupTableColumns(page.getTable());
     state.setAvailableColumns(allColumns);
     //
-    ArrayList<CompositeObject> pkList = new ArrayList<CompositeObject>();
+    List<CompositeObject> pkList = new ArrayList<>();
     for (ITableRow row : table.getSelectedRows()) {
-      pkList.add(new CompositeObject(BookmarkUtility.makeSerializableKeys(row.getKeyValues(), false)));
+      pkList.add(new CompositeObject(makeSerializableKeys(row.getKeyValues(), false)));
     }
     state.setSelectedChildrenPrimaryKeys(pkList);
     //
@@ -853,7 +856,7 @@ public final class BookmarkUtility {
       for (int j = 0; j < table.getRowCount(); j++) {
         if (page.getChildNode(j) == childPage) {
           ITableRow childRow = table.getRow(j);
-          state.setExpandedChildPrimaryKey(new CompositeObject(BookmarkUtility.makeSerializableKeys(childRow.getKeyValues(), false)));
+          state.setExpandedChildPrimaryKey(new CompositeObject(makeSerializableKeys(childRow.getKeyValues(), false)));
           break;
         }
       }

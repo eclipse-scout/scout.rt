@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -160,9 +161,9 @@ public final class CollectionUtility {
 
   /**
    * Returns a sub list with the provided indices. This methods supports negative indices in the sense that -1 addresses
-   * the last element and -2 the 2nd last. For positive indices, the methods uses
-   * {@link java.util.List#subList(int, int)} with one change: It is returning the sub list starting with c[fromIndex]
-   * to c[toIndex]. slice(c, 0, 0): first element of c slice(c, 0, -3): c without the last two elements
+   * the last element and -2 the 2nd last. For positive indices, the methods uses {@link List#subList(int, int)} with
+   * one change: It is returning the sub list starting with c[fromIndex] to c[toIndex]. slice(c, 0, 0): first element of
+   * c slice(c, 0, -3): c without the last two elements
    *
    * @param c
    * @param fromIndex
@@ -170,7 +171,7 @@ public final class CollectionUtility {
    * @return
    */
   public static <T> List<T> slice(List<T> c, int fromIndex, int toIndex) {
-    List<T> result = new ArrayList<T>();
+    List<T> result = new ArrayList<>();
 
     // null check
     if (c == null) {
@@ -201,7 +202,7 @@ public final class CollectionUtility {
       toIndex++;
     }
 
-    return new ArrayList<T>(c.subList(fromIndex, toIndex));
+    return new ArrayList<>(c.subList(fromIndex, toIndex));
   }
 
   /**
@@ -247,7 +248,7 @@ public final class CollectionUtility {
     if (values == null) {
       return true;
     }
-    HashSet<T> set = hashSet(c);
+    Set<T> set = hashSet(c);
     for (T value : values) {
       if (!set.contains(value)) {
         return false;
@@ -263,7 +264,7 @@ public final class CollectionUtility {
     if (values == null || c == null) {
       return false;
     }
-    HashSet<T> set = hashSet(c);
+    Set<T> set = hashSet(c);
     for (T value : values) {
       if (set.contains(value)) {
         return true;
@@ -280,7 +281,7 @@ public final class CollectionUtility {
     if (values == null || c == null) {
       return false;
     }
-    HashSet<T> set = hashSet(c);
+    Set<T> set = hashSet(c);
     for (T value : values) {
       if (set.contains(value)) {
         return true;
@@ -311,10 +312,8 @@ public final class CollectionUtility {
     if (values == null) {
       return emptyArrayList();
     }
-    ArrayList<T> list = new ArrayList<T>(values.length);
-    for (T v : values) {
-      list.add(v);
-    }
+    ArrayList<T> list = new ArrayList<>(values.length);
+    Collections.addAll(list, values);
     return list;
   }
 
@@ -326,11 +325,11 @@ public final class CollectionUtility {
    * @return An empty but modifiable {@link ArrayList} with an initial capacity of <code>0</code>.
    */
   public static <T> ArrayList<T> emptyArrayList() {
-    return new ArrayList<T>(0);
+    return new ArrayList<>(0);
   }
 
   public static <T> ArrayList<T> arrayList(T value) {
-    ArrayList<T> list = new ArrayList<T>(1);
+    ArrayList<T> list = new ArrayList<>(1);
     if (value != null) {
       list.add(value);
     }
@@ -339,10 +338,10 @@ public final class CollectionUtility {
 
   public static <T> ArrayList<T> truncateList(List<? extends T> input, int maxSize) {
     if (input == null) {
-      input = new ArrayList<T>();
+      input = new ArrayList<>();
     }
     int endIndex = Math.min(input.size(), maxSize);
-    ArrayList<T> result = new ArrayList<T>(endIndex);
+    ArrayList<T> result = new ArrayList<>(endIndex);
     for (int i = 0; i < endIndex; i++) {
       result.add(input.get(i));
     }
@@ -358,7 +357,7 @@ public final class CollectionUtility {
    */
   public static <T> ArrayList<T> arrayList(Collection<? extends T> c) {
     if (c != null) {
-      return new ArrayList<T>(c);
+      return new ArrayList<>(c);
     }
     return emptyArrayList();
   }
@@ -372,7 +371,7 @@ public final class CollectionUtility {
    */
   public static <T> ArrayList<T> arrayListWithoutNullElements(Collection<? extends T> c) {
     if (c != null) {
-      ArrayList<T> list = new ArrayList<T>(c.size());
+      ArrayList<T> list = new ArrayList<>(c.size());
       for (T o : c) {
         if (o != null) {
           list.add(o);
@@ -392,9 +391,9 @@ public final class CollectionUtility {
    */
   public static <T> HashSet<T> hashSet(Collection<? extends T> c) {
     if (c != null) {
-      return new HashSet<T>(c);
+      return new HashSet<>(c);
     }
-    return new HashSet<T>(0);
+    return new HashSet<>(0);
   }
 
   /**
@@ -420,9 +419,9 @@ public final class CollectionUtility {
    */
   public static <T> LinkedHashSet<T> orderedHashSet(Collection<? extends T> c) {
     if (c != null) {
-      return new LinkedHashSet<T>(c);
+      return new LinkedHashSet<>(c);
     }
-    return new LinkedHashSet<T>(0);
+    return new LinkedHashSet<>(0);
   }
 
   /**
@@ -441,19 +440,19 @@ public final class CollectionUtility {
 
   @SuppressWarnings("unchecked")
   public static <T> T[] toArray(Collection<T> c, Class<T> clazz) {
-    if (c == null || c.size() == 0) {
-      T[] a = (T[]) java.lang.reflect.Array.newInstance(clazz, 0);
+    if (c == null || c.isEmpty()) {
+      T[] a = (T[]) Array.newInstance(clazz, 0);
       return Collections.<T> emptyList().toArray(a);
     }
     else {
-      T[] a = (T[]) java.lang.reflect.Array.newInstance(clazz, c.size());
+      T[] a = (T[]) Array.newInstance(clazz, c.size());
       return c.toArray(a);
     }
   }
 
   public static <T, V extends T> List<T> appendList(List<T> list, V o) {
     if (list == null) {
-      list = new ArrayList<T>();
+      list = new ArrayList<>();
     }
     list.add(o);
     return list;
@@ -461,7 +460,7 @@ public final class CollectionUtility {
 
   public static <T, V extends T> List<T> appendList(List<T> list, int index, V o) {
     if (list == null) {
-      list = new ArrayList<T>(1);
+      list = new ArrayList<>(1);
     }
     if (index > list.size()) {
       for (int i = list.size(); i < index; i++) {
@@ -474,9 +473,9 @@ public final class CollectionUtility {
 
   public static <T> List<T> appendAllList(List<T> list, Collection<? extends T> c) {
     if (list == null) {
-      list = new ArrayList<T>(1);
+      list = new ArrayList<>(1);
     }
-    if (c != null && c.size() > 0) {
+    if (c != null && !c.isEmpty()) {
       list.addAll(c);
     }
     return list;
@@ -484,7 +483,7 @@ public final class CollectionUtility {
 
   public static <T, V extends T> List<T> removeObjectList(List<T> list, V o) {
     if (list == null) {
-      list = new ArrayList<T>(1);
+      list = new ArrayList<>(1);
     }
     list.remove(o);
     return list;
@@ -492,7 +491,7 @@ public final class CollectionUtility {
 
   public static <T> List<T> removeObjectList(List<T> list, int i) {
     if (list == null) {
-      list = new ArrayList<T>(1);
+      list = new ArrayList<>(1);
     }
     list.remove(i);
     return list;
@@ -500,7 +499,7 @@ public final class CollectionUtility {
 
   public static <T, V extends T> Set<T> removeObjectSet(Set<T> set, V o) {
     if (set == null) {
-      set = new HashSet<T>(1);
+      set = new HashSet<>(1);
     }
     set.remove(o);
     return set;
@@ -519,40 +518,40 @@ public final class CollectionUtility {
 
   @SuppressWarnings("unchecked")
   public static <T, U> U[] getValueArray(Map<T, U> m, Class<U> clazz) {
-    if (m == null || m.size() == 0) {
-      U[] a = (U[]) java.lang.reflect.Array.newInstance(clazz, 0);
+    if (m == null || m.isEmpty()) {
+      U[] a = (U[]) Array.newInstance(clazz, 0);
       return Collections.<U> emptyList().toArray(a);
     }
     else {
-      U[] a = (U[]) java.lang.reflect.Array.newInstance(clazz, m.size());
+      U[] a = (U[]) Array.newInstance(clazz, m.size());
       return m.values().toArray(a);
     }
   }
 
   @SuppressWarnings("unchecked")
   public static <T, U> T[] getKeyArray(Map<T, U> m, Class<T> clazz) {
-    if (m == null || m.size() == 0) {
-      T[] a = (T[]) java.lang.reflect.Array.newInstance(clazz, 0);
+    if (m == null || m.isEmpty()) {
+      T[] a = (T[]) Array.newInstance(clazz, 0);
       return Collections.<T> emptyList().toArray(a);
     }
     else {
-      T[] a = (T[]) java.lang.reflect.Array.newInstance(clazz, m.size());
+      T[] a = (T[]) Array.newInstance(clazz, m.size());
       return m.keySet().toArray(a);
     }
   }
 
   public static <T, U> Map<T, U> copyMap(Map<T, U> m) {
-    if (m == null || m.size() == 0) {
-      return new HashMap<T, U>(0);
+    if (m == null || m.isEmpty()) {
+      return new HashMap<>(0);
     }
     else {
-      return new HashMap<T, U>(m);
+      return new HashMap<>(m);
     }
   }
 
   public static <T, U, V extends T, W extends U> Map<T, U> putObject(Map<T, U> map, V key, W value) {
     if (map == null) {
-      map = new HashMap<T, U>();
+      map = new HashMap<>();
     }
     map.put(key, value);
     return map;
@@ -567,7 +566,7 @@ public final class CollectionUtility {
 
   public static <T, U> Map<T, U> removeObject(Map<T, U> map, T key) {
     if (map == null) {
-      return new HashMap<T, U>();
+      return new HashMap<>();
     }
     map.remove(key);
     return map;
@@ -589,10 +588,10 @@ public final class CollectionUtility {
 
   public static <T, U> Map<T, U> putAllObjects(Map<T, U> targetMap, Map<T, U> sourceMap) {
     if (targetMap == null && sourceMap == null) {
-      return new HashMap<T, U>();
+      return new HashMap<>();
     }
     if (targetMap == null) {
-      return new HashMap<T, U>(sourceMap);
+      return new HashMap<>(sourceMap);
     }
     if (sourceMap == null) {
       return targetMap; // nothing to add
@@ -607,28 +606,28 @@ public final class CollectionUtility {
 
   @SuppressWarnings("unchecked")
   public static <T, U> U[] getSortedValueArray(SortedMap<T, U> m, Class<U> clazz) {
-    if (m == null || m.size() == 0) {
-      U[] a = (U[]) java.lang.reflect.Array.newInstance(clazz, 0);
+    if (m == null || m.isEmpty()) {
+      U[] a = (U[]) Array.newInstance(clazz, 0);
       return Collections.<U> emptyList().toArray(a);
     }
     else {
-      U[] a = (U[]) java.lang.reflect.Array.newInstance(clazz, m.size());
+      U[] a = (U[]) Array.newInstance(clazz, m.size());
       return m.values().toArray(a);
     }
   }
 
   public static <T, U> SortedMap<T, U> copySortedMap(SortedMap<T, U> m) {
-    if (m == null || m.size() == 0) {
-      return new TreeMap<T, U>();
+    if (m == null || m.isEmpty()) {
+      return new TreeMap<>();
     }
     else {
-      return new TreeMap<T, U>(m);
+      return new TreeMap<>(m);
     }
   }
 
   public static <T extends Comparable, U> SortedMap<T, U> putObjectSortedMap(SortedMap<T, U> map, T key, U value) {
     if (map == null) {
-      map = new TreeMap<T, U>();
+      map = new TreeMap<>();
     }
     map.put(key, value);
     return map;
@@ -643,7 +642,7 @@ public final class CollectionUtility {
 
   public static <T extends Comparable, U> SortedMap<T, U> removeObjectSortedMap(SortedMap<T, U> map, T key) {
     if (map == null) {
-      return new TreeMap<T, U>();
+      return new TreeMap<>();
     }
     map.remove(key);
     return map;
@@ -651,10 +650,10 @@ public final class CollectionUtility {
 
   public static <T extends Comparable, U> SortedMap<T, U> putAllObjectsSortedMap(SortedMap<T, U> targetMap, Map<T, U> sourceMap) {
     if (targetMap == null && sourceMap == null) {
-      return new TreeMap<T, U>();
+      return new TreeMap<>();
     }
     if (targetMap == null) {
-      return new TreeMap<T, U>(sourceMap);
+      return new TreeMap<>(sourceMap);
     }
     if (sourceMap == null) {
       return targetMap; // nothing to add
@@ -671,7 +670,7 @@ public final class CollectionUtility {
    * @return An empty but modifiable {@link HashMap} with an initial capacity of <code>0</code>.
    */
   public static <T, U> HashMap<T, U> emptyHashMap() {
-    return new HashMap<T, U>(0);
+    return new HashMap<>(0);
   }
 
   public static <T, U> U lastElement(SortedMap<T, U> m) {
@@ -696,10 +695,8 @@ public final class CollectionUtility {
     if (values == null) {
       return emptyHashSet();
     }
-    HashSet<T> set = new HashSet<T>(values.length);
-    for (T v : values) {
-      set.add(v);
-    }
+    HashSet<T> set = new HashSet<>(values.length);
+    Collections.addAll(set, values);
     return set;
   }
 
@@ -719,7 +716,7 @@ public final class CollectionUtility {
    * @return An empty but modifiable {@link HashSet} with an initial capacity of <code>0</code>.
    */
   public static <T> HashSet<T> emptyHashSet() {
-    return new HashSet<T>(0);
+    return new HashSet<>(0);
   }
 
   /**
@@ -730,7 +727,7 @@ public final class CollectionUtility {
    * @return An empty but modifiable {@link TreeSet} with an initial capacity of <code>0</code>.
    */
   public static <T> TreeSet<T> emptyTreeSet() {
-    return new TreeSet<T>();
+    return new TreeSet<>();
   }
 
   /**
@@ -738,7 +735,7 @@ public final class CollectionUtility {
    */
   @SuppressWarnings("unchecked")
   public static <T> List<T> combine(Collection<?>... collections) {
-    List<T> list = new ArrayList<T>();
+    List<T> list = new ArrayList<>();
     if (collections != null && collections.length > 0) {
       for (Collection<?> c : collections) {
         for (Object t : c) {
@@ -811,10 +808,10 @@ public final class CollectionUtility {
             o = s;
           }
         }
-        list = CollectionUtility.appendList(list, o);
+        list = appendList(list, o);
       }
     }
-    return CollectionUtility.arrayList(list);
+    return arrayList(list);
   }
 
   /**

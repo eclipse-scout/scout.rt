@@ -22,11 +22,11 @@ import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueOutputToken;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 
 class TableBeanHolderOutput implements IBindOutput {
-  private ITableBeanHolder m_holder;
-  private Method m_getterMethod;
-  private Method m_setterMethod;
-  private Class m_beanType;
-  private ValueOutputToken m_source;
+  private final ITableBeanHolder m_holder;
+  private final Method m_getterMethod;
+  private final Method m_setterMethod;
+  private final Class m_beanType;
+  private final ValueOutputToken m_source;
   private int m_batchIndex = -1;
   private int m_jdbcBindIndex = -1;
 

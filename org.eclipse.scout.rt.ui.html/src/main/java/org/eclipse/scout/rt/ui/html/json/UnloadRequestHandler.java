@@ -16,7 +16,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.mail.Session;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -44,7 +43,7 @@ public class UnloadRequestHandler extends AbstractUiServletRequestHandler {
   public static final Pattern UNLOAD_PATH_PATTERN = Pattern.compile("^/unload/(.+)$");
 
   @Override
-  public boolean handlePost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean handlePost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     final String pathInfo = req.getPathInfo();
 
     final Matcher matcher = UNLOAD_PATH_PATTERN.matcher(pathInfo);

@@ -17,7 +17,7 @@ import org.json.JSONObject;
 
 public class JsonBenchLayoutData implements IJsonObject {
 
-  private BenchLayoutData m_layoutData;
+  private final BenchLayoutData m_layoutData;
 
   public JsonBenchLayoutData(BenchLayoutData layoutdata) {
     m_layoutData = layoutdata;

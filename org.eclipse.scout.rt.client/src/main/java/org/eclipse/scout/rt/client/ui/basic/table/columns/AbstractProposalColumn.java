@@ -23,12 +23,11 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
 @ClassId("7e21b24b-ddd8-4114-8b82-91dd396bf11b")
-public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractSmartColumn<LOOKUP_TYPE> implements IProposalColumn<LOOKUP_TYPE>, IContributionOwner {
+public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractSmartColumn<LOOKUP_TYPE> implements IProposalColumn<LOOKUP_TYPE> {
 
   public AbstractProposalColumn() {
     this(true);
@@ -181,7 +180,7 @@ public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractSmartC
 
   @Override
   protected IProposalColumnExtension<LOOKUP_TYPE, ? extends AbstractProposalColumn<LOOKUP_TYPE>> createLocalExtension() {
-    return new LocalProposalColumn2Extension<LOOKUP_TYPE, AbstractProposalColumn<LOOKUP_TYPE>>(this);
+    return new LocalProposalColumn2Extension<>(this);
   }
 
   /**

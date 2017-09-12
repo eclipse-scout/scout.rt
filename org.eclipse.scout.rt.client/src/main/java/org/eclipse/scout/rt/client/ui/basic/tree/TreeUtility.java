@@ -45,7 +45,7 @@ public final class TreeUtility {
    * Searches for the lowest common ancestor of the given node. Lowest means farthest away from root.
    */
   public static ITreeNode findLowestCommonAncestorNode(List<ITreeNode> nodes) {
-    if (nodes == null || nodes.size() == 0) {
+    if (nodes == null || nodes.isEmpty()) {
       return null;
     }
 

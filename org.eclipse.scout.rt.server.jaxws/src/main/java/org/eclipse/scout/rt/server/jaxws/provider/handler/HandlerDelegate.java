@@ -69,35 +69,19 @@ public class HandlerDelegate<CONTEXT extends MessageContext> implements Handler<
 
   @Override
   public boolean handleMessage(final CONTEXT messageContext) {
-    return handle(messageContext, "handleMessage", new Callable<Boolean>() {
-
-      @Override
-      public Boolean call() throws Exception {
-        return m_handler.handleMessage(messageContext);
-      }
-    });
+    return handle(messageContext, "handleMessage", () -> m_handler.handleMessage(messageContext));
   }
 
   @Override
   public boolean handleFault(final CONTEXT messageContext) {
-    return handle(messageContext, "handleFault", new Callable<Boolean>() {
-
-      @Override
-      public Boolean call() throws Exception {
-        return m_handler.handleFault(messageContext);
-      }
-    });
+    return handle(messageContext, "handleFault", () -> m_handler.handleFault(messageContext));
   }
 
   @Override
   public void close(final MessageContext messageContext) {
-    handle(messageContext, "close", new Callable<Void>() {
-
-      @Override
-      public Void call() throws Exception {
-        m_handler.close(messageContext);
-        return null;
-      }
+    handle(messageContext, "close", (Callable<Void>) () -> {
+      m_handler.close(messageContext);
+      return null;
     });
   }
 
@@ -111,12 +95,7 @@ public class HandlerDelegate<CONTEXT extends MessageContext> implements Handler<
       }
       else {
         final Subject subject = MessageContexts.getSubject(messageContext, HANDLER_SUBJECT);
-        return m_handlerRunContextProducer.produce(subject).call(new Callable<T>() {
-          @Override
-          public T call() throws Exception {
-            return callable.call();
-          }
-        }, DefaultExceptionTranslator.class);
+        return m_handlerRunContextProducer.produce(subject).call(callable::call, DefaultExceptionTranslator.class);
       }
     }
     catch (final Exception e) {

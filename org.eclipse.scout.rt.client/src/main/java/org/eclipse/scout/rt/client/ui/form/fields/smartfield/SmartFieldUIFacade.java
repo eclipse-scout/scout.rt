@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 public class SmartFieldUIFacade<VALUE> implements ISmartFieldUIFacade<VALUE> {
 
-  private AbstractSmartField<VALUE> m_smartField;
+  private final AbstractSmartField<VALUE> m_smartField;
 
   public SmartFieldUIFacade(AbstractSmartField<VALUE> smartField) {
     this.m_smartField = smartField;

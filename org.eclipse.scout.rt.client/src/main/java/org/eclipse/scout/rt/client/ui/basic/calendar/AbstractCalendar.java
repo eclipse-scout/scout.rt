@@ -10,18 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.calendar;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Deque;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
@@ -71,7 +73,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
 
   private boolean m_initialized;
   private List<ICalendarItemProvider> m_providers;
-  private final HashMap<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> m_componentsByProvider;
+  private final Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> m_componentsByProvider;
   private ICalendarUIFacade m_uiFacade;
   private int m_calendarChanging;
   private final DateTimeFormatFactory m_dateTimeFormatFactory;
@@ -88,11 +90,11 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   }
 
   public AbstractCalendar(boolean callInitializer) {
-    m_calendarEventBuffer = new ArrayList<CalendarEvent>();
+    m_calendarEventBuffer = new ArrayList<>();
     m_listenerList = new EventListenerList();
     m_dateTimeFormatFactory = new DateTimeFormatFactory();
-    m_componentsByProvider = new HashMap<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>>();
-    m_objectExtensions = new ObjectExtensions<AbstractCalendar, ICalendarExtension<? extends AbstractCalendar>>(this, false);
+    m_componentsByProvider = new HashMap<>();
+    m_objectExtensions = new ObjectExtensions<>(this, false);
     if (callInitializer) {
       callInitializer();
     }
@@ -210,12 +212,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   }
 
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
-      @Override
-      public void run() {
-        initConfig();
-      }
-    });
+    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
   protected void initConfig() {
@@ -232,7 +229,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
 
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
-    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
+    OrderedCollection<IMenu> menus = new OrderedCollection<>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
       IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
       menus.addOrdered(menu);
@@ -244,7 +241,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     List<Class<? extends ICalendarItemProvider>> configuredProducers = getConfiguredProducers();
     List<ICalendarItemProvider> contributedProducers = m_contributionHolder.getContributionsByClass(ICalendarItemProvider.class);
 
-    List<ICalendarItemProvider> producerList = new ArrayList<ICalendarItemProvider>(configuredProducers.size() + contributedProducers.size());
+    List<ICalendarItemProvider> producerList = new ArrayList<>(configuredProducers.size() + contributedProducers.size());
     for (Class<? extends ICalendarItemProvider> itemProviderClazz : configuredProducers) {
       try {
         ICalendarItemProvider provider = ConfigurationUtility.newInnerInstance(this, itemProviderClazz);
@@ -265,24 +262,21 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
-    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
+    new MoveActionNodesHandler<>(menus).moveModelObjects();
     ICalendarContextMenu contextMenu = new CalendarContextMenu(this, menus.getOrderedList());
     setContextMenu(contextMenu);
 
     // attach change listener for item updates
     for (final ICalendarItemProvider p : m_providers) {
       p.addPropertyChangeListener(
-          new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent e) {
-              if (e.getPropertyName().equals(ICalendarItemProvider.PROP_ITEMS)) {
-                List<ICalendarItemProvider> modified = new ArrayList<ICalendarItemProvider>(1);
-                modified.add(p);
-                updateComponentsInternal(modified);
-              }
-              else if (e.getPropertyName().equals(ICalendarItemProvider.PROP_LOAD_IN_PROGRESS)) {
-                updateLoadInProgressInternal();
-              }
+          e -> {
+            if (e.getPropertyName().equals(ICalendarItemProvider.PROP_ITEMS)) {
+              List<ICalendarItemProvider> modified = new ArrayList<>(1);
+              modified.add(p);
+              updateComponentsInternal(modified);
+            }
+            else if (e.getPropertyName().equals(ICalendarItemProvider.PROP_LOAD_IN_PROGRESS)) {
+              updateLoadInProgressInternal();
             }
           });
     }
@@ -294,7 +288,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   }
 
   protected ICalendarExtension<? extends AbstractCalendar> createLocalExtension() {
-    return new LocalCalendarExtension<AbstractCalendar>(this);
+    return new LocalCalendarExtension<>(this);
   }
 
   @Override
@@ -329,12 +323,9 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
      * add property change listener to - reload calendar items when view range
      * changes
      */
-    addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent e) {
-        if (e.getPropertyName().equals(PROP_VIEW_RANGE)) {
-          updateComponentsInternal(m_providers);
-        }
+    addPropertyChangeListener(e -> {
+      if (e.getPropertyName().equals(PROP_VIEW_RANGE)) {
+        updateComponentsInternal(m_providers);
       }
     });
     updateComponentsInternal(m_providers);
@@ -479,10 +470,10 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
      * fire events tree changes are finished now, fire all buffered events and
      * call lookups
      */
-    m_calendarEventBuffer = new ArrayList<CalendarEvent>();
+    m_calendarEventBuffer = new ArrayList<>();
     // coalesce ITEMS_CHANGED,ITEM_SELECTED events
-    Set<Integer> types = new HashSet<Integer>();
-    List<CalendarEvent> coalescedEvents = new LinkedList<CalendarEvent>();
+    Set<Integer> types = new HashSet<>();
+    List<CalendarEvent> coalescedEvents = new LinkedList<>();
     // reverse traversal
     CalendarEvent[] a = m_calendarEventBuffer.toArray(new CalendarEvent[0]);
     for (int i = a.length - 1; i >= 0; i--) {
@@ -552,17 +543,17 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     @SuppressWarnings("unchecked")
     Range<Date> propValue = (Range<Date>) propertySupport.getProperty(PROP_VIEW_RANGE);
     // return a copy
-    return new Range<Date>(propValue);
+    return new Range<>(propValue);
   }
 
   @Override
   public void setViewRange(Date minDate, Date maxDate) {
-    setViewRangeInternal(new Range<Date>(minDate, maxDate));
+    setViewRangeInternal(new Range<>(minDate, maxDate));
   }
 
   @Override
   public void setViewRange(Range<Date> viewRange) {
-    setViewRangeInternal(new Range<Date>(viewRange));
+    setViewRangeInternal(new Range<>(viewRange));
   }
 
   private void setViewRangeInternal(Range<Date> viewRange) {
@@ -639,20 +630,20 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     Range<Date> d = getViewRange();
     if (d.getFrom() != null && d.getTo() != null) {
       for (ICalendarItemProvider p : changedProviders) {
-        LinkedList<CalendarComponent> components = new LinkedList<CalendarComponent>();
+        Deque<CalendarComponent> components = new LinkedList<>();
         for (ICalendarItem item : p.getItems(d.getFrom(), d.getTo())) {
           components.add(new CalendarComponent(this, p, item));
         }
         m_componentsByProvider.put(p.getClass(), components);
       }
       // filter and resolve item conflicts
-      Set<Class<? extends ICalendarItemProvider>> providerTypes = new HashSet<Class<? extends ICalendarItemProvider>>(changedProviders.size());
+      Set<Class<? extends ICalendarItemProvider>> providerTypes = new HashSet<>(changedProviders.size());
       for (ICalendarItemProvider provider : changedProviders) {
         providerTypes.add(provider.getClass());
       }
       interceptFilterCalendarItems(providerTypes, m_componentsByProvider);
       // complete list
-      TreeMap<CompositeObject, CalendarComponent> sortMap = new TreeMap<CompositeObject, CalendarComponent>();
+      SortedMap<CompositeObject, CalendarComponent> sortMap = new TreeMap<>();
       int index = 0;
       for (Collection<CalendarComponent> c : m_componentsByProvider.values()) {
         for (CalendarComponent comp : c) {
@@ -686,50 +677,46 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
    */
   public Collection<CalendarItemConflict> findConflictingItems(Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> componentsByProvider, Class<?>... providerTypes) {
     if (providerTypes != null && providerTypes.length >= 2) {
-      Map<String, List<CalendarComponent>> classificationMap = new HashMap<String, List<CalendarComponent>>();
-      for (int i = 0; i < providerTypes.length; i++) {
-        Collection<CalendarComponent> a = componentsByProvider.get(providerTypes[i]);
+      Map<String, List<CalendarComponent>> classificationMap = new HashMap<>();
+      for (Class<?> providerType : providerTypes) {
+        Collection<CalendarComponent> a = componentsByProvider.get(providerType);
         if (a != null) {
           for (CalendarComponent comp : a) {
             String key = StringUtility.emptyIfNull(comp.getItem().getSubject()).toLowerCase().trim();
-            List<CalendarComponent> list = classificationMap.get(key);
-            if (list == null) {
-              list = new ArrayList<CalendarComponent>();
-              classificationMap.put(key, list);
-            }
+            List<CalendarComponent> list = classificationMap.computeIfAbsent(key, k -> new ArrayList<>());
             list.add(comp);
           }
         }
       }
-      List<CalendarItemConflict> conflicts = new ArrayList<CalendarItemConflict>();
-      for (Map.Entry<String, List<CalendarComponent>> e : classificationMap.entrySet()) {
+      List<CalendarItemConflict> conflicts = new ArrayList<>();
+      for (Entry<String, List<CalendarComponent>> e : classificationMap.entrySet()) {
         if (e.getValue().size() >= 2) {
           List<CalendarComponent> list = e.getValue();
           // find CalendarComponents with same Provider, break them up in separate groups for duplicate check
           // reason: all CalendarComponents of the same provider are assumed to be distinct
-          Map<ICalendarItemProvider, ArrayList<CalendarComponent>> groups = new HashMap<ICalendarItemProvider, ArrayList<CalendarComponent>>();
+          Map<ICalendarItemProvider, ArrayList<CalendarComponent>> groups = new HashMap<>();
           for (CalendarComponent c : list) {
             if (groups.containsKey(c.getProvider())) {
               groups.get(c.getProvider()).add(c);
             }
             else {
-              ArrayList<CalendarComponent> tmp = new ArrayList<CalendarComponent>();
+              ArrayList<CalendarComponent> tmp = new ArrayList<>();
               tmp.add(c);
               groups.put(c.getProvider(), tmp);
             }
           }
-          List<CalendarComponent> groupComp = new ArrayList<CalendarComponent>();
-          for (ArrayList<CalendarComponent> g : groups.values()) {
+          List<CalendarComponent> groupComp = new ArrayList<>();
+          for (List<CalendarComponent> g : groups.values()) {
             if (g.size() > 1) {
               groupComp.addAll(g);
             }
           }
-          if (groupComp.size() == 0) {
+          if (groupComp.isEmpty()) {
             // no duplicate records of a provider found, start with first item
             groupComp.add(list.get(0));
           }
           for (CalendarComponent ref : groupComp) {
-            List<CalendarComponent> matchList = new ArrayList<CalendarComponent>();
+            List<CalendarComponent> matchList = new ArrayList<>();
             double matchSum = 0;
             matchList.add(ref);
             for (CalendarComponent test : list) {
@@ -841,8 +828,8 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     else {
       EventListener[] listeners = m_listenerList.getListeners(CalendarListener.class);
       if (listeners != null && listeners.length > 0) {
-        for (int i = 0; i < listeners.length; i++) {
-          ((CalendarListener) listeners[i]).calendarChanged(e);
+        for (EventListener listener : listeners) {
+          ((CalendarListener) listener).calendarChanged(e);
         }
       }
     }
@@ -856,8 +843,8 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     else {
       EventListener[] listeners = m_listenerList.getListeners(CalendarListener.class);
       if (listeners != null && listeners.length > 0) {
-        for (int i = 0; i < listeners.length; i++) {
-          ((CalendarListener) listeners[i]).calendarChangedBatch(batch);
+        for (EventListener listener : listeners) {
+          ((CalendarListener) listener).calendarChangedBatch(batch);
         }
       }
     }

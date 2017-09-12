@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public class ResourceListTransferObject extends TransferObject {
-  private List<BinaryResource> m_resources;
+  private final List<BinaryResource> m_resources;
 
   public ResourceListTransferObject(BinaryResource... resources) {
     this(Arrays.asList(resources));

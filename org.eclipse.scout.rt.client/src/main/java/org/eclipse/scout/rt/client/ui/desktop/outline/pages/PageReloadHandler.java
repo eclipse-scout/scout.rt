@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.IReloadHandler;
  */
 public class PageReloadHandler implements IReloadHandler {
 
-  private IPage m_page;
+  private final IPage m_page;
 
   public PageReloadHandler(IPage page) {
     m_page = page;

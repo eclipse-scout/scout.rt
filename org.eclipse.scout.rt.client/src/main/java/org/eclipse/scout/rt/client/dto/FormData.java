@@ -29,38 +29,37 @@ import java.lang.annotation.Target;
  * <td rowspan="1" vAlign="top"><code>value</code></td>
  * <td vAlign="top">*.class</td>
  * <td vAlign="top">A form data class (e.g. <code>AbstractMyGroupboxData.class</code>).
- * <li>The form data class to generate for a <code>? extends AbstractForm</code> when {@link FormData.SdkCommand#CREATE}
- * </li>
- * <li>The super class of the managed form data when {@link FormData.SdkCommand#USE}</li></td>
+ * <li>The form data class to generate for a <code>? extends AbstractForm</code> when {@link SdkCommand#CREATE}</li>
+ * <li>The super class of the managed form data when {@link SdkCommand#USE}</li></td>
  * </tr>
  * <tr>
  * <td rowspan="4" vAlign="top"><code>sdkCommand</code></td>
- * <td vAlign="top">{@link FormData.SdkCommand#CREATE}</td>
+ * <td vAlign="top">{@link SdkCommand#CREATE}</td>
  * <td vAlign="top">Scout SDK will create and manage the form data.</td>
  * </tr>
  * <tr>
- * <td vAlign="top">{@link FormData.SdkCommand#USE}</td>
+ * <td vAlign="top">{@link SdkCommand#USE}</td>
  * <td vAlign="top">All subclasses will use the formdata (<code>value</code>) as a supertype of its formdata.</td>
  * </tr>
  * <tr>
- * <td vAlign="top">{@link FormData.SdkCommand#IGNORE}</td>
+ * <td vAlign="top">{@link SdkCommand#IGNORE}</td>
  * <td>The annotated class will be ignored in the formdata.</td>
  * </tr>
  * <tr>
- * <td vAlign="top">{@link FormData.SdkCommand#DEFAULT}</td>
+ * <td vAlign="top">{@link SdkCommand#DEFAULT}</td>
  * <td>Not to use in the code.</td>
  * </tr>
  * <tr>
  * <td rowspan="3" vAlign="top"><code>defaultSubtypeSdkCommand</code></td>
- * <td vAlign="top">{@link FormData.DefaultSubtypeSdkCommand#CREATE}</td>
+ * <td vAlign="top">{@link DefaultSubtypeSdkCommand#CREATE}</td>
  * <td vAlign="top">All subtypes will be included in the formdata.</td>
  * </tr>
  * <tr>
- * <td vAlign="top">{@link FormData.DefaultSubtypeSdkCommand#IGNORE}</td>
+ * <td vAlign="top">{@link DefaultSubtypeSdkCommand#IGNORE}</td>
  * <td vAlign="top">All subtypes will be ignored in the formdata.</td>
  * </tr>
  * <tr>
- * <td>{@link FormData.DefaultSubtypeSdkCommand#DEFAULT}</td>
+ * <td>{@link DefaultSubtypeSdkCommand#DEFAULT}</td>
  * <td vAlign="top">Not to use in the code.</td>
  * </tr>
  * <tr>

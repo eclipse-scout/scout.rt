@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.platform.service;
 /**
  * Allows to get inventory information about services.
  */
+@FunctionalInterface
 public interface IServiceInventory {
 
   /**

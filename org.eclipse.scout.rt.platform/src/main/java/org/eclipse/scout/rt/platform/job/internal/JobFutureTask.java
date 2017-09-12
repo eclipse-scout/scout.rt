@@ -22,12 +22,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
-import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
@@ -49,8 +51,6 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
-import org.eclipse.scout.rt.platform.util.concurrent.IBiConsumer;
-import org.eclipse.scout.rt.platform.util.concurrent.IBiFunction;
 import org.quartz.Calendar;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -92,12 +92,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected volatile Thread m_runner;
 
   public JobFutureTask(final JobManager jobManager, final RunMonitor runMonitor, final JobInput input, final CallableChain<RESULT> callableChain, final Callable<RESULT> callable) {
-    super(new Callable<RESULT>() {
-
-      @Override
-      public RESULT call() throws Exception {
-        return callableChain.call(callable); // Run all processors as contained in the chain before invoking the Callable.
-      }
+    super(() -> {
+      return callableChain.call(callable); // Run all processors as contained in the chain before invoking the Callable.
     });
 
     m_jobManager = jobManager;
@@ -114,13 +110,9 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
     // Contribute to the CallableChain
     m_jobManager.interceptCallableChain(m_callableChain, this, m_runMonitor, m_input);
-    m_callableChain.addLast(new ICallableDecorator() {
-
-      @Override
-      public IUndecorator decorate() throws Exception {
-        changeState(JobState.RUNNING);
-        return null;
-      }
+    m_callableChain.addLast(() -> {
+      changeState(JobState.RUNNING);
+      return null;
     });
 
     // Compute execution data.
@@ -334,7 +326,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     catch (final ExecutionException | CancellationException e) { // NOSONAR
       // NOOP: Do not propagate ExecutionException and CancellationException (see JavaDoc contract)
     }
-    catch (final java.lang.InterruptedException e) {
+    catch (final InterruptedException e) {
       restoreInterruptionStatus();
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateInterruptedException(e, "Interrupted while waiting for a job to complete"));
     }
@@ -350,11 +342,11 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     catch (final ExecutionException | CancellationException e) { // NOSONAR
       // NOOP: Do not propagate ExecutionException and CancellationException (see JavaDoc contract)
     }
-    catch (final java.lang.InterruptedException e) {
+    catch (final InterruptedException e) {
       restoreInterruptionStatus();
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateInterruptedException(e, "Interrupted while waiting for a job to complete"));
     }
-    catch (final java.util.concurrent.TimeoutException e) {
+    catch (final TimeoutException e) {
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateTimeoutException(e, "Failed to wait for a job to complete because the maximal wait time elapsed", timeout, unit));
     }
   }
@@ -366,11 +358,11 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     try {
       m_completionPromise.awaitFinished(timeout, unit);
     }
-    catch (final java.lang.InterruptedException e) {
+    catch (final InterruptedException e) {
       restoreInterruptionStatus();
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateInterruptedException(e, "Interrupted while waiting for a job to finish"));
     }
-    catch (final java.util.concurrent.TimeoutException e) {
+    catch (final TimeoutException e) {
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateTimeoutException(e, "Failed to wait for a job to finish because the maximal wait time elapsed", timeout, unit));
     }
   }
@@ -393,7 +385,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     catch (final CancellationException e) {
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateCancellationException(e, "Failed to wait for a job to complete because the job was cancelled"));
     }
-    catch (final java.lang.InterruptedException e) {
+    catch (final InterruptedException e) {
       restoreInterruptionStatus();
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateInterruptedException(e, "Interrupted while waiting for a job to complete"));
     }
@@ -417,11 +409,11 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     catch (final CancellationException e) {
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateCancellationException(e, "Failed to wait for a job to complete because the job was cancelled"));
     }
-    catch (final java.lang.InterruptedException e) {
+    catch (final InterruptedException e) {
       restoreInterruptionStatus();
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateInterruptedException(e, "Interrupted while waiting for a job to complete"));
     }
-    catch (final java.util.concurrent.TimeoutException e) {
+    catch (final TimeoutException e) {
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateTimeoutException(e, "Failed to wait for a job to complete because the maximal wait time elapsed", timeout, unit));
     }
   }
@@ -433,48 +425,34 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
-  public <FUNCTION_RESULT> IFuture<FUNCTION_RESULT> whenDoneSchedule(final IBiFunction<RESULT, Throwable, FUNCTION_RESULT> function, final JobInput input) {
+  public <FUNCTION_RESULT> IFuture<FUNCTION_RESULT> whenDoneSchedule(final BiFunction<RESULT, Throwable, FUNCTION_RESULT> function, final JobInput input) {
     Assertions.assertNotNull(input, "Input must not be null");
     Assertions.assertNotNull(function, "Function must not be null");
 
     final AtomicReference<DoneEvent<RESULT>> doneEvent = new AtomicReference<>();
 
     // Create the future to be executed after entering done state.
-    final JobFutureTask<FUNCTION_RESULT> functionFuture = m_jobManager.createJobFutureTask(new Callable<FUNCTION_RESULT>() {
-
-      @Override
-      public FUNCTION_RESULT call() throws Exception {
-        return function.apply(doneEvent.get().getResult(), doneEvent.get().getException());
-      }
-    }, input);
+    final JobFutureTask<FUNCTION_RESULT> functionFuture = m_jobManager.createJobFutureTask(() -> function.apply(doneEvent.get().getResult(), doneEvent.get().getException()), input);
 
     // Submit the function's future upon entering done state.
-    whenDone(new IDoneHandler<RESULT>() {
-
-      @Override
-      public void onDone(final DoneEvent<RESULT> event) {
-        doneEvent.set(event);
-        // Propagate cancellation if applicable.
-        // Nevertheless, even if not executed, the future must be submitted to enter done state.
-        if (event.isCancelled()) {
-          functionFuture.cancel(false);
-        }
-        m_jobManager.submit(functionFuture);
+    whenDone(event -> {
+      doneEvent.set(event);
+      // Propagate cancellation if applicable.
+      // Nevertheless, even if not executed, the future must be submitted to enter done state.
+      if (event.isCancelled()) {
+        functionFuture.cancel(false);
       }
+      m_jobManager.submit(functionFuture);
     }, null);
 
     return functionFuture;
   }
 
   @Override
-  public IFuture<Void> whenDoneSchedule(final IBiConsumer<RESULT, Throwable> function, final JobInput input) {
-    return whenDoneSchedule(new IBiFunction<RESULT, Throwable, Void>() {
-
-      @Override
-      public Void apply(final RESULT result, final Throwable throwable) {
-        function.accept(result, throwable);
-        return null;
-      }
+  public IFuture<Void> whenDoneSchedule(final BiConsumer<RESULT, Throwable> function, final JobInput input) {
+    return whenDoneSchedule((result, throwable) -> {
+      function.accept(result, throwable);
+      return null;
     }, input);
   }
 
@@ -488,13 +466,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     final JobListenerWithFilter localListener = new JobListenerWithFilter(listener, filter);
     m_listeners.add(localListener);
 
-    return new IRegistrationHandle() {
-
-      @Override
-      public void dispose() {
-        m_listeners.remove(localListener);
-      }
-    };
+    return () -> m_listeners.remove(localListener);
   }
 
   protected List<JobListenerWithFilter> getListeners() {
@@ -542,7 +514,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   /**
-   * Restores the thread's interrupted status because cleared by catching {@link java.lang.InterruptedException}.
+   * Restores the thread's interrupted status because cleared by catching {@link InterruptedException}.
    */
   protected void restoreInterruptionStatus() {
     Thread.currentThread().interrupt();

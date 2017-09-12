@@ -39,8 +39,8 @@ public abstract class AbstractNonBlockingPool<T> {
   private final long m_maxAgeMillis;
   private final AtomicLong m_poolSize = new AtomicLong();
 
-  private final ConcurrentMap<T, State> m_idleElements = new ConcurrentHashMap<T, State>();
-  private final ConcurrentMap<T, State> m_busyElements = new ConcurrentHashMap<T, State>();
+  private final ConcurrentMap<T, State> m_idleElements = new ConcurrentHashMap<>();
+  private final ConcurrentMap<T, State> m_busyElements = new ConcurrentHashMap<>();
 
   public AbstractNonBlockingPool(long maxAge, TimeUnit timeUnit) {
     m_maxAgeMillis = timeUnit.toMillis(maxAge);

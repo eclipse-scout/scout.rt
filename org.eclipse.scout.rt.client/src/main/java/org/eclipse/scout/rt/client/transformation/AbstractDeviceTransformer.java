@@ -14,8 +14,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 public abstract class AbstractDeviceTransformer implements IDeviceTransformer {
 
   private IDesktop m_desktop;
-  private Set<IForm> m_dirtyGridData = new HashSet<>();
-  private DeviceTransformationConfig m_deviceTransformationConfig;
+  private final Set<IForm> m_dirtyGridData = new HashSet<>();
+  private final DeviceTransformationConfig m_deviceTransformationConfig;
 
   public AbstractDeviceTransformer() {
     m_deviceTransformationConfig = createDeviceTransformationConfig();

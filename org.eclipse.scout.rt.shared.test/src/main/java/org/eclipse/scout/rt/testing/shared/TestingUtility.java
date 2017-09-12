@@ -256,9 +256,9 @@ public final class TestingUtility {
   @SuppressWarnings("unchecked")
   public static <T> IBean<?> mockConfigProperty(Class<? extends IConfigProperty<T>> propertyClass, T value) {
     IConfigProperty<?> mock = Mockito.mock(IConfigProperty.class);
-    Mockito.<T> when((T) mock.getValue(ArgumentMatchers.<String> any())).thenReturn(value);
-    Mockito.<T> when((T) mock.getValue()).thenReturn(value);
-    return TestingUtility.registerBean(new BeanMetaData(propertyClass, mock));
+    Mockito.when((T) mock.getValue(ArgumentMatchers.any())).thenReturn(value);
+    Mockito.when((T) mock.getValue()).thenReturn(value);
+    return registerBean(new BeanMetaData(propertyClass, mock));
   }
 
 }

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.server.jdbc.internal.exec;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.holders.IHolder;
@@ -22,16 +23,16 @@ import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueOutputToken;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 
 abstract class AbstractBeanPropertyOutput implements IBindOutput {
-  private String m_propertyName;
-  private Class m_propertyType;
-  private ValueOutputToken m_source;
+  private final String m_propertyName;
+  private final Class m_propertyType;
+  private final ValueOutputToken m_source;
   private int m_batchIndex = -1;
   private int m_jdbcBindIndex = -1;
-  private ArrayList<Object> m_accumulator;
+  private final List<Object> m_accumulator;
 
   public AbstractBeanPropertyOutput(Class beanType, String propertyName, ValueOutputToken source) {
     m_propertyName = propertyName;
-    m_accumulator = new ArrayList<Object>();
+    m_accumulator = new ArrayList<>();
     m_source = source;
     //
     try {

@@ -22,8 +22,8 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.servicetunnel.StaticDate;
 
 /**
- * Helper to transform {@link java.util.Date} to a JSON string. Because JSON has no built-in date type, we use a string
- * in a canonical format. There are three valid formats:
+ * Helper to transform {@link Date} to a JSON string. Because JSON has no built-in date type, we use a string in a
+ * canonical format. There are three valid formats:
  * <ul>
  * <li>"Full": {@value #JSON_PATTERN_FULL}
  * <li>"Date only": {@value #JSON_PATTERN_DATE_ONLY} (time part is implicitly 00:00:00.000)

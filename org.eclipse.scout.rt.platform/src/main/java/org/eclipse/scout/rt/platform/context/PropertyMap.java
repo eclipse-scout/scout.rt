@@ -116,7 +116,7 @@ public class PropertyMap implements Iterable<Entry<Object, Object>> {
    * @return <code>true</code> if set in current property map, or else <code>false</code>.
    */
   public static boolean isSet(final String property) {
-    final PropertyMap propertyMap = PropertyMap.CURRENT.get();
+    final PropertyMap propertyMap = CURRENT.get();
     if (propertyMap == null) {
       return false;
     }

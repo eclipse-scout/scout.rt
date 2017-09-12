@@ -11,11 +11,11 @@
 package org.eclipse.scout.rt.shared.data.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,7 +56,7 @@ public final class DataModelUtility {
    * @since 3.8.0
    */
   public static String entityPathToExternalId(IDataModel f, EntityPath entityPath) {
-    if (entityPath == null || entityPath.size() == 0) {
+    if (entityPath == null || entityPath.isEmpty()) {
       return "";
     }
     StringBuilder buf = new StringBuilder();
@@ -123,7 +123,7 @@ public final class DataModelUtility {
    * @since 3.8.0
    */
   public static EntityPath externalIdToEntityPath(IDataModel f, String externalId) {
-    if (externalId == null || externalId.length() == 0) {
+    if (externalId == null || externalId.isEmpty()) {
       return EntityPath.EMPTY;
     }
     return resolveEntityPathRec(f, externalId, EntityPath.EMPTY);
@@ -135,7 +135,7 @@ public final class DataModelUtility {
    * @since 3.8.0
    */
   public static AttributePath externalIdToAttributePath(IDataModel f, String externalId) {
-    if (externalId == null || externalId.length() == 0) {
+    if (externalId == null || externalId.isEmpty()) {
       return null;
     }
     return resolveAttributePath(f, externalId);
@@ -256,14 +256,14 @@ public final class DataModelUtility {
     if (s == null) {
       return null;
     }
-    Map<String, String> map = new HashMap<String, String>(1);
+    Map<String, String> map = new HashMap<>(1);
     for (String e : PAT_SEMI_COLON.split(s)) {
       Matcher m = PAT_NVPAIR.matcher(e);
       if (m.matches()) {
         map.put(m.group(1), m.group(2));
       }
     }
-    return map.size() > 0 ? map : null;
+    return !map.isEmpty() ? map : null;
   }
 
   /**
@@ -274,11 +274,11 @@ public final class DataModelUtility {
    * null values are exported as empty strings
    */
   public static String exportMetaData(Map<String, String> map) {
-    if (map == null || map.size() == 0) {
+    if (map == null || map.isEmpty()) {
       return "";
     }
     StringBuilder buf = new StringBuilder(16);
-    for (Map.Entry<String, String> e : map.entrySet()) {
+    for (Entry<String, String> e : map.entrySet()) {
       buf.append(";");
       buf.append(e.getKey());
       buf.append('=');
@@ -301,20 +301,17 @@ public final class DataModelUtility {
       return CollectionUtility.emptyArrayList();
     }
     entities = new ArrayList<IDataModelEntity>(entities);
-    Collections.sort(entities, new Comparator<IDataModelEntity>() {
-      @Override
-      public int compare(IDataModelEntity o1, IDataModelEntity o2) {
-        if (o1 == null && o2 == null) {
-          return 0;
-        }
-        if (o1 == null) {
-          return -1;
-        }
-        if (o2 == null) {
-          return 1;
-        }
-        return StringUtility.compareIgnoreCase(o1.getText(), o2.getText());
+    entities.sort((Comparator<IDataModelEntity>) (o1, o2) -> {
+      if (o1 == null && o2 == null) {
+        return 0;
       }
+      if (o1 == null) {
+        return -1;
+      }
+      if (o2 == null) {
+        return 1;
+      }
+      return StringUtility.compareIgnoreCase(o1.getText(), o2.getText());
     });
     return entities;
   }
@@ -332,26 +329,23 @@ public final class DataModelUtility {
       return CollectionUtility.emptyArrayList();
     }
     attributes = new ArrayList<IDataModelAttribute>(attributes);
-    Collections.sort(attributes, new Comparator<IDataModelAttribute>() {
-      @Override
-      public int compare(IDataModelAttribute o1, IDataModelAttribute o2) {
-        if (o1 == null && o2 == null) {
-          return 0;
-        }
-        if (o1 == null) {
-          return -1;
-        }
-        if (o2 == null) {
-          return 1;
-        }
-        if (o1.getType() == DataModelConstants.TYPE_AGGREGATE_COUNT && o2.getType() != DataModelConstants.TYPE_AGGREGATE_COUNT) {
-          return -1;
-        }
-        if (o2.getType() == DataModelConstants.TYPE_AGGREGATE_COUNT && o1.getType() != DataModelConstants.TYPE_AGGREGATE_COUNT) {
-          return 1;
-        }
-        return StringUtility.compareIgnoreCase(o1.getText(), o2.getText());
+    attributes.sort((Comparator<IDataModelAttribute>) (o1, o2) -> {
+      if (o1 == null && o2 == null) {
+        return 0;
       }
+      if (o1 == null) {
+        return -1;
+      }
+      if (o2 == null) {
+        return 1;
+      }
+      if (o1.getType() == DataModelConstants.TYPE_AGGREGATE_COUNT && o2.getType() != DataModelConstants.TYPE_AGGREGATE_COUNT) {
+        return -1;
+      }
+      if (o2.getType() == DataModelConstants.TYPE_AGGREGATE_COUNT && o1.getType() != DataModelConstants.TYPE_AGGREGATE_COUNT) {
+        return 1;
+      }
+      return StringUtility.compareIgnoreCase(o1.getText(), o2.getText());
     });
     return attributes;
   }

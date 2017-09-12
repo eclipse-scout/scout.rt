@@ -26,7 +26,7 @@ public abstract class AbstractEventHistory<T> implements IEventHistory<T> {
   private final ConcurrentExpiringMap<Object, T> m_cache;
 
   public AbstractEventHistory(long timeToLiveMillis) {
-    m_cache = new ConcurrentExpiringMap<Object, T>(timeToLiveMillis, TimeUnit.MILLISECONDS);
+    m_cache = new ConcurrentExpiringMap<>(timeToLiveMillis, TimeUnit.MILLISECONDS);
   }
 
   /**

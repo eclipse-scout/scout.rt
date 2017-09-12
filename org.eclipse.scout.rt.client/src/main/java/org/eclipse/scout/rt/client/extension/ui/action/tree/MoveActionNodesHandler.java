@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.action.tree;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -49,7 +48,7 @@ public class MoveActionNodesHandler<T extends IActionNode<T>> extends AbstractMo
 
   @Override
   protected List<T> collectAllModelObjects() {
-    List<T> allModelObjects = new LinkedList<T>();
+    List<T> allModelObjects = new LinkedList<>();
     collectAllActionNodes(getRootModelObjects(), allModelObjects);
     return allModelObjects;
   }
@@ -58,8 +57,7 @@ public class MoveActionNodesHandler<T extends IActionNode<T>> extends AbstractMo
     if (actionNodes == null) {
       return;
     }
-    for (Iterator<? extends T> it = actionNodes.iterator(); it.hasNext();) {
-      T actionNode = it.next();
+    for (T actionNode : actionNodes) {
       allActionNodes.add(actionNode);
       if (actionNode.hasChildActions()) {
         collectAllActionNodes(actionNode.getChildActions(), allActionNodes);

@@ -18,7 +18,6 @@ import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
 
-import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
 import org.junit.Test;
 
 /**

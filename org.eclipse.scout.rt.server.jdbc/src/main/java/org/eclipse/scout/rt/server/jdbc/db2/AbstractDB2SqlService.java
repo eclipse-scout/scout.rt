@@ -21,7 +21,7 @@ public abstract class AbstractDB2SqlService extends AbstractSqlService {
   @Order(80)
   @Override
   protected Class<? extends ISqlStyle> getConfiguredSqlStyle() {
-    return org.eclipse.scout.rt.server.jdbc.db2.DB2SqlStyle.class;
+    return DB2SqlStyle.class;
   }
 
   @ConfigProperty(ConfigProperty.STRING)

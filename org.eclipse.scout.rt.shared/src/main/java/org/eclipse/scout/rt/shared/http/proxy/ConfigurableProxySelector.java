@@ -3,6 +3,7 @@ package org.eclipse.scout.rt.shared.http.proxy;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.net.Proxy.Type;
 import java.net.ProxySelector;
 import java.net.SocketAddress;
 import java.net.URI;
@@ -78,14 +79,14 @@ public class ConfigurableProxySelector extends ProxySelector {
   public ConfigurableProxySelector(Class<? extends AbstractStringListConfigProperty> proxyProperty, Class<? extends AbstractStringListConfigProperty> ignoreProxyProperty) {
     // load proxy map
     List<String> proxyMap = CONFIG.getPropertyValue(proxyProperty);
-    m_proxyMap = new HashMap<Pattern, Proxy>();
+    m_proxyMap = new HashMap<>();
     if (proxyMap != null) {
       for (String proxyConfiguration : proxyMap) {
         Pattern pattern = Pattern.compile(proxyConfiguration.substring(0, proxyConfiguration.lastIndexOf('=')), Pattern.CASE_INSENSITIVE);
         String proxyAddress = proxyConfiguration.substring(proxyConfiguration.lastIndexOf('=') + 1);
         String hostname = proxyAddress.substring(0, proxyAddress.lastIndexOf(':'));
         Integer port = Integer.valueOf(proxyAddress.substring(proxyAddress.lastIndexOf(':') + 1));
-        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(hostname, port));
+        Proxy proxy = new Proxy(Type.HTTP, new InetSocketAddress(hostname, port));
         m_proxyMap.put(pattern, proxy);
       }
     }
@@ -93,7 +94,7 @@ public class ConfigurableProxySelector extends ProxySelector {
 
     // load ignore proxy list
     List<String> proxyIgnoreList = CONFIG.getPropertyValue(ignoreProxyProperty);
-    m_proxyIgnoreList = new ArrayList<Pattern>();
+    m_proxyIgnoreList = new ArrayList<>();
     if (proxyIgnoreList != null) {
       for (String ignoreProxy : proxyIgnoreList) {
         m_proxyIgnoreList.add(Pattern.compile(ignoreProxy, Pattern.CASE_INSENSITIVE));
@@ -136,7 +137,7 @@ public class ConfigurableProxySelector extends ProxySelector {
     }
 
     if (!m_proxyMap.isEmpty()) {
-      List<Proxy> proxyList = new ArrayList<Proxy>();
+      List<Proxy> proxyList = new ArrayList<>();
       for (Entry<Pattern, Proxy> entry : m_proxyMap.entrySet()) {
         if (entry.getKey().matcher(uri.toString()).matches()) {
           proxyList.add(entry.getValue());

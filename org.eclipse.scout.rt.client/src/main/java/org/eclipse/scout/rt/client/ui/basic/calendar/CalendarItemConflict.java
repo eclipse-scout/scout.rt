@@ -20,9 +20,9 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvi
  * Two or more items of different {@link ICalendarItemProvider}s that have same subject and overlapping dates.
  */
 public class CalendarItemConflict {
-  private Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> m_componentsByProvider;
-  private List<CalendarComponent> m_components;
-  private double m_match;
+  private final Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> m_componentsByProvider;
+  private final List<CalendarComponent> m_components;
+  private final double m_match;
 
   public CalendarItemConflict(Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> componentsByProvider, List<CalendarComponent> components, double match) {
     m_componentsByProvider = componentsByProvider;

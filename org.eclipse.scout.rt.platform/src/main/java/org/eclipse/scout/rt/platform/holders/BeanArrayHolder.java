@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.platform.holders;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +36,7 @@ public class BeanArrayHolder<T> implements IBeanArrayHolder<T>, Serializable {
   public BeanArrayHolder(Class<T> clazz) {
     m_clazz = clazz;
     m_list = new ArrayList<>();
-    m_stateList = new HashMap<T, State>();
+    m_stateList = new HashMap<>();
   }
 
   @Override
@@ -48,7 +49,7 @@ public class BeanArrayHolder<T> implements IBeanArrayHolder<T>, Serializable {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
     }
     m_list.add(ret);
-    m_stateList.put(ret, IBeanArrayHolder.State.NON_CHANGED);
+    m_stateList.put(ret, State.NON_CHANGED);
     return ret;
   }
 
@@ -78,9 +79,7 @@ public class BeanArrayHolder<T> implements IBeanArrayHolder<T>, Serializable {
       return m_list.size();
     }
     EnumSet<State> state = EnumSet.noneOf(State.class);
-    for (State s : states) {
-      state.add(s);
-    }
+    Collections.addAll(state, states);
     if (state.isEmpty() || (state.contains(State.INSERTED) && state.contains(State.UPDATED)
         && state.contains(State.DELETED) && state.contains(State.NON_CHANGED))) {
       return m_list.size();
@@ -96,12 +95,10 @@ public class BeanArrayHolder<T> implements IBeanArrayHolder<T>, Serializable {
 
   @Override
   public T[] getBeans(State... states) {
-    List<T> ret = new ArrayList<T>();
+    List<T> ret = new ArrayList<>();
     EnumSet<State> state = EnumSet.noneOf(State.class);
     if (states != null) {
-      for (State s : states) {
-        state.add(s);
-      }
+      Collections.addAll(state, states);
     }
     if (state.isEmpty() || (state.contains(State.INSERTED) && state.contains(State.UPDATED)
         && state.contains(State.DELETED) && state.contains(State.NON_CHANGED))) {

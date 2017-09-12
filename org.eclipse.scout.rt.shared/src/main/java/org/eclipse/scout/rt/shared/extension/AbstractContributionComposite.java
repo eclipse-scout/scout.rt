@@ -16,7 +16,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -60,8 +59,8 @@ public abstract class AbstractContributionComposite implements IContributionOwne
     }
     List<?> contributionsForMe = extensionRegistry.createContributionsFor(owner, type);
     if (type == null) {
-      m_contributionsByType = new HashMap<Class<?>, ArrayList<?>>();
-      m_contributionsByClass = new HashMap<Class<?>, Object>(contributionsForMe.size());
+      m_contributionsByType = new HashMap<>();
+      m_contributionsByClass = new HashMap<>(contributionsForMe.size());
     }
     if (CollectionUtility.hasElements(contributionsForMe)) {
       for (Object contribution : contributionsForMe) {
@@ -72,12 +71,7 @@ public abstract class AbstractContributionComposite implements IContributionOwne
 
   public <T> void resetContributionsByClass(Object o, Class<T> type) {
     m_contributionsByType.remove(type);
-    for (Iterator<Object> it = m_contributionsByClass.values().iterator(); it.hasNext();) {
-      Object obj = it.next();
-      if (type.isAssignableFrom(obj.getClass())) {
-        it.remove();
-      }
-    }
+    m_contributionsByClass.values().removeIf(obj -> type.isAssignableFrom(obj.getClass()));
     IInternalExtensionRegistry extensionRegistry = BEANS.get(IInternalExtensionRegistry.class);
     initContributionsMap(o, extensionRegistry, type);
   }
@@ -110,7 +104,7 @@ public abstract class AbstractContributionComposite implements IContributionOwne
     ArrayList<T> contributionsOfType = (ArrayList<T>) m_contributionsByType.get(type);
     if (contributionsOfType == null) {
       Collection<Object> values = m_contributionsByClass.values();
-      contributionsOfType = new ArrayList<T>(values.size());
+      contributionsOfType = new ArrayList<>(values.size());
       for (Object o : values) {
         if (type.isAssignableFrom(o.getClass())) {
           T contribution = type.cast(o);

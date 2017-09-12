@@ -26,13 +26,13 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractJsonPropertyObserver.class);
 
   private PropertyChangeListener m_propertyChangeListener;
-  private PropertyEventFilter m_propertyEventFilter;
+  private final PropertyEventFilter m_propertyEventFilter;
   private boolean m_initializingProperties;
 
   /**
    * Key = propertyName.
    */
-  private Map<String, JsonProperty<?>> m_jsonProperties;
+  private final Map<String, JsonProperty<?>> m_jsonProperties;
 
   public AbstractJsonPropertyObserver(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);

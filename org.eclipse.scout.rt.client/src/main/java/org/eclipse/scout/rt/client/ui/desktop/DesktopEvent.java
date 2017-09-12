@@ -191,31 +191,31 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    buf.append(getClass().getSimpleName() + "[");
+    buf.append(getClass().getSimpleName()).append("[");
     // decode type
     try {
       Field[] f = getClass().getDeclaredFields();
-      for (int i = 0; i < f.length; i++) {
-        if (Modifier.isPublic(f[i].getModifiers())
-            && Modifier.isStatic(f[i].getModifiers())
-            && f[i].getName().startsWith("TYPE_")
-            && ((Number) f[i].get(null)).intValue() == m_type) {
-          buf.append(f[i].getName());
+      for (Field aF : f) {
+        if (Modifier.isPublic(aF.getModifiers())
+            && Modifier.isStatic(aF.getModifiers())
+            && aF.getName().startsWith("TYPE_")
+            && ((Number) aF.get(null)).intValue() == m_type) {
+          buf.append(aF.getName());
           break;
         }
       }
     }
     catch (Exception t) { // NOSONAR
-      buf.append("#" + m_type);
+      buf.append("#").append(m_type);
     }
     if (m_form != null) {
-      buf.append(" " + m_form.getTitle());
+      buf.append(" ").append(m_form.getTitle());
     }
     if (m_messageBox != null) {
-      buf.append(" " + m_messageBox.getHeader());
+      buf.append(" ").append(m_messageBox.getHeader());
     }
     if (m_outline != null) {
-      buf.append(" " + m_outline.getRootNode().getCell().getText());
+      buf.append(" ").append(m_outline.getRootNode().getCell().getText());
     }
     buf.append("]");
     return buf.toString();

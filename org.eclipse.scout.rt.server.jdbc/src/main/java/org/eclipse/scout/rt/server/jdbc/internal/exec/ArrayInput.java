@@ -19,9 +19,9 @@ import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueInputToken;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 
 class ArrayInput implements IBindInput {
-  private Object m_array;
+  private final Object m_array;
 
-  private ValueInputToken m_target;
+  private final ValueInputToken m_target;
   private int m_arrayLen = 0;
   private int m_batchIndex = -1;
   private int m_jdbcBindIndex = -1;

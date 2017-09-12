@@ -129,11 +129,11 @@ public class SmartFieldSearchParam<LOOKUP_KEY> implements ISmartFieldSearchParam
   }
 
   public static <LOOKUP_KEY> ISmartFieldSearchParam<LOOKUP_KEY> createTextParam(String wildcard, String searchText, boolean selectCurrentValue) {
-    return new SmartFieldSearchParam<LOOKUP_KEY>(wildcard, searchText, null, false, selectCurrentValue);
+    return new SmartFieldSearchParam<>(wildcard, searchText, null, false, selectCurrentValue);
   }
 
   public static <LOOKUP_KEY> ISmartFieldSearchParam<LOOKUP_KEY> createParentParam(LOOKUP_KEY parentKey, boolean selectCurrentValue) {
-    return new SmartFieldSearchParam<LOOKUP_KEY>(null, null, parentKey, true, selectCurrentValue);
+    return new SmartFieldSearchParam<>(null, null, parentKey, true, selectCurrentValue);
   }
 
 }

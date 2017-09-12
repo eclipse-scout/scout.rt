@@ -73,6 +73,6 @@ public abstract class AbstractObjectColumn extends AbstractColumn<Object> implem
 
   @Override
   protected IObjectColumnExtension<? extends AbstractObjectColumn> createLocalExtension() {
-    return new LocalObjectColumnExtension<AbstractObjectColumn>(this);
+    return new LocalObjectColumnExtension<>(this);
   }
 }

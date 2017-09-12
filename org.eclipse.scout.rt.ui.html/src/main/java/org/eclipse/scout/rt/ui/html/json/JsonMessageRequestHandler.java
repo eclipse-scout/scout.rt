@@ -13,14 +13,13 @@ package org.eclipse.scout.rt.ui.html.json;
 import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.servlet.ServletException;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -31,7 +30,6 @@ import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.resource.MimeType;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
@@ -65,7 +63,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   private final JsonRequestHelper m_jsonRequestHelper = BEANS.get(JsonRequestHelper.class);
 
   @Override
-  public boolean handlePost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+  public boolean handlePost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
     // serve only /json
     String pathInfo = req.getPathInfo();
     if (ObjectUtility.notEquals(pathInfo, "/json")) {
@@ -127,13 +125,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
           .withThreadLocal(IUiSession.CURRENT, uiSession)
           .withThreadLocal(JsonRequest.CURRENT, jsonRequest)
           .withDiagnostics(BEANS.all(IUiRunContextDiagnostics.class))
-          .run(new IRunnable() {
-
-            @Override
-            public void run() throws Exception {
-              handleJsonRequest(IUiSession.CURRENT.get(), JsonRequest.CURRENT.get(), req, resp);
-            }
-          }, DefaultExceptionTranslator.class);
+          .run(() -> handleJsonRequest(IUiSession.CURRENT.get(), JsonRequest.CURRENT.get(), req, resp), DefaultExceptionTranslator.class);
     }
     catch (Exception | PlatformError e) {
       if (jsonRequest == null || uiSession == null || jsonRequest.getRequestType() == RequestType.STARTUP_REQUEST) {
@@ -232,7 +224,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     // we probably cannot show the /logout URL. To prevent nasty error messages from the app server, we
     // fall back to the "session timeout" error message.
 
-    boolean platformValid = (Platform.get() != null && Platform.get().getState() == IPlatform.State.PlatformStarted);
+    boolean platformValid = (Platform.get() != null && Platform.get().getState() == State.PlatformStarted);
     if (platformValid && jsonReq.getRequestType() == RequestType.POLL_REQUEST) {
       writeJsonResponse(resp, m_jsonRequestHelper.createSessionTerminatedResponse(uiSession.getLogoutRedirectUrl()));
     }
@@ -354,7 +346,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     }
   }
 
-  protected IUiSession createUiSession(HttpServletRequest req, HttpServletResponse resp, JsonStartupRequest jsonStartupReq) throws ServletException, IOException {
+  protected IUiSession createUiSession(HttpServletRequest req, HttpServletResponse resp, JsonStartupRequest jsonStartupReq) {
     HttpSession httpSession = req.getSession();
     ISessionStore sessionStore = m_httpSessionHelper.getSessionStore(httpSession);
 

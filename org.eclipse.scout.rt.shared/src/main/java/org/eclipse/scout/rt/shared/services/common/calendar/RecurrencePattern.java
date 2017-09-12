@@ -10,16 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.calendar;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class RecurrencePattern implements java.io.Serializable {
+public class RecurrencePattern implements Serializable {
   private static final long serialVersionUID = 1L;
   //
   public static final int TYPE_DAILY = 119535;
@@ -86,7 +86,7 @@ public class RecurrencePattern implements java.io.Serializable {
    * value startw with 1
    */
   private int m_monthOfYear;
-  private ArrayList<RecurrenceException> m_recurrenceExceptions = new ArrayList<RecurrenceException>();
+  private final List<RecurrenceException> m_recurrenceExceptions = new ArrayList<>();
 
   public long getLastModified() {
     return m_lastModified;
@@ -283,7 +283,7 @@ public class RecurrencePattern implements java.io.Serializable {
     int min = getStartTimeMinutes() % (24 * 60);
     GregorianCalendar startRecCal = new GregorianCalendar();
     startRecCal.setTime(applyTime(m_firstDate, min / 60, min % 60, 0));
-    TreeSet<Date> list = new TreeSet<Date>();
+    Set<Date> list = new TreeSet<>();
     if (m_interval <= 0) {
       m_interval = 1;
     }
@@ -314,8 +314,7 @@ public class RecurrencePattern implements java.io.Serializable {
       }
     }
     // remove exceptions
-    for (Iterator<RecurrenceException> it = m_recurrenceExceptions.iterator(); it.hasNext();) {
-      RecurrenceException recEx = it.next();
+    for (RecurrenceException recEx : m_recurrenceExceptions) {
       Calendar cal = Calendar.getInstance();
       cal.setTime(recEx.getOriginalStartDate());
       cal.set(Calendar.HOUR, 0);
@@ -614,18 +613,18 @@ public class RecurrencePattern implements java.io.Serializable {
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder("Pattern[");
-    buf.append("startTimeMinutes=" + m_startTimeMinutes + ",");
-    buf.append("endTimeMinutes=" + m_endTimeMinutes + ",");
-    buf.append("durationMinutes=" + m_durationMinutes + ",");
-    buf.append("firstDate=" + m_firstDate + ",");
-    buf.append("lastDate=" + m_lastDate + ",");
-    buf.append("occurrences=" + m_occurrences + ",");
-    buf.append("type=" + m_type + ",");
-    buf.append("interval=" + m_interval + ",");
-    buf.append("instance=" + m_instance + ",");
-    buf.append("dayOfWeekBits=" + Integer.toBinaryString(m_dayOfWeekBits) + ",");
-    buf.append("dayOfMonth=" + m_dayOfMonth + ",");
-    buf.append("regenerate=" + m_regenerate + ",");
+    buf.append("startTimeMinutes=").append(m_startTimeMinutes).append(",");
+    buf.append("endTimeMinutes=").append(m_endTimeMinutes).append(",");
+    buf.append("durationMinutes=").append(m_durationMinutes).append(",");
+    buf.append("firstDate=").append(m_firstDate).append(",");
+    buf.append("lastDate=").append(m_lastDate).append(",");
+    buf.append("occurrences=").append(m_occurrences).append(",");
+    buf.append("type=").append(m_type).append(",");
+    buf.append("interval=").append(m_interval).append(",");
+    buf.append("instance=").append(m_instance).append(",");
+    buf.append("dayOfWeekBits=").append(Integer.toBinaryString(m_dayOfWeekBits)).append(",");
+    buf.append("dayOfMonth=").append(m_dayOfMonth).append(",");
+    buf.append("regenerate=").append(m_regenerate).append(",");
     buf.append("]");
     return buf.toString();
   }

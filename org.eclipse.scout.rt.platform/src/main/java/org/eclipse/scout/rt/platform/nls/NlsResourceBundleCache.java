@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * <h4>ResourceBundleCache</h4> Is used to cache resource bundle instances per {@link java.util.Locale}
+ * <h4>ResourceBundleCache</h4> Is used to cache resource bundle instances per {@link Locale}
  *
  * @author Ivan Motsch
  */
@@ -47,7 +47,7 @@ public class NlsResourceBundleCache {
   public NlsResourceBundleCache(String resourceBundleName, Class wrapperClass) {
     m_resourceBundleName = resourceBundleName;
     m_wrapperClass = wrapperClass;
-    m_resourceBundles = new ConcurrentHashMap<Locale, ResourceBundle>();
+    m_resourceBundles = new ConcurrentHashMap<>();
   }
 
   public ResourceBundle getResourceBundle(Locale locale) {

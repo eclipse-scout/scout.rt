@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.IReloadHandler;
  */
 public class TableFieldReloadHandler implements IReloadHandler {
 
-  private ITableField m_tableField;
+  private final ITableField m_tableField;
 
   public TableFieldReloadHandler(ITableField field) {
     m_tableField = field;

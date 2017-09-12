@@ -35,7 +35,6 @@ import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -280,8 +279,8 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   protected void fireMessageBoxEvent(MessageBoxEvent e) {
     EventListener[] listeners = m_listenerList.getListeners(MessageBoxListener.class);
     if (listeners != null && listeners.length > 0) {
-      for (int i = 0; i < listeners.length; i++) {
-        ((MessageBoxListener) listeners[i]).messageBoxChanged(e);
+      for (EventListener listener : listeners) {
+        ((MessageBoxListener) listener).messageBoxChanged(e);
       }
     }
   }
@@ -340,12 +339,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
         IFuture<Void> autoCloseFuture = null;
         if (getAutoCloseMillis() > 0) {
           final long closeDelay = getAutoCloseMillis();
-          autoCloseFuture = Jobs.schedule(new IRunnable() {
-            @Override
-            public void run() throws Exception {
-              closeMessageBox();
-            }
-          }, Jobs.newInput()
+          autoCloseFuture = Jobs.schedule(this::closeMessageBox, Jobs.newInput()
               .withName("Closing message box")
               .withRunContext(ClientRunContexts.copyCurrent())
               .withExecutionTrigger(Jobs.newExecutionTrigger()

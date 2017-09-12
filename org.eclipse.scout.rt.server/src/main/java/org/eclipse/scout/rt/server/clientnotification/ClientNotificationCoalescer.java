@@ -32,18 +32,14 @@ import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationAddress
 public class ClientNotificationCoalescer {
 
   public List<ClientNotificationMessage> coalesce(List<ClientNotificationMessage> inNotifications) {
-    LinkedHashSet<ClientNotificationMessage> notificationsNoDuplicates = new LinkedHashSet<ClientNotificationMessage>(inNotifications);
+    Iterable<ClientNotificationMessage> notificationsNoDuplicates = new LinkedHashSet<>(inNotifications);
     // sort by distribute & address property
     Map<Boolean, Map<IClientNotificationAddress, List<ClientNotificationMessage>>> messagesPerDistributeAndAddress = new HashMap<>();
-    messagesPerDistributeAndAddress.put(true, new HashMap<IClientNotificationAddress, List<ClientNotificationMessage>>());
-    messagesPerDistributeAndAddress.put(false, new HashMap<IClientNotificationAddress, List<ClientNotificationMessage>>());
+    messagesPerDistributeAndAddress.put(true, new HashMap<>());
+    messagesPerDistributeAndAddress.put(false, new HashMap<>());
     for (ClientNotificationMessage message : notificationsNoDuplicates) {
       Map<IClientNotificationAddress, List<ClientNotificationMessage>> messagesPerAddress = messagesPerDistributeAndAddress.get(message.isDistributeOverCluster());
-      List<ClientNotificationMessage> messages = messagesPerAddress.get(message.getAddress());
-      if (messages == null) {
-        messages = new ArrayList<ClientNotificationMessage>();
-        messagesPerAddress.put(message.getAddress(), messages);
-      }
+      List<ClientNotificationMessage> messages = messagesPerAddress.computeIfAbsent(message.getAddress(), k -> new ArrayList<>());
       messages.add(message);
     }
     List<ClientNotificationMessage> result = new ArrayList<>();

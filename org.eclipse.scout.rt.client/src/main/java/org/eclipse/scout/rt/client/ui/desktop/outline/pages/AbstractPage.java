@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.client.context.ClientRunContext;
@@ -40,7 +41,6 @@ import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
@@ -70,7 +70,6 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
@@ -95,14 +94,11 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(TABLE_VISIBLE, DETAIL_FORM_VISIBLE, PAGE_MENUS_ADDED,
       LIMITED_RESULT, ALWAYS_CREATE_CHILD_PAGE, SEARCH_ACTIVE, SEARCH_REQUIRED, PAGE_ACTIVE);
   static final NamedBitMaskHelper FLAGS2_BIT_HELPER = new NamedBitMaskHelper(PAGE_ACTIVATED);
-  private static final IMenuTypeMapper TREE_MENU_TYPE_MAPPER = new IMenuTypeMapper() {
-    @Override
-    public IMenuType map(IMenuType menuType) {
-      if (menuType == TreeMenuType.SingleSelection) {
-        return TableMenuType.EmptySpace;
-      }
-      return menuType;
+  private static final IMenuTypeMapper TREE_MENU_TYPE_MAPPER = menuType -> {
+    if (menuType == TreeMenuType.SingleSelection) {
+      return TableMenuType.EmptySpace;
     }
+    return menuType;
   };
 
   private T m_table;
@@ -110,8 +106,8 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   private DataChangeListener m_internalDataChangeListener;
   private final TreeListener m_treeListener;
   private final String m_userPreferenceContext;
-  private final Map<ITableRow, IPage> m_tableRowToPageMap = new HashMap<ITableRow, IPage>();
-  private final Map<IPage, ITableRow> m_pageToTableRowMap = new HashMap<IPage, ITableRow>();
+  private final Map<ITableRow, IPage> m_tableRowToPageMap = new HashMap<>();
+  private final Map<IPage, ITableRow> m_pageToTableRowMap = new HashMap<>();
 
   /**
    * Provides 8 boolean flags.<br>
@@ -144,24 +140,16 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
       createDisplayParentRunContext()
           .run(
-              new IRunnable() {
-                @Override
-                public void run() throws Exception {
-                  runInExtensionContext(new Runnable() {
-                    @Override
-                    public void run() {
-                      m_table = createTable();
-                      if (m_table != null) {
-                        m_table.initTable(); // calls execInitTable of AbstractTable
-                        firePageChanged();
-                        addDefaultTableControls();
-                        interceptInitTable(); // calls execInitTable of AbstractPage
-                        fireAfterTableInit();
-                      }
-                    }
-                  });
+              () -> runInExtensionContext(() -> {
+                m_table = createTable();
+                if (m_table != null) {
+                  m_table.initTable(); // calls execInitTable of AbstractTable
+                  firePageChanged();
+                  addDefaultTableControls();
+                  interceptInitTable(); // calls execInitTable of AbstractPage
+                  fireAfterTableInit();
                 }
-              });
+              }));
     }
     return m_table;
   }
@@ -212,7 +200,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   @Override
   public List<ITableRow> getTableRowsFor(Collection<? extends ITreeNode> childPageNodes) {
-    List<ITableRow> result = new ArrayList<ITableRow>();
+    List<ITableRow> result = new ArrayList<>();
     for (ITreeNode node : childPageNodes) {
       ITableRow row = getTableRowFor(node);
       if (row != null) {
@@ -413,7 +401,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       return;
     }
     //
-    HashSet<ITreeNode> pathsToSelections = new HashSet<ITreeNode>();
+    Set<ITreeNode> pathsToSelections = new HashSet<>();
     for (ITreeNode node : getTree().getSelectedNodes()) {
       ITreeNode tmp = node;
       while (tmp != null) {
@@ -689,7 +677,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   @Override
   public List<IPage<?>> getChildPages() {
-    List<IPage<?>> childPages = new ArrayList<IPage<?>>();
+    List<IPage<?>> childPages = new ArrayList<>();
     for (ITreeNode childNode : getChildNodes()) {
       childPages.add((IPage) childNode);
     }
@@ -818,12 +806,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       return null;
     }
     return createDisplayParentRunContext()
-        .call(new Callable<IForm>() {
-          @Override
-          public IForm call() throws Exception {
-            return getConfiguredDetailForm().newInstance();
-          }
-        });
+        .call((Callable<IForm>) getConfiguredDetailForm()::newInstance);
   }
 
   /**
@@ -909,13 +892,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    */
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
-      m_internalDataChangeListener = new WeakDataChangeListener() {
-
-        @Override
-        public void dataChanged(Object... innerDataTypes) {
-          AbstractPage.this.dataChanged(innerDataTypes);
-        }
-      };
+      m_internalDataChangeListener = (WeakDataChangeListener) AbstractPage.this::dataChanged;
     }
 
     IDesktop.CURRENT.get().addDataChangeListener(m_internalDataChangeListener, dataTypes);
@@ -924,16 +901,12 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   @Override
   public void dataChanged(final Object... dataTypes) {
     createDisplayParentRunContext()
-        .run(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            try {
-              interceptDataChanged(dataTypes);
-            }
-            catch (Exception e) {
-              BEANS.get(ExceptionHandler.class).handle(e);
-            }
+        .run(() -> {
+          try {
+            interceptDataChanged(dataTypes);
+          }
+          catch (Exception e) {
+            BEANS.get(ExceptionHandler.class).handle(e);
           }
         });
   }

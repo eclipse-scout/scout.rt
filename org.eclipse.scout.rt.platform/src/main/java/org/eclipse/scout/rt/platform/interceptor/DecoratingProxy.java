@@ -35,12 +35,7 @@ public class DecoratingProxy<INSTANCE> {
    * @return The created decorating proxy.
    */
   public static <T> DecoratingProxy<T> newInstance(IInstanceInvocationHandler<T> handler, Class... interfaces) {
-    return newInstance(handler, new Callable<T>() {
-      @Override
-      public T call() throws Exception {
-        return null;
-      }
-    }, interfaces);
+    return newInstance(handler, () -> null, interfaces);
   }
 
   /**
@@ -59,7 +54,7 @@ public class DecoratingProxy<INSTANCE> {
    * @return The created decorating proxy.
    */
   public static <T> DecoratingProxy<T> newInstance(IInstanceInvocationHandler<T> handler, Callable<T> targetInstanceProvider, Class... interfaces) {
-    return new DecoratingProxy<T>(handler, targetInstanceProvider, interfaces);
+    return new DecoratingProxy<>(handler, targetInstanceProvider, interfaces);
   }
 
   protected DecoratingProxy(IInstanceInvocationHandler<INSTANCE> handler, Callable<INSTANCE> targetInstanceProvider, Class[] interfaces) {
@@ -142,14 +137,9 @@ public class DecoratingProxy<INSTANCE> {
    *
    * @return The proxy to be called.
    */
+  @SuppressWarnings("unchecked")
   public INSTANCE getProxy() {
-    return m_cachedProxyInstance.setIfAbsentAndGet(new Callable<INSTANCE>() {
-      @Override
-      @SuppressWarnings("unchecked")
-      public INSTANCE call() throws Exception {
-        return (INSTANCE) Proxy.newProxyInstance(DecoratingProxy.class.getClassLoader(), getInterfaceClasses(), new P_InvocationHandler(DecoratingProxy.this));
-      }
-    });
+    return m_cachedProxyInstance.setIfAbsentAndGet(() -> (INSTANCE) Proxy.newProxyInstance(DecoratingProxy.class.getClassLoader(), getInterfaceClasses(), new P_InvocationHandler(DecoratingProxy.this)));
   }
 
   /**
@@ -163,7 +153,7 @@ public class DecoratingProxy<INSTANCE> {
 
     private final DecoratingProxy<T> m_decoratingProxy;
 
-    protected P_InvocationHandler(DecoratingProxy<T> proxy) {
+    P_InvocationHandler(DecoratingProxy<T> proxy) {
       m_decoratingProxy = proxy;
     }
 

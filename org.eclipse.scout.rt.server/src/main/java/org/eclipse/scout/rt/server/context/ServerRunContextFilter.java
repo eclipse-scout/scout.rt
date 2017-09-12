@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContextProducer;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.logging.ServletDiagnosticsProviderFactory;
 
@@ -47,12 +46,7 @@ public class ServerRunContextFilter implements Filter {
   public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
     final HttpServletRequest req = (HttpServletRequest) request;
     final HttpServletResponse resp = (HttpServletResponse) response;
-    lookupRunContext(req, resp).run(new IRunnable() {
-      @Override
-      public void run() throws IOException, ServletException {
-        chain.doFilter(request, response);
-      }
-    });
+    lookupRunContext(req, resp).run(() -> chain.doFilter(request, response));
   }
 
   @Override

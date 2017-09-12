@@ -26,12 +26,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 
 public class JsonWrappedFormField<WRAPPED_FORM_FIELD extends IWrappedFormField<? extends IForm>> extends JsonFormField<WRAPPED_FORM_FIELD> {
 
-  private FormListener m_innerFormListener = new FormListener() {
-    @Override
-    public void formChanged(FormEvent e) {
-      handleInnerFormEvent(e);
-    }
-  };
+  private final FormListener m_innerFormListener = this::handleInnerFormEvent;
 
   public JsonWrappedFormField(WRAPPED_FORM_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);

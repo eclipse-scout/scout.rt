@@ -1,7 +1,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
@@ -10,7 +9,6 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
@@ -37,7 +35,7 @@ public class LookupRowHelper {
     }
 
     beforeProvide(provider, lookupCall);
-    final List<ILookupRow<T>> result = (List<ILookupRow<T>>) provider.provide(lookupCall);
+    final List<ILookupRow<T>> result = provider.provide(lookupCall);
     return afterProvide(provider, lookupCall, result);
   }
 
@@ -48,21 +46,16 @@ public class LookupRowHelper {
    */
   public <T> IFuture<List<ILookupRow<T>>> scheduleLookup(final ILookupRowProvider<T> provider, final ILookupCall<T> lookupCall) {
     Assertions.assertNotNull(provider);
-    return Jobs.schedule(new Callable<List<ILookupRow<T>>>() {
-
-      @Override
-      public List<ILookupRow<T>> call() throws Exception {
-        LOG.debug("Fetching data");
-        if (lookupCall == null) {
-          LOG.warn("Fetching data for empty lookup call");
-          return CollectionUtility.emptyArrayList();
-        }
-        beforeProvide(provider, lookupCall);
-        final List<ILookupRow<T>> lookupRes = provider.provide(lookupCall);
-        LOG.debug("Result received {}", lookupRes);
-        return afterProvide(provider, lookupCall, lookupRes);
+    return Jobs.schedule(() -> {
+      LOG.debug("Fetching data");
+      if (lookupCall == null) {
+        LOG.warn("Fetching data for empty lookup call");
+        return CollectionUtility.emptyArrayList();
       }
-
+      beforeProvide(provider, lookupCall);
+      final List<ILookupRow<T>> lookupRes = provider.provide(lookupCall);
+      LOG.debug("Result received {}", lookupRes);
+      return afterProvide(provider, lookupCall, lookupRes);
     }, Jobs.newInput()
         .withRunContext(ClientRunContexts.copyCurrent())
         .withName("Lookup [lookupCall={}, provider={}]", lookupCall != null ? lookupCall.getClass().getName() : "null", provider)
@@ -70,23 +63,11 @@ public class LookupRowHelper {
   }
 
   private <T> void beforeProvide(final ILookupRowProvider<T> provider, final ILookupCall<T> lookupCall) {
-    runInModelJob(new Runnable() {
-
-      @Override
-      public void run() {
-        provider.beforeProvide(lookupCall);
-      }
-    });
+    runInModelJob(() -> provider.beforeProvide(lookupCall));
   }
 
   private <T> List<ILookupRow<T>> afterProvide(final ILookupRowProvider<T> provider, final ILookupCall<T> lookupCall, final List<ILookupRow<T>> result) {
-    runInModelJob(new Runnable() {
-
-      @Override
-      public void run() {
-        provider.afterProvide(lookupCall, result);
-      }
-    });
+    runInModelJob(() -> provider.afterProvide(lookupCall, result));
     return result;
   }
 
@@ -99,13 +80,7 @@ public class LookupRowHelper {
       runnable.run();
     }
     else {
-      ModelJobs.schedule(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          runnable.run();
-        }
-      }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+      ModelJobs.schedule(runnable::run, ModelJobs.newInput(ClientRunContexts.copyCurrent())
           .withExceptionHandling(null, false))
           .awaitDone();
     }

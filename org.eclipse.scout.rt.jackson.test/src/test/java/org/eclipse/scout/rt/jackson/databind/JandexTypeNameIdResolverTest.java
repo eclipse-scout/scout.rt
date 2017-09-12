@@ -89,16 +89,16 @@ public class JandexTypeNameIdResolverTest {
 
 /* ------ Test case CoreBean as base, a project template bean and two concrete project bean implementations
 
-      +---------------------+
-      |      CoreBean       |
-      +----------^----------+
-                 |
-      +----------+----------+
-      | ProjectTemplateBean |
-      +----------^----------+
-                 |
-    +------------+--------------+
-    |                           |
+    +---------------------+
+    |      CoreBean       |
+    +----------^----------+
+               |
+    +----------+----------+
+    | ProjectTemplateBean |
+    +----------^----------+
+               |
+  +------------+--------------+
+  |                           |
  +--------------------+   +--------------------+
  |  ProjectBean1      |   |    ProjectBean2    |
  +--------------------+   +--------------------+

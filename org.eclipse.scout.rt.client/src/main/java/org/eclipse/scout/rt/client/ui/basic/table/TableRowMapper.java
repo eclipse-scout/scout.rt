@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.HolderToRowMapper;
@@ -18,9 +19,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.internal.RowToHolderMapper;
 import org.eclipse.scout.rt.platform.holders.IHolder;
 
 public class TableRowMapper {
-  private ITableRow m_row;
-  private ArrayList<RowToHolderMapper> m_exportMappings;
-  private ArrayList<HolderToRowMapper> m_importMappings;
+  private final ITableRow m_row;
+  private List<RowToHolderMapper> m_exportMappings;
+  private List<HolderToRowMapper> m_importMappings;
 
   public TableRowMapper(ITableRow row) {
     m_row = row;
@@ -49,15 +50,15 @@ public class TableRowMapper {
   public <T> void addMapping(IColumn<T> col, IHolder<T> holder, boolean enableExport, boolean enableImport) {
     if (enableExport) {
       if (m_exportMappings == null) {
-        m_exportMappings = new ArrayList<RowToHolderMapper>();
+        m_exportMappings = new ArrayList<>();
       }
-      m_exportMappings.add(new RowToHolderMapper<T>(m_row, col, holder));
+      m_exportMappings.add(new RowToHolderMapper<>(m_row, col, holder));
     }
     if (enableImport) {
       if (m_importMappings == null) {
-        m_importMappings = new ArrayList<HolderToRowMapper>();
+        m_importMappings = new ArrayList<>();
       }
-      m_importMappings.add(new HolderToRowMapper<T>(m_row, col, holder));
+      m_importMappings.add(new HolderToRowMapper<>(m_row, col, holder));
     }
   }
 

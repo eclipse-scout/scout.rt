@@ -21,7 +21,7 @@ public abstract class AbstractMsSqlSqlService extends AbstractSqlService {
   @Order(80)
   @Override
   protected Class<? extends ISqlStyle> getConfiguredSqlStyle() {
-    return org.eclipse.scout.rt.server.jdbc.mssql.MSSQLSqlStyle.class;
+    return MSSQLSqlStyle.class;
   }
 
   @ConfigProperty(ConfigProperty.STRING)

@@ -15,7 +15,7 @@ import java.util.EventObject;
 public class BookmarkServiceEvent extends EventObject {
   private static final long serialVersionUID = 1L;
 
-  private int m_type;
+  private final int m_type;
 
   public static final int TYPE_CHANGED = 10;
 

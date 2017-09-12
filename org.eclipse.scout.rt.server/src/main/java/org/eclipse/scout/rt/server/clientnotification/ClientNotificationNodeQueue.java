@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.FinalValue;
+import org.eclipse.scout.rt.server.clientnotification.ClientNotificationProperties.NodeQueueCapacity;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationAddress;
 import org.slf4j.Logger;
@@ -54,7 +55,7 @@ public class ClientNotificationNodeQueue {
   private final AtomicLong m_lastConsumeAccess;
 
   public ClientNotificationNodeQueue() {
-    this(CONFIG.getPropertyValue(ClientNotificationProperties.NodeQueueCapacity.class));
+    this(CONFIG.getPropertyValue(NodeQueueCapacity.class));
   }
 
   public ClientNotificationNodeQueue(int capacity) {
@@ -84,11 +85,7 @@ public class ClientNotificationNodeQueue {
     m_sessionUserCacheLock.writeLock().lock();
     try {
       m_sessions.add(sessionId);
-      Set<String> userSessions = m_userToSessions.get(userId);
-      if (userSessions == null) {
-        userSessions = new HashSet<>();
-        m_userToSessions.put(userId, userSessions);
-      }
+      Set<String> userSessions = m_userToSessions.computeIfAbsent(userId, k -> new HashSet<>());
       userSessions.add(sessionId);
     }
     finally {
@@ -189,13 +186,8 @@ public class ClientNotificationNodeQueue {
   }
 
   private List<ClientNotificationMessage> getRelevantNotifications(Collection<? extends ClientNotificationMessage> notificationInput) {
-    List<ClientNotificationMessage> notifications = new ArrayList<ClientNotificationMessage>(notificationInput);
-    Iterator<ClientNotificationMessage> it = notifications.iterator();
-    while (it.hasNext()) {
-      if (!isRelevant(it.next().getAddress())) {
-        it.remove();
-      }
-    }
+    List<ClientNotificationMessage> notifications = new ArrayList<>(notificationInput);
+    notifications.removeIf(clientNotificationMessage -> !isRelevant(clientNotificationMessage.getAddress()));
     return notifications;
   }
 

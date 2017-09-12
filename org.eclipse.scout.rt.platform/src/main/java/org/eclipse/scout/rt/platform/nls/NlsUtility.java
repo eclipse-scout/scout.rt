@@ -75,17 +75,14 @@ public final class NlsUtility {
       field.setAccessible(true);
     }
     else {
-      AccessController.doPrivileged(new PrivilegedAction<Object>() {
-        @Override
-        public Object run() {
-          field.setAccessible(true);
-          return null;
-        }
+      AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+        field.setAccessible(true);
+        return null;
       });
     }
   }
 
-  private static Pattern messageArgumentPattern = Pattern.compile("\\{([0-9]+)\\}");
+  private static final Pattern messageArgumentPattern = Pattern.compile("\\{([0-9]+)\\}");
 
   /**
    * @param key
@@ -113,7 +110,7 @@ public final class NlsUtility {
             }
           }
           else {
-            b.append("{" + index + "}");
+            b.append("{").append(index).append("}");
           }
           // next
           start = m.end();

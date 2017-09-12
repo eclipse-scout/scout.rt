@@ -37,7 +37,7 @@ public final class BinaryResource implements Serializable {
   private final String m_contentType;
 
   /**
-   * String instead of {@link java.nio.charset.Charset} because otherwise not serializable.
+   * String instead of {@link Charset} because otherwise not serializable.
    */
   private final String m_charset;
   private final byte[] m_content;

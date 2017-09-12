@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -132,27 +130,19 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   }
 
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
-      @Override
-      public void run() {
-        initConfig();
-      }
-    });
+    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
   protected void initConfig() {
-    m_sharedVariableMap.addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent e) {
-        if (IClientNodeId.CURRENT.get() != null) {
-          String sessionId = getId();
-          if (sessionId != null) {
-            SharedContextChangedNotification notification = new SharedContextChangedNotification(new SharedVariableMap(m_sharedVariableMap));
-            BEANS.get(ClientNotificationRegistry.class).putTransactionalForSession(sessionId, notification);
-          }
-          else {
-            LOG.warn("No sessionId set");
-          }
+    m_sharedVariableMap.addPropertyChangeListener(e -> {
+      if (IClientNodeId.CURRENT.get() != null) {
+        String sessionId = getId();
+        if (sessionId != null) {
+          SharedContextChangedNotification notification = new SharedContextChangedNotification(new SharedVariableMap(m_sharedVariableMap));
+          BEANS.get(ClientNotificationRegistry.class).putTransactionalForSession(sessionId, notification);
+        }
+        else {
+          LOG.warn("No sessionId set");
         }
       }
     });
@@ -168,7 +158,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   }
 
   protected IServerSessionExtension<? extends AbstractServerSession> createLocalExtension() {
-    return new LocalServerSessionExtension<AbstractServerSession>(this);
+    return new LocalServerSessionExtension<>(this);
   }
 
   @Override

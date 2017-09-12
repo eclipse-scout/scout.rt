@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 public class HttpException extends Exception {
   private static final long serialVersionUID = 1L;
 
-  private int m_statusCode;
+  private final int m_statusCode;
 
   public static String getNameFor(int statusCode) {
     switch (statusCode) {

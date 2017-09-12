@@ -19,8 +19,6 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
-import org.eclipse.scout.rt.platform.job.listener.IJobListener;
-import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.slf4j.Logger;
@@ -60,22 +58,12 @@ public class DevelopmentThreadNameDecorator extends ThreadNameDecorator {
                 JobState.WAITING_FOR_PERMIT,
                 JobState.WAITING_FOR_BLOCKING_CONDITION)
             .toFilter(),
-        new IJobListener() {
+        event -> threadInfo.updateThreadName(future.getJobInput().getThreadName(), buildExecutionInfo(future)));
 
-          @Override
-          public void changed(final JobEvent event) {
-            threadInfo.updateThreadName(future.getJobInput().getThreadName(), buildExecutionInfo(future));
-          }
-        });
-
-    return new IUndecorator() {
-
-      @Override
-      public void undecorate() {
-        // Restore to the original thread name.
-        listenerRegistration.dispose();
-        threadInfo.reset();
-      }
+    return () -> {
+      // Restore to the original thread name.
+      listenerRegistration.dispose();
+      threadInfo.reset();
     };
   }
 

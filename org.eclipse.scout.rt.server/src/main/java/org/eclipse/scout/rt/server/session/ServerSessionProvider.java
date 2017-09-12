@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.server.session;
 
 import java.util.UUID;
-import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -63,29 +62,21 @@ public class ServerSessionProvider {
     return serverRunContext
         .copy()
         .withTransactionScope(TransactionScope.REQUIRES_NEW) // enforce a new transaction
-        .call(new Callable<SESSION>() {
+        .call(() -> {
+          // 1. Create an empty session instance.
+          @SuppressWarnings("unchecked")
+          final SESSION session = (SESSION) BEANS.get(IServerSession.class);
 
-          @Override
-          public SESSION call() throws Exception {
-            // 1. Create an empty session instance.
-            @SuppressWarnings("unchecked")
-            final SESSION session = (SESSION) BEANS.get(IServerSession.class);
-
-            // 2. Start the session.
-            return ServerRunContexts.copyCurrent()
-                .withSession(session)
-                .withTransactionScope(TransactionScope.MANDATORY) // run in the same transaction
-                .call(new Callable<SESSION>() {
-
-              @Override
-              public SESSION call() throws Exception {
+          // 2. Start the session.
+          return ServerRunContexts.copyCurrent()
+              .withSession(session)
+              .withTransactionScope(TransactionScope.MANDATORY) // run in the same transaction
+              .call(() -> {
                 beforeStartSession(session, sid);
                 session.start(sid);
                 afterStartSession(session);
                 return session;
-              }
-            });
-          }
+              });
         });
   }
 
@@ -107,7 +98,7 @@ public class ServerSessionProvider {
    * Returns the {@link IServerSession} associated with the current thread, or <code>null</code> if not available, or if
    * not of the type {@link IServerSession}.
    */
-  public static final IServerSession currentSession() {
+  public static IServerSession currentSession() {
     return Sessions.currentSession(IServerSession.class);
   }
 
@@ -115,7 +106,7 @@ public class ServerSessionProvider {
    * Returns the {@link IServerSession} associated with the current thread, or <code>null</code> if not available, or if
    * not of the expected type.
    */
-  public static final <SESSION extends IServerSession> SESSION currentSession(final Class<SESSION> type) {
+  public static <SESSION extends IServerSession> SESSION currentSession(final Class<SESSION> type) {
     return Sessions.currentSession(type);
   }
 }

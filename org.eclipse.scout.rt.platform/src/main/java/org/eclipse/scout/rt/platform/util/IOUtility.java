@@ -17,7 +17,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -124,7 +123,7 @@ public final class IOUtility {
     }
     else {
       try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
-        IOUtility.writeFromToStream(buffer, in);
+        writeFromToStream(buffer, in);
         return buffer.toByteArray();
       }
       catch (IOException e) {
@@ -284,9 +283,6 @@ public final class IOUtility {
         }
       }
     }
-    catch (FileNotFoundException n) {
-      throw new ProcessingException("filename: " + filename, n);
-    }
     catch (IOException e) {
       throw new ProcessingException("filename: " + filename, e);
     }
@@ -380,7 +376,7 @@ public final class IOUtility {
    * Directory browsing including subtree
    */
   public static File[] listFilesInSubtree(File dir, FileFilter filter) {
-    ArrayList<File> list = new ArrayList<File>();
+    ArrayList<File> list = new ArrayList<>();
     listFilesRec(dir, filter, list);
     return list.toArray(new File[list.size()]);
   }
@@ -433,7 +429,7 @@ public final class IOUtility {
       if (fileName != null) {
         fileName = fileName.replaceAll("[\\\\/:*?\\\"<>|]*", "");
       }
-      if (fileName == null || fileName.length() == 0) {
+      if (fileName == null || fileName.isEmpty()) {
         fileName = getTempFileName(".tmp");
       }
       File f = File.createTempFile("tmp", ".tmp");
@@ -707,7 +703,7 @@ public final class IOUtility {
     }
 
     String s = url.trim();
-    if (s.length() == 0) {
+    if (s.isEmpty()) {
       return "";
     }
 
@@ -735,7 +731,7 @@ public final class IOUtility {
     }
 
     String s = encodedUrl.trim();
-    if (s.length() == 0) {
+    if (s.isEmpty()) {
       return "";
     }
 
@@ -757,7 +753,7 @@ public final class IOUtility {
   public static URL urlTextToUrl(String urlText) {
     String text = urlText;
     URL url = null;
-    if (text != null && text.length() > 0) {
+    if (text != null && !text.isEmpty()) {
       try {
         url = new URL(text);
       }
@@ -807,7 +803,7 @@ public final class IOUtility {
   /**
    * @param file
    * @param charsetName
-   *          The name of a supported {@link java.nio.charset.Charset </code>charset<code>}
+   *          The name of a supported {@link Charset </code>charset<code>}
    * @return List containing all lines of the file as Strings
    * @throws ProcessingException
    *           if an {@link IOException} occurs (e.g. if file does not exists)

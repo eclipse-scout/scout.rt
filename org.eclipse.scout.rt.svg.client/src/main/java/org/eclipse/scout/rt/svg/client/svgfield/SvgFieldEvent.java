@@ -68,8 +68,8 @@ public class SvgFieldEvent extends EventObject {
   private static class Point implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private float m_x;
-    private float m_y;
+    private final float m_x;
+    private final float m_y;
 
     public Point(float x, float y) {
       m_x = x;

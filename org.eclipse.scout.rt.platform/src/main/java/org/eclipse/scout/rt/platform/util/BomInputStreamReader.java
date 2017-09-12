@@ -56,7 +56,7 @@ public class BomInputStreamReader extends InputStreamReader {
 
   static {
     // setup set of unicode character sets handled by this implementation
-    Charset[] cs = new Charset[]{
+    Charset[] cs = {
         StandardCharsets.UTF_8,
         StandardCharsets.UTF_16,
         StandardCharsets.UTF_16BE,

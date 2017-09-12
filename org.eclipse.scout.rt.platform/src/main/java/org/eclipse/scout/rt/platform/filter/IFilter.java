@@ -15,6 +15,7 @@ package org.eclipse.scout.rt.platform.filter;
  *
  * @since 5.1
  */
+@FunctionalInterface
 public interface IFilter<ELEMENT> {
 
   /**

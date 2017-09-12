@@ -125,7 +125,7 @@ public abstract class AbstractWebServiceClient<SERVICE extends Service, PORT> {
     m_serviceClazz = resolveServiceClass();
     m_portTypeClazz = resolvePortClass();
     m_webServiceClientAnnotation =
-        Assertions.assertNotNull(m_serviceClazz.getAnnotation(javax.xml.ws.WebServiceClient.class), "Missing '{}' annotation on webservice [service={}]", AbstractWebServiceClient.class.getSimpleName(), m_serviceClazz.getName());
+        Assertions.assertNotNull(m_serviceClazz.getAnnotation(WebServiceClient.class), "Missing '{}' annotation on webservice [service={}]", AbstractWebServiceClient.class.getSimpleName(), m_serviceClazz.getName());
   }
 
   @PostConstruct

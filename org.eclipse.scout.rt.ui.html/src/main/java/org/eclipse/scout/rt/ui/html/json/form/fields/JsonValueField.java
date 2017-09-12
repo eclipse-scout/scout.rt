@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Set;
 
@@ -79,7 +78,7 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    m_jsonContextMenu = new JsonContextMenu<IContextMenu>(getModel().getContextMenu(), this);
+    m_jsonContextMenu = new JsonContextMenu<>(getModel().getContextMenu(), this);
     m_jsonContextMenu.init();
   }
 
@@ -95,17 +94,14 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
     if (m_contextMenuListener != null) {
       throw new IllegalStateException();
     }
-    m_contextMenuListener = new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
-          handleModelContextMenuVisibleChanged((Boolean) evt.getNewValue());
-        }
-        else if (IContextMenu.PROP_CURRENT_MENU_TYPES.equals(evt.getPropertyName())) {
-          @SuppressWarnings("unchecked")
-          Set<? extends IMenuType> newValue = (Set<? extends IMenuType>) evt.getNewValue();
-          handleModelContextMenuCurrentMenuTypesChanged(newValue);
-        }
+    m_contextMenuListener = evt -> {
+      if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+        handleModelContextMenuVisibleChanged((Boolean) evt.getNewValue());
+      }
+      else if (IContextMenu.PROP_CURRENT_MENU_TYPES.equals(evt.getPropertyName())) {
+        @SuppressWarnings("unchecked")
+        Set<? extends IMenuType> newValue = (Set<? extends IMenuType>) evt.getNewValue();
+        handleModelContextMenuCurrentMenuTypesChanged(newValue);
       }
     };
     getModel().getContextMenu().addPropertyChangeListener(m_contextMenuListener);

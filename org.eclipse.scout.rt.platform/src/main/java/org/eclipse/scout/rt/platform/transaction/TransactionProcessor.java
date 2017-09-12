@@ -160,13 +160,7 @@ public class TransactionProcessor<RESULT> implements ICallableInterceptor<RESULT
     RunMonitor.CURRENT.get().registerCancellable(transaction);
 
     // Return the 'undo-action' to unregister the transaction from the monitor.
-    return new IRegistrationHandle() {
-
-      @Override
-      public void dispose() {
-        RunMonitor.CURRENT.get().unregisterCancellable(transaction);
-      }
-    };
+    return () -> RunMonitor.CURRENT.get().unregisterCancellable(transaction);
   }
 
   /**
@@ -179,13 +173,7 @@ public class TransactionProcessor<RESULT> implements ICallableInterceptor<RESULT
   protected IRegistrationHandle registerAsCurrentTransaction(final ITransaction transaction) throws Exception {
     final IUndecorator decoration = new ThreadLocalProcessor<>(ITransaction.CURRENT, transaction).decorate();
 
-    return new IRegistrationHandle() {
-
-      @Override
-      public void dispose() {
-        decoration.undecorate();
-      }
-    };
+    return decoration::undecorate;
   }
 
   protected void assertTransactionMemberRegistration() {

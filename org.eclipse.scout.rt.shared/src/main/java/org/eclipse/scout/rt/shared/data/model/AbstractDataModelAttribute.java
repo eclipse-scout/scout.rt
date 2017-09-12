@@ -55,7 +55,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ClassId("350b5965-e92d-4f7e-b7b7-7135a572ff91")
-public abstract class AbstractDataModelAttribute extends AbstractPropertyObserver implements IDataModelAttribute, DataModelConstants, Serializable, IExtensibleObject {
+public abstract class AbstractDataModelAttribute extends AbstractPropertyObserver implements IDataModelAttribute, Serializable, IExtensibleObject {
 
   private static final long serialVersionUID = 1L;
   private static final String ALLOW_NULL_OPERATOR = "ALLOW_NULL_OPERATOR";
@@ -104,7 +104,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    *          {@link #callInitializer()} itself
    */
   public AbstractDataModelAttribute(boolean callInitConfig) {
-    m_objectExtensions = new ObjectExtensions<AbstractDataModelAttribute, IDataModelAttributeExtension<? extends AbstractDataModelAttribute>>(this, false);
+    m_objectExtensions = new ObjectExtensions<>(this, false);
     if (callInitConfig) {
       callInitializer();
     }
@@ -127,7 +127,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     if (viewOrder == IOrdered.DEFAULT_ORDER) {
       while (cls != null && IDataModelAttribute.class.isAssignableFrom(cls)) {
         if (cls.isAnnotationPresent(Order.class)) {
-          Order order = (Order) cls.getAnnotation(Order.class);
+          Order order = cls.getAnnotation(Order.class);
           return order.value();
         }
         cls = cls.getSuperclass();
@@ -242,12 +242,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   }
 
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
-      @Override
-      public void run() {
-        initConfig();
-      }
-    });
+    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
   protected void initConfig() {
@@ -288,7 +283,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   }
 
   protected IDataModelAttributeExtension<? extends AbstractDataModelAttribute> createLocalExtension() {
-    return new LocalDataModelAttributeExtension<AbstractDataModelAttribute>(this);
+    return new LocalDataModelAttributeExtension<>(this);
   }
 
   @Override
@@ -301,7 +296,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    */
 
   protected void injectOperators() {
-    List<IDataModelAttributeOp> operatorList = new ArrayList<IDataModelAttributeOp>();
+    List<IDataModelAttributeOp> operatorList = new ArrayList<>();
     for (IDataModelAttributeOperatorProvider injector : BEANS.all(IDataModelAttributeOperatorProvider.class)) {
       injector.injectOperators(this, operatorList);
     }
@@ -751,7 +746,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
       call = BEANS.get(ICodeLookupCallFactoryService.class).newInstance((Class<? extends ICodeType<?, Object>>) codeTypeClass);
     }
     else if (lookupCall instanceof LookupCall<?>) {
-      call = (ILookupCall<Object>) ((LookupCall<Object>) lookupCall).clone();
+      call = ((LookupCall<Object>) lookupCall).clone();
     }
     else {
       return null;

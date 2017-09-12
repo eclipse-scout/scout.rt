@@ -25,14 +25,14 @@ public interface ILoggerSupport {
   /**
    * Log levels supported by scout. The levels of concrete loggers are mapped to and limited by these values.
    */
-  public static enum LogLevel {
+  enum LogLevel {
     ALL,
     TRACE,
     DEBUG,
     INFO,
     WARN,
     ERROR,
-    OFF;
+    OFF
   }
 
   /**

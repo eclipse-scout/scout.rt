@@ -28,6 +28,7 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
+import org.openqa.selenium.chrome.ChromeDriverService.Builder;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
@@ -103,7 +104,7 @@ public final class SeleniumDriver {
     env.put("LANG", "en_US.UTF-8");
     System.out.println("Using custom environment variables for driver: " + new JSONObject(env).toString(2));
     RemoteWebDriver driver = new ChromeDriver(
-        new ChromeDriverService.Builder()
+        new Builder()
             .usingAnyFreePort()
             .withEnvironment(env) // <--
             .build(),

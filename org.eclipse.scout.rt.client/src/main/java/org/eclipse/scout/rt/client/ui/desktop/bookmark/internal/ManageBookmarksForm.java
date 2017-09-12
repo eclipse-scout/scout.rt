@@ -40,10 +40,6 @@ import org.eclipse.scout.rt.shared.security.UpdateUserBookmarkPermission;
 @ClassId("e233756c-9f3e-40bf-918d-a869b6321af8")
 public class ManageBookmarksForm extends AbstractForm implements BookmarkServiceListener {
 
-  public ManageBookmarksForm() {
-    super();
-  }
-
   @Override
   protected String getConfiguredTitle() {
     return TEXTS.get("Bookmarks");

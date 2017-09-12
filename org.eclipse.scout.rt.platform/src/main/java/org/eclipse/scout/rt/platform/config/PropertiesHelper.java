@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -276,7 +275,7 @@ public class PropertiesHelper {
    *         empty list is returned. Never returns <code>null</code>. The resulting {@link List} cannot be modified.
    */
   public List<String> getPropertyList(String key, String namespace) {
-    return getPropertyList(key, Collections.<String> emptyList(), namespace);
+    return getPropertyList(key, Collections.emptyList(), namespace);
   }
 
   /**
@@ -417,7 +416,7 @@ public class PropertiesHelper {
    *         that key and namespace the resulting map is empty. Never returns <code>null</code>.
    */
   public Map<String, String> getPropertyMap(String key, String namespace) {
-    return getPropertyMap(key, Collections.<String, String> emptyMap(), namespace);
+    return getPropertyMap(key, Collections.emptyMap(), namespace);
   }
 
   /**
@@ -736,7 +735,7 @@ public class PropertiesHelper {
     return m_isInitialized;
   }
 
-  protected void collectMapEntriesWith(String keyPrefix, Set<? extends Object> keySet, Map<String, String> collector) {
+  protected void collectMapEntriesWith(String keyPrefix, Set<?> keySet, Map<String, String> collector) {
     for (Object propKey : keySet) {
       String k = propKey.toString();
       String mapKey = toMapKey(k, keyPrefix);
@@ -906,7 +905,7 @@ public class PropertiesHelper {
       return;
     }
 
-    List<String> imports = new ArrayList<String>(rawImports.size());
+    List<String> imports = new ArrayList<>(rawImports.size());
     for (String s : rawImports) {
       imports.add(resolve(s, pat));
     }
@@ -963,8 +962,8 @@ public class PropertiesHelper {
   protected void parse(URL propertiesFileUrl) {
     ServiceLoader<IConfigFileLoader> services = ServiceLoader.load(IConfigFileLoader.class);
     IConfigFileLoader loader = null;
-    for (Iterator<IConfigFileLoader> it = services.iterator(); it.hasNext();) {
-      loader = it.next();
+    for (IConfigFileLoader service : services) {
+      loader = service;
       if (loader != null) {
         break;
       }

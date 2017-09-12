@@ -26,7 +26,7 @@ import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.jar.Attributes;
+import java.util.jar.Attributes.Name;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
@@ -43,7 +43,7 @@ public final class SandboxClassLoaderBuilder {
 
   private static final int ANY_SIZE = 10240;
 
-  private final Map<String, URL> m_urls = new LinkedHashMap<String, URL>();
+  private final Map<String, URL> m_urls = new LinkedHashMap<>();
   private final JarLocator m_jarLocator;
   private final ClassLoader m_originalClassLoader = SandboxClassLoaderBuilder.class.getClassLoader();
 
@@ -86,7 +86,7 @@ public final class SandboxClassLoaderBuilder {
     try {
       //create jar
       Manifest manifest = new Manifest();
-      manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
+      manifest.getMainAttributes().put(Name.MANIFEST_VERSION, "1.0");
       try (JarOutputStream jar = new JarOutputStream(jarData, manifest)) {
         for (String className : classNames) {
           String classPath = (className.replace(".", "/")) + ".class";
@@ -119,12 +119,7 @@ public final class SandboxClassLoaderBuilder {
   }
 
   public URLClassLoader build(final ClassLoader parent) {
-    return AccessController.doPrivileged(new PrivilegedAction<URLClassLoader>() {
-      @Override
-      public URLClassLoader run() {
-        return new P_ScriptClassLoader(m_urls.values().toArray(new URL[0]), parent);
-      }
-    });
+    return AccessController.doPrivileged((PrivilegedAction<URLClassLoader>) () -> new P_ScriptClassLoader(m_urls.values().toArray(new URL[0]), parent));
   }
 
   static URL createTemporaryJar(String jarFilePath, byte[] data) {

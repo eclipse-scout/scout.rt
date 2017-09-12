@@ -33,7 +33,6 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
 import org.eclipse.scout.rt.server.commons.servlet.CookieUtility;
 import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
@@ -130,12 +129,7 @@ public class UiServlet extends AbstractHttpServlet {
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
     m_httpServletControl.doDefaults(this, req, resp);
     try {
-      createServletRunContext(req, resp).run(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          m_requestHandlerGet.handleRequest(req, resp);
-        }
-      }, DefaultExceptionTranslator.class);
+      createServletRunContext(req, resp).run(() -> m_requestHandlerGet.handleRequest(req, resp), DefaultExceptionTranslator.class);
     }
     catch (Exception e) {
       LOG.error("Failed to process HTTP-GET request from UI", e);
@@ -147,12 +141,7 @@ public class UiServlet extends AbstractHttpServlet {
   protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
     m_httpServletControl.doDefaults(this, req, resp);
     try {
-      createServletRunContext(req, resp).run(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          m_requestHandlerPost.handleRequest(req, resp);
-        }
-      }, DefaultExceptionTranslator.class);
+      createServletRunContext(req, resp).run(() -> m_requestHandlerPost.handleRequest(req, resp), DefaultExceptionTranslator.class);
     }
     catch (Exception e) {
       LOG.error("Failed to process HTTP-POST request from UI", e);
@@ -175,9 +164,6 @@ public class UiServlet extends AbstractHttpServlet {
    */
   protected abstract static class P_AbstractRequestHandler implements Serializable {
     private static final long serialVersionUID = 1L;
-
-    protected P_AbstractRequestHandler() {
-    }
 
     protected void handleRequest(HttpServletRequest req, HttpServletResponse resp) throws IOException {
       long start = System.nanoTime();
@@ -212,9 +198,6 @@ public class UiServlet extends AbstractHttpServlet {
   protected static class P_RequestHandlerGet extends P_AbstractRequestHandler {
     private static final long serialVersionUID = 1L;
 
-    protected P_RequestHandlerGet() {
-    }
-
     @Override
     protected void handleRequest(HttpServletRequest req, HttpServletResponse resp) throws IOException {
       // The servlet is registered at '/'. To make relative URLs work, we need to make sure the request URL has a trailing '/'.
@@ -235,9 +218,6 @@ public class UiServlet extends AbstractHttpServlet {
 
   protected static class P_RequestHandlerPost extends P_AbstractRequestHandler {
     private static final long serialVersionUID = 1L;
-
-    protected P_RequestHandlerPost() {
-    }
 
     @Override
     protected boolean delegateRequest(IUiServletRequestHandler handler, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

@@ -67,7 +67,7 @@ public final class BinaryResources {
   }
 
   /**
-   * Convenience method that supports {@link java.nio.charset.Charset}.
+   * Convenience method that supports {@link Charset}.
    *
    * @param charset
    *          Charset for encoding

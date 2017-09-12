@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceWithoutAuthorizati
 /**
  * Provides cancellation support for operations initiated by the client.
  */
+@FunctionalInterface
 @TunnelToServer
 @RemoteServiceWithoutAuthorization
 public interface IRunMonitorCancelService extends IService {

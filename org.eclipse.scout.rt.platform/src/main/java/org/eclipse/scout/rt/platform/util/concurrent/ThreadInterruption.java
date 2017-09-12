@@ -23,13 +23,9 @@ public final class ThreadInterruption {
   public static IRestorer clear() {
     final boolean interrupted = Thread.interrupted(); // clears and returns the current interruption status
 
-    return new IRestorer() {
-
-      @Override
-      public void restore() {
-        if (interrupted) {
-          Thread.currentThread().interrupt();
-        }
+    return () -> {
+      if (interrupted) {
+        Thread.currentThread().interrupt();
       }
     };
   }
@@ -37,6 +33,7 @@ public final class ThreadInterruption {
   /**
    * Handle to restore the thread's interrupted status.
    */
+  @FunctionalInterface
   public interface IRestorer {
 
     /**

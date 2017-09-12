@@ -44,7 +44,7 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
     return this;
   }
 
-  public ServiceTunnelAccessTokenAccessController init(final ServiceTunnelAccessTokenAuthConfig config) throws ServletException {
+  public ServiceTunnelAccessTokenAccessController init(final ServiceTunnelAccessTokenAuthConfig config) {
     m_config = config;
     return this;
   }

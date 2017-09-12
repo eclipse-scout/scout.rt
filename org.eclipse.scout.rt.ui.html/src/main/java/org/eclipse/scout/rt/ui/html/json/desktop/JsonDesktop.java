@@ -17,9 +17,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.BrowserHistoryEntry;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
@@ -80,8 +77,8 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
 
   private final DownloadHandlerStorage m_downloads;
   private DesktopListener m_desktopListener;
-  private DesktopEventFilter m_desktopEventFilter;
-  private BooleanPropertyChangeFilter m_browserHistoryFilter = new BooleanPropertyChangeFilter(IDesktop.PROP_BROWSER_HISTORY_ENTRY, false);
+  private final DesktopEventFilter m_desktopEventFilter;
+  private final BooleanPropertyChangeFilter m_browserHistoryFilter = new BooleanPropertyChangeFilter(IDesktop.PROP_BROWSER_HISTORY_ENTRY, false);
 
   public JsonDesktop(DESKTOP desktop, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(desktop, uiSession, id, parent);
@@ -103,11 +100,11 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     attachGlobalAdapters(getModel().getMessageBoxes(getModel()));
     attachGlobalAdapters(getModel().getFileChoosers(getModel()));
     attachAdapters(getModel().getNotifications());
-    attachAdapters(getModel().getMenus(), new DisplayableActionFilter<IMenu>());
+    attachAdapters(getModel().getMenus(), new DisplayableActionFilter<>());
     attachAdapters(getModel().getAddOns());
-    attachAdapters(getModel().getKeyStrokes(), new DisplayableActionFilter<IKeyStroke>());
-    attachAdapters(getModel().getViewButtons(), new DisplayableActionFilter<IViewButton>());
-    attachGlobalAdapter(getModel().getOutline(), new DisplayableOutlineFilter<IOutline>());
+    attachAdapters(getModel().getKeyStrokes(), new DisplayableActionFilter<>());
+    attachAdapters(getModel().getViewButtons(), new DisplayableActionFilter<>());
+    attachGlobalAdapter(getModel().getOutline(), new DisplayableOutlineFilter<>());
   }
 
   @Override
@@ -353,12 +350,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     putAdapterIdsProperty(json, "messageBoxes", getModel().getMessageBoxes(getModel()));
     putAdapterIdsProperty(json, "notifications", getModel().getNotifications());
     putAdapterIdsProperty(json, "fileChoosers", getModel().getFileChoosers(getModel()));
-    putAdapterIdsProperty(json, "menus", getModel().getMenus(), new DisplayableActionFilter<IMenu>());
+    putAdapterIdsProperty(json, "menus", getModel().getMenus(), new DisplayableActionFilter<>());
     putAdapterIdsProperty(json, "addOns", getModel().getAddOns());
-    putAdapterIdsProperty(json, "keyStrokes", getModel().getKeyStrokes(), new DisplayableActionFilter<IKeyStroke>());
-    putAdapterIdsProperty(json, "viewButtons", getModel().getViewButtons(), new DisplayableActionFilter<IViewButton>());
-    putAdapterIdProperty(json, "outline", getModel().getOutline(), new DisplayableOutlineFilter<IOutline>());
-    if (getModel().getSelectedViews(getModel()).size() > 0) {
+    putAdapterIdsProperty(json, "keyStrokes", getModel().getKeyStrokes(), new DisplayableActionFilter<>());
+    putAdapterIdsProperty(json, "viewButtons", getModel().getViewButtons(), new DisplayableActionFilter<>());
+    putAdapterIdProperty(json, "outline", getModel().getOutline(), new DisplayableOutlineFilter<>());
+    if (!getModel().getSelectedViews(getModel()).isEmpty()) {
       putAdapterIdsProperty(json, "selectedViewTabs", getModel().getSelectedViews(getModel()));
     }
     return json;

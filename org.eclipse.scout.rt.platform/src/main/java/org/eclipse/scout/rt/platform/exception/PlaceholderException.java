@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.exception;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This exception class is used as place holder for exceptions that are most likely not known by external callers. The
@@ -55,7 +56,7 @@ public class PlaceholderException extends Exception {
    */
   public static Throwable transformException(Throwable t) {
     // first, go to exception stack and reverse it
-    ArrayList<Throwable> throwableStack = new ArrayList<Throwable>();
+    List<Throwable> throwableStack = new ArrayList<>();
     while (t != null) {
       throwableStack.add(0, t);
       t = t.getCause();

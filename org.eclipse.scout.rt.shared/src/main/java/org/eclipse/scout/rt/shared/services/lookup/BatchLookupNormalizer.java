@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.shared.services.lookup;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
@@ -46,13 +47,13 @@ public class BatchLookupNormalizer {
     m_originalLength = 0;
     m_forwardMapping = null;
     m_normalizedCalls = null;
-    if (calls == null || calls.size() == 0) {
+    if (calls == null || calls.isEmpty()) {
       return CollectionUtility.emptyArrayList();
     }
     m_originalLength = calls.size();
     m_forwardMapping = new int[m_originalLength];
-    HashMap<ILookupCall<?>, Integer> normMap = new HashMap<ILookupCall<?>, Integer>();
-    ArrayList<ILookupCall<?>> normList = new ArrayList<ILookupCall<?>>(m_originalLength / 2);
+    Map<ILookupCall<?>, Integer> normMap = new HashMap<>();
+    List<ILookupCall<?>> normList = new ArrayList<>(m_originalLength / 2);
     int normIndex = 0;
     for (int i = 0; i < m_originalLength; i++) {
       ILookupCall<?> call = calls.get(i);
@@ -91,7 +92,7 @@ public class BatchLookupNormalizer {
     if (normalizedResults.size() != m_normalizedCalls.size()) {
       throw new IllegalArgumentException("normalized result array must have length " + m_normalizedCalls.size() + " (" + normalizedResults.size() + ")");
     }
-    List<List<ILookupRow<?>>> result = new ArrayList<List<ILookupRow<?>>>(m_originalLength);
+    List<List<ILookupRow<?>>> result = new ArrayList<>(m_originalLength);
     for (int i = 0; i < m_originalLength; i++) {
       int mapIndex = m_forwardMapping[i];
       if (mapIndex >= 0) {

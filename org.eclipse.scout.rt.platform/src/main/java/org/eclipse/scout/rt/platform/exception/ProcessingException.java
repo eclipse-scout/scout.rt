@@ -133,7 +133,7 @@ public class ProcessingException extends PlatformException {
    * @return the complete stacktrace of the Throwable and all its causes (recursive)
    */
   public static StackTraceElement[] unionStackTrace(Throwable t) {
-    final ArrayList<StackTraceElement> list = new ArrayList<StackTraceElement>();
+    final ArrayList<StackTraceElement> list = new ArrayList<>();
     while (t != null) {
       list.addAll(0, Arrays.asList(t.getStackTrace()));
       t = t.getCause();

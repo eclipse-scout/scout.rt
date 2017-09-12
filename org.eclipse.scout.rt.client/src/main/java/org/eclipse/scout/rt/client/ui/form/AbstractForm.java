@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
@@ -114,7 +114,6 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
-import org.eclipse.scout.rt.platform.reflect.FastPropertyDescriptor;
 import org.eclipse.scout.rt.platform.reflect.IPropertyFilter;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
@@ -215,14 +214,14 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   public AbstractForm(boolean callInitializer) {
     m_listenerList = new EventListenerList();
-    m_modal = new PreferredValue<Boolean>(false, false);
+    m_modal = new PreferredValue<>(false, false);
     m_closeType = IButton.SYSTEM_TYPE_NONE;
     m_displayParent = new PreferredValue<>(null, false);
     m_eventHistory = createEventHistory();
     setHandler(new NullFormHandler());
     setFormLoading(true);
     m_blockingCondition = Jobs.newBlockingCondition(false);
-    m_objectExtensions = new ObjectExtensions<AbstractForm, IFormExtension<? extends AbstractForm>>(this, true);
+    m_objectExtensions = new ObjectExtensions<>(this, true);
 
     if (callInitializer) {
       callInitializer();
@@ -263,18 +262,15 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     m_initialClientRunContext = ClientRunContexts.copyCurrent();
 
     // Run the initialization on behalf of this Form.
-    ClientRunContexts.copyCurrent().withForm(this).run(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        interceptInitConfig();
-        postInitConfig();
-        setInitialized();
-      }
+    ClientRunContexts.copyCurrent().withForm(this).run(() -> {
+      interceptInitConfig();
+      postInitConfig();
+      setInitialized();
     });
   }
 
   protected IFormExtension<? extends AbstractForm> createLocalExtension() {
-    return new LocalFormExtension<AbstractForm>(this);
+    return new LocalFormExtension<>(this);
   }
 
   /*
@@ -655,18 +651,15 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   protected final void interceptInitConfig() {
     final Holder<RuntimeException> exceptionHolder = new Holder<>(RuntimeException.class, null);
     final Holder<PlatformError> errorHolder = new Holder<>(PlatformError.class, null);
-    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
-      @Override
-      public void run() {
-        try {
-          initConfig();
-        }
-        catch (RuntimeException e) {
-          exceptionHolder.setValue(e);
-        }
-        catch (PlatformError e) {
-          errorHolder.setValue(e);
-        }
+    m_objectExtensions.initConfig(createLocalExtension(), () -> {
+      try {
+        initConfig();
+      }
+      catch (RuntimeException e) {
+        exceptionHolder.setValue(e);
+      }
+      catch (PlatformError e) {
+        errorHolder.setValue(e);
       }
     });
     if (exceptionHolder.getValue() != null) {
@@ -689,7 +682,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
     IGroupBox rootBox = getRootGroupBox();
     try {
-      if (fieldArray.size() > 0) {
+      if (!fieldArray.isEmpty()) {
         injectedFields = new DefaultFormFieldInjection(this);
         injectedFields.addFields(fieldArray);
         FormFieldInjectionThreadLocal.push(injectedFields);
@@ -774,17 +767,14 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
     // visit all system buttons and attach observer
     m_systemButtonListener = new P_SystemButtonListener();// is auto-detaching
-    IFormFieldVisitor v2 = new IFormFieldVisitor() {
-      @Override
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
-        if (field instanceof IButton) {
-          final IButton button = (IButton) field;
-          if (button.getSystemType() != IButton.SYSTEM_TYPE_NONE) {
-            button.addButtonListener(m_systemButtonListener);
-          }
+    IFormFieldVisitor v2 = (field, level, fieldIndex) -> {
+      if (field instanceof IButton) {
+        final IButton button = (IButton) field;
+        if (button.getSystemType() != IButton.SYSTEM_TYPE_NONE) {
+          button.addButtonListener(m_systemButtonListener);
         }
-        return true;
       }
+      return true;
     };
     visitFields(v2);
     getRootGroupBox().addPropertyChangeListener(new P_MainBoxPropertyChangeProxy());
@@ -981,12 +971,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    */
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
-      m_internalDataChangeListener = new WeakDataChangeListener() {
-        @Override
-        public void dataChanged(Object... innerDataTypes) {
-          interceptDataChanged(innerDataTypes);
-        }
-      };
+      m_internalDataChangeListener = (WeakDataChangeListener) this::interceptDataChanged;
     }
     getDesktop().addDataChangeListener(m_internalDataChangeListener, dataTypes);
   }
@@ -1031,61 +1016,57 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * This method is called from the implemented handler methods in a explicit form subclass
    */
   protected IForm startInternal(final IFormHandler handler) {
-    ClientRunContexts.copyCurrent().withForm(this).run(new IRunnable() {
+    ClientRunContexts.copyCurrent().withForm(this).run(() -> {
+      if (isBlockingInternal()) {
+        throw new IllegalStateException("The form " + getFormId() + " has already been started");
+      }
+      // Ensure that boolean is set not only once by the constructor
+      setFormLoading(true);
+      setHandler(handler);
+      m_closeType = IButton.SYSTEM_TYPE_NONE;
+      m_blockingCondition.setBlocking(true);
+      try {
+        initForm();
+        loadStateInternal();
 
-      @Override
-      public void run() throws Exception {
-        if (isBlockingInternal()) {
-          throw new IllegalStateException("The form " + getFormId() + " has already been started");
+        // if form was disposed during initForm() or loadStateInternal()
+        if (!isBlockingInternal()) {
+          return;
         }
-        // Ensure that boolean is set not only once by the constructor
-        setFormLoading(true);
-        setHandler(handler);
-        m_closeType = IButton.SYSTEM_TYPE_NONE;
-        m_blockingCondition.setBlocking(true);
-        try {
-          initForm();
-          loadStateInternal();
 
-          // if form was disposed during initForm() or loadStateInternal()
-          if (!isBlockingInternal()) {
-            return;
-          }
-
-          if (getHandler().isGuiLess()) {
-            // make sure the form is storing since it is not showing
-            storeStateInternal();
-            markSaved();
-            doFinally();
-            disposeFormInternal();
-            return;
-          }
-        }
-        catch (RuntimeException | PlatformError e) {
+        if (getHandler().isGuiLess()) {
+          // make sure the form is storing since it is not showing
+          storeStateInternal();
+          markSaved();
+          doFinally();
           disposeFormInternal();
-
-          PlatformException pe = BEANS.get(PlatformExceptionTranslator.class).translate(e)
-              .withContextInfo("form", AbstractForm.this.getClass().getName());
-          if (pe instanceof VetoException) {
-            VetoException ve = (VetoException) pe;
-            interceptOnVetoException(ve, ve.getStatus().getCode());
-          }
-          throw pe;
+          return;
         }
+      }
+      catch (RuntimeException | PlatformError e) {
+        disposeFormInternal();
 
-        setButtonsArmed(true);
-        setCloseTimerArmed(true);
-        setFormStarted(true);
+        PlatformException pe = BEANS.get(PlatformExceptionTranslator.class).translate(e)
+            .withContextInfo("form", AbstractForm.this.getClass().getName());
+        if (pe instanceof VetoException) {
+          VetoException ve = (VetoException) pe;
+          interceptOnVetoException(ve, ve.getStatus().getCode());
+        }
+        throw pe;
+      }
 
-        // Notify the UI to display this form.
-        if (isShowOnStart()) {
-          IDesktop desktop = getDesktop();
-          if (desktop == null || !desktop.isOpened()) {
-            throw new ProcessingException("There is no desktop or it is not open in the UI.");
-          }
-          else {
-            desktop.showForm(AbstractForm.this);
-          }
+      setButtonsArmed(true);
+      setCloseTimerArmed(true);
+      setFormStarted(true);
+
+      // Notify the UI to display this form.
+      if (isShowOnStart()) {
+        IDesktop desktop = getDesktop();
+        if (desktop == null || !desktop.isOpened()) {
+          throw new ProcessingException("There is no desktop or it is not open in the UI.");
+        }
+        else {
+          desktop.showForm(AbstractForm.this);
         }
       }
     });
@@ -1168,12 +1149,12 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     BeanUtility.setProperties(target, properties, false, null);
     // properties in extensions of form
     exportExtensionProperties(this, target);
-    final Set<IFormField> exportedFields = new HashSet<IFormField>();
+    final Set<IFormField> exportedFields = new HashSet<>();
 
     // all fields
     Map<Integer, Map<String/* qualified field id */, AbstractFormFieldData>> breadthFirstMap = target.getAllFieldsRec();
     for (Map<String/* qualified field id */, AbstractFormFieldData> targetMap : breadthFirstMap.values()) {
-      for (Map.Entry<String, AbstractFormFieldData> e : targetMap.entrySet()) {
+      for (Entry<String, AbstractFormFieldData> e : targetMap.entrySet()) {
         String fieldQId = e.getKey();
         AbstractFormFieldData data = e.getValue();
 
@@ -1201,39 +1182,36 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     // visit remaining fields (there could be an extension with properties e.g. on a groupbox)
     final Holder<RuntimeException> exHolder = new Holder<>(RuntimeException.class);
     final Holder<PlatformError> errorHolder = new Holder<>(PlatformError.class);
-    visitFields(new IFormFieldVisitor() {
-      @Override
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
-        if (exportedFields.contains(field)) {
-          // already exported -> skip
-          return true;
-        }
-
-        final IForm formOfField = field.getForm();
-        if (formOfField == null) {
-          // either form has not been initialized or the field is part of a composite field, that does not override setForminternal -> skip
-          LOG.info("Extension properties are not exported for fields on which getForm() returns null. "
-              + "Ensure that the form is initialized and that the field's parent invokes field.setFormInternal(IForm) [exportingForm={}, field={}]",
-              AbstractForm.this.getClass().getName(), field.getClass().getName());
-          return true;
-        }
-        if (formOfField != AbstractForm.this) {
-          // field belongs to another form -> skip
-          return true;
-        }
-
-        try {
-          exportExtensionProperties(field, target);
-        }
-        catch (RuntimeException e) {
-          exHolder.setValue(e);
-        }
-        catch (PlatformError e) {
-          errorHolder.setValue(e);
-        }
-
-        return exHolder.getValue() == null && errorHolder.getValue() == null;
+    visitFields((field, level, fieldIndex) -> {
+      if (exportedFields.contains(field)) {
+        // already exported -> skip
+        return true;
       }
+
+      final IForm formOfField = field.getForm();
+      if (formOfField == null) {
+        // either form has not been initialized or the field is part of a composite field, that does not override setForminternal -> skip
+        LOG.info("Extension properties are not exported for fields on which getForm() returns null. "
+            + "Ensure that the form is initialized and that the field's parent invokes field.setFormInternal(IForm) [exportingForm={}, field={}]",
+            AbstractForm.this.getClass().getName(), field.getClass().getName());
+        return true;
+      }
+      if (formOfField != AbstractForm.this) {
+        // field belongs to another form -> skip
+        return true;
+      }
+
+      try {
+        exportExtensionProperties(field, target);
+      }
+      catch (RuntimeException e) {
+        exHolder.setValue(e);
+      }
+      catch (PlatformError e) {
+        errorHolder.setValue(e);
+      }
+
+      return exHolder.getValue() == null && errorHolder.getValue() == null;
     });
     if (exHolder.getValue() != null) {
       throw exHolder.getValue();
@@ -1327,13 +1305,10 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
 
     // search for the extension in the children
-    final IHolder<Object> result = new Holder<Object>(Object.class);
-    IFormFieldVisitor visitor = new IFormFieldVisitor() {
-      @Override
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
-        result.setValue(getClientPartOfExtensionOrContribution(extToSearch, field));
-        return result.getValue() == null;
-      }
+    final IHolder<Object> result = new Holder<>(Object.class);
+    IFormFieldVisitor visitor = (field, level, fieldIndex) -> {
+      result.setValue(getClientPartOfExtensionOrContribution(extToSearch, field));
+      return result.getValue() == null;
     };
     if (owner instanceof IForm) {
       ((IForm) owner).visitFields(visitor);
@@ -1362,14 +1337,14 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     importProperties(source, this, AbstractFormData.class, filter);
 
     // sort fields, first non-slave fields, then slave fields in transitive order
-    LinkedList<IFormField> masterList = new LinkedList<IFormField>();
-    LinkedList<IFormField> slaveList = new LinkedList<IFormField>();
-    HashMap<IFormField, AbstractFormFieldData> dataMap = new HashMap<IFormField, AbstractFormFieldData>();
+    Deque<IFormField> masterList = new LinkedList<>();
+    LinkedList<IFormField> slaveList = new LinkedList<>();
+    Map<IFormField, AbstractFormFieldData> dataMap = new HashMap<>();
 
     // collect fields and split them into masters/slaves
     Map<Integer, Map<String/* qualified field id */, AbstractFormFieldData>> breadthFirstMap = source.getAllFieldsRec();
     for (Map<String/* qualified field id */, AbstractFormFieldData> sourceMap : breadthFirstMap.values()) {
-      for (Map.Entry<String, AbstractFormFieldData> e : sourceMap.entrySet()) {
+      for (Entry<String, AbstractFormFieldData> e : sourceMap.entrySet()) {
         String fieldQId = e.getKey();
         AbstractFormFieldData data = e.getValue();
         FindFieldByFormDataIdVisitor v = new FindFieldByFormDataIdVisitor(fieldQId, this);
@@ -1839,8 +1814,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       throw veto;
     }
     // check all fields that might be invalid
-    final ArrayList<String> invalidTexts = new ArrayList<String>();
-    final ArrayList<String> mandatoryTexts = new ArrayList<String>();
+    final List<String> invalidTexts = new ArrayList<>();
+    final List<String> mandatoryTexts = new ArrayList<>();
     P_AbstractCollectingFieldVisitor<IValidateContentDescriptor> v = new P_AbstractCollectingFieldVisitor<IValidateContentDescriptor>() {
       @Override
       public boolean visitField(IFormField f, int level, int fieldIndex) {
@@ -1885,7 +1860,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   protected IHtmlContent createValidationMessageBoxHtml(final List<String> invalidTexts, final List<String> mandatoryTexts) {
     List<CharSequence> content = new ArrayList<>();
 
-    if (mandatoryTexts.size() > 0) {
+    if (!mandatoryTexts.isEmpty()) {
       content.add(HTML.bold(TEXTS.get("FormEmptyMandatoryFieldsMessage")));
 
       List<IHtmlListElement> mandatoryTextElements = new ArrayList<>();
@@ -1895,7 +1870,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       content.add(HTML.ul(mandatoryTextElements));
       content.add(HTML.br());
     }
-    if (invalidTexts.size() > 0) {
+    if (!invalidTexts.isEmpty()) {
       content.add(HTML.bold(TEXTS.get("FormInvalidFieldsMessage")));
 
       List<IHtmlListElement> invalidTextElements = new ArrayList<>();
@@ -2196,20 +2171,15 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     if (isBlockingInternal()) {
       try {
         // check if there is an active close, cancel or finish button
-        final Set<Integer> enabledSystemTypes = new HashSet<Integer>();
-        final Set<IButton> enabledSystemButtons = new HashSet<IButton>();
-        IFormFieldVisitor v = new IFormFieldVisitor() {
-          @Override
-          public boolean visitField(IFormField field, int level, int fieldIndex) {
-            if (field instanceof IButton) {
-              IButton b = (IButton) field;
-              if (b.isEnabled() && b.isVisible()) {
-                enabledSystemTypes.add(b.getSystemType());
-                enabledSystemButtons.add(b);
-              }
+        final Set<Integer> enabledSystemTypes = new HashSet<>();
+        IFormFieldVisitor v = (field, level, fieldIndex) -> {
+          if (field instanceof IButton) {
+            IButton b = (IButton) field;
+            if (b.isEnabled() && b.isVisible()) {
+              enabledSystemTypes.add(b.getSystemType());
             }
-            return true;
           }
+          return true;
         };
         visitFields(v);
         interceptOnCloseRequest(kill, enabledSystemTypes);
@@ -2369,20 +2339,17 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     // add custom properties
     Element xProps = root.getOwnerDocument().createElement("properties");
     root.appendChild(xProps);
-    IPropertyFilter filter = new IPropertyFilter() {
-      @Override
-      public boolean accept(FastPropertyDescriptor descriptor) {
-        if (descriptor.getPropertyType().isInstance(IFormField.class)) {
-          return false;
-        }
-        if (!descriptor.getPropertyType().isPrimitive() && !Serializable.class.isAssignableFrom(descriptor.getPropertyType())) {
-          return false;
-        }
-        if (descriptor.getReadMethod() == null || descriptor.getWriteMethod() == null) {
-          return false;
-        }
-        return true;
+    IPropertyFilter filter = descriptor -> {
+      if (descriptor.getPropertyType().isInstance(IFormField.class)) {
+        return false;
       }
+      if (!descriptor.getPropertyType().isPrimitive() && !Serializable.class.isAssignableFrom(descriptor.getPropertyType())) {
+        return false;
+      }
+      if (descriptor.getReadMethod() == null || descriptor.getWriteMethod() == null) {
+        return false;
+      }
+      return true;
     };
     Map<String, Object> props = BeanUtility.getProperties(this, AbstractForm.class, filter);
     storePropertiesToXml(xProps, props);
@@ -2485,7 +2452,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     Element xFields = XmlUtility.getFirstChildElement(root, "fields");
     if (xFields != null) {
       for (Element xField : XmlUtility.getChildElements(xFields, "field")) {
-        List<String> xmlFieldIds = new LinkedList<String>();
+        List<String> xmlFieldIds = new LinkedList<>();
         // add enclosing field path to xml field IDs
         for (Element element : XmlUtility.getChildElements(xField, "enclosingField")) {
           xmlFieldIds.add(element.getAttribute("fieldId"));
@@ -2501,23 +2468,20 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
     // in all tabboxes select the first tab that contains data, iff the current
     // tab has no values set
-    getRootGroupBox().visitFields(new IFormFieldVisitor() {
-      @Override
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
-        if (field instanceof ITabBox) {
-          ITabBox tabBox = (ITabBox) field;
-          IGroupBox selbox = tabBox.getSelectedTab();
-          if (selbox == null || !selbox.isSaveNeeded()) {
-            for (IGroupBox g : tabBox.getGroupBoxes()) {
-              if (g.isSaveNeeded()) {
-                tabBox.setSelectedTab(g);
-                break;
-              }
+    getRootGroupBox().visitFields((field, level, fieldIndex) -> {
+      if (field instanceof ITabBox) {
+        ITabBox tabBox = (ITabBox) field;
+        IGroupBox selbox = tabBox.getSelectedTab();
+        if (selbox == null || !selbox.isSaveNeeded()) {
+          for (IGroupBox g : tabBox.getGroupBoxes()) {
+            if (g.isSaveNeeded()) {
+              tabBox.setSelectedTab(g);
+              break;
             }
           }
         }
-        return true;
       }
+      return true;
     });
   }
 
@@ -2547,7 +2511,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * @see #storePropertiesToXml(Element, Map)
    */
   protected Map<String, Object> loadPropertiesFromXml(Element xProps) {
-    Map<String, Object> props = new HashMap<String, Object>();
+    Map<String, Object> props = new HashMap<>();
     for (Element xProp : XmlUtility.getChildElements(xProps, "property")) {
       String name = xProp.getAttribute("name");
       try {
@@ -2630,7 +2594,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       return;
     }
     if (m_fieldReplacements == null) {
-      m_fieldReplacements = new HashMap<Class<?>, Class<? extends IFormField>>();
+      m_fieldReplacements = new HashMap<>();
     }
     m_fieldReplacements.putAll(replacements);
   }
@@ -2718,9 +2682,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     EventListener[] listeners = m_listenerList.getListeners(FormListener.class);
     if (listeners != null && listeners.length > 0) {
       RuntimeException pe = null;
-      for (int i = 0; i < listeners.length; i++) {
+      for (EventListener listener : listeners) {
         try {
-          ((FormListener) listeners[i]).formChanged(e);
+          ((FormListener) listener).formChanged(e);
         }
         catch (RuntimeException ex) {
           if (pe == null) {
@@ -3061,13 +3025,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   protected IDisplayParent resolveDisplayParent() {
-    return m_initialClientRunContext.call(new Callable<IDisplayParent>() {
-
-      @Override
-      public IDisplayParent call() throws Exception {
-        return BEANS.get(DisplayParentResolver.class).resolve(AbstractForm.this);
-      }
-    });
+    return m_initialClientRunContext.call(() -> BEANS.get(DisplayParentResolver.class).resolve(AbstractForm.this));
   }
 
   /**
@@ -3162,7 +3120,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   private abstract static class P_AbstractCollectingFieldVisitor<T> implements IFormFieldVisitor {
-    private final ArrayList<T> m_list = new ArrayList<T>();
+    private final List<T> m_list = new ArrayList<>();
 
     public void collect(T o) {
       m_list.add(o);

@@ -17,7 +17,7 @@ public class ValueInputToken implements IToken {
   /**
    * sql text
    */
-  private String m_parsedToken;
+  private final String m_parsedToken;
   /**
    * optional: the op left to the token
    */
@@ -121,7 +121,7 @@ public class ValueInputToken implements IToken {
   @Override
   public String toString() {
     StringBuilder b = new StringBuilder();
-    b.append(getClass().getSimpleName() + "[");
+    b.append(getClass().getSimpleName()).append("[");
     b.append("parsed '");
     if (getParsedAttribute() != null) {
       b.append(getParsedAttribute());

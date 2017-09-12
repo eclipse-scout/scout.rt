@@ -65,26 +65,16 @@ public class AutoAcknowledgeSubscriptionStrategy implements ISubscriptionStrateg
 
       @Override
       public void onJmsMessage(final Message jmsMessage) throws Exception {
-        final IRunnable runnable = new IRunnable() {
+        final IRunnable runnable = () -> {
+          final JmsMessageReader<DTO> messageReader = JmsMessageReader.newInstance(jmsMessage, marshaller);
+          final IMessage<DTO> message = messageReader.readMessage();
 
-          @Override
-          public void run() throws Exception {
-            final JmsMessageReader<DTO> messageReader = JmsMessageReader.newInstance(jmsMessage, marshaller);
-            final IMessage<DTO> message = messageReader.readMessage();
-
-            runContext.copy()
-                .withCorrelationId(messageReader.readCorrelationId())
-                .withThreadLocal(IMessage.CURRENT, message)
-                .withTransactionScope(TransactionScope.REQUIRES_NEW)
-                .withDiagnostics(BEANS.all(IJmsRunContextDiagnostics.class))
-                .run(new IRunnable() {
-
-                  @Override
-                  public void run() throws Exception {
-                    handleMessage(listener, message);
-                  }
-                });
-          }
+          runContext.copy()
+              .withCorrelationId(messageReader.readCorrelationId())
+              .withThreadLocal(IMessage.CURRENT, message)
+              .withTransactionScope(TransactionScope.REQUIRES_NEW)
+              .withDiagnostics(BEANS.all(IJmsRunContextDiagnostics.class))
+              .run(() -> handleMessage(listener, message));
         };
 
         if (m_singleThreaded) {

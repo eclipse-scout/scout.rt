@@ -76,7 +76,7 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
         // Build string for HTML "sandbox" attribute
         StringBuilder sb = new StringBuilder();
         for (SandboxPermission sandboxValue : sandbox) {
-          sb.append(sandboxValue.getAttribute() + " ");
+          sb.append(sandboxValue.getAttribute()).append(" ");
         }
         sb.deleteCharAt(sb.length() - 1); // delete last space
         return sb.toString();

@@ -14,8 +14,7 @@ package org.eclipse.scout.rt.platform.util.concurrent;
  * Indicates that a thread was interrupted while waiting for some condition to become <code>true</code>, e.g. while
  * waiting for a job to complete.
  * <p>
- * Unlike {@link java.lang.InterruptedException}, the thread's interrupted status is not cleared when catching this
- * error.
+ * Unlike {@link InterruptedException}, the thread's interrupted status is not cleared when catching this error.
  *
  * @since 5.2
  */

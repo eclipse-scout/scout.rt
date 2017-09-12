@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
+@FunctionalInterface
 public interface IFileChooserUIFacade {
 
   void setResultFromUI(List<BinaryResource> files);

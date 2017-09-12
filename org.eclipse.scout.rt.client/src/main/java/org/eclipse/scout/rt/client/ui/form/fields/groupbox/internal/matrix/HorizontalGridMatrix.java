@@ -27,8 +27,8 @@ public class HorizontalGridMatrix implements IGridMatrix {
 
   private final int m_columnCount;
   private int m_rowCount;
-  private MatrixCursor m_cursor;
-  private final Map<MatrixIndex, Cell> m_assignedCells = new HashMap<MatrixIndex, Cell>();
+  private final MatrixCursor m_cursor;
+  private final Map<MatrixIndex, Cell> m_assignedCells = new HashMap<>();
 
   public HorizontalGridMatrix(int columnCount) {
     m_columnCount = columnCount;

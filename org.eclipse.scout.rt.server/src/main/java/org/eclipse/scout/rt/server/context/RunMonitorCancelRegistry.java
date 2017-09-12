@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.server.context;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -90,13 +89,9 @@ public class RunMonitorCancelRegistry {
       m_registry.add(entry);
     }
 
-    return new IRegistrationHandle() {
-
-      @Override
-      public void unregister() {
-        synchronized (m_registryLock) {
-          m_registry.remove(entry);
-        }
+    return () -> {
+      synchronized (m_registryLock) {
+        m_registry.remove(entry);
       }
     };
   }
@@ -131,12 +126,7 @@ public class RunMonitorCancelRegistry {
     final RunMonitor currentRunMonitor = RunMonitor.CURRENT.get();
     synchronized (m_registryLock) {
       registryEntries = m_sessionIdIndex.get(sessionId);
-      for (Iterator<RegistryEntry> it = registryEntries.iterator(); it.hasNext();) {
-        RegistryEntry next = it.next();
-        if (next.getRunMonitor() == currentRunMonitor) {
-          it.remove();
-        }
-      }
+      registryEntries.removeIf(next -> next.getRunMonitor() == currentRunMonitor);
       m_registry.remove(registryEntries);
     }
 
@@ -213,6 +203,7 @@ public class RunMonitorCancelRegistry {
   /**
    * A token representing the registration of a monitor. This token can later be used to unregister the monitor.
    */
+  @FunctionalInterface
   public interface IRegistrationHandle {
 
     /**

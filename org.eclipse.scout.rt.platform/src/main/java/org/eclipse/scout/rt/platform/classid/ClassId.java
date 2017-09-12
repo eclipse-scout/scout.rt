@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.platform.annotations.DtoRelevant;
  * another place in the inner class hierarchy.
  * <p>
  * 
- * @see org.eclipse.scout.rt.platform.classid.ITypeWithClassId
+ * @see ITypeWithClassId
  */
 @DtoRelevant
 @Target(ElementType.TYPE)

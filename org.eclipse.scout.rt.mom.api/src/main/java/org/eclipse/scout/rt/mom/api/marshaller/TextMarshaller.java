@@ -27,7 +27,7 @@ public class TextMarshaller implements IMarshaller {
 
   @Override
   public Object unmarshall(final Object data, final Map<String, String> context) {
-    return (String) data;
+    return data;
   }
 
   @Override

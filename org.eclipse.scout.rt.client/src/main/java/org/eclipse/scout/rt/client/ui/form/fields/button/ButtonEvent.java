@@ -51,7 +51,7 @@ public class ButtonEvent extends EventObject implements IModelEvent {
       return;
     }
     if (m_popupMenuList == null) {
-      m_popupMenuList = new ArrayList<IMenu>(menus.size());
+      m_popupMenuList = new ArrayList<>(menus.size());
     }
     m_popupMenuList.addAll(menus);
   }
@@ -61,7 +61,7 @@ public class ButtonEvent extends EventObject implements IModelEvent {
       return;
     }
     if (m_popupMenuList == null) {
-      m_popupMenuList = new ArrayList<IMenu>();
+      m_popupMenuList = new ArrayList<>();
     }
     m_popupMenuList.add(menu);
   }

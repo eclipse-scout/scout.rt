@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.html.json.form.fields;
 import java.beans.PropertyChangeEvent;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -198,7 +197,7 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
     putJsonProperty(new JsonAdapterProperty<FORM_FIELD>(IFormField.PROP_KEY_STROKES, model, getUiSession()) {
       @Override
       protected JsonAdapterPropertyConfig createConfig() {
-        return new JsonAdapterPropertyConfigBuilder().filter(new DisplayableActionFilter<IAction>()).build();
+        return new JsonAdapterPropertyConfigBuilder().filter(new DisplayableActionFilter<>()).build();
       }
 
       @Override

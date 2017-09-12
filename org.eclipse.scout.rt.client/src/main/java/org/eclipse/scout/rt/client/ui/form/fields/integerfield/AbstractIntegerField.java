@@ -71,7 +71,7 @@ public abstract class AbstractIntegerField extends AbstractNumberField<Integer> 
     Integer retVal = null;
     BigDecimal parsedVal = parseToBigDecimalInternal(text);
     if (parsedVal != null) {
-      retVal = Integer.valueOf(parsedVal.intValueExact());
+      retVal = parsedVal.intValueExact();
     }
     return retVal;
   }
@@ -85,7 +85,7 @@ public abstract class AbstractIntegerField extends AbstractNumberField<Integer> 
 
   @Override
   protected IIntegerFieldExtension<? extends AbstractIntegerField> createLocalExtension() {
-    return new LocalIntegerFieldExtension<AbstractIntegerField>(this);
+    return new LocalIntegerFieldExtension<>(this);
   }
 
 }

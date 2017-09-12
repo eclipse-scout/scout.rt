@@ -43,13 +43,7 @@ public class DiagnosticContextValueProcessor implements ICallableDecorator {
     putOrRemoveMdcValue(m_mdcKey, m_mdcValueProvider.value());
 
     // Restore origin value upon completion of the command.
-    return new IUndecorator() {
-
-      @Override
-      public void undecorate() {
-        putOrRemoveMdcValue(m_mdcKey, originValue);
-      }
-    };
+    return () -> putOrRemoveMdcValue(m_mdcKey, originValue);
   }
 
   public String getMdcKey() {

@@ -13,7 +13,7 @@ public class BenchColumnData extends FlexboxLayoutData {
   public static final int NORTH = 0;
   public static final int CENTER = 1;
   public static final int SOUTH = 2;
-  private FlexboxLayoutData[] m_rows = {
+  private final FlexboxLayoutData[] m_rows = {
       new FlexboxLayoutData(),
       new FlexboxLayoutData(),
       new FlexboxLayoutData()
@@ -99,7 +99,7 @@ public class BenchColumnData extends FlexboxLayoutData {
 
   @Override
   public BenchColumnData copy() {
-    return (BenchColumnData) copyValues(new BenchColumnData());
+    return copyValues(new BenchColumnData());
   }
 
   @Override

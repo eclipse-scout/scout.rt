@@ -72,7 +72,7 @@ public abstract class AbstractDataModel implements IDataModel, Serializable, ICo
 
     List<IDataModelAttribute> contributedAttributes = m_contributionHolder.getContributionsByClass(IDataModelAttribute.class);
 
-    OrderedCollection<IDataModelAttribute> attributes = new OrderedCollection<IDataModelAttribute>();
+    OrderedCollection<IDataModelAttribute> attributes = new OrderedCollection<>();
     for (Class<? extends IDataModelAttribute> attributeClazz : filtered) {
       IDataModelAttribute a = ConfigurationUtility.newInnerInstance(holder, attributeClazz);
       attributes.addOrdered(a);
@@ -87,7 +87,7 @@ public abstract class AbstractDataModel implements IDataModel, Serializable, ICo
     List<Class<IDataModelEntity>> filtered = ConfigurationUtility.filterClasses(all, IDataModelEntity.class);
     List<IDataModelEntity> contributedEntities = m_contributionHolder.getContributionsByClass(IDataModelEntity.class);
 
-    OrderedCollection<IDataModelEntity> entities = new OrderedCollection<IDataModelEntity>();
+    OrderedCollection<IDataModelEntity> entities = new OrderedCollection<>();
     for (Class<? extends IDataModelEntity> dataModelEntityClazz : filtered) {
       entities.addOrdered(ConfigurationUtility.newInnerInstance(holder, dataModelEntityClazz));
     }
@@ -118,7 +118,7 @@ public abstract class AbstractDataModel implements IDataModel, Serializable, ICo
     }
     // entities
     m_entities = createEntities();
-    Map<Class<? extends IDataModelEntity>, IDataModelEntity> instanceMap = new HashMap<Class<? extends IDataModelEntity>, IDataModelEntity>(m_entities.size());
+    Map<Class<? extends IDataModelEntity>, IDataModelEntity> instanceMap = new HashMap<>(m_entities.size());
     for (IDataModelEntity e : m_entities) {
       if (e instanceof AbstractDataModelEntity) {
         ((AbstractDataModelEntity) e).setParentEntity(null);

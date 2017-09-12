@@ -10,12 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
-import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
@@ -103,36 +99,30 @@ public abstract class AbstractOutlineButton extends AbstractButton {
       setSelected(desktop.getOutline() == m_outline);
       // add selection listener
       desktop.addDesktopListener(
-          new DesktopListener() {
-            @Override
-            public void desktopChanged(DesktopEvent e) {
-              switch (e.getType()) {
-                case DesktopEvent.TYPE_OUTLINE_CHANGED: {
-                  setSelected(e.getOutline() == m_outline);
-                  break;
-                }
+          e -> {
+            switch (e.getType()) {
+              case DesktopEvent.TYPE_OUTLINE_CHANGED: {
+                setSelected(e.getOutline() == m_outline);
+                break;
               }
             }
           });
       // add change listener
       m_outline.addPropertyChangeListener(
-          new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent e) {
-              String n = e.getPropertyName();
-              Object v = e.getNewValue();
-              if (n.equals(IOutline.PROP_VISIBLE)) {
-                setVisible((Boolean) v);
-              }
-              else if (n.equals(IOutline.PROP_ENABLED)) {
-                setEnabled((Boolean) v, true, false);
-              }
-              else if (n.equals(IOutline.PROP_TITLE)) {
-                setLabel((String) v);
-              }
-              else if (n.equals(IOutline.PROP_DEFAULT_ICON_ID)) {
-                setIconId((String) v);
-              }
+          e -> {
+            String n = e.getPropertyName();
+            Object v = e.getNewValue();
+            if (n.equals(IOutline.PROP_VISIBLE)) {
+              setVisible((Boolean) v);
+            }
+            else if (n.equals(IOutline.PROP_ENABLED)) {
+              setEnabled((Boolean) v, true, false);
+            }
+            else if (n.equals(IOutline.PROP_TITLE)) {
+              setLabel((String) v);
+            }
+            else if (n.equals(IOutline.PROP_DEFAULT_ICON_ID)) {
+              setIconId((String) v);
             }
           });
     }

@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -42,12 +41,16 @@ import org.w3c.dom.Element;
  *   <!--1st april only in 2005-->
  *   <holiday date="01.04.2006" color="RRGGBB" text_de="..." tooltip_de="..." text_en="..." tooltip_en="..."/>
  *   <!--every 3rd monday in april-->
- *   <holiday date="01.04.0000" weekday="Monday" instance="3" color="RRGGBB" text_de="..." tooltip_de="..." text_en="..." tooltip_en="..."/>
+ *   <holiday date="01.04.0000" weekday="Monday" instance="3" color="RRGGBB" text_de="..." tooltip_de="..." text_en=
+"..." tooltip_en="..."/>
  *   <!--every last monday in april-->
- *   <holiday date="01.04.0000" weekday="Monday" instance="last" color="RRGGBB" text_de="..." tooltip_de="..." text_en="..." tooltip_en="..."/>
+ *   <holiday date="01.04.0000" weekday="Monday" instance="last" color="RRGGBB" text_de="..." tooltip_de="..." text_en=
+"..." tooltip_en="..."/>
  *   <!--second sunday after easter-->
- *   <holiday id="easter" date="01.04.0000" weekday="Sunday" instance="2" color="RRGGBB" text_de="Easter" tooltip_de="..." text_en="..." tooltip_en="..."/>
- *   <holiday id="pfingsten" relativeTo="easter" weekday="Sunday" instance="2" color="RRGGBB" text_de="..." tooltip_de="..." text_en="..." tooltip_en="..."/>
+ *   <holiday id="easter" date="01.04.0000" weekday="Sunday" instance="2" color="RRGGBB" text_de="Easter" tooltip_de=
+"..." text_en="..." tooltip_en="..."/>
+ *   <holiday id="pfingsten" relativeTo="easter" weekday="Sunday" instance="2" color="RRGGBB" text_de="..." tooltip_de=
+"..." text_en="..." tooltip_en="..."/>
  * </holidays>
  * }
  * </pre>
@@ -64,7 +67,7 @@ public class HolidayCalendarItemParser {
   private static final String ID = "id";
   private static final String RELATIVE_TO = "relativeTo";
 
-  private SimpleDateFormat m_dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+  private final SimpleDateFormat m_dateFormat = new SimpleDateFormat("dd.MM.yyyy");
   private final Element m_xml;
 
   public HolidayCalendarItemParser(URL xmlResource) {
@@ -76,7 +79,7 @@ public class HolidayCalendarItemParser {
   }
 
   public Set<? extends ICalendarItem> getItems(Locale loc, Date minDate, Date maxDate) {
-    Set<HolidayItem> itemList = new HashSet<HolidayItem>();
+    Set<HolidayItem> itemList = new HashSet<>();
     int startYear, endYear;
     Calendar cal = Calendar.getInstance();
     cal.setTime(minDate);
@@ -88,20 +91,14 @@ public class HolidayCalendarItemParser {
       addHolidays(loc, year, itemList);
     }
     // remove all the holidays lying before minDate or after maxDate
-    Iterator<HolidayItem> iter = itemList.iterator();
-    while (iter.hasNext()) {
-      HolidayItem item = iter.next();
-      if (minDate.after(item.getStart()) || maxDate.before(item.getStart())) {
-        iter.remove();
-      }
-    }
+    itemList.removeIf(item -> minDate.after(item.getStart()) || maxDate.before(item.getStart()));
     return itemList;
   }
 
   private void addHolidays(Locale loc, int year, Collection<HolidayItem> newList) {
-    HashMap<String/* id */, HolidayItem> holidayMap = new HashMap<String, HolidayItem>();
+    Map<String/* id */, HolidayItem> holidayMap = new HashMap<>();
     // prepare locale patterns
-    String[] locPatterns = new String[]{
+    String[] locPatterns = {
         loc.getCountry() + "_" + loc.getLanguage() + "_" + loc.getVariant(),
         loc.getCountry() + "_" + loc.getLanguage(),
         loc.getLanguage(),
@@ -255,8 +252,8 @@ public class HolidayCalendarItemParser {
   }
 
   private String getAttributeByLocale(Element e, String[] locPatterns, String attributeNamePrefix) {
-    for (int i = 0; i < locPatterns.length; i++) {
-      String attribName = attributeNamePrefix + "_" + locPatterns[i];
+    for (String locPattern : locPatterns) {
+      String attribName = attributeNamePrefix + "_" + locPattern;
       if (e.hasAttribute(attribName)) {
         String s = e.getAttribute(attribName);
         if (s != null) {

@@ -111,7 +111,7 @@ public class ClassIdentifier implements Serializable {
     if (classes == null || classes.length == 0) {
       return new ClassIdentifier[0];
     }
-    ArrayList<ClassIdentifier> result = new ArrayList<ClassIdentifier>();
+    ArrayList<ClassIdentifier> result = new ArrayList<>();
     for (Class<?> c : classes) {
       if (c != null) {
         result.add(new ClassIdentifier(c));

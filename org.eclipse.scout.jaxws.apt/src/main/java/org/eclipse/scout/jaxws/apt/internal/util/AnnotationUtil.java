@@ -30,6 +30,7 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Clazz;
+import org.eclipse.scout.rt.server.jaxws.provider.annotation.Clazz.NullClazz;
 
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JClass;
@@ -66,7 +67,7 @@ public final class AnnotationUtil {
   }
 
   public static TypeElement getTypeElement(final AnnotationMirror annotationMirror, final String fieldName, final Elements elementUtils, final Types typeUtils) {
-    final AnnotationValue annotationValue = AnnotationUtil.getAnnotationValue(annotationMirror, fieldName, elementUtils);
+    final AnnotationValue annotationValue = getAnnotationValue(annotationMirror, fieldName, elementUtils);
     return (TypeElement) typeUtils.asElement((TypeMirror) annotationValue.getValue());
   }
 
@@ -81,7 +82,7 @@ public final class AnnotationUtil {
       for (final Entry<? extends ExecutableElement, ? extends AnnotationValue> _annotationParamEntry : _annotation.getElementValues().entrySet()) {
         final String paramName = _annotationParamEntry.getKey().getSimpleName().toString();
         final AnnotationValue _paramValue = _annotationParamEntry.getValue();
-        targetAnnotation.param(paramName, AnnotationUtil.createExpression(model, _paramValue));
+        targetAnnotation.param(paramName, createExpression(model, _paramValue));
       }
     }
   }
@@ -120,15 +121,15 @@ public final class AnnotationUtil {
       final P_AnnotationExpression refAnnotationExpression = new P_AnnotationExpression(refAnnotationClazz);
       for (final Entry<? extends ExecutableElement, ? extends AnnotationValue> _annotationParamEntry : _refAnnotation.getElementValues().entrySet()) {
         final String paramName = _annotationParamEntry.getKey().getSimpleName().toString();
-        refAnnotationExpression.param(paramName, AnnotationUtil.createExpression(model, _annotationParamEntry.getValue()));
+        refAnnotationExpression.param(paramName, createExpression(model, _annotationParamEntry.getValue()));
       }
       return refAnnotationExpression;
     }
     // Array member type.
     else if (_rawParamValue instanceof List<?>) {
       final List<JExpression> expressions = new ArrayList<>();
-      for (final Object _arrayElementValue : (List<?>) _rawParamValue) {
-        expressions.add(AnnotationUtil.createExpression(model, (AnnotationValue) _arrayElementValue));
+      for (final Object _arrayElementValue : (Iterable<?>) _rawParamValue) {
+        expressions.add(createExpression(model, (AnnotationValue) _arrayElementValue));
       }
       return new JExpressionImpl() {
 
@@ -177,14 +178,14 @@ public final class AnnotationUtil {
    */
   public static String resolveClass(final AnnotationMirror clazzAnnotationMirror, final ProcessingEnvironment env) {
     // 1. Try resolve by qualified name.
-    final String qualifiedName = (String) AnnotationUtil.getAnnotationValue(clazzAnnotationMirror, "qualifiedName", env.getElementUtils()).getValue();
+    final String qualifiedName = (String) getAnnotationValue(clazzAnnotationMirror, "qualifiedName", env.getElementUtils()).getValue();
     if (!qualifiedName.isEmpty()) {
       return qualifiedName;
     }
 
     // 2. Try resolve by class.
-    final TypeElement handlerClazz = AnnotationUtil.getTypeElement(clazzAnnotationMirror, "value", env.getElementUtils(), env.getTypeUtils());
-    if (!Clazz.NullClazz.class.getName().equals(handlerClazz.getQualifiedName().toString())) {
+    final TypeElement handlerClazz = getTypeElement(clazzAnnotationMirror, "value", env.getElementUtils(), env.getTypeUtils());
+    if (!NullClazz.class.getName().equals(handlerClazz.getQualifiedName().toString())) {
       return handlerClazz.getQualifiedName().toString();
     }
 

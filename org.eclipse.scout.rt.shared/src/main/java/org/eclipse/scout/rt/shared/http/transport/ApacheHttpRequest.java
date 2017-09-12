@@ -85,7 +85,7 @@ public class ApacheHttpRequest extends LowLevelHttpRequest {
         }
 
         @Override
-        public InputStream getContent() throws IOException {
+        public InputStream getContent() {
           throw new UnsupportedOperationException("Streaming entity cannot be represented as an input stream.");
         }
       };

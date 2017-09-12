@@ -56,7 +56,7 @@ public class EitherOrNode extends AbstractComposerNode {
 
   @Override
   protected void execInitTreeNode() {
-    List<IMenu> menus = new ArrayList<IMenu>();
+    List<IMenu> menus = new ArrayList<>();
     for (IMenu m : getMenus()) {
       if (m.getClass() == AddEntityOnEitherOrPlaceholderMenu.class) {
         attachAddEntityMenus(menus);

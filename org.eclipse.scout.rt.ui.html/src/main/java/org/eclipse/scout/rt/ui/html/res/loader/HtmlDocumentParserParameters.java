@@ -16,7 +16,7 @@ public class HtmlDocumentParserParameters {
   private final boolean m_cacheEnabled;
   private final String m_basePath;
   private final String m_theme;
-  private String m_htmlPath;
+  private final String m_htmlPath;
 
   public HtmlDocumentParserParameters(String htmlPath, String theme, boolean minify, boolean cacheEnabled, String basePath) {
     m_minify = minify;

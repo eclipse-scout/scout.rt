@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.lookup;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -26,7 +25,6 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +56,7 @@ import org.slf4j.LoggerFactory;
  * {@link LocalLookupCall#execCreateLookupRows()}
  */
 @ClassId("0f461d52-9712-494f-9748-8016e5f4ca5a")
-public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, Serializable, ITypeWithClassId {
+public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, ITypeWithClassId {
 
   private static final long serialVersionUID = 0L;
   private static final Logger LOG = LoggerFactory.getLogger(LookupCall.class);
@@ -332,13 +330,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
 
   @Override
   public IFuture<Void> getDataByKeyInBackground(final RunContext runContext, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
-    return loadDataInBackground(new IDataProvider<KEY_TYPE>() {
-
-      @Override
-      public List<? extends ILookupRow<KEY_TYPE>> provide() {
-        return getDataByKey();
-      }
-    }, runContext, callback);
+    return loadDataInBackground(this::getDataByKey, runContext, callback);
   }
 
   @Override
@@ -354,13 +346,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
 
   @Override
   public IFuture<Void> getDataByTextInBackground(final RunContext runContext, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
-    return loadDataInBackground(new IDataProvider<KEY_TYPE>() {
-
-      @Override
-      public List<? extends ILookupRow<KEY_TYPE>> provide() {
-        return getDataByText();
-      }
-    }, runContext, callback);
+    return loadDataInBackground(this::getDataByText, runContext, callback);
   }
 
   @Override
@@ -376,13 +362,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
 
   @Override
   public IFuture<Void> getDataByAllInBackground(final RunContext runContext, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
-    return loadDataInBackground(new IDataProvider<KEY_TYPE>() {
-
-      @Override
-      public List<? extends ILookupRow<KEY_TYPE>> provide() {
-        return getDataByAll();
-      }
-    }, runContext, callback);
+    return loadDataInBackground(this::getDataByAll, runContext, callback);
   }
 
   @Override
@@ -397,26 +377,14 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
 
   @Override
   public IFuture<Void> getDataByRecInBackground(final RunContext runContext, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
-    return loadDataInBackground(new IDataProvider<KEY_TYPE>() {
-
-      @Override
-      public List<? extends ILookupRow<KEY_TYPE>> provide() {
-        return getDataByRec();
-      }
-    }, runContext, callback);
+    return loadDataInBackground(this::getDataByRec, runContext, callback);
   }
 
   /**
    * Loads data asynchronously, and calls the specified callback once completed.
    */
   protected IFuture<Void> loadDataInBackground(final IDataProvider<KEY_TYPE> dataProvider, final RunContext runContext, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
-    return Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        loadData(dataProvider, callback);
-      }
-    }, Jobs.newInput()
+    return Jobs.schedule(() -> loadData(dataProvider, callback), Jobs.newInput()
         .withRunContext(runContext)
         .withName("Fetching lookup data [provider={}, lookupCall={}]", dataProvider.getClass().getName(), getClass().getName()));
   }
@@ -449,6 +417,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
     return builder.toString();
   }
 
+  @FunctionalInterface
   protected interface IDataProvider<KEY_TYPE> {
 
     /**

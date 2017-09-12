@@ -23,6 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -102,7 +103,6 @@ import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
@@ -165,7 +165,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private final List<Object> m_addOns;
   private IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractDesktop, org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> m_objectExtensions;
-  private List<ClientCallback<Coordinates>> m_pendingPositionResponses = Collections.synchronizedList(new ArrayList<ClientCallback<Coordinates>>());
+  private final List<ClientCallback<Coordinates>> m_pendingPositionResponses = Collections.synchronizedList(new ArrayList<ClientCallback<Coordinates>>());
   private int m_attachedGuis = 0;
 
   /**
@@ -182,7 +182,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_dataChangeListenerList = new HashMap<>();
     m_dataChangeEventBuffer = new ArrayList<>();
     m_formStore = BEANS.get(FormStore.class);
-    m_selectedViewTabs = new HashMap<String, IForm>();
+    m_selectedViewTabs = new HashMap<>();
     m_messageBoxStore = BEANS.get(MessageBoxStore.class);
     m_fileChooserStore = BEANS.get(FileChooserStore.class);
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent().withDesktop(this));
@@ -195,12 +195,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   protected final void callInitializer() {
     // Run the initialization on behalf of this Desktop.
-    ClientRunContexts.copyCurrent().withDesktop(this).run(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        interceptInitConfig();
-      }
-    });
+    ClientRunContexts.copyCurrent().withDesktop(this).run(this::interceptInitConfig);
   }
 
   protected IEventHistory<DesktopEvent> createEventHistory() {
@@ -561,7 +556,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   protected org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop> createLocalExtension() {
-    return new LocalDesktopExtension<AbstractDesktop>(this);
+    return new LocalDesktopExtension<>(this);
   }
 
   @Override
@@ -575,24 +570,16 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
-      @Override
-      public void run() {
-        initConfig();
-      }
-    });
+    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
   protected void initConfig() {
     m_eventHistory = createEventHistory();
     // add convenience observer for event history
-    addDesktopListener(new DesktopListener() {
-      @Override
-      public void desktopChanged(DesktopEvent e) {
-        IEventHistory<DesktopEvent> h = getEventHistory();
-        if (h != null) {
-          h.notifyEvent(e);
-        }
+    addDesktopListener(e -> {
+      IEventHistory<DesktopEvent> h = getEventHistory();
+      if (h != null) {
+        h.notifyEvent(e);
       }
     });
 
@@ -611,7 +598,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_contributionHolder = new ContributionComposite(this);
 
     // outlines
-    OrderedCollection<IOutline> outlines = new OrderedCollection<IOutline>();
+    OrderedCollection<IOutline> outlines = new OrderedCollection<>();
     for (IDesktopExtension ext : extensions) {
       try {
         ext.contributeOutlines(outlines);
@@ -628,7 +615,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     setAvailableOutlines(outlines.getOrderedList());
 
     // actions (keyStroke, menu, viewButton, toolButton)
-    List<IAction> actionList = new ArrayList<IAction>();
+    List<IAction> actionList = new ArrayList<>();
     for (IDesktopExtension ext : extensions) {
       try {
         ext.contributeActions(actionList);
@@ -645,12 +632,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     OrderedComparator orderedComparator = new OrderedComparator();
     List<IMenu> menuList = new ActionFinder().findActions(actionList, IMenu.class, false);
     ExtensionUtility.moveModelObjects(menuList);
-    Collections.sort(menuList, orderedComparator);
+    menuList.sort(orderedComparator);
     m_menus = menuList;
 
     List<IViewButton> viewButtonList = new ActionFinder().findActions(actionList, IViewButton.class, false);
     ExtensionUtility.moveModelObjects(viewButtonList);
-    Collections.sort(viewButtonList, orderedComparator);
+    viewButtonList.sort(orderedComparator);
     m_viewButtons = viewButtonList;
 
     // add dynamic keyStrokes
@@ -678,13 +665,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   protected final void interceptInit() {
-    List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop>> extensions = getAllExtensions();
+    List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
     DesktopInitChain chain = new DesktopInitChain(extensions);
     chain.execInit();
   }
 
   private void initDesktopExtensions() {
-    m_desktopExtensions = new LinkedList<IDesktopExtension>();
+    m_desktopExtensions = new LinkedList<>();
     m_desktopExtensions.add(getLocalDesktopExtension());
     injectDesktopExtensions(m_desktopExtensions);
   }
@@ -810,7 +797,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       return CollectionUtility.emptyArrayList();
     }
 
-    final List<FORM> forms = new ArrayList<FORM>();
+    final List<FORM> forms = new ArrayList<>();
     for (final IForm candidate : m_formStore.values()) {
       if (formType.isAssignableFrom(candidate.getClass())) {
         @SuppressWarnings("unchecked")
@@ -974,7 +961,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public List<IDesktopNotification> getNotifications() {
-    return new ArrayList<IDesktopNotification>(m_notifications); // ordered as inserted because LinkedHashSet is used
+    return new ArrayList<>(m_notifications); // ordered as inserted because LinkedHashSet is used
   }
 
   @Override
@@ -1089,31 +1076,28 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     else {
       ctx = m_outline.createDisplayParentRunContext();
     }
-    ctx.run(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        if (m_outline != null) {
-          m_activeOutlineListener = new P_ActiveOutlineListener();
-          m_outline.addPropertyChangeListener(m_activeOutlineListener);
-          setBrowserHistoryEntry(BEANS.get(OutlineDeepLinkHandler.class).createBrowserHistoryEntry(m_outline));
-        }
-        // <bsh 2010-10-15>
-        // Those three "setXyz(null)" statements used to be called unconditionally. Now, they
-        // are only called when the new outline is null. When the new outline is _not_ null, we
-        // will override the "null" anyway (see below).
-        // This change is needed for the "on/off semantics" of the tool tab buttons to work correctly.
-        if (m_outline == null) {
-          setPageDetailForm(null);
-          setPageDetailTable(null);
-          setPageSearchForm(null, true);
-        }
-        // </bsh>
-        updateActiveFormOnOutlineChanged();
-        fireOutlineChanged(oldOutline, m_outline);
-        onOutlineChangedInternal();
-
-        fireOutlineContentActivate();
+    ctx.run(() -> {
+      if (m_outline != null) {
+        m_activeOutlineListener = new P_ActiveOutlineListener();
+        m_outline.addPropertyChangeListener(m_activeOutlineListener);
+        setBrowserHistoryEntry(BEANS.get(OutlineDeepLinkHandler.class).createBrowserHistoryEntry(m_outline));
       }
+      // <bsh 2010-10-15>
+      // Those three "setXyz(null)" statements used to be called unconditionally. Now, they
+      // are only called when the new outline is null. When the new outline is _not_ null, we
+      // will override the "null" anyway (see below).
+      // This change is needed for the "on/off semantics" of the tool tab buttons to work correctly.
+      if (m_outline == null) {
+        setPageDetailForm(null);
+        setPageDetailTable(null);
+        setPageSearchForm(null, true);
+      }
+      // </bsh>
+      updateActiveFormOnOutlineChanged();
+      fireOutlineChanged(oldOutline, m_outline);
+      onOutlineChangedInternal();
+
+      fireOutlineContentActivate();
     });
   }
 
@@ -1254,7 +1238,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void setAvailableOutlines(List<? extends IOutline> availableOutlines) {
-    activateOutline((IOutline) null);
+    activateOutline(null);
     if (m_availableOutlines != null) {
       for (IOutline o : m_availableOutlines) {
         ClientSessionProvider.currentSession().getMemoryPolicy().deregisterOutline(o);
@@ -1329,7 +1313,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void addKeyStrokes(IKeyStroke... keyStrokes) {
     if (keyStrokes != null && keyStrokes.length > 0) {
-      Map<String, IKeyStroke> map = new HashMap<String, IKeyStroke>();
+      Map<String, IKeyStroke> map = new HashMap<>();
       for (IKeyStroke ks : getKeyStrokes()) {
         map.put(ks.getKeyStroke(), ks);
       }
@@ -1343,7 +1327,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void removeKeyStrokes(IKeyStroke... keyStrokes) {
     if (keyStrokes != null && keyStrokes.length > 0) {
-      Map<String, IKeyStroke> map = new HashMap<String, IKeyStroke>();
+      Map<String, IKeyStroke> map = new HashMap<>();
       for (IKeyStroke ks : getKeyStrokes()) {
         map.put(ks.getKeyStroke(), ks);
       }
@@ -1361,7 +1345,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public List<IAction> getActions() {
-    List<IAction> result = new ArrayList<IAction>();
+    List<IAction> result = new ArrayList<>();
     result.addAll(getKeyStrokes());
     result.addAll(getMenus());
     result.addAll(getViewButtons());
@@ -1509,13 +1493,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     if (notification != null && m_notifications.add(notification)) {
       fireNotification(DesktopEvent.TYPE_NOTIFICATION_ADDED, notification);
       if (notification.getDuration() > 0) {
-        ModelJobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            removeNotification(notification);
-          }
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        ModelJobs.schedule(() -> removeNotification(notification), ModelJobs.newInput(ClientRunContexts.copyCurrent())
             .withExecutionTrigger(Jobs.newExecutionTrigger()
                 .withStartIn(notification.getDuration(), TimeUnit.MILLISECONDS)));
       }
@@ -1701,21 +1679,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void addDataChangeListener(DataChangeListener listener, Object... dataTypes) {
     if (dataTypes == null || dataTypes.length == 0) {
-      EventListenerList list = m_dataChangeListenerList.get(null);
-      if (list == null) {
-        list = new EventListenerList();
-        m_dataChangeListenerList.put(null, list);
-      }
+      EventListenerList list = m_dataChangeListenerList.computeIfAbsent(null, k -> new EventListenerList());
       list.add(DataChangeListener.class, listener);
     }
     else {
       for (Object dataType : dataTypes) {
         if (dataType != null) {
-          EventListenerList list = m_dataChangeListenerList.get(dataType);
-          if (list == null) {
-            list = new EventListenerList();
-            m_dataChangeListenerList.put(dataType, list);
-          }
+          EventListenerList list = m_dataChangeListenerList.computeIfAbsent(dataType, k -> new EventListenerList());
           list.add(DataChangeListener.class, listener);
         }
       }
@@ -1781,11 +1751,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   private void processDataChangeBuffer() {
-    Set<Object> knownEvents = new HashSet<Object>();
+    Set<Object> knownEvents = new HashSet<>();
     for (Object[] dataTypes : m_dataChangeEventBuffer) {
-      for (Object dataType : dataTypes) {
-        knownEvents.add(dataType);
-      }
+      Collections.addAll(knownEvents, dataTypes);
     }
     m_dataChangeEventBuffer.clear();
     fireDataChangedImpl(knownEvents.toArray(new Object[knownEvents.size()]));
@@ -1795,23 +1763,19 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     if (dataTypes != null && dataTypes.length > 0) {
       // Important: Use LinkedHashMaps to make event firing deterministic!
       // (If listeners would be called in random order, bugs may not be reproduced very well.)
-      HashMap<DataChangeListener, Set<Object>> map = new LinkedHashMap<>();
+      Map<DataChangeListener, Set<Object>> map = new LinkedHashMap<>();
       for (Object dataType : dataTypes) {
         if (dataType != null) {
           EventListenerList list = m_dataChangeListenerList.get(dataType);
           if (list != null) {
             for (DataChangeListener listener : list.getListeners(DataChangeListener.class)) {
-              Set<Object> typeSet = map.get(listener);
-              if (typeSet == null) {
-                typeSet = new LinkedHashSet<Object>();
-                map.put(listener, typeSet);
-              }
+              Set<Object> typeSet = map.computeIfAbsent(listener, k -> new LinkedHashSet<>());
               typeSet.add(dataType);
             }
           }
         }
       }
-      for (Map.Entry<DataChangeListener, Set<Object>> e : map.entrySet()) {
+      for (Entry<DataChangeListener, Set<Object>> e : map.entrySet()) {
         DataChangeListener listener = e.getKey();
         Set<Object> typeSet = e.getValue();
         listener.dataChanged(typeSet.toArray());
@@ -1982,7 +1946,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     setOpenedInternal(false);
     detachGui();
 
-    List<IForm> showedForms = new ArrayList<IForm>();
+    List<IForm> showedForms = new ArrayList<>();
     // Remove showed forms
     for (IForm form : m_formStore.values()) {
       hideForm(form);
@@ -2017,7 +1981,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     for (IFileChooser f : getFileChoosers()) {
       if (f != null) {
         try {
-          f.getUIFacade().setResultFromUI(Collections.<BinaryResource> emptyList());
+          f.getUIFacade().setResultFromUI(Collections.emptyList());
         }
         catch (RuntimeException | PlatformError e) {
           LOG.error("Exception while closing filechooser", e);
@@ -2476,7 +2440,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
     @Override
     public void fireGeolocationDetermined(String latitude, String longitude) {
-      ArrayList<ClientCallback<Coordinates>> pendingCallbacks;
+      Iterable<ClientCallback<Coordinates>> pendingCallbacks;
       synchronized (m_pendingPositionResponses) {
         pendingCallbacks = new ArrayList<>(m_pendingPositionResponses);
         m_pendingPositionResponses.clear();
@@ -2489,7 +2453,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
     @Override
     public void fireGeolocationFailed(String errorCode, String errorMessage) {
-      ArrayList<ClientCallback<Coordinates>> pendingCallbacks;
+      Iterable<ClientCallback<Coordinates>> pendingCallbacks;
       synchronized (m_pendingPositionResponses) {
         pendingCallbacks = new ArrayList<>(m_pendingPositionResponses);
         m_pendingPositionResponses.clear();
@@ -2543,7 +2507,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   protected boolean continueClosingConsideringUnsavedForms() {
     List<IForm> forms = getUnsavedForms();
-    if (forms.size() > 0) {
+    if (!forms.isEmpty()) {
       try {
         UnsavedFormChangesForm f = new UnsavedFormChangesForm(forms);
         f.startNew();
@@ -2583,7 +2547,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public List<IForm> getUnsavedForms() {
-    List<IForm> saveNeededForms = new ArrayList<IForm>();
+    List<IForm> saveNeededForms = new ArrayList<>();
     List<IForm> showedForms = m_formStore.values();
     // last element on the stack is the first that needs to be saved: iterate from end to start
     for (int i = showedForms.size() - 1; i >= 0; i--) {

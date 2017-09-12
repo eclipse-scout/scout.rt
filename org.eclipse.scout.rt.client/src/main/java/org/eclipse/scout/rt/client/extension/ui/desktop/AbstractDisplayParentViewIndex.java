@@ -45,11 +45,7 @@ public abstract class AbstractDisplayParentViewIndex implements IIndex<IDisplayP
       return false;
     }
 
-    List<IForm> elements = m_mapByIndex.get(index);
-    if (elements == null) {
-      elements = new ArrayList<>();
-      m_mapByIndex.put(index, elements);
-    }
+    List<IForm> elements = m_mapByIndex.computeIfAbsent(index, k -> new ArrayList<>());
     int position = calculatePositionForElement(element);
     elements.add(position, element);
     m_mapByElement.put(element, index);

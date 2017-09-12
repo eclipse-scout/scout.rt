@@ -23,6 +23,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.Format;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -72,7 +73,7 @@ public class CsvHelper {
   }
 
   public CsvHelper(Locale locale, String separatorChar, String textDelimiterChar, String lineSeparator) {
-    this(locale, (separatorChar != null && separatorChar.length() > 0 ? separatorChar.charAt(0) : 0x00), (textDelimiterChar != null && textDelimiterChar.length() > 0 ? textDelimiterChar.charAt(0) : 0x00), lineSeparator);
+    this(locale, (separatorChar != null && !separatorChar.isEmpty() ? separatorChar.charAt(0) : 0x00), (textDelimiterChar != null && !textDelimiterChar.isEmpty() ? textDelimiterChar.charAt(0) : 0x00), lineSeparator);
   }
 
   public CsvHelper(Locale locale, char separatorChar, char textDelimiterChar, String lineSeparator) {
@@ -118,7 +119,7 @@ public class CsvHelper {
   }
 
   public void setColumnNames(List<String> list) {
-    m_colNames = new ArrayList<String>(list);
+    m_colNames = new ArrayList<>(list);
     m_colCount = Math.max(m_colCount, m_colNames.size());
     m_ignoredColumns = new boolean[m_colNames.size()];
     for (int i = 0; i < m_colNames.size(); i++) {
@@ -176,7 +177,7 @@ public class CsvHelper {
     else if (sLow.startsWith("integer")) {// integer_<format>
       if (s.length() >= 8) {
         Format f = new DecimalFormat(s.substring(8), new DecimalFormatSymbols(getLocale()));
-        ((DecimalFormat) f).setParseIntegerOnly(true);
+        ((NumberFormat) f).setParseIntegerOnly(true);
         return f;
       }
       else {
@@ -204,9 +205,9 @@ public class CsvHelper {
       return Collections.emptyList();
     }
 
-    List<Boolean> ignoredColumns = new ArrayList<Boolean>(m_ignoredColumns.length);
-    for (int i = 0; i < m_ignoredColumns.length; i++) {
-      ignoredColumns.add(m_ignoredColumns[i]);
+    List<Boolean> ignoredColumns = new ArrayList<>(m_ignoredColumns.length);
+    for (boolean m_ignoredColumn : m_ignoredColumns) {
+      ignoredColumns.add(m_ignoredColumn);
     }
     return ignoredColumns;
   }
@@ -279,7 +280,7 @@ public class CsvHelper {
           cellList.add(cellList.size(), null);
         }
         // convert data types
-        ArrayList<Object> objList = new ArrayList<Object>(cellList.size());
+        List<Object> objList = new ArrayList<>(cellList.size());
         for (colIndex = 0; colIndex < cellList.size(); colIndex++) {
           if (m_ignoredColumns == null || m_ignoredColumns.length == 0 || m_ignoredColumns.length < colIndex || !m_ignoredColumns[colIndex]) {
             cell = cellList.get(colIndex);
@@ -391,7 +392,7 @@ public class CsvHelper {
     Object val = null;
     String cell = null;
     try {
-      ArrayList<String> rowStrings = new ArrayList<String>();
+      List<String> rowStrings = new ArrayList<>();
       rowStrings.clear();
       for (int i = 0; i < row.length; i++) {
         val = row[i];
@@ -427,7 +428,7 @@ public class CsvHelper {
   }
 
   protected List<String> importRow(Reader reader) throws IOException {
-    List<String> cellList = new ArrayList<String>(Math.max(getColCount(), 2));
+    List<String> cellList = new ArrayList<>(Math.max(getColCount(), 2));
     boolean inString = false;
     StringBuilder curBuf = new StringBuilder();
     String token;
@@ -460,7 +461,7 @@ public class CsvHelper {
             if (token.charAt(0) == getTextDelimiterChar() && token.charAt(tokenLen - 1) == getTextDelimiterChar()) {
               token = token.substring(1, tokenLen - 1);
             }
-            if (token.length() == 0) {
+            if (token.isEmpty()) {
               token = null;
             }
           }
@@ -488,7 +489,7 @@ public class CsvHelper {
       ch = reader.read();
     }
     // end of file?
-    if (cellList.size() == 0 && ch < 0) {
+    if (cellList.isEmpty() && ch < 0) {
       cellList = null;
     }
     return cellList;
@@ -536,7 +537,7 @@ public class CsvHelper {
   protected String encodeText(String text) {
     if (getTextDelimiterChar() != 0x00 && text != null) {
       text = stringReplace(text, "" + getTextDelimiterChar(), "" + getTextDelimiterChar() + getTextDelimiterChar());
-      if (text.indexOf(getSeparatorChar()) >= 0 || text.indexOf(getTextDelimiterChar()) >= 0 || (isEncodeLineSeparator() && text.indexOf(getLineSeparator()) >= 0)) {
+      if (text.indexOf(getSeparatorChar()) >= 0 || text.indexOf(getTextDelimiterChar()) >= 0 || (isEncodeLineSeparator() && text.contains(getLineSeparator()))) {
         text = getTextDelimiterChar() + text + getTextDelimiterChar();
       }
     }
@@ -544,7 +545,7 @@ public class CsvHelper {
   }
 
   protected String decodeText(String text) {
-    if (text != null && text.length() > 0 && getTextDelimiterChar() != 0x00) {
+    if (text != null && !text.isEmpty() && getTextDelimiterChar() != 0x00) {
       if (text.charAt(0) == getTextDelimiterChar() && text.charAt(text.length() - 1) == getTextDelimiterChar()) {
         text = text.substring(1, text.length() - 1);
       }

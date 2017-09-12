@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueInputToken;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 
 class TriStateInput implements IBindInput {
-  private IBindInput m_delegate;
+  private final IBindInput m_delegate;
 
   public TriStateInput(ISqlStyle sqlStyle, TriState ts, ValueInputToken target) {
     if (ts == null || ts.isUndefined()) {

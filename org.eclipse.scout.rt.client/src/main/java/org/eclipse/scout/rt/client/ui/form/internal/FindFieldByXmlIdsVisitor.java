@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -37,7 +38,7 @@ public class FindFieldByXmlIdsVisitor implements IFormFieldVisitor {
   /**
    * Tree map with candidates. The entry with the largest key is the best matching field.
    */
-  private final TreeMap<CompositeObject, IFormField> m_prioMap;
+  private final NavigableMap<CompositeObject, IFormField> m_prioMap;
 
   /**
    * Set with ambiguous field keys.
@@ -46,8 +47,8 @@ public class FindFieldByXmlIdsVisitor implements IFormFieldVisitor {
 
   public FindFieldByXmlIdsVisitor(String... xmlFieldIds) {
     m_xmlFieldIds = xmlFieldIds;
-    m_prioMap = new TreeMap<CompositeObject, IFormField>();
-    m_ambiguousFieldKeys = new HashSet<CompositeObject>();
+    m_prioMap = new TreeMap<>();
+    m_ambiguousFieldKeys = new HashSet<>();
   }
 
   @Override

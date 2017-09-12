@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.basic.planner;
 
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -66,10 +65,10 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   private EventListenerList m_listenerList;
   private IPlannerUIFacade m_activityMapUIFacade;
   private long m_minimumActivityDuration;// millis
-  private List<Resource<RI>> m_resources;
+  private final List<Resource<RI>> m_resources;
   private List<Resource<RI>> m_selectedResources = new ArrayList<>();
   private int m_tableChanging;
-  private AbstractEventBuffer<PlannerEvent> m_eventBuffer;
+  private final AbstractEventBuffer<PlannerEvent> m_eventBuffer;
   private IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractPlanner<RI, AI>, IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> m_objectExtensions;
   private int m_eventBufferLoopDetection;
@@ -80,8 +79,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   public AbstractPlanner(boolean callInitializer) {
-    m_objectExtensions = new ObjectExtensions<AbstractPlanner<RI, AI>, IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>>(this, false);
-    m_resources = new ArrayList<Resource<RI>>();
+    m_objectExtensions = new ObjectExtensions<>(this, false);
+    m_resources = new ArrayList<>();
     m_eventBuffer = createEventBuffer();
     m_resourceObserver = new P_ResourceObserver();
     if (callInitializer) {
@@ -258,14 +257,10 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
-      @Override
-      public void run() {
-        initConfig();
-      }
-    });
+    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
+  @SuppressWarnings("unchecked")
   protected void initConfig() {
     m_listenerList = new EventListenerList();
     m_activityMapUIFacade = createUIFacade();
@@ -273,7 +268,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     setLabel(getConfiguredLabel());
     setAvailableDisplayModes(getConfiguredAvailableDisplayModes());
     setDisplayMode(getConfiguredDisplayMode());
-    setDisplayModeOptions(new HashMap<Integer, DisplayModeOptions>());
+    setDisplayModeOptions(new HashMap<>());
     initDisplayModeOptions();
     setHeaderVisible(getConfiguredHeaderVisible());
     setSelectionMode(getConfiguredSelectionMode());
@@ -281,7 +276,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     setMinimumActivityDuration(getConfiguredMinimumActivityDuration());
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
-    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
+    OrderedCollection<IMenu> menus = new OrderedCollection<>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
       IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
       menus.addOrdered(menu);
@@ -296,14 +291,13 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
-    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
+    new MoveActionNodesHandler<>(menus).moveModelObjects();
     IPlannerContextMenu contextMenu = new PlannerContextMenu(this, menus.getOrderedList());
     setContextMenu(contextMenu);
 
     // local property observer
     addPlannerListener(new PlannerAdapter() {
       @Override
-      @SuppressWarnings("unchecked")
       public void plannerChanged(PlannerEvent e) {
         if (e.getType() == PlannerEvent.TYPE_RESOURCES_SELECTED) {
           List<Resource<RI>> resources = (List<Resource<RI>>) e.getResources();
@@ -316,43 +310,39 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
         }
       }
     });
-    addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      @SuppressWarnings("unchecked")
-      public void propertyChange(PropertyChangeEvent e) {
-        if (e.getPropertyName().equals(PROP_DISPLAY_MODE)) {
+    addPropertyChangeListener(e -> {
+      if (e.getPropertyName().equals(PROP_DISPLAY_MODE)) {
+        try {
+          interceptDisplayModeChanged((int) e.getNewValue());
+        }
+        catch (Exception t) {
+          BEANS.get(ExceptionHandler.class).handle(t);
+        }
+      }
+      else if (e.getPropertyName().equals(PROP_VIEW_RANGE)) {
+        try {
+          interceptViewRangeChanged((Range<Date>) e.getNewValue());
+        }
+        catch (Exception t) {
+          BEANS.get(ExceptionHandler.class).handle(t);
+        }
+      }
+      else if (e.getPropertyName().equals(PROP_SELECTION_RANGE)) {
+        try {
+          interceptSelectionRangeChanged((Range<Date>) e.getNewValue());
+        }
+        catch (Exception t) {
+          BEANS.get(ExceptionHandler.class).handle(t);
+        }
+      }
+      else if (e.getPropertyName().equals(PROP_SELECTED_ACTIVITY)) {
+        Activity<RI, AI> cell = (Activity<RI, AI>) e.getNewValue();
+        if (cell != null) {
           try {
-            interceptDisplayModeChanged((int) e.getNewValue());
+            interceptActivitySelected(cell);
           }
           catch (Exception t) {
             BEANS.get(ExceptionHandler.class).handle(t);
-          }
-        }
-        else if (e.getPropertyName().equals(PROP_VIEW_RANGE)) {
-          try {
-            interceptViewRangeChanged((Range) e.getNewValue());
-          }
-          catch (Exception t) {
-            BEANS.get(ExceptionHandler.class).handle(t);
-          }
-        }
-        else if (e.getPropertyName().equals(PROP_SELECTION_RANGE)) {
-          try {
-            interceptSelectionRangeChanged((Range) e.getNewValue());
-          }
-          catch (Exception t) {
-            BEANS.get(ExceptionHandler.class).handle(t);
-          }
-        }
-        else if (e.getPropertyName().equals(PROP_SELECTED_ACTIVITY)) {
-          Activity<RI, AI> cell = (Activity<RI, AI>) e.getNewValue();
-          if (cell != null) {
-            try {
-              interceptActivitySelected(cell);
-            }
-            catch (Exception t) {
-              BEANS.get(ExceptionHandler.class).handle(t);
-            }
           }
         }
       }
@@ -374,7 +364,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   protected IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> createLocalExtension() {
-    return new LocalPlannerExtension<RI, AI, AbstractPlanner<RI, AI>>(this);
+    return new LocalPlannerExtension<>(this);
   }
 
   @Override
@@ -456,11 +446,11 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   private void restoreSelection(List<RI> selectedIds) {
     List<Resource<RI>> selectedResources = new ArrayList<>();
-    if (selectedIds.size() > 0) {
+    if (!selectedIds.isEmpty()) {
       for (Resource<RI> resource : getResources()) {
         if (selectedIds.remove(resource.getId())) {
           selectedResources.add(resource);
-          if (selectedIds.size() == 0) {
+          if (selectedIds.isEmpty()) {
             break;
           }
         }
@@ -479,7 +469,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     setPlannerChanging(true);
     try {
       int resourceCountBefore = m_resources.size();
-      List<Resource<RI>> deletedResources = new ArrayList<Resource<RI>>();
+      List<Resource<RI>> deletedResources = new ArrayList<>();
       for (Resource<RI> resource : resources) {
         m_resources.remove(resource);
         deletedResources.add(resource);
@@ -487,13 +477,13 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
       if (deletedResources.size() == resourceCountBefore) {
         fireAllResourcesDeleted();
         deselectAllResources();
-        setSelectionRange(new Range<Date>());
+        setSelectionRange(new Range<>());
       }
       else {
         fireResourcesDeleted(deletedResources);
         if (deselectResources(deletedResources)) {
           // Adjust selection range too if selected resources were deleted
-          setSelectionRange(new Range<Date>());
+          setSelectionRange(new Range<>());
         }
       }
     }
@@ -539,7 +529,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   public void updateResources(List<Resource<RI>> resources) {
-    if (resources == null || resources.size() == 0) {
+    if (resources == null || resources.isEmpty()) {
       return;
     }
     for (Resource<RI> resource : resources) {
@@ -587,7 +577,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   @Override
   public List<RI> getSelectedResourceIds() {
-    List<RI> ids = new ArrayList<RI>();
+    List<RI> ids = new ArrayList<>();
     List<Resource<RI>> resources = getSelectedResources();
     for (Resource<RI> resource : resources) {
       ids.add(resource.getId());
@@ -597,7 +587,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   @Override
   public void deselectAllResources() {
-    selectResources(new ArrayList<Resource<RI>>());
+    selectResources(new ArrayList<>());
   }
 
   @Override
@@ -624,15 +614,14 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   public void selectResources(List<? extends Resource<RI>> resources) {
     setPlannerChanging(true);
     try {
-      List<Resource<RI>> newSelection = new ArrayList<Resource<RI>>();
-      newSelection.addAll(resources);
+      List<Resource<RI>> newSelection = new ArrayList<>(resources);
       if (newSelection.size() > 1 && !isMultiSelectResources()) {
         Resource<RI> first = newSelection.get(0);
         newSelection.clear();
         newSelection.add(first);
       }
       if (!CollectionUtility.equalsCollection(m_selectedResources, newSelection, false)) {
-        m_selectedResources = new ArrayList<Resource<RI>>(newSelection);
+        m_selectedResources = new ArrayList<>(newSelection);
         List<Resource<RI>> notificationCopy = CollectionUtility.arrayList(m_selectedResources);
 
         fireResourcesSelected(notificationCopy);
@@ -713,8 +702,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     else {
       EventListener[] listeners = m_listenerList.getListeners(PlannerListener.class);
       if (listeners != null && listeners.length > 0) {
-        for (int i = 0; i < listeners.length; i++) {
-          ((PlannerListener) listeners[i]).plannerChanged(e);
+        for (EventListener listener : listeners) {
+          ((PlannerListener) listener).plannerChanged(e);
         }
       }
     }
@@ -898,12 +887,12 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     @SuppressWarnings("unchecked")
     Range<Date> propValue = (Range<Date>) propertySupport.getProperty(PROP_VIEW_RANGE);
     // return a copy
-    return new Range<Date>(propValue);
+    return new Range<>(propValue);
   }
 
   @Override
   public void setViewRange(Date minDate, Date maxDate) {
-    setViewRange(new Range<Date>(minDate, maxDate));
+    setViewRange(new Range<>(minDate, maxDate));
   }
 
   @Override
@@ -929,7 +918,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   @Override
   public void setSelectionRange(Date beginDate, Date endDate) {
-    setSelectionRange(new Range<Date>(beginDate, endDate));
+    setSelectionRange(new Range<>(beginDate, endDate));
   }
 
   @Override
@@ -943,7 +932,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     @SuppressWarnings("unchecked")
     Range<Date> propValue = (Range<Date>) propertySupport.getProperty(PROP_SELECTION_RANGE);
     // return a copy
-    return new Range<Date>(propValue);
+    return new Range<>(propValue);
   }
 
   @Override
@@ -1110,49 +1099,49 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   protected final void interceptResourcesSelected(List<Resource<RI>> resources) {
     List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
-    PlannerResourcesSelectedChain<RI, AI> chain = new PlannerResourcesSelectedChain<RI, AI>(extensions);
+    PlannerResourcesSelectedChain<RI, AI> chain = new PlannerResourcesSelectedChain<>(extensions);
     chain.execResourcesSelected(resources);
   }
 
   protected final void interceptSelectionRangeChanged(Range<Date> selectionRange) {
     List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
-    PlannerSelectionRangeChangedChain<RI, AI> chain = new PlannerSelectionRangeChangedChain<RI, AI>(extensions);
+    PlannerSelectionRangeChangedChain<RI, AI> chain = new PlannerSelectionRangeChangedChain<>(extensions);
     chain.execSelectionRangeChanged(selectionRange);
   }
 
   protected final void interceptViewRangeChanged(Range<Date> viewRange) {
     List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
-    PlannerViewRangeChangedChain<RI, AI> chain = new PlannerViewRangeChangedChain<RI, AI>(extensions);
+    PlannerViewRangeChangedChain<RI, AI> chain = new PlannerViewRangeChangedChain<>(extensions);
     chain.execViewRangeChanged(viewRange);
   }
 
   protected void interceptDisplayModeChanged(int displayMode) {
     List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
-    PlannerDisplayModeChangedChain<RI, AI> chain = new PlannerDisplayModeChangedChain<RI, AI>(extensions);
+    PlannerDisplayModeChangedChain<RI, AI> chain = new PlannerDisplayModeChangedChain<>(extensions);
     chain.execDisplayModeChanged(displayMode);
   }
 
   protected final void interceptActivitySelected(Activity<RI, AI> cell) {
     List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
-    PlannerActivitySelectedChain<RI, AI> chain = new PlannerActivitySelectedChain<RI, AI>(extensions);
+    PlannerActivitySelectedChain<RI, AI> chain = new PlannerActivitySelectedChain<>(extensions);
     chain.execActivitySelected(cell);
   }
 
   protected final void interceptDisposePlanner() {
     List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
-    PlannerDisposePlannerChain<RI, AI> chain = new PlannerDisposePlannerChain<RI, AI>(extensions);
+    PlannerDisposePlannerChain<RI, AI> chain = new PlannerDisposePlannerChain<>(extensions);
     chain.execDisposePlanner();
   }
 
   protected final void interceptDecorateActivity(Activity<RI, AI> activity) {
     List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
-    PlannerDecorateActivityChain<RI, AI> chain = new PlannerDecorateActivityChain<RI, AI>(extensions);
+    PlannerDecorateActivityChain<RI, AI> chain = new PlannerDecorateActivityChain<>(extensions);
     chain.execDecorateActivity(activity);
   }
 
   protected final void interceptInitPlanner() {
     List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
-    PlannerInitPlannerChain<RI, AI> chain = new PlannerInitPlannerChain<RI, AI>(extensions);
+    PlannerInitPlannerChain<RI, AI> chain = new PlannerInitPlannerChain<>(extensions);
     chain.execInitPlanner();
   }
 

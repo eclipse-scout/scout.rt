@@ -15,8 +15,8 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -52,9 +52,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.VetoException;
-import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
-import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
@@ -65,7 +63,6 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -94,7 +91,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   private static final ILookupRow EMPTY_LOOKUP_ROW = new LookupRow<>(null, "");
 
   @SuppressWarnings("unchecked")
-  private static final <KEY> ILookupRow<KEY> emptyLookupRow() {
+  private static <KEY> ILookupRow<KEY> emptyLookupRow() {
     return EMPTY_LOOKUP_ROW;
   }
 
@@ -116,7 +113,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   /**
    * Provides the label-texts for the radio-buttons of the active-filter.
    */
-  private String[] m_activeFilterLabels = {
+  private final String[] m_activeFilterLabels = {
       TEXTS.get("ui.All"),
       TEXTS.get("ui.Inactive"),
       TEXTS.get("ui.Active")};
@@ -1054,13 +1051,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   protected void cleanupResultList(final List<ILookupRow<VALUE>> list) {
-    final Iterator<? extends ILookupRow<VALUE>> iterator = list.iterator();
-    while (iterator.hasNext()) {
-      final ILookupRow<VALUE> candidate = iterator.next();
-      if (candidate == null) {
-        iterator.remove();
-      }
-    }
+    list.removeIf(Objects::isNull);
   }
 
   protected void handleFetchResult(ISmartFieldDataFetchResult<VALUE> result) {
@@ -1071,20 +1062,20 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
       if (isBrowseHierarchy()) {
         result = addHierarchicalResults(result);
       }
-      setResult(new SmartFieldResult<VALUE>(result));
+      setResult(new SmartFieldResult<>(result));
     }
   }
 
   protected ISmartFieldDataFetchResult<VALUE> addHierarchicalResults(ISmartFieldDataFetchResult<VALUE> result) {
-    return new HierarchicalLookupResultBuilder<VALUE>(this).addParentLookupRows(result);
+    return new HierarchicalLookupResultBuilder<>(this).addParentLookupRows(result);
   }
 
   protected ISmartFieldLookupRowFetcher<VALUE> createLookupRowFetcher() {
     if (isBrowseHierarchy()) {
-      return new HierarchicalSmartFieldDataFetcher<VALUE>(this);
+      return new HierarchicalSmartFieldDataFetcher<>(this);
     }
     else {
-      return new SmartFieldDataFetcher<VALUE>(this);
+      return new SmartFieldDataFetcher<>(this);
     }
   }
 
@@ -1164,66 +1155,66 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   @Override
   protected ISmartFieldExtension<VALUE, ? extends AbstractSmartField<VALUE>> createLocalExtension() {
-    return new LocalSmartField2Extension<VALUE, AbstractSmartField<VALUE>>(this);
+    return new LocalSmartField2Extension<>(this);
   }
 
   protected final void interceptFilterBrowseLookupResult(ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SmartField2FilterBrowseLookupResultChain<VALUE> chain = new SmartField2FilterBrowseLookupResultChain<VALUE>(extensions);
+    SmartField2FilterBrowseLookupResultChain<VALUE> chain = new SmartField2FilterBrowseLookupResultChain<>(extensions);
     chain.execFilterBrowseLookupResult(call, result);
   }
 
   protected final void interceptFilterKeyLookupResult(ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SmartField2FilterKeyLookupResultChain<VALUE> chain = new SmartField2FilterKeyLookupResultChain<VALUE>(extensions);
+    SmartField2FilterKeyLookupResultChain<VALUE> chain = new SmartField2FilterKeyLookupResultChain<>(extensions);
     chain.execFilterKeyLookupResult(call, result);
   }
 
   protected final void interceptPrepareLookup(ILookupCall<VALUE> call) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SmartField2PrepareLookupChain<VALUE> chain = new SmartField2PrepareLookupChain<VALUE>(extensions);
+    SmartField2PrepareLookupChain<VALUE> chain = new SmartField2PrepareLookupChain<>(extensions);
     chain.execPrepareLookup(call);
   }
 
   protected final void interceptPrepareTextLookup(ILookupCall<VALUE> call, String text) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SmartField2PrepareTextLookupChain<VALUE> chain = new SmartField2PrepareTextLookupChain<VALUE>(extensions);
+    SmartField2PrepareTextLookupChain<VALUE> chain = new SmartField2PrepareTextLookupChain<>(extensions);
     chain.execPrepareTextLookup(call, text);
   }
 
   protected final void interceptPrepareBrowseLookup(ILookupCall<VALUE> call, String browseHint) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SmartField2PrepareBrowseLookupChain<VALUE> chain = new SmartField2PrepareBrowseLookupChain<VALUE>(extensions);
+    SmartField2PrepareBrowseLookupChain<VALUE> chain = new SmartField2PrepareBrowseLookupChain<>(extensions);
     chain.execPrepareBrowseLookup(call, browseHint);
   }
 
   protected final void interceptFilterTextLookupResult(ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SmartField2FilterTextLookupResultChain<VALUE> chain = new SmartField2FilterTextLookupResultChain<VALUE>(extensions);
+    SmartField2FilterTextLookupResultChain<VALUE> chain = new SmartField2FilterTextLookupResultChain<>(extensions);
     chain.execFilterTextLookupResult(call, result);
   }
 
   protected final void interceptPrepareRecLookup(ILookupCall<VALUE> call, VALUE parentKey) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SmartField2PrepareRecLookupChain<VALUE> chain = new SmartField2PrepareRecLookupChain<VALUE>(extensions);
+    SmartField2PrepareRecLookupChain<VALUE> chain = new SmartField2PrepareRecLookupChain<>(extensions);
     chain.execPrepareRecLookup(call, parentKey);
   }
 
   protected final void interceptFilterLookupResult(ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SmartField2FilterLookupResultChain<VALUE> chain = new SmartField2FilterLookupResultChain<VALUE>(extensions);
+    SmartField2FilterLookupResultChain<VALUE> chain = new SmartField2FilterLookupResultChain<>(extensions);
     chain.execFilterLookupResult(call, result);
   }
 
   protected final void interceptFilterRecLookupResult(ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SmartField2FilterRecLookupResultChain<VALUE> chain = new SmartField2FilterRecLookupResultChain<VALUE>(extensions);
+    SmartField2FilterRecLookupResultChain<VALUE> chain = new SmartField2FilterRecLookupResultChain<>(extensions);
     chain.execFilterRecLookupResult(call, result);
   }
 
   protected final void interceptPrepareKeyLookup(ILookupCall<VALUE> call, VALUE key) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SmartField2PrepareKeyLookupChain<VALUE> chain = new SmartField2PrepareKeyLookupChain<VALUE>(extensions);
+    SmartField2PrepareKeyLookupChain<VALUE> chain = new SmartField2PrepareKeyLookupChain<>(extensions);
     chain.execPrepareKeyLookup(call, key);
   }
 
@@ -1272,14 +1263,10 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
         BEANS.get(ExceptionHandler.class).handle(exception);
       }
     });
-    future.whenDone(new IDoneHandler<Void>() {
-
-      @Override
-      public void onDone(DoneEvent<Void> event) {
-        // Release guard only upon very recent lookup has been finished.
-        if (m_valueChangedLookupCounter.decrementAndGet() == 0) {
-          m_contextInstalledCondition.setBlocking(false);
-        }
+    future.whenDone(event -> {
+      // Release guard only upon very recent lookup has been finished.
+      if (m_valueChangedLookupCounter.decrementAndGet() == 0) {
+        m_contextInstalledCondition.setBlocking(false);
       }
     }, null);
   }
@@ -1551,7 +1538,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     cancelPotentialLookup();
 
     if (getLookupCall() == null) {
-      callback.onSuccess(Collections.<ILookupRow<VALUE>> emptyList());
+      callback.onSuccess(Collections.emptyList());
       return null;
     }
 
@@ -1579,13 +1566,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
         else {
           // Synchronize with the model thread.
           // Note: The model job will not commence execution if the current ClientRunContext is or gets cancelled.
-          ModelJobs.schedule(new IRunnable() {
-
-            @Override
-            public void run() throws Exception {
-              updateField(rows, exception);
-            }
-          }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+          ModelJobs.schedule(() -> updateField(rows, exception), ModelJobs.newInput(ClientRunContexts.copyCurrent())
               .withName("Updating {}", AbstractSmartField.this.getClass().getName()))
               .awaitDone(); // block the current thread until completed
         }
@@ -1602,7 +1583,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
           callback.onSuccess(result);
         }
         catch (FutureCancelledError | ThreadInterruptedError e) { // NOSONAR
-          callback.onSuccess(Collections.<ILookupRow<VALUE>> emptyList());
+          callback.onSuccess(Collections.emptyList());
         }
         catch (final RuntimeException e) { // NOSONAR
           callback.onFailure(exception);

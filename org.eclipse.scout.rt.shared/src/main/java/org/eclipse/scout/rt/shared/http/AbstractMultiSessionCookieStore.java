@@ -36,7 +36,7 @@ public abstract class AbstractMultiSessionCookieStore<CS> {
 
   public AbstractMultiSessionCookieStore() {
     // Use a WeakHashMap to ensure that client sessions are not retained when no longer needed.
-    m_cookieStores = new WeakHashMap<ISession, CS>();
+    m_cookieStores = new WeakHashMap<>();
     m_defaultCookieStore = createDefaultCookieStore();
   }
 

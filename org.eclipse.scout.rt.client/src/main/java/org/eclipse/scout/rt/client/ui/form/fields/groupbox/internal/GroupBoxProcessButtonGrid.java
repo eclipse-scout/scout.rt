@@ -24,8 +24,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder;
  */
 public class GroupBoxProcessButtonGrid {
   private IGroupBox m_groupBox = null;
-  private boolean m_includeSystemButtons;
-  private boolean m_includeCustomButtons;
+  private final boolean m_includeSystemButtons;
+  private final boolean m_includeCustomButtons;
   private List<IButton> m_buttons;
 
   public GroupBoxProcessButtonGrid(IGroupBox groupBox, boolean includeCustomButtons, boolean includeSystemButtons) {
@@ -36,7 +36,7 @@ public class GroupBoxProcessButtonGrid {
 
   public void validate() {
     // reset
-    List<IButton> buttonList = new ArrayList<IButton>();
+    List<IButton> buttonList = new ArrayList<>();
     if (m_includeCustomButtons) {
       buttonList.addAll(m_groupBox.getCustomProcessButtons());
     }

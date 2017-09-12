@@ -116,9 +116,9 @@ public final class UriUtility {
    */
   private static String getQueryString(URI uri) {
     final String uriString = Assertions.assertNotNull(uri).toString();
-    final int start = uriString.indexOf("?");
+    final int start = uriString.indexOf('?');
     if (start > 0) {
-      final int fragmentStart = uriString.indexOf("#", start);
+      final int fragmentStart = uriString.indexOf('#', start);
       final int end = fragmentStart > 0 ? fragmentStart : uriString.length();
       return uriString.substring(start + 1, end);
     }

@@ -31,12 +31,7 @@ import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
  * @since 3.8.1
  */
 public final class FormFieldInjectionThreadLocal {
-  private static final ThreadLocal<FormFieldInjectionThreadLocal> THREAD_LOCAL = new ThreadLocal<FormFieldInjectionThreadLocal>() {
-    @Override
-    protected FormFieldInjectionThreadLocal initialValue() {
-      return new FormFieldInjectionThreadLocal();
-    }
-  };
+  private static final ThreadLocal<FormFieldInjectionThreadLocal> THREAD_LOCAL = ThreadLocal.withInitial(FormFieldInjectionThreadLocal::new);
 
   /**
    * @param injection
@@ -125,9 +120,9 @@ public final class FormFieldInjectionThreadLocal {
     THREAD_LOCAL.get().injectFieldsInternal(container, fields);
   }
 
-  private final ArrayList<IFormFieldInjection> m_stack = new ArrayList<IFormFieldInjection>();
+  private final List<IFormFieldInjection> m_stack = new ArrayList<>();
 
-  private final List<ICompositeField> m_containerFields = new ArrayList<ICompositeField>();
+  private final List<ICompositeField> m_containerFields = new ArrayList<>();
 
   private FormFieldInjectionThreadLocal() {
   }

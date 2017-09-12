@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json;
 /**
  * Implementations of this interface transform a model object into a JSONObject.
  */
+@FunctionalInterface
 public interface IJsonObject {
 
   Object toJson();

@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 
 public class DesktopEventFilterCondition {
 
-  private int m_type;
+  private final int m_type;
   private IForm m_form;
   private boolean m_checkDisplayParents;
 

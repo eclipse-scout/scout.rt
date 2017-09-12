@@ -40,7 +40,7 @@ public final class HttpCacheKey implements Serializable {
    */
   public HttpCacheKey(String resourcePath, Map<String, String> attributes) {
     m_resourcePath = resourcePath;
-    m_attributes = attributes != null && !attributes.isEmpty() ? new HashMap<String, String>(attributes) : null;
+    m_attributes = attributes != null && !attributes.isEmpty() ? new HashMap<>(attributes) : null;
   }
 
   public String getResourcePath() {

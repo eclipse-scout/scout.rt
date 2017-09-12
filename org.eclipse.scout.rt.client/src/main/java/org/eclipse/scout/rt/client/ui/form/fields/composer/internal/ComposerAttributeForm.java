@@ -52,10 +52,6 @@ public class ComposerAttributeForm extends AbstractForm {
    */
   private List<String> m_selectedDisplayValues;
 
-  public ComposerAttributeForm() {
-    super();
-  }
-
   /**
    * form property
    */
@@ -76,13 +72,13 @@ public class ComposerAttributeForm extends AbstractForm {
     return CollectionUtility.arrayList(m_selectedValues);
   }
 
-  public void setSelectedValues(List<? extends Object> o) {
+  public void setSelectedValues(List<?> o) {
     setSelectedValuesInternal(o);
     // single observer
     activateValueField();
   }
 
-  private void setSelectedValuesInternal(List<? extends Object> values0) {
+  private void setSelectedValuesInternal(List<?> values0) {
     m_selectedValues = CollectionUtility.arrayListWithoutNullElements(values0);
   }
 
@@ -208,10 +204,10 @@ public class ComposerAttributeForm extends AbstractForm {
         @Override
         protected List<ILookupRow<IDataModelAttribute>> execLoadTableData() {
           List<IDataModelAttribute> a = getAvailableAttributes();
-          List<ILookupRow<IDataModelAttribute>> result = new ArrayList<ILookupRow<IDataModelAttribute>>(a.size());
+          List<ILookupRow<IDataModelAttribute>> result = new ArrayList<>(a.size());
           for (IDataModelAttribute attribute : a) {
             if (attribute.isVisible()) {
-              result.add(new LookupRow<IDataModelAttribute>(attribute, attribute.getText()).withIconId(attribute.getIconId()));
+              result.add(new LookupRow<>(attribute, attribute.getText()).withIconId(attribute.getIconId()));
             }
           }
           return result;
@@ -275,20 +271,20 @@ public class ComposerAttributeForm extends AbstractForm {
             ops = att.getOperators();
           }
           if (ops != null) {
-            List<ILookupRow<IDataModelAttributeOp>> result = new ArrayList<ILookupRow<IDataModelAttributeOp>>(ops.size());
+            List<ILookupRow<IDataModelAttributeOp>> result = new ArrayList<>(ops.size());
             for (IDataModelAttributeOp op : ops) {
               String text = op.getText();
-              if (text != null && text.indexOf("{0}") >= 0) {
+              if (text != null && text.contains("{0}")) {
                 text = text.replace("{0}", "n");
               }
-              if (text != null && text.indexOf("{1}") >= 0) {
+              if (text != null && text.contains("{1}")) {
                 text = text.replace("{1}", "m");
               }
-              result.add(new LookupRow<IDataModelAttributeOp>(op, text));
+              result.add(new LookupRow<>(op, text));
             }
             return result;
           }
-          return new ArrayList<ILookupRow<IDataModelAttributeOp>>(0);
+          return new ArrayList<>(0);
         }
 
         @Override

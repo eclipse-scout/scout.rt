@@ -219,11 +219,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
 
       // there is already an initial event.
       // check if there is already an event merger or create one
-      TableEventMerger eventMerger = eventMergerByType.get(type);
-      if (eventMerger == null) {
-        eventMerger = new TableEventMerger(initialEvent);
-        eventMergerByType.put(type, eventMerger);
-      }
+      TableEventMerger eventMerger = eventMergerByType.computeIfAbsent(type, k -> new TableEventMerger(initialEvent));
 
       // merge current event and remove it from the original event list
       eventMerger.merge(event);
@@ -245,7 +241,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
       return;
     }
 
-    List<Integer> eventIndexesToDelete = new ArrayList<Integer>();
+    List<Integer> eventIndexesToDelete = new ArrayList<>();
     for (ListIterator<TableEvent> it = events.listIterator(events.size()); it.hasPrevious();) {
       final int eventIndex = it.previousIndex();
       final TableEvent event = it.previous();
@@ -294,12 +290,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
   }
 
   protected void removeEmptyEvents(List<TableEvent> events) {
-    for (Iterator<TableEvent> it = events.iterator(); it.hasNext();) {
-      TableEvent event = it.next();
-      if (isRowsRequired(event.getType()) && !event.hasRows()) {
-        it.remove();
-      }
-    }
+    events.removeIf(event -> isRowsRequired(event.getType()) && !event.hasRows());
   }
 
   /**
@@ -544,9 +535,9 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
 
     private final TableEvent m_targetEvent;
     private final Collection<IColumn<?>> m_targetColumns;
-    private final HashSet<IColumn<?>> m_targetColumnSet;
+    private final Set<IColumn<?>> m_targetColumnSet;
     private final List<ITableRow> m_targetRows;
-    private final HashSet<ITableRow> m_targetRowSet;
+    private final Set<ITableRow> m_targetRowSet;
 
     private List<IColumn<?>> m_mergedColumns;
     private List<ITableRow> m_mergedRows;
@@ -594,13 +585,9 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
      * Merge collections, such that, if an element is in both collections, only the one of the second collection (later
      * event) is kept.
      */
-    protected <TYPE> void mergeCollections(Collection<TYPE> source, List<TYPE> target, HashSet<TYPE> targetSet) {
-      for (Iterator<TYPE> it = source.iterator(); it.hasNext();) {
-        TYPE sourceElement = it.next();
-        if (!targetSet.add(sourceElement)) { // returns true, if the sourceElement has been added; false, if it was already in the set.
-          it.remove();
-        }
-      }
+    protected <TYPE> void mergeCollections(Collection<TYPE> source, List<TYPE> target, Set<TYPE> targetSet) {
+      // returns true, if the sourceElement has been added; false, if it was already in the set.
+      source.removeIf(sourceElement -> !targetSet.add(sourceElement));
       target.addAll(0, source);
     }
   }
@@ -631,12 +618,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
         return;
       }
 
-      for (Iterator<ITableRow> it = m_rows.iterator(); it.hasNext();) {
-        ITableRow next = it.next();
-        if (event.containsRow(next)) {
-          it.remove();
-        }
-      }
+      m_rows.removeIf(event::containsRow);
     }
 
     public void complete() {

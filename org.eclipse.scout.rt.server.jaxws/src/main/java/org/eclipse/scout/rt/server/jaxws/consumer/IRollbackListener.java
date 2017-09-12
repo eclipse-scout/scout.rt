@@ -15,6 +15,7 @@ package org.eclipse.scout.rt.server.jaxws.consumer;
  *
  * @since 5.1
  */
+@FunctionalInterface
 public interface IRollbackListener {
 
   /**

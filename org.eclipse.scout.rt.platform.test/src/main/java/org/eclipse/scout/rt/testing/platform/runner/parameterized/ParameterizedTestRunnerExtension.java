@@ -55,8 +55,8 @@ public final class ParameterizedTestRunnerExtension {
    * Creates parameterized and non parameterized test methods.
    */
   public static List<FrameworkMethod> createTestMethods(List<FrameworkMethod> originalTestMethods, int numberOfParameterEntries) {
-    List<FrameworkMethod> nonParameterizedTestMethods = new LinkedList<FrameworkMethod>();
-    List<FrameworkMethod> originalTestMethodsToBeParameterized = new LinkedList<FrameworkMethod>();
+    List<FrameworkMethod> nonParameterizedTestMethods = new LinkedList<>();
+    List<FrameworkMethod> originalTestMethodsToBeParameterized = new LinkedList<>();
 
     for (FrameworkMethod test : originalTestMethods) {
       if (test.getAnnotation(NonParameterized.class) != null) {
@@ -68,14 +68,14 @@ public final class ParameterizedTestRunnerExtension {
       }
     }
 
-    List<FrameworkMethod> result = new LinkedList<FrameworkMethod>();
+    List<FrameworkMethod> result = new LinkedList<>();
     result.addAll(nonParameterizedTestMethods);
     result.addAll(createParameterizedTestMethods(originalTestMethodsToBeParameterized, numberOfParameterEntries));
     return result;
   }
 
   static List<FrameworkMethod> createParameterizedTestMethods(List<FrameworkMethod> originalTestMethods, int numberOfParameterEntries) {
-    List<FrameworkMethod> result = new LinkedList<FrameworkMethod>();
+    List<FrameworkMethod> result = new LinkedList<>();
 
     for (int paramsIndex = 0; paramsIndex < numberOfParameterEntries; paramsIndex++) {
       for (FrameworkMethod test : originalTestMethods) {

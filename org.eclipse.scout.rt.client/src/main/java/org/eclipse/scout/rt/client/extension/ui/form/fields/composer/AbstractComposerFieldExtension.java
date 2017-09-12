@@ -63,7 +63,7 @@ public abstract class AbstractComposerFieldExtension<OWNER extends AbstractCompo
   }
 
   @Override
-  public AttributeNode execCreateAttributeNode(ComposerFieldCreateAttributeNodeChain chain, ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<? extends Object> values, List<String> texts) {
+  public AttributeNode execCreateAttributeNode(ComposerFieldCreateAttributeNodeChain chain, ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<?> values, List<String> texts) {
     return chain.execCreateAttributeNode(parentNode, a, aggregationType, op, values, texts);
   }
 
@@ -88,7 +88,7 @@ public abstract class AbstractComposerFieldExtension<OWNER extends AbstractCompo
   }
 
   @Override
-  public EntityNode execCreateEntityNode(ComposerFieldCreateEntityNodeChain chain, ITreeNode parentNode, IDataModelEntity e, boolean negated, List<? extends Object> values, List<String> texts) {
+  public EntityNode execCreateEntityNode(ComposerFieldCreateEntityNodeChain chain, ITreeNode parentNode, IDataModelEntity e, boolean negated, List<?> values, List<String> texts) {
     return chain.execCreateEntityNode(parentNode, e, negated, values, texts);
   }
 }

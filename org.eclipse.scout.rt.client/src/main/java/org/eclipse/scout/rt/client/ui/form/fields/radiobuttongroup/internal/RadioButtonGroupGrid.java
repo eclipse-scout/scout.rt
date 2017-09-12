@@ -41,7 +41,7 @@ public class RadioButtonGroupGrid implements ICompositeFieldGrid<ICompositeField
     m_group = compositeField;
     m_gridColumns = 0;
     m_gridRows = 0;
-    ArrayList<IFormField> list = new ArrayList<IFormField>();
+    ArrayList<IFormField> list = new ArrayList<>();
     // filter
     for (IFormField f : m_group.getFields()) {
       if (f.isVisible()) {

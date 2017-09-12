@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 /**
  * Interface required for interaction between JsonOutline and JsonOutlineTable.
  */
+@FunctionalInterface
 public interface IJsonOutlineAdapter {
 
   /**

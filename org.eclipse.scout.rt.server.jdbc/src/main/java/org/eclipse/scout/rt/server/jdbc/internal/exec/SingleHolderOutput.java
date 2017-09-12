@@ -18,8 +18,8 @@ import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueOutputToken;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 
 class SingleHolderOutput implements IBindOutput {
-  private IHolder<?> m_holder;
-  private ValueOutputToken m_source;
+  private final IHolder<?> m_holder;
+  private final ValueOutputToken m_source;
   private int m_batchIndex = -1;
   private int m_jdbcBindIndex = -1;
   private Object m_accumulator;

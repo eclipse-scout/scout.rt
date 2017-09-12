@@ -45,7 +45,7 @@ public final class HolderUtility {
     if (h == null) {
       return null;
     }
-    return new Holder<T>(h.getHolderType(), h.getValue());
+    return new Holder<>(h.getHolderType(), h.getValue());
   }
 
 }

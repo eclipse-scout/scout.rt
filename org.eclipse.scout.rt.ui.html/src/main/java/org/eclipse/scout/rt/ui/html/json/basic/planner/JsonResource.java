@@ -21,7 +21,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonResource implements IJsonObject {
-  private Resource<?> m_resource;
+  private final Resource<?> m_resource;
   private final IIdProvider<Resource<?>> m_resourceIdProvider;
   private final IIdProvider<Activity<?, ?>> m_cellIdProvider;
   private final IJsonAdapter<?> m_parentAdapter;

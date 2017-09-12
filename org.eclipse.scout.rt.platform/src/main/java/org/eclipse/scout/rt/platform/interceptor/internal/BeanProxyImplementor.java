@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.platform.interceptor.internal;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
@@ -36,12 +35,7 @@ public class BeanProxyImplementor<T> implements IInstanceInvocationHandler<T> {
   public BeanProxyImplementor(IBean<T> bean, IBeanDecorator<T> interceptor, Class... types) {
     m_bean = Assertions.assertNotNull(bean);
     m_interceptor = Assertions.assertNotNull(interceptor);
-    m_decoratingProxy = DecoratingProxy.newInstance(this, new Callable<T>() {
-      @Override
-      public T call() throws Exception {
-        return m_bean.getInstance();
-      }
-    }, types);
+    m_decoratingProxy = DecoratingProxy.newInstance(this, m_bean::getInstance, types);
   }
 
   public T getProxy() {

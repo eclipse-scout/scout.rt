@@ -25,6 +25,7 @@ import java.util.ServiceLoader;
  *
  * @since 6.1
  */
+@FunctionalInterface
 public interface IConfigFileLoader {
 
   /**

@@ -72,10 +72,10 @@ public class CopyOnWriteTransactionalMap<K, V> extends AbstractTransactionalMap<
     return (TM) new CopyOnWriteMapTransactionMember(getTransactionMemberId(), isFastForward());
   }
 
-  public class CopyOnWriteMapTransactionMember extends AbstractTransactionalMap.AbstractMapTransactionMember<K, V> {
+  public class CopyOnWriteMapTransactionMember extends AbstractMapTransactionMember<K, V> {
 
     public CopyOnWriteMapTransactionMember(String transactionMemberId, boolean fastForward) {
-      this(transactionMemberId, new HashMap<K, V>(), new HashMap<K, V>(), fastForward);
+      this(transactionMemberId, new HashMap<>(), new HashMap<>(), fastForward);
     }
 
     public CopyOnWriteMapTransactionMember(String transactionId, Map<K, V> removedMap, Map<K, V> insertedMap, boolean fastForward) {
@@ -90,7 +90,7 @@ public class CopyOnWriteTransactionalMap<K, V> extends AbstractTransactionalMap<
     @Override
     public void commitPhase2() {
       synchronized (m_sharedMapLock) {
-        HashMap<K, V> newSharedMap = new HashMap<>(m_sharedMap);
+        Map<K, V> newSharedMap = new HashMap<>(m_sharedMap);
         Collection<K> successfulCommitedChanges = new ArrayList<>();
         Collection<K> failedCommitedChanges = new ArrayList<>();
         for (Entry<K, V> entry : getRemovedMap().entrySet()) {
@@ -146,7 +146,7 @@ public class CopyOnWriteTransactionalMap<K, V> extends AbstractTransactionalMap<
     protected boolean fastForward(K key, V value) {
       synchronized (m_sharedMapLock) {
         if (m_sharedMap.get(key) == null) {
-          HashMap<K, V> newSharedMap = new HashMap<>(m_sharedMap);
+          Map<K, V> newSharedMap = new HashMap<>(m_sharedMap);
           newSharedMap.put(key, value);
           m_sharedMap = newSharedMap;
           return true;

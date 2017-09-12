@@ -112,7 +112,7 @@ public class JSONStringer {
   /**
    * Unlike the original implementation, this stack isn't limited to 20 levels of nesting.
    */
-  private final List<Scope> m_stack = new ArrayList<Scope>();
+  private final List<Scope> m_stack = new ArrayList<>();
 
   /**
    * A string containing a full set of spaces for a single level of indentation, or null for no pretty printing.

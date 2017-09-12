@@ -81,15 +81,9 @@ class DelayedExecutor {
    * <code>value1</code> is greater than <code>value2</code>, or <code>0</code> if the two values are equals.
    */
   private int signum(final long value1, final long value2) {
-    if (value1 > value2) { // do not subtract because of potential overflow.
-      return +1;
-    }
-    else if (value1 < value2) { // do not subtract because of potential overflow.
-      return -1;
-    }
-    else {
-      return 0;
-    }
+    // do not subtract because of potential overflow.
+    // do not subtract because of potential overflow.
+    return Long.compare(value1, value2);
   }
 
   /**

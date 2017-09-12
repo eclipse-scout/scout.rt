@@ -143,18 +143,10 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     IPermissionService psvc = BEANS.opt(IPermissionService.class);
     if (psvc != null) {
       for (Class<? extends Permission> d : psvc.getAllPermissionClasses()) {
-        List<Class<?>> list = m_permissionNameToDescriptor.get(d.getSimpleName());
-        if (list == null) {
-          list = new ArrayList<>();
-          m_permissionNameToDescriptor.put(d.getSimpleName(), list);
-        }
+        List<Class<?>> list = m_permissionNameToDescriptor.computeIfAbsent(d.getSimpleName(), k -> new ArrayList<>());
         list.add(d);
 
-        list = m_permissionNameToDescriptor.get(d.getName());
-        if (list == null) {
-          list = new ArrayList<>();
-          m_permissionNameToDescriptor.put(d.getName(), list);
-        }
+        list = m_permissionNameToDescriptor.computeIfAbsent(d.getName(), k -> new ArrayList<>());
         list.add(d);
       }
     }
@@ -163,18 +155,10 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     ICodeService csvc = BEANS.opt(ICodeService.class);
     if (csvc != null) {
       for (Class<?> d : csvc.getAllCodeTypeClasses()) {
-        List<Class<?>> list = m_codeNameToDescriptor.get(d.getSimpleName());
-        if (list == null) {
-          list = new ArrayList<>();
-          m_codeNameToDescriptor.put(d.getSimpleName(), list);
-        }
+        List<Class<?>> list = m_codeNameToDescriptor.computeIfAbsent(d.getSimpleName(), k -> new ArrayList<>());
         list.add(d);
 
-        list = m_codeNameToDescriptor.get(d.getName());
-        if (list == null) {
-          list = new ArrayList<>();
-          m_codeNameToDescriptor.put(d.getName(), list);
-        }
+        list = m_codeNameToDescriptor.computeIfAbsent(d.getName(), k -> new ArrayList<>());
         list.add(d);
       }
     }
@@ -746,13 +730,13 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     String base = name;
     String suffix = "";
     ClassLoader classLoader = getClass().getClassLoader();
-    while (base.length() > 0) {
+    while (!base.isEmpty()) {
       List<Class<?>> list = map.get(base);
       if (list != null) {
         for (Class<?> desc : list) {
           try {
             Class c = classLoader.loadClass(desc.getName());
-            if (suffix.length() > 0) {
+            if (!suffix.isEmpty()) {
               c = classLoader.loadClass(desc.getName() + suffix.replace('.', '$'));
               return c;
             }

@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
 
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+
 /**
  * This wrapper bounds the maximum concurrent resolve operation of a cache. In case a waiting operation is interrupted,
  * the interrupt state on the thread is set again and the resolve is then done <b>without</b> a bound.
@@ -43,7 +45,7 @@ public class BoundedResolveCacheWrapper<K, V> extends AbstractCacheWrapper<K, V>
     catch (InterruptedException e) {
       // interrupted, mark thread again as interrupted and resolve without a semaphore anyway
       Thread.currentThread().interrupt();
-      throw new org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError("Interrupted during acquire", e);
+      throw new ThreadInterruptedError("Interrupted during acquire", e);
     }
     try {
       return super.get(key);
@@ -56,7 +58,7 @@ public class BoundedResolveCacheWrapper<K, V> extends AbstractCacheWrapper<K, V>
   @Override
   public Map<K, V> getAll(Collection<? extends K> keys) {
     Map<K, V> cacheMap = getUnmodifiableMap();
-    Map<K, V> result = new HashMap<K, V>();
+    Map<K, V> result = new HashMap<>();
     for (K key : keys) {
       V value = cacheMap.get(key);
       if (value == null) {

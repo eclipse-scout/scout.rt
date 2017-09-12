@@ -27,7 +27,7 @@ public final class ObjectUtility {
   /**
    * <p>
    * Indicates whether some Object a is "equal to" another Object b. The equivalence relation is implemented according
-   * to {@link java.lang.Object#equals(Object)}.
+   * to {@link Object#equals(Object)}.
    * </p>
    * Additionally, some commonly used comparisons are implemented as "expected".
    * <p>
@@ -42,11 +42,11 @@ public final class ObjectUtility {
    * <b>Arrays:</b> Arrays are considered "equal to" one another, if all their elements are "equal to" one another.
    * </p>
    * <p>
-   * <b>Timestamp and Date:</b> {@link java.sql.Timestamp#equals(Object)} is not symmetric. E.g. when comparing a Date d
-   * and Timestamp t, d.equals(t) may return true while t.equals(d) returns false. This is not "expected" and
-   * inconvenient when performing operations like sorting on collections containing both Dates and Timestamps.
-   * Therefore, this method handles <code> java.sql.Timestamp</code> specifically to provide a symmetric implementation
-   * of the equivalence comparison.
+   * <b>Timestamp and Date:</b> {@link Timestamp#equals(Object)} is not symmetric. E.g. when comparing a Date d and
+   * Timestamp t, d.equals(t) may return true while t.equals(d) returns false. This is not "expected" and inconvenient
+   * when performing operations like sorting on collections containing both Dates and Timestamps. Therefore, this method
+   * handles <code> java.sql.Timestamp</code> specifically to provide a symmetric implementation of the equivalence
+   * comparison.
    * </p>
    * <p>
    * <code>java.sql.Timestamp</code> is a subclass of <code>java.util.Date</code>, which additionally allows to specify
@@ -167,7 +167,7 @@ public final class ObjectUtility {
       return false;
     }
     for (Object e : elements) {
-      if (ObjectUtility.equals(o, e)) {
+      if (equals(o, e)) {
         return true;
       }
     }

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.beanfield;
 
+@FunctionalInterface
 public interface IBeanFieldUIFacade {
 
   void fireAppLinkActionFromUI(String ref);

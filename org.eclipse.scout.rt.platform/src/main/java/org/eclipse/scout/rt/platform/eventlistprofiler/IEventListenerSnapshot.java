@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.eventlistprofiler;
 
+@FunctionalInterface
 public interface IEventListenerSnapshot {
 
   void add(Class<?> listenerType, String context, Object listener);

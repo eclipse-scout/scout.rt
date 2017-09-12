@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.tabbox;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -99,16 +97,13 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
     m_grid = new TabBoxGrid();
     setMarkStrategy(getConfiguredMarkStrategy());
     super.initConfig();
-    addPropertyChangeListener(PROP_SELECTED_TAB, new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent e) {
-        // single observer exec
-        try {
-          interceptTabSelected(getSelectedTab());
-        }
-        catch (Exception ex) {
-          BEANS.get(ExceptionHandler.class).handle(ex);
-        }
+    addPropertyChangeListener(PROP_SELECTED_TAB, e -> {
+      // single observer exec
+      try {
+        interceptTabSelected(getSelectedTab());
+      }
+      catch (Exception ex) {
+        BEANS.get(ExceptionHandler.class).handle(ex);
       }
     });
     initMenus();
@@ -117,7 +112,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
   private void initMenus() {
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
-    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
+    OrderedCollection<IMenu> menus = new OrderedCollection<>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
       try {
         menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
@@ -133,7 +128,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
-    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
+    new MoveActionNodesHandler<>(menus).moveModelObjects();
     // set container on menus
     IFormFieldContextMenu contextMenu = new FormFieldContextMenu<ITabBox>(this, menus.getOrderedList());
     contextMenu.setContainerInternal(this);
@@ -204,7 +199,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
 
   @Override
   public List<IGroupBox> getGroupBoxes() {
-    List<IGroupBox> result = new ArrayList<IGroupBox>();
+    List<IGroupBox> result = new ArrayList<>();
     for (IFormField field : getFields()) {
       if (field instanceof IGroupBox) {
         result.add((IGroupBox) field);
@@ -303,7 +298,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
 
   @Override
   protected ITabBoxExtension<? extends AbstractTabBox> createLocalExtension() {
-    return new LocalTabBoxExtension<AbstractTabBox>(this);
+    return new LocalTabBoxExtension<>(this);
   }
 
   @Override

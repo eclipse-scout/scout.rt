@@ -62,7 +62,6 @@ public class ColumnEditableTest {
 
   /**
    * Tests, if a field in the editable column is valid
-   *
    */
   @Test
   public void testFieldInEditableColumn() {

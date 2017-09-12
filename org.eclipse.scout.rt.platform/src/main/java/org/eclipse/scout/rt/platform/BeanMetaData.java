@@ -213,7 +213,7 @@ public class BeanMetaData {
    * @return A {@link Map} with the {@link Annotation} class as key and the {@link Annotation} instance as value.
    */
   public Map<Class<? extends Annotation>, Annotation> getBeanAnnotations() {
-    return new HashMap<Class<? extends Annotation>, Annotation>(m_beanAnnotations);
+    return new HashMap<>(m_beanAnnotations);
   }
 
   /**

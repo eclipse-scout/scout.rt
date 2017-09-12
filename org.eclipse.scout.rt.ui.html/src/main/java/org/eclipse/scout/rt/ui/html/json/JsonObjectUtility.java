@@ -15,10 +15,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.reflect.FastBeanInfo;
@@ -264,18 +266,16 @@ public final class JsonObjectUtility {
     JSONObject jbean = (JSONObject) jval;
     T o;
     try {
-      o = (T) type.newInstance();
+      o = type.newInstance();
     }
     catch (Exception e) {
       throw new IllegalArgumentException("type " + type + " object " + jval, e);
     }
     try {
-      HashSet<String> missingNames = new HashSet<>();
+      Set<String> missingNames = new HashSet<>();
       String[] nameArray = getNames(jbean);
       if (nameArray != null) {
-        for (String key : nameArray) {
-          missingNames.add(key);
-        }
+        Collections.addAll(missingNames, nameArray);
         for (String key : nameArray) {
           try { // NOSONAR
             Field f = type.getField(key);
@@ -291,7 +291,7 @@ public final class JsonObjectUtility {
           }
         }
       }
-      if (missingNames.size() > 0) {
+      if (!missingNames.isEmpty()) {
         FastBeanInfo beanInfo = new FastBeanInfo(type, Object.class);
         for (FastPropertyDescriptor desc : beanInfo.getPropertyDescriptors()) {
           Method m = desc.getWriteMethod();
@@ -304,7 +304,7 @@ public final class JsonObjectUtility {
           missingNames.remove(key);
         }
       }
-      if (throwForMissingProperty && missingNames.size() > 0) {
+      if (throwForMissingProperty && !missingNames.isEmpty()) {
         throw new IllegalArgumentException("properties " + missingNames + " do not exist in " + type);
       }
       return o;
@@ -334,7 +334,7 @@ public final class JsonObjectUtility {
     }
     //array
     if (jval instanceof JSONArray) {
-      return (JSONArray) jval;
+      return jval;
     }
     if (type == String.class) {
       return jsonObject.getString(propertyName);
@@ -375,7 +375,7 @@ public final class JsonObjectUtility {
     }
     //array
     if (jval instanceof JSONArray) {
-      return (JSONArray) jval;
+      return jval;
     }
     if (type == String.class) {
       return jsonArray.getString(index);

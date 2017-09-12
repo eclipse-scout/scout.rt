@@ -42,11 +42,7 @@ public abstract class AbstractConfigProperty<DATA_TYPE, RAW_TYPE> implements ICo
   @Override
   public synchronized DATA_TYPE getValue(String namespace) {
     String key = createKey(namespace);
-    P_ParsedPropertyValueEntry<DATA_TYPE> entry = m_values.get(key);
-    if (entry == null) {
-      entry = read(namespace);
-      m_values.put(key, entry);
-    }
+    P_ParsedPropertyValueEntry<DATA_TYPE> entry = m_values.computeIfAbsent(key, k -> read(namespace));
 
     if (entry.m_exc != null) {
       throw entry.m_exc;
@@ -114,8 +110,8 @@ public abstract class AbstractConfigProperty<DATA_TYPE, RAW_TYPE> implements ICo
       return;
     }
 
-    for (int i = 0; i < listeners.length; i++) {
-      listeners[i].configPropertyChanged(e);
+    for (IConfigChangedListener listener : listeners) {
+      listener.configPropertyChanged(e);
     }
   }
 

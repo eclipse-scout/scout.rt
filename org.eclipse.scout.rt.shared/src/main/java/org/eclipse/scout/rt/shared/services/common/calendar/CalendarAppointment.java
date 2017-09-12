@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.calendar;
 
-import java.io.Serializable;
+import java.util.AbstractCollection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 
-public class CalendarAppointment extends AbstractCalendarItem implements ICalendarAppointment, Serializable {
+public class CalendarAppointment extends AbstractCalendarItem implements ICalendarAppointment {
   private static final long serialVersionUID = 1L;
   //
   private Object m_person;
@@ -28,7 +28,7 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
   private boolean m_fullDay;
   private String m_location;
   private int m_busyStatus;
-  private HashSet<String> m_recipientEmail = new HashSet<String>();
+  private final AbstractCollection<String> m_recipientEmail = new HashSet<>();
 
   public CalendarAppointment() {
     super();

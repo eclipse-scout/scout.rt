@@ -35,9 +35,6 @@ import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 public abstract class AbstractDesktopExtension implements IDesktopExtension {
   private IDesktop m_coreDesktop;
 
-  public AbstractDesktopExtension() {
-  }
-
   @Override
   public ContributionCommand initDelegate() {
     return execInit();

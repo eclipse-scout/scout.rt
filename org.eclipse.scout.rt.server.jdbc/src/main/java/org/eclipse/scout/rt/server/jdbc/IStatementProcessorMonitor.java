@@ -15,6 +15,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
 
+@FunctionalInterface
 public interface IStatementProcessorMonitor {
 
   /**

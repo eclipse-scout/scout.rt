@@ -89,7 +89,7 @@ public interface IWizardStep<FORM extends IForm> extends IPropertyObserver, ITyp
    * @param stepKind
    *          any of the STEP_* constants activate this step normally creates a form, calls
    *          {@link IForm#startWizardStep(IWizardStep2, Class)} on the form and places the form inside the wizard
-   *          {@link IWizard#setWizardForm(org.eclipse.scout.rt.client.ui.form.IForm)}
+   *          {@link IWizard#setWizardForm(IForm)}
    */
   void activate(int stepKind);
 

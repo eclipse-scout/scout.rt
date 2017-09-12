@@ -96,9 +96,9 @@ public final class TableUtility {
         }
         Field[] fields = tmp.getDeclaredFields();
         if (fields != null && fields.length > 0) {
-          for (int i = 0; i < fields.length; i++) {
-            if ((fields[i].getModifiers() & (Modifier.STATIC | Modifier.FINAL)) == 0) {
-              LOG.warn("{} subclasses LocalLookupCall with additional member {} and should therefore override the 'equals' and 'hashCode' methods", clazz, fields[i].getName());
+          for (Field field : fields) {
+            if ((field.getModifiers() & (Modifier.STATIC | Modifier.FINAL)) == 0) {
+              LOG.warn("{} subclasses LocalLookupCall with additional member {} and should therefore override the 'equals' and 'hashCode' methods", clazz, field.getName());
               return false;
             }
           }
@@ -116,9 +116,9 @@ public final class TableUtility {
         }
         Field[] fields = tmp.getDeclaredFields();
         if (fields != null && fields.length > 0) {
-          for (int i = 0; i < fields.length; i++) {
-            if ((fields[i].getModifiers() & (Modifier.STATIC | Modifier.FINAL)) == 0) {
-              LOG.warn("{} subclasses LookupCall with additional member {} and should therefore override the 'equals' and 'hashCode' methods", clazz, fields[i].getName());
+          for (Field field : fields) {
+            if ((field.getModifiers() & (Modifier.STATIC | Modifier.FINAL)) == 0) {
+              LOG.warn("{} subclasses LookupCall with additional member {} and should therefore override the 'equals' and 'hashCode' methods", clazz, field.getName());
               return false;
             }
           }
@@ -253,20 +253,20 @@ public final class TableUtility {
         a[csvRowIndex][c] = format;
         csvRowIndex++;
       }
-      for (int r = 0; r < nr; r++) {
+      for (ITableRow row : rows) {
         if (byValue) {
           if (type == Timestamp.class) {
-            a[csvRowIndex][c] = TypeCastUtility.castValue(columns.get(c).getValue(rows.get(r)), Timestamp.class);
+            a[csvRowIndex][c] = TypeCastUtility.castValue(columns.get(c).getValue(row), Timestamp.class);
           }
           else {
-            a[csvRowIndex][c] = columns.get(c).getValue(rows.get(r));
+            a[csvRowIndex][c] = columns.get(c).getValue(row);
           }
         }
         else {
-          String text = columns.get(c).getDisplayText(rows.get(r));
+          String text = columns.get(c).getDisplayText(row);
           //special intercept for boolean
           if (type == Boolean.class) {
-            Boolean b = TypeCastUtility.castValue(columns.get(c).getValue(rows.get(r)), Boolean.class);
+            Boolean b = TypeCastUtility.castValue(columns.get(c).getValue(row), Boolean.class);
             if (b != null && b.booleanValue() && !StringUtility.hasText(text)) {
               // only use X if no display text is set
               text = "X";
@@ -284,6 +284,7 @@ public final class TableUtility {
     return a;
   }
 
+  @FunctionalInterface
   public interface ITableCellEditorFilter {
     boolean accept(ITableRow row, IColumn<?> col);
   }

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.form;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -31,16 +30,13 @@ import org.eclipse.scout.rt.shared.extension.AbstractContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 
 @Bean
-public abstract class AbstractFormData extends AbstractContributionComposite implements Serializable, IPropertyHolder {
+public abstract class AbstractFormData extends AbstractContributionComposite implements IPropertyHolder {
   public static final char FIELD_PATH_DELIM = '/';
   private static final long serialVersionUID = 1L;
 
   private Map<Class<?>, Class<? extends AbstractFormFieldData>> m_fieldDataReplacements;
   private Map<Class<? extends AbstractPropertyData>, AbstractPropertyData> m_propertyMap;
   private Map<Class<? extends AbstractFormFieldData>, AbstractFormFieldData> m_fieldMap;
-
-  public AbstractFormData() {
-  }
 
   private List<Class<AbstractPropertyData>> getConfiguredPropertyDatas() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
@@ -57,7 +53,7 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
   protected void initConfig() {
     // add properties
     List<Class<AbstractPropertyData>> configuredPropertyDatas = getConfiguredPropertyDatas();
-    Map<Class<? extends AbstractPropertyData>, AbstractPropertyData> propMap = new HashMap<Class<? extends AbstractPropertyData>, AbstractPropertyData>(configuredPropertyDatas.size());
+    Map<Class<? extends AbstractPropertyData>, AbstractPropertyData> propMap = new HashMap<>(configuredPropertyDatas.size());
     for (Class<AbstractPropertyData> propertyDataClazz : configuredPropertyDatas) {
       AbstractPropertyData p = ConfigurationUtility.newInnerInstance(this, propertyDataClazz);
       propMap.put(p.getClass(), p);
@@ -68,7 +64,7 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
 
     // add fields
     List<Class<? extends AbstractFormFieldData>> formFieldDataClazzes = getConfiguredFieldDatas();
-    m_fieldMap = new HashMap<Class<? extends AbstractFormFieldData>, AbstractFormFieldData>(formFieldDataClazzes.size());
+    m_fieldMap = new HashMap<>(formFieldDataClazzes.size());
     Map<Class<?>, Class<? extends AbstractFormFieldData>> replacements = ConfigurationUtility.getReplacementMapping(formFieldDataClazzes);
     if (!replacements.isEmpty()) {
       m_fieldDataReplacements = replacements;
@@ -110,7 +106,7 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
     }
     else {
       if (m_propertyMap == null) {
-        m_propertyMap = new HashMap<Class<? extends AbstractPropertyData>, AbstractPropertyData>();
+        m_propertyMap = new HashMap<>();
       }
       m_propertyMap.put(c, v);
     }
@@ -194,7 +190,7 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    *         would be returned as A B U V X Y E F
    */
   public Map<Integer, Map<String/* qualified field id */, AbstractFormFieldData>> getAllFieldsRec() {
-    TreeMap<Integer, Map<String, AbstractFormFieldData>> breadthFirstMap = new TreeMap<Integer, Map<String, AbstractFormFieldData>>();
+    Map<Integer, Map<String, AbstractFormFieldData>> breadthFirstMap = new TreeMap<>();
     for (AbstractFormFieldData child : getFields()) {
       collectAllFieldsRec(child, breadthFirstMap, 0, "", false);
     }
@@ -224,11 +220,7 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
   }
 
   private static void collectAllFieldsRec(AbstractFormFieldData field, Map<Integer/* level */, Map<String/* qualified field id */, AbstractFormFieldData>> breadthFirstMap, int level, String prefix, boolean isContributionTopLevelContainer) {
-    Map<String/* qualified field id */, AbstractFormFieldData> subMap = breadthFirstMap.get(level);
-    if (subMap == null) {
-      subMap = new HashMap<String/* qualified field id */, AbstractFormFieldData>();
-      breadthFirstMap.put(level, subMap);
-    }
+    Map<String/* qualified field id */, AbstractFormFieldData> subMap = breadthFirstMap.computeIfAbsent(level, k -> new HashMap<>());
     boolean isTopLevel = field.getClass().getDeclaringClass() == null;
     String fieldId = null;
     if (isTopLevel || isContributionTopLevelContainer) {
@@ -303,8 +295,8 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    *         would be returned as p1, p4, p2, p3
    */
   public Map<Integer, Map<String/* qualified property id */, AbstractPropertyData<?>>> getAllPropertiesRec() {
-    TreeMap<Integer, Map<String, AbstractPropertyData<?>>> breadthFirstMap = new TreeMap<Integer, Map<String, AbstractPropertyData<?>>>();
-    HashMap<String, AbstractPropertyData<?>> rootMap = new HashMap<String/* qualified field id */, AbstractPropertyData<?>>();
+    Map<Integer, Map<String, AbstractPropertyData<?>>> breadthFirstMap = new TreeMap<>();
+    Map<String, AbstractPropertyData<?>> rootMap = new HashMap<>();
     breadthFirstMap.put(0, rootMap);
     for (AbstractPropertyData<?> prop : getAllProperties()) {
       rootMap.put(prop.getClass().getSimpleName(), prop);
@@ -316,11 +308,7 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
   }
 
   private void collectAllPropertiesRec(AbstractFormFieldData field, Map<Integer/* level */, Map<String/* qualified field id */, AbstractPropertyData<?>>> breadthFirstMap, int level, String prefix) {
-    Map<String/* qualified field id */, AbstractPropertyData<?>> subMap = breadthFirstMap.get(level);
-    if (subMap == null) {
-      subMap = new HashMap<String/* qualified field id */, AbstractPropertyData<?>>();
-      breadthFirstMap.put(level, subMap);
-    }
+    Map<String/* qualified field id */, AbstractPropertyData<?>> subMap = breadthFirstMap.computeIfAbsent(level, k -> new HashMap<>());
     for (AbstractPropertyData<?> prop : field.getAllProperties()) {
       subMap.put(prefix + prop.getClass().getSimpleName(), prop);
     }
@@ -346,7 +334,7 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
     }
     AbstractPropertyData<?> candidate = null;
     for (Map<String, AbstractPropertyData<?>> subMap : breadthFirstMap.values()) {
-      for (Map.Entry<String, AbstractPropertyData<?>> entry : subMap.entrySet()) {
+      for (Entry<String, AbstractPropertyData<?>> entry : subMap.entrySet()) {
         String propertyId = entry.getKey();
         AbstractPropertyData<?> pd = entry.getValue();
         if (matchesAllParts(valueTypeClassIdentifier, propertyId, pd)) {

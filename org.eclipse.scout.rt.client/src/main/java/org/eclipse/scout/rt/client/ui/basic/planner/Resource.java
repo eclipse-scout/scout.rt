@@ -19,9 +19,9 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICellObserver;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public class Resource<RI> implements ICellObserver, IActivityObserver {
-  private RI m_id;
-  private Cell m_cell;
-  private List<Activity<?, ?>> m_activities;
+  private final RI m_id;
+  private final Cell m_cell;
+  private final List<Activity<?, ?>> m_activities;
   private int m_resourceChanging = 0;
   private boolean m_resourcePropertiesChanged;
   private IResourceObserver<RI> m_observer;
@@ -31,7 +31,7 @@ public class Resource<RI> implements ICellObserver, IActivityObserver {
     m_cell = new Cell(this);
     m_cell.setText(text);
     m_cell.setObserver(this);
-    m_activities = new ArrayList<Activity<?, ?>>();
+    m_activities = new ArrayList<>();
   }
 
   public RI getId() {

@@ -15,9 +15,11 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
-import javax.mail.Flags;
+import javax.mail.Authenticator;
+import javax.mail.Flags.Flag;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -44,11 +46,11 @@ public class POP3Adapter {
   private String m_password;
   private String m_defaultFolderName;
   private Store m_store;
-  private HashMap<String, Folder> m_cachedFolders;
+  private final Map<String, Folder> m_cachedFolders;
   private boolean m_connected = false;
 
   public POP3Adapter() {
-    m_cachedFolders = new HashMap<String, Folder>();
+    m_cachedFolders = new HashMap<>();
   }
 
   public POP3Adapter(String host, int port, String username, String password) {
@@ -71,7 +73,7 @@ public class POP3Adapter {
 
   public String[] getUnseenMessageSubjects(String folderName) {
     connect();
-    ArrayList<Message> messages = new ArrayList<Message>();
+    ArrayList<Message> messages = new ArrayList<>();
     Folder folder = null;
     String[] subjects = null;
     try {
@@ -84,9 +86,9 @@ public class POP3Adapter {
         Message[] m = folder.getMessages();
         for (int i = 0; i < Array.getLength(m); i++) {
           item = m[i];
-          if (!item.isSet(Flags.Flag.SEEN)) {
+          if (!item.isSet(Flag.SEEN)) {
             messages.add(item);
-            item.setFlag(Flags.Flag.DELETED, true);
+            item.setFlag(Flag.DELETED, true);
 
           }
         }
@@ -105,15 +107,12 @@ public class POP3Adapter {
     return subjects;
   }
 
-  public Message[] getUnseenMessages(final Flags.Flag markAfterRead) {
-    final ArrayList<Message> list = new ArrayList<Message>();
-    visitUnseenMessages(getDefaultFolderName(), new IPOP3MessageVisitor() {
-      @Override
-      public boolean visit(Message m) throws MessagingException {
-        list.add(m);
-        m.setFlag(markAfterRead, true);
-        return true;
-      }
+  public Message[] getUnseenMessages(final Flag markAfterRead) {
+    final ArrayList<Message> list = new ArrayList<>();
+    visitUnseenMessages(getDefaultFolderName(), m -> {
+      list.add(m);
+      m.setFlag(markAfterRead, true);
+      return true;
     });
     return list.toArray(new Message[list.size()]);
   }
@@ -130,7 +129,7 @@ public class POP3Adapter {
         int count = folder.getMessageCount();
         for (int i = 0; i < count; i++) {
           Message m = folder.getMessage(i + 1);
-          if (!m.isSet(Flags.Flag.SEEN)) {
+          if (!m.isSet(Flag.SEEN)) {
             boolean ok = visitor.visit(m);
             if (!ok) {
               break;
@@ -154,7 +153,7 @@ public class POP3Adapter {
       props.setProperty("mail.pop3.port", "" + getPort());
       props.setProperty("mail.pop3.auth", "" + isUseSSL());
 
-      Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+      Session session = Session.getInstance(props, new Authenticator() {
         @Override
         protected PasswordAuthentication getPasswordAuthentication() {
           return new PasswordAuthentication(props.getProperty("mail.pop3.user"),
@@ -201,7 +200,7 @@ public class POP3Adapter {
 
   public void closeConnection() {
     if (isConnected()) {
-      List<MessagingException> exceptions = new ArrayList<MessagingException>();
+      List<MessagingException> exceptions = new ArrayList<>();
       for (Folder folder : m_cachedFolders.values()) {
         try {
 
@@ -225,7 +224,7 @@ public class POP3Adapter {
       catch (MessagingException e) {
         exceptions.add(e);
       }
-      if (exceptions.size() > 0) {
+      if (!exceptions.isEmpty()) {
         throw new ProcessingException(exceptions.get(0).getMessage());
       }
       m_cachedFolders.clear();

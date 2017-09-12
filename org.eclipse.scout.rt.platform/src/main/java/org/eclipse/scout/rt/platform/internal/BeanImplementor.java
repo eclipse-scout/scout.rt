@@ -31,13 +31,13 @@ public class BeanImplementor<T> implements IBean<T> {
    * Creates a {@link BeanImplementor} with {@link DefaultBeanInstanceProducer} to produce beans upon bean lookup.
    */
   public BeanImplementor(BeanMetaData beanData) {
-    this(beanData, new DefaultBeanInstanceProducer<T>());
+    this(beanData, new DefaultBeanInstanceProducer<>());
   }
 
   @SuppressWarnings("unchecked")
   public BeanImplementor(BeanMetaData beanData, IBeanInstanceProducer<T> beanInstanceProducer) {
     m_beanClazz = (Class<? extends T>) Assertions.assertNotNull(beanData.getBeanClazz());
-    m_beanAnnotations = new HashMap<Class<? extends Annotation>, Annotation>(Assertions.assertNotNull(beanData.getBeanAnnotations()));
+    m_beanAnnotations = new HashMap<>(Assertions.assertNotNull(beanData.getBeanAnnotations()));
     m_initialInstance = (T) beanData.getInitialInstance();
     m_instanceAvailable = m_initialInstance != null;
     if (m_initialInstance != null && !hasAnnotation(ApplicationScoped.class)) {
@@ -69,7 +69,7 @@ public class BeanImplementor<T> implements IBean<T> {
 
   @Override
   public Map<Class<? extends Annotation>, Annotation> getBeanAnnotations() {
-    return new HashMap<Class<? extends Annotation>, Annotation>(m_beanAnnotations);
+    return new HashMap<>(m_beanAnnotations);
   }
 
   @Override

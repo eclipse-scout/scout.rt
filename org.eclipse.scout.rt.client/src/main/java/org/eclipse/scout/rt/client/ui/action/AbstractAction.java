@@ -97,7 +97,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     m_enabled = NamedBitMaskHelper.ALL_BITS_SET; // default enabled
     m_visible = NamedBitMaskHelper.ALL_BITS_SET; // default visible
     m_flags = NamedBitMaskHelper.NO_BITS_SET; // default all to false. are initialized in initConfig()
-    m_objectExtensions = new ObjectExtensions<AbstractAction, IActionExtension<? extends AbstractAction>>(this, false);
+    m_objectExtensions = new ObjectExtensions<>(this, false);
     if (callInitializer) {
       callInitializer();
     }
@@ -309,12 +309,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
-      @Override
-      public void run() {
-        initConfig();
-      }
-    });
+    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
   protected void initConfig() {
@@ -338,7 +333,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   protected IActionExtension<? extends AbstractAction> createLocalExtension() {
-    return new LocalActionExtension<AbstractAction>(this);
+    return new LocalActionExtension<>(this);
   }
 
   @Override
@@ -378,7 +373,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
       Class<?> cls = getClass();
       while (cls != null && IAction.class.isAssignableFrom(cls)) {
         if (cls.isAnnotationPresent(Order.class)) {
-          Order order = (Order) cls.getAnnotation(Order.class);
+          Order order = cls.getAnnotation(Order.class);
           return order.value();
         }
         cls = cls.getSuperclass();

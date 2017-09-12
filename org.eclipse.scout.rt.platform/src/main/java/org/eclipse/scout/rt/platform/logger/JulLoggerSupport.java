@@ -29,7 +29,7 @@ public class JulLoggerSupport extends AbstractLoggerSupport {
   private final Map<Level, LogLevel> m_julToScoutLevelMap;
 
   public JulLoggerSupport() {
-    m_julToScoutLevelMap = new HashMap<Level, LogLevel>();
+    m_julToScoutLevelMap = new HashMap<>();
     registerLevelMappings(m_julToScoutLevelMap);
   }
 

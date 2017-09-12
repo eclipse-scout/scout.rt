@@ -71,7 +71,7 @@ public abstract class AbstractLongField extends AbstractNumberField<Long> implem
     Long retVal = null;
     BigDecimal parsedVal = parseToBigDecimalInternal(text);
     if (parsedVal != null) {
-      retVal = Long.valueOf(parsedVal.longValueExact());
+      retVal = parsedVal.longValueExact();
     }
     return retVal;
   }
@@ -85,7 +85,7 @@ public abstract class AbstractLongField extends AbstractNumberField<Long> implem
 
   @Override
   protected ILongFieldExtension<? extends AbstractLongField> createLocalExtension() {
-    return new LocalLongFieldExtension<AbstractLongField>(this);
+    return new LocalLongFieldExtension<>(this);
   }
 
 }

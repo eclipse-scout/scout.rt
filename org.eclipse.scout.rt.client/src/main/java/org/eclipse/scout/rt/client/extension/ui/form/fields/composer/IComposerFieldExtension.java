@@ -46,7 +46,7 @@ public interface IComposerFieldExtension<OWNER extends AbstractComposerField> ex
 
   AttributePath execResolveAttributePath(ComposerFieldResolveAttributePathChain chain, AttributeNode node);
 
-  AttributeNode execCreateAttributeNode(ComposerFieldCreateAttributeNodeChain chain, ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<? extends Object> values, List<String> texts);
+  AttributeNode execCreateAttributeNode(ComposerFieldCreateAttributeNodeChain chain, ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<?> values, List<String> texts);
 
   IDataModel execCreateDataModel(ComposerFieldCreateDataModelChain chain);
 
@@ -56,5 +56,5 @@ public interface IComposerFieldExtension<OWNER extends AbstractComposerField> ex
 
   EitherOrNode execCreateAdditionalOrNode(ComposerFieldCreateAdditionalOrNodeChain chain, ITreeNode eitherOrNode, boolean negated);
 
-  EntityNode execCreateEntityNode(ComposerFieldCreateEntityNodeChain chain, ITreeNode parentNode, IDataModelEntity e, boolean negated, List<? extends Object> values, List<String> texts);
+  EntityNode execCreateEntityNode(ComposerFieldCreateEntityNodeChain chain, ITreeNode parentNode, IDataModelEntity e, boolean negated, List<?> values, List<String> texts);
 }

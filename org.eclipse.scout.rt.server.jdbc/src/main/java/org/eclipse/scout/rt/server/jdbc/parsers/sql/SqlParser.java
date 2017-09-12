@@ -12,11 +12,12 @@ package org.eclipse.scout.rt.server.jdbc.parsers.sql;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -105,12 +106,12 @@ public class SqlParser {
    * avoid dead-lock
    */
   private static class ParseContext {
-    private HashSet<ParseStep> m_steps;
-    private HashMap<String, String> m_bindMap;
+    private final Set<ParseStep> m_steps;
+    private final Map<String, String> m_bindMap;
 
     public ParseContext() {
-      m_steps = new HashSet<ParseStep>();
-      m_bindMap = new HashMap<String, String>();
+      m_steps = new HashSet<>();
+      m_bindMap = new HashMap<>();
     }
 
     public Map<String/*code*/, String/*name*/> getBinds() {
@@ -122,7 +123,7 @@ public class SqlParser {
      *         loop and the context was NOT added
      */
     public ParseStep checkAndAdd(String method, List<IToken> list) {
-      ParseStep step = new ParseStep(method, list.size() > 0 ? list.get(0) : null);
+      ParseStep step = new ParseStep(method, !list.isEmpty() ? list.get(0) : null);
       if (m_steps.contains(step)) {
         return null;
       }
@@ -188,7 +189,7 @@ public class SqlParser {
         }
       }
     }
-    if (list.size() > 0) {
+    if (!list.isEmpty()) {
       Unparsed up = new Unparsed();
       up.setText(flatten(list));
       if (stm == null) {
@@ -240,7 +241,7 @@ public class SqlParser {
     }
     try {
       //brackets
-      ArrayList<IToken> backup = new ArrayList<IToken>(list);
+      Collection<IToken> backup = new ArrayList<>(list);
       BracketExpr be = parseBracketExpr(list, ctx);
       if (be != null) {
         BracketExpr tmp = be;
@@ -278,7 +279,7 @@ public class SqlParser {
       while ((p = parsePart(list, ctx, false)) != null) {
         ss.addChild(p);
       }
-      if (ss.getChildren().size() == 0) {
+      if (ss.getChildren().isEmpty()) {
         return null;
       }
       return ss;
@@ -589,7 +590,7 @@ public class SqlParser {
       IToken open = null;
       IToken t = null;
       IToken close = null;
-      ArrayList<IToken> backup = new ArrayList<IToken>(list);
+      Collection<IToken> backup = new ArrayList<>(list);
       if ((open = removeToken(list, OpenBracketToken.class)) != null && ((t = parseStatement(list, ctx)) != null || (t = parseListExpr(list, ctx)) != null || t == null) && (close = removeToken(list, CloseBracketToken.class)) != null) {
         //ok
       }
@@ -662,7 +663,7 @@ public class SqlParser {
 
   @SuppressWarnings("unchecked")
   private <T extends IToken> T removeToken(List<IToken> list, Class<T> tokenType) {
-    if (0 < list.size() && tokenType.isAssignableFrom(list.get(0).getClass())) {
+    if (!list.isEmpty() && tokenType.isAssignableFrom(list.get(0).getClass())) {
       return (T) list.remove(0);
     }
     return null;
@@ -670,7 +671,7 @@ public class SqlParser {
 
   @SuppressWarnings("unchecked")
   private <T extends IToken> T removeToken(List<IToken> list, Class<T> tokenType, String text) {
-    if (0 < list.size() && tokenType.isAssignableFrom(list.get(0).getClass()) && text.equals(list.get(0).getText())) {
+    if (!list.isEmpty() && tokenType.isAssignableFrom(list.get(0).getClass()) && text.equals(list.get(0).getText())) {
       return (T) list.remove(0);
     }
     return null;
@@ -685,7 +686,7 @@ public class SqlParser {
   private List<IToken> tokenize(String s, ParseContext ctx) {
     s = encodeBinds(s, ctx);
     s = s.replaceAll("[\\n\\r]+", " ");
-    List<IToken> list = new ArrayList<IToken>();
+    List<IToken> list = new ArrayList<>();
     list.add(new Raw(s));
     //
     list = tokenizeRaw(list, COMMENT_PAT, Comment.class, true);
@@ -715,12 +716,7 @@ public class SqlParser {
     list = tokenizeRaw(list, CLOSE_BRACKET_PAT, CloseBracketToken.class, false);
     list = tokenizeRaw(list, LIST_SEPARATOR_PAT, ListSeparator.class, false);
     //eliminate all empty Raw
-    for (Iterator<IToken> it = list.iterator(); it.hasNext();) {
-      IToken item = it.next();
-      if (item instanceof Raw && !StringUtility.hasText(item.getText())) {
-        it.remove();
-      }
-    }
+    list.removeIf(item -> item instanceof Raw && !StringUtility.hasText(item.getText()));
     //check the rest, no more Raw, convert to comment with warning
     for (int i = 0; i < list.size(); i++) {
       IToken tok = list.get(i);
@@ -743,9 +739,9 @@ public class SqlParser {
           }
         }
         if (succ == null) {
-          for (int k = 0; k < list.size(); k++) {
-            if (!(list.get(k) instanceof Comment)) {
-              succ = list.get(k);
+          for (IToken aList : list) {
+            if (!(aList instanceof Comment)) {
+              succ = aList;
               break;
             }
           }
@@ -755,22 +751,17 @@ public class SqlParser {
         }
       }
     }
-    for (Iterator<IToken> it = list.iterator(); it.hasNext();) {
-      IToken item = it.next();
-      if (item instanceof Comment) {
-        it.remove();
-      }
-    }
+    list.removeIf(item -> item instanceof Comment);
     decodeBinds(list, ctx);
     return list;
   }
 
   @SuppressWarnings("squid:S1643")
   private List<IToken> tokenizeRaw(List<IToken> list, Pattern p, Class<? extends IToken> tokenType, boolean transcodeDelimiters) {
-    ArrayList<IToken> newList = new ArrayList<IToken>(list.size());
+    List<IToken> newList = new ArrayList<>(list.size());
     for (IToken item : list) {
       if (item instanceof Raw) {
-        String s = ((Raw) item).getText();
+        String s = item.getText();
         if (transcodeDelimiters) {
           s = encodeDelimiters(s);
         }

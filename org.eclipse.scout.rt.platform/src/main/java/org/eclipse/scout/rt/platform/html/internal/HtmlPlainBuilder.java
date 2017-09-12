@@ -44,7 +44,7 @@ public class HtmlPlainBuilder extends AbstractExpressionBuilder {
 
   @Override
   public void build() {
-    if (m_texts.size() > 0) {
+    if (!m_texts.isEmpty()) {
       appendText();
     }
   }

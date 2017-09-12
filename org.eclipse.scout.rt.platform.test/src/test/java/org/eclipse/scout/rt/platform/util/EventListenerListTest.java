@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.platform.util;
 
 import java.util.EventListener;
 
-import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.junit.Assert;
 import org.junit.Test;
 

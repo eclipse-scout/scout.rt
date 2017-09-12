@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.composer;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.platform.classid.ClassId;
@@ -61,7 +62,7 @@ public abstract class AbstractDataModelOperatorField extends AbstractSmartField<
     IDataModelAttributeOp newOp = null;
     if (attribute != null) {
       setView(true, true, false);
-      HashSet<IDataModelAttributeOp> tmp = new HashSet<IDataModelAttributeOp>();
+      Set<IDataModelAttributeOp> tmp = new HashSet<>();
       List<IDataModelAttributeOp> ops = attribute.getOperators();
       tmp.addAll(ops);
       if (tmp.contains(oldOp)) {

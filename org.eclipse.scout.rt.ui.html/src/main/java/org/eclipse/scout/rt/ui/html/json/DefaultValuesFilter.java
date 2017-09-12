@@ -79,11 +79,7 @@ public class DefaultValuesFilter {
         String prop = (String) it2.next();
         Object value = jsonProperties.opt(prop);
         // Add to map
-        Map<String, Object> propMap = m_defaults.get(type);
-        if (propMap == null) {
-          propMap = new HashMap<>();
-          m_defaults.put(type, propMap);
-        }
+        Map<String, Object> propMap = m_defaults.computeIfAbsent(type, k -> new HashMap<>());
         Object oldValue = propMap.get(prop);
         if (value instanceof JSONObject && oldValue instanceof JSONObject) {
           // Combine

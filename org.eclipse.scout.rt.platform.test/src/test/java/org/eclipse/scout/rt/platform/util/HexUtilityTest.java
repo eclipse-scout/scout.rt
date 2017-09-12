@@ -13,9 +13,6 @@ package org.eclipse.scout.rt.platform.util;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.scout.rt.platform.util.HexUtility;
-import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.TuningUtility;
 import org.junit.Test;
 
 public class HexUtilityTest {

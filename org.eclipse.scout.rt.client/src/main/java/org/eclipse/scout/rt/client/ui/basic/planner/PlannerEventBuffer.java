@@ -80,7 +80,7 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
    */
   protected List<Resource> removeResourcesFromPreviousEvents(List<? extends Resource> resourcesToRemove, List<PlannerEvent> events, Integer... creationTypes) {
     List<Integer> creationTypesList = Arrays.asList(creationTypes);
-    List<Resource> remainingResources = new ArrayList<Resource>();
+    List<Resource> remainingResources = new ArrayList<>();
 
     for (Resource resourceToRemove : resourcesToRemove) {
       boolean resourceRemovedFromCreationEvent = false;
@@ -234,9 +234,7 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
         resources.add(resource);
       }
     }
-    for (Resource resource : second) {
-      resources.add(resource);
-    }
+    resources.addAll(second);
     return resources;
   }
 
@@ -258,12 +256,7 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
   }
 
   protected void removeEmptyEvents(List<PlannerEvent> events) {
-    for (Iterator<PlannerEvent> it = events.iterator(); it.hasNext();) {
-      PlannerEvent event = it.next();
-      if (isResourcesRequired(event.getType()) && event.getResources().isEmpty()) {
-        it.remove();
-      }
-    }
+    events.removeIf(event -> isResourcesRequired(event.getType()) && event.getResources().isEmpty());
   }
 
   /**

@@ -5,6 +5,7 @@ package org.eclipse.scout.rt.platform.util;
  *
  * @since 6.0
  */
+@FunctionalInterface
 public interface IDisposable {
 
   /**

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jaxws.provider.annotation;
 
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -68,7 +69,7 @@ import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMet
  *
  * @since 5.1
  */
-@Target(java.lang.annotation.ElementType.TYPE)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface WebServiceEntryPoint {
@@ -87,13 +88,13 @@ public @interface WebServiceEntryPoint {
    * Specifies the class name of the entry point generated. If not set, the name is like the name of the endpoint
    * interface suffixed with <em>EntryPoint</em>.
    */
-  String entryPointName() default WebServiceEntryPoint.DERIVED;
+  String entryPointName() default DERIVED;
 
   /**
    * Specifies the package name of the entry point generated. If not set, the package name is the same as of the element
    * declaring this {@link WebServiceEntryPoint} annotation.
    */
-  String entryPointPackage() default WebServiceEntryPoint.DERIVED;
+  String entryPointPackage() default DERIVED;
 
   /**
    * Specifies the service name as declared in the WSDL file, and must be set if publishing the webservice via auto
@@ -125,7 +126,7 @@ public @interface WebServiceEntryPoint {
    * Specifies the location of the WSDL document. If not set, the location is derived from {@link WebServiceClient}
    * annotation which is typically initialized with the 'wsdlLocation' as provided to 'wsimport'.
    */
-  String wsdlLocation() default WebServiceEntryPoint.DERIVED;
+  String wsdlLocation() default DERIVED;
 
   /**
    * Specifies the authentication mechanism to be installed, and in which {@link RunContext} to run authenticated
@@ -139,7 +140,7 @@ public @interface WebServiceEntryPoint {
    * <li>If providing a <em>handler binding file</em> yourself, this annotation is ignored.</li>
    * </ul>
    */
-  Authentication authentication() default @Authentication();
+  Authentication authentication() default @Authentication;
 
   /**
    * Specifies the handlers to be installed. The order of the handlers is as declared. A handler is looked up as a bean,

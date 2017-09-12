@@ -76,7 +76,7 @@ public abstract class AbstractTableRowBuilder<T> {
     }
 
     int rowCount = Array.getLength(dataArray);
-    List<ITableRow> rows = new ArrayList<ITableRow>(rowCount);
+    List<ITableRow> rows = new ArrayList<>(rowCount);
     for (int r = 0; r < rowCount; r++) {
       rows.add(createRow(new Object[]{Array.get(dataArray, r)}));
     }
@@ -118,7 +118,7 @@ public abstract class AbstractTableRowBuilder<T> {
     }
     //
     int rowCount = Array.getLength(dataMatrix);
-    List<ITableRow> rows = new ArrayList<ITableRow>(rowCount);
+    List<ITableRow> rows = new ArrayList<>(rowCount);
     if (isRef) {
       Object[] refData = new Object[rowCount];
       for (int r = 0; r < rowCount; r++) {
@@ -147,7 +147,7 @@ public abstract class AbstractTableRowBuilder<T> {
   }
 
   public List<ITableRow> createRowsByCodes(Collection<? extends ICode<?>> codes) {
-    List<ITableRow> result = new ArrayList<ITableRow>(codes.size());
+    List<ITableRow> result = new ArrayList<>(codes.size());
     for (ICode<?> code : codes) {
       ITableRow row = createRow(new Object[]{code.getId(), code.getText()});
       row.setIconId(code.getIconId());

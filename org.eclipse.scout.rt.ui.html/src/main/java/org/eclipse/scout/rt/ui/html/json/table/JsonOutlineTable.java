@@ -23,7 +23,7 @@ import org.json.JSONObject;
 public class JsonOutlineTable<T extends ITable> extends JsonTable<T> {
   public static final String PROP_PAGE = "ui:page";
 
-  private IPage m_page;
+  private final IPage m_page;
 
   public JsonOutlineTable(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent, IPage page) {
     super(model, uiSession, id, parent);

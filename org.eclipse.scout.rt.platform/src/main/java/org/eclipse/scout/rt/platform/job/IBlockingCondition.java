@@ -90,8 +90,8 @@ public interface IBlockingCondition {
    * then {@link ThreadInterruptedError} is thrown with the thread's interrupted status still set. Additionally for
    * semaphore aware jobs, when it finally returns from this method the semaphore permit will be re-acquired.
    * <p>
-   * If the timeout elapses, then {@link TimedOutError} is thrown. Additionally for semaphore aware jobs, this
-   * method returns with the semaphore permit re-acquired.
+   * If the timeout elapses, then {@link TimedOutError} is thrown. Additionally for semaphore aware jobs, this method
+   * returns with the semaphore permit re-acquired.
    *
    * @param timeout
    *          the maximal time to wait.
@@ -143,8 +143,8 @@ public interface IBlockingCondition {
    * it will continue to wait until being unblocked. When it finally returns from this method its interrupted status
    * will still be set.
    * <p>
-   * If the timeout elapses, then {@link TimedOutError} is thrown. Additionally for semaphore aware jobs, this
-   * method returns with the semaphore permit re-acquired.
+   * If the timeout elapses, then {@link TimedOutError} is thrown. Additionally for semaphore aware jobs, this method
+   * returns with the semaphore permit re-acquired.
    *
    * @param timeout
    *          the maximal time to wait.

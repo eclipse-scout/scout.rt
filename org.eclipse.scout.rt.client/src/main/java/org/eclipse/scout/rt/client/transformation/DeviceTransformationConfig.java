@@ -26,9 +26,9 @@ import org.slf4j.LoggerFactory;
 public class DeviceTransformationConfig {
   private static final Logger LOG = LoggerFactory.getLogger(DeviceTransformationConfig.class);
 
-  private Set<IDeviceTransformation> m_enabledTransformations = new HashSet<IDeviceTransformation>();
-  private Map<IForm, ExclusionInfo> m_excludedForms = new WeakHashMap<IForm, ExclusionInfo>();
-  private Map<IFormField, ExclusionInfo> m_excludedFields = new WeakHashMap<IFormField, ExclusionInfo>();
+  private final Set<IDeviceTransformation> m_enabledTransformations = new HashSet<>();
+  private final Map<IForm, ExclusionInfo> m_excludedForms = new WeakHashMap<>();
+  private final Map<IFormField, ExclusionInfo> m_excludedFields = new WeakHashMap<>();
 
   public void enableTransformation(IDeviceTransformation transformation) {
     m_enabledTransformations.add(transformation);
@@ -69,11 +69,7 @@ public class DeviceTransformationConfig {
   }
 
   public void excludeForm(IForm form) {
-    ExclusionInfo exclusionInfo = m_excludedForms.get(form);
-    if (exclusionInfo == null) {
-      exclusionInfo = new ExclusionInfo();
-      m_excludedForms.put(form, exclusionInfo);
-    }
+    ExclusionInfo exclusionInfo = m_excludedForms.computeIfAbsent(form, k -> new ExclusionInfo());
 
     exclusionInfo.setExcludeAllTransformations(true);
 
@@ -81,11 +77,7 @@ public class DeviceTransformationConfig {
   }
 
   public void excludeFormTransformation(IForm form, IDeviceTransformation transformation) {
-    ExclusionInfo exclusionInfo = m_excludedForms.get(form);
-    if (exclusionInfo == null) {
-      exclusionInfo = new ExclusionInfo();
-      m_excludedForms.put(form, exclusionInfo);
-    }
+    ExclusionInfo exclusionInfo = m_excludedForms.computeIfAbsent(form, k -> new ExclusionInfo());
 
     exclusionInfo.getExcludedTransformations().add(transformation);
 
@@ -119,11 +111,7 @@ public class DeviceTransformationConfig {
   }
 
   public void excludeField(IFormField formField) {
-    ExclusionInfo exclusionInfo = m_excludedFields.get(formField);
-    if (exclusionInfo == null) {
-      exclusionInfo = new ExclusionInfo();
-      m_excludedFields.put(formField, exclusionInfo);
-    }
+    ExclusionInfo exclusionInfo = m_excludedFields.computeIfAbsent(formField, k -> new ExclusionInfo());
 
     exclusionInfo.setExcludeAllTransformations(true);
 
@@ -131,11 +119,7 @@ public class DeviceTransformationConfig {
   }
 
   public void excludeFieldTransformation(IFormField formField, IDeviceTransformation transformation) {
-    ExclusionInfo exclusionInfo = m_excludedFields.get(formField);
-    if (exclusionInfo == null) {
-      exclusionInfo = new ExclusionInfo();
-      m_excludedFields.put(formField, exclusionInfo);
-    }
+    ExclusionInfo exclusionInfo = m_excludedFields.computeIfAbsent(formField, k -> new ExclusionInfo());
 
     exclusionInfo.getExcludedTransformations().add(transformation);
 
@@ -170,10 +154,10 @@ public class DeviceTransformationConfig {
 
   private class ExclusionInfo {
     private boolean m_excludeAllTransformations = false;
-    private Set<IDeviceTransformation> m_excludedTransformations;
+    private final Set<IDeviceTransformation> m_excludedTransformations;
 
     public ExclusionInfo() {
-      m_excludedTransformations = new HashSet<IDeviceTransformation>();
+      m_excludedTransformations = new HashSet<>();
     }
 
     public Set<IDeviceTransformation> getExcludedTransformations() {

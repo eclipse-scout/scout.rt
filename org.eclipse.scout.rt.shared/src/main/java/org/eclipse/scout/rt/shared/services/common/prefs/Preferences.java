@@ -68,7 +68,7 @@ public class Preferences implements IPreferences {
   private boolean m_dirty;
 
   protected Preferences(String name, ISession userScope) {
-    this(name, userScope, new LinkedHashMap<String, String>(), false);
+    this(name, userScope, new LinkedHashMap<>(), false);
   }
 
   protected Preferences(Preferences other) {
@@ -153,7 +153,7 @@ public class Preferences implements IPreferences {
   public List<String> getList(String key, List<String> defaultValues) {
     String existingPref = getInternal(key);
     if (!StringUtility.isNullOrEmpty(existingPref)) {
-      return new ArrayList<String>(Arrays.asList(existingPref.split(DELIM)));
+      return new ArrayList<>(Arrays.asList(existingPref.split(DELIM)));
     }
     return defaultValues;
   }
@@ -367,7 +367,7 @@ public class Preferences implements IPreferences {
 
   @Override
   public synchronized Set<String> keys() {
-    return new LinkedHashSet<String>(m_prefs.keySet());
+    return new LinkedHashSet<>(m_prefs.keySet());
   }
 
   @Override

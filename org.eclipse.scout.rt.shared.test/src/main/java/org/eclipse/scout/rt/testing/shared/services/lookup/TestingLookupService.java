@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  * @since 3.9.0
  */
 public class TestingLookupService implements ILookupService<Long> {
-  private List<ILookupRow<Long>> m_rows = new ArrayList<ILookupRow<Long>>();
+  private List<ILookupRow<Long>> m_rows = new ArrayList<>();
 
   public List<ILookupRow<Long>> getRows() {
     return CollectionUtility.arrayList(m_rows);
@@ -40,7 +40,7 @@ public class TestingLookupService implements ILookupService<Long> {
 
   @Override
   public List<ILookupRow<Long>> getDataByKey(ILookupCall<Long> call) {
-    List<ILookupRow<Long>> list = new ArrayList<ILookupRow<Long>>();
+    List<ILookupRow<Long>> list = new ArrayList<>();
     Object key = call.getKey();
     if (key != null) {
       for (ILookupRow<Long> row : getRows()) {
@@ -54,7 +54,7 @@ public class TestingLookupService implements ILookupService<Long> {
 
   @Override
   public List<ILookupRow<Long>> getDataByRec(ILookupCall<Long> call) {
-    List<ILookupRow<Long>> list = new ArrayList<ILookupRow<Long>>();
+    List<ILookupRow<Long>> list = new ArrayList<>();
     Object parentKey = call.getRec();
     if (parentKey == null) {
       for (ILookupRow<Long> row : getRows()) {
@@ -75,7 +75,7 @@ public class TestingLookupService implements ILookupService<Long> {
 
   @Override
   public List<ILookupRow<Long>> getDataByText(ILookupCall<Long> call) {
-    List<ILookupRow<Long>> list = new ArrayList<ILookupRow<Long>>();
+    List<ILookupRow<Long>> list = new ArrayList<>();
     Pattern p = createLowerCaseSearchPattern(call.getText());
     for (ILookupRow<Long> row : getRows()) {
       if (row.getText() != null && p.matcher(row.getText().toLowerCase()).matches()) {
@@ -87,7 +87,7 @@ public class TestingLookupService implements ILookupService<Long> {
 
   @Override
   public List<ILookupRow<Long>> getDataByAll(ILookupCall<Long> call) {
-    List<ILookupRow<Long>> list = new ArrayList<ILookupRow<Long>>();
+    List<ILookupRow<Long>> list = new ArrayList<>();
     Pattern p = createLowerCaseSearchPattern(call.getAll());
     for (ILookupRow<Long> row : getRows()) {
       if (row.getText() != null && p.matcher(row.getText().toLowerCase()).matches()) {

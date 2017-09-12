@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
@@ -135,8 +136,8 @@ public class StatementProcessor implements IStatementProcessor {
         }
       }
       //
-      m_inputList = new ArrayList<IBindInput>();
-      m_outputList = new ArrayList<IBindOutput>();
+      m_inputList = new ArrayList<>();
+      m_outputList = new ArrayList<>();
       //
       IntoModel intoModel = new IntoParser(m_originalStm).parse();
       String stmWithoutSelectInto = intoModel.getFilteredStatement();
@@ -235,7 +236,7 @@ public class StatementProcessor implements IStatementProcessor {
       initialFetchSize = rs.getFetchSize();
       dynamicFetchSize = initialFetchSize;
     }
-    ArrayList<Object[]> rows = new ArrayList<Object[]>();
+    List<Object[]> rows = new ArrayList<>();
     while (rs.next()) {
       if (isDynamicPrefetch && ++rowCount % dynamicFetchSize == 0 && dynamicFetchSize < getMaxFetchSize(rs)) {
         dynamicFetchSize = Math.min(Math.max(initialFetchSize, rowCount / 2), getMaxFetchSize(rs));
@@ -263,7 +264,7 @@ public class StatementProcessor implements IStatementProcessor {
     PreparedStatement ps = null;
     ResultSet rs = null;
     try {
-      ArrayList<Object[]> rows = new ArrayList<Object[]>();
+      ArrayList<Object[]> rows = new ArrayList<>();
       while (hasNextInputBatch()) {
         nextInputBatch();
         prepareInputStatementAndBinds();
@@ -380,7 +381,7 @@ public class StatementProcessor implements IStatementProcessor {
           ResultSetMetaData meta = rs.getMetaData();
           int colCount = meta.getColumnCount();
           while (rs.next()) {
-            ArrayList<SqlBind> row = new ArrayList<SqlBind>(colCount);
+            List<SqlBind> row = new ArrayList<>(colCount);
             for (int i = 0; i < colCount; i++) {
               int type = meta.getColumnType(i + 1);
               Object value = sqlStyle.readBind(rs, meta, type, i + 1);
@@ -616,7 +617,7 @@ public class StatementProcessor implements IStatementProcessor {
 
   private void prepareInputStatementAndBinds() {
     // bind inputs and set replace token on inputs
-    m_currentInputBindMap = new TreeMap<Integer, SqlBind>();
+    m_currentInputBindMap = new TreeMap<>();
     ISqlStyle sqlStyle = m_callerService.getSqlStyle();
     for (IBindInput in : m_inputList) {
       SqlBind bind = in.produceSqlBindAndSetReplaceToken(sqlStyle);
@@ -698,7 +699,7 @@ public class StatementProcessor implements IStatementProcessor {
     }
     if (statementPlainText) {
       String p = m_currentInputStm != null ? m_currentInputStm : "";
-      ArrayList<SqlBind> bindList = new ArrayList<SqlBind>(m_currentInputBindMap.values());
+      List<SqlBind> bindList = new ArrayList<>(m_currentInputBindMap.values());
       int pos = findNextBind(p, 0);
       int bindIndex = 0;
       while (pos >= 0 && bindIndex < bindList.size()) {
@@ -864,7 +865,7 @@ public class StatementProcessor implements IStatementProcessor {
 
   protected void writeBinds(PreparedStatement ps) throws SQLException {
     ISqlStyle sqlStyle = m_callerService.getSqlStyle();
-    for (Map.Entry<Integer, SqlBind> e : m_currentInputBindMap.entrySet()) {
+    for (Entry<Integer, SqlBind> e : m_currentInputBindMap.entrySet()) {
       sqlStyle.writeBind(ps, e.getKey(), e.getValue());
     }
   }
@@ -1147,8 +1148,8 @@ public class StatementProcessor implements IStatementProcessor {
       IBindOutput result = null;
       ValueOutputToken valueOutputToken = (ValueOutputToken) bindToken;
       String[] path = REGEX_DOT.split(valueOutputToken.getName());
-      for (int i = 0; i < bindBases.length; i++) {
-        IBindOutput out = createOutputRec(valueOutputToken, path, bindBases[i]);
+      for (Object bindBase : bindBases) {
+        IBindOutput out = createOutputRec(valueOutputToken, path, bindBase);
         if (out != null) {
           if (isBindDuplicateCheckEnabled()) {
             if (result == null) {

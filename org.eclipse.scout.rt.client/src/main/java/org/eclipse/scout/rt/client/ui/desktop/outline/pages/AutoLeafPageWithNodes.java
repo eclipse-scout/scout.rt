@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 
 @ClassId("2c6592c7-bae5-4cec-a475-e5b8f2e7fed7")
 public class AutoLeafPageWithNodes extends AbstractPageWithNodes {
-  private ITableRow m_tableRow;
+  private final ITableRow m_tableRow;
 
   public AutoLeafPageWithNodes(ITableRow row) {
     if (row == null) {

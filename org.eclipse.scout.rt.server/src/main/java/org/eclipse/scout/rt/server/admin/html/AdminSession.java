@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.server.admin.html;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.servlet.ServletOutputStream;
@@ -29,12 +28,12 @@ import org.eclipse.scout.rt.shared.OfficialVersion;
 @SuppressWarnings("bsiRulesDefinition:htmlInString")
 public class AdminSession {
 
-  private TopView m_topView;
+  private final TopView m_topView;
   private Map<String, AbstractHtmlAction> m_actionMap;
 
   public AdminSession() {
     m_topView = new TopView(this);
-    m_actionMap = new HashMap<String, AbstractHtmlAction>();
+    m_actionMap = new HashMap<>();
   }
 
   public void serviceRequest(HttpServletRequest req, HttpServletResponse res) throws IOException {
@@ -44,9 +43,8 @@ public class AdminSession {
     if (actionId != null) {
       AbstractHtmlAction action = getAction(actionId);
       if (action != null) {
-        HashMap<String, String> paramMap = new HashMap<String, String>();
-        for (Iterator it = req.getParameterMap().keySet().iterator(); it.hasNext();) {
-          String n = (String) it.next();
+        Map<String, String> paramMap = new HashMap<>();
+        for (String n : req.getParameterMap().keySet()) {
           String v = StringUtility.valueOf(req.getParameter(n));
           paramMap.put(n, v);
         }

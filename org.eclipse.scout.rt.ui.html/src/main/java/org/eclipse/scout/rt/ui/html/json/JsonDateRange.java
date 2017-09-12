@@ -17,14 +17,14 @@ import org.json.JSONObject;
 
 public class JsonDateRange implements IJsonObject {
 
-  private Range<Date> m_range;
+  private final Range<Date> m_range;
 
   public JsonDateRange(Range<Date> range) {
     m_range = range;
   }
 
   public JsonDateRange(Date from, Date to) {
-    m_range = new Range<Date>(from, to);
+    m_range = new Range<>(from, to);
   }
 
   @Override

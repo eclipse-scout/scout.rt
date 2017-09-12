@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.platform.job;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
@@ -26,8 +28,6 @@ import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
-import org.eclipse.scout.rt.platform.util.concurrent.IBiConsumer;
-import org.eclipse.scout.rt.platform.util.concurrent.IBiFunction;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
@@ -180,8 +180,8 @@ public interface IFuture<RESULT> extends ICancellable {
   /**
    * Waits if necessary for at most the given time for the job to complete, and then returns its result, if available,
    * or throws its exception according to {@link DefaultRuntimeExceptionTranslator}, or throws
-   * {@link FutureCancelledError} if cancelled, or throws {@link TimedOutError} if waiting timeout elapsed, or
-   * throws {@link ThreadInterruptedError} if the current thread was interrupted while waiting.
+   * {@link FutureCancelledError} if cancelled, or throws {@link TimedOutError} if waiting timeout elapsed, or throws
+   * {@link ThreadInterruptedError} if the current thread was interrupted while waiting.
    *
    * @param timeout
    *          the maximal time to wait for the job to complete.
@@ -202,8 +202,8 @@ public interface IFuture<RESULT> extends ICancellable {
   /**
    * Waits if necessary for at most the given time for the job to complete, and then returns its result, if available,
    * or throws its exception according to {@link IExceptionTranslator}, or throws {@link FutureCancelledError} if
-   * cancelled, or throws {@link TimedOutError} if waiting timeout elapsed, or throws
-   * {@link ThreadInterruptedError} if the current thread was interrupted while waiting.
+   * cancelled, or throws {@link TimedOutError} if waiting timeout elapsed, or throws {@link ThreadInterruptedError} if
+   * the current thread was interrupted while waiting.
    * <p>
    * Use a specific {@link IExceptionTranslator} to control exception translation.
    *
@@ -286,15 +286,15 @@ public interface IFuture<RESULT> extends ICancellable {
    *          input to schedule the function.
    * @return the future representing the asynchronous execution of the function.
    */
-  <FUNCTION_RESULT> IFuture<FUNCTION_RESULT> whenDoneSchedule(IBiFunction<RESULT, Throwable, FUNCTION_RESULT> function, JobInput input);
+  <FUNCTION_RESULT> IFuture<FUNCTION_RESULT> whenDoneSchedule(BiFunction<RESULT, Throwable, FUNCTION_RESULT> function, JobInput input);
 
   /**
-   * Provides the same functionality as {@link #whenDoneSchedule(IBiFunction, JobInput)} but is convenience for a job
+   * Provides the same functionality as {@link #whenDoneSchedule(BiFunction, JobInput)} but is convenience for a job
    * which does not compute a result.
    *
-   * @see #whenDoneSchedule(IBiFunction, JobInput)
+   * @see #whenDoneSchedule(BiFunction, JobInput)
    */
-  IFuture<Void> whenDoneSchedule(IBiConsumer<RESULT, Throwable> function, final JobInput input);
+  IFuture<Void> whenDoneSchedule(BiConsumer<RESULT, Throwable> function, final JobInput input);
 
   /**
    * Registers the given listener to be notified about all job lifecycle events related to this Future. If the listener

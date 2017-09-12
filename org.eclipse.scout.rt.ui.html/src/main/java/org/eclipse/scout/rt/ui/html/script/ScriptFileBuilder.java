@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.ui.html.UiThemeUtility;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.eclipse.scout.rt.ui.html.script.ScriptSource.FileType;
+import org.eclipse.scout.rt.ui.html.script.ScriptSource.NodeType;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +71,7 @@ public class ScriptFileBuilder {
   private static final Pattern STYLESHEET_IMPORT_PATTERN = Pattern.compile("^\\s*@import\\s+\"(.*?)\".*$", Pattern.MULTILINE);
 
   /**
-   * Pattern for a script url that is not a {@link ScriptSource.NodeType#SRC_FRAGMENT}
+   * Pattern for a script url that is not a {@link NodeType#SRC_FRAGMENT}
    * <p>
    * <b>Regex groups:</b> <code>$1$2[-$4][.min].$5</code><br>
    * <ul>
@@ -130,7 +131,7 @@ public class ScriptFileBuilder {
    *          because the browser requests *-module.css or *-macro.css, but on the server we must lookup a *-module.less
    *          file instead.
    */
-  protected ScriptSource locateNonFragmentScript(String requestPath, boolean lenient) throws IOException {
+  protected ScriptSource locateNonFragmentScript(String requestPath, boolean lenient) {
     Matcher mat = SCRIPT_URL_PATTERN.matcher(requestPath);
     if (mat.matches()) {
       return m_scriptLocator.locateFile(requestPath, mat, m_minify, lenient);
@@ -148,7 +149,7 @@ public class ScriptFileBuilder {
       String themeFragmentPath = parts[0] + "-" + m_theme + (parts[1] == null ? "" : "." + parts[1]);
       URL url = m_resourceLocator.getScriptSource(themeFragmentPath);
       if (url != null) {
-        return new ScriptSource(fragmentPath, url, ScriptSource.NodeType.SRC_FRAGMENT);
+        return new ScriptSource(fragmentPath, url, NodeType.SRC_FRAGMENT);
       }
     }
 
@@ -157,25 +158,25 @@ public class ScriptFileBuilder {
       LOG.warn("locate fragment {}: does not exist", fragmentPath);
       return null;
     }
-    return new ScriptSource(fragmentPath, url, ScriptSource.NodeType.SRC_FRAGMENT);
+    return new ScriptSource(fragmentPath, url, NodeType.SRC_FRAGMENT);
   }
 
   protected ScriptOutput processLibrary(String pathInfo, ScriptSource script, boolean compileAndMinify) throws IOException {
-    if (!ObjectUtility.isOneOf(script.getNodeType(), ScriptSource.NodeType.LIBRARY, ScriptSource.NodeType.LIBRARY_MINIFIED)) {
-      throw new IOException(script.getRequestPath() + " / " + script.getURL() + ": expected " + ScriptSource.NodeType.LIBRARY + " or " + ScriptSource.NodeType.LIBRARY_MINIFIED + ", but got " + script.getNodeType());
+    if (!ObjectUtility.isOneOf(script.getNodeType(), NodeType.LIBRARY, NodeType.LIBRARY_MINIFIED)) {
+      throw new IOException(script.getRequestPath() + " / " + script.getURL() + ": expected " + NodeType.LIBRARY + " or " + NodeType.LIBRARY_MINIFIED + ", but got " + script.getNodeType());
     }
     long lastModified = script.getURL().openConnection().getLastModified();
     String libraryContent = new String(IOUtility.readFromUrl(script.getURL()), StandardCharsets.UTF_8);
     // only minfy if not already minified
-    if (compileAndMinify && script.getNodeType() != ScriptSource.NodeType.LIBRARY_MINIFIED) {
+    if (compileAndMinify && script.getNodeType() != NodeType.LIBRARY_MINIFIED) {
       libraryContent = compileAndMinifyContent(script.getFileType(), libraryContent);
     }
     return new ScriptOutput(pathInfo, libraryContent.getBytes(StandardCharsets.UTF_8), lastModified);
   }
 
   protected ScriptOutput processMacroWithIncludesRec(String pathInfo, ScriptSource script, boolean compileAndMinify) throws IOException {
-    if (script.getNodeType() != ScriptSource.NodeType.MACRO) {
-      throw new IOException(script.getRequestPath() + " / " + script.getURL() + ": expected " + ScriptSource.NodeType.MACRO + ", but got " + script.getNodeType());
+    if (script.getNodeType() != NodeType.MACRO) {
+      throw new IOException(script.getRequestPath() + " / " + script.getURL() + ": expected " + NodeType.MACRO + ", but got " + script.getNodeType());
     }
     String basePath = script.getRequestPath();
     if (basePath.lastIndexOf('/') < 0) {
@@ -216,20 +217,20 @@ public class ScriptFileBuilder {
             break;
           }
           default: {
-            LOG.warn("Unexpected {} {} for {}", ScriptSource.NodeType.class.getSimpleName(), includeScript.getNodeType(), includePath);
+            LOG.warn("Unexpected {} {} for {}", NodeType.class.getSimpleName(), includeScript.getNodeType(), includePath);
             break;
           }
         }
       }
       // Add debug information to returned content
       if (!m_minify) {
-        if (script.getFileType() == ScriptSource.FileType.JS) {
+        if (script.getFileType() == FileType.JS) {
           buf.write(("// --- " + (includeScript == null ? "" : includeScript.getNodeType() + " ") + includePath + " ---\n").getBytes(StandardCharsets.UTF_8));
           if (replacement == null) {
             buf.write("// !!! NOT PROCESSED\n".getBytes(StandardCharsets.UTF_8));
           }
         }
-        else if (script.getFileType() == ScriptSource.FileType.STYLESHEET) {
+        else if (script.getFileType() == FileType.STYLESHEET) {
           buf.write(("/* --- " + (includeScript == null ? "" : includeScript.getNodeType() + " ") + includePath + " --- */\n").getBytes(StandardCharsets.UTF_8));
           if (replacement == null) {
             buf.write("/* !!! NOT PROCESSED */\n".getBytes(StandardCharsets.UTF_8));
@@ -262,8 +263,8 @@ public class ScriptFileBuilder {
   }
 
   protected ScriptOutput processModuleWithIncludes(String pathInfo, ScriptSource script, boolean compileAndMinify) throws IOException {
-    if (script.getNodeType() != ScriptSource.NodeType.SRC_MODULE) {
-      throw new IOException(script.getRequestPath() + " / " + script.getURL() + ": expected " + ScriptSource.NodeType.SRC_MODULE + ", but got " + script.getNodeType());
+    if (script.getNodeType() != NodeType.SRC_MODULE) {
+      throw new IOException(script.getRequestPath() + " / " + script.getURL() + ": expected " + NodeType.SRC_MODULE + ", but got " + script.getNodeType());
     }
     StringBuilder buf = new StringBuilder();
     long lastModified = script.getURL().openConnection().getLastModified();
@@ -283,15 +284,15 @@ public class ScriptFileBuilder {
             break;
           }
           default: {
-            LOG.warn("Unexpected {} {} for {}", ScriptSource.NodeType.class.getSimpleName(), includeFragment.getNodeType(), includePath);
+            LOG.warn("Unexpected {} {} for {}", NodeType.class.getSimpleName(), includeFragment.getNodeType(), includePath);
             break;
           }
         }
       }
       // Add debug information to returned content
       if (!m_minify) {
-        if (script.getFileType() == ScriptSource.FileType.JS) {
-          buf.append("// --- " + (includeFragment == null ? "" : includeFragment.getNodeType() + " ") + includePath + " ---\n");
+        if (script.getFileType() == FileType.JS) {
+          buf.append("// --- ").append(includeFragment == null ? "" : includeFragment.getNodeType() + " ").append(includePath).append(" ---\n");
           if (replacement == null) {
             buf.append("// !!! NOT PROCESSED\n");
           }
@@ -299,8 +300,8 @@ public class ScriptFileBuilder {
             replacement = insertLineNumbers(includePath, replacement);
           }
         }
-        else if (script.getFileType() == ScriptSource.FileType.STYLESHEET) {
-          buf.append("/* --- " + (includeFragment == null ? "" : includeFragment.getNodeType() + " ") + includePath + " --- */\n");
+        else if (script.getFileType() == FileType.STYLESHEET) {
+          buf.append("/* --- ").append(includeFragment == null ? "" : includeFragment.getNodeType() + " ").append(includePath).append(" --- */\n");
           if (replacement == null) {
             buf.append("/* !!! NOT PROCESSED */\n");
           }
@@ -328,7 +329,7 @@ public class ScriptFileBuilder {
     return content;
   }
 
-  protected String compileContent(ScriptSource.FileType fileType, String content) throws IOException {
+  protected String compileContent(FileType fileType, String content) throws IOException {
     switch (fileType) {
       case JS:
         return BEANS.get(ScriptProcessor.class).compileJs(content);
@@ -339,7 +340,7 @@ public class ScriptFileBuilder {
     }
   }
 
-  protected String minifyContent(ScriptSource.FileType fileType, String content) throws IOException {
+  protected String minifyContent(FileType fileType, String content) throws IOException {
     switch (fileType) {
       case JS:
         return BEANS.get(ScriptProcessor.class).minifyJs(content);
@@ -350,7 +351,7 @@ public class ScriptFileBuilder {
     }
   }
 
-  protected String insertLineNumbers(final String path, final String text) throws IOException {
+  protected String insertLineNumbers(final String path, final String text) {
     if (text == null) {
       return null;
     }
@@ -372,7 +373,7 @@ public class ScriptFileBuilder {
     int linePrefixLength = (lines.length + "").length();
     for (String line : lines) {
       buf.append((insideBlockComment ? "//" : "/*"));
-      if (qualifier.length() > 0) {
+      if (!qualifier.isEmpty()) {
         buf.append(qualifier).append("|");
       }
       buf.append(filename).append(":");

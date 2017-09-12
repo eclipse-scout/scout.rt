@@ -60,7 +60,7 @@ public final class MessageContexts {
    *         yet.
    */
   public static boolean isInboundMessage(final MessageContext context) {
-    return !MessageContexts.isOutboundMessage(context);
+    return !isOutboundMessage(context);
   }
 
   /**
@@ -80,7 +80,7 @@ public final class MessageContexts {
    * Returns the {@link RunContext} of the ongoing request, or <code>null</code> if not set.
    */
   public static RunContext getRunContext(final MessageContext messageContext) {
-    final Object runContext = messageContext.get(MessageContexts.PROP_RUNCONTEXT);
+    final Object runContext = messageContext.get(PROP_RUNCONTEXT);
     if (runContext instanceof RunContext) {
       return (RunContext) runContext;
     }
@@ -97,7 +97,7 @@ public final class MessageContexts {
    * if not set.
    */
   public static Subject getSubject(final MessageContext messageContext, final Subject defaultSubject) {
-    final RunContext runContext = MessageContexts.getRunContext(messageContext);
+    final RunContext runContext = getRunContext(messageContext);
     if (runContext != null && runContext.getSubject() != null) {
       return runContext.getSubject();
     }

@@ -28,7 +28,7 @@ public final class ClientNotificationProperties {
 
     @Override
     protected Integer getDefaultValue() {
-      return Integer.valueOf(200);
+      return 200;
     }
 
     @Override
@@ -44,7 +44,7 @@ public final class ClientNotificationProperties {
 
     @Override
     protected Integer getDefaultValue() {
-      return Integer.valueOf(10000);
+      return 10000;
     }
 
     @Override
@@ -60,7 +60,7 @@ public final class ClientNotificationProperties {
 
     @Override
     protected Integer getDefaultValue() {
-      return Integer.valueOf(30);
+      return 30;
     }
 
     @Override
@@ -79,7 +79,7 @@ public final class ClientNotificationProperties {
 
     @Override
     protected Integer getDefaultValue() {
-      return Integer.valueOf(10 * 60 * 1000);
+      return 10 * 60 * 1000;
     }
 
     @Override

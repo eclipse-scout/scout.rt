@@ -200,8 +200,8 @@ public class BlockingCondition implements IBlockingCondition {
 
   /**
    * Waits until signaled or the timeout elapses. If <code>awaitInterruptibly</code> is set to <code>true</code>, this
-   * method returns with an {@link ThreadInterruptedError} upon interruption. For either case, when this method
-   * finally returns, the thread's interrupted status will still be set.
+   * method returns with an {@link ThreadInterruptedError} upon interruption. For either case, when this method finally
+   * returns, the thread's interrupted status will still be set.
    */
   protected void awaitUntilSignaledOrTimeout(final long timeout, final TimeUnit unit, final boolean awaitInterruptibly) {
     boolean interrupted = false;
@@ -315,17 +315,13 @@ public class BlockingCondition implements IBlockingCondition {
 
     // Return the registration handle to unregister the registered execution hints.
     final AtomicBoolean disposed = new AtomicBoolean(false);
-    final IRegistrationHandle registrationHandle = new IRegistrationHandle() {
+    final IRegistrationHandle registrationHandle = () -> {
+      if (!disposed.compareAndSet(false, true)) {
+        return; // already disposed, e.g. due to timeout or interruption
+      }
 
-      @Override
-      public void dispose() {
-        if (!disposed.compareAndSet(false, true)) {
-          return; // already disposed, e.g. due to timeout or interruption
-        }
-
-        for (final String associatedExecutionHint : associatedExecutionHints) {
-          future.removeExecutionHint(associatedExecutionHint);
-        }
+      for (final String associatedExecutionHint : associatedExecutionHints) {
+        future.removeExecutionHint(associatedExecutionHint);
       }
     };
     m_waitForHints.add(registrationHandle);

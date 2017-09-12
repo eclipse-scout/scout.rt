@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 /**
  * Allows the subscription of a replier to respond to requests sent to a 'request-reply' destination. Requests are
@@ -74,29 +73,21 @@ public class AutoAcknowledgeReplierStrategy implements IReplierStrategy {
 
         // Read and process the message asynchronously because JMS session is single-threaded. This allows concurrent message processing.
         // Unlike AutoAcknowledgeSubscriptionStrategy, a job is scheduled for 'single-threaded' mode to support cancellation (execution hint).
-        final IFuture<Void> future = Jobs.schedule(new IRunnable() {
+        final IFuture<Void> future = Jobs.schedule(() -> {
+          final JmsMessageReader<REQUEST> requestReader = JmsMessageReader.newInstance(jmsRequest, marshaller);
+          final IMessage<REQUEST> request = requestReader.readMessage();
+          final Destination replyTopic = requestReader.readReplyTo();
 
-          @Override
-          public void run() throws Exception {
-            final JmsMessageReader<REQUEST> requestReader = JmsMessageReader.newInstance(jmsRequest, marshaller);
-            final IMessage<REQUEST> request = requestReader.readMessage();
-            final Destination replyTopic = requestReader.readReplyTo();
-
-            runContext.copy()
-                .withCorrelationId(requestReader.readCorrelationId())
-                .withThreadLocal(IMessage.CURRENT, request)
-                .withTransactionScope(TransactionScope.REQUIRES_NEW)
-                .withDiagnostics(BEANS.all(IJmsRunContextDiagnostics.class))
-                .withRunMonitor(RunMonitor.CURRENT.get()) // associate with the calling monitor to propagate cancellation
-                .run(new IRunnable() {
-
-                  @Override
-                  public void run() throws Exception {
-                    final Message replyMessage = handleRequest(listener, marshaller, request, replyId);
-                    m_mom.send(m_mom.getDefaultProducer(), replyTopic, replyMessage, jmsRequest.getJMSDeliveryMode(), jmsRequest.getJMSPriority(), Message.DEFAULT_TIME_TO_LIVE);
-                  }
-                });
-          }
+          runContext.copy()
+              .withCorrelationId(requestReader.readCorrelationId())
+              .withThreadLocal(IMessage.CURRENT, request)
+              .withTransactionScope(TransactionScope.REQUIRES_NEW)
+              .withDiagnostics(BEANS.all(IJmsRunContextDiagnostics.class))
+              .withRunMonitor(RunMonitor.CURRENT.get()) // associate with the calling monitor to propagate cancellation
+              .run(() -> {
+                final Message replyMessage = handleRequest(listener, marshaller, request, replyId);
+                m_mom.send(m_mom.getDefaultProducer(), replyTopic, replyMessage, jmsRequest.getJMSDeliveryMode(), jmsRequest.getJMSPriority(), Message.DEFAULT_TIME_TO_LIVE);
+              });
         }, Jobs.newInput()
             .withName("Receiving JMS request [dest={}]", destination)
             .withExceptionHandling(BEANS.get(MomExceptionHandler.class), true)

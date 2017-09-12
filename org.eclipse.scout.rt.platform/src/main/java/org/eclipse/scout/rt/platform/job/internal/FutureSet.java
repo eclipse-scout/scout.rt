@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.platform.filter.NotFilter;
 import org.eclipse.scout.rt.platform.filter.OrFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
-import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
@@ -66,17 +65,13 @@ public class FutureSet {
    * Invoke to initialize this {@link FutureSet}.
    */
   public void init(final IJobManager jobManager) {
-    m_jobListenerRegistration = jobManager.addListener(newSignalingFilter(), new IJobListener() {
-
-      @Override
-      public void changed(final JobEvent event) {
-        m_writeLock.lock();
-        try {
-          m_changedCondition.signalAll();
-        }
-        finally {
-          m_writeLock.unlock();
-        }
+    m_jobListenerRegistration = jobManager.addListener(newSignalingFilter(), event -> {
+      m_writeLock.lock();
+      try {
+        m_changedCondition.signalAll();
+      }
+      finally {
+        m_writeLock.unlock();
       }
     });
   }
@@ -298,28 +293,24 @@ public class FutureSet {
    * Creates the filter to signal waiting threads upon a job event.
    */
   protected IFilter<JobEvent> newSignalingFilter() {
-    return new IFilter<JobEvent>() {
-
-      @Override
-      public boolean accept(final JobEvent event) {
-        switch (event.getType()) {
-          case JOB_EXECUTION_HINT_ADDED:
-          case JOB_EXECUTION_HINT_REMOVED:
-            return true; // manual signaling required
-          case JOB_STATE_CHANGED: // NOSONAR
-            switch (event.getData().getState()) {
-              case PENDING:
-              case RUNNING:
-              case WAITING_FOR_BLOCKING_CONDITION:
-              case WAITING_FOR_PERMIT:
-              case DONE:
-                return true; // manual signaling required
-              default:
-                return false; // signaling done by adding/removing the Future
-            }
-          default:
-            return false;
-        }
+    return event -> {
+      switch (event.getType()) {
+        case JOB_EXECUTION_HINT_ADDED:
+        case JOB_EXECUTION_HINT_REMOVED:
+          return true; // manual signaling required
+        case JOB_STATE_CHANGED: // NOSONAR
+          switch (event.getData().getState()) {
+            case PENDING:
+            case RUNNING:
+            case WAITING_FOR_BLOCKING_CONDITION:
+            case WAITING_FOR_PERMIT:
+            case DONE:
+              return true; // manual signaling required
+            default:
+              return false; // signaling done by adding/removing the Future
+          }
+        default:
+          return false;
       }
     };
   }

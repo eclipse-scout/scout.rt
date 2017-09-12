@@ -17,9 +17,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -40,9 +41,9 @@ public final class BeanUtility {
 
   static {
     BEAN_INFO_CACHE_LOCK = new Object();
-    BEAN_INFO_CACHE = new HashMap<CompositeObject, FastBeanInfo>();
+    BEAN_INFO_CACHE = new HashMap<>();
     // primitive -> complex classes mappings
-    PRIMITIVE_COMPLEX_CLASS_MAP = new HashMap<Class, Class>();
+    PRIMITIVE_COMPLEX_CLASS_MAP = new HashMap<>();
     PRIMITIVE_COMPLEX_CLASS_MAP.put(boolean.class, Boolean.class);
     PRIMITIVE_COMPLEX_CLASS_MAP.put(byte.class, Byte.class);
     PRIMITIVE_COMPLEX_CLASS_MAP.put(char.class, Character.class);
@@ -52,8 +53,8 @@ public final class BeanUtility {
     PRIMITIVE_COMPLEX_CLASS_MAP.put(float.class, Float.class);
     PRIMITIVE_COMPLEX_CLASS_MAP.put(double.class, Double.class);
     // complex -> primitive classes mappings
-    COMPLEX_PRIMITIVE_CLASS_MAP = new HashMap<Class, Class>();
-    for (Map.Entry<Class, Class> entry : PRIMITIVE_COMPLEX_CLASS_MAP.entrySet()) {
+    COMPLEX_PRIMITIVE_CLASS_MAP = new HashMap<>();
+    for (Entry<Class, Class> entry : PRIMITIVE_COMPLEX_CLASS_MAP.entrySet()) {
       COMPLEX_PRIMITIVE_CLASS_MAP.put(entry.getValue(), entry.getKey());
     }
   }
@@ -65,11 +66,10 @@ public final class BeanUtility {
    * @return all properties of from up to (and excluding) to stopClazz, filtering with filter
    */
   public static Map<String, Object> getProperties(Object from, Class<?> stopClazz, IPropertyFilter filter) {
-    HashMap<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     try {
       FastPropertyDescriptor[] props = getFastPropertyDescriptors(from.getClass(), stopClazz, filter);
-      for (int i = 0; i < props.length; i++) {
-        FastPropertyDescriptor fromProp = props[i];
+      for (FastPropertyDescriptor fromProp : props) {
         Method readMethod = fromProp.getReadMethod();
         if (readMethod != null) {
           Object value = readMethod.invoke(from, (Object[]) null);
@@ -90,8 +90,7 @@ public final class BeanUtility {
    */
   public static void setProperties(Object to, Map<String, Object> map, boolean lenient, IPropertyFilter filter) {
     FastBeanInfo toInfo = getFastBeanInfo(to.getClass(), null);
-    for (Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator(); it.hasNext();) {
-      Map.Entry<String, Object> entry = it.next();
+    for (Entry<String, Object> entry : map.entrySet()) {
       String name = entry.getKey();
       Object value = entry.getValue();
       try {
@@ -129,11 +128,7 @@ public final class BeanUtility {
     }
     synchronized (BEAN_INFO_CACHE_LOCK) {
       CompositeObject key = new CompositeObject(beanClass, stopClass);
-      FastBeanInfo info = BEAN_INFO_CACHE.get(key);
-      if (info == null) {
-        info = new FastBeanInfo(beanClass, stopClass);
-        BEAN_INFO_CACHE.put(key, info);
-      }
+      FastBeanInfo info = BEAN_INFO_CACHE.computeIfAbsent(key, k -> new FastBeanInfo(beanClass, stopClass));
       return info;
     }
   }
@@ -155,9 +150,8 @@ public final class BeanUtility {
   public static FastPropertyDescriptor[] getFastPropertyDescriptors(Class<?> clazz, Class<?> stopClazz, IPropertyFilter filter) {
     FastBeanInfo info = getFastBeanInfo(clazz, stopClazz);
     FastPropertyDescriptor[] a = info.getPropertyDescriptors();
-    ArrayList<FastPropertyDescriptor> filteredProperties = new ArrayList<FastPropertyDescriptor>(a.length);
-    for (int i = 0; i < a.length; i++) {
-      FastPropertyDescriptor pd = a[i];
+    ArrayList<FastPropertyDescriptor> filteredProperties = new ArrayList<>(a.length);
+    for (FastPropertyDescriptor pd : a) {
       if (filter != null && !(filter.accept(pd))) {
         // ignore it
       }
@@ -255,7 +249,7 @@ public final class BeanUtility {
       return null;
     }
     // find best matching constructor
-    TreeMap<Integer, Set<Constructor<T>>> candidates = new TreeMap<Integer, Set<Constructor<T>>>();
+    NavigableMap<Integer, Set<Constructor<T>>> candidates = new TreeMap<>();
     for (Constructor<?> ctor : c.getConstructors()) {
       int distance = 0;
       Class<?>[] ctorParameters = ctor.getParameterTypes();
@@ -283,11 +277,7 @@ public final class BeanUtility {
           // collect candidates
           @SuppressWarnings("unchecked")
           Constructor<T> candidate = (Constructor<T>) ctor;
-          Set<Constructor<T>> rankedCtors = candidates.get(distance);
-          if (rankedCtors == null) {
-            rankedCtors = new HashSet<Constructor<T>>();
-            candidates.put(distance, rankedCtors);
-          }
+          Set<Constructor<T>> rankedCtors = candidates.computeIfAbsent(distance, k -> new HashSet<>());
           rankedCtors.add(candidate);
         }
       }
@@ -406,11 +396,11 @@ public final class BeanUtility {
     else {
       Class<?> test = type;
       while (test != null) {
-        lookAheadList.addAll(Arrays.<Class<?>> asList(test.getInterfaces()));
+        lookAheadList.addAll(Arrays.asList(test.getInterfaces()));
         test = test.getSuperclass();
       }
     }
-    while (lookAheadList.size() > 0) {
+    while (!lookAheadList.isEmpty()) {
       workList = lookAheadList;
       lookAheadList = new ArrayList<>();
       for (Class<?> c : workList) {
@@ -419,7 +409,7 @@ public final class BeanUtility {
           // look ahead
           Class<?>[] ifs = c.getInterfaces();
           if (ifs.length > 0) {
-            lookAheadList.addAll(Arrays.<Class<?>> asList(ifs));
+            lookAheadList.addAll(Arrays.asList(ifs));
           }
         }
       }

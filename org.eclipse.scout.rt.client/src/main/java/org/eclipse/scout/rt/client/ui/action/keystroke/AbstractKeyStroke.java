@@ -45,7 +45,7 @@ public abstract class AbstractKeyStroke extends AbstractAction implements IKeySt
 
   @Override
   protected IKeyStrokeExtension<? extends AbstractKeyStroke> createLocalExtension() {
-    return new LocalKeyStrokeExtension<AbstractKeyStroke>(this);
+    return new LocalKeyStrokeExtension<>(this);
   }
 
 }

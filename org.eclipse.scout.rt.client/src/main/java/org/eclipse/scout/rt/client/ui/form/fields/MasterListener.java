@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 
 import java.util.EventListener;
 
+@FunctionalInterface
 public interface MasterListener extends EventListener {
   void masterChanged(Object masterValue);
 }

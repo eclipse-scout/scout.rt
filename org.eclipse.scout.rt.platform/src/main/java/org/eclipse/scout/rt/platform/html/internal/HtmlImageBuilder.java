@@ -10,12 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.html.internal;
 
-import org.eclipse.scout.rt.platform.html.IHtmlElement;
-
 /**
  * Builder for a html image.
  */
-public class HtmlImageBuilder extends EmptyHtmlNodeBuilder implements IHtmlElement {
+public class HtmlImageBuilder extends EmptyHtmlNodeBuilder {
 
   private static final long serialVersionUID = 1L;
 

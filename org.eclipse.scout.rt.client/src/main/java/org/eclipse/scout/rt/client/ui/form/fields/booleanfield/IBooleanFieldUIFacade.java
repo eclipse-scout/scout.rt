@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.booleanfield;
 
+@FunctionalInterface
 public interface IBooleanFieldUIFacade {
 
   void setValueFromUI(Boolean value);

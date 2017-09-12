@@ -21,6 +21,8 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -121,7 +123,7 @@ public class RemoteFileService implements IRemoteFileService {
   private String[][] getFiles(String folderBase, FilenameFilter filter) {
     File root = new File(getRootPath());
     File path = null;
-    if (folderBase == null || folderBase.length() == 0) {
+    if (folderBase == null || folderBase.isEmpty()) {
       path = new File(getRootPath());
     }
     else {
@@ -143,16 +145,16 @@ public class RemoteFileService implements IRemoteFileService {
       throw new SecurityException("invalid path for file service: path outside root-path");
     }
 
-    ArrayList<String> dirList = new ArrayList<String>();
-    ArrayList<String> fileList = new ArrayList<String>();
+    List<String> dirList = new ArrayList<>();
+    List<String> fileList = new ArrayList<>();
     String[] dir = path.list(filter);
     if (dir != null) {
-      for (int i = 0; i < dir.length; i++) {
+      for (String aDir : dir) {
         try {
-          File file = new File(path.getCanonicalPath() + "/" + dir[i]);
+          File file = new File(path.getCanonicalPath() + "/" + aDir);
           if (!file.isHidden()) {
             if (file.exists() && file.isDirectory()) {
-              String[][] tmp = getFiles((folderBase == null ? dir[i] : folderBase + "/" + dir[i]), filter);
+              String[][] tmp = getFiles((folderBase == null ? aDir : folderBase + "/" + aDir), filter);
               for (String[] f : tmp) {
                 dirList.add(f[0]);
                 fileList.add(f[1]);
@@ -160,7 +162,7 @@ public class RemoteFileService implements IRemoteFileService {
             }
             else {
               dirList.add(folderBase);
-              fileList.add(dir[i]);
+              fileList.add(aDir);
             }
           }
         }
@@ -187,7 +189,7 @@ public class RemoteFileService implements IRemoteFileService {
   }
 
   public RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient, String charsetName, long maxBlockSize) {
-    HashMap<String, RemoteFile> fileList = new HashMap<String, RemoteFile>();
+    Map<String, RemoteFile> fileList = new HashMap<>();
     if (existingFileInfoOnClient != null) {
       for (RemoteFile rf : existingFileInfoOnClient) {
         fileList.put((rf.getDirectory().endsWith("/") ? rf.getDirectory() : rf.getDirectory() + "/") + rf.getName(), rf);
@@ -228,7 +230,7 @@ public class RemoteFileService implements IRemoteFileService {
   private File getFileInternal(RemoteFile spec) {
     File root = new File(getRootPath());
     File folder = null;
-    if (spec.getDirectory() == null || spec.getDirectory().length() == 0) {
+    if (spec.getDirectory() == null || spec.getDirectory().isEmpty()) {
       folder = new File(getRootPath());
     }
     else {

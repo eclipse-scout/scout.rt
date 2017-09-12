@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.menu;
 
 import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 
+@FunctionalInterface
 public interface IJsonContextMenuOwner {
 
   String PROP_MENUS = "menus";

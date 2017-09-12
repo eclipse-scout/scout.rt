@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
@@ -33,7 +34,6 @@ import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
-import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.extension.services.common.code.CodeTypeWithGenericChains.CodeTypeWithGenericCreateCodeChain;
@@ -46,7 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ClassId("119a9156-45e7-4f32-9b55-01aa6b5283d7")
-public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE extends ICode<CODE_ID>> implements ICodeType<CODE_TYPE_ID, CODE_ID>, IContributionOwner, IExtensibleObject, Serializable {
+public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE extends ICode<CODE_ID>> implements ICodeType<CODE_TYPE_ID, CODE_ID>, IContributionOwner, Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractCodeTypeWithGeneric.class);
   private static final long serialVersionUID = 1L;
 
@@ -55,8 +55,8 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   private String m_iconId;
   private boolean m_hierarchy;
   private int m_maxLevel;
-  private transient Map<CODE_ID, CODE> m_rootCodeMap = new HashMap<CODE_ID, CODE>();
-  private List<CODE> m_rootCodeList = new ArrayList<CODE>();
+  private transient Map<CODE_ID, CODE> m_rootCodeMap = new HashMap<>();
+  private List<CODE> m_rootCodeList = new ArrayList<>();
   protected IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>, ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>> m_objectExtensions;
 
@@ -65,7 +65,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   }
 
   public AbstractCodeTypeWithGeneric(boolean callInitializer) {
-    m_objectExtensions = new ObjectExtensions<AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>, ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>>(this, true);
+    m_objectExtensions = new ObjectExtensions<>(this, true);
     if (callInitializer) {
       callInitializer();
     }
@@ -94,7 +94,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   }
 
   public AbstractCodeTypeWithGeneric(String label, boolean hierarchy) {
-    m_objectExtensions = new ObjectExtensions<AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>, ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>>(this, true);
+    m_objectExtensions = new ObjectExtensions<>(this, true);
     m_text = label;
     m_hierarchy = hierarchy;
   }
@@ -144,7 +144,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   protected List<? extends CODE> execCreateCodes() {
     List<Class<ICode>> configuredCodes = getConfiguredCodes();
     List<ICode> contributedCodes = m_contributionHolder.getContributionsByClass(ICode.class);
-    OrderedCollection<CODE> codes = new OrderedCollection<CODE>();
+    OrderedCollection<CODE> codes = new OrderedCollection<>();
     for (Class<? extends ICode> codeClazz : configuredCodes) {
       CODE code = (CODE) ConfigurationUtility.newInnerInstance(this, codeClazz);
       codes.addOrdered(code);
@@ -153,7 +153,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
       codes.addOrdered((CODE) c);
     }
 
-    new MoveCodesHandler<CODE_ID, CODE>(codes).moveModelObjects();
+    new MoveCodesHandler<>(codes).moveModelObjects();
     return codes.getOrderedList();
   }
 
@@ -181,7 +181,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
     else {
       // try to create mutable code
       if (codeClazz.isAssignableFrom(MutableCode.class)) {
-        return (CODE) new MutableCode<CODE_ID>(newRow);
+        return (CODE) new MutableCode<>(newRow);
       }
     }
     return null;
@@ -251,12 +251,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   }
 
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
-      @Override
-      public void run() {
-        initConfig();
-      }
-    });
+    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
   protected void initConfig() {
@@ -269,7 +264,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   }
 
   protected ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>> createLocalExtension() {
-    return new LocalCodeTypeWithGenericExtension<CODE_TYPE_ID, CODE_ID, CODE, AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>(this);
+    return new LocalCodeTypeWithGenericExtension<>(this);
   }
 
   @Override
@@ -289,7 +284,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
    */
   protected final List<? extends CODE> interceptCreateCodes() {
     List<? extends ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>> extensions = getAllExtensions();
-    CodeTypeWithGenericCreateCodesChain<CODE_TYPE_ID, CODE_ID, CODE> chain = new CodeTypeWithGenericCreateCodesChain<CODE_TYPE_ID, CODE_ID, CODE>(extensions);
+    CodeTypeWithGenericCreateCodesChain<CODE_TYPE_ID, CODE_ID, CODE> chain = new CodeTypeWithGenericCreateCodesChain<>(extensions);
     return chain.execCreateCodes();
   }
 
@@ -300,7 +295,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
    */
   protected final CODE interceptCreateCode(ICodeRow<CODE_ID> newRow) {
     List<? extends ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>> extensions = getAllExtensions();
-    CodeTypeWithGenericCreateCodeChain<CODE_TYPE_ID, CODE_ID, CODE> chain = new CodeTypeWithGenericCreateCodeChain<CODE_TYPE_ID, CODE_ID, CODE>(extensions);
+    CodeTypeWithGenericCreateCodeChain<CODE_TYPE_ID, CODE_ID, CODE> chain = new CodeTypeWithGenericCreateCodeChain<>(extensions);
     return chain.execCreateCode(newRow);
   }
 
@@ -312,13 +307,13 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
    */
   protected List<? extends ICodeRow<CODE_ID>> interceptLoadCodes(Class<? extends ICodeRow<CODE_ID>> codeRowType) {
     List<? extends ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>> extensions = getAllExtensions();
-    CodeTypeWithGenericLoadCodesChain<CODE_TYPE_ID, CODE_ID, CODE> chain = new CodeTypeWithGenericLoadCodesChain<CODE_TYPE_ID, CODE_ID, CODE>(extensions);
+    CodeTypeWithGenericLoadCodesChain<CODE_TYPE_ID, CODE_ID, CODE> chain = new CodeTypeWithGenericLoadCodesChain<>(extensions);
     return chain.execLoadCodes(codeRowType);
   }
 
   protected void interceptOverwriteCode(ICodeRow<CODE_ID> oldCode, ICodeRow<CODE_ID> newCode) {
     List<? extends ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>> extensions = getAllExtensions();
-    CodeTypeWithGenericOverwriteCodeChain<CODE_TYPE_ID, CODE_ID, CODE> chain = new CodeTypeWithGenericOverwriteCodeChain<CODE_TYPE_ID, CODE_ID, CODE>(extensions);
+    CodeTypeWithGenericOverwriteCodeChain<CODE_TYPE_ID, CODE_ID, CODE> chain = new CodeTypeWithGenericOverwriteCodeChain<>(extensions);
     chain.execOverwriteCode(oldCode, newCode);
   }
 
@@ -359,8 +354,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   public CODE getCode(CODE_ID id) {
     CODE c = m_rootCodeMap.get(id);
     if (c == null) {
-      for (Iterator<CODE> it = m_rootCodeList.iterator(); it.hasNext();) {
-        CODE childCode = it.next();
+      for (CODE childCode : m_rootCodeList) {
         c = (CODE) childCode.getChildCode(id);
         if (c != null) {
           return c;
@@ -374,8 +368,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   @Override
   public CODE getCodeByExtKey(Object extKey) {
     CODE c = null;
-    for (Iterator<CODE> it = m_rootCodeList.iterator(); it.hasNext();) {
-      CODE childCode = it.next();
+    for (CODE childCode : m_rootCodeList) {
       if (extKey.equals(childCode.getExtKey())) {
         c = childCode;
       }
@@ -438,26 +431,21 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
 
   @Override
   public List<? extends CODE> getCodes(boolean activeOnly) {
-    List<CODE> list = new ArrayList<CODE>(m_rootCodeList);
+    List<CODE> list = new ArrayList<>(m_rootCodeList);
     if (activeOnly) {
-      for (Iterator<CODE> it = list.iterator(); it.hasNext();) {
-        CODE code = it.next();
-        if (!code.isActive()) {
-          it.remove();
-        }
-      }
+      list.removeIf(code -> !code.isActive());
     }
     return list;
   }
 
   protected void loadCodes() {
-    m_rootCodeMap = new HashMap<CODE_ID, CODE>();
-    m_rootCodeList = new ArrayList<CODE>();
+    m_rootCodeMap = new HashMap<>();
+    m_rootCodeList = new ArrayList<>();
     //
     // 1a create unconnected codes and assign to type
-    List<CODE> allCodesOrdered = new ArrayList<CODE>();
-    Map<CODE, CODE> codeToParentCodeMap = new HashMap<CODE, CODE>();
-    Map<CODE_ID, CODE> idToCodeMap = new HashMap<CODE_ID, CODE>();
+    List<CODE> allCodesOrdered = new ArrayList<>();
+    Map<CODE, CODE> codeToParentCodeMap = new HashMap<>();
+    Map<CODE_ID, CODE> idToCodeMap = new HashMap<>();
     // 1a add configured codes
     List<? extends CODE> createdList = interceptCreateCodes();
     if (createdList != null) {
@@ -469,8 +457,8 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
     }
     // 1b add dynamic codes
     List<? extends ICodeRow<CODE_ID>> result = interceptLoadCodes(getConfiguredCodeRowType());
-    if (result != null && result.size() > 0) {
-      HashMap<CODE, CODE_ID> codeToParentIdMap = new HashMap<CODE, CODE_ID>();
+    if (result != null && !result.isEmpty()) {
+      Map<CODE, CODE_ID> codeToParentIdMap = new HashMap<>();
       // create unconnected codes and assign to type
       for (ICodeRow<CODE_ID> newRow : result) {
         CODE existingCode = idToCodeMap.get(newRow.getKey());
@@ -489,7 +477,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
           //add new
           allCodesOrdered.add(newCode);
           idToCodeMap.put(newCode.getId(), newCode);
-          CODE_ID parentId = (CODE_ID) newRow.getParentKey();
+          CODE_ID parentId = newRow.getParentKey();
           codeToParentIdMap.put(newCode, parentId);
         }
         else if (existingCode != null) {
@@ -498,8 +486,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
           allCodesOrdered.add(existingCode);
         }
       }
-      for (Iterator<Map.Entry<CODE, CODE_ID>> it = codeToParentIdMap.entrySet().iterator(); it.hasNext();) {
-        Map.Entry<CODE, CODE_ID> e = it.next();
+      for (Entry<CODE, CODE_ID> e : codeToParentIdMap.entrySet()) {
         CODE code = e.getKey();
         CODE_ID parentId = e.getValue();
         CODE parentCode = null;
@@ -523,15 +510,12 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
       }
     }
     // 3 mark all chidren of inactive codes also as inactive
-    visit(new ICodeVisitor<ICode<CODE_ID>>() {
-      @Override
-      public boolean visit(ICode<CODE_ID> code, int treeLevel) {
-        final ICode<CODE_ID> parentCode = code.getParentCode();
-        if (parentCode != null && !parentCode.isActive() && code.isActive() && code instanceof AbstractCode<?>) {
-          ((AbstractCode<?>) code).setActiveInternal(false);
-        }
-        return true;
+    visit((code, treeLevel) -> {
+      final ICode<CODE_ID> parentCode = code.getParentCode();
+      if (parentCode != null && !parentCode.isActive() && code.isActive() && code instanceof AbstractCode<?>) {
+        ((AbstractCode<?>) code).setActiveInternal(false);
       }
+      return true;
     }, false);
   }
 
@@ -620,9 +604,9 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   }
 
   protected Object readResolve() throws ObjectStreamException {
-    m_rootCodeMap = new HashMap<CODE_ID, CODE>();
+    m_rootCodeMap = new HashMap<>();
     if (m_rootCodeList == null) {
-      m_rootCodeList = new ArrayList<CODE>();
+      m_rootCodeList = new ArrayList<>();
     }
     else {
       for (CODE code : m_rootCodeList) {

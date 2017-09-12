@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 
 public class ScriptSource {
 
-  public static enum FileType {
+  public enum FileType {
     JS,
     /**
      * CSS and LESS are both handled equally.
@@ -37,7 +37,7 @@ public class ScriptSource {
     }
   }
 
-  public static enum NodeType {
+  public enum NodeType {
     /**
      * A macro consists of multiple libraries and modules and has the file name *-macro.js or *-macro.css
      * <p>
@@ -112,7 +112,7 @@ public class ScriptSource {
   private final FileType m_fileType;
   private final NodeType m_nodeType;
 
-  public ScriptSource(String requestPath, URL url, ScriptSource.FileType fileType, ScriptSource.NodeType nodeType) {
+  public ScriptSource(String requestPath, URL url, FileType fileType, NodeType nodeType) {
     if (url == null) {
       throw new IllegalArgumentException(requestPath + ": url is null");
     }
@@ -126,7 +126,7 @@ public class ScriptSource {
    * Like {@link #ScriptSource(String, URL, FileType, NodeType)} but resolves the file type automatically from the
    * requestPath
    */
-  public ScriptSource(String requestPath, URL url, ScriptSource.NodeType nodeType) {
+  public ScriptSource(String requestPath, URL url, NodeType nodeType) {
     this(requestPath, url, FileType.resolveFromFilename(requestPath), nodeType);
   }
 
@@ -141,14 +141,14 @@ public class ScriptSource {
   /**
    * Returns never <code>null</code>.
    */
-  public ScriptSource.FileType getFileType() {
+  public FileType getFileType() {
     return m_fileType;
   }
 
   /**
    * Returns never <code>null</code>.
    */
-  public ScriptSource.NodeType getNodeType() {
+  public NodeType getNodeType() {
     return m_nodeType;
   }
 

@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public abstract class AbstractEventFilter<EVENT extends EventObject, CONDITION> {
 
-  private List<CONDITION> m_conditions;
+  private final List<CONDITION> m_conditions;
 
   public AbstractEventFilter() {
     m_conditions = new LinkedList<>();

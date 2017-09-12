@@ -26,7 +26,7 @@ public abstract class JsonProperty<MODEL_ELEMENT> {
   private final String m_propertyName;
   private final MODEL_ELEMENT m_model;
   private IJsonAdapter<?> m_parentJsonAdapter;
-  private List<JsonProperty<?>> m_lazyProperties = new LinkedList<JsonProperty<?>>();
+  private final List<JsonProperty<?>> m_lazyProperties = new LinkedList<>();
   private boolean m_valueSent;
 
   public JsonProperty(String propertyName, MODEL_ELEMENT model) {

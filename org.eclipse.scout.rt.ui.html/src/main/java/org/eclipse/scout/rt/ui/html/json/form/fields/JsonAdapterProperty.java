@@ -22,11 +22,11 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 
 @SuppressWarnings("squid:S00118")
 public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MODEL_ELEMENT> {
-  private IUiSession m_uiSession;
-  private boolean m_global;
-  private boolean m_disposeOnChange;
-  private IFilter<Object> m_filter;
-  private Set<IJsonAdapter> m_ownedAdapters = new HashSet<IJsonAdapter>();
+  private final IUiSession m_uiSession;
+  private final boolean m_global;
+  private final boolean m_disposeOnChange;
+  private final IFilter<Object> m_filter;
+  private final Set<IJsonAdapter> m_ownedAdapters = new HashSet<>();
 
   public JsonAdapterProperty(String propertyName, MODEL_ELEMENT model, IUiSession session) {
     super(propertyName, model);
@@ -90,7 +90,7 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
       return;
     }
     if (modelValue instanceof Collection) {
-      for (Object model : (Collection) modelValue) {
+      for (Object model : (Iterable) modelValue) {
         createAdapter(model);
       }
     }
@@ -123,7 +123,7 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
    * Dispose all old owned adapters.
    */
   protected void disposeAdapters(Object newModels) {
-    Set<IJsonAdapter> attachedAdapters = new HashSet<IJsonAdapter>(m_ownedAdapters);
+    Set<IJsonAdapter> attachedAdapters = new HashSet<>(m_ownedAdapters);
     for (IJsonAdapter<?> adapter : attachedAdapters) {
       if (newModels instanceof Collection) {
         // Dispose adapter only if's model is not part of the new models

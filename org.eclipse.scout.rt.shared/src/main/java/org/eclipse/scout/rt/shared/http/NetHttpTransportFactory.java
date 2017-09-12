@@ -19,7 +19,7 @@ public class NetHttpTransportFactory implements IHttpTransportFactory {
 
   @Override
   public HttpTransport newHttpTransport(IHttpTransportManager manager) {
-    NetHttpTransport.Builder builder = new NetHttpTransport.Builder();
+    Builder builder = new Builder();
 
     interceptNewHttpTransport(builder, manager);
     manager.interceptNewHttpTransport(new NetHttpTransportBuilder(builder));
@@ -35,13 +35,13 @@ public class NetHttpTransportFactory implements IHttpTransportFactory {
   }
 
   public static class NetHttpTransportBuilder implements IHttpTransportBuilder {
-    private final NetHttpTransport.Builder m_builder;
+    private final Builder m_builder;
 
-    public NetHttpTransportBuilder(NetHttpTransport.Builder builder) {
+    public NetHttpTransportBuilder(Builder builder) {
       m_builder = builder;
     }
 
-    public NetHttpTransport.Builder getBuilder() {
+    public Builder getBuilder() {
       return m_builder;
     }
   }

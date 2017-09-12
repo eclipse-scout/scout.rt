@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.shared.ISession;
  *
  * @since 5.1
  */
+@FunctionalInterface
 public interface ISessionListener extends EventListener {
 
   /**

@@ -16,6 +16,7 @@ import java.security.Permission;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -24,14 +25,13 @@ import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.security.PublishUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.UpdateUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
-import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkStorageService;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageService implements IBookmarkStorageService {
+public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageService {
   private static final Logger LOG = LoggerFactory.getLogger(FileSystemBookmarkStorageService.class);
 
   public static final String GLOBAL_FILE_NAME = "all_users";
@@ -50,12 +50,10 @@ public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageSer
       throw new ProcessingException("Function denied", new SecurityException("Function denied"));
     }
     //
-    HashSet<Object> set = new HashSet<Object>();
+    Set<Object> set = new HashSet<>();
     Collection<Object> userIdList = (Collection<Object>) targetGroup.get("userIdList");
     if (userIdList != null) {
-      for (Object userId : userIdList) {
-        set.add(userId);
-      }
+      set.addAll(userIdList);
     }
     Object userId = targetGroup.get("userId");
     if (userId != null) {

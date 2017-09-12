@@ -36,7 +36,7 @@ public class EmptyHtmlNodeBuilder extends HtmlNodeBuilder {
   @Override
   public void build() {
     appendStartTag();
-    if (getTexts().size() > 0) {
+    if (!getTexts().isEmpty()) {
       appendText();
     }
   }

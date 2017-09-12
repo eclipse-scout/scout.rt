@@ -15,7 +15,7 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 
-public class CalendarTask extends AbstractCalendarItem implements ICalendarTask, java.io.Serializable {
+public class CalendarTask extends AbstractCalendarItem implements ICalendarTask {
   private static final long serialVersionUID = 0L;
 
   private Object m_responsibleIdObject;

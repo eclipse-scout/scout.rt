@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.csv;
 
 import java.util.List;
 
+@FunctionalInterface
 public interface IDataConsumer {
   void processRow(int lineNr, List<Object> row);
 }

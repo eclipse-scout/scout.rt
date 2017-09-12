@@ -16,7 +16,6 @@ import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -42,8 +41,8 @@ public class DiagnosticSession {
 
   public void serviceRequest(HttpServletRequest req, HttpServletResponse res) throws IOException {
     if (!req.getParameterMap().isEmpty()) {
-      for (Iterator paramIt = req.getParameterMap().entrySet().iterator(); paramIt.hasNext();) {
-        Entry next = (Entry) paramIt.next();
+      for (Entry<String, String[]> stringEntry : req.getParameterMap().entrySet()) {
+        Entry next = (Entry) stringEntry;
         String action = (String) next.getKey();
         Object value = next.getValue();
         IDiagnostic diagnosticProvider = DiagnosticFactory.getDiagnosticProvider(action);
@@ -151,10 +150,10 @@ public class DiagnosticSession {
   }
 
   private List<List<String>> getDiagnosticItems() {
-    List<List<String>> result = new ArrayList<List<String>>();
+    List<List<String>> result = new ArrayList<>();
 
     /* system information from JVM */
-    ArrayList<String> infos = getSystemInformation();
+    List<String> infos = getSystemInformation();
     DiagnosticFactory.addDiagnosticItemToList(result, "Server", "", DiagnosticFactory.STATUS_TITLE);
     DiagnosticFactory.addDiagnosticItemToList(result, "Runtime Environment", infos.get(0), DiagnosticFactory.STATUS_INFO);
     DiagnosticFactory.addDiagnosticItemToList(result, "Application Directory", infos.get(1), DiagnosticFactory.STATUS_INFO);
@@ -172,7 +171,7 @@ public class DiagnosticSession {
     }
 
     // system properties
-    List<String> properties = new ArrayList<String>();
+    List<String> properties = new ArrayList<>();
     for (Object property : System.getProperties().keySet()) {
       properties.add(property + "");
     }
@@ -193,10 +192,8 @@ public class DiagnosticSession {
     DiagnosticFactory.addDiagnosticItemToList(result, "System properties", sb.toString(), DiagnosticFactory.STATUS_INFO);
 
     // environment
-    List<String> envKeys = new ArrayList<String>();
-    for (String envKey : System.getenv().keySet()) {
-      envKeys.add(envKey);
-    }
+    List<String> envKeys = new ArrayList<>();
+    envKeys.addAll(System.getenv().keySet());
     Collections.sort(envKeys);
     sb = new StringBuilder();
     sb.append("<a href=\"#\" onClick=\"javascript:toggle_visibility('env'); return false;\">(show / hide)</a>");
@@ -229,7 +226,7 @@ public class DiagnosticSession {
     StringBuilder buf = new StringBuilder();
     for (List<String> status : result) {
       if (ObjectUtility.notEquals(DiagnosticFactory.STATUS_TITLE, status.get(2))) {
-        buf.append("<status name='" + status.get(0) + "' status='" + status.get(2) + "'>");
+        buf.append("<status name='").append(status.get(0)).append("' status='").append(status.get(2)).append("'>");
         buf.append(status.get(1));
         buf.append("</status>");
       }
@@ -240,12 +237,11 @@ public class DiagnosticSession {
   private String getDiagnosticItemsHTML(List<List<String>> diagnosticItems) {
     StringBuilder buf = new StringBuilder();
     buf.append("<table>");
-    for (int i = 0; i < diagnosticItems.size(); i++) {
-      List<String> item = diagnosticItems.get(i);
+    for (List<String> item : diagnosticItems) {
       String style = "";
       String status = item.get(2);
       if (DiagnosticFactory.STATUS_TITLE.equals(status)) {
-        buf.append("<tr><td><b>" + item.get(0) + "&nbsp;&nbsp;</b></td><td></td><td></td>");
+        buf.append("<tr><td><b>").append(item.get(0)).append("&nbsp;&nbsp;</b></td><td></td><td></td>");
       }
       else {
         if (DiagnosticFactory.STATUS_OK.equals(status) || DiagnosticFactory.STATUS_ACTIVE.equals(status)) {
@@ -257,7 +253,7 @@ public class DiagnosticSession {
         else if (DiagnosticFactory.STATUS_INFO.equals(status)) {
           style = " style =\"color:white;background-color:blue\"";
         }
-        buf.append("<tr><td style=\"background-color:lightgrey\">" + item.get(0) + "&nbsp;&nbsp;</td><td>" + item.get(1) + "&nbsp;&nbsp;</td><td" + style + "><b>" + item.get(2) + "</b></td>");
+        buf.append("<tr><td style=\"background-color:lightgrey\">").append(item.get(0)).append("&nbsp;&nbsp;</td><td>").append(item.get(1)).append("&nbsp;&nbsp;</td><td").append(style).append("><b>").append(item.get(2)).append("</b></td>");
       }
     }
     buf.append("</table>");
@@ -272,9 +268,9 @@ public class DiagnosticSession {
    *
    * @return ArrayList<String>
    */
-  public static ArrayList<String> getSystemInformation() {
+  public static List<String> getSystemInformation() {
     Runtime rt = Runtime.getRuntime();
-    ArrayList<String> result = new ArrayList<String>();
+    ArrayList<String> result = new ArrayList<>();
 
     result.add(System.getProperty("java.runtime.name") + " (" + System.getProperty("java.runtime.version") + ")");
     result.add(System.getProperty("user.dir"));

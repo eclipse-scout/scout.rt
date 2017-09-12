@@ -186,7 +186,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
 
   @Override
   public List<IClientSession> getAllClientSessions() {
-    List<IClientSession> result = new LinkedList<IClientSession>();
+    List<IClientSession> result = new LinkedList<>();
     synchronized (m_cacheLock) {
       Iterator<Entry<String, WeakReference<IClientSession>>> iterator = m_sessionIdToSession.entrySet().iterator();
       while (iterator.hasNext()) {

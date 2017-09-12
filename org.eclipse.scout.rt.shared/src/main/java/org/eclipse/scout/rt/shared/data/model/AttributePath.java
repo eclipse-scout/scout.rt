@@ -27,11 +27,11 @@ public final class AttributePath implements IDataModelPath {
   private final IDataModelAttribute m_attribute;
 
   public AttributePath(List<IDataModelEntity> entityPath, IDataModelAttribute attribute) {
-    this(entityPath != null && entityPath.size() > 0 ? new EntityPath(entityPath) : null, attribute);
+    this(entityPath != null && !entityPath.isEmpty() ? new EntityPath(entityPath) : null, attribute);
   }
 
   public AttributePath(EntityPath entityPath, IDataModelAttribute attribute) {
-    if (entityPath == null || entityPath.size() == 0) {
+    if (entityPath == null || entityPath.isEmpty()) {
       m_entityPath = EntityPath.EMPTY;
     }
     else {

@@ -157,14 +157,9 @@ public class JsonResponse {
   public JsonEvent replaceActionEvent(String eventTarget, String eventType, JSONObject eventData) {
     assertWritable();
 
-    for (Iterator<JsonEvent> it = m_eventList.iterator(); it.hasNext();) {
-      JsonEvent event = it.next();
-      // Same target and same type --> remove existing event
-      if (ObjectUtility.equals(event.getTarget(), eventTarget) &&
-          ObjectUtility.equals(event.getType(), eventType)) {
-        it.remove();
-      }
-    }
+    // Same target and same type --> remove existing event
+    m_eventList.removeIf(event -> ObjectUtility.equals(event.getTarget(), eventTarget) &&
+        ObjectUtility.equals(event.getType(), eventType));
     return addActionEvent(eventTarget, eventType, eventData);
   }
 
@@ -173,8 +168,7 @@ public class JsonResponse {
   }
 
   public boolean containsPropertyChangeEvent(String id, String propertyName) {
-    for (Iterator<JsonEvent> it = m_eventList.iterator(); it.hasNext();) {
-      JsonEvent event = it.next();
+    for (JsonEvent event : m_eventList) {
       if (event.getTarget().equals(id) && event instanceof JsonPropertyChangeEvent &&
           ((JsonPropertyChangeEvent) event).getProperties().containsKey(propertyName)) {
         return true;
@@ -309,7 +303,7 @@ public class JsonResponse {
         adapterData.put(entry.getKey(), adapterJson);
         if (LOG.isDebugEnabled()) {
           if (adapterIds == null) {
-            adapterIds = new LinkedList<String>();
+            adapterIds = new LinkedList<>();
           }
           adapterIds.add(entry.getValue().getId());
         }
@@ -416,12 +410,7 @@ public class JsonResponse {
     m_idToPropertyChangeEventMap.remove(id);
 
     // Unregister as buffered events adapter (we are no longer interested in those buffered events)
-    for (Iterator<IJsonAdapter<?>> it = m_bufferedEventsAdapters.iterator(); it.hasNext();) {
-      IJsonAdapter<?> adapter = it.next();
-      if (ObjectUtility.equals(adapter.getId(), id)) {
-        it.remove();
-      }
-    }
+    m_bufferedEventsAdapters.removeIf(adapter -> ObjectUtility.equals(adapter.getId(), id));
   }
 
   /**

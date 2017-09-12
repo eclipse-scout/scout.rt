@@ -26,7 +26,7 @@ public abstract class AbstractSmartFieldLookupRowFetcher<LOOKUP_KEY> implements 
 
   /**
    * @param listener
-   * @see org.eclipse.scout.rt.platform.reflect.BasicPropertySupport#addPropertyChangeListener(java.beans.PropertyChangeListener)
+   * @see BasicPropertySupport#addPropertyChangeListener(PropertyChangeListener)
    */
   @Override
   public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -35,7 +35,7 @@ public abstract class AbstractSmartFieldLookupRowFetcher<LOOKUP_KEY> implements 
 
   /**
    * @param listener
-   * @see org.eclipse.scout.rt.platform.reflect.BasicPropertySupport#removePropertyChangeListener(java.beans.PropertyChangeListener)
+   * @see BasicPropertySupport#removePropertyChangeListener(PropertyChangeListener)
    */
   @Override
   public void removePropertyChangeListener(PropertyChangeListener listener) {
@@ -45,8 +45,7 @@ public abstract class AbstractSmartFieldLookupRowFetcher<LOOKUP_KEY> implements 
   /**
    * @param propertyName
    * @param listener
-   * @see org.eclipse.scout.rt.platform.reflect.BasicPropertySupport#addPropertyChangeListener(java.lang.String,
-   *      java.beans.PropertyChangeListener)
+   * @see BasicPropertySupport#addPropertyChangeListener(String, PropertyChangeListener)
    */
   @Override
   public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
@@ -56,8 +55,7 @@ public abstract class AbstractSmartFieldLookupRowFetcher<LOOKUP_KEY> implements 
   /**
    * @param propertyName
    * @param listener
-   * @see org.eclipse.scout.rt.platform.reflect.BasicPropertySupport#removePropertyChangeListener(java.lang.String,
-   *      java.beans.PropertyChangeListener)
+   * @see BasicPropertySupport#removePropertyChangeListener(String, PropertyChangeListener)
    */
   @Override
   public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
@@ -78,7 +76,7 @@ public abstract class AbstractSmartFieldLookupRowFetcher<LOOKUP_KEY> implements 
   public ISmartFieldDataFetchResult<LOOKUP_KEY> newResult(String searchText, boolean selectCurrentValue) {
     String wildcard = getSmartField().getWildcard();
     ISmartFieldSearchParam<LOOKUP_KEY> param = SmartFieldSearchParam.createTextParam(wildcard, searchText, selectCurrentValue);
-    return new SmartFieldDataFetchResult<LOOKUP_KEY>(null, null, param);
+    return new SmartFieldDataFetchResult<>(null, null, param);
   }
 
   protected void setResult(ISmartFieldDataFetchResult<LOOKUP_KEY> result) {

@@ -103,7 +103,7 @@ public final class MOM {
    *           empty
    */
   public static <REQUEST, REPLY> IBiDestination<REQUEST, REPLY> newBiDestination(final String name, final IDestinationType destinationType, final IResolveMethod resolveMethod, final Map<String, String> properties) {
-    return new Destination<REQUEST, REPLY>(name, destinationType, resolveMethod, properties);
+    return new Destination<>(name, destinationType, resolveMethod, properties);
   }
 
   /**

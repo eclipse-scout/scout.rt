@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 @ClassId("c2e405b4-be26-4d27-b379-06ec62793d84")
 public abstract class AbstractWizardContainerForm extends AbstractForm implements IWizardContainerForm {
 
-  private IWizard m_wizard;
+  private final IWizard m_wizard;
   private P_WizardPropertyListener m_propertyChangeListener;
 
   public AbstractWizardContainerForm(IWizard wizard) {
@@ -205,6 +205,6 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
 
   @Override
   protected IWizardContainerFormExtension<? extends AbstractWizardContainerForm> createLocalExtension() {
-    return new LocalWizardContainerFormExtension<AbstractWizardContainerForm>(this);
+    return new LocalWizardContainerFormExtension<>(this);
   }
 }

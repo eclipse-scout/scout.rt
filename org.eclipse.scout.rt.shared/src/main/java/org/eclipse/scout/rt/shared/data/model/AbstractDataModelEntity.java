@@ -88,9 +88,9 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
    *          {@link #callInitializer()} itself
    */
   public AbstractDataModelEntity(boolean callInitConfig) {
-    m_attributes = new ArrayList<IDataModelAttribute>();
-    m_entities = new ArrayList<IDataModelEntity>();
-    m_objectExtensions = new ObjectExtensions<AbstractDataModelEntity, IDataModelEntityExtension<? extends AbstractDataModelEntity>>(this, false);
+    m_attributes = new ArrayList<>();
+    m_entities = new ArrayList<>();
+    m_objectExtensions = new ObjectExtensions<>(this, false);
     if (callInitConfig) {
       callInitializer();
     }
@@ -128,7 +128,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
     if (viewOrder == IOrdered.DEFAULT_ORDER) {
       while (cls != null && IDataModelEntity.class.isAssignableFrom(cls)) {
         if (cls.isAnnotationPresent(Order.class)) {
-          Order order = (Order) cls.getAnnotation(Order.class);
+          Order order = cls.getAnnotation(Order.class);
           return order.value();
         }
         cls = cls.getSuperclass();
@@ -209,12 +209,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   }
 
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
-      @Override
-      public void run() {
-        initConfig();
-      }
-    });
+    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
   protected void initConfig() {
@@ -229,7 +224,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
     List<Class<IDataModelAttribute>> configuredAttributes = getConfiguredAttributes();
     List<IDataModelAttribute> contributedAttributes = m_contributionHolder.getContributionsByClass(IDataModelAttribute.class);
 
-    OrderedCollection<IDataModelAttribute> attributes = new OrderedCollection<IDataModelAttribute>();
+    OrderedCollection<IDataModelAttribute> attributes = new OrderedCollection<>();
     for (Class<? extends IDataModelAttribute> c : configuredAttributes) {
       attributes.addOrdered(ConfigurationUtility.newInnerInstance(this, c));
     }
@@ -246,7 +241,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
       }
     }
     //lazy create entities at point when setParentEntity is set, this is necessary to avoid cyclic loops
-    m_entities = new ArrayList<IDataModelEntity>();
+    m_entities = new ArrayList<>();
   }
 
   @Override
@@ -255,7 +250,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   }
 
   protected IDataModelEntityExtension<? extends AbstractDataModelEntity> createLocalExtension() {
-    return new LocalDataModelEntityExtension<AbstractDataModelEntity>(this);
+    return new LocalDataModelEntityExtension<>(this);
   }
 
   @Override
@@ -465,8 +460,8 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
     List<IDataModelEntity> contributedEntities = m_contributionHolder.getContributionsByClass(IDataModelEntity.class);
     int numEntities = configuredEntities.size() + contributedEntities.size();
 
-    Set<IDataModelEntity> newConfiguredInstances = new HashSet<IDataModelEntity>(numEntities);
-    OrderedCollection<IDataModelEntity> entities = new OrderedCollection<IDataModelEntity>();
+    Set<IDataModelEntity> newConfiguredInstances = new HashSet<>(numEntities);
+    OrderedCollection<IDataModelEntity> entities = new OrderedCollection<>();
     for (Class<? extends IDataModelEntity> c : configuredEntities) {
       //check if a parent is of same type, in that case use reference
       IDataModelEntity e = instanceMap.get(c);

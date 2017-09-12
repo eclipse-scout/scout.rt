@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
-import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.testing.client.runner.statement.ClientRunContextStatement;
 import org.eclipse.scout.rt.testing.client.runner.statement.RunInModelJobStatement;
 import org.eclipse.scout.rt.testing.client.runner.statement.TimeoutClientRunContextStatement;
@@ -245,7 +244,7 @@ public class ClientTestRunner extends PlatformTestRunner {
 
     private void dropFileChooser(IDesktop desktop, IFileChooser f) {
       try {
-        f.getUIFacade().setResultFromUI(new ArrayList<BinaryResource>());
+        f.getUIFacade().setResultFromUI(new ArrayList<>());
       }
       catch (Exception ex) { // NOSONAR
         //nop

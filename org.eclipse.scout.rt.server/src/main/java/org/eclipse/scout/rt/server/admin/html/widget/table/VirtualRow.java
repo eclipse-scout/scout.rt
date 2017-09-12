@@ -16,13 +16,13 @@ import java.util.List;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 public class VirtualRow extends HtmlComponent {
-  private List<String> m_cells;
+  private final List<String> m_cells;
   // temporary
   private int m_cellBegin;
 
   public VirtualRow(HtmlComponent parent) {
     super(parent);
-    m_cells = new ArrayList<String>();
+    m_cells = new ArrayList<>();
   }
 
   public String getCellAt(int columnIndex) {

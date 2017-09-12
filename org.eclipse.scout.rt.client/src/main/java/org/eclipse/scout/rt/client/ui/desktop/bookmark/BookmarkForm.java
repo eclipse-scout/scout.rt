@@ -37,10 +37,6 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
   private BookmarkFolder m_bookmarkRootFolder;
   private Bookmark m_bookmark;
 
-  public BookmarkForm() {
-    super();
-  }
-
   @Override
   public BookmarkFolder getBookmarkRootFolder() {
     return m_bookmarkRootFolder;

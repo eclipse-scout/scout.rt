@@ -38,7 +38,7 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultFormFieldInjection.class);
 
   private final Map<IFormField, Set<Class<? extends IFormField>>> m_replacingFormFieldsByContainer;
-  private final ArrayList<Class<? extends IFormField>> m_injectedFieldList;
+  private final List<Class<? extends IFormField>> m_injectedFieldList;
   private final Object m_enclosingContext;
 
   private Set<Class<? extends IFormField>> m_injectingFields;
@@ -51,8 +51,8 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
    * @param enclosingContext
    */
   public DefaultFormFieldInjection(Object enclosingContext) {
-    m_replacingFormFieldsByContainer = new HashMap<IFormField, Set<Class<? extends IFormField>>>();
-    m_injectedFieldList = new ArrayList<Class<? extends IFormField>>();
+    m_replacingFormFieldsByContainer = new HashMap<>();
+    m_injectedFieldList = new ArrayList<>();
     m_enclosingContext = enclosingContext;
   }
 
@@ -101,9 +101,9 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
   }
 
   private void prepare() {
-    m_injectingFields = new HashSet<Class<? extends IFormField>>();
-    m_replacingFields = new HashSet<Class<? extends IFormField>>();
-    m_replacementMapping = new HashMap<Class<?>, Class<? extends IFormField>>();
+    m_injectingFields = new HashSet<>();
+    m_replacingFields = new HashSet<>();
+    m_replacementMapping = new HashMap<>();
 
     // 1. separate injected fields by annotation
     for (Class<? extends IFormField> f : m_injectedFieldList) {
@@ -117,13 +117,13 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
 
     // 2. remove transitive replacements (i.e. compute replacing leaf classes)
     if (!m_replacingFields.isEmpty()) {
-      m_replacementMapping = ConfigurationUtility.getReplacementMapping(new ArrayList<Class<? extends IFormField>>(m_replacingFields));
+      m_replacementMapping = ConfigurationUtility.getReplacementMapping(new ArrayList<>(m_replacingFields));
       m_replacingFields = new HashSet<>(m_replacementMapping.values()); // values of all configured mappings correspond to the all leaf classes of replacements
     }
 
     // 3. remove injected fields that are replaced and treat those replacing fields as injected fields
     if (!m_injectingFields.isEmpty() && !m_replacingFields.isEmpty()) {
-      Set<Class<? extends IFormField>> replacingInjectedFields = new HashSet<Class<? extends IFormField>>();
+      Set<Class<? extends IFormField>> replacingInjectedFields = new HashSet<>();
       for (Class<? extends IFormField> replacingField : m_replacingFields) {
         for (Iterator<Class<? extends IFormField>> it = m_injectingFields.iterator(); it.hasNext();) {
           Class<? extends IFormField> injectedField = it.next();
@@ -150,7 +150,7 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
       return;
     }
 
-    Set<Class<? extends IFormField>> replacingFields = new HashSet<Class<? extends IFormField>>();
+    Set<Class<? extends IFormField>> replacingFields = new HashSet<>();
     // remove all replaced classes
     for (Iterator<Class<? extends IFormField>> it = fieldList.iterator(); it.hasNext();) {
       Class<? extends IFormField> field = it.next();

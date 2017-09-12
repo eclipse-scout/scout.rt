@@ -26,8 +26,8 @@ import org.eclipse.scout.rt.ui.html.scriptprocessor.internal.loader.SandboxClass
  */
 @ApplicationScoped
 public class ScriptProcessor {
-  private URLClassLoader m_yuiLoader;
-  private URLClassLoader m_lessLoader;
+  private final URLClassLoader m_yuiLoader;
+  private final URLClassLoader m_lessLoader;
 
   public ScriptProcessor() {
     //set up an external private class loader
@@ -64,7 +64,7 @@ public class ScriptProcessor {
     return runInClassLoader(m_lessLoader, CompileCssWithLess.class.getName(), new Class[]{String.class}, new Object[]{content});
   }
 
-  public String compileJs(String content) throws IOException {
+  public String compileJs(String content) {
     return content;
   }
 

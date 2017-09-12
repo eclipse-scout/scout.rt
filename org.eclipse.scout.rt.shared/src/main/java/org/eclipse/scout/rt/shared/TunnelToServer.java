@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.platform.BeanInvocationHint;
  */
 @Documented
 @BeanInvocationHint
-@Target({ElementType.TYPE})
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TunnelToServer {
 

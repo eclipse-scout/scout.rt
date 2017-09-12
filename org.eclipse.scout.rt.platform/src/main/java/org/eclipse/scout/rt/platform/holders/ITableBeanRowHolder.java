@@ -15,6 +15,7 @@ package org.eclipse.scout.rt.platform.holders;
  *
  * @since 3.10.0-M3
  */
+@FunctionalInterface
 public interface ITableBeanRowHolder {
 
   /**

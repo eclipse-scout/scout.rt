@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.platform.chain.IChainable;
  *
  * @since 5.2
  */
+@FunctionalInterface
 public interface ICallableDecorator extends IChainable {
 
   /**
@@ -37,7 +38,8 @@ public interface ICallableDecorator extends IChainable {
   /**
    * Undecorator to restore decoration.
    */
-  public interface IUndecorator {
+  @FunctionalInterface
+  interface IUndecorator {
 
     /**
      * Method invoked after executed the {@link Callable}, and is invoked regardless of success or failure.

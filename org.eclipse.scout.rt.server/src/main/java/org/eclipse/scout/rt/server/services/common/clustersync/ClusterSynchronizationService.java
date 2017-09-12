@@ -38,7 +38,6 @@ import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ClusterSyncUserProperty;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -165,7 +164,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
 
   private void publishAll(Collection<Serializable> notifications) {
     if (isEnabled()) {
-      List<IClusterNotificationMessage> internalMessages = new ArrayList<IClusterNotificationMessage>();
+      List<IClusterNotificationMessage> internalMessages = new ArrayList<>();
       for (Serializable n : notifications) {
         internalMessages.add(new ClusterNotificationMessage(n, getNotificationProperties()));
       }
@@ -210,13 +209,9 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
       ServerRunContext serverRunContext = ServerRunContexts.empty();
       serverRunContext.withSubject(m_subject);
       serverRunContext.withSession(BEANS.get(ServerSessionProviderWithCache.class).provide(serverRunContext.copy()));
-      serverRunContext.run(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          NotificationHandlerRegistry reg = BEANS.get(NotificationHandlerRegistry.class);
-          reg.notifyNotificationHandlers(notificationMessage.getNotification());
-        }
+      serverRunContext.run(() -> {
+        NotificationHandlerRegistry reg = BEANS.get(NotificationHandlerRegistry.class);
+        reg.notifyNotificationHandlers(notificationMessage.getNotification());
       });
     }
   }
@@ -243,7 +238,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
 
     public ClusterSynchTransactionMember(String transactionId) {
       super(transactionId);
-      m_messageQueue = new LinkedList<IClusterNotificationMessage>();
+      m_messageQueue = new LinkedList<>();
     }
 
     public synchronized void addMessage(IClusterNotificationMessage m) {

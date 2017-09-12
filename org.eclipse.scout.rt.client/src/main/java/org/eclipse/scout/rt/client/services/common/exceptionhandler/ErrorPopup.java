@@ -14,7 +14,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -155,9 +157,9 @@ public class ErrorPopup {
       return true;
     }
     if (t instanceof AbstractInterruptionError ||
-        t instanceof java.lang.InterruptedException ||
-        t instanceof java.util.concurrent.TimeoutException ||
-        t instanceof java.util.concurrent.CancellationException) {
+        t instanceof InterruptedException ||
+        t instanceof TimeoutException ||
+        t instanceof CancellationException) {
       parseInterruptedError(t);
       return true;
     }

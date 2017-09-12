@@ -144,13 +144,13 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
 
   protected final List<Resource<RI>> interceptLoadResources() {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    PlannerFieldLoadResourcesChain<P, RI, AI> chain = new PlannerFieldLoadResourcesChain<P, RI, AI>(extensions);
+    PlannerFieldLoadResourcesChain<P, RI, AI> chain = new PlannerFieldLoadResourcesChain<>(extensions);
     return chain.execLoadResourceTableData();
   }
 
   protected final void interceptPopulateResources() {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    PlannerFieldPopulateResourcesChain<P, RI, AI> chain = new PlannerFieldPopulateResourcesChain<P, RI, AI>(extensions);
+    PlannerFieldPopulateResourcesChain<P, RI, AI> chain = new PlannerFieldPopulateResourcesChain<>(extensions);
     chain.execPopulateResources();
   }
 
@@ -173,7 +173,7 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
 
   @Override
   protected IPlannerFieldExtension<P, RI, AI, ? extends AbstractPlannerField<P, RI, AI>> createLocalExtension() {
-    return new LocalPlannerFieldExtension<P, RI, AI, AbstractPlannerField<P, RI, AI>>(this);
+    return new LocalPlannerFieldExtension<>(this);
   }
 
 }

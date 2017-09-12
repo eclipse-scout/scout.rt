@@ -87,7 +87,7 @@ public final class PlatformConfigProperties {
 
     @Override
     protected Integer getDefaultValue() {
-      return Integer.valueOf(25);
+      return 25;
     }
   }
 
@@ -139,7 +139,7 @@ public final class PlatformConfigProperties {
 
     @Override
     protected Long getDefaultValue() {
-      return Long.valueOf(60);
+      return 60L;
     }
   }
 

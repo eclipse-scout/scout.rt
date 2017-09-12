@@ -125,7 +125,7 @@ public class FormBasedAccessController implements IAccessController {
    *          is a {@link ICredentialVerifier} AUTH_* constant
    * @param response
    */
-  protected void handleForbidden(final int status, final HttpServletResponse response) throws IOException, ServletException {
+  protected void handleForbidden(final int status, final HttpServletResponse response) throws IOException {
     if (m_config.getStatus403WaitMillis() > 0L) {
       SleepUtil.sleepSafe(m_config.getStatus403WaitMillis(), TimeUnit.MILLISECONDS);
     }

@@ -60,10 +60,10 @@ import org.eclipse.scout.rt.server.jdbc.parsers.sql.SqlParserToken.Unparsed;
 public class SqlFormatter {
 
   private static class FormatContext {
-    private int m_tabSize;
+    private final int m_tabSize;
     private int m_indent;
     private int m_linePos;
-    private StringBuilder m_buf;
+    private final StringBuilder m_buf;
 
     public FormatContext(int tabSize) {
       m_tabSize = tabSize;

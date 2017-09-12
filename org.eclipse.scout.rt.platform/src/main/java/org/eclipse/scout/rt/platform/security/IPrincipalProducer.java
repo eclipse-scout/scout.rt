@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
  *
  * @since 5.2
  */
+@FunctionalInterface
 @ApplicationScoped
 public interface IPrincipalProducer {
 

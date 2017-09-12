@@ -31,8 +31,8 @@ public class FileChooser implements IFileChooser {
   private final IFileChooserUIFacade m_uiFacade;
   private final EventListenerList m_listenerList = new EventListenerList();
 
-  private List<String> m_fileExtensions;
-  private boolean m_multiSelect;
+  private final List<String> m_fileExtensions;
+  private final boolean m_multiSelect;
   private List<BinaryResource> m_files;
   private final IBlockingCondition m_blockingCondition;
   private long m_maximumUploadSize;

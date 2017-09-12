@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util;
 
+import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.util.EventListener;
@@ -39,7 +40,7 @@ public class EventListenerList implements IEventListenerSource {
         Class c = (Class) m_listenerList[i];
         Object o = m_listenerList[i + 1];
         if (o instanceof WeakReference) {
-          snapshot.add(c, null, ((WeakReference) o).get());
+          snapshot.add(c, null, ((Reference) o).get());
         }
         else {
           snapshot.add(c, null, o);
@@ -64,7 +65,7 @@ public class EventListenerList implements IEventListenerSource {
         if (lList[i] == t) {
           Object ref = lList[i + 1];
           if (ref instanceof WeakReference) {
-            result[j] = (T) ((WeakReference) ref).get();
+            result[j] = (T) ((Reference) ref).get();
             if (result[j] == null) {
               nullCount++;
             }
@@ -78,9 +79,9 @@ public class EventListenerList implements IEventListenerSource {
       if (nullCount > 0) {
         EventListener[] tmp = new EventListener[result.length - nullCount];
         j = 0;
-        for (int i = 0; i < result.length; i++) {
-          if (result[i] != null) {
-            tmp[j++] = result[i];
+        for (T aResult : result) {
+          if (aResult != null) {
+            tmp[j++] = aResult;
           }
         }
         result = (T[]) tmp;
@@ -95,12 +96,11 @@ public class EventListenerList implements IEventListenerSource {
     }
   }
 
-  @SuppressWarnings("unchecked")
   private <T extends EventListener> int getListenerCountNoLock(Class<T> t) {
     int count = 0;
     Object[] lList = m_listenerList;
     for (int i = 0; i < lList.length; i += 2) {
-      if (t == (Class<T>) lList[i]) {
+      if (t == lList[i]) {
         count++;
       }
     }
@@ -182,7 +182,7 @@ public class EventListenerList implements IEventListenerSource {
     for (int i = m_listenerList.length - 2; i >= 0; i -= 2) {
       if (m_listenerList[i] == t) {
         if (m_listenerList[i + 1] instanceof WeakReference) {
-          if (((WeakReference) m_listenerList[i + 1]).get() == listener) {
+          if (((Reference) m_listenerList[i + 1]).get() == listener) {
             index = i;
             break;
           }
@@ -240,7 +240,7 @@ public class EventListenerList implements IEventListenerSource {
     for (int i = m_listenerList.length - 2; i >= 0; i -= 2) {
       Object ref = m_listenerList[i + 1];
       if (ref instanceof WeakReference) {
-        if (((WeakReference) ref).get() == null) {
+        if (((Reference) ref).get() == null) {
           m_listenerList[i + 1] = null;
           nullCount++;
         }

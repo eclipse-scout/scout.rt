@@ -45,11 +45,7 @@ public abstract class AbstractMultiValuesIndex<INDEX, ELEMENT> implements IMulti
     }
 
     for (final INDEX index : indexes) {
-      List<ELEMENT> elements = m_mapByIndex.get(index);
-      if (elements == null) {
-        elements = new ArrayList<>();
-        m_mapByIndex.put(index, elements);
-      }
+      List<ELEMENT> elements = m_mapByIndex.computeIfAbsent(index, k -> new ArrayList<>());
       elements.add(element);
     }
     m_mapByElement.put(element, new HashSet<>(indexes));

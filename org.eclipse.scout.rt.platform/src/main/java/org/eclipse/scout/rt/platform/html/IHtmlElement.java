@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.platform.html;
 /**
  * A html element
  */
-public interface IHtmlElement extends CharSequence, IHtmlContent {
+public interface IHtmlElement extends IHtmlContent {
 
   /**
    * Add a css class

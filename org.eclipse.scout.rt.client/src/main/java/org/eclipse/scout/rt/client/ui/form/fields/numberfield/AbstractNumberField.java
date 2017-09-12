@@ -343,7 +343,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
     else {
       text = text.trim();
     }
-    if (text.length() > 0) {
+    if (!text.isEmpty()) {
       text = ensureSuffix(text);
       ParsePosition p = new ParsePosition(0);
       BigDecimal valBeforeRounding = (BigDecimal) getFormatInternal().parse(text, p);
@@ -522,10 +522,10 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
       String fracPartDigits = pat.matcher(parts[1]).replaceAll("");
       boolean fracPartValid = StringUtility.length(fracPartDigits) <= format.getMaximumFractionDigits();
       if (fracPartValid) {
-        result.append(decimalSeparator + fracPartDigits);
+        result.append(decimalSeparator).append(fracPartDigits);
       }
       else {
-        result.append(decimalSeparator + fracPartDigits.substring(0, format.getMaximumFractionDigits()));
+        result.append(decimalSeparator).append(fracPartDigits.substring(0, format.getMaximumFractionDigits()));
       }
     }
     return result.toString();
@@ -540,6 +540,6 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
 
   @Override
   protected INumberFieldExtension<NUMBER, ? extends AbstractNumberField<NUMBER>> createLocalExtension() {
-    return new LocalNumberFieldExtension<NUMBER, AbstractNumberField<NUMBER>>(this);
+    return new LocalNumberFieldExtension<>(this);
   }
 }

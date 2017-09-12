@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.servicetunnel;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -19,10 +20,10 @@ import java.util.GregorianCalendar;
  * <p>
  * {@link ServiceTunnelObjectReplacer}
  */
-public class StaticDate implements java.io.Serializable {
+public class StaticDate implements Serializable {
   private static final long serialVersionUID = -3278051886953717195L;
 
-  private long m_textAsLong;
+  private final long m_textAsLong;
 
   public StaticDate(Date d) {
     Calendar cal = new GregorianCalendar();

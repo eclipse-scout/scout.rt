@@ -128,7 +128,7 @@ public class HttpClientInfo {
 
   protected static final String HTTP_CLIENT_INFO_ATTRIBUTE_NAME = "scout.htmlui.httpsession.httpclientinfo";
 
-  private FinalValue<String> m_userAgent = new FinalValue<String>();
+  private final FinalValue<String> m_userAgent = new FinalValue<>();
 
   private UiEngineType m_engineType = UiEngineType.UNKNOWN;
   private Version m_engineVersion;
@@ -181,21 +181,21 @@ public class HttpClientInfo {
 
     // Webkit Browsers
     regex = "AppleWebKit\\/([^ ]+)";
-    boolean isWebkit = (userAgent.indexOf("AppleWebKit") != -1) && StringUtility.containsRegEx(userAgent, regex);
+    boolean isWebkit = (userAgent.contains("AppleWebKit")) && StringUtility.containsRegEx(userAgent, regex);
     if (isWebkit) {
       setWebkit(true);
-      if (userAgent.indexOf("Chrome") != -1) {
+      if (userAgent.contains("Chrome")) {
         setEngineType(UiEngineType.CHROME);
       }
-      else if (userAgent.indexOf("Safari") != -1) {
-        if (userAgent.indexOf("Android") != -1) {
+      else if (userAgent.contains("Safari")) {
+        if (userAgent.contains("Android")) {
           setEngineType(UiEngineType.ANDROID);
         }
         else {
           setEngineType(UiEngineType.SAFARI);
         }
       }
-      else if (userAgent.indexOf("Mobile") != -1) {
+      else if (userAgent.contains("Mobile")) {
         // iPad reports this in fullscreen mode
         setEngineType(UiEngineType.SAFARI);
         setStandalone(true);
@@ -216,10 +216,10 @@ public class HttpClientInfo {
 
     // Gecko Browsers (Mozilla)
     regex = "rv\\:([^\\);]+)(\\)|;)";
-    boolean isGecko = (userAgent.indexOf("Gecko") != -1) && StringUtility.containsRegEx(userAgent, regex);
+    boolean isGecko = (userAgent.contains("Gecko")) && StringUtility.containsRegEx(userAgent, regex);
     if (isGecko) {
       setGecko(true);
-      if (userAgent.indexOf("Firefox") != -1) {
+      if (userAgent.contains("Firefox")) {
         setEngineType(UiEngineType.FIREFOX);
       }
       setEngineVersion(extractVersion(userAgent, regex));
@@ -229,9 +229,9 @@ public class HttpClientInfo {
 
   protected void initSystemInfo() {
     String userAgent = getUserAgent();
-    if (userAgent.indexOf("Windows") != -1 || userAgent.indexOf("Win32") != -1 || userAgent.indexOf("Win64") != -1 || userAgent.indexOf("Win95") != -1) {
+    if (userAgent.contains("Windows") || userAgent.contains("Win32") || userAgent.contains("Win64") || userAgent.contains("Win95")) {
       setSystem(UiSystem.WINDOWS);
-      if (userAgent.indexOf("Windows Phone") != -1 || userAgent.indexOf("IEMobile") != -1) {
+      if (userAgent.contains("Windows Phone") || userAgent.contains("IEMobile")) {
         setSystemVersion(parseWindowsPhoneVersion(userAgent));
         setMobile(true);
       }
@@ -239,10 +239,10 @@ public class HttpClientInfo {
         setSystemVersion(parseWindowsVersion(userAgent));
       }
     }
-    else if (userAgent.indexOf("Macintosh") != -1 || userAgent.indexOf("MacPPC") != -1 || userAgent.indexOf("MacIntel") != -1 || userAgent.indexOf("Mac_PowerPC") != -1) {
+    else if (userAgent.contains("Macintosh") || userAgent.contains("MacPPC") || userAgent.contains("MacIntel") || userAgent.contains("Mac_PowerPC")) {
       setSystem(UiSystem.OSX);
     }
-    else if (userAgent.indexOf("Android") != -1) {
+    else if (userAgent.contains("Android")) {
       setSystem(UiSystem.ANDROID);
       setSystemVersion(parseAndroidVersion(userAgent));
 
@@ -255,7 +255,7 @@ public class HttpClientInfo {
       }
       else {
         // Android 4 is used on smartphones and tablets
-        if (getUserAgent().indexOf("Mobile") != -1) {
+        if (getUserAgent().contains("Mobile")) {
           setMobile(true);
         }
         else {
@@ -263,15 +263,15 @@ public class HttpClientInfo {
         }
       }
     }
-    else if (userAgent.indexOf("X11") != -1 || userAgent.indexOf("Linux") != -1 || userAgent.indexOf("BSD") != -1 || userAgent.indexOf("SunOS") != -1 || userAgent.indexOf("DragonFly") != -1) {
+    else if (userAgent.contains("X11") || userAgent.contains("Linux") || userAgent.contains("BSD") || userAgent.contains("SunOS") || userAgent.contains("DragonFly")) {
       setSystem(UiSystem.UNIX);
     }
-    else if (userAgent.indexOf("iPad") != -1) {
+    else if (userAgent.contains("iPad")) {
       setSystem(UiSystem.IOS);
       setSystemVersion(parseIosVersion(userAgent));
       setTablet(true);
     }
-    else if (userAgent.indexOf("iPhone") != -1 || userAgent.indexOf("iPod") != -1) {
+    else if (userAgent.contains("iPhone") || userAgent.contains("iPod")) {
       setSystem(UiSystem.IOS);
       setSystemVersion(parseIosVersion(userAgent));
       setMobile(true);
@@ -562,7 +562,7 @@ public class HttpClientInfo {
     versionString = versionString.replaceAll("^[/\\s]*", "");
     Matcher matcher = Pattern.compile("([0-9]+)\\.([0-9]+)[\\.]?([0-9]*)").matcher(versionString);
 
-    int[] vArr = new int[]{0, 0, 0};
+    int[] vArr = {0, 0, 0};
     if (matcher.matches()) {
       for (int i = 1; i <= 3; i++) {
         String versionPart = matcher.group(i);

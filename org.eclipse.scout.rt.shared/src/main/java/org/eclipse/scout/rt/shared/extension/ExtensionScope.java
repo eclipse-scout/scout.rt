@@ -71,7 +71,7 @@ public class ExtensionScope<T extends AbstractExtensionRegistryItem> {
    * Creates a new global scope for the given class identifiers.
    */
   protected Map<Class<?>, Set<ScopeItem>> createGlobalScope(Collection<ClassIdentifier> classIdentifiers, boolean topDownStrategy) {
-    Map<Class<?>, Set<ScopeItem>> scopeItems = new HashMap<Class<?>, Set<ScopeItem>>(classIdentifiers.size());
+    Map<Class<?>, Set<ScopeItem>> scopeItems = new HashMap<>(classIdentifiers.size());
     for (ClassIdentifier identifier : classIdentifiers) {
       ScopeItem item = new ScopeItem(identifier, topDownStrategy);
       addCurrentItemSegment(scopeItems, item);
@@ -101,7 +101,7 @@ public class ExtensionScope<T extends AbstractExtensionRegistryItem> {
     }
 
     // 1. collect scope items for the given owner type hierarchy
-    Set<ScopeItem> items = new HashSet<ScopeItem>();
+    Set<ScopeItem> items = new HashSet<>();
     ExtensionScope<T> curScope = this;
     while (curScope != null) {
       collectScopeItemsRec(ownerType, items, curScope.m_scopeItems);
@@ -114,7 +114,7 @@ public class ExtensionScope<T extends AbstractExtensionRegistryItem> {
     }
 
     // 2. create new sub scope
-    Map<Class<?>, Set<ScopeItem>> subScopeItems = new HashMap<Class<?>, Set<ScopeItem>>(items.size());
+    Map<Class<?>, Set<ScopeItem>> subScopeItems = new HashMap<>(items.size());
     for (ScopeItem item : items) {
       collectSubScopeItems(item, subScopeItems);
     }
@@ -124,7 +124,7 @@ public class ExtensionScope<T extends AbstractExtensionRegistryItem> {
       return null;
     }
 
-    return new ExtensionScope<T>(subScopeItems, this, m_extensionItems);
+    return new ExtensionScope<>(subScopeItems, this, m_extensionItems);
   }
 
   /**
@@ -143,8 +143,8 @@ public class ExtensionScope<T extends AbstractExtensionRegistryItem> {
     }
 
     // 2. filter matching items and create sub scope
-    Set<ScopeItem> filteredScopeItems = new HashSet<ScopeItem>();
-    Map<Class<?>, Set<ScopeItem>> subScopeItems = new HashMap<Class<?>, Set<ScopeItem>>(potentialScopeItems.size());
+    Set<ScopeItem> filteredScopeItems = new HashSet<>();
+    Map<Class<?>, Set<ScopeItem>> subScopeItems = new HashMap<>(potentialScopeItems.size());
     collectFilteredandSubScopItems(potentialScopeItems, filteredScopeItems, subScopeItems);
 
     // 3. apply additional parent model object filter if provided
@@ -196,16 +196,12 @@ public class ExtensionScope<T extends AbstractExtensionRegistryItem> {
    */
   protected void addCurrentItemSegment(Map<Class<?>, Set<ScopeItem>> scopeItems, ScopeItem item) {
     Class<?> currentSegment = item.getCurrentSegment();
-    Set<ScopeItem> subItemList = scopeItems.get(currentSegment);
-    if (subItemList == null) {
-      subItemList = new HashSet<ScopeItem>();
-      scopeItems.put(currentSegment, subItemList);
-    }
+    Set<ScopeItem> subItemList = scopeItems.computeIfAbsent(currentSegment, k -> new HashSet<>());
     subItemList.add(item);
   }
 
   protected Set<ScopeItem> getScopeItems(Class<?> owner) {
-    Set<ScopeItem> collector = new HashSet<ScopeItem>();
+    Set<ScopeItem> collector = new HashSet<>();
     if (m_parentScope != null) {
       Set<ScopeItem> parentScopeItems = m_parentScope.getScopeItems(owner);
       collector.addAll(parentScopeItems);
@@ -247,7 +243,7 @@ public class ExtensionScope<T extends AbstractExtensionRegistryItem> {
     if (CollectionUtility.isEmpty(scopeItems)) {
       return Collections.emptySet();
     }
-    Set<T> collector = new TreeSet<T>(new P_ExtensionRegistryItemComparator());
+    Set<T> collector = new TreeSet<>(new P_ExtensionRegistryItemComparator());
     for (ScopeItem scopeItem : scopeItems) {
       ClassIdentifier classIdentifier = scopeItem.getIdentifier();
       if (!scopeItem.isLastSegment()) {
@@ -266,7 +262,7 @@ public class ExtensionScope<T extends AbstractExtensionRegistryItem> {
 
     @Override
     public int compare(AbstractExtensionRegistryItem o1, AbstractExtensionRegistryItem o2) {
-      return Long.valueOf(o1.getOrder()).compareTo(Long.valueOf(o2.getOrder()));
+      return Long.compare(o1.getOrder(), o2.getOrder());
     }
   }
 }

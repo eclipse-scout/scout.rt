@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.platform.IPlatform.State;
 public class PlatformEvent extends EventObject {
   private static final long serialVersionUID = 1L;
 
-  private final IPlatform.State m_state;
+  private final State m_state;
 
   public PlatformEvent(IPlatform platform, State state) {
     super(platform);
@@ -40,7 +40,7 @@ public class PlatformEvent extends EventObject {
   /**
    * @return The new platform state.
    */
-  public IPlatform.State getState() {
+  public State getState() {
     return m_state;
   }
 

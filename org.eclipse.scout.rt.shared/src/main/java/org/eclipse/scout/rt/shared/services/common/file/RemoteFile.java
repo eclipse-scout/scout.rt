@@ -247,7 +247,7 @@ public class RemoteFile implements Serializable {
    *         file.
    */
   public boolean hasMoreParts() {
-    return getContentLength() == RemoteFile.DEFAULT_MAX_BLOCK_SIZE;
+    return getContentLength() == DEFAULT_MAX_BLOCK_SIZE;
   }
 
   public int getPartStartPosition() {
@@ -287,15 +287,15 @@ public class RemoteFile implements Serializable {
     return m_compressedData != null;
   }
 
-  public Writer getCompressedWriter() throws IOException {
+  public Writer getCompressedWriter() {
     return new CompressedWriter(this, m_charsetName);
   }
 
-  public Reader getDecompressedReader() throws IOException {
+  public Reader getDecompressedReader() {
     return new DecompressedReader(this, m_charsetName);
   }
 
-  public OutputStream getCompressedOutputStream() throws IOException {
+  public OutputStream getCompressedOutputStream() {
     return new CompressedOutputStream(this);
   }
 
@@ -516,7 +516,7 @@ public class RemoteFile implements Serializable {
   private static final Map<String, String> FILE_EXTENSION_TO_MIME_TYPE_MAP;
 
   static {
-    FILE_EXTENSION_TO_MIME_TYPE_MAP = new HashMap<String, String>();
+    FILE_EXTENSION_TO_MIME_TYPE_MAP = new HashMap<>();
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("ai", "application/postscript");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("aif", "audio/x-aiff");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("aifc", "audio/x-aiff");

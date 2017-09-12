@@ -129,7 +129,8 @@ public final class JobTestUtil {
     }
   }
 
-  public static interface ICondition {
+  @FunctionalInterface
+  public interface ICondition {
 
     boolean isFulfilled();
   }

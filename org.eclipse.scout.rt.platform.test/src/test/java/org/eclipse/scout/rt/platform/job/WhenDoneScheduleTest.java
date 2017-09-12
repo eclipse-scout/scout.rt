@@ -13,14 +13,14 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
-import org.eclipse.scout.rt.platform.util.concurrent.IBiConsumer;
-import org.eclipse.scout.rt.platform.util.concurrent.IBiFunction;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
@@ -47,21 +47,21 @@ public class WhenDoneScheduleTest {
             return "a";
           }
         }, Jobs.newInput())
-        .whenDoneSchedule(new IBiFunction<String, Throwable, String>() {
+        .whenDoneSchedule(new BiFunction<String, Throwable, String>() {
 
           @Override
           public String apply(String result, Throwable u) {
             return result + "b";
           }
         }, Jobs.newInput())
-        .whenDoneSchedule(new IBiFunction<String, Throwable, String>() {
+        .whenDoneSchedule(new BiFunction<String, Throwable, String>() {
 
           @Override
           public String apply(String result, Throwable u) {
             return result + "c";
           }
         }, Jobs.newInput())
-        .whenDoneSchedule(new IBiFunction<String, Throwable, String>() {
+        .whenDoneSchedule(new BiFunction<String, Throwable, String>() {
 
           @Override
           public String apply(String result, Throwable u) {
@@ -88,7 +88,7 @@ public class WhenDoneScheduleTest {
           }
         }, Jobs.newInput()
             .withExceptionHandling(null, false))
-        .whenDoneSchedule(new IBiFunction<String, Throwable, String>() {
+        .whenDoneSchedule(new BiFunction<String, Throwable, String>() {
 
           @Override
           public String apply(String result, Throwable e) {
@@ -97,7 +97,7 @@ public class WhenDoneScheduleTest {
           }
         }, Jobs.newInput()
             .withExceptionHandling(null, false))
-        .whenDoneSchedule(new IBiFunction<String, Throwable, String>() {
+        .whenDoneSchedule(new BiFunction<String, Throwable, String>() {
 
           @Override
           public String apply(String result, Throwable e) {
@@ -106,7 +106,7 @@ public class WhenDoneScheduleTest {
           }
         }, Jobs.newInput()
             .withExceptionHandling(null, false))
-        .whenDoneSchedule(new IBiFunction<String, Throwable, String>() {
+        .whenDoneSchedule(new BiFunction<String, Throwable, String>() {
 
           @Override
           public String apply(String result, Throwable e) {
@@ -141,7 +141,7 @@ public class WhenDoneScheduleTest {
         .withExecutionHint(JOB_MARKER));
 
     // Schedule function
-    IFuture<Void> functionFuture = future.whenDoneSchedule(new IBiConsumer<Void, Throwable>() {
+    IFuture<Void> functionFuture = future.whenDoneSchedule(new BiConsumer<Void, Throwable>() {
 
       @Override
       public void accept(Void result, Throwable u) {
@@ -185,7 +185,7 @@ public class WhenDoneScheduleTest {
     }, Jobs.newInput());
 
     // Schedule function
-    IFuture<Void> functionFuture = future.whenDoneSchedule(new IBiFunction<Void, Throwable, Void>() {
+    IFuture<Void> functionFuture = future.whenDoneSchedule(new BiFunction<Void, Throwable, Void>() {
 
       @Override
       public Void apply(Void t, Throwable u) {
@@ -208,7 +208,7 @@ public class WhenDoneScheduleTest {
     }, Jobs.newInput());
 
     // Schedule function
-    IFuture<Integer> functionFuture = future.whenDoneSchedule(new IBiFunction<String, Throwable, Integer>() {
+    IFuture<Integer> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, Integer>() {
 
       @Override
       public Integer apply(String result, Throwable error) {
@@ -238,7 +238,7 @@ public class WhenDoneScheduleTest {
 
     // Schedule function
     final AtomicBoolean functionExecuted = new AtomicBoolean(false);
-    IFuture<Void> functionFuture = future.whenDoneSchedule(new IBiFunction<String, Throwable, Void>() {
+    IFuture<Void> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, Void>() {
 
       @Override
       public Void apply(String result, Throwable error) {
@@ -282,7 +282,7 @@ public class WhenDoneScheduleTest {
 
     // Schedule function
     final AtomicBoolean functionExecuted = new AtomicBoolean(false);
-    IFuture<Void> functionFuture = future.whenDoneSchedule(new IBiFunction<String, Throwable, Void>() {
+    IFuture<Void> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, Void>() {
 
       @Override
       public Void apply(String result, Throwable error) {
@@ -334,7 +334,7 @@ public class WhenDoneScheduleTest {
 
     // Schedule function
     final AtomicBoolean functionExecuted = new AtomicBoolean(false);
-    IFuture<Void> functionFuture = future.whenDoneSchedule(new IBiFunction<String, Throwable, Void>() {
+    IFuture<Void> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, Void>() {
 
       @Override
       public Void apply(String result, Throwable error) {
@@ -380,7 +380,7 @@ public class WhenDoneScheduleTest {
     final AtomicBoolean functionExecuted = new AtomicBoolean(false);
 
     RunMonitor functionRunMonitor = BEANS.get(RunMonitor.class);
-    IFuture<Void> functionFuture = future.whenDoneSchedule(new IBiFunction<String, Throwable, Void>() {
+    IFuture<Void> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, Void>() {
 
       @Override
       public Void apply(String result, Throwable error) {
@@ -434,7 +434,7 @@ public class WhenDoneScheduleTest {
     // Schedule function
     final AtomicBoolean functionExecuted = new AtomicBoolean(false);
 
-    IFuture<Void> functionFuture = future.whenDoneSchedule(new IBiFunction<String, Throwable, Void>() {
+    IFuture<Void> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, Void>() {
 
       @Override
       public Void apply(String result, Throwable error) {
@@ -476,7 +476,7 @@ public class WhenDoneScheduleTest {
         .withExecutionHint(JOB_MARKER));
 
     // Schedule function
-    IFuture<String> functionFuture = future.whenDoneSchedule(new IBiFunction<String, Throwable, String>() {
+    IFuture<String> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, String>() {
 
       @Override
       public String apply(String result, Throwable error) {
@@ -530,7 +530,7 @@ public class WhenDoneScheduleTest {
 
     // Schedule function with same semaphore
     final AtomicBoolean functionExecuted = new AtomicBoolean(false);
-    IFuture<Void> functionFuture = future.whenDoneSchedule(new IBiFunction<String, Throwable, Void>() {
+    IFuture<Void> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, Void>() {
 
       @Override
       public Void apply(String result, Throwable error) {
@@ -580,7 +580,7 @@ public class WhenDoneScheduleTest {
     }, Jobs.newInput()
         .withExceptionHandling(null, false)); // to not work with JUnitExceptionHandler
 
-    IFuture<Integer> functionFuture = future.whenDoneSchedule(new IBiFunction<String, Throwable, Integer>() {
+    IFuture<Integer> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, Integer>() {
 
       @Override
       public Integer apply(String result, Throwable error) {
@@ -623,7 +623,7 @@ public class WhenDoneScheduleTest {
       }
     }, Jobs.newInput());
 
-    IFuture<Integer> functionFuture = future.whenDoneSchedule(new IBiFunction<String, Throwable, Integer>() {
+    IFuture<Integer> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, Integer>() {
 
       @Override
       public Integer apply(String result, Throwable error) {
@@ -671,7 +671,7 @@ public class WhenDoneScheduleTest {
     final BlockingCountDownLatch hint2RemovedLatch = new BlockingCountDownLatch(1);
 
     // Schedule function
-    IFuture<String> functionFuture = future.whenDoneSchedule(new IBiFunction<String, Throwable, String>() {
+    IFuture<String> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, String>() {
 
       @Override
       public String apply(String result, Throwable error) {

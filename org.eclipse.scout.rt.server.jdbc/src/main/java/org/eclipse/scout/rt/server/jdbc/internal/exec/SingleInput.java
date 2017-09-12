@@ -18,9 +18,9 @@ import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 class SingleInput implements IBindInput {
   private int m_batchIndex = -1;
   private int m_jdbcBindIndex = -1;
-  private Object m_value;
-  private Class m_nullType;
-  private ValueInputToken m_target;
+  private final Object m_value;
+  private final Class m_nullType;
+  private final ValueInputToken m_target;
 
   public SingleInput(Object value, Class nullType, ValueInputToken target) {
     m_value = value;

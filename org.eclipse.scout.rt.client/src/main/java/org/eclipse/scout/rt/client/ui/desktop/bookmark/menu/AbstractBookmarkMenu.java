@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.client.ui.desktop.bookmark.menu;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceEvent;
-import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceListener;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
@@ -67,12 +65,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
   @Order(10)
   protected void execInitAction() {
     BEANS.get(IBookmarkService.class).addBookmarkServiceListener(
-        new BookmarkServiceListener() {
-          @Override
-          public void bookmarksChanged(BookmarkServiceEvent e) {
-            handleBookmarksChanged();
-          }
-        });
+        e -> handleBookmarksChanged());
     handleBookmarksChanged();
   }
 
@@ -125,7 +118,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
   protected void handleBookmarksChanged() {
     IBookmarkService service = BEANS.get(IBookmarkService.class);
     List<IMenu> oldList = getChildActions();
-    List<IMenu> newList = new ArrayList<IMenu>();
+    List<IMenu> newList = new ArrayList<>();
     for (IMenu m : oldList) {
       if (m.getClass() == AddUserBookmarkMenu.class) {
         newList.add(m);
@@ -162,7 +155,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
       group.setSeparator(false);
       group.setText(f.getTitle());
       group.setIconId(f.getIconId());
-      List<IMenu> childActionList = new ArrayList<IMenu>();
+      List<IMenu> childActionList = new ArrayList<>();
       addBookmarkTreeInternal(f, childActionList);
       group.setChildActions(childActionList);
       actionList.add(group);

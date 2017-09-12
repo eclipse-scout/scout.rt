@@ -60,7 +60,7 @@ public class FindFieldByFormDataIdVisitor implements IFormFieldVisitor {
   public FindFieldByFormDataIdVisitor(String fieldId, IForm searchContextRootForm) {
     m_searchContextRootForm = searchContextRootForm;
     m_fieldIdParts = FIELD_PATH_SPLIT_PATTERN.split(fieldId);
-    m_prioMap = new TreeMap<CompositeObject, IFormField>();
+    m_prioMap = new TreeMap<>();
   }
 
   @Override
@@ -143,6 +143,6 @@ public class FindFieldByFormDataIdVisitor implements IFormFieldVisitor {
   }
 
   public IFormField getField() {
-    return m_prioMap.size() > 0 ? m_prioMap.get(m_prioMap.firstKey()) : null;
+    return !m_prioMap.isEmpty() ? m_prioMap.get(m_prioMap.firstKey()) : null;
   }
 }

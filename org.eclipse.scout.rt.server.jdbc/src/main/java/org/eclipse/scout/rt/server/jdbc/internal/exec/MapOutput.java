@@ -18,9 +18,9 @@ import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueOutputToken;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 
 class MapOutput implements IBindOutput {
-  private Map<Object, Object> m_map;
-  private Object m_mapKey;
-  private ValueOutputToken m_source;
+  private final Map<Object, Object> m_map;
+  private final Object m_mapKey;
+  private final ValueOutputToken m_source;
   private int m_batchIndex = -1;
   private int m_jdbcBindIndex = -1;
   private Object m_accumulator;

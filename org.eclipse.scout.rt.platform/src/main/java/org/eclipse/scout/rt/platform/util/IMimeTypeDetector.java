@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.platform.Order;
  * In order to find the mime type of a stream or file there are various tools which may be used in all possible
  * combinations.
  * <ul>
- * <li>{@link Files#probeContentType(java.nio.file.Path)}
+ * <li>{@link Files#probeContentType(Path)}
  * <li>
  * <li>Apache Tika org.apache.tika:tika-core</li>
  * <li>ServletContext#getMimeType(String)</li>
@@ -50,6 +50,7 @@ import org.eclipse.scout.rt.platform.Order;
  * @author BSI AG
  * @since 5.2
  */
+@FunctionalInterface
 @Bean
 public interface IMimeTypeDetector {
 

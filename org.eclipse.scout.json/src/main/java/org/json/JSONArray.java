@@ -23,8 +23,9 @@ package org.json;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
+
+import org.json.JSONStringer.Scope;
 
 // Note: this class was written without inspecting the non-free org.json sourcecode.
 
@@ -61,7 +62,7 @@ public class JSONArray {
    * Creates a {@code JSONArray} with no values.
    */
   public JSONArray() {
-    m_values = new ArrayList<Object>();
+    m_values = new ArrayList<>();
   }
 
   /**
@@ -75,8 +76,8 @@ public class JSONArray {
   public JSONArray(Collection copyFrom) {
     this();
     if (copyFrom != null) {
-      for (Iterator it = copyFrom.iterator(); it.hasNext();) {
-        put(JSONObject.wrap(it.next()));
+      for (Object aCopyFrom : copyFrom) {
+        put(JSONObject.wrap(aCopyFrom));
       }
     }
   }
@@ -124,7 +125,7 @@ public class JSONArray {
       throw new JSONException("Not a primitive array: " + array.getClass());
     }
     final int length = Array.getLength(array);
-    m_values = new ArrayList<Object>(length);
+    m_values = new ArrayList<>(length);
     for (int i = 0; i < length; ++i) {
       put(JSONObject.wrap(Array.get(array, i)));
     }
@@ -556,14 +557,14 @@ public class JSONArray {
    */
   public String join(String separator) {
     JSONStringer stringer = new JSONStringer();
-    stringer.open(JSONStringer.Scope.NULL, "");
+    stringer.open(Scope.NULL, "");
     for (int i = 0, size = m_values.size(); i < size; i++) {
       if (i > 0) {
         stringer.out.append(separator);
       }
       stringer.value(m_values.get(i));
     }
-    stringer.close(JSONStringer.Scope.NULL, JSONStringer.Scope.NULL, "");
+    stringer.close(Scope.NULL, Scope.NULL, "");
     return stringer.out.toString();
   }
 

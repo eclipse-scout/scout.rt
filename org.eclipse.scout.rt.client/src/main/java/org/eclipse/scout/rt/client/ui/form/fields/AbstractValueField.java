@@ -21,9 +21,9 @@ import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandl
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IValueFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldChangedValueChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldValidateValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldFormatValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldParseValueChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldValidateValueChain;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
@@ -81,7 +81,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
 
   @Override
   protected IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>> createLocalExtension() {
-    return new LocalValueFieldExtension<VALUE, AbstractValueField<VALUE>>(this);
+    return new LocalValueFieldExtension<>(this);
   }
 
   /*
@@ -108,7 +108,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
-    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
+    OrderedCollection<IMenu> menus = new OrderedCollection<>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
       menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
     }
@@ -121,7 +121,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
-    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
+    new MoveActionNodesHandler<>(menus).moveModelObjects();
     //set container on menus
     IValueFieldContextMenu contextMenu = createContextMenu(menus);
     contextMenu.setContainerInternal(this);
@@ -273,8 +273,8 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     EventListener[] a = m_listeningSlaves.getListeners(MasterListener.class);
     if (a != null && a.length > 0) {
       VALUE masterValue = getValue();
-      for (int i = 0; i < a.length; i++) {
-        ((MasterListener) a[i]).masterChanged(masterValue);
+      for (EventListener anA : a) {
+        ((MasterListener) anA).masterChanged(masterValue);
       }
     }
   }
@@ -329,7 +329,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
         validatedValue = validateValue(rawValue);
       }
       catch (ProcessingException v) {
-        addErrorStatus(new ValidationFailedStatus<VALUE>(v, rawValue));
+        addErrorStatus(new ValidationFailedStatus<>(v, rawValue));
         updateDisplayText(rawValue);
         return;
       }
@@ -337,7 +337,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
         final String message = TEXTS.get("InvalidValueMessageX", StringUtility.emptyIfNull(rawValue));
         ProcessingException pe = new ProcessingException(message, e);
         LOG.warn("Unexpected Error: ", pe);
-        addErrorStatus(new ValidationFailedStatus<VALUE>(pe, rawValue));
+        addErrorStatus(new ValidationFailedStatus<>(pe, rawValue));
         updateDisplayText(rawValue);
         return;
       }
@@ -620,7 +620,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalValueFieldExtension<VALUE, OWNER extends AbstractValueField<VALUE>> extends AbstractFormField.LocalFormFieldExtension<OWNER> implements IValueFieldExtension<VALUE, OWNER> {
+  protected static class LocalValueFieldExtension<VALUE, OWNER extends AbstractValueField<VALUE>> extends LocalFormFieldExtension<OWNER> implements IValueFieldExtension<VALUE, OWNER> {
 
     public LocalValueFieldExtension(OWNER owner) {
       super(owner);
@@ -649,25 +649,25 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
 
   protected final VALUE interceptValidateValue(VALUE rawValue) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    ValueFieldValidateValueChain<VALUE> chain = new ValueFieldValidateValueChain<VALUE>(extensions);
+    ValueFieldValidateValueChain<VALUE> chain = new ValueFieldValidateValueChain<>(extensions);
     return chain.execValidateValue(rawValue);
   }
 
   protected final String interceptFormatValue(VALUE validValue) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    ValueFieldFormatValueChain<VALUE> chain = new ValueFieldFormatValueChain<VALUE>(extensions);
+    ValueFieldFormatValueChain<VALUE> chain = new ValueFieldFormatValueChain<>(extensions);
     return chain.execFormatValue(validValue);
   }
 
   protected final void interceptChangedValue() {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    ValueFieldChangedValueChain<VALUE> chain = new ValueFieldChangedValueChain<VALUE>(extensions);
+    ValueFieldChangedValueChain<VALUE> chain = new ValueFieldChangedValueChain<>(extensions);
     chain.execChangedValue();
   }
 
   protected final VALUE interceptParseValue(String text) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    ValueFieldParseValueChain<VALUE> chain = new ValueFieldParseValueChain<VALUE>(extensions);
+    ValueFieldParseValueChain<VALUE> chain = new ValueFieldParseValueChain<>(extensions);
     return chain.execParseValue(text);
   }
 }

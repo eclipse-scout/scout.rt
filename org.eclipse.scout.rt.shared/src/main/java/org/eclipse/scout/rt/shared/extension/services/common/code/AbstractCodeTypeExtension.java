@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 
 public abstract class AbstractCodeTypeExtension<CODE_TYPE_ID, CODE_ID, OWNER extends AbstractCodeType<CODE_TYPE_ID, CODE_ID>>
-    extends AbstractCodeTypeWithGenericExtension<CODE_TYPE_ID, CODE_ID, ICode<CODE_ID>, OWNER> implements ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, OWNER> {
+    extends AbstractCodeTypeWithGenericExtension<CODE_TYPE_ID, CODE_ID, ICode<CODE_ID>, OWNER> {
 
   private static final long serialVersionUID = 1L;
 

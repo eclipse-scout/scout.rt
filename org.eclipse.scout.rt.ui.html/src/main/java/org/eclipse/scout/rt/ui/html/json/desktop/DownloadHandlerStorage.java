@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.servlet.cache.DownloadHttpResponseInterceptor;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResponseInterceptor;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
@@ -104,12 +103,7 @@ public class DownloadHandlerStorage {
    *          time to live in milliseconds
    */
   protected void scheduleRemoval(final String key, long ttl) {
-    final IFuture oldFuture = m_futureMap.put(key, Jobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        removeOnTimeout(key);
-      }
-    }, Jobs.newInput()
+    final IFuture oldFuture = m_futureMap.put(key, Jobs.schedule(() -> removeOnTimeout(key), Jobs.newInput()
         .withExecutionHint(RESOURCE_CLEANUP_JOB_MARKER)
         .withRunContext(RunContexts.copyCurrent())
         .withExecutionTrigger(Jobs.newExecutionTrigger()

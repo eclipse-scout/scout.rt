@@ -16,8 +16,8 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
 public class CallInspector {
-  private SessionInspector m_parent;
-  private CallInfo m_info;
+  private final SessionInspector m_parent;
+  private final CallInfo m_info;
 
   protected CallInspector(SessionInspector parent, ServiceTunnelRequest call) {
     m_parent = parent;

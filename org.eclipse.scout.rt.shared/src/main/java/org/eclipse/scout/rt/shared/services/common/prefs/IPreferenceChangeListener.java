@@ -18,6 +18,7 @@ import java.util.EventListener;
  * @since 5.1
  * @see IPreferences#addPreferenceChangeListener(IPreferenceChangeListener)
  */
+@FunctionalInterface
 public interface IPreferenceChangeListener extends EventListener {
 
   /**

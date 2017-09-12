@@ -11,8 +11,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.matrix;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,9 +30,9 @@ public class VerticalGridMatrix implements IGridMatrix {
 
   private MatrixCursor m_cursor;
 
-  private final Map<IFormField, GridData> m_fieldGridDatas = new HashMap<IFormField, GridData>();
-  private final Map<MatrixIndex, Cell> m_cells = new HashMap<MatrixIndex, Cell>();
-  private final Map<IFormField, Integer> m_formFieldIndexes = new HashMap<IFormField, Integer>();
+  private final Map<IFormField, GridData> m_fieldGridDatas = new HashMap<>();
+  private final Map<MatrixIndex, Cell> m_cells = new HashMap<>();
+  private final Map<IFormField, Integer> m_formFieldIndexes = new HashMap<>();
 
   public VerticalGridMatrix(int columnCount, int rowCount) {
     this(0, 0, columnCount, rowCount);
@@ -102,8 +100,8 @@ public class VerticalGridMatrix implements IGridMatrix {
   }
 
   private void reorganizeGridAbove(int x, int y, int w) {
-    Set<IFormField> fieldsToReorganize = new HashSet<IFormField>();
-    Map<MatrixIndex, Cell> occupiedCells = new HashMap<MatrixIndex, Cell>();
+    Set<IFormField> fieldsToReorganize = new HashSet<>();
+    Map<MatrixIndex, Cell> occupiedCells = new HashMap<>();
     Bounds reorgBounds = new Bounds(x, 0, w, y + 1);
 
     int minY = y;
@@ -140,14 +138,11 @@ public class VerticalGridMatrix implements IGridMatrix {
       return;
     }
     // sort fields
-    List<IFormField> sortedFieldsToReorganize = new ArrayList<IFormField>(fieldsToReorganize);
-    Collections.sort(sortedFieldsToReorganize, new Comparator<IFormField>() {
-      @Override
-      public int compare(IFormField o1, IFormField o2) {
-        Integer i1 = m_formFieldIndexes.get(o1);
-        Integer i2 = m_formFieldIndexes.get(o2);
-        return i1.compareTo(i2);
-      }
+    List<IFormField> sortedFieldsToReorganize = new ArrayList<>(fieldsToReorganize);
+    sortedFieldsToReorganize.sort((o1, o2) -> {
+      Integer i1 = m_formFieldIndexes.get(o1);
+      Integer i2 = m_formFieldIndexes.get(o2);
+      return i1.compareTo(i2);
     });
     reorgBounds.y = minY;
 
@@ -168,9 +163,7 @@ public class VerticalGridMatrix implements IGridMatrix {
     }
     MatrixIndex currentIndex = m_cursor.currentIndex();
     if (!isAllCellFree(currentIndex.x, currentIndex.y, w, h)) {
-      if (m_cells.get(currentIndex) == null) {
-        m_cells.put(currentIndex, new Cell());
-      }
+      m_cells.computeIfAbsent(currentIndex, k -> new Cell());
       return nextFree(w, h);
     }
     return true;

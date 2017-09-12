@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
  * URLs that call back to this method are defined using
  * {@link BinaryResourceUrlUtility#createDynamicAdapterResourceUrl(IJsonAdapter, String)}
  */
+@FunctionalInterface
 public interface IBinaryResourceProvider {
 
   BinaryResourceHolder provideBinaryResource(String filename);

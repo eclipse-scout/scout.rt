@@ -11,7 +11,7 @@ import org.json.JSONObject;
  */
 public class JsonLayoutData implements IJsonObject {
 
-  private FlexboxLayoutData m_layoutData;
+  private final FlexboxLayoutData m_layoutData;
 
   public JsonLayoutData(FlexboxLayoutData layoutData) {
     m_layoutData = layoutData;

@@ -10,12 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.html.internal;
 
-import org.eclipse.scout.rt.platform.html.IHtmlElement;
-
 /**
  * Builder for a html link.
  */
-public class HtmlLinkBuilder extends HtmlNodeBuilder implements IHtmlElement {
+public class HtmlLinkBuilder extends HtmlNodeBuilder {
 
   private static final long serialVersionUID = 1L;
 

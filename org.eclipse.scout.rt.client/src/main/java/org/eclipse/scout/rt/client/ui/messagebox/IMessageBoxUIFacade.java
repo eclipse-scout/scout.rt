@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.messagebox;
 
+@FunctionalInterface
 public interface IMessageBoxUIFacade {
 
   void setResultFromUI(int option);

@@ -41,7 +41,7 @@ public class EntityNode extends AbstractComposerNode {
 
   @Override
   protected void execInitTreeNode() {
-    List<IMenu> menus = new ArrayList<IMenu>();
+    List<IMenu> menus = new ArrayList<>();
     for (IMenu m : getMenus()) {
       if (m.getClass() == AddEntityPlaceholderOnEntityMenu.class) {
         attachAddEntityMenus(menus);
@@ -51,7 +51,7 @@ public class EntityNode extends AbstractComposerNode {
       }
     }
     // delete separator if it is at the end
-    if (menus.size() > 0 && menus.get(menus.size() - 1).getClass() == Separator2Menu.class) {
+    if (!menus.isEmpty() && menus.get(menus.size() - 1).getClass() == Separator2Menu.class) {
       menus.remove(menus.size() - 1);
     }
     setMenus(menus);
@@ -61,14 +61,14 @@ public class EntityNode extends AbstractComposerNode {
   protected void execDecorateCell(Cell cell) {
     StringBuilder label = new StringBuilder();
     if (getSiblingBefore() != null) {
-      label.append(TEXTS.get("ExtendedSearchAnd") + " ");
+      label.append(TEXTS.get("ExtendedSearchAnd")).append(" ");
     }
     if (isNegative()) {
-      label.append(TEXTS.get("ExtendedSearchNot") + " ");
+      label.append(TEXTS.get("ExtendedSearchNot")).append(" ");
     }
     label.append(m_entity.getText());
     if (getChildNodeCount() > 0) {
-      label.append(" " + TEXTS.get("ExtendedSearchEntitySuffix"));
+      label.append(" ").append(TEXTS.get("ExtendedSearchEntitySuffix"));
     }
     cell.setText(label.toString());
   }
@@ -93,7 +93,7 @@ public class EntityNode extends AbstractComposerNode {
     return CollectionUtility.arrayList(m_values);
   }
 
-  public void setValues(List<? extends Object> values) {
+  public void setValues(List<?> values) {
     m_values = CollectionUtility.arrayListWithoutNullElements(values);
   }
 

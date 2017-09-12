@@ -12,6 +12,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
  * @see IMom#reply(IDestination, IRequestListener, RunContext)l
  * @since 6.1
  */
+@FunctionalInterface
 public interface IRequestListener<REQUEST_OBJECT, REPLY_OBJECT> {
 
   /**

@@ -20,7 +20,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -197,7 +196,7 @@ public class JandexInventoryBuilder {
 
   protected Index scanJar(URI indexUri) throws URISyntaxException, IOException {
     String s = indexUri.getRawSchemeSpecificPart();
-    File jarFile = new File(new URI(s.substring(0, s.lastIndexOf("!"))));
+    File jarFile = new File(new URI(s.substring(0, s.lastIndexOf('!'))));
     Index index = readIndex(indexUri);
     if (index != null) {
       return index;
@@ -218,17 +217,14 @@ public class JandexInventoryBuilder {
   protected IndexMetaData indexMetaData(Path dir) throws IOException {
     final AtomicLong lastModifiedRef = new AtomicLong();
     final AtomicInteger fileCountRef = new AtomicInteger();
-    JandexFiles.walkFileTree(dir, new IJandexFileVisitor() {
-      @Override
-      public void visit(Path path, BasicFileAttributes attrs) throws IOException {
-        if (!acceptPathForIndex(path)) {
-          return;
-        }
-        fileCountRef.incrementAndGet();
-        long t = attrs.lastModifiedTime().toMillis();
-        if (t > lastModifiedRef.get()) {
-          lastModifiedRef.set(t);
-        }
+    JandexFiles.walkFileTree(dir, (path, attrs) -> {
+      if (!acceptPathForIndex(path)) {
+        return;
+      }
+      fileCountRef.incrementAndGet();
+      long t = attrs.lastModifiedTime().toMillis();
+      if (t > lastModifiedRef.get()) {
+        lastModifiedRef.set(t);
       }
     });
     return new IndexMetaData(lastModifiedRef.get(), fileCountRef.get());
@@ -284,12 +280,7 @@ public class JandexInventoryBuilder {
   }
 
   protected Index createFolderIndex(Path dir, final Indexer indexer) throws IOException {
-    JandexFiles.walkFileTree(dir, new IJandexFileVisitor() {
-      @Override
-      public void visit(Path path, BasicFileAttributes attrs) throws IOException {
-        appendPathToIndex(path, indexer);
-      }
-    });
+    JandexFiles.walkFileTree(dir, (path, attrs) -> appendPathToIndex(path, indexer));
     return indexer.complete();
   }
 

@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.html.csp;
 import java.io.IOException;
 import java.io.Reader;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,7 +44,7 @@ public class ContentSecurityPolicyReportHandler extends AbstractUiServletRequest
   private static final int MAX_CSP_REPORT_DATALENGTH = 4 * 1024;
 
   @Override
-  public boolean handlePost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+  public boolean handlePost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
     // serve only if path is ending with /csp-report
     String pathInfo = req.getPathInfo();
     if (pathInfo == null || !pathInfo.endsWith(HANDLER_PATH)) {

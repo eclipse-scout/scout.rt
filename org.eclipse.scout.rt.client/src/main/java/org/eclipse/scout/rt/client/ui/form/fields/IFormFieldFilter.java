@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 /**
  * filters form fields
  */
+@FunctionalInterface
 public interface IFormFieldFilter {
   /**
    * specifies if the given field should be further processed.

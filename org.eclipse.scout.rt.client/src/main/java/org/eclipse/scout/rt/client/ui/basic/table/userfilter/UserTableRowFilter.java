@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilter;
  * @since 5.1
  */
 public class UserTableRowFilter implements ITableRowFilter, IUserFilter {
-  private Set<? extends ITableRow> m_rows;
+  private final Set<? extends ITableRow> m_rows;
 
   public UserTableRowFilter(Collection<? extends ITableRow> rows) {
     m_rows = new HashSet<ITableRow>(rows);

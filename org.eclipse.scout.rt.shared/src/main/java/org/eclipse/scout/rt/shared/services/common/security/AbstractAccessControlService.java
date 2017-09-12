@@ -276,7 +276,7 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
 
   @Override
   public void clearCache() {
-    getCache().invalidate(new AllCacheEntryFilter<K, PermissionCollection>(), true);
+    getCache().invalidate(new AllCacheEntryFilter<>(), true);
   }
 
   @Override
@@ -286,7 +286,7 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
 
   protected void clearCache(Collection<? extends K> cacheKeys) {
     if (cacheKeys != null && !cacheKeys.isEmpty()) {
-      getCache().invalidate(new KeyCacheEntryFilter<K, PermissionCollection>(cacheKeys), true);
+      getCache().invalidate(new KeyCacheEntryFilter<>(cacheKeys), true);
     }
   }
 }

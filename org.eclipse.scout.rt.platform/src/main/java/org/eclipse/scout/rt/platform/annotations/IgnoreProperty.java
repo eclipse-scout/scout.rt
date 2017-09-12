@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.platform.reflect.FastBeanInfo;
 @Target(ElementType.METHOD)
 public @interface IgnoreProperty {
 
-  public enum Context {
+  enum Context {
     GUI
   }
 

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.filechooser;
 
 import java.util.EventListener;
 
+@FunctionalInterface
 public interface FileChooserListener extends EventListener {
 
   void fileChooserChanged(FileChooserEvent e);

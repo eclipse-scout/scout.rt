@@ -44,7 +44,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
   private static final CellStyle DEFAULT_CELL_STYLE;
 
   static {
-    SHARED_STYLE_STORE = new HashMap<CellStyle, CellStyle>();
+    SHARED_STYLE_STORE = new HashMap<>();
     DEFAULT_CELL_STYLE = new CellStyle();
     SHARED_STYLE_STORE.put(DEFAULT_CELL_STYLE, DEFAULT_CELL_STYLE);
   }
@@ -112,7 +112,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
         value = getObserver().validateValue(this, value);
       }
       catch (ProcessingException e) {
-        addErrorStatus(new ValidationFailedStatus<Object>(e, value));
+        addErrorStatus(new ValidationFailedStatus<>(e, value));
       }
     }
     if (ObjectUtility.equals(m_value, value)) {

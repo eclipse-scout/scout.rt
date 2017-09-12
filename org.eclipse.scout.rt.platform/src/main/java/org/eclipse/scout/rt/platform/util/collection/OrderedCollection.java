@@ -39,7 +39,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
   private final Comparator<? super ORDERED> m_comparator;
 
   public OrderedCollection() {
-    m_orderedObjects = new LinkedList<ORDERED>();
+    m_orderedObjects = new LinkedList<>();
     m_comparator = new OrderedComparator();
   }
 
@@ -142,7 +142,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
   }
 
   private void ensureSorted() {
-    Collections.sort(m_orderedObjects, m_comparator);
+    m_orderedObjects.sort(m_comparator);
   }
 
   public boolean addLast(ORDERED o) {
@@ -229,12 +229,11 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
   }
 
   public List<ORDERED> getOrderedList() {
-    List<ORDERED> list = new ArrayList<ORDERED>(size());
+    List<ORDERED> list = new ArrayList<>(size());
     ORDERED prev = null;
     boolean unsorted = false;
     boolean first = true;
-    for (Iterator<ORDERED> it = m_orderedObjects.iterator(); it.hasNext();) {
-      ORDERED next = it.next();
+    for (ORDERED next : m_orderedObjects) {
       list.add(next);
       if (unsorted) {
         // ordered collection is not sorted correctly. Skip successive checks.
@@ -250,7 +249,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
     }
 
     if (unsorted) {
-      Collections.sort(list, m_comparator);
+      list.sort(m_comparator);
     }
     return list;
   }
@@ -278,7 +277,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
   }
 
   public boolean addAllBefore(Collection<? extends ORDERED> objectToAdd, Class<? extends ORDERED> referenceClass) {
-    ArrayList<ORDERED> cleanObjects = CollectionUtility.arrayListWithoutNullElements(objectToAdd);
+    List<ORDERED> cleanObjects = CollectionUtility.arrayListWithoutNullElements(objectToAdd);
     if (cleanObjects.isEmpty()) {
       return false;
     }
@@ -290,7 +289,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
   }
 
   public boolean addAllAfter(Collection<? extends ORDERED> objectToAdd, Class<? extends ORDERED> referenceClass) {
-    ArrayList<ORDERED> cleanObjects = CollectionUtility.arrayListWithoutNullElements(objectToAdd);
+    List<ORDERED> cleanObjects = CollectionUtility.arrayListWithoutNullElements(objectToAdd);
     if (cleanObjects.isEmpty()) {
       return false;
     }
@@ -302,7 +301,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
   }
 
   public boolean addAllFirst(Collection<? extends ORDERED> objectsToAdd) {
-    ArrayList<ORDERED> cleanObjects = CollectionUtility.arrayListWithoutNullElements(objectsToAdd);
+    List<ORDERED> cleanObjects = CollectionUtility.arrayListWithoutNullElements(objectsToAdd);
     if (cleanObjects.isEmpty()) {
       return false;
     }
@@ -323,7 +322,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
   }
 
   public boolean addAllLast(Collection<? extends ORDERED> objectsToAdd) {
-    ArrayList<ORDERED> cleanObjects = CollectionUtility.arrayListWithoutNullElements(objectsToAdd);
+    List<ORDERED> cleanObjects = CollectionUtility.arrayListWithoutNullElements(objectsToAdd);
     if (cleanObjects.isEmpty()) {
       return false;
     }
@@ -343,7 +342,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
   }
 
   public boolean addAllBefore(Collection<? extends ORDERED> objectsToAdd, ORDERED reference) {
-    ArrayList<ORDERED> cleanObjects = CollectionUtility.arrayListWithoutNullElements(objectsToAdd);
+    List<ORDERED> cleanObjects = CollectionUtility.arrayListWithoutNullElements(objectsToAdd);
     if (cleanObjects.isEmpty()) {
       return false;
     }
@@ -362,7 +361,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
   }
 
   public boolean addAllAfter(Collection<? extends ORDERED> objectsToAdd, ORDERED reference) {
-    ArrayList<ORDERED> cleanObjects = CollectionUtility.arrayListWithoutNullElements(objectsToAdd);
+    List<ORDERED> cleanObjects = CollectionUtility.arrayListWithoutNullElements(objectsToAdd);
     if (cleanObjects.isEmpty()) {
       return false;
     }
@@ -382,7 +381,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
   }
 
   public boolean addAllAt(Collection<? extends ORDERED> objectsToAdd, int index) {
-    ArrayList<ORDERED> cleanObjects = CollectionUtility.arrayListWithoutNullElements(objectsToAdd);
+    List<ORDERED> cleanObjects = CollectionUtility.arrayListWithoutNullElements(objectsToAdd);
     if (cleanObjects.isEmpty()) {
       return false;
     }
@@ -406,8 +405,8 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
     int i = 0;
     ensureSorted();
     ORDERED reference = null;
-    for (Iterator<ORDERED> it = m_orderedObjects.iterator(); it.hasNext();) {
-      reference = it.next();
+    for (ORDERED m_orderedObject : m_orderedObjects) {
+      reference = m_orderedObject;
       if (i == index) {
         return reference;
       }
@@ -419,8 +418,8 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
   private ORDERED getReferenceObjectByClass(Class<? extends ORDERED> referenceClass) {
     ensureSorted();
     ORDERED reference = null;
-    for (Iterator<ORDERED> it = m_orderedObjects.iterator(); it.hasNext();) {
-      reference = it.next();
+    for (ORDERED m_orderedObject : m_orderedObjects) {
+      reference = m_orderedObject;
       if (referenceClass.isInstance(reference)) {
         return reference;
       }

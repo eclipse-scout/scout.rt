@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.extension.ui.action.menu.IMenuExtension;
 import org.eclipse.scout.rt.client.extension.ui.action.menu.MenuChains.MenuOwnerValueChangedChain;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
-import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.tree.AbstractActionNode;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -140,7 +139,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     if (input == null) {
       return null;
     }
-    List<ITableRow> rows = new ArrayList<ITableRow>(input.size());
+    List<ITableRow> rows = new ArrayList<>(input.size());
     for (Object o : input) {
       if (o instanceof ITableRow) {
         rows.add((ITableRow) o);
@@ -162,7 +161,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     if (input == null) {
       return null;
     }
-    List<ITreeNode> rows = new ArrayList<ITreeNode>(input.size());
+    List<ITreeNode> rows = new ArrayList<>(input.size());
     for (Object o : input) {
       if (o instanceof ITreeNode) {
         rows.add((ITreeNode) o);
@@ -200,22 +199,19 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   protected void afterChildMenusAdd(Collection<? extends IMenu> newChildMenus) {
     if (CollectionUtility.hasElements(newChildMenus)) {
       final Object ownerValue = m_ownerValue;
-      IActionVisitor visitor = new IActionVisitor() {
-        @Override
-        public int visit(IAction action) {
-          if (action instanceof IMenu) {
-            IMenu menu = (IMenu) action;
-            try {
-              if (ObjectUtility.notEquals(menu.getOwnerValue(), ownerValue)) {
-                menu.handleOwnerValueChanged(ownerValue);
-              }
-            }
-            catch (RuntimeException e) {
-              LOG.error("error during handle owner value changed.", e);
+      IActionVisitor visitor = action -> {
+        if (action instanceof IMenu) {
+          IMenu menu = (IMenu) action;
+          try {
+            if (ObjectUtility.notEquals(menu.getOwnerValue(), ownerValue)) {
+              menu.handleOwnerValueChanged(ownerValue);
             }
           }
-          return CONTINUE;
+          catch (RuntimeException e) {
+            LOG.error("error during handle owner value changed.", e);
+          }
         }
+        return IActionVisitor.CONTINUE;
       };
       for (IMenu m : newChildMenus) {
         m.acceptVisitor(visitor);
@@ -230,7 +226,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   @SuppressWarnings("unchecked")
   @Override
   public Set<IMenuType> getMenuTypes() {
-    return CollectionUtility.<IMenuType> hashSet((Set<IMenuType>) propertySupport.getProperty(PROP_MENU_TYPES));
+    return CollectionUtility.hashSet((Collection<? extends IMenuType>) propertySupport.getProperty(PROP_MENU_TYPES));
   }
 
   public void setMenuTypes(Set<? extends IMenuType> menuTypes) {
@@ -267,7 +263,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
 
   @Override
   protected IMenuExtension<? extends AbstractMenu> createLocalExtension() {
-    return new LocalMenuExtension<AbstractMenu>(this);
+    return new LocalMenuExtension<>(this);
   }
 
 }

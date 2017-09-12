@@ -41,7 +41,7 @@ public class DataModelOperatorLookupCall extends LocalLookupCall<IDataModelAttri
 
   @Override
   protected List<ILookupRow<IDataModelAttributeOp>> execCreateLookupRows() {
-    List<ILookupRow<IDataModelAttributeOp>> result = new ArrayList<ILookupRow<IDataModelAttributeOp>>();
+    List<ILookupRow<IDataModelAttributeOp>> result = new ArrayList<>();
     List<IDataModelAttributeOp> ops = null;
     if (m_attribute != null) {
       ops = m_attribute.getOperators();
@@ -49,13 +49,13 @@ public class DataModelOperatorLookupCall extends LocalLookupCall<IDataModelAttri
     if (ops != null) {
       for (IDataModelAttributeOp op : ops) {
         String text = op.getShortText();
-        if (text != null && text.indexOf("{0}") >= 0) {
+        if (text != null && text.contains("{0}")) {
           text = text.replace("{0}", "n");
         }
-        if (text != null && text.indexOf("{1}") >= 0) {
+        if (text != null && text.contains("{1}")) {
           text = text.replace("{1}", "m");
         }
-        result.add(new LookupRow<IDataModelAttributeOp>(op, text));
+        result.add(new LookupRow<>(op, text));
       }
     }
 

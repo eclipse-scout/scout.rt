@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
+@FunctionalInterface
 public interface ITreeVisitor {
 
   boolean visit(ITreeNode node);

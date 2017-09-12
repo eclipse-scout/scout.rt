@@ -12,11 +12,9 @@ package org.eclipse.scout.rt.platform.filter;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
-import org.eclipse.scout.rt.platform.filter.NotFilter;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.junit.Before;
 import org.junit.Test;

@@ -12,6 +12,7 @@ import java.lang.reflect.UndeclaredThrowableException;
  * @author Matthias Villiger
  * @see DecoratingProxy
  */
+@FunctionalInterface
 public interface IInstanceInvocationHandler<T> {
   /**
    * Processes a method invocation on a {@link DecoratingProxy} instance and returns the result. This method will be

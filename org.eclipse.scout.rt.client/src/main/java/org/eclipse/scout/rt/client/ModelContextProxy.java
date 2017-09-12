@@ -10,10 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -45,23 +42,11 @@ public class ModelContextProxy {
    */
   @SuppressWarnings("unchecked")
   public <OBJECT> OBJECT newProxy(final OBJECT object, final ModelContext modelContext) {
-    return (OBJECT) Proxy.newProxyInstance(object.getClass().getClassLoader(), ReflectionUtility.getInterfaces(object.getClass()), new InvocationHandler() {
-
-      @Override
-      public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
-        return ClientRunContexts.copyCurrent()
-            .withDesktop(modelContext.getDesktop())
-            .withOutline(modelContext.getOutline(), false)
-            .withForm(modelContext.getForm())
-            .call(new Callable<Object>() {
-
-              @Override
-              public Object call() throws Exception {
-                return method.invoke(object, args);
-              }
-            }, DefaultExceptionTranslator.class);
-      }
-    });
+    return (OBJECT) Proxy.newProxyInstance(object.getClass().getClassLoader(), ReflectionUtility.getInterfaces(object.getClass()), (proxy, method, args) -> ClientRunContexts.copyCurrent()
+        .withDesktop(modelContext.getDesktop())
+        .withOutline(modelContext.getOutline(), false)
+        .withForm(modelContext.getForm())
+        .call(() -> method.invoke(object, args), DefaultExceptionTranslator.class));
   }
 
   public static final class ModelContext {

@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.server.commons.servlet.filter.gzip;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +33,7 @@ public class GzipServletRequestWrapper extends HttpServletRequestWrapper {
   private int m_compressedLength = -1;
   private int m_uncompressedLength = -1;
 
-  public GzipServletRequestWrapper(HttpServletRequest req) throws IOException {
+  public GzipServletRequestWrapper(HttpServletRequest req) {
     super(req);
   }
 
@@ -104,7 +104,7 @@ public class GzipServletRequestWrapper extends HttpServletRequestWrapper {
   public Enumeration<String> getHeaderNames() {
     Enumeration<String> names = super.getHeaderNames();
     if (names != null) {
-      ArrayList<String> list = Collections.list(names);
+      List<String> list = Collections.list(names);
       list.remove(GzipServletFilter.CONTENT_ENCODING);
       return Collections.enumeration(list);
     }

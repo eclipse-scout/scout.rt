@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.basic.tree;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -123,13 +122,13 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   public AbstractTreeNode(boolean callInitializer) {
     setFilterAccepted(true);
     m_childNodeListLock = new Object();
-    m_childNodeList = new ArrayList<ITreeNode>();
+    m_childNodeList = new ArrayList<>();
     m_filteredChildNodesLock = new Object();
     m_childrenLoadedLock = new OptimisticLock();
     m_cell = new Cell(this);
     m_enabled = NamedBitMaskHelper.ALL_BITS_SET; // default enabled
     m_visible = NamedBitMaskHelper.ALL_BITS_SET; // default visible
-    m_objectExtensions = new ObjectExtensions<AbstractTreeNode, ITreeNodeExtension<? extends AbstractTreeNode>>(this, this instanceof AbstractPage<?>);
+    m_objectExtensions = new ObjectExtensions<>(this, this instanceof AbstractPage<?>);
     if (callInitializer) {
       callInitializer();
     }
@@ -219,12 +218,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), new Runnable() {
-      @Override
-      public void run() {
-        initConfig();
-      }
-    });
+    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), this::initConfig);
   }
 
   protected void initConfig() {
@@ -239,7 +233,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
 
-    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
+    OrderedCollection<IMenu> menus = new OrderedCollection<>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
       IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
       menus.addOrdered(menu);
@@ -253,7 +247,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     }
     menus.addAllOrdered(contributedMenus);
 
-    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
+    new MoveActionNodesHandler<>(menus).moveModelObjects();
     m_menus = menus.getOrderedList();
   }
 
@@ -263,7 +257,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   protected ITreeNodeExtension<? extends AbstractTreeNode> createLocalExtension() {
-    return new LocalTreeNodeExtension<AbstractTreeNode>(this);
+    return new LocalTreeNodeExtension<>(this);
   }
 
   @Override
@@ -789,7 +783,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
       synchronized (m_filteredChildNodesLock) {
         if (m_filteredChildNodes == null) {
           synchronized (m_childNodeListLock) {
-            List<ITreeNode> list = new ArrayList<ITreeNode>(m_childNodeList.size());
+            List<ITreeNode> list = new ArrayList<>(m_childNodeList.size());
             for (ITreeNode node : m_childNodeList) {
               if (node.isFilterAccepted()) {
                 list.add(node);
@@ -865,7 +859,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
    */
   public final void setChildNodeOrderInternal(List<ITreeNode> nodes) {
     synchronized (m_childNodeListLock) {
-      ArrayList<ITreeNode> newList = new ArrayList<ITreeNode>(m_childNodeList.size());
+      List<ITreeNode> newList = new ArrayList<>(m_childNodeList.size());
       int index = 0;
       for (ITreeNode n : nodes) {
         n.setChildNodeIndexInternal(index);
@@ -905,7 +899,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
    */
   public final void removeChildNodesInternal(Collection<? extends ITreeNode> nodes, boolean includeSubtree, boolean disposeNodes) {
 
-    List<ITreeNode> removedNodes = new ArrayList<ITreeNode>();
+    List<ITreeNode> removedNodes = new ArrayList<>();
     synchronized (m_childNodeListLock) {
       for (ITreeNode node : nodes) {
         if (m_childNodeList.remove(node)) {
@@ -1053,8 +1047,8 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     }
     if (includeSubtree) {
       synchronized (m_childNodeListLock) {
-        for (Iterator<ITreeNode> it = m_childNodeList.iterator(); it.hasNext();) {
-          (it.next()).setTreeInternal(tree, includeSubtree);
+        for (ITreeNode aM_childNodeList : m_childNodeList) {
+          (aM_childNodeList).setTreeInternal(tree, includeSubtree);
         }
       }
     }

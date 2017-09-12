@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
  */
 @ClassId("0b6b8066-b0e4-4d29-a809-c6fe615b9dc8")
 public class DynamicForm extends AbstractForm {
-  private IGroupBox m_mainBox;
+  private final IGroupBox m_mainBox;
 
   public DynamicForm(String title, IGroupBox mainBox) {
     super(false);

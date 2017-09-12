@@ -10,10 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -24,11 +22,6 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 public abstract class AbstractExtensionChain<EXTENSION> {
 
   private final ListIterator<? extends IExtension<?>> m_iterator;
-
-  /**
-   * the execution state of every executer.
-   */
-  private final Map<EXTENSION, MethodState> m_executionStates = new HashMap<EXTENSION, MethodState>();
 
   private final Class<?> m_filterClass;
 
@@ -117,7 +110,6 @@ public abstract class AbstractExtensionChain<EXTENSION> {
       EXTENSION nextExtension = next();
       MethodState methodState = new MethodState(CollectionUtility.arrayList(arguments));
       try {
-        m_executionStates.put(nextExtension, methodState);
         methodInvocation.callMethod(nextExtension);
         methodState.setReturnValue(methodInvocation.getReturnValue());
       }

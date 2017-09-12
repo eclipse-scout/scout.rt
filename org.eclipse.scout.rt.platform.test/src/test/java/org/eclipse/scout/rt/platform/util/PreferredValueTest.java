@@ -15,7 +15,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.scout.rt.platform.util.PreferredValue;
 import org.junit.Test;
 
 public class PreferredValueTest {

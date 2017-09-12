@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
@@ -65,12 +64,9 @@ public abstract class AbstractOutlineTableField extends AbstractTableField<ITabl
 
   @Override
   protected void execInitField() {
-    m_tablePropertyListener = new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent e) {
-        if (e.getPropertyName().equals(ITable.PROP_TITLE)) {
-          interceptTableTitleChanged();
-        }
+    m_tablePropertyListener = e -> {
+      if (e.getPropertyName().equals(ITable.PROP_TITLE)) {
+        interceptTableTitleChanged();
       }
     };
   }
@@ -117,6 +113,6 @@ public abstract class AbstractOutlineTableField extends AbstractTableField<ITabl
 
   @Override
   protected IOutlineTableFieldExtension<? extends AbstractOutlineTableField> createLocalExtension() {
-    return new LocalOutlineTableFieldExtension<AbstractOutlineTableField>(this);
+    return new LocalOutlineTableFieldExtension<>(this);
   }
 }

@@ -11,8 +11,10 @@
 package org.eclipse.scout.rt.platform.job.internal;
 
 import java.security.AccessController;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.security.auth.Subject;
 
@@ -36,23 +38,23 @@ import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 public class JobExceptionTranslator {
 
   /**
-   * Translates {@link java.util.concurrent.CancellationException} into {@link ThreadInterruptedError}.
+   * Translates {@link CancellationException} into {@link ThreadInterruptedError}.
    */
-  protected FutureCancelledError translateCancellationException(final java.util.concurrent.CancellationException e, final String message) {
+  protected FutureCancelledError translateCancellationException(final CancellationException e, final String message) {
     return decorate(new FutureCancelledError(message, e));
   }
 
   /**
-   * Translates {@link java.lang.InterruptedException} into {@link ThreadInterruptedError}.
+   * Translates {@link InterruptedException} into {@link ThreadInterruptedError}.
    */
-  protected ThreadInterruptedError translateInterruptedException(final java.lang.InterruptedException e, final String message) {
+  protected ThreadInterruptedError translateInterruptedException(final InterruptedException e, final String message) {
     return decorate(new ThreadInterruptedError(message, e));
   }
 
   /**
-   * Translates {@link java.util.concurrent.TimeoutException} into {@link TimedOutError}.
+   * Translates {@link TimeoutException} into {@link TimedOutError}.
    */
-  protected TimedOutError translateTimeoutException(final java.util.concurrent.TimeoutException e, final String message, final long timeout, final TimeUnit unit) {
+  protected TimedOutError translateTimeoutException(final TimeoutException e, final String message, final long timeout, final TimeUnit unit) {
     return decorate(new TimedOutError(message, e).withContextInfo("timeout", "{}ms", unit.toMillis(timeout)));
   }
 

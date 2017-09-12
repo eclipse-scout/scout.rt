@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.imagefield;
 
 import java.util.EventListener;
 
+@FunctionalInterface
 public interface ImageFieldListener extends EventListener {
 
   void imageFieldChanged(ImageFieldEvent e);

@@ -52,21 +52,21 @@ public final class MessageBoxes {
    * Do not forget to call {@link #show()} at the end.
    */
   public static IMessageBox createOk() {
-    return MessageBoxes.create().withYesButtonText(TEXTS.get("OkButton"));
+    return create().withYesButtonText(TEXTS.get("OkButton"));
   }
 
   /**
    * Creates e message box with yes and not buttons.
    */
   public static IMessageBox createYesNo() {
-    return MessageBoxes.create().withYesButtonText(TEXTS.get("YesButton")).withNoButtonText(TEXTS.get("NoButton"));
+    return create().withYesButtonText(TEXTS.get("YesButton")).withNoButtonText(TEXTS.get("NoButton"));
   }
 
   /**
    * Creates a message box with yes, no and cancel buttons.
    */
   public static IMessageBox createYesNoCancel() {
-    return MessageBoxes.createYesNo().withCancelButtonText(TEXTS.get("CancelButton"));
+    return createYesNo().withCancelButtonText(TEXTS.get("CancelButton"));
   }
 
   /**

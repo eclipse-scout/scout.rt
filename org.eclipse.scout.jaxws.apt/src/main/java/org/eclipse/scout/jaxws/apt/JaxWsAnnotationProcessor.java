@@ -37,6 +37,7 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.QualifiedNameable;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
@@ -149,7 +150,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
         // Mark endpoint interface as processed.
         endpointInterfaceNames.remove(endpointInterfaceName);
 
-        final EntryPointDefinition entryPointDefinition = new EntryPointDefinition((TypeElement) _entryPointDefinition, _endpointInterface, processingEnv);
+        final EntryPointDefinition entryPointDefinition = new EntryPointDefinition(_entryPointDefinition, _endpointInterface, processingEnv);
         if (entryPointDefinition.isIgnore()) {
           m_logger.info("Ignore entry point definition for endpoint interface '{}' [entryPoint={}, wsdl:portType={}, wsdl:service={}, wsdl:port={}]",
               endpointInterfaceName,
@@ -198,7 +199,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
         continue; // ignore entry point definitions
       }
 
-      endpointInterfaceNames.add(((TypeElement) candidate).getQualifiedName().toString());
+      endpointInterfaceNames.add(((QualifiedNameable) candidate).getQualifiedName().toString());
     }
 
     return endpointInterfaceNames;

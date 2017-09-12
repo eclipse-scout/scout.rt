@@ -306,7 +306,7 @@ public class JSONTokener {
   private Object readLiteral() {
     String literal = nextToInternal("{}[]/\\:,=;# \t\f");
 
-    if (literal.length() == 0) {
+    if (literal.isEmpty()) {
       if (m_lenient) {
         return JSONObject.NULL;
       }

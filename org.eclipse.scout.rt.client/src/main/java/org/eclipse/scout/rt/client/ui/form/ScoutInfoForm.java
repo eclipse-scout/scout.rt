@@ -45,10 +45,6 @@ import org.eclipse.scout.rt.shared.TEXTS;
 @ClassId("dee01442-979d-4231-a3f9-bd2a163e752a")
 public class ScoutInfoForm extends AbstractForm {
 
-  public ScoutInfoForm() {
-    super();
-  }
-
   @Override
   protected String getConfiguredTitle() {
     return TEXTS.get("Info");
@@ -121,9 +117,9 @@ public class ScoutInfoForm extends AbstractForm {
     return props;
   }
 
-  protected IHtmlTable createHtmlTable(Map<String, ? extends Object> properties) {
+  protected IHtmlTable createHtmlTable(Map<String, ?> properties) {
     List<IHtmlTableRow> rows = new ArrayList<>();
-    for (Entry<String, ? extends Object> p : properties.entrySet()) {
+    for (Entry<String, ?> p : properties.entrySet()) {
       rows.add(createHtmlRow(p.getKey(), p.getValue()));
     }
     return HTML.table(rows);
@@ -185,7 +181,7 @@ public class ScoutInfoForm extends AbstractForm {
 
     @Override
     protected void execLoad() {
-      List<BinaryResource> attachments = new ArrayList<BinaryResource>();
+      List<BinaryResource> attachments = new ArrayList<>();
       contributeHtmlAttachments(attachments);
       if (!attachments.isEmpty()) {
         getHtmlField().setAttachments(attachments);

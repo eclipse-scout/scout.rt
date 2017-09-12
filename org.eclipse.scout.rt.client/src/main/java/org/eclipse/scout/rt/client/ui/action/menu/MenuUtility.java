@@ -17,7 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
@@ -70,7 +69,7 @@ public final class MenuUtility {
    * @return a list of all visible menus an eliminated multiple occurrences of separators.
    */
   public static <T extends IActionNode<?>> List<T> consolidateMenus(List<T> original) {
-    LinkedList<T> consolidatedMenus = new LinkedList<T>();
+    LinkedList<T> consolidatedMenus = new LinkedList<>();
     T lastMenu = null;
     for (T m : original) {
       if (isVisible(m)) {
@@ -97,7 +96,7 @@ public final class MenuUtility {
     if (CollectionUtility.isEmpty(selectedResources)) {
       return CollectionUtility.hashSet(PlannerMenuType.EmptySpace);
     }
-    Set<PlannerMenuType> menuTypes = new HashSet<PlannerMenuType>();
+    Set<PlannerMenuType> menuTypes = new HashSet<>();
     if (CollectionUtility.size(selectedResources) > 0) {
       menuTypes.add(PlannerMenuType.Resource);
     }
@@ -170,16 +169,13 @@ public final class MenuUtility {
       return null;
     }
 
-    final List<T> collectedMenus = new ArrayList<T>();
-    contextMenu.acceptVisitor(new IActionVisitor() {
-      @Override
-      public int visit(IAction action) {
-        if (menuType.isInstance(action)) {
-          T menu = menuType.cast(action);
-          collectedMenus.add(menu);
-        }
-        return CONTINUE;
+    final List<T> collectedMenus = new ArrayList<>();
+    contextMenu.acceptVisitor(action -> {
+      if (menuType.isInstance(action)) {
+        T menu = menuType.cast(action);
+        collectedMenus.add(menu);
       }
+      return IActionVisitor.CONTINUE;
     });
 
     if (collectedMenus.isEmpty()) {

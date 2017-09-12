@@ -32,7 +32,7 @@ public class Status implements IStatus, Serializable {
   private final String m_message;
   private int m_code;
   private String m_iconId;
-  private double m_order;
+  private final double m_order;
 
   /**
    * @param severity

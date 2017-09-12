@@ -12,7 +12,8 @@ package org.eclipse.scout.rt.platform.util;
 
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -71,7 +72,7 @@ public final class TuningUtility {
     TIMER_STACK = new LinkedList<>();
     // analysis
     ANALYSIS_MAP_LOCK = new Object();
-    ANALYSIS_MAP = new TreeMap<String, TreeSet<CompositeObject>>();
+    ANALYSIS_MAP = new TreeMap<>();
   }
 
   /**
@@ -122,11 +123,7 @@ public final class TuningUtility {
     }
     if (addToBatch) {
       synchronized (ANALYSIS_MAP_LOCK) {
-        TreeSet<CompositeObject> set = ANALYSIS_MAP.get(name);
-        if (set == null) {
-          set = new TreeSet<CompositeObject>();
-          ANALYSIS_MAP.put(name, set);
-        }
+        TreeSet<CompositeObject> set = ANALYSIS_MAP.computeIfAbsent(name, k -> new TreeSet<>());
         set.add(new CompositeObject(dtNanos, set.size()));
       }
     }
@@ -148,9 +145,9 @@ public final class TuningUtility {
       TIMER_STACK.pop();
     }
     synchronized (ANALYSIS_MAP_LOCK) {
-      for (Map.Entry<String, TreeSet<CompositeObject>> e : ANALYSIS_MAP.entrySet()) {
+      for (Entry<String, TreeSet<CompositeObject>> e : ANALYSIS_MAP.entrySet()) {
         String name = e.getKey();
-        TreeSet<CompositeObject> set = e.getValue();
+        Set<CompositeObject> set = e.getValue();
         long[] seriesSorted = new long[set.size()];
         int index = 0;
         for (CompositeObject o : set) {
@@ -188,13 +185,13 @@ public final class TuningUtility {
     StringBuilder b = new StringBuilder();
     b.append("#TUNING: ");
     b.append(name);
-    b.append("[" + seriesSorted.length + "]");
+    b.append("[").append(seriesSorted.length).append("]");
     if (seriesSorted.length > 0) {
       double sum = 0;
       for (long n : seriesSorted) {
         sum += n;
       }
-      b.append(" sum=" + StringUtility.formatNanos((long) sum));
+      b.append(" sum=").append(StringUtility.formatNanos((long) sum));
       long avg = (long) (sum / seriesSorted.length);
       b.append("ms");
       b.append(" min=");
@@ -213,12 +210,12 @@ public final class TuningUtility {
       int start = Math.max(1, seriesSorted.length / 100);
       int end = Math.min(seriesSorted.length - 2, seriesSorted.length - 1 - seriesSorted.length / 100);
       if (start < end) {
-        b.append("  [without " + start + " smallest and " + (seriesSorted.length - 1 - end) + " largest: ");
+        b.append("  [without ").append(start).append(" smallest and ").append(seriesSorted.length - 1 - end).append(" largest: ");
         sum = 0;
         for (int i = start; i <= end; i++) {
           sum += seriesSorted[i];
         }
-        b.append(" sum=" + StringUtility.formatNanos((long) sum));
+        b.append(" sum=").append(StringUtility.formatNanos((long) sum));
         avg = (long) (sum / (end - start));
         b.append(" min=");
         b.append(StringUtility.formatNanos(seriesSorted[start]));

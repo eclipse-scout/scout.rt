@@ -45,7 +45,7 @@ public class ProcessInspector {
   private final Set<String> m_ignoredCallSet;
 
   public ProcessInspector() {
-    m_sessionToInspectorMap = new ConcurrentExpiringMap<IServerSession, SessionInspector>(2, TimeUnit.MINUTES);
+    m_sessionToInspectorMap = new ConcurrentExpiringMap<>(2, TimeUnit.MINUTES);
     m_ignoredCallSet = Collections.synchronizedSet(new HashSet<String>());
   }
 
@@ -89,11 +89,11 @@ public class ProcessInspector {
   }
 
   public void setTimeout(long timeoutMillis) {
-    m_sessionToInspectorMap = new ConcurrentExpiringMap<IServerSession, SessionInspector>(m_sessionToInspectorMap, timeoutMillis, TimeUnit.MILLISECONDS);
+    m_sessionToInspectorMap = new ConcurrentExpiringMap<>(m_sessionToInspectorMap, timeoutMillis, TimeUnit.MILLISECONDS);
   }
 
   public SessionInspector[] getSessionInspectors(String user) {
-    ArrayList<SessionInspector> a = new ArrayList<SessionInspector>();
+    ArrayList<SessionInspector> a = new ArrayList<>();
     for (SessionInspector si : m_sessionToInspectorMap.values()) {
       if (("" + user).equalsIgnoreCase("" + si.getInfo().getUserId())) {
         a.add(si);
@@ -121,7 +121,7 @@ public class ProcessInspector {
 
   public void clearSessionInspectors(String user) {
     for (Iterator<Entry<IServerSession, SessionInspector>> iterator = m_sessionToInspectorMap.entrySet().iterator(); iterator.hasNext();) {
-      Entry<IServerSession, SessionInspector> entry = (Entry<IServerSession, SessionInspector>) iterator.next();
+      Entry<IServerSession, SessionInspector> entry = iterator.next();
       SessionInspector session = entry.getValue();
       if (("" + user).equalsIgnoreCase("" + session.getInfo().getUserId())) {
         iterator.remove();

@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.shared.services.common.security.IAccessControlServic
  */
 public class TableOrganizer implements ITableOrganizer {
 
-  private ITable m_table;
+  private final ITable m_table;
 
   public TableOrganizer(ITable table) {
     m_table = table;

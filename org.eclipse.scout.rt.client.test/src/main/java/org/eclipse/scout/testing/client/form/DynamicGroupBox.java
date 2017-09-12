@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
  */
 @ClassId("23b1f701-f076-40a6-85cc-505b1ca27220")
 public class DynamicGroupBox extends AbstractGroupBox {
-  private IFormField[] m_injectedFields;
+  private final IFormField[] m_injectedFields;
 
   public DynamicGroupBox(IFormField... fields) {
     super(false);

@@ -308,13 +308,13 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   private void initMenus() {
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
-    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
+    OrderedCollection<IMenu> menus = new OrderedCollection<>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
       menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
     }
     menus.addAllOrdered(contributedMenus);
     injectMenusInternal(menus);
-    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
+    new MoveActionNodesHandler<>(menus).moveModelObjects();
     // set container on menus
     IFormFieldContextMenu contextMenu = new FormFieldContextMenu<IGroupBox>(this, menus.getOrderedList());
     contextMenu.setContainerInternal(this);
@@ -330,10 +330,10 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
 
   private void categorizeFields() {
     // categorize items
-    List<IFormField> controlList = new ArrayList<IFormField>();
-    List<IGroupBox> groupList = new ArrayList<IGroupBox>();
-    List<IButton> customButtonList = new ArrayList<IButton>();
-    List<IButton> systemButtonList = new ArrayList<IButton>();
+    List<IFormField> controlList = new ArrayList<>();
+    List<IGroupBox> groupList = new ArrayList<>();
+    List<IButton> customButtonList = new ArrayList<>();
+    List<IButton> systemButtonList = new ArrayList<>();
     for (IFormField field : getFields()) {
       if (field instanceof IGroupBox) {
         groupList.add((IGroupBox) field);
@@ -677,6 +677,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
 
   @Override
   protected IGroupBoxExtension<? extends AbstractGroupBox> createLocalExtension() {
-    return new LocalGroupBoxExtension<AbstractGroupBox>(this);
+    return new LocalGroupBoxExtension<>(this);
   }
 }

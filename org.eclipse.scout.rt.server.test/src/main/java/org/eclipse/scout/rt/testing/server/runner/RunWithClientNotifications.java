@@ -16,8 +16,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
+import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
 
 /**
  * Annotation to set {@link ThreadLocal} for client notifications.

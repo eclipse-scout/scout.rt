@@ -12,10 +12,10 @@ package org.eclipse.scout.rt.server.jdbc.parsers.token;
 
 public class DatabaseSpecificToken implements IToken {
   // sql text
-  private String m_parsedToken;
+  private final String m_parsedToken;
   private String m_replaceToken;
   // bind info
-  private String m_name;
+  private final String m_name;
 
   public DatabaseSpecificToken(String parsedToken, String name) {
     m_parsedToken = parsedToken;

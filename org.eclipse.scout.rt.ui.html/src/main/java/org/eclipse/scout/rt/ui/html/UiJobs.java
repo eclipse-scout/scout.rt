@@ -84,13 +84,7 @@ public class UiJobs {
     }
     catch (final ThreadInterruptedError e) {
       // Handle exception in proper ClientRunContext.
-      ClientRunContexts.copyCurrent().withSession(clientSession, true).run(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          BEANS.get(exceptionHandler).handle(e);
-        }
-      });
+      ClientRunContexts.copyCurrent().withSession(clientSession, true).run(() -> BEANS.get(exceptionHandler).handle(e));
     }
     catch (TimedOutError e) {
       handleAwaitModelJobsTimedOutError(clientSession, exceptionHandler, e);
@@ -101,16 +95,11 @@ public class UiJobs {
     LOG.warn("Timeout while waiting for model jobs to finish, cancelling running and scheduled model jobs.");
     cancelModelJobs(clientSession);
 
-    ModelJobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        MessageBoxes.createOk()
-            .withHeader(TEXTS.get("ui.RequestTimeout"))
-            .withBody(TEXTS.get("ui.RequestTimeoutMsg"))
-            .withSeverity(IStatus.ERROR).show();
-      }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(clientSession, true))
-        .withName("Handling await model jobs timeout"));
+    ModelJobs.schedule((IRunnable) MessageBoxes.createOk()
+        .withHeader(TEXTS.get("ui.RequestTimeout"))
+        .withBody(TEXTS.get("ui.RequestTimeoutMsg"))
+        .withSeverity(IStatus.ERROR)::show, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(clientSession, true))
+            .withName("Handling await model jobs timeout"));
   }
 
   /**
@@ -119,8 +108,8 @@ public class UiJobs {
   public void cancelModelJobs(IClientSession clientSession) {
     Jobs.getJobManager().cancel(ModelJobs.newFutureFilterBuilder()
         .andMatch(new SessionFutureFilter(clientSession))
-        .andMatchNotExecutionHint(UiJobs.EXECUTION_HINT_RESPONSE_TO_JSON)
-        .andMatchNotExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST)
+        .andMatchNotExecutionHint(EXECUTION_HINT_RESPONSE_TO_JSON)
+        .andMatchNotExecutionHint(EXECUTION_HINT_POLL_REQUEST)
         .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)
         .toFilter(), true);
   }

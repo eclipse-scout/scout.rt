@@ -17,6 +17,7 @@ package org.eclipse.scout.rt.shared.extension;
  *
  * @since 4.2
  */
+@FunctionalInterface
 public interface IExtension<OWNER extends IExtensibleObject> {
 
   /**

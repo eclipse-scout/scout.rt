@@ -56,6 +56,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
@@ -125,7 +126,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   public AbstractColumn(boolean callInitializer) {
     m_headerCell = new HeaderCell();
     m_visible = NamedBitMaskHelper.ALL_BITS_SET; // default visible
-    m_objectExtensions = new ObjectExtensions<AbstractColumn<VALUE>, IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>>(this, false);
+    m_objectExtensions = new ObjectExtensions<>(this, false);
     if (callInitializer) {
       callInitializer();
     }
@@ -803,7 +804,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     if (!(editField instanceof IValueField<?>)) {
       throw new ProcessingException("Expected a value field.");
     }
-    return (VALUE) ((IValueField) editField).getValue();
+    return (VALUE) ((IHolder) editField).getValue();
   }
 
   private boolean contentEquals(Cell cell, IValueField<VALUE> field) {
@@ -843,7 +844,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   protected IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>> createLocalExtension() {
-    return new LocalColumnExtension<VALUE, AbstractColumn<VALUE>>(this);
+    return new LocalColumnExtension<>(this);
   }
 
   @Override
@@ -852,12 +853,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
-      @Override
-      public void run() {
-        initConfig();
-      }
-    });
+    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
   protected void initConfig() {
@@ -927,7 +923,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     if (viewOrder == IOrdered.DEFAULT_ORDER) {
       while (cls != null && IColumn.class.isAssignableFrom(cls)) {
         if (cls.isAnnotationPresent(Order.class)) {
-          Order order = (Order) cls.getAnnotation(Order.class);
+          Order order = cls.getAnnotation(Order.class);
           return order.value();
         }
         cls = cls.getSuperclass();
@@ -1184,7 +1180,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       }
       Cell cell = r.getCellForUpdate(this);
       //add error
-      cell.addErrorStatus(new ValidationFailedStatus<VALUE>(e, value));
+      cell.addErrorStatus(new ValidationFailedStatus<>(e, value));
       updateDisplayText(r, value);
     }
   }
@@ -1205,7 +1201,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public List<VALUE> getValues() {
     int rowCount = m_table.getRowCount();
-    List<VALUE> values = new ArrayList<VALUE>(rowCount);
+    List<VALUE> values = new ArrayList<>(rowCount);
     for (int i = 0; i < rowCount; i++) {
       values.add(getValue(m_table.getRow(i)));
     }
@@ -1214,7 +1210,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public List<VALUE> getValues(boolean includeDeleted) {
-    List<VALUE> values = new ArrayList<VALUE>();
+    List<VALUE> values = new ArrayList<>();
     for (ITableRow row : m_table.getRows()) {
       if (includeDeleted || (row.getStatus() != ITableRow.STATUS_DELETED)) {
         values.add(getValue(row));
@@ -1225,7 +1221,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public List<VALUE> getValues(Collection<? extends ITableRow> rows) {
-    List<VALUE> values = new ArrayList<VALUE>(rows.size());
+    List<VALUE> values = new ArrayList<>(rows.size());
     for (ITableRow row : rows) {
       values.add(getValue(row));
     }
@@ -1235,7 +1231,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public List<VALUE> getSelectedValues() {
     List<ITableRow> selectedRows = m_table.getSelectedRows();
-    List<VALUE> values = new ArrayList<VALUE>(selectedRows.size());
+    List<VALUE> values = new ArrayList<>(selectedRows.size());
     for (ITableRow row : selectedRows) {
       values.add(getValue(row));
     }
@@ -1260,7 +1256,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public List<String> getDisplayTexts() {
-    List<String> values = new ArrayList<String>(m_table.getRowCount());
+    List<String> values = new ArrayList<>(m_table.getRowCount());
     for (int i = 0; i < m_table.getRowCount(); i++) {
       values.add(getDisplayText(m_table.getRow(i)));
     }
@@ -1281,7 +1277,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public List<String> getSelectedDisplayTexts() {
     List<ITableRow> selectedRows = m_table.getSelectedRows();
-    List<String> values = new ArrayList<String>(selectedRows.size());
+    List<String> values = new ArrayList<>(selectedRows.size());
     for (ITableRow row : selectedRows) {
       values.add(getDisplayText(row));
     }
@@ -1291,7 +1287,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public List<VALUE> getInsertedValues() {
     List<ITableRow> insertedRows = m_table.getInsertedRows();
-    List<VALUE> values = new ArrayList<VALUE>(insertedRows.size());
+    List<VALUE> values = new ArrayList<>(insertedRows.size());
     for (ITableRow row : insertedRows) {
       values.add(getValue(row));
     }
@@ -1301,7 +1297,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public List<VALUE> getUpdatedValues() {
     List<ITableRow> updatedRows = m_table.getUpdatedRows();
-    List<VALUE> values = new ArrayList<VALUE>(updatedRows.size());
+    List<VALUE> values = new ArrayList<>(updatedRows.size());
     for (ITableRow row : updatedRows) {
       values.add(getValue(row));
     }
@@ -1311,7 +1307,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public List<VALUE> getDeletedValues() {
     List<ITableRow> deletedRows = m_table.getDeletedRows();
-    List<VALUE> values = new ArrayList<VALUE>(deletedRows.size());
+    List<VALUE> values = new ArrayList<>(deletedRows.size());
     for (ITableRow row : deletedRows) {
       values.add(getValue(row));
     }
@@ -1321,7 +1317,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public List<VALUE> getNotDeletedValues() {
     List<ITableRow> notDeletedRows = m_table.getNotDeletedRows();
-    List<VALUE> values = new ArrayList<VALUE>(notDeletedRows.size());
+    List<VALUE> values = new ArrayList<>(notDeletedRows.size());
     for (ITableRow row : notDeletedRows) {
       values.add(getValue(row));
     }
@@ -1331,7 +1327,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public List<ITableRow> findRows(Collection<? extends VALUE> values) {
     if (values != null) {
-      List<ITableRow> foundRows = new ArrayList<ITableRow>();
+      List<ITableRow> foundRows = new ArrayList<>();
       for (int i = 0; i < m_table.getRowCount(); i++) {
         ITableRow row = m_table.getRow(i);
         if (ObjectUtility.isOneOf(getValue(row), values)) {
@@ -1345,7 +1341,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public List<ITableRow> findRows(VALUE value) {
-    List<ITableRow> foundRows = new ArrayList<ITableRow>();
+    List<ITableRow> foundRows = new ArrayList<>();
     for (int i = 0; i < m_table.getRowCount(); i++) {
       ITableRow row = m_table.getRow(i);
       if (ObjectUtility.equals(value, getValue(row))) {
@@ -1379,7 +1375,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public boolean containsDuplicateValues() {
-    return new HashSet<VALUE>(getValues()).size() < getValues().size();
+    return new HashSet<>(getValues()).size() < getValues().size();
   }
 
   @Override
@@ -2051,49 +2047,49 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   protected final void interceptCompleteEdit(ITableRow row, IFormField editingField) {
     List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> extensions = getAllExtensions();
-    ColumnCompleteEditChain<VALUE> chain = new ColumnCompleteEditChain<VALUE>(extensions);
+    ColumnCompleteEditChain<VALUE> chain = new ColumnCompleteEditChain<>(extensions);
     chain.execCompleteEdit(row, editingField);
   }
 
   protected final void interceptInitColumn() {
     List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> extensions = getAllExtensions();
-    ColumnInitColumnChain<VALUE> chain = new ColumnInitColumnChain<VALUE>(extensions);
+    ColumnInitColumnChain<VALUE> chain = new ColumnInitColumnChain<>(extensions);
     chain.execInitColumn();
   }
 
   protected final VALUE interceptParseValue(ITableRow row, Object rawValue) {
     List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> extensions = getAllExtensions();
-    ColumnParseValueChain<VALUE> chain = new ColumnParseValueChain<VALUE>(extensions);
+    ColumnParseValueChain<VALUE> chain = new ColumnParseValueChain<>(extensions);
     return chain.execParseValue(row, rawValue);
   }
 
   protected final VALUE interceptValidateValue(ITableRow row, VALUE rawValue) {
     List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> extensions = getAllExtensions();
-    ColumnValidateValueChain<VALUE> chain = new ColumnValidateValueChain<VALUE>(extensions);
+    ColumnValidateValueChain<VALUE> chain = new ColumnValidateValueChain<>(extensions);
     return chain.execValidateValue(row, rawValue);
   }
 
   protected final IFormField interceptPrepareEdit(ITableRow row) {
     List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> extensions = getAllExtensions();
-    ColumnPrepareEditChain<VALUE> chain = new ColumnPrepareEditChain<VALUE>(extensions);
+    ColumnPrepareEditChain<VALUE> chain = new ColumnPrepareEditChain<>(extensions);
     return chain.execPrepareEdit(row);
   }
 
   protected final void interceptDecorateHeaderCell(HeaderCell cell) {
     List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> extensions = getAllExtensions();
-    ColumnDecorateHeaderCellChain<VALUE> chain = new ColumnDecorateHeaderCellChain<VALUE>(extensions);
+    ColumnDecorateHeaderCellChain<VALUE> chain = new ColumnDecorateHeaderCellChain<>(extensions);
     chain.execDecorateHeaderCell(cell);
   }
 
   protected final void interceptDecorateCell(Cell cell, ITableRow row) {
     List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> extensions = getAllExtensions();
-    ColumnDecorateCellChain<VALUE> chain = new ColumnDecorateCellChain<VALUE>(extensions);
+    ColumnDecorateCellChain<VALUE> chain = new ColumnDecorateCellChain<>(extensions);
     chain.execDecorateCell(cell, row);
   }
 
   protected final void interceptDisposeColumn() {
     List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> extensions = getAllExtensions();
-    ColumnDisposeColumnChain<VALUE> chain = new ColumnDisposeColumnChain<VALUE>(extensions);
+    ColumnDisposeColumnChain<VALUE> chain = new ColumnDisposeColumnChain<>(extensions);
     chain.execDisposeColumn();
   }
 

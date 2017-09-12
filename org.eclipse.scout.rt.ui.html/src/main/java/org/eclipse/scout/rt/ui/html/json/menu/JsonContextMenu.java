@@ -33,15 +33,15 @@ import org.json.JSONArray;
 public class JsonContextMenu<CONTEXT_MENU extends IContextMenu> {
 
   private ContextMenuListener m_contextMenuListener;
-  private Set<IJsonAdapter<?>> m_jsonMenuAdapters = new HashSet<IJsonAdapter<?>>();
+  private final Set<IJsonAdapter<?>> m_jsonMenuAdapters = new HashSet<>();
 
   private final IUiSession m_uiSession;
   private final CONTEXT_MENU m_model;
-  private IJsonAdapter<?> m_parent;
-  private IFilter<IMenu> m_filter;
+  private final IJsonAdapter<?> m_parent;
+  private final IFilter<IMenu> m_filter;
 
   public JsonContextMenu(CONTEXT_MENU model, IJsonAdapter<?> parent) {
-    this(model, parent, new DisplayableActionFilter<IMenu>());
+    this(model, parent, new DisplayableActionFilter<>());
   }
 
   public JsonContextMenu(CONTEXT_MENU model, IJsonAdapter<?> parent, IFilter<IMenu> filter) {
@@ -110,7 +110,7 @@ public class JsonContextMenu<CONTEXT_MENU extends IContextMenu> {
   }
 
   public void handleModelContextMenuStructureChanged(ContextMenuEvent event) {
-    Set<IJsonAdapter> jsonMenuAdapters = new HashSet<IJsonAdapter>(m_jsonMenuAdapters);
+    Set<IJsonAdapter> jsonMenuAdapters = new HashSet<>(m_jsonMenuAdapters);
     for (IJsonAdapter<?> adapter : jsonMenuAdapters) {
       // Dispose adapter only if's model is not part of the new models
       if (!getModel().getChildActions().contains((adapter.getModel()))) {

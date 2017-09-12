@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 
 public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCapable {
 
-  static enum CloseType {
+  enum CloseType {
     /**
      * wizard is not yet closed so the close state is unknown, see also {@link IWizard#close()},
      * {@link IWizard#isClosed()}, {@link IWizard#getCloseType()}

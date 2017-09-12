@@ -22,13 +22,13 @@ public class BookmarkFolder implements Serializable {
   private long m_id;
   private String m_title;
   private String m_iconId;
-  private List<BookmarkFolder> m_folders;
-  private List<Bookmark> m_bookmarks;
+  private final List<BookmarkFolder> m_folders;
+  private final List<Bookmark> m_bookmarks;
   private Bookmark m_startupBookmark;
 
   public BookmarkFolder() {
-    m_folders = new ArrayList<BookmarkFolder>();
-    m_bookmarks = new ArrayList<Bookmark>();
+    m_folders = new ArrayList<>();
+    m_bookmarks = new ArrayList<>();
   }
 
   protected BookmarkFolder(BookmarkFolder other) {
@@ -177,7 +177,7 @@ public class BookmarkFolder implements Serializable {
    * visit all bookmarks in this folder and all its sub-folders
    */
   public boolean visit(IBookmarkVisitor v) {
-    ArrayList<BookmarkFolder> path = new ArrayList<BookmarkFolder>();
+    List<BookmarkFolder> path = new ArrayList<>();
     return visitInternal(v, path);
   }
 
@@ -190,13 +190,13 @@ public class BookmarkFolder implements Serializable {
       if (!result) {
         return result;
       }
-      for (Bookmark b : new ArrayList<Bookmark>(getBookmarks())) {
+      for (Bookmark b : new ArrayList<>(getBookmarks())) {
         result = v.visitBookmark(path, b);
         if (!result) {
           return result;
         }
       }
-      for (BookmarkFolder f : new ArrayList<BookmarkFolder>(getFolders())) {
+      for (BookmarkFolder f : new ArrayList<>(getFolders())) {
         result = f.visitInternal(v, path);
         if (!result) {
           return result;

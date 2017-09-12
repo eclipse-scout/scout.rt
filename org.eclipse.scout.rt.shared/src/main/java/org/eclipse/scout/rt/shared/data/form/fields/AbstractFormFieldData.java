@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.form.fields;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +22,7 @@ import org.eclipse.scout.rt.shared.data.form.IPropertyHolder;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 import org.eclipse.scout.rt.shared.extension.AbstractContributionComposite;
 
-public abstract class AbstractFormFieldData extends AbstractContributionComposite implements IPropertyHolder, Serializable {
+public abstract class AbstractFormFieldData extends AbstractContributionComposite implements IPropertyHolder {
   private static final long serialVersionUID = 1L;
 
   private Map<Class<?>, Class<? extends AbstractFormFieldData>> m_fieldDataReplacements;
@@ -58,7 +57,7 @@ public abstract class AbstractFormFieldData extends AbstractContributionComposit
   protected void initConfig() {
     // add properties
     List<Class<AbstractPropertyData>> configuredPropertyDatas = getConfiguredPropertyDatas();
-    Map<Class<? extends AbstractPropertyData>, AbstractPropertyData> propMap = new HashMap<Class<? extends AbstractPropertyData>, AbstractPropertyData>(configuredPropertyDatas.size());
+    Map<Class<? extends AbstractPropertyData>, AbstractPropertyData> propMap = new HashMap<>(configuredPropertyDatas.size());
     for (Class<AbstractPropertyData> propertyDataClazz : configuredPropertyDatas) {
       AbstractPropertyData p = ConfigurationUtility.newInnerInstance(this, propertyDataClazz);
       propMap.put(p.getClass(), p);
@@ -66,7 +65,7 @@ public abstract class AbstractFormFieldData extends AbstractContributionComposit
 
     // add fields
     List<Class<? extends AbstractFormFieldData>> fieldDataClasses = getConfiguredFieldDatas();
-    Map<Class<? extends AbstractFormFieldData>, AbstractFormFieldData> map = new HashMap<Class<? extends AbstractFormFieldData>, AbstractFormFieldData>(fieldDataClasses.size());
+    Map<Class<? extends AbstractFormFieldData>, AbstractFormFieldData> map = new HashMap<>(fieldDataClasses.size());
     for (Class<? extends AbstractFormFieldData> formFieldDataClazz : fieldDataClasses) {
       AbstractFormFieldData f = ConfigurationUtility.newInnerInstance(this, formFieldDataClazz);
       map.put(f.getClass(), f);
@@ -135,7 +134,7 @@ public abstract class AbstractFormFieldData extends AbstractContributionComposit
     }
     else {
       if (m_propertyMap == null) {
-        m_propertyMap = new HashMap<Class<? extends AbstractPropertyData>, AbstractPropertyData>();
+        m_propertyMap = new HashMap<>();
       }
       m_propertyMap.put(c, v);
     }
@@ -177,7 +176,7 @@ public abstract class AbstractFormFieldData extends AbstractContributionComposit
     }
     else {
       if (m_fieldMap == null) {
-        m_fieldMap = new HashMap<Class<? extends AbstractFormFieldData>, AbstractFormFieldData>();
+        m_fieldMap = new HashMap<>();
       }
       m_fieldMap.put(clazz, v);
     }

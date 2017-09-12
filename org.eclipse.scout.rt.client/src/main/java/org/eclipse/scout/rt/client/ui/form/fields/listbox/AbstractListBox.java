@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.listbox;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -252,7 +250,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     if (!isMasterRequired() || getMasterValue() != null) {
       data = interceptLoadTableData();
     }
-    List<ITableRow> rows = new ArrayList<ITableRow>();
+    List<ITableRow> rows = new ArrayList<>();
     if (data != null) {
       for (ILookupRow<KEY> lr : data) {
         rows.add(getTableRowBuilder().createTableRow(lr));
@@ -286,7 +284,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
   @Override
   protected void initConfig() {
     m_fields = CollectionUtility.emptyArrayList();
-    m_movedFormFieldsByClass = new HashMap<Class<? extends IFormField>, IFormField>();
+    m_movedFormFieldsByClass = new HashMap<>();
     super.initConfig();
     setFilterActiveRows(getConfiguredFilterActiveRows());
     setFilterActiveRowsValue(TriState.TRUE);
@@ -347,36 +345,33 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
       setCodeTypeClass(getConfiguredCodeType());
     }
     // local property listener
-    addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent e) {
-        if (m_table == null) {
-          return;
-        }
+    addPropertyChangeListener(e -> {
+      if (m_table == null) {
+        return;
+      }
 
-        String name = e.getPropertyName();
-        if (PROP_ENABLED_COMPUTED.equals(name)) {
-          boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
-          m_table.setEnabled(newEnabled);
-        }
-        else if (PROP_FILTER_CHECKED_ROWS_VALUE.equals(name)) {
-          updateCheckedRowsFilter();
-        }
-        else if (PROP_FILTER_ACTIVE_ROWS_VALUE.equals(name)) {
-          updateActiveRowsFilter();
-        }
+      String name = e.getPropertyName();
+      if (PROP_ENABLED_COMPUTED.equals(name)) {
+        boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
+        m_table.setEnabled(newEnabled);
+      }
+      else if (PROP_FILTER_CHECKED_ROWS_VALUE.equals(name)) {
+        updateCheckedRowsFilter();
+      }
+      else if (PROP_FILTER_ACTIVE_ROWS_VALUE.equals(name)) {
+        updateActiveRowsFilter();
       }
     });
     // add fields
     List<Class<? extends IFormField>> fieldClasses = getConfiguredFields();
     List<IFormField> contributedFields = m_contributionHolder.getContributionsByClass(IFormField.class);
-    List<IFormField> fieldList = new ArrayList<IFormField>(fieldClasses.size() + contributedFields.size());
+    List<IFormField> fieldList = new ArrayList<>(fieldClasses.size() + contributedFields.size());
     for (Class<? extends IFormField> fieldClazz : fieldClasses) {
       IFormField f = ConfigurationUtility.newInnerInstance(this, fieldClazz);
       fieldList.add(f);
     }
     fieldList.addAll(contributedFields);
-    Collections.sort(fieldList, new OrderedComparator());
+    fieldList.sort(new OrderedComparator());
 
     for (IFormField f : fieldList) {
       f.setParentFieldInternal(this);
@@ -677,7 +672,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
 
   @Override
   public void setSingleValue(KEY value) {
-    Set<KEY> valueSet = new HashSet<KEY>();
+    Set<KEY> valueSet = new HashSet<>();
     if (value != null) {
       valueSet.add(value);
     }
@@ -708,10 +703,10 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
   @Override
   public Set<ILookupRow<KEY>> getCheckedLookupRows() {
     Collection<ITableRow> checkedRows = getTable().getCheckedRows();
-    Set<ILookupRow<KEY>> result = new HashSet<ILookupRow<KEY>>(checkedRows.size());
+    Set<ILookupRow<KEY>> result = new HashSet<>(checkedRows.size());
     for (ITableRow row : checkedRows) {
       ICell cell = row.getCell(1);
-      result.add(new LookupRow<KEY>((KEY) row.getCellValue(0), cell.getText())
+      result.add(new LookupRow<>((KEY) row.getCellValue(0), cell.getText())
           .withIconId(cell.getIconId())
           .withTooltipText(cell.getTooltipText())
           .withBackgroundColor(cell.getBackgroundColor())
@@ -734,7 +729,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
 
   @Override
   public void checkKeys(Collection<? extends KEY> keys) {
-    setValue(CollectionUtility.<KEY> hashSetWithoutNullElements(keys));
+    setValue(CollectionUtility.hashSetWithoutNullElements(keys));
   }
 
   @Override
@@ -752,7 +747,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
 
   @Override
   public Set<KEY> getUncheckedKeys() {
-    Set<KEY> result = new HashSet<KEY>();
+    Set<KEY> result = new HashSet<>();
     Set<KEY> initValue = getInitValue();
     if (initValue != null) {
       result.addAll(initValue);
@@ -1075,25 +1070,25 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
 
   protected final void interceptPopulateTable() {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    ListBoxPopulateTableChain<KEY> chain = new ListBoxPopulateTableChain<KEY>(extensions);
+    ListBoxPopulateTableChain<KEY> chain = new ListBoxPopulateTableChain<>(extensions);
     chain.execPopulateTable();
   }
 
   protected final List<? extends ILookupRow<KEY>> interceptLoadTableData() {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    ListBoxLoadTableDataChain<KEY> chain = new ListBoxLoadTableDataChain<KEY>(extensions);
+    ListBoxLoadTableDataChain<KEY> chain = new ListBoxLoadTableDataChain<>(extensions);
     return chain.execLoadTableData();
   }
 
   protected final void interceptFilterLookupResult(ILookupCall<KEY> call, List<ILookupRow<KEY>> result) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    ListBoxFilterLookupResultChain<KEY> chain = new ListBoxFilterLookupResultChain<KEY>(extensions);
+    ListBoxFilterLookupResultChain<KEY> chain = new ListBoxFilterLookupResultChain<>(extensions);
     chain.execFilterLookupResult(call, result);
   }
 
   protected final void interceptPrepareLookup(ILookupCall<KEY> call) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    ListBoxPrepareLookupChain<KEY> chain = new ListBoxPrepareLookupChain<KEY>(extensions);
+    ListBoxPrepareLookupChain<KEY> chain = new ListBoxPrepareLookupChain<>(extensions);
     chain.execPrepareLookup(call);
   }
 
@@ -1126,6 +1121,6 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
 
   @Override
   protected IListBoxExtension<KEY, ? extends AbstractListBox<KEY>> createLocalExtension() {
-    return new LocalListBoxExtension<KEY, AbstractListBox<KEY>>(this);
+    return new LocalListBoxExtension<>(this);
   }
 }

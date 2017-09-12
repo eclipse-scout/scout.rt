@@ -15,6 +15,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,9 +32,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings({"serial", "squid:S2057"})
-public class TableEvent extends java.util.EventObject implements IModelEvent {
+public class TableEvent extends EventObject implements IModelEvent {
 
-  private static Logger LOG = LoggerFactory.getLogger(TableEvent.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TableEvent.class);
   /**
    * Column visibility and/or order and/or width changed
    */
@@ -266,7 +267,7 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
   public void addPopupMenu(IMenu menu) {
     if (menu != null) {
       if (m_popupMenus == null) {
-        m_popupMenus = new ArrayList<IMenu>();
+        m_popupMenus = new ArrayList<>();
       }
       m_popupMenus.add(menu);
     }
@@ -278,7 +279,7 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
   public void addPopupMenus(List<IMenu> menus) {
     if (menus != null) {
       if (m_popupMenus == null) {
-        m_popupMenus = new ArrayList<IMenu>();
+        m_popupMenus = new ArrayList<>();
       }
       m_popupMenus.addAll(menus);
     }
@@ -408,7 +409,7 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    buf.append(getClass().getSimpleName() + "[");
+    buf.append(getClass().getSimpleName()).append("[");
     buf.append(getTypeName());
     // rows
     if (CollectionUtility.hasElements(m_rows) && getTable() != null) {
@@ -419,10 +420,10 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
       else {
         buf.append("rows {");
         Iterator<? extends ITableRow> rowIt = m_rows.iterator();
-        buf.append("" + rowIt.next());
+        buf.append("").append(rowIt.next());
         while (rowIt.hasNext()) {
           buf.append(",");
-          buf.append("" + rowIt.next());
+          buf.append("").append(rowIt.next());
         }
         buf.append("}");
       }
@@ -437,10 +438,10 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
   protected String getTypeName() {
     try {
       Field[] f = getClass().getDeclaredFields();
-      for (int i = 0; i < f.length; i++) {
-        if (Modifier.isPublic(f[i].getModifiers()) && Modifier.isStatic(f[i].getModifiers()) && f[i].getName().startsWith("TYPE_")
-            && ((Number) f[i].get(null)).intValue() == m_type) {
-          return (f[i].getName());
+      for (Field aF : f) {
+        if (Modifier.isPublic(aF.getModifiers()) && Modifier.isStatic(aF.getModifiers()) && aF.getName().startsWith("TYPE_")
+            && ((Number) aF.get(null)).intValue() == m_type) {
+          return (aF.getName());
         }
       }
     }

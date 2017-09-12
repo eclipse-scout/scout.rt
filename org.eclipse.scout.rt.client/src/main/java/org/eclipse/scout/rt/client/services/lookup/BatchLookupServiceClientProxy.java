@@ -30,7 +30,7 @@ public class BatchLookupServiceClientProxy implements IBatchLookupService {
   @Override
   public List<List<ILookupRow<?>>> getBatchDataByKey(BatchLookupCall batch) {
     List<ILookupCall<?>> allCalls = batch.getCallBatch();
-    List<ILookupCall<?>> cleanCalls = new ArrayList<ILookupCall<?>>(allCalls.size());
+    List<ILookupCall<?>> cleanCalls = new ArrayList<>(allCalls.size());
     //set calls with key==null to null
     for (ILookupCall<?> call : allCalls) {
       if (call != null && call.getKey() == null) {
@@ -44,7 +44,7 @@ public class BatchLookupServiceClientProxy implements IBatchLookupService {
     if (split.getLocalCallCount() > 0) {
       BatchLookupResultCache cache = new BatchLookupResultCache();
       List<ILookupCall<?>> calls = split.getLocalCalls();
-      List<List<ILookupRow<?>>> result = new ArrayList<List<ILookupRow<?>>>();
+      List<List<ILookupRow<?>>> result = new ArrayList<>();
       for (ILookupCall<?> call : calls) {
         result.add(cache.getDataByKey(call));
       }
@@ -75,7 +75,7 @@ public class BatchLookupServiceClientProxy implements IBatchLookupService {
     if (split.getLocalCallCount() > 0) {
       BatchLookupResultCache cache = new BatchLookupResultCache();
       List<ILookupCall<?>> calls = split.getLocalCalls();
-      List<List<ILookupRow<?>>> resultArray = new ArrayList<List<ILookupRow<?>>>();
+      List<List<ILookupRow<?>>> resultArray = new ArrayList<>();
       for (ILookupCall<?> call : calls) {
         resultArray.add(cache.getDataByText(call));
       }
@@ -94,7 +94,7 @@ public class BatchLookupServiceClientProxy implements IBatchLookupService {
     if (split.getLocalCallCount() > 0) {
       BatchLookupResultCache cache = new BatchLookupResultCache();
       List<ILookupCall<?>> calls = split.getLocalCalls();
-      List<List<ILookupRow<?>>> resultArray = new ArrayList<List<ILookupRow<?>>>();
+      List<List<ILookupRow<?>>> resultArray = new ArrayList<>();
       for (ILookupCall<?> call : calls) {
         resultArray.add(cache.getDataByAll(call));
       }
@@ -113,7 +113,7 @@ public class BatchLookupServiceClientProxy implements IBatchLookupService {
     if (split.getLocalCallCount() > 0) {
       BatchLookupResultCache cache = new BatchLookupResultCache();
       List<ILookupCall<?>> calls = split.getLocalCalls();
-      List<List<ILookupRow<?>>> resultArray = new ArrayList<List<ILookupRow<?>>>();
+      List<List<ILookupRow<?>>> resultArray = new ArrayList<>();
       for (ILookupCall<?> call : calls) {
         resultArray.add(cache.getDataByRec(call));
       }

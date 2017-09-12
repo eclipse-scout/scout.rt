@@ -42,7 +42,7 @@ public class FileChooserStore extends IndexedStore<IFileChooser> {
    * Returns <code>true</code> if this store contains 'application-modal' file choosers, or <code>false</code> if not.
    */
   public boolean containsApplicationModalFileChoosers() {
-    return m_applicationModalIndex.get(Boolean.TRUE).size() > 0;
+    return !m_applicationModalIndex.get(Boolean.TRUE).isEmpty();
   }
 
   // ====  Index definitions ==== //

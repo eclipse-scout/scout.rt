@@ -19,11 +19,11 @@ import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueInputToken;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 
 class BeanPropertyInput implements IBindInput {
-  private String m_propertyName;
+  private final String m_propertyName;
   private FastPropertyDescriptor m_propertyDesc;
-  private Object[] m_beans;
+  private final Object[] m_beans;
   private Object[] m_rawValues;
-  private ValueInputToken m_target;
+  private final ValueInputToken m_target;
   private int m_batchIndex = -1;
   private int m_jdbcBindIndex = -1;
 

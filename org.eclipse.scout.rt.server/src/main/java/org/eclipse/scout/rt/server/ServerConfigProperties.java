@@ -42,7 +42,7 @@ public final class ServerConfigProperties {
 
     @Override
     protected Long getDefaultValue() {
-      return Long.valueOf(TimeUnit.DAYS.toMillis(1));
+      return TimeUnit.DAYS.toMillis(1);
     }
 
     @Override

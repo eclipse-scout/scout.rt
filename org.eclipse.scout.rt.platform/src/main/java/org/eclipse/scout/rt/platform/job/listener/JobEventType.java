@@ -47,5 +47,5 @@ public enum JobEventType {
   /**
    * Signals that the job manager was shutdown.
    */
-  JOB_MANAGER_SHUTDOWN;
+  JOB_MANAGER_SHUTDOWN
 }

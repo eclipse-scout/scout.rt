@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -95,7 +94,7 @@ public abstract class AbstractEventBuffer<T extends IModelEvent> {
    */
   protected List<T> consume() {
     List<T> list = m_buffer;
-    m_buffer = new LinkedList<T>();
+    m_buffer = new LinkedList<>();
     m_lastAddedEvent = null;
     return list;
   }
@@ -123,12 +122,7 @@ public abstract class AbstractEventBuffer<T extends IModelEvent> {
    *          List to filter. Must not be <code>null</code>.
    */
   protected void remove(Set<Integer> types, List<T> events) {
-    for (Iterator<T> it = events.iterator(); it.hasNext();) {
-      T event = it.next();
-      if (types.contains(event.getType())) {
-        it.remove();
-      }
-    }
+    events.removeIf(event -> types.contains(event.getType()));
   }
 
   protected boolean isIdenticalEvent(T event1, T event2) {
@@ -142,7 +136,7 @@ public abstract class AbstractEventBuffer<T extends IModelEvent> {
       sb.append(" is empty");
     }
     else {
-      sb.append(" contains " + size() + " events:");
+      sb.append(" contains ").append(size()).append(" events:");
       sb.append("\n- ");
       sb.append(CollectionUtility.format(m_buffer, "\n- "));
     }

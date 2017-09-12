@@ -70,7 +70,7 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
     String validValue = null;
     rawValue = super.validateValueInternal(rawValue);
     validValue = rawValue;
-    if (validValue != null && validValue.length() == 0) {
+    if (validValue != null && validValue.isEmpty()) {
       validValue = null;
     }
     return validValue;
@@ -109,7 +109,7 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
   // convert string to a real string
   @Override
   protected String parseValueInternal(String text) {
-    if (text != null && text.length() == 0) {
+    if (text != null && text.isEmpty()) {
       text = null;
     }
     return text;
@@ -124,7 +124,7 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
 
   @Override
   protected ILabelFieldExtension<? extends AbstractLabelField> createLocalExtension() {
-    return new LocalLabelFieldExtension<AbstractLabelField>(this);
+    return new LocalLabelFieldExtension<>(this);
   }
 
 }

@@ -65,7 +65,7 @@ public class BeanManagerImplementor implements IBeanManager {
       @SuppressWarnings("unchecked")
       BeanHierarchy<T> h = m_beanHierarchies.get(beanClazz);
       if (h == null) {
-        return Collections.<IBean<T>> emptyList();
+        return Collections.emptyList();
       }
       else {
         List<IBean<T>> singleBean = h.querySingle();
@@ -95,8 +95,7 @@ public class BeanManagerImplementor implements IBeanManager {
 
   protected Collection<Class<?>> listImplementedTypes(IBean<?> bean) {
     //interfaces
-    Set<Class<?>> set = new LinkedHashSet<>();
-    set.addAll(BeanUtility.getInterfacesHierarchy(bean.getBeanClazz(), Object.class));
+    Set<Class<?>> set = new LinkedHashSet<>(BeanUtility.getInterfacesHierarchy(bean.getBeanClazz(), Object.class));
     //super types
     Class c = bean.getBeanClazz();
     while (c != null && c != Object.class) {
@@ -114,7 +113,7 @@ public class BeanManagerImplementor implements IBeanManager {
     }
 
     // apply decorations
-    List<IBean<T>> result = new ArrayList<IBean<T>>(beans.size());
+    List<IBean<T>> result = new ArrayList<>(beans.size());
     for (IBean<T> bean : beans) {
       result.add(getDecoratedBean(bean, beanClazz, beanDecorationFactory));
     }
@@ -127,7 +126,7 @@ public class BeanManagerImplementor implements IBeanManager {
       return bean;
     }
 
-    T proxy = new BeanProxyImplementor<T>(bean, decorator, beanClazz).getProxy();
+    T proxy = new BeanProxyImplementor<>(bean, decorator, beanClazz).getProxy();
     return createBeanImplementor(new BeanMetaData(beanClazz)
         .withInitialInstance(proxy)
         .withAnnotations(bean.getBeanAnnotations().values()));
@@ -154,11 +153,7 @@ public class BeanManagerImplementor implements IBeanManager {
     try {
       IBean<T> bean = createBeanImplementor(beanData);
       for (Class<?> type : listImplementedTypes(bean)) {
-        BeanHierarchy h = m_beanHierarchies.get(type);
-        if (h == null) {
-          h = new BeanHierarchy(type);
-          m_beanHierarchies.put(type, h);
-        }
+        BeanHierarchy h = m_beanHierarchies.computeIfAbsent(type, k -> new BeanHierarchy(type));
         h.addBean(bean);
       }
       return bean;
@@ -198,7 +193,7 @@ public class BeanManagerImplementor implements IBeanManager {
       if (h == null) {
         return CollectionUtility.emptyArrayList();
       }
-      return new ArrayList<IBean<T>>(h.getBeans());
+      return new ArrayList<>(h.getBeans());
     }
     finally {
       m_lock.readLock().unlock();
@@ -262,9 +257,7 @@ public class BeanManagerImplementor implements IBeanManager {
   protected Set<IBean<?>> getAllBeans() {
     Set<IBean<?>> all = new HashSet<>();
     for (BeanHierarchy<?> h : m_beanHierarchies.values()) {
-      for (IBean<?> bean : h.getBeans()) {
-        all.add(bean);
-      }
+      all.addAll(h.getBeans());
     }
     return all;
   }
@@ -335,8 +328,8 @@ public class BeanManagerImplementor implements IBeanManager {
 
   public void startCreateImmediatelyBeans() {
     for (IBean bean : getBeans(Object.class)) {
-      if (BeanManagerImplementor.isCreateImmediately(bean)) {
-        if (BeanManagerImplementor.isApplicationScoped(bean)) {
+      if (isCreateImmediately(bean)) {
+        if (isApplicationScoped(bean)) {
           bean.getInstance();
         }
         else {

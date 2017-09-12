@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.pagefield;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.context.ClientRunContext;
@@ -101,23 +99,20 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
       m_outline = new SimpleOutline();
       m_outline.setRootNode(m_page);
       m_outline.selectNode(m_page);
-      m_outline.addPropertyChangeListener(new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent e) {
-          try {
-            if (e.getPropertyName().equals(IOutline.PROP_DETAIL_FORM)) {
-              getDetailFormField().setInnerForm(((IOutline) e.getSource()).getDetailForm());
-            }
-            else if (e.getPropertyName().equals(IOutline.PROP_DETAIL_TABLE)) {
-              getTableField().setTable(detachSearchFormTableControl(((IOutline) e.getSource()).getDetailTable()), true);
-            }
-            else if (e.getPropertyName().equals(IOutline.PROP_SEARCH_FORM)) {
-              getSearchFormField().setInnerForm(((IOutline) e.getSource()).getSearchForm());
-            }
+      m_outline.addPropertyChangeListener(e -> {
+        try {
+          if (e.getPropertyName().equals(IOutline.PROP_DETAIL_FORM)) {
+            getDetailFormField().setInnerForm(((IOutline) e.getSource()).getDetailForm());
           }
-          catch (RuntimeException | PlatformError ex) {
-            BEANS.get(ExceptionHandler.class).handle(ex);
+          else if (e.getPropertyName().equals(IOutline.PROP_DETAIL_TABLE)) {
+            getTableField().setTable(detachSearchFormTableControl(((IOutline) e.getSource()).getDetailTable()), true);
           }
+          else if (e.getPropertyName().equals(IOutline.PROP_SEARCH_FORM)) {
+            getSearchFormField().setInnerForm(((IOutline) e.getSource()).getSearchForm());
+          }
+        }
+        catch (RuntimeException | PlatformError ex) {
+          BEANS.get(ExceptionHandler.class).handle(ex);
         }
       });
 
@@ -201,12 +196,7 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
     @Override
     protected void initConfig() {
       super.initConfig();
-      addPropertyChangeListener(PROP_INNER_FORM, new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-          calculateVisibleInternal();
-        }
-      });
+      addPropertyChangeListener(PROP_INNER_FORM, evt -> calculateVisibleInternal());
     }
   }
 
@@ -247,12 +237,7 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
     @Override
     protected void initConfig() {
       super.initConfig();
-      addPropertyChangeListener(PROP_TABLE, new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-          calculateVisibleInternal();
-        }
-      });
+      addPropertyChangeListener(PROP_TABLE, evt -> calculateVisibleInternal());
     }
   }
 
@@ -273,12 +258,7 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
     @Override
     protected void initConfig() {
       super.initConfig();
-      addPropertyChangeListener(PROP_INNER_FORM, new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-          calculateVisibleInternal();
-        }
-      });
+      addPropertyChangeListener(PROP_INNER_FORM, evt -> calculateVisibleInternal());
     }
   }
 
@@ -318,6 +298,6 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
 
   @Override
   protected IPageFieldExtension<PAGE, ? extends AbstractPageField<PAGE>> createLocalExtension() {
-    return new LocalPageFieldExtension<PAGE, AbstractPageField<PAGE>>(this);
+    return new LocalPageFieldExtension<>(this);
   }
 }

@@ -171,7 +171,7 @@ public class RunContext implements IAdaptable {
    * {@link #interceptCallableChain(CallableChain)}. Contributions are added before setting the transaction boundary.
    */
   protected <RESULT> CallableChain<RESULT> createCallableChain() {
-    final CallableChain<RESULT> contributions = new CallableChain<RESULT>();
+    final CallableChain<RESULT> contributions = new CallableChain<>();
     interceptCallableChain(contributions);
 
     @SuppressWarnings("unchecked")
@@ -181,10 +181,10 @@ public class RunContext implements IAdaptable {
         .withTransactionMembers(m_transactionMembers);
 
     return new CallableChain<RESULT>()
-        .add(new ThreadLocalProcessor<>(RunContext.CURRENT, this))
+        .add(new ThreadLocalProcessor<>(CURRENT, this))
         .add(new ThreadLocalProcessor<>(CorrelationId.CURRENT, m_correlationId))
         .add(new ThreadLocalProcessor<>(RunMonitor.CURRENT, Assertions.assertNotNull(m_runMonitor)))
-        .add(new SubjectProcessor<RESULT>(m_subject))
+        .add(new SubjectProcessor<>(m_subject))
         .add(new DiagnosticContextValueProcessor(BEANS.get(PrinicpalContextValueProvider.class)))
         .add(new DiagnosticContextValueProcessor(BEANS.get(CorrelationIdContextValueProvider.class)))
         .add(new ThreadLocalProcessor<>(NlsLocale.CURRENT, m_locale))
@@ -483,7 +483,7 @@ public class RunContext implements IAdaptable {
    * {@link AssertionException} if not running in a {@link RunContext}.
    */
   protected void fillCurrentValues() {
-    final RunContext currentRunContext = Assertions.assertNotNull(RunContext.CURRENT.get());
+    final RunContext currentRunContext = Assertions.assertNotNull(CURRENT.get());
 
     m_runMonitor = RunMonitor.CURRENT.get();
     m_subject = Subject.getSubject(AccessController.getContext());

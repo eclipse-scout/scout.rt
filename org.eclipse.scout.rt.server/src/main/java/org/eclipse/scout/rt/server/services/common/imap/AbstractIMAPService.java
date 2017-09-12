@@ -12,9 +12,10 @@ package org.eclipse.scout.rt.server.services.common.imap;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
-import javax.mail.Flags;
+import javax.mail.Flags.Flag;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -219,7 +220,7 @@ public abstract class AbstractIMAPService implements IIMAPService {
 
   private class ReadMailTask extends AbstractMailTask {
 
-    private final ArrayList<Message> m_messages = new ArrayList<Message>();
+    private final List<Message> m_messages = new ArrayList<>();
 
     @Override
     public void doTask(Folder folder) {
@@ -228,7 +229,7 @@ public abstract class AbstractIMAPService implements IIMAPService {
         Message[] m = folder.getMessages();
         for (int i = 0; i < Array.getLength(m); i++) {
           item = m[i];
-          if (!item.isSet(Flags.Flag.SEEN)) {
+          if (!item.isSet(Flag.SEEN)) {
             m_messages.add(item);
           }
         }
@@ -248,7 +249,7 @@ public abstract class AbstractIMAPService implements IIMAPService {
   private class DeleteMailTask extends AbstractMailTask {
 
     private Message[] m_toDelete;
-    private boolean m_deleteAll;
+    private final boolean m_deleteAll;
 
     DeleteMailTask(boolean all) {
       m_deleteAll = all;
@@ -266,7 +267,7 @@ public abstract class AbstractIMAPService implements IIMAPService {
           for (int j = 0; j < Array.getLength(m); j++) {
             Message msg = m[j];
             if (item.equals(msg)) {
-              msg.setFlag(Flags.Flag.DELETED, true);
+              msg.setFlag(Flag.DELETED, true);
             }
           }
         }

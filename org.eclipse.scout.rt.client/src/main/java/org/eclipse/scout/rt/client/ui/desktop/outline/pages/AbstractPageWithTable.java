@@ -63,12 +63,10 @@ import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.page.AbstractTablePageData;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
-import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.slf4j.Logger;
@@ -79,7 +77,7 @@ import org.slf4j.LoggerFactory;
  * child pages are explicitly added
  */
 @ClassId("b131ace3-9d63-46d9-9659-e288ca26b367")
-public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPage<T> implements IPageWithTable<T>, IContributionOwner {
+public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPage<T> implements IPageWithTable<T> {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractPageWithTable.class);
 
@@ -317,7 +315,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
   /**
    * This method must only be called in a context with the current outline set. See
-   * {@link ClientRunContext#withOutline(org.eclipse.scout.rt.client.ui.desktop.outline.IOutline, boolean)}
+   * {@link ClientRunContext#withOutline(IOutline, boolean)}
    */
   protected IPage<?> createChildPageInternalInRunContext(final ITableRow row) {
     IPage<?> childPage = interceptCreateChildPage(row);
@@ -397,13 +395,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
     try {
       return createDisplayParentRunContext()
-          .call(new Callable<ISearchForm>() {
-
-            @Override
-            public ISearchForm call() throws Exception {
-              return configuredSearchForm.newInstance();
-            }
-          });
+          .call((Callable<ISearchForm>) configuredSearchForm::newInstance);
     }
     catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + configuredSearchForm.getName() + "'.", e));
@@ -449,33 +441,30 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
     m_searchForm.setShowOnStart(false);
     // listen for search action
-    m_searchFormListener = new FormListener() {
-      @Override
-      public void formChanged(FormEvent e) {
-        switch (e.getType()) {
-          case FormEvent.TYPE_LOAD_COMPLETE: {
-            // do page reload to execute search
-            try {
-              T table = getTable(false);
-              if (table != null) {
-                table.discardAllRows();
-              }
+    m_searchFormListener = e -> {
+      switch (e.getType()) {
+        case FormEvent.TYPE_LOAD_COMPLETE: {
+          // do page reload to execute search
+          try {
+            T table = getTable(false);
+            if (table != null) {
+              table.discardAllRows();
             }
-            catch (RuntimeException | PlatformError ex) {
-              BEANS.get(ExceptionHandler.class).handle(ex);
-            }
-            break;
           }
-          case FormEvent.TYPE_STORE_AFTER: {
-            // do page reload to execute search
-            try {
-              reloadPage();
-            }
-            catch (RuntimeException | PlatformError ex) {
-              BEANS.get(ExceptionHandler.class).handle(ex);
-            }
-            break;
+          catch (RuntimeException | PlatformError ex) {
+            BEANS.get(ExceptionHandler.class).handle(ex);
           }
+          break;
+        }
+        case FormEvent.TYPE_STORE_AFTER: {
+          // do page reload to execute search
+          try {
+            reloadPage();
+          }
+          catch (RuntimeException | PlatformError ex) {
+            BEANS.get(ExceptionHandler.class).handle(ex);
+          }
+          break;
         }
       }
     };
@@ -862,7 +851,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * <code>updateChildPageCells</code> is true. Otherwise, the cells are not updated.
    */
   private List<IPage<?>> getChildPagesFor(List<? extends ITableRow> tableRows, boolean updateChildPageCells) {
-    List<IPage<?>> result = new ArrayList<IPage<?>>();
+    List<IPage<?>> result = new ArrayList<>();
     try {
       for (ITableRow row : tableRows) {
         IPage<?> page = getPageFor(row);
@@ -938,42 +927,39 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         case TableEvent.TYPE_ROWS_INSERTED: {
           if (!isLeaf()) {
             createDisplayParentRunContext()
-                .run(new IRunnable() {
-                  @Override
-                  public void run() {
-                    final List<ITableRow> tableRows = e.getRows();
-                    final List<IPage<?>> childPageList = new ArrayList<IPage<?>>(tableRows.size());
+                .run(() -> {
+                  final List<ITableRow> tableRows = e.getRows();
+                  final List<IPage<?>> childPageList = new ArrayList<>(tableRows.size());
 
-                    for (ITableRow element : tableRows) {
-                      try {
-                        IPage<?> childPage = createChildPageInternalInRunContext(element);
-                        if (childPage != null) {
-                          childPage.setRejectedByUser(element.isRejectedByUser());
-                          childPage.setFilterAccepted(element.isFilterAccepted());
-                          childPage.setEnabled(element.isEnabled(), IDimensions.ENABLED);
-                          T table = getTable();
-                          if (table != null) {
-                            ICell tableCell = table.getSummaryCell(element);
-                            updateCellFromTableCell(childPage.getCellForUpdate(), tableCell);
-                          }
-                          linkTableRowWithPage(element, childPage);
-                          childPageList.add(childPage);
+                  for (ITableRow element : tableRows) {
+                    try {
+                      IPage<?> childPage = createChildPageInternalInRunContext(element);
+                      if (childPage != null) {
+                        childPage.setRejectedByUser(element.isRejectedByUser());
+                        childPage.setFilterAccepted(element.isFilterAccepted());
+                        childPage.setEnabled(element.isEnabled(), IDimensions.ENABLED);
+                        T table = getTable();
+                        if (table != null) {
+                          ICell tableCell = table.getSummaryCell(element);
+                          updateCellFromTableCell(childPage.getCellForUpdate(), tableCell);
                         }
-                      }
-                      catch (RuntimeException | PlatformError ex) {
-                        BEANS.get(ExceptionHandler.class).handle(ex);
+                        linkTableRowWithPage(element, childPage);
+                        childPageList.add(childPage);
                       }
                     }
-                    if (outlineMediator != null) {
-                      outlineMediator.mediateTableRowsInserted(tableRows, childPageList, AbstractPageWithTable.this);
+                    catch (RuntimeException | PlatformError ex) {
+                      BEANS.get(ExceptionHandler.class).handle(ex);
                     }
+                  }
+                  if (outlineMediator != null) {
+                    outlineMediator.mediateTableRowsInserted(tableRows, childPageList, AbstractPageWithTable.this);
+                  }
 
-                    // check if a page was revoked
-                    for (ITableRow tableRow : tableRows) {
-                      IPage<?> page = getPageFor(tableRow);
-                      if (page != null && page.getParentNode() == null) {
-                        unlinkTableRowWithPage(tableRow);
-                      }
+                  // check if a page was revoked
+                  for (ITableRow tableRow : tableRows) {
+                    IPage<?> page = getPageFor(tableRow);
+                    if (page != null && page.getParentNode() == null) {
+                      unlinkTableRowWithPage(tableRow);
                     }
                   }
                 });
@@ -1015,31 +1001,31 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
   protected final void interceptLoadData(SearchFilter filter) {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
-    PageWithTableLoadDataChain<T> chain = new PageWithTableLoadDataChain<T>(extensions);
+    PageWithTableLoadDataChain<T> chain = new PageWithTableLoadDataChain<>(extensions);
     chain.execLoadData(filter);
   }
 
   protected final IPage<?> interceptCreateChildPage(ITableRow row) {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
-    PageWithTableCreateChildPageChain<T> chain = new PageWithTableCreateChildPageChain<T>(extensions);
+    PageWithTableCreateChildPageChain<T> chain = new PageWithTableCreateChildPageChain<>(extensions);
     return chain.execCreateChildPage(row);
   }
 
   protected final void interceptPopulateTable() {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
-    PageWithTablePopulateTableChain<T> chain = new PageWithTablePopulateTableChain<T>(extensions);
+    PageWithTablePopulateTableChain<T> chain = new PageWithTablePopulateTableChain<>(extensions);
     chain.execPopulateTable();
   }
 
   protected final void interceptInitSearchForm() {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
-    PageWithTableInitSearchFormChain<T> chain = new PageWithTableInitSearchFormChain<T>(extensions);
+    PageWithTableInitSearchFormChain<T> chain = new PageWithTableInitSearchFormChain<>(extensions);
     chain.execInitSearchForm();
   }
 
   protected final List<IMenu> interceptComputeTableEmptySpaceMenus() {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
-    PageWithTableComputeTableEmptySpaceMenusChain<T> chain = new PageWithTableComputeTableEmptySpaceMenusChain<T>(extensions);
+    PageWithTableComputeTableEmptySpaceMenusChain<T> chain = new PageWithTableComputeTableEmptySpaceMenusChain<>(extensions);
     return chain.execComputeTableEmptySpaceMenus();
   }
 
@@ -1077,7 +1063,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
   @Override
   protected IPageWithTableExtension<T, ? extends AbstractPageWithTable<T>> createLocalExtension() {
-    return new LocalPageWithTableExtension<T, AbstractPageWithTable<T>>(this);
+    return new LocalPageWithTableExtension<>(this);
   }
 
 }

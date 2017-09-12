@@ -22,11 +22,11 @@ public class BatchLookupCall implements Serializable {
   private final List<ILookupCall<?>> m_calls;
 
   public BatchLookupCall() {
-    m_calls = new ArrayList<ILookupCall<?>>();
+    m_calls = new ArrayList<>();
   }
 
   public BatchLookupCall(List<ILookupCall<?>> calls) {
-    m_calls = new ArrayList<ILookupCall<?>>(calls);
+    m_calls = new ArrayList<>(calls);
   }
 
   public void addLookupCall(ILookupCall<?> call) {

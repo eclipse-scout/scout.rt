@@ -15,9 +15,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.platform.holders.IHolder;
 
 public class RowToHolderMapper<T> {
-  private ITableRow m_row;
-  private IColumn<T> m_col;
-  private IHolder<T> m_holder;
+  private final ITableRow m_row;
+  private final IColumn<T> m_col;
+  private final IHolder<T> m_holder;
 
   public RowToHolderMapper(ITableRow row, IColumn<T> col, IHolder<T> holder) {
     m_row = row;

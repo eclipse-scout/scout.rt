@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.ui.html.logging;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
-import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiSession;
 import org.slf4j.MDC;
@@ -16,7 +15,7 @@ import org.slf4j.MDC;
  * @see MDC
  */
 @ApplicationScoped
-public class UiSessionIdContextValueProvider implements IDiagnosticContextValueProvider, IUiRunContextDiagnostics {
+public class UiSessionIdContextValueProvider implements IUiRunContextDiagnostics {
 
   public static final String KEY = "scout.ui.session.id";
 

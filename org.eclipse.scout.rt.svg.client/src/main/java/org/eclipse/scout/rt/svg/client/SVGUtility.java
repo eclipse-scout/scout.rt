@@ -70,6 +70,7 @@ public final class SVGUtility {
 
   private static final float DEFAULT_FONT_HEIGHT = 14f;
 
+  @FunctionalInterface
   public interface INodeVisitor {
     /**
      * @return true to continue visiting, false to stop
@@ -162,7 +163,7 @@ public final class SVGUtility {
   }
 
   public static List<Element> getElementsAt(SVGDocument doc, SVGPoint point) {
-    ArrayList<Element> list = new ArrayList<Element>();
+    List<Element> list = new ArrayList<>();
     SVGOMRect svgOMRect = new SVGOMRect(point.getX(), point.getY(), 1, 1);
     NodeList intersectedElements = doc.getRootElement().getIntersectionList(svgOMRect, null);
     int n = intersectedElements.getLength();
@@ -236,7 +237,7 @@ public final class SVGUtility {
     for (int i = 0; i < nl.getLength(); i++) {
       nl.item(i).getParentNode().removeChild(nl.item(i));
     }
-    if (value == null || value.length() == 0) {
+    if (value == null || value.isEmpty()) {
       setTextContent(textElement, null);
       return;
     }
@@ -308,11 +309,11 @@ public final class SVGUtility {
       return "";
     }
     List<String> lines = Arrays.asList(text.split("[\n\r]"));
-    if (wordWrap == null || wordWrap <= 0 || text.length() == 0) {
+    if (wordWrap == null || wordWrap <= 0 || text.isEmpty()) {
       return text;
     }
     float wrap = wordWrap.floatValue();
-    ArrayList<String> wrappedLines = new ArrayList<String>(lines.size());
+    List<String> wrappedLines = new ArrayList<>(lines.size());
     for (String line : lines) {
       if (!StringUtility.hasText(line)) {
         wrappedLines.add("");
@@ -331,8 +332,7 @@ public final class SVGUtility {
         int endIndex = 0;
         float acc = 0;
         StringBuilder lineBuf = new StringBuilder();
-        for (int wordIndex = 0; wordIndex < words.length; wordIndex++) {
-          String word = words[wordIndex];
+        for (String word : words) {
           endIndex = startIndex + word.length();
           float dw = 0;
           for (int i = startIndex; i < endIndex; i++) {
@@ -376,7 +376,7 @@ public final class SVGUtility {
         setTextContent(contextElement, null);
       }
     }
-    while (wrappedLines.size() > 0 && wrappedLines.get(wrappedLines.size() - 1).length() == 0) {
+    while (!wrappedLines.isEmpty() && wrappedLines.get(wrappedLines.size() - 1).isEmpty()) {
       wrappedLines.remove(wrappedLines.size() - 1);
     }
     StringBuilder buf = new StringBuilder();
@@ -418,7 +418,7 @@ public final class SVGUtility {
    *         end.
    */
   public static String clipText(SVGTextContentElement contextElement, String text, float clipWidth) {
-    if (text == null || text.length() == 0) {
+    if (text == null || text.isEmpty()) {
       return text;
     }
     if (clipWidth <= 0) {
@@ -467,7 +467,7 @@ public final class SVGUtility {
    * @return the text width in pixels
    */
   public static float getTextWidth(SVGTextContentElement contextElement, String text) {
-    if (text == null || text.length() == 0) {
+    if (text == null || text.isEmpty()) {
       return 0;
     }
     try {

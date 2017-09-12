@@ -271,7 +271,7 @@ public final class XmlUtility {
   public static Object getObjectAttribute(Element element, String attribName) throws IOException, ClassNotFoundException {
     Object o = null;
     String base64 = element.getAttribute(attribName);
-    if (base64.length() > 0) {
+    if (!base64.isEmpty()) {
       byte[] raw = Base64Utility.decode(base64);
       o = SerializationUtility.createObjectSerializer().deserialize(raw, null);
     }
@@ -477,7 +477,7 @@ public final class XmlUtility {
    */
   public static Document getXmlDocument(URL url) {
     try (InputStream is = url.openStream()) {
-      return XmlUtility.getXmlDocument(is);
+      return getXmlDocument(is);
     }
     catch (IOException e) {
       throw new ProcessingException("Unable to open URL '" + url.toExternalForm() + "'.", e);

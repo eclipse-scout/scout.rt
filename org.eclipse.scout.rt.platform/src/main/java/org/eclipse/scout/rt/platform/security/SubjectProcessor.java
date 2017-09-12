@@ -40,13 +40,7 @@ public class SubjectProcessor<RESULT> implements ICallableInterceptor<RESULT> {
   @Override
   public RESULT intercept(final Chain<RESULT> chain) throws Exception {
     try {
-      return Subject.doAs(m_subject, new PrivilegedExceptionAction<RESULT>() {
-
-        @Override
-        public RESULT run() throws Exception {
-          return chain.continueChain();
-        }
-      });
+      return Subject.doAs(m_subject, (PrivilegedExceptionAction<RESULT>) chain::continueChain);
     }
     catch (final PrivilegedActionException e) { // NOSONAR
       throw e.getException();

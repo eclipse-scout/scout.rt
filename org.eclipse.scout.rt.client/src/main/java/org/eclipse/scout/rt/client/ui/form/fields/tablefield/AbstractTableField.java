@@ -10,10 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.tablefield;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.scout.rt.client.dto.FormData;
@@ -162,15 +161,12 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     super.initConfig();
     setTableInternal(createTable());
     // local enabled listener
-    addPropertyChangeListener(PROP_ENABLED_COMPUTED, new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent e) {
-        if (m_table == null) {
-          return;
-        }
-        boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
-        m_table.setEnabled(newEnabled);
+    addPropertyChangeListener(PROP_ENABLED_COMPUTED, e -> {
+      if (m_table == null) {
+        return;
       }
+      boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
+      m_table.setEnabled(newEnabled);
     });
   }
 
@@ -413,7 +409,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     ITable table = getTable();
     //check cells
     ValidateTableFieldDescriptor tableDesc = null;
-    TreeSet<String> columnNames = new TreeSet<String>();
+    Set<String> columnNames = new TreeSet<>();
     if (table != null) {
       for (ITableRow row : table.getRows()) {
         for (IColumn col : table.getColumns()) {
@@ -582,36 +578,36 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
 
   @Override
   protected ITableFieldExtension<T, ? extends AbstractTableField<T>> createLocalExtension() {
-    return new LocalTableFieldExtension<T, AbstractTableField<T>>(this);
+    return new LocalTableFieldExtension<>(this);
   }
 
   protected final void interceptReloadTableData() {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    TableFieldReloadTableDataChain<T> chain = new TableFieldReloadTableDataChain<T>(extensions);
+    TableFieldReloadTableDataChain<T> chain = new TableFieldReloadTableDataChain<>(extensions);
     chain.execReloadTableData();
   }
 
   protected final void interceptSaveInsertedRow(ITableRow row) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    TableFieldSaveInsertedRowChain<T> chain = new TableFieldSaveInsertedRowChain<T>(extensions);
+    TableFieldSaveInsertedRowChain<T> chain = new TableFieldSaveInsertedRowChain<>(extensions);
     chain.execSaveInsertedRow(row);
   }
 
   protected final void interceptSaveUpdatedRow(ITableRow row) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    TableFieldSaveUpdatedRowChain<T> chain = new TableFieldSaveUpdatedRowChain<T>(extensions);
+    TableFieldSaveUpdatedRowChain<T> chain = new TableFieldSaveUpdatedRowChain<>(extensions);
     chain.execSaveUpdatedRow(row);
   }
 
   protected final void interceptSaveDeletedRow(ITableRow row) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    TableFieldSaveDeletedRowChain<T> chain = new TableFieldSaveDeletedRowChain<T>(extensions);
+    TableFieldSaveDeletedRowChain<T> chain = new TableFieldSaveDeletedRowChain<>(extensions);
     chain.execSaveDeletedRow(row);
   }
 
   protected final void interceptSave(List<? extends ITableRow> insertedRows, List<? extends ITableRow> updatedRows, List<? extends ITableRow> deletedRows) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    TableFieldSaveChain<T> chain = new TableFieldSaveChain<T>(extensions);
+    TableFieldSaveChain<T> chain = new TableFieldSaveChain<>(extensions);
     chain.execSave(insertedRows, updatedRows, deletedRows);
   }
 

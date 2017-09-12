@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.clustersync;
 
+@FunctionalInterface
 public interface IPublishSubscribeMessageListener {
 
   /**

@@ -178,7 +178,7 @@ public class JmsMessageWriter {
       return this;
     }
 
-    final String json = (String) BEANS.get(JsonMarshaller.class).marshall(context, new HashMap<String, String>());
+    final String json = (String) BEANS.get(JsonMarshaller.class).marshall(context, new HashMap<>());
     writeProperty(property, json);
     return this;
   }

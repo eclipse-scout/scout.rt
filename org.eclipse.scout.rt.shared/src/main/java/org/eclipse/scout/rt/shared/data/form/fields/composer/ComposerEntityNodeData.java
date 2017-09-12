@@ -40,7 +40,7 @@ public class ComposerEntityNodeData extends TreeNodeData {
    *         This excludes all other child entities and their attributes.
    */
   public List<ComposerAttributeNodeData> getContainingAttributeNodes() {
-    List<ComposerAttributeNodeData> list = new ArrayList<ComposerAttributeNodeData>();
+    List<ComposerAttributeNodeData> list = new ArrayList<>();
     visitContainingAttributeNodesRec(this, list);
     return list;
   }

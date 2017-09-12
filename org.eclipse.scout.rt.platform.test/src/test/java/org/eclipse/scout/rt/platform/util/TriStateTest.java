@@ -18,7 +18,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.rt.platform.serialization.IObjectSerializer;
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
-import org.eclipse.scout.rt.platform.util.TriState;
 import org.junit.Test;
 
 /**

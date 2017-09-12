@@ -169,8 +169,8 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
   private void fireSvgFieldEventInternal(SvgFieldEvent e) {
     EventListener[] a = m_listenerList.getListeners(ISvgFieldListener.class);
     if (a != null) {
-      for (int i = 0; i < a.length; i++) {
-        ((ISvgFieldListener) a[i]).handleSvgFieldEvent(e);
+      for (EventListener anA : a) {
+        ((ISvgFieldListener) anA).handleSvgFieldEvent(e);
       }
     }
   }
@@ -225,6 +225,6 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
 
   @Override
   protected ISvgFieldExtension<? extends AbstractSvgField> createLocalExtension() {
-    return new LocalSvgFieldExtension<AbstractSvgField>(this);
+    return new LocalSvgFieldExtension<>(this);
   }
 }

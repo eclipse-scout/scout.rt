@@ -22,7 +22,7 @@ public class ActionFinder {
 
   public <T extends IAction> T findAction(List<? extends IAction> actionTree, Class<T> searchType) {
     List<T> filteredActions = findActions(actionTree, searchType, true, true);
-    if (filteredActions.size() > 0) {
+    if (!filteredActions.isEmpty()) {
       return filteredActions.get(0);
     }
     return null;
@@ -34,7 +34,7 @@ public class ActionFinder {
 
   @SuppressWarnings("unchecked")
   private <T extends IAction> List<T> findActions(List<? extends IAction> actionTree, Class<T> searchType, boolean recursive, boolean oneMatchSearch) {
-    List<T> list = new ArrayList<T>();
+    List<T> list = new ArrayList<>();
 
     for (IAction action : actionTree) {
       if (searchType.isAssignableFrom(action.getClass())) {

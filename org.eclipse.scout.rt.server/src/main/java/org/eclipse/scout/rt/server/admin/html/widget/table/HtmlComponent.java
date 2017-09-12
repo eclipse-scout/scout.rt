@@ -39,7 +39,7 @@ public class HtmlComponent {
     m_baseURL = m_req.getContextPath() + m_req.getServletPath();
     m_writer = new StringWriter();
     m_out = new PrintWriter(m_writer, true);
-    m_actionMap = new HashMap<String, AbstractHtmlAction>();
+    m_actionMap = new HashMap<>();
   }
 
   public HtmlComponent(HtmlComponent other) {
@@ -50,7 +50,7 @@ public class HtmlComponent {
     //
     m_writer = new StringWriter();
     m_out = new PrintWriter(m_writer, true);
-    m_actionMap = new HashMap<String, AbstractHtmlAction>();
+    m_actionMap = new HashMap<>();
   }
 
   public void append(HtmlComponent other) {

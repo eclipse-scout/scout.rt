@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.client.extension.ui.form.fields.BasicFieldChains;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.BasicFieldChains.BasicFieldExecChangedDisplayTextChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IBasicFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
@@ -59,7 +58,7 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
 
   @Override
   protected IBasicFieldExtension<VALUE, ? extends AbstractBasicField<VALUE>> createLocalExtension() {
-    return new LocalBasicFieldExtension<VALUE, AbstractBasicField<VALUE>>(this);
+    return new LocalBasicFieldExtension<>(this);
   }
 
   /**
@@ -118,14 +117,14 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
 
   protected final void interceptExecChangedDisplayText() {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    new BasicFieldChains.BasicFieldExecChangedDisplayTextChain<VALUE>(extensions).execChangedDisplayText();
+    new BasicFieldExecChangedDisplayTextChain<VALUE>(extensions).execChangedDisplayText();
   }
 
   /**
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalBasicFieldExtension<VALUE_TYPE, OWNER_FIELD extends AbstractBasicField<VALUE_TYPE>> extends AbstractValueField.LocalValueFieldExtension<VALUE_TYPE, OWNER_FIELD>
+  protected static class LocalBasicFieldExtension<VALUE_TYPE, OWNER_FIELD extends AbstractBasicField<VALUE_TYPE>> extends LocalValueFieldExtension<VALUE_TYPE, OWNER_FIELD>
       implements IBasicFieldExtension<VALUE_TYPE, OWNER_FIELD> {
 
     public LocalBasicFieldExtension(OWNER_FIELD owner) {

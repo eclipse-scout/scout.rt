@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.imagefield;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +83,7 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    m_jsonContextMenu = new JsonContextMenu<IContextMenu>(getModel().getContextMenu(), this);
+    m_jsonContextMenu = new JsonContextMenu<>(getModel().getContextMenu(), this);
     m_jsonContextMenu.init();
   }
 
@@ -100,12 +99,9 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
     if (m_contextMenuListener != null) {
       throw new IllegalStateException();
     }
-    m_contextMenuListener = new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
-          handleModelContextMenuVisibleChanged((Boolean) evt.getNewValue());
-        }
+    m_contextMenuListener = evt -> {
+      if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+        handleModelContextMenuVisibleChanged((Boolean) evt.getNewValue());
       }
     };
     getModel().getContextMenu().addPropertyChangeListener(m_contextMenuListener);

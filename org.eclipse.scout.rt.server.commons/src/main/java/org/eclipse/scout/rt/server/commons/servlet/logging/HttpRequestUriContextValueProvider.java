@@ -28,7 +28,7 @@ import org.slf4j.MDC;
 public class HttpRequestUriContextValueProvider implements IDiagnosticContextValueProvider {
 
   public static final String KEY = "http.request.uri";
-  private String m_requestUri;
+  private final String m_requestUri;
 
   public HttpRequestUriContextValueProvider(String requestUri) {
     m_requestUri = requestUri;

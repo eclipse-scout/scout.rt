@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Locale;
 
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.util.ArrayComparator.ColumnComparator;
 
 public final class MatrixUtility {
 
@@ -211,12 +212,12 @@ public final class MatrixUtility {
   }
 
   /**
-   * Sorting a 2d Object array providing {@link ArrayComparator.ColumnComparator ArrayComparator.ColumnComparators}
+   * Sorting a 2d Object array providing {@link ColumnComparator ArrayComparator.ColumnComparators}
    *
    * @param data
    * @param columnComparators
    */
-  public static void sortWithComparators(Object[][] data, ArrayComparator.ColumnComparator... columnComparators) {
+  public static void sortWithComparators(Object[][] data, ColumnComparator... columnComparators) {
     if (data != null && data.length >= 2 && columnComparators != null && columnComparators.length > 0) {
       Arrays.sort(data, new ArrayComparator(columnComparators));
     }

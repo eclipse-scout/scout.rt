@@ -18,13 +18,13 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public class PlannerEventFilterCondition {
 
-  private int m_type;
+  private final int m_type;
   private List<Resource> m_resources;
   private boolean m_checkResources;
 
   public PlannerEventFilterCondition(int type) {
     m_type = type;
-    m_resources = new ArrayList<Resource>();
+    m_resources = new ArrayList<>();
   }
 
   public int getType() {

@@ -27,13 +27,9 @@ public final class Callables {
    * Returns a callable object that represents the given {@link IRunnable}.
    */
   public static Callable<Void> callable(final IRunnable runnable) {
-    return new Callable<Void>() {
-
-      @Override
-      public Void call() throws Exception {
-        runnable.run();
-        return null;
-      }
+    return () -> {
+      runnable.run();
+      return null;
     };
   }
 }

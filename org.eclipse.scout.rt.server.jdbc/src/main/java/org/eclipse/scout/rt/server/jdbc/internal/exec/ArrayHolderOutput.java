@@ -20,9 +20,9 @@ import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueOutputToken;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 
 class ArrayHolderOutput implements IBindOutput {
-  private IHolder<?> m_holder;
-  private ValueOutputToken m_source;
-  private final List<Object> m_accumulator = new ArrayList<Object>();
+  private final IHolder<?> m_holder;
+  private final ValueOutputToken m_source;
+  private final List<Object> m_accumulator = new ArrayList<>();
   private int m_batchIndex = -1;
   private int m_jdbcBindIndex = -1;
 

@@ -16,8 +16,8 @@ import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
@@ -81,7 +81,7 @@ public class CallsView extends DefaultView {
   }
 
   private void renderCallTable(HtmlComponent p, SessionInspector session) {
-    TreeMap<CompositeObject, CallInspector> timeToCalls = new TreeMap<CompositeObject, CallInspector>();
+    TreeMap<CompositeObject, CallInspector> timeToCalls = new TreeMap<>();
     CallInspector[] callInspectors = session.getCallInspectors();
     for (int i = 0; i < callInspectors.length; i++) {
       long startTime = callInspectors[i].getInfo().getStartTime();
@@ -302,15 +302,14 @@ public class CallsView extends DefaultView {
         }
       }
       else if (o instanceof Map) {
-        for (Iterator it = ((Map) o).entrySet().iterator(); it.hasNext();) {
-          Map.Entry e = (Map.Entry) it.next();
+        for (Object o1 : ((Map) o).entrySet()) {
+          Entry e = (Entry) o1;
           renderValueRow(p, "{" + "" + e.getKey() + "}", e.getValue());
         }
       }
       else if (o instanceof Collection) {
         int index = 0;
-        for (Iterator it = ((Collection) o).iterator(); it.hasNext();) {
-          Object value = it.next();
+        for (Object value : ((Iterable) o)) {
           renderValueRow(p, "" + index, value);
           index++;
         }

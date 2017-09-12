@@ -17,8 +17,8 @@ import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueInputToken;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 
 class BeanArrayHolderInput implements IBindInput {
-  private IBeanArrayHolder m_holder;
-  private BeanPropertyInput m_delegate;
+  private final IBeanArrayHolder m_holder;
+  private final BeanPropertyInput m_delegate;
 
   public BeanArrayHolderInput(IBeanArrayHolder holder, Object[] beans, String propertyName, ValueInputToken target) {
     m_holder = holder;

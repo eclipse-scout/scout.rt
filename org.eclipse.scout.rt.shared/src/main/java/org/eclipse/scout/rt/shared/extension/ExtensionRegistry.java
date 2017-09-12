@@ -28,8 +28,8 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
-import org.eclipse.scout.rt.platform.extension.InheritOuterExtensionScope;
 import org.eclipse.scout.rt.platform.extension.Extends;
+import org.eclipse.scout.rt.platform.extension.InheritOuterExtensionScope;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -56,11 +56,11 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
 
   public ExtensionRegistry() {
     m_readWriteLock = new ReentrantReadWriteLock(/*not fair*/);
-    m_extensionItemMap = new HashMap<ClassIdentifier, List<ExtensionRegistryItem>>();
-    m_contributionItemMap = new HashMap<ClassIdentifier, List<ExtensionRegistryItem>>();
-    m_modelMoveItemMap = new HashMap<ClassIdentifier, List<ExtensionRegistryMoveItem>>();
-    m_extensionStack = new ThreadLocal<ExtensionStack>();
-    m_scopeStack = new ThreadLocal<ScopeStack>();
+    m_extensionItemMap = new HashMap<>();
+    m_contributionItemMap = new HashMap<>();
+    m_modelMoveItemMap = new HashMap<>();
+    m_extensionStack = new ThreadLocal<>();
+    m_scopeStack = new ThreadLocal<>();
     m_registrationOrder = new AtomicLong();
     m_globalContributionScope = createGlobalScope(m_contributionItemMap, true);
     m_globalExtensionScope = createGlobalScope(m_extensionItemMap, true);
@@ -196,7 +196,7 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
    */
   protected List<Class<?>> collectInnerExtensionClasses(Class<?> extensionClass) {
     Class<?>[] innerClasses = extensionClass.getClasses();
-    List<Class<?>> result = new ArrayList<Class<?>>(innerClasses.length);
+    List<Class<?>> result = new ArrayList<>(innerClasses.length);
     for (Class<?> innerClass : innerClasses) {
       if (!Modifier.isAbstract(innerClass.getModifiers())) {
         result.add(innerClass);
@@ -270,11 +270,7 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
   protected void registerInternal(ClassIdentifier ownerClassIdentifier, Class<?> declaringClass, Class<?> extensionClass, Double modelOrder, Class<?> extensionGeneric, boolean isExtension) {
     validateRegister(ownerClassIdentifier, extensionClass, modelOrder, extensionGeneric, isExtension);
     Map<ClassIdentifier, List<ExtensionRegistryItem>> map = getInsertionMap(isExtension);
-    List<ExtensionRegistryItem> extensions = map.get(ownerClassIdentifier);
-    if (extensions == null) {
-      extensions = new LinkedList<ExtensionRegistryItem>();
-      map.put(ownerClassIdentifier, extensions);
-    }
+    List<ExtensionRegistryItem> extensions = map.computeIfAbsent(ownerClassIdentifier, k -> new LinkedList<>());
     ExtensionRegistryItem item = new ExtensionRegistryItem(ownerClassIdentifier, declaringClass, extensionClass, modelOrder, m_registrationOrder.incrementAndGet());
     extensions.add(item);
 
@@ -333,11 +329,7 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
     m_readWriteLock.writeLock().lock();
     try {
       Map<ClassIdentifier, List<ExtensionRegistryMoveItem>> modelMoveItemMap = getModelMoveItemMap();
-      List<ExtensionRegistryMoveItem> moveItems = modelMoveItemMap.get(modelClassIdentifer);
-      if (moveItems == null) {
-        moveItems = new LinkedList<ExtensionRegistryMoveItem>();
-        modelMoveItemMap.put(modelClassIdentifer, moveItems);
-      }
+      List<ExtensionRegistryMoveItem> moveItems = modelMoveItemMap.computeIfAbsent(modelClassIdentifer, k -> new LinkedList<>());
       ExtensionRegistryMoveItem item = new ExtensionRegistryMoveItem(modelClassIdentifer, newContainerClassIdentifier, newOrder, m_registrationOrder.incrementAndGet());
       moveItems.add(item);
       m_globalModelMoveItemScope = createGlobalScope(getModelMoveItemMap(), false);
@@ -582,7 +574,7 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
       m_readWriteLock.readLock().unlock();
     }
 
-    LinkedList<T> extensions = new LinkedList<T>();
+    LinkedList<T> extensions = new LinkedList<>();
     if (CollectionUtility.isEmpty(extensionItems)) {
       return extensions;
     }
@@ -611,7 +603,7 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
       m_readWriteLock.readLock().unlock();
     }
 
-    LinkedList<T> contributions = new LinkedList<T>();
+    LinkedList<T> contributions = new LinkedList<>();
     if (CollectionUtility.isEmpty(contributionItems)) {
       return contributions;
     }
@@ -619,7 +611,7 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
     ExtensionStack extensionStack = m_extensionStack.get();
     for (ExtensionRegistryItem item : contributionItems) {
       if (filterType == null || filterType.isAssignableFrom(item.getExtensionClass())) {
-        contributions.addFirst(item.<T> createInstance(container, extensionStack));
+        contributions.addFirst(item.createInstance(container, extensionStack));
       }
     }
     return contributions;
@@ -631,7 +623,7 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
       throw new IllegalArgumentException("container must not be null.");
     }
     Set<ExtensionRegistryItem> contributionItems = getModelContributionItemsFor(container);
-    Set<Class<?>> result = new LinkedHashSet<Class<?>>(contributionItems.size());
+    Set<Class<?>> result = new LinkedHashSet<>(contributionItems.size());
     for (ExtensionRegistryItem item : contributionItems) {
       result.add(item.getExtensionClass());
     }
@@ -668,15 +660,15 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
         newOrder = item.getNewModelOrder();
       }
     }
-    return new MoveDescriptor<T>(modelObject, newContainer, newOrder);
+    return new MoveDescriptor<>(modelObject, newContainer, newOrder);
   }
 
   protected <T extends AbstractExtensionRegistryItem> ExtensionScope<T> createGlobalScope(Map<ClassIdentifier, List<T>> registryItems, boolean topDownStrategy) {
-    Map<ClassIdentifier, List<T>> clonedRegistryItems = new HashMap<ClassIdentifier, List<T>>(registryItems.size());
+    Map<ClassIdentifier, List<T>> clonedRegistryItems = new HashMap<>(registryItems.size());
     for (Entry<ClassIdentifier, List<T>> entry : registryItems.entrySet()) {
-      clonedRegistryItems.put(entry.getKey(), new LinkedList<T>(entry.getValue()));
+      clonedRegistryItems.put(entry.getKey(), new LinkedList<>(entry.getValue()));
     }
-    return new ExtensionScope<T>(clonedRegistryItems, topDownStrategy);
+    return new ExtensionScope<>(clonedRegistryItems, topDownStrategy);
   }
 
   @Override

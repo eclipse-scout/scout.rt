@@ -23,9 +23,6 @@ import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
 public abstract class AbstractBookmarkStorageService implements IBookmarkStorageService {
 
-  public AbstractBookmarkStorageService() {
-  }
-
   @Override
   public BookmarkData getBookmarkData() {
     Object userId = getCurrentUserId();

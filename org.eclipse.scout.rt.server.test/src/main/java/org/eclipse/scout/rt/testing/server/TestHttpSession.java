@@ -3,6 +3,7 @@ package org.eclipse.scout.rt.testing.server;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
@@ -16,7 +17,7 @@ import javax.servlet.http.HttpSessionContext;
 @SuppressWarnings("deprecation")
 public class TestHttpSession implements HttpSession {
 
-  private final HashMap<String, Object> m_sessionAttributes = new HashMap<>();
+  private final Map<String, Object> m_sessionAttributes = new HashMap<>();
 
   @Override
   public long getCreationTime() {

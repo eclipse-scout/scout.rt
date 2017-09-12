@@ -140,7 +140,7 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
   @Override
   protected Boolean parseValueInternal(String text) {
     Boolean retVal = null;
-    if (text != null && text.length() == 0) {
+    if (text != null && text.isEmpty()) {
       text = null;
     }
     if (text != null) {
@@ -188,6 +188,6 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
 
   @Override
   protected IBooleanFieldExtension<? extends AbstractBooleanField> createLocalExtension() {
-    return new LocalBooleanFieldExtension<AbstractBooleanField>(this);
+    return new LocalBooleanFieldExtension<>(this);
   }
 }

@@ -9,6 +9,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartFieldResult;
+import org.eclipse.scout.rt.platform.exception.IThrowableWithContextInfo;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
@@ -31,8 +32,8 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
 
   // Contains always the mapping from the last performed lookup operation
   // all values are reset each time a new lookup starts
-  private Map<Object, Integer> m_keyToIdMap = new HashMap<>();
-  private Map<Integer, Object> m_idToKeyMap = new HashMap<>();
+  private final Map<Object, Integer> m_keyToIdMap = new HashMap<>();
+  private final Map<Integer, Object> m_idToKeyMap = new HashMap<>();
   private int m_id = 0;
 
   public JsonSmartField(MODEL model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
@@ -317,7 +318,7 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
 
   protected Object exceptionToJson(Throwable exception) {
     if (exception instanceof PlatformException) {
-      return ((PlatformException) exception).getDisplayMessage();
+      return ((IThrowableWithContextInfo) exception).getDisplayMessage();
     }
     else {
       return exception.getMessage();
@@ -335,7 +336,7 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
   }
 
   protected ILookupRow<VALUE> createLookupRow(VALUE key, String text, JSONObject json) {
-    LookupRow<VALUE> lookupRow = new LookupRow<VALUE>(key, text);
+    LookupRow<VALUE> lookupRow = new LookupRow<>(key, text);
     if (json.has("enabled")) {
       lookupRow.withEnabled(json.getBoolean("enabled"));
     }

@@ -256,6 +256,6 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
 
   @Override
   protected IDecimalFieldExtension<T, ? extends AbstractDecimalField<T>> createLocalExtension() {
-    return new LocalDecimalFieldExtension<T, AbstractDecimalField<T>>(this);
+    return new LocalDecimalFieldExtension<>(this);
   }
 }

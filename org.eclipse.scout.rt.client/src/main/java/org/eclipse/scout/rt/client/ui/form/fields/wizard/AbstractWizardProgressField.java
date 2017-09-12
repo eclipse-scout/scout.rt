@@ -210,6 +210,6 @@ public abstract class AbstractWizardProgressField extends AbstractFormField impl
 
   @Override
   protected IWizardProgressFieldExtension<? extends AbstractWizardProgressField> createLocalExtension() {
-    return new LocalWizardProgressFieldExtension<AbstractWizardProgressField>(this);
+    return new LocalWizardProgressFieldExtension<>(this);
   }
 }

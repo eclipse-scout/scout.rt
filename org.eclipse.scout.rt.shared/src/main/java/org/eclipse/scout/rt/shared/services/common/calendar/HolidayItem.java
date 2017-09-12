@@ -10,16 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.calendar;
 
-import java.io.Serializable;
-
 /**
  * This class represents a full-day holiday calendar item
  */
-public class HolidayItem extends CalendarTask implements Serializable {
+public class HolidayItem extends CalendarTask {
   private static final long serialVersionUID = 1L;
-
-  public HolidayItem() {
-    super();
-  }
 
 }

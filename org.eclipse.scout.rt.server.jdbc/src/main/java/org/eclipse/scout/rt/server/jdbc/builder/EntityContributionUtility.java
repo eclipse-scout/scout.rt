@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jdbc.builder;
 
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
@@ -18,7 +19,6 @@ import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.StringUtility.ITagProcessor;
 import org.eclipse.scout.rt.server.jdbc.builder.FormDataStatementBuilder.EntityStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,7 +138,7 @@ public final class EntityContributionUtility {
     }
     else {
       // extend the select section
-      if (childContributions.getSelectParts().size() > 0) {
+      if (!childContributions.getSelectParts().isEmpty()) {
         StringBuilder selectBuf = new StringBuilder();
         for (String selectPart : childContributions.getSelectParts()) {
           if (selectBuf.length() > 0) {
@@ -148,14 +148,11 @@ public final class EntityContributionUtility {
         }
         final String s = selectBuf.toString();
         if (StringUtility.getTag(entityPart, "selectParts") != null) {
-          entityPart = StringUtility.replaceTags(entityPart, "selectParts", new ITagProcessor() {
-            @Override
-            public String processTag(String tagName, String tagContent) {
-              if (tagContent.length() > 0) {
-                return tagContent + ", " + s;
-              }
-              return s;
+          entityPart = StringUtility.replaceTags(entityPart, "selectParts", (tagName, tagContent) -> {
+            if (!tagContent.isEmpty()) {
+              return tagContent + ", " + s;
             }
+            return s;
           });
         }
         else {
@@ -164,8 +161,8 @@ public final class EntityContributionUtility {
       }
       entityPart = StringUtility.removeTagBounds(entityPart, "selectParts");
       // extend the from section
-      TreeSet<String> fromParts = new TreeSet<String>(childContributions.getFromParts());
-      if (fromParts.size() > 0) {
+      Set<String> fromParts = new TreeSet<>(childContributions.getFromParts());
+      if (!fromParts.isEmpty()) {
         StringBuilder buf = new StringBuilder();
         for (String fromPart : fromParts) {
           if (!isAnsiJoin(fromPart)) {
@@ -176,13 +173,7 @@ public final class EntityContributionUtility {
         }
         final String s = buf.toString();
         if (StringUtility.getTag(entityPart, "fromParts") != null) {
-          entityPart = StringUtility.replaceTags(entityPart, "fromParts", new ITagProcessor() {
-
-            @Override
-            public String processTag(String tagName, String tagContent) {
-              return tagContent + s;
-            }
-          });
+          entityPart = StringUtility.replaceTags(entityPart, "fromParts", (tagName, tagContent) -> tagContent + s);
         }
         else {
           throw new IllegalArgumentException("missing <fromParts/> tag");
@@ -190,15 +181,12 @@ public final class EntityContributionUtility {
       }
       entityPart = StringUtility.removeTagBounds(entityPart, "fromParts");
       // extend the where section
-      if (childContributions.getWhereParts().size() > 0) {
+      if (!childContributions.getWhereParts().isEmpty()) {
 
         final String s = CollectionUtility.format(childContributions.getWhereParts(), " AND ");
         if (StringUtility.getTag(entityPart, "whereParts") != null) {
-          entityPart = StringUtility.replaceTags(entityPart, "whereParts", new ITagProcessor() {
-            @Override
-            public String processTag(String tagName, String tagContent) {
-              return tagContent + " AND " + s;//legacy: always prefix an additional AND
-            }
+          entityPart = StringUtility.replaceTags(entityPart, "whereParts", (tagName, tagContent) -> {
+            return tagContent + " AND " + s;//legacy: always prefix an additional AND
           });
         }
         else {
@@ -209,23 +197,20 @@ public final class EntityContributionUtility {
       // extend the group by / having section
       if (StringUtility.getTag(entityPart, "groupBy") != null) {
         int selectGroupByDelta = childContributions.getSelectParts().size() - childContributions.getGroupByParts().size();
-        if ((selectGroupByDelta > 0 && childContributions.getGroupByParts().size() > 0) || childContributions.getHavingParts().size() > 0) {
+        if ((selectGroupByDelta > 0 && !childContributions.getGroupByParts().isEmpty()) || !childContributions.getHavingParts().isEmpty()) {
           entityPart = StringUtility.removeTagBounds(entityPart, "groupBy");
-          if (childContributions.getGroupByParts().size() > 0) {
+          if (!childContributions.getGroupByParts().isEmpty()) {
             //check group by parts
             for (String s : childContributions.getGroupByParts()) {
               checkGroupByPart(s);
             }
             final String s = CollectionUtility.format(childContributions.getGroupByParts(), ", ");
             if (StringUtility.getTag(entityPart, "groupByParts") != null) {
-              entityPart = StringUtility.replaceTags(entityPart, "groupByParts", new ITagProcessor() {
-                @Override
-                public String processTag(String tagName, String tagContent) {
-                  if (tagContent.length() > 0) {
-                    return tagContent + ", " + s;
-                  }
-                  return s;
+              entityPart = StringUtility.replaceTags(entityPart, "groupByParts", (tagName, tagContent) -> {
+                if (!tagContent.isEmpty()) {
+                  return tagContent + ", " + s;
                 }
+                return s;
               });
             }
             else {
@@ -234,26 +219,20 @@ public final class EntityContributionUtility {
           }
           else {
             //no group by parts, avoid empty GROUP BY clause
-            entityPart = StringUtility.replaceTags(entityPart, "groupByParts", new ITagProcessor() {
-              @Override
-              public String processTag(String tagName, String tagContent) {
-                if (tagContent.length() > 0) {
-                  return tagContent;
-                }
-                return tagContent + " 1 ";
+            entityPart = StringUtility.replaceTags(entityPart, "groupByParts", (tagName, tagContent) -> {
+              if (!tagContent.isEmpty()) {
+                return tagContent;
               }
+              return tagContent + " 1 ";
             });
           }
           entityPart = StringUtility.removeTagBounds(entityPart, "groupByParts");
           //
-          if (childContributions.getHavingParts().size() > 0) {
+          if (!childContributions.getHavingParts().isEmpty()) {
             final String s = CollectionUtility.format(childContributions.getHavingParts(), " AND ");
             if (StringUtility.getTag(entityPart, "havingParts") != null) {
-              entityPart = StringUtility.replaceTags(entityPart, "havingParts", new ITagProcessor() {
-                @Override
-                public String processTag(String tagName, String tagContent) {
-                  return tagContent + " AND " + s;//legacy: always prefix an additional AND
-                }
+              entityPart = StringUtility.replaceTags(entityPart, "havingParts", (tagName, tagContent) -> {
+                return tagContent + " AND " + s;//legacy: always prefix an additional AND
               });
             }
             else {
@@ -265,32 +244,21 @@ public final class EntityContributionUtility {
           }
         }
         else {
-          entityPart = StringUtility.replaceTags(entityPart, "groupBy", new ITagProcessor() {
-            @Override
-            public String processTag(String tagName, String tagContent) {
-              if (!StringUtility.hasText(StringUtility.getTag(tagContent, "groupByParts"))
-                  && !StringUtility.hasText(StringUtility.getTag(tagContent, "havingParts"))) {
-                return "";
-              }
-
-              // preserve statically defined group-by and having parts
-              tagContent = StringUtility.replaceTags(tagContent, "groupByParts", new ITagProcessor() {
-                @Override
-                public String processTag(String innerTagName, String innerTagContent) {
-                  if (innerTagContent.length() > 0) {
-                    return innerTagContent;
-                  }
-                  return innerTagContent + " 1 ";
-                }
-              });
-              tagContent = StringUtility.replaceTags(tagContent, "havingParts", new ITagProcessor() {
-                @Override
-                public String processTag(String innerTagName, String innerTagContent) {
-                  return innerTagContent;
-                }
-              });
-              return tagContent;
+          entityPart = StringUtility.replaceTags(entityPart, "groupBy", (tagName, tagContent) -> {
+            if (!StringUtility.hasText(StringUtility.getTag(tagContent, "groupByParts"))
+                && !StringUtility.hasText(StringUtility.getTag(tagContent, "havingParts"))) {
+              return "";
             }
+
+            // preserve statically defined group-by and having parts
+            tagContent = StringUtility.replaceTags(tagContent, "groupByParts", (innerTagName, innerTagContent) -> {
+              if (!innerTagContent.isEmpty()) {
+                return innerTagContent;
+              }
+              return innerTagContent + " 1 ";
+            });
+            tagContent = StringUtility.replaceTags(tagContent, "havingParts", (innerTagName, innerTagContent) -> innerTagContent);
+            return tagContent;
           });
         }
       }
@@ -340,7 +308,7 @@ public final class EntityContributionUtility {
     }
     else {
       //check for remaining dirt
-      if (entityPart.length() > 0) {
+      if (!entityPart.isEmpty()) {
         LOG.warn("entityPart {} contains content that is not wrapped in a tag: {}", entityPartWithTags, entityPart);
       }
     }

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.exception;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +24,7 @@ import org.slf4j.helpers.MessageFormatter;
  *
  * @since 6.1
  */
-public class PlatformError extends Error implements Serializable, IThrowableWithContextInfo {
+public class PlatformError extends Error implements IThrowableWithContextInfo {
 
   private static final long serialVersionUID = 1L;
 

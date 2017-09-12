@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json.basic.filechooser;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.platform.Bean;
@@ -32,7 +33,7 @@ import org.eclipse.scout.rt.platform.util.FileUtility;
  */
 @Bean
 public class JsonFileChooserAcceptAttributeBuilder {
-  private final HashMap<String, String> m_mimeTypeToAcceptType = new HashMap<>();
+  private final Map<String, String> m_mimeTypeToAcceptType = new HashMap<>();
 
   /**
    * append the collection of media types to the list
@@ -86,7 +87,7 @@ public class JsonFileChooserAcceptAttributeBuilder {
    * @return the completed set of accept types
    */
   public Set<String> build() {
-    return new HashSet<String>(m_mimeTypeToAcceptType.values());
+    return new HashSet<>(m_mimeTypeToAcceptType.values());
   }
 
   /**

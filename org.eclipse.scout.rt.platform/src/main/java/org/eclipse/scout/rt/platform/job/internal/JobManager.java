@@ -17,6 +17,7 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -40,7 +41,6 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
-import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.IPermitAcquiredCallback;
 import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.QueuePosition;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -127,13 +127,7 @@ public class JobManager implements IJobManager {
           futureTask.changeState(JobState.PENDING);
         }
 
-        m_delayedExecutor.schedule(new Runnable() {
-
-          @Override
-          public void run() {
-            competeForPermitAndExecute(futureTask, new FutureRunner<>(JobManager.this, futureTask));
-          }
-        }, futureTask.getFirstFireTime());
+        m_delayedExecutor.schedule(() -> competeForPermitAndExecute(futureTask, new FutureRunner<>(JobManager.this, futureTask)), futureTask.getFirstFireTime());
       }
     }
     catch (final RuntimeException | Error e) { // NOSONAR
@@ -152,13 +146,7 @@ public class JobManager implements IJobManager {
     }
     else {
       futureTask.changeState(JobState.WAITING_FOR_PERMIT);
-      executionSemaphore.compete(futureTask, QueuePosition.TAIL, new IPermitAcquiredCallback() {
-
-        @Override
-        public void onPermitAcquired() {
-          m_executor.execute(futureRunner);
-        }
-      });
+      executionSemaphore.compete(futureTask, QueuePosition.TAIL, () -> m_executor.execute(futureRunner));
     }
   }
 
@@ -172,10 +160,10 @@ public class JobManager implements IJobManager {
     try {
       m_futures.awaitDone(filter, timeout, unit);
     }
-    catch (final java.util.concurrent.TimeoutException e) {
+    catch (final TimeoutException e) {
       throw BEANS.get(JobExceptionTranslator.class).translateTimeoutException(e, "Failed to wait for jobs to complete because the maximal wait time elapsed", timeout, unit);
     }
-    catch (final java.lang.InterruptedException e) {
+    catch (final InterruptedException e) {
       Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
       throw BEANS.get(JobExceptionTranslator.class).translateInterruptedException(e, "Interrupted while waiting for jobs to complete");
     }
@@ -186,10 +174,10 @@ public class JobManager implements IJobManager {
     try {
       m_futures.awaitFinished(filter, timeout, unit);
     }
-    catch (final java.util.concurrent.TimeoutException e) {
+    catch (final TimeoutException e) {
       throw BEANS.get(JobExceptionTranslator.class).translateTimeoutException(e, "Failed to wait for jobs to complete because the maximal wait time elapsed", timeout, unit);
     }
-    catch (final java.lang.InterruptedException e) {
+    catch (final InterruptedException e) {
       Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
       throw BEANS.get(JobExceptionTranslator.class).translateInterruptedException(e, "Interrupted while waiting for jobs to complete");
     }
@@ -257,7 +245,7 @@ public class JobManager implements IJobManager {
     final RunMonitor runMonitor = Assertions.assertNotNull(input.getRunContext() != null ? input.getRunContext().getRunMonitor() : BEANS.get(RunMonitor.class), "'RunMonitor' required if providing a 'RunContext'");
 
     final JobInput inputCopy = ensureJobInputName(input, callable.getClass().getName());
-    return new JobFutureTask<>(this, runMonitor, inputCopy, new CallableChain<RESULT>(), callable);
+    return new JobFutureTask<>(this, runMonitor, inputCopy, new CallableChain<>(), callable);
   }
 
   /**
@@ -271,25 +259,21 @@ public class JobManager implements IJobManager {
     final boolean prestartCoreThreads = CONFIG.getPropertyValue(JobManagerPrestartCoreThreadsProperty.class);
 
     // Create the rejection handler.
-    final RejectedExecutionHandler rejectHandler = new RejectedExecutionHandler() {
+    final RejectedExecutionHandler rejectHandler = (runnable, executor) -> {
+      if (isShutdown()) {
+        LOG.debug("Job rejected because the job manager is shutdown.");
+      }
+      else {
+        // Do not propagate exception, because the caller is not the submitting thread.
+        LOG.error("Job rejected because no more threads or queue slots available. [runnable={}]", runnable);
+      }
 
-      @Override
-      public void rejectedExecution(final Runnable runnable, final ThreadPoolExecutor executor) {
-        if (isShutdown()) {
-          LOG.debug("Job rejected because the job manager is shutdown.");
-        }
-        else {
-          // Do not propagate exception, because the caller is not the submitting thread.
-          LOG.error("Job rejected because no more threads or queue slots available. [runnable={}]", runnable);
-        }
-
-        if (runnable instanceof IRejectableRunnable) {
-          ((IRejectableRunnable) runnable).reject();
-        }
+      if (runnable instanceof IRejectableRunnable) {
+        ((IRejectableRunnable) runnable).reject();
       }
     };
 
-    final ThreadPoolExecutor executor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new NamedThreadFactory("scout-thread"), rejectHandler);
+    final ThreadPoolExecutor executor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, new SynchronousQueue<>(), new NamedThreadFactory("scout-thread"), rejectHandler);
     executor.allowCoreThreadTimeOut(allowCoreThreadTimeOut);
     if (prestartCoreThreads) {
       executor.prestartAllCoreThreads();
@@ -352,13 +336,13 @@ public class JobManager implements IJobManager {
    */
   protected <RESULT> void interceptCallableChain(final CallableChain<RESULT> callableChain, final JobFutureTask<?> future, final RunMonitor runMonitor, final JobInput input) {
     callableChain
-        .add(new CallableChainExceptionHandler<RESULT>())
+        .add(new CallableChainExceptionHandler<>())
         .add(new ThreadLocalProcessor<>(IFuture.CURRENT, future))
         .add(new ThreadLocalProcessor<>(RunMonitor.CURRENT, runMonitor))
         .add(BEANS.get(ThreadNameDecorator.class))
         .add(new DiagnosticContextValueProcessor(BEANS.get(JobNameContextValueProvider.class)))
-        .add(new RunContextRunner<RESULT>(input.getRunContext()))
-        .add(new ExceptionProcessor<RESULT>(input)); // must follow RunContextRunner to handle exception in proper RunContext
+        .add(new RunContextRunner<>(input.getRunContext()))
+        .add(new ExceptionProcessor<>(input)); // must follow RunContextRunner to handle exception in proper RunContext
   }
 
   @Override

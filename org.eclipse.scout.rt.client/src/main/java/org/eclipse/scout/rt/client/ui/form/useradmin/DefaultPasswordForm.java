@@ -32,10 +32,6 @@ import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementServic
 public class DefaultPasswordForm extends AbstractForm {
   private String m_userId;
 
-  public DefaultPasswordForm() {
-    super();
-  }
-
   public String getUserId() {
     return m_userId;
   }

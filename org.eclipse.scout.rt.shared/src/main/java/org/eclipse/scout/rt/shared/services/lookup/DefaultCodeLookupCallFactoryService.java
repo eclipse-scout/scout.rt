@@ -19,7 +19,7 @@ public class DefaultCodeLookupCallFactoryService implements ICodeLookupCallFacto
 
   @Override
   public <T> CodeLookupCall<T> newInstance(Class<? extends ICodeType<?, T>> codeTypeClass) {
-    return new CodeLookupCall<T>(codeTypeClass);
+    return new CodeLookupCall<>(codeTypeClass);
   }
 
 }

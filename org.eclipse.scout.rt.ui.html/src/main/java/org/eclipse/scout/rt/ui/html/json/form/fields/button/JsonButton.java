@@ -111,7 +111,7 @@ public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> im
     }
     else {
       List<?> adapterList = getUiSession().getJsonAdapters(getModel().getKeyStrokeScope());
-      if (adapterList.size() > 0) {
+      if (!adapterList.isEmpty()) {
         adapter = (IJsonAdapter<?>) adapterList.get(0);
       }
     }
@@ -129,7 +129,7 @@ public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> im
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    m_jsonContextMenu = new JsonContextMenu<IContextMenu>(getModel().getContextMenu(), this);
+    m_jsonContextMenu = new JsonContextMenu<>(getModel().getContextMenu(), this);
     m_jsonContextMenu.init();
   }
 

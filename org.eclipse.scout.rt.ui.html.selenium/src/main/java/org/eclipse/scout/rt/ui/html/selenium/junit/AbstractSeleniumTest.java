@@ -504,16 +504,13 @@ public abstract class AbstractSeleniumTest {
   }
 
   public void waitUntilWindowsCount(final int expectedWindowsCount) {
-    waitUntil(new Function<WebDriver, Integer>() {
-      @Override
-      public Integer apply(WebDriver webDriver) {
-        int numWindows = webDriver.getWindowHandles().size();
-        if (numWindows == expectedWindowsCount) {
-          return numWindows;
-        }
-        else {
-          return null;
-        }
+    waitUntil(webDriver -> {
+      int numWindows = webDriver.getWindowHandles().size();
+      if (numWindows == expectedWindowsCount) {
+        return numWindows;
+      }
+      else {
+        return null;
       }
     });
   }

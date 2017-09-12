@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
+@FunctionalInterface
 public interface IIdProvider<T> {
 
   String getId(T object);

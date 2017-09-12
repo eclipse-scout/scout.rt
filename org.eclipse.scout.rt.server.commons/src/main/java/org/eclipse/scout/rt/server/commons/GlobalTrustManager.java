@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.server.commons;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -88,13 +87,8 @@ public class GlobalTrustManager {
     }
   }
 
-  protected X509Certificate[] getTrustedCertificates() throws IOException, CertificateException {
-    FilenameFilter certFilter = new FilenameFilter() {
-      @Override
-      public boolean accept(File file, String name) {
-        return (name.toLowerCase().endsWith(".der"));
-      }
-    };
+  protected X509Certificate[] getTrustedCertificates() {
+    FilenameFilter certFilter = (file, name) -> (name.toLowerCase().endsWith(".der"));
     List<X509Certificate> trustedCerts = null;
     try {
       RemoteFile[] certRemoteFiles = BEANS.get(IRemoteFileService.class).getRemoteFiles(PATH_CERTS, certFilter, null);
@@ -111,7 +105,7 @@ public class GlobalTrustManager {
   }
 
   protected List<X509Certificate> installTrustedCertificates(RemoteFile[] certRemoteFiles) {
-    List<X509Certificate> trustedCerts = new LinkedList<X509Certificate>();
+    List<X509Certificate> trustedCerts = new LinkedList<>();
     for (RemoteFile certRemoteFile : certRemoteFiles) {
       try {
         LOG.info("Trusted certificate '{}' found.", certRemoteFile.getName());
@@ -143,7 +137,7 @@ public class GlobalTrustManager {
     private static final String CERTIFICATE_NOT_TRUSTED = "certificate not trusted.";
 
     private TrustManager[] m_installedTrustManagers;
-    private X509Certificate[] m_trustedCerts;
+    private final X509Certificate[] m_trustedCerts;
 
     public P_GlobalTrustManager(X509Certificate[] trustedCerts, String tmAlgorithm) throws NoSuchAlgorithmException, KeyStoreException {
       if (trustedCerts != null) {
@@ -228,8 +222,7 @@ public class GlobalTrustManager {
 
     @Override
     public X509Certificate[] getAcceptedIssuers() {
-      List<X509Certificate> trustedCertsAll = new ArrayList<X509Certificate>();
-      trustedCertsAll.addAll(Arrays.asList(m_trustedCerts));
+      List<X509Certificate> trustedCertsAll = new ArrayList<>(Arrays.asList(m_trustedCerts));
 
       // ask default truststore (e.g. cacerts) for trusted certificates. Depending on the authType, different managers are possible.
       for (TrustManager trustManager : m_installedTrustManagers) {

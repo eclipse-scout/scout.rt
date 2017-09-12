@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.server.jdbc.parsers.token;
 
 public class TextToken implements IToken {
-  private String m_parsedToken;
+  private final String m_parsedToken;
 
   public TextToken(String parsedToken) {
     m_parsedToken = parsedToken;

@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.composer;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -160,7 +158,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   @ConfigOperation
   @Order(99)
   protected EntityPath execResolveEntityPath(EntityNode node) {
-    LinkedList<IDataModelEntity> list = new LinkedList<IDataModelEntity>();
+    LinkedList<IDataModelEntity> list = new LinkedList<>();
     EntityNode tmp = node;
     while (tmp != null) {
       if (tmp.getEntity() != null) {
@@ -169,7 +167,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       //next
       tmp = tmp.getAncestorNode(EntityNode.class);
     }
-    if (list.size() > 0) {
+    if (!list.isEmpty()) {
       interceptResolveRootPathForTopLevelEntity(list.get(0), list);
     }
     return new EntityPath(list);
@@ -184,7 +182,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   @ConfigOperation
   @Order(99)
   protected AttributePath execResolveAttributePath(AttributeNode node) {
-    LinkedList<IDataModelEntity> list = new LinkedList<IDataModelEntity>();
+    LinkedList<IDataModelEntity> list = new LinkedList<>();
     if (node == null) {
       return null;
     }
@@ -196,7 +194,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       //next
       tmp = tmp.getAncestorNode(EntityNode.class);
     }
-    if (list.size() > 0) {
+    if (!list.isEmpty()) {
       interceptResolveRootPathForTopLevelEntity(list.get(0), list);
     }
     else {
@@ -247,7 +245,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
    */
   @ConfigOperation
   @Order(110)
-  protected EntityNode execCreateEntityNode(ITreeNode parentNode, IDataModelEntity e, boolean negated, List<? extends Object> values, List<String> texts) {
+  protected EntityNode execCreateEntityNode(ITreeNode parentNode, IDataModelEntity e, boolean negated, List<?> values, List<String> texts) {
     EntityNode node = new EntityNode(this, e);
     node.setValues(values);
     node.setTexts(texts);
@@ -266,7 +264,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
    */
   @ConfigOperation
   @Order(120)
-  protected AttributeNode execCreateAttributeNode(ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<? extends Object> values, List<String> texts) {
+  protected AttributeNode execCreateAttributeNode(ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<?> values, List<String> texts) {
     if (aggregationType != null && aggregationType == DataModelConstants.AGGREGATION_NONE) {
       aggregationType = null;
     }
@@ -351,15 +349,12 @@ public abstract class AbstractComposerField extends AbstractFormField implements
           });
 
       // local enabled listener
-      addPropertyChangeListener(PROP_ENABLED_COMPUTED, new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent e) {
-          if (m_tree == null) {
-            return;
-          }
-          boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
-          m_tree.setEnabled(newEnabled);
+      addPropertyChangeListener(PROP_ENABLED_COMPUTED, e -> {
+        if (m_tree == null) {
+          return;
         }
+        boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
+        m_tree.setEnabled(newEnabled);
       });
     }
     else {
@@ -467,7 +462,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
           LOG.warn("read op", e);
           continue;
         }
-        ArrayList<Object> valueList = new ArrayList<Object>();
+        List<Object> valueList = new ArrayList<>();
         try {
           for (int i = 1; i <= 5; i++) {
             String valueName = (i == 1 ? "value" : "value" + i);
@@ -480,7 +475,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
           LOG.warn("read value for attribute {}", id, e);
           continue;
         }
-        ArrayList<String> displayValueList = new ArrayList<String>();
+        List<String> displayValueList = new ArrayList<>();
         for (int i = 1; i <= 5; i++) {
           String displayValueName = (i == 1 ? "displayValue" : "displayValue" + i);
           if (xmlElem.hasAttribute(displayValueName)) {
@@ -643,7 +638,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   }
 
   @Override
-  public EntityNode addEntityNode(ITreeNode parentNode, IDataModelEntity e, boolean negated, List<? extends Object> values, List<String> texts) {
+  public EntityNode addEntityNode(ITreeNode parentNode, IDataModelEntity e, boolean negated, List<?> values, List<String> texts) {
     EntityNode node = interceptCreateEntityNode(parentNode, e, negated, values, texts);
     if (node != null) {
       getTree().addChildNode(parentNode, node);
@@ -673,7 +668,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   }
 
   @Override
-  public AttributeNode addAttributeNode(ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<? extends Object> values, List<String> texts) {
+  public AttributeNode addAttributeNode(ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<?> values, List<String> texts) {
     AttributeNode node = interceptCreateAttributeNode(parentNode, a, aggregationType, op, values, texts);
     if (node != null) {
       getTree().addChildNode(parentNode, node);
@@ -709,15 +704,12 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     try {
       m_tree.setTreeChanging(true);
       //
-      ITreeVisitor v = new ITreeVisitor() {
-        @Override
-        public boolean visit(ITreeNode node) {
-          if (!node.isStatusNonchanged()) {
-            node.setStatusInternal(ITreeNode.STATUS_NON_CHANGED);
-            m_tree.updateNode(node);
-          }
-          return true;
+      ITreeVisitor v = node -> {
+        if (!node.isStatusNonchanged()) {
+          node.setStatusInternal(ITreeNode.STATUS_NON_CHANGED);
+          m_tree.updateNode(node);
         }
+        return true;
       };
       m_tree.visitNode(m_tree.getRootNode(), v);
       m_tree.clearDeletedNodes();
@@ -764,14 +756,11 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       super.execDisposeTree();
 
       // dispose nodes (not necessary to remove them, dispose is sufficient)
-      visitTree(new ITreeVisitor() {
-        @Override
-        public boolean visit(ITreeNode node) {
-          if (node instanceof AbstractComposerNode) {
-            ((AbstractComposerNode) node).dispose();
-          }
-          return true;
+      visitTree(node -> {
+        if (node instanceof AbstractComposerNode) {
+          ((AbstractComposerNode) node).dispose();
         }
+        return true;
       });
     }
 
@@ -899,7 +888,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     return chain.execResolveAttributePath(node);
   }
 
-  protected final AttributeNode interceptCreateAttributeNode(ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<? extends Object> values, List<String> texts) {
+  protected final AttributeNode interceptCreateAttributeNode(ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<?> values, List<String> texts) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ComposerFieldCreateAttributeNodeChain chain = new ComposerFieldCreateAttributeNodeChain(extensions);
     return chain.execCreateAttributeNode(parentNode, a, aggregationType, op, values, texts);
@@ -929,7 +918,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     return chain.execCreateAdditionalOrNode(eitherOrNode, negated);
   }
 
-  protected final EntityNode interceptCreateEntityNode(ITreeNode parentNode, IDataModelEntity e, boolean negated, List<? extends Object> values, List<String> texts) {
+  protected final EntityNode interceptCreateEntityNode(ITreeNode parentNode, IDataModelEntity e, boolean negated, List<?> values, List<String> texts) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ComposerFieldCreateEntityNodeChain chain = new ComposerFieldCreateEntityNodeChain(extensions);
     return chain.execCreateEntityNode(parentNode, e, negated, values, texts);
@@ -962,7 +951,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     }
 
     @Override
-    public AttributeNode execCreateAttributeNode(ComposerFieldCreateAttributeNodeChain chain, ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<? extends Object> values,
+    public AttributeNode execCreateAttributeNode(ComposerFieldCreateAttributeNodeChain chain, ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<?> values,
         List<String> texts) {
       return getOwner().execCreateAttributeNode(parentNode, a, aggregationType, op, values, texts);
     }
@@ -988,13 +977,13 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     }
 
     @Override
-    public EntityNode execCreateEntityNode(ComposerFieldCreateEntityNodeChain chain, ITreeNode parentNode, IDataModelEntity e, boolean negated, List<? extends Object> values, List<String> texts) {
+    public EntityNode execCreateEntityNode(ComposerFieldCreateEntityNodeChain chain, ITreeNode parentNode, IDataModelEntity e, boolean negated, List<?> values, List<String> texts) {
       return getOwner().execCreateEntityNode(parentNode, e, negated, values, texts);
     }
   }
 
   @Override
   protected IComposerFieldExtension<? extends AbstractComposerField> createLocalExtension() {
-    return new LocalComposerFieldExtension<AbstractComposerField>(this);
+    return new LocalComposerFieldExtension<>(this);
   }
 }

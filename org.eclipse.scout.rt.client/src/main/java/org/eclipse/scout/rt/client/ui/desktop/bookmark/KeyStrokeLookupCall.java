@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TreeSet;
 
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
@@ -42,10 +43,10 @@ public class KeyStrokeLookupCall extends LocalLookupCall<String> {
 
   @Override
   protected List<ILookupRow<String>> execCreateLookupRows() {
-    final HashMap<String, Integer> keyStrokesUpper = new HashMap<String, Integer>();
+    final Map<String, Integer> keyStrokesUpper = new HashMap<>();
     //build possible keyStrokes
     for (int i = 1; i <= 12; i++) {
-      keyStrokesUpper.put("SHIFT-F" + i, Integer.valueOf(i));
+      keyStrokesUpper.put("SHIFT-F" + i, i);
     }
     //remove used keyStrokes
     IBookmarkService service = BEANS.get(IBookmarkService.class);
@@ -72,12 +73,12 @@ public class KeyStrokeLookupCall extends LocalLookupCall<String> {
     service.getBookmarkData().getGlobalBookmarks().visit(v);
     service.getBookmarkData().getUserBookmarks().visit(v);
     //
-    TreeSet<Integer> availableNumbers = new TreeSet<Integer>(keyStrokesUpper.values());
-    ArrayList<ILookupRow<String>> resultList = new ArrayList<ILookupRow<String>>();
+    Iterable<Integer> availableNumbers = new TreeSet<>(keyStrokesUpper.values());
+    List<ILookupRow<String>> resultList = new ArrayList<>();
     for (Integer i : availableNumbers) {
       String key = "Shift-F" + i;
       String text = "Shift-F" + i;
-      ILookupRow<String> row = new LookupRow<String>(key, text);
+      ILookupRow<String> row = new LookupRow<>(key, text);
       resultList.add(row);
     }
     return resultList;

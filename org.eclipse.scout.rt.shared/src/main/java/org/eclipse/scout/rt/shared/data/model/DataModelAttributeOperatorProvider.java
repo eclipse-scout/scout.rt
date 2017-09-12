@@ -353,8 +353,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
   private static class NEQ extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -388,8 +388,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
   private static class LT extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -424,8 +424,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class LE extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -461,8 +461,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class EQ extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -498,8 +498,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class GT extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -535,8 +535,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class GE extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -572,8 +572,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class DateIsInDays extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -609,8 +609,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class DateIsInGEDays extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -646,8 +646,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class DateIsInGEMonths extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -683,8 +683,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class DateIsInLEDays extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -720,8 +720,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class DateIsInLEMonths extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -757,8 +757,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class DateIsInLastDays extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -794,8 +794,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class DateIsInLastMonths extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -831,8 +831,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class DateIsInMonths extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -868,8 +868,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class DateIsInNextDays extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -905,8 +905,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class DateIsInNextMonths extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -942,8 +942,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class DateIsNotToday extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -979,8 +979,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class DateIsToday extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1016,8 +1016,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class DateTimeIsInGEHours extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1053,8 +1053,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class DateTimeIsInGEMinutes extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1090,8 +1090,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class DateTimeIsInLEHours extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1127,8 +1127,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class DateTimeIsInLEMinutes extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1164,8 +1164,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class DateTimeIsNotNow extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1201,8 +1201,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class DateTimeIsNow extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1238,8 +1238,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class EndsWith extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1275,8 +1275,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class NotEndsWith extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1312,8 +1312,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class In extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1349,8 +1349,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class Contains extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1386,8 +1386,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class NotIn extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1423,8 +1423,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class NotContains extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1460,8 +1460,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class NotNull extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1500,8 +1500,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class NumberNotNull extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1537,8 +1537,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class Null extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1577,8 +1577,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class NumberNull extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1614,8 +1614,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class StartsWith extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1651,8 +1651,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class NotStartsWith extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1688,8 +1688,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class TimeIsInGEHours extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1725,8 +1725,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class TimeIsInGEMinutes extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1762,8 +1762,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class TimeIsInHours extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1799,8 +1799,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class TimeIsInLEHours extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1836,8 +1836,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class TimeIsInLEMinutes extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1873,8 +1873,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class TimeIsInMinutes extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1910,8 +1910,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class TimeIsNow extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1947,8 +1947,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class TimeIsNotNow extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -1983,8 +1983,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
   private static class Between extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType
@@ -2027,8 +2027,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   private static class Like extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
-    private String m_shortText;
-    private String m_text;
+    private final String m_shortText;
+    private final String m_text;
 
     /**
      * @param aggregationType

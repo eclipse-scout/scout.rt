@@ -78,7 +78,7 @@ public class SqlConnectionBuilder {
       String jndiUrlPkgPrefixes = sqlService.getJndiUrlPkgPrefixes();
       LOG.info("Opening rmi connection. jndiName: '{}', user: '{}', initialContextFactory: '{}', providerUrl: '{}'", jndiName, user, jndiInitialContextFactory, jndiProviderUrl);
       @SuppressWarnings("squid:S1149")
-      Hashtable<String, String> ht = new Hashtable<String, String>();
+      Hashtable<String, String> ht = new Hashtable<>();
       if (jndiInitialContextFactory != null) {
         ht.put(Context.INITIAL_CONTEXT_FACTORY, jndiInitialContextFactory);
       }
@@ -89,7 +89,7 @@ public class SqlConnectionBuilder {
         ht.put(Context.URL_PKG_PREFIXES, jndiUrlPkgPrefixes);
       }
       DataSource dataSource = null;
-      if (ht.size() > 0) {
+      if (!ht.isEmpty()) {
         initialContext = new InitialContext(ht);
       }
       else {

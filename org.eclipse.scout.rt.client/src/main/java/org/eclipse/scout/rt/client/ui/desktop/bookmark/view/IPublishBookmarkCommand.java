@@ -18,13 +18,13 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkStorageServ
  * Injection command for {@link BookmarkViewForm#getUserBookmarkTreeField()} and
  * {@link AbstractBookmarkTreeField#injectPublishBookmarkCommand(IPublishBookmarkCommand)}
  */
+@FunctionalInterface
 public interface IPublishBookmarkCommand {
 
   /**
    * Obtains the target group for the bookmark to be published to
    * <p>
-   * and calls
-   * {@link IBookmarkStorageService#publishBookmarkData(org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder, java.util.Map)}
+   * and calls {@link IBookmarkStorageService#publishBookmarkData(BookmarkFolder, java.util.Map)}
    */
   void publishBookmark(BookmarkFolder publishFolder);
 

@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.util.WeakEventListener;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +70,7 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
     IForm f = getForm();
     while (f != null) {
       if (f instanceof IWizardContainerForm) {
-        setWizard(((IWizardContainerForm) f).getWizard());
+        setWizard(f.getWizard());
       }
       f = f.getOuterForm();
     }
@@ -112,16 +111,13 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
 
   private void markDirty() {
     m_dirty = true;
-    ModelJobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        if (m_dirty) {
-          try {
-            refreshStatus();
-          }
-          catch (RuntimeException | PlatformError e) {
-            LOG.warn("Could not refresh status", e);
-          }
+    ModelJobs.schedule(() -> {
+      if (m_dirty) {
+        try {
+          refreshStatus();
+        }
+        catch (RuntimeException | PlatformError e) {
+          LOG.warn("Could not refresh status", e);
         }
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));

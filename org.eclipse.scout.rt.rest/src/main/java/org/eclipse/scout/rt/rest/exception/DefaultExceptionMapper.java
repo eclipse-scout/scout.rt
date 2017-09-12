@@ -6,6 +6,7 @@ package org.eclipse.scout.rt.rest.exception;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.slf4j.Logger;
@@ -32,6 +33,6 @@ public class DefaultExceptionMapper extends AbstractExceptionMapper<Exception> {
   }
 
   protected Response createResponse(Exception exception) {
-    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    return Response.status(Status.INTERNAL_SERVER_ERROR).build();
   }
 }

@@ -15,7 +15,7 @@ package org.eclipse.scout.rt.client.ui.dnd;
  */
 
 public class ImageTransferObject extends TransferObject {
-  private Object m_img;
+  private final Object m_img;
 
   public ImageTransferObject(Object img) {
     m_img = img;

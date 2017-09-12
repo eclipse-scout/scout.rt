@@ -16,6 +16,7 @@ package org.eclipse.scout.rt.client.ui.basic.table;
  * {@link ITable#getFilteredRows()}. The rows themselves are still in the table! The methods {@link ITable#getRows()}
  * and {@link ITable#getRowCount()} are unaffected by the filter. The UI should use {@link ITable#getFilteredRows()}
  */
+@FunctionalInterface
 public interface ITableRowFilter {
 
   /**

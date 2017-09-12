@@ -24,7 +24,7 @@ import org.mockito.MockitoAnnotations;
 public class BeanAnnotationsInitStatement extends Statement {
 
   protected final Statement m_next;
-  private Object m_target;
+  private final Object m_target;
 
   /**
    * Creates a statement to register fields annotated with {@link BeanMock} or {@link Mock}.

@@ -34,11 +34,7 @@ public class ClusterNotificationMessageCoalescer {
     // sort by properties
     Map<IClusterNotificationProperties, List<Serializable>> notificationsPerProps = new HashMap<>();
     for (IClusterNotificationMessage message : inNotifications) {
-      List<Serializable> messages = notificationsPerProps.get(message.getProperties());
-      if (messages == null) {
-        messages = new ArrayList<>();
-        notificationsPerProps.put(message.getProperties(), messages);
-      }
+      List<Serializable> messages = notificationsPerProps.computeIfAbsent(message.getProperties(), k -> new ArrayList<>());
       messages.add(message.getNotification());
     }
 

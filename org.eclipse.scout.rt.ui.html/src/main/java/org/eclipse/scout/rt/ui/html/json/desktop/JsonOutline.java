@@ -11,10 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -47,7 +44,6 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   private static final String PROP_DETAIL_FORM_VISIBLE = "detailFormVisible";
   private static final String PROP_DETAIL_TABLE_VISIBLE = "detailTableVisible";
 
-  private Set<IJsonAdapter<?>> m_jsonDetailTables = new HashSet<IJsonAdapter<?>>();
   private final IDesktop m_desktop;
 
   public JsonOutline(OUTLINE outline, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
@@ -93,7 +89,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     putAdapterIdsProperty(json, "views", m_desktop.getViews(getModel()));
-    if (m_desktop.getSelectedViews(getModel()).size() > 0) {
+    if (!m_desktop.getSelectedViews(getModel()).isEmpty()) {
       putAdapterIdsProperty(json, "selectedViewTabs", m_desktop.getSelectedViews(getModel()));
     }
     putAdapterIdsProperty(json, "dialogs", m_desktop.getDialogs(getModel(), false));
@@ -116,7 +112,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
 
   @Override
   protected JsonContextMenu<IContextMenu> createJsonContextMenu() {
-    return new JsonContextMenu<IContextMenu>(getModel().getContextMenu(), this, new OutlineMenuFilter<IMenu>());
+    return new JsonContextMenu<>(getModel().getContextMenu(), this, new OutlineMenuFilter<>());
   }
 
   @Override
@@ -155,7 +151,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
 
   protected boolean acceptModelTreeEvent(TreeEvent event) {
     // Don't fill the event buffer with events that are currently not relevant for the UI
-    if (event instanceof OutlineEvent && ObjectUtility.isOneOf(((OutlineEvent) event).getType(),
+    if (event instanceof OutlineEvent && ObjectUtility.isOneOf(event.getType(),
         OutlineEvent.TYPE_PAGE_BEFORE_DATA_LOADED,
         OutlineEvent.TYPE_PAGE_AFTER_DATA_LOADED,
         OutlineEvent.TYPE_PAGE_AFTER_TABLE_INIT,
@@ -221,8 +217,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
       return;
     }
     table.setProperty(JsonOutlineTable.PROP_PAGE, page);
-    IJsonAdapter<?> detailTableAdapter = attachGlobalAdapter(table);
-    m_jsonDetailTables.add(detailTableAdapter);
+    attachGlobalAdapter(table);
   }
 
   protected void detachDetailTable(IPage page) {
@@ -230,11 +225,8 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     if (table != null) {
       table.setProperty(JsonOutlineTable.PROP_PAGE, null);
       IJsonAdapter<?> jsonTableAdapter = getGlobalAdapter(table);
-      if (jsonTableAdapter != null) {
-        m_jsonDetailTables.remove(jsonTableAdapter);
-        if (!jsonTableAdapter.isDisposed()) {
-          jsonTableAdapter.dispose();
-        }
+      if (jsonTableAdapter != null && !jsonTableAdapter.isDisposed()) {
+        jsonTableAdapter.dispose();
       }
     }
   }

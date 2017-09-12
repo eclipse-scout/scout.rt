@@ -61,7 +61,7 @@ public class TextKeyTextProviderService implements ITextProviderService {
     @Override
     public void stateChanged(PlatformEvent event) {
       if (State.PlatformStarted == event.getState() && CONFIG.getPropertyValue(TextProvidersShowKeysProperty.class)) {
-        TextKeyTextProviderService.register();
+        register();
       }
     }
   }

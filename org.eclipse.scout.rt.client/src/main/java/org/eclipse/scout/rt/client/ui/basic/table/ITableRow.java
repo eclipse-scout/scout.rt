@@ -104,7 +104,7 @@ public interface ITableRow {
    *
    * @return true if value was in fact changed
    */
-  boolean setCellValues(List<? extends Object> values);
+  boolean setCellValues(List<?> values);
 
   List<Object> getKeyValues();
 

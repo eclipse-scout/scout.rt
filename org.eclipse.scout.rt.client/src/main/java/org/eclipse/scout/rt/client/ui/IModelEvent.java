@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui;
 /**
  * Marker for Events in Scout Model
  */
+@FunctionalInterface
 public interface IModelEvent {
 
   int getType();

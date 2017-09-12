@@ -39,16 +39,12 @@ public class ThreadLocalProcessor<THREAD_LOCAL> implements ICallableDecorator {
     m_threadLocal.set(m_value);
 
     // Restore value upon completion of the command.
-    return new IUndecorator() {
-
-      @Override
-      public void undecorate() {
-        if (originValue == null) {
-          m_threadLocal.remove();
-        }
-        else {
-          m_threadLocal.set(originValue);
-        }
+    return () -> {
+      if (originValue == null) {
+        m_threadLocal.remove();
+      }
+      else {
+        m_threadLocal.set(originValue);
       }
     };
   }

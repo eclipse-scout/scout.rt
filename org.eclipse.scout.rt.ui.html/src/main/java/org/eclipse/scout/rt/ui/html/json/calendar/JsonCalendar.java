@@ -94,7 +94,7 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
     super.attachChildAdapters();
     attachAdapter(getModel().getSelectedComponent());
     attachAdapters(getModel().getComponents());
-    m_jsonContextMenu = new JsonContextMenu<IContextMenu>(getModel().getContextMenu(), this);
+    m_jsonContextMenu = new JsonContextMenu<>(getModel().getContextMenu(), this);
     m_jsonContextMenu.init();
   }
 
@@ -319,7 +319,7 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
     JSONObject viewRange = data.optJSONObject("viewRange");
     Date fromDate = toJavaDate(viewRange, "from");
     Date toDate = toJavaDate(viewRange, "to");
-    return new Range<Date>(fromDate, toDate);
+    return new Range<>(fromDate, toDate);
   }
 
   protected Date extractSelectedDate(JSONObject data) {

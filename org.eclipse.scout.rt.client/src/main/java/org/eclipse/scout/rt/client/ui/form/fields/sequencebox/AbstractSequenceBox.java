@@ -10,12 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.sequencebox;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.sequencebox.ISequenceBoxExtension;
@@ -111,7 +110,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   @ConfigOperation
   @Order(200)
   protected <T extends Comparable<T>> void execCheckFromTo(IValueField<T>[] valueFields, int changedIndex) {
-    ArrayList<IValueField<T>> nonEmptyFields = new ArrayList<IValueField<T>>();
+    List<IValueField<T>> nonEmptyFields = new ArrayList<>();
     int nonEmptyIndex = -1;
     for (int i = 0; i < valueFields.length; i++) {
       if (valueFields[i].getValue() != null) {
@@ -131,7 +130,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     }
   }
 
-  private <T extends Comparable<T>> void checkNonEmptyFromTo(ArrayList<IValueField<T>> nonEmptyFields, int nonEmptyIndex) {
+  private <T extends Comparable<T>> void checkNonEmptyFromTo(List<IValueField<T>> nonEmptyFields, int nonEmptyIndex) {
     // check changed field against its non-empty neighbours
     IValueField<T> v = nonEmptyFields.get(nonEmptyIndex);
 
@@ -167,7 +166,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   }
 
   private <T extends Comparable<T>> boolean equalTypes(List<IValueField<T>> nonEmptyFields) {
-    HashSet<Class> beanTypes = new HashSet<Class>();
+    Set<Class> beanTypes = new HashSet<>();
     for (IValueField<T> f : nonEmptyFields) {
       beanTypes.add(f.getValue().getClass());
     }
@@ -196,24 +195,18 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     // when range box has visible label, suppress first field's label and append
     // to own label
     propertySupport.addPropertyChangeListener(
-        new PropertyChangeListener() {
-          @Override
-          public void propertyChange(PropertyChangeEvent e) {
-            if (e.getPropertyName().equals(IFormField.PROP_LABEL_VISIBLE) || e.getPropertyName().equals(IFormField.PROP_LABEL) || e.getPropertyName().equals(IFormField.PROP_VISIBLE)) {
-              updateLabelComposition();
-            }
+        e -> {
+          if (e.getPropertyName().equals(IFormField.PROP_LABEL_VISIBLE) || e.getPropertyName().equals(IFormField.PROP_LABEL) || e.getPropertyName().equals(IFormField.PROP_VISIBLE)) {
+            updateLabelComposition();
           }
         });
     // <bsh 2010-10-01>
     // If inner fields change their visibility dynamically, the label of the SequenceBox might change.
     for (IFormField field : getFields()) {
       field.addPropertyChangeListener(
-          new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent e) {
-              if (e.getPropertyName().equals(IFormField.PROP_LABEL_VISIBLE) || e.getPropertyName().equals(IFormField.PROP_LABEL) || e.getPropertyName().equals(IFormField.PROP_VISIBLE)) {
-                updateLabelComposition();
-              }
+          e -> {
+            if (e.getPropertyName().equals(IFormField.PROP_LABEL_VISIBLE) || e.getPropertyName().equals(IFormField.PROP_LABEL) || e.getPropertyName().equals(IFormField.PROP_VISIBLE)) {
+              updateLabelComposition();
             }
           });
     }
@@ -236,12 +229,9 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
         final int index = i;
         valueFields[index].addPropertyChangeListener(
             IValueField.PROP_VALUE,
-            new PropertyChangeListener() {
-              @Override
-              public void propertyChange(PropertyChangeEvent e) {
-                if (getForm() != null && isAutoCheckFromTo()) {
-                  checkFromTo(valueFields, index);
-                }
+            e -> {
+              if (getForm() != null && isAutoCheckFromTo()) {
+                checkFromTo(valueFields, index);
               }
             });
       }
@@ -252,7 +242,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
    * @return Comparable {@link IValueField}s with the same holder type than the first one
    */
   private ArrayList<IValueField> getComparableValueFields() {
-    ArrayList<IValueField> valueFieldList = new ArrayList<IValueField>();
+    ArrayList<IValueField> valueFieldList = new ArrayList<>();
     Class<?> sharedType = null;
     for (IFormField f : getFields()) {
       if (f instanceof IValueField) {
@@ -488,6 +478,6 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
 
   @Override
   protected ISequenceBoxExtension<? extends AbstractSequenceBox> createLocalExtension() {
-    return new LocalSequenceBoxExtension<AbstractSequenceBox>(this);
+    return new LocalSequenceBoxExtension<>(this);
   }
 }

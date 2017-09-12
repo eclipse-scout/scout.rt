@@ -15,7 +15,6 @@ import java.io.PrintWriter;
 import java.lang.ref.WeakReference;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
@@ -60,7 +59,7 @@ public final class EventListenerProfiler {
       return;
     }
     synchronized (m_sourcesLock) {
-      m_sources.add(new WeakReference<IEventListenerSource>(source));
+      m_sources.add(new WeakReference<>(source));
     }
   }
 
@@ -101,12 +100,7 @@ public final class EventListenerProfiler {
   }
 
   private void manageNoLock() {
-    for (Iterator<WeakReference<IEventListenerSource>> it = m_sources.iterator(); it.hasNext();) {
-      WeakReference<IEventListenerSource> ref = it.next();
-      if (ref.get() == null) {
-        it.remove();
-      }
-    }
+    m_sources.removeIf(ref -> ref.get() == null);
   }
 
 }

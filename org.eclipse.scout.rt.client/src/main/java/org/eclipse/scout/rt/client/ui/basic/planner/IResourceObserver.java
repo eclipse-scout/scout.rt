@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.planner;
 
+@FunctionalInterface
 public interface IResourceObserver<RI> {
   void resourceChanged(Resource<RI> resource);
 }

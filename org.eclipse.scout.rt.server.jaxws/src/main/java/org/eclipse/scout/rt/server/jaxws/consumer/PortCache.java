@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.jaxws.consumer.pool.PooledPortProvider;
 import org.quartz.SimpleScheduleBuilder;
 
@@ -55,7 +54,7 @@ public class PortCache<PORT> implements IPortProvider<PORT> {
    *          factory to create new Ports.
    */
   public PortCache(final int corePoolSize, final long timeToLive, final IPortProvider<PORT> portProvider) {
-    this(corePoolSize, timeToLive, portProvider, new ConcurrentLinkedDeque<PortCacheEntry<PORT>>());
+    this(corePoolSize, timeToLive, portProvider, new ConcurrentLinkedDeque<>());
   }
 
   PortCache(final int corePoolSize, final long timeToLive, final IPortProvider<PORT> portProvider, final Deque<PortCacheEntry<PORT>> queue) {
@@ -70,13 +69,7 @@ public class PortCache<PORT> implements IPortProvider<PORT> {
    */
   public void init() {
     // Start periodic cleanup job.
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        discardExpiredPorts();
-      }
-    }, Jobs.newInput()
+    Jobs.schedule(this::discardExpiredPorts, Jobs.newInput()
         .withName("Cleaning up JAX-WS port cache")
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(1, TimeUnit.MINUTES)
@@ -84,13 +77,7 @@ public class PortCache<PORT> implements IPortProvider<PORT> {
 
     // Ensures to have at minimum 'corePoolSize' Ports in the cache.
     if (m_corePoolSize > 0) {
-      Jobs.schedule(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          ensureCorePool();
-        }
-      }, Jobs.newInput()
+      Jobs.schedule(this::ensureCorePool, Jobs.newInput()
           .withName("Initializing JAX-WS port cache"));
     }
   }
@@ -102,12 +89,8 @@ public class PortCache<PORT> implements IPortProvider<PORT> {
 
     // Preemptively create a new port and put it into the cache.
     // Note: Do not invoke with current RunContext because the port will be used by any other invoker.
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        m_queue.offer(new PortCacheEntry<>(m_portProvider.provide(), m_timeToLive));
-      }
+    Jobs.schedule(() -> {
+      m_queue.offer(new PortCacheEntry<>(m_portProvider.provide(), m_timeToLive));
     }, Jobs.newInput()
         .withName("Producing PortType to be put into cache"));
 

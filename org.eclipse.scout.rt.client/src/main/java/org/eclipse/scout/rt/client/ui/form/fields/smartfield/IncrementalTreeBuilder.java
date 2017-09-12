@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 /**
@@ -43,7 +43,7 @@ public class IncrementalTreeBuilder<LOOKUP_KEY> {
     List<ILookupRow<LOOKUP_KEY>> res = new ArrayList<>();
 
     cacheKeys(lookupRows);
-    HashSet<LOOKUP_KEY> allRows = new HashSet<>();
+    Set<LOOKUP_KEY> allRows = new HashSet<>();
 
     List<List<ILookupRow<LOOKUP_KEY>>> paths = createPaths(lookupRows, existingTree);
     if (parent == null) {
@@ -139,19 +139,15 @@ public class IncrementalTreeBuilder<LOOKUP_KEY> {
    */
   public Map<LOOKUP_KEY, ILookupRow<LOOKUP_KEY>> createParentMap(ITree tree) {
     final Map<LOOKUP_KEY, ILookupRow<LOOKUP_KEY>> map = new HashMap<>();
-    tree.visitTree(new ITreeVisitor() {
-
-      @Override
-      public boolean visit(ITreeNode node) {
-        ITreeNode parent = node.getParentNode();
-        ILookupRow<LOOKUP_KEY> row = getLookupRow(node);
-        if (row != null) {
-          LOOKUP_KEY key = row.getKey();
-          m_keyCache.put(key, row);
-          map.put(key, getLookupRow(parent));
-        }
-        return true;
+    tree.visitTree(node -> {
+      ITreeNode parent = node.getParentNode();
+      ILookupRow<LOOKUP_KEY> row = getLookupRow(node);
+      if (row != null) {
+        LOOKUP_KEY key = row.getKey();
+        m_keyCache.put(key, row);
+        map.put(key, getLookupRow(parent));
       }
+      return true;
     });
     return map;
   }

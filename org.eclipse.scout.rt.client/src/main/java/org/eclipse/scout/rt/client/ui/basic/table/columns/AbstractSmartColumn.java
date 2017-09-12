@@ -68,7 +68,7 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractColumn<VALUE> i
 
   @Override
   protected ISmartColumnExtension<VALUE, ? extends AbstractSmartColumn<VALUE>> createLocalExtension() {
-    return new LocalSmartColumn2Extension<VALUE, AbstractSmartColumn<VALUE>>(this);
+    return new LocalSmartColumn2Extension<>(this);
   }
 
   @Override
@@ -297,9 +297,9 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractColumn<VALUE> i
   @Override
   public void updateDisplayTexts(List<ITableRow> rows) {
     try {
-      if (rows.size() > 0) {
+      if (!rows.isEmpty()) {
         BatchLookupCall batchCall = new BatchLookupCall();
-        ArrayList<ITableRow> batchRowList = new ArrayList<ITableRow>();
+        ArrayList<ITableRow> batchRowList = new ArrayList<>();
 
         BatchLookupResultCache lookupResultCache = new BatchLookupResultCache();
         for (ITableRow row : rows) {
@@ -315,7 +315,7 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractColumn<VALUE> i
             }
           }
           else {
-            applyLookupResult(row, new ArrayList<ILookupRow<?>>(0));
+            applyLookupResult(row, new ArrayList<>(0));
           }
         }
 
@@ -475,7 +475,7 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractColumn<VALUE> i
 
   protected final void interceptPrepareLookup(ILookupCall<VALUE> call, ITableRow row) {
     List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> extensions = getAllExtensions();
-    SmartColumn2PrepareLookupChain<VALUE> chain = new SmartColumn2PrepareLookupChain<VALUE>(extensions);
+    SmartColumn2PrepareLookupChain<VALUE> chain = new SmartColumn2PrepareLookupChain<>(extensions);
     chain.execPrepareLookup(call, row);
   }
 

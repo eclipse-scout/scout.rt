@@ -44,8 +44,8 @@ public final class EntityPath implements IDataModelPath {
    * @param useCopyOfList
    *          if true then the entityPath list is assumed to be mutable and a copy of it is taken.
    */
-  protected EntityPath(List<IDataModelEntity> entityPath, boolean useCopyOfList) {
-    if (entityPath == null || entityPath.size() == 0) {
+  EntityPath(List<IDataModelEntity> entityPath, boolean useCopyOfList) {
+    if (entityPath == null || entityPath.isEmpty()) {
       m_entityPath = CollectionUtility.emptyArrayList();
     }
     else {
@@ -70,14 +70,14 @@ public final class EntityPath implements IDataModelPath {
    * convenience to get first element
    */
   public IDataModelEntity firstElement() {
-    return m_entityPath.size() > 0 ? m_entityPath.get(0) : null;
+    return !m_entityPath.isEmpty() ? m_entityPath.get(0) : null;
   }
 
   /**
    * convenience to get last element
    */
   public IDataModelEntity lastElement() {
-    return m_entityPath.size() > 0 ? m_entityPath.get(m_entityPath.size() - 1) : null;
+    return !m_entityPath.isEmpty() ? m_entityPath.get(m_entityPath.size() - 1) : null;
   }
 
   public int size() {
@@ -122,7 +122,7 @@ public final class EntityPath implements IDataModelPath {
     if (e == null) {
       return this;
     }
-    ArrayList<IDataModelEntity> newList = new ArrayList<IDataModelEntity>(size() + 1);
+    ArrayList<IDataModelEntity> newList = new ArrayList<>(size() + 1);
     newList.add(e);
     newList.addAll(m_entityPath);
     return new EntityPath(newList, false);
@@ -135,7 +135,7 @@ public final class EntityPath implements IDataModelPath {
     if (e == null) {
       return this;
     }
-    ArrayList<IDataModelEntity> newList = new ArrayList<IDataModelEntity>(size() + 1);
+    ArrayList<IDataModelEntity> newList = new ArrayList<>(size() + 1);
     newList.addAll(m_entityPath);
     newList.add(e);
     return new EntityPath(newList, false);
@@ -148,7 +148,7 @@ public final class EntityPath implements IDataModelPath {
     if (p == null || p.size() == 0) {
       return this;
     }
-    ArrayList<IDataModelEntity> newList = new ArrayList<IDataModelEntity>(size() + 1);
+    ArrayList<IDataModelEntity> newList = new ArrayList<>(size() + 1);
     newList.addAll(p.m_entityPath);
     newList.addAll(this.m_entityPath);
     return new EntityPath(newList, false);
@@ -161,7 +161,7 @@ public final class EntityPath implements IDataModelPath {
     if (p == null || p.size() == 0) {
       return this;
     }
-    ArrayList<IDataModelEntity> newList = new ArrayList<IDataModelEntity>(size() + 1);
+    ArrayList<IDataModelEntity> newList = new ArrayList<>(size() + 1);
     newList.addAll(this.m_entityPath);
     newList.addAll(p.m_entityPath);
     return new EntityPath(newList, false);
@@ -210,7 +210,7 @@ public final class EntityPath implements IDataModelPath {
           buf.append(".");
         }
         buf.append(e.getClass().getSimpleName());
-        buf.append("(" + e.getText() + ")");
+        buf.append("(").append(e.getText()).append(")");
         index++;
       }
     }

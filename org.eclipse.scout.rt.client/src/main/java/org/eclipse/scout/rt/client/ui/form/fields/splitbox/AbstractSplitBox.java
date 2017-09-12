@@ -308,7 +308,7 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
 
   @Override
   protected ISplitBoxExtension<? extends AbstractSplitBox> createLocalExtension() {
-    return new LocalSplitBoxExtension<AbstractSplitBox>(this);
+    return new LocalSplitBoxExtension<>(this);
   }
 
 }

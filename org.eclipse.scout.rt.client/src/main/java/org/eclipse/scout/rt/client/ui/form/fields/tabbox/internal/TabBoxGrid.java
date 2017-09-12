@@ -31,7 +31,7 @@ public class TabBoxGrid implements ICompositeFieldGrid<ITabBox> {
     // reset
     m_gridColumns = 0;
     m_gridRows = 0;
-    ArrayList<IFormField> list = new ArrayList<IFormField>();
+    ArrayList<IFormField> list = new ArrayList<>();
     // filter
     for (IFormField f : tabBox.getGroupBoxes()) {
       if (f.isVisible()) {
@@ -47,16 +47,16 @@ public class TabBoxGrid implements ICompositeFieldGrid<ITabBox> {
   }
 
   private void layoutStatic() {
-    for (int i = 0; i < m_fields.length; i++) {
-      GridData data = GridDataBuilder.createFromHints(m_fields[i], 1);
+    for (IFormField m_field1 : m_fields) {
+      GridData data = GridDataBuilder.createFromHints(m_field1, 1);
       m_gridRows = Math.max(m_gridRows, data.h);
       m_gridColumns = Math.max(m_gridColumns, data.w);
     }
-    for (int i = 0; i < m_fields.length; i++) {
-      GridData data = GridDataBuilder.createFromHints(m_fields[i], m_gridColumns);
+    for (IFormField m_field : m_fields) {
+      GridData data = GridDataBuilder.createFromHints(m_field, m_gridColumns);
       data.x = 0;
       data.y = 0;
-      m_fields[i].setGridDataInternal(data);
+      m_field.setGridDataInternal(data);
     }
   }
 

@@ -64,13 +64,7 @@ public class JobListeners {
     final JobListenerWithFilter globalListener = new JobListenerWithFilter(listener, filter);
     m_globalListeners.add(globalListener);
 
-    return new IRegistrationHandle() {
-
-      @Override
-      public void dispose() {
-        m_globalListeners.remove(globalListener);
-      }
-    };
+    return () -> m_globalListeners.remove(globalListener);
   }
 
   /**
@@ -82,13 +76,9 @@ public class JobListeners {
       registrations.add(future.addListener(filter, listener));
     }
 
-    return new IRegistrationHandle() {
-
-      @Override
-      public void dispose() {
-        for (final IRegistrationHandle registration : registrations) {
-          registration.dispose();
-        }
+    return () -> {
+      for (final IRegistrationHandle registration : registrations) {
+        registration.dispose();
       }
     };
   }

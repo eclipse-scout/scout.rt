@@ -42,7 +42,7 @@ class Destination<REQUEST, REPLY> implements IBiDestination<REQUEST, REPLY> {
     m_name = assertNotNullOrEmpty(name, "destination name not specified");
     m_type = assertNotNull(type, "destination type not specified");
     m_resolveMethod = assertNotNull(resolveMethod, "resolve method not specified");
-    m_properties = (properties == null ? Collections.<String, String> emptyMap() : Collections.unmodifiableMap(properties));
+    m_properties = (properties == null ? Collections.emptyMap() : Collections.unmodifiableMap(properties));
   }
 
   @Override

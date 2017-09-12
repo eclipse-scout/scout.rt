@@ -13,8 +13,10 @@ package org.eclipse.scout.rt.platform.reflect;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeListenerProxy;
+import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,13 +40,13 @@ public class BasicPropertySupport implements IEventListenerSource {
 
   public static final int DEFAULT_INT_VALUE = 0;
   public static final int DEFAULT_DOUBLE_VALUE = 0;
-  public static final Integer DEFAULT_INT = Integer.valueOf(DEFAULT_INT_VALUE);
-  public static final Double DEFAULT_DOUBLE = Double.valueOf(DEFAULT_DOUBLE_VALUE);
+  public static final Integer DEFAULT_INT = DEFAULT_INT_VALUE;
+  public static final Double DEFAULT_DOUBLE = (double) DEFAULT_DOUBLE_VALUE;
   public static final long DEFAULT_LONG_VALUE = DEFAULT_INT_VALUE;
-  public static final Long DEFAULT_LONG = Long.valueOf(DEFAULT_LONG_VALUE);
+  public static final Long DEFAULT_LONG = DEFAULT_LONG_VALUE;
   private static final Boolean DEFAULT_BOOL = Boolean.FALSE;
-  private final Map<String, Object> m_props = new HashMap<String, Object>();
-  private Object m_source;
+  private final Map<String, Object> m_props = new HashMap<>();
+  private final Object m_source;
   // observer
   private final Object m_listenerLock = new Object();
   private List<Object> m_listeners;
@@ -65,7 +67,7 @@ public class BasicPropertySupport implements IEventListenerSource {
       if (m_listeners != null) {
         for (Object o : m_listeners) {
           if (o instanceof WeakReference) {
-            snapshot.add(PropertyChangeListener.class, null, ((WeakReference) o).get());
+            snapshot.add(PropertyChangeListener.class, null, ((Reference) o).get());
           }
           else {
             snapshot.add(PropertyChangeListener.class, null, o);
@@ -73,11 +75,11 @@ public class BasicPropertySupport implements IEventListenerSource {
         }
       }
       if (m_childListeners != null) {
-        for (Map.Entry<String, List<Object>> e : m_childListeners.entrySet()) {
+        for (Entry<String, List<Object>> e : m_childListeners.entrySet()) {
           String context = e.getKey();
           for (Object o : e.getValue()) {
             if (o instanceof WeakReference) {
-              snapshot.add(PropertyChangeListener.class, context, ((WeakReference) o).get());
+              snapshot.add(PropertyChangeListener.class, context, ((Reference) o).get());
             }
             else {
               snapshot.add(PropertyChangeListener.class, context, o);
@@ -137,7 +139,7 @@ public class BasicPropertySupport implements IEventListenerSource {
   }
 
   public boolean setPropertyInt(String name, int i) {
-    return setProperty(name, Integer.valueOf(i), DEFAULT_INT);
+    return setProperty(name, i, DEFAULT_INT);
   }
 
   public int getPropertyInt(String name) {
@@ -146,7 +148,7 @@ public class BasicPropertySupport implements IEventListenerSource {
   }
 
   public boolean setPropertyDouble(String name, double d) {
-    return setProperty(name, new Double(d), DEFAULT_DOUBLE);
+    return setProperty(name, d, DEFAULT_DOUBLE);
   }
 
   public double getPropertyDouble(String name) {
@@ -155,7 +157,7 @@ public class BasicPropertySupport implements IEventListenerSource {
   }
 
   public boolean setPropertyLong(String name, long i) {
-    return setProperty(name, Long.valueOf(i), DEFAULT_LONG);
+    return setProperty(name, i, DEFAULT_LONG);
   }
 
   public long getPropertyLong(String name) {
@@ -164,7 +166,7 @@ public class BasicPropertySupport implements IEventListenerSource {
   }
 
   public boolean setPropertyBool(String name, boolean b) {
-    return setProperty(name, Boolean.valueOf(b), DEFAULT_BOOL);
+    return setProperty(name, b, DEFAULT_BOOL);
   }
 
   public boolean getPropertyBool(String name) {
@@ -197,14 +199,13 @@ public class BasicPropertySupport implements IEventListenerSource {
     return setPropertyList(name, newValue, true);
   }
 
-  @SuppressWarnings("unchecked")
   private <T> boolean setPropertyList(String name, List<T> newValue, boolean alwaysFire) {
     Object oldValue = m_props.get(name);
     boolean propChanged = setPropertyNoFire(name, newValue);
     if (propChanged || alwaysFire) {
       Object eventOldValue = null;
       if (oldValue instanceof List) {
-        eventOldValue = CollectionUtility.arrayList((List) oldValue);
+        eventOldValue = CollectionUtility.arrayList((Collection<?>) oldValue);
       }
       // fire a copy
       List<T> eventNewValue = null;
@@ -230,14 +231,13 @@ public class BasicPropertySupport implements IEventListenerSource {
     return setPropertySet(name, newValue, true);
   }
 
-  @SuppressWarnings("unchecked")
   private <T> boolean setPropertySet(String name, Set<T> newValue, boolean alwaysFire) {
     Object oldValue = m_props.get(name);
     boolean propChanged = setPropertyNoFire(name, newValue);
     if (propChanged || alwaysFire) {
       Object eventOldValue = null;
       if (oldValue instanceof Set) {
-        eventOldValue = CollectionUtility.hashSet((Set) oldValue);
+        eventOldValue = CollectionUtility.hashSet((Collection<?>) oldValue);
       }
       // fire a copy
       Set<T> eventNewValue = null;
@@ -298,15 +298,15 @@ public class BasicPropertySupport implements IEventListenerSource {
     if (listener instanceof PropertyChangeListenerProxy) {
       PropertyChangeListenerProxy proxy = (PropertyChangeListenerProxy) listener;
       // Call two argument add method.
-      addPropertyChangeListener(proxy.getPropertyName(), (PropertyChangeListener) proxy.getListener());
+      addPropertyChangeListener(proxy.getPropertyName(), proxy.getListener());
     }
     else {
       synchronized (m_listenerLock) {
         if (m_listeners == null) {
-          m_listeners = new ArrayList<Object>();
+          m_listeners = new ArrayList<>();
         }
         if (listener instanceof WeakEventListener) {
-          m_listeners.add(new WeakReference<PropertyChangeListener>(listener));
+          m_listeners.add(new WeakReference<>(listener));
         }
         else {
           m_listeners.add(listener);
@@ -319,7 +319,7 @@ public class BasicPropertySupport implements IEventListenerSource {
     if (listener instanceof PropertyChangeListenerProxy) {
       PropertyChangeListenerProxy proxy = (PropertyChangeListenerProxy) listener;
       // Call two argument remove method.
-      removePropertyChangeListener(proxy.getPropertyName(), (PropertyChangeListener) proxy.getListener());
+      removePropertyChangeListener(proxy.getPropertyName(), proxy.getListener());
     }
     else {
       synchronized (m_listenerLock) {
@@ -336,15 +336,11 @@ public class BasicPropertySupport implements IEventListenerSource {
   public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
     synchronized (m_listenerLock) {
       if (m_childListeners == null) {
-        m_childListeners = new HashMap<String, List<Object>>();
+        m_childListeners = new HashMap<>();
       }
-      List<Object> children = m_childListeners.get(propertyName);
-      if (children == null) {
-        children = new ArrayList<Object>();
-        m_childListeners.put(propertyName, children);
-      }
+      List<Object> children = m_childListeners.computeIfAbsent(propertyName, k -> new ArrayList<>());
       if (listener instanceof WeakEventListener) {
-        children.add(new WeakReference<PropertyChangeListener>(listener));
+        children.add(new WeakReference<>(listener));
       }
       else {
         children.add(listener);
@@ -368,12 +364,12 @@ public class BasicPropertySupport implements IEventListenerSource {
    * property-name)
    */
   public ArrayList<PropertyChangeListener> getPropertyChangeListeners() {
-    ArrayList<PropertyChangeListener> listeners = new ArrayList<PropertyChangeListener>(4);
+    ArrayList<PropertyChangeListener> listeners = new ArrayList<>(4);
     synchronized (m_listenerLock) {
       if (m_listeners != null) {
         for (Object o : m_listeners) {
           if (o instanceof WeakReference) {
-            o = ((WeakReference) o).get();
+            o = ((Reference) o).get();
           }
           if (o != null) {
             listeners.add((PropertyChangeListener) o);
@@ -388,7 +384,7 @@ public class BasicPropertySupport implements IEventListenerSource {
    * get a map with all listeners which are registered for a specific property-name
    */
   public Map<String, List<PropertyChangeListener>> getSpecificPropertyChangeListeners() {
-    HashMap<String, List<PropertyChangeListener>> listeners = new HashMap<String, List<PropertyChangeListener>>();
+    Map<String, List<PropertyChangeListener>> listeners = new HashMap<>();
     synchronized (m_listenerLock) {
       if (m_childListeners != null) {
         for (Entry<String, List<Object>> entry : m_childListeners.entrySet()) {
@@ -397,14 +393,10 @@ public class BasicPropertySupport implements IEventListenerSource {
           if (propertySpecificListeners != null) {
             for (Object o : propertySpecificListeners) {
               if (o instanceof WeakReference) {
-                o = ((WeakReference) o).get();
+                o = ((Reference) o).get();
               }
               if (o != null) {
-                List<PropertyChangeListener> children = listeners.get(propertyName);
-                if (children == null) {
-                  children = new ArrayList<PropertyChangeListener>();
-                  listeners.put(propertyName, children);
-                }
+                List<PropertyChangeListener> children = listeners.computeIfAbsent(propertyName, k -> new ArrayList<>());
                 children.add((PropertyChangeListener) o);
               }
             }
@@ -422,7 +414,7 @@ public class BasicPropertySupport implements IEventListenerSource {
     if (listener instanceof WeakEventListener) {
       for (int i = 0, n = listeners.size(); i < n; i++) {
         Object o = listeners.get(i);
-        if (o instanceof WeakReference && ((WeakReference) o).get() == listener) {
+        if (o instanceof WeakReference && ((Reference) o).get() == listener) {
           listeners.remove(i);
           break;
         }
@@ -431,7 +423,7 @@ public class BasicPropertySupport implements IEventListenerSource {
     else {
       listeners.remove(listener);
     }
-    if (listeners.size() == 0 && listeners instanceof ArrayList) {
+    if (listeners.isEmpty() && listeners instanceof ArrayList) {
       ((ArrayList) listeners).trimToSize();
     }
   }
@@ -444,14 +436,14 @@ public class BasicPropertySupport implements IEventListenerSource {
     if (oldValue == newValue) {
       return;
     }
-    firePropertyChangeImpl(propertyName, Integer.valueOf(oldValue), Integer.valueOf(newValue));
+    firePropertyChangeImpl(propertyName, oldValue, newValue);
   }
 
   public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
     if (oldValue == newValue) {
       return;
     }
-    firePropertyChangeImpl(propertyName, Boolean.valueOf(oldValue), Boolean.valueOf(newValue));
+    firePropertyChangeImpl(propertyName, oldValue, newValue);
   }
 
   public void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
@@ -464,7 +456,7 @@ public class BasicPropertySupport implements IEventListenerSource {
   private void firePropertyChangeImpl(String propertyName, Object oldValue, Object newValue) {
     List l = m_listeners;
     Map m = m_childListeners;
-    if ((l != null && l.size() > 0) || (m != null && m.size() > 0)) {
+    if ((l != null && !l.isEmpty()) || (m != null && !m.isEmpty())) {
       PropertyChangeEvent e = new PropertyChangeEvent(m_source, propertyName, oldValue, newValue);
       firePropertyChangeImpl(e);
     }
@@ -479,18 +471,18 @@ public class BasicPropertySupport implements IEventListenerSource {
       // buffer the event for later batch firing
       synchronized (m_listenerLock) {
         if (m_propertyEventBuffer == null) {
-          m_propertyEventBuffer = new ArrayList<PropertyChangeEvent>();
+          m_propertyEventBuffer = new ArrayList<>();
         }
         m_propertyEventBuffer.add(e);
       }
     }
     else {
-      ArrayList<PropertyChangeListener> targets = new ArrayList<PropertyChangeListener>(4);
+      List<PropertyChangeListener> targets = new ArrayList<>(4);
       synchronized (m_listenerLock) {
         if (m_listeners != null) {
           for (Object o : m_listeners) {
             if (o instanceof WeakReference) {
-              o = ((WeakReference) o).get();
+              o = ((Reference) o).get();
             }
             if (o != null) {
               targets.add((PropertyChangeListener) o);
@@ -503,7 +495,7 @@ public class BasicPropertySupport implements IEventListenerSource {
           if (childListeners != null) {
             for (Object o : childListeners) {
               if (o instanceof WeakReference) {
-                o = ((WeakReference) o).get();
+                o = ((Reference) o).get();
               }
               if (o != null) {
                 targets.add((PropertyChangeListener) o);
@@ -512,7 +504,7 @@ public class BasicPropertySupport implements IEventListenerSource {
           }
         }
       }// end synchronized
-      if (targets.size() > 0) {
+      if (!targets.isEmpty()) {
         for (PropertyChangeListener listener : targets) {
           listener.propertyChange(e);
         }
@@ -534,8 +526,8 @@ public class BasicPropertySupport implements IEventListenerSource {
     }
     if (a != null && a.length > 0) {
       // coalesce by names
-      LinkedList<PropertyChangeEvent> coalesceList = new LinkedList<PropertyChangeEvent>();
-      HashSet<String> names = new HashSet<String>();
+      List<PropertyChangeEvent> coalesceList = new LinkedList<>();
+      Set<String> names = new HashSet<>();
       // reverse traversal
       for (int i = a.length - 1; i >= 0; i--) {
         if (!names.contains(a[i].getPropertyName())) {

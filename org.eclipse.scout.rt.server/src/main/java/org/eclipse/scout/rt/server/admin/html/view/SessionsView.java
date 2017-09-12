@@ -91,7 +91,7 @@ public class SessionsView extends DefaultView {
 
   protected SessionInspector[] getSortedSessions() {
     SessionInspector[] sessionInspectors = ProcessInspector.instance().getSessionInspectors();
-    TreeMap<CompositeObject, SessionInspector> userAndTimeToSessions = new TreeMap<CompositeObject, SessionInspector>();
+    TreeMap<CompositeObject, SessionInspector> userAndTimeToSessions = new TreeMap<>();
     for (int i = 0; i < sessionInspectors.length; i++) {
       String user = sessionInspectors[i].getInfo().getUserId();
       long lastAccess = NumberUtility.nvl(sessionInspectors[i].getInfo().getLastAccessedTime(), 0L);

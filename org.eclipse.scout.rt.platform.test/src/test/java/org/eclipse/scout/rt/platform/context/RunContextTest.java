@@ -492,32 +492,32 @@ public class RunContextTest {
             .withTransactionScope(TransactionScope.REQUIRED)
             .run(new IRunnable() {
 
-          @Override
-          public void run() throws Exception {
-            assertSame(tx, ITransaction.CURRENT.get());
-            assertSame(txMember, ITransaction.CURRENT.get().getMember("txMember"));
-          }
-        });
+              @Override
+              public void run() throws Exception {
+                assertSame(tx, ITransaction.CURRENT.get());
+                assertSame(txMember, ITransaction.CURRENT.get().getMember("txMember"));
+              }
+            });
         RunContexts.copyCurrent()
             .withTransactionScope(TransactionScope.REQUIRES_NEW)
             .run(new IRunnable() {
 
-          @Override
-          public void run() throws Exception {
-            assertNotSame(tx, ITransaction.CURRENT.get());
-            assertNull(ITransaction.CURRENT.get().getMember("txMember"));
-          }
-        });
+              @Override
+              public void run() throws Exception {
+                assertNotSame(tx, ITransaction.CURRENT.get());
+                assertNull(ITransaction.CURRENT.get().getMember("txMember"));
+              }
+            });
         RunContexts.copyCurrent()
             .withTransactionScope(TransactionScope.MANDATORY)
             .run(new IRunnable() {
 
-          @Override
-          public void run() throws Exception {
-            assertSame(tx, ITransaction.CURRENT.get());
-            assertSame(txMember, ITransaction.CURRENT.get().getMember("txMember"));
-          }
-        });
+              @Override
+              public void run() throws Exception {
+                assertSame(tx, ITransaction.CURRENT.get());
+                assertSame(txMember, ITransaction.CURRENT.get().getMember("txMember"));
+              }
+            });
       }
     });
   }
@@ -679,19 +679,19 @@ public class RunContextTest {
             .withRunMonitor(monitor)
             .run(new IRunnable() {
 
-          @Override
-          public void run() throws Exception {
-            try {
-              assertTrue(setupLatch.countDownAndBlock(10, TimeUnit.SECONDS));
-            }
-            catch (InterruptedException e) {
-              interrupted.set(true);
-            }
-            finally {
-              verifyLatch.countDown();
-            }
-          }
-        });
+              @Override
+              public void run() throws Exception {
+                try {
+                  assertTrue(setupLatch.countDownAndBlock(10, TimeUnit.SECONDS));
+                }
+                catch (InterruptedException e) {
+                  interrupted.set(true);
+                }
+                finally {
+                  verifyLatch.countDown();
+                }
+              }
+            });
       }
     }, Jobs.newInput());
 
@@ -771,12 +771,12 @@ public class RunContextTest {
                 .withThreadLocal(diagnosticThreadLocal2, "ABC")
                 .run(new IRunnable() {
 
-              @Override
-              public void run() throws Exception {
-                assertEquals("value-1", MDC.get("test-key-1"));
-                assertEquals("ABC", MDC.get("test-key-2"));
-              }
-            });
+                  @Override
+                  public void run() throws Exception {
+                    assertEquals("value-1", MDC.get("test-key-1"));
+                    assertEquals("ABC", MDC.get("test-key-2"));
+                  }
+                });
 
             Jobs.schedule(new IRunnable() {
 

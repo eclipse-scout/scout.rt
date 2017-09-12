@@ -22,6 +22,6 @@ import java.lang.annotation.Target;
  * @since 4.0.0
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.ANNOTATION_TYPE})
+@Target(ElementType.ANNOTATION_TYPE)
 public @interface DtoRelevant {
 }

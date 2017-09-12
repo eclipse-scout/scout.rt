@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
-import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -153,14 +152,11 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
   @Override
   protected void beforeStartSession(final IClientSession clientSession, final String sessionId) {
     // Adds a DesktopListener to automatically cancel all message boxes.
-    ClientRunContexts.copyCurrent().getDesktop().addDesktopListener(new DesktopListener() {
-      @Override
-      public void desktopChanged(final DesktopEvent e) {
-        switch (e.getType()) {
-          case DesktopEvent.TYPE_MESSAGE_BOX_SHOW:
-            e.getMessageBox().getUIFacade().setResultFromUI(IMessageBox.CANCEL_OPTION);
-            break;
-        }
+    ClientRunContexts.copyCurrent().getDesktop().addDesktopListener(e -> {
+      switch (e.getType()) {
+        case DesktopEvent.TYPE_MESSAGE_BOX_SHOW:
+          e.getMessageBox().getUIFacade().setResultFromUI(IMessageBox.CANCEL_OPTION);
+          break;
       }
     });
   }

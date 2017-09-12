@@ -31,11 +31,11 @@ public class EntityContribution {
   }
 
   public EntityContribution() {
-    m_selectParts = new ArrayList<String>(2);
-    m_fromParts = new ArrayList<String>(2);
-    m_whereParts = new ArrayList<String>(2);
-    m_groupByParts = new ArrayList<String>(2);
-    m_havingParts = new ArrayList<String>(2);
+    m_selectParts = new ArrayList<>(2);
+    m_fromParts = new ArrayList<>(2);
+    m_whereParts = new ArrayList<>(2);
+    m_groupByParts = new ArrayList<>(2);
+    m_havingParts = new ArrayList<>(2);
   }
 
   public EntityContribution(EntityContribution... contributions) {

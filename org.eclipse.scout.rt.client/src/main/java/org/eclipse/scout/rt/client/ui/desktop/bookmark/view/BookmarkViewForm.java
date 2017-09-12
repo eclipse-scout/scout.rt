@@ -59,10 +59,6 @@ import org.slf4j.LoggerFactory;
 public class BookmarkViewForm extends AbstractForm {
   private static final Logger LOG = LoggerFactory.getLogger(BookmarkViewForm.class);
 
-  public BookmarkViewForm() {
-    super();
-  }
-
   @ConfigProperty(ConfigProperty.FORM)
   @Order(10)
   protected Class<? extends IBookmarkForm> getConfiguredBookmarkForm() {
@@ -160,7 +156,7 @@ public class BookmarkViewForm extends AbstractForm {
           @Override
           protected void execChangedDisplayText() {
             String s = StringUtility.emptyIfNull(getDisplayText()).trim();
-            if (s.length() > 0) {
+            if (!s.isEmpty()) {
               if (!s.endsWith("*")) {
                 s = s + "*";
               }
@@ -329,26 +325,20 @@ public class BookmarkViewForm extends AbstractForm {
 
   public class ViewHandler extends AbstractFormHandler {
 
-    private final INotificationListener<BookmarkChangedClientNotification> m_cncListener = new INotificationListener<BookmarkChangedClientNotification>() {
-      @Override
-      public void handleNotification(BookmarkChangedClientNotification notification) {
-        try {
-          BEANS.get(IBookmarkService.class).loadBookmarks();
-        }
-        catch (RuntimeException | PlatformError e) {
-          LOG.error("Could not reload bookmarks.", e);
-        }
+    private final INotificationListener<BookmarkChangedClientNotification> m_cncListener = notification -> {
+      try {
+        BEANS.get(IBookmarkService.class).loadBookmarks();
+      }
+      catch (RuntimeException | PlatformError e) {
+        LOG.error("Could not reload bookmarks.", e);
       }
     };
 
-    private final BookmarkServiceListener m_bmListener = new BookmarkServiceListener() {
-      @Override
-      public void bookmarksChanged(BookmarkServiceEvent e) {
-        switch (e.getType()) {
-          case BookmarkServiceEvent.TYPE_CHANGED: {
-            refreshFormState();
-            break;
-          }
+    private final BookmarkServiceListener m_bmListener = e -> {
+      switch (e.getType()) {
+        case BookmarkServiceEvent.TYPE_CHANGED: {
+          refreshFormState();
+          break;
         }
       }
     };

@@ -66,7 +66,7 @@ public final class BEANS {
    * @return All instances of this type ordered by {@link Order} annotation value. Never returns <code>null</code>.
    */
   public static <T> List<T> all(Class<T> beanClazz) {
-    return BEANS.all(beanClazz, null);
+    return all(beanClazz, null);
   }
 
   /**
@@ -77,7 +77,7 @@ public final class BEANS {
    */
   public static <T> List<T> all(Class<T> beanClazz, IFilter<T> filter) {
     List<IBean<T>> beans = Platform.get().getBeanManager().getBeans(beanClazz);
-    List<T> instances = new ArrayList<T>(beans.size());
+    List<T> instances = new ArrayList<>(beans.size());
     for (IBean<T> bean : beans) {
       T instance = bean.getInstance();
       if (instance != null && (filter == null || filter.accept(instance))) {

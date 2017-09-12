@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.platform.util;
 
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -19,6 +18,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.slf4j.Logger;
@@ -176,7 +176,7 @@ public class UriBuilder {
     try {
       return createURIInternal(encoding);
     }
-    catch (MalformedURLException | URISyntaxException e) {
+    catch (URISyntaxException e) {
       throw new ProcessingException("error creating URI", e);
     }
   }
@@ -188,7 +188,7 @@ public class UriBuilder {
   // Thus: we can and should not use URI as an object to store query-parameters. Maybe we should replace our own
   // API with a custom GetRequest implementation.
   // Another approach would be to use URL instead of URI since, the URL class does not change the query string.
-  private URI createURIInternal(String encoding) throws MalformedURLException, URISyntaxException {
+  private URI createURIInternal(String encoding) throws URISyntaxException {
     final URI uri = new URI(m_scheme, null, m_host, m_port, m_path, null, null);
     final String urlWithQuery = StringUtility.join("?", uri.toString(), getQueryString(encoding));
     final String fullUrl = StringUtility.join("#", urlWithQuery, m_fragment);
@@ -211,7 +211,7 @@ public class UriBuilder {
     }
 
     StringBuilder query = new StringBuilder();
-    for (Map.Entry<String, String> param : m_parameters.entrySet()) {
+    for (Entry<String, String> param : m_parameters.entrySet()) {
       if (!StringUtility.hasText(param.getKey())) {
         LOG.warn("ignoring parameter with empty key");
         continue;

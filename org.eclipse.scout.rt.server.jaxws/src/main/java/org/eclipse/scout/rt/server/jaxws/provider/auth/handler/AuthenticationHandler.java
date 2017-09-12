@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.server.jaxws.provider.auth.handler;
 
 import java.security.Principal;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
@@ -189,13 +188,7 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
       return m_authenticationMethod.authenticate(context, m_credentialVerifier, m_principalProducer);
     }
     else {
-      return m_authRunContextProducer.produce(CREDENTIAL_AUTH_SUBJECT).call(new Callable<Principal>() {
-
-        @Override
-        public Principal call() throws Exception {
-          return m_authenticationMethod.authenticate(context, m_credentialVerifier, m_principalProducer);
-        }
-      }, DefaultExceptionTranslator.class);
+      return m_authRunContextProducer.produce(CREDENTIAL_AUTH_SUBJECT).call(() -> m_authenticationMethod.authenticate(context, m_credentialVerifier, m_principalProducer), DefaultExceptionTranslator.class);
     }
   }
 

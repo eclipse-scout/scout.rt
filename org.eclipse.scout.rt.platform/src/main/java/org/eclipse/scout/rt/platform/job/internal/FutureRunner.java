@@ -58,13 +58,7 @@ public class FutureRunner<RESULT> implements IRejectableRunnable {
     applyMisfire(m_futureTask.getCalendar(), m_trigger);
 
     // Schedule next execution.
-    m_jobManager.getDelayedExecutor().schedule(new Runnable() {
-
-      @Override
-      public void run() {
-        m_jobManager.competeForPermitAndExecute(m_futureTask, FutureRunner.this);
-      }
-    }, m_trigger.getNextFireTime());
+    m_jobManager.getDelayedExecutor().schedule(() -> m_jobManager.competeForPermitAndExecute(m_futureTask, FutureRunner.this), m_trigger.getNextFireTime());
   }
 
   @Override

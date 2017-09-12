@@ -16,6 +16,7 @@ import java.util.EventListener;
  * A form listener must implement the method {@link #formChanged}. Register a listener via
  * {@link IForm#addFormListener(FormListener)} in order to react to certain changes.
  */
+@FunctionalInterface
 public interface FormListener extends EventListener {
   /**
    * When implementing a form listener, you will get a {@link FormEvent}. Its type will tell you more about the event

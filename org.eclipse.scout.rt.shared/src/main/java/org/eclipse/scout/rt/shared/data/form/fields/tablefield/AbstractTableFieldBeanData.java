@@ -40,10 +40,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData implements ITableBeanHolder {
   private static final long serialVersionUID = 1L;
 
-  private List<AbstractTableRowData> m_rowList = new ArrayList<AbstractTableRowData>();
-
-  public AbstractTableFieldBeanData() {
-  }
+  private final List<AbstractTableRowData> m_rowList = new ArrayList<>();
 
   /**
    * @return Returns the number of available table row data.

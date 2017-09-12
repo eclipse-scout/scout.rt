@@ -81,7 +81,7 @@ public class BasicCache<K, V> implements ICache<K, V> {
       value = m_resolver.resolve(key);
       if (value != null) {
         if (m_atomicInsertion) {
-          V alreadySetValue = ((ConcurrentMap<K, V>) m_cacheMap).putIfAbsent(key, value);
+          V alreadySetValue = m_cacheMap.putIfAbsent(key, value);
           value = alreadySetValue != null ? alreadySetValue : value;
         }
         else {
@@ -98,7 +98,7 @@ public class BasicCache<K, V> implements ICache<K, V> {
     if (keys.isEmpty()) {
       return CollectionUtility.emptyHashMap();
     }
-    Map<K, V> result = new HashMap<K, V>();
+    Map<K, V> result = new HashMap<>();
     for (Iterator<K> iterator = keys.iterator(); iterator.hasNext();) {
       K key = iterator.next();
       V value = m_cacheMap.get(key);
@@ -119,7 +119,7 @@ public class BasicCache<K, V> implements ICache<K, V> {
         iterator.remove();
       }
       else if (m_atomicInsertion) {
-        V alreadySetValue = ((ConcurrentMap<K, V>) m_cacheMap).putIfAbsent(entry.getKey(), entry.getValue());
+        V alreadySetValue = m_cacheMap.putIfAbsent(entry.getKey(), entry.getValue());
         if (alreadySetValue != null) {
           entry.setValue(alreadySetValue);
         }
@@ -144,12 +144,7 @@ public class BasicCache<K, V> implements ICache<K, V> {
       }
     }
     else if (filter != null) {
-      for (Iterator<Entry<K, V>> iterator = m_cacheMap.entrySet().iterator(); iterator.hasNext();) {
-        Entry<K, V> entry = iterator.next();
-        if (filter.accept(entry.getKey(), entry.getValue())) {
-          iterator.remove();
-        }
-      }
+      m_cacheMap.entrySet().removeIf(entry -> filter.accept(entry.getKey(), entry.getValue()));
     }
   }
 

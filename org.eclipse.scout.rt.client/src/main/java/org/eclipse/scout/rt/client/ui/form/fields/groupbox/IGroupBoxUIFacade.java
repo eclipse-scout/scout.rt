@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.groupbox;
 
+@FunctionalInterface
 public interface IGroupBoxUIFacade {
 
   void setExpandedFromUI(boolean expanded);

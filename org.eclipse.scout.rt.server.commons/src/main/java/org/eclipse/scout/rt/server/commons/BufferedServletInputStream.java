@@ -14,6 +14,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 
 import org.eclipse.scout.rt.platform.util.IOUtility;
@@ -25,11 +26,11 @@ public class BufferedServletInputStream extends ServletInputStream {
   private volatile Object m_readListener;
   private volatile boolean m_finished;
 
-  public BufferedServletInputStream(InputStream source, int len) throws IOException {
+  public BufferedServletInputStream(InputStream source, int len) {
     this(IOUtility.readBytes(source, len)); // maybe read the data async?
   }
 
-  public BufferedServletInputStream(InputStream source) throws IOException {
+  public BufferedServletInputStream(InputStream source) {
     this(IOUtility.readBytes(source));
   }
 
@@ -54,7 +55,7 @@ public class BufferedServletInputStream extends ServletInputStream {
   }
 
   @SuppressWarnings("all")
-  public void setReadListener(javax.servlet.ReadListener readListener) {
+  public void setReadListener(ReadListener readListener) {
     if (readListener == null) {
       throw new NullPointerException("readlistener may not be null."); // as per ServletInputStream spec
     }
@@ -73,7 +74,7 @@ public class BufferedServletInputStream extends ServletInputStream {
       final int next = m_data.read();
       if (next < 0) {
         m_finished = true;
-        javax.servlet.ReadListener listener = (javax.servlet.ReadListener) m_readListener;
+        ReadListener listener = (ReadListener) m_readListener;
         if (listener != null) {
           listener.onAllDataRead();
         }
@@ -81,7 +82,7 @@ public class BufferedServletInputStream extends ServletInputStream {
       return next;
     }
     catch (IOException e) {
-      javax.servlet.ReadListener listener = (javax.servlet.ReadListener) m_readListener;
+      ReadListener listener = (ReadListener) m_readListener;
       if (listener != null) {
         listener.onError(e);
       }

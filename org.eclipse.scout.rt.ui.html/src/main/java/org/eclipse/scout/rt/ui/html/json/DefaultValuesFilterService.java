@@ -114,7 +114,7 @@ public class DefaultValuesFilterService implements IDefaultValuesFilterService {
       // Build a list of default values configs
       List<URL> urls = getDefaultValuesConfigurationUrls();
       long newestModified = 0;
-      List<JSONObject> defaultValuesConfigurations = new ArrayList<JSONObject>();
+      List<JSONObject> defaultValuesConfigurations = new ArrayList<>();
       for (URL url : urls) {
         URLConnection conn = url.openConnection();
         long lastModified = conn.getLastModified();

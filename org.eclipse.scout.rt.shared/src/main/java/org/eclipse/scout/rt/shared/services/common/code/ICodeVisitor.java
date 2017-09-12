@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.code;
 
+@FunctionalInterface
 public interface ICodeVisitor<CODE extends ICode<?>> {
 
   /**

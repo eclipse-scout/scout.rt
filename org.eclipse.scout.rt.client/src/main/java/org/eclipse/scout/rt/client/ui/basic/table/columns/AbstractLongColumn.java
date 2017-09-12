@@ -88,7 +88,7 @@ public abstract class AbstractLongColumn extends AbstractNumberColumn<Long> impl
 
   @Override
   protected ILongColumnExtension<? extends AbstractLongColumn> createLocalExtension() {
-    return new LocalLongColumnExtension<AbstractLongColumn>(this);
+    return new LocalLongColumnExtension<>(this);
   }
 
 }

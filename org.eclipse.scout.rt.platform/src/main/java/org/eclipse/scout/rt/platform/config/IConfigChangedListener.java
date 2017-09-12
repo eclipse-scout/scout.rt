@@ -6,6 +6,7 @@ import java.util.EventListener;
  * <h3>{@link IConfigChangedListener}</h3><br>
  * Interface for listeners that want to be notified if the state or value of a {@link IConfigProperty} changes.
  */
+@FunctionalInterface
 public interface IConfigChangedListener extends EventListener {
   /**
    * Callback indicating that the given event occurred.

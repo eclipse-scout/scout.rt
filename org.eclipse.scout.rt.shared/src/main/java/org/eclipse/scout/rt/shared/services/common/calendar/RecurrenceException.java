@@ -10,10 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.calendar;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @SuppressWarnings("squid:S2166")
-public class RecurrenceException implements java.io.Serializable {
+public class RecurrenceException implements Serializable {
   private static final long serialVersionUID = 1L;
   //
   private ICalendarItem m_item;

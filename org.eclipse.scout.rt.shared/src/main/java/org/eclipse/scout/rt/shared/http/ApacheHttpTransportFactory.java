@@ -4,7 +4,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLSocketFactory;
 
-import org.apache.http.ConnectionReuseStrategy;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.config.RegistryBuilder;
@@ -65,13 +64,7 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
    */
   protected void setConnectionKeepAliveAndRetrySettings(HttpClientBuilder builder) {
     final boolean keepAliveProp = CONFIG.getPropertyValue(ApacheHttpTransportKeepAliveProperty.class);
-    builder.setConnectionReuseStrategy(new ConnectionReuseStrategy() {
-
-      @Override
-      public boolean keepAlive(HttpResponse response, HttpContext context) {
-        return keepAliveProp;
-      }
-    });
+    builder.setConnectionReuseStrategy((response, context) -> keepAliveProp);
 
     // Connections should not be kept open forever, there are numerous reasons a connection could get invalid. Also it does not make much sense to keep a connection open forever
     builder.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy() {

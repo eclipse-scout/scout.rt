@@ -92,7 +92,7 @@ public class JandexClassInventory implements IClassInventory {
   }
 
   protected Set<IClassInfo> convertClassInfos(Collection<ClassInfo> classInfos) {
-    Set<IClassInfo> result = new HashSet<IClassInfo>(classInfos.size());
+    Set<IClassInfo> result = new HashSet<>(classInfos.size());
     for (ClassInfo classInfo : classInfos) {
       result.add(new JandexClassInfo(classInfo));
     }
@@ -100,7 +100,7 @@ public class JandexClassInventory implements IClassInventory {
   }
 
   protected Set<IClassInfo> convertAnnotationInstance(Collection<AnnotationInstance> annotationInstances) {
-    Set<IClassInfo> result = new HashSet<IClassInfo>(annotationInstances.size());
+    Set<IClassInfo> result = new HashSet<>(annotationInstances.size());
     for (AnnotationInstance annotationInstance : annotationInstances) {
       AnnotationTarget target = annotationInstance.target();
       if (target instanceof ClassInfo) {

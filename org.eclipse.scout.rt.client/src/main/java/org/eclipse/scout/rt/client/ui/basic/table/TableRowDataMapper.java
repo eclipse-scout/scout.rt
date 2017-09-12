@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -54,18 +55,14 @@ public class TableRowDataMapper implements ITableRowDataMapper {
 
     m_columnSet = columnSet;
     IPropertyFilter filter = createPropertyFilter();
-    List<FastPropertyDescriptor> props = new LinkedList<FastPropertyDescriptor>();
-    for (FastPropertyDescriptor desc : BeanUtility.getFastPropertyDescriptors(rowType, AbstractTableRowData.class, filter)) {
-      props.add(desc);
-    }
+    List<FastPropertyDescriptor> props = new LinkedList<>();
+    Collections.addAll(props, BeanUtility.getFastPropertyDescriptors(rowType, AbstractTableRowData.class, filter));
     Set<Class<?>> contributions = BEANS.get(IInternalExtensionRegistry.class).getContributionsFor(rowType);
     for (Class<?> contribution : contributions) {
-      for (FastPropertyDescriptor desc : BeanUtility.getFastPropertyDescriptors(contribution, Object.class, filter)) {
-        props.add(desc);
-      }
+      Collections.addAll(props, BeanUtility.getFastPropertyDescriptors(contribution, Object.class, filter));
     }
 
-    m_propertyDescriptorByColumn = new HashMap<IColumn, FastPropertyDescriptor>(props.size());
+    m_propertyDescriptorByColumn = new HashMap<>(props.size());
     for (FastPropertyDescriptor rowDataPropertyDesc : props) {
       IColumn column = findColumn(columnSet, rowDataPropertyDesc);
       if (column != null) {
@@ -80,7 +77,7 @@ public class TableRowDataMapper implements ITableRowDataMapper {
     for (IColumn<?> col : columnSet.getColumns()) {
       if (isColumnIgnored(col)) {
         if (ignoredColumns == null) {
-          ignoredColumns = new HashSet<IColumn<?>>();
+          ignoredColumns = new HashSet<>();
         }
         ignoredColumns.add(col);
       }
@@ -129,7 +126,7 @@ public class TableRowDataMapper implements ITableRowDataMapper {
    * @return Returns the given string with the first character in upper case.
    */
   private String capitalize(String s) {
-    if (s == null || s.length() == 0) {
+    if (s == null || s.isEmpty()) {
       return null;
     }
     if (s.length() == 1) {
@@ -155,7 +152,7 @@ public class TableRowDataMapper implements ITableRowDataMapper {
     if (rowData.getCustomValues() == null) {
       return;
     }
-    Map<String, Object> customValuesCopy = new HashMap<String, Object>(rowData.getCustomValues());
+    Map<String, Object> customValuesCopy = new HashMap<>(rowData.getCustomValues());
     for (IColumn col : m_columnSet.getColumns()) {
       customValuesCopy.remove(col.getColumnId());
     }

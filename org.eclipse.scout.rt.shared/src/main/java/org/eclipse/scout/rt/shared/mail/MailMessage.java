@@ -24,15 +24,15 @@ import org.eclipse.scout.rt.platform.Bean;
 @Bean
 public class MailMessage {
 
-  private final List<MailParticipant> m_toRecipients = new ArrayList<MailParticipant>();
-  private final List<MailParticipant> m_ccRecipients = new ArrayList<MailParticipant>();
-  private final List<MailParticipant> m_bccRecipients = new ArrayList<MailParticipant>();
+  private final List<MailParticipant> m_toRecipients = new ArrayList<>();
+  private final List<MailParticipant> m_ccRecipients = new ArrayList<>();
+  private final List<MailParticipant> m_bccRecipients = new ArrayList<>();
   private MailParticipant m_sender;
-  private final List<MailParticipant> m_replyTos = new ArrayList<MailParticipant>();
+  private final List<MailParticipant> m_replyTos = new ArrayList<>();
   private String m_subject;
   private String m_bodyPlainText;
   private String m_bodyHtml;
-  private final List<MailAttachment> m_attachments = new ArrayList<MailAttachment>();
+  private final List<MailAttachment> m_attachments = new ArrayList<>();
 
   /**
    * @return an unmodifiable list of TO recipients.

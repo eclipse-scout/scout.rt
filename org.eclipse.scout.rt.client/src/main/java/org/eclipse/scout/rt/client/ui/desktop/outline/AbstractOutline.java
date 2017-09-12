@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.Ou
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineInitDefaultDetailFormChain;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -58,7 +57,6 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
@@ -72,14 +70,11 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractOutline.class);
   private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper(IDimensions.VISIBLE, IDimensions.VISIBLE_GRANTED);
-  private static final IMenuTypeMapper TABLE_MENU_TYPE_MAPPER = new IMenuTypeMapper() {
-    @Override
-    public IMenuType map(IMenuType menuType) {
-      if (menuType == TableMenuType.EmptySpace || menuType == TableMenuType.SingleSelection) {
-        return TreeMenuType.SingleSelection;
-      }
-      return menuType;
+  private static final IMenuTypeMapper TABLE_MENU_TYPE_MAPPER = menuType -> {
+    if (menuType == TableMenuType.EmptySpace || menuType == TableMenuType.SingleSelection) {
+      return TreeMenuType.SingleSelection;
     }
+    return menuType;
   };
 
   /**
@@ -109,12 +104,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   protected void callInitializer() {
     // Run the initialization on behalf of this Outline.
     createDisplayParentRunContext()
-        .run(new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            AbstractOutline.super.callInitializer();
-          }
-        });
+        .run(() -> AbstractOutline.super.callInitializer());
   }
 
   @Override
@@ -275,7 +265,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   @Override
   protected void execDrop(ITreeNode node, TransferObject t) {
     if (node instanceof IPageWithTable) {
-      ITable table = ((IPageWithTable) node).getTable();
+      ITable table = ((IPage) node).getTable();
       if (table.getDropType() != 0) {
         table.getUIFacade().fireRowDropActionFromUI(null, t);
       }
@@ -353,7 +343,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       Class<?> cls = getClass();
       while (cls != null && IOutline.class.isAssignableFrom(cls)) {
         if (cls.isAnnotationPresent(Order.class)) {
-          Order order = (Order) cls.getAnnotation(Order.class);
+          Order order = cls.getAnnotation(Order.class);
           return order.value();
         }
         cls = cls.getSuperclass();
@@ -368,7 +358,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     if (pageTypes == null || pageTypes.length < 1) {
       return;
     }
-    List<Class<? extends IPage>> list = new ArrayList<Class<? extends IPage>>(pageTypes.length);
+    List<Class<? extends IPage>> list = new ArrayList<>(pageTypes.length);
     for (Class<?> c : pageTypes) {
       if (IPage.class.isAssignableFrom(c)) {
         list.add((Class<? extends IPage>) c);
@@ -379,22 +369,19 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   public void refreshPages(final List<Class<? extends IPage>> pageTypes) {
-    final List<IPage<?>> candidates = new ArrayList<IPage<?>>();
-    ITreeVisitor v = new ITreeVisitor() {
-      @Override
-      public boolean visit(ITreeNode node) {
-        IPage<?> page = (IPage) node;
-        if (page == null) {
-          return true;
-        }
-        Class<? extends IPage> pageClass = page.getClass();
-        for (Class<? extends IPage> c : pageTypes) {
-          if (c.isAssignableFrom(pageClass)) {
-            candidates.add(page);
-          }
-        }
+    final List<IPage<?>> candidates = new ArrayList<>();
+    ITreeVisitor v = node -> {
+      IPage<?> page = (IPage) node;
+      if (page == null) {
         return true;
       }
+      Class<? extends IPage> pageClass = page.getClass();
+      for (Class<? extends IPage> c : pageTypes) {
+        if (c.isAssignableFrom(pageClass)) {
+          candidates.add(page);
+        }
+      }
+      return true;
     };
     visitNode(getRootNode(), v);
     for (IPage<?> page : candidates) {
@@ -406,7 +393,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   public void releaseUnusedPages() {
-    final HashSet<IPage> preservationSet = new HashSet<IPage>();
+    final Set<IPage> preservationSet = new HashSet<>();
     IPage<?> oldSelection = (IPage) getSelectedNode();
     IPage<?> p = oldSelection;
     if (p != null) {
@@ -415,23 +402,20 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
         p = p.getParentPage();
       }
     }
-    ITreeVisitor v = new ITreeVisitor() {
-      @Override
-      public boolean visit(ITreeNode node) {
-        IPage<?> page = (IPage) node;
-        if (preservationSet.contains(page)) {
-          // nop
-        }
-        else if (page.isChildrenLoaded() && (!page.isExpanded() || !(page.getParentPage() != null && page.getParentPage().isChildrenLoaded()))) {
-          try {
-            unloadNode(page);
-          }
-          catch (RuntimeException | PlatformError e) {
-            BEANS.get(ExceptionHandler.class).handle(e);
-          }
-        }
-        return true;
+    ITreeVisitor v = node -> {
+      IPage<?> page = (IPage) node;
+      if (preservationSet.contains(page)) {
+        // nop
       }
+      else if (page.isChildrenLoaded() && (!page.isExpanded() || !(page.getParentPage() != null && page.getParentPage().isChildrenLoaded()))) {
+        try {
+          unloadNode(page);
+        }
+        catch (RuntimeException | PlatformError e) {
+          BEANS.get(ExceptionHandler.class).handle(e);
+        }
+      }
+      return true;
     };
     try {
       setTreeChanging(true);
@@ -459,18 +443,15 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   public <T extends IPage> T findPage(final Class<T> pageType) {
-    final Holder<T> result = new Holder<T>(pageType, null);
-    ITreeVisitor v = new ITreeVisitor() {
-      @Override
-      @SuppressWarnings("unchecked")
-      public boolean visit(ITreeNode node) {
-        IPage<?> page = (IPage) node;
-        Class<? extends IPage> pageClass = page.getClass();
-        if (pageType.isAssignableFrom(pageClass)) {
-          result.setValue((T) page);
-        }
-        return result.getValue() == null;
+    final Holder<T> result = new Holder<>(pageType, null);
+    @SuppressWarnings("unchecked")
+    ITreeVisitor v = node -> {
+      IPage<?> page = (IPage) node;
+      Class<? extends IPage> pageClass = page.getClass();
+      if (pageType.isAssignableFrom(pageClass)) {
+        result.setValue((T) page);
       }
+      return result.getValue() == null;
     };
     visitNode(getRootNode(), v);
     return result.getValue();
@@ -604,7 +585,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       //
       super.unloadNode(node);
       if (node instanceof IPageWithTable) {
-        ((IPageWithTable) node).getTable().deleteAllRows();
+        ((IPage) node).getTable().deleteAllRows();
       }
     }
     finally {
@@ -619,33 +600,30 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     }
 
     createDisplayParentRunContext()
-        .run(new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            setTreeChanging(true);
-            try {
-              selectNode(null);
-              unloadNode(getRootNode());
-              getRootNode().ensureChildrenLoaded();
-            }
-            finally {
-              setTreeChanging(false);
-            }
+        .run(() -> {
+          setTreeChanging(true);
+          try {
+            selectNode(null);
+            unloadNode(getRootNode());
+            getRootNode().ensureChildrenLoaded();
+          }
+          finally {
+            setTreeChanging(false);
+          }
 
-            ITreeNode root = getRootNode();
-            if (root instanceof IPageWithTable) {
-              ISearchForm searchForm = ((IPageWithTable) root).getSearchFormInternal();
-              if (searchForm != null) {
-                searchForm.doReset();
-              }
+          ITreeNode root = getRootNode();
+          if (root instanceof IPageWithTable) {
+            ISearchForm searchForm = ((IPageWithTable) root).getSearchFormInternal();
+            if (searchForm != null) {
+              searchForm.doReset();
             }
-            if (!isRootNodeVisible()) {
-              root.setExpanded(true);
-            }
-            selectFirstNode();
-            if (getSelectedNode() instanceof IPageWithTable) {
-              getSelectedNode().setExpanded(true);
-            }
+          }
+          if (!isRootNodeVisible()) {
+            root.setExpanded(true);
+          }
+          selectFirstNode();
+          if (getSelectedNode() instanceof IPageWithTable) {
+            getSelectedNode().setExpanded(true);
           }
         });
   }
@@ -662,7 +640,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   public List<IMenu> getMenusForPage(IPage<?> page) {
-    List<IMenu> result = new ArrayList<IMenu>();
+    List<IMenu> result = new ArrayList<>();
     for (IMenu m : getContextMenu().getChildActions()) {
       if (!m_inheritedMenusOfPage.contains(m)) {
         result.add(m);
@@ -1004,7 +982,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   protected IOutlineExtension<? extends AbstractOutline> createLocalExtension() {
-    return new LocalOutlineExtension<AbstractOutline>(this);
+    return new LocalOutlineExtension<>(this);
   }
 
   @Override

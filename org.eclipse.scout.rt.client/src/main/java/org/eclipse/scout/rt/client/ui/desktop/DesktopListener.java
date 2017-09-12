@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.desktop;
 
 import java.util.EventListener;
 
+@FunctionalInterface
 public interface DesktopListener extends EventListener {
   void desktopChanged(DesktopEvent e);
 }

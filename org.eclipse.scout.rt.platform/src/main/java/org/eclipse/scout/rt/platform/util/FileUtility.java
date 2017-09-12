@@ -52,7 +52,7 @@ public final class FileUtility {
     destinationDir.mkdirs();
     destinationDir.setLastModified(archiveFile.lastModified());
     String localFile = destinationDir.getName();
-    try (JarFile jar = new JarFile(archiveFile);) {
+    try (JarFile jar = new JarFile(archiveFile)) {
       Enumeration<JarEntry> entries = jar.entries();
       while (entries.hasMoreElements()) {
         JarEntry file = entries.nextElement();
@@ -213,8 +213,8 @@ public final class FileUtility {
 
       String[] children = sourceLocation.list();
       if (children != null && children.length > 0) {
-        for (int i = 0; i < children.length; i++) {
-          copyTree(new File(sourceLocation, children[i]), new File(targetLocation, children[i]));
+        for (String aChildren : children) {
+          copyTree(new File(sourceLocation, aChildren), new File(targetLocation, aChildren));
         }
       }
     }
@@ -224,20 +224,20 @@ public final class FileUtility {
   }
 
   public static List<File> listTree(File f, boolean includeFiles, boolean includeFolders) throws IOException {
-    ArrayList<File> list = new ArrayList<File>();
+    List<File> list = new ArrayList<>();
     listTreeRec(f, list, includeFiles, includeFolders);
     return list;
   }
 
-  private static void listTreeRec(File f, List<File> list, boolean includeFiles, boolean includeFolders) throws IOException {
+  private static void listTreeRec(File f, List<File> list, boolean includeFiles, boolean includeFolders) {
     if (f.isDirectory()) {
       if (includeFolders) {
         list.add(f);
       }
       String[] children = f.list();
       if (children != null && children.length > 0) {
-        for (int i = 0; i < children.length; i++) {
-          listTreeRec(new File(f, children[i]), list, includeFiles, includeFolders);
+        for (String aChildren : children) {
+          listTreeRec(new File(f, aChildren), list, includeFiles, includeFolders);
         }
       }
     }
@@ -305,7 +305,7 @@ public final class FileUtility {
     if (ext == null) {
       return getMimeType((Path) null);
     }
-    if (ext.length() > 0 && ext.charAt(0) == '.') {
+    if (!ext.isEmpty() && ext.charAt(0) == '.') {
       ext = ext.substring(1);
     }
     ext = ext.toLowerCase(Locale.US).trim();

@@ -28,7 +28,7 @@ import org.slf4j.MDC;
 public class HttpRequestMethodContextValueProvider implements IDiagnosticContextValueProvider {
 
   public static final String KEY = "http.request.method";
-  private String m_requestMethod;
+  private final String m_requestMethod;
 
   public HttpRequestMethodContextValueProvider(String requestMethod) {
     m_requestMethod = requestMethod;

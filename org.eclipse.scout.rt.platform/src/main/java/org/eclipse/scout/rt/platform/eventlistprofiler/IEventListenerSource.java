@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.eventlistprofiler;
 
+@FunctionalInterface
 public interface IEventListenerSource {
 
   void dumpListenerList(IEventListenerSnapshot snapshot);

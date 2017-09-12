@@ -121,7 +121,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * Strategy used in
    * {@link DataModelAttributePartDefinition#createInstance(FormDataStatementBuilder, ComposerAttributeNodeData, AttributeStrategy, String, List, List, Map)}
    */
-  public static enum AttributeStrategy {
+  public enum AttributeStrategy {
     /**
      * Assuming the constraint "SALARY &gt;= 1000" and the attribute statement
      *
@@ -189,12 +189,12 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * Strategy used in
    * {@link DataModelEntityPartDefinition#createInstance(FormDataStatementBuilder, ComposerEntityNodeData, EntityStrategy, String, Map)}
    */
-  public static enum EntityStrategy {
+  public enum EntityStrategy {
     BuildConstraints,
     BuildQuery,
   }
 
-  public static enum AttributeKind {
+  public enum AttributeKind {
     /**
      * no attribute node
      */
@@ -205,13 +205,13 @@ public class FormDataStatementBuilder implements DataModelConstants {
     AggregationNonZeroTraversing,
   }
 
-  private ISqlStyle m_sqlStyle;
+  private final ISqlStyle m_sqlStyle;
   private IDataModel m_dataModel;
-  private AliasMapper m_aliasMapper;
-  private Map<Class<?>, DataModelAttributePartDefinition> m_dataModelAttMap;
-  private Map<Class<?>, DataModelEntityPartDefinition> m_dataModelEntMap;
-  private List<BasicPartDefinition> m_basicDefs;
-  private Map<String, Object> m_bindMap;
+  private final AliasMapper m_aliasMapper;
+  private final Map<Class<?>, DataModelAttributePartDefinition> m_dataModelAttMap;
+  private final Map<Class<?>, DataModelEntityPartDefinition> m_dataModelEntMap;
+  private final List<BasicPartDefinition> m_basicDefs;
+  private final Map<String, Object> m_bindMap;
   private AtomicInteger m_sequenceProvider;
   private StringBuilder m_where;
   private List<IFormDataStatementBuilderInjection> m_formDataStatementBuilderInjections;
@@ -222,10 +222,10 @@ public class FormDataStatementBuilder implements DataModelConstants {
   public FormDataStatementBuilder(ISqlStyle sqlStyle) {
     m_sqlStyle = sqlStyle;
     m_aliasMapper = new AliasMapper();
-    m_bindMap = new HashMap<String, Object>();
-    m_dataModelAttMap = new HashMap<Class<?>, DataModelAttributePartDefinition>();
-    m_dataModelEntMap = new HashMap<Class<?>, DataModelEntityPartDefinition>();
-    m_basicDefs = new ArrayList<BasicPartDefinition>();
+    m_bindMap = new HashMap<>();
+    m_dataModelAttMap = new HashMap<>();
+    m_dataModelEntMap = new HashMap<>();
+    m_basicDefs = new ArrayList<>();
     setSequenceProvider(new AtomicInteger(0));
   }
 
@@ -253,7 +253,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
       return;
     }
     if (m_formDataStatementBuilderInjections == null) {
-      m_formDataStatementBuilderInjections = new ArrayList<IFormDataStatementBuilderInjection>(1);
+      m_formDataStatementBuilderInjections = new ArrayList<>(1);
     }
     m_formDataStatementBuilderInjections.add(j);
   }
@@ -749,7 +749,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
         i++;
       }
       else if (nodes.get(i) instanceof ComposerEitherOrNodeData) {
-        ArrayList<ComposerEitherOrNodeData> orNodes = new ArrayList<ComposerEitherOrNodeData>();
+        List<ComposerEitherOrNodeData> orNodes = new ArrayList<>();
         orNodes.add((ComposerEitherOrNodeData) nodes.get(i));
         int k = i;
         while (k + 1 < nodes.size() && (nodes.get(k + 1) instanceof ComposerEitherOrNodeData) && !((ComposerEitherOrNodeData) nodes.get(k + 1)).isBeginOfEitherOr()) {
@@ -894,15 +894,15 @@ public class FormDataStatementBuilder implements DataModelConstants {
     if (entityStrategy != EntityStrategy.BuildConstraints) {
       return null;
     }
-    List<List<ComposerEitherOrNodeData>> orBlocks = new ArrayList<List<ComposerEitherOrNodeData>>();
-    List<TreeNodeData> otherParts = new ArrayList<TreeNodeData>();
-    List<ComposerEitherOrNodeData> currentOrBlock = new ArrayList<ComposerEitherOrNodeData>();
+    List<List<ComposerEitherOrNodeData>> orBlocks = new ArrayList<>();
+    List<TreeNodeData> otherParts = new ArrayList<>();
+    List<ComposerEitherOrNodeData> currentOrBlock = new ArrayList<>();
     for (TreeNodeData ch : childParts) {
       if (ch instanceof ComposerEitherOrNodeData) {
         ComposerEitherOrNodeData orData = (ComposerEitherOrNodeData) ch;
         if (orData.isBeginOfEitherOr()) {
-          if (currentOrBlock.size() > 0) {
-            orBlocks.add(new ArrayList<ComposerEitherOrNodeData>(currentOrBlock));
+          if (!currentOrBlock.isEmpty()) {
+            orBlocks.add(new ArrayList<>(currentOrBlock));
           }
           currentOrBlock.clear();
         }
@@ -912,19 +912,19 @@ public class FormDataStatementBuilder implements DataModelConstants {
         otherParts.add(ch);
       }
     }
-    if (currentOrBlock.size() > 0) {
-      orBlocks.add(new ArrayList<ComposerEitherOrNodeData>(currentOrBlock));
+    if (!currentOrBlock.isEmpty()) {
+      orBlocks.add(new ArrayList<>(currentOrBlock));
       currentOrBlock.clear();
     }
     //
-    if (orBlocks.size() > 0) {
+    if (!orBlocks.isEmpty()) {
       StringBuilder blockBuf = new StringBuilder();
       int blockCount = 0;
       for (List<ComposerEitherOrNodeData> list : orBlocks) {
         int elemCount = 0;
         StringBuilder elemBuf = new StringBuilder();
         for (ComposerEitherOrNodeData orData : list) {
-          ArrayList<TreeNodeData> subList = new ArrayList<TreeNodeData>();
+          List<TreeNodeData> subList = new ArrayList<>();
           subList.addAll(otherParts);
           subList.addAll(orData.getChildNodes());
           String s = buildComposerEntityEitherOrSplit(entityStrategy, baseStm, negative ^ orData.isNegative(), subList);
@@ -965,7 +965,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     if (entityStrategy != EntityStrategy.BuildConstraints) {
       return null;
     }
-    ArrayList<TreeNodeData> nonZeroChildren = new ArrayList<TreeNodeData>(2);
+    List<TreeNodeData> nonZeroChildren = new ArrayList<>(2);
     for (TreeNodeData ch : childParts) {
       switch (getAttributeKind(ch)) {
         case Undefined:
@@ -1000,8 +1000,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
     EntityContribution childContributions = new EntityContribution();
     switch (entityStrategy) {
       case BuildConstraints: {
-        ArrayList<TreeNodeData> nonAggregationParts = new ArrayList<TreeNodeData>(childParts.size());
-        ArrayList<TreeNodeData> aggregationParts = new ArrayList<TreeNodeData>(2);
+        List<TreeNodeData> nonAggregationParts = new ArrayList<>(childParts.size());
+        List<TreeNodeData> aggregationParts = new ArrayList<>(2);
         for (TreeNodeData ch : childParts) {
           switch (getAttributeKind(ch)) {
             case Undefined:
@@ -1091,16 +1091,16 @@ public class FormDataStatementBuilder implements DataModelConstants {
       LOG.warn("no PartDefinition for attribute: {}", attribute);
       return new EntityContribution();
     }
-    List<Object> bindValues = new ArrayList<Object>();
+    List<Object> bindValues = new ArrayList<>();
     if (node.getValues() != null) {
       bindValues.addAll(node.getValues());
     }
-    List<String> bindNames = new ArrayList<String>(bindValues.size());
+    List<String> bindNames = new ArrayList<>(bindValues.size());
     for (int i = 0; i < bindValues.size(); i++) {
       bindNames.add("" + (char) (((int) 'a') + i));
     }
     AliasMapper aliasMap = getAliasMapper();
-    ComposerEntityNodeData parentEntityNode = FormDataStatementBuilder.getParentNodeOfType(node, ComposerEntityNodeData.class);
+    ComposerEntityNodeData parentEntityNode = getParentNodeOfType(node, ComposerEntityNodeData.class);
     Map<String, String> parentAliasMap = parentEntityNode != null ? aliasMap.getNodeAliases(parentEntityNode) : aliasMap.getRootAliases();
     String stm = null;
     switch (attributeStrategy) {
@@ -1238,13 +1238,13 @@ public class FormDataStatementBuilder implements DataModelConstants {
       return new EntityContribution();
     }
     //convenience: automatically wrap attribute in attribute tags
-    if (stm.indexOf("<attribute>") < 0) {
+    if (!stm.contains("<attribute>")) {
       stm = "<attribute>" + stm + "</attribute>";
     }
     //convenience: automatically add missing alias on plain attributes, but only if the parent entity has at most 1 alias mapping
     Matcher m = PLAIN_ATTRIBUTE_PATTERN.matcher(stm);
     if (m.find()) {
-      if (parentAliasMap.size() == 0) {
+      if (parentAliasMap.isEmpty()) {
         //nop
       }
       else if (parentAliasMap.size() == 1) {
@@ -1331,7 +1331,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     String wherePart = StringUtility.getTag(stm, "wherePart");
     if (wherePart == null) {
       String tmp = StringUtility.removeTag(stm, "attribute").trim();
-      if (tmp.length() > 0) {
+      if (!tmp.isEmpty()) {
         wherePart = stm;
         stm = "";
       }
@@ -1339,7 +1339,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     stm = StringUtility.removeTag(stm, "wherePart").trim();
     String attPart = StringUtility.getTag(stm, "attribute");
     stm = StringUtility.removeTag(stm, "attribute").trim();
-    if (stm.length() > 0) {
+    if (!stm.isEmpty()) {
       LOG.warn("attribute part is not well-formed; contains wherePart tag and also other sql text: {}", stm);
     }
     //
@@ -1406,7 +1406,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
       }
       case BuildConstraintOfAttributeWithContext: {
         String whereAndAttPart = (wherePart != null ? wherePart : "") + (wherePart != null && attPart != null ? " AND " : "") + (attPart != null ? "<attribute>" + attPart + "</attribute>" : "");
-        if (whereAndAttPart.length() > 0) {
+        if (!whereAndAttPart.isEmpty()) {
           String sql = createSqlPart(aggregationType, whereAndAttPart, positiveOperation, bindNames, bindValues, plainBind, parentAliasMap);
           if (sql != null) {
             if (negation) {
@@ -1460,22 +1460,22 @@ public class FormDataStatementBuilder implements DataModelConstants {
       sql = "";
     }
     if (bindNames == null) {
-      bindNames = new ArrayList<String>(0);
+      bindNames = new ArrayList<>(0);
     }
     if (bindValues == null) {
-      bindValues = new ArrayList<Object>(0);
+      bindValues = new ArrayList<>(0);
     }
     // the attribute was of the form: NAME or
     // <attribute>NAME</attribute>
     // make sure there is an attribute tag in the string, if none enclose all
     // by default
-    if (sql.indexOf("<attribute>") < 0) {
+    if (!sql.contains("<attribute>")) {
       sql = "<attribute>" + sql + "</attribute>";
     }
     //convenience: automatically add missing alias on plain attributes, but only if the parent entity has at most 1 alias mapping
     Matcher m = PLAIN_ATTRIBUTE_PATTERN.matcher(sql);
     if (m.find()) {
-      if (parentAliasMap.size() == 0) {
+      if (parentAliasMap.isEmpty()) {
         //nop
       }
       else if (parentAliasMap.size() == 1) {
@@ -1488,21 +1488,15 @@ public class FormDataStatementBuilder implements DataModelConstants {
     //resolve aliases
     sql = m_aliasMapper.replaceMarkersByAliases(sql, parentAliasMap, parentAliasMap);
     // generate unique bind names
-    final ArrayList<String> newBindNames = new ArrayList<String>(2);
-    for (int i = 0; i < bindNames.size(); i++) {
-      String o = bindNames.get(i);
+    final List<String> newBindNames = new ArrayList<>(2);
+    for (String o : bindNames) {
       String n = localizeBindName(o, "__");
       newBindNames.add(n);
       sql = localizeStatement(sql, o, n);
     }
     // part decoration
     final List<Object> valuesFinal = bindValues;
-    ITagProcessor processor = new ITagProcessor() {
-      @Override
-      public String processTag(String tagName, String a) {
-        return createSqlOpValuePart(aggregationType, a, operation, newBindNames, valuesFinal, plainBind);
-      }
-    };
+    ITagProcessor processor = (tagName, a) -> createSqlOpValuePart(aggregationType, a, operation, newBindNames, valuesFinal, plainBind);
     return StringUtility.replaceTags(sql, "attribute", processor);
   }
 
@@ -1553,7 +1547,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
       case OPERATOR_NONE: {
         if (plainBind) {
           if (names != null) {
-            HashMap<String, String> tokenValue = new HashMap<String, String>();
+            Map<String, String> tokenValue = new HashMap<>();
             for (int i = 0; i < names.length; i++) {
               tokenValue.put(names[i], m_sqlStyle.toPlainText(values[i]));
             }

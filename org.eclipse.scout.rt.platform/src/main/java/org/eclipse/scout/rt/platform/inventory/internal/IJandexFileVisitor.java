@@ -17,6 +17,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 /**
  * @since 7.0
  */
+@FunctionalInterface
 public interface IJandexFileVisitor {
   void visit(Path path, BasicFileAttributes attrs) throws IOException;
 }

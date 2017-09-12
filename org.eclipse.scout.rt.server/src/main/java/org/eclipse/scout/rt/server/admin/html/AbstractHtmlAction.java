@@ -17,11 +17,11 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public abstract class AbstractHtmlAction implements Runnable {
 
-  private Map<String, String> m_formParameters = new HashMap<String, String>();
+  private Map<String, String> m_formParameters = new HashMap<>();
   private String m_plainText;
   private String m_htmlText;
   private Throwable m_exception;
-  private String m_uid;
+  private final String m_uid;
 
   public AbstractHtmlAction(String uid) {
     super();

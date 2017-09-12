@@ -140,7 +140,7 @@ public class JsonRequest {
     return JsonObjectUtility.toString(m_request);
   }
 
-  public static enum RequestType {
+  public enum RequestType {
     REQUEST,
     STARTUP_REQUEST,
     UNLOAD_REQUEST,
@@ -153,7 +153,7 @@ public class JsonRequest {
     /**
      * Returns the <code>enum constant</code> which represents the given {@link JSONObject}.
      */
-    private static final RequestType valueOf(JSONObject request) {
+    private static RequestType valueOf(JSONObject request) {
       if (request.has(PROP_PING)) {
         return PING_REQUEST;
       }

@@ -57,6 +57,6 @@ public abstract class AbstractViewButton extends AbstractAction implements IView
 
   @Override
   protected IViewButtonExtension<? extends AbstractViewButton> createLocalExtension() {
-    return new LocalViewButtonExtension<AbstractViewButton>(this);
+    return new LocalViewButtonExtension<>(this);
   }
 }

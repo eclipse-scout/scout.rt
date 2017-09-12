@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 /**
  * Messages are acknowledged upon successful commit of the receiving transaction. While processing a message, this
@@ -77,13 +76,7 @@ public class TransactedSubscriptionStrategy implements ISubscriptionStrategy {
                 .withTransactedSession(transactedSession)
                 .withAutoClose(false))
             .withDiagnostics(BEANS.all(IJmsRunContextDiagnostics.class))
-            .run(new IRunnable() {
-
-              @Override
-              public void run() throws Exception {
-                handleMessage(listener, message);
-              }
-            });
+            .run(() -> handleMessage(listener, message));
       }
     });
   }

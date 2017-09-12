@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.tabbox;
 
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 
+@FunctionalInterface
 public interface ITabBoxUIFacade {
   void setSelectedTabFromUI(IGroupBox box);
 }

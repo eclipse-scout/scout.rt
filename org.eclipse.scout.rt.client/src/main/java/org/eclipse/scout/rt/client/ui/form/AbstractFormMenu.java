@@ -90,13 +90,10 @@ public abstract class AbstractFormMenu<FORM extends IForm> extends AbstractMenu 
     }
     FORM form = createForm();
     if (form != null) {
-      form.addFormListener(new FormListener() {
-        @Override
-        public void formChanged(FormEvent e) {
-          if (e.getType() == FormEvent.TYPE_CLOSED) {
-            setSelected(false);
-            setForm(null);
-          }
+      form.addFormListener(e -> {
+        if (e.getType() == FormEvent.TYPE_CLOSED) {
+          setSelected(false);
+          setForm(null);
         }
       });
       decorateForm(form);
@@ -170,6 +167,6 @@ public abstract class AbstractFormMenu<FORM extends IForm> extends AbstractMenu 
 
   @Override
   protected IFormMenuExtension<FORM, ? extends AbstractFormMenu<FORM>> createLocalExtension() {
-    return new LocalFormMenuExtension<FORM, AbstractFormMenu<FORM>>(this);
+    return new LocalFormMenuExtension<>(this);
   }
 }

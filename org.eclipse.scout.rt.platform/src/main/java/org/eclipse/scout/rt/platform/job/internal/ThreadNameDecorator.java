@@ -28,12 +28,7 @@ public class ThreadNameDecorator implements ICallableDecorator {
     final ThreadInfo threadInfo = ThreadInfo.CURRENT.get();
     threadInfo.updateThreadName(IFuture.CURRENT.get().getJobInput().getThreadName(), null);
 
-    return new IUndecorator() {
-
-      @Override
-      public void undecorate() {
-        threadInfo.reset(); // Restore to the original thread name.
-      }
-    };
+    // Restore to the original thread name.
+    return threadInfo::reset;
   }
 }

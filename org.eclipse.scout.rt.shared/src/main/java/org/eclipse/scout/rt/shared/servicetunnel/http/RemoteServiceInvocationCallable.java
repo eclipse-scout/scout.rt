@@ -112,7 +112,7 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
       }
 
       final Method serviceMethod = IRunMonitorCancelService.class.getMethod(IRunMonitorCancelService.CANCEL_METHOD, long.class);
-      final Object[] serviceArgs = new Object[]{m_serviceRequest.getRequestSequence()};
+      final Object[] serviceArgs = {m_serviceRequest.getRequestSequence()};
       ServiceTunnelRequest request = m_tunnel.createRequest(IRunMonitorCancelService.class, serviceMethod, serviceArgs);
       request.setClientNodeId(m_serviceRequest.getClientNodeId());
       request.setSessionId(sessionId);

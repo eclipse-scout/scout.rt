@@ -117,7 +117,7 @@ public final class ComposerFieldChains {
       super(extensions);
     }
 
-    public AttributeNode execCreateAttributeNode(final ITreeNode parentNode, final IDataModelAttribute a, final Integer aggregationType, final IDataModelAttributeOp op, final List<? extends Object> values, final List<String> texts) {
+    public AttributeNode execCreateAttributeNode(final ITreeNode parentNode, final IDataModelAttribute a, final Integer aggregationType, final IDataModelAttributeOp op, final List<?> values, final List<String> texts) {
       MethodInvocation<AttributeNode> methodInvocation = new MethodInvocation<AttributeNode>() {
         @Override
         protected void callMethod(IComposerFieldExtension<? extends AbstractComposerField> next) {
@@ -206,7 +206,7 @@ public final class ComposerFieldChains {
       super(extensions);
     }
 
-    public EntityNode execCreateEntityNode(final ITreeNode parentNode, final IDataModelEntity e, final boolean negated, final List<? extends Object> values, final List<String> texts) {
+    public EntityNode execCreateEntityNode(final ITreeNode parentNode, final IDataModelEntity e, final boolean negated, final List<?> values, final List<String> texts) {
       MethodInvocation<EntityNode> methodInvocation = new MethodInvocation<EntityNode>() {
         @Override
         protected void callMethod(IComposerFieldExtension<? extends AbstractComposerField> next) {

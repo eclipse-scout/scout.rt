@@ -75,7 +75,7 @@ public final class DateUtility {
   }
 
   /**
-   * format date with specific pattern as defined in {@link java.text.SimpleDateFormat}
+   * format date with specific pattern as defined in {@link SimpleDateFormat}
    */
   public static String format(Date d, String pattern) {
     if (d == null || !StringUtility.hasText(pattern)) {
@@ -176,7 +176,7 @@ public final class DateUtility {
     cal.add(Calendar.DATE, sign * (sec / 3600 / 24));
     cal.add(Calendar.HOUR_OF_DAY, sign * ((sec / 3600) % 24));
     cal.add(Calendar.MINUTE, sign * ((sec / 60) % 60));
-    cal.add(Calendar.SECOND, (int) (sign * ((sec) % 60)));
+    cal.add(Calendar.SECOND, sign * ((sec) % 60));
     return cal.getTime();
   }
 
@@ -768,13 +768,13 @@ public final class DateUtility {
     Calendar c = Calendar.getInstance();
     c.setTime(time);
     double t = ((c.get(Calendar.HOUR_OF_DAY) * 60 + c.get(Calendar.MINUTE)) * 60 + c.get(Calendar.SECOND)) * 1000 + c.get(Calendar.MILLISECOND);
-    Double d = new Double(t / DAY_MILLIS);
+    Double d = t / DAY_MILLIS;
     // range check
     if (d.doubleValue() < 0) {
-      d = new Double(0);
+      d = 0d;
     }
     if (d.doubleValue() > 1) {
-      d = new Double(1);
+      d = 1d;
     }
     return d;
   }

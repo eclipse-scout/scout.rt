@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.server.jdbc.AbstractSqlService;
 import org.slf4j.Logger;
@@ -48,8 +47,8 @@ public class SqlConnectionPool {
    * Instance
    */
   private final Object m_poolLock = new Object();
-  private final Set<PoolEntry> m_idleEntries = new HashSet<PoolEntry>();
-  private final Set<PoolEntry> m_busyEntries = new HashSet<PoolEntry>();
+  private final Set<PoolEntry> m_idleEntries = new HashSet<>();
+  private final Set<PoolEntry> m_busyEntries = new HashSet<>();
   private volatile String m_name;
   private volatile int m_poolSize;
   private volatile long m_connectionLifetime;
@@ -69,13 +68,7 @@ public class SqlConnectionPool {
    * Start managing pool
    */
   private void startManagePool() {
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        managePool();
-      }
-    }, Jobs.newInput()
+    Jobs.schedule(this::managePool, Jobs.newInput()
         .withName("Managing SQL connection pool for {}", m_name)
         .withExecutionHint(m_identity)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
@@ -91,8 +84,8 @@ public class SqlConnectionPool {
       PoolEntry candidate = null;
       while (candidate == null) {
         // get next available conn
-        for (Iterator it = m_idleEntries.iterator(); it.hasNext();) {
-          candidate = (PoolEntry) it.next();
+        for (PoolEntry m_idleEntry : m_idleEntries) {
+          candidate = m_idleEntry;
           break;
         }
         if (candidate == null && m_idleEntries.size() + m_busyEntries.size() < m_poolSize) {
@@ -110,7 +103,7 @@ public class SqlConnectionPool {
           try {
             m_poolLock.wait();
           }
-          catch (java.lang.InterruptedException ie) {
+          catch (InterruptedException ie) {
             Thread.currentThread().interrupt(); // Restore the thread's interrupted status because cleared by catching {@link java.lang.InterruptedException}.
             throw new ThreadInterruptedError("Interrupted while leasing database connection");
           }
@@ -212,18 +205,19 @@ public class SqlConnectionPool {
     StringBuilder buf = new StringBuilder();
     SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSSS");
     synchronized (m_poolLock) {
-      buf.append("Total connections: " + (m_busyEntries.size() + m_idleEntries.size()));
+      buf.append("Total connections: ").append(m_busyEntries.size() + m_idleEntries.size());
       buf.append("\n");
-      buf.append("Busy: " + m_busyEntries.size());
+      buf.append("Busy: ").append(m_busyEntries.size());
       buf.append("\n");
       for (PoolEntry e : m_busyEntries) {
-        buf.append("  class=" + e.conn.getClass().getName() + ", created=" + fmt.format(new Date(e.createTime)) + ", leaseCount=" + e.leaseCount + ", leaseBegin=" + fmt.format(new Date(e.leaseBegin)));
+        buf.append("  class=").append(e.conn.getClass().getName()).append(", created=").append(fmt.format(new Date(e.createTime))).append(", leaseCount=").append(e.leaseCount).append(", leaseBegin=")
+            .append(fmt.format(new Date(e.leaseBegin)));
         buf.append("\n");
       }
-      buf.append("Idle: " + m_idleEntries.size());
+      buf.append("Idle: ").append(m_idleEntries.size());
       buf.append("\n");
       for (PoolEntry e : m_idleEntries) {
-        buf.append("  class=" + e.conn.getClass().getName() + ", created=" + fmt.format(new Date(e.createTime)) + ", leaseCount=" + e.leaseCount);
+        buf.append("  class=").append(e.conn.getClass().getName()).append(", created=").append(fmt.format(new Date(e.createTime))).append(", leaseCount=").append(e.leaseCount);
         buf.append("\n");
       }
     }
@@ -304,17 +298,13 @@ public class SqlConnectionPool {
   }
 
   protected void closeConnectionAsync(final Connection connection, final String reason) {
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        LOG.info("Closing SQL connection {}", connection);
-        try {
-          connection.close();
-        }
-        catch (SQLException e) {
-          LOG.error("Failed to close SQL connection [connection={}]", connection, e);
-        }
+    Jobs.schedule(() -> {
+      LOG.info("Closing SQL connection {}", connection);
+      try {
+        connection.close();
+      }
+      catch (SQLException e) {
+        LOG.error("Failed to close SQL connection [connection={}]", connection, e);
       }
     }, Jobs.newInput()
         .withName("Closing SQL connection [name={}, connection={}, reason={}]", m_name, connection, reason)

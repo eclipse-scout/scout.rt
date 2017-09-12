@@ -11,6 +11,7 @@ import org.eclipse.scout.rt.platform.Platform;
  * If there is at least one {@link IConfigurationValidator} that accepts a given key-value-pair (see
  * {@link #isValid(String, String)}) the configuration is considered to be valid. Otherwise the platform will not start.
  */
+@FunctionalInterface
 @Bean
 public interface IConfigurationValidator {
   /**

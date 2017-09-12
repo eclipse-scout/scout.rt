@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.messagebox;
 
 import java.util.EventListener;
 
+@FunctionalInterface
 public interface MessageBoxListener extends EventListener {
   void messageBoxChanged(MessageBoxEvent e);
 }

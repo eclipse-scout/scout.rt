@@ -15,14 +15,14 @@ package org.eclipse.scout.rt.server.jdbc.parsers.token;
  */
 public class FunctionInputToken implements IToken {
   // sql text
-  private String m_parsedToken;
+  private final String m_parsedToken;
   private String m_replaceToken;
   private boolean m_plainValue;
   private boolean m_plainSql;
   private boolean m_plainToken;
   // bind info
-  private String m_name;
-  private String[] m_args;
+  private final String m_name;
+  private final String[] m_args;
 
   public FunctionInputToken(String parsedToken, String name, String[] args, boolean plainValue, boolean plainSql) {
     m_parsedToken = parsedToken;

@@ -23,6 +23,7 @@ import javax.xml.ws.handler.MessageContext;
  *
  * @since 6.0.300
  */
+@FunctionalInterface
 public interface IPortProvider<PORT> {
 
   /**
@@ -33,7 +34,7 @@ public interface IPortProvider<PORT> {
   /**
    * Callback to initialize a Port.
    */
-  public interface IPortInitializer {
+  interface IPortInitializer {
 
     /**
      * Method invoked to install handler in the given handler-chain.

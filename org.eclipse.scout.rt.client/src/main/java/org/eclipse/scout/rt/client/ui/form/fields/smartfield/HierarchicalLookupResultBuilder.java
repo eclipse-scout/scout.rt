@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
+import java.util.Set;
 
 import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -48,7 +48,7 @@ public class HierarchicalLookupResultBuilder<VALUE> {
     List<ILookupRow<VALUE>> res = new ArrayList<>();
 
     cacheKeys(lookupRows);
-    HashSet<VALUE> allRows = new HashSet<>();
+    Set<VALUE> allRows = new HashSet<>();
 
     List<List<ILookupRow<VALUE>>> paths = createPaths(lookupRows);
     if (parent == null) {
@@ -162,7 +162,7 @@ public class HierarchicalLookupResultBuilder<VALUE> {
     else {
       lookupRows = result.getLookupRows();
     }
-    return new SmartFieldDataFetchResult<VALUE>(lookupRows, result.getException(), result.getSearchParam());
+    return new SmartFieldDataFetchResult<>(lookupRows, result.getException(), result.getSearchParam());
   }
 
   private class P_KeyLookupRowProvider implements ILookupRowByKeyProvider<VALUE> {
@@ -188,17 +188,13 @@ public class HierarchicalLookupResultBuilder<VALUE> {
 
     @Override
     public ILookupRow<VALUE> getLookupRow(VALUE key) {
-      m_rows.setIfAbsentAndGet(new Callable<Map<VALUE, ILookupRow<VALUE>>>() {
-        @Override
-        public Map<VALUE, ILookupRow<VALUE>> call() throws Exception {
-          List<ILookupRow<VALUE>> rows = LookupJobHelper.await(m_smartField.callBrowseLookupInBackground(false));
-          HashMap<VALUE, ILookupRow<VALUE>> rowMap = new HashMap<>();
-          for (ILookupRow<VALUE> r : rows) {
-            rowMap.put(r.getKey(), r);
-          }
-          return Collections.unmodifiableMap(rowMap);
+      m_rows.setIfAbsentAndGet(() -> {
+        List<ILookupRow<VALUE>> rows = LookupJobHelper.await(m_smartField.callBrowseLookupInBackground(false));
+        Map<VALUE, ILookupRow<VALUE>> rowMap = new HashMap<>();
+        for (ILookupRow<VALUE> r : rows) {
+          rowMap.put(r.getKey(), r);
         }
-
+        return Collections.unmodifiableMap(rowMap);
       });
       return m_rows.get().get(key);
     }

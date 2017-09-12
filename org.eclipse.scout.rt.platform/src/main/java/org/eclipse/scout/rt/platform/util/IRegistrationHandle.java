@@ -5,6 +5,7 @@ package org.eclipse.scout.rt.platform.util;
  *
  * @since 5.2
  */
+@FunctionalInterface
 public interface IRegistrationHandle extends IDisposable {
 
   /**
@@ -16,11 +17,7 @@ public interface IRegistrationHandle extends IDisposable {
   /**
    * Handle that does nothing upon {@link #dispose()}.
    */
-  IRegistrationHandle NULL_HANDLE = new IRegistrationHandle() {
-
-    @Override
-    public void dispose() {
-      // NOOP
-    }
+  IRegistrationHandle NULL_HANDLE = () -> {
+    // NOOP
   };
 }

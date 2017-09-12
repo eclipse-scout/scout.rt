@@ -43,7 +43,7 @@ public abstract class AbstractHttpServlet extends HttpServlet {
   private final class P_HttpInvocationHandler implements InvocationHandler {
 
     private boolean m_valid = true;
-    private Object m_origin;
+    private final Object m_origin;
 
     public P_HttpInvocationHandler(Object origin) {
       m_origin = origin;

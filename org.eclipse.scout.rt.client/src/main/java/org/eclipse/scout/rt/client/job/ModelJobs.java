@@ -21,9 +21,7 @@ import org.eclipse.scout.rt.client.job.filter.future.ModelJobFutureFilter;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.filter.IFilter;
-import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
-import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -124,12 +122,8 @@ public final class ModelJobs {
   /**
    * Runnable which does nothing.
    */
-  private static final IRunnable NULL_RUNNABLE = new IRunnable() {
-
-    @Override
-    public void run() throws Exception {
-      // NOOP
-    }
+  private static final IRunnable NULL_RUNNABLE = () -> {
+    // NOOP
   };
 
   private ModelJobs() {
@@ -287,7 +281,7 @@ public final class ModelJobs {
    * given time, there is only one model thread active per client session.
    */
   public static boolean isModelThread() {
-    return ModelJobs.isModelThread(ClientSessionProvider.currentSession());
+    return isModelThread(ClientSessionProvider.currentSession());
   }
 
   /**
@@ -296,7 +290,7 @@ public final class ModelJobs {
    */
   public static boolean isModelThread(final IClientSession clientSession) {
     final IFuture<?> currentFuture = IFuture.CURRENT.get();
-    if (!ModelJobs.isModelJob(currentFuture)) {
+    if (!isModelJob(currentFuture)) {
       return false;
     }
 
@@ -308,7 +302,7 @@ public final class ModelJobs {
    * Fails if the current thread is not the model thread.
    */
   public static void assertModelThread() {
-    if (!ModelJobs.isModelThread()) {
+    if (!isModelThread()) {
       throw new WrongThreadException("Only the model thread is allowed to update the UI model.");
     }
   }
@@ -343,18 +337,12 @@ public final class ModelJobs {
    * It is rarely appropriate to use this method. It may be useful for debugging or testing purposes.
    */
   public static void yield() {
-    Assertions.assertTrue(ModelJobs.isModelThread(), "'Yield' must be invoked from model thread");
+    Assertions.assertTrue(isModelThread(), "'Yield' must be invoked from model thread");
 
     final IBlockingCondition idleCondition = Jobs.newBlockingCondition(true);
-    ModelJobs.schedule(NULL_RUNNABLE, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+    schedule(NULL_RUNNABLE, newInput(ClientRunContexts.copyCurrent())
         .withName("Technical job to yield model thread"))
-        .whenDone(new IDoneHandler<Void>() {
-
-          @Override
-          public void onDone(final DoneEvent<Void> event) {
-            idleCondition.setBlocking(false);
-          }
-        }, ClientRunContexts.copyCurrent());
+            .whenDone(event -> idleCondition.setBlocking(false), ClientRunContexts.copyCurrent());
 
     // Release the current model job permit and wait until all competing model jobs of this session completed their work.
     idleCondition.waitFor();

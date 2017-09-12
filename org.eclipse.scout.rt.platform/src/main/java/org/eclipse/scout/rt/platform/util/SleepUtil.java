@@ -43,8 +43,8 @@ public final class SleepUtil {
     try {
       Thread.sleep(unit.toMillis(time));
     }
-    catch (final java.lang.InterruptedException e) {
-      SleepUtil.restoreInterruptionStatus();
+    catch (final InterruptedException e) {
+      restoreInterruptionStatus();
     }
   }
 
@@ -59,7 +59,7 @@ public final class SleepUtil {
    *          unit of the timeout.
    */
   public static void sleepElseLog(final long time, final TimeUnit unit) {
-    SleepUtil.sleepElseLog(time, unit, "Interrupted");
+    sleepElseLog(time, unit, "Interrupted");
   }
 
   /**
@@ -82,8 +82,8 @@ public final class SleepUtil {
     try {
       Thread.sleep(unit.toMillis(time));
     }
-    catch (final java.lang.InterruptedException e) {
-      SleepUtil.restoreInterruptionStatus();
+    catch (final InterruptedException e) {
+      restoreInterruptionStatus();
 
       final Object[] args = Arrays.copyOf(msgArgs, msgArgs.length + 1);
       args[args.length - 1] = e; // add the exception to the last index to be interpreted as cause
@@ -104,7 +104,7 @@ public final class SleepUtil {
    *           if the sleeping thread is interrupted.
    */
   public static void sleepElseThrow(final long time, final TimeUnit unit) {
-    SleepUtil.sleepElseThrow(time, unit, "Interrupted");
+    sleepElseThrow(time, unit, "Interrupted");
   }
 
   /**
@@ -127,8 +127,8 @@ public final class SleepUtil {
     try {
       Thread.sleep(unit.toMillis(time));
     }
-    catch (final java.lang.InterruptedException e) {
-      SleepUtil.restoreInterruptionStatus();
+    catch (final InterruptedException e) {
+      restoreInterruptionStatus();
 
       final Object[] args = Arrays.copyOf(msgArgs, msgArgs.length + 1);
       args[args.length - 1] = e; // add the exception to the last index to be interpreted as cause
@@ -137,7 +137,7 @@ public final class SleepUtil {
   }
 
   /**
-   * Restores the thread's interrupted status because cleared by catching {@link java.lang.InterruptedException}.
+   * Restores the thread's interrupted status because cleared by catching {@link InterruptedException}.
    */
   private static void restoreInterruptionStatus() {
     Thread.currentThread().interrupt();

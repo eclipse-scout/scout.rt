@@ -151,7 +151,7 @@ public abstract class AbstractClipboardField extends AbstractValueField<Collecti
 
   @Override
   protected IClipboardFieldExtension<? extends AbstractClipboardField> createLocalExtension() {
-    return new LocalClipboardFieldExtension<AbstractClipboardField>(this);
+    return new LocalClipboardFieldExtension<>(this);
   }
 
   /*

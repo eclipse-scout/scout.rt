@@ -63,7 +63,7 @@ public class XmlFactoriesTestSupport {
   public void doTest() throws IOException {
     Files.walkFileTree(getRoot(), new SimpleFileVisitor<Path>() {
       @Override
-      public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+      public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
         Path fileName = dir.getFileName();
         if (fileName != null && ".git".equals(fileName.toString())) {
           return FileVisitResult.SKIP_SUBTREE;

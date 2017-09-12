@@ -12,12 +12,11 @@ package org.eclipse.scout.rt.shared.data.form.fields;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.Serializable;
 
 import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
-public abstract class AbstractValueFieldData<T> extends AbstractFormFieldData implements IHolder<T>, Serializable {
+public abstract class AbstractValueFieldData<T> extends AbstractFormFieldData implements IHolder<T> {
   private static final long serialVersionUID = 1L;
 
   private T m_value;

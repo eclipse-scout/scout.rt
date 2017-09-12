@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.ShowInvisibleColumnsForm.MainBox.GroupBox.ColumnsTableField;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.ShowInvisibleColumnsForm.MainBox.GroupBox.ColumnsTableField.Table;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
@@ -101,7 +102,7 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
 
       @Order(10)
       @ClassId("9aa78206-cbf3-406f-a8c5-0783bfd1de9b")
-      public class ColumnsTableField extends AbstractTableField<ColumnsTableField.Table> {
+      public class ColumnsTableField extends AbstractTableField<Table> {
         @Override
         protected int getConfiguredGridH() {
           return 6;
@@ -233,13 +234,13 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
 
     @Override
     protected void execStore() {
-      ArrayList<IColumn<?>> newCols = new ArrayList<>();
+      List<IColumn<?>> newCols = new ArrayList<>();
       for (ITableRow row : getColumnsTableField().getTable().getCheckedRows()) {
         IColumn<?> col = getColumnsTableField().getTable().getKeyColumn().getValue(row);
         newCols.add(col);
         col.setVisible(true);
       }
-      if (m_insertAfterColumn == null || newCols.size() == 0) {
+      if (m_insertAfterColumn == null || newCols.isEmpty()) {
         return;
       }
       ColumnSet colSet = newCols.get(0).getTable().getColumnSet();

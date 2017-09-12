@@ -10,39 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.Base64;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * Base64 encoding/decoding utility. The difference to {@link Base64} is that this utility is able to decode base64
+ * strings that contain newline characters. These are removed before parsing.
+ */
 public final class Base64Utility {
-  private static final Logger LOG = LoggerFactory.getLogger(Base64Utility.class);
 
   private Base64Utility() {
-  }
-
-  private static final char[] BYTE_TO_CHAR;
-  private static final char[] BYTE_TO_CHAR_URL_SAFE;
-  private static final int[] CHAR_TO_BYTE;
-  private static final int[] CHAR_TO_BYTE_URL_SAFE;
-
-  static {
-    BYTE_TO_CHAR = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".toCharArray();
-    BYTE_TO_CHAR_URL_SAFE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_".toCharArray();
-
-    int[] charToByte = new int[128];
-    for (int i = 0; i < BYTE_TO_CHAR.length; i++) {
-      charToByte[(int) BYTE_TO_CHAR[i]] = i;
-    }
-    CHAR_TO_BYTE = charToByte;
-
-    charToByte = new int[128];
-    for (int i = 0; i < BYTE_TO_CHAR_URL_SAFE.length; i++) {
-      charToByte[(int) BYTE_TO_CHAR_URL_SAFE[i]] = i;
-    }
-    CHAR_TO_BYTE_URL_SAFE = charToByte;
   }
 
   /**
@@ -72,46 +48,10 @@ public final class Base64Utility {
    * @return A <code>String</code> containing the encoded data.
    */
   public static String encode(byte[] bytes, boolean urlSafe) {
-    int length = bytes.length;
-    if (length == 0) {
-      return "";
-    }
-    char[] mappingTable;
     if (urlSafe) {
-      mappingTable = BYTE_TO_CHAR_URL_SAFE;
+      return Base64.getUrlEncoder().encodeToString(bytes);
     }
-    else {
-      mappingTable = BYTE_TO_CHAR;
-    }
-    StringBuilder buffer = new StringBuilder((int) Math.ceil(length / 3d) * 4);
-    int remainder = length % 3;
-    length -= remainder;
-    int block;
-    int i = 0;
-    while (i < length) {
-      block = ((bytes[i++] & 0xff) << 16) | ((bytes[i++] & 0xff) << 8)
-          | (bytes[i++] & 0xff);
-      buffer.append(mappingTable[block >>> 18]);
-      buffer.append(mappingTable[(block >>> 12) & 0x3f]);
-      buffer.append(mappingTable[(block >>> 6) & 0x3f]);
-      buffer.append(mappingTable[block & 0x3f]);
-    }
-    if (remainder == 0) {
-      return buffer.toString();
-    }
-    if (remainder == 1) {
-      block = (bytes[i] & 0xff) << 4;
-      buffer.append(mappingTable[block >>> 6]);
-      buffer.append(mappingTable[block & 0x3f]);
-      buffer.append("==");
-      return buffer.toString();
-    }
-    block = (((bytes[i++] & 0xff) << 8) | ((bytes[i]) & 0xff)) << 2;
-    buffer.append(mappingTable[block >>> 12]);
-    buffer.append(mappingTable[(block >>> 6) & 0x3f]);
-    buffer.append(mappingTable[block & 0x3f]);
-    buffer.append("=");
-    return buffer.toString();
+    return Base64.getEncoder().encodeToString(bytes);
   }
 
   /**
@@ -141,78 +81,10 @@ public final class Base64Utility {
    * @return A <code>byte[]</code> containing the decoded data block.
    */
   public static byte[] decode(String string, boolean urlSafe) {
-    int length = string == null ? 0 : string.length();
-    if (length == 0) {
-      return new byte[0];
-    }
-    int[] mappingTable;
+    string = StringUtility.replaceNewLines(string, "");
     if (urlSafe) {
-      mappingTable = CHAR_TO_BYTE_URL_SAFE;
+      return Base64.getUrlDecoder().decode(string);
     }
-    else {
-      mappingTable = CHAR_TO_BYTE;
-    }
-    try (P_Base64InputStream is = new P_Base64InputStream(string, urlSafe)) {
-      ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-      int c1, c2, c3, c4;
-      c1 = is.read();
-      c2 = is.read();
-      c3 = is.read();
-      c4 = is.read();
-      while (c1 >= 0 || c2 >= 0 || c3 >= 0 || c4 >= 0) {
-        int block;
-        block = ((c1 != -1 ? mappingTable[c1] : -1) & 0xff) << 18
-            | ((c2 != -1 ? mappingTable[c2] : -1) & 0xff) << 12
-            | ((c3 != -1 ? mappingTable[c3] : -1) & 0xff) << 6
-            | ((c4 != -1 ? mappingTable[c4] : -1) & 0xff);
-        buffer.write((byte) (block >>> 16));
-        if (c3 != -1) {
-          buffer.write((byte) ((block >>> 8) & 0xff));
-        }
-        if (c4 != -1) {
-          buffer.write((byte) (block & 0xff));
-        }
-        c1 = is.read();
-        c2 = is.read();
-        c3 = is.read();
-        c4 = is.read();
-      }
-      return buffer.toByteArray();
-    }
-    catch (IOException e) {
-      LOG.error("IOException in Base64Utility.decode()", e);
-      return new byte[0];
-    }
-  }
-
-  private static class P_Base64InputStream extends InputStream {
-    private final String m_buffer;
-    private final int m_count;
-    private final boolean m_urlSafe;
-    private int m_pos = 0;
-
-    public P_Base64InputStream(String base64String, boolean urlSafe) {
-      m_buffer = base64String;
-      m_count = base64String.length();
-      m_urlSafe = urlSafe;
-    }
-
-    protected boolean matchesUrlChars(char ch) {
-      if (m_urlSafe) {
-        return (ch == '-') || (ch == '_');
-      }
-      return (ch == '+') || (ch == '/');
-    }
-
-    @Override
-    public int read() throws IOException {
-      while (m_pos < m_count) {
-        char ch = m_buffer.charAt(m_pos++);
-        if ((ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || matchesUrlChars(ch)) {
-          return (ch & 0xFF);
-        }
-      }
-      return -1;
-    }
+    return Base64.getDecoder().decode(string);
   }
 }

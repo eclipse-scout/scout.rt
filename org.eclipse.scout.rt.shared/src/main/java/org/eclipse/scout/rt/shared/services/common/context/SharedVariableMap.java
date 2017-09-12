@@ -34,7 +34,7 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
 
   public SharedVariableMap() {
     m_version = 0;
-    m_variables = new HashMap<String, Object>();
+    m_variables = new HashMap<>();
     m_propertySupport = new BasicPropertySupport(this);
   }
 
@@ -107,7 +107,7 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
   }
 
   @Override
-  public Set<java.util.Map.Entry<String, Object>> entrySet() {
+  public Set<Entry<String, Object>> entrySet() {
     return CollectionUtility.hashSet(m_variables.entrySet());
   }
 
@@ -140,7 +140,7 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
    * Fires a change event
    */
   @Override
-  public void putAll(Map<? extends String, ? extends Object> m) {
+  public void putAll(Map<? extends String, ?> m) {
     m_variables.putAll(m);
     mapChanged();
   }

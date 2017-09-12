@@ -39,24 +39,24 @@ public abstract class AbstractBigIntegerField extends AbstractNumberField<BigInt
   @Order(250)
   @Override
   protected BigInteger getConfiguredMinValue() {
-    return AbstractBigIntegerField.DEFAULT_MIN_VALUE;
+    return DEFAULT_MIN_VALUE;
   }
 
   @Override
   @ConfigProperty(ConfigProperty.BIG_INTEGER)
   @Order(260)
   protected BigInteger getConfiguredMaxValue() {
-    return AbstractBigIntegerField.DEFAULT_MAX_VALUE;
+    return DEFAULT_MAX_VALUE;
   }
 
   @Override
   protected BigInteger getMinPossibleValue() {
-    return AbstractBigIntegerField.DEFAULT_MIN_VALUE;
+    return DEFAULT_MIN_VALUE;
   }
 
   @Override
   protected BigInteger getMaxPossibleValue() {
-    return AbstractBigIntegerField.DEFAULT_MAX_VALUE;
+    return DEFAULT_MAX_VALUE;
   }
 
   /**
@@ -81,7 +81,7 @@ public abstract class AbstractBigIntegerField extends AbstractNumberField<BigInt
 
   @Override
   protected IBigIntegerFieldExtension<? extends AbstractBigIntegerField> createLocalExtension() {
-    return new LocalBigIntegerFieldExtension<AbstractBigIntegerField>(this);
+    return new LocalBigIntegerFieldExtension<>(this);
   }
 
 }

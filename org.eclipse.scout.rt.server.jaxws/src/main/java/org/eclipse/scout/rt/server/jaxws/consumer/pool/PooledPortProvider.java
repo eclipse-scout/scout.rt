@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.admin.diagnostic.DiagnosticFactory;
 import org.eclipse.scout.rt.server.admin.diagnostic.IDiagnostic;
 import org.eclipse.scout.rt.server.jaxws.consumer.IPortProvider;
@@ -79,12 +78,9 @@ public class PooledPortProvider<SERVICE extends Service, PORT> implements IPortP
    * Schedules a job that is executed every minute
    */
   protected void installCleanupWorker() {
-    Jobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        m_portPool.discardExpiredPoolEntries();
-        m_servicePool.discardExpiredPoolEntries();
-      }
+    Jobs.schedule(() -> {
+      m_portPool.discardExpiredPoolEntries();
+      m_servicePool.discardExpiredPoolEntries();
     }, Jobs.newInput()
         .withName("Cleaning up JAX-WS service and port pools")
         .withExecutionTrigger(Jobs.newExecutionTrigger()

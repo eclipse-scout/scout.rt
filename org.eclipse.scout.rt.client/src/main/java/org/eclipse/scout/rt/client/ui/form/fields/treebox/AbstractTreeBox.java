@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.treebox;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -302,7 +300,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   @Override
   protected void initConfig() {
     m_fields = CollectionUtility.emptyArrayList();
-    m_movedFormFieldsByClass = new HashMap<Class<? extends IFormField>, IFormField>();
+    m_movedFormFieldsByClass = new HashMap<>();
     super.initConfig();
     setFilterActiveNodes(getConfiguredFilterActiveNodes());
     setFilterActiveNodesValue(TriState.TRUE);
@@ -367,24 +365,21 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       setCodeTypeClass(getConfiguredCodeType());
     }
     // local property listener
-    addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent e) {
-        if (m_tree == null) {
-          return;
-        }
+    addPropertyChangeListener(e -> {
+      if (m_tree == null) {
+        return;
+      }
 
-        String name = e.getPropertyName();
-        if (PROP_ENABLED_COMPUTED.equals(name)) {
-          boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
-          m_tree.setEnabled(newEnabled);
-        }
-        else if (PROP_FILTER_CHECKED_NODES_VALUE.equals(name)) {
-          updateCheckedNodesFilter();
-        }
-        else if (PROP_FILTER_ACTIVE_NODES_VALUE.equals(name)) {
-          updateActiveNodesFilter();
-        }
+      String name = e.getPropertyName();
+      if (PROP_ENABLED_COMPUTED.equals(name)) {
+        boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
+        m_tree.setEnabled(newEnabled);
+      }
+      else if (PROP_FILTER_CHECKED_NODES_VALUE.equals(name)) {
+        updateCheckedNodesFilter();
+      }
+      else if (PROP_FILTER_ACTIVE_NODES_VALUE.equals(name)) {
+        updateActiveNodesFilter();
       }
     });
 
@@ -392,12 +387,12 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     List<Class<? extends IFormField>> configuredFields = getConfiguredFields();
     List<IFormField> contributedFields = m_contributionHolder.getContributionsByClass(IFormField.class);
 
-    List<IFormField> fieldList = new ArrayList<IFormField>(configuredFields.size() + contributedFields.size());
+    List<IFormField> fieldList = new ArrayList<>(configuredFields.size() + contributedFields.size());
     for (Class<? extends IFormField> fieldClazz : configuredFields) {
       fieldList.add(ConfigurationUtility.newInnerInstance(this, fieldClazz));
     }
     fieldList.addAll(contributedFields);
-    Collections.sort(fieldList, new OrderedComparator());
+    fieldList.sort(new OrderedComparator());
     for (IFormField f : fieldList) {
       f.setParentFieldInternal(this);
     }
@@ -474,17 +469,14 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
         interceptLoadChildNodes(parentNode);
         // when tree is non-incremental, mark all leaf cadidates as leafs
         if (!isLoadIncremental()) {
-          ITreeVisitor v = new ITreeVisitor() {
-            @Override
-            public boolean visit(ITreeNode node) {
-              if (node.getChildNodeCount() == 0) {
-                node.setLeafInternal(true);
-              }
-              else {
-                node.setLeafInternal(false);
-              }
-              return true;
+          ITreeVisitor v = node -> {
+            if (node.getChildNodeCount() == 0) {
+              node.setLeafInternal(true);
             }
+            else {
+              node.setLeafInternal(false);
+            }
+            return true;
           };
           getTree().visitNode(getTree().getRootNode(), v);
         }
@@ -562,7 +554,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       prepareLookupCall(call, parentNode);
       data = call.getDataByRec();
       data = filterLookupResult(call, data);
-      List<ITreeNode> subTree = new ArrayList<ITreeNode>(getTreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, false));
+      List<ITreeNode> subTree = new ArrayList<>(getTreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, false));
       filterNewNodesRec(subTree, parentNode != null ? parentNode.getTreeLevel() + 1 : 0);
       return subTree;
     }
@@ -621,7 +613,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   @Override
   protected String formatValueInternal(Set<T> validValue) {
-    if (validValue == null || validValue.size() == 0) {
+    if (validValue == null || validValue.isEmpty()) {
       return "";
     }
     StringBuilder b = new StringBuilder();
@@ -693,7 +685,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   @Override
   public void setSingleValue(T value) {
-    Set<T> valueSet = new HashSet<T>();
+    Set<T> valueSet = new HashSet<>();
     if (value != null) {
       valueSet.add(value);
     }
@@ -717,7 +709,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   @Override
   public void checkKey(T key) {
-    Set<T> keySet = new HashSet<T>();
+    Set<T> keySet = new HashSet<>();
     if (key != null) {
       keySet.add(key);
     }
@@ -736,7 +728,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   @Override
   public Set<T> getUncheckedKeys() {
-    Set<T> set = new HashSet<T>();
+    Set<T> set = new HashSet<>();
     Set<T> a = getInitValue();
     if (a != null) {
       set.addAll(a);
@@ -750,16 +742,13 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   @Override
   public void checkAllKeys() {
-    final Set<T> keySet = new HashSet<T>();
-    ITreeVisitor v = new ITreeVisitor() {
-      @SuppressWarnings("unchecked")
-      @Override
-      public boolean visit(ITreeNode node) {
-        if (node.getPrimaryKey() != null) {
-          keySet.add((T) node.getPrimaryKey());
-        }
-        return true;
+    final Set<T> keySet = new HashSet<>();
+    @SuppressWarnings("unchecked")
+    ITreeVisitor v = node -> {
+      if (node.getPrimaryKey() != null) {
+        keySet.add((T) node.getPrimaryKey());
       }
+      return true;
     };
     m_tree.visitNode(m_tree.getRootNode(), v);
     checkKeys(keySet);
@@ -906,12 +895,9 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       //
       Set<T> checkedKeys = getCheckedKeys();
       Collection<ITreeNode> checkedNodes = m_tree.findNodes(checkedKeys);
-      getTree().visitTree(new ITreeVisitor() {
-        @Override
-        public boolean visit(ITreeNode node) {
-          node.setChecked(false);
-          return true;
-        }
+      getTree().visitTree(node -> {
+        node.setChecked(false);
+        return true;
       });
       for (ITreeNode node : checkedNodes) {
         node.setChecked(true);
@@ -944,7 +930,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       else {
         checkedNodes = m_tree.getSelectedNodes();
       }
-      Set<T> checkedKeys = new HashSet<T>();
+      Set<T> checkedKeys = new HashSet<>();
       for (ITreeNode checkedNode : checkedNodes) {
         checkedKeys.add((T) checkedNode.getPrimaryKey());
       }
@@ -957,12 +943,9 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       }
       if (!getTree().isCheckable()) {
         //checks follow selection
-        getTree().visitTree(new ITreeVisitor() {
-          @Override
-          public boolean visit(ITreeNode node) {
-            node.setChecked(node.isSelectedNode());
-            return true;
-          }
+        getTree().visitTree(node -> {
+          node.setChecked(node.isSelectedNode());
+          return true;
         });
       }
       getTree().applyNodeFilters();
@@ -1132,25 +1115,25 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   protected final void interceptFilterNewNode(ITreeNode newNode, int treeLevel) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    TreeBoxFilterNewNodeChain<T> chain = new TreeBoxFilterNewNodeChain<T>(extensions);
+    TreeBoxFilterNewNodeChain<T> chain = new TreeBoxFilterNewNodeChain<>(extensions);
     chain.execFilterNewNode(newNode, treeLevel);
   }
 
   protected final void interceptLoadChildNodes(ITreeNode parentNode) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    TreeBoxLoadChildNodesChain<T> chain = new TreeBoxLoadChildNodesChain<T>(extensions);
+    TreeBoxLoadChildNodesChain<T> chain = new TreeBoxLoadChildNodesChain<>(extensions);
     chain.execLoadChildNodes(parentNode);
   }
 
   protected final void interceptPrepareLookup(ILookupCall<T> call, ITreeNode parent) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    TreeBoxPrepareLookupChain<T> chain = new TreeBoxPrepareLookupChain<T>(extensions);
+    TreeBoxPrepareLookupChain<T> chain = new TreeBoxPrepareLookupChain<>(extensions);
     chain.execPrepareLookup(call, parent);
   }
 
   protected final void interceptFilterLookupResult(ILookupCall<T> call, List<ILookupRow<T>> result) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    TreeBoxFilterLookupResultChain<T> chain = new TreeBoxFilterLookupResultChain<T>(extensions);
+    TreeBoxFilterLookupResultChain<T> chain = new TreeBoxFilterLookupResultChain<>(extensions);
     chain.execFilterLookupResult(call, result);
   }
 
@@ -1183,7 +1166,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   @Override
   protected ITreeBoxExtension<T, ? extends AbstractTreeBox<T>> createLocalExtension() {
-    return new LocalTreeBoxExtension<T, AbstractTreeBox<T>>(this);
+    return new LocalTreeBoxExtension<>(this);
   }
 
 }

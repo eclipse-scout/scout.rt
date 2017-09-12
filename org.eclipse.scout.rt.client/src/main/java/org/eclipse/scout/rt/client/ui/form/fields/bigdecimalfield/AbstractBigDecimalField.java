@@ -38,24 +38,24 @@ public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDe
   @ConfigProperty(ConfigProperty.BIG_DECIMAL)
   @Order(300)
   protected BigDecimal getConfiguredMinValue() {
-    return AbstractBigDecimalField.DEFAULT_MIN_VALUE;
+    return DEFAULT_MIN_VALUE;
   }
 
   @Override
   @ConfigProperty(ConfigProperty.BIG_DECIMAL)
   @Order(310)
   protected BigDecimal getConfiguredMaxValue() {
-    return AbstractBigDecimalField.DEFAULT_MAX_VALUE;
+    return DEFAULT_MAX_VALUE;
   }
 
   @Override
   protected BigDecimal getMinPossibleValue() {
-    return AbstractBigDecimalField.DEFAULT_MIN_VALUE;
+    return DEFAULT_MIN_VALUE;
   }
 
   @Override
   protected BigDecimal getMaxPossibleValue() {
-    return AbstractBigDecimalField.DEFAULT_MAX_VALUE;
+    return DEFAULT_MAX_VALUE;
   }
 
   /**
@@ -75,7 +75,7 @@ public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDe
 
   @Override
   protected IBigDecimalFieldExtension<? extends AbstractBigDecimalField> createLocalExtension() {
-    return new LocalBigDecimalFieldExtension<AbstractBigDecimalField>(this);
+    return new LocalBigDecimalFieldExtension<>(this);
   }
 
 }

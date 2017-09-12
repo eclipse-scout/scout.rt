@@ -30,11 +30,11 @@ public class GzipServletResponseWrapper extends HttpServletResponseWrapper {
   private ServletOutputStream m_servletOut;
   private PrintWriter m_writer;
 
-  public GzipServletResponseWrapper(HttpServletResponse resp) throws IOException {
+  public GzipServletResponseWrapper(HttpServletResponse resp) {
     super(resp);
   }
 
-  protected BufferedServletOutputStream ensureBufferedStream() throws IOException {
+  protected BufferedServletOutputStream ensureBufferedStream() {
     if (m_buf == null) {
       m_buf = new BufferedServletOutputStream();
     }

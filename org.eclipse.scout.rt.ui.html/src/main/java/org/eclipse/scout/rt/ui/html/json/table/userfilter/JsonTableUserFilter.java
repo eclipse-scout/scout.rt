@@ -17,7 +17,7 @@ import org.json.JSONObject;
 
 @SuppressWarnings("squid:S00118")
 public abstract class JsonTableUserFilter<T extends IUserFilterState> implements IJsonObject {
-  private T m_filter;
+  private final T m_filter;
   private JsonTable m_jsonTable;
 
   public JsonTableUserFilter(T filter) {

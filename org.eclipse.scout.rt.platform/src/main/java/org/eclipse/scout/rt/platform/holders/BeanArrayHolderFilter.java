@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.holders;
 
+import java.util.Collections;
 import java.util.EnumSet;
 
 import org.eclipse.scout.rt.platform.holders.IBeanArrayHolder.State;
@@ -21,9 +22,7 @@ public class BeanArrayHolderFilter<T> {
   public BeanArrayHolderFilter(IBeanArrayHolder<T> beanArray, State... states) {
     m_beanArray = beanArray;
     if (states != null) {
-      for (State s : states) {
-        m_states.add(s);
-      }
+      Collections.addAll(m_states, states);
     }
   }
 

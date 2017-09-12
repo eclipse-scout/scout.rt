@@ -168,7 +168,8 @@ public class ConfigFileCredentialVerifier implements ICredentialVerifier {
   /**
    * Represents a password from 'config.properties'.
    */
-  protected static interface IPassword {
+  @FunctionalInterface
+  protected interface IPassword {
 
     /**
      * Returns whether the given password matches the password in 'config.properties'.

@@ -62,7 +62,7 @@ public class RemoteServiceAccessPermission extends Permission {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    return ((RemoteServiceAccessPermission) obj).getName().equals(this.getName());
+    return ((Permission) obj).getName().equals(this.getName());
   }
 
   @Override

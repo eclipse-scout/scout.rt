@@ -22,7 +22,7 @@ public abstract class AbstractSqlTransactionMember extends AbstractTransactionMe
   private static final Logger LOG = LoggerFactory.getLogger(AbstractSqlTransactionMember.class);
 
   private final Object m_activeStatementsLock = new Object();
-  private final HashSet<Statement> m_activeStatements = new HashSet<Statement>();
+  private final HashSet<Statement> m_activeStatements = new HashSet<>();
   private boolean m_cancelled;
 
   /** true during completion phase (commit/rollback) */
@@ -72,13 +72,13 @@ public abstract class AbstractSqlTransactionMember extends AbstractTransactionMe
 
   @Override
   public void cancel() {
-    HashSet<Statement> set;
+    Iterable<Statement> set;
     synchronized (m_activeStatementsLock) {
       if (m_cancelled) {
         return;
       }
       m_cancelled = true;
-      set = new HashSet<Statement>(m_activeStatements);
+      set = new HashSet<>(m_activeStatements);
       m_activeStatements.clear();
     }
     for (Statement s : set) {

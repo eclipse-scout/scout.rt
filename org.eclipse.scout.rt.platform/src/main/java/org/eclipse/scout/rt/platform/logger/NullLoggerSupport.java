@@ -28,7 +28,7 @@ public class NullLoggerSupport extends AbstractLoggerSupport {
   private final String m_slf4jloggerFactoryClassStr;
 
   public NullLoggerSupport(String slf4jloggerFactoryClassStr) {
-    m_queriedLoggers = new ConcurrentHashMap<String, Object>();
+    m_queriedLoggers = new ConcurrentHashMap<>();
     m_slf4jloggerFactoryClassStr = slf4jloggerFactoryClassStr;
   }
 

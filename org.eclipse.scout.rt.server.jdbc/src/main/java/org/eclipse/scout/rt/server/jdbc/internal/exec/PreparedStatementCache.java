@@ -30,12 +30,12 @@ public class PreparedStatementCache extends AbstractTransactionMember implements
 
   public static final String TRANSACTION_MEMBER_ID = "PreparedStatementCache";
 
-  private ConcurrentExpiringMap<String, Integer> m_countCache;
-  private ConcurrentExpiringMap<String, PreparedStatement> m_statementCache;
+  private final ConcurrentExpiringMap<String, Integer> m_countCache;
+  private final ConcurrentExpiringMap<String, PreparedStatement> m_statementCache;
 
   public PreparedStatementCache(int statementCacheSize) {
     super(TRANSACTION_MEMBER_ID);
-    m_countCache = new ConcurrentExpiringMap<String, Integer>(2L, TimeUnit.MINUTES, 200);
+    m_countCache = new ConcurrentExpiringMap<>(2L, TimeUnit.MINUTES, 200);
     m_statementCache = new ConcurrentExpiringMap<String, PreparedStatement>(1L, TimeUnit.HOURS, statementCacheSize) {
       @Override
       protected void execEntryEvicted(String key, PreparedStatement value) {

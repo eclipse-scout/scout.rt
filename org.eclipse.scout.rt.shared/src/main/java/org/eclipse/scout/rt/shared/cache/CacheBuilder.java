@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -198,7 +197,7 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
   }
 
   public boolean isAtomicInsertion() {
-    return m_atomicInsertion & m_threadSafe;
+    return m_atomicInsertion && m_threadSafe;
   }
 
   @Override
@@ -303,12 +302,7 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
     if (cacheClass == null) {
       return;
     }
-    for (Iterator<CustomWrapperInitializer> iterator = m_customWrappers.iterator(); iterator.hasNext();) {
-      CustomWrapperInitializer initializer = iterator.next();
-      if (cacheClass.equals(initializer.getWrapperClass())) {
-        iterator.remove();
-      }
-    }
+    m_customWrappers.removeIf(initializer -> cacheClass.equals(initializer.getWrapperClass()));
   }
 
   /**

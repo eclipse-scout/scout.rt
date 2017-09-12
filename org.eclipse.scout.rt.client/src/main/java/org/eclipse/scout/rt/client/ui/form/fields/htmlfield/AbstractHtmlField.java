@@ -117,7 +117,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     String validValue = null;
     rawValue = super.validateValueInternal(rawValue);
     validValue = rawValue;
-    if (validValue != null && validValue.length() == 0) {
+    if (validValue != null && validValue.isEmpty()) {
       validValue = null;
     }
     return validValue;
@@ -131,7 +131,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   // convert string to a real string
   @Override
   protected String parseValueInternal(String text) {
-    if (text != null && text.length() == 0) {
+    if (text != null && text.isEmpty()) {
       text = null;
     }
     return text;
@@ -156,7 +156,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
       m_attachments = new HashMap<>(0);
     }
     else {
-      HashMap<String, BinaryResource> newMap = new HashMap<>(attachments.size());
+      Map<String, BinaryResource> newMap = new HashMap<>(attachments.size());
       for (BinaryResource attachment : attachments) {
         if (attachment != null) {
           newMap.put(attachment.getFilename(), attachment);
@@ -243,6 +243,6 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
 
   @Override
   protected IHtmlFieldExtension<? extends AbstractHtmlField> createLocalExtension() {
-    return new LocalHtmlFieldExtension<AbstractHtmlField>(this);
+    return new LocalHtmlFieldExtension<>(this);
   }
 }

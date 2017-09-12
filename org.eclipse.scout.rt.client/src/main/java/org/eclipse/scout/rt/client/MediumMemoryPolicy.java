@@ -11,13 +11,13 @@
 package org.eclipse.scout.rt.client;
 
 import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -42,8 +42,8 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
   private final ConcurrentExpiringMap<String /*pageTableIdentifier*/, byte[]> m_tableUserFilterState;
 
   public MediumMemoryPolicy() {
-    m_searchFormCache = new ConcurrentExpiringMap<String, SearchFormState>(0L, TimeUnit.MILLISECONDS, 5);
-    m_tableUserFilterState = new ConcurrentExpiringMap<String, byte[]>(0L, TimeUnit.MILLISECONDS, 5);
+    m_searchFormCache = new ConcurrentExpiringMap<>(0L, TimeUnit.MILLISECONDS, 5);
+    m_tableUserFilterState = new ConcurrentExpiringMap<>(0L, TimeUnit.MILLISECONDS, 5);
   }
 
   @Override
@@ -100,7 +100,7 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
     try {
       final AtomicLong nodeCount = new AtomicLong();
       if (desktop.getOutline() != null && desktop.getOutline().getSelectedNode() != null) {
-        final HashSet<IPage> preservationSet = new HashSet<IPage>();
+        final Set<IPage> preservationSet = new HashSet<>();
         IPage<?> p = (IPage) desktop.getOutline().getSelectedNode();
         while (p != null) {
           // the tree in the selection is not the topic
@@ -109,21 +109,18 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
           preservationSet.add(p);
           p = p.getParentPage();
         }
-        ITreeVisitor v = new ITreeVisitor() {
-          @Override
-          public boolean visit(ITreeNode node) {
-            IPage<?> page = (IPage) node;
-            if (preservationSet.contains(page)) {
-              // nop
-            }
-            else if (page.getParentPage() == null) {
-              // nop, InvisibleRootPage
-            }
-            else if (page.isChildrenLoaded()) {
-              nodeCount.getAndAdd(page.getChildNodeCount());
-            }
-            return true;
+        ITreeVisitor v = node -> {
+          IPage<?> page = (IPage) node;
+          if (preservationSet.contains(page)) {
+            // nop
           }
+          else if (page.getParentPage() == null) {
+            // nop, InvisibleRootPage
+          }
+          else if (page.isChildrenLoaded()) {
+            nodeCount.getAndAdd(page.getChildNodeCount());
+          }
+          return true;
         };
         for (IOutline outline : desktop.getAvailableOutlines()) {
           outline.visitNode(outline.getRootNode(), v);

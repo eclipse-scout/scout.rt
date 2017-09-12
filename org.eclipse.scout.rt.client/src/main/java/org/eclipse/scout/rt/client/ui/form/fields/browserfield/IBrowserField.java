@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
  */
 public interface IBrowserField extends IFormField {
 
-  public enum SandboxPermission {
+  enum SandboxPermission {
     AllowForms("allow-forms"),
     AllowPointerLock("allow-pointer-lock"),
     AllowPopups("allow-popups"),
@@ -33,7 +33,7 @@ public interface IBrowserField extends IFormField {
     AllowScripts("allow-scripts"),
     AllowTopNavigation("allow-top-navigation");
 
-    private String m_attribute;
+    private final String m_attribute;
 
     SandboxPermission(String attribute) {
       m_attribute = attribute;

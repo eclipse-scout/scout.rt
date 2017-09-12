@@ -41,7 +41,7 @@ public abstract class AbstractUTCDateField extends AbstractDateField implements 
 
   @Override
   protected IUTCDateFieldExtension<? extends AbstractUTCDateField> createLocalExtension() {
-    return new LocalUTCDateFieldExtension<AbstractUTCDateField>(this);
+    return new LocalUTCDateFieldExtension<>(this);
   }
 
 }

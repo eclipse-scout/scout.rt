@@ -24,10 +24,10 @@ import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 
 class TableBeanHolderInput implements IBindInput {
 
-  private ITableBeanHolder m_table;
-  private ITableBeanRowHolder[] m_filteredRows;
-  private Method m_getterMethod;
-  private ValueInputToken m_target;
+  private final ITableBeanHolder m_table;
+  private final ITableBeanRowHolder[] m_filteredRows;
+  private final Method m_getterMethod;
+  private final ValueInputToken m_target;
   private int m_batchIndex = -1;
   private int m_jdbcBindIndex = -1;
 

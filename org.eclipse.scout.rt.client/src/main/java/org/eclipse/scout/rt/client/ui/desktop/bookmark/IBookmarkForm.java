@@ -53,13 +53,11 @@ public interface IBookmarkForm extends IForm {
 
   /**
    * Opens the form for modification of an existing bookmark
-   * 
    */
   void startModify();
 
   /**
    * Opens the form for creation of a new bookmark
-   * 
    */
   void startNew();
 }

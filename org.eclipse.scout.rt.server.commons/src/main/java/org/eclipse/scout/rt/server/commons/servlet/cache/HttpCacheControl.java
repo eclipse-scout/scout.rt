@@ -108,7 +108,7 @@ public class HttpCacheControl {
       //   is basically the same, but for proxies (s = shared). This overrides any default value
       //   the proxy may use internally.
       // Note: Because "must-revalidate" is not present, a cache MAY use a stale resource longer than max-age.
-      resp.setHeader(HttpCacheControl.CACHE_CONTROL, "private, max-age=" + maxAge + ", s-maxage=" + maxAge);
+      resp.setHeader(CACHE_CONTROL, "private, max-age=" + maxAge + ", s-maxage=" + maxAge);
     }
     else {
       // "private"
@@ -118,11 +118,11 @@ public class HttpCacheControl {
       // "max-age=0"
       //   A resource will become stale immediately (after 0 seconds).
       // Note: "max-age=0, must-revalidate" would be the same as "no-cache"
-      resp.setHeader(HttpCacheControl.CACHE_CONTROL, "private, max-age=0, must-revalidate");
+      resp.setHeader(CACHE_CONTROL, "private, max-age=0, must-revalidate");
     }
 
     String etag = obj.createETag();
-    String ifNoneMatch = req.getHeader(HttpCacheControl.IF_NONE_MATCH);
+    String ifNoneMatch = req.getHeader(IF_NONE_MATCH);
     boolean clientSentEtag = (ifNoneMatch != null);
 
     // Check If-None-Match (Etag)
@@ -138,7 +138,7 @@ public class HttpCacheControl {
     }
     // Check If-Modified-Since
     else {
-      long ifModifiedSince = req.getDateHeader(HttpCacheControl.IF_MODIFIED_SINCE);
+      long ifModifiedSince = req.getDateHeader(IF_MODIFIED_SINCE);
       if (notModifiedSince(ifModifiedSince, obj.getResource().getLastModified())) {
         if (LOG.isDebugEnabled()) {
           LOG.debug("Use http cached object (If-Modified-Since): {}", req.getPathInfo());
@@ -149,10 +149,10 @@ public class HttpCacheControl {
     }
 
     if (obj.getResource().getLastModified() > 0) {
-      resp.setDateHeader(HttpCacheControl.LAST_MODIFIED, obj.getResource().getLastModified());
+      resp.setDateHeader(LAST_MODIFIED, obj.getResource().getLastModified());
     }
     if (etag != null) {
-      resp.setHeader(HttpCacheControl.ETAG, etag);
+      resp.setHeader(ETAG, etag);
     }
 
     return false;
@@ -169,15 +169,15 @@ public class HttpCacheControl {
     //   Should not be necessary here, but because some browser apparently imply a
     //   short caching time with "no-cache" (http://stackoverflow.com/a/19938619),
     //   we explicitly set it to 0.
-    resp.setHeader(HttpCacheControl.CACHE_CONTROL, "private, no-store, no-cache, max-age=0");
+    resp.setHeader(CACHE_CONTROL, "private, no-store, no-cache, max-age=0");
   }
 
   protected boolean notModified(String ifNoneMatch, String etag) {
-    return (ifNoneMatch != null && etag != null && ifNoneMatch.indexOf(etag) != -1);
+    return (ifNoneMatch != null && etag != null && ifNoneMatch.contains(etag));
   }
 
   // for purposes of comparison we add 999 to ifModifiedSince since the fidelity of the IMS header generally doesn't include milliseconds
   protected boolean notModifiedSince(long ifModifiedSince, long lastModified) {
-    return (ifModifiedSince > -1 && lastModified > 0 && lastModified <= (ifModifiedSince + HttpCacheControl.IF_MODIFIED_SINCE_FIDELITY));
+    return (ifModifiedSince > -1 && lastModified > 0 && lastModified <= (ifModifiedSince + IF_MODIFIED_SINCE_FIDELITY));
   }
 }

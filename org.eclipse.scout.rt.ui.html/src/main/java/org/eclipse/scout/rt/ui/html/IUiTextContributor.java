@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
  * UI on session startup (i.e. static UI texts that are required by JavaScript classes). Dynamic texts are always sent
  * as regular (form-)data and must <i>not</i> be contributed here.
  */
+@FunctionalInterface
 @ApplicationScoped
 public interface IUiTextContributor {
 

@@ -29,9 +29,6 @@ public abstract class AbstractGroupBoxBodyGrid implements IGroupBoxBodyGrid {
   private int m_gridRows;
   private int m_gridColumns;
 
-  public AbstractGroupBoxBodyGrid() {
-  }
-
   protected void setGridColumns(int gridColumns) {
     m_gridColumns = gridColumns;
   }
@@ -59,7 +56,7 @@ public abstract class AbstractGroupBoxBodyGrid implements IGroupBoxBodyGrid {
     int containingGridXYCount = 0;
     int notContainingGridXYCount = 0;
     // build
-    List<IFormField> fieldsExceptProcessButtons = new ArrayList<IFormField>();
+    List<IFormField> fieldsExceptProcessButtons = new ArrayList<>();
     for (IFormField formField : groupBox.getFields()) {
       if (formField.isVisible()) {
         if (!isProcessButton(formField)) {

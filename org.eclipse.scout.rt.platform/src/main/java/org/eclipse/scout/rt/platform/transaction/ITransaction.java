@@ -10,11 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.transaction;
 
+import java.util.function.Function;
+
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
-import org.eclipse.scout.rt.platform.util.concurrent.IFunction;
 
 /**
  * Represents a transaction which multiple transaction members can participate for consistent commit or rollback.
@@ -46,7 +47,7 @@ public interface ITransaction extends ICancellable {
    *
    * @return transaction member registered, or which was produced by the given mapping function.
    */
-  <TRANSACTION_MEMBER extends ITransactionMember> TRANSACTION_MEMBER registerMemberIfAbsent(String memberId, IFunction<String, TRANSACTION_MEMBER> producer);
+  <TRANSACTION_MEMBER extends ITransactionMember> TRANSACTION_MEMBER registerMemberIfAbsent(String memberId, Function<String, TRANSACTION_MEMBER> producer);
 
   /**
    * Produces and registers the given transaction member using the given mapping function, but only if not registered
@@ -56,7 +57,7 @@ public interface ITransaction extends ICancellable {
    * @return transaction member registered, or which was produced by the given mapping function, or null in case the
    *         transaction has been cancelled.
    */
-  <TRANSACTION_MEMBER extends ITransactionMember> TRANSACTION_MEMBER registerMemberIfAbsentAndNotCancelled(String memberId, IFunction<String, TRANSACTION_MEMBER> producer);
+  <TRANSACTION_MEMBER extends ITransactionMember> TRANSACTION_MEMBER registerMemberIfAbsentAndNotCancelled(String memberId, Function<String, TRANSACTION_MEMBER> producer);
 
   /**
    * Returns the transaction member of the given member id, or <code>null</code> if not registered.

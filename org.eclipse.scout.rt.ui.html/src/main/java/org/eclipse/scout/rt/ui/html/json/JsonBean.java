@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.eclipse.scout.rt.platform.annotations.IgnoreProperty;
@@ -43,8 +44,8 @@ import org.json.JSONObject;
  */
 public class JsonBean implements IJsonObject {
 
-  private Object m_bean;
-  private IJsonObjectFactory m_objectFactory;
+  private final Object m_bean;
+  private final IJsonObjectFactory m_objectFactory;
   private BinaryResourceMediator m_binaryResourceMediator;
 
   public JsonBean(Object bean, IJsonObjectFactory objectFactory) {
@@ -118,7 +119,7 @@ public class JsonBean implements IJsonObject {
       throw new IllegalArgumentException("Cannot convert " + type + " to json object");
     }
     try {
-      TreeMap<String, Object> properties = new TreeMap<>();
+      SortedMap<String, Object> properties = new TreeMap<>();
       for (Field f : type.getFields()) {
         if (Modifier.isStatic(f.getModifiers())) {
           continue;
@@ -145,7 +146,7 @@ public class JsonBean implements IJsonObject {
         properties.put(key, jsonObject.toJson());
       }
       JSONObject jbean = new JSONObject();
-      for (Map.Entry<String, Object> e : properties.entrySet()) {
+      for (Entry<String, Object> e : properties.entrySet()) {
         jbean.put(e.getKey(), e.getValue());
       }
       return jbean;

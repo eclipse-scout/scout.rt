@@ -58,19 +58,14 @@ public class BookmarkService implements IBookmarkService {
 
   @PostConstruct
   public void addBookmarkServiceListener() {
-    addBookmarkServiceListener(new BookmarkServiceListener() {
-      @Override
-      public void bookmarksChanged(BookmarkServiceEvent e) {
-        handleBookmarksChangedInternal(e);
-      }
-    });
+    addBookmarkServiceListener(this::handleBookmarksChangedInternal);
   }
 
   protected void handleBookmarksChangedInternal(BookmarkServiceEvent e) {
     switch (e.getType()) {
       case BookmarkServiceEvent.TYPE_CHANGED: {
         //refresh global keystrokes
-        final ArrayList<Bookmark> list = new ArrayList<Bookmark>();
+        final List<Bookmark> list = new ArrayList<>();
         IBookmarkVisitor visitor = new IBookmarkVisitor() {
           @Override
           public boolean visitFolder(List<BookmarkFolder> path) {
@@ -90,7 +85,7 @@ public class BookmarkService implements IBookmarkService {
 
         IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
         if (desktop != null) {
-          List<IKeyStroke> newKeyStrokes = new ArrayList<IKeyStroke>();
+          List<IKeyStroke> newKeyStrokes = new ArrayList<>();
           for (IKeyStroke k : desktop.getKeyStrokes()) {
             if (k instanceof ActivateBookmarkKeyStroke) {
               //remove
@@ -212,8 +207,8 @@ public class BookmarkService implements IBookmarkService {
     ServiceState state = getServiceState();
     EventListener[] a = state.m_listenerList.getListeners(BookmarkServiceListener.class);
     if (a != null) {
-      for (int i = 0; i < a.length; i++) {
-        ((BookmarkServiceListener) a[i]).bookmarksChanged(e);
+      for (EventListener anA : a) {
+        ((BookmarkServiceListener) anA).bookmarksChanged(e);
       }
     }
   }

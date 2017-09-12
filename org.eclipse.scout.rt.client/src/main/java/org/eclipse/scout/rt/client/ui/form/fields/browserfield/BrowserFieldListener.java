@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 
 import java.util.EventListener;
 
+@FunctionalInterface
 public interface BrowserFieldListener extends EventListener {
 
   void browserFieldChanged(BrowserFieldEvent e);

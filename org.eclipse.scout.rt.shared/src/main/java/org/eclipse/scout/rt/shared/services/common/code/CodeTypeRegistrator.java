@@ -5,7 +5,7 @@ import java.util.Set;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBeanManager;
-import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.slf4j.Logger;
@@ -20,7 +20,7 @@ public class CodeTypeRegistrator implements IPlatformListener {
 
   @Override
   public void stateChanged(PlatformEvent e) {
-    if (e.getState() == IPlatform.State.BeanManagerPrepared) {
+    if (e.getState() == State.BeanManagerPrepared) {
       IBeanManager beanManager = e.getSource().getBeanManager();
       Set<Class<? extends ICodeType<?, ?>>> classes = BEANS.get(CodeTypeClassInventory.class).getClasses();
       for (Class<? extends ICodeType<?, ?>> c : classes) {

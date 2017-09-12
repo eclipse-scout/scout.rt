@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.session;
 
 import java.util.UUID;
-import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.clientnotification.IClientSessionRegistry;
@@ -61,33 +60,25 @@ public class ClientSessionProvider {
     final String sid = sessionId != null ? sessionId : Sessions.randomSessionId();
 
     // Create the session with the given context applied.
-    return clientRunContext.call(new Callable<SESSION>() {
+    return clientRunContext.call(() -> {
+      // 1. Create an empty session instance.
+      @SuppressWarnings("unchecked")
+      final SESSION session = (SESSION) BEANS.get(IClientSession.class);
 
-      @Override
-      public SESSION call() throws Exception {
-        // 1. Create an empty session instance.
-        @SuppressWarnings("unchecked")
-        final SESSION session = (SESSION) BEANS.get(IClientSession.class);
+      // 2. Enable this session to receive client notifications.
+      registerSessionForNotifications(session, sid);
 
-        // 2. Enable this session to receive client notifications.
-        registerSessionForNotifications(session, sid);
-
-        // 3. Load the session in the model thread.
-        return ModelJobs.schedule(new Callable<SESSION>() {
-
-          @Override
-          public SESSION call() throws Exception {
-            beforeStartSession(session, sid);
-            session.start(sid);
-            afterStartSession(session);
-            return session;
-          }
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()
-            .withSession(session, true))
-            .withName("Starting ClientSession [sessionId={}]", sid)
-            .withExceptionHandling(null, false))
-            .awaitDoneAndGet();
-      }
+      // 3. Load the session in the model thread.
+      return ModelJobs.schedule(() -> {
+        beforeStartSession(session, sid);
+        session.start(sid);
+        afterStartSession(session);
+        return session;
+      }, ModelJobs.newInput(ClientRunContexts.copyCurrent()
+          .withSession(session, true))
+          .withName("Starting ClientSession [sessionId={}]", sid)
+          .withExceptionHandling(null, false))
+          .awaitDoneAndGet();
     });
   }
 
@@ -116,7 +107,7 @@ public class ClientSessionProvider {
    * Returns the {@link IClientSession} associated with the current thread, or <code>null</code> if not available, or if
    * not of the type {@link IClientSession}.
    */
-  public static final IClientSession currentSession() {
+  public static IClientSession currentSession() {
     return Sessions.currentSession(IClientSession.class);
   }
 
@@ -124,7 +115,7 @@ public class ClientSessionProvider {
    * Returns the {@link IClientSession} associated with the current thread, or <code>null</code> if not available, or if
    * not of the expected type.
    */
-  public static final <SESSION extends IClientSession> SESSION currentSession(final Class<SESSION> type) {
+  public static <SESSION extends IClientSession> SESSION currentSession(final Class<SESSION> type) {
     return Sessions.currentSession(type);
   }
 }

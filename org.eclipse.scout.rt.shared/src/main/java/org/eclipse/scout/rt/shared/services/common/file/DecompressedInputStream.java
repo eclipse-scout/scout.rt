@@ -20,10 +20,10 @@ import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
 public class DecompressedInputStream extends InputStream {
-  private RemoteFile m_remoteFile;
-  private ByteArrayInputStream m_buffer;
-  private Inflater m_inflater;
-  private InflaterInputStream m_inflaterInputStream;
+  private final RemoteFile m_remoteFile;
+  private final ByteArrayInputStream m_buffer;
+  private final Inflater m_inflater;
+  private final InflaterInputStream m_inflaterInputStream;
 
   public DecompressedInputStream(RemoteFile f) throws IOException {
     if (f.getCompressedData() == null) {

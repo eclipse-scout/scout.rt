@@ -23,9 +23,9 @@ import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.IProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.status.IStatus;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.slf4j.Logger;
@@ -74,13 +74,7 @@ public class ClientExceptionHandler extends ExceptionHandler {
         }
         else {
           try {
-            ModelJobs.schedule(new IRunnable() {
-
-              @Override
-              public void run() throws Exception {
-                showException(t);
-              }
-            }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+            ModelJobs.schedule(() -> showException(t), ModelJobs.newInput(ClientRunContexts.copyCurrent())
                 .withExceptionHandling(null, true)
                 .withName("Visualizing PlatformException"))
                 .awaitDone();
@@ -107,7 +101,7 @@ public class ClientExceptionHandler extends ExceptionHandler {
             .withHeader(TEXTS.get("Error"));
 
         if (t instanceof VetoException) {
-          IProcessingStatus status = ((VetoException) t).getStatus();
+          IProcessingStatus status = ((ProcessingException) t).getStatus();
           msgBox
               .withHeader(status.getTitle())
               .withBody(status.getBody());

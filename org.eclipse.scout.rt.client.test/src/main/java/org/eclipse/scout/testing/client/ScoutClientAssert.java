@@ -14,11 +14,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox.DefaultListBoxTable;
@@ -43,8 +42,8 @@ public final class ScoutClientAssert {
 
   private static void assertContainsKeys(boolean strict, AbstractListBox<?> listbox, Object... keys) {
     // TODO [7.0] abr: check row visibility
-    HashSet<Object> expectedKeys = new HashSet<Object>(Arrays.asList(keys));
-    HashSet<Object> unexpectedKeys = new HashSet<Object>();
+    Set<Object> expectedKeys = new HashSet<>(Arrays.asList(keys));
+    Set<Object> unexpectedKeys = new HashSet<>();
     List listBoxKeys = ((DefaultListBoxTable) listbox.getTable()).getKeyColumn().getValues();
     for (Object key : listBoxKeys) {
       boolean expected = expectedKeys.remove(key);
@@ -242,19 +241,16 @@ public final class ScoutClientAssert {
   private static void assertView(final ViewKind viewKind, final boolean strict, IForm form, IFormField... fields) {
     Assert.assertNotNull(form);
     Assert.assertNotNull(fields);
-    final HashSet<IFormField> expectedFields = new HashSet<IFormField>(Arrays.asList(fields));
-    final ArrayList<IFormField> unexpectedFields = new ArrayList<IFormField>();
-    form.visitFields(new IFormFieldVisitor() {
-      @Override
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
-        if (viewKind.testField(field)) {
-          boolean expected = expectedFields.remove(field);
-          if (strict && !expected) {
-            unexpectedFields.add(field);
-          }
+    final Set<IFormField> expectedFields = new HashSet<>(Arrays.asList(fields));
+    final List<IFormField> unexpectedFields = new ArrayList<>();
+    form.visitFields((field, level, fieldIndex) -> {
+      if (viewKind.testField(field)) {
+        boolean expected = expectedFields.remove(field);
+        if (strict && !expected) {
+          unexpectedFields.add(field);
         }
-        return true;
       }
+      return true;
     });
     if (!expectedFields.isEmpty() || !unexpectedFields.isEmpty()) {
       StringBuilder builder = new StringBuilder();
@@ -275,14 +271,14 @@ public final class ScoutClientAssert {
   private static String formatFieldNames(Collection<IFormField> fields) {
     StringBuilder builder = new StringBuilder();
     boolean first = true;
-    for (Iterator<IFormField> it = fields.iterator(); it.hasNext();) {
+    for (IFormField field : fields) {
       if (!first) {
         builder.append(", ");
       }
       else {
         first = false;
       }
-      builder.append(it.next().getFieldId());
+      builder.append(field.getFieldId());
     }
     return builder.toString();
   }

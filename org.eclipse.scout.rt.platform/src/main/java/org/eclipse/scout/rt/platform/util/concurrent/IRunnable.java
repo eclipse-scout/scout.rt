@@ -17,6 +17,7 @@ package org.eclipse.scout.rt.platform.util.concurrent;
  * @see Runnable
  * @see 5.1
  */
+@FunctionalInterface
 public interface IRunnable {
 
   /**

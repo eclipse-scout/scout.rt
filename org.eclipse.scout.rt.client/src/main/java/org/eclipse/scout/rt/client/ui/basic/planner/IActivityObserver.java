@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.planner;
 
+@FunctionalInterface
 public interface IActivityObserver<RI, AI> {
 
   void activityChanged(Activity<RI, AI> activity, int bitPos);

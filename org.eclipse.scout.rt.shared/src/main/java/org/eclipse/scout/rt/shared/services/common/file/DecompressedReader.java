@@ -28,10 +28,10 @@ import org.slf4j.LoggerFactory;
 public class DecompressedReader extends Reader {
   private static final Logger LOG = LoggerFactory.getLogger(DecompressedReader.class);
 
-  private RemoteFile m_remoteFile;
-  private ByteArrayInputStream m_buffer;
-  private Inflater m_inflater;
-  private InflaterInputStream m_inflaterInputStream;
+  private final RemoteFile m_remoteFile;
+  private final ByteArrayInputStream m_buffer;
+  private final Inflater m_inflater;
+  private final InflaterInputStream m_inflaterInputStream;
   private InputStreamReader m_inputReader;
 
   public DecompressedReader(RemoteFile f) {

@@ -50,6 +50,7 @@ public final class StringUtility {
 
   private static final String[] EMPTY_ARRAY = new String[0];
 
+  @FunctionalInterface
   public interface ITagProcessor {
     String/* tagReplacement */ processTag(String tagName, String tagContent);
   }
@@ -102,10 +103,10 @@ public final class StringUtility {
     }
     StringBuilder buf = new StringBuilder();
     char[] ch = wildcardPattern.toCharArray();
-    for (int i = 0; i < ch.length; i++) {
-      switch (ch[i]) {
+    for (char aCh : ch) {
+      switch (aCh) {
         case ' ': {
-          buf.append(ch[i]);
+          buf.append(aCh);
           break;
         }
         case '*':
@@ -126,7 +127,7 @@ public final class StringUtility {
         case '<':
         case '>':
         case '=': {
-          buf.append(ch[i]);
+          buf.append(aCh);
           break;
         }
         case '.': {
@@ -134,8 +135,8 @@ public final class StringUtility {
           break;
         }
         default: {
-          if (ch[i] >= 32 && (Character.isJavaIdentifierStart(ch[i]) || Character.isJavaIdentifierPart(ch[i]))) {
-            buf.append(ch[i]);
+          if (aCh >= 32 && (Character.isJavaIdentifierStart(aCh) || Character.isJavaIdentifierPart(aCh))) {
+            buf.append(aCh);
           }
           else {
             buf.append('.');
@@ -191,8 +192,8 @@ public final class StringUtility {
     }
     char[] cA = s.toCharArray();
     int count = 0;
-    for (int i = 0; i < cA.length; i++) {
-      if (cA[i] == c) {
+    for (char aCA : cA) {
+      if (aCA == c) {
         count++;
       }
     }
@@ -212,7 +213,7 @@ public final class StringUtility {
     return returnValue;
   }
 
-  private static final Set<String> BOOLEAN_TRUE = new HashSet<String>(3);
+  private static final Set<String> BOOLEAN_TRUE = new HashSet<>(3);
 
   static {
     BOOLEAN_TRUE.add("true");
@@ -220,7 +221,7 @@ public final class StringUtility {
     BOOLEAN_TRUE.add("1");
   }
 
-  private static final Set<String> BOOLEAN_FALSE = new HashSet<String>(3);
+  private static final Set<String> BOOLEAN_FALSE = new HashSet<>(3);
 
   static {
     BOOLEAN_FALSE.add("false");
@@ -246,7 +247,7 @@ public final class StringUtility {
    * </ul>
    */
   public static boolean parseBoolean(String s, boolean defaultValue) {
-    if (s == null || s.length() == 0) {
+    if (s == null || s.isEmpty()) {
       return defaultValue;
     }
     s = s.toLowerCase().trim();
@@ -272,7 +273,7 @@ public final class StringUtility {
    * @since Build 153
    */
   public static int getLineCount(String s) {
-    if (s == null || s.length() == 0) {
+    if (s == null || s.isEmpty()) {
       return 0;
     }
     int r = 1;
@@ -482,12 +483,7 @@ public final class StringUtility {
   }
 
   public static String replaceTags(String text, String tagName, boolean ignoreCase, final String replacement) {
-    return replaceTags(text, tagName, ignoreCase, new ITagProcessor() {
-      @Override
-      public String processTag(String name, String tagContent) {
-        return replacement;
-      }
-    });
+    return replaceTags(text, tagName, ignoreCase, (name, tagContent) -> replacement);
   }
 
   /**
@@ -561,8 +557,8 @@ public final class StringUtility {
       return null;
     }
     if (tagNames != null) {
-      for (int i = 0; i < tagNames.length; i++) {
-        text = removeTag(text, tagNames[i]);
+      for (String tagName : tagNames) {
+        text = removeTag(text, tagName);
       }
     }
     return text;
@@ -627,10 +623,10 @@ public final class StringUtility {
     StringBuilder buf = new StringBuilder();
     char[] ch = s.toCharArray();
     int col = 0;
-    for (int i = 0; i < ch.length; i++) {
-      if (ch[i] == '\n' || ch[i] == '\r') {
+    for (char aCh : ch) {
+      if (aCh == '\n' || aCh == '\r') {
         col = 0;
-        buf.append(ch[i]);
+        buf.append(aCh);
       }
       else {
         col++;
@@ -638,7 +634,7 @@ public final class StringUtility {
           buf.append('\n');
           col = 1;
         }
-        buf.append(ch[i]);
+        buf.append(aCh);
       }
     }
     return buf.toString();
@@ -673,7 +669,7 @@ public final class StringUtility {
   }
 
   public static String unwrapText(String s) {
-    if (s == null || s.length() == 0) {
+    if (s == null || s.isEmpty()) {
       return null;
     }
     s = s.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ');
@@ -695,7 +691,7 @@ public final class StringUtility {
   }
 
   public static String unquoteText(String s) {
-    if (s == null || s.length() == 0) {
+    if (s == null || s.isEmpty()) {
       return null;
     }
     if (s.charAt(0) == '\'' && s.charAt(s.length() - 1) == '\'') {
@@ -741,7 +737,7 @@ public final class StringUtility {
   private static final String CONVERT_UTF_ASCII_HEX_CHARS = "0123456789abcdef";
 
   public static String convertUTFAscii(String s, boolean escapeControlChars) {
-    if (s == null || s.length() == 0) {
+    if (s == null || s.isEmpty()) {
       return s;
     }
     int len = s.length();
@@ -807,7 +803,7 @@ public final class StringUtility {
    */
   @SuppressWarnings("squid:ForLoopCounterChangedCheck")
   public static String convertAsciiUTF(String s) {
-    if (s == null || s.length() == 0) {
+    if (s == null || s.isEmpty()) {
       return s;
     }
     char ch;
@@ -872,7 +868,7 @@ public final class StringUtility {
   }
 
   public static int asc(String s) {
-    if (s == null || s.length() == 0) {
+    if (s == null || s.isEmpty()) {
       return 0;
     }
     else {
@@ -1122,10 +1118,10 @@ public final class StringUtility {
    * <p>
    * Splits the string around matches of the <code>regex</code>. Returns an empty array if the provided string
    * <code>s</code> is <code>null</code> or has length 0. Otherwise, the method returns the result of
-   * {@link java.lang.String#split(String)}.
+   * {@link String#split(String)}.
    */
   public static String[] split(String s, String regex) {
-    if (s == null || s.length() == 0) {
+    if (s == null || s.isEmpty()) {
       return new String[0];
     }
     return s.split(regex);
@@ -1136,10 +1132,10 @@ public final class StringUtility {
    * <p>
    * Splits the string around matches of the <code>regex</code>, but returns at most <code>limit</code> elements.
    * Returns an empty array if the provided string <code>s</code> is <code>null</code> or has length 0. Otherwise, the
-   * method returns the result of {@link java.lang.String#split(String, int)}.
+   * method returns the result of {@link String#split(String, int)}.
    */
   public static String[] split(String s, String regex, int limit) {
-    if (s == null || s.length() == 0) {
+    if (s == null || s.isEmpty()) {
       return new String[0];
     }
     return s.split(regex, limit);
@@ -1209,7 +1205,7 @@ public final class StringUtility {
    * </pre>
    */
   public static String lpad(String s, String fill, int len) {
-    if (s == null || fill == null || s.length() >= len || fill.length() == 0) {
+    if (s == null || fill == null || s.length() >= len || fill.isEmpty()) {
       return s;
     }
     StringBuilder buf = new StringBuilder(s);
@@ -1232,7 +1228,7 @@ public final class StringUtility {
    * </pre>
    */
   public static String rpad(String s, String fill, int len) {
-    if (s == null || fill == null || s.length() >= len || fill.length() == 0) {
+    if (s == null || fill == null || s.length() >= len || fill.isEmpty()) {
       return s;
     }
     StringBuilder buf = new StringBuilder(s);
@@ -1588,9 +1584,9 @@ public final class StringUtility {
    * but <code>removePrefixes("CompanyFormData","Form","Company")</code> will result in "FormData"
    */
   public static String removePrefixes(String s, String... prefixes) {
-    for (int i = 0; i < prefixes.length; i++) {
-      if (prefixes[i] != null && s.toLowerCase().startsWith(prefixes[i].toLowerCase())) {
-        s = s.substring(prefixes[i].length());
+    for (String prefixe : prefixes) {
+      if (prefixe != null && s.toLowerCase().startsWith(prefixe.toLowerCase())) {
+        s = s.substring(prefixe.length());
       }
     }
     return s;
@@ -1616,13 +1612,13 @@ public final class StringUtility {
     if (s != null && s.length > 0) {
       StringBuilder b = new StringBuilder();
       String suffix = s[0];
-      if (StringUtility.hasText(suffix)) {
+      if (hasText(suffix)) {
         b.append(suffix.trim());
       }
       for (int i = 1, l = s.length - 1; i < l; i = i + 2) {
         String del = s[i];
         suffix = s[i + 1];
-        if (StringUtility.hasText(suffix)) {
+        if (hasText(suffix)) {
           if (b.length() > 0) {
             b.append(del);
           }
@@ -1630,7 +1626,7 @@ public final class StringUtility {
         }
       }
       retVal = b.toString().trim();
-      if ((s.length % 2) == 0 && retVal.length() > 0) {
+      if ((s.length % 2) == 0 && !retVal.isEmpty()) {
         retVal = retVal + s[s.length - 1];
       }
     }
@@ -1686,10 +1682,10 @@ public final class StringUtility {
    * @see Collator#setStrength(int)
    */
   public static int compare(int strength, Locale locale, String a, String b) {
-    if (a != null && a.length() == 0) {
+    if (a != null && a.isEmpty()) {
       a = null;
     }
-    if (b != null && b.length() == 0) {
+    if (b != null && b.isEmpty()) {
       b = null;
     }
     //

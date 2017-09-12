@@ -16,7 +16,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -56,7 +57,7 @@ public class ServicesView extends DefaultView {
     // read all services
     m_serviceInspectors = null;
     try {
-      ArrayList<ServiceInspector> list = new ArrayList<ServiceInspector>();
+      ArrayList<ServiceInspector> list = new ArrayList<>();
       for (IService service : BEANS.all(IService.class)) {
         list.add(new ServiceInspector(service));
       }
@@ -90,7 +91,7 @@ public class ServicesView extends DefaultView {
 
   private void renderServiceTables(HtmlComponent p) {
     // categorize services
-    TreeMap<CompositeObject, Collection<ServiceInspector>> servicesMap = new TreeMap<CompositeObject, Collection<ServiceInspector>>();
+    SortedMap<CompositeObject, Collection<ServiceInspector>> servicesMap = new TreeMap<>();
     if (m_serviceInspectors != null) {
       for (ServiceInspector inspector : m_serviceInspectors) {
         String serviceName = inspector.getService().getClass().getSimpleName();
@@ -111,8 +112,8 @@ public class ServicesView extends DefaultView {
           }
           else {
             List<Class<?>> serviceInterfaces = BeanUtility.getInterfacesHierarchy(inspector.getService().getClass(), Object.class);
-            Class topInterface = (serviceInterfaces.size() > 0 ? serviceInterfaces.get(serviceInterfaces.size() - 1) : null);
-            if (topInterface != null && topInterface.getPackage() != null && topInterface.getPackage().getName().indexOf(".common.") >= 0) {
+            Class topInterface = (!serviceInterfaces.isEmpty() ? serviceInterfaces.get(serviceInterfaces.size() - 1) : null);
+            if (topInterface != null && topInterface.getPackage() != null && topInterface.getPackage().getName().contains(".common.")) {
               sectionOrder = 4;
               sectionName = "Common Services";
             }
@@ -122,11 +123,7 @@ public class ServicesView extends DefaultView {
             }
           }
           CompositeObject key = new CompositeObject(sectionOrder, sectionName);
-          Collection<ServiceInspector> list = servicesMap.get(key);
-          if (list == null) {
-            list = new ArrayList<ServiceInspector>();
-            servicesMap.put(key, list);
-          }
+          Collection<ServiceInspector> list = servicesMap.computeIfAbsent(key, k -> new ArrayList<>());
           list.add(inspector);
         }
         catch (RuntimeException e) {
@@ -135,7 +132,7 @@ public class ServicesView extends DefaultView {
       }
     }
     // tables per section
-    for (Map.Entry<CompositeObject, Collection<ServiceInspector>> e : servicesMap.entrySet()) {
+    for (Entry<CompositeObject, Collection<ServiceInspector>> e : servicesMap.entrySet()) {
       String sectionName = (String) e.getKey().getComponent(1);
       Collection<ServiceInspector> list = e.getValue();
       renderServiceTable(p, sectionName, list);
@@ -145,7 +142,7 @@ public class ServicesView extends DefaultView {
 
   private void renderServiceTable(HtmlComponent p, String sectionName, Collection<ServiceInspector> serviceInspectors) {
     // sort
-    TreeMap<String, ServiceInspector> sortMap = new TreeMap<String, ServiceInspector>();
+    SortedMap<String, ServiceInspector> sortMap = new TreeMap<>();
     for (ServiceInspector inspector : serviceInspectors) {
       String s = inspector.getService().getClass().getName();
       sortMap.put(s, inspector);
@@ -195,15 +192,15 @@ public class ServicesView extends DefaultView {
   private void renderHierarchy(HtmlComponent p, ServiceInspector service, ReflectServiceInventory inv) {
     // hierarchy
     Class serviceClass = service.getService().getClass();
-    ArrayList<Class> interfaceHierarchy = new ArrayList<Class>();
+    List<Class> interfaceHierarchy = new ArrayList<>();
     for (Class c : serviceClass.getInterfaces()) {
       interfaceHierarchy.addAll(BeanUtility.getInterfacesHierarchy(c, Object.class));
     }
-    if (interfaceHierarchy.size() == 0) {
+    if (interfaceHierarchy.isEmpty()) {
       interfaceHierarchy.addAll(BeanUtility.getInterfacesHierarchy(serviceClass, Object.class));
     }
     interfaceHierarchy.add(serviceClass);
-    ArrayList<Class> classHierarchy = new ArrayList<Class>();
+    List<Class> classHierarchy = new ArrayList<>();
     Class test = service.getService().getClass();
     while (test != null) {
       if (Object.class.isAssignableFrom(test)) {
@@ -275,7 +272,7 @@ public class ServicesView extends DefaultView {
                 @Override
                 public void run() {
                   String propText = getFormParameter("value", "");
-                  if (propText.length() == 0) {
+                  if (propText.isEmpty()) {
                     propText = null;
                   }
                   try {

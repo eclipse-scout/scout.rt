@@ -70,7 +70,7 @@ public class JettyServer {
     // port
     int port = 8080;
     String portConfig = System.getProperty(SERVER_PORT_KEY);
-    if (portConfig != null && portConfig.length() > 0) {
+    if (portConfig != null && !portConfig.isEmpty()) {
       try {
         port = Integer.parseInt(portConfig);
       }
@@ -230,7 +230,7 @@ public class JettyServer {
         Set<String> resources = new HashSet<>();
 
         // 1. Find resources contained in other, dependent JARs.
-        resources.addAll(JettyServer.getResourcePathsFromDependentJars(getClassLoader(), path));
+        resources.addAll(getResourcePathsFromDependentJars(getClassLoader(), path));
 
         // 2. Find resource in the web application's resources (higher precedence).
         resources.addAll(super.getResourcePaths(path));
@@ -337,11 +337,11 @@ public class JettyServer {
 
         if ("jar".equals(resourceUrl.toURI().getScheme())) {
           // The resource is located within a packed JAR. (e.g. located in Maven repository)
-          resources.addAll(JettyServer.listFilesFromJar(absoluteResourcePath, path));
+          resources.addAll(listFilesFromJar(absoluteResourcePath, path));
         }
         else {
           // The resource is located within an unpacked JAR, which typically applies when running the server from within the IDE.
-          resources.addAll(JettyServer.listFilesFromDirectory(absoluteResourcePath, path));
+          resources.addAll(listFilesFromDirectory(absoluteResourcePath, path));
         }
       }
     }

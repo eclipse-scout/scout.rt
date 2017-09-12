@@ -1,5 +1,6 @@
 package org.eclipse.scout.rt.shared.cache;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -9,7 +10,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
  */
 public class CacheRegistryService implements ICacheRegistryService {
 
-  private final ConcurrentHashMap<String, ICache> m_map = new ConcurrentHashMap<>();
+  private final Map<String, ICache> m_map = new ConcurrentHashMap<>();
 
   /**
    * Register a cache with a given id
@@ -31,7 +32,7 @@ public class CacheRegistryService implements ICacheRegistryService {
     return getMap().get(cacheId);
   }
 
-  protected ConcurrentHashMap<String, ICache> getMap() {
+  protected Map<String, ICache> getMap() {
     return m_map;
   }
 

@@ -16,6 +16,8 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.eclipse.scout.rt.platform.util.CompositeObject;
@@ -24,9 +26,9 @@ import org.eclipse.scout.rt.platform.util.CompositeObject;
  * Convenience for use with {@link IInventoryProvider}
  */
 public class ReflectServiceInventory {
-  private HashSet<PropertyDescriptor> m_properties = new HashSet<PropertyDescriptor>();
-  private HashSet<Method> m_operations = new HashSet<Method>();
-  private ArrayList<String> m_states = new ArrayList<String>();
+  private final Set<PropertyDescriptor> m_properties = new HashSet<>();
+  private final Set<Method> m_operations = new HashSet<>();
+  private final ArrayList<String> m_states = new ArrayList<>();
 
   public ReflectServiceInventory(Object service) {
     analyzeService(service);
@@ -34,7 +36,7 @@ public class ReflectServiceInventory {
 
   private void analyzeService(Object service) {
     // properties
-    HashSet<Method> propertyMethods = new HashSet<Method>();
+    Set<Method> propertyMethods = new HashSet<>();
     try {
       BeanInfo info = Introspector.getBeanInfo(service.getClass());
       PropertyDescriptor[] a = info.getPropertyDescriptors();
@@ -66,7 +68,7 @@ public class ReflectServiceInventory {
   }
 
   public PropertyDescriptor[] getProperties() {
-    TreeMap<CompositeObject, PropertyDescriptor> sortMap = new TreeMap<CompositeObject, PropertyDescriptor>();
+    SortedMap<CompositeObject, PropertyDescriptor> sortMap = new TreeMap<>();
     int index = 0;
     for (PropertyDescriptor p : m_properties) {
       if ("class".equals(p.getName())) {
@@ -94,7 +96,7 @@ public class ReflectServiceInventory {
   }
 
   public Method[] getOperations() {
-    TreeMap<CompositeObject, Method> sortMap = new TreeMap<CompositeObject, Method>();
+    SortedMap<CompositeObject, Method> sortMap = new TreeMap<>();
     int index = 0;
     for (Method m : m_operations) {
       if ("getInventory".equals(m.getName())) {

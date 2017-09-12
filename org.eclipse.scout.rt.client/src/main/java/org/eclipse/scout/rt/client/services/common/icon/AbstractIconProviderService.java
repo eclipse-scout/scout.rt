@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.services.common.icon;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.rt.platform.util.IOUtility;
@@ -27,10 +28,10 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractIconProviderService implements IIconProviderService {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractIconProviderService.class);
-  private static final String[] DEFAULT_ICON_EXTENSIONS = new String[]{"png", "gif", "jpg"};
+  private static final String[] DEFAULT_ICON_EXTENSIONS = {"png", "gif", "jpg"};
 
   private final ReentrantReadWriteLock m_cacheLock = new ReentrantReadWriteLock();
-  private final HashMap<String, IconSpec> m_cache = new HashMap<String, IconSpec>();
+  private final Map<String, IconSpec> m_cache = new HashMap<>();
 
   protected AbstractIconProviderService() {
   }

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.listbox;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
@@ -56,35 +55,32 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
   @Override
   protected void execInitField() {
     if (m_listBoxPropertyListener == null) {
-      m_listBoxPropertyListener = new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent e) {
-          String name = e.getPropertyName();
-          if (IListBox.PROP_FILTER_CHECKED_ROWS.equals(name)) {
-            updateVisibilities();
-          }
-          else if (IListBox.PROP_FILTER_ACTIVE_ROWS.equals(name)) {
-            updateVisibilities();
-          }
-          else if (IListBox.PROP_FILTER_CHECKED_ROWS_VALUE.equals(name)) {
-            try {
-              if (m_listBoxSyncLock.acquire()) {
-                getCheckedStateRadioButtonGroup().setValue(getListBox().getFilterCheckedRowsValue());
-              }
-            }
-            finally {
-              m_listBoxSyncLock.release();
+      m_listBoxPropertyListener = e -> {
+        String name = e.getPropertyName();
+        if (IListBox.PROP_FILTER_CHECKED_ROWS.equals(name)) {
+          updateVisibilities();
+        }
+        else if (IListBox.PROP_FILTER_ACTIVE_ROWS.equals(name)) {
+          updateVisibilities();
+        }
+        else if (IListBox.PROP_FILTER_CHECKED_ROWS_VALUE.equals(name)) {
+          try {
+            if (m_listBoxSyncLock.acquire()) {
+              getCheckedStateRadioButtonGroup().setValue(getListBox().getFilterCheckedRowsValue());
             }
           }
-          else if (IListBox.PROP_FILTER_ACTIVE_ROWS_VALUE.equals(name)) {
-            try {
-              if (m_listBoxSyncLock.acquire()) {
-                getActiveStateRadioButtonGroup().setValue(getListBox().getFilterActiveRowsValue());
-              }
+          finally {
+            m_listBoxSyncLock.release();
+          }
+        }
+        else if (IListBox.PROP_FILTER_ACTIVE_ROWS_VALUE.equals(name)) {
+          try {
+            if (m_listBoxSyncLock.acquire()) {
+              getActiveStateRadioButtonGroup().setValue(getListBox().getFilterActiveRowsValue());
             }
-            finally {
-              m_listBoxSyncLock.release();
-            }
+          }
+          finally {
+            m_listBoxSyncLock.release();
           }
         }
       };

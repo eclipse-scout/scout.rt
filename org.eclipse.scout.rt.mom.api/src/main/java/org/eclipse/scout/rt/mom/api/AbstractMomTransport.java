@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.mom.api;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -87,7 +86,7 @@ public abstract class AbstractMomTransport implements IMomTransport {
    */
   protected Map<Object, Object> lookupEnvironment() {
     final Map<String, String> configuredEnv = Assertions.assertNotNull(getConfiguredEnvironment(), "Environment for {} not specified", getClass().getSimpleName());
-    final Map<Object, Object> env = new HashMap<Object, Object>(configuredEnv);
+    final Map<Object, Object> env = new HashMap<>(configuredEnv);
     // Use the class name as default symbolic name
     if (!env.containsKey(IMomImplementor.SYMBOLIC_NAME)) {
       env.put(IMomImplementor.SYMBOLIC_NAME, getClass().getSimpleName());
@@ -111,12 +110,7 @@ public abstract class AbstractMomTransport implements IMomTransport {
   protected IMomImplementor getDelegate() {
     if (!m_delegate.isSet()) {
       synchronized (m_delegate) {
-        m_delegate.setIfAbsent(new Callable<IMomImplementor>() {
-          @Override
-          public IMomImplementor call() throws Exception {
-            return initDelegate();
-          }
-        });
+        m_delegate.setIfAbsent(this::initDelegate);
       }
     }
     return m_delegate.get();

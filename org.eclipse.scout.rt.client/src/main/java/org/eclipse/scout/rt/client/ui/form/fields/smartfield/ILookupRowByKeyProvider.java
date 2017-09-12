@@ -5,6 +5,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 /**
  * Provides a lookup row.
  */
+@FunctionalInterface
 interface ILookupRowByKeyProvider<LOOKUP_KEY> {
 
   /**

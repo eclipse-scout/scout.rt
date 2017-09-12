@@ -72,10 +72,10 @@ public class BindParser {
     NAME_MAP = "_.0123456789{}[]ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
   }
 
-  private String m_str;
+  private final String m_str;
   private ParsePosition m_pos;
   //
-  private ArrayList<IToken> m_tokenList = new ArrayList<IToken>();
+  private final ArrayList<IToken> m_tokenList = new ArrayList<>();
   private int m_lastTokenEndIndex;
 
   public BindParser(String sqlStatement) {
@@ -133,7 +133,7 @@ public class BindParser {
       trace("parseFunctionArgList");
     }
     int index = m_pos.getIndex();
-    ArrayList<String> textList = new ArrayList<String>();
+    ArrayList<String> textList = new ArrayList<>();
     String text;
     if ((text = parseFunctionArg()) != null) {
       textList.add(text);
@@ -339,7 +339,7 @@ public class BindParser {
       boolean plainValue = "##".equals(m_str.substring(index, index + 2));
       String name;
       ArrayList<String> args;
-      if ((name = parseName()) != null && parseWhitespace(0) && matches("(") && parseWhitespace(0) && (args = parseFunctionArgList()).size() > 0 && parseWhitespace(0) && matches(")")) {
+      if ((name = parseName()) != null && parseWhitespace(0) && matches("(") && parseWhitespace(0) && !(args = parseFunctionArgList()).isEmpty() && parseWhitespace(0) && matches(")")) {
         return new FunctionInputToken(m_str.substring(index, m_pos.getIndex()), name, args.toArray(new String[0]), plainValue, false);
       }
     }

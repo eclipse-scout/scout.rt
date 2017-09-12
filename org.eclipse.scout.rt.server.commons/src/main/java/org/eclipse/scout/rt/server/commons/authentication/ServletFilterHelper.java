@@ -55,7 +55,7 @@ public class ServletFilterHelper {
   public Principal getPrincipalOnSession(HttpServletRequest req) {
     final HttpSession session = req.getSession(false);
     if (session != null) {
-      Principal principal = (Principal) session.getAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL);
+      Principal principal = (Principal) session.getAttribute(SESSION_ATTRIBUTE_FOR_PRINCIPAL);
       if (principal != null) {
         return principal;
       }
@@ -73,7 +73,7 @@ public class ServletFilterHelper {
    */
   public void putPrincipalOnSession(HttpServletRequest req, Principal principal) {
     HttpSession session = req.getSession();
-    session.setAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL, principal);
+    session.setAttribute(SESSION_ATTRIBUTE_FOR_PRINCIPAL, principal);
   }
 
   /**
@@ -154,13 +154,10 @@ public class ServletFilterHelper {
     try {
       Subject.doAs(
           createSubject(principal),
-          new PrivilegedExceptionAction<Object>() {
-            @Override
-            public Object run() throws Exception {
-              HttpServletRequest secureReq = new SecureHttpServletRequestWrapper(req, principal);
-              chain.doFilter(secureReq, res);
-              return null;
-            }
+          (PrivilegedExceptionAction<Object>) () -> {
+            HttpServletRequest secureReq = new SecureHttpServletRequestWrapper(req, principal);
+            chain.doFilter(secureReq, res);
+            return null;
           });
     }
     catch (PrivilegedActionException e) { // NOSONAR

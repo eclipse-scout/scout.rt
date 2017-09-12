@@ -60,7 +60,7 @@ public final class JsonAdapterUtility {
     return jsonAdapterIds;
   }
 
-  public static <M extends Object> JSONArray getAdapterIdsForModel(IUiSession uiSession, Collection<M> models, IJsonAdapter<?> parent) {
+  public static <M> JSONArray getAdapterIdsForModel(IUiSession uiSession, Collection<M> models, IJsonAdapter<?> parent) {
     return getAdapterIdsForModel(uiSession, models, parent, null);
   }
 
@@ -100,7 +100,7 @@ public final class JsonAdapterUtility {
    * Example: StringField -> [ GroupBox, GroupBox, TabBox, GroupBox, SequenceBox, StringField ].
    */
   private static List<IFormField> getFieldHierarchy(IFormField formField) {
-    List<IFormField> fieldHierarchy = new ArrayList<IFormField>();
+    List<IFormField> fieldHierarchy = new ArrayList<>();
     while (formField != null) {
       fieldHierarchy.add(0, formField);
       formField = formField.getParentField();

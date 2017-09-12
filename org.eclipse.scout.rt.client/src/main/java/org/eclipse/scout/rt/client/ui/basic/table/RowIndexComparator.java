@@ -20,14 +20,6 @@ public class RowIndexComparator implements Comparator<ITableRow>, Serializable {
   public int compare(ITableRow row1, ITableRow row2) {
     int x1 = row1.getRowIndex();
     int x2 = row2.getRowIndex();
-    if (x1 < x2) {
-      return -1;
-    }
-    else if (x1 > x2) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
+    return Integer.compare(x1, x2);
   }
 }

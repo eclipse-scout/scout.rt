@@ -32,7 +32,7 @@ public class OrFilter<ELEMENT> implements IFilter<ELEMENT> {
   }
 
   public OrFilter(final Collection<IFilter<ELEMENT>> filters) {
-    Assertions.assertTrue(filters.size() > 0, "Must have one filter at minimum");
+    Assertions.assertTrue(!filters.isEmpty(), "Must have one filter at minimum");
     m_filters = CollectionUtility.arrayList(filters);
   }
 

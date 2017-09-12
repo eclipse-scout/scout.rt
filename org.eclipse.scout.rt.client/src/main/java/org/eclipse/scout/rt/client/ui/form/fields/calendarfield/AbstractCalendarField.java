@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.calendarfield;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Date;
 import java.util.List;
 
@@ -92,12 +90,9 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
        * settings
        */
       m_calendar.addPropertyChangeListener(
-          new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent e) {
-              if (e.getPropertyName().equals(ICalendar.PROP_SELECTED_DATE)) {
-                syncCalendarToCalendarField();
-              }
+          e -> {
+            if (e.getPropertyName().equals(ICalendar.PROP_SELECTED_DATE)) {
+              syncCalendarToCalendarField();
             }
           });
       syncCalendarToCalendarField();
@@ -184,7 +179,7 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
 
   @Override
   protected ICalendarFieldExtension<T, ? extends AbstractCalendarField<T>> createLocalExtension() {
-    return new LocalCalendarFieldExtension<T, AbstractCalendarField<T>>(this);
+    return new LocalCalendarFieldExtension<>(this);
   }
 
 }

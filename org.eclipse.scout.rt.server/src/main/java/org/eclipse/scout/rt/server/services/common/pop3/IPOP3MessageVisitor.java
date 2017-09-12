@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server.services.common.pop3;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
+@FunctionalInterface
 public interface IPOP3MessageVisitor {
   /**
    * @return true to continue visiting, false to break up further visiting

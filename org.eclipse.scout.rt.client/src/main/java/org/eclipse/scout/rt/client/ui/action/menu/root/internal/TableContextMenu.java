@@ -14,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
@@ -66,17 +65,14 @@ public class TableContextMenu extends AbstractContextMenu<ITable> implements ITa
     ITable container = getContainer();
     if (container != null) {
       final boolean enabled = container.isEnabled();
-      acceptVisitor(new IActionVisitor() {
-        @Override
-        public int visit(IAction action) {
-          if (action instanceof IMenu) {
-            IMenu menu = (IMenu) action;
-            if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
-              menu.setEnabled(enabled);
-            }
+      acceptVisitor(action -> {
+        if (action instanceof IMenu) {
+          IMenu menu = (IMenu) action;
+          if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
+            menu.setEnabled(enabled);
           }
-          return CONTINUE;
         }
+        return IActionVisitor.CONTINUE;
       });
     }
   }
@@ -112,17 +108,14 @@ public class TableContextMenu extends AbstractContextMenu<ITable> implements ITa
       }
     }
     final boolean inheritedEnability = enabled;
-    acceptVisitor(new IActionVisitor() {
-      @Override
-      public int visit(IAction action) {
-        if (action instanceof IMenu) {
-          IMenu menu = (IMenu) action;
-          if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
-            menu.setEnabledInheritAccessibility(inheritedEnability);
-          }
+    acceptVisitor(action -> {
+      if (action instanceof IMenu) {
+        IMenu menu = (IMenu) action;
+        if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
+          menu.setEnabledInheritAccessibility(inheritedEnability);
         }
-        return CONTINUE;
       }
+      return IActionVisitor.CONTINUE;
     });
   }
 

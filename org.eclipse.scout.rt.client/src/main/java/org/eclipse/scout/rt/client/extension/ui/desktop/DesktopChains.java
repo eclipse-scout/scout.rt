@@ -24,24 +24,24 @@ public final class DesktopChains {
   private DesktopChains() {
   }
 
-  protected abstract static class AbstractDesktopChain extends AbstractExtensionChain<org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> {
+  protected abstract static class AbstractDesktopChain extends AbstractExtensionChain<IDesktopExtension<? extends AbstractDesktop>> {
 
-    public AbstractDesktopChain(List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions) {
+    public AbstractDesktopChain(List<? extends IDesktopExtension<? extends AbstractDesktop>> extensions) {
       super(extensions, IDesktopExtension.class);
     }
   }
 
-  public static class DesktopInitChain extends org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.AbstractDesktopChain {
+  public static class DesktopInitChain extends AbstractDesktopChain {
 
-    public DesktopInitChain(List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions) {
+    public DesktopInitChain(List<? extends IDesktopExtension<? extends AbstractDesktop>> extensions) {
       super(extensions);
     }
 
     public void execInit() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop> next) {
-          next.execInit(org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopInitChain.this);
+        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) {
+          next.execInit(DesktopInitChain.this);
         }
       };
       callChain(methodInvocation);

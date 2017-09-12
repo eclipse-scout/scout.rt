@@ -94,7 +94,7 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
         if (cells[index] != null) {
           switch (index) {
             case 0: {
-              ID_TYPE key = (ID_TYPE) TypeCastUtility.castValue(cells[index], aClazz);
+              ID_TYPE key = TypeCastUtility.castValue(cells[index], aClazz);
               withKey(key);
               break;
             }
@@ -128,7 +128,7 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
               break;
             }
             case 8: {
-              ID_TYPE o = (ID_TYPE) TypeCastUtility.castValue(cells[index], aClazz);
+              ID_TYPE o = TypeCastUtility.castValue(cells[index], aClazz);
               if ((o instanceof Number) && ((Number) o).longValue() == 0) {
                 o = null;
               }

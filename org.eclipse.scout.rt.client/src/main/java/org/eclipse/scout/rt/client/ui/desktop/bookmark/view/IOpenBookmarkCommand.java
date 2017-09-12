@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
  * Injection command for {@link BookmarkViewForm#getUserBookmarkTreeField()} and
  * {@link AbstractBookmarkTreeField#injectOpenBookmarkCommand(IInjectOpenBookmarkCommand)}
  */
+@FunctionalInterface
 public interface IOpenBookmarkCommand {
 
   /**

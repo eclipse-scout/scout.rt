@@ -20,14 +20,14 @@ import org.eclipse.scout.rt.server.jdbc.parsers.token.IToken;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 
 class FunctionInput implements IBindInput {
-  private ISqlService m_callerService;
-  private Object[] m_bindBases;
+  private final ISqlService m_callerService;
+  private final Object[] m_bindBases;
   //
   private int m_batchIndex = -1;
   private int m_jdbcBindIndex = -1;
   private Object m_value;
   private boolean m_valueSet;
-  private FunctionInputToken m_target;
+  private final FunctionInputToken m_target;
 
   public FunctionInput(ISqlService callerService, Object[] bindBases, FunctionInputToken target) {
     m_callerService = callerService;

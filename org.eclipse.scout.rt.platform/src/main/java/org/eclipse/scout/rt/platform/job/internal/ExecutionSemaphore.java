@@ -127,17 +127,13 @@ public class ExecutionSemaphore implements IExecutionSemaphore {
     final Object acquisitionLock = new Object();
     final AtomicBoolean waitingForPermit = new AtomicBoolean(true);
 
-    compete(task, queuePosition, new IPermitAcquiredCallback() {
-
-      @Override
-      public void onPermitAcquired() {
-        synchronized (acquisitionLock) {
-          if (waitingForPermit.get()) {
-            acquisitionLock.notify();
-          }
-          else {
-            release(task);
-          }
+    compete(task, queuePosition, () -> {
+      synchronized (acquisitionLock) {
+        if (waitingForPermit.get()) {
+          acquisitionLock.notify();
+        }
+        else {
+          release(task);
         }
       }
     });
@@ -148,7 +144,7 @@ public class ExecutionSemaphore implements IExecutionSemaphore {
         try {
           acquisitionLock.wait();
         }
-        catch (final java.lang.InterruptedException e) {
+        catch (final InterruptedException e) {
           Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
           waitingForPermit.set(false);
 
@@ -346,7 +342,7 @@ public class ExecutionSemaphore implements IExecutionSemaphore {
    * Position in the queue of competing tasks.
    */
   protected enum QueuePosition {
-    HEAD, TAIL;
+    HEAD, TAIL
   }
 
   /**
@@ -367,6 +363,7 @@ public class ExecutionSemaphore implements IExecutionSemaphore {
    *
    * @since 5.2
    */
+  @FunctionalInterface
   public interface IPermitAcquiredCallback {
 
     /**

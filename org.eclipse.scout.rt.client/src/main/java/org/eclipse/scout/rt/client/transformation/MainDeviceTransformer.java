@@ -15,7 +15,6 @@ import org.eclipse.scout.rt.client.ui.form.FormUtility;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,12 +34,7 @@ public class MainDeviceTransformer implements IDeviceTransformer {
   }
 
   protected List<IDeviceTransformer> createTransformers() {
-    return BEANS.all(IDeviceTransformer.class, new IFilter<IDeviceTransformer>() {
-      @Override
-      public boolean accept(IDeviceTransformer transformer) {
-        return !(transformer instanceof MainDeviceTransformer) && transformer.isActive();
-      }
-    });
+    return BEANS.all(IDeviceTransformer.class, transformer -> !(transformer instanceof MainDeviceTransformer) && transformer.isActive());
   }
 
   @Override
@@ -57,7 +51,7 @@ public class MainDeviceTransformer implements IDeviceTransformer {
       transformer.dispose();
     }
     if (!m_transformedForms.isEmpty()) {
-      List<IForm> forms = new ArrayList<IForm>();
+      List<IForm> forms = new ArrayList<>();
       for (WeakReference<IForm> ref : m_transformedForms.values()) {
         forms.add(ref.get());
       }
@@ -111,7 +105,7 @@ public class MainDeviceTransformer implements IDeviceTransformer {
     }
 
     // mark form as transformed
-    m_transformedForms.put(form, new WeakReference<IForm>(form));
+    m_transformedForms.put(form, new WeakReference<>(form));
   }
 
   @Override
@@ -182,7 +176,7 @@ public class MainDeviceTransformer implements IDeviceTransformer {
     }
 
     // mark as transformed
-    m_transformedOutlines.put(outline, new WeakReference<IOutline>(outline));
+    m_transformedOutlines.put(outline, new WeakReference<>(outline));
   }
 
   @Override

@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
@@ -65,17 +64,14 @@ public class TreeContextMenu extends AbstractContextMenu<ITree> implements ITree
     ITree container = getContainer();
     if (container != null) {
       final boolean enabled = container.isEnabled();
-      acceptVisitor(new IActionVisitor() {
-        @Override
-        public int visit(IAction action) {
-          if (action instanceof IMenu) {
-            IMenu menu = (IMenu) action;
-            if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
-              menu.setEnabledInheritAccessibility(enabled);
-            }
+      acceptVisitor(action -> {
+        if (action instanceof IMenu) {
+          IMenu menu = (IMenu) action;
+          if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
+            menu.setEnabledInheritAccessibility(enabled);
           }
-          return CONTINUE;
         }
+        return IActionVisitor.CONTINUE;
       });
     }
   }
@@ -109,17 +105,14 @@ public class TreeContextMenu extends AbstractContextMenu<ITree> implements ITree
       }
     }
     final boolean inheritedEnability = enabled;
-    acceptVisitor(new IActionVisitor() {
-      @Override
-      public int visit(IAction action) {
-        if (action instanceof IMenu) {
-          IMenu menu = (IMenu) action;
-          if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
-            menu.setEnabledInheritAccessibility(inheritedEnability);
-          }
+    acceptVisitor(action -> {
+      if (action instanceof IMenu) {
+        IMenu menu = (IMenu) action;
+        if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
+          menu.setEnabledInheritAccessibility(inheritedEnability);
         }
-        return CONTINUE;
       }
+      return IActionVisitor.CONTINUE;
     });
   }
 

@@ -16,7 +16,6 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.rt.server.services.lookup.BatchLookupService;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupNormalizer;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupResultCache;

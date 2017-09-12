@@ -28,6 +28,6 @@ import org.eclipse.scout.rt.ui.html.selenium.util.SeleniumUtil;
  * @see: https://bugs.chromium.org/p/chromedriver/issues/detail?id=30
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target(ElementType.METHOD)
 public @interface IgnoreTestOnMacOS {
 }

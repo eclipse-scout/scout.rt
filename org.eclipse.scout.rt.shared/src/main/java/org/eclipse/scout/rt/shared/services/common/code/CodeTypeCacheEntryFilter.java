@@ -30,7 +30,7 @@ public class CodeTypeCacheEntryFilter implements ICacheEntryFilter<CodeTypeCache
   private final Set<Class<? extends ICodeType<?, ?>>> m_codeTypeClasses;
 
   public CodeTypeCacheEntryFilter(Class<? extends ICodeType<?, ?>> codeTypeClass) {
-    m_codeTypeClasses = CollectionUtility.<Class<? extends ICodeType<?, ?>>> hashSet(codeTypeClass);
+    m_codeTypeClasses = CollectionUtility.hashSet(codeTypeClass);
   }
 
   public CodeTypeCacheEntryFilter(Collection<Class<? extends ICodeType<?, ?>>> codeTypeClasses) {
@@ -49,7 +49,7 @@ public class CodeTypeCacheEntryFilter implements ICacheEntryFilter<CodeTypeCache
   @Override
   public ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>> coalesce(ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>> other) {
     if (other instanceof CodeTypeCacheEntryFilter) {
-      HashSet<Class<? extends ICodeType<?, ?>>> newSet = new HashSet<Class<? extends ICodeType<?, ?>>>(m_codeTypeClasses);
+      HashSet<Class<? extends ICodeType<?, ?>>> newSet = new HashSet<>(m_codeTypeClasses);
       newSet.addAll(((CodeTypeCacheEntryFilter) other).m_codeTypeClasses);
       return new CodeTypeCacheEntryFilter(newSet);
     }

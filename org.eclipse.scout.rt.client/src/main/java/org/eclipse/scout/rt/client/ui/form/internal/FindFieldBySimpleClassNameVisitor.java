@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
 public class FindFieldBySimpleClassNameVisitor implements IFormFieldVisitor {
-  private String m_simpleName;
+  private final String m_simpleName;
   private IFormField m_found;
 
   public FindFieldBySimpleClassNameVisitor(String simpleName) {

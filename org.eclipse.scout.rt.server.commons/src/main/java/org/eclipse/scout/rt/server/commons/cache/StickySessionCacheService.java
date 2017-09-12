@@ -67,7 +67,7 @@ public class StickySessionCacheService extends AbstractHttpSessionCacheService {
   }
 
   protected void setEntryInternal(String key, Object value, HttpServletRequest req, HttpServletResponse res, Long expiration) {
-    req.getSession(true).setAttribute(key, new CacheEntry<Object>(value, expiration));
+    req.getSession(true).setAttribute(key, new CacheEntry<>(value, expiration));
   }
 
   protected ICacheEntry getEntryInternal(String key, HttpServletRequest req, HttpServletResponse res) {

@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
  *
  * @author jbr
  */
-public class TestEnvironmentDesktop extends AbstractDesktop implements IDesktop {
+public class TestEnvironmentDesktop extends AbstractDesktop {
 
   @Override
   protected String getConfiguredTitle() {

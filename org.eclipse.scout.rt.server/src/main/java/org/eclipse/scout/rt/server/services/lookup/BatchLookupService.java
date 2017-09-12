@@ -34,10 +34,10 @@ public class BatchLookupService implements IServerBatchLookupService {
   @Override
   public List<List<ILookupRow<?>>> getBatchDataByKey(BatchLookupCall batch) {
     List<ILookupCall<?>> calls = batch.getCallBatch();
-    List<List<ILookupRow<?>>> result = new ArrayList<List<ILookupRow<?>>>();
+    List<List<ILookupRow<?>>> result = new ArrayList<>();
     BatchLookupResultCache cache = new BatchLookupResultCache();
     for (ILookupCall<?> call : calls) {
-      result.add(new ArrayList<ILookupRow<?>>(cache.getDataByKey(call)));
+      result.add(new ArrayList<>(cache.getDataByKey(call)));
     }
     return result;
   }
@@ -45,10 +45,10 @@ public class BatchLookupService implements IServerBatchLookupService {
   @Override
   public List<List<ILookupRow<?>>> getBatchDataByText(BatchLookupCall batch) {
     List<ILookupCall<?>> calls = batch.getCallBatch();
-    List<List<ILookupRow<?>>> result = new ArrayList<List<ILookupRow<?>>>();
+    List<List<ILookupRow<?>>> result = new ArrayList<>();
     BatchLookupResultCache cache = new BatchLookupResultCache();
     for (ILookupCall<?> call : calls) {
-      result.add(new ArrayList<ILookupRow<?>>(cache.getDataByText(call)));
+      result.add(new ArrayList<>(cache.getDataByText(call)));
     }
     return result;
   }
@@ -56,10 +56,10 @@ public class BatchLookupService implements IServerBatchLookupService {
   @Override
   public List<List<ILookupRow<?>>> getBatchDataByAll(BatchLookupCall batch) {
     List<ILookupCall<?>> calls = batch.getCallBatch();
-    List<List<ILookupRow<?>>> result = new ArrayList<List<ILookupRow<?>>>();
+    List<List<ILookupRow<?>>> result = new ArrayList<>();
     BatchLookupResultCache cache = new BatchLookupResultCache();
     for (ILookupCall<?> call : calls) {
-      result.add(new ArrayList<ILookupRow<?>>(cache.getDataByAll(call)));
+      result.add(new ArrayList<>(cache.getDataByAll(call)));
     }
     return result;
   }
@@ -67,10 +67,10 @@ public class BatchLookupService implements IServerBatchLookupService {
   @Override
   public List<List<ILookupRow<?>>> getBatchDataByRec(BatchLookupCall batch) {
     List<ILookupCall<?>> calls = batch.getCallBatch();
-    List<List<ILookupRow<?>>> result = new ArrayList<List<ILookupRow<?>>>();
+    List<List<ILookupRow<?>>> result = new ArrayList<>();
     BatchLookupResultCache cache = new BatchLookupResultCache();
     for (ILookupCall<?> call : calls) {
-      result.add(new ArrayList<ILookupRow<?>>(cache.getDataByRec(call)));
+      result.add(new ArrayList<>(cache.getDataByRec(call)));
     }
     return result;
   }

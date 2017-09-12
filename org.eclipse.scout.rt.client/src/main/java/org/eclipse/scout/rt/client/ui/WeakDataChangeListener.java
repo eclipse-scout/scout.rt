@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.platform.util.WeakEventListener;
 /**
  * see {@link DataChangeListener}
  */
+@FunctionalInterface
 public interface WeakDataChangeListener extends DataChangeListener, WeakEventListener {
 
 }

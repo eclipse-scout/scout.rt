@@ -167,7 +167,7 @@ public class CallableChain<RESULT> {
    *           thrown during execution of the command.
    */
   public RESULT call(final Callable<RESULT> command) throws Exception {
-    return new Chain<RESULT>(m_chainables, command).continueChain();
+    return new Chain<>(m_chainables, command).continueChain();
   }
 
   /**

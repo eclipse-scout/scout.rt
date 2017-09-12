@@ -18,7 +18,4 @@ import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldD
 public abstract class AbstractComposerData extends AbstractTreeFieldData {
   private static final long serialVersionUID = 1L;
 
-  public AbstractComposerData() {
-  }
-
 }

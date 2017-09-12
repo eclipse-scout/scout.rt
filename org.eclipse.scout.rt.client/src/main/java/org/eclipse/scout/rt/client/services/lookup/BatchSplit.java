@@ -24,12 +24,12 @@ import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
  * Split a batch into local calls and remote calls
  */
 public class BatchSplit {
-  private List<ILookupCall<?>> m_calls;
-  private boolean[] m_local;
+  private final List<ILookupCall<?>> m_calls;
+  private final boolean[] m_local;
   private int m_localCount;
   private int m_remoteCount;
   //
-  private Map<ILookupCall<?>, List<ILookupRow<?>>> m_results;
+  private final Map<ILookupCall<?>, List<ILookupRow<?>>> m_results;
 
   public BatchSplit(BatchLookupCall batch) {
     this(batch.getCallBatch());
@@ -51,7 +51,7 @@ public class BatchSplit {
         }
       }
     }
-    m_results = new HashMap<ILookupCall<?>, List<ILookupRow<?>>>();
+    m_results = new HashMap<>();
   }
 
   public int getLocalCallCount() {
@@ -59,7 +59,7 @@ public class BatchSplit {
   }
 
   public List<ILookupCall<?>> getLocalCalls() {
-    List<ILookupCall<?>> localResult = new ArrayList<ILookupCall<?>>();
+    List<ILookupCall<?>> localResult = new ArrayList<>();
     for (int i = 0; i < m_calls.size(); i++) {
       ILookupCall<?> call = m_calls.get(i);
       if (call != null && m_local[i]) {
@@ -74,7 +74,7 @@ public class BatchSplit {
   }
 
   public List<ILookupCall<?>> getRemoteCalls() {
-    List<ILookupCall<?>> remoteResult = new ArrayList<ILookupCall<?>>();
+    List<ILookupCall<?>> remoteResult = new ArrayList<>();
     for (int i = 0; i < m_calls.size(); i++) {
       ILookupCall<?> call = m_calls.get(i);
       if (call != null && !m_local[i]) {
@@ -107,7 +107,7 @@ public class BatchSplit {
   }
 
   public List<List<ILookupRow<?>>> getCombinedResults() {
-    List<List<ILookupRow<?>>> result = new ArrayList<List<ILookupRow<?>>>();
+    List<List<ILookupRow<?>>> result = new ArrayList<>();
     for (ILookupCall<?> call : m_calls) {
       result.add(m_results.get(call));
     }

@@ -41,5 +41,5 @@ public enum TransactionScope {
    * associated with a transaction, a {@link TransactionRequiredException} is thrown. Use the <code>MANDATORY</code>
    * scope if the executable must use the transaction of the caller.
    */
-  MANDATORY;
+  MANDATORY
 }

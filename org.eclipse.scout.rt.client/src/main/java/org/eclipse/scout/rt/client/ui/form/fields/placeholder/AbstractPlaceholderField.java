@@ -33,6 +33,6 @@ public abstract class AbstractPlaceholderField extends AbstractFormField impleme
 
   @Override
   protected IPlaceholderFieldExtension<? extends AbstractPlaceholderField> createLocalExtension() {
-    return new LocalPlaceholderFieldExtension<AbstractPlaceholderField>(this);
+    return new LocalPlaceholderFieldExtension<>(this);
   }
 }

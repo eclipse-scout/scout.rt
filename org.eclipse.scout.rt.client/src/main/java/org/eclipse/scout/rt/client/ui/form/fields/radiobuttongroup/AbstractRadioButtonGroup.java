@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
  * same time. In an AbstractRadioButtonGroup only 1 RadioButton can be selected at a time.
  */
 @ClassId("20dd4412-e677-4996-afcc-13c43b9dcae8")
-public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> implements IRadioButtonGroup<T>, ICompositeField {
+public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> implements IRadioButtonGroup<T> {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractRadioButtonGroup.class);
 
   private boolean m_valueAndSelectionMediatorActive;
@@ -135,7 +135,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   @Override
   protected void initConfig() {
     m_fields = CollectionUtility.emptyArrayList();
-    m_movedFormFieldsByClass = new HashMap<Class<? extends IFormField>, IFormField>();
+    m_movedFormFieldsByClass = new HashMap<>();
     m_fieldPropertyChangeListener = new P_FieldPropertyChangeListenerEx();
     m_grid = createGrid();
     super.initConfig();
@@ -152,7 +152,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     // add fields
     List<Class<? extends IFormField>> configuredFields = getConfiguredFields();
     List<IFormField> contributedFields = m_contributionHolder.getContributionsByClass(IFormField.class);
-    OrderedCollection<IFormField> fields = new OrderedCollection<IFormField>();
+    OrderedCollection<IFormField> fields = new OrderedCollection<>();
     for (Class<? extends IFormField> fieldClazz : configuredFields) {
       fields.addOrdered(ConfigurationUtility.newInnerInstance(this, fieldClazz));
     }
@@ -167,7 +167,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
       f.addPropertyChangeListener(m_fieldPropertyChangeListener);
     }
     //extract buttons from field subtree
-    List<IRadioButton<T>> buttonList = new ArrayList<IRadioButton<T>>();
+    List<IRadioButton<T>> buttonList = new ArrayList<>();
     for (IFormField f : m_fields) {
       IRadioButton<T> b = findFirstButtonInFieldTree(f);
       if (b != null) {
@@ -651,13 +651,13 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
 
   protected final void interceptPrepareLookup(ILookupCall<T> call) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    RadioButtonGroupPrepareLookupChain<T> chain = new RadioButtonGroupPrepareLookupChain<T>(extensions);
+    RadioButtonGroupPrepareLookupChain<T> chain = new RadioButtonGroupPrepareLookupChain<>(extensions);
     chain.execPrepareLookup(call);
   }
 
   protected final void interceptFilterLookupResult(ILookupCall<T> call, List<ILookupRow<T>> result) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    RadioButtonGroupFilterLookupResultChain<T> chain = new RadioButtonGroupFilterLookupResultChain<T>(extensions);
+    RadioButtonGroupFilterLookupResultChain<T> chain = new RadioButtonGroupFilterLookupResultChain<>(extensions);
     chain.execFilterLookupResult(call, result);
   }
 
@@ -680,6 +680,6 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
 
   @Override
   protected IRadioButtonGroupExtension<T, ? extends AbstractRadioButtonGroup<T>> createLocalExtension() {
-    return new LocalRadioButtonGroupExtension<T, AbstractRadioButtonGroup<T>>(this);
+    return new LocalRadioButtonGroupExtension<>(this);
   }
 }

@@ -224,33 +224,27 @@ public final class FormDataUtility {
     }
   }
 
-  private static final Comparator<AbstractPropertyData<?>> PROPERTY_DATA_COMPARATOR = new Comparator<AbstractPropertyData<?>>() {
-    @Override
-    public int compare(AbstractPropertyData<?> a, AbstractPropertyData<?> b) {
-      String aid = null;
-      String bid = null;
-      if (a != null) {
-        aid = a.getPropertyId();
-      }
-      if (b != null) {
-        bid = b.getPropertyId();
-      }
-      return ObjectUtility.compareTo(aid, bid);
+  private static final Comparator<AbstractPropertyData<?>> PROPERTY_DATA_COMPARATOR = (a, b) -> {
+    String aid = null;
+    String bid = null;
+    if (a != null) {
+      aid = a.getPropertyId();
     }
+    if (b != null) {
+      bid = b.getPropertyId();
+    }
+    return ObjectUtility.compareTo(aid, bid);
   };
-  private static final Comparator<AbstractFormFieldData> FORM_FIELD_DATA_COMPARATOR = new Comparator<AbstractFormFieldData>() {
-    @Override
-    public int compare(AbstractFormFieldData a, AbstractFormFieldData b) {
-      String aid = null;
-      String bid = null;
-      if (a != null) {
-        aid = a.getFieldId();
-      }
-      if (b != null) {
-        bid = b.getFieldId();
-      }
-      return ObjectUtility.compareTo(aid, bid);
+  private static final Comparator<AbstractFormFieldData> FORM_FIELD_DATA_COMPARATOR = (a, b) -> {
+    String aid = null;
+    String bid = null;
+    if (a != null) {
+      aid = a.getFieldId();
     }
+    if (b != null) {
+      bid = b.getFieldId();
+    }
+    return ObjectUtility.compareTo(aid, bid);
   };
 
   private static final class DataNode {

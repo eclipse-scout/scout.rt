@@ -37,8 +37,8 @@ public class AliasMapper {
   private final Map<Object, Map<String, String>> m_nodeAliases;
 
   public AliasMapper() {
-    m_rootAliases = new HashMap<String, String>();
-    m_nodeAliases = new HashMap<Object, Map<String, String>>();
+    m_rootAliases = new HashMap<>();
+    m_nodeAliases = new HashMap<>();
     m_sequenceProvider = new AtomicInteger(0);
   }
 
@@ -121,11 +121,7 @@ public class AliasMapper {
    * @return the live map with the effective aliases per entity for example {PERSON = p, TASK = t} never returns null
    */
   public Map<String, String> getNodeAliases(Object node) {
-    Map<String, String> map = m_nodeAliases.get(node);
-    if (map == null) {
-      map = new HashMap<String, String>();
-      m_nodeAliases.put(node, map);
-    }
+    Map<String, String> map = m_nodeAliases.computeIfAbsent(node, k -> new HashMap<>());
     return map;
   }
 
@@ -163,11 +159,7 @@ public class AliasMapper {
    *          for example p, t etc.
    */
   public void setNodeAlias(Object node, String entityName, String alias) {
-    Map<String, String> map = m_nodeAliases.get(node);
-    if (map == null) {
-      map = new HashMap<String, String>();
-      m_nodeAliases.put(node, map);
-    }
+    Map<String, String> map = m_nodeAliases.computeIfAbsent(node, k -> new HashMap<>());
     map.put(cleanEntityName(entityName), alias);
   }
 
@@ -222,7 +214,7 @@ public class AliasMapper {
     String s = statementPart;
     Matcher m = ENTITY_NAME.matcher(s);
     while (m.find()) {
-      boolean parent = m.group(1) != null && m.group(1).length() > 0;
+      boolean parent = m.group(1) != null && !m.group(1).isEmpty();
       String name = cleanEntityName(m.group(2));
       String replacement = null;
       if (parent) {

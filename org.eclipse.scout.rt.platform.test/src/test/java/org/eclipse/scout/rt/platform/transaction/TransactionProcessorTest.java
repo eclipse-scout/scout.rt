@@ -16,7 +16,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
@@ -37,7 +38,6 @@ import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
-import org.eclipse.scout.rt.platform.util.concurrent.IFunction;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -626,7 +626,7 @@ public class TransactionProcessorTest {
   public void testRegisterMemberIfAbsentAndNotCancelled() {
     BasicTransaction t = new BasicTransaction();
     assertNotNull("expected non null transaction member object",
-        t.registerMemberIfAbsentAndNotCancelled("123", new IFunction<String, TestTransactionMember>() {
+        t.registerMemberIfAbsentAndNotCancelled("123", new Function<String, TestTransactionMember>() {
 
           @Override
           public TestTransactionMember apply(String memberId) {
@@ -641,7 +641,7 @@ public class TransactionProcessorTest {
     BasicTransaction t = new BasicTransaction();
     t.cancel(false);
     assertNull("expected null transaction member object",
-        t.registerMemberIfAbsentAndNotCancelled("123", new IFunction<String, TestTransactionMember>() {
+        t.registerMemberIfAbsentAndNotCancelled("123", new Function<String, TestTransactionMember>() {
 
           @Override
           public TestTransactionMember apply(String memberId) {
@@ -656,7 +656,7 @@ public class TransactionProcessorTest {
   public void testRegisterMemberIfAbsent() {
     BasicTransaction t = new BasicTransaction();
     assertNotNull("expected non null transaction member object",
-        t.registerMemberIfAbsent("123", new IFunction<String, TestTransactionMember>() {
+        t.registerMemberIfAbsent("123", new Function<String, TestTransactionMember>() {
 
           @Override
           public TestTransactionMember apply(String memberId) {
@@ -670,7 +670,7 @@ public class TransactionProcessorTest {
   public void testRegisterMemberIfAbsentOnCancelledTransaction() {
     BasicTransaction t = new BasicTransaction();
     t.cancel(false);
-    t.registerMemberIfAbsent("123", new IFunction<String, TestTransactionMember>() {
+    t.registerMemberIfAbsent("123", new Function<String, TestTransactionMember>() {
 
       @Override
       public TestTransactionMember apply(String memberId) {

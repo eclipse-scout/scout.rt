@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
 
 public class DefaultView implements IView {
 
-  private AdminSession m_as;
+  private final AdminSession m_as;
 
   public DefaultView(AdminSession as) {
     m_as = as;

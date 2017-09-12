@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingDelayProperty;
@@ -72,7 +71,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
    * Map of scheduled housekeeping jobs (key = clientSessionId). Using this map, scheduled but not yet executed
    * housekeepings can be cancelled again when the client session is still to be used.
    */
-  protected final Map<String, IFuture<?>> m_housekeepingFutures = new HashMap<String, IFuture<?>>();
+  protected final Map<String, IFuture<?>> m_housekeepingFutures = new HashMap<>();
 
   protected final ReadLock m_readLock;
   protected final WriteLock m_writeLock;
@@ -214,11 +213,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
       m_clientSessionMap.put(clientSession.getId(), clientSession);
 
       // Link to client session
-      Set<IUiSession> map = m_uiSessionsByClientSession.get(clientSession);
-      if (map == null) {
-        map = new HashSet<>();
-        m_uiSessionsByClientSession.put(clientSession, map);
-      }
+      Set<IUiSession> map = m_uiSessionsByClientSession.computeIfAbsent(clientSession, k -> new HashSet<>());
       map.add(uiSession);
     }
     finally {
@@ -282,12 +277,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
 
     // Check if client session is still used after a few moments
     LOG.debug("Session housekeeping: Schedule job for client session with ID {}", clientSession.getId());
-    final IFuture<Void> future = Jobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        doHousekeeping(clientSession);
-      }
-    }, Jobs.newInput()
+    final IFuture<Void> future = Jobs.schedule(() -> doHousekeeping(clientSession), Jobs.newInput()
         .withName("Performing session housekeeping for client session with ID {}", clientSession.getId())
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(CONFIG.getPropertyValue(SessionStoreHousekeepingDelayProperty.class), TimeUnit.SECONDS)));
@@ -319,12 +309,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
       if (uiSessions == null || uiSessions.isEmpty()) {
         LOG.info("Session housekeeping: Shutting down client session with ID {} because it is not used anymore", clientSession.getId());
         try {
-          final IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
-            @Override
-            public void run() throws Exception {
-              forceClientSessionShutdown(clientSession);
-            }
-          }, ModelJobs.newInput(ClientRunContexts.empty().withSession(clientSession, true))
+          final IFuture<Void> future = ModelJobs.schedule(() -> forceClientSessionShutdown(clientSession), ModelJobs.newInput(ClientRunContexts.empty().withSession(clientSession, true))
               .withName("Force shutting down client session {} by session housekeeping", clientSession.getId()));
 
           int timeout = CONFIG.getPropertyValue(SessionStoreHousekeepingMaxWaitShutdownProperty.class).intValue();
@@ -448,13 +433,10 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
       if (m_writeLock.tryLock(timeout, TimeUnit.SECONDS)) {
         try {
           for (final IClientSession clientSession : m_clientSessionMap.values()) {
-            futures.add(ModelJobs.schedule(new IRunnable() {
-              @Override
-              public void run() {
-                LOG.debug("Shutting down client session with ID {} due to invalidation of HTTP session", clientSession.getId());
-                forceClientSessionShutdown(clientSession);
-                removeClientSession(clientSession);
-              }
+            futures.add(ModelJobs.schedule(() -> {
+              LOG.debug("Shutting down client session with ID {} due to invalidation of HTTP session", clientSession.getId());
+              forceClientSessionShutdown(clientSession);
+              removeClientSession(clientSession);
             }, ModelJobs.newInput(ClientRunContexts.empty()
                 .withSession(clientSession, true))
                 .withName("Closing desktop due to HTTP session invalidation")));

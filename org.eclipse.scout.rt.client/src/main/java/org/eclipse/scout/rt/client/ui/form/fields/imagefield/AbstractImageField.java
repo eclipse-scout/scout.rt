@@ -182,13 +182,13 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
-    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
+    OrderedCollection<IMenu> menus = new OrderedCollection<>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
       menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
     }
     menus.addAllOrdered(contributedMenus);
     injectMenusInternal(menus);
-    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
+    new MoveActionNodesHandler<>(menus).moveModelObjects();
     m_contextMenu = new FormFieldContextMenu<IImageField>(this, menus.getOrderedList());
     m_contextMenu.setContainerInternal(this);
   }
@@ -240,8 +240,8 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   private void fireImageBoxEventInternal(ImageFieldEvent e) {
     EventListener[] a = m_listenerList.getListeners(ImageFieldListener.class);
     if (a != null) {
-      for (int i = 0; i < a.length; i++) {
-        ((ImageFieldListener) a[i]).imageFieldChanged(e);
+      for (EventListener anA : a) {
+        ((ImageFieldListener) anA).imageFieldChanged(e);
       }
     }
   }
@@ -525,7 +525,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
 
   @Override
   protected IImageFieldExtension<? extends AbstractImageField> createLocalExtension() {
-    return new LocalImageFieldExtension<AbstractImageField>(this);
+    return new LocalImageFieldExtension<>(this);
   }
 
 }

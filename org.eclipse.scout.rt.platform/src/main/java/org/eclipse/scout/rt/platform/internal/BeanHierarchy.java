@@ -66,7 +66,7 @@ public class BeanHierarchy<T> {
    */
   public IBean<T> getExactBean(Class<?> beanClazz) {
     List<IBean<T>> beans = CollectionUtility.arrayList(m_beans);
-    Collections.sort(beans, ORDER_COMPARATOR);
+    beans.sort(ORDER_COMPARATOR);
     return getExactBean(beans, beanClazz);
   }
 
@@ -125,7 +125,7 @@ public class BeanHierarchy<T> {
       try {
         List<IBean<T>> list = new ArrayList<>(m_beans);
         //sort by Order ascending
-        Collections.sort(list, ORDER_COMPARATOR);
+        list.sort(ORDER_COMPARATOR);
 
         //remove duplicate registered classes, keep only bean with lowest order
         Set<Class<?>> seenBeans = new HashSet<>();
@@ -171,18 +171,14 @@ public class BeanHierarchy<T> {
         }
 
         //remove replaced beans
-        for (Iterator<IBean<T>> it = list.iterator(); it.hasNext();) {
-          if (extendsMap.containsKey(it.next().getBeanClazz())) {
-            it.remove();
-          }
-        }
+        list.removeIf(tiBean -> extendsMap.containsKey(tiBean.getBeanClazz()));
 
         if (list.isEmpty()) {
           m_all = Collections.emptyList();
           m_single = Collections.emptyList();
         }
         else {
-          m_all = Collections.unmodifiableList(new ArrayList<IBean<T>>(list));
+          m_all = Collections.unmodifiableList(new ArrayList<>(list));
 
           IBean<T> exactBean = getExactBean(list, refClazz);
           if (exactBean != null) {
@@ -210,7 +206,7 @@ public class BeanHierarchy<T> {
             while (iterator.hasNext() && orderOf(curBean = iterator.next()) == lowestOrder) {
               lowestOrderBeans.add(curBean);
             }
-            m_single = Collections.unmodifiableList(new ArrayList<IBean<T>>(lowestOrderBeans));
+            m_single = Collections.unmodifiableList(new ArrayList<>(lowestOrderBeans));
           }
         }
       }
@@ -242,15 +238,12 @@ public class BeanHierarchy<T> {
     return null; // no exact match found
   }
 
-  private static final Comparator<IBean<?>> ORDER_COMPARATOR = new Comparator<IBean<?>>() {
-    @Override
-    public int compare(IBean<?> o1, IBean<?> o2) {
-      int cmp = Double.compare(orderOf(o1), orderOf(o2));
-      if (cmp != 0) {
-        return cmp;
-      }
-      return o1.getBeanClazz().getName().compareTo(o2.getBeanClazz().getName());
+  private static final Comparator<IBean<?>> ORDER_COMPARATOR = (o1, o2) -> {
+    int cmp = Double.compare(orderOf(o1), orderOf(o2));
+    if (cmp != 0) {
+      return cmp;
     }
+    return o1.getBeanClazz().getName().compareTo(o2.getBeanClazz().getName());
   };
 
   public static double orderOf(IBean<?> b) {

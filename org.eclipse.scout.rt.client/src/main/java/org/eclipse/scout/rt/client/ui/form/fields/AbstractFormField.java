@@ -144,7 +144,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     m_enabled = NamedBitMaskHelper.ALL_BITS_SET; // default enabled
     m_visible = NamedBitMaskHelper.ALL_BITS_SET; // default visible
     m_labelVisible = NamedBitMaskHelper.ALL_BITS_SET; // default label visible
-    m_objectExtensions = new ObjectExtensions<AbstractFormField, IFormFieldExtension<? extends AbstractFormField>>(this, false);
+    m_objectExtensions = new ObjectExtensions<>(this, false);
     if (callInitializer) {
       callInitializer();
     }
@@ -186,7 +186,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   protected IFormFieldExtension<? extends AbstractFormField> createLocalExtension() {
-    return new LocalFormFieldExtension<AbstractFormField>(this);
+    return new LocalFormFieldExtension<>(this);
   }
 
   @Override
@@ -807,12 +807,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), new Runnable() {
-      @Override
-      public void run() {
-        initConfig();
-      }
-    });
+    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), this::initConfig);
   }
 
   protected void initConfig() {
@@ -859,12 +854,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         getConfiguredHorizontalAlignment(), getConfiguredVerticalAlignment(), getConfiguredFillHorizontal(), getConfiguredFillVertical(), getConfiguredWidthInPixel(), getConfiguredHeightInPixel()));
     setMasterRequired(getConfiguredMasterRequired());
     // private listener for subtree property change events
-    addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent e) {
-        fireSubtreePropertyChange(e);
-      }
-    });
+    addPropertyChangeListener(this::fireSubtreePropertyChange);
   }
 
   /**
@@ -880,7 +870,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       Class<?> cls = getClass();
       while (cls != null && IFormField.class.isAssignableFrom(cls)) {
         if (cls.isAnnotationPresent(Order.class)) {
-          Order order = (Order) cls.getAnnotation(Order.class);
+          Order order = cls.getAnnotation(Order.class);
           return order.value();
         }
         cls = cls.getSuperclass();
@@ -989,12 +979,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
-      m_internalDataChangeListener = new WeakDataChangeListener() {
-        @Override
-        public void dataChanged(Object... innerDataTypes) {
-          interceptDataChanged(innerDataTypes);
-        }
-      };
+      m_internalDataChangeListener = (WeakDataChangeListener) this::interceptDataChanged;
     }
     IDesktop.CURRENT.get().addDataChangeListener(m_internalDataChangeListener, dataTypes);
   }
@@ -1209,7 +1194,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     IForm form = getForm();
     String currentClassId = computeClassId();
     if (form != null) {
-      List<String> classIds = new ArrayList<String>();
+      List<String> classIds = new ArrayList<>();
       for (IFormField f : form.getAllFields()) {
         if (f != this) {
           String fClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(f.getClass(), true);
@@ -1252,7 +1237,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public List<ICompositeField> getEnclosingFieldList() {
-    List<ICompositeField> enclosingFieldList = new ArrayList<ICompositeField>();
+    List<ICompositeField> enclosingFieldList = new ArrayList<>();
     // compute enclosing field path
     ICompositeField p = getParentField();
     while (p != null) {
@@ -1482,23 +1467,17 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
     if (enabled && updateParents) {
       // also enable all parents
-      visitParents(new IFormFieldVisitor() {
-        @Override
-        public boolean visitField(IFormField field, int level, int fieldIndex) {
-          field.setEnabled(true, dimension);
-          return true;
-        }
+      visitParents((field, level, fieldIndex) -> {
+        field.setEnabled(true, dimension);
+        return true;
       });
     }
 
     if (updateChildren) {
       // propagate change to children
-      acceptVisitor(new IFormFieldVisitor() {
-        @Override
-        public boolean visitField(IFormField field, int level, int fieldIndex) {
-          field.setEnabled(enabled, dimension);
-          return true;
-        }
+      acceptVisitor((field, level, fieldIndex) -> {
+        field.setEnabled(enabled, dimension);
+        return true;
       }, 0, 0, false);
     }
   }
@@ -1514,12 +1493,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       return false;
     }
 
-    return visitParents(new IFormFieldVisitor() {
-      @Override
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
-        return field.isEnabled();
-      }
-    });
+    return visitParents((field, level, fieldIndex) -> field.isEnabled());
   }
 
   @Override
@@ -1575,15 +1549,12 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     }
 
     // notify myself and children that their inherited value might have changed
-    acceptVisitor(new IFormFieldVisitor() {
-      @Override
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
-        if (field instanceof AbstractFormField) {
-          boolean b = (enabled ? field.isEnabledIncludingParents() : false);
-          ((AbstractFormField) field).propertySupport.firePropertyChange(PROP_ENABLED_COMPUTED, !b, b);
-        }
-        return true;
+    acceptVisitor((field, level, fieldIndex) -> {
+      if (field instanceof AbstractFormField) {
+        boolean b = (enabled ? field.isEnabledIncludingParents() : false);
+        ((AbstractFormField) field).propertySupport.firePropertyChange(PROP_ENABLED_COMPUTED, !b, b);
       }
+      return true;
     }, 0, 0, true);
   }
 
@@ -1741,23 +1712,17 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
     if (visible && updateParents) {
       // also enable all parents
-      visitParents(new IFormFieldVisitor() {
-        @Override
-        public boolean visitField(IFormField field, int level, int fieldIndex) {
-          field.setVisible(true, dimension);
-          return true;
-        }
+      visitParents((field, level, fieldIndex) -> {
+        field.setVisible(true, dimension);
+        return true;
       });
     }
 
     if (updateChildren) {
       // propagate change to children
-      acceptVisitor(new IFormFieldVisitor() {
-        @Override
-        public boolean visitField(IFormField field, int level, int fieldIndex) {
-          field.setVisible(visible, dimension);
-          return true;
-        }
+      acceptVisitor((field, level, fieldIndex) -> {
+        field.setVisible(visible, dimension);
+        return true;
       }, 0, 0, false);
     }
   }
@@ -1783,12 +1748,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       return false;
     }
 
-    return visitParents(new IFormFieldVisitor() {
-      @Override
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
-        return field.isVisible();
-      }
-    });
+    return visitParents((field, level, fieldIndex) -> field.isVisible());
   }
 
   /**
@@ -2023,7 +1983,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public void setGridDataHints(GridData hints) {
-    propertySupport.setProperty(PROP_GRID_DATA_HINTS, new GridData((GridData) hints));
+    propertySupport.setProperty(PROP_GRID_DATA_HINTS, new GridData(hints));
   }
 
   @Override
@@ -2087,13 +2047,10 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public void updateKeyStrokes() {
-    m_objectExtensions.runInExtensionContext(new Runnable() {
-      @Override
-      public void run() {
-        m_contributionHolder.resetContributionsByClass(AbstractFormField.this, IKeyStroke.class);
-        List<IKeyStroke> keyStrokes = initLocalKeyStrokes();
-        propertySupport.setPropertyList(PROP_KEY_STROKES, keyStrokes);
-      }
+    m_objectExtensions.runInExtensionContext(() -> {
+      m_contributionHolder.resetContributionsByClass(AbstractFormField.this, IKeyStroke.class);
+      List<IKeyStroke> keyStrokes = initLocalKeyStrokes();
+      propertySupport.setPropertyList(PROP_KEY_STROKES, keyStrokes);
     });
   }
 
@@ -2101,7 +2058,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     List<Class<? extends IKeyStroke>> configuredKeyStrokes = getConfiguredKeyStrokes();
     List<IKeyStroke> contributedKeyStrokes = m_contributionHolder.getContributionsByClass(IKeyStroke.class);
 
-    Map<String, IKeyStroke> ksMap = new HashMap<String, IKeyStroke>(configuredKeyStrokes.size() + contributedKeyStrokes.size());
+    Map<String, IKeyStroke> ksMap = new HashMap<>(configuredKeyStrokes.size() + contributedKeyStrokes.size());
     for (Class<? extends IKeyStroke> keystrokeClazz : configuredKeyStrokes) {
       IKeyStroke ks = ConfigurationUtility.newInnerInstance(this, keystrokeClazz);
       ks.initAction();

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.basic.cell;
 
+@FunctionalInterface
 public interface ICellValueReader {
 
   Object read();

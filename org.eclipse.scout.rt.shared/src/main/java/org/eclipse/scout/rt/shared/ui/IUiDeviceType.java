@@ -15,6 +15,7 @@ import java.io.Serializable;
 /**
  * @since 3.8.0
  */
+@FunctionalInterface
 public interface IUiDeviceType extends Serializable {
   String getIdentifier();
 }

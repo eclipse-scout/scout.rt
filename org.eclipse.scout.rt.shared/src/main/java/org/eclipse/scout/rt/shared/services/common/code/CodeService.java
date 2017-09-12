@@ -163,11 +163,7 @@ public class CodeService implements ICodeService {
     Map<CodeTypeCacheKey, Set<Class<? extends ICodeType<?, ?>>>> requestedCodeTypesByCacheKey = new HashMap<>();
     for (Class<? extends ICodeType<?, ?>> type : types) {
       CodeTypeCacheKey cacheKey = createCacheKey(type);
-      Set<Class<? extends ICodeType<?, ?>>> requestedCodeTypes = requestedCodeTypesByCacheKey.get(cacheKey);
-      if (requestedCodeTypes == null) {
-        requestedCodeTypes = new HashSet<>();
-        requestedCodeTypesByCacheKey.put(cacheKey, requestedCodeTypes);
-      }
+      Set<Class<? extends ICodeType<?, ?>>> requestedCodeTypes = requestedCodeTypesByCacheKey.computeIfAbsent(cacheKey, k -> new HashSet<>());
       requestedCodeTypes.add(type);
       keys.add(cacheKey);
     }
@@ -219,16 +215,13 @@ public class CodeService implements ICodeService {
     if (codeType == null) {
       return null;
     }
-    final Holder<ICode> codeHolder = new Holder<ICode>(ICode.class);
-    ICodeVisitor v = new ICodeVisitor() {
-      @Override
-      public boolean visit(ICode code, int treeLevel) {
-        if (code.getClass() == type) {
-          codeHolder.setValue(code);
-          return false;
-        }
-        return true;
+    final Holder<ICode> codeHolder = new Holder<>(ICode.class);
+    ICodeVisitor v = (code, treeLevel) -> {
+      if (code.getClass() == type) {
+        codeHolder.setValue(code);
+        return false;
       }
+      return true;
     };
     codeType.visit(v);
     return (T) codeHolder.getValue();

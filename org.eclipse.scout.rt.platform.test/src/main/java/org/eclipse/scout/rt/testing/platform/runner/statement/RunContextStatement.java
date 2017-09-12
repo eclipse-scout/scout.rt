@@ -22,6 +22,7 @@ import org.junit.runners.model.Statement;
  */
 public class RunContextStatement extends Statement {
 
+  @FunctionalInterface
   public interface IRunContextProvider {
     RunContext create();
   }

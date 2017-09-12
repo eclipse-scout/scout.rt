@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.Format;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.INumberColumnExtension;
@@ -128,11 +129,11 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
    * @since 5.2
    */
   protected Set<String> getConfiguredAllowedAggregationFunctions() {
-    return CollectionUtility.hashSet(INumberColumn.AggregationFunction.SUM,
-        INumberColumn.AggregationFunction.MIN,
-        INumberColumn.AggregationFunction.MAX,
-        INumberColumn.AggregationFunction.AVG,
-        INumberColumn.AggregationFunction.NONE);
+    return CollectionUtility.hashSet(AggregationFunction.SUM,
+        AggregationFunction.MIN,
+        AggregationFunction.MAX,
+        AggregationFunction.AVG,
+        AggregationFunction.NONE);
   }
 
   /**
@@ -142,7 +143,7 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
    * @since 5.2
    */
   protected String getConfiguredAggregationFunction() {
-    return INumberColumn.AggregationFunction.SUM;
+    return AggregationFunction.SUM;
   }
 
   /**
@@ -202,7 +203,7 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
 
   @Override
   public DecimalFormat getFormat() {
-    return (DecimalFormat) ((DecimalFormat) propertySupport.getProperty(INumberValueContainer.PROP_DECIMAL_FORMAT)).clone();
+    return (DecimalFormat) ((Format) propertySupport.getProperty(INumberValueContainer.PROP_DECIMAL_FORMAT)).clone();
   }
 
   @Override
@@ -387,6 +388,6 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
 
   @Override
   protected INumberColumnExtension<NUMBER, ? extends AbstractNumberColumn<NUMBER>> createLocalExtension() {
-    return new LocalNumberColumnExtension<NUMBER, AbstractNumberColumn<NUMBER>>(this);
+    return new LocalNumberColumnExtension<>(this);
   }
 }

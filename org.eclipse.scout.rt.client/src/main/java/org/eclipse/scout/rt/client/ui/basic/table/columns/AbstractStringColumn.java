@@ -180,7 +180,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     if (table != null) {
       for (int i = 0, ni = table.getRowCount(); i < ni; i++) {
         String value = getValue(table.getRow(i));
-        if (value != null && value.length() > 0) {
+        if (value != null && !value.isEmpty()) {
           return false;
         }
       }
@@ -270,6 +270,6 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
 
   @Override
   protected IStringColumnExtension<? extends AbstractStringColumn> createLocalExtension() {
-    return new LocalStringColumnExtension<AbstractStringColumn>(this);
+    return new LocalStringColumnExtension<>(this);
   }
 }

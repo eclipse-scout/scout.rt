@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithNo
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
@@ -45,7 +44,6 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 /**
  * A page containing a list of "menu" entries<br>
@@ -57,14 +55,11 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 @ClassId("d33a8000-e240-4ed4-9a93-44f168ec1ab8")
 public abstract class AbstractPageWithNodes extends AbstractPage<ITable> implements IPageWithNodes {
 
-  private static final IMenuTypeMapper TREE_MENU_TYPE_MAPPER = new IMenuTypeMapper() {
-    @Override
-    public IMenuType map(IMenuType menuType) {
-      if (menuType == TreeMenuType.SingleSelection) {
-        return TableMenuType.SingleSelection;
-      }
-      return menuType;
+  private static final IMenuTypeMapper TREE_MENU_TYPE_MAPPER = menuType -> {
+    if (menuType == TreeMenuType.SingleSelection) {
+      return TableMenuType.SingleSelection;
     }
+    return menuType;
   };
 
   public AbstractPageWithNodes() {
@@ -102,13 +97,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
 
   protected void createChildPagesInternal(final List<IPage<?>> pageList) {
     createDisplayParentRunContext()
-        .run(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            interceptCreateChildPages(pageList);
-          }
-        });
+        .run(() -> interceptCreateChildPages(pageList));
   }
 
   @Override
@@ -170,7 +159,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
    */
   @Override
   protected void loadChildrenImpl() {
-    List<IPage<?>> pageList = new ArrayList<IPage<?>>();
+    List<IPage<?>> pageList = new ArrayList<>();
     createChildPagesInternal(pageList);
     // load tree
     ITree tree = getTree();
@@ -289,7 +278,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
       m_pageMenusOfSelection = null;
     }
 
-    List<IMenu> pageMenus = new ArrayList<IMenu>();
+    List<IMenu> pageMenus = new ArrayList<>();
     List<ITableRow> selectedRows = getTable().getSelectedRows();
     if (CollectionUtility.size(selectedRows) == 1) {
       ITreeNode node = getTreeNodeFor(CollectionUtility.firstElement(selectedRows));
@@ -451,7 +440,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
 
   @Override
   protected IPageWithNodesExtension<? extends AbstractPageWithNodes> createLocalExtension() {
-    return new LocalPageWithNodesExtension<AbstractPageWithNodes>(this);
+    return new LocalPageWithNodesExtension<>(this);
   }
 
 }

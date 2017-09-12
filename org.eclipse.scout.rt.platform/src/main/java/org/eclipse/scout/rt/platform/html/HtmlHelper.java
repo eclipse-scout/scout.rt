@@ -59,7 +59,7 @@ public class HtmlHelper {
    */
   public String toPlainTextNoTrim(String html) {
 
-    if (html == null || html.length() == 0) {
+    if (html == null || html.isEmpty()) {
       return html;
     }
     String s = StringUtility.getTag(html, "body", true);
@@ -114,7 +114,7 @@ public class HtmlHelper {
    * @see https://www.owasp.org/index.php/XSS_%28Cross_Site_Scripting%29_Prevention_Cheat_Sheet
    */
   public String escape(String text) {
-    if (text == null || text.length() == 0) {
+    if (text == null || text.isEmpty()) {
       return text;
     }
     text = StringUtility.replace(text, "&", "&amp;");
@@ -131,7 +131,7 @@ public class HtmlHelper {
    * alter whitespace.
    */
   public String unescape(String html) {
-    if (html == null || html.length() == 0) {
+    if (html == null || html.isEmpty()) {
       return html;
     }
 

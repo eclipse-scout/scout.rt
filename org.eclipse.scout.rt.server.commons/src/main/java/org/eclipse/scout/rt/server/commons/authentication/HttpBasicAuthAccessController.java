@@ -107,7 +107,7 @@ public class HttpBasicAuthAccessController implements IAccessController {
   /**
    * Method invoked if the user could not be verified, or the user's credential was wrong.
    */
-  protected void handleForbidden(final int status, final HttpServletResponse resp) throws IOException, ServletException {
+  protected void handleForbidden(final int status, final HttpServletResponse resp) throws IOException {
     if (status == ICredentialVerifier.AUTH_CREDENTIALS_REQUIRED) {
       resp.addHeader(ServletFilterHelper.HTTP_HEADER_WWW_AUTHENTICATE, ServletFilterHelper.HTTP_BASIC_AUTH_NAME);
       resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);

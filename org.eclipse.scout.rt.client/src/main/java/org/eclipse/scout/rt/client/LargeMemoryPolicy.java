@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 /**
@@ -34,8 +33,8 @@ public class LargeMemoryPolicy extends AbstractMemoryPolicy {
   private long m_maxMemThreshold = 90L;
 
   public LargeMemoryPolicy() {
-    m_searchFormCache = new HashMap<String, SearchFormState>();
-    m_tableUserFilterState = new HashMap<String, byte[]>();
+    m_searchFormCache = new HashMap<>();
+    m_tableUserFilterState = new HashMap<>();
   }
 
   @Override
@@ -93,12 +92,7 @@ public class LargeMemoryPolicy extends AbstractMemoryPolicy {
     long memUsed = (memTotal - Runtime.getRuntime().freeMemory());
     long memMax = Runtime.getRuntime().maxMemory();
     if (memUsed > memMax * getMaxMemThreshold() / 100L) {
-      ModelJobs.schedule(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          desktop.releaseUnusedPages();
-        }
-      }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("Checking memory"));
+      ModelJobs.schedule(desktop::releaseUnusedPages, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("Checking memory"));
     }
   }
 

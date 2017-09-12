@@ -47,7 +47,7 @@ public final class NumberUtility {
       return new Double(n.toString());
     }
     else {
-      return new Double(n.doubleValue());
+      return n.doubleValue();
     }
   }
 
@@ -329,16 +329,16 @@ public final class NumberUtility {
    */
   public static Number sign(Number n) {
     if (n == null) {
-      return Integer.valueOf(0);
+      return 0;
     }
     double d = n.doubleValue();
     if (d < 0) {
-      return Integer.valueOf(-1);
+      return -1;
     }
     if (d > 0) {
-      return Integer.valueOf(+1);
+      return +1;
     }
-    return Integer.valueOf(0);
+    return 0;
   }
 
   /**
@@ -499,7 +499,7 @@ public final class NumberUtility {
    *         representation of the object is a zero length string.
    */
   public static BigDecimal getBigDecimalValue(Object o) {
-    if (o != null && o.toString().length() > 0) {
+    if (o != null && !o.toString().isEmpty()) {
       return new BigDecimal(o.toString());
     }
     else {
@@ -519,14 +519,14 @@ public final class NumberUtility {
    * @returns <code>true</code> if, and only if the given String is a valid number according to the given separators
    */
   public static boolean isValidDouble(String str, String decimalSeparator, String thousandsSeparator) {
-    if (str == null || str.length() == 0) {
+    if (str == null || str.isEmpty()) {
       return true;
     }
-    if (thousandsSeparator != null && thousandsSeparator.length() > 0) {
+    if (thousandsSeparator != null && !thousandsSeparator.isEmpty()) {
       str = str.replace(thousandsSeparator, "");
     }
     String regex = "[+-]?\\d*";
-    if (decimalSeparator != null && decimalSeparator.length() > 0) {
+    if (decimalSeparator != null && !decimalSeparator.isEmpty()) {
       regex += "(\\" + decimalSeparator + "\\d+)?";
     }
     return str.matches(regex);

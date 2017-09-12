@@ -28,7 +28,7 @@ import org.slf4j.MDC;
 public class HttpRequestQueryStringContextValueProvider implements IDiagnosticContextValueProvider {
 
   public static final String KEY = "http.request.querystring";
-  private String m_queryString;
+  private final String m_queryString;
 
   public HttpRequestQueryStringContextValueProvider(String queryString) {
     m_queryString = queryString;

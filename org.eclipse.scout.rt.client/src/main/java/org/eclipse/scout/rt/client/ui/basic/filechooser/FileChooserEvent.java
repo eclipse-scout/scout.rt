@@ -21,7 +21,7 @@ public class FileChooserEvent extends EventObject implements IModelEvent {
   // state
   public static final int TYPE_CLOSED = 900;
 
-  private int m_type;
+  private final int m_type;
 
   public FileChooserEvent(IFileChooser fc, int type) {
     super(fc);
@@ -40,22 +40,22 @@ public class FileChooserEvent extends EventObject implements IModelEvent {
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    buf.append(getClass().getSimpleName() + "[");
+    buf.append(getClass().getSimpleName()).append("[");
     // decode type
     try {
       Field[] f = getClass().getDeclaredFields();
-      for (int i = 0; i < f.length; i++) {
-        if (Modifier.isPublic(f[i].getModifiers())
-            && Modifier.isStatic(f[i].getModifiers())
-            && f[i].getName().startsWith("TYPE_")
-            && ((Number) f[i].get(null)).intValue() == m_type) {
-          buf.append(f[i].getName());
+      for (Field aF : f) {
+        if (Modifier.isPublic(aF.getModifiers())
+            && Modifier.isStatic(aF.getModifiers())
+            && aF.getName().startsWith("TYPE_")
+            && ((Number) aF.get(null)).intValue() == m_type) {
+          buf.append(aF.getName());
           break;
         }
       }
     }
     catch (Exception t) { // NOSONAR
-      buf.append("#" + m_type);
+      buf.append("#").append(m_type);
     }
     buf.append("]");
     return buf.toString();

@@ -21,7 +21,7 @@ public class MessageBoxEvent extends EventObject implements IModelEvent {
   // state
   public static final int TYPE_CLOSED = 900;
 
-  private int m_type;
+  private final int m_type;
 
   public MessageBoxEvent(IMessageBox mb, int type) {
     super(mb);
@@ -44,22 +44,22 @@ public class MessageBoxEvent extends EventObject implements IModelEvent {
     // decode type
     try {
       Field[] f = getClass().getDeclaredFields();
-      for (int i = 0; i < f.length; i++) {
-        if (Modifier.isPublic(f[i].getModifiers())
-            && Modifier.isStatic(f[i].getModifiers())
-            && f[i].getName().startsWith("TYPE_")
-            && ((Number) f[i].get(null)).intValue() == m_type) {
-          buf.append(f[i].getName());
+      for (Field aF : f) {
+        if (Modifier.isPublic(aF.getModifiers())
+            && Modifier.isStatic(aF.getModifiers())
+            && aF.getName().startsWith("TYPE_")
+            && ((Number) aF.get(null)).intValue() == m_type) {
+          buf.append(aF.getName());
           break;
         }
       }
     }
     catch (Exception t) { // NOSONAR
-      buf.append("#" + m_type);
+      buf.append("#").append(m_type);
     }
     // messageBox
     if (getMessageBox() != null) {
-      buf.append(" " + getMessageBox().getHeader());
+      buf.append(" ").append(getMessageBox().getHeader());
     }
     buf.append("]");
     return buf.toString();

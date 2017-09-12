@@ -48,8 +48,8 @@ public interface IDecimalValueContainer<T extends Number> extends INumberValueCo
   /**
    * When set to true, the local specific (depending on {@link NlsLocale#get()}) positive and negative percentage
    * suffixes are set to the internal {@link DecimalFormat}.<br>
-   * <b>Note:</b> This setting is independent from {@link #setMultiplier(int)}. For example if the parsed value for
-   * "18 %" should be 0.18, set the multiplier to 100.
+   * <b>Note:</b> This setting is independent from {@link #setMultiplier(int)}. For example if the parsed value for "18
+   * %" should be 0.18, set the multiplier to 100.
    */
   void setPercent(boolean b);
 

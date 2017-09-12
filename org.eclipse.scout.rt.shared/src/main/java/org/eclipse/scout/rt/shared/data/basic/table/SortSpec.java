@@ -15,8 +15,8 @@ import java.io.Serializable;
 public class SortSpec implements Serializable {
   private static final long serialVersionUID = 0L;
 
-  private int[] m_columns;
-  private boolean[] m_ascending;
+  private final int[] m_columns;
+  private final boolean[] m_ascending;
 
   public SortSpec(int columnIndex, boolean ascending) {
     m_columns = new int[]{columnIndex};

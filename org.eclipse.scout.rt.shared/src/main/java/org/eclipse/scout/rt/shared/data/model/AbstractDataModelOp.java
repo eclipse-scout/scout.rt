@@ -46,7 +46,7 @@ public abstract class AbstractDataModelOp implements IDataModelAttributeOp, Data
 
   public static String buildText(Integer aggregationType, String attributeText, String opText, List<String> valueTexts) {
     String text1 = null;
-    if (valueTexts != null && valueTexts.size() > 0) {
+    if (valueTexts != null && !valueTexts.isEmpty()) {
       text1 = valueTexts.get(0);
     }
     String text2 = null;
@@ -90,12 +90,12 @@ public abstract class AbstractDataModelOp implements IDataModelAttributeOp, Data
       b.append(attributeText);
     }
     String verboseValue;
-    if (opText.indexOf("{0}") >= 0) {
+    if (opText.contains("{0}")) {
       verboseValue = opText;
-      if (verboseValue.indexOf("{0}") >= 0 && text1 != null) {
+      if (verboseValue.contains("{0}") && text1 != null) {
         verboseValue = verboseValue.replace("{0}", text1);
       }
-      if (verboseValue.indexOf("{1}") >= 0 && text2 != null) {
+      if (verboseValue.contains("{1}") && text2 != null) {
         verboseValue = verboseValue.replace("{1}", text2);
       }
     }

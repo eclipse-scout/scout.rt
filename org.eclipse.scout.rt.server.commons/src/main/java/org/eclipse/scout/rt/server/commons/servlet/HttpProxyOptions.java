@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HttpProxyOptions {
-  private Map<String, String> m_customRequestHeaders;
+  private final Map<String, String> m_customRequestHeaders;
 
   public HttpProxyOptions() {
     m_customRequestHeaders = new HashMap<>();

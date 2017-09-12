@@ -113,7 +113,7 @@ public final class UserAgent implements Serializable {
    * @return {@link UserAgent} associated with the current thread.
    */
   public static UserAgent get() {
-    return UserAgent.CURRENT.get();
+    return CURRENT.get();
   }
 
   @Override

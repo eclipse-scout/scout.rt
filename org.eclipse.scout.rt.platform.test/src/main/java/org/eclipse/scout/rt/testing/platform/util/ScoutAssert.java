@@ -27,7 +27,7 @@ public final class ScoutAssert {
   }
 
   public static <T> void assertSetEquals(T[] expected, Collection<T> actual) {
-    assertSetEquals(new ArrayList<T>(Arrays.asList(expected)), actual);
+    assertSetEquals(new ArrayList<>(Arrays.asList(expected)), actual);
   }
 
   public static <T> void assertSetEquals(Collection<T> expected,
@@ -35,13 +35,13 @@ public final class ScoutAssert {
     if (actual == null) {
       fail(format("sets are not equal", expected, actual));
     }
-    if (!new HashSet<T>(expected).equals(new HashSet<T>(actual))) {
+    if (!new HashSet<>(expected).equals(new HashSet<>(actual))) {
       fail(format("sets are not equal", expected, actual));
     }
   }
 
   public static <T> void assertListEquals(T[] expected, Collection<T> actual) {
-    assertListEquals(new ArrayList<T>(Arrays.asList(expected)), actual);
+    assertListEquals(new ArrayList<>(Arrays.asList(expected)), actual);
   }
 
   public static <T> void assertListEquals(Collection<T> expected,
@@ -49,7 +49,7 @@ public final class ScoutAssert {
     if (actual == null) {
       fail(format("lists are not equal", expected, actual));
     }
-    if (!new ArrayList<T>(expected).equals(new ArrayList<T>(actual))) {
+    if (!new ArrayList<>(expected).equals(new ArrayList<>(actual))) {
       fail(format("lists are not equal", expected, actual));
     }
   }

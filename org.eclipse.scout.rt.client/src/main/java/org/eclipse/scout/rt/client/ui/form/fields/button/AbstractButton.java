@@ -255,7 +255,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
-    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
+    OrderedCollection<IMenu> menus = new OrderedCollection<>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
       IMenu menu;
       menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
@@ -263,7 +263,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     }
     menus.addAllOrdered(contributedMenus);
     injectMenusInternal(menus);
-    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
+    new MoveActionNodesHandler<>(menus).moveModelObjects();
     IContextMenu contextMenu = new FormFieldContextMenu<IButton>(this, menus.getOrderedList());
     contextMenu.setContainerInternal(this);
     setContextMenu(contextMenu);
@@ -484,8 +484,8 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   private void fireButtonEvent(ButtonEvent e) {
     EventListener[] listeners = m_listenerList.getListeners(ButtonListener.class);
     if (listeners != null && listeners.length > 0) {
-      for (int i = 0; i < listeners.length; i++) {
-        ((ButtonListener) listeners[i]).buttonChanged(e);
+      for (EventListener listener : listeners) {
+        ((ButtonListener) listener).buttonChanged(e);
       }
     }
   }
@@ -561,6 +561,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
 
   @Override
   protected IButtonExtension<? extends AbstractButton> createLocalExtension() {
-    return new LocalButtonExtension<AbstractButton>(this);
+    return new LocalButtonExtension<>(this);
   }
 }

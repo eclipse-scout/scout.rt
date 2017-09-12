@@ -31,7 +31,7 @@ public class AndFilter<ELEMENT> implements IFilter<ELEMENT> {
   }
 
   public AndFilter(final Collection<IFilter<ELEMENT>> filters) {
-    Assertions.assertTrue(filters.size() > 0, "Must have one filter at minimum");
+    Assertions.assertTrue(!filters.isEmpty(), "Must have one filter at minimum");
     m_filters = CollectionUtility.arrayList(filters);
   }
 

@@ -43,7 +43,7 @@ import org.eclipse.scout.rt.shared.csv.IDataConsumer;
 
 public class CsvSqlAdapter {
 
-  private ISqlService m_sqlService;
+  private final ISqlService m_sqlService;
 
   public CsvSqlAdapter(ISqlService service) {
     if (service == null) {
@@ -175,8 +175,7 @@ public class CsvSqlAdapter {
       h.setColumnNames(params.getCsvColumnNames());
     }
 
-    Collection<String> cols = new ArrayList<String>();
-    cols.addAll(params.getCsvColumnNames());
+    Collection<String> cols = new ArrayList<>(params.getCsvColumnNames());
     // prepare select statement
     String sqlText;
     Object[] base = null;
@@ -271,7 +270,7 @@ public class CsvSqlAdapter {
     if (params.getCsvColumnNames() != null) {
       h.setColumnNames(params.getCsvColumnNames());
     }
-    Collection<String> cols = new ArrayList<String>();
+    Collection<String> cols = new ArrayList<>();
     if (params.getGroupKeyValue() != null) {
       cols.add(params.getGroupKeyColumnName());
     }
@@ -283,8 +282,7 @@ public class CsvSqlAdapter {
     buf.append("INSERT INTO ");
     buf.append(params.getTableName());
     buf.append("(");
-    for (Iterator<String> it = cols.iterator(); it.hasNext();) {
-      String colName = it.next();
+    for (String colName : cols) {
       if (!CsvHelper.IGNORED_COLUMN_NAME.equals(colName)) {
         buf.append(colName);
         buf.append(",");
@@ -293,10 +291,9 @@ public class CsvSqlAdapter {
     buf.deleteCharAt(buf.length() - 1);
     buf.append(") VALUES (");
     int i = 0;
-    for (Iterator<String> it = cols.iterator(); it.hasNext();) {
-      String colName = it.next();
+    for (String colName : cols) {
       if (!CsvHelper.IGNORED_COLUMN_NAME.equals(colName)) {
-        buf.append(":v" + i);
+        buf.append(":v").append(i);
         buf.append(",");
         i++;
       }
@@ -315,9 +312,9 @@ public class CsvSqlAdapter {
   }
 
   private class SqlInsertDataConsumer implements IDataConsumer {
-    private String m_statement;
-    private Object m_groupKey;
-    private boolean m_useLineNumberColumnName;
+    private final String m_statement;
+    private final Object m_groupKey;
+    private final boolean m_useLineNumberColumnName;
 
     public SqlInsertDataConsumer(String stm, Object groupKey, boolean useLineNumberColumnName) {
       m_statement = stm;
@@ -328,7 +325,7 @@ public class CsvSqlAdapter {
     @Override
     public void processRow(int lineNr, List<Object> row) {
       try {
-        ArrayList<Object> bindBase = new ArrayList<Object>();
+        List<Object> bindBase = new ArrayList<>();
         int i = 0;
         if (m_groupKey != null) {
           bindBase.add(new NVPair("v" + i, m_groupKey));
@@ -338,8 +335,8 @@ public class CsvSqlAdapter {
           bindBase.add(new NVPair("v" + i, lineNr));
           i++;
         }
-        for (Iterator<Object> it = row.iterator(); it.hasNext();) {
-          bindBase.add(new NVPair("v" + i, it.next()));
+        for (Object aRow : row) {
+          bindBase.add(new NVPair("v" + i, aRow));
           i++;
         }
         m_sqlService.insert(m_statement, bindBase.toArray());

@@ -47,30 +47,20 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 @ClassId("28ec2113-6461-4810-9527-253d0bf68788")
 public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMenu, IReadOnlyMenu {
 
-  private IMenu m_wrappedMenu;
-  private PropertyChangeListener m_wrappedMenuPropertyChangeListener;
-  private Set<IMenuType> m_menuTypes;
-  private IActionFilter m_menuFilter;
-  private IMenuTypeMapper m_menuTypeMapper;
+  private final IMenu m_wrappedMenu;
+  private final PropertyChangeListener m_wrappedMenuPropertyChangeListener;
+  private final Set<IMenuType> m_menuTypes;
+  private final IActionFilter m_menuFilter;
+  private final IMenuTypeMapper m_menuTypeMapper;
 
-  public static final IActionFilter ACCEPT_ALL_FILTER = new IActionFilter() {
+  public static final IActionFilter ACCEPT_ALL_FILTER = action -> true;
 
-    @Override
-    public boolean accept(IAction action) {
-      return true;
-    }
-  };
-
-  public static final IMenuTypeMapper AUTO_MENU_TYPE_MAPPER = new IMenuTypeMapper() {
-    @Override
-    public IMenuType map(IMenuType menuType) {
-      return menuType;
-    }
-  };
+  public static final IMenuTypeMapper AUTO_MENU_TYPE_MAPPER = menuType -> menuType;
 
   /**
    * maps a menuType of the wrapped menu to the menuType of the wrapperMenu
    */
+  @FunctionalInterface
   public interface IMenuTypeMapper {
     IMenuType map(IMenuType menuType);
   }
@@ -143,7 +133,7 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
 
   protected Set<IMenuType> mapMenuTypes(IMenu menu, IMenuTypeMapper mapper) {
     Set<IMenuType> originalTypes = menu.getMenuTypes();
-    Set<IMenuType> mappedTypes = new HashSet<IMenuType>(originalTypes.size());
+    Set<IMenuType> mappedTypes = new HashSet<>(originalTypes.size());
     for (IMenuType menuType : originalTypes) {
       mappedTypes.add(mapper.map(menuType));
     }
@@ -157,7 +147,7 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
 
   protected void wrapChildActions() {
     List<IMenu> childActions = m_wrappedMenu.getChildActions();
-    List<IMenu> wrappedChildActions = new ArrayList<IMenu>(childActions.size());
+    List<IMenu> wrappedChildActions = new ArrayList<>(childActions.size());
     // create child wrappers
     for (IAction a : ActionUtility.getActions(m_wrappedMenu.getChildActions(), m_menuFilter)) {
       if (a instanceof IMenu) {
@@ -552,13 +542,13 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(getClass().getSimpleName());
-    sb.append("[wrappedMenu=" + m_wrappedMenu.getClass().getSimpleName());
-    sb.append(" text='" + getText()).append("'");
-    sb.append(" enabled=" + isEnabled());
-    sb.append(" enabledGranted=" + isEnabledGranted());
-    sb.append(" inheritAccessibility=" + isInheritAccessibility());
-    sb.append(" visible=" + isVisible());
-    sb.append(" visibleGranted=" + isVisibleGranted());
+    sb.append("[wrappedMenu=").append(m_wrappedMenu.getClass().getSimpleName());
+    sb.append(" text='").append(getText()).append("'");
+    sb.append(" enabled=").append(isEnabled());
+    sb.append(" enabledGranted=").append(isEnabledGranted());
+    sb.append(" inheritAccessibility=").append(isInheritAccessibility());
+    sb.append(" visible=").append(isVisible());
+    sb.append(" visibleGranted=").append(isVisibleGranted());
     sb.append("]");
     return sb.toString();
   }

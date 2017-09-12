@@ -15,15 +15,16 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public abstract class AbstractCalendarItem implements ICalendarItem, Serializable {
   private static final long serialVersionUID = 1L;
 
-  public static final DateFormat getDumpDateFormat() {
+  public static DateFormat getDumpDateFormat() {
     return new SimpleDateFormat("dd.MM.yy HH:mm:ss");
   }
 
-  public static final DateFormat getExchangeableDateFormat() {
+  public static DateFormat getExchangeableDateFormat() {
     return new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
   }
 
@@ -42,7 +43,7 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
   private Serializable m_externalKey;
 
   public AbstractCalendarItem() {
-    this(Long.valueOf(0L));
+    this(0L);
   }
 
   public AbstractCalendarItem(Object id) {
@@ -180,15 +181,15 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
     StringBuilder b = new StringBuilder();
     b.append(getClass().getSimpleName());
     b.append("[");
-    HashMap<String, Object> attributes = new HashMap<String, Object>();
+    Map<String, Object> attributes = new HashMap<>();
     dumpState(attributes);
     int count = 0;
-    for (Map.Entry<String, Object> e : attributes.entrySet()) {
+    for (Entry<String, Object> e : attributes.entrySet()) {
       if (e.getValue() != null) {
         if (count > 0) {
           b.append(", ");
         }
-        b.append(e.getKey() + "=" + e.getValue());
+        b.append(e.getKey()).append("=").append(e.getValue());
         count++;
       }
     }

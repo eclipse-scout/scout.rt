@@ -247,7 +247,7 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
 
   @Override
   protected IDateColumnExtension<? extends AbstractDateColumn> createLocalExtension() {
-    return new LocalDateColumnExtension<AbstractDateColumn>(this);
+    return new LocalDateColumnExtension<>(this);
   }
 
 }

@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.platform.service.IService;
 /**
  * Support service for querying available Permission types.
  */
+@FunctionalInterface
 public interface IPermissionService extends IService {
 
   /**

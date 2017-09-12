@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.ui.html.json.AbstractEventFilter;
 
 public class TableEventFilter extends AbstractEventFilter<TableEvent, TableEventFilterCondition> {
 
-  private JsonTable<? extends ITable> m_jsonTable;
+  private final JsonTable<? extends ITable> m_jsonTable;
 
   public TableEventFilter(JsonTable<? extends ITable> jsonTable) {
     m_jsonTable = jsonTable;
@@ -35,7 +35,7 @@ public class TableEventFilter extends AbstractEventFilter<TableEvent, TableEvent
         if (condition.checkRows()) {
           List<ITableRow> rows = new ArrayList<>(event.getRows());
           rows.removeAll(condition.getRows());
-          if (rows.size() == 0) {
+          if (rows.isEmpty()) {
             // Ignore event if no nodes remain (or if the event contained no nodes at all)
             return null;
           }

@@ -15,6 +15,4 @@ import org.eclipse.scout.rt.platform.util.date.UTCDate;
 public abstract class AbstractUTCFieldData extends AbstractValueFieldData<UTCDate> {
   private static final long serialVersionUID = 1L;
 
-  public AbstractUTCFieldData() {
-  }
 }

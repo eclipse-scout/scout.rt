@@ -18,7 +18,6 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.client.extension.ui.action.menu.root.IContextMenuExtension;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
-import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -137,21 +136,18 @@ public abstract class AbstractContextMenu<T extends IPropertyObserver> extends A
     final IActionFilter activeFilter = ActionUtility.createMenuFilterMenuTypes(getCurrentMenuTypes(), true);
     if (activeFilter != null) {
       final BooleanHolder visibleHolder = new BooleanHolder(false);
-      acceptVisitor(new IActionVisitor() {
-        @Override
-        public int visit(IAction action) {
-          if (action instanceof IMenu) {
-            IMenu menu = (IMenu) action;
-            if (menu.hasChildActions() || menu.isSeparator() || menu instanceof IContextMenu) {
-              return CONTINUE;
-            }
-            else if (activeFilter.accept(menu)) {
-              visibleHolder.setValue(true);
-              return CANCEL;
-            }
+      acceptVisitor(action -> {
+        if (action instanceof IMenu) {
+          IMenu menu = (IMenu) action;
+          if (menu.hasChildActions() || menu.isSeparator() || menu instanceof IContextMenu) {
+            return IActionVisitor.CONTINUE;
           }
-          return CONTINUE;
+          else if (activeFilter.accept(menu)) {
+            visibleHolder.setValue(true);
+            return IActionVisitor.CANCEL;
+          }
         }
+        return IActionVisitor.CONTINUE;
       });
       setVisible(visibleHolder.getValue());
     }

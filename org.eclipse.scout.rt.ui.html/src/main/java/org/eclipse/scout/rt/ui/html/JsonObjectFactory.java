@@ -170,26 +170,26 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
       // the use the same model, but we need different adapters
       IGroupBox groupBox = (IGroupBox) model;
       if (groupBox.getParentField() instanceof ITabBox) {
-        return new JsonTabItem<IGroupBox>(groupBox, session, id, parent);
+        return new JsonTabItem<>(groupBox, session, id, parent);
       }
       else {
-        return new JsonGroupBox<IGroupBox>(groupBox, session, id, parent);
+        return new JsonGroupBox<>(groupBox, session, id, parent);
       }
     }
     if (model instanceof ISequenceBox) {
-      return new JsonSequenceBox<ISequenceBox>((ISequenceBox) model, session, id, parent);
+      return new JsonSequenceBox<>((ISequenceBox) model, session, id, parent);
     }
     if (model instanceof ITabBox) {
-      return new JsonTabBox<ITabBox>((ITabBox) model, session, id, parent);
+      return new JsonTabBox<>((ITabBox) model, session, id, parent);
     }
     if (model instanceof IBooleanField) {
-      return new JsonCheckBoxField<IBooleanField>((IBooleanField) model, session, id, parent);
+      return new JsonCheckBoxField<>((IBooleanField) model, session, id, parent);
     }
     if (model instanceof ILabelField) {
-      return new JsonLabelField<ILabelField>((ILabelField) model, session, id, parent);
+      return new JsonLabelField<>((ILabelField) model, session, id, parent);
     }
     if (model instanceof IImageField) {
-      return new JsonImageField<IImageField>((IImageField) model, session, id, parent);
+      return new JsonImageField<>((IImageField) model, session, id, parent);
     }
     if (model instanceof ITableField<?>) {
       return new JsonTableField<ITableField<? extends ITable>>((ITableField<?>) model, session, id, parent);
@@ -198,7 +198,7 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
       return new JsonListBox((IListBox<?>) model, session, id, parent);
     }
     if (model instanceof ITreeField) {
-      return new JsonTreeField<ITreeField>((ITreeField) model, session, id, parent);
+      return new JsonTreeField<>((ITreeField) model, session, id, parent);
     }
     if (model instanceof ITreeBox<?>) {
       return new JsonTreeBox<ITreeBox>((ITreeBox<?>) model, session, id, parent);
@@ -210,10 +210,10 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
       return new JsonRadioButtonGroup<IRadioButtonGroup>((IRadioButtonGroup<?>) model, session, id, parent);
     }
     if (model instanceof IButton) {
-      return new JsonButton<IButton>((IButton) model, session, id, parent);
+      return new JsonButton<>((IButton) model, session, id, parent);
     }
     if (model instanceof IStringField) {
-      return new JsonStringField<IStringField>((IStringField) model, session, id, parent);
+      return new JsonStringField<>((IStringField) model, session, id, parent);
     }
     if (model instanceof INumberField<?>) {
       return new JsonNumberField<INumberField>((INumberField<?>) model, session, id, parent);
@@ -225,7 +225,7 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
       return new JsonSmartField((ISmartField<?>) model, session, id, parent);
     }
     if (model instanceof IDateField) {
-      return new JsonDateField<IDateField>((IDateField) model, session, id, parent);
+      return new JsonDateField<>((IDateField) model, session, id, parent);
     }
     if (model instanceof ICalendarField<?>) {
       return new JsonCalendarField<ICalendarField<? extends ICalendar>>((ICalendarField<?>) model, session, id, parent);
@@ -237,107 +237,107 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
       return new JsonWrappedFormField<IWrappedFormField<? extends IForm>>((IWrappedFormField<?>) model, session, id, parent);
     }
     if (model instanceof ISplitBox) {
-      return new JsonSplitBox<ISplitBox>((ISplitBox) model, session, id, parent);
+      return new JsonSplitBox<>((ISplitBox) model, session, id, parent);
     }
     if (model instanceof IPlaceholderField) {
-      return new JsonPlaceholderField<IPlaceholderField>((IPlaceholderField) model, session, id, parent);
+      return new JsonPlaceholderField<>((IPlaceholderField) model, session, id, parent);
     }
     if (model instanceof IWizardProgressField) {
-      return new JsonWizardProgressField<IWizardProgressField>((IWizardProgressField) model, session, id, parent);
+      return new JsonWizardProgressField<>((IWizardProgressField) model, session, id, parent);
     }
     if (model instanceof IHtmlField) {
-      return new JsonHtmlField<IHtmlField>((IHtmlField) model, session, id, parent);
+      return new JsonHtmlField<>((IHtmlField) model, session, id, parent);
     }
     if (model instanceof IComposerField) {
-      return new JsonComposerField<IComposerField>((IComposerField) model, session, id, parent);
+      return new JsonComposerField<>((IComposerField) model, session, id, parent);
     }
     if (model instanceof IBeanField) {
       return new JsonBeanField<IBeanField<?>>((IBeanField) model, session, id, parent);
     }
     if (model instanceof IFileChooserField) {
-      return new JsonFileChooserField<IFileChooserField>((IFileChooserField) model, session, id, parent);
+      return new JsonFileChooserField<>((IFileChooserField) model, session, id, parent);
     }
     if (model instanceof IColorField) {
-      return new JsonColorField<IColorField>((IColorField) model, session, id, parent);
+      return new JsonColorField<>((IColorField) model, session, id, parent);
     }
     if (model instanceof IBrowserField) {
-      return new JsonBrowserField<IBrowserField>((IBrowserField) model, session, id, parent);
+      return new JsonBrowserField<>((IBrowserField) model, session, id, parent);
     }
     if (model instanceof IClipboardField) {
-      return new JsonClipboardField<IClipboardField>((IClipboardField) model, session, id, parent);
+      return new JsonClipboardField<>((IClipboardField) model, session, id, parent);
     }
 
     // --- other model objects ---
     if (model instanceof IDesktop) {
-      return new JsonDesktop<IDesktop>((IDesktop) model, session, id, parent);
+      return new JsonDesktop<>((IDesktop) model, session, id, parent);
     }
     if (model instanceof IFormMenu<?>) {
       return new JsonFormMenu((IFormMenu<?>) model, session, id, parent);
     }
     if (model instanceof IMenu) {
-      return new JsonMenu<IMenu>((IMenu) model, session, id, parent);
+      return new JsonMenu<>((IMenu) model, session, id, parent);
     }
     if (model instanceof IKeyStroke) {
-      return new JsonKeyStroke<IKeyStroke>((IKeyStroke) model, session, id, parent);
+      return new JsonKeyStroke<>((IKeyStroke) model, session, id, parent);
     }
     if (model instanceof ISearchForm) {
-      return new JsonSearchForm<ISearchForm>((ISearchForm) model, session, id, parent);
+      return new JsonSearchForm<>((ISearchForm) model, session, id, parent);
     }
     if (model instanceof IForm) {
-      return new JsonForm<IForm>((IForm) model, session, id, parent);
+      return new JsonForm<>((IForm) model, session, id, parent);
     }
     if (model instanceof IMessageBox) {
-      return new JsonMessageBox<IMessageBox>((IMessageBox) model, session, id, parent);
+      return new JsonMessageBox<>((IMessageBox) model, session, id, parent);
     }
     if (model instanceof IDesktopNotification) {
-      return new JsonDesktopNotification<IDesktopNotification>((IDesktopNotification) model, session, id, parent);
+      return new JsonDesktopNotification<>((IDesktopNotification) model, session, id, parent);
     }
     if (model instanceof IOutlineViewButton) {
-      return new JsonOutlineViewButton<IOutlineViewButton>((IOutlineViewButton) model, session, id, parent);
+      return new JsonOutlineViewButton<>((IOutlineViewButton) model, session, id, parent);
     }
     if (model instanceof IViewButton) {
-      return new JsonViewButton<IViewButton>((IViewButton) model, session, id, parent);
+      return new JsonViewButton<>((IViewButton) model, session, id, parent);
     }
     if (model instanceof ISearchOutline) {
-      return new JsonSearchOutline<ISearchOutline>((ISearchOutline) model, session, id, parent);
+      return new JsonSearchOutline<>((ISearchOutline) model, session, id, parent);
     }
     if (model instanceof IOutline) {
-      return new JsonOutline<IOutline>((IOutline) model, session, id, parent);
+      return new JsonOutline<>((IOutline) model, session, id, parent);
     }
     if (model instanceof ITree) {
-      return new JsonTree<ITree>((ITree) model, session, id, parent);
+      return new JsonTree<>((ITree) model, session, id, parent);
     }
     if (model instanceof ITable) {
       ITable table = (ITable) model;
       IPage page = (IPage) table.getProperty(JsonOutlineTable.PROP_PAGE);
       if (page != null) {
-        return new JsonOutlineTable<ITable>(table, session, id, parent, page);
+        return new JsonOutlineTable<>(table, session, id, parent, page);
       }
-      return new JsonTable<ITable>(table, session, id, parent);
+      return new JsonTable<>(table, session, id, parent);
     }
     if (model instanceof IClientSession) {
-      return new JsonClientSession<IClientSession>((IClientSession) model, session, id, parent);
+      return new JsonClientSession<>((IClientSession) model, session, id, parent);
     }
     if (model instanceof ICalendar) {
-      return new JsonCalendar<ICalendar>((ICalendar) model, session, id, parent);
+      return new JsonCalendar<>((ICalendar) model, session, id, parent);
     }
     if (model instanceof CalendarComponent) {
-      return new JsonCalendarComponent<CalendarComponent>((CalendarComponent) model, session, id, parent);
+      return new JsonCalendarComponent<>((CalendarComponent) model, session, id, parent);
     }
     if (model instanceof IPlanner<?, ?>) {
       return new JsonPlanner<IPlanner>((IPlanner<?, ?>) model, session, id, parent);
     }
     if (model instanceof IFileChooser) {
-      return new JsonFileChooser<IFileChooser>((IFileChooser) model, session, id, parent);
+      return new JsonFileChooser<>((IFileChooser) model, session, id, parent);
     }
     if (model instanceof IAggregateTableControl) { // needs to be before ITableControl
-      return new JsonAggregateTableControl<IAggregateTableControl>((IAggregateTableControl) model, session, id, parent);
+      return new JsonAggregateTableControl<>((IAggregateTableControl) model, session, id, parent);
     }
     if (model instanceof IFormTableControl) { // needs to be before ITableControl
-      return new JsonFormTableControl<IFormTableControl>((IFormTableControl) model, session, id, parent);
+      return new JsonFormTableControl<>((IFormTableControl) model, session, id, parent);
     }
     if (model instanceof ITableControl) {
-      return new JsonTableControl<ITableControl>((ITableControl) model, session, id, parent);
+      return new JsonTableControl<>((ITableControl) model, session, id, parent);
     }
     return null;
   }
@@ -367,7 +367,7 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
       return new JsonStringColumn((IStringColumn) object);
     }
     if (object instanceof IBeanColumn<?>) {
-      return new JsonBeanColumn((IBeanColumn<?>) object);
+      return new JsonBeanColumn((IColumn<?>) object);
     }
     if (object instanceof IIconColumn) {
       return new JsonIconColumn((IIconColumn) object);

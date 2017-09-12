@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.platform.BEANS;
  *          the type of the notification
  * @see NotificationHandlerRegistry
  */
+@FunctionalInterface
 @ApplicationScoped
 public interface INotificationHandler<T extends Serializable> {
 

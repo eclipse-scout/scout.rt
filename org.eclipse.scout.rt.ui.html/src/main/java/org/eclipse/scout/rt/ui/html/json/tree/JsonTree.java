@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.MouseButton;
-import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -201,7 +200,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     putJsonProperty(new JsonAdapterProperty<ITree>(ITree.PROP_KEY_STROKES, model, getUiSession()) {
       @Override
       protected JsonAdapterPropertyConfig createConfig() {
-        return new JsonAdapterPropertyConfigBuilder().filter(new DisplayableActionFilter<IAction>()).build();
+        return new JsonAdapterPropertyConfigBuilder().filter(new DisplayableActionFilter<>()).build();
       }
 
       @Override
@@ -232,7 +231,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   }
 
   protected JsonContextMenu<IContextMenu> createJsonContextMenu() {
-    return new JsonContextMenu<IContextMenu>(getModel().getContextMenu(), this);
+    return new JsonContextMenu<>(getModel().getContextMenu(), this);
   }
 
   @Override
@@ -883,10 +882,10 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   protected void handleUiNodesChecked(JsonEvent event) {
     CheckedInfo checkedInfo = jsonToCheckedInfo(event.getData());
     addTreeEventFilterCondition(TreeEvent.TYPE_NODES_CHECKED).setCheckedNodes(checkedInfo.getCheckedNodes(), checkedInfo.getUncheckedNodes());
-    if (checkedInfo.getCheckedNodes().size() > 0) {
+    if (!checkedInfo.getCheckedNodes().isEmpty()) {
       getModel().getUIFacade().setNodesCheckedFromUI(checkedInfo.getCheckedNodes(), true);
     }
-    if (checkedInfo.getUncheckedNodes().size() > 0) {
+    if (!checkedInfo.getUncheckedNodes().isEmpty()) {
       getModel().getUIFacade().setNodesCheckedFromUI(checkedInfo.getUncheckedNodes(), false);
     }
   }
@@ -958,7 +957,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
    * @return the filtered node count excluding nodes filtered by the user
    */
   protected int getFilteredNodeCount(ITreeNode parentNode) {
-    if (getModel().getNodeFilters().size() == 0) {
+    if (getModel().getNodeFilters().isEmpty()) {
       return parentNode.getChildNodeCount();
     }
     int filteredNodeCount = 0;
@@ -1008,9 +1007,9 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   }
 
   protected static class CheckedInfo {
-    private final List<ITreeNode> m_allNodes = new ArrayList<ITreeNode>();
-    private final List<ITreeNode> m_checkedNodes = new ArrayList<ITreeNode>();
-    private final List<ITreeNode> m_uncheckedNodes = new ArrayList<ITreeNode>();
+    private final List<ITreeNode> m_allNodes = new ArrayList<>();
+    private final List<ITreeNode> m_checkedNodes = new ArrayList<>();
+    private final List<ITreeNode> m_uncheckedNodes = new ArrayList<>();
 
     public List<ITreeNode> getAllNodes() {
       return m_allNodes;

@@ -86,7 +86,7 @@ public abstract class AbstractBeanField<VALUE> extends AbstractValueField<VALUE>
 
   @Override
   protected IBeanFieldExtension<VALUE, ? extends AbstractBeanField<VALUE>> createLocalExtension() {
-    return new LocalBeanFieldExtension<VALUE, AbstractBeanField<VALUE>>(this);
+    return new LocalBeanFieldExtension<>(this);
   }
 
   @Override

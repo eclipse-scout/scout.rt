@@ -69,12 +69,12 @@ public class SmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmartFieldLookupR
 
     @Override
     public void onSuccess(List<? extends ILookupRow<LOOKUP_KEY>> rows) {
-      setResult(new SmartFieldDataFetchResult<>(new ArrayList<ILookupRow<LOOKUP_KEY>>(rows), null, m_param));
+      setResult(new SmartFieldDataFetchResult<>(new ArrayList<>(rows), null, m_param));
     }
 
     @Override
     public void onFailure(RuntimeException exception) {
-      setResult(new SmartFieldDataFetchResult<LOOKUP_KEY>(null, exception, m_param));
+      setResult(new SmartFieldDataFetchResult<>(null, exception, m_param));
     }
   }
 }

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineTreeFieldExtension;
@@ -42,23 +41,17 @@ public abstract class AbstractOutlineTreeField extends AbstractTreeField impleme
 
   @Override
   protected void execInitField() {
-    m_desktopListener = new DesktopListener() {
-      @Override
-      public void desktopChanged(DesktopEvent e) {
-        switch (e.getType()) {
-          case DesktopEvent.TYPE_OUTLINE_CHANGED: {
-            installOutline(e.getOutline());
-            break;
-          }
+    m_desktopListener = e -> {
+      switch (e.getType()) {
+        case DesktopEvent.TYPE_OUTLINE_CHANGED: {
+          installOutline(e.getOutline());
+          break;
         }
       }
     };
-    m_treePropertyListener = new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent e) {
-        if (e.getPropertyName().equals(ITree.PROP_TITLE)) {
-          setLabel((String) e.getNewValue());
-        }
+    m_treePropertyListener = e -> {
+      if (e.getPropertyName().equals(ITree.PROP_TITLE)) {
+        setLabel((String) e.getNewValue());
       }
     };
     //
@@ -98,6 +91,6 @@ public abstract class AbstractOutlineTreeField extends AbstractTreeField impleme
 
   @Override
   protected IOutlineTreeFieldExtension<? extends AbstractOutlineTreeField> createLocalExtension() {
-    return new LocalOutlineTreeFieldExtension<AbstractOutlineTreeField>(this);
+    return new LocalOutlineTreeFieldExtension<>(this);
   }
 }

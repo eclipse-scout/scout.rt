@@ -15,6 +15,7 @@ package org.eclipse.scout.rt.testing.platform.runner.parameterized;
  * and the {@link ParameterizedClientTestRunner}. <br/>
  * The test runner will provide this class as input for a test case of a test class.
  */
+@FunctionalInterface
 public interface IScoutTestParameter {
 
   /** Get the name of the parameter. It is used in the test result. */

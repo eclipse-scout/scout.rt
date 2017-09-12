@@ -85,11 +85,11 @@ public final class BinaryResourceUrlUtility {
     if (str == null) {
       return null;
     }
-    Matcher m = BinaryResourceUrlUtility.ICON_REGEX_PATTERN.matcher(String.valueOf(str));
+    Matcher m = ICON_REGEX_PATTERN.matcher(String.valueOf(str));
     @SuppressWarnings("squid:S1149")
     StringBuffer ret = new StringBuffer();
     while (m.find()) {
-      m.appendReplacement(ret, m.group(1) + BinaryResourceUrlUtility.createIconUrl(m.group(2)) + m.group(1));
+      m.appendReplacement(ret, m.group(1) + createIconUrl(m.group(2)) + m.group(1));
     }
     m.appendTail(ret);
     return ret.toString();
@@ -160,11 +160,11 @@ public final class BinaryResourceUrlUtility {
     if (str == null) {
       return null;
     }
-    Matcher m = BinaryResourceUrlUtility.BINARY_RESOURCE_REGEX_PATTERN.matcher(str);
+    Matcher m = BINARY_RESOURCE_REGEX_PATTERN.matcher(str);
     @SuppressWarnings("squid:S1149")
     StringBuffer ret = new StringBuffer();
     while (m.find()) {
-      m.appendReplacement(ret, m.group(1) + BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(jsonAdapter, m.group(2)) + m.group(1));
+      m.appendReplacement(ret, m.group(1) + createDynamicAdapterResourceUrl(jsonAdapter, m.group(2)) + m.group(1));
     }
     m.appendTail(ret);
     return ret.toString();

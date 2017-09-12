@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.server.commons.authentication;
 
 import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,11 +42,11 @@ public class PathInfoFilter {
    * comma separated list of simple patterns with *
    */
   public static Pattern simplePatternListToRegex(String patList) {
-    HashSet<String> patSet = new HashSet<String>();
+    Set<String> patSet = new HashSet<>();
     if (patList != null) {
       for (String s : patList.split("[,\\s]")) {
         s = s.trim();
-        if (s.length() > 0) {
+        if (!s.isEmpty()) {
           if (!s.startsWith("/")) {
             s = "/" + s;
           }

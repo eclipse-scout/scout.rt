@@ -75,7 +75,7 @@ public class AttributeNode extends AbstractComposerNode {
     return CollectionUtility.arrayList(m_values);
   }
 
-  public void setValues(List<? extends Object> values) {
+  public void setValues(List<?> values) {
     m_values = CollectionUtility.arrayList(values);
   }
 

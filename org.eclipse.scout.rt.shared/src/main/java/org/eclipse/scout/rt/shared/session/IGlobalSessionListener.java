@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
  *
  * @since 5.1
  */
+@FunctionalInterface
 @ApplicationScoped
 public interface IGlobalSessionListener extends ISessionListener {
 

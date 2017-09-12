@@ -20,6 +20,7 @@ package org.eclipse.scout.rt.platform;
  * 
  * @since 5.1
  */
+@FunctionalInterface
 public interface IBeanInstanceProducer<T> {
   /**
    * Creates an instance for the given {@link IBean}.

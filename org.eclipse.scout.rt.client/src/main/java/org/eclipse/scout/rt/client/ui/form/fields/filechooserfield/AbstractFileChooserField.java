@@ -145,7 +145,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
     String filename = validValue.getFilename();
     if (StringUtility.hasText(filename)) {
       if (!isShowFileExtension() && filename.indexOf('.') >= 0) {
-        return filename.substring(0, filename.lastIndexOf("."));
+        return filename.substring(0, filename.lastIndexOf('.'));
       }
       return filename;
     }
@@ -181,6 +181,6 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
 
   @Override
   protected IFileChooserFieldExtension<? extends AbstractFileChooserField> createLocalExtension() {
-    return new LocalFileChooserFieldExtension<AbstractFileChooserField>(this);
+    return new LocalFileChooserFieldExtension<>(this);
   }
 }

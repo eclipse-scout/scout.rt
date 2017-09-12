@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.html.IHtmlContent;
 /**
  * Empty node for HTML fragments: Creates a node that may contain other html content, but does not have a tag name.
  */
-public class HtmlContentBuilder extends AbstractExpressionBuilder implements IHtmlContent {
+public class HtmlContentBuilder extends AbstractExpressionBuilder {
 
   private static final long serialVersionUID = 1L;
 
@@ -48,7 +48,7 @@ public class HtmlContentBuilder extends AbstractExpressionBuilder implements IHt
 
   @Override
   public void build() {
-    if (m_texts.size() > 0) {
+    if (!m_texts.isEmpty()) {
       appendText();
     }
   }

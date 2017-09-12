@@ -64,7 +64,7 @@ public abstract class AbstractCheckBoxMenu extends AbstractMenu implements IChec
 
   @Override
   protected ICheckBoxMenuExtension<? extends AbstractCheckBoxMenu> createLocalExtension() {
-    return new LocalCheckBoxMenuExtension<AbstractCheckBoxMenu>(this);
+    return new LocalCheckBoxMenuExtension<>(this);
   }
 
 }

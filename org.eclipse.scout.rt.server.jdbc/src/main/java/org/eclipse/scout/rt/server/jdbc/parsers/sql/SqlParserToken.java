@@ -38,9 +38,6 @@ final class SqlParserToken {
     private List<IToken> m_children;
     private List<Comment> m_comments;
 
-    public AbstractToken() {
-    }
-
     @Override
     public String getText() {
       return m_text;
@@ -54,7 +51,7 @@ final class SqlParserToken {
     @Override
     public void addChild(IToken child) {
       if (m_children == null) {
-        m_children = new ArrayList<IToken>();
+        m_children = new ArrayList<>();
       }
       m_children.add(child);
     }
@@ -62,7 +59,7 @@ final class SqlParserToken {
     @Override
     public void addChildren(List<IToken> children) {
       if (m_children == null) {
-        m_children = new ArrayList<IToken>();
+        m_children = new ArrayList<>();
       }
       m_children.addAll(children);
     }
@@ -75,7 +72,7 @@ final class SqlParserToken {
     @Override
     public void addComment(Comment c) {
       if (m_comments == null) {
-        m_comments = new ArrayList<Comment>();
+        m_comments = new ArrayList<>();
       }
       m_comments.add(c);
     }

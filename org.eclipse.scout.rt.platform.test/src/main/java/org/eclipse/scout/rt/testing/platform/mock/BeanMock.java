@@ -22,7 +22,7 @@ import org.mockito.Mock;
  * Mark a field as a {@link Mock} to be registered in the {@link IBeanManager}
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
+@Target(ElementType.FIELD)
 public @interface BeanMock {
 
 }

@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationAddress;
@@ -54,45 +53,41 @@ public class ClientNotificationDispatcher {
     for (final ClientNotificationMessage message : notifications) {
       RunContexts.copyCurrent()
           .withCorrelationId(message.getCorrelationId())
-          .run(new IRunnable() {
+          .run(() -> {
+            IClientNotificationAddress address = message.getAddress();
+            Serializable notification = message.getNotification();
+            LOG.debug("Processing client notification {}", notification);
 
-            @Override
-            public void run() throws Exception {
-              IClientNotificationAddress address = message.getAddress();
-              Serializable notification = message.getNotification();
-              LOG.debug("Processing client notification {}", notification);
-
-              if (address.isNotifyAllNodes()) {
-                // notify all nodes
-                LOG.debug("Notify all nodes");
-                dispatchForNode(notification, address);
+            if (address.isNotifyAllNodes()) {
+              // notify all nodes
+              LOG.debug("Notify all nodes");
+              dispatchForNode(notification, address);
+            }
+            else if (address.isNotifyAllSessions()) {
+              // notify all sessions
+              LOG.debug("Notify all sessions");
+              for (IClientSession session : notificationService.getAllClientSessions()) {
+                dispatchForSession(session, notification, address);
               }
-              else if (address.isNotifyAllSessions()) {
-                // notify all sessions
-                LOG.debug("Notify all sessions");
-                for (IClientSession session : notificationService.getAllClientSessions()) {
+            }
+            else if (CollectionUtility.hasElements(address.getSessionIds())) {
+              // notify all specified sessions
+              LOG.debug("Notify sessions by session id: {}", address.getSessionIds());
+              for (String sessionId : address.getSessionIds()) {
+                IClientSession session = notificationService.getClientSession(sessionId);
+                if (session == null) {
+                  LOG.warn("received notification for invalid session '{}'.", sessionId);
+                }
+                else {
                   dispatchForSession(session, notification, address);
                 }
               }
-              else if (CollectionUtility.hasElements(address.getSessionIds())) {
-                // notify all specified sessions
-                LOG.debug("Notify sessions by session id: {}", address.getSessionIds());
-                for (String sessionId : address.getSessionIds()) {
-                  IClientSession session = notificationService.getClientSession(sessionId);
-                  if (session == null) {
-                    LOG.warn("received notification for invalid session '{}'.", sessionId);
-                  }
-                  else {
-                    dispatchForSession(session, notification, address);
-                  }
-                }
-              }
-              else if (CollectionUtility.hasElements(address.getUserIds())) {
-                LOG.debug("Notify sessions by user id: {}", address.getUserIds());
-                for (String userId : address.getUserIds()) {
-                  for (IClientSession session : notificationService.getClientSessionsForUser(userId)) {
-                    dispatchForSession(session, notification, address);
-                  }
+            }
+            else if (CollectionUtility.hasElements(address.getUserIds())) {
+              LOG.debug("Notify sessions by user id: {}", address.getUserIds());
+              for (String userId : address.getUserIds()) {
+                for (IClientSession session : notificationService.getClientSessionsForUser(userId)) {
+                  dispatchForSession(session, notification, address);
                 }
               }
             }
@@ -115,13 +110,7 @@ public class ClientNotificationDispatcher {
     }
     else {
       // dispatch async
-      IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          dispatchSync(notification, address);
-        }
-      }, Jobs.newInput()
+      IFuture<Void> future = Jobs.schedule(() -> dispatchSync(notification, address), Jobs.newInput()
           .withRunContext(ClientRunContexts.copyCurrent())
           .withName("Dispatching client notification"));
 
@@ -147,13 +136,7 @@ public class ClientNotificationDispatcher {
       dispatchSync(notification, address);
     }
     else {
-      IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          dispatchSync(notification, address);
-        }
-      }, Jobs.newInput()
+      IFuture<Void> future = Jobs.schedule(() -> dispatchSync(notification, address), Jobs.newInput()
           .withRunContext(ClientRunContexts.empty()
               .withSession(session, true)
               .withCorrelationId(CorrelationId.CURRENT.get()))
@@ -200,7 +183,7 @@ public class ClientNotificationDispatcher {
   }
 
   private class P_NotificationFutureCallback implements IDoneHandler<Void> {
-    private IFuture<Void> m_future;
+    private final IFuture<Void> m_future;
 
     P_NotificationFutureCallback(IFuture<Void> furture) {
       m_future = furture;

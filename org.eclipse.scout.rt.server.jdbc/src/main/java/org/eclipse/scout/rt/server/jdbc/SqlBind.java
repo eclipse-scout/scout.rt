@@ -15,8 +15,8 @@ import java.lang.reflect.Modifier;
 import java.sql.Types;
 
 public class SqlBind {
-  private int m_sqlType;
-  private Object m_value;
+  private final int m_sqlType;
+  private final Object m_value;
 
   public SqlBind(int sqlType, Object value) {
     m_sqlType = sqlType;

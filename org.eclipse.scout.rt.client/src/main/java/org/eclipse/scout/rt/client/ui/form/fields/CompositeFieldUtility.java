@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +35,7 @@ public final class CompositeFieldUtility {
       throw new IllegalArgumentException("field is part of a different form,  '" + f.getForm() + "' instead of '" + compositeField.getForm() + "'");
     }
     fields.add(f);
-    Collections.sort(fields, new OrderedComparator());
+    fields.sort(new OrderedComparator());
     f.setParentFieldInternal(compositeField);
     f.setFormInternal(compositeField.getForm());
   }
@@ -126,21 +125,18 @@ public final class CompositeFieldUtility {
       return formFieldClass.cast(movedField);
     }
     // visit child fields
-    final Holder<T> found = new Holder<T>(formFieldClass);
-    IFormFieldVisitor v = new IFormFieldVisitor() {
-      @Override
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
-        if (field.getClass() == formFieldClass) {
-          found.setValue(formFieldClass.cast(field));
-        }
-        else if (field instanceof ICompositeField) {
-          T movedFieldByClass = getMovedFieldByClass((ICompositeField) field, formFieldClass);
-          if (movedFieldByClass != null) {
-            found.setValue(movedFieldByClass);
-          }
-        }
-        return found.getValue() == null;
+    final Holder<T> found = new Holder<>(formFieldClass);
+    IFormFieldVisitor v = (field, level, fieldIndex) -> {
+      if (field.getClass() == formFieldClass) {
+        found.setValue(formFieldClass.cast(field));
       }
+      else if (field instanceof ICompositeField) {
+        T movedFieldByClass = getMovedFieldByClass((ICompositeField) field, formFieldClass);
+        if (movedFieldByClass != null) {
+          found.setValue(movedFieldByClass);
+        }
+      }
+      return found.getValue() == null;
     };
     compositeField.visitFields(v);
     return found.getValue();
@@ -163,21 +159,18 @@ public final class CompositeFieldUtility {
       return movedField;
     }
     // visit child fields
-    final Holder<T> found = new Holder<T>(type);
-    IFormFieldVisitor v = new IFormFieldVisitor() {
-      @Override
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
-        if (type.isAssignableFrom(field.getClass()) && field.getFieldId().equals(id)) {
-          found.setValue(type.cast(field));
-        }
-        else if (field instanceof ICompositeField) {
-          T movedFieldById = getMovedFieldById((ICompositeField) field, id, type);
-          if (movedFieldById != null) {
-            found.setValue(movedFieldById);
-          }
-        }
-        return found.getValue() == null;
+    final Holder<T> found = new Holder<>(type);
+    IFormFieldVisitor v = (field, level, fieldIndex) -> {
+      if (type.isAssignableFrom(field.getClass()) && field.getFieldId().equals(id)) {
+        found.setValue(type.cast(field));
       }
+      else if (field instanceof ICompositeField) {
+        T movedFieldById = getMovedFieldById((ICompositeField) field, id, type);
+        if (movedFieldById != null) {
+          found.setValue(movedFieldById);
+        }
+      }
+      return found.getValue() == null;
     };
     compositeField.visitFields(v);
     return found.getValue();

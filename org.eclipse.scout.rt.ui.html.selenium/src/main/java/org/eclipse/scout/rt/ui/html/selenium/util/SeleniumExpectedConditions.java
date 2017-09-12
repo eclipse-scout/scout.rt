@@ -14,6 +14,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.ui.html.selenium.util.TextComparator.Contains;
+import org.eclipse.scout.rt.ui.html.selenium.util.TextComparator.Equals;
+import org.eclipse.scout.rt.ui.html.selenium.util.TextComparator.EqualsIgnoreCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -31,20 +34,16 @@ public final class SeleniumExpectedConditions {
   }
 
   /**
-   * Same as {@link ExpectedConditions#elementToBeClickable(org.openqa.selenium.By)} but with a parent element which is
-   * also resolved lazy.
+   * Same as {@link ExpectedConditions#elementToBeClickable(By)} but with a parent element which is also resolved lazy.
    */
   public static ExpectedCondition<WebElement> childElementToBeClickable(final WebElement parent, final By locator) {
-    return new ExpectedCondition<WebElement>() {
-      @Override
-      public WebElement apply(WebDriver driver) {
-        List<WebElement> elements = parent.findElements(locator);
-        if (elements.size() == 1) {
-          return ExpectedConditions.elementToBeClickable(elements.get(0)).apply(driver);
-        }
-        else {
-          return null;
-        }
+    return driver -> {
+      List<WebElement> elements = parent.findElements(locator);
+      if (elements.size() == 1) {
+        return ExpectedConditions.elementToBeClickable(elements.get(0)).apply(driver);
+      }
+      else {
+        return null;
       }
     };
   }
@@ -78,15 +77,12 @@ public final class SeleniumExpectedConditions {
    * @return
    */
   public static ExpectedCondition<WebElement> radioButtonToBeChecked(final WebElement radioButtonGroup, final String radioButtonText) {
-    return new ExpectedCondition<WebElement>() {
-      @Override
-      public WebElement apply(WebDriver driver) {
-        List<WebElement> elements = radioButtonGroup.findElements(By.cssSelector(".field.checked > .label"));
-        if (elements.size() == 1) {
-          return elements.get(0);
-        }
-        return null;
+    return driver -> {
+      List<WebElement> elements = radioButtonGroup.findElements(By.cssSelector(".field.checked > .label"));
+      if (elements.size() == 1) {
+        return elements.get(0);
       }
+      return null;
     };
   }
 
@@ -94,16 +90,13 @@ public final class SeleniumExpectedConditions {
    * Used to wait until a check-box inside the given field has the requested checked state (checked or unchecked).
    */
   public static ExpectedCondition<WebElement> checkBoxToBeChecked(final WebElement checkBoxField, final boolean checked) {
-    return new ExpectedCondition<WebElement>() {
-      @Override
-      public WebElement apply(WebDriver driver) {
-        String selector = checked ? ".checked" : ":not(.checked)";
-        List<WebElement> elements = checkBoxField.findElements(By.cssSelector(".check-box" + selector));
-        if (elements.size() == 1) {
-          return elements.get(0);
-        }
-        return null;
+    return driver -> {
+      String selector = checked ? ".checked" : ":not(.checked)";
+      List<WebElement> elements = checkBoxField.findElements(By.cssSelector(".check-box" + selector));
+      if (elements.size() == 1) {
+        return elements.get(0);
       }
+      return null;
     };
   }
 
@@ -112,7 +105,7 @@ public final class SeleniumExpectedConditions {
    * "class" of an element should contain the string "error-status".
    */
   public static ExpectedCondition<Boolean> attributeToContainValue(final WebElement element, final String attributeName, final String value) {
-    return attributeToCompareValue(new TextComparator.Contains(), element, attributeName, value);
+    return attributeToCompareValue(new Contains(), element, attributeName, value);
   }
 
   /**
@@ -120,7 +113,7 @@ public final class SeleniumExpectedConditions {
    * "class" must be equals "error-status".
    */
   public static ExpectedCondition<Boolean> attributeToEqualsValue(final WebElement element, final String attributeName, final String value) {
-    return attributeToCompareValue(new TextComparator.Equals(), element, attributeName, value);
+    return attributeToCompareValue(new Equals(), element, attributeName, value);
   }
 
   /**
@@ -128,7 +121,7 @@ public final class SeleniumExpectedConditions {
    * the attribute "class" must be equals "error-status".
    */
   public static ExpectedCondition<Boolean> attributeToEqualsIgnoreCaseValue(final WebElement element, final String attributeName, final String value) {
-    return attributeToCompareValue(new TextComparator.EqualsIgnoreCase(), element, attributeName, value);
+    return attributeToCompareValue(new EqualsIgnoreCase(), element, attributeName, value);
   }
 
   private static ExpectedCondition<Boolean> attributeToCompareValue(final TextComparator comparator, final WebElement element, final String attributeName, final String value) {

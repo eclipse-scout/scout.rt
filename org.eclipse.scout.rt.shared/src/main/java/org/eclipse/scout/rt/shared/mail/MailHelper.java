@@ -30,7 +30,7 @@ import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.activation.MimetypesFileTypeMap;
 import javax.mail.BodyPart;
-import javax.mail.Message;
+import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
@@ -94,7 +94,7 @@ public class MailHelper {
    * @return
    */
   public List<Part> getBodyParts(Part message) {
-    List<Part> bodyCollector = new ArrayList<Part>();
+    List<Part> bodyCollector = new ArrayList<>();
     collectMailParts(message, bodyCollector, null, null);
     return bodyCollector;
   }
@@ -107,7 +107,7 @@ public class MailHelper {
    * @return
    */
   public List<Part> getAttachmentParts(Part message) {
-    List<Part> attachmentCollector = new ArrayList<Part>();
+    List<Part> attachmentCollector = new ArrayList<>();
     collectMailParts(message, null, attachmentCollector, null);
     return attachmentCollector;
   }
@@ -396,13 +396,13 @@ public class MailHelper {
         m.setSubject(mailMessage.getSubject(), StandardCharsets.UTF_8.name());
       }
       if (!CollectionUtility.isEmpty(mailMessage.getToRecipients())) {
-        m.setRecipients(Message.RecipientType.TO, createInternetAddresses(mailMessage.getToRecipients()));
+        m.setRecipients(RecipientType.TO, createInternetAddresses(mailMessage.getToRecipients()));
       }
       if (!CollectionUtility.isEmpty(mailMessage.getCcRecipients())) {
-        m.setRecipients(Message.RecipientType.CC, createInternetAddresses(mailMessage.getCcRecipients()));
+        m.setRecipients(RecipientType.CC, createInternetAddresses(mailMessage.getCcRecipients()));
       }
       if (!CollectionUtility.isEmpty(mailMessage.getBccRecipients())) {
-        m.setRecipients(Message.RecipientType.BCC, createInternetAddresses(mailMessage.getBccRecipients()));
+        m.setRecipients(RecipientType.BCC, createInternetAddresses(mailMessage.getBccRecipients()));
       }
       return m;
     }
@@ -492,10 +492,7 @@ public class MailHelper {
       }
       msg.saveChanges();
     }
-    catch (MessagingException e) {
-      throw new ProcessingException("Failed to add attachment to existing mime message", e);
-    }
-    catch (IOException e) {
+    catch (MessagingException | IOException e) {
       throw new ProcessingException("Failed to add attachment to existing mime message", e);
     }
   }
@@ -528,10 +525,7 @@ public class MailHelper {
       }
       msg.saveChanges();
     }
-    catch (MessagingException e) {
-      throw new ProcessingException("Failed to add attachment to existing mime message", e);
-    }
-    catch (IOException e) {
+    catch (MessagingException | IOException e) {
       throw new ProcessingException("Failed to add attachment to existing mime message", e);
     }
   }
@@ -673,13 +667,13 @@ public class MailHelper {
    * javax.mime.Message.
    * <p>
    * Array instead of list is returned in order to directly used to result with
-   * {@link MimeMessage#setRecipients(javax.mail.Message.RecipientType, javax.mail.Address[])}.
+   * {@link MimeMessage#setRecipients(RecipientType, javax.mail.Address[])}.
    */
   protected InternetAddress[] createInternetAddresses(List<MailParticipant> participants) {
     if (CollectionUtility.isEmpty(participants)) {
       return null;
     }
-    ArrayList<InternetAddress> addrList = new ArrayList<InternetAddress>();
+    ArrayList<InternetAddress> addrList = new ArrayList<>();
     for (MailParticipant participant : participants) {
       addrList.add(createInternetAddress(participant));
     }

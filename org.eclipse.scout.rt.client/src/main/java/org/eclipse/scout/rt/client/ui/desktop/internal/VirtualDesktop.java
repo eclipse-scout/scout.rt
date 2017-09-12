@@ -67,8 +67,8 @@ public class VirtualDesktop implements IDesktop {
 
   public VirtualDesktop() {
     m_listenerList = new EventListenerList();
-    m_propertyChangeListenerMap = new HashMap<String, EventListenerList>();
-    m_dataChangeListenerMap = new HashMap<Object, EventListenerList>();
+    m_propertyChangeListenerMap = new HashMap<>();
+    m_dataChangeListenerMap = new HashMap<>();
   }
 
   public DesktopListener[] getDesktopListeners() {
@@ -85,21 +85,13 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void addPropertyChangeListener(PropertyChangeListener listener) {
-    EventListenerList list = m_propertyChangeListenerMap.get(null);
-    if (list == null) {
-      list = new EventListenerList();
-      m_propertyChangeListenerMap.put(null, list);
-    }
+    EventListenerList list = m_propertyChangeListenerMap.computeIfAbsent(null, k -> new EventListenerList());
     list.add(PropertyChangeListener.class, listener);
   }
 
   @Override
   public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-    EventListenerList list = m_propertyChangeListenerMap.get(propertyName);
-    if (list == null) {
-      list = new EventListenerList();
-      m_propertyChangeListenerMap.put(propertyName, list);
-    }
+    EventListenerList list = m_propertyChangeListenerMap.computeIfAbsent(propertyName, k -> new EventListenerList());
     list.add(PropertyChangeListener.class, listener);
   }
 
@@ -143,21 +135,13 @@ public class VirtualDesktop implements IDesktop {
   @Override
   public void addDataChangeListener(DataChangeListener listener, Object... dataTypes) {
     if (dataTypes == null || dataTypes.length == 0) {
-      EventListenerList list = m_dataChangeListenerMap.get(null);
-      if (list == null) {
-        list = new EventListenerList();
-        m_dataChangeListenerMap.put(null, list);
-      }
+      EventListenerList list = m_dataChangeListenerMap.computeIfAbsent(null, k -> new EventListenerList());
       list.add(DataChangeListener.class, listener);
     }
     else {
       for (Object dataType : dataTypes) {
         if (dataType != null) {
-          EventListenerList list = m_dataChangeListenerMap.get(dataType);
-          if (list == null) {
-            list = new EventListenerList();
-            m_dataChangeListenerMap.put(dataType, list);
-          }
+          EventListenerList list = m_dataChangeListenerMap.computeIfAbsent(dataType, k -> new EventListenerList());
           list.add(DataChangeListener.class, listener);
         }
       }

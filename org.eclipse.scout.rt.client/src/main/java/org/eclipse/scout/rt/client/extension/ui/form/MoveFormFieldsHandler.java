@@ -35,7 +35,7 @@ public class MoveFormFieldsHandler {
   public MoveFormFieldsHandler(IForm form) {
     m_form = form;
     m_extensionRegistry = BEANS.get(IInternalExtensionRegistry.class);
-    m_moveDescriptors = new HashSet<MoveDescriptor<IFormField>>();
+    m_moveDescriptors = new HashSet<>();
   }
 
   public void moveFields() {

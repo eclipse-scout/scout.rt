@@ -53,7 +53,7 @@ public class DefaultAuthToken {
    *         if {@link #isEnabled()} returns false.
    */
   public static DefaultAuthToken create() {
-    if (!DefaultAuthToken.isEnabled()) {
+    if (!isEnabled()) {
       return null;
     }
 

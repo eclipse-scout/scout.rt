@@ -215,7 +215,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
         return new SqlBind(Types.TIMESTAMP, new Timestamp(((Calendar) o).getTimeInMillis()));
       }
     }
-    else if (java.util.Date.class.isAssignableFrom(c)) {
+    else if (Date.class.isAssignableFrom(c)) {
       if (o == null) {
         return new SqlBind(Types.TIMESTAMP, o);
       }
@@ -435,14 +435,14 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
       case Types.SMALLINT:
       case Types.INTEGER:
       case Types.TINYINT: {
-        o = Long.valueOf(rs.getLong(jdbcBindIndex));
+        o = rs.getLong(jdbcBindIndex);
         break;
       }
       // Double
       case Types.DOUBLE:
       case Types.FLOAT:
       case Types.REAL: {
-        o = new Double(rs.getDouble(jdbcBindIndex));
+        o = rs.getDouble(jdbcBindIndex);
         break;
       }
       // String
@@ -549,7 +549,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
     else if (Calendar.class.isAssignableFrom(c)) {
       jdbcType = Types.TIMESTAMP;
     }
-    else if (java.util.Date.class.isAssignableFrom(c)) {
+    else if (Date.class.isAssignableFrom(c)) {
       jdbcType = Types.TIMESTAMP;
     }
     else if (Double.class.isAssignableFrom(c)) {

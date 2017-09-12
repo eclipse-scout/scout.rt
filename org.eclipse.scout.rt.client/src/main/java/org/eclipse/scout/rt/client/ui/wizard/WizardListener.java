@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.wizard;
 
 import java.util.EventListener;
 
+@FunctionalInterface
 public interface WizardListener extends EventListener {
 
   void wizardChanged(WizardEvent e);

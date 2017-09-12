@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.ui.html.json.AbstractEventFilter;
 
 public class TreeEventFilter extends AbstractEventFilter<TreeEvent, TreeEventFilterCondition> {
 
-  private JsonTree<? extends ITree> m_jsonTree;
+  private final JsonTree<? extends ITree> m_jsonTree;
 
   public TreeEventFilter(JsonTree<? extends ITree> jsonTree) {
     m_jsonTree = jsonTree;
@@ -47,7 +47,7 @@ public class TreeEventFilter extends AbstractEventFilter<TreeEvent, TreeEventFil
         if (condition.checkNodes()) {
           Collection<ITreeNode> nodes = new ArrayList<>(event.getNodes());
           nodes.removeAll(condition.getNodes());
-          if (nodes.size() == 0) {
+          if (nodes.isEmpty()) {
             // Ignore event if no nodes remain (or if the event contained no nodes at all)
             return null;
           }

@@ -121,7 +121,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
         }
 
         public List<IForm> getInvalidForms() {
-          LinkedList<IForm> invalidForms = new LinkedList<IForm>();
+          LinkedList<IForm> invalidForms = new LinkedList<>();
           for (IForm f : getValue()) {
             try {
               f.validateForm();
@@ -227,7 +227,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
     @Override
     protected boolean execValidate() {
       List<IForm> invalidForms = getOpenFormsField().getInvalidForms();
-      if (invalidForms.size() > 0) {
+      if (!invalidForms.isEmpty()) {
         StringBuilder msg = new StringBuilder(TEXTS.get("FormsCannotBeSaved"));
         msg.append("\n\n");
         for (IForm f : invalidForms) {
@@ -262,10 +262,10 @@ public class UnsavedFormChangesForm extends AbstractForm {
 
     @Override
     protected List<? extends ILookupRow<IForm>> execCreateLookupRows() {
-      List<ILookupRow<IForm>> formRows = new ArrayList<ILookupRow<IForm>>();
+      List<ILookupRow<IForm>> formRows = new ArrayList<>();
       for (IForm f : m_unsavedForms) {
         String text = getFormDisplayName(f);
-        formRows.add(new LookupRow<IForm>(f, text).withTooltipText(text));
+        formRows.add(new LookupRow<>(f, text).withTooltipText(text));
       }
       return formRows;
     }

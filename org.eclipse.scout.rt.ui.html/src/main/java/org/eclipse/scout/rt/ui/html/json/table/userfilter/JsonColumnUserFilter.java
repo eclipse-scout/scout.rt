@@ -48,7 +48,7 @@ public class JsonColumnUserFilter<T extends ColumnUserFilterState> extends JsonT
 
   protected Set<Object> createSelectedValuesFromJson(JSONObject json) {
     JSONArray jsonSelectedValues = json.getJSONArray("selectedValues");
-    Set<Object> selectedValues = new HashSet<Object>();
+    Set<Object> selectedValues = new HashSet<>();
     for (int i = 0; i < jsonSelectedValues.length(); i++) {
       if (jsonSelectedValues.isNull(i)) {
         selectedValues.add(null);

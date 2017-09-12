@@ -56,7 +56,7 @@ public abstract class AbstractBigDecimalColumn extends AbstractDecimalColumn<Big
       validValue = (BigDecimal) rawValue;
     }
     else if (rawValue instanceof Long) {
-      validValue = new BigDecimal(((Long) rawValue).toString());
+      validValue = new BigDecimal(rawValue.toString());
     }
     else if (rawValue instanceof Double) {
       validValue = BigDecimal.valueOf((Double) rawValue);
@@ -82,7 +82,7 @@ public abstract class AbstractBigDecimalColumn extends AbstractDecimalColumn<Big
 
   @Override
   protected IBigDecimalColumnExtension<? extends AbstractBigDecimalColumn> createLocalExtension() {
-    return new LocalBigDecimalColumnExtension<AbstractBigDecimalColumn>(this);
+    return new LocalBigDecimalColumnExtension<>(this);
   }
 
 }

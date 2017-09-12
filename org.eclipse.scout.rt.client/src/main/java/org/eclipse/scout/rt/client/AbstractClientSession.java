@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Semaphore;
@@ -109,7 +110,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     m_stateLock = new Object();
     m_userAgent = UserAgent.get();
     m_subject = Subject.getSubject(AccessController.getContext());
-    m_objectExtensions = new ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>>(this, true);
+    m_objectExtensions = new ObjectExtensions<>(this, true);
     m_sharedVariableMap = new SharedVariableMap();
 
     setLocale(NlsLocale.get());
@@ -130,16 +131,11 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   protected IClientSessionExtension<? extends AbstractClientSession> createLocalExtension() {
-    return new LocalClientSessionExtension<AbstractClientSession>(this);
+    return new LocalClientSessionExtension<>(this);
   }
 
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
-      @Override
-      public void run() {
-        initConfig();
-      }
-    });
+    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -351,7 +347,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
       for (DesktopListener listener : m_virtualDesktop.getDesktopListeners()) {
         m_desktop.addDesktopListener(listener);
       }
-      for (Map.Entry<String, EventListenerList> e : m_virtualDesktop.getPropertyChangeListenerMap().entrySet()) {
+      for (Entry<String, EventListenerList> e : m_virtualDesktop.getPropertyChangeListenerMap().entrySet()) {
         String propName = e.getKey();
         EventListenerList list = e.getValue();
         if (propName == null) {
@@ -365,7 +361,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
           }
         }
       }
-      for (Map.Entry<Object, EventListenerList> e : m_virtualDesktop.getDataChangeListenerMap().entrySet()) {
+      for (Entry<Object, EventListenerList> e : m_virtualDesktop.getDataChangeListenerMap().entrySet()) {
         Object dataType = e.getKey();
         EventListenerList list = e.getValue();
         if (dataType == null) {

@@ -10,13 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.wizard;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -95,11 +94,11 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   public AbstractWizard(boolean callInitializer) {
     m_listenerList = new EventListenerList();
     m_changingLock = new OptimisticLock();
-    m_accumulatedEvents = new ArrayList<WizardEvent>(3);
-    m_availableStepList = new ArrayList<IWizardStep<? extends IForm>>(0);
-    m_stepList = new ArrayList<IWizardStep<? extends IForm>>(0);
+    m_accumulatedEvents = new ArrayList<>(3);
+    m_availableStepList = new ArrayList<>(0);
+    m_stepList = new ArrayList<>(0);
     m_blockingCondition = Jobs.newBlockingCondition(false);
-    m_objectExtensions = new ObjectExtensions<AbstractWizard, IWizardExtension<? extends AbstractWizard>>(this, true);
+    m_objectExtensions = new ObjectExtensions<>(this, true);
     if (callInitializer) {
       callInitializer();
     }
@@ -148,7 +147,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IWizardStep>> filtered = ConfigurationUtility.filterClasses(dca, IWizardStep.class);
 
-    List<Class<? extends IWizardStep<? extends IForm>>> result = new ArrayList<Class<? extends IWizardStep<? extends IForm>>>(filtered.size());
+    List<Class<? extends IWizardStep<? extends IForm>>> result = new ArrayList<>(filtered.size());
     for (Class<? extends IWizardStep> wizardStep : filtered) {
       result.add((Class<? extends IWizardStep<? extends IForm>>) wizardStep);
     }
@@ -320,12 +319,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
-      @Override
-      public void run() {
-        initConfig();
-      }
-    });
+    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
   @SuppressWarnings({"boxing", "unchecked"})
@@ -343,55 +337,46 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     interceptDecorateContainerForm();
 
     // Run the initialization on behalf of the container form.
-    runWithinContainerForm(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        // steps
-        List<Class<? extends IWizardStep<? extends IForm>>> configuredAvailableSteps = getConfiguredAvailableSteps();
-        List<IWizardStep> contributedSteps = m_contributionHolder.getContributionsByClass(IWizardStep.class);
-        OrderedCollection<IWizardStep<? extends IForm>> steps = new OrderedCollection<IWizardStep<? extends IForm>>();
-        for (Class<? extends IWizardStep<? extends IForm>> element : configuredAvailableSteps) {
-          IWizardStep<? extends IForm> step = ConfigurationUtility.newInnerInstance(AbstractWizard.this, element);
-          steps.addOrdered(step);
-        }
-        for (IWizardStep step : contributedSteps) {
-          steps.addOrdered(step);
-        }
-        injectStepsInternal(steps);
-        ExtensionUtility.moveModelObjects(steps);
-        setAvailableSteps(steps.getOrderedList());
-
-        // add listener to listen on any field in active form
-        m_anyFieldChangeListener = new PropertyChangeListener() {
-          @Override
-          public void propertyChange(PropertyChangeEvent e) {
-            try {
-              interceptAnyFieldChanged((IFormField) e.getSource());
-            }
-            catch (RuntimeException | PlatformError t) {
-              LOG.error("{} {}={}", e.getSource(), e.getPropertyName(), e.getNewValue(), t);
-            }
-          }
-        };
-        propertySupport.addPropertyChangeListener(PROP_WIZARD_FORM, new PropertyChangeListener() {
-          @Override
-          public void propertyChange(PropertyChangeEvent e) {
-            IForm oldForm = (IForm) e.getOldValue();
-            IForm newForm = (IForm) e.getNewValue();
-            if (oldForm != null) {
-              oldForm.getRootGroupBox().removeSubtreePropertyChangeListener(IValueField.PROP_VALUE, m_anyFieldChangeListener);
-            }
-            if (newForm != null) {
-              newForm.getRootGroupBox().addSubtreePropertyChangeListener(IValueField.PROP_VALUE, m_anyFieldChangeListener);
-            }
-          }
-        });
+    runWithinContainerForm(() -> {
+      // steps
+      List<Class<? extends IWizardStep<? extends IForm>>> configuredAvailableSteps = getConfiguredAvailableSteps();
+      List<IWizardStep> contributedSteps = m_contributionHolder.getContributionsByClass(IWizardStep.class);
+      OrderedCollection<IWizardStep<? extends IForm>> steps = new OrderedCollection<>();
+      for (Class<? extends IWizardStep<? extends IForm>> element : configuredAvailableSteps) {
+        IWizardStep<? extends IForm> step = ConfigurationUtility.newInnerInstance(AbstractWizard.this, element);
+        steps.addOrdered(step);
       }
+      for (IWizardStep step : contributedSteps) {
+        steps.addOrdered(step);
+      }
+      injectStepsInternal(steps);
+      ExtensionUtility.moveModelObjects(steps);
+      setAvailableSteps(steps.getOrderedList());
+
+      // add listener to listen on any field in active form
+      m_anyFieldChangeListener = e -> {
+        try {
+          interceptAnyFieldChanged((IFormField) e.getSource());
+        }
+        catch (RuntimeException | PlatformError t) {
+          LOG.error("{} {}={}", e.getSource(), e.getPropertyName(), e.getNewValue(), t);
+        }
+      };
+      propertySupport.addPropertyChangeListener(PROP_WIZARD_FORM, e -> {
+        IForm oldForm = (IForm) e.getOldValue();
+        IForm newForm = (IForm) e.getNewValue();
+        if (oldForm != null) {
+          oldForm.getRootGroupBox().removeSubtreePropertyChangeListener(IValueField.PROP_VALUE, m_anyFieldChangeListener);
+        }
+        if (newForm != null) {
+          newForm.getRootGroupBox().addSubtreePropertyChangeListener(IValueField.PROP_VALUE, m_anyFieldChangeListener);
+        }
+      });
     });
   }
 
   protected IWizardExtension<? extends AbstractWizard> createLocalExtension() {
-    return new LocalWizardExtension<AbstractWizard>(this);
+    return new LocalWizardExtension<>(this);
   }
 
   @Override
@@ -440,12 +425,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   private void fireWizardEvent(WizardEvent e) {
     if (m_changingLock.isAcquired()) {
       // coalesce event with existing event list
-      for (Iterator<WizardEvent> it = m_accumulatedEvents.iterator(); it.hasNext();) {
-        WizardEvent existingEvent = it.next();
-        if (existingEvent.getType() == e.getType()) {
-          it.remove();
-        }
-      }
+      m_accumulatedEvents.removeIf(existingEvent -> existingEvent.getType() == e.getType());
       m_accumulatedEvents.add(e);
     }
     else {
@@ -488,7 +468,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
       if (m_changingLock.isReleased()) {
         // now send all accumulated events
         List<WizardEvent> list = m_accumulatedEvents;
-        m_accumulatedEvents = new ArrayList<WizardEvent>(3);
+        m_accumulatedEvents = new ArrayList<>(3);
         for (WizardEvent e : list) {
           fireWizardEvent(e);
         }
@@ -576,12 +556,12 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
 
   @Override
   public List<IWizardStep<? extends IForm>> getAvailableSteps() {
-    return CollectionUtility.<IWizardStep<? extends IForm>> arrayList(m_availableStepList);
+    return CollectionUtility.arrayList(m_availableStepList);
   }
 
   @Override
   public void setAvailableSteps(List<IWizardStep<? extends IForm>> steps) {
-    m_availableStepList = new ArrayList<IWizardStep<? extends IForm>>();
+    m_availableStepList = new ArrayList<>();
     if (steps != null) {
       for (IWizardStep<? extends IForm> step : steps) {
         if (step != null) {
@@ -593,7 +573,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
 
   @Override
   public List<IWizardStep<? extends IForm>> getSteps() {
-    return CollectionUtility.<IWizardStep<? extends IForm>> arrayList(m_stepList);
+    return CollectionUtility.arrayList(m_stepList);
   }
 
   @Override
@@ -616,7 +596,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         }
       }
       // add new
-      m_stepList = new ArrayList<IWizardStep<? extends IForm>>();
+      m_stepList = new ArrayList<>();
       if (steps != null) {
         for (IWizardStep<? extends IForm> step : steps) {
           if (step != null) {
@@ -660,7 +640,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
       steps = getStepSpan(m_activeStep, false, targetStep, true);
     }
     else {
-      steps = Collections.<IWizardStep<? extends IForm>> singletonList(targetStep);
+      steps = Collections.singletonList(targetStep);
     }
 
     try {
@@ -746,7 +726,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
 
   @Override
   public List<IWizardStep<? extends IForm>> getStepSpan(IWizardStep<? extends IForm> from, boolean includeFrom, IWizardStep<? extends IForm> to, boolean includeTo) {
-    ArrayList<IWizardStep<? extends IForm>> list = new ArrayList<IWizardStep<? extends IForm>>();
+    List<IWizardStep<? extends IForm>> list = new ArrayList<>();
     if (includeFrom) {
       list.add(from);
     }
@@ -824,7 +804,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
 
   public List<IWizardStep<? extends IForm>> getHistory() {
     int index = getStepIndex(getActiveStep());
-    if (m_stepList.size() > 0 && index >= 0) {
+    if (!m_stepList.isEmpty() && index >= 0) {
       return CollectionUtility.arrayList(m_stepList.subList(0, Math.min(index, m_stepList.size())));
     }
     else {
@@ -834,7 +814,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
 
   public List<IWizardStep<? extends IForm>> getExpectedFuture() {
     int index = getStepIndex(getActiveStep());
-    if (m_stepList.size() > 0 && index < m_stepList.size()) {
+    if (!m_stepList.isEmpty() && index < m_stepList.size()) {
       return CollectionUtility.arrayList(m_stepList.subList(Math.max(index + 1, 0), m_stepList.size()));
     }
     else {
@@ -853,15 +833,12 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     setCloseTypeInternal(CloseType.Unknown);
 
     // Run the initialization on behalf of this Form.
-    runWithinContainerForm(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        interceptStart();
-        if (m_containerForm.isFormStartable()) {
-          m_containerForm.startWizard();
-        }
-        interceptPostStart();
+    runWithinContainerForm(() -> {
+      interceptStart();
+      if (m_containerForm.isFormStartable()) {
+        m_containerForm.startWizard();
       }
+      interceptPostStart();
     });
   }
 
@@ -878,7 +855,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         LOG.error("Unexpected error while closing container form: {}", m_containerForm, e);
       }
       // dispose all steps
-      HashSet<IWizardStep<? extends IForm>> set = new HashSet<IWizardStep<? extends IForm>>();
+      Collection<IWizardStep<? extends IForm>> set = new HashSet<>();
       set.addAll(getAvailableSteps());
       set.addAll(getSteps());
       for (IWizardStep<? extends IForm> step : set) {
@@ -939,12 +916,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Override
   public void doNextStep() {
     if (isOpen()) {
-      runWithinContainerForm(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          interceptNextStep();
-        }
-      });
+      runWithinContainerForm(this::interceptNextStep);
     }
   }
 
@@ -954,12 +926,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Override
   public void doPreviousStep() {
     if (isOpen()) {
-      runWithinContainerForm(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          interceptPreviousStep();
-        }
-      });
+      runWithinContainerForm(this::interceptPreviousStep);
     }
   }
 
@@ -969,12 +936,9 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Override
   public void doFinish() {
     if (isOpen()) {
-      runWithinContainerForm(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          interceptFinish();
-          setCloseTypeInternal(CloseType.Finished);
-        }
+      runWithinContainerForm(() -> {
+        interceptFinish();
+        setCloseTypeInternal(CloseType.Finished);
       });
     }
   }
@@ -985,12 +949,9 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Override
   public void doCancel() {
     if (isOpen()) {
-      runWithinContainerForm(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          interceptCancel();
-          setCloseTypeInternal(CloseType.Cancelled);
-        }
+      runWithinContainerForm(() -> {
+        interceptCancel();
+        setCloseTypeInternal(CloseType.Cancelled);
       });
     }
   }
@@ -1001,12 +962,9 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Override
   public void doSuspend() {
     if (isOpen()) {
-      runWithinContainerForm(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          interceptSuspend();
-          setCloseTypeInternal(CloseType.Suspended);
-        }
+      runWithinContainerForm(() -> {
+        interceptSuspend();
+        setCloseTypeInternal(CloseType.Suspended);
       });
     }
   }
@@ -1016,35 +974,20 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    */
   @Override
   public void doReset() {
-    runWithinContainerForm(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        interceptReset();
-      }
-    });
+    runWithinContainerForm(this::interceptReset);
   }
 
   @Override
   public void doAppLinkAction(final String ref) {
     if (isOpen()) {
-      runWithinContainerForm(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          interceptAppLinkAction(ref);
-        }
-      });
+      runWithinContainerForm(() -> interceptAppLinkAction(ref));
     }
   }
 
   @Override
   public void doStepAction(final IWizardStep<? extends IForm> step) {
     if (isOpen()) {
-      runWithinContainerForm(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          interceptStepAction(step);
-        }
-      });
+      runWithinContainerForm(() -> interceptStepAction(step));
     }
   }
 

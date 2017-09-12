@@ -7,6 +7,7 @@ import java.io.Serializable;
  *
  * @since 6.0.0
  */
+@FunctionalInterface
 public interface IUiEngineType extends Serializable {
 
   /**

@@ -10,9 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.basic;
 
+import java.io.Serializable;
 import java.util.StringTokenizer;
 
-public class FontSpec implements java.io.Serializable {
+public class FontSpec implements Serializable {
   private static final long serialVersionUID = 1L;
   public static final int STYLE_PLAIN = 0x00;
   public static final int STYLE_BOLD = 0x01;
@@ -73,7 +74,7 @@ public class FontSpec implements java.io.Serializable {
    * Sample: Dialog-PLAIN-12
    */
   public static FontSpec parse(String pattern) {
-    if (pattern == null || pattern.length() == 0) {
+    if (pattern == null || pattern.isEmpty()) {
       return null;
     }
     else {
