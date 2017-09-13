@@ -24,7 +24,7 @@ scout.FormFieldLayout = function(formField) {
 scout.inherits(scout.FormFieldLayout, scout.AbstractLayout);
 
 // Minimum field with to normal state, for smaller widths the "compact" style is applied.
-scout.FormFieldLayout.MIN_FIELD_WIDTH = 50;
+scout.FormFieldLayout.MIN_FIELD_WIDTH = 61;
 
 scout.FormFieldLayout.prototype.layout = function($container) {
   var containerPadding, fieldOffset, fieldSize, fieldBounds, htmlField, labelHasFieldWidth, top, bottom, left, right,
@@ -117,7 +117,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     } else {
       scout.graphics.setBounds(formField.$fieldContainer, fieldBounds);
     }
-    formField.$field.toggleClass('compact', fieldBounds.width < scout.FormFieldLayout.MIN_FIELD_WIDTH);
+    formField.$field.toggleClass('compact', fieldBounds.width <= scout.FormFieldLayout.MIN_FIELD_WIDTH);
 
     if (labelHasFieldWidth) {
       var fieldWidth = fieldSize.add(fieldMargins).width - formField.$label.cssMarginX();
