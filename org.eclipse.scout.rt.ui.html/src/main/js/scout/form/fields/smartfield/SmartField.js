@@ -829,7 +829,7 @@ scout.SmartField.prototype._onFieldBlur = function(event) {
   if (this.embedded) {
     return;
   }
-  scout.SmartField2.parent.prototype._onFieldBlur.call(this, event);
+  scout.SmartField.parent.prototype._onFieldBlur.call(this, event);
   this.closePopup();
 };
 
