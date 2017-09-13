@@ -112,10 +112,22 @@ public class JsonSplitBox<SPLIT_BOX extends ISplitBox> extends JsonFormField<SPL
         return getModel().isFieldCollapsed();
       }
     });
-    putJsonProperty(new JsonProperty<ISplitBox>(ISplitBox.PROP_COLLAPSE_KEY_STROKE, model) {
+    putJsonProperty(new JsonProperty<ISplitBox>(ISplitBox.PROP_TOGGLE_COLLAPSE_KEY_STROKE, model) {
       @Override
       protected String modelValue() {
-        return getModel().getCollapseKeyStroke();
+        return getModel().getToggleCollapseKeyStroke();
+      }
+    });
+    putJsonProperty(new JsonProperty<ISplitBox>(ISplitBox.PROP_FIRST_COLLAPSE_KEY_STROKE, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getFirstCollapseKeyStroke();
+      }
+    });
+    putJsonProperty(new JsonProperty<ISplitBox>(ISplitBox.PROP_SECOND_COLLAPSE_KEY_STROKE, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getSecondCollapseKeyStroke();
       }
     });
     putJsonProperty(new JsonProperty<ISplitBox>(ISplitBox.PROP_FIELD_MINIMIZED, model) {

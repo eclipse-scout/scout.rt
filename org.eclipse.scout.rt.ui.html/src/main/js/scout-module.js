@@ -491,6 +491,8 @@
   __include("scout/form/fields/splitbox/SplitBox.js");
   __include("scout/form/fields/splitbox/SplitBoxAdapter.js");
   __include("scout/form/fields/splitbox/SplitBoxCollapseKeyStroke.js");
+  __include("scout/form/fields/splitbox/SplitBoxFirstCollapseKeyStroke.js");
+  __include("scout/form/fields/splitbox/SplitBoxSecondCollapseKeyStroke.js");
   __include("scout/form/fields/splitbox/SplitBoxLayout.js");
   __include("scout/form/fields/stringfield/StringField.js");
   __include("scout/form/fields/stringfield/StringFieldAdapter.js");

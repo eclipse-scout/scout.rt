@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 /**
  * <h3>AbstractSplitBox</h3> ...
@@ -41,8 +42,6 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
   public AbstractSplitBox(boolean callInitializer) {
     super(callInitializer);
   }
-
-  // configuration
 
   @Override
   protected boolean getConfiguredGridUseUiHeight() {
@@ -108,8 +107,12 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     return false;
   }
 
+  /**
+   * @deprecated use {@link #getConfiguredToogleCollapseKeyStroke()} instead
+   */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(390)
+  @Deprecated
   protected String getConfiguredCollapseKeyStroke() {
     return null;
   }
@@ -118,6 +121,24 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
   @Order(400)
   protected boolean getConfiguredFieldMinimized() {
     return false;
+  }
+
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(410)
+  protected String getConfiguredToogleCollapseKeyStroke() {
+    return null;
+  }
+
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(420)
+  protected String getConfiguredFirstCollapseKeyStroke() {
+    return null;
+  }
+
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(430)
+  protected String getConfiguredSecondCollapseKeyStroke() {
+    return null;
   }
 
   @Override
@@ -136,7 +157,10 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
       setCollapsibleField(getFieldByClass(getConfiguredCollapsibleField()));
     }
     setFieldCollapsed(getConfiguredFieldCollapsed());
-    setCollapseKeyStroke(getConfiguredCollapseKeyStroke());
+    // legacy mode, use deprecated configured key as fallback, this code will be removed in Scout 8.0
+    setToggleCollapseKeyStroke(ObjectUtility.nvl(getConfiguredToogleCollapseKeyStroke(), getConfiguredCollapseKeyStroke()));
+    setFirstCollapseKeyStroke(getConfiguredFirstCollapseKeyStroke());
+    setSecondCollapseKeyStroke(getConfiguredSecondCollapseKeyStroke());
     setFieldMinimized(getConfiguredFieldMinimized());
   }
 
@@ -261,14 +285,54 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     return propertySupport.getPropertyBool(PROP_FIELD_COLLAPSED);
   }
 
+  /**
+   * @deprecated use {@link #setToggleCollapseKeyStroke(String)} instead, code will be removed with Scout 8.0.
+   */
+  @Deprecated
   @Override
+  @SuppressWarnings("deprecation")
   public void setCollapseKeyStroke(String keyStroke) {
     propertySupport.setProperty(PROP_COLLAPSE_KEY_STROKE, keyStroke);
   }
 
+  /**
+   * @deprecated use {@link #getToggleCollapseKeyStroke()} instead, code will be removed with Scout 8.0.
+   */
+  @Deprecated
   @Override
+  @SuppressWarnings("deprecation")
   public String getCollapseKeyStroke() {
     return propertySupport.getPropertyString(PROP_COLLAPSE_KEY_STROKE);
+  }
+
+  @Override
+  public void setToggleCollapseKeyStroke(String keyStroke) {
+    propertySupport.setProperty(PROP_TOGGLE_COLLAPSE_KEY_STROKE, keyStroke);
+  }
+
+  @Override
+  public String getToggleCollapseKeyStroke() {
+    return propertySupport.getPropertyString(PROP_TOGGLE_COLLAPSE_KEY_STROKE);
+  }
+
+  @Override
+  public void setFirstCollapseKeyStroke(String keyStroke) {
+    propertySupport.setProperty(PROP_FIRST_COLLAPSE_KEY_STROKE, keyStroke);
+  }
+
+  @Override
+  public String getFirstCollapseKeyStroke() {
+    return propertySupport.getPropertyString(PROP_FIRST_COLLAPSE_KEY_STROKE);
+  }
+
+  @Override
+  public void setSecondCollapseKeyStroke(String keyStroke) {
+    propertySupport.setProperty(PROP_SECOND_COLLAPSE_KEY_STROKE, keyStroke);
+  }
+
+  @Override
+  public String getSecondCollapseKeyStroke() {
+    return propertySupport.getPropertyString(PROP_SECOND_COLLAPSE_KEY_STROKE);
   }
 
   @Override
