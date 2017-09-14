@@ -291,12 +291,6 @@
   __include("scout/timepicker/TimePickerPopupLayout.js");
   __include("scout/timepicker/TimePickerTouchPopup.js");
   __include("scout/timepicker/TimePickerTouchPopupLayout.js");
-  // Tiles
-  __include("scout/tiles/Tile.js");
-  __include("scout/tiles/Tiles.js");
-  __include("scout/tiles/TilesGrid.js");
-  __include("scout/tiles/TilesLayout.js");
-  __include("scout/tiles/PlaceholderTile.js");
   // Tree
   __include("scout/tree/Tree.js");
   __include("scout/tree/TreeAdapter.js");
@@ -320,68 +314,6 @@
   __include("scout/tree/keystrokes/CompactTreeDownKeyStroke.js");
   __include("scout/tree/keystrokes/CompactTreeLeftKeyStroke.js");
   __include("scout/tree/keystrokes/CompactTreeRightKeyStroke.js");
-  // Desktop
-  __include("scout/desktop/Desktop.js");
-  __include("scout/desktop/DesktopAdapter.js");
-  __include("scout/desktop/DesktopKeyStroke.js");
-  __include("scout/desktop/DesktopLogo.js");
-  __include("scout/desktop/DesktopLayout.js");
-  __include("scout/desktop/DesktopTabBoxController.js");
-  __include("scout/desktop/PopupWindow.js");
-  __include("scout/desktop/OpenUriHandler.js");
-  __include("scout/desktop/bench/DesktopBench.js");
-  __include("scout/desktop/bench/BenchColumn.js");
-  __include("scout/desktop/bench/layout/BenchRowLayoutData.js");
-  __include("scout/desktop/bench/layout/BenchColumnLayoutData.js");
-  __include("scout/desktop/bench/DesktopTabSelectKeyStroke.js");
-  __include("scout/desktop/desktoptab/DisableBrowserTabSwitchingKeyStroke.js");
-  __include("scout/desktop/header/DesktopHeader.js");
-  __include("scout/desktop/header/HeaderTabBoxController.js");
-  __include("scout/desktop/header/DesktopHeaderLayout.js");
-  __include("scout/desktop/navigation/DesktopNavigation.js");
-  __include("scout/desktop/navigation/DesktopNavigationHandle.js");
-  __include("scout/desktop/navigation/DesktopNavigationLayout.js");
-  __include("scout/desktop/navigation/ShrinkNavigationKeyStroke.js");
-  __include("scout/desktop/navigation/EnlargeNavigationKeyStroke.js");
-  __include("scout/desktop/notification/DesktopNotification.js");
-  __include("scout/desktop/notification/DesktopNotificationAdapter.js");
-  __include("scout/desktop/notification/OfflineDesktopNotification.js");
-  __include("scout/desktop/popupblocker/PopupBlockerHandler.js");
-  __include("scout/desktop/popupblocker/PopupBlockerDesktopNotification.js");
-  __include("scout/desktop/toolbox/DesktopToolBox.js");
-  __include("scout/desktop/viewbutton/ViewButton.js");
-  __include("scout/desktop/viewbutton/ViewButtonAdapter.js");
-  __include("scout/desktop/viewbutton/ViewButtonBox.js");
-  __include("scout/desktop/viewbutton/ViewButtonBoxLayout.js");
-  __include("scout/desktop/viewbutton/ViewMenuOpenKeyStroke.js");
-  __include("scout/desktop/viewbutton/ViewMenuPopup.js");
-  __include("scout/desktop/viewbutton/ViewMenuPopupLayout.js");
-  __include("scout/desktop/viewbutton/ViewMenuTab.js");
-  __include("scout/desktop/outline/pages/Page.js");
-  __include("scout/desktop/outline/pages/PageWithNodes.js");
-  __include("scout/desktop/outline/pages/PageWithTable.js");
-  __include("scout/desktop/outline/pages/AutoLeafPageWithNodes.js");
-  __include("scout/tabbox/SimpleTab.js");
-  __include("scout/desktop/desktoptab/DesktopTab.js"); // requires SimpleTab.js
-  __include("scout/tabbox/SimpleTabArea.js");
-  __include("scout/tabbox/SimpleTabAreaLayout.js");
-  __include("scout/desktop/outline/DetailTableTreeFilter.js");
-  __include("scout/desktop/outline/Outline.js");
-  __include("scout/desktop/outline/OutlineAdapter.js");
-  __include("scout/desktop/outline/OutlineMediator.js");
-  __include("scout/desktop/outline/OutlineOverview.js");
-  __include("scout/desktop/outline/OutlineLayout.js");
-  __include("scout/desktop/outline/OutlineViewButton.js"); // requires ViewButton.js
-  __include("scout/desktop/outline/OutlineViewButtonAdapter.js");
-  __include("scout/desktop/outline/PageLayout.js");
-  __include("scout/desktop/outline/SearchOutline.js");
-  __include("scout/desktop/outline/SearchOutlineAdapter.js");
-  __include("scout/desktop/outline/SearchOutlineLayout.js");
-  __include("scout/desktop/outline/navigation/NavigateButton.js"); // requires Menu.js
-  __include("scout/desktop/outline/navigation/NavigateDownButton.js");
-  __include("scout/desktop/outline/navigation/NavigateUpButton.js");
-  __include("scout/desktop/outline/keystrokes/OutlineKeyStrokeContext.js");
-  __include("scout/desktop/outline/keystrokes/OutlineNavigateToTopKeyStroke.js");
   // Basics for form fields
   __include("scout/form/fields/fields.js");
   __include("scout/form/fields/AppLinkKeyStroke.js");
@@ -520,6 +452,84 @@
   __include("scout/form/fields/wizard/WizardProgressFieldLayout.js");
   __include("scout/form/fields/wrappedform/WrappedFormField.js");
   __include("scout/form/fields/wrappedform/WrappedFormFieldAdapter.js");
+  // Tiles
+  __include("scout/tiles/Tile.js");
+  __include("scout/tiles/TileAdapter.js");
+  __include("scout/tiles/Tiles.js");
+  __include("scout/tiles/TilesGrid.js");
+  __include("scout/tiles/TilesLayout.js");
+  __include("scout/tiles/WidgetTile.js");
+  __include("scout/tiles/PlaceholderTile.js");
+  __include("scout/tiles/fields/FormFieldTile.js");
+  __include("scout/tiles/fields/FormFieldTileAdapter.js");
+  __include("scout/tiles/fields/button/TileButton.js");
+  // Desktop
+  __include("scout/desktop/Desktop.js");
+  __include("scout/desktop/DesktopAdapter.js");
+  __include("scout/desktop/DesktopKeyStroke.js");
+  __include("scout/desktop/DesktopLogo.js");
+  __include("scout/desktop/DesktopLayout.js");
+  __include("scout/desktop/DesktopTabBoxController.js");
+  __include("scout/desktop/PopupWindow.js");
+  __include("scout/desktop/OpenUriHandler.js");
+  __include("scout/desktop/bench/DesktopBench.js");
+  __include("scout/desktop/bench/BenchColumn.js");
+  __include("scout/desktop/bench/layout/BenchRowLayoutData.js");
+  __include("scout/desktop/bench/layout/BenchColumnLayoutData.js");
+  __include("scout/desktop/bench/DesktopTabSelectKeyStroke.js");
+  __include("scout/desktop/desktoptab/DisableBrowserTabSwitchingKeyStroke.js");
+  __include("scout/desktop/header/DesktopHeader.js");
+  __include("scout/desktop/header/HeaderTabBoxController.js");
+  __include("scout/desktop/header/DesktopHeaderLayout.js");
+  __include("scout/desktop/navigation/DesktopNavigation.js");
+  __include("scout/desktop/navigation/DesktopNavigationHandle.js");
+  __include("scout/desktop/navigation/DesktopNavigationLayout.js");
+  __include("scout/desktop/navigation/ShrinkNavigationKeyStroke.js");
+  __include("scout/desktop/navigation/EnlargeNavigationKeyStroke.js");
+  __include("scout/desktop/notification/DesktopNotification.js");
+  __include("scout/desktop/notification/DesktopNotificationAdapter.js");
+  __include("scout/desktop/notification/OfflineDesktopNotification.js");
+  __include("scout/desktop/popupblocker/PopupBlockerHandler.js");
+  __include("scout/desktop/popupblocker/PopupBlockerDesktopNotification.js");
+  __include("scout/desktop/toolbox/DesktopToolBox.js");
+  __include("scout/desktop/viewbutton/ViewButton.js");
+  __include("scout/desktop/viewbutton/ViewButtonAdapter.js");
+  __include("scout/desktop/viewbutton/ViewButtonBox.js");
+  __include("scout/desktop/viewbutton/ViewButtonBoxLayout.js");
+  __include("scout/desktop/viewbutton/ViewMenuOpenKeyStroke.js");
+  __include("scout/desktop/viewbutton/ViewMenuPopup.js");
+  __include("scout/desktop/viewbutton/ViewMenuPopupLayout.js");
+  __include("scout/desktop/viewbutton/ViewMenuTab.js");
+  __include("scout/desktop/outline/pages/Page.js");
+  __include("scout/desktop/outline/pages/PageWithNodes.js");
+  __include("scout/desktop/outline/pages/PageWithTable.js");
+  __include("scout/desktop/outline/pages/PageTileButton.js");
+  __include("scout/desktop/outline/pages/PageTiles.js");
+  __include("scout/desktop/outline/pages/PageTilesSelectKeyStroke.js");
+  __include("scout/desktop/outline/pages/AutoLeafPageWithNodes.js");
+  __include("scout/tabbox/SimpleTab.js");
+  __include("scout/desktop/desktoptab/DesktopTab.js"); // requires SimpleTab.js
+  __include("scout/tabbox/SimpleTabArea.js");
+  __include("scout/tabbox/SimpleTabAreaLayout.js");
+  __include("scout/desktop/outline/DetailTableTreeFilter.js");
+  __include("scout/desktop/outline/Outline.js");
+  __include("scout/desktop/outline/OutlineAdapter.js");
+  __include("scout/desktop/outline/OutlineMediator.js");
+  __include("scout/desktop/outline/OutlineLayout.js");
+  __include("scout/desktop/outline/OutlineViewButton.js"); // requires ViewButton.js
+  __include("scout/desktop/outline/OutlineViewButtonAdapter.js");
+  __include("scout/desktop/outline/PageLayout.js");
+  __include("scout/desktop/outline/SearchOutline.js");
+  __include("scout/desktop/outline/SearchOutlineAdapter.js");
+  __include("scout/desktop/outline/SearchOutlineLayout.js");
+  __include("scout/desktop/outline/navigation/NavigateButton.js"); // requires Menu.js
+  __include("scout/desktop/outline/navigation/NavigateDownButton.js");
+  __include("scout/desktop/outline/navigation/NavigateUpButton.js");
+  __include("scout/desktop/outline/keystrokes/OutlineKeyStrokeContext.js");
+  __include("scout/desktop/outline/keystrokes/OutlineNavigateToTopKeyStroke.js");
+  __include("scout/desktop/outline/overview/OutlineOverview.js");
+  __include("scout/desktop/outline/overview/TileOutlineOverview.js");
+  __include("scout/desktop/outline/overview/TileOutlineOverviewLayout.js");
   // More misc. elements
   __include("scout/desktop/DesktopFormController.js");
   __include("scout/table/FilterFieldsGroupBox.js"); // requires GroupBox.js

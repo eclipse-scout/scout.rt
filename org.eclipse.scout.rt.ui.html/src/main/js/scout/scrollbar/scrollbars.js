@@ -499,6 +499,21 @@ scout.scrollbars = {
         $.log.trace('Restored scroll position for ' + $scrollable.attr('class') + '. Top: ' + scrollTop + '. Left: ' + scrollLeft);
       }
     });
+  },
+
+  setVisible: function($scrollable, visible) {
+    if (!$scrollable || !$scrollable.data('scrollable')) {
+      return;
+    }
+    var scrollbars = $scrollable.data('scrollbars');
+    if (!scrollbars) {
+      return;
+    }
+    scrollbars.forEach(function(scrollbar) {
+      if (scrollbar.rendered) {
+        scrollbar.$container.setVisible(visible);
+      }
+    });
   }
 
 };

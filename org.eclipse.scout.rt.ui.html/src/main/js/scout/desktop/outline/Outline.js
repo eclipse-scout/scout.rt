@@ -15,27 +15,41 @@
  */
 scout.Outline = function() {
   scout.Outline.parent.call(this);
-  this._addWidgetProperties(['defaultDetailForm', 'views', 'selectedViewTabs', 'dialogs', 'messageBoxes', 'fileChoosers']);
 
-  this.toggleBreadcrumbStyleEnabled = true;
+  this.compact = false;
+  this.defaultDetailForm = null;
+  this.embedDetailContent = false;
+  this.inBackground = false;
+  this.mediator = null;
   this.navigateButtonsVisible = true;
+  this.navigateUpInProgress = false; // see NavigateUpButton.js
+  this.outlineOverview = null;
+  this.outlineOverviewVisible = true;
+  this.toggleBreadcrumbStyleEnabled = true;
+  this.titleVisible = true;
+
+  this.menus = [];
+  this.titleMenuBar = null;
+  this.nodeMenuBar = null;
+  this.nodeMenuBarVisible = false;
+  this.detailMenuBar = null;
+  this.detailMenuBarVisible = false;
+
   this.dialogs = [];
   this.views = [];
   this.messageBoxes = [];
   this.fileChoosers = [];
-  this.navigateUpInProgress = false; // see NavigateUpButton.js
+  this.formController = null;
+  this.messageBoxController = null;
+  this.fileChooserController = null;
+
+  this._detailContentDestroyHandler = this._onDetailContentDestroy.bind(this);
+  this._detailMenusNodesSelectedHandler = null;
   this._additionalContainerClasses += ' outline';
   this._treeItemPaddingLeft = 37;
   this._treeItemPaddingLevel = 20;
-  this.inBackground = false;
-  this.embedDetailContent = false;
-  this.compact = false;
-  this.formController;
-  this.messageBoxController;
-  this.fileChooserController;
   this._scrolldirections = 'y';
-  this.titleVisible = true;
-  this.mediator;
+  this._addWidgetProperties(['defaultDetailForm', 'views', 'selectedViewTabs', 'dialogs', 'messageBoxes', 'fileChoosers']);
 };
 scout.inherits(scout.Outline, scout.Tree);
 
@@ -53,7 +67,6 @@ scout.Outline.prototype._init = function(model) {
   this.fileChooserController = new scout.FileChooserController(this, this.session);
   this.resolveTextKeys(['title']);
   this._setDefaultDetailForm(this.defaultDetailForm);
-  this._detailContentDestroyHandler = this._onDetailContentDestroy.bind(this);
 
   // menu bars
   this.titleMenuBar = scout.create('MenuBar', {
@@ -354,10 +367,7 @@ scout.Outline.prototype._updateOutlineOverview = function() {
     if (this.outlineOverviewVisible) {
       if (!this.outlineOverview) {
         // Create outlineOverview if no defaultDetailForm is available
-        this._setProperty('outlineOverview', scout.create('OutlineOverview', {
-          parent: this,
-          outline: this
-        }));
+        this._setProperty('outlineOverview', this._createOutlineOverview());
       }
     } else {
       if (this.outlineOverview) {
@@ -366,6 +376,13 @@ scout.Outline.prototype._updateOutlineOverview = function() {
       }
     }
   }
+};
+
+scout.Outline.prototype._createOutlineOverview = function() {
+  return scout.create('TileOutlineOverview', {
+    parent: this,
+    outline: this
+  });
 };
 
 scout.Outline.prototype.setNavigateButtonsVisible = function(navigateButtonsVisible) {

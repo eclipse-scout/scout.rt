@@ -20,21 +20,17 @@ scout.TilesLayout.prototype.layout = function($container) {
 
   // Store the current position of the tiles
   this.widget.tiles.forEach(function(tile, i) {
-    var pos = tile.$container.position();
-    tile.$container.data('oldLeft', pos.left);
-    tile.$container.data('oldTop', pos.top);
+    var pos = scout.graphics.location(tile.$container);
+    tile.$container.data('oldLeft', pos.x);
+    tile.$container.data('oldTop', pos.y);
   }, this);
 
-  if (this.widget.prefGridColumnCount === undefined) {
-    // Store the preferred column count
-    this.widget.prefGridColumnCount = this.widget.gridColumnCount;
-  }
-  this.widget.gridColumnCount = this.widget.prefGridColumnCount;
+  this._resetGridColumnCount();
 
   this.widget.invalidateLayout();
   this.widget.invalidateLogicalGrid(false);
   if (this.widget.htmlComp.prefSize().width <= $container.width()) {
-    this._layout(this.widget.$container);
+    this._layout($container);
     contentFits = true;
   }
 
@@ -44,52 +40,107 @@ scout.TilesLayout.prototype.layout = function($container) {
     this.widget.invalidateLayout();
     this.widget.invalidateLogicalGrid(false);
     if (this.widget.htmlComp.prefSize().width <= $container.width()) {
-      this._layout(this.widget.$container);
+      this._layout($container);
       contentFits = true;
     }
   }
 
-  // animate the position change of the tiles
+  // If it does not fit, layout anyway (happens on small sizes if even one column is not sufficient)
+  if (!contentFits) {
+    this._layout($container);
+  }
+
+  if (animated) {
+    // Hide scrollbar before the animation (does not look good if scrollbar is shown while the animation is running)
+    scout.scrollbars.setVisible($container, false);
+
+    // The animation of the position change won't look good if the box is scrolled down -> scroll up first
+    $container[0].scrollTop = 0;
+  }
+
+  // Animate the position change of the tiles
   var promises = [];
   this.widget.tiles.forEach(function(tile, i) {
-    var deferred = $.Deferred(),
-      pos = tile.$container.position(),
+    var pos = scout.graphics.location(tile.$container),
       fromLeft = tile.$container.data('oldLeft') || 0,
       fromTop = tile.$container.data('oldTop') || 0;
 
     if (!animated) {
-      fromLeft = (pos.left - fromLeft) * 0.95;
-      fromTop = (pos.top - fromTop) * 0.95;
+      fromLeft = (pos.x - fromLeft) * 0.95;
+      fromTop = (pos.y - fromTop) * 0.95;
     }
 
-    promises.push(deferred.promise());
-
+    // Stop running animations before starting the new ones to make sure existing promises are not resolved too early
     tile.$container
-      .cssLeftAnimated(fromLeft, pos.left, {
+      .stop()
+      .cssLeftAnimated(fromLeft, pos.x, {
+        start: function(promise) {
+          promises.push(promise);
+        },
         queue: false
       })
-      .cssTopAnimated(fromTop, pos.top, {
-        queue: false,
-        complete: function() {
-          deferred.resolve();
-        }
+      .cssTopAnimated(fromTop, pos.y, {
+        start: function(promise) {
+          promises.push(promise);
+        },
+        queue: false
       });
     tile.$container.removeData('oldLeft');
     tile.$container.removeData('oldTop');
   }, this);
+
   this.widget.initialAnimationDone = true;
 
-  // when all animations have been finished update scrollbar of the first scrollable parent
+  // When all animations have been finished update scrollbar
   if (promises.length > 0) {
-    $.promiseAll(promises).done(function() {
-      var htmlComp = this.widget.htmlComp;
-      while (htmlComp) {
-        if (htmlComp.scrollable) {
-          scout.scrollbars.update(htmlComp.$comp);
-          break;
-        }
-        htmlComp = htmlComp.getParent();
-      }
-    }.bind(this));
+    $.promiseAll(promises).done(this._updateScrollbar.bind(this));
   }
+};
+
+scout.TilesLayout.prototype._updateScrollbar = function() {
+  scout.scrollbars.setVisible(this.widget.$container, true);
+
+  // Update first scrollable parent (if widget itself is not scrollable, maybe a parent is)
+  var htmlComp = this.widget.htmlComp;
+  while (htmlComp) {
+    if (htmlComp.scrollable) {
+      // Update immediately to prevent flickering (scrollbar is made visible on the top of this function)
+      scout.scrollbars.update(htmlComp.$comp, true);
+      break;
+    }
+    htmlComp = htmlComp.getParent();
+  }
+};
+
+scout.TilesLayout.prototype._resetGridColumnCount = function() {
+  if (this.widget.prefGridColumnCount === undefined) {
+    // Store the preferred column count
+    this.widget.prefGridColumnCount = this.widget.gridColumnCount;
+  }
+  this.widget.gridColumnCount = this.widget.prefGridColumnCount;
+};
+
+scout.TilesLayout.prototype.prefSizeForWidth = function(width) {
+  var prefSize,
+    contentFits = false;
+
+  this._resetGridColumnCount();
+
+  this.widget.invalidateLayout();
+  this.widget.invalidateLogicalGrid(false);
+  prefSize = this.widget.htmlComp.prefSize();
+  if (prefSize.width <= width) {
+    contentFits = true;
+  }
+
+  while (!contentFits && this.widget.gridColumnCount > 1) {
+    this.widget.gridColumnCount--;
+    this.widget.invalidateLayout();
+    this.widget.invalidateLogicalGrid(false);
+    prefSize = this.widget.htmlComp.prefSize();
+    if (prefSize.width <= width) {
+      contentFits = true;
+    }
+  }
+  return prefSize;
 };

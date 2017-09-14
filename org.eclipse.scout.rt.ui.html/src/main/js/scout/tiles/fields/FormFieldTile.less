@@ -1,0 +1,241 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the BSI CRM Software License v1.0
+ * which accompanies this distribution as bsi-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+@tile-padding-h: 24px;
+@tile-padding-v: 18px;
+@tile-with-label-padding-top: 15px;
+@tile-box-shadow-inset: 4px;
+
+.tile.form-field {
+  border: 1px solid @tile-default-border-color;
+  background-color: @tile-default-background-color;
+  color: @tile-default-color;
+  padding: @tile-with-label-padding-top @tile-padding-h @tile-padding-v @tile-padding-h;
+  margin-left: @mandatory-indicator-width;
+  overflow: hidden;
+
+  &.label-hidden {
+    padding-top: @tile-padding-v;
+  }
+
+  &.no-padding {
+    padding: 0;
+
+    & > .field {
+      border: 0;
+      border-radius: 0;
+    }
+  }
+
+  & > label {
+    color: @tile-default-color;
+    font-weight: bold;
+    margin: 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid @tile-default-border-color;
+    margin-bottom: @tile-padding-v - @tile-box-shadow-inset;
+  }
+
+  & > .field {
+    margin-left: 0;
+    overflow: hidden;
+  }
+
+  & > .status {
+    text-align: right;
+  }
+
+  &:not(.inverted):not(.loading):not(.tile-button) {
+    box-shadow: inset 0 0 0 @tile-box-shadow-inset @tile-default-inner-border-color;
+  }
+
+  /* Define a short transition for opacity changes on all field elements (used in .loading state) */
+  & > label,
+  & > .mandatory-indicator,
+  & > .field,
+  & > .status {
+    transition: opacity 0.15s; /* Same time is used in animation() of .loading-indicator */
+    opacity: 1;
+  }
+
+  &.loading {
+    & > label,
+    & > .mandatory-indicator,
+    & > .field,
+    & > .status {
+      /* Same as 'visibility: hidden', except it can be animated with CSS transitions */
+      opacity: 0;
+    }
+
+    & > .loading-indicator {
+      #scout.loading-indicator();
+    }
+  }
+
+  /* Don't show underline decoration for links inside certain tiles */
+  &.html-field .app-link,
+  &.tile-list-field .app-link,
+  &.tile-attributes-field .app-link {
+    text-decoration: none;
+  }
+
+  &.inverted {
+    border-color: transparent;
+    background-color: @tile-default-inverted-background-color;
+    color: @tile-default-inverted-color;
+
+    & > label {
+      color: @tile-default-inverted-color;
+      border-bottom: 1px solid @tile-default-inverted-border-color;
+    }
+
+    /* Override link style in inverted tiles, otherwise app-links would not be readable */
+    & .app-link {
+      color: @tile-default-inverted-color;
+      text-decoration: underline;
+    }
+
+    &.has-tooltip > .status,
+    &.has-menus > .status {
+
+      &::before  {
+        color: @icon-inverted-color;
+      }
+
+      &:hover::before {
+        color: @palette-blue-2;
+      }
+    }
+
+    &.has-error > .status {
+
+      &::before  {
+        color: @palette-red-1;
+      }
+
+      &:hover::before {
+        color: @palette-red-2;
+      }
+    }
+
+    /* scrollbars on dark background */
+
+    & .scrollbar-thumb {
+      background-color: fade(@palette-white, 30%);
+    }
+
+    & .scrollbar-thumb-move,
+    & .scrollbar-thumb:hover {
+      background-color: fade(@palette-white, 60%);
+    }
+  }
+
+  &.color-alternative {
+    border-color: @tile-alternative-border-color;
+    background-color: @tile-alternative-background-color;
+    color: @tile-alternative-color;
+
+    & > label {
+      color: @tile-alternative-color;
+      border-bottom: 1px solid @tile-alternative-border-color;
+    }
+
+    & .app-link {
+      color: @tile-alternative-link-color;
+    }
+  }
+
+  &.inverted.color-alternative {
+    border-color: transparent;
+    background-color: @tile-alternative-inverted-background-color;
+    color: @tile-alternative-inverted-color;
+
+    & > label {
+      color: @tile-alternative-inverted-color;
+      border-bottom: 1px solid @tile-alternative-inverted-border-color;
+    }
+
+    & .app-link {
+      color: @tile-alternative-inverted-color;
+    }
+
+    &.has-tooltip > .status,
+    &.has-menus > .status {
+
+      &::before  {
+        color: @icon-inverted-color;
+      }
+
+      &:hover::before {
+        color: @palette-cyan-0;
+      }
+    }
+
+    &.has-error > .status {
+
+      &::before  {
+        color: @palette-red-1;
+      }
+
+      &:hover::before {
+        color: @palette-red-0;
+      }
+    }
+  }
+
+  &.loading {
+    border-style: dashed;
+  }
+
+  /* --- Special rules for specific tile fields --- */
+
+  &.browser-field > .field {
+    border-radius: 0;
+  }
+  &.browser-field.inverted > .field {
+    border: 0;
+  }
+
+  /* Fields with mandatory indicator */
+  &.table-field,
+  &.chart-field {
+    padding-left: @tile-padding-h - @mandatory-indicator-width;
+
+    & > label {
+      margin-left: @mandatory-indicator-width;
+    }
+  }
+
+  /* Move part of the tile's padding (@offset) to the inner div. */
+  /* This makes it possible to draw the scrollbar (seemingly) outside the field. */
+  &.scrollbar-y-outside {
+    @offset: 14px;
+    padding-right: @tile-padding-h - @offset;
+
+    & > label {
+      margin-right: @offset;
+    }
+
+    &.label-hidden > .status {
+      /* increase space between status and field if label is hidden (= status is displayed on the field's right side) */
+      margin-left: @field-status-margin-left + 10px;
+    }
+
+    & > .field {
+      padding-right: @offset;
+
+      & > .scrollbar.y-axis {
+        /* Remove margin top/bottom, because root-group-box already provides a padding */
+        height: 100%;
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+    }
+  }
+}

@@ -19,13 +19,10 @@ scout.Tiles = function() {
   this.logicalGridRowHeight = 150;
   this.logicalGridColumnWidth = 200;
   this.withPlaceholders = false;
+  this.scrollable = false;
   this._addWidgetProperties(['tiles']);
 };
 scout.inherits(scout.Tiles, scout.Widget);
-
-scout.Tiles.prototype._init = function(model) {
-  scout.Tiles.parent.prototype._init.call(this, model);
-};
 
 scout.Tiles.prototype._render = function() {
   this.$container = this.$parent.appendDiv('tiles');
@@ -40,6 +37,7 @@ scout.Tiles.prototype._renderProperties = function() {
   this._renderLogicalGridVGap();
   this._renderLogicalGridRowHeight();
   this._renderLogicalGridColumnWidth();
+  this._renderScrollable();
 };
 
 scout.Tiles.prototype.setTiles = function(tiles) {
@@ -110,6 +108,17 @@ scout.Tiles.prototype._renderLogicalGridColumnWidth = function() {
   this.invalidateLayoutTree();
 };
 
+scout.Tiles.prototype._renderScrollable = function() {
+  if (this.scrollable) {
+    scout.scrollbars.install(this.$container, {
+      parent: this,
+      axis: 'y'
+    });
+  } else {
+    scout.scrollbars.uninstall(this.$container, this.session);
+  }
+};
+
 scout.Tiles.prototype.setWithPlaceholders = function(withPlaceholders) {
   this.setProperty('withPlaceholders', withPlaceholders);
 };
@@ -120,7 +129,7 @@ scout.Tiles.prototype._renderWithPlaceholders = function() {
 
 scout.Tiles.prototype.fillUpWithPlaceholders= function() {
   if (!this.withPlaceholders) {
-    this._deletePlaceholders();
+    this._deleteAllPlaceholders();
     return;
   }
   this._deleteObsoletePlaceholders();
@@ -148,12 +157,21 @@ scout.Tiles.prototype._createPlaceholders = function() {
   // Otherwise create placeholders for every missing tile in the last row
   numPlaceholders = columnCount - 1 - lastX;
   for (var i = 0; i < numPlaceholders; i++) {
-    var tile = scout.create('PlaceholderTile', {
-      parent: this
-    });
-    placeholders.push(tile);
+    placeholders.push(this._createPlaceholder());
   }
   return placeholders;
+};
+
+scout.Tiles.prototype._createPlaceholder = function() {
+  var placeholder = scout.create('PlaceholderTile', {
+    parent: this
+  });
+  // If the first tile in the box is a tile with a form field, add the class with-form-fields to the placeholder because form field tiles have a mandatory indicator
+  // If mixed tiles are used so that the first one is not a form field tile but others are, the class has to be added manually
+  if (this.tiles[0] && this.tiles[0].widget instanceof scout.FormField) {
+    placeholder.addCssClass('with-form-fields');
+  }
+  return placeholder;
 };
 
 scout.Tiles.prototype._deleteObsoletePlaceholders = function() {
@@ -177,7 +195,7 @@ scout.Tiles.prototype._deleteObsoletePlaceholders = function() {
   this.setTiles(tiles);
 };
 
-scout.Tiles.prototype._deletePlaceholders = function() {
+scout.Tiles.prototype._deleteAllPlaceholders = function() {
   var tiles = this.tiles.filter(function(tile) {
     return !(tile instanceof scout.PlaceholderTile);
   });
