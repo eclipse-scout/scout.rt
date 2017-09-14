@@ -1,0 +1,132 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+.tile.form-field.tile-button {
+  padding-top: 0;
+  padding-bottom: 0;
+  cursor: pointer;
+  /* The following two rules are required to ensure the cells do not exceed the containers size if content is long  */
+  display: table;
+  table-layout: fixed;
+
+  &:not(.disabled):hover > .field {
+
+    & > .icon-container > .font-icon,
+    & > .label {
+      color: @tile-button-default-hover-color;
+    }
+  }
+
+  &:not(.disabled):active {
+    background-color: @tile-button-default-active-background-color;
+  }
+
+  & > .field {
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+    position: relative;
+
+    /* Make IE trigger the :active state if the field is pressed */
+    pointer-events: none;
+
+    & > .icon-container,
+    & > .label {
+      display: block;
+    }
+
+    & > .icon-container {
+      margin-bottom: 15px;
+
+      & > .font-icon {
+        font-size: 35px;
+        color: @tile-button-default-icon-color;
+      }
+    }
+
+    & > .label {
+      font-size: 16px;
+      #scout.overflow-ellipsis();
+    }
+
+    & > span:last-of-type {
+      padding-bottom: 5px;
+    }
+  }
+
+  &.inverted {
+
+    &:not(.disabled) > .field,
+    &:not(.disabled):hover > .field {
+
+      & > .icon-container > .font-icon ,
+      & > .label {
+        color: @tile-button-default-inverted-color;
+      }
+    }
+
+    &:not(.disabled):active {
+      background-color: @tile-button-default-inverted-active-background-color;
+      border-color: @tile-button-default-inverted-active-background-color;
+    }
+  }
+
+  &.color-alternative {
+
+    & > .field > .icon-container > .font-icon {
+      color: @tile-button-alternative-icon-color;
+    }
+
+    &:not(.disabled):hover > .field {
+
+      & > .icon-container > .font-icon,
+      & > .label {
+        color: @tile-button-alternative-hover-color;
+      }
+    }
+
+    &:not(.disabled):active {
+      background-color: @tile-button-alternative-active-background-color;
+    }
+  }
+
+  &.color-alternative.inverted {
+
+    &:not(.disabled) > .field,
+    &:not(.disabled):hover > .field {
+
+      & > .icon-container > .font-icon ,
+      & > .label {
+        color: @tile-button-alternative-inverted-color;
+      }
+    }
+
+    &:not(.disabled):active {
+      background-color: @tile-button-alternative-inverted-active-background-color;
+      border-color: @tile-button-alternative-inverted-active-background-color;
+    }
+  }
+
+  &.disabled,
+  &.disabled:hover {
+    background-color: @tile-default-inner-border-color;
+    border-color: @button-disabled-border-color;
+    cursor: default;
+
+    & > .field {
+      & > .icon-container > .font-icon {
+        color: @button-disabled-color;
+      }
+      & > .label {
+        color: @button-disabled-color;
+      }
+    }
+  }
+}
