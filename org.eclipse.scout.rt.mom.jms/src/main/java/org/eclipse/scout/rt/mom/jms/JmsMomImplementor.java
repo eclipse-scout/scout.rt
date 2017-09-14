@@ -509,7 +509,7 @@ public class JmsMomImplementor implements IMomImplementor {
     final ConnectionFactory connectionFactory = (ConnectionFactory) context.lookup(connectionFactoryName);
     final Connection connection = connectionFactory.createConnection();
     connection.setClientID(computeClientId(properties));
-    connection.setExceptionListener(BEANS.get(MomExceptionHandler.class)::handle);
+    connection.setExceptionListener(ex -> BEANS.get(MomExceptionHandler.class).handle(ex));
     return connection;
   }
 

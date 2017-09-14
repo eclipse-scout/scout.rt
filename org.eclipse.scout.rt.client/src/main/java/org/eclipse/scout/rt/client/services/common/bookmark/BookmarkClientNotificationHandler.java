@@ -21,7 +21,7 @@ public class BookmarkClientNotificationHandler extends AbstractObservableNotific
 
   @Override
   public void handleNotification(BookmarkChangedClientNotification notification, IClientNotificationAddress address) {
-    ModelJobs.schedule(BEANS.get(IBookmarkService.class)::loadBookmarks, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    ModelJobs.schedule(() -> BEANS.get(IBookmarkService.class).loadBookmarks(), ModelJobs.newInput(ClientRunContexts.copyCurrent()));
     super.handleNotification(notification, address);
   }
 
