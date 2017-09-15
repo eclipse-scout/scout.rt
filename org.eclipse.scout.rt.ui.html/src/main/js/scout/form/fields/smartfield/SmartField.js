@@ -964,6 +964,10 @@ scout.SmartField.prototype._onActiveFilterSelected = function(event) {
   this._lookupByTextOrAll(true);
 };
 
+scout.SmartField.prototype.setBrowseMaxRowCount = function(browseMaxRowCount) {
+  this.setProperty('browseMaxRowCount', browseMaxRowCount);
+};
+
 scout.SmartField.prototype.setBrowseAutoExpandAll = function(browseAutoExpandAll) {
   this.setProperty('browseAutoExpandAll', browseAutoExpandAll);
 };
@@ -977,6 +981,10 @@ scout.SmartField.prototype.setBrowseLoadIncremental = function(browseLoadIncreme
 
 scout.SmartField.prototype.setActiveFilter = function(activeFilter) {
   this.setProperty('activeFilter', this.activeFilterEnabled ? activeFilter : null);
+};
+
+scout.SmartField.prototype.setActiveFilterEnabled = function(activeFilterEnabled) {
+  this.setProperty('activeFilterEnabled', activeFilterEnabled);
 };
 
 /**
