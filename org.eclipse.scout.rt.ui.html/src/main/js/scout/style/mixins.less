@@ -107,23 +107,24 @@
     color: @text-color;
   }
 
-  .field-with-icon(@className: ~'.icon') {
 
-    & ~ @{className} {
-      padding-right: @text-field-padding-x;
-    }
+  .value-field-with-icon(@className: ~'.icon') {
 
-
-    &:focus ~ @{className}::before,
-    &.focused ~ @{className}::before {
+    &.focused > @{className}::before,
+    &.focused > .field > @{className}::before {
       color: @text-field-icon-focus-color;
     }
 
-    &.has-error ~ @{className}::before {
+    &.has-error > @{className}::before ,
+    &.has-error > .field > @{className}::before {
       color: @text-field-icon-error-color;
     }
 
-    &.disabled ~ @{className} {
+
+    &.disabled > @{className},
+    &.disabled > .field > @{className},
+    &.compact > @{className},
+    &.compact > .field > @{className}  {
       display: none;
     }
   }

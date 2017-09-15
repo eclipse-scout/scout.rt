@@ -118,6 +118,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
       scout.graphics.setBounds(formField.$fieldContainer, fieldBounds);
     }
     formField.$field.toggleClass('compact', fieldBounds.width <= scout.FormFieldLayout.MIN_FIELD_WIDTH);
+    formField.$container.toggleClass('compact', fieldBounds.width <= scout.FormFieldLayout.MIN_FIELD_WIDTH);
 
     if (labelHasFieldWidth) {
       var fieldWidth = fieldSize.add(fieldMargins).width - formField.$label.cssMarginX();
@@ -128,14 +129,25 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     }
   }
 
-  // Icon is placed inside the field (as overlay)
-  if (formField.$field && formField.$icon && formField.$icon.isVisible()) {
-    this._layoutIcon(formField, fieldBounds, right, top);
-  }
+  if (formField.$field) {
+    // Icons are placed inside the field (as overlay)
+    var fieldBorder = scout.graphics.borders(formField.$field),
+      inputBounds = scout.graphics.offsetBounds(formField.$field);
+    top += fieldBorder.top;
+    right += fieldBorder.right;
+    fieldBounds.x += fieldBorder.left;
+    fieldBounds.y += fieldBorder.top;
+    fieldBounds.height = inputBounds.height - fieldBorder.top - fieldBorder.bottom;
+    fieldBounds.width = inputBounds.width - fieldBorder.left - fieldBorder.right;
 
-  // Clearable icon if present
-  if (formField.$field && formField.$clearIcon && formField.$clearIcon.isVisible()) {
-    this._layoutClearableIcon(formField, fieldBounds, right, top);
+    if (formField.$icon) {
+      this._layoutIcon(formField, fieldBounds, right, top);
+    }
+
+    // Clearable icon if present
+    if (formField.$clearIcon) {
+      this._layoutClearableIcon(formField, fieldBounds, right, top);
+    }
   }
 
   // Make sure tooltip is at correct position after layouting, if there is one
@@ -238,42 +250,36 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
 };
 
 scout.FormFieldLayout.prototype._layoutIcon = function(formField, fieldBounds, right, top) {
-  var height = this.rowHeight,
-    borderTop = formField.$field.cssBorderTopWidth();
+  var height = this.rowHeight;
   if (fieldBounds) {
     // If field is bigger than rowHeight (e.g. if used in desktop cell editor), make sure icon is as height as field
     height = fieldBounds.height;
   }
   formField.$icon
-    .cssRight(formField.$field.cssBorderRightWidth() + right)
-    .cssTop(top + borderTop)
-    .cssHeight(height - borderTop - formField.$field.cssBorderBottomWidth())
-    .cssLineHeight(height - borderTop - formField.$field.cssBorderBottomWidth());
+    .cssRight(right)
+    .cssTop(fieldBounds.y)
+    .cssHeight(height)
+    .cssLineHeight(height);
 };
 
 scout.FormFieldLayout.prototype._layoutClearableIcon = function(formField, fieldBounds, right, top) {
-  var height = this.rowHeight,
-    borderTop = formField.$field.cssBorderTopWidth();
-  var iconWidth = 0;
+  var height = this.rowHeight;
   if (fieldBounds) {
     // If field is bigger than rowHeight (e.g. if used in desktop cell editor), make sure icon is as height as field
     height = fieldBounds.height;
   }
   if (formField instanceof scout.BasicField && formField.gridData.horizontalAlignment > 0) {
     formField.$clearIcon
-      .cssLeft(fieldBounds.x + formField.$field.cssBorderRightWidth())
-      .cssTop(top + borderTop)
-      .cssHeight(height - borderTop - formField.$field.cssBorderBottomWidth())
-      .cssLineHeight(height - borderTop - formField.$field.cssBorderBottomWidth());
+      .cssLeft(fieldBounds.x)
+      .cssTop(fieldBounds.y)
+      .cssHeight(height)
+      .cssLineHeight(height);
   } else {
-    if (formField.$icon && formField.$icon.isVisible()) {
-      iconWidth = scout.graphics.prefSize(formField.$icon, true).width;
-    }
     formField.$clearIcon
-      .cssRight(formField.$field.cssBorderRightWidth() + right + iconWidth)
-      .cssTop(top + borderTop)
-      .cssHeight(height - borderTop - formField.$field.cssBorderBottomWidth())
-      .cssLineHeight(height - borderTop - formField.$field.cssBorderBottomWidth());
+      .cssRight(right)
+      .cssTop(fieldBounds.y)
+      .cssHeight(height)
+      .cssLineHeight(height);
   }
 };
 

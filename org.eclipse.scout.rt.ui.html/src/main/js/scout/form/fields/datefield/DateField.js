@@ -13,8 +13,8 @@ scout.DateField = function() {
 
   this.popup;
   this.autoDate;
-  this.dateClearable = false;
   this.dateDisplayText = null;
+  this.dateHasText = false;
   this.dateFocused = false;
   this.dateFormatPattern;
   this.disabledCopyOverlay = true;
@@ -24,10 +24,10 @@ scout.DateField = function() {
   this.hasTime = false;
   this.hasTimePopup = true;
   this.timeDisplayText = null;
+  this.timeHasText = false;
   this.timePickerResolution;
   this.timeFormatPattern;
   this.timeFocused = false;
-  this.timeClearable = false;
 
   this.$dateField;
   this.$timeField;
@@ -122,8 +122,8 @@ scout.DateField.prototype._renderProperties = function() {
   // Has to be the last call, otherwise _renderErrorStatus() would operate on the wrong state.
   scout.DateField.parent.prototype._renderProperties.call(this);
 
-  this._renderDateClearable();
-  this._renderTimeClearable();
+  this._renderDateHasText();
+  this._renderTimeHasText();
 };
 
 scout.DateField.prototype._remove = function() {
@@ -171,10 +171,6 @@ scout.DateField.prototype._renderHasDate = function() {
 
     this.$dateFieldIcon = scout.fields.appendIcon(this.$field, 'date')
       .on('mousedown', this._onDateIconMouseDown.bind(this));
-    // date clear icon
-    this.$dateClearIcon = this.$field.appendSpan('icon date-clear unfocusable')
-      .on('mousedown', this._onDateClearIconMouseDown.bind(this));
-
     // avoid fastclick on icon. Otherwise the blur event overtakes the mousedown event.
     this.$dateFieldIcon.addClass('needsclick');
 
@@ -190,6 +186,7 @@ scout.DateField.prototype._renderHasDate = function() {
     this._renderDisplayText();
     this.htmlDateTimeComposite.invalidateLayoutTree();
   }
+  this._renderDateClearable();
 };
 
 scout.DateField.prototype.setHasTime = function(hasTime) {
@@ -228,12 +225,7 @@ scout.DateField.prototype._renderHasTime = function() {
       .on('mousedown', this._onTimeIconMouseDown.bind(this));
     // avoid fastclick on icon. Otherwise the blur event overtakes the mousedown event.
     this.$timeFieldIcon.addClass('needsclick');
-
-    // date clear icon
-    this.$timeClearIcon = this.$field.appendSpan('icon time-clear unfocusable')
-      .on('mousedown', this._onTimeClearIconMouseDown.bind(this));
-    this.$timeClearIcon.addClass('needsclick');
-
+    
   } else if (!this.hasTime && this.$timeField) {
     // Remove $timeField
     this.$timeField.remove();
@@ -246,6 +238,7 @@ scout.DateField.prototype._renderHasTime = function() {
     this._renderDisplayText();
     this.htmlDateTimeComposite.invalidateLayoutTree();
   }
+  this._renderTimeClearable();
 };
 
 scout.DateField.prototype.setTimePickerResolution = function(timePickerResolution) {
@@ -342,11 +335,9 @@ scout.DateField.prototype._renderEnabled = function() {
 scout.DateField.prototype._renderDisplayText = function() {
   if (this.hasDate) {
     this._renderDateDisplayText();
-    this._updateDateClearable();
   }
   if (this.hasTime) {
     this._renderTimeDisplayText();
-    this._updateTimeClearable();
   }
   this._removePredictionFields();
 };
@@ -364,7 +355,7 @@ scout.DateField.prototype._readDisplayText = function() {
 
 scout.DateField.prototype._renderDateDisplayText = function() {
   scout.fields.valOrText(this.$dateField, this.dateDisplayText);
-  this._updateDateClearable();
+  this._updateDateHasText();
 };
 
 scout.DateField.prototype._readDateDisplayText = function() {
@@ -373,6 +364,7 @@ scout.DateField.prototype._readDateDisplayText = function() {
 
 scout.DateField.prototype._renderTimeDisplayText = function() {
   scout.fields.valOrText(this.$timeField, this.timeDisplayText);
+  this._updateTimeHasText();
 };
 
 scout.DateField.prototype._readTimeDisplayText = function() {
@@ -536,29 +528,37 @@ scout.DateField.prototype.setDateFocused = function(dateFocused) {
 };
 
 scout.DateField.prototype._renderDateFocused = function() {
-  this._updateDateClearable();
+  this.$container.toggleClass('date-focused', this.dateFocused);
 };
 
-scout.DateField.prototype._updateDateClearable = function() {
-  if (this.touch) {
-    return;
-  }
-  if (!this.$field) {
-    return;
-  }
-  var clearable = scout.strings.hasText(this._readDateDisplayText());
-  if (!this.embedded) {
-    clearable = clearable && this.dateFocused;
-  }
-  this.setDateClearable(clearable);
+scout.DateField.prototype._updateTimeHasText = function() {
+  this.setTimeHasText(scout.strings.hasText(this._readTimeDisplayText()));
 };
 
-scout.DateField.prototype.setDateClearable = function(dateClearable) {
-  this.setProperty('dateClearable', dateClearable);
+scout.DateField.prototype.setTimeHasText = function(timeHasText) {
+  this.setProperty('timeHasText', timeHasText);
 };
 
-scout.DateField.prototype._renderDateClearable = function() {
-  this.$container.toggleClass('date-clearable', this.dateClearable);
+scout.DateField.prototype._renderTimeHasText = function() {
+  if (this.$timeField) {
+    this.$timeField.toggleClass('has-text', this.timeHasText);
+  }
+  this.$container.toggleClass('time-has-text', this.timeHasText);
+};
+
+scout.DateField.prototype._updateDateHasText = function() {
+  this.setDateHasText(scout.strings.hasText(this._readDateDisplayText()));
+};
+
+scout.DateField.prototype.setDateHasText = function(dateHasText) {
+  this.setProperty('dateHasText', dateHasText);
+};
+
+scout.DateField.prototype._renderDateHasText = function() {
+  if (this.$dateField) {
+    this.$dateField.toggleClass('has-text', this.dateHasText);
+  }
+  this.$container.toggleClass('date-has-text', this.dateHasText);
 };
 
 /**
@@ -584,12 +584,12 @@ scout.DateField.prototype._clear = function() {
   if (this.hasDate && !this.timeFocused) {
     this.$dateField.val('');
     this._setDateValid(true);
-    this._updateDateClearable();
+    this._updateDateHasText();
   }
   if (this.hasTime && !this.dateFocused) {
     this.$timeField.val('');
     this._setTimeValid(true);
-    this._updateTimeClearable();
+    this._updateTimeHasText();
   }
 };
 
@@ -597,18 +597,14 @@ scout.DateField.prototype._onDateClearIconMouseDown = function(event) {
   if (!this.enabledComputed) {
     return;
   }
-  var clearable = this.dateClearable;
   this.$dateField.focus();
-  if (clearable) {
-    this.clear();
-    if (this.value) {
-      this.selectDate(this.value, false);
-    } else {
-      this.preselectDate(this._referenceDate(), false);
-    }
-    this._updateDateClearable();
-    event.preventDefault();
+  this.clear();
+  if (this.value) {
+    this.selectDate(this.value, false);
+  } else {
+    this.preselectDate(this._referenceDate(), false);
   }
+  event.preventDefault();
 };
 
 scout.DateField.prototype._onDateIconMouseDown = function(event) {
@@ -626,48 +622,60 @@ scout.DateField.prototype.setTimeFocused = function(timeFocused) {
 };
 
 scout.DateField.prototype._renderTimeFocused = function() {
-  this._updateTimeClearable();
+  this.$container.toggleClass('time-focused', this.timeFocused);
 };
 
-scout.DateField.prototype._updateTimeClearable = function() {
-  if (this.touch) {
-    return;
-  }
-  if (!this.$field) {
-    return;
-  }
-  var clearable = scout.strings.hasText(this._readTimeDisplayText());
-  if (!this.embedded) {
-    clearable = clearable && this.timeFocused;
-  }
-  this.setTimeClearable(clearable);
+scout.DateField.prototype._renderClearable = function() {
+  this._renderDateClearable();
+  this._renderTimeClearable();
+  this._updateClearableStyles();
 };
 
-scout.DateField.prototype.setTimeClearable = function(timeClearable) {
-  this.setProperty('timeClearable', timeClearable);
+scout.DateField.prototype._renderDateClearable = function() {
+  if (this.hasDate || this.isClearable()) {
+    if (!this.$dateClearIcon) {
+      // date clear icon
+      this.$dateClearIcon = this.$field.appendSpan('icon date-clear unfocusable')
+        .on('mousedown', this._onDateClearIconMouseDown.bind(this));
+      // avoid fastclick on icon. Otherwise the blur event overtakes the mousedown event.
+      this.$dateClearIcon.addClass('needsclick');
+    }
+  } else {
+    if (this.$dateClearIcon) {
+      // Remove clear icon
+      this.$dateClearIcon.remove();
+      this.$dateClearIcon = null;
+    }
+  }
 };
 
 scout.DateField.prototype._renderTimeClearable = function() {
-  this.$container.toggleClass('time-clearable', this.timeClearable);
+  if (this.hasTime && this.isClearable() && !this.$timeClearIcon) {
+    // date clear icon
+    this.$timeClearIcon = this.$field.appendSpan('icon time-clear unfocusable')
+      .on('mousedown', this._onTimeClearIconMouseDown.bind(this));
+    // avoid fastclick on icon. Otherwise the blur event overtakes the mousedown event.
+    this.$timeClearIcon.addClass('needsclick');
+  } else if ((!this.hasTime || !this.isClearable()) && this.$timeClearIcon) {
+    // Remove $dateField
+    this.$timeClearIcon.remove();
+    this.$timeClearIcon = null;
+  }
 };
 
 scout.DateField.prototype._onTimeClearIconMouseDown = function(event) {
   if (!this.enabledComputed) {
     return;
   }
-  var clearable = this.timeClearable;
   this.$timeField.focus();
-  if (clearable) {
-    this.clear();
-    if (this.value) {
-      this.selectTime(this.value, false);
-    } else {
-      this.preselectTime(this._referenceDate(), false);
-    }
-    this._updateTimeClearable();
-    event.preventDefault();
-    return;
+  this.clear();
+  if (this.value) {
+    this.selectTime(this.value, false);
+  } else {
+    this.preselectTime(this._referenceDate(), false);
   }
+  event.preventDefault();
+  return;
 };
 
 scout.DateField.prototype._onTimeIconMouseDown = function(event) {
@@ -894,7 +902,7 @@ scout.DateField.prototype._onDateFieldInput = function(event) {
     // No valid prediction!
     this._removePredictionFields();
   }
-  this._updateDateClearable();
+  this._updateDateHasText();
 };
 
 scout.DateField.prototype.acceptInput = function() {
@@ -1097,7 +1105,7 @@ scout.DateField.prototype._onTimeFieldInput = function(event) {
     this._tempTimeDate = null;
     this._removePredictionFields();
   }
-  this._updateTimeClearable();
+  this._updateTimeHasText();
 };
 
 scout.DateField.prototype._onDatePickerDateSelect = function(event) {
@@ -1194,8 +1202,8 @@ scout.DateField.prototype._updateDisplayTextProperty = function() {
  */
 scout.DateField.prototype.aboutToBlurByMouseDown = function(target) {
   var dateFieldActive, timeFieldActive, eventOnDatePicker, eventOnTimePicker,
-    eventOnDateField = this.$dateField ? (this.$dateField.isOrHas(target) || this.$dateFieldIcon.isOrHas(target) || this.$dateClearIcon.isOrHas(target)) : false,
-    eventOnTimeField = this.$timeField ? (this.$timeField.isOrHas(target) || this.$timeFieldIcon.isOrHas(target) || this.$timeClearIcon.isOrHas(target)) : false,
+    eventOnDateField = this.$dateField ? (this.$dateField.isOrHas(target) || this.$dateFieldIcon.isOrHas(target) || (this.$dateClearIcon && this.$dateClearIcon.isOrHas(target))) : false,
+    eventOnTimeField = this.$timeField ? (this.$timeField.isOrHas(target) || this.$timeFieldIcon.isOrHas(target) || (this.$timeClearIcon && this.$timeClearIcon.isOrHas(target))) : false,
     eventOnPopup = this.popup && this.popup.$container.isOrHas(target),
     datePicker = this.getDatePicker(),
     timePicker = this.getTimePicker();
@@ -1432,8 +1440,7 @@ scout.DateField.prototype._predictDate = function(inputText) {
  */
 scout.DateField.prototype._predictTime = function(inputText) {
   inputText = inputText || '';
-
-  var analyzeInfo = this.isolatedTimeFormat.analyze(inputText, this.value ||this._referenceDate());
+  var analyzeInfo = this.isolatedTimeFormat.analyze(inputText, this.value || this._referenceDate());
   if (analyzeInfo.error) {
     this._setTimeValid(false);
     return null;

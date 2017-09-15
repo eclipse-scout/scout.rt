@@ -18,6 +18,12 @@ scout.DatePickerTouchPopup.prototype._init = function(options) {
   this._field.on('acceptInput', this._onFieldAcceptInput.bind(this));
 };
 
+scout.DatePickerTouchPopup.prototype._fieldOverrides = function() {
+  var overrides = scout.DatePickerTouchPopup.parent.prototype._fieldOverrides.call(this);
+  overrides.hasTime = false;
+  return overrides;
+};
+
 /**
  * @override TouchPopup.js
  */

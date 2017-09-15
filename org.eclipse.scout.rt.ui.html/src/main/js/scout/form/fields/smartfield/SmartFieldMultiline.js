@@ -34,7 +34,7 @@ scout.SmartFieldMultiline.prototype._render = function() {
       .focus(this._onFieldFocus.bind(this))
       .keyup(this._onFieldKeyUp.bind(this))
       .keydown(this._onFieldKeyDown.bind(this))
-      .on('input', this._onInputChanged.bind(this));
+      .on('input', this._onFieldInput.bind(this));
   }
   this.addField($input);
   this._$multilineLines = this.$fieldContainer
@@ -43,9 +43,8 @@ scout.SmartFieldMultiline.prototype._render = function() {
   if (!this.embedded) {
     this.addMandatoryIndicator();
   }
-  this.addIcon(this.$fieldContainer);
+  this.addIcon();
   this.$icon.addClass('needsclick');
-  this.addClearIcon(this.$fieldContainer);
   this.addStatus();
 };
 

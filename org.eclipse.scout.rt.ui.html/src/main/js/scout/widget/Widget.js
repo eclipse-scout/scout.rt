@@ -45,6 +45,7 @@ scout.Widget = function() {
   this.enabled = true;
   this.disabledStyle = scout.Widget.DisabledStyle.DEFAULT;
   this.visible = true;
+  this.focused = false;
   this.loading = false;
 
   this.$container;
@@ -293,6 +294,7 @@ scout.Widget.prototype._render = function() {
 scout.Widget.prototype._renderProperties = function() {
   this._renderEnabled();
   this._renderVisible();
+  this._renderFocused();
   this._renderCssClass();
   this._renderLoading();
 };
@@ -582,6 +584,22 @@ scout.Widget.prototype._renderVisible = function() {
     return;
   }
   this.$container.setVisible(this.visible);
+};
+
+/**
+ * This function does not set the focus to the field. It toggles the 'focused' class on the field container if present.
+ * Objects using widget as prototype must call this function onBlur and onFocus to ensure the class gets toggled.
+ *
+ *  Use scout.Widget.focus to set the focus to the widget.
+ */
+scout.Widget.prototype.setFocused = function(focused) {
+  this.setProperty('focused', focused);
+};
+
+scout.Widget.prototype._renderFocused = function() {
+  if (this.$container) {
+    this.$container.toggleClass('focused', this.focused);
+  }
 };
 
 scout.Widget.prototype._setCssClass = function(cssClass) {

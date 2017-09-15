@@ -238,6 +238,14 @@ scout.graphics = {
     });
   },
 
+  borders: function($comp) {
+    return scout.graphics.insets($comp, {
+      includeMargin: false,
+      includePadding: false,
+      includeBorder: true
+    });
+  },
+
   /**
    * Sets the location (CSS properties left, top) of the component.
    * @param vararg integer value for X position OR instance of scout.Point

@@ -22,10 +22,25 @@ scout.ValueField = function() {
   this.parser = this._parseValue.bind(this);
   this.formatter = this._formatValue.bind(this);
   this._addCloneProperties(['value', 'displayText']);
-  this.focused = false;
-  this.clearable = false;
+  this.clearable = scout.ValueField.Clearable.FOCUSED;
+  this.hasText = false;
 };
 scout.inherits(scout.ValueField, scout.FormField);
+
+scout.ValueField.Clearable = {
+  /**
+   * The clear icon is showed when the field has text.
+   */
+  ALWAYS: 'clearableAlways',
+  /**
+   * The clear icon will be showed when the field is focused and has text.
+   */
+  FOCUSED: 'clearableFocused',
+  /**
+   * Never show the clear icon.
+   */
+  NEVER: 'clearableNever'
+};
 
 scout.ValueField.prototype._init = function(model) {
   scout.ValueField.parent.prototype._init.call(this, model);
@@ -52,13 +67,14 @@ scout.ValueField.prototype._renderProperties = function() {
   scout.ValueField.parent.prototype._renderProperties.call(this);
   this._renderDisplayText();
   this._renderClearable();
+  this._renderHasText();
 };
 
 /**
  * The default impl. is a NOP, because not every ValueField has a sensible display text.
  */
 scout.ValueField.prototype._renderDisplayText = function() {
-  this._updateClearable();
+  this._updateHasText();
 };
 
 /**
@@ -69,10 +85,8 @@ scout.ValueField.prototype._readDisplayText = function() {
 };
 
 scout.ValueField.prototype._onClearIconMouseDown = function(event) {
-  if (this.clearable) {
-    this.clear();
-    event.preventDefault();
-  }
+  this.clear();
+  event.preventDefault();
 };
 
 scout.ValueField.prototype._onFieldFocus = function(event) {
@@ -206,14 +220,6 @@ scout.ValueField.prototype.isFocusOnField = function(target) {
   return this.$field.isOrHas(target) || (this.$clearIcon && this.$clearIcon.isOrHas(target));
 };
 
-scout.ValueField.prototype.setFocused = function(focused) {
-  this.setProperty('focused', focused);
-};
-
-scout.ValueField.prototype._renderFocused = function() {
-  this._updateClearable();
-};
-
 scout.ValueField.prototype._triggerAcceptInput = function(whileTyping) {
   var event = {
     displayText: this.displayText,
@@ -226,24 +232,62 @@ scout.ValueField.prototype.setDisplayText = function(displayText) {
   this.setProperty('displayText', displayText);
 };
 
-scout.ValueField.prototype._updateClearable = function() {
-  this.setClearable(scout.strings.hasText(this._readDisplayText()) && this.focused);
+scout.ValueField.prototype._updateHasText = function() {
+  this.setHasText(scout.strings.hasText(this._readDisplayText()));
 };
 
-scout.ValueField.prototype.setClearable = function(clearable) {
-  this.setProperty('clearable', clearable);
+scout.ValueField.prototype.setHasText = function(hasText) {
+  this.setProperty('hasText', hasText);
+};
+
+scout.ValueField.prototype._renderHasText = function() {
+  if (this.$field) {
+    this.$field.toggleClass('has-text', this.hasText);
+  }
+  this.$container.toggleClass('has-text', this.hasText);
+};
+
+scout.ValueField.prototype.setClearable = function(clearableStyle) {
+  this.setProperty('clearable', clearableStyle);
 };
 
 scout.ValueField.prototype._renderClearable = function() {
-  this.$container.toggleClass('clearable', this.clearable);
+  if (this.isClearable()) {
+    if (!this.$clearIcon) {
+      this.addClearIcon();
+    }
+  } else {
+    if (this.$clearIcon) {
+      // Remove $dateField
+      this.$clearIcon.remove();
+      this.$clearIcon = null;
+    }
+  }
   this.invalidateLayoutTree(false);
+  this._updateClearableStyles();
 };
+
+scout.ValueField.prototype._updateClearableStyles = function() {
+  this.$container.removeClass('clearable-always clearable-focused');
+  if (this.isClearable()) {
+    if (this.clearable === scout.ValueField.Clearable.ALWAYS) {
+      this.$container.addClass('clearable-always');
+    } else if (this.clearable === scout.ValueField.Clearable.FOCUSED) {
+      this.$container.addClass('clearable-focused');
+    }
+  }
+};
+
+scout.ValueField.prototype.isClearable = function() {
+  return this.clearable === scout.ValueField.Clearable.ALWAYS || this.clearable === scout.ValueField.Clearable.FOCUSED;
+};
+
 /**
  * Clears the display text and the value to null.
  */
 scout.ValueField.prototype.clear = function() {
   this._clear();
-  this._updateClearable();
+  this._updateHasText();
   this.acceptInput();
   this._triggerClear();
 };
@@ -486,7 +530,7 @@ scout.ValueField.prototype.addField = function($field) {
 };
 
 scout.ValueField.prototype._onFieldInput = function() {
-  this._updateClearable();
+  this._updateHasText();
 };
 
 scout.ValueField.prototype._onStatusMouseDown = function(event) {

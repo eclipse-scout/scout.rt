@@ -34,37 +34,3 @@ scout.SmartFieldLayout.prototype.layout = function($container) {
     popup.validateLayout();
   }
 };
-
-/**
- * Layout for icon in multiline smart-field works a bit different because the icon here is _inside_
- * an additional field container, which contains the INPUT field and the icon.
- *
- * @override FormFieldLayout.js
- */
-scout.SmartFieldLayout.prototype._layoutIcon = function(formField, fieldBounds, right, top) {
-  var multiline = formField instanceof scout.SmartFieldMultiline;
-  // Cannot use field bounds because icon should have same height as input field
-  var height = this._smartField.$field.outerHeight();
-  formField.$icon
-    .cssRight(formField.$field.cssBorderRightWidth() + (multiline ? 0 : right))
-    .cssTop(top)
-    .cssHeight(height)
-    .cssLineHeight(height);
-};
-
-/**
- * Layout for clear icon in multiline smart-field works a bit different because the icon here is _inside_
- * an additional field container, which contains the INPUT field and the icon.
- *
- * @override FormFieldLayout.js
- */
-scout.SmartFieldLayout.prototype._layoutClearableIcon = function(formField, fieldBounds, right, top) {
-  var multiline = formField instanceof scout.SmartFieldMultiline;
-  // Cannot use field bounds because icon should have same height as input field
-  var height = this._smartField.$field.outerHeight();
-  formField.$clearIcon
-    .cssRight(formField.$field.cssBorderRightWidth() + (multiline ? 0 : right))
-    .cssTop(top)
-    .cssHeight(height)
-    .cssLineHeight(height);
-};

@@ -29,30 +29,33 @@
     }
   }
 
+  /* adjust paddings in case of both icons (icon and clear-icon) are visible */
+  &.has-icon.clearable-always.has-text&:not(.loading)&:not(.disabled)&:not(.compact),
+  &.has-icon.clearable-focused.has-text.focused&:not(.loading)&:not(.disabled)&:not(.compact) {
+
+    > input {
+      padding-right: @text-field-padding-x + 40px;
+    }
+
+    &.halign-right > input {
+      padding-left: @text-field-padding-x + 15px;
+      padding-right: @text-field-padding-x + 15px;
+    }
+
+    > .icon{
+      display: block;
+    }
+  }
+
+
   &.has-icon {
 
-  & > .icon {
+    & > .icon {
       cursor: pointer;
+
       &::before {
         content: @icon-arrow-right;
       }
     }
-
-    /* adjust paddings in case of both icons (icon and clear-icon) are visible */
-    &.clearable{
-      & > input[type=text] {
-        padding-right: @text-field-padding-x + 40px;
-
-        &.halign-right {
-          padding-left: @text-field-padding-x + 15px;
-          padding-right: @text-field-padding-x + 15px;
-        }
-
-        & ~ .icon {
-          display: block;
-        }
-      }
-    }
   }
 }
-

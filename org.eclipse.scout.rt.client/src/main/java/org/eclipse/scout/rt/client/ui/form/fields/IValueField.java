@@ -33,6 +33,27 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IContext
    */
   String PROP_CONTEXT_MENU = "contextMenu";
 
+  String PROP_CLEARABLE = "clearable";
+
+  /**
+   * Property to signal a clearable icon is never used of this field.
+   *
+   * @see IValueField#setClearable(String)
+   */
+  String CLEARABLE_NEVER = "clearableNever";
+  /**
+   * Property to signal a clearable icon is only showed on the focused field when the field does have an input text.
+   *
+   * @see IValueField#setClearable(String)
+   */
+  String CLEARABLE_FOCUSED = "clearableFocused";
+  /**
+   * Property to signal a clearable icon is always displayed when the field does have an input text.
+   *
+   * @see IValueField#setClearable(String)
+   */
+  String CLEARABLE_ALWAYS = "clearableAlways";
+
   /**
    * set field value to initValue and clear all error flags
    */
@@ -123,4 +144,25 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IContext
    */
   void setAutoAddDefaultMenus(boolean b);
 
+  /**
+   * getter for clearable style. Supported styles are:
+   * <ul>
+   * <li>{@link IValueField#CLEARABLE_FOCUSED} the clear icon will be displayed on fields having the focus and
+   * containing text.</li>
+   * <li>{@link IValueField#CLEARABLE_ALWAYS} the clear icon will be displayed on fields containing text</li>
+   * <li>{@link IValueField#CLEARABLE_NEVER} the clear icon will never be displayed.</li>
+   * </ul>
+   */
+  String getClearable();
+
+  /**
+   * Sets the clearable style. Supported styles are:
+   * <ul>
+   * <li>{@link IValueField#CLEARABLE_FOCUSED} the clear icon will be displayed on fields having the focus and
+   * containing text.</li>
+   * <li>{@link IValueField#CLEARABLE_ALWAYS} the clear icon will be displayed on fields containing text</li>
+   * <li>{@link IValueField#CLEARABLE_NEVER} the clear icon will never be displayed.</li>
+   * </ul>
+   */
+  void setClearable(String clearableStyle);
 }

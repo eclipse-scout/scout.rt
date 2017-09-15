@@ -99,9 +99,16 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     return true;
   }
 
+  @Order(220)
+  @ConfigProperty(ConfigProperty.STRING)
+  protected String getConfiguredClearable() {
+    return CLEARABLE_FOCUSED;
+  }
+
   @Override
   protected void initConfig() {
     super.initConfig();
+    setClearable(getConfiguredClearable());
     m_listeningSlaves = new EventListenerList();
     setAutoAddDefaultMenus(getConfiguredAutoAddDefaultMenus());
 
@@ -590,6 +597,16 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   @Override
   public void setAutoAddDefaultMenus(boolean b) {
     propertySupport.setPropertyBool(PROP_AUTO_ADD_DEFAULT_MENUS, b);
+  }
+
+  @Override
+  public void setClearable(String clearableStyle) {
+    propertySupport.setPropertyString(PROP_CLEARABLE, clearableStyle);
+  }
+
+  @Override
+  public String getClearable() {
+    return propertySupport.getPropertyString(PROP_CLEARABLE);
   }
 
   /**

@@ -11,8 +11,6 @@
 scout.SmartField = function() {
   scout.SmartField.parent.call(this);
 
-  this.focused = false;
-  this.clearable = false;
   this.popup = null;
   this.lookupCall = null;
   this.codeType = null;
@@ -37,7 +35,8 @@ scout.SmartField = function() {
   this.lookupStatus = null;
 
   this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilter', 'activeFilterEnabled', 'activeFilterLabels',
-    'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental']);
+    'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental'
+  ]);
 };
 scout.inherits(scout.SmartField, scout.ValueField);
 
@@ -109,7 +108,7 @@ scout.SmartField.prototype._render = function() {
       .focus(this._onFieldFocus.bind(this))
       .keyup(this._onFieldKeyUp.bind(this))
       .keydown(this._onFieldKeyDown.bind(this))
-      .on('input', this._onInputChanged.bind(this));
+      .on('input', this._onFieldInput.bind(this));
   }
   this.addField($field);
 
@@ -118,13 +117,7 @@ scout.SmartField.prototype._render = function() {
   }
   this.addIcon();
   this.$icon.addClass('needsclick');
-  this.addClearIcon();
   this.addStatus();
-};
-
-scout.SmartField.prototype._renderProperties = function() {
-  scout.SmartField.parent.prototype._renderProperties.call(this);
-  this._renderClearable();
 };
 
 scout.SmartField.prototype.cssClassName = function() {
@@ -159,7 +152,7 @@ scout.SmartField.prototype._renderDisplayText = function() {
     displayText = textLines[0];
   }
   scout.fields.valOrText(this.$field, displayText);
-  this._updateClearable();
+  scout.SmartField.parent.prototype._renderDisplayText.call(this);
 };
 
 /**
@@ -454,7 +447,6 @@ scout.SmartField.prototype._isLookupRowActive = function(lookupRow) {
 
 scout.SmartField.prototype._renderEnabled = function() {
   scout.SmartField.parent.prototype._renderEnabled.call(this);
-
   this.$field.setTabbable(this.enabledComputed);
 };
 
@@ -761,7 +753,7 @@ scout.SmartField.prototype.closePopup = function() {
  * @override
  */
 scout.SmartField.prototype.aboutToBlurByMouseDown = function(target) {
-  var eventOnField = this.$field.isOrHas(target) || this.$icon.isOrHas(target) || this.$clearIcon.isOrHas(target);
+  var eventOnField = this.$field.isOrHas(target) || this.$icon.isOrHas(target) || (this.$clearIcon && this.$clearIcon.isOrHas(target));
   var eventOnPopup = this.popup && this.popup.$container.isOrHas(target);
   if (!eventOnField && !eventOnPopup) {
     this.acceptInput(); // event outside this value field
@@ -785,16 +777,8 @@ scout.SmartField.prototype._onIconMouseDown = function(event) {
   if (!this.enabledComputed) {
     return;
   }
-
   event.preventDefault();
-
-  var clearable = this.clearable;
   this.$field.focus();
-  if (clearable) {
-    this.clear();
-    return;
-  }
-
   if (!this.embedded) {
     if (this.isDropdown()) {
       this.togglePopup();
@@ -804,6 +788,16 @@ scout.SmartField.prototype._onIconMouseDown = function(event) {
   }
 };
 
+scout.SmartField.prototype._onClearIconMouseDown = function(event) {
+  $.log.debug('(SmartField#_onClearIconMouseDown)');
+  if (!this.enabledComputed) {
+    return;
+  }
+  event.preventDefault();
+  this.$field.focus();
+  this.clear();
+};
+
 scout.SmartField.prototype._clear = function() {
   this._userWasTyping = true;
   this.$field.val('');
@@ -811,7 +805,7 @@ scout.SmartField.prototype._clear = function() {
     // When cleared, browse by all again, need to do it in setTimeout because sending acceptInput and lookupAll at the same time does not seem to work
     setTimeout(this._lookupByTextOrAll.bind(this, true));
   }
-  this._updateClearable();
+  this._updateHasText();
 };
 
 scout.SmartField.prototype.togglePopup = function() {
@@ -829,16 +823,8 @@ scout.SmartField.prototype._onFieldBlur = function(event) {
   if (this.embedded) {
     return;
   }
-  scout.SmartField.parent.prototype._onFieldBlur.call(this, event);
+  this.acceptInput(false);
   this.closePopup();
-};
-
-scout.SmartField.prototype._onFieldFocus = function(event) {
-  this.setFocused(true);
-};
-
-scout.SmartField.prototype._onInputChanged = function(event) {
-  this._updateClearable();
 };
 
 scout.SmartField.prototype._onFieldKeyUp = function(event) {
@@ -970,7 +956,6 @@ scout.SmartField.prototype._isFunctionKey = function(event) {
 scout.SmartField.prototype._onLookupRowSelected = function(event) {
   this.setLookupRow(event.lookupRow);
   this._inputAccepted();
-  this._updateClearable();
   this.closePopup();
 };
 
@@ -1112,30 +1097,11 @@ scout.SmartField.prototype._showSelection = function() {
   return text === this.lookupRow.text;
 };
 
-scout.SmartField.prototype.setFocused = function(focused) {
-  this.setProperty('focused', focused);
-};
-
-scout.SmartField.prototype._renderFocused = function() {
-  this._updateClearable();
-};
-
-scout.SmartField.prototype._updateClearable = function() {
-  if (this.touch) {
-    return;
-  }
-  if (!this.$field) {
-    return;
-  }
-  if (this.isDropdown()) {
-    this.setClearable(false);
-    return;
-  }
-  var clearable = scout.strings.hasText(this._readDisplayText());
-  if (!this.embedded) {
-    clearable = clearable && this.focused;
-  }
-  this.setClearable(clearable);
+/**
+ * override to ensure dropdown fields and touch mode smart fields does not have a clear icon.
+ */
+scout.SmartField.prototype.isClearable = function() {
+  return scout.SmartField.parent.prototype.isClearable.call(this) && !this.isDropdown() && !this.touch;
 };
 
 scout.SmartField.prototype._triggerAcceptInputFail = function() {

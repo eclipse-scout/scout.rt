@@ -73,6 +73,12 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
         return getModel().getDisplayText();
       }
     });
+    putJsonProperty(new JsonProperty<VALUE_FIELD>(IValueField.PROP_CLEARABLE, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().getClearable();
+      }
+    });
   }
 
   @Override

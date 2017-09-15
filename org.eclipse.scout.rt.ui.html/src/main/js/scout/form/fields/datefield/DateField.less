@@ -8,80 +8,118 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.date-field > .field {
+.date-field {
+  #scout.value-field-with-icon(~'.icon.date');
+  #scout.value-field-with-icon(~'.icon.time');
 
-  & > .icon {
+  & > .field {
 
-    &.date-clear,
-    &.time-clear {
-      cursor: pointer;
+    & > input,
+    & > .input-field {
+      position: absolute;
+    }
+
+    .icon {
+
+      &.date-clear,
+      &.time-clear {
+        cursor: pointer;
+        display: none;
+
+        &::before {
+          content: @icon-remove;
+        }
+      }
+
+      &.date {
+
+        &::before {
+          content: @icon-calendar;
+        }
+      }
+
+      &.time {
+
+        &::before {
+          content: @icon-clock;
+        }
+      }
+    }
+  }
+
+  &.date-focused > .icon.date::before,
+  &.date-focused > .field > .icon.date::before,
+  &.time-focused > .icon.time::before,
+  &.time-focused > .field > .icon.time::before {
+    color: @text-field-icon-focus-color;
+  }
+
+  &:not(.disabled)&:not(.compact-date) > .field {
+    & > .icon.date{
+      display: block;
+    }
+
+    & > input.date {
+      padding-right: @text-field-padding-x + 15px;
+    }
+  }
+
+  &:not(.disabled)&:not(.compact-time) > .field {
+    & > .icon.time{
+      display: block;
+    }
+
+    & > input.time {
+      padding-right: @text-field-padding-x + 15px;
+    }
+  }
+
+  &.clearable-always.date-has-text&:not(.disabled)&:not(.compact-date),
+  &.clearable-focused.date-has-text.date-focused&:not(.disabled)&:not(.compact-date) {
+    #scout.value-field-with-icon(~'.icon.date-clear');
+
+    &.date-focused > .icon.date::before,
+    &.date-focused > .field > .icon.date-clear::before {
+      color: @text-field-icon-focus-color;
+    }
+
+    & > .field >  .date-clear {
+      display: block;
+    }
+
+    & > .field > .icon.date {
       display: none;
-
-      &::before {
-        content: @icon-remove;
-      }
     }
 
-    &.date {
-
-      &::before {
-        content: @icon-calendar;
-      }
-    }
-
-    &.time {
-    
-      &::before {
-        content: @icon-clock;
-      }
+    & > .field > input.date {
+      padding-right: @text-field-padding-x + 15px;
     }
   }
 
-  & > input,
-  & > .input-field {
-    position: absolute;
+  &.clearable-always.time-has-text&:not(.disabled)&:not(.compact-time),
+  &.clearable-focused.time-has-text.time-focused&:not(.disabled)&:not(.compact-time) {
+    #scout.value-field-with-icon(~'.icon.time-clear');
 
-    &.date {
-      #scout.field-with-icon( ~'.icon.date');
-      #scout.field-with-icon( ~'.icon.date-clear');
-      padding-right: @text-field-padding-x + 15px;
-
-      &.disabled {
-        padding-right: @text-field-padding-x;
-        & ~ .icon {
-          display: none;
-        }
-      }
-      /* When field is too small, hide the icon */
-      &.compact {
-        padding-right: @text-field-padding-x;
-        & ~ .icon {
-          display: none;
-        }
-      }
+    &.time-focused > .icon.time::before,
+    &.time-focused > .field > .icon.time-clear::before {
+      color: @text-field-icon-focus-color;
     }
 
-    &.time {
-      #scout.field-with-icon( ~'.icon.time');
-      #scout.field-with-icon( ~'.icon.time-clear');
+    & > .field >  .time-clear {
+      display: block;
+    }
+
+    & > .field > .icon.time {
+      display: none;
+    }
+
+    & > .field > input.time {
       padding-right: @text-field-padding-x + 15px;
-
-      &.disabled {
-        padding-right: @text-field-padding-x;
-        & ~ .icon {
-          display: none;
-        }
-      }
-
-      When field is too small, hide the icon
-      &.compact {
-        padding-right: @text-field-padding-x;
-        & ~ .icon {
-          display: none;
-        }
-      }
     }
   }
+}
+
+.date-field > .field {
 
   & > .input-field[placeholder]:empty::before {
     #scout.fake-placeholder();

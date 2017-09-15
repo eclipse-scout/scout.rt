@@ -8,6 +8,34 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+.dropdown-field {
+
+  & > .icon {
+    cursor: pointer;
+
+    &::before {
+      content: @icon-caret-down;
+    }
+  }
+
+  &.popup-open > .icon::before {
+    content: @icon-caret-up;
+  }
+
+  & > .field {
+    cursor: pointer;
+
+    &:focus,
+    &.focused {
+      #scout.focus-border();
+    }
+
+    &.disabled {
+      cursor: default;
+    }
+  }
+}
+
 .proposal-field {
 
   & > .icon::before {
@@ -114,6 +142,30 @@
       border-color: @error-border-color;
     }
   }
+}
+
+
+.proposal-field.loading,
+.smart-field.loading {
+
+  & > .icon {
+    #scout.animation(rotation 1.25s linear infinite);
+
+    &::before {
+      content: @icon-spinner;
+    }
+  }
+
+  & > input,
+  & > .input-field,
+  & > .field > input,
+  & > .field > .input-field {
+    & ~ .icon {
+      margin-right: @text-field-padding-x;
+      padding-right: 0;
+    }
+  }
+
 }
 
 .dropdown-field-popup, .smart-field-popup, .proposal-field-popup {
@@ -253,56 +305,4 @@
 }
 .delay-2 {
   #scout.animation-delay(400ms);
-}
-
-
-.dropdown-field {
-
-  & > .icon {
-    cursor: pointer;
-
-    &::before {
-      content: @icon-caret-down;
-    }
-  }
-
-  &.popup-open > .icon::before {
-    content: @icon-caret-up;
-  }
-
-  & > .field {
-    cursor: pointer;
-
-    &:focus,
-    &.focused {
-      #scout.focus-border();
-    }
-
-    &.disabled {
-      cursor: default;
-    }
-  }
-}
-
-.proposal-field.loading,
-.smart-field.loading {
-
-  & > .icon {
-    #scout.animation(rotation 1.25s linear infinite);
-
-    &::before {
-      content: @icon-spinner;
-    }
-  }
-
-  & > input,
-  & > .input-field,
-  & > .field > input,
-  & > .field > .input-field {
-    & ~ .icon {
-      margin-right: @text-field-padding-x;
-      padding-right: 0;
-    }
-  }
-
 }

@@ -927,22 +927,33 @@ scout.FormField.prototype.addContainer = function($parent, cssClass, layout) {
  */
 scout.FormField.prototype.updateInnerAlignment = function(opts) {
   opts = opts || {};
+  var $fieldContainer = opts.$fieldContainer || this.$fieldContainer;
+
+  this._updateElementInnerAlignment(opts, $fieldContainer);
+  if ($fieldContainer !== this.$container) {
+    // also set the styles to the container
+    this._updateElementInnerAlignment(opts, this.$container);
+  }
+};
+
+scout.FormField.prototype._updateElementInnerAlignment = function(opts, $field) {
+  opts = opts || {};
   var useHorizontalAlignment = scout.nvl(opts.useHorizontalAlignment, true);
   var useVerticalAlignment = scout.nvl(opts.useVerticalAlignment, true);
   var $fieldContainer = opts.$fieldContainer || this.$fieldContainer;
 
-  if ($fieldContainer) {
-    $fieldContainer.removeClass('has-inner-alignment halign-left halign-center halign-right valign-top valign-middle valign-bottom');
+  if ($field) {
+    $field.removeClass('has-inner-alignment halign-left halign-center halign-right valign-top valign-middle valign-bottom');
     if (useHorizontalAlignment || useVerticalAlignment) {
       // Set horizontal and vertical alignment (from gridData)
-      $fieldContainer.addClass('has-inner-alignment');
+      $field.addClass('has-inner-alignment');
       if (useHorizontalAlignment) {
         var hAlign = this.gridData.horizontalAlignment;
-        $fieldContainer.addClass(hAlign < 0 ? 'halign-left' : (hAlign > 0 ? 'halign-right' : 'halign-center'));
+        $field.addClass(hAlign < 0 ? 'halign-left' : (hAlign > 0 ? 'halign-right' : 'halign-center'));
       }
       if (useVerticalAlignment) {
         var vAlign = this.gridData.verticalAlignment;
-        $fieldContainer.addClass(vAlign < 0 ? 'valign-top' : (vAlign > 0 ? 'valign-bottom' : 'valign-middle'));
+        $field.addClass(vAlign < 0 ? 'valign-top' : (vAlign > 0 ? 'valign-bottom' : 'valign-middle'));
       }
     }
   }

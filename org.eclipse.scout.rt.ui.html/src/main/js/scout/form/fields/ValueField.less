@@ -1,9 +1,20 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 .value-field {
 
   & > .icon,
   & > .field > .icon,
   & > .clear-icon,
   & > .field > .clear-icon {
+    display: none;
     position: absolute;
     padding-right: @text-field-padding-x;
 
@@ -17,11 +28,16 @@
   & > .clear-icon,
   & > .field > .clear-icon {
     cursor: pointer;
-    display: none;
 
     &::before {
       content: @icon-remove;
     }
+  }
+
+  &.halign-right > .clear-icon,
+  &.halign-right > .field > .clear-icon {
+    padding-right: 0;
+    padding-left: @text-field-padding-x;
   }
 
   & > .icon,
@@ -29,68 +45,54 @@
     cursor: text;
   }
 
-  &.has-icon {
+  &.clearable-always.has-text&:not(.loading)&:not(.disabled)&:not(.compact),
+  &.clearable-focused.has-text.focused&:not(.loading)&:not(.disabled)&:not(.compact) {
+    #scout.value-field-with-icon(~'.clear-icon');
 
-    & > input,
-    & > .input-field,
-    & > .field > input,
-    & > .field > .input-field,
-     & > .file-input {
-      #scout.field-with-icon(~'.icon');
-      padding-right: @text-field-padding-x + 15px;
-
-      &.disabled {
-        padding-right: @text-field-padding-x;
-        & ~ .icon {
-          display: none;
-        }
-      }
-
-      /* When field is too small, hide the icon */
-      &.compact {
-        padding-right: @text-field-padding-x;
-        & ~ .icon {
-          display: none;
-        }
-      }
-    }
-  }
-  &:not(.loading).clearable {
-
-    & > .clear-icon,
-    & > .field > .clear-icon {
+    & > .clear-icon {
       display: block;
     }
 
-    & > .icon,
-    & > .field > .icon {
+    & > .icon {
       display: none;
     }
 
     & > input,
     & > .input-field,
     & > .field > input,
-    & > .field > .input-field {
+    & > .field > .input-field,
+    & > .file-input {
       padding-right: @text-field-padding-x + 15px;
+    }
 
-      &.disabled {
-        padding-right: @text-field-padding-x;
-      }
+    &.halign-right {
 
-      /* When field is too small, hide the icon */
-      &.compact {
+      & > input,
+      & > .input-field,
+      & > .field > input,
+      & > .field > .input-field,
+      & > .file-input {
+        padding-left: @text-field-padding-x + 15px;
         padding-right: @text-field-padding-x;
-        & ~ .clear-icon {
-          display: none;
-        }
       }
     }
   }
 
-  & > input,
-  & > .input-field,
-  & > .field > input,
-  & > .field > .input-field {
-    #scout.field-with-icon(~'.clear-icon');
+
+  &.has-icon:not(.compact) {
+    #scout.value-field-with-icon(~'.icon');
+
+    & > .icon,
+    & > .field > .icon {
+      display: block;
+    }
+
+    & > input,
+    & > .input-field,
+    & > .field > input,
+    & > .field > .input-field,
+    & > .file-input {
+      padding-right: @text-field-padding-x + 15px;
+    }
   }
 }

@@ -40,6 +40,7 @@ public class JsonAdapterRegistryTest {
   public void testCreateDisposeInSameRequest() throws Exception {
     UiSession session = new UiSessionMock();
     IStringField model = new AbstractStringField() {
+
     };
     IJsonAdapter<?> adapter = session.getOrCreateJsonAdapter(model, null);
 

@@ -19,11 +19,6 @@ scout.BasicField = function() {
 };
 scout.inherits(scout.BasicField, scout.ValueField);
 
-scout.BasicField.prototype.addContainer = function($parent, cssClass, layout) {
-  scout.BasicField.parent.prototype.addContainer.call(this, $parent, cssClass, layout);
-  this.$container.addClass('basic-field');
-};
-
 scout.BasicField.prototype.addField = function($field) {
   scout.BasicField.parent.prototype.addField.call(this, $field);
   if ($field) {

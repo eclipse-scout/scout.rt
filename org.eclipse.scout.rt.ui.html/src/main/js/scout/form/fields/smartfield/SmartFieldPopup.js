@@ -111,7 +111,7 @@ scout.SmartFieldPopup.prototype._onRemoveSmartField = function(event) {
  * @override because the icon is not in the $anchor container.
  */
 scout.SmartFieldPopup.prototype._isMouseDownOnAnchor = function(event) {
-  return this.field.$field.isOrHas(event.target) || this.field.$icon.isOrHas(event.target) || this.field.$clearIcon.isOrHas(event.target);
+  return this.field.$field.isOrHas(event.target) || this.field.$icon.isOrHas(event.target) || (this.field.$clearIcon && this.field.$clearIcon.isOrHas(event.target));
 };
 
 scout.SmartFieldPopup.prototype._onAnimationEnd = function() {

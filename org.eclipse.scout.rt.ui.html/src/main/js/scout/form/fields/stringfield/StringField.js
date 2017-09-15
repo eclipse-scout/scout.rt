@@ -54,7 +54,7 @@ scout.StringField.prototype._createKeyStrokeContext = function() {
 };
 
 scout.StringField.prototype._render = function() {
-  this.addContainer(this.$parent, 'string-field');
+  this.addContainer(this.$parent, 'string-field', new scout.StringFieldLayout(this));
   this.addLabel();
   this.addMandatoryIndicator();
 
@@ -90,7 +90,6 @@ scout.StringField.prototype._render = function() {
   }
 
   this.addField($field);
-  this.addClearIcon();
   this.addStatus();
 };
 
@@ -124,6 +123,13 @@ scout.StringField.prototype._renderProperties = function() {
 scout.StringField.prototype.addIcon = function() {
   this.$icon = scout.fields.appendIcon(this.$container)
     .on('click', this._onIconClick.bind(this));
+};
+
+/**
+ * override to ensure dropdown fields and touch mode smart fields does not have a clear icon.
+ */
+scout.StringField.prototype.isClearable = function() {
+  return scout.StringField.parent.prototype.isClearable.call(this) && !this.multilineText;
 };
 
 scout.StringField.prototype.setMaxLength = function(maxLength) {
@@ -210,15 +216,18 @@ scout.StringField.prototype.setHasAction = function(hasAction) {
 
 scout.StringField.prototype._renderHasAction = function() {
   if (this.hasAction) {
+    if (!this.$icon) {
+      this.addIcon();
+    }
     this.$container.addClass('has-icon');
-    this.addIcon();
-    this.invalidateLayoutTree(false);
   } else {
     if (this.$icon) {
       this.$icon.remove();
-      this.$container.removeClass('has-icon');
+      this.$icon = null;
     }
+    this.$container.removeClass('has-icon');
   }
+  this.revalidateLayout();
 };
 
 scout.StringField.prototype.setFormatUpper = function(formatUpper) {
