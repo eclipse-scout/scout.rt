@@ -167,3 +167,11 @@ scout.ProposalField2.prototype._acceptInput = function(searchText, searchTextEmp
 
   return this._acceptInputDeferred.promise();
 };
+
+scout.ProposalField2.prototype.setTrimText = function(trimText) {
+  this.setProperty('trimText', trimText);
+};
+
+scout.ProposalField2.prototype.setMaxLength = function(maxLength) {
+  this.setProperty('maxLength', maxLength);
+};
