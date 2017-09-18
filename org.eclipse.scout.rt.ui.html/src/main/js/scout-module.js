@@ -122,6 +122,7 @@
   __include("scout/carousel/CarouselLayout.js");
   __include("scout/cell/Cell.js");
   __include("scout/collapsehandle/CollapseHandle.js");
+  __include("scout/contenteditor/ContentEditor.js");
   __include("scout/focus/FocusManager.js");
   __include("scout/focus/FocusContext.js");
   __include("scout/focus/focusUtils.js");
@@ -412,6 +413,8 @@
   __include("scout/form/fields/clipboardfield/ClipboardFieldAdapter.js");
   __include("scout/form/fields/colorfield/ColorField.js");
   __include("scout/form/fields/colorfield/ColorFieldAdapter.js");
+  __include("scout/form/fields/contenteditorfield/ContentEditorField.js");
+  __include("scout/form/fields/contenteditorfield/ContentEditorFieldAdapter.js");
   __include("scout/form/fields/datefield/DateField.js");
   __include("scout/form/fields/datefield/DateFieldAdapter.js");
   __include("scout/form/fields/datefield/DateTimeCompositeLayout.js");
