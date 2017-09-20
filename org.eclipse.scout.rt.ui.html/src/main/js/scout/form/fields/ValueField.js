@@ -600,7 +600,7 @@ scout.ValueField.invokeValueFieldAcceptInput = function(target) {
  * That is used in DateField.js with multiple input elements.
  */
 scout.ValueField._getActiveValueField = function(target) {
-  var $activeElement = $(target.ownerDocument.activeElement),
+  var $activeElement = $(target).activeElement(),
     valueField = $activeElement.data('valuefield') || $activeElement.parent().data('valuefield');
   return valueField && !(valueField.$field && valueField.$field.hasClass('disabled')) ? valueField : null;
 };
