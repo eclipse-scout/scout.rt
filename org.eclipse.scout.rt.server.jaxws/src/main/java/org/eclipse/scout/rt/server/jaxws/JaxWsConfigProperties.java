@@ -16,6 +16,7 @@ import javax.security.auth.Subject;
 import javax.xml.ws.Service;
 
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
+import org.eclipse.scout.rt.platform.config.AbstractClassConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
@@ -89,7 +90,7 @@ public final class JaxWsConfigProperties {
    * By default, JAX-WS Metro (not bundled with JRE) is used. For that to work, add a Maven project dependency to JAX-WS
    * Metro to your server application's pom like <code>com.sun.xml.ws:jaxws-rt:2.2.10</code>.
    */
-  public static class JaxWsImplementorProperty extends AbstractStringConfigProperty {
+  public static class JaxWsImplementorProperty extends AbstractClassConfigProperty<JaxWsImplementorSpecifics> {
 
     @Override
     public String getKey() {
@@ -97,8 +98,8 @@ public final class JaxWsConfigProperties {
     }
 
     @Override
-    protected String getDefaultValue() {
-      return JaxWsMetroSpecifics.class.getName();
+    protected Class<? extends JaxWsImplementorSpecifics> getDefaultValue() {
+      return JaxWsMetroSpecifics.class;
     }
   }
 

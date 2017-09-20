@@ -1,6 +1,9 @@
 package org.eclipse.scout.rt.ui.html;
 
-import java.util.ArrayList;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -92,12 +95,12 @@ public final class UiHtmlConfigProperties {
     protected List<String> parse(String value) {
       String[] tokens = StringUtility.tokenize(value, ',');
       // Prevent accidental modification by returning an unmodifiable list because property is cached and always returns the same instance
-      return Arrays.asList(tokens);
+      return unmodifiableList(asList(tokens));
     }
 
     @Override
     protected List<String> getDefaultValue() {
-      return Collections.unmodifiableList(new ArrayList<String>(0));
+      return emptyList();
     }
   }
 
@@ -120,12 +123,12 @@ public final class UiHtmlConfigProperties {
     protected List<String> parse(String value) {
       String[] tokens = StringUtility.tokenize(value, ',');
       // Prevent accidental modification by returning an unmodifiable list because property is cached and always returns the same instance
-      return Arrays.asList(tokens);
+      return unmodifiableList(Arrays.asList(tokens));
     }
 
     @Override
     protected List<String> getDefaultValue() {
-      return Collections.unmodifiableList(new ArrayList<String>(0));
+      return Collections.emptyList();
     }
 
   }

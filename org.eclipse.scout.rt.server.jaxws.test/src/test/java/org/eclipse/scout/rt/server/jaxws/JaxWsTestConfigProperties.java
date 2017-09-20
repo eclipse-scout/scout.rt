@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.jaxws;
 
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsImplementorProperty;
+import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsRISpecifics;
 
 public final class JaxWsTestConfigProperties {
@@ -32,8 +33,8 @@ public final class JaxWsTestConfigProperties {
     }
 
     @Override
-    protected String getDefaultValue() {
-      return JaxWsRISpecifics.class.getName();
+    protected Class<? extends JaxWsImplementorSpecifics> getDefaultValue() {
+      return JaxWsRISpecifics.class;
     }
   }
 }

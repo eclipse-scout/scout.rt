@@ -18,8 +18,6 @@ import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsImplementorProperty;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 import org.slf4j.Logger;
@@ -50,23 +48,15 @@ public class JaxWsPlatformListener implements IPlatformListener {
   }
 
   protected void installImplementorSpecifics(final IBeanManager beanManager) {
-    final String jaxwsImplementor = CONFIG.getPropertyValue(JaxWsImplementorProperty.class);
+    final Class<? extends JaxWsImplementorSpecifics> jaxwsImplementor = CONFIG.getPropertyValue(JaxWsImplementorProperty.class);
     if (jaxwsImplementor == null) {
       return;
     }
 
-    try {
-      final Class<?> jaxwsImplementorClazz = Class.forName(jaxwsImplementor);
-      Assertions.assertTrue(JaxWsImplementorSpecifics.class.isAssignableFrom(jaxwsImplementorClazz), "Implementor class must be of type '{}'.", JaxWsImplementorSpecifics.class.getName());
+    beanManager.unregisterClass(jaxwsImplementor); // Unregister the Bean first, so it can be registered with @Replace annotation anew.
+    beanManager.registerBean(new BeanMetaData(jaxwsImplementor).withReplace(true));
 
-      beanManager.unregisterClass(jaxwsImplementorClazz); // Unregister the Bean first, so it can be registered with @Replace annotation anew.
-      beanManager.registerBean(new BeanMetaData(jaxwsImplementorClazz).withReplace(true));
-
-      LOG.info("JAX-WS implementor specific class installed: {}", jaxwsImplementorClazz.getName());
-    }
-    catch (final ClassNotFoundException e) {
-      throw new PlatformException("Configured JAX-WS implementor specific class", e);
-    }
+    LOG.info("JAX-WS implementor specific class installed: {}", jaxwsImplementor.getName());
   }
 
   protected void logImplementorInfo(final IBeanManager beanManager) {

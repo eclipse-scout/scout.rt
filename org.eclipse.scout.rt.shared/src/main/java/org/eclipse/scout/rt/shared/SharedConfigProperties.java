@@ -10,9 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
+
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -138,12 +139,12 @@ public final class SharedConfigProperties {
     protected List<String> parse(String value) {
       String[] tokens = StringUtility.tokenize(value, ',');
       // Prevent accidental modification by returning an unmodifiable list because property is cached and always returns the same instance
-      return Arrays.asList(tokens);
+      return unmodifiableList(asList(tokens));
     }
 
     @Override
     protected List<String> getDefaultValue() {
-      return Collections.unmodifiableList(new ArrayList<String>(0));
+      return emptyList();
     }
 
   }

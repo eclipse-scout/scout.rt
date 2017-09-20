@@ -46,7 +46,7 @@ public class ClientNotificationNodeQueue {
 
   private final FinalValue<String> m_nodeId = new FinalValue<>();
 
-  private final Integer m_capacity;
+  private final int m_capacity;
   private final BlockingDeque<ClientNotificationMessage> m_notifications;
 
   private final ReentrantReadWriteLock m_sessionUserCacheLock = new ReentrantReadWriteLock();
