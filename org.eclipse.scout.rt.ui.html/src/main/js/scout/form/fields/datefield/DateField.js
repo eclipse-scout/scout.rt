@@ -97,8 +97,7 @@ scout.DateField.prototype.createTimePopup = function() {
     cssClass: this._errorStatusClass(),
     closeOnAnchorMouseDown: false,
     field: this,
-    timeResolution: this.timePickerResolution,
-    displayText: this.timeDisplayText
+    timeResolution: this.timePickerResolution
   });
 };
 

@@ -195,8 +195,7 @@ describe('SmartField', function() {
       jasmine.clock().tick(500);
       expect(field.popup).not.toBe(null);
       expect(field.popup._field.$field.val()).toBe('Foo');
-      expect(field.popup._field.$container).toHaveClass('clearable');
-      expect(field.popup._field.clearable).toBe(true);
+      expect(field.popup._field.$container).toHaveClass('clearable-always');
     });
 
     it('stays open if active / inactive radio buttons are clicked', function() {
