@@ -92,7 +92,7 @@ scout.focusUtils = {
       activeElement = element.activeElement(true);
       element = element[0];
     } else {
-      activeElement = element.ownerDocument.activeElement;
+      activeElement = (element instanceof Document ? element : element.ownerDocument).activeElement;
     }
     return activeElement === element;
   }

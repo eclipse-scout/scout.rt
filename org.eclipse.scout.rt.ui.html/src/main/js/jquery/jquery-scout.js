@@ -28,11 +28,11 @@
  */
 function elemVisible(elem) {
   // Check if element itself is hidden by its own style attribute
-  if (isHidden(elem.style)) {
+  if (!elem || isHidden(elem.style)) {
     return false;
   }
   // Must use correct window for element / computedStyle
-  var myWindow = elem.ownerDocument.defaultView;
+  var myWindow = (elem instanceof Document ? elem : elem.ownerDocument).defaultView;
   // Check if element itself is hidden by external style-sheet
   if (isHidden(myWindow.getComputedStyle(elem))) {
     return false;
@@ -433,7 +433,7 @@ $.fn.makeSpan = function(cssClass, text) {
  * @param domElement (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
  */
 $.fn.document = function(domElement) {
-  var myDocument = this.length ? this[0].ownerDocument : null;
+  var myDocument = this.length ? (this[0] instanceof Document ? this[0] : this[0].ownerDocument) : null;
   return domElement ? myDocument : $(myDocument);
 };
 
