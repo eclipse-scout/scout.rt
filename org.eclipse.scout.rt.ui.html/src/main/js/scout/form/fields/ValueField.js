@@ -24,6 +24,8 @@ scout.ValueField = function() {
   this._addCloneProperties(['value', 'displayText']);
   this.clearable = scout.ValueField.Clearable.FOCUSED;
   this.hasText = false;
+
+  this.$clearIcon = null;
 };
 scout.inherits(scout.ValueField, scout.FormField);
 
@@ -75,6 +77,12 @@ scout.ValueField.prototype._renderProperties = function() {
  */
 scout.ValueField.prototype._renderDisplayText = function() {
   this._updateHasText();
+};
+
+
+scout.ValueField.prototype._remove = function(){
+  scout.ValueField.parent.prototype._remove.call(this);
+  this.$clearIcon = null;
 };
 
 /**

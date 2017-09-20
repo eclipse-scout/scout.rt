@@ -41,6 +41,7 @@ scout.FormField = function() {
    */
   this.$field;
   this.$fieldContainer;
+  this.$icon = null;
 
   /**
    * The computed enabled state. The difference to the 'enabled' property is that this member also considers the enabled-states of the parent widgets.
@@ -194,6 +195,8 @@ scout.FormField.prototype._remove = function() {
   this._removeField();
   this._removeStatus();
   this._removeLabel();
+  this._removeIcon();
+  this.removeMandatoryIndicator();
   this._removeDisabledCopyOverlay();
   this._uninstallDragAndDropHandler();
 };
@@ -795,6 +798,13 @@ scout.FormField.prototype._removeLabel = function() {
   this.$label = null;
 };
 
+scout.FormField.prototype._removeIcon = function() {
+  if (!this.$icon) {
+    return;
+  }
+  this.$icon.remove();
+  this.$icon = null;
+};
 /**
  * Appends the given field to the this.$container and sets the property this.$field.
  * The $field is used as $fieldContainer as long as you don't explicitly call addFieldContainer before calling addField.
@@ -864,6 +874,9 @@ scout.FormField.prototype.addMandatoryIndicator = function() {
 };
 
 scout.FormField.prototype.removeMandatoryIndicator = function() {
+  if (!this.$mandatory) {
+    return;
+  }
   this.$mandatory.remove();
   this.$mandatory = null;
 };

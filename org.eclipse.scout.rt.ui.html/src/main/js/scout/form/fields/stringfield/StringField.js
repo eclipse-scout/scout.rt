@@ -221,10 +221,7 @@ scout.StringField.prototype._renderHasAction = function() {
     }
     this.$container.addClass('has-icon');
   } else {
-    if (this.$icon) {
-      this.$icon.remove();
-      this.$icon = null;
-    }
+    this._removeIcon();
     this.$container.removeClass('has-icon');
   }
   this.revalidateLayout();

@@ -73,6 +73,7 @@ scout.DateField.prototype._initValue = function(value) {
   scout.DateField.parent.prototype._initValue.call(this, value);
 };
 
+
 scout.DateField.prototype.createDatePopup = function() {
   var popupType = this.touch ? 'DatePickerTouchPopup' : 'DatePickerPopup';
   return scout.create(popupType, {
@@ -131,6 +132,8 @@ scout.DateField.prototype._remove = function() {
   this.$timeField = null;
   this.$dateFieldIcon = null;
   this.$timeFieldIcon = null;
+  this.$dateClearIcon = null;
+  this.$timeClearIcon = null;
   this._$predictDateField = null;
   this._$predictTimeField = null;
   this.popup = null;
@@ -224,7 +227,7 @@ scout.DateField.prototype._renderHasTime = function() {
       .on('mousedown', this._onTimeIconMouseDown.bind(this));
     // avoid fastclick on icon. Otherwise the blur event overtakes the mousedown event.
     this.$timeFieldIcon.addClass('needsclick');
-    
+
   } else if (!this.hasTime && this.$timeField) {
     // Remove $timeField
     this.$timeField.remove();
