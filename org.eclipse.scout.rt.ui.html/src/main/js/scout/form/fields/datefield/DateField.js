@@ -905,6 +905,18 @@ scout.DateField.prototype._onDateFieldInput = function(event) {
     this._removePredictionFields();
   }
   this._updateDateHasText();
+
+  // Hide the prediction field if input field is scrolled to the left. Otherwise, the
+  // two fields would not be aligned correctly, which looks bad. This can only happen
+  // when the fields are rather small, so the prediction would be of limited use anyway.
+  // Unfortunately, most browsers don't fire 'scroll' events for input fields. Also,
+  // when the 'input' even is fired, the scrollLeft() position sometimes has not been
+  // updated yet, that's why we must use setTimeout() with a short delay.
+  setTimeout(function() {
+    if (this._$predictDateField) {
+      this._$predictDateField.setVisible(this.$dateField.scrollLeft() === 0);
+    }
+  }.bind(this), 50);
 };
 
 scout.DateField.prototype.acceptInput = function() {
@@ -1108,6 +1120,13 @@ scout.DateField.prototype._onTimeFieldInput = function(event) {
     this._removePredictionFields();
   }
   this._updateTimeHasText();
+
+  // See comment for similar code in _onDateFieldInput()
+  setTimeout(function() {
+    if (this._$predictTimeField) {
+      this._$predictTimeField.setVisible(this.$timeField.scrollLeft() === 0);
+    }
+  }.bind(this), 50);
 };
 
 scout.DateField.prototype._onDatePickerDateSelect = function(event) {
