@@ -223,7 +223,7 @@ public final class FileUtility {
     }
   }
 
-  public static List<File> listTree(File f, boolean includeFiles, boolean includeFolders) throws IOException {
+  public static List<File> listTree(File f, boolean includeFiles, boolean includeFolders) {
     List<File> list = new ArrayList<>();
     listTreeRec(f, list, includeFiles, includeFolders);
     return list;
