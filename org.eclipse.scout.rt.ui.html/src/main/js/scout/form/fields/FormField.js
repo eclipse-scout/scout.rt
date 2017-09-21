@@ -419,6 +419,9 @@ scout.FormField.prototype._onStatusMousedown = function(event) {
   // showing menus is more important than showing tooltips
   if (this.menusVisible && this._hasMenus()) {
     var func = function func(event) {
+      if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
+        return;
+      }
       var menus = this._getCurrentMenus();
       // Toggle menu
       if (this.contextPopup && this.contextPopup.rendered) {
