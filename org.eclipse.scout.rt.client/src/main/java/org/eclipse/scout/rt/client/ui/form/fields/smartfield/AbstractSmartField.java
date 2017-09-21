@@ -26,16 +26,16 @@ import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ISmartFieldExtension;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartField2FilterBrowseLookupResultChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartField2FilterKeyLookupResultChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartField2FilterLookupResultChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartField2FilterRecLookupResultChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartField2FilterTextLookupResultChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartField2PrepareBrowseLookupChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartField2PrepareKeyLookupChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartField2PrepareLookupChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartField2PrepareRecLookupChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartField2PrepareTextLookupChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartFieldFilterBrowseLookupResultChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartFieldFilterKeyLookupResultChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartFieldFilterLookupResultChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartFieldFilterRecLookupResultChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartFieldFilterTextLookupResultChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartFieldPrepareBrowseLookupChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartFieldPrepareKeyLookupChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartFieldPrepareLookupChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartFieldPrepareRecLookupChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartFieldPrepareTextLookupChain;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
@@ -1095,126 +1095,126 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     }
   }
 
-  protected static class LocalSmartField2Extension<VALUE, OWNER extends AbstractSmartField<VALUE>> extends LocalValueFieldExtension<VALUE, OWNER>
+  protected static class LocalSmartFieldExtension<VALUE, OWNER extends AbstractSmartField<VALUE>> extends LocalValueFieldExtension<VALUE, OWNER>
       implements ISmartFieldExtension<VALUE, OWNER> {
 
-    public LocalSmartField2Extension(OWNER owner) {
+    public LocalSmartFieldExtension(OWNER owner) {
       super(owner);
     }
 
     @Override
-    public void execFilterBrowseLookupResult(SmartField2FilterBrowseLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
+    public void execFilterBrowseLookupResult(SmartFieldFilterBrowseLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
       getOwner().execFilterBrowseLookupResult(call, result);
     }
 
     @Override
-    public void execFilterKeyLookupResult(SmartField2FilterKeyLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
+    public void execFilterKeyLookupResult(SmartFieldFilterKeyLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
       getOwner().execFilterKeyLookupResult(call, result);
     }
 
     @Override
-    public void execPrepareLookup(SmartField2PrepareLookupChain<VALUE> chain, ILookupCall<VALUE> call) {
+    public void execPrepareLookup(SmartFieldPrepareLookupChain<VALUE> chain, ILookupCall<VALUE> call) {
       getOwner().execPrepareLookup(call);
     }
 
     @Override
-    public void execPrepareTextLookup(SmartField2PrepareTextLookupChain<VALUE> chain, ILookupCall<VALUE> call, String text) {
+    public void execPrepareTextLookup(SmartFieldPrepareTextLookupChain<VALUE> chain, ILookupCall<VALUE> call, String text) {
       getOwner().execPrepareTextLookup(call, text);
     }
 
     @Override
-    public void execPrepareBrowseLookup(SmartField2PrepareBrowseLookupChain<VALUE> chain, ILookupCall<VALUE> call, String browseHint) {
+    public void execPrepareBrowseLookup(SmartFieldPrepareBrowseLookupChain<VALUE> chain, ILookupCall<VALUE> call, String browseHint) {
       getOwner().execPrepareBrowseLookup(call, browseHint);
     }
 
     @Override
-    public void execFilterTextLookupResult(SmartField2FilterTextLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
+    public void execFilterTextLookupResult(SmartFieldFilterTextLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
       getOwner().execFilterTextLookupResult(call, result);
     }
 
     @Override
-    public void execPrepareRecLookup(SmartField2PrepareRecLookupChain<VALUE> chain, ILookupCall<VALUE> call, VALUE parentKey) {
+    public void execPrepareRecLookup(SmartFieldPrepareRecLookupChain<VALUE> chain, ILookupCall<VALUE> call, VALUE parentKey) {
       getOwner().execPrepareRecLookup(call, parentKey);
     }
 
     @Override
-    public void execFilterLookupResult(SmartField2FilterLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
+    public void execFilterLookupResult(SmartFieldFilterLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
       getOwner().execFilterLookupResult(call, result);
     }
 
     @Override
-    public void execFilterRecLookupResult(SmartField2FilterRecLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
+    public void execFilterRecLookupResult(SmartFieldFilterRecLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
       getOwner().execFilterRecLookupResult(call, result);
     }
 
     @Override
-    public void execPrepareKeyLookup(SmartField2PrepareKeyLookupChain<VALUE> chain, ILookupCall<VALUE> call, VALUE key) {
+    public void execPrepareKeyLookup(SmartFieldPrepareKeyLookupChain<VALUE> chain, ILookupCall<VALUE> call, VALUE key) {
       getOwner().execPrepareKeyLookup(call, key);
     }
   }
 
   @Override
   protected ISmartFieldExtension<VALUE, ? extends AbstractSmartField<VALUE>> createLocalExtension() {
-    return new LocalSmartField2Extension<>(this);
+    return new LocalSmartFieldExtension<>(this);
   }
 
   protected final void interceptFilterBrowseLookupResult(ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SmartField2FilterBrowseLookupResultChain<VALUE> chain = new SmartField2FilterBrowseLookupResultChain<>(extensions);
+    SmartFieldFilterBrowseLookupResultChain<VALUE> chain = new SmartFieldFilterBrowseLookupResultChain<>(extensions);
     chain.execFilterBrowseLookupResult(call, result);
   }
 
   protected final void interceptFilterKeyLookupResult(ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SmartField2FilterKeyLookupResultChain<VALUE> chain = new SmartField2FilterKeyLookupResultChain<>(extensions);
+    SmartFieldFilterKeyLookupResultChain<VALUE> chain = new SmartFieldFilterKeyLookupResultChain<>(extensions);
     chain.execFilterKeyLookupResult(call, result);
   }
 
   protected final void interceptPrepareLookup(ILookupCall<VALUE> call) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SmartField2PrepareLookupChain<VALUE> chain = new SmartField2PrepareLookupChain<>(extensions);
+    SmartFieldPrepareLookupChain<VALUE> chain = new SmartFieldPrepareLookupChain<>(extensions);
     chain.execPrepareLookup(call);
   }
 
   protected final void interceptPrepareTextLookup(ILookupCall<VALUE> call, String text) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SmartField2PrepareTextLookupChain<VALUE> chain = new SmartField2PrepareTextLookupChain<>(extensions);
+    SmartFieldPrepareTextLookupChain<VALUE> chain = new SmartFieldPrepareTextLookupChain<>(extensions);
     chain.execPrepareTextLookup(call, text);
   }
 
   protected final void interceptPrepareBrowseLookup(ILookupCall<VALUE> call, String browseHint) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SmartField2PrepareBrowseLookupChain<VALUE> chain = new SmartField2PrepareBrowseLookupChain<>(extensions);
+    SmartFieldPrepareBrowseLookupChain<VALUE> chain = new SmartFieldPrepareBrowseLookupChain<>(extensions);
     chain.execPrepareBrowseLookup(call, browseHint);
   }
 
   protected final void interceptFilterTextLookupResult(ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SmartField2FilterTextLookupResultChain<VALUE> chain = new SmartField2FilterTextLookupResultChain<>(extensions);
+    SmartFieldFilterTextLookupResultChain<VALUE> chain = new SmartFieldFilterTextLookupResultChain<>(extensions);
     chain.execFilterTextLookupResult(call, result);
   }
 
   protected final void interceptPrepareRecLookup(ILookupCall<VALUE> call, VALUE parentKey) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SmartField2PrepareRecLookupChain<VALUE> chain = new SmartField2PrepareRecLookupChain<>(extensions);
+    SmartFieldPrepareRecLookupChain<VALUE> chain = new SmartFieldPrepareRecLookupChain<>(extensions);
     chain.execPrepareRecLookup(call, parentKey);
   }
 
   protected final void interceptFilterLookupResult(ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SmartField2FilterLookupResultChain<VALUE> chain = new SmartField2FilterLookupResultChain<>(extensions);
+    SmartFieldFilterLookupResultChain<VALUE> chain = new SmartFieldFilterLookupResultChain<>(extensions);
     chain.execFilterLookupResult(call, result);
   }
 
   protected final void interceptFilterRecLookupResult(ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SmartField2FilterRecLookupResultChain<VALUE> chain = new SmartField2FilterRecLookupResultChain<>(extensions);
+    SmartFieldFilterRecLookupResultChain<VALUE> chain = new SmartFieldFilterRecLookupResultChain<>(extensions);
     chain.execFilterRecLookupResult(call, result);
   }
 
   protected final void interceptPrepareKeyLookup(ILookupCall<VALUE> call, VALUE key) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SmartField2PrepareKeyLookupChain<VALUE> chain = new SmartField2PrepareKeyLookupChain<>(extensions);
+    SmartFieldPrepareKeyLookupChain<VALUE> chain = new SmartFieldPrepareKeyLookupChain<>(extensions);
     chain.execPrepareKeyLookup(call, key);
   }
 

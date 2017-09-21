@@ -24,16 +24,16 @@ public final class SmartFieldChains {
   private SmartFieldChains() {
   }
 
-  protected abstract static class AbstractSmartField2Chain<VALUE> extends AbstractExtensionChain<ISmartFieldExtension<VALUE, ? extends AbstractSmartField<VALUE>>> {
+  protected abstract static class AbstractSmartFieldChain<VALUE> extends AbstractExtensionChain<ISmartFieldExtension<VALUE, ? extends AbstractSmartField<VALUE>>> {
 
-    public AbstractSmartField2Chain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+    public AbstractSmartFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions, ISmartFieldExtension.class);
     }
   }
 
-  public static class SmartField2FilterBrowseLookupResultChain<VALUE> extends AbstractSmartField2Chain<VALUE> {
+  public static class SmartFieldFilterBrowseLookupResultChain<VALUE> extends AbstractSmartFieldChain<VALUE> {
 
-    public SmartField2FilterBrowseLookupResultChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+    public SmartFieldFilterBrowseLookupResultChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -41,16 +41,16 @@ public final class SmartFieldChains {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ISmartFieldExtension<VALUE, ? extends AbstractSmartField<VALUE>> next) {
-          next.execFilterBrowseLookupResult(SmartField2FilterBrowseLookupResultChain.this, call, result);
+          next.execFilterBrowseLookupResult(SmartFieldFilterBrowseLookupResultChain.this, call, result);
         }
       };
       callChain(methodInvocation, call, result);
     }
   }
 
-  public static class SmartField2FilterKeyLookupResultChain<VALUE> extends AbstractSmartField2Chain<VALUE> {
+  public static class SmartFieldFilterKeyLookupResultChain<VALUE> extends AbstractSmartFieldChain<VALUE> {
 
-    public SmartField2FilterKeyLookupResultChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+    public SmartFieldFilterKeyLookupResultChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -58,16 +58,16 @@ public final class SmartFieldChains {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ISmartFieldExtension<VALUE, ? extends AbstractSmartField<VALUE>> next) {
-          next.execFilterKeyLookupResult(SmartField2FilterKeyLookupResultChain.this, call, result);
+          next.execFilterKeyLookupResult(SmartFieldFilterKeyLookupResultChain.this, call, result);
         }
       };
       callChain(methodInvocation, call, result);
     }
   }
 
-  public static class SmartField2PrepareLookupChain<VALUE> extends AbstractSmartField2Chain<VALUE> {
+  public static class SmartFieldPrepareLookupChain<VALUE> extends AbstractSmartFieldChain<VALUE> {
 
-    public SmartField2PrepareLookupChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+    public SmartFieldPrepareLookupChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -75,16 +75,16 @@ public final class SmartFieldChains {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ISmartFieldExtension<VALUE, ? extends AbstractSmartField<VALUE>> next) {
-          next.execPrepareLookup(SmartField2PrepareLookupChain.this, call);
+          next.execPrepareLookup(SmartFieldPrepareLookupChain.this, call);
         }
       };
       callChain(methodInvocation, call);
     }
   }
 
-  public static class SmartField2PrepareTextLookupChain<VALUE> extends AbstractSmartField2Chain<VALUE> {
+  public static class SmartFieldPrepareTextLookupChain<VALUE> extends AbstractSmartFieldChain<VALUE> {
 
-    public SmartField2PrepareTextLookupChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+    public SmartFieldPrepareTextLookupChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -92,16 +92,16 @@ public final class SmartFieldChains {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ISmartFieldExtension<VALUE, ? extends AbstractSmartField<VALUE>> next) {
-          next.execPrepareTextLookup(SmartField2PrepareTextLookupChain.this, call, text);
+          next.execPrepareTextLookup(SmartFieldPrepareTextLookupChain.this, call, text);
         }
       };
       callChain(methodInvocation, call, text);
     }
   }
 
-  public static class SmartField2PrepareBrowseLookupChain<VALUE> extends AbstractSmartField2Chain<VALUE> {
+  public static class SmartFieldPrepareBrowseLookupChain<VALUE> extends AbstractSmartFieldChain<VALUE> {
 
-    public SmartField2PrepareBrowseLookupChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+    public SmartFieldPrepareBrowseLookupChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -109,16 +109,16 @@ public final class SmartFieldChains {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ISmartFieldExtension<VALUE, ? extends AbstractSmartField<VALUE>> next) {
-          next.execPrepareBrowseLookup(SmartField2PrepareBrowseLookupChain.this, call, browseHint);
+          next.execPrepareBrowseLookup(SmartFieldPrepareBrowseLookupChain.this, call, browseHint);
         }
       };
       callChain(methodInvocation, call, browseHint);
     }
   }
 
-  public static class SmartField2FilterTextLookupResultChain<VALUE> extends AbstractSmartField2Chain<VALUE> {
+  public static class SmartFieldFilterTextLookupResultChain<VALUE> extends AbstractSmartFieldChain<VALUE> {
 
-    public SmartField2FilterTextLookupResultChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+    public SmartFieldFilterTextLookupResultChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -126,16 +126,16 @@ public final class SmartFieldChains {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ISmartFieldExtension<VALUE, ? extends AbstractSmartField<VALUE>> next) {
-          next.execFilterTextLookupResult(SmartField2FilterTextLookupResultChain.this, call, result);
+          next.execFilterTextLookupResult(SmartFieldFilterTextLookupResultChain.this, call, result);
         }
       };
       callChain(methodInvocation, call, result);
     }
   }
 
-  public static class SmartField2PrepareRecLookupChain<VALUE> extends AbstractSmartField2Chain<VALUE> {
+  public static class SmartFieldPrepareRecLookupChain<VALUE> extends AbstractSmartFieldChain<VALUE> {
 
-    public SmartField2PrepareRecLookupChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+    public SmartFieldPrepareRecLookupChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -143,16 +143,16 @@ public final class SmartFieldChains {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ISmartFieldExtension<VALUE, ? extends AbstractSmartField<VALUE>> next) {
-          next.execPrepareRecLookup(SmartField2PrepareRecLookupChain.this, call, parentKey);
+          next.execPrepareRecLookup(SmartFieldPrepareRecLookupChain.this, call, parentKey);
         }
       };
       callChain(methodInvocation, call, parentKey);
     }
   }
 
-  public static class SmartField2FilterLookupResultChain<VALUE> extends AbstractSmartField2Chain<VALUE> {
+  public static class SmartFieldFilterLookupResultChain<VALUE> extends AbstractSmartFieldChain<VALUE> {
 
-    public SmartField2FilterLookupResultChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+    public SmartFieldFilterLookupResultChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -160,16 +160,16 @@ public final class SmartFieldChains {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ISmartFieldExtension<VALUE, ? extends AbstractSmartField<VALUE>> next) {
-          next.execFilterLookupResult(SmartField2FilterLookupResultChain.this, call, result);
+          next.execFilterLookupResult(SmartFieldFilterLookupResultChain.this, call, result);
         }
       };
       callChain(methodInvocation, call, result);
     }
   }
 
-  public static class SmartField2FilterRecLookupResultChain<VALUE> extends AbstractSmartField2Chain<VALUE> {
+  public static class SmartFieldFilterRecLookupResultChain<VALUE> extends AbstractSmartFieldChain<VALUE> {
 
-    public SmartField2FilterRecLookupResultChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+    public SmartFieldFilterRecLookupResultChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -177,16 +177,16 @@ public final class SmartFieldChains {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ISmartFieldExtension<VALUE, ? extends AbstractSmartField<VALUE>> next) {
-          next.execFilterRecLookupResult(SmartField2FilterRecLookupResultChain.this, call, result);
+          next.execFilterRecLookupResult(SmartFieldFilterRecLookupResultChain.this, call, result);
         }
       };
       callChain(methodInvocation, call, result);
     }
   }
 
-  public static class SmartField2PrepareKeyLookupChain<VALUE> extends AbstractSmartField2Chain<VALUE> {
+  public static class SmartFieldPrepareKeyLookupChain<VALUE> extends AbstractSmartFieldChain<VALUE> {
 
-    public SmartField2PrepareKeyLookupChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+    public SmartFieldPrepareKeyLookupChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -194,7 +194,7 @@ public final class SmartFieldChains {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ISmartFieldExtension<VALUE, ? extends AbstractSmartField<VALUE>> next) {
-          next.execPrepareKeyLookup(SmartField2PrepareKeyLookupChain.this, call, key);
+          next.execPrepareKeyLookup(SmartFieldPrepareKeyLookupChain.this, call, key);
         }
       };
       callChain(methodInvocation, call, key);

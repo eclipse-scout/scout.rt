@@ -114,7 +114,7 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
     chain.execAttributeChanged(attribute);
   }
 
-  protected static class LocalDataModelAggregationFieldExtension<OWNER extends AbstractDataModelAggregationField> extends LocalSmartField2Extension<Integer, OWNER> implements IDataModelAggregationFieldExtension<OWNER> {
+  protected static class LocalDataModelAggregationFieldExtension<OWNER extends AbstractDataModelAggregationField> extends LocalSmartFieldExtension<Integer, OWNER> implements IDataModelAggregationFieldExtension<OWNER> {
 
     public LocalDataModelAggregationFieldExtension(OWNER owner) {
       super(owner);

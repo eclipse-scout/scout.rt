@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
 
 /**
- * Generic type V: value of the SmartField2, which is also the key used in lookup-rows.
+ * Generic type V: value of the SmartField, which is also the key used in lookup-rows.
  */
 public interface ISmartField<VALUE> extends IValueField<VALUE> {
 

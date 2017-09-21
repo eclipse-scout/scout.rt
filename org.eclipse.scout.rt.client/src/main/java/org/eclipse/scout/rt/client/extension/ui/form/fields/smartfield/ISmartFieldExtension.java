@@ -13,40 +13,40 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IValueFieldExtension;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartField2FilterBrowseLookupResultChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartField2FilterKeyLookupResultChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartField2FilterLookupResultChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartField2FilterRecLookupResultChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartField2FilterTextLookupResultChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartField2PrepareBrowseLookupChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartField2PrepareKeyLookupChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartField2PrepareLookupChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartField2PrepareRecLookupChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartField2PrepareTextLookupChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartFieldFilterBrowseLookupResultChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartFieldFilterKeyLookupResultChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartFieldFilterLookupResultChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartFieldFilterRecLookupResultChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartFieldFilterTextLookupResultChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartFieldPrepareBrowseLookupChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartFieldPrepareKeyLookupChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartFieldPrepareLookupChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartFieldPrepareRecLookupChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.SmartFieldChains.SmartFieldPrepareTextLookupChain;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 public interface ISmartFieldExtension<VALUE, OWNER extends AbstractSmartField<VALUE>> extends IValueFieldExtension<VALUE, OWNER> {
 
-  void execFilterBrowseLookupResult(SmartField2FilterBrowseLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result);
+  void execFilterBrowseLookupResult(SmartFieldFilterBrowseLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result);
 
-  void execFilterKeyLookupResult(SmartField2FilterKeyLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result);
+  void execFilterKeyLookupResult(SmartFieldFilterKeyLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result);
 
-  void execPrepareLookup(SmartField2PrepareLookupChain<VALUE> chain, ILookupCall<VALUE> call);
+  void execPrepareLookup(SmartFieldPrepareLookupChain<VALUE> chain, ILookupCall<VALUE> call);
 
-  void execPrepareTextLookup(SmartField2PrepareTextLookupChain<VALUE> chain, ILookupCall<VALUE> call, String text);
+  void execPrepareTextLookup(SmartFieldPrepareTextLookupChain<VALUE> chain, ILookupCall<VALUE> call, String text);
 
-  void execPrepareBrowseLookup(SmartField2PrepareBrowseLookupChain<VALUE> chain, ILookupCall<VALUE> call, String browseHint);
+  void execPrepareBrowseLookup(SmartFieldPrepareBrowseLookupChain<VALUE> chain, ILookupCall<VALUE> call, String browseHint);
 
-  void execFilterTextLookupResult(SmartField2FilterTextLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result);
+  void execFilterTextLookupResult(SmartFieldFilterTextLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result);
 
-  void execPrepareRecLookup(SmartField2PrepareRecLookupChain<VALUE> chain, ILookupCall<VALUE> call, VALUE parentKey);
+  void execPrepareRecLookup(SmartFieldPrepareRecLookupChain<VALUE> chain, ILookupCall<VALUE> call, VALUE parentKey);
 
-  void execFilterLookupResult(SmartField2FilterLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result);
+  void execFilterLookupResult(SmartFieldFilterLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result);
 
-  void execFilterRecLookupResult(SmartField2FilterRecLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result);
+  void execFilterRecLookupResult(SmartFieldFilterRecLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result);
 
-  void execPrepareKeyLookup(SmartField2PrepareKeyLookupChain<VALUE> chain, ILookupCall<VALUE> call, VALUE key);
+  void execPrepareKeyLookup(SmartFieldPrepareKeyLookupChain<VALUE> chain, ILookupCall<VALUE> call, VALUE key);
 
 }

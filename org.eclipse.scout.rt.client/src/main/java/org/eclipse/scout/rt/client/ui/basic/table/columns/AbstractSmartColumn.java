@@ -433,7 +433,7 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractColumn<VALUE> i
 
   @Override
   protected IFormField prepareEditInternal(final ITableRow row) {
-    SmartField2Editor f = (SmartField2Editor) getDefaultEditor();
+    SmartFieldEditor f = (SmartFieldEditor) getDefaultEditor();
     f.setRow(row);
     mapEditorFieldProperties(f);
     return f;
@@ -441,7 +441,7 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractColumn<VALUE> i
 
   @Override
   protected ISmartField<VALUE> createDefaultEditor() {
-    return new SmartField2Editor();
+    return new SmartFieldEditor();
   }
 
   @Override
@@ -498,7 +498,7 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractColumn<VALUE> i
    */
   @ClassId("18e7b5e0-b4e4-424f-869b-7dab2f526560")
   @SuppressWarnings("bsiRulesDefinition:orderMissing")
-  protected class SmartField2Editor extends AbstractSmartField<VALUE> {
+  protected class SmartFieldEditor extends AbstractSmartField<VALUE> {
     private ITableRow m_row;
 
     protected ITableRow getRow() {
