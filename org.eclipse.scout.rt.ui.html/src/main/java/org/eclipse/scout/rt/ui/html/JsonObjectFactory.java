@@ -76,11 +76,14 @@ import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
+import org.eclipse.scout.rt.client.ui.form.fields.tilesfield.ITilesField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
 import org.eclipse.scout.rt.client.ui.form.fields.wizard.IWizardProgressField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.client.ui.tile.ITile;
+import org.eclipse.scout.rt.client.ui.tile.ITiles;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonObjectFactory;
@@ -133,6 +136,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.stringfield.JsonStringField
 import org.eclipse.scout.rt.ui.html.json.form.fields.tabbox.JsonTabBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tabbox.JsonTabItem;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tablefield.JsonTableField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.tilesfield.JsonTilesField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.treebox.JsonTreeBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.treefield.JsonTreeField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.wizard.JsonWizardProgressField;
@@ -157,6 +161,8 @@ import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonDateColumnUserFilt
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonNumberColumnUserFilter;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTableTextUserFilter;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTextColumnUserFilter;
+import org.eclipse.scout.rt.ui.html.json.tile.JsonTile;
+import org.eclipse.scout.rt.ui.html.json.tile.JsonTiles;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 
 @Bean
@@ -271,6 +277,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     if (model instanceof IContentEditorField) {
       return new JsonContentEditorField((IContentEditorField) model, session, id, parent);
     }
+    if (model instanceof ITilesField<?>) {
+      return new JsonTilesField<ITilesField<? extends ITiles>>((ITilesField<?>) model, session, id, parent);
+    }    
 
     // --- other model objects ---
     if (model instanceof IDesktop) {
@@ -343,6 +352,12 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof ITableControl) {
       return new JsonTableControl<>((ITableControl) model, session, id, parent);
+    }
+    if (model instanceof ITile) {
+      return new JsonTile<>((ITile) model, session, id, parent);
+    }
+    if (model instanceof ITiles) {
+      return new JsonTiles<>((ITiles) model, session, id, parent);
     }
     return null;
   }

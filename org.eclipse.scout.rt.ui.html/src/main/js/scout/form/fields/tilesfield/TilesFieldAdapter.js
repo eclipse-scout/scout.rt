@@ -8,6 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
- .tiles {
-  overflow: hidden;
- }
+scout.TilesFieldAdapter = function() {
+  scout.TilesFieldAdapter.parent.call(this);
+};
+scout.inherits(scout.TilesFieldAdapter, scout.FormFieldAdapter);

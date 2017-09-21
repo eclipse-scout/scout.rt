@@ -8,6 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
- .tiles {
-  overflow: hidden;
- }
+scout.WidgetTileAdapter = function() {
+  scout.WidgetTileAdapter.parent.call(this);
+};
+scout.inherits(scout.WidgetTileAdapter, scout.TileAdapter);

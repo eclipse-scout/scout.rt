@@ -11,6 +11,7 @@ scout.PageTiles = function() {
   scout.PageTiles.parent.call(this);
   this.outline = null;
   this.withPlaceholders = true;
+  this.scrollable = false;
   this._outlineNodeChangedHandler = this._onOutlineNodeChanged.bind(this);
   this._outlineStructureChangedHandler = this._onOutlineStructureChanged.bind(this);
 };

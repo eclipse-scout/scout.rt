@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.Tile = function() {
   scout.Tile.parent.call(this);
-  this.gridData;
+  this.gridData = null;
   this.gridDataHints = new scout.GridData();
   this.colorScheme = null;
 };

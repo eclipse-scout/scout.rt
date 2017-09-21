@@ -442,6 +442,7 @@
   __include("scout/form/fields/tablefield/TableField.js");
   __include("scout/form/fields/tablefield/TableFieldAdapter.js");
   __include("scout/form/fields/tilesfield/TilesField.js");
+  __include("scout/form/fields/tilesfield/TilesFieldAdapter.js");
   __include("scout/form/fields/treebox/TreeBox.js");
   __include("scout/form/fields/treebox/TreeBoxAdapter.js");
   __include("scout/form/fields/treebox/TreeBoxLayout.js");
@@ -456,9 +457,11 @@
   __include("scout/tiles/Tile.js");
   __include("scout/tiles/TileAdapter.js");
   __include("scout/tiles/Tiles.js");
+  __include("scout/tiles/TilesAdapter.js");
   __include("scout/tiles/TilesGrid.js");
   __include("scout/tiles/TilesLayout.js");
   __include("scout/tiles/WidgetTile.js");
+  __include("scout/tiles/WidgetTileAdapter.js");
   __include("scout/tiles/PlaceholderTile.js");
   __include("scout/tiles/fields/FormFieldTile.js");
   __include("scout/tiles/fields/FormFieldTileAdapter.js");

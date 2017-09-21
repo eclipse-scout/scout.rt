@@ -361,6 +361,33 @@
     "Page": {
       "detailTableVisible": true,
       "detailFormVisible": true
+    },
+    "Tile": {
+      "colorScheme": "default",
+      "gridDataHints": {
+        "x": -1,
+        "y": -1,
+        "w": 1,
+        "h": 1,
+        "weightX": -1,
+        "weightY": -1,
+        "useUiWidth": false,
+        "useUiHeight": false,
+        "horizontalAlignment": -1,
+        "verticalAlignment": -1,
+        "fillHorizontal": true,
+        "fillVertical": true,
+        "widthInPixel": 0,
+        "heightInPixel": 0
+      }
+    },
+    "Tiles": {
+      "gridColumnCount": 4,
+      "logicalGridHGap": 15,
+      "logicalGridVGap": 20,
+      "logicalGridRowHeight": 150,
+      "withPlaceholders": false,
+      "scrollable": false
     }
   },
 
@@ -431,7 +458,9 @@
       "MessageBox": null,
       "Calendar": null,
       "Planner": null,
-      "DesktopNotification": null
+      "DesktopNotification": null,
+      "Tile": null,
+      "Tiles": null
     },
     "Column": {
       "BeanColumn": null,

@@ -24,19 +24,18 @@ public class JsonTableField<TABLE_FIELD extends ITableField<? extends ITable>> e
   }
 
   @Override
+  public String getObjectType() {
+    return "TableField";
+  }
+
+  @Override
   protected void initJsonProperties(TABLE_FIELD model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonAdapterProperty<ITableField<? extends ITable>>(ITableField.PROP_TABLE, model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<TABLE_FIELD>(ITableField.PROP_TABLE, model, getUiSession()) {
       @Override
       protected ITable modelValue() {
         return getModel().getTable();
       }
     });
   }
-
-  @Override
-  public String getObjectType() {
-    return "TableField";
-  }
-
 }

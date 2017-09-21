@@ -19,7 +19,7 @@ scout.Tiles = function() {
   this.logicalGridRowHeight = 150;
   this.logicalGridColumnWidth = 200;
   this.withPlaceholders = false;
-  this.scrollable = false;
+  this.scrollable = true;
   this._addWidgetProperties(['tiles']);
 };
 scout.inherits(scout.Tiles, scout.Widget);
