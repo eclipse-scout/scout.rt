@@ -236,7 +236,7 @@ scout.objects = {
    * @returns the key / name of a property
    */
   keyByValue: function(obj, value) {
-    return Object.keys(obj)[Object.values(obj).indexOf(value)];
+    return Object.keys(obj)[this.values(obj).indexOf(value)];
   },
 
   /**
