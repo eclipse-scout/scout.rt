@@ -283,10 +283,8 @@ scout.Table.prototype._render = function($parent) {
     .on('mouseup', '.table-row', this._onRowMouseUp.bind(this))
     .on('dblclick', '.table-row', this._onRowDoubleClick.bind(this))
     .on('scroll', this._onDataScroll.bind(this))
-    .on('contextmenu', '.table-row', function(event) {
+    .on('contextmenu', function(event) {
       event.preventDefault();
-      event.stopPropagation();
-      return false;
     });
   scout.scrollbars.install(this.$data, {
     parent: this,
@@ -439,14 +437,15 @@ scout.Table.prototype._onRowDoubleClick = function(event) {
 
 scout.Table.prototype.onContextMenu = function(event) {
   var func = function(event) {
-    event.preventDefault();
-
-    var menuItems;
+    if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
+      return;
+    }
     if (this.selectedRows.length > 0) {
-      menuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
+      var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
       if (!event.pageX && !event.pageY) {
         var $rowToDisplay = this.selectionHandler.lastActionRow ? this.selectionHandler.lastActionRow.$row : this.selectedRows[this.selectedRows.length - 1].$row;
         var offset = $rowToDisplay.offset();
+        offset.left += this.$data.scrollLeft();
         event.pageX = offset.left + 10;
         event.pageY = offset.top + $rowToDisplay.outerHeight() / 2;
       }

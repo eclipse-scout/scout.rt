@@ -541,6 +541,9 @@ scout.FormField.prototype._onStatusMousedown = function(event) {
     }
   } else if (hasMenus) {
     var func = function func(event) {
+      if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
+        return;
+      }
       // Toggle menu
       if (this.contextPopup && this.contextPopup.rendered) {
         this._hideContextMenu();

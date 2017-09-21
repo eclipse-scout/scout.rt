@@ -2250,8 +2250,9 @@ scout.Tree.prototype._triggerNodesSelected = function(debounce) {
 
 scout.Tree.prototype._showContextMenu = function(event) {
   var func = function(event) {
-    event.preventDefault();
-
+    if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
+      return;
+    }
     var filteredMenus = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true),
       $part = $(event.currentTarget);
     if (filteredMenus.length === 0) {
@@ -2803,6 +2804,7 @@ scout.Tree.prototype._onNodeControlDoubleClick = function(event) {
 };
 
 scout.Tree.prototype._onContextMenu = function(event) {
+  event.preventDefault();
   this._showContextMenu(event);
 };
 
