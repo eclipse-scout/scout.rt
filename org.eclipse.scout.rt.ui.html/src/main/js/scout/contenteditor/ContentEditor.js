@@ -27,7 +27,6 @@ scout.ContentEditor.prototype._init = function(model) {
 
 scout.ContentEditor.prototype._render = function() {
   this.$container = this.$parent.appendDiv('ce');
-  this._renderButtonGroup();
 
   this.iframe.render();
   this.iframe.$container.addClass('ce-iframe');
@@ -38,31 +37,9 @@ scout.ContentEditor.prototype._render = function() {
   }.bind(this));
 };
 
-// TODO: remove drag and drop icons --> will be in an other widget
-scout.ContentEditor.prototype._renderButtonGroup = function() {
-  var $buttonGroup = this.$container.appendDiv('ce-buttongroup');
-  var $button1 = $buttonGroup.appendDiv('ce-button').text('Text with Image').attr('draggable', 'true').attr('style', '-khtml-user-drag: element;');
-
-  $button1.on('dragstart', function(event) {
-    var textData = '<div data-ce-element="text-with-image"><img src="res/contentEditorRes/img/download.png" class="image" data-ce-element-part="image" alt="Image"><div class="text" data-ce-element-part="text">Text</div></div>';
-    event.originalEvent.dataTransfer.setData("text", textData);
-  }.bind(this));
-  $button1.on('mousedown', function(event) {
-    event.stopPropagation(); //firefox
-  }.bind(this));
-
-  var $button2 = $buttonGroup.appendDiv('ce-button').text('Text').attr('draggable', 'true');
-  $button2.on('dragstart', function(event) {
-    var textData = '<div data-ce-element="text" data-ce-element-part="text">Text only</div>';
-    event.originalEvent.dataTransfer.setData("text", textData);
-  }.bind(this));
-  $button2.on('mousedown', function(event) {
-    event.stopPropagation(); //firefox
-  }.bind(this));
-};
-
 scout.ContentEditor.prototype.setContent = function(content) {
   this.setProperty('content', content);
+  this._renderContent();
 };
 
 // TODO: remove all tags and attributes that were added by the editor
@@ -83,7 +60,7 @@ scout.ContentEditor.prototype._renderContent = function() {
 };
 
 scout.ContentEditor.prototype._injectStyleSheet = function($header) {
-  $header.append('<link rel="stylesheet" type="text/css" href="res/ContentEditorIFrame.css">');
+  $header.append('<link rel="stylesheet" type="text/css" href="' + this.session.url.baseUrlRaw + 'res/contenteditor.css">');
   this.$slots.addClass('ce-slot');
 };
 
