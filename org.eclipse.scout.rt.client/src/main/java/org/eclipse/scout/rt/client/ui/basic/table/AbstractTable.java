@@ -48,6 +48,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRow
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowsSelectedChain;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
+import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.MouseButton;
@@ -95,7 +96,6 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.html.HTML;
-import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
@@ -127,7 +127,7 @@ import org.slf4j.LoggerFactory;
  * for every inner column class there is a generated getXYColumn method directly on the table
  */
 @ClassId("e88f7f88-9747-40ea-88bd-744803aef7a7")
-public abstract class AbstractTable extends AbstractPropertyObserver implements ITable, IContributionOwner, IExtensibleObject {
+public abstract class AbstractTable extends AbstractWidget implements ITable, IContributionOwner, IExtensibleObject {
 
   private static final String INITIALIZED = "INITIALIZED";
   private static final String AUTO_DISCARD_ON_DELETE = "AUTO_DISCARD_ON_DELETE";
@@ -199,6 +199,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   public AbstractTable(boolean callInitializer) {
+    super(false);
     m_enabled = NamedBitMaskHelper.ALL_BITS_SET; // default enabled
     m_selectedRows = new ArrayList<>();
     m_checkedRows = new LinkedHashSet<>();
@@ -240,6 +241,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return m_contributionHolder.optContribution(contribution);
   }
 
+  @Override
   protected void callInitializer() {
     interceptInitConfig();
   }
@@ -855,7 +857,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), this::initConfig);
   }
 
+  @Override
   protected void initConfig() {
+    super.initConfig();
     m_eventHistory = createEventHistory();
     m_eventBuffer = createEventBuffer();
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(createUIFacade(), ModelContext.copyCurrent());

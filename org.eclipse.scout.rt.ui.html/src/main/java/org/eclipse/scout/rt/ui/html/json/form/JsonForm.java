@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -31,7 +31,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<FORM> {
+public class JsonForm<FORM extends IForm> extends AbstractJsonWidget<FORM> {
   private static final Logger LOG = LoggerFactory.getLogger(JsonForm.class);
 
   public static final String PROP_FORM_ID = "formId";

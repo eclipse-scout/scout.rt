@@ -11,18 +11,18 @@
 package org.eclipse.scout.rt.client.ui.messagebox;
 
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.html.IHtmlContent;
-import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.status.IStatus;
 
 /**
  * Interface for message box.<br/>
  * Use {@link MessageBoxes} to create a message box.
  */
-public interface IMessageBox extends IPropertyObserver {
+public interface IMessageBox extends IWidget {
 
   /**
    * Result status YES

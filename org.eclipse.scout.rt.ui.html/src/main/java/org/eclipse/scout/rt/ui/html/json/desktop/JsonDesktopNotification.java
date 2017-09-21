@@ -13,13 +13,13 @@ package org.eclipse.scout.rt.ui.html.json.desktop;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 
-public class JsonDesktopNotification<DESKTOP_NOTIFICATION extends IDesktopNotification> extends AbstractJsonPropertyObserver<DESKTOP_NOTIFICATION> {
+public class JsonDesktopNotification<DESKTOP_NOTIFICATION extends IDesktopNotification> extends AbstractJsonWidget<DESKTOP_NOTIFICATION> {
 
   public static final String EVENT_CLOSE = "close";
 

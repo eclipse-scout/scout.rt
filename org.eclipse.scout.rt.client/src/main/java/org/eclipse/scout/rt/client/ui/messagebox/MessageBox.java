@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.DisplayParentResolver;
@@ -31,7 +32,6 @@ import org.eclipse.scout.rt.platform.html.IHtmlContent;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * Use {@link MessageBoxes} to create a message box.
  */
 @Bean
-public class MessageBox extends AbstractPropertyObserver implements IMessageBox {
+public class MessageBox extends AbstractWidget implements IMessageBox {
 
   private static final Logger LOG = LoggerFactory.getLogger(MessageBox.class);
 
@@ -75,8 +75,10 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   private boolean m_answerSet;
   private int m_severity;
 
+  @Override
   @PostConstruct
   protected void initConfig() {
+    super.initConfig();	  
     m_displayParent = BEANS.get(DisplayParentResolver.class).resolve(this);
   }
 

@@ -14,17 +14,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ICalendarContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
 import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
-import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 
-public interface ICalendar extends IPropertyObserver, IContextMenuOwner {
+public interface ICalendar extends IWidget, IContextMenuOwner {
 
   /**
    * type {@link Set<CalendarComponent>}

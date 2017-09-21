@@ -16,11 +16,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IPlannerContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
-import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.util.Range;
 
 /**
@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.platform.util.Range;
  *
  * @since 5.1
  */
-public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, IContextMenuOwner {
+public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IWidget, IContextMenuOwner {
 
   /**
    * type {@link Date}[2]

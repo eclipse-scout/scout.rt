@@ -15,7 +15,7 @@ import java.beans.PropertyChangeEvent;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("squid:S00118")
-public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonPropertyObserver<ACTION> {
+public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonWidget<ACTION> {
 
   private static final Logger LOG = LoggerFactory.getLogger(JsonAction.class);
 

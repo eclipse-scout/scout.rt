@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendarUIFacade;
 import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
@@ -41,7 +41,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonPropertyObserver<CALENDAR> implements IJsonContextMenuOwner {
+public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget<CALENDAR> implements IJsonContextMenuOwner {
 
   private static final Logger LOG = LoggerFactory.getLogger(JsonCalendar.class);
 

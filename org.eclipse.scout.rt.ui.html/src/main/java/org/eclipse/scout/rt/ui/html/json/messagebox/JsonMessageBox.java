@@ -15,13 +15,13 @@ import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxEvent;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxListener;
 import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 
-public class JsonMessageBox<MESSAGE_BOX extends IMessageBox> extends AbstractJsonPropertyObserver<MESSAGE_BOX> {
+public class JsonMessageBox<MESSAGE_BOX extends IMessageBox> extends AbstractJsonWidget<MESSAGE_BOX> {
 
   public static final String EVENT_ACTION = "action";
 

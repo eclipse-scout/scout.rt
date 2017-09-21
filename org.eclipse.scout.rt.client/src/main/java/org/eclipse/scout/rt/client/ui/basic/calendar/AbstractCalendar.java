@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.Ca
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.CalendarFilterCalendarItemsChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.CalendarInitCalendarChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.ICalendarExtension;
+import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.CalendarMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -46,7 +47,6 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
@@ -68,7 +68,7 @@ import org.slf4j.LoggerFactory;
 /**
  * {@link ICalendarItemProducer} are defined as inner classes<br>
  */
-public abstract class AbstractCalendar extends AbstractPropertyObserver implements ICalendar, IContributionOwner, IExtensibleObject {
+public abstract class AbstractCalendar extends AbstractWidget implements ICalendar, IContributionOwner, IExtensibleObject {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractCalendar.class);
 
   private boolean m_initialized;
@@ -90,6 +90,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   }
 
   public AbstractCalendar(boolean callInitializer) {
+    super(false);
     m_calendarEventBuffer = new ArrayList<>();
     m_listenerList = new EventListenerList();
     m_dateTimeFormatFactory = new DateTimeFormatFactory();
@@ -120,6 +121,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     return m_contributionHolder.optContribution(contribution);
   }
 
+  @Override
   protected void callInitializer() {
     if (!m_initialized) {
       interceptInitConfig();
@@ -220,7 +222,9 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
+  @Override
   protected void initConfig() {
+    super.initConfig();
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     m_contributionHolder = new ContributionComposite(this);
     setTitle(getConfiguredTitle());

@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.Plan
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerSelectionRangeChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerViewRangeChangedChain;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
+import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
@@ -41,7 +42,6 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
@@ -58,7 +58,7 @@ import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver implements IPlanner<RI, AI>, IContributionOwner, IExtensibleObject {
+public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements IPlanner<RI, AI>, IContributionOwner, IExtensibleObject {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractPlanner.class);
 
   private boolean m_initialized;
@@ -79,6 +79,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   public AbstractPlanner(boolean callInitializer) {
+    super(false);
     m_objectExtensions = new ObjectExtensions<>(this, false);
     m_resources = new ArrayList<>();
     m_eventBuffer = createEventBuffer();
@@ -108,6 +109,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     return m_contributionHolder.optContribution(contribution);
   }
 
+  @Override
   protected void callInitializer() {
     if (!m_initialized) {
       interceptInitConfig();
@@ -265,8 +267,10 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   protected void initConfig() {
+    super.initConfig();
     m_listenerList = new EventListenerList();
     m_activityMapUIFacade = createUIFacade();
     //

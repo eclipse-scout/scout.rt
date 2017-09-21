@@ -12,13 +12,13 @@ package org.eclipse.scout.rt.client.ui.desktop.notification;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
+import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
 
-public class DesktopNotification extends AbstractPropertyObserver implements IDesktopNotification {
+public class DesktopNotification extends AbstractWidget implements IDesktopNotification {
 
   private final IStatus m_status;
   private final long m_duration;

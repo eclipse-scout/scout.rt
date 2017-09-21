@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.IStyleable;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
@@ -26,11 +27,10 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
-import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 import org.eclipse.scout.rt.shared.dimension.IEnabledDimension;
 
-public interface ITree extends IPropertyObserver, IDNDSupport, IStyleable, IAppLinkCapable, IContextMenuOwner, IEnabledDimension {
+public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable, IContextMenuOwner, IEnabledDimension {
 
   String PROP_TITLE = "title";
   String PROP_ENABLED = "enabled";

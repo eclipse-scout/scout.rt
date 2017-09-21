@@ -52,7 +52,7 @@ import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiException;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -80,7 +80,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T> implements IJsonContextMenuOwner, IBinaryResourceConsumer, IBinaryResourceProvider {
+public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implements IJsonContextMenuOwner, IBinaryResourceConsumer, IBinaryResourceProvider {
   private static final Logger LOG = LoggerFactory.getLogger(JsonTable.class);
 
   public static final String EVENT_ROW_CLICK = "rowClick";

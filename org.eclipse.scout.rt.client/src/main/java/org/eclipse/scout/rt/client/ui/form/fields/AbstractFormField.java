@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.Form
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldMarkSavedChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
+import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
@@ -52,7 +53,6 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
@@ -79,7 +79,7 @@ import org.w3c.dom.Element;
 
 @ClassId("cb3204c4-71bf-4dc6-88a4-3a8f81a7ca10")
 @FormData(value = AbstractFormFieldData.class, sdkCommand = SdkCommand.USE)
-public abstract class AbstractFormField extends AbstractPropertyObserver implements IFormField, IContributionOwner, IExtensibleObject {
+public abstract class AbstractFormField extends AbstractWidget implements IFormField, IContributionOwner, IExtensibleObject {
 
   private static final String ENABLED_SLAVE = "ENABLED_SLAVE";
   private static final String INITIALIZED = "INITIALIZED";
@@ -141,6 +141,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   public AbstractFormField(boolean callInitializer) {
+    super(false);
     m_enabled = NamedBitMaskHelper.ALL_BITS_SET; // default enabled
     m_visible = NamedBitMaskHelper.ALL_BITS_SET; // default visible
     m_labelVisible = NamedBitMaskHelper.ALL_BITS_SET; // default label visible
@@ -170,6 +171,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return m_contributionHolder.optContribution(contribution);
   }
 
+  @Override
   protected final void callInitializer() {
     if (isInitialized()) {
       return;
@@ -815,7 +817,9 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), this::initConfig);
   }
 
+  @Override
   protected void initConfig() {
+    super.initConfig();
     setGridDataInternal(new GridData(-1, -1, 1, 1, -1, -1));
     setGridDataHints(new GridData(-1, -1, 1, 1, -1, -1));
     propertySupport.setPropertyBool(PROP_EMPTY, true);

@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.ui.desktop.notification;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.platform.status.IStatus;
 
 /**
@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.status.IStatus;
  *
  * @since 5.2
  */
-public interface IDesktopNotification extends IPropertyObserver {
+public interface IDesktopNotification extends IWidget {
 
   /**
    * Default duration a notification is displayed is 5 seconds.

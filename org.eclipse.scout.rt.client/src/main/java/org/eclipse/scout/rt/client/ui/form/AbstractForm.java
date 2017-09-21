@@ -63,6 +63,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.IFormExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.MoveFormFieldsHandler;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
+import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
@@ -112,7 +113,6 @@ import org.eclipse.scout.rt.platform.html.IHtmlListElement;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.reflect.IPropertyFilter;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -148,7 +148,7 @@ import org.w3c.dom.Element;
 
 @ClassId("cec05259-9e6f-480c-94fa-f02f56e777f7")
 @FormData(value = AbstractFormData.class, sdkCommand = SdkCommand.USE)
-public abstract class AbstractForm extends AbstractPropertyObserver implements IForm, IExtensibleObject, IContributionOwner {
+public abstract class AbstractForm extends AbstractWidget implements IForm, IExtensibleObject, IContributionOwner {
 
   private static final String INITIALIZED = "INITIALIZED";
   private static final String CACHE_BOUNDS = "CACHE_BOUNDS";
@@ -213,6 +213,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   public AbstractForm(boolean callInitializer) {
+    super(false);
     m_listenerList = new EventListenerList();
     m_modal = new PreferredValue<>(false, false);
     m_closeType = IButton.SYSTEM_TYPE_NONE;
@@ -258,6 +259,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return m_contributionHolder.optContribution(contribution);
   }
 
+  @Override
   protected void callInitializer() {
     if (isInitialized()) {
       return;
@@ -675,7 +677,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   protected void initConfig() {
+    super.initConfig();
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent().withForm(this));
     m_timerFutureMap = new HashMap<>();
     setShowOnStart(getConfiguredShowOnStart());

@@ -366,64 +366,72 @@
 
   /* *** Object type hierarchy *** */
   "objectTypeHierarchy": {
-    "FormField": {
-      "Button": {
-        "RadioButton": null
-      },
-      "BrowserField": null,
-      "GroupBox": {
-        "TabItem": null
-      },
-      "ImageField": null,
-      "ListBox": null,
-      "PlaceholderField": null,
-      "PlannerField": null,
-      "SequenceBox": null,
-      "SplitBox": null,
-      "TabBox": null,
-      "TableField": null,
-      "TreeField": null,
-      "TreeBox": null,
-      "ValueField": {
-        "BasicField": {
-          "ColorField": null,
-          "NumberField": null,
-          "StringField": null
+    "Widget": {
+      "FormField": {
+        "Button": {
+          "RadioButton": null
         },
-        "BeanField": null,
-        "CheckBoxField": null,
-        "CalendarField": null,
-        "ClipboardField": null,
-        "DateField": null,
-        "FileChooserField": null,
-        "HtmlField": null,
-        "LabelField": null,
-        "SmartField": {
-          "ProposalField": null,
-          "SmartFieldMultiline": null
+        "BrowserField": null,
+        "GroupBox": {
+          "TabItem": null
         },
-        "SliderField": null,
-        "RadioButtonGroup": null
+        "ImageField": null,
+        "ListBox": null,
+        "PlaceholderField": null,
+        "PlannerField": null,
+        "SequenceBox": null,
+        "SplitBox": null,
+        "TabBox": null,
+        "TableField": null,
+        "TreeField": null,
+        "TreeBox": null,
+        "ValueField": {
+          "BasicField": {
+            "ColorField": null,
+            "NumberField": null,
+            "StringField": null
+          },
+          "BeanField": null,
+          "CheckBoxField": null,
+          "CalendarField": null,
+          "ClipboardField": null,
+          "DateField": null,
+          "FileChooserField": null,
+          "HtmlField": null,
+          "LabelField": null,
+          "SmartField": {
+            "ProposalField": null,
+            "SmartFieldMultiline": null
+          },
+          "SliderField": null,
+          "RadioButtonGroup": null
+        },
+        "WizardProgressField": null,
+        "WrappedFormField": null
       },
-      "WizardProgressField": null,
-      "WrappedFormField": null
-    },
-    "Action": {
-      "ToolButton": null,
-      "KeyStroke": null,
-      "Menu": {
-        "TableOrganizeMenu": null,
-        "FormMenu": null
+      "Action": {
+        "ToolButton": null,
+        "KeyStroke": null,
+        "Menu": {
+          "TableOrganizeMenu": null,
+          "FormMenu": null
+        },
+        "OutlineViewButton": null,
+        "TableControl": {
+          "FormTableControl": null
+        }
       },
-      "OutlineViewButton": null,
-      "TableControl": {
-        "FormTableControl": null
-      }
-    },
-    "Tree": {
-      "Outline": {
-        "SearchOutline": null
-      }
+      "Table": null,
+      "Tree": {
+        "Outline": {
+          "SearchOutline": null
+        }
+      },
+      "Form": null,
+      "MessageBox": null,
+      "Calendar": null,
+      "Planner": null,
+      "DesktopNotification": null
     },
     "Column": {
       "BeanColumn": null,

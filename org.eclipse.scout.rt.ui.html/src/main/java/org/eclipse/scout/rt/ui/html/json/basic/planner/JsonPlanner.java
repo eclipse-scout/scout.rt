@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.client.ui.basic.planner.PlannerListener;
 import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
 import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 import org.eclipse.scout.rt.ui.html.json.IIdProvider;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -46,7 +46,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPropertyObserver<PLANNER> implements IJsonContextMenuOwner {
+public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonWidget<PLANNER> implements IJsonContextMenuOwner {
   private static final Logger LOG = LoggerFactory.getLogger(JsonPlanner.class);
 
   public static final String EVENT_PLANNER_CHANGED = "plannerChanged";

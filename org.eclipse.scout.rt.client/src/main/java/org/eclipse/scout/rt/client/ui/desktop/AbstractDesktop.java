@@ -54,6 +54,7 @@ import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUti
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.transformation.IDeviceTransformationService;
+import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.Coordinates;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
@@ -94,7 +95,6 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -133,7 +133,7 @@ import org.slf4j.LoggerFactory;
  * </ul>
  * The Eclipse Scout SDK creates a subclass of this class that can be used as initial desktop.
  */
-public abstract class AbstractDesktop extends AbstractPropertyObserver implements IDesktop, IContributionOwner, IExtensibleObject {
+public abstract class AbstractDesktop extends AbstractWidget implements IDesktop, IContributionOwner, IExtensibleObject {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractDesktop.class);
 
@@ -177,6 +177,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   public AbstractDesktop(boolean callInitializer) {
+    super(false);
     m_localDesktopExtension = new P_LocalDesktopExtension();
     m_listenerList = new EventListenerList();
     m_dataChangeListenerList = new HashMap<>();
@@ -193,6 +194,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @Override
   protected final void callInitializer() {
     // Run the initialization on behalf of this Desktop.
     ClientRunContexts.copyCurrent().withDesktop(this).run(this::interceptInitConfig);
@@ -578,7 +580,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
+  @Override
   protected void initConfig() {
+    super.initConfig();
     m_eventHistory = createEventHistory();
     // add convenience observer for event history
     addDesktopListener(e -> {

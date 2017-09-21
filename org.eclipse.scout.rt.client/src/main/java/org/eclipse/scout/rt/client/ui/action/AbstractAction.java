@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionInitAc
 import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionSelectionChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
+import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -32,7 +33,6 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
@@ -46,7 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ClassId("d3cdbb0d-4c53-4854-b6f2-23465050c3c5")
-public abstract class AbstractAction extends AbstractPropertyObserver implements IAction, IExtensibleObject {
+public abstract class AbstractAction extends AbstractWidget implements IAction, IExtensibleObject {
 
   private static final String ENABLED_INHERIT_ACCESSIBILITY = "ENABLED_INHERIT_ACCESSIBILITY";
   private static final String INITIALIZED = "INITIALIZED";
@@ -93,6 +93,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   public AbstractAction(boolean callInitializer) {
+    super(false);
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(createUIFacade(), ModelContext.copyCurrent());
     m_enabled = NamedBitMaskHelper.ALL_BITS_SET; // default enabled
     m_visible = NamedBitMaskHelper.ALL_BITS_SET; // default visible
@@ -103,6 +104,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     }
   }
 
+  @Override
   protected void callInitializer() {
     if (isInitialized()) {
       return;
@@ -312,7 +314,9 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
+  @Override
   protected void initConfig() {
+    super.initConfig();
     setIconId(getConfiguredIconId());
     setText(getConfiguredText());
     setTooltipText(getConfiguredTooltipText());

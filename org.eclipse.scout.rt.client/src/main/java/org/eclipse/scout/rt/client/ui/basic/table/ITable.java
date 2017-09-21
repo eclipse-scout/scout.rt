@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.IStyleable;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
@@ -34,7 +35,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
-import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
@@ -50,7 +50,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICode;
  * </p>
  * For every inner column class there is a generated getXYColumn method directly on the table.
  */
-public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId, IStyleable, IAppLinkCapable, IContextMenuOwner, IEnabledDimension {
+public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleable, IAppLinkCapable, IContextMenuOwner, IEnabledDimension {
 
   /**
    * String

@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodesC
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodesSelectedChain;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
+import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
@@ -60,7 +61,6 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.holders.Holder;
-import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
@@ -79,7 +79,7 @@ import org.eclipse.scout.rt.shared.services.common.security.IAccessControlServic
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractTree extends AbstractPropertyObserver implements ITree, IContributionOwner, IExtensibleObject {
+public abstract class AbstractTree extends AbstractWidget implements ITree, IContributionOwner, IExtensibleObject {
 
   private static final String INITIALIZED = "INITIALIZED";
   private static final String AUTO_DISCARD_ON_DELETE = "AUTO_DISCARD_ON_DELETE";
@@ -135,6 +135,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   public AbstractTree(boolean callInitializer) {
+    super(false);
     m_listenerList = new EventListenerList();
     m_checkedNodes = new HashSet<>();
     m_deletedNodes = new HashMap<>();
@@ -145,6 +146,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   protected void callInitializer() {
     if (isInitialized()) {
       return;
@@ -566,7 +568,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
+  @Override
   protected void initConfig() {
+    super.initConfig();
     m_enabled = NamedBitMaskHelper.ALL_BITS_SET; // default enabled
     m_eventHistory = createEventHistory();
     m_eventBuffer = createEventBuffer();
