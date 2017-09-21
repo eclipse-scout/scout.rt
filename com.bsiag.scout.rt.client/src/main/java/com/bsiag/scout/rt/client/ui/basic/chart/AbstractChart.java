@@ -13,13 +13,13 @@ import java.math.BigDecimal;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
+import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 
@@ -88,7 +88,7 @@ import com.bsiag.scout.rt.shared.data.basic.chart.IChartType;
  * @since 5.2
  */
 @ClassId("c31e0b6e-77bd-4752-ab1a-bda7560230b2")
-public abstract class AbstractChart extends AbstractPropertyObserver implements IChart {
+public abstract class AbstractChart extends AbstractWidget implements IChart {
   // TODO [15.4] bsh: make extensible
 
   private IChartUIFacade m_uiFacade;
@@ -113,6 +113,7 @@ public abstract class AbstractChart extends AbstractPropertyObserver implements 
     return simpleClassId;
   }
 
+  @Override
   protected void callInitializer() {
     initConfig();
   }
@@ -120,7 +121,9 @@ public abstract class AbstractChart extends AbstractPropertyObserver implements 
   /*
    * Configuration
    */
+  @Override
   protected void initConfig() {
+    super.initConfig();	  
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     setChartType(getConfiguredChartType());
     setAutoColor(getConfiguredAutoColor());

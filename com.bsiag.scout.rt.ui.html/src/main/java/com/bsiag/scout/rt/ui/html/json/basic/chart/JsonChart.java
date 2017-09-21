@@ -10,7 +10,7 @@
 package com.bsiag.scout.rt.ui.html.json.basic.chart;
 
 import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
@@ -22,7 +22,7 @@ import com.bsiag.scout.rt.shared.data.basic.chart.IChartBean;
 /**
  * @since 5.2
  */
-public class JsonChart<CHART extends IChart> extends AbstractJsonPropertyObserver<CHART> {
+public class JsonChart<CHART extends IChart> extends AbstractJsonWidget<CHART> {
 
   public static final String EVENT_VALUE_CLICKED = "valueClicked";
 

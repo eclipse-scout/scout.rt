@@ -9,15 +9,15 @@
  ******************************************************************************/
 package com.bsiag.scout.rt.client.ui.basic.chart;
 
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
-import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartBean;
 
 /**
  * @since 5.2
  */
-public interface IChart extends IPropertyObserver, ITypeWithClassId {
+public interface IChart extends IWidget, ITypeWithClassId {
 
   String PROP_CONTAINER = "container";
   String PROP_AUTO_COLOR = "autoColor";
