@@ -6,6 +6,7 @@ package org.eclipse.scout.rt.server.commons;
 
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
+import org.eclipse.scout.rt.platform.config.AbstractMapConfigProperty;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 
 public final class ServerCommonsConfigProperties {
@@ -42,6 +43,20 @@ public final class ServerCommonsConfigProperties {
     @Override
     public String getKey() {
       return "scout.csp.enabled";
+    }
+
+    /**
+     * Configures individual Content Security Policy (CSP) directives.
+     *
+     * @see org.eclipse.scout.rt.server.commons.servlet.ContentSecurityPolicy
+     */
+    public static class CspDirectiveProperty extends AbstractMapConfigProperty {
+
+      @Override
+      public String getKey() {
+        return "scout.csp.directive";
+      }
+
     }
   }
 }

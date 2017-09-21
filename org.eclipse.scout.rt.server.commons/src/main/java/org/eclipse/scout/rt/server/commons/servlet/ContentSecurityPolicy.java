@@ -7,12 +7,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.CspEnabledProperty.CspDirectiveProperty;
 
 /**
  * This bean holds a modifiable set of Content Security Policy Level 2 (CSP) directives. The default rules are defined
  * by the method {@link #initDirectives()}. A "CSP token" to use in a HTTP header can be retrieved with the method
  * {@link #toToken()}.
+ * <p>
+ * Use the 'scout.csp.directive' config property to configure individual CSP directives in your Scout application.
  * <p>
  * Possible values for directives:
  * <table border=1 cellpadding=3 cellspacing=0>
@@ -59,6 +63,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  * </table>
  *
  * @see <a href="https://www.w3.org/TR/CSP2/">https://www.w3.org/TR/CSP2/</a>
+ * @see CspDirectiveProperty
  */
 @Bean
 public class ContentSecurityPolicy {
@@ -109,12 +114,34 @@ public class ContentSecurityPolicy {
    * </ul>
    */
   protected void initDirectives() {
-    withDefaultSrc("'self'");
-    withScriptSrc("'self'");
-    withStyleSrc("'self' 'unsafe-inline'");
-    withFrameSrc("*");
-    withChildSrc("*");
-    withReportUri(HttpServletControl.CSP_REPORT_URL); // see also ContentSecurityPolicyReportHandler
+    withBaseUri(getConfiguredDefault(DIRECTIVE_BASE_URI, null));
+    withImgSrc(getConfiguredDefault(DIRECTIVE_IMG_SRC, "'self'"));
+    withStyleSrc(getConfiguredDefault(DIRECTIVE_STYLE_SRC, "'self' 'unsafe-inline'"));
+    withChildSrc(getConfiguredDefault(DIRECTIVE_CHILD_SRC, "*"));
+    withConnectSrc(getConfiguredDefault(DIRECTIVE_CONNECT_SRC, null));
+    withDefaultSrc(getConfiguredDefault(DIRECTIVE_DEFAULT_SRC, "'self'"));
+    withFontSrc(getConfiguredDefault(DIRECTIVE_FONT_SRC, null));
+    withFormAction(getConfiguredDefault(DIRECTIVE_FORM_ACTION, null));
+    withFrameAncestors(getConfiguredDefault(DIRECTIVE_FRAME_ANCESTORS, null));
+    withMediaSrc(getConfiguredDefault(DIRECTIVE_MEDIA_SRC, null));
+    withObjectSrc(getConfiguredDefault(DIRECTIVE_OBJECT_SRC, null));
+    withPluginTypes(getConfiguredDefault(DIRECTIVE_PLUGIN_TYPES, null));
+    withReportUri(getConfiguredDefault(DIRECTIVE_REPORT_URI, HttpServletControl.CSP_REPORT_URL)); // see also ContentSecurityPolicyReportHandler
+    withSandbox(getConfiguredDefault(DIRECTIVE_SANDBOX, null));
+    withScriptSrc(getConfiguredDefault(DIRECTIVE_SCRIPT_SRC, "'self'"));
+    withFrameSrc(getConfiguredDefault(DIRECTIVE_FRAME_SRC, "*"));
+  }
+
+  protected String getConfiguredDefault(String directiveKey, String fallbackValue) {
+    Map<String, String> mapProperty = CONFIG.getPropertyValue(CspDirectiveProperty.class);
+    if (mapProperty == null) {
+      return fallbackValue;
+    }
+    String configValue = mapProperty.get(directiveKey);
+    if (configValue == null) {
+      return fallbackValue;
+    }
+    return configValue;
   }
 
   /**
