@@ -56,7 +56,8 @@ scout.AjaxCall.isOfflineError = function(jqXHR, textStatus, errorThrown, request
   var offline = (
     // Status code = 0 -> no connection
     !jqXHR.status ||
-    // Status code >= 12000 comes from windows, see http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx. Not sure if it is necessary for IE >= 9.
+    // Workaround for IE 9: Apparently, Windows network error codes (http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx)
+    // are passed to JS as HTTP 'status' in some cases (e.g. when server goes offline).
     jqXHR.status >= 12000 ||
     // Status code 502 = Bad Gateway
     // Status code 503 = Service Unavailable
