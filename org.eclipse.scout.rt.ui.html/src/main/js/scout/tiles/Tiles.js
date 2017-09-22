@@ -12,7 +12,9 @@ scout.Tiles = function() {
   scout.Tiles.parent.call(this);
   this.initialAnimationDone = false;
   this.tiles = [];
+  // GridColumnCount will be modifed by the layout, prefGridColumnCount remains unchanged
   this.gridColumnCount = 4;
+  this.prefGridColumnCount = this.gridColumnCount;
   this.logicalGrid = scout.create('scout.TilesGrid');
   this.logicalGridHGap = 15;
   this.logicalGridVGap = 20;
@@ -86,6 +88,12 @@ scout.Tiles.prototype.deleteTiles = function(tilesToDelete) {
   var tiles = this.tiles.slice();
   scout.arrays.removeAll(tiles, tilesToDelete);
   this.setTiles(tiles);
+};
+
+scout.Tiles.prototype.setGridColumnCount = function(gridColumnCount) {
+  this.setProperty('gridColumnCount', gridColumnCount);
+  this.prefGridColumnCount = gridColumnCount;
+  this.invalidateLogicalGrid();
 };
 
 scout.Tiles.prototype._renderLogicalGridHGap = function() {

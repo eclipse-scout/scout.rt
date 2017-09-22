@@ -113,10 +113,6 @@ scout.TilesLayout.prototype._updateScrollbar = function() {
 };
 
 scout.TilesLayout.prototype._resetGridColumnCount = function() {
-  if (this.widget.prefGridColumnCount === undefined) {
-    // Store the preferred column count
-    this.widget.prefGridColumnCount = this.widget.gridColumnCount;
-  }
   this.widget.gridColumnCount = this.widget.prefGridColumnCount;
 };
 
