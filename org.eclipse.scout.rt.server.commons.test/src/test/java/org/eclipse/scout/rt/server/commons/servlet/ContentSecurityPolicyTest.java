@@ -2,7 +2,10 @@ package org.eclipse.scout.rt.server.commons.servlet;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.function.Function;
+
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -10,332 +13,162 @@ import org.junit.Test;
  */
 public class ContentSecurityPolicyTest {
 
-  /**
-   * Wrapper class to setup {@link ContentSecurityPolicy} for various tests. <br>
-   * Note: When using Java 8 this class can be replaced with lambda expressions.
-   */
-  protected abstract static class P_ContentSecurityPolicyWrapper {
-    private final String m_directive;
+  private ContentSecurityPolicy m_csp = new ContentSecurityPolicy();
 
-    public P_ContentSecurityPolicyWrapper(String directive) {
-      m_directive = directive;
-    }
-
-    protected abstract void with(ContentSecurityPolicy csp, String source);
-
-    protected abstract void append(ContentSecurityPolicy csp, String source);
-
-    protected String getDirective() {
-      return m_directive;
-    }
+  @Before
+  public void setUp() {
+    m_csp.empty();
   }
 
   @Test
   public void testBaseUri() {
-    testDirective(new P_ContentSecurityPolicyWrapper(ContentSecurityPolicy.DIRECTIVE_BASE_URI) {
-      @Override
-      protected void with(ContentSecurityPolicy csp, String source) {
-        csp.withBaseUri(source);
-      }
-
-      @Override
-      protected void append(ContentSecurityPolicy csp, String source) {
-        csp.appendBaseUri(source);
-      }
-    });
+    testDirective(ContentSecurityPolicy.DIRECTIVE_BASE_URI, m_csp::appendBaseUri, m_csp::withBaseUri);
   }
 
   @Test
   public void testStyleSrc() {
-    testDirective(new P_ContentSecurityPolicyWrapper(ContentSecurityPolicy.DIRECTIVE_STYLE_SRC) {
-      @Override
-      protected void with(ContentSecurityPolicy csp, String source) {
-        csp.withStyleSrc(source);
-      }
-
-      @Override
-      protected void append(ContentSecurityPolicy csp, String source) {
-        csp.appendStyleSrc(source);
-      }
-    });
+    testDirective(ContentSecurityPolicy.DIRECTIVE_STYLE_SRC, m_csp::appendStyleSrc, m_csp::withStyleSrc);
   }
 
   @Test
   public void testScriptSrc() {
-    testDirective(new P_ContentSecurityPolicyWrapper(ContentSecurityPolicy.DIRECTIVE_SCRIPT_SRC) {
-      @Override
-      protected void with(ContentSecurityPolicy csp, String source) {
-        csp.withScriptSrc(source);
-      }
-
-      @Override
-      protected void append(ContentSecurityPolicy csp, String source) {
-        csp.appendScriptSrc(source);
-      }
-    });
+    testDirective(ContentSecurityPolicy.DIRECTIVE_SCRIPT_SRC, m_csp::appendScriptSrc, m_csp::withScriptSrc);
   }
 
   @SuppressWarnings("deprecation")
   @Test
   public void testFrameSrc() {
-    testDirective(new P_ContentSecurityPolicyWrapper(ContentSecurityPolicy.DIRECTIVE_FRAME_SRC) {
-      @Override
-      protected void with(ContentSecurityPolicy csp, String source) {
-        csp.withFrameSrc(source);
-      }
-
-      @Override
-      protected void append(ContentSecurityPolicy csp, String source) {
-        csp.appendFrameSrc(source);
-      }
-    });
+    testDirective(ContentSecurityPolicy.DIRECTIVE_FRAME_SRC, m_csp::appendFrameSrc, m_csp::withFrameSrc);
   }
 
   @Test
   public void testChildSrc() {
-    testDirective(new P_ContentSecurityPolicyWrapper(ContentSecurityPolicy.DIRECTIVE_CHILD_SRC) {
-      @Override
-      protected void with(ContentSecurityPolicy csp, String source) {
-        csp.withChildSrc(source);
-      }
-
-      @Override
-      protected void append(ContentSecurityPolicy csp, String source) {
-        csp.appendChildSrc(source);
-      }
-    });
+    testDirective(ContentSecurityPolicy.DIRECTIVE_CHILD_SRC, m_csp::appendChildSrc, m_csp::withChildSrc);
   }
 
   @Test
   public void testReportUri() {
-    testDirective(new P_ContentSecurityPolicyWrapper(ContentSecurityPolicy.DIRECTIVE_REPORT_URI) {
-      @Override
-      protected void with(ContentSecurityPolicy csp, String source) {
-        csp.withReportUri(source);
-      }
-
-      @Override
-      protected void append(ContentSecurityPolicy csp, String source) {
-        csp.appendReportUri(source);
-      }
-    });
+    testDirective(ContentSecurityPolicy.DIRECTIVE_REPORT_URI, m_csp::appendReportUri, m_csp::withReportUri);
   }
 
   @Test
   public void testFontSrc() {
-    testDirective(new P_ContentSecurityPolicyWrapper(ContentSecurityPolicy.DIRECTIVE_FONT_SRC) {
-      @Override
-      protected void with(ContentSecurityPolicy csp, String source) {
-        csp.withFontSrc(source);
-      }
-
-      @Override
-      protected void append(ContentSecurityPolicy csp, String source) {
-        csp.appendFontSrc(source);
-      }
-    });
+    testDirective(ContentSecurityPolicy.DIRECTIVE_FONT_SRC, m_csp::appendFontSrc, m_csp::withFontSrc);
   }
 
   @Test
   public void testImgSrc() {
-    testDirective(new P_ContentSecurityPolicyWrapper(ContentSecurityPolicy.DIRECTIVE_IMG_SRC) {
-      @Override
-      protected void with(ContentSecurityPolicy csp, String source) {
-        csp.withImgSrc(source);
-      }
-
-      @Override
-      protected void append(ContentSecurityPolicy csp, String source) {
-        csp.appendImgSrc(source);
-      }
-    });
+    testDirective(ContentSecurityPolicy.DIRECTIVE_IMG_SRC, m_csp::appendImgSrc, m_csp::withImgSrc);
   }
 
   @Test
   public void testMediaSrc() {
-    testDirective(new P_ContentSecurityPolicyWrapper(ContentSecurityPolicy.DIRECTIVE_MEDIA_SRC) {
-      @Override
-      protected void with(ContentSecurityPolicy csp, String source) {
-        csp.withMediaSrc(source);
-      }
-
-      @Override
-      protected void append(ContentSecurityPolicy csp, String source) {
-        csp.appendMediaSrc(source);
-      }
-    });
+    testDirective(ContentSecurityPolicy.DIRECTIVE_MEDIA_SRC, m_csp::appendMediaSrc, m_csp::withMediaSrc);
   }
 
   @Test
   public void testObjectSrc() {
-    testDirective(new P_ContentSecurityPolicyWrapper(ContentSecurityPolicy.DIRECTIVE_OBJECT_SRC) {
-      @Override
-      protected void with(ContentSecurityPolicy csp, String source) {
-        csp.withObjectSrc(source);
-      }
-
-      @Override
-      protected void append(ContentSecurityPolicy csp, String source) {
-        csp.appendObjectSrc(source);
-      }
-    });
+    testDirective(ContentSecurityPolicy.DIRECTIVE_OBJECT_SRC, m_csp::appendObjectSrc, m_csp::withObjectSrc);
   }
 
   @Test
   public void testSandbox() {
-    testDirective(new P_ContentSecurityPolicyWrapper(ContentSecurityPolicy.DIRECTIVE_SANDBOX) {
-      @Override
-      protected void with(ContentSecurityPolicy csp, String source) {
-        csp.withSandbox(source);
-      }
-
-      @Override
-      protected void append(ContentSecurityPolicy csp, String source) {
-        csp.appendSandbox(source);
-      }
-    });
+    testDirective(ContentSecurityPolicy.DIRECTIVE_SANDBOX, m_csp::appendSandbox, m_csp::withSandbox);
   }
 
   @Test
   public void testDefaultSrc() {
-    testDirective(new P_ContentSecurityPolicyWrapper(ContentSecurityPolicy.DIRECTIVE_DEFAULT_SRC) {
-      @Override
-      protected void with(ContentSecurityPolicy csp, String source) {
-        csp.withDefaultSrc(source);
-      }
-
-      @Override
-      protected void append(ContentSecurityPolicy csp, String source) {
-        csp.appendDefaultSrc(source);
-      }
-    });
+    testDirective(ContentSecurityPolicy.DIRECTIVE_DEFAULT_SRC, m_csp::appendDefaultSrc, m_csp::withDefaultSrc);
   }
 
   @Test
   public void testConnectSrc() {
-    testDirective(new P_ContentSecurityPolicyWrapper(ContentSecurityPolicy.DIRECTIVE_CONNECT_SRC) {
-      @Override
-      protected void with(ContentSecurityPolicy csp, String source) {
-        csp.withConnectSrc(source);
-      }
-
-      @Override
-      protected void append(ContentSecurityPolicy csp, String source) {
-        csp.appendConnectSrc(source);
-      }
-    });
+    testDirective(ContentSecurityPolicy.DIRECTIVE_CONNECT_SRC, m_csp::appendConnectSrc, m_csp::withConnectSrc);
   }
 
   @Test
   public void testFormAction() {
-    testDirective(new P_ContentSecurityPolicyWrapper(ContentSecurityPolicy.DIRECTIVE_FORM_ACTION) {
-      @Override
-      protected void with(ContentSecurityPolicy csp, String source) {
-        csp.withFormAction(source);
-      }
-
-      @Override
-      protected void append(ContentSecurityPolicy csp, String source) {
-        csp.appendFormAction(source);
-      }
-    });
+    testDirective(ContentSecurityPolicy.DIRECTIVE_FORM_ACTION, m_csp::appendFormAction, m_csp::withFormAction);
   }
 
   @Test
   public void testFrameAncestors() {
-    testDirective(new P_ContentSecurityPolicyWrapper(ContentSecurityPolicy.DIRECTIVE_FRAME_ANCESTORS) {
-      @Override
-      protected void with(ContentSecurityPolicy csp, String source) {
-        csp.withFrameAncestors(source);
-      }
-
-      @Override
-      protected void append(ContentSecurityPolicy csp, String source) {
-        csp.appendFrameAncestors(source);
-      }
-    });
+    testDirective(ContentSecurityPolicy.DIRECTIVE_FRAME_ANCESTORS, m_csp::appendFrameAncestors, m_csp::withFrameAncestors);
   }
 
   @Test
   public void testPluginTypes() {
-    testDirective(new P_ContentSecurityPolicyWrapper(ContentSecurityPolicy.DIRECTIVE_PLUGIN_TYPES) {
-      @Override
-      protected void with(ContentSecurityPolicy csp, String source) {
-        csp.withPluginTypes(source);
-      }
-
-      @Override
-      protected void append(ContentSecurityPolicy csp, String source) {
-        csp.appendPluginTypes(source);
-      }
-    });
+    testDirective(ContentSecurityPolicy.DIRECTIVE_PLUGIN_TYPES, m_csp::appendPluginTypes, m_csp::withPluginTypes);
   }
 
   @Test
   public void testToTokenWithNullValues() {
-    ContentSecurityPolicy csp = new ContentSecurityPolicy();
-    csp.empty();
-
     // Test with empty content
-    csp.withBaseUri(null);
-    assertEquals("", csp.toToken());
+    m_csp.withBaseUri(null);
+    assertEquals("", m_csp.toToken());
 
     // Test adding null content to existing null content
-    csp.appendBaseUri(null);
-    assertEquals("", csp.toToken());
+    m_csp.appendBaseUri(null);
+    assertEquals("", m_csp.toToken());
 
     // Test adding setting content
-    csp.withBaseUri("foo");
-    assertEquals(StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, ContentSecurityPolicy.DIRECTIVE_BASE_URI, "foo"), csp.toToken());
+    m_csp.withBaseUri("foo");
+    assertEquals(StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, ContentSecurityPolicy.DIRECTIVE_BASE_URI, "foo"), m_csp.toToken());
 
     // Test adding null content to existing content
-    csp.appendBaseUri(null);
-    assertEquals(StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, ContentSecurityPolicy.DIRECTIVE_BASE_URI, "foo"), csp.toToken());
+    m_csp.appendBaseUri(null);
+    assertEquals(StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, ContentSecurityPolicy.DIRECTIVE_BASE_URI, "foo"), m_csp.toToken());
 
     // Test adding content to existing null content
-    csp.withBaseUri(null);
-    csp.appendBaseUri("foo");
-    assertEquals(StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, ContentSecurityPolicy.DIRECTIVE_BASE_URI, "foo"), csp.toToken());
+    m_csp.withBaseUri(null);
+    m_csp.appendBaseUri("foo");
+    assertEquals(StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, ContentSecurityPolicy.DIRECTIVE_BASE_URI, "foo"), m_csp.toToken());
 
     // Test setting or appending null values for other directives
-    csp.withFontSrc(null);
-    csp.appendConnectSrc(null);
-    assertEquals(StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, ContentSecurityPolicy.DIRECTIVE_BASE_URI, "foo"), csp.toToken());
+    m_csp.withFontSrc(null);
+    m_csp.appendConnectSrc(null);
+    assertEquals(StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, ContentSecurityPolicy.DIRECTIVE_BASE_URI, "foo"), m_csp.toToken());
   }
 
   @Test
   public void testAppendWithDuplicatedValues() {
-    ContentSecurityPolicy csp = new ContentSecurityPolicy();
-    csp.empty();
-    csp.appendChildSrc("'foo'");
-    assertEquals(StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, ContentSecurityPolicy.DIRECTIVE_CHILD_SRC, "'foo'"), csp.toToken());
+    m_csp.appendChildSrc("'foo'");
+    assertEquals(StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, ContentSecurityPolicy.DIRECTIVE_CHILD_SRC, "'foo'"), m_csp.toToken());
 
-    csp.appendChildSrc("'bar'");
-    assertEquals(StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, ContentSecurityPolicy.DIRECTIVE_CHILD_SRC, "'foo' 'bar'"), csp.toToken());
+    m_csp.appendChildSrc("'bar'");
+    assertEquals(StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, ContentSecurityPolicy.DIRECTIVE_CHILD_SRC, "'foo' 'bar'"), m_csp.toToken());
 
-    csp.appendChildSrc("foo");
-    assertEquals(StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, ContentSecurityPolicy.DIRECTIVE_CHILD_SRC, "'foo' 'bar'"), csp.toToken());
+    m_csp.appendChildSrc("foo");
+    assertEquals(StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, ContentSecurityPolicy.DIRECTIVE_CHILD_SRC, "'foo' 'bar'"), m_csp.toToken());
 
-    csp.appendChildSrc("fo");
-    assertEquals(StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, ContentSecurityPolicy.DIRECTIVE_CHILD_SRC, "'foo' 'bar'"), csp.toToken());
+    m_csp.appendChildSrc("fo");
+    assertEquals(StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, ContentSecurityPolicy.DIRECTIVE_CHILD_SRC, "'foo' 'bar'"), m_csp.toToken());
 
-    csp.appendChildSrc("bar");
-    assertEquals(StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, ContentSecurityPolicy.DIRECTIVE_CHILD_SRC, "'foo' 'bar'"), csp.toToken());
+    m_csp.appendChildSrc("bar");
+    assertEquals(StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, ContentSecurityPolicy.DIRECTIVE_CHILD_SRC, "'foo' 'bar'"), m_csp.toToken());
+  }
+
+  @Test
+  public void testPutOrRemove() throws Exception {
+    m_csp.withChildSrc("foo");
+    assertEquals("expect only 'foo' as directive source", StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, ContentSecurityPolicy.DIRECTIVE_CHILD_SRC, "foo"), m_csp.toToken());
+
+    m_csp.withChildSrc(null);
+    assertEquals("expect directive to be removed", "", m_csp.toToken());
   }
 
   /**
-   * Runs test for one directive using wrapper class around {@link ContentSecurityPolicy}
+   * Runs test for one directive using method pointers to append* and with* methods.
    */
-  protected void testDirective(P_ContentSecurityPolicyWrapper wrapper) {
-    ContentSecurityPolicy csp = new ContentSecurityPolicy();
-    csp.empty();
-    wrapper.append(csp, "foo");
-    assertEquals("expect only 'foo' as directive source", StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, wrapper.getDirective(), "foo"), csp.toToken());
+  protected void testDirective(String directive, Function<String, ContentSecurityPolicy> appendFunc, Function<String, ContentSecurityPolicy> withFunc) {
+    appendFunc.apply("foo");
+    assertEquals("expect only 'foo' as directive source", StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, directive, "foo"), m_csp.toToken());
 
-    wrapper.with(csp, "bar");
-    assertEquals("expect only 'bar' as directive source", StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, wrapper.getDirective(), "bar"), csp.toToken());
+    withFunc.apply("bar");
+    assertEquals("expect only 'bar' as directive source", StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, directive, "bar"), m_csp.toToken());
 
-    wrapper.append(csp, "foo");
-    assertEquals("expect 'bar' and 'foo' as directive source", StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, wrapper.getDirective(), "bar", "foo"), csp.toToken());
+    appendFunc.apply("foo");
+    assertEquals("expect 'bar' and 'foo' as directive source", StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, directive, "bar", "foo"), m_csp.toToken());
   }
+
 }

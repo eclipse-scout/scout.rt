@@ -145,6 +145,18 @@ public class ContentSecurityPolicy {
   }
 
   /**
+   * Settings a directive to null is the same as removing the directive entirely.
+   */
+  protected void putOrRemove(String key, String value) {
+    if (value == null) {
+      m_directives.remove(key);
+    }
+    else {
+      m_directives.put(key, value);
+    }
+  }
+
+  /**
    * @return live map of all CSP directives in this rule set
    */
   public final Map<String, String> getDirectives() {
@@ -162,7 +174,7 @@ public class ContentSecurityPolicy {
    * @see <a href="https://www.w3.org/TR/CSP2/#directive-base-uri">https://www.w3.org/TR/CSP2/#directive-base-uri</a>
    */
   public ContentSecurityPolicy withBaseUri(String baseUri) {
-    m_directives.put(DIRECTIVE_BASE_URI, baseUri);
+    putOrRemove(DIRECTIVE_BASE_URI, baseUri);
     return this;
   }
 
@@ -179,7 +191,7 @@ public class ContentSecurityPolicy {
    * @see <a href="https://www.w3.org/TR/CSP2/#directive-child-src">https://www.w3.org/TR/CSP2/#directive-child-src</a>
    */
   public ContentSecurityPolicy withChildSrc(String childSrc) {
-    m_directives.put(DIRECTIVE_CHILD_SRC, childSrc);
+    putOrRemove(DIRECTIVE_CHILD_SRC, childSrc);
     return this;
   }
 
@@ -197,7 +209,7 @@ public class ContentSecurityPolicy {
    *      "https://www.w3.org/TR/CSP2/#directive-connect-src">https://www.w3.org/TR/CSP2/#directive-connect-src</a>
    */
   public ContentSecurityPolicy withConnectSrc(String connectSrc) {
-    m_directives.put(DIRECTIVE_CONNECT_SRC, connectSrc);
+    putOrRemove(DIRECTIVE_CONNECT_SRC, connectSrc);
     return this;
   }
 
@@ -216,7 +228,7 @@ public class ContentSecurityPolicy {
    *      "https://www.w3.org/TR/CSP2/#directive-default-src">https://www.w3.org/TR/CSP2/#directive-default-src</a>
    */
   public ContentSecurityPolicy withDefaultSrc(String defaultSrc) {
-    m_directives.put(DIRECTIVE_DEFAULT_SRC, defaultSrc);
+    putOrRemove(DIRECTIVE_DEFAULT_SRC, defaultSrc);
     return this;
   }
 
@@ -234,7 +246,7 @@ public class ContentSecurityPolicy {
    * @see <a href="https://www.w3.org/TR/CSP2/#directive-font-src">https://www.w3.org/TR/CSP2/#directive-font-src</a>
    */
   public ContentSecurityPolicy withFontSrc(String fontSrc) {
-    m_directives.put(DIRECTIVE_FONT_SRC, fontSrc);
+    putOrRemove(DIRECTIVE_FONT_SRC, fontSrc);
     return this;
   }
 
@@ -252,7 +264,7 @@ public class ContentSecurityPolicy {
    *      "https://www.w3.org/TR/CSP2/#directive-form-action">https://www.w3.org/TR/CSP2/#directive-form-action</a>
    */
   public ContentSecurityPolicy withFormAction(String formAction) {
-    m_directives.put(DIRECTIVE_FORM_ACTION, formAction);
+    putOrRemove(DIRECTIVE_FORM_ACTION, formAction);
     return this;
   }
 
@@ -271,7 +283,7 @@ public class ContentSecurityPolicy {
    *      "https://www.w3.org/TR/CSP2/#directive-frame-ancestors">https://www.w3.org/TR/CSP2/#directive-frame-ancestors</a>
    */
   public ContentSecurityPolicy withFrameAncestors(String frameAncestors) {
-    m_directives.put(DIRECTIVE_FRAME_ANCESTORS, frameAncestors);
+    putOrRemove(DIRECTIVE_FRAME_ANCESTORS, frameAncestors);
     return this;
   }
 
@@ -292,7 +304,7 @@ public class ContentSecurityPolicy {
    */
   @Deprecated
   public ContentSecurityPolicy withFrameSrc(String frameSrc) {
-    m_directives.put(DIRECTIVE_FRAME_SRC, frameSrc);
+    putOrRemove(DIRECTIVE_FRAME_SRC, frameSrc);
     return this;
   }
 
@@ -311,7 +323,7 @@ public class ContentSecurityPolicy {
    * @see <a href="https://www.w3.org/TR/CSP2/#directive-img-src">https://www.w3.org/TR/CSP2/#directive-img-src</a>
    */
   public ContentSecurityPolicy withImgSrc(String imgSrc) {
-    m_directives.put(DIRECTIVE_IMG_SRC, imgSrc);
+    putOrRemove(DIRECTIVE_IMG_SRC, imgSrc);
     return this;
   }
 
@@ -328,7 +340,7 @@ public class ContentSecurityPolicy {
    * @see <a href="https://www.w3.org/TR/CSP2/#directive-media-src">https://www.w3.org/TR/CSP2/#directive-media-src</a>
    */
   public ContentSecurityPolicy withMediaSrc(String mediaSrc) {
-    m_directives.put(DIRECTIVE_MEDIA_SRC, mediaSrc);
+    putOrRemove(DIRECTIVE_MEDIA_SRC, mediaSrc);
     return this;
   }
 
@@ -346,7 +358,7 @@ public class ContentSecurityPolicy {
    *      "https://www.w3.org/TR/CSP2/#directive-object-src">https://www.w3.org/TR/CSP2/#directive-object-src</a>
    */
   public ContentSecurityPolicy withObjectSrc(String objectSrc) {
-    m_directives.put(DIRECTIVE_OBJECT_SRC, objectSrc);
+    putOrRemove(DIRECTIVE_OBJECT_SRC, objectSrc);
     return this;
   }
 
@@ -365,7 +377,7 @@ public class ContentSecurityPolicy {
    *      "https://www.w3.org/TR/CSP2/#directive-plugin-types">https://www.w3.org/TR/CSP2/#directive-plugin-types</a>
    */
   public ContentSecurityPolicy withPluginTypes(String pluginTypes) {
-    m_directives.put(DIRECTIVE_PLUGIN_TYPES, pluginTypes);
+    putOrRemove(DIRECTIVE_PLUGIN_TYPES, pluginTypes);
     return this;
   }
 
@@ -384,7 +396,7 @@ public class ContentSecurityPolicy {
    *      "https://www.w3.org/TR/CSP2/#directive-report-uri">https://www.w3.org/TR/CSP2/#directive-report-uri</a>
    */
   public ContentSecurityPolicy withReportUri(String reportUri) {
-    m_directives.put(DIRECTIVE_REPORT_URI, reportUri);
+    putOrRemove(DIRECTIVE_REPORT_URI, reportUri);
     return this;
   }
 
@@ -402,7 +414,7 @@ public class ContentSecurityPolicy {
    * @see <a href="https://www.w3.org/TR/CSP2/#directive-sandbox">https://www.w3.org/TR/CSP2/#directive-sandbox</a>
    */
   public ContentSecurityPolicy withSandbox(String sandbox) {
-    m_directives.put(DIRECTIVE_SANDBOX, sandbox);
+    putOrRemove(DIRECTIVE_SANDBOX, sandbox);
     return this;
   }
 
@@ -420,7 +432,7 @@ public class ContentSecurityPolicy {
    *      "https://www.w3.org/TR/CSP2/#directive-script-src">https://www.w3.org/TR/CSP2/#directive-script-src</a>
    */
   public ContentSecurityPolicy withScriptSrc(String scriptSrc) {
-    m_directives.put(DIRECTIVE_SCRIPT_SRC, scriptSrc);
+    putOrRemove(DIRECTIVE_SCRIPT_SRC, scriptSrc);
     return this;
   }
 
@@ -438,7 +450,7 @@ public class ContentSecurityPolicy {
    * @see <a href="https://www.w3.org/TR/CSP2/#directive-style-src">https://www.w3.org/TR/CSP2/#directive-style-src</a>
    */
   public ContentSecurityPolicy withStyleSrc(String styleSrc) {
-    m_directives.put(DIRECTIVE_STYLE_SRC, styleSrc);
+    putOrRemove(DIRECTIVE_STYLE_SRC, styleSrc);
     return this;
   }
 
