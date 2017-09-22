@@ -20,7 +20,13 @@ public class JobManagerLoadTest {
 
   private static final String JOB_IDENTIFIER = UUID.randomUUID().toString();
 
-  private static final long JOB_COUNT = 50_000;
+  /*
+   * Be careful when changing this constant.
+   * Performance testing based on execution time is not very accurate because it expects a minimal base performance of
+   * the system the test is executed on. Further, this particular test creates a lot of new threads, i.e. OS resources
+   * that might be limited for the executing user or process.
+   */
+  private static final long JOB_COUNT = 25_000;
 
   @Test(timeout = 20_000)
   public void testImmediateExecuting() {
@@ -46,7 +52,7 @@ public class JobManagerLoadTest {
     }
     catch (TimedOutException e) {
       Jobs.getJobManager().cancel(filter, true);
-      fail("Scheduling 50'000 jobs took longer than 10s");
+      fail("Scheduling 25'000 jobs took longer than 10s");
     }
   }
 
@@ -78,7 +84,7 @@ public class JobManagerLoadTest {
     }
     catch (TimedOutException e) {
       Jobs.getJobManager().cancel(filter, true);
-      fail("Scheduling 50'000 took longer than 10s");
+      fail("Scheduling 25'000 took longer than 10s");
     }
   }
 }
