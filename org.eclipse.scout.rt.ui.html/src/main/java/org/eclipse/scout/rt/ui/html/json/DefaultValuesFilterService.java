@@ -15,6 +15,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -71,7 +72,9 @@ public class DefaultValuesFilterService implements IDefaultValuesFilterService {
 
   protected List<URL> getDefaultValuesConfigurationUrls() {
     List<URL> urls = new ArrayList<>();
-    for (IDefaultValuesConfigurationContributor contributor : BEANS.all(IDefaultValuesConfigurationContributor.class)) {
+    List<IDefaultValuesConfigurationContributor> contributors = BEANS.all(IDefaultValuesConfigurationContributor.class);
+    Collections.reverse(contributors);
+    for (IDefaultValuesConfigurationContributor contributor : contributors) {
       URL url = contributor.contributeDefaultValuesConfigurationUrl();
       if (url != null) {
         urls.add(url);

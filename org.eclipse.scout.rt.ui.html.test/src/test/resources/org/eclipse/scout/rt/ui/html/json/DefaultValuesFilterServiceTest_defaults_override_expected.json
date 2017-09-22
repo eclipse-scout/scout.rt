@@ -1,0 +1,23 @@
+{
+  "defaults": {
+    "FormField": {
+      "enabled": true,
+      "visible": false,
+      "custom": "abc"
+    }
+  },
+  "objectTypeHierarchy": {
+    "Widget": {
+      "Action": {
+        "Menu": null,
+        "TableControl": null
+      },
+      "FormField": {
+        "TableField": {
+          "CustomTableField": null
+        }
+      },
+      "Tile": null
+    }
+  }
+}
