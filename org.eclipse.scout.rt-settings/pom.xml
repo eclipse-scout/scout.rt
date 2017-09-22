@@ -15,7 +15,7 @@
   <parent>
     <groupId>org.eclipse.scout.rt</groupId>
     <artifactId>org.eclipse.scout.rt</artifactId>
-    <version>7.0.150-SNAPSHOT</version>
+    <version>7.0.150.001_Oxygen_1a_RC1</version>
     <relativePath>../org.eclipse.scout.rt/pom.xml</relativePath>
   </parent>
 
