@@ -38,6 +38,12 @@ scout.RemoteLookupCall.prototype.getByRec = function(rec) {
   return this.deferred.promise();
 };
 
+scout.RemoteLookupCall.prototype.getByKey = function(key) {
+  this._newDeferred(scout.RemoteLookupRequest.byKey(key));
+  this.adapter.lookupByKey(key);
+  return this.deferred.promise();
+};
+
 scout.RemoteLookupCall.prototype.resolveLookup = function(lookupResult) {
   if (!this._belongsToLatestRequest(lookupResult)) {
     $.log.trace('(RemoteLookupCall#resolveLookup) ignore lookupResult. Does not belong to latest request', this.deferred.requestParameter);
@@ -53,7 +59,9 @@ scout.RemoteLookupCall.prototype.resolveLookup = function(lookupResult) {
 
 scout.RemoteLookupCall.prototype._belongsToLatestRequest = function(lookupResult) {
   var resultParameter;
-  if (lookupResult.hasOwnProperty('rec')) {
+  if (lookupResult.hasOwnProperty('key')) {
+    resultParameter = scout.RemoteLookupRequest.byKey(lookupResult.key);
+  } else if (lookupResult.hasOwnProperty('rec')) {
     resultParameter = scout.RemoteLookupRequest.byRec(lookupResult.rec);
   } else {
     resultParameter = scout.RemoteLookupRequest.byText(lookupResult.searchText);

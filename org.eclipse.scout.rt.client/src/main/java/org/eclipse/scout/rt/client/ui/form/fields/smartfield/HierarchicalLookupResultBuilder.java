@@ -19,6 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.ISmartFieldResult;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.QueryParam;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.SmartFieldResult;
 import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.slf4j.Logger;
@@ -147,7 +151,7 @@ public class HierarchicalLookupResultBuilder<VALUE> {
   /**
    * @return all new rows to be inserted (including parents of search result)
    */
-  public ISmartFieldDataFetchResult<VALUE> addParentLookupRows(ISmartFieldDataFetchResult<VALUE> result) {
+  public ISmartFieldResult<VALUE> addParentLookupRows(ISmartFieldResult<VALUE> result) {
     List<ILookupRow<VALUE>> lookupRows;
     if (m_smartField.isLoadParentNodes()) {
       if (m_smartField.isBrowseLoadIncremental()) {
@@ -156,13 +160,17 @@ public class HierarchicalLookupResultBuilder<VALUE> {
       else {
         m_lookupRowProvider = new P_BrowseLookupRowProvider();
       }
-      VALUE parent = result.getSearchParam().getParentKey();
-      lookupRows = getRowsWithParents(result.getLookupRows(), parent);
+      VALUE parentKey = null;
+      IQueryParam queryParam = result.getQueryParam();
+      if (QueryParam.isParentKeyQuery(queryParam)) {
+        parentKey = QueryParam.getParentKey(queryParam);
+      }
+      lookupRows = getRowsWithParents(result.getLookupRows(), parentKey);
     }
     else {
       lookupRows = result.getLookupRows();
     }
-    return new SmartFieldDataFetchResult<>(lookupRows, result.getException(), result.getSearchParam());
+    return new SmartFieldResult<>(lookupRows, result.getQueryParam(), result.getException());
   }
 
   private class P_KeyLookupRowProvider implements ILookupRowByKeyProvider<VALUE> {

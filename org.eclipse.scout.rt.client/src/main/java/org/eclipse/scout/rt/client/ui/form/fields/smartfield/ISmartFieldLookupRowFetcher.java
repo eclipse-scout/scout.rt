@@ -12,38 +12,19 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.ISmartFieldResult;
+
 public interface ISmartFieldLookupRowFetcher<LOOKUP_KEY> {
 
   String PROP_SEARCH_RESULT = "searchResult";
 
-  /**
-   * @param listener
-   */
   void addPropertyChangeListener(PropertyChangeListener listener);
 
-  /**
-   * @param listener
-   */
   void removePropertyChangeListener(PropertyChangeListener listener);
 
-  /**
-   * @param propertyName
-   * @param listener
-   */
-  void addPropertyChangeListener(String propertyName, PropertyChangeListener listener);
+  void update(IQueryParam queryParam, boolean synchronous);
 
-  /**
-   * @param propertyName
-   * @param listener
-   */
-  void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);
-
-  void update(ISmartFieldSearchParam<LOOKUP_KEY> searchParam, boolean synchronous);
-
-  ISmartFieldDataFetchResult<LOOKUP_KEY> getResult();
-
-  ISmartFieldDataFetchResult<LOOKUP_KEY> newResult(String searchText, boolean selectCurrentValue);
-
-  String getLastSearchText();
+  ISmartFieldResult<LOOKUP_KEY> getResult();
 
 }

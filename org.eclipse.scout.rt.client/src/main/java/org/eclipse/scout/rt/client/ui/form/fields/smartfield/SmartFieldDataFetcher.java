@@ -13,6 +13,9 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.QueryParam;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.SmartFieldResult;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
 
@@ -24,25 +27,24 @@ public class SmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmartFieldLookupR
   }
 
   @Override
-  public void update(ISmartFieldSearchParam<LOOKUP_KEY> query, boolean synchronous) {
-    String searchText = query.getSearchQuery();
-    String text = searchText;
-    if (text == null) {
-      text = "";
-    }
-
-    final String textNonNull = text;
-    final int maxCount = getSmartField().getBrowseMaxRowCount();
-    final ILookupRowFetchedCallback<LOOKUP_KEY> callback = new P_LookupCallDataCallback(query);
-    final int maxRowCount = (maxCount > 0 ? maxCount + 1 : 0);
+  public void update(IQueryParam queryParam, boolean synchronous) {
+    int maxCount = getSmartField().getBrowseMaxRowCount();
+    ILookupRowFetchedCallback<LOOKUP_KEY> callback = new P_LookupCallDataCallback(queryParam);
+    int maxRowCount = (maxCount > 0 ? maxCount + 1 : 0);
 
     if (synchronous) {
       try {
-        if (getSmartField().getWildcard().equals(text) || text.isEmpty()) {
-          callback.onSuccess(getSmartField().callBrowseLookup(text, maxRowCount));
+        if (QueryParam.isKeyQuery(queryParam)) {
+          callback.onSuccess(getSmartField().callKeyLookup(QueryParam.getKey(queryParam)));
+        }
+        else if (QueryParam.isAllQuery(queryParam)) {
+          callback.onSuccess(getSmartField().callBrowseLookup(QueryParam.getText(queryParam), maxRowCount));
+        }
+        else if (QueryParam.isTextQuery(queryParam)) {
+          callback.onSuccess(getSmartField().callTextLookup(QueryParam.getText(queryParam), maxRowCount));
         }
         else {
-          callback.onSuccess(getSmartField().callTextLookup(text, maxRowCount));
+          throw new IllegalStateException();
         }
       }
       catch (RuntimeException e) {
@@ -50,31 +52,37 @@ public class SmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmartFieldLookupR
       }
     }
     else {
-      if (getSmartField().getWildcard().equals(textNonNull) || textNonNull.isEmpty()) {
-        getSmartField().callBrowseLookupInBackground(textNonNull, maxRowCount, callback);
+      if (QueryParam.isKeyQuery(queryParam)) {
+        getSmartField().callKeyLookupInBackground(QueryParam.getKey(queryParam), callback);
+      }
+      else if (QueryParam.isAllQuery(queryParam)) {
+        getSmartField().callBrowseLookupInBackground(QueryParam.getText(queryParam), maxRowCount, callback);
+      }
+      else if (QueryParam.isTextQuery(queryParam)) {
+        getSmartField().callTextLookupInBackground(QueryParam.getText(queryParam), maxRowCount, callback);
       }
       else {
-        getSmartField().callTextLookupInBackground(textNonNull, maxRowCount, callback);
+        throw new IllegalStateException();
       }
     }
   }
 
   private final class P_LookupCallDataCallback implements ILookupRowFetchedCallback<LOOKUP_KEY> {
-    private final ISmartFieldSearchParam<LOOKUP_KEY> m_param;
+    private final IQueryParam m_param;
 
-    private P_LookupCallDataCallback(ISmartFieldSearchParam<LOOKUP_KEY> param) {
+    private P_LookupCallDataCallback(IQueryParam param) {
       m_param = param;
       setResult(null);
     }
 
     @Override
     public void onSuccess(List<? extends ILookupRow<LOOKUP_KEY>> rows) {
-      setResult(new SmartFieldDataFetchResult<>(new ArrayList<>(rows), null, m_param));
+      setResult(new SmartFieldResult<>(new ArrayList<>(rows), m_param, null));
     }
 
     @Override
     public void onFailure(RuntimeException exception) {
-      setResult(new SmartFieldDataFetchResult<>(null, exception, m_param));
+      setResult(new SmartFieldResult<>(null, m_param, exception));
     }
   }
 }

@@ -44,6 +44,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnDescriptor;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.ISmartFieldResult;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.QueryParam;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
@@ -491,11 +494,11 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   @Override
-  public SmartFieldResult getResult() {
-    return (SmartFieldResult) propertySupport.getProperty(PROP_RESULT);
+  public ISmartFieldResult getResult() {
+    return (ISmartFieldResult) propertySupport.getProperty(PROP_RESULT);
   }
 
-  protected void setResult(SmartFieldResult<VALUE> result) {
+  protected void setResult(ISmartFieldResult<VALUE> result) {
     propertySupport.setProperty(PROP_RESULT, result);
   }
 
@@ -850,8 +853,8 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   protected VALUE handleMissingLookupRow(String text) {
-    doSearch(text, false, true);
-    ISmartFieldDataFetchResult<VALUE> fetchResult = getLookupRowFetcher().getResult();
+    lookupByTextInternal(text, true);
+    ISmartFieldResult<VALUE> fetchResult = getLookupRowFetcher().getResult();
 
     int numResults = 0;
     if (fetchResult != null && fetchResult.getLookupRows() != null) {
@@ -916,27 +919,30 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   @Override
   public void lookupAll() {
-    doSearch(null, false, false);
+    doSearch(QueryParam.createQueryByAll(this), false);
   }
 
   @Override
   public void lookupByText(String text) {
-    doSearch(text, false, false);
+    lookupByTextInternal(text, false);
+  }
+
+  protected void lookupByTextInternal(String text, boolean synchronous) {
+    doSearch(QueryParam.createQueryByText(this, text), synchronous);
   }
 
   @Override
   public void lookupByRec(VALUE parentKey) {
-    doSearch(SmartFieldSearchParam.createParentParam(parentKey, false), false);
+    doSearch(QueryParam.createQueryByParentKey(this, parentKey), false);
   }
 
   @Override
-  public void doSearch(String text, boolean selectCurrentValue, boolean synchronous) {
-    ISmartFieldSearchParam<VALUE> param = SmartFieldSearchParam.createTextParam(getWildcard(), text, selectCurrentValue);
-    doSearch(param, synchronous);
+  public void lookupByKey(VALUE key) {
+    doSearch(QueryParam.createQueryByKey(this, key), false);
   }
 
   @Override
-  public void doSearch(ISmartFieldSearchParam<VALUE> param, boolean synchronous) {
+  public void doSearch(IQueryParam param, boolean synchronous) {
     getLookupRowFetcher().update(param, synchronous);
   }
 
@@ -1054,7 +1060,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     list.removeIf(Objects::isNull);
   }
 
-  protected void handleFetchResult(ISmartFieldDataFetchResult<VALUE> result) {
+  protected void handleFetchResult(ISmartFieldResult<VALUE> result) {
     if (result == null) {
       setResult(null);
     }
@@ -1062,11 +1068,11 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
       if (isBrowseHierarchy()) {
         result = addHierarchicalResults(result);
       }
-      setResult(new SmartFieldResult<>(result));
+      setResult(result);
     }
   }
 
-  protected ISmartFieldDataFetchResult<VALUE> addHierarchicalResults(ISmartFieldDataFetchResult<VALUE> result) {
+  protected ISmartFieldResult<VALUE> addHierarchicalResults(ISmartFieldResult<VALUE> result) {
     return new HierarchicalLookupResultBuilder<>(this).addParentLookupRows(result);
   }
 
@@ -1090,7 +1096,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
       if (ISmartFieldLookupRowFetcher.PROP_SEARCH_RESULT.equals(evt.getPropertyName())) {
-        handleFetchResult((ISmartFieldDataFetchResult<VALUE>) evt.getNewValue());
+        handleFetchResult((ISmartFieldResult<VALUE>) evt.getNewValue());
       }
     }
   }

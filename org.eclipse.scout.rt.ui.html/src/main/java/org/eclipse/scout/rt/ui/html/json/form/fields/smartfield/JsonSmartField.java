@@ -8,7 +8,10 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnDescriptor;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartFieldResult;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.ByTextQueryParam;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.ISmartFieldResult;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.QueryParam;
 import org.eclipse.scout.rt.platform.exception.IThrowableWithContextInfo;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.status.IStatus;
@@ -70,7 +73,7 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
       @Override
       @SuppressWarnings("unchecked")
       public Object prepareValueForToJson(Object value) {
-        return resultToJson((SmartFieldResult<VALUE>) value);
+        return resultToJson((ISmartFieldResult<VALUE>) value);
       }
     });
     putJsonProperty(new JsonProperty<ISmartField<VALUE>>(ISmartField.PROP_LOOKUP_ROW, model) {
@@ -151,7 +154,10 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if ("lookupByText".equals(event.getType())) {
+    if ("lookupByKey".equals(event.getType())) {
+      handleUiLookupByKey(event);
+    }
+    else if ("lookupByText".equals(event.getType())) {
       handleUiLookupByText(event);
     }
     else if ("lookupAll".equals(event.getType())) {
@@ -254,6 +260,12 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
     getModel().lookupByRec(rec);
   }
 
+  protected void handleUiLookupByKey(JsonEvent event) {
+    String mappedKey = event.getData().optString("key");
+    VALUE key = getLookupRowKeyForId(mappedKey);
+    getModel().lookupByKey(key);
+  }
+
   /**
    * Why resolve current key and not resolve key with a parameter? Because it is not guaranteed that the key is
    * serializable / comparable. So we cannot simply send the key from the UI to the server. Additionally we do not have
@@ -294,7 +306,7 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
   }
 
   @SuppressWarnings("unchecked")
-  protected JSONObject resultToJson(SmartFieldResult result) {
+  protected JSONObject resultToJson(ISmartFieldResult result) {
     if (result == null) {
       return null;
     }
@@ -304,11 +316,17 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
       jsonLookupRows.put(lookupRowToJson(lookupRow, hasMultipleColumns()));
     }
     json.put("lookupRows", jsonLookupRows);
-    if (result.isByRec()) {
-      json.put("rec", getIdForLookupRowKey(result.getRec()));
+    IQueryParam queryParam = result.getQueryParam();
+    if (QueryParam.isKeyQuery(queryParam)) {
+      json.put("key", getIdForLookupRowKey(QueryParam.getKey(queryParam)));
+    }
+    else if (QueryParam.isParentKeyQuery(queryParam)) {
+      json.put("rec", getIdForLookupRowKey(QueryParam.getParentKey(queryParam)));
     }
     else {
-      json.put("searchText", result.getSearchText());
+      ByTextQueryParam byTextQueryParam = (ByTextQueryParam) queryParam;
+      json.put("wildcard", byTextQueryParam.getWildcard());
+      json.put("searchText", byTextQueryParam.getText());
     }
     if (result.getException() != null) {
       json.put("exception", exceptionToJson(result.getException()));

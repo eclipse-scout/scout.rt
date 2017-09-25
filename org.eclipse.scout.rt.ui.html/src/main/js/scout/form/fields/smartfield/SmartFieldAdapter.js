@@ -49,6 +49,13 @@ scout.SmartFieldAdapter.prototype.lookupByRec = function(rec) {
   });
 };
 
+scout.SmartFieldAdapter.prototype.lookupByKey = function(key) {
+  this._send('lookupByKey', {
+    showBusyIndicator: false,
+    key: key
+  });
+};
+
 scout.SmartFieldAdapter.prototype._onWidgetAcceptInput = function(event) {
   var eventData = {
     displayText: event.displayText,

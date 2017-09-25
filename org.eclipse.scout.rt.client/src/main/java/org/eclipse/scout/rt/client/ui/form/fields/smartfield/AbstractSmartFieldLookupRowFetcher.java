@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.ISmartFieldResult;
 import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
 
 public abstract class AbstractSmartFieldLookupRowFetcher<LOOKUP_KEY> implements ISmartFieldLookupRowFetcher<LOOKUP_KEY> {
@@ -42,53 +43,19 @@ public abstract class AbstractSmartFieldLookupRowFetcher<LOOKUP_KEY> implements 
     m_propertySupport.removePropertyChangeListener(listener);
   }
 
-  /**
-   * @param propertyName
-   * @param listener
-   * @see BasicPropertySupport#addPropertyChangeListener(String, PropertyChangeListener)
-   */
-  @Override
-  public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-    m_propertySupport.addPropertyChangeListener(propertyName, listener);
-  }
-
-  /**
-   * @param propertyName
-   * @param listener
-   * @see BasicPropertySupport#removePropertyChangeListener(String, PropertyChangeListener)
-   */
-  @Override
-  public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-    m_propertySupport.removePropertyChangeListener(propertyName, listener);
-  }
-
   public ISmartField<LOOKUP_KEY> getSmartField() {
     return m_smartField;
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public ISmartFieldDataFetchResult<LOOKUP_KEY> getResult() {
-    return (ISmartFieldDataFetchResult<LOOKUP_KEY>) m_propertySupport.getProperty(PROP_SEARCH_RESULT);
+  public ISmartFieldResult<LOOKUP_KEY> getResult() {
+    return (ISmartFieldResult<LOOKUP_KEY>) m_propertySupport.getProperty(PROP_SEARCH_RESULT);
   }
 
-  @Override
-  public ISmartFieldDataFetchResult<LOOKUP_KEY> newResult(String searchText, boolean selectCurrentValue) {
-    String wildcard = getSmartField().getWildcard();
-    ISmartFieldSearchParam<LOOKUP_KEY> param = SmartFieldSearchParam.createTextParam(wildcard, searchText, selectCurrentValue);
-    return new SmartFieldDataFetchResult<>(null, null, param);
-  }
-
-  protected void setResult(ISmartFieldDataFetchResult<LOOKUP_KEY> result) {
+  protected void setResult(ISmartFieldResult<LOOKUP_KEY> result) {
     // Always propagate the event of an executed search to the listeners even if the search result did not change. Thus, the proposal popup is opened for every search.
     m_propertySupport.setPropertyAlwaysFire(PROP_SEARCH_RESULT, result);
   }
 
-  @Override
-  public String getLastSearchText() {
-    if (getResult() != null) {
-      return getResult().getSearchParam().getSearchQuery();
-    }
-    return null;
-  }
 }

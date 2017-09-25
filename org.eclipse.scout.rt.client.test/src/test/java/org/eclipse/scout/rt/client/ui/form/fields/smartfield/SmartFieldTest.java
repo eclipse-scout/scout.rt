@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartFieldTest.TestForm.MainBox.StyleField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.ISmartFieldResult;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Order;
@@ -324,7 +325,7 @@ public class SmartFieldTest {
     f.lookupAll();
     waitForResult();
 
-    SmartFieldResult result = f.getResult();
+    ISmartFieldResult result = f.getResult();
     @SuppressWarnings("unchecked")
     List<ILookupRow<?>> lookupRows = result.getLookupRows();
     assertEquals(5, lookupRows.size());
@@ -338,7 +339,7 @@ public class SmartFieldTest {
     f.lookupByText("unknown");
     waitForResult();
 
-    SmartFieldResult result = f.getResult();
+    ISmartFieldResult result = f.getResult();
     @SuppressWarnings("unchecked")
     List<ILookupRow<?>> lookupRows = result.getLookupRows();
     assertEquals(0, lookupRows.size());
@@ -352,7 +353,7 @@ public class SmartFieldTest {
     f.lookupByText("Red");
     waitForResult();
 
-    SmartFieldResult result = f.getResult();
+    ISmartFieldResult result = f.getResult();
     @SuppressWarnings("unchecked")
     List<ILookupRow<?>> lookupRows = result.getLookupRows();
     assertEquals(0, lookupRows.size());

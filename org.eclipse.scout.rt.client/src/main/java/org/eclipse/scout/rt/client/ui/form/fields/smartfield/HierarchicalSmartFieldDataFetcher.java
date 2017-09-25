@@ -15,12 +15,14 @@ import java.util.function.BiConsumer;
 
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.QueryParam;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.SmartFieldResult;
 import org.eclipse.scout.rt.platform.exception.IProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
-import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +35,7 @@ public class HierarchicalSmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmart
   }
 
   @Override
-  public void update(ISmartFieldSearchParam<LOOKUP_KEY> query, boolean blocking) {
+  public void update(IQueryParam query, boolean blocking) {
     IFuture<Void> fRes =
         scheduleLookup(query)
             .whenDoneSchedule(updateResult(query), newModelJobInput());
@@ -42,11 +44,11 @@ public class HierarchicalSmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmart
     }
   }
 
-  private BiConsumer<List<ILookupRow<LOOKUP_KEY>>, Throwable> updateResult(final ISmartFieldSearchParam<LOOKUP_KEY> query) {
+  private BiConsumer<List<ILookupRow<LOOKUP_KEY>>, Throwable> updateResult(final IQueryParam query) {
     return (rows, error) -> {
-      SmartFieldDataFetchResult<LOOKUP_KEY> result = new SmartFieldDataFetchResult<>(rows, error, query);
-      if (result.getException() != null) {
-        logException(result.getException());
+      SmartFieldResult<LOOKUP_KEY> result = new SmartFieldResult<>(rows, query, error);
+      if (error != null) {
+        logException(error);
       }
       setResult(result);
     };
@@ -88,20 +90,19 @@ public class HierarchicalSmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmart
         .withExceptionHandling(null, false);
   }
 
-  protected IFuture<List<ILookupRow<LOOKUP_KEY>>> scheduleLookup(ISmartFieldSearchParam<LOOKUP_KEY> query) {
-    if (query.isByParentSearch()) {
-      return getSmartField().callSubTreeLookupInBackground(query.getParentKey(), false);
+  protected IFuture<List<ILookupRow<LOOKUP_KEY>>> scheduleLookup(IQueryParam query) {
+    if (QueryParam.isParentKeyQuery(query)) {
+      return getSmartField().callSubTreeLookupInBackground(QueryParam.getParentKey(query), false);
     }
-    else if (isTextLookup(query.getSearchQuery()) && !query.isSelectCurrentValue()) {
-      return getSmartField().callTextLookupInBackground(query.getSearchQuery(), true);
+    else if (QueryParam.isTextQuery(query)) {
+      return getSmartField().callTextLookupInBackground(QueryParam.getText(query), true);
     }
-    else {
+    else if (QueryParam.isAllQuery(query)) {
       return getSmartField().callBrowseLookupInBackground(true);
     }
-  }
-
-  protected boolean isTextLookup(String searchText) {
-    return !StringUtility.isNullOrEmpty(searchText) && !getSmartField().getWildcard().equals(searchText);
+    else {
+      throw new IllegalStateException();
+    }
   }
 
 }
