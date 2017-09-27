@@ -263,6 +263,7 @@ describe('SmartField', function() {
     it('should set error status when result has an exception', function() {
       var field = createFieldWithLookupCall();
       field._lookupByTextOrAllDone({
+        queryBy: scout.QueryBy.ALL,
         lookupRows: [],
         exception: 'a total disaster'
       });
@@ -317,6 +318,7 @@ describe('SmartField', function() {
       field.render();
       field.$field.focus();
       var result = {
+        queryBy: scout.QueryBy.ALL,
         lookupRows: [1, 2, 3, 4, 5]
       };
       field._lookupByTextOrAllDone(result);
@@ -331,6 +333,7 @@ describe('SmartField', function() {
       field.render();
       field.$field.focus();
       var result = {
+        queryBy: scout.QueryBy.ALL,
         lookupRows: [1, 2, 3, 4, 5]
       };
       field._lookupByTextOrAllDone(result);

@@ -153,14 +153,14 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if ("lookupByKey".equals(event.getType())) {
-      handleUiLookupByKey(event);
+    if ("lookupByAll".equals(event.getType())) {
+      handleUiLookupByAll();
     }
     else if ("lookupByText".equals(event.getType())) {
       handleUiLookupByText(event);
     }
-    else if ("lookupAll".equals(event.getType())) {
-      handleUiLookupAll();
+    else if ("lookupByKey".equals(event.getType())) {
+      handleUiLookupByKey(event);
     }
     else if ("lookupByRec".equals(event.getType())) {
       handleUiLookupByRec(event);
@@ -249,8 +249,8 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
   }
 
   protected void handleUiLookupByText(JsonEvent event) {
-    String searchText = event.getData().optString("searchText");
-    getModel().lookupByText(searchText);
+    String text = event.getData().optString("text");
+    getModel().lookupByText(text);
   }
 
   protected void handleUiLookupByRec(JsonEvent event) {
@@ -272,8 +272,8 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
    *
    * @param event
    */
-  protected void handleUiLookupAll() {
-    getModel().lookupAll();
+  protected void handleUiLookupByAll() {
+    getModel().lookupByAll();
   }
 
   protected void resetKeyMap() {
@@ -316,15 +316,15 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
     }
     json.put("lookupRows", jsonLookupRows);
     IQueryParam queryParam = result.getQueryParam();
-    if (queryParam.is(QueryBy.KEY)) {
+    json.put("queryBy", queryParam.getQueryBy());
+    if (queryParam.is(QueryBy.TEXT)) {
+      json.put("text", queryParam.getText());
+    }
+    else if (queryParam.is(QueryBy.KEY)) {
       json.put("key", getIdForLookupRowKey(queryParam.getKey()));
     }
     else if (queryParam.is(QueryBy.REC)) {
       json.put("rec", getIdForLookupRowKey(queryParam.getKey()));
-    }
-    else {
-      json.put("wildcard", queryParam.getWildcard());
-      json.put("searchText", queryParam.getText());
     }
     if (result.getException() != null) {
       json.put("exception", exceptionToJson(result.getException()));

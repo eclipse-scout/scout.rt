@@ -40,13 +40,14 @@ scout.StaticLookupCall.prototype._init = function(model) {
 
 scout.StaticLookupCall.prototype.getAll = function() {
   var deferred = $.Deferred();
-  setTimeout(this._queryAll.bind(this, deferred), this._delay);
+  setTimeout(this._queryByAll.bind(this, deferred), this._delay);
   return deferred.promise();
 };
 
-scout.StaticLookupCall.prototype._queryAll = function(deferred) {
+scout.StaticLookupCall.prototype._queryByAll = function(deferred) {
   var datas = this.data.slice(0, scout.StaticLookupCall.MAX_ROW_COUNT + 1);
   deferred.resolve({
+    queryBy: scout.QueryBy.ALL,
     lookupRows: datas.map(this._dataToLookupRow)
   });
 };
@@ -66,7 +67,8 @@ scout.StaticLookupCall.prototype._queryByText = function(deferred, text) {
   // resolve non-hierarchical results immediately
   if (!this.hierarchical) {
     deferred.resolve({
-      searchText: text,
+      queryBy: scout.QueryBy.TEXT,
+      text: text,
       lookupRows: lookupRows
     });
   }
@@ -87,7 +89,8 @@ scout.StaticLookupCall.prototype._queryByText = function(deferred, text) {
     })
     .done(function(lookupRows) {
       deferred.resolve({
-        searchText: text,
+        queryBy: scout.QueryBy.TEXT,
+        text: text,
         lookupRows: lookupRows
       });
     }.bind(this))
@@ -127,6 +130,7 @@ scout.StaticLookupCall.prototype._queryByRec = function(deferred, rec) {
     return aggr;
   }.bind(this), []);
   deferred.resolve({
+    queryBy: scout.QueryBy.REC,
     rec: rec,
     lookupRows: lookupRows
   });

@@ -105,14 +105,14 @@ public final class SmartFieldChains {
       super(extensions);
     }
 
-    public void execPrepareBrowseLookup(final ILookupCall<VALUE> call, final String browseHint) {
+    public void execPrepareBrowseLookup(final ILookupCall<VALUE> call) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ISmartFieldExtension<VALUE, ? extends AbstractSmartField<VALUE>> next) {
-          next.execPrepareBrowseLookup(SmartFieldPrepareBrowseLookupChain.this, call, browseHint);
+          next.execPrepareBrowseLookup(SmartFieldPrepareBrowseLookupChain.this, call);
         }
       };
-      callChain(methodInvocation, call, browseHint);
+      callChain(methodInvocation, call);
     }
   }
 

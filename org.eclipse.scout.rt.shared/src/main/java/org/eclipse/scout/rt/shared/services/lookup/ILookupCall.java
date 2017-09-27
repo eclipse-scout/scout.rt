@@ -21,6 +21,9 @@ import org.eclipse.scout.rt.platform.util.TriState;
 @Bean
 public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
 
+  /**
+   * @return In case lookup call is a "by key" query, getAll returns the key
+   */
   KEY_TYPE getKey();
 
   void setKey(KEY_TYPE object);
@@ -29,10 +32,16 @@ public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
 
   void setAll(String s);
 
+  /**
+   * @return In case lookup call is a "by all" query, getAll returns the wildcard character
+   */
   String getAll();
 
   void setRec(KEY_TYPE parent);
 
+  /**
+   * @return In case lookup call is a "by rec" query (which is a lookup by parent key), getRec returns the parent key
+   */
   KEY_TYPE getRec();
 
   void setMaster(Object master);
@@ -43,6 +52,9 @@ public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
 
   TriState getActive();
 
+  /**
+   * @return In case lookup call is a "by text" query , getText returns the search text
+   */
   String getText();
 
   List<? extends ILookupRow<KEY_TYPE>> getDataByKey();

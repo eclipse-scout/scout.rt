@@ -46,8 +46,9 @@ describe('SmartFieldMultiline', function() {
 
     it('reset multiline-lines DIV on error', function() {
       field._acceptByTextDone({
+        queryBy: scout.QueryBy.TEXT,
         lookupRows: [],
-        searchText: 'Xxx'
+        text: 'Xxx'
       });
       expect(field.$field.val()).toBe('Xxx');
       expect(field._$multilineLines.text()).toBe('');

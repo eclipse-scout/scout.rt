@@ -235,7 +235,7 @@ scout.ProposalChooser.prototype._selectProposal = function(result, proposals) {
   if (this._isProposal()) {
     return; // no pre-selection when field is a proposal field
   }
-  if (result.browse) {
+  if (result.byAll) {
     this.trySelectCurrentValue();
   } else if (proposals.length === 1) {
     this.selectFirstLookupRow();

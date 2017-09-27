@@ -37,7 +37,7 @@ public class SmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmartFieldLookupR
           callback.onSuccess(getSmartField().callKeyLookup(queryParam.getKey()));
         }
         else if (queryParam.is(QueryBy.ALL)) {
-          callback.onSuccess(getSmartField().callBrowseLookup(queryParam.getText(), maxRowCount)); // XXX check if we must pass this parameter
+          callback.onSuccess(getSmartField().callBrowseLookup(maxRowCount));
         }
         else if (queryParam.is(QueryBy.TEXT)) {
           callback.onSuccess(getSmartField().callTextLookup(queryParam.getText(), maxRowCount));
@@ -55,7 +55,7 @@ public class SmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmartFieldLookupR
         getSmartField().callKeyLookupInBackground(queryParam.getKey(), callback);
       }
       else if (queryParam.is(QueryBy.ALL)) {
-        getSmartField().callBrowseLookupInBackground(queryParam.getText(), maxRowCount, callback);
+        getSmartField().callBrowseLookupInBackground(maxRowCount, callback);
       }
       else if (queryParam.is(QueryBy.TEXT)) {
         getSmartField().callTextLookupInBackground(queryParam.getText(), maxRowCount, callback);

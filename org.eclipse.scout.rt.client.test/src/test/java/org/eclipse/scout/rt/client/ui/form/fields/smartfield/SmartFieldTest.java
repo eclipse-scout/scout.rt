@@ -322,7 +322,7 @@ public class SmartFieldTest {
   public void testHierarchicalBrowse() {
     StyleField f = m_styleField;
     f.setBrowseHierarchy(true);
-    f.lookupAll();
+    f.lookupByAll();
     waitForResult();
 
     ISmartFieldResult result = f.getResult();
@@ -446,7 +446,7 @@ public class SmartFieldTest {
   @Test
   public void testDeleteProposal() throws Exception {
     m_styleField.setValue(ID_RED);
-    m_styleField.lookupAll();
+    m_styleField.lookupByAll();
     waitUntilLookupRowsLoaded();
     m_styleField.getUIFacade().setLookupRowFromUI(null);
     assertNull(m_styleField.getValue());

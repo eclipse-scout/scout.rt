@@ -98,7 +98,7 @@ scout.ProposalField.prototype._acceptByTextDone = function(result) {
     }
   }
 
-  this._customTextAccepted(result.searchText);
+  this._customTextAccepted(result.text);
 };
 
 scout.ProposalField.prototype._customTextAccepted = function(searchText) {

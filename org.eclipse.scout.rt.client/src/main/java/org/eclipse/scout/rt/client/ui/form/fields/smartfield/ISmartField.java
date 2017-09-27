@@ -61,7 +61,7 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
   String DISPLAY_STYLE_DEFAULT = "default";
   String DISPLAY_STYLE_DROPDOWN = "dropdown";
 
-  void lookupAll();
+  void lookupByAll();
 
   void lookupByText(String searchText);
 
@@ -183,7 +183,7 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
 
   void prepareTextLookup(ILookupCall<VALUE> call, String text);
 
-  void prepareBrowseLookup(ILookupCall<VALUE> call, String browseHint, TriState activeState);
+  void prepareBrowseLookup(ILookupCall<VALUE> call, TriState activeState);
 
   void prepareRecLookup(ILookupCall<VALUE> call, VALUE parentKey, TriState activeState);
 
@@ -221,14 +221,14 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
    *
    * @return rows not <code>null</code>
    */
-  List<? extends ILookupRow<VALUE>> callBrowseLookup(String browseHint, int maxRowCount);
+  List<? extends ILookupRow<VALUE>> callBrowseLookup(int maxRowCount);
 
   /**
    * Lookup all rows using {@link ILookupCall#getDataByAll()}. Blocks until the result is available.
    *
    * @return rows not <code>null</code>
    */
-  List<? extends ILookupRow<VALUE>> callBrowseLookup(String browseHint, int maxRowCount, TriState activeState);
+  List<? extends ILookupRow<VALUE>> callBrowseLookup(int maxRowCount, TriState activeState);
 
   /**
    * Lookup rows of a parent key using {@link ILookupCall#getDataByRec()}. Blocks until the result is available.
@@ -268,17 +268,6 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
    * @return {@link IFuture} to cancel data fetching
    */
   IFuture<List<ILookupRow<VALUE>>> callBrowseLookupInBackground(boolean cancelRunningJobs);
-
-  /**
-   * Lookup rows asynchronously by all {@link ILookupCall#getDataByAll()}. Automatically cancels already running lookup
-   * jobs of this field, before starting the lookup job.
-   *
-   * @param cancelRunningJobs
-   *          if <code>true</code> it automatically cancels already running lookup jobs of this field, before starting
-   *          the new lookup job.
-   * @return {@link IFuture} to cancel data fetching
-   */
-  IFuture<List<ILookupRow<VALUE>>> callBrowseLookupInBackground(String browseHint, boolean cancelRunningJobs);
 
   /**
    * Lookup child rows of a given parent key asynchronously using {@link ILookupCall#getDataByRec()}.
@@ -326,7 +315,7 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
    *
    * @return {@link IFuture} to cancel data fetching
    */
-  IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupRowFetchedCallback<VALUE> callback);
+  IFuture<Void> callBrowseLookupInBackground(int maxRowCount, ILookupRowFetchedCallback<VALUE> callback);
 
   /**
    * Loads lookup rows asynchronously, and notifies the specified callback upon loading completed.
@@ -335,7 +324,7 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
    *
    * @return {@link IFuture} to cancel data fetching
    */
-  IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupRowFetchedCallback<VALUE> callback);
+  IFuture<Void> callBrowseLookupInBackground(int maxRowCount, TriState activeState, ILookupRowFetchedCallback<VALUE> callback);
 
   ColumnDescriptor[] getColumnDescriptors();
 

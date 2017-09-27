@@ -44,8 +44,8 @@ public abstract class AbstractSmartFieldExtension<VALUE, OWNER extends AbstractS
   }
 
   @Override
-  public void execPrepareBrowseLookup(SmartFieldPrepareBrowseLookupChain<VALUE> chain, ILookupCall<VALUE> call, String browseHint) {
-    chain.execPrepareBrowseLookup(call, browseHint);
+  public void execPrepareBrowseLookup(SmartFieldPrepareBrowseLookupChain<VALUE> chain, ILookupCall<VALUE> call) {
+    chain.execPrepareBrowseLookup(call);
   }
 
   @Override

@@ -53,7 +53,7 @@ describe('SmartFieldRemote', function() {
     it('must "browse all" when field is valid and browse parameter is true', function() {
       smartField.openPopup(true);
       sendQueuedAjaxCalls();
-      var expectedEvent = new scout.RemoteEvent(smartField.id, 'lookupAll', {
+      var expectedEvent = new scout.RemoteEvent(smartField.id, 'lookupByAll', {
         showBusyIndicator: false
       });
       expect(mostRecentJsonRequest()).toContainEvents([expectedEvent]);
@@ -65,7 +65,7 @@ describe('SmartFieldRemote', function() {
       sendQueuedAjaxCalls();
       var expectedEvent = new scout.RemoteEvent(smartField.id, 'lookupByText', {
         showBusyIndicator: false,
-        searchText: 'foo',
+        text: 'foo',
       });
       expect(mostRecentJsonRequest()).toContainEvents([expectedEvent]);
     });
@@ -79,7 +79,7 @@ describe('SmartFieldRemote', function() {
       sendQueuedAjaxCalls();
       var expectedEvent = new scout.RemoteEvent(smartField.id, 'lookupByText', {
         showBusyIndicator: false,
-        searchText: 'foo',
+        text: 'foo',
       });
       expect(mostRecentJsonRequest()).toContainEvents([expectedEvent]);
     });
@@ -156,7 +156,7 @@ describe('SmartFieldRemote', function() {
 
       sendQueuedAjaxCalls();
       var expectedEvent = new scout.RemoteEvent(smartField.id, 'lookupByText', {
-        searchText: 'bar',
+        text: 'bar',
         showBusyIndicator: false
       });
       expect(mostRecentJsonRequest()).toContainEvents([expectedEvent]);
@@ -173,6 +173,7 @@ describe('SmartFieldRemote', function() {
 
     function resolveLookupCall(smartField) {
       smartField.lookupCall.resolveLookup({
+        queryBy: scout.QueryBy.ALL,
         lookupRows: [new scout.LookupRow(123, 'foo')]
       });
       jasmine.clock().tick(500);

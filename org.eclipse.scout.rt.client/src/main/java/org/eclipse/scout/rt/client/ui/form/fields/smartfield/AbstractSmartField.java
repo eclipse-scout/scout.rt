@@ -299,7 +299,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
    */
   @ConfigOperation
   @Order(260)
-  protected void execPrepareBrowseLookup(ILookupCall<VALUE> call, String browseHint) {
+  protected void execPrepareBrowseLookup(ILookupCall<VALUE> call) {
   }
 
   /**
@@ -823,10 +823,10 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   @Override
-  public void prepareBrowseLookup(ILookupCall<VALUE> call, String browseHint, TriState activeState) {
+  public void prepareBrowseLookup(ILookupCall<VALUE> call, TriState activeState) {
     call.setKey(null);
     call.setText(null);
-    call.setAll(browseHint);
+    call.setAll(getWildcard());
     call.setRec(null);
     call.setActive(activeState);
     // when there is a master value defined in the original call, don't set it to null when no master value is available
@@ -834,7 +834,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
       call.setMaster(getMasterValue());
     }
     interceptPrepareLookup(call);
-    interceptPrepareBrowseLookup(call, browseHint);
+    interceptPrepareBrowseLookup(call);
   }
 
   @Override
@@ -918,8 +918,8 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   // search and update the field with the result
 
   @Override
-  public void lookupAll() {
-    doSearch(QueryParam.createByAll(null, null), false);
+  public void lookupByAll() {
+    doSearch(QueryParam.createByAll(), false);
   }
 
   @Override
@@ -928,7 +928,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   protected void lookupByTextInternal(String text, boolean synchronous) {
-    doSearch(QueryParam.createByText(getWildcard(), text), synchronous);
+    doSearch(QueryParam.createByText(text), synchronous);
   }
 
   @Override
@@ -962,14 +962,14 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   @Override
-  public List<? extends ILookupRow<VALUE>> callBrowseLookup(String browseHint, int maxRowCount) {
-    return callBrowseLookup(browseHint, maxRowCount, isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE);
+  public List<? extends ILookupRow<VALUE>> callBrowseLookup(int maxRowCount) {
+    return callBrowseLookup(maxRowCount, isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE);
   }
 
   @Override
-  public List<? extends ILookupRow<VALUE>> callBrowseLookup(String browseHint, int maxRowCount, TriState activeState) {
+  public List<? extends ILookupRow<VALUE>> callBrowseLookup(int maxRowCount, TriState activeState) {
     LookupRowCollector<VALUE> collector = new LookupRowCollector<>();
-    fetchLookupRows(newByAllLookupRowProvider(browseHint, activeState), collector, false, maxRowCount);
+    fetchLookupRows(newByAllLookupRowProvider(activeState), collector, false, maxRowCount);
     return collector.get();
   }
 
@@ -1000,13 +1000,8 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   @Override
   public IFuture<List<ILookupRow<VALUE>>> callBrowseLookupInBackground(boolean cancelRunningJobs) {
-    return callBrowseLookupInBackground(null, cancelRunningJobs);
-  }
-
-  @Override
-  public IFuture<List<ILookupRow<VALUE>>> callBrowseLookupInBackground(String browseHint, boolean cancelRunningJobs) {
     TriState activeState = isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE;
-    final ILookupRowProvider<VALUE> provider = newByAllLookupRowProvider(browseHint, activeState);
+    final ILookupRowProvider<VALUE> provider = newByAllLookupRowProvider(activeState);
     return callInBackground(provider, cancelRunningJobs);
   }
 
@@ -1047,13 +1042,13 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   @Override
-  public IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupRowFetchedCallback<VALUE> callback) {
-    return callBrowseLookupInBackground(browseHint, maxRowCount, isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE, callback);
+  public IFuture<Void> callBrowseLookupInBackground(int maxRowCount, ILookupRowFetchedCallback<VALUE> callback) {
+    return callBrowseLookupInBackground(maxRowCount, isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE, callback);
   }
 
   @Override
-  public IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupRowFetchedCallback<VALUE> callback) {
-    return fetchLookupRows(newByAllLookupRowProvider(browseHint, activeState), callback, true, maxRowCount);
+  public IFuture<Void> callBrowseLookupInBackground(int maxRowCount, TriState activeState, ILookupRowFetchedCallback<VALUE> callback) {
+    return fetchLookupRows(newByAllLookupRowProvider(activeState), callback, true, maxRowCount);
   }
 
   protected void cleanupResultList(final List<ILookupRow<VALUE>> list) {
@@ -1129,8 +1124,8 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     }
 
     @Override
-    public void execPrepareBrowseLookup(SmartFieldPrepareBrowseLookupChain<VALUE> chain, ILookupCall<VALUE> call, String browseHint) {
-      getOwner().execPrepareBrowseLookup(call, browseHint);
+    public void execPrepareBrowseLookup(SmartFieldPrepareBrowseLookupChain<VALUE> chain, ILookupCall<VALUE> call) {
+      getOwner().execPrepareBrowseLookup(call);
     }
 
     @Override
@@ -1188,10 +1183,10 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     chain.execPrepareTextLookup(call, text);
   }
 
-  protected final void interceptPrepareBrowseLookup(ILookupCall<VALUE> call, String browseHint) {
+  protected final void interceptPrepareBrowseLookup(ILookupCall<VALUE> call) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     SmartFieldPrepareBrowseLookupChain<VALUE> chain = new SmartFieldPrepareBrowseLookupChain<>(extensions);
-    chain.execPrepareBrowseLookup(call, browseHint);
+    chain.execPrepareBrowseLookup(call);
   }
 
   protected final void interceptFilterTextLookupResult(ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
@@ -1398,12 +1393,12 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
    * @see LookupCall#getDataByAll()
    * @see LookupCall#getDataByAllInBackground(ILookupRowFetchedCallback)
    */
-  protected ILookupRowProvider<VALUE> newByAllLookupRowProvider(final String browseHint, final TriState activeState) {
+  protected ILookupRowProvider<VALUE> newByAllLookupRowProvider(final TriState activeState) {
     return new ILookupRowProvider<VALUE>() {
 
       @Override
       public void beforeProvide(ILookupCall<VALUE> lookupCall) {
-        prepareBrowseLookup(lookupCall, browseHint, activeState);
+        prepareBrowseLookup(lookupCall, activeState);
       }
 
       @Override
@@ -1431,11 +1426,10 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
       @Override
       public String toString() {
-        ToStringBuilder sb = new ToStringBuilder(this)
+        return new ToStringBuilder(this)
             .attr("All Lookup")
-            .attr("browseHint", browseHint)
-            .attr("activeState", activeState);
-        return sb.toString();
+            .attr("activeState", activeState)
+            .toString();
       }
 
     };

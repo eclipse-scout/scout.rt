@@ -17,6 +17,4 @@ public interface IQueryParam<T> {
 
   String getText();
 
-  String getWildcard();
-
 }

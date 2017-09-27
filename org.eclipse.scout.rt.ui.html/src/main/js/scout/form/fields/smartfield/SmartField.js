@@ -336,7 +336,7 @@ scout.SmartField.prototype._acceptByTextDone = function(result) {
       this._inputAccepted();
     } else {
       this.setErrorStatus(scout.Status.error({
-        message: this.session.text('SmartFieldInactiveRow', result.searchText)
+        message: this.session.text('SmartFieldInactiveRow', result.text)
       }));
     }
     return;
@@ -351,6 +351,7 @@ scout.SmartField.prototype._acceptByTextDone = function(result) {
  */
 scout.SmartField.prototype._extendResult = function(result) {
   result.singleMatch = null;
+  this._setQueryTypeOnResult(result);
 
   if (this.browseHierarchy) {
     // tree (hierarchical)
@@ -374,7 +375,7 @@ scout.SmartField.prototype._extendResult = function(result) {
 };
 
 scout.SmartField.prototype._acceptInputFail = function(result) {
-  var searchText = result.searchText;
+  var searchText = result.text;
 
   // in any other case something went wrong
   if (result.numLookupRows === 0) {
@@ -573,7 +574,6 @@ scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText) {
 
   var deferred = $.Deferred();
   var doneHandler = function(result) {
-    result.browse = browse;
     this._lookupByTextOrAllDone(result);
     deferred.resolve(result);
   }.bind(this);
@@ -595,11 +595,17 @@ scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText) {
   return deferred.promise();
 };
 
+scout.SmartField.prototype._setQueryTypeOnResult = function(result) {
+  var propertyName = 'by' + scout.strings.toUpperCaseFirstLetter(result.queryBy.toLowerCase()); // e.g. 'byAll'
+  result[propertyName] = true;
+};
+
 scout.SmartField.prototype._lookupByTextOrAllDone = function(result) {
 
   var numLookupRows = result.lookupRows.length,
     emptyResult = numLookupRows === 0;
-  this._notUnique = !result.browse && numLookupRows > 1;
+  this._setQueryTypeOnResult(result);
+  this._notUnique = !result.byAll && numLookupRows > 1;
 
   // Oops! Something went wrong while the lookup has been processed.
   if (result.exception) {
@@ -621,7 +627,7 @@ scout.SmartField.prototype._lookupByTextOrAllDone = function(result) {
 
   // We don't want to set an error status on the field for the 'no data' case
   // Only show the message as status in the proposal chooser popup
-  if (emptyResult && result.browse) {
+  if (emptyResult && result.byAll) {
     this.setLookupStatus(scout.Status.warn({
       message: this.session.text('SmartFieldNoDataFound'),
       code: scout.SmartField.ErrorCode.NO_DATA
@@ -643,7 +649,7 @@ scout.SmartField.prototype._lookupByTextOrAllDone = function(result) {
   if (emptyResult) {
     this._handleEmptyResult();
     this.setLookupStatus(scout.Status.warn({
-      message: this.session.text('SmartFieldCannotComplete', result.searchText),
+      message: this.session.text('SmartFieldCannotComplete', result.text),
       code: scout.SmartField.ErrorCode.NO_RESULTS
     }));
     return;

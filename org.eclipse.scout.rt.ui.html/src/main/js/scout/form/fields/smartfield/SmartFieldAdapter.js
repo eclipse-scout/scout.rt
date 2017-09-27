@@ -29,31 +29,20 @@ scout.SmartFieldAdapter.prototype._syncDisplayText = function(displayText) {
   this.widget.setDisplayText(displayText);
 };
 
-scout.SmartFieldAdapter.prototype.lookupAll = function() {
-  this._send('lookupAll', {
-    showBusyIndicator: false
-  });
-};
-
-scout.SmartFieldAdapter.prototype.lookupByText = function(searchText) {
-  this._send('lookupByText', {
-    showBusyIndicator: false,
-    searchText: searchText
-  });
-};
-
-scout.SmartFieldAdapter.prototype.lookupByRec = function(rec) {
-  this._send('lookupByRec', {
-    showBusyIndicator: false,
-    rec: rec
-  });
-};
-
-scout.SmartFieldAdapter.prototype.lookupByKey = function(key) {
-  this._send('lookupByKey', {
-    showBusyIndicator: false,
-    key: key
-  });
+/**
+ * @param {scout.QueryBy} queryBy
+ * @param {object} [queryData] optional data (text, key, rec)
+ */
+scout.SmartFieldAdapter.prototype.sendLookup = function(queryBy, queryData) {
+  var propertyName = queryBy.toLowerCase(),
+    requestType = 'lookupBy' + scout.strings.toUpperCaseFirstLetter(propertyName),
+    requestData = {
+      showBusyIndicator: false
+    };
+  if (!scout.objects.isNullOrUndefined(queryData)) {
+    requestData[propertyName] = queryData;
+  }
+  this._send(requestType, requestData);
 };
 
 scout.SmartFieldAdapter.prototype._onWidgetAcceptInput = function(event) {

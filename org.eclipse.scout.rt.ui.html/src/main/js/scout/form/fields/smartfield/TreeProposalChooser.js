@@ -91,17 +91,13 @@ scout.TreeProposalChooser.prototype.setLookupResult = function(result) {
     this.model.deleteAllChildNodes();
     treeNodesFlat = lookupRows.map(this._createTreeNode.bind(this));
     treeNodes = this._flatListToSubTree(treeNodesFlat);
-    if (this._isLookupByText(result)) {
+    if (result.byText) {
       this._expandAllParentNodes(treeNodesFlat);
     }
     this.model.insertNodes(treeNodes);
   }
 
   this._selectProposal(result, treeNodesFlat);
-};
-
-scout.TreeProposalChooser.prototype._isLookupByText = function(result) {
-  return !result.browse && result.searchText !== result.wildcard;
 };
 
 scout.TreeProposalChooser.prototype._expandAllParentNodes = function(treeNodesFlat) {
