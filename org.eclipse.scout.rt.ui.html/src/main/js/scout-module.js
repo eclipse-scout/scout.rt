@@ -139,6 +139,7 @@
   __include("scout/text/texts.js");
   __include("scout/tooltip/Tooltip.js");
   __include("scout/tooltip/tooltips.js");
+  __include("scout/tooltip/WidgetTooltip.js");
   __include("scout/action/Action.js");
   __include("scout/action/ActionAdapter.js");
   __include("scout/action/ActionKeyStroke.js");
