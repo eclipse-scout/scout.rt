@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.QueryParam;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam.QueryBy;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.SmartFieldResult;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
@@ -23,25 +23,24 @@ public class SmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmartFieldLookupR
 
   public SmartFieldDataFetcher(ISmartField<LOOKUP_KEY> smartField) {
     super(smartField);
-
   }
 
   @Override
-  public void update(IQueryParam queryParam, boolean synchronous) {
+  public void update(IQueryParam<LOOKUP_KEY> queryParam, boolean synchronous) {
     int maxCount = getSmartField().getBrowseMaxRowCount();
     ILookupRowFetchedCallback<LOOKUP_KEY> callback = new P_LookupCallDataCallback(queryParam);
     int maxRowCount = (maxCount > 0 ? maxCount + 1 : 0);
 
     if (synchronous) {
       try {
-        if (QueryParam.isKeyQuery(queryParam)) {
-          callback.onSuccess(getSmartField().callKeyLookup(QueryParam.getKey(queryParam)));
+        if (queryParam.is(QueryBy.KEY)) {
+          callback.onSuccess(getSmartField().callKeyLookup(queryParam.getKey()));
         }
-        else if (QueryParam.isAllQuery(queryParam)) {
-          callback.onSuccess(getSmartField().callBrowseLookup(QueryParam.getText(queryParam), maxRowCount));
+        else if (queryParam.is(QueryBy.ALL)) {
+          callback.onSuccess(getSmartField().callBrowseLookup(queryParam.getText(), maxRowCount)); // XXX check if we must pass this parameter
         }
-        else if (QueryParam.isTextQuery(queryParam)) {
-          callback.onSuccess(getSmartField().callTextLookup(QueryParam.getText(queryParam), maxRowCount));
+        else if (queryParam.is(QueryBy.TEXT)) {
+          callback.onSuccess(getSmartField().callTextLookup(queryParam.getText(), maxRowCount));
         }
         else {
           throw new IllegalStateException();
@@ -52,14 +51,14 @@ public class SmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmartFieldLookupR
       }
     }
     else {
-      if (QueryParam.isKeyQuery(queryParam)) {
-        getSmartField().callKeyLookupInBackground(QueryParam.getKey(queryParam), callback);
+      if (queryParam.is(QueryBy.KEY)) {
+        getSmartField().callKeyLookupInBackground(queryParam.getKey(), callback);
       }
-      else if (QueryParam.isAllQuery(queryParam)) {
-        getSmartField().callBrowseLookupInBackground(QueryParam.getText(queryParam), maxRowCount, callback);
+      else if (queryParam.is(QueryBy.ALL)) {
+        getSmartField().callBrowseLookupInBackground(queryParam.getText(), maxRowCount, callback);
       }
-      else if (QueryParam.isTextQuery(queryParam)) {
-        getSmartField().callTextLookupInBackground(QueryParam.getText(queryParam), maxRowCount, callback);
+      else if (queryParam.is(QueryBy.TEXT)) {
+        getSmartField().callTextLookupInBackground(queryParam.getText(), maxRowCount, callback);
       }
       else {
         throw new IllegalStateException();
@@ -68,9 +67,9 @@ public class SmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmartFieldLookupR
   }
 
   private final class P_LookupCallDataCallback implements ILookupRowFetchedCallback<LOOKUP_KEY> {
-    private final IQueryParam m_param;
+    private final IQueryParam<LOOKUP_KEY> m_param;
 
-    private P_LookupCallDataCallback(IQueryParam param) {
+    private P_LookupCallDataCallback(IQueryParam<LOOKUP_KEY> param) {
       m_param = param;
       setResult(null);
     }

@@ -1,51 +1,65 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield.result;
 
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
+public class QueryParam<T> implements IQueryParam {
 
-public class QueryParam {
+  private QueryBy m_queryBy;
 
-  public static IQueryParam createQueryByText(ISmartField smartField, String text) {
-    return new ByTextQueryParam(smartField.getWildcard(), text);
+  private String m_wildcard;
+
+  private String m_text;
+
+  private T m_key;
+
+  QueryParam(QueryBy queryBy, T key, String wildcard, String text) {
+    m_queryBy = queryBy;
+    m_key = key;
+    m_wildcard = wildcard;
+    m_text = text;
   }
 
-  public static IQueryParam createQueryByAll(ISmartField smartField) {
-    return new ByTextQueryParam(smartField.getWildcard(), null);
+  @Override
+  public QueryBy getQueryBy() {
+    return m_queryBy;
   }
 
-  public static <T> IQueryParam createQueryByKey(ISmartField smartField, T key) {
-    return new ByKeyQueryParam<T>(key);
+  @Override
+  public String getWildcard() {
+    return m_wildcard;
   }
 
-  public static <T> IQueryParam createQueryByParentKey(ISmartField smartField, T parentKey) {
-    return new ByParentKeyQueryParam<T>(parentKey);
+  @Override
+  public String getText() {
+    return m_text;
   }
 
-  public static boolean isAllQuery(IQueryParam queryParam) {
-    return queryParam instanceof ByTextQueryParam && ((ByTextQueryParam) queryParam).isBrowseAll();
+  @Override
+  public T getKey() {
+    return m_key;
   }
 
-  public static boolean isTextQuery(IQueryParam queryParam) {
-    return queryParam instanceof ByTextQueryParam && !((ByTextQueryParam) queryParam).isBrowseAll();
+  @Override
+  public boolean is(QueryBy queryBy) {
+    return m_queryBy == queryBy;
   }
 
-  public static boolean isParentKeyQuery(IQueryParam queryParam) {
-    return queryParam instanceof ByParentKeyQueryParam;
+  @SuppressWarnings("unchecked")
+  public static <T> IQueryParam<T> createByText(String wildcard, String text) {
+    return new QueryParam<T>(QueryBy.TEXT, null, wildcard, text);
   }
 
-  public static boolean isKeyQuery(IQueryParam queryParam) {
-    return queryParam instanceof ByKeyQueryParam;
+  @SuppressWarnings("unchecked")
+  public static <T> IQueryParam<T> createByAll(String wildcard, String text) {
+    return new QueryParam<T>(QueryBy.ALL, null, wildcard, text);
   }
 
-  public static String getText(IQueryParam queryParam) {
-    return ((ByTextQueryParam) queryParam).getText();
+  @SuppressWarnings("unchecked")
+  public static <T> IQueryParam<T> createByKey(T key) {
+    return new QueryParam<T>(QueryBy.KEY, key, null, null);
   }
 
-  public static <T> T getParentKey(IQueryParam queryParam) {
-    return ((ByParentKeyQueryParam<T>) queryParam).getParentKey();
-  }
-
-  public static <T> T getKey(IQueryParam queryParam) {
-    return ((ByKeyQueryParam<T>) queryParam).getKey();
+  @SuppressWarnings("unchecked")
+  public static <T> IQueryParam<T> createByRec(T recKey) {
+    return new QueryParam<T>(QueryBy.REC, recKey, null, null);
   }
 
 }

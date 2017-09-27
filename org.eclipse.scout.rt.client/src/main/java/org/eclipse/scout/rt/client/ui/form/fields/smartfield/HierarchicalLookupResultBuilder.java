@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam.QueryBy;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.ISmartFieldResult;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.QueryParam;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.SmartFieldResult;
 import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -160,12 +160,12 @@ public class HierarchicalLookupResultBuilder<VALUE> {
       else {
         m_lookupRowProvider = new P_BrowseLookupRowProvider();
       }
-      VALUE parentKey = null;
-      IQueryParam queryParam = result.getQueryParam();
-      if (QueryParam.isParentKeyQuery(queryParam)) {
-        parentKey = QueryParam.getParentKey(queryParam);
+      VALUE recKey = null;
+      IQueryParam<VALUE> queryParam = result.getQueryParam();
+      if (queryParam.is(QueryBy.REC)) {
+        recKey = queryParam.getKey();
       }
-      lookupRows = getRowsWithParents(result.getLookupRows(), parentKey);
+      lookupRows = getRowsWithParents(result.getLookupRows(), recKey);
     }
     else {
       lookupRows = result.getLookupRows();

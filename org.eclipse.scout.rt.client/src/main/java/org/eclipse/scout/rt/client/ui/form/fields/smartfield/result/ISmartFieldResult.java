@@ -6,7 +6,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 public interface ISmartFieldResult<LOOKUP_KEY> {
 
-  IQueryParam getQueryParam();
+  IQueryParam<LOOKUP_KEY> getQueryParam();
 
   Throwable getException();
 

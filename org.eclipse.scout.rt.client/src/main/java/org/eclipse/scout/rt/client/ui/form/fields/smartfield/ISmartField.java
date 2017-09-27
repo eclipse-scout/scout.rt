@@ -195,7 +195,7 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
 
   // search and update the field with the result
 
-  void doSearch(IQueryParam param, boolean synchronous);
+  void doSearch(IQueryParam<VALUE> param, boolean synchronous);
 
   // blocking lookups
   /**

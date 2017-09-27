@@ -23,7 +23,7 @@ public interface ISmartFieldLookupRowFetcher<LOOKUP_KEY> {
 
   void removePropertyChangeListener(PropertyChangeListener listener);
 
-  void update(IQueryParam queryParam, boolean synchronous);
+  void update(IQueryParam<LOOKUP_KEY> queryParam, boolean synchronous);
 
   ISmartFieldResult<LOOKUP_KEY> getResult();
 

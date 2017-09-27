@@ -7,20 +7,20 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 public class SmartFieldResult<LOOKUP_KEY> implements ISmartFieldResult<LOOKUP_KEY> {
 
   private List<ILookupRow<LOOKUP_KEY>> m_lookupRows;
-  private IQueryParam m_queryParam;
+  private IQueryParam<LOOKUP_KEY> m_queryParam;
   private Throwable m_exception;
 
   public SmartFieldResult() {
   }
 
-  public SmartFieldResult(List<ILookupRow<LOOKUP_KEY>> lookupRows, IQueryParam queryParam, Throwable exception) {
+  public SmartFieldResult(List<ILookupRow<LOOKUP_KEY>> lookupRows, IQueryParam<LOOKUP_KEY> queryParam, Throwable exception) {
     m_lookupRows = lookupRows;
     m_queryParam = queryParam;
     m_exception = exception;
   }
 
   @Override
-  public IQueryParam getQueryParam() {
+  public IQueryParam<LOOKUP_KEY> getQueryParam() {
     return m_queryParam;
   }
 

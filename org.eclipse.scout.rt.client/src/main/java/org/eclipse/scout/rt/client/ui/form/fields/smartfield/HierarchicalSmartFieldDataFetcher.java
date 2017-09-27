@@ -16,7 +16,7 @@ import java.util.function.BiConsumer;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.QueryParam;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam.QueryBy;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.SmartFieldResult;
 import org.eclipse.scout.rt.platform.exception.IProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -35,7 +35,7 @@ public class HierarchicalSmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmart
   }
 
   @Override
-  public void update(IQueryParam query, boolean blocking) {
+  public void update(IQueryParam<LOOKUP_KEY> query, boolean blocking) {
     IFuture<Void> fRes =
         scheduleLookup(query)
             .whenDoneSchedule(updateResult(query), newModelJobInput());
@@ -44,7 +44,7 @@ public class HierarchicalSmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmart
     }
   }
 
-  private BiConsumer<List<ILookupRow<LOOKUP_KEY>>, Throwable> updateResult(final IQueryParam query) {
+  private BiConsumer<List<ILookupRow<LOOKUP_KEY>>, Throwable> updateResult(final IQueryParam<LOOKUP_KEY> query) {
     return (rows, error) -> {
       SmartFieldResult<LOOKUP_KEY> result = new SmartFieldResult<>(rows, query, error);
       if (error != null) {
@@ -90,14 +90,14 @@ public class HierarchicalSmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmart
         .withExceptionHandling(null, false);
   }
 
-  protected IFuture<List<ILookupRow<LOOKUP_KEY>>> scheduleLookup(IQueryParam query) {
-    if (QueryParam.isParentKeyQuery(query)) {
-      return getSmartField().callSubTreeLookupInBackground(QueryParam.getParentKey(query), false);
+  protected IFuture<List<ILookupRow<LOOKUP_KEY>>> scheduleLookup(IQueryParam<LOOKUP_KEY> query) {
+    if (query.is(QueryBy.REC)) {
+      return getSmartField().callSubTreeLookupInBackground(query.getKey(), false);
     }
-    else if (QueryParam.isTextQuery(query)) {
-      return getSmartField().callTextLookupInBackground(QueryParam.getText(query), true);
+    else if (query.is(QueryBy.TEXT)) {
+      return getSmartField().callTextLookupInBackground(query.getText(), true);
     }
-    else if (QueryParam.isAllQuery(query)) {
+    else if (query.is(QueryBy.ALL)) {
       return getSmartField().callBrowseLookupInBackground(true);
     }
     else {

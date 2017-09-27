@@ -829,7 +829,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     call.setAll(browseHint);
     call.setRec(null);
     call.setActive(activeState);
-    //when there is a master value defined in the original call, don't set it to null when no master value is available
+    // when there is a master value defined in the original call, don't set it to null when no master value is available
     if (getMasterValue() != null || getLookupCall() == null || getLookupCall().getMaster() == null) {
       call.setMaster(getMasterValue());
     }
@@ -919,7 +919,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   @Override
   public void lookupAll() {
-    doSearch(QueryParam.createQueryByAll(this), false);
+    doSearch(QueryParam.createByAll(null, null), false);
   }
 
   @Override
@@ -928,21 +928,21 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   protected void lookupByTextInternal(String text, boolean synchronous) {
-    doSearch(QueryParam.createQueryByText(this, text), synchronous);
+    doSearch(QueryParam.createByText(getWildcard(), text), synchronous);
   }
 
   @Override
   public void lookupByRec(VALUE parentKey) {
-    doSearch(QueryParam.createQueryByParentKey(this, parentKey), false);
+    doSearch(QueryParam.<VALUE> createByRec(parentKey), false);
   }
 
   @Override
   public void lookupByKey(VALUE key) {
-    doSearch(QueryParam.createQueryByKey(this, key), false);
+    doSearch(QueryParam.<VALUE> createByKey(key), false);
   }
 
   @Override
-  public void doSearch(IQueryParam param, boolean synchronous) {
+  public void doSearch(IQueryParam<VALUE> param, boolean synchronous) {
     getLookupRowFetcher().update(param, synchronous);
   }
 

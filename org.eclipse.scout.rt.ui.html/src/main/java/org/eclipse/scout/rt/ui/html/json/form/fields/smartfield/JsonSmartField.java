@@ -8,10 +8,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnDescriptor;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.ByTextQueryParam;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam.QueryBy;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.ISmartFieldResult;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.QueryParam;
 import org.eclipse.scout.rt.platform.exception.IThrowableWithContextInfo;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.status.IStatus;
@@ -317,16 +316,15 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
     }
     json.put("lookupRows", jsonLookupRows);
     IQueryParam queryParam = result.getQueryParam();
-    if (QueryParam.isKeyQuery(queryParam)) {
-      json.put("key", getIdForLookupRowKey(QueryParam.getKey(queryParam)));
+    if (queryParam.is(QueryBy.KEY)) {
+      json.put("key", getIdForLookupRowKey(queryParam.getKey()));
     }
-    else if (QueryParam.isParentKeyQuery(queryParam)) {
-      json.put("rec", getIdForLookupRowKey(QueryParam.getParentKey(queryParam)));
+    else if (queryParam.is(QueryBy.REC)) {
+      json.put("rec", getIdForLookupRowKey(queryParam.getKey()));
     }
     else {
-      ByTextQueryParam byTextQueryParam = (ByTextQueryParam) queryParam;
-      json.put("wildcard", byTextQueryParam.getWildcard());
-      json.put("searchText", byTextQueryParam.getText());
+      json.put("wildcard", queryParam.getWildcard());
+      json.put("searchText", queryParam.getText());
     }
     if (result.getException() != null) {
       json.put("exception", exceptionToJson(result.getException()));
