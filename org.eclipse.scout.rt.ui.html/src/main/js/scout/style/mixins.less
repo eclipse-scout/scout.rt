@@ -421,4 +421,20 @@
       height: @loading-animation-size;
     }
   }
+
+  .cursor-grab {
+    /* "grab" cursor with fallback for browsers that don't understand CSS3 cursors */
+    cursor: move;
+    cursor: -webkit-grab;
+    cursor: -moz-grab;
+    cursor: grab;
+  }
+
+  .cursor-grabbing {
+    /* "grabbing" cursor with fallback for browsers that don't understand CSS3 cursors */
+    cursor: move;
+    cursor: -webkit-grabbing;
+    cursor: -moz-grabbing;
+    cursor: grabbing;
+  }
 }
