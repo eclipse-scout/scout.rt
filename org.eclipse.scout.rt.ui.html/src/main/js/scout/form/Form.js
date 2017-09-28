@@ -29,14 +29,13 @@ scout.Form = function() {
   this.closable = true;
   this.cacheBounds = false;
   this.resizable = true;
-  this.rootGroupBox;
+  this.rootGroupBox = null;
   this.saveNeeded = false;
   this.saveNeededVisible = false;
-  this._locked;
-  this.formController;
-  this.messageBoxController;
-  this.fileChooserController;
-  this._glassPaneRenderer;
+  this.formController = null;
+  this.messageBoxController = null;
+  this.fileChooserController = null;
+  this._glassPaneRenderer = null;
   this.$statusIcons = [];
   /**
    * Whether this form should render its initial focus
@@ -145,10 +144,6 @@ scout.Form.prototype._renderForm = function() {
 
   this.htmlComp.setLayout(layout);
   this.rootGroupBox.render();
-
-  if (this._locked) {
-    this.disable();
-  }
 
   if (this.isDialog()) {
     this.$container.addClassForAnimation('animate-open');

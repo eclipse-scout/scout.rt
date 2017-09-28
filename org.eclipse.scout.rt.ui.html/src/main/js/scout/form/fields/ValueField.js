@@ -13,19 +13,20 @@
  */
 scout.ValueField = function() {
   scout.ValueField.parent.call(this);
+  this.clearable = scout.ValueField.Clearable.FOCUSED;
   this.displayText = null;
+  this.formatter = this._formatValue.bind(this);
+  this.hasText = false;
   this.initialValue = null;
   this.invalidValueMessageKey = 'InvalidValueMessageX';
+  this.parser = this._parseValue.bind(this);
   this.value = null;
   this.validators = [];
   this.validators.push(this._validateValue.bind(this));
-  this.parser = this._parseValue.bind(this);
-  this.formatter = this._formatValue.bind(this);
-  this._addCloneProperties(['value', 'displayText']);
-  this.clearable = scout.ValueField.Clearable.FOCUSED;
-  this.hasText = false;
 
   this.$clearIcon = null;
+
+  this._addCloneProperties(['value', 'displayText']);
 };
 scout.inherits(scout.ValueField, scout.FormField);
 

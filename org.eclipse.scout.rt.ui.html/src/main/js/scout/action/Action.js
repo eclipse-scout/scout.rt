@@ -11,30 +11,28 @@
 scout.Action = function() {
   scout.Action.parent.call(this);
 
-  this.selected = false;
-  this.horizontalAlignment = -1;
+  this.actionStyle = scout.Action.ActionStyle.DEFAULT;
+  this.compact = false;
   this.iconId = null;
   this.imageLoadingInvalidatesLayout = true;
-  this.tooltipText = null;
-  this.text = null;
-  this.cssClass = null;
-  this.toggleAction = false;
+  this.horizontalAlignment = -1;
   this.keyStroke = null;
   this.keyStrokeFirePolicy = scout.Action.KeyStrokeFirePolicy.ACCESSIBLE_ONLY;
-
+  this.selected = false;
   /**
    * This property decides whether or not the tabindex attribute is set in the DOM.
    */
   this.tabbable = false;
-
+  this.text = null;
   /**
    * Supported action styles are:
    * - default: regular menu-look, also used in overflow menus
    * - button: menu looks like a button
    */
-  this.actionStyle = scout.Action.ActionStyle.DEFAULT;
   this.textVisible = true;
-  this.compact = false;
+  this.toggleAction = false;
+  this.tooltipText = null;
+
   this._addCloneProperties(['actionStyle', 'horizontalAlignment', 'iconId', 'selected', 'tabbable', 'text', 'tooltipText', 'toggleAction']);
 };
 scout.inherits(scout.Action, scout.Widget);

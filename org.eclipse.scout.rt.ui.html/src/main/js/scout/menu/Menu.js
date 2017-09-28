@@ -10,29 +10,27 @@
  ******************************************************************************/
 scout.Menu = function() {
   scout.Menu.parent.call(this);
-  this._addWidgetProperties('childActions');
 
-  this.defaultMenu = null; // null = determined by the menu bar
-  this.separator = false;
   this.childActions = [];
-  this.menuTypes = [];
-  this.popup;
+  this.defaultMenu = null; // null = determined by the menu bar
   this.excludedByFilter = false;
-  this.preventDoubleClick = false;
-
-  /**
-   * This property is set if this is a subMenu. The property is set when this submenu is rendered.
-   */
-  this.parentMenu;
-
+  this.menuTypes = [];
   /**
    * This property is true when the menu instance was moved into a overflow-menu
    * when there's not enough space on the screen (see MenuBarLayout.js). When set
    * to true, button style menus must be displayed as regular menus.
    */
   this.overflow = false;
+  /**
+   * This property is set if this is a subMenu. The property is set when this submenu is rendered.
+   */
+  this.parentMenu = null;
+  this.popup = null;
+  this.preventDoubleClick = false;
+  this.separator = false;
 
   this._addCloneProperties(['defaultMenu', 'menuTypes', 'overflow', 'separator']);
+  this._addWidgetProperties('childActions');
 };
 scout.inherits(scout.Menu, scout.Action);
 

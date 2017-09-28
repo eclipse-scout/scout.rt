@@ -14,22 +14,34 @@
  */
 scout.FormField = function() {
   scout.FormField.parent.call(this);
+
   this.dropType = 0;
   this.dropMaximumSize = scout.dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
+  this.empty = true;
+  /**
+   * The computed enabled state. The difference to the 'enabled' property is that this member also considers the enabled-states of the parent widgets.
+   */
+  this.enabledComputed = true;
+  this.errorStatus = null;
+  this.gridData = null;
+  this.gridDataHints = new scout.GridData();
+  this.mode = scout.FormField.Mode.DEFAULT;
   this.keyStrokes = [];
   this.labelVisible = true;
   this.labelPosition = scout.FormField.LabelPosition.DEFAULT;
   this.labelWidthInPixel = 0;
   this.mandatory = false;
-  this.statusVisible = true;
-  this.statusPosition = scout.FormField.StatusPosition.DEFAULT;
   this.menus = [];
   this.menusVisible = false;
-  this.gridData;
-  this.gridDataHints = new scout.GridData();
-  this.$label;
-  this.errorStatus = null;
+  this.preventInitialFocus = false;
+  this.requiresSave = false;
+  this.statusPosition = scout.FormField.StatusPosition.DEFAULT;
+  this.statusVisible = true;
+  this.touched = false;
+  this.tooltipText = null;
+  this.tooltip = null;
 
+  this.$label = null;
   /**
    * Note the difference between $field and $fieldContainer:
    * - $field points to the input-field (typically a browser-text field)
@@ -39,28 +51,13 @@ scout.FormField = function() {
    *   points to the input-field and $fieldContainer to the parent DIV of the input-field.
    *   This property should be used primarily for layout-functionality.
    */
-  this.$field;
-  this.$fieldContainer;
+  this.$field = null;
+  this.$fieldContainer = null;
   this.$icon = null;
-
   /**
-   * The computed enabled state. The difference to the 'enabled' property is that this member also considers the enabled-states of the parent widgets.
+   * The status is used for error-status, tooltip-icon and menus.
    */
-  this.enabledComputed = true;
-
-  /**
-   * The status label is used for error-status, tooltip-icon and menus.
-   */
-  this.$status;
-  this._addWidgetProperties(['keyStrokes', 'menus']);
-  this._addCloneProperties(['errorStatus']);
-  this.mode = scout.FormField.Mode.DEFAULT;
-  this.touched = false;
-  this.tooltipText = null;
-  this.tooltip = null;
-  this.requiresSave = false;
-  this.empty = true;
-  this.preventInitialFocus = false;
+  this.$status = null;
 
   /**
    * Some browsers don't support copying text from disabled input fields. If such a browser is detected
@@ -68,7 +65,10 @@ scout.FormField = function() {
    * provides a custom copy context menu that opens the ClipboardForm.
    */
   this.disabledCopyOverlay = false;
-  this.$disabledCopyOverlay;
+  this.$disabledCopyOverlay = null;
+
+  this._addWidgetProperties(['keyStrokes', 'menus']);
+  this._addCloneProperties(['errorStatus']);
 };
 scout.inherits(scout.FormField, scout.Widget);
 
@@ -959,21 +959,22 @@ scout.FormField.prototype._updateElementInnerAlignment = function(opts, $field) 
   opts = opts || {};
   var useHorizontalAlignment = scout.nvl(opts.useHorizontalAlignment, true);
   var useVerticalAlignment = scout.nvl(opts.useVerticalAlignment, true);
-  var $fieldContainer = opts.$fieldContainer || this.$fieldContainer;
 
-  if ($field) {
-    $field.removeClass('has-inner-alignment halign-left halign-center halign-right valign-top valign-middle valign-bottom');
-    if (useHorizontalAlignment || useVerticalAlignment) {
-      // Set horizontal and vertical alignment (from gridData)
-      $field.addClass('has-inner-alignment');
-      if (useHorizontalAlignment) {
-        var hAlign = this.gridData.horizontalAlignment;
-        $field.addClass(hAlign < 0 ? 'halign-left' : (hAlign > 0 ? 'halign-right' : 'halign-center'));
-      }
-      if (useVerticalAlignment) {
-        var vAlign = this.gridData.verticalAlignment;
-        $field.addClass(vAlign < 0 ? 'valign-top' : (vAlign > 0 ? 'valign-bottom' : 'valign-middle'));
-      }
+  if (!$field) {
+    return;
+  }
+
+  $field.removeClass('has-inner-alignment halign-left halign-center halign-right valign-top valign-middle valign-bottom');
+  if (useHorizontalAlignment || useVerticalAlignment) {
+    // Set horizontal and vertical alignment (from gridData)
+    $field.addClass('has-inner-alignment');
+    if (useHorizontalAlignment) {
+      var hAlign = this.gridData.horizontalAlignment;
+      $field.addClass(hAlign < 0 ? 'halign-left' : (hAlign > 0 ? 'halign-right' : 'halign-center'));
+    }
+    if (useVerticalAlignment) {
+      var vAlign = this.gridData.verticalAlignment;
+      $field.addClass(vAlign < 0 ? 'valign-top' : (vAlign > 0 ? 'valign-bottom' : 'valign-middle'));
     }
   }
 };

@@ -9,12 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.Widget = function() {
-  this.session;
+  this.session = null;
 
   /**
    * The owner is responsible that its children are destroyed when the owner is being destroyed.
    */
-  this.owner;
+  this.owner = null;
   /**
    * The parent is typically the same as the owner.
    * But the widget may be used by another widget (like a popup), in that case the parent will be changed to the popup but the owner stays the same.
@@ -22,7 +22,7 @@ scout.Widget = function() {
    * Example: ViewMenuPopup uses the ViewButtons as menu items. These view buttons are owned by the desktop and must therefore not be destroyed
    * when the popup closes, otherwise they could not be reused the second time the popup opens.
    */
-  this.parent;
+  this.parent = null;
   this.children = [];
   this.initialized = false;
 
