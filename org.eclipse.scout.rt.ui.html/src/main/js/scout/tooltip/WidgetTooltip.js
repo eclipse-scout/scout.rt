@@ -11,7 +11,7 @@
 scout.WidgetTooltip = function() {
   scout.WidgetTooltip.parent.call(this);
 
-  this.$widgetContainer = null,
+  this.$widgetContainer = null;
   this.widget = null;
   this._addWidgetProperties(['widget']);
 
