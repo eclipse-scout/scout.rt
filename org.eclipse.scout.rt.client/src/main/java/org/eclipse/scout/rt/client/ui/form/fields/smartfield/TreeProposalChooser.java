@@ -164,7 +164,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
 
   private List<ITreeNode> getSubtree(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result) {
     List<? extends ILookupRow<LOOKUP_KEY>> rows = getRows(result);
-    boolean markChildrenLoaded = !m_contentAssistField.isBrowseLoadIncremental() || !result.getSearchParam().isByParentSearch();
+    boolean markChildrenLoaded = !m_contentAssistField.isBrowseLoadIncremental() || !result.getSearchParam().isByParentKeySearch();
     return new P_TreeNodeBuilder()
         .createTreeNodes(rows, ITreeNode.STATUS_NON_CHANGED, markChildrenLoaded);
   }
@@ -285,7 +285,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     if (m_contentAssistField.isBrowseLoadIncremental()) {
       ILookupRow<LOOKUP_KEY> b = (LookupRow) (parentNode != null ? parentNode.getCell().getValue() : null);
       LOOKUP_KEY parentKey = b != null ? b.getKey() : null;
-      getContentAssistField().doSearch(ContentAssistSearchParam.createParentParam(parentKey, false), false);
+      getContentAssistField().doSearch(ContentAssistSearchParam.createParentKeyParam(parentKey, false), false);
       if (parentNode != null) {
         parentNode.setChildrenLoaded(true);
       }

@@ -35,3 +35,8 @@ scout.RemoteLookupRequest.byText = function(searchText) {
 scout.RemoteLookupRequest.byRec = function(rec) {
   return new scout.RemoteLookupRequest('byRec', rec);
 };
+
+scout.RemoteLookupRequest.byKey = function(key) {
+  return new scout.RemoteLookupRequest('byKey', key);
+};
+

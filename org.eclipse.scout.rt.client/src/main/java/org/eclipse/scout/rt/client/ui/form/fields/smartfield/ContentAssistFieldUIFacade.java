@@ -54,7 +54,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
     String searchText = toSearchText(displayText);
     if (!StringUtility.equalsIgnoreNewLines(m_field.getLookupRowFetcher().getLastSearchText(), searchText)) {
       if (m_field.isBrowseLoadIncremental() && m_field.getWildcard().equals(searchText)) {
-        IContentAssistSearchParam<LOOKUP_KEY> searchParam = ContentAssistSearchParam.createParentParam(null, false);
+        IContentAssistSearchParam<LOOKUP_KEY> searchParam = ContentAssistSearchParam.createParentKeyParam(null, false);
         m_field.doSearch(searchParam, false);
       }
       else {
@@ -78,7 +78,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
     IContentAssistFieldDataFetchResult<LOOKUP_KEY> newResult = m_field.getLookupRowFetcher().newResult(toSearchText(searchText), false);
     proposalChooser.dataFetchedDelegate(newResult, m_field.getConfiguredBrowseMaxRowCount());
     if (m_field.isBrowseLoadIncremental()) {
-      IContentAssistSearchParam<LOOKUP_KEY> searchParam = ContentAssistSearchParam.createParentParam(null, selectCurrentValue);
+      IContentAssistSearchParam<LOOKUP_KEY> searchParam = ContentAssistSearchParam.createParentKeyParam(null, selectCurrentValue);
       m_field.doSearch(searchParam, false);
     }
     else {

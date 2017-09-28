@@ -35,12 +35,20 @@ public class SmartField2Result<V> {
     return m_result.getSearchParam().getSearchText();
   }
 
-  public boolean isByRec() {
-    return m_result.getSearchParam().isByParentSearch();
+  public V getParentKey() {
+    return m_result.getSearchParam().getParentKey();
   }
 
-  public V getRec() {
-    return m_result.getSearchParam().getParentKey();
+  public boolean isByParentKeySearch() {
+    return m_result.getSearchParam().isByParentKeySearch();
+  }
+
+  public V getKey() {
+    return m_result.getSearchParam().getKey();
+  }
+
+  public boolean isByKeySearch() {
+    return m_result.getSearchParam().isByKeySearch();
   }
 
 }

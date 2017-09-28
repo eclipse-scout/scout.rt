@@ -14,9 +14,13 @@ public interface IContentAssistSearchParam<LOOKUP_KEY> {
 
   LOOKUP_KEY getParentKey();
 
-  boolean isSelectCurrentValue();
+  boolean isByParentKeySearch();
 
-  boolean isByParentSearch();
+  LOOKUP_KEY getKey();
+
+  boolean isByKeySearch();
+
+  boolean isSelectCurrentValue();
 
   String getWildcard();
 

@@ -150,6 +150,9 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
     else if ("lookupAll".equals(event.getType())) {
       handleUiLookupAll();
     }
+    else if ("lookupByKey".equals(event.getType())) {
+      handleUiLookupByKey(event);
+    }
     else if ("lookupByRec".equals(event.getType())) {
       handleUiLookupByRec(event);
     }
@@ -241,6 +244,12 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
     getModel().lookupByText(searchText);
   }
 
+  protected void handleUiLookupByKey(JsonEvent event) {
+    String mappedKey = event.getData().optString("key");
+    VALUE key = getLookupRowKeyForId(mappedKey);
+    getModel().lookupByKey(key);
+  }
+
   protected void handleUiLookupByRec(JsonEvent event) {
     String mappedParentKey = event.getData().optString("rec");
     VALUE rec = getLookupRowKeyForId(mappedParentKey);
@@ -297,8 +306,11 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
       jsonLookupRows.put(lookupRowToJson(lookupRow, hasMultipleColumns()));
     }
     json.put("lookupRows", jsonLookupRows);
-    if (result.isByRec()) {
-      json.put("rec", getIdForLookupRowKey(result.getRec()));
+    if (result.isByParentKeySearch()) {
+      json.put("rec", getIdForLookupRowKey(result.getParentKey()));
+    }
+    else if (result.isByKeySearch()) {
+      json.put("key", getIdForLookupRowKey(result.getKey()));
     }
     else {
       json.put("searchText", result.getSearchText());

@@ -93,7 +93,7 @@ public class HierarchicalContentAssistDataFetcher<LOOKUP_KEY> extends AbstractCo
   }
 
   protected IFuture<List<ILookupRow<LOOKUP_KEY>>> scheduleLookup(IContentAssistSearchParam<LOOKUP_KEY> query) {
-    if (query.isByParentSearch()) {
+    if (query.isByParentKeySearch()) {
       return getContentAssistField().callSubTreeLookupInBackground(query.getParentKey(), false);
     }
     else if (isTextLookup(query.getSearchQuery()) && !query.isSelectCurrentValue()) {
