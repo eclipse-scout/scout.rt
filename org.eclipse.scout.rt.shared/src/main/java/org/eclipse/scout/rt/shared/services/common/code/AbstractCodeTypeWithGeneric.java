@@ -236,6 +236,9 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
     if (newCode.getFont() == null) {
       newCode.withFont(oldCode.getFont());
     }
+    if (newCode.getCssClass() == null) {
+      newCode.withCssClass(oldCode.getCssClass());
+    }
     if (newCode.getForegroundColor() == null) {
       newCode.withForegroundColor(oldCode.getForegroundColor());
     }

@@ -90,12 +90,12 @@ public interface ILookupRow<KEY_TYPE> extends Serializable {
   ILookupRow<KEY_TYPE> withFont(FontSpec font);
 
   /**
-   * @return css class
+   * @return CSS class
    */
   String getCssClass();
 
   /**
-   * @return {@link ILookupRow} with given css class
+   * @return {@link ILookupRow} with given CSS class
    */
   ILookupRow<KEY_TYPE> withCssClass(String cssClass);
 

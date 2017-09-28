@@ -30,7 +30,6 @@ public class CodeTypeTest {
 
   @Test
   public void testOverwriteCode_overwriteValues() throws Exception {
-
     TestCodeType ct = new TestCodeType();
     ICode c = ct.getCode(TestCodeType.Test1Code.ID);
     assertEquals(TestCodeType.DYNAMIC_TEXT, c.getText());
@@ -39,6 +38,7 @@ public class CodeTypeTest {
     assertEquals(TestCodeType.CONFIGURED_BACKGROUND_COLOR, c.getBackgroundColor());
     assertEquals(TestCodeType.CONFIGURED_FOREGROUND_COLOR, c.getForegroundColor());
     assertEquals(TestCodeType.CONFIGURED_FONT, c.getFont().toPattern());
+    assertEquals(TestCodeType.CONFIGURED_CSS_CLASS, c.getCssClass());
     assertEquals(TestCodeType.DYNAMIC_ENABLED, c.isEnabled());
     // parent key
     assertEquals(TestCodeType.DYNAMIC_ACTIVE, c.isActive());
@@ -57,6 +57,7 @@ public class CodeTypeTest {
     assertEquals(TestCodeType.DYNAMIC_BACKGROUND_COLOR, c.getBackgroundColor());
     assertEquals(TestCodeType.DYNAMIC_FOREGROUND_COLOR, c.getForegroundColor());
     assertEquals(TestCodeType.DYNAMIC_FONT, c.getFont().toPattern());
+    assertEquals(TestCodeType.DYNAMIC_CSS_CLASS, c.getCssClass());
     assertEquals(TestCodeType.DYNAMIC_ENABLED, c.isEnabled());
     // parent key
     assertEquals(TestCodeType.DYNAMIC_ACTIVE, c.isActive());
@@ -75,6 +76,7 @@ public class CodeTypeTest {
     public static final String CONFIGURED_BACKGROUND_COLOR = "configuredBackgroundColor";
     public static final String CONFIGURED_FOREGROUND_COLOR = "configuredForegroundColor";
     public static final String CONFIGURED_FONT = "null-ITALIC-0";
+    public static final String CONFIGURED_CSS_CLASS = "configuredCssClass";
     public static final boolean CONFIGURED_ENABLED = false;
     public static final boolean CONFIGURED_ACTIVE = false;
     public static final String CONFIGURED_EXT_KEY = "configuredExtKey";
@@ -86,6 +88,7 @@ public class CodeTypeTest {
     public static final String DYNAMIC_BACKGROUND_COLOR = "dynamicBackgroundColor";
     public static final String DYNAMIC_FOREGROUND_COLOR = "dynamicForegroundColor";
     public static final String DYNAMIC_FONT = "null-BOLD-0";
+    public static final String DYNAMIC_CSS_CLASS = "dynamicCssClass";
     public static final boolean DYNAMIC_ENABLED = true;
     public static final String DYNAMIC_PARENT_KEY = "dynamicParentKey";
     public static final boolean DYNAMIC_ACTIVE = true;
@@ -109,6 +112,7 @@ public class CodeTypeTest {
           null, // background color
           null, // foreground color
           null, // font
+          null, // css class
           DYNAMIC_ENABLED,
           DYNAMIC_PARENT_KEY,
           DYNAMIC_ACTIVE,
@@ -124,6 +128,7 @@ public class CodeTypeTest {
               DYNAMIC_BACKGROUND_COLOR,
               DYNAMIC_FOREGROUND_COLOR,
               FontSpec.parse(DYNAMIC_FONT),
+              DYNAMIC_CSS_CLASS,
               DYNAMIC_ENABLED,
               DYNAMIC_PARENT_KEY,
               DYNAMIC_ACTIVE,
@@ -191,6 +196,11 @@ public class CodeTypeTest {
       }
 
       @Override
+      protected String getConfiguredCssClass() {
+        return CONFIGURED_CSS_CLASS;
+      }
+
+      @Override
       protected boolean getConfiguredEnabled() {
         return CONFIGURED_ENABLED;
       }
@@ -209,6 +219,7 @@ public class CodeTypeTest {
       protected Double getConfiguredValue() {
         return CONFIGURED_VALUE;
       }
+
     }
 
     @Order(20)

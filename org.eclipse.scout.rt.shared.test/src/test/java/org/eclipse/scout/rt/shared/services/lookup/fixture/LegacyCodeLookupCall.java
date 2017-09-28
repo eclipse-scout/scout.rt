@@ -100,6 +100,7 @@ public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_
           .withBackgroundColor(code.getBackgroundColor())
           .withForegroundColor(code.getForegroundColor())
           .withFont(code.getFont())
+          .withCssClass(code.getCssClass())
           .withEnabled(code.isEnabled())
           .withParentKey(parentId)
           .withActive(code.isActive()));

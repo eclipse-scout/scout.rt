@@ -179,6 +179,7 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
         t.getBackgroundColor(),
         t.getForegroundColor(),
         t.getFont(),
+        t.getCssClass(),
         t.isEnabled(),
         t.getParentKey(),
         t.isActive(),
@@ -194,19 +195,21 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
   }
 
   @SuppressWarnings("squid:S00107")
-  public CodeRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font, boolean enabled, ID_TYPE parentKey, boolean active, String extKey, Number value, long partitionId) {
-    this(key, text, iconId, tooltip, backgroundColor, foregroundColor, font, enabled, parentKey, active, extKey, value, partitionId, IOrdered.DEFAULT_ORDER);
+  public CodeRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font, String cssClass, boolean enabled, ID_TYPE parentKey, boolean active, String extKey, Number value,
+      long partitionId) {
+    this(key, text, iconId, tooltip, backgroundColor, foregroundColor, font, cssClass, enabled, parentKey, active, extKey, value, partitionId, IOrdered.DEFAULT_ORDER);
   }
 
   @SuppressWarnings("squid:S00107")
-  public CodeRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font, boolean enabled, ID_TYPE parentKey, boolean active, String extKey, Number value, long partitionId,
-      double order) {
+  public CodeRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font, String cssClass, boolean enabled, ID_TYPE parentKey, boolean active, String extKey, Number value,
+      long partitionId, double order) {
     super(key, text);
     withIconId(iconId);
     withTooltipText(tooltip);
     withBackgroundColor(backgroundColor);
     withForegroundColor(foregroundColor);
     withFont(font);
+    withCssClass(cssClass);
     withActive(active);
     withEnabled(enabled);
     withParentKey(parentKey);
