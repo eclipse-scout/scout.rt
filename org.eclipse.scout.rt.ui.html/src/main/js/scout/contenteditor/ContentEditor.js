@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.ContentEditor = function() {
   scout.ContentEditor.parent.call(this);
+  this._contentElements = [];
 };
 scout.inherits(scout.ContentEditor, scout.Widget);
 
@@ -23,6 +24,21 @@ scout.ContentEditor.prototype._init = function(model) {
     sandboxEnabled: false,
     scrollBarEnabled: model.scrollBarEnabled
   });
+};
+
+scout.ContentEditor.prototype.addElement = function(element) {
+  this._contentElements.push(element);
+};
+
+scout.ContentEditor.prototype.removeElement = function(element) {
+  scout.arrays.remove(this._contentElements, element);
+};
+
+scout.ContentEditor.prototype.updateElement = function(elementContent, slot, elementId) {
+  var element = scout.arrays.find(this._contentElements, function(element) {
+    return element.elementId === elementId;
+  });
+  element.updateContent(elementContent);
 };
 
 scout.ContentEditor.prototype._render = function() {
@@ -42,7 +58,7 @@ scout.ContentEditor.prototype.setContent = function(content) {
   this._renderContent();
 };
 
-// TODO: remove all tags and attributes that were added by the editor
+// TODO: get content of content editor and all elements
 scout.ContentEditor.prototype.getContent = function() {
   return this.iframe.$iframe.get(0).contentWindow.document.outerHtml;
 };
@@ -87,43 +103,14 @@ scout.ContentEditor.prototype._onSlotDragLeave = function(event) {
 
 scout.ContentEditor.prototype._onSlotDrop = function(event) {
   var e = event.originalEvent;
-  var $element = $(e.dataTransfer.getData('text'));
-  $element.addClass('ce-element');
+  var $elementContent = $(e.dataTransfer.getData('text'));
+  var contentElement = scout.create('ContentElement', {
+    contentEditor: this,
+    $container: $elementContent
+  });
 
   var $slot = $(e.target).closest('[data-contenteditor-slot]');
-  $slot.find('.ce-slot-placeholder').before($element);
-  $slot.removeClass('ce-accept-drop');
-
-  $element
-    .on('mouseenter', this._onElementMouseEnter.bind(this))
-    .on('mouseleave', this._onElementMouseLeave.bind(this));
-
+  contentElement.dropInto($slot);
   return false;
 };
 
-scout.ContentEditor.prototype._onElementMouseEnter = function(event) {
-  var $element = $(event.target).closest('.ce-element');
-
-  $element.addClass('ce-element-hover');
-  var $removeButton = $element.appendDiv('ce-element-remove-button').text('Remove');
-  $removeButton.on('click', function(event) {
-    $element.closest('.ce-element').remove();
-  });
-  var $moveUpButton = $element.appendDiv('ce-element-moveup-button').text('Move Up');
-  $moveUpButton.on('click', function(event) {
-    $element.prev('.ce-element').insertAfter($element);
-  });
-  var $moveDownButton = $element.appendDiv('ce-element-movedown-button').text('Move Down');
-  $moveDownButton.on('click', function(event) {
-    $element.next('.ce-element').insertBefore($element);
-  });
-};
-
-scout.ContentEditor.prototype._onElementMouseLeave = function(event) {
-  var $element = $(event.target).closest('.ce-element');
-
-  $element.removeClass('ce-element-hover');
-  $element.find('.ce-element-remove-button').remove();
-  $element.find('.ce-element-moveup-button').remove();
-  $element.find('.ce-element-movedown-button').remove();
-};

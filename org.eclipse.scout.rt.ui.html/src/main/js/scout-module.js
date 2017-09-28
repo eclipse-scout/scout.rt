@@ -122,6 +122,7 @@
   __include("scout/carousel/CarouselLayout.js");
   __include("scout/cell/Cell.js");
   __include("scout/collapsehandle/CollapseHandle.js");
+  __include("scout/contenteditor/ContentElement.js");
   __include("scout/contenteditor/ContentEditor.js");
   __include("scout/focus/FocusManager.js");
   __include("scout/focus/FocusContext.js");

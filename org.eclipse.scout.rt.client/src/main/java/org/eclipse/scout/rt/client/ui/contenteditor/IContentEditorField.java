@@ -16,8 +16,18 @@ public interface IContentEditorField extends IFormField {
 
   String PROP_CONTENT = "content";
 
-  void setContent(String s);
+  void addContentEditorFieldListener(ContentEditorFieldListener listener);
+
+  void removeContentEditorFieldListener(ContentEditorFieldListener listener);
+
+  void setContent(String content);
 
   String getContent();
+
+  void execEditElement(ContentElement contentElement);
+
+  void updateElement(ContentElement contentElement);
+
+  IContentEditorFieldUIFacade getUIFacade();
 
 }

@@ -14,6 +14,32 @@ scout.ContentEditorFieldAdapter = function() {
 scout.inherits(scout.ContentEditorFieldAdapter, scout.FormFieldAdapter);
 
 
+scout.ContentEditorFieldAdapter.prototype.onModelAction = function(event) {
+  if (event.type === 'updateElement') {
+    this._onModelUpdateElement(event);
+  } else {
+    scout.ContentEditorFieldAdapter.parent.prototype.onModelAction.call(this, event);
+  }
+};
+
+scout.ContentEditorFieldAdapter.prototype._onModelUpdateElement = function(event) {
+  this.widget.updateElement(event.elementContent, event.slot, event.elementId);
+};
+
 scout.ContentEditorFieldAdapter.prototype._sendContent = function(content) {
 
+};
+
+scout.ContentEditorFieldAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'editElement') {
+    this._onEditElement(event);
+  }
+};
+
+scout.ContentEditorFieldAdapter.prototype._onEditElement = function(event) {
+  this._send('editElement', {
+    elementContent: event.elementContent,
+    slot: event.slot,
+    elementId: event.elementId
+  });
 };

@@ -31,28 +31,46 @@
 }
 
 .ce-element {
-
+  position: relative;
+  border: 2px solid transparent !important;
 }
 
 .ce-element-hover {
-  border-radius: 2px !important;
-  border: 1px dashed @palette-blue-6 !important;
-  background-color: @palette-blue-0 !important;
+  border: 2px solid @palette-blue-6 !important;
 }
 
-/* TODO remove buttons --> will be moved to another widget*/
-.ce-element-remove-button, .ce-element-moveup-button, .ce-element-movedown-button {
+.ce-element-button-group {
+  position: absolute;
+  top: 0;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.ce-element-button {
+  #scout.font-icon();
   text-align: center;
-  color: @palette-blue-6;
-  background-color: @palette-white;
-  border: 1px solid @palette-blue-6;
-  border-radius: 3px;
-  padding: 10px;
-  margin-right: 10px;
+  color: @palette-white;
+  background-color: @palette-blue-5;
+  padding: 8px;
+  width: 28px;
   display: inline-block;
   user-select: none;
   cursor: pointer;
-  font-family: Arial, sans-serif;
-  font-weight: normal;
-  font-size: 13px;
+  font-size: 16px;
+}
+
+.ce-remove-button::before {
+  content: @icon-remove;
+}
+
+.ce-move-up-button::before {
+  content: @icon-caret-up;
+}
+
+.ce-move-down-button::before {
+  content: @icon-caret-down;
+}
+
+.ce-edit-button::before {
+  content: @icon-pencil;
 }

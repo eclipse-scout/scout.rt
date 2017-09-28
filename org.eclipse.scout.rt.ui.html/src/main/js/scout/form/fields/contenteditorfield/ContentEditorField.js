@@ -24,6 +24,7 @@ scout.ContentEditorField.prototype._init = function(model) {
   });
 
   this.contentEditor.on('propertyChange', this._onPropertyChange.bind(this));
+  this.contentEditor.on('editElement', this._onEditElement.bind(this));
 };
 
 scout.ContentEditorField.prototype._render = function() {
@@ -54,3 +55,10 @@ scout.ContentEditorField.prototype._onPropertyChange = function(event) {
   }
 };
 
+scout.ContentEditorField.prototype._onEditElement = function(event) {
+  this.trigger('editElement', event);
+};
+
+scout.ContentEditorField.prototype.updateElement = function(elementContent, slot, elementId) {
+  this.contentEditor.updateElement(elementContent, slot, elementId);
+};
