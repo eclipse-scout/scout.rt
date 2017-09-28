@@ -1,14 +1,13 @@
-/*!
- * jQuery UI Core 1.11.2
- * http://jqueryui.com
+/*******************************************************************************
+ * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
  *
- * Copyright 2014 jQuery Foundation and other contributors
- * Released under the MIT license.
- * http://jquery.org/license
- *
- * http://api.jqueryui.com/category/ui-core/
- */
-
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 /**
  * This file extends jQuery with custom selectors required in Scout.
  * Part of this file is copied with some modifications from jQuery UI.
