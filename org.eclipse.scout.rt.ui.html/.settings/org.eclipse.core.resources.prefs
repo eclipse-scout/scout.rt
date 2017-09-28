@@ -10,6 +10,7 @@ encoding//src/main/resources=UTF-8
 encoding//src/main/shared=UTF-8
 encoding//src/main/webapp=UTF-8
 encoding//src/test/java=UTF-8
+encoding//src/test/js=UTF-8
 encoding//src/test/resources=UTF-8
 encoding//target/generated-sources/annotations=UTF-8
 encoding//target/generated-sources/wsimport=UTF-8
