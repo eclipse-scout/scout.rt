@@ -217,6 +217,7 @@ public class CodeLookupCallTest {
     public static final String BACKGROUND_COLOR = "configuredBackgroundColor";
     public static final String FOREGROUND_COLOR = "configuredForegroundColor";
     public static final String FONT = "null-ITALIC-0";
+    public static final String CSS_CLASS = "configuredCssClass";
     public static final boolean ENABLED = false;
     public static final boolean ACTIVE = false;
     public static final String EXT_KEY = "configuredExtKey";
@@ -248,6 +249,7 @@ public class CodeLookupCallTest {
         CodeLookupCallTestCodeType.BACKGROUND_COLOR,
         CodeLookupCallTestCodeType.FOREGROUND_COLOR,
         FontSpec.parse(CodeLookupCallTestCodeType.FONT),
+        CodeLookupCallTestCodeType.CSS_CLASS,
         CodeLookupCallTestCodeType.ENABLED,
         parentKey,
         CodeLookupCallTestCodeType.ACTIVE,

@@ -154,6 +154,7 @@ public abstract class AbstractTableRowBuilder<T> {
       row.setBackgroundColor(code.getBackgroundColor());
       row.setForegroundColor(code.getForegroundColor());
       row.setFont(code.getFont());
+      row.setCssClass(code.getCssClass());
       result.add(row);
     }
     return result;

@@ -85,6 +85,8 @@ public interface ICode<T> extends ITypeWithClassId, IOrdered {
 
   FontSpec getFont();
 
+  String getCssClass();
+
   /**
    * Used for primary key mappings to external systems
    */
@@ -109,4 +111,5 @@ public interface ICode<T> extends ITypeWithClassId, IOrdered {
    * @return a value copy of the code state in form a {@link CodeRow}
    */
   ICodeRow<T> toCodeRow();
+
 }

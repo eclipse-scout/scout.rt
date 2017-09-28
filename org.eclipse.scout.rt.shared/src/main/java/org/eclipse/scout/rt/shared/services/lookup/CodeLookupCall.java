@@ -154,6 +154,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
         .withBackgroundColor(c.getBackgroundColor())
         .withForegroundColor(c.getForegroundColor())
         .withFont(c.getFont())
+        .withCssClass(c.getCssClass())
         .withEnabled(c.isEnabled())
         .withParentKey(c.getParentCode() != null ? c.getParentCode().getId() : null)
         .withActive(c.isActive());

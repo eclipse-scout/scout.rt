@@ -141,6 +141,12 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
     return null;
   }
 
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(40)
+  protected String getConfiguredCssClass() {
+    return null;
+  }
+
   @ConfigProperty(ConfigProperty.DOUBLE)
   @Order(80)
   protected Double getConfiguredValue() {
@@ -214,6 +220,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
           (getConfiguredBackgroundColor()),
           (getConfiguredForegroundColor()),
           FontSpec.parse(getConfiguredFont()),
+          getConfiguredCssClass(),
           getConfiguredEnabled(),
           null,
           getConfiguredActive(),
@@ -342,6 +349,11 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
   @Override
   public FontSpec getFont() {
     return m_row.getFont();
+  }
+
+  @Override
+  public String getCssClass() {
+    return m_row.getCssClass();
   }
 
   @Override
