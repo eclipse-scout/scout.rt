@@ -263,4 +263,61 @@ describe('FormField', function() {
 
   });
 
+  describe('property visible', function() {
+    var formField, model;
+
+    beforeEach(function() {
+      model = helper.createFieldModel();
+      formField = createFormField(model);
+    });
+
+    it('shows the field if visible = true', function() {
+      formField.visible = true;
+      formField.render();
+
+      expect(formField.$container.isVisible()).toBe(true);
+    });
+
+    it('does not show the field if visible = false', function() {
+      formField.visible = false;
+      formField.render();
+
+      expect(formField.$container.isVisible()).toBe(false);
+    });
+
+    it('hides the status message if field is made invisible', function() {
+      formField.errorStatus = new scout.Status({
+        message: 'error',
+        severity: scout.Status.Severity.ERROR
+      });
+      formField.render();
+
+      expect(formField.$container.isVisible()).toBe(true);
+      expect(formField.tooltip.rendered).toBe(true);
+      expect($('.tooltip').length).toBe(1);
+
+      formField.setVisible(false);
+      expect(formField.tooltip).toBe(null);
+      expect($('.tooltip').length).toBe(0);
+    });
+
+    it('shows the status message if field is made visible', function() {
+      formField.errorStatus = new scout.Status({
+        message: 'error',
+        severity: scout.Status.Severity.ERROR
+      });
+      formField.visible = false;
+      formField.render();
+
+      expect(formField.$container.isVisible()).toBe(false);
+      expect(formField.tooltip).toBe(null);
+      expect($('.tooltip').length).toBe(0);
+
+      formField.setVisible(true);
+      expect(formField.tooltip.rendered).toBe(true);
+      expect($('.tooltip').length).toBe(1);
+    });
+
+  });
+
 });
