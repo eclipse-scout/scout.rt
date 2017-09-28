@@ -56,6 +56,7 @@ scout.FormField = function() {
   this.mode = scout.FormField.Mode.DEFAULT;
   this.touched = false;
   this.tooltipText = null;
+  this.tooltip = null;
   this.requiresSave = false;
   this.empty = true;
   this.preventInitialFocus = false;
@@ -236,7 +237,7 @@ scout.FormField.prototype._renderErrorStatus = function() {
 
   this._updateErrorStatusClasses(statusClass, hasStatus);
   this._updateStatusVisible();
-  if (hasStatus) {
+  if (hasStatus && this.visible) {
     this._showStatusMessage();
   } else {
     this._hideStatusMessage();
@@ -277,6 +278,8 @@ scout.FormField.prototype._renderVisible = function() {
     if (htmlCompParent) { // may be null if $container is detached
       htmlCompParent.invalidateLayoutTree();
     }
+    // Make sure error status is hidden / shown when visibility changes
+    this._renderErrorStatus();
   }
 };
 
@@ -659,7 +662,7 @@ scout.FormField.prototype._showStatusMessage = function() {
   if (status) {
     text = status.message;
     severity = status.severity;
-    autoRemove = !(status && status.isError());
+    autoRemove = !status.isError();
     if (this.tooltip && this.tooltip.autoRemove !== autoRemove) {
       // AutoRemove may not be changed dynamically -> Remove and reopen tooltip
       this.tooltip.destroy();
