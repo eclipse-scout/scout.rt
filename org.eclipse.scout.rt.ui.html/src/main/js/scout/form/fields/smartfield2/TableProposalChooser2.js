@@ -158,7 +158,7 @@ scout.TableProposalChooser2.prototype._createTableRow = function(lookupRow, mult
     row.active = false;
   }
   if (lookupRow.cssClass) {
-    cell.cssClass = lookupRow.cssClass;
+    row.cssClass = lookupRow.cssClass;
   }
 
   if (multipleColumns && lookupRow.additionalTableRowData) {
