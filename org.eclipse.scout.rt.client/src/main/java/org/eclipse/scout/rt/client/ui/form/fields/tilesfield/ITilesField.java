@@ -1,6 +1,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.tilesfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.client.ui.tile.ITiles;
 
 public interface ITilesField<T extends ITiles> extends IFormField {
@@ -13,4 +14,6 @@ public interface ITilesField<T extends ITiles> extends IFormField {
   void setTiles(T tiles);
 
   T getTiles();
+
+  <K extends ITile> K getTileByClass(Class<K> tileClass);
 }

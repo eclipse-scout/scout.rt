@@ -3,11 +3,12 @@ package org.eclipse.scout.rt.client.ui.tile;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.IWidget;
+import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 
 /**
  * @since 7.1
  */
-public interface ITiles extends IWidget {
+public interface ITiles extends IWidget, ITypeWithClassId {
 
   String PROP_TILES = "tiles";
   String PROP_GRID_COLUMN_COUNT = "gridColumnCount";
@@ -87,4 +88,6 @@ public interface ITiles extends IWidget {
    *          the vertical gap in pixels to use between single tiles.
    */
   void setLogicalGridVGap(int logicalGridGap);
+
+  <T extends ITile> T getTileByClass(Class<T> tileClass);
 }

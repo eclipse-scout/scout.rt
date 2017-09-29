@@ -5,6 +5,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.shared.data.tile.ITileColorScheme;
+import org.eclipse.scout.rt.shared.data.tile.TileColorScheme;
 
 /**
  * @since 7.1

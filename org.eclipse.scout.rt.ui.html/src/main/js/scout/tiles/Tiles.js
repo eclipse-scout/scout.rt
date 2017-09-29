@@ -29,7 +29,11 @@ scout.inherits(scout.Tiles, scout.Widget);
 scout.Tiles.prototype._render = function() {
   this.$container = this.$parent.appendDiv('tiles');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.TilesLayout(this));
+  this.htmlComp.setLayout(this._createLayout());
+};
+
+scout.Tiles.prototype._createLayout = function() {
+  return new scout.TilesLayout(this);
 };
 
 scout.Tiles.prototype._renderProperties = function() {

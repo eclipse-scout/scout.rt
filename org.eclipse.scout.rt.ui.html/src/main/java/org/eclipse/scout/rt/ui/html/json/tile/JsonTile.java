@@ -2,7 +2,7 @@ package org.eclipse.scout.rt.ui.html.json.tile;
 
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
-import org.eclipse.scout.rt.client.ui.tile.ITileColorScheme;
+import org.eclipse.scout.rt.shared.data.tile.ITileColorScheme;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;

@@ -82,8 +82,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
 import org.eclipse.scout.rt.client.ui.form.fields.wizard.IWizardProgressField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.client.ui.tile.IFormFieldTile;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.client.ui.tile.ITiles;
+import org.eclipse.scout.rt.client.ui.tile.IWidgetTile;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonObjectFactory;
@@ -161,8 +163,10 @@ import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonDateColumnUserFilt
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonNumberColumnUserFilter;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTableTextUserFilter;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTextColumnUserFilter;
+import org.eclipse.scout.rt.ui.html.json.tile.JsonFormFieldTile;
 import org.eclipse.scout.rt.ui.html.json.tile.JsonTile;
 import org.eclipse.scout.rt.ui.html.json.tile.JsonTiles;
+import org.eclipse.scout.rt.ui.html.json.tile.JsonWidgetTile;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 
 @Bean
@@ -279,7 +283,7 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof ITilesField<?>) {
       return new JsonTilesField<ITilesField<? extends ITiles>>((ITilesField<?>) model, session, id, parent);
-    }    
+    }
 
     // --- other model objects ---
     if (model instanceof IDesktop) {
@@ -352,6 +356,12 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof ITableControl) {
       return new JsonTableControl<>((ITableControl) model, session, id, parent);
+    }
+    if (model instanceof IFormFieldTile) {
+      return new JsonFormFieldTile<>((IFormFieldTile) model, session, id, parent);
+    }
+    if (model instanceof IWidgetTile) {
+      return new JsonWidgetTile<>((IWidgetTile) model, session, id, parent);
     }
     if (model instanceof ITile) {
       return new JsonTile<>((ITile) model, session, id, parent);

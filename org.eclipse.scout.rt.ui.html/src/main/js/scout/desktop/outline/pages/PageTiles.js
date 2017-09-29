@@ -84,7 +84,7 @@ scout.PageTiles.prototype._createPageTile = function(page) {
   var tile = scout.create('FormFieldTile', {
     parent: this,
     colorScheme: 'default-inverted',
-    widget: button
+    refWidget: button
   });
   page.tile = tile;
   return tile;

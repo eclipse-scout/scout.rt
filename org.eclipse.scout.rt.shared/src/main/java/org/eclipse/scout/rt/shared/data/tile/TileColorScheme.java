@@ -7,7 +7,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.tile;
+package org.eclipse.scout.rt.shared.data.tile;
 
 /**
  * @since 5.2

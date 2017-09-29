@@ -5,12 +5,14 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 /**
  * @since 7.1
  */
+@ClassId("c04e6cf7-fda0-4146-afea-6a0ff0a50c4b")
 public abstract class AbstractTiles extends AbstractWidget implements ITiles {
 
   public AbstractTiles() {
@@ -160,5 +162,30 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   @Override
   public void setLogicalGridRowHeight(int logicalGridRowHeight) {
     propertySupport.setPropertyInt(PROP_LOGICAL_GRID_ROW_HEIGHT, logicalGridRowHeight);
+  }
+
+  @Override
+  public <T extends ITile> T getTileByClass(Class<T> tileClass) {
+    // TODO [15.4] bsh: Make this method more sophisticated (@Replace etc.)
+    T candidate = null;
+    for (ITile tile : getTiles()) {
+      if (tile.getClass() == tileClass) {
+        return tileClass.cast(tile);
+      }
+      if (candidate == null && tileClass.isInstance(tile)) {
+        candidate = tileClass.cast(tile);
+      }
+    }
+    return candidate;
+  }
+
+  @Override
+  public String classId() {
+    String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
+    // FIXME CGU tiles add container?
+//    if (getContainer() != null) {
+//      return simpleClassId + ID_CONCAT_SYMBOL + getContainer().classId();
+//    }
+    return simpleClassId;
   }
 }
