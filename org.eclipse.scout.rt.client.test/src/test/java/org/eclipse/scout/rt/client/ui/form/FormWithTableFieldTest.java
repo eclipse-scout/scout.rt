@@ -90,9 +90,6 @@ public class FormWithTableFieldTest {
   @FormData(value = TableFormData.class, sdkCommand = FormData.SdkCommand.CREATE)
   public class TableForm extends AbstractForm {
 
-    /**
-     * @throws org.eclipse.scout.rt.platform.exception.ProcessingException
-     */
     public TableForm() {
       super();
     }
@@ -102,23 +99,14 @@ public class FormWithTableFieldTest {
       return "Form with table import";
     }
 
-    /**
-     * @return the LoremField
-     */
     public LoremField getLoremField() {
       return getFieldByClass(LoremField.class);
     }
 
-    /**
-     * @throws org.eclipse.scout.rt.platform.exception.ProcessingException
-     */
     public void startModify() {
       startInternal(new ModifyHandler());
     }
 
-    /**
-     * @throws org.eclipse.scout.rt.platform.exception.ProcessingException
-     */
     public void startNew() {
       startInternal(new NewHandler());
     }
@@ -136,9 +124,6 @@ public class FormWithTableFieldTest {
 
         public class Table extends AbstractTable {
 
-          /**
-           * @return the NameColumn
-           */
           public NameColumn getNameColumn() {
             return getColumnSet().getColumnByClass(NameColumn.class);
           }
