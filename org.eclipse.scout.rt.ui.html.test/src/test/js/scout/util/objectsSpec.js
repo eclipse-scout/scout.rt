@@ -316,6 +316,20 @@ describe("scout.objects", function() {
     });
   });
 
+  describe('isPlainObject', function() {
+
+    it('works as expected', function() {
+      expect(scout.objects.isPlainObject({})).toBe(true);
+      expect(scout.objects.isPlainObject({foo: 'bar'})).toBe(true);
+      expect(scout.objects.isPlainObject([])).toBe(false);
+      expect(scout.objects.isPlainObject(null)).toBe(false);
+      expect(scout.objects.isPlainObject(undefined)).toBe(false);
+      expect(scout.objects.isPlainObject(1)).toBe(false);
+      expect(scout.objects.isPlainObject('foo')).toBe(false);
+    });
+
+  });
+
   describe('argumentsToArray', function() {
 
     it('returns an array', function() {

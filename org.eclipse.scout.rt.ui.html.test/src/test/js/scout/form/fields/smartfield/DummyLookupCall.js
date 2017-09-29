@@ -10,7 +10,9 @@
  ******************************************************************************/
 scout.DummyLookupCall = function() {
   scout.DummyLookupCall.parent.call(this);
+  
   this.multiline = false;
+  this.showText = true;
   this.setDelay(250);
 };
 scout.inherits(scout.DummyLookupCall, scout.StaticLookupCall);
@@ -23,6 +25,9 @@ scout.DummyLookupCall.prototype._data = function() {
   ];
 
   function line(text) {
+    if (!this.showText) {
+      return null;
+    }
     if (this.multiline) {
       return '1:' + text + '\n2:' + text;
     } else {

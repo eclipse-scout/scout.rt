@@ -254,7 +254,9 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
   protected void handleUiLookupRowChange(JSONObject data) {
     JSONObject jsonLookupRow = data.optJSONObject(ISmartField.PROP_LOOKUP_ROW);
     ILookupRow<VALUE> lookupRow = lookupRowFromJson(jsonLookupRow);
+    VALUE value = lookupRow == null ? null : lookupRow.getKey();
     addPropertyEventFilterCondition(ISmartField.PROP_LOOKUP_ROW, lookupRow);
+    addPropertyEventFilterCondition(IValueField.PROP_VALUE, value);
     getModel().getUIFacade().setLookupRowFromUI(lookupRow);
   }
 
