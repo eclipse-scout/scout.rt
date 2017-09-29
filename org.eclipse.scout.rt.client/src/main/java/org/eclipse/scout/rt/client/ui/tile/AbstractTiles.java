@@ -6,6 +6,7 @@ import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
@@ -95,7 +96,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   }
 
   @Override
-  public List<ITile> getTiles() {
+  public List<? extends ITile> getTiles() {
     return propertySupport.getPropertyList(PROP_TILES);
   }
 
@@ -182,10 +183,21 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   @Override
   public String classId() {
     String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
-    // FIXME CGU tiles add container?
-//    if (getContainer() != null) {
-//      return simpleClassId + ID_CONCAT_SYMBOL + getContainer().classId();
-//    }
+    if (getContainer() != null) {
+      return simpleClassId + ID_CONCAT_SYMBOL + getContainer().classId();
+    }
     return simpleClassId;
+  }
+
+  @Override
+  public ITypeWithClassId getContainer() {
+    return (ITypeWithClassId) propertySupport.getProperty(PROP_CONTAINER);
+  }
+
+  /**
+   * do not use this internal method unless you are implementing a container that holds and controls tiles.
+   */
+  public void setContainerInternal(ITypeWithClassId container) {
+    propertySupport.setProperty(PROP_CONTAINER, container);
   }
 }

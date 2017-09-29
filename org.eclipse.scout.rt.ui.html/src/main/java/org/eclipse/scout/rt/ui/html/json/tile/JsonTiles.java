@@ -29,7 +29,7 @@ public class JsonTiles<T extends ITiles> extends AbstractJsonWidget<T> {
     super.initJsonProperties(model);
     putJsonProperty(new JsonAdapterProperty<T>(ITiles.PROP_TILES, model, getUiSession()) {
       @Override
-      protected List<ITile> modelValue() {
+      protected List<? extends ITile> modelValue() {
         return getModel().getTiles();
       }
     });

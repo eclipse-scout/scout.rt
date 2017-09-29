@@ -3,6 +3,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.tilesfield;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.client.ui.tile.AbstractTiles;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.client.ui.tile.ITiles;
 import org.eclipse.scout.rt.platform.classid.ClassId;
@@ -57,7 +58,18 @@ public abstract class AbstractTilesField<T extends ITiles> extends AbstractFormF
 
   @Override
   public void setTiles(T tiles) {
+    T oldTiles = getTiles();
+    if (oldTiles == tiles) {
+      return;
+    }
+
+    if (oldTiles instanceof AbstractTiles) {
+      ((AbstractTiles) oldTiles).setContainerInternal(null);
+    }
     propertySupport.setProperty(PROP_TILES, tiles);
+    if (tiles instanceof AbstractTiles) {
+      ((AbstractTiles) tiles).setContainerInternal(this);
+    }
   }
 
   /**

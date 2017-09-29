@@ -17,11 +17,12 @@ public interface ITiles extends IWidget, ITypeWithClassId {
   String PROP_LOGICAL_GRID_ROW_HEIGHT = "logicalGridRowHeight";
   String PROP_LOGICAL_GRID_H_GAP = "logicalGridHGap";
   String PROP_LOGICAL_GRID_V_GAP = "logicalGridVGap";
+  String PROP_CONTAINER = "container";
 
   /**
    * @return list of tiles. Return value is never <code>null</code>.
    */
-  List<ITile> getTiles();
+  List<? extends ITile> getTiles();
 
   /**
    * @param tiles
@@ -90,4 +91,9 @@ public interface ITiles extends IWidget, ITypeWithClassId {
   void setLogicalGridVGap(int logicalGridGap);
 
   <T extends ITile> T getTileByClass(Class<T> tileClass);
+
+  /**
+   * Container of the tiles.
+   */
+  ITypeWithClassId getContainer();
 }
