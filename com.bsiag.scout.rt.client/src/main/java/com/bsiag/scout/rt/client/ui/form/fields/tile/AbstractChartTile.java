@@ -9,6 +9,7 @@
  ******************************************************************************/
 package com.bsiag.scout.rt.client.ui.form.fields.tile;
 
+import org.eclipse.scout.rt.client.ui.tile.AbstractFormFieldTile;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
@@ -23,7 +24,7 @@ import com.bsiag.scout.rt.client.ui.form.fields.tile.AbstractChartTile.ChartFiel
  * @since 5.2
  */
 @ClassId("e482fd82-fb1b-4dd5-8a42-ade0a0fa5eaf")
-public abstract class AbstractChartTile extends AbstractTile<ChartField> {
+public abstract class AbstractChartTile extends AbstractFormFieldTile<ChartField> {
 
   public AbstractChartTile() {
     this(true);
@@ -100,34 +101,34 @@ public abstract class AbstractChartTile extends AbstractTile<ChartField> {
   }
 
   @Override
-  protected void initTileFieldInternal() {
-    super.initTileFieldInternal();
+  protected void initTileWidgetConfig() {
+    super.initTileWidgetConfig();
 
     if (getConfiguredChartType() != null) {
-      getTileField().getChart().setChartType(getConfiguredChartType());
+      getTileWidget().getChart().setChartType(getConfiguredChartType());
     }
     if (getConfiguredAutoColor() != null) {
-      getTileField().getChart().setAutoColor(getConfiguredAutoColor());
+      getTileWidget().getChart().setAutoColor(getConfiguredAutoColor());
     }
     if (getConfiguredClickable() != null) {
-      getTileField().getChart().setClickable(getConfiguredClickable());
+      getTileWidget().getChart().setClickable(getConfiguredClickable());
     }
     if (getConfiguredAnimated() != null) {
-      getTileField().getChart().setAnimated(getConfiguredAnimated());
+      getTileWidget().getChart().setAnimated(getConfiguredAnimated());
     }
     if (getConfiguredLegendPosition() != null) {
-      getTileField().getChart().setLegendPosition(getConfiguredLegendPosition());
+      getTileWidget().getChart().setLegendPosition(getConfiguredLegendPosition());
     }
     if (getConfiguredLegendVisible() != null) {
-      getTileField().getChart().setLegendVisible(getConfiguredLegendVisible());
+      getTileWidget().getChart().setLegendVisible(getConfiguredLegendVisible());
     }
     if (getConfiguredInteractiveLegendVisible() != null) {
-      getTileField().getChart().setInteractiveLegendVisible(getConfiguredInteractiveLegendVisible());
+      getTileWidget().getChart().setInteractiveLegendVisible(getConfiguredInteractiveLegendVisible());
     }
   }
 
   public Chart getChart() {
-    return getTileField().getChart();
+    return getTileWidget().getChart();
   }
 
   @Order(10)

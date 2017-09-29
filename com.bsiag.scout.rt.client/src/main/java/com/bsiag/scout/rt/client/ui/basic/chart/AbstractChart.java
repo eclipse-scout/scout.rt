@@ -99,6 +99,7 @@ public abstract class AbstractChart extends AbstractWidget implements IChart {
   }
 
   public AbstractChart(boolean callInitializer) {
+    super(false);
     if (callInitializer) {
       callInitializer();
     }
@@ -123,7 +124,7 @@ public abstract class AbstractChart extends AbstractWidget implements IChart {
    */
   @Override
   protected void initConfig() {
-    super.initConfig();	  
+    super.initConfig();
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     setChartType(getConfiguredChartType());
     setAutoColor(getConfiguredAutoColor());
