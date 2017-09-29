@@ -238,6 +238,14 @@ scout.graphics = {
     });
   },
 
+  paddings: function($comp) {
+    return scout.graphics.insets($comp, {
+      includeMargin: false,
+      includePadding: true,
+      includeBorder: false
+    });
+  },
+
   borders: function($comp) {
     return scout.graphics.insets($comp, {
       includeMargin: false,
