@@ -15,7 +15,7 @@ scout.Tiles = function() {
   // GridColumnCount will be modifed by the layout, prefGridColumnCount remains unchanged
   this.gridColumnCount = 4;
   this.prefGridColumnCount = this.gridColumnCount;
-  this.logicalGrid = scout.create('scout.TilesGrid');
+  this.logicalGrid = scout.create('scout.HorizontalGrid');
   this.logicalGridHGap = 15;
   this.logicalGridVGap = 20;
   this.logicalGridRowHeight = 150;
@@ -227,4 +227,14 @@ scout.Tiles.prototype.validateLogicalGrid = function() {
   this.fillUpWithPlaceholders();
   this.logicalGrid.setDirty(true);
   this.logicalGrid.validate(this);
+};
+
+/**
+ * @override
+ */
+scout.Tiles.prototype._setLogicalGrid = function(logicalGrid) {
+  scout.Tiles.parent.prototype._setLogicalGrid.call(this, logicalGrid);
+  if (this.logicalGrid) {
+    this.logicalGrid.setGridConfig(new scout.TilesGridConfig());
+  }
 };

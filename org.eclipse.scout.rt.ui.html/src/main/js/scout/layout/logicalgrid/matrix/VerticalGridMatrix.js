@@ -8,34 +8,34 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.VerticalGridMatrixGroupBox = function(columnCount, rowCount, x, y) {
-  scout.VerticalGridMatrixGroupBox.parent.call(this, new scout.GroupBoxGridMatrixCursor(x || 0, y || 0, columnCount, rowCount, scout.GroupBoxGridMatrixCursor.VERTICAL));
+scout.VerticalGridMatrix = function(columnCount, rowCount, x, y) {
+  scout.VerticalGridMatrix.parent.call(this, new scout.LogicalGridMatrixCursor(x || 0, y || 0, columnCount, rowCount, scout.LogicalGridMatrixCursor.VERTICAL));
 
-  this._fields = [];
-  this._fieldGridDatas = [];
+  this._widgets = [];
+  this._widgetGridDatas = [];
 };
-scout.inherits(scout.VerticalGridMatrixGroupBox, scout.AbstractGridMatrixGroupBox);
+scout.inherits(scout.VerticalGridMatrix, scout.LogicalGridMatrix);
 
-scout.VerticalGridMatrixGroupBox.prototype.resetAll = function(columnCount, rowCount) {
-  this._fieldGridDatas = [];
+scout.VerticalGridMatrix.prototype.resetAll = function(columnCount, rowCount) {
+  this._widgetGridDatas = [];
   this._assignedCells = [];
-  this._fieldIndexes = [];
-  this._cursor = new scout.GroupBoxGridMatrixCursor(this._cursor.startX, this._cursor.startY, columnCount, rowCount, scout.GroupBoxGridMatrixCursor.VERTICAL);
+  this._widgetIndexes = [];
+  this._cursor = new scout.LogicalGridMatrixCursor(this._cursor.startX, this._cursor.startY, columnCount, rowCount, scout.LogicalGridMatrixCursor.VERTICAL);
 };
 
-scout.VerticalGridMatrixGroupBox.prototype.computeGridData = function(fields) {
-  this._fields = fields;
-  return fields.every(function(f, i) {
-    this._fieldGridDatas[i] = scout.GroupBoxBodyGrid.getGridDataFromHints(f, this._cursor.columnCount);
-    return this._add(f, this._fieldGridDatas[i]);
+scout.VerticalGridMatrix.prototype.computeGridData = function(widgets) {
+  this._widgets = widgets;
+  return widgets.every(function(f, i) {
+    this._widgetGridDatas[i] = scout.AbstractGrid.getGridDataFromHints(f, this._cursor.columnCount);
+    return this._add(f, this._widgetGridDatas[i]);
   }.bind(this));
 };
 
-scout.VerticalGridMatrixGroupBox.prototype.getGridData = function(f) {
-  return this._fieldGridDatas[this._fields.indexOf(f)];
+scout.VerticalGridMatrix.prototype.getGridData = function(f) {
+  return this._widgetGridDatas[this._widgets.indexOf(f)];
 };
 
-scout.VerticalGridMatrixGroupBox.prototype._addAssignedCells = function(cells) {
+scout.VerticalGridMatrix.prototype._addAssignedCells = function(cells) {
   cells.forEach(function(v, i) {
     if (v) {
       v.forEach(function(w, j) {
@@ -50,17 +50,17 @@ scout.VerticalGridMatrixGroupBox.prototype._addAssignedCells = function(cells) {
   }.bind(this));
 };
 
-scout.VerticalGridMatrixGroupBox.prototype._getAssignedCells = function() {
+scout.VerticalGridMatrix.prototype._getAssignedCells = function() {
   return this._assignedCells;
 };
 
-scout.VerticalGridMatrixGroupBox.prototype._add = function(f, gd) {
+scout.VerticalGridMatrix.prototype._add = function(f, gd) {
   var idx = this._cursor.currentIndex();
   if (gd.w > 1) {
-    // try to reorganize fields above
+    // try to reorganize widgets above
     var x = idx.x,
       y = idx.y;
-    // try to move left if the right border of the field is outside the column range
+    // try to move left if the right border of the widget is outside the column range
     while (x + gd.w > this._cursor.startX + this._cursor.columnCount) {
       // shift left and bottom
       x--;
@@ -74,23 +74,23 @@ scout.VerticalGridMatrixGroupBox.prototype._add = function(f, gd) {
   idx = this._cursor.currentIndex();
   gd.x = idx.x;
   gd.y = idx.y;
-  // add field
+  // add widget
   for (var xx = idx.x; xx < idx.x + gd.w; xx++) {
     for (var yy = idx.y; yy < idx.y + gd.h; yy++) {
       this._setAssignedCell({
         x: xx,
         y: yy
-      }, new scout.GroupBoxGridCell(f, gd));
+      }, new scout.LogicalGridMatrixCell(f, gd));
     }
   }
   return true;
 };
 
-scout.VerticalGridMatrixGroupBox.prototype._reorganizeGridAbove = function(x, y, w) {
-  var fieldsToReorganize = [];
-  var addFieldToReorganize = function(f) {
-    if (fieldsToReorganize.indexOf(f) === -1) {
-      fieldsToReorganize.push(f);
+scout.VerticalGridMatrix.prototype._reorganizeGridAbove = function(x, y, w) {
+  var widgetsToReorganize = [];
+  var addWidgetToReorganize = function(f) {
+    if (widgetsToReorganize.indexOf(f) === -1) {
+      widgetsToReorganize.push(f);
     }
   };
   var occupiedCells = [];
@@ -129,39 +129,39 @@ scout.VerticalGridMatrixGroupBox.prototype._reorganizeGridAbove = function(x, y,
         }
         // includes
         else {
-          // add field to reorganization
+          // add widget to reorganization
           this._setAssignedCell(idx, null);
-          addFieldToReorganize(cell.field);
+          addWidgetToReorganize(cell.widget);
           usedCells++;
           minY = Math.min(idx.y, minY);
         }
       }
     }
   }
-  if (fieldsToReorganize.length === 0) {
+  if (widgetsToReorganize.length === 0) {
     return;
   }
-  fieldsToReorganize.sort(function(a, b) {
-    return this._fields.indexOf(a) < this._fields.indexOf(b) ? -1 : 1;
+  widgetsToReorganize.sort(function(a, b) {
+    return this._widgets.indexOf(a) < this._widgets.indexOf(b) ? -1 : 1;
   }.bind(this));
   reorgBounds.y = minY;
 
-  var reorgMatrix = new scout.VerticalGridMatrixGroupBox(reorgBounds.w, Math.floor((usedCells + reorgBounds.w - 1) / reorgBounds.w), reorgBounds.x, reorgBounds.y);
+  var reorgMatrix = new scout.VerticalGridMatrix(reorgBounds.w, Math.floor((usedCells + reorgBounds.w - 1) / reorgBounds.w), reorgBounds.x, reorgBounds.y);
   reorgMatrix._addAssignedCells(occupiedCells);
-  while (!reorgMatrix.computeGridData(fieldsToReorganize)) {
+  while (!reorgMatrix.computeGridData(widgetsToReorganize)) {
     reorgMatrix.resetAll(reorgMatrix.getColumnCount(), reorgMatrix.getRowCount() + 1);
   }
   this._cursor.reset();
   this._addAssignedCells(reorgMatrix._getAssignedCells());
-  reorgMatrix._fieldGridDatas.forEach(function(v, i) {
-    this._fieldGridDatas[this._fields.indexOf(reorgMatrix._fields[i])] = v;
+  reorgMatrix._widgetGridDatas.forEach(function(v, i) {
+    this._widgetGridDatas[this._widgets.indexOf(reorgMatrix._widgets[i])] = v;
   }.bind(this));
 };
 
-scout.VerticalGridMatrixGroupBox.prototype._horizontalMatchesOrOverlaps = function(bounds, gd) {
+scout.VerticalGridMatrix.prototype._horizontalMatchesOrOverlaps = function(bounds, gd) {
   return bounds.x >= gd.x && bounds.x + bounds.w <= gd.x + gd.w;
 };
 
-scout.VerticalGridMatrixGroupBox.prototype._horizontalOverlapsOnSide = function(bounds, gd) {
+scout.VerticalGridMatrix.prototype._horizontalOverlapsOnSide = function(bounds, gd) {
   return bounds.x > gd.x || bounds.x + bounds.w < gd.x + gd.w;
 };

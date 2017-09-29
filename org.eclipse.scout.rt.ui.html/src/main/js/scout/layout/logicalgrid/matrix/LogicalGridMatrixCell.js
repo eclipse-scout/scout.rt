@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.GroupBoxGridCell = function(field, data) {
-  this.field = field;
+scout.LogicalGridMatrixCell = function(widget, data) {
+  this.widget = widget;
   this.data = data;
 };
 
-scout.GroupBoxGridCell.prototype.isEmpty = function() {
-  return !this.field;
+scout.LogicalGridMatrixCell.prototype.isEmpty = function() {
+  return !this.widget;
 };

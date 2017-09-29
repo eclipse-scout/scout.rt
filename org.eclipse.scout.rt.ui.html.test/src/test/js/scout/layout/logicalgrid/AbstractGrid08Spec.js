@@ -43,7 +43,7 @@
  * @since 4.0.0 M6 25.02.2014
  */
 // see reference implementation org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout08Test
-describe("GroupBoxBodyGrid08", function() {
+describe("AbstractGrid08", function() {
   var session;
 
   beforeEach(function() {
@@ -136,7 +136,8 @@ describe("GroupBoxBodyGrid08", function() {
 
   describe('group box layout 08', function() {
     it('test horizontal layout', function() {
-      var grid = new scout.HorizontalGroupBoxBodyGrid();
+      var grid = new scout.HorizontalGrid();
+      grid.setGridConfig(new scout.GroupBoxGridConfig());
       grid.validate(this.groupBox);
 
       // group box
@@ -166,7 +167,8 @@ describe("GroupBoxBodyGrid08", function() {
     });
 
     it('test vertical smart layout', function() {
-      var grid = new scout.VerticalSmartGroupBoxBodyGrid();
+      var grid = new scout.VerticalSmartGrid();
+      grid.setGridConfig(new scout.GroupBoxGridConfig());
       grid.validate(this.groupBox);
 
       // group box

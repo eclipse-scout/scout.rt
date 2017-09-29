@@ -8,13 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.HorizontalGroupBoxBodyGrid = function() {
-  scout.HorizontalGroupBoxBodyGrid.parent.call(this);
+scout.HorizontalGrid = function() {
+  scout.HorizontalGrid.parent.call(this);
 };
-scout.inherits(scout.HorizontalGroupBoxBodyGrid, scout.GroupBoxBodyGrid);
+scout.inherits(scout.HorizontalGrid, scout.AbstractGrid);
 
-scout.GroupBoxBodyGrid.prototype.layoutAllDynamic = function(fields) {
-  var matrix = new scout.HorizontalGridMatrixGroupBox(this.getGridColumnCount());
-  matrix.computeGridData(fields);
+scout.HorizontalGrid.prototype.layoutAllDynamic = function(widgets) {
+  var matrix = new scout.HorizontalGridMatrix(this.getGridColumnCount());
+  matrix.computeGridData(widgets);
   this.gridRows = matrix.getRowCount();
 };

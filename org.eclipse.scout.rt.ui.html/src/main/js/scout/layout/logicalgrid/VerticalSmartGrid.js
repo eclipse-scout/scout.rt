@@ -8,27 +8,27 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.VerticalSmartGroupBoxBodyGrid = function() {
-  scout.VerticalSmartGroupBoxBodyGrid.parent.call(this);
+scout.VerticalSmartGrid = function() {
+  scout.VerticalSmartGrid.parent.call(this);
 };
-scout.inherits(scout.VerticalSmartGroupBoxBodyGrid, scout.GroupBoxBodyGrid);
+scout.inherits(scout.VerticalSmartGrid, scout.AbstractGrid);
 
-scout.VerticalSmartGroupBoxBodyGrid.prototype.layoutAllDynamic = function(fields) {
+scout.VerticalSmartGrid.prototype.layoutAllDynamic = function(widgets) {
   var cellCount = 0;
-  fields.forEach(function(f) {
-    var hints = scout.GroupBoxBodyGrid.getGridDataFromHints(f, this.getGridColumnCount());
+  widgets.forEach(function(f) {
+    var hints = scout.AbstractGrid.getGridDataFromHints(f, this.getGridColumnCount());
     cellCount += hints.w * hints.h;
   }.bind(this));
 
   // do the calc
   var rowCount = Math.floor((cellCount + this.getGridColumnCount() - 1) / this.getGridColumnCount());
-  var matrix = new scout.VerticalGridMatrixGroupBox(this.getGridColumnCount(), rowCount);
-  while (!matrix.computeGridData(fields)) {
+  var matrix = new scout.VerticalGridMatrix(this.getGridColumnCount(), rowCount);
+  while (!matrix.computeGridData(widgets)) {
     matrix.resetAll(this.getGridColumnCount(), ++rowCount);
   }
 
   // set gridData
-  fields.forEach(function(f) {
+  widgets.forEach(function(f) {
     f.gridData = matrix.getGridData(f);
   });
   this.gridRows = matrix.getRowCount();

@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-// see reference implementation org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout02Test
 /**
- * Javadoc:
+ * Reference implementation javadoc:
  *
  * <h4>Vertical</h4>
  *
@@ -39,7 +38,8 @@
  * @author Andreas Hoegger
  * @since 4.0.0 M6 25.02.2014
  */
-describe("GroupBoxBodyGrid02", function() {
+// see reference implementation org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout10Test
+describe("AbstractGrid10", function() {
   var session;
 
   beforeEach(function() {
@@ -53,7 +53,10 @@ describe("GroupBoxBodyGrid02", function() {
     });
     this.fields.push(scout.create('StringField', {
       parent: this.groupBox,
-      label: "Field 01"
+      label: "Field 01",
+      gridDataHints: new scout.GridData({
+        w: 1
+      })
     }));
     this.fields.push(scout.create('StringField', {
       parent: this.groupBox,
@@ -73,8 +76,7 @@ describe("GroupBoxBodyGrid02", function() {
     }));
     this.fields.push(scout.create('StringField', {
       parent: this.groupBox,
-      label: "Field 05",
-      gridDataHints: new scout.GridData({})
+      label: "Field 05"
     }));
     this.fields.push(scout.create('StringField', {
       parent: this.groupBox,
@@ -85,6 +87,11 @@ describe("GroupBoxBodyGrid02", function() {
     }));
     this.fields.push(scout.create('Button', {
       parent: this.groupBox,
+      label: "Toggle",
+      displayStyle: scout.Button.DisplayStyle.TOGGLE
+    }));
+    this.fields.push(scout.create('Button', {
+      parent: this.groupBox,
       label: "Close",
       systemType: scout.Button.SystemType.CLOSE
     }));
@@ -92,9 +99,10 @@ describe("GroupBoxBodyGrid02", function() {
     this.groupBox.render();
   });
 
-  describe('group box layout 02', function() {
+  describe('group box layout 10', function() {
     it('test horizontal layout', function() {
-      var grid = new scout.HorizontalGroupBoxBodyGrid();
+      var grid = new scout.HorizontalGrid();
+      grid.setGridConfig(new scout.GroupBoxGridConfig());
       grid.validate(this.groupBox);
 
       // group box
@@ -121,7 +129,8 @@ describe("GroupBoxBodyGrid02", function() {
     });
 
     it('test vertical smart layout', function() {
-      var grid = new scout.VerticalSmartGroupBoxBodyGrid();
+      var grid = new scout.VerticalSmartGrid();
+      grid.setGridConfig(new scout.GroupBoxGridConfig());
       grid.validate(this.groupBox);
 
       // group box

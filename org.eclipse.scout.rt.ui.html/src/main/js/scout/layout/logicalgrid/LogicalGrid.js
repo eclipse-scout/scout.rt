@@ -11,21 +11,27 @@
 /**
  * Base class for every logical grid. The concrete grids should implement {@link #_validate}.
  */
-scout.LogicalGrid = function() {
+scout.LogicalGrid = function(options) {
+  options = options || {};
   this.dirty = true;
+  this.gridConfig = options.gridConfig || null;
 };
 
 scout.LogicalGrid.prototype.setDirty = function(dirty) {
   this.dirty = dirty;
 };
 
+scout.LogicalGrid.prototype.setGridConfig = function(gridConfig) {
+  this.gridConfig = gridConfig;
+};
+
 /**
  * Calls {@link #_validate} if the grid is dirty. Sets dirty to false afterwards.
  */
-scout.LogicalGrid.prototype.validate = function(widget) {
+scout.LogicalGrid.prototype.validate = function(gridContainer) {
   if (!this.dirty) {
     return;
   }
-  this._validate(widget);
+  this._validate(gridContainer);
   this.setDirty(false);
 };

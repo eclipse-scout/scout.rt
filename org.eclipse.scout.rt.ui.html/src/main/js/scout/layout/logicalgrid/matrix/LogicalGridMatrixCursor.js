@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.GroupBoxGridMatrixCursor = function(x, y, columnCount, rowCount, orientation) {
+scout.LogicalGridMatrixCursor = function(x, y, columnCount, rowCount, orientation) {
   this.startX = x;
   this.startY = y;
   this.columnCount = columnCount;
@@ -18,29 +18,29 @@ scout.GroupBoxGridMatrixCursor = function(x, y, columnCount, rowCount, orientati
   this.reset();
 };
 
-scout.GroupBoxGridMatrixCursor.HORIZONTAL = 0;
-scout.GroupBoxGridMatrixCursor.VERTICAL = 1;
+scout.LogicalGridMatrixCursor.HORIZONTAL = 0;
+scout.LogicalGridMatrixCursor.VERTICAL = 1;
 
-scout.GroupBoxGridMatrixCursor.prototype.reset = function() {
+scout.LogicalGridMatrixCursor.prototype.reset = function() {
   this._currentIndex = {
     x: -1,
     y: -1
   };
 };
 
-scout.GroupBoxGridMatrixCursor.prototype.currentIndex = function() {
+scout.LogicalGridMatrixCursor.prototype.currentIndex = function() {
   return {
     x: this._currentIndex.x,
     y: this._currentIndex.y
   };
 };
 
-scout.GroupBoxGridMatrixCursor.prototype.increment = function() {
+scout.LogicalGridMatrixCursor.prototype.increment = function() {
   if (this._currentIndex.x < 0 || this._currentIndex.y < 0) {
     // initial
     this._currentIndex.x = this.startX;
     this._currentIndex.y = this.startY;
-  } else if (this.orientation === scout.GroupBoxGridMatrixCursor.HORIZONTAL) {
+  } else if (this.orientation === scout.LogicalGridMatrixCursor.HORIZONTAL) {
     this._currentIndex.x++;
     if (this._currentIndex.x >= this.startX + this.columnCount) {
       this._currentIndex.x = this.startX;
@@ -60,13 +60,13 @@ scout.GroupBoxGridMatrixCursor.prototype.increment = function() {
   return true;
 };
 
-scout.GroupBoxGridMatrixCursor.prototype.decrement = function() {
+scout.LogicalGridMatrixCursor.prototype.decrement = function() {
   if (this._currentIndex.x < 0 || this._currentIndex.y < 0) {
     return false;
   } else if (this._currentIndex.x >= this.startX + this.columnCount || this._currentIndex.y >= this.startY + this.rowCount) {
     this._currentIndex.x = this.startX + this.columnCount - 1;
     this._currentIndex.y = this.startY + this.rowCount - 1;
-  } else if (this.orientation === scout.GroupBoxGridMatrixCursor.HORIZONTAL) {
+  } else if (this.orientation === scout.LogicalGridMatrixCursor.HORIZONTAL) {
     this._currentIndex.x--;
     if (this._currentIndex.x < this.startX) {
       this._currentIndex.x = this.startX + this.columnCount - 1;
@@ -86,7 +86,7 @@ scout.GroupBoxGridMatrixCursor.prototype.decrement = function() {
   return true;
 };
 
-scout.GroupBoxGridMatrixCursor.prototype.toString = function() {
+scout.LogicalGridMatrixCursor.prototype.toString = function() {
   var builder = [];
   builder.push('MatrixCursor [');
   builder.push('orientation=' + this.orientation);

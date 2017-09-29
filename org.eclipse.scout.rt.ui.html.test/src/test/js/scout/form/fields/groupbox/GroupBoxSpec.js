@@ -195,21 +195,21 @@ describe("GroupBox", function() {
     it('may be specified using the object type', function() {
       var groupBox = scout.create('GroupBox', {
         parent: session.desktop,
-        logicalGrid: 'HorizontalGroupBoxBodyGrid'
+        logicalGrid: 'HorizontalGrid'
       });
-      expect(groupBox.logicalGrid instanceof scout.HorizontalGroupBoxBodyGrid).toBe(true);
+      expect(groupBox.logicalGrid instanceof scout.HorizontalGrid).toBe(true);
 
       groupBox = scout.create('GroupBox', {
         parent: session.desktop,
-        logicalGrid: 'VerticalSmartGroupBoxBodyGrid'
+        logicalGrid: 'VerticalSmartGrid'
       });
-      expect(groupBox.logicalGrid instanceof scout.VerticalSmartGroupBoxBodyGrid).toBe(true);
+      expect(groupBox.logicalGrid instanceof scout.VerticalSmartGrid).toBe(true);
 
       groupBox = scout.create('GroupBox', {
         parent: session.desktop,
-        logicalGrid: scout.create('HorizontalGroupBoxBodyGrid')
+        logicalGrid: scout.create('HorizontalGrid')
       });
-      expect(groupBox.logicalGrid instanceof scout.HorizontalGroupBoxBodyGrid).toBe(true);
+      expect(groupBox.logicalGrid instanceof scout.HorizontalGrid).toBe(true);
     });
 
     it('uses widthInPixel and heightInPixel as dialog width and height if set on main box', function() {

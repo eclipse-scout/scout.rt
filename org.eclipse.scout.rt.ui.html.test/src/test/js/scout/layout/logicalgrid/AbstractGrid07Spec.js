@@ -9,15 +9,17 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 /**
- * Reference impl. javadoc:
+ * Reference implementation javadoc:
  *
  * <h4>Vertical</h4>
  *
  * <pre>
  * -----------------------------------------
- *    Field01   |   Field01   |   Field02
+ *    Field01   |   Field02   |   Field04
  * -----------------------------------------
- *    Field01   |   Field01   |   Field03
+ *    Field03   |   Field03   |   Field05
+ * -----------------------------------------
+ *    Field03   |   Field03   |
  * -----------------------------------------
  * </pre>
  *
@@ -25,17 +27,19 @@
  *
  * <pre>
  * -----------------------------------------
- *    Field01   |   Field01   |   Field02
+ *    Field01   |   Field02   |
  * -----------------------------------------
- *    Field01   |   Field01   |   Field03
+ *    Field03   |   Field03   |   Field04
+ * -----------------------------------------
+ *    Field03   |   Field03   |   Field05
  * -----------------------------------------
  * </pre>
  *
  * @author Andreas Hoegger
  * @since 4.0.0 M6 25.02.2014
  */
-// see reference implementation org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout05Test
-describe("GroupBoxBodyGrid05", function() {
+// see reference implementation org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout07Test
+describe("AbstractGrid07", function() {
   var session;
 
   beforeEach(function() {
@@ -49,11 +53,7 @@ describe("GroupBoxBodyGrid05", function() {
     });
     this.fields.push(scout.create('StringField', {
       parent: this.groupBox,
-      label: "Field 01",
-      gridDataHints: new scout.GridData({
-        h: 2,
-        w: 2
-      })
+      label: "Field 01"
     }));
     this.fields.push(scout.create('StringField', {
       parent: this.groupBox,
@@ -62,7 +62,20 @@ describe("GroupBoxBodyGrid05", function() {
     this.fields.push(scout.create('StringField', {
       parent: this.groupBox,
       label: "Field 03",
-      gridDataHints: new scout.GridData()
+      gridDataHints: new scout.GridData({
+        h: 2,
+        w: 2
+      })
+    }));
+    this.fields.push(scout.create('StringField', {
+      parent: this.groupBox,
+      label: "Field 04",
+      gridDataHints: new scout.GridData({})
+    }));
+    this.fields.push(scout.create('StringField', {
+      parent: this.groupBox,
+      label: "Field 05",
+      gridDataHints: new scout.GridData({})
     }));
     this.fields.push(scout.create('Button', {
       parent: this.groupBox,
@@ -73,42 +86,55 @@ describe("GroupBoxBodyGrid05", function() {
     this.groupBox.render();
   });
 
-  describe('group box layout 05', function() {
+  describe('group box layout 07', function() {
     it('test horizontal layout', function() {
-      var grid = new scout.HorizontalGroupBoxBodyGrid();
+      var grid = new scout.HorizontalGrid();
+      grid.setGridConfig(new scout.GroupBoxGridConfig());
       grid.validate(this.groupBox);
 
       // group box
-      expect(grid.getGridRowCount()).toEqual(2);
+      expect(grid.getGridRowCount()).toEqual(3);
       expect(grid.getGridColumnCount()).toEqual(3);
 
       // field01
-      scout.GroupBoxSpecHelper.assertGridData(0, 0, 2, 2, this.fields[0].gridData);
+      scout.GroupBoxSpecHelper.assertGridData(0, 0, 1, 1, this.fields[0].gridData);
 
       // field02
-      scout.GroupBoxSpecHelper.assertGridData(2, 0, 1, 1, this.fields[1].gridData);
+      scout.GroupBoxSpecHelper.assertGridData(1, 0, 1, 1, this.fields[1].gridData);
 
       // field03
-      scout.GroupBoxSpecHelper.assertGridData(2, 1, 1, 1, this.fields[2].gridData);
+      scout.GroupBoxSpecHelper.assertGridData(0, 1, 2, 2, this.fields[2].gridData);
+
+      // field04
+      scout.GroupBoxSpecHelper.assertGridData(2, 1, 1, 1, this.fields[3].gridData);
+
+      // field05
+      scout.GroupBoxSpecHelper.assertGridData(2, 2, 1, 1, this.fields[4].gridData);
     });
 
     it('test vertical smart layout', function() {
-      var grid = new scout.VerticalSmartGroupBoxBodyGrid();
+      var grid = new scout.VerticalSmartGrid();
+      grid.setGridConfig(new scout.GroupBoxGridConfig());
       grid.validate(this.groupBox);
 
       // group box
-      expect(grid.getGridRowCount()).toEqual(2);
+      expect(grid.getGridRowCount()).toEqual(3);
       expect(grid.getGridColumnCount()).toEqual(3);
 
       // field01
-      scout.GroupBoxSpecHelper.assertGridData(0, 0, 2, 2, this.fields[0].gridData);
+      scout.GroupBoxSpecHelper.assertGridData(0, 0, 1, 1, this.fields[0].gridData);
 
       // field02
-      scout.GroupBoxSpecHelper.assertGridData(2, 0, 1, 1, this.fields[1].gridData);
+      scout.GroupBoxSpecHelper.assertGridData(1, 0, 1, 1, this.fields[1].gridData);
 
       // field03
-      scout.GroupBoxSpecHelper.assertGridData(2, 1, 1, 1, this.fields[2].gridData);
+      scout.GroupBoxSpecHelper.assertGridData(0, 1, 2, 2, this.fields[2].gridData);
+
+      // field04
+      scout.GroupBoxSpecHelper.assertGridData(2, 0, 1, 1, this.fields[3].gridData);
+
+      // field05
+      scout.GroupBoxSpecHelper.assertGridData(2, 1, 1, 1, this.fields[4].gridData);
     });
   });
-
 });

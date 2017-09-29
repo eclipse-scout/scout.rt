@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 // see reference implementation org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout01Test
-describe("GroupBoxBodyGrid01", function() {
+describe("AbstractGrid01", function() {
   var session;
 
   beforeEach(function() {
@@ -50,7 +50,8 @@ describe("GroupBoxBodyGrid01", function() {
 
   describe('group box layout 01', function() {
     it('test horizontal layout', function() {
-      var grid = new scout.HorizontalGroupBoxBodyGrid();
+      var grid = new scout.HorizontalGrid();
+      grid.setGridConfig(new scout.GroupBoxGridConfig());
       grid.validate(this.groupBox);
 
       // group box
@@ -70,9 +71,9 @@ describe("GroupBoxBodyGrid01", function() {
       scout.GroupBoxSpecHelper.assertGridData(1, 2, 1, 1, this.fields[3].gridData);
     });
 
-
     it('test vertical smart layout', function() {
-      var grid = new scout.VerticalSmartGroupBoxBodyGrid();
+      var grid = new scout.VerticalSmartGrid();
+      grid.setGridConfig(new scout.GroupBoxGridConfig());
       grid.validate(this.groupBox);
 
       // group box

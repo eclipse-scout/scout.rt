@@ -24,7 +24,7 @@ scout.GroupBox = function() {
   this.scrollable = null;
   this.expandable = false;
   this.expanded = true;
-  this.logicalGrid = scout.create('scout.VerticalSmartGroupBoxBodyGrid');
+  this.logicalGrid = scout.create('scout.VerticalSmartGrid');
   this.gridColumnCount = 2;
   this.gridDataHints.useUiHeight = true;
   this.gridDataHints.w = scout.FormField.FULL_WIDTH;
@@ -437,6 +437,16 @@ scout.GroupBox.prototype.invalidateLogicalGrid = function(invalidateLayout) {
   scout.GroupBox.parent.prototype.invalidateLogicalGrid.call(this, false);
   if (scout.nvl(invalidateLayout, true) && this.rendered) {
     this.htmlBody.invalidateLayoutTree();
+  }
+};
+
+/**
+ * @override
+ */
+scout.GroupBox.prototype._setLogicalGrid = function(logicalGrid) {
+  scout.GroupBox.parent.prototype._setLogicalGrid.call(this, logicalGrid);
+  if (this.logicalGrid) {
+    this.logicalGrid.setGridConfig(new scout.GroupBoxGridConfig());
   }
 };
 
