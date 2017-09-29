@@ -219,10 +219,13 @@ scout.SmartField2.prototype._acceptInput = function(searchText, searchTextEmpty,
   }
 
   // Do nothing when search text is equals to the text of the current lookup row
-  if (!selectedLookupRow && this.lookupRow && this.lookupRow.text === searchText) {
-    $.log.debug('(SmartField2#acceptInput) unchanged: text is equals. Close popup');
-    this._inputAccepted(false);
-    return;
+  if (!selectedLookupRow && this.lookupRow) {
+    var lookupRowText = scout.strings.nvl(this.lookupRow.text);
+    if (lookupRowText === searchText) {
+      $.log.debug('(SmartField2#acceptInput) unchanged: text is equals. Close popup');
+      this._inputAccepted(false);
+      return;
+    }
   }
 
   // Do nothing when we don't have a current lookup row and search text is empty
@@ -457,7 +460,12 @@ scout.SmartField2.prototype._renderEnabled = function() {
 };
 
 scout.SmartField2.prototype._setLookupCall = function(lookupCall) {
-  if (typeof lookupCall === 'string') {
+  if (lookupCall instanceof scout.LookupCall) {
+    // NOP - required to distinct instance from plain object (=model)
+  } else if (scout.objects.isPlainObject(lookupCall)) {
+    lookupCall.session = this.session;
+    lookupCall = scout.create(lookupCall);
+  } else if (typeof lookupCall === 'string') {
     lookupCall = scout.create(lookupCall, {
       session: this.session
     });

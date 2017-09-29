@@ -162,10 +162,12 @@ scout.objects = {
   },
 
   /**
-   * Returns true if the given object is an object but _not_ an array.
+   * Returns true if the given object is an object, _not_ an array and not null or undefined.
    */
   isPlainObject: function(obj) {
-    return (typeof obj === 'object' && !Array.isArray(obj));
+    return typeof obj === 'object' &&
+      !this.isNullOrUndefined(obj) &&
+      !Array.isArray(obj);
   },
 
   /**

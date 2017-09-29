@@ -26,10 +26,14 @@ describe('SmartField2', function() {
     removePopups(session, '.touch-popup');
   });
 
-  function createFieldWithLookupCall(model) {
+  function createFieldWithLookupCall(model, lookupCallModel) {
+    lookupCallModel = $.extend({
+      objectType: 'DummyLookupCall'
+    }, lookupCallModel);
+
     model = $.extend({}, {
       parent: session.desktop,
-      lookupCall: 'DummyLookupCall'
+      lookupCall: lookupCallModel
     }, model);
     return scout.create('SmartField2', model);
   }
@@ -244,6 +248,29 @@ describe('SmartField2', function() {
       jasmine.clock().tick(500);
       expect(field.lookupRow.text).toBe('Foo');
       expect(field.$field.val()).toBe('Foo');
+      expect(field.value).toBe(1);
+      field.acceptInput();
+      expect(eventTriggered).toBe(false);
+    });
+
+    // ticket #214831
+    it('should not be triggered, when search text is (still) empty or equals to the text of the lookup row (lookupRow.text is null)', function() {
+      var field = createFieldWithLookupCall({}, {showText: false});
+      var eventTriggered = false;
+      field.render();
+      field.on('acceptInput', function() {
+        eventTriggered = true;
+      });
+      // empty case
+      field.acceptInput();
+      expect(eventTriggered).toBe(false);
+
+      // text equals case
+      field.setValue(1); // set lookup row [1, null]
+      jasmine.clock().tick(500);
+      expect(field.lookupRow.text).toBe(null);
+      expect(field.$field.val()).toBe('');
+      expect(field.value).toBe(1);
       field.acceptInput();
       expect(eventTriggered).toBe(false);
     });
