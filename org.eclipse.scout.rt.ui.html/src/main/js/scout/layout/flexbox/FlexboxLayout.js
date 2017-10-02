@@ -96,7 +96,9 @@ scout.FlexboxLayout.prototype._computeCacheKey = function(childCount) {
 scout.FlexboxLayout.prototype.layout = function($container) {
   var children = this._getChildren($container),
     htmlContainer = scout.HtmlComponent.get($container),
-    containerSize = htmlContainer.availableSize(),
+    containerSize = htmlContainer.availableSize({
+      exact: true
+    }),
     splitterWithDelta;
 
   containerSize = containerSize.subtract(htmlContainer.insets());

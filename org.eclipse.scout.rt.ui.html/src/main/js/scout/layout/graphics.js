@@ -117,8 +117,11 @@ scout.graphics = {
     // - Results:
     //     IE                   <div id="elem" style="height: 345.23px">     [Fractional part cut off after two digits]
     //     Firefox & Chrome     <div id="elem" style="height: 345.24px">     [Fractional part rounded to three digits]
-    prefSize.width = Math.ceil(prefSize.width);
-    prefSize.height = Math.ceil(prefSize.height);
+    var exact = scout.nvl(options.exact, false);
+    if (!exact) {
+      prefSize.width = Math.ceil(prefSize.width);
+      prefSize.height = Math.ceil(prefSize.height);
+    }
 
     return prefSize;
   },
@@ -159,16 +162,13 @@ scout.graphics = {
     var bcr = $elem[0].getBoundingClientRect();
     var size = new scout.Dimension(bcr.width, bcr.height);
     var includeMargin = scout.nvl(options.includeMargin, false);
-    var exact = scout.nvl(options.exact, false);
     if (includeMargin) {
       size.width += $elem.cssMarginX();
       size.height += $elem.cssMarginY();
     }
     // see comments in prefSize()
-    if (exact) {
-      size.width = size.width;
-      size.height = size.height;
-    } else {
+    var exact = scout.nvl(options.exact, false);
+    if (!exact) {
       size.width = Math.ceil(size.width);
       size.height = Math.ceil(size.height);
     }

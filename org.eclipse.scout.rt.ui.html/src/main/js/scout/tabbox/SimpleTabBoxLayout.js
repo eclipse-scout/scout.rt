@@ -18,9 +18,11 @@ scout.SimpleTabBoxLayout.prototype.layout = function($container) {
   var containerSize, viewContentSize,
     htmlContainer = scout.HtmlComponent.get($container),
     htmlViewContent = scout.HtmlComponent.get(this.tabBox.$viewContent),
-    tabAreaSize ;
+    tabAreaSize;
 
-  containerSize = htmlContainer.availableSize()
+  containerSize = htmlContainer.availableSize({
+      exact: true
+    })
     .subtract(htmlContainer.insets());
 
   tabAreaSize = this._layoutTabArea(containerSize);
@@ -36,7 +38,7 @@ scout.SimpleTabBoxLayout.prototype.layout = function($container) {
  */
 scout.SimpleTabBoxLayout.prototype._layoutTabArea = function(containerSize) {
   if (!this.tabBox.rendered) {
-    return new scout.Dimension(0,0);
+    return new scout.Dimension(0, 0);
   }
   // exprected the tab area is layouted dynamically only
   var htmlViewTabs = scout.HtmlComponent.get(this.tabBox.$tabArea),
@@ -44,7 +46,7 @@ scout.SimpleTabBoxLayout.prototype._layoutTabArea = function(containerSize) {
     margins = htmlViewTabs.margins();
   var size = new scout.Dimension(containerSize.width, prefSize.height + margins.top + margins.bottom);
   htmlViewTabs.setSize(size);
-  return  size;
+  return size;
 };
 
 /**
