@@ -665,11 +665,6 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     return validKey == getLookupRow().getKey() || (validKey != null && validKey.equals(getLookupRow().getKey()));
   }
 
-  @Override
-  protected final VALUE execValidateValue(VALUE rawValue) {
-    return rawValue;
-  }
-
   /**
    * Notice: This method is called from a worker originated outside the scout thread (sync into scout model thread)
    */
@@ -887,6 +882,9 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     }
   }
 
+  /**
+   * You should not override this internal method. Use <code>execValidateValue</code> instead.
+   */
   @Override
   protected VALUE validateValueInternal(VALUE rawValue) {
     VALUE validatedValue = super.validateValueInternal(rawValue);
@@ -1283,7 +1281,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     }
 
     ILookupRow<VALUE> currentLookupRow = getLookupRow();
-    if (currentLookupRow == null) {
+    if (currentLookupRow == null || !lookupRowMatchesValue(currentLookupRow, validKey)) {
       try {
         List<? extends ILookupRow<VALUE>> lookupRows = callKeyLookup(validKey);
         if (!lookupRows.isEmpty()) {
