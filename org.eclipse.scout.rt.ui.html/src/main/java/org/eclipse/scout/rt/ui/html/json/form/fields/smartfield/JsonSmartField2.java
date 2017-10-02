@@ -12,6 +12,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.SmartField2Result;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
@@ -164,19 +165,43 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
   @Override
   protected void handleUiAcceptInput(JsonEvent event) {
     JSONObject data = event.getData();
+    VALUE valueFromUi = null;
+
     // When we have a lookup row, we prefer the lookup row over the value
     if (data.has(ISmartField2.PROP_LOOKUP_ROW)) {
-      this.handleUiLookupRowChange(data);
+      valueFromUi = valueFromJsonLookupRow(data);
+      handleUiLookupRowChange(data);
     }
     else if (data.has(IValueField.PROP_VALUE)) {
+      valueFromUi = valueFromJsonValue(data);
       handleUiValueChange(data);
     }
+
+    // In case the model changes its value to something other than what the UI
+    // sends, we cannot set display text and error status. This can happen if
+    // execValidateValue is overridden.
+    VALUE valueFromModel = getModel().getValue();
+    if (!ObjectUtility.equals(valueFromUi, valueFromModel)) {
+      return;
+    }
+
     if (data.has(IValueField.PROP_DISPLAY_TEXT)) {
-      this.handleUiDisplayTextChange(data);
+      handleUiDisplayTextChange(data);
     }
     if (data.has(IValueField.PROP_ERROR_STATUS)) {
-      this.handleUiErrorStatusChange(data);
+      handleUiErrorStatusChange(data);
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected VALUE valueFromJsonValue(JSONObject data) {
+    return (VALUE) jsonToValue(data.optString(IValueField.PROP_VALUE));
+  }
+
+  protected VALUE valueFromJsonLookupRow(JSONObject data) {
+    JSONObject jsonLookupRow = data.optJSONObject(ISmartField2.PROP_LOOKUP_ROW);
+    ILookupRow<VALUE> lookupRow = lookupRowFromJson(jsonLookupRow);
+    return lookupRow == null ? null : lookupRow.getKey();
   }
 
   @Override
@@ -185,10 +210,10 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
       handleUiValueChange(data);
     }
     else if (IValueField.PROP_DISPLAY_TEXT.equals(propertyName)) {
-      this.handleUiDisplayTextChange(data);
+      handleUiDisplayTextChange(data);
     }
     else if (ISmartField2.PROP_LOOKUP_ROW.equals(propertyName)) {
-      this.handleUiLookupRowChange(data);
+      handleUiLookupRowChange(data);
     }
     else if (ISmartField2.PROP_ACTIVE_FILTER.equals(propertyName)) {
       String activeFilterString = data.optString(ISmartField2.PROP_ACTIVE_FILTER, null);
@@ -197,7 +222,7 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
       getModel().getUIFacade().setActiveFilterFromUI(activeFilter);
     }
     else if (IFormField.PROP_ERROR_STATUS.equals(propertyName)) {
-      this.handleUiErrorStatusChange(data);
+      handleUiErrorStatusChange(data);
     }
     else {
       super.handleUiPropertyChange(propertyName, data);
