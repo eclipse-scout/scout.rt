@@ -156,7 +156,7 @@ scout.DesktopLayout.prototype.calculateNavigationWidth = function(containerSize)
     // This code ensures this rule is never violated (necessary if mode is toggled programmatically rather than by the user)
     if (outline.displayStyle === scout.Tree.DisplayStyle.BREADCRUMB) {
       splitterPosition = scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH;
-    } else if (splitterPosition <= scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH) {
+    } else if (Math.floor(splitterPosition) <= scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH) {
       splitterPosition = scout.DesktopNavigation.DEFAULT_STYLE_WIDTH;
     }
   }
