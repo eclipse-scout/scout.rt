@@ -441,6 +441,7 @@ public abstract class AbstractSmartColumn2<VALUE> extends AbstractColumn<VALUE> 
     return f;
   }
 
+  @SuppressWarnings("deprecation")
   protected void mapEditorFieldProperties(IMixedSmartField<VALUE, VALUE> f) {
     super.mapEditorFieldProperties(f);
     f.setBrowseNewText(getConfiguredBrowseNewText());

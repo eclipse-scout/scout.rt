@@ -49,6 +49,7 @@ import org.mockito.Mockito;
 public class AbstractMixedSmartColumnTest {
 
   @Test
+  @SuppressWarnings("deprecation")
   public void testPrepareEditInternal() {
     AbstractMixedSmartColumn<Long, Long> column = new AbstractMixedSmartColumn<Long, Long>() {
     };
