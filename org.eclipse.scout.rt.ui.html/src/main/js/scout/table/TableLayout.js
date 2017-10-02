@@ -31,7 +31,9 @@ scout.TableLayout.prototype.layout = function($container) {
     lastColumn = visibleColumns[visibleColumns.length - 1],
     htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
     htmlContainer = this.table.htmlComp,
-    containerSize = htmlContainer.availableSize().subtract(htmlContainer.insets()),
+    containerSize = htmlContainer.availableSize({
+      exact: true
+    }).subtract(htmlContainer.insets()),
     menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
 
   if (menuBar.visible) {

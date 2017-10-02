@@ -26,11 +26,13 @@ scout.TreeLayout.prototype._layout = function($container) {
     htmlMenuBar = menuBar.htmlComp,
     htmlContainer = this.tree.htmlComp;
 
-  containerSize = htmlContainer.availableSize()
+  containerSize = htmlContainer.availableSize({
+      exact: true
+    })
     .subtract(htmlContainer.insets());
 
   if (this.tree.toggleBreadcrumbStyleEnabled) {
-    this.tree.setBreadcrumbStyleActive(containerSize.width <= this.tree.breadcrumbTogglingThreshold);
+    this.tree.setBreadcrumbStyleActive(Math.floor(containerSize.width) <= this.tree.breadcrumbTogglingThreshold);
   }
 
   heightOffset = 0;

@@ -88,7 +88,9 @@ scout.Splitter.prototype._derivePositionFromAnchor = function() {
   if (!this.$anchor) {
     return null;
   }
-  var anchorBounds = scout.graphics.offsetBounds(this.$anchor);
+  var anchorBounds = scout.graphics.offsetBounds(this.$anchor, {
+    exact: true
+  });
   if (this.splitHorizontal) {
     return anchorBounds.x + anchorBounds.width;
   } else {
