@@ -83,7 +83,12 @@ scout.NumberField.prototype._parseValue = function(displayText) {
   // if only math symbols are in the input string...
   if (this.calc.isFormula(input)) {
     // ...evaluate and return. If the display text changed, ValueField.js will make sure, the new display text is sent to the model.
-    return this.calc.evalFormula(input);
+    var calculated = this.calc.evalFormula(input);
+    if (isNaN(calculated)) {
+      // catch input that is not a valid expression (although it looks like one, e.g. "1.2.3")
+      throw new Error(displayText + ' is not a valid expression');
+    }
+    return calculated;
   }
   return this.decimalFormat.parse(displayText);
 };
