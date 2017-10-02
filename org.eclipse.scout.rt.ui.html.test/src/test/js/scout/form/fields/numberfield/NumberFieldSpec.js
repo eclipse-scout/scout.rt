@@ -330,6 +330,72 @@ describe('NumberField', function() {
       expect(field.$field[0].value).toBe('-1');
     });
 
+    it('of invalid expressions', function() {
+      field.render();
+      field.decimalFormat.decimalSeparatorChar = '.';
+      field.decimalFormat.groupingChar = '\'';
+
+      field.resetValue();
+      field.clearErrorStatus();
+      expect(field.value).toBe(null);
+      expect(field.errorStatus).toBe(null);
+      field.$field.val('1.2.3');
+      field.acceptInput();
+      expect(field.value).toBe(null);
+      expect(field.errorStatus).not.toBe(null);
+
+      field.resetValue();
+      field.clearErrorStatus();
+      expect(field.value).toBe(null);
+      expect(field.errorStatus).toBe(null);
+      field.$field.val('8+-2'); // valid
+      field.acceptInput();
+      expect(field.value).toBe(6);
+      expect(field.errorStatus).toBe(null);
+
+      field.resetValue();
+      field.clearErrorStatus();
+      field.$field.val('8+/2'); // invalid
+      field.acceptInput();
+      expect(field.value).toBe(null);
+      expect(field.errorStatus).not.toBe(null);
+
+      field.resetValue();
+      field.clearErrorStatus();
+      field.$field.val('--7');
+      field.acceptInput();
+      expect(field.value).toBe(null);
+      expect(field.errorStatus).not.toBe(null);
+
+      field.resetValue();
+      field.clearErrorStatus();
+      field.$field.val('(6');
+      field.acceptInput();
+      expect(field.value).toBe(null);
+      expect(field.errorStatus).not.toBe(null);
+
+      field.resetValue();
+      field.clearErrorStatus();
+      field.$field.val('2^2'); // not supported
+      field.acceptInput();
+      expect(field.value).toBe(null);
+      expect(field.errorStatus).not.toBe(null);
+
+      field.resetValue();
+      field.clearErrorStatus();
+      field.$field.val('1,5');
+      field.acceptInput();
+      expect(field.value).toBe(null);
+      expect(field.errorStatus).not.toBe(null);
+
+      field.resetValue();
+      field.clearErrorStatus();
+      field.$field.val('1..5');
+      field.acceptInput();
+      expect(field.value).toBe(null);
+      expect(field.errorStatus).not.toBe(null);
+    });
+
   });
 
 });
