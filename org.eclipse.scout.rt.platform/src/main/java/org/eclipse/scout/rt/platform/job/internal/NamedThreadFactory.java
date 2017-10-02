@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 /**
  * Thread factory for named threads and to handle uncaught exceptions.
@@ -50,6 +51,13 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
 
       @Override
       public void run() {
+        /*
+         * Workaround to clear inherited Mapped Diagnostic Context (MDC) which would otherwise preserve
+         * and log MDC entries which were valid when the new worker thread was created.
+         * Logback < 1.1.5 is affected (see https://jira.qos.ch/browse/LOGBACK-422)
+         */
+        MDC.clear();
+
         ThreadInfo.CURRENT.set(threadInfoRef.get());
         try {
           super.run();
