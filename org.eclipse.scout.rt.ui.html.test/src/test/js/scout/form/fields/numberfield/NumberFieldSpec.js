@@ -217,6 +217,44 @@ describe("NumberField", function() {
       expect(field.$field[0].value).toBe('-1');
     });
 
+    it('of invalid expressions', function() {
+      field.render(session.$entryPoint);
+      field.decimalFormat.decimalSeparatorChar = '.';
+      field.decimalFormat.groupingChar = '\'';
+
+      field.$field.val('1.2.3');
+      field._parse();
+      expect(field.$field[0].value).toBe('1.2.3'); // unchanged (not "NaN")
+
+      field.$field.val('8+-2'); // valid
+      field._parse();
+      expect(field.$field[0].value).toBe('6');
+
+      field.$field.val('8+/2'); // invalid
+      field._parse();
+      expect(field.$field[0].value).toBe('8+/2'); // unchanged (not "NaN")
+
+      field.$field.val('--7');
+      field._parse();
+      expect(field.$field[0].value).toBe('--7'); // unchanged (not "NaN")
+
+      field.$field.val('(6');
+      field._parse();
+      expect(field.$field[0].value).toBe('(6'); // unchanged (not "NaN")
+
+      field.$field.val('2^2'); // not supported
+      field._parse();
+      expect(field.$field[0].value).toBe('2^2'); // unchanged (not "NaN")
+
+      field.$field.val('1,5');
+      field._parse();
+      expect(field.$field[0].value).toBe('1,5'); // unchanged (not "NaN")
+
+      field.$field.val('1..5');
+      field._parse();
+      expect(field.$field[0].value).toBe('1..5'); // unchanged (not "NaN")
+    });
+
   });
 
 });

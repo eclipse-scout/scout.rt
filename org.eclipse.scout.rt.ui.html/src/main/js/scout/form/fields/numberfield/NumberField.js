@@ -86,6 +86,10 @@ scout.NumberField.prototype._parse = function() {
       // changed, ValueField.js will make sure, the new value is sent to the model.
       try {
         input = this.calc.evalFormula(input);
+        if (isNaN(input)) {
+          // catch input that is not a valid expression (although it looks like one, e.g. "1.2.3")
+          return;
+        }
         input = this.decimalFormat.format(input, false);
         this.$field.val(input);
       } catch (err) {
