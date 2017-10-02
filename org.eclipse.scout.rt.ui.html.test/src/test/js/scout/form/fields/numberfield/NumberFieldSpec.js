@@ -72,6 +72,34 @@ describe('NumberField', function() {
 
   });
 
+  describe('acceptInput', function() {
+    it('updates the display text after calculation even if the value was not changed', function() {
+      var field = helper.createField('NumberField');
+      field.render();
+      field.$field.val('6');
+      field.acceptInput();
+      expect(field.displayText).toBe('6');
+      expect(field.$field.val()).toBe('6');
+      expect(field.value).toBe(6);
+
+      // Enter invalid input
+      field.$field.val('3---3');
+      field.acceptInput();
+      expect(field.displayText).toBe('3---3');
+      expect(field.$field.val()).toBe('3---3');
+      expect(field.value).toBe(6);
+      expect(field.errorStatus instanceof scout.Status).toBe(true);
+
+      // Fix input -> Calculator will change the display text to 6 using parseValue
+      field.$field.val('3+3');
+      field.acceptInput();
+      expect(field.displayText).toBe('6');
+      expect(field.$field.val()).toBe('6');
+      expect(field.value).toBe(6);
+      expect(field.errorStatus).toBe(null);
+    });
+  });
+
   describe('setDecimalFormat', function() {
     var field;
 

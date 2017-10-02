@@ -263,7 +263,16 @@ scout.ValueField.prototype._triggerClear = function() {
 };
 
 scout.ValueField.prototype.setValue = function(value) {
-  this.setProperty('value', value);
+  // Same code as in Widget#setValue expect for the equals check
+  // -> _setValue has to be called even if the value is equal so that update display text will be executed
+  value = this._prepareProperty('value', value);
+  if (this.rendered) {
+    this._callRemoveProperty('value');
+  }
+  this._callSetProperty('value', value);
+  if (this.rendered) {
+    this._callRenderProperty('value');
+  }
 };
 
 /**

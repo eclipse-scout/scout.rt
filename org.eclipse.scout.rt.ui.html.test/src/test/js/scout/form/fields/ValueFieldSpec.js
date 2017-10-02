@@ -383,6 +383,40 @@ describe('ValueField', function() {
       expect(displayText).toBe('formatted value');
     });
 
+    it('updates the display text even if it was changed using parse value', function() {
+      var field = helper.createField('StringField');
+      field.setParser(function(text) {
+        if (text === 'Error') {
+          throw new Error();
+        } else if (text === 'Foo') {
+          return 'Bar';
+        }
+        return 'Text';
+      });
+      field.render();
+      field.$field.val('Foo');
+      field.acceptInput();
+      expect(field.displayText).toBe('Bar');
+      expect(field.$field.val()).toBe('Bar');
+      expect(field.value).toBe('Bar');
+
+      // Value stays unchanged if input is invalid
+      field.$field.val('Error');
+      field.acceptInput();
+      expect(field.displayText).toBe('Error');
+      expect(field.$field.val()).toBe('Error');
+      expect(field.value).toBe('Bar');
+      expect(field.errorStatus instanceof scout.Status).toBe(true);
+
+      // Revert back to valid value -> display text has to be updated as well even though value was not changed
+      field.$field.val('Foo');
+      field.acceptInput();
+      expect(field.displayText).toBe('Bar');
+      expect(field.$field.val()).toBe('Bar');
+      expect(field.value).toBe('Bar');
+      expect(field.errorStatus).toBe(null);
+    });
+
   });
 
   describe('validator', function() {
