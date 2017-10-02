@@ -83,12 +83,12 @@ scout.HtmlComponent.prototype.getAvailableSize = function() {
  * If it is not scrollable, the actual height is returned.<p>
  * The returned width is always the actual width because there are no horizontal scrollbars.
  */
-scout.HtmlComponent.prototype.availableSize = function() {
-  var size = this.size(),
+scout.HtmlComponent.prototype.availableSize = function(options) {
+  var size = this.size(options),
     prefSize;
 
   if (this.scrollable) {
-    prefSize = this.prefSize();
+    prefSize = this.prefSize(options);
     if (prefSize.height > size.height) {
       size.height = prefSize.height;
     }

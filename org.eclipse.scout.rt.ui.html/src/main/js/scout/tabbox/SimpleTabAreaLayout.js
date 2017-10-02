@@ -26,7 +26,9 @@ scout.SimpleTabAreaLayout.OVERFLOW_MENU_WIDTH = 30;
 scout.SimpleTabAreaLayout.prototype.layout = function($container) {
   var tabWidth,
     htmlContainer = this.tabArea.htmlComp,
-    containerSize = htmlContainer.size(),
+    containerSize = htmlContainer.size({
+      exact: true
+    }),
     $tabs = htmlContainer.$comp.find('.simple-tab'),
     numTabs = this.tabArea.getTabs().length,
     smallPrefSize = this.smallPrefSize();
@@ -43,7 +45,7 @@ scout.SimpleTabAreaLayout.prototype.layout = function($container) {
 
   // All tabs in container
   if (smallPrefSize.width <= containerSize.width) {
-    tabWidth = Math.min(scout.SimpleTabAreaLayout.TAB_WIDTH_LARGE, Math.floor(containerSize.width / numTabs));
+    tabWidth = Math.min(scout.SimpleTabAreaLayout.TAB_WIDTH_LARGE, containerSize.width / numTabs);
     // 2nd - all Tabs fit when they have small size
     $tabs.each(function() {
       $(this).outerWidth(tabWidth);

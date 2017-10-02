@@ -17,7 +17,9 @@ scout.inherits(scout.DesktopNavigationLayout, scout.AbstractLayout);
 scout.DesktopNavigationLayout.prototype.layout = function($container) {
   var bodySize, viewButtonBoxSize, viewButtonBoxPrefSize,
     htmlContainer = this.navigation.htmlComp,
-    containerSize = htmlContainer.size(),
+    containerSize = htmlContainer.size({
+      exact: true
+    }),
     htmlBody = this.navigation.htmlCompBody,
     toolBox = this.navigation.toolBox,
     viewButtonBox = this.navigation.viewButtonBox,

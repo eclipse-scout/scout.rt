@@ -131,7 +131,9 @@ scout.DesktopLayout.prototype._animate = function(animationProps, htmlComp, size
 
 scout.DesktopLayout.prototype.containerSize = function() {
   var htmlContainer = this.desktop.htmlComp,
-    containerSize = htmlContainer.availableSize();
+    containerSize = htmlContainer.availableSize({
+      exact: true
+    });
 
   return containerSize.subtract(htmlContainer.insets());
 };
