@@ -5,6 +5,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.shared.data.tile.ITileColorScheme;
 import org.eclipse.scout.rt.shared.data.tile.TileColorScheme;
 
@@ -36,6 +37,33 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
     setColorScheme(getConfiguredColorScheme());
     setCssClass(getConfiguredCssClass());
     setGridDataHints(new GridData(getConfiguredGridX(), getConfiguredGridY(), getConfiguredGridW(), getConfiguredGridH(), -1, -1, false, false, -1, -1, true, true, 0, 0));
+  }
+
+  @Override
+  public final void init() {
+    try {
+      initInternal();
+    }
+    catch (Exception e) {
+      handleInitException(e);
+    }
+  }
+
+  protected void initInternal() {
+    // nop
+  }
+
+  protected void handleInitException(Exception exception) {
+    throw new PlatformException("Exception occured while initializing tile", exception);
+  }
+
+  @Override
+  public final void dispose() {
+    disposeInternal();
+  }
+
+  protected void disposeInternal() {
+    // nop
   }
 
   /**

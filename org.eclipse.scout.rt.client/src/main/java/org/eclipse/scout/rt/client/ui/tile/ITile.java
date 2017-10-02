@@ -24,4 +24,8 @@ public interface ITile extends IWidget, IOrdered, IStyleable {
   GridData getGridDataHints();
 
   void setGridDataHints(GridData data);
+
+  void init();
+
+  void dispose();
 }

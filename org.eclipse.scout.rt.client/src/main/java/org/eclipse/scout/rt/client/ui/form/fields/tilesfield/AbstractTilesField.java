@@ -72,6 +72,22 @@ public abstract class AbstractTilesField<T extends ITiles> extends AbstractFormF
     }
   }
 
+  @Override
+  protected void initFieldInternal() {
+    super.initFieldInternal();
+    if (getTiles() != null) {
+      getTiles().initTiles();
+    }
+  }
+
+  @Override
+  protected void disposeFieldInternal() {
+    if (getTiles() != null) {
+      getTiles().disposeTiles();
+    }
+    super.disposeFieldInternal();
+  }
+
   /**
    * {@inheritDoc}
    * <p>

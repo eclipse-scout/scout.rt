@@ -88,12 +88,23 @@ public final class FormUtility {
     v.handleResult();
   }
 
+  public static void initFormFields(ICompositeField field) {
+    InitFieldVisitor v = new InitFieldVisitor();
+    field.visitFields(v);
+    v.handleResult();
+  }
+
   /**
    * Dispose the complete field tree of the form
    */
   public static void disposeFormFields(IForm form) {
     DisposeFieldVisitor v = new DisposeFieldVisitor();
     form.visitFields(v);
+  }
+
+  public static void disposeFormFields(ICompositeField field) {
+    DisposeFieldVisitor v = new DisposeFieldVisitor();
+    field.visitFields(v);
   }
 
   /**

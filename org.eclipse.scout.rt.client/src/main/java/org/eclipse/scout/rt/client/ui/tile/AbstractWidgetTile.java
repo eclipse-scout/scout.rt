@@ -56,4 +56,39 @@ public abstract class AbstractWidgetTile<T extends IWidget> extends AbstractTile
   public void setRefWidget(T widget) {
     propertySupport.setProperty(PROP_REF_WIDGET, widget);
   }
+
+  @Override
+  public void initInternal() {
+    initRefWidget();
+  }
+
+  protected void initRefWidget() {
+    initRefWidgetInternal();
+    execInitRefWidget();
+  }
+
+  protected void initRefWidgetInternal() {
+    // nop
+  }
+
+  protected void execInitRefWidget() {
+  }
+
+  @Override
+  protected void disposeInternal() {
+    disposeRefWidget();
+  }
+
+  protected void disposeRefWidget() {
+    disposeRefWidgetInternal();
+    execDisposeRefWidget();
+  }
+
+  protected void disposeRefWidgetInternal() {
+    // nop
+  }
+
+  protected void execDisposeRefWidget() {
+  }
+
 }

@@ -59,6 +59,20 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     return ConfigurationUtility.removeReplacedClasses(filtered);
   }
 
+  @Override
+  public void initTiles() {
+    for (ITile tile : getTiles()) {
+      tile.init();
+    }
+  }
+
+  @Override
+  public void disposeTiles() {
+    for (ITile tile : getTiles()) {
+      tile.dispose();
+    }
+  }
+
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(5)
   protected int getConfiguredGridColumnCount() {
