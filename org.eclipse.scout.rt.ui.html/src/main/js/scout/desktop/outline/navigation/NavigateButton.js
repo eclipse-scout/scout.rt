@@ -67,7 +67,10 @@ scout.NavigateButton.prototype._render = function($parent) {
   scout.NavigateButton.parent.prototype._render.call(this, $parent);
   this.$container.addClass('navigate-button small');
   this.$container.addClass(this._additionalCssClass);
-  this.outline.keyStrokeContext.registerKeyStroke(this);
+  // Note: Don't register with this.outline.keyStrokeContext! When the outline is collapsed,
+  // its keyStrokeContext is destroyed. The desktop's keyStrokeContext is more persistent.
+  // see also _remove().
+  this.outline.session.desktop.keyStrokeContext.registerKeyStroke(this);
 };
 
 /**
@@ -75,12 +78,12 @@ scout.NavigateButton.prototype._render = function($parent) {
  */
 scout.NavigateButton.prototype._remove = function() {
   scout.NavigateButton.parent.prototype._remove.call(this);
-  this.outline.keyStrokeContext.unregisterKeyStroke(this);
+  this.outline.session.desktop.keyStrokeContext.unregisterKeyStroke(this);
 };
 
 scout.NavigateButton.prototype._setDetailVisible = function() {
   var detailVisible = this._toggleDetail();
-  $.log.debug('show detail-' + detailVisible ? 'form' : 'table');
+  $.log.debug('show detail-' + (detailVisible ? 'form' : 'table'));
   this.outline.setDetailFormVisibleByUi(this.node, detailVisible);
 };
 
