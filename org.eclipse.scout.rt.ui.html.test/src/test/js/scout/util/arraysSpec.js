@@ -150,6 +150,49 @@ describe("scout.arrays", function() {
 
   });
 
+  describe("insertSorted", function() {
+
+    it("inserts element at correct position", function() {
+      var compareOrdered = function(a, b) {
+        return a.order < b.order ? -1 : (a.order > b.order ? 1 : 0);
+      };
+      var flat = function(arr) {
+        return arr.map(function(el) {
+          return el.text;
+        }).join(', ');
+      };
+
+      // Without duplicates
+      var arr = [];
+      scout.arrays.insertSorted(arr, { order: 10, text: 'A' }, compareOrdered);
+      scout.arrays.insertSorted(arr, { order: 20, text: 'B' }, compareOrdered);
+      scout.arrays.insertSorted(arr, { order: 5, text: 'C' }, compareOrdered);
+      expect(flat(arr)).toBe('C, A, B');
+
+      // With duplicates
+      scout.arrays.insertSorted(arr, { order: 10, text: 'D' }, compareOrdered);
+      expect(flat(arr)).toBe('C, A, D, B');
+      scout.arrays.insertSorted(arr, { order: 10, text: 'E' }, compareOrdered);
+      expect(flat(arr)).toBe('C, A, D, E, B');
+      scout.arrays.insertSorted(arr, { order: 5, text: 'F' }, compareOrdered);
+      expect(flat(arr)).toBe('C, F, A, D, E, B');
+      scout.arrays.insertSorted(arr, { order: 5, text: 'G' }, compareOrdered);
+      expect(flat(arr)).toBe('C, F, G, A, D, E, B');
+      scout.arrays.insertSorted(arr, { order: 5, text: 'H' }, compareOrdered);
+      expect(flat(arr)).toBe('C, F, G, H, A, D, E, B');
+      scout.arrays.insertSorted(arr, { order: 5, text: 'I' }, compareOrdered);
+      expect(flat(arr)).toBe('C, F, G, H, I, A, D, E, B');
+
+      // Only duplicates
+      arr = [];
+      scout.arrays.insertSorted(arr, { order: 11, text: 'X' }, compareOrdered);
+      scout.arrays.insertSorted(arr, { order: 11, text: 'Y' }, compareOrdered);
+      scout.arrays.insertSorted(arr, { order: 11, text: 'Z' }, compareOrdered);
+      expect(flat(arr)).toBe('X, Y, Z');
+    });
+
+  });
+
   describe("max", function() {
     it("returns 0 iff input contains 0", function() {
       expect(scout.arrays.max([null, 5])).toBe(5);

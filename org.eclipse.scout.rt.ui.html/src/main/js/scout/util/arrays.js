@@ -103,6 +103,40 @@ scout.arrays = {
   },
 
   /**
+   * Inserts the given element into the array according to the sort order indicated by the given comparison function.
+   *
+   * All arguments are mandatory.
+   */
+  insertSorted: function(arr, element, compareFunc) {
+    // https://en.wikipedia.org/wiki/Binary_search_algorithm
+    var left = 0;
+    var right = arr.length - 1;
+    while (left <= right) {
+      var middle = left + Math.floor((right - left) / 2);
+      var c = compareFunc(arr[middle], element);
+      if (c < 0) {
+        // Search in right half
+        left = middle + 1;
+      } else if (c > 0) {
+        // Search in left half
+        right = middle - 1;
+      } else {
+        // Found an exact match.
+        // The insertion point index is equal to the last index starting from "middle" that matches
+        // the element. This ensures a stable insertion order (because of the device-and-conquer
+        // method, "middle" might be any of the elements with the same value).
+        left = middle + 1;
+        while (left < arr.length && compareFunc(arr[left], element) === 0) {
+          left++;
+        }
+        break;
+      }
+    }
+    // "left" now contains the index to insert the element
+    arr.splice(left, 0, element);
+  },
+
+  /**
    * This function uses scout.arrays.insert() which relies on Array.prototype.splice(). Check its js-doc for details.
    */
   move: function(arr, fromIndex, toIndex) {
