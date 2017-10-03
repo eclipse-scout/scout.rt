@@ -17,6 +17,7 @@ scout.inherits(scout.TilesField, scout.FormField);
 scout.TilesField.prototype._render = function() {
   this.addContainer(this.$parent, 'tiles-field');
   this.addLabel();
+//  this.addMandatoryIndicator(); // FIXME CGU should tiles or container have an indicator?
   this.addStatus();
   if (this.tiles) {
     this._renderTiles();

@@ -36,7 +36,8 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
     setOrder(calculateViewOrder());
     setColorScheme(getConfiguredColorScheme());
     setCssClass(getConfiguredCssClass());
-    setGridDataHints(new GridData(getConfiguredGridX(), getConfiguredGridY(), getConfiguredGridW(), getConfiguredGridH(), -1, -1, false, false, -1, -1, true, true, 0, 0));
+    // FIXME CGU tiles maybe better create getConfiguredGridDataHints and enhance GridData with "with" pattern
+    setGridDataHints(new GridData(getConfiguredGridX(), getConfiguredGridY(), getConfiguredGridW(), getConfiguredGridH(), getConfiguredGridWeightX(), getConfiguredGridWeightY(), false, false, -1, -1, true, true, 0, 0));
   }
 
   @Override
@@ -144,6 +145,18 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   @Order(50)
   protected int getConfiguredGridY() {
     return -1;
+  }
+
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(60)
+  protected int getConfiguredGridWeightX() {
+    return -1;
+  }
+
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(70)
+  protected int getConfiguredGridWeightY() {
+    return 0;
   }
 
   @Override

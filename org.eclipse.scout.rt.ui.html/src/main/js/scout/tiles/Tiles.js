@@ -12,19 +12,24 @@ scout.Tiles = function() {
   scout.Tiles.parent.call(this);
   this.initialAnimationDone = false;
   this.tiles = [];
-  // GridColumnCount will be modifed by the layout, prefGridColumnCount remains unchanged
+  // GridColumnCount will be modified by the layout, prefGridColumnCount remains unchanged
   this.gridColumnCount = 4;
   this.prefGridColumnCount = this.gridColumnCount;
   this.logicalGrid = scout.create('scout.HorizontalGrid');
   this.logicalGridHGap = 15;
   this.logicalGridVGap = 20;
-  this.logicalGridRowHeight = 150;
   this.logicalGridColumnWidth = 200;
+  this.logicalGridRowHeight = 150;
   this.withPlaceholders = false;
   this.scrollable = true;
   this._addWidgetProperties(['tiles']);
 };
 scout.inherits(scout.Tiles, scout.Widget);
+
+scout.Tiles.prototype._init = function(model) {
+  scout.Tiles.parent.prototype._init.call(this, model);
+  this._setGridColumnCount(this.gridColumnCount);
+};
 
 scout.Tiles.prototype._render = function() {
   this.$container = this.$parent.appendDiv('tiles');
@@ -96,8 +101,16 @@ scout.Tiles.prototype.deleteTiles = function(tilesToDelete) {
 
 scout.Tiles.prototype.setGridColumnCount = function(gridColumnCount) {
   this.setProperty('gridColumnCount', gridColumnCount);
+};
+
+scout.Tiles.prototype._setGridColumnCount = function(gridColumnCount) {
+  this._setProperty('gridColumnCount', gridColumnCount);
   this.prefGridColumnCount = gridColumnCount;
   this.invalidateLogicalGrid();
+};
+
+scout.Tiles.prototype.setLogicalGridHGap = function(logicalGridHGap) {
+  this.setProperty('logicalGridHGap', logicalGridHGap);
 };
 
 scout.Tiles.prototype._renderLogicalGridHGap = function() {
@@ -105,18 +118,30 @@ scout.Tiles.prototype._renderLogicalGridHGap = function() {
   this.invalidateLayoutTree();
 };
 
+scout.Tiles.prototype.setLogicalGridVGap = function(logicalGridVGap) {
+  this.setProperty('logicalGridVGap', logicalGridVGap);
+};
+
 scout.Tiles.prototype._renderLogicalGridVGap = function() {
   this.htmlComp.layout.vgap = this.logicalGridVGap;
   this.invalidateLayoutTree();
 };
 
-scout.Tiles.prototype._renderLogicalGridRowHeight = function() {
-  this.htmlComp.layout.rowHeight = this.logicalGridRowHeight;
-  this.invalidateLayoutTree();
+scout.Tiles.prototype.setLogicalGridColumnWidth = function(logicalGridColumnWidth) {
+  this.setProperty('logicalGridColumnWidth', logicalGridColumnWidth);
 };
 
 scout.Tiles.prototype._renderLogicalGridColumnWidth = function() {
   this.htmlComp.layout.columnWidth = this.logicalGridColumnWidth;
+  this.invalidateLayoutTree();
+};
+
+scout.Tiles.prototype.setLogicalGridRowHeight = function(logicalGridRowHeight) {
+  this.setProperty('logicalGridRowHeight', logicalGridRowHeight);
+};
+
+scout.Tiles.prototype._renderLogicalGridRowHeight = function() {
+  this.htmlComp.layout.rowHeight = this.logicalGridRowHeight;
   this.invalidateLayoutTree();
 };
 
@@ -180,7 +205,7 @@ scout.Tiles.prototype._createPlaceholder = function() {
   });
   // If the first tile in the box is a tile with a form field, add the class with-form-fields to the placeholder because form field tiles have a mandatory indicator
   // If mixed tiles are used so that the first one is not a form field tile but others are, the class has to be added manually
-  if (this.tiles[0] && this.tiles[0].widget instanceof scout.FormField) {
+  if (this.tiles[0] && this.tiles[0] instanceof scout.FormFieldTile) {
     placeholder.addCssClass('with-form-fields');
   }
   return placeholder;

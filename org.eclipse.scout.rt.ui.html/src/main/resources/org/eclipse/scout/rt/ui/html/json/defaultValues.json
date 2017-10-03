@@ -370,7 +370,7 @@
         "w": 1,
         "h": 1,
         "weightX": -1,
-        "weightY": -1,
+        "weightY": 0,
         "useUiWidth": false,
         "useUiHeight": false,
         "horizontalAlignment": -1,
@@ -383,8 +383,10 @@
     },
     "Tiles": {
       "gridColumnCount": 4,
+      "logicalGrid": "Horizontal",
       "logicalGridHGap": 15,
       "logicalGridVGap": 20,
+      "logicalGridColumnWidth": 200,
       "logicalGridRowHeight": 150,
       "withPlaceholders": false,
       "scrollable": false

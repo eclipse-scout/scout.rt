@@ -99,6 +99,11 @@ public abstract class AbstractTilesField<T extends ITiles> extends AbstractFormF
   }
 
   @Override
+  protected boolean getConfiguredLabelVisible() {
+    return false;
+  }
+
+  @Override
   protected boolean execIsEmpty() {
     return getTiles().getTiles().isEmpty();
   }

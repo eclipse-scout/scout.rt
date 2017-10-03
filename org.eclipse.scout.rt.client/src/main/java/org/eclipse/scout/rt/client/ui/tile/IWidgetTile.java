@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.ui.tile;
 import org.eclipse.scout.rt.client.ui.IWidget;
 
 public interface IWidgetTile<T extends IWidget> extends ITile {
-  String PROP_REF_WIDGET = "refWidget";
+  String PROP_REF_WIDGET = "refWidget"; // FIXME CGU tiles rename to tileWidget
 
   T getRefWidget();
 }

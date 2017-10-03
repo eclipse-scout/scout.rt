@@ -28,6 +28,8 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   protected void initConfig() {
     super.initConfig();
     setScrollable(getConfiguredScrollable());
+    setLogicalGrid(getConfiguredLogicalGrid());
+    setLogicalGridColumnWidth(getConfiguredLogicalGridColumnWidth());
     setLogicalGridRowHeight(getConfiguredLogicalGridRowHeight());
     setLogicalGridHGap(getConfiguredLogicalGridHGap());
     setLogicalGridVGap(getConfiguredLogicalGridVGap());
@@ -80,7 +82,19 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(8)
+  protected String getConfiguredLogicalGrid() {
+    return LOGICAL_GRID_HORIZONTAL;
+  }
+
+  @ConfigProperty(ConfigProperty.INTEGER)
   @Order(10)
+  protected int getConfiguredLogicalGridColumnWidth() {
+    return 200;
+  }
+
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(15)
   protected int getConfiguredLogicalGridRowHeight() {
     return 150;
   }
@@ -92,7 +106,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(20)
+  @Order(25)
   protected int getConfiguredLogicalGridVGap() {
     return 20;
   }
@@ -117,6 +131,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   @Override
   public void setTiles(List<ITile> tiles) {
     propertySupport.setPropertyList(PROP_TILES, tiles);
+    // FIXME CGU tiles dispose old tiles and init new tiles, postInit
   }
 
   @Override
@@ -150,6 +165,36 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   }
 
   @Override
+  public String getLogicalGrid() {
+    return propertySupport.getPropertyString(PROP_LOGICAL_GRID);
+  }
+
+  @Override
+  public void setLogicalGrid(String logicalGrid) {
+    propertySupport.setPropertyString(PROP_LOGICAL_GRID, logicalGrid);
+  }
+
+  @Override
+  public int getLogicalGridColumnWidth() {
+    return propertySupport.getPropertyInt(PROP_LOGICAL_GRID_COLUMN_WIDTH);
+  }
+
+  @Override
+  public void setLogicalGridColumnWidth(int logicalGridColumnWidth) {
+    propertySupport.setPropertyInt(PROP_LOGICAL_GRID_COLUMN_WIDTH, logicalGridColumnWidth);
+  }
+
+  @Override
+  public int getLogicalGridRowHeight() {
+    return propertySupport.getPropertyInt(PROP_LOGICAL_GRID_ROW_HEIGHT);
+  }
+
+  @Override
+  public void setLogicalGridRowHeight(int logicalGridRowHeight) {
+    propertySupport.setPropertyInt(PROP_LOGICAL_GRID_ROW_HEIGHT, logicalGridRowHeight);
+  }
+
+  @Override
   public int getLogicalGridHGap() {
     return propertySupport.getPropertyInt(PROP_LOGICAL_GRID_H_GAP);
   }
@@ -167,16 +212,6 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   @Override
   public void setLogicalGridVGap(int logicalGridGap) {
     propertySupport.setPropertyInt(PROP_LOGICAL_GRID_V_GAP, logicalGridGap);
-  }
-
-  @Override
-  public int getLogicalGridRowHeight() {
-    return propertySupport.getPropertyInt(PROP_LOGICAL_GRID_ROW_HEIGHT);
-  }
-
-  @Override
-  public void setLogicalGridRowHeight(int logicalGridRowHeight) {
-    propertySupport.setPropertyInt(PROP_LOGICAL_GRID_ROW_HEIGHT, logicalGridRowHeight);
   }
 
   @Override

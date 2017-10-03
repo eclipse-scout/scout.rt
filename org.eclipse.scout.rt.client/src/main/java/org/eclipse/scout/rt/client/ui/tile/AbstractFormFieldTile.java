@@ -36,6 +36,7 @@ public abstract class AbstractFormFieldTile<T extends IFormField> extends Abstra
   protected void initRefWidgetInternal() {
     super.initRefWidgetInternal();
 
+    // FIXME CGU tiles Move to init internal, create execInitTile
     T refWidget = getRefWidget();
     if (refWidget instanceof ICompositeField) {
       FormUtility.initFormFields((ICompositeField) refWidget);
@@ -45,6 +46,7 @@ public abstract class AbstractFormFieldTile<T extends IFormField> extends Abstra
     }
     // FIXME CGU tiles postInit?
 
+    // FIXME CGU tiles move to initConfig
     // Apply tile configuration properties
     if (getConfiguredLabel() != null) {
       refWidget.setLabel(getConfiguredLabel());

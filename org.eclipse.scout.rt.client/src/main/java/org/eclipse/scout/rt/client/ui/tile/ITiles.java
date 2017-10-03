@@ -14,10 +14,15 @@ public interface ITiles extends IWidget, ITypeWithClassId {
   String PROP_GRID_COLUMN_COUNT = "gridColumnCount";
   String PROP_WITH_PLACEHOLDERS = "withPlaceholders";
   String PROP_SCROLLABLE = "scrollable";
+  String PROP_LOGICAL_GRID = "logicalGrid";
+  String PROP_LOGICAL_GRID_COLUMN_WIDTH = "logicalGridColumnWidth";
   String PROP_LOGICAL_GRID_ROW_HEIGHT = "logicalGridRowHeight";
   String PROP_LOGICAL_GRID_H_GAP = "logicalGridHGap";
   String PROP_LOGICAL_GRID_V_GAP = "logicalGridVGap";
   String PROP_CONTAINER = "container";
+
+  String LOGICAL_GRID_HORIZONTAL = "HorizontalGrid";
+  String LOGICAL_GRID_VERTICAL_SMART = "VerticalSmartGrid";
 
   void initTiles();
 
@@ -58,6 +63,23 @@ public interface ITiles extends IWidget, ITypeWithClassId {
   boolean isScrollable();
 
   void setScrollable(boolean scrollable);
+
+  String getLogicalGrid();
+
+  void setLogicalGrid(String logicalGrid);
+
+  /**
+   * @return the width in pixels to use for tiles with the logical unit "width = 1". Larger logical widths are
+   *         multiplied with this value (and gaps are added).
+   */
+  int getLogicalGridColumnWidth();
+
+  /**
+   * @param logicalGridColumnWidth
+   *          the width in pixels to use for tiles with the logical unit "width = 1". Larger logical widths are
+   *          multiplied with this value (and gaps are added).
+   */
+  void setLogicalGridColumnWidth(int logicalGridColumnWidth);
 
   /**
    * @return the height in pixels to use for tiles with the logical unit "height = 1". Larger logical heights are

@@ -51,6 +51,18 @@ public class JsonTiles<T extends ITiles> extends AbstractJsonWidget<T> {
         return getModel().isScrollable();
       }
     });
+    putJsonProperty(new JsonProperty<T>(ITiles.PROP_LOGICAL_GRID, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getLogicalGrid();
+      }
+    });
+    putJsonProperty(new JsonProperty<T>(ITiles.PROP_LOGICAL_GRID_COLUMN_WIDTH, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getLogicalGridColumnWidth();
+      }
+    });
     putJsonProperty(new JsonProperty<T>(ITiles.PROP_LOGICAL_GRID_ROW_HEIGHT, model) {
       @Override
       protected Integer modelValue() {
