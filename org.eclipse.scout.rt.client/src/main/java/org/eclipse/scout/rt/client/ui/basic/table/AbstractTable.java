@@ -235,6 +235,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return m_objectExtensions.getExtension(c);
   }
 
+  @Override
+  public final <T> T optContribution(Class<T> contribution) {
+    return m_contributionHolder.optContribution(contribution);
+  }
+
   protected void callInitializer() {
     interceptInitConfig();
   }

@@ -86,6 +86,11 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractColumn<VALUE> i
     return m_contributionHolder.getContribution(contribution);
   }
 
+  @Override
+  public final <T> T optContribution(Class<T> contribution) {
+    return m_contributionHolder.optContribution(contribution);
+  }
+
   /**
    * Configures whether the values are sorted by display text or by sort code in case of a code type class. This
    * configuration only is useful if a code type class is set (see {@link #getConfiguredCodeType()}). In case of a

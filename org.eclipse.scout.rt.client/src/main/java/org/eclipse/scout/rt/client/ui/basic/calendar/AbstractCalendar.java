@@ -115,6 +115,11 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     return m_contributionHolder.getContribution(contribution);
   }
 
+  @Override
+  public final <T> T optContribution(Class<T> contribution) {
+    return m_contributionHolder.optContribution(contribution);
+  }
+
   protected void callInitializer() {
     if (!m_initialized) {
       interceptInitConfig();

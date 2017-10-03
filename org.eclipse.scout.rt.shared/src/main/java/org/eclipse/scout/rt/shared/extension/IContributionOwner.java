@@ -43,12 +43,23 @@ public interface IContributionOwner {
    * Returns the contribution that exactly matches the given contribution class.
    *
    * @param contribution
-   *          The class of the contribution to return. Must not be null.
-   * @return The contribution instance that is exactly of the given class type.
+   *          The class of the contribution to return. Must not be {@code null}.
+   * @return The contribution instance that is exactly of the given class type. Never returns {@code null}.
    * @throws IllegalExtensionException
-   *           when no extension with the given class can be found.
+   *           if no extension with the given class can be found.
    * @throws IllegalArgumentException
-   *           when the contribution parameter is null.
+   *           if the contribution parameter is {@code null}.
    */
   <T> T getContribution(Class<T> contribution);
+
+  /**
+   * Returns the contribution that exactly matches the given contribution class.
+   *
+   * @param contribution
+   *          The class of the contribution to return. Must not be {@code null}.
+   * @return The contribution instance that is exactly of the given class type or {@code null} if it cannot be found.
+   * @throws IllegalArgumentException
+   *           if the contribution parameter is {@code null}.
+   */
+  <T> T optContribution(Class<T> contribution);
 }
