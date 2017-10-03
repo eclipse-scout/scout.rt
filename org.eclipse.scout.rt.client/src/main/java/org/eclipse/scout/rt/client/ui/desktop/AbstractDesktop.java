@@ -227,6 +227,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return m_contributionHolder.getContribution(contribution);
   }
 
+  @Override
+  public final <T> T optContribution(Class<T> contribution) {
+    return m_contributionHolder.optContribution(contribution);
+  }
+
   /*
    * Configuration
    */

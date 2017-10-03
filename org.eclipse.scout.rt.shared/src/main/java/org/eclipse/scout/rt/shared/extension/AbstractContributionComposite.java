@@ -124,28 +124,35 @@ public abstract class AbstractContributionComposite implements IContributionOwne
   }
 
   @Override
-  public <T> T getContribution(Class<T> contribution) {
+  public <T> T getContribution(final Class<T> contribution) {
+    final T result = optContribution(contribution);
+    if (result != null) {
+      return result;
+    }
+    throw new IllegalExtensionException("No contribution of type '" + contribution.getName() + "' exists for class '" + getClass().getName() + "'.");
+  }
+
+  @Override
+  public <T> T optContribution(final Class<T> contribution) {
     if (contribution == null) {
       throw new IllegalArgumentException("Contribution class must be specified.");
     }
 
     // check in my contributions
-    Object object = m_contributionsByClass.get(contribution);
+    final Object object = m_contributionsByClass.get(contribution);
     if (object != null) {
       return contribution.cast(object);
     }
 
     // check nested contributions
-    for (Object o : m_contributionsByClass.values()) {
+    for (final Object o : m_contributionsByClass.values()) {
       if (o instanceof IContributionOwner) {
-        IContributionOwner comp = (IContributionOwner) o;
-        object = comp.getContribution(contribution);
-        if (object != null) {
-          return contribution.cast(object);
+        final T result = ((IContributionOwner) o).optContribution(contribution);
+        if (result != null) {
+          return result;
         }
       }
     }
-
-    throw new IllegalExtensionException("No contribution of type '" + contribution.getName() + "' exists for class '" + getClass().getName() + "'.");
+    return null;
   }
 }

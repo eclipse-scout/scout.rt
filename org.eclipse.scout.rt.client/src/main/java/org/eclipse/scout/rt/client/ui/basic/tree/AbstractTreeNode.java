@@ -162,6 +162,11 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     return m_contributionHolder.getContribution(contribution);
   }
 
+  @Override
+  public final <T> T optContribution(Class<T> contribution) {
+    return m_contributionHolder.optContribution(contribution);
+  }
+
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(20)
   protected boolean getConfiguredLeaf() {

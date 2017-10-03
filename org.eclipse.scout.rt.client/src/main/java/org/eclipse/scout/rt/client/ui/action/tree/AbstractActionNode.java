@@ -59,6 +59,11 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
     return m_contributionHolder.getContribution(contribution);
   }
 
+  @Override
+  public final <TYPE> TYPE optContribution(Class<TYPE> contribution) {
+    return m_contributionHolder.optContribution(contribution);
+  }
+
   /*
    * Configuration
    */

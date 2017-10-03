@@ -165,6 +165,11 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return m_contributionHolder.getContribution(contribution);
   }
 
+  @Override
+  public final <T> T optContribution(Class<T> contribution) {
+    return m_contributionHolder.optContribution(contribution);
+  }
+
   protected final void callInitializer() {
     if (isInitialized()) {
       return;
