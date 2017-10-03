@@ -184,24 +184,29 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
   @Override
   protected void handleUiAcceptInput(JsonEvent event) {
     JSONObject data = event.getData();
+    boolean valueSet = false;
     VALUE valueFromUi = null;
 
     // When we have a lookup row, we prefer the lookup row over the value
     if (data.has(ISmartField.PROP_LOOKUP_ROW)) {
       valueFromUi = valueFromJsonLookupRow(data);
       handleUiLookupRowChange(data);
+      valueSet = true;
     }
     else if (data.has(IValueField.PROP_VALUE)) {
       valueFromUi = valueFromJsonValue(data);
       handleUiValueChange(data);
+      valueSet = true;
     }
 
     // In case the model changes its value to something other than what the UI
     // sends, we cannot set display text and error status. This can happen if
     // execValidateValue is overridden.
-    VALUE valueFromModel = getModel().getValue();
-    if (!ObjectUtility.equals(valueFromUi, valueFromModel)) {
-      return;
+    if (valueSet) {
+      VALUE valueFromModel = getModel().getValue();
+      if (!ObjectUtility.equals(valueFromUi, valueFromModel)) {
+        return;
+      }
     }
 
     if (data.has(IValueField.PROP_DISPLAY_TEXT)) {
