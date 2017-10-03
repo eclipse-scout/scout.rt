@@ -63,6 +63,11 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
     return m_contributionHolder.getContribution(contribution);
   }
 
+  @Override
+  public final <TYPE> TYPE optContribution(Class<TYPE> contribution) {
+    return m_contributionHolder.optContribution(contribution);
+  }
+
   /**
    * Configured
    */

@@ -168,6 +168,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return m_contributionHolder.getContribution(contribution);
   }
 
+  @Override
+  public final <T> T optContribution(Class<T> contribution) {
+    return m_contributionHolder.optContribution(contribution);
+  }
+
   /*
    * Configuration
    */
