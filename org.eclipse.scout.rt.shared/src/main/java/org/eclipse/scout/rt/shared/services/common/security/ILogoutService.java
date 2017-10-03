@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.shared.TunnelToServer;
 /**
  * Support service to explicitly close a session and release cached sessions, resources, and credentials
  */
-@FunctionalInterface
 @TunnelToServer
 public interface ILogoutService extends IService {
 

@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.shared.ISession;
  * @since 5.1
  * @see Preferences#get(ISession, String)
  */
-@FunctionalInterface
 public interface IUserPreferencesService extends IService {
 
   /**

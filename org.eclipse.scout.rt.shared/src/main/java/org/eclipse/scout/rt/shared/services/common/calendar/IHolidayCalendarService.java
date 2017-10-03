@@ -16,7 +16,6 @@ import java.util.Set;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
-@FunctionalInterface
 @TunnelToServer
 public interface IHolidayCalendarService extends ICalendarService {
 

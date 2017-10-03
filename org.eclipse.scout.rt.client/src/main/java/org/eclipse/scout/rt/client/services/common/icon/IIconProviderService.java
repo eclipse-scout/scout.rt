@@ -15,7 +15,6 @@ import org.eclipse.scout.rt.platform.service.IService;
 /**
  * see {@link IconLocator#instance()}
  */
-@FunctionalInterface
 public interface IIconProviderService extends IService {
 
   /**
