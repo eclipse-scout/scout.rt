@@ -718,7 +718,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
 
   protected void handleUiAppLinkAction(JsonEvent event) {
     IColumn column = extractColumn(event.getData());
-    String ref = event.getData().getString("ref");
+    String ref = event.getData().optString("ref", null);
     if (column != null) {
       getModel().getUIFacade().setContextColumnFromUI(column);
     }

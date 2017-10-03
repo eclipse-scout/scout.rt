@@ -119,7 +119,7 @@ scout.HtmlField.prototype._renderScrollToAnchor = function() {
 };
 
 scout.HtmlField.prototype._onAppLinkAction = function(event) {
-  var $target = $(event.target);
+  var $target = $(event.delegateTarget);
   var ref = $target.data('ref');
   this.triggerAppLinkAction(ref);
 };

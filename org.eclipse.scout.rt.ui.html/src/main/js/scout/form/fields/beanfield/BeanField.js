@@ -87,7 +87,7 @@ scout.BeanField.prototype.triggerAppLinkAction = function(ref) {
 };
 
 scout.BeanField.prototype._onAppLinkAction = function(event) {
-  var $target = $(event.target);
+  var $target = $(event.delegateTarget);
   var ref = $target.data('ref');
   this.triggerAppLinkAction(ref);
 };
