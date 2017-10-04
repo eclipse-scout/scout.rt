@@ -222,7 +222,11 @@ public final class IOUtility {
         byte[] buf = new byte[len];
         int count = 0;
         while (count < len) {
-          count += in.read(buf, count, len - count);
+          int read = in.read(buf, count, len - count);
+          if (read < 0) {
+            return Arrays.copyOf(buf, count);
+          }
+          count += read;
         }
         return buf;
       }
@@ -316,7 +320,7 @@ public final class IOUtility {
    *
    * @param in
    * @param len
-   *          optional known length in bytes or -1 if unknown
+   *          optional known length in characters or -1 if unknown
    * @return the content string
    */
   public static String readString(Reader in, int len) {
@@ -325,7 +329,11 @@ public final class IOUtility {
         char[] buf = new char[len];
         int count = 0;
         while (count < len) {
-          count += in.read(buf, count, len - count);
+          int read = in.read(buf, count, len - count);
+          if (read < 0) {
+            return new String(buf, 0, count);
+          }
+          count += read;
         }
         return new String(buf);
       }
