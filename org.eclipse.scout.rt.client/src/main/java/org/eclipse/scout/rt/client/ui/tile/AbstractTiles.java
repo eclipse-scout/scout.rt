@@ -27,14 +27,16 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   @Override
   protected void initConfig() {
     super.initConfig();
-    setScrollable(getConfiguredScrollable());
+    setGridColumnCount(getConfiguredGridColumnCount());
     setLogicalGrid(getConfiguredLogicalGrid());
     setLogicalGridColumnWidth(getConfiguredLogicalGridColumnWidth());
     setLogicalGridRowHeight(getConfiguredLogicalGridRowHeight());
     setLogicalGridHGap(getConfiguredLogicalGridHGap());
     setLogicalGridVGap(getConfiguredLogicalGridVGap());
+    // getConfiguredMaxContentWidth should not be moved up so that calculatePreferredWidth may be used inside getConfiguredMaxContentWidth()
+    setMaxContentWidth(getConfiguredMaxContentWidth());
+    setScrollable(getConfiguredScrollable());
     setWithPlaceholders(getConfiguredWithPlaceholders());
-    setGridColumnCount(getConfiguredGridColumnCount());
 
     OrderedCollection<ITile> tiles = new OrderedCollection<>();
     injectTilesInternal(tiles);
@@ -106,16 +108,35 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     return 150;
   }
 
+  /**
+   * Configures the gap between two logical grid columns.
+   */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(20)
   protected int getConfiguredLogicalGridHGap() {
     return 15;
   }
 
+  /**
+   * Configures the gap between two logical grid rows.
+   */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(25)
   protected int getConfiguredLogicalGridVGap() {
     return 20;
+  }
+
+  /**
+   * Configures the maximum width in pixels to use for the content. The maximum is disabled if this value is
+   * <code>&lt;= 0</code>.
+   * <p>
+   * You may use {@link #calculatePreferredWidth()} if you want to limit the width based on the column count, column
+   * width and column gap.
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(290)
+  protected int getConfiguredMaxContentWidth() {
+    return -1;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -219,6 +240,24 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   @Override
   public void setLogicalGridVGap(int logicalGridGap) {
     propertySupport.setPropertyInt(PROP_LOGICAL_GRID_V_GAP, logicalGridGap);
+  }
+
+  @Override
+  public int getMaxContentWidth() {
+    return propertySupport.getPropertyInt(PROP_MAX_CONTENT_WIDTH);
+  }
+
+  @Override
+  public void setMaxContentWidth(int maxContentWidth) {
+    propertySupport.setPropertyInt(PROP_MAX_CONTENT_WIDTH, maxContentWidth);
+  }
+
+  /**
+   * @returns the preferred width based on grid column count, column width and horizontal gap. Typically used to set the
+   *          max content width.
+   */
+  protected int calculatePreferredWidth() {
+    return getGridColumnCount() * getLogicalGridColumnWidth() + (getGridColumnCount() - 1) * getLogicalGridHGap();
   }
 
   @Override

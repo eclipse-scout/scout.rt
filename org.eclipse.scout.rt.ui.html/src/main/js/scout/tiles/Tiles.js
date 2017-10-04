@@ -20,6 +20,7 @@ scout.Tiles = function() {
   this.logicalGridVGap = 20;
   this.logicalGridColumnWidth = 200;
   this.logicalGridRowHeight = 150;
+  this.maxContentWidth = -1;
   this.withPlaceholders = false;
   this.scrollable = true;
   this._addWidgetProperties(['tiles']);
@@ -48,6 +49,7 @@ scout.Tiles.prototype._renderProperties = function() {
   this._renderLogicalGridVGap();
   this._renderLogicalGridRowHeight();
   this._renderLogicalGridColumnWidth();
+  this._renderMaxContentWidth();
   this._renderScrollable();
 };
 
@@ -143,6 +145,19 @@ scout.Tiles.prototype.setLogicalGridRowHeight = function(logicalGridRowHeight) {
 scout.Tiles.prototype._renderLogicalGridRowHeight = function() {
   this.htmlComp.layout.rowHeight = this.logicalGridRowHeight;
   this.invalidateLayoutTree();
+};
+
+scout.Tiles.prototype.setMaxContentWidth = function(maxContentWidth) {
+  this.setProperty('maxContentWidth', maxContentWidth);
+};
+
+scout.Tiles.prototype._renderMaxContentWidth = function() {
+  this.htmlComp.layout.maxContentWidth = this.maxContentWidth;
+  this.invalidateLayoutTree();
+};
+
+scout.Tiles.prototype.setScrollable = function(scrollable) {
+  this.setProperty('scrollable', scrollable);
 };
 
 scout.Tiles.prototype._renderScrollable = function() {

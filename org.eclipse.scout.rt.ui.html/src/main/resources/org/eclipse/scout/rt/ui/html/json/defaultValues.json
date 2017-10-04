@@ -388,6 +388,7 @@
       "logicalGridVGap": 20,
       "logicalGridColumnWidth": 200,
       "logicalGridRowHeight": 150,
+      "maxContentWidth": -1,
       "withPlaceholders": false,
       "scrollable": false
     }

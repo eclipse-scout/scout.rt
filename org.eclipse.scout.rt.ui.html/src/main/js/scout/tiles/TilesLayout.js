@@ -10,13 +10,15 @@
  ******************************************************************************/
 scout.TilesLayout = function(tiles) {
   scout.TilesLayout.parent.call(this, tiles);
+  this.maxContentWidth = -1;
 };
 scout.inherits(scout.TilesLayout, scout.LogicalGridLayout);
 
 scout.TilesLayout.prototype.layout = function($container) {
   var contentFits;
+  var htmlComp = this.widget.htmlComp;
   // Animate only once initially but animate every time on resize
-  var animated = this.widget.htmlComp.layouted || !this.widget.initialAnimationDone;
+  var animated = htmlComp.layouted || !this.widget.initialAnimationDone;
 
   // Store the current position of the tiles
   this.widget.tiles.forEach(function(tile, i) {
@@ -25,11 +27,13 @@ scout.TilesLayout.prototype.layout = function($container) {
     tile.$container.data('oldTop', pos.y);
   }, this);
 
+  this._updateMaxContentWidth();
   this._resetGridColumnCount();
 
   this.widget.invalidateLayout();
   this.widget.invalidateLogicalGrid(false);
-  if (this.widget.htmlComp.prefSize().width <= $container.width()) {
+  var containerWidth = $container.outerWidth();
+  if (htmlComp.prefSize().width <= containerWidth) {
     this._layout($container);
     contentFits = true;
   }
@@ -39,7 +43,7 @@ scout.TilesLayout.prototype.layout = function($container) {
     this.widget.gridColumnCount--;
     this.widget.invalidateLayout();
     this.widget.invalidateLogicalGrid(false);
-    if (this.widget.htmlComp.prefSize().width <= $container.width()) {
+    if (htmlComp.prefSize().width <= containerWidth) {
       this._layout($container);
       contentFits = true;
     }
@@ -109,6 +113,29 @@ scout.TilesLayout.prototype._updateScrollbar = function() {
       break;
     }
     htmlComp = htmlComp.getParent();
+  }
+};
+
+/**
+ * When max. content width should be enforced, add a padding to the container if necessary
+ * (to make sure, scrollbar position is not changed)
+ */
+scout.TilesLayout.prototype._updateMaxContentWidth = function() {
+  if (this.maxContentWidth <= 0) {
+    return;
+  }
+  var htmlComp = this.widget.htmlComp;
+  var containerSize = htmlComp.size();
+  // Reset padding-right manually set by layout
+  htmlComp.$comp.cssPaddingRight(null);
+  // Measure current padding-right (by CSS)
+  var cssPaddingRight = htmlComp.$comp.cssPaddingRight();
+  // Calculate difference between current with and max. width
+  var oldWidth = containerSize.width;
+  var newWidth = Math.min(containerSize.width, this.maxContentWidth);
+  var diff = oldWidth - newWidth - htmlComp.$comp.cssPaddingLeft() - htmlComp.$comp.cssBorderWidthX();
+  if (diff > cssPaddingRight) {
+    htmlComp.$comp.cssPaddingRight(diff);
   }
 };
 

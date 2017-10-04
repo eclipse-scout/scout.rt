@@ -12,9 +12,6 @@ scout.GroupBoxLayout = function(groupBox) {
   scout.GroupBoxLayout.parent.call(this);
   this._groupBox = groupBox;
   this._statusWidth = scout.HtmlEnvironment.fieldStatusWidth;
-
-  // The maximum width for the group box body (null = no max. width)
-  this.maxContentWidth = null;
 };
 scout.inherits(scout.GroupBoxLayout, scout.AbstractLayout);
 
@@ -56,22 +53,6 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
     } else {
       titleMarginX = $groupBoxTitle.cssMarginX() + statusWidth;
       $groupBoxTitle.cssWidth('calc(100% - ' + titleMarginX + 'px)');
-    }
-  }
-
-  // When max. content width should be enforced, add a padding to the group box body
-  // if necessary (to make sure, scrollbar position is not changed)
-  if (this.maxContentWidth > 0) {
-    // Reset padding-right manually set by layout
-    htmlGbBody.$comp.css('padding-right', '');
-    // Measure current padding-right (by CSS)
-    var cssPaddingRight = htmlGbBody.$comp.cssPxValue('padding-right');
-    // Calculate difference between current body with and max. width
-    var oldWidth = gbBodySize.width;
-    var newWidth = Math.min(gbBodySize.width, this.maxContentWidth);
-    var diff = oldWidth - newWidth;
-    if (diff > cssPaddingRight) {
-      htmlGbBody.$comp.css('padding-right', diff);
     }
   }
 

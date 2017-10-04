@@ -19,6 +19,7 @@ public interface ITiles extends IWidget, ITypeWithClassId {
   String PROP_LOGICAL_GRID_ROW_HEIGHT = "logicalGridRowHeight";
   String PROP_LOGICAL_GRID_H_GAP = "logicalGridHGap";
   String PROP_LOGICAL_GRID_V_GAP = "logicalGridVGap";
+  String PROP_MAX_CONTENT_WIDTH = "maxContentWidth";
   String PROP_CONTAINER = "container";
 
   String LOGICAL_GRID_HORIZONTAL = "HorizontalGrid";
@@ -103,12 +104,12 @@ public interface ITiles extends IWidget, ITypeWithClassId {
 
   /**
    * @param logicalGridGap
-   *          the horizontal gap in pixels to use between single tiles.
+   *          the horizontal gap in pixels to use between two logical grid columns.
    */
   void setLogicalGridHGap(int logicalGridGap);
 
   /**
-   * @return the vertical gap in pixels to use between single tiles.
+   * @return the vertical gap in pixels to use between two logical grid rows.
    */
   int getLogicalGridVGap();
 
@@ -117,6 +118,19 @@ public interface ITiles extends IWidget, ITypeWithClassId {
    *          the vertical gap in pixels to use between single tiles.
    */
   void setLogicalGridVGap(int logicalGridGap);
+
+  /**
+   * @return the maximum width in pixels to use for the content. The maximum is disabled if this value is
+   *         <code>&lt;= 0</code>.
+   */
+  int getMaxContentWidth();
+
+  /**
+   * @param maxContentWidth
+   *          the maximum width in pixels to use for the content. The maximum is disabled if this value is
+   *          <code>&lt;= 0</code>
+   */
+  void setMaxContentWidth(int logicalGridMaxContentWidth);
 
   <T extends ITile> T getTileByClass(Class<T> tileClass);
 

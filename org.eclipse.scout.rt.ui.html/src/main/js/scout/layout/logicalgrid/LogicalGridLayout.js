@@ -71,7 +71,9 @@ scout.LogicalGridLayout.prototype.validateLayout = function($container) {
     rowHeight: this.rowHeight,
     columnWidth: this.columnWidth
   });
-  $.log.trace('(LogicalGridLayout#validateLayout) $container=' + scout.HtmlComponent.get($container).debug());
+  if ($.log.isTraceEnabled()) {
+    $.log.trace('(LogicalGridLayout#validateLayout) $container=' + scout.HtmlComponent.get($container).debug());
+  }
 };
 
 scout.LogicalGridLayout.prototype.layout = function($container) {
@@ -86,7 +88,9 @@ scout.LogicalGridLayout.prototype._layout = function($container) {
   if (this.minWidthInPixel > 0 && containerSize.width < this.minWidthInPixel) {
     containerSize.width = this.minWidthInPixel;
   }
-  $.log.trace('(LogicalGridLayout#layout) container ' + htmlContainer.debug() + ' size=' + containerSize + ' insets=' + containerInsets);
+  if ($.log.isTraceEnabled()) {
+    $.log.trace('(LogicalGridLayout#layout) container ' + htmlContainer.debug() + ' size=' + containerSize + ' insets=' + containerInsets);
+  }
   var cellBounds = this.info.layoutCellBounds(containerSize, containerInsets);
 
   // Set bounds of components
@@ -142,7 +146,9 @@ scout.LogicalGridLayout.prototype._layout = function($container) {
         }
       }
     }
-    $.log.trace('(LogicalGridLayout#layout) comp=' + htmlComp.debug() + ' bounds=' + r);
+    if ($.log.isTraceEnabled()) {
+      $.log.trace('(LogicalGridLayout#layout) comp=' + htmlComp.debug() + ' bounds=' + r);
+    }
     htmlComp.setBounds(r);
   }
 };

@@ -81,5 +81,11 @@ public class JsonTiles<T extends ITiles> extends AbstractJsonWidget<T> {
         return getModel().getLogicalGridVGap();
       }
     });
+    putJsonProperty(new JsonProperty<T>(ITiles.PROP_MAX_CONTENT_WIDTH, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getMaxContentWidth();
+      }
+    });
   }
 }
