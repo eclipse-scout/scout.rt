@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,10 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.tile;
 
-import org.eclipse.scout.rt.client.ui.IWidget;
+import org.eclipse.scout.rt.client.ui.tile.TileChains.TileDisposeTileChain;
+import org.eclipse.scout.rt.client.ui.tile.TileChains.TileInitTileChain;
+import org.eclipse.scout.rt.shared.extension.IExtension;
 
-public interface IWidgetTile<T extends IWidget> extends ITile {
-  String PROP_TILE_WIDGET = "tileWidget";
+public interface ITileExtension<OWNER extends AbstractTile> extends IExtension<OWNER> {
 
-  T getTileWidget();
+  void execInitTile(TileInitTileChain chain);
+
+  void execDisposeTile(TileDisposeTileChain chain);
 }

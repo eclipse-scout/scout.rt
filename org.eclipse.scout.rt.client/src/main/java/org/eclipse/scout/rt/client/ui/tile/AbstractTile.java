@@ -1,25 +1,35 @@
 package org.eclipse.scout.rt.client.ui.tile;
 
+import java.util.List;
+
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
+import org.eclipse.scout.rt.client.ui.tile.TileChains.TileDisposeTileChain;
+import org.eclipse.scout.rt.client.ui.tile.TileChains.TileInitTileChain;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.shared.data.tile.ITileColorScheme;
 import org.eclipse.scout.rt.shared.data.tile.TileColorScheme;
+import org.eclipse.scout.rt.shared.extension.AbstractExtension;
+import org.eclipse.scout.rt.shared.extension.IExtension;
+import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 
 /**
  * @since 7.1
  */
 public abstract class AbstractTile extends AbstractWidget implements ITile {
 
+  private final ObjectExtensions<AbstractTile, ITileExtension<? extends AbstractTile>> m_objectExtensions;
+
   public AbstractTile() {
     this(true);
   }
 
   public AbstractTile(boolean callInitializer) {
-    super();
+    super(false);
+    m_objectExtensions = new ObjectExtensions<>(this, false);
     if (callInitializer) {
       callInitializer();
     }
@@ -27,7 +37,11 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
 
   @Override
   protected void callInitializer() {
-    initConfig();
+    interceptInitConfig();
+  }
+
+  protected final void interceptInitConfig() {
+    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), this::initConfig);
   }
 
   @Override
@@ -41,9 +55,15 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   }
 
   @Override
+  public void postInitConfig() {
+    // NOP
+  }
+
+  @Override
   public final void init() {
     try {
       initInternal();
+      interceptInitTile();
     }
     catch (Exception e) {
       handleInitException(e);
@@ -58,13 +78,22 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
     throw new PlatformException("Exception occured while initializing tile", exception);
   }
 
+  protected void execInitTile() {
+    // NOP
+  }
+
   @Override
   public final void dispose() {
     disposeInternal();
+    interceptDisposeTile();
   }
 
   protected void disposeInternal() {
-    // nop
+    // NOP
+  }
+
+  protected void execDisposeTile() {
+    // NOP
   }
 
   /**
@@ -197,5 +226,53 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   @Override
   public void setCssClass(String cssClass) {
     propertySupport.setPropertyString(PROP_CSS_CLASS, cssClass);
+  }
+
+  @Override
+  public final List<? extends ITileExtension<? extends AbstractTile>> getAllExtensions() {
+    return m_objectExtensions.getAllExtensions();
+  }
+
+  @Override
+  public <T extends IExtension<?>> T getExtension(Class<T> c) {
+    return m_objectExtensions.getExtension(c);
+  }
+
+  protected final void interceptDisposeTile() {
+    List<? extends ITileExtension<? extends AbstractTile>> extensions = getAllExtensions();
+    TileDisposeTileChain chain = new TileDisposeTileChain(extensions);
+    chain.execDisposeTile();
+  }
+
+  protected final void interceptInitTile() {
+    List<? extends ITileExtension<? extends AbstractTile>> extensions = getAllExtensions();
+    TileInitTileChain chain = new TileInitTileChain(extensions);
+    chain.execInitTile();
+  }
+
+  protected ITileExtension<? extends AbstractTile> createLocalExtension() {
+    return new LocalTileExtension<>(this);
+  }
+
+  /**
+   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
+   * any further chain elements.
+   */
+  protected static class LocalTileExtension<OWNER extends AbstractTile> extends AbstractExtension<OWNER> implements ITileExtension<OWNER> {
+
+    public LocalTileExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execDisposeTile(TileDisposeTileChain chain) {
+      getOwner().execDisposeTile();
+    }
+
+    @Override
+    public void execInitTile(TileInitTileChain chain) {
+      getOwner().execInitTile();
+    }
+
   }
 }

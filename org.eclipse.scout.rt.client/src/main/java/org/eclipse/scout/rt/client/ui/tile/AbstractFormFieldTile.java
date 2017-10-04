@@ -27,52 +27,63 @@ public abstract class AbstractFormFieldTile<T extends IFormField> extends Abstra
   }
 
   @Override
-  protected void handleInitException(Exception exception) {
-    LOG.error("Error while initializing tile {}: {}", getRefWidget(), exception.getMessage(), exception);
-    getRefWidget().addErrorStatus(TEXTS.get("ErrorWhileLoadingData"));
+  protected void initConfig() {
+    super.initConfig();
+    initTileWidgetConfig();
   }
 
   @Override
-  protected void initRefWidgetInternal() {
-    super.initRefWidgetInternal();
+  protected void postInitTileWidgetConfig() {
+    getTileWidget().postInitConfig();
+  }
 
-    // FIXME CGU tiles Move to init internal, create execInitTile
-    T refWidget = getRefWidget();
-    if (refWidget instanceof ICompositeField) {
-      FormUtility.initFormFields((ICompositeField) refWidget);
-    }
-    else {
-      refWidget.initField();
-    }
-    // FIXME CGU tiles postInit?
+  @Override
+  protected void handleInitException(Exception exception) {
+    LOG.error("Error while initializing tile {}: {}", getTileWidget(), exception.getMessage(), exception);
+    getTileWidget().addErrorStatus(TEXTS.get("ErrorWhileLoadingData"));
+  }
 
-    // FIXME CGU tiles move to initConfig
+  protected void initTileWidgetConfig() {
     // Apply tile configuration properties
+    T widget = getTileWidget();
     if (getConfiguredLabel() != null) {
-      refWidget.setLabel(getConfiguredLabel());
+      widget.setLabel(getConfiguredLabel());
     }
     if (getConfiguredLabelVisible() != null) {
-      refWidget.setLabelVisible(getConfiguredLabelVisible());
+      widget.setLabelVisible(getConfiguredLabelVisible());
     }
 
     // Adjust style
-    refWidget.setLabelPosition(IFormField.LABEL_POSITION_TOP);
-    refWidget.setMandatory(false);
-    refWidget.setStatusVisible(false);
+    widget.setLabelPosition(IFormField.LABEL_POSITION_TOP);
+    widget.setMandatory(false);
+    widget.setStatusVisible(false);
     // Pull up status into label, let field fill entire tile
-    refWidget.setStatusPosition(IFormField.STATUS_POSITION_TOP);
+    widget.setStatusPosition(IFormField.STATUS_POSITION_TOP);
   }
 
   @Override
-  protected void disposeRefWidgetInternal() {
-    T refWidget = getRefWidget();
-    if (refWidget instanceof ICompositeField) {
-      FormUtility.initFormFields((ICompositeField) refWidget);
+  protected void initTileWidget() {
+    super.initTileWidget();
+
+    T widget = getTileWidget();
+    if (widget instanceof ICompositeField) {
+      FormUtility.initFormFields((ICompositeField) widget);
     }
     else {
-      refWidget.disposeField();
+      widget.initField();
     }
-    super.disposeRefWidgetInternal();
+  }
+
+  @Override
+  protected void disposeTileWidget() {
+    T widget = getTileWidget();
+    if (widget instanceof ICompositeField) {
+      FormUtility.initFormFields((ICompositeField) widget);
+    }
+    else {
+      widget.disposeField();
+    }
+    super.disposeTileWidget();
   }
 
   // ----- Configuration delegated to tile field: -----

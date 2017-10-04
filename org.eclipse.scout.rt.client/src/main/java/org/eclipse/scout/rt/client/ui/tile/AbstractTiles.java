@@ -69,6 +69,13 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   }
 
   @Override
+  public void postInitTilesConfig() {
+    for (ITile tile : getTiles()) {
+      tile.postInitConfig();
+    }
+  }
+
+  @Override
   public void disposeTiles() {
     for (ITile tile : getTiles()) {
       tile.dispose();

@@ -5,11 +5,12 @@ import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.shared.data.tile.ITileColorScheme;
+import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 
 /**
  * @since 7.1
  */
-public interface ITile extends IWidget, IOrdered, IStyleable {
+public interface ITile extends IWidget, IOrdered, IStyleable, IExtensibleObject {
   String PROP_ORDER = "order";
   String PROP_COLOR_SCHEME = "colorScheme";
   String PROP_GRID_DATA_HINTS = "gridDataHints";
@@ -26,6 +27,8 @@ public interface ITile extends IWidget, IOrdered, IStyleable {
   void setGridDataHints(GridData data);
 
   void init();
+
+  void postInitConfig();
 
   void dispose();
 }

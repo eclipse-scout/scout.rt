@@ -81,6 +81,14 @@ public abstract class AbstractTilesField<T extends ITiles> extends AbstractFormF
   }
 
   @Override
+  public void postInitConfig() {
+    super.postInitConfig();
+    if (getTiles() != null) {
+      getTiles().postInitTilesConfig();
+    }
+  }
+
+  @Override
   protected void disposeFieldInternal() {
     if (getTiles() != null) {
       getTiles().disposeTiles();

@@ -26,6 +26,8 @@ public interface ITiles extends IWidget, ITypeWithClassId {
 
   void initTiles();
 
+  void postInitTilesConfig();
+
   void disposeTiles();
 
   /**

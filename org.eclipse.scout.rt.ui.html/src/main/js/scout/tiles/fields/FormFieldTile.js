@@ -20,8 +20,8 @@ scout.FormFieldTile.prototype._renderProperties = function() {
 
 scout.FormFieldTile.prototype._renderFieldLabelVisible = function() {
   // Special handling for browser field (remove padding when label is invisible)
-  if (this.refWidget instanceof scout.BrowserField) {
-    this.refWidget.$container.toggleClass('no-padding', !this.refWidget.labelVisible && !this.refWidget.errorStatus);
+  if (this.tileWidget instanceof scout.BrowserField) {
+    this.tileWidget.$container.toggleClass('no-padding', !this.tileWidget.labelVisible && !this.tileWidget.errorStatus);
   }
 };
 

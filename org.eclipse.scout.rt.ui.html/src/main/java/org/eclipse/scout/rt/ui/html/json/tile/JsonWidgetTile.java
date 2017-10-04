@@ -23,10 +23,10 @@ public class JsonWidgetTile<T extends IWidgetTile> extends JsonTile<T> {
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonAdapterProperty<T>(IWidgetTile.PROP_REF_WIDGET, model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<T>(IWidgetTile.PROP_TILE_WIDGET, model, getUiSession()) {
       @Override
       protected IWidget modelValue() {
-        return getModel().getRefWidget();
+        return getModel().getTileWidget();
       }
     });
   }
