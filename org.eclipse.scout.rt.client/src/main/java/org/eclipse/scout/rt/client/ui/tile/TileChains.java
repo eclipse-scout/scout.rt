@@ -61,4 +61,20 @@ public final class TileChains {
     }
   }
 
+  public static class TileLoadDataTileChain extends AbstractTileChain {
+
+    public TileLoadDataTileChain(List<? extends ITileExtension<? extends AbstractTile>> extensions) {
+      super(extensions);
+    }
+
+    public void execLoadData() {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(ITileExtension<? extends AbstractTile> next) {
+          next.execLoadData(TileLoadDataTileChain.this);
+        }
+      };
+      callChain(methodInvocation);
+    }
+  }
 }

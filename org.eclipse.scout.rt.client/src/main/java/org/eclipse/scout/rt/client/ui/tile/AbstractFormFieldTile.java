@@ -5,6 +5,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +43,18 @@ public abstract class AbstractFormFieldTile<T extends IFormField> extends Abstra
   protected void handleInitException(Exception exception) {
     LOG.error("Error while initializing tile {}: {}", getTileWidget(), exception.getMessage(), exception);
     getTileWidget().addErrorStatus(TEXTS.get("ErrorWhileLoadingData"));
+  }
+
+  @Override
+  protected void handleLoadDataException(Exception e) {
+    if (e instanceof VetoException) {
+      LOG.info("VetoException on {}: {}", this.getClass().getName(), e.getMessage());
+      getTileWidget().addErrorStatus(((ProcessingException) e).getStatus());
+    }
+    else {
+      LOG.error("Unexpected error on {}", this.getClass().getName(), e);
+      getTileWidget().addErrorStatus(TEXTS.get("ErrorWhileLoadingData"));
+    }
   }
 
   protected void initTileWidgetConfig() {
@@ -105,5 +119,21 @@ public abstract class AbstractFormFieldTile<T extends IFormField> extends Abstra
   @SuppressWarnings("findbugs:NP_BOOLEAN_RETURN_NULL")
   protected Boolean getConfiguredLabelVisible() {
     return null;
+  }
+
+  @Override
+  protected void beforeLoadData() {
+    getTileWidget().clearErrorStatus();
+  }
+
+  @Override
+  public void onLoadDataCancel() {
+    setLoading(false);
+    getTileWidget().addErrorStatus(TEXTS.get("ErrorWhileLoadingData"));
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " [m_widget=" + getTileWidget() + ", m_container=" + getContainer() + "]";
   }
 }

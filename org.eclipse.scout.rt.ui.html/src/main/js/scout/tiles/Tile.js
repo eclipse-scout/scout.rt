@@ -22,6 +22,15 @@ scout.Tile.ColorSchemeId = {
   ALTERNATIVE: 'alternative'
 };
 
+/**
+ * @override
+ */
+scout.Tile.prototype._createLoadingSupport = function() {
+  return new scout.LoadingSupport({
+    widget: this
+  });
+};
+
 scout.Tile.prototype._init = function(model) {
   scout.Tile.parent.prototype._init.call(this, model);
   this._setGridDataHints(this.gridDataHints);

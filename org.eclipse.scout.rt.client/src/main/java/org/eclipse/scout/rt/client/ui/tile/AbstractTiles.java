@@ -3,11 +3,15 @@ package org.eclipse.scout.rt.client.ui.tile;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
+import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
@@ -334,5 +338,40 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
    */
   public void setContainerInternal(ITypeWithClassId container) {
     propertySupport.setProperty(PROP_CONTAINER, container);
+  }
+
+  protected String getAsyncLoadIdentifier() {
+    return null;
+  }
+
+  protected String getWindowIdentifier() {
+    return null;
+  }
+
+  @Override
+  public JobInput createAsyncLoadJobInput(ITile tile) {
+    return Jobs.newInput()
+        .withRunContext(ClientRunContexts.copyCurrent().withProperty(PROP_RUN_CONTEXT_TILE, tile))
+        .withName(PROP_ASYNC_LOAD_JOBNAME_PREFIX)
+        .withExecutionHint(PROP_ASYNC_LOAD_IDENTIFIER_PREFIX + getAsyncLoadIdentifier())
+        .withExecutionHint(PROP_WINDOW_IDENTIFIER_PREFIX + getWindowIdentifier());
+  }
+
+  @Override
+  public void ensureTileDataLoaded() {
+    BEANS.get(TileDataLoadManager.class).cancel(getAsyncLoadIdentifier(), getWindowIdentifier());
+
+    for (ITile tile : getTiles()) {
+      tile.ensureDataLoaded();
+    }
+  }
+
+  @Override
+  public void loadTileData() {
+    BEANS.get(TileDataLoadManager.class).cancel(getAsyncLoadIdentifier(), getWindowIdentifier());
+
+    for (ITile tile : getTiles()) {
+      tile.loadData();
+    }
   }
 }

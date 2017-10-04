@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.tile;
 
 import org.eclipse.scout.rt.client.ui.tile.TileChains.TileDisposeTileChain;
 import org.eclipse.scout.rt.client.ui.tile.TileChains.TileInitTileChain;
+import org.eclipse.scout.rt.client.ui.tile.TileChains.TileLoadDataTileChain;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 
 public abstract class AbstractTileExtension<OWNER_FIELD extends AbstractTile> extends AbstractExtension<OWNER_FIELD>
@@ -29,6 +30,11 @@ public abstract class AbstractTileExtension<OWNER_FIELD extends AbstractTile> ex
   @Override
   public void execInitTile(TileInitTileChain chain) {
     chain.execInitTile();
+  }
+
+  @Override
+  public void execLoadData(TileLoadDataTileChain chain) {
+    chain.execLoadData();
   }
 
 }

@@ -43,6 +43,12 @@ public class JsonTile<T extends ITile> extends AbstractJsonWidget<T> {
         return getModel().getCssClass();
       }
     });
+    putJsonProperty(new JsonProperty<T>(ITile.PROP_LOADING, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isLoading();
+      }
+    });
     putJsonProperty(new JsonProperty<T>(ITile.PROP_GRID_DATA_HINTS, model) {
       @Override
       protected GridData modelValue() {

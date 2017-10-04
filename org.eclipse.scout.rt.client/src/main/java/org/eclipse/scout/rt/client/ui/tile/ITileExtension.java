@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.tile;
 
 import org.eclipse.scout.rt.client.ui.tile.TileChains.TileDisposeTileChain;
 import org.eclipse.scout.rt.client.ui.tile.TileChains.TileInitTileChain;
+import org.eclipse.scout.rt.client.ui.tile.TileChains.TileLoadDataTileChain;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 
 public interface ITileExtension<OWNER extends AbstractTile> extends IExtension<OWNER> {
@@ -19,4 +20,6 @@ public interface ITileExtension<OWNER extends AbstractTile> extends IExtension<O
   void execInitTile(TileInitTileChain chain);
 
   void execDisposeTile(TileDisposeTileChain chain);
+
+  void execLoadData(TileLoadDataTileChain chain);
 }

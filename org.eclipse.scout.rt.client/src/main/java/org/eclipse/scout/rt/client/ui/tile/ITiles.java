@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
+import org.eclipse.scout.rt.platform.job.JobInput;
 
 /**
  * @since 7.1
@@ -21,6 +22,11 @@ public interface ITiles extends IWidget, ITypeWithClassId {
   String PROP_LOGICAL_GRID_V_GAP = "logicalGridVGap";
   String PROP_MAX_CONTENT_WIDTH = "maxContentWidth";
   String PROP_CONTAINER = "container";
+
+  String PROP_ASYNC_LOAD_JOBNAME_PREFIX = "tileAsyncDataLoadJob";
+  String PROP_ASYNC_LOAD_IDENTIFIER_PREFIX = "tileAsyncDataLoadIdentifier";
+  String PROP_WINDOW_IDENTIFIER_PREFIX = "tileDataLoadWindowsIdentifier";
+  String PROP_RUN_CONTEXT_TILE = "tileDataLoadWindowsIdentifier";
 
   String LOGICAL_GRID_HORIZONTAL = "HorizontalGrid";
   String LOGICAL_GRID_VERTICAL_SMART = "VerticalSmartGrid";
@@ -138,4 +144,14 @@ public interface ITiles extends IWidget, ITypeWithClassId {
    * Container of the tiles.
    */
   ITypeWithClassId getContainer();
+
+  /**
+   * Creates a {@link JobInput} which is used by {@link AbstractTile} to schedule the asynchronous data load.<br>
+   * It can be used to add properties to a job so tile loading jobs can be identified later on if necessary
+   */
+  JobInput createAsyncLoadJobInput(ITile tile);
+
+  void loadTileData();
+
+  void ensureTileDataLoaded();
 }
