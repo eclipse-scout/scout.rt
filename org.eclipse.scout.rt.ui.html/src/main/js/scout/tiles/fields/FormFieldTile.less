@@ -17,7 +17,6 @@
   background-color: @tile-default-background-color;
   color: @tile-default-color;
   padding: @tile-with-label-padding-top @tile-padding-h @tile-padding-v @tile-padding-h;
-  margin-left: @mandatory-indicator-width;
   overflow: hidden;
 
   &.label-hidden {
@@ -49,6 +48,10 @@
 
   & > .status {
     text-align: right;
+  }
+
+  & > .mandatory-indicator {
+    display: none;
   }
 
   &:not(.inverted):not(.loading):not(.tile-button) {
@@ -200,16 +203,6 @@
   }
   &.browser-field.inverted > .field {
     border: 0;
-  }
-
-  /* Fields with mandatory indicator */
-  &.table-field,
-  &.chart-field {
-    padding-left: @tile-padding-h - @mandatory-indicator-width;
-
-    & > label {
-      margin-left: @mandatory-indicator-width;
-    }
   }
 
   /* Move part of the tile's padding (@offset) to the inner div. */

@@ -46,7 +46,7 @@ scout.TreeBoxLayout.prototype.preferredLayoutSize = function($container) {
   if (treeBox.$label && treeBox.labelVisible) {
     width += scout.HtmlEnvironment.fieldLabelWidth;
   }
-  if (treeBox.$mandatory) {
+  if (treeBox.$mandatory && treeBox.$mandatory.isVisible()) {
     width += treeBox.$mandatory.outerWidth(true);
   }
   if (treeBox.$status && treeBox.statusVisible) {

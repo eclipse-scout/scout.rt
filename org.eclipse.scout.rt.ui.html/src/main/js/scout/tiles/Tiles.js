@@ -215,15 +215,9 @@ scout.Tiles.prototype._createPlaceholders = function() {
 };
 
 scout.Tiles.prototype._createPlaceholder = function() {
-  var placeholder = scout.create('PlaceholderTile', {
+  return scout.create('PlaceholderTile', {
     parent: this
   });
-  // If the first tile in the box is a tile with a form field, add the class with-form-fields to the placeholder because form field tiles have a mandatory indicator
-  // If mixed tiles are used so that the first one is not a form field tile but others are, the class has to be added manually
-  if (this.tiles[0] && this.tiles[0] instanceof scout.FormFieldTile) {
-    placeholder.addCssClass('with-form-fields');
-  }
-  return placeholder;
 };
 
 scout.Tiles.prototype._deleteObsoletePlaceholders = function() {

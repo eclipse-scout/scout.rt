@@ -60,7 +60,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
       labelHasFieldWidth = true;
     }
   }
-  if (formField.$mandatory) {
+  if (formField.$mandatory && formField.$mandatory.isVisible()) {
     formField.$mandatory
       .cssTop(top)
       .cssLeft(left)
@@ -122,7 +122,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
 
     if (labelHasFieldWidth) {
       var fieldWidth = fieldSize.add(fieldMargins).width - formField.$label.cssMarginX();
-      if (formField.$mandatory) {
+      if (formField.$mandatory && formField.$mandatory.isVisible()) {
         fieldWidth += formField.$mandatory.outerWidth(true);
       }
       formField.$label.cssWidth(fieldWidth);
@@ -223,7 +223,7 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
       height += topLabelHeight;
     }
   }
-  if (formField.$mandatory) {
+  if (formField.$mandatory && formField.$mandatory.isVisible()) {
     width += this.mandatoryIndicatorWidth + formField.$mandatory.cssMarginX();
   }
   if (this._isStatusVisible()) {

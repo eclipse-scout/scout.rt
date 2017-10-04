@@ -46,7 +46,7 @@ scout.ListBoxLayout.prototype.preferredLayoutSize = function($container) {
   if (listBox.$label && listBox.labelVisible) {
     width += scout.HtmlEnvironment.fieldLabelWidth;
   }
-  if (listBox.$mandatory) {
+  if (listBox.$mandatory && listBox.$mandatory.isVisible()) {
     width += listBox.$mandatory.outerWidth(true);
   }
   if (listBox.$status && listBox.statusVisible) {
