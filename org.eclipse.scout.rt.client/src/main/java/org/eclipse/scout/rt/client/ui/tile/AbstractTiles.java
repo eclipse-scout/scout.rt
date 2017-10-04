@@ -1,5 +1,6 @@
 package org.eclipse.scout.rt.client.ui.tile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
@@ -8,6 +9,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 /**
@@ -15,6 +17,7 @@ import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
  */
 @ClassId("c04e6cf7-fda0-4146-afea-6a0ff0a50c4b")
 public abstract class AbstractTiles extends AbstractWidget implements ITiles {
+  private boolean m_initialized;
 
   public AbstractTiles() {
     this(true);
@@ -22,6 +25,15 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
 
   public AbstractTiles(boolean callInitializer) {
     super(callInitializer);
+  }
+
+  @Override
+  protected void callInitializer() {
+    if (isInitialized()) {
+      return;
+    }
+    super.callInitializer();
+    setInitialized(true);
   }
 
   @Override
@@ -41,6 +53,14 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     OrderedCollection<ITile> tiles = new OrderedCollection<>();
     injectTilesInternal(tiles);
     setTiles(tiles.getOrderedList());
+  }
+
+  public boolean isInitialized() {
+    return m_initialized;
+  }
+
+  protected void setInitialized(boolean initialized) {
+    m_initialized = initialized;
   }
 
   protected void injectTilesInternal(OrderedCollection<ITile> tiles) {
@@ -157,9 +177,29 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   }
 
   @Override
-  public void setTiles(List<ITile> tiles) {
+  public void setTiles(List<? extends ITile> tiles) {
+    List<? extends ITile> oldTiles = ObjectUtility.nvl(getTiles(), new ArrayList<>());
+    List<? extends ITile> newTiles = ObjectUtility.nvl(tiles, new ArrayList<>());
+
+    // Dispose old tiles (only if they are not in the new list)
+    for (ITile tile : oldTiles) {
+      if (!newTiles.contains(tile)) {
+        tile.dispose();
+      }
+    }
+
     propertySupport.setPropertyList(PROP_TILES, tiles);
-    // FIXME CGU tiles dispose old tiles and init new tiles, postInit
+
+    // Initialize new tiles
+    // Only initialize when tiles are added later,
+    // if they are added while initConfig runs, initTiles() will take care of the initialization which will be called by the container (e.g. TilesField)
+    for (ITile tile : newTiles) {
+      tile.setContainer(this);
+      if (isInitialized() && !oldTiles.contains(tile)) {
+        tile.postInitConfig();
+        tile.init();
+      }
+    }
   }
 
   @Override

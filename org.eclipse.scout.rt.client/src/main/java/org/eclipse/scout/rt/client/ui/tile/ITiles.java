@@ -40,7 +40,7 @@ public interface ITiles extends IWidget, ITypeWithClassId {
    * @param tiles
    *          the new list of tiles to be set.
    */
-  void setTiles(List<ITile> tiles);
+  void setTiles(List<? extends ITile> tiles);
 
   /**
    * @return the preferred number of grid columns.
