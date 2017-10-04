@@ -8,14 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.ce-slot {
-  border-radius: 2px !important;
-  margin: 2px !important;
-  display: block !important;
-  border: 1px dashed @palette-blue-4 !important;
-}
-
 .ce-slot-placeholder {
+  border: 1px dashed @palette-blue-4 !important;
   font-family: Arial, sans-serif !important;
   font-weight: normal !important;
   font-size: 11px !important;
@@ -24,15 +18,26 @@
   text-transform: uppercase !important;
   text-align: center !important;
   padding: 3px !important;
+  display: none !important;
+}
+
+.ce-slot-placeholder-accept {
+  display: block !important;
 }
 
 .ce-accept-drop {
-  border-color: @palette-blue-6 !important;
+  border-color: @palette-orange-4 !important;
+  background-color: @palette-orange-0 !important;
+  color: @palette-orange-4 !important;
 }
 
 .ce-element {
   position: relative;
-  border: 2px solid transparent !important;
+  border: 2px solid transparent;
+  -moz-transition: all 0.3s ease-out;
+  -webkit-transition: all 0.3s ease-out;
+  -o-transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out;
 }
 
 .ce-element-hover {
@@ -47,7 +52,7 @@
 }
 
 .ce-element-button {
-  #scout.font-icon();
+  #scout .font-icon();
   text-align: center;
   color: @palette-white;
   background-color: @palette-blue-5;

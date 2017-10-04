@@ -11,13 +11,18 @@
 scout.ContentEditor = function() {
   scout.ContentEditor.parent.call(this);
   this._contentElements = [];
+  this.placeholderText = '';
+  this.doc = null;
+  this.content = '';
+  this.$slots = null;
+  this.$placeholders = null;
+  this._$currentClosestPlaceholder = null;
 };
 scout.inherits(scout.ContentEditor, scout.Widget);
 
 scout.ContentEditor.prototype._init = function(model) {
   scout.ContentEditor.parent.prototype._init.call(this, model);
-  this.content;
-  this.$slots;
+  this._iframeDragCounter = 0;
 
   this.iframe = scout.create('IFrame', {
     parent: this,
@@ -63,16 +68,20 @@ scout.ContentEditor.prototype.getContent = function() {
   return this.iframe.$iframe.get(0).contentWindow.document.outerHtml;
 };
 
-scout.ContentEditor.prototype._renderContent = function() {
-  var doc = this.iframe.$iframe.get(0).contentWindow.document;
+scout.ContentEditor.prototype.setPlaceholderText = function(placeholderText) {
+  this.setProperty('placeholderText', placeholderText);
+};
 
-  doc.open();
-  doc.write(this.content);
-  doc.close();
+scout.ContentEditor.prototype._renderContent = function() {
+  this.doc = this.iframe.$iframe.get(0).contentWindow.document;
+
+  this.doc.open();
+  this.doc.write(this.content);
+  this.doc.close();
 
   // the jquery ready event is attached to the root document and not to the document of the iframe.
   // therefore we must use the DOMContentLoaded event by ourselves
-  doc.addEventListener('DOMContentLoaded', this._onIframeContentLoaded.bind(this, doc));
+  this.doc.addEventListener('DOMContentLoaded', this._onIframeContentLoaded.bind(this));
 };
 
 scout.ContentEditor.prototype._injectStyleSheet = function($header) {
@@ -80,37 +89,123 @@ scout.ContentEditor.prototype._injectStyleSheet = function($header) {
   this.$slots.addClass('ce-slot');
 };
 
-scout.ContentEditor.prototype._onIframeContentLoaded = function(doc) {
-  this.$slots = $(doc.body).find('[data-ce-slot]');
-  this.$slots.appendDiv('ce-slot-placeholder').text('Add Element');
-  this._injectStyleSheet($(doc.head));
+scout.ContentEditor.prototype._onIframeContentLoaded = function() {
+  this.$slots = $(this.doc.body).find('[data-ce-slot]');
+  this.$placeholders = this.$slots.appendDiv('ce-slot-placeholder').text(this.placeholderText);
+  this._injectStyleSheet($(this.doc.head));
 
-  this.$slots
-    .on('dragenter dragover', this._onSlotDragOver.bind(this))
-    .on('dragleave', this._onSlotDragLeave.bind(this))
-    .on('drop', this._onSlotDrop.bind(this));
+  $(this.doc)
+    .on('dragenter', this._onIframeDragEnter.bind(this))
+    .on('dragover', this._onIframeDragOver.bind(this))
+    .on('dragleave', this._onIframeDragLeave.bind(this))
+    .on('drop', this._onIframeDrop.bind(this));
 };
 
-scout.ContentEditor.prototype._onSlotDragOver = function(event) {
-  $(event.target).closest('[data-ce-slot]').addClass('ce-accept-drop');
-  return false;
+scout.ContentEditor.prototype._onIframeDragEnter = function(event) {
+  event.preventDefault();
+  this._iframeDragCounter++;
+  this._showPlaceHolders(this._getTypeOfDragEvent(event));
 };
 
-scout.ContentEditor.prototype._onSlotDragLeave = function(event) {
-  $(event.target).closest('[data-ce-slot]').removeClass('ce-accept-drop');
-  return false;
-};
-
-scout.ContentEditor.prototype._onSlotDrop = function(event) {
+scout.ContentEditor.prototype._getTypeOfDragEvent = function(event) {
   var e = event.originalEvent;
-  var $elementContent = $(e.dataTransfer.getData('text'));
-  var contentElement = scout.create('ContentElement', {
-    contentEditor: this,
-    $container: $elementContent
-  });
+  if (e.dataTransfer.types) {
+    return e.dataTransfer.types[0];
+  }
+  return '';
+};
 
-  var $slot = $(e.target).closest('[data-ce-slot]');
-  contentElement.dropInto($slot);
+scout.ContentEditor.prototype._onIframeDragOver = function(event) {
+  event.preventDefault();
+  var type = this._getTypeOfDragEvent(event);
+  var $closestPlaceholder = this._getClosestPlaceholder(event.clientX, event.clientY, type);
+
+  if ($closestPlaceholder && this._$currentClosestPlaceholder !== $closestPlaceholder) {
+    this._$currentClosestPlaceholder = $closestPlaceholder;
+    this._getPlaceholdersForType(type).each(function(index, slot) {
+      if ($(slot) !== this._$currentClosestPlaceholder) {
+        $(slot).removeClass('ce-accept-drop');
+      }
+    }.bind(this));
+    this._$currentClosestPlaceholder.addClass('ce-accept-drop');
+  }
+};
+
+scout.ContentEditor.prototype._onIframeDragLeave = function(event) {
+  if (--this._iframeDragCounter === 0) {
+    this._hidePlaceHolders();
+  }
+};
+
+scout.ContentEditor.prototype._showPlaceHolders = function(type) {
+  this._getPlaceholdersForType(type)
+    .addClass('ce-slot-placeholder-accept')
+    .css('opacity', '1')
+    .css('height', 'auto');
+};
+
+scout.ContentEditor.prototype._getPlaceholdersForType = function(type) {
+  if (type === 'text/plain') {
+    type = 'text';
+  }
+  return $(this.doc.body).find('[data-ce-allowed-elements~=\'' + type + '\'] .ce-slot-placeholder');
+};
+
+scout.ContentEditor.prototype._hidePlaceHolders = function() {
+  $(this.doc.body).find('[data-ce-slot] .ce-slot-placeholder').animate({
+    height: '0',
+    opacity: 0
+  }, 'fast', 'linear', function() {
+    $(this.doc.body).find('[data-ce-slot] .ce-slot-placeholder')
+      .removeClass('ce-slot-placeholder-accept');
+  }.bind(this));
+};
+
+scout.ContentEditor.prototype._onIframeDrop = function(event) {
+  event.preventDefault();
+  var e = event.originalEvent;
+  if (e.dataTransfer.types) {
+    var type = e.dataTransfer.types[0];
+    var $elementContent = $(e.dataTransfer.getData(type));
+    var contentElement = scout.create('ContentElement', {
+      contentEditor: this,
+      $container: $elementContent
+    });
+    contentElement.dropInto(this._$currentClosestPlaceholder);
+  }
+  this._hidePlaceHolders();
+  this._iframeDragCounter = 0;
   return false;
 };
 
+scout.ContentEditor.prototype._getClosestPlaceholder = function(x, y, type) {
+  var $closest;
+  var closestDistance;
+  this._getPlaceholdersForType(type).each(function(index, placeholder) {
+    var $placeholder = $(placeholder);
+    var distance = this._getDistance($placeholder, x, y);
+    if (!$closest || distance < closestDistance) {
+      $closest = $placeholder;
+      closestDistance = distance;
+    }
+  }.bind(this));
+  return $closest;
+};
+
+scout.ContentEditor.prototype._getDistance = function($element, x, y) {
+  var xOffset = 0;
+  var yOffset = 0;
+
+  if ($element.position().top > y) {
+    yOffset = $element.position().top - y;
+  } else if ($element.position().top + $element.height() < y) {
+    yOffset = y - $element.position().top - $element.height();
+  }
+
+  if ($element.position().left > x) {
+    xOffset = $element.position().left - x;
+  } else if ($element.position().left + $element.width() < x) {
+    xOffset = x - $element.position().left - $element.width();
+  }
+  return Math.sqrt(xOffset * xOffset + yOffset * yOffset);
+};

@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 scout.ContentElement = function() {
   this.elementId = scout.objectFactory.createUniqueId();
   this.contentEditor;
@@ -13,24 +23,23 @@ scout.ContentElement.prototype.init = function(model) {
   this.content = scout.nvl(this.$container.html(), '');
 };
 
-scout.ContentElement.prototype.dropInto = function($slot) {
-  this.$container.addClass('ce-element');
+scout.ContentElement.prototype.dropInto = function($placeholder) {
+  this.$container.addClass('ce-element ce-element-hover');
   this.contentEditor.addElement(this);
 
-  this.$slot = $slot;
-  this.slot = $slot.attr('data-ce-slot');
+  this.$slot = $placeholder.parent();
+  this.slot = this.$slot.attr('data-ce-slot');
 
-  $slot.find('.ce-slot-placeholder').before(this.$container);
-  $slot.removeClass('ce-accept-drop');
+  $placeholder.before(this.$container);
+  $placeholder.removeClass('ce-accept-drop');
 
   this.$container
     .on('mouseenter', this._onElementMouseEnter.bind(this))
     .on('mouseleave', this._onElementMouseLeave.bind(this));
 
-  this.$container.css('opacity', '0');
-  this.$container.animate({
-    opacity: '1'
-  }, 'slow');
+  setTimeout(function() {
+    this.$container.removeClass('ce-element-hover');
+  }.bind(this), 200);
 };
 
 scout.ContentElement.prototype._onElementMouseEnter = function(event) {

@@ -20,7 +20,8 @@ scout.ContentEditorField.prototype._init = function(model) {
 
   this.contentEditor = scout.create('ContentEditor', {
     parent: this,
-    content: model.content
+    content: model.content,
+    placeholderText: model.placeholderText
   });
 
   this.contentEditor.on('propertyChange', this._onPropertyChange.bind(this));
@@ -47,6 +48,11 @@ scout.ContentEditorField.prototype.setContent = function(content) {
 
 scout.ContentEditorField.prototype.getContent = function() {
   return this.contentEditor.getContent();
+};
+
+scout.ContentEditorField.prototype.setPlaceholderText = function(placeholderText) {
+  this.setProperty('placeholderText', placeholderText);
+  this.contentEditor.setPlaceholderText(placeholderText);
 };
 
 scout.ContentEditorField.prototype._onPropertyChange = function(event) {

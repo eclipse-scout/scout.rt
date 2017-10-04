@@ -16,6 +16,8 @@ import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 
@@ -29,6 +31,7 @@ public abstract class AbstractContentEditorField extends AbstractFormField imple
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     super.initConfig();
+    setPlaceholderText(getConfiguredPlaceholderText());
   }
 
   @Override
@@ -70,6 +73,22 @@ public abstract class AbstractContentEditorField extends AbstractFormField imple
   @Override
   public String getContent() {
     return propertySupport.getPropertyString(PROP_CONTENT);
+  }
+
+  @Override
+  public String getPlaceholderText() {
+    return propertySupport.getPropertyString(PROP_PLACEHOLDER_TEXT);
+  }
+
+  @Override
+  public void setPlaceholderText(String placeholderText) {
+    propertySupport.setPropertyString(PROP_PLACEHOLDER_TEXT, placeholderText);
+  }
+
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(10)
+  protected String getConfiguredPlaceholderText() {
+    return null;
   }
 
   // FIXME cbu: add intercept method and chain classes

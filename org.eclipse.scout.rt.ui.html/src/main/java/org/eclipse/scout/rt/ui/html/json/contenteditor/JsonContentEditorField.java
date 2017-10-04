@@ -51,6 +51,12 @@ public class JsonContentEditorField extends JsonFormField<IContentEditorField> {
         return getModel().getContent();
       }
     });
+    putJsonProperty(new JsonProperty<IContentEditorField>(IContentEditorField.PROP_PLACEHOLDER_TEXT, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getPlaceholderText();
+      }
+    });
   }
 
   @Override

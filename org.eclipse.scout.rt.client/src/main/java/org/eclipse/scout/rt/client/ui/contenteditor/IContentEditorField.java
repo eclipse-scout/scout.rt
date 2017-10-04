@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 public interface IContentEditorField extends IFormField {
 
   String PROP_CONTENT = "content";
+  String PROP_PLACEHOLDER_TEXT = "placeholderText";
 
   void addContentEditorFieldListener(ContentEditorFieldListener listener);
 
@@ -23,6 +24,10 @@ public interface IContentEditorField extends IFormField {
   void setContent(String content);
 
   String getContent();
+
+  String getPlaceholderText();
+
+  void setPlaceholderText(String placeholderText);
 
   void execEditElement(ContentElement contentElement);
 
