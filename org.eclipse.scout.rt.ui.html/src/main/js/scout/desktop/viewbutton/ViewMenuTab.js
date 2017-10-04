@@ -73,7 +73,7 @@ scout.ViewMenuTab.prototype._update = function() {
 };
 
 scout.ViewMenuTab.prototype._render = function() {
-  this.$container = this.$parent.appendDiv('view-button-tab')
+  this.$container = this.$parent.appendDiv('view-button-tab view-menu-tab')
     .unfocusable()
     .on('mousedown', this.togglePopup.bind(this));
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
