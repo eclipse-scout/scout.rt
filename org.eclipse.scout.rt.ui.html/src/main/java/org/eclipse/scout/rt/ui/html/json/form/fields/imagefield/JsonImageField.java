@@ -128,15 +128,18 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
 
   @Override
   protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
-    if (ObjectUtility.isOneOf(propertyName, IImageField.PROP_IMAGE, IImageField.PROP_IMAGE_ID)) {
-      handleModelImageOrImageIdChanged();
+    if (ObjectUtility.isOneOf(propertyName,
+        IImageField.PROP_IMAGE,
+        IImageField.PROP_IMAGE_ID,
+        IImageField.PROP_IMAGE_URL)) {
+      handleModelImageSourceChanged();
     }
     else {
       super.handleModelPropertyChange(propertyName, oldValue, newValue);
     }
   }
 
-  protected void handleModelImageOrImageIdChanged() {
+  protected void handleModelImageSourceChanged() {
     addPropertyChangeEvent(PROP_IMAGE_URL, getImageUrl());
   }
 
@@ -164,6 +167,9 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
     }
     if (getModel().getImageId() != null) {
       return BinaryResourceUrlUtility.createIconUrl(getModel().getImageId());
+    }
+    if (getModel().getImageUrl() != null) {
+      return getModel().getImageId();
     }
     return null;
   }

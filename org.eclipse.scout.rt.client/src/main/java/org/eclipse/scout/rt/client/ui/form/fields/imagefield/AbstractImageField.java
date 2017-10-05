@@ -246,6 +246,33 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     }
   }
 
+  /**
+   * Sets all other image source properties to null.
+   */
+  protected void reconcileImageSourceProperties(String propertySet) {
+    String[] allProperties = {
+        PROP_IMAGE_URL,
+        PROP_IMAGE_ID,
+        PROP_IMAGE
+    };
+    for (String property : allProperties) {
+      if (!property.equals(propertySet)) {
+        propertySupport.setProperty(property, null);
+      }
+    }
+  }
+
+  @Override
+  public String getImageUrl() {
+    return propertySupport.getPropertyString(PROP_IMAGE_URL);
+  }
+
+  @Override
+  public void setImageUrl(String imageUrl) {
+    propertySupport.setProperty(PROP_IMAGE_URL, imageUrl);
+    reconcileImageSourceProperties(PROP_IMAGE_URL);
+  }
+
   @Override
   public Object getImage() {
     return propertySupport.getProperty(PROP_IMAGE);
@@ -254,6 +281,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   @Override
   public void setImage(Object imgObj) {
     propertySupport.setProperty(PROP_IMAGE, imgObj);
+    reconcileImageSourceProperties(PROP_IMAGE);
   }
 
   @Override
@@ -264,6 +292,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   @Override
   public void setImageId(String imageId) {
     propertySupport.setPropertyString(PROP_IMAGE_ID, imageId);
+    reconcileImageSourceProperties(PROP_IMAGE_ID);
   }
 
   @Override

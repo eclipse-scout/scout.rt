@@ -36,12 +36,17 @@ import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
  * </ul>
  */
 public interface IImageField extends IFormField, IDNDSupport {
+  String PROP_IMAGE_URL = "imageUrl";
   String PROP_IMAGE_ID = "imageId";
   String PROP_IMAGE = "image";
   String PROP_IMAGE_TRANSFORM = "imageTransform";
   String PROP_ANALYSIS_RECTANGLE = "analysisRectangle";
   String PROP_AUTO_FIT = "autoFit";
   String PROP_SCROLL_BAR_ENABLED = "scrollBarEnabled";
+
+  String getImageUrl();
+
+  void setImageUrl(String imageUrl);
 
   String getImageId();
 
