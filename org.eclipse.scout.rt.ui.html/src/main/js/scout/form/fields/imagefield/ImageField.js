@@ -34,7 +34,6 @@ scout.ImageField.prototype._render = function() {
   // Complete the layout hierarchy between the image field and the image
   var htmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
   htmlComp.setLayout(new scout.SingleLayout());
-
   this.image.render(this.$fieldContainer);
 
   this.addLabel();
@@ -46,6 +45,7 @@ scout.ImageField.prototype._renderProperties = function() {
   scout.ImageField.parent.prototype._renderProperties.call(this);
   this._renderScrollBarEnabled();
   this._renderDropType();
+  this._renderImageUrl();
 };
 
 scout.ImageField.prototype._remove = function() {
@@ -69,6 +69,12 @@ scout.ImageField.prototype.setImageUrl = function(imageUrl) {
 scout.ImageField.prototype._setImageUrl = function(imageUrl) {
   this._setProperty('imageUrl', imageUrl);
   this.image.setImageUrl(imageUrl);
+};
+
+scout.ImageField.prototype._renderImageUrl = function() {
+  var hasImageUrl = !!this.imageUrl;
+  this.$fieldContainer.toggleClass('has-image', hasImageUrl);
+  this.$container.toggleClass('has-image', hasImageUrl);
 };
 
 scout.ImageField.prototype.setAutoFit = function(autoFit) {
