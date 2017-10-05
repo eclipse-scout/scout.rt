@@ -113,7 +113,11 @@ public final class IOUtility {
         byte[] buf = new byte[len];
         int count = 0;
         while (count < len) {
-          count += in.read(buf, count, len - count);
+          int read = in.read(buf, count, len - count);
+          if (read < 0) {
+            return Arrays.copyOf(buf, count);
+          }
+          count += read;
         }
         return buf;
       }

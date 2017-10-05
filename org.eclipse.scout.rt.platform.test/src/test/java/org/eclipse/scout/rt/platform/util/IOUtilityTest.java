@@ -430,18 +430,25 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testReadBytes1() {
+  public void testReadBytes() {
     byte[] expected = new byte[]{0, 1, 2, 3};
     byte[] actual = IOUtility.readBytes(newInputStream(expected));
     assertArrayEquals(expected, actual);
   }
 
   @Test
-  public void testReadBytes2() {
+  public void testReadBytesLengthToSmall() {
     byte[] data = new byte[]{0, 1, 2, 3};
     byte[] expected = Arrays.copyOfRange(data, 0, 3);
     byte[] actual = IOUtility.readBytes(newInputStream(data), 3);
     assertArrayEquals(expected, actual);
+  }
+
+  @Test
+  public void testReadBytesLengthToBig() {
+    byte[] data = new byte[]{0, 1, 2, 3};
+    byte[] actual = IOUtility.readBytes(newInputStream(data), 10);
+    assertArrayEquals(data, actual);
   }
 
   @Test
@@ -460,14 +467,14 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testReadString1() {
+  public void testReadString() {
     String expected = "0123";
     String actual = IOUtility.readString(newReader(expected));
     assertEquals(expected, actual);
   }
 
   @Test
-  public void testReadString2() {
+  public void testReadStringLenthToSmall() {
     String data = "0123";
     String expected = data.substring(0, 3);
     String actual = IOUtility.readString(newReader(data), 3);
