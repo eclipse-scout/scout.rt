@@ -22,7 +22,9 @@ scout.Tiles = function() {
   this.logicalGridRowHeight = 150;
   this.maxContentWidth = -1;
   this.withPlaceholders = false;
+  this.selectable = false;
   this.scrollable = true;
+  this._tilePropertyChangeHandler = this._onTilePropertyChange.bind(this);
   this._addWidgetProperties(['tiles']);
 };
 scout.inherits(scout.Tiles, scout.Widget);
@@ -30,6 +32,29 @@ scout.inherits(scout.Tiles, scout.Widget);
 scout.Tiles.prototype._init = function(model) {
   scout.Tiles.parent.prototype._init.call(this, model);
   this._setGridColumnCount(this.gridColumnCount);
+  this._initTiles();
+};
+
+scout.Tiles.prototype._initTiles = function() {
+  this.tiles.forEach(function(tile) {
+    this._initTile(tile);
+  }, this);
+};
+
+scout.Tiles.prototype._initTile = function(tile) {
+  this._attachTile(tile);
+  tile.setSelectable(this.selectable);
+};
+
+scout.Tiles.prototype._destroy = function() {
+  this._destroyTiles();
+  scout.Tiles.parent.prototype._destroy.call(this);
+};
+
+scout.Tiles.prototype._destroyTiles = function() {
+  this.tiles.forEach(function(tile) {
+    this._detachTile(tile);
+  }, this);
 };
 
 scout.Tiles.prototype._render = function() {
@@ -53,52 +78,111 @@ scout.Tiles.prototype._renderProperties = function() {
   this._renderScrollable();
 };
 
-scout.Tiles.prototype.setTiles = function(tiles) {
-  if (scout.objects.equals(this.tiles, tiles)) {
-    return;
-  }
-
-  tiles = this._prepareProperty('tiles', tiles);
-  if (this.rendered) {
-    var tilesToRemove = this.tiles.slice();
-
-    // only remove those which are not in the new array
-    scout.arrays.removeAll(tilesToRemove, tiles);
-    this._removeTiles(tilesToRemove);
-  }
-  this._setProperty('tiles', tiles);
-  if (this.rendered) {
-    this._renderTiles();
-  }
-};
-
 scout.Tiles.prototype._renderTiles = function() {
   this.tiles.forEach(function(tile) {
-    if (!tile.rendered) {
-      tile.render();
-      tile.setLayoutData(new scout.LogicalGridData(tile));
-    }
-  });
-  if (!this.htmlComp.layouting) {
-    // no need to invalidate when tile placeholders are added or removed while layouting
-    this.invalidateLayoutTree();
-  }
+    this._renderTile(tile);
+  }, this);
 };
 
-scout.Tiles.prototype._removeTiles = function(tiles) {
-  tiles.forEach(function(tile) {
-    tile.remove();
-  });
+scout.Tiles.prototype.insertTile = function(tile) {
+  this.insertTiles([tile]);
 };
 
-scout.Tiles.prototype.addTiles = function(tiles) {
+scout.Tiles.prototype.insertTiles = function(tiles) {
   this.setTiles(this.tiles.concat(tiles));
+};
+
+scout.Tiles.prototype.deleteTile = function(tile) {
+  this.deleteTiles([tile]);
 };
 
 scout.Tiles.prototype.deleteTiles = function(tilesToDelete) {
   var tiles = this.tiles.slice();
   scout.arrays.removeAll(tiles, tilesToDelete);
   this.setTiles(tiles);
+};
+
+scout.Tiles.prototype.setTiles = function(tiles) {
+  if (scout.objects.equals(this.tiles, tiles)) {
+    return;
+  }
+  tiles = this._prepareProperty('tiles', tiles);
+
+  // Only delete those which are not in the new array
+  // Only insert those which are not already there
+  var tilesToDelete = this.tiles.slice();
+  scout.arrays.removeAll(tilesToDelete, tiles);
+  var tilesToInsert = tiles.slice();
+  scout.arrays.removeAll(tilesToInsert, this.tiles);
+
+  this._deleteTiles(tilesToDelete);
+  if (tilesToInsert.length > 0 || tilesToDelete.length > 0) {
+    this._setProperty('tiles', tiles);
+  }
+  this._insertTiles(tilesToInsert);
+};
+
+scout.Tiles.prototype._insertTiles = function(tiles) {
+  if (tiles.length === 0) {
+    return;
+  }
+
+  tiles.forEach(function(tile) {
+    this._initTile(tile);
+    if (this.rendered) {
+      this._renderTile(tile);
+    }
+  }, this);
+
+  if (this.rendered && !this.htmlComp.layouting) {
+    // no need to invalidate when tile placeholders are added or removed while layouting
+    this.invalidateLayoutTree();
+  }
+};
+
+scout.Tiles.prototype._attachTile = function(tile) {
+  tile.on('propertyChange', this._tilePropertyChangeHandler);
+};
+
+scout.Tiles.prototype._renderTile = function(tile) {
+  tile.render();
+  tile.setLayoutData(new scout.LogicalGridData(tile));
+};
+
+scout.Tiles.prototype._deleteTiles = function(tiles) {
+  if (tiles.length === 0) {
+    return;
+  }
+
+  tiles.forEach(function(tile) {
+    this._detachTile(tile);
+    if (this.rendered) {
+      tile.remove();
+    }
+  }, this);
+
+  if (this.rendered && !this.htmlComp.layouting) {
+    // no need to invalidate when tile placeholders are added or removed while layouting
+    this.invalidateLayoutTree();
+  }
+};
+
+scout.Tiles.prototype._detachTile = function(tile) {
+  tile.off('propertyChange', this._tilePropertyChangeHandler);
+};
+
+scout.Tiles.prototype._onTilePropertyChange = function(event) {
+  if (event.propertyName === 'selected') {
+    if (!this.selectable) {
+      event.preventDefault();
+      return;
+    }
+    if (event.newValue) {
+      this.selectTile(event.source);
+    } else {
+      this.deselectTile(event.source);
+    }
+  }
 };
 
 scout.Tiles.prototype.setGridColumnCount = function(gridColumnCount) {
@@ -185,7 +269,7 @@ scout.Tiles.prototype.fillUpWithPlaceholders= function() {
     return;
   }
   this._deleteObsoletePlaceholders();
-  this._addPlaceholders();
+  this._insertPlaceholders();
 };
 
 scout.Tiles.prototype._createPlaceholders = function() {
@@ -248,9 +332,9 @@ scout.Tiles.prototype._deleteAllPlaceholders = function() {
   this.setTiles(tiles);
 };
 
-scout.Tiles.prototype._addPlaceholders = function() {
+scout.Tiles.prototype._insertPlaceholders = function() {
   var placeholders = this._createPlaceholders();
-  this.addTiles(placeholders);
+  this.insertTiles(placeholders);
 };
 
 scout.Tiles.prototype.validateLogicalGrid = function() {
@@ -271,4 +355,68 @@ scout.Tiles.prototype._setLogicalGrid = function(logicalGrid) {
   if (this.logicalGrid) {
     this.logicalGrid.setGridConfig(new scout.TilesGridConfig());
   }
+};
+
+scout.Tiles.prototype.setSelectable = function(selectable) {
+  this.setProperty('selectable', selectable);
+  if (!selectable) {
+    this.deselectAllTiles();
+  }
+  this.tiles.forEach(function(tile) {
+    tile.setSelectable(selectable);
+  });
+};
+
+scout.Tiles.prototype.selectedTiles = function() {
+  return this.tiles.filter(function(tile) {
+    return tile.selected;
+  });
+};
+
+scout.Tiles.prototype.selectTiles = function(tiles) {
+  tiles = scout.arrays.ensure(tiles);
+
+  // Deselect the tiles which are not part of the new selection
+  var tilesToUnselect = this.selectedTiles();
+  scout.arrays.removeAll(tilesToUnselect, tiles);
+  tilesToUnselect.forEach(function(tile) {
+    this._detachTile(tile);
+    tile.setSelected(false);
+    this._attachTile(tile);
+  }, this);
+
+  if (!this.selectable) {
+    return;
+  }
+
+  // Select the tiles
+  tiles.forEach(function(tile) {
+    this._detachTile(tile);
+    tile.setSelected(true);
+    this._attachTile(tile);
+  }, this);
+};
+
+scout.Tiles.prototype.selectTile = function(tile) {
+  this.selectTiles([tile]);
+};
+
+scout.Tiles.prototype.selectAllTiles = function(tile) {
+  this.selectTiles(this.tiles);
+};
+
+scout.Tiles.prototype.deselectTiles = function(tiles) {
+  tiles = scout.arrays.ensure(tiles);
+  var selectedTiles = this.selectedTiles();
+  if (scout.arrays.removeAll(selectedTiles, tiles)) {
+    this.selectTiles(selectedTiles);
+  }
+};
+
+scout.Tiles.prototype.deselectTile = function(tile) {
+  this.deselectTiles([tile]);
+};
+
+scout.Tiles.prototype.deselectAllTiles = function(tiles) {
+  this.selectTiles([]);
 };

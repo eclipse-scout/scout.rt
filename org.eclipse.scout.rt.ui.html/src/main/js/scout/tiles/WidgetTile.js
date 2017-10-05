@@ -38,8 +38,6 @@ scout.WidgetTile.prototype._destroy = function() {
 
 scout.WidgetTile.prototype._render = function() {
   this.tileWidget.render(this.$parent);
-  this.tileWidget.$container.addClass('tile');
-  this.tileWidget.$container.attr('data-tileadapter', this.id);
   this.$container = this.tileWidget.$container;
   this.htmlComp = this.tileWidget.htmlComp;
 };

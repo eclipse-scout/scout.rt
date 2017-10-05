@@ -964,6 +964,7 @@ scout.Widget.prototype.triggerPropertyChange = function(propertyName, oldValue, 
     newValue: newValue
   });
   this.trigger('propertyChange', event);
+  return event;
 };
 
 /**
@@ -976,7 +977,11 @@ scout.Widget.prototype._setProperty = function(propertyName, newValue) {
     return;
   }
   this[propertyName] = newValue;
-  this.triggerPropertyChange(propertyName, oldValue, newValue);
+  var event = this.triggerPropertyChange(propertyName, oldValue, newValue);
+  if (event.defaultPrevented) {
+    // Revert to old value if property change should be prevented
+    this[propertyName] = oldValue;
+  }
 };
 
 /**

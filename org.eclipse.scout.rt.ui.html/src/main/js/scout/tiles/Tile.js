@@ -13,6 +13,8 @@ scout.Tile = function() {
   this.gridData = null;
   this.gridDataHints = new scout.GridData();
   this.colorScheme = null;
+  this.selected = false;
+  this.selectable = false;
 };
 scout.inherits(scout.Tile, scout.Widget);
 
@@ -36,6 +38,7 @@ scout.Tile.prototype._init = function(model) {
   this._setGridDataHints(this.gridDataHints);
   this._setGridData(this.gridData);
   this._setColorScheme(this.colorScheme);
+  this._setSelectable(this.selectable);
 };
 
 scout.Tile.prototype._render = function() {
@@ -48,6 +51,13 @@ scout.Tile.prototype._renderProperties = function() {
   scout.Tile.parent.prototype._renderProperties.call(this);
   this._renderGridData();
   this._renderColorScheme();
+  this._renderSelectable();
+  this._renderSelected();
+};
+
+scout.Tile.prototype._postRender = function() {
+  this.$container.addClass('tile');
+  this.$container.on('mousedown', this._onMouseDown.bind(this));
 };
 
 scout.Tile.prototype.setGridDataHints = function(gridData) {
@@ -116,4 +126,34 @@ scout.Tile.prototype._ensureColorScheme = function(colorScheme) {
 scout.Tile.prototype._renderColorScheme = function() {
   this.$container.toggleClass('color-alternative', (this.colorScheme.scheme === scout.Tile.ColorSchemeId.ALTERNATIVE));
   this.$container.toggleClass('inverted', this.colorScheme.inverted);
+};
+
+scout.Tile.prototype.setSelected = function(selected) {
+  if (selected && !this.selectable) {
+    return;
+  }
+  this.setProperty('selected', selected);
+};
+
+scout.Tile.prototype._renderSelected = function() {
+  this.$container.toggleClass('selected', this.selected);
+};
+
+scout.Tile.prototype.setSelectable = function(selectable) {
+  this.setProperty('selectable', selectable);
+};
+
+scout.Tile.prototype._setSelectable = function(selectable) {
+  this._setProperty('selectable', selectable);
+  if (!this.selectable) {
+    this.setSelected(false);
+  }
+};
+
+scout.Tile.prototype._renderSelectable = function() {
+  this.$container.toggleClass('selectable', this.selectable);
+};
+
+scout.Tile.prototype._onMouseDown = function(event) {
+  this.setSelected(!this.selected);
 };
