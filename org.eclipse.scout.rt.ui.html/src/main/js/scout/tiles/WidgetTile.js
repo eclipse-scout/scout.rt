@@ -17,12 +17,23 @@ scout.WidgetTile = function() {
   // The referenced widget which will be rendered (it is not possible to just call it 'widget' due to the naming conflict with the widget function)
   this.tileWidget = null;
   this._addWidgetProperties(['tileWidget']);
+  this._widgetPropertyChangeHandler = this._onWidgetPropertyChange.bind(this);
 };
 scout.inherits(scout.WidgetTile, scout.Tile);
 
 scout.WidgetTile.prototype._init = function(model) {
   scout.WidgetTile.parent.prototype._init.call(this, model);
   scout.assertProperty(this, 'tileWidget', scout.Widget);
+  // Hide tile if tileWidget is made invisible (don't do it if visible is true to not accidentally override the visibility state)
+  if (!this.tileWidget.visible) {
+    this.setVisible(false);
+  }
+  this.tileWidget.on('propertyChange', this._widgetPropertyChangeHandler);
+};
+
+scout.WidgetTile.prototype._destroy = function() {
+  this.tileWidget.off('propertyChange', this._widgetPropertyChangeHandler);
+  scout.WidgetTile.parent.prototype._destroy.call(this);
 };
 
 scout.WidgetTile.prototype._render = function() {
@@ -31,4 +42,10 @@ scout.WidgetTile.prototype._render = function() {
   this.tileWidget.$container.attr('data-tileadapter', this.id);
   this.$container = this.tileWidget.$container;
   this.htmlComp = this.tileWidget.htmlComp;
+};
+
+scout.WidgetTile.prototype._onWidgetPropertyChange = function(event) {
+  if (event.propertyName === 'visible') {
+    this.setVisible(event.newValue);
+  }
 };

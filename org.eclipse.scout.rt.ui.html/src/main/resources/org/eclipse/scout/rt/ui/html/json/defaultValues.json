@@ -399,7 +399,10 @@
     "Widget": {
       "FormField": {
         "Button": {
-          "RadioButton": null
+          "RadioButton": null,
+          "TileButton": {
+            "PageTileButton": null
+          }
         },
         "BrowserField": null,
         "GroupBox": {
