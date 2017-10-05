@@ -169,7 +169,7 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
       return BinaryResourceUrlUtility.createIconUrl(getModel().getImageId());
     }
     if (getModel().getImageUrl() != null) {
-      return getModel().getImageId();
+      return getModel().getImageUrl();
     }
     return null;
   }
