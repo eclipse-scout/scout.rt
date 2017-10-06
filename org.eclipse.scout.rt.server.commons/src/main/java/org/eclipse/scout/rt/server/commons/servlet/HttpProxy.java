@@ -83,7 +83,7 @@ public class HttpProxy {
    * Writes the returned response body of the forwarded request, the headers and the status to the response.<b>
    */
   public void proxyGet(HttpServletRequest req, HttpServletResponse resp, HttpProxyOptions options) throws IOException {
-    String url = StringUtility.join("", getRemoteUrl(), req.getPathInfo(), StringUtility.box("?", req.getQueryString(), ""));
+    String url = rewriteUrl(req, options);
     HttpRequest httpReq = BEANS.get(DefaultHttpTransportManager.class).getHttpRequestFactory().buildGetRequest(new GenericUrl(url));
     httpReq = prepareRequest(httpReq);
 
@@ -97,6 +97,18 @@ public class HttpProxy {
     LOG.debug("Forwarded get request to " + url);
   }
 
+  /**
+   * Rewrites the <code>pathInfo</code> part of the current request if the rewriteRule and rewriteReplacement is set on
+   * the options object. This allows to redirect the request to a different URL than the URL that has been requested.
+   */
+  protected String rewriteUrl(HttpServletRequest req, HttpProxyOptions options) {
+    String pathInfo = req.getPathInfo();
+    if (options.getRewriteRule() != null && options.getRewriteReplacement() != null) {
+      pathInfo = pathInfo.replaceAll(options.getRewriteRule(), options.getRewriteReplacement());
+    }
+    return StringUtility.join("", getRemoteUrl(), pathInfo, StringUtility.box("?", req.getQueryString(), ""));
+  }
+
   public void proxyPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     proxyPost(req, resp, new HttpProxyOptions());
   }
@@ -107,7 +119,7 @@ public class HttpProxy {
    * Writes the returned response body of the forwarded request, the headers and the status to the response.<b>
    */
   public void proxyPost(HttpServletRequest req, HttpServletResponse resp, HttpProxyOptions options) throws IOException {
-    String url = StringUtility.join("", getRemoteUrl(), req.getPathInfo());
+    String url = rewriteUrl(req, options);
     HttpRequest httpReq = BEANS.get(DefaultHttpTransportManager.class).getHttpRequestFactory().buildPostRequest(new GenericUrl(url), null);
     httpReq.getHeaders().setCacheControl("no-cache");
     httpReq = prepareRequest(httpReq);
