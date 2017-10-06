@@ -5,16 +5,20 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 
 /**
  * @since 7.1
  */
-public interface ITiles extends IWidget, ITypeWithClassId {
+public interface ITiles extends IWidget, ITypeWithClassId, IExtensibleObject {
 
   String PROP_TILES = "tiles";
+  String PROP_SELECTED_TILES = "selectedTiles";
   String PROP_GRID_COLUMN_COUNT = "gridColumnCount";
   String PROP_WITH_PLACEHOLDERS = "withPlaceholders";
   String PROP_SCROLLABLE = "scrollable";
+  String PROP_SELECTABLE = "selectable";
+  String PROP_MULTI_SELECT = "multiSelect";
   String PROP_LOGICAL_GRID = "logicalGrid";
   String PROP_LOGICAL_GRID_COLUMN_WIDTH = "logicalGridColumnWidth";
   String PROP_LOGICAL_GRID_ROW_HEIGHT = "logicalGridRowHeight";
@@ -65,6 +69,14 @@ public interface ITiles extends IWidget, ITypeWithClassId {
   boolean isWithPlaceholders();
 
   void setWithPlaceholders(boolean withPlaceholders);
+
+  boolean isSelectable();
+
+  void setSelectable(boolean selectable);
+
+  boolean isMultiSelect();
+
+  void setMultiSelect(boolean multiSelect);
 
   /**
    * @return true if the box should be vertically scrollable, false if not
@@ -138,6 +150,32 @@ public interface ITiles extends IWidget, ITypeWithClassId {
    */
   void setMaxContentWidth(int logicalGridMaxContentWidth);
 
+  void addTiles(List<? extends ITile> tiles);
+
+  void addTile(ITile tile);
+
+  void deleteTiles(List<? extends ITile> tiles);
+
+  void deleteTile(ITile tile);
+
+  void deleteAllTiles();
+
+  void selectTiles(List<? extends ITile> tiles);
+
+  void selectTile(ITile tile);
+
+  void selectAllTiles();
+
+  void deselectTiles(List<? extends ITile> tiles);
+
+  void deselectTile(ITile tile);
+
+  void deselectAllTiles();
+
+  List<? extends ITile> getSelectedTiles();
+
+  ITile getSelectedTile();
+
   <T extends ITile> T getTileByClass(Class<T> tileClass);
 
   /**
@@ -154,4 +192,6 @@ public interface ITiles extends IWidget, ITypeWithClassId {
   void loadTileData();
 
   void ensureTileDataLoaded();
+
+  ITilesUIFacade getUIFacade();
 }

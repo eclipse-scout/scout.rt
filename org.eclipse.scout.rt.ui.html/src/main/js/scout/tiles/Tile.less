@@ -10,13 +10,14 @@
  ******************************************************************************/
 .tile {
 
-  transition: transform 200ms ease-in;
+  transition: transform 200ms ease-out, box-shadow 200ms ease-out;
 
   &.selectable {
     cursor: pointer;
   }
 
   &.selected {
-    #scout.transform(scale(1.05));
+    #scout.transform(translateY(-10px));
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
   }
 }

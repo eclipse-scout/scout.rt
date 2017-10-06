@@ -268,11 +268,23 @@ scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
   }
 
   if (this.isRemoteProperty(propertyName)) {
-    if (value && this.widget.isWidgetProperty(propertyName)) {
-      value = value.modelAdapter.id;
-    }
+    value = this._prepareRemoteProperty(propertyName, value);
     this._callSendProperty(propertyName, value);
   }
+};
+
+scout.ModelAdapter.prototype._prepareRemoteProperty = function(propertyName, value) {
+  if (!value || !this.widget.isWidgetProperty(propertyName)) {
+    return value;
+  }
+
+  if (!Array.isArray(value)) {
+    return value.modelAdapter.id;
+  }
+
+  return value.map(function(widget) {
+    return widget.modelAdapter.id;
+  });
 };
 
 scout.ModelAdapter.prototype._callSendProperty = function(propertyName, value) {

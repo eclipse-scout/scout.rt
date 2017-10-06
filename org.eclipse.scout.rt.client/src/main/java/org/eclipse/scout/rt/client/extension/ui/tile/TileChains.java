@@ -8,10 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.tile;
+package org.eclipse.scout.rt.client.extension.ui.tile;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.tile.AbstractTile;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
 public final class TileChains {

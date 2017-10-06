@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,14 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.tiles {
-  overflow: hidden;
+package org.eclipse.scout.rt.client.ui.tile;
 
-  &.selectable {
-    padding: 10px;
-  }
+import java.util.List;
 
-  &.scrollable {
-    padding-right: 15px;
-  }
+public interface ITilesUIFacade {
+
+  void setSelectedTilesFromUI(List<? extends ITile> tiles);
+
 }

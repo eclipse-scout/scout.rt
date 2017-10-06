@@ -10,5 +10,10 @@
  ******************************************************************************/
 scout.TilesAdapter = function() {
   scout.TilesAdapter.parent.call(this);
+  this._addRemoteProperties(['selectedTiles']);
 };
 scout.inherits(scout.TilesAdapter, scout.ModelAdapter);
+
+scout.TilesAdapter.prototype._syncSelectedTiles = function(tiles) {
+  this.widget.selectTiles(tiles);
+};

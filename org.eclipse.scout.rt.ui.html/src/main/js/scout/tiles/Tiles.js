@@ -21,11 +21,14 @@ scout.Tiles = function() {
   this.logicalGridColumnWidth = 200;
   this.logicalGridRowHeight = 150;
   this.maxContentWidth = -1;
+  this.multiSelect = true;
   this.withPlaceholders = false;
   this.selectable = false;
+  this.selectedTiles = [];
   this.scrollable = true;
   this._tilePropertyChangeHandler = this._onTilePropertyChange.bind(this);
-  this._addWidgetProperties(['tiles']);
+  this._addWidgetProperties(['tiles', 'selectedTiles']);
+  this._addPreserveOnPropertyChangeProperties(['selectedTiles']);
 };
 scout.inherits(scout.Tiles, scout.Widget);
 
@@ -44,6 +47,7 @@ scout.Tiles.prototype._initTiles = function() {
 scout.Tiles.prototype._initTile = function(tile) {
   this._attachTile(tile);
   tile.setSelectable(this.selectable);
+  tile.setSelected(this.selectedTiles.indexOf(tile) >= 0);
 };
 
 scout.Tiles.prototype._destroy = function() {
@@ -76,6 +80,7 @@ scout.Tiles.prototype._renderProperties = function() {
   this._renderLogicalGridColumnWidth();
   this._renderMaxContentWidth();
   this._renderScrollable();
+  this._renderSelectable();
 };
 
 scout.Tiles.prototype._renderTiles = function() {
@@ -89,6 +94,7 @@ scout.Tiles.prototype.insertTile = function(tile) {
 };
 
 scout.Tiles.prototype.insertTiles = function(tiles) {
+  tiles = scout.arrays.ensure(tiles);
   this.setTiles(this.tiles.concat(tiles));
 };
 
@@ -97,9 +103,14 @@ scout.Tiles.prototype.deleteTile = function(tile) {
 };
 
 scout.Tiles.prototype.deleteTiles = function(tilesToDelete) {
+  tilesToDelete = scout.arrays.ensure(tilesToDelete);
   var tiles = this.tiles.slice();
   scout.arrays.removeAll(tiles, tilesToDelete);
   this.setTiles(tiles);
+};
+
+scout.Tiles.prototype.deleteAllTiles = function() {
+  this.setTiles([]);
 };
 
 scout.Tiles.prototype.setTiles = function(tiles) {
@@ -253,6 +264,8 @@ scout.Tiles.prototype._renderScrollable = function() {
   } else {
     scout.scrollbars.uninstall(this.$container, this.session);
   }
+  this.$container.toggleClass('scrollable', this.scrollable);
+  this.invalidateLayoutTree();
 };
 
 scout.Tiles.prototype.setWithPlaceholders = function(withPlaceholders) {
@@ -367,17 +380,17 @@ scout.Tiles.prototype.setSelectable = function(selectable) {
   });
 };
 
-scout.Tiles.prototype.selectedTiles = function() {
-  return this.tiles.filter(function(tile) {
-    return tile.selected;
-  });
+scout.Tiles.prototype._renderSelectable = function() {
+  this.$container.toggleClass('selectable', this.selectable);
+  this.invalidateLayoutTree();
 };
 
 scout.Tiles.prototype.selectTiles = function(tiles) {
   tiles = scout.arrays.ensure(tiles);
+  tiles = this._prepareWidgetProperty('selectedTiles', tiles);
 
   // Deselect the tiles which are not part of the new selection
-  var tilesToUnselect = this.selectedTiles();
+  var tilesToUnselect = this.selectedTiles;
   scout.arrays.removeAll(tilesToUnselect, tiles);
   tilesToUnselect.forEach(function(tile) {
     this._detachTile(tile);
@@ -386,7 +399,12 @@ scout.Tiles.prototype.selectTiles = function(tiles) {
   }, this);
 
   if (!this.selectable) {
+    this.setProperty('selectedTiles', []);
     return;
+  }
+
+  if (!this.multiSelect && tiles.length > 1) {
+    tiles = [tiles[0]];
   }
 
   // Select the tiles
@@ -395,6 +413,8 @@ scout.Tiles.prototype.selectTiles = function(tiles) {
     tile.setSelected(true);
     this._attachTile(tile);
   }, this);
+
+  this.setProperty('selectedTiles', tiles.slice());
 };
 
 scout.Tiles.prototype.selectTile = function(tile) {
@@ -407,7 +427,7 @@ scout.Tiles.prototype.selectAllTiles = function(tile) {
 
 scout.Tiles.prototype.deselectTiles = function(tiles) {
   tiles = scout.arrays.ensure(tiles);
-  var selectedTiles = this.selectedTiles();
+  var selectedTiles = this.selectedTiles.slice();
   if (scout.arrays.removeAll(selectedTiles, tiles)) {
     this.selectTiles(selectedTiles);
   }

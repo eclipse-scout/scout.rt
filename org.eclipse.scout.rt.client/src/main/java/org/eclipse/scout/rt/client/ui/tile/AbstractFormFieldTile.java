@@ -5,6 +5,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @since 7.1
  */
+@ClassId("824f17e6-a83f-4e5b-8915-34737a786265")
 public abstract class AbstractFormFieldTile<T extends IFormField> extends AbstractWidgetTile<T> implements IFormFieldTile<T> {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractFormFieldTile.class);
 

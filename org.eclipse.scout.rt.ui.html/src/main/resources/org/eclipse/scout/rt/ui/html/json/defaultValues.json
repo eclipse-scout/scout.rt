@@ -390,6 +390,8 @@
       "logicalGridRowHeight": 150,
       "maxContentWidth": -1,
       "withPlaceholders": false,
+      "selectable": false,
+      "multiSelect": true,
       "scrollable": false
     }
   },

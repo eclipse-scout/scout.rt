@@ -8,11 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.tile;
+package org.eclipse.scout.rt.client.extension.ui.tile;
 
-import org.eclipse.scout.rt.client.ui.tile.TileChains.TileDisposeTileChain;
-import org.eclipse.scout.rt.client.ui.tile.TileChains.TileInitTileChain;
-import org.eclipse.scout.rt.client.ui.tile.TileChains.TileLoadDataTileChain;
+import org.eclipse.scout.rt.client.extension.ui.tile.TileChains.TileDisposeTileChain;
+import org.eclipse.scout.rt.client.extension.ui.tile.TileChains.TileInitTileChain;
+import org.eclipse.scout.rt.client.extension.ui.tile.TileChains.TileLoadDataTileChain;
+import org.eclipse.scout.rt.client.ui.tile.AbstractTile;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 
 public abstract class AbstractTileExtension<OWNER_FIELD extends AbstractTile> extends AbstractExtension<OWNER_FIELD>

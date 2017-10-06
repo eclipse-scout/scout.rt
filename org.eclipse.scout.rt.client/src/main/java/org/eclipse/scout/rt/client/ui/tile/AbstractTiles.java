@@ -1,34 +1,52 @@
 package org.eclipse.scout.rt.client.ui.tile;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ModelContextProxy;
+import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.extension.ui.tile.ITilesExtension;
+import org.eclipse.scout.rt.client.extension.ui.tile.TilesChains.TilesSelectedChain;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
+import org.eclipse.scout.rt.shared.extension.AbstractExtension;
+import org.eclipse.scout.rt.shared.extension.IExtension;
+import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 
 /**
  * @since 7.1
  */
 @ClassId("c04e6cf7-fda0-4146-afea-6a0ff0a50c4b")
 public abstract class AbstractTiles extends AbstractWidget implements ITiles {
+  private ITilesUIFacade m_uiFacade;
   private boolean m_initialized;
+  private final ObjectExtensions<AbstractTiles, ITilesExtension<? extends AbstractTiles>> m_objectExtensions;
 
   public AbstractTiles() {
     this(true);
   }
 
   public AbstractTiles(boolean callInitializer) {
-    super(callInitializer);
+    super(false);
+    m_objectExtensions = new ObjectExtensions<>(this, false);
+    if (callInitializer) {
+      callInitializer();
+    }
   }
 
   @Override
@@ -36,13 +54,18 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     if (isInitialized()) {
       return;
     }
-    super.callInitializer();
+    interceptInitConfig();
     setInitialized(true);
+  }
+
+  protected final void interceptInitConfig() {
+    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), this::initConfig);
   }
 
   @Override
   protected void initConfig() {
     super.initConfig();
+    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(createUIFacade(), ModelContext.copyCurrent());
     setGridColumnCount(getConfiguredGridColumnCount());
     setLogicalGrid(getConfiguredLogicalGrid());
     setLogicalGridColumnWidth(getConfiguredLogicalGridColumnWidth());
@@ -57,6 +80,10 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     OrderedCollection<ITile> tiles = new OrderedCollection<>();
     injectTilesInternal(tiles);
     setTiles(tiles.getOrderedList());
+    setSelectedTiles(new ArrayList<ITile>());
+
+    // local property observer
+    addPropertyChangeListener(new P_PropertyChangeListener());
   }
 
   public boolean isInitialized() {
@@ -85,6 +112,15 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<ITile>> filtered = ConfigurationUtility.filterClasses(dca, ITile.class);
     return ConfigurationUtility.removeReplacedClasses(filtered);
+  }
+
+  protected ITilesUIFacade createUIFacade() {
+    return new P_TilesUIFacade();
+  }
+
+  @Override
+  public ITilesUIFacade getUIFacade() {
+    return m_uiFacade;
   }
 
   @Override
@@ -170,7 +206,19 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(40)
+  protected boolean getConfiguredSelectable() {
+    return false;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(50)
+  protected boolean getConfiguredMultiSelect() {
+    return true;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(60)
   protected boolean getConfiguredScrollable() {
     return true;
   }
@@ -207,6 +255,35 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   }
 
   @Override
+  public void addTiles(List<? extends ITile> tilesToAdd) {
+    List<ITile> tiles = new ArrayList<>(getTiles());
+    tiles.addAll(tilesToAdd);
+    setTiles(tiles);
+  }
+
+  @Override
+  public void addTile(ITile tile) {
+    addTiles(CollectionUtility.arrayList(tile));
+  }
+
+  @Override
+  public void deleteTiles(List<? extends ITile> tilesToDelete) {
+    List<ITile> tiles = new ArrayList<>(getTiles());
+    tiles.removeAll(tilesToDelete);
+    setTiles(tiles);
+  }
+
+  @Override
+  public void deleteTile(ITile tile) {
+    deleteTiles(CollectionUtility.arrayList(tile));
+  }
+
+  @Override
+  public void deleteAllTiles() {
+    setTiles(new ArrayList<ITile>());
+  }
+
+  @Override
   public int getGridColumnCount() {
     return propertySupport.getPropertyInt(PROP_GRID_COLUMN_COUNT);
   }
@@ -224,6 +301,26 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   @Override
   public void setWithPlaceholders(boolean withPlaceholders) {
     propertySupport.setPropertyBool(PROP_WITH_PLACEHOLDERS, withPlaceholders);
+  }
+
+  @Override
+  public boolean isSelectable() {
+    return propertySupport.getPropertyBool(PROP_SELECTABLE);
+  }
+
+  @Override
+  public void setSelectable(boolean selectable) {
+    propertySupport.setPropertyBool(PROP_SELECTABLE, selectable);
+  }
+
+  @Override
+  public boolean isMultiSelect() {
+    return propertySupport.getPropertyBool(PROP_MULTI_SELECT);
+  }
+
+  @Override
+  public void setMultiSelect(boolean multiSelect) {
+    propertySupport.setPropertyBool(PROP_MULTI_SELECT, multiSelect);
   }
 
   @Override
@@ -304,6 +401,87 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     return getGridColumnCount() * getLogicalGridColumnWidth() + (getGridColumnCount() - 1) * getLogicalGridHGap();
   }
 
+  /**
+   * Called whenever the selection changes.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   *
+   * @param tiles
+   *          an unmodifiable list of the selected tiles, may be empty but not null.
+   */
+  @ConfigOperation
+  @Order(100)
+  protected void execTilesSelected(List<? extends ITile> tiles) {
+  }
+
+  @Override
+  public void selectTiles(List<? extends ITile> tiles) {
+    List<ITile> newSelection = new ArrayList<>(tiles);
+    if (newSelection.size() > 1 && !isMultiSelect()) {
+      ITile first = newSelection.get(0);
+      newSelection.clear();
+      newSelection.add(first);
+    }
+    if (!CollectionUtility.equalsCollection(getSelectedTiles(), newSelection, false)) {
+      setSelectedTiles(newSelection);
+    }
+  }
+
+  @Override
+  public void selectTile(ITile tile) {
+    selectTiles(CollectionUtility.arrayList(tile));
+  }
+
+  @Override
+  public void selectAllTiles() {
+    selectTiles(getTiles());
+  }
+
+  @Override
+  public void deselectTiles(List<? extends ITile> tiles) {
+    List<? extends ITile> selectedTiles = getSelectedTiles();
+    boolean selectionChanged = selectedTiles.removeAll(tiles);
+    if (selectionChanged) {
+      selectTiles(selectedTiles);
+    }
+  }
+
+  @Override
+  public void deselectTile(ITile tile) {
+    deselectTiles(CollectionUtility.arrayList(tile));
+  }
+
+  @Override
+  public void deselectAllTiles() {
+    selectTiles(new ArrayList<ITile>());
+  }
+
+  @Override
+  public List<? extends ITile> getSelectedTiles() {
+    return propertySupport.getPropertyList(PROP_SELECTED_TILES);
+  }
+
+  public void setSelectedTiles(List<? extends ITile> tiles) {
+    propertySupport.setPropertyList(PROP_SELECTED_TILES, tiles);
+  }
+
+  @Override
+  public ITile getSelectedTile() {
+    if (getSelectedTiles().size() == 0) {
+      return null;
+    }
+    return getSelectedTiles().get(0);
+  }
+
+  @Override
+  public String classId() {
+    String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
+    if (getContainer() != null) {
+      return simpleClassId + ID_CONCAT_SYMBOL + getContainer().classId();
+    }
+    return simpleClassId;
+  }
+
   @Override
   public <T extends ITile> T getTileByClass(Class<T> tileClass) {
     // TODO [15.4] bsh: Make this method more sophisticated (@Replace etc.)
@@ -317,15 +495,6 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
       }
     }
     return candidate;
-  }
-
-  @Override
-  public String classId() {
-    String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
-    if (getContainer() != null) {
-      return simpleClassId + ID_CONCAT_SYMBOL + getContainer().classId();
-    }
-    return simpleClassId;
   }
 
   @Override
@@ -374,4 +543,63 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
       tile.loadData();
     }
   }
+
+  protected class P_TilesUIFacade implements ITilesUIFacade {
+
+    @Override
+    public void setSelectedTilesFromUI(List<? extends ITile> tiles) {
+      selectTiles(tiles);
+    }
+
+  }
+
+  @Override
+  public final List<? extends ITilesExtension<? extends AbstractTiles>> getAllExtensions() {
+    return m_objectExtensions.getAllExtensions();
+  }
+
+  @Override
+  public <T extends IExtension<?>> T getExtension(Class<T> c) {
+    return m_objectExtensions.getExtension(c);
+  }
+
+  protected ITilesExtension<? extends AbstractTiles> createLocalExtension() {
+    return new LocalTilesExtension<>(this);
+  }
+
+  protected static class LocalTilesExtension<TILES extends AbstractTiles> extends AbstractExtension<TILES> implements ITilesExtension<TILES> {
+
+    public LocalTilesExtension(TILES owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execTilesSelected(TilesSelectedChain chain, List<? extends ITile> tiles) {
+      getOwner().execTilesSelected(tiles);
+    }
+  }
+
+  protected final void interceptTilesSelected(List<? extends ITile> tiles) {
+    List<? extends ITilesExtension<? extends AbstractTiles>> extensions = getAllExtensions();
+    TilesSelectedChain chain = new TilesSelectedChain(extensions);
+    chain.execTilesSelected(tiles);
+  }
+
+  protected class P_PropertyChangeListener implements PropertyChangeListener {
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+      if (event.getPropertyName().equals(PROP_SELECTED_TILES)) {
+        @SuppressWarnings("unchecked")
+        List<? extends ITile> tiles = (List<? extends ITile>) event.getNewValue();
+        try {
+          interceptTilesSelected(tiles);
+        }
+        catch (Exception t) {
+          BEANS.get(ExceptionHandler.class).handle(t);
+        }
+      }
+    }
+  }
+
 }

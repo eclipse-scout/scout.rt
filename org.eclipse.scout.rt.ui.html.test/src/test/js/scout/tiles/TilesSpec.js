@@ -31,37 +31,52 @@ describe("Tiles", function() {
     return scout.create('Tiles', model);
   }
 
+  function createTile(model) {
+    var defaults = {
+      parent: session.desktop
+    };
+    model = $.extend({}, defaults, model);
+    return scout.create('Tile', model);
+  }
+
   describe('selectTiles', function() {
     it('selects the given tiles and unselects the previously selected ones', function() {
       var tiles = createTiles(3, {
         selectable: true
       });
       tiles.selectTiles(tiles.tiles[0]);
-      expect(tiles.selectedTiles().length).toBe(1);
+      expect(tiles.selectedTiles.length).toBe(1);
+      expect(tiles.selectedTiles[0]).toBe(tiles.tiles[0]);
       expect(tiles.tiles[0].selected).toBe(true);
       expect(tiles.tiles[1].selected).toBe(false);
       expect(tiles.tiles[2].selected).toBe(false);
 
       tiles.selectTiles(tiles.tiles[1]);
-      expect(tiles.selectedTiles().length).toBe(1);
+      expect(tiles.selectedTiles.length).toBe(1);
+      expect(tiles.selectedTiles[0]).toBe(tiles.tiles[1]);
       expect(tiles.tiles[0].selected).toBe(false);
       expect(tiles.tiles[1].selected).toBe(true);
       expect(tiles.tiles[2].selected).toBe(false);
 
       tiles.selectTiles([tiles.tiles[0], tiles.tiles[2]]);
-      expect(tiles.selectedTiles().length).toBe(2);
+      expect(tiles.selectedTiles.length).toBe(2);
+      expect(tiles.selectedTiles[0]).toBe(tiles.tiles[0]);
+      expect(tiles.selectedTiles[1]).toBe(tiles.tiles[2]);
       expect(tiles.tiles[0].selected).toBe(true);
       expect(tiles.tiles[1].selected).toBe(false);
       expect(tiles.tiles[2].selected).toBe(true);
 
       tiles.selectTiles([tiles.tiles[0], tiles.tiles[1], tiles.tiles[2]]);
-      expect(tiles.selectedTiles().length).toBe(3);
+      expect(tiles.selectedTiles.length).toBe(3);
+      expect(tiles.selectedTiles[0]).toBe(tiles.tiles[0]);
+      expect(tiles.selectedTiles[1]).toBe(tiles.tiles[1]);
+      expect(tiles.selectedTiles[2]).toBe(tiles.tiles[2]);
       expect(tiles.tiles[0].selected).toBe(true);
       expect(tiles.tiles[1].selected).toBe(true);
       expect(tiles.tiles[2].selected).toBe(true);
 
       tiles.selectTiles([]);
-      expect(tiles.selectedTiles().length).toBe(0);
+      expect(tiles.selectedTiles.length).toBe(0);
       expect(tiles.tiles[0].selected).toBe(false);
       expect(tiles.tiles[1].selected).toBe(false);
       expect(tiles.tiles[2].selected).toBe(false);
@@ -85,22 +100,66 @@ describe("Tiles", function() {
         selectable: true
       });
       tiles.selectAllTiles();
-      expect(tiles.selectedTiles().length).toBe(3);
+      expect(tiles.selectedTiles.length).toBe(3);
+      expect(tiles.selectedTiles[0]).toBe(tiles.tiles[0]);
+      expect(tiles.selectedTiles[1]).toBe(tiles.tiles[1]);
+      expect(tiles.selectedTiles[2]).toBe(tiles.tiles[2]);
       expect(tiles.tiles[0].selected).toBe(true);
       expect(tiles.tiles[1].selected).toBe(true);
       expect(tiles.tiles[2].selected).toBe(true);
 
       tiles.deselectTiles(tiles.tiles[1]);
-      expect(tiles.selectedTiles().length).toBe(2);
+      expect(tiles.selectedTiles.length).toBe(2);
+      expect(tiles.selectedTiles[0]).toBe(tiles.tiles[0]);
+      expect(tiles.selectedTiles[1]).toBe(tiles.tiles[2]);
       expect(tiles.tiles[0].selected).toBe(true);
       expect(tiles.tiles[1].selected).toBe(false);
       expect(tiles.tiles[2].selected).toBe(true);
 
       tiles.deselectAllTiles();
-      expect(tiles.selectedTiles().length).toBe(0);
+      expect(tiles.selectedTiles.length).toBe(0);
       expect(tiles.tiles[0].selected).toBe(false);
       expect(tiles.tiles[1].selected).toBe(false);
       expect(tiles.tiles[2].selected).toBe(false);
+    });
+  });
+
+  describe('insertTiles', function() {
+    it('inserts the given tiles', function() {
+      var tiles = createTiles(0);
+      var tile0 = createTile();
+      var tile1 = createTile();
+      var tile2 = createTile();
+      expect(tiles.tiles.length).toBe(0);
+
+      tiles.insertTiles(tile0);
+      expect(tiles.tiles.length).toBe(1);
+      expect(tiles.tiles[0]).toBe(tile0);
+
+      tiles.insertTiles([tile1, tile2]);
+      expect(tiles.tiles.length).toBe(3);
+      expect(tiles.tiles[0]).toBe(tile0);
+      expect(tiles.tiles[1]).toBe(tile1);
+      expect(tiles.tiles[2]).toBe(tile2);
+    });
+  });
+
+  describe('deleteTiles', function() {
+    it('deletes the given tiles', function() {
+      var tiles = createTiles(0);
+      var tile0 = createTile();
+      var tile1 = createTile();
+      var tile2 = createTile();
+      tiles.insertTiles([tile0, tile1, tile2]);
+      expect(tiles.tiles.length).toBe(3);
+
+      tiles.deleteTiles(tile1);
+      expect(tiles.tiles.length).toBe(2);
+      expect(tiles.tiles[0]).toBe(tile0);
+      expect(tiles.tiles[1]).toBe(tile2);
+
+      tiles.deleteTiles([tile0, tile2]);
+      expect(tiles.tiles.length).toBe(0);
     });
   });
 });

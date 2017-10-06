@@ -1,11 +1,13 @@
 package org.eclipse.scout.rt.client.ui.tile;
 
 import org.eclipse.scout.rt.client.ui.IWidget;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 
 /**
  * @since 7.1
  */
+@ClassId("b9299ac7-2401-4ff5-9806-3dafbfce5d22")
 public abstract class AbstractWidgetTile<T extends IWidget> extends AbstractTile implements IWidgetTile<T> {
 
   public AbstractWidgetTile() {
