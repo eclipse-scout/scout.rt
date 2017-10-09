@@ -289,7 +289,7 @@ scout.Planner.prototype._showContextMenu = function(event, allowedType) {
     if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
       return;
     }
-    var filteredMenus = this._filterMenus([allowedType]),
+    var filteredMenus = this._filterMenus([allowedType], true),
       $part = $(event.currentTarget);
     if (filteredMenus.length === 0) {
       return; // at least one menu item must be visible
@@ -1139,7 +1139,7 @@ scout.Planner.prototype._setMenus = function(menus) {
 };
 
 scout.Planner.prototype._updateMenuBar = function() {
-  var menuItems = this._filterMenus(['Planner.EmptySpace', 'Planner.Resource', 'Planner.Activity', 'Planner.Range'], true);
+  var menuItems = this._filterMenus(['Planner.EmptySpace', 'Planner.Resource', 'Planner.Activity', 'Planner.Range'], false, true);
   this.menuBar.setMenuItems(menuItems);
 };
 
@@ -1147,7 +1147,7 @@ scout.Planner.prototype._removeMenus = function() {
   // menubar takes care about removal
 };
 
-scout.Planner.prototype._filterMenus = function(allowedTypes, enableDisableKeyStroke) {
+scout.Planner.prototype._filterMenus = function(allowedTypes, onlyVisible, enableDisableKeyStroke) {
   allowedTypes = allowedTypes || [];
   if (allowedTypes.indexOf('Planner.Resource') > -1 && this.selectedResources.length === 0) {
     scout.arrays.remove(allowedTypes, 'Planner.Resource');
@@ -1158,7 +1158,7 @@ scout.Planner.prototype._filterMenus = function(allowedTypes, enableDisableKeySt
   if (allowedTypes.indexOf('Planner.Range') > -1 && !this.selectionRange.from && !this.selectionRange.to) {
     scout.arrays.remove(allowedTypes, 'Planner.Range');
   }
-  return scout.menus.filter(this.menus, allowedTypes, true, enableDisableKeyStroke);
+  return scout.menus.filter(this.menus, allowedTypes, onlyVisible, enableDisableKeyStroke);
 };
 
 scout.Planner.prototype._renderWorkDayCount = function() {};
