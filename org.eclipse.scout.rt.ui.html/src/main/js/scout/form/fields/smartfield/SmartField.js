@@ -848,15 +848,24 @@ scout.SmartField.prototype._onFieldKeyUp = function(event) {
   var pasteShortcut = event.ctrlKey && w === scout.keys.V;
 
   if (!pasteShortcut && (
-      event.ctrlKey || event.altKey ||
+      event.ctrlKey ||
+      event.altKey ||
       w === scout.keys.ENTER ||
       w === scout.keys.TAB ||
       w === scout.keys.SHIFT ||
       w === scout.keys.CTRL ||
+      w === scout.keys.ALT ||
       w === scout.keys.HOME ||
       w === scout.keys.END ||
       w === scout.keys.LEFT ||
       w === scout.keys.RIGHT ||
+      w === scout.keys.WIN_LEFT ||
+      w === scout.keys.WIN_RIGHT ||
+      w === scout.keys.SELECT ||
+      w === scout.keys.NUM_LOCK ||
+      w === scout.keys.CAPS_LOCK ||
+      w === scout.keys.SCROLL_LOCK ||
+      w === scout.keys.PAUSE ||
       this._isNavigationKey(event) ||
       this._isFunctionKey(event)
     )) {
