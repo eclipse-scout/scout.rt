@@ -81,7 +81,9 @@ scout.keys = {
   F10: 121,
   F11: 122,
   F12: 123,
-  SELECT: 93,
+  WIN_LEFT: 91, // Left windows key / left command key
+  WIN_RIGHT: 92, // Right windows key / right command key
+  SELECT: 93, // Menu key
   NUMPAD_0: 96,
   NUMPAD_1: 97,
   NUMPAD_2: 98,
@@ -167,6 +169,8 @@ scout.codesToKeys = {
   88: 'X',
   89: 'Y',
   90: 'Z',
+  91: 'WIN_LEFT',
+  92: 'WIN_RIGHT',
   93: 'SELECT',
   112: 'F1',
   113: 'F2',
