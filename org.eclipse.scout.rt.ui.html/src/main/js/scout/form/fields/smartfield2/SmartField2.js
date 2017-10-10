@@ -1027,11 +1027,11 @@ scout.SmartField2.prototype.setActiveFilterEnabled = function(activeFilterEnable
 scout.SmartField2.prototype._executeLookup = function(lookupFunc) {
   this._lookupInProgress = true;
   this.setLoading(true);
-  this._clearLookupStatus();
   return lookupFunc()
-    .done(function() {
+    .always(function() {
       this._lookupInProgress = false;
       this.setLoading(false);
+      this.clearErrorStatus();
     }.bind(this));
 };
 
