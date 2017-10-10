@@ -121,12 +121,10 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
 
   @Override
   protected void attachNode(ITreeNode node, boolean attachChildren) {
-    if (attachChildren) {
-      attachNodes(node.getChildNodes(), attachChildren);
-    }
     if (!(node instanceof IPage)) {
       throw new IllegalArgumentException("Expected node to be a page. " + node);
     }
+    super.attachNode(node, attachChildren);
     IPage<?> page = (IPage) node;
     if (hasDetailForm(page)) {
       attachGlobalAdapter(page.getDetailForm());
@@ -211,8 +209,8 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
 
   @Override
   protected void disposeNode(ITreeNode node, boolean disposeChildren) {
-    super.disposeNode(node, disposeChildren);
     detachDetailTable(node, false);
+    super.disposeNode(node, disposeChildren);
     // No need to dispose detail form (it will be disposed automatically when it is closed)
   }
 
@@ -242,7 +240,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
 
   protected void detachDetailTable(ITreeNode node, boolean disposeChildren) {
     if (disposeChildren) {
-      detachDetailTables(node.getChildNodes(), disposeChildren);
+      detachDetailTables(getChildNodes(node), disposeChildren);
     }
 
     if (!(node instanceof IPage)) {
