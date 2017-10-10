@@ -637,14 +637,8 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
     return;
   }
 
-  // We don't want to set an error status on the field for the 'no data' case
-  // Only show the message as status in the proposal chooser popup
+  // 'No data' case
   if (emptyResult && result.browse) {
-    this.setLookupStatus(scout.Status.warn({
-      message: this.session.text('SmartFieldNoDataFound'),
-      code: scout.SmartField2.ErrorCode.NO_DATA
-    }));
-
     // When active filter is enabled we must always show the popup, because the user
     // must be able to switch the filter properties. Otherwise a user could set the filter
     // to 'inactive', and receives an empty result for that query, the popup is closed
@@ -655,6 +649,11 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
     } else {
       this.closePopup();
     }
+
+    this.setLookupStatus(scout.Status.warn({
+      message: this.session.text('SmartFieldNoDataFound'),
+      code: scout.SmartField2.ErrorCode.NO_DATA
+    }));
     return;
   }
 
