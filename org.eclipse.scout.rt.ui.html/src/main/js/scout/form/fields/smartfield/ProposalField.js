@@ -89,8 +89,8 @@ scout.ProposalField.prototype._acceptByTextDone = function(result) {
   this._extendResult(result);
 
   // when there's exactly one result, we accept that lookup row
-  if (result.numLookupRows === 1) {
-    var lookupRow = result.singleMatch;
+  if (result.uniqueMatch) {
+    var lookupRow = result.uniqueMatch;
     if (this._isLookupRowActive(lookupRow)) {
       this.setLookupRow(lookupRow);
       this._inputAccepted();

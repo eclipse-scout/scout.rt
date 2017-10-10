@@ -332,8 +332,8 @@ scout.SmartField.prototype._acceptByTextDone = function(result) {
   this._notUnique = result.numLookupRows > 1;
 
   // when there's exactly one result, we accept that lookup row
-  if (result.numLookupRows === 1) {
-    var lookupRow = result.singleMatch;
+  if (result.uniqueMatch) {
+    var lookupRow = result.uniqueMatch;
     if (this._isLookupRowActive(lookupRow)) {
       this.setLookupRow(lookupRow);
       this._inputAccepted();
@@ -349,12 +349,15 @@ scout.SmartField.prototype._acceptByTextDone = function(result) {
 };
 
 /**
- * Extends the properties 'singleMatch' and 'numLookupRows' on the given result object.
+ * Extends the properties 'uniqueMatch' and 'numLookupRows' on the given result object.
  * The implementation is different depending on the browseHierarchy property.
  */
 scout.SmartField.prototype._extendResult = function(result) {
-  result.singleMatch = null;
-  this._setQueryTypeOnResult(result);
+  result.uniqueMatch = null;
+
+  // Set query type on result, e.g. 'byAll'
+  var propertyName = 'by' + scout.strings.toUpperCaseFirstLetter(result.queryBy.toLowerCase());
+  result[propertyName] = true;
 
   if (this.browseHierarchy) {
     // tree (hierarchical)
@@ -366,22 +369,24 @@ scout.SmartField.prototype._extendResult = function(result) {
     var leafs = proposalChooser.findLeafs();
     result.numLookupRows = leafs.length;
     if (result.numLookupRows === 1) {
-      result.singleMatch = leafs[0].lookupRow;
+      result.uniqueMatch = leafs[0].lookupRow;
     }
   } else {
     // table
     result.numLookupRows = result.lookupRows.length;
     if (result.numLookupRows === 1) {
-      result.singleMatch = result.lookupRows[0];
+      result.uniqueMatch = result.lookupRows[0];
     }
   }
+
+  result.empty = (result.numLookupRows === 0);
 };
 
 scout.SmartField.prototype._acceptInputFail = function(result) {
   var searchText = result.text;
 
   // in any other case something went wrong
-  if (result.numLookupRows === 0) {
+  if (result.empty) {
     if (!this.embedded) {
       this.closePopup();
     }
@@ -603,17 +608,9 @@ scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText) {
   return deferred.promise();
 };
 
-scout.SmartField.prototype._setQueryTypeOnResult = function(result) {
-  var propertyName = 'by' + scout.strings.toUpperCaseFirstLetter(result.queryBy.toLowerCase()); // e.g. 'byAll'
-  result[propertyName] = true;
-};
-
 scout.SmartField.prototype._lookupByTextOrAllDone = function(result) {
-
-  var numLookupRows = result.lookupRows.length,
-    emptyResult = numLookupRows === 0;
-  this._setQueryTypeOnResult(result);
-  this._notUnique = !result.byAll && numLookupRows > 1;
+  this._extendResult(result);
+  this._notUnique = !result.byAll && result.numLookupRows > 1;
 
   // Oops! Something went wrong while the lookup has been processed.
   if (result.exception) {
@@ -634,7 +631,7 @@ scout.SmartField.prototype._lookupByTextOrAllDone = function(result) {
   }
 
   // 'No data' case
-  if (emptyResult && result.byAll) {
+  if (result.empty && result.byAll) {
     // When active filter is enabled we must always show the popup, because the user
     // must be able to switch the filter properties. Otherwise a user could set the filter
     // to 'inactive', and receives an empty result for that query, the popup is closed
@@ -653,7 +650,7 @@ scout.SmartField.prototype._lookupByTextOrAllDone = function(result) {
     return;
   }
 
-  if (emptyResult) {
+  if (result.empty) {
     this._handleEmptyResult();
     this.setLookupStatus(scout.Status.warn({
       message: this.session.text('SmartFieldCannotComplete', result.text),
@@ -663,7 +660,7 @@ scout.SmartField.prototype._lookupByTextOrAllDone = function(result) {
   }
 
   var popupStatus = null;
-  if (numLookupRows > this.browseMaxRowCount) {
+  if (result.numLookupRows > this.browseMaxRowCount) {
     // Info: we limit the lookup rows here, but this is more a last line of defense
     // limit should be always performed on the server, so we don't have to transfer
     // unnecessary lookup rows over the slow network. Make sure your Scout lookup call

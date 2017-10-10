@@ -308,6 +308,32 @@ describe('SmartField', function() {
       expect(field.lookupStatus).toBe(null);
     });
 
+    /**
+     * The hierarchical result contains 2 lookup-rows, but only leafs are counted when the numLookupRows
+     * property is set which is used to determine whether or not the result is unqiue.
+     */
+    it('hierarchical lookup with unique result', function() {
+      var field = createFieldWithLookupCall({
+        browseHierarchy: true
+      }, {
+        hierarchical: true
+      });
+      var result = null;
+      field.render();
+      field.$field.val('Bar');
+      field._lookupByTextOrAll()
+        .then(function(result0) {
+          result = result0;
+        });
+      jasmine.clock().tick(500); // 2 ticks required for promises in StaticLookupCall.js
+      jasmine.clock().tick(500);
+      expect(result.empty).toBe(false);
+      expect(result.numLookupRows).toBe(1);
+      expect(result.lookupRows.length).toBe(2); // 2 because parent row has been added to result
+      expect(result.uniqueMatch.text).toBe('Bar');
+      expect(result.byText).toBe(true);
+    });
+
   });
 
   describe('touch / embed', function() {

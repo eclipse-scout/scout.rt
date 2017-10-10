@@ -19,9 +19,9 @@ scout.inherits(scout.DummyLookupCall, scout.StaticLookupCall);
 
 scout.DummyLookupCall.prototype._data = function() {
   return [
-    [1, line.call(this, 'Foo')],
-    [2, line.call(this, 'Bar')],
-    [3, line.call(this, 'Baz')]
+    [1, line.call(this, 'Foo'), 0],
+    [2, line.call(this, 'Bar'), 1],
+    [3, line.call(this, 'Baz'), 1]
   ];
 
   function line(text) {
