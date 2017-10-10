@@ -379,13 +379,15 @@ scout.SmartField2.prototype._extendResult = function(result) {
       result.singleMatch = result.lookupRows[0];
     }
   }
+
+  result.empty = (result.numLookupRows === 0);
 };
 
 scout.SmartField2.prototype._acceptInputFail = function(result) {
   var searchText = result.searchText;
 
   // in any other case something went wrong
-  if (result.numLookupRows === 0) {
+  if (result.empty) {
     if (!this.embedded) {
       this.closePopup();
     }
@@ -614,10 +616,8 @@ scout.SmartField2.prototype._lookupByTextOrAll = function(browse, searchText) {
 };
 
 scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
-
-  var numLookupRows = result.lookupRows.length,
-    emptyResult = numLookupRows === 0;
-  this._notUnique = !result.browse && numLookupRows > 1;
+  this._extendResult(result);
+  this._notUnique = !result.browse && result.numLookupRows > 1;
 
   // Oops! Something went wrong while the lookup has been processed.
   if (result.exception) {
@@ -638,7 +638,7 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
   }
 
   // 'No data' case
-  if (emptyResult && result.browse) {
+  if (result.empty && result.browse) {
     // When active filter is enabled we must always show the popup, because the user
     // must be able to switch the filter properties. Otherwise a user could set the filter
     // to 'inactive', and receives an empty result for that query, the popup is closed
@@ -657,7 +657,7 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
     return;
   }
 
-  if (emptyResult) {
+  if (result.empty) {
     this._handleEmptyResult();
     this.setLookupStatus(scout.Status.warn({
       message: this.session.text('SmartFieldCannotComplete', result.searchText),
@@ -667,7 +667,7 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
   }
 
   var popupStatus = null;
-  if (numLookupRows > this.browseMaxRowCount) {
+  if (result.numLookupRows > this.browseMaxRowCount) {
     // Info: we limit the lookup rows here, but this is more a last line of defense
     // limit should be always performed on the server, so we don't have to transfer
     // unnecessary lookup rows over the slow network. Make sure your Scout lookup call
