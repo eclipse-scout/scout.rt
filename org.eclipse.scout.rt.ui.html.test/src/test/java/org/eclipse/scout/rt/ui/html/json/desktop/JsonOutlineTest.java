@@ -133,6 +133,93 @@ public class JsonOutlineTest {
     assertNull(m_uiSession.getJsonAdapter(tablePage.getTable(), m_uiSession.getRootJsonAdapter()));
   }
 
+  @Test
+  public void testPageDisposalOnRemoveAll() throws JSONException {
+    NodePage nodePage = new NodePage();
+    nodePage.getTable(true); // trigger table creation
+
+    NodePage childPage = new NodePage();
+    childPage.getTable(true); // trigger table creation
+
+    List<IPage<?>> pages = new ArrayList<IPage<?>>();
+    pages.add(nodePage);
+    IOutline outline = new Outline(pages);
+    outline.addChildNode(nodePage, childPage);
+    JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline, null);
+
+    // Assert that pages have an id
+    String nodeId = JsonTreeTest.getOrCreateNodeId(jsonOutline, nodePage);
+    assertNotNull(nodeId);
+    assertNotNull(JsonTreeTest.getNode(jsonOutline, nodeId));
+    String childId = JsonTreeTest.getOrCreateNodeId(jsonOutline, childPage);
+    assertNotNull(childId);
+    assertNotNull(JsonTreeTest.getNode(jsonOutline, childId));
+
+    // Assert that adapters for table have been created
+    assertNotNull(m_uiSession.getJsonAdapter(nodePage.getTable(), m_uiSession.getRootJsonAdapter()));
+    assertNotNull(m_uiSession.getJsonAdapter(childPage.getTable(), m_uiSession.getRootJsonAdapter()));
+
+    // Remove all child nodes of the root page
+    outline.removeAllChildNodes(outline.getRootNode());
+
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+
+    // Assert that pages have been disposed
+    assertNull(JsonTreeTest.getNode(jsonOutline, nodeId));
+    assertNull(JsonTreeTest.getNode(jsonOutline, childId));
+
+    // Assert that tables have been disposed
+    assertNull(m_uiSession.getJsonAdapter(nodePage.getTable(), m_uiSession.getRootJsonAdapter()));
+    assertNull(m_uiSession.getJsonAdapter(childPage.getTable(), m_uiSession.getRootJsonAdapter()));
+  }
+
+  @Test
+  public void testPageDisposalOnRemoveAllNested() throws JSONException {
+    NodePage nodePage = new NodePage();
+    nodePage.getCellForUpdate().setText("node");
+    nodePage.getTable(true); // trigger table creation
+
+    NodePage childPage = new NodePage();
+    childPage.getCellForUpdate().setText("child");
+    childPage.getTable(true); // trigger table creation
+
+    List<IPage<?>> pages = new ArrayList<IPage<?>>();
+    pages.add(nodePage);
+    IOutline outline = new Outline(pages);
+    outline.addChildNode(nodePage, childPage);
+    JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline, null);
+
+    // Assert that pages have an id
+    String nodeId = JsonTreeTest.getOrCreateNodeId(jsonOutline, nodePage);
+    assertNotNull(nodeId);
+    assertNotNull(JsonTreeTest.getNode(jsonOutline, nodeId));
+    String childId = JsonTreeTest.getOrCreateNodeId(jsonOutline, childPage);
+    assertNotNull(childId);
+    assertNotNull(JsonTreeTest.getNode(jsonOutline, childId));
+
+    // Assert that adapters for table have been created
+    assertNotNull(m_uiSession.getJsonAdapter(nodePage.getTable(), m_uiSession.getRootJsonAdapter()));
+    assertNotNull(m_uiSession.getJsonAdapter(childPage.getTable(), m_uiSession.getRootJsonAdapter()));
+
+    outline.setTreeChanging(true);
+    // First remove all child nodes of the node page
+    outline.removeAllChildNodes(nodePage);
+    // Then remove all child nodes of the root page
+    outline.removeAllChildNodes(outline.getRootNode());
+    // Finally fire the events -> event buffer will remove the first event, but JsonOutline must dispose the children of nodePage anyway. That is why JsonTree keeps track of the child/parent link by itself.
+    outline.setTreeChanging(false);
+
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+
+    // Assert that pages have been disposed
+    assertNull(JsonTreeTest.getNode(jsonOutline, nodeId));
+    assertNull(JsonTreeTest.getNode(jsonOutline, childId));
+
+    // Assert that tables have been disposed
+    assertNull(m_uiSession.getJsonAdapter(nodePage.getTable(), m_uiSession.getRootJsonAdapter()));
+    assertNull(m_uiSession.getJsonAdapter(childPage.getTable(), m_uiSession.getRootJsonAdapter()));
+  }
+
   /**
    * Node.detailTable must not be sent if node.tableVisible is set to false to reduce response size.
    */

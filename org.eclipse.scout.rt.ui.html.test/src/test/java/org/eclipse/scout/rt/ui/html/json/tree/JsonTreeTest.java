@@ -295,6 +295,36 @@ public class JsonTreeTest {
     JsonTestUtility.processBufferedEvents(m_uiSession);
     assertNull(jsonTree.optNodeId(nodes.get(0)));
     assertNull(jsonTree.optTreeNodeForNodeId(node0Id));
+    assertNull(jsonTree.getParentNode(nodes.get(0)));
+    assertEquals(0, jsonTree.getChildNodes(nodes.get(0)).size());
+  }
+
+  @Test
+  public void testChildNodeDisposal() throws JSONException {
+    List<ITreeNode> nodes = new ArrayList<ITreeNode>();
+    nodes.add(new TreeNode());
+    nodes.add(new TreeNode());
+    nodes.add(new TreeNode());
+    TreeNode child0 = new TreeNode();
+    TreeNode child1 = new TreeNode();
+    ITree tree = createTree(nodes);
+    tree.addChildNode(nodes.get(0), child0);
+    tree.addChildNode(nodes.get(0), child1);
+    JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
+
+    String child0Id = jsonTree.getOrCreateNodeId(child0);
+    assertNotNull(child0Id);
+    assertNotNull(jsonTree.optTreeNodeForNodeId(child0Id));
+    assertEquals(nodes.get(0), jsonTree.getParentNode(child0));
+    assertEquals(2, jsonTree.getChildNodes(nodes.get(0)).size());
+
+    tree.removeNode(child0);
+
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    assertNull(jsonTree.optNodeId(child0));
+    assertNull(jsonTree.optTreeNodeForNodeId(child0Id));
+    assertNull(jsonTree.getParentNode(child0));
+    assertEquals(1, jsonTree.getChildNodes(nodes.get(0)).size());
   }
 
   @Test
@@ -453,6 +483,7 @@ public class JsonTreeTest {
 
       assertNotNull(nodeId);
       assertNotNull(jsonTree.optTreeNodeForNodeId(nodeId));
+      assertNotNull(jsonTree.getParentNode(node));
     }
 
     tree.removeNode(allNodes.get(0));
@@ -460,6 +491,8 @@ public class JsonTreeTest {
     JsonTestUtility.processBufferedEvents(m_uiSession);
     for (ITreeNode node : allNodes) {
       assertNull(jsonTree.optNodeId(node));
+      assertNull(jsonTree.getParentNode(node));
+      assertEquals(0, jsonTree.getChildNodes(node).size());
     }
     for (String nodeId : allNodeIds) {
       assertNull(jsonTree.optTreeNodeForNodeId(nodeId));
