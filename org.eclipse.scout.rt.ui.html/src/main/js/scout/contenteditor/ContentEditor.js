@@ -81,7 +81,7 @@ scout.ContentEditor.prototype._injectStyleSheet = function($header) {
 };
 
 scout.ContentEditor.prototype._onIframeContentLoaded = function(doc) {
-  this.$slots = $(doc.body).find('[data-contenteditor-slot]');
+  this.$slots = $(doc.body).find('[data-ce-slot]');
   this.$slots.appendDiv('ce-slot-placeholder').text('Add Element');
   this._injectStyleSheet($(doc.head));
 
@@ -92,12 +92,12 @@ scout.ContentEditor.prototype._onIframeContentLoaded = function(doc) {
 };
 
 scout.ContentEditor.prototype._onSlotDragOver = function(event) {
-  $(event.target).closest('[data-contenteditor-slot]').addClass('ce-accept-drop');
+  $(event.target).closest('[data-ce-slot]').addClass('ce-accept-drop');
   return false;
 };
 
 scout.ContentEditor.prototype._onSlotDragLeave = function(event) {
-  $(event.target).closest('[data-contenteditor-slot]').removeClass('ce-accept-drop');
+  $(event.target).closest('[data-ce-slot]').removeClass('ce-accept-drop');
   return false;
 };
 
@@ -109,7 +109,7 @@ scout.ContentEditor.prototype._onSlotDrop = function(event) {
     $container: $elementContent
   });
 
-  var $slot = $(e.target).closest('[data-contenteditor-slot]');
+  var $slot = $(e.target).closest('[data-ce-slot]');
   contentElement.dropInto($slot);
   return false;
 };

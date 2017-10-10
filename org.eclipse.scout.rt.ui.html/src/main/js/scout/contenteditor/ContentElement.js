@@ -18,7 +18,7 @@ scout.ContentElement.prototype.dropInto = function($slot) {
   this.contentEditor.addElement(this);
 
   this.$slot = $slot;
-  this.slot = $slot.attr('data-contenteditor-slot');
+  this.slot = $slot.attr('data-ce-slot');
 
   $slot.find('.ce-slot-placeholder').before(this.$container);
   $slot.removeClass('ce-accept-drop');
