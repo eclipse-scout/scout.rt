@@ -55,15 +55,13 @@ scout.WidgetTooltip.prototype._renderProperties = function() {
   this._renderWidget();
 };
 
-scout.WidgetTooltip.prototype.setWidget = function(widget) {
-  this.setProperty('widget', widget);
+scout.WidgetTooltip.prototype._remove = function() {
+  this._removeWidget();
+  scout.WidgetTooltip.parent.prototype._remove.call(this);
 };
 
-scout.WidgetTooltip.prototype._removeWidget = function() {
-  if (this.widget) {
-    this.session.focusManager.uninstallFocusContext(this.$widgetContainer);
-    this.widget.remove();
-  }
+scout.WidgetTooltip.prototype.setWidget = function(widget) {
+  this.setProperty('widget', widget);
 };
 
 scout.WidgetTooltip.prototype._renderWidget = function() {
@@ -83,5 +81,12 @@ scout.WidgetTooltip.prototype._renderWidget = function() {
   // be shifted for a few pixels.
   if (this.withFocusContext && this.widget) {
     this.session.focusManager.installFocusContext(this.$widgetContainer, this.initialFocus());
+  }
+};
+
+scout.WidgetTooltip.prototype._removeWidget = function() {
+  if (this.widget) {
+    this.session.focusManager.uninstallFocusContext(this.$widgetContainer);
+    this.widget.remove();
   }
 };
