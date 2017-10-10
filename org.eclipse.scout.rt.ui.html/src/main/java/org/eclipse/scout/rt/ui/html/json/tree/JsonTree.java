@@ -14,8 +14,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
@@ -85,6 +87,14 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
   private TreeListener m_treeListener;
   private final Map<String, ITreeNode> m_treeNodes;
   private final Map<ITreeNode, String> m_treeNodeIds;
+
+  /**
+   * Keep the parent/child hierarchy to that nodes may be disposed properly. In case of delete events the model is
+   * already updated so it is not always possible anymore to visit all the child nodes.
+   */
+  private final Map<ITreeNode, Set<ITreeNode>> m_childNodes;
+  private final Map<ITreeNode, ITreeNode> m_parentNodes;
+
   private final TreeEventFilter m_treeEventFilter;
   private final AbstractEventBuffer<TreeEvent> m_eventBuffer;
   private JsonContextMenu<IContextMenu> m_jsonContextMenu;
@@ -93,6 +103,8 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     super(model, uiSession, id, parent);
     m_treeNodes = new HashMap<>();
     m_treeNodeIds = new HashMap<>();
+    m_childNodes = new HashMap<>();
+    m_parentNodes = new HashMap<>();
     m_treeEventFilter = new TreeEventFilter(this);
     m_eventBuffer = model.createEventBuffer();
   }
@@ -267,6 +279,11 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     // Rather than requiring callers to ensure that the nodes on which
     // their events operate exist, we create them here ourselves.
     getOrCreateNodeId(node);
+
+    Set<ITreeNode> children = getChildNodes(node.getParentNode());
+    children.add(node);
+    m_childNodes.put(node.getParentNode(), children);
+    m_parentNodes.put(node, node.getParentNode());
   }
 
   protected void attachNode(ITreeNode node, boolean attachChildren) {
@@ -293,15 +310,51 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
   protected void disposeAllNodes() {
     m_treeNodeIds.clear();
     m_treeNodes.clear();
+    m_childNodes.clear();
+    m_parentNodes.clear();
   }
 
   protected void disposeNode(ITreeNode node, boolean disposeChildren) {
     if (disposeChildren) {
-      disposeNodes(node.getChildNodes(), disposeChildren);
+      disposeNodes(getChildNodes(node), disposeChildren);
     }
     String nodeId = m_treeNodeIds.get(node);
     m_treeNodeIds.remove(node);
     m_treeNodes.remove(nodeId);
+
+    // Remove node from parent/child hierarchy maps.
+    // The node will be removed from its parent childNodes list later in unlinkFromParentNode
+    m_childNodes.remove(node);
+    m_parentNodes.remove(node);
+  }
+
+  /**
+   * @return the child nodes of the given nodes which are kept by the map {@link #m_childNodes}. This method is
+   *         typically used on delete operations because {@link ITreeNode#getChildNodes()} may not contain the deleted
+   *         nodes anymore.
+   * @see #m_childNodes
+   */
+  protected Set<ITreeNode> getChildNodes(ITreeNode node) {
+    Set<ITreeNode> children = m_childNodes.get(node);
+    if (children == null) {
+      return new HashSet<>();
+    }
+    return children;
+  }
+
+  protected ITreeNode getParentNode(ITreeNode node) {
+    return m_parentNodes.get(node);
+  }
+
+  /**
+   * Removes the given node from the child list of the parent node ({@link #m_childNodes}). Does not remove it from the
+   * {@link #m_parentNodes} list because it is not necessary as it will be done in
+   * {@link #disposeNode(ITreeNode, boolean)}.
+   */
+  protected void unlinkFromParentNode(ITreeNode node) {
+    ITreeNode parentNode = getParentNode(node);
+    Set<ITreeNode> childrenOfParent = getChildNodes(parentNode);
+    childrenOfParent.remove(node);
   }
 
   protected void disposeNodes(Collection<ITreeNode> nodes, boolean disposeChildren) {
@@ -556,6 +609,10 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
         addActionEvent(EVENT_NODES_DELETED, jsonEvent);
       }
     }
+
+    for (ITreeNode node : nodes) {
+      unlinkFromParentNode(node);
+    }
     disposeNodes(nodes, true);
   }
 
@@ -564,6 +621,9 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, getNodeId(event.getCommonParentNode()));
     addActionEvent(EVENT_ALL_CHILD_NODES_DELETED, jsonEvent);
     // Read the removed nodes from the event, because they are no longer contained in the model
+    for (ITreeNode node : event.getChildNodes()) {
+      unlinkFromParentNode(node);
+    }
     disposeNodes(event.getChildNodes(), true);
   }
 
