@@ -21,6 +21,7 @@ import java.util.List;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -36,25 +37,31 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class DefaultValuesFilterServiceTest {
 
-  private List<IBean<IDefaultValuesConfigurationContributor>> s_origBeans = new ArrayList<>();
-  private List<IBean<?>> s_newBeans = new ArrayList<>();
+  private List<IBean<IDefaultValuesConfigurationContributor>> m_origBeans = new ArrayList<>();
+  private DefaultValuesFilter m_filter;
+  private List<IBean<?>> m_newBeans = new ArrayList<>();
 
   @Before
   public void setUp() {
-    s_origBeans = BEANS.getBeanManager().getBeans(IDefaultValuesConfigurationContributor.class);
-    TestingUtility.unregisterBeans(s_origBeans);
+    // Make sure filter is initialized anew by setting it to null so that contributors are gathered again
+    m_filter = BEANS.get(DefaultValuesFilterService.class).getFilter();
+    BEANS.get(DefaultValuesFilterService.class).setFilter(null);
 
-    s_newBeans.add(TestingUtility.registerBean(new BeanMetaData(OverrideOriginalContributor.class)));
-    s_newBeans.add(TestingUtility.registerBean(new BeanMetaData(OverrideContributor.class)));
+    m_origBeans = BEANS.getBeanManager().getBeans(IDefaultValuesConfigurationContributor.class);
+    TestingUtility.unregisterBeans(m_origBeans);
+
+    m_newBeans.add(TestingUtility.registerBean(new BeanMetaData(OverrideOriginalContributor.class)));
+    m_newBeans.add(TestingUtility.registerBean(new BeanMetaData(OverrideContributor.class)));
   }
 
   @After
   public void tearDown() {
-    for (IBean<?> bean : s_newBeans) {
+    for (IBean<?> bean : m_newBeans) {
       TestingUtility.registerBean(new BeanMetaData(bean.getClass()));
     }
 
-    TestingUtility.unregisterBeans(s_newBeans);
+    TestingUtility.unregisterBeans(m_newBeans);
+    BEANS.get(DefaultValuesFilterService.class).setFilter(m_filter);
   }
 
   protected String readFile(String filename) throws IOException {
@@ -75,6 +82,7 @@ public class DefaultValuesFilterServiceTest {
   }
 
   @Order(1000)
+  @IgnoreBean
   public static class OverrideOriginalContributor implements IDefaultValuesConfigurationContributor {
 
     @Override
@@ -85,6 +93,7 @@ public class DefaultValuesFilterServiceTest {
   }
 
   @Order(100)
+  @IgnoreBean
   public static class OverrideContributor implements IDefaultValuesConfigurationContributor {
 
     @Override
