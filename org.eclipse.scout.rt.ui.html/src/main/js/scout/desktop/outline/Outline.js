@@ -867,15 +867,13 @@ scout.Outline.prototype._glassPaneTargets = function(element) {
 scout.Outline.prototype._getBenchGlassPaneTargetsForView = function(view) {
   var $glassPanes = [];
   $glassPanes = $glassPanes.concat(this._getTabGlassPaneTargetsForView(view, this.session.desktop.header));
-  this.session.desktop.bench.visitChildren(function(tabBox) {
-    if (tabBox instanceof scout.SimpleTabBox) {
-      if (tabBox.children.indexOf(view) !== -1) {
-        scout.arrays.pushAll($glassPanes, this._getTabGlassPaneTargetsForView(view, tabBox));
-      } else if (tabBox.$container) {
-        $glassPanes.push(tabBox.$container);
-      }
+  this.session.desktop.bench.visibleTabBoxes().forEach(function(tabBox) {
+    if (tabBox.hasView(view)) {
+      scout.arrays.pushAll($glassPanes, this._getTabGlassPaneTargetsForView(view, tabBox));
+    } else if (tabBox.$container) {
+      $glassPanes.push(tabBox.$container);
     }
-  }.bind(this));
+  }, this);
   return $glassPanes;
 };
 
