@@ -63,7 +63,6 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
    * @see TableMenuType
    * @see TreeMenuType
    * @see ValueFieldMenuType
-   * @see ActivityMapMenuType
    */
   @Order(55)
   @ConfigProperty(ConfigProperty.MENU_TYPE)

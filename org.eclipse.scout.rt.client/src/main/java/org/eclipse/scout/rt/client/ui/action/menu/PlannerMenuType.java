@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.client.ui.action.menu;
 
 /**
- * All possible menus types of a planner menu. This menu types are used of {@link AbstractMenu#getConfiguredMenuTypes()}
- * method.
+ * All possible menu types of a planner menu. These menu types are used by
+ * {@link AbstractMenu#getConfiguredMenuTypes()}.
  */
 public enum PlannerMenuType implements IMenuType {
   EmptySpace,

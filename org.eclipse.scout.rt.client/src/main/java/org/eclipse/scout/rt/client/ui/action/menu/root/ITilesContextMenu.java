@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2016 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,13 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.action.menu;
+package org.eclipse.scout.rt.client.ui.action.menu.root;
+
+import org.eclipse.scout.rt.client.ui.tile.ITiles;
 
 /**
- * All possible menu types of a calendar menu. This menu types are used by
- * {@link AbstractMenu#getConfiguredMenuTypes()}.
+ * The tiles menu container is the invisible root container for all context menus on the tiles element.
  */
-public enum CalendarMenuType implements IMenuType {
-  EmptySpace,
-  CalendarComponent
+public interface ITilesContextMenu extends IContextMenu {
+
+  @Override
+  ITiles getContainer();
+
+  void callOwnerValueChanged();
 }

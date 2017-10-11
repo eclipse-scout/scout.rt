@@ -3,22 +3,28 @@ package org.eclipse.scout.rt.ui.html.json.tile;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.client.ui.tile.ITiles;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
+import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
+import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
+import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
  * @since 7.1
  */
-public class JsonTiles<T extends ITiles> extends AbstractJsonWidget<T> {
+public class JsonTiles<T extends ITiles> extends AbstractJsonWidget<T> implements IJsonContextMenuOwner {
+
+  private JsonContextMenu<IContextMenu> m_jsonContextMenu;
 
   public JsonTiles(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -27,6 +33,19 @@ public class JsonTiles<T extends ITiles> extends AbstractJsonWidget<T> {
   @Override
   public String getObjectType() {
     return "Tiles";
+  }
+
+  @Override
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
+    m_jsonContextMenu = new JsonContextMenu<>(getModel().getContextMenu(), this);
+    m_jsonContextMenu.init();
+  }
+
+  @Override
+  protected void disposeChildAdapters() {
+    getJsonContextMenu().dispose();
+    super.disposeChildAdapters();
   }
 
   @Override
@@ -118,6 +137,13 @@ public class JsonTiles<T extends ITiles> extends AbstractJsonWidget<T> {
   }
 
   @Override
+  public JSONObject toJson() {
+    JSONObject json = super.toJson();
+    json.put(PROP_MENUS, getJsonContextMenu().childActionsToJson());
+    return json;
+  }
+
+  @Override
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (ITiles.PROP_SELECTED_TILES.equals(propertyName)) {
       List<ITile> tiles = extractTiles(data);
@@ -141,5 +167,14 @@ public class JsonTiles<T extends ITiles> extends AbstractJsonWidget<T> {
       tiles.add((ITile) model);
     }
     return tiles;
+  }
+
+  @Override
+  public void handleModelContextMenuChanged(FilteredJsonAdapterIds<?> filteredAdapters) {
+    addPropertyChangeEvent(PROP_MENUS, filteredAdapters);
+  }
+
+  public JsonContextMenu<IContextMenu> getJsonContextMenu() {
+    return m_jsonContextMenu;
   }
 }

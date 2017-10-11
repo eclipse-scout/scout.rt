@@ -11,10 +11,10 @@
 package org.eclipse.scout.rt.client.ui.action.menu;
 
 /**
- * All possible menus types of a activity map menu. This menu types are used of
- * {@link AbstractMenu#getConfiguredMenuTypes()} method.
+ * All possible menu types of a tile menu. These menu types are used by {@link AbstractMenu#getConfiguredMenuTypes()}.
  */
-public enum ActivityMapMenuType implements IMenuType {
-  Selection,
-  Activity
+public enum TilesMenuType implements IMenuType {
+  EmptySpace,
+  SingleSelection,
+  MultiSelection
 }

@@ -17,6 +17,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
@@ -26,6 +28,8 @@ import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
 import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.tile.ITile;
+import org.eclipse.scout.rt.client.ui.tile.ITiles;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.Range;
 
@@ -151,6 +155,18 @@ public final class MenuUtility {
     }
   }
 
+  public static Set<TilesMenuType> getMenuTypesForTilesSelection(List<? extends ITile> selection) {
+    if (CollectionUtility.isEmpty(selection)) {
+      return CollectionUtility.hashSet(TilesMenuType.EmptySpace);
+    }
+    else if (CollectionUtility.size(selection) == 1) {
+      return CollectionUtility.hashSet(TilesMenuType.SingleSelection);
+    }
+    else {
+      return CollectionUtility.hashSet(TilesMenuType.MultiSelection);
+    }
+  }
+
   /**
    * @return the sub-menu of the given context menu owner that implements the given type. If no implementation is found,
    *         <code>null</code> is returned. Note: This method uses instance-of checks, hence the menu replacement
@@ -185,5 +201,35 @@ public final class MenuUtility {
       return collectedMenus.get(0);
     }
     throw new IllegalStateException("Ambiguous menu type " + menuType.getName() + "! More than one implementation was found: " + CollectionUtility.format(collectedMenus));
+  }
+
+  public static void updateMenuVisibilitiesForTiles(ITiles tiles) {
+    Set<IMenuType> acceptedMenuTypes = new HashSet<>();
+    acceptedMenuTypes.add(TilesMenuType.EmptySpace);
+    if (tiles.getSelectedTiles().size() == 1) {
+      acceptedMenuTypes.add(TilesMenuType.SingleSelection);
+    }
+    else if (tiles.getSelectedTiles().size() > 1) {
+      acceptedMenuTypes.add(TilesMenuType.MultiSelection);
+    }
+    updateMenuVisibilities(tiles.getContextMenu(), acceptedMenuTypes);
+  }
+
+  /**
+   * Updates the visibility of every single menu (including child menus) according to the given acceptedMenuTypes.
+   */
+  public static void updateMenuVisibilities(IContextMenu contextMenu, Set<IMenuType> acceptedMenuTypes) {
+    final IActionFilter activeFilter = ActionUtility.createMenuFilterMenuTypes(acceptedMenuTypes, false);
+    contextMenu.acceptVisitor(action -> {
+      if (!(action instanceof IMenu)) {
+        return IActionVisitor.CONTINUE;
+      }
+      IMenu menu = (IMenu) action;
+      if (menu.isSeparator()) {
+        return IActionVisitor.CONTINUE;
+      }
+      menu.setVisible(activeFilter.accept(menu));
+      return IActionVisitor.CONTINUE;
+    });
   }
 }

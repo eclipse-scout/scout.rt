@@ -199,6 +199,9 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
     List<T> normalizedList = CollectionUtility.arrayListWithoutNullElements(actionList);
     if (!normalizedList.isEmpty()) {
       List<T> childList = getChildActionsInternal();
+      if (childList == null) {
+        return;
+      }
       boolean listChanged = false;
       for (T a : normalizedList) {
         if (childList.remove(a)) {

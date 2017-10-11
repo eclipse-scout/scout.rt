@@ -92,6 +92,20 @@ describe("Tiles", function() {
       tiles.tiles[0].setSelected(true);
       expect(tiles.tiles[0].selected).toBe(false);
     });
+
+    it('triggers a property change event', function() {
+      var tiles = createTiles(3, {
+        selectable: true
+      });
+      var eventTriggered = false;
+      tiles.on('propertyChange', function(event) {
+        if (event.propertyName === 'selectedTiles') {
+          eventTriggered = true;
+        }
+      });
+      tiles.selectTiles(tiles.tiles[0]);
+      expect(eventTriggered).toBe(true);
+    });
   });
 
   describe('deselectTiles', function() {
@@ -122,6 +136,21 @@ describe("Tiles", function() {
       expect(tiles.tiles[1].selected).toBe(false);
       expect(tiles.tiles[2].selected).toBe(false);
     });
+
+    it('triggers a property change event', function() {
+      var tiles = createTiles(3, {
+        selectable: true
+      });
+      var eventTriggered = false;
+      tiles.selectAllTiles();
+      tiles.on('propertyChange', function(event) {
+        if (event.propertyName === 'selectedTiles') {
+          eventTriggered = true;
+        }
+      });
+      tiles.deselectTile(tiles.tiles[0]);
+      expect(eventTriggered).toBe(true);
+    });
   });
 
   describe('insertTiles', function() {
@@ -142,6 +171,19 @@ describe("Tiles", function() {
       expect(tiles.tiles[1]).toBe(tile1);
       expect(tiles.tiles[2]).toBe(tile2);
     });
+
+    it('triggers a property change event', function() {
+      var tiles = createTiles(0);
+      var tile0 = createTile();
+      var eventTriggered = false;
+      tiles.on('propertyChange', function(event) {
+        if (event.propertyName === 'tiles') {
+          eventTriggered = true;
+        }
+      });
+      tiles.insertTiles(tile0);
+      expect(eventTriggered).toBe(true);
+    });
   });
 
   describe('deleteTiles', function() {
@@ -160,6 +202,71 @@ describe("Tiles", function() {
 
       tiles.deleteTiles([tile0, tile2]);
       expect(tiles.tiles.length).toBe(0);
+    });
+
+    it('deselects the deleted tiles', function() {
+      var tiles = createTiles(0, {
+        selectable: true
+      });
+      var tile0 = createTile();
+      var tile1 = createTile();
+      var tile2 = createTile();
+      tiles.insertTiles([tile0, tile1, tile2]);
+      expect(tiles.tiles.length).toBe(3);
+
+      tiles.selectAllTiles();
+      expect(tiles.selectedTiles.length).toBe(3);
+
+      tiles.deleteTiles(tile1);
+      expect(tiles.selectedTiles.length).toBe(2);
+      expect(tiles.selectedTiles[0]).toBe(tile0);
+      expect(tiles.selectedTiles[1]).toBe(tile2);
+
+      tiles.deleteTiles([tile0, tile2]);
+      expect(tiles.selectedTiles.length).toBe(0);
+    });
+
+    it('triggers a property change event', function() {
+      var tiles = createTiles(3);
+      var eventTriggered = false;
+      tiles.on('propertyChange', function(event) {
+        if (event.propertyName === 'tiles') {
+          eventTriggered = true;
+        }
+      });
+      tiles.deleteTiles(tiles.tiles[0]);
+      expect(eventTriggered).toBe(true);
+    });
+  });
+
+  describe('deleteAllTiles', function() {
+    it('deletes all tiles', function() {
+      var tiles = createTiles(0);
+      var tile0 = createTile();
+      var tile1 = createTile();
+      var tile2 = createTile();
+      tiles.insertTiles([tile0, tile1, tile2]);
+      expect(tiles.tiles.length).toBe(3);
+
+      tiles.deleteAllTiles();
+      expect(tiles.tiles.length).toBe(0);
+    });
+
+    it('deselects the deleted tiles', function() {
+      var tiles = createTiles(0, {
+        selectable: true
+      });
+      var tile0 = createTile();
+      var tile1 = createTile();
+      var tile2 = createTile();
+      tiles.insertTiles([tile0, tile1, tile2]);
+      expect(tiles.tiles.length).toBe(3);
+
+      tiles.selectAllTiles();
+      expect(tiles.selectedTiles.length).toBe(3);
+
+      tiles.deleteAllTiles();
+      expect(tiles.selectedTiles.length).toBe(0);
     });
   });
 });

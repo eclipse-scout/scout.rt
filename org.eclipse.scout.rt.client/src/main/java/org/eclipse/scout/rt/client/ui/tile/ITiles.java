@@ -3,14 +3,18 @@ package org.eclipse.scout.rt.client.ui.tile;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.IWidget;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
+import org.eclipse.scout.rt.client.ui.action.menu.root.ITilesContextMenu;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 
 /**
  * @since 7.1
  */
-public interface ITiles extends IWidget, ITypeWithClassId, IExtensibleObject {
+public interface ITiles extends IWidget, ITypeWithClassId, IExtensibleObject, IContributionOwner, IContextMenuOwner {
 
   String PROP_TILES = "tiles";
   String PROP_SELECTED_TILES = "selectedTiles";
@@ -26,6 +30,7 @@ public interface ITiles extends IWidget, ITypeWithClassId, IExtensibleObject {
   String PROP_LOGICAL_GRID_V_GAP = "logicalGridVGap";
   String PROP_MAX_CONTENT_WIDTH = "maxContentWidth";
   String PROP_CONTAINER = "container";
+  String PROP_CONTEXT_MENU = "contextMenus";
 
   String PROP_ASYNC_LOAD_JOBNAME_PREFIX = "tileAsyncDataLoadJob";
   String PROP_ASYNC_LOAD_IDENTIFIER_PREFIX = "tileAsyncDataLoadIdentifier";
@@ -192,6 +197,14 @@ public interface ITiles extends IWidget, ITypeWithClassId, IExtensibleObject {
   void loadTileData();
 
   void ensureTileDataLoaded();
+
+  /**
+   * @param menus
+   */
+  void setMenus(List<? extends IMenu> menus);
+
+  @Override
+  ITilesContextMenu getContextMenu();
 
   ITilesUIFacade getUIFacade();
 }

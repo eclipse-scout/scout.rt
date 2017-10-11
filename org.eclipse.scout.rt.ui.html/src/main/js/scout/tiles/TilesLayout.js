@@ -121,15 +121,17 @@ scout.TilesLayout.prototype._updateScrollbar = function() {
  * (to make sure, scrollbar position is not changed)
  */
 scout.TilesLayout.prototype._updateMaxContentWidth = function() {
+  // Reset padding-right set by layout
+  var htmlComp = this.widget.htmlComp;
+  var containerSize = htmlComp.size();
+  htmlComp.$comp.cssPaddingRight(null);
   if (this.maxContentWidth <= 0) {
     return;
   }
-  var htmlComp = this.widget.htmlComp;
-  var containerSize = htmlComp.size();
-  // Reset padding-right manually set by layout
-  htmlComp.$comp.cssPaddingRight(null);
+
   // Measure current padding-right (by CSS)
   var cssPaddingRight = htmlComp.$comp.cssPaddingRight();
+
   // Calculate difference between current with and max. width
   var oldWidth = containerSize.width;
   var newWidth = Math.min(containerSize.width, this.maxContentWidth);

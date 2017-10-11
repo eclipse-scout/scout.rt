@@ -8,9 +8,14 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.tile.ITilesExtension;
 import org.eclipse.scout.rt.client.extension.ui.tile.TilesChains.TilesSelectedChain;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
+import org.eclipse.scout.rt.client.ui.action.menu.root.ITilesContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.internal.TilesContextMenu;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
@@ -25,6 +30,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
+import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 
@@ -36,6 +42,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   private ITilesUIFacade m_uiFacade;
   private boolean m_initialized;
   private final ObjectExtensions<AbstractTiles, ITilesExtension<? extends AbstractTiles>> m_objectExtensions;
+  private ContributionComposite m_contributionHolder;
 
   public AbstractTiles() {
     this(true);
@@ -66,6 +73,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   protected void initConfig() {
     super.initConfig();
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(createUIFacade(), ModelContext.copyCurrent());
+    m_contributionHolder = new ContributionComposite(this);
     setGridColumnCount(getConfiguredGridColumnCount());
     setLogicalGrid(getConfiguredLogicalGrid());
     setLogicalGridColumnWidth(getConfiguredLogicalGridColumnWidth());
@@ -74,17 +82,40 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     setLogicalGridVGap(getConfiguredLogicalGridVGap());
     // getConfiguredMaxContentWidth should not be moved up so that calculatePreferredWidth may be used inside getConfiguredMaxContentWidth()
     setMaxContentWidth(getConfiguredMaxContentWidth());
+    setMultiSelect(getConfiguredMultiSelect());
     setSelectable(getConfiguredSelectable());
     setScrollable(getConfiguredScrollable());
     setWithPlaceholders(getConfiguredWithPlaceholders());
 
     OrderedCollection<ITile> tiles = new OrderedCollection<>();
     injectTilesInternal(tiles);
+    setSelectedTiles(new ArrayList<>());
     setTiles(tiles.getOrderedList());
-    setSelectedTiles(new ArrayList<ITile>());
+    initMenus();
 
     // local property observer
     addPropertyChangeListener(new P_PropertyChangeListener());
+  }
+
+  protected void initMenus() {
+    List<Class<? extends IMenu>> ma = getDeclaredMenus();
+    OrderedCollection<IMenu> menus = new OrderedCollection<>();
+    for (Class<? extends IMenu> clazz : ma) {
+      IMenu menu = ConfigurationUtility.newInnerInstance(this, clazz);
+      menus.addOrdered(menu);
+    }
+    List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
+    menus.addAllOrdered(contributedMenus);
+    injectMenusInternal(menus);
+
+    // set container on menus
+    for (IMenu menu : menus) {
+      menu.setContainerInternal(this);
+    }
+
+    new MoveActionNodesHandler<>(menus).moveModelObjects();
+    ITilesContextMenu contextMenu = new TilesContextMenu(this, menus.getOrderedList());
+    setContextMenu(contextMenu);
   }
 
   public boolean isInitialized() {
@@ -113,6 +144,47 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<ITile>> filtered = ConfigurationUtility.filterClasses(dca, ITile.class);
     return ConfigurationUtility.removeReplacedClasses(filtered);
+  }
+
+  /**
+   * Override this internal method only in order to make use of dynamic menus<br>
+   * Used to manage menu list and add/remove menus.<br>
+   * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
+   *
+   * @param menus
+   *          live and mutable collection of configured menus
+   */
+  protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
+  }
+
+  protected List<Class<? extends IMenu>> getDeclaredMenus() {
+    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
+    List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
+    return ConfigurationUtility.removeReplacedClasses(filtered);
+  }
+
+  @Override
+  public void setMenus(List<? extends IMenu> menus) {
+    getContextMenu().setChildActions(menus);
+  }
+
+  protected void setContextMenu(ITilesContextMenu contextMenu) {
+    propertySupport.setProperty(PROP_CONTEXT_MENU, contextMenu);
+  }
+
+  @Override
+  public ITilesContextMenu getContextMenu() {
+    return (ITilesContextMenu) propertySupport.getProperty(PROP_CONTEXT_MENU);
+  }
+
+  @Override
+  public List<IMenu> getMenus() {
+    return getContextMenu().getChildActions();
+  }
+
+  @Override
+  public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
+    return MenuUtility.getMenuByClass(this, menuType);
   }
 
   protected ITilesUIFacade createUIFacade() {
@@ -226,20 +298,22 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
 
   @Override
   public List<? extends ITile> getTiles() {
-    return propertySupport.getPropertyList(PROP_TILES);
+    return CollectionUtility.arrayList(propertySupport.getPropertyList(PROP_TILES));
   }
 
   @Override
   public void setTiles(List<? extends ITile> tiles) {
-    List<? extends ITile> oldTiles = ObjectUtility.nvl(getTiles(), new ArrayList<>());
+    List<? extends ITile> oldTiles = getTiles();
     List<? extends ITile> newTiles = ObjectUtility.nvl(tiles, new ArrayList<>());
 
     // Dispose old tiles (only if they are not in the new list)
-    for (ITile tile : oldTiles) {
-      if (!newTiles.contains(tile)) {
-        tile.dispose();
-      }
+    @SuppressWarnings("unchecked")
+    List<ITile> tilesToDelete = (List<ITile>) oldTiles;
+    tilesToDelete.removeAll(tiles);
+    for (ITile tile : tilesToDelete) {
+      tile.dispose();
     }
+    deselectTiles(tilesToDelete);
 
     propertySupport.setPropertyList(PROP_TILES, tiles);
 
@@ -459,7 +533,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
 
   @Override
   public List<? extends ITile> getSelectedTiles() {
-    return propertySupport.getPropertyList(PROP_SELECTED_TILES);
+    return CollectionUtility.arrayList(propertySupport.getPropertyList(PROP_SELECTED_TILES));
   }
 
   public void setSelectedTiles(List<? extends ITile> tiles) {
@@ -552,6 +626,26 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
       selectTiles(tiles);
     }
 
+  }
+
+  @Override
+  public final <T> T optContribution(Class<T> contribution) {
+    return m_contributionHolder.optContribution(contribution);
+  }
+
+  @Override
+  public final List<Object> getAllContributions() {
+    return m_contributionHolder.getAllContributions();
+  }
+
+  @Override
+  public final <T> List<T> getContributionsByClass(Class<T> type) {
+    return m_contributionHolder.getContributionsByClass(type);
+  }
+
+  @Override
+  public final <T> T getContribution(Class<T> contribution) {
+    return m_contributionHolder.getContribution(contribution);
   }
 
   @Override

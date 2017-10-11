@@ -11,8 +11,7 @@
 package org.eclipse.scout.rt.client.ui.action.menu;
 
 /**
- * All possible menus types of a table menu. This menu types are used of {@link AbstractMenu#getConfiguredMenuTypes()}
- * method.
+ * All possible menu types of a table menu. These menu types are used by {@link AbstractMenu#getConfiguredMenuTypes()}.
  * <p>
  * Specificity: {@link #Header}, {@link #EmptySpace}, {@link #SingleSelection}, {@link #MultiSelection}
  */

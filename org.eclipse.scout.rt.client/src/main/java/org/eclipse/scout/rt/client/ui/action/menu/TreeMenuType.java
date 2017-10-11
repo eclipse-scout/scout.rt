@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.client.ui.action.menu;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 
 /**
- * All possible menus types of a tree menu. This menu types are used of {@link AbstractMenu#getConfiguredMenuTypes()}
- * method on any {@link ITree}.
+ * All possible menu types of a tree menu. These menu types are used by {@link AbstractMenu#getConfiguredMenuTypes()} on
+ * any {@link ITree}.
  * <p>
  * Specificity: {@link #Header}, {@link #EmptySpace}, {@link #SingleSelection}, {@link #MultiSelection}
  */

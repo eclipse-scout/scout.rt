@@ -11,7 +11,6 @@
 scout.Tiles = function() {
   scout.Tiles.parent.call(this);
   this.initialAnimationDone = false;
-  this.tiles = [];
   // GridColumnCount will be modified by the layout, prefGridColumnCount remains unchanged
   this.gridColumnCount = 4;
   this.prefGridColumnCount = this.gridColumnCount;
@@ -21,13 +20,16 @@ scout.Tiles = function() {
   this.logicalGridColumnWidth = 200;
   this.logicalGridRowHeight = 150;
   this.maxContentWidth = -1;
+  this.menus = [];
   this.multiSelect = true;
   this.withPlaceholders = false;
   this.selectable = false;
   this.selectedTiles = [];
   this.scrollable = true;
+  this.tiles = [];
+  this._filterMenusHandler = this._filterMenus.bind(this);
   this._tilePropertyChangeHandler = this._onTilePropertyChange.bind(this);
-  this._addWidgetProperties(['tiles', 'selectedTiles']);
+  this._addWidgetProperties(['tiles', 'selectedTiles', 'menus']);
   this._addPreserveOnPropertyChangeProperties(['selectedTiles']);
 };
 scout.inherits(scout.Tiles, scout.Widget);
@@ -36,6 +38,14 @@ scout.Tiles.prototype._init = function(model) {
   scout.Tiles.parent.prototype._init.call(this, model);
   this._setGridColumnCount(this.gridColumnCount);
   this._initTiles();
+  this._setMenus(this.menus);
+};
+
+/**
+ * @override
+ */
+scout.Tiles.prototype._createKeyStrokeContext = function() {
+  return new scout.KeyStrokeContext();
 };
 
 scout.Tiles.prototype._initTiles = function() {
@@ -65,6 +75,7 @@ scout.Tiles.prototype._render = function() {
   this.$container = this.$parent.appendDiv('tiles');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
+  this.$container.on('mousedown', '.tile', this._onTileMouseDown.bind(this));
 };
 
 scout.Tiles.prototype._createLayout = function() {
@@ -171,6 +182,7 @@ scout.Tiles.prototype._deleteTiles = function(tiles) {
       tile.remove();
     }
   }, this);
+  this.deselectTiles(tiles);
 
   if (this.rendered && !this.htmlComp.layouting) {
     // no need to invalidate when tile placeholders are added or removed while layouting
@@ -184,15 +196,27 @@ scout.Tiles.prototype._detachTile = function(tile) {
 
 scout.Tiles.prototype._onTilePropertyChange = function(event) {
   if (event.propertyName === 'selected') {
-    if (!this.selectable) {
-      event.preventDefault();
-      return;
-    }
-    if (event.newValue) {
-      this.selectTile(event.source);
-    } else {
-      this.deselectTile(event.source);
-    }
+    this._onTileSelected(event);
+  }
+};
+
+scout.Tiles.prototype._onTileSelected = function(event) {
+  if (!this.selectable) {
+    event.preventDefault();
+    return;
+  }
+
+  var tile = event.source;
+  var selected = event.newValue;
+  if (this.multiSelect && selected) {
+    this.addTilesToSelection(event.source);
+    return;
+  }
+
+  if (selected) {
+    this.selectTile(tile);
+  } else {
+    this.deselectTile(tile);
   }
 };
 
@@ -251,6 +275,57 @@ scout.Tiles.prototype._renderMaxContentWidth = function() {
   this.invalidateLayoutTree();
 };
 
+scout.Tiles.prototype._setMenus = function(menus, oldMenus) {
+  this.updateKeyStrokes(menus, oldMenus);
+  this._setProperty('menus', menus);
+};
+
+scout.Tiles.prototype._filterMenus = function(menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
+  return scout.menus.filterAccordingToSelection('Tiles', this.selectedTiles.length, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes);
+};
+
+scout.Tiles.prototype.showContextMenu = function(options) {
+  this.session.onRequestsDone(this._showContextMenu.bind(this, options));
+};
+
+scout.Tiles.prototype._showContextMenu = function(options) {
+  options = options || {};
+  if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
+    return;
+  }
+  if (this.selectedTiles.length === 0) {
+    return;
+  }
+  var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true, false);
+  if (menuItems.length === 0) {
+    return;
+  }
+  var pageX = scout.nvl(options.pageX, null);
+  var pageY = scout.nvl(options.pageY, null);
+  if (pageX === null || pageY === null) {
+    var $selectedTile = scout.arrays.last(this.selectedTiles).$container;
+    var offset = $selectedTile.offset();
+    pageX = offset.left + 10;
+    pageY = offset.top + 10;
+  }
+  // Prevent firing of 'onClose'-handler during contextMenu.open()
+  // (Can lead to null-access when adding a new handler to this.contextMenu)
+  if (this.contextMenu) {
+    this.contextMenu.close();
+  }
+  this.contextMenu = scout.create('ContextMenuPopup', {
+    parent: this,
+    menuItems: menuItems,
+    location: {
+      x: pageX,
+      y: pageY
+    },
+    $anchor: this.$container,
+    menuFilter: this._filterMenusHandler
+  });
+  this.contextMenu.open();
+};
+
 scout.Tiles.prototype.setScrollable = function(scrollable) {
   this.setProperty('scrollable', scrollable);
 };
@@ -276,7 +351,7 @@ scout.Tiles.prototype._renderWithPlaceholders = function() {
   this.invalidateLayoutTree();
 };
 
-scout.Tiles.prototype.fillUpWithPlaceholders= function() {
+scout.Tiles.prototype.fillUpWithPlaceholders = function() {
   if (!this.withPlaceholders) {
     this._deleteAllPlaceholders();
     return;
@@ -439,4 +514,23 @@ scout.Tiles.prototype.deselectTile = function(tile) {
 
 scout.Tiles.prototype.deselectAllTiles = function(tiles) {
   this.selectTiles([]);
+};
+
+scout.Tiles.prototype.addTilesToSelection = function(tiles) {
+  tiles = scout.arrays.ensure(tiles);
+  this.selectTiles(this.selectedTiles.concat(tiles));
+};
+
+scout.Tiles.prototype.addTileToSelection = function(tile) {
+  this.addTilesToSelection([tile]);
+};
+
+scout.Tiles.prototype._onTileMouseDown = function(event) {
+  if (event.which === 3) {
+    this.showContextMenu({
+      pageX: event.pageX,
+      pageY: event.pageY
+    });
+    return false;
+  }
 };

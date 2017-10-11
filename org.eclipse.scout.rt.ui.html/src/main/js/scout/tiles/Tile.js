@@ -155,5 +155,9 @@ scout.Tile.prototype._renderSelectable = function() {
 };
 
 scout.Tile.prototype._onMouseDown = function(event) {
+  if (this.selected && event.which === 3) {
+    // Do not toggle if context menus should be shown and tile already is selected
+    return;
+  }
   this.setSelected(!this.selected);
 };

@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.client.ui.action.menu;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
 /**
- * All possible menus types of a value field menu. This menu types are used of
- * {@link AbstractMenu#getConfiguredMenuTypes()} method on any {@link IValueField}.
+ * All possible menu types of a value field menu. These menu types are used by
+ * {@link AbstractMenu#getConfiguredMenuTypes()} on any {@link IValueField}.
  */
 public enum ValueFieldMenuType implements IMenuType {
   Null,
