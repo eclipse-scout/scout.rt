@@ -1007,7 +1007,7 @@ scout.SmartField.prototype._executeLookup = function(lookupFunc) {
     .always(function() {
       this._lookupInProgress = false;
       this.setLoading(false);
-      this.clearErrorStatus();
+      this._clearLookupStatus();
     }.bind(this));
 };
 

@@ -298,13 +298,16 @@ describe('SmartField', function() {
       expect(field.errorStatus.message).toBe('a total disaster');
     });
 
-    it('_executeLookup should always remove error- and lookup-status', function() {
+    it('_executeLookup should always remove lookup-status (but not the error-status)', function() {
       var field = createFieldWithLookupCall();
-      field.setErrorStatus(scout.Status.error({message: 'foo'}));
+      var lookupStatus = scout.Status.warn({message: 'bar'});
+      var errorStatus = scout.Status.error({message: 'foo'});
+      field.setLookupStatus(lookupStatus);
+      field.setErrorStatus(errorStatus);
       var getByKeyFunc = field.lookupCall.getByKey.bind(field.lookupCall, 1);
       field._executeLookup(getByKeyFunc);
       jasmine.clock().tick(500);
-      expect(field.errorStatus).toBe(null);
+      expect(field.errorStatus).toBe(errorStatus);
       expect(field.lookupStatus).toBe(null);
     });
 
