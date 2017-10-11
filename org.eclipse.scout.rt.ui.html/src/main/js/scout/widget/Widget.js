@@ -584,6 +584,13 @@ scout.Widget.prototype._renderVisible = function() {
     return;
   }
   this.$container.setVisible(this.visible);
+  if (this.rendered && this.htmlComp) {
+    this.parent.invalidateLogicalGrid(false);
+    var htmlCompParent = this.htmlComp.getParent();
+    if (htmlCompParent) {
+      htmlCompParent.invalidateLayoutTree();
+    }
+  }
 };
 
 /**

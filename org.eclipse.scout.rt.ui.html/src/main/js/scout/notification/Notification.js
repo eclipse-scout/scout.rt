@@ -71,11 +71,3 @@ scout.Notification.prototype._renderMessage = function() {
   this.$container.html(message);
   this.invalidateLayoutTree();
 };
-
-/**
- * @override
- */
-scout.Notification.prototype._renderVisible = function() {
-  scout.Notification.parent.prototype._renderVisible.call(this);
-  this.invalidateLayoutTree();
-};

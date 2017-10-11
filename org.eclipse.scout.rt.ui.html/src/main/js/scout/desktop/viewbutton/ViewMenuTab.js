@@ -21,9 +21,8 @@ scout.ViewMenuTab = function() {
   this.viewButton = null;
   this.viewMenus = [];
   this.selected = false;
-  this.iconId;
+  this.iconId = null;
   this.inBackground = false;
-  this.visible = true;
 
   this.defaultIconId = scout.icons.OUTLINE;
   this._viewMenuPropertyChangeHandler = this._onViewMenuPropertyChange.bind(this);
@@ -95,14 +94,6 @@ scout.ViewMenuTab.prototype._renderProperties = function() {
   this._renderIconId();
   this._renderSelected();
   this._renderInBackground();
-};
-
-/**
- * @override
- */
-scout.ViewMenuTab.prototype._renderVisible = function() {
-  this.$container.setVisible(this.visible);
-  this.invalidateLayoutTree();
 };
 
 scout.ViewMenuTab.prototype._renderSelected = function() {

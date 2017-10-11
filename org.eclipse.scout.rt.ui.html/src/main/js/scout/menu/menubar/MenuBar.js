@@ -101,19 +101,6 @@ scout.MenuBar.prototype._remove = function() {
   this.visible = false;
 };
 
-/**
- * @override
- */
-scout.MenuBar.prototype._renderVisible = function() {
-  this.$container.setVisible(this.visible);
-  if (this.rendered) {
-    var htmlCompParent = this.htmlComp.getParent();
-    if (htmlCompParent) {
-      htmlCompParent.invalidateLayoutTree();
-    }
-  }
-};
-
 scout.MenuBar.prototype.bottom = function() {
   this.position = 'bottom';
 };

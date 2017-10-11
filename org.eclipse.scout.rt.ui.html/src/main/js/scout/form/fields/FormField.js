@@ -274,13 +274,8 @@ scout.FormField.prototype._renderTooltipText = function() {
  * @override
  */
 scout.FormField.prototype._renderVisible = function() {
-  this.$container.setVisible(this.visible);
+  scout.FormField.parent.prototype._renderVisible.call(this);
   if (this.rendered) {
-    this.parent.invalidateLogicalGrid(false);
-    var htmlCompParent = this.htmlComp.getParent();
-    if (htmlCompParent) { // may be null if $container is detached
-      htmlCompParent.invalidateLayoutTree();
-    }
     // Make sure error status is hidden / shown when visibility changes
     this._renderErrorStatus();
   }
