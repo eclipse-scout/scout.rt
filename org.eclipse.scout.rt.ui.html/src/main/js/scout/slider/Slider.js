@@ -79,7 +79,7 @@ scout.Slider.prototype._renderStep = function() {
 scout.Slider.prototype._onValueChange = function(event) {
   var n = Number(this.$sliderInput.val());
   // Ensure valid number
-  if (isNaN(n) || n === null || n === undefined) {
+  if (!scout.objects.isNumber(n)) {
     n = scout.nvl(this.maxValue, this.minValue, 0);
   }
   this.setValue(n);
