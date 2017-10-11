@@ -811,15 +811,16 @@ scout.Desktop.prototype._getBenchGlassPaneTargetsForView = function(view) {
   $glassPanes = $glassPanes.concat(this._getTabGlassPaneTargetsForView(view, this.header));
 
   if (this.bench) {
-    this.bench.visitChildren(function(tabBox) {
-      if (tabBox instanceof scout.SimpleTabBox && tabBox.rendered) {
-        if (tabBox.children.indexOf(view) !== -1) {
-          $glassPanes = $glassPanes.concat(this._getTabGlassPaneTargetsForView(view, tabBox));
-        } else {
-          $glassPanes.push(tabBox.$container);
-        }
+    this.bench.visibleTabBoxes().forEach(function(tabBox) {
+      if (!tabBox.rendered) {
+        return;
       }
-    }.bind(this));
+      if (tabBox.hasView(view)) {
+        $glassPanes = $glassPanes.concat(this._getTabGlassPaneTargetsForView(view, tabBox));
+      } else {
+        $glassPanes.push(tabBox.$container);
+      }
+    }, this);
   }
   return $glassPanes;
 };

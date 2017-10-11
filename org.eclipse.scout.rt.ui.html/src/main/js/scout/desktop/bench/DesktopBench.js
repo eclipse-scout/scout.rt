@@ -723,6 +723,13 @@ scout.DesktopBench.prototype.getTabBox = function(displayViewId) {
   return viewColumn.getTabBox(displayViewId);
 };
 
+scout.DesktopBench.prototype.visibleTabBoxes = function() {
+  return this.visibleColumns().reduce(function(arr, column) {
+    scout.arrays.pushAll(arr, column.visibleTabBoxes());
+    return arr;
+  }, []);
+};
+
 scout.DesktopBench.prototype.hasView = function(view) {
   return this.columns.filter(function(column) {
     return column.hasView(view);
