@@ -16,6 +16,7 @@ scout.keys = {
   CTRL: 17,
   ALT: 18,
   PAUSE: 19,
+  CAPS_LOCK: 20,
   ESC: 27,
   /**
    * The duplicate ESC / ESCAPE constant is required for Scout classic
@@ -121,6 +122,7 @@ scout.codesToKeys = {
   17: 'CTRL',
   18: 'ALT',
   19: 'PAUSE',
+  20: 'Caps lock',
   27: 'Esc',
   33: 'Page up',
   34: 'Page down',
