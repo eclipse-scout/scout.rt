@@ -106,7 +106,12 @@ scout.MenuBar.prototype._remove = function() {
  */
 scout.MenuBar.prototype._renderVisible = function() {
   this.$container.setVisible(this.visible);
-  this.invalidateLayoutTree();
+  if (this.rendered) {
+    var htmlCompParent = this.htmlComp.getParent();
+    if (htmlCompParent) {
+      htmlCompParent.invalidateLayoutTree();
+    }
+  }
 };
 
 scout.MenuBar.prototype.bottom = function() {
