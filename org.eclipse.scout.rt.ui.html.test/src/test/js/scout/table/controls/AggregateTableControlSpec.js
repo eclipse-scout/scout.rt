@@ -116,8 +116,34 @@ describe("AggregateTableControl", function() {
       var $aggrRow = $aggregateRow(tableControl);
       var $aggrCells = $aggrRow.children('.table-cell');
       $aggrCells.children('.table-cell-icon').remove();
-      expect($aggrCells.eq(0).text()).toBe(' ');
+      expect($aggrCells.eq(0).text()).toBe('\u00a0'); // nbsp
       expect($aggrCells.eq(1).text()).toBe('6');
+
+      // show nothing if all values are missing
+      prepareTable();
+      rows[0].cells[1].value = null;
+      rows[1].cells[1].value = null;
+      rows[2].cells[1].value = null;
+      table.render(session.$entryPoint);
+
+      $aggrRow = $aggregateRow(tableControl);
+      $aggrCells = $aggrRow.children('.table-cell');
+      $aggrCells.children('.table-cell-icon').remove();
+      expect($aggrCells.eq(0).text()).toBe('\u00a0'); // nbsp
+      expect($aggrCells.eq(1).text()).toBe('\u00a0'); // nbsp
+
+      // show 0 if values add up to zero
+      prepareTable();
+      rows[0].cells[1].value = -10;
+      rows[1].cells[1].value = 10;
+      rows[2].cells[1].value = null;
+      table.render(session.$entryPoint);
+
+      $aggrRow = $aggregateRow(tableControl);
+      $aggrCells = $aggrRow.children('.table-cell');
+      $aggrCells.children('.table-cell-icon').remove();
+      expect($aggrCells.eq(0).text()).toBe('\u00a0'); // nbsp
+      expect($aggrCells.eq(1).text()).toBe('0');
     });
 
     it("aggregation type none does not aggregate", function() {
@@ -130,8 +156,8 @@ describe("AggregateTableControl", function() {
 
       var $aggrRow = $aggregateRow(tableControl);
       var $aggrCells = $aggrRow.children('.table-cell');
-      expect($aggrCells.eq(0).text()).toBe(' ');
-      expect($aggrCells.eq(1).text()).toBe(' ');
+      expect($aggrCells.eq(0).text()).toBe('\u00a0'); // nbsp
+      expect($aggrCells.eq(1).text()).toBe('\u00a0'); // nbsp
     });
 
     it("sums up numbers in a number column but only on filtered rows", function() {
@@ -149,7 +175,7 @@ describe("AggregateTableControl", function() {
       var $aggrRow = $aggregateRow(tableControl);
       var $aggrCells = $aggrRow.children('.table-cell');
       $aggrCells.children('.table-cell-icon').remove();
-      expect($aggrCells.eq(0).text()).toBe(' ');
+      expect($aggrCells.eq(0).text()).toBe('\u00a0'); // nbsp
       expect($aggrCells.eq(1).text()).toBe('3');
     });
 

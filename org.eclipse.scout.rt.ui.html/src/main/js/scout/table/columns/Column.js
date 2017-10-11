@@ -16,7 +16,7 @@ scout.Column = function() {
   this.fixedWidth = false;
   this.horizontalAlignment = -1;
   this.htmlEnabled = false;
-  this.initialized = false;  
+  this.initialized = false;
   this.mandatory = false;
   this.sortActive = false;
   this.sortAscending = true;
@@ -347,7 +347,7 @@ scout.Column.prototype.cellValueOrText = function(row) {
 scout.Column.prototype.cellValueOrTextForCalculation = function(row) {
   var cell = this.cell(row);
   var value = this.cellValueOrText(row);
-  if (!value) {
+  if (scout.objects.isNullOrUndefined(value)) {
     return null;
   }
   return this._preprocessValueOrTextForCalculation(value, cell);
