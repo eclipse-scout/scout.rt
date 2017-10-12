@@ -33,11 +33,14 @@ scout.GlassPaneRenderer.prototype.renderGlassPanes = function() {
   }, this);
 };
 
-scout.GlassPaneRenderer.prototype.renderGlassPane = function(glassPaneTarget) {
-  var $glassPane;
+/**
+ * @param {($|HTMLElement)} $glassPaneTarget
+ */
+scout.GlassPaneRenderer.prototype.renderGlassPane = function($glassPaneTarget) {
+  $glassPaneTarget = $.ensure($glassPaneTarget);
 
   // Render glasspanes onto glasspane targets.
-  $glassPane = $(glassPaneTarget)
+  var $glassPane = $glassPaneTarget
     .appendDiv('glasspane')
     .on('mousedown', this._onMousedown.bind(this));
 
@@ -48,17 +51,17 @@ scout.GlassPaneRenderer.prototype.renderGlassPane = function(glassPaneTarget) {
   }
 
   this._$glassPanes.push($glassPane);
-  this._$glassPaneTargets.push(glassPaneTarget);
+  this._$glassPaneTargets.push($glassPaneTarget);
 
   // Register 'glassPaneTarget' in focus manager.
-  this.session.focusManager.registerGlassPaneTarget(glassPaneTarget);
+  this.session.focusManager.registerGlassPaneTarget($glassPaneTarget);
   this._registerDisplayParent();
 };
 
 scout.GlassPaneRenderer.prototype.removeGlassPanes = function() {
   // Remove glass-panes
   this._$glassPanes.forEach(function($glassPane) {
-    if($glassPane.parent()) {
+    if ($glassPane.parent()) {
       $glassPane.parent().removeClass('no-hover');
     }
     $glassPane.remove();
@@ -73,7 +76,6 @@ scout.GlassPaneRenderer.prototype.removeGlassPanes = function() {
 
   // Unregister glasspane targets from focus manager
   this._$glassPaneTargets.forEach(function($glassPaneTarget) {
-
     this.session.focusManager.unregisterGlassPaneTarget($glassPaneTarget);
   }, this);
   this._unregisterDisplayParent();
