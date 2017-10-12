@@ -37,7 +37,6 @@ describe('Desktop', function() {
       parent = new scout.Widget();
 
     beforeEach(function() {
-      session._renderDesktop();
       parent.session = session;
       ntfc = scout.create('DesktopNotification', {
         id: 'theID',
@@ -46,7 +45,17 @@ describe('Desktop', function() {
       });
     });
 
-    it('addNotification', function() {
+    it('is rendered when desktop is rendered', function() {
+      desktop.notifications.push(ntfc);
+      expect(desktop.notifications.indexOf(ntfc)).toBe(0);
+      expect(ntfc.rendered).toBe(false);
+
+      session._renderDesktop();
+      expect(ntfc.rendered).toBe(true);
+    });
+
+    it('may be added with addNotification', function() {
+      session._renderDesktop();
       spyOn(ntfc, 'fadeIn');
       desktop.addNotification(ntfc);
       expect(ntfc.fadeIn).toHaveBeenCalled();
@@ -56,7 +65,6 @@ describe('Desktop', function() {
     });
 
     it('schedules addNotification when desktop is not rendered', function() {
-      desktop.remove();
       scout.create('DesktopNotification', {
         parent: desktop,
         status: {
@@ -75,6 +83,7 @@ describe('Desktop', function() {
     });
 
     it('removeNotification with object', function() {
+      session._renderDesktop();
       spyOn(ntfc, 'fadeOut');
       desktop.addNotification(ntfc); // first add -> create $notifications DIV
       desktop.removeNotification(ntfc);
@@ -82,6 +91,7 @@ describe('Desktop', function() {
     });
 
     it('removeNotification with (string) ID', function() {
+      session._renderDesktop();
       spyOn(ntfc, 'fadeOut');
       desktop.addNotification(ntfc); // first add -> create $notifications DIV
       desktop.removeNotification('theID');
@@ -89,6 +99,7 @@ describe('Desktop', function() {
     });
 
     it('_onNotificationRemove - last notifications removes $notifications DIV', function() {
+      session._renderDesktop();
       desktop.addNotification(ntfc); // first add -> create $notifications DIV
       desktop.removeNotification(ntfc);
       expect(desktop.notifications.length).toBe(0);
