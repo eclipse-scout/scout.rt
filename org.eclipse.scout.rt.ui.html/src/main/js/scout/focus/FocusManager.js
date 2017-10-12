@@ -226,8 +226,8 @@ scout.FocusManager.prototype.isElementCovertByGlassPane = function(element) {
 /**
  * Registers the given glasspane target, so that the focus cannot be gained on the given target nor on its child elements.
  */
-scout.FocusManager.prototype.registerGlassPaneTarget = function(glassPaneTarget) {
-  this._glassPaneTargets.push(glassPaneTarget);
+scout.FocusManager.prototype.registerGlassPaneTarget = function($glassPaneTarget) {
+  this._glassPaneTargets.push($glassPaneTarget);
   this.validateFocus();
 };
 
@@ -238,8 +238,8 @@ scout.FocusManager.prototype.registerGlassPaneDisplayParent = function(displayPa
 /**
  * Unregisters the given glasspane target, so that the focus can be gained again for the target or one of its child controls.
  */
-scout.FocusManager.prototype.unregisterGlassPaneTarget = function(glassPaneTarget) {
-  scout.arrays.remove(this._glassPaneTargets, glassPaneTarget);
+scout.FocusManager.prototype.unregisterGlassPaneTarget = function($glassPaneTarget) {
+  scout.arrays.remove(this._glassPaneTargets, $glassPaneTarget);
   this.validateFocus();
 };
 
