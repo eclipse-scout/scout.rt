@@ -74,6 +74,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     setLogicalGridVGap(getConfiguredLogicalGridVGap());
     // getConfiguredMaxContentWidth should not be moved up so that calculatePreferredWidth may be used inside getConfiguredMaxContentWidth()
     setMaxContentWidth(getConfiguredMaxContentWidth());
+    setSelectable(getConfiguredSelectable());
     setScrollable(getConfiguredScrollable());
     setWithPlaceholders(getConfiguredWithPlaceholders());
 
