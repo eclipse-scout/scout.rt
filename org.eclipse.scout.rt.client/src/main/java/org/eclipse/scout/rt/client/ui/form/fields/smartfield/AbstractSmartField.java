@@ -78,10 +78,6 @@ import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
-/**
- * This class is not thought to directly subclass. Use {@link AbstractSmartField} or {@link AbstractProposalField}
- * instead.
- */
 @ClassId("444e6fb6-3b0b-4917-933e-b6eb81345499")
 public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE> implements ISmartField<VALUE> {
 
