@@ -230,18 +230,6 @@ scout.SimpleTab.prototype._renderIconId = function(iconId) {
   }
 };
 
-scout.SimpleTab.prototype.setCssClass = function(cssClass) {
-  this.setProperty('cssClass', cssClass);
-};
-
-scout.SimpleTab.prototype._renderCssClass = function() {
-  this.$container.addClass(this.cssClass);
-};
-
-scout.SimpleTab.prototype._removeCssClass = function() {
-  this.$container.removeClass(this.cssClass);
-};
-
 scout.SimpleTab.prototype.setClosable = function(closable) {
   this.setProperty('closable', closable);
 };
