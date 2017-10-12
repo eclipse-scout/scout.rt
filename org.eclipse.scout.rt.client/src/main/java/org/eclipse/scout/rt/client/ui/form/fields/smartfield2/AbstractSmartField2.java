@@ -44,8 +44,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnDescriptor;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractProposalField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistFieldDataFetcher;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistSearchParam;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.HierarchicalContentAssistDataFetcher;
@@ -88,10 +86,6 @@ import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
-/**
- * This class is not thought to directly subclass. Use {@link AbstractSmartField} or {@link AbstractProposalField}
- * instead.
- */
 @ClassId("444e6fb6-3b0b-4917-933e-b6eb81345499")
 public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALUE> implements ISmartField2<VALUE> {
 

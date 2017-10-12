@@ -50,8 +50,6 @@ import org.w3c.dom.Element;
 /**
  * This adapter is used so we can use the old lookup/fetcher implementations which require the IContentAssistField
  * interface.
- *
- * @author awe
  */
 @ClassId("67abbc75-74a4-4a2c-9c1c-3ab13bf2ceb2")
 public class SmartField2ContentAssistAdapter<VALUE> implements IContentAssistField<VALUE, VALUE> {
