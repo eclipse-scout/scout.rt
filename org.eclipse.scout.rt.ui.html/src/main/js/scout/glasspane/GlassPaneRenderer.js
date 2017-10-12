@@ -34,11 +34,10 @@ scout.GlassPaneRenderer.prototype.renderGlassPanes = function() {
 };
 
 /**
- * @param {($|HTMLElement)} glassPaneTarget
+ * @param {($|HTMLElement)} $glassPaneTarget
  */
-scout.GlassPaneRenderer.prototype.renderGlassPane = function(glassPaneTarget) {
-  var $glassPane,
-    $glassPaneTarget = $.ensure(glassPaneTarget);
+scout.GlassPaneRenderer.prototype.renderGlassPane = function($glassPaneTarget) {
+  $glassPaneTarget = $.ensure($glassPaneTarget);
 
   if (this._widget.$container && this._widget.$container[0] === $glassPaneTarget[0]) {
     // Don't render a glass pane on the widget itself (necessary if glass pane is added after the widget is rendered)
@@ -46,7 +45,7 @@ scout.GlassPaneRenderer.prototype.renderGlassPane = function(glassPaneTarget) {
   }
 
   // Render glasspanes onto glasspane targets.
-  $glassPane = $(glassPaneTarget)
+  var $glassPane = $glassPaneTarget
     .appendDiv('glasspane')
     .on('mousedown', this._onMouseDown.bind(this));
 
@@ -63,17 +62,17 @@ scout.GlassPaneRenderer.prototype.renderGlassPane = function(glassPaneTarget) {
   }
 
   this._$glassPanes.push($glassPane);
-  this._$glassPaneTargets.push(glassPaneTarget);
+  this._$glassPaneTargets.push($glassPaneTarget);
 
   // Register 'glassPaneTarget' in focus manager.
-  this.session.focusManager.registerGlassPaneTarget(glassPaneTarget);
+  this.session.focusManager.registerGlassPaneTarget($glassPaneTarget);
   this._registerDisplayParent();
 };
 
 scout.GlassPaneRenderer.prototype.removeGlassPanes = function() {
   // Remove glass-panes
   this._$glassPanes.forEach(function($glassPane) {
-    if($glassPane.parent()) {
+    if ($glassPane.parent()) {
       $glassPane.parent().removeClass('no-hover');
     }
     $glassPane.remove();
@@ -88,7 +87,6 @@ scout.GlassPaneRenderer.prototype.removeGlassPanes = function() {
 
   // Unregister glasspane targets from focus manager
   this._$glassPaneTargets.forEach(function($glassPaneTarget) {
-
     this.session.focusManager.unregisterGlassPaneTarget($glassPaneTarget);
   }, this);
   this._unregisterDisplayParent();
