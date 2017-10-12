@@ -33,9 +33,12 @@ scout.GlassPaneRenderer.prototype.renderGlassPanes = function() {
   }, this);
 };
 
+/**
+ * @param {($|HTMLElement)} glassPaneTarget
+ */
 scout.GlassPaneRenderer.prototype.renderGlassPane = function(glassPaneTarget) {
   var $glassPane,
-    $glassPaneTarget = $(glassPaneTarget);
+    $glassPaneTarget = $.ensure(glassPaneTarget);
 
   if (this._widget.$container && this._widget.$container[0] === $glassPaneTarget[0]) {
     // Don't render a glass pane on the widget itself (necessary if glass pane is added after the widget is rendered)

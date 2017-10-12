@@ -35,7 +35,7 @@ scout.DeferredGlassPaneTarget.prototype.removeGlassPaneRenderer = function(glass
 scout.DeferredGlassPaneTarget.prototype.renderWhenReady = function() {
   if (this.glassPaneRenderer && this.$glassPaneTargets && this.$glassPaneTargets.length > 0) {
     this.$glassPaneTargets.forEach(function($glassPaneTarget) {
-      this.glassPaneRenderer.renderGlassPane($glassPaneTarget[0]);
+      this.glassPaneRenderer.renderGlassPane($glassPaneTarget);
     }.bind(this));
   }
 };
