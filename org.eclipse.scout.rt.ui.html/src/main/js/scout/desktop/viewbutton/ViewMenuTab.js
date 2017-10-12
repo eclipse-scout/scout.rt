@@ -15,14 +15,14 @@
  */
 scout.ViewMenuTab = function() {
   scout.ViewMenuTab.parent.call(this);
-  this.$container;
-  this.$arrowIcon; // small "arrow down" icon at the right side of the icon
 
   this.viewButton = null;
   this.viewMenus = [];
   this.selected = false;
   this.iconId = null;
   this.inBackground = false;
+
+  this.$arrowIcon = null; // small "arrow down" icon at the right side of the icon
 
   this.defaultIconId = scout.icons.OUTLINE;
   this._viewMenuPropertyChangeHandler = this._onViewMenuPropertyChange.bind(this);
@@ -77,9 +77,7 @@ scout.ViewMenuTab.prototype._render = function() {
     .on('mousedown', this.togglePopup.bind(this));
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
 
-  this.$arrowIcon = this.$container
-    .appendSpan('arrow-icon')
-    .on('mousedown', this.togglePopup.bind(this));
+  this._renderArrowIcon();
 
   this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
 };
@@ -94,6 +92,23 @@ scout.ViewMenuTab.prototype._renderProperties = function() {
   this._renderIconId();
   this._renderSelected();
   this._renderInBackground();
+};
+
+scout.ViewMenuTab.prototype._renderArrowIcon = function() {
+  this.$arrowIcon = this.$container.appendDiv('arrow-icon');
+
+  // Create the SVG icon. Colors, rotation etc. are styled via CSS. (Source file: ViewMenuTab_arrow-icon.svg)
+  // Note that the arrow part is not transparent, otherwise the real tab icon might show through.
+  var $svg = this.$arrowIcon.appendSVG('svg', 'arrow-icon-svg')
+    .attr('width', '250')
+    .attr('height', '250')
+    .attr('viewBox', '0 0 250 250');
+  $svg.appendSVG('circle', 'circle')
+    .attr('cx', '125')
+    .attr('cy', '125')
+    .attr('r', '125');
+  $svg.appendSVG('path', 'arrow')
+    .attr('d', 'm159.64 98.85-34.63 34.638-34.636-34.638c-6.3692-6.3619-16.713-6.3619-23.086 0-6.3775 6.3775-6.3775 16.719 0 23.095l46.179 46.178c6.3692 6.3755 16.713 6.3755 23.087 4e-3l46.172-46.182c6.3713-6.3755 6.3713-16.717 0-23.095-6.3682-6.3703-16.716-6.3703-23.086 1.1e-5z');
 };
 
 scout.ViewMenuTab.prototype._renderSelected = function() {

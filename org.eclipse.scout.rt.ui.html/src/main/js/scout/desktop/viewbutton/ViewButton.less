@@ -74,39 +74,40 @@
   }
 
   & > .arrow-icon {
+    /* Set size to zero, so we can position the element relative to the parent element while NOT taking up space. */
+    /* Otherwise, the icon would "jump" when toggling the visibility. */
     display: inline-block;
-    position: relative;
-    vertical-align: middle;
-    background-color: inherit;
-    height: 0;
     width: 0;
-    left: -8px;
-    bottom: -3px;
+    height: 0;
+    position: relative;
+    top: 10px;
+    left: -6px;
 
-    /* background */
-    &::before {
-      content: '';
-      display: inline-block;
-      width: 15px;
-      height: 14px;
-      position: absolute;
-      top: 0;
-      left: 0;
-      background-color: inherit;
+    & > .arrow-icon-svg {
+      width: 11px;
+      height: 11px;
+
+      & > .circle {
+        fill: @palette-white;
+      }
+      & > .arrow {
+        fill: @navigation-background-color;
+      }
     }
 
-    /* icon */
-    &::after {
-      #scout.font-icon();
-      font-size: 17px;
-      content: @icon-angle-down;
-      position: absolute;
-      top: -2px;
-      left: 2px;
-    }
+    &.menu-open > .arrow-icon-svg {
+      transform:
+        /* For some reason, the icon is positioned 1px too high in the menu popup -> fix it */
+        translateY(1px)
+        /* Rotate the arrow */
+        rotate(180deg);
 
-    &.menu-open::after {
-      content: @icon-angle-up;
+      & > .circle {
+        fill: @active-color;
+      }
+      & > .arrow {
+        fill: @palette-white;
+      }
     }
   }
 }
