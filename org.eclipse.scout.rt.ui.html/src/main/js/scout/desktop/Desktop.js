@@ -138,6 +138,7 @@ scout.Desktop.prototype._render = function() {
   this._renderInBackground();
   this._renderDisplayStyle();
   this._renderNavigationHandleVisible();
+  this._renderNotifications();
   this.addOns.forEach(function(addOn) {
     addOn.render();
   }, this);
@@ -171,15 +172,7 @@ scout.Desktop.prototype._postRender = function() {
   this.formController.render();
   this.messageBoxController.render();
   this.fileChooserController.render();
-  this._renderNotifications();
-
   this.initialFormRendering = false;
-};
-
-scout.Desktop.prototype._renderNotifications = function() {
-  this.notifications.forEach(function(notification) {
-    this._renderNotification(notification);
-  }.bind(this));
 };
 
 scout.Desktop.prototype._renderDisplayStyle = function() {
@@ -630,14 +623,12 @@ scout.Desktop.prototype.addNotification = function(notification) {
     return;
   }
   this.notifications.push(notification);
-  this._renderNotification(notification);
+  if (this.rendered) {
+    this._renderNotification(notification);
+  }
 };
 
 scout.Desktop.prototype._renderNotification = function(notification) {
-  if (!this.rendered) {
-    return;
-  }
-
   if (this.$notifications) {
     // Bring to front
     this.$notifications.appendTo(this.$container);
@@ -648,6 +639,12 @@ scout.Desktop.prototype._renderNotification = function(notification) {
   if (notification.duration > 0) {
     notification.removeTimeout = setTimeout(notification.hide.bind(notification), notification.duration);
   }
+};
+
+scout.Desktop.prototype._renderNotifications = function() {
+  this.notifications.forEach(function(notification) {
+    this._renderNotification(notification);
+  }.bind(this));
 };
 
 /**
