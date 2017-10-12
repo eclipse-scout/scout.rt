@@ -666,10 +666,10 @@ $.fn.appendIcon = function(iconId, cssClass) {
     .addClass('icon image-icon');
 };
 
-$.fn.appendImg = function(iconUrl, cssClass) {
+$.fn.appendImg = function(imageSrc, cssClass) {
   var $icon = this.appendElement('<img>', cssClass);
-  if (iconUrl) {
-    $icon.attr('src', iconUrl);
+  if (imageSrc) {
+    $icon.attr('src', imageSrc);
   }
   return $icon;
 };
