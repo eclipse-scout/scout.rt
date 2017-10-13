@@ -353,6 +353,45 @@ describe("Table Filter", function() {
       expect(table.selectedRows[0]).toBe(table.rows[1]);
     });
 
+    it("stays removed even if filtered row is selected explicitly", function() {
+      var model = helper.createModelFixture(2, 2),
+        table = helper.createTable(model),
+        column0 = table.columns[0];
+
+      // Initially, no rows are selected
+      table.render(session.$entryPoint);
+      expect(table.rows.length).toBe(2);
+      expect(table.filteredRows().length).toBe(2);
+      expect(table.selectedRows.length).toBe(0);
+
+      // Add a filter that hides the first row (still no rows selected)
+      var filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
+      table.filter();
+      expect(table.rows.length).toBe(2);
+      expect(table.filteredRows().length).toBe(1);
+      expect(table.selectedRows.length).toBe(0);
+
+      // Explicitly select the first row (currently invisible), expect still no selected row
+      table.selectRows(table.rows[0]);
+      expect(table.rows.length).toBe(2);
+      expect(table.filteredRows().length).toBe(1);
+      expect(table.selectedRows.length).toBe(0);
+
+      // Remove the filter again (still no selection)
+      table.removeFilter(filter);
+      table.filter();
+      expect(table.rows.length).toBe(2);
+      expect(table.filteredRows().length).toBe(2);
+      expect(table.selectedRows.length).toBe(0);
+
+      // Now select the first row again, this time the selection should change
+      table.selectRows(table.rows[0]);
+      expect(table.rows.length).toBe(2);
+      expect(table.filteredRows().length).toBe(2);
+      expect(table.selectedRows.length).toBe(1);
+      expect(table.selectedRows[0]).toBe(table.rows[0]);
+    });
+
     it("gets removed for non visible rows after filtering if a row has been updated", function() {
       var model = helper.createModelFixture(2, 3),
         table = helper.createTable(model),
