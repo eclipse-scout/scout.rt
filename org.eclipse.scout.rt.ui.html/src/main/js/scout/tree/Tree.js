@@ -1839,7 +1839,11 @@ scout.Tree.prototype.selectNode = function(node, debounceSend) {
 
 scout.Tree.prototype.selectNodes = function(nodes, debounceSend) {
   var scrollTop;
-  nodes = scout.arrays.ensure(nodes);
+
+  // Exclude nodes that are currently not showing because of a filter (they cannot be selected)
+  nodes = scout.arrays.ensure(nodes).filter(function(node) {
+    return node.isFilterAccepted();
+  });
 
   if (scout.arrays.equalsIgnoreOrder(nodes, this.selectedNodes)) {
     return;
@@ -1852,8 +1856,7 @@ scout.Tree.prototype.selectNodes = function(nodes, debounceSend) {
     this._removeSelection();
   }
 
-  // Make a copy so that original array stays untouched
-  this.selectedNodes = nodes.slice();
+  this.selectedNodes = nodes; // (Note: direct assignment is safe because the initial filtering created a copy of the original array)
   this._nodesSelectedInternal();
   this._triggerNodesSelected(debounceSend);
 

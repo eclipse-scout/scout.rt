@@ -39,7 +39,12 @@ scout.TreeExpandOrDrillDownKeyStroke.prototype.handle = function(event) {
     this.field.expandNode(currentNode, {
       lazy: false // always show all nodes on node double click
     });
-  } else if (currentNode.childNodes.length > 0) {
-    this.selectNodesAndReveal(currentNode.childNodes[0], true);
+  } else {
+    var visibleChildNodes = currentNode.childNodes.filter(function(node) {
+      return node.isFilterAccepted();
+    });
+    if (visibleChildNodes.length > 0) {
+      this.selectNodesAndReveal(visibleChildNodes[0], true);
+    }
   }
 };
