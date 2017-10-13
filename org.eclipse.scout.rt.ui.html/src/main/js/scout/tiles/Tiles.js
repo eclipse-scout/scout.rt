@@ -128,7 +128,9 @@ scout.Tiles.prototype.setTiles = function(tiles) {
   if (scout.objects.equals(this.tiles, tiles)) {
     return;
   }
-  tiles = this._prepareProperty('tiles', tiles);
+
+  // Ensure given tiles are real tiles (of type scout.Tile)
+  tiles = this._createChildren(tiles);
 
   // Only delete those which are not in the new array
   // Only insert those which are not already there
@@ -179,7 +181,13 @@ scout.Tiles.prototype._deleteTiles = function(tiles) {
   tiles.forEach(function(tile) {
     this._detachTile(tile);
     if (this.rendered) {
-      tile.remove();
+      if (this._animateTileRemoval(tile)) {
+        // Animate tile removal, but not while layouting when tile placeholders are added or removed
+        tile.animateRemoval = true;
+      }
+      tile.destroy();
+      this._onTileRemove(tile);
+      tile.animateRemoval = false;
     }
   }, this);
   this.deselectTiles(tiles);
@@ -188,6 +196,31 @@ scout.Tiles.prototype._deleteTiles = function(tiles) {
     // no need to invalidate when tile placeholders are added or removed while layouting
     this.invalidateLayoutTree();
   }
+};
+
+scout.Tiles.prototype._animateTileRemoval = function(tile) {
+  return !(tile instanceof scout.PlaceholderTile);
+};
+
+scout.Tiles.prototype._onTileRemove = function(tile) {
+  if (!tile.animateRemoval || this.tileRemovalPending) {
+    return;
+  }
+  this.tileRemovalPending = true;
+  tile.$container.oneAnimationEnd(function() {
+    this.tileRemovalPending = false;
+    if (this.rendered && !this.htmlComp.layouting) {
+      this.invalidateLayoutTree();
+    }
+  }.bind(this));
+};
+
+scout.Tiles.prototype.invalidateLayoutTree = function() {
+  if (this.tileRemovalPending) {
+    // Do not invalidate while tile removal is still pending
+    return;
+  }
+  scout.Tiles.parent.prototype.invalidateLayoutTree.call(this);
 };
 
 scout.Tiles.prototype._detachTile = function(tile) {

@@ -9,7 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 .tile {
-
   transition: transform 200ms ease-out, box-shadow 200ms ease-out;
 
   &.selectable {
@@ -19,5 +18,10 @@
   &.selected {
     #scout.transform(translateY(-10px));
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  &.removed {
+    #scout.animation-name(fadeout-shrink-blur);
+    #scout.animation-duration(0.2s);
   }
 }
