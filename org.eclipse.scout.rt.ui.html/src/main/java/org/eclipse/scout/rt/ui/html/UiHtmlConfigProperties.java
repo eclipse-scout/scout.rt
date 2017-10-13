@@ -2,6 +2,7 @@ package org.eclipse.scout.rt.ui.html;
 
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.client.job.ModelJobs.WrongThreadException;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigProperty;
@@ -162,6 +163,26 @@ public class UiHtmlConfigProperties {
     @Override
     protected Integer getDefaultValue() {
       return 60; // 1 minute
+    }
+  }
+
+  /**
+   * Only the model thread is allowed to update the UI model. If the model is updated by another thread the output is
+   * not predictable anymore. It may work sometimes, but it may as well create incomprehensible exceptions.
+   * <p>
+   * To avoid such exceptions, this property may be set to true so that every time the model is updated by the wrong
+   * thread a {@link WrongThreadException} will be thrown.
+   */
+  public static class UiEnforceModelThreadProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.ui.enforceModelThread";
+    }
+
+    @Override
+    protected Boolean getDefaultValue() {
+      return false;
     }
   }
 

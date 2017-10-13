@@ -10,15 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form;
 
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiEnforceModelThreadProperty;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
@@ -285,6 +288,9 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
 
     @Override
     public void formChanged(FormEvent e) {
+      if (CONFIG.getPropertyValue(UiEnforceModelThreadProperty.class)) {
+        ModelJobs.assertModelThread();
+      }
       handleModelFormChanged(e);
     }
   }

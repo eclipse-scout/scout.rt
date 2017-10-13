@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarAdapter;
@@ -22,8 +23,10 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarEvent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarListener;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendarUIFacade;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiEnforceModelThreadProperty;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
@@ -356,11 +359,17 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
 
     @Override
     public void calendarChanged(CalendarEvent e) {
+      if (CONFIG.getPropertyValue(UiEnforceModelThreadProperty.class)) {
+        ModelJobs.assertModelThread();
+      }
       addActionEvent(EVENT_CALENDAR_CHANGED, new JsonCalendarEvent(JsonCalendar.this, e).toJson());
     }
 
     @Override
     public void calendarChangedBatch(List<CalendarEvent> batch) {
+      if (CONFIG.getPropertyValue(UiEnforceModelThreadProperty.class)) {
+        ModelJobs.assertModelThread();
+      }
       JSONArray jsonArray = new JSONArray();
       for (CalendarEvent event : batch) {
         jsonArray.put(new JsonCalendarEvent(JsonCalendar.this, event).toJson());

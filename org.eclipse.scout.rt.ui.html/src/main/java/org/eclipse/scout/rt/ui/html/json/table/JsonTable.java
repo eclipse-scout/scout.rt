@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
@@ -44,6 +45,7 @@ import org.eclipse.scout.rt.client.ui.dnd.TextTransferObject;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -54,6 +56,7 @@ import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiException;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiEnforceModelThreadProperty;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -1503,10 +1506,13 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
   }
 
-  private class P_TableListener extends TableAdapter {
+  protected class P_TableListener extends TableAdapter {
 
     @Override
     public void tableChanged(final TableEvent e) {
+      if (CONFIG.getPropertyValue(UiEnforceModelThreadProperty.class)) {
+        ModelJobs.assertModelThread();
+      }
       handleModelTableEvent(e);
     }
   }

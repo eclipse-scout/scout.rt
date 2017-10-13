@@ -14,12 +14,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooserEvent;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooserListener;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiEnforceModelThreadProperty;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -129,10 +132,13 @@ public class JsonFileChooser<FILE_CHOOSER extends IFileChooser> extends Abstract
     return getModel().getMaximumUploadSize();
   }
 
-  private class P_FileChooserListener implements FileChooserListener {
+  protected class P_FileChooserListener implements FileChooserListener {
 
     @Override
     public void fileChooserChanged(FileChooserEvent e) {
+      if (CONFIG.getPropertyValue(UiEnforceModelThreadProperty.class)) {
+        ModelJobs.assertModelThread();
+      }
       handleModelFileChooserEvent(e);
     }
   }

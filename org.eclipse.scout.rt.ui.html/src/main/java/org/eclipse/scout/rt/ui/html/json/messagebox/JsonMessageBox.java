@@ -10,10 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.messagebox;
 
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxEvent;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxListener;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiEnforceModelThreadProperty;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -183,9 +186,12 @@ public class JsonMessageBox<MESSAGE_BOX extends IMessageBox> extends AbstractJso
     getModel().getUIFacade().setResultFromUI(resultOption);
   }
 
-  private class P_MessageBoxListener implements MessageBoxListener {
+  protected class P_MessageBoxListener implements MessageBoxListener {
     @Override
     public void messageBoxChanged(MessageBoxEvent event) {
+      if (CONFIG.getPropertyValue(UiEnforceModelThreadProperty.class)) {
+        ModelJobs.assertModelThread();
+      }
       handleModelMessageBoxChanged(event);
     }
   }
