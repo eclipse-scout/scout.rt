@@ -270,8 +270,12 @@ scout.TableHeader.prototype._headerItemTooltipText = function($col) {
   } else if ($col.isContentTruncated() || ($col.width() + $col.position().left) > $col.parent().width()) {
     $col = $col.clone();
     $col.children('.table-header-item-state').remove();
-    return $col.text();
+    var text = $col.text();
+    if (scout.strings.hasText(text)) {
+      return text;
+    }
   }
+  return null;
 };
 
 scout.TableHeader.prototype.setHeaderMenusEnabled = function(headerMenusEnabled) {

@@ -575,6 +575,7 @@ scout.TableAdapter.modifyTablePrototype = function() {
     }
   }, true);
 
+  // _sortAfterInsert
   scout.objects.replacePrototypeFunction(scout.Table, '_sortAfterInsert', function(wasEmpty) {
     if (this.modelAdapter) {
       // There will only be a row order changed event if table was not empty.
@@ -606,6 +607,14 @@ scout.TableAdapter.modifyTablePrototype = function() {
       return uiSortPossible && this._isSortingPossibleOrig(sortColumns);
     }
     return this._isSortingPossibleOrig(sortColumns);
+  }, true);
+
+  // sort
+  scout.objects.replacePrototypeFunction(scout.Table, 'sort', function(column, direction, multiSort, remove) {
+    if (this.modelAdapter && column.guiOnly) {
+      return;
+    }
+    this.sortOrig(column, direction, multiSort, remove);
   }, true);
 };
 
