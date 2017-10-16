@@ -2673,19 +2673,17 @@ scout.Tree.prototype.showNode = function(node, useAnimation, indexHint) {
   $node.removeClass('hiding');
   var that = this;
   if (useAnimation) {
-    $node.data('oldStyle', $node.attr('style'));
+    var oldStyle = $node.attr('style');
+    var oldVisible = $node.isVisible();
     $node.setVisible(false);
     $node.stop().slideDown({
       duration: 250,
       start: that.startAnimationFunc,
       complete: function() {
         that.runningAnimationsFinishFunc();
-        var oldStyle = $node.data('oldStyle');
-        if (oldStyle) {
-          $node.removeData('oldStyle');
-          $node.attrOrRemove('style', oldStyle);
-        }
         $node.removeClass('showing');
+        $node.setVisible(oldVisible);
+        $node.attrOrRemove('style', oldStyle);
       }
     });
   }
@@ -2713,7 +2711,7 @@ scout.Tree.prototype.hideNode = function(node, useAnimation, suppressDetachHandl
 
   if (useAnimation) {
     this._renderViewportBlocked = true;
-    $node.data('oldStyle', $node.attr('style'));
+    var oldStyle = $node.attr('style');
     $node.stop().slideUp({
       duration: 250,
       start: that.startAnimationFunc,
@@ -2721,11 +2719,7 @@ scout.Tree.prototype.hideNode = function(node, useAnimation, suppressDetachHandl
         that.runningAnimationsFinishFunc();
         $node.detach();
         node.attached = false;
-        var oldStyle = $node.data('oldStyle');
-        if (oldStyle) {
-          $node.removeData('oldStyle');
-          $node.attrOrRemove('style', oldStyle);
-        }
+        $node.attrOrRemove('style', oldStyle);
       }
     });
   } else if (!suppressDetachHandling) {
