@@ -11,10 +11,13 @@
 scout.Slider = function() {
   scout.Slider.parent.call(this);
 
-  this.value;
-  this.minValue;
-  this.maxValue;
-  this.step;
+  this.value = null;
+  this.minValue = null;
+  this.maxValue = null;
+  this.step = null;
+
+  this.$sliderInput = null;
+  this.$sliderValue = null;
 };
 scout.inherits(scout.Slider, scout.Widget);
 
@@ -44,6 +47,12 @@ scout.Slider.prototype._renderProperties = function() {
   this._renderMinValue();
   this._renderMaxValue();
   this._renderStep();
+};
+
+scout.Slider.prototype._remove = function() {
+  scout.Slider.parent.prototype._remove.call(this);
+  this.$sliderInput = null;
+  this.$sliderValue = null;
 };
 
 scout.Slider.prototype._renderValue = function() {
