@@ -27,6 +27,7 @@ scout.icons = {
   CATEGORY: 'font:\uE024',
   GEAR: 'font:\uE031',
   STAR: 'font:\uE032',
+  STAR_SOLID: 'font:\uE033',
   PERSON: 'font:\uE034',
   VERTICAL_DOTS: 'font:\uE040',
   SEARCH: 'font:\uE042',
