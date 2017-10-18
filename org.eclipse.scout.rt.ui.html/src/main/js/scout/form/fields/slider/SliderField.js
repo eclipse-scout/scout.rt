@@ -32,6 +32,13 @@ scout.SliderField.prototype._renderSlider = function() {
   this.addField(this.slider.$container);
 };
 
+scout.SliderField.prototype._readDisplayText = function() {
+  // Use the inner slider's value as display text, as the user cannot enter the value manually.
+  // This value is already guaranteed to be a valid number (see Slider.js, _onValueChange). We
+  // convert it to a string to match the expected data type for a display text.
+  return String(this.slider.value);
+};
+
 scout.SliderField.prototype.setValue = function(value) {
   this.slider.setValue(value);
 };
