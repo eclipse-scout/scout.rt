@@ -82,6 +82,14 @@
     position: relative;
     top: 10px;
     left: -6px;
+    opacity: 1;
+    transition: opacity 150ms;
+
+    &.hidden {
+      /* override "display: none" */
+      display: inline-block !important;
+      opacity: 0;
+    }
 
     & > .arrow-icon-svg {
       width: 11px;
