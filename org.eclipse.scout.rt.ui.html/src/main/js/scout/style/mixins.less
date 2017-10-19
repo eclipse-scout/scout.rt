@@ -245,7 +245,7 @@
     width: @check-box-size;
     height: @check-box-size;
     border: 2px solid @border-color;
-    border-radius: 3px;
+    border-radius: @check-box-border-radius;
     background-color: @control-background-color;
     text-align: center;
   }
@@ -322,7 +322,7 @@
   .button-focus() {
     #scout.overlay(-3px, -3px, 6px, 6px);
     #scout.focus-border();
-    border-radius: @border-radius;
+    border-radius: @button-border-radius;
   }
 
   .triangle-top-left(@size, @color) {

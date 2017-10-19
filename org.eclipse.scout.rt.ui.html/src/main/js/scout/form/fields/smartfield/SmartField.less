@@ -99,8 +99,8 @@
 
   & .multiline-input {
     border-bottom-color: @border-color;
-    border-top-left-radius: @border-radius;
-    border-top-right-radius: @border-radius;
+    border-top-left-radius: @control-border-radius;
+    border-top-right-radius: @control-border-radius;
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
     width: 100%;
@@ -123,8 +123,8 @@
     border: solid 1px @border-color;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
-    border-bottom-right-radius: @border-radius;
-    border-bottom-left-radius: @border-radius;
+    border-bottom-right-radius: @control-border-radius;
+    border-bottom-left-radius: @control-border-radius;
     border-top: none;
     padding: 3px 10px;
     #scout.overflow-ellipsis-nowrap();
@@ -171,7 +171,7 @@
 .dropdown-field-popup, .smart-field-popup, .proposal-field-popup {
   position: absolute;
   border: solid 1px @popup-border-color;
-  border-radius: @border-radius;
+  border-radius: @popup-border-radius;
   overflow: hidden;
   background-color: @palette-white;
   #scout.drop-shadow();

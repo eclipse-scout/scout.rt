@@ -11,7 +11,7 @@
 .time-picker-popup {
   position: absolute;
   border: 1px solid @popup-border-color;
-  border-radius: @border-radius;
+  border-radius: @popup-border-radius;
   #scout.focus-border();
   overflow: hidden;
 }
@@ -67,7 +67,8 @@
           padding-right: 20px;
         }
       }
-      > .text {
+
+      & > .text {
         display: inline-block;
         padding: 5px;
         border: 1px solid transparent;
