@@ -449,6 +449,14 @@ $.ensure = function($elem) {
   return $($elem);
 };
 
+// === $.easing extensions ===
+
+$.extend($.easing, {
+  easeOutQuart: function(x) {
+    return 1 - Math.pow(1 - x, 4);
+  }
+});
+
 // === $.prototype extensions ===
 
 $.fn.nvl = function($element) {
