@@ -8,39 +8,69 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.ce-slot-placeholder {
-  border: 1px dashed @palette-blue-4 !important;
-  font-family: Arial, sans-serif !important;
-  font-weight: normal !important;
-  font-size: 11px !important;
-  color: @palette-blue-6 !important;
-  background-color: @palette-blue-0 !important;
-  text-transform: uppercase !important;
-  text-align: center !important;
-  padding: 3px !important;
-  display: none !important;
+[data-ce-slot] {
+  padding-top: 1px;
+  padding-bottom: 3px;
+  border: 1px solid transparent;
 }
 
-.ce-slot-placeholder-accept {
-  display: block !important;
+.ce-slot-accept {
+  border: 1px dashed @palette-blue-4 !important;
+  position: relative;
 }
 
 .ce-accept-drop {
   border-color: @palette-orange-4 !important;
-  background-color: @palette-orange-0 !important;
-  color: @palette-orange-4 !important;
+
+  .ce-slot-content-list {
+    background-color: @palette-orange-0 !important;
+    color: @palette-orange-4 !important;
+  }
+}
+
+.ce-slot-content-list {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: none;
+  vertical-align: top;
+  background-color: @palette-blue-0;
+  font-family: Arial, sans-serif;
+  font-weight: normal;
+  font-size: 11px;
+  color: @palette-blue-6;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 3px 6px;
+}
+
+.ce-slot-accept .ce-slot-content-list {
+  display: inline-block;
+}
+
+.ce-placeholder {
+  position: absolute;
+  display: block;
+  border: 1px solid transparent;
+  width: 100%;
+}
+
+.ce-placeholder-accept-drop {
+  border: 1px solid @palette-orange-4;
 }
 
 .ce-element {
   position: relative;
   border: 2px solid transparent;
-  -moz-transition: all 0.3s ease-out;
-  -webkit-transition: all 0.3s ease-out;
-  -o-transition: all 0.3s ease-out;
   transition: all 0.3s ease-out;
 }
 
 .ce-element-hover {
+  border: 2px solid @palette-blue-6 !important;
+}
+
+.ce-dropping-element {
+  position: absolute;
   border: 2px solid @palette-blue-6 !important;
 }
 
@@ -52,7 +82,7 @@
 }
 
 .ce-element-button {
-  #scout .font-icon();
+  #scout.font-icon();
   text-align: center;
   color: @palette-white;
   background-color: @palette-blue-5;
@@ -78,4 +108,8 @@
 
 .ce-edit-button::before {
   content: @icon-pencil;
+}
+
+.ce-copy-button::before {
+  content: @icon-angle-double-down;
 }

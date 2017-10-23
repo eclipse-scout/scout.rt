@@ -31,7 +31,7 @@ public abstract class AbstractContentEditorField extends AbstractFormField imple
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     super.initConfig();
-    setPlaceholderText(getConfiguredPlaceholderText());
+    setDropzoneLabel(getConfiguredDropzoneLabel());
   }
 
   @Override
@@ -76,18 +76,18 @@ public abstract class AbstractContentEditorField extends AbstractFormField imple
   }
 
   @Override
-  public String getPlaceholderText() {
-    return propertySupport.getPropertyString(PROP_PLACEHOLDER_TEXT);
+  public String getDropzoneLabel() {
+    return propertySupport.getPropertyString(PROP_DROPZONE_LABEL);
   }
 
   @Override
-  public void setPlaceholderText(String placeholderText) {
-    propertySupport.setPropertyString(PROP_PLACEHOLDER_TEXT, placeholderText);
+  public void setDropzoneLabel(String dropzoneLabel) {
+    propertySupport.setPropertyString(PROP_DROPZONE_LABEL, dropzoneLabel);
   }
 
   @ConfigProperty(ConfigProperty.STRING)
   @Order(10)
-  protected String getConfiguredPlaceholderText() {
+  protected String getConfiguredDropzoneLabel() {
     return null;
   }
 

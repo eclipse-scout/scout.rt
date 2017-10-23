@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 public interface IContentEditorField extends IFormField {
 
   String PROP_CONTENT = "content";
-  String PROP_PLACEHOLDER_TEXT = "placeholderText";
+  String PROP_DROPZONE_LABEL = "dropzoneLabel";
 
   void addContentEditorFieldListener(ContentEditorFieldListener listener);
 
@@ -25,9 +25,9 @@ public interface IContentEditorField extends IFormField {
 
   String getContent();
 
-  String getPlaceholderText();
+  String getDropzoneLabel();
 
-  void setPlaceholderText(String placeholderText);
+  void setDropzoneLabel(String dropzoneLabel);
 
   void execEditElement(ContentElement contentElement);
 

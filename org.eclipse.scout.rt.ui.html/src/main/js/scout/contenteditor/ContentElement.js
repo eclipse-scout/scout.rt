@@ -20,7 +20,7 @@ scout.ContentElement = function() {
 scout.ContentElement.prototype.init = function(model) {
   this.contentEditor = model.contentEditor;
   this.$container = model.$container;
-  this.content = scout.nvl(this.$container.html(), '');
+  this.content = scout.nvl(this.$container[0].outerHTML, '');
 };
 
 scout.ContentElement.prototype.dropInto = function($placeholder) {
@@ -30,8 +30,7 @@ scout.ContentElement.prototype.dropInto = function($placeholder) {
   this.$slot = $placeholder.parent();
   this.slot = this.$slot.attr('data-ce-slot');
 
-  $placeholder.before(this.$container);
-  $placeholder.removeClass('ce-accept-drop');
+  $placeholder.after(this.$container);
 
   this.$container
     .on('mouseenter', this._onElementMouseEnter.bind(this))
@@ -61,6 +60,10 @@ scout.ContentElement.prototype._onElementMouseEnter = function(event) {
   $buttonGroup
     .appendDiv('ce-element-button ce-edit-button')
     .on('click', this._onEdit.bind(this));
+
+  $buttonGroup
+  .appendDiv('ce-element-button ce-copy-button')
+  .on('click', this._onCopy.bind(this));
 };
 
 scout.ContentElement.prototype._onElementMouseLeave = function(event) {
@@ -119,7 +122,17 @@ scout.ContentElement.prototype._onEdit = function() {
   });
 };
 
+scout.ContentElement.prototype._onCopy = function() {
+  var $elementContent = this.$container.clone(false).removeClass('ce-element-hover');
+  $elementContent.find('.ce-element-button-group').remove();
+  var contentElement = scout.create('ContentElement', {
+    contentEditor: this.contentEditor,
+    $container: $elementContent
+  });
+  contentElement.dropInto(this.$container);
+};
+
 scout.ContentElement.prototype.updateContent = function(content) {
   this.content = content;
-  this.$container.html(content);
+  this.$container.html($(content).html());
 };

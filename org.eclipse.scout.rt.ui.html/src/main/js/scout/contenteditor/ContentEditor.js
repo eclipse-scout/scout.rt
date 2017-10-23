@@ -11,18 +11,19 @@
 scout.ContentEditor = function() {
   scout.ContentEditor.parent.call(this);
   this._contentElements = [];
-  this.placeholderText = '';
+  this.dropzoneLabel = '';
   this.doc = null;
   this.content = '';
   this.$slots = null;
   this.$placeholders = null;
+  this._$currentClosestSlot = null;
   this._$currentClosestPlaceholder = null;
 };
 scout.inherits(scout.ContentEditor, scout.Widget);
 
 scout.ContentEditor.prototype._init = function(model) {
   scout.ContentEditor.parent.prototype._init.call(this, model);
-  this._iframeDragCounter = 0;
+  this._iframeDragTargetList = [];
 
   this.iframe = scout.create('IFrame', {
     parent: this,
@@ -68,8 +69,8 @@ scout.ContentEditor.prototype.getContent = function() {
   return this.iframe.$iframe.get(0).contentWindow.document.outerHtml;
 };
 
-scout.ContentEditor.prototype.setPlaceholderText = function(placeholderText) {
-  this.setProperty('placeholderText', placeholderText);
+scout.ContentEditor.prototype.setDropzoneLabel = function(dropzoneLabel) {
+  this.setProperty('dropzoneLabel', dropzoneLabel);
 };
 
 scout.ContentEditor.prototype._renderContent = function() {
@@ -91,8 +92,12 @@ scout.ContentEditor.prototype._injectStyleSheet = function($header) {
 
 scout.ContentEditor.prototype._onIframeContentLoaded = function() {
   this.$slots = $(this.doc.body).find('[data-ce-slot]');
-  this.$placeholders = this.$slots.appendDiv('ce-slot-placeholder').text(this.placeholderText);
+  this.$slots.each(function() {
+    $(this).appendDiv('ce-slot-content-list').text($(this).attr('data-ce-allowed-elements'));
+  });
+
   this._injectStyleSheet($(this.doc.head));
+  this._disableLinks();
 
   $(this.doc)
     .on('dragenter', this._onIframeDragEnter.bind(this))
@@ -101,10 +106,16 @@ scout.ContentEditor.prototype._onIframeContentLoaded = function() {
     .on('drop', this._onIframeDrop.bind(this));
 };
 
+scout.ContentEditor.prototype._disableLinks = function() {
+  $(this.doc.body).find('a').on('click', function() {
+    return false;
+  });
+};
+
 scout.ContentEditor.prototype._onIframeDragEnter = function(event) {
+  this._iframeDragTargetList.push(event.target);
+  this._showSlots(this._getTypeOfDragEvent(event));
   event.preventDefault();
-  this._iframeDragCounter++;
-  this._showPlaceHolders(this._getTypeOfDragEvent(event));
 };
 
 scout.ContentEditor.prototype._getTypeOfDragEvent = function(event) {
@@ -117,48 +128,22 @@ scout.ContentEditor.prototype._getTypeOfDragEvent = function(event) {
 
 scout.ContentEditor.prototype._onIframeDragOver = function(event) {
   event.preventDefault();
-  var type = this._getTypeOfDragEvent(event);
-  var $closestPlaceholder = this._getClosestPlaceholder(event.clientX, event.clientY, type);
 
-  if ($closestPlaceholder && this._$currentClosestPlaceholder !== $closestPlaceholder) {
-    this._$currentClosestPlaceholder = $closestPlaceholder;
-    this._getPlaceholdersForType(type).each(function(index, slot) {
-      if ($(slot) !== this._$currentClosestPlaceholder) {
+  var type = this._getTypeOfDragEvent(event);
+  var $closestSlot = this._getClosestSlot(event.clientX, event.clientY, type);
+
+  if ($closestSlot && this._$currentClosestSlot !== $closestSlot) {
+    this._$currentClosestSlot = $closestSlot;
+    this._getSlotsForType(type).each(function(index, slot) {
+      if ($(slot) !== this._$currentClosestSlot) {
         $(slot).removeClass('ce-accept-drop');
+        this._hidePlaceholders($(slot));
       }
     }.bind(this));
-    this._$currentClosestPlaceholder.addClass('ce-accept-drop');
+    this._$currentClosestSlot.addClass('ce-accept-drop');
+    this._showPlaceholders();
   }
-};
-
-scout.ContentEditor.prototype._onIframeDragLeave = function(event) {
-  if (--this._iframeDragCounter === 0) {
-    this._hidePlaceHolders();
-  }
-};
-
-scout.ContentEditor.prototype._showPlaceHolders = function(type) {
-  this._getPlaceholdersForType(type)
-    .addClass('ce-slot-placeholder-accept')
-    .css('opacity', '1')
-    .css('height', 'auto');
-};
-
-scout.ContentEditor.prototype._getPlaceholdersForType = function(type) {
-  if (type === 'text/plain') {
-    type = 'text';
-  }
-  return $(this.doc.body).find('[data-ce-allowed-elements~=\'' + type + '\'] .ce-slot-placeholder');
-};
-
-scout.ContentEditor.prototype._hidePlaceHolders = function() {
-  $(this.doc.body).find('[data-ce-slot] .ce-slot-placeholder').animate({
-    height: '0',
-    opacity: 0
-  }, 'fast', 'linear', function() {
-    $(this.doc.body).find('[data-ce-slot] .ce-slot-placeholder')
-      .removeClass('ce-slot-placeholder-accept');
-  }.bind(this));
+  this._highlightClosestPlaceholder(event.clientX, event.clientY);
 };
 
 scout.ContentEditor.prototype._onIframeDrop = function(event) {
@@ -171,17 +156,90 @@ scout.ContentEditor.prototype._onIframeDrop = function(event) {
       contentEditor: this,
       $container: $elementContent
     });
-    contentElement.dropInto(this._$currentClosestPlaceholder);
+    this._animateDrop(event, this._$currentClosestPlaceholder, function() {
+      contentElement.dropInto(this._$currentClosestPlaceholder);
+      this._hidePlaceholders();
+    }.bind(this));
   }
-  this._hidePlaceHolders();
-  this._iframeDragCounter = 0;
+  this._hideSlots();
+  this._iframeDragTargetList = [];
   return false;
 };
 
-scout.ContentEditor.prototype._getClosestPlaceholder = function(x, y, type) {
+scout.ContentEditor.prototype._animateDrop = function(event, $placeholder, complete) {
+  var $element = $(this.doc.body).appendDiv('ce-dropping-element');
+  $element.offset({left: event.clientX, top: event.clientY});
+  $element.animate({'left': $placeholder.offset().left + 'px', 'top': $placeholder.offset().top, 'height': '10px', 'width': $placeholder.width() }, 200, function() {
+    $element.remove();
+    if(complete) {
+      complete();
+    }
+  }.bind(this));
+};
+
+scout.ContentEditor.prototype._onIframeDragLeave = function(event) {
+  scout.arrays.remove(this._iframeDragTargetList, event.target);
+  if (this._iframeDragTargetList.length === 0) {
+    this._hideSlots();
+    this._hidePlaceholders();
+  }
+};
+
+scout.ContentEditor.prototype._showSlots = function(type) {
+  var $slotsForType = this._getSlotsForType(type);
+  $slotsForType.addClass('ce-slot-accept');
+};
+
+scout.ContentEditor.prototype._showPlaceholders = function() {
+  this._$currentClosestSlot.prependDiv('ce-placeholder');
+  this._$currentClosestSlot
+    .find('.ce-element')
+    .afterDiv('ce-placeholder');
+};
+
+scout.ContentEditor.prototype._highlightClosestPlaceholder = function(x, y) {
+  var $closest = this._getClosestPlaceholder(x, y);
+  if ($closest && this._$currentClosestPlaceholder !== $closest) {
+    this._$currentClosestPlaceholder = $closest;
+    $(this.doc.body).find('.ce-placeholder').each(function(index, placeholder) {
+      if ($(placeholder) !== $closest) {
+        $(placeholder).removeClass('ce-placeholder-accept-drop');
+      }
+    }.bind(this));
+    $closest.addClass('ce-placeholder-accept-drop');
+  }
+};
+
+scout.ContentEditor.prototype._hidePlaceholders = function($parent) {
+  if (!$parent) {
+    $parent = $(this.doc.body);
+  }
+  var $placeholder = $parent.find('.ce-placeholder');
+  $placeholder.each(function(i) {
+    scout.arrays.remove(this._iframeDragTargetList, $placeholder[i]);
+  }.bind(this));
+  $parent.find('.ce-placeholder').remove();
+};
+
+scout.ContentEditor.prototype._hideSlots = function() {
+  $(this.doc.body).find('[data-ce-slot]').removeClass('ce-slot-accept ce-accept-drop');
+};
+
+scout.ContentEditor.prototype._getPlaceholdersForType = function(type) {
+  return this._getSlotsForType(type).find('.ce-slot-placeholder');
+};
+
+scout.ContentEditor.prototype._getSlotsForType = function(type) {
+  if (type === 'text/plain') {
+    type = 'text';
+  }
+  return $(this.doc.body).find('[data-ce-allowed-elements~=\'' + type + '\']');
+};
+
+scout.ContentEditor.prototype._getClosestPlaceholder = function(x, y) {
   var $closest;
   var closestDistance;
-  this._getPlaceholdersForType(type).each(function(index, placeholder) {
+  $(this.doc.body).find('.ce-placeholder').each(function(index, placeholder) {
     var $placeholder = $(placeholder);
     var distance = this._getDistance($placeholder, x, y);
     if (!$closest || distance < closestDistance) {
@@ -192,20 +250,34 @@ scout.ContentEditor.prototype._getClosestPlaceholder = function(x, y, type) {
   return $closest;
 };
 
+scout.ContentEditor.prototype._getClosestSlot = function(x, y, type) {
+  var $closest;
+  var closestDistance;
+  this._getSlotsForType(type).each(function(index, slot) {
+    var $slot = $(slot);
+    var distance = this._getDistance($slot, x, y);
+    if (!$closest || distance < closestDistance) {
+      $closest = $slot;
+      closestDistance = distance;
+    }
+  }.bind(this));
+  return $closest;
+};
+
 scout.ContentEditor.prototype._getDistance = function($element, x, y) {
   var xOffset = 0;
   var yOffset = 0;
 
-  if ($element.position().top > y) {
-    yOffset = $element.position().top - y;
-  } else if ($element.position().top + $element.height() < y) {
-    yOffset = y - $element.position().top - $element.height();
+  if ($element.offset().top > y) {
+    yOffset = $element.offset().top - y;
+  } else if ($element.offset().top + $element.height() < y) {
+    yOffset = y - $element.offset().top - $element.height();
   }
 
-  if ($element.position().left > x) {
-    xOffset = $element.position().left - x;
-  } else if ($element.position().left + $element.width() < x) {
-    xOffset = x - $element.position().left - $element.width();
+  if ($element.offset().left > x) {
+    xOffset = $element.offset().left - x;
+  } else if ($element.offset().left + $element.width() < x) {
+    xOffset = x - $element.offset().left - $element.width();
   }
   return Math.sqrt(xOffset * xOffset + yOffset * yOffset);
 };
