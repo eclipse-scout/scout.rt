@@ -11,25 +11,52 @@
 scout.ContentEditor = function() {
   scout.ContentEditor.parent.call(this);
   this._contentElements = [];
+  this._slots = [];
+  this._closestSlot = null;
+
   this.dropzoneLabel = '';
   this.doc = null;
   this.content = '';
-  this.$slots = null;
-  this.$placeholders = null;
-  this._$currentClosestSlot = null;
-  this._$currentClosestPlaceholder = null;
+  this._$closestPlaceholder = null;
 };
 scout.inherits(scout.ContentEditor, scout.Widget);
 
 scout.ContentEditor.prototype._init = function(model) {
   scout.ContentEditor.parent.prototype._init.call(this, model);
-  this._iframeDragTargetList = [];
+
+  this._resetDragging();
 
   this.iframe = scout.create('IFrame', {
     parent: this,
     sandboxEnabled: false,
     scrollBarEnabled: model.scrollBarEnabled
   });
+};
+
+scout.ContentEditor.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('ce');
+
+  this.iframe.render();
+  this.iframe.$container.addClass('ce-iframe');
+  this.$container.append(this.iframe.$container);
+
+  this.iframe.$iframe.ready(function() {
+    this._renderContent();
+  }.bind(this));
+};
+
+scout.ContentEditor.prototype.setDropzoneLabel = function(dropzoneLabel) {
+  this.setProperty('dropzoneLabel', dropzoneLabel);
+};
+
+scout.ContentEditor.prototype.setContent = function(content) {
+  this.setProperty('content', content);
+  this._renderContent();
+};
+
+// TODO: get content of content editor and all elements
+scout.ContentEditor.prototype.getContent = function() {
+  return this.iframe.$iframe.get(0).contentWindow.document.documentElement.outerHtml;
 };
 
 scout.ContentEditor.prototype.addElement = function(element) {
@@ -47,63 +74,91 @@ scout.ContentEditor.prototype.updateElement = function(elementContent, slot, ele
   element.updateContent(elementContent);
 };
 
-scout.ContentEditor.prototype._render = function() {
-  this.$container = this.$parent.appendDiv('ce');
-
-  this.iframe.render();
-  this.iframe.$container.addClass('ce-iframe');
-  this.$container.append(this.iframe.$container);
-
-  this.iframe.$iframe.ready(function() {
-    this._renderContent();
-  }.bind(this));
-};
-
-scout.ContentEditor.prototype.setContent = function(content) {
-  this.setProperty('content', content);
-  this._renderContent();
-};
-
-// TODO: get content of content editor and all elements
-scout.ContentEditor.prototype.getContent = function() {
-  return this.iframe.$iframe.get(0).contentWindow.document.outerHtml;
-};
-
-scout.ContentEditor.prototype.setDropzoneLabel = function(dropzoneLabel) {
-  this.setProperty('dropzoneLabel', dropzoneLabel);
-};
-
 scout.ContentEditor.prototype._renderContent = function() {
   this.doc = this.iframe.$iframe.get(0).contentWindow.document;
 
   this.doc.open();
   this.doc.write(this.content);
-  this.doc.close();
 
   // the jquery ready event is attached to the root document and not to the document of the iframe.
   // therefore we must use the DOMContentLoaded event by ourselves
   this.doc.addEventListener('DOMContentLoaded', this._onIframeContentLoaded.bind(this));
+  this.doc.close();
+};
+
+scout.ContentEditor.prototype._onIframeContentLoaded = function() {
+  this._injectStyleSheet($(this.doc.head));
+  this._disableLinks();
+  this._createSlots();
+
+  $(this.doc)
+    .on('dragenter', this._onIframeDragEnter.bind(this))
+    .on('dragleave', this._onIframeDragLeave.bind(this))
+    .on('dragover', this._onIframeDragOver.bind(this))
+    .on('drop', this._onIframeDrop.bind(this));
+};
+
+scout.ContentEditor.prototype._onIframeDragEnter = function(event) {
+  this._iframeDragTargetList.push(event.target);
+  this._showSlots(this._getTypeOfDragEvent(event));
+
+  event.preventDefault();
+};
+
+scout.ContentEditor.prototype._onIframeDragLeave = function(event) {
+  scout.arrays.remove(this._iframeDragTargetList, event.target);
+  if (this._iframeDragTargetList.length === 0) {
+    this._hideSlots();
+    this._stopAccepting();
+    this._resetDragging();
+  }
+};
+
+scout.ContentEditor.prototype._onIframeDragOver = function(event) {
+  event.preventDefault();
+
+  if (event.clientX === this._dragPositionX && event.clientY === this._dragPositionY) {
+    return;
+  }
+  this._dragPositionX = event.clientX;
+  this._dragPositionY = event.clientY;
+
+  if (!this._dragAnimationFrame) {
+    var type = this._getTypeOfDragEvent(event);
+    this._dragAnimationFrame = window.requestAnimationFrame(this._highlightClosestSlot.bind(this, type, event.clientX, event.clientY));
+  }
+};
+
+scout.ContentEditor.prototype._onIframeDrop = function(event) {
+  event.preventDefault();
+
+  if (!this._$closestPlaceholder) {
+    this._stopAccepting();
+    this._hideSlots();
+    this._resetDragging();
+    return false;
+  }
+
+  var e = event.originalEvent;
+  if (e.dataTransfer.types) {
+    var type = e.dataTransfer.types[0];
+    var $elementContent = $(e.dataTransfer.getData(type));
+    var contentElement = scout.create('ContentElement', {
+      contentEditor: this,
+      $container: $elementContent
+    });
+    this._animateDrop(event, this._$closestPlaceholder, function() {
+      contentElement.dropInto(this._closestSlot, this._$closestPlaceholder);
+      this._stopAccepting();
+    }.bind(this));
+  }
+  this._hideSlots();
+  this._resetDragging();
+  return false;
 };
 
 scout.ContentEditor.prototype._injectStyleSheet = function($header) {
   $header.append('<link rel="stylesheet" type="text/css" href="' + this.session.url.baseUrlRaw + 'res/contenteditor.css">');
-  this.$slots.addClass('ce-slot');
-};
-
-scout.ContentEditor.prototype._onIframeContentLoaded = function() {
-  this.$slots = $(this.doc.body).find('[data-ce-slot]');
-  this.$slots.each(function() {
-    $(this).appendDiv('ce-slot-content-list').text($(this).attr('data-ce-allowed-elements'));
-  });
-
-  this._injectStyleSheet($(this.doc.head));
-  this._disableLinks();
-
-  $(this.doc)
-    .on('dragenter', this._onIframeDragEnter.bind(this))
-    .on('dragover', this._onIframeDragOver.bind(this))
-    .on('dragleave', this._onIframeDragLeave.bind(this))
-    .on('drop', this._onIframeDrop.bind(this));
 };
 
 scout.ContentEditor.prototype._disableLinks = function() {
@@ -112,10 +167,25 @@ scout.ContentEditor.prototype._disableLinks = function() {
   });
 };
 
-scout.ContentEditor.prototype._onIframeDragEnter = function(event) {
-  this._iframeDragTargetList.push(event.target);
-  this._showSlots(this._getTypeOfDragEvent(event));
-  event.preventDefault();
+scout.ContentEditor.prototype._createSlots = function() {
+  $(this.doc.body).find('[data-ce-slot]').each(function(index, slot) {
+    this._slots.push(scout.create('ContentEditorSlot', {
+      contentEditor: this,
+      $container: $(slot)
+    }));
+  }.bind(this));
+};
+
+scout.ContentEditor.prototype._resetDragging = function() {
+  this._iframeDragTargetList = [];
+
+  this._dragPositionX = null;
+  this._dragPositionY = null;
+  this._dragAnimationFrame = null;
+
+  if (this._dragAnimationFrame) {
+    window.cancelAnimationFrame(this._dragAnimationFrame);
+  }
 };
 
 scout.ContentEditor.prototype._getTypeOfDragEvent = function(event) {
@@ -126,158 +196,105 @@ scout.ContentEditor.prototype._getTypeOfDragEvent = function(event) {
   return '';
 };
 
-scout.ContentEditor.prototype._onIframeDragOver = function(event) {
-  event.preventDefault();
-
-  var type = this._getTypeOfDragEvent(event);
-  var $closestSlot = this._getClosestSlot(event.clientX, event.clientY, type);
-
-  if ($closestSlot && this._$currentClosestSlot !== $closestSlot) {
-    this._$currentClosestSlot = $closestSlot;
-    this._getSlotsForType(type).each(function(index, slot) {
-      if ($(slot) !== this._$currentClosestSlot) {
-        $(slot).removeClass('ce-accept-drop');
-        this._hidePlaceholders($(slot));
-      }
-    }.bind(this));
-    this._$currentClosestSlot.addClass('ce-accept-drop');
-    this._showPlaceholders();
-  }
-  this._highlightClosestPlaceholder(event.clientX, event.clientY);
-};
-
-scout.ContentEditor.prototype._onIframeDrop = function(event) {
-  event.preventDefault();
-  var e = event.originalEvent;
-  if (e.dataTransfer.types) {
-    var type = e.dataTransfer.types[0];
-    var $elementContent = $(e.dataTransfer.getData(type));
-    var contentElement = scout.create('ContentElement', {
-      contentEditor: this,
-      $container: $elementContent
-    });
-    this._animateDrop(event, this._$currentClosestPlaceholder, function() {
-      contentElement.dropInto(this._$currentClosestPlaceholder);
-      this._hidePlaceholders();
-    }.bind(this));
-  }
-  this._hideSlots();
-  this._iframeDragTargetList = [];
-  return false;
-};
-
 scout.ContentEditor.prototype._animateDrop = function(event, $placeholder, complete) {
   var $element = $(this.doc.body).appendDiv('ce-dropping-element');
-  $element.offset({left: event.clientX, top: event.clientY});
-  $element.animate({'left': $placeholder.offset().left + 'px', 'top': $placeholder.offset().top, 'height': '10px', 'width': $placeholder.width() }, 200, function() {
+  $element.offset({
+    left: event.clientX,
+    top: event.clientY
+  });
+  $element.animate({
+    'left': $placeholder.offset().left + 'px',
+    'top': $placeholder.offset().top,
+    'height': '10px',
+    'width': $placeholder.width()
+  }, 200, function() {
     $element.remove();
-    if(complete) {
+    if (complete) {
       complete();
     }
   }.bind(this));
 };
 
-scout.ContentEditor.prototype._onIframeDragLeave = function(event) {
-  scout.arrays.remove(this._iframeDragTargetList, event.target);
-  if (this._iframeDragTargetList.length === 0) {
-    this._hideSlots();
-    this._hidePlaceholders();
+scout.ContentEditor.prototype._highlightClosestSlot = function(type, x, y) {
+  this._dragAnimationFrame = null;
+
+  if (!this._iframeDragTargetList || this._iframeDragTargetList.length === 0) {
+    // dragging already stopped but animation frame was requested before. Canceling this function.
+    return;
   }
+
+  this._closestSlot = this._getClosestSlot(x, y);
+  if (!this._closestSlot) {
+    this._stopAccepting();
+    return;
+  }
+
+  if (!this._closestSlot.isAccepting()) {
+    for (var i = 0; i < this._slots.length; i++) {
+      if (this._slots[i] !== this._closestSlot) {
+        this._slots[i].stopAccepting();
+      }
+    }
+    this._closestSlot.requestAccepting(type);
+  }
+  this._$closestPlaceholder = this._closestSlot.highlightClosestPlaceholder(x, y, type);
 };
 
 scout.ContentEditor.prototype._showSlots = function(type) {
-  var $slotsForType = this._getSlotsForType(type);
-  $slotsForType.addClass('ce-slot-accept');
-};
-
-scout.ContentEditor.prototype._showPlaceholders = function() {
-  this._$currentClosestSlot.prependDiv('ce-placeholder');
-  this._$currentClosestSlot
-    .find('.ce-element')
-    .afterDiv('ce-placeholder');
-};
-
-scout.ContentEditor.prototype._highlightClosestPlaceholder = function(x, y) {
-  var $closest = this._getClosestPlaceholder(x, y);
-  if ($closest && this._$currentClosestPlaceholder !== $closest) {
-    this._$currentClosestPlaceholder = $closest;
-    $(this.doc.body).find('.ce-placeholder').each(function(index, placeholder) {
-      if ($(placeholder) !== $closest) {
-        $(placeholder).removeClass('ce-placeholder-accept-drop');
-      }
-    }.bind(this));
-    $closest.addClass('ce-placeholder-accept-drop');
+  for (var i = 0; i < this._slots.length; i++) {
+    this._slots[i].show(type);
   }
 };
 
-scout.ContentEditor.prototype._hidePlaceholders = function($parent) {
-  if (!$parent) {
-    $parent = $(this.doc.body);
+scout.ContentEditor.prototype._stopAccepting = function() {
+  for (var i = 0; i < this._slots.length; i++) {
+    this._slots[i].stopAccepting();
   }
-  var $placeholder = $parent.find('.ce-placeholder');
-  $placeholder.each(function(i) {
-    scout.arrays.remove(this._iframeDragTargetList, $placeholder[i]);
-  }.bind(this));
-  $parent.find('.ce-placeholder').remove();
 };
 
 scout.ContentEditor.prototype._hideSlots = function() {
-  $(this.doc.body).find('[data-ce-slot]').removeClass('ce-slot-accept ce-accept-drop');
-};
-
-scout.ContentEditor.prototype._getPlaceholdersForType = function(type) {
-  return this._getSlotsForType(type).find('.ce-slot-placeholder');
-};
-
-scout.ContentEditor.prototype._getSlotsForType = function(type) {
-  if (type === 'text/plain') {
-    type = 'text';
+  for (var i = 0; i < this._slots.length; i++) {
+    this._slots[i].hide();
   }
-  return $(this.doc.body).find('[data-ce-allowed-elements~=\'' + type + '\']');
 };
 
-scout.ContentEditor.prototype._getClosestPlaceholder = function(x, y) {
-  var $closest;
+scout.ContentEditor.prototype._getClosestSlot = function(x, y) {
+  var closest = null;
   var closestDistance;
-  $(this.doc.body).find('.ce-placeholder').each(function(index, placeholder) {
-    var $placeholder = $(placeholder);
-    var distance = this._getDistance($placeholder, x, y);
-    if (!$closest || distance < closestDistance) {
-      $closest = $placeholder;
-      closestDistance = distance;
-    }
-  }.bind(this));
-  return $closest;
-};
 
-scout.ContentEditor.prototype._getClosestSlot = function(x, y, type) {
-  var $closest;
-  var closestDistance;
-  this._getSlotsForType(type).each(function(index, slot) {
-    var $slot = $(slot);
-    var distance = this._getDistance($slot, x, y);
-    if (!$closest || distance < closestDistance) {
-      $closest = $slot;
+  for (var i = 0; i < this._slots.length; i++) {
+    var distance = this._getDistance(this._slots[i].$container, x, y);
+    if(distance > 50) {
+      continue;
+    }
+
+    if (!closest || distance < closestDistance) {
+      closest = this._slots[i];
       closestDistance = distance;
     }
-  }.bind(this));
-  return $closest;
+  }
+  return closest;
 };
 
 scout.ContentEditor.prototype._getDistance = function($element, x, y) {
   var xOffset = 0;
   var yOffset = 0;
 
-  if ($element.offset().top > y) {
-    yOffset = $element.offset().top - y;
-  } else if ($element.offset().top + $element.height() < y) {
-    yOffset = y - $element.offset().top - $element.height();
+  var elementTop = $element.offset().top - $(this.doc).scrollTop();
+  var elementLeft = $element.offset().left - $(this.doc).scrollLeft();
+  var elementBottom = elementTop + $element.height();
+  var elementRight = elementLeft + $element.width();
+
+  if (elementTop > y) {
+    yOffset = elementTop - y;
+  } else if (elementBottom < y) {
+    yOffset = y - elementTop - $element.height();
   }
 
-  if ($element.offset().left > x) {
-    xOffset = $element.offset().left - x;
-  } else if ($element.offset().left + $element.width() < x) {
-    xOffset = x - $element.offset().left - $element.width();
+  if (elementLeft > x) {
+    xOffset = elementLeft - x;
+  } else if (elementRight < x) {
+    xOffset = x - elementLeft - $element.width();
   }
   return Math.sqrt(xOffset * xOffset + yOffset * yOffset);
 };

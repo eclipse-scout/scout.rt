@@ -13,7 +13,6 @@ scout.ContentElement = function() {
   this.contentEditor;
   this.$container;
   this.content;
-  this.$slot;
   this.slot;
 };
 
@@ -23,14 +22,17 @@ scout.ContentElement.prototype.init = function(model) {
   this.content = scout.nvl(this.$container[0].outerHTML, '');
 };
 
-scout.ContentElement.prototype.dropInto = function($placeholder) {
+scout.ContentElement.prototype.dropInto = function(slot, $placeholder) {
   this.$container.addClass('ce-element ce-element-hover');
   this.contentEditor.addElement(this);
 
-  this.$slot = $placeholder.parent();
-  this.slot = this.$slot.attr('data-ce-slot');
+  this.slot = slot;
 
   $placeholder.after(this.$container);
+  if($placeholder.hasClass('ce-mandatory-placeholder')) {
+    scout.arrays.remove(this.contentEditor._iframeDragTargetList, $placeholder);
+    $placeholder.remove();
+  }
 
   this.$container
     .on('mouseenter', this._onElementMouseEnter.bind(this))
@@ -50,20 +52,26 @@ scout.ContentElement.prototype._onElementMouseEnter = function(event) {
     .on('click', this._onRemove.bind(this));
 
   $buttonGroup
-    .appendDiv('ce-element-button ce-move-up-button')
-    .on('click', this._onMoveUp.bind(this));
-
-  $buttonGroup
-    .appendDiv('ce-element-button ce-move-down-button')
-    .on('click', this._onMoveDown.bind(this));
-
-  $buttonGroup
     .appendDiv('ce-element-button ce-edit-button')
     .on('click', this._onEdit.bind(this));
 
-  $buttonGroup
-  .appendDiv('ce-element-button ce-copy-button')
-  .on('click', this._onCopy.bind(this));
+  if (this.$container.prev('.ce-element').length >= 1) {
+    $buttonGroup
+      .appendDiv('ce-element-button ce-move-up-button')
+      .on('click', this._onMoveUp.bind(this));
+  }
+
+  if (this.$container.next('.ce-element').length >= 1) {
+    $buttonGroup
+      .appendDiv('ce-element-button ce-move-down-button')
+      .on('click', this._onMoveDown.bind(this));
+  }
+
+  if (this.slot.isFree()) {
+    $buttonGroup
+      .appendDiv('ce-element-button ce-copy-button')
+      .on('click', this._onCopy.bind(this));
+  }
 };
 
 scout.ContentElement.prototype._onElementMouseLeave = function(event) {
@@ -76,9 +84,12 @@ scout.ContentElement.prototype._onRemove = function() {
   $element.animate({
     height: '0',
     opacity: 0
-  }, 'fast', 'linear', function() {
+  }, 250, 'linear', function() {
     $element.remove();
     this.contentEditor.removeElement(this);
+    this._onElementMouseLeave();
+    this._onElementMouseEnter();
+    this.slot._showMandatoryPlaceholders();
   }.bind(this));
 };
 
@@ -95,6 +106,7 @@ scout.ContentElement.prototype._onMoveUp = function() {
     $prev.insertAfter(this.$container);
     $prev.css('top', 'auto');
     this.$container.css('top', 'auto');
+    this._onElementMouseLeave();
   }.bind(this));
 };
 
@@ -111,13 +123,14 @@ scout.ContentElement.prototype._onMoveDown = function() {
     $next.insertBefore(this.$container);
     $next.css('top', 'auto');
     this.$container.css('top', 'auto');
+    this._onElementMouseLeave();
   }.bind(this));
 };
 
 scout.ContentElement.prototype._onEdit = function() {
   this.contentEditor.trigger('editElement', {
     elementContent: this.content,
-    slot: this.slot,
+    slot: this.slot.name(),
     elementId: this.elementId
   });
 };
@@ -129,7 +142,9 @@ scout.ContentElement.prototype._onCopy = function() {
     contentEditor: this.contentEditor,
     $container: $elementContent
   });
-  contentElement.dropInto(this.$container);
+  contentElement.dropInto(this.slot, this.$container);
+  this._onElementMouseLeave();
+  this._onElementMouseEnter();
 };
 
 scout.ContentElement.prototype.updateContent = function(content) {

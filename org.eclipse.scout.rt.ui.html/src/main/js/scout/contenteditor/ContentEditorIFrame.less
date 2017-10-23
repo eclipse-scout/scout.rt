@@ -8,43 +8,59 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-[data-ce-slot] {
-  padding-top: 1px;
-  padding-bottom: 3px;
-  border: 1px solid transparent;
+* {
+  user-select: none;
 }
 
-.ce-slot-accept {
-  border: 1px dashed @palette-blue-4 !important;
+[data-ce-slot] {
+  padding-top: 2px;
+  padding-bottom: 4px;
+  margin-top: 1px;
+  margin-bottom: 1px;
+  border: 2px dashed transparent !important;
+}
+
+.ce-slot-visible {
+  border-color: @palette-blue-4 !important;
   position: relative;
 }
 
-.ce-accept-drop {
+.ce-slot-accept {
   border-color: @palette-orange-4 !important;
-
-  .ce-slot-content-list {
-    background-color: @palette-orange-0 !important;
-    color: @palette-orange-4 !important;
-  }
 }
 
-.ce-slot-content-list {
+.ce-slot-invalid {
+  border-color: @palette-red-4 !important;
+}
+
+.ce-slot-label {
   position: absolute;
   top: 0;
   right: 0;
   display: none;
   vertical-align: top;
-  background-color: @palette-blue-0;
+  background-color: @palette-red-0;
   font-family: Arial, sans-serif;
   font-weight: normal;
-  font-size: 11px;
-  color: @palette-blue-6;
-  text-transform: uppercase;
+  font-size: 13px;
+  color: @palette-red-4;
+  text-transform: capitalize;
   text-align: center;
   padding: 3px 6px;
+
+  z-index: 999;
+
+  span {
+    display: none;
+  }
 }
 
-.ce-slot-accept .ce-slot-content-list {
+span.ce-slot-label-invalid {
+  font-weight: bold;
+  display: inline;
+}
+
+.ce-slot-invalid .ce-slot-label {
   display: inline-block;
 }
 
@@ -52,11 +68,49 @@
   position: absolute;
   display: block;
   border: 1px solid transparent;
-  width: 100%;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-top: -6px;
+  margin-left: 2px;
+  margin-righht: 2px;
+  opacity: 0.7;
+}
+
+div.ce-mandatory-placeholder {
+  margin: 5px;
+  position: relative;
+  border: 2px dashed @palette-blue-4;
+  background-color: @palette-blue-0;
+  color: @palette-blue-7;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  font-weight: normal;
+  font-size: 13px;
+  padding: 3px;
+}
+
+div.ce-mandatory-placeholder.ce-placeholder-accept-drop {
+  height: auto;
+  background-color: @palette-orange-0;
+  color: @palette-orange-4;
+}
+
+.ce-slot-invalid div.ce-mandatory-placeholder {
+  background-color: @palette-red-0;
+  color: @palette-red-4;
+}
+
+.ce-slot-visible div.ce-mandatory-placeholder {
+  border-color: transparent;
 }
 
 .ce-placeholder-accept-drop {
-  border: 1px solid @palette-orange-4;
+  height: 2px;
+  background-color: @palette-orange-4;
+  border-top: 6px solid @palette-orange-0;
+  border-bottom: 6px solid @palette-orange-0;
+  border-right: 5px solid @palette-orange-4;
+  border-left: 5px solid @palette-orange-4;
 }
 
 .ce-element {
@@ -85,7 +139,7 @@
   #scout.font-icon();
   text-align: center;
   color: @palette-white;
-  background-color: @palette-blue-5;
+  background-color: @palette-blue-6;
   padding: 8px;
   width: 28px;
   display: inline-block;
