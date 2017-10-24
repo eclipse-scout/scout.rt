@@ -176,6 +176,14 @@ input {
   }
 }
 
+input[type="text"],
+textarea {
+  /* Explicitly set 'user-select' to something other than 'none', otherwise the focus manager */
+  /* might prevent text selection (scout.focusUtils.isSelectableText()). Some browsers already */
+  /* provide such a rule in the user style sheet, but some do not (e.g. Chrome 62). */
+  #scout.user-select(text);
+}
+
 input[type="radio"] {
   /* radiobutton in active filter (smartfield) should be displayed as radiobutton */
   -webkit-appearance: radio;
