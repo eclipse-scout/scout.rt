@@ -624,7 +624,10 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     }
   }
 
-  private CalendarComponent resolveComponent(CalendarComponent comp) {
+  protected CalendarComponent resolveComponent(CalendarComponent comp) {
+    if (comp == null || !getComponents().contains(comp)) {
+      return null;
+    }
     return comp;
   }
 
