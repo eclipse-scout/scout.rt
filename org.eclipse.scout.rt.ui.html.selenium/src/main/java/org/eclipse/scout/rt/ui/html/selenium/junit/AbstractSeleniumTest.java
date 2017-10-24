@@ -84,7 +84,9 @@ public abstract class AbstractSeleniumTest {
   @AfterClass
   public static void tearDownAfterClass() {
     if (!SeleniumSuiteState.isSuiteStarted()) {
-      s_driver.quit();
+      if (s_driver != null) {
+        s_driver.quit();
+      }
       System.out.println("Selenium driver terminated by AbstractSeleniumTest");
     }
     s_driver = null;
