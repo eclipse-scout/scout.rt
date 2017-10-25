@@ -540,6 +540,11 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
   void requestFocus();
 
   /**
+   * Convenience for {@link IForm#requestInput(IFormField)}
+   */
+  void requestInput();
+
+  /**
    * MasterSlave
    */
   IValueField getMasterField();
@@ -991,4 +996,5 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
   void setDisabledStyle(int disabledStyle);
 
   int getDisabledStyle();
+
 }

@@ -51,7 +51,11 @@ public class FormEvent extends EventObject implements IModelEvent {
    * see {@link IFormField#requestFocus()}
    */
   public static final int TYPE_REQUEST_FOCUS = 6020;
-  //next 6030
+  /**
+   * see {@link IFormField#requestInput()}
+   */
+  public static final int TYPE_REQUEST_INPUT = 6030;
+  //next 6040
 
   private final int m_type;
   private final IFormField m_formField;

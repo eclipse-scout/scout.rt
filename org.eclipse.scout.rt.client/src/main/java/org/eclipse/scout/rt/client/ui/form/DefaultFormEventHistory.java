@@ -37,6 +37,7 @@ public class DefaultFormEventHistory extends AbstractEventHistory<FormEvent> {
   public void notifyEvent(FormEvent event) {
     switch (event.getType()) {
       case FormEvent.TYPE_REQUEST_FOCUS:
+      case FormEvent.TYPE_REQUEST_INPUT:
       case FormEvent.TYPE_TO_BACK:
       case FormEvent.TYPE_TO_FRONT: {
         addToCache(event.getType(), event);

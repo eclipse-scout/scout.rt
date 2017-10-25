@@ -2004,6 +2004,14 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   @Override
+  public void requestInput() {
+    IForm form = getForm();
+    if (form != null) {
+      form.requestInput(this);
+    }
+  }
+
+  @Override
   public void setPreventInitialFocus(boolean preventInitialFocus) {
     propertySupport.setPropertyBool(PROP_PREVENT_INITIAL_FOCUS, preventInitialFocus);
   }

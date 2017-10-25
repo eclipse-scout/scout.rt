@@ -40,13 +40,19 @@ scout.FormAdapter.prototype._onWidgetEvent = function(event) {
 
 scout.FormAdapter.prototype.onModelAction = function(event) {
   if (event.type === 'requestFocus') {
-    this._onRequestFocus(event.formField);
+    this._onRequestFocus(event);
+  } else if (event.type === 'requestInput') {
+    this._onRequestInput(event);
   } else {
     scout.FormAdapter.parent.prototype.onModelAction.call(this, event);
   }
 };
 
-scout.FormAdapter.prototype._onRequestFocus = function(formFieldId) {
-  var formField = this.session.getOrCreateWidget(formFieldId, this.widget);
-  formField.focus();
+scout.FormAdapter.prototype._onRequestFocus = function(event) {
+  this.session.getOrCreateWidget(event.formField, this.widget).focus();
 };
+
+scout.FormAdapter.prototype._onRequestInput = function(event) {
+  this.session.getOrCreateWidget(event.formField, this.widget).requestInput();
+};
+

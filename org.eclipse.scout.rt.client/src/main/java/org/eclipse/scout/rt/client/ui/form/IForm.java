@@ -661,9 +661,16 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
   void setSearchFilter(SearchFilter filter);
 
   /**
-   * Request focus for the field by sending a {@link FormEvent#TYPE_REQUEST_FOCUS} event
+   * Request focus for the field by sending a {@link FormEvent#TYPE_REQUEST_FOCUS} event.
    */
-  void requestFocus(IFormField f);
+  void requestFocus(IFormField field);
+
+  /**
+   * Request input mode for the field by sending a {@link FormEvent#TYPE_REQUEST_INPUT} event. For most fields request
+   * input does the same thing as request focus. But some fields, e.g. the SmartField, may decide to open a popup in
+   * order to get input for the field.
+   */
+  void requestInput(IFormField field);
 
   /**
    * Add a {@link FormListener}. These listeners will be called when the form is activated, closed, discarded, before

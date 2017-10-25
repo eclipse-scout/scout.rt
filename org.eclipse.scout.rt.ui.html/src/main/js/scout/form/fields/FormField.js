@@ -1150,3 +1150,7 @@ scout.FormField.prototype.getValidationResult = function() {
 scout.FormField.prototype._updateEmpty = function() {
   // NOP
 };
+
+scout.FormField.prototype.requestInput = function() {
+  this.focus();
+};

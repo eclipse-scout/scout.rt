@@ -1262,3 +1262,10 @@ scout.SmartField.prototype._flushLookupStatus = function() {
 
   this._clearLookupStatus();
 };
+
+scout.SmartField.prototype.requestInput = function() {
+  if (this.enabledComputed && this.rendered) {
+    this.focus();
+    this.openPopup();
+  }
+};
