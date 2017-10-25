@@ -558,6 +558,11 @@ public class SmartField2ContentAssistAdapter<VALUE> implements IContentAssistFie
   }
 
   @Override
+  public void requestInput() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public IValueField getMasterField() {
     throw new UnsupportedOperationException();
   }

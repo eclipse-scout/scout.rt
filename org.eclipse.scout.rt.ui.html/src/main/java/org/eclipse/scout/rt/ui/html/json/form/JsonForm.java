@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -53,6 +52,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
 
   public static final String EVENT_FORM_CLOSING = "formClosing";
   public static final String EVENT_REQUEST_FOCUS = "requestFocus";
+  public static final String EVENT_REQUEST_INPUT = "requestInput";
 
   private final IDesktop m_desktop;
   private FormListener m_formListener;
@@ -154,6 +154,8 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
     attachGlobalAdapters(m_desktop.getDialogs(getModel(), false));
     attachGlobalAdapters(m_desktop.getMessageBoxes(getModel()));
     attachGlobalAdapters(m_desktop.getFileChoosers(getModel()));
+
+    addInitialInputEvent();
   }
 
   @Override
@@ -194,22 +196,46 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
     return json;
   }
 
-  public void setInitialFocusProperty(JSONObject json) {
-    //check for request focus events in history
-    IEventHistory<FormEvent> h = getModel().getEventHistory();
-    if (h != null) {
-      for (FormEvent e : h.getRecentEvents()) {
-        if (e.getType() == FormEvent.TYPE_REQUEST_FOCUS) {
-          IJsonAdapter<?> formFieldAdapter = JsonAdapterUtility.findChildAdapter(this, e.getFormField());
-          if (formFieldAdapter == null) {
-            LOG.error("Cannot handle requestFocus event, because adapter for {} could not be resolved in {}", e.getFormField(), this);
-            return;
-          }
+  protected void addInitialInputEvent() {
+    FormEvent event = findRecentRequestEvent(FormEvent.TYPE_REQUEST_INPUT);
+    if (event != null) {
+      handleModelRequestEvent(event, true);
+    }
+  }
 
-          putProperty(json, PROP_INITIAL_FOCUS, formFieldAdapter.getId());
-        }
+  // TODO [7.0] BSH Try to replace PROP_INITIAL_FOCUS by protected EVENT_REQUEST_FOCUS (but check "initialFocusEnabled")
+  protected void setInitialFocusProperty(JSONObject json) {
+    FormEvent event = findRecentRequestEvent(FormEvent.TYPE_REQUEST_FOCUS);
+    if (event != null) {
+      IJsonAdapter<?> childAdapter = findChildAdapter(event);
+      if (childAdapter != null) {
+        putProperty(json, PROP_INITIAL_FOCUS, childAdapter.getId());
       }
     }
+  }
+
+  protected IJsonAdapter<?> findChildAdapter(FormEvent event) {
+    IJsonAdapter<?> childAdapter = JsonAdapterUtility.findChildAdapter(this, event.getFormField());
+    if (childAdapter == null) {
+      LOG.error("Cannot handle form-event {}, because adapter for {} could not be resolved in {}",
+          event.getType(), event.getFormField(), this);
+    }
+    return childAdapter;
+  }
+
+  protected FormEvent findRecentRequestEvent(int eventType) {
+    IEventHistory<FormEvent> history = getModel().getEventHistory();
+    if (history == null) {
+      return null;
+    }
+    FormEvent event = null;
+    for (FormEvent event0 : history.getRecentEvents()) {
+      if (event0.getType() == eventType) {
+        event = event0;
+        break;
+      }
+    }
+    return event;
   }
 
   protected String displayHintToJson(int displayHint) {
@@ -232,7 +258,8 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
         handleModelFormClosed(event.getForm());
         break;
       case FormEvent.TYPE_REQUEST_FOCUS:
-        handleModelRequestFocus(event.getFormField());
+      case FormEvent.TYPE_REQUEST_INPUT:
+        handleModelRequestEvent(event, false);
         break;
       default:
         // NOP
@@ -256,17 +283,27 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
     getUiSession().sendDisposeAdapterEvent(this);
   }
 
-  protected void handleModelRequestFocus(IFormField formField) {
-    IJsonAdapter<?> formFieldAdapter = JsonAdapterUtility.findChildAdapter(this, formField);
-    if (formFieldAdapter == null) {
-      LOG.error("Cannot handle requestFocus event, because adapter for {} could not be resolved in {}", formField, this);
-      return;
+  protected void handleModelRequestEvent(FormEvent event, boolean protect) {
+    IJsonAdapter<?> childAdapter = findChildAdapter(event);
+    if (childAdapter != null) {
+      JSONObject json = new JSONObject();
+      putProperty(json, PROP_FORM_FIELD, childAdapter.getId());
+      JsonEvent jsonEvent = addActionEvent(getRequestEventName(event.getType()), json);
+      if (protect) {
+        jsonEvent.protect();
+      }
     }
+  }
 
-    JSONObject jsonEvent = new JSONObject();
-    putProperty(jsonEvent, PROP_FORM_FIELD, formFieldAdapter.getId());
-    // TODO [7.0] BSH Try to replace PROP_INITIAL_FOCUS by protected EVENT_REQUEST_FOCUS (but check "initialFocusEnabled")
-    addActionEvent(EVENT_REQUEST_FOCUS, jsonEvent);
+  protected String getRequestEventName(int eventType) {
+    switch (eventType) {
+      case FormEvent.TYPE_REQUEST_FOCUS:
+        return EVENT_REQUEST_FOCUS;
+      case FormEvent.TYPE_REQUEST_INPUT:
+        return EVENT_REQUEST_INPUT;
+      default:
+        throw new IllegalArgumentException("Unsupported event type");
+    }
   }
 
   @Override

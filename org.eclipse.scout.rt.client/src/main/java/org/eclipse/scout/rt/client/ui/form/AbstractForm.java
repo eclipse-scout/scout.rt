@@ -2611,7 +2611,15 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     if (f == null || f.getForm() != this) {
       return;
     }
-    fireRequestFocus(f);
+    fireRequestEvent(FormEvent.TYPE_REQUEST_FOCUS, f);
+  }
+
+  @Override
+  public void requestInput(IFormField f) {
+    if (f == null || f.getForm() != this) {
+      return;
+    }
+    fireRequestEvent(FormEvent.TYPE_REQUEST_INPUT, f);
   }
 
   /**
@@ -2781,9 +2789,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   @SuppressWarnings("bsiRulesDefinition:htmlInString")
-  private void fireRequestFocus(IFormField f) {
+  private void fireRequestEvent(int eventType, IFormField f) {
     try {
-      fireFormEvent(new FormEvent(this, FormEvent.TYPE_REQUEST_FOCUS, f));
+      fireFormEvent(new FormEvent(this, eventType, f));
     }
     catch (RuntimeException | PlatformError e) {
       throw BEANS.get(PlatformExceptionTranslator.class).translate(e)

@@ -560,6 +560,11 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   void requestFocus();
 
   /**
+   * Convenience for {@link IForm#requestInput(IFormField)}
+   */
+  void requestInput();
+
+  /**
    * MasterSlave
    */
   IValueField getMasterField();
@@ -1011,4 +1016,5 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   void setDisabledStyle(int disabledStyle);
 
   int getDisabledStyle();
+
 }
