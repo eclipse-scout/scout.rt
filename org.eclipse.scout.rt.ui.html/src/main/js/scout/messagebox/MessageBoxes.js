@@ -12,7 +12,9 @@
  * This class is a convenient builder for creating message boxes. Use the static functions to
  * create and open simple and often used message boxes.
  */
-scout.MessageBoxes = function(parent) {
+scout.MessageBoxes = function() {
+  this.parent = null;
+
   this.yesText = null;
   this.noText = null;
   this.cancelText = null;
@@ -21,7 +23,6 @@ scout.MessageBoxes = function(parent) {
   this.headerText = null;
   this.closeOnClick = true;
   this.html = false;
-  this.parent = parent;
 };
 
 scout.MessageBoxes.prototype.init = function(options) {
@@ -104,6 +105,22 @@ scout.MessageBoxes.prototype.buildAndOpen = function() {
   return def.promise();
 };
 
+/* --- STATIC HELPERS ------------------------------------------------------------- */
+
+scout.MessageBoxes.create = function(parent) {
+  return scout.create('MessageBoxes', {
+    parent: parent
+  });
+};
+
+scout.MessageBoxes.createOk = function(parent) {
+  return this.create(parent).withYes(parent.session.text('Ok'));
+};
+
+scout.MessageBoxes.createYesNo = function(parent) {
+  return this.create(parent).withYes().withNo();
+};
+
 /**
  * Opens a message box with an Ok button.
  *
@@ -114,9 +131,8 @@ scout.MessageBoxes.prototype.buildAndOpen = function() {
  * @static
  */
 scout.MessageBoxes.openOk = function(parent, bodyText, severity) {
-  return new scout.MessageBoxes(parent)
+  return this.createOk(parent)
     .withBody(bodyText)
-    .withYes(parent.session.text('Ok'))
     .withSeverity(severity)
     .buildAndOpen();
 };
@@ -131,10 +147,8 @@ scout.MessageBoxes.openOk = function(parent, bodyText, severity) {
  * @static
  */
 scout.MessageBoxes.openYesNo = function(parent, bodyText, severity) {
-  return new scout.MessageBoxes(parent)
+  return this.createYesNo(parent)
     .withBody(bodyText)
-    .withYes()
-    .withNo()
     .withSeverity(severity)
     .buildAndOpen();
 };

@@ -222,7 +222,7 @@ scout.Lifecycle.prototype._whenInvalid = function(func) {
 };
 
 scout.Lifecycle.prototype._showYesNoCancelMessageBox = function(message, yesAction, noAction) {
-  return new scout.MessageBoxes(this.widget)
+  return scout.MessageBoxes.create(this.widget)
     .withSeverity(scout.Status.Severity.WARNING)
     .withHeader(message)
     .withYes()
@@ -244,10 +244,9 @@ scout.Lifecycle.prototype._showYesNoCancelMessageBox = function(message, yesActi
  * @returns {Promise}
  */
 scout.Lifecycle.prototype._showStatusMessageBox = function(status) {
-  return new scout.MessageBoxes(this.widget)
+  return scout.MessageBoxes.createOk(this.widget)
     .withSeverity(status.severity)
     .withBody(status.message, true)
-    .withYes(this.session().text('Ok'))
     .buildAndOpen();
 };
 
