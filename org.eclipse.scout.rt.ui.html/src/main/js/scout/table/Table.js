@@ -1261,10 +1261,10 @@ scout.Table.prototype._removeAllRows = function() {
  */
 scout.Table.prototype._removeRows = function(rows) {
   if (!rows) {
-    rows = scout.arrays.ensure(rows);
     this._removeAllRows();
     return;
   }
+  var tableAttached = this.isAttachedAndRendered();
   rows = scout.arrays.ensure(rows);
   rows.forEach(function(row) {
     var rowIndex = this.filteredRows().indexOf(row);
@@ -1272,19 +1272,26 @@ scout.Table.prototype._removeRows = function(rows) {
     if (rowIndex === -1) {
       throw new Error('Row not found, cannot remove $row');
     }
-    // if row is not rendered but its rowindex is inside the view range -> inconsistency
-    if (!row.$row && this.viewRangeRendered.contains(rowIndex) && !row.$row) {
-      throw new Error('Inconsistency found while removing row. Row is not but inside rendered view range. RowIndex: ' + rowIndex);
-    }
-    // if row is rendered but its rowindex is not inside the view range -> inconsistency
-    if (row.$row && !this.viewRangeRendered.contains(rowIndex)) {
-      throw new Error('Inconsistency found while removing row. Row is rendered but not inside rendered view range. RowIndex: ' + rowIndex);
-    }
+    var rowRendered = !!row.$row;
+    var rowInViewRange = this.viewRangeRendered.contains(rowIndex);
 
+    // Note: these checks can only be done, when table is rendered _and_ attached. When the table is detached it can
+    // still add rows, but these new rows are not rendered while the table is detached. Thus this check would fail,
+    // when a row that has been added in detached state is removed again while table is still detached.
+    if (tableAttached) {
+      // if row is not rendered but its row-index is inside the view range -> inconsistency
+      if (!rowRendered && rowInViewRange) {
+        throw new Error('Inconsistency found while removing row. Row is undefined but inside rendered view range. RowIndex: ' + rowIndex);
+      }
+      // if row is rendered but its row-index is not inside the view range -> inconsistency
+      if (rowRendered && !rowInViewRange) {
+        throw new Error('Inconsistency found while removing row. Row is rendered but not inside rendered view range. RowIndex: ' + rowIndex);
+      }
+    }
     this._removeRow(row);
 
     // Adjust view range if row is inside or before range
-    if (this.viewRangeRendered.contains(rowIndex) || rowIndex < this.viewRangeRendered.from) {
+    if (rowInViewRange || rowIndex < this.viewRangeRendered.from) {
       if (rowIndex < this.viewRangeRendered.from) {
         this.viewRangeRendered.from--;
         this.viewRangeRendered.to--;
@@ -3548,25 +3555,26 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
 };
 
 scout.Table.prototype._removeRangeMarkers = function() {
-  var firstRow, lastRow;
-  if (this.viewRangeRendered.size() === 0) {
-    return;
-  }
-  firstRow = this.filteredRows()[this.viewRangeRendered.from];
-  lastRow = this.filteredRows()[this.viewRangeRendered.to - 1];
-  firstRow.$row.removeClass('first');
-  lastRow.$row.removeClass('last');
+  this._modifyRangeMarkers('removeClass');
 };
 
 scout.Table.prototype._renderRangeMarkers = function() {
-  var firstRow, lastRow;
+  this._modifyRangeMarkers('addClass');
+};
+
+scout.Table.prototype._modifyRangeMarkers = function(funcName) {
   if (this.viewRangeRendered.size() === 0) {
     return;
   }
-  firstRow = this.filteredRows()[this.viewRangeRendered.from];
-  lastRow = this.filteredRows()[this.viewRangeRendered.to - 1];
-  firstRow.$row.addClass('first');
-  lastRow.$row.addClass('last');
+  var filteredRows = this.filteredRows();
+  modifyRangeMarker(filteredRows[this.viewRangeRendered.from], 'first');
+  modifyRangeMarker(filteredRows[this.viewRangeRendered.to - 1], 'last');
+
+  function modifyRangeMarker(row, cssClass) {
+    if (row && row.$row) {
+      row.$row[funcName](cssClass);
+    }
+  }
 };
 
 scout.Table.prototype.ensureRowRendered = function(row) {
