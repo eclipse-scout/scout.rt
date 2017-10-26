@@ -2793,7 +2793,7 @@ describe("Table", function() {
       // Simply expect no error was thrown (can be replaced with expect().nothing()
       // in newer Jasmine versions). This is just to avoid the 'no expectations'
       // warning in the console.
-      expect(true).toBeTrue();
+      expect(true).toBeTruthy();
 
       function runTest(rowToDeleteIndex) {
         var model = helper.createModelFixture(1, 1);
