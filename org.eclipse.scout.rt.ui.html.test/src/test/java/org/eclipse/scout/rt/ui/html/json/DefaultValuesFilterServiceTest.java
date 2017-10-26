@@ -38,30 +38,30 @@ import org.junit.runner.RunWith;
 public class DefaultValuesFilterServiceTest {
 
   private List<IBean<IDefaultValuesConfigurationContributor>> m_origBeans = new ArrayList<>();
-  private DefaultValuesFilter m_filter;
+  private DefaultValuesFilter m_origFilter;
   private List<IBean<?>> m_newBeans = new ArrayList<>();
 
   @Before
   public void setUp() {
     // Make sure filter is initialized anew by setting it to null so that contributors are gathered again
-    m_filter = BEANS.get(DefaultValuesFilterService.class).getFilter();
+    m_origFilter = BEANS.get(DefaultValuesFilterService.class).getFilter();
     BEANS.get(DefaultValuesFilterService.class).setFilter(null);
 
     m_origBeans = BEANS.getBeanManager().getBeans(IDefaultValuesConfigurationContributor.class);
     TestingUtility.unregisterBeans(m_origBeans);
-
     m_newBeans.add(TestingUtility.registerBean(new BeanMetaData(OverrideOriginalContributor.class)));
     m_newBeans.add(TestingUtility.registerBean(new BeanMetaData(OverrideContributor.class)));
   }
 
   @After
   public void tearDown() {
-    for (IBean<?> bean : m_newBeans) {
-      TestingUtility.registerBean(new BeanMetaData(bean.getClass()));
+    TestingUtility.unregisterBeans(m_newBeans);
+    for (IBean<?> bean : m_origBeans) {
+      TestingUtility.registerBean(new BeanMetaData(bean.getBeanClazz()));
     }
 
-    TestingUtility.unregisterBeans(m_newBeans);
-    BEANS.get(DefaultValuesFilterService.class).setFilter(m_filter);
+    // Restore original filter
+    BEANS.get(DefaultValuesFilterService.class).setFilter(m_origFilter);
   }
 
   protected String readFile(String filename) throws IOException {
