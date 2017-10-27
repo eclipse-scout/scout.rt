@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -21,15 +22,16 @@ public class HttpProxyTest {
 
   @Test
   public void testRewriteUrl() {
-    HttpProxy proxy = new HttpProxy();
-    proxy.setRemoteUrl("http://localhost:8085/api");
-    HttpProxyOptions options = new HttpProxyOptions()
-        .withRewriteRule("/studio-api/")
-        .withRewriteReplacement("/");
-    HttpServletRequest req = Mockito.mock(HttpServletRequest.class);
-    Mockito.when(req.getPathInfo()).thenReturn("/studio-api/config/media/templates/a20a1264-2c56-4c71-a1fd-a1edb675a8ee/preview-image");
-    String url = proxy.rewriteUrl(req, options);
-    assertEquals("http://localhost:8085/api/config/media/templates/a20a1264-2c56-4c71-a1fd-a1edb675a8ee/preview-image", url);
-  }
+    HttpProxy proxy = BEANS.get(HttpProxy.class)
+        .withRemoteBaseUrl("http://internal.example.com:1234/api");
 
+    HttpProxyRequestOptions options = new HttpProxyRequestOptions()
+        .withRewriteRule(new SimpleRegexRewriteRule("/my-api/", "/"));
+
+    HttpServletRequest req = Mockito.mock(HttpServletRequest.class);
+    Mockito.when(req.getPathInfo()).thenReturn("/my-api/templates/a20a1264-2c56-4c71-a1fd-a1edb675a8ee/preview");
+
+    String url = proxy.rewriteUrl(req, options);
+    assertEquals("http://internal.example.com:1234/api/templates/a20a1264-2c56-4c71-a1fd-a1edb675a8ee/preview", url);
+  }
 }

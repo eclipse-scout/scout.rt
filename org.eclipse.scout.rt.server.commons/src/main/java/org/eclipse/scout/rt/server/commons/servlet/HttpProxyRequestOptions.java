@@ -15,24 +15,21 @@ import java.util.Map;
 
 /**
  * <ul>
- * <li><b>rewriteRule</b> A regular expression string that is applied on the <i>pathInfo</i> part of the current HTTP
+ * <li><b>rewriteRule:</b> A regular expression string that is applied on the <i>pathInfo</i> part of the current HTTP
  * request</li>
- * <li><b>rewriteReplacement</b> Used as replacement string for the string matched by the rewrite rule</li>
+ * <li><b>rewriteReplacement:</b> Used as replacement string for the string matched by the rewrite rule</li>
  * </ul>
  */
-public class HttpProxyOptions {
+public class HttpProxyRequestOptions {
 
   private final Map<String, String> m_customRequestHeaders;
+  private IRewriteRule m_rewriteRule;
 
-  private String m_rewriteRule;
-
-  private String m_rewriteReplacement;
-
-  public HttpProxyOptions() {
+  public HttpProxyRequestOptions() {
     m_customRequestHeaders = new HashMap<>();
   }
 
-  public HttpProxyOptions withCustomRequestHeader(String name, String value) {
+  public HttpProxyRequestOptions withCustomRequestHeader(String name, String value) {
     m_customRequestHeaders.put(name, value);
     return this;
   }
@@ -41,22 +38,12 @@ public class HttpProxyOptions {
     return m_customRequestHeaders;
   }
 
-  public HttpProxyOptions withRewriteRule(String rewriteRule) {
+  public HttpProxyRequestOptions withRewriteRule(IRewriteRule rewriteRule) {
     m_rewriteRule = rewriteRule;
     return this;
   }
 
-  public String getRewriteRule() {
+  public IRewriteRule getRewriteRule() {
     return m_rewriteRule;
   }
-
-  public HttpProxyOptions withRewriteReplacement(String rewriteReplacement) {
-    m_rewriteReplacement = rewriteReplacement;
-    return this;
-  }
-
-  public String getRewriteReplacement() {
-    return m_rewriteReplacement;
-  }
-
 }

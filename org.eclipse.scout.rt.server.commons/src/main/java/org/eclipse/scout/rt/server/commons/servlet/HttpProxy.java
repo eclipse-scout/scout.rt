@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,13 +44,13 @@ import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.InputStreamContent;
 
 /**
- * Forwards get and post requests to the given remote URL.
+ * Forwards GET and POST requests to the given remote URL.
  */
 @Bean
 public class HttpProxy {
   private static final Logger LOG = LoggerFactory.getLogger(HttpProxy.class);
 
-  private String m_remoteUrl;
+  private String m_remoteBaseUrl;
   private final List<IHttpHeaderFilter> m_requestHeaderFilters;
   private final List<IHttpHeaderFilter> m_responseHeaderFilters;
 
@@ -72,17 +71,35 @@ public class HttpProxy {
     m_responseHeaderFilters.add(new HttpHeaderNameValueFilter("Transfer-Encoding", "chunked"));
   }
 
-  public void proxyGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    proxyGet(req, resp, new HttpProxyOptions());
+  /**
+   * Convenience method for {@link #proxyGet(HttpServletRequest, HttpServletResponse, HttpProxyRequestOptions)} without
+   * options.
+   */
+  public void proxyGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    proxyGet(req, resp, null);
   }
 
   /**
-   * Adds every request header beside the blacklisted to the forwarded request.<br>
-   * Writes the request payload to the forwarded request or adds every query parameter to the forwarded request if
-   * parameters are used.<br>
-   * Writes the returned response body of the forwarded request, the headers and the status to the response.<b>
+   * Forwards the given request to the remote URL using the <code>GET</code> method.
+   * <ul>
+   * <li>Adds every request header beside the blacklisted to the forwarded request.
+   * <li>Writes the request payload to the forwarded request or adds every query parameter to the forwarded request if
+   * parameters are used.
+   * <li>Writes the returned response body, headers and status to the response.
+   * </ul>
+   *
+   * @param req
+   *          original request
+   * @param resp
+   *          response where the response from the remote server is written to
+   * @param options
+   *          optional options for this request
    */
-  public void proxyGet(HttpServletRequest req, HttpServletResponse resp, HttpProxyOptions options) throws IOException {
+  public void proxyGet(HttpServletRequest req, HttpServletResponse resp, HttpProxyRequestOptions options) throws IOException {
+    if (options == null) {
+      options = new HttpProxyRequestOptions();
+    }
+
     String url = rewriteUrl(req, options);
     HttpRequest httpReq = BEANS.get(DefaultHttpTransportManager.class).getHttpRequestFactory().buildGetRequest(new GenericUrl(url));
     httpReq = prepareRequest(httpReq);
@@ -94,31 +111,51 @@ public class HttpProxy {
     writeResponseHeaders(resp, httpResp);
     writeResponseStatus(resp, httpResp);
     writeResponsePayload(resp, httpResp);
-    LOG.debug("Forwarded get request to " + url);
+
+    LOG.debug("Forwarded GET request to {}", url);
   }
 
   /**
    * Rewrites the <code>pathInfo</code> part of the current request if the rewriteRule and rewriteReplacement is set on
    * the options object. This allows to redirect the request to a different URL than the URL that has been requested.
    */
-  protected String rewriteUrl(HttpServletRequest req, HttpProxyOptions options) {
+  protected String rewriteUrl(HttpServletRequest req, HttpProxyRequestOptions options) {
     String pathInfo = req.getPathInfo();
-    if (options.getRewriteRule() != null && options.getRewriteReplacement() != null) {
-      pathInfo = pathInfo.replaceAll(options.getRewriteRule(), options.getRewriteReplacement());
+    IRewriteRule rewriteRule = options.getRewriteRule();
+    if (rewriteRule != null) {
+      pathInfo = rewriteRule.rewrite(pathInfo);
     }
-    return StringUtility.join("", getRemoteUrl(), pathInfo, StringUtility.box("?", req.getQueryString(), ""));
-  }
-
-  public void proxyPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    proxyPost(req, resp, new HttpProxyOptions());
+    return StringUtility.join("", getRemoteBaseUrl(), pathInfo, StringUtility.box("?", req.getQueryString(), ""));
   }
 
   /**
-   * Adds every request header beside the blacklisted to the forwarded request.<br>
-   * Adds every form parameter to the forwarded request.<br>
-   * Writes the returned response body of the forwarded request, the headers and the status to the response.<b>
+   * Convenience method for {@link #proxyPost(HttpServletRequest, HttpServletResponse, HttpProxyRequestOptions)} without
+   * options.
    */
-  public void proxyPost(HttpServletRequest req, HttpServletResponse resp, HttpProxyOptions options) throws IOException {
+  public void proxyPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    proxyPost(req, resp, null);
+  }
+
+  /**
+   * Forwards the given request to the remote URL using the POST method.
+   * <ul>
+   * <li>Adds every request header (except the blacklisted ones) to the forwarded request.
+   * <li>Adds every form parameter to the forwarded request.
+   * <li>Writes the returned response body, headers and status to the response.
+   * </ul>
+   *
+   * @param req
+   *          original request
+   * @param resp
+   *          response where the response from the remote server is written to
+   * @param options
+   *          optional options for this request
+   */
+  public void proxyPost(HttpServletRequest req, HttpServletResponse resp, HttpProxyRequestOptions options) throws IOException {
+    if (options == null) {
+      options = new HttpProxyRequestOptions();
+    }
+
     String url = rewriteUrl(req, options);
     HttpRequest httpReq = BEANS.get(DefaultHttpTransportManager.class).getHttpRequestFactory().buildPostRequest(new GenericUrl(url), null);
     httpReq.getHeaders().setCacheControl("no-cache");
@@ -140,7 +177,8 @@ public class HttpProxy {
     writeResponseHeaders(resp, httpResp);
     writeResponseStatus(resp, httpResp);
     writeResponsePayload(resp, httpResp);
-    LOG.debug("Forwarded post request to " + url);
+
+    LOG.debug("Forwarded POST request to {}", url);
   }
 
   protected HttpRequest prepareRequest(HttpRequest httpReq) {
@@ -158,7 +196,7 @@ public class HttpProxy {
       if (value != null) {
         HttpHeaders headers = httpReq.getHeaders();
         headers.set(name, Collections.singletonList(value));
-        LOG.trace("Wrote request header: {}: {}", name, value);
+        LOG.trace("Added request header: {}: {}", name, value);
       }
       else {
         LOG.trace("Removed request header: {} (original value: {})", name, req.getHeader(name));
@@ -172,7 +210,7 @@ public class HttpProxy {
     }
     for (Entry<String, String> header : customHeaders.entrySet()) {
       httpReq.getHeaders().set(header.getKey(), header.getValue());
-      LOG.trace("Wrote custom request header: {}: {}", header.getValue(), header.getValue());
+      LOG.trace("Added custom request header: {}: {}", header.getValue(), header.getValue());
     }
   }
 
@@ -232,7 +270,7 @@ public class HttpProxy {
       }
       if (value != null) {
         resp.setHeader(entry.getKey(), value);
-        LOG.trace("Wrote response header: {}: {}", entry.getKey(), value);
+        LOG.trace("Added response header: {}: {}", entry.getKey(), value);
       }
       else {
         LOG.trace("Removed response header: {} (original value: {})", name, originalValue);
@@ -240,27 +278,49 @@ public class HttpProxy {
     }
   }
 
-  public String getRemoteUrl() {
-    return m_remoteUrl;
+  /**
+   * @return the base URL on the remote server (without trailing slash). All requests are forwarded to this destination
+   *         by concatenating this URL and the requests "path info".
+   * @see {@link #rewriteUrl(HttpServletRequest, HttpProxyRequestOptions)}
+   */
+  public String getRemoteBaseUrl() {
+    return m_remoteBaseUrl;
   }
 
-  public void setRemoteUrl(String remoteUrl) {
-    m_remoteUrl = remoteUrl;
+  /**
+   * @param remoteBaseUrl
+   *          the base URL on the remote server (without trailing slash). All requests are forwarded to this destination
+   *          by concatenating this URL and the requests "path info".
+   * @see {@link #rewriteUrl(HttpServletRequest, HttpProxyRequestOptions)}
+   */
+  public HttpProxy withRemoteBaseUrl(String remoteBaseUrl) {
+    m_remoteBaseUrl = remoteBaseUrl;
+    return this;
   }
 
+  /**
+   * @return live list of request header filters (use {@link #withRequestHeaderFilter(IHttpHeaderFilter)} to add
+   *         filters)
+   */
   public List<IHttpHeaderFilter> getRequestHeaderFilters() {
     return m_requestHeaderFilters;
   }
 
-  public void addRequestHeaderFilter(IHttpHeaderFilter filter) {
+  public HttpProxy withRequestHeaderFilter(IHttpHeaderFilter filter) {
     m_requestHeaderFilters.add(filter);
+    return this;
   }
 
+  /**
+   * @return live list of response header filters (use {@link #withResponseHeaderFilter(IHttpHeaderFilter)} to add
+   *         filters)
+   */
   public List<IHttpHeaderFilter> getResponseHeaderFilters() {
     return m_responseHeaderFilters;
   }
 
-  public void addResponseHeaderFilter(IHttpHeaderFilter filter) {
+  public HttpProxy withResponseHeaderFilter(IHttpHeaderFilter filter) {
     m_responseHeaderFilters.add(filter);
+    return this;
   }
 }
