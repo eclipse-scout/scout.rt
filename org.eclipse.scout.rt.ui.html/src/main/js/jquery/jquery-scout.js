@@ -280,12 +280,15 @@ $.colorOpacity = function(hex, opacity) {
 };
 
 /**
- * CSP-safe method to dynamically load a script from the server. A new <script>
- * tag is added to the head element to prevent problematic "eval()" calls. A
- * jQuery deferred object is returned which can be used to execute code after
- * the loading has been complete:
+ * CSP-safe method to dynamically load and execute a script from server.
  *
- *   $.injectScript('http://www....').done(function() { ... });
+ * A new <script> tag is added to the document's head element. The methods returns
+ * a promise which can be used to execute code after the loading has been completed.
+ * A jQuery object referring to the new script tag is passed to the promise's
+ * callback functions.
+ *
+ *   $.injectScript('http://server/path/script.js')
+ *     .done(function($scriptTag) { ... });
  *
  * Options (optional):
  *
@@ -301,33 +304,77 @@ $.injectScript = function(url, options) {
   var deferred = $.Deferred();
 
   var myDocument = options.document || window.document;
-  var scriptTag = myDocument.createElement('script');
-  $(scriptTag)
+  var linkTag = myDocument.createElement('script');
+  $(linkTag)
     .attr('src', url)
     .attr('async', true)
     .on('load error', function(event) {
       if (options.removeTag) {
-        myDocument.head.removeChild(scriptTag);
+        myDocument.head.removeChild(linkTag);
       }
       if (event.type === 'error') {
-        deferred.reject($(scriptTag));
+        deferred.reject($(linkTag));
       } else {
-        deferred.resolve($(scriptTag));
+        deferred.resolve($(linkTag));
       }
     });
   // Use raw JS function to append the <script> tag, because jQuery handles
   // script tags specially (see "domManip" function) and uses eval() which
   // is not CSP-safe.
-  myDocument.head.appendChild(scriptTag);
+  myDocument.head.appendChild(linkTag);
 
   return deferred.promise();
 };
 
 /**
- * Dynamically add a style sheet to the document. A new <style> tag is added to the head element.
- * A jQuery object referring to the new style tag is returned.
+ * CSP-safe method to dynamically load a style sheet from server.
  *
- *   $injectStyle('p { text-color: orange; }').done(function() { ... });
+ * A new <link> tag is added to the document's head element. The methods returns
+ * a promise which can be used to execute code after the loading has been completed.
+ * A jQuery object referring to the new link tag is passed to the promise's
+ * callback functions.
+ *
+ *   $.injectStyleSheet('http://server/path/style.css')
+ *     .done(function($linkTag) { ... });
+ *
+ * Options (optional):
+ *
+ * NAME              DEFAULT             DESCRIPTION
+ * --------------------------------------------------------------------------------------------
+ * document          window.document     Which document to inject the style sheet to.
+ */
+$.injectStyleSheet = function(url, options) {
+  options = options || {};
+  var deferred = $.Deferred();
+
+  var myDocument = options.document || window.document;
+  var linkTag = myDocument.createElement('link');
+  $(linkTag)
+    .attr('rel', 'stylesheet')
+    .attr('type', 'text/css')
+    .attr('href', url)
+    .on('load error', function(event) {
+      if (event.type === 'error') {
+        deferred.reject($(linkTag));
+      } else {
+        deferred.resolve($(linkTag));
+      }
+    });
+  // Use raw JS function to append the <script> tag, because jQuery handles
+  // script tags specially (see "domManip" function) and uses eval() which
+  // is not CSP-safe.
+  myDocument.head.appendChild(linkTag);
+
+  return deferred.promise();
+};
+
+/**
+ * Dynamically adds styles to the document.
+ *
+ * A new <style> tag is added to the document's head element. The methods returns
+ * a jQuery object referring to the new style tag.
+ *
+ *   $styleTag = $.injectStyle('p { text-color: orange; }');
  *
  * Options (optional):
  *
