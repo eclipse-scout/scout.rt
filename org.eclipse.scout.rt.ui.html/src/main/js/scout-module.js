@@ -131,9 +131,6 @@
   __include("scout/carousel/CarouselLayout.js");
   __include("scout/cell/Cell.js");
   __include("scout/collapsehandle/CollapseHandle.js");
-  __include("scout/contenteditor/ContentElement.js");
-  __include("scout/contenteditor/ContentEditor.js");
-  __include("scout/contenteditor/ContentEditorSlot.js");
   __include("scout/focus/FocusManager.js");
   __include("scout/focus/FocusContext.js");
   __include("scout/focus/focusUtils.js");
@@ -540,4 +537,9 @@
   __include("scout/desktop/DesktopFormController.js");
   __include("scout/table/FilterFieldsGroupBox.js"); // requires GroupBox.js
   __include("scout/resizable/Resizable.js");
+  __include("scout/contenteditor/ContentElement.js");
+  __include("scout/contenteditor/ContentEditor.js");
+  __include("scout/contenteditor/ContentEditorSlot.js");
+  __include("scout/contenteditor/ContentEditorElementTile.js");
+  __include("scout/contenteditor/ContentEditorElementTileAdapter.js");
 } (window.scout = window.scout || {}, jQuery)); //NOSONAR

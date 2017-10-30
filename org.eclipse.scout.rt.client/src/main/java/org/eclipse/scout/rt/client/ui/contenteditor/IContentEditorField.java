@@ -12,6 +12,9 @@ package org.eclipse.scout.rt.client.ui.contenteditor;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
+/**
+ * @since 7.1
+ */
 public interface IContentEditorField extends IFormField {
 
   String PROP_CONTENT = "content";

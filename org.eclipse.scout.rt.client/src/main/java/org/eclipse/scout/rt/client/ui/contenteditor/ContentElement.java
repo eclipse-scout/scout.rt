@@ -1,5 +1,8 @@
 package org.eclipse.scout.rt.client.ui.contenteditor;
 
+/**
+ * @since 7.1
+ */
 public class ContentElement {
   private String m_content;
   private String m_slot;

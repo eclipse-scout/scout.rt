@@ -1,0 +1,41 @@
+/*
+ * Copyright (c) BSI Business Systems Integration AG. All rights reserved.
+ * http://www.bsiag.com/
+ */
+.tile.ce-element-tile {
+  border: solid 1px @border-color;
+  border-radius: 5px;
+  overflow: hidden;
+  padding: 10px;
+
+  background-color: @control-background-color;
+  #scout.cursor-grab();
+}
+
+.tile.ce-element-tile .ce-element-tile-icon {
+  #scout.font-icon();
+  font-size: 28px;
+  margin-right: 5px;
+  color: @palette-gray-6;
+  float: left;
+}
+
+.tile.ce-element-tile .ce-element-tile-label {
+  text-transform: capitalize;
+  font-size: 14px;
+  font-weight: bold;
+  color: @palette-gray-7;
+  margin-bottom: 8px;
+  margin-left: 36px;
+}
+
+.tile.ce-element-tile .ce-element-tile-description {
+  text-transform: capitalize;
+  font-size: 14px;
+  color: @palette-gray-7;
+  margin-left: 36px;
+}
+
+.tile.ce-element-tile.grabbing {
+  #scout.cursor-grabbing();
+}

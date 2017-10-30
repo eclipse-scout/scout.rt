@@ -4,6 +4,9 @@ import java.util.EventObject;
 
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 
+/**
+ * @since 7.1
+ */
 public class ContentEditorFieldEvent extends EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;
 

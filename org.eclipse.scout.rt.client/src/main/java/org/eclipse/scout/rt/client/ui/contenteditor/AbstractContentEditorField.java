@@ -21,6 +21,9 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 
+/**
+ * @since 7.1
+ */
 @ClassId("182a9023-67f0-4e15-b7cd-3453fc64a8dd")
 public abstract class AbstractContentEditorField extends AbstractFormField implements IContentEditorField {
 
