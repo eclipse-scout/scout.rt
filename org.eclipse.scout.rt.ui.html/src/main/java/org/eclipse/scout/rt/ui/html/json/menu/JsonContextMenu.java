@@ -13,12 +13,12 @@ package org.eclipse.scout.rt.ui.html.json.menu;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuListener;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -38,13 +38,13 @@ public class JsonContextMenu<CONTEXT_MENU extends IContextMenu> {
   private final IUiSession m_uiSession;
   private final CONTEXT_MENU m_model;
   private final IJsonAdapter<?> m_parent;
-  private final IFilter<IMenu> m_filter;
+  private final Predicate<IMenu> m_filter;
 
   public JsonContextMenu(CONTEXT_MENU model, IJsonAdapter<?> parent) {
     this(model, parent, new DisplayableActionFilter<>());
   }
 
-  public JsonContextMenu(CONTEXT_MENU model, IJsonAdapter<?> parent, IFilter<IMenu> filter) {
+  public JsonContextMenu(CONTEXT_MENU model, IJsonAdapter<?> parent, Predicate<IMenu> filter) {
     if (model == null) {
       throw new IllegalArgumentException("model must not be null");
     }
@@ -66,7 +66,7 @@ public class JsonContextMenu<CONTEXT_MENU extends IContextMenu> {
     return m_parent;
   }
 
-  public IFilter<IMenu> getFilter() {
+  public Predicate<IMenu> getFilter() {
     return m_filter;
   }
 

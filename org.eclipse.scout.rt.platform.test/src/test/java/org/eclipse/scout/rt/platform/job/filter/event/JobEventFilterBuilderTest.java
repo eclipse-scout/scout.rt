@@ -15,10 +15,10 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -106,36 +106,36 @@ public class JobEventFilterBuilderTest {
         .withExecutionHint(JOB_IDENTIFIER));
 
     // with filtering for futures
-    IFilter<JobEvent> filter = new JobEventFilterBuilder()
+    Predicate<JobEvent> filter = new JobEventFilterBuilder()
         .andMatchFuture(future1, future2, future3, future4, future8, future9, future10)
         .toFilter();
 
-    assertTrue(filter.accept(newJobStateChangedEvent(future1)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future2)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future3)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future4)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future5)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future6)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future7)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future8)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future9)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future10)));
+    assertTrue(filter.test(newJobStateChangedEvent(future1)));
+    assertTrue(filter.test(newJobStateChangedEvent(future2)));
+    assertTrue(filter.test(newJobStateChangedEvent(future3)));
+    assertTrue(filter.test(newJobStateChangedEvent(future4)));
+    assertFalse(filter.test(newJobStateChangedEvent(future5)));
+    assertFalse(filter.test(newJobStateChangedEvent(future6)));
+    assertFalse(filter.test(newJobStateChangedEvent(future7)));
+    assertTrue(filter.test(newJobStateChangedEvent(future8)));
+    assertTrue(filter.test(newJobStateChangedEvent(future9)));
+    assertTrue(filter.test(newJobStateChangedEvent(future10)));
 
     // additionally with filtering for single executing jobs
     filter = new JobEventFilterBuilder()
         .andMatchFuture(future1, future2, future3, future4, future8, future9, future10)
         .andAreSingleExecuting()
         .toFilter();
-    assertTrue(filter.accept(newJobStateChangedEvent(future1)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future2)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future3)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future4)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future5)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future6)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future7)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future8)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future9)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future10)));
+    assertTrue(filter.test(newJobStateChangedEvent(future1)));
+    assertTrue(filter.test(newJobStateChangedEvent(future2)));
+    assertTrue(filter.test(newJobStateChangedEvent(future3)));
+    assertFalse(filter.test(newJobStateChangedEvent(future4)));
+    assertFalse(filter.test(newJobStateChangedEvent(future5)));
+    assertFalse(filter.test(newJobStateChangedEvent(future6)));
+    assertFalse(filter.test(newJobStateChangedEvent(future7)));
+    assertTrue(filter.test(newJobStateChangedEvent(future8)));
+    assertTrue(filter.test(newJobStateChangedEvent(future9)));
+    assertTrue(filter.test(newJobStateChangedEvent(future10)));
 
     // additionally with filtering for mutex
     filter = new JobEventFilterBuilder()
@@ -143,16 +143,16 @@ public class JobEventFilterBuilderTest {
         .andAreSingleExecuting()
         .andMatchExecutionSemaphore(mutex1)
         .toFilter();
-    assertFalse(filter.accept(newJobStateChangedEvent(future1)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future2)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future3)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future4)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future5)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future6)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future7)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future8)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future9)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future10)));
+    assertFalse(filter.test(newJobStateChangedEvent(future1)));
+    assertTrue(filter.test(newJobStateChangedEvent(future2)));
+    assertTrue(filter.test(newJobStateChangedEvent(future3)));
+    assertFalse(filter.test(newJobStateChangedEvent(future4)));
+    assertFalse(filter.test(newJobStateChangedEvent(future5)));
+    assertFalse(filter.test(newJobStateChangedEvent(future6)));
+    assertFalse(filter.test(newJobStateChangedEvent(future7)));
+    assertTrue(filter.test(newJobStateChangedEvent(future8)));
+    assertFalse(filter.test(newJobStateChangedEvent(future9)));
+    assertTrue(filter.test(newJobStateChangedEvent(future10)));
 
     // additionally with filtering for jobs running on behalf of a RunContext
     filter = new JobEventFilterBuilder()
@@ -161,16 +161,16 @@ public class JobEventFilterBuilderTest {
         .andMatchExecutionSemaphore(mutex1)
         .andMatchRunContext(RunContext.class)
         .toFilter();
-    assertFalse(filter.accept(newJobStateChangedEvent(future1)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future2)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future3)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future4)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future5)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future6)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future7)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future8)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future9)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future10)));
+    assertFalse(filter.test(newJobStateChangedEvent(future1)));
+    assertTrue(filter.test(newJobStateChangedEvent(future2)));
+    assertTrue(filter.test(newJobStateChangedEvent(future3)));
+    assertFalse(filter.test(newJobStateChangedEvent(future4)));
+    assertFalse(filter.test(newJobStateChangedEvent(future5)));
+    assertFalse(filter.test(newJobStateChangedEvent(future6)));
+    assertFalse(filter.test(newJobStateChangedEvent(future7)));
+    assertFalse(filter.test(newJobStateChangedEvent(future8)));
+    assertFalse(filter.test(newJobStateChangedEvent(future9)));
+    assertTrue(filter.test(newJobStateChangedEvent(future10)));
 
     // additionally with filtering for jobs running on behalf of a specific P_RunContext
     filter = new JobEventFilterBuilder()
@@ -179,16 +179,16 @@ public class JobEventFilterBuilderTest {
         .andMatchExecutionSemaphore(mutex1)
         .andMatchRunContext(P_RunContext.class)
         .toFilter();
-    assertFalse(filter.accept(newJobStateChangedEvent(future1)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future2)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future3)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future4)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future5)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future6)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future7)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future8)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future9)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future10)));
+    assertFalse(filter.test(newJobStateChangedEvent(future1)));
+    assertFalse(filter.test(newJobStateChangedEvent(future2)));
+    assertTrue(filter.test(newJobStateChangedEvent(future3)));
+    assertFalse(filter.test(newJobStateChangedEvent(future4)));
+    assertFalse(filter.test(newJobStateChangedEvent(future5)));
+    assertFalse(filter.test(newJobStateChangedEvent(future6)));
+    assertFalse(filter.test(newJobStateChangedEvent(future7)));
+    assertFalse(filter.test(newJobStateChangedEvent(future8)));
+    assertFalse(filter.test(newJobStateChangedEvent(future9)));
+    assertTrue(filter.test(newJobStateChangedEvent(future10)));
 
     // additionally with filtering for names
     filter = new JobEventFilterBuilder()
@@ -198,16 +198,16 @@ public class JobEventFilterBuilderTest {
         .andMatchRunContext(P_RunContext.class)
         .andMatchName("A", "B", "C")
         .toFilter();
-    assertFalse(filter.accept(newJobStateChangedEvent(future1)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future2)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future3)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future4)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future5)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future6)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future7)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future8)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future9)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future10)));
+    assertFalse(filter.test(newJobStateChangedEvent(future1)));
+    assertFalse(filter.test(newJobStateChangedEvent(future2)));
+    assertTrue(filter.test(newJobStateChangedEvent(future3)));
+    assertFalse(filter.test(newJobStateChangedEvent(future4)));
+    assertFalse(filter.test(newJobStateChangedEvent(future5)));
+    assertFalse(filter.test(newJobStateChangedEvent(future6)));
+    assertFalse(filter.test(newJobStateChangedEvent(future7)));
+    assertFalse(filter.test(newJobStateChangedEvent(future8)));
+    assertFalse(filter.test(newJobStateChangedEvent(future9)));
+    assertFalse(filter.test(newJobStateChangedEvent(future10)));
 
     // additionally with filtering for other names
     filter = new JobEventFilterBuilder()
@@ -217,16 +217,16 @@ public class JobEventFilterBuilderTest {
         .andMatchRunContext(P_RunContext.class)
         .andMatchName("D", "E", "F")
         .toFilter();
-    assertFalse(filter.accept(newJobStateChangedEvent(future1)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future2)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future3)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future4)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future5)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future6)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future7)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future8)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future9)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future10)));
+    assertFalse(filter.test(newJobStateChangedEvent(future1)));
+    assertFalse(filter.test(newJobStateChangedEvent(future2)));
+    assertFalse(filter.test(newJobStateChangedEvent(future3)));
+    assertFalse(filter.test(newJobStateChangedEvent(future4)));
+    assertFalse(filter.test(newJobStateChangedEvent(future5)));
+    assertFalse(filter.test(newJobStateChangedEvent(future6)));
+    assertFalse(filter.test(newJobStateChangedEvent(future7)));
+    assertFalse(filter.test(newJobStateChangedEvent(future8)));
+    assertFalse(filter.test(newJobStateChangedEvent(future9)));
+    assertFalse(filter.test(newJobStateChangedEvent(future10)));
   }
 
   @Test
@@ -269,62 +269,62 @@ public class JobEventFilterBuilderTest {
         .withExecutionHint(JOB_IDENTIFIER));
 
     // One future exclusion with no other criteria
-    IFilter<JobEvent> filter = Jobs.newEventFilterBuilder()
+    Predicate<JobEvent> filter = Jobs.newEventFilterBuilder()
         .andMatchNotFuture(future8).toFilter();
-    assertTrue(filter.accept(newJobStateChangedEvent(future1)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future2)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future3)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future4)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future5)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future6)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future7)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future8)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future9)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future10)));
+    assertTrue(filter.test(newJobStateChangedEvent(future1)));
+    assertTrue(filter.test(newJobStateChangedEvent(future2)));
+    assertTrue(filter.test(newJobStateChangedEvent(future3)));
+    assertTrue(filter.test(newJobStateChangedEvent(future4)));
+    assertTrue(filter.test(newJobStateChangedEvent(future5)));
+    assertTrue(filter.test(newJobStateChangedEvent(future6)));
+    assertTrue(filter.test(newJobStateChangedEvent(future7)));
+    assertFalse(filter.test(newJobStateChangedEvent(future8)));
+    assertTrue(filter.test(newJobStateChangedEvent(future9)));
+    assertTrue(filter.test(newJobStateChangedEvent(future10)));
 
     // Multiple future exclusions with no other criteria
     filter = Jobs.newEventFilterBuilder()
         .andMatchNotFuture(future8, future9).toFilter();
-    assertTrue(filter.accept(newJobStateChangedEvent(future1)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future2)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future3)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future4)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future5)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future6)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future7)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future8)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future9)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future10)));
+    assertTrue(filter.test(newJobStateChangedEvent(future1)));
+    assertTrue(filter.test(newJobStateChangedEvent(future2)));
+    assertTrue(filter.test(newJobStateChangedEvent(future3)));
+    assertTrue(filter.test(newJobStateChangedEvent(future4)));
+    assertTrue(filter.test(newJobStateChangedEvent(future5)));
+    assertTrue(filter.test(newJobStateChangedEvent(future6)));
+    assertTrue(filter.test(newJobStateChangedEvent(future7)));
+    assertFalse(filter.test(newJobStateChangedEvent(future8)));
+    assertFalse(filter.test(newJobStateChangedEvent(future9)));
+    assertTrue(filter.test(newJobStateChangedEvent(future10)));
 
     // One future exclusion with other criterion (mutex)
     filter = Jobs.newEventFilterBuilder()
         .andMatchExecutionSemaphore(mutex)
         .andMatchNotFuture(future8).toFilter();
-    assertFalse(filter.accept(newJobStateChangedEvent(future1)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future2)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future3)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future4)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future5)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future6)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future7)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future8)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future9)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future10)));
+    assertFalse(filter.test(newJobStateChangedEvent(future1)));
+    assertFalse(filter.test(newJobStateChangedEvent(future2)));
+    assertFalse(filter.test(newJobStateChangedEvent(future3)));
+    assertFalse(filter.test(newJobStateChangedEvent(future4)));
+    assertFalse(filter.test(newJobStateChangedEvent(future5)));
+    assertTrue(filter.test(newJobStateChangedEvent(future6)));
+    assertTrue(filter.test(newJobStateChangedEvent(future7)));
+    assertFalse(filter.test(newJobStateChangedEvent(future8)));
+    assertTrue(filter.test(newJobStateChangedEvent(future9)));
+    assertTrue(filter.test(newJobStateChangedEvent(future10)));
 
     // Multiple future exclusion with other criterion (mutex)
     filter = Jobs.newEventFilterBuilder()
         .andMatchExecutionSemaphore(mutex)
         .andMatchNotFuture(future8, future9).toFilter();
-    assertFalse(filter.accept(newJobStateChangedEvent(future1)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future2)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future3)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future4)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future5)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future6)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future7)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future8)));
-    assertFalse(filter.accept(newJobStateChangedEvent(future9)));
-    assertTrue(filter.accept(newJobStateChangedEvent(future10)));
+    assertFalse(filter.test(newJobStateChangedEvent(future1)));
+    assertFalse(filter.test(newJobStateChangedEvent(future2)));
+    assertFalse(filter.test(newJobStateChangedEvent(future3)));
+    assertFalse(filter.test(newJobStateChangedEvent(future4)));
+    assertFalse(filter.test(newJobStateChangedEvent(future5)));
+    assertTrue(filter.test(newJobStateChangedEvent(future6)));
+    assertTrue(filter.test(newJobStateChangedEvent(future7)));
+    assertFalse(filter.test(newJobStateChangedEvent(future8)));
+    assertFalse(filter.test(newJobStateChangedEvent(future9)));
+    assertTrue(filter.test(newJobStateChangedEvent(future10)));
   }
 
   private static JobEvent newJobStateChangedEvent(IFuture<?> future) {

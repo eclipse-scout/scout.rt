@@ -16,12 +16,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -85,33 +85,33 @@ public class ClientRunContextFutureFilterTest {
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .andMatchState(JobState.WAITING_FOR_BLOCKING_CONDITION)
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .andMatchNotState(JobState.WAITING_FOR_BLOCKING_CONDITION)
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertTrue(ModelJobs.newFutureFilterBuilder()
         .toFilter()
-        .accept(m_modelJobFuture));
+        .test(m_modelJobFuture));
 
     assertTrue(ModelJobs.newFutureFilterBuilder()
         .andMatchState(JobState.WAITING_FOR_BLOCKING_CONDITION)
         .toFilter()
-        .accept(m_modelJobFuture));
+        .test(m_modelJobFuture));
 
     assertFalse(ModelJobs.newFutureFilterBuilder()
         .andMatchNotState(JobState.WAITING_FOR_BLOCKING_CONDITION)
         .toFilter()
-        .accept(m_modelJobFuture));
+        .test(m_modelJobFuture));
 
     // Release threads
     condition.setBlocking(false);
@@ -127,19 +127,19 @@ public class ClientRunContextFutureFilterTest {
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .toFilter()
-        .accept(clientJobFuture));
+        .test(clientJobFuture));
 
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .andAreNotSingleExecuting()
         .toFilter()
-        .accept(clientJobFuture));
+        .test(clientJobFuture));
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .andAreSingleExecuting()
         .toFilter()
-        .accept(clientJobFuture));
+        .test(clientJobFuture));
 
     IFuture<Void> modelJobFuture = ModelJobs.schedule(mock(IRunnable.class), ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true))
         .withExecutionTrigger(Jobs.newExecutionTrigger()
@@ -147,17 +147,17 @@ public class ClientRunContextFutureFilterTest {
 
     assertTrue(ModelJobs.newFutureFilterBuilder()
         .toFilter()
-        .accept(modelJobFuture));
+        .test(modelJobFuture));
 
     assertTrue(ModelJobs.newFutureFilterBuilder()
         .andAreNotSingleExecuting()
         .toFilter()
-        .accept(modelJobFuture));
+        .test(modelJobFuture));
 
     assertFalse(ModelJobs.newFutureFilterBuilder()
         .andAreSingleExecuting()
         .toFilter()
-        .accept(modelJobFuture));
+        .test(modelJobFuture));
 
     // cleanup
     Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
@@ -171,23 +171,23 @@ public class ClientRunContextFutureFilterTest {
         .andMatchRunContext(ClientRunContext.class)
         .andMatch(new SessionFutureFilter(m_clientSession1))
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertTrue(ModelJobs.newFutureFilterBuilder()
         .andMatch(new SessionFutureFilter(m_clientSession1))
         .toFilter()
-        .accept(m_modelJobFuture));
+        .test(m_modelJobFuture));
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .andMatch(new SessionFutureFilter(m_clientSession2))
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertFalse(ModelJobs.newFutureFilterBuilder()
         .andMatch(new SessionFutureFilter(m_clientSession2))
         .toFilter()
-        .accept(m_modelJobFuture));
+        .test(m_modelJobFuture));
   }
 
   @Test
@@ -195,21 +195,21 @@ public class ClientRunContextFutureFilterTest {
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class).andMatch(new SessionFutureFilter(m_clientSession1))
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertTrue(ModelJobs.newFutureFilterBuilder().andMatch(new SessionFutureFilter(m_clientSession1))
         .toFilter()
-        .accept(m_modelJobFuture));
+        .test(m_modelJobFuture));
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class).andMatch(new SessionFutureFilter(m_clientSession2))
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertFalse(ModelJobs.newFutureFilterBuilder()
         .andMatch(new SessionFutureFilter(m_clientSession2))
         .toFilter()
-        .accept(m_modelJobFuture));
+        .test(m_modelJobFuture));
   }
 
   @Test
@@ -218,23 +218,23 @@ public class ClientRunContextFutureFilterTest {
         .andMatchRunContext(ClientRunContext.class)
         .andMatchNot(new SessionFutureFilter(m_clientSession1))
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertFalse(ModelJobs.newFutureFilterBuilder()
         .andMatchNot(new SessionFutureFilter(m_clientSession1))
         .toFilter()
-        .accept(m_modelJobFuture));
+        .test(m_modelJobFuture));
 
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .andMatchNot(new SessionFutureFilter(m_clientSession2))
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertTrue(ModelJobs.newFutureFilterBuilder()
         .andMatchNot(new SessionFutureFilter(m_clientSession2))
         .toFilter()
-        .accept(m_modelJobFuture));
+        .test(m_modelJobFuture));
   }
 
   @Test
@@ -243,73 +243,73 @@ public class ClientRunContextFutureFilterTest {
         .andMatchRunContext(ClientRunContext.class)
         .andMatchFuture(m_clientJobFuture, m_modelJobFuture)
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertFalse(ModelJobs.newFutureFilterBuilder()
         .andMatchFuture(m_clientJobFuture, m_modelJobFuture)
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
-    assertTrue(new FutureFilter(m_clientJobFuture, m_modelJobFuture).accept(m_clientJobFuture));
+    assertTrue(new FutureFilter(m_clientJobFuture, m_modelJobFuture).test(m_clientJobFuture));
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .andMatchNot(ModelJobFutureFilter.INSTANCE)
         .andMatchFuture(m_clientJobFuture, m_modelJobFuture)
         .toFilter()
-        .accept(m_modelJobFuture));
+        .test(m_modelJobFuture));
 
     assertTrue(ModelJobs.newFutureFilterBuilder()
         .andMatchFuture(m_clientJobFuture, m_modelJobFuture)
         .toFilter()
-        .accept(m_modelJobFuture));
+        .test(m_modelJobFuture));
 
-    assertTrue(new FutureFilter(m_clientJobFuture, m_modelJobFuture).accept(m_modelJobFuture));
+    assertTrue(new FutureFilter(m_clientJobFuture, m_modelJobFuture).test(m_modelJobFuture));
 
     assertTrue(ModelJobs.newFutureFilterBuilder()
         .andMatchFuture(m_modelJobFuture)
         .toFilter()
-        .accept(m_modelJobFuture));
+        .test(m_modelJobFuture));
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .andMatchNot(ModelJobFutureFilter.INSTANCE)
         .andMatchFuture(m_modelJobFuture)
         .toFilter()
-        .accept(m_modelJobFuture));
+        .test(m_modelJobFuture));
 
     assertFalse(ModelJobs.newFutureFilterBuilder()
         .andMatchFuture(m_clientJobFuture)
         .toFilter()
-        .accept(m_modelJobFuture));
+        .test(m_modelJobFuture));
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .andMatchFuture(m_clientJobFuture)
         .toFilter()
-        .accept(m_modelJobFuture));
+        .test(m_modelJobFuture));
 
     assertFalse(ModelJobs.newFutureFilterBuilder()
         .andMatchFuture(m_modelJobFuture)
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .andMatchFuture(m_modelJobFuture)
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertFalse(ModelJobs.newFutureFilterBuilder()
         .andMatchFuture(m_clientJobFuture)
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .andMatchFuture(m_clientJobFuture)
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
   }
 
   @Test
@@ -320,12 +320,12 @@ public class ClientRunContextFutureFilterTest {
         .andMatchRunContext(ClientRunContext.class)
         .andMatchFuture(IFuture.CURRENT.get())
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertFalse(ModelJobs.newFutureFilterBuilder()
         .andMatchFuture(IFuture.CURRENT.get())
         .toFilter()
-        .accept(m_modelJobFuture));
+        .test(m_modelJobFuture));
 
     IFuture.CURRENT.set(m_modelJobFuture);
 
@@ -333,12 +333,12 @@ public class ClientRunContextFutureFilterTest {
         .andMatchRunContext(ClientRunContext.class)
         .andMatchFuture(IFuture.CURRENT.get())
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertTrue(ModelJobs.newFutureFilterBuilder()
         .andMatchFuture(IFuture.CURRENT.get())
         .toFilter()
-        .accept(m_modelJobFuture));
+        .test(m_modelJobFuture));
 
     IFuture.CURRENT.remove();
   }
@@ -351,12 +351,12 @@ public class ClientRunContextFutureFilterTest {
         .andMatchRunContext(ClientRunContext.class)
         .andMatchNotFuture(IFuture.CURRENT.get())
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertTrue(ModelJobs.newFutureFilterBuilder()
         .andMatchNotFuture(IFuture.CURRENT.get())
         .toFilter()
-        .accept(m_modelJobFuture));
+        .test(m_modelJobFuture));
 
     IFuture.CURRENT.set(m_modelJobFuture);
 
@@ -364,12 +364,12 @@ public class ClientRunContextFutureFilterTest {
         .andMatchRunContext(ClientRunContext.class)
         .andMatchNotFuture(IFuture.CURRENT.get())
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertFalse(ModelJobs.newFutureFilterBuilder()
         .andMatchNotFuture(IFuture.CURRENT.get())
         .toFilter()
-        .accept(m_modelJobFuture));
+        .test(m_modelJobFuture));
 
     IFuture.CURRENT.remove();
   }
@@ -383,84 +383,84 @@ public class ClientRunContextFutureFilterTest {
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .andMatchExecutionSemaphore(null)
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .andMatchExecutionSemaphore(mutex1)
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .andMatchExecutionSemaphore(mutex2)
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     m_clientJobFuture.getJobInput().withExecutionSemaphore(null);
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .andMatchExecutionSemaphore(null)
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .andMatchExecutionSemaphore(mutex1)
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .andMatchExecutionSemaphore(mutex2)
         .toFilter()
-        .accept(m_clientJobFuture));
+        .test(m_clientJobFuture));
   }
 
   @Test
   public void testCustomFilter() {
     // False Filter
-    assertFalse(Jobs.newFutureFilterBuilder().andMatchRunContext(ClientRunContext.class).andMatch(new IFilter<IFuture<?>>() {
+    assertFalse(Jobs.newFutureFilterBuilder().andMatchRunContext(ClientRunContext.class).andMatch(new Predicate<IFuture<?>>() {
 
       @Override
-      public boolean accept(IFuture<?> future) {
+      public boolean test(IFuture<?> future) {
         return false;
       }
-    }).toFilter().accept(m_clientJobFuture));
+    }).toFilter().test(m_clientJobFuture));
 
     // True Filter
-    assertTrue(Jobs.newFutureFilterBuilder().andMatchRunContext(ClientRunContext.class).andMatch(new IFilter<IFuture<?>>() {
+    assertTrue(Jobs.newFutureFilterBuilder().andMatchRunContext(ClientRunContext.class).andMatch(new Predicate<IFuture<?>>() {
 
       @Override
-      public boolean accept(IFuture<?> future) {
+      public boolean test(IFuture<?> future) {
         return true;
       }
-    }).toFilter().accept(m_clientJobFuture));
+    }).toFilter().test(m_clientJobFuture));
 
     // True/False Filter
-    assertFalse(Jobs.newFutureFilterBuilder().andMatchRunContext(ClientRunContext.class).andMatch(new IFilter<IFuture<?>>() {
+    assertFalse(Jobs.newFutureFilterBuilder().andMatchRunContext(ClientRunContext.class).andMatch(new Predicate<IFuture<?>>() {
 
       @Override
-      public boolean accept(IFuture<?> future) {
+      public boolean test(IFuture<?> future) {
         return true;
       }
-    }).andMatch(new IFilter<IFuture<?>>() {
+    }).andMatch(new Predicate<IFuture<?>>() {
 
       @Override
-      public boolean accept(IFuture<?> future) {
+      public boolean test(IFuture<?> future) {
         return false;
       }
-    }).toFilter().accept(m_clientJobFuture));
+    }).toFilter().test(m_clientJobFuture));
   }
 }

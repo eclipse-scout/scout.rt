@@ -10,14 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.messagebox;
 
+import java.util.function.Predicate;
+
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 
 /**
  * Filter to accept file choosers attached to a specific {@link IDisplayParent}.
  */
-public class DisplayParentFileChooserFilter implements IFilter<IFileChooser> {
+public class DisplayParentFileChooserFilter implements Predicate<IFileChooser> {
 
   private final IDisplayParent m_displayParent;
 
@@ -26,7 +27,7 @@ public class DisplayParentFileChooserFilter implements IFilter<IFileChooser> {
   }
 
   @Override
-  public boolean accept(final IFileChooser fileChooser) {
+  public boolean test(final IFileChooser fileChooser) {
     return m_displayParent == fileChooser.getDisplayParent();
   }
 }

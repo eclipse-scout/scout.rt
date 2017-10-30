@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.util.Collection;
+import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.json.JSONArray;
 
 /**
@@ -22,9 +22,9 @@ import org.json.JSONArray;
 public class FilteredJsonAdapterIds<MODEL> implements IJsonObject {
 
   private final Collection<IJsonAdapter<MODEL>> m_adapters;
-  private final IFilter<MODEL> m_filter;
+  private final Predicate<MODEL> m_filter;
 
-  public FilteredJsonAdapterIds(Collection<IJsonAdapter<MODEL>> adapters, IFilter<MODEL> filter) {
+  public FilteredJsonAdapterIds(Collection<IJsonAdapter<MODEL>> adapters, Predicate<MODEL> filter) {
     m_adapters = adapters;
     m_filter = filter;
   }

@@ -10,13 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.platform.filter.IFilter;
+import java.util.function.Predicate;
 
-public class DisplayableOutlineFilter<T extends IOutline> implements IFilter<T> {
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+
+public class DisplayableOutlineFilter<T extends IOutline> implements Predicate<T> {
 
   @Override
-  public boolean accept(T element) {
+  public boolean test(T element) {
     return element.isVisibleGranted();
   }
 

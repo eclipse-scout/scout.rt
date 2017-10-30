@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.filter;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -21,24 +22,24 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  *
  * @since 5.1
  */
-public class AndFilter<ELEMENT> implements IFilter<ELEMENT> {
+public class AndFilter<ELEMENT> implements Predicate<ELEMENT> {
 
-  private final List<IFilter<ELEMENT>> m_filters;
+  private final List<Predicate<ELEMENT>> m_filters;
 
   @SafeVarargs
-  public AndFilter(final IFilter<ELEMENT>... filters) {
+  public AndFilter(final Predicate<ELEMENT>... filters) {
     this(CollectionUtility.arrayList(filters));
   }
 
-  public AndFilter(final Collection<IFilter<ELEMENT>> filters) {
+  public AndFilter(final Collection<Predicate<ELEMENT>> filters) {
     Assertions.assertTrue(!filters.isEmpty(), "Must have one filter at minimum");
     m_filters = CollectionUtility.arrayList(filters);
   }
 
   @Override
-  public boolean accept(final ELEMENT element) {
-    for (final IFilter<ELEMENT> filter : m_filters) {
-      if (!filter.accept(element)) {
+  public boolean test(final ELEMENT element) {
+    for (final Predicate<ELEMENT> filter : m_filters) {
+      if (!filter.test(element)) {
         return false;
       }
     }

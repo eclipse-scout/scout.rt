@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.job.filter.future;
 
+import java.util.function.Predicate;
+
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.util.IAdaptable;
 import org.eclipse.scout.rt.shared.ISession;
@@ -21,7 +22,7 @@ import org.eclipse.scout.rt.shared.ISession;
  *
  * @since 5.2
  */
-public class SessionFutureFilter implements IFilter<IFuture<?>>, IAdaptable {
+public class SessionFutureFilter implements Predicate<IFuture<?>>, IAdaptable {
 
   private final ISession m_session;
 
@@ -30,7 +31,7 @@ public class SessionFutureFilter implements IFilter<IFuture<?>>, IAdaptable {
   }
 
   @Override
-  public boolean accept(final IFuture<?> future) {
+  public boolean test(final IFuture<?> future) {
     final RunContext runContext = future.getJobInput().getRunContext();
     if (runContext == null) {
       return false;

@@ -15,9 +15,9 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -34,10 +34,10 @@ public class JobNameRegexFutureFilterTest {
     IFuture<Void> future2 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withName("job_B_job"));
     IFuture<Void> future3 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withName("job_C_job"));
 
-    IFilter<IFuture<?>> filter = new JobNameRegexFutureFilter(Pattern.compile(".*[AB].*"));
-    assertTrue(filter.accept(future1));
-    assertTrue(filter.accept(future2));
-    assertFalse(filter.accept(future3));
+    Predicate<IFuture<?>> filter = new JobNameRegexFutureFilter(Pattern.compile(".*[AB].*"));
+    assertTrue(filter.test(future1));
+    assertTrue(filter.test(future2));
+    assertFalse(filter.test(future3));
 
     // cleanup
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()

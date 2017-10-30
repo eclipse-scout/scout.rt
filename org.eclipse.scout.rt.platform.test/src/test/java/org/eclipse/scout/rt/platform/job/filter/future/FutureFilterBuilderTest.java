@@ -15,10 +15,10 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -102,47 +102,47 @@ public class FutureFilterBuilderTest {
         .withExecutionSemaphore(mutex1)
         .withExecutionHint(JOB_IDENTIFIER));
 
-    assertTrue(new FutureFilterBuilder().toFilter().accept(future1));
-    assertTrue(new FutureFilterBuilder().toFilter().accept(future2));
-    assertTrue(new FutureFilterBuilder().toFilter().accept(future3));
-    assertTrue(new FutureFilterBuilder().toFilter().accept(future4));
-    assertTrue(new FutureFilterBuilder().toFilter().accept(future5));
-    assertTrue(new FutureFilterBuilder().toFilter().accept(future6));
-    assertTrue(new FutureFilterBuilder().toFilter().accept(future7));
-    assertTrue(new FutureFilterBuilder().toFilter().accept(future8));
-    assertTrue(new FutureFilterBuilder().toFilter().accept(future9));
-    assertTrue(new FutureFilterBuilder().toFilter().accept(future10));
+    assertTrue(new FutureFilterBuilder().toFilter().test(future1));
+    assertTrue(new FutureFilterBuilder().toFilter().test(future2));
+    assertTrue(new FutureFilterBuilder().toFilter().test(future3));
+    assertTrue(new FutureFilterBuilder().toFilter().test(future4));
+    assertTrue(new FutureFilterBuilder().toFilter().test(future5));
+    assertTrue(new FutureFilterBuilder().toFilter().test(future6));
+    assertTrue(new FutureFilterBuilder().toFilter().test(future7));
+    assertTrue(new FutureFilterBuilder().toFilter().test(future8));
+    assertTrue(new FutureFilterBuilder().toFilter().test(future9));
+    assertTrue(new FutureFilterBuilder().toFilter().test(future10));
 
     // with filtering for futures
-    IFilter<IFuture<?>> filter = new FutureFilterBuilder()
+    Predicate<IFuture<?>> filter = new FutureFilterBuilder()
         .andMatchFuture(future1, future2, future3, future4, future8, future9, future10)
         .toFilter();
-    assertTrue(filter.accept(future1));
-    assertTrue(filter.accept(future2));
-    assertTrue(filter.accept(future3));
-    assertTrue(filter.accept(future4));
-    assertFalse(filter.accept(future5));
-    assertFalse(filter.accept(future6));
-    assertFalse(filter.accept(future7));
-    assertTrue(filter.accept(future8));
-    assertTrue(filter.accept(future9));
-    assertTrue(filter.accept(future10));
+    assertTrue(filter.test(future1));
+    assertTrue(filter.test(future2));
+    assertTrue(filter.test(future3));
+    assertTrue(filter.test(future4));
+    assertFalse(filter.test(future5));
+    assertFalse(filter.test(future6));
+    assertFalse(filter.test(future7));
+    assertTrue(filter.test(future8));
+    assertTrue(filter.test(future9));
+    assertTrue(filter.test(future10));
 
     // additionally with filtering for single executing jobs
     filter = new FutureFilterBuilder()
         .andMatchFuture(future1, future2, future3, future4, future8, future9, future10)
         .andAreSingleExecuting()
         .toFilter();
-    assertTrue(filter.accept(future1));
-    assertTrue(filter.accept(future2));
-    assertTrue(filter.accept(future3));
-    assertFalse(filter.accept(future4));
-    assertFalse(filter.accept(future5));
-    assertFalse(filter.accept(future6));
-    assertFalse(filter.accept(future7));
-    assertTrue(filter.accept(future8));
-    assertTrue(filter.accept(future9));
-    assertTrue(filter.accept(future10));
+    assertTrue(filter.test(future1));
+    assertTrue(filter.test(future2));
+    assertTrue(filter.test(future3));
+    assertFalse(filter.test(future4));
+    assertFalse(filter.test(future5));
+    assertFalse(filter.test(future6));
+    assertFalse(filter.test(future7));
+    assertTrue(filter.test(future8));
+    assertTrue(filter.test(future9));
+    assertTrue(filter.test(future10));
 
     // additionally with filtering for mutex
     filter = new FutureFilterBuilder()
@@ -150,16 +150,16 @@ public class FutureFilterBuilderTest {
         .andAreSingleExecuting()
         .andMatchExecutionSemaphore(mutex1)
         .toFilter();
-    assertFalse(filter.accept(future1));
-    assertTrue(filter.accept(future2));
-    assertTrue(filter.accept(future3));
-    assertFalse(filter.accept(future4));
-    assertFalse(filter.accept(future5));
-    assertFalse(filter.accept(future6));
-    assertFalse(filter.accept(future7));
-    assertTrue(filter.accept(future8));
-    assertFalse(filter.accept(future9));
-    assertTrue(filter.accept(future10));
+    assertFalse(filter.test(future1));
+    assertTrue(filter.test(future2));
+    assertTrue(filter.test(future3));
+    assertFalse(filter.test(future4));
+    assertFalse(filter.test(future5));
+    assertFalse(filter.test(future6));
+    assertFalse(filter.test(future7));
+    assertTrue(filter.test(future8));
+    assertFalse(filter.test(future9));
+    assertTrue(filter.test(future10));
 
     // additionally with filtering for jobs running on behalf of a RunContext
     filter = new FutureFilterBuilder()
@@ -168,16 +168,16 @@ public class FutureFilterBuilderTest {
         .andMatchExecutionSemaphore(mutex1)
         .andMatchRunContext(RunContext.class)
         .toFilter();
-    assertFalse(filter.accept(future1));
-    assertTrue(filter.accept(future2));
-    assertTrue(filter.accept(future3));
-    assertFalse(filter.accept(future4));
-    assertFalse(filter.accept(future5));
-    assertFalse(filter.accept(future6));
-    assertFalse(filter.accept(future7));
-    assertFalse(filter.accept(future8));
-    assertFalse(filter.accept(future9));
-    assertTrue(filter.accept(future10));
+    assertFalse(filter.test(future1));
+    assertTrue(filter.test(future2));
+    assertTrue(filter.test(future3));
+    assertFalse(filter.test(future4));
+    assertFalse(filter.test(future5));
+    assertFalse(filter.test(future6));
+    assertFalse(filter.test(future7));
+    assertFalse(filter.test(future8));
+    assertFalse(filter.test(future9));
+    assertTrue(filter.test(future10));
 
     // additionally with filtering for jobs running on behalf of a specific P_RunContext
     filter = new FutureFilterBuilder()
@@ -186,16 +186,16 @@ public class FutureFilterBuilderTest {
         .andMatchExecutionSemaphore(mutex1)
         .andMatchRunContext(P_RunContext.class)
         .toFilter();
-    assertFalse(filter.accept(future1));
-    assertFalse(filter.accept(future2));
-    assertTrue(filter.accept(future3));
-    assertFalse(filter.accept(future4));
-    assertFalse(filter.accept(future5));
-    assertFalse(filter.accept(future6));
-    assertFalse(filter.accept(future7));
-    assertFalse(filter.accept(future8));
-    assertFalse(filter.accept(future9));
-    assertTrue(filter.accept(future10));
+    assertFalse(filter.test(future1));
+    assertFalse(filter.test(future2));
+    assertTrue(filter.test(future3));
+    assertFalse(filter.test(future4));
+    assertFalse(filter.test(future5));
+    assertFalse(filter.test(future6));
+    assertFalse(filter.test(future7));
+    assertFalse(filter.test(future8));
+    assertFalse(filter.test(future9));
+    assertTrue(filter.test(future10));
 
     // additionally with filtering for names
     filter = new FutureFilterBuilder()
@@ -205,16 +205,16 @@ public class FutureFilterBuilderTest {
         .andMatchRunContext(P_RunContext.class)
         .andMatchName("A", "B", "C")
         .toFilter();
-    assertFalse(filter.accept(future1));
-    assertFalse(filter.accept(future2));
-    assertTrue(filter.accept(future3));
-    assertFalse(filter.accept(future4));
-    assertFalse(filter.accept(future5));
-    assertFalse(filter.accept(future6));
-    assertFalse(filter.accept(future7));
-    assertFalse(filter.accept(future8));
-    assertFalse(filter.accept(future9));
-    assertFalse(filter.accept(future10));
+    assertFalse(filter.test(future1));
+    assertFalse(filter.test(future2));
+    assertTrue(filter.test(future3));
+    assertFalse(filter.test(future4));
+    assertFalse(filter.test(future5));
+    assertFalse(filter.test(future6));
+    assertFalse(filter.test(future7));
+    assertFalse(filter.test(future8));
+    assertFalse(filter.test(future9));
+    assertFalse(filter.test(future10));
 
     // additionally with filtering for other names
     filter = new FutureFilterBuilder()
@@ -224,16 +224,16 @@ public class FutureFilterBuilderTest {
         .andMatchRunContext(P_RunContext.class)
         .andMatchName("D", "E", "F")
         .toFilter();
-    assertFalse(filter.accept(future1));
-    assertFalse(filter.accept(future2));
-    assertFalse(filter.accept(future3));
-    assertFalse(filter.accept(future4));
-    assertFalse(filter.accept(future5));
-    assertFalse(filter.accept(future6));
-    assertFalse(filter.accept(future7));
-    assertFalse(filter.accept(future8));
-    assertFalse(filter.accept(future9));
-    assertFalse(filter.accept(future10));
+    assertFalse(filter.test(future1));
+    assertFalse(filter.test(future2));
+    assertFalse(filter.test(future3));
+    assertFalse(filter.test(future4));
+    assertFalse(filter.test(future5));
+    assertFalse(filter.test(future6));
+    assertFalse(filter.test(future7));
+    assertFalse(filter.test(future8));
+    assertFalse(filter.test(future9));
+    assertFalse(filter.test(future10));
   }
 
   @Test
@@ -276,62 +276,62 @@ public class FutureFilterBuilderTest {
         .withExecutionSemaphore(mutex));
 
     // One future exclusion with not other criteria
-    IFilter<IFuture<?>> filter = Jobs.newFutureFilterBuilder()
+    Predicate<IFuture<?>> filter = Jobs.newFutureFilterBuilder()
         .andMatchNotFuture(future8).toFilter();
-    assertTrue(filter.accept(future1));
-    assertTrue(filter.accept(future2));
-    assertTrue(filter.accept(future3));
-    assertTrue(filter.accept(future4));
-    assertTrue(filter.accept(future5));
-    assertTrue(filter.accept(future6));
-    assertTrue(filter.accept(future7));
-    assertFalse(filter.accept(future8));
-    assertTrue(filter.accept(future9));
-    assertTrue(filter.accept(future10));
+    assertTrue(filter.test(future1));
+    assertTrue(filter.test(future2));
+    assertTrue(filter.test(future3));
+    assertTrue(filter.test(future4));
+    assertTrue(filter.test(future5));
+    assertTrue(filter.test(future6));
+    assertTrue(filter.test(future7));
+    assertFalse(filter.test(future8));
+    assertTrue(filter.test(future9));
+    assertTrue(filter.test(future10));
 
     // Multiple future exclusions with not other criteria
     filter = Jobs.newFutureFilterBuilder()
         .andMatchNotFuture(future8, future9).toFilter();
-    assertTrue(filter.accept(future1));
-    assertTrue(filter.accept(future2));
-    assertTrue(filter.accept(future3));
-    assertTrue(filter.accept(future4));
-    assertTrue(filter.accept(future5));
-    assertTrue(filter.accept(future6));
-    assertTrue(filter.accept(future7));
-    assertFalse(filter.accept(future8));
-    assertFalse(filter.accept(future9));
-    assertTrue(filter.accept(future10));
+    assertTrue(filter.test(future1));
+    assertTrue(filter.test(future2));
+    assertTrue(filter.test(future3));
+    assertTrue(filter.test(future4));
+    assertTrue(filter.test(future5));
+    assertTrue(filter.test(future6));
+    assertTrue(filter.test(future7));
+    assertFalse(filter.test(future8));
+    assertFalse(filter.test(future9));
+    assertTrue(filter.test(future10));
 
     // One future exclusion with other criterion (mutex)
     filter = Jobs.newFutureFilterBuilder()
         .andMatchExecutionSemaphore(mutex)
         .andMatchNotFuture(future8).toFilter();
-    assertFalse(filter.accept(future1));
-    assertFalse(filter.accept(future2));
-    assertFalse(filter.accept(future3));
-    assertFalse(filter.accept(future4));
-    assertFalse(filter.accept(future5));
-    assertTrue(filter.accept(future6));
-    assertTrue(filter.accept(future7));
-    assertFalse(filter.accept(future8));
-    assertTrue(filter.accept(future9));
-    assertTrue(filter.accept(future10));
+    assertFalse(filter.test(future1));
+    assertFalse(filter.test(future2));
+    assertFalse(filter.test(future3));
+    assertFalse(filter.test(future4));
+    assertFalse(filter.test(future5));
+    assertTrue(filter.test(future6));
+    assertTrue(filter.test(future7));
+    assertFalse(filter.test(future8));
+    assertTrue(filter.test(future9));
+    assertTrue(filter.test(future10));
 
     // Multiple future exclusion with other criterion (mutex)
     filter = Jobs.newFutureFilterBuilder()
         .andMatchExecutionSemaphore(mutex)
         .andMatchNotFuture(future8, future9).toFilter();
-    assertFalse(filter.accept(future1));
-    assertFalse(filter.accept(future2));
-    assertFalse(filter.accept(future3));
-    assertFalse(filter.accept(future4));
-    assertFalse(filter.accept(future5));
-    assertTrue(filter.accept(future6));
-    assertTrue(filter.accept(future7));
-    assertFalse(filter.accept(future8));
-    assertFalse(filter.accept(future9));
-    assertTrue(filter.accept(future10));
+    assertFalse(filter.test(future1));
+    assertFalse(filter.test(future2));
+    assertFalse(filter.test(future3));
+    assertFalse(filter.test(future4));
+    assertFalse(filter.test(future5));
+    assertTrue(filter.test(future6));
+    assertTrue(filter.test(future7));
+    assertFalse(filter.test(future8));
+    assertFalse(filter.test(future9));
+    assertTrue(filter.test(future10));
   }
 
   private static class P_RunContext extends RunContext {

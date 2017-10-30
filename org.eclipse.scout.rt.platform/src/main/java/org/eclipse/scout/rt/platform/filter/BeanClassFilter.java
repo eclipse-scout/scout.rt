@@ -10,13 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.filter;
 
+import java.util.function.Predicate;
+
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 
 /**
  * Class filter for beans classes.
  */
-public class BeanClassFilter implements IFilter<IClassInfo> {
+public class BeanClassFilter implements Predicate<IClassInfo> {
 
   /**
    * Checks whether the given class can be registered as a bean
@@ -25,7 +27,7 @@ public class BeanClassFilter implements IFilter<IClassInfo> {
    *         <code>false</code> otherwise.
    */
   @Override
-  public boolean accept(IClassInfo ci) {
+  public boolean test(IClassInfo ci) {
     return ci.isInstanciable() && !ci.hasAnnotation(IgnoreBean.class);
   }
 

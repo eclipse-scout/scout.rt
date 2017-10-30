@@ -14,7 +14,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
+import java.util.function.Predicate;
+
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -35,9 +36,9 @@ public class MutexFutureFilterTest {
     IFuture<Void> future2 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withExecutionSemaphore(mutex1));
     IFuture<Void> future3 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withExecutionSemaphore(mutex2));
 
-    IFilter<IFuture<?>> filter = new ExecutionSemaphoreFutureFilter(mutex1);
-    assertTrue(filter.accept(future1));
-    assertTrue(filter.accept(future2));
-    assertFalse(filter.accept(future3));
+    Predicate<IFuture<?>> filter = new ExecutionSemaphoreFutureFilter(mutex1);
+    assertTrue(filter.test(future1));
+    assertTrue(filter.test(future2));
+    assertFalse(filter.test(future3));
   }
 }

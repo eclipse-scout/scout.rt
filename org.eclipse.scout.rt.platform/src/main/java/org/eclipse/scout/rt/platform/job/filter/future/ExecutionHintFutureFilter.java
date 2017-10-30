@@ -10,7 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.filter.future;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
+import java.util.function.Predicate;
+
 import org.eclipse.scout.rt.platform.job.IFuture;
 
 /**
@@ -18,7 +19,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
  *
  * @since 5.2
  */
-public class ExecutionHintFutureFilter implements IFilter<IFuture<?>> {
+public class ExecutionHintFutureFilter implements Predicate<IFuture<?>> {
 
   private final String m_hint;
 
@@ -27,7 +28,7 @@ public class ExecutionHintFutureFilter implements IFilter<IFuture<?>> {
   }
 
   @Override
-  public boolean accept(final IFuture<?> future) {
+  public boolean test(final IFuture<?> future) {
     return future.containsExecutionHint(m_hint);
   }
 }

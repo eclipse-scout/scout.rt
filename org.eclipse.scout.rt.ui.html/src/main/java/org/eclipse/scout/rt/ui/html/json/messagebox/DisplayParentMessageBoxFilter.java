@@ -10,14 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.messagebox;
 
+import java.util.function.Predicate;
+
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 
 /**
  * Filter to accept message-boxes attached to a specific {@link IDisplayParent}.
  */
-public class DisplayParentMessageBoxFilter implements IFilter<IMessageBox> {
+public class DisplayParentMessageBoxFilter implements Predicate<IMessageBox> {
 
   private final IDisplayParent m_displayParent;
 
@@ -26,7 +27,7 @@ public class DisplayParentMessageBoxFilter implements IFilter<IMessageBox> {
   }
 
   @Override
-  public boolean accept(final IMessageBox messageBox) {
+  public boolean test(final IMessageBox messageBox) {
     return m_displayParent == messageBox.getDisplayParent();
   }
 }

@@ -10,13 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
+import java.util.function.Predicate;
 
 public class JsonAdapterPropertyConfig {
 
   private final boolean m_global;
   private final boolean m_disposeOnChange;
-  private final IFilter<?> m_filter;
+  private final Predicate<?> m_filter;
 
   JsonAdapterPropertyConfig() {
     m_global = false;
@@ -24,7 +24,7 @@ public class JsonAdapterPropertyConfig {
     m_filter = null;
   }
 
-  JsonAdapterPropertyConfig(boolean global, boolean disposeOnChange, IFilter<?> filter) {
+  JsonAdapterPropertyConfig(boolean global, boolean disposeOnChange, Predicate<?> filter) {
     m_global = global;
     m_disposeOnChange = disposeOnChange;
     m_filter = filter;
@@ -39,8 +39,8 @@ public class JsonAdapterPropertyConfig {
   }
 
   @SuppressWarnings("unchecked")
-  public IFilter<Object> getFilter() {
-    return (IFilter<Object>) m_filter;
+  public Predicate<Object> getFilter() {
+    return (Predicate<Object>) m_filter;
   }
 
 }

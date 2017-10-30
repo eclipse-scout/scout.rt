@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
+import java.util.function.Predicate;
 
 public class JsonAdapterPropertyConfigBuilder {
 
@@ -20,7 +20,7 @@ public class JsonAdapterPropertyConfigBuilder {
 
   private boolean m_global;
   private boolean m_disposeOnChange;
-  private IFilter<?> m_filter;
+  private Predicate<?> m_filter;
 
   public JsonAdapterPropertyConfigBuilder() {
     m_disposeOnChange = true;
@@ -37,7 +37,7 @@ public class JsonAdapterPropertyConfigBuilder {
     return this;
   }
 
-  public JsonAdapterPropertyConfigBuilder filter(IFilter<?> filter) {
+  public JsonAdapterPropertyConfigBuilder filter(Predicate<?> filter) {
     m_filter = filter;
     return this;
   }

@@ -18,8 +18,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -76,7 +76,7 @@ public class AssertNoRunningJobsStatement extends Statement {
   /**
    * Asserts that all jobs accepted by the given filter are in 'done' state.
    */
-  private void assertNoRunningJobs(final IFilter<IFuture<?>> jobFilter) {
+  private void assertNoRunningJobs(final Predicate<IFuture<?>> jobFilter) {
     try {
       Thread.interrupted(); // clear the thread's interrupted status, in case the JUnit test interrupted the executing thread.
       Jobs.getJobManager().awaitDone(jobFilter, AWAIT_DONE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
@@ -92,7 +92,7 @@ public class AssertNoRunningJobsStatement extends Statement {
   /**
    * Finds running job names which comply with the given filter.
    */
-  private List<String> findJobNames(final IFilter<IFuture<?>> filter) {
+  private List<String> findJobNames(final Predicate<IFuture<?>> filter) {
     final List<String> jobs = new ArrayList<>();
     for (final IFuture<?> future : Jobs.getJobManager().getFutures(filter)) {
       jobs.add(future.getJobInput().getName());

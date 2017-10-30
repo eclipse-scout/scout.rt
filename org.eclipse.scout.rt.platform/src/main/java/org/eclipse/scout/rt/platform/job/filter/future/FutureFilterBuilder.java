@@ -10,17 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.filter.future;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
 import org.eclipse.scout.rt.platform.filter.AndFilter;
-import org.eclipse.scout.rt.platform.filter.IFilter;
-import org.eclipse.scout.rt.platform.filter.NotFilter;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
@@ -34,16 +34,16 @@ import org.eclipse.scout.rt.platform.job.JobState;
 @Bean
 public class FutureFilterBuilder {
 
-  private final List<IFilter<IFuture<?>>> m_andFilters = new ArrayList<>();
+  private final List<Predicate<IFuture<?>>> m_andFilters = new ArrayList<>();
 
   /**
    * Builds the filter based on the criteria as configured with this builder instance. Thereby, the filter criteria are
    * joined by logical 'AND' operation.
    */
-  public IFilter<IFuture<?>> toFilter() {
+  public Predicate<IFuture<?>> toFilter() {
     switch (m_andFilters.size()) {
       case 0:
-        return new AlwaysFilter<>();
+        return f -> true;
       case 1:
         return m_andFilters.get(0);
       default:
@@ -54,7 +54,7 @@ public class FutureFilterBuilder {
   /**
    * To match all jobs where the given filter evaluates to <code>true</code>.
    */
-  public FutureFilterBuilder andMatch(final IFilter<IFuture<?>> filter) {
+  public FutureFilterBuilder andMatch(final Predicate<IFuture<?>> filter) {
     m_andFilters.add(filter);
     return this;
   }
@@ -62,8 +62,8 @@ public class FutureFilterBuilder {
   /**
    * To match all jobs where the given filter does not apply, meaning evaluates to <code>false</code>.
    */
-  public FutureFilterBuilder andMatchNot(final IFilter<IFuture<?>> filter) {
-    m_andFilters.add(new NotFilter<>(filter));
+  public FutureFilterBuilder andMatchNot(final Predicate<IFuture<?>> filter) {
+    m_andFilters.add(assertNotNull(filter, "Filter to negate must not be null").negate());
     return this;
   }
 

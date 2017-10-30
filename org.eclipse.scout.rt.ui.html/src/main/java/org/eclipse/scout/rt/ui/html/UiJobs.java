@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -22,7 +23,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.filter.AndFilter;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -157,7 +157,7 @@ public class UiJobs {
    * @throws TimedOutError
    *           if the job did not complete within the maximal timeout.
    */
-  public void await(final IFilter<IFuture<?>> filter) {
+  public void await(final Predicate<IFuture<?>> filter) {
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)
         .andAreSingleExecuting() // only wait for 'one-shot' jobs

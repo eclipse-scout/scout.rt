@@ -15,8 +15,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -41,10 +41,10 @@ public class SingleExecutionFutureFilterTest {
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withSchedule(FixedDelayScheduleBuilder.repeatForever(1, TimeUnit.SECONDS))));
 
-    IFilter<IFuture<?>> filter = SingleExecutionFutureFilter.INSTANCE;
-    assertTrue(filter.accept(future1));
-    assertFalse(filter.accept(future2));
-    assertFalse(filter.accept(future3));
+    Predicate<IFuture<?>> filter = SingleExecutionFutureFilter.INSTANCE;
+    assertTrue(filter.test(future1));
+    assertFalse(filter.test(future2));
+    assertFalse(filter.test(future3));
 
     // cleanup
     Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()

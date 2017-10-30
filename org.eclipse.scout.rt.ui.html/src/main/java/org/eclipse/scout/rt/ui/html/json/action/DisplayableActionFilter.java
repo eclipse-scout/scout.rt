@@ -10,13 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.action;
 
-import org.eclipse.scout.rt.client.ui.action.IAction;
-import org.eclipse.scout.rt.platform.filter.IFilter;
+import java.util.function.Predicate;
 
-public class DisplayableActionFilter<T extends IAction> implements IFilter<T> {
+import org.eclipse.scout.rt.client.ui.action.IAction;
+
+public class DisplayableActionFilter<T extends IAction> implements Predicate<T> {
 
   @Override
-  public boolean accept(T element) {
+  public boolean test(T element) {
     return element.isVisibleGranted();
   }
 

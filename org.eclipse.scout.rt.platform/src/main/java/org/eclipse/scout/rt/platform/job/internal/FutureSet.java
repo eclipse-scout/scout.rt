@@ -21,15 +21,11 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerCorePoolSizeProperty;
-import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
-import org.eclipse.scout.rt.platform.filter.AndFilter;
-import org.eclipse.scout.rt.platform.filter.IFilter;
-import org.eclipse.scout.rt.platform.filter.NotFilter;
-import org.eclipse.scout.rt.platform.filter.OrFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -132,16 +128,16 @@ public class FutureSet {
    *
    * @param filter
    *          to limit the Futures to be matched by the matcher. If <code>null</code>, all contained Futures are
-   *          checked, which is the same as using {@link AlwaysFilter}.
+   *          checked.
    * @param matcher
    *          to match the filtered Futures.
    * @return <code>true</code> if all Futures accepted by the specified Filter are successfully matched.
    */
-  public boolean matchesEvery(final IFilter<IFuture<?>> filter, final IFilter<JobFutureTask<?>> matcher) {
+  public boolean matchesEvery(final Predicate<IFuture<?>> filter, final Predicate<JobFutureTask<?>> matcher) {
     for (final JobFutureTask<?> future : copyFutures()) {
-      final boolean accepted = (filter == null || filter.accept(future));
+      final boolean accepted = (filter == null || filter.test(future));
 
-      if (accepted && !matcher.accept(future)) {
+      if (accepted && !matcher.test(future)) {
         return false;
       }
     }
@@ -151,9 +147,9 @@ public class FutureSet {
   /**
    * Returns <code>true</code>, if this {@link FutureSet} contains one Future matching the given filter at minimum.
    */
-  public boolean containsSome(final IFilter<IFuture<?>> filter) {
+  public boolean containsSome(final Predicate<IFuture<?>> filter) {
     for (final JobFutureTask<?> future : copyFutures()) {
-      if (filter == null || filter.accept(future)) {
+      if (filter == null || filter.test(future)) {
         return true;
       }
     }
@@ -165,8 +161,7 @@ public class FutureSet {
    * cancelled, or the timeout elapses.
    *
    * @param filter
-   *          filter to limit the Futures to await for. If <code>null</code>, all Futures are awaited, which is the same
-   *          as using {@link AlwaysFilter}.
+   *          filter to limit the Futures to await for. If <code>null</code>, all Futures are awaited.
    * @param timeout
    *          the maximal time to wait.
    * @param unit
@@ -176,7 +171,7 @@ public class FutureSet {
    * @throws TimeoutException
    *           if the wait timed out.
    */
-  public void awaitDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException, TimeoutException {
+  public void awaitDone(final Predicate<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException, TimeoutException {
     Assertions.assertGreater(timeout, 0L, "Invalid timeout; must be > 0 [timeout={}]", timeout);
 
     // Wait until all Futures matching the filter are done, or the deadline elapsed.
@@ -202,8 +197,7 @@ public class FutureSet {
    * premature cancellation.
    *
    * @param filter
-   *          filter to limit the Futures to await for. If <code>null</code>, all Futures are awaited, which is the same
-   *          as using {@link AlwaysFilter}.
+   *          filter to limit the Futures to await for. If <code>null</code>, all Futures are awaited.
    * @param timeout
    *          the maximal time to wait.
    * @param unit
@@ -213,7 +207,7 @@ public class FutureSet {
    * @throws TimeoutException
    *           if the wait timed out.
    */
-  public void awaitFinished(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException, TimeoutException {
+  public void awaitFinished(final Predicate<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException, TimeoutException {
     Assertions.assertGreater(timeout, 0L, "Invalid timeout; must be > 0 [timeout={}]", timeout);
 
     // Wait until all Futures matching the filter are removed, or the deadline elapsed.
@@ -234,21 +228,20 @@ public class FutureSet {
   }
 
   /**
-   * Returns all Futures accepted by the given {@link IFilter}.
+   * Returns all Futures accepted by the given {@link Predicate}.
    * <p>
    * A future is contained as long as not finished yet. A job is finished upon its completion, or upon a premature
    * cancellation, meaning that it will never commence execution.
    * <p>
    *
    * @param filter
-   *          to limit the Futures to be returned. If <code>null</code>, all Futures are returned, which is the same as
-   *          using {@link AlwaysFilter}.
+   *          to limit the Futures to be returned. If <code>null</code>, all Futures are returned.
    * @return futures accepted by the given filter.
    */
-  public final Set<IFuture<?>> values(final IFilter<IFuture<?>> filter) {
+  public final Set<IFuture<?>> values(final Predicate<IFuture<?>> filter) {
     final Set<IFuture<?>> futures = new HashSet<>();
     for (final IFuture<?> candidate : copyFutures()) {
-      if (filter == null || filter.accept(candidate)) {
+      if (filter == null || filter.test(candidate)) {
         futures.add(candidate);
       }
     }
@@ -256,20 +249,16 @@ public class FutureSet {
   }
 
   /**
-   * Cancels all Futures which are accepted by the given Filter.
-   * <p>
-   * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
-   * a filter in {@link NotFilter}.
+   * Cancels all Futures which are accepted by the given {@link Predicate}.
    *
    * @param filter
-   *          to limit the Futures to be cancelled. If <code>null</code>, all contained Futures are cancelled, which is
-   *          the same as using {@link AlwaysFilter}.
+   *          to limit the Futures to be cancelled. If <code>null</code>, all contained Futures are cancelled.
    * @param interruptIfRunning
    *          <code>true</code> to interrupt in-progress jobs.
    * @return <code>true</code> if all Futures matching the Filter are cancelled successfully, or <code>false</code>, if
    *         a Future could not be cancelled, typically because already completed normally.
    */
-  public boolean cancel(final IFilter<IFuture<?>> filter, final boolean interruptIfRunning) {
+  public boolean cancel(final Predicate<IFuture<?>> filter, final boolean interruptIfRunning) {
     final Set<Boolean> success = new HashSet<>();
 
     for (final IFuture<?> future : values(filter)) {
@@ -292,7 +281,7 @@ public class FutureSet {
   /**
    * Creates the filter to signal waiting threads upon a job event.
    */
-  protected IFilter<JobEvent> newSignalingFilter() {
+  protected Predicate<JobEvent> newSignalingFilter() {
     return event -> {
       switch (event.getType()) {
         case JOB_EXECUTION_HINT_ADDED:

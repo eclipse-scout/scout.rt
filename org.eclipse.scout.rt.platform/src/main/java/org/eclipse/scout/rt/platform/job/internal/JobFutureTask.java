@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
@@ -36,7 +37,6 @@ import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator
 import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.IThrowableWithContextInfo;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.ExecutionTrigger;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
@@ -462,7 +462,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
-  public IRegistrationHandle addListener(final IFilter<JobEvent> filter, final IJobListener listener) {
+  public IRegistrationHandle addListener(final Predicate<JobEvent> filter, final IJobListener listener) {
     final JobListenerWithFilter localListener = new JobListenerWithFilter(listener, filter);
     m_listeners.add(localListener);
 

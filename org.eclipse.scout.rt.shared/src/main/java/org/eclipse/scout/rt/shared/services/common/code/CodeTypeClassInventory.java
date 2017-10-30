@@ -10,9 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.code;
 
+import java.util.function.Predicate;
+
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.filter.BeanClassFilter;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.FilteredClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
@@ -31,7 +32,7 @@ public class CodeTypeClassInventory extends FilteredClassInventory<ICodeType<?, 
     this(new BeanClassFilter());
   }
 
-  public CodeTypeClassInventory(IFilter<IClassInfo> filter) {
+  public CodeTypeClassInventory(Predicate<IClassInfo> filter) {
     super(filter, ICodeType.class);
   }
 

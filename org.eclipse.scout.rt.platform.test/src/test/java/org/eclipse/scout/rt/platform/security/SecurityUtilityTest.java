@@ -17,18 +17,13 @@ import java.util.Arrays;
 
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
-import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @RunWith(PlatformTestRunner.class)
 public class SecurityUtilityTest {
-
-  private static final Logger LOG = LoggerFactory.getLogger(SecurityUtilityTest.class);
 
   private static final int KEY_LEN = 128;
   private static final Charset ENCODING = StandardCharsets.UTF_8;
@@ -36,9 +31,6 @@ public class SecurityUtilityTest {
 
   @Test
   public void testEncryption() throws Exception {
-    if (!isEncryptionSupported()) {
-      return;
-    }
     final String origData = "origData";
     final byte[] salt = SecurityUtility.createRandomBytes();
     final byte[] inputBytes = origData.getBytes(ENCODING);
@@ -54,21 +46,8 @@ public class SecurityUtilityTest {
     Assert.assertEquals(origData, decryptedString);
   }
 
-  protected boolean isEncryptionSupported() {
-    boolean isJava18OrNewer = ObjectUtility.compareTo(System.getProperty("java.version"), "1.8") >= 0;
-    if (!isJava18OrNewer) {
-      // encryption only supported in java 1.8 or newer
-      LOG.warn("Encryption tests skipped because it is not supported by this Java version. At least a JRE 1.8 is required.");
-      return false;
-    }
-    return true;
-  }
-
   @Test(expected = AssertionException.class)
   public void testEncryptNoData() throws Exception {
-    if (!isEncryptionSupported()) {
-      throw new AssertionException("not supported but expected.");
-    }
     final byte[] salt = SecurityUtility.createRandomBytes();
     SecurityUtility.encrypt(null, "pass".toCharArray(), salt, KEY_LEN);
   }
@@ -189,11 +168,6 @@ public class SecurityUtilityTest {
 
   @Test
   public void testHashPassword() {
-    if (!isEncryptionSupported()) {
-      // only supported in java 1.8 or newer
-      return;
-    }
-
     final byte[] salt = SecurityUtility.createRandomBytes();
     final byte[] salt2 = SecurityUtility.createRandomBytes();
     final int iterations = 10000;
@@ -344,10 +318,6 @@ public class SecurityUtilityTest {
 
   @Test
   public void testDecryptionApiStability() throws Exception {
-    if (!isEncryptionSupported()) {
-      return;
-    }
-
     final byte[] encrypted = Base64Utility.decode("43aysPcKhTvyzZIWa6d1wwntGobQOXT38VU=");
     final byte[] salt = Base64Utility.decode("iPENJpMTU8MxarL8ZMHxXw==");
     Assert.assertEquals("myTestData", new String(SecurityUtility.decrypt(encrypted, PASSWORD, salt, 128), ENCODING));

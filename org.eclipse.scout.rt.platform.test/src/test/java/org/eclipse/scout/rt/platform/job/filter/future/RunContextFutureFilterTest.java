@@ -14,9 +14,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
+import java.util.function.Predicate;
+
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -34,17 +35,17 @@ public class RunContextFutureFilterTest {
     IFuture<Void> future3 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(new P_RunContext1()));
     IFuture<Void> future4 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(new P_RunContext2()));
 
-    IFilter<IFuture<?>> filter = new RunContextFutureFilter(RunContext.class);
-    assertFalse(filter.accept(future1));
-    assertTrue(filter.accept(future2));
-    assertTrue(filter.accept(future3));
-    assertTrue(filter.accept(future4));
+    Predicate<IFuture<?>> filter = new RunContextFutureFilter(RunContext.class);
+    assertFalse(filter.test(future1));
+    assertTrue(filter.test(future2));
+    assertTrue(filter.test(future3));
+    assertTrue(filter.test(future4));
 
     filter = new RunContextFutureFilter(P_RunContext1.class);
-    assertFalse(filter.accept(future1));
-    assertFalse(filter.accept(future2));
-    assertTrue(filter.accept(future3));
-    assertFalse(filter.accept(future4));
+    assertFalse(filter.test(future1));
+    assertFalse(filter.test(future2));
+    assertTrue(filter.test(future3));
+    assertFalse(filter.test(future4));
   }
 
   private static class P_RunContext1 extends RunContext {

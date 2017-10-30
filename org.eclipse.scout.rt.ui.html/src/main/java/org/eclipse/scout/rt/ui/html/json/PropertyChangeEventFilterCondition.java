@@ -28,7 +28,7 @@ public class PropertyChangeEventFilterCondition implements IPropertyChangeEventF
   }
 
   @Override
-  public boolean accept(PropertyChangeEvent event) {
+  public boolean test(PropertyChangeEvent event) {
     Object newValue = event.getNewValue();
 
     // Ignore if null == null

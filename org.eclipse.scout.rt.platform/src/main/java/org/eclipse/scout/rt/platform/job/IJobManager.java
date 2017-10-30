@@ -13,14 +13,10 @@ package org.eclipse.scout.rt.platform.job;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
-import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
-import org.eclipse.scout.rt.platform.filter.AndFilter;
-import org.eclipse.scout.rt.platform.filter.IFilter;
-import org.eclipse.scout.rt.platform.filter.NotFilter;
-import org.eclipse.scout.rt.platform.filter.OrFilter;
 import org.eclipse.scout.rt.platform.job.filter.event.JobEventFilterBuilder;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -119,9 +115,7 @@ public interface IJobManager {
   /**
    * Checks whether all Futures accepted by the given Filter are in 'done-state' (completed or cancelled).
    * <p>
-   * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
-   * a filter in {@link NotFilter}. Also see {@link newFutureFilterBuilder} to create a filter to match multiple
-   * criteria joined by logical 'AND' operation.
+   * See {@link newFutureFilterBuilder} to create a filter to match multiple criteria joined by logical 'AND' operation.
    * <p>
    * Example:
    *
@@ -134,18 +128,16 @@ public interface IJobManager {
    *
    * @param filter
    *          filter to limit the Futures to be checked for their 'done-state'. If <code>null</code>, all Futures are
-   *          checked, which is the same as using {@link AlwaysFilter}.
+   *          checked.
    * @return <code>true</code> if all Futures matching the given Filter are in 'done-state'.
    */
-  boolean isDone(IFilter<IFuture<?>> filter);
+  boolean isDone(Predicate<IFuture<?>> filter);
 
   /**
    * Waits if necessary for at most the given time for all futures matching the given filter to complete, or until
    * cancelled, or the timeout elapses.
    * <p>
-   * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
-   * a filter in {@link NotFilter}. Also see {@link newFutureFilterBuilder} to create a filter to match multiple
-   * criteria joined by logical 'AND' operation.
+   * See {@link newFutureFilterBuilder} to create a filter to match multiple criteria joined by logical 'AND' operation.
    * <p>
    * Example:
    *
@@ -157,8 +149,7 @@ public interface IJobManager {
    * </pre>
    *
    * @param filter
-   *          filter to limit the Futures to await for. If <code>null</code>, all Futures are awaited, which is the same
-   *          as using {@link AlwaysFilter}.
+   *          filter to limit the Futures to await for. If <code>null</code>, all Futures are awaited.
    * @param timeout
    *          the maximal time to wait.
    * @param unit
@@ -168,7 +159,7 @@ public interface IJobManager {
    * @throws TimedOutError
    *           if the wait timed out.
    */
-  void awaitDone(IFilter<IFuture<?>> filter, long timeout, TimeUnit unit);
+  void awaitDone(Predicate<IFuture<?>> filter, long timeout, TimeUnit unit);
 
   /**
    * Waits if necessary for at most the given time for all futures matching the given filter to finish, meaning that
@@ -176,8 +167,7 @@ public interface IJobManager {
    * premature cancellation.
    *
    * @param filter
-   *          filter to limit the Futures to await for. If <code>null</code>, all Futures are awaited, which is the same
-   *          as using {@link AlwaysFilter}.
+   *          filter to limit the Futures to await for. If <code>null</code>, all Futures are awaited.
    * @param timeout
    *          the maximal time to wait for the job to complete.
    * @param unit
@@ -187,17 +177,16 @@ public interface IJobManager {
    * @throws TimedOutError
    *           if the wait timed out.
    */
-  void awaitFinished(IFilter<IFuture<?>> filter, long timeout, TimeUnit unit);
+  void awaitFinished(Predicate<IFuture<?>> filter, long timeout, TimeUnit unit);
 
   /**
-   * Returns all Futures accepted by the given {@link IFilter}.
+   * Returns all Futures accepted by the given {@link Predicate}.
    * <p>
    * A future is registered in job manager as long as not finished yet. A job is finished upon its completion, or upon a
    * premature cancellation, meaning that it will never commence execution.
    * <p>
-   * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
-   * a filter in {@link NotFilter}. See {@link newFutureFilterBuilder} to create a filter to match multiple criteria
-   * joined by logical 'AND' operation. Use a {@link CollectorVisitor} to collect all visited Futures.
+   * See {@link newFutureFilterBuilder} to create a filter to match multiple criteria joined by logical 'AND' operation.
+   * Use a {@link CollectorVisitor} to collect all visited Futures.
    * <p>
    * Example:
    *
@@ -209,18 +198,15 @@ public interface IJobManager {
    * </pre>
    *
    * @param filter
-   *          to limit the Futures to be returned. If <code>null</code>, all Futures are returned, which is the same as
-   *          using {@link AlwaysFilter}.
+   *          to limit the Futures to be returned. If <code>null</code>, all Futures are returned.
    * @return futures accepted by the given filter.
    */
-  Set<IFuture<?>> getFutures(IFilter<IFuture<?>> filter);
+  Set<IFuture<?>> getFutures(Predicate<IFuture<?>> filter);
 
   /**
    * Cancels all Futures which are accepted by the given Filter.
    * <p>
-   * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
-   * a filter in {@link NotFilter}. Also see {@link newFutureFilterBuilder} to create a filter to match multiple
-   * criteria joined by logical 'AND' operation.
+   * See {@link newFutureFilterBuilder} to create a filter to match multiple criteria joined by logical 'AND' operation.
    * <p>
    * Example:
    *
@@ -232,14 +218,13 @@ public interface IJobManager {
    * </pre>
    *
    * @param filter
-   *          to limit the Futures to be cancelled. If <code>null</code>, all Futures are cancelled, which is the same
-   *          as using {@link AlwaysFilter}.
+   *          to limit the Futures to be cancelled. If <code>null</code>, all Futures are cancelled.
    * @param interruptIfRunning
    *          <code>true</code> to interrupt in-progress tasks.
    * @return <code>true</code> if all Futures matching the Filter are cancelled successfully, or <code>false</code>, if
    *         a Future could not be cancelled, typically because already completed normally.
    */
-  boolean cancel(IFilter<IFuture<?>> filter, boolean interruptIfRunning);
+  boolean cancel(Predicate<IFuture<?>> filter, boolean interruptIfRunning);
 
   /**
    * Creates a blocking condition to put a job into waiting mode until the condition falls.
@@ -269,9 +254,7 @@ public interface IJobManager {
    * Registers the given listener to be notified about job lifecycle events that comply with the given filter. If the
    * listener is already registered, that previous registration is replaced.
    * <p>
-   * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
-   * a filter in {@link NotFilter}. Also see {@link JobEventFilterBuilder} to create a filter to match multiple criteria
-   * joined by logical 'AND' operation.
+   * See {@link JobEventFilterBuilder} to create a filter to match multiple criteria joined by logical 'AND' operation.
    * <p>
    * Example:
    *
@@ -290,7 +273,7 @@ public interface IJobManager {
    * @return A token representing the registration of the given {@link IJobListener}. This token can later be used to
    *         unregister the listener.
    */
-  IRegistrationHandle addListener(IFilter<JobEvent> filter, IJobListener listener);
+  IRegistrationHandle addListener(Predicate<JobEvent> filter, IJobListener listener);
 
   /**
    * Returns <code>true</code> if this job manager is shutdown, or else <code>false</code>.

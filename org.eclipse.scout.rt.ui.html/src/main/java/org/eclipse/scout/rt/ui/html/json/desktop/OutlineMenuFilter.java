@@ -18,8 +18,8 @@ import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 public class OutlineMenuFilter<T extends IAction> extends DisplayableActionFilter<T> {
 
   @Override
-  public boolean accept(T element) {
-    if (super.accept(element) && element instanceof IMenu) {
+  public boolean test(T element) {
+    if (super.test(element) && element instanceof IMenu) {
       return ((IMenu) element).getMenuTypes().contains(TreeMenuType.Header);
     }
     return false;

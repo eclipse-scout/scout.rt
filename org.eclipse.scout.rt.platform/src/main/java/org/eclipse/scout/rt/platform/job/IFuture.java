@@ -14,15 +14,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
-import org.eclipse.scout.rt.platform.filter.AndFilter;
-import org.eclipse.scout.rt.platform.filter.IFilter;
-import org.eclipse.scout.rt.platform.filter.NotFilter;
-import org.eclipse.scout.rt.platform.filter.OrFilter;
 import org.eclipse.scout.rt.platform.job.filter.event.JobEventFilterBuilder;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -311,9 +308,7 @@ public interface IFuture<RESULT> extends ICancellable {
    * Registers the given listener to be notified about job lifecycle events related to this Future, and which comply
    * with the given filter. If the listener is already registered, that previous registration is replaced.
    * <p>
-   * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
-   * a filter in {@link NotFilter}. Also see {@link JobEventFilterBuilder} to create a filter to match multiple criteria
-   * joined by logical 'AND' operation.
+   * See {@link JobEventFilterBuilder} to create a filter to match multiple criteria joined by logical 'AND' operation.
    * <p>
    * Example:
    *
@@ -331,7 +326,7 @@ public interface IFuture<RESULT> extends ICancellable {
    * @return A token representing the registration of the given {@link IJobListener}. This token can later be used to
    *         unregister the listener.
    */
-  IRegistrationHandle addListener(IFilter<JobEvent> filter, IJobListener listener);
+  IRegistrationHandle addListener(Predicate<JobEvent> filter, IJobListener listener);
 
   /**
    * Associates this {@link IFuture} with an execution hint, which can be evaluated by filters like when listening to

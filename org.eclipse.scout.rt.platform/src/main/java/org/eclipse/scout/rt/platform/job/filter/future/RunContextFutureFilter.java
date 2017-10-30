@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.filter.future;
 
+import java.util.function.Predicate;
+
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 
 /**
@@ -19,7 +20,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
  *
  * @since 5.2
  */
-public class RunContextFutureFilter implements IFilter<IFuture<?>> {
+public class RunContextFutureFilter implements Predicate<IFuture<?>> {
 
   private final Class<? extends RunContext> m_runContextClazz;
 
@@ -28,7 +29,7 @@ public class RunContextFutureFilter implements IFilter<IFuture<?>> {
   }
 
   @Override
-  public boolean accept(final IFuture<?> future) {
+  public boolean test(final IFuture<?> future) {
     final RunContext runContext = future.getJobInput().getRunContext();
     if (runContext == null) {
       return false;

@@ -29,7 +29,7 @@ public class BooleanPropertyChangeFilter implements IPropertyChangeEventFilterCo
   }
 
   @Override
-  public boolean accept(PropertyChangeEvent event) {
+  public boolean test(PropertyChangeEvent event) {
     return m_acceptEvent;
   }
 

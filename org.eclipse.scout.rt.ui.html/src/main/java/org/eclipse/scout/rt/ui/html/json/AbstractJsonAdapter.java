@@ -13,10 +13,10 @@ package org.eclipse.scout.rt.ui.html.json;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONObject;
@@ -181,11 +181,11 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   @Override
-  public final <A extends IJsonAdapter<? super M>, M> A attachAdapter(M model, IFilter<M> filter) {
+  public final <A extends IJsonAdapter<? super M>, M> A attachAdapter(M model, Predicate<M> filter) {
     if (model == null) {
       return null;
     }
-    if (filter != null && !filter.accept(model)) {
+    if (filter != null && !filter.test(model)) {
       return null;
     }
     return m_uiSession.getOrCreateJsonAdapter(model, this);
@@ -197,7 +197,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   @Override
-  public final <M> List<IJsonAdapter<?>> attachAdapters(Collection<M> models, IFilter<M> filter) {
+  public final <M> List<IJsonAdapter<?>> attachAdapters(Collection<M> models, Predicate<M> filter) {
     List<IJsonAdapter<?>> adapters = new ArrayList<>(models.size());
     for (M model : models) {
       IJsonAdapter<?> adapter = attachAdapter(model, filter);
@@ -218,11 +218,11 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   @Override
-  public <A extends IJsonAdapter<? super MODEL>, MODEL> A getAdapter(MODEL model, IFilter<MODEL> filter) {
+  public <A extends IJsonAdapter<? super MODEL>, MODEL> A getAdapter(MODEL model, Predicate<MODEL> filter) {
     if (model == null) {
       return null;
     }
-    if (filter != null && !filter.accept(model)) {
+    if (filter != null && !filter.test(model)) {
       return null;
     }
     return m_uiSession.getJsonAdapter(model, this);
@@ -234,7 +234,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   @Override
-  public <MODEL> Collection<IJsonAdapter<?>> getAdapters(Collection<MODEL> models, IFilter<MODEL> filter) {
+  public <MODEL> Collection<IJsonAdapter<?>> getAdapters(Collection<MODEL> models, Predicate<MODEL> filter) {
     List<IJsonAdapter<?>> adapters = new ArrayList<>(models.size());
     for (MODEL model : models) {
       IJsonAdapter<?> adapter = getAdapter(model, filter);
@@ -249,11 +249,11 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return getGlobalAdapter(model, null);
   }
 
-  public final <A extends IJsonAdapter<? super MODEL>, MODEL> A getGlobalAdapter(MODEL model, IFilter<MODEL> filter) {
+  public final <A extends IJsonAdapter<? super MODEL>, MODEL> A getGlobalAdapter(MODEL model, Predicate<MODEL> filter) {
     if (model == null) {
       return null;
     }
-    if (filter != null && !filter.accept(model)) {
+    if (filter != null && !filter.test(model)) {
       return null;
     }
     return m_uiSession.getJsonAdapter(model, getUiSession().getRootJsonAdapter());
@@ -263,7 +263,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return attachGlobalAdapters(models, null);
   }
 
-  protected final <MODEL> List<IJsonAdapter<?>> attachGlobalAdapters(Collection<MODEL> models, IFilter<MODEL> filter) {
+  protected final <MODEL> List<IJsonAdapter<?>> attachGlobalAdapters(Collection<MODEL> models, Predicate<MODEL> filter) {
     List<IJsonAdapter<?>> adapters = new ArrayList<>(models.size());
     for (MODEL model : models) {
       IJsonAdapter<?> adapter = attachGlobalAdapter(model, filter);
@@ -286,11 +286,11 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return attachGlobalAdapter(model, null);
   }
 
-  protected final <A extends IJsonAdapter<? super M>, M> A attachGlobalAdapter(M model, IFilter<M> filter) {
+  protected final <A extends IJsonAdapter<? super M>, M> A attachGlobalAdapter(M model, Predicate<M> filter) {
     if (model == null) {
       return null;
     }
-    if (filter != null && !filter.accept(model)) {
+    if (filter != null && !filter.test(model)) {
       return null;
     }
     return m_uiSession.getOrCreateJsonAdapter(model, getUiSession().getRootJsonAdapter());
@@ -300,11 +300,11 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return putAdapterIdProperty(json, key, model, null);
   }
 
-  protected final <M> JSONObject putAdapterIdProperty(JSONObject json, String key, M model, IFilter<M> filter) {
+  protected final <M> JSONObject putAdapterIdProperty(JSONObject json, String key, M model, Predicate<M> filter) {
     if (model == null) {
       return json;
     }
-    if (filter != null && !filter.accept(model)) {
+    if (filter != null && !filter.test(model)) {
       return null;
     }
     return json.put(key, JsonAdapterUtility.getAdapterIdForModel(getUiSession(), model, this));
@@ -314,7 +314,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return putAdapterIdsProperty(json, key, models, null);
   }
 
-  protected final <M> JSONObject putAdapterIdsProperty(JSONObject json, String key, Collection<M> models, IFilter<M> filter) {
+  protected final <M> JSONObject putAdapterIdsProperty(JSONObject json, String key, Collection<M> models, Predicate<M> filter) {
     return json.put(key, JsonAdapterUtility.getAdapterIdsForModel(getUiSession(), models, this, filter));
   }
 

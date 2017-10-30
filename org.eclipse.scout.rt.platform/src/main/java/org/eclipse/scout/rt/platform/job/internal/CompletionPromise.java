@@ -23,11 +23,11 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -332,10 +332,10 @@ class CompletionPromise<RESULT> {
   /**
    * Matches futures in 'done' state.
    */
-  static final IFilter<JobFutureTask<?>> FUTURE_DONE_MATCHER = FutureTask::isDone;
+  static final Predicate<JobFutureTask<?>> FUTURE_DONE_MATCHER = FutureTask::isDone;
 
   /**
    * Matches futures in 'done' state, and for which the 'done' event was fired.
    */
-  static final IFilter<JobFutureTask<?>> PROMISE_DONE_MATCHER = future -> future.getCompletionPromise().isDone();
+  static final Predicate<JobFutureTask<?>> PROMISE_DONE_MATCHER = future -> future.getCompletionPromise().isDone();
 }

@@ -24,6 +24,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Predicate;
 
 import javax.security.auth.Subject;
 import javax.servlet.SessionCookieConfig;
@@ -46,7 +47,6 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
@@ -990,11 +990,11 @@ public class UiSession implements IUiSession {
    * job either transitioned into 'DONE' state, or requires 'UI interaction', or is a periodic job with a round
    * completed.
    */
-  protected IFilter<JobEvent> newUiDataAvailableFilter() {
-    return new IFilter<JobEvent>() {
+  protected Predicate<JobEvent> newUiDataAvailableFilter() {
+    return new Predicate<JobEvent>() {
 
       @Override
-      public boolean accept(final JobEvent event) {
+      public boolean test(final JobEvent event) {
         switch (event.getType()) {
           case JOB_STATE_CHANGED: {
             return isJobDone(event.getData().getState(), event.getData().getFuture());

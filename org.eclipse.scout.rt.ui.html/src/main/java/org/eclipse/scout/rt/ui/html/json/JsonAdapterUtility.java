@@ -13,10 +13,10 @@ package org.eclipse.scout.rt.ui.html.json;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONArray;
@@ -34,8 +34,8 @@ public final class JsonAdapterUtility {
    * Returns the ID of the JSON adapter for the given model. This method requires that the adapter has already been
    * created before. The method will never create a new adapter instance.
    */
-  public static <M> String getAdapterIdForModel(IUiSession uiSession, M model, IJsonAdapter<?> parent, IFilter<M> filter) {
-    if (filter != null && !filter.accept(model)) {
+  public static <M> String getAdapterIdForModel(IUiSession uiSession, M model, IJsonAdapter<?> parent, Predicate<M> filter) {
+    if (filter != null && !filter.test(model)) {
       return null;
     }
     IJsonAdapter<?> adapter = uiSession.getJsonAdapter(model, parent);
@@ -49,7 +49,7 @@ public final class JsonAdapterUtility {
    * Returns a list of IDs of the JSON adapters for the given models. This method requires that the adapter has already
    * been created before. The method will never create a new adapter instance.
    */
-  public static <M> JSONArray getAdapterIdsForModel(IUiSession uiSession, Collection<M> models, IJsonAdapter<?> parent, IFilter<M> filter) {
+  public static <M> JSONArray getAdapterIdsForModel(IUiSession uiSession, Collection<M> models, IJsonAdapter<?> parent, Predicate<M> filter) {
     JSONArray jsonAdapterIds = new JSONArray();
     for (M model : models) {
       String adapterId = getAdapterIdForModel(uiSession, model, parent, filter);
@@ -119,13 +119,13 @@ public final class JsonAdapterUtility {
    * @return a {@link JSONArray} with the IDs of the given adapters that accept the given filter (or all adapters of the
    *         filter is <code>null</code>).
    */
-  public static <T> JSONArray adapterIdsToJson(Collection<IJsonAdapter<T>> adapters, IFilter<T> filter) {
+  public static <T> JSONArray adapterIdsToJson(Collection<IJsonAdapter<T>> adapters, Predicate<T> filter) {
     if (adapters == null) {
       return null;
     }
     JSONArray array = new JSONArray();
     for (IJsonAdapter<T> adapter : adapters) {
-      if (filter == null || filter.accept(adapter.getModel())) {
+      if (filter == null || filter.test(adapter.getModel())) {
         array.put(adapter.getId());
       }
     }

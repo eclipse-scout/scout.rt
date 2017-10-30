@@ -26,17 +26,17 @@ public class JobEventFilterTest {
   public void test1() {
     JobEventFilter filter = new JobEventFilter(JobEventType.JOB_STATE_CHANGED);
 
-    assertTrue(filter.accept(new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED, new JobEventData())));
-    assertFalse(filter.accept(new JobEvent(mock(IJobManager.class), JobEventType.JOB_MANAGER_SHUTDOWN, new JobEventData())));
-    assertFalse(filter.accept(new JobEvent(mock(IJobManager.class), JobEventType.JOB_EXECUTION_HINT_ADDED, new JobEventData())));
+    assertTrue(filter.test(new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED, new JobEventData())));
+    assertFalse(filter.test(new JobEvent(mock(IJobManager.class), JobEventType.JOB_MANAGER_SHUTDOWN, new JobEventData())));
+    assertFalse(filter.test(new JobEvent(mock(IJobManager.class), JobEventType.JOB_EXECUTION_HINT_ADDED, new JobEventData())));
   }
 
   @Test
   public void test2() {
     JobEventFilter filter = new JobEventFilter(JobEventType.JOB_STATE_CHANGED, JobEventType.JOB_MANAGER_SHUTDOWN);
 
-    assertTrue(filter.accept(new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED, new JobEventData())));
-    assertTrue(filter.accept(new JobEvent(mock(IJobManager.class), JobEventType.JOB_MANAGER_SHUTDOWN, new JobEventData())));
-    assertFalse(filter.accept(new JobEvent(mock(IJobManager.class), JobEventType.JOB_EXECUTION_HINT_ADDED, new JobEventData())));
+    assertTrue(filter.test(new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED, new JobEventData())));
+    assertTrue(filter.test(new JobEvent(mock(IJobManager.class), JobEventType.JOB_MANAGER_SHUTDOWN, new JobEventData())));
+    assertFalse(filter.test(new JobEvent(mock(IJobManager.class), JobEventType.JOB_EXECUTION_HINT_ADDED, new JobEventData())));
   }
 }

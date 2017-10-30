@@ -10,7 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.filter.future;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
+import java.util.function.Predicate;
+
 import org.eclipse.scout.rt.platform.job.IFuture;
 
 /**
@@ -20,15 +21,15 @@ import org.eclipse.scout.rt.platform.job.IFuture;
  * @see IFuture#isSingleExecuting(boolean)
  * @since 5.1
  */
-public final class SingleExecutionFutureFilter implements IFilter<IFuture<?>> {
+public final class SingleExecutionFutureFilter implements Predicate<IFuture<?>> {
 
-  public static final IFilter<IFuture<?>> INSTANCE = new SingleExecutionFutureFilter();
+  public static final Predicate<IFuture<?>> INSTANCE = new SingleExecutionFutureFilter();
 
   private SingleExecutionFutureFilter() {
   }
 
   @Override
-  public boolean accept(final IFuture<?> future) {
+  public boolean test(final IFuture<?> future) {
     return future.isSingleExecution();
   }
 }

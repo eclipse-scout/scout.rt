@@ -15,10 +15,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.function.Predicate;
+
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -40,50 +41,50 @@ public class ModelJobEventFilterTest {
     IClientSession session2 = mock(IClientSession.class);
     when(session2.getModelJobSemaphore()).thenReturn(Jobs.newExecutionSemaphore(1));
 
-    IFilter<JobEvent> filter = ModelJobEventFilter.INSTANCE;
+    Predicate<JobEvent> filter = ModelJobEventFilter.INSTANCE;
 
     // not a model job (no future)
     JobEvent event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED, new JobEventData().withFuture(null));
-    assertFalse(filter.accept(event));
+    assertFalse(filter.test(event));
 
     // not a model job (no ClientRunContext)
     event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
         new JobEventData().withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput())));
-    assertFalse(filter.accept(event));
+    assertFalse(filter.test(event));
 
     // not a model job (no ClientRunContext)
     event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
         new JobEventData().withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(RunContexts.empty()))));
-    assertFalse(filter.accept(event));
+    assertFalse(filter.test(event));
 
     // not a model job (no mutex and not session on ClientRunContext)
     event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
         new JobEventData().withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty()))));
-    assertFalse(filter.accept(event));
+    assertFalse(filter.test(event));
 
     // not a model job (no mutex)
     event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
         new JobEventData().withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(session1, false)))));
-    assertFalse(filter.accept(event));
+    assertFalse(filter.test(event));
 
     // not a model job (wrong mutex type)
     event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
         new JobEventData().withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(session1, false)).withExecutionSemaphore(Jobs.newExecutionSemaphore(1)))));
-    assertFalse(filter.accept(event));
+    assertFalse(filter.test(event));
 
     // not a model job (different session on ClientRunContext and mutex)
     event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
         new JobEventData().withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(session1, false)).withExecutionSemaphore(session2.getModelJobSemaphore()))));
-    assertFalse(filter.accept(event));
+    assertFalse(filter.test(event));
 
     // not a model job (no session on ClientRunContext)
     event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
         new JobEventData().withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(null, false)).withExecutionSemaphore(session1.getModelJobSemaphore()))));
-    assertFalse(filter.accept(event));
+    assertFalse(filter.test(event));
 
     // this is a model job (same session on ClientRunContext and mutex)
     event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
         new JobEventData().withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(session1, false)).withExecutionSemaphore(session1.getModelJobSemaphore()))));
-    assertTrue(filter.accept(event));
+    assertTrue(filter.test(event));
   }
 }

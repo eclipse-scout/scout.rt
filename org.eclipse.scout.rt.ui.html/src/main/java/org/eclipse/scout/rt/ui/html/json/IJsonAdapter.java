@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONObject;
 
@@ -68,19 +68,19 @@ public interface IJsonAdapter<T> extends IJsonObject {
   // getAdapters -> getChildAdapters
   // getParent -> getParentAdapter
 
-  <A extends IJsonAdapter<? super MODEL>, MODEL> A attachAdapter(MODEL model, IFilter<MODEL> filter);
+  <A extends IJsonAdapter<? super MODEL>, MODEL> A attachAdapter(MODEL model, Predicate<MODEL> filter);
 
   <MODEL> List<IJsonAdapter<?>> attachAdapters(Collection<MODEL> models);
 
-  <MODEL> List<IJsonAdapter<?>> attachAdapters(Collection<MODEL> models, IFilter<MODEL> filter);
+  <MODEL> List<IJsonAdapter<?>> attachAdapters(Collection<MODEL> models, Predicate<MODEL> filter);
 
   <A extends IJsonAdapter<? super Object>> A getAdapter(Object model);
 
-  <A extends IJsonAdapter<? super MODEL>, MODEL> A getAdapter(MODEL model, IFilter<MODEL> filter);
+  <A extends IJsonAdapter<? super MODEL>, MODEL> A getAdapter(MODEL model, Predicate<MODEL> filter);
 
   Collection<IJsonAdapter<?>> getAdapters(Collection<?> models);
 
-  <MODEL> Collection<IJsonAdapter<?>> getAdapters(Collection<MODEL> models, IFilter<MODEL> filter);
+  <MODEL> Collection<IJsonAdapter<?>> getAdapters(Collection<MODEL> models, Predicate<MODEL> filter);
 
   IJsonAdapter<?> getParent();
 

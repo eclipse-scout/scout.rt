@@ -19,6 +19,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -35,7 +36,6 @@ import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerM
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerPrestartCoreThreadsProperty;
 import org.eclipse.scout.rt.platform.context.RunContextRunner;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -151,12 +151,12 @@ public class JobManager implements IJobManager {
   }
 
   @Override
-  public boolean isDone(final IFilter<IFuture<?>> filter) {
+  public boolean isDone(final Predicate<IFuture<?>> filter) {
     return m_futures.matchesEvery(filter, CompletionPromise.FUTURE_DONE_MATCHER);
   }
 
   @Override
-  public void awaitDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) {
+  public void awaitDone(final Predicate<IFuture<?>> filter, final long timeout, final TimeUnit unit) {
     try {
       m_futures.awaitDone(filter, timeout, unit);
     }
@@ -170,7 +170,7 @@ public class JobManager implements IJobManager {
   }
 
   @Override
-  public void awaitFinished(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) {
+  public void awaitFinished(final Predicate<IFuture<?>> filter, final long timeout, final TimeUnit unit) {
     try {
       m_futures.awaitFinished(filter, timeout, unit);
     }
@@ -184,7 +184,7 @@ public class JobManager implements IJobManager {
   }
 
   @Override
-  public boolean cancel(final IFilter<IFuture<?>> filter, final boolean interruptIfRunning) {
+  public boolean cancel(final Predicate<IFuture<?>> filter, final boolean interruptIfRunning) {
     return m_futures.cancel(filter, interruptIfRunning);
   }
 
@@ -215,7 +215,7 @@ public class JobManager implements IJobManager {
   }
 
   @Override
-  public Set<IFuture<?>> getFutures(final IFilter<IFuture<?>> filter) {
+  public Set<IFuture<?>> getFutures(final Predicate<IFuture<?>> filter) {
     return m_futures.values(filter);
   }
 
@@ -225,7 +225,7 @@ public class JobManager implements IJobManager {
   }
 
   @Override
-  public IRegistrationHandle addListener(final IFilter<JobEvent> filter, final IJobListener listener) {
+  public IRegistrationHandle addListener(final Predicate<JobEvent> filter, final IJobListener listener) {
     return m_listeners.add(filter, listener);
   }
 

@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.filter.future;
 
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 
 /**
@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
  *
  * @since 5.1
  */
-public class JobNameRegexFutureFilter implements IFilter<IFuture<?>> {
+public class JobNameRegexFutureFilter implements Predicate<IFuture<?>> {
 
   private final Pattern m_regex;
 
@@ -29,7 +29,7 @@ public class JobNameRegexFutureFilter implements IFilter<IFuture<?>> {
   }
 
   @Override
-  public boolean accept(final IFuture<?> future) {
+  public boolean test(final IFuture<?> future) {
     if (future.getJobInput().getName() == null) {
       return false;
     }

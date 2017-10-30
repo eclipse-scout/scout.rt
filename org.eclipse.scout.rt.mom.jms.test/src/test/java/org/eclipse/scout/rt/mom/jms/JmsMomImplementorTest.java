@@ -37,6 +37,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -75,7 +76,6 @@ import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.holders.StringHolder;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -161,7 +161,7 @@ public class JmsMomImplementorTest {
     }
 
     // Cancel jobs
-    IFilter<IFuture<?>> testJobsFilter = Jobs.newFutureFilterBuilder()
+    Predicate<IFuture<?>> testJobsFilter = Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(m_testJobExecutionHint)
         .toFilter();
     Set<IFuture<?>> futures = Jobs.getJobManager().getFutures(testJobsFilter);

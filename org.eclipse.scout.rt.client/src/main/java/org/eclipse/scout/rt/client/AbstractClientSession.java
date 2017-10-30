@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 import javax.security.auth.Subject;
 
@@ -45,7 +46,6 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -446,7 +446,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     // Filter matches all running jobs that have the same client session associated, except the current thread
     // and model jobs. Because the current thread is (or should be) a model job, we cannot wait for other
     // model threads. They are always cancelled.
-    IFilter<IFuture<?>> runningJobsFilter = Jobs.newFutureFilterBuilder()
+    Predicate<IFuture<?>> runningJobsFilter = Jobs.newFutureFilterBuilder()
         .andMatch(new SessionFutureFilter(ISession.CURRENT.get()))
         .andMatchNotFuture(IFuture.CURRENT.get())
         .andMatchNot(ModelJobFutureFilter.INSTANCE)

@@ -21,8 +21,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -434,7 +434,7 @@ public class ExecutionSemaphoreTest {
     future.awaitDone(1, TimeUnit.SECONDS);
     assertEquals(CollectionUtility.hashSet("job-1-running"), protocol);
 
-    IFilter<IFuture<?>> job2Filter = Jobs.newFutureFilterBuilder()
+    Predicate<IFuture<?>> job2Filter = Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(executionHint)
         .toFilter();
 

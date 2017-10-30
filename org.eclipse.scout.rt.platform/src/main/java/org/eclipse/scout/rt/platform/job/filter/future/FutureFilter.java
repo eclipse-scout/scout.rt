@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.platform.job.filter.future;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IAdaptable;
@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.util.IAdaptable;
  *
  * @since 5.1
  */
-public class FutureFilter implements IFilter<IFuture<?>>, IAdaptable {
+public class FutureFilter implements Predicate<IFuture<?>>, IAdaptable {
 
   private final Set<IFuture<?>> m_futures;
 
@@ -36,7 +36,7 @@ public class FutureFilter implements IFilter<IFuture<?>>, IAdaptable {
   }
 
   @Override
-  public boolean accept(final IFuture<?> future) {
+  public boolean test(final IFuture<?> future) {
     return m_futures.contains(future);
   }
 

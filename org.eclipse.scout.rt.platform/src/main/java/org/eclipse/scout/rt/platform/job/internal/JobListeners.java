@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.platform.job.internal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -47,7 +47,7 @@ public class JobListeners {
    * @return A token representing the registration of the given {@link IJobListener}. This token can later be used to
    *         unregister the listener.
    */
-  IRegistrationHandle add(final IFilter<JobEvent> filter, final IJobListener listener) {
+  IRegistrationHandle add(final Predicate<JobEvent> filter, final IJobListener listener) {
     final IFuture[] futures = getFilteredFutures(filter);
     if (futures != null) {
       return addLocalListener(filter, listener, futures); // register the listener directly on the future to reduce contention.
@@ -60,7 +60,7 @@ public class JobListeners {
   /**
    * Registers the given listener as global listeners.
    */
-  protected IRegistrationHandle addGlobalListener(final IFilter<JobEvent> filter, final IJobListener listener) {
+  protected IRegistrationHandle addGlobalListener(final Predicate<JobEvent> filter, final IJobListener listener) {
     final JobListenerWithFilter globalListener = new JobListenerWithFilter(listener, filter);
     m_globalListeners.add(globalListener);
 
@@ -70,7 +70,7 @@ public class JobListeners {
   /**
    * Registers the given listener locally on the given Futures to reduce contention.
    */
-  protected IRegistrationHandle addLocalListener(final IFilter<JobEvent> filter, final IJobListener listener, final IFuture[] futures) {
+  protected IRegistrationHandle addLocalListener(final Predicate<JobEvent> filter, final IJobListener listener, final IFuture[] futures) {
     final List<IRegistrationHandle> registrations = new ArrayList<>(futures.length);
     for (final IFuture<?> future : futures) {
       registrations.add(future.addListener(filter, listener));
@@ -121,7 +121,7 @@ public class JobListeners {
    * Returns the futures constrained by the given filter (if any), or <code>null</code> otherwise.<br/>
    * For that to work, the given filter must implement {@link IAdaptable} for the type <code>IFuture[].class</code>.
    */
-  protected IFuture[] getFilteredFutures(final IFilter<JobEvent> filter) {
+  protected IFuture[] getFilteredFutures(final Predicate<JobEvent> filter) {
     if (filter instanceof IAdaptable) {
       return ((IAdaptable) filter).getAdapter(IFuture[].class);
     }

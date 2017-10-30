@@ -14,14 +14,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
 import org.eclipse.scout.rt.platform.filter.AndFilter;
-import org.eclipse.scout.rt.platform.filter.IFilter;
-import org.eclipse.scout.rt.platform.filter.NotFilter;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
@@ -36,6 +34,7 @@ import org.eclipse.scout.rt.platform.job.filter.future.SingleExecutionFutureFilt
 import org.eclipse.scout.rt.platform.job.internal.JobListeners;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.IAdaptable;
 
 /**
@@ -47,16 +46,16 @@ import org.eclipse.scout.rt.platform.util.IAdaptable;
 @Bean
 public class JobEventFilterBuilder {
 
-  private final List<IFilter<JobEvent>> m_andFilters = new ArrayList<>();
+  private final List<Predicate<JobEvent>> m_andFilters = new ArrayList<>();
 
   /**
    * Builds the filter based on the criteria as configured with this builder instance. Thereby, the filter criteria are
    * joined by logical 'AND' operation.
    */
-  public IFilter<JobEvent> toFilter() {
+  public Predicate<JobEvent> toFilter() {
     switch (m_andFilters.size()) {
       case 0:
-        return new AlwaysFilter<>();
+        return future -> true;
       case 1:
         return m_andFilters.get(0);
       default:
@@ -68,7 +67,7 @@ public class JobEventFilterBuilder {
   /**
    * To match all events where the given filter evaluates to <code>true</code>.
    */
-  public JobEventFilterBuilder andMatch(final IFilter<JobEvent> filter) {
+  public JobEventFilterBuilder andMatch(final Predicate<JobEvent> filter) {
     m_andFilters.add(filter);
     return this;
   }
@@ -76,8 +75,8 @@ public class JobEventFilterBuilder {
   /**
    * To match all events where the given filter does not apply, meaning evaluates to <code>false</code>.
    */
-  public JobEventFilterBuilder andMatchNot(final IFilter<JobEvent> filter) {
-    m_andFilters.add(new NotFilter<>(filter));
+  public JobEventFilterBuilder andMatchNot(final Predicate<JobEvent> filter) {
+    m_andFilters.add(Assertions.assertNotNull(filter, "Filter to negate must not be null").negate());
     return this;
   }
 
@@ -219,7 +218,7 @@ public class JobEventFilterBuilder {
 
     private IFuture<?>[] m_futureIntersection = null;
 
-    public AdaptableAndFilter(final Collection<IFilter<JobEvent>> filters) {
+    public AdaptableAndFilter(final Collection<Predicate<JobEvent>> filters) {
       super(filters);
       m_futureIntersection = calculateFutureIntersection(filters);
     }
@@ -228,10 +227,10 @@ public class JobEventFilterBuilder {
      * Resolves each filter's futures (if filter supports adaptable mechanism), and returns the intersection of all
      * filter's futures.
      */
-    protected static IFuture<?>[] calculateFutureIntersection(final Collection<IFilter<JobEvent>> filters) {
+    protected static IFuture<?>[] calculateFutureIntersection(final Collection<Predicate<JobEvent>> filters) {
       List<IFuture<?>> intersection = null;
 
-      for (final IFilter<JobEvent> filter : filters) {
+      for (final Predicate<JobEvent> filter : filters) {
         // Check whether the filter supports the adaptable mechanism.
         if (!(filter instanceof IAdaptable)) {
           continue;

@@ -65,8 +65,8 @@ public class CodeTypeClassInventoryTest {
   static class IgnoreTestCodeType1Filter extends BeanClassFilter {
 
     @Override
-    public boolean accept(IClassInfo ci) {
-      return super.accept(ci) && ObjectUtility.notEquals(ci.name(), TestCodeType1.class.getName());
+    public boolean test(IClassInfo ci) {
+      return super.test(ci) && ObjectUtility.notEquals(ci.name(), TestCodeType1.class.getName());
     }
   }
 

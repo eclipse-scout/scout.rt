@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.platform.job.filter.event;
 
 import java.util.Set;
+import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  *
  * @since 5.1
  */
-public class JobEventFilter implements IFilter<JobEvent> {
+public class JobEventFilter implements Predicate<JobEvent> {
 
   private final Set<JobEventType> m_eventTypes;
 
@@ -31,7 +31,7 @@ public class JobEventFilter implements IFilter<JobEvent> {
   }
 
   @Override
-  public boolean accept(final JobEvent event) {
+  public boolean test(final JobEvent event) {
     return m_eventTypes.contains(event.getType());
   }
 }

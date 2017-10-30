@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.platform.inventory;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,10 +24,10 @@ import org.slf4j.LoggerFactory;
 public class FilteredClassInventory<T> {
   private static final Logger LOG = LoggerFactory.getLogger(FilteredClassInventory.class);
 
-  private final IFilter<IClassInfo> m_filter;
+  private final Predicate<IClassInfo> m_filter;
   private final Class<?> m_inventoryType;
 
-  public FilteredClassInventory(IFilter<IClassInfo> filter, Class<?> clazz) {
+  public FilteredClassInventory(Predicate<IClassInfo> filter, Class<?> clazz) {
     m_filter = filter;
     m_inventoryType = clazz;
   }
@@ -39,7 +39,7 @@ public class FilteredClassInventory<T> {
     Set<IClassInfo> allClasses = findClasses();
     Set<Class<? extends T>> filteredClasses = new HashSet<>(allClasses.size());
     for (IClassInfo ci : allClasses) {
-      if (m_filter.accept(ci)) {
+      if (m_filter.test(ci)) {
         try {
           @SuppressWarnings("unchecked")
           Class<? extends T> clazz = (Class<? extends T>) ci.resolveClass();

@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.client.ui.tile;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.job.ModelJobs;
@@ -20,7 +21,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
@@ -87,7 +87,7 @@ public class TileDataLoadManager {
         .andMatchFuture(futures).toFilter(), true);
   }
 
-  public static class JobExcludeCurrentByIdentifierFilter implements IFilter<IFuture<?>> {
+  public static class JobExcludeCurrentByIdentifierFilter implements Predicate<IFuture<?>> {
 
     private final String m_asyncLoadIdentifierName;
     private final String m_windowIdentifier;
@@ -98,7 +98,7 @@ public class TileDataLoadManager {
     }
 
     @Override
-    public boolean accept(final IFuture<?> future) {
+    public boolean test(final IFuture<?> future) {
       JobInput jobInput = future.getJobInput();
       return jobInput != null
           && ObjectUtility.equals(future.getJobInput().getName(), ITiles.PROP_ASYNC_LOAD_JOBNAME_PREFIX)

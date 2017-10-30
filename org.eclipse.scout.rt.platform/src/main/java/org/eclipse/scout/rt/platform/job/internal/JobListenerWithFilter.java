@@ -10,7 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
+import java.util.function.Predicate;
+
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.slf4j.Logger;
@@ -21,16 +22,16 @@ class JobListenerWithFilter implements IJobListener {
   private static final Logger LOG = LoggerFactory.getLogger(JobListenerWithFilter.class);
 
   private final IJobListener m_listener;
-  private final IFilter<JobEvent> m_filter;
+  private final Predicate<JobEvent> m_filter;
 
-  JobListenerWithFilter(final IJobListener listener, final IFilter<JobEvent> filter) {
+  JobListenerWithFilter(final IJobListener listener, final Predicate<JobEvent> filter) {
     m_listener = listener;
     m_filter = filter;
   }
 
   @Override
   public void changed(final JobEvent event) {
-    if (m_filter == null || m_filter.accept(event)) {
+    if (m_filter == null || m_filter.test(event)) {
       try {
         m_listener.changed(event);
       }
@@ -48,7 +49,7 @@ class JobListenerWithFilter implements IJobListener {
     return m_listener;
   }
 
-  public IFilter<JobEvent> getFilter() {
+  public Predicate<JobEvent> getFilter() {
     return m_filter;
   }
 }

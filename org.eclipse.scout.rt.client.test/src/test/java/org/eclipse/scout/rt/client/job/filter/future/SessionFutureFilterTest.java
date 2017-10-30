@@ -34,19 +34,19 @@ public class SessionFutureFilterTest {
     SessionFutureFilter filter = new SessionFutureFilter(session1);
 
     // Tests a Future of a job  without RunContext
-    assertFalse(filter.accept(Jobs.schedule(mock(IRunnable.class), Jobs.newInput())));
+    assertFalse(filter.test(Jobs.schedule(mock(IRunnable.class), Jobs.newInput())));
 
     // Tests a Future of a job  with RunContext
-    assertFalse(filter.accept(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(RunContexts.empty()))));
+    assertFalse(filter.test(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(RunContexts.empty()))));
 
     // Tests a Future of a job  with ClientRunContext without session
-    assertFalse(filter.accept(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty()))));
+    assertFalse(filter.test(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty()))));
 
     // Tests a Future of a job  with ClientRunContext with correct session
-    assertTrue(filter.accept(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(session1, false)))));
+    assertTrue(filter.test(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(session1, false)))));
 
     // Tests a Future of a job  with ClientRunContext with wrong session
-    assertFalse(filter.accept(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(session2, false)))));
+    assertFalse(filter.test(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(session2, false)))));
 
     // Test adaptable to the session
     assertSame(session1, filter.getAdapter(ISession.class));

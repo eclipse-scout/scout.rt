@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.platform.job.filter.future;
 
 import java.util.Set;
+import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  *
  * @since 5.1
  */
-public class JobNameFutureFilter implements IFilter<IFuture<?>> {
+public class JobNameFutureFilter implements Predicate<IFuture<?>> {
 
   private final Set<String> m_names;
 
@@ -30,7 +30,7 @@ public class JobNameFutureFilter implements IFilter<IFuture<?>> {
   }
 
   @Override
-  public boolean accept(final IFuture<?> future) {
+  public boolean test(final IFuture<?> future) {
     return m_names.contains(future.getJobInput().getName());
   }
 }

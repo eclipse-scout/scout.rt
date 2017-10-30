@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.platform.job.filter.future;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
 
@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.job.JobState;
  *
  * @since 5.2
  */
-public class JobStateFutureFilter implements IFilter<IFuture<?>> {
+public class JobStateFutureFilter implements Predicate<IFuture<?>> {
 
   private final Set<JobState> m_states;
 
@@ -32,7 +32,7 @@ public class JobStateFutureFilter implements IFilter<IFuture<?>> {
   }
 
   @Override
-  public boolean accept(final IFuture<?> future) {
+  public boolean test(final IFuture<?> future) {
     return m_states.contains(future.getState());
   }
 }

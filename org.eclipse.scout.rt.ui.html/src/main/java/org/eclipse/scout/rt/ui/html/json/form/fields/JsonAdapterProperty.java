@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.ui.html.json.form.fields;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
@@ -25,7 +25,7 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
   private final IUiSession m_uiSession;
   private final boolean m_global;
   private final boolean m_disposeOnChange;
-  private final IFilter<Object> m_filter;
+  private final Predicate<Object> m_filter;
   private final Set<IJsonAdapter> m_ownedAdapters = new HashSet<>();
 
   public JsonAdapterProperty(String propertyName, MODEL_ELEMENT model, IUiSession session) {
@@ -53,7 +53,7 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
     return m_disposeOnChange;
   }
 
-  protected IFilter<Object> getFilter() {
+  protected Predicate<Object> getFilter() {
     return m_filter;
   }
 

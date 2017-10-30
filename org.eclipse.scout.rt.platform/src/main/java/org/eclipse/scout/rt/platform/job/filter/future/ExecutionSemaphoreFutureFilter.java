@@ -10,7 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.filter.future;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
+import java.util.function.Predicate;
+
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -20,7 +21,7 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
  *
  * @since 5.1
  */
-public class ExecutionSemaphoreFutureFilter implements IFilter<IFuture<?>> {
+public class ExecutionSemaphoreFutureFilter implements Predicate<IFuture<?>> {
 
   private final IExecutionSemaphore m_semaphore;
 
@@ -29,7 +30,7 @@ public class ExecutionSemaphoreFutureFilter implements IFilter<IFuture<?>> {
   }
 
   @Override
-  public boolean accept(final IFuture<?> future) {
+  public boolean test(final IFuture<?> future) {
     return ObjectUtility.equals(m_semaphore, future.getJobInput().getExecutionSemaphore());
   }
 }

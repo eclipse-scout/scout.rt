@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.platform;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 
@@ -70,17 +70,17 @@ public final class BEANS {
   }
 
   /**
-   * Gets all not replaced beans of the given beanClazz that are accepted by the given {@link IFilter}.<br>
+   * Gets all not replaced beans of the given beanClazz that are accepted by the given {@link Predicate}.<br>
    * See {@link IBeanManager#getBeans(Class)} for more details.
    *
    * @return All instances of this type ordered by {@link Order} annotation value. Never returns <code>null</code>.
    */
-  public static <T> List<T> all(Class<T> beanClazz, IFilter<T> filter) {
+  public static <T> List<T> all(Class<T> beanClazz, Predicate<T> filter) {
     List<IBean<T>> beans = Platform.get().getBeanManager().getBeans(beanClazz);
     List<T> instances = new ArrayList<>(beans.size());
     for (IBean<T> bean : beans) {
       T instance = bean.getInstance();
-      if (instance != null && (filter == null || filter.accept(instance))) {
+      if (instance != null && (filter == null || filter.test(instance))) {
         instances.add(instance);
       }
     }

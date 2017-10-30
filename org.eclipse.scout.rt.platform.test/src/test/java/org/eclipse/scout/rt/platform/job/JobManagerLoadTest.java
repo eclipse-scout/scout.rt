@@ -17,8 +17,8 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -40,7 +40,7 @@ public class JobManagerLoadTest {
 
   @Test(timeout = 20_000)
   public void testImmediateExecuting() {
-    IFilter<IFuture<?>> filter = Jobs.newFutureFilterBuilder()
+    Predicate<IFuture<?>> filter = Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(JOB_IDENTIFIER)
         .toFilter();
 
@@ -68,7 +68,7 @@ public class JobManagerLoadTest {
 
   @Test(timeout = 20_000)
   public void testDelayedExecuting() {
-    IFilter<IFuture<?>> filter = Jobs.newFutureFilterBuilder()
+    Predicate<IFuture<?>> filter = Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(JOB_IDENTIFIER)
         .toFilter();
 

@@ -15,8 +15,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -61,10 +61,10 @@ public class ExecutionHintFutureFilterTest {
             future4)
         .toFilter(), 10, TimeUnit.SECONDS);
 
-    IFilter<IFuture<?>> filter = new ExecutionHintFutureFilter("ui-interaction-required");
-    assertTrue(filter.accept(future1)); // hint added by job input
-    assertFalse(filter.accept(future2)); // hint is removed while running
-    assertTrue(filter.accept(future3)); // hint added while running
-    assertFalse(filter.accept(future4));
+    Predicate<IFuture<?>> filter = new ExecutionHintFutureFilter("ui-interaction-required");
+    assertTrue(filter.test(future1)); // hint added by job input
+    assertFalse(filter.test(future2)); // hint is removed while running
+    assertTrue(filter.test(future3)); // hint added while running
+    assertFalse(filter.test(future4));
   }
 }

@@ -10,7 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.filter.event;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
+import java.util.function.Predicate;
+
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.IAdaptable;
@@ -22,22 +23,22 @@ import org.eclipse.scout.rt.platform.util.IAdaptable;
  *
  * @since 5.1
  */
-public class FutureFilterWrapperJobEventFilter implements IFilter<JobEvent>, IAdaptable {
+public class FutureFilterWrapperJobEventFilter implements Predicate<JobEvent>, IAdaptable {
 
-  private final IFilter<IFuture<?>> m_futureFilterDelegate;
+  private final Predicate<IFuture<?>> m_futureFilterDelegate;
 
-  public FutureFilterWrapperJobEventFilter(final IFilter<IFuture<?>> futureFilterDelegate) {
+  public FutureFilterWrapperJobEventFilter(final Predicate<IFuture<?>> futureFilterDelegate) {
     m_futureFilterDelegate = futureFilterDelegate;
   }
 
   @Override
-  public final boolean accept(final JobEvent event) {
+  public final boolean test(final JobEvent event) {
     final IFuture<?> future = event.getData().getFuture();
     if (future == null) {
       return false;
     }
     else {
-      return m_futureFilterDelegate.accept(future);
+      return m_futureFilterDelegate.test(future);
     }
   }
 

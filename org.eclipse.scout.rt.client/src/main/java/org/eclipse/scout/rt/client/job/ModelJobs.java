@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.job;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
@@ -20,7 +21,6 @@ import org.eclipse.scout.rt.client.job.filter.event.ModelJobEventFilter;
 import org.eclipse.scout.rt.client.job.filter.future.ModelJobFutureFilter;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -115,7 +115,7 @@ public final class ModelJobs {
    *   ...
    * </pre>
    *
-   * @see {@link IJobManager#awaitDone(IFilter, long, TimeUnit)}
+   * @see {@link IJobManager#awaitDone(Predicate, long, TimeUnit)}
    */
   public static final String EXECUTION_HINT_UI_INTERACTION_REQUIRED = "ui.interaction.required";
 

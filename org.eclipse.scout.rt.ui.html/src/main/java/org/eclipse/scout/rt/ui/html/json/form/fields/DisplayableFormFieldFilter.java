@@ -10,13 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.platform.filter.IFilter;
+import java.util.function.Predicate;
 
-public class DisplayableFormFieldFilter<T extends IFormField> implements IFilter<T> {
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+
+public class DisplayableFormFieldFilter<T extends IFormField> implements Predicate<T> {
 
   @Override
-  public boolean accept(T element) {
+  public boolean test(T element) {
     return element.isVisibleGranted();
   }
 

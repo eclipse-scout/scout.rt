@@ -10,7 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.job.filter.event;
 
-import org.eclipse.scout.rt.platform.filter.IFilter;
+import java.util.function.Predicate;
+
 import org.eclipse.scout.rt.platform.job.filter.event.FutureFilterWrapperJobEventFilter;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.IAdaptable;
@@ -22,7 +23,7 @@ import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
  *
  * @since 5.2
  */
-public class SessionJobEventFilter implements IFilter<JobEvent>, IAdaptable {
+public class SessionJobEventFilter implements Predicate<JobEvent>, IAdaptable {
 
   private final FutureFilterWrapperJobEventFilter m_futureFilterDelegate;
 
@@ -31,8 +32,8 @@ public class SessionJobEventFilter implements IFilter<JobEvent>, IAdaptable {
   }
 
   @Override
-  public boolean accept(final JobEvent event) {
-    return m_futureFilterDelegate.accept(event);
+  public boolean test(final JobEvent event) {
+    return m_futureFilterDelegate.test(event);
   }
 
   @Override
