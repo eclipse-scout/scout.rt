@@ -868,7 +868,8 @@ scout.Desktop.prototype.hideForm = function(form) {
 };
 
 scout.Desktop.prototype.activateForm = function(form) {
-  form.displayParent.formController.activateForm(form);
+  var displayParent = form.displayParent || this;
+  displayParent.formController.activateForm(form);
   this._setFormActivated(form);
 
   // If the form has a modal child dialog, this dialog needs to be activated as well.
