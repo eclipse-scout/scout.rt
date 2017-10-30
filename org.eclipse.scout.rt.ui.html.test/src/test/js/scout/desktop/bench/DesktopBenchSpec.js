@@ -80,7 +80,6 @@ describe("DesktopBench", function() {
     });
 
     it("preserves desktop.inBackground when updating outline content", function() {
-
       // select node 0 (which will be in foreground)
       outline.selectNodes(outline.nodes[0]);
       expect(desktop.inBackground).toBeFalsy();
@@ -110,7 +109,6 @@ describe("DesktopBench", function() {
     });
 
     it("preserves desktop.inBackground when switching nodes", function() {
-
       // select node 0 (which will be in foreground)
       outline.selectNodes(outline.nodes[0]);
       expect(desktop.inBackground).toBeFalsy();
