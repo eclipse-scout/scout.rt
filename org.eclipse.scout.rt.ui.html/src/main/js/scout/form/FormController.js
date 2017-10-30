@@ -246,11 +246,16 @@ scout.FormController.prototype._removeDialog = function(dialog, unregister) {
 };
 
 scout.FormController.prototype._activateView = function(view) {
-  this.session.desktop.bench.activateView(view);
+  var bench = this.session.desktop.bench;
+  if (bench) {
+    // Bench may be null (e.g. in mobile mode). This may probably only happen if the form is not really a view, because otherwise the bench would already be open.
+    // Example: form of a FormToolButton has display style set to view but is opened as menu popup rather than in the bench.
+    // So this null check is actually a workaround because a better solution would be to never call this function for fake views, but currently it is not possible to identify them easily.
+    bench.activateView(view);
+  }
 };
 
 scout.FormController.prototype._activateDialog = function(dialog) {
-
   // If the display-parent is a view-form --> activate it always.
   // If it is another dialog --> activate it only if the dialog to activate is modal
   if (dialog.displayParent instanceof scout.Form &&
