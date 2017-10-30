@@ -1062,6 +1062,18 @@ describe('Desktop', function() {
         expect(desktop.headerVisible).toBe(false);
       });
 
+      it('does not bring activateForm to fail for fake views', function() {
+        var form = formHelper.createFormWithOneField();
+        form.displayHint = scout.Form.DisplayHint.VIEW;
+        scout.create('FormMenu', {
+          parent: desktop,
+          form: form
+        });
+
+        // Does not really work (meaning menu is not selected) but must not throw an exception either
+        form.activate();
+      });
+
     });
   });
 
