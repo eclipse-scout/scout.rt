@@ -24,23 +24,12 @@ scout.DesktopFormController.instanceCounter = 0;
 
 scout.DesktopFormController.prototype.render = function() {
   scout.DesktopFormController.parent.prototype.render.call(this);
-  // find active form and set selected.
-  var selectable;
-  if (this.desktop.activeForm) {
-    var form = this.desktop.activeForm;
-    if (form.isDialog()) {
-      // find ui selectable part
-      selectable = this._findActiveSelectablePart(form);
-    } else if (form.isView()) {
-      selectable = form;
-    }
-  }
-  if (!selectable) {
+  var activeForm = this.desktop.activeForm;
+  if (activeForm) {
+    activeForm.activate();
+  } else {
     this.desktop.bringOutlineToFront();
-  } else if (this.desktop.bench) {
-    this.desktop.bench.activateView(selectable);
   }
-
 };
 
 scout.DesktopFormController.prototype._renderViews = function() {
@@ -58,20 +47,6 @@ scout.DesktopFormController.prototype._renderViews = function() {
     // ensure layout is done before continuing rendering dialogs.
     this.desktop.bench.htmlComp.validateLayoutTree();
   }
-};
-
-/**
- * Goes up in display hierarchy to find the form to select on desktop. null if outline is selected.
- */
-scout.DesktopFormController.prototype._findActiveSelectablePart = function(form) {
-  if (form.parent.isView && form.parent.isDialog) {
-    if (form.parent.isView()) {
-      return form.parent;
-    } else if (form.parent.isDialog()) {
-      return this._findActiveSelectablePart(form.parent);
-    }
-  }
-  return null;
 };
 
 /**
