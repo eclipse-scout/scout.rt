@@ -586,7 +586,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   /**
    * @param kill
-   *          true if a widget close icon (normally the X on the titlebar) was pressed or ESC was pressed
+   *          true if the form should be closed immediately (no matter what system button was pressed)
    * @param enabledButtonSystemTypes
    *          set of all <code>IButton#SYSTEM_TYPE_*</code> of all enabled and visible buttons of this form (never
    *          <code>null</code>)
@@ -594,7 +594,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @ConfigOperation
   @Order(18)
   protected void execOnCloseRequest(boolean kill, Set<Integer> enabledButtonSystemTypes) {
-    if (enabledButtonSystemTypes.contains(IButton.SYSTEM_TYPE_CLOSE)) {
+    if (kill || enabledButtonSystemTypes.contains(IButton.SYSTEM_TYPE_CLOSE)) {
       doClose();
     }
     else {

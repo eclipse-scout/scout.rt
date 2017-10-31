@@ -23,6 +23,16 @@ scout.FormAdapter.prototype._initModel = function(model, parent) {
   return model;
 };
 
+scout.FormAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'abort') {
+    this._onWidgetAbort(event);
+  } else if (event.type === 'close') {
+    this._onWidgetClose(event);
+  } else {
+    scout.FormAdapter.parent.prototype._onWidgetEvent.call(this, event);
+  }
+};
+
 scout.FormAdapter.prototype._onWidgetAbort = function(event) {
   // Do not close the form immediately, server will send the close event
   event.preventDefault();
@@ -30,12 +40,8 @@ scout.FormAdapter.prototype._onWidgetAbort = function(event) {
   this._send('formClosing');
 };
 
-scout.FormAdapter.prototype._onWidgetEvent = function(event) {
-  if (event.type === 'abort') {
-    this._onWidgetAbort(event);
-  } else {
-    scout.FormAdapter.parent.prototype._onWidgetEvent.call(this, event);
-  }
+scout.FormAdapter.prototype._onWidgetClose = function(event) {
+  this._send('close');
 };
 
 scout.FormAdapter.prototype.onModelAction = function(event) {

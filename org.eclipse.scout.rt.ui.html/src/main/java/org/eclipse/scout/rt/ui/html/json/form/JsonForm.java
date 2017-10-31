@@ -51,6 +51,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
   public static final String PROP_INITIAL_FOCUS = "initialFocus";
 
   public static final String EVENT_FORM_CLOSING = "formClosing";
+  public static final String EVENT_CLOSE = "close";
   public static final String EVENT_REQUEST_FOCUS = "requestFocus";
   public static final String EVENT_REQUEST_INPUT = "requestInput";
 
@@ -311,10 +312,23 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
     if (EVENT_FORM_CLOSING.equals(event.getType())) {
       handleUiFormClosing(event);
     }
+    else if (EVENT_CLOSE.equals(event.getType())) {
+      handleUiClose(event);
+    }
   }
 
   public void handleUiFormClosing(JsonEvent event) {
     getModel().getUIFacade().fireFormClosingFromUI();
+  }
+
+  public void handleUiClose(JsonEvent event) {
+    // Dispose the form adapter. This prevents "formHide" and "disposeAdapter" events
+    // to be sent back to the UI. Because the "close" event is only sent when the form
+    // is already destroyed in the UI, those events would cause errors in the UI.
+    dispose();
+    // Close the form in the model, without possibility of a veto. This will not
+    // generate any UI events, because the JsonForm adapter is already disposed.
+    getModel().getUIFacade().fireFormKilledFromUI();
   }
 
   protected class P_FormListener implements FormListener {
