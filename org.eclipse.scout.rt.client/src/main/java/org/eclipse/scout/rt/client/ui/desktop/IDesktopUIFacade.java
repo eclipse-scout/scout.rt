@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.desktop;
 
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 
@@ -66,6 +67,8 @@ public interface IDesktopUIFacade {
    * GUI fires this event when the application/workbench is closing
    */
   void fireGuiDetached();
+
+  void activateForm(IForm form);
 
   /**
    * GUI fires this event when user clicks on back/forward button in the navigation history of the browser.

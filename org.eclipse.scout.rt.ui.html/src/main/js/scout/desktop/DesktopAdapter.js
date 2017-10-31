@@ -40,7 +40,10 @@ scout.DesktopAdapter.prototype._sendFormActivated = function(form) {
 
   this._send('formActivated', eventData, {
     coalesce: function(previous) {
-      return this.target === previous.target && this.type === previous.type;
+      // Do not coalesce if formId was set to null by the previous event,
+      // this is the only way the server knows that the desktop was brought to front
+      return this.target === previous.target && this.type === previous.type &&
+        !(previous.formId === null && this.formId !== null);
     }
   });
 };

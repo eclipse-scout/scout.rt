@@ -175,7 +175,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   protected void handleUiFormActivated(JsonEvent event) {
     String formId = event.getData().optString("formId", null);
     if (formId == null) {
-      getModel().activateForm(null);
+      getModel().getUIFacade().activateForm(null);
       return;
     }
     IJsonAdapter<?> jsonAdapter = getUiSession().getJsonAdapter(formId);
@@ -186,7 +186,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     }
     IForm form = (IForm) jsonAdapter.getModel();
     addDesktopEventFilterCondition(DesktopEvent.TYPE_FORM_ACTIVATE).setForm(form);
-    getModel().activateForm(form);
+    getModel().getUIFacade().activateForm(form);
   }
 
   protected DesktopEventFilterCondition addDesktopEventFilterCondition(int tableEventType) {
