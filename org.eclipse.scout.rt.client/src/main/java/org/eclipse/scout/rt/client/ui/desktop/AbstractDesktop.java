@@ -2419,6 +2419,17 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     }
 
     @Override
+    public void activateForm(IForm form) {
+      if (form == null) {
+        // If form is null, outline is in front -> no view of the center area is selected anymore
+        // It is done here and not in activateForm itself because activateForm is called by hideForm() too,
+        // but in that case the outline may be still in the background
+        m_selectedViewTabs.remove(IForm.VIEW_ID_CENTER);
+      }
+      AbstractDesktop.this.activateForm(form);
+    }
+
+    @Override
     public void setNavigationVisibleFromUI(boolean visible) {
       setNavigationVisible(visible);
     }
