@@ -128,7 +128,7 @@ scout.DesktopFormController.prototype._onPopupWindowUnload = function(popupWindo
   var form = popupWindow.form;
   $.log.debug('Popup window for form ID ' + form.id + ' is unloaded - don\'t know if its closed or reloaded yet');
 
-  // this remove() is important: when a popup-window in IEis closed all references to a HTMLDivElement become
+  // this remove() is important: when a popup-window in IE is closed, all references to a HTMLDivElement become
   // invalid. Every call or read on such invalid objects will cause an Error. Even though the DOM element
   // is invalid, the JQuery object which references the DOM element is still alive and occupies memory. That's
   // why we must remove JQuery objects _before_ the popup-window is closed finally.
@@ -137,6 +137,7 @@ scout.DesktopFormController.prototype._onPopupWindowUnload = function(popupWindo
   // must do this with setTimeout because at this point window is always still open
   // Note: timeout with 0 milliseconds will not work
   setTimeout(function() {
+    // Check if popup is closed (when the unload event was triggered by page reload it will still be open)
     if (popupWindow.isClosed()) {
       $.log.debug('Popup window for form ID ' + form.id + ' has been closed');
       form.close();
