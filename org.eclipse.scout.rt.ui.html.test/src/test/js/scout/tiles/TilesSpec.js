@@ -269,4 +269,162 @@ describe("Tiles", function() {
       expect(tiles.selectedTiles.length).toBe(0);
     });
   });
+
+  describe('mouseDown', function() {
+
+    describe('with multiSelect = false', function() {
+
+      it('on a deselected tile selects the tile', function() {
+        var tiles = createTiles(3, {
+          selectable: true
+        });
+        tiles.render();
+        var tile0 = tiles.tiles[0];
+
+        tile0.$container.triggerMouseDown();
+        expect(tile0.selected).toBe(true);
+        expect(tiles.selectedTiles.length).toBe(1);
+      });
+
+      it('on a deselected tile selects the tile and unselects others', function() {
+        var tiles = createTiles(3, {
+          selectable: true
+        });
+        tiles.render();
+        var tile0 = tiles.tiles[0];
+        var tile1 = tiles.tiles[1];
+        tiles.selectTile(tile1);
+        expect(tile1.selected).toBe(true);
+
+        tile0.$container.triggerMouseDown();
+        expect(tile0.selected).toBe(true);
+        expect(tile1.selected).toBe(false);
+        expect(tiles.selectedTiles.length).toBe(1);
+      });
+
+      it('on a selected tile deselects the tile', function() {
+        var tiles = createTiles(3, {
+          selectable: true
+        });
+        tiles.render();
+        var tile0 = tiles.tiles[0];
+        tiles.selectTile(tile0);
+        expect(tile0.selected).toBe(true);
+
+        tile0.$container.triggerMouseDown();
+        expect(tile0.selected).toBe(false);
+        expect(tiles.selectedTiles.length).toBe(0);
+      });
+
+    });
+
+    describe('with multiSelect = true', function() {
+
+      it('on a deselected tile selects the tile', function() {
+        var tiles = createTiles(3, {
+          selectable: true,
+          multiSelect: true
+        });
+        tiles.render();
+        var tile0 = tiles.tiles[0];
+
+        tile0.$container.triggerMouseDown();
+        expect(tile0.selected).toBe(true);
+        expect(tiles.selectedTiles.length).toBe(1);
+      });
+
+      it('on a deselected tile selects the tile and unselects others', function() {
+        var tiles = createTiles(3, {
+          selectable: true,
+          multiSelect: true
+        });
+        tiles.render();
+        var tile0 = tiles.tiles[0];
+        var tile1 = tiles.tiles[1];
+        tiles.selectTile(tile1);
+        expect(tile1.selected).toBe(true);
+
+        tile0.$container.triggerMouseDown();
+        expect(tile0.selected).toBe(true);
+        expect(tile1.selected).toBe(false);
+        expect(tiles.selectedTiles.length).toBe(1);
+      });
+
+      it('on a selected tile deselects the tile', function() {
+        var tiles = createTiles(3, {
+          selectable: true,
+          multiSelect: true
+        });
+        tiles.render();
+        var tile0 = tiles.tiles[0];
+        tiles.selectTile(tile0);
+        expect(tile0.selected).toBe(true);
+
+        tile0.$container.triggerMouseDown();
+        expect(tile0.selected).toBe(false);
+        expect(tiles.selectedTiles.length).toBe(0);
+      });
+
+      it('on a selected tile keeps the selection but deselects others if other tiles are selected', function() {
+        var tiles = createTiles(3, {
+          selectable: true,
+          multiSelect: true
+        });
+        tiles.render();
+        var tile0 = tiles.tiles[0];
+        var tile1 = tiles.tiles[1];
+        tiles.selectTiles([tile0, tile1]);
+        expect(tile0.selected).toBe(true);
+        expect(tile1.selected).toBe(true);
+
+        tile0.$container.triggerMouseDown();
+        expect(tile0.selected).toBe(true);
+        expect(tile1.selected).toBe(false);
+        expect(tiles.selectedTiles.length).toBe(1);
+      });
+
+      describe('with CTRL pressed', function() {
+
+        it('on a deselected tile adds the tile to the selection', function() {
+          var tiles = createTiles(3, {
+            selectable: true,
+            multiSelect: true
+          });
+          tiles.render();
+          var tile0 = tiles.tiles[0];
+          var tile1 = tiles.tiles[1];
+          tiles.selectTile(tile1);
+          expect(tile0.selected).toBe(false);
+          expect(tile1.selected).toBe(true);
+
+          tile0.$container.triggerMouseDown({modifier: 'ctrl'});
+          expect(tile0.selected).toBe(true);
+          expect(tile1.selected).toBe(true);
+          expect(tiles.selectedTiles.length).toBe(2);
+        });
+
+        it('on a selected tile removes the tile from the selection', function() {
+          var tiles = createTiles(3, {
+            selectable: true,
+            multiSelect: true
+          });
+          tiles.render();
+          var tile0 = tiles.tiles[0];
+          var tile1 = tiles.tiles[1];
+          tiles.selectTiles([tile0, tile1]);
+          expect(tile0.selected).toBe(true);
+          expect(tile1.selected).toBe(true);
+
+          tile0.$container.triggerMouseDown({modifier: 'ctrl'});
+          expect(tile0.selected).toBe(false);
+          expect(tile1.selected).toBe(true);
+          expect(tiles.selectedTiles.length).toBe(1);
+        });
+
+      });
+
+    });
+
+  });
+
 });

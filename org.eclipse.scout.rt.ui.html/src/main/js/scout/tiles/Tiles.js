@@ -28,7 +28,6 @@ scout.Tiles = function() {
   this.scrollable = true;
   this.tiles = [];
   this._filterMenusHandler = this._filterMenus.bind(this);
-  this._tilePropertyChangeHandler = this._onTilePropertyChange.bind(this);
   this._addWidgetProperties(['tiles', 'selectedTiles', 'menus']);
   this._addPreserveOnPropertyChangeProperties(['selectedTiles']);
 };
@@ -55,20 +54,8 @@ scout.Tiles.prototype._initTiles = function() {
 };
 
 scout.Tiles.prototype._initTile = function(tile) {
-  this._attachTile(tile);
   tile.setSelectable(this.selectable);
   tile.setSelected(this.selectedTiles.indexOf(tile) >= 0);
-};
-
-scout.Tiles.prototype._destroy = function() {
-  this._destroyTiles();
-  scout.Tiles.parent.prototype._destroy.call(this);
-};
-
-scout.Tiles.prototype._destroyTiles = function() {
-  this.tiles.forEach(function(tile) {
-    this._detachTile(tile);
-  }, this);
 };
 
 scout.Tiles.prototype._render = function() {
@@ -164,10 +151,6 @@ scout.Tiles.prototype._insertTiles = function(tiles) {
   }
 };
 
-scout.Tiles.prototype._attachTile = function(tile) {
-  tile.on('propertyChange', this._tilePropertyChangeHandler);
-};
-
 scout.Tiles.prototype._renderTile = function(tile) {
   tile.render();
   tile.setLayoutData(new scout.LogicalGridData(tile));
@@ -179,7 +162,6 @@ scout.Tiles.prototype._deleteTiles = function(tiles) {
   }
 
   tiles.forEach(function(tile) {
-    this._detachTile(tile);
     if (this.rendered) {
       if (this._animateTileRemoval(tile)) {
         // Animate tile removal, but not while layouting when tile placeholders are added or removed
@@ -221,36 +203,6 @@ scout.Tiles.prototype.invalidateLayoutTree = function() {
     return;
   }
   scout.Tiles.parent.prototype.invalidateLayoutTree.call(this);
-};
-
-scout.Tiles.prototype._detachTile = function(tile) {
-  tile.off('propertyChange', this._tilePropertyChangeHandler);
-};
-
-scout.Tiles.prototype._onTilePropertyChange = function(event) {
-  if (event.propertyName === 'selected') {
-    this._onTileSelected(event);
-  }
-};
-
-scout.Tiles.prototype._onTileSelected = function(event) {
-  if (!this.selectable) {
-    event.preventDefault();
-    return;
-  }
-
-  var tile = event.source;
-  var selected = event.newValue;
-  if (this.multiSelect && selected) {
-    this.addTilesToSelection(event.source);
-    return;
-  }
-
-  if (selected) {
-    this.selectTile(tile);
-  } else {
-    this.deselectTile(tile);
-  }
 };
 
 scout.Tiles.prototype.setGridColumnCount = function(gridColumnCount) {
@@ -493,6 +445,9 @@ scout.Tiles.prototype._renderSelectable = function() {
   this.invalidateLayoutTree();
 };
 
+/**
+ * Selects the given tiles and deselects the previously selected ones.
+ */
 scout.Tiles.prototype.selectTiles = function(tiles) {
   tiles = scout.arrays.ensure(tiles);
   tiles = this._prepareWidgetProperty('selectedTiles', tiles);
@@ -501,9 +456,7 @@ scout.Tiles.prototype.selectTiles = function(tiles) {
   var tilesToUnselect = this.selectedTiles;
   scout.arrays.removeAll(tilesToUnselect, tiles);
   tilesToUnselect.forEach(function(tile) {
-    this._detachTile(tile);
     tile.setSelected(false);
-    this._attachTile(tile);
   }, this);
 
   if (!this.selectable) {
@@ -517,9 +470,7 @@ scout.Tiles.prototype.selectTiles = function(tiles) {
 
   // Select the tiles
   tiles.forEach(function(tile) {
-    this._detachTile(tile);
     tile.setSelected(true);
-    this._attachTile(tile);
   }, this);
 
   this.setProperty('selectedTiles', tiles.slice());
@@ -559,11 +510,50 @@ scout.Tiles.prototype.addTileToSelection = function(tile) {
 };
 
 scout.Tiles.prototype._onTileMouseDown = function(event) {
+  this._selectTileOnMouseDown(event);
+
   if (event.which === 3) {
     this.showContextMenu({
       pageX: event.pageX,
       pageY: event.pageY
     });
     return false;
+  }
+};
+
+scout.Tiles.prototype._selectTileOnMouseDown = function(event) {
+  if (!this.selectable) {
+    return;
+  }
+  if (this.selected && event.which === 3) {
+    // Do not toggle if context menus should be shown and tile already is selected
+    return;
+  }
+
+  var $tile = $(event.currentTarget);
+  var tile = $tile.data('widget');
+
+  // Click on a tile toggles the selection ...
+  var selected = !tile.selected;
+  if (tile.selected && this.selectedTiles.length > 1 && !event.ctrlKey) {
+    // ... but if multiple tiles are selected, click on an already selected tile deselects every other tile but keeps the selection of the clicked one
+    selected = true;
+  }
+
+  // CTRL click on a tile adds or removes that tile to or from the selection
+  if (this.multiSelect && event.ctrlKey) {
+    if (selected) {
+      this.addTilesToSelection(tile);
+    } else {
+      this.deselectTile(tile);
+    }
+    return;
+  }
+
+  // If multi selection is disabled or no CTRL key is pressed, only the clicked tile may be selected
+  if (selected) {
+    this.selectTile(tile);
+  } else {
+    this.deselectAllTiles();
   }
 };

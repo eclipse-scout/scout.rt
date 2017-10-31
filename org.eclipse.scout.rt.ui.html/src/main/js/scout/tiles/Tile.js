@@ -57,7 +57,6 @@ scout.Tile.prototype._renderProperties = function() {
 
 scout.Tile.prototype._postRender = function() {
   this.$container.addClass('tile');
-  this.$container.on('mousedown', this._onMouseDown.bind(this));
 };
 
 scout.Tile.prototype.setGridDataHints = function(gridData) {
@@ -152,12 +151,4 @@ scout.Tile.prototype._setSelectable = function(selectable) {
 
 scout.Tile.prototype._renderSelectable = function() {
   this.$container.toggleClass('selectable', this.selectable);
-};
-
-scout.Tile.prototype._onMouseDown = function(event) {
-  if (this.selected && event.which === 3) {
-    // Do not toggle if context menus should be shown and tile already is selected
-    return;
-  }
-  this.setSelected(!this.selected);
 };
