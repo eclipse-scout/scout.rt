@@ -837,7 +837,6 @@ public class ColumnSet {
     cell.setSortAscending(ascending);
     rebuildHeaderCell(col);
     fireColumnHeadersUpdated(CollectionUtility.hashSet(col));
-
   }
 
   /**
@@ -863,6 +862,7 @@ public class ColumnSet {
       //only set the grouping property.
       HeaderCell cell = (HeaderCell) col.getHeaderCell();
       cell.setGroupingActive(true);
+      fireColumnHeadersUpdated(CollectionUtility.hashSet(col));
       return;
     }
 
@@ -878,10 +878,6 @@ public class ColumnSet {
       index++;
     }
 
-    if (index == 0) {
-      LOG.warn("Multi grouping event, but no column currently grouped");
-    }
-
     if (!isSortColumn(col)) {
       m_userSortColumns.add(index, col);
       HeaderCell cell = (HeaderCell) col.getHeaderCell();
@@ -890,7 +886,6 @@ public class ColumnSet {
       cell.setGroupingActive(true);
       fireColumnHeadersUpdated(CollectionUtility.hashSet(col));
     }
-
   }
 
   /**
@@ -939,7 +934,6 @@ public class ColumnSet {
     }
 
     fireColumnHeadersUpdated(CollectionUtility.hashSet(col));
-
   }
 
   public void handleGroupingEvent(IColumn col, boolean multiGroup, boolean ascending) {
@@ -968,11 +962,9 @@ public class ColumnSet {
     finally {
       m_table.setTableChanging(false);
     }
-
   }
 
   public void removeGroupColumn(IColumn<?> col) {
-
     col = resolveColumn(col);
     if (col == null) {
       return;
@@ -1002,7 +994,6 @@ public class ColumnSet {
       cell.setGroupingActive(false);
       removeSortColumn(col);
     }
-
   }
 
   public void setAggregationFunction(INumberColumn<?> col, String f) {
