@@ -48,6 +48,7 @@ import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
@@ -450,6 +451,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
         .andMatch(new SessionFutureFilter(ISession.CURRENT.get()))
         .andMatchNotFuture(IFuture.CURRENT.get())
         .andMatchNot(ModelJobFutureFilter.INSTANCE)
+        .andMatchNotState(JobState.DONE, JobState.REJECTED)
         .toFilter();
 
     // Wait for running jobs to complete before we cancel them
@@ -480,6 +482,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
         .andMatch(new SessionFutureFilter(ISession.CURRENT.get()))
         .andMatchNotFuture(IFuture.CURRENT.get())
         .andMatch(ModelJobFutureFilter.INSTANCE)
+        .andMatchNotState(JobState.DONE, JobState.REJECTED)
         .toFilter());
     if (!runningModelJobs.isEmpty()) {
       LOG.info("Cancel running model jobs because the client session was shut down. [session={}, user={}, jobs={}]", AbstractClientSession.this, getUserId(), runningModelJobs);
