@@ -35,6 +35,10 @@ scout.icons = {
   SUM: 'font:\uE025',
 
   REMOVE: 'font:\uE045',
+  ZOOM_FRAME: 'font:\uE046',
+  ZOOM_FRAME_EMPTY: 'font:\uE047',
+  WINDOW_OUT: 'font:\uE048',
+  WINDOW_IN: 'font:\uE049',
   ROTATE_RIGHT: 'font:\uF01E',
   PENCIL: 'font:\uF040',
   CHEVRON_LEFT: 'font:\uF053',
