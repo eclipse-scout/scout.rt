@@ -10,7 +10,8 @@
  ******************************************************************************/
 scout.Tiles = function() {
   scout.Tiles.parent.call(this);
-  this.initialAnimationDone = false;
+  this.startupAnimationDone = false;
+  this.startupAnimationEnabled = false;
   // GridColumnCount will be modified by the layout, prefGridColumnCount remains unchanged
   this.gridColumnCount = 4;
   this.prefGridColumnCount = this.gridColumnCount;
@@ -91,9 +92,9 @@ scout.Tiles.prototype.insertTile = function(tile) {
   this.insertTiles([tile]);
 };
 
-scout.Tiles.prototype.insertTiles = function(tiles) {
-  tiles = scout.arrays.ensure(tiles);
-  this.setTiles(this.tiles.concat(tiles));
+scout.Tiles.prototype.insertTiles = function(tilesToInsert, appendPlaceholders) {
+  tilesToInsert = scout.arrays.ensure(tilesToInsert);
+  this.setTiles(this.tiles.concat(tilesToInsert), appendPlaceholders);
 };
 
 scout.Tiles.prototype.deleteTile = function(tile) {
@@ -111,7 +112,7 @@ scout.Tiles.prototype.deleteAllTiles = function() {
   this.setTiles([]);
 };
 
-scout.Tiles.prototype.setTiles = function(tiles) {
+scout.Tiles.prototype.setTiles = function(tiles, appendPlaceholders) {
   if (scout.objects.equals(this.tiles, tiles)) {
     return;
   }
@@ -119,12 +120,27 @@ scout.Tiles.prototype.setTiles = function(tiles) {
   // Ensure given tiles are real tiles (of type scout.Tile)
   tiles = this._createChildren(tiles);
 
+  if (scout.nvl(appendPlaceholders, true)) {
+    // Remove placeholders from new tiles, they will be added later
+    this._deletePlaceholders(tiles);
+  }
+
+  var tilesToInsert = tiles.slice();
+  scout.arrays.removeAll(tilesToInsert, this.tiles);
+
+  // Append the existing placeholders, otherwise they would be unnecessarily deleted if a tile is deleted
+  if (scout.nvl(appendPlaceholders, true)) {
+    var placeholders = this.placeholders();
+    // But only add as much placeholders as needed: If a new tile is added, it should replace the placeholder underneath.
+    // If this were not done the placeholders would move animated when a new tile is inserted rather than just staying where they are
+    placeholders = placeholders.slice(Math.min(tilesToInsert.length, placeholders.length), placeholders.length);
+    scout.arrays.pushAll(tiles, placeholders);
+  }
+
   // Only delete those which are not in the new array
   // Only insert those which are not already there
   var tilesToDelete = this.tiles.slice();
   scout.arrays.removeAll(tilesToDelete, tiles);
-  var tilesToInsert = tiles.slice();
-  scout.arrays.removeAll(tilesToInsert, this.tiles);
 
   this._deleteTiles(tilesToDelete);
   if (tilesToInsert.length > 0 || tilesToDelete.length > 0) {
@@ -142,6 +158,18 @@ scout.Tiles.prototype._insertTiles = function(tiles) {
     this._initTile(tile);
     if (this.rendered) {
       this._renderTile(tile);
+      tile.$container.addClass('invisible');
+      // Wait until the layout animation is done before animating the insert operation.
+      // Also make them invisible to not cover existing tiles while they are moving or changing size.
+      // Also do it for tiles which don't have an insert animation (e.g. placeholders), due to the same reason.
+      this.one('layoutAnimationDone', function() {
+        if (tile.rendered) {
+          tile.$container.removeClass('invisible');
+          if (this._animateTileInsertion(tile)) {
+            tile.$container.addClassForAnimation('animate-insert');
+          }
+        }
+      }.bind(this));
     }
   }, this);
 
@@ -168,7 +196,7 @@ scout.Tiles.prototype._deleteTiles = function(tiles) {
         tile.animateRemoval = true;
       }
       tile.destroy();
-      this._onTileRemove(tile);
+      this._onTileDestroy(tile);
       tile.animateRemoval = false;
     }
   }, this);
@@ -184,7 +212,11 @@ scout.Tiles.prototype._animateTileRemoval = function(tile) {
   return !(tile instanceof scout.PlaceholderTile);
 };
 
-scout.Tiles.prototype._onTileRemove = function(tile) {
+scout.Tiles.prototype._animateTileInsertion = function(tile) {
+  return !(tile instanceof scout.PlaceholderTile);
+};
+
+scout.Tiles.prototype._onTileDestroy = function(tile) {
   if (!tile.animateRemoval || this.tileRemovalPending) {
     return;
   }
@@ -342,7 +374,16 @@ scout.Tiles.prototype.fillUpWithPlaceholders = function() {
     return;
   }
   this._deleteObsoletePlaceholders();
-  this._insertPlaceholders();
+  this._insertMissingPlaceholders();
+};
+
+scout.Tiles.prototype.tilesWithoutPlaceholders = function() {
+  if (!this.withPlaceholders) {
+    return this.tiles;
+  }
+  return this.tiles.filter(function(tile) {
+    return !(tile instanceof scout.PlaceholderTile);
+  });
 };
 
 scout.Tiles.prototype._createPlaceholders = function() {
@@ -381,13 +422,13 @@ scout.Tiles.prototype._deleteObsoletePlaceholders = function() {
   var tiles = [],
     obsolete = false;
 
-  this.tiles.forEach(function(tile) {
+  this.tiles.forEach(function(tile, index) {
     if (!(tile instanceof scout.PlaceholderTile)) {
       tiles.push(tile);
       return;
     }
-    // Remove all placeholder in the row if there is one at x=0
-    if (tile.gridData.x === 0) {
+    // Remove all placeholder in the row if there is one at x=0 (don't do it if there are only placeholders)
+    if (tile.gridData.x === 0 && index !== 0) {
       obsolete = true;
     }
     if (!obsolete) {
@@ -395,19 +436,55 @@ scout.Tiles.prototype._deleteObsoletePlaceholders = function() {
     }
   }, this);
 
-  this.setTiles(tiles);
+  this.setTiles(tiles, false);
 };
 
 scout.Tiles.prototype._deleteAllPlaceholders = function() {
   var tiles = this.tiles.filter(function(tile) {
     return !(tile instanceof scout.PlaceholderTile);
   });
-  this.setTiles(tiles);
+  this.setTiles(tiles, false);
 };
 
-scout.Tiles.prototype._insertPlaceholders = function() {
+scout.Tiles.prototype.placeholders = function() {
+  var i, placeholders = [];
+  for (i = this.tiles.length - 1; i >= 0; i--) {
+    if (!(this.tiles[i] instanceof scout.PlaceholderTile)) {
+      // Placeholders are always at the end -> we may stop as soon as no more placeholders are found
+      break;
+    }
+    scout.arrays.insert(placeholders, this.tiles[i], 0);
+  }
+  return placeholders;
+};
+
+scout.Tiles.prototype._insertMissingPlaceholders = function() {
   var placeholders = this._createPlaceholders();
-  this.insertTiles(placeholders);
+  this.insertTiles(placeholders, false);
+};
+
+scout.Tiles.prototype._deletePlaceholders = function(tiles) {
+  var i;
+  for (i = tiles.length - 1; i >= 0; i--) {
+    if (tiles[i] instanceof scout.PlaceholderTile) {
+      scout.arrays.remove(tiles, tiles[i]);
+    }
+  }
+};
+
+scout.Tiles.prototype._replacePlaceholders = function(tiles, tilesToInsert) {
+  // Find index of the first tile which is not a placeholder (placeholders are always added at the end, so it is faster if search is done backwards)
+  var index = scout.arrays.findIndexFromReverse(tiles, tiles.length - 1, function(tile) {
+    return !(tile instanceof scout.PlaceholderTile);
+  });
+
+  var numPlaceholders = tiles.length - 1 - index;
+  for (var i = 1; i <= numPlaceholders; i++) {
+    var tile = tiles[index + i];
+    if (tilesToInsert[i - 1] && !(tilesToInsert[i - 1] instanceof scout.PlaceholderTile)) {
+      scout.arrays.remove(tiles, tile);
+    }
+  }
 };
 
 scout.Tiles.prototype.validateLogicalGrid = function() {
@@ -532,6 +609,9 @@ scout.Tiles.prototype._selectTileOnMouseDown = function(event) {
 
   var $tile = $(event.currentTarget);
   var tile = $tile.data('widget');
+  if (tile instanceof scout.PlaceholderTile) {
+    return;
+  }
 
   // Click on a tile toggles the selection ...
   var selected = !tile.selected;

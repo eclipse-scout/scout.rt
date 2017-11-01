@@ -199,22 +199,24 @@
   @keyframes shrink-y { .keyframes-shrink-y(); }
 
 
-  /*** Zoom Bounce ***/
+  /*** Fade In Zoom Bounce ***/
 
-  .keyframes-zoom-bounce() {
+  .keyframes-fadein-zoom-bounce() {
     00% { /* see comment on top */
+      opacity: 0;
       #scout.transform(scale(0.75, 0.75));
     }
-    25% {
-      #scout.transform(scale(1.1, 1.1));
+    65% {
+      opacity: 1;
+      #scout.transform(scale(1.02, 1.02));
     }
     100% {
       #scout.transform(scale(1, 1));
     }
   }
 
-  @-webkit-keyframes zoom-bounce { .keyframes-zoom-bounce(); }
-  @keyframes zoom-bounce { .keyframes-zoom-bounce(); }
+  @-webkit-keyframes fadein-zoom-bounce { .keyframes-fadein-zoom-bounce(); }
+  @keyframes fadein-zoom-bounce { .keyframes-fadein-zoom-bounce(); }
 
   /*** Rotation ***/
 

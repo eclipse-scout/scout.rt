@@ -17,14 +17,13 @@ scout.inherits(scout.TilesLayout, scout.LogicalGridLayout);
 scout.TilesLayout.prototype.layout = function($container) {
   var contentFits;
   var htmlComp = this.widget.htmlComp;
-  // Animate only once initially but animate every time on resize
-  var animated = htmlComp.layouted || !this.widget.initialAnimationDone;
+  // Animate only once on startup (if enabled) but animate every time on resize
+  var animated = htmlComp.layouted || (this.widget.startupAnimationEnabled && !this.widget.startupAnimationDone);
 
   // Store the current position of the tiles
   this.widget.tiles.forEach(function(tile, i) {
-    var pos = scout.graphics.location(tile.$container);
-    tile.$container.data('oldLeft', pos.x);
-    tile.$container.data('oldTop', pos.y);
+    var bounds = scout.graphics.cssBounds(tile.$container);
+    tile.$container.data('oldBounds', bounds);
   }, this);
 
   this._updateMaxContentWidth();
@@ -65,40 +64,85 @@ scout.TilesLayout.prototype.layout = function($container) {
   // Animate the position change of the tiles
   var promises = [];
   this.widget.tiles.forEach(function(tile, i) {
-    var pos = scout.graphics.location(tile.$container),
-      fromLeft = tile.$container.data('oldLeft') || 0,
-      fromTop = tile.$container.data('oldTop') || 0;
-
-    if (!animated) {
-      fromLeft = (pos.x - fromLeft) * 0.95;
-      fromTop = (pos.y - fromTop) * 0.95;
+    if (tile.$container.hasClass('invisible')) {
+      // When tiles are inserted they are invisible because a dedicated insert animation will be started after the layouting,
+      // the animation here is to animate the position change -> don't animate inserted tiles here
+      tile.$container.removeData('oldBounds');
+      return;
     }
 
-    // Stop running animations before starting the new ones to make sure existing promises are not resolved too early
-    tile.$container
-      .stop()
-      .cssLeftAnimated(fromLeft, pos.x, {
-        start: function(promise) {
-          promises.push(promise);
-        },
-        queue: false
-      })
-      .cssTopAnimated(fromTop, pos.y, {
-        start: function(promise) {
-          promises.push(promise);
-        },
-        queue: false
-      });
-    tile.$container.removeData('oldLeft');
-    tile.$container.removeData('oldTop');
+    var bounds = scout.graphics.cssBounds(tile.$container);
+    var fromBounds = tile.$container.data('oldBounds');
+    if (tile instanceof scout.PlaceholderTile && !fromBounds) {
+      // Placeholders may not have fromBounds because they are added while layouting
+      // Just let them appear at the correct position
+      fromBounds = bounds.clone();
+    }
+
+    if (!animated) {
+      // This is a small, discreet startup animation, just move the tiles a little
+      // It will happen if the startup animation is disabled, or every time the tiles are rendered anew
+      fromBounds = new scout.Rectangle(bounds.x * 0.95, bounds.y * 0.95, bounds.width, bounds.height);
+    }
+
+    if (fromBounds.equals(bounds)) {
+      // Don't animate if bounds are equals (otherwise promises would always resolve after 300ms even though no animation was visible)
+      tile.$container.removeData('oldBounds');
+      return;
+    }
+
+    // Start animation
+    scout.arrays.pushAll(promises, this._animateTileBounds(tile, fromBounds, bounds));
+
+    tile.$container.removeData('oldBounds');
   }, this);
 
-  this.widget.initialAnimationDone = true;
+  this.widget.startupAnimationDone = true;
 
-  // When all animations have been finished update scrollbar
+  // When all animations have been finished, trigger event and update scrollbar
   if (promises.length > 0) {
-    $.promiseAll(promises).done(this._updateScrollbar.bind(this));
+    $.promiseAll(promises).done(this._onAnimationDone.bind(this));
+  } else {
+    this._onAnimationDone();
   }
+};
+
+scout.TilesLayout.prototype._onAnimationDone = function() {
+  this.widget.trigger('layoutAnimationDone');
+  this._updateScrollbar();
+};
+
+scout.TilesLayout.prototype._animateTileBounds = function(tile, fromBounds, bounds) {
+  var promises = [];
+
+  // Stop running animations before starting the new ones to make sure existing promises are not resolved too early
+  tile.$container
+    .stop()
+    .cssLeftAnimated(fromBounds.x, bounds.x, {
+      start: function(promise) {
+        promises.push(promise);
+      },
+      queue: false
+    })
+    .cssTopAnimated(fromBounds.y, bounds.y, {
+      start: function(promise) {
+        promises.push(promise);
+      },
+      queue: false
+    })
+    .cssWidthAnimated(fromBounds.width, bounds.width, {
+      start: function(promise) {
+        promises.push(promise);
+      },
+      queue: false
+    })
+    .cssHeightAnimated(fromBounds.height, bounds.height, {
+      start: function(promise) {
+        promises.push(promise);
+      },
+      queue: false
+    });
+  return promises;
 };
 
 scout.TilesLayout.prototype._updateScrollbar = function() {

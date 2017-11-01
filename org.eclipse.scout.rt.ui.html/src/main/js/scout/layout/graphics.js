@@ -347,6 +347,13 @@ scout.graphics = {
       .cssHeight(bounds.height);
   },
 
+  /**
+   * @returns {scout.Rectangle} the bounds of the element specified by the style.
+   */
+  cssBounds: function($elem) {
+    return new scout.Rectangle($elem.cssLeft(), $elem.cssTop(), $elem.cssWidth(), $elem.cssHeight());
+  },
+
   debugOutput: function($comp) {
     if (!$comp) {
       return '$comp is undefined';

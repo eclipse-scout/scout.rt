@@ -313,25 +313,41 @@ scout.arrays = {
   },
 
   findFromForward: function(arr, startIndex, predicate) {
+    var index = scout.arrays.findIndexFromForward(arr, startIndex, predicate);
+    if (index === -1) {
+      return null;
+    }
+    return arr[index];
+  },
+
+  findIndexFromForward: function(arr, startIndex, predicate) {
     if (!arr || !predicate) {
       return null;
     }
     for (var i = startIndex; i < arr.length; i++) {
       var element = arr[i];
       if (predicate(element, i)) {
-        return element;
+        return i;
       }
     }
   },
 
   findFromReverse: function(arr, startIndex, predicate) {
+    var index = scout.arrays.findIndexFromReverse(arr, startIndex, predicate);
+    if (index === -1) {
+      return null;
+    }
+    return arr[index];
+  },
+
+  findIndexFromReverse: function(arr, startIndex, predicate) {
     if (!arr || !predicate) {
       return null;
     }
     for (var i = startIndex; i >= 0; i--) {
       var element = arr[i];
       if (predicate(element, i)) {
-        return element;
+        return i;
       }
     }
   },
