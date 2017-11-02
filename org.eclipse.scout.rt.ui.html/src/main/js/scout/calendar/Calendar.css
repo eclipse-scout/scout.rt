@@ -31,6 +31,7 @@
 }
 
 .calendar-scrollable-components {
+  position: relative;
   height: 100%;
 }
 
