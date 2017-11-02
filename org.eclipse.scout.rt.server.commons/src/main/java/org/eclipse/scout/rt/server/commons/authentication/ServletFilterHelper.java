@@ -238,11 +238,14 @@ public class ServletFilterHelper {
           LOG.debug("Returning session timeout error as json.");
         }
         sendJsonSessionTimeout(resp);
-        return;
       }
       else {
-        LOG.warn("The request for '{}' is a POST request. " + (redirect ? "Redirecting" : "Forwarding") + " to '{}' will most likely fail. (Trying nevertheless.)", req.getPathInfo(), targetLocation);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("The request for '{}' is a POST request. " + (redirect ? "Redirecting" : "Forwarding") + " to '{}' will most likely fail. Sending HTTP status '403 Forbidden' instead.", req.getPathInfo(), targetLocation);
+        }
+        resp.sendError(HttpServletResponse.SC_FORBIDDEN);
       }
+      return;
     }
 
     if (LOG.isDebugEnabled()) {
