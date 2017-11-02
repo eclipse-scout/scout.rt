@@ -8,9 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-@root-group-box-padding-left: @bench-padding-x - @mandatory-indicator-width;
-@root-group-box-padding-right: @bench-padding-x;
-
 .root-group-box {
   /* necessary if dialog gets really small */
   overflow: hidden;
@@ -32,6 +29,7 @@
 }
 
 .group-box {
+
   & > .menubar {
     margin-left: @mandatory-indicator-width;
     margin-right: 0;
@@ -54,7 +52,7 @@
   width: calc(~'100%' - @mandatory-indicator-width);
   margin-top: @group-margin-top;
   margin-left: @mandatory-indicator-width;
-  border-bottom: 3px solid @group-box-title-border-color;
+  border-bottom: @group-title-border-width solid @group-box-title-border-color;
   #scout.overflow-ellipsis-nowrap();
 
   .group-box.collapsed:not(.with-line) > & {
