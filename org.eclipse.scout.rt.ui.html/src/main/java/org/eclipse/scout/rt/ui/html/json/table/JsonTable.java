@@ -1316,9 +1316,23 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
   protected void handleModelRowOrderChanged(Collection<ITableRow> modelRows) {
     JSONArray jsonRowIds = new JSONArray();
+    List<String> rowIds = new ArrayList<>();
     for (ITableRow row : modelRows) {
       if (isRowAccepted(row)) {
-        jsonRowIds.put(getTableRowId(row));
+        String rowId = getTableRowId(row);
+        jsonRowIds.put(rowId);
+        rowIds.add(rowId);
+      }
+    }
+
+    if (jsonRowIds.length() < m_tableRows.size()) {
+      // Append missing rows to the end, otherwise the UI cannot not update the order.
+      // This may happen if rows are deleted after a row order change.
+      // In that case rows are deleted anyway so it is fine if they are not ordered correctly
+      List<String> missingRowIds = new ArrayList<String>(m_tableRows.keySet());
+      missingRowIds.removeAll(rowIds);
+      for (String id : missingRowIds) {
+        jsonRowIds.put(id);
       }
     }
 

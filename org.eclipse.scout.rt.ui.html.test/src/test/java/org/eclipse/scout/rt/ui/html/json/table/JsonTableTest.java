@@ -1231,6 +1231,91 @@ public class JsonTableTest {
     assertTrue(rowIds.length() == 3);
   }
 
+  @Test
+  public void testDeleteAfterMove() throws Exception {
+    TableWith3Cols table = new TableWith3Cols();
+    table.initTable();
+    table.fill(3, false);
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+    m_uiSession.currentJsonResponse().addAdapter(jsonTable);
+    JSONObject response = m_uiSession.currentJsonResponse().toJson();
+    JsonTestUtility.endRequest(m_uiSession);
+    String row0Id = jsonTable.getTableRowId(table.getRow(0));
+    String row1Id = jsonTable.getTableRowId(table.getRow(1));
+    String row2Id = jsonTable.getTableRowId(table.getRow(2));
+
+    table.moveRow(0, 2);
+    table.deleteRow(0);
+
+    response = m_uiSession.currentJsonResponse().toJson();
+    JsonTestUtility.endRequest(m_uiSession);
+    JSONArray events = response.optJSONArray("events");
+    assertEquals(2, events.length());
+    JSONObject event0 = events.getJSONObject(0);
+    JSONObject event1 = events.getJSONObject(1);
+
+    assertEquals("rowOrderChanged", event0.getString("type"));
+    JSONArray rowIds = event0.optJSONArray("rowIds");
+    assertTrue(rowIds.length() == 3);
+    assertEquals(row2Id, rowIds.get(0));
+    assertEquals(row0Id, rowIds.get(1));
+    assertEquals(row1Id, rowIds.get(2)); // <-- this is not correct but since it will be deleted it is fine
+    assertEquals("rowsDeleted", event1.getString("type"));
+  }
+
+  /**
+   * Use case: Insert, addFilter, removeFilter, delete row of an already inserted row.
+   * <p>
+   * This exotic case will generate a row order changed event with not enough rows because at the time the row order
+   * change event is generated (in JsonTable.preprocessBufferedEvents), getTable().getRows() returns the already
+   * modified list where the row is already deleted. This is the difference to the test above, where the deletion really
+   * happens after the row order change.
+   */
+  @Test
+  public void testDeleteAfterInsertAndFilterNop() throws Exception {
+    TableWith3Cols table = new TableWith3Cols();
+    table.initTable();
+    table.fill(2, false);
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+    m_uiSession.currentJsonResponse().addAdapter(jsonTable);
+    JSONObject response = m_uiSession.currentJsonResponse().toJson();
+    JsonTestUtility.endRequest(m_uiSession);
+    final ITableRow row0 = table.getRow(0);
+    String row0Id = jsonTable.getTableRowId(table.getRow(0));
+    String row1Id = jsonTable.getTableRowId(table.getRow(1));
+
+    ITableRow newRow0 = table.addRow();
+    ITableRow newRow1 = table.addRow();
+    table.addRowFilter(new ITableRowFilter() {
+      @Override
+      public boolean accept(ITableRow r) {
+        return r == row0;
+      }
+    });
+    // Remove filter again -> NOP
+    table.removeRowFilter(table.getRowFilters().get(0));
+    // delete the first row -> this will "destroy" the row order changed event
+    table.deleteRow(0);
+
+    response = m_uiSession.currentJsonResponse().toJson();
+    JsonTestUtility.endRequest(m_uiSession);
+    JSONArray events = response.optJSONArray("events");
+    assertEquals(3, events.length());
+    JSONObject event0 = events.getJSONObject(0);
+    JSONObject event1 = events.getJSONObject(1);
+    JSONObject event2 = events.getJSONObject(2);
+
+    assertEquals("rowsInserted", event0.getString("type"));
+    assertEquals("rowOrderChanged", event1.getString("type"));
+    JSONArray rowIds = event1.optJSONArray("rowIds");
+    assertTrue(rowIds.length() == 4);
+    assertEquals(row1Id, rowIds.get(0));
+    assertEquals(jsonTable.getTableRowId(newRow0), rowIds.get(1));
+    assertEquals(jsonTable.getTableRowId(newRow1), rowIds.get(2));
+    assertEquals(row0Id, rowIds.get(3)); // <-- this is not correct but since it will be deleted it is fine
+    assertEquals("rowsDeleted", event2.getString("type"));
+  }
+
   /**
    * Tests if a RequestFocusInCell-Event get discarded when now row is set/available in the Event
    */
