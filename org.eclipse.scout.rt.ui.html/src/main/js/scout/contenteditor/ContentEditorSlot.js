@@ -97,10 +97,10 @@ scout.ContentEditorSlot.prototype._placeholderWidth = function() {
 
 scout.ContentEditorSlot.prototype.showPlaceholders = function() {
   // don't show placeholders if there are mandatory placeholders: mandatory placeholders need to be filled first.
-  if(this.$container.find('.ce-mandatory-placeholder').length > 0) {
+  if (this.$container.find('.ce-mandatory-placeholder').length > 0) {
     return;
   }
-
+  this.$container.removeClass('ce-slot-mandatory');
   var width = this._placeholderWidth();
 
   // add placeholder in the beginning of the slot if not already there.
@@ -128,6 +128,15 @@ scout.ContentEditorSlot.prototype._showMandatoryPlaceholders = function() {
       .appendDiv('ce-placeholder ce-mandatory-placeholder')
       .text(this.contentEditor.dropzoneLabel);
   }
+  if (this._hasMandatoryPlaceholders()) {
+    this.$container.addClass('ce-slot-mandatory');
+  } else {
+    this.$container.removeClass('ce-slot-mandatory');
+  }
+};
+
+scout.ContentEditorSlot.prototype._hasMandatoryPlaceholders = function() {
+  return this.$container.find('.ce-mandatory-placeholder').length > 0;
 };
 
 scout.ContentEditorSlot.prototype.showLabel = function(isOccupied, isTypeMissing) {
@@ -152,7 +161,7 @@ scout.ContentEditorSlot.prototype.isAccepting = function() {
 
 scout.ContentEditorSlot.prototype.highlightClosestPlaceholder = function(x, y, type) {
   var $closest = this._getClosestPlaceholder(x, y);
-  if(!this.hasType(type)) {
+  if (!this.hasType(type)) {
     return null;
   }
   if ($closest && this._$closestPlaceholder !== $closest) {

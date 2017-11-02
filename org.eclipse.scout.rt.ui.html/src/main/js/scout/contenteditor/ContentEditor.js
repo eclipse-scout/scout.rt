@@ -87,9 +87,10 @@ scout.ContentEditor.prototype._renderContent = function() {
 };
 
 scout.ContentEditor.prototype._onIframeContentLoaded = function() {
-  this._injectStyleSheet($(this.doc.head));
+  this._injectStyleSheet($(this.doc.head), function() {
+    this._createSlots();
+  }.bind(this));
   this._disableLinks();
-  this._createSlots();
 
   $(this.doc)
     .on('dragenter', this._onIframeDragEnter.bind(this))
@@ -157,8 +158,11 @@ scout.ContentEditor.prototype._onIframeDrop = function(event) {
   return false;
 };
 
-scout.ContentEditor.prototype._injectStyleSheet = function($header) {
-  $header.append('<link rel="stylesheet" type="text/css" href="' + this.session.url.baseUrlRaw + 'res/contenteditor.css">');
+scout.ContentEditor.prototype._injectStyleSheet = function($header, callback) {
+  var $styleLink = $('<link rel="stylesheet" type="text/css">');
+  $header.append($styleLink);
+  // use the baseurl here to prevent loading the contenteditor.css file from the resource server.
+  $styleLink.on('load', callback.bind(this)).attr("href", this.session.url.baseUrlRaw + "res/contenteditor.css");
 };
 
 scout.ContentEditor.prototype._disableLinks = function() {
@@ -230,32 +234,32 @@ scout.ContentEditor.prototype._highlightClosestSlot = function(type, x, y) {
   }
 
   if (!this._closestSlot.isAccepting()) {
-    for (var i = 0; i < this._slots.length; i++) {
-      if (this._slots[i] !== this._closestSlot) {
-        this._slots[i].stopAccepting();
+    this._slots.forEach(function (slot) {
+      if (slot !== this._closestSlot) {
+        slot.stopAccepting();
       }
-    }
+    }.bind(this));
     this._closestSlot.requestAccepting(type);
   }
   this._$closestPlaceholder = this._closestSlot.highlightClosestPlaceholder(x, y, type);
 };
 
 scout.ContentEditor.prototype._showSlots = function(type) {
-  for (var i = 0; i < this._slots.length; i++) {
-    this._slots[i].show(type);
-  }
+  this._slots.forEach(function (slot) {
+    slot.show(type);
+  });
 };
 
 scout.ContentEditor.prototype._stopAccepting = function() {
-  for (var i = 0; i < this._slots.length; i++) {
-    this._slots[i].stopAccepting();
-  }
+  this._slots.forEach(function (slot) {
+    slot.stopAccepting();
+  });
 };
 
 scout.ContentEditor.prototype._hideSlots = function() {
-  for (var i = 0; i < this._slots.length; i++) {
-    this._slots[i].hide();
-  }
+  this._slots.forEach(function (slot) {
+    slot.hide();
+  });
 };
 
 scout.ContentEditor.prototype._getClosestSlot = function(x, y) {
