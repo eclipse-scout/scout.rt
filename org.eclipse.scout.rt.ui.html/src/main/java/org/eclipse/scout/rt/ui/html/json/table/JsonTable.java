@@ -1513,6 +1513,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       if (CONFIG.getPropertyValue(UiEnforceModelThreadProperty.class)) {
         ModelJobs.assertModelThread();
       }
+      else {
+        ModelJobs.warnIfNotModelThread();
+      }
       handleModelTableEvent(e);
     }
   }

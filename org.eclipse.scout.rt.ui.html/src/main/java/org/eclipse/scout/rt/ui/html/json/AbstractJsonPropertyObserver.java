@@ -232,6 +232,9 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
       if (CONFIG.getPropertyValue(UiEnforceModelThreadProperty.class)) {
         ModelJobs.assertModelThread();
       }
+      else {
+        ModelJobs.warnIfNotModelThread();
+      }
       handleModelPropertyChange(event);
     }
   }

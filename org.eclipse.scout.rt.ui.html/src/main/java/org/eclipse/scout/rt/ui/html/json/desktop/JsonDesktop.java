@@ -494,6 +494,9 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
       if (CONFIG.getPropertyValue(UiEnforceModelThreadProperty.class)) {
         ModelJobs.assertModelThread();
       }
+      else {
+        ModelJobs.warnIfNotModelThread();
+      }
       handleModelDesktopEvent(e);
     }
   }

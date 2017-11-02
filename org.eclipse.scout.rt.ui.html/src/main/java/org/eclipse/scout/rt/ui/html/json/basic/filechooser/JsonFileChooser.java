@@ -139,6 +139,9 @@ public class JsonFileChooser<FILE_CHOOSER extends IFileChooser> extends Abstract
       if (CONFIG.getPropertyValue(UiEnforceModelThreadProperty.class)) {
         ModelJobs.assertModelThread();
       }
+      else {
+        ModelJobs.warnIfNotModelThread();
+      }
       handleModelFileChooserEvent(e);
     }
   }

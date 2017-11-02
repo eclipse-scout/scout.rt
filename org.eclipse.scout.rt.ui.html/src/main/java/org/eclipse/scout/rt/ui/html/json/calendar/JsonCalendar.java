@@ -362,6 +362,9 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
       if (CONFIG.getPropertyValue(UiEnforceModelThreadProperty.class)) {
         ModelJobs.assertModelThread();
       }
+      else {
+        ModelJobs.warnIfNotModelThread();
+      }
       addActionEvent(EVENT_CALENDAR_CHANGED, new JsonCalendarEvent(JsonCalendar.this, e).toJson());
     }
 
@@ -369,6 +372,9 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
     public void calendarChangedBatch(List<CalendarEvent> batch) {
       if (CONFIG.getPropertyValue(UiEnforceModelThreadProperty.class)) {
         ModelJobs.assertModelThread();
+      }
+      else {
+        ModelJobs.warnIfNotModelThread();
       }
       JSONArray jsonArray = new JSONArray();
       for (CalendarEvent event : batch) {

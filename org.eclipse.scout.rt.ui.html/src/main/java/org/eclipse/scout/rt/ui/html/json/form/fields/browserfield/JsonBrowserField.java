@@ -190,6 +190,9 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
       if (CONFIG.getPropertyValue(UiEnforceModelThreadProperty.class)) {
         ModelJobs.assertModelThread();
       }
+      else {
+        ModelJobs.warnIfNotModelThread();
+      }
       handleModelBrowserFieldEvent(e);
     }
   }

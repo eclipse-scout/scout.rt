@@ -1055,6 +1055,9 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
       if (CONFIG.getPropertyValue(UiEnforceModelThreadProperty.class)) {
         ModelJobs.assertModelThread();
       }
+      else {
+        ModelJobs.warnIfNotModelThread();
+      }
       handleModelTreeEvent(e);
     }
   }

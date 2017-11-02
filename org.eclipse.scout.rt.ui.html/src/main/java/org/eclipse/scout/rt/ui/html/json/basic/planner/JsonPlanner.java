@@ -541,6 +541,9 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
       if (CONFIG.getPropertyValue(UiEnforceModelThreadProperty.class)) {
         ModelJobs.assertModelThread();
       }
+      else {
+        ModelJobs.warnIfNotModelThread();
+      }
       handleModelEvent(event);
     }
   }

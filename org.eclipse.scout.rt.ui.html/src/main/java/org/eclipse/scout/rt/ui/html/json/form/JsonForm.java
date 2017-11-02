@@ -291,6 +291,9 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
       if (CONFIG.getPropertyValue(UiEnforceModelThreadProperty.class)) {
         ModelJobs.assertModelThread();
       }
+      else {
+        ModelJobs.warnIfNotModelThread();
+      }
       handleModelFormChanged(e);
     }
   }

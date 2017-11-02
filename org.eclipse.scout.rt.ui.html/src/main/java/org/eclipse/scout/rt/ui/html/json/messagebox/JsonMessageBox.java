@@ -192,6 +192,9 @@ public class JsonMessageBox<MESSAGE_BOX extends IMessageBox> extends AbstractJso
       if (CONFIG.getPropertyValue(UiEnforceModelThreadProperty.class)) {
         ModelJobs.assertModelThread();
       }
+      else {
+        ModelJobs.warnIfNotModelThread();
+      }
       handleModelMessageBoxChanged(event);
     }
   }

@@ -36,6 +36,8 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper class to schedule model jobs.
@@ -87,6 +89,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
  * @see IClientSession#getModelJobSemaphore()
  */
 public final class ModelJobs {
+  private static final Logger LOG = LoggerFactory.getLogger(ModelJobs.class);
 
   /**
    * Execution hint to signal that a model job requires interaction from the UI, which typically would be from the user,
@@ -310,6 +313,15 @@ public final class ModelJobs {
   public static void assertModelThread() {
     if (!ModelJobs.isModelThread()) {
       throw new WrongThreadException("Only the model thread is allowed to update the UI model.");
+    }
+  }
+
+  /**
+   * Writes a warning with the stack trace to the log file if the current thread is not the model thread.
+   */
+  public static void warnIfNotModelThread() {
+    if (!ModelJobs.isModelThread() && LOG.isWarnEnabled()) {
+      LOG.warn("", new WrongThreadException("Only the model thread is allowed to update the UI model."));
     }
   }
 
