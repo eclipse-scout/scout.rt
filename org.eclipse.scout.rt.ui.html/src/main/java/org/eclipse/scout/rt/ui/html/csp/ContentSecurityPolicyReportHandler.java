@@ -16,6 +16,7 @@ import java.io.Reader;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
@@ -36,6 +37,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 5.2
  */
+@Order(5400)
 public class ContentSecurityPolicyReportHandler extends AbstractUiServletRequestHandler {
   private static final Logger LOG = LoggerFactory.getLogger(ContentSecurityPolicyReportHandler.class);
 

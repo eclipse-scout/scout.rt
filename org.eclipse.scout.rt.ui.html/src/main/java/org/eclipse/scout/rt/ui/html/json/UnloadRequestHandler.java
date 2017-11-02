@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon}
  * @since 6.1
  */
-@Order(5040)
+@Order(5500)
 public class UnloadRequestHandler extends AbstractUiServletRequestHandler {
   private static final Logger LOG = LoggerFactory.getLogger(UnloadRequestHandler.class);
 

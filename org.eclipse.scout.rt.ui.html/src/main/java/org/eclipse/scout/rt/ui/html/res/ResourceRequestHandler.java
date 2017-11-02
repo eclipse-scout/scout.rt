@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * /dynamic/*, /icon/*, *.js, *.css, *.html, *.png, *.gif, *.jpg, *.woff, *.json
  */
-@Order(5020)
+@Order(4510)
 public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
   private static final Logger LOG = LoggerFactory.getLogger(ResourceRequestHandler.class);
 

@@ -51,7 +51,7 @@ import org.slf4j.MDC;
  * <p>
  * Provides the {@link MDC#put(String, String)} properties {@value #MDC_SCOUT_SESSION_ID}
  */
-@Order(5010)
+@Order(4500)
 public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   private static final Logger LOG = LoggerFactory.getLogger(JsonMessageRequestHandler.class);
 

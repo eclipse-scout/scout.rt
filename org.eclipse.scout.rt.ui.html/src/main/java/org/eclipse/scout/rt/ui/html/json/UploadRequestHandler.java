@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This handler contributes to the {@link UiServlet} as the POST handler for /upload
  */
-@Order(5030)
+@Order(4520)
 public class UploadRequestHandler extends AbstractUiServletRequestHandler {
   private static final Logger LOG = LoggerFactory.getLogger(UploadRequestHandler.class);
 
