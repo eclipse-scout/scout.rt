@@ -3695,6 +3695,7 @@ scout.Table.prototype.updateColumnHeaders = function(columns) {
     column.headerIconId = columns[i].headerIconId;
     column.sortActive = columns[i].sortActive;
     column.sortAscending = columns[i].sortAscending;
+    column.grouped = columns[i].grouped;
     if (!column.sortActive && column.sortIndex !== -1) {
       // Adjust indices of other sort columns (if a sort column in the middle got removed, there won't necessarily be an event for the other columns)
       this._removeSortColumn(column);
