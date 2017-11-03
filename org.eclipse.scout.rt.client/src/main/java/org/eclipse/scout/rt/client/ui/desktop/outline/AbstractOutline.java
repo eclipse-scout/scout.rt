@@ -640,13 +640,12 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   public List<IMenu> getMenusForPage(IPage<?> page) {
-    List<IMenu> result = new ArrayList<>();
-    for (IMenu m : getContextMenu().getChildActions()) {
-      if (!m_inheritedMenusOfPage.contains(m)) {
-        result.add(m);
-      }
-    }
-    result.addAll(computeInheritedMenusOfPage(page));
+    List<IMenu> pageMenus = page.getMenus();
+    List<IMenu> inheritedMenus = computeInheritedMenusOfPage(page);
+
+    List<IMenu> result = new ArrayList<IMenu>(pageMenus.size() + inheritedMenus.size());
+    result.addAll(pageMenus);
+    result.addAll(inheritedMenus);
     return result;
   }
 
