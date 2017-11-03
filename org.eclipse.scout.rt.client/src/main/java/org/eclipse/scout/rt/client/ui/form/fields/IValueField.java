@@ -40,19 +40,19 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IContext
    *
    * @see IValueField#setClearable(String)
    */
-  String CLEARABLE_NEVER = "clearableNever";
+  String CLEARABLE_NEVER = "never";
   /**
    * Property to signal a clearable icon is only showed on the focused field when the field does have an input text.
    *
    * @see IValueField#setClearable(String)
    */
-  String CLEARABLE_FOCUSED = "clearableFocused";
+  String CLEARABLE_FOCUSED = "focused";
   /**
    * Property to signal a clearable icon is always displayed when the field does have an input text.
    *
    * @see IValueField#setClearable(String)
    */
-  String CLEARABLE_ALWAYS = "clearableAlways";
+  String CLEARABLE_ALWAYS = "always";
 
   /**
    * set field value to initValue and clear all error flags

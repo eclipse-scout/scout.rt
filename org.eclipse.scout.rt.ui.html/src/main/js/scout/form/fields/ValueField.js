@@ -34,15 +34,15 @@ scout.ValueField.Clearable = {
   /**
    * The clear icon is showed when the field has text.
    */
-  ALWAYS: 'clearableAlways',
+  ALWAYS: 'always',
   /**
    * The clear icon will be showed when the field is focused and has text.
    */
-  FOCUSED: 'clearableFocused',
+  FOCUSED: 'focused',
   /**
    * Never show the clear icon.
    */
-  NEVER: 'clearableNever'
+  NEVER: 'never'
 };
 
 scout.ValueField.prototype._init = function(model) {
