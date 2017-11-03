@@ -176,6 +176,7 @@ div.ce-mandatory-placeholder.ce-placeholder-accept-drop {
   border-bottom: 1px solid @palette-gray-4;
   background-color: @palette-gray-1;
   width: 100%;
+  font-size: 18px;
 }
 
 .ce-element-button {
@@ -188,10 +189,13 @@ div.ce-mandatory-placeholder.ce-placeholder-accept-drop {
   user-select: none;
   cursor: pointer;
   font-size: 18px;
+  line-height: 1;
 }
 
 .ce-remove-button::before {
-  content: @icon-remove;
+  font-family: crmIcons;
+  content: '\E108';
+  font-size: 15px;
 }
 
 .ce-move-up-button::before {

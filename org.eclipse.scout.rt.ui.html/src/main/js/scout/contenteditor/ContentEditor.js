@@ -34,7 +34,16 @@ scout.ContentEditor.prototype._init = function(model) {
 };
 
 scout.ContentEditor.prototype._render = function() {
+
   this.$container = this.$parent.appendDiv('ce');
+
+  this.$buttons = this.$container.appendDiv('ce-buttons');
+  this.$buttons.appendDiv('ce-desktop-button');
+  this.$buttons.appendDiv('ce-tablet-button');
+  this.$buttons.appendDiv('ce-phone-button');
+  var $languageButton = this.$buttons.appendDiv('ce-language-button');
+  $languageButton.appendDiv('ce-language-button-label').text('Deutsch ');
+  $languageButton.appendDiv('ce-language-button-icon');
 
   this.iframe.render();
   this.iframe.$container.addClass('ce-iframe');

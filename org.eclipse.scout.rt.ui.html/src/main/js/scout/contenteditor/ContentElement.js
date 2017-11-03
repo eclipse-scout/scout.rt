@@ -70,11 +70,12 @@ scout.ContentElement.prototype._onElementClick = function(event) {
   if (!this._controlsVisible()) {
     this._hideEditIndicator();
     this._showControls();
-    this.doubleClicking = true;
-    setTimeout(function() {
-      this.doubleClicking = false;
-    }.bind(this), 300);
   }
+
+  this.doubleClicking = true;
+  setTimeout(function() {
+    this.doubleClicking = false;
+  }.bind(this), 300);
 };
 
 scout.ContentElement.prototype._showEditIndicator = function() {
@@ -93,7 +94,7 @@ scout.ContentElement.prototype._showControls = function() {
   this._showGlasspanes();
 
   $buttonGroup
-    .appendDiv('ce-element-button ce-remove-button')
+    .appendDiv('ce-element-button ce-remove-button font-crmIcons')
     .on('click', this._onRemove.bind(this));
 
   $buttonGroup
