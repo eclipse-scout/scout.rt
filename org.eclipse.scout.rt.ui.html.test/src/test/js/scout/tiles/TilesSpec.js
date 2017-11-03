@@ -20,7 +20,8 @@ describe("Tiles", function() {
     var tiles = [];
     for (var i = 0; i < numTiles; i++) {
       tiles.push(scout.create('Tile', {
-        parent: session.desktop
+        parent: session.desktop,
+        label: "Tile " + i
       }));
     }
     var defaults = {
@@ -91,6 +92,32 @@ describe("Tiles", function() {
 
       tiles.tiles[0].setSelected(true);
       expect(tiles.tiles[0].selected).toBe(false);
+    });
+
+    it('does not select tiles excluded by filter', function() {
+      var tiles = createTiles(3, {
+        selectable: true
+      });
+
+      var filter = {
+        accept: function(tile) {
+          return tile.label.indexOf('1') < 0;
+        }
+      };
+      tiles.addFilter(filter);
+      tiles.filter();
+
+      tiles.selectTiles(tiles.tiles[1]);
+      expect(tiles.tiles[1].selected).toBe(false);
+
+      tiles.selectTiles(tiles.tiles[0]);
+      expect(tiles.tiles[0].selected).toBe(true);
+
+      tiles.removeFilter(filter);
+      tiles.filter();
+
+      tiles.selectTiles(tiles.tiles[1]);
+      expect(tiles.tiles[1].selected).toBe(true);
     });
 
     it('triggers a property change event', function() {
@@ -397,7 +424,9 @@ describe("Tiles", function() {
           expect(tile0.selected).toBe(false);
           expect(tile1.selected).toBe(true);
 
-          tile0.$container.triggerMouseDown({modifier: 'ctrl'});
+          tile0.$container.triggerMouseDown({
+            modifier: 'ctrl'
+          });
           expect(tile0.selected).toBe(true);
           expect(tile1.selected).toBe(true);
           expect(tiles.selectedTiles.length).toBe(2);
@@ -415,7 +444,9 @@ describe("Tiles", function() {
           expect(tile0.selected).toBe(true);
           expect(tile1.selected).toBe(true);
 
-          tile0.$container.triggerMouseDown({modifier: 'ctrl'});
+          tile0.$container.triggerMouseDown({
+            modifier: 'ctrl'
+          });
           expect(tile0.selected).toBe(false);
           expect(tile1.selected).toBe(true);
           expect(tiles.selectedTiles.length).toBe(1);
@@ -423,6 +454,75 @@ describe("Tiles", function() {
 
       });
 
+    });
+
+  });
+
+  describe('filter', function() {
+
+    it('filters the tiles according to the added filters', function() {
+      var tiles = createTiles(3);
+      expect(tiles.filteredTiles().length).toBe(3);
+
+      var filter1 = {
+        accept: function(tile) {
+          return tile.label.indexOf('1') < 0;
+        }
+      };
+      tiles.addFilter(filter1);
+      tiles.filter();
+      expect(tiles.filteredTiles().length).toBe(2);
+
+      var filter2 = {
+        accept: function(tile) {
+          return tile.label.indexOf('2') < 0;
+        }
+      };
+      tiles.addFilter(filter2);
+      tiles.filter();
+      expect(tiles.filteredTiles().length).toBe(1);
+
+      tiles.removeFilter(filter1);
+      tiles.filter();
+      expect(tiles.filteredTiles().length).toBe(2);
+
+      tiles.removeFilter(filter2);
+      tiles.filter();
+      expect(tiles.filteredTiles().length).toBe(3);
+      expect(tiles.filters.length).toBe(0);
+    });
+
+    it('considers newly inserted tiles', function() {
+      var tiles = createTiles(3);
+      var tile3 = createTile({
+        label: "Tile 3"
+      });
+      var tile4 = createTile({
+        label: "Tile 4"
+      });
+      expect(tiles.tiles.length).toBe(3);
+
+      var filter = {
+        accept: function(tile) {
+          // Accept tile 1 and 4 only
+          return tile.label.indexOf('1') >= 0 || tile.label.indexOf('4') >= 0;
+        }
+      };
+      tiles.addFilter(filter);
+      tiles.filter();
+      expect(tiles.filteredTiles().length).toBe(1);
+
+      // Insert tile 3 which is not accepted -> still only tile 1 visible
+      tiles.insertTiles(tile3);
+      expect(tiles.tiles.length).toBe(4);
+      expect(tiles.filteredTiles().length).toBe(1);
+
+      // Insert tile 4 which is accepted -> tile 1 and 4 are visible
+      tiles.insertTiles(tile4);
+      expect(tiles.tiles.length).toBe(5);
+      expect(tiles.filteredTiles().length).toBe(2);
+      expect(tiles.filteredTiles()[0]).toBe(tiles.tiles[1]);
+      expect(tiles.filteredTiles()[1]).toBe(tiles.tiles[4]);
     });
 
   });

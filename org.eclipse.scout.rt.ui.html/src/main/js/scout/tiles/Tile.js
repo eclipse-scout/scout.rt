@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.Tile = function() {
   scout.Tile.parent.call(this);
+  this.filterAccepted = true;
   this.gridData = null;
   this.gridDataHints = new scout.GridData();
   this.colorScheme = null;
@@ -151,4 +152,19 @@ scout.Tile.prototype._setSelectable = function(selectable) {
 
 scout.Tile.prototype._renderSelectable = function() {
   this.$container.toggleClass('selectable', this.selectable);
+};
+
+scout.Tile.prototype.setFilterAccepted = function(filterAccepted) {
+  this.setProperty('filterAccepted', filterAccepted);
+};
+
+scout.Tile.prototype._renderFilterAccepted = function() {
+  this._renderVisible();
+};
+
+/**
+ * @override
+ */
+scout.Tile.prototype.isVisible = function() {
+  return this.visible && this.filterAccepted;
 };

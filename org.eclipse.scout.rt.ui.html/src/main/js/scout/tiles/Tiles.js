@@ -10,8 +10,7 @@
  ******************************************************************************/
 scout.Tiles = function() {
   scout.Tiles.parent.call(this);
-  this.startupAnimationDone = false;
-  this.startupAnimationEnabled = false;
+  this.filters = [];
   // GridColumnCount will be modified by the layout, prefGridColumnCount remains unchanged
   this.gridColumnCount = 4;
   this.prefGridColumnCount = this.gridColumnCount;
@@ -27,6 +26,8 @@ scout.Tiles = function() {
   this.selectable = false;
   this.selectedTiles = [];
   this.scrollable = true;
+  this.startupAnimationDone = false;
+  this.startupAnimationEnabled = false;
   this.tiles = [];
   this._filterMenusHandler = this._filterMenus.bind(this);
   this._addWidgetProperties(['tiles', 'selectedTiles', 'menus']);
@@ -146,6 +147,7 @@ scout.Tiles.prototype.setTiles = function(tiles, appendPlaceholders) {
   if (tilesToInsert.length > 0 || tilesToDelete.length > 0) {
     this._setProperty('tiles', tiles);
   }
+  this._applyFilters(tiles);
   this._insertTiles(tilesToInsert);
 };
 
@@ -190,15 +192,13 @@ scout.Tiles.prototype._deleteTiles = function(tiles) {
   }
 
   tiles.forEach(function(tile) {
-    if (this.rendered) {
-      if (this._animateTileRemoval(tile)) {
-        // Animate tile removal, but not while layouting when tile placeholders are added or removed
-        tile.animateRemoval = true;
-      }
-      tile.destroy();
-      this._onTileDestroy(tile);
-      tile.animateRemoval = false;
+    if (this._animateTileRemoval(tile)) {
+      // Animate tile removal, but not while layouting when tile placeholders are added or removed
+      tile.animateRemoval = true;
     }
+    tile.destroy();
+    this._onTileDestroy(tile);
+    tile.animateRemoval = false;
   }, this);
   this.deselectTiles(tiles);
 
@@ -217,7 +217,7 @@ scout.Tiles.prototype._animateTileInsertion = function(tile) {
 };
 
 scout.Tiles.prototype._onTileDestroy = function(tile) {
-  if (!tile.animateRemoval || this.tileRemovalPending) {
+  if (!tile.rendered || !tile.animateRemoval || this.tileRemovalPending) {
     return;
   }
   this.tileRemovalPending = true;
@@ -527,6 +527,7 @@ scout.Tiles.prototype._renderSelectable = function() {
  */
 scout.Tiles.prototype.selectTiles = function(tiles) {
   tiles = scout.arrays.ensure(tiles);
+  tiles = this.visibleTiles(tiles); // Selecting invisible tiles is not allowed
   tiles = this._prepareWidgetProperty('selectedTiles', tiles);
 
   // Deselect the tiles which are not part of the new selection
@@ -557,6 +558,9 @@ scout.Tiles.prototype.selectTile = function(tile) {
   this.selectTiles([tile]);
 };
 
+/**
+ * Selects all visible tiles
+ */
 scout.Tiles.prototype.selectAllTiles = function(tile) {
   this.selectTiles(this.tiles);
 };
@@ -636,4 +640,70 @@ scout.Tiles.prototype._selectTileOnMouseDown = function(event) {
   } else {
     this.deselectAllTiles();
   }
+};
+
+scout.Tiles.prototype.addFilter = function(filter) {
+  if (this.filters.indexOf(filter) < 0) {
+    this.filters.push(filter);
+  }
+};
+
+scout.Tiles.prototype.removeFilter = function(filter) {
+  scout.arrays.remove(this.filters, filter);
+};
+
+scout.Tiles.prototype.filter = function() {
+  this._applyFilters(this.tiles);
+};
+
+scout.Tiles.prototype._applyFilters = function(tiles) {
+  tiles.forEach(function(tile) {
+    this._applyFiltersForTile(tile);
+  }, this);
+};
+
+/**
+ * @returns {Boolean} true if tile state has changed, false if not
+ */
+scout.Tiles.prototype._applyFiltersForTile = function(tile) {
+  if (this._tileAcceptedByFilters(tile)) {
+    if (!tile.filterAccepted) {
+      tile.setFilterAccepted(true);
+      return true;
+    }
+  } else {
+    if (tile.filterAccepted) {
+      tile.setFilterAccepted(false);
+      return true;
+    }
+  }
+  return false;
+};
+
+scout.Tiles.prototype._tileAcceptedByFilters = function(tile) {
+  return !this.filters.some(function(filter) {
+    if (!filter.accept(tile)) {
+      return true;
+    }
+  });
+};
+
+/**
+ * @returns the tiles which are accepted by the filter and therefore visible.
+ */
+scout.Tiles.prototype.filteredTiles = function(tiles) {
+  tiles = scout.nvl(tiles, this.tiles);
+  return tiles.filter(function(tile) {
+    return tile.filterAccepted;
+  });
+};
+
+/**
+ * @returns the visible tiles, meaning tiles which are not visible because tile.visible is false and tiles which are excluded by the filter are not returned.
+ */
+scout.Tiles.prototype.visibleTiles = function(tiles) {
+  tiles = scout.nvl(tiles, this.tiles);
+  return tiles.filter(function(tile) {
+    return tile.isVisible();
+  });
 };

@@ -579,11 +579,18 @@ scout.Widget.prototype.setVisible = function(visible) {
   this.setProperty('visible', visible);
 };
 
+/**
+ * @returns whether the widget is visible or not. May depend on other conditions than the visible property only
+ */
+scout.Widget.prototype.isVisible = function() {
+  return this.visible;
+};
+
 scout.Widget.prototype._renderVisible = function() {
   if (!this.$container) {
     return;
   }
-  this.$container.setVisible(this.visible);
+  this.$container.setVisible(this.isVisible());
   if (this.rendered && this.htmlComp) {
     this.parent.invalidateLogicalGrid(false);
     var htmlCompParent = this.htmlComp.getParent();

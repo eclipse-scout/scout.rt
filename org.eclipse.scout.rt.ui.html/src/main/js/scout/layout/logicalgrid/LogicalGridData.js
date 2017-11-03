@@ -101,7 +101,7 @@ scout.LogicalGridData.prototype._inheritWeightYRec = function(widget) {
     var i, inheritWeightY, child, children = widget.getFields();
     for (i = 0; i < children.length; i++) {
       child = children[i];
-      if (child.visible) {
+      if (child.isVisible()) {
         var data = child.gridData;
         if (data.weightY < 0) {
           inheritWeightY = this._inheritWeightYRec(child);

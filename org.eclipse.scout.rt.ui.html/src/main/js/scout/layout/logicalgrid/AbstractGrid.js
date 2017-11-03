@@ -33,7 +33,7 @@ scout.AbstractGrid.prototype._validate = function(gridContainer) {
   // build
   var widgets = [];
   this.gridConfig.getGridWidgets().forEach(function(widget) {
-    if (widget.visible) {
+    if (widget.isVisible()) {
       widgets.push(widget);
       var hints = widget.gridDataHints;
       if (hints && hints.x >= 0 && hints.y >= 0) {
