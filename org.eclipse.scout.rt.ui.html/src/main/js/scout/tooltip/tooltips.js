@@ -9,6 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.tooltips = {
+
+  DEFAULT_TOOLTIP_DELAY: 600, // ms
+
+  // Quite long tooltip delay for cases where the normal delay would be annoying
+  LONG_TOOLTIP_DELAY: 2000, // ms
+
   install: function($comp, options) {
     var support = new scout.TooltipSupport(options);
     support.install($comp);
@@ -58,7 +64,7 @@ scout.tooltips = {
 scout.TooltipSupport = function(options) {
   var defaultOptions = {
     selector: null,
-    delay: 600,
+    delay: scout.tooltips.DEFAULT_TOOLTIP_DELAY,
     text: undefined,
     nativeTooltip: false
   };

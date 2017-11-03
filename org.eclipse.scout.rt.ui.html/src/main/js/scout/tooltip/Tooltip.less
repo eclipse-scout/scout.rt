@@ -26,7 +26,7 @@
 }
 
 .tooltip-content {
-  background-color: @tooltip-background-color;
+  background-color: inherit;
   padding: @tooltip-padding-y @tooltip-padding-x;
   position: relative;
   min-width: 60px; /* Prevents tooltips with very short text from looking "strange" */
@@ -43,7 +43,7 @@
 }
 
 .tooltip-menus {
-  background-color: @tooltip-background-color;
+  background-color: inherit;
   padding: 0 @tooltip-padding-x 5px @tooltip-padding-x;
   position: relative;
 
@@ -70,8 +70,8 @@
   position: absolute;
   width: @tooltip-arrow-size;
   height: @tooltip-arrow-size;
-  background-color: @tooltip-background-color;
-  border: @tooltip-border;
+  background-color: inherit;
+  border: inherit;
   #scout.transform(rotate(45deg));
   #scout.drop-shadow();
 }
