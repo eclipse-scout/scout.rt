@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Ebene_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 58 44" style="enable-background:new 0 0 58 44;" xml:space="preserve">
+<title>browser-window</title>
+<desc>Created with Sketch.</desc>
+<g id="Präsentation-UGM">
+	<g id="CMS_Wizard_V2" transform="translate(-1339.000000, -275.000000)">
+		<g id="browser-window" transform="translate(1339.000000, 275.000000)">
+			<g id="Shape">
+				<g>
+					<path d="M9,0C4,0,0,4,0,9v26c0,5,4,9,9,9h40c5,0,9-4,9-9V9c0-5-4-9-9-9H9z M49,42H9c-3.9,0-7-3.1-7-7V18h54v17
+						C56,38.9,52.9,42,49,42z M56,16H2V9c0-3.9,3.1-7,7-7h40c3.9,0,7,3.1,7,7V16z"/>
+				</g>
+			</g>
+			<g id="Path">
+				<path d="M9,11c-1.2,0-2-0.8-2-2s0.8-2,2-2s2,0.8,2,2S10.2,11,9,11z"/>
+			</g>
+			<g id="Path_1_">
+				<path d="M15,11c-1.2,0-2-0.8-2-2s0.8-2,2-2s2,0.8,2,2S16.2,11,15,11z"/>
+			</g>
+			<g id="Path_2_">
+				<path d="M21,11c-1.2,0-2-0.8-2-2s0.8-2,2-2s2,0.8,2,2S22.2,11,21,11z"/>
+			</g>
+		</g>
+	</g>
+</g>
+</svg>

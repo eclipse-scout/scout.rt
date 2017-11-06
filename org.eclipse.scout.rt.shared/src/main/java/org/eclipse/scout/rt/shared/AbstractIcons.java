@@ -56,11 +56,36 @@ public abstract class AbstractIcons implements Serializable {
   public static final String Search = "font:\uE042";
   public static final String Folder = "font:\uE043";
   public static final String Sum = "font:\ue025";
+  public static final String Megaphone = "font:\uE04A";
+  public static final String Pencil = "font:\uE04B";
+  public static final String Image = "font:\uE04C";
+  public static final String Letter = "font:\uE04D";
+  public static final String Drag = "font:\uE04E";
+  public static final String Trash = "font:\uE050";
+  public static final String Desktop = "font:\uE051";
+  public static final String Smartphone = "font:\uE052";
+  public static final String Tablet = "font:\uE053";
+  public static final String Copy = "font:\uE054";
+  public static final String Envelope = "font:\uE055";
+  public static final String Pdf = "font:\uE056";
+  public static final String Sourcecode = "font:\uE057";
+  public static final String Sms = "font:\uE058";
+  public static final String Snipplets = "font:\uE059";
+  public static final String SocialMedia = "font:\uE05A";
+  public static final String SocialFollow = "font:\uE05B";
+  public static final String SocialShare = "font:\uE05C";
+  public static final String Table = "font:\uE05D";
+  public static final String Text = "font:\uE05E";
+  public static final String TextWithImage = "font:\uE05F";
+  public static final String Divider = "font:\uE060";
+  public static final String Move = "font:\uE061";
+  public static final String Video = "font:\uE062";
+  public static final String Eye = "font:\uE063";
+  public static final String Window = "font:\uE064";
 
   /* awesome font icons */
   public static final String Remove = "font:\uE045";
   public static final String RotateRight = "font:\uF01E";
-  public static final String Pencil = "font:\uF040";
   public static final String ChevronLeft = "font:\uF053";
   public static final String ChevronRight = "font:\uF054";
   public static final String ArrowRight = "font:\uF061";
