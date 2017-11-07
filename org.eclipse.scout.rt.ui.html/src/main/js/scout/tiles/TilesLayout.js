@@ -79,6 +79,12 @@ scout.TilesLayout.prototype.layout = function($container) {
       fromBounds = bounds.clone();
     }
 
+    if (!this._inViewport(bounds) && !this._inViewport(fromBounds)) {
+      // If neither the new nor the old position is in the viewport don't animate the tile. This will affect the animation performance in a positive way if there are many tiles
+      tile.$container.removeData('oldBounds');
+      return;
+    }
+
     if (!animated) {
       // This is a small, discreet startup animation, just move the tiles a little
       // It will happen if the startup animation is disabled, or every time the tiles are rendered anew
@@ -105,6 +111,13 @@ scout.TilesLayout.prototype.layout = function($container) {
   } else {
     this._onAnimationDone();
   }
+};
+
+scout.TilesLayout.prototype._inViewport = function(bounds) {
+  var topLeftPos = new scout.Point(bounds.x, bounds.y);
+  var bottomRightPos = new scout.Point(bounds.x + bounds.width, bounds.y + bounds.height);
+  var $scrollable = this.widget.$container;
+  return scout.scrollbars.isLocationInView(topLeftPos, $scrollable) || scout.scrollbars.isLocationInView(bottomRightPos, $scrollable);
 };
 
 scout.TilesLayout.prototype._onAnimationDone = function() {
