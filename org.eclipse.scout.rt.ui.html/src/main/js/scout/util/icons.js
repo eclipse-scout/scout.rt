@@ -74,6 +74,7 @@ scout.icons = {
 
   MEGAPHONE: 'font:\uE04A',
   PENCIL: 'font:\uE04B',
+  PENCIL_SOLID: 'font:\uF040',
   IMAGE: 'font:\uE04C',
   LETTER: 'font:\uE04D',
   DRAG: 'font:\uE04E',
