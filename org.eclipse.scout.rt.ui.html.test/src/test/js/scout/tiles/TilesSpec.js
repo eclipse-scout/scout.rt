@@ -462,7 +462,7 @@ describe("Tiles", function() {
 
     it('filters the tiles according to the added filters', function() {
       var tiles = createTiles(3);
-      expect(tiles.filteredTiles().length).toBe(3);
+      expect(tiles.filteredTiles.length).toBe(3);
 
       var filter1 = {
         accept: function(tile) {
@@ -471,7 +471,12 @@ describe("Tiles", function() {
       };
       tiles.addFilter(filter1);
       tiles.filter();
-      expect(tiles.filteredTiles().length).toBe(2);
+      expect(tiles.filteredTiles.length).toBe(2);
+      expect(tiles.filteredTiles[0]).toBe(tiles.tiles[0]);
+      expect(tiles.filteredTiles[1]).toBe(tiles.tiles[2]);
+      expect(tiles.tiles[0].filterAccepted).toBe(true);
+      expect(tiles.tiles[1].filterAccepted).toBe(false);
+      expect(tiles.tiles[2].filterAccepted).toBe(true);
 
       var filter2 = {
         accept: function(tile) {
@@ -480,16 +485,41 @@ describe("Tiles", function() {
       };
       tiles.addFilter(filter2);
       tiles.filter();
-      expect(tiles.filteredTiles().length).toBe(1);
+      expect(tiles.filteredTiles.length).toBe(1);
+      expect(tiles.filteredTiles[0]).toBe(tiles.tiles[0]);
+      expect(tiles.tiles[0].filterAccepted).toBe(true);
+      expect(tiles.tiles[1].filterAccepted).toBe(false);
+      expect(tiles.tiles[2].filterAccepted).toBe(false);
 
       tiles.removeFilter(filter1);
       tiles.filter();
-      expect(tiles.filteredTiles().length).toBe(2);
+      expect(tiles.filteredTiles.length).toBe(2);
+      expect(tiles.filteredTiles[0]).toBe(tiles.tiles[0]);
+      expect(tiles.filteredTiles[1]).toBe(tiles.tiles[1]);
+      expect(tiles.tiles[0].filterAccepted).toBe(true);
+      expect(tiles.tiles[1].filterAccepted).toBe(true);
+      expect(tiles.tiles[2].filterAccepted).toBe(false);
 
       tiles.removeFilter(filter2);
       tiles.filter();
-      expect(tiles.filteredTiles().length).toBe(3);
+      expect(tiles.filteredTiles.length).toBe(3);
       expect(tiles.filters.length).toBe(0);
+      expect(tiles.filteredTiles[0]).toBe(tiles.tiles[0]);
+      expect(tiles.filteredTiles[1]).toBe(tiles.tiles[1]);
+      expect(tiles.filteredTiles[2]).toBe(tiles.tiles[2]);
+      expect(tiles.tiles[0].filterAccepted).toBe(true);
+      expect(tiles.tiles[1].filterAccepted).toBe(true);
+      expect(tiles.tiles[2].filterAccepted).toBe(true);
+
+      // Add same first filter again
+      tiles.addFilter(filter1);
+      tiles.filter();
+      expect(tiles.filteredTiles.length).toBe(2);
+      expect(tiles.filteredTiles[0]).toBe(tiles.tiles[0]);
+      expect(tiles.filteredTiles[1]).toBe(tiles.tiles[2]);
+      expect(tiles.tiles[0].filterAccepted).toBe(true);
+      expect(tiles.tiles[1].filterAccepted).toBe(false);
+      expect(tiles.tiles[2].filterAccepted).toBe(true);
     });
 
     it('considers newly inserted tiles', function() {
@@ -510,19 +540,56 @@ describe("Tiles", function() {
       };
       tiles.addFilter(filter);
       tiles.filter();
-      expect(tiles.filteredTiles().length).toBe(1);
+      expect(tiles.filteredTiles.length).toBe(1);
 
       // Insert tile 3 which is not accepted -> still only tile 1 visible
       tiles.insertTiles(tile3);
       expect(tiles.tiles.length).toBe(4);
-      expect(tiles.filteredTiles().length).toBe(1);
+      expect(tiles.filteredTiles.length).toBe(1);
 
       // Insert tile 4 which is accepted -> tile 1 and 4 are visible
       tiles.insertTiles(tile4);
       expect(tiles.tiles.length).toBe(5);
-      expect(tiles.filteredTiles().length).toBe(2);
-      expect(tiles.filteredTiles()[0]).toBe(tiles.tiles[1]);
-      expect(tiles.filteredTiles()[1]).toBe(tiles.tiles[4]);
+      expect(tiles.filteredTiles.length).toBe(2);
+      expect(tiles.filteredTiles[0]).toBe(tiles.tiles[1]);
+      expect(tiles.filteredTiles[1]).toBe(tiles.tiles[4]);
+    });
+
+    it('deselects not accepted tiles', function() {
+      var tiles = createTiles(3, {
+        selectable: true
+      });
+      tiles.selectTiles([tiles.tiles[0], tiles.tiles[1]]);
+      expect(tiles.filteredTiles.length).toBe(3);
+      expect(tiles.selectedTiles.length).toBe(2);
+      expect(tiles.selectedTiles[0]).toBe(tiles.tiles[0]);
+      expect(tiles.selectedTiles[1]).toBe(tiles.tiles[1]);
+
+      var filter = {
+        accept: function(tile) {
+          // Accept tile 1 only
+          return tile.label.indexOf('1') >= 0;
+        }
+      };
+      tiles.addFilter(filter);
+      tiles.filter();
+      expect(tiles.filteredTiles.length).toBe(1);
+      expect(tiles.selectedTiles.length).toBe(1);
+      expect(tiles.selectedTiles[0]).toBe(tiles.tiles[1]);
+    });
+
+    it('applies the filters initially, if there is one', function() {
+      var tiles = createTiles(3, {
+        filters: [{
+          accept: function(tile) {
+            // Accept tile 1 only
+            return tile.label.indexOf('1') >= 0;
+          }
+        }]
+      });
+      expect(tiles.tiles.length).toBe(3);
+      expect(tiles.filteredTiles.length).toBe(1);
+      expect(tiles.filteredTiles[0]).toBe(tiles.tiles[1]);
     });
 
   });

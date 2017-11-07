@@ -18,6 +18,7 @@ public interface ITiles extends IWidget, ITypeWithClassId, IExtensibleObject, IC
 
   String PROP_TILES = "tiles";
   String PROP_SELECTED_TILES = "selectedTiles";
+  String PROP_FILTERED_TILES = "filteredTiles";
   String PROP_GRID_COLUMN_COUNT = "gridColumnCount";
   String PROP_WITH_PLACEHOLDERS = "withPlaceholders";
   String PROP_SCROLLABLE = "scrollable";
@@ -50,6 +51,8 @@ public interface ITiles extends IWidget, ITypeWithClassId, IExtensibleObject, IC
    * @return list of tiles. Return value is never <code>null</code>.
    */
   List<? extends ITile> getTiles();
+
+  int getTileCount();
 
   /**
    * @param tiles
@@ -179,6 +182,8 @@ public interface ITiles extends IWidget, ITypeWithClassId, IExtensibleObject, IC
 
   List<? extends ITile> getSelectedTiles();
 
+  int getSelectedTileCount();
+
   ITile getSelectedTile();
 
   <T extends ITile> T getTileByClass(Class<T> tileClass);
@@ -197,6 +202,28 @@ public interface ITiles extends IWidget, ITypeWithClassId, IExtensibleObject, IC
   void loadTileData();
 
   void ensureTileDataLoaded();
+
+  List<ITileFilter> getFilters();
+
+  void addFilter(ITileFilter filter);
+
+  void addFilter(ITileFilter filter, boolean applyFilters);
+
+  void removeFilter(ITileFilter filter);
+
+  void removeFilter(ITileFilter filter, boolean applyFilters);
+
+  /**
+   * Applies every filter.
+   * <p>
+   * This method is typically executed automatically, but if you add or remove filters with applyFilters parameter set
+   * to false, you need to call this method by yourself.
+   */
+  void filter();
+
+  List<? extends ITile> getFilteredTiles();
+
+  int getFilteredTileCount();
 
   /**
    * @param menus

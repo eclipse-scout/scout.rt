@@ -8,11 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.TilesGridConfig = function() {
-  scout.TilesGridConfig.parent.call(this);
+scout.RemoteTileFilter = function(model) {
+  model = model || {};
+  this.tileMap = {};
+  if (model.tileIds) {
+    this.setTileIds(model.tileIds);
+  }
 };
-scout.inherits(scout.TilesGridConfig, scout.LogicalGridConfig);
 
-scout.TilesGridConfig.prototype.getGridWidgets = function() {
-  return this.widget.filteredTiles;
+scout.RemoteTileFilter.prototype.setTileIds = function(tileIds) {
+  this.tileMap = {};
+  tileIds.forEach(function(tileId) {
+    this.tileMap[tileId] = tileId;
+  }, this);
+};
+
+scout.RemoteTileFilter.prototype.accept = function(tile) {
+  return !!this.tileMap[tile.id];
 };

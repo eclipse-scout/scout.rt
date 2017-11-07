@@ -460,6 +460,7 @@
   __include("scout/tiles/TilesAdapter.js");
   __include("scout/tiles/TilesGridConfig.js");
   __include("scout/tiles/TilesLayout.js");
+  __include("scout/tiles/RemoteTileFilter.js");
   __include("scout/tiles/WidgetTile.js");
   __include("scout/tiles/WidgetTileAdapter.js");
   __include("scout/tiles/PlaceholderTile.js");

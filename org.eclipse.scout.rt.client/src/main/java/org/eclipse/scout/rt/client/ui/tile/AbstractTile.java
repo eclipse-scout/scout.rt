@@ -41,6 +41,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   private final ObjectExtensions<AbstractTile, ITileExtension<? extends AbstractTile>> m_objectExtensions;
   private ITiles m_container;
   private DataChangeListener m_internalDataChangeListener;
+  private boolean m_filterAccepted = true;
   private boolean m_loaded = false;
   private boolean m_loadingLocked = false;
 
@@ -344,6 +345,16 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   public String classId() {
     String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), true);
     return getContainer().classId() + ID_CONCAT_SYMBOL + simpleClassId;
+  }
+
+  @Override
+  public void setFilterAccepted(boolean filterAccepted) {
+    m_filterAccepted = filterAccepted;
+  }
+
+  @Override
+  public boolean isFilterAccepted() {
+    return m_filterAccepted;
   }
 
   @Override

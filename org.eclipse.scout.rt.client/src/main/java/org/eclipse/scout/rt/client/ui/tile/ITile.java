@@ -38,6 +38,10 @@ public interface ITile extends IWidget, IOrdered, IStyleable, IExtensibleObject,
 
   void setContainer(ITiles container);
 
+  void setFilterAccepted(boolean filterAccepted);
+
+  boolean isFilterAccepted();
+
   void ensureDataLoaded();
 
   void loadData();

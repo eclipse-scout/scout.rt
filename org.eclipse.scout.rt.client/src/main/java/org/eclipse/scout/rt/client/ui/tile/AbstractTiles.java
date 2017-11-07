@@ -4,6 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -43,6 +44,8 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   private boolean m_initialized;
   private final ObjectExtensions<AbstractTiles, ITilesExtension<? extends AbstractTiles>> m_objectExtensions;
   private ContributionComposite m_contributionHolder;
+  private List<ITileFilter> m_filters;
+  private boolean m_filteredRowsDirty = false;
 
   public AbstractTiles() {
     this(true);
@@ -51,6 +54,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   public AbstractTiles(boolean callInitializer) {
     super(false);
     m_objectExtensions = new ObjectExtensions<>(this, false);
+    m_filters = new ArrayList<>(1);
     if (callInitializer) {
       callInitializer();
     }
@@ -90,6 +94,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     OrderedCollection<ITile> tiles = new OrderedCollection<>();
     injectTilesInternal(tiles);
     setSelectedTiles(new ArrayList<>());
+    setFilteredTiles(new ArrayList<>());
     setTiles(tiles.getOrderedList());
     initMenus();
 
@@ -198,21 +203,21 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
 
   @Override
   public void initTiles() {
-    for (ITile tile : getTiles()) {
+    for (ITile tile : getTilesInternal()) {
       tile.init();
     }
   }
 
   @Override
   public void postInitTilesConfig() {
-    for (ITile tile : getTiles()) {
+    for (ITile tile : getTilesInternal()) {
       tile.postInitConfig();
     }
   }
 
   @Override
   public void disposeTiles() {
-    for (ITile tile : getTiles()) {
+    for (ITile tile : getTilesInternal()) {
       tile.dispose();
     }
   }
@@ -302,6 +307,18 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   }
 
   @Override
+  public int getTileCount() {
+    return getTilesInternal().size();
+  }
+
+  /**
+   * @return the live list of the tiles
+   */
+  protected List<? extends ITile> getTilesInternal() {
+    return propertySupport.getPropertyList(PROP_TILES);
+  }
+
+  @Override
   public void setTiles(List<? extends ITile> tiles) {
     List<? extends ITile> oldTiles = getTiles();
     List<? extends ITile> newTiles = ObjectUtility.nvl(tiles, new ArrayList<>());
@@ -327,11 +344,13 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
         tile.init();
       }
     }
+    m_filteredRowsDirty = tilesToDelete.size() > 0 || newTiles.size() > 0;
+    applyFilters(newTiles);
   }
 
   @Override
   public void addTiles(List<? extends ITile> tilesToAdd) {
-    List<ITile> tiles = new ArrayList<>(getTiles());
+    List<ITile> tiles = new ArrayList<>(getTilesInternal());
     tiles.addAll(tilesToAdd);
     setTiles(tiles);
   }
@@ -343,7 +362,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
 
   @Override
   public void deleteTiles(List<? extends ITile> tilesToDelete) {
-    List<ITile> tiles = new ArrayList<>(getTiles());
+    List<ITile> tiles = new ArrayList<>(getTilesInternal());
     tiles.removeAll(tilesToDelete);
     setTiles(tiles);
   }
@@ -491,13 +510,18 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
 
   @Override
   public void selectTiles(List<? extends ITile> tiles) {
-    List<ITile> newSelection = new ArrayList<>(tiles);
+    if (!isSelectable()) {
+      setSelectedTiles(new ArrayList<>());
+      return;
+    }
+
+    List<ITile> newSelection = filterTiles(tiles);
     if (newSelection.size() > 1 && !isMultiSelect()) {
       ITile first = newSelection.get(0);
       newSelection.clear();
       newSelection.add(first);
     }
-    if (!CollectionUtility.equalsCollection(getSelectedTiles(), newSelection, false)) {
+    if (!CollectionUtility.equalsCollection(getSelectedTilesInternal(), newSelection, false)) {
       setSelectedTiles(newSelection);
     }
   }
@@ -509,7 +533,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
 
   @Override
   public void selectAllTiles() {
-    selectTiles(getTiles());
+    selectTiles(getTilesInternal());
   }
 
   @Override
@@ -536,13 +560,25 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     return CollectionUtility.arrayList(propertySupport.getPropertyList(PROP_SELECTED_TILES));
   }
 
-  public void setSelectedTiles(List<? extends ITile> tiles) {
+  /**
+   * @return the live list of the selected tiles
+   */
+  protected List<? extends ITile> getSelectedTilesInternal() {
+    return propertySupport.getPropertyList(PROP_SELECTED_TILES);
+  }
+
+  @Override
+  public int getSelectedTileCount() {
+    return getSelectedTilesInternal().size();
+  }
+
+  protected void setSelectedTiles(List<? extends ITile> tiles) {
     propertySupport.setPropertyList(PROP_SELECTED_TILES, tiles);
   }
 
   @Override
   public ITile getSelectedTile() {
-    if (getSelectedTiles().size() == 0) {
+    if (getSelectedTileCount() == 0) {
       return null;
     }
     return getSelectedTiles().get(0);
@@ -561,7 +597,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   public <T extends ITile> T getTileByClass(Class<T> tileClass) {
     // TODO [15.4] bsh: Make this method more sophisticated (@Replace etc.)
     T candidate = null;
-    for (ITile tile : getTiles()) {
+    for (ITile tile : getTilesInternal()) {
       if (tile.getClass() == tileClass) {
         return tileClass.cast(tile);
       }
@@ -605,7 +641,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   public void ensureTileDataLoaded() {
     BEANS.get(TileDataLoadManager.class).cancel(getAsyncLoadIdentifier(), getWindowIdentifier());
 
-    for (ITile tile : getTiles()) {
+    for (ITile tile : getTilesInternal()) {
       tile.ensureDataLoaded();
     }
   }
@@ -614,9 +650,122 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   public void loadTileData() {
     BEANS.get(TileDataLoadManager.class).cancel(getAsyncLoadIdentifier(), getWindowIdentifier());
 
-    for (ITile tile : getTiles()) {
+    for (ITile tile : getTilesInternal()) {
       tile.loadData();
     }
+  }
+
+  @Override
+  public List<ITileFilter> getFilters() {
+    return CollectionUtility.arrayList(m_filters);
+  }
+
+  @Override
+  public void addFilter(ITileFilter filter, boolean applyFilters) {
+    if (filter == null || m_filters.contains(filter)) {
+      return;
+    }
+    m_filters.add(filter);
+    if (applyFilters) {
+      filter();
+    }
+  }
+
+  @Override
+  public void addFilter(ITileFilter filter) {
+    addFilter(filter, true);
+  }
+
+  @Override
+  public void removeFilter(ITileFilter filter, boolean applyFilters) {
+    if (filter != null && m_filters.remove(filter) && applyFilters) {
+      filter();
+    }
+  }
+
+  @Override
+  public void removeFilter(ITileFilter filter) {
+    removeFilter(filter, true);
+  }
+
+  @Override
+  public void filter() {
+    // Full reset is set to true to loop through every tile and make sure tile.filterAccepted is correctly set
+    applyFilters(true);
+  }
+
+  protected boolean applyFilters() {
+    return applyFilters(getTilesInternal(), false);
+  }
+
+  protected boolean applyFilters(boolean fullReset) {
+    return applyFilters(getTilesInternal(), fullReset);
+  }
+
+  protected boolean applyFilters(List<? extends ITile> tiles) {
+    return applyFilters(tiles, false);
+  }
+
+  protected boolean applyFilters(List<? extends ITile> tiles, boolean fullReset) {
+    if (m_filters.size() == 0 && !fullReset) {
+      setFilteredTiles(getTilesInternal());
+      return false;
+    }
+    boolean filterChanged = false;
+    List<ITile> newlyHiddenTiles = new ArrayList<>();
+    for (ITile tile : tiles) {
+      boolean wasFilterAccepted = tile.isFilterAccepted();
+      applyFilters(tile);
+      if (tile.isFilterAccepted() != wasFilterAccepted) {
+        filterChanged = true;
+      }
+      if (filterChanged && !tile.isFilterAccepted()) {
+        newlyHiddenTiles.add(tile);
+      }
+    }
+
+    // Non visible tiles must be deselected
+    deselectTiles(newlyHiddenTiles);
+
+    if (filterChanged || m_filteredRowsDirty) {
+      setFilteredTiles(filterTiles(getTilesInternal()));
+      m_filteredRowsDirty = false;
+    }
+
+    return filterChanged;
+  }
+
+  protected void applyFilters(ITile tile) {
+    tile.setFilterAccepted(true);
+    for (ITileFilter filter : m_filters) {
+      if (!filter.accept(tile)) {
+        tile.setFilterAccepted(false);
+      }
+    }
+  }
+
+  @Override
+  public List<? extends ITile> getFilteredTiles() {
+    return propertySupport.getPropertyList(PROP_FILTERED_TILES);
+  }
+
+  protected void setFilteredTiles(List<? extends ITile> tiles) {
+    propertySupport.setPropertyList(PROP_FILTERED_TILES, tiles);
+  }
+
+  @Override
+  public int getFilteredTileCount() {
+    return getFilteredTiles().size();
+  }
+
+  protected List<ITile> filterTiles(List<? extends ITile> tiles) {
+    if (m_filters.isEmpty()) {
+      return new ArrayList<>(tiles);
+    }
+    return tiles
+        .stream()
+        .filter((t) -> t.isFilterAccepted())
+        .collect(Collectors.toList());
   }
 
   protected class P_TilesUIFacade implements ITilesUIFacade {

@@ -68,6 +68,26 @@ public class JsonTiles<T extends ITiles> extends AbstractJsonWidget<T> implement
         return new JsonAdapterPropertyConfigBuilder().disposeOnChange(false).build();
       }
     });
+    putJsonProperty(new JsonAdapterProperty<T>(ITiles.PROP_FILTERED_TILES, model, getUiSession()) {
+      @Override
+      protected List<? extends ITile> modelValue() {
+        return getModel().getFilteredTiles();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        if (getModel().getFilters().size() == 0) {
+          // If no filter is active return null instead of an array which contains the same content as the tiles array
+          return null;
+        }
+        return super.prepareValueForToJson(value);
+      }
+
+      @Override
+      protected JsonAdapterPropertyConfig createConfig() {
+        return new JsonAdapterPropertyConfigBuilder().disposeOnChange(false).build();
+      }
+    });
     putJsonProperty(new JsonProperty<ITiles>(ITiles.PROP_GRID_COLUMN_COUNT, model) {
       @Override
       protected Integer modelValue() {

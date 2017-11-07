@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,7 @@ scout.TilesLayout.prototype.layout = function($container) {
   var animated = htmlComp.layouted || (this.widget.startupAnimationEnabled && !this.widget.startupAnimationDone);
 
   // Store the current position of the tiles
-  this.widget.tiles.forEach(function(tile, i) {
+  this.widget.filteredTiles.forEach(function(tile, i) {
     var bounds = scout.graphics.cssBounds(tile.$container);
     tile.$container.data('oldBounds', bounds);
   }, this);
@@ -63,7 +63,7 @@ scout.TilesLayout.prototype.layout = function($container) {
 
   // Animate the position change of the tiles
   var promises = [];
-  this.widget.tiles.forEach(function(tile, i) {
+  this.widget.filteredTiles.forEach(function(tile, i) {
     if (tile.$container.hasClass('invisible')) {
       // When tiles are inserted they are invisible because a dedicated insert animation will be started after the layouting,
       // the animation here is to animate the position change -> don't animate inserted tiles here

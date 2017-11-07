@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,8 @@
 scout.Tiles = function() {
   scout.Tiles.parent.call(this);
   this.filters = [];
+  this.filteredTiles = [];
+  this.filteredTilesDirty = false;
   // GridColumnCount will be modified by the layout, prefGridColumnCount remains unchanged
   this.gridColumnCount = 4;
   this.prefGridColumnCount = this.gridColumnCount;
@@ -39,6 +41,8 @@ scout.Tiles.prototype._init = function(model) {
   scout.Tiles.parent.prototype._init.call(this, model);
   this._setGridColumnCount(this.gridColumnCount);
   this._initTiles();
+  this._applyFilters(this.tiles);
+  this._updateFilteredTiles();
   this._setMenus(this.menus);
 };
 
@@ -102,11 +106,11 @@ scout.Tiles.prototype.deleteTile = function(tile) {
   this.deleteTiles([tile]);
 };
 
-scout.Tiles.prototype.deleteTiles = function(tilesToDelete) {
+scout.Tiles.prototype.deleteTiles = function(tilesToDelete, appendPlaceholders) {
   tilesToDelete = scout.arrays.ensure(tilesToDelete);
   var tiles = this.tiles.slice();
   scout.arrays.removeAll(tiles, tilesToDelete);
-  this.setTiles(tiles);
+  this.setTiles(tiles, appendPlaceholders);
 };
 
 scout.Tiles.prototype.deleteAllTiles = function() {
@@ -121,20 +125,21 @@ scout.Tiles.prototype.setTiles = function(tiles, appendPlaceholders) {
   // Ensure given tiles are real tiles (of type scout.Tile)
   tiles = this._createChildren(tiles);
 
-  if (scout.nvl(appendPlaceholders, true)) {
+  if (this.withPlaceholders && scout.nvl(appendPlaceholders, true)) {
     // Remove placeholders from new tiles, they will be added later
     this._deletePlaceholders(tiles);
   }
 
   var tilesToInsert = tiles.slice();
   scout.arrays.removeAll(tilesToInsert, this.tiles);
+  this._applyFilters(tilesToInsert);
 
   // Append the existing placeholders, otherwise they would be unnecessarily deleted if a tile is deleted
-  if (scout.nvl(appendPlaceholders, true)) {
+  if (this.withPlaceholders && scout.nvl(appendPlaceholders, true)) {
     var placeholders = this.placeholders();
     // But only add as much placeholders as needed: If a new tile is added, it should replace the placeholder underneath.
     // If this were not done the placeholders would move animated when a new tile is inserted rather than just staying where they are
-    placeholders = placeholders.slice(Math.min(tilesToInsert.length, placeholders.length), placeholders.length);
+    placeholders = placeholders.slice(Math.min(this._filterTiles(tilesToInsert).length, placeholders.length), placeholders.length);
     scout.arrays.pushAll(tiles, placeholders);
   }
 
@@ -147,8 +152,10 @@ scout.Tiles.prototype.setTiles = function(tiles, appendPlaceholders) {
   if (tilesToInsert.length > 0 || tilesToDelete.length > 0) {
     this._setProperty('tiles', tiles);
   }
-  this._applyFilters(tiles);
   this._insertTiles(tilesToInsert);
+
+  this.filteredTilesDirty = this.filteredTilesDirty || tilesToDelete.length > 0 || tilesToInsert.length > 0;
+  this._updateFilteredTiles();
 };
 
 scout.Tiles.prototype._insertTiles = function(tiles) {
@@ -389,7 +396,7 @@ scout.Tiles.prototype.tilesWithoutPlaceholders = function() {
 scout.Tiles.prototype._createPlaceholders = function() {
   var numPlaceholders, lastX,
     columnCount = this.gridColumnCount,
-    tiles = this.tiles,
+    tiles = this.filteredTiles,
     placeholders = [];
 
   if (tiles.length > 0) {
@@ -419,24 +426,21 @@ scout.Tiles.prototype._createPlaceholder = function() {
 };
 
 scout.Tiles.prototype._deleteObsoletePlaceholders = function() {
-  var tiles = [],
+  var obsoletePlaceholders = [],
     obsolete = false;
 
-  this.tiles.forEach(function(tile, index) {
-    if (!(tile instanceof scout.PlaceholderTile)) {
-      tiles.push(tile);
-      return;
-    }
+  var placeholders = this.placeholders();
+  placeholders.forEach(function(placeholder) {
     // Remove all placeholder in the row if there is one at x=0 (don't do it if there are only placeholders)
-    if (tile.gridData.x === 0 && index !== 0) {
+    if (placeholder.gridData.x === 0 && this.filteredTiles[0] !== placeholder) {
       obsolete = true;
     }
-    if (!obsolete) {
-      tiles.push(tile);
+    if (obsolete) {
+      obsoletePlaceholders.push(placeholder);
     }
   }, this);
 
-  this.setTiles(tiles, false);
+  this.deleteTiles(obsoletePlaceholders, false);
 };
 
 scout.Tiles.prototype._deleteAllPlaceholders = function() {
@@ -527,8 +531,8 @@ scout.Tiles.prototype._renderSelectable = function() {
  */
 scout.Tiles.prototype.selectTiles = function(tiles) {
   tiles = scout.arrays.ensure(tiles);
-  tiles = this.visibleTiles(tiles); // Selecting invisible tiles is not allowed
   tiles = this._prepareWidgetProperty('selectedTiles', tiles);
+  tiles = this._filterTiles(tiles); // Selecting invisible tiles is not allowed
 
   // Deselect the tiles which are not part of the new selection
   var tilesToUnselect = this.selectedTiles;
@@ -653,13 +657,41 @@ scout.Tiles.prototype.removeFilter = function(filter) {
 };
 
 scout.Tiles.prototype.filter = function() {
-  this._applyFilters(this.tiles);
+  // Full reset is set to true to loop through every tile and make sure tile.filterAccepted is correctly set
+  this._applyFilters(this.tiles, true);
+  this._updateFilteredTiles();
 };
 
-scout.Tiles.prototype._applyFilters = function(tiles) {
+scout.Tiles.prototype._applyFilters = function(tiles, fullReset) {
+  if (this.filters.length === 0 && !scout.nvl(fullReset, false)) {
+    return;
+  }
+  var newlyHiddenTiles = [];
+  var changed = false;
   tiles.forEach(function(tile) {
-    this._applyFiltersForTile(tile);
+    if (this._applyFiltersForTile(tile)) {
+      changed = true;
+    }
+    if (!tile.filterAccepted && changed) {
+      newlyHiddenTiles.push(tile);
+    }
   }, this);
+
+  if (changed) {
+    this.filteredTilesDirty = true;
+  }
+
+  // Non visible tiles must be deselected
+  this.deselectTiles(newlyHiddenTiles);
+};
+
+scout.Tiles.prototype._updateFilteredTiles = function() {
+  if (this.filteredTilesDirty) {
+    this.setProperty('filteredTiles', this._filterTiles());
+    this.filteredTilesDirty = false;
+  } else if (this.filters.length === 0) {
+    this.setProperty('filteredTiles', this.tiles);
+  }
 };
 
 /**
@@ -682,6 +714,10 @@ scout.Tiles.prototype._applyFiltersForTile = function(tile) {
 
 scout.Tiles.prototype._tileAcceptedByFilters = function(tile) {
   return !this.filters.some(function(filter) {
+    // return true if an element was found which is not accepted by the filter to break the some() loop
+    if (tile instanceof scout.PlaceholderTile) {
+      return false;
+    }
     if (!filter.accept(tile)) {
       return true;
     }
@@ -691,19 +727,12 @@ scout.Tiles.prototype._tileAcceptedByFilters = function(tile) {
 /**
  * @returns the tiles which are accepted by the filter and therefore visible.
  */
-scout.Tiles.prototype.filteredTiles = function(tiles) {
+scout.Tiles.prototype._filterTiles = function(tiles) {
   tiles = scout.nvl(tiles, this.tiles);
+  if (this.filters.length === 0) {
+    return tiles.slice();
+  }
   return tiles.filter(function(tile) {
     return tile.filterAccepted;
-  });
-};
-
-/**
- * @returns the visible tiles, meaning tiles which are not visible because tile.visible is false and tiles which are excluded by the filter are not returned.
- */
-scout.Tiles.prototype.visibleTiles = function(tiles) {
-  tiles = scout.nvl(tiles, this.tiles);
-  return tiles.filter(function(tile) {
-    return tile.isVisible();
   });
 };

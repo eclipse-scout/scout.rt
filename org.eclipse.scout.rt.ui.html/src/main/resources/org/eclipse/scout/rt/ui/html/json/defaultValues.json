@@ -382,17 +382,20 @@
       }
     },
     "Tiles": {
+      "filteredTiles": null,
       "gridColumnCount": 4,
-      "logicalGrid": "Horizontal",
+      "logicalGrid": "HorizontalGrid",
       "logicalGridHGap": 15,
       "logicalGridVGap": 20,
       "logicalGridColumnWidth": 200,
       "logicalGridRowHeight": 150,
       "maxContentWidth": -1,
+      "multiSelect": true,
       "withPlaceholders": false,
       "selectable": false,
-      "multiSelect": true,
-      "scrollable": false
+      "selectedTiles": [],
+      "scrollable": false,
+      "tiles": []
     }
   },
 

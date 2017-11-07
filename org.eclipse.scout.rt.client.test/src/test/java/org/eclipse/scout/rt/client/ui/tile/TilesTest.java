@@ -83,6 +83,7 @@ public class TilesTest {
   @Test
   public void testSelectTiles() {
     P_Tiles tiles = createTestTiles();
+    tiles.setSelectable(true);
     tiles.setMultiSelect(false);
     P_Tile tile0 = createTestTile();
     P_Tile tile1 = createTestTile();
@@ -103,6 +104,7 @@ public class TilesTest {
   @Test
   public void testSelectTilesEvent() {
     P_Tiles tiles = createTestTiles();
+    tiles.setSelectable(true);
     tiles.setMultiSelect(false);
     P_Tile tile0 = createTestTile();
     P_Tile tile1 = createTestTile();
@@ -119,8 +121,40 @@ public class TilesTest {
   }
 
   @Test
+  public void testSelectTiles_filtered() {
+    P_Tiles tiles = createTestTiles();
+    tiles.setSelectable(true);
+    P_Tile tile0 = createTestTile();
+    P_Tile tile1 = createTestTile();
+    P_Tile tile2 = createTestTile();
+    tiles.addTiles(Arrays.asList(tile0, tile1, tile2));
+    assertEquals(3, tiles.getTiles().size());
+    assertEquals(3, tiles.getFilteredTiles().size());
+    assertEquals(0, tiles.getSelectedTiles().size());
+
+    // Only tile1 is visible -> only tile1 may be selected
+    ITileFilter filter = (tile) -> tile == tile1; // accept tile1
+    tiles.addFilter(filter);
+    tiles.selectTiles(Arrays.asList(tile0, tile1));
+    assertEquals(3, tiles.getTiles().size());
+    assertEquals(1, tiles.getFilteredTiles().size());
+    assertEquals(1, tiles.getSelectedTiles().size());
+    assertEquals(tile1, tiles.getFilteredTiles().get(0));
+    assertEquals(tile1, tiles.getSelectedTiles().get(0));
+
+    tiles.removeFilter(filter);
+    tiles.selectTiles(Arrays.asList(tile0, tile1));
+    assertEquals(3, tiles.getTiles().size());
+    assertEquals(3, tiles.getFilteredTiles().size());
+    assertEquals(2, tiles.getSelectedTiles().size());
+    assertEquals(tile0, tiles.getSelectedTiles().get(0));
+    assertEquals(tile1, tiles.getSelectedTiles().get(1));
+  }
+
+  @Test
   public void testDeselectTiles() {
     P_Tiles tiles = createTestTiles();
+    tiles.setSelectable(true);
     tiles.setMultiSelect(false);
     P_Tile tile0 = createTestTile();
     P_Tile tile1 = createTestTile();
@@ -140,6 +174,7 @@ public class TilesTest {
   @Test
   public void testDeselectTilesEvent() {
     P_Tiles tiles = createTestTiles();
+    tiles.setSelectable(true);
     tiles.setMultiSelect(false);
     P_Tile tile0 = createTestTile();
     P_Tile tile1 = createTestTile();
@@ -163,6 +198,7 @@ public class TilesTest {
   @Test
   public void testDeselectTilesWhenDeleted() {
     P_Tiles tiles = createTestTiles();
+    tiles.setSelectable(true);
     tiles.setMultiSelect(true);
     P_Tile tile0 = createTestTile();
     P_Tile tile1 = createTestTile();
@@ -184,6 +220,7 @@ public class TilesTest {
   @Test
   public void testSelectAllTiles() {
     P_Tiles tiles = createTestTiles();
+    tiles.setSelectable(true);
     tiles.setMultiSelect(true);
     P_Tile tile0 = createTestTile();
     P_Tile tile1 = createTestTile();
@@ -201,6 +238,7 @@ public class TilesTest {
   @Test
   public void testDeselectAllTiles() {
     P_Tiles tiles = createTestTiles();
+    tiles.setSelectable(true);
     tiles.setMultiSelect(true);
     P_Tile tile0 = createTestTile();
     P_Tile tile1 = createTestTile();
@@ -218,6 +256,7 @@ public class TilesTest {
   @Test
   public void testDeselectAllTilesWhenAllDeleted() {
     P_Tiles tiles = createTestTiles();
+    tiles.setSelectable(true);
     tiles.setMultiSelect(true);
     P_Tile tile0 = createTestTile();
     P_Tile tile1 = createTestTile();
@@ -231,6 +270,110 @@ public class TilesTest {
     tiles.deleteAllTiles();
     assertEquals(0, tiles.getTiles().size());
     assertEquals(0, tiles.getSelectedTiles().size());
+  }
+
+  @Test
+  public void testFilterTiles() {
+    P_Tiles tiles = createTestTiles();
+    P_Tile tile0 = createTestTile();
+    P_Tile tile1 = createTestTile();
+    P_Tile tile2 = createTestTile();
+    tiles.addTiles(Arrays.asList(tile0, tile1, tile2));
+    assertEquals(3, tiles.getTiles().size());
+    assertEquals(3, tiles.getFilteredTiles().size());
+
+    ITileFilter filter1 = (tile) -> tile != tile1; // accept tile0 and tile2
+    tiles.addFilter(filter1);
+    assertEquals(3, tiles.getTiles().size());
+    assertEquals(2, tiles.getFilteredTiles().size());
+    assertEquals(tile0, tiles.getFilteredTiles().get(0));
+    assertEquals(tile2, tiles.getFilteredTiles().get(1));
+    assertEquals(true, tiles.getTiles().get(0).isFilterAccepted());
+    assertEquals(false, tiles.getTiles().get(1).isFilterAccepted());
+    assertEquals(true, tiles.getTiles().get(2).isFilterAccepted());
+
+    ITileFilter filter2 = (tile) -> tile != tile0; // accept tile1 and tile2
+    tiles.addFilter(filter2);
+    assertEquals(3, tiles.getTiles().size());
+    assertEquals(1, tiles.getFilteredTiles().size());
+    assertEquals(tile2, tiles.getFilteredTiles().get(0));
+    assertEquals(false, tiles.getTiles().get(0).isFilterAccepted());
+    assertEquals(false, tiles.getTiles().get(1).isFilterAccepted());
+    assertEquals(true, tiles.getTiles().get(2).isFilterAccepted());
+
+    tiles.removeFilter(filter1);
+    assertEquals(3, tiles.getTiles().size());
+    assertEquals(2, tiles.getFilteredTiles().size());
+    assertEquals(tile1, tiles.getFilteredTiles().get(0));
+    assertEquals(tile2, tiles.getFilteredTiles().get(1));
+    assertEquals(false, tiles.getTiles().get(0).isFilterAccepted());
+    assertEquals(true, tiles.getTiles().get(1).isFilterAccepted());
+    assertEquals(true, tiles.getTiles().get(2).isFilterAccepted());
+
+    tiles.removeFilter(filter2);
+    assertEquals(3, tiles.getTiles().size());
+    assertEquals(3, tiles.getFilteredTiles().size());
+    assertEquals(tile0, tiles.getFilteredTiles().get(0));
+    assertEquals(tile1, tiles.getFilteredTiles().get(1));
+    assertEquals(tile2, tiles.getFilteredTiles().get(2));
+    assertEquals(true, tiles.getTiles().get(0).isFilterAccepted());
+    assertEquals(true, tiles.getTiles().get(1).isFilterAccepted());
+    assertEquals(true, tiles.getTiles().get(2).isFilterAccepted());
+  }
+
+  @Test
+  public void testFilterTiles_deselectTiles() {
+    P_Tiles tiles = createTestTiles();
+    tiles.setSelectable(true);
+    P_Tile tile0 = createTestTile();
+    P_Tile tile1 = createTestTile();
+    P_Tile tile2 = createTestTile();
+    tiles.addTiles(Arrays.asList(tile0, tile1, tile2));
+    tiles.selectTiles(Arrays.asList(tile0, tile1));
+    assertEquals(3, tiles.getTiles().size());
+    assertEquals(3, tiles.getFilteredTiles().size());
+    assertEquals(2, tiles.getSelectedTiles().size());
+    assertEquals(tile0, tiles.getSelectedTiles().get(0));
+    assertEquals(tile1, tiles.getSelectedTiles().get(1));
+
+    ITileFilter filter = (tile) -> tile == tile1; // accept tile1
+    tiles.addFilter(filter);
+    assertEquals(3, tiles.getTiles().size());
+    assertEquals(1, tiles.getFilteredTiles().size());
+    assertEquals(1, tiles.getSelectedTiles().size());
+    assertEquals(tile1, tiles.getSelectedTiles().get(0));
+  }
+
+  @Test
+  public void testFilterTiles_insertTiles() {
+    P_Tiles tiles = createTestTiles();
+    P_Tile tile0 = createTestTile();
+    P_Tile tile1 = createTestTile();
+    P_Tile tile2 = createTestTile();
+    P_Tile tile3 = createTestTile();
+    P_Tile tile4 = createTestTile();
+    tiles.addTiles(Arrays.asList(tile0, tile1, tile2));
+    assertEquals(3, tiles.getTiles().size());
+    assertEquals(3, tiles.getFilteredTiles().size());
+
+    ITileFilter filter = (tile) -> tile == tile1 || tile == tile4; // accept tile1 and 4
+    tiles.addFilter(filter);
+    assertEquals(3, tiles.getTiles().size());
+    assertEquals(1, tiles.getFilteredTiles().size());
+    assertEquals(tile1, tiles.getFilteredTiles().get(0));
+
+    // Insert tile 3 -> not accepted
+    tiles.addTile(tile3);
+    assertEquals(4, tiles.getTiles().size());
+    assertEquals(1, tiles.getFilteredTiles().size());
+    assertEquals(tile1, tiles.getFilteredTiles().get(0));
+
+    // Insert tile 4 -> accepted
+    tiles.addTile(tile4);
+    assertEquals(5, tiles.getTiles().size());
+    assertEquals(2, tiles.getFilteredTiles().size());
+    assertEquals(tile1, tiles.getFilteredTiles().get(0));
+    assertEquals(tile4, tiles.getFilteredTiles().get(1));
   }
 
   /**
