@@ -44,9 +44,11 @@ scout.CarouselLayout.prototype.layout = function($container) {
 };
 
 scout.CarouselLayout.prototype.preferredLayoutSize = function($container) {
-  var dim = (this.carousel.currentIndex < this.carousel.$carouselItems.length && this.carousel.currentIndex >= 0) ?
-    scout.HtmlComponent.get(this.carousel.$carouselItems[this.carousel.currentIndex]).prefSize() :
-    new scout.Dimension(1, 1);
-  dim += this.carousel.htmlCompStatus.size().height;
+  var currentIndex = this.carousel.currentItem;
+  var dim = new scout.Dimension(1, 1);
+  if (currentIndex < this.carousel.$carouselItems.length && currentIndex >= 0) {
+    dim = scout.HtmlComponent.get(this.carousel.$carouselItems[currentIndex]).prefSize();
+  }
+  dim.height += this.carousel.htmlCompStatus.size().height;
   return dim;
 };

@@ -129,6 +129,7 @@ scout.Carousel.prototype.setCurrentItem = function(currentItem) {
 scout.Carousel.prototype._renderCurrentItem = function() {
   this._renderItemsInternal(undefined, false);
   this._renderCurrentStatusItem();
+  this.invalidateLayoutTree();
 };
 
 scout.Carousel.prototype._renderItemsInternal = function(item, skipRemove) {
