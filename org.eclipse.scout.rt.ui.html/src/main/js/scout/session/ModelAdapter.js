@@ -227,16 +227,32 @@ scout.ModelAdapter.prototype._sendProperty = function(propertyName, value) {
   this._send('property', data);
 };
 
+/**
+ * Adds a custom filter for events.
+ */
 scout.ModelAdapter.prototype.addFilterForWidgetEvent = function(filter) {
   this._widgetEventTypeFilter.addFilter(filter);
 };
 
+/**
+ * Adds a filter which only checks the type of the event.
+ */
 scout.ModelAdapter.prototype.addFilterForWidgetEventType = function(eventType) {
   this._widgetEventTypeFilter.addFilterForEventType(eventType);
 };
 
+/**
+ * Adds a filter which checks the name and value of every property in the given properties array.
+ */
 scout.ModelAdapter.prototype.addFilterForProperties = function(properties) {
   this._propertyChangeEventFilter.addFilterForProperties(properties);
+};
+
+/**
+ * Adds a filter which only checks the property name and ignores the value.
+ */
+scout.ModelAdapter.prototype.addFilterForPropertyName = function(propertyName) {
+  this._propertyChangeEventFilter.addFilterForPropertyName(propertyName);
 };
 
 scout.ModelAdapter.prototype._isPropertyChangeEventFiltered = function(propertyName, value) {

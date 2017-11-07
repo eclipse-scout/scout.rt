@@ -16,6 +16,8 @@ scout.TilesAdapter = function() {
 scout.inherits(scout.TilesAdapter, scout.ModelAdapter);
 
 scout.TilesAdapter.prototype._syncSelectedTiles = function(tiles) {
+  // Tiles.js won't modify the selectedTiles array while processing the response -> ignore every selectedTiles property change
+  this.addFilterForPropertyName('selectedTiles');
   this.widget.selectTiles(tiles);
 };
 
