@@ -109,6 +109,11 @@ scout.ImageField.prototype._renderGridData = function() {
   this._updateInnerAlignment();
 };
 
+scout.ImageField.prototype._renderGridDataHints = function() {
+  scout.ImageField.parent.prototype._renderGridDataHints.call(this);
+  this._updateInnerAlignment();
+};
+
 scout.ImageField.prototype._updateInnerAlignment = function() {
   // Enable inner alignment only when scrollbars are disabled
   this.updateInnerAlignment({

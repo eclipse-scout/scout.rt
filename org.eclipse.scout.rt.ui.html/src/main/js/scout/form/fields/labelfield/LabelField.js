@@ -51,3 +51,10 @@ scout.LabelField.prototype._renderGridData = function() {
     useHorizontalAlignment: true
   });
 };
+
+scout.LabelField.prototype._renderGridDataHints = function() {
+  scout.LabelField.parent.prototype._renderGridDataHints.call(this);
+  this.updateInnerAlignment({
+    useHorizontalAlignment: true
+  });
+};

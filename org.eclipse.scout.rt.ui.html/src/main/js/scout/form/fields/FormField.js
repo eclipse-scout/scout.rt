@@ -525,6 +525,9 @@ scout.FormField.prototype._setGridDataHints = function(gridData) {
     gridData = new scout.GridData();
   }
   this._setProperty('gridDataHints', scout.GridData.ensure(gridData));
+};
+
+scout.FormField.prototype._renderGridDataHints = function() {
   this.parent.invalidateLogicalGrid();
 };
 
@@ -963,12 +966,17 @@ scout.FormField.prototype._updateElementInnerAlignment = function(opts, $field) 
   if (useHorizontalAlignment || useVerticalAlignment) {
     // Set horizontal and vertical alignment (from gridData)
     $field.addClass('has-inner-alignment');
+    var gridData = this.gridData;
+    if (this.parent.logicalGrid) {
+      // If the logical grid is calculated by JS, use the hints instead of the calculated grid data
+      gridData = this.gridDataHints;
+    }
     if (useHorizontalAlignment) {
-      var hAlign = this.gridData.horizontalAlignment;
+      var hAlign = gridData.horizontalAlignment;
       $field.addClass(hAlign < 0 ? 'halign-left' : (hAlign > 0 ? 'halign-right' : 'halign-center'));
     }
     if (useVerticalAlignment) {
-      var vAlign = this.gridData.verticalAlignment;
+      var vAlign = gridData.verticalAlignment;
       $field.addClass(vAlign < 0 ? 'valign-top' : (vAlign > 0 ? 'valign-bottom' : 'valign-middle'));
     }
   }

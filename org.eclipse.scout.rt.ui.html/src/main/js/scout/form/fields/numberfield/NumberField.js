@@ -47,6 +47,13 @@ scout.NumberField.prototype._renderGridData = function() {
   });
 };
 
+scout.NumberField.prototype._renderGridDataHints = function() {
+  scout.NumberField.parent.prototype._renderGridDataHints.call(this);
+  this.updateInnerAlignment({
+    useHorizontalAlignment: true
+  });
+};
+
 scout.NumberField.prototype._getDefaultFormat = function(locale) {
   return locale.decimalFormatPatternDefault;
 };

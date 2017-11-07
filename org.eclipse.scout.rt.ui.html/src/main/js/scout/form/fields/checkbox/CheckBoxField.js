@@ -156,6 +156,13 @@ scout.CheckBoxField.prototype._renderGridData = function() {
   });
 };
 
+scout.CheckBoxField.prototype._renderGridDataHints = function() {
+  scout.CheckBoxField.parent.prototype._renderGridDataHints.call(this);
+  this.updateInnerAlignment({
+    useHorizontalAlignment: true
+  });
+};
+
 scout.CheckBoxField.prototype.prepareForCellEdit = function(opts) {
   scout.CheckBoxField.parent.prototype.prepareForCellEdit.call(this, opts);
   this.$checkBoxLabel.hide();

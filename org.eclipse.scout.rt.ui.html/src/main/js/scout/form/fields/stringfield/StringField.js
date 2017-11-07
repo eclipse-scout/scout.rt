@@ -351,6 +351,13 @@ scout.StringField.prototype._renderGridData = function() {
   });
 };
 
+scout.StringField.prototype._renderGridDataHints = function() {
+  scout.StringField.parent.prototype._renderGridDataHints.call(this);
+  this.updateInnerAlignment({
+    useHorizontalAlignment: true
+  });
+};
+
 scout.StringField.prototype._onIconClick = function(event) {
   this.acceptInput();
   this.$field.focus();
