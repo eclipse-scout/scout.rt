@@ -20,72 +20,77 @@ public final class ClientNotificationProperties {
   private ClientNotificationProperties() {
   }
 
-  /**
-   * Capacity of notification queue for client notifications. If maximum capacity is reached, notification messages are
-   * dropped.
-   */
   public static class NodeQueueCapacity extends AbstractPositiveIntegerConfigProperty {
 
     @Override
-    protected Integer getDefaultValue() {
+    public Integer getDefaultValue() {
       return 200;
     }
 
     @Override
+    public String description() {
+      return "Capacity of the client notification queue. If maximum capacity is reached, notification messages are dropped. The default value is 200.";
+    }
+
+    @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.clientnotification.ClientNotificationNodeQueue#capacity";
+      return "scout.clientnotification.nodeQueueCapacity";
     }
   }
 
-  /**
-   * The maximum amount of time in [ms] a consumer blocks while waiting for new notifications.
-   */
   public static class MaxNotificationBlockingTimeOut extends AbstractPositiveIntegerConfigProperty {
 
     @Override
-    protected Integer getDefaultValue() {
+    public Integer getDefaultValue() {
       return 10000;
     }
 
     @Override
+    public String description() {
+      return "The maximum amount of time in millisecons a consumer blocks while waiting for new notifications. The default is 10 seconds.";
+    }
+
+    @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.clientnotification.ClientNotificationService#blockingTimeout";
+      return "scout.clientnotification.maxNotificationBlockingTimeOut";
     }
   }
 
-  /**
-   * The maximum number of notifications that are consumed at once.
-   */
   public static class MaxNotificationMessages extends AbstractPositiveIntegerConfigProperty {
 
     @Override
-    protected Integer getDefaultValue() {
+    public Integer getDefaultValue() {
       return 30;
     }
 
     @Override
+    public String description() {
+      return "The maximum number of client notifications that are consumed at once. The default is 30.";
+    }
+
+    @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.clientnotification.ClientNotificationService#maxMessages";
+      return "scout.clientnotification.chunkSize";
     }
   }
 
-  /**
-   * If no message is consumed for a certain amount of time, notification queues are removed to avoid overflows and
-   * unnecessary memory consumption. This may happen, if a node does not properly unregister (e.g. due to a crash). <br>
-   * This timeout in milliseconds specifies the amount of time in milliseconds waited, until a queue (with possibly
-   * pending notifications) is removed, if notifications are not consumed.
-   */
   public static class NotificationQueueExpireTime extends AbstractPositiveIntegerConfigProperty {
 
     @Override
-    protected Integer getDefaultValue() {
+    public Integer getDefaultValue() {
       return 10 * 60 * 1000;
     }
 
     @Override
+    public String description() {
+      return "If no message is consumed for the specified number of milliseconds, client notification queues (with possibly pending notifications) are removed.\n"
+          + "This avoids overflows and unnecessary memory consumption. Old queues may exist if a node does not properly unregister (e.g. due to a crash).\n"
+          + "The default value is 10 minutes.";
+    }
+
+    @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry#m_queueExpireTime";
+      return "scout.clientnotification.notificationQueueExpireTime";
     }
   }
-
 }

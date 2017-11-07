@@ -58,8 +58,13 @@ public class IntegerConfigPropertyTest {
   public static class SampleTestProperty extends AbstractIntegerConfigProperty {
 
     @Override
-    protected Integer getDefaultValue() {
+    public Integer getDefaultValue() {
       return 42;
+    }
+
+    @Override
+    public String description() {
+      return null;
     }
 
     @Override
@@ -72,8 +77,13 @@ public class IntegerConfigPropertyTest {
   public static class PositiveSampleTestProperty extends AbstractPositiveIntegerConfigProperty {
 
     @Override
-    protected Integer getDefaultValue() {
+    public Integer getDefaultValue() {
       return 42;
+    }
+
+    @Override
+    public String description() {
+      return null;
     }
 
     @Override

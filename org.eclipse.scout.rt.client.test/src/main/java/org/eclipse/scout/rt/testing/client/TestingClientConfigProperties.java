@@ -29,8 +29,13 @@ public final class TestingClientConfigProperties {
     }
 
     @Override
+    public String description() {
+      return "Testing client session expiration in milliseconds. The default value is 1 day.";
+    }
+
+    @Override
     public String getKey() {
-      return "org.eclipse.scout.testing.client.ClientSessionProviderWithCache#expiration";
+      return "scout.client.testingSessionTtl";
     }
   }
 }

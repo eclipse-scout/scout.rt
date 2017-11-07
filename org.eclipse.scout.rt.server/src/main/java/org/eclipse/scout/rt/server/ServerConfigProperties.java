@@ -16,38 +16,48 @@ import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPortConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
-import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
+import org.eclipse.scout.rt.server.services.common.file.RemoteFileService;
 
 public final class ServerConfigProperties {
+
   private ServerConfigProperties() {
   }
 
   public static class ClusterSyncUserProperty extends AbstractStringConfigProperty {
 
+    public static final String CLUSTER_SYNC_USER_NAME = "system";
+
     @Override
-    protected String getDefaultValue() {
-      return "system";
+    public String getDefaultValue() {
+      return CLUSTER_SYNC_USER_NAME;
     }
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.clustersync.ClusterSynchronizationService#user";
+      return "scout.clustersync.user";
+    }
+
+    @Override
+    public String description() {
+      return String.format("Technical subject under which received cluster sync notifications are executed. The default value is '%s'.", CLUSTER_SYNC_USER_NAME);
     }
   }
 
-  /**
-   * expiration for {@link ServerSessionProviderWithCache} in milliseconds. Default is one day.
-   */
   public static class ServerSessionCacheExpirationProperty extends AbstractPositiveLongConfigProperty {
 
     @Override
-    protected Long getDefaultValue() {
+    public Long getDefaultValue() {
       return TimeUnit.DAYS.toMillis(1);
     }
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache#expiration";
+      return "scout.serverSessionTtl";
+    }
+
+    @Override
+    public String description() {
+      return "Server sessions that have not been accessed for the specified number of milliseconds are removed from the cache. The default value is one day.";
     }
   }
 
@@ -55,7 +65,12 @@ public final class ServerConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.file.RemoteFileService#rootPath";
+      return "scout.remotefileRootPath";
+    }
+
+    @Override
+    public String description() {
+      return String.format("Absolute path to the root directory of the '%s'. The default value is null.", RemoteFileService.class.getSimpleName());
     }
   }
 
@@ -63,7 +78,12 @@ public final class ServerConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.imap.AbstractIMAPService#host";
+      return "scout.imap.host";
+    }
+
+    @Override
+    public String description() {
+      return "The IMAP server to connect to.";
     }
   }
 
@@ -71,7 +91,12 @@ public final class ServerConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.imap.AbstractIMAPService#port";
+      return "scout.imap.port";
+    }
+
+    @Override
+    public String description() {
+      return "The port on which the IMAP server should be contacted. If not specified, the default port is used.";
     }
   }
 
@@ -79,7 +104,12 @@ public final class ServerConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.imap.AbstractIMAPService#mailbox";
+      return "scout.imap.mailbox";
+    }
+
+    @Override
+    public String description() {
+      return "The mailbox folder name to open. If not specified the default folder is opened.";
     }
   }
 
@@ -87,7 +117,12 @@ public final class ServerConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.imap.AbstractIMAPService#userName";
+      return "scout.imap.username";
+    }
+
+    @Override
+    public String description() {
+      return "Default user name for IMAP.";
     }
   }
 
@@ -95,7 +130,12 @@ public final class ServerConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.imap.AbstractIMAPService#password";
+      return "scout.imap.password";
+    }
+
+    @Override
+    public String description() {
+      return "The password to connect to the mailbox.";
     }
   }
 
@@ -103,7 +143,12 @@ public final class ServerConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.imap.AbstractIMAPService#sslProtocols";
+      return "scout.imap.sslProtocols";
+    }
+
+    @Override
+    public String description() {
+      return "Specifies the SSL protocols that will be enabled for SSL connections. The property value is a whitespace separated list of tokens acceptable to the javax.net.ssl.SSLSocket.setEnabledProtocols() method.";
     }
   }
 
@@ -111,7 +156,12 @@ public final class ServerConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.smtp.AbstractSMTPService#host";
+      return "scout.smtp.host";
+    }
+
+    @Override
+    public String description() {
+      return "SMTP server host name.";
     }
   }
 
@@ -119,7 +169,12 @@ public final class ServerConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.smtp.AbstractSMTPService#port";
+      return "scout.smtp.port";
+    }
+
+    @Override
+    public String description() {
+      return "The port to connect to the server.";
     }
   }
 
@@ -127,7 +182,12 @@ public final class ServerConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.smtp.AbstractSMTPService#username";
+      return "scout.smtp.username";
+    }
+
+    @Override
+    public String description() {
+      return "SMTP server username.";
     }
   }
 
@@ -135,7 +195,12 @@ public final class ServerConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.smtp.AbstractSMTPService#password";
+      return "scout.smtp.password";
+    }
+
+    @Override
+    public String description() {
+      return "SMTP server password";
     }
   }
 
@@ -143,7 +208,12 @@ public final class ServerConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.smtp.AbstractSMTPService#subjectPrefix";
+      return "scout.smtp.subjectPrefix";
+    }
+
+    @Override
+    public String description() {
+      return "Text that will be added in front of each email subject that is sent. The default value is null.";
     }
   }
 
@@ -151,7 +221,12 @@ public final class ServerConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.smtp.AbstractSMTPService#defaultFromEmail";
+      return "scout.smtp.defaultFromEmail";
+    }
+
+    @Override
+    public String description() {
+      return "Default sender Email address.";
     }
   }
 
@@ -159,7 +234,12 @@ public final class ServerConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.smtp.AbstractSMTPService#debugReceiverEmail";
+      return "scout.smtp.debugReceiverEmail";
+    }
+
+    @Override
+    public String description() {
+      return "If specified all emails are sent to this address instead of the real one. This may be useful during development to not send emails to real users by accident.";
     }
   }
 
@@ -167,7 +247,12 @@ public final class ServerConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.smtp.AbstractSMTPService#sslProtocols";
+      return "scout.smtp.sslProtocols";
+    }
+
+    @Override
+    public String description() {
+      return "Specifies the SSL protocols that will be enabled for SSL connections. The property value is a whitespace separated list of tokens acceptable to the javax.net.ssl.SSLSocket.setEnabledProtocols() method.";
     }
   }
 
@@ -175,7 +260,12 @@ public final class ServerConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.smtp.AbstractSMTPService#useAuthentication";
+      return "scout.smtp.useAuth";
+    }
+
+    @Override
+    public String description() {
+      return "If true, attempt to authenticate the user using the AUTH command.";
     }
   }
 
@@ -183,8 +273,12 @@ public final class ServerConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.smtp.AbstractSMTPService#useSmtps";
+      return "scout.smtp.useSsl";
+    }
+
+    @Override
+    public String description() {
+      return "Specifies if a secure connection should be used.";
     }
   }
-
 }

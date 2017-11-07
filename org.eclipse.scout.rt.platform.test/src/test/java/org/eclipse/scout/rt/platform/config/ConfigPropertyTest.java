@@ -68,7 +68,12 @@ public class ConfigPropertyTest {
     }
 
     @Override
-    protected String getDefaultValue() {
+    public String description() {
+      return null;
+    }
+
+    @Override
+    public String getDefaultValue() {
       return "default";
     }
   }
@@ -84,6 +89,11 @@ public class ConfigPropertyTest {
     }
 
     @Override
+    public String description() {
+      return null;
+    }
+
+    @Override
     protected List<Integer> parse(List<String> value) {
       List<Integer> result = new ArrayList<Integer>(value.size());
       for (String s : value) {
@@ -93,7 +103,7 @@ public class ConfigPropertyTest {
     }
 
     @Override
-    protected List<Integer> getDefaultValue() {
+    public List<Integer> getDefaultValue() {
       return Arrays.asList(22, 33);
     }
 

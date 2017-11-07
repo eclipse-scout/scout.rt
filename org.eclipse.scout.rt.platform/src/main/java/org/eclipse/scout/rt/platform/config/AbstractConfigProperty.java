@@ -23,7 +23,8 @@ public abstract class AbstractConfigProperty<DATA_TYPE, RAW_TYPE> implements ICo
   private final Map<String /* namespace, may be null */, P_ParsedPropertyValueEntry<DATA_TYPE>> m_values = new HashMap<>();
   private final EventListenerList m_listeners = new EventListenerList();
 
-  protected DATA_TYPE getDefaultValue() {
+  @Override
+  public DATA_TYPE getDefaultValue() {
     return null;
   }
 

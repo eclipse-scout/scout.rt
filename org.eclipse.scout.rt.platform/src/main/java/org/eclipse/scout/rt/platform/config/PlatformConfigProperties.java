@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.config;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 
 public final class PlatformConfigProperties {
@@ -17,18 +18,20 @@ public final class PlatformConfigProperties {
   private PlatformConfigProperties() {
   }
 
-  /**
-   * Property to specify if the application is running in development mode. Default is <code>false</code>.
-   */
   public static class PlatformDevModeProperty extends AbstractBooleanConfigProperty {
 
     @Override
     public String getKey() {
-      return "scout.dev.mode";
+      return "scout.devMode";
     }
 
     @Override
-    protected Boolean getDefaultValue() {
+    public String description() {
+      return "Property to specify if the application is running in development mode. Default is false.";
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
       return Boolean.FALSE;
     }
   }
@@ -41,7 +44,12 @@ public final class PlatformConfigProperties {
     }
 
     @Override
-    protected String getDefaultValue() {
+    public String description() {
+      return "The application version as displayed to the user. Used e.g. in the info form and the diagnostic views. The default value is '0.0.0'.";
+    }
+
+    @Override
+    public String getDefaultValue() {
       return "0.0.0";
     }
   }
@@ -54,30 +62,34 @@ public final class PlatformConfigProperties {
     }
 
     @Override
-    protected String getDefaultValue() {
+    public String description() {
+      return "The display name of the application. Used e.g. in the info form and the diagnostic views. The default value is 'unknown'.";
+    }
+
+    @Override
+    public String getDefaultValue() {
       return "unknown";
     }
   }
 
-  /**
-   * Specifies if jandex indexes should be rebuilt.
-   */
   public static class JandexRebuildProperty extends AbstractBooleanConfigProperty {
 
     @Override
     public String getKey() {
-      return "jandex.rebuild";
+      return "scout.jandex.rebuild";
     }
 
     @Override
-    protected Boolean getDefaultValue() {
+    public String description() {
+      return "Specifies if Jandex indexes should be rebuilt. Is only necessary to enable during development when the class files change often. The default value is false.";
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
       return Boolean.FALSE;
     }
   }
 
-  /**
-   * The number of threads to keep in the pool, even if they are idle.
-   */
   public static class JobManagerCorePoolSizeProperty extends AbstractPositiveIntegerConfigProperty {
 
     @Override
@@ -86,17 +98,16 @@ public final class PlatformConfigProperties {
     }
 
     @Override
-    protected Integer getDefaultValue() {
+    public String description() {
+      return "The number of threads to keep in the pool, even if they are idle. The default value is 25.";
+    }
+
+    @Override
+    public Integer getDefaultValue() {
       return 25;
     }
   }
 
-  /**
-   * Specifies whether all threads of the core-pool should be started upon job manager startup, so that they are idle
-   * waiting for work.
-   *
-   * @see JobManagerCorePoolSizeProperty
-   */
   public static class JobManagerPrestartCoreThreadsProperty extends AbstractBooleanConfigProperty {
 
     @Override
@@ -105,14 +116,17 @@ public final class PlatformConfigProperties {
     }
 
     @Override
-    protected Boolean getDefaultValue() {
+    public String description() {
+      return String.format("Specifies whether all threads of the core-pool should be started upon job manager startup, so that they are idle waiting for work.\n"
+          + "By default this is disabled in development mode (property '%s' is true) and enabled otherwise.", BEANS.get(PlatformDevModeProperty.class).getKey());
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
       return !Platform.get().inDevelopmentMode();
     }
   }
 
-  /**
-   * The maximal number of threads to be created once the core-pool-size is exceeded.
-   */
   public static class JobManagerMaximumPoolSizeProperty extends AbstractPositiveIntegerConfigProperty {
 
     @Override
@@ -121,15 +135,17 @@ public final class PlatformConfigProperties {
     }
 
     @Override
-    protected Integer getDefaultValue() {
+    public String description() {
+      return String.format("The maximal number of threads to be created once the value of '%s' is exceeded. The default value is unlimited (which means limited by the resources of the machine).",
+          BEANS.get(JobManagerCorePoolSizeProperty.class).getKey());
+    }
+
+    @Override
+    public Integer getDefaultValue() {
       return Integer.MAX_VALUE;
     }
   }
 
-  /**
-   * The time limit (in seconds) for which threads, which are created upon exceeding the 'core-pool-size' limit, may
-   * remain idle before being terminated.
-   */
   public static class JobManagerKeepAliveTimeProperty extends AbstractPositiveLongConfigProperty {
 
     @Override
@@ -138,14 +154,17 @@ public final class PlatformConfigProperties {
     }
 
     @Override
-    protected Long getDefaultValue() {
+    public String description() {
+      return String.format("The time limit (in seconds) for which threads, which are created upon exceeding the '%s' limit, may remain idle before being terminated. The default value is 1 minute.",
+          BEANS.get(JobManagerCorePoolSizeProperty.class).getKey());
+    }
+
+    @Override
+    public Long getDefaultValue() {
       return 60L;
     }
   }
 
-  /**
-   * Specifies whether threads of the core-pool should be terminated after being idle for longer than 'keepAliveTime'.
-   */
   public static class JobManagerAllowCoreThreadTimeoutProperty extends AbstractBooleanConfigProperty {
 
     @Override
@@ -154,7 +173,13 @@ public final class PlatformConfigProperties {
     }
 
     @Override
-    protected Boolean getDefaultValue() {
+    public String description() {
+      return String.format("Specifies whether threads of the core-pool should be terminated after being idle for longer than the value of property '%s'. The defautl value is false.",
+          BEANS.get(JobManagerKeepAliveTimeProperty.class).getKey());
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
       return Boolean.FALSE;
     }
   }

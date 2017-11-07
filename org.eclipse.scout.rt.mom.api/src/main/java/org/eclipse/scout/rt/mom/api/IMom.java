@@ -198,11 +198,6 @@ public interface IMom {
    */
   void destroy();
 
-  /**
-   * Specifies the default {@link IMarshaller} to use if no marshaller is specified for a MOM or a destination.
-   * <p>
-   * By default, {@link JsonMarshaller} is used.
-   */
   class DefaultMarshallerProperty extends AbstractClassConfigProperty<IMarshaller> {
 
     @Override
@@ -211,17 +206,16 @@ public interface IMom {
     }
 
     @Override
-    protected Class<? extends IMarshaller> getDefaultValue() {
+    public String description() {
+      return String.format("Specifies the default Marshaller to use if no marshaller is specified for a MOM or a destination. By default the '%s' is used.", JsonMarshaller.class.getSimpleName());
+    }
+
+    @Override
+    public Class<? extends IMarshaller> getDefaultValue() {
       return JsonMarshaller.class;
     }
   }
 
-  /**
-   * Specifies if 'request-reply' messaging is enabled by default. This value can also be configured individually per
-   * MOM (see {@link IMomImplementor#REQUEST_REPLY_ENABLED}).
-   * <p>
-   * The default value is <code>true</code>.
-   */
   class RequestReplyEnabledProperty extends AbstractBooleanConfigProperty {
 
     @Override
@@ -230,25 +224,30 @@ public interface IMom {
     }
 
     @Override
-    protected Boolean getDefaultValue() {
+    public String description() {
+      return "Specifies if 'request-reply' messaging is enabled by default. This value can also be configured individually per MOM. The default value is true.";
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
       return Boolean.TRUE;
     }
   }
 
-  /**
-   * Specifies the default topic to receive cancellation request for 'request-reply' communication.
-   * <p>
-   * By default, a defined topic with the name <code>scout.mom.requestreply.cancellation</code> is used.
-   */
   class RequestReplyCancellationTopicProperty extends AbstractDestinationConfigProperty<String> {
 
     @Override
     public String getKey() {
-      return "scout.mom.requestreply.cancellation.topic";
+      return "scout.mom.requestreply.cancellationTopic";
     }
 
     @Override
-    protected IDestination<String> getDefaultValue() {
+    public String description() {
+      return "Specifies the default topic to receive cancellation request for 'request-reply' communication. By default, a defined topic with the name 'scout.mom.requestreply.cancellation' is used.";
+    }
+
+    @Override
+    public IDestination<String> getDefaultValue() {
       return MOM.newDestination("scout.mom.requestreply.cancellation", getType(), ResolveMethod.DEFINE, null);
     }
 

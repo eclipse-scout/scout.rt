@@ -27,7 +27,12 @@ public final class SqlConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#transactionMemberId";
+      return "scout.sql.transactionMemberId";
+    }
+
+    @Override
+    public String description() {
+      return "Id of the transaction member on which the connection is available.";
     }
   }
 
@@ -35,7 +40,12 @@ public final class SqlConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#jndiName";
+      return "scout.sql.jndi.name";
+    }
+
+    @Override
+    public String description() {
+      return "The name of the object to lookup in the JNDI context. Default is null.";
     }
   }
 
@@ -43,7 +53,12 @@ public final class SqlConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#jndiInitialContextFactory";
+      return "scout.sql.jndi.initialContextFactory";
+    }
+
+    @Override
+    public String description() {
+      return "The name of the object to lookup in the JNDI context. Default is null.";
     }
   }
 
@@ -51,7 +66,12 @@ public final class SqlConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#jndiProviderUrl";
+      return "scout.sql.jndi.providerUrl";
+    }
+
+    @Override
+    public String description() {
+      return "JNDI provider url (e.g. 'ldap://somehost:389'). Default is null.";
     }
   }
 
@@ -59,7 +79,12 @@ public final class SqlConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#jndiUrlPkgPrefixes";
+      return "scout.sql.jndi.urlPkgPrefixes";
+    }
+
+    @Override
+    public String description() {
+      return "A colon-separated list of package prefixes for the class name of the factory class that will create a URL context factory. Default is null.";
     }
   }
 
@@ -67,7 +92,12 @@ public final class SqlConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#jdbcMappingName";
+      return "scout.sql.jdbc.mappingName";
+    }
+
+    @Override
+    public String description() {
+      return "The JDBC mapping name. By default 'jdbc:oracle:thin:@localhost:1521:ORCL' is used.";
     }
   }
 
@@ -75,7 +105,12 @@ public final class SqlConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#jdbcDriverName";
+      return "scout.sql.jdbc.driverName";
+    }
+
+    @Override
+    public String description() {
+      return "The driver name to use. By default 'oracle.jdbc.OracleDriver' is used.";
     }
   }
 
@@ -83,7 +118,12 @@ public final class SqlConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#jdbcProperties";
+      return "scout.sql.jdbc.properties";
+    }
+
+    @Override
+    public String description() {
+      return "Semicolon separated list of properties to pass to the JDBC connection. The default value is null. E.g.: key1=val1;key2=val2";
     }
   }
 
@@ -91,7 +131,12 @@ public final class SqlConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#username";
+      return "scout.sql.username";
+    }
+
+    @Override
+    public String description() {
+      return "The username to connect to the database (JDBC or JNDI)";
     }
   }
 
@@ -99,7 +144,12 @@ public final class SqlConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#password";
+      return "scout.sql.password";
+    }
+
+    @Override
+    public String description() {
+      return "The password to connect to the database (JDBC or JNDI)";
     }
   }
 
@@ -107,7 +157,12 @@ public final class SqlConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#directJdbcConnection";
+      return "scout.sql.directJdbcConnection";
+    }
+
+    @Override
+    public String description() {
+      return "If true a direct JDBC connection is created. Otherwise a JNDI connection is used. The default value is true.";
     }
   }
 
@@ -115,7 +170,12 @@ public final class SqlConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#jdbcPoolConnectionLifetime";
+      return "scout.sql.jdbc.pool.connectionIdleTimeout";
+    }
+
+    @Override
+    public String description() {
+      return "Idle connections will be closed after this timeout in milliseconds. The default value is 5 minutes.";
     }
   }
 
@@ -123,7 +183,12 @@ public final class SqlConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#jdbcPoolConnectionBusyTimeout";
+      return "scout.sql.jdbc.pool.connectionBusyTimeout";
+    }
+
+    @Override
+    public String description() {
+      return "Connections will be closed after this timeout in milliseconds even if the connection is still busy. The default value is 6 hours.";
     }
   }
 
@@ -131,7 +196,12 @@ public final class SqlConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#jdbcStatementCacheSize";
+      return "scout.sql.jdbc.statementCacheSize";
+    }
+
+    @Override
+    public String description() {
+      return "Maximum number of cached SQL statements. The default value is 25.";
     }
   }
 
@@ -139,24 +209,29 @@ public final class SqlConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#jdbcPoolSize";
+      return "scout.sql.jdbc.pool.size";
+    }
+
+    @Override
+    public String description() {
+      return "The maximum number of connections to create. The default pool size is 25.";
     }
   }
 
-  /**
-   * Indicates whether to uninstall JDBC driver upon platform shutdown (<code>true</code> by default).
-   * <p>
-   * This property has no effect if working with JNDI JDBC connections.
-   */
   public static class SqlJdbcDriverUnloadProperty extends AbstractBooleanConfigProperty {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#jdbcDriverUnload";
+      return "scout.sql.jdbc.driverUnload";
     }
 
     @Override
-    protected Boolean getDefaultValue() {
+    public String description() {
+      return "Indicates whether to uninstall JDBC driver upon platform shutdown. This property has no effect if working with JNDI JDBC connections. By default this property is enabled.";
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
       return Boolean.TRUE;
     }
   }

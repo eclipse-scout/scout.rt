@@ -92,14 +92,16 @@ public class NodeIdentifier {
     return StringUtility.join(":", hostname, 8080);
   }
 
-  /**
-   * Represents the config-property to configure a node identifier.
-   */
   public static class NodeIdProperty extends AbstractStringConfigProperty {
 
     @Override
     public String getKey() {
-      return "scout.node.id";
+      return "scout.nodeId";
+    }
+
+    @Override
+    public String description() {
+      return "Specifies the cluster node name. If not specified a default id is computed.";
     }
   }
 }

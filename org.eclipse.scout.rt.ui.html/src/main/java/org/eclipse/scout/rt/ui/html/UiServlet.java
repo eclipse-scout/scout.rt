@@ -19,7 +19,6 @@ import java.util.Locale;
 import javax.security.auth.Subject;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -225,26 +224,23 @@ public class UiServlet extends AbstractHttpServlet {
     }
   }
 
-  /**
-   * Specifies if the {@link SessionCookieConfig} should be checked for the 'Secure' flag. This flag should be set for
-   * encrypted (https) channels to ensure the user agent only sends the cookie over secured channels.<br>
-   * Unfortunately it is not possible to detect if the request from the user is using a secured channel.
-   * {@link ServletRequest#isSecure()} only detects if the request received by the container is secured. But the
-   * container may be behind a proxy which forwards the requests without encryption but the request from the browser to
-   * the proxy itself is encrypted.<br>
-   * To handle these cases the check is executed by default even if the request is not secure. In those cases where
-   * really no encrypted channel to the user agent is used (not recommended) this property should be set to
-   * <code>false</code>.
-   */
   public static class CheckSessionCookieSecureFlagProperty extends AbstractBooleanConfigProperty {
 
     @Override
     public String getKey() {
-      return "scout.auth.cookie.session.validate.secure";
+      return "scout.auth.cookieSessionValidateSecure";
     }
 
     @Override
-    protected Boolean getDefaultValue() {
+    public String description() {
+      return "Specifies if the UI server should ensure a secure cookie configuration of the webapp.\n"
+          + "If enabled the application validates that the 'httpOnly' and 'Secure' flags are set in the cookie configuration in the web.xml.\n"
+          + "This property should be disabled if no secure connection (https) is used to the client browser (not recommended).\n"
+          + "The default value is true.";
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
       return Boolean.TRUE;
     }
   }

@@ -29,11 +29,11 @@ public final class JaxWsTestConfigProperties {
 
     @Override
     public String getKey() {
-      return "jaxws.implementor";
+      return "scout.jaxws.implementor";
     }
 
     @Override
-    protected Class<? extends JaxWsImplementorSpecifics> getDefaultValue() {
+    public Class<? extends JaxWsImplementorSpecifics> getDefaultValue() {
       return JaxWsRISpecifics.class;
     }
   }

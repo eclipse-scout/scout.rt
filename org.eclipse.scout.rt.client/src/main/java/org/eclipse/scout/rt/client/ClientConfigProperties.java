@@ -10,20 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
-import org.eclipse.scout.rt.client.services.common.prefs.FileSystemUserPreferencesStorageService;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 public final class ClientConfigProperties {
+
   private ClientConfigProperties() {
   }
 
-  /**
-   * Specifies how long the client keeps fetched data before it is discarded.<br>
-   * Must be one of the following values: small, medium or large. Default is large.
-   */
   public static class MemoryPolicyProperty extends AbstractStringConfigProperty {
 
     @Override
@@ -36,41 +32,49 @@ public final class ClientConfigProperties {
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.memory";
+      return "scout.client.memoryPolicy";
     }
 
     @Override
-    protected String getDefaultValue() {
+    public String description() {
+      return "Specifies how long the client keeps fetched data before it is discarded. One of 'small', 'medium' or 'large'. The default value is 'large'.";
+    }
+
+    @Override
+    public String getDefaultValue() {
       return "large";
     }
   }
 
-  /**
-   * Specifies the user area on the local file system where to store user preferences.<br>
-   * If nothing is specified the user home of the operating system is used.
-   *
-   * @see FileSystemUserPreferencesStorageService
-   */
   public static class UserAreaProperty extends AbstractStringConfigProperty {
 
     @Override
     public String getKey() {
-      return "user.area";
+      return "scout.client.userArea";
+    }
+
+    @Override
+    public String description() {
+      return "User data area (e.g. in the user home) to store user preferences. If nothing is specified the user home of the operating system is used. By default no user home is set.";
     }
   }
 
-  /**
-   * Specifies the maximal time (in seconds) to wait until running jobs are cancelled on session shutdown.
-   */
   public static class JobCompletionDelayOnSessionShutdown extends AbstractPositiveLongConfigProperty {
 
     @Override
     public String getKey() {
-      return "session.jobCompletionDelayOnSessionShutdown";
+      return "scout.client.jobCompletionDelayOnSessionShutdown";
     }
 
     @Override
-    protected Long getDefaultValue() {
+    public String description() {
+      return "Specifies the maximal time (in seconds) to wait until running jobs are cancelled on session shutdown.\n"
+          + "Should be smaller than 'scout.ui.sessionstore.housekeepingMaxWaitForShutdown'.\n"
+          + "The default value is 10 seconds.";
+    }
+
+    @Override
+    public Long getDefaultValue() {
       return 10L;
     }
   }

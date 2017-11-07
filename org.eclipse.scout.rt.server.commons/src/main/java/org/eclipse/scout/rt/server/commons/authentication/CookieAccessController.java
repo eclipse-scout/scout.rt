@@ -196,11 +196,16 @@ public class CookieAccessController implements IAccessController {
   public static class EnabledProperty extends AbstractBooleanConfigProperty {
     @Override
     public String getKey() {
-      return "scout.auth.cookie.enabled";
+      return "scout.auth.cookieEnabled";
     }
 
     @Override
-    protected Boolean getDefaultValue() {
+    public String description() {
+      return String.format("Specifies if the '%s' is enabled.", CookieAccessController.class.getSimpleName());
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
       return false;
     }
   }
@@ -208,11 +213,18 @@ public class CookieAccessController implements IAccessController {
   public static class NameProperty extends AbstractStringConfigProperty {
     @Override
     public String getKey() {
-      return "scout.auth.cookie.name";
+      return "scout.auth.cookieName";
     }
 
     @Override
-    protected String getDefaultValue() {
+    public String description() {
+      return String.format("If the '%s' is enabled, specifies the name for the cookie.\n"
+          + "The name must conform to RFC 2109. However, vendors may provide a configuration option that allows cookie names conforming to the original Netscape Cookie Specification to be accepted.\n"
+          + "By default 'sso.user.id' is used as cookie name.", CookieAccessController.class.getSimpleName());
+    }
+
+    @Override
+    public String getDefaultValue() {
       return "sso.user.id";
     }
   }
@@ -220,11 +232,19 @@ public class CookieAccessController implements IAccessController {
   public static class MaxAgeProperty extends AbstractLongConfigProperty {
     @Override
     public String getKey() {
-      return "scout.auth.cookie.maxAge";
+      return "scout.auth.cookieMaxAge";
     }
 
     @Override
-    protected Long getDefaultValue() {
+    public String description() {
+      return String.format("If the '%s' is enabled, specifies the maximum age in seconds for the cookie.\n"
+          + "A positive value indicates that the cookie will expire after that many seconds have passed.\n"
+          + "A negative value means that the cookie is not stored persistently and will be deleted when the Web browser exits. A zero value causes the cookie to be deleted.\n"
+          + "The default value is 10 hours.", CookieAccessController.class.getSimpleName());
+    }
+
+    @Override
+    public Long getDefaultValue() {
       //10 hours
       return 36000L;
     }

@@ -57,6 +57,12 @@ public interface IConfigProperty<DATA_TYPE> {
   void addListener(IConfigChangedListener listener);
 
   /**
+   * @return The description of the property. This may contain a textual description of what the property configures and
+   *         may also include data type restrictions.
+   */
+  String description();
+
+  /**
    * Removes an {@link IConfigChangedListener} from this property.
    *
    * @param listener
@@ -90,4 +96,9 @@ public interface IConfigProperty<DATA_TYPE> {
    *          The namespace of the new value.
    */
   void setValue(DATA_TYPE newValue, String namespace);
+
+  /**
+   * @return The default value of this {@link IConfigProperty} which is used if no value is configured.
+   */
+  DATA_TYPE getDefaultValue();
 }

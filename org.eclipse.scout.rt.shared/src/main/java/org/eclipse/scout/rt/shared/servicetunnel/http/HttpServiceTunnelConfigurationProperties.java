@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.servicetunnel.http;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractIntegerConfigProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportMaxConnectionsPerRouteProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportMaxConnectionsTotalProperty;
@@ -30,37 +31,41 @@ public final class HttpServiceTunnelConfigurationProperties {
   public static class HttpServiceTunnelTransportMaxConnectionsPerRouteProperty extends AbstractIntegerConfigProperty {
 
     @Override
-    protected Integer getDefaultValue() {
+    public Integer getDefaultValue() {
       return 2048;
     }
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.servicetunnel.apache_max_connections_per_route";
+      return "scout.servicetunnel.maxConnectionsPerRoute";
     }
 
+    @Override
+    public String description() {
+      return String.format("Specifies the default maximum connections per route property for the HTTP service tunnel.\n"
+          + "Overrides the value from '%s' for the service tunnel.\n"
+          + "Default value is 2048.", BEANS.get(ApacheHttpTransportMaxConnectionsPerRouteProperty.class).getKey());
+    }
   }
 
-  /**
-   * <p>
-   * Configuration property to define the default total maximum connections property for the HTTP service tunnel (if the
-   * Apache HTTP client is used, overrides {@link ApacheHttpTransportMaxConnectionsTotalProperty}).
-   * </p>
-   *
-   * @see ApacheHttpTransportMaxConnectionsTotalProperty
-   */
   public static class HttpServiceTunnelTransportMaxConnectionsTotalProperty extends AbstractIntegerConfigProperty {
 
     @Override
-    protected Integer getDefaultValue() {
+    public Integer getDefaultValue() {
       return 2048;
     }
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.servicetunnel.apache_max_connections_total";
+      return "scout.servicetunnel.maxConnectionsTotal";
     }
 
+    @Override
+    public String description() {
+      return String.format("Specifies the default total maximum connections property for the HTTP service tunnel.\n"
+          + "Overrides the value from '%s' for the service tunnel.\n"
+          + "The default value is 2048.",
+          BEANS.get(ApacheHttpTransportMaxConnectionsTotalProperty.class).getKey());
+    }
   }
-
 }

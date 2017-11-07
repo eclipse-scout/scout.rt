@@ -114,18 +114,20 @@ public class AnonymousAccessController implements IAccessController {
     }
   }
 
-  /**
-   * @since 5.2
-   */
   public static class EnabledProperty extends AbstractBooleanConfigProperty {
 
     @Override
     public String getKey() {
-      return "scout.auth.anonymous.enabled";
+      return "scout.auth.anonymousEnabled";
     }
 
     @Override
-    protected Boolean getDefaultValue() {
+    public String description() {
+      return String.format("Specifies if the '%s' is enabled. Therefore if a security filter uses this controller no login is required.", AnonymousAccessController.class.getSimpleName());
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
       return true;
     }
   }

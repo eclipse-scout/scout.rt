@@ -70,6 +70,13 @@ public class ClusterMom extends AbstractMomTransport {
     public String getKey() {
       return "scout.mom.cluster.implementor";
     }
+
+    @Override
+    public String description() {
+      return String.format("Specifies the MOM implementor.\n"
+          + "Example to work with a JMS based implementor:\n" +
+          "%s=org.eclipse.scout.rt.mom.jms.JmsMomImplementor", getKey());
+    }
   }
 
   /**
@@ -113,6 +120,17 @@ public class ClusterMom extends AbstractMomTransport {
     @Override
     public String getKey() {
       return "scout.mom.cluster.environment";
+    }
+
+    @Override
+    public String description() {
+      return "Contains the configuration to connect to the network or broker. This configuration is specific to the MOM implementor\n" +
+          "Example to connect to a peer based cluster, which is useful in development mode because there is no central broker:\n" +
+          "scout.mom.cluster.environment[scout.mom.name]=Scout Cluster MOM\n" +
+          "scout.mom.cluster.environment[scout.mom.connectionfactory.name]=ClusterMom\n" +
+          "scout.mom.cluster.environment[java.naming.factory.initial]=org.apache.activemq.jndi.ActiveMQInitialContextFactory\n" +
+          "scout.mom.cluster.environment[java.naming.provider.url]=failover:(peer://mom/cluster?persistent=false)\n" +
+          "scout.mom.cluster.environment[connectionFactoryNames]=ClusterMom";
     }
   }
 }

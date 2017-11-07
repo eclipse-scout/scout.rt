@@ -131,7 +131,7 @@ public class AccessControlServiceTest {
 
   class TestBlockingProperty extends MaxNotificationBlockingTimeOut {
     @Override
-    protected Integer getDefaultValue() {
+    public Integer getDefaultValue() {
       return 1;
     }
   }

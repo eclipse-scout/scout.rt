@@ -38,8 +38,13 @@ public class LongConfigPropertyTest {
   public static class SampleTestProperty extends AbstractLongConfigProperty {
 
     @Override
-    protected Long getDefaultValue() {
+    public Long getDefaultValue() {
       return 42L;
+    }
+
+    @Override
+    public String description() {
+      return null;
     }
 
     @Override

@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +60,7 @@ public class ConfigPropertyValidator implements IConfigurationValidator {
 
     try {
       property.getValue(); // check if the given value is valid according to the value constraints of that property class.
+      checkDefaultValueConfiguration(parsedKey, property, value);
     }
     catch (Exception ex) {
       LOG.error("Failed parsing value of config property with key='{}'. Configured value='{}'.", parsedKey, value, ex);
@@ -65,5 +68,22 @@ public class ConfigPropertyValidator implements IConfigurationValidator {
     }
 
     return true;
+  }
+
+  /**
+   * Check if configured value matches the default value
+   */
+  protected void checkDefaultValueConfiguration(String parsedKey, IConfigProperty<?> property, String configuredValue) {
+    Object actualValue = property.getValue();
+    Object defaultValue = property.getDefaultValue();
+    if (ObjectUtility.equals(actualValue, defaultValue)) {
+      String msg = "Config property with key='{}' has configured value='{}'. This results in an actual value of '{}' which is equal to the default value. Remove config entry for this key to minimize properties file.";
+      if (Platform.get().inDevelopmentMode()) {
+        LOG.warn(msg, parsedKey, configuredValue, actualValue);
+      }
+      else {
+        LOG.info(msg, parsedKey, configuredValue, actualValue);
+      }
+    }
   }
 }

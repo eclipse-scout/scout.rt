@@ -131,34 +131,39 @@ public class ConfigFileCredentialVerifier implements ICredentialVerifier {
 
   // ==== Config Properties ==== //
 
-  /**
-   * Represents credentials to be loaded into {@link ConfigFileCredentialVerifier}.
-   * <p>
-   * Multiple credentials are separated with a semicolon, username and password with the 'colon' sign.
-   * <p/>
-   * Example: <code>scott:*****;jack:*****;john:*****</code>
-   */
   public static class CredentialsProperty extends AbstractStringConfigProperty {
 
     @Override
     public String getKey() {
       return "scout.auth.credentials";
     }
+
+    @Override
+    public String description() {
+      return String.format("Specifies the known credentials (username & passwords) of the '%s'.\n"
+          + "Credentials are separated by semicolon. Username and password information are separated by colon.\n"
+          + "By default the password information consists of Base64 encoded salt followed by a dot followed by the Base64 encoded SHA-512 hash of the password (using UTF-16).\n"
+          + "Example: username1:base64EncodedSalt.base64EncodedPasswordHash;username2:base64EncodedSalt.base64EncodedPasswordHash\n"
+          + "To create a salt and hash tuples based on a clear text password use the '%s.main()' method that can be invoked from the command line.\n"
+          + "If '%s' is set to 'true' the password information just consists of the cleartext password.",
+          ConfigFileCredentialVerifier.class.getName(), ConfigFileCredentialVerifier.class.getName(), BEANS.get(CredentialPlainTextProperty.class).getKey());
+    }
   }
 
-  /**
-   * Indicates whether plain-text or hashed passwords are stored in 'config.properties'. By default, this verifier
-   * expects hashed passwords.
-   */
   public static class CredentialPlainTextProperty extends AbstractBooleanConfigProperty {
 
     @Override
     public String getKey() {
-      return "scout.auth.credentials.plaintext";
+      return "scout.auth.credentialsPlaintext";
     }
 
     @Override
-    protected Boolean getDefaultValue() {
+    public String description() {
+      return String.format("Specifies if the passwords specified in property '%s' is plaintext (not recommended) or hashed. A value of false indicates hashed passwords which is the default.", BEANS.get(CredentialsProperty.class).getKey());
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
       return Boolean.FALSE;
     }
   }

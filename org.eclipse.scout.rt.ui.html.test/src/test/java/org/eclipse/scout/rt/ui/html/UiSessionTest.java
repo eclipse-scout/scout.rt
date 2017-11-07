@@ -76,7 +76,7 @@ public class UiSessionTest {
           public JobCompletionDelayOnSessionShutdown produce(IBean<JobCompletionDelayOnSessionShutdown> bean) {
             return new JobCompletionDelayOnSessionShutdown() {
               @Override
-              protected Long getDefaultValue() {
+              public Long getDefaultValue() {
                 return 0L;
               }
             };
@@ -85,28 +85,28 @@ public class UiSessionTest {
 
         new BeanMetaData(SessionStoreHousekeepingDelayProperty.class).withInitialInstance(new SessionStoreHousekeepingDelayProperty() {
           @Override
-          protected Integer getDefaultValue() {
+          public Integer getDefaultValue() {
             return 0;
           }
         }),
 
         new BeanMetaData(SessionStoreHousekeepingMaxWaitShutdownProperty.class).withInitialInstance(new SessionStoreHousekeepingMaxWaitShutdownProperty() {
           @Override
-          protected Integer getDefaultValue() {
+          public Integer getDefaultValue() {
             return 1;
           }
         }),
 
         new BeanMetaData(SessionStoreMaxWaitWriteLockProperty.class).withInitialInstance(new SessionStoreMaxWaitWriteLockProperty() {
           @Override
-          protected Integer getDefaultValue() {
+          public Integer getDefaultValue() {
             return 1;
           }
         }),
 
         new BeanMetaData(SessionStoreMaxWaitAllShutdownProperty.class).withInitialInstance(new SessionStoreMaxWaitAllShutdownProperty() {
           @Override
-          protected Integer getDefaultValue() {
+          public Integer getDefaultValue() {
             return 1;
           }
         }),

@@ -107,34 +107,38 @@ public class TileDataLoadManager {
     }
   }
 
-  /**
-   * max number of threads that can be created to load tiles per server node
-   */
   public static class TileMaxConcurrentDataLoadThreadsProperty extends AbstractPositiveIntegerConfigProperty {
 
     @Override
     public String getKey() {
-      return "scout.client.tiles.maxConcurrentDataLoadThreads";
+      return "scout.tiles.maxConcurrentDataLoadThreads";
     }
 
     @Override
-    protected Integer getDefaultValue() {
+    public String description() {
+      return "Maximum number of threads per server that can be created to load tiles. The default value is 25.";
+    }
+
+    @Override
+    public Integer getDefaultValue() {
       return 25;
     }
   }
 
-  /**
-   * max number of tile load requests that can be queued if no thread is available, request will be denied
-   */
   public static class TileDataLoadQueueTimeoutSeconds extends AbstractPositiveIntegerConfigProperty {
 
     @Override
     public String getKey() {
-      return "scout.client.tiles.dataLoadQueueTimeoutSeconds";
+      return "scout.tiles.dataLoadQueueTimeoutSeconds";
     }
 
     @Override
-    protected Integer getDefaultValue() {
+    public String description() {
+      return "Maximum number of seconds a tile load job can execute until it is automatically cancelled. The default value is 2 minutes.";
+    }
+
+    @Override
+    public Integer getDefaultValue() {
       return 120;
     }
   }

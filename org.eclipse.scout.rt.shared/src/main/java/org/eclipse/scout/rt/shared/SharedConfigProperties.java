@@ -10,11 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableList;
-
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
@@ -22,67 +17,83 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractBinaryConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
-import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractSubjectConfigProperty;
 import org.eclipse.scout.rt.platform.config.ConfigUtility;
+import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
+import org.eclipse.scout.rt.shared.services.common.text.TextKeyTextProviderService;
 
 public final class SharedConfigProperties {
 
   private SharedConfigProperties() {
   }
 
-  /**
-   * Private key for digital signature of service tunnel requests
-   */
   public static class AuthTokenPrivateKeyProperty extends AbstractBinaryConfigProperty {
 
     @Override
     public String getKey() {
-      return "scout.auth.privatekey";
+      return "scout.auth.privateKey";
+    }
+
+    @Override
+    public String description() {
+      return String.format("Specifies the Base64 encoded private key for signing requests from the UI server to the backend server. By validating the signature the server can ensure the request is trustworthy.\n" +
+          "Furthermore the CookieAccessController uses this private key to sign the cookie.\n" +
+          "New public-private-key-pairs can be created by invoking the class '%s' on the command line.", SecurityUtility.class.getName());
     }
   }
 
-  /**
-   * public key for {@link AuthTokenPrivateKeyProperty}
-   */
   public static class AuthTokenPublicKeyProperty extends AbstractBinaryConfigProperty {
 
     @Override
     public String getKey() {
-      return "scout.auth.publickey";
+      return "scout.auth.publicKey";
+    }
+
+    @Override
+    public String description() {
+      return String.format("Specifies the Base64 encoded public key used to validate signed requests on the backend server. The public key must match the private key stored in the property '%s' on the UI server.\n" +
+          "New public-private-key-pairs can be created by invoking the class '%s' on the command line.", BEANS.get(AuthTokenPrivateKeyProperty.class).getKey(), SecurityUtility.class.getName());
     }
   }
 
-  /**
-   * Time to Live for the authentication token in milliseconds. The default is 10 minutes.
-   */
   public static class AuthTokenTimeToLiveProperty extends AbstractPositiveLongConfigProperty {
 
     @Override
-    protected Long getDefaultValue() {
+    public Long getDefaultValue() {
       return TimeUnit.MINUTES.toMillis(10);
     }
 
     @Override
+    public String description() {
+      return "Number of milliseconds a signature on a request from the UI server to the backend server is valid (TTL for the authentication token). If a request is not received within this time, it is rejected.\n"
+          + "By default this property is set to 10 minutes.";
+    }
+
+    @Override
     public String getKey() {
-      return "scout.auth.token.ttl";
+      return "scout.auth.tokenTtl";
     }
   }
 
   public static class BackendUrlProperty extends AbstractStringConfigProperty {
 
     @Override
-    protected String getDefaultValue() {
+    public String getDefaultValue() {
       return ConfigUtility.getProperty("server.url");//legacy
     }
 
     @Override
     public String getKey() {
-      return "scout.server.url";
+      return "scout.backendUrl";
+    }
+
+    @Override
+    public String description() {
+      return "The URL of the scout backend server (without any servlets). E.g.: http://localhost:8080\n"
+          + "By default this property is null.";
     }
 
     @Override
@@ -90,24 +101,26 @@ public final class SharedConfigProperties {
       if (value == null) {
         return null;
       }
-      int i = value.lastIndexOf("/process");
+      int i = value.lastIndexOf(ServiceTunnelTargetUrlProperty.PROCESS_SERVLET_MAPPING);
       if (i >= 0) {
         value = value.substring(0, i);
       }
       return super.parse(value);
     }
-
   }
 
-  /**
-   * Absolute URL to the deployed http(s):// base of the web-application. The expected 'external' URL should include
-   * proxies, redirects, etc. Example: <code>https://www.bsi-software.com/bsi-crm/</code>.
-   */
   public static class ExternalBaseUrlProperty extends AbstractStringConfigProperty {
 
     @Override
     public String getKey() {
-      return "scout.external.base.url";
+      return "scout.externalBaseUrl";
+    }
+
+    @Override
+    public String description() {
+      return "Absolute URL to the deployed http(s):// base of the web-application. The URL should include proxies, redirects, etc.\n" +
+          "Example: https://www.my-company.com/my-scout-application/.\n" +
+          "This URL is used to replace '<scout:base />' tags.";
     }
 
     @Override
@@ -120,55 +133,30 @@ public final class SharedConfigProperties {
       }
       return null;
     }
-
   }
 
-  /**
-   * Property representing the list of URLs the {@link RemoteHealthChecker} has to check.
-   * <p>
-   * Example: <code>http://localhost:8080/status,http://localhost:8081/status</code>
-   */
-  public static class RemoteHealthCheckUrlsProperty extends AbstractConfigProperty<List<String>, String> {
-
-    @Override
-    public String getKey() {
-      return "scout.healthcheck.remoteUrls";
-    }
-
-    @Override
-    protected List<String> parse(String value) {
-      String[] tokens = StringUtility.tokenize(value, ',');
-      // Prevent accidental modification by returning an unmodifiable list because property is cached and always returns the same instance
-      return unmodifiableList(asList(tokens));
-    }
-
-    @Override
-    protected List<String> getDefaultValue() {
-      return emptyList();
-    }
-
-  }
-
-  /**
-   * Property representing the service tunnel URL.
-   * <p>
-   * This property is based on convention over configuration, meaning that without an explicit configuration, the URL
-   * points to '{@link BackendUrlProperty}/process'.
-   */
   public static class ServiceTunnelTargetUrlProperty extends AbstractStringConfigProperty {
 
+    public static final String PROCESS_SERVLET_MAPPING = "/process";
+
     @Override
-    protected String getDefaultValue() {
+    public String getDefaultValue() {
       String backendUrl = BEANS.get(BackendUrlProperty.class).getValue();
       if (StringUtility.hasText(backendUrl)) {
-        return backendUrl + "/process";
+        return backendUrl + PROCESS_SERVLET_MAPPING;
       }
       return null;
     }
 
     @Override
+    public String description() {
+      return String.format("Specifies the URL to the ServiceTunnelServlet on the backend server.\n"
+          + "By default this property points to the value of property '%s' with '%s' appended.", BEANS.get(BackendUrlProperty.class).getKey(), PROCESS_SERVLET_MAPPING);
+    }
+
+    @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.servicetunnel.targetUrl";
+      return "scout.servicetunnel.targetUrl";
     }
   }
 
@@ -176,26 +164,33 @@ public final class SharedConfigProperties {
 
     @Override
     @SuppressWarnings("findbugs:NP_BOOLEAN_RETURN_NULL")
-    protected Boolean getDefaultValue() {
+    public Boolean getDefaultValue() {
       // no default value. means the response decides
       return null;
     }
 
     @Override
+    public String description() {
+      return "Specifies if the service tunnel should compress the data. If null, the response decides which is default to true.";
+    }
+
+    @Override
     public String getKey() {
-      return "org.eclipse.scout.serviceTunnel.compress";
+      return "scout.servicetunnel.compress";
     }
   }
 
-  /**
-   * Property to specify if remote proxy beans should be created for interfaces annotated with {@link TunnelToServer}.
-   * Default is <code>true</code>.
-   */
   public static class CreateTunnelToServerBeansProperty extends AbstractBooleanConfigProperty {
 
     @Override
     public String getKey() {
-      return "scout.beans.createTunnelToServerBeans";
+      return "scout.createTunnelToServerBeans";
+    }
+
+    @Override
+    public String description() {
+      return String.format("Specifies if the Scout platform should create proxy beans for interfaces annotated with '%s'. Calls to beans of such types are then tunneled to the Scout backend.\n"
+          + "By default this property is enabled if the property '%s' is set.", TunnelToServer.class.getSimpleName(), BEANS.get(ServiceTunnelTargetUrlProperty.class).getKey());
     }
 
     @Override
@@ -205,54 +200,61 @@ public final class SharedConfigProperties {
     }
   }
 
-  /**
-   * Technical {@link Subject} used to authenticate notification requests.
-   */
   public static class NotificationSubjectProperty extends AbstractSubjectConfigProperty {
+
+    public static final String NOTIFICATION_AUTHENTICATOR_SUBJECT_NAME = "notification-authenticator";
 
     @Override
     public String getKey() {
-      return "notification.user.authenticator";
+      return "scout.client.notificationSubject";
     }
 
     @Override
-    protected Subject getDefaultValue() {
-      return convertToSubject("notification-authenticator");
+    public String description() {
+      return String.format("Technical subject under which received client notifications are executed.\n"
+          + "By default '%s' is used.", NOTIFICATION_AUTHENTICATOR_SUBJECT_NAME);
+    }
+
+    @Override
+    public Subject getDefaultValue() {
+      return convertToSubject(NOTIFICATION_AUTHENTICATOR_SUBJECT_NAME);
     }
   }
 
-  /**
-   * Time to Live for level permission check caching in milliseconds.
-   * <p>
-   * If calculating the permission level for a permission instance, it can be internally be cached. This caching is
-   * typically useful in a client and should be relative small (few minutes). If no value is set, no caching at all is
-   * used. As default, no time to live is set and therefore caching is disabled. Currently this property is only used in
-   * {@link BasicHierarchyPermission}.
-   */
   public static class PermissionLevelCheckCacheTimeToLiveProperty extends AbstractPositiveLongConfigProperty {
 
     @Override
     public String getKey() {
-      return "scout.permission.level.check.cache.ttl";
+      return "scout.permissionLevelCacheTtl";
+    }
+
+    @Override
+    public String description() {
+      return "Time to live for level permission check caching in milliseconds.\n" +
+          "If calculating the permission level for a permission instance, it can be internally cached. This caching is typically useful in a client and should be relative small (few minutes). If no value is set, caching is disabled.\n" +
+          "As default, no time to live is set and therefore caching is disabled.";
     }
   }
 
-  /**
-   * If this property is set to true, the TextKeyTextProviderService will be registered with high priority, and each
-   * call to TEXTS.getText() will return the given text key. This is useful for debug/testing purposes or exporting
-   * forms to JSON.
-   */
   public static class TextProvidersShowKeysProperty extends AbstractBooleanConfigProperty {
 
     @Override
     public String getKey() {
-      return "scout.text.providers.show.keys";
+      return "scout.texts.showKeys";
     }
 
     @Override
-    protected Boolean getDefaultValue() {
+    public String description() {
+      return String.format(
+          "If this property is set to true, the '%s' will be registered with high priority, and each call to %s.get() will return the given text key instead of the translation.\n"
+              + "This is useful for debug/testing purposes or exporting forms to JSON.\n"
+              + "By default this property is false.",
+          TextKeyTextProviderService.class.getSimpleName(), TEXTS.class.getSimpleName());
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
       return false;
     }
   }
-
 }

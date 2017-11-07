@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.CspEnab
  * by the method {@link #initDirectives()}. A "CSP token" to use in a HTTP header can be retrieved with the method
  * {@link #toToken()}.
  * <p>
- * Use the 'scout.csp.directive' config property to configure individual CSP directives in your Scout application.
+ * Use the 'scout.cspDirective' config property to configure individual CSP directives in your Scout application.
  * <p>
  * Possible values for directives:
  * <table border=1 cellpadding=3 cellspacing=0>

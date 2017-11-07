@@ -59,6 +59,11 @@ public interface IClusterMomDestinations extends IMomDestinations {
     }
 
     @Override
+    public String description() {
+      return "Name of the topic for cluster notifications published by scout application.";
+    }
+
+    @Override
     protected IDestinationType getType() {
       return DestinationType.TOPIC;
     }

@@ -40,10 +40,13 @@ public class TestingUtilityTest {
     }
 
     @Override
-    protected Long getDefaultValue() {
-      return 1L;
+    public String description() {
+      return null;
     }
 
+    @Override
+    public Long getDefaultValue() {
+      return 1L;
+    }
   }
-
 }

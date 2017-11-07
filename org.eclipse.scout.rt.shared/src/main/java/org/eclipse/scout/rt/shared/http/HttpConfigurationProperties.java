@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.http;
 
-import org.apache.http.conn.HttpClientConnectionManager;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractIntegerConfigProperty;
 
@@ -19,127 +18,101 @@ public final class HttpConfigurationProperties {
   private HttpConfigurationProperties() {
   }
 
-  /**
-   * <p>
-   * Configuration property to define the default maximum life time in milliseconds for kept alive connections for the
-   * Apache HTTP client.
-   * </p>
-   * <p>
-   * The default setting of the Apache HTTP client itself would be indefinite. This property is used by the
-   * {@link ApacheHttpTransportFactory} but may be ignored if a custom {@link IHttpTransportFactory} or a custom
-   * {@link HttpClientConnectionManager} is used.
-   * </p>
-   */
   public static class ApacheHttpTransportConnectionTimeToLiveProperty extends AbstractIntegerConfigProperty {
 
     @Override
-    protected Integer getDefaultValue() {
+    public Integer getDefaultValue() {
       return 1000 * 60 * 60; // default: 1 hour
     }
 
     @Override
-    public String getKey() {
-      return "scout.http.apache_connection_time_to_live";
+    public String description() {
+      return "Specifies the maximum life time in milliseconds for kept alive connections of the Apache HTTP client. The defautl value is 1 hour.";
     }
 
+    @Override
+    public String getKey() {
+      return "scout.http.connectionTtl";
+    }
   }
 
-  /**
-   * <p>
-   * Configuration property to define the default maximum connections per route property for the Apache HTTP client.
-   * </p>
-   * <p>
-   * The default setting of the Apache HTTP client itself would be 2. As the HTTP client is also used for the service
-   * tunnel where practically all routes are the same, Scout sets the default to a much higher setting. This property is
-   * used by the {@link ApacheHttpTransportFactory} but may be ignored if a custom {@link IHttpTransportFactory} or a
-   * custom {@link HttpClientConnectionManager} is used.
-   * </p>
-   */
   public static class ApacheHttpTransportMaxConnectionsPerRouteProperty extends AbstractIntegerConfigProperty {
 
     @Override
-    protected Integer getDefaultValue() {
+    public Integer getDefaultValue() {
       return 32;
     }
 
     @Override
-    public String getKey() {
-      return "scout.http.apache_max_connections_per_route";
+    public String description() {
+      return "Configuration property to define the default maximum connections per route of the Apache HTTP client. The default value is 32.";
     }
 
+    @Override
+    public String getKey() {
+      return "scout.http.maxConnectionsPerRoute";
+    }
   }
 
-  /**
-   * <p>
-   * Configuration property to define the default total maximum connections property for the Apache HTTP client.
-   * </p>
-   * <p>
-   * The default setting of the Apache HTTP client itself would be 20. As the HTTP client is also used for the service
-   * tunnel where more connections in parallel should exist, Scout sets the default to a much higher setting. This
-   * property is used by the {@link ApacheHttpTransportFactory} but may be ignored if a custom
-   * {@link IHttpTransportFactory} or a custom {@link HttpClientConnectionManager} is used.
-   * </p>
-   */
   public static class ApacheHttpTransportMaxConnectionsTotalProperty extends AbstractIntegerConfigProperty {
 
     @Override
-    protected Integer getDefaultValue() {
+    public Integer getDefaultValue() {
       return 128;
     }
 
     @Override
-    public String getKey() {
-      return "scout.http.apache_max_connections_total";
+    public String description() {
+      return "Specifies the total maximum connections of the Apache HTTP client. The default value is 128.";
     }
 
+    @Override
+    public String getKey() {
+      return "scout.http.maxConnectionsTotal";
+    }
   }
 
-  /**
-   * <p>
-   * Configuration property to enable/disable keep-alive connections.
-   * </p>
-   * <p>
-   * As default setting the <i>http.keepAlive</i> system property is used, if this property is not set <code>true</code>
-   * is used as default (similar to java.net client implementation).
-   * </p>
-   */
   public static class ApacheHttpTransportKeepAliveProperty extends AbstractBooleanConfigProperty {
 
+    public static final String HTTP_KEEP_ALIVE = "http.keepAlive";
+
     @Override
-    protected Boolean getDefaultValue() {
-      String prop = System.getProperty("http.keepAlive");
+    public Boolean getDefaultValue() {
+      String prop = System.getProperty(HTTP_KEEP_ALIVE);
       return prop != null ? Boolean.valueOf(prop) : true;
     }
 
     @Override
-    public String getKey() {
-      return "scout.http.apache_keep_alive";
+    public String description() {
+      return String.format("Enable/disable HTTP keep-alive connections.\n"
+          + "The default value is defined by the system property '%s' or true if the system property is undefined.", HTTP_KEEP_ALIVE);
     }
 
+    @Override
+    public String getKey() {
+      return "scout.http.keepAlive";
+    }
   }
 
-  /**
-   * <p>
-   * Configuration property to enable/disable one retry for non-idempotent <i>POST</i> requests.
-   * </p>
-   * <p>
-   * As default setting the <i>sun.net.http.retryPost</i> system property is used, if this property is not set
-   * <code>true</code> is used as default (similar to java.net client implementation).
-   * </p>
-   */
   public static class ApacheHttpTransportRetryPostProperty extends AbstractBooleanConfigProperty {
 
+    public static final String SUN_NET_HTTP_RETRY_POST = "sun.net.http.retryPost";
+
     @Override
-    protected Boolean getDefaultValue() {
-      String prop = System.getProperty("sun.net.http.retryPost");
+    public Boolean getDefaultValue() {
+      String prop = System.getProperty(SUN_NET_HTTP_RETRY_POST);
       return prop != null ? Boolean.valueOf(prop) : true;
     }
 
     @Override
-    public String getKey() {
-      return "scout.http.apache_retry_post";
+    public String description() {
+      return String.format("Enable or disable one retry for non-idempotent POST requests.\n"
+          + "The default value is defined by the system property '%s' or true if the system property is undefined.", SUN_NET_HTTP_RETRY_POST);
     }
 
+    @Override
+    public String getKey() {
+      return "scout.http.retryHost";
+    }
   }
-
 }

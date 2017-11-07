@@ -67,7 +67,7 @@ public interface IMomImplementor extends IMom {
    * <p>
    * <b>Value type:</b> {@link IDestination} or {@link String} (parseable by {@link DestinationConfigPropertyParser})
    */
-  String REQUEST_REPLY_CANCELLATION_TOPIC = "scout.mom.requestreply.cancellation.topic";
+  String REQUEST_REPLY_CANCELLATION_TOPIC = "scout.mom.requestreply.cancellationTopic";
 
   /**
    * Initializes this implementor, e.g. to connect to the environment as specified by the given properties.

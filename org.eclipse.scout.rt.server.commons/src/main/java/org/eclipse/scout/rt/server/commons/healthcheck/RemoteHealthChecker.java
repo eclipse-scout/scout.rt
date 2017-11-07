@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.shared.SharedConfigProperties.RemoteHealthCheckUrlsProperty;
+import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.RemoteHealthCheckUrlsProperty;
 import org.eclipse.scout.rt.shared.http.DefaultHttpTransportManager;
 
 import com.google.api.client.http.GenericUrl;

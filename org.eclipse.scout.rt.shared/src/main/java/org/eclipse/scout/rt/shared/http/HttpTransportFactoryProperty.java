@@ -23,13 +23,18 @@ import org.eclipse.scout.rt.platform.config.AbstractClassConfigProperty;
 public class HttpTransportFactoryProperty extends AbstractClassConfigProperty<IHttpTransportFactory> {
 
   @Override
-  protected Class<? extends IHttpTransportFactory> getDefaultValue() {
+  public Class<? extends IHttpTransportFactory> getDefaultValue() {
     return ApacheHttpTransportFactory.class;
   }
 
   @Override
-  public String getKey() {
-    return "scout.http.transport_factory";
+  public String description() {
+    return String.format("Fully qualified class name of the HTTP transport factory the application uses. The class must implement '%s'.\n"
+        + "By default '%s' is used.", IHttpTransportFactory.class.getName(), ApacheHttpTransportFactory.class.getName());
   }
 
+  @Override
+  public String getKey() {
+    return "scout.http.transportFactory";
+  }
 }

@@ -160,7 +160,7 @@ public class ClientSessionTest {
           public JobCompletionDelayOnSessionShutdown produce(IBean<JobCompletionDelayOnSessionShutdown> bean) {
             return new JobCompletionDelayOnSessionShutdown() {
               @Override
-              protected Long getDefaultValue() {
+              public Long getDefaultValue() {
                 return 1000L;
               }
             };
@@ -214,7 +214,7 @@ public class ClientSessionTest {
           public JobCompletionDelayOnSessionShutdown produce(IBean<JobCompletionDelayOnSessionShutdown> bean) {
             return new JobCompletionDelayOnSessionShutdown() {
               @Override
-              protected Long getDefaultValue() {
+              public Long getDefaultValue() {
                 return 1000L;
               }
             };
