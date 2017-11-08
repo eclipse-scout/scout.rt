@@ -162,6 +162,24 @@ scout.Tile.prototype._renderFilterAccepted = function() {
   this._renderVisible();
 };
 
+scout.Tile.prototype._renderVisible = function() {
+  if (this.rendering) {
+    this.$container.setVisible(this.isVisible());
+    return;
+  }
+  if (!this.isVisible()) {
+    this.$container.addClassForAnimation('animate-invisible');
+    this.$container.oneAnimationEnd(function() {
+      // Make the element invisible after the animation (but only if visibility has not changed again in the meantime)
+      this.$container.setVisible(this.isVisible());
+    }.bind(this));
+  } else {
+    this.$container.setVisible(true);
+    this.$container.addClassForAnimation('animate-visible');
+  }
+  this.invalidateParentLogicalGrid();
+};
+
 /**
  * @override
  */

@@ -535,6 +535,20 @@ scout.Rectangle.prototype.subtract = function(insets) {
 };
 
 /**
+ * Moves the rectangle the given distance.
+ * <p>
+ * @param dx the distance to move the rectangle along the x axis.
+ * @param dy the distance to move the rectangle along the y axis.
+ */
+scout.Rectangle.prototype.translate = function(dx, dy) {
+  return new scout.Rectangle(
+    this.x + dx,
+    this.y + dy,
+    this.width,
+    this.height);
+};
+
+/**
  * @returns {scout.Point} property x and y of this instance as new Point instance
  */
 scout.Rectangle.prototype.point = function() {

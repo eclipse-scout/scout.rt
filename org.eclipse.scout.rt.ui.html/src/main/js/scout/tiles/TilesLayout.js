@@ -63,6 +63,7 @@ scout.TilesLayout.prototype.layout = function($container) {
 
   // Animate the position change of the tiles
   var promises = [];
+  var containerPos = htmlComp.offset();
   this.widget.filteredTiles.forEach(function(tile, i) {
     if (tile.$container.hasClass('invisible')) {
       // When tiles are inserted they are invisible because a dedicated insert animation will be started after the layouting,
@@ -79,12 +80,6 @@ scout.TilesLayout.prototype.layout = function($container) {
       fromBounds = bounds.clone();
     }
 
-    if (!this._inViewport(bounds) && !this._inViewport(fromBounds)) {
-      // If neither the new nor the old position is in the viewport don't animate the tile. This will affect the animation performance in a positive way if there are many tiles
-      tile.$container.removeData('oldBounds');
-      return;
-    }
-
     if (!animated) {
       // This is a small, discreet startup animation, just move the tiles a little
       // It will happen if the startup animation is disabled, or every time the tiles are rendered anew
@@ -93,6 +88,12 @@ scout.TilesLayout.prototype.layout = function($container) {
 
     if (fromBounds.equals(bounds)) {
       // Don't animate if bounds are equals (otherwise promises would always resolve after 300ms even though no animation was visible)
+      tile.$container.removeData('oldBounds');
+      return;
+    }
+
+    if (!this._inViewport(bounds.translate(containerPos.x, containerPos.y)) && !this._inViewport(fromBounds.translate(containerPos.x, containerPos.y))) {
+      // If neither the new nor the old position is in the viewport don't animate the tile. This will affect the animation performance in a positive way if there are many tiles
       tile.$container.removeData('oldBounds');
       return;
     }

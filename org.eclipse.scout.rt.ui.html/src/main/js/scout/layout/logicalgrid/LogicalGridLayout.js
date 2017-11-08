@@ -56,7 +56,14 @@ scout.LogicalGridLayout.prototype.validateLayout = function($container) {
   $container.children().each(function (idx, elem) {
     var $comp = $(elem);
     var htmlComp = scout.HtmlComponent.optGet($comp);
-    if (htmlComp && $comp.isVisible()) {
+    if (!htmlComp) {
+      return;
+    }
+    var widget = $comp.data('widget');
+    // Prefer the visibility state of the widget, if there is one.
+    // This allows for transitions, because the $component may still be in the process of being made invisible
+    var visible = widget ? widget.isVisible() : $comp.isVisible();
+    if (visible) {
       visibleComps.push($comp);
       cons = htmlComp.layoutData;
       cons.validate();

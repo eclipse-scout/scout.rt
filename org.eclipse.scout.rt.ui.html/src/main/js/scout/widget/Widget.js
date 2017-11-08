@@ -591,13 +591,7 @@ scout.Widget.prototype._renderVisible = function() {
     return;
   }
   this.$container.setVisible(this.isVisible());
-  if (this.rendered && this.htmlComp) {
-    this.parent.invalidateLogicalGrid(false);
-    var htmlCompParent = this.htmlComp.getParent();
-    if (htmlCompParent) {
-      htmlCompParent.invalidateLayoutTree();
-    }
-  }
+  this.invalidateParentLogicalGrid();
 };
 
 /**
@@ -792,6 +786,23 @@ scout.Widget.prototype.invalidateLogicalGrid = function(invalidateLayout) {
   this.logicalGrid.setDirty(true);
   if (scout.nvl(invalidateLayout, true)) {
     this.invalidateLayoutTree();
+  }
+};
+
+/**
+ * Invalidates the logical grid of the parent widget. Typically done when the visibility of the widget changes.
+ * @param {boolean} [invalidateLayout] true, to invalidate the layout of the parent of this.htmlComp, false if not. Default is true.
+ */
+scout.Widget.prototype.invalidateParentLogicalGrid = function(invalidateLayout) {
+  if (!this.rendered || !this.htmlComp) {
+    return;
+  }
+  this.parent.invalidateLogicalGrid(false);
+  if (scout.nvl(invalidateLayout, true)) {
+    var htmlCompParent = this.htmlComp.getParent();
+    if (htmlCompParent) {
+      htmlCompParent.invalidateLayoutTree();
+    }
   }
 };
 

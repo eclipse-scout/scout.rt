@@ -20,6 +20,16 @@
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   }
 
+  &.animate-visible {
+    #scout.animation-name(fadein-grow-blur);
+    #scout.animation-duration(0.4s);
+  }
+
+  &.animate-invisible {
+    #scout.animation-name(fadeout-shrink-blur);
+    #scout.animation-duration(0.3s);
+  }
+
   &.animate-insert {
     #scout.animation-name(fadein-zoom-bounce);
     #scout.animation-duration(0.4s);
