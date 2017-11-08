@@ -181,7 +181,7 @@ scout.ContentEditor.prototype._disableLinks = function() {
 };
 
 scout.ContentEditor.prototype._createSlots = function() {
-  $(this.doc.body).find('[data-ce-slot]').each(function(index, slot) {
+  $(this.doc.body).find('[data-ce-dropzone]').each(function(index, slot) {
     this._slots.push(scout.create('ContentEditorSlot', {
       contentEditor: this,
       $container: $(slot)

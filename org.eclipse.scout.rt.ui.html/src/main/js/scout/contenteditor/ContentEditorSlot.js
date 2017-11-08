@@ -34,13 +34,13 @@ scout.ContentEditorSlot.prototype.init = function(model) {
 };
 
 scout.ContentEditorSlot.prototype.name = function() {
-  return this.$container.attr('data-ce-slot');
+  return this.$container.attr('data-ce-dropzone');
 };
 
 scout.ContentEditorSlot.prototype._renderLabel = function() {
   var label = '';
-  this.minElements = this.$container.attr('data-ce-slot-min-number-of-elements');
-  this.maxElements = this.$container.attr('data-ce-slot-max-number-of-elements');
+  this.minElements = this.$container.attr('data-ce-dropzone-min-number-of-elements');
+  this.maxElements = this.$container.attr('data-ce-dropzone-max-number-of-elements');
 
   this.$label = this.$container.appendDiv('ce-slot-label').text(label);
 
@@ -52,7 +52,7 @@ scout.ContentEditorSlot.prototype._renderLabel = function() {
     this.$maxElementsLabel = $('<span class="ce-slot-max-elements-label"> Max: ' + this.maxElements + '</span>');
     this.$label.append(this.$maxElementsLabel);
   }
-  this.$elementTypesLabel = $('<span class="ce-slot-element-types-label"> Types: ' + this.$container.attr('data-ce-allowed-elements') + '</span>');
+  this.$elementTypesLabel = $('<span class="ce-slot-element-types-label"> Types: ' + this.$container.attr('data-ce-dropzone-allowed-elements') + '</span>');
   this.$label.append(this.$elementTypesLabel);
 };
 
@@ -68,7 +68,7 @@ scout.ContentEditorSlot.prototype.hasType = function(type) {
   if (type === 'text/plain') {
     type = 'text';
   }
-  return this.$container.is('[data-ce-allowed-elements~=\'' + type + '\']');
+  return this.$container.is('[data-ce-dropzone-allowed-elements~=\'' + type + '\']');
 };
 
 scout.ContentEditorSlot.prototype.isFree = function() {
@@ -122,7 +122,7 @@ scout.ContentEditorSlot.prototype.showPlaceholders = function() {
 };
 
 scout.ContentEditorSlot.prototype._showMandatoryPlaceholders = function() {
-  var numberOfMandatoryPlaceholders = this.$container.attr('data-ce-slot-min-number-of-elements') - this.$container.find('.ce-element').length;
+  var numberOfMandatoryPlaceholders = this.$container.attr('data-ce-dropzone-min-number-of-elements') - this.$container.find('.ce-element').length;
   for (var i = 0; i < numberOfMandatoryPlaceholders; i++) {
     this.$container
       .appendDiv('ce-placeholder ce-mandatory-placeholder')
