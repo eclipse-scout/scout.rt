@@ -288,6 +288,7 @@ scout.Table.prototype._remove = function() {
   this._uninstallDragAndDropHandler();
   // FIXME CGU do not delete header, implement according to footer
   this.header = null;
+  this._destroyCellEditorPopup();
   this._removeAggregateRows();
   this._uninstallImageListeners();
   this._uninstallCellTooltipSupport();
@@ -3811,8 +3812,7 @@ scout.Table.prototype._onEndCellEdit = function(fieldId) {
   if (this.cellEditorPopup) {
     // Remove the cell-editor popup prior destroying the field, so that the 'cell-editor-popup's focus context is uninstalled first and the focus can be restored onto the last focused element of the surrounding focus context.
     // Otherwise, if the currently focused field is removed from DOM, the $entryPoint would be focused first, which can be avoided if removing the popup first.
-    this.cellEditorPopup.remove();
-    this.cellEditorPopup = null;
+    this._destroyCellEditorPopup();
   }
   field.destroy();
 };
@@ -3944,9 +3944,23 @@ scout.Table.prototype._detach = function() {
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
   // Detach helper stores the current scroll pos and restores in attach.
-  // To make it work scrollTop needs to be reseted here otherwise viewport won't be rendered by _onDataScroll
+  // To make it work scrollTop needs to be reset here otherwise viewport won't be rendered by _onDataScroll
   this.scrollTop = 0;
   scout.Table.parent.prototype._detach.call(this);
+};
+
+scout.Table.prototype._destroyCellEditorPopup = function() {
+  // When a cell editor popup is open and table is detached, we close the popup immediately
+  // and don't wait for the model event 'endCellEdit'. By doing this we can avoid problems
+  // with invalid focus contexts.
+  if (this.cellEditorPopup) {
+    this.cellEditorPopup.remove();
+    this.cellEditorPopup = null;
+  }
+};
+
+scout.Table.prototype._beforeDetach = function() {
+  this._destroyCellEditorPopup();
 };
 
 scout.Table.prototype.setVirtual = function(virtual) {
