@@ -441,8 +441,7 @@ scout.Desktop.prototype.updateSplitterPosition = function() {
   if (!this.splitter) {
     return;
   }
-  // TODO [7.0] awe: (user-prefs) Use user-preferences instead of sessionStorage
-  var storedSplitterPosition = this.cacheSplitterPosition && scout.webstorage.getItem(sessionStorage, 'scout:desktopSplitterPosition');
+  var storedSplitterPosition = this.cacheSplitterPosition && this._loadCachedSplitterPosition();
   if (storedSplitterPosition) {
     // Restore splitter position
     var splitterPosition = parseInt(storedSplitterPosition, 10);
@@ -958,7 +957,7 @@ scout.Desktop.prototype._onSplitterMoveEnd = function(event) {
 
   // Store size
   if (this.cacheSplitterPosition) {
-    storeSplitterPosition(this.splitter.position);
+    this._storeCachedSplitterPosition(this.splitter.position);
   }
 
   // Check if splitter is smaller than min size
@@ -979,7 +978,7 @@ scout.Desktop.prototype._onSplitterMoveEnd = function(event) {
         this.resizing = true;
         this.splitter.setPosition();
         // Store size
-        storeSplitterPosition(this.splitter.position);
+        this._storeCachedSplitterPosition(this.splitter.position);
         this.revalidateLayout();
         this.resizing = false;
       }.bind(this)
@@ -987,12 +986,16 @@ scout.Desktop.prototype._onSplitterMoveEnd = function(event) {
   } else {
     this.resizing = false;
   }
+};
 
-  // ----- Helper functions -----
+scout.Desktop.prototype._loadCachedSplitterPosition = function() {
+  return scout.webstorage.getItem(sessionStorage, 'scout:desktopSplitterPosition') ||
+    scout.webstorage.getItem(localStorage, 'scout:desktopSplitterPosition:' + window.location.pathname);
+};
 
-  function storeSplitterPosition(splitterPosition) {
-    scout.webstorage.setItem(sessionStorage, 'scout:desktopSplitterPosition', splitterPosition);
-  }
+scout.Desktop.prototype._storeCachedSplitterPosition = function(splitterPosition) {
+  scout.webstorage.setItem(sessionStorage, 'scout:desktopSplitterPosition', splitterPosition);
+  scout.webstorage.setItem(localStorage, 'scout:desktopSplitterPosition:' + window.location.pathname, splitterPosition);
 };
 
 scout.Desktop.prototype._onNotificationRemove = function(notification) {
