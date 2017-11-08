@@ -46,7 +46,7 @@ scout.ErrorHandler.prototype.createLogMessage = function(errorMessage, fileName,
   logStr += '\n(' + 'Code ' + errorCode + ')';
   if (error && error.debugInfo) {
     // Error throwers may put a "debugInfo" string on the error object that is then added to the log string (this is a scout extension).
-    logStr += '\n----- Additional debug information: -----\n' + error.scoutDebugInfo;
+    logStr += '\n----- Additional debug information: -----\n' + error.debugInfo;
   }
   return logStr;
 };
