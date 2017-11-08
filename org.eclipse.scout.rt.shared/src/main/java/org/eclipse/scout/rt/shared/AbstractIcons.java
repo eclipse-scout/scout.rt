@@ -52,15 +52,19 @@ public abstract class AbstractIcons implements Serializable {
   public static final String Star = "font:\uE032";
   public static final String StarSolid = "font:\uE033";
   public static final String Person = "font:\uE034";
+  public static final String RemoveLarge = "font:\uE035";
   public static final String VerticalDots = "font:\uE040";
   public static final String Search = "font:\uE042";
   public static final String Folder = "font:\uE043";
+  public static final String Spinner = "font:\uE044";
+  public static final String Remove = "font:\uE045";
   public static final String Sum = "font:\ue025";
   public static final String Megaphone = "font:\uE04A";
   public static final String Pencil = "font:\uE04B";
   public static final String Image = "font:\uE04C";
   public static final String Letter = "font:\uE04D";
   public static final String Drag = "font:\uE04E";
+  public static final String PencilSolid = "font:\uE04F";
   public static final String Trash = "font:\uE050";
   public static final String Desktop = "font:\uE051";
   public static final String Smartphone = "font:\uE052";
@@ -84,7 +88,6 @@ public abstract class AbstractIcons implements Serializable {
   public static final String Window = "font:\uE064";
 
   /* awesome font icons */
-  public static final String Remove = "font:\uE045";
   public static final String RotateRight = "font:\uF01E";
   public static final String ChevronLeft = "font:\uF053";
   public static final String ChevronRight = "font:\uF054";
@@ -117,6 +120,5 @@ public abstract class AbstractIcons implements Serializable {
   public static final String LongArrowUp = "font:\uF176";
   public static final String LongArrowLeft = "font:\uF177";
   public static final String LongArrowRight = "font:\uF178";
-  public static final String PencilSolid = "font:\uF040";
 
 }
