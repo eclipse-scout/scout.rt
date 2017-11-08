@@ -247,6 +247,7 @@ scout.Popup.prototype._onPopupOpen = function(event) {
   // Use case: popup opens a modal dialog. User clicks on a smartfield on this dialog -> underlying popup must not get closed
   if (!this.isOrHas(event.popup) &&
     !event.popup.isOrHas(this) &&
+    this.rendered &&
     !this.session.focusManager.isElementCovertByGlassPane(this.$container[0])) {
     this.close();
   }
