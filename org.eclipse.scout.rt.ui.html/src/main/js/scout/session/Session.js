@@ -1324,22 +1324,9 @@ scout.Session.prototype._processEvents = function(events) {
 
   // If there are still events whose target could not be resolved, throw an error
   if (events.length) {
-    var debugInfo = 'Events:\n- ' + events.map(function(event) {
-      return JSON.stringify(event);
-    }).join('\n- ') + '\nAdapterDataCache:';
-    var ids = Object.keys(this._adapterDataCache);
-    if (ids.length) {
-      debugInfo += '\n- ' + Object.keys(this._adapterDataCache).map(function(id) {
-        return JSON.stringify(this._adapterDataCache[id]);
-      }, this).join('\n- ');
-    } else {
-      debugInfo += ' (empty)';
-    }
-    var error = new Error('Could not resolve event targets: [' + events.map(function(event) {
+    throw new Error('Could not resolve event targets: [' + events.map(function(event) {
       return '"' + event.target + '"';
     }, this).join(', ') + ']');
-    error.debugInfo = debugInfo;
-    throw error;
   }
 };
 
