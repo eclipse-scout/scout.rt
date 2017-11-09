@@ -10,9 +10,9 @@
  ******************************************************************************/
 scout.ContentEditorFieldAdapter = function() {
   scout.ContentEditorFieldAdapter.parent.call(this);
+  this._addRemoteProperties(['content']);
 };
 scout.inherits(scout.ContentEditorFieldAdapter, scout.FormFieldAdapter);
-
 
 scout.ContentEditorFieldAdapter.prototype.onModelAction = function(event) {
   if (event.type === 'updateElement') {
@@ -26,13 +26,11 @@ scout.ContentEditorFieldAdapter.prototype._onModelUpdateElement = function(event
   this.widget.updateElement(event.elementContent, event.slot, event.elementId);
 };
 
-scout.ContentEditorFieldAdapter.prototype._sendContent = function(content) {
-
-};
-
 scout.ContentEditorFieldAdapter.prototype._onWidgetEvent = function(event) {
   if (event.type === 'editElement') {
     this._onEditElement(event);
+  } else {
+    scout.ContentEditorFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }
 };
 

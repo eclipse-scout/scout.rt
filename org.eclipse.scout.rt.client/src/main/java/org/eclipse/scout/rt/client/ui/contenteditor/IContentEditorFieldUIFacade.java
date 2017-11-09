@@ -5,5 +5,7 @@ package org.eclipse.scout.rt.client.ui.contenteditor;
  */
 public interface IContentEditorFieldUIFacade {
 
-  void editElementFromUi(ContentElement contentElement);
+  void editElementFromUI(ContentElement contentElement);
+
+  void setContentFromUI(String content);
 }

@@ -107,8 +107,13 @@ public abstract class AbstractContentEditorField extends AbstractFormField imple
   protected class P_UIFacade implements IContentEditorFieldUIFacade {
 
     @Override
-    public void editElementFromUi(ContentElement contentElement) {
+    public void editElementFromUI(ContentElement contentElement) {
       execEditElement(contentElement);
+    }
+
+    @Override
+    public void setContentFromUI(String content) {
+      setContent(content);
     }
   }
 }

@@ -46,10 +46,6 @@ scout.ContentEditorField.prototype.setContent = function(content) {
   this.contentEditor.setContent(content);
 };
 
-scout.ContentEditorField.prototype.getContent = function() {
-  return this.contentEditor.getContent();
-};
-
 scout.ContentEditorField.prototype.setDropzoneLabel = function(dropzoneLabel) {
   this.setProperty('dropzoneLabel', dropzoneLabel);
   this.contentEditor.setDropzoneLabel(dropzoneLabel);
@@ -57,7 +53,7 @@ scout.ContentEditorField.prototype.setDropzoneLabel = function(dropzoneLabel) {
 
 scout.ContentEditorField.prototype._onPropertyChange = function(event) {
   if (event.propertyName === 'content') {
-    this._setProperty('content', this.getContent());
+    this._setProperty('content', this.contentEditor.content);
   }
 };
 

@@ -91,7 +91,16 @@ public class JsonContentEditorField extends JsonFormField<IContentEditorField> {
     String content = data.getString(PROP_ELEMENT_CONTENT);
     String slot = data.getString(PROP_SLOT);
     String elementId = data.getString(PROP_ELEMENT_ID);
-    getModel().getUIFacade().editElementFromUi(new ContentElement(content, slot, elementId));
+    getModel().getUIFacade().editElementFromUI(new ContentElement(content, slot, elementId));
+  }
+
+  @Override
+  protected void handleUiPropertyChange(String propertyName, JSONObject data) {
+    if (IContentEditorField.PROP_CONTENT.equals(propertyName)) {
+      String content = data.getString(propertyName);
+      addPropertyEventFilterCondition(IContentEditorField.PROP_CONTENT, content);
+      getModel().getUIFacade().setContentFromUI(content);
+    }
   }
 
   @Override

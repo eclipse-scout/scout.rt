@@ -34,16 +34,7 @@ scout.ContentEditor.prototype._init = function(model) {
 };
 
 scout.ContentEditor.prototype._render = function() {
-
   this.$container = this.$parent.appendDiv('ce');
-
-  this.$buttons = this.$container.appendDiv('ce-buttons');
-  this.$buttons.appendDiv('ce-desktop-button');
-  this.$buttons.appendDiv('ce-tablet-button');
-  this.$buttons.appendDiv('ce-phone-button');
-  var $languageButton = this.$buttons.appendDiv('ce-language-button');
-  $languageButton.appendDiv('ce-language-button-label').text('Deutsch ');
-  $languageButton.appendDiv('ce-language-button-icon');
 
   this.iframe.render();
   this.iframe.$container.addClass('ce-iframe');
@@ -60,20 +51,34 @@ scout.ContentEditor.prototype.setDropzoneLabel = function(dropzoneLabel) {
 
 scout.ContentEditor.prototype.setContent = function(content) {
   this.setProperty('content', content);
-  this._renderContent();
 };
 
-// TODO: get content of content editor and all elements
+scout.ContentEditor.prototype.updateContentProperty = function() {
+  this._setProperty('content', this.getContent());
+};
+
 scout.ContentEditor.prototype.getContent = function() {
-  return this.iframe.$iframe.get(0).contentWindow.document.documentElement.outerHtml;
+  var $html = $(this.iframe.$iframe.get(0).contentWindow.document.documentElement).clone();
+  $html.find('#ce-iframe-style').remove();
+  $html.find('.ce-dropping-element').remove();
+  $html.find('.ce-slot-label').remove();
+  $html.find('.ce-slot').removeClass('ce-slot ce-slot-visible ce-slot-invalid ce-slot-accept ce-slot-mandatory');
+  $html.find('.ce-placeholder').remove();
+  $html.find('.ce-element').removeClass('ce-element ce-element-hover');
+  $html.find('.ce-element-edit-indicator').remove();
+  $html.find('.ce-element-button-group').remove();
+  $html.find('.ce-glasspane').remove();
+  return $html.html();
 };
 
 scout.ContentEditor.prototype.addElement = function(element) {
   this._contentElements.push(element);
+  this.updateContentProperty();
 };
 
 scout.ContentEditor.prototype.removeElement = function(element) {
   scout.arrays.remove(this._contentElements, element);
+  this.updateContentProperty();
 };
 
 scout.ContentEditor.prototype.updateElement = function(elementContent, slot, elementId) {
@@ -81,6 +86,7 @@ scout.ContentEditor.prototype.updateElement = function(elementContent, slot, ele
     return element.elementId === elementId;
   });
   element.updateContent(elementContent);
+  this.updateContentProperty();
 };
 
 scout.ContentEditor.prototype._renderContent = function() {
@@ -168,7 +174,7 @@ scout.ContentEditor.prototype._onIframeDrop = function(event) {
 };
 
 scout.ContentEditor.prototype._injectStyleSheet = function($header, callback) {
-  var $styleLink = $('<link rel="stylesheet" type="text/css">');
+  var $styleLink = $('<link rel="stylesheet" type="text/css" id="ce-iframe-style">');
   $header.append($styleLink);
   // use the baseurl here to prevent loading the contenteditor.css file from the resource server.
   $styleLink.on('load', callback.bind(this)).attr("href", this.session.url.baseUrlRaw + "res/contenteditor.css");
@@ -243,7 +249,7 @@ scout.ContentEditor.prototype._highlightClosestSlot = function(type, x, y) {
   }
 
   if (!this._closestSlot.isAccepting()) {
-    this._slots.forEach(function (slot) {
+    this._slots.forEach(function(slot) {
       if (slot !== this._closestSlot) {
         slot.stopAccepting();
       }
@@ -254,19 +260,19 @@ scout.ContentEditor.prototype._highlightClosestSlot = function(type, x, y) {
 };
 
 scout.ContentEditor.prototype._showSlots = function(type) {
-  this._slots.forEach(function (slot) {
+  this._slots.forEach(function(slot) {
     slot.show(type);
   });
 };
 
 scout.ContentEditor.prototype._stopAccepting = function() {
-  this._slots.forEach(function (slot) {
+  this._slots.forEach(function(slot) {
     slot.stopAccepting();
   });
 };
 
 scout.ContentEditor.prototype._hideSlots = function() {
-  this._slots.forEach(function (slot) {
+  this._slots.forEach(function(slot) {
     slot.hide();
   });
 };
@@ -277,7 +283,7 @@ scout.ContentEditor.prototype._getClosestSlot = function(x, y) {
 
   for (var i = 0; i < this._slots.length; i++) {
     var distance = this._getDistance(this._slots[i].$container, x, y);
-    if(distance > 50) {
+    if (distance > 50) {
       continue;
     }
 
