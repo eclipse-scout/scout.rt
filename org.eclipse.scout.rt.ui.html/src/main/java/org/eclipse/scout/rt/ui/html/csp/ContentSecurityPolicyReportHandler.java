@@ -18,9 +18,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.UiServlet;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,14 +44,12 @@ public class ContentSecurityPolicyReportHandler extends AbstractUiServletRequest
   private static final Logger LOG = LoggerFactory.getLogger(ContentSecurityPolicyReportHandler.class);
 
   private static final String HANDLER_PATH = "/" + HttpServletControl.CSP_REPORT_URL;
-
   private static final int MAX_CSP_REPORT_DATALENGTH = 4 * 1024;
 
   @Override
   public boolean handlePost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-    // serve only if path is ending with /csp-report
-    String pathInfo = req.getPathInfo();
-    if (pathInfo == null || !pathInfo.endsWith(HANDLER_PATH)) {
+    // serve only /csp-report
+    if (!ObjectUtility.equals(req.getPathInfo(), HANDLER_PATH)) {
       return false;
     }
 
@@ -58,6 +58,16 @@ public class ContentSecurityPolicyReportHandler extends AbstractUiServletRequest
       cspReportData = IOUtility.readString(in, MAX_CSP_REPORT_DATALENGTH);
       if (in.read() != -1) {
         cspReportData += "... [only first " + MAX_CSP_REPORT_DATALENGTH + " bytes shown]";
+      }
+      else {
+        // Format JSON
+        try {
+          JSONObject json = new JSONObject(cspReportData);
+          cspReportData = json.toString(2);
+        }
+        catch (RuntimeException e) {
+          LOG.trace("Error while converting CSP report to JSON", e);
+        }
       }
     }
 

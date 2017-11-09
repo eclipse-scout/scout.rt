@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * /dynamic/*, /icon/*, *.js, *.css, *.html, *.png, *.gif, *.jpg, *.woff, *.json
  */
-@Order(4510)
+@Order(5900) // should be the last request handler, because it is not restricted to a path prefix (e.g. it consumes all *.html files)
 public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
   private static final Logger LOG = LoggerFactory.getLogger(ResourceRequestHandler.class);
 
