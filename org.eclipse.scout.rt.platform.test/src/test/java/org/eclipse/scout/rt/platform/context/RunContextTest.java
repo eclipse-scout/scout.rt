@@ -345,7 +345,7 @@ public class RunContextTest {
         // Test specific monitor and no registration as child monitor
         final RunMonitor specificRunMonitor = BEANS.get(RunMonitor.class);
         assertSame(specificRunMonitor, RunContexts.copyCurrent().withRunMonitor(specificRunMonitor).getRunMonitor());
-        assertFalse(currentMonitor.getCancellables().contains(RunContexts.copyCurrent().withRunMonitor(specificRunMonitor)));
+        assertFalse(currentMonitor.getCancellables().contains(RunContexts.copyCurrent().withRunMonitor(specificRunMonitor).getRunMonitor()));
         RunContexts.copyCurrent().withRunMonitor(specificRunMonitor).run(new IRunnable() {
 
           @Override
