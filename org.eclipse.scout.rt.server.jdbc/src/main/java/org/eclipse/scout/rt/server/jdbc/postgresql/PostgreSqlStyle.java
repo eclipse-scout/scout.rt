@@ -58,7 +58,7 @@ public class PostgreSqlStyle extends AbstractSqlStyle {
   }
 
   @Override
-  protected SqlBind createBindFor(Object o, @SuppressWarnings("rawtypes") Class c) {
+  protected SqlBind createBindFor(Object o, Class c) {
     if (Boolean.class.isAssignableFrom(c)) {
       return new SqlBind(Types.BOOLEAN, o);
     }

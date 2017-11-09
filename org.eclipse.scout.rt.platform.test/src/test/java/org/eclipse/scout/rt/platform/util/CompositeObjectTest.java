@@ -56,6 +56,7 @@ public class CompositeObjectTest {
   }
 
   @Test
+  @SuppressWarnings("unlikely-arg-type")
   public void testEqualsNotTypeCompositeObject() {
     // not of type CompositeObject
     assertFalse(m_compObjLongValue.equals(1234L));

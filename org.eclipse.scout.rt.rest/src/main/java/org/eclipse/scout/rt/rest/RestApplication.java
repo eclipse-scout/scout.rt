@@ -48,8 +48,7 @@ public class RestApplication extends Application {
   }
 
   protected void registerExceptionMappers(Set<Class<?>> classes) {
-    for (@SuppressWarnings("rawtypes")
-    IBean<ExceptionMapper> bean : BEANS.getBeanManager().getBeans(ExceptionMapper.class)) {
+    for (IBean<ExceptionMapper> bean : BEANS.getBeanManager().getBeans(ExceptionMapper.class)) {
       classes.add(bean.getBeanClazz());
       LOG.info("{} registered as REST exception mapper", bean.getBeanClazz());
     }

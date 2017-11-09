@@ -327,7 +327,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
-  @SuppressWarnings({"boxing", "unchecked"})
+  @SuppressWarnings("unchecked")
   protected void initConfig() {
     setTitle(getConfiguredTitle());
     setSubTitle(getConfiguredSubTitle());
@@ -1028,8 +1028,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   /**
-   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
-   * any further chain elements.
+   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call any
+   * further chain elements.
    */
   protected static class LocalWizardExtension<OWNER extends AbstractWizard> extends AbstractExtension<OWNER> implements IWizardExtension<OWNER> {
 
