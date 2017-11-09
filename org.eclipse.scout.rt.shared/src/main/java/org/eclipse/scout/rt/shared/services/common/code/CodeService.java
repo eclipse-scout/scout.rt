@@ -50,8 +50,7 @@ public class CodeService implements ICodeService {
   private volatile ICache<CodeTypeCacheKey, ICodeType<?, ?>> m_cache;
 
   /**
-   * Creates and initializes a new cache. Executed in {@link PostConstruct} to ensure that the cache created exactly
-   * once.
+   * Creates and initializes a new cache. Executed in {@link PostConstruct} to ensure that the cache created exactly once.
    */
   @PostConstruct
   protected void initCache() {
@@ -179,9 +178,10 @@ public class CodeService implements ICodeService {
   }
 
   @Override
-  public <CODE_ID_TYPE, CODE extends ICode<CODE_ID_TYPE>> CODE getCode(Class<CODE> type) {
-    Class<? extends ICodeType<?, CODE_ID_TYPE>> declaringCodeTypeClass = getDeclaringCodeTypeClass(type);
-    ICodeType<?, CODE_ID_TYPE> codeType = getCodeType(declaringCodeTypeClass);
+  public <CODE extends ICode<?>> CODE getCode(Class<CODE> type) {
+    Class<? extends ICode<?>> typeClass = type;
+    Class<? extends ICodeType<?, ?>> declaringCodeTypeClass = getDeclaringCodeTypeClass(typeClass);
+    ICodeType<?, ?> codeType = getCodeType(declaringCodeTypeClass);
     return findCode(type, codeType);
   }
 

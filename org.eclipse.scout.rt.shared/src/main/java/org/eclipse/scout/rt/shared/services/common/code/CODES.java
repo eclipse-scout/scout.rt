@@ -45,7 +45,7 @@ public final class CODES {
     return BEANS.get(ICodeService.class).getCodeTypes(types);
   }
 
-  public static <CODE_ID_TYPE, CODE extends ICode<CODE_ID_TYPE>> CODE getCode(Class<CODE> type) {
+  public static <CODE extends ICode<?>> CODE getCode(Class<CODE> type) {
     return BEANS.get(ICodeService.class).getCode(type);
   }
 
