@@ -262,19 +262,6 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   }
 
   /**
-   * Configures the css class(es) of this action.
-   * <p>
-   * Subclasses can override this method. Default is {@code null}.
-   *
-   * @return a string containing one or more classes separated by space, or null if no class should be set.
-   */
-  @ConfigProperty(ConfigProperty.STRING)
-  @Order(55)
-  protected String getConfiguredCssClass() {
-    return null;
-  }
-
-  /**
    * called by {@link #initAction()}<br>
    * this way a menu can for example add/remove custom child menus
    */
@@ -761,16 +748,6 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   @Override
   public void setHorizontalAlignment(byte horizontalAlignment) {
     m_horizontalAlignment = horizontalAlignment;
-  }
-
-  @Override
-  public String getCssClass() {
-    return propertySupport.getPropertyString(PROP_CSS_CLASS);
-  }
-
-  @Override
-  public void setCssClass(String cssClass) {
-    propertySupport.setPropertyString(PROP_CSS_CLASS, cssClass);
   }
 
   @Override

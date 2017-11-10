@@ -39,7 +39,6 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonWidget<FORM> {
   public static final String PROP_ICON_ID = IForm.PROP_ICON_ID;
   public static final String PROP_CLOSABLE = IForm.PROP_CLOSABLE;
   public static final String PROP_SAVE_NEEDED_VISIBLE = IForm.PROP_SAVE_NEEDED_VISIBLE;
-  public static final String PROP_CSS_CLASS = IForm.PROP_CSS_CLASS;
   public static final String PROP_MODAL = "modal";
   public static final String PROP_DISPLAY_HINT = "displayHint";
   public static final String PROP_DISPLAY_VIEW_ID = "displayViewId";
@@ -118,13 +117,6 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonWidget<FORM> {
       @Override
       protected Boolean modelValue() {
         return getModel().isSaveNeededVisible();
-      }
-
-    });
-    putJsonProperty(new JsonProperty<IForm>(PROP_CSS_CLASS, model) {
-      @Override
-      protected String modelValue() {
-        return getModel().getCssClass();
       }
     });
     putJsonProperty(new JsonProperty<IForm>(PROP_SAVE_NEEDED, model) {

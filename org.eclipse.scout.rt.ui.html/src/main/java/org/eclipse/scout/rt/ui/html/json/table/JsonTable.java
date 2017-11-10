@@ -185,6 +185,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
 
   @Override
   protected void initJsonProperties(T model) {
+    super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_ENABLED, model) {
       @Override
       protected Boolean modelValue() {
@@ -329,12 +330,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       @Override
       protected List<IKeyStroke> modelValue() {
         return getModel().getKeyStrokes();
-      }
-    });
-    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_CSS_CLASS, model) {
-      @Override
-      protected String modelValue() {
-        return getModel().getCssClass();
       }
     });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_CONTEXT_COLUMN, model) {

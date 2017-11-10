@@ -37,12 +37,6 @@ public class JsonTile<T extends ITile> extends AbstractJsonWidget<T> {
         return ((ITileColorScheme) value).getIdentifier();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ITile.PROP_CSS_CLASS, model) {
-      @Override
-      protected String modelValue() {
-        return getModel().getCssClass();
-      }
-    });
     putJsonProperty(new JsonProperty<T>(ITile.PROP_LOADING, model) {
       @Override
       protected Boolean modelValue() {

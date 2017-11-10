@@ -16,4 +16,15 @@ public abstract class AbstractJsonWidget<T extends IWidget> extends AbstractJson
   public String getObjectType() {
     return "Widget";
   }
+
+  @Override
+  protected void initJsonProperties(T model) {
+    super.initJsonProperties(model);
+    putJsonProperty(new JsonProperty<T>(IWidget.PROP_CSS_CLASS, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getCssClass();
+      }
+    });
+  }
 }

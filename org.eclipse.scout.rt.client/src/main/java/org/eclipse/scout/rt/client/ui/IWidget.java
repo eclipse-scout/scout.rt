@@ -5,6 +5,6 @@ import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 /**
  * @since 7.1
  */
-public interface IWidget extends IPropertyObserver {
+public interface IWidget extends IPropertyObserver, IStyleable {
 
 }

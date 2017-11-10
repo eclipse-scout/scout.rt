@@ -102,12 +102,6 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
         return getModel().getStatusPosition();
       }
     });
-    putJsonProperty(new JsonProperty<FORM_FIELD>(IFormField.PROP_CSS_CLASS, model) {
-      @Override
-      protected String modelValue() {
-        return getModel().getCssClass();
-      }
-    });
     putJsonProperty(new JsonProperty<FORM_FIELD>(IFormField.PROP_FONT, model) {
       @Override
       protected Object modelValue() {
