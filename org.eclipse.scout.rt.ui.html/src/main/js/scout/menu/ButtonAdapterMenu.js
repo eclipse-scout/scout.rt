@@ -56,8 +56,16 @@ scout.ButtonAdapterMenu.prototype._onButtonPropertyChange = function(event) {
   event.changedProperties.forEach(function(prop) {
     changedProperties[prop] = event.newProperties[prop];
   });
+  var menuModelProperties = scout.ButtonAdapterMenu.adaptButtonProperties(changedProperties);
+  // add late model properties, some properties were maybe not available during scout.ModelAdapter.prototype._init when the initial list
+  // of model properties was created; however if one of these properties is changed, they should still be recognized as model properties
+  for (var propertyName in menuModelProperties) {
+    if (!this._isModelProperty(propertyName)) {
+      this._addModelProperties(propertyName);
+    }
+  }
   this.onModelPropertyChange({
-    properties: scout.ButtonAdapterMenu.adaptButtonProperties(changedProperties)
+    properties: menuModelProperties
   });
 };
 
