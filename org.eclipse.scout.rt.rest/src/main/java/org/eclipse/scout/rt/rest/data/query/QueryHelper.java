@@ -14,11 +14,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.ws.rs.BadRequestException;
+
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class QueryHelper {
+
+  private static final Logger LOG = LoggerFactory.getLogger(QueryHelper.class);
 
   /**
    * @param param
@@ -58,6 +64,36 @@ public class QueryHelper {
     }
     splitted.add(token.toString());
     return splitted;
+  }
+
+  /**
+   * Creates and returns instances of a query with an include. The given include string is passed and parsed to the
+   * instantiated ResourceInclude.
+   *
+   * @param queryClass
+   * @param includeClass
+   * @param include
+   *          string as received from HTTP query param string
+   */
+  @SuppressWarnings({"unchecked", "squid:S1166"})
+  public <Q extends IDataQueryWithInclude<I>, I extends ResourceInclude> Q buildQueryWithInclude(Class<Q> queryClass, Class<I> includeClass, String include) {
+    Q query;
+    try {
+      query = queryClass.newInstance();
+    }
+    catch (InstantiationException | IllegalAccessException e) {
+      LOG.debug("Failed to instantiate query class {}", queryClass);
+      throw new BadRequestException("Failed to instantiate query class.");
+    }
+
+    try {
+      query.setInclude((I) includeClass.newInstance().parse(include));
+      return query;
+    }
+    catch (Exception e) {
+      LOG.debug("Parsing failed with message {}", e.getMessage());
+      throw new BadRequestException("Query parsing failed. Check your request parameters.");
+    }
   }
 
 }

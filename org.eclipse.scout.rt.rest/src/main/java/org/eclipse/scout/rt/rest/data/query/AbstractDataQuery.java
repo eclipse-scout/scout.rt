@@ -15,6 +15,10 @@ import java.util.Collection;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 
 public abstract class AbstractDataQuery extends AbstractQuery {
+
+  public static final String PROP_CHUNK_SIZE = "chunkSize";
+  public static final String PROP_CHUNK_RANGE = "chunkRange";
+  public static final String PROP_IDS = "ids";
   private static final long serialVersionUID = 1L;
 
   private Integer m_chunkSize;
@@ -46,11 +50,19 @@ public abstract class AbstractDataQuery extends AbstractQuery {
   }
 
   @Override
+  public QueryBuilder addQueryParams(QueryBuilder builder) {
+    return super.addQueryParams(builder)
+        .queryParam(PROP_CHUNK_SIZE, m_chunkSize)
+        .queryParam(PROP_CHUNK_RANGE, m_chunkRange)
+        .queryParam(PROP_IDS, m_ids);
+  }
+
+  @Override
   protected void interceptToStringBuilder(ToStringBuilder builder) {
     super.interceptToStringBuilder(builder);
     builder
-        .attr("chunkSize", m_chunkSize)
-        .attr("chunkRange", m_chunkRange)
-        .attr("ids", m_ids);
+        .attr(PROP_CHUNK_SIZE, m_chunkSize)
+        .attr(PROP_CHUNK_RANGE, m_chunkRange)
+        .attr(PROP_IDS, m_ids);
   }
 }

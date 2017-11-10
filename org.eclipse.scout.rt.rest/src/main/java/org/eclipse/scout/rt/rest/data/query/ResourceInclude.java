@@ -48,7 +48,7 @@ public class ResourceInclude extends Include {
 
   public ResourceInclude include(String name, Include include) {
     if (!isValidInclude(name)) {
-      throw new IllegalArgumentException("include not valid");
+      throw new IllegalArgumentException("Include not valid");
     }
     m_includes.put(name, include);
     return this;
@@ -75,6 +75,22 @@ public class ResourceInclude extends Include {
     return this;
   }
 
+  /**
+   * Returns the current state of the Include as string (reverse operation of parse). returns an empty string if nothing
+   * is included.
+   */
+  public String format() {
+    if (m_includes.isEmpty()) {
+      return "";
+    }
+    StringBuilder sb = new StringBuilder(); // FIXME [awe] implement more sophisticated (sub-)includes
+    m_includes.entrySet().stream().forEach(entry -> {
+      sb.append(entry.getKey()).append(",");
+    });
+    sb.deleteCharAt(sb.length() - 1); // delete last comma
+    return sb.toString();
+  }
+
   protected void parseSingleInclude(String includeParam) {
     String subInclude = null;
     String includeName = includeParam;
@@ -82,14 +98,14 @@ public class ResourceInclude extends Include {
     int indexOfClosingBracket = includeParam.indexOf(')');
     if (indexOfOpeningBracket > -1) {
       if (indexOfClosingBracket < 0) {
-        throw new IllegalArgumentException("Missing closing bracket.");
+        throw new IllegalArgumentException("Missing closing bracket");
       }
       subInclude = includeParam.substring(indexOfOpeningBracket + 1, indexOfClosingBracket);
       includeName = includeParam.substring(0, indexOfOpeningBracket);
     }
 
     if (!isValidInclude(includeName)) {
-      throw new IllegalArgumentException("Include " + includeName + " not valid.");
+      throw new IllegalArgumentException("Include " + includeName + " not valid");
     }
 
     Class<? extends Include> includeClass = m_validIncludes.get(includeName);
@@ -98,7 +114,7 @@ public class ResourceInclude extends Include {
       include = includeClass.newInstance();
     }
     catch (InstantiationException | IllegalAccessException e) {
-      throw new IllegalArgumentException("Could not instanciate include " + includeName + ".", e);
+      throw new IllegalArgumentException("Could not instanciate include " + includeName, e);
     }
     include(includeName, include);
     if (include instanceof ResourceInclude) {
