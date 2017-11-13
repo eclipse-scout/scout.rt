@@ -95,8 +95,14 @@ public abstract class AbstractComposerNode extends AbstractTreeNode {
       childEntitites = getComposerField().getEntities();
     }
     for (IDataModelEntity e : childEntitites) {
-      menus.add(new AddEntityMenu(getComposerField(), this, e));
+      menus.add(createAddEntityMenu(e));
     }
+  }
+
+  protected IMenu createAddEntityMenu(IDataModelEntity e) {
+    AddEntityMenu menu = new AddEntityMenu(getComposerField(), this, e);
+    menu.initAction();
+    return menu;
   }
 
   @Override
