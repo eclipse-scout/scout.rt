@@ -963,6 +963,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   protected void disposeFieldInternal() {
+    ActionUtility.disposeActions(getKeyStrokes());
   }
 
   /**
