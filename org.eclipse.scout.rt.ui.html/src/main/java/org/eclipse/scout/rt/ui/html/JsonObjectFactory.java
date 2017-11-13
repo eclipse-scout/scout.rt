@@ -39,8 +39,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.userfilter.NumberColumnUserFil
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableTextUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TextColumnUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
-import org.eclipse.scout.rt.client.ui.contenteditor.IContentEditorElementTile;
-import org.eclipse.scout.rt.client.ui.contenteditor.IContentEditorField;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -101,8 +99,6 @@ import org.eclipse.scout.rt.ui.html.json.basic.filechooser.JsonFileChooser;
 import org.eclipse.scout.rt.ui.html.json.basic.planner.JsonPlanner;
 import org.eclipse.scout.rt.ui.html.json.calendar.JsonCalendar;
 import org.eclipse.scout.rt.ui.html.json.calendar.JsonCalendarComponent;
-import org.eclipse.scout.rt.ui.html.json.contenteditor.JsonContentEditorElementTile;
-import org.eclipse.scout.rt.ui.html.json.contenteditor.JsonContentEditorField;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktopNotification;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonFormMenu;
@@ -279,12 +275,6 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof IClipboardField) {
       return new JsonClipboardField<>((IClipboardField) model, session, id, parent);
-    }
-    if (model instanceof IContentEditorField) {
-      return new JsonContentEditorField((IContentEditorField) model, session, id, parent);
-    }
-    if (model instanceof IContentEditorElementTile) {
-      return new JsonContentEditorElementTile((IContentEditorElementTile) model, session, id, parent);
     }
     if (model instanceof ITilesField<?>) {
       return new JsonTilesField<ITilesField<? extends ITiles>>((ITilesField<?>) model, session, id, parent);

@@ -360,8 +360,6 @@
   __include("scout/form/fields/clipboardfield/ClipboardFieldAdapter.js");
   __include("scout/form/fields/colorfield/ColorField.js");
   __include("scout/form/fields/colorfield/ColorFieldAdapter.js");
-  __include("scout/form/fields/contenteditorfield/ContentEditorField.js");
-  __include("scout/form/fields/contenteditorfield/ContentEditorFieldAdapter.js");
   __include("scout/form/fields/datefield/DateField.js");
   __include("scout/form/fields/datefield/DateFieldAdapter.js");
   __include("scout/form/fields/datefield/DateTimeCompositeLayout.js");
@@ -538,9 +536,4 @@
   __include("scout/desktop/DesktopFormController.js");
   __include("scout/table/FilterFieldsGroupBox.js"); // requires GroupBox.js
   __include("scout/resizable/Resizable.js");
-  __include("scout/contenteditor/ContentElement.js");
-  __include("scout/contenteditor/ContentEditor.js");
-  __include("scout/contenteditor/ContentEditorSlot.js");
-  __include("scout/contenteditor/ContentEditorElementTile.js");
-  __include("scout/contenteditor/ContentEditorElementTileAdapter.js");
 } (window.scout = window.scout || {}, jQuery)); //NOSONAR
