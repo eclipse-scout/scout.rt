@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.TilesFieldAdapter = function() {
-  scout.TilesFieldAdapter.parent.call(this);
+scout.AccordionAdapter = function() {
+  scout.AccordionAdapter.parent.call(this);
 };
-scout.inherits(scout.TilesFieldAdapter, scout.FormFieldAdapter);
+scout.inherits(scout.AccordionAdapter, scout.ModelAdapter);

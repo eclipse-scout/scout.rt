@@ -10,6 +10,8 @@
  ******************************************************************************/
 scout.Tiles = function() {
   scout.Tiles.parent.call(this);
+  this.animateTileRemoval = true;
+  this.animateTileInsertion = true;
   this.filters = [];
   this.filteredTiles = [];
   this.filteredTilesDirty = false;
@@ -28,6 +30,7 @@ scout.Tiles = function() {
   this.selectable = false;
   this.selectedTiles = [];
   this.scrollable = true;
+  this.renderAnimationEnabled = false;
   this.startupAnimationDone = false;
   this.startupAnimationEnabled = false;
   this.tiles = [];
@@ -62,6 +65,7 @@ scout.Tiles.prototype._initTiles = function() {
 scout.Tiles.prototype._initTile = function(tile) {
   tile.setSelectable(this.selectable);
   tile.setSelected(this.selectedTiles.indexOf(tile) >= 0);
+  tile.setParent(this);
 };
 
 scout.Tiles.prototype._render = function() {
@@ -118,6 +122,7 @@ scout.Tiles.prototype.deleteAllTiles = function() {
 };
 
 scout.Tiles.prototype.setTiles = function(tiles, appendPlaceholders) {
+  tiles = scout.arrays.ensure(tiles);
   if (scout.objects.equals(this.tiles, tiles)) {
     return;
   }
@@ -130,8 +135,7 @@ scout.Tiles.prototype.setTiles = function(tiles, appendPlaceholders) {
     this._deletePlaceholders(tiles);
   }
 
-  var tilesToInsert = tiles.slice();
-  scout.arrays.removeAll(tilesToInsert, this.tiles);
+  var tilesToInsert = scout.arrays.diff(tiles, this.tiles);
   this._applyFilters(tilesToInsert);
 
   // Append the existing placeholders, otherwise they would be unnecessarily deleted if a tile is deleted
@@ -145,14 +149,11 @@ scout.Tiles.prototype.setTiles = function(tiles, appendPlaceholders) {
 
   // Only delete those which are not in the new array
   // Only insert those which are not already there
-  var tilesToDelete = this.tiles.slice();
-  scout.arrays.removeAll(tilesToDelete, tiles);
+  var tilesToDelete = scout.arrays.diff(this.tiles, tiles);
 
   this._deleteTiles(tilesToDelete);
-  if (tilesToInsert.length > 0 || tilesToDelete.length > 0) {
-    this._setProperty('tiles', tiles);
-  }
   this._insertTiles(tilesToInsert);
+  this._setProperty('tiles', tiles);
 
   this.filteredTilesDirty = this.filteredTilesDirty || tilesToDelete.length > 0 || tilesToInsert.length > 0;
   this._updateFilteredTiles();
@@ -164,27 +165,31 @@ scout.Tiles.prototype._insertTiles = function(tiles) {
   }
 
   tiles.forEach(function(tile) {
-    this._initTile(tile);
-    if (this.rendered) {
-      this._renderTile(tile);
-      tile.$container.addClass('invisible');
-      // Wait until the layout animation is done before animating the insert operation.
-      // Also make them invisible to not cover existing tiles while they are moving or changing size.
-      // Also do it for tiles which don't have an insert animation (e.g. placeholders), due to the same reason.
-      this.one('layoutAnimationDone', function() {
-        if (tile.rendered) {
-          tile.$container.removeClass('invisible');
-          if (this._animateTileInsertion(tile)) {
-            tile.$container.addClassForAnimation('animate-insert');
-          }
-        }
-      }.bind(this));
-    }
+    this._insertTile(tile);
   }, this);
 
   if (this.rendered && !this.htmlComp.layouting) {
     // no need to invalidate when tile placeholders are added or removed while layouting
     this.invalidateLayoutTree();
+  }
+};
+
+scout.Tiles.prototype._insertTile = function(tile) {
+  this._initTile(tile);
+  if (this.rendered) {
+    this._renderTile(tile);
+    tile.$container.addClass('invisible');
+    // Wait until the layout animation is done before animating the insert operation.
+    // Also make them invisible to not cover existing tiles while they are moving or changing size.
+    // Also do it for tiles which don't have an insert animation (e.g. placeholders), due to the same reason.
+    this.one('layoutAnimationDone', function() {
+      if (tile.rendered) {
+        tile.$container.removeClass('invisible');
+        if (this._animateTileInsertion(tile)) {
+          tile.$container.addClassForAnimation('animate-insert');
+        }
+      }
+    }.bind(this));
   }
 };
 
@@ -199,13 +204,7 @@ scout.Tiles.prototype._deleteTiles = function(tiles) {
   }
 
   tiles.forEach(function(tile) {
-    if (this._animateTileRemoval(tile)) {
-      // Animate tile removal, but not while layouting when tile placeholders are added or removed
-      tile.animateRemoval = true;
-    }
-    tile.destroy();
-    this._onTileDestroy(tile);
-    tile.animateRemoval = false;
+    this._deleteTile(tile);
   }, this);
   this.deselectTiles(tiles);
 
@@ -215,15 +214,30 @@ scout.Tiles.prototype._deleteTiles = function(tiles) {
   }
 };
 
+scout.Tiles.prototype._deleteTile = function(tile) {
+  if (this._animateTileRemoval(tile)) {
+    // Animate tile removal, but not while layouting when tile placeholders are added or removed
+    tile.animateRemoval = true;
+  }
+  // Destroy only if it is the owner, if tile belongs to another widget, just remove it
+  if (tile.owner === this) {
+    tile.destroy();
+  } else if (this.rendered) {
+    tile.remove();
+  }
+  this._onTileDelete(tile);
+  tile.animateRemoval = false;
+};
+
 scout.Tiles.prototype._animateTileRemoval = function(tile) {
-  return !(tile instanceof scout.PlaceholderTile);
+  return this.animateTileRemoval && !(tile instanceof scout.PlaceholderTile);
 };
 
 scout.Tiles.prototype._animateTileInsertion = function(tile) {
-  return !(tile instanceof scout.PlaceholderTile);
+  return this.animateTileInsertion && !(tile instanceof scout.PlaceholderTile);
 };
 
-scout.Tiles.prototype._onTileDestroy = function(tile) {
+scout.Tiles.prototype._onTileDelete = function(tile) {
   if (!tile.rendered || !tile.animateRemoval || this.tileRemovalPending) {
     return;
   }
@@ -524,6 +538,10 @@ scout.Tiles.prototype.setSelectable = function(selectable) {
 scout.Tiles.prototype._renderSelectable = function() {
   this.$container.toggleClass('selectable', this.selectable);
   this.invalidateLayoutTree();
+};
+
+scout.Tiles.prototype.setMultiSelect = function(multiSelect) {
+  this.setProperty('multiSelect', multiSelect);
 };
 
 /**

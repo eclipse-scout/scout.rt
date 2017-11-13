@@ -410,6 +410,15 @@ scout.arrays = {
     return Math.min.apply(Math, filtered);
   },
 
+  /**
+   * @returns all elements of the first array which are not in the second array
+   */
+  diff: function(arr1, arr2) {
+    var diff = arr1.slice();
+    scout.arrays.removeAll(diff, arr2);
+    return diff;
+  },
+
   //
   // Use these methods if you have an array of jquery objects.
   // Reason $elem1 === $elem2 does often not work because new jquery objects are created for the same html node.

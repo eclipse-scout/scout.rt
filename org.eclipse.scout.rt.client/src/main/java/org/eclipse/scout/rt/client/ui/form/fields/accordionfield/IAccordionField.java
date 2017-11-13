@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.TilesFieldAdapter = function() {
-  scout.TilesFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.TilesFieldAdapter, scout.FormFieldAdapter);
+package org.eclipse.scout.rt.client.ui.form.fields.accordionfield;
+
+import org.eclipse.scout.rt.client.ui.accordion.IAccordion;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+
+public interface IAccordionField<T extends IAccordion> extends IFormField {
+
+  /**
+   * {@link IAccordion}
+   */
+  String PROP_ACCORDION = "accordion";
+
+  void setAccordion(T accordion);
+
+  T getAccordion();
+}

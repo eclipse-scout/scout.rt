@@ -14,10 +14,19 @@ scout.RowLayout = function() {
 scout.inherits(scout.RowLayout, scout.AbstractLayout);
 
 scout.RowLayout.prototype.layout = function($container) {
+  var htmlComp = scout.HtmlComponent.get($container);
+  var containerSize = htmlComp.availableSize()
+    .subtract(htmlComp.insets());
+
   $container.children().each(function() {
     var htmlComp = scout.HtmlComponent.optGet($(this));
     if (htmlComp) {
-      htmlComp.setSize(htmlComp.prefSize());
+      var prefSize = htmlComp.prefSize();
+
+      // All elements in a row layout have the same width which is the width of the container
+      prefSize.width = containerSize.width;
+
+      htmlComp.setSize(prefSize);
     }
   });
 };

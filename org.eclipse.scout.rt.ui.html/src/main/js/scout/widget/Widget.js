@@ -485,14 +485,18 @@ scout.Widget.prototype.setParent = function(parent) {
 };
 
 scout.Widget.prototype.addChild = function(child) {
-  $.log.trace('addChild(' + child + ') to ' + this);
+  if ($.log.isTraceEnabled()) {
+    $.log.trace('addChild(' + child + ') to ' + this);
+  }
   if (this.children.indexOf(child) === -1) {
     this.children.push(child);
   }
 };
 
 scout.Widget.prototype.removeChild = function(child) {
-  $.log.trace('removeChild(' + child + ') from ' + this);
+  if ($.log.isTraceEnabled()) {
+    $.log.trace('removeChild(' + child + ') from ' + this);
+  }
   scout.arrays.remove(this.children, child);
 };
 
@@ -1047,12 +1051,9 @@ scout.Widget.prototype._prepareWidgetProperty = function(propertyName, widgets) 
 
   var oldWidgets = this[propertyName];
   if (oldWidgets && Array.isArray(widgets)) {
-    // if new value is an array, old value has to be one as well
-    // copy to prevent modification of original
-    oldWidgets = oldWidgets.slice();
-
-    // only destroy those which are not in the new array
-    scout.arrays.removeAll(oldWidgets, widgets);
+    // If new value is an array, old value has to be one as well
+    // Only destroy those which are not in the new array
+    oldWidgets = scout.arrays.diff(oldWidgets, widgets);
   }
 
   // Destroy old child widget(s)

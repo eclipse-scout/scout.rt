@@ -175,6 +175,13 @@ scout.graphics = {
     return size;
   },
 
+  /**
+   * @returns {scout.Dimension} the size of the element specified by the style.
+   */
+  cssSize: function($elem) {
+    return new scout.Dimension($elem.cssWidth(), $elem.cssHeight());
+  },
+
   setSize: function($comp, vararg, height) {
     var size = vararg instanceof scout.Dimension ?
       vararg : new scout.Dimension(vararg, height);

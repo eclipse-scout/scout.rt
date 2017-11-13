@@ -14,6 +14,7 @@ import java.text.DecimalFormat;
 import java.util.Date;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.ui.accordion.IAccordion;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
@@ -48,6 +49,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormMenu;
+import org.eclipse.scout.rt.client.ui.form.fields.accordionfield.IAccordionField;
 import org.eclipse.scout.rt.client.ui.form.fields.beanfield.IBeanField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
@@ -80,6 +82,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
 import org.eclipse.scout.rt.client.ui.form.fields.wizard.IWizardProgressField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
+import org.eclipse.scout.rt.client.ui.group.IGroup;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.tile.IFormFieldTile;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
@@ -94,6 +97,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonByteArray;
 import org.eclipse.scout.rt.ui.html.json.JsonClientSession;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonDecimalFormat;
+import org.eclipse.scout.rt.ui.html.json.accordion.JsonAccordion;
 import org.eclipse.scout.rt.ui.html.json.action.keystroke.JsonKeyStroke;
 import org.eclipse.scout.rt.ui.html.json.basic.filechooser.JsonFileChooser;
 import org.eclipse.scout.rt.ui.html.json.basic.planner.JsonPlanner;
@@ -109,6 +113,7 @@ import org.eclipse.scout.rt.ui.html.json.desktop.JsonSearchOutline;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonViewButton;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonDateField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.accordionfield.JsonAccordionField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.beanfield.JsonBeanField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.browserfield.JsonBrowserField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.button.JsonButton;
@@ -141,6 +146,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.treebox.JsonTreeBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.treefield.JsonTreeField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.wizard.JsonWizardProgressField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.wrappedform.JsonWrappedFormField;
+import org.eclipse.scout.rt.ui.html.json.group.JsonGroup;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.messagebox.JsonMessageBox;
 import org.eclipse.scout.rt.ui.html.json.table.JsonAlphanumericSortingStringColumn;
@@ -279,6 +285,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     if (model instanceof ITilesField<?>) {
       return new JsonTilesField<ITilesField<? extends ITiles>>((ITilesField<?>) model, session, id, parent);
     }
+    if (model instanceof IAccordionField<?>) {
+      return new JsonAccordionField<IAccordionField<? extends IAccordion>>((IAccordionField<?>) model, session, id, parent);
+    }
 
     // --- other model objects ---
     if (model instanceof IDesktop) {
@@ -363,6 +372,12 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof ITiles) {
       return new JsonTiles<>((ITiles) model, session, id, parent);
+    }
+    if (model instanceof IGroup) {
+      return new JsonGroup<>((IGroup) model, session, id, parent);
+    }
+    if (model instanceof IAccordion) {
+      return new JsonAccordion<>((IAccordion) model, session, id, parent);
     }
     return null;
   }

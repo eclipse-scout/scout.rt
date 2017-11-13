@@ -8,28 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.TilesField = function() {
-  scout.TilesField.parent.call(this);
-  this._addWidgetProperties(['tiles']);
+scout.AccordionField = function() {
+  scout.AccordionField.parent.call(this);
+  this._addWidgetProperties(['accordion']);
 };
-scout.inherits(scout.TilesField, scout.FormField);
+scout.inherits(scout.AccordionField, scout.FormField);
 
-scout.TilesField.prototype._render = function() {
-  this.addContainer(this.$parent, 'tiles-field');
+scout.AccordionField.prototype._render = function() {
+  this.addContainer(this.$parent, 'accordion-field');
   this.addLabel();
   this.addMandatoryIndicator();
   this.addStatus();
-  if (this.tiles) {
-    this._renderTiles();
+  if (this.accordion) {
+    this._renderAccordion();
   }
 };
 
-scout.TilesField.prototype._renderTiles = function() {
-  this.tiles.render();
-  this.addField(this.tiles.$container);
+scout.AccordionField.prototype._renderAccordion = function() {
+  this.accordion.render();
+  this.addField(this.accordion.$container);
 };
 
-scout.TilesField.prototype._removeTiles = function() {
-  this.tiles.remove();
+scout.AccordionField.prototype._removeAccordion = function() {
+  this.accordion.remove();
   this._removeField();
 };

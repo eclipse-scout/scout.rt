@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.TilesFieldAdapter = function() {
-  scout.TilesFieldAdapter.parent.call(this);
+scout.GroupAdapter = function() {
+  scout.GroupAdapter.parent.call(this);
+  this._addRemoteProperties(['collapsed']);
 };
-scout.inherits(scout.TilesFieldAdapter, scout.FormFieldAdapter);
+scout.inherits(scout.GroupAdapter, scout.ModelAdapter);

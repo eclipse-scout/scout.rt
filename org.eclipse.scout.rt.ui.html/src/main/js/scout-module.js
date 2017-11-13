@@ -126,6 +126,8 @@
   __include("scout/keystroke/AbortKeyStroke.js");
   __include("scout/keystroke/TabItemKeyStroke.js");
   // Misc. elements
+  __include("scout/accordion/Accordion.js");
+  __include("scout/accordion/AccordionAdapter.js");
   __include("scout/boxbuttons/BoxButtons.js");
   __include("scout/carousel/Carousel.js");
   __include("scout/carousel/CarouselLayout.js");
@@ -166,6 +168,9 @@
   __include("scout/datepicker/DatePickerPopupLayout.js");
   __include("scout/datepicker/DatePickerTouchPopup.js");
   __include("scout/datepicker/DatePickerTouchPopupLayout.js");
+  __include("scout/group/Group.js");
+  __include("scout/group/GroupAdapter.js");
+  __include("scout/group/GroupLayout.js");
   __include("scout/image/Icon.js");
   __include("scout/image/IconDesc.js");
   __include("scout/image/Image.js");
@@ -343,6 +348,8 @@
   __include("scout/messagebox/MessageBoxes.js");
   __include("scout/messagebox/MessageBoxLayout.js");
   // Form fields (A-Z)
+  __include("scout/form/fields/accordionfield/AccordionField.js");
+  __include("scout/form/fields/accordionfield/AccordionFieldAdapter.js");
   __include("scout/form/fields/beanfield/BeanField.js");
   __include("scout/form/fields/beanfield/BeanFieldAdapter.js");
   __include("scout/form/fields/browserfield/BrowserField.js");

@@ -18,13 +18,15 @@ scout.TilesLayout.prototype.layout = function($container) {
   var contentFits;
   var htmlComp = this.widget.htmlComp;
   // Animate only once on startup (if enabled) but animate every time on resize
-  var animated = htmlComp.layouted || (this.widget.startupAnimationEnabled && !this.widget.startupAnimationDone);
+  var animated = htmlComp.layouted || (this.widget.startupAnimationEnabled && !this.widget.startupAnimationDone) || this.widget.renderAnimationEnabled;
 
   // Store the current position of the tiles
-  this.widget.filteredTiles.forEach(function(tile, i) {
-    var bounds = scout.graphics.cssBounds(tile.$container);
-    tile.$container.data('oldBounds', bounds);
-  }, this);
+  if (animated) {
+    this.widget.filteredTiles.forEach(function(tile, i) {
+      var bounds = scout.graphics.cssBounds(tile.$container);
+      tile.$container.data('oldBounds', bounds);
+    }, this);
+  }
 
   this._updateMaxContentWidth();
   this._resetGridColumnCount();
@@ -53,13 +55,29 @@ scout.TilesLayout.prototype.layout = function($container) {
     this._layout($container);
   }
 
+  var promises = [];
   if (animated) {
-    // Hide scrollbar before the animation (does not look good if scrollbar is shown while the animation is running)
-    scout.scrollbars.setVisible($container, false);
-
-    // The animation of the position change won't look good if the box is scrolled down -> scroll up first
-    $container[0].scrollTop = 0;
+    promises = this._animateTiles();
   }
+  this.widget.startupAnimationDone = true;
+
+  // When all animations have been finished, trigger event and update scrollbar
+  if (promises.length > 0) {
+    $.promiseAll(promises).done(this._onAnimationDone.bind(this));
+  } else {
+    this._onAnimationDone();
+  }
+};
+
+scout.TilesLayout.prototype._animateTiles = function() {
+  var htmlComp = this.widget.htmlComp;
+  var $container = htmlComp.$comp;
+
+  // Hide scrollbar before the animation (does not look good if scrollbar is shown while the animation is running)
+  scout.scrollbars.setVisible($container, false);
+
+  // The animation of the position change won't look good if the box is scrolled down -> scroll up first
+  $container[0].scrollTop = 0;
 
   // Animate the position change of the tiles
   var promises = [];
@@ -80,9 +98,9 @@ scout.TilesLayout.prototype.layout = function($container) {
       fromBounds = bounds.clone();
     }
 
-    if (!animated) {
-      // This is a small, discreet startup animation, just move the tiles a little
-      // It will happen if the startup animation is disabled, or every time the tiles are rendered anew
+    if (this.widget.startupAnimationDone && this.widget.renderAnimationEnabled) {
+      // This is a small, discreet render animation, just move the tiles a little
+      // It will happen if the startup animation is disabled or done and every time the tiles are rendered anew
       fromBounds = new scout.Rectangle(bounds.x * 0.95, bounds.y * 0.95, bounds.width, bounds.height);
     }
 
@@ -104,14 +122,7 @@ scout.TilesLayout.prototype.layout = function($container) {
     tile.$container.removeData('oldBounds');
   }, this);
 
-  this.widget.startupAnimationDone = true;
-
-  // When all animations have been finished, trigger event and update scrollbar
-  if (promises.length > 0) {
-    $.promiseAll(promises).done(this._onAnimationDone.bind(this));
-  } else {
-    this._onAnimationDone();
-  }
+  return promises;
 };
 
 scout.TilesLayout.prototype._inViewport = function(bounds) {

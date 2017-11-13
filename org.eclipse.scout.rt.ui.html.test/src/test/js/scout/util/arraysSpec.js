@@ -659,4 +659,16 @@ describe("scout.arrays", function() {
 
   });
 
+  describe("diff", function() {
+
+    it("returns all elements of the first array which are not in the second array", function() {
+      var arr1 = ['a', 'b', 'b1', 'c'];
+      var arr2 = ['b', 'c', 'c1', 'd'];
+
+      expect(scout.arrays.diff(arr1, arr2)).toEqual(['a', 'b1']);
+      expect(scout.arrays.diff(arr2, arr1)).toEqual(['c1', 'd']);
+    });
+
+  });
+
 });

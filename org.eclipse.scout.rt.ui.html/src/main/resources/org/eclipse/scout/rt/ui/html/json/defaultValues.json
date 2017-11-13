@@ -396,6 +396,14 @@
       "selectedTiles": [],
       "scrollable": false,
       "tiles": []
+    },
+    "Accordion": {
+      "exclusiveExpand": true,
+      "scrollable": true,
+      "groups": []
+    },
+    "Group": {
+      "collapsed": false
     }
   },
 
@@ -471,7 +479,9 @@
       "Planner": null,
       "DesktopNotification": null,
       "Tile": null,
-      "Tiles": null
+      "Tiles": null,
+      "Accordion": null,
+      "Group": null
     },
     "Column": {
       "BeanColumn": null,

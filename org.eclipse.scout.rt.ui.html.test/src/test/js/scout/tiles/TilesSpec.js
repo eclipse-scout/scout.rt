@@ -19,10 +19,10 @@ describe("Tiles", function() {
   function createTiles(numTiles, model) {
     var tiles = [];
     for (var i = 0; i < numTiles; i++) {
-      tiles.push(scout.create('Tile', {
-        parent: session.desktop,
+      tiles.push({
+        objectType: 'Tile',
         label: "Tile " + i
-      }));
+      });
     }
     var defaults = {
       parent: session.desktop,
@@ -211,6 +211,24 @@ describe("Tiles", function() {
       tiles.insertTiles(tile0);
       expect(eventTriggered).toBe(true);
     });
+
+    it('links the inserted tiles with the tiles container', function() {
+      var tiles = createTiles(0);
+      var tile0 = createTile();
+      var tile1 = createTile();
+      var tile2 = createTile();
+      expect(tiles.tiles.length).toBe(0);
+      expect(tile0.parent).toBe(session.desktop);
+      expect(tile1.parent).toBe(session.desktop);
+      expect(tile2.parent).toBe(session.desktop);
+
+      tiles.insertTile(tile0);
+      expect(tile0.parent).toBe(tiles);
+
+      tiles.insertTiles([tile1, tile2]);
+      expect(tile1.parent).toBe(tiles);
+      expect(tile2.parent).toBe(tiles);
+    });
   });
 
   describe('deleteTiles', function() {
@@ -263,6 +281,75 @@ describe("Tiles", function() {
       });
       tiles.deleteTiles(tiles.tiles[0]);
       expect(eventTriggered).toBe(true);
+    });
+
+    it('destroys the deleted tiles', function() {
+      var tiles = createTiles(0, {
+        animateTileRemoval: false
+      });
+      var tile0 = createTile({
+        parent: tiles
+      });
+      var tile1 = createTile({
+        parent: tiles
+      });
+      var tile2 = createTile({
+        parent: tiles
+      });
+      tiles.render();
+      tiles.insertTiles([tile0, tile1, tile2]);
+      expect(tile0.destroyed).toBe(false);
+      expect(tile0.rendered).toBe(true);
+      expect(tile1.destroyed).toBe(false);
+      expect(tile1.rendered).toBe(true);
+      expect(tile2.destroyed).toBe(false);
+      expect(tile2.rendered).toBe(true);
+
+      tiles.deleteTile(tile1);
+      expect(tile1.destroyed).toBe(true);
+      expect(tile1.rendered).toBe(false);
+
+      tiles.deleteTiles([tile0, tile2]);
+      expect(tile0.destroyed).toBe(true);
+      expect(tile0.rendered).toBe(false);
+      expect(tile2.destroyed).toBe(true);
+      expect(tile2.rendered).toBe(false);
+    });
+
+    /**
+     * This spec is important if a tile should be moved from one tiles container to another.
+     */
+    it('does not destroy the deleted tiles if the tiles container is not the owner', function() {
+      var tiles = createTiles(0, {
+        animateTileRemoval: false
+      });
+      var tile0 = createTile({
+        owner: session.desktop
+      });
+      var tile1 = createTile({
+        owner: session.desktop
+      });
+      var tile2 = createTile({
+        owner: session.desktop
+      });
+      tiles.render();
+      tiles.insertTiles([tile0, tile1, tile2]);
+      expect(tile0.destroyed).toBe(false);
+      expect(tile0.rendered).toBe(true);
+      expect(tile1.destroyed).toBe(false);
+      expect(tile1.rendered).toBe(true);
+      expect(tile2.destroyed).toBe(false);
+      expect(tile2.rendered).toBe(true);
+
+      tiles.deleteTile(tile1);
+      expect(tile1.destroyed).toBe(false);
+      expect(tile1.rendered).toBe(false);
+
+      tiles.deleteTiles([tile0, tile2]);
+      expect(tile0.destroyed).toBe(false);
+      expect(tile0.rendered).toBe(false);
+      expect(tile2.destroyed).toBe(false);
+      expect(tile2.rendered).toBe(false);
     });
   });
 

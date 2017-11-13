@@ -1,0 +1,41 @@
+.group {
+  position: relative;
+}
+
+.group-header {
+   position: relative;
+   display: table;
+   table-layout: fixed;
+   width: 100%;
+   padding: 10px 0;
+   border-top: 1px solid @border-color;
+   cursor: pointer;
+}
+
+.group-title {
+  display: table-cell;
+  font-size: @font-size-plus;
+  font-weight: @font-weight-bold;
+  #scout.overflow-ellipsis-nowrap();
+}
+
+.group-collapse-icon {
+  display: table-cell;
+  width: 30px;
+  text-align: right;
+  position: relative;
+
+  &::before {
+    #scout.font-icon();
+    content: @icon-angle-down;
+    font-size: @font-size-large;
+    /* Position absolute to prevent cell getting larger */
+    position: absolute;
+    right: 5px;
+    top: 0;
+  }
+
+  &.collapsed::before {
+    content: @icon-angle-up;
+  }
+}

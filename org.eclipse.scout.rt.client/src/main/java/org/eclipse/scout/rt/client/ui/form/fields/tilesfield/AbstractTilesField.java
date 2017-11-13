@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.tile.AbstractTiles;
-import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.client.ui.tile.ITiles;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
@@ -114,10 +113,5 @@ public abstract class AbstractTilesField<T extends ITiles> extends AbstractFormF
   @Override
   protected boolean execIsEmpty() {
     return getTiles().getTiles().isEmpty();
-  }
-
-  @Override
-  public <K extends ITile> K getTileByClass(Class<K> tileClass) {
-    return getTiles().getTileByClass(tileClass);
   }
 }

@@ -57,31 +57,31 @@ public class JsonGroupBox<GROUP_BOX extends IGroupBox> extends JsonCompositeFiel
   protected void initJsonProperties(GROUP_BOX model) {
     super.initJsonProperties(model);
 
-    putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_BORDER_DECORATION, model) {
+    putJsonProperty(new JsonProperty<GROUP_BOX>(IGroupBox.PROP_BORDER_DECORATION, model) {
       @Override
       protected String modelValue() {
         return getModel().getBorderDecoration();
       }
     });
-    putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_BORDER_VISIBLE, model) {
+    putJsonProperty(new JsonProperty<GROUP_BOX>(IGroupBox.PROP_BORDER_VISIBLE, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isBorderVisible();
       }
     });
-    putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_EXPANDABLE, model) {
+    putJsonProperty(new JsonProperty<GROUP_BOX>(IGroupBox.PROP_EXPANDABLE, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isExpandable();
       }
     });
-    putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_EXPANDED, model) {
+    putJsonProperty(new JsonProperty<GROUP_BOX>(IGroupBox.PROP_EXPANDED, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isExpanded();
       }
     });
-    putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_GRID_COLUMN_COUNT, model) {
+    putJsonProperty(new JsonProperty<GROUP_BOX>(IGroupBox.PROP_GRID_COLUMN_COUNT, model) {
       @Override
       protected Integer modelValue() {
         return getModel().getGridColumnCount();

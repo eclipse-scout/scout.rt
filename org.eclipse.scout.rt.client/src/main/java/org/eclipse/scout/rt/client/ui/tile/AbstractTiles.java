@@ -332,8 +332,6 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     }
     deselectTiles(tilesToDelete);
 
-    propertySupport.setPropertyList(PROP_TILES, tiles);
-
     // Initialize new tiles
     // Only initialize when tiles are added later,
     // if they are added while initConfig runs, initTiles() will take care of the initialization which will be called by the container (e.g. TilesField)
@@ -344,6 +342,8 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
         tile.init();
       }
     }
+    propertySupport.setPropertyList(PROP_TILES, tiles);
+
     m_filteredRowsDirty = tilesToDelete.size() > 0 || newTiles.size() > 0;
     applyFilters(newTiles);
   }
