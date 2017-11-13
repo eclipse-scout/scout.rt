@@ -23,7 +23,7 @@ scout.DetachHelper = function(session) {
 };
 
 scout.DetachHelper.prototype.beforeDetach = function($container, options) {
-  options = $.extend(this._defaultOptions, options || {});
+  options = $.extend({}, this._defaultOptions, options);
   if (options.storeScrollPositions) {
     this._storeScrollPositions($container);
   }
