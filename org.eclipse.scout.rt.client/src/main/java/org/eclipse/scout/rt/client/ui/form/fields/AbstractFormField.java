@@ -994,6 +994,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   protected void disposeFieldInternal() {
+    ActionUtility.disposeActions(getKeyStrokes());
   }
 
   /**
