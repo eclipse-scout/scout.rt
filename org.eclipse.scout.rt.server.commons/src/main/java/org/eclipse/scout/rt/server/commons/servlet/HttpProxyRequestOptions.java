@@ -14,11 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <ul>
- * <li><b>rewriteRule:</b> A regular expression string that is applied on the <i>pathInfo</i> part of the current HTTP
- * request</li>
- * <li><b>rewriteReplacement:</b> Used as replacement string for the string matched by the rewrite rule</li>
- * </ul>
+ * Options for a HTTP request via {@link HttpProxy}.
  */
 public class HttpProxyRequestOptions {
 
