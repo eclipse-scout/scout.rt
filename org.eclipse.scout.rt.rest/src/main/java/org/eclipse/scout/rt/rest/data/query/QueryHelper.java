@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.rest.data.query;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.ws.rs.BadRequestException;
@@ -28,10 +29,18 @@ public class QueryHelper {
 
   /**
    * @param param
-   *          comma separated strings
+   *          Comma separated strings
    */
   public List<String> parseParam(String param) {
     return Arrays.asList(StringUtility.tokenize(param, ','));
+  }
+
+  /**
+   * @param params
+   *          Collection of parameters
+   */
+  public String formatParam(Collection<String> params) {
+    return StringUtility.join(",", params);
   }
 
   /**
