@@ -14,7 +14,7 @@ scout.Tiles = function() {
   this.animateTileInsertion = true;
   this.filters = [];
   this.filteredTiles = [];
-  this.filteredTilesDirty = false;
+  this.filteredTilesDirty = true;
   // GridColumnCount will be modified by the layout, prefGridColumnCount remains unchanged
   this.gridColumnCount = 4;
   this.prefGridColumnCount = this.gridColumnCount;
@@ -704,11 +704,13 @@ scout.Tiles.prototype._applyFilters = function(tiles, fullReset) {
 };
 
 scout.Tiles.prototype._updateFilteredTiles = function() {
+  var tiles = this.tiles;
+  if (this.filters.length > 0) {
+    tiles = this._filterTiles();
+  }
   if (this.filteredTilesDirty) {
-    this.setProperty('filteredTiles', this._filterTiles());
+    this.setProperty('filteredTiles', tiles);
     this.filteredTilesDirty = false;
-  } else if (this.filters.length === 0) {
-    this.setProperty('filteredTiles', this.tiles);
   }
 };
 

@@ -679,6 +679,22 @@ describe("Tiles", function() {
       expect(tiles.filteredTiles[0]).toBe(tiles.tiles[1]);
     });
 
+    it('applies the filters initially even if every tile is accepted', function() {
+      var tiles = createTiles(3, {
+        filters: [{
+          accept: function(tile) {
+            // Accept all
+            return true;
+          }
+        }]
+      });
+      expect(tiles.tiles.length).toBe(3);
+      expect(tiles.filteredTiles.length).toBe(3);
+      expect(tiles.filteredTiles[0]).toBe(tiles.tiles[0]);
+      expect(tiles.filteredTiles[1]).toBe(tiles.tiles[1]);
+      expect(tiles.filteredTiles[2]).toBe(tiles.tiles[2]);
+    });
+
   });
 
 });
