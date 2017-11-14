@@ -19,19 +19,21 @@ scout.RowLayout.prototype.layout = function($container) {
     .subtract(htmlComp.insets());
 
   $container.children().each(function() {
-    var htmlComp = scout.HtmlComponent.optGet($(this));
-    if (htmlComp) {
-      var prefSize = htmlComp.prefSize();
+    var htmlChild = scout.HtmlComponent.optGet($(this));
+    if (htmlChild) {
+      var prefSize = htmlChild.prefSize({
+        widthHint: containerSize.width
+      });
 
       // All elements in a row layout have the same width which is the width of the container
       prefSize.width = containerSize.width;
 
-      htmlComp.setSize(prefSize);
+      htmlChild.setSize(prefSize);
     }
   });
 };
 
-scout.RowLayout.prototype.preferredLayoutSize = function($container) {
+scout.RowLayout.prototype.preferredLayoutSize = function($container, options) {
   var prefSize = new scout.Dimension(),
     htmlContainer = scout.HtmlComponent.get($container),
     maxWidth = 0;
@@ -40,7 +42,7 @@ scout.RowLayout.prototype.preferredLayoutSize = function($container) {
     var htmlChildPrefSize,
       htmlChild = scout.HtmlComponent.optGet($(this));
     if (htmlChild) {
-      htmlChildPrefSize = htmlChild.prefSize()
+      htmlChildPrefSize = htmlChild.prefSize(options)
         .add(htmlChild.margins());
       maxWidth = Math.max(htmlChildPrefSize.width, maxWidth);
       prefSize.height += htmlChildPrefSize.height;

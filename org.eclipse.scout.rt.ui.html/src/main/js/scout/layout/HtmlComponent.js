@@ -204,7 +204,12 @@ scout.HtmlComponent.prototype.prefSize = function(options) {
   if (!this.layout) {
     throw new Error('Called prefSize() but component has no layout');
   }
-  options = options || {};
+  // Remove padding, border and margins from the widthHint so that the actual layout does not need to take care of it
+  // Create a copy to not modify the original options
+  options = $.extend({}, options);
+  if (options.widthHint) {
+    options.widthHint -= this.insets(true).horizontal();
+  }
   var prefSize = this.layout.preferredLayoutSize(this.$comp, options);
   $.log.trace('(HtmlComponent#getPreferredSize) ' + this.debug() + ' widthHint=' + options.widthHint + ' heightHint=' + options.heightHint + ' preferredSize=' + prefSize);
   return prefSize;

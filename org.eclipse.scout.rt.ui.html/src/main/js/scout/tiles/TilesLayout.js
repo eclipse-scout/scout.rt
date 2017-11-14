@@ -98,7 +98,7 @@ scout.TilesLayout.prototype._animateTiles = function() {
       fromBounds = bounds.clone();
     }
 
-    if (this.widget.startupAnimationDone && this.widget.renderAnimationEnabled) {
+    if (!htmlComp.layouted && this.widget.startupAnimationDone && this.widget.renderAnimationEnabled) {
       // This is a small, discreet render animation, just move the tiles a little
       // It will happen if the startup animation is disabled or done and every time the tiles are rendered anew
       fromBounds = new scout.Rectangle(bounds.x * 0.95, bounds.y * 0.95, bounds.width, bounds.height);
@@ -214,15 +214,25 @@ scout.TilesLayout.prototype._resetGridColumnCount = function() {
   this.widget.gridColumnCount = this.widget.prefGridColumnCount;
 };
 
+scout.TilesLayout.prototype.preferredLayoutSize = function($container, options) {
+  options = $.extend({}, options);
+  if (options.widthHint) {
+    return this.prefSizeForWidth(options.widthHint);
+  }
+  return scout.TilesLayout.parent.prototype.preferredLayoutSize.call(this, $container, options);
+};
+
 scout.TilesLayout.prototype.prefSizeForWidth = function(width) {
   var prefSize,
+    htmlComp = this.widget.htmlComp,
     contentFits = false;
 
+  width += htmlComp.insets().horizontal();
   this._resetGridColumnCount();
 
   this.widget.invalidateLayout();
   this.widget.invalidateLogicalGrid(false);
-  prefSize = this.widget.htmlComp.prefSize();
+  prefSize = htmlComp.prefSize();
   if (prefSize.width <= width) {
     contentFits = true;
   }
@@ -231,7 +241,7 @@ scout.TilesLayout.prototype.prefSizeForWidth = function(width) {
     this.widget.gridColumnCount--;
     this.widget.invalidateLayout();
     this.widget.invalidateLogicalGrid(false);
-    prefSize = this.widget.htmlComp.prefSize();
+    prefSize = htmlComp.prefSize();
     if (prefSize.width <= width) {
       contentFits = true;
     }

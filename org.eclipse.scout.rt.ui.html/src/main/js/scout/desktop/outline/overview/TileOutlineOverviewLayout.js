@@ -24,8 +24,9 @@ scout.TileOutlineOverviewLayout.prototype.layout = function($container) {
     }));
 
   var htmlTiles = pageTiles.htmlComp;
-  var tilesSize = contentSize.subtract(htmlTiles.margins());
-  var tilesPrefSize = pageTiles.htmlComp.layout.prefSizeForWidth(tilesSize.width);
+  var tilesPrefSize = pageTiles.htmlComp.prefSize({
+    widthHint: contentSize.width
+  });
   htmlTiles.setSize(tilesPrefSize);
   this._positionContent();
 };

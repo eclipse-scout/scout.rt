@@ -45,7 +45,7 @@ scout.GroupLayout.prototype.preferredLayoutSize = function($container, options) 
     // (if revalidateLayoutTree is called during collapsed property event)
     prefSize = new scout.Dimension(0, 0);
   } else {
-    prefSize = htmlBody.prefSize()
+    prefSize = htmlBody.prefSize(options)
       .add(htmlBody.margins());
   }
   prefSize = prefSize.add(htmlComp.insets());
