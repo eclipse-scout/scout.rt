@@ -313,6 +313,10 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
   }
 
   protected void enhanceDetailFormWithPageMenus() {
+    if (getOutline() == null) {
+      return;
+    }
+
     IForm form = getDetailForm();
     IFormFieldContextMenu mainBoxContextMenu = form.getRootGroupBox().getContextMenu();
     List<IMenu> menus = mainBoxContextMenu.getChildActions();
