@@ -11,6 +11,8 @@
 scout.TilesLayout = function(tiles) {
   scout.TilesLayout.parent.call(this, tiles);
   this.maxContentWidth = -1;
+  this.containerPos = null;
+  this.containerScrollTop = null;
 };
 scout.inherits(scout.TilesLayout, scout.LogicalGridLayout);
 
@@ -73,16 +75,21 @@ scout.TilesLayout.prototype._animateTiles = function() {
   var htmlComp = this.widget.htmlComp;
   var $container = htmlComp.$comp;
 
-  // Hide scrollbar before the animation (does not look good if scrollbar is shown while the animation is running)
-  scout.scrollbars.setVisible($container, false);
+  this.containerPos = htmlComp.offset();
+  this.containerScrollTop = $container.scrollTop();
 
-  // The animation of the position change won't look good if the box is scrolled down -> scroll up first
-  $container[0].scrollTop = 0;
+  // Hide scrollbar before the animation (does not look good if scrollbar is hidden after the animation)
+  scout.scrollbars.opacity($container, 0);
 
   // Animate the position change of the tiles
   var promises = [];
-  var containerPos = htmlComp.offset();
   this.widget.filteredTiles.forEach(function(tile, i) {
+
+    // Stop running animations before starting the new ones to make sure existing promises are not resolved too early
+    // It may also happen that while the animation of a tile is in progress, the layout is triggered again but the tile should not be animated anymore
+    // (e.g. if it is not in the viewport anymore). In that case the animation must be stopped otherwise it may be placed at a wrong position
+    tile.$container.stop();
+
     if (tile.$container.hasClass('invisible')) {
       // When tiles are inserted they are invisible because a dedicated insert animation will be started after the layouting,
       // the animation here is to animate the position change -> don't animate inserted tiles here
@@ -110,7 +117,7 @@ scout.TilesLayout.prototype._animateTiles = function() {
       return;
     }
 
-    if (!this._inViewport(bounds.translate(containerPos.x, containerPos.y)) && !this._inViewport(fromBounds.translate(containerPos.x, containerPos.y))) {
+    if (!this._inViewport(bounds) && !this._inViewport(fromBounds)) {
       // If neither the new nor the old position is in the viewport don't animate the tile. This will affect the animation performance in a positive way if there are many tiles
       tile.$container.removeData('oldBounds');
       return;
@@ -126,6 +133,7 @@ scout.TilesLayout.prototype._animateTiles = function() {
 };
 
 scout.TilesLayout.prototype._inViewport = function(bounds) {
+  bounds = bounds.translate(this.containerPos.x, this.containerPos.y).translate(0, -this.containerScrollTop);
   var topLeftPos = new scout.Point(bounds.x, bounds.y);
   var bottomRightPos = new scout.Point(bounds.x + bounds.width, bounds.y + bounds.height);
   var $scrollable = this.widget.$container;
@@ -133,16 +141,14 @@ scout.TilesLayout.prototype._inViewport = function(bounds) {
 };
 
 scout.TilesLayout.prototype._onAnimationDone = function() {
-  this.widget.trigger('layoutAnimationDone');
   this._updateScrollbar();
+  this.widget.trigger('layoutAnimationDone');
 };
 
 scout.TilesLayout.prototype._animateTileBounds = function(tile, fromBounds, bounds) {
   var promises = [];
 
-  // Stop running animations before starting the new ones to make sure existing promises are not resolved too early
   tile.$container
-    .stop()
     .cssLeftAnimated(fromBounds.x, bounds.x, {
       start: function(promise) {
         promises.push(promise);
@@ -171,7 +177,7 @@ scout.TilesLayout.prototype._animateTileBounds = function(tile, fromBounds, boun
 };
 
 scout.TilesLayout.prototype._updateScrollbar = function() {
-  scout.scrollbars.setVisible(this.widget.$container, true);
+  scout.scrollbars.opacity(this.widget.$container, 1);
 
   // Update first scrollable parent (if widget itself is not scrollable, maybe a parent is)
   var htmlComp = this.widget.htmlComp;

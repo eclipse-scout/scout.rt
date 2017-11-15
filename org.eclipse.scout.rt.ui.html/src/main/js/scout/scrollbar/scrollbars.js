@@ -514,6 +514,20 @@ scout.scrollbars = {
         scrollbar.$container.setVisible(visible);
       }
     });
-  }
+  },
 
+  opacity: function($scrollable, opacity) {
+    if (!$scrollable || !$scrollable.data('scrollable')) {
+      return;
+    }
+    var scrollbars = $scrollable.data('scrollbars');
+    if (!scrollbars) {
+      return;
+    }
+    scrollbars.forEach(function(scrollbar) {
+      if (scrollbar.rendered) {
+        scrollbar.$container.css('opacity', opacity);
+      }
+    });
+  }
 };
