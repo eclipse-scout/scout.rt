@@ -69,6 +69,9 @@ import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.bench.layout.BenchLayoutData;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeListener;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeManager;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -167,6 +170,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   private final ObjectExtensions<AbstractDesktop, org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> m_objectExtensions;
   private final List<ClientCallback<Coordinates>> m_pendingPositionResponses = Collections.synchronizedList(new ArrayList<ClientCallback<Coordinates>>());
   private int m_attachedGuis = 0;
+  private IDataChangeManager m_dataChangeManager;
 
   /**
    * do not instantiate a new desktop<br>
@@ -189,6 +193,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent().withDesktop(this));
     m_addOns = new ArrayList<>();
     m_objectExtensions = new ObjectExtensions<>(this, true);
+    m_dataChangeManager = BEANS.get(IDataChangeManager.class);
     if (callInitializer) {
       callInitializer();
     }
@@ -1675,6 +1680,11 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   @Override
+  public void addDataChangeListener(IDataChangeListener listener) {
+    m_dataChangeManager.addDataChangeListener(listener);
+  }
+
+  @Override
   public void removeDataChangeListener(DataChangeListener listener, Object... dataTypes) {
     if (dataTypes == null || dataTypes.length == 0) {
       for (Iterator<EventListenerList> it = m_dataChangeListenerList.values().iterator(); it.hasNext();) {
@@ -1701,6 +1711,11 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   @Override
+  public void removeDataChangeListener(IDataChangeListener listener) {
+    m_dataChangeManager.removeDataChangeListener(listener);
+  }
+
+  @Override
   public boolean isDataChanging() {
     return m_dataChanging > 0;
   }
@@ -1721,7 +1736,42 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   @Override
-  public void dataChanged(Object... dataTypes) {
+  public void dataChanged(Object... arguments) {
+    List<DataChangeEvent> changeEvents = new ArrayList<>();
+    List<Object> dataTypes = new ArrayList<>();
+
+    for (Object arg : arguments) {
+      if (arg instanceof DataChangeEvent) {
+        changeEvents.add((DataChangeEvent) arg);
+      }
+      else {
+        dataTypes.add(arg);
+      }
+    }
+
+    if (changeEvents.size() > 0) {
+      handleDataChanged(changeEvents);
+    }
+    if (dataTypes.size() > 0) {
+      handleDataChangedByType(dataTypes.toArray());
+    }
+  }
+
+  /**
+   * This is the new way of handling data change events. The event object may contain data, a listener can use this data
+   * directly without the need to load data from a data source.
+   */
+  protected void handleDataChanged(Collection<DataChangeEvent> events) {
+    for (DataChangeEvent event : events) {
+      m_dataChangeManager.fireDataChangeEvent(event);
+    }
+  }
+
+  /**
+   * This is the traditional way of handling data change events. It's based on a data-type, the event does not contain
+   * any data.
+   */
+  protected void handleDataChangedByType(Object[] dataTypes) {
     if (isDataChanging()) {
       if (dataTypes != null && dataTypes.length > 0) {
         m_dataChangeEventBuffer.add(dataTypes);

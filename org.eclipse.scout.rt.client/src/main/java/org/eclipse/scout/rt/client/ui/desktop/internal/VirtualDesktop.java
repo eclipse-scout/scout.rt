@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
 import org.eclipse.scout.rt.client.ui.desktop.IOpenUriAction;
 import org.eclipse.scout.rt.client.ui.desktop.bench.layout.BenchLayoutData;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -49,11 +50,6 @@ import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 
 /**
- *  Copyright (c) 2001,2008 BSI AG
- * @version 3.x
- */
-
-/**
  * This class is used as a placeholder of virtual desktop while the desktop is loading until the desktop is set onto the
  * {@link IClientSession}. Reasons for that are observer attachments and data change registration in the init block of
  * forms, fields, pages that must be done while the desktop is loading. This pattern solves the bird/egg problem in
@@ -62,17 +58,23 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 public class VirtualDesktop implements IDesktop {
 
   private final EventListenerList m_listenerList;
+  private final EventListenerList m_dataChangeListenerList;
   private final Map<String, EventListenerList> m_propertyChangeListenerMap;
   private final Map<Object, EventListenerList> m_dataChangeListenerMap;
 
   public VirtualDesktop() {
     m_listenerList = new EventListenerList();
+    m_dataChangeListenerList = new EventListenerList();
     m_propertyChangeListenerMap = new HashMap<>();
     m_dataChangeListenerMap = new HashMap<>();
   }
 
   public DesktopListener[] getDesktopListeners() {
     return m_listenerList.getListeners(DesktopListener.class);
+  }
+
+  public IDataChangeListener[] getDataChangeListeners() {
+    return m_dataChangeListenerList.getListeners(IDataChangeListener.class);
   }
 
   public Map<Object, EventListenerList> getDataChangeListenerMap() {
@@ -149,6 +151,11 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public void addDataChangeListener(IDataChangeListener listener) {
+    m_dataChangeListenerList.add(IDataChangeListener.class, listener);
+  }
+
+  @Override
   public void removeDataChangeListener(DataChangeListener listener, Object... dataTypes) {
     if (dataTypes == null || dataTypes.length == 0) {
       for (Iterator<EventListenerList> it = m_dataChangeListenerMap.values().iterator(); it.hasNext();) {
@@ -172,6 +179,11 @@ public class VirtualDesktop implements IDesktop {
         }
       }
     }
+  }
+
+  @Override
+  public void removeDataChangeListener(IDataChangeListener listener) {
+    m_dataChangeListenerList.remove(IDataChangeListener.class, listener);
   }
 
   private UnsupportedOperationException createUnsupportedOperationException() {

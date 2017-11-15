@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.client.job.filter.future.ModelJobFutureFilter;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.internal.VirtualDesktop;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -361,6 +362,9 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
             m_desktop.addPropertyChangeListener(propName, listener);
           }
         }
+      }
+      for (IDataChangeListener listener : m_virtualDesktop.getDataChangeListeners()) {
+        m_desktop.addDataChangeListener(listener);
       }
       for (Entry<Object, EventListenerList> e : m_virtualDesktop.getDataChangeListenerMap().entrySet()) {
         Object dataType = e.getKey();

@@ -32,6 +32,9 @@ import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.bench.layout.BenchLayoutData;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeListener;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeManager;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
@@ -430,12 +433,19 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable {
    */
   void addDataChangeListener(DataChangeListener listener, Object... dataTypes);
 
+  void addDataChangeListener(IDataChangeListener listener);
+
   void removeDataChangeListener(DataChangeListener listener, Object... dataTypes);
+
+  void removeDataChangeListener(IDataChangeListener listener);
 
   /**
    * Call this method to refresh all listeners on that dataTypes.<br>
    * These might include pages, forms, fields etc.<br>
    *
+   * @param dataTypes
+   *          accepts either vararg Objects that act as data-type or since 7.1 one or more {@link DataChangeEvent}s
+   *          which are processed by the {@link IDataChangeManager}. It's also possible to mix both types.
    * @see {@link AbstractForm#execDataChanged(Object...)} {@link AbstractForm#execDataChanged(Object...)}
    *      {@link AbstractFormField#execDataChanged(Object...)} {@link AbstractFormField#execDataChanged(Object...)}
    *      {@link AbstractPage#execDataChanged(Object...)} {@link AbstractPage#execDataChanged(Object...)}
