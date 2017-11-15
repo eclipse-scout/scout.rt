@@ -201,4 +201,40 @@ describe("Accordion", function() {
     });
   });
 
+  describe('setGroups', function() {
+
+    it('applies the order of the new groups to groups and filteredGroups', function() {
+      var accordion = createAccordion(0);
+      var group0 = createGroup();
+      var group1 = createGroup();
+      var group2 = createGroup();
+      accordion.insertGroups([group0, group1, group2]);
+
+      accordion.setGroups([group2, group1, group0]);
+      expect(accordion.groups[0]).toBe(group2);
+      expect(accordion.groups[1]).toBe(group1);
+      expect(accordion.groups[2]).toBe(group0);
+    });
+
+    it('applies the order of the new groups to the rendered elements', function() {
+      var accordion = createAccordion(0);
+      var group0 = createGroup();
+      var group1 = createGroup();
+      var group2 = createGroup();
+      accordion.insertGroups([group0, group1, group2]);
+      accordion.render();
+      var $groups = accordion.$container.children('.group');
+      expect($groups.eq(0).data('widget')).toBe(group0);
+      expect($groups.eq(1).data('widget')).toBe(group1);
+      expect($groups.eq(2).data('widget')).toBe(group2);
+
+      accordion.setGroups([group2, group1, group0]);
+      $groups = accordion.$container.children('.group');
+      expect($groups.eq(0).data('widget')).toBe(group2);
+      expect($groups.eq(1).data('widget')).toBe(group1);
+      expect($groups.eq(2).data('widget')).toBe(group0);
+    });
+
+  });
+
 });

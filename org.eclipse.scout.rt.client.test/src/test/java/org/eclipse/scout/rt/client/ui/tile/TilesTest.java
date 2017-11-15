@@ -81,6 +81,97 @@ public class TilesTest {
   }
 
   @Test
+  public void testSetTiles() {
+    P_Tiles tiles = createTestTiles();
+    P_Tile tile0 = createTestTile();
+    P_Tile tile1 = createTestTile();
+    P_Tile tile2 = createTestTile();
+    P_Tile tile3 = createTestTile();
+    tiles.setTiles(Arrays.asList(tile0, tile1));
+    assertEquals(1, tile0.initCalls);
+    assertEquals(0, tile0.disposeCalls);
+    assertEquals(1, tile1.initCalls);
+    assertEquals(0, tile1.disposeCalls);
+
+    tiles.setTiles(Arrays.asList(tile2, tile3));
+    assertEquals(1, tile0.initCalls);
+    assertEquals(1, tile0.disposeCalls);
+    assertEquals(1, tile1.initCalls);
+    assertEquals(1, tile1.disposeCalls);
+    assertEquals(1, tile2.initCalls);
+    assertEquals(0, tile2.disposeCalls);
+    assertEquals(1, tile3.initCalls);
+    assertEquals(0, tile3.disposeCalls);
+
+    // Set same elements again -> nothing should happen
+    tiles.setTiles(Arrays.asList(tile2, tile3));
+    assertEquals(1, tile0.initCalls);
+    assertEquals(1, tile0.disposeCalls);
+    assertEquals(1, tile1.initCalls);
+    assertEquals(1, tile1.disposeCalls);
+    assertEquals(1, tile2.initCalls);
+    assertEquals(0, tile2.disposeCalls);
+    assertEquals(1, tile3.initCalls);
+    assertEquals(0, tile3.disposeCalls);
+  }
+
+  @Test
+  public void testSetTiles_checkOrder() {
+    P_Tiles tiles = createTestTiles();
+    P_Tile tile0 = createTestTile();
+    P_Tile tile1 = createTestTile();
+    P_Tile tile2 = createTestTile();
+
+    tiles.addTiles(Arrays.asList(tile0, tile1, tile2));
+    assertEquals(3, tiles.getTiles().size());
+    assertEquals(tile0, tiles.getTiles().get(0));
+    assertEquals(tile1, tiles.getTiles().get(1));
+    assertEquals(tile2, tiles.getTiles().get(2));
+    assertEquals(3, tiles.getFilteredTiles().size());
+    assertEquals(tile0, tiles.getFilteredTiles().get(0));
+    assertEquals(tile1, tiles.getFilteredTiles().get(1));
+    assertEquals(tile2, tiles.getFilteredTiles().get(2));
+
+    tiles.setTiles(Arrays.asList(tile2, tile1, tile0));
+    assertEquals(3, tiles.getTiles().size());
+    assertEquals(tile2, tiles.getTiles().get(0));
+    assertEquals(tile1, tiles.getTiles().get(1));
+    assertEquals(tile0, tiles.getTiles().get(2));
+    assertEquals(3, tiles.getFilteredTiles().size());
+    assertEquals(tile2, tiles.getFilteredTiles().get(0));
+    assertEquals(tile1, tiles.getFilteredTiles().get(1));
+    assertEquals(tile0, tiles.getFilteredTiles().get(2));
+  }
+
+  @Test
+  public void testSetTiles_checkOrderWithFilter() {
+    P_Tiles tiles = createTestTiles();
+    P_Tile tile0 = createTestTile();
+    P_Tile tile1 = createTestTile();
+    P_Tile tile2 = createTestTile();
+    tiles.addTiles(Arrays.asList(tile0, tile1, tile2));
+
+    ITileFilter filter = (tile) -> tile != tile1; // accept tile0 and tile2
+    tiles.addFilter(filter);
+    assertEquals(3, tiles.getTiles().size());
+    assertEquals(tile0, tiles.getTiles().get(0));
+    assertEquals(tile1, tiles.getTiles().get(1));
+    assertEquals(tile2, tiles.getTiles().get(2));
+    assertEquals(2, tiles.getFilteredTiles().size());
+    assertEquals(tile0, tiles.getFilteredTiles().get(0));
+    assertEquals(tile2, tiles.getFilteredTiles().get(1));
+
+    tiles.setTiles(Arrays.asList(tile2, tile1, tile0));
+    assertEquals(3, tiles.getTiles().size());
+    assertEquals(tile2, tiles.getTiles().get(0));
+    assertEquals(tile1, tiles.getTiles().get(1));
+    assertEquals(tile0, tiles.getTiles().get(2));
+    assertEquals(2, tiles.getFilteredTiles().size());
+    assertEquals(tile2, tiles.getFilteredTiles().get(0));
+    assertEquals(tile0, tiles.getFilteredTiles().get(1));
+  }
+
+  @Test
   public void testSelectTiles() {
     P_Tiles tiles = createTestTiles();
     tiles.setSelectable(true);
@@ -390,8 +481,23 @@ public class TilesTest {
   }
 
   public static class P_Tiles extends AbstractTiles {
+
   }
 
   public static class P_Tile extends AbstractTile {
+    public int initCalls = 0;
+    public int disposeCalls = 0;
+
+    @Override
+    protected void execInitTile() {
+      super.execInitTile();
+      initCalls++;
+    }
+
+    @Override
+    protected void execDisposeTile() {
+      super.execDisposeTile();
+      disposeCalls++;
+    }
   }
 }

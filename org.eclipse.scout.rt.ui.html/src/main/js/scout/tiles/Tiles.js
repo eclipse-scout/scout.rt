@@ -153,6 +153,7 @@ scout.Tiles.prototype.setTiles = function(tiles, appendPlaceholders) {
 
   this._deleteTiles(tilesToDelete);
   this._insertTiles(tilesToInsert);
+  this._updateTileOrder(tiles);
   this._setProperty('tiles', tiles);
 
   this.filteredTilesDirty = this.filteredTilesDirty || tilesToDelete.length > 0 || tilesToInsert.length > 0;
@@ -248,6 +249,35 @@ scout.Tiles.prototype._onTileDelete = function(tile) {
       this.invalidateLayoutTree();
     }
   }.bind(this));
+};
+
+scout.Tiles.prototype._updateTileOrder = function(tiles) {
+  var different = false;
+  if (!this.rendered) {
+    // If it is not rendered, check whether the order is different and if yes, mark the filters as dirty so that this.filteredTiles will be ordered as well
+    different = tiles.some(function(tile, i) {
+      return this.tiles[i] !== tile;
+    }, this);
+    if (different) {
+      this.filteredTilesDirty = true;
+    }
+    return;
+  }
+
+  // Loop through the the tiles and move every html element to the end of the container
+  // Only move if the order is different to the old order
+  tiles.forEach(function(tile, i) {
+    if (this.tiles[i] !== tile || different) {
+      // Start ordering as soon as the order of the arrays starts to differ
+      different = true;
+      tile.$container.appendTo(this.$container);
+    }
+  }, this);
+
+  if (different) {
+    this.filteredTilesDirty = true;
+    this.invalidateLogicalGrid();
+  }
 };
 
 scout.Tiles.prototype.invalidateLayoutTree = function() {

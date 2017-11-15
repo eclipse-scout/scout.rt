@@ -88,6 +88,7 @@ scout.Accordion.prototype.setGroups = function(groups) {
   var groupsToInsert = scout.arrays.diff(groups, this.groups);
   this._deleteGroups(groupsToDelete);
   this._insertGroups(groupsToInsert);
+  this._updateGroupOrder(groups);
 
   this._setProperty('groups', groups);
 
@@ -143,6 +144,22 @@ scout.Accordion.prototype._renderGroups = function() {
   }, this);
   this._updateFirstLastMarker();
   this.invalidateLayoutTree();
+};
+
+scout.Accordion.prototype._updateGroupOrder = function(groups) {
+  if (!this.rendered) {
+    return;
+  }
+  // Loop through the the groups and move every html element to the end of the container
+  // Only move if the order is different to the old order
+  var different = false;
+  groups.forEach(function(group, i) {
+    if (this.groups[i] !== group || different) {
+      // Start ordering as soon as the order of the array starts to differ
+      different = true;
+      group.$container.appendTo(this.$container);
+    }
+  }, this);
 };
 
 scout.Accordion.prototype._updateFirstLastMarker = function() {

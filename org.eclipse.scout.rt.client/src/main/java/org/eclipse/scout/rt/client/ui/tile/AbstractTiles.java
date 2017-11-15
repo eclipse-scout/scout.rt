@@ -320,12 +320,14 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
 
   @Override
   public void setTiles(List<? extends ITile> tiles) {
-    List<? extends ITile> oldTiles = getTiles();
-    List<? extends ITile> newTiles = ObjectUtility.nvl(tiles, new ArrayList<>());
+    if (CollectionUtility.equalsCollection(getTilesInternal(), tiles, true)) {
+      return;
+    }
+    List<? extends ITile> existingTiles = ObjectUtility.nvl(getTilesInternal(), new ArrayList<>());
+    tiles = ObjectUtility.nvl(tiles, new ArrayList<>());
 
     // Dispose old tiles (only if they are not in the new list)
-    @SuppressWarnings("unchecked")
-    List<ITile> tilesToDelete = (List<ITile>) oldTiles;
+    List<ITile> tilesToDelete = new ArrayList<ITile>(existingTiles);
     tilesToDelete.removeAll(tiles);
     for (ITile tile : tilesToDelete) {
       tile.dispose();
@@ -335,17 +337,20 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     // Initialize new tiles
     // Only initialize when tiles are added later,
     // if they are added while initConfig runs, initTiles() will take care of the initialization which will be called by the container (e.g. TilesField)
-    for (ITile tile : newTiles) {
+    List<ITile> tilesToInsert = new ArrayList<ITile>(tiles);
+    tilesToInsert.removeAll(existingTiles);
+    for (ITile tile : tilesToInsert) {
       tile.setContainer(this);
-      if (isInitialized() && !oldTiles.contains(tile)) {
+      if (isInitialized()) {
         tile.postInitConfig();
         tile.init();
       }
     }
+
     propertySupport.setPropertyList(PROP_TILES, tiles);
 
-    m_filteredRowsDirty = tilesToDelete.size() > 0 || newTiles.size() > 0;
-    applyFilters(newTiles);
+    m_filteredRowsDirty = true;
+    applyFilters(tilesToInsert);
   }
 
   @Override
@@ -709,6 +714,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   protected boolean applyFilters(List<? extends ITile> tiles, boolean fullReset) {
     if (m_filters.size() == 0 && !fullReset) {
       setFilteredTiles(getTilesInternal());
+      m_filteredRowsDirty = false;
       return false;
     }
     boolean filterChanged = false;

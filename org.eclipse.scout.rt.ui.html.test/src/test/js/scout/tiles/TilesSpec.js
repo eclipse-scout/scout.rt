@@ -384,6 +384,90 @@ describe("Tiles", function() {
     });
   });
 
+  describe('setTiles', function() {
+
+    it('applies the order of the new tiles to tiles and filteredTiles', function() {
+      var tiles = createTiles(0);
+      var tile0 = createTile();
+      var tile1 = createTile();
+      var tile2 = createTile();
+      tiles.insertTiles([tile0, tile1, tile2]);
+
+      tiles.setTiles([tile2, tile1, tile0]);
+      expect(tiles.tiles[0]).toBe(tile2);
+      expect(tiles.tiles[1]).toBe(tile1);
+      expect(tiles.tiles[2]).toBe(tile0);
+      expect(tiles.filteredTiles[0]).toBe(tile2);
+      expect(tiles.filteredTiles[1]).toBe(tile1);
+      expect(tiles.filteredTiles[2]).toBe(tile0);
+    });
+
+    it('applies the order of the new tiles to the rendered elements', function() {
+      var tiles = createTiles(0);
+      var tile0 = createTile();
+      var tile1 = createTile();
+      var tile2 = createTile();
+      tiles.insertTiles([tile0, tile1, tile2]);
+      tiles.render();
+      var $tiles = tiles.$container.children('.tile');
+      expect($tiles.eq(0).data('widget')).toBe(tile0);
+      expect($tiles.eq(1).data('widget')).toBe(tile1);
+      expect($tiles.eq(2).data('widget')).toBe(tile2);
+
+      tiles.setTiles([tile2, tile1, tile0]);
+      $tiles = tiles.$container.children('.tile');
+      expect($tiles.eq(0).data('widget')).toBe(tile2);
+      expect($tiles.eq(1).data('widget')).toBe(tile1);
+      expect($tiles.eq(2).data('widget')).toBe(tile0);
+      expect(tiles.tiles[0]).toBe(tile2);
+      expect(tiles.tiles[1]).toBe(tile1);
+      expect(tiles.tiles[2]).toBe(tile0);
+      expect(tiles.filteredTiles[0]).toBe(tile2);
+      expect(tiles.filteredTiles[1]).toBe(tile1);
+      expect(tiles.filteredTiles[2]).toBe(tile0);
+    });
+
+    it('applies the order of the new tiles to the filteredTiles if a filter is active', function() {
+      var tiles = createTiles(3);
+      var tile0 = tiles.tiles[0];
+      var tile1 = tiles.tiles[1];
+      var tile2 = tiles.tiles[2];
+
+      var filter = {
+        accept: function(tile) {
+          return tile.label.indexOf('1') < 0;
+        }
+      };
+      tiles.addFilter(filter);
+      tiles.filter();
+
+      tiles.render();
+      var $tiles = tiles.$container.children('.tile');
+      expect($tiles.eq(0).data('widget')).toBe(tile0);
+      expect($tiles.eq(1).data('widget')).toBe(tile1);
+      expect($tiles.eq(2).data('widget')).toBe(tile2);
+      expect(tiles.tiles[0]).toBe(tile0);
+      expect(tiles.tiles[1]).toBe(tile1);
+      expect(tiles.tiles[2]).toBe(tile2);
+      expect(tiles.filteredTiles.length).toBe(2);
+      expect(tiles.filteredTiles[0]).toBe(tile0);
+      expect(tiles.filteredTiles[1]).toBe(tile2);
+
+      tiles.setTiles([tile2, tile1, tile0]);
+      $tiles = tiles.$container.children('.tile');
+      expect($tiles.eq(0).data('widget')).toBe(tile2);
+      expect($tiles.eq(1).data('widget')).toBe(tile1);
+      expect($tiles.eq(2).data('widget')).toBe(tile0);
+      expect(tiles.tiles[0]).toBe(tile2);
+      expect(tiles.tiles[1]).toBe(tile1);
+      expect(tiles.tiles[2]).toBe(tile0);
+      expect(tiles.filteredTiles.length).toBe(2);
+      expect(tiles.filteredTiles[0]).toBe(tile2);
+      expect(tiles.filteredTiles[1]).toBe(tile0);
+    });
+
+  });
+
   describe('mouseDown', function() {
 
     describe('with multiSelect = false', function() {

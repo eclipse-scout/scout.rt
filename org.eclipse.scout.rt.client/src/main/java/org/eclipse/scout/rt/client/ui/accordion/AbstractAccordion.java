@@ -142,12 +142,14 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
 
   @Override
   public void setGroups(List<? extends IGroup> groups) {
-    List<? extends IGroup> oldGroups = getGroups();
-    List<? extends IGroup> newGroups = ObjectUtility.nvl(groups, new ArrayList<>());
+    if (CollectionUtility.equalsCollection(getGroupsInternal(), groups, true)) {
+      return;
+    }
+    List<? extends IGroup> existingGroups = ObjectUtility.nvl(getGroupsInternal(), new ArrayList<>());
+    groups = ObjectUtility.nvl(groups, new ArrayList<>());
 
     // Dispose old groups (only if they are not in the new list)
-    @SuppressWarnings("unchecked")
-    List<IGroup> groupsToDelete = (List<IGroup>) oldGroups;
+    List<IGroup> groupsToDelete = new ArrayList<IGroup>(existingGroups);
     groupsToDelete.removeAll(groups);
     for (IGroup group : groupsToDelete) {
       group.dispose();
@@ -155,10 +157,12 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
 
     // Initialize new groups
     // Only initialize when groups are added later,
-    // if they are added while initConfig runs, initGroups() will take care of the initialization which will be called by the container (e.g. AccordionField)
-    for (IGroup group : newGroups) {
+    // if they are added while initConfig runs, initGroups() will take care of the initialization which will be called by the container (e.g. GroupsField)
+    List<IGroup> groupsToInsert = new ArrayList<IGroup>(groups);
+    groupsToInsert.removeAll(existingGroups);
+    for (IGroup group : groupsToInsert) {
       group.setContainer(this);
-      if (isInitialized() && !oldGroups.contains(group)) {
+      if (isInitialized()) {
         group.postInitConfig();
         group.init();
       }
