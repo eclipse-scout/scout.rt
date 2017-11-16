@@ -17,6 +17,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -44,7 +46,8 @@ import javax.jms.Message;
 import javax.naming.Context;
 import javax.naming.NamingException;
 
-import org.apache.activemq.jndi.ActiveMQInitialContextFactory;
+import org.apache.activemq.broker.BrokerRegistry;
+import org.apache.activemq.broker.BrokerService;
 import org.eclipse.scout.rt.mom.api.AbstractMomTransport;
 import org.eclipse.scout.rt.mom.api.IBiDestination;
 import org.eclipse.scout.rt.mom.api.IDestination;
@@ -54,7 +57,6 @@ import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.IMessageListener;
 import org.eclipse.scout.rt.mom.api.IMom;
 import org.eclipse.scout.rt.mom.api.IMomImplementor;
-import org.eclipse.scout.rt.mom.api.IMomTransport;
 import org.eclipse.scout.rt.mom.api.IRequestListener;
 import org.eclipse.scout.rt.mom.api.ISubscription;
 import org.eclipse.scout.rt.mom.api.MOM;
@@ -65,6 +67,7 @@ import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.ObjectMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.TextMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Replace;
@@ -83,6 +86,7 @@ import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.BeanUtility;
 import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.IDisposable;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -90,59 +94,154 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
-import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
+import org.eclipse.scout.rt.testing.platform.runner.parameterized.AbstractScoutTestParameter;
+import org.eclipse.scout.rt.testing.platform.runner.parameterized.IScoutTestParameter;
+import org.eclipse.scout.rt.testing.platform.runner.parameterized.NonParameterized;
+import org.eclipse.scout.rt.testing.platform.runner.parameterized.ParameterizedPlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RunWith(PlatformTestRunner.class)
+@RunWith(ParameterizedPlatformTestRunner.class)
 public class JmsMomImplementorTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(JmsMomImplementorTest.class);
 
-  private static IBean<? extends IMomTransport> s_momBean;
+  @ClassRule
+  public static final ArtemisJmsBrokerTestRule ARTEMIS_RULE = new ArtemisJmsBrokerTestRule();
 
+  private IBean<? extends JmsTestMom> m_momBean;
   private List<IDisposable> m_disposables;
+
   private String m_testJobExecutionHint;
 
   @Rule
   public TestName m_testName = new TestName();
   public long m_t0;
 
-  @BeforeClass
-  public static void beforeClass() throws Exception {
-    installTestMom(JmsTestMom.class);
+  private static final AtomicInteger MOM_COUNTER = new AtomicInteger(0);
+
+  @Parameters
+  public static List<IScoutTestParameter> getParameters() {
+    List<IScoutTestParameter> parametersList = new LinkedList<IScoutTestParameter>();
+
+    // We do not need jmx for unit testing. Also we must disable watchTopicAdvisories else some concurrent issues with broker recreation will happen
+    final String activeMQUrlOptions = "?broker.persistent=false&broker.useJmx=false&jms.watchTopicAdvisories=false";
+    final Map<String, String> activeMQEnvironment = new HashMap<>();
+    activeMQEnvironment.put(Context.INITIAL_CONTEXT_FACTORY, org.apache.activemq.jndi.ActiveMQInitialContextFactory.class.getName());
+    activeMQEnvironment.put("connectionFactoryNames", "JUnitConnectionFactory"); // Active MQ specific
+    activeMQEnvironment.put(IMomImplementor.CONNECTION_FACTORY, "JUnitConnectionFactory");
+
+    parametersList.add(new AbstractJmsEnvironmentTestParameter("activemq") {
+
+      @Override
+      public Class<? extends IMomImplementor> getImplementor() {
+        return JmsMomImplementor.class;
+      }
+
+      @Override
+      public Map<String, String> getEnvironment() {
+        Map<String, String> env = new HashMap<>(activeMQEnvironment);
+        env.put(Context.PROVIDER_URL, "vm://mom" + MOM_COUNTER.incrementAndGet() + "/junit" + activeMQUrlOptions);
+        env.put(IMomImplementor.SYMBOLIC_NAME, "Scout JUnit MOM #" + MOM_COUNTER.get());
+        return env;
+      }
+    });
+    parametersList.add(new AbstractJmsEnvironmentTestParameter("activemq-j2ee") {
+
+      @Override
+      public Class<? extends IMomImplementor> getImplementor() {
+        return J2eeJmsMomImplementor.class;
+      }
+
+      @Override
+      public Map<String, String> getEnvironment() {
+        Map<String, String> env = new HashMap<>(activeMQEnvironment);
+        env.put(Context.PROVIDER_URL, "vm://mom" + MOM_COUNTER.incrementAndGet() + "/junit" + activeMQUrlOptions);
+        env.put(IMomImplementor.SYMBOLIC_NAME, "Scout JUnit MOM #" + MOM_COUNTER.get());
+        return env;
+      }
+    });
+
+    final Map<String, String> artemisEnvironment = new HashMap<>();
+    artemisEnvironment.put(Context.INITIAL_CONTEXT_FACTORY, org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory.class.getName());
+    artemisEnvironment.put(IMomImplementor.CONNECTION_FACTORY, "invmConnectionFactory");
+    artemisEnvironment.put("connectionFactory.invmConnectionFactory", "vm://0");
+    artemisEnvironment.put(IMomImplementor.SYMBOLIC_NAME, "Scout JUnit MOM [artemis]");
+
+    parametersList.add(new AbstractJmsEnvironmentTestParameter("artemis") {
+
+      @Override
+      public Class<? extends IMomImplementor> getImplementor() {
+        return JmsMomImplementor.class;
+      }
+
+      @Override
+      public Map<String, String> getEnvironment() {
+        return new HashMap<>(artemisEnvironment);
+      }
+    });
+    parametersList.add(new AbstractJmsEnvironmentTestParameter("artemis-j2ee") {
+
+      @Override
+      public Class<? extends IMomImplementor> getImplementor() {
+        return J2eeJmsMomImplementor.class;
+      }
+
+      @Override
+      public Map<String, String> getEnvironment() {
+        return new HashMap<>(artemisEnvironment);
+      }
+    });
+    return parametersList;
   }
 
-  @AfterClass
-  public static void afterClass() {
-    uninstallTestMom();
+  private final AbstractJmsEnvironmentTestParameter m_parameter;
+
+  public JmsMomImplementorTest(AbstractJmsEnvironmentTestParameter parameter) {
+    m_parameter = parameter;
   }
 
-  protected static void installTestMom(Class<? extends IMomTransport> transportType) {
-    if (s_momBean != null) {
+  protected abstract static class AbstractJmsEnvironmentTestParameter extends AbstractScoutTestParameter {
+
+    public AbstractJmsEnvironmentTestParameter(String name) {
+      super(name);
+    }
+
+    public abstract Class<? extends IMomImplementor> getImplementor();
+
+    public abstract Map<String, String> getEnvironment();
+  }
+
+  protected void installTestMom(Class<? extends JmsTestMom> transportType) {
+    if (m_momBean != null) {
       uninstallTestMom();
     }
-    s_momBean = BEANS.getBeanManager().registerClass(transportType);
+
+    JmsTestMom transport = BeanUtility.createInstance(transportType, m_parameter);
+    m_momBean = BEANS.getBeanManager().registerBean(new BeanMetaData(transportType, transport));
   }
 
-  protected static void uninstallTestMom() {
-    s_momBean.getInstance().destroy();
-    BEANS.getBeanManager().unregisterBean(s_momBean);
-    s_momBean = null;
+  protected void uninstallTestMom() {
+    m_momBean.getInstance().destroy();
+
+    BEANS.getBeanManager().unregisterBean(m_momBean);
+    m_momBean = null;
   }
 
   @Before
   public void before() {
+    installTestMom(JmsTestMom.class);
+
     LOG.info("---------------------------------------------------");
     LOG.info("<{}>", m_testName.getMethodName());
     m_t0 = System.nanoTime();
@@ -151,14 +250,9 @@ public class JmsMomImplementorTest {
   }
 
   @After
-  public void after() {
+  public void after() throws Exception {
     // Dispose resources
-    if (m_disposables.size() > 0) {
-      LOG.info("Disposing {} objects: {}", m_disposables.size(), m_disposables);
-      for (IDisposable disposable : m_disposables) {
-        disposable.dispose();
-      }
-    }
+    dispose(m_disposables);
 
     // Cancel jobs
     Predicate<IFuture<?>> testJobsFilter = Jobs.newFutureFilterBuilder()
@@ -181,11 +275,21 @@ public class JmsMomImplementorTest {
       }
     }
 
+    uninstallTestMom();
+
+    // ensure activeMQ is stopped
+    BrokerService brokerService = BrokerRegistry.getInstance().findFirst();
+    if (brokerService != null) {
+      brokerService.stop();
+      brokerService.waitUntilStopped();
+    }
+
     LOG.info("Finished test in {} ms", StringUtility.formatNanos(System.nanoTime() - m_t0));
     LOG.info("</{}>", m_testName.getMethodName());
   }
 
   @Test
+  @NonParameterized
   public void testInstanceScoped() {
     JmsMomImplementor mom1 = BEANS.get(JmsMomImplementor.class);
     JmsMomImplementor mom2 = BEANS.get(JmsMomImplementor.class);
@@ -193,23 +297,27 @@ public class JmsMomImplementorTest {
   }
 
   @Test
+  @NonParameterized
   public void testCreateContextNullMap() throws NamingException {
-    new JmsMomImplementor().createContext(null);
+    new JmsMomImplementor().createContextEnvironment(null);
   }
 
   @Test
+  @NonParameterized
   public void testCreateContextEmptyMap() throws NamingException {
-    new JmsMomImplementor().createContext(Collections.emptyMap());
+    new JmsMomImplementor().createContextEnvironment(Collections.emptyMap());
   }
 
   @Test
+  @NonParameterized
   public void testCreateContextOrdinaryMap() throws NamingException {
-    new JmsMomImplementor().createContext(Collections.<Object, Object> singletonMap("key", "value"));
+    new JmsMomImplementor().createContextEnvironment(Collections.<Object, Object> singletonMap("key", "value"));
   }
 
   @Test
+  @NonParameterized
   public void testCreateContextMapWithNullEntries() throws NamingException {
-    new JmsMomImplementor().createContext(Collections.<Object, Object> singletonMap("key", null));
+    new JmsMomImplementor().createContextEnvironment(Collections.<Object, Object> singletonMap("key", null));
   }
 
   @Test
@@ -291,6 +399,64 @@ public class JmsMomImplementorTest {
     assertEquals("Hello World", testPublishAndConsumeInternal("Hello World", BEANS.get(ObjectMarshaller.class)));
     assertEquals("Hello World", testPublishAndConsumeInternal("Hello World", BEANS.get(JsonMarshaller.class)));
     assertArrayEquals("Hello World".getBytes(StandardCharsets.UTF_8), (byte[]) testPublishAndConsumeInternal("Hello World".getBytes(StandardCharsets.UTF_8), BEANS.get(BytesMarshaller.class)));
+  }
+
+  @Test
+  public void testSubscriptionSingleThreadedDisposeSynchronized() throws InterruptedException {
+    testSubscriptionDisposeSynchronized(MOM.newSubscribeInput().withAcknowledgementMode(SubscribeInput.ACKNOWLEDGE_AUTO_SINGLE_THREADED));
+    testSubscriptionDisposeSynchronized(MOM.newSubscribeInput().withAcknowledgementMode(SubscribeInput.ACKNOWLEDGE_AUTO));
+  }
+
+  /**
+   * In case of single threaded subscription, {@link ISubscription#dispose()} waits for any ongoing processing of this
+   * subscription to finish.
+   */
+  private void testSubscriptionDisposeSynchronized(SubscribeInput subscribeInput) throws InterruptedException {
+    final Capturer<String> capturer = new Capturer<>();
+    final CountDownLatch latch = new CountDownLatch(1);
+
+    IDestination<String> queue = MOM.newDestination("test/mom/testPublishText", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
+    m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, BEANS.get(TextMarshaller.class)));
+
+    MOM.publish(JmsTestMom.class, queue, "hello world");
+    final ISubscription subscription = MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<String>() {
+
+      @Override
+      public void onMessage(IMessage<String> message) {
+        capturer.set(message.getTransferObject());
+        try {
+          latch.await();
+        }
+        catch (InterruptedException e) {
+          throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
+        }
+      }
+    }, subscribeInput);
+
+    assertEquals("hello world", capturer.get());
+
+    IFuture<Void> disposeFuture = Jobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        subscription.dispose();
+      }
+    }, Jobs.newInput()
+        .withName("dispose subscription")
+        .withExecutionHint(m_testJobExecutionHint)
+        .withExceptionHandling(null, false));
+
+    // Verify
+    try {
+      disposeFuture.awaitDoneAndGet(200, TimeUnit.MILLISECONDS);
+      assertEquals(SubscribeInput.ACKNOWLEDGE_AUTO, subscribeInput.getAcknowledgementMode());
+    }
+    catch (TimedOutError e) {
+      assertEquals(SubscribeInput.ACKNOWLEDGE_AUTO_SINGLE_THREADED, subscribeInput.getAcknowledgementMode());
+    }
+    finally {
+      latch.countDown();
+    }
   }
 
   @Test(timeout = 200_000)
@@ -537,7 +703,7 @@ public class JmsMomImplementorTest {
     }));
 
     // Verify
-    assertTrue(latch.await(1, TimeUnit.SECONDS));
+    assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
   }
 
   @Test
@@ -604,41 +770,6 @@ public class JmsMomImplementorTest {
 
     // Verify
     assertEquals("propValue", capturer1.get());
-  }
-
-  @Test
-  public void testMultipleProperties() throws InterruptedException {
-    IDestination<String> topic = MOM.newDestination("test/mom/testProperties", DestinationType.TOPIC, ResolveMethod.DEFINE, null);
-
-    final Capturer<String> capturer1 = new Capturer<>();
-
-    // Subscribe for the destination
-    m_disposables.add(MOM.subscribe(JmsTestMom.class, topic, new IMessageListener<String>() {
-      @Override
-      public void onMessage(IMessage<String> message) {
-        String result = StringUtility.join("|",
-            message.getProperty("prop"),
-            message.getProperty("123"),
-            message.getProperty("null"),
-            message.getProperty("last"));
-        capturer1.set(result);
-      }
-    }));
-
-    // Publish a message
-    Map<String, String> myMap = new HashMap<>();
-    myMap.put("prop", "propValue");
-    myMap.put("anotherProp", "not used");
-    myMap.put("123", "one-two-three");
-    myMap.put("null", null);
-    MOM.publish(JmsTestMom.class, topic, "hello world", MOM.newPublishInput()
-        .withProperties(null) // test null-safety
-        .withProperty("prop", "propValue")
-        .withProperties(myMap)
-        .withProperty("last", "."));
-
-    // Verify
-    assertEquals("propValue|one-two-three|.", capturer1.get());
   }
 
   @Test
@@ -782,11 +913,9 @@ public class JmsMomImplementorTest {
   }
 
   @Test(timeout = 200_000)
+  @Times(10) // regression
   public void testQueueRequestReplyRequestFirst() throws InterruptedException {
     final IBiDestination<String, String> queue = MOM.newBiDestination("test/mom/testQueueRequestReplyRequestFirst", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
-
-    // Test setup: simulate to initiate 'request-reply' before subscription
-    IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1);
 
     // 1. Initiate 'request-reply' communication
     IFuture<String> requestFuture = Jobs.schedule(new Callable<String>() {
@@ -797,8 +926,11 @@ public class JmsMomImplementorTest {
       }
     }, Jobs.newInput()
         .withName("requester (Q)")
-        .withExecutionHint(m_testJobExecutionHint)
-        .withExecutionSemaphore(mutex));
+        .withExecutionHint(m_testJobExecutionHint));
+
+    // Wait some time to give request message publisher time to send message
+    // If we wait not long enough, we get a false positive
+    Thread.sleep(300);
 
     // 2. Subscribe for reply
     Jobs.schedule(new IRunnable() {
@@ -816,8 +948,7 @@ public class JmsMomImplementorTest {
       }
     }, Jobs.newInput()
         .withName("replier (Q)")
-        .withExecutionHint(m_testJobExecutionHint)
-        .withExecutionSemaphore(mutex));
+        .withExecutionHint(m_testJobExecutionHint));
 
     String testee = requestFuture.awaitDoneAndGet(10, TimeUnit.SECONDS);
 
@@ -826,19 +957,18 @@ public class JmsMomImplementorTest {
   }
 
   @Test(timeout = 200_000)
-  @Times(10) // regression
-  public void testTopicRequestReplyRequestFirst() throws InterruptedException {
-    final IBiDestination<String, String> topic = MOM.newBiDestination("test/mom/testTopicRequestReplyRequestFirst", DestinationType.TOPIC, ResolveMethod.DEFINE, null);
+  public void testRequestReplyWithBlockingCondition() throws InterruptedException {
+    final IBiDestination<String, String> queue = MOM.newBiDestination("test/mom/testRequestReplyWithBlockingCondition", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
 
-    // Test setup: simulate to initiate 'request-reply' before subscription
+    // semaphore for jobs
     IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1);
 
-    // 1. Initiate 'request-reply' communication
+    // request should block with IBlockingCondition.waitFor in order to release semaphore
     IFuture<String> requestFuture = Jobs.schedule(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
-        return MOM.request(JmsTestMom.class, topic, "hello world");
+        return MOM.request(JmsTestMom.class, queue, "hello world");
       }
     }, Jobs.newInput()
         .withName("requester (T)")
@@ -846,33 +976,25 @@ public class JmsMomImplementorTest {
         .withExceptionHandling(null, false)
         .withExecutionSemaphore(mutex));
 
-    // 2. Subscribe for reply
-    IFuture<Void> replyFuture = Jobs.schedule(new IRunnable() {
+    // test if semaphore was released (with waitFor)
+    IFuture<Void> otherFuture = Jobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        // Subscribe replier
-        m_disposables.add(MOM.reply(JmsTestMom.class, topic, new IRequestListener<String, String>() {
-
-          @Override
-          public String onRequest(IMessage<String> request) {
-            return request.getTransferObject().toUpperCase();
-          }
-        }));
+        // nop
       }
     }, Jobs.newInput()
-        .withName("replier (T)")
+        .withName("null job")
         .withExecutionHint(m_testJobExecutionHint)
         .withExecutionSemaphore(mutex));
 
-    replyFuture.awaitDone();
     // Verify
     try {
-      requestFuture.awaitDoneAndGet(200, TimeUnit.MILLISECONDS);
-      fail();
+      otherFuture.awaitDone(2000, TimeUnit.MILLISECONDS);
+      assertSame(JobState.WAITING_FOR_BLOCKING_CONDITION, requestFuture.getState());
     }
     catch (TimedOutError e) {
-      assertTrue(true);
+      fail();
     }
   }
 
@@ -1285,7 +1407,6 @@ public class JmsMomImplementorTest {
   }
 
   @Test
-  @Times(1)
   public void testPublishJsonDataSecure() throws InterruptedException {
     final Capturer<Person> capturer = new Capturer<>();
 
@@ -1620,7 +1741,9 @@ public class JmsMomImplementorTest {
       public void onMessage(IMessage<Object> msg) {
         capturer.set(msg.getTransferObject());
       }
-    }));
+    }, MOM.newSubscribeInput()
+        // use single threaded in order to block dispose until subscription is completely released
+        .withAcknowledgementMode(SubscribeInput.ACKNOWLEDGE_AUTO_SINGLE_THREADED)));
 
     // Verify
     try {
@@ -1646,7 +1769,9 @@ public class JmsMomImplementorTest {
         public Object onRequest(IMessage<Object> req) {
           return req.getTransferObject();
         }
-      }));
+      }, MOM.newSubscribeInput()
+          // use single threaded in order to block dispose until subscription is completely released
+          .withAcknowledgementMode(SubscribeInput.ACKNOWLEDGE_AUTO_SINGLE_THREADED)));
 
       return MOM.request(JmsTestMom.class, queue, request);
     }
@@ -1656,13 +1781,21 @@ public class JmsMomImplementorTest {
   }
 
   private void dispose(Collection<IDisposable> disposables) {
-    for (IDisposable disposable : disposables) {
-      disposable.dispose();
+    if (!disposables.isEmpty()) {
+      LOG.info("Disposing {} objects: {}", disposables.size(), disposables);
+      for (IDisposable disposable : disposables) {
+        disposable.dispose();
+      }
     }
   }
 
   @Test
   public void testTopicDurableSubscription() throws InterruptedException {
+    if (m_parameter.getImplementor() == J2eeJmsMomImplementor.class) {
+      // J2EE implementor does not set any client id; therefore no durable subscription is possible
+      return;
+    }
+
     final IDestination<String> topic = MOM.newDestination("test/mom/testTopicPublishSubscribe", DestinationType.TOPIC, ResolveMethod.DEFINE, null);
     final String durableSubscriptionName = "Durable-Test-Subscription";
 
@@ -1724,145 +1857,115 @@ public class JmsMomImplementorTest {
   @Test
   public void testMomEnvironmentWithCustomDefaultMarshaller() throws InterruptedException {
     installTestMom(JmsTestMomWithTextMarshaller.class);
-    try {
-      final Capturer<String> capturer1 = new Capturer<>();
-      final Capturer<Object> capturer2 = new Capturer<>();
+    final Capturer<String> capturer1 = new Capturer<>();
+    final Capturer<Object> capturer2 = new Capturer<>();
 
-      IDestination<String> queueString = MOM.newDestination("test/mom/testPublishStringData", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
-      IDestination<Object> queueObject = MOM.newDestination("test/mom/testPublishObjectData", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
-      m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queueObject, BEANS.get(ObjectMarshaller.class)));
+    IDestination<String> queueString = MOM.newDestination("test/mom/testPublishStringData", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
+    IDestination<Object> queueObject = MOM.newDestination("test/mom/testPublishObjectData", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
+    m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queueObject, BEANS.get(ObjectMarshaller.class)));
 
-      MOM.publish(JmsTestMom.class, queueString, "Hello MOM!");
-      MOM.publish(JmsTestMom.class, queueObject, new StringHolder("Hello MOM! (holder)"));
-      m_disposables.add(MOM.subscribe(JmsTestMom.class, queueString, new IMessageListener<String>() {
-        @Override
-        public void onMessage(IMessage<String> message) {
-          capturer1.set(message.getTransferObject());
-        }
-      }));
-      m_disposables.add(MOM.subscribe(JmsTestMom.class, queueObject, new IMessageListener<Object>() {
-        @Override
-        public void onMessage(IMessage<Object> message) {
-          capturer2.set(message.getTransferObject());
-        }
-      }));
+    MOM.publish(JmsTestMom.class, queueString, "Hello MOM!");
+    MOM.publish(JmsTestMom.class, queueObject, new StringHolder("Hello MOM! (holder)"));
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, queueString, new IMessageListener<String>() {
+      @Override
+      public void onMessage(IMessage<String> message) {
+        capturer1.set(message.getTransferObject());
+      }
+    }));
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, queueObject, new IMessageListener<Object>() {
+      @Override
+      public void onMessage(IMessage<Object> message) {
+        capturer2.set(message.getTransferObject());
+      }
+    }));
 
-      // Verify
-      String received1 = capturer1.get();
-      Object received2 = capturer2.get();
-      assertEquals("Hello MOM!", received1);
-      assertEquals("Hello MOM! (holder)", Objects.toString(received2));
-    }
-    finally {
-      installTestMom(JmsTestMom.class);
-    }
+    // Verify
+    String received1 = capturer1.get();
+    Object received2 = capturer2.get();
+    assertEquals("Hello MOM!", received1);
+    assertEquals("Hello MOM! (holder)", Objects.toString(received2));
   }
 
   @Test
   public void testMomEnvironmentWithConfiguredDefaultMarshaller() throws InterruptedException {
     installTestMom(JmsTestMomWithConfiguredTextMarshaller.class);
-    try {
-      final Capturer<String> capturer = new Capturer<>();
+    final Capturer<String> capturer = new Capturer<>();
 
-      IDestination<String> queueString = MOM.newDestination("test/mom/testPublishStringData", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
+    IDestination<String> queueString = MOM.newDestination("test/mom/testPublishStringData", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
 
-      MOM.publish(JmsTestMom.class, queueString, "Hello MOM!");
-      m_disposables.add(MOM.subscribe(JmsTestMom.class, queueString, new IMessageListener<String>() {
-        @Override
-        public void onMessage(IMessage<String> message) {
-          capturer.set(message.getTransferObject());
-        }
-      }));
+    MOM.publish(JmsTestMom.class, queueString, "Hello MOM!");
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, queueString, new IMessageListener<String>() {
+      @Override
+      public void onMessage(IMessage<String> message) {
+        capturer.set(message.getTransferObject());
+      }
+    }));
 
-      // Verify
-      String received = capturer.get();
-      assertEquals("!MOM olleH", received);
-    }
-    finally {
-      installTestMom(JmsTestMom.class);
-    }
+    // Verify
+    String received = capturer.get();
+    assertEquals("!MOM olleH", received);
   }
 
   @Test(expected = PlatformException.class)
   public void testMomEnvironmentWithInvalidMarshaller() throws InterruptedException {
     installTestMom(JmsTestMomWithInvalidMarshaller.class);
-    try {
-      IDestination<String> queueString = MOM.newDestination("test/mom/testPublishStringData", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
-      MOM.publish(JmsTestMom.class, queueString, "Hello MOM!");
-    }
-    finally {
-      installTestMom(JmsTestMom.class);
-    }
+    IDestination<String> queueString = MOM.newDestination("test/mom/testPublishStringData", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
+    MOM.publish(JmsTestMom.class, queueString, "Hello MOM!");
   }
 
   @Test(expected = AssertionException.class)
   public void testMomEnvironmentWithoutRequestReply() throws InterruptedException {
     installTestMom(JmsTestMomWithoutRequestReply.class);
-    try {
-      testRequestReplyInternal("Hello World", null);
-    }
-    finally {
-      installTestMom(JmsTestMom.class);
-    }
+    testRequestReplyInternal("Hello World", null);
   }
 
   @Test(timeout = 200_000)
   public void testMomEnvironmentWithCustomCancellationTopicAsString() throws InterruptedException {
     installTestMom(JmsTestMomWithCustomRequestReplyCancellationTopicAsString.class);
-    try {
-      IDestination<String> defaultTopic = CONFIG.getPropertyValue(IMom.RequestReplyCancellationTopicProperty.class);
-      IDestination<String> differentTopic = MOM.newDestination("differentTopic", IDestination.DestinationType.TOPIC, IDestination.ResolveMethod.DEFINE, null);
-      final Capturer<String> capturer1 = new Capturer<>();
-      final Capturer<String> capturer2 = new Capturer<>();
-      m_disposables.add(MOM.subscribe(JmsTestMom.class, defaultTopic, new IMessageListener<String>() {
-        @Override
-        public void onMessage(IMessage<String> message) {
-          capturer1.set("cancelled!"); // should not be called
-        }
-      }));
-      m_disposables.add(MOM.subscribe(JmsTestMom.class, differentTopic, new IMessageListener<String>() {
-        @Override
-        public void onMessage(IMessage<String> message) {
-          capturer2.set("cancelled!"); // should be called
-        }
-      }));
+    IDestination<String> defaultTopic = CONFIG.getPropertyValue(IMom.RequestReplyCancellationTopicProperty.class);
+    IDestination<String> differentTopic = MOM.newDestination("differentTopic", IDestination.DestinationType.TOPIC, IDestination.ResolveMethod.DEFINE, null);
+    final Capturer<String> capturer1 = new Capturer<>();
+    final Capturer<String> capturer2 = new Capturer<>();
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, defaultTopic, new IMessageListener<String>() {
+      @Override
+      public void onMessage(IMessage<String> message) {
+        capturer1.set("cancelled!"); // should not be called
+      }
+    }));
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, differentTopic, new IMessageListener<String>() {
+      @Override
+      public void onMessage(IMessage<String> message) {
+        capturer2.set("cancelled!"); // should be called
+      }
+    }));
 
-      // Run test
-      final IBiDestination<String, String> queue = MOM.newBiDestination("test/mom/testQueueRequestReplyCancellation", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
-      testRequestReplyCancellationInternal(queue);
+    // Run test
+    final IBiDestination<String, String> queue = MOM.newBiDestination("test/mom/testQueueRequestReplyCancellation", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
+    testRequestReplyCancellationInternal(queue);
 
-      // Verify
-      capturer1.assertEmpty(1, TimeUnit.SECONDS);
-      assertNotNull(capturer2.get(1, TimeUnit.SECONDS));
-    }
-    finally {
-      installTestMom(JmsTestMom.class);
-    }
+    // Verify
+    capturer1.assertEmpty(1, TimeUnit.SECONDS);
+    assertNotNull(capturer2.get(1, TimeUnit.SECONDS));
   }
 
   @Test(timeout = 200_000)
   public void testMomEnvironmentWithCustomCancellationTopic() throws InterruptedException {
     installTestMom(JmsTestMomWithCustomRequestReplyCancellationTopic.class);
-    try {
-      IDestination<String> differentTopic = MOM.newDestination("UnitTestTopic", IDestination.DestinationType.TOPIC, IDestination.ResolveMethod.JNDI, null);
-      final Capturer<String> capturer = new Capturer<>();
-      m_disposables.add(MOM.subscribe(JmsTestMom.class, differentTopic, new IMessageListener<String>() {
-        @Override
-        public void onMessage(IMessage<String> message) {
-          capturer.set("cancelled!"); // should be called
-        }
-      }));
+    IDestination<String> differentTopic = MOM.newDestination("UnitTestTopic", IDestination.DestinationType.TOPIC, IDestination.ResolveMethod.JNDI, null);
+    final Capturer<String> capturer = new Capturer<>();
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, differentTopic, new IMessageListener<String>() {
+      @Override
+      public void onMessage(IMessage<String> message) {
+        capturer.set("cancelled!"); // should be called
+      }
+    }));
 
-      // Run test
-      final IBiDestination<String, String> queue = MOM.newBiDestination("test/mom/testQueueRequestReplyCancellation", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
-      testRequestReplyCancellationInternal(queue);
+    // Run test
+    final IBiDestination<String, String> queue = MOM.newBiDestination("test/mom/testQueueRequestReplyCancellation", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
+    testRequestReplyCancellationInternal(queue);
 
-      // Verify
-      assertNotNull(capturer.get(1, TimeUnit.SECONDS));
-    }
-    finally {
-      installTestMom(JmsTestMom.class);
-    }
+    // Verify
+    assertNotNull(capturer.get(1, TimeUnit.SECONDS));
   }
 
   private static class SomethingWrongException extends RuntimeException {
@@ -1884,28 +1987,30 @@ public class JmsMomImplementorTest {
   @IgnoreBean
   public static class JmsTestMom extends AbstractMomTransport {
 
-    private static final AtomicInteger MOM_COUNTER = new AtomicInteger(0);
+    private final AbstractJmsEnvironmentTestParameter m_parameter;
+
+    public JmsTestMom(AbstractJmsEnvironmentTestParameter parameter) {
+      m_parameter = parameter;
+    }
 
     @Override
     protected Class<? extends IMomImplementor> getConfiguredImplementor() {
-      return JmsMomImplementor.class;
+      return m_parameter.getImplementor();
     }
 
     @Override
     protected Map<String, String> getConfiguredEnvironment() {
-      final Map<String, String> env = new HashMap<>();
-      env.put(Context.INITIAL_CONTEXT_FACTORY, ActiveMQInitialContextFactory.class.getName());
-      env.put(Context.PROVIDER_URL, "vm://mom" + MOM_COUNTER.incrementAndGet() + "/junit?broker.persistent=false");
-      env.put("connectionFactoryNames", "JUnitConnectionFactory"); // Active MQ specific
-      env.put(IMomImplementor.CONNECTION_FACTORY, "JUnitConnectionFactory");
-      env.put(IMomImplementor.SYMBOLIC_NAME, "Scout JUnit MOM #" + MOM_COUNTER.get());
-      return env;
+      return m_parameter.getEnvironment();
     }
   }
 
   @IgnoreBean
   @Replace
   public static class JmsTestMomWithTextMarshaller extends JmsTestMom {
+
+    public JmsTestMomWithTextMarshaller(AbstractJmsEnvironmentTestParameter parameter) {
+      super(parameter);
+    }
 
     @Override
     protected Map<String, String> getConfiguredEnvironment() {
@@ -1919,6 +2024,10 @@ public class JmsMomImplementorTest {
   @IgnoreBean
   @Replace
   public static class JmsTestMomWithConfiguredTextMarshaller extends JmsTestMom {
+
+    public JmsTestMomWithConfiguredTextMarshaller(AbstractJmsEnvironmentTestParameter parameter) {
+      super(parameter);
+    }
 
     @Override
     protected IMarshaller getConfiguredDefaultMarshaller() {
@@ -1935,6 +2044,10 @@ public class JmsMomImplementorTest {
   @Replace
   public static class JmsTestMomWithInvalidMarshaller extends JmsTestMom {
 
+    public JmsTestMomWithInvalidMarshaller(AbstractJmsEnvironmentTestParameter parameter) {
+      super(parameter);
+    }
+
     @Override
     protected Map<String, String> getConfiguredEnvironment() {
       final Map<String, String> env = super.getConfiguredEnvironment();
@@ -1946,6 +2059,10 @@ public class JmsMomImplementorTest {
   @IgnoreBean
   @Replace
   public static class JmsTestMomWithoutRequestReply extends JmsTestMom {
+
+    public JmsTestMomWithoutRequestReply(AbstractJmsEnvironmentTestParameter parameter) {
+      super(parameter);
+    }
 
     @Override
     protected Map<String, String> getConfiguredEnvironment() {
@@ -1959,6 +2076,10 @@ public class JmsMomImplementorTest {
   @Replace
   public static class JmsTestMomWithCustomRequestReplyCancellationTopicAsString extends JmsTestMom {
 
+    public JmsTestMomWithCustomRequestReplyCancellationTopicAsString(AbstractJmsEnvironmentTestParameter parameter) {
+      super(parameter);
+    }
+
     @Override
     protected Map<String, String> getConfiguredEnvironment() {
       final Map<String, String> env = super.getConfiguredEnvironment();
@@ -1971,6 +2092,10 @@ public class JmsMomImplementorTest {
   @IgnoreBean
   @Replace
   public static class JmsTestMomWithCustomRequestReplyCancellationTopic extends JmsTestMom {
+
+    public JmsTestMomWithCustomRequestReplyCancellationTopic(AbstractJmsEnvironmentTestParameter parameter) {
+      super(parameter);
+    }
 
     @Override
     protected Map<Object, Object> lookupEnvironment() {

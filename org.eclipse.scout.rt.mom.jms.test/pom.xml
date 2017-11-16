@@ -58,7 +58,22 @@
           <groupId>org.apache.activemq</groupId>
           <artifactId>activemq-openwire-legacy</artifactId>
         </exclusion>
+        <exclusion>
+          <!-- to be able to run tests with artemis we require geronimo-jms_2.0_spec -->
+          <groupId>org.apache.geronimo.specs</groupId>
+          <artifactId>geronimo-jms_1.1_spec</artifactId>
+        </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>artemis-jms-client</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>artemis-jms-server</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

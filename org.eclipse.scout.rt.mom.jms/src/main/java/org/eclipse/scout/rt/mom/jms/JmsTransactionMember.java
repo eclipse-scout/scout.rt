@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.mom.jms;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
 
 import javax.jms.JMSException;
-import javax.jms.MessageProducer;
 import javax.jms.Session;
 
 import org.eclipse.scout.rt.platform.Bean;
@@ -31,10 +31,10 @@ public class JmsTransactionMember implements ITransactionMember {
 
   private static final Logger LOG = LoggerFactory.getLogger(JmsTransactionMember.class);
 
-  private volatile String m_memberId;
-  private volatile Session m_transactedSession;
-  private volatile MessageProducer m_transactedProducer;
-  private volatile boolean m_autoCloseClose;
+  private String m_memberId;
+  private IJmsSessionProvider m_sessionProvider;
+  private Session m_transactedSession;
+  private boolean m_autoClose;
 
   @Override
   public String getMemberId() {
@@ -46,27 +46,24 @@ public class JmsTransactionMember implements ITransactionMember {
     return this;
   }
 
+  public IJmsSessionProvider getSessionProvider() {
+    return m_sessionProvider;
+  }
+
+  public JmsTransactionMember withSessionProvider(IJmsSessionProvider sessionProvider) throws JMSException {
+    m_sessionProvider = sessionProvider;
+    m_transactedSession = sessionProvider.getSession();
+    assertNotNull(m_transactedSession);
+    assertTrue(m_transactedSession.getTransacted());
+    return this;
+  }
+
   public Session getTransactedSession() {
     return m_transactedSession;
   }
 
-  public JmsTransactionMember withTransactedSession(final Session transactedSession) throws JMSException {
-    assertTrue(transactedSession.getTransacted(), "session must be transacted");
-    m_transactedSession = transactedSession;
-    return this;
-  }
-
-  public MessageProducer getTransactedProducer() {
-    return m_transactedProducer;
-  }
-
-  public JmsTransactionMember withTransactedProducer(final MessageProducer transactedProducer) {
-    m_transactedProducer = transactedProducer;
-    return this;
-  }
-
   public JmsTransactionMember withAutoClose(final boolean autoClose) {
-    m_autoCloseClose = autoClose;
+    m_autoClose = autoClose;
     return this;
   }
 
@@ -102,16 +99,11 @@ public class JmsTransactionMember implements ITransactionMember {
 
   @Override
   public void release() {
-    if (!m_autoCloseClose) {
+    if (!m_autoClose) {
       return;
     }
 
-    try {
-      m_transactedSession.close();
-    }
-    catch (final JMSException e) {
-      LOG.error("Failed to close transacted session [session={}]", m_transactedSession, e);
-    }
+    getSessionProvider().close();
   }
 
   @Override

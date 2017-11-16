@@ -10,15 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.mom.jms;
 
-import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
-import javax.jms.Session;
 
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IMom;
 import org.eclipse.scout.rt.mom.api.ISubscription;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.eclipse.scout.rt.mom.api.SubscribeInput;
+import org.eclipse.scout.rt.platform.job.IFuture;
 
 /**
  * Represents a {@link MessageConsumer} in the JMS messaging standard.
@@ -28,14 +26,16 @@ import org.slf4j.LoggerFactory;
  */
 public class JmsSubscription implements ISubscription {
 
-  private static final Logger LOG = LoggerFactory.getLogger(JmsSubscription.class);
+  protected final IDestination<?> m_destination;
+  protected final SubscribeInput m_subscribeInput;
+  protected final IJmsSessionProvider m_sessionProvider;
+  protected final IFuture<Void> m_jobMonitor;
 
-  private final Session m_session;
-  private final IDestination<?> m_destination;
-
-  public JmsSubscription(final Session session, final IDestination<?> destination) {
-    m_session = session;
+  public JmsSubscription(IDestination<?> destination, SubscribeInput subscribeInput, IJmsSessionProvider sessionProvider, IFuture<Void> jobMonitor) {
     m_destination = destination;
+    m_subscribeInput = subscribeInput;
+    m_sessionProvider = sessionProvider;
+    m_jobMonitor = jobMonitor;
   }
 
   @Override
@@ -45,11 +45,12 @@ public class JmsSubscription implements ISubscription {
 
   @Override
   public void dispose() {
-    try {
-      m_session.close();
-    }
-    catch (final JMSException e) {
-      LOG.warn("Failed to close session", m_session, e);
+    m_sessionProvider.close();
+    if (SubscribeInput.ACKNOWLEDGE_AUTO_SINGLE_THREADED == m_subscribeInput.getAcknowledgementMode()) {
+      // Close did not throw an exception
+      // In case of single threaded subscription we wait for the job to finish
+      // This allows API clients to wait for any ongoing message processing
+      m_jobMonitor.awaitDone();
     }
   }
 }
