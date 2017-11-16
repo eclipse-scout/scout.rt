@@ -150,11 +150,10 @@ public class JmsMessageReader<DTO> {
         }
       }
 
-      @SuppressWarnings("unchecked")
       @Override
       public <T> T getAdapter(final Class<T> type) {
         if (Message.class.equals(type)) {
-          return (T) m_message;
+          return type.cast(m_message);
         }
         return null;
       }
