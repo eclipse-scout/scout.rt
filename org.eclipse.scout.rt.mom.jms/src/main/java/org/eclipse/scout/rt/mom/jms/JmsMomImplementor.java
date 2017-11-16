@@ -1,9 +1,7 @@
 package org.eclipse.scout.rt.mom.jms;
 
-import static org.eclipse.scout.rt.mom.api.SubscribeInput.ACKNOWLEDGE_AUTO;
-import static org.eclipse.scout.rt.mom.api.SubscribeInput.ACKNOWLEDGE_AUTO_SINGLE_THREADED;
-import static org.eclipse.scout.rt.mom.api.SubscribeInput.ACKNOWLEDGE_TRANSACTED;
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.JMS_PROP_REPLY_ID;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertEqual;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertFalse;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
@@ -12,9 +10,10 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.jms.Connection;
@@ -24,7 +23,6 @@ import javax.jms.Destination;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
@@ -55,11 +53,16 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.NodeIdentifier;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -70,9 +73,8 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IFunction;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,24 +96,23 @@ public class JmsMomImplementor implements IMomImplementor {
   public static final String JMS_CLIENT_ID = "scout.mom.jms.clientId";
 
   protected final String m_momUid = UUID.randomUUID().toString();
+
+  // init -> thread-safety: only set in init method
   protected String m_symbolicName;
-  protected Context m_context;
+  @SuppressWarnings("squid:S1149")
+  protected Hashtable<Object, Object> m_contextEnvironment;
+  protected ConnectionFactory m_connectionFactory;
+  protected String m_clientId;
   protected Connection m_connection;
-
-  protected Session m_defaultSession; // single-threaded
-  protected MessageProducer m_defaultProducer;
-
   protected boolean m_requestReplyEnabled;
-  protected TemporaryQueue m_replyQueue;
-  protected Topic m_requestReplyCancellationTopic;
-  protected final Map<String, ReplyFuture> m_replyFutureMap = new ConcurrentHashMap<>();
-
-  protected final Map<IDestination, IMarshaller> m_marshallers = new ConcurrentHashMap<>();
-
-  protected final Map<Integer, ISubscriptionStrategy> m_subscriptionStrategies = new ConcurrentHashMap<>();
-  protected final Map<Integer, IReplierStrategy> m_replierStrategies = new ConcurrentHashMap<>();
-
+  protected IDestination<?> m_requestReplyCancellationTopic;
   protected IMarshaller m_defaultMarshaller;
+  // end init
+
+  protected ISubscription m_requestCancellationSubscription;
+
+  protected final Map<IDestination, Destination> m_jmsDestinations = new ConcurrentHashMap<>();
+  protected final Map<IDestination, IMarshaller> m_marshallers = new ConcurrentHashMap<>();
 
   @Override
   public void init(final Map<Object, Object> properties) throws Exception {
@@ -120,21 +121,18 @@ public class JmsMomImplementor implements IMomImplementor {
       LOG.info("{} configuration: {}", m_symbolicName, properties);
     }
     try {
-      m_context = createContext(properties);
-      m_connection = createConnection(m_context, properties);
-      m_defaultSession = m_connection.createSession(false /* non-transacted */, Session.AUTO_ACKNOWLEDGE);
-      m_defaultProducer = m_defaultSession.createProducer(null /* all destinations */);
+      m_contextEnvironment = createContextEnvironment(properties);
+      m_connectionFactory = createConnectionFactory(properties);
+      m_clientId = computeClientId(properties);
+      m_connection = createConnection();
 
-      initStrategies();
-      initRequestReplyMessaging(properties);
-      initDefaultMarshaller(properties);
+      m_defaultMarshaller = createDefaultMarshaller(properties);
 
-      // Start the connection
-      m_connection.start();
+      initRequestReply(properties);
+
       LOG.info("{} initialized: {}", m_symbolicName, m_connection);
     }
     catch (Exception e) {
-      // Ensure allocated resources are again
       try {
         destroy();
       }
@@ -145,18 +143,7 @@ public class JmsMomImplementor implements IMomImplementor {
     }
   }
 
-  protected void initStrategies() {
-    // Install subscription strategies (fire-and-forget messaging)
-    registerSubscriptionStrategy(ACKNOWLEDGE_AUTO, BEANS.get(AutoAcknowledgeSubscriptionStrategy.class).init(this, false));
-    registerSubscriptionStrategy(ACKNOWLEDGE_AUTO_SINGLE_THREADED, BEANS.get(AutoAcknowledgeSubscriptionStrategy.class).init(this, true));
-    registerSubscriptionStrategy(ACKNOWLEDGE_TRANSACTED, BEANS.get(TransactedSubscriptionStrategy.class).init(this));
-
-    // Install replier strategies (request-reply messaging)
-    registerReplierStrategy(ACKNOWLEDGE_AUTO, BEANS.get(AutoAcknowledgeReplierStrategy.class).init(this, false));
-    registerReplierStrategy(ACKNOWLEDGE_AUTO_SINGLE_THREADED, BEANS.get(AutoAcknowledgeReplierStrategy.class).init(this, true));
-  }
-
-  protected void initRequestReplyMessaging(final Map<Object, Object> properties) throws JMSException {
+  protected void initRequestReply(final Map<Object, Object> properties) throws JMSException {
     m_requestReplyEnabled = BooleanUtility.nvl(
         TypeCastUtility.castValue(properties.get(REQUEST_REPLY_ENABLED), Boolean.class),
         CONFIG.getPropertyValue(RequestReplyEnabledProperty.class));
@@ -165,61 +152,28 @@ public class JmsMomImplementor implements IMomImplementor {
       return;
     }
 
-    // Register consumer to dispatch replies of 'request-reply' messaging to the requester.
-    m_replyQueue = m_defaultSession.createTemporaryQueue();
-    installReplyConsumer();
-
     // Register consumer to handle cancellation requests for 'request-reply' communication.
-    IDestination<?> cancellationTopic;
-    Object prop = properties.get(REQUEST_REPLY_CANCELLATION_TOPIC);
+    Object prop = properties.get(IMomImplementor.REQUEST_REPLY_CANCELLATION_TOPIC);
     if (prop instanceof IDestination) {
-      cancellationTopic = (IDestination<?>) prop;
+      m_requestReplyCancellationTopic = (IDestination<?>) prop;
     }
     else {
       final String cancellationTopicName = ObjectUtility.toString(prop);
       if (cancellationTopicName != null) {
         final DestinationConfigPropertyParser p = BEANS.get(DestinationConfigPropertyParser.class).parse(cancellationTopicName);
-        cancellationTopic = MOM.newDestination(p.getDestinationName(), DestinationType.TOPIC, p.getResolveMethod(), p.getParameters());
+        m_requestReplyCancellationTopic = MOM.newDestination(p.getDestinationName(), DestinationType.TOPIC, p.getResolveMethod(), p.getParameters());
       }
       else {
-        cancellationTopic = CONFIG.getPropertyValue(RequestReplyCancellationTopicProperty.class);
+        m_requestReplyCancellationTopic = CONFIG.getPropertyValue(RequestReplyCancellationTopicProperty.class);
       }
     }
-    m_requestReplyCancellationTopic = (Topic) resolveJmsDestination(cancellationTopic, m_defaultSession);
-    installRequestCancellationConsumer();
-  }
-
-  protected void installReplyConsumer() throws JMSException {
-    final MessageConsumer consumer = m_defaultSession.createConsumer(m_replyQueue);
-    consumer.setMessageListener(new JmsMessageListener() {
-      @Override
-      public void onJmsMessage(final Message message) throws JMSException {
-        final String replyId = message.getStringProperty(JMS_PROP_REPLY_ID);
-        final ReplyFuture replyFuture = m_replyFutureMap.remove(replyId);
-        if (replyFuture != null) {
-          replyFuture.set(message);
-        }
-      }
-    });
-  }
-
-  protected void installRequestCancellationConsumer() throws JMSException {
-    final MessageConsumer consumer = m_defaultSession.createConsumer(m_requestReplyCancellationTopic);
-    consumer.setMessageListener(new JmsMessageListener() {
-      @Override
-      public void onJmsMessage(final Message message) throws JMSException {
-        Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
-            .andMatchExecutionHint(message.getStringProperty(JMS_PROP_REPLY_ID))
-            .toFilter(), true);
-      }
-    });
   }
 
   @SuppressWarnings("unchecked")
-  protected void initDefaultMarshaller(final Map<Object, Object> properties) {
+  protected IMarshaller createDefaultMarshaller(final Map<Object, Object> properties) {
     Object prop = properties.get(MARSHALLER);
     if (prop instanceof IMarshaller) {
-      m_defaultMarshaller = (IMarshaller) prop;
+      return (IMarshaller) prop;
     }
     else {
       Class<? extends IMarshaller> marshallerClass;
@@ -235,8 +189,23 @@ public class JmsMomImplementor implements IMomImplementor {
       else {
         marshallerClass = CONFIG.getPropertyValue(DefaultMarshallerProperty.class);
       }
-      m_defaultMarshaller = BEANS.get(marshallerClass);
+      return BEANS.get(marshallerClass);
     }
+  }
+
+  public JobInput newJobInput() {
+    return Jobs.newInput()
+        .withExceptionHandling(BEANS.get(MomExceptionHandler.class), true)
+        .withExecutionHint(m_momUid);
+  }
+
+  public IJmsSessionProvider createSessionProvider() throws JMSException {
+    return createSessionProvider(null, false);
+  }
+
+  public IJmsSessionProvider createSessionProvider(IDestination<?> destination, boolean transacted) throws JMSException {
+    Session session = transacted ? m_connection.createSession(true, Session.SESSION_TRANSACTED) : m_connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+    return new JmsSessionProvider(session, resolveJmsDestination(destination, session));
   }
 
   @Override
@@ -252,26 +221,23 @@ public class JmsMomImplementor implements IMomImplementor {
         publishNonTransactional(destination, transferObject, input);
       }
     }
-    catch (final JMSException e) {
+    catch (JMSException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
     }
   }
 
   protected <DTO> void publishNonTransactional(final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) throws JMSException {
-    final IMarshaller marshaller = resolveMarshaller(destination);
-
-    final Message message = JmsMessageWriter.newInstance(m_defaultSession, marshaller)
-        .writeTransferObject(transferObject)
-        .writeReplyTo(input.getReplyTo() == null ? null : resolveJmsDestination(input.getReplyTo(), m_defaultSession))
-        .writeProperties(input.getProperties())
-        .writeCorrelationId(CorrelationId.CURRENT.get())
-        .build();
-    send(m_defaultProducer, resolveJmsDestination(destination, m_defaultSession), message, toJmsDeliveryMode(input), toJmsPriority(input), toJmsTimeToLive(input));
+    IJmsSessionProvider sessionProvider = createSessionProvider(destination, false);
+    try {
+      send(sessionProvider, destination, transferObject, input);
+    }
+    finally {
+      sessionProvider.close();
+    }
   }
 
   protected <DTO> void publishTransactional(final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) throws JMSException {
     final ITransaction currentTransaction = assertNotNull(ITransaction.CURRENT.get(), "Transaction required for transactional messaging");
-    final IMarshaller marshaller = resolveMarshaller(destination);
 
     // Register transaction member for transacted publishing.
     final JmsTransactionMember txMember = currentTransaction.registerMemberIfAbsent(m_momUid, new IFunction<String, JmsTransactionMember>() {
@@ -279,11 +245,9 @@ public class JmsMomImplementor implements IMomImplementor {
       @Override
       public JmsTransactionMember apply(final String memberId) {
         try {
-          final Session transactedSession = m_connection.createSession(true, Session.SESSION_TRANSACTED);
           return BEANS.get(JmsTransactionMember.class)
               .withMemberId(memberId)
-              .withTransactedSession(transactedSession)
-              .withTransactedProducer(transactedSession.createProducer(null))
+              .withSessionProvider(createSessionProvider(destination, true))
               .withAutoClose(true); // close upon transaction end
         }
         catch (final JMSException e) {
@@ -293,16 +257,7 @@ public class JmsMomImplementor implements IMomImplementor {
     });
 
     // Publish the message
-    final Session transactedSession = txMember.getTransactedSession();
-    final MessageProducer transactedProducer = txMember.getTransactedProducer();
-
-    final Message message = JmsMessageWriter.newInstance(transactedSession, marshaller)
-        .writeTransferObject(transferObject)
-        .writeReplyTo(input.getReplyTo() == null ? null : resolveJmsDestination(input.getReplyTo(), transactedSession))
-        .writeProperties(input.getProperties())
-        .writeCorrelationId(CorrelationId.CURRENT.get())
-        .build();
-    send(transactedProducer, resolveJmsDestination(destination, transactedSession), message, toJmsDeliveryMode(input), toJmsPriority(input), toJmsTimeToLive(input));
+    send(txMember.getSessionProvider(), destination, transferObject, input);
   }
 
   @Override
@@ -310,15 +265,29 @@ public class JmsMomImplementor implements IMomImplementor {
     assertNotNull(destination, "destination not specified");
     assertNotNull(listener, "messageListener not specified");
     assertNotNull(input, "input not specified");
-
     try {
-      final int acknowledgementMode = input.getAcknowledgementMode();
-      final ISubscriptionStrategy strategy = assertNotNull(m_subscriptionStrategies.get(acknowledgementMode), "Acknowledgement mode not supported [mode={}]", acknowledgementMode);
-      return strategy.subscribe(destination, listener, input);
+      return subscribeImpl(destination, listener, input);
     }
     catch (final JMSException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
     }
+  }
+
+  protected <DTO> ISubscription subscribeImpl(IDestination<DTO> destination, IMessageListener<DTO> listener, SubscribeInput input) throws JMSException {
+    IJmsSessionProvider sessionProvider = createSessionProvider(destination, SubscribeInput.ACKNOWLEDGE_TRANSACTED == input.getAcknowledgementMode());
+    try {
+      IFuture<Void> jobMonitor = Jobs.schedule(createMessageConsumerJob(sessionProvider, destination, listener, input),
+          newJobInput().withName("JMS message listener [dest={}]", destination));
+      return new JmsSubscription(destination, input, sessionProvider, jobMonitor);
+    }
+    catch (JMSException | RuntimeException e) {
+      sessionProvider.close();
+      throw e;
+    }
+  }
+
+  protected <DTO> IRunnable createMessageConsumerJob(IJmsSessionProvider sessionProvider, IDestination<DTO> destination, IMessageListener<DTO> listener, SubscribeInput input) throws JMSException {
+    return new MessageConsumerJob<DTO>(this, sessionProvider, destination, listener, input);
   }
 
   @Override
@@ -328,53 +297,122 @@ public class JmsMomImplementor implements IMomImplementor {
     assertNotNull(input, "publishInput not specified");
     assertFalse(input.isTransactional(), "transactional mode not supported for 'request-reply' communication");
 
-    final IMarshaller marshaller = resolveMarshaller(destination);
-
-    // Prepare to receive the reply message
     final String replyId = String.format("scout.mom.requestreply.uid-%s", UUID.randomUUID()); // JMS message ID not applicable because unknown until sent
-    final ReplyFuture<REPLY> replyFuture = new ReplyFuture<>(marshaller, replyId);
+    final IBlockingCondition condition = Jobs.newBlockingCondition(true);
 
-    m_replyFutureMap.put(replyId, replyFuture);
+    IFuture<Message> requestFuture = Jobs.schedule(new Callable<Message>() {
+
+      @Override
+      public Message call() throws Exception {
+        try {
+          return requestImpl(destination, requestObject, input, replyId);
+        }
+        finally {
+          condition.setBlocking(false);
+        }
+      }
+    }, newJobInput()
+        .withName("request on {}", destination)
+        .withExceptionHandling(BEANS.get(MomExceptionHandler.class), false)
+        .withRunContext(RunContexts.copyCurrent(true)
+            .withDiagnostics(BEANS.all(IJmsRunContextDiagnostics.class))));
+
     try {
-      // Prepare the request message
-      final Message message = JmsMessageWriter.newInstance(m_defaultSession, marshaller)
-          .writeReplyTo(m_replyQueue)
-          .writeReplyId(replyId)
-          .writeProperties(input.getProperties())
-          .writeCorrelationId(CorrelationId.CURRENT.get())
-          .writeTransferObject(requestObject)
-          .build();
-      send(m_defaultProducer, resolveJmsDestination(destination, m_defaultSession), message, toJmsDeliveryMode(input), toJmsPriority(input), toJmsTimeToLive(input));
+      long timeout = input.getRequestReplyTimeout();
+      if (timeout == PublishInput.INFINITELY) {
+        condition.waitFor();
+      }
+      else {
+        condition.waitFor(timeout, TimeUnit.MILLISECONDS);
+      }
 
-      // Wait until the reply is received
-      return waitForReply(replyFuture, input.getRequestReplyTimeout());
+      Message responseMessage = requestFuture.awaitDoneAndGet();
+      return transform(responseMessage, replyId, resolveMarshaller(destination));
     }
-    catch (final JMSException e) {
+    catch (JMSException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
     }
-    finally {
-      m_replyFutureMap.remove(replyId);
+    catch (ThreadInterruptedError | TimedOutError e) {
+
+      // send cancel to replier
+      cancelRequest(replyId);
+
+      // cancel request job
+      if (requestFuture.cancel(true)) {
+        requestFuture.awaitDone();
+      }
+
+      throw e;
     }
   }
 
-  /**
-   * Waits until received the reply. If interrupted or the timeout elapses, the request is cancelled.
-   */
-  protected <REPLY> REPLY waitForReply(final ReplyFuture<REPLY> replyFuture, final long timeout) throws JMSException {
+  protected <REQUEST, REPLY> Message requestImpl(final IBiDestination<REQUEST, REPLY> destination, final REQUEST requestObject, final PublishInput input, String replyId) throws JMSException {
+    Message responseMessage;
+    IJmsSessionProvider sessionProvider = createSessionProvider(destination, false);
     try {
-      return replyFuture.awaitDoneAndGet(timeout);
+      TemporaryQueue temporaryQueue = sessionProvider.getTemporaryQueue();
+
+      // send request message
+      JmsMessageWriter messageWriter = JmsMessageWriter.newInstance(sessionProvider.getSession(), resolveMarshaller(destination))
+          .writeReplyTo(temporaryQueue)
+          .writeReplyId(replyId)
+          .writeProperties(input.getProperties())
+          .writeTransferObject(requestObject);
+      send(sessionProvider, destination, messageWriter, input);
+
+      // receive response message
+      responseMessage = sessionProvider.getSession().createConsumer(temporaryQueue).receive();
     }
-    catch (final ExecutionException e) {
-      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e); // exception thrown by the replier
+    catch (JMSException e) {
+      if (IFuture.CURRENT.get().isCancelled()) {
+        // if job was canceled, we ignore JMSException as these are exceptions because of interruption
+        LOG.info("Request job canceled; {}", e.getMessage());
+        return null;
+      }
+      else {
+        throw e;
+      }
     }
-    catch (ThreadInterruptedError | TimedOutError e) {
-      final Message cancellationMessage = JmsMessageWriter.newInstance(m_defaultSession, BEANS.get(TextMarshaller.class))
-          .writeReplyId(replyFuture.getReplyId())
-          .writeCorrelationId(CorrelationId.CURRENT.get())
-          .build();
-      send(m_defaultProducer, m_requestReplyCancellationTopic, cancellationMessage, Message.DEFAULT_DELIVERY_MODE, Message.DEFAULT_PRIORITY, Message.DEFAULT_TIME_TO_LIVE);
-      throw e;
+    finally {
+      sessionProvider.close();
     }
+
+    // After closing session, delete not required temporary queue. The queue is associated with the connection and exists as long as the connection is alive.
+    sessionProvider.deleteTemporaryQueue();
+
+    return responseMessage;
+  }
+
+  @SuppressWarnings("unchecked")
+  protected <REPLY> REPLY transform(Message message, String replyId, IMarshaller marshaller) throws JMSException {
+    assertEqual(replyId, message.getStringProperty(JMS_PROP_REPLY_ID), "expected reply message with id {} but got {}", replyId, message);
+
+    JmsMessageReader reader = JmsMessageReader.newInstance(message, marshaller);
+    Object reply = reader.readMessage().getTransferObject();
+    if (reader.readRequestReplySuccess()) {
+      return (REPLY) reply;
+    }
+    Throwable cause = reply instanceof Throwable ? (Throwable) reply : new ProcessingException("Request-Reply failed");
+    throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(cause);
+  }
+
+  protected void cancelRequest(final String replyId) {
+    Jobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        assertNotNull(m_requestReplyCancellationTopic);
+        IJmsSessionProvider sessionProvider = createSessionProvider();
+        try {
+          JmsMessageWriter writer = JmsMessageWriter.newInstance(sessionProvider.getSession(), BEANS.get(TextMarshaller.class))
+              .writeReplyId(replyId);
+          send(sessionProvider.getProducer(), resolveJmsDestination(m_requestReplyCancellationTopic, sessionProvider.getSession()), writer, Message.DEFAULT_DELIVERY_MODE, Message.DEFAULT_PRIORITY, Message.DEFAULT_TIME_TO_LIVE);
+        }
+        finally {
+          sessionProvider.close();
+        }
+      }
+    }, newJobInput().withName("JMS publish cancel request for {}", replyId));
   }
 
   @Override
@@ -384,19 +422,69 @@ public class JmsMomImplementor implements IMomImplementor {
     assertNotNull(listener, "messageListener not specified");
     assertNotNull(input, "input not specified");
     try {
-      final int acknowledgementMode = input.getAcknowledgementMode();
-      final IReplierStrategy strategy = assertNotNull(m_replierStrategies.get(acknowledgementMode), "Acknowledgement mode not supported [mode={}]", acknowledgementMode);
-      return strategy.subscribe(destination, listener, input);
+      ensureRequestCancellationSubscription();
+      return replyImpl(destination, listener, input);
     }
     catch (final JMSException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
+    }
+  }
+
+  protected <REQUEST, REPLY> ISubscription replyImpl(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final SubscribeInput input) throws JMSException {
+    IJmsSessionProvider sessionProvider = createSessionProvider(destination, false);
+    try {
+      IFuture<Void> jobMonitor = Jobs.schedule(createReplyMessageConsumerJob(sessionProvider, destination, listener, input),
+          newJobInput().withName("JMS message listener [dest={}]", destination));
+
+      return new JmsSubscription(destination, input, sessionProvider, jobMonitor);
+    }
+    catch (JMSException | RuntimeException e) {
+      sessionProvider.close();
+      throw e;
+    }
+  }
+
+  protected <REQUEST, REPLY> IRunnable createReplyMessageConsumerJob(IJmsSessionProvider sessionProvider, IBiDestination<REQUEST, REPLY> destination, IRequestListener<REQUEST, REPLY> listener, SubscribeInput input) throws JMSException {
+    return new ReplyMessageConsumerJob<REQUEST, REPLY>(this, sessionProvider, destination, listener, input);
+  }
+
+  protected synchronized void ensureRequestCancellationSubscription() throws JMSException {
+    if (m_requestCancellationSubscription == null) {
+      m_requestCancellationSubscription = subscribeRequestCancellation(m_requestReplyCancellationTopic);
+    }
+  }
+
+  protected <DTO> ISubscription subscribeRequestCancellation(IDestination<DTO> cancellationTopic) throws JMSException {
+    IJmsSessionProvider sessionProvider = createSessionProvider(cancellationTopic, false);
+    try {
+      SubscribeInput input = MOM.newSubscribeInput();
+      IFuture<Void> jobMonitor = Jobs.schedule(new AbstractMessageConsumerJob<DTO>(this, sessionProvider, cancellationTopic, input) {
+
+        @Override
+        protected void onJmsMessage(Message jmsMessage) throws JMSException {
+          Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
+              .andMatchExecutionHint(jmsMessage.getStringProperty(JMS_PROP_REPLY_ID))
+              .toFilter(), true);
+        }
+      }, newJobInput().withName("JMS reply cancle message listener"));
+      return new JmsSubscription(cancellationTopic, input, sessionProvider, jobMonitor);
+    }
+    catch (JMSException | RuntimeException e) {
+      sessionProvider.close();
+      throw e;
     }
   }
 
   @Override
   public void cancelDurableSubscription(final String durableSubscriptionName) {
     try {
-      m_defaultSession.unsubscribe(durableSubscriptionName);
+      IJmsSessionProvider sessionProvider = createSessionProvider();
+      try {
+        sessionProvider.getSession().unsubscribe(durableSubscriptionName);
+      }
+      finally {
+        sessionProvider.close();
+      }
     }
     catch (final JMSException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
@@ -404,13 +492,39 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   @Override
-  public void destroy() {
+  public synchronized void destroy() {
     try {
+      if (m_requestCancellationSubscription != null) {
+        m_requestCancellationSubscription.dispose();
+      }
+
+      // cancel any still running mom jobs
+      IFilter<IFuture<?>> momJobsFilter = Jobs.newFutureFilterBuilder().andMatchExecutionHint(m_momUid).toFilter();
+      Set<IFuture<?>> futures = Jobs.getJobManager().getFutures(momJobsFilter);
+      if (!futures.isEmpty()) {
+        Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
+            .andMatchFuture(futures)
+            .andMatchNotState(JobState.DONE)
+            .toFilter(), false);
+      }
+
+      // close connection
       if (m_connection != null) {
         m_connection.close();
       }
+
+      // wait for jobs to finish
+      if (!futures.isEmpty()) {
+        try {
+          Jobs.getJobManager().awaitDone(momJobsFilter, 10, TimeUnit.SECONDS);
+          LOG.debug("All mom jobs have finished.");
+        }
+        catch (ThreadInterruptedError | TimedOutError e) {
+          LOG.warn("Unable to cancel all mom jobs: {}", futures, e);
+        }
+      }
     }
-    catch (final JMSException e) {
+    catch (JMSException e) {
       LOG.error("Failed to destroy MOM", e);
     }
   }
@@ -427,76 +541,54 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   /**
-   * Registers the given {@link ISubscriptionStrategy} to receive message (fire-and-forget messaging).
-   */
-  public void registerSubscriptionStrategy(final int acknowledgementMode, final ISubscriptionStrategy strategy) {
-    m_subscriptionStrategies.put(acknowledgementMode, strategy);
-  }
-
-  /**
-   * Registers the given {@link IReplierStrategy} to respond to requests (request-reply messaging).
-   */
-  public void registerReplierStrategy(final int acknowledgementMode, final IReplierStrategy strategy) {
-    m_replierStrategies.put(acknowledgementMode, strategy);
-  }
-
-  /**
    * Returns the {@link IMarshaller} registered for the given destination, and is never <code>null</code>.
    */
   public IMarshaller resolveMarshaller(final IDestination<?> destination) {
-    final IMarshaller marshaller = m_marshallers.get(destination);
-    if (marshaller != null) {
-      return marshaller;
-    }
-    return m_defaultMarshaller;
+    IMarshaller marshaller = m_marshallers.get(destination);
+    return marshaller != null ? marshaller : m_defaultMarshaller;
   }
 
   /**
-   * Returns the {@link Connection} to the JMS broker.
+   * @return a shared {@link Connection} to JMS broker.
    */
   public Connection getConnection() {
     return m_connection;
   }
 
-  /**
-   * Returns the default {@link Session} of this MOM to receive and send messages. This session is not transacted, and
-   * configured for auto-acknowledge messages.
-   * <p>
-   * Please note: A JMS session is single-threaded, so while processing a message, not other message can be received,
-   * nor a message published.
-   */
-  public Session getDefaultSession() {
-    return m_defaultSession;
+  public <DTO> void send(IJmsSessionProvider sessionProvider, IDestination<DTO> destination, DTO transferObject, PublishInput input) throws JMSException {
+    Session session = sessionProvider.getSession();
+    JmsMessageWriter messageWriter = JmsMessageWriter.newInstance(session, resolveMarshaller(destination))
+        .writeTransferObject(transferObject)
+        .writeReplyTo(resolveJmsDestination(input.getReplyTo(), session))
+        .writeProperties(input.getProperties());
+    send(sessionProvider, destination, messageWriter, input);
   }
 
-  /**
-   * Returns the default {@link MessageProducer} of this MOM to send messages. There is not destination associated with
-   * this producer.
-   */
-  public MessageProducer getDefaultProducer() {
-    return m_defaultProducer;
+  public <DTO> void send(IJmsSessionProvider sessionProvider, IDestination<DTO> destination, JmsMessageWriter messageWriter, PublishInput input) throws JMSException {
+    assertNotNull(destination);
+    Session session = sessionProvider.getSession();
+    send(sessionProvider.getProducer(), resolveJmsDestination(destination, session), messageWriter, input);
   }
 
-  /**
-   * Sends the message to the given destination.
-   */
-  public void send(final MessageProducer producer, final Destination destination, final Message message, final int deliveryMode, final int priority, final long timeToLive) throws JMSException {
-    final IRestorer interruption = ThreadInterruption.clear(); // Temporarily clear the thread's interrupted status while sending a message.
-    try {
-      LOG.debug("Sending JMS message [destination={}, message={}]", destination, message);
-      producer.send(destination, message, deliveryMode, priority, timeToLive);
-    }
-    finally {
-      interruption.restore();
-    }
+  public <DTO> void send(MessageProducer producer, Destination destination, JmsMessageWriter messageWriter, PublishInput input) throws JMSException {
+    send(producer, destination, messageWriter, toJmsDeliveryMode(input), toJmsPriority(input), toJmsTimeToLive(input));
   }
 
-  protected Context createContext(final Map<Object, Object> properties) throws NamingException {
-    return new InitialContext(prepareContextEnvironment(properties));
+  public void send(MessageProducer producer, Destination destination, JmsMessageWriter messageWriter, int deliveryMode, int priority, long timeToLive) throws JMSException {
+    Message message = messageWriter
+        .writeCorrelationId(CorrelationId.CURRENT.get())
+        .build();
+    LOG.debug("Sending JMS message [destination={}, message={}]", destination, message);
+    producer.send(destination, message, deliveryMode, priority, timeToLive);
+  }
+
+  protected Context createContext() throws NamingException {
+    // calling this constructor on InitialContext will not modify m_contextEnvironment
+    return new InitialContext(m_contextEnvironment);
   }
 
   @SuppressWarnings("squid:S1149")
-  protected Hashtable<?, ?> prepareContextEnvironment(final Map<Object, Object> properties) throws NamingException {
+  protected Hashtable<Object, Object> createContextEnvironment(final Map<Object, Object> properties) throws NamingException {
     Hashtable<Object, Object> env = new Hashtable<>();
     if (properties != null) {
       for (Entry<Object, Object> entry : properties.entrySet()) {
@@ -515,24 +607,59 @@ public class JmsMomImplementor implements IMomImplementor {
     return env;
   }
 
-  protected Connection createConnection(final Context context, final Map<Object, Object> properties) throws NamingException, JMSException {
-    final String connectionFactoryName = (String) assertNotNull(properties.get(CONNECTION_FACTORY), "Property {} not specified to lookup connection factory", CONNECTION_FACTORY);
-    final ConnectionFactory connectionFactory = (ConnectionFactory) context.lookup(connectionFactoryName);
-    final Connection connection = connectionFactory.createConnection();
-    connection.setClientID(computeClientId(properties));
+  protected ConnectionFactory createConnectionFactory(Map<Object, Object> properties) throws NamingException {
+    String connectionFactoryName = (String) assertNotNull(properties.get(CONNECTION_FACTORY), "Property {} not specified to lookup connection factory", CONNECTION_FACTORY);
+    return (ConnectionFactory) createContext().lookup(connectionFactoryName);
+  }
+
+  protected Connection createConnection() throws JMSException {
+    Object securityPrincipal = m_contextEnvironment.get(Context.SECURITY_PRINCIPAL);
+    Object securityCredentials = m_contextEnvironment.get(Context.SECURITY_CREDENTIALS);
+    Connection connection;
+    if (securityPrincipal != null && securityCredentials != null) {
+      connection = m_connectionFactory.createConnection(securityPrincipal.toString(), securityCredentials.toString());
+    }
+    else {
+      connection = m_connectionFactory.createConnection();
+    }
+
+    postCreateConnection(connection);
+    return connection;
+  }
+
+  protected void postCreateConnection(Connection connection) throws JMSException {
+    connection.setClientID(m_clientId);
     connection.setExceptionListener(new ExceptionListener() {
       @Override
       public void onException(final JMSException exception) {
         BEANS.get(MomExceptionHandler.class).handle(exception);
       }
     });
-    return connection;
+    // we directly start the shared connection
+    connection.start();
   }
 
   public Destination resolveJmsDestination(final IDestination<?> destination, final Session session) {
+    if (destination == null) {
+      return null;
+    }
+    Destination jmsDestination = m_jmsDestinations.get(destination);
+    if (jmsDestination == null) {
+      synchronized (m_jmsDestinations) {
+        jmsDestination = m_jmsDestinations.get(destination);
+        if (jmsDestination == null) {
+          jmsDestination = defineOrLookupJmsDestination(destination, session);
+          m_jmsDestinations.put(destination, jmsDestination);
+        }
+      }
+    }
+    return jmsDestination;
+  }
+
+  protected Destination defineOrLookupJmsDestination(final IDestination<?> destination, final Session session) {
     try {
       if (destination.getResolveMethod() == ResolveMethod.JNDI) {
-        return lookupJmsDestination(destination, session);
+        return lookupJmsDestination(destination);
       }
       else if (destination.getResolveMethod() == ResolveMethod.DEFINE) {
         return defineJmsDestination(destination, session);
@@ -547,8 +674,8 @@ public class JmsMomImplementor implements IMomImplementor {
   /**
    * Looks up a destination via JNDI.
    */
-  protected Destination lookupJmsDestination(final IDestination<?> destination, final Session session) throws NamingException {
-    final Object object = Assertions.assertNotNull(m_context.lookup(destination.getName()));
+  protected Destination lookupJmsDestination(final IDestination<?> destination) throws NamingException {
+    final Object object = Assertions.assertNotNull(createContext().lookup(destination.getName()));
     final Class<?> expectedType = (destination.getType() == DestinationType.QUEUE ? Queue.class : Topic.class);
     Assertions.assertInstance(object, expectedType, "The looked up destination is of type '{}', but expected type '{}' [{}]", object.getClass().getName(), expectedType.getName(), destination);
     return (Destination) object;
@@ -589,65 +716,6 @@ public class JmsMomImplementor implements IMomImplementor {
     }
     final String nodeId = BEANS.get(NodeIdentifier.class).get();
     return StringUtility.join(" ", m_symbolicName, StringUtility.box("(", nodeId, ")"));
-  }
-
-  /**
-   * Future to wait for a reply to receive.
-   */
-  protected static class ReplyFuture<REPLY> {
-
-    protected final IBlockingCondition m_condition = Jobs.newBlockingCondition(true);
-    private final String m_replyId;
-    private final IMarshaller m_marshaller;
-
-    protected volatile Message m_reply;
-
-    public ReplyFuture(final IMarshaller marshaller, final String replyId) {
-      m_marshaller = marshaller;
-      m_replyId = replyId;
-    }
-
-    /**
-     * Sets the reply.
-     */
-    public void set(final Message reply) {
-      m_reply = reply;
-      m_condition.setBlocking(false);
-    }
-
-    /**
-     * Waits until a reply is received.
-     *
-     * @param timeoutMillis
-     *          the maximal time to wait for the job to complete, or {@link PublishInput#INFINITELY} to wait infinitely.
-     * @throws ThreadInterruptedError
-     *           if interrupted while waiting.
-     * @throws TimedOutError
-     *           if the wait timed out.
-     */
-    @SuppressWarnings("unchecked")
-    public REPLY awaitDoneAndGet(final long timeoutMillis) throws JMSException, ExecutionException {
-      // Wait until the reply is received
-      if (timeoutMillis == PublishInput.INFINITELY) {
-        m_condition.waitFor();
-      }
-      else {
-        m_condition.waitFor(timeoutMillis, TimeUnit.MILLISECONDS);
-      }
-
-      // Evaluate the reply
-      final JmsMessageReader reader = JmsMessageReader.newInstance(m_reply, m_marshaller);
-      final Object reply = reader.readMessage().getTransferObject();
-      if (reader.readRequestReplySuccess()) {
-        return (REPLY) reply;
-      }
-      final Throwable cause = reply instanceof Throwable ? (Throwable) reply : new ProcessingException("Request-Reply failed");
-      throw new ExecutionException(cause);
-    }
-
-    public String getReplyId() {
-      return m_replyId;
-    }
   }
 
   /**

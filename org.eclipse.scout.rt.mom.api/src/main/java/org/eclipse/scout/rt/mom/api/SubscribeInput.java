@@ -26,6 +26,8 @@ public class SubscribeInput {
    * Subscription mode to acknowledge a message automatically upon its receipt. This mode uses the <i>message receiving
    * thread</i> to process the message, meaning the subscription does not receive any other messages for the time of
    * processing a message.
+   * <p>
+   * Unsubscribe ({@link ISubscription#dispose()}) will block until any processing of messages is finished.
    */
   public static final int ACKNOWLEDGE_AUTO_SINGLE_THREADED = 2;
 
