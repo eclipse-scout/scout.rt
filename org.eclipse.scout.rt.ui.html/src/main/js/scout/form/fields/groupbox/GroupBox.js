@@ -34,7 +34,6 @@ scout.GroupBox = function() {
   this.processButtons = [];
   this.processMenus = [];
   this.staticMenus = [];
-  this.minWidthInPixel = 0;
 
   this.$body;
   this.$title;
@@ -50,6 +49,7 @@ scout.GroupBox.BorderDecoration = {
 scout.GroupBox.prototype._init = function(model) {
   scout.GroupBox.parent.prototype._init.call(this, model);
   this._setFields(this.fields);
+  this._setBodyLayoutConfig(this.bodyLayoutConfig);
   this.menuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
@@ -137,6 +137,7 @@ scout.GroupBox.prototype._renderProperties = function() {
   this._renderExpanded(); // Need to be before renderVisible is executed, otherwise controls might be rendered if group box is invisible which breaks some widgets (e.g. Tree and Table)
   scout.GroupBox.parent.prototype._renderProperties.call(this);
 
+  this._renderBodyLayoutConfig();
   this._renderNotification();
   this._renderBorderVisible();
   this._renderExpandable();
@@ -149,14 +150,33 @@ scout.GroupBox.prototype._createLayout = function() {
 };
 
 scout.GroupBox.prototype._createBodyLayout = function() {
-  var env = scout.HtmlEnvironment;
-  return new scout.LogicalGridLayout(this, {
-    hgap: env.formColumnGap,
-    vgap: env.formRowGap,
-    columnWidth: env.formColumnWidth,
-    rowWidth: env.formRowHeight,
-    minWidthInPixel: this.minWidthInPixel
-  });
+  return new scout.LogicalGridLayout(this, this.bodyLayoutConfig);
+};
+
+scout.GroupBox.prototype.setBodyLayoutConfig = function(bodyLayoutConfig) {
+  this.setProperty('bodyLayoutConfig', bodyLayoutConfig);
+};
+
+scout.GroupBox.prototype._setBodyLayoutConfig = function(bodyLayoutConfig) {
+  if (!bodyLayoutConfig) {
+    bodyLayoutConfig = new scout.LogicalGridLayoutConfig();
+  }
+  this._setProperty('bodyLayoutConfig', scout.LogicalGridLayoutConfig.ensure(bodyLayoutConfig));
+};
+
+scout.GroupBox.prototype._renderBodyLayoutConfig = function() {
+  this.htmlBody.layout.hgap = this.bodyLayoutConfig.hgap;
+  this.htmlBody.layout.vgap = this.bodyLayoutConfig.vgap;
+  this.htmlBody.layout.columnWidth = this.bodyLayoutConfig.columnWidth;
+  this.htmlBody.layout.rowHeight = this.bodyLayoutConfig.rowHeight;
+  var oldMinWidth = this.htmlBody.layout.minWidth;
+  this.htmlBody.layout.minWidth = this.bodyLayoutConfig.minWidth;
+  if (oldMinWidth !== this.bodyLayoutConfig.minWidth) {
+    this._renderScrollable();
+  }
+  if (this.rendered) {
+    this.htmlBody.invalidateLayoutTree();
+  }
 };
 
 scout.GroupBox.prototype._renderControls = function() {
@@ -174,19 +194,19 @@ scout.GroupBox.prototype.setScrollable = function(scrollable) {
 };
 
 scout.GroupBox.prototype._renderScrollable = function() {
-  // horizontal (x-axis) scrollbar is only installed when minWidthInPixel is > 0
+  scout.scrollbars.uninstall(this.$body, this.session);
+
+  // horizontal (x-axis) scrollbar is only installed when minWidth is > 0
   if (this.scrollable) {
     scout.scrollbars.install(this.$body, {
       parent: this,
-      axis: ((this.minWidthInPixel > 0) ? 'both' : 'y')
+      axis: ((this.bodyLayoutConfig.minWidth > 0) ? 'both' : 'y')
     });
-  } else if (this.minWidthInPixel > 0) {
+  } else if (this.bodyLayoutConfig.minWidth > 0) {
     scout.scrollbars.install(this.$body, {
       parent: this,
       axis: 'x'
     });
-  } else {
-    scout.scrollbars.uninstall(this.$body, this.session);
   }
 };
 

@@ -11,7 +11,7 @@
 /**
  * JavaScript port of org.eclipse.scout.rt.ui.swing.LogicalGridLayout.
  *
- * @param options available options: hgap, vgap, rowHeight, columnWidth, minWidthInPixel
+ * @param options available options: hgap, vgap, rowHeight, columnWidth, minWidth
  *
  */
 scout.LogicalGridLayout = function(widget, options) {
@@ -25,7 +25,7 @@ scout.LogicalGridLayout = function(widget, options) {
   this.vgap = 0;
   this.rowHeight = scout.HtmlEnvironment.formRowHeight;
   this.columnWidth = scout.HtmlEnvironment.formColumnWidth;
-  this.minWidthInPixel = 0;
+  this.minWidth = 0;
   $.extend(this, options);
 };
 scout.inherits(scout.LogicalGridLayout, scout.AbstractLayout);
@@ -92,8 +92,8 @@ scout.LogicalGridLayout.prototype._layout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container),
     containerSize = htmlContainer.availableSize(),
     containerInsets = htmlContainer.insets();
-  if (this.minWidthInPixel > 0 && containerSize.width < this.minWidthInPixel) {
-    containerSize.width = this.minWidthInPixel;
+  if (this.minWidth > 0 && containerSize.width < this.minWidth) {
+    containerSize.width = this.minWidth;
   }
   if ($.log.isTraceEnabled()) {
     $.log.trace('(LogicalGridLayout#layout) container ' + htmlContainer.debug() + ' size=' + containerSize + ' insets=' + containerInsets);

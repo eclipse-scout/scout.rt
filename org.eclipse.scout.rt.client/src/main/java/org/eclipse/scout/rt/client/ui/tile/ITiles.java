@@ -25,11 +25,7 @@ public interface ITiles extends IWidget, ITypeWithClassId, IExtensibleObject, IC
   String PROP_SELECTABLE = "selectable";
   String PROP_MULTI_SELECT = "multiSelect";
   String PROP_LOGICAL_GRID = "logicalGrid";
-  String PROP_LOGICAL_GRID_COLUMN_WIDTH = "logicalGridColumnWidth";
-  String PROP_LOGICAL_GRID_ROW_HEIGHT = "logicalGridRowHeight";
-  String PROP_LOGICAL_GRID_H_GAP = "logicalGridHGap";
-  String PROP_LOGICAL_GRID_V_GAP = "logicalGridVGap";
-  String PROP_MAX_CONTENT_WIDTH = "maxContentWidth";
+  String PROP_LAYOUT_CONFIG = "layoutConfig";
   String PROP_CONTAINER = "container";
   String PROP_CONTEXT_MENU = "contextMenus";
 
@@ -97,66 +93,9 @@ public interface ITiles extends IWidget, ITypeWithClassId, IExtensibleObject, IC
 
   void setLogicalGrid(String logicalGrid);
 
-  /**
-   * @return the width in pixels to use for tiles with the logical unit "width = 1". Larger logical widths are
-   *         multiplied with this value (and gaps are added).
-   */
-  int getLogicalGridColumnWidth();
+  void setLayoutConfig(TilesLayoutConfig config);
 
-  /**
-   * @param logicalGridColumnWidth
-   *          the width in pixels to use for tiles with the logical unit "width = 1". Larger logical widths are
-   *          multiplied with this value (and gaps are added).
-   */
-  void setLogicalGridColumnWidth(int logicalGridColumnWidth);
-
-  /**
-   * @return the height in pixels to use for tiles with the logical unit "height = 1". Larger logical heights are
-   *         multiplied with this value (and gaps are added).
-   */
-  int getLogicalGridRowHeight();
-
-  /**
-   * @param logicalGridRowHeight
-   *          the height in pixels to use for tiles with the logical unit "height = 1". Larger logical heights are
-   *          multiplied with this value (and gaps are added).
-   */
-  void setLogicalGridRowHeight(int logicalGridRowHeight);
-
-  /**
-   * @return the horizontal gap in pixels to use between single tiles.
-   */
-  int getLogicalGridHGap();
-
-  /**
-   * @param logicalGridGap
-   *          the horizontal gap in pixels to use between two logical grid columns.
-   */
-  void setLogicalGridHGap(int logicalGridGap);
-
-  /**
-   * @return the vertical gap in pixels to use between two logical grid rows.
-   */
-  int getLogicalGridVGap();
-
-  /**
-   * @param logicalGridGap
-   *          the vertical gap in pixels to use between single tiles.
-   */
-  void setLogicalGridVGap(int logicalGridGap);
-
-  /**
-   * @return the maximum width in pixels to use for the content. The maximum is disabled if this value is
-   *         <code>&lt;= 0</code>.
-   */
-  int getMaxContentWidth();
-
-  /**
-   * @param maxContentWidth
-   *          the maximum width in pixels to use for the content. The maximum is disabled if this value is
-   *          <code>&lt;= 0</code>
-   */
-  void setMaxContentWidth(int logicalGridMaxContentWidth);
+  TilesLayoutConfig getLayoutConfig();
 
   void addTiles(List<? extends ITile> tiles);
 

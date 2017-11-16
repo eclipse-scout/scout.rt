@@ -19,11 +19,7 @@ scout.Tiles = function() {
   this.gridColumnCount = 4;
   this.prefGridColumnCount = this.gridColumnCount;
   this.logicalGrid = scout.create('scout.HorizontalGrid');
-  this.logicalGridHGap = 15;
-  this.logicalGridVGap = 20;
-  this.logicalGridColumnWidth = 200;
-  this.logicalGridRowHeight = 150;
-  this.maxContentWidth = -1;
+  this.layoutConfig = null;
   this.menus = [];
   this.multiSelect = true;
   this.withPlaceholders = false;
@@ -43,6 +39,7 @@ scout.inherits(scout.Tiles, scout.Widget);
 scout.Tiles.prototype._init = function(model) {
   scout.Tiles.parent.prototype._init.call(this, model);
   this._setGridColumnCount(this.gridColumnCount);
+  this._setLayoutConfig(this.layoutConfig);
   this._initTiles();
   this._applyFilters(this.tiles);
   this._updateFilteredTiles();
@@ -82,11 +79,7 @@ scout.Tiles.prototype._createLayout = function() {
 scout.Tiles.prototype._renderProperties = function() {
   scout.Tiles.parent.prototype._renderProperties.call(this);
   this._renderTiles();
-  this._renderLogicalGridHGap();
-  this._renderLogicalGridVGap();
-  this._renderLogicalGridRowHeight();
-  this._renderLogicalGridColumnWidth();
-  this._renderMaxContentWidth();
+  this._renderLayoutConfig();
   this._renderScrollable();
   this._renderSelectable();
 };
@@ -298,48 +291,28 @@ scout.Tiles.prototype._setGridColumnCount = function(gridColumnCount) {
   this.invalidateLogicalGrid();
 };
 
-scout.Tiles.prototype.setLogicalGridHGap = function(logicalGridHGap) {
-  this.setProperty('logicalGridHGap', logicalGridHGap);
+scout.Tiles.prototype.setLayoutConfig = function(layoutConfig) {
+  this.setProperty('layoutConfig', layoutConfig);
 };
 
-scout.Tiles.prototype._renderLogicalGridHGap = function() {
-  this.htmlComp.layout.hgap = this.logicalGridHGap;
-  this.invalidateLayoutTree();
+scout.Tiles.prototype._setLayoutConfig = function(layoutConfig) {
+  if (!layoutConfig) {
+    layoutConfig = new scout.TilesLayoutConfig();
+  }
+  this._setProperty('layoutConfig', scout.TilesLayoutConfig.ensure(layoutConfig));
 };
 
-scout.Tiles.prototype.setLogicalGridVGap = function(logicalGridVGap) {
-  this.setProperty('logicalGridVGap', logicalGridVGap);
-};
-
-scout.Tiles.prototype._renderLogicalGridVGap = function() {
-  this.htmlComp.layout.vgap = this.logicalGridVGap;
-  this.invalidateLayoutTree();
-};
-
-scout.Tiles.prototype.setLogicalGridColumnWidth = function(logicalGridColumnWidth) {
-  this.setProperty('logicalGridColumnWidth', logicalGridColumnWidth);
-};
-
-scout.Tiles.prototype._renderLogicalGridColumnWidth = function() {
-  this.htmlComp.layout.columnWidth = this.logicalGridColumnWidth;
-  this.invalidateLayoutTree();
-};
-
-scout.Tiles.prototype.setLogicalGridRowHeight = function(logicalGridRowHeight) {
-  this.setProperty('logicalGridRowHeight', logicalGridRowHeight);
-};
-
-scout.Tiles.prototype._renderLogicalGridRowHeight = function() {
-  this.htmlComp.layout.rowHeight = this.logicalGridRowHeight;
-  this.invalidateLayoutTree();
-};
-
-scout.Tiles.prototype.setMaxContentWidth = function(maxContentWidth) {
-  this.setProperty('maxContentWidth', maxContentWidth);
-};
-
-scout.Tiles.prototype._renderMaxContentWidth = function() {
-  this.htmlComp.layout.maxContentWidth = this.maxContentWidth;
+scout.Tiles.prototype._renderLayoutConfig = function() {
+  this.htmlComp.layout.hgap = this.layoutConfig.hgap;
+  this.htmlComp.layout.vgap = this.layoutConfig.vgap;
+  this.htmlComp.layout.columnWidth = this.layoutConfig.columnWidth;
+  this.htmlComp.layout.rowHeight = this.layoutConfig.rowHeight;
+  this.htmlComp.layout.maxWidth = this.layoutConfig.maxWidth;
+  var oldMinWidth = this.htmlComp.layout.minWidth;
+  this.htmlComp.layout.minWidth = this.layoutConfig.minWidth;
+  if (oldMinWidth !== this.layoutConfig.minWidth) {
+    this._renderScrollable();
+  }
   this.invalidateLayoutTree();
 };
 
@@ -399,13 +372,19 @@ scout.Tiles.prototype.setScrollable = function(scrollable) {
 };
 
 scout.Tiles.prototype._renderScrollable = function() {
+  scout.scrollbars.uninstall(this.$container, this.session);
+
+  // horizontal (x-axis) scrollbar is only installed when minWidth is > 0
   if (this.scrollable) {
     scout.scrollbars.install(this.$container, {
       parent: this,
-      axis: 'y'
+      axis: ((this.layoutConfig.minWidth > 0) ? 'both' : 'y')
     });
-  } else {
-    scout.scrollbars.uninstall(this.$container, this.session);
+  } else if (this.layoutConfig.minWidth > 0) {
+    scout.scrollbars.install(this.$container, {
+      parent: this,
+      axis: 'x'
+    });
   }
   this.$container.toggleClass('scrollable', this.scrollable);
   this.invalidateLayoutTree();

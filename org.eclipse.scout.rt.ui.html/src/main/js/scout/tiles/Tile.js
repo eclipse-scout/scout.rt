@@ -37,7 +37,6 @@ scout.Tile.prototype._createLoadingSupport = function() {
 scout.Tile.prototype._init = function(model) {
   scout.Tile.parent.prototype._init.call(this, model);
   this._setGridDataHints(this.gridDataHints);
-  this._setGridData(this.gridData);
   this._setColorScheme(this.colorScheme);
   this._setSelectable(this.selectable);
 };
@@ -50,7 +49,7 @@ scout.Tile.prototype._render = function() {
 
 scout.Tile.prototype._renderProperties = function() {
   scout.Tile.parent.prototype._renderProperties.call(this);
-  this._renderGridData();
+  this._renderGridDataHints();
   this._renderColorScheme();
   this._renderSelectable();
   this._renderSelected();
@@ -69,23 +68,10 @@ scout.Tile.prototype._setGridDataHints = function(gridData) {
     gridData = new scout.GridData();
   }
   this._setProperty('gridDataHints', scout.GridData.ensure(gridData));
+};
+
+scout.Tile.prototype._renderGridDataHints = function() {
   this.parent.invalidateLogicalGrid();
-};
-
-scout.Tile.prototype._setGridData = function(gridData) {
-  if (!gridData) {
-    gridData = new scout.GridData();
-  }
-  this._setProperty('gridData', scout.GridData.ensure(gridData));
-};
-
-scout.Tile.prototype._renderGridData = function() {
-  if (this.rendered) {
-    var htmlCompParent = this.htmlComp.getParent();
-    if (htmlCompParent) { // may be null if $container is detached
-      htmlCompParent.invalidateLayoutTree();
-    }
-  }
 };
 
 scout.Tile.prototype.setColorScheme = function(colorScheme) {

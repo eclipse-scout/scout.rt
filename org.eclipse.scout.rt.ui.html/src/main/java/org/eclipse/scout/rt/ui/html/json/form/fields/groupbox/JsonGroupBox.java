@@ -12,10 +12,12 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.groupbox;
 
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.LogicalGridLayoutConfig;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonLogicalGridLayoutConfig;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonCompositeField;
 import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
@@ -87,14 +89,29 @@ public class JsonGroupBox<GROUP_BOX extends IGroupBox> extends JsonCompositeFiel
         return getModel().getGridColumnCount();
       }
     });
+    putJsonProperty(new JsonProperty<GROUP_BOX>(IGroupBox.PROP_SCROLLABLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isScrollable().getBooleanValue();
+      }
+    });
+    putJsonProperty(new JsonProperty<GROUP_BOX>(IGroupBox.PROP_BODY_LAYOUT_CONFIG, model) {
+      @Override
+      protected LogicalGridLayoutConfig modelValue() {
+        return getModel().getBodyLayoutConfig();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return new JsonLogicalGridLayoutConfig((LogicalGridLayoutConfig) value).toJson();
+      }
+    });
   }
 
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     json.put(PROP_MENUS, m_jsonContextMenu.childActionsToJson());
-    json.put(IGroupBox.PROP_MIN_WIDTH_IN_PIXEL, getModel().getMinWidthInPixel());
-    json.put(IGroupBox.PROP_SCROLLABLE, getModel().isScrollable().getBooleanValue());
     return json;
   }
 

@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.LogicalGridLayoutConfig;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.platform.util.TriState;
 
@@ -86,6 +87,7 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
    */
   String PROP_GRID_COLUMN_COUNT = "gridColumnCount";
 
+  String PROP_BODY_LAYOUT_CONFIG = "bodyLayoutConfig";
   /*
    * Runtime
    */
@@ -166,6 +168,10 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
    */
   void setGridColumnCount(int c);
 
+  void setBodyLayoutConfig(LogicalGridLayoutConfig config);
+
+  LogicalGridLayoutConfig getBodyLayoutConfig();
+
   TriState isScrollable();
 
   /**
@@ -201,14 +207,19 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
 
   /**
    * @see IGroupBox#setMinWidthInPixel(int)
+   * @deprecated will be removed with 8.0, use {@link #getBodyLayoutConfig()} instead
    */
+  @Deprecated
   int getMinWidthInPixel();
 
   /**
    * Setter for {@link AbstractGroupBox#getConfiguredMinWidthInPixel()}
    * <p>
    * Only changes made before the groupbox is rendered have an effect.
+   *
+   * @deprecated will be removed with 8.0, use {@link #setBodyLayoutConfig(LogicalGridLayoutConfig)} instead
    */
+  @Deprecated
   void setMinWidthInPixel(int minWidthInPixel);
 
   IGroupBoxUIFacade getUIFacade();

@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.LogicalGridLayoutConfig;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxProcessButtonGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.VerticalSmartGroupBoxBodyGrid;
@@ -92,6 +93,17 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Order(210)
   protected Class<? extends IGroupBoxBodyGrid> getConfiguredBodyGrid() {
     return VerticalSmartGroupBoxBodyGrid.class;
+  }
+
+  /**
+   * Configures the layout hints.
+   * <p>
+   * The hints are set to -1 by default which means the values will be set by the UI.
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(215)
+  protected LogicalGridLayoutConfig getConfiguredBodyLayoutConfig() {
+    return new LogicalGridLayoutConfig().withMinWidth(getConfiguredMinWidthInPixel());
   }
 
   /**
@@ -265,9 +277,12 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    * horizontal direction.
    * <p>
    * Default is 0.
+   *
+   * @deprecated will be removed with 8.0, use {@link #getConfiguredBodyLayoutConfig()} instead
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(290)
+  @Deprecated
   protected int getConfiguredMinWidthInPixel() {
     return 0;
   }
@@ -301,7 +316,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     setBackgroundImageVerticalAlignment(getConfiguredBackgroundImageVerticalAlignment());
     setScrollable(getConfiguredScrollable());
     setSelectionKeyStroke(getConfiguredSelectionKeyStroke());
-    setMinWidthInPixel(getConfiguredMinWidthInPixel());
+    setBodyLayoutConfig(getConfiguredBodyLayoutConfig());
     initMenus();
   }
 
@@ -511,6 +526,16 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   }
 
   @Override
+  public LogicalGridLayoutConfig getBodyLayoutConfig() {
+    return (LogicalGridLayoutConfig) propertySupport.getProperty(PROP_BODY_LAYOUT_CONFIG);
+  }
+
+  @Override
+  public void setBodyLayoutConfig(LogicalGridLayoutConfig layoutConfig) {
+    propertySupport.setProperty(PROP_BODY_LAYOUT_CONFIG, layoutConfig);
+  }
+
+  @Override
   public TriState isScrollable() {
     return (TriState) propertySupport.getProperty(PROP_SCROLLABLE);
   }
@@ -558,14 +583,16 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     propertySupport.setPropertyBool(PROP_BORDER_VISIBLE, b);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public int getMinWidthInPixel() {
-    return propertySupport.getPropertyInt(PROP_MIN_WIDTH_IN_PIXEL);
+    return getBodyLayoutConfig().getMinWidth();
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void setMinWidthInPixel(int minWidthInPixel) {
-    propertySupport.setPropertyInt(PROP_MIN_WIDTH_IN_PIXEL, minWidthInPixel);
+    setBodyLayoutConfig(getBodyLayoutConfig().copy().withMinWidth(minWidthInPixel));
   }
 
   @Override

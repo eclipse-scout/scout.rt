@@ -90,6 +90,7 @@
   __include("scout/layout/logicalgrid/LogicalGridConfig.js");
   __include("scout/layout/logicalgrid/LogicalGridData.js");
   __include("scout/layout/logicalgrid/LogicalGridLayout.js");
+  __include("scout/layout/logicalgrid/LogicalGridLayoutConfig.js");
   __include("scout/layout/logicalgrid/LogicalGridLayoutInfo.js");
   __include("scout/layout/logicalgrid/AbstractGrid.js");
   __include("scout/layout/logicalgrid/HorizontalGrid.js");
@@ -465,6 +466,7 @@
   __include("scout/tiles/TilesAdapter.js");
   __include("scout/tiles/TilesGridConfig.js");
   __include("scout/tiles/TilesLayout.js");
+  __include("scout/tiles/TilesLayoutConfig.js");
   __include("scout/tiles/RemoteTileFilter.js");
   __include("scout/tiles/WidgetTile.js");
   __include("scout/tiles/WidgetTileAdapter.js");

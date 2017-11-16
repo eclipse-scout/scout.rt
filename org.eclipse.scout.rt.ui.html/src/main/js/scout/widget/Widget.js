@@ -754,6 +754,13 @@ scout.Widget.prototype.revalidateLayoutTree = function(invalidateParents) {
   this.htmlComp.revalidateLayoutTree(invalidateParents);
 };
 
+/**
+ * The layout data contains hints for the layout of the parent container to layout this individual child widget inside the container.<br>
+ * Note: this is not the same as the LayoutConfig. The LayoutConfig contains constraints for the layout itself and is therefore set on the parent container directly.
+ * <p>
+ * Example: The parent container uses a LogicalGridLayout to layout its children. Every child has a LogicalGridLayoutData to tell the layout how this specific child should be layouted.
+ * The parent may have a LogicalGridLayoutConfig to specify constraints which affect either only the container or every child in the container.
+ */
 scout.Widget.prototype.setLayoutData = function(layoutData) {
   if (!this.rendered) {
     return;

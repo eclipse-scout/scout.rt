@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.client.ui.tile.ITiles;
+import org.eclipse.scout.rt.client.ui.tile.TilesLayoutConfig;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
@@ -124,34 +125,15 @@ public class JsonTiles<T extends ITiles> extends AbstractJsonWidget<T> implement
         return getModel().getLogicalGrid();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ITiles.PROP_LOGICAL_GRID_COLUMN_WIDTH, model) {
+    putJsonProperty(new JsonProperty<T>(ITiles.PROP_LAYOUT_CONFIG, model) {
       @Override
-      protected Integer modelValue() {
-        return getModel().getLogicalGridColumnWidth();
+      protected TilesLayoutConfig modelValue() {
+        return getModel().getLayoutConfig();
       }
-    });
-    putJsonProperty(new JsonProperty<T>(ITiles.PROP_LOGICAL_GRID_ROW_HEIGHT, model) {
+
       @Override
-      protected Integer modelValue() {
-        return getModel().getLogicalGridRowHeight();
-      }
-    });
-    putJsonProperty(new JsonProperty<T>(ITiles.PROP_LOGICAL_GRID_H_GAP, model) {
-      @Override
-      protected Integer modelValue() {
-        return getModel().getLogicalGridHGap();
-      }
-    });
-    putJsonProperty(new JsonProperty<T>(ITiles.PROP_LOGICAL_GRID_V_GAP, model) {
-      @Override
-      protected Integer modelValue() {
-        return getModel().getLogicalGridVGap();
-      }
-    });
-    putJsonProperty(new JsonProperty<T>(ITiles.PROP_MAX_CONTENT_WIDTH, model) {
-      @Override
-      protected Integer modelValue() {
-        return getModel().getMaxContentWidth();
+      public Object prepareValueForToJson(Object value) {
+        return new JsonTilesLayoutConfig((TilesLayoutConfig) value).toJson();
       }
     });
   }

@@ -80,12 +80,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     m_contributionHolder = new ContributionComposite(this);
     setGridColumnCount(getConfiguredGridColumnCount());
     setLogicalGrid(getConfiguredLogicalGrid());
-    setLogicalGridColumnWidth(getConfiguredLogicalGridColumnWidth());
-    setLogicalGridRowHeight(getConfiguredLogicalGridRowHeight());
-    setLogicalGridHGap(getConfiguredLogicalGridHGap());
-    setLogicalGridVGap(getConfiguredLogicalGridVGap());
-    // getConfiguredMaxContentWidth should not be moved up so that calculatePreferredWidth may be used inside getConfiguredMaxContentWidth()
-    setMaxContentWidth(getConfiguredMaxContentWidth());
+    setLayoutConfig(getConfiguredLayoutConfig());
     setMultiSelect(getConfiguredMultiSelect());
     setSelectable(getConfiguredSelectable());
     setScrollable(getConfiguredScrollable());
@@ -234,47 +229,16 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     return LOGICAL_GRID_HORIZONTAL;
   }
 
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(10)
-  protected int getConfiguredLogicalGridColumnWidth() {
-    return 200;
-  }
-
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(15)
-  protected int getConfiguredLogicalGridRowHeight() {
-    return 150;
-  }
-
   /**
-   * Configures the gap between two logical grid columns.
-   */
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(20)
-  protected int getConfiguredLogicalGridHGap() {
-    return 15;
-  }
-
-  /**
-   * Configures the gap between two logical grid rows.
-   */
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(25)
-  protected int getConfiguredLogicalGridVGap() {
-    return 20;
-  }
-
-  /**
-   * Configures the maximum width in pixels to use for the content. The maximum is disabled if this value is
-   * <code>&lt;= 0</code>.
+   * Configures the layout hints.
    * <p>
-   * You may use {@link #calculatePreferredWidth()} if you want to limit the width based on the column count, column
+   * You may use {@link #calculatePreferredWidth()} if you want to limit the max width based on the column count, column
    * width and column gap.
    */
   @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(290)
-  protected int getConfiguredMaxContentWidth() {
-    return -1;
+  @Order(10)
+  protected TilesLayoutConfig getConfiguredLayoutConfig() {
+    return new TilesLayoutConfig();
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -443,61 +407,13 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   }
 
   @Override
-  public int getLogicalGridColumnWidth() {
-    return propertySupport.getPropertyInt(PROP_LOGICAL_GRID_COLUMN_WIDTH);
+  public TilesLayoutConfig getLayoutConfig() {
+    return (TilesLayoutConfig) propertySupport.getProperty(PROP_LAYOUT_CONFIG);
   }
 
   @Override
-  public void setLogicalGridColumnWidth(int logicalGridColumnWidth) {
-    propertySupport.setPropertyInt(PROP_LOGICAL_GRID_COLUMN_WIDTH, logicalGridColumnWidth);
-  }
-
-  @Override
-  public int getLogicalGridRowHeight() {
-    return propertySupport.getPropertyInt(PROP_LOGICAL_GRID_ROW_HEIGHT);
-  }
-
-  @Override
-  public void setLogicalGridRowHeight(int logicalGridRowHeight) {
-    propertySupport.setPropertyInt(PROP_LOGICAL_GRID_ROW_HEIGHT, logicalGridRowHeight);
-  }
-
-  @Override
-  public int getLogicalGridHGap() {
-    return propertySupport.getPropertyInt(PROP_LOGICAL_GRID_H_GAP);
-  }
-
-  @Override
-  public void setLogicalGridHGap(int logicalGridGap) {
-    propertySupport.setPropertyInt(PROP_LOGICAL_GRID_H_GAP, logicalGridGap);
-  }
-
-  @Override
-  public int getLogicalGridVGap() {
-    return propertySupport.getPropertyInt(PROP_LOGICAL_GRID_V_GAP);
-  }
-
-  @Override
-  public void setLogicalGridVGap(int logicalGridGap) {
-    propertySupport.setPropertyInt(PROP_LOGICAL_GRID_V_GAP, logicalGridGap);
-  }
-
-  @Override
-  public int getMaxContentWidth() {
-    return propertySupport.getPropertyInt(PROP_MAX_CONTENT_WIDTH);
-  }
-
-  @Override
-  public void setMaxContentWidth(int maxContentWidth) {
-    propertySupport.setPropertyInt(PROP_MAX_CONTENT_WIDTH, maxContentWidth);
-  }
-
-  /**
-   * @returns the preferred width based on grid column count, column width and horizontal gap. Typically used to set the
-   *          max content width.
-   */
-  protected int calculatePreferredWidth() {
-    return getGridColumnCount() * getLogicalGridColumnWidth() + (getGridColumnCount() - 1) * getLogicalGridHGap();
+  public void setLayoutConfig(TilesLayoutConfig layoutConfig) {
+    propertySupport.setProperty(PROP_LAYOUT_CONFIG, layoutConfig);
   }
 
   /**

@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.TilesLayout = function(tiles) {
   scout.TilesLayout.parent.call(this, tiles);
-  this.maxContentWidth = -1;
+  this.maxWidth = -1;
   this.containerPos = null;
   this.containerScrollTop = null;
 };
@@ -30,12 +30,13 @@ scout.TilesLayout.prototype.layout = function($container) {
     }, this);
   }
 
-  this._updateMaxContentWidth();
+  this._updateMaxWidth();
   this._resetGridColumnCount();
 
   this.widget.invalidateLayout();
   this.widget.invalidateLogicalGrid(false);
   var containerWidth = $container.outerWidth();
+  containerWidth = Math.max(containerWidth, this.minWidth);
   if (htmlComp.prefSize().width <= containerWidth) {
     this._layout($container);
     contentFits = true;
@@ -192,15 +193,15 @@ scout.TilesLayout.prototype._updateScrollbar = function() {
 };
 
 /**
- * When max. content width should be enforced, add a padding to the container if necessary
+ * When max. width should be enforced, add a padding to the container if necessary
  * (to make sure, scrollbar position is not changed)
  */
-scout.TilesLayout.prototype._updateMaxContentWidth = function() {
+scout.TilesLayout.prototype._updateMaxWidth = function() {
   // Reset padding-right set by layout
   var htmlComp = this.widget.htmlComp;
-  var containerSize = htmlComp.size();
   htmlComp.$comp.cssPaddingRight(null);
-  if (this.maxContentWidth <= 0) {
+
+  if (this.maxWidth <= 0) {
     return;
   }
 
@@ -208,8 +209,9 @@ scout.TilesLayout.prototype._updateMaxContentWidth = function() {
   var cssPaddingRight = htmlComp.$comp.cssPaddingRight();
 
   // Calculate difference between current with and max. width
+  var containerSize = htmlComp.size();
   var oldWidth = containerSize.width;
-  var newWidth = Math.min(containerSize.width, this.maxContentWidth);
+  var newWidth = Math.min(containerSize.width, this.maxWidth);
   var diff = oldWidth - newWidth - htmlComp.$comp.cssPaddingLeft() - htmlComp.$comp.cssBorderWidthX();
   if (diff > cssPaddingRight) {
     htmlComp.$comp.cssPaddingRight(diff);

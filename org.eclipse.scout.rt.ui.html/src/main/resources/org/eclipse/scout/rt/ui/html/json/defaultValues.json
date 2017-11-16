@@ -89,7 +89,13 @@
       "expanded": true,
       "fields": [],
       "gridColumnCount": -1,
-      "minWidthInPixel": 0
+      "bodyLayoutConfig": {
+        "hgap": -1,
+        "vgap": -1,
+        "columnWidth": -1,
+        "rowHeight": -1,
+        "minWidth": 0
+      }
     },
     "TabBox": {
       "tabItems": []
@@ -385,11 +391,14 @@
       "filteredTiles": null,
       "gridColumnCount": 4,
       "logicalGrid": "HorizontalGrid",
-      "logicalGridHGap": 15,
-      "logicalGridVGap": 20,
-      "logicalGridColumnWidth": 200,
-      "logicalGridRowHeight": 150,
-      "maxContentWidth": -1,
+      "layoutConfig": {
+        "hgap": 15,
+        "vgap": 20,
+        "columnWidth": 200,
+        "rowHeight": 150,
+        "maxWidth": -1,
+        "minWidth": 0
+      },
       "multiSelect": true,
       "withPlaceholders": false,
       "selectable": false,
