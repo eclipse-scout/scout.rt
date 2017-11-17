@@ -468,9 +468,7 @@ scout.Tree.prototype._renderNodesInRange = function(range) {
 
   var numNodesRendered = this.ensureRangeVisible(range);
 
-  if ($.log.isTraceEnabled()) {
-    $.log.trace(numNodesRendered + ' new nodes rendered from ' + range);
-  }
+  $.log.isTraceEnabled() && $.log.trace(numNodesRendered + ' new nodes rendered from ' + range);
 };
 
 scout.Tree.prototype.ensureRangeVisible = function(range) {
@@ -497,7 +495,7 @@ scout.Tree.prototype._renderFiller = function() {
     this.$fillBefore.cssWidth(fillBeforeDimensions.width);
     this.maxNodeWidth = Math.max(fillBeforeDimensions.width, this.maxNodeWidth);
   }
-  $.log.trace('FillBefore height: ' + fillBeforeDimensions.height);
+  $.log.isTraceEnabled() && $.log.trace('FillBefore height: ' + fillBeforeDimensions.height);
 
   if (!this.$fillAfter) {
     this.$fillAfter = this.$data.appendDiv('tree-data-fill');
@@ -513,7 +511,7 @@ scout.Tree.prototype._renderFiller = function() {
     this.$fillAfter.cssWidth(fillAfterDimensions.width);
     this.maxNodeWidth = Math.max(fillAfterDimensions.width, this.maxNodeWidth);
   }
-  $.log.trace('FillAfter height: ' + fillAfterDimensions.height);
+  $.log.isTraceEnabled() && $.log.trace('FillAfter height: ' + fillAfterDimensions.height);
 };
 
 scout.Tree.prototype._calculateFillerDimension = function(range) {
@@ -551,9 +549,7 @@ scout.Tree.prototype._removeNodesInRange = function(range) {
     numNodesRemoved++;
   }
 
-  if ($.log.isTraceEnabled()) {
-    $.log.trace(numNodesRemoved + ' nodes removed from ' + range + '.');
-  }
+  $.log.isTraceEnabled() && $.log.trace(numNodesRemoved + ' nodes removed from ' + range + '.');
 };
 
 /**

@@ -29,9 +29,9 @@ scout.PopupWindow = function(myWindow, form) { // use 'myWindow' in place of 'wi
 };
 
 scout.PopupWindow.prototype._onUnload = function() {
-  $.log.debug('stored form ID ' + this.form.id + ' to session storage');
+  $.log.isDebugEnabled() && $.log.debug('stored form ID ' + this.form.id + ' to session storage');
   if (this.form.destroyed) {
-    $.log.debug('form ID ' + this.form.id + ' is already destroyed - don\'t trigger unload event');
+    $.log.isDebugEnabled() && $.log.debug('form ID ' + this.form.id + ' is already destroyed - don\'t trigger unload event');
   } else {
     this.events.trigger('popupWindowUnload', this);
   }
@@ -98,7 +98,7 @@ scout.PopupWindow.prototype._onResize = function() {
     height = $myWindow.height(),
     left = this.myWindow.screenX,
     top = this.myWindow.screenY;
-  $.log.debug('popup-window resize: width=' + width + ' height=' + height + ' top=' + top + ' left=' + left);
+  $.log.isDebugEnabled() && $.log.debug('popup-window resize: width=' + width + ' height=' + height + ' top=' + top + ' left=' + left);
 
   this.form.storeCacheBounds(new scout.Rectangle(left, top, width, height));
   var windowSize = new scout.Dimension($myWindow.width(), $myWindow.height());

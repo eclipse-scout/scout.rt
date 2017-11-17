@@ -81,6 +81,6 @@ scout.NumberColumnUserFilter.prototype._onPropertyChange = function(event) {
   }
   this.numberFrom = this.numberFromField.value;
   this.numberTo = this.numberToField.value;
-  $.log.debug('(NumberColumnUserFilter#_onPropertyChange) numberFrom=' + this.numberFrom + ' numberTo=' + this.numberTo);
+  $.log.isDebugEnabled() && $.log.debug('(NumberColumnUserFilter#_onPropertyChange) numberFrom=' + this.numberFrom + ' numberTo=' + this.numberTo);
   this.triggerFilterFieldsChanged(event);
 };

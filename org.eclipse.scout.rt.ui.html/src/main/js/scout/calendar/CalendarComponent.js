@@ -38,7 +38,6 @@ scout.CalendarComponent.prototype._remove = function() {
 };
 
 scout.CalendarComponent.prototype._render = function() {
-  $.log.debug('(CalendarComponent#_render)');
   var i, partDay, $day, $part;
 
   for (i = 0; i < this.coveredDays.length; i++) {

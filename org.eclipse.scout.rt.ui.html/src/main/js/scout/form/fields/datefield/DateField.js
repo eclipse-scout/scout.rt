@@ -1335,7 +1335,7 @@ scout.DateField.prototype.closePopup = function() {
 };
 
 scout.DateField.prototype.toggleDatePopup = function() {
-  $.log.info('(DateField#toggleDatePopup) popupOpen=', !!this.popup);
+  $.log.isInfoEnabled() && $.log.info('(DateField#toggleDatePopup) popupOpen=', !!this.popup);
   if (this.popup) {
     this.closePopup();
   } else {
@@ -1360,7 +1360,7 @@ scout.DateField.prototype.openTimePopup = function(date) {
 };
 
 scout.DateField.prototype.toggleTimePopup = function() {
-  $.log.info('(DateField#toggleTimePopup) popupOpen=', !!this.popup);
+  $.log.isInfoEnabled() && $.log.info('(DateField#toggleTimePopup) popupOpen=', !!this.popup);
   if (this.popup) {
     this.closePopup();
   } else {

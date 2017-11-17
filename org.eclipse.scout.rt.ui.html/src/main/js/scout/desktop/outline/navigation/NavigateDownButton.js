@@ -79,7 +79,7 @@ scout.NavigateDownButton.prototype._drill = function() {
   }
 
   if (drillNode) {
-    $.log.debug('drill down to node ' + drillNode);
+    $.log.isDebugEnabled() && $.log.debug('drill down to node ' + drillNode);
     // Collapse other expanded child nodes
     var parentNode = drillNode.parentNode;
     if (parentNode) {

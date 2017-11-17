@@ -253,7 +253,7 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
     this.$container.css('margin-bottom', '');
   }
 
-  $.log.trace('bodyWidth=' + bodyWidth + ' pos=[left=' + pos.left + ' top=' + pos.top + '] headSize=' + headSize +
+  $.log.isTraceEnabled() && $.log.trace('bodyWidth=' + bodyWidth + ' pos=[left=' + pos.left + ' top=' + pos.top + '] headSize=' + headSize +
     ' headInsets=' + headInsets + ' left=' + left + ' top=' + top);
   this.$head.cssTop(headTop);
   this.$body.cssTop(bodyTop);

@@ -46,7 +46,7 @@ scout.scrollbars = {
     } else {
       this._$scrollables[session] = [$container];
     }
-    $.log.trace('Scrollable added: ' + $container.attr('class') + '. New length: ' + this._$scrollables[session].length);
+    $.log.isTraceEnabled() && $.log.trace('Scrollable added: ' + $container.attr('class') + '. New length: ' + this._$scrollables[session].length);
   },
 
   removeScrollable: function(session, $container) {
@@ -54,7 +54,7 @@ scout.scrollbars = {
     if (this._$scrollables[session]) {
       initLength = this._$scrollables[session].length;
       scout.arrays.$remove(this._$scrollables[session], $container);
-      $.log.trace('Scrollable removed: ' + $container.attr('class') + '. New length: ' + this._$scrollables[session].length);
+      $.log.isTraceEnabled() && $.log.trace('Scrollable removed: ' + $container.attr('class') + '. New length: ' + this._$scrollables[session].length);
       if (initLength === this._$scrollables[session].length) {
         throw new Error('scrollable could not be removed. Potential memory leak. ' + $container.attr('class'));
       }
@@ -95,7 +95,7 @@ scout.scrollbars = {
     return $container;
 
     function installNativeScrollbars() {
-      $.log.trace('use native scrollbars for container ' + scout.graphics.debugOutput($container));
+      $.log.isTraceEnabled() && $.log.trace('use native scrollbars for container ' + scout.graphics.debugOutput($container));
       if (options.axis === 'x') {
         $container
           .css('overflow-x', 'auto')
@@ -111,7 +111,7 @@ scout.scrollbars = {
     }
 
     function installJsScrollbars() {
-      $.log.trace('installing JS-scrollbars for container ' + scout.graphics.debugOutput($container));
+      $.log.isTraceEnabled() && $.log.trace('installing JS-scrollbars for container ' + scout.graphics.debugOutput($container));
       scrollbars = scout.arrays.ensure($container.data('scrollbars'));
       scrollbars.forEach(function(scrollbar) {
         scrollbar.destroy();
@@ -463,7 +463,7 @@ scout.scrollbars = {
         $scrollable.data('scrollTop', scrollTop);
         scrollLeft = $scrollable.scrollLeft();
         $scrollable.data('scrollLeft', $scrollable.scrollLeft());
-        $.log.trace('Stored scroll position for ' + $scrollable.attr('class') + '. Top: ' + scrollTop + '. Left: ' + scrollLeft);
+        $.log.isTraceEnabled() && $.log.trace('Stored scroll position for ' + $scrollable.attr('class') + '. Top: ' + scrollTop + '. Left: ' + scrollLeft);
       }
     });
   },
@@ -496,7 +496,7 @@ scout.scrollbars = {
         // -> outline tab gets rendered, scrollbar gets updated with set timeout, outline tab gets detached
         // -> update event never had any effect because it executed after detaching (due to set timeout)
         scout.scrollbars.update($scrollable);
-        $.log.trace('Restored scroll position for ' + $scrollable.attr('class') + '. Top: ' + scrollTop + '. Left: ' + scrollLeft);
+        $.log.isTraceEnabled() && $.log.trace('Restored scroll position for ' + $scrollable.attr('class') + '. Top: ' + scrollTop + '. Left: ' + scrollLeft);
       }
     });
   },

@@ -242,7 +242,7 @@ scout.BrowserField.prototype._popupWindowOpen = function() {
         popupWindowClosed = this._popupWindow === null || this._popupWindow.closed;
       } catch (e) {
         // for some unknown reason, IE sometimes throws a "SCRIPT16386" error while trying to read '._popupWindow.closed'.
-        $.log.info('Reading the property popupWindow.closed threw an error (Retry in 500ms)');
+        $.log.isInfoEnabled() && $.log.info('Reading the property popupWindow.closed threw an error (Retry in 500ms)');
         return;
       }
       if (popupWindowClosed) {
@@ -257,10 +257,10 @@ scout.BrowserField.prototype._popupWindowOpen = function() {
 
 scout.BrowserField.prototype._onMessage = function(event) {
   if (event.source !== this.$field[0].contentWindow) {
-    $.log.trace('skipped post-message, because different source. data=' + event.data + ' origin=' + event.origin);
+    $.log.isTraceEnabled() && $.log.trace('skipped post-message, because different source. data=' + event.data + ' origin=' + event.origin);
     return;
   }
-  $.log.debug('received post-message data=' + event.data + ' origin=' + event.origin);
+  $.log.isDebugEnabled() && $.log.debug('received post-message data=' + event.data + ' origin=' + event.origin);
   this.trigger('message', {
     data: event.data,
     origin: event.origin

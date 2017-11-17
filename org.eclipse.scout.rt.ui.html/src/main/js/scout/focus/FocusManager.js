@@ -124,7 +124,7 @@ scout.FocusManager.prototype.activate = function(activate) {
   if (this.active !== activate) {
     this.active = activate;
     if ($.log.isDebugEnabled()) {
-      $.log.debug('Focus manager active: ' + this.active);
+      $.log.isDebugEnabled() && $.log.debug('Focus manager active: ' + this.active);
     }
     if (this.active) {
       this.validateFocus();

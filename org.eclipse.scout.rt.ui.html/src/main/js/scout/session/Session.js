@@ -248,7 +248,7 @@ scout.Session.prototype.createModelAdapter = function(adapterData) {
     session: this
   };
   var adapter = scout.create(objectType, adapterModel, createOpts);
-  $.log.trace('created new adapter ' + adapter);
+  $.log.isTraceEnabled() && $.log.trace('created new adapter ' + adapter);
   return adapter;
 };
 
@@ -418,10 +418,10 @@ scout.Session.prototype._processStartupResponse = function(data) {
 
     this.ready = true;
 
-    $.log.info('Session initialized. Detected ' + scout.device);
+    $.log.isInfoEnabled() && $.log.info('Session initialized. Detected ' + scout.device);
     if ($.log.isDebugEnabled()) {
-      $.log.debug('size of _adapterDataCache after session has been initialized: ' + scout.objects.countOwnProperties(this._adapterDataCache));
-      $.log.debug('size of modelAdapterRegistry after session has been initialized: ' + scout.objects.countOwnProperties(this.modelAdapterRegistry));
+      $.log.isDebugEnabled() && $.log.debug('size of _adapterDataCache after session has been initialized: ' + scout.objects.countOwnProperties(this._adapterDataCache));
+      $.log.isDebugEnabled() && $.log.debug('size of modelAdapterRegistry after session has been initialized: ' + scout.objects.countOwnProperties(this.modelAdapterRegistry));
     }
   }.bind(this);
 
@@ -756,7 +756,7 @@ scout.Session.prototype.abortAllAjaxCalls = function() {
  */
 scout.Session.prototype._resumeBackgroundJobPolling = function() {
   if (this.backgroundJobPollingSupport.enabled && this.backgroundJobPollingSupport.status !== scout.BackgroundJobPollingStatus.RUNNING) {
-    $.log.info('Resume background jobs polling request, status was=' + this.backgroundJobPollingSupport.status);
+    $.log.isInfoEnabled() && $.log.info('Resume background jobs polling request, status was=' + this.backgroundJobPollingSupport.status);
     this._pollForBackgroundJobs();
   }
 };
@@ -883,7 +883,7 @@ scout.Session.prototype._copyAdapterData = function(adapterData) {
     count++;
   }
   if (count > 0) {
-    $.log.trace('Stored ' + count + ' properties in adapterDataCache');
+    $.log.isTraceEnabled() && $.log.trace('Stored ' + count + ' properties in adapterDataCache');
   }
 };
 
@@ -1327,7 +1327,7 @@ scout.Session.prototype._processEvents = function(events) {
       // encountered before the "showForm" event has been processed. If the target adapter cannot be
       // resolved, we try the other events first, expecting them to trigger the creation of the event
       // adapter. As soon as a event could be processed successfully, we try our postponed event again.
-      $.log.debug("Postponing '" + event.type + "' for adapter with ID " + event.target);
+      $.log.isDebugEnabled() && $.log.debug("Postponing '" + event.type + "' for adapter with ID " + event.target);
       i++;
       continue;
     }
@@ -1336,7 +1336,7 @@ scout.Session.prototype._processEvents = function(events) {
     events.splice(i, 1);
     i = 0;
 
-    $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.target);
+    $.log.isDebugEnabled() && $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.target);
     adapter.onModelEvent(event);
     adapter.resetEventFilters();
   }
@@ -1351,7 +1351,7 @@ scout.Session.prototype._processEvents = function(events) {
 };
 
 scout.Session.prototype.start = function() {
-  $.log.info('Session starting...');
+  $.log.isInfoEnabled() && $.log.info('Session starting...');
 
   // After a short time, display a loading animation (will be removed again in _renderDesktop)
   this._setApplicationLoading(true);
@@ -1452,7 +1452,7 @@ scout.Session.prototype._onReloadPage = function(event) {
 };
 
 scout.Session.prototype._onWindowBeforeUnload = function() {
-  $.log.info('Session before unloading...');
+  $.log.isInfoEnabled() && $.log.info('Session before unloading...');
   // TODO [7.0] BSH Cancel pending requests
 
   // Set a flag that indicates unloading before _onWindowUnload() is called.
@@ -1466,7 +1466,7 @@ scout.Session.prototype._onWindowBeforeUnload = function() {
 };
 
 scout.Session.prototype._onWindowUnload = function() {
-  $.log.info('Session unloading...');
+  $.log.isInfoEnabled() && $.log.info('Session unloading...');
   this.unloaded = true;
 
   // Close popup windows

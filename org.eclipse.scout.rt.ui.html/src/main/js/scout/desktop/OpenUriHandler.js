@@ -15,7 +15,7 @@ scout.OpenUriHandler.prototype.init = function(model) {
 };
 
 scout.OpenUriHandler.prototype.openUri = function(uri, action) {
-  $.log.debug('(OpenUriHandler#openUri) uri=' + uri + ' action=' + action);
+  $.log.isDebugEnabled() && $.log.debug('(OpenUriHandler#openUri) uri=' + uri + ' action=' + action);
   if (!uri) {
     return;
   }

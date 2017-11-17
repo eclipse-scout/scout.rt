@@ -161,12 +161,12 @@ scout.ObjectFactory.prototype.createUniqueId = function() {
 };
 
 scout.ObjectFactory.prototype.register = function(objectType, createFunc) {
-  $.log.debug('(ObjectFactory) registered create-function for objectType ' + objectType);
+  $.log.isDebugEnabled() && $.log.debug('(ObjectFactory) registered create-function for objectType ' + objectType);
   this._registry[objectType] = createFunc;
 };
 
 scout.ObjectFactory.prototype.unregister = function(objectType) {
-  $.log.debug('(ObjectFactory) unregistered objectType ' + objectType);
+  $.log.isDebugEnabled() && $.log.debug('(ObjectFactory) unregistered objectType ' + objectType);
   delete this._registry[objectType];
 };
 

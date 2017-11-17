@@ -46,7 +46,7 @@ scout.RemoteLookupCall.prototype.getByRec = function(rec) {
 
 scout.RemoteLookupCall.prototype.resolveLookup = function(lookupResult) {
   if (!this._belongsToLatestRequest(lookupResult)) {
-    $.log.trace('(RemoteLookupCall#resolveLookup) ignore lookupResult. Does not belong to latest request', this.deferred.requestParameter);
+    $.log.isTraceEnabled() && $.log.trace('(RemoteLookupCall#resolveLookup) ignore lookupResult. Does not belong to latest request', this.deferred.requestParameter);
     return;
   }
 

@@ -88,7 +88,7 @@ scout.locales = {
     }
 
     // Otherwise search a locale with the same language
-    $.log.info('Locale for languageTag ' + languageTag + ' not found. Trying to load best match.');
+    $.log.isInfoEnabled() && $.log.info('Locale for languageTag ' + languageTag + ' not found. Trying to load best match.');
     var language = this.splitLanguageTag(languageTag)[0];
     locale = scout.locales.findFirstForLanguage(language);
     if (locale) {
@@ -96,7 +96,7 @@ scout.locales = {
     }
 
     // If still not found, use the default locale
-    $.log.info('Still no matching locale for languageTag ' + languageTag + ' found. Using default locale.');
+    $.log.isInfoEnabled() && $.log.info('Still no matching locale for languageTag ' + languageTag + ' found. Using default locale.');
     return new scout.Locale();
   },
 

@@ -152,7 +152,7 @@ scout.ValueField.prototype.parseAndSetValue = function(displayText) {
 };
 
 scout.ValueField.prototype._parsingFailed = function(displayText, error) {
-  $.log.debug('Parsing failed for field with id ' + this.id, error);
+  $.log.isDebugEnabled() && $.log.debug('Parsing failed for field with id ' + this.id, error);
   var event = new scout.Event({
     displayText: displayText,
     error: error
@@ -434,7 +434,7 @@ scout.ValueField.prototype._validateValue = function(value) {
 };
 
 scout.ValueField.prototype._validationFailed = function(value, error) {
-  $.log.debug('Validation failed for field with id ' + this.id, error);
+  $.log.isDebugEnabled() && $.log.debug('Validation failed for field with id ' + this.id, error);
   var status = this._createValidationFailedStatus(value, error);
   this._updateErrorStatus(status);
   this._updateDisplayText(value);

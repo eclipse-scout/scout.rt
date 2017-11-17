@@ -57,7 +57,7 @@ scout.App.prototype._prepareDone = function(options) {
   this.trigger('prepare', {
     options: options
   });
-  $.log.debug('App prepared');
+  $.log.isDebugEnabled() && $.log.debug('App prepared');
 };
 
 scout.App.prototype._prepareLogging = function(options) {
@@ -101,7 +101,7 @@ scout.App.prototype._bootstrapDone = function(options) {
   this.trigger('bootstrap', {
     options: options
   });
-  $.log.debug('App bootstrapped');
+  $.log.isDebugEnabled() && $.log.debug('App bootstrapped');
 };
 
 /**
@@ -124,7 +124,7 @@ scout.App.prototype._init = function(options) {
 
 scout.App.prototype._checkBrowserCompability = function(options) {
   var device = scout.device;
-  $.log.info('Detected browser ' + device.browser + ' version ' + device.browserVersion);
+  $.log.isInfoEnabled() && $.log.info('Detected browser ' + device.browser + ' version ' + device.browserVersion);
   if (!scout.nvl(options.checkBrowserCompatibility, true) || device.isSupportedBrowser()) {
     // No check requested or browser is supported
     return true;
@@ -242,7 +242,7 @@ scout.App.prototype._loadSession = function($entryPoint, options) {
 
     session.ready = true;
     this.trigger('sessionReady', {session: session});
-    $.log.info('Session initialized. Detected ' + scout.device);
+    $.log.isInfoEnabled() && $.log.info('Session initialized. Detected ' + scout.device);
   }.bind(this));
   return session;
 };
@@ -270,7 +270,7 @@ scout.App.prototype._initDone = function(options) {
   this.trigger('init', {
     options: options
   });
-  $.log.info('App initialized');
+  $.log.isInfoEnabled() && $.log.info('App initialized');
 };
 
 scout.App.prototype._fail = function(options, error) {

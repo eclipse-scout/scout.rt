@@ -25,7 +25,7 @@ scout.Reconnector.prototype.start = function() {
     return;
   }
 
-  $.log.trace('[ajax reconnector] start');
+  $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] start');
   this.started = true;
   this._schedulePing(this.initialDelay);
 };
@@ -35,7 +35,7 @@ scout.Reconnector.prototype.stop = function() {
 };
 
 scout.Reconnector.prototype._schedulePing = function(delay) {
-  $.log.trace('[ajax reconnector] schedule ping() in ' + delay + ' ms');
+  $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] schedule ping() in ' + delay + ' ms');
   setTimeout(this._ping.bind(this), delay);
 };
 
@@ -57,7 +57,7 @@ scout.Reconnector.prototype._ping = function() {
     ping: true
   });
 
-  $.log.trace('[ajax reconnector] ' + pingAjaxOptions.type + ' "' + pingAjaxOptions.url + '"');
+  $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ' + pingAjaxOptions.type + ' "' + pingAjaxOptions.url + '"');
   this.pingStartTimestamp = Date.now();
   $.ajax(pingAjaxOptions)
     .done(this._onPingDone.bind(this))
@@ -65,14 +65,14 @@ scout.Reconnector.prototype._ping = function() {
 };
 
 scout.Reconnector.prototype._onPingDone = function(data, textStatus, jqXHR) {
-  $.log.trace('[ajax reconnector] ping success -> connection re-established!');
+  $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ping success -> connection re-established!');
   this.session.onReconnectingSucceeded();
   this.stop();
 };
 
 scout.Reconnector.prototype._onPingFail = function(jqXHR, textStatus, errorThrown) {
   var handleFailedPing = function handleFailedPing() {
-    $.log.trace('[ajax reconnector] ping failed');
+    $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ping failed');
     this.session.onReconnectingFailed();
     this._schedulePing(this.interval);
   }.bind(this);

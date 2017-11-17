@@ -253,7 +253,7 @@ scout.Widget.prototype._destroyChild = function(child) {
  * If not specified, the $container of the parent is used.
  */
 scout.Widget.prototype.render = function($parent) {
-  $.log.trace('Rendering widget: ' + this);
+  $.log.isTraceEnabled() && $.log.trace('Rendering widget: ' + this);
   if (!this.initialized) {
     throw new Error('Not initialized: ' + this);
   }
@@ -357,7 +357,7 @@ scout.Widget.prototype._removeInternal = function() {
     return;
   }
 
-  $.log.trace('Removing widget: ' + this);
+  $.log.isTraceEnabled() && $.log.trace('Removing widget: ' + this);
   this.removing = true;
 
   // remove children in reverse order.
@@ -485,18 +485,14 @@ scout.Widget.prototype.setParent = function(parent) {
 };
 
 scout.Widget.prototype.addChild = function(child) {
-  if ($.log.isTraceEnabled()) {
-    $.log.trace('addChild(' + child + ') to ' + this);
-  }
+  $.log.isTraceEnabled() && $.log.trace('addChild(' + child + ') to ' + this);
   if (this.children.indexOf(child) === -1) {
     this.children.push(child);
   }
 };
 
 scout.Widget.prototype.removeChild = function(child) {
-  if ($.log.isTraceEnabled()) {
-    $.log.trace('removeChild(' + child + ') from ' + this);
-  }
+  $.log.isTraceEnabled() && $.log.trace('removeChild(' + child + ') from ' + this);
   scout.arrays.remove(this.children, child);
 };
 

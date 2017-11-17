@@ -129,7 +129,7 @@ scout.SimpleTabAreaLayout.prototype._onMouseDownOverflow = function(event) {
       tab: tab
     });
     menu.on('action', function() {
-      $.log.debug('(SimpleTabAreaLayout#_onMouseDownOverflow) tab=' + this);
+      $.log.isDebugEnabled() && $.log.debug('(SimpleTabAreaLayout#_onMouseDownOverflow) tab=' + this);
       tabArea.selectTab(this);
     }.bind(tab));
     overflowMenus.push(menu);

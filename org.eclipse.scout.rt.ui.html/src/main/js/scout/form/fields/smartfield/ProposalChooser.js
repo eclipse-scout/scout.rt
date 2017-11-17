@@ -159,7 +159,7 @@ scout.ProposalChooser.prototype._updateStatusImpl = function() {
     return;
   }
 
-  $.log.debug('_updateStatus statusVisible=' + visible);
+  $.log.isDebugEnabled() && $.log.debug('_updateStatus statusVisible=' + visible);
   this.$status.setVisible(visible);
   if (this.status) {
     this._setStatusMessage(this.status.message);

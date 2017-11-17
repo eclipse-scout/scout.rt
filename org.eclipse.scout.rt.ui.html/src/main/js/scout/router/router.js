@@ -54,7 +54,7 @@ scout.router = {
       if (route.matches(location)) {
 
         if (route === this.currentRoute && route.location === location) {
-          $.log.debug('Route has not changed - do not activate route');
+          $.log.isDebugEnabled() && $.log.debug('Route has not changed - do not activate route');
           return;
         }
 
@@ -68,7 +68,7 @@ scout.router = {
         this.currentRoute.activate(location);
 
         window.location.replace(location);
-        $.log.info('router: activated route for location=', location);
+        $.log.isInfoEnabled() && ('router: activated route for location=', location);
 
         this.events.trigger('routeChange', {
           route: route

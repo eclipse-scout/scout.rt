@@ -56,7 +56,7 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
     }
   }
 
-  $.log.trace('(GroupBoxLayout#layout) gbBodySize=' + gbBodySize);
+  $.log.isTraceEnabled() && $.log.trace('(GroupBoxLayout#layout) gbBodySize=' + gbBodySize);
   htmlGbBody.setSize(gbBodySize);
 
    if (htmlGbBody.scrollable || this._groupBox.bodyLayoutConfig.minWidth > 0 ) {

@@ -25,9 +25,9 @@ scout.comparators = {
       // set static collator variable once
       if (scout.device.supportsInternationalization()) {
         this.collator = new window.Intl.Collator(session.locale.languageTag);
-        $.log.info('(comparators.TEXT#install) Browser supports i18n - installed Intl.Collator, can sort in Browser');
+        $.log.isInfoEnabled() && $.log.info('(comparators.TEXT#install) Browser supports i18n - installed Intl.Collator, can sort in Browser');
       } else {
-        $.log.info('(comparators.TEXT#install) Browser doesn\'t support i18n. Must sort on server');
+        $.log.isInfoEnabled() && $.log.info('(comparators.TEXT#install) Browser doesn\'t support i18n. Must sort on server');
       }
 
       this.installed = true;

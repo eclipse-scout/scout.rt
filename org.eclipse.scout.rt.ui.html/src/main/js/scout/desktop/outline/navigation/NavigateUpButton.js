@@ -45,14 +45,14 @@ scout.NavigateUpButton.prototype._buttonEnabled = function() {
 scout.NavigateUpButton.prototype._drill = function() {
   var parentNode = this.node.parentNode;
   if (parentNode) {
-    $.log.debug('drill up to node ' + parentNode);
+    $.log.isDebugEnabled() && $.log.debug('drill up to node ' + parentNode);
     this.outline.navigateUpInProgress = true;
     this.outline.selectNodes(parentNode);
     this.outline.collapseNode(parentNode, {
       collapseChildNodes: true
     });
   } else {
-    $.log.debug('drill up to top');
+    $.log.isDebugEnabled() && $.log.debug('drill up to top');
     this.outline.navigateToTop();
   }
 };

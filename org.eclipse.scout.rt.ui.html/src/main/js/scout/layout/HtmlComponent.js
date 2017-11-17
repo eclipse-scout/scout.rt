@@ -211,7 +211,7 @@ scout.HtmlComponent.prototype.prefSize = function(options) {
     options.widthHint -= this.insets(true).horizontal();
   }
   var prefSize = this.layout.preferredLayoutSize(this.$comp, options);
-  $.log.trace('(HtmlComponent#getPreferredSize) ' + this.debug() + ' widthHint=' + options.widthHint + ' heightHint=' + options.heightHint + ' preferredSize=' + prefSize);
+  $.log.isTraceEnabled() && $.log.trace('(HtmlComponent#getPreferredSize) ' + this.debug() + ' widthHint=' + options.widthHint + ' heightHint=' + options.heightHint + ' preferredSize=' + prefSize);
   return prefSize;
 };
 

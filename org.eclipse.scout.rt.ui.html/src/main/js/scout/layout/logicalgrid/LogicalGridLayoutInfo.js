@@ -90,7 +90,7 @@ scout.LogicalGridLayoutInfo = function(model) {
   //
   this.cols = usedCols.size();
   this.rows = usedRows.size();
-  $.log.trace('(LogicalGridLayoutInfo#CTOR) $components.length=' + this.$components.length + ' usedCols=' + this.cols + ' usedRows=' + this.rows);
+  $.log.isTraceEnabled() && $.log.trace('(LogicalGridLayoutInfo#CTOR) $components.length=' + this.$components.length + ' usedCols=' + this.cols + ' usedRows=' + this.rows);
   this._initializeInfo();
 };
 

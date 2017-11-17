@@ -3717,7 +3717,7 @@ scout.Table.prototype._renderFiller = function() {
   var fillBeforeHeight = this._calculateFillerHeight(new scout.Range(0, this.viewRangeRendered.from));
   this.$fillBefore.cssHeight(fillBeforeHeight);
   this.$fillBefore.cssWidth(this.rowWidth);
-  $.log.trace('FillBefore height: ' + fillBeforeHeight);
+  $.log.isTraceEnabled() && $.log.trace('FillBefore height: ' + fillBeforeHeight);
 
   if (!this.$fillAfter) {
     this.$fillAfter = this.$data.appendDiv('table-data-fill');
@@ -3727,7 +3727,7 @@ scout.Table.prototype._renderFiller = function() {
   var fillAfterHeight = this._calculateFillerHeight(new scout.Range(this.viewRangeRendered.to, this.filteredRows().length));
   this.$fillAfter.cssHeight(fillAfterHeight);
   this.$fillAfter.cssWidth(this.rowWidth);
-  $.log.trace('FillAfter height: ' + fillAfterHeight);
+  $.log.isTraceEnabled() && $.log.trace('FillAfter height: ' + fillAfterHeight);
 };
 
 scout.Table.prototype._applyFillerStyle = function($filler) {

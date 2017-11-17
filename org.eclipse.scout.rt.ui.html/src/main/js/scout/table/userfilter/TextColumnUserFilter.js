@@ -76,7 +76,7 @@ scout.TextColumnUserFilter.prototype.addFilterFields = function(groupBox) {
 
 scout.TextColumnUserFilter.prototype._onAcceptInput = function(event) {
   this.freeText = this.freeTextField.$field.val().trim();
-  $.log.debug('(TextColumnUserFilter#_onAcceptInput) freeText=' + this.freeText);
+  $.log.isDebugEnabled() && $.log.debug('(TextColumnUserFilter#_onAcceptInput) freeText=' + this.freeText);
   this.triggerFilterFieldsChanged(event);
 };
 

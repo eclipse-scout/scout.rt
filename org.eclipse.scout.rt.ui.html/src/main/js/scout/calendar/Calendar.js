@@ -170,7 +170,6 @@ scout.Calendar.prototype._renderDisplayMode = function(oldDisplayMode) {
   if (oldDisplayMode === scout.Calendar.DisplayMode.MONTH || this.displayMode === scout.Calendar.DisplayMode.MONTH) {
     this._renderComponents();
   }
-  $.log.debug('(Calendar#_renderDisplayMode) impl.');
 };
 
 scout.Calendar.prototype._setViewRange = function(viewRange) {
@@ -180,7 +179,6 @@ scout.Calendar.prototype._setViewRange = function(viewRange) {
 
 scout.Calendar.prototype._setMenus = function(menus) {
   this._setProperty('menus', menus);
-  $.log.debug('(Calendar#_setMenus) impl.');
 };
 
 scout.Calendar.prototype._render = function() {
@@ -259,8 +257,6 @@ scout.Calendar.prototype._renderProperties = function() {
   this._renderSelectedComponent();
   this._renderLoadInProgress();
   this._renderDisplayMode();
-  this._renderSelectedDate();
-  this._renderViewRange();
 };
 
 scout.Calendar.prototype._renderComponents = function() {
@@ -275,7 +271,6 @@ scout.Calendar.prototype._renderComponents = function() {
 };
 
 scout.Calendar.prototype._renderSelectedComponent = function() {
-  $.log.debug('(Calendar#_renderSelectedComponent)');
   if (this.selectedComponent) {
     this.selectedComponent.setSelected(true);
   }
@@ -283,14 +278,6 @@ scout.Calendar.prototype._renderSelectedComponent = function() {
 
 scout.Calendar.prototype._renderLoadInProgress = function() {
   this.$progress.setVisible(this.loadInProgress);
-};
-
-scout.Calendar.prototype._renderViewRange = function() {
-  $.log.debug('(Calendar#_renderViewRange) impl.');
-};
-
-scout.Calendar.prototype._renderSelectedDate = function() {
-  $.log.debug('(Calendar#_renderSelectedDate) impl.');
 };
 
 /* -- basics, events -------------------------------------------- */
@@ -477,7 +464,7 @@ scout.Calendar.prototype._setSelection = function(selectedDate, selectedComponen
 /* --  set display mode and range ------------------------------------- */
 
 scout.Calendar.prototype._updateScreen = function(animate) {
-  $.log.info('(Calendar#_updateScreen)');
+  $.log.isInfoEnabled() && $.log.info('(Calendar#_updateScreen)');
 
   // select mode
   $('.calendar-mode', this.$commands).select(false);

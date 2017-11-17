@@ -29,7 +29,7 @@ scout.FormLayout.prototype.layout = function($container) {
     rootGbSize.height -= this._titleHeight();
   }
 
-  $.log.trace('(FormLayout#layout) rootGbSize=' + rootGbSize);
+  $.log.isTraceEnabled() && $.log.trace('(FormLayout#layout) rootGbSize=' + rootGbSize);
   htmlRootGb.setSize(rootGbSize);
 };
 

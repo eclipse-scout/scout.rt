@@ -72,7 +72,7 @@ scout.ProposalField.prototype._ensureValue = function(value) {
 };
 
 scout.ProposalField.prototype._acceptByText = function(searchText) {
-  $.log.debug('(ProposalField#_acceptByText) searchText=', searchText);
+  $.log.isDebugEnabled() && $.log.debug('(ProposalField#_acceptByText) searchText=', searchText);
   if (this.lookupOnAcceptByText) {
     scout.ProposalField.parent.prototype._acceptByText.call(this, searchText);
   } else {
@@ -139,14 +139,14 @@ scout.ProposalField.prototype._copyValuesFromField = function(otherField) {
 scout.ProposalField.prototype._acceptInput = function(searchText, searchTextEmpty, searchTextChanged, selectedLookupRow) {
   // Do nothing when search text is equals to the text of the current lookup row
   if (!selectedLookupRow && this.lookupRow && this.lookupRow.text === searchText) {
-    $.log.debug('(ProposalField#_acceptInput) unchanged: text is equals. Close popup');
+    $.log.isDebugEnabled() && $.log.debug('(ProposalField#_acceptInput) unchanged: text is equals. Close popup');
     this._inputAccepted(false);
     return;
   }
 
   // 2.) proposal chooser is open -> use the selected row as value
   if (selectedLookupRow) {
-    $.log.debug('(ProposalField#_acceptInput) lookup-row selected. Set lookup-row, close popup lookupRow=', selectedLookupRow.toString());
+    $.log.isDebugEnabled() && $.log.debug('(ProposalField#_acceptInput) lookup-row selected. Set lookup-row, close popup lookupRow=', selectedLookupRow.toString());
     this.clearErrorStatus();
     this.setLookupRow(selectedLookupRow);
     this._inputAccepted();

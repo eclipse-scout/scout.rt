@@ -137,7 +137,7 @@ scout.TabBox.prototype._setSelectedTab = function(tab) {
   if (this.selectedTab === tab) {
     return;
   }
-  $.log.debug('(TabBox#_selectTab) tab=' + tab);
+  $.log.isDebugEnabled() && $.log.debug('(TabBox#_selectTab) tab=' + tab);
   var oldSelectedTab = this.selectedTab;
   var selectedTab = tab;
   if (oldSelectedTab) {

@@ -161,7 +161,7 @@ scout.SmartField.prototype._renderDisplayText = function() {
  */
 scout.SmartField.prototype.acceptInput = function() {
   if (!this._acceptInputEnabled) {
-    $.log.trace('(SmartField#acceptInput) Skipped acceptInput because _acceptInputEnabled=false');
+    $.log.isTraceEnabled() && $.log.trace('(SmartField#acceptInput) Skipped acceptInput because _acceptInputEnabled=false');
     return this._acceptInputDeferred.promise();
   }
 
@@ -190,7 +190,7 @@ scout.SmartField.prototype.acceptInput = function() {
   this._clearPendingLookup();
 
   if (this.touch) {
-    $.log.debug('(SmartField#acceptInput) Always send acceptInput for touch field');
+    $.log.isDebugEnabled() && $.log.debug('(SmartField#acceptInput) Always send acceptInput for touch field');
     this._inputAccepted();
     return;
   }
@@ -217,7 +217,7 @@ scout.SmartField.prototype._acceptInput = function(searchText, searchTextEmpty, 
   if (!selectedLookupRow && this.lookupRow) {
     var lookupRowText = scout.strings.nvl(this.lookupRow.text);
     if (lookupRowText === searchText) {
-      $.log.debug('(SmartField#acceptInput) unchanged: text is equals. Close popup');
+      $.log.isDebugEnabled() && $.log.debug('(SmartField#acceptInput) unchanged: text is equals. Close popup');
       this._inputAccepted(false);
       return;
     }
@@ -227,7 +227,7 @@ scout.SmartField.prototype._acceptInput = function(searchText, searchTextEmpty, 
   // trigger event when search text has changed. This is required for the case where
   // a field is cleared, and the remote model must be updated (value=null)
   if (!selectedLookupRow && !this.lookupRow && searchTextEmpty) {
-    $.log.debug('(SmartField#acceptInput) unchanged: text is empty. Close popup');
+    $.log.isDebugEnabled() && $.log.debug('(SmartField#acceptInput) unchanged: text is empty. Close popup');
     this.clearErrorStatus();
     this._inputAccepted(searchTextChanged);
     return;
@@ -236,7 +236,7 @@ scout.SmartField.prototype._acceptInput = function(searchText, searchTextEmpty, 
   // 1.) when search text is empty and no lookup-row is selected, simply set the value to null
   // Note: here we assume that a current lookup row is set.
   if (!selectedLookupRow && searchTextEmpty) {
-    $.log.debug('(SmartField#acceptInput) empty. Set lookup-row to null, close popup');
+    $.log.isDebugEnabled() && $.log.debug('(SmartField#acceptInput) empty. Set lookup-row to null, close popup');
     this.clearErrorStatus();
     this.setLookupRow(null);
     this._inputAccepted();
@@ -245,7 +245,7 @@ scout.SmartField.prototype._acceptInput = function(searchText, searchTextEmpty, 
 
   // 2.) proposal chooser is open -> use the selected row as value
   if (selectedLookupRow) {
-    $.log.debug('(SmartField#acceptInput) lookup-row selected. Set lookup-row, close popup lookupRow=', selectedLookupRow.toString());
+    $.log.isDebugEnabled() && $.log.debug('(SmartField#acceptInput) lookup-row selected. Set lookup-row, close popup lookupRow=', selectedLookupRow.toString());
     this.clearErrorStatus();
     this.setLookupRow(selectedLookupRow);
     this._inputAccepted();
@@ -288,7 +288,7 @@ scout.SmartField.prototype._firstTextLine = function(text) {
  * This function is intended to be overridden. Proposal field has another behavior than the smart field.
  */
 scout.SmartField.prototype._acceptByText = function(searchText) {
-  $.log.debug('(SmartField#_acceptByText) searchText=', searchText);
+  $.log.isDebugEnabled() && $.log.debug('(SmartField#_acceptByText) searchText=', searchText);
   this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText))
     .done(this._acceptByTextDone.bind(this));
 };
@@ -320,7 +320,7 @@ scout.SmartField.prototype._focusNextTabbable = function() {
     } else if (nextIndex >= $tabElements.length) {
       nextIndex = 0;
     }
-    $.log.debug('(SmartField#_inputAccepted) tab-index=' + fieldIndex + ' next tab-index=' + nextIndex);
+    $.log.isDebugEnabled() && $.log.debug('(SmartField#_inputAccepted) tab-index=' + fieldIndex + ' next tab-index=' + nextIndex);
     $tabElements.eq(nextIndex).focus();
     this._tabPrevented = null;
   }
@@ -418,7 +418,7 @@ scout.SmartField.prototype._acceptInputFail = function(result) {
 };
 
 scout.SmartField.prototype.lookupByRec = function(rec) {
-  $.log.debug('(SmartField#lookupByRec) rec=', rec);
+  $.log.isDebugEnabled() && $.log.debug('(SmartField#lookupByRec) rec=', rec);
   return this._executeLookup(this.lookupCall.getByRec.bind(this.lookupCall, rec))
     .then(function(result) {
 
@@ -524,7 +524,7 @@ scout.SmartField.prototype._formatLookupRow = function(lookupRow) {
  */
 scout.SmartField.prototype.openPopup = function(browse) {
   var searchText = this._readDisplayText();
-  $.log.info('SmartField#openPopup browse=' + browse + ' searchText=' + searchText + ' popup=' + this.popup + ' pendingOpenPopup=' + this._pendingOpenPopup);
+  $.log.isInfoEnabled() && $.log.info('SmartField#openPopup browse=' + browse + ' searchText=' + searchText + ' popup=' + this.popup + ' pendingOpenPopup=' + this._pendingOpenPopup);
 
   // Reset scheduled focus next tabbable when user clicks on the smartfield while a lookup is resolved.
   this._tabPrevented = null;
@@ -593,13 +593,13 @@ scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText) {
 
   // execute lookup byAll immediately
   if (browse) {
-    $.log.debug('(SmartField#_lookupByTextOrAll) lookup byAll (seachText empty)');
+    $.log.isDebugEnabled() && $.log.debug('(SmartField#_lookupByTextOrAll) lookup byAll (seachText empty)');
     this._executeLookup(this.lookupCall.getAll.bind(this.lookupCall))
       .done(doneHandler);
   } else {
     // execute lookup byText with a debounce/delay
     this._pendingLookup = setTimeout(function() {
-      $.log.debug('(SmartField#_lookupByTextOrAll) lookup byText searchText=' + searchText);
+      $.log.isDebugEnabled() && $.log.debug('(SmartField#_lookupByTextOrAll) lookup byText searchText=' + searchText);
       this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText))
         .done(doneHandler);
     }.bind(this), scout.SmartField.DEBOUNCE_DELAY);
@@ -771,7 +771,7 @@ scout.SmartField.prototype.aboutToBlurByMouseDown = function(target) {
 };
 
 scout.SmartField.prototype._onFieldMouseDown = function(event) {
-  $.log.debug('(SmartField#_onFieldMouseDown)');
+  $.log.isDebugEnabled() && $.log.debug('(SmartField#_onFieldMouseDown)');
   if (!this.enabledComputed) {
     return;
   }
@@ -783,7 +783,7 @@ scout.SmartField.prototype._onFieldMouseDown = function(event) {
 };
 
 scout.SmartField.prototype._onIconMouseDown = function(event) {
-  $.log.debug('(SmartField#_onIconMouseDown)');
+  $.log.isDebugEnabled() && $.log.debug('(SmartField#_onIconMouseDown)');
   if (!this.enabledComputed) {
     return;
   }
@@ -799,7 +799,7 @@ scout.SmartField.prototype._onIconMouseDown = function(event) {
 };
 
 scout.SmartField.prototype._onClearIconMouseDown = function(event) {
-  $.log.debug('(SmartField#_onClearIconMouseDown)');
+  $.log.isDebugEnabled() && $.log.debug('(SmartField#_onClearIconMouseDown)');
   if (!this.enabledComputed) {
     return;
   }
@@ -819,7 +819,7 @@ scout.SmartField.prototype._clear = function() {
 };
 
 scout.SmartField.prototype.togglePopup = function() {
-  $.log.info('(SmartField#togglePopup) popupOpen=', this.isPopupOpen());
+  $.log.isInfoEnabled() && $.log.info('(SmartField#togglePopup) popupOpen=', this.isPopupOpen());
   if (this.isPopupOpen()) {
     this.closePopup();
   } else {
@@ -895,7 +895,7 @@ scout.SmartField.prototype._isPreventDefaultTabHandling = function(event) {
   if (this.isPopupOpen() || this._lookupInProgress) {
     doPrevent = true;
   }
-  $.log.trace('(SmartField#_isPreventDefaultTabHandling) must prevent default when TAB was pressed = ' + doPrevent);
+  $.log.isTraceEnabled() && $.log.trace('(SmartField#_isPreventDefaultTabHandling) must prevent default when TAB was pressed = ' + doPrevent);
   return doPrevent;
 };
 
@@ -911,7 +911,7 @@ scout.SmartField.prototype._onFieldKeyDown = function(event) {
     if (this.mode === scout.FormField.Mode.DEFAULT) {
       event.preventDefault(); // prevent browser default TAB behavior
       event.stopPropagation(); // prevent FocusContext#._onKeyDown
-      $.log.debug('(SmartField#_onFieldKeyDown) set _tabPrevented');
+      $.log.isDebugEnabled() && $.log.debug('(SmartField#_onFieldKeyDown) set _tabPrevented');
       this._tabPrevented = {
         shiftKey: event.shiftKey
       };

@@ -117,7 +117,7 @@ scout.TabAreaLayout.prototype.layout = function($container) {
       for (i = 0; i < numTabs; i++) {
         tab = tabs[i];
         if (visibleTabs.indexOf(i) === -1) {
-          $.log.debug('Overflow tab=' + tab);
+          $.log.isDebugEnabled() && $.log.debug('Overflow tab=' + tab);
           this._overflowTabs.push(tab);
           tab.removeTab();
         }
@@ -155,7 +155,7 @@ scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
       visible: tabItem.visible
     });
     menu.on('action', function(event) {
-      $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + tabItem);
+      $.log.isDebugEnabled() && $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + tabItem);
       tabBox.setSelectedTab(tabItem);
         popup.one('remove', function(event) {
           tabItem.focusTab();

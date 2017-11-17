@@ -122,7 +122,7 @@ scout.Device.prototype._needsFastClick = function() {
 scout.Device.prototype._loadFastClickDeferred = function() {
   return this._loadScriptDeferred('res/fastclick-1.0.6.js', function() {
     FastClick.attach(document.body);
-    $.log.info('FastClick script loaded and attached');
+    $.log.isInfoEnabled() && $.log.info('FastClick script loaded and attached');
   });
 };
 

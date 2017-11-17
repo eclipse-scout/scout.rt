@@ -95,16 +95,16 @@ scout.DesktopFormController.prototype._addPopupWindow = function(newWindow, form
   popupWindow.resizeToPrefSize = resizeToPrefSize;
   popupWindow.events.on('popupWindowUnload', this._onPopupWindowUnload.bind(this));
   this._popupWindows.push(popupWindow);
-  $.log.debug('Opened new popup window for form ID ' + form.id);
+  $.log.isDebugEnabled() && $.log.debug('Opened new popup window for form ID ' + form.id);
 };
 
 scout.DesktopFormController.prototype._onDocumentPopupWindowReady = function(event, data) {
-  $.log.debug('(FormController#_onDocumentPopupWindowReady) data=' + data);
+  $.log.isDebugEnabled() && $.log.debug('(FormController#_onDocumentPopupWindowReady) data=' + data);
   var popupWindow;
   if (data.formId) {
     // reload (existing popup window)
     var i, formId = data.formId;
-    $.log.debug('Popup window for form ID ' + formId + ' has been reloaded');
+    $.log.isDebugEnabled() && $.log.debug('Popup window for form ID ' + formId + ' has been reloaded');
     for (i = 0; i < this._popupWindows.length; i++) {
       popupWindow = this._popupWindows[i];
       if (popupWindow.form.id === formId) {
@@ -126,7 +126,7 @@ scout.DesktopFormController.prototype._onDocumentPopupWindowReady = function(eve
 
 scout.DesktopFormController.prototype._onPopupWindowUnload = function(popupWindow) {
   var form = popupWindow.form;
-  $.log.debug('Popup window for form ID ' + form.id + ' is unloaded - don\'t know if its closed or reloaded yet');
+  $.log.isDebugEnabled() && $.log.debug('Popup window for form ID ' + form.id + ' is unloaded - don\'t know if its closed or reloaded yet');
 
   // this remove() is important: when a popup-window in IE is closed, all references to a HTMLDivElement become
   // invalid. Every call or read on such invalid objects will cause an Error. Even though the DOM element
@@ -139,7 +139,7 @@ scout.DesktopFormController.prototype._onPopupWindowUnload = function(popupWindo
   setTimeout(function() {
     // Check if popup is closed (when the unload event was triggered by page reload it will still be open)
     if (popupWindow.isClosed()) {
-      $.log.debug('Popup window for form ID ' + form.id + ' has been closed');
+      $.log.isDebugEnabled() && $.log.debug('Popup window for form ID ' + form.id + ' has been closed');
       form.close();
     }
   }.bind(this), 250);
