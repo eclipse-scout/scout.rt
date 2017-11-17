@@ -50,7 +50,7 @@ scout.Widget = function() {
 
   this.$container;
   // If set to true, remove won't remove the element immediately but after the animation has been finished
-  // This expects a css animation which may be triggered by the class 'removed'
+  // This expects a css animation which may be triggered by the class 'animate-remove'
   // If browser does not support css animation, remove will be executed immediately
   this.animateRemoval = false;
 
@@ -378,7 +378,7 @@ scout.Widget.prototype._removeInternal = function() {
 };
 
 /**
- * Adds class 'removed' to container which can be used to trigger the animation.
+ * Adds class 'animate-remove' to container which can be used to trigger the animation.
  * After the animation is executed, the element gets removed using this._removeInternal.
  */
 scout.Widget.prototype._removeAnimated = function() {
@@ -398,7 +398,7 @@ scout.Widget.prototype._removeAnimated = function() {
     if (!this.rendered) {
       return;
     }
-    this.$container.addClass('removed');
+    this.$container.addClass('animate-remove');
     this.$container.oneAnimationEnd(function() {
       this.removalPending = false;
       this._removeInternal();

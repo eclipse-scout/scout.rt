@@ -1395,7 +1395,7 @@ $.fn.removeAnimated = function(cssClass, callback) {
     this.fadeOutAndRemove(callback);
   } else {
     // Add CSS class and wait for 'animationend' event
-    this.addClass(cssClass || 'removed');
+    this.addClass(cssClass || 'animate-remove');
     this.oneAnimationEnd(function() {
       $(this).remove();
       callback && callback.call(this);
