@@ -412,7 +412,8 @@
       "groups": []
     },
     "Group": {
-      "collapsed": false
+      "collapsed": false,
+      "headerVisible": true
     }
   },
 

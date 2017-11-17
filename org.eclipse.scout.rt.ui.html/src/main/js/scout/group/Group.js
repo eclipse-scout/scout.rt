@@ -13,6 +13,7 @@ scout.Group = function() {
   this.bodyAnimating = false;
   this.collapsed = false;
   this.title = null;
+  this.headerVisible = true;
   this.body = null;
 
   this.$container = null;
@@ -50,6 +51,7 @@ scout.Group.prototype._render = function() {
 scout.Group.prototype._renderProperties = function() {
   scout.Group.parent.prototype._renderProperties.call(this);
   this._renderTitle();
+  this._renderHeaderVisible();
   this._renderCollapsed();
 };
 
@@ -69,6 +71,15 @@ scout.Group.prototype._renderTitle = function() {
     this.title,
     scout.strings.box('(', this.counter, ')'));
   this.$title.textOrNbsp(title);
+};
+
+scout.Group.prototype.setHeaderVisible = function(headerVisible) {
+  this.setProperty('headerVisible', headerVisible);
+};
+
+scout.Group.prototype._renderHeaderVisible = function() {
+  this.$header.setVisible(this.headerVisible);
+  this.invalidateLayoutTree();
 };
 
 scout.Group.prototype.setBody = function(body) {

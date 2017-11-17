@@ -70,6 +70,7 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
     setOrder(calculateViewOrder());
     setCollapsed(getConfiguredCollapsed());
     setTitle(getConfiguredTitle());
+    setHeaderVisible(getConfiguredHeaderVisible());
     setBody(createBody());
   }
 
@@ -200,6 +201,22 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
   @Override
   public String getTitle() {
     return propertySupport.getPropertyString(PROP_TITLE);
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(100)
+  protected boolean getConfiguredHeaderVisible() {
+    return true;
+  }
+
+  @Override
+  public void setHeaderVisible(boolean headerVisible) {
+    propertySupport.setPropertyBool(PROP_HEADER_VISIBLE, headerVisible);
+  }
+
+  @Override
+  public boolean isHeaderVisible() {
+    return propertySupport.getPropertyBool(PROP_HEADER_VISIBLE);
   }
 
   protected IWidget createBody() {

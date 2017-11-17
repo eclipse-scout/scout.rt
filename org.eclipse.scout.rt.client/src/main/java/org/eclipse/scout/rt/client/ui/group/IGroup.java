@@ -21,6 +21,7 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
   String PROP_ORDER = "order";
   String PROP_COLLAPSED = "collapsed";
   String PROP_TITLE = "title";
+  String PROP_HEADER_VISIBLE = "headerVisible";
   String PROP_BODY = "body";
 
   void init();
@@ -42,6 +43,10 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
   String getTitle();
 
   void setTitle(String body);
+
+  boolean isHeaderVisible();
+
+  void setHeaderVisible(boolean headerVisible);
 
   IWidget getBody();
 
