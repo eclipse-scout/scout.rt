@@ -118,7 +118,7 @@
   @-webkit-keyframes fade-short-drop { .keyframes-fade-short-drop(); }
   @keyframes fade-short-drop { .keyframes-fade-short-drop(); }
 
-  /*** Fade out and shrink ***/
+  /*** Fade out and shrink with blur ***/
 
   .keyframes-fadeout-shrink-blur() {
     from {
@@ -136,7 +136,23 @@
   @-webkit-keyframes fadeout-shrink-blur { .keyframes-fadeout-shrink-blur(); }
   @keyframes fadeout-shrink-blur { .keyframes-fadeout-shrink-blur(); }
 
-  /*** Fade in and grow ***/
+  /*** Fade out and shrink ***/
+
+  .keyframes-fadeout-shrink() {
+    from {
+      opacity: 1;
+      transform: scale(1, 1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0, 0);
+    }
+  }
+
+  @-webkit-keyframes fadeout-shrink { .keyframes-fadeout-shrink(); }
+  @keyframes fadeout-shrink { .keyframes-fadeout-shrink(); }
+
+  /*** Fade in and grow with blur ***/
 
   .keyframes-fadein-grow-blur() {
     from {
@@ -153,6 +169,22 @@
 
   @-webkit-keyframes fadein-grow-blur { .keyframes-fadein-grow-blur(); }
   @keyframes fadein-grow-blur { .keyframes-fadein-grow-blur(); }
+
+  /*** Fade in and grow ***/
+
+  .keyframes-fadein-grow() {
+    from {
+      opacity: 0;
+      transform: scale(0, 0);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1, 1);
+    }
+  }
+
+  @-webkit-keyframes fadein-grow { .keyframes-fadein-grow(); }
+  @keyframes fadein-grow { .keyframes-fadein-grow(); }
 
   /*** Slide In Bottom ***
        Moves the element into screen from bottom up */
