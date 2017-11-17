@@ -57,9 +57,9 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
     super.initConfig();
     setExclusiveExpand(getConfiguredExclusiveExpand());
     setScrollable(getConfiguredScrollable());
-    OrderedCollection<IGroup> tiles = new OrderedCollection<>();
-    injectGroupsInternal(tiles);
-    setGroups(tiles.getOrderedList());
+    OrderedCollection<IGroup> groups = new OrderedCollection<>();
+    injectGroupsInternal(groups);
+    setGroups(groups.getOrderedList());
   }
 
   @Override
@@ -82,12 +82,12 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
     m_initialized = initialized;
   }
 
-  protected void injectGroupsInternal(OrderedCollection<IGroup> tiles) {
-    List<Class<? extends IGroup>> tileClasses = getConfiguredGroups();
-    for (Class<? extends IGroup> tileClass : tileClasses) {
-      IGroup tile = createGroupInternal(tileClass);
-      if (tile != null) {
-        tiles.addOrdered(tile);
+  protected void injectGroupsInternal(OrderedCollection<IGroup> groups) {
+    List<Class<? extends IGroup>> groupClasses = getConfiguredGroups();
+    for (Class<? extends IGroup> groupClass : groupClasses) {
+      IGroup group = createGroupInternal(groupClass);
+      if (group != null) {
+        groups.addOrdered(group);
       }
     }
   }

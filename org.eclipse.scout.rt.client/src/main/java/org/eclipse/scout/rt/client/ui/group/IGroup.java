@@ -23,6 +23,7 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
   String PROP_TITLE = "title";
   String PROP_HEADER_VISIBLE = "headerVisible";
   String PROP_BODY = "body";
+  String PROP_GROUP_ID = "groupId";
 
   void init();
 
@@ -53,4 +54,8 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
   void setBody(IWidget widget);
 
   IGroupUIFacade getUIFacade();
+
+  Object getGroupId();
+
+  void setGroupId(Object groupId);
 }
