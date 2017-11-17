@@ -57,6 +57,9 @@ scout.Tile.prototype._renderProperties = function() {
 
 scout.Tile.prototype._postRender = function() {
   this.$container.addClass('tile');
+  // Make sure prefSize returns the size the tile has after the animation even if it is called while the animation runs
+  // Otherwise the tile may have the wrong size after making a tile with useUiHeight = true visible
+  this.htmlComp.layout.animateClasses = ['animate-visible', 'animate-invisible'];
 };
 
 scout.Tile.prototype.setGridDataHints = function(gridData) {

@@ -40,7 +40,7 @@ scout.Group.prototype._render = function() {
   this.$header = this.$container.prependDiv('group-header')
     .on('click', this._onHeaderClick.bind(this));
   this.htmlHeader = scout.HtmlComponent.install(this.$header, this.session);
-  this.$title = this.$header.appendDiv('grooup-title');
+  this.$title = this.$header.appendDiv('group-title');
   this.$collapseIcon = this.$header.appendDiv('group-collapse-icon');
 
   scout.tooltips.installForEllipsis(this.$title, {

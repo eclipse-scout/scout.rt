@@ -39,6 +39,9 @@ scout.graphics = {
    *                                          position). If the calling method does that itself, you should
    *                                          set this option to false to prevent overriding the stored
    *                                          scrolling position in $elem's data attributes.
+   * animateClasses           undefined       If set, the $elem is checked for one of these classes.
+   *                                          If one class is currently set on the $elem, a clone of the $elem without the class
+   *                                          is created and measured instead. See also {@link #prefSizeWithoutAnimation}.
    *
    * @memberOf scout.graphics
    * @param $elem
@@ -70,6 +73,10 @@ scout.graphics = {
       restoreScrollPositions: true
     };
     options = $.extend({}, defaults, options);
+
+    if (options.animateClasses && options.animateClasses.length > 0) {
+      return this.prefSizeWithoutAnimation($elem, options);
+    }
 
     var oldStyle = $elem.attr('style');
     var oldScrollLeft = $elem.scrollLeft();
@@ -123,6 +130,31 @@ scout.graphics = {
       prefSize.height = Math.ceil(prefSize.height);
     }
 
+    return prefSize;
+  },
+
+  /**
+   * If the $container is currently animated by CSS, create a clone, remove the animating CSS class and measure the clone instead.
+   * This may be necessary because the animation might change the size of the element.
+   * If prefSize is called during the animation, the current size is returned instead of the one after the animation.
+   */
+  prefSizeWithoutAnimation: function($elem, options) {
+    var animateClass = scout.arrays.find(options.animateClasses, function(cssClass) {
+      return $elem.hasClass(cssClass);
+    });
+    options = $.extend({}, options);
+    options.animateClasses = null;
+
+    if (!animateClass) {
+      return this.prefSize($elem, options);
+    }
+
+    var $clone = $elem
+      .clone()
+      .removeClass(animateClass)
+      .appendTo($elem.parent());
+    var prefSize = scout.graphics.prefSize($clone, options);
+    $clone.remove();
     return prefSize;
   },
 

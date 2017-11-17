@@ -14,7 +14,8 @@
  * - layout
  * - preferredLayoutSize
  */
-scout.AbstractLayout = function() { //
+scout.AbstractLayout = function() {
+  this.animateClasses = [];
 };
 
 /**
@@ -40,7 +41,10 @@ scout.AbstractLayout.prototype.layout = function($container) { //
  *
  * @return scout.Dimension preferred size
  */
-// TODO [7.0] BSH Add "options" argument to all overrides of this method
 scout.AbstractLayout.prototype.preferredLayoutSize = function($container, options) {
+  if (this.animateClasses.length > 0) {
+    options = $.extend({}, options);
+    options.animateClasses = this.animateClasses;
+  }
   return scout.graphics.prefSize($container, options);
 };
