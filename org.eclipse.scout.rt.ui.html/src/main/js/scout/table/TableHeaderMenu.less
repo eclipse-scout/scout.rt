@@ -213,11 +213,17 @@
   &.add-column::before {
     content: @icon-plus;
   }
+
   &.remove-column::before {
     content: @icon-minus;
   }
-  &.change-column::before {
-    content: @icon-pencil-solid;
+
+  &.change-column {
+    font-size: 15px;
+
+    &::before {
+      content: @icon-pencil-solid;
+    }
   }
 
   &.togglable.selected:hover {

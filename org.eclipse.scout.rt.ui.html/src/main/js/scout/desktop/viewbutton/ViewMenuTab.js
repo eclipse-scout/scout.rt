@@ -68,7 +68,7 @@ scout.ViewMenuTab.prototype._update = function() {
   this.viewButton = viewButton;
 
   // Use iconId from outline view button (defaultIconId as fallback)
-  this.iconId = (this.outlineViewButton && this.outlineViewButton.iconId) || this.defaultIconId;
+  this.iconId = (this.viewButton && this.viewButton.iconId) || this.defaultIconId;
 };
 
 scout.ViewMenuTab.prototype._render = function() {
