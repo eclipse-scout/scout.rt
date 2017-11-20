@@ -34,10 +34,12 @@ import org.eclipse.scout.rt.shared.TEXTS;
 public abstract class AbstractTilesAccordion extends AbstractAccordion {
 
   public static final String PROP_SHOW_FILTER_COUNT = "showFilterCount";
+  public static final String PROP_SELECTED_TILES = "selectedTiles";
 
   private List<ITileFilter> m_tileFilters;
   private Map<Object, ITilesAccordionGroupManager> m_groupManagers;
   private ITilesAccordionGroupManager m_groupManager;
+  private boolean m_selectionUpdateLocked = false;
 
   public AbstractTilesAccordion() {
     this(true);
@@ -57,7 +59,7 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
     super.initConfig();
     setShowFilterCount(getConfiguredShowFilterCount());
     setGroupManager(new DefaultGroupManager());
-    IGroup firstGroup = getGroups().get(0);
+    IGroup firstGroup = getDefaultGroup();
     getTileGrid(firstGroup).addPropertyChangeListener(new P_FilteredTilesListener(firstGroup));
   }
 
@@ -283,8 +285,6 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
 
   }
 
-  // FIXME [awe] select only one tile in all tiles
-
   public ITile getSelectedTile() {
     for (ITiles tileGrid : getAllTileGrids()) {
       if (tileGrid.getSelectedTile() != null) {
@@ -305,7 +305,7 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
     return Collections.emptyList();
   }
 
-  public static class P_FilteredTilesListener implements PropertyChangeListener {
+  public class P_FilteredTilesListener implements PropertyChangeListener {
 
     private IGroup m_group;
 
@@ -316,11 +316,31 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
       if (ITiles.PROP_FILTERED_TILES.equals(evt.getPropertyName())) {
-        int numFilteredTiles = ((ITiles) m_group.getBody()).getFilteredTileCount();
+        int numFilteredTiles = getTileGrid(m_group).getFilteredTileCount();
         m_group.setTitleSuffix("(" + numFilteredTiles + ")");
       }
+      else if (ITiles.PROP_SELECTED_TILES.equals(evt.getPropertyName())) {
+        List<? extends ITile> selectedTiles = getTileGrid(m_group).getSelectedTiles();
+        if (selectedTiles.size() > 0) {
+          // make sure only one group has selected tiles
+          if (m_selectionUpdateLocked) {
+            return;
+          }
+          m_selectionUpdateLocked = true;
+          try {
+            for (IGroup group : getGroupsInternal()) {
+              if (group != m_group) {
+                getTileGrid(group).deselectAllTiles();
+              }
+            }
+          }
+          finally {
+            m_selectionUpdateLocked = false;
+          }
+        }
+        propertySupport.setProperty(PROP_SELECTED_TILES, selectedTiles);
+      }
     }
-
   }
 
 }
