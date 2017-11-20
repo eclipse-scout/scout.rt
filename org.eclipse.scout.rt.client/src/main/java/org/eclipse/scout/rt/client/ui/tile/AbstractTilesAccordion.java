@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 @ClassId("e1e96659-f922-45c8-b350-78f9de059a83")
 public abstract class AbstractTilesAccordion extends AbstractAccordion {
@@ -83,7 +84,13 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
   protected IGroup getGroupById(Object groupId) {
     return getGroups().stream()
         .filter(group -> ObjectUtility.equals(groupId, group.getGroupId()))
-        .findFirst().get();
+        .findFirst()
+        .orElse(getDefaultGroup());
+  }
+
+  @SuppressWarnings("unchecked")
+  protected <T extends IGroup> T getDefaultGroup() {
+    return (T) getGroupsInternal().get(0);
   }
 
   public void setTiles(List<ITile> tiles) {
@@ -147,7 +154,14 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
 
     List<ITile> allTiles = getAllTiles();
     List<? extends IGroup> currentGroups = getGroupsInternal();
-    List<GroupTemplate> requiredGroups = m_groupManager.createGroups();
+
+    // We always add a default group which is used when the DefaultGroupManager is active or
+    // when a group manager is active and one or more tile could not be put into a matching group
+    // thus this group acts as a "catch-all" for tiles without a group.
+    GroupTemplate defaultGroup = new GroupTemplate(DefaultGroupManager.GROUP_ID_DEFAULT, TEXTS.get("NotGrouped"));
+    List<GroupTemplate> requiredGroups = new ArrayList<GroupTemplate>();
+    requiredGroups.add(defaultGroup);
+    requiredGroups.addAll(m_groupManager.createGroups());
     int currentSize = currentGroups.size();
     int requiredSize = requiredGroups.size();
 
@@ -182,6 +196,16 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
 
     for (ITileFilter filter : m_tileFilters) {
       addFilterToAllTileGrids(filter);
+    }
+
+    // When DGM is active, we never show the header
+    if (m_groupManager instanceof DefaultGroupManager) {
+      getDefaultGroup().setHeaderVisible(false);
+    }
+    else {
+      // Make the default group invisible, when it has no tiles at all
+      ITiles defaultTiles = getTileGrid(getDefaultGroup());
+      getDefaultGroup().setHeaderVisible(defaultTiles.getTileCount() > 0);
     }
   }
 
