@@ -19,11 +19,9 @@ public interface ITilesAccordionGroupManager {
   Object getGroupIdByTile(ITile tile);
 
   /**
-   * Creates a list of group templates which is used to create instances of {@link IGroup} widgets later. All tiles are
-   * passed to this method, so a group manager can create groups based on the given tiles. However a group manager may
-   * also create groups without looking at the tiles at all.
+   * Creates a list of group templates which is used to create instances of {@link IGroup} widgets later.
    */
-  List<GroupTemplate> createGroups(List<ITile> allTiles);
+  List<GroupTemplate> createGroups();
 
   /**
    * An ID used to store and retrieve a group handler from a HashMap. You may use a string, the class handler class

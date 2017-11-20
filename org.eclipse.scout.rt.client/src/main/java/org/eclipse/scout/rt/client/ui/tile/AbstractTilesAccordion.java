@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.tile;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -21,11 +23,16 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.client.ui.accordion.AbstractAccordion;
 import org.eclipse.scout.rt.client.ui.group.IGroup;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 @ClassId("e1e96659-f922-45c8-b350-78f9de059a83")
 public abstract class AbstractTilesAccordion extends AbstractAccordion {
+
+  public static final String PROP_SHOW_FILTER_COUNT = "showFilterCount";
 
   private List<ITileFilter> m_tileFilters;
   private Map<Object, ITilesAccordionGroupManager> m_groupManagers;
@@ -47,14 +54,20 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
   @Override
   protected void initConfig() {
     super.initConfig();
-
-    ITilesAccordionGroupManager defaultHandler = new DefaultGroupManager();
-    m_groupManagers.put(DefaultGroupManager.ID, defaultHandler);
-    activateGroupManager(DefaultGroupManager.ID);
+    setShowFilterCount(getConfiguredShowFilterCount());
+    setGroupManager(new DefaultGroupManager());
+    IGroup firstGroup = getGroups().get(0);
+    getTileGrid(firstGroup).addPropertyChangeListener(new P_FilteredTilesListener(firstGroup));
   }
 
   @Override
   protected boolean getConfiguredExclusiveExpand() {
+    return false;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(10)
+  protected boolean getConfiguredShowFilterCount() {
     return false;
   }
 
@@ -69,7 +82,7 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
 
   protected IGroup getGroupById(Object groupId) {
     return getGroups().stream()
-        .filter(group -> group.getGroupId().equals(groupId))
+        .filter(group -> ObjectUtility.equals(groupId, group.getGroupId()))
         .findFirst().get();
   }
 
@@ -88,6 +101,22 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
 
   protected ITiles getTileGrid(IGroup group) {
     return (ITiles) group.getBody();
+  }
+
+  public boolean isShowFilterCount() {
+    return propertySupport.getPropertyBool(PROP_SHOW_FILTER_COUNT);
+  }
+
+  public void setShowFilterCount(boolean showFilterCount) {
+    propertySupport.setPropertyBool(PROP_SHOW_FILTER_COUNT, showFilterCount);
+  }
+
+  /**
+   * Adds and activates the given group manager.
+   */
+  public void setGroupManager(ITilesAccordionGroupManager groupManager) {
+    addGroupManager(groupManager);
+    activateGroupManager(groupManager.getId());
   }
 
   public void addGroupManager(ITilesAccordionGroupManager groupManager) {
@@ -118,7 +147,7 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
 
     List<ITile> allTiles = getAllTiles();
     List<? extends IGroup> currentGroups = getGroupsInternal();
-    List<GroupTemplate> requiredGroups = m_groupManager.createGroups(allTiles);
+    List<GroupTemplate> requiredGroups = m_groupManager.createGroups();
     int currentSize = currentGroups.size();
     int requiredSize = requiredGroups.size();
 
@@ -162,7 +191,9 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
     if (groups.size() != 1) {
       throw new IllegalStateException("Must have excatly one group as inner class, but there are " + groups.size() + " groups");
     }
-    return groups.get(0);
+    IGroup group = groups.get(0);
+    getTileGrid(group).addPropertyChangeListener(new P_FilteredTilesListener(group));
+    return group;
   }
 
   public Stream<ITiles> streamAllTileGrids() {
@@ -248,6 +279,24 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
       }
     }
     return Collections.emptyList();
+  }
+
+  public static class P_FilteredTilesListener implements PropertyChangeListener {
+
+    private IGroup m_group;
+
+    public P_FilteredTilesListener(IGroup group) {
+      m_group = group;
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+      if (ITiles.PROP_FILTERED_TILES.equals(evt.getPropertyName())) {
+        int numFilteredTiles = ((ITiles) m_group.getBody()).getFilteredTileCount();
+        m_group.setTitleSuffix("(" + numFilteredTiles + ")");
+      }
+    }
+
   }
 
 }

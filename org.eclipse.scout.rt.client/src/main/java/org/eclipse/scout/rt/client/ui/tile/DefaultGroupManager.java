@@ -28,7 +28,7 @@ public class DefaultGroupManager implements ITilesAccordionGroupManager {
   }
 
   @Override
-  public List<GroupTemplate> createGroups(List<ITile> allTiles) {
+  public List<GroupTemplate> createGroups() {
     return Collections.singletonList(
         new GroupTemplate(GROUP_ID_DEFAULT, null)
             .withHeaderVisible(false));

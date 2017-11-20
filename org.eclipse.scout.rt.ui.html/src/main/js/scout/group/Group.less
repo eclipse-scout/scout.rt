@@ -4,8 +4,7 @@
 
 .group-header {
    position: relative;
-   display: table;
-   table-layout: fixed;
+   display: flex;
    width: 100%;
    padding: 10px 0;
    border-top: 1px solid @border-color;
@@ -13,14 +12,16 @@
 }
 
 .group-title {
-  display: table-cell;
+  flex-grow: 1;
   font-size: @font-size-plus;
   font-weight: @font-weight-bold;
   #scout.overflow-ellipsis-nowrap();
 }
 
+.group-title-suffix {
+}
+
 .group-collapse-icon {
-  display: table-cell;
   width: 30px;
   text-align: right;
   position: relative;

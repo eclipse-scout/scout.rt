@@ -203,6 +203,16 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
     return propertySupport.getPropertyString(PROP_TITLE);
   }
 
+  @Override
+  public void setTitleSuffix(String suffix) {
+    propertySupport.setPropertyString(PROP_TITLE_SUFFIX, suffix);
+  }
+
+  @Override
+  public String getTitleSuffix() {
+    return propertySupport.getPropertyString(PROP_TITLE_SUFFIX);
+  }
+
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
   protected boolean getConfiguredHeaderVisible() {

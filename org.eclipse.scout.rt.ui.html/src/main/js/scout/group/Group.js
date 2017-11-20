@@ -41,6 +41,7 @@ scout.Group.prototype._render = function() {
     .on('click', this._onHeaderClick.bind(this));
   this.htmlHeader = scout.HtmlComponent.install(this.$header, this.session);
   this.$title = this.$header.appendDiv('group-title');
+  this.$titleSuffix = this.$header.appendDiv('group-title-suffix');
   this.$collapseIcon = this.$header.appendDiv('group-collapse-icon');
 
   scout.tooltips.installForEllipsis(this.$title, {
@@ -51,6 +52,7 @@ scout.Group.prototype._render = function() {
 scout.Group.prototype._renderProperties = function() {
   scout.Group.parent.prototype._renderProperties.call(this);
   this._renderTitle();
+  this._renderTitleSuffix();
   this._renderHeaderVisible();
   this._renderCollapsed();
 };
@@ -58,6 +60,7 @@ scout.Group.prototype._renderProperties = function() {
 scout.Group.prototype._remove = function() {
   this.$header = null;
   this.$title = null;
+  this.$titleSuffix = null;
   this.$collapseIcon = null;
   scout.Group.parent.prototype._remove.call(this);
 };
@@ -67,10 +70,15 @@ scout.Group.prototype.setTitle = function(title) {
 };
 
 scout.Group.prototype._renderTitle = function() {
-  var title = scout.strings.join(' ',
-    this.title,
-    scout.strings.box('(', this.counter, ')'));
-  this.$title.textOrNbsp(title);
+  this.$title.textOrNbsp(this.title);
+};
+
+scout.Group.prototype.setTitleSuffix = function(titleSuffix) {
+  this.setProperty('titleSuffix', titleSuffix);
+};
+
+scout.Group.prototype._renderTitleSuffix = function() {
+  this.$titleSuffix.textOrNbsp(this.titleSuffix);
 };
 
 scout.Group.prototype.setHeaderVisible = function(headerVisible) {

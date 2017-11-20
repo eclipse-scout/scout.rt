@@ -24,6 +24,7 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
   String PROP_HEADER_VISIBLE = "headerVisible";
   String PROP_BODY = "body";
   String PROP_GROUP_ID = "groupId";
+  String PROP_TITLE_SUFFIX = "titleSuffix";
 
   void init();
 
@@ -43,7 +44,11 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
 
   String getTitle();
 
-  void setTitle(String body);
+  void setTitle(String title);
+
+  String getTitleSuffix();
+
+  void setTitleSuffix(String suffix);
 
   boolean isHeaderVisible();
 
