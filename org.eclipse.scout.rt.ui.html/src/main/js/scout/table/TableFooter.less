@@ -81,8 +81,18 @@
       border-top: solid 3px transparent;
       border-bottom-color: transparent;
 
+      &:focus::before {
+         top: @group-title-padding-bottom;
+       }
+
+      & > .label {
+        /* Reverse paddings because border is now on top */
+        padding-top: @group-title-padding-bottom;
+        padding-bottom: @group-title-padding-top;
+      }
+
       &.selected {
-        border-top-color: @active-color;
+        border-top-color: @tab-item-active-color;
       }
 
       &.marked:not(.selected) {
@@ -114,10 +124,10 @@
   display: inline-block;
   position: relative;
   vertical-align: top;
-
   margin-top: (@table-footer-height - 26px) / 2;
   margin-right: @table-control-padding;
 }
+
 .table-text-filter {
   width: 100%;
   min-height: 26px;
@@ -127,6 +137,7 @@
   &:focus {
     &.has-text {
       padding-right: @text-field-padding-x + 15px;
+
       & ~ .clear-icon {
         display: block;
       }
@@ -142,6 +153,7 @@
     line-height: 26px;
     padding-right: @text-field-padding-x;
     cursor: pointer;
+
     &::before{
       #scout.font-icon();
       font-size: 13px;

@@ -10,7 +10,7 @@
  ******************************************************************************/
 .tab-box {
   & > .status {
-    margin-bottom: @tabbox-border-width;
+    margin-bottom: @tab-area-border-width;
   }
 }
 
@@ -25,8 +25,8 @@
     display: block;
     width: 100%;
     height: 0;
-    border-bottom: @tabbox-border-width solid @palette-gray-5;
-    margin-top: -@tabbox-border-width;
+    border-bottom: @tab-area-border-width solid @palette-gray-5;
+    margin-top: -@tab-area-border-width;
   }
 
   & > .menubar {
@@ -40,7 +40,7 @@
     border: none;
     z-index: 1;
     #scout.menubar-background-color-inherit();
-    padding-bottom: @tabbox-border-width;
+    padding-bottom: @tab-area-border-width;
 
     & > .menubox {
 
@@ -59,7 +59,7 @@
     position: absolute;
     margin-left: @field-status-margin-left;
     #scout.status();
-    border-bottom: @tabbox-border-width solid transparent;
+    border-bottom: @tab-area-border-width solid transparent;
   }
 
   .tab-box.has-tooltip > & > .status {
@@ -84,16 +84,16 @@
   display: inline-block;
   vertical-align: middle;
   #scout.font-text-normal(@font-weight-bold);
-  color: @title-color;
+  color: @tab-item-color;
   border: none;
   background-color: transparent;
-  padding: 0 @tabbox-padding-x;
-  border-bottom: solid @tabbox-border-width transparent;
+  padding: 0 @tab-item-padding-x;
+  border-bottom: solid @tab-area-border-width transparent;
   cursor: pointer;
 
   &.selected {
-    color: @active-color;
-    border-bottom-color: @active-color;
+    color: @tab-item-active-color;
+    border-bottom-color: @tab-item-active-color;
   }
 
   &.marked:not(.selected) {
@@ -101,11 +101,11 @@
   }
 
   &:hover {
-    color: @hover-color;
+    color: @tab-item-hover-color;
   }
 
   &:active {
-    color: @active-color;
+    color: @tab-item-active-color;
   }
 
   &:focus {
@@ -115,16 +115,16 @@
   &:focus::before {
     #scout.font-icon();
     content: @icon-angle-right;
-    color: @active-color;
+    color: @tab-item-active-color;
     position: absolute;
-    top: @group-title-padding-y;
-    left: @tabbox-padding-x - @tabbox-focus-arrow-width;
-    width: @tabbox-focus-arrow-width;
+    top: @group-title-padding-top;
+    left: @tab-item-padding-x - @tab-item-focus-arrow-width;
+    width: @tab-item-focus-arrow-width;
     text-align: center;
   }
 
   & > .label {
-    padding: @group-title-padding-y 0;
+    padding: @group-title-padding-top 0 @group-title-padding-bottom;
     display: inline-block;
     vertical-align: middle;
   }

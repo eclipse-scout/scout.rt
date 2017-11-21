@@ -66,7 +66,7 @@
     /* adjust control position (use absolute positioning, otherwise the layout would be disturbed, */
     /* because the control div is higher than the title span */
     position: absolute;
-    top: @group-margin-top + @group-title-padding-y - 3px;
+    top: @group-margin-top + @group-title-padding-top - 3px;
     left: @mandatory-indicator-width;
 
     /* for good animation, ensure that the control is a square and the icon is centered */
@@ -104,7 +104,7 @@
     display: inline-block;
     vertical-align: middle;
     color: @title-color;
-    padding: @group-title-padding-y 0;
+    padding: @group-title-padding-top 0 @group-title-padding-bottom 0;
     #scout.overflow-ellipsis();
   }
 
