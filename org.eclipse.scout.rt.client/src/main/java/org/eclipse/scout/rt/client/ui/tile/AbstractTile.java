@@ -72,8 +72,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
     setOrder(calculateViewOrder());
     setColorScheme(getConfiguredColorScheme());
     setCssClass(getConfiguredCssClass());
-    // FIXME CGU tiles maybe better create getConfiguredGridDataHints and enhance GridData with "with" pattern
-    setGridDataHints(new GridData(getConfiguredGridX(), getConfiguredGridY(), getConfiguredGridW(), getConfiguredGridH(), getConfiguredGridWeightX(), getConfiguredGridWeightY(), false, false, -1, -1, true, true, 0, 0));
+    setGridDataHints(getConfiguredGridDataHints());
   }
 
   @Override
@@ -166,36 +165,63 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
     return TileColorScheme.DEFAULT;
   }
 
+  /**
+   * Configures the grid data for this tile.
+   * <p>
+   * The typical approach to configure it is to get the default object by calling
+   * <code>super.getConfiguredGridDataHints()</code> and the using the "with" methods to adjust the properties.
+   * <p>
+   * <b>Example:</b><br>
+   *
+   * <pre>
+   * &#64;Override
+   * protected GridData getConfiguredGridDataHints() {
+   *   return super.getConfiguredGridDataHints()
+   *       .withW(2)
+   *       .withUseUiHeight(true);
+   * }
+   * </pre>
+   *
+   * The most common methods are also available as separate getConfigured methods (e.g. {@link #getConfiguredGridW()},
+   * {@link #getConfiguredGridH()}).
+   */
+  @ConfigProperty(ConfigProperty.OBJECT)
+  @Order(15)
+  protected GridData getConfiguredGridDataHints() {
+    return new GridData(-1, -1, getConfiguredGridW(), getConfiguredGridH(),
+        getConfiguredGridWeightX(), getConfiguredGridWeightY(), false, false, -1, -1, true, true, 0, 0);
+  }
+
+  /**
+   * @see #getConfiguredGridDataHints()
+   */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(20)
   protected int getConfiguredGridW() {
     return 1;
   }
 
+  /**
+   * @see #getConfiguredGridDataHints()
+   */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(30)
   protected int getConfiguredGridH() {
     return 1;
   }
 
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(40)
-  protected int getConfiguredGridX() {
-    return -1;
-  }
-
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(50)
-  protected int getConfiguredGridY() {
-    return -1;
-  }
-
+  /**
+   * @see #getConfiguredGridDataHints()
+   */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(60)
   protected int getConfiguredGridWeightX() {
     return -1;
   }
 
+  /**
+   * @see #getConfiguredGridDataHints()
+   */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(70)
   protected int getConfiguredGridWeightY() {

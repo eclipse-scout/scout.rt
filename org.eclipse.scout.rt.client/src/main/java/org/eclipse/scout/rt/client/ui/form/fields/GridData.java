@@ -70,6 +70,76 @@ public final class GridData {
     this.heightInPixel = heightInPixel;
   }
 
+  public GridData withX(int newX) {
+    this.x = newX;
+    return this;
+  }
+
+  public GridData withY(int newY) {
+    this.y = newY;
+    return this;
+  }
+
+  public GridData withW(int newW) {
+    this.w = newW;
+    return this;
+  }
+
+  public GridData withH(int newH) {
+    this.h = newH;
+    return this;
+  }
+
+  public GridData withWeightX(double newWeightX) {
+    this.weightX = newWeightX;
+    return this;
+  }
+
+  public GridData withWeightY(double newWeightY) {
+    this.weightY = newWeightY;
+    return this;
+  }
+
+  public GridData withUseUiWidth(boolean newUseUiWidth) {
+    this.useUiWidth = newUseUiWidth;
+    return this;
+  }
+
+  public GridData withUseUiHeight(boolean newUseUiHeight) {
+    this.useUiHeight = newUseUiHeight;
+    return this;
+  }
+
+  public GridData withHorizontalAlignment(int newHorizontalAlignment) {
+    this.horizontalAlignment = newHorizontalAlignment;
+    return this;
+  }
+
+  public GridData withVerticalAlignment(int newVerticalAlignment) {
+    this.verticalAlignment = newVerticalAlignment;
+    return this;
+  }
+
+  public GridData withFillHorizontal(boolean newFillHorizontal) {
+    this.fillHorizontal = newFillHorizontal;
+    return this;
+  }
+
+  public GridData withFillVertical(boolean newFillVertical) {
+    this.fillVertical = newFillVertical;
+    return this;
+  }
+
+  public GridData withWidthInPixel(int newWidthInPixel) {
+    this.widthInPixel = newWidthInPixel;
+    return this;
+  }
+
+  public GridData withHeightInPixel(int newHeightInPixel) {
+    this.heightInPixel = newHeightInPixel;
+    return this;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
