@@ -101,7 +101,7 @@ scout.PageTiles.prototype._onOutlineNodeChanged = function(event) {
   if (!tile) {
     return;
   }
-  tile.field.notifyPageChanged();
+  tile.tileWidget.notifyPageChanged();
 };
 
 scout.PageTiles.prototype._onOutlineStructureChanged = function(event) {

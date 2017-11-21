@@ -21,7 +21,7 @@ scout.PageTileButton.prototype._init = function(model) {
   scout.PageTileButton.parent.prototype._init.call(this, model);
 
   this.label = this.page.text;
-  this.iconId = this.page.overwiewIconId;
+  this.iconId = this.page.overviewIconId;
 
   this.on('click', function(event) {
     this.outline.selectNode(this.page);
@@ -30,5 +30,5 @@ scout.PageTileButton.prototype._init = function(model) {
 
 scout.PageTileButton.prototype.notifyPageChanged = function() {
   this.setLabel(this.page.text);
-  this.setIconId(this.page.iconId);
+  this.setIconId(this.page.overviewIconId);
 };
