@@ -41,6 +41,12 @@ scout.HtmlComponent = function($comp, session) {
    */
   this.pixelBasedSizing = true;
   this.sizeCached = null;
+
+  /**
+   * Object which stores the computed preferred size. Key is a string containing the width and height hints.
+   * @see #computePrefSizeKey(options);
+   */
+  this.prefSizeCached = {};
   this.session = session;
 };
 
@@ -91,10 +97,11 @@ scout.HtmlComponent.prototype.availableSize = function(options) {
 };
 
 /**
- * Invalidates the component (sets the valid property to false).
+ * Invalidates the component (sets the valid property to false and calls layout.invalidate()).
  */
 scout.HtmlComponent.prototype.invalidateLayout = function() {
   this.valid = false;
+  this.prefSizeCached = {};
   if (this.layout) {
     this.layout.invalidate();
   }
@@ -197,22 +204,51 @@ scout.HtmlComponent.prototype.setLayout = function(layout) {
 };
 
 /**
- * Returns the preferred size of the component, insets included.
+ * Returns the preferred size of the component, insets included.<p>
+ * The preferred size is cached until the component will be invalidated.
+ * Hence, subsequent calls to this function will return the cached preferred size unless the component is invalidated.
+ *
  * @exception When component has no layout
  */
 scout.HtmlComponent.prototype.prefSize = function(options) {
+  options = options || {};
   if (!this.layout) {
     throw new Error('Called prefSize() but component has no layout');
   }
-  // Remove padding, border and margins from the widthHint so that the actual layout does not need to take care of it
+
+  var prefSizeCacheKey = this.computePrefSizeKey(options);
+  var prefSizeCached = this.prefSizeCached[prefSizeCacheKey];
+  if (this.valid && !scout.objects.isNullOrUndefined(prefSizeCached)) {
+    $.log.isTraceEnabled() && $.log.trace('(HtmlComponent#prefSize) ' + this.debug() + ' widthHint=' + options.widthHint + ' heightHint=' + options.heightHint + ' prefSizeCached=' + prefSizeCached);
+    return prefSizeCached;
+  }
+
+  if (options.widthHint || options.heightHint) {
+    options = this._adjustSizeHintsForPrefSize(options);
+  }
+
+  var prefSize = this.layout.preferredLayoutSize(this.$comp, options);
+  this.prefSizeCached[prefSizeCacheKey] = prefSize;
+
+  $.log.isTraceEnabled() && $.log.trace('(HtmlComponent#prefSize) ' + this.debug() + ' widthHint=' + options.widthHint + ' heightHint=' + options.heightHint + ' prefSize=' + prefSize);
+  return prefSize;
+};
+
+scout.HtmlComponent.prototype.computePrefSizeKey = function(options) {
+  return 'wHint' + scout.nvl(options.widthHint, '-1') + 'hHint' + scout.nvl(options.heightHint, '-1');
+};
+
+scout.HtmlComponent.prototype._adjustSizeHintsForPrefSize = function(options) {
+  // Remove padding, border and margins from the width and heightHint so that the actual layout does not need to take care of it
   // Create a copy to not modify the original options
   options = $.extend({}, options);
   if (options.widthHint) {
     options.widthHint -= this.insets(true).horizontal();
   }
-  var prefSize = this.layout.preferredLayoutSize(this.$comp, options);
-  $.log.isTraceEnabled() && $.log.trace('(HtmlComponent#getPreferredSize) ' + this.debug() + ' widthHint=' + options.widthHint + ' heightHint=' + options.heightHint + ' preferredSize=' + prefSize);
-  return prefSize;
+  if (options.heightHint) {
+    options.heightHint -= this.insets(true).vertical();
+  }
+  return options;
 };
 
 /**
