@@ -76,6 +76,7 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
 
   public void addTile(ITile tile) {
     getTileGrid(getGroupByTile(tile)).addTile(tile);
+    updateGroupStates();
   }
 
   protected IGroup getGroupByTile(ITile tile) {
@@ -111,6 +112,10 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
     for (Entry<IGroup, List<ITile>> entry : map.entrySet()) {
       getTileGrid(entry.getKey()).setTiles(entry.getValue());
     }
+    updateGroupStates();
+  }
+
+  protected void updateGroupStates() {
     updateDefaultGroupVisible();
     updateCollapseStateOfGroups();
   }
