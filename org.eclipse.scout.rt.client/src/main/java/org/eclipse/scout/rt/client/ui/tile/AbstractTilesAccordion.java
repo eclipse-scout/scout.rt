@@ -90,9 +90,14 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
         .orElse(getDefaultGroup());
   }
 
+  /**
+   * The default group is always the last group.
+   */
   @SuppressWarnings("unchecked")
   protected <T extends IGroup> T getDefaultGroup() {
-    return (T) getGroupsInternal().get(0);
+    List<? extends IGroup> groups = getGroupsInternal();
+    int lastGroup = groups.size() - 1;
+    return (T) groups.get(lastGroup);
   }
 
   public void setTiles(List<ITile> tiles) {
@@ -105,6 +110,28 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
     }
     for (Entry<IGroup, List<ITile>> entry : map.entrySet()) {
       getTileGrid(entry.getKey()).setTiles(entry.getValue());
+    }
+    updateDefaultGroupVisible();
+    updateCollapseStateOfGroups();
+  }
+
+  protected void updateDefaultGroupVisible() {
+    // When DGM is active, we never show the header
+    IGroup defaultGroup = getDefaultGroup();
+    if (m_groupManager instanceof DefaultGroupManager) {
+      defaultGroup.setHeaderVisible(false);
+    }
+    else {
+      // Make the default group invisible, when it has no tiles at all
+      ITiles defaultTiles = getTileGrid(defaultGroup);
+      defaultGroup.setHeaderVisible(defaultTiles.getTileCount() > 0);
+    }
+  }
+
+  protected void updateCollapseStateOfGroups() {
+    for (IGroup group : getGroupsInternal()) {
+      boolean collapsed = getTileGrid(group).getTileCount() == 0;
+      group.setCollapsed(collapsed);
     }
   }
 
@@ -162,8 +189,8 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
     // thus this group acts as a "catch-all" for tiles without a group.
     GroupTemplate defaultGroup = new GroupTemplate(DefaultGroupManager.GROUP_ID_DEFAULT, TEXTS.get("NotGrouped"));
     List<GroupTemplate> requiredGroups = new ArrayList<GroupTemplate>();
-    requiredGroups.add(defaultGroup);
     requiredGroups.addAll(m_groupManager.createGroups());
+    requiredGroups.add(defaultGroup);
     int currentSize = currentGroups.size();
     int requiredSize = requiredGroups.size();
 
@@ -198,16 +225,6 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
 
     for (ITileFilter filter : m_tileFilters) {
       addFilterToAllTileGrids(filter);
-    }
-
-    // When DGM is active, we never show the header
-    if (m_groupManager instanceof DefaultGroupManager) {
-      getDefaultGroup().setHeaderVisible(false);
-    }
-    else {
-      // Make the default group invisible, when it has no tiles at all
-      ITiles defaultTiles = getTileGrid(getDefaultGroup());
-      getDefaultGroup().setHeaderVisible(defaultTiles.getTileCount() > 0);
     }
   }
 
