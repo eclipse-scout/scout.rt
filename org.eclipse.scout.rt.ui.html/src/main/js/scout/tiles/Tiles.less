@@ -22,4 +22,9 @@
   & > .scrollbar {
     transition: opacity 80ms ease-out;
   }
+
+  .accordion > .group > .group-body&.empty {
+    /* Remove bottom margin if tiles is used in an accordion and there are no tiles */
+    margin-bottom: 0;
+  }
 }

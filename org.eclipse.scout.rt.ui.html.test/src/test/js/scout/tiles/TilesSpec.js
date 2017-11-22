@@ -382,6 +382,21 @@ describe("Tiles", function() {
       tiles.deleteAllTiles();
       expect(tiles.selectedTiles.length).toBe(0);
     });
+
+    it('adds empty marker', function() {
+      var tiles = createTiles(0);
+      var tile0 = createTile();
+      var tile1 = createTile();
+      var tile2 = createTile();
+      tiles.render();
+      expect(tiles.$container).toHaveClass('empty');
+
+      tiles.insertTiles([tile0, tile1, tile2]);
+      expect(tiles.$container).not.toHaveClass('empty');
+
+      tiles.deleteAllTiles();
+      expect(tiles.$container).toHaveClass('empty');
+    });
   });
 
   describe('setTiles', function() {
@@ -777,6 +792,26 @@ describe("Tiles", function() {
       expect(tiles.filteredTiles[0]).toBe(tiles.tiles[0]);
       expect(tiles.filteredTiles[1]).toBe(tiles.tiles[1]);
       expect(tiles.filteredTiles[2]).toBe(tiles.tiles[2]);
+    });
+
+    it('updates empty marker', function() {
+      var tiles = createTiles(3);
+      tiles.render();
+      expect(tiles.$container).not.toHaveClass('empty');
+
+      var filter = {
+        accept: function(tile) {
+          // Accept none
+          return false;
+        }
+      };
+      tiles.addFilter(filter);
+      tiles.filter();
+      expect(tiles.$container).toHaveClass('empty');
+
+      tiles.removeFilter(filter);
+      tiles.filter();
+      expect(tiles.$container).not.toHaveClass('empty');
     });
 
   });

@@ -12,6 +12,7 @@ scout.Tiles = function() {
   scout.Tiles.parent.call(this);
   this.animateTileRemoval = true;
   this.animateTileInsertion = true;
+  this.empty = false;
   this.filters = [];
   this.filteredTiles = [];
   this.filteredTilesDirty = true;
@@ -82,6 +83,7 @@ scout.Tiles.prototype._renderProperties = function() {
   this._renderLayoutConfig();
   this._renderScrollable();
   this._renderSelectable();
+  this._renderEmpty();
 };
 
 scout.Tiles.prototype._renderTiles = function() {
@@ -96,6 +98,9 @@ scout.Tiles.prototype.insertTile = function(tile) {
 
 scout.Tiles.prototype.insertTiles = function(tilesToInsert, appendPlaceholders) {
   tilesToInsert = scout.arrays.ensure(tilesToInsert);
+  if (tilesToInsert.length === 0) {
+    return;
+  }
   this.setTiles(this.tiles.concat(tilesToInsert), appendPlaceholders);
 };
 
@@ -105,6 +110,9 @@ scout.Tiles.prototype.deleteTile = function(tile) {
 
 scout.Tiles.prototype.deleteTiles = function(tilesToDelete, appendPlaceholders) {
   tilesToDelete = scout.arrays.ensure(tilesToDelete);
+  if (tilesToDelete.length === 0) {
+    return;
+  }
   var tiles = this.tiles.slice();
   scout.arrays.removeAll(tiles, tilesToDelete);
   this.setTiles(tiles, appendPlaceholders);
@@ -467,10 +475,7 @@ scout.Tiles.prototype._deleteObsoletePlaceholders = function() {
 };
 
 scout.Tiles.prototype._deleteAllPlaceholders = function() {
-  var tiles = this.tiles.filter(function(tile) {
-    return !(tile instanceof scout.PlaceholderTile);
-  });
-  this.setTiles(tiles, false);
+  this.deleteTiles(this.placeholders(), false);
 };
 
 scout.Tiles.prototype.placeholders = function() {
@@ -721,6 +726,20 @@ scout.Tiles.prototype._updateFilteredTiles = function() {
     this.setProperty('filteredTiles', tiles);
     this.filteredTilesDirty = false;
   }
+  this._updateEmpty();
+};
+
+scout.Tiles.prototype._updateEmpty = function() {
+  this.setEmpty(this.filteredTiles.length === 0);
+};
+
+scout.Tiles.prototype.setEmpty = function(empty) {
+  this.setProperty('empty', empty);
+};
+
+scout.Tiles.prototype._renderEmpty = function() {
+  this.$container.toggleClass('empty', this.empty);
+  this.invalidateLayoutTree();
 };
 
 /**
