@@ -118,7 +118,7 @@ scout.Scrollbar.prototype.scroll = function(diff) {
  */
 scout.Scrollbar.prototype._scrollToAbsolutePoint = function(absolutePoint) {
   var scrollPos = Math.min(
-    (this._scrollSize - this._offsetSize), // scrollPos can't be larger than the start of last page
+    (this._scrollSize - this._offsetSize + 1), // scrollPos can't be larger than the start of last page. Add +1 because at least chrome has issues to scroll to the very bottom if scrollTop is fractional
     Math.max(0, Math.round(absolutePoint))); // scrollPos can't be negative
 
   this.$parent[this._scrollDir](scrollPos);
