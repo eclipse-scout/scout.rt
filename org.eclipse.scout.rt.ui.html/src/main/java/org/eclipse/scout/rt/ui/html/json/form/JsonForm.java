@@ -198,7 +198,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
   }
 
   protected void addInitialInputEvent() {
-    FormEvent event = findRecentRequestEvent(FormEvent.TYPE_REQUEST_INPUT);
+    FormEvent event = findRecentEvent(FormEvent.TYPE_REQUEST_INPUT);
     if (event != null) {
       handleModelRequestEvent(event, true);
     }
@@ -206,7 +206,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
 
   // TODO [7.0] BSH Try to replace PROP_INITIAL_FOCUS by protected EVENT_REQUEST_FOCUS (but check "initialFocusEnabled")
   protected void setInitialFocusProperty(JSONObject json) {
-    FormEvent event = findRecentRequestEvent(FormEvent.TYPE_REQUEST_FOCUS);
+    FormEvent event = findRecentEvent(FormEvent.TYPE_REQUEST_FOCUS);
     if (event != null) {
       IJsonAdapter<?> childAdapter = findChildAdapter(event);
       if (childAdapter != null) {
@@ -224,19 +224,17 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
     return childAdapter;
   }
 
-  protected FormEvent findRecentRequestEvent(int eventType) {
+  protected FormEvent findRecentEvent(int eventType) {
     IEventHistory<FormEvent> history = getModel().getEventHistory();
     if (history == null) {
       return null;
     }
-    FormEvent event = null;
-    for (FormEvent event0 : history.getRecentEvents()) {
-      if (event0.getType() == eventType) {
-        event = event0;
-        break;
+    for (FormEvent event : history.getRecentEvents()) {
+      if (event.getType() == eventType) {
+        return event;
       }
     }
-    return event;
+    return null;
   }
 
   protected String displayHintToJson(int displayHint) {
