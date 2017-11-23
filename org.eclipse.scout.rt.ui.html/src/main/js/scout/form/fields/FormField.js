@@ -1160,5 +1160,7 @@ scout.FormField.prototype._updateEmpty = function() {
 };
 
 scout.FormField.prototype.requestInput = function() {
-  this.focus();
+  if (this.enabledComputed && this.rendered) {
+    this.focus();
+  }
 };
