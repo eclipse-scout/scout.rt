@@ -1587,15 +1587,43 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
         else {
           // Synchronize with the model thread.
           // Note: The model job will not commence execution if the current ClientRunContext is or gets cancelled.
-          ModelJobs.schedule(new IRunnable() {
-
-            @Override
-            public void run() throws Exception {
-              updateField(rows, exception);
+          try {
+            ClientRunContext callerRunContext = ClientRunContexts.copyCurrent();
+            if (callerRunContext.getRunMonitor().isCancelled()) {
+              return;
             }
-          }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
-              .withName("Updating {}", AbstractSmartField2.this.getClass().getName()))
-              .awaitDone(); // block the current thread until completed
+            ModelJobs.schedule(new IRunnable() {
+              @Override
+              public void run() throws Exception {
+                updateField(rows, exception);
+              }
+            }, ModelJobs.newInput(callerRunContext)
+                .withName("Updating {}", AbstractSmartField2.this.getClass().getName()))
+                .awaitDone(); // block the current thread until completed
+          }
+          catch (ThreadInterruptedError e) { // NOSONAR
+            /*
+            This state can be reached by a race condition when the job's RunMonitor is in canceled state and later the ModelJob is run.
+            This yields to a Thread.interrupt in the RunContext.ThreadInterrupter...
+            
+            at RunContext$ThreadInterrupter.cancel(boolean) line: 563
+            at RunMonitor.cancel(ICancellable, boolean) line: 160
+            at RunMonitor.registerCancellable(ICancellable) line: 104  <---------------------
+            at RunContext$ThreadInterrupter.<init>(Thread, RunMonitor) line: 545
+            at ClientRunContext(RunContext).call(Callable<RESULT>, Class<IExceptionTranslator<EXCEPTION>>) line: 154
+            at RunContextRunner<RESULT>.intercept(Chain<RESULT>) line: 38
+            
+            which itself causes the running job to be interrupted with a InterruptedException
+            
+            at org.eclipse.scout.rt.platform.job.internal.JobExceptionTranslator.translateInterruptedException(JobExceptionTranslator.java:49)
+            at org.eclipse.scout.rt.platform.job.internal.JobFutureTask.awaitDone(JobFutureTask.java:339)
+            at org.eclipse.scout.rt.client.ui.form.fields.smartfield2.AbstractSmartField2$7.joinModelThreadAndUpdateField(AbstractSmartField2.java:1598)
+            at org.eclipse.scout.rt.client.ui.form.fields.smartfield2.AbstractSmartField2$7.onSuccess(AbstractSmartField2.java:1575)
+            at org.eclipse.scout.rt.shared.services.lookup.LookupCall.loadData(LookupCall.java:437)
+            at org.eclipse.scout.rt.shared.services.lookup.LookupCall$5.run(LookupCall.java:417)
+            */
+            return;
+          }
         }
       }
 
