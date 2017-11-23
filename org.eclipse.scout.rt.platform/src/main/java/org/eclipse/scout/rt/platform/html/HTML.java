@@ -26,7 +26,10 @@ import org.eclipse.scout.rt.platform.html.internal.HtmlListElement;
 import org.eclipse.scout.rt.platform.html.internal.HtmlNodeBuilder;
 import org.eclipse.scout.rt.platform.html.internal.HtmlPlainBuilder;
 import org.eclipse.scout.rt.platform.html.internal.HtmlTableBuilder;
+import org.eclipse.scout.rt.platform.html.internal.HtmlTableColgroupBuilder;
+import org.eclipse.scout.rt.platform.html.internal.HtmlTableColgroupColBuilder;
 import org.eclipse.scout.rt.platform.html.internal.HtmlTableDataBuilder;
+import org.eclipse.scout.rt.platform.html.internal.HtmlTableHeadBuilder;
 import org.eclipse.scout.rt.platform.html.internal.HtmlTableRowBuilder;
 import org.eclipse.scout.rt.platform.html.internal.StyleElementBuilder;
 
@@ -319,8 +322,8 @@ public final class HTML {
   }
 
   /**
-   * Creates a HTML representation for the given icon. For a font icon, a 'span' element is returned, or an 'img'
-   * element otherwise.
+   * Creates a HTML representation for the given icon. For a font icon, a 'span' element is returned, or an 'img' element
+   * otherwise.
    *
    * @param icon
    *          icon like {@link AbstractIcons#Info}
@@ -384,6 +387,55 @@ public final class HTML {
    */
   public static IHtmlContent ol(IHtmlListElement... li) {
     return new HtmlNodeBuilder("ol", li);
+  }
+
+  /**
+   * Creates a html element for a colgroup.<br>
+   * Example see {@link #table(IHtmlTableColgroup, List)}.
+   */
+  public static IHtmlTableColgroup colgroup(IHtmlTableColgroupCol... cols) {
+    return new HtmlTableColgroupBuilder(Arrays.asList(cols));
+  }
+
+  /**
+   * Creates a html element for a colgroup.<br>
+   * Example see {@link #table(IHtmlTableColgroup, List)}.
+   */
+  public static IHtmlTableColgroup colgroup(List<IHtmlTableColgroupCol> cols) {
+    return new HtmlTableColgroupBuilder(cols);
+  }
+
+  /**
+   * Creates a html element for a colgroup col.<br>
+   * Example see {@link #table(IHtmlTableColgroup, List)}.
+   */
+  public static IHtmlTableColgroupCol col() {
+    return new HtmlTableColgroupColBuilder();
+  }
+
+  /**
+   * Create a html element with encoded text for table data: &lt;th&gt;text&lt;/th&gt;.
+   * <p>
+   * Example:<br>
+   * <code>
+   * HTML.table(<br>
+   *     &nbsp;HTML.tr(<br>
+   *     &nbsp;&nbsp;HTML.th("cell1"),<br>
+   *     &nbsp;&nbsp;HTML.th("cell2")<br>
+   *     &nbsp;),<br>
+   *     &nbsp;HTML.tr(<br>
+   *     &nbsp;&nbsp;HTML.td("cell3"),<br>
+   *     &nbsp;&nbsp;HTML.td("cell4")<br>
+   *     )<br>
+   *     ).cellspacing(1).cellpadding(2)<br>
+   * </code>
+   * </p>
+   *
+   * @param text
+   *          text with binds
+   */
+  public static IHtmlTableCell th(CharSequence... text) {
+    return new HtmlTableHeadBuilder(Arrays.asList(text));
   }
 
   /**
@@ -489,6 +541,50 @@ public final class HTML {
    */
   public static IHtmlTable table(List<IHtmlTableRow> rows) {
     return new HtmlTableBuilder(rows);
+  }
+
+  /**
+   * Create a html element with encoded text for a table. Example:<br>
+   * <code>
+   * HTML.table(<br>
+   *     &nbsp;HTML.colgroup(<br>
+   *     &nbsp;&nbsp;HTML.col(),<br>
+   *     &nbsp;&nbsp;HTML.col()<br>
+   *     &nbsp;),<br>
+   *     &nbsp;HTML.tr(<br>
+   *     &nbsp;&nbsp;HTML.td("cell1"),<br>
+   *     &nbsp;&nbsp;HTML.td("cell2")<br>
+   *     &nbsp;),<br>
+   *     &nbsp;HTML.tr(<br>
+   *     &nbsp;&nbsp;HTML.td("cell3"),<br>
+   *     &nbsp;&nbsp;HTML.td("cell4")<br>
+   *     )
+   * </code>
+   */
+  public static IHtmlTable table(IHtmlTableColgroup colgroup, IHtmlTableRow... rows) {
+    return new HtmlTableBuilder(colgroup, Arrays.asList(rows));
+  }
+
+  /**
+   * Create a html element with encoded text for a table. Example:<br>
+   * <code>
+   * HTML.table(<br>
+   *     &nbsp;HTML.colgroup(<br>
+   *     &nbsp;&nbsp;HTML.col(),<br>
+   *     &nbsp;&nbsp;HTML.col()<br>
+   *     &nbsp;),<br>
+   *     &nbsp;HTML.tr(<br>
+   *     &nbsp;&nbsp;HTML.td("cell1"),<br>
+   *     &nbsp;&nbsp;HTML.td("cell2")<br>
+   *     &nbsp;),<br>
+   *     &nbsp;HTML.tr(<br>
+   *     &nbsp;&nbsp;HTML.td("cell3"),<br>
+   *     &nbsp;&nbsp;HTML.td("cell4")<br>
+   *     )
+   * </code>
+   */
+  public static IHtmlTable table(IHtmlTableColgroup colgroup, List<IHtmlTableRow> rows) {
+    return new HtmlTableBuilder(colgroup, rows);
   }
 
   /**

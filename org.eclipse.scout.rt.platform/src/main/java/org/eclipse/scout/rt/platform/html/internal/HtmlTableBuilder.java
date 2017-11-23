@@ -12,8 +12,11 @@ package org.eclipse.scout.rt.platform.html.internal;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.html.IHtmlElement;
 import org.eclipse.scout.rt.platform.html.IHtmlTable;
+import org.eclipse.scout.rt.platform.html.IHtmlTableColgroup;
 import org.eclipse.scout.rt.platform.html.IHtmlTableRow;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * Builder for a html table.
@@ -23,7 +26,24 @@ public class HtmlTableBuilder extends HtmlNodeBuilder implements IHtmlTable {
   private static final long serialVersionUID = 1L;
 
   public HtmlTableBuilder(List<IHtmlTableRow> rows) {
-    super("table", rows);
+    this(null, rows);
+  }
+
+  public HtmlTableBuilder(IHtmlTableColgroup colgroup, List<IHtmlTableRow> rows) {
+    super("table", merge(colgroup, rows));
+  }
+
+  protected static List<? extends IHtmlElement> merge(IHtmlTableColgroup colgroup, List<IHtmlTableRow> rows) {
+    if (colgroup == null) {
+      return rows;
+    }
+    if (rows == null) {
+      return CollectionUtility.arrayList(colgroup);
+    }
+
+    List<IHtmlElement> result = CollectionUtility.arrayList(colgroup);
+    result.addAll(rows);
+    return result;
   }
 
   /**

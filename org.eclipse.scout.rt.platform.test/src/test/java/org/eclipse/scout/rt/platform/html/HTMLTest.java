@@ -186,6 +186,14 @@ public class HTMLTest {
   }
 
   @Test
+  public void testCellWithColspanAndColgroup() {
+    IHtmlTableColgroup colgroup = HTML.colgroup(HTML.col(), HTML.col());
+    IHtmlTableRow row = HTML.tr(HTML.td("1").colspan(2), HTML.td("2"));
+    IHtmlTable table = HTML.table(colgroup, row);
+    assertEquals("<table><colgroup><col><col></colgroup><tr><td colspan=\"2\">1</td><td>2</td></tr></table>", table.toHtml());
+  }
+
+  @Test
   public void testMultipleRowsNoBinds() {
     IHtmlTableRow row1 = HTML.tr(HTML.td("p1"), HTML.td("p2"));
     IHtmlTableRow row2 = HTML.tr(HTML.td("p3"), HTML.td("p4"));
