@@ -681,7 +681,7 @@ scout.Widget.prototype._renderLoading = function() {
 //--- Layouting / HtmlComponent methods ---
 
 scout.Widget.prototype.pack = function() {
-  if (!this.rendered) {
+  if (!this.rendered || this.removing) {
     return;
   }
   if (!this.htmlComp) {
@@ -691,7 +691,7 @@ scout.Widget.prototype.pack = function() {
 };
 
 scout.Widget.prototype.invalidateLayout = function() {
-  if (!this.rendered) {
+  if (!this.rendered || this.removing) {
     return;
   }
   if (!this.htmlComp) {
@@ -701,7 +701,7 @@ scout.Widget.prototype.invalidateLayout = function() {
 };
 
 scout.Widget.prototype.validateLayout = function() {
-  if (!this.rendered) {
+  if (!this.rendered || this.removing) {
     return;
   }
   if (!this.htmlComp) {
@@ -711,7 +711,7 @@ scout.Widget.prototype.validateLayout = function() {
 };
 
 scout.Widget.prototype.revalidateLayout = function() {
-  if (!this.rendered) {
+  if (!this.rendered || this.removing) {
     return;
   }
   if (!this.htmlComp) {
@@ -721,7 +721,7 @@ scout.Widget.prototype.revalidateLayout = function() {
 };
 
 scout.Widget.prototype.invalidateLayoutTree = function(invalidateParents) {
-  if (!this.rendered) {
+  if (!this.rendered || this.removing) {
     return;
   }
   if (!this.htmlComp) {
@@ -731,7 +731,7 @@ scout.Widget.prototype.invalidateLayoutTree = function(invalidateParents) {
 };
 
 scout.Widget.prototype.validateLayoutTree = function() {
-  if (!this.rendered) {
+  if (!this.rendered || this.removing) {
     return;
   }
   if (!this.htmlComp) {
@@ -741,7 +741,7 @@ scout.Widget.prototype.validateLayoutTree = function() {
 };
 
 scout.Widget.prototype.revalidateLayoutTree = function(invalidateParents) {
-  if (!this.rendered) {
+  if (!this.rendered || this.removing) {
     return;
   }
   if (!this.htmlComp) {
