@@ -31,14 +31,15 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
  * The following hints are supported:
  * <ul>
  * <li><b><code>?cache=(true|false)</code></b>: Enable/disable HTTP caching of resources. Default value is
- * <code>false</code> (<code>true</code> in development mode).
+ * <code>true</code> (<code>false</code> in development mode).
  * <li><b><code>?compress=(true|false)</code></b>: Enable/disable GZIP compression (if client supports it). Default
- * value is <code>false</code> (<code>true</code> in development mode).
+ * value is <code>true</code>.
  * <li><b><code>?minify=(true|false)</code></b>: Enable/disable "minification" of JS/CSS files. Default value is
- * <code>false</code> (<code>true</code> in development mode).
+ * <code>true</code> (<code>false</code> in development mode).
  * <li><b><code>?inspector=(true|false)</code></b>: Enable/disable inspector attributes in DOM ("modelClass",
- * "classId"). Default value is <code>true</code> (<code>false</code> in development mode).
- * <li><b><code>?debug=(true|false)</code></b>: Enable/disable all of the above flags.
+ * "classId"). Default value is <code>false</code> (<code>true</code> in development mode).
+ * <li><b><code>?debug=(true|false)</code></b>: <code>true</code> sets <i>cache=false, compress=false, minify=false,
+ * inspector=true</i>. <code>false</code> sets the opposite.
  * </ul>
  * <p>
  * The state of all URL hints is stored as a cookie to make it available in subsequent requests without the need to
@@ -71,7 +72,7 @@ public class UrlHints implements Serializable {
   @PostConstruct
   protected void initDefaults() {
     m_cache = !Platform.get().inDevelopmentMode();
-    m_compress = !Platform.get().inDevelopmentMode();
+    m_compress = true;
     m_minify = !Platform.get().inDevelopmentMode();
     m_inspector = Platform.get().inDevelopmentMode();
   }
@@ -267,8 +268,7 @@ public class UrlHints implements Serializable {
   }
 
   /**
-   * Static convenience method delegating to
-   * {@link UrlHintsHelper#updateHints(HttpServletRequest, HttpServletResponse)}.
+   * Static convenience method delegating to {@link UrlHintsHelper#updateHints(HttpServletRequest, HttpServletResponse)}.
    */
   public static void updateHints(HttpServletRequest req, HttpServletResponse resp) {
     URL_HINTS_HELPER.get().updateHints(req, resp);
