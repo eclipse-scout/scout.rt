@@ -130,7 +130,10 @@ scout.TableSelectionHandler.prototype.handleSelection = function(event) {
     var afterFromSelection = (this._prevSelectedRowIndex > this.fromIndex);
 
     // In 'ctrlKey' mode, the unselection is done via 'select=false'
+    // Also prevent unselect in shiftKey mode, because otherwise we'd could
+    // possibly have unwanted gaps within the selection block (see #172929).
     if (!event.ctrlKey) {
+
       // If we are going _towards_ the startIndex, unselect all rows between the current row and the
       // selected row with the greatest distance (this._maxSelectedRowIndex).
       if (goingUp && afterFromSelection) {
@@ -138,6 +141,19 @@ scout.TableSelectionHandler.prototype.handleSelection = function(event) {
       } else if (goingDown && beforeFromSelection) {
         rowsToUnselect = this._allRows.slice(this._maxSelectedRowIndex, thisIndex);
       }
+
+      // when shift is pressed: only unselect when first or last row (but not in the middle of the selection, see #172929)
+      if (rowsToUnselect && event.shiftKey) {
+        var selectionIndizes = this.getMinMaxSelectionIndizes();
+        rowsToUnselect = rowsToUnselect.reduce(function(aggr, row) {
+          var rowIndex = this._allRows.indexOf(row);
+          if (scout.isOneOf(rowIndex, selectionIndizes[0], selectionIndizes[1])) {
+            aggr.push(row);
+          }
+          return aggr;
+        }.bind(this), []);
+      }
+
       if (rowsToUnselect) {
         rowsToUnselect.forEach(function(row) {
           this.table.removeRowFromSelection(row, true);
@@ -176,6 +192,28 @@ scout.TableSelectionHandler.prototype._selectRange = function(fromIndex, toIndex
       this.table.removeRowFromSelection(row, true);
     }, this);
   }
+};
+
+scout.TableSelectionHandler.prototype.getMinMaxSelectionIndizes = function() {
+  var
+    selectedRows = this.table.selectedRows,
+    allRows = this.table.filteredRows();
+
+  if (!selectedRows || selectedRows.length === 0) {
+    return [-1, -1];
+  }
+
+  var min = -1, max = -1;
+  selectedRows.forEach(function(row) {
+    var index = allRows.indexOf(row);
+    if (min === -1 || index < min) {
+      min = index;
+    }
+    if (max === -1 || index > max) {
+      max = index;
+    }
+  });
+  return [min, max];
 };
 
 scout.TableSelectionHandler.prototype.onMouseUp = function(event) {

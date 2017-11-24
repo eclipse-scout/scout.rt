@@ -58,7 +58,11 @@ scout.TableNavigationDownKeyStroke.prototype.handle = function(event) {
         // use case: rows 2,3,4 are selected, last action row is 2. User presses shift-down -> rows 3,4 need to be the new selection
         newSelectedRows = [];
         scout.arrays.pushAll(newSelectedRows, selectedRows);
-        scout.arrays.remove(newSelectedRows, lastActionRow);
+        // only unselect when first or last row (but not in the middle of the selection, see #172929)
+        var selectionIndizes = table.selectionHandler.getMinMaxSelectionIndizes();
+        if (scout.isOneOf(lastActionRowIndex, selectionIndizes[0], selectionIndizes[1])) {
+          scout.arrays.remove(newSelectedRows, lastActionRow);
+        }
       } else {
         newSelectedRows = scout.arrays.union(selectedRows, newSelectedRows);
         newActionRow = this._findLastSelectedRowAfter(table, newActionRowIndex);
