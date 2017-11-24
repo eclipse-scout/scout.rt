@@ -8,57 +8,138 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-@desktop-navigation-width: 290px;
-@desktop-navigation-min-width: 49px; /* not 50px because last pixel is the border (would not look good)*/
-@desktop-navigation-breadcrumb-width: 240px;
-@desktop-header-height: 51px;
-@bench-padding-x: 20px;
-@bench-view-min-width: 50px;
-@bench-view-min-height: 50px;
-@view-button-box-height: @desktop-header-height - 1px; /* minus the border */
 
-@text-field-padding-y: 7px;
-@text-field-padding-x: 10px;
-@button-padding-x: 7px;
-@button-padding-y: 2px;
-@borderless-field-padding-y: 8px;
+/* -------------------------------- */
+/* Global sizes                     */
+/* -------------------------------- */
 
 @border-radius: 3px;
+@borderless-field-padding-y: 8px;
 @control-border-radius: @border-radius;
-@button-border-radius: @border-radius;
-@check-box-border-radius: @border-radius;
-@popup-border-radius: @border-radius;
 
 /* ------------------------------- */
 /* IMPORTANT:
 /* The following constants are also defined in scout.HtmlEnvironment (graphics.js). */
 /* If you change them, be sure to apply them at both places. */
+/* ------------------------------- */
 @logical-grid-height: 30px;
 @mandatory-indicator-width: 8px;
 @field-status-width: 20px;
 @field-status-margin-left: 10px;
-/* ------------------------------- */
 
-@tree-node-control-size: 15px;
-@outline-node-control-size: 20px;
+/* -------------------------------- */
+/* Component specific sizes        */
+/* -------------------------------- */
+@bench-padding-x: 20px;
+@bench-view-min-height: 50px;
+@bench-view-min-width: 50px;
+@box-margin-y: 15px;
+@box-width: 420px;
+@busyindicator-icon-size: 20px;
+@button-border-radius: @border-radius;
+@button-padding-x: 7px;
+@button-padding-y: 2px;
+@calendar-component-margin-left: 32px;
+@calendar-header-button-height: 30px;
+@calendar-title-height: 25px;
+@calendar-week-name-width: 45px;
+@check-box-border-radius: @border-radius;
+@check-box-size: 18px;
+@checkable-cell-padding-adjustment: 2px; /* Adjustment to shift the checkbox a little upwards to align it with the text (resp. first line of the text in case of multiline table cells) */
+@compact-outline-node-padding-x: 16px;
+@compact-outline-node-padding-y: @outline-breadcrumb-node-padding-y;
+@desktop-bench-drop-shadow-top: 3px;
+@desktop-header-height: 51px;
+@desktop-navigation-breadcrumb-width: 240px;
+@desktop-navigation-min-width: 49px; /* not 50px because last pixel is the border (would not look good)*/
+@desktop-navigation-width: 290px;
+@detail-table-data-padding-x: @bench-padding-x - @table-cell-padding-left;
+@detail-table-header-menubar-padding-right: 10px;
+@detail-table-header-padding-x: @bench-padding-x - @table-header-padding-left;
+@detail-table-header-padding-y: @table-header-padding-y + 5;
+@detail-table-row-padding-y: @table-row-padding-y + 5;
+@form-title-margin-top: 10px;
 @group-box-control-size: 20px;
-
-@tree-node-control-checkbox-size: 20px + @tree-node-control-size;
-@tree-node-checkbox-size: 20px;
-@tree-node-bitmap-icon-size: 16px;
-
-@group-margin-top: 14px;
 @group-margin-bottom: 16px;
-@group-title-padding-top: 6px;
-@group-title-padding-bottom: 6px;
+@group-margin-top: 14px;
 @group-title-border-width: 3px;
+@group-title-padding-bottom: 6px;
+@group-title-padding-top: 6px;
+@header-menu-textandicon-padding-right: 11px;
+@menu-item-height: 39px;
+@menu-item-margin-right-between-buttons: 10px;
+@menu-item-margin-right: 20px;
+@menu-item-max-image-icon-height: 18px;
+@menu-item-min-image-icon-width: 18px;
+@menubar-height: @logical-grid-height;
+@messagebox-label-padding: 20px;
+@messagebox-max-width: 330px;
+@mobile-popup-title-margin-right: 30px;
+@mobile-popup-title-margin-top: 10px;
+@outline-breadcrumb-node-padding-y: 12px;
+@outline-node-control-size: 20px;
+@outline-node-padding-right: 8px;
+@outline-node-padding-y: 8px;
+@outline-title-margin-bottom: 12px;
+@outline-title-margin-left: 12px;
+@outline-title-margin-right: 12px;
+@planner-header-button-height: 30px;
+@planner-resource-minheight: 30px;
+@planner-resource-title-width: 150px;
+@planner-scale-height: 45px;
+@popup-border-radius: @border-radius;
+@radio-button-circle-size: 18px;
+@resource-padding-x: 5px;
 @root-group-box-padding-left: @bench-padding-x - @mandatory-indicator-width;
 @root-group-box-padding-right: @bench-padding-x;
-
-@tab-item-padding-x: 20px;
-@tab-item-focus-arrow-width: 15px;
+@scrollbar-margin: 8px;
+@scrollbar-side-margin: 3px;
+@scrollbar-size: 8px;
+@scrollbar-thumb-size: @scrollbar-size;
 @tab-area-border-width: 3px;
+@tab-item-focus-arrow-width: 15px;
+@tab-item-padding-x: 20px;
+@table-cell-padding-left: 8px; /* also used in scout.Column.prototype.buildCell */
+@table-cell-padding-right: 4px;  /* also used in scout.Column.prototype.buildCell */
+@table-control-content-padding: 10px;
+@table-control-padding: 14px;
+@table-footer-height: 52px;
+@table-header-menu-group-padding-top: 10px;
+@table-header-menu-padding: 10px;
+@table-header-padding-left: @table-cell-padding-left;
+@table-header-padding-right: @table-cell-padding-right;
+@table-header-padding-y: @table-row-padding-y;
+@table-header-sort-icon-size-1: 12px;
+@table-header-sort-icon-size-2: @table-header-sort-icon-size-1 + 12px; /* bigger space when multiple icons are displayed */
+@table-menubar-padding: 8px;
+@table-row-padding-y: 7px;
+@text-field-padding-x: 10px;
+@text-field-padding-y: 7px;
+@tile-field-box-shadow-inset: 4px;
+@tile-field-padding-x: 24px;
+@tile-field-padding-y: 18px;
+@tile-field-with-label-padding-top: 15px;
+@tooltip-arrow-size: 14px;
+@tooltip-border-size: 1px;
+@tooltip-border: @tooltip-border-size solid @tooltip-border-color;
+@tooltip-menu-padding-y: 5px;
+@tooltip-padding-x: 12px;
+@tooltip-padding-y: 8px;
+@tree-node-bitmap-icon-size: 16px;
+@tree-node-checkbox-size: 20px;
+@tree-node-control-checkbox-size: 20px + @tree-node-control-size;
+@tree-node-control-size: 15px;
+@tree-node-padding: 6px;
+@view-button-box-height: @desktop-header-height - 1px; /* minus the border */
+@wizard-progress-border-width: 1px;
+@wizard-progress-content-h-padding: 15px;
+@wizard-progress-height: 52px;
+@wizard-progress-separator-line-width: 1px;
+@wizard-progress-separator-width: 10px;
 
-@iphone5-width: 320px;
+/* -------------------------------- */
+/* Other sizes                      */
+/* -------------------------------- */
 @iphone5-height: 568px;
+@iphone5-width: 320px;
 @iphone6-width: 375px;

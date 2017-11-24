@@ -8,13 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-@outline-breadcrumb-node-padding-v: 12px;
-@outline-title-margin-left: 12px;
-@outline-title-margin-right: 12px;
-@outline-title-margin-bottom: 12px;
-@compact-outline-node-padding-h: 16px;
-@compact-outline-node-padding-v: @outline-breadcrumb-node-padding-v;
-
 .outline.tree {
 
   &.in-background > .tree-data > .tree-node.selected {
@@ -51,10 +44,10 @@
       border: 0;
 
       /* leave some space for the scrollbar */
-      padding-right: 8px;
+      padding-right: @outline-node-padding-right;
       /* set top/bottom padding for item */
-      padding-top: 8px;
-      padding-bottom: 8px;
+      padding-top: @outline-node-padding-y;
+      padding-bottom: @outline-node-padding-y;
 
       &.group {
         background-color: @outline-group-background-color;
@@ -170,7 +163,7 @@
       border-bottom: 1px solid @outline-breadcrumb-border-color;
 
       /* !important is necessary here to override the element specific left-padding (calculated by Tree.js for level indentation). */
-      padding: @outline-breadcrumb-node-padding-v 6px !important; /* NOSONAR (see comment above) */
+      padding: @outline-breadcrumb-node-padding-y 6px !important; /* NOSONAR (see comment above) */
 
       &.ancestor-of-selected,
       &.child-of-selected {
@@ -253,7 +246,7 @@
     text-align: left;
 
     & > .outline-title-text {
-      padding-left: @compact-outline-node-padding-h;
+      padding-left: @compact-outline-node-padding-x;
     }
   }
 
@@ -265,14 +258,14 @@
 
       & > .text {
         display: inline-block;
-        padding: @compact-outline-node-padding-v @compact-outline-node-padding-h;
+        padding: @compact-outline-node-padding-y @compact-outline-node-padding-x;
       }
 
       & > .icon {
-        padding: @compact-outline-node-padding-v 0 @compact-outline-node-padding-v @compact-outline-node-padding-h;
+        padding: @compact-outline-node-padding-y 0 @compact-outline-node-padding-y @compact-outline-node-padding-x;
 
         &.font-icon {
-          padding-top: @compact-outline-node-padding-v + 2;
+          padding-top: @compact-outline-node-padding-y + 2;
         }
       }
 
@@ -281,16 +274,16 @@
         right: 0;
         top: 0;
         width: auto;
-        padding: @compact-outline-node-padding-v - 3px @compact-outline-node-padding-h 0 0;
+        padding: @compact-outline-node-padding-y - 3px @compact-outline-node-padding-x 0 0;
       }
 
       & > .detail-menubar {
-        padding: 0 @compact-outline-node-padding-h @compact-outline-node-padding-v @compact-outline-node-padding-h;
+        padding: 0 @compact-outline-node-padding-x @compact-outline-node-padding-y @compact-outline-node-padding-x;
       }
 
       & > .form > .root-group-box > .group-box-body {
-        padding-left: @compact-outline-node-padding-h - @mandatory-indicator-width;
-        padding-right: @compact-outline-node-padding-h;
+        padding-left: @compact-outline-node-padding-x - @mandatory-indicator-width;
+        padding-right: @compact-outline-node-padding-x;
       }
     }
 

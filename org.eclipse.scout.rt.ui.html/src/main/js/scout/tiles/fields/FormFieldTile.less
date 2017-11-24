@@ -7,20 +7,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-@tile-padding-h: 24px;
-@tile-padding-v: 18px;
-@tile-with-label-padding-top: 15px;
-@tile-box-shadow-inset: 4px;
-
 .tile.form-field {
   border: 1px solid @tile-default-border-color;
   background-color: @tile-default-background-color;
   color: @tile-default-color;
-  padding: @tile-with-label-padding-top @tile-padding-h @tile-padding-v @tile-padding-h;
+  padding: @tile-field-with-label-padding-top @tile-field-padding-x @tile-field-padding-y @tile-field-padding-x;
   overflow: hidden;
 
   &.label-hidden {
-    padding-top: @tile-padding-v;
+    padding-top: @tile-field-padding-y;
   }
 
   &.no-padding {
@@ -38,7 +33,7 @@
     margin: 0;
     padding-bottom: 5px;
     border-bottom: 1px solid @tile-default-border-color;
-    margin-bottom: @tile-padding-v - @tile-box-shadow-inset;
+    margin-bottom: @tile-field-padding-y - @tile-field-box-shadow-inset;
   }
 
   & > .field {
@@ -55,7 +50,7 @@
   }
 
   &:not(.inverted):not(.loading):not(.tile-button) {
-    box-shadow: inset 0 0 0 @tile-box-shadow-inset @tile-default-inner-border-color;
+    box-shadow: inset 0 0 0 @tile-field-box-shadow-inset @tile-default-inner-border-color;
   }
 
   /* Define a short transition for opacity changes on all field elements (used in .loading state) */
@@ -209,7 +204,7 @@
   /* This makes it possible to draw the scrollbar (seemingly) outside the field. */
   &.scrollbar-y-outside {
     @offset: 14px;
-    padding-right: @tile-padding-h - @offset;
+    padding-right: @tile-field-padding-x - @offset;
 
     & > label {
       margin-right: @offset;

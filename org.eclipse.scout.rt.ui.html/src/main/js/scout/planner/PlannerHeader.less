@@ -8,8 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-@planner-header-buttons: 30px;
-
 .planner-icon(@icon, @size) {
   #scout.font-icon();
   display: inline-block;
@@ -44,13 +42,13 @@
   white-space: nowrap;
   text-align: center;
   cursor: pointer;
-  height: @planner-header-buttons;
+  height: @planner-header-button-height;
   color: @text-color;
   background-color: @button-background-color;
   border: 1px solid @border-color;
   border-radius: @button-border-radius;
   margin-right: 5px;
-  line-height: @planner-header-buttons;
+  line-height: @planner-header-button-height;
 
   &:hover {
     color: @hover-color;
@@ -94,8 +92,8 @@
   display: inline-block;
   vertical-align: middle;
   text-align: center;
-  height: @planner-header-buttons;
-  line-height: @planner-header-buttons;
+  height: @planner-header-button-height;
+  line-height: @planner-header-button-height;
   cursor: pointer;
 }
 
