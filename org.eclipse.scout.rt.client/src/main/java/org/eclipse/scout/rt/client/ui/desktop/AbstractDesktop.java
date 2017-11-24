@@ -75,9 +75,12 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.FormUtility;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 import org.eclipse.scout.rt.client.ui.form.IFormMenu;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -2067,6 +2070,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   private void attachGui() {
+    ensureProposalChoosersClosed();
     setGuiAvailableInternal(true);
 
     // extensions
@@ -2092,6 +2096,39 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       final String deepLinkPath = propertyMap.get(DeepLinkUrlParameter.DEEP_LINK);
       activateDefaultView(deepLinkPath);
     }
+  }
+
+  /**
+   * Avoid that proposal choosers from content assist fields are still opened in the Java model after the UI has been
+   * reloaded by pressing Ctrl + R. This is only required for the 'old' smart-field, the new smart-field has no model
+   * representation of the proposal chooser anymore. That means when the UI is reloaded, the proposal chooser is gone.
+   * Thus, this method mimics the behavior of the new smart-field. #216067
+   *
+   * @deprecated will be removed with 7.1
+   */
+  @Deprecated
+  protected void ensureProposalChoosersClosed() {
+    closeProposalChoosers(getActiveForm());
+    IOutline outline = getOutline();
+    if (outline != null) {
+      closeProposalChoosers(outline.getDetailForm());
+      closeProposalChoosers(outline.getSearchForm());
+    }
+  }
+
+  protected void closeProposalChoosers(IForm form) {
+    if (form == null) {
+      return;
+    }
+    form.visitFields(new IFormFieldVisitor() {
+      @Override
+      public boolean visitField(IFormField field, int level, int fieldIndex) {
+        if (field instanceof IContentAssistField) {
+          ((IContentAssistField) field).getUIFacade().cancelProposalChooserFromUI();
+        }
+        return true;
+      }
+    });
   }
 
   /**
