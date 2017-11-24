@@ -542,7 +542,7 @@ public final class Assertions {
    * @throws AssertionException
    *           if <code>instance</code> is not an instance of <code>clazz</code>
    */
-  public static <T> T assertInstance(final T value, final Class<?> clazz) {
+  public static <T> T assertInstance(final Object value, final Class<T> clazz) {
     return assertInstance(value, clazz, "expected 'value' to be an instance of 'class' [value={}, class={}]", value, clazz);
   }
 
@@ -561,11 +561,11 @@ public final class Assertions {
    * @throws AssertionException
    *           if <code>instance</code> is not an instance of <code>clazz</code>
    */
-  public static <T> T assertInstance(final T value, final Class<?> clazz, final String msg, final Object... msgArgs) {
+  public static <T> T assertInstance(final Object value, final Class<T> clazz, final String msg, final Object... msgArgs) {
     if (!clazz.isInstance(value)) {
       fail(msg, msgArgs);
     }
-    return value;
+    return clazz.cast(value);
   }
 
   /**
