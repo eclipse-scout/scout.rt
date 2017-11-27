@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 @ClassId("1c8c645d-9e75-4bb1-9f79-c0532d2cdb72")
@@ -127,7 +128,7 @@ public abstract class AbstractProposalField<VALUE> extends AbstractSmartField<VA
       if (stringValue.length() > getMaxLength()) {
         stringValue = stringValue.substring(0, getMaxLength());
       }
-      validValue = (VALUE) stringValue;
+      validValue = (VALUE) StringUtility.nullIfEmpty(stringValue);
     }
     return validValue;
   }

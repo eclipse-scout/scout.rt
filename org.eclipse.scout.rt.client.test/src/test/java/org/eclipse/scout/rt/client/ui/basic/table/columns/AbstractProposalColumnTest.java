@@ -72,7 +72,7 @@ public class AbstractProposalColumnTest {
 
     field.getUIFacade().setValueAsStringFromUI("");
     assertEquals("", field.getDisplayText());
-    assertEquals("", field.getValue());
+    assertEquals(null, field.getValue());
   }
 
   @Test
