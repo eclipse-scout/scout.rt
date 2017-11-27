@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.jackson.databind;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -188,7 +189,7 @@ public class JandexTypeNameIdResolverTest {
   public void testMarshallUnmarshallBaseClassWithoutJsonTypeName() {
     BaseClassWithoutJsonTypeName b = new BaseClassWithoutJsonTypeName();
     b.b = true;
-    marshallUnmarshall(b, true, false);
+    marshallUnmarshall(b, true, "null"); // TODO [16.0] pbz: check if writing "null" type info could be omitted when using Jackson 2.9.2
   }
 
   @Test
@@ -196,7 +197,7 @@ public class JandexTypeNameIdResolverTest {
     BaseClass b = new BaseClass();
     b.b = true;
 
-    BaseClass bMarshalled = marshallUnmarshall(b);
+    BaseClass bMarshalled = marshallUnmarshall(b, "Base");
     assertEquals(true, bMarshalled.b);
   }
 
@@ -205,14 +206,14 @@ public class JandexTypeNameIdResolverTest {
     Impl1 i1 = new Impl1();
     i1.b = true;
     i1.i = 100;
-    Impl1 i1Marshalled = marshallUnmarshall(i1);
+    Impl1 i1Marshalled = marshallUnmarshall(i1, "Impl1");
     assertEquals(true, i1Marshalled.b);
     assertEquals(100, i1Marshalled.i);
 
     Impl2 i2 = new Impl2();
     i2.b = true;
     i2.s = "foo";
-    Impl2 i2Marshalled = marshallUnmarshall(i2);
+    Impl2 i2Marshalled = marshallUnmarshall(i2, "Impl2");
     assertEquals(true, i2Marshalled.b);
     assertEquals("foo", i2Marshalled.s);
   }
@@ -239,7 +240,7 @@ public class JandexTypeNameIdResolverTest {
     i1.i = 100;
     BaseClass b = i1;
 
-    BaseClass bMarshalled = marshallUnmarshall(b);
+    BaseClass bMarshalled = marshallUnmarshall(b, "Impl1");
     assertEquals(true, bMarshalled.b);
     assertTrue(bMarshalled instanceof Impl1);
     assertEquals(100, ((Impl1) bMarshalled).i);
@@ -254,7 +255,7 @@ public class JandexTypeNameIdResolverTest {
     BaseClassWrapper wrapper = new BaseClassWrapper();
     wrapper.baseClass = i1;
 
-    BaseClassWrapper wrapperMarshalled = marshallUnmarshall(wrapper);
+    BaseClassWrapper wrapperMarshalled = marshallUnmarshall(wrapper, "Impl1");
     assertEquals(true, wrapperMarshalled.baseClass.b);
     assertTrue(wrapperMarshalled.baseClass instanceof Impl1);
     assertEquals(100, ((Impl1) wrapperMarshalled.baseClass).i);
@@ -264,7 +265,7 @@ public class JandexTypeNameIdResolverTest {
     i2.s = "foo";
     wrapper.baseClass = i2;
 
-    BaseClassWrapper wrapperMarshalled2 = marshallUnmarshall(wrapper);
+    BaseClassWrapper wrapperMarshalled2 = marshallUnmarshall(wrapper, "Impl2");
     assertEquals(true, wrapperMarshalled2.baseClass.b);
     assertTrue(wrapperMarshalled2.baseClass instanceof Impl2);
     assertEquals("foo", ((Impl2) wrapperMarshalled2.baseClass).s);
@@ -286,7 +287,7 @@ public class JandexTypeNameIdResolverTest {
     i3.b = true;
     i3.f = 99;
     ct.abc = i3;
-    ComplexType ctMarshalled = marshallUnmarshall(ct);
+    ComplexType ctMarshalled = marshallUnmarshall(ct, "Impl1");
     assertEquals(true, ctMarshalled.i1.b);
     assertEquals(100, ctMarshalled.i1.i);
     assertEquals(1000l, ctMarshalled.mnat.l);
@@ -301,7 +302,7 @@ public class JandexTypeNameIdResolverTest {
   public void testMarshallUnmarshallCoreBean() {
     CoreBean bean = new CoreBean();
     bean.b = true;
-    CoreBean beanMarshalled = marshallUnmarshall(bean);
+    CoreBean beanMarshalled = marshallUnmarshall(bean, "CoreBean");
     assertTrue(beanMarshalled.b);
     assertEquals(ProjectTemplateBean.class, beanMarshalled.getClass());
   }
@@ -311,7 +312,7 @@ public class JandexTypeNameIdResolverTest {
     ProjectTemplateBean bean = new ProjectTemplateBean();
     bean.b = true;
     bean.i = 100;
-    ProjectTemplateBean beanMarshalled = marshallUnmarshall(bean);
+    ProjectTemplateBean beanMarshalled = marshallUnmarshall(bean, "CoreBean");
     assertEquals(true, beanMarshalled.b);
     assertEquals(100, beanMarshalled.i);
     assertEquals(ProjectTemplateBean.class, beanMarshalled.getClass());
@@ -325,7 +326,7 @@ public class JandexTypeNameIdResolverTest {
       bean.b = true;
       bean.i = 100;
       bean.f1 = 3.14f;
-      ProjectBean1 beanMarshalled = marshallUnmarshall(bean);
+      ProjectBean1 beanMarshalled = marshallUnmarshall(bean, "CoreBean");
       assertEquals(true, beanMarshalled.b);
       assertEquals(100, beanMarshalled.i);
       assertEquals(3.14f, beanMarshalled.f1, 0);
@@ -342,7 +343,7 @@ public class JandexTypeNameIdResolverTest {
     IBean<?> registeredProjectBean2 = TestingUtility.registerBean(new BeanMetaData(ProjectBean2.class).withReplace(true));
     try {
       CoreBean bean = new CoreBean();
-      marshallUnmarshall(bean);
+      marshallUnmarshall(bean, "CoreBean");
     }
     finally {
       TestingUtility.unregisterBean(registeredProjectBean1);
@@ -351,7 +352,7 @@ public class JandexTypeNameIdResolverTest {
   }
 
   /* ------ Test case with an ICustomer interface extending IDataObject, multiple implementations, which are then replaced by project classes
-  
+
                +--------------------+
                |    IDataObject     |<---------------+
                +---------^----------+                |
@@ -371,7 +372,7 @@ public class JandexTypeNameIdResolverTest {
     +--------+-----------+   +----------+---------+
     |   ProjectPerson    |   |   ProjectCompany   |
     +--------------------+   +--------------------+
-  
+
   */
 
   @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = JSON_TYPE_PROPERTY)
@@ -479,7 +480,7 @@ public class JandexTypeNameIdResolverTest {
   public void testPoJoClass() {
     try {
       ProjectPerson person = new ProjectPerson();
-      marshallUnmarshall(person, false, false);
+      marshallUnmarshall(person, false, "null"); // TODO [16.0] pbz: check if writing "null" type info could be omitted when using Jackson 2.9.2
     }
     catch (PlatformException e) {
       assertTrue(e.getCause() instanceof JsonMappingException);
@@ -496,7 +497,7 @@ public class JandexTypeNameIdResolverTest {
     ProjectCompany company = new ProjectCompany();
     company.setId("companyId");
     customers.add(company);
-    List<ICustomer> marshalled = marshallUnmarshall(customers, false, false); // note since List<> is not annotated with @JandexTypeNameIdResolver, no typeId is generated
+    List<ICustomer> marshalled = marshallUnmarshall(customers, false, null); // note since List<> is not annotated with @JandexTypeNameIdResolver, no typeId is generated
     assertEquals(2, marshalled.size());
     CollectionUtility.contains(marshalled, person);
     CollectionUtility.contains(marshalled, company);
@@ -520,7 +521,7 @@ public class JandexTypeNameIdResolverTest {
       customerResponse.customers = new ArrayList<>();
       customerResponse.customers.add(BEANS.get(ProjectPerson.class));
       customerResponse.customers.add(BEANS.get(ProjectCompany.class));
-      marshallUnmarshall(customerResponse);
+      marshallUnmarshall(customerResponse, "Person");
     }
     finally {
       TestingUtility.unregisterBeans(registeredBeans);
@@ -529,28 +530,28 @@ public class JandexTypeNameIdResolverTest {
 
   protected void runTestBeanInterfaceWithMultipleImplementation() {
     ProjectPerson person = BEANS.get(ProjectPerson.class);
-    ProjectPerson personMarshalled = marshallUnmarshall(person);
+    ProjectPerson personMarshalled = marshallUnmarshall(person, "Person");
     assertEquals(ProjectPerson.class, personMarshalled.getClass());
 
     PersonResponse personResponse = new PersonResponse();
     personResponse.persons = new ArrayList<>();
     personResponse.persons.add(person);
-    PersonResponse personResponseMarshalled = marshallUnmarshall(personResponse);
+    PersonResponse personResponseMarshalled = marshallUnmarshall(personResponse, "Person");
     assertEquals(ProjectPerson.class, personResponseMarshalled.persons.get(0).getClass());
 
     CustomerResponse customerResponse = new CustomerResponse();
     ICustomer customer = BEANS.get(ProjectPerson.class);
-    ICustomer customerMarshalled = marshallUnmarshall(customer);
+    ICustomer customerMarshalled = marshallUnmarshall(customer, "Person");
     assertEquals(ProjectPerson.class, customerMarshalled.getClass());
     customerResponse.customers = new ArrayList<>();
     customerResponse.customers.add(customer);
 
-    CustomerResponse customerResponseMarshalled = marshallUnmarshall(customerResponse);
+    CustomerResponse customerResponseMarshalled = marshallUnmarshall(customerResponse, "Person");
     assertEquals(ProjectPerson.class, customerResponseMarshalled.customers.get(0).getClass());
   }
 
   /* ------ Test case with an ICustomer interface NOT extending IDataObject, multiple implementations, which are then replaced by project classes
-  
+
                +--------------------+
                |    IDataObject     |
                +---------^----------+
@@ -570,7 +571,7 @@ public class JandexTypeNameIdResolverTest {
     +--------+-----------+   +----------+---------+
     |   ProjectPerson2   |   |   ProjectCompany2  |
     +--------------------+   +--------------------+
-  
+
   */
 
   @JsonTypeIdResolver(JandexTypeNameIdResolver.class)
@@ -612,7 +613,7 @@ public class JandexTypeNameIdResolverTest {
       customerResponse.customers = new ArrayList<>();
       customerResponse.customers.add(BEANS.get(ProjectPerson2.class));
       customerResponse.customers.add(BEANS.get(ProjectCompany2.class));
-      marshallUnmarshall(customerResponse);
+      marshallUnmarshall(customerResponse, "Person");
     }
     finally {
       TestingUtility.unregisterBeans(registeredBeans);
@@ -622,8 +623,8 @@ public class JandexTypeNameIdResolverTest {
   /**
    * Test-case with a base class and two subclasses which do not specify an own JSON type identifier.
    * <p>
-   * This example is a completeness test for JandexTypeNameIdResolver, in a normal case this scenario is not
-   * reproducible due to a check for duplicated replaced classes within bean manager. This test case should fail, since
+   * This example is a completeness test for JandexTypeNameIdResolver, in a normal case this scenario is not reproducible
+   * due to a check for duplicated replaced classes within bean manager. This test case should fail, since
    * JandexTypeNameIdResolver cannot find the correct matching class if more than one matching subclass is available.
    */
   @Test(expected = InvalidTypeIdException.class)
@@ -642,19 +643,24 @@ public class JandexTypeNameIdResolverTest {
     }
   }
 
-  protected static <T> T marshallUnmarshall(T object) {
-    return marshallUnmarshall(object, false, true);
+  protected static <T> T marshallUnmarshall(T object, String expectedJsonType) {
+    return marshallUnmarshall(object, false, expectedJsonType);
   }
 
   @SuppressWarnings("unchecked")
-  protected static <T> T marshallUnmarshall(T object, boolean useAnnotationIntrospector, boolean expectJsonTypeProperty) {
+  protected static <T> T marshallUnmarshall(T object, boolean useAnnotationIntrospector, String expectedJsonType) {
     ObjectMapper mapper = new ObjectMapper();
     if (useAnnotationIntrospector) {
       mapper.setAnnotationIntrospector(BEANS.get(JandexJacksonAnnotationIntrospector.class));
     }
     try {
       String json = mapper.writeValueAsString(object);
-      assertEquals("Expected \"" + JSON_TYPE_PROPERTY + "\" property in JSON string " + json, expectJsonTypeProperty, String.class.cast(json).contains(JSON_TYPE_PROPERTY));
+      if (expectedJsonType != null) {
+        assertTrue("Expected \"" + JSON_TYPE_PROPERTY + "\" property in JSON string " + json, json.contains("\"" + JSON_TYPE_PROPERTY + "\":\"" + expectedJsonType + "\""));
+      }
+      else {
+        assertFalse("Did not expect \"" + JSON_TYPE_PROPERTY + "\" property in JSON string " + json, json.contains(JSON_TYPE_PROPERTY));
+      }
       return (T) mapper.readValue(json, (Class<T>) object.getClass());
     }
     catch (IOException e) {
