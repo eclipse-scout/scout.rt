@@ -31,14 +31,15 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
  * The following hints are supported:
  * <ul>
  * <li><b><code>?cache=(true|false)</code></b>: Enable/disable HTTP caching of resources. Default value is
- * <code>false</code> (<code>true</code> in development mode).
+ * <code>true</code> (<code>false</code> in development mode).
  * <li><b><code>?compress=(true|false)</code></b>: Enable/disable GZIP compression (if client supports it). Default
- * value is <code>false</code> (<code>true</code> in development mode).
+ * value is <code>true</code> (<code>false</code> in development mode).
  * <li><b><code>?minify=(true|false)</code></b>: Enable/disable "minification" of JS/CSS files. Default value is
- * <code>false</code> (<code>true</code> in development mode).
+ * <code>true</code> (<code>false</code> in development mode).
  * <li><b><code>?inspector=(true|false)</code></b>: Enable/disable inspector attributes in DOM ("modelClass",
- * "classId"). Default value is <code>true</code> (<code>false</code> in development mode).
- * <li><b><code>?debug=(true|false)</code></b>: Enable/disable all of the above flags.
+ * "classId"). Default value is <code>false</code> (<code>true</code> in development mode).
+ * <li><b><code>?debug=(true|false)</code></b>: <code>true</code> sets <i>cache=false, compress=false, minify=false,
+ * inspector=true</i>. <code>false</code> sets the opposite.
  * </ul>
  * <p>
  * The state of all URL hints is stored as a cookie to make it available in subsequent requests without the need to
