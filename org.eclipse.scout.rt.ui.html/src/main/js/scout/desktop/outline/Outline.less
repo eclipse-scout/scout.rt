@@ -48,6 +48,7 @@
       /* set top/bottom padding for item */
       padding-top: @outline-node-padding-y;
       padding-bottom: @outline-node-padding-y;
+      padding-left: @outline-node-padding-left;
 
       &.group {
         background-color: @outline-group-background-color;
@@ -73,13 +74,8 @@
       }
 
       & > .tree-node-control {
-        /* adjust control position */
-        margin-left: -@outline-node-control-size - 5px;
-        margin-top: -3px;
-
-        width: @outline-node-control-size;
-        height: @outline-node-control-size;
-        line-height: @outline-node-control-size;
+        padding-top: @outline-node-padding-y;
+        padding-left: @outline-node-control-padding-left;
 
         &::before {
           font-size: @outline-node-control-size;

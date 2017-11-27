@@ -46,8 +46,7 @@ scout.Outline = function() {
   this._detailContentDestroyHandler = this._onDetailContentDestroy.bind(this);
   this._detailMenusNodesSelectedHandler = null;
   this._additionalContainerClasses += ' outline';
-  this._treeItemPaddingLeft = 37;
-  this._treeItemPaddingLevel = 20;
+  this.nodePaddingLevel = 20;
   this._scrolldirections = 'y';
   this._addWidgetProperties(['defaultDetailForm', 'views', 'selectedViewTabs', 'dialogs', 'messageBoxes', 'fileChoosers']);
 };

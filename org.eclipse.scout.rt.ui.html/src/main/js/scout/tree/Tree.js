@@ -31,6 +31,10 @@ scout.Tree = function() {
   this.multiCheck = true;
   this.nodes = []; // top-level nodes
   this.nodesMap = {}; // all nodes by id
+  this.nodePaddingLeft = null; /* is read from CSS */
+  this.nodeCheckBoxPaddingLeft = 29;
+  this.nodeControlPaddingLeft = null; /* is read from CSS */
+  this.nodePaddingLevel = 15;
   this.scrollToSelection = false;
   this.scrollTop = 0;
   this.selectedNodes = [];
@@ -44,9 +48,6 @@ scout.Tree = function() {
   this.visibleNodesMap = {};
   this._addWidgetProperties(['menus', 'keyStrokes']);
   this._additionalContainerClasses = ''; // may be used by subclasses to set additional CSS classes
-  this._treeItemPaddingLeft = 23;
-  this._treeItemCheckBoxPaddingLeft = 29;
-  this._treeItemPaddingLevel = 15;
   this._filters = [];
   this._doubleClickSupport = new scout.DoubleClickSupport();
   this._$animationWrapper = null; // used by _renderExpansion()
@@ -845,7 +846,7 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNode) {
 };
 
 scout.Tree.prototype._renderNode = function(node) {
-  var paddingLeft = this._computeTreeItemPaddingLeft(node.level);
+  var paddingLeft = this._computeNodePaddingLeft(node.level);
   node.render(this.$container, paddingLeft, this.checkable, this.enabled);
   return node.$node;
 };
@@ -899,7 +900,7 @@ scout.Tree.prototype._renderCheckable = function() {
       $checkbox.remove();
     }
 
-    $node.css('padding-left', this._computeTreeItemPaddingLeft(parseFloat($node.attr('data-level'))));
+    $node.css('padding-left', this._computeNodePaddingLeft(parseFloat($node.attr('data-level'))));
 
     // Recursion
     if (node.childNodes) {
@@ -1903,11 +1904,30 @@ scout.Tree.prototype.isNodeSelected = function(node) {
   return this.selectedNodes.indexOf(node) > -1;
 };
 
-scout.Tree.prototype._computeTreeItemPaddingLeft = function(level) {
+scout.Tree.prototype._computeNodePaddingLeft = function(level) {
+  this._computeNodePaddings();
   if (this.checkable) {
-    return level * this._treeItemPaddingLevel + this._treeItemPaddingLeft + this._treeItemCheckBoxPaddingLeft;
+    return level * this.nodePaddingLevel + this.nodePaddingLeft + this.nodeCheckBoxPaddingLeft;
   }
-  return level * this._treeItemPaddingLevel + this._treeItemPaddingLeft;
+  return level * this.nodePaddingLevel + this.nodePaddingLeft;
+};
+
+/**
+ * Reads the paddings from CSS and stores them in nodePaddingLeft and nodeControlPaddingLeft
+ */
+scout.Tree.prototype._computeNodePaddings = function() {
+  if (this.nodePaddingLeft !== null && this.nodeControlPaddingLeft !== null) {
+    return;
+  }
+  var $dummyNode = this.$data.appendDiv('tree-node');
+  var $dummyNodeControl = $dummyNode.appendDiv('tree-node-control');
+  if (this.nodePaddingLeft === null) {
+    this.nodePaddingLeft = $dummyNode.cssPaddingLeft();
+  }
+  if (this.nodeControlPaddingLeft === null) {
+    this.nodeControlPaddingLeft = $dummyNodeControl.cssPaddingLeft();
+  }
+  $dummyNode.remove();
 };
 
 scout.Tree.prototype._expandAllParentNodes = function(node) {

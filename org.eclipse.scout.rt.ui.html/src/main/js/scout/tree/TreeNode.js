@@ -209,10 +209,12 @@ scout.TreeNode.prototype.$icon = function() {
 };
 
 scout.TreeNode.prototype._renderControl = function() {
+  var tree = this.getTree();
   var $control = this.$node.prependDiv('tree-node-control');
-  if (this.getTree().checkable) {
+  if (tree.checkable) {
     $control.addClass('checkable');
   }
+  $control.cssPaddingLeft(tree.nodeControlPaddingLeft + this.level * tree.nodePaddingLevel);
   $control.setVisible(!this.leaf);
 };
 

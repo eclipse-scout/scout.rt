@@ -66,7 +66,7 @@
   border: 1px solid transparent;
   border-left: 0 solid transparent;
   border-right: 0 solid transparent;
-  padding: @tree-node-padding;
+  padding: @tree-node-padding-y @tree-node-padding-right @tree-node-padding-y @tree-node-padding-left;
   #scout.overflow-ellipsis-nowrap();
 
   &:active {
@@ -126,7 +126,7 @@
   top: auto;
   left: auto;
   margin-top: -2px;
-  margin-left: -@tree-node-checkbox-size - 4px;
+  margin-left: -@tree-node-checkbox-size - 6px;
   width: @tree-node-checkbox-size;
   height: @tree-node-checkbox-size;
 
@@ -173,22 +173,16 @@
 .tree-node-control {
   display: block;
   position: absolute;
-  top: auto;
-  left: auto;
-  transition: transform 0.3s;
+  top: 0;
+  left: 0;
   cursor: pointer;
-
-  /* adjust control position */
-  margin-left: -@tree-node-control-size - 2px;
-  margin-top: -1px;
-
-  /* for good animation, ensure that the control is a square and the icon is centered */
-  width: @tree-node-control-size;
-  height: @tree-node-control-size;
-  line-height: @tree-node-control-size;
-  text-align: center;
+  padding: @tree-node-padding-y 8px @tree-node-padding-y @tree-node-control-padding-left;
+  height: 100%;
+  line-height: 14px; /* Necessary to bottom align it with the text. Must not be the same size as the font-size, otherwise it is positioned to far on the bottom with IE */
 
   &::before {
+    display: block;
+    transition: transform 0.3s;
     #scout.font-icon();
     font-size: @tree-node-control-size;
     content: @icon-angle-right;
@@ -201,19 +195,15 @@
       margin-left: -2px;
     }
 
+    .tree-node.expanded > & {
+      /* This "imprecise" angle is a workround for firefox to prevent shifting the div a little when the animation finishes. */
+      /* See https://bugzilla.mozilla.org/show_bug.cgi?id=739176 */
+      #scout.transform(rotate(89.99deg));
+    }
+
     .tree-node-control:hover::before {
       color: @hover-color;
     }
-  }
-
-  .tree-node.expanded > & {
-    /* This "imprecise" angle is a workround for firefox to prevent shifting the div a little when the animation finishes. */
-    /* See https://bugzilla.mozilla.org/show_bug.cgi?id=739176 */
-    #scout.transform(rotate(89.99deg));
-  }
-
-  &.checkable {
-    margin-left: -@tree-node-control-checkbox-size - 8px;
   }
 }
 
@@ -231,7 +221,7 @@
       border-bottom: 1px solid @border-color;
 
       /* !important is necessary here to override the element specific left-padding (calculated by Tree.js for level indentation). */
-      padding: 10px @tree-node-padding 8px @tree-node-padding !important; /* NOSONAR (see comment above) */
+      padding: 10px @tree-node-padding-y 8px @tree-node-padding-y !important; /* NOSONAR (see comment above) */
 
       &.ancestor-of-selected,
       &.child-of-selected,
