@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractProposalFie
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 @ClassId("1c8c645d-9e75-4bb1-9f79-c0532d2cdb72")
@@ -123,4 +124,22 @@ public abstract class AbstractProposalField2<VALUE> extends AbstractSmartField2<
     // Other than the smart-field the proposal field does not do a lookup by key to find and set
     // a lookup row. A lookup row is never set by value.
   }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  protected VALUE validateValueInternal(VALUE rawValue) {
+    VALUE validValue = super.validateValueInternal(rawValue);
+    if (validValue != null) {
+      String stringValue = (String) validValue;
+      if (isTrimText()) {
+        stringValue = stringValue.trim();
+      }
+      if (stringValue.length() > getMaxLength()) {
+        stringValue = stringValue.substring(0, getMaxLength());
+      }
+      validValue = (VALUE) StringUtility.nullIfEmpty(stringValue);
+    }
+    return validValue;
+  }
+
 }
