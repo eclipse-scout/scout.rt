@@ -43,6 +43,12 @@ scout.Widget = function() {
   this.destroyed = false;
 
   this.enabled = true;
+  /**
+   * The computed enabled state. The difference to the 'enabled' property is that this member
+   * also considers the enabled-states of the parent widgets.
+   */
+  this.enabledComputed = true;
+  this.inheritAccessibility = true;
   this.disabledStyle = scout.Widget.DisabledStyle.DEFAULT;
   this.visible = true;
   this.focused = false;
@@ -56,7 +62,7 @@ scout.Widget = function() {
   this.animateRemoval = false;
 
   this._widgetProperties = [];
-  this._cloneProperties = ['visible', 'enabled', 'cssClass'];
+  this._cloneProperties = ['visible', 'enabled', 'inheritAccessibility', 'cssClass'];
   this.eventDelegators = [];
   this._preserveOnPropertyChangeProperties = [];
   this._postRenderActions = [];
@@ -119,6 +125,7 @@ scout.Widget.prototype._init = function(model) {
   }.bind(this));
 
   this._setLogicalGrid(this.logicalGrid);
+  this._setEnabled(this.enabled);
 };
 
 /**
@@ -494,6 +501,9 @@ scout.Widget.prototype.setParent = function(parent) {
   }
   this.parent = parent;
   this.parent.addChild(this);
+  if (this.initialized) {
+    this.recomputeEnabled(this.parent.enabledComputed);
+  }
   this.parent.one('destroy', this._parentDestroyHandler);
 };
 
@@ -546,20 +556,89 @@ scout.Widget.prototype.has = function(widget) {
   return false;
 };
 
-scout.Widget.prototype.setEnabled = function(enabled) {
+scout.Widget.prototype.getForm = function() {
+  return scout.Form.findForm(this);
+};
+
+/**
+ * Changes the enabled property of this form field to the given value.
+ *
+ * @param enabled
+ *          Required. The new enabled value
+ * @param updateParents
+ *          (optional) If true, the enabled property of all parent form fields are
+ *          updated to same value as well. Default is false.
+ * @param updateChildren
+ *          (optional) If true the enabled property of all child form fields (recursive)
+ *          are updated to same value as well. Default is false.
+ */
+scout.Widget.prototype.setEnabled = function(enabled, updateParents, updateChildren) {
   this.setProperty('enabled', enabled);
+
+  if (enabled && updateParents && this.parent) {
+    this.parent.setEnabled(true, true, false);
+  }
+
+  if (updateChildren) {
+    this.visitChildren(function(field) {
+      field.setEnabled(enabled);
+    });
+  }
+};
+
+scout.Widget.prototype._setEnabled = function(enabled) {
+  this._setProperty('enabled', enabled);
+  this.recomputeEnabled();
+};
+
+scout.Widget.prototype.recomputeEnabled = function(parentEnabled) {
+  if (parentEnabled === undefined) {
+    parentEnabled = true;
+    if (this.parent && this.parent.initialized && this.parent.enabledComputed !== undefined) {
+      parentEnabled = this.parent.enabledComputed;
+    }
+  }
+
+  var enabledComputed = this._computeEnabled(this.inheritAccessibility, parentEnabled);
+  this.setProperty('enabledComputed', enabledComputed);
+
+  // Manually call _renderEnabled(), because _renderEnabledComputed() does not exist
+  if (this.rendered) {
+    this._renderEnabled(); // refresh
+  }
+
+  this.children.forEach(function(child) {
+    child.recomputeEnabled(enabledComputed);
+  });
+};
+
+scout.Widget.prototype._computeEnabled = function(inheritAccessibility, parentEnabled) {
+  return this.enabled && (inheritAccessibility ? parentEnabled : true);
 };
 
 scout.Widget.prototype._renderEnabled = function() {
   if (!this.$container) {
     return;
   }
-  this.$container.setEnabled(this.enabled);
+  this.$container.setEnabled(this.enabledComputed);
   this._renderDisabledStyle();
+};
+
+scout.Widget.prototype.setInheritAccessibility = function(inheritAccessibility) {
+  this.setProperty('inheritAccessibility', inheritAccessibility);
+};
+
+scout.Widget.prototype._setInheritAccessibility = function(inheritAccessibility) {
+  this._setProperty('inheritAccessibility', inheritAccessibility);
+  this.recomputeEnabled();
 };
 
 scout.Widget.prototype.setDisabledStyle = function(disabledStyle) {
   this.setProperty('disabledStyle', disabledStyle);
+
+  this.children.forEach(function(child) {
+    child.setDisabledStyle(disabledStyle);
+  });
 };
 
 scout.Widget.prototype._renderDisabledStyle = function() {
@@ -574,14 +653,7 @@ scout.Widget.prototype._renderDisabledStyleInternal = function($element) {
   if (!$element) {
     return;
   }
-  var enabled = this.enabled;
-  // For FormFields, the parents' "enabledness" must be considered as well (e.g. when a field is enabled,
-  // but the parent group box is not, the field has enabled=true but is rendered as disabled). This
-  // instance check may probably be removed in the future, when enabledComputed is move to Widget.js
-  if (this instanceof scout.FormField) {
-    enabled = this.enabledComputed;
-  }
-  if (enabled) {
+  if (this.enabledComputed) {
     $element.removeClass('read-only');
   } else {
     $element.toggleClass('read-only', this.disabledStyle === scout.Widget.DisabledStyle.READ_ONLY);

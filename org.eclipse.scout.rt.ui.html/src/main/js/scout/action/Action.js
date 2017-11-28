@@ -144,7 +144,7 @@ scout.Action.prototype._removeIconId = function() {
  * @override
  */
 scout.Action.prototype._renderEnabled = function() {
-  this.$container.setEnabled(this.enabled);
+  scout.Action.parent.prototype._renderEnabled.call(this);
   if (this.rendered) { // prevent unnecessary tooltip updates during initial rendering
     this._updateTooltip();
   }
@@ -175,7 +175,7 @@ scout.Action.prototype._renderTooltipText = function() {
 };
 
 /**
- * Installs or uninstalls tooltip based on tooltipText, selected and enabled.
+ * Installs or uninstalls tooltip based on tooltipText, selected and enabledComputed.
  */
 scout.Action.prototype._updateTooltip = function() {
   if (this._shouldInstallTooltip()) {
@@ -186,7 +186,7 @@ scout.Action.prototype._updateTooltip = function() {
 };
 
 scout.Action.prototype._shouldInstallTooltip = function() {
-  return this.tooltipText && !this.selected && this.enabled;
+  return this.tooltipText && !this.selected && this.enabledComputed;
 };
 
 scout.Action.prototype._renderTabbable = function() {
@@ -212,7 +212,7 @@ scout.Action.prototype._configureTooltip = function() {
 /**
  * @return {Boolean}
  *          <code>true</code> if the action has been performed or <code>false</code> if it
- *          has not been performed (e.g. when the button is not enabled).
+ *          has not been performed (e.g. when the button is not enabledComputed).
  */
 scout.Action.prototype.doAction = function() {
   if (!this.prepareDoAction()) {
@@ -241,7 +241,7 @@ scout.Action.prototype.isToggleAction = function() {
  * @returns {Boolean} <code>true</code> if the action may be executed, <code>false</code> if it should be ignored.
  */
 scout.Action.prototype.prepareDoAction = function() {
-  if (!this.enabled || !this.visible) {
+  if (!this.enabledComputed || !this.visible) {
     return false;
   }
 

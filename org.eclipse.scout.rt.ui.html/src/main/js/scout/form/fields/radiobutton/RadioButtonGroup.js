@@ -112,16 +112,6 @@ scout.RadioButtonGroup.prototype._renderEnabled = function() {
   this._provideTabIndex();
 };
 
-/**
- * @override FormField.js
- */
-scout.RadioButtonGroup.prototype.recomputeEnabled = function(parentEnabled) {
-  scout.RadioButtonGroup.parent.prototype.recomputeEnabled.call(this, parentEnabled);
-  this.getFields().forEach(function(field) {
-    field.recomputeEnabled(this.enabledComputed);
-  }, this);
-};
-
 scout.RadioButtonGroup.prototype._provideTabIndex = function() {
   var tabSet;
   this.radioButtons.forEach(function(radioButton) {

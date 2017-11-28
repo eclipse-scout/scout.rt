@@ -40,6 +40,101 @@ describe('Widget', function() {
     return widget;
   }
 
+  describe('enabled', function() {
+    it('should be propagated correctly', function() {
+      widget.init({
+        session: session,
+        parent: parent
+      });
+      // check setup
+      expect(widget.inheritAccessibility).toBe(true);
+      expect(widget.parent.inheritAccessibility).toBe(true);
+      expect(widget.enabled).toBe(true);
+      expect(widget.enabledComputed).toBe(true);
+      expect(widget.parent.enabled).toBe(true);
+      expect(widget.parent.enabledComputed).toBe(true);
+
+      // check change on widget itself
+      widget.setEnabled(false, false, false);
+      expect(widget.enabled).toBe(false);
+      expect(widget.enabledComputed).toBe(false);
+      expect(widget.parent.enabled).toBe(true);
+      expect(widget.parent.enabledComputed).toBe(true);
+
+      // check that child-propagation works and resets the enabled state
+      widget.parent.setEnabled(true, false, true);
+      expect(widget.enabled).toBe(true);
+      expect(widget.enabledComputed).toBe(true);
+      expect(widget.parent.enabled).toBe(true);
+      expect(widget.parent.enabledComputed).toBe(true);
+
+      // check that inheritance works
+      widget.parent.setEnabled(false, false, false);
+      expect(widget.enabled).toBe(true);
+      expect(widget.enabledComputed).toBe(false);
+      expect(widget.parent.enabled).toBe(false);
+      expect(widget.parent.enabledComputed).toBe(false);
+
+      // check that parent-propagation works
+      widget.setEnabled(true, true, false);
+      expect(widget.enabled).toBe(true);
+      expect(widget.enabledComputed).toBe(true);
+      expect(widget.parent.enabled).toBe(true);
+      expect(widget.parent.enabledComputed).toBe(true);
+    });
+
+    it('should not be inherited if inheritAccessibility is disabled', function() {
+      widget.init({
+        session: session,
+        parent: parent
+      });
+      // check setup
+      widget.setInheritAccessibility(false);
+      expect(widget.inheritAccessibility).toBe(false);
+      expect(widget.parent.inheritAccessibility).toBe(true);
+      expect(widget.enabled).toBe(true);
+      expect(widget.enabledComputed).toBe(true);
+      expect(widget.parent.enabled).toBe(true);
+      expect(widget.parent.enabledComputed).toBe(true);
+
+      // change enabled of parent and verify that it has no effect on child because inheritance is disabled.
+      widget.parent.setEnabled(false, false, false);
+      expect(widget.enabled).toBe(true);
+      expect(widget.enabledComputed).toBe(true);
+      expect(widget.parent.enabled).toBe(false);
+      expect(widget.parent.enabledComputed).toBe(false);
+    });
+
+    it('should correctly recalculate enabled state when adding a new field', function() {
+      widget.init({
+        session: session,
+        parent: parent
+      });
+      // check setup
+      parent.setEnabled(false, false, false);
+      expect(widget.enabled).toBe(true);
+      expect(widget.enabledComputed).toBe(false);
+      expect(widget.parent.enabled).toBe(false);
+      expect(widget.parent.enabledComputed).toBe(false);
+
+      // add a new field which itself is enabled
+      var tmpParent = new TestWidget();
+      var additionalWidget = new TestWidget();
+      additionalWidget.init({
+        session: session,
+        parent: tmpParent
+      });
+
+      expect(additionalWidget.enabled).toBe(true);
+      expect(additionalWidget.enabledComputed).toBe(true);
+      additionalWidget.setParent(widget.parent);
+
+      // check that the new widget is disabled now
+      expect(additionalWidget.enabled).toBe(true);
+      expect(additionalWidget.enabledComputed).toBe(false);
+    });
+  });
+
   describe('rendering', function() {
 
     it('should set rendering, rendered flags correctly', function() {

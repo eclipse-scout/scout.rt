@@ -18,10 +18,6 @@ scout.FormField = function() {
   this.dropType = 0;
   this.dropMaximumSize = scout.dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
   this.empty = true;
-  /**
-   * The computed enabled state. The difference to the 'enabled' property is that this member also considers the enabled-states of the parent widgets.
-   */
-  this.enabledComputed = true;
   this.errorStatus = null;
   this.fieldStyle = scout.FormField.DEFAULT_FIELD_STYLE;
   this.gridData = null;
@@ -135,7 +131,6 @@ scout.FormField.prototype._init = function(model) {
   this._setErrorStatus(this.errorStatus);
   this._setGridDataHints(this.gridDataHints);
   this._setGridData(this.gridData);
-  this._setEnabled(this.enabled);
   this._updateEmpty();
 };
 
@@ -444,52 +439,13 @@ scout.FormField.prototype._renderLabelPosition = function(position) {
 };
 
 /**
- * Changes the enabled property of this form field to the given value.
- * @param enabled
- *          Required. The new enabled value
- * @param updateParents
- *          (optional) If true the enabled property of all parent form fields are updated to same value as well.
- * @param updateChildren
- *          (optional) If true the enabled property of all child form fields (recursive) are updated to same value as well.
- */
-scout.FormField.prototype.setEnabled = function(enabled, updateParents, updateChildren) {
-  scout.FormField.parent.prototype.setEnabled.call(this, enabled);
-
-  if (enabled && updateParents) {
-    this.visitParents(function(field) {
-      field.setEnabled(true);
-    });
-  }
-
-  if (updateChildren) {
-    this.visit(function(field) {
-      field.setEnabled(enabled);
-    });
-  }
-};
-
-scout.FormField.prototype._setEnabled = function(enabled) {
-  this._setProperty('enabled', enabled);
-  var parentEnabled = enabled;
-  if (this.parent.initialized && this.parent.enabledComputed !== undefined) {
-    parentEnabled = this.parent.enabledComputed;
-  }
-  this.recomputeEnabled(parentEnabled);
-};
-
-/**
  * @override
  */
 scout.FormField.prototype._renderEnabled = function() {
-  // Complete override, because Widget.js only looks at the "enabled" property. However,
-  // in FormFields, the property "enabledComputed" should be used instead.
-  if (this.$container) {
-    this.$container.setEnabled(this.enabledComputed);
-  }
+  scout.FormField.parent.prototype._renderEnabled.call(this);
   if (this.$field) {
     this.$field.setEnabled(this.enabledComputed);
   }
-  this._renderDisabledStyle();
   this._updateDisabledCopyOverlay();
 };
 
@@ -641,15 +597,6 @@ scout.FormField.prototype._renderMenusVisible = function() {
 scout.FormField.prototype._setKeyStrokes = function(keyStrokes) {
   this.updateKeyStrokes(keyStrokes, this.keyStrokes);
   this._setProperty('keyStrokes', keyStrokes);
-};
-
-scout.FormField.prototype.recomputeEnabled = function(parentEnabled) {
-  this.setProperty('enabledComputed', this.enabled && parentEnabled);
-
-  // Manually call _renderEnabled(), because _renderEnabledComputed() does not exist
-  if (this.rendered) {
-    this._renderEnabled(); // refresh
-  }
 };
 
 scout.FormField.prototype._onStatusMouseDown = function(event) {
@@ -844,10 +791,6 @@ scout.FormField.prototype.activate = function() {
   if (this.$field) {
     this.$field.focus();
   }
-};
-
-scout.FormField.prototype.getForm = function() {
-  return scout.Form.findForm(this);
 };
 
 scout.FormField.prototype.getParentGroupBox = function() {

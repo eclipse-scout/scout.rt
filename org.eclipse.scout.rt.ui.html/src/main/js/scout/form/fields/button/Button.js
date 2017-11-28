@@ -77,13 +77,11 @@ scout.Button.prototype._initKeyStrokeContext = function() {
 };
 
 /**
- * @override FormField.js
+ * @override Widget.js
  */
-scout.Button.prototype.recomputeEnabled = function(parentEnabled) {
-  if (this._isIgnoreAccessibilityFlags()) {
-    parentEnabled = true;
-  }
-  scout.Button.parent.prototype.recomputeEnabled.call(this, parentEnabled);
+scout.Button.prototype._computeEnabled = function(inheritAccessibility, parentEnabled) {
+  return scout.Button.parent.prototype._computeEnabled.call(this,
+      inheritAccessibility && !this._isIgnoreAccessibilityFlags(), parentEnabled);
 };
 
 scout.Button.prototype._isIgnoreAccessibilityFlags = function() {

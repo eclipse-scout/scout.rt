@@ -4000,6 +4000,9 @@ scout.Table.prototype._calculateFillerHeight = function(range) {
 };
 
 scout.Table.prototype.containsAggregatedNumberColumn = function() {
+  if (!this.initialized) {
+    return false;
+  }
   return this.visibleColumns().some(function(column) {
     return column instanceof scout.NumberColumn && column.aggregationFunction !== 'none';
   });
