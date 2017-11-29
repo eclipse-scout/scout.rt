@@ -154,7 +154,7 @@ scout.TableControl.prototype.isContentAvailable = function() {
 };
 
 scout.TableControl.prototype.toggle = function() {
-  if(!this.enabled){
+  if (!this.enabled) {
     return;
   }
   if (this.tableFooter.selectedControl === this) {
@@ -179,8 +179,11 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
   // Instead of calling parent.setSelected(), we manually execute the required code. Otherwise
   // we would not be able to pass 'closeWhenUnselected' to _renderSelected().
   this._setProperty('selected', selected);
+  closeWhenUnselected = scout.nvl(closeWhenUnselected, true);
   if (this.rendered) {
     this._renderSelected(selected, closeWhenUnselected);
+  } else if (closeWhenUnselected && this === this.tableFooter.selectedControl && !selected) {
+    this.tableFooter.onControlSelected(null);
   }
 };
 
