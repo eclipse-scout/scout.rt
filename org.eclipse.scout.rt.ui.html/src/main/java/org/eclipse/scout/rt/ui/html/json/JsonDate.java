@@ -143,6 +143,13 @@ public class JsonDate implements IJsonObject {
     return m_javaDate;
   }
 
+  /**
+   * Returns a formatted date which uses the JSON_PATTERN_FULL pattern and utc-flag set to false.
+   */
+  public static String format(Date date) {
+    return format(date, JSON_PATTERN_FULL, false);
+  }
+
   public static String format(Date date, String pattern, boolean utc) {
     if (date == null || pattern == null) {
       return null;
