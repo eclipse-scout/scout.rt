@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.IImageFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.ImageFieldChains.ImageFieldDragRequestChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.ImageFieldChains.ImageFieldDropRequestChain;
+import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
@@ -65,9 +66,37 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     return 0;
   }
 
+  /**
+   * Configures the image id of the field. Use this method instead of {@link #getConfiguredImageUrl()} if you have an image id which may be resolved by the {@link IconLocator} rather than an URL.
+   * <p>
+   * If multiple image properties are set, the UI will read the first property which is not null according to the
+   * following order:
+   * <ol>
+   * <li>Image (Binary resource)
+   * <li>ImageId
+   * <li>ImageUrl
+   * </ol>
+   */
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(300)
   protected String getConfiguredImageId() {
+    return null;
+  }
+
+  /**
+   * Configures the image URL of the field. Use this method instead of {@link #getConfiguredImageId()} if you have a real URL pointing to the image.
+   * <p>
+   * If multiple image properties are set, the UI will read the first property which is not null according to the
+   * following order:
+   * <ol>
+   * <li>Image (Binary resource)
+   * <li>ImageId
+   * <li>ImageUrl
+   * </ol>
+   */
+  @ConfigProperty(ConfigProperty.ICON_ID)
+  @Order(310)
+  protected String getConfiguredImageUrl() {
     return null;
   }
 
@@ -171,6 +200,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     setImageTransform(new AffineTransformSpec());
     setAutoFit(getConfiguredAutoFit());
     setImageId(getConfiguredImageId());
+    setImageUrl(getConfiguredImageUrl());
     setPanDelta(getConfiguredPanDelta());
     setRotateDelta(getConfiguredRotateDelta());
     setZoomDelta(getConfiguredZoomDelta());
@@ -246,22 +276,6 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     }
   }
 
-  /**
-   * Sets all other image source properties to null.
-   */
-  protected void reconcileImageSourceProperties(String propertySet) {
-    String[] allProperties = {
-        PROP_IMAGE_URL,
-        PROP_IMAGE_ID,
-        PROP_IMAGE
-    };
-    for (String property : allProperties) {
-      if (!property.equals(propertySet)) {
-        propertySupport.setProperty(property, null);
-      }
-    }
-  }
-
   @Override
   public String getImageUrl() {
     return propertySupport.getPropertyString(PROP_IMAGE_URL);
@@ -270,7 +284,6 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   @Override
   public void setImageUrl(String imageUrl) {
     propertySupport.setProperty(PROP_IMAGE_URL, imageUrl);
-    reconcileImageSourceProperties(PROP_IMAGE_URL);
   }
 
   @Override
@@ -281,7 +294,6 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   @Override
   public void setImage(Object imgObj) {
     propertySupport.setProperty(PROP_IMAGE, imgObj);
-    reconcileImageSourceProperties(PROP_IMAGE);
   }
 
   @Override
@@ -292,7 +304,6 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   @Override
   public void setImageId(String imageId) {
     propertySupport.setPropertyString(PROP_IMAGE_ID, imageId);
-    reconcileImageSourceProperties(PROP_IMAGE_ID);
   }
 
   @Override
