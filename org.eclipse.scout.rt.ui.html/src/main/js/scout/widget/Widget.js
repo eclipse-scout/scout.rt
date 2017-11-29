@@ -637,10 +637,13 @@ scout.Widget.prototype.setCssClass = function(cssClass) {
 
 scout.Widget.prototype.addCssClass = function(cssClass) {
   var cssClasses = this.cssClassAsArray();
-  if (cssClasses.indexOf(cssClass) >= 0) {
-    return;
-  }
-  cssClasses.push(cssClass);
+  var cssClassesToAdd = scout.Widget.cssClassAsArray(cssClass);
+  cssClassesToAdd.forEach(function(newCssClass) {
+    if (cssClasses.indexOf(newCssClass) >= 0) {
+      return;
+    }
+    cssClasses.push(newCssClass);
+  }, this);
   this.setProperty('cssClass', scout.arrays.format(cssClasses, ' '));
 };
 

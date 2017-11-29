@@ -552,10 +552,11 @@ describe('Widget', function() {
         widget.addCssClass('custom-class');
         expect(widget.$container).toHaveClass('custom-class');
 
-        widget.addCssClass('another-class');
-        expect(widget.cssClass).toBe('custom-class another-class');
+        widget.addCssClass('another-class1 another-class2');
+        expect(widget.cssClass).toBe('custom-class another-class1 another-class2');
         expect(widget.$container).toHaveClass('custom-class');
-        expect(widget.$container).toHaveClass('another-class');
+        expect(widget.$container).toHaveClass('another-class1');
+        expect(widget.$container).toHaveClass('another-class2');
       });
 
       it("does not add the same class multiple times", function() {
@@ -567,6 +568,9 @@ describe('Widget', function() {
         expect(widget.cssClass).toBe('custom-class');
 
         widget.addCssClass('custom-class');
+        expect(widget.cssClass).toBe('custom-class');
+
+        widget.addCssClass('custom-class custom-class');
         expect(widget.cssClass).toBe('custom-class');
       });
 

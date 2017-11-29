@@ -225,4 +225,8 @@ public final class GridData {
   public String toString() {
     return getClass().getSimpleName() + "[x=" + x + ", y=" + y + ", w=" + w + ", h=" + h + ", weightX=" + weightX + ", weightY=" + weightY + ", useUiWidth=" + useUiWidth + ", useUiHeight=" + useUiHeight + "]";
   }
+
+  public GridData copy() {
+    return new GridData(this);
+  }
 }
