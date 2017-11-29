@@ -10,16 +10,21 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util;
 
+import java.lang.reflect.Constructor;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+
+import org.junit.Test;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
-import java.lang.reflect.Constructor;
-
-import org.junit.Test;
 
 /**
  * JUnit tests for {@link BeanUtility}
@@ -243,6 +248,26 @@ public class BeanUtilityTest {
     }
   }
 
+  @Test
+  public void testGetInterfacesHierarchyWithoutFilterClass() {
+    List<Class<? extends Object>> hierarchy = BeanUtility.getInterfacesHierarchy(InterfaceWithHierarchy.class, null);
+    Iterator<Class<? extends Object>> it = hierarchy.iterator();
+    assertEquals(Iterable.class, it.next());
+    assertEquals(Collection.class, it.next());
+    assertEquals(Set.class, it.next());
+    assertEquals(SortedSet.class, it.next());
+    assertEquals(InterfaceWithHierarchy.class, it.next());
+  }
+
+  @Test
+  public void testGetInterfacesHierarchyWithFilterClass() {
+    List<Class<? extends Set>> hierarchy = BeanUtility.getInterfacesHierarchy(InterfaceWithHierarchy.class, Set.class);
+    Iterator<Class<? extends Set>> it = hierarchy.iterator();
+    assertEquals(Set.class, it.next());
+    assertEquals(SortedSet.class, it.next());
+    assertEquals(InterfaceWithHierarchy.class, it.next());
+  }
+
   public static class OnlyDefalutConstructor {
   }
 
@@ -364,5 +389,8 @@ public class BeanUtilityTest {
   }
 
   public class NonStaticInnerClass {
+  }
+
+  public interface InterfaceWithHierarchy extends SortedSet<Object> {
   }
 }

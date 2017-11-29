@@ -189,8 +189,8 @@ public final class BeanUtility {
   }
 
   /**
-   * Creates a new instance of the given class using the constructor that matches the given parameter types. The
-   * resulting object is initialized with the given parameters.
+   * Creates a new instance of the given class using the constructor that matches the given parameter types. The resulting
+   * object is initialized with the given parameters.
    *
    * @param <T>
    * @param c
@@ -223,11 +223,11 @@ public final class BeanUtility {
    *          The class the constructor is searched for.
    * @param parameterTypes
    *          A possibly empty vararg list of required constructor parameter types.
-   * @return Returns the exact constructor of the given class and the given list of parameter types, the best matching
-   *         one or <code>null</code>, if none can be found.
+   * @return Returns the exact constructor of the given class and the given list of parameter types, the best matching one
+   *         or <code>null</code>, if none can be found.
    * @throws ProcessingException
-   *           A {@link ProcessingException} is thrown if there are multiple constructors satisfying the given
-   *           constructor specification.
+   *           A {@link ProcessingException} is thrown if there are multiple constructors satisfying the given constructor
+   *           specification.
    * @since 3.8.1
    */
   public static <T> Constructor<T> findConstructor(Class<T> c, Class<?>... parameterTypes) {
@@ -307,8 +307,8 @@ public final class BeanUtility {
    * </tr>
    * <tr>
    * <td align="center" valign="top">-1</td>
-   * <td>the type distance cannot be computed. Possible problems are that the <code>declaredType</code> is not
-   * assignable from the <code>actualType</code>.</td>
+   * <td>the type distance cannot be computed. Possible problems are that the <code>declaredType</code> is not assignable
+   * from the <code>actualType</code>.</td>
    * </tr>
    * <tr>
    * <td align="center" valign="top">0</td>
@@ -325,9 +325,8 @@ public final class BeanUtility {
    *          The method parameter's declared type.
    * @param actualType
    *          The type of the object used in the actual method invocation.
-   * @return Returns -1 if the distance cannot be computed or the declared type is not assignable from the actual type.
-   *         It returns 0 for a perfect match (i.e. <code>declaredType == actualType</code> and a number &gt;0
-   *         otherwise.
+   * @return Returns -1 if the distance cannot be computed or the declared type is not assignable from the actual type. It
+   *         returns 0 for a perfect match (i.e. <code>declaredType == actualType</code> and a number &gt;0 otherwise.
    * @since 3.8.1
    */
   public static int computeTypeDistance(Class<?> declaredType, Class<?> actualType) {
@@ -417,7 +416,7 @@ public final class BeanUtility {
     Map<CompositeObject, Class<? extends T>> resultMap = new TreeMap<>();
     int index = 0;
     for (Class<?> c : resultSet) {
-      if (filterClass.isAssignableFrom(c)) {
+      if (filterClass == null || filterClass.isAssignableFrom(c)) {
         int depth = 0;
         Class<T> test = (Class<T>) c;
         while (test != null) {
@@ -426,7 +425,7 @@ public final class BeanUtility {
           test = null;
           if (xa != null) {
             for (Class x : xa) {
-              if (filterClass.isAssignableFrom(x)) {
+              if (filterClass == null || filterClass.isAssignableFrom(x)) {
                 test = x;
               }
             }
