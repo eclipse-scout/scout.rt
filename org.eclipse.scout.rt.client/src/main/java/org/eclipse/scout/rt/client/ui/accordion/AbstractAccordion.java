@@ -140,7 +140,10 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
     groupsToInsert.removeAll(existingGroups);
     for (IGroup group : groupsToInsert) {
       group.setContainer(this);
-      if (isInitConfigDone()) {
+    }
+    // Initialize after every group has been linked to the container, so that it is possible to access other groups in group.execInit
+    if (isInitConfigDone()) {
+      for (IGroup group : groupsToInsert) {
         group.postInitConfig();
         group.init();
       }

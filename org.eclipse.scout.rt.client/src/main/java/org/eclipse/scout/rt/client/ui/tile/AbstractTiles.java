@@ -295,7 +295,10 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     tilesToInsert.removeAll(existingTiles);
     for (ITile tile : tilesToInsert) {
       tile.setContainer(this);
-      if (isInitConfigDone()) {
+    }
+    // Initialize after every tile has been linked to the container, so that it is possible to access other tiles in tile.execInit
+    if (isInitConfigDone()) {
+      for (ITile tile : tilesToInsert) {
         tile.postInitConfig();
         tile.init();
       }
