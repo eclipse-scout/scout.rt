@@ -99,10 +99,7 @@ public abstract class AbstractChart extends AbstractWidget implements IChart {
   }
 
   public AbstractChart(boolean callInitializer) {
-    super(false);
-    if (callInitializer) {
-      callInitializer();
-    }
+    super(callInitializer);
   }
 
   @Override
@@ -112,11 +109,6 @@ public abstract class AbstractChart extends AbstractWidget implements IChart {
       return simpleClassId + ID_CONCAT_SYMBOL + getContainer().classId();
     }
     return simpleClassId;
-  }
-
-  @Override
-  protected void callInitializer() {
-    initConfig();
   }
 
   /*
