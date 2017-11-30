@@ -139,7 +139,7 @@ public class PlannerTest {
    */
   private P_Planner createTestPlanner() {
     P_Planner planner = new P_Planner();
-    planner.initPlanner();
+    planner.init();
     return planner;
   }
 

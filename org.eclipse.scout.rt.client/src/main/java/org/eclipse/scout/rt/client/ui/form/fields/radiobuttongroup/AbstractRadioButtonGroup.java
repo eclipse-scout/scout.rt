@@ -386,7 +386,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   public void rebuildFieldGrid() {
     if (m_grid != null) {
       m_grid.validate(this);
-      if (isInitialized()) {
+      if (isInitConfigDone()) {
         if (getParentField() != null) {
           getParentField().rebuildFieldGrid();
         }
@@ -403,7 +403,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   protected void handleFieldVisibilityChanged() {
-    if (isInitialized()) {
+    if (isInitConfigDone()) {
       rebuildFieldGrid();
     }
   }
@@ -505,7 +505,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    */
   @Override
   public void setStatusVisible(boolean statusVisible) {
-    setStatusVisible(statusVisible, isInitialized());
+    setStatusVisible(statusVisible, isInitConfigDone());
   }
 
   @Override

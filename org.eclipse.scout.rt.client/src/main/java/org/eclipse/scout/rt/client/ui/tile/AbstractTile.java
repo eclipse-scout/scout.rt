@@ -76,14 +76,10 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   }
 
   @Override
-  public void postInitConfig() {
-    // NOP
-  }
-
-  @Override
-  public final void init() {
+  protected final void initInternal() {
+    super.initInternal();
     try {
-      initInternal();
+      initTileInternal();
       interceptInitTile();
     }
     catch (Exception e) {
@@ -91,7 +87,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
     }
   }
 
-  protected void initInternal() {
+  protected void initTileInternal() {
     if (getContainer() == null) {
       throw new IllegalStateException("Tile is not connected to a container");
     }
@@ -109,12 +105,13 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   }
 
   @Override
-  public final void dispose() {
-    disposeInternal();
+  protected final void disposeInternal() {
+    disposeTileInternal();
     interceptDisposeTile();
+    super.disposeInternal();
   }
 
-  protected void disposeInternal() {
+  protected void disposeTileInternal() {
     // NOP
   }
 

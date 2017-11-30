@@ -188,7 +188,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
   @Override
   protected void initFieldInternal() {
     if (m_tree != null && !m_treeExternallyManaged) {
-      m_tree.initTree();
+      m_tree.init();
     }
     if (getConfiguredAutoLoad()) {
       loadRootNode();
@@ -200,7 +200,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
   protected void disposeFieldInternal() {
     super.disposeFieldInternal();
     if (m_tree != null && !m_treeExternallyManaged) {
-      m_tree.disposeTree();
+      m_tree.dispose();
     }
   }
 

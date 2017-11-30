@@ -447,8 +447,8 @@ public class AbstractTreeTest {
     }
 
     @Override
-    public void disposeInternal() {
-      super.disposeInternal();
+    public void disposeActionInternal() {
+      super.disposeActionInternal();
       m_disposed = true;
     }
   }

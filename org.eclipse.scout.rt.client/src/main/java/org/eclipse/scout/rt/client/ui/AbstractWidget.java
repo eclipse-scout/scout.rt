@@ -20,11 +20,112 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
   }
 
   protected void callInitializer() {
+    if (isInitConfigDone()) {
+      return;
+    }
+    initConfigInternal();
+    setInitConfigDone(true);
+  }
+
+  /**
+   * Will be called by {@link #callInitializer()} but only if {@link #isInitConfigDone()} returns false.
+   */
+  protected void initConfigInternal() {
     initConfig();
   }
 
   protected void initConfig() {
     setCssClass(getConfiguredCssClass());
+  }
+
+  @Override
+  public boolean isInitConfigDone() {
+    return propertySupport.getPropertyBool(PROP_INIT_CONFIG_DONE);
+  }
+
+  protected void setInitConfigDone(boolean initConfigDone) {
+    propertySupport.setPropertyBool(PROP_INIT_CONFIG_DONE, initConfigDone);
+  }
+
+  @Override
+  public void postInitConfig() {
+    if (isPostInitConfigDone()) {
+      return;
+    }
+    postInitConfigInternal();
+    setPostInitConfigDone(true);
+  }
+
+  /**
+   * Will be called by {@link #postInitConfig()} but only if {@link #isPostInitConfigDone()} returns false.
+   */
+  protected void postInitConfigInternal() {
+    // NOP
+  }
+
+  @Override
+  public boolean isPostInitConfigDone() {
+    return propertySupport.getPropertyBool(PROP_POST_INIT_CONFIG_DONE);
+  }
+
+  protected void setPostInitConfigDone(boolean postInitConfigDone) {
+    propertySupport.setPropertyBool(PROP_POST_INIT_CONFIG_DONE, postInitConfigDone);
+  }
+
+  @Override
+  public void init() {
+    if (isInitDone()) {
+      return;
+    }
+    initInternal();
+    setInitDone(true);
+  }
+
+  /**
+   * Will be called by {@link #init()} but only if {@link #isInitDone()} returns false.
+   */
+  protected void initInternal() {
+    // NOP
+  }
+
+  @Override
+  public boolean isInitDone() {
+    return propertySupport.getPropertyBool(PROP_INIT_DONE);
+  }
+
+  protected void setInitDone(boolean initDone) {
+    propertySupport.setPropertyBool(PROP_INIT_DONE, initDone);
+  }
+
+  @Override
+  public void reinit() {
+    setInitDone(false);
+    init();
+  }
+
+  @Override
+  public void dispose() {
+    if (isDisposeDone()) {
+      return;
+    }
+    disposeInternal();
+    setDisposeDone(true);
+  }
+
+  /**
+   * Will be called by {@link #dispose()} but only if {@link #isDisposeDone()} returns false.
+   */
+  protected void disposeInternal() {
+    // NOP
+  }
+
+  @Override
+  public boolean isDisposeDone() {
+    return propertySupport.getPropertyBool(PROP_DISPOSE_DONE);
+  }
+
+  protected void setDisposeDone(boolean disposeDone) {
+    propertySupport.setPropertyBool(PROP_DISPOSE_DONE, disposeDone);
   }
 
   /**

@@ -75,15 +75,16 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
   }
 
   @Override
-  public void postInitConfig() {
-    // NOP
-    // FIXME CGU How to init Body? -> Add IWidget.init(), IWidget.dispose(), IWidget.postInitConfig()
+  protected void postInitConfigInternal() {
+    super.postInitConfigInternal();
+    getBody().postInitConfig();
   }
 
   @Override
-  public final void init() {
+  protected final void initInternal() {
+    super.initInternal();
     try {
-      initInternal();
+      initGroupInternal();
       interceptInitGroup();
     }
     catch (Exception e) {
@@ -91,10 +92,11 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
     }
   }
 
-  protected void initInternal() {
+  protected void initGroupInternal() {
     if (getContainer() == null) {
       throw new IllegalStateException("Group is not connected to a container");
     }
+    getBody().init();
   }
 
   protected void handleInitException(Exception exception) {
@@ -106,13 +108,13 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
   }
 
   @Override
-  public final void dispose() {
-    disposeInternal();
+  protected final void disposeInternal() {
+    disposeGroupInternal();
     interceptDisposeGroup();
   }
 
-  protected void disposeInternal() {
-    // NOP
+  protected void disposeGroupInternal() {
+    getBody().dispose();
   }
 
   protected void execDisposeGroup() {

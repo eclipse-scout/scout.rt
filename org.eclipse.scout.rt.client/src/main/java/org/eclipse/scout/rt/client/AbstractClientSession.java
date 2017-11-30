@@ -382,7 +382,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
       }
       m_virtualDesktop = null;
     }
-    m_desktop.initDesktop();
+    m_desktop.init();
   }
 
   /**
@@ -431,7 +431,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
     if (m_desktop != null) {
       try {
-        m_desktop.closeInternal();
+        m_desktop.dispose();
       }
       catch (Exception t) {
         LOG.error("Failed to close the desktop.", t);

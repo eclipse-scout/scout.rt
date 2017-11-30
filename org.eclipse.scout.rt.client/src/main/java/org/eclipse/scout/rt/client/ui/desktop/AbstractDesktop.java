@@ -163,7 +163,6 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   private List<IMenu> m_menus;
   private List<IViewButton> m_viewButtons;
   private boolean m_autoPrefixWildcardForTextSearch;
-  private boolean m_desktopInitialized;
   private boolean m_isForcedClosing = false;
   private final List<Object> m_addOns;
   private IContributionOwner m_contributionHolder;
@@ -645,7 +644,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     List<IKeyStroke> ksList = new ActionFinder().findActions(actionList, IKeyStroke.class, true);
     for (IKeyStroke ks : ksList) {
       try {
-        ks.initAction();
+        ks.init();
       }
       catch (RuntimeException | PlatformError e) {
         LOG.error("could not initialize key stroke '{}'.", ks, e);
@@ -656,7 +655,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     // init outlines
     for (IOutline o : m_availableOutlines) {
       try {
-        o.initTree();
+        o.init();
       }
       catch (Exception e) {
         LOG.error("Could not init outline {}", o, e);
@@ -699,10 +698,8 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   @Override
-  public void initDesktop() {
-    if (m_desktopInitialized) {
-      return;
-    }
+  protected void initInternal() {
+    super.initInternal();
     // extensions
     for (IDesktopExtension ext : getDesktopExtensions()) {
       try {
@@ -716,7 +713,16 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       }
     }
     ActionUtility.initActions(getActions());
-    m_desktopInitialized = true;
+  }
+
+  /**
+   * @deprecated will be removed with 8.0, use {@link #init()}, {@link #reinit()} or {@link #initInternal()} instead
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  @Override
+  public void initDesktop() {
+    init();
   }
 
   /**
@@ -1974,6 +1980,11 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   @Override
+  protected void disposeInternal() {
+    closeInternal();
+  }
+
+  @Override
   public void closeInternal() {
     setOpenedInternal(false);
     detachGui();
@@ -2049,7 +2060,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     // dispose outlines
     for (IOutline outline : getAvailableOutlines()) {
       try {
-        outline.disposeTree();
+        outline.dispose();
       }
       catch (RuntimeException | PlatformError e) {
         LOG.warn("Exception while disposing outline.", e);

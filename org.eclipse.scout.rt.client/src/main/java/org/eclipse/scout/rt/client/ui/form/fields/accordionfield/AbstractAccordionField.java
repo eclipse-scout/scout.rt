@@ -82,22 +82,22 @@ public abstract class AbstractAccordionField<T extends IAccordion> extends Abstr
   protected void initFieldInternal() {
     super.initFieldInternal();
     if (getAccordion() != null) {
-      getAccordion().initAccordion();
+      getAccordion().init();
     }
   }
 
   @Override
-  public void postInitConfig() {
-    super.postInitConfig();
+  protected void postInitConfigInternal() {
+    super.postInitConfigInternal();
     if (getAccordion() != null) {
-      getAccordion().postInitAccordionConfig();
+      getAccordion().postInitConfig();
     }
   }
 
   @Override
   protected void disposeFieldInternal() {
     if (getAccordion() != null) {
-      getAccordion().disposeAccordion();
+      getAccordion().dispose();
     }
     super.disposeFieldInternal();
   }

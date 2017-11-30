@@ -41,7 +41,7 @@ public class AbstractRowDataColumnTest {
   @Test
   public void testTablesObservedBeforeInsertionEvent() {
     TestTable table = new TestTable();
-    table.initTable();
+    table.init();
     ITableRow row = table.createRow();
     table.getRowDataColumn().setValue(row, "newValue");
     row = table.addRow(row);
@@ -55,7 +55,7 @@ public class AbstractRowDataColumnTest {
   @Test
   public void testSuccessfulImport() {
     TestTable table = new TestTable();
-    table.initTable();
+    table.init();
 
     TestTableBean tableBean = new TestTableBean();
     TestTableBean.TableBeanRowData row = tableBean.addRow();

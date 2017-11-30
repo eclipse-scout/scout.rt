@@ -108,7 +108,7 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
 
   @Override
   protected void initFieldInternal() {
-    getCalendar().initCalendar();
+    getCalendar().init();
     super.initFieldInternal();
   }
 
@@ -116,7 +116,7 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
   protected void disposeFieldInternal() {
     ClientUIPreferences.getInstance().setCalendarPreferences(getCalendar().getDisplayMode(), getCalendar().isDisplayCondensed());
     super.disposeFieldInternal();
-    getCalendar().disposeCalendar();
+    getCalendar().dispose();
   }
 
   @Override

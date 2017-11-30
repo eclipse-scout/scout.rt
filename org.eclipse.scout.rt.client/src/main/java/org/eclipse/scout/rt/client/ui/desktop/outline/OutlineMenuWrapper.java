@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionFilter;
@@ -29,7 +30,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.IReadOnlyMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
@@ -45,7 +45,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  * using the state of the original menu.
  */
 @ClassId("28ec2113-6461-4810-9527-253d0bf68788")
-public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMenu, IReadOnlyMenu {
+public class OutlineMenuWrapper extends AbstractWidget implements IMenu, IReadOnlyMenu {
 
   private final IMenu m_wrappedMenu;
   private final PropertyChangeListener m_wrappedMenuPropertyChangeListener;
@@ -230,7 +230,18 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
   }
 
   @Override
+  protected void initConfig() {
+    // NOP
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
   public void initAction() {
+    init();
+  }
+
+  @Override
+  public void postInitConfig() {
     // NOP
   }
 

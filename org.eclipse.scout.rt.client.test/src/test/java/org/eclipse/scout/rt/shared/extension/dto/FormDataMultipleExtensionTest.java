@@ -56,7 +56,7 @@ public class FormDataMultipleExtensionTest extends AbstractLocalExtensionTestCas
   private void doTest() throws Exception {
     // create and test form
     OrigForm origForm = new OrigForm();
-    origForm.initForm();
+    origForm.init();
     assertEquals(OrigForm.STRING_FIELD_ORIG_VALUE, origForm.getFirstStringField().getValue());
     assertEquals(MultipleExtGroupBoxExtension.BIGDECIMAL_FIELD_ORIG_VAL, origForm.getFieldByClass(SecondBigDecimalField.class).getValue());
     assertEquals(MultipleExtGroupBoxExtension.DATE_FIELD_ORIG_VAL, origForm.getFieldByClass(ThirdDateField.class).getValue());

@@ -316,9 +316,9 @@ public class JsonOutlineTest {
     List<IPage<?>> pages = new ArrayList<IPage<?>>();
     IOutline outline = new Outline(pages);
     IMenu headerMenu = new HeaderMenu();
-    headerMenu.initAction();
+    headerMenu.init();
     IMenu nonHeaderMenu = new NonHeaderMenu();
-    nonHeaderMenu.initAction();
+    nonHeaderMenu.init();
     outline.getContextMenu().addChildAction(headerMenu);
     outline.getContextMenu().addChildAction(nonHeaderMenu);
     JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline, null);

@@ -55,6 +55,12 @@ public final class FormUtility {
     v.handleResult();
   }
 
+  public static void postInitConfig(ICompositeField compositeField) {
+    PostInitConfigFieldVisitor v = new PostInitConfigFieldVisitor();
+    compositeField.visitFields(v);
+    v.handleResult();
+  }
+
   /**
    * Complete the configurations of the complete field tree of the form. This method is normally called by the form's
    * constructor after the form initConfig and postInitConfig. This method is normally called before
@@ -174,7 +180,7 @@ public final class FormUtility {
     @Override
     public boolean visitField(IFormField field, int level, int fieldIndex) {
       try {
-        field.initField();
+        field.init();
       }
       catch (RuntimeException e) {
         if (m_firstEx == null) {
@@ -195,7 +201,7 @@ public final class FormUtility {
     @Override
     public boolean visitField(IFormField field, int level, int fieldIndex) {
       try {
-        field.disposeField();
+        field.dispose();
       }
       catch (Exception t) {
         LOG.warn("Could not dispose field '{}'", field, t);

@@ -83,8 +83,16 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IWidget, IContextMen
   int SELECTION_MODE_SINGLE_RANGE = 1;
   int SELECTION_MODE_MULTI_RANGE = 2;
 
+  /**
+   * @deprecated will be removed with 8.0, use {@link #init()} or {@link #reinit()} instead
+   */
+  @Deprecated
   void initPlanner();
 
+  /**
+   * @deprecated will be removed with 8.0, use {@link #dispose()} instead
+   */
+  @Deprecated
   void disposePlanner();
 
   void addPlannerListener(PlannerListener listener);

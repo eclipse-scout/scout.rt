@@ -60,7 +60,7 @@ public class FormDataSingleExtensionTest extends AbstractLocalExtensionTestCase 
   private void doTest() throws Exception {
     // create and test form
     OrigForm origForm = new OrigForm();
-    origForm.initForm();
+    origForm.init();
     assertEquals(OrigForm.STRING_FIELD_ORIG_VALUE, origForm.getFirstStringField().getValue());
     assertEquals(SingleFormExtension.BIG_DECIMAL_FIELD_ORIG_VALUE, origForm.getFieldByClass(SecondBigDecimalField.class).getValue());
 

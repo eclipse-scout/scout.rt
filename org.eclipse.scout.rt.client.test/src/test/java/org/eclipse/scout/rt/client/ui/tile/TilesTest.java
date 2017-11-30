@@ -472,7 +472,7 @@ public class TilesTest {
    */
   private P_Tiles createTestTiles() {
     P_Tiles tiles = new P_Tiles();
-    tiles.initTiles();
+    tiles.init();
     return tiles;
   }
 

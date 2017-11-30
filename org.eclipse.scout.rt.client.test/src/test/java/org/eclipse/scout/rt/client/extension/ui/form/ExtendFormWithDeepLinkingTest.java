@@ -153,7 +153,7 @@ public class ExtendFormWithDeepLinkingTest extends AbstractLocalExtensionTestCas
     BEANS.get(IExtensionRegistry.class).register(TemplateStringFieldExtension.class, AbstractStringField.class);
 
     MultiTemplateUsageForm form = new MultiTemplateUsageForm();
-    form.initForm();
+    form.init();
     assertTypes(form.getMainBox().getFields(), FirstTemplateBox.class, SecondTemplateBox.class, MainBoxStringField.class);
 
     // first template box
@@ -186,7 +186,7 @@ public class ExtendFormWithDeepLinkingTest extends AbstractLocalExtensionTestCas
     BEANS.get(IExtensionRegistry.class).register(TemplateStringFieldExtension.class, new ClassIdentifier(TopFieldsBox.class, AbstractStringField.class), null);
 
     MultiTemplateUsageForm form = new MultiTemplateUsageForm();
-    form.initForm();
+    form.init();
     assertTypes(form.getMainBox().getFields(), FirstTemplateBox.class, SecondTemplateBox.class, MainBoxStringField.class);
 
     // first template box
@@ -219,7 +219,7 @@ public class ExtendFormWithDeepLinkingTest extends AbstractLocalExtensionTestCas
     BEANS.get(IExtensionRegistry.class).register(TemplateStringFieldExtension.class, new ClassIdentifier(MultiTemplateUsageForm.class, TopFieldsBox.class, AbstractStringField.class), null);
 
     MultiTemplateUsageForm form = new MultiTemplateUsageForm();
-    form.initForm();
+    form.init();
     assertTypes(form.getMainBox().getFields(), FirstTemplateBox.class, SecondTemplateBox.class, MainBoxStringField.class);
 
     // first template box
@@ -252,7 +252,7 @@ public class ExtendFormWithDeepLinkingTest extends AbstractLocalExtensionTestCas
     BEANS.get(IExtensionRegistry.class).register(TemplateStringFieldExtension.class, new ClassIdentifier(AbstractTemplateFieldsBox.class, AbstractStringField.class), null);
 
     MultiTemplateUsageForm form = new MultiTemplateUsageForm();
-    form.initForm();
+    form.init();
     assertTypes(form.getMainBox().getFields(), FirstTemplateBox.class, SecondTemplateBox.class, MainBoxStringField.class);
 
     // first template box
@@ -285,7 +285,7 @@ public class ExtendFormWithDeepLinkingTest extends AbstractLocalExtensionTestCas
     BEANS.get(IExtensionRegistry.class).register(ExtendedFormExtension.class);
 
     OrigForm form = new OrigForm();
-    form.initForm();
+    form.init();
 
     assertTypes(form.getMainBox().getFields(), OrigForm.MainBox.TopBox.class, OrigForm.MainBox.BottomBox.class);
   }
@@ -295,7 +295,7 @@ public class ExtendFormWithDeepLinkingTest extends AbstractLocalExtensionTestCas
     BEANS.get(IExtensionRegistry.class).register(ExtendedFormExtension.class);
 
     ExtendedForm form = new ExtendedForm();
-    form.initForm();
+    form.init();
 
     assertTypes(form.getMainBox().getFields(), ExtendedFormExtension.DetailBox.class, OrigForm.MainBox.TopBox.class, OrigForm.MainBox.BottomBox.class);
   }

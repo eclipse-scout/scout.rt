@@ -49,7 +49,7 @@ public class SubScopeExtensionTest {
     BEANS.get(IExtensionRegistry.class).register(SecondExtension.class);
 
     ScopeTestForm f = new ScopeTestForm();
-    f.initForm();
+    f.init();
     MyStringField stringField = f.getRootGroupBox().getFieldByClass(MyStringField.class);
     Assert.assertNotNull(stringField);
     Assert.assertEquals(MAX_LEN, stringField.getMaxLength());

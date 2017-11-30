@@ -41,7 +41,6 @@ import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 @ClassId("c04e6cf7-fda0-4146-afea-6a0ff0a50c4b")
 public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   private ITilesUIFacade m_uiFacade;
-  private boolean m_initialized;
   private final ObjectExtensions<AbstractTiles, ITilesExtension<? extends AbstractTiles>> m_objectExtensions;
   private ContributionComposite m_contributionHolder;
   private List<ITileFilter> m_filters;
@@ -61,12 +60,8 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   }
 
   @Override
-  protected void callInitializer() {
-    if (isInitialized()) {
-      return;
-    }
+  protected void initConfigInternal() {
     interceptInitConfig();
-    setInitialized(true);
   }
 
   protected final void interceptInitConfig() {
@@ -116,14 +111,6 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     new MoveActionNodesHandler<>(menus).moveModelObjects();
     ITilesContextMenu contextMenu = new TilesContextMenu(this, menus.getOrderedList());
     setContextMenu(contextMenu);
-  }
-
-  public boolean isInitialized() {
-    return m_initialized;
-  }
-
-  protected void setInitialized(boolean initialized) {
-    m_initialized = initialized;
   }
 
   protected void injectTilesInternal(OrderedCollection<ITile> tiles) {
@@ -197,24 +184,27 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   }
 
   @Override
-  public void initTiles() {
+  protected void initInternal() {
+    super.initInternal();
     for (ITile tile : getTilesInternal()) {
       tile.init();
     }
   }
 
   @Override
-  public void postInitTilesConfig() {
+  protected void postInitConfigInternal() {
+    super.postInitConfigInternal();
     for (ITile tile : getTilesInternal()) {
       tile.postInitConfig();
     }
   }
 
   @Override
-  public void disposeTiles() {
+  protected void disposeInternal() {
     for (ITile tile : getTilesInternal()) {
       tile.dispose();
     }
+    super.disposeInternal();
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -305,7 +295,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     tilesToInsert.removeAll(existingTiles);
     for (ITile tile : tilesToInsert) {
       tile.setContainer(this);
-      if (isInitialized()) {
+      if (isInitConfigDone()) {
         tile.postInitConfig();
         tile.init();
       }

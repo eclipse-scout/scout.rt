@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.extension.ui.action.menu.AbstractMenuExtensio
 import org.eclipse.scout.rt.client.extension.ui.basic.table.AbstractTableExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.AbstractPageWithTableExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageInitPageChain;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.platform.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +61,7 @@ public class EveryPersonTablePageExtension<T extends AbstractPersonTablePage<T>.
     }
 
     @Order(20)
-    public class TestMenu extends AbstractInitializableMenu {
+    public class TestMenu extends AbstractMenu {
     }
   }
 }

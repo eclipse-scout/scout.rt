@@ -33,7 +33,7 @@ public class TableEventOrderTest {
   @Test
   public void testRowsInsertedAfterColumnStructureChanged() throws Exception {
     P_Table table = new P_Table();
-    table.initTable();
+    table.init();
 
     P_TableListener tableListener = new P_TableListener();
     table.addTableListener(tableListener);

@@ -52,7 +52,7 @@ public class JsonCellToJsonTest {
   @Test
   public void testStringColumn() throws JSONException {
     TableWithStringColumn table = new TableWithStringColumn();
-    table.initTable();
+    table.init();
     ITableRow row = table.addRow(table.createRow());
     table.getColumn().setValue(row, "A string");
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
@@ -67,7 +67,7 @@ public class JsonCellToJsonTest {
   @Test
   public void testLongColumn() throws JSONException {
     TableWithLongColumn table = new TableWithLongColumn();
-    table.initTable();
+    table.init();
     ITableRow row = table.addRow(table.createRow());
     table.getColumn().setValue(row, 15L);
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
@@ -84,7 +84,7 @@ public class JsonCellToJsonTest {
   public void testLongColumn_leftAlignment() throws JSONException {
     TableWithLongColumn table = new TableWithLongColumn();
     table.getColumn().setHorizontalAlignment(-1);
-    table.initTable();
+    table.init();
     ITableRow row = table.addRow(table.createRow());
     table.getColumn().setValue(row, 15L);
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
@@ -99,7 +99,7 @@ public class JsonCellToJsonTest {
   @Test
   public void testNullValue() throws JSONException {
     TableWithLongColumn table = new TableWithLongColumn();
-    table.initTable();
+    table.init();
     ITableRow row = table.addRow(table.createRow());
     table.getColumn().setValue(row, null);
     row.getCellForUpdate(table.getColumn()).setText("-empty-");
@@ -116,7 +116,7 @@ public class JsonCellToJsonTest {
   @Test
   public void testNullValueAndEmptyText() throws JSONException {
     TableWithLongColumn table = new TableWithLongColumn();
-    table.initTable();
+    table.init();
     ITableRow row = table.addRow(table.createRow());
     table.getColumn().setValue(row, null);
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
@@ -133,7 +133,7 @@ public class JsonCellToJsonTest {
   public void testNullValueAndEmptyText_leftAlignment() throws JSONException {
     TableWithLongColumn table = new TableWithLongColumn();
     table.getColumn().setHorizontalAlignment(-1);
-    table.initTable();
+    table.init();
     ITableRow row = table.addRow(table.createRow());
     table.getColumn().setValue(row, null);
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
@@ -145,7 +145,7 @@ public class JsonCellToJsonTest {
   @Test
   public void testDateColumn() throws JSONException {
     TableWithDateColumn table = new TableWithDateColumn();
-    table.initTable();
+    table.init();
     ITableRow row = table.addRow(table.createRow());
 
     table.getColumn().setFormat("dd.MM.yyyy");
@@ -164,7 +164,7 @@ public class JsonCellToJsonTest {
   @Test
   public void testDateColumn_jsonDatePattern() throws JSONException {
     TableWithDateColumn table = new TableWithDateColumn();
-    table.initTable();
+    table.init();
     ITableRow row = table.addRow(table.createRow());
 
     table.getColumn().setFormat(JsonDate.JSON_PATTERN_DATE_ONLY);
@@ -178,7 +178,7 @@ public class JsonCellToJsonTest {
   @Test
   public void testBooleanColumn() throws JSONException {
     TableWithBooleanColumn table = new TableWithBooleanColumn();
-    table.initTable();
+    table.init();
     ITableRow row = table.addRow(table.createRow());
     table.getColumn().setValue(row, true);
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);

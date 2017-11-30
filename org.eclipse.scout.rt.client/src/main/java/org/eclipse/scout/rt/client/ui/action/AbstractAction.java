@@ -49,7 +49,6 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractAction extends AbstractWidget implements IAction, IExtensibleObject {
 
   private static final String ENABLED_INHERIT_ACCESSIBILITY = "ENABLED_INHERIT_ACCESSIBILITY";
-  private static final String INITIALIZED = "INITIALIZED";
   private static final String INHERIT_ACCESSIBILITY = "INHERIT_ACCESSIBILITY";
   private static final String TOGGLE_ACTION = "TOGGLE_ACTION";
   private static final String SEPARATOR = "SEPARATOR";
@@ -57,7 +56,7 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractAction.class);
   private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper(IDimensions.VISIBLE, IDimensions.VISIBLE_GRANTED);
   private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED, IDimensions.ENABLED_GRANTED, ENABLED_INHERIT_ACCESSIBILITY);
-  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INITIALIZED, INHERIT_ACCESSIBILITY, TOGGLE_ACTION, SEPARATOR);
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INHERIT_ACCESSIBILITY, TOGGLE_ACTION, SEPARATOR);
 
   /**
    * Provides 8 dimensions for enabled state.<br>
@@ -76,7 +75,7 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
 
   /**
    * Provides 8 boolean flags.<br>
-   * Currently used: {@link #INITIALIZED}, {@link #INHERIT_ACCESSIBILITY}, {@link #TOGGLE_ACTION}, {@link #SEPARATOR}
+   * Currently used: {@link #INHERIT_ACCESSIBILITY}, {@link #TOGGLE_ACTION}, {@link #SEPARATOR}
    */
   private byte m_flags;
 
@@ -105,20 +104,24 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   }
 
   @Override
-  protected void callInitializer() {
-    if (isInitialized()) {
-      return;
-    }
+  protected void initConfigInternal() {
     interceptInitConfig();
-    setInitialized();
+  }
+
+  @Override
+  protected void initInternal() {
+    super.initInternal();
+    interceptInitAction();
   }
 
   /**
-   * This is the init of the runtime model after the environment (form, fields, ..) are built and configured
+   * @deprecated will be removed with 8.0, use {@link #init()} {@link #reinit()} or {@link #initInternal()} instead
    */
+  @Deprecated
+  @SuppressWarnings("deprecation")
   @Override
   public final void initAction() {
-    interceptInitAction();
+    init();
   }
 
   /*
@@ -262,7 +265,7 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   }
 
   /**
-   * called by {@link #initAction()}<br>
+   * called by {@link #init()}<br>
    * this way a menu can for example add/remove custom child menus
    */
   @ConfigOperation
@@ -480,14 +483,6 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   @Override
   public void setTooltipText(String text) {
     propertySupport.setPropertyString(PROP_TOOLTIP_TEXT, text);
-  }
-
-  private boolean isInitialized() {
-    return FLAGS_BIT_HELPER.isBitSet(INITIALIZED, m_flags);
-  }
-
-  private void setInitialized() {
-    m_flags = FLAGS_BIT_HELPER.setBit(INITIALIZED, m_flags);
   }
 
   @Override
@@ -828,9 +823,9 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   }
 
   @Override
-  public final void dispose() {
+  protected final void disposeInternal() {
     try {
-      disposeInternal();
+      disposeActionInternal();
     }
     catch (RuntimeException e) {
       LOG.warn("Exception while disposing action.", e);
@@ -841,9 +836,11 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
     catch (RuntimeException e) {
       LOG.warn("Exception while disposing action.", e);
     }
+    super.disposeInternal();
   }
 
-  protected void disposeInternal() {
+  protected void disposeActionInternal() {
+    // NOP
   }
 
 }

@@ -91,7 +91,7 @@ public class JsonPlannerTest {
    */
   private P_Planner createPlanner() {
     P_Planner planner = new P_Planner();
-    planner.initPlanner();
+    planner.init();
     return planner;
   }
 

@@ -192,8 +192,16 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
    */
   String PROP_GROUPING_STYLE = "groupingStyle";
 
+  /**
+   * @deprecated will be removed with 8.0, use {@link #init()} or {@link #reinit()} instead
+   */
+  @Deprecated
   void initTable();
 
+  /**
+   * @deprecated will be removed with 8.0, use {@link #dispose()} instead
+   */
+  @Deprecated
   void disposeTable();
 
   /**

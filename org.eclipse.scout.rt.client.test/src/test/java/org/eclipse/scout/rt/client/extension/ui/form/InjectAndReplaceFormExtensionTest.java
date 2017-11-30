@@ -221,7 +221,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
     BEANS.get(IExtensionRegistry.class).register(ExtendedFormExtendedGroupWithField.class);
 
     OrigForm form = new OrigForm();
-    assertTrue(form.getFieldByClass(TopBoxStringField.class).isInitialized());
+    assertTrue(form.getFieldByClass(TopBoxStringField.class).isInitConfigDone());
   }
 
   public static void assertOperations(List<String> actual, String... expected) {

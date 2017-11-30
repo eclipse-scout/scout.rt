@@ -268,7 +268,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   @Override
   public void setHasTime(boolean b) {
     propertySupport.setPropertyBool(PROP_HAS_TIME, b);
-    if (isInitialized()) {
+    if (isInitConfigDone()) {
       setValue(getValue());
     }
   }
@@ -291,7 +291,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   @Override
   public void setHasDate(boolean b) {
     propertySupport.setPropertyBool(PROP_HAS_DATE, b);
-    if (isInitialized()) {
+    if (isInitConfigDone()) {
       setValue(getValue());
     }
   }

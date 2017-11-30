@@ -143,7 +143,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
               () -> runInExtensionContext(() -> {
                 m_table = createTable();
                 if (m_table != null) {
-                  m_table.initTable(); // calls execInitTable of AbstractTable
+                  m_table.init(); // calls execInitTable of AbstractTable
                   firePageChanged();
                   addDefaultTableControls();
                   interceptInitTable(); // calls execInitTable of AbstractPage
@@ -847,7 +847,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   protected void disposeTable() {
     T table = getTable(false);
     if (table != null) {
-      table.disposeTable();
+      table.dispose();
       setTableStatus(null);
     }
   }

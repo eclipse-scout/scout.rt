@@ -167,7 +167,7 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
   @Override
   public void rebuildFieldGrid() {
     m_grid.validate(this);
-    if (isInitialized() && getForm() != null) {
+    if (isInitConfigDone() && getForm() != null) {
       getForm().structureChanged(this);
     }
   }
@@ -180,7 +180,7 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
   @Override
   protected void handleFieldVisibilityChanged() {
     super.handleFieldVisibilityChanged();
-    if (isInitialized()) {
+    if (isInitConfigDone()) {
       rebuildFieldGrid();
     }
   }

@@ -44,7 +44,7 @@ public class TableRowInsertOrderTest {
   @Test
   public void testEventRowOrderAfterInsert() throws Exception {
     P_Table table = new P_Table();
-    table.initTable();
+    table.init();
 
     P_TableListener tableListener = new P_TableListener();
     table.addTableListener(tableListener);
@@ -70,7 +70,7 @@ public class TableRowInsertOrderTest {
     table.getFirstColumn().setInitialSortIndex(0);
     table.getFirstColumn().setInitialSortIndex(1);
     table.getFirstColumn().setInitialSortAscending(false);
-    table.initTable();
+    table.init();
 
     P_TableListener tableListener = new P_TableListener();
     table.addTableListener(tableListener);

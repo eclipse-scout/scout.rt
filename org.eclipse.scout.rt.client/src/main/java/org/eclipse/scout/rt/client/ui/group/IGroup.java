@@ -26,12 +26,6 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
   String PROP_GROUP_ID = "groupId";
   String PROP_TITLE_SUFFIX = "titleSuffix";
 
-  void init();
-
-  void postInitConfig();
-
-  void dispose();
-
   ITypeWithClassId getContainer();
 
   void setContainer(ITypeWithClassId container);

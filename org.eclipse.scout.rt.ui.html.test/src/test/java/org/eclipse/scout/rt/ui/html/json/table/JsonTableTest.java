@@ -156,7 +156,7 @@ public class JsonTableTest {
       }
     };
     table.fill(5);
-    table.initTable();
+    table.init();
 
     ITableRow row2 = table.getRow(2);
     ITableRow row4 = table.getRow(4);
@@ -198,7 +198,7 @@ public class JsonTableTest {
       }
     };
     table.fill(5);
-    table.initTable();
+    table.init();
 
     ITableRow row2 = table.getRow(2);
     ITableRow row4 = table.getRow(4);
@@ -252,7 +252,7 @@ public class JsonTableTest {
   public void testColumnOrderChangedEvent() throws JSONException {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
-    table.initTable();
+    table.init();
     table.resetColumns();
 
     IColumn<?> column0 = table.getColumns().get(0);
@@ -280,7 +280,7 @@ public class JsonTableTest {
   public void testColumnOrderChangedEvent_assertCellOrder() throws JSONException {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
-    table.initTable();
+    table.init();
     table.resetColumns();
 
     IColumn<?> column0 = table.getColumns().get(0);
@@ -312,7 +312,7 @@ public class JsonTableTest {
   public void testIgnorableColumnOrderChangedEvent() throws JSONException {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
-    table.initTable();
+    table.init();
     table.resetColumns();
 
     IColumn<?> column = table.getColumns().get(0);
@@ -336,7 +336,7 @@ public class JsonTableTest {
   public void testColumnHeadersUpdatedEvent() throws JSONException {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
-    table.initTable();
+    table.init();
     table.resetColumns();
     table.getColumnSet().getColumn(0).setDisplayable(false);
 
@@ -369,7 +369,7 @@ public class JsonTableTest {
   public void testColumnStructureChangedEvent() throws JSONException {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
-    table.initTable();
+    table.init();
     table.resetColumns();
     table.getColumnSet().getColumn(0).setVisible(false);
 
@@ -397,7 +397,7 @@ public class JsonTableTest {
   public void testColumnStructureChangedEvent_dispose() throws JSONException {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
-    table.initTable();
+    table.init();
     table.resetColumns();
     IColumn column0 = table.getColumnSet().getColumn(0);
     IColumn column1 = table.getColumnSet().getColumn(1);
@@ -438,7 +438,7 @@ public class JsonTableTest {
   @Test
   public void testDontSendNonDisplayableMenus() throws Exception {
     TableWithNonDisplayableMenu table = new TableWithNonDisplayableMenu();
-    table.initTable();
+    table.init();
 
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
     jsonTable.toJson();
@@ -482,7 +482,7 @@ public class JsonTableTest {
   @Test
   public void testMenuDisposalOnPropertyChangeWithNonDisplayableMenu() throws JSONException {
     ITable table = new TableWithNonDisplayableMenu();
-    table.initTable();
+    table.init();
 
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
     jsonTable.toJson();
@@ -505,7 +505,7 @@ public class JsonTableTest {
   @Test
   public void testTableControlDisposalOnPropertyChange() throws JSONException {
     ITable table = new TableWithoutMenus();
-    table.initTable();
+    table.init();
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
     jsonTable.toJson();
 
@@ -523,7 +523,7 @@ public class JsonTableTest {
   @Test
   public void testMultipleTableControlDisposallOnPropertyChange() throws JSONException {
     ITable table = new TableWithoutMenus();
-    table.initTable();
+    table.init();
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
     jsonTable.toJson();
 
@@ -603,7 +603,7 @@ public class JsonTableTest {
     TableWith3Cols table = new TableWith3Cols();
 
     table.fill(3);
-    table.initTable();
+    table.init();
 
     JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
     ITableRow row0 = table.getRow(0);
@@ -660,7 +660,7 @@ public class JsonTableTest {
     TableWith3Cols table = new TableWith3Cols();
 
     table.fill(3);
-    table.initTable();
+    table.init();
 
     JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
     ITableRow row0 = table.getRow(0);
@@ -696,7 +696,7 @@ public class JsonTableTest {
   public void testAddRowFilterAfterUpdates() throws Exception {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(3);
-    table.initTable();
+    table.init();
 
     JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
     // Simulate that the full table is sent to the UI
@@ -736,7 +736,7 @@ public class JsonTableTest {
   public void testRemoveRowFilterAfterUpdates() throws Exception {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(3);
-    table.initTable();
+    table.init();
 
     JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
     // Filter the first row
@@ -786,7 +786,7 @@ public class JsonTableTest {
     TableWith3Cols table = new TableWith3Cols();
 
     table.fill(3);
-    table.initTable();
+    table.init();
 
     JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
     ITableRow row0 = table.getRow(0);
@@ -819,7 +819,7 @@ public class JsonTableTest {
     TableWith3Cols table = new TableWith3Cols();
 
     table.fill(3);
-    table.initTable();
+    table.init();
 
     JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
     ITableRow row0 = table.getRow(0);
@@ -842,7 +842,7 @@ public class JsonTableTest {
   public void testUserRowFilter_UpdateEvent() throws Exception {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(3);
-    table.initTable();
+    table.init();
 
     JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
     // Simulate that the full table is sent to the UI
@@ -905,7 +905,7 @@ public class JsonTableTest {
     TableWith3Cols table = new TableWith3Cols();
 
     table.fill(3);
-    table.initTable();
+    table.init();
 
     JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
     ITableRow row0 = table.getRow(0);
@@ -947,7 +947,7 @@ public class JsonTableTest {
     TableWith3Cols table = new TableWith3Cols();
 
     table.fill(2);
-    table.initTable();
+    table.init();
 
     JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
     ITableRow row0 = table.getRow(0);
@@ -981,7 +981,7 @@ public class JsonTableTest {
     TableWith3Cols table = new TableWith3Cols();
 
     table.fill(2);
-    table.initTable();
+    table.init();
 
     JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
     ITableRow row0 = table.getRow(0);
@@ -1015,7 +1015,7 @@ public class JsonTableTest {
   public void testTableEventCoalesceInUi_TwoRowsAdded() throws Exception {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
-    table.initTable();
+    table.init();
     table.resetColumns();
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
 
@@ -1046,7 +1046,7 @@ public class JsonTableTest {
   public void testTableEventCoalesceInUi_RowInsertedAndUpdated() throws Exception {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
-    table.initTable();
+    table.init();
     table.resetColumns();
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
 
@@ -1078,7 +1078,7 @@ public class JsonTableTest {
   public void testTableEventCoalesceInUi_RowInsertedAndDeleted() throws Exception {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
-    table.initTable();
+    table.init();
     table.resetColumns();
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
 
@@ -1107,7 +1107,7 @@ public class JsonTableTest {
   @Test
   public void testTableEventCoalesceInUi_InsertAndRowOrderChanged() throws Exception {
     TableWith3Cols table = new TableWith3Cols();
-    table.initTable();
+    table.init();
     table.resetColumns();
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
 
@@ -1128,7 +1128,7 @@ public class JsonTableTest {
   @Test
   public void testTableEventCoalesceInUi_UpdateEventOnFilteredRow() throws Exception {
     TableWith3Cols table = new TableWith3Cols();
-    table.initTable();
+    table.init();
     table.fill(1, false);
     table.resetColumns();
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
@@ -1156,7 +1156,7 @@ public class JsonTableTest {
   @Test
   public void testTableEventCoalesceInUi_DeleteEventOnFilteredRow() throws Exception {
     TableWith3Cols table = new TableWith3Cols();
-    table.initTable();
+    table.init();
     table.fill(1, false);
     table.resetColumns();
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
@@ -1234,7 +1234,7 @@ public class JsonTableTest {
   @Test
   public void testDeleteAfterMove() throws Exception {
     TableWith3Cols table = new TableWith3Cols();
-    table.initTable();
+    table.init();
     table.fill(3, false);
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
     m_uiSession.currentJsonResponse().addAdapter(jsonTable);
@@ -1274,7 +1274,7 @@ public class JsonTableTest {
   @Test
   public void testDeleteAfterInsertAndFilterNop() throws Exception {
     TableWith3Cols table = new TableWith3Cols();
-    table.initTable();
+    table.init();
     table.fill(2, false);
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
     m_uiSession.currentJsonResponse().addAdapter(jsonTable);
@@ -1323,7 +1323,7 @@ public class JsonTableTest {
   public void testRequestFocusInCellRowRequired() {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
-    table.initTable();
+    table.init();
     table.resetColumns();
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
 
@@ -1350,7 +1350,7 @@ public class JsonTableTest {
   public void testRequestFocusInCellCoalesce() {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
-    table.initTable();
+    table.init();
     table.resetColumns();
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
 
@@ -1377,7 +1377,7 @@ public class JsonTableTest {
   public void testRequestFocusInCellCoalesceWithtAutoDiscardOnDelete() {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
-    table.initTable();
+    table.init();
     table.setAutoDiscardOnDelete(true);
     table.resetColumns();
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
@@ -1401,7 +1401,7 @@ public class JsonTableTest {
   public void testRequestFocusInCellCoalesceInMultipleResponses() throws Exception {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
-    table.initTable();
+    table.init();
     table.resetColumns();
     table.setAutoDiscardOnDelete(true);
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
@@ -1457,7 +1457,7 @@ public class JsonTableTest {
   public static Table createTableFixture(int numRows) {
     Table table = new Table();
     table.fill(numRows);
-    table.initTable();
+    table.init();
     return table;
   }
 

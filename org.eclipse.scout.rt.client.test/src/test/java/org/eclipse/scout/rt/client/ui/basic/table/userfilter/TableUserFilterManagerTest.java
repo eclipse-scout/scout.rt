@@ -111,7 +111,7 @@ public class TableUserFilterManagerTest {
 
   protected TestTable createTable() {
     TestTable table = new TestTable();
-    table.initTable();
+    table.init();
     return table;
   }
 

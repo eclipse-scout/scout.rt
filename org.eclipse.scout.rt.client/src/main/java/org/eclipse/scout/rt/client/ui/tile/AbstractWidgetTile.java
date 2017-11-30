@@ -32,13 +32,13 @@ public abstract class AbstractWidgetTile<T extends IWidget> extends AbstractTile
   }
 
   @Override
-  public void postInitConfig() {
-    super.postInitConfig();
+  public void postInitConfigInternal() {
+    super.postInitConfigInternal();
     postInitTileWidgetConfig();
   }
 
   protected void postInitTileWidgetConfig() {
-    // NOP
+    getTileWidget().postInitConfig();
   }
 
   /**
@@ -72,23 +72,23 @@ public abstract class AbstractWidgetTile<T extends IWidget> extends AbstractTile
   }
 
   @Override
-  protected void initInternal() {
-    super.initInternal();
+  protected void initTileInternal() {
+    super.initTileInternal();
     initTileWidget();
   }
 
   @Override
-  protected void disposeInternal() {
+  protected void disposeTileInternal() {
     disposeTileWidget();
-    super.disposeInternal();
+    super.disposeTileInternal();
   }
 
   protected void initTileWidget() {
-    // NOP
+    getTileWidget().init();
   }
 
   protected void disposeTileWidget() {
-    // NOP
+    getTileWidget().dispose();
   }
 
 }

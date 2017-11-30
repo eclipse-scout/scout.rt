@@ -432,7 +432,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     m_bodyGrid.validate(this);
     m_customProcessButtonGrid.validate();
     m_systemProcessButtonGrid.validate();
-    if (isInitialized() && getForm() != null) {
+    if (isInitConfigDone() && getForm() != null) {
       getForm().structureChanged(this);
     }
   }
@@ -515,7 +515,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   public void setGridColumnCount(int c) {
     propertySupport.setPropertyInt(PROP_GRID_COLUMN_COUNT, c);
-    if (isInitialized()) {
+    if (isInitConfigDone()) {
       rebuildFieldGrid();
     }
   }
@@ -568,7 +568,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   protected void handleFieldVisibilityChanged() {
     super.handleFieldVisibilityChanged();
-    if (isInitialized()) {
+    if (isInitConfigDone()) {
       rebuildFieldGrid();
     }
   }

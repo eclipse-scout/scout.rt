@@ -525,7 +525,48 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public void init() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public void reinit() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public boolean isInitConfigDone() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public boolean isPostInitConfigDone() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public boolean isInitDone() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public boolean isDisposeDone() {
+    throw createUnsupportedOperationException();
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
   public void initDesktop() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public void postInitConfig() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public void dispose() {
     throw createUnsupportedOperationException();
   }
 

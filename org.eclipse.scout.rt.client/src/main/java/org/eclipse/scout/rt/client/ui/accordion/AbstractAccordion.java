@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 @ClassId("0f4a0100-ef2b-46e2-809b-56ed62c56006")
 public abstract class AbstractAccordion extends AbstractWidget implements IAccordion {
-  private boolean m_initialized;
 
   public AbstractAccordion() {
     this(true);
@@ -37,19 +36,6 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
     if (callInitializer) {
       callInitializer();
     }
-  }
-
-  @Override
-  protected void callInitializer() {
-    if (isInitialized()) {
-      return;
-    }
-    interceptInitConfig();
-    setInitialized(true);
-  }
-
-  protected final void interceptInitConfig() {
-    initConfig();
   }
 
   @Override
@@ -74,14 +60,6 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
     propertySupport.setProperty(PROP_CONTAINER, container);
   }
 
-  public boolean isInitialized() {
-    return m_initialized;
-  }
-
-  protected void setInitialized(boolean initialized) {
-    m_initialized = initialized;
-  }
-
   protected void injectGroupsInternal(OrderedCollection<IGroup> groups) {
     List<Class<? extends IGroup>> groupClasses = getConfiguredGroups();
     for (Class<? extends IGroup> groupClass : groupClasses) {
@@ -103,21 +81,21 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
   }
 
   @Override
-  public void initAccordion() {
+  protected void initInternal() {
     for (IGroup group : getGroupsInternal()) {
       group.init();
     }
   }
 
   @Override
-  public void postInitAccordionConfig() {
+  protected void postInitConfigInternal() {
     for (IGroup group : getGroupsInternal()) {
       group.postInitConfig();
     }
   }
 
   @Override
-  public void disposeAccordion() {
+  protected void disposeInternal() {
     for (IGroup group : getGroupsInternal()) {
       group.dispose();
     }
@@ -162,7 +140,7 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
     groupsToInsert.removeAll(existingGroups);
     for (IGroup group : groupsToInsert) {
       group.setContainer(this);
-      if (isInitialized()) {
+      if (isInitConfigDone()) {
         group.postInitConfig();
         group.init();
       }

@@ -28,12 +28,6 @@ public interface ITile extends IWidget, IOrdered, IStyleable, IExtensibleObject,
 
   void setGridDataHints(GridData data);
 
-  void init();
-
-  void postInitConfig();
-
-  void dispose();
-
   ITiles getContainer();
 
   void setContainer(ITiles container);

@@ -178,7 +178,7 @@ public final class JsonTestUtility {
     @Override
     public boolean visitField(IFormField field, int level, int fieldIndex) {
       try {
-        field.initField();
+        field.init();
       }
       catch (RuntimeException e) {
         if (m_firstEx == null) {

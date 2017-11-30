@@ -367,14 +367,14 @@ public abstract class AbstractComposerField extends AbstractFormField implements
    */
   @Override
   protected void initFieldInternal() {
-    getTree().initTree();
+    getTree().init();
     super.initFieldInternal();
   }
 
   @Override
   protected void disposeFieldInternal() {
     super.disposeFieldInternal();
-    getTree().disposeTree();
+    getTree().dispose();
   }
 
   @Override

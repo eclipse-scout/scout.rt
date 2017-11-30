@@ -192,7 +192,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   @Override
   protected void initFieldInternal() {
     if (m_table != null && !m_tableExternallyManaged) {
-      m_table.initTable();
+      m_table.init();
     }
     super.initFieldInternal();
   }
@@ -201,7 +201,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   protected void disposeFieldInternal() {
     super.disposeFieldInternal();
     if (m_table != null && !m_tableExternallyManaged) {
-      m_table.disposeTable();
+      m_table.dispose();
     }
   }
 
@@ -228,7 +228,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         m_table.removeTableListener(m_managedTableListener);
         m_managedTableListener = null;
       }
-      if (isInitialized()) {
+      if (isInitConfigDone()) {
         for (int i = m_valueChangeTriggerEnabled; i <= 0; ++i) {
           m_table.setValueChangeTriggerEnabled(true);
         }
@@ -243,7 +243,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         m_managedTableListener = new P_ManagedTableListener();
         m_table.addTableListener(m_managedTableListener);
       }
-      if (isInitialized()) {
+      if (isInitConfigDone()) {
         for (int i = m_valueChangeTriggerEnabled; i <= 0; ++i) {
           m_table.setValueChangeTriggerEnabled(false);
         }
@@ -614,7 +614,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   @Override
   public void setValueChangeTriggerEnabled(boolean b) {
     super.setValueChangeTriggerEnabled(b);
-    if (isInitialized() && getTable() != null) {
+    if (isInitConfigDone() && getTable() != null) {
       getTable().setValueChangeTriggerEnabled(b);
     }
   }

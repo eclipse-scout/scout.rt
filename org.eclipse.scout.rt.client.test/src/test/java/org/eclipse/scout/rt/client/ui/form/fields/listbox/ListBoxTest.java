@@ -153,7 +153,7 @@ public class ListBoxTest extends AbstractListBox<Long> {
   @Test
   public void testValidation() {
     ValidatingListBox listBox = new ValidatingListBox();
-    listBox.initField();
+    listBox.init();
 
     listBox.checkRow("g");
     assertEquals("g", listBox.getCheckedRowsString());

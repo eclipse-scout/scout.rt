@@ -247,13 +247,13 @@ public class TableTest {
   }
 
   /**
-   * Test of {@link AbstractTable#sort()}. If {@link AbstractTable#isSortEnabled()} is false (e.g. sort not enabled),
-   * rows will stay in the order they were added to the table.
+   * Test of {@link AbstractTable#sort()}. If {@link AbstractTable#isSortEnabled()} is false (e.g. sort not enabled), rows
+   * will stay in the order they were added to the table.
    */
   @Test
   public void testSortNotEnabled() throws Exception {
     P_Table table = new P_Table();
-    table.initTable();
+    table.init();
 
     table.setSortEnabled(false);
 
@@ -290,7 +290,7 @@ public class TableTest {
   @Test
   public void testSortFirstColumn() throws Exception {
     P_Table table = new P_Table();
-    table.initTable();
+    table.init();
 
     table.setSortEnabled(true);
     table.getColumnSet().setSortColumn(table.getFirstColumn(), false);
@@ -328,7 +328,7 @@ public class TableTest {
   @Test
   public void testSortTwoColumns() throws Exception {
     P_Table table = new P_Table();
-    table.initTable();
+    table.init();
 
     table.setSortEnabled(true);
     table.getColumnSet().setSortColumn(table.getSecondColumn(), false);
@@ -381,7 +381,7 @@ public class TableTest {
   @Test
   public void testSortDefault() throws Exception {
     P_Table table = new P_Table();
-    table.initTable();
+    table.init();
 
     //ensure table state:
     assertEquals("SortEnabled", true, table.isSortEnabled());
@@ -436,7 +436,7 @@ public class TableTest {
   @Test
   public void testReplaceRows() {
     P_Table table = new P_Table();
-    table.initTable();
+    table.init();
   }
 
   @Test
@@ -453,7 +453,7 @@ public class TableTest {
   @Test
   public void testResetContextColumn() {
     P_Table table = new P_Table();
-    table.initTable();
+    table.init();
     fillTable(table);
     FirstColumn column = table.getFirstColumn();
     table.getUIFacade().setContextColumnFromUI(column);
@@ -474,7 +474,7 @@ public class TableTest {
    */
   private P_Table createTestTable(int status) {
     P_Table table = new P_Table();
-    table.initTable();
+    table.init();
     table.addRowsByMatrix(new Object[][]{new Object[]{10, "Lorem"}, new Object[]{11, "Ipsum"}}, status);
     return table;
   }

@@ -82,7 +82,7 @@ public abstract class AbstractProposalField<VALUE> extends AbstractSmartField<VA
   @Override
   public void setMaxLength(int maxLength) {
     boolean changed = propertySupport.setPropertyInt(PROP_MAX_LENGTH, Math.max(0, maxLength));
-    if (changed && isInitialized()) {
+    if (changed && isInitConfigDone()) {
       setValue(getValue());
     }
   }
@@ -95,7 +95,7 @@ public abstract class AbstractProposalField<VALUE> extends AbstractSmartField<VA
   @Override
   public void setTrimText(boolean trimText) {
     boolean changed = propertySupport.setPropertyBool(PROP_TRIM_TEXT_ON_VALIDATE, trimText);
-    if (changed && isInitialized()) {
+    if (changed && isInitConfigDone()) {
       setValue(getValue());
     }
   }

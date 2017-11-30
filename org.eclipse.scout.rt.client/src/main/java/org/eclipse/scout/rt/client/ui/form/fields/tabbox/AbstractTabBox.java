@@ -142,7 +142,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
   @Override
   public void rebuildFieldGrid() {
     m_grid.validate(this);
-    if (isInitialized() && getForm() != null) {
+    if (isInitConfigDone() && getForm() != null) {
       getForm().structureChanged(this);
     }
   }
@@ -157,7 +157,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
     // box is only visible when it has at least one visible item
     super.handleFieldVisibilityChanged();
 
-    if (isInitialized()) {
+    if (isInitConfigDone()) {
       rebuildFieldGrid();
     }
 

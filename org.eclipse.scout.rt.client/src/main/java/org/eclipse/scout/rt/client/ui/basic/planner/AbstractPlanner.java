@@ -61,7 +61,6 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements IPlanner<RI, AI>, IContributionOwner, IExtensibleObject {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractPlanner.class);
 
-  private boolean m_initialized;
   private EventListenerList m_listenerList;
   private IPlannerUIFacade m_activityMapUIFacade;
   private long m_minimumActivityDuration;// millis
@@ -110,11 +109,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
   }
 
   @Override
-  protected void callInitializer() {
-    if (!m_initialized) {
-      interceptInitConfig();
-      m_initialized = true;
-    }
+  protected void initConfigInternal() {
+    interceptInitConfig();
   }
 
   @Override
@@ -401,18 +397,30 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
    */
 
   @Override
-  public final void initPlanner() {
+  protected final void initInternal() {
+    super.initInternal();
     initPlannerInternal();
     interceptInitPlanner();
     // init actions
     ActionUtility.initActions(getMenus());
   }
 
+  /**
+   * @deprecated will be removed with 8.0, use {@link #init()} {@link #reinit()} or {@link #initInternal()} instead
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  @Override
+  public final void initPlanner() {
+    init();
+  }
+
   protected void initPlannerInternal() {
+    // NOP
   }
 
   @Override
-  public final void disposePlanner() {
+  protected final void disposeInternal() {
     disposePlannerInternal();
     try {
       interceptDisposePlanner();
@@ -420,6 +428,13 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
     catch (Exception t) {
       LOG.warn(getClass().getName(), t);
     }
+    super.disposeInternal();
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public final void disposePlanner() {
+    dispose();
   }
 
   protected void disposePlannerInternal() {

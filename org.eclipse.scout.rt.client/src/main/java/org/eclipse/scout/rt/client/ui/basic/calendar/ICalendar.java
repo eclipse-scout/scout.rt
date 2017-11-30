@@ -101,8 +101,16 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
    */
   String PROP_CONTEXT_MENU = "contextMenus";
 
+  /**
+   * @deprecated will be removed with 8.0, use {@link #init()} or {@link #reinit()} instead
+   */
+  @Deprecated
   void initCalendar();
 
+  /**
+   * @deprecated will be removed with 8.0, use {@link #dispose()} instead
+   */
+  @Deprecated
   void disposeCalendar();
 
   String getTitle();

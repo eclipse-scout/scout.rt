@@ -72,7 +72,7 @@ public class DefaultSearchFilterServiceTest {
   @Test
   public void testListBox() {
     AbstractListBox<Long> listBox = new MyListBox();
-    listBox.initField();
+    listBox.init();
     runBasicAsserts(listBox);
     listBox.setValue(new HashSet<Long>(Arrays.asList(2L)));
     m_searchFilterService.applySearchDelegate(listBox, m_searchFilter, false);
@@ -82,7 +82,7 @@ public class DefaultSearchFilterServiceTest {
   @Test
   public void testTreeBox() {
     AbstractTreeBox<Long> treeBox = new MyTreeBox();
-    treeBox.initField();
+    treeBox.init();
     runBasicAsserts(treeBox);
     treeBox.setValue(new HashSet<Long>(Arrays.asList(2L)));
     m_searchFilterService.applySearchDelegate(treeBox, m_searchFilter, false);
@@ -92,7 +92,7 @@ public class DefaultSearchFilterServiceTest {
   @Test
   public void testLabelField() {
     AbstractLabelField labelField = new MyLabelField();
-    labelField.initField();
+    labelField.init();
     runBasicAsserts(labelField);
     labelField.setValue("value");
     m_searchFilterService.applySearchDelegate(labelField, m_searchFilter, false);
@@ -102,7 +102,7 @@ public class DefaultSearchFilterServiceTest {
   @Test
   public void testStringField() {
     AbstractStringField stringField = new MyStringField();
-    stringField.initField();
+    stringField.init();
     runBasicAsserts(stringField);
     stringField.setValue("value");
     m_searchFilterService.applySearchDelegate(stringField, m_searchFilter, false);
@@ -112,7 +112,7 @@ public class DefaultSearchFilterServiceTest {
   @Test
   public void testHtmlField() {
     AbstractHtmlField htmlField = new MyHTMLField();
-    htmlField.initField();
+    htmlField.init();
     runBasicAsserts(htmlField);
     htmlField.setValue("value");
     m_searchFilterService.applySearchDelegate(htmlField, m_searchFilter, false);
@@ -122,7 +122,7 @@ public class DefaultSearchFilterServiceTest {
   @Test
   public void testBooleanField() {
     AbstractBooleanField booleanField = new MyBooleanField();
-    booleanField.initField();
+    booleanField.init();
     runBasicAsserts(booleanField);
     booleanField.setValue(true);
     m_searchFilterService.applySearchDelegate(booleanField, m_searchFilter, false);
@@ -144,7 +144,7 @@ public class DefaultSearchFilterServiceTest {
   @Test
   public void testRadioButtonGroup() {
     MyRadioButtonGroup radioButtonGroup = new MyRadioButtonGroup();
-    radioButtonGroup.initField();
+    radioButtonGroup.init();
     runBasicAsserts(radioButtonGroup);
     radioButtonGroup.setValue(1L);
     m_searchFilterService.applySearchDelegate(radioButtonGroup, m_searchFilter, false);
@@ -154,7 +154,7 @@ public class DefaultSearchFilterServiceTest {
   @Test
   public void testValueField() {
     MyValueField field = new MyValueField();
-    field.initField();
+    field.init();
     runBasicAsserts(field);
     field.setValue(1L);
     m_searchFilterService.applySearchDelegate(field, m_searchFilter, false);
@@ -164,14 +164,14 @@ public class DefaultSearchFilterServiceTest {
   @Test
   public void testSequenceBox() {
     MySequenceBox seqBox = new MySequenceBox();
-    seqBox.initField();
+    seqBox.init();
 
     MySequenceBox.MyStringField stringField = seqBox.getMyStringField();
     runBasicAsserts(stringField);
 
     m_searchFilter.clear();
     seqBox = new MySequenceBoxWithLabel();
-    seqBox.initField();
+    seqBox.init();
     stringField = seqBox.getMyStringField();
     m_searchFilterService.applySearchDelegate(stringField, m_searchFilter, false);
     Assert.assertEquals("", m_searchFilter.getDisplayTextsPlain());
@@ -186,7 +186,7 @@ public class DefaultSearchFilterServiceTest {
   @Test
   public void testComposerField() {
     MyComposerField composer = new MyComposerField();
-    composer.initField();
+    composer.init();
     runBasicAsserts(composer);
 
     CarEntity carEntity = composer.new CarEntity();

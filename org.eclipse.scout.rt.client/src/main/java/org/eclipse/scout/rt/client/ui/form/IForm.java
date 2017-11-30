@@ -120,6 +120,13 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
   /**
    * Initialize the form and all of its fields. By default any of the #start* methods of the form call this method
    */
+  @Override
+  void init();
+
+  /**
+   * @deprecated will be removed with 8.0, use {@link #init()} or {@link #reinit()} instead
+   */
+  @Deprecated
   void initForm();
 
   /**

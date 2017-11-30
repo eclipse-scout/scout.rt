@@ -50,7 +50,7 @@ public class TableFieldExtensionTest extends AbstractLocalExtensionTestCase {
     Assert.assertTrue(extensionRegistry.getContributionsFor(TableInOrigFormRowData.class).contains(TableInOrigFormFieldExtensionRowData.class));
 
     OrigFormWithTableField form = new OrigFormWithTableField();
-    form.initForm();
+    form.init();
 
     // test DTO round trip
     OrigFormWithTableFieldData ex = new OrigFormWithTableFieldData();

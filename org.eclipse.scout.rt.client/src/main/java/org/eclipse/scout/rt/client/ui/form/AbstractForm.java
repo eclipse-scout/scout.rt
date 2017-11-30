@@ -150,7 +150,6 @@ import org.w3c.dom.Element;
 @FormData(value = AbstractFormData.class, sdkCommand = SdkCommand.USE)
 public abstract class AbstractForm extends AbstractWidget implements IForm, IExtensibleObject, IContributionOwner {
 
-  private static final String INITIALIZED = "INITIALIZED";
   private static final String CACHE_BOUNDS = "CACHE_BOUNDS";
   private static final String ASK_IF_NEED_SAVE = "ASK_IF_NEED_SAVE";
   private static final String BUTTONS_ARMED = "BUTTONS_ARMED";
@@ -161,7 +160,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   private static final String FORM_STARTED = "FORM_STARTED";
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractForm.class);
-  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INITIALIZED, CACHE_BOUNDS, ASK_IF_NEED_SAVE,
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(CACHE_BOUNDS, ASK_IF_NEED_SAVE,
       BUTTONS_ARMED, CLOSE_TIMER_ARMED, SHOW_ON_START);
   private static final NamedBitMaskHelper STATE_BIT_HELPER = new NamedBitMaskHelper(FORM_STORED, FORM_LOADING, FORM_STARTED);
 
@@ -260,11 +259,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   @Override
-  protected void callInitializer() {
-    if (isInitialized()) {
-      return;
-    }
-
+  protected void initConfigInternal() {
     // Remember the initial ClientRunContext to not loose the Form from current calling context.
     m_initialClientRunContext = ClientRunContexts.copyCurrent();
 
@@ -272,7 +267,6 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     ClientRunContexts.copyCurrent().withForm(this).run(() -> {
       interceptInitConfig();
       postInitConfig();
-      setInitialized();
     });
   }
 
@@ -777,14 +771,6 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     setButtonsArmed(true);
   }
 
-  private boolean isInitialized() {
-    return FLAGS_BIT_HELPER.isBitSet(INITIALIZED, m_flags);
-  }
-
-  private void setInitialized() {
-    m_flags = FLAGS_BIT_HELPER.setBit(INITIALIZED, m_flags);
-  }
-
   @Override
   public void setEnabledPermission(Permission p) {
     boolean b = true;
@@ -1012,7 +998,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       m_closeType = IButton.SYSTEM_TYPE_NONE;
       m_blockingCondition.setBlocking(true);
       try {
-        initForm();
+        init();
         loadStateInternal();
 
         // if form was disposed during initForm() or loadStateInternal()
@@ -1025,12 +1011,12 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
           storeStateInternal();
           markSaved();
           doFinally();
-          disposeFormInternal();
+          dispose();
           return;
         }
       }
       catch (RuntimeException | PlatformError e) {
-        disposeFormInternal();
+        dispose();
 
         PlatformException pe = BEANS.get(PlatformExceptionTranslator.class).translate(e)
             .withContextInfo("form", AbstractForm.this.getClass().getName());
@@ -1646,19 +1632,31 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   /**
    * override in subclasses to perform form initialization before handler starts
    */
-  protected void postInitConfig() {
+  @Override
+  public void postInitConfig() {
     FormUtility.postInitConfig(this);
     FormUtility.rebuildFieldGrid(this, true);
   }
 
   @Override
-  public void initForm() {
+  protected void initInternal() {
+    super.initInternal();
     // form
     initFormInternal();
     // fields
     FormUtility.initFormFields(this);
     // custom
     interceptInitForm();
+  }
+
+  /**
+   * @deprecated will be removed with 8.0, use {@link #init()} {@link #reinit()} or {@link #initInternal()} instead
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  @Override
+  public void initForm() {
+    init();
   }
 
   protected void initFormInternal() {
@@ -1904,7 +1902,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       m_closeType = IButton.SYSTEM_TYPE_CLOSE;
       discardStateInternal();
       doFinally();
-      disposeFormInternal();
+      dispose();
     }
     catch (RuntimeException | PlatformError e) {
       throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
@@ -1954,7 +1952,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       }
       discardStateInternal();
       doFinally();
-      disposeFormInternal();
+      dispose();
     }
     catch (RuntimeException | PlatformError e) {
       m_closeType = IButton.SYSTEM_TYPE_NONE;
@@ -1984,7 +1982,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     try {
       visitFields(v);
       // init again
-      initForm();
+      reinit();
       // load again
       loadStateInternal();
     }
@@ -2015,7 +2013,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
         markSaved();
       }
       doFinally();
-      disposeFormInternal();
+      dispose();
     }
     catch (RuntimeException e) {
       m_closeType = IButton.SYSTEM_TYPE_NONE;
@@ -2199,6 +2197,12 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   @Override
   public boolean isEmpty() {
     return getRootGroupBox().isEmpty();
+  }
+
+  @Override
+  protected void disposeInternal() {
+    disposeFormInternal();
+    super.disposeInternal();
   }
 
   /**

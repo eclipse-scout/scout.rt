@@ -187,7 +187,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     OrderedCollection<IMenu> menus = new OrderedCollection<>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
       IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
-      menu.initAction();
+      menu.init();
       menus.addOrdered(menu);
     }
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);

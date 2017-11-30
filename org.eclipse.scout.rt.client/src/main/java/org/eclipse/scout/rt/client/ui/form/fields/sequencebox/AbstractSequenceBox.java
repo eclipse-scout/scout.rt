@@ -275,7 +275,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   @Override
   public void rebuildFieldGrid() {
     m_grid.validate(this);
-    if (isInitialized() && getForm() != null) {
+    if (isInitConfigDone() && getForm() != null) {
       getForm().structureChanged(this);
     }
   }
@@ -288,7 +288,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   @Override
   protected void handleFieldVisibilityChanged() {
     super.handleFieldVisibilityChanged();
-    if (isInitialized()) {
+    if (isInitConfigDone()) {
       // box is only visible when it has at least one visible item
       rebuildFieldGrid();
     }

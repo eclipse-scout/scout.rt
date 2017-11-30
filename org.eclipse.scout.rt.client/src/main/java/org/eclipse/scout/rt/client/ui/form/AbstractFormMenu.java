@@ -145,12 +145,12 @@ public abstract class AbstractFormMenu<FORM extends IForm> extends AbstractMenu 
   }
 
   @Override
-  public void disposeInternal() {
-    super.disposeInternal();
+  public void disposeActionInternal() {
     FORM form = getForm();
     if (form != null && !form.isFormClosed()) {
       form.doClose();
     }
+    super.disposeActionInternal();
   }
 
   protected static class LocalFormMenuExtension<FORM extends IForm, OWNER extends AbstractFormMenu<FORM>> extends LocalMenuExtension<OWNER> implements IFormMenuExtension<FORM, OWNER> {

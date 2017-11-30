@@ -178,7 +178,7 @@ public class JsonTreeTest {
   @Test
   public void testDispose() {
     ITree tree = new TreeWith3Levels();
-    tree.initTree();
+    tree.init();
     JsonTree<ITree> object = UiSessionTestUtility.newJsonAdapter(m_uiSession, tree, null);
     WeakReference<JsonTree> ref = new WeakReference<JsonTree>(object);
 
@@ -470,7 +470,7 @@ public class JsonTreeTest {
   @Test
   public void testNodeDisposalRec() throws JSONException {
     ITree tree = new TreeWith3Levels();
-    tree.initTree();
+    tree.init();
 
     List<ITreeNode> allNodes = getAllTreeNodes(tree);
     List<String> allNodeIds = new LinkedList<String>();
@@ -817,13 +817,13 @@ public class JsonTreeTest {
 
   protected TreeWithOneNode createTreeWithOneNode() {
     TreeWithOneNode tree = new TreeWithOneNode();
-    tree.initTree();
+    tree.init();
     return tree;
   }
 
   protected Tree createTree(List<ITreeNode> nodes) {
     Tree tree = new Tree(nodes);
-    tree.initTree();
+    tree.init();
     return tree;
   }
 

@@ -23,12 +23,6 @@ public interface IAccordion extends IWidget, ITypeWithClassId {
   String PROP_SCROLLABLE = "scrollable";
   String PROP_CONTAINER = "container";
 
-  void initAccordion();
-
-  void postInitAccordionConfig();
-
-  void disposeAccordion();
-
   ITypeWithClassId getContainer();
 
   /**

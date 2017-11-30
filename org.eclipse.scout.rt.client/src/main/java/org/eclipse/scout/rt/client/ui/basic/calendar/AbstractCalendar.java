@@ -71,7 +71,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractCalendar extends AbstractWidget implements ICalendar, IContributionOwner, IExtensibleObject {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractCalendar.class);
 
-  private boolean m_initialized;
+  private boolean m_initConfigDone;
   private List<ICalendarItemProvider> m_providers;
   private final Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> m_componentsByProvider;
   private ICalendarUIFacade m_uiFacade;
@@ -123,9 +123,9 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
 
   @Override
   protected void callInitializer() {
-    if (!m_initialized) {
+    if (!m_initConfigDone) {
       interceptInitConfig();
-      m_initialized = true;
+      m_initConfigDone = true;
     }
   }
 
@@ -320,11 +320,9 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
    * Runtime
    */
 
-  /**
-   * This is the init of the runtime model after the table and columns are built and configured
-   */
   @Override
-  public void initCalendar() {
+  protected void initInternal() {
+    super.initInternal();
     // init menus
     ActionUtility.initActions(getMenus());
     interceptInitCalendar();
@@ -340,6 +338,16 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     updateComponentsInternal(m_providers);
   }
 
+  /**
+   * @deprecated will be removed with 8.0, use {@link #init()} {@link #reinit()} or {@link #initInternal()} instead
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  @Override
+  public void initCalendar() {
+    init();
+  }
+
   private void disposeCalendarInternal() {
     ActionUtility.disposeActions(getMenus());
     for (ICalendarItemProvider p : m_providers) {
@@ -353,7 +361,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
   }
 
   @Override
-  public void disposeCalendar() {
+  protected void disposeInternal() {
     disposeCalendarInternal();
     try {
       interceptDisposeCalendar();
@@ -361,6 +369,13 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     catch (Exception e) {
       LOG.warn("Exception while disposing calendar", e);
     }
+    super.disposeInternal();
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public void disposeCalendar() {
+    dispose();
   }
 
   @Override

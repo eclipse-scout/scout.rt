@@ -226,7 +226,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
         propertySupport.setProperty(PROP_MAX_VALUE, n);
       }
       propertySupport.setProperty(PROP_MIN_VALUE, n);
-      if (isInitialized()) {
+      if (isInitConfigDone()) {
         setValue(getValue());
       }
     }
@@ -256,7 +256,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
         propertySupport.setProperty(PROP_MIN_VALUE, n);
       }
       propertySupport.setProperty(PROP_MAX_VALUE, n);
-      if (isInitialized()) {
+      if (isInitConfigDone()) {
         setValue(getValue());
       }
     }

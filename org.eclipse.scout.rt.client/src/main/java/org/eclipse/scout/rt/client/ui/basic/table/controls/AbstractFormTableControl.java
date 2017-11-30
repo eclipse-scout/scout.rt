@@ -148,12 +148,12 @@ public abstract class AbstractFormTableControl extends AbstractTableControl impl
   }
 
   @Override
-  public void disposeInternal() {
-    super.disposeInternal();
+  public void disposeActionInternal() {
     IForm form = getForm();
     if (form != null && !form.isFormClosed()) {
       form.doClose();
     }
+    super.disposeActionInternal();
   }
 
   /**

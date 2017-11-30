@@ -421,7 +421,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   @Override
   protected void initFieldInternal() {
-    getTree().initTree();
+    getTree().init();
     if (getConfiguredAutoLoad()) {
       try {
         setValueChangeTriggerEnabled(false);
@@ -438,7 +438,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   @Override
   protected void disposeFieldInternal() {
     super.disposeFieldInternal();
-    getTree().disposeTree();
+    getTree().dispose();
   }
 
   @SuppressWarnings("unchecked")
@@ -982,7 +982,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
    */
   @Override
   public void setStatusVisible(boolean statusVisible) {
-    setStatusVisible(statusVisible, isInitialized());
+    setStatusVisible(statusVisible, isInitConfigDone());
   }
 
   @Override

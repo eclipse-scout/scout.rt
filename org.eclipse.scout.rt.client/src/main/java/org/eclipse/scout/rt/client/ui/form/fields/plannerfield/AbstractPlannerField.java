@@ -122,14 +122,14 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
 
   @Override
   protected void initFieldInternal() {
-    getPlanner().initPlanner();
+    getPlanner().init();
     super.initFieldInternal();
   }
 
   @Override
   protected void disposeFieldInternal() {
     super.disposeFieldInternal();
-    getPlanner().disposePlanner();
+    getPlanner().dispose();
   }
 
   @Override

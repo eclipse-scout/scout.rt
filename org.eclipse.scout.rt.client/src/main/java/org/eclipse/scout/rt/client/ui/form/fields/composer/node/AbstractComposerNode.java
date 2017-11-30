@@ -101,7 +101,7 @@ public abstract class AbstractComposerNode extends AbstractTreeNode {
 
   protected IMenu createAddEntityMenu(IDataModelEntity e) {
     AddEntityMenu menu = new AddEntityMenu(getComposerField(), this, e);
-    menu.initAction();
+    menu.init();
     return menu;
   }
 

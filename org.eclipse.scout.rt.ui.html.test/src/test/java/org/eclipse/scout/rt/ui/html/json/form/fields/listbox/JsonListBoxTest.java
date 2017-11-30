@@ -59,7 +59,7 @@ public class JsonListBoxTest {
   public void testReloadAndRowFilterChange() throws Exception {
     ListBox listBox = new ListBox();
     ITable table = listBox.getTable();
-    listBox.initField();
+    listBox.init();
 
     JsonListBox<Long, IListBox<Long>> jsonListBox = m_uiSession.createJsonAdapter(listBox, null);
     JsonTable<ITable> jsonTable = jsonListBox.getAdapter(table);

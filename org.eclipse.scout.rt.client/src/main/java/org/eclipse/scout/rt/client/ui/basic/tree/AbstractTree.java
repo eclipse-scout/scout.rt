@@ -81,14 +81,13 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractTree extends AbstractWidget implements ITree, IContributionOwner, IExtensibleObject {
 
-  private static final String INITIALIZED = "INITIALIZED";
   private static final String AUTO_DISCARD_ON_DELETE = "AUTO_DISCARD_ON_DELETE";
   private static final String AUTO_TITLE = "AUTO_TITLE";
   private static final String ACTION_RUNNING = "ACTION_RUNNING";
   private static final String SAVE_AND_RESTORE_SCROLLBARS = "SAVE_AND_RESTORE_SCROLLBARS";
   private static final Logger LOG = LoggerFactory.getLogger(AbstractTree.class);
   private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED, IDimensions.ENABLED_GRANTED);
-  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INITIALIZED, AUTO_DISCARD_ON_DELETE, AUTO_TITLE, ACTION_RUNNING, SAVE_AND_RESTORE_SCROLLBARS);
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(AUTO_DISCARD_ON_DELETE, AUTO_TITLE, ACTION_RUNNING, SAVE_AND_RESTORE_SCROLLBARS);
 
   private final EventListenerList m_listenerList;
   private final Set<ITreeNode> m_checkedNodes;
@@ -147,12 +146,8 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   }
 
   @Override
-  protected void callInitializer() {
-    if (isInitialized()) {
-      return;
-    }
+  protected void initConfigInternal() {
     interceptInitConfig();
-    setInitialized();
   }
 
   @Override
@@ -707,17 +702,28 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
    * Runtime
    */
   @Override
-  public final void initTree() {
+  protected final void initInternal() {
+    super.initInternal();
     initTreeInternal();
     ActionUtility.initActions(getMenus());
     interceptInitTree();
+  }
+
+  /**
+   * @deprecated will be removed with 8.0, use {@link #init()} {@link #reinit()} or {@link #initInternal()} instead
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  @Override
+  public final void initTree() {
+    init();
   }
 
   protected void initTreeInternal() {
   }
 
   @Override
-  public final void disposeTree() {
+  protected final void disposeInternal() {
     disposeTreeInternal();
     try {
       interceptDisposeTree();
@@ -725,6 +731,13 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     catch (Exception e) {
       LOG.warn("Exception while disposing tree", e);
     }
+    super.disposeInternal();
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public final void disposeTree() {
+    dispose();
   }
 
   protected void disposeTreeInternal() {
@@ -890,14 +903,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   @Override
   public boolean hasProperty(String name) {
     return propertySupport.hasProperty(name);
-  }
-
-  private boolean isInitialized() {
-    return FLAGS_BIT_HELPER.isBitSet(INITIALIZED, m_flags);
-  }
-
-  private void setInitialized() {
-    m_flags = FLAGS_BIT_HELPER.setBit(INITIALIZED, m_flags);
   }
 
   @Override

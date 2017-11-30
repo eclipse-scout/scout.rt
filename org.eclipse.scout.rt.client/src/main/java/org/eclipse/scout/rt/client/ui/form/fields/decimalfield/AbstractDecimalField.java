@@ -198,7 +198,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
   public void setFractionDigits(int i) {
     try {
       propertySupport.setPropertyInt(IDecimalValueContainer.PROP_PARSING_FRACTION_DIGITS, i);
-      if (isInitialized()) {
+      if (isInitConfigDone()) {
         setValue(getValue());
       }
     }
@@ -218,7 +218,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
       DecimalFormat format = getFormat();
       format.setMultiplier(i);
       setFormat(format);
-      if (isInitialized()) {
+      if (isInitConfigDone()) {
         setValue(getValue());
       }
     }

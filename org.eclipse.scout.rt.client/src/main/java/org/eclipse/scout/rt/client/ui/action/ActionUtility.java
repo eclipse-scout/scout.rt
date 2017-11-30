@@ -114,7 +114,7 @@ public final class ActionUtility {
     @Override
     public int visit(IAction action) {
       try {
-        action.initAction();
+        action.init();
       }
       catch (RuntimeException e) {
         if (m_firstEx == null) {

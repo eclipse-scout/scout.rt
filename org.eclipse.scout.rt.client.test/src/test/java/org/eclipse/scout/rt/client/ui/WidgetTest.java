@@ -17,6 +17,65 @@ import org.junit.Test;
 public class WidgetTest {
 
   @Test
+  public void testInitConfig() {
+    Widget widget = new Widget();
+    assertEquals(1, widget.initConfigCalls);
+    assertEquals(true, widget.isInitConfigDone());
+  }
+
+  @Test
+  public void testPostInitConfig() {
+    Widget widget = new Widget();
+    assertEquals(0, widget.postInitConfigCalls);
+    assertEquals(false, widget.isPostInitConfigDone());
+
+    widget.postInitConfig();
+    assertEquals(1, widget.postInitConfigCalls);
+    assertEquals(true, widget.isPostInitConfigDone());
+
+    // Does not execute postInitConfig again
+    widget.postInitConfig();
+    assertEquals(1, widget.postInitConfigCalls);
+    assertEquals(true, widget.isPostInitConfigDone());
+  }
+
+  @Test
+  public void testInit() {
+    Widget widget = new Widget();
+    assertEquals(0, widget.initCalls);
+    assertEquals(false, widget.isInitDone());
+
+    widget.init();
+    assertEquals(1, widget.initCalls);
+    assertEquals(true, widget.isInitDone());
+
+    // Does not execute init again
+    widget.init();
+    assertEquals(1, widget.initCalls);
+    assertEquals(true, widget.isInitDone());
+  }
+
+  @Test
+  public void testDispose() {
+    Widget widget = new Widget();
+    assertEquals(0, widget.disposeCalls);
+    assertEquals(false, widget.isDisposeDone());
+
+    widget.init();
+    assertEquals(0, widget.disposeCalls);
+    assertEquals(false, widget.isDisposeDone());
+
+    widget.dispose();
+    assertEquals(1, widget.disposeCalls);
+    assertEquals(true, widget.isDisposeDone());
+
+    // Does not execute dispose again
+    widget.dispose();
+    assertEquals(1, widget.disposeCalls);
+    assertEquals(true, widget.isDisposeDone());
+  }
+
+  @Test
   public void testAddCssClass() {
     IWidget widget = new Widget();
     widget.addCssClass("custom-class");
@@ -48,5 +107,33 @@ public class WidgetTest {
 
   protected class Widget extends AbstractWidget {
 
+    public int initCalls = 0;
+    public int initConfigCalls;
+    public int postInitConfigCalls = 0;
+    public int disposeCalls = 0;
+
+    @Override
+    protected void initConfigInternal() {
+      super.initConfigInternal();
+      initConfigCalls++;
+    }
+
+    @Override
+    protected void postInitConfigInternal() {
+      super.postInitConfigInternal();
+      postInitConfigCalls++;
+    }
+
+    @Override
+    protected void initInternal() {
+      super.initInternal();
+      initCalls++;
+    }
+
+    @Override
+    protected void disposeInternal() {
+      disposeCalls++;
+      super.disposeInternal();
+    }
   }
 }

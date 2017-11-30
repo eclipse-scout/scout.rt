@@ -34,7 +34,7 @@ public class DesktopExtensionTest extends AbstractLocalExtensionTestCase {
   public void testExecInitExtension() {
     BEANS.get(IExtensionRegistry.class).register(DesktopExt01.class, Desktop.class);
     // test code
-    new Desktop().initDesktop();
+    new Desktop().init();
     Assert.assertEquals(1, desktopExecInitCounter.get());
     Assert.assertEquals(1, ext01ExecInitCounter.get());
   }

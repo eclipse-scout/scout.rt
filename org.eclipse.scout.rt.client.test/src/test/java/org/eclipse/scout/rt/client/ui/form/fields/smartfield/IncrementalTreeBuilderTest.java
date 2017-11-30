@@ -99,7 +99,7 @@ public class IncrementalTreeBuilderTest {
   private ITree createTestTree() {
     AbstractTree tree = new AbstractTree() {
     };
-    tree.initTree();
+    tree.init();
     return tree;
   }
 

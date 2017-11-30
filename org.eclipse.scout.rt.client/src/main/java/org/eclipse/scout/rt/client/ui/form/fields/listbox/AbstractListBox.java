@@ -406,7 +406,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
 
   @Override
   protected void initFieldInternal() {
-    getTable().initTable();
+    getTable().init();
     if (getConfiguredAutoLoad()) {
       try {
         setValueChangeTriggerEnabled(false);
@@ -423,7 +423,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
   @Override
   protected void disposeFieldInternal() {
     super.disposeFieldInternal();
-    getTable().disposeTable();
+    getTable().dispose();
   }
 
   public AbstractTableRowBuilder<KEY> getTableRowBuilder() {
@@ -885,7 +885,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
    */
   @Override
   public void setStatusVisible(boolean statusVisible) {
-    setStatusVisible(statusVisible, isInitialized());
+    setStatusVisible(statusVisible, isInitConfigDone());
   }
 
   @Override

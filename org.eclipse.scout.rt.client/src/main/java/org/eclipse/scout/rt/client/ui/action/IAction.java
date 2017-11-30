@@ -58,6 +58,10 @@ public interface IAction extends IWidget, ITypeWithClassId, IOrdered, IStyleable
    */
   int KEYSTROKE_FIRE_POLICY_ALWAYS = 1;
 
+  /**
+   * @deprecated will be removed with 8.0, use {@link #init()} or {@link #reinit()} instead
+   */
+  @Deprecated
   void initAction();
 
   /**
@@ -227,10 +231,4 @@ public interface IAction extends IWidget, ITypeWithClassId, IOrdered, IStyleable
   byte getHorizontalAlignment();
 
   void setView(boolean visible, boolean enabled);
-
-  /**
-   * Called by the scout framework when the action is disposed in order to release any bound resources. There is usually
-   * no need to call this method by the application's code.
-   */
-  void dispose();
 }

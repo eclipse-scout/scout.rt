@@ -37,11 +37,6 @@ public abstract class AbstractFormFieldTile<T extends IFormField> extends Abstra
   }
 
   @Override
-  protected void postInitTileWidgetConfig() {
-    getTileWidget().postInitConfig();
-  }
-
-  @Override
   protected void handleInitException(Exception exception) {
     LOG.error("Error while initializing tile {}: {}", getTileWidget(), exception.getMessage(), exception);
     getTileWidget().addErrorStatus(TEXTS.get("ErrorWhileLoadingData"));
@@ -78,15 +73,24 @@ public abstract class AbstractFormFieldTile<T extends IFormField> extends Abstra
   }
 
   @Override
-  protected void initTileWidget() {
-    super.initTileWidget();
+  protected void postInitTileWidgetConfig() {
+    T widget = getTileWidget();
+    if (widget instanceof ICompositeField) {
+      FormUtility.postInitConfig(((ICompositeField) widget));
+    }
+    else {
+      super.postInitTileWidgetConfig();
+    }
+  }
 
+  @Override
+  protected void initTileWidget() {
     T widget = getTileWidget();
     if (widget instanceof ICompositeField) {
       FormUtility.initFormFields((ICompositeField) widget);
     }
     else {
-      widget.initField();
+      super.initTileWidget();
     }
   }
 
@@ -94,12 +98,11 @@ public abstract class AbstractFormFieldTile<T extends IFormField> extends Abstra
   protected void disposeTileWidget() {
     T widget = getTileWidget();
     if (widget instanceof ICompositeField) {
-      FormUtility.initFormFields((ICompositeField) widget);
+      FormUtility.disposeFormFields((ICompositeField) widget);
     }
     else {
-      widget.disposeField();
+      super.disposeTileWidget();
     }
-    super.disposeTileWidget();
   }
 
   // ----- Configuration delegated to tile field: -----

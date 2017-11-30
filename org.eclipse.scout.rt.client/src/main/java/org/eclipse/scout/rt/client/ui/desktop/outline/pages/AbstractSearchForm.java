@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 public abstract class AbstractSearchForm extends AbstractForm implements ISearchForm {
 
   @Override
-  public void initForm() {
+  public void initInternal() {
     // form
     initFormInternal();
     // fields

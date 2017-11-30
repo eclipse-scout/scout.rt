@@ -171,6 +171,10 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable {
    */
   String DISPLAY_STYLE_COMPACT = "compact";
 
+  /**
+   * @deprecated will be removed with 8.0, use {@link #init()} or {@link #reinit()} instead
+   */
+  @Deprecated
   void initDesktop();
 
   /**

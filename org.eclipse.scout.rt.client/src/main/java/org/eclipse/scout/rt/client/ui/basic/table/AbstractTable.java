@@ -129,14 +129,13 @@ import org.slf4j.LoggerFactory;
 @ClassId("e88f7f88-9747-40ea-88bd-744803aef7a7")
 public abstract class AbstractTable extends AbstractWidget implements ITable, IContributionOwner, IExtensibleObject {
 
-  private static final String INITIALIZED = "INITIALIZED";
   private static final String AUTO_DISCARD_ON_DELETE = "AUTO_DISCARD_ON_DELETE";
   private static final String SORT_VALID = "SORT_VALID";
   private static final String INITIAL_MULTI_LINE_TEXT = "INITIAL_MULTI_LINE_TEXT";
   private static final String ACTION_RUNNING = "ACTION_RUNNING";
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractTable.class);
-  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INITIALIZED, AUTO_DISCARD_ON_DELETE, SORT_VALID, INITIAL_MULTI_LINE_TEXT, ACTION_RUNNING);
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(AUTO_DISCARD_ON_DELETE, SORT_VALID, INITIAL_MULTI_LINE_TEXT, ACTION_RUNNING);
   private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED);
 
   public interface IResetColumnsOption {
@@ -888,7 +887,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     List<IKeyStroke> ksList = new ArrayList<>(ksClasses.size());
     for (Class<? extends IKeyStroke> clazz : ksClasses) {
       IKeyStroke ks = ConfigurationUtility.newInnerInstance(this, clazz);
-      ks.initAction();
+      ks.init();
       if (ks.getKeyStroke() != null) {
         ksList.add(ks);
       }
@@ -1127,10 +1126,10 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   @Override
   public void setUserPreferenceContext(String context) {
     m_userPreferenceContext = context;
-    if (isTableInitialized()) {
+    if (isInitDone()) {
       //re-initialize
       try {
-        initTable();
+        reinit();
       }
       catch (RuntimeException e) {
         LOG.error("Failed re-initializing table {}", getClass().getName(), e);
@@ -1138,11 +1137,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     }
   }
 
-  /**
-   * This is the init of the runtime model after the table and columns are built and configured
-   */
   @Override
-  public final void initTable() {
+  protected final void initInternal() {
+    super.initInternal();
     try {
       if (m_initLock.acquire()) {
         try {
@@ -1157,9 +1154,18 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       }
     }
     finally {
-      setTableInitialized();
       m_initLock.release();
     }
+  }
+
+  /**
+   * @deprecated will be removed with 8.0, use {@link #init()} {@link #reinit()} or {@link #initInternal()} instead
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  @Override
+  public final void initTable() {
+    init();
   }
 
   protected void initTableInternal() {
@@ -1170,7 +1176,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   @Override
-  public final void disposeTable() {
+  protected final void disposeInternal() {
     try {
       disposeTableInternal();
       interceptDisposeTable();
@@ -1178,6 +1184,13 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     catch (Exception e) {
       LOG.error("Could not dispose table [{}]", getClass().getName(), e);
     }
+    super.disposeInternal();
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public final void disposeTable() {
+    dispose();
   }
 
   protected void disposeTableInternal() {
@@ -1584,13 +1597,13 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     m_flags = FLAGS_BIT_HELPER.changeBit(AUTO_DISCARD_ON_DELETE, on, m_flags);
   }
 
+  /**
+   * @deprecated will be removed with 8.0, use {@link #isInitDone()} instead
+   */
   @Override
+  @Deprecated
   public boolean isTableInitialized() {
-    return FLAGS_BIT_HELPER.isBitSet(INITIALIZED, m_flags);
-  }
-
-  private void setTableInitialized() {
-    m_flags = FLAGS_BIT_HELPER.setBit(INITIALIZED, m_flags);
+    return isInitDone();
   }
 
   @Override

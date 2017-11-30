@@ -50,8 +50,8 @@ public class AddEntityMenu extends AbstractMenu {
   }
 
   @Override
-  public void disposeInternal() {
-    super.disposeInternal();
+  public void disposeActionInternal() {
+    super.disposeActionInternal();
     if (m_propertyChangeListener != null) {
       m_entity.removePropertyChangeListener(m_propertyChangeListener);
       m_propertyChangeListener = null;

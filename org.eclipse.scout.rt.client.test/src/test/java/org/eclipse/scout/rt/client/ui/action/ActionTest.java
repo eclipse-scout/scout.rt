@@ -181,8 +181,8 @@ public class ActionTest {
     boolean m_additionalDisposeCalled;
 
     @Override
-    protected void disposeInternal() {
-      super.disposeInternal();
+    protected void disposeActionInternal() {
+      super.disposeActionInternal();
       m_disposeInternalCalled = true;
     }
 

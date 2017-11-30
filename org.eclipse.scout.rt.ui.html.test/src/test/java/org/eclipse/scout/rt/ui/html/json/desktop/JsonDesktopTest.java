@@ -75,14 +75,14 @@ public class JsonDesktopTest {
   @Test
   public void testDisposeWithForms() {
     DesktopWithOutlineForms desktop = new DesktopWithOutlineForms();
-    desktop.initDesktop();
+    desktop.init();
     testDispose(desktop);
   }
 
   @Test
   public void testDisposeWithoutForms() {
     DesktopWithOneOutline desktop = new DesktopWithOneOutline();
-    desktop.initDesktop();
+    desktop.init();
     testDispose(desktop);
   }
 
@@ -97,7 +97,7 @@ public class JsonDesktopTest {
   @Test
   public void testFormAddedAndRemoved() throws Exception {
     DesktopWithOneOutline desktop = new DesktopWithOneOutline();
-    desktop.initDesktop();
+    desktop.init();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
     FormWithOneField form = new FormWithOneField();
     form.setDisplayParent(desktop);
@@ -155,7 +155,7 @@ public class JsonDesktopTest {
   @Test
   public void testFormClosedBeforeRemovedInDifferentRequests() throws Exception {
     DesktopWithOneOutline desktop = new DesktopWithOneOutline();
-    desktop.initDesktop();
+    desktop.init();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
     FormWithOneField form = new FormWithOneField();
     form.setDisplayParent(desktop);
@@ -194,7 +194,7 @@ public class JsonDesktopTest {
   @Test
   public void testFormClosedBeforeRemovedInSameRequest() throws JSONException {
     DesktopWithOneOutline desktop = new DesktopWithOneOutline();
-    desktop.initDesktop();
+    desktop.init();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
     FormWithOneField form = new FormWithOneField();
     form.setDisplayParent(desktop);
@@ -232,7 +232,7 @@ public class JsonDesktopTest {
   @Test
   public void testDontSendNonDisplayableMenus() throws Exception {
     IDesktop desktop = new DesktopWithNonDisplayableActions();
-    desktop.initDesktop();
+    desktop.init();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
 
     JsonMenu<IMenu> jsonDisplayableMenu = jsonDesktop.getAdapter(desktop.getMenu(DesktopWithNonDisplayableActions.DisplayableMenu.class));
@@ -264,7 +264,7 @@ public class JsonDesktopTest {
   @Test
   public void testDontSendNonDisplayableViewButtons() throws Exception {
     IDesktop desktop = new DesktopWithNonDisplayableActions();
-    desktop.initDesktop();
+    desktop.init();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
 
     JsonOutlineViewButton<IOutlineViewButton> jsonDisplayableAction = jsonDesktop.getAdapter(desktop.getViewButton(DesktopWithNonDisplayableActions.DisplayableOutlineViewButton.class));
@@ -289,7 +289,7 @@ public class JsonDesktopTest {
   @Test
   public void testDontSendNonDisplayableOutline() throws Exception {
     IDesktop desktop = new DesktopWithNonDisplayableOutline();
-    desktop.initDesktop();
+    desktop.init();
     desktop.setOutline(NonDisplayableOutlineWithOneNode.class);
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
 
@@ -307,7 +307,7 @@ public class JsonDesktopTest {
   @Test
   public void testHandleModelDownloadResource() throws Exception {
     IDesktop desktop = new DesktopWithNonDisplayableOutline();
-    desktop.initDesktop();
+    desktop.init();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
     jsonDesktop.handleModelOpenUri(new BinaryResource("foo.txt", null), OpenUriAction.DOWNLOAD);
     jsonDesktop.handleModelOpenUri(new BinaryResource("TP6 ARL ; Zulassung (UVV) - Bearbeitung elektr. Fax-Eingang [-8874 , ABC-Prüfbericht] (1).pdf", null), OpenUriAction.DOWNLOAD);

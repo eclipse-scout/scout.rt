@@ -73,7 +73,7 @@ public class FormDataTemplateExtensionTest extends AbstractLocalExtensionTestCas
   private void doValueFieldTemplateTest() throws Exception {
     String changedValue = "other value";
     OrigForm origForm = new OrigForm();
-    origForm.initForm();
+    origForm.init();
 
     assertEquals(SpecialStringField.INIT_VAL, origForm.getFieldByClass(SpecialStringField.class).getValue());
 
@@ -93,7 +93,7 @@ public class FormDataTemplateExtensionTest extends AbstractLocalExtensionTestCas
     // create and test form
     Set<Integer> valueOfSecondTree = CollectionUtility.hashSet(8, 9, 10);
     OrigForm origForm = new OrigForm();
-    origForm.initForm();
+    origForm.init();
     origForm.getSecondUseOfTemplateBox().getFieldByClass(TreeBoxToTemplateField.class).setValue(valueOfSecondTree);
     assertEquals(OrigForm.STRING_TEMPLATE_1_3, origForm.getFirstUseOfTemplateBox().getThirdStringInTemplateField().getValue());
     assertNull(origForm.getFirstUseOfTemplateBox().getGroupBoxInTemplateField().getFieldByClass(TreeBoxToTemplateField.class));
@@ -131,7 +131,7 @@ public class FormDataTemplateExtensionTest extends AbstractLocalExtensionTestCas
     // create and test form
     Set<Integer> valueOfSecondTree = CollectionUtility.hashSet(5, 6, 7);
     OrigForm origForm = new OrigForm();
-    origForm.initForm();
+    origForm.init();
     origForm.getSecondUseOfTemplateBox().getGroupBoxInTemplateField().getFieldByClass(TreeBoxToTemplateField.class).setValue(valueOfSecondTree);
     assertEquals(OrigForm.STRING_FIELD_ORIG_VALUE, origForm.getFirstStringField().getValue());
     assertEquals(OrigForm.STRING_TEMPLATE_1_1, origForm.getFirstUseOfTemplateBox().getFirstStringInTemplateField().getValue());

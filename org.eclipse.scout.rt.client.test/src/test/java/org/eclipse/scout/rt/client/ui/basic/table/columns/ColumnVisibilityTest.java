@@ -50,13 +50,13 @@ public class ColumnVisibilityTest {
   }
 
   /**
-   * Column that is configured displayable and that is set to not-displayable and back to displayable in the
-   * execInitTable of {@link AbstractTable}.
+   * Column that is configured displayable and that is set to not-displayable and back to displayable in the execInitTable
+   * of {@link AbstractTable}.
    */
   @Test
   public void test_displayable_configuredTrue_initFalseTrue() throws Exception {
     TestTable table = new TestTable();
-    table.initTable();
+    table.init();
     Test1Column col1 = table.getTest1Column();
 
     assertTrue(col1.isDisplayable());
@@ -70,7 +70,7 @@ public class ColumnVisibilityTest {
   @Test
   public void test_displayable_configuredFalse_initTrue() throws Exception {
     TestTable table = new TestTable();
-    table.initTable();
+    table.init();
     Test2Column col2 = table.getTest2Column();
 
     assertTrue(col2.isDisplayable());
@@ -78,8 +78,8 @@ public class ColumnVisibilityTest {
   }
 
   /**
-   * Column that is configured displayable and that is set to not-displayable and back to displayable in the
-   * execInitTable of {@link AbstractTable}. In addition the column's preferences are set to invisible.
+   * Column that is configured displayable and that is set to not-displayable and back to displayable in the execInitTable
+   * of {@link AbstractTable}. In addition the column's preferences are set to invisible.
    */
   @Test
   public void test_displayable_configuredTrue_initFalseTrue_uiPrefsVisibleFalse() throws Exception {
@@ -89,7 +89,7 @@ public class ColumnVisibilityTest {
 
     // perform test
     TestTable table = new TestTable();
-    table.initTable();
+    table.init();
     Test1Column col1 = table.getTest1Column();
 
     assertTrue(col1.isDisplayable());
@@ -108,7 +108,7 @@ public class ColumnVisibilityTest {
 
     // perform test
     TestTable table = new TestTable();
-    table.initTable();
+    table.init();
     Test2Column col2 = table.getTest2Column();
 
     assertTrue(col2.isDisplayable());
@@ -116,9 +116,9 @@ public class ColumnVisibilityTest {
   }
 
   /**
-   * Column that is configured displayable and that is set to not-displayable and back to displayable in the
-   * execInitTable of {@link AbstractTable}. In addition the column's preferences are set to visible but visible granted
-   * is set to false.
+   * Column that is configured displayable and that is set to not-displayable and back to displayable in the execInitTable
+   * of {@link AbstractTable}. In addition the column's preferences are set to visible but visible granted is set to
+   * false.
    */
   @Test
   public void test_displayable_configuredTrue_initFalseTrue_uiPrefsVisibleTrueVisibleGrantedFalse() throws Exception {
@@ -129,7 +129,7 @@ public class ColumnVisibilityTest {
 
     // perform test
     TestTable table = new TestTable();
-    table.initTable();
+    table.init();
     Test1Column col1 = table.getTest1Column();
 
     assertTrue(col1.isDisplayable());
@@ -149,7 +149,7 @@ public class ColumnVisibilityTest {
 
     // perform test
     TestTable table = new TestTable();
-    table.initTable();
+    table.init();
     Test2Column col2 = table.getTest2Column();
 
     assertTrue(col2.isDisplayable());

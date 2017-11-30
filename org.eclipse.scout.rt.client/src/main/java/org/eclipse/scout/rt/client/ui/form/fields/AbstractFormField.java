@@ -82,7 +82,6 @@ import org.w3c.dom.Element;
 public abstract class AbstractFormField extends AbstractWidget implements IFormField, IContributionOwner, IExtensibleObject {
 
   private static final String ENABLED_SLAVE = "ENABLED_SLAVE";
-  private static final String INITIALIZED = "INITIALIZED";
   private static final String TOUCHED = "TOUCHED";
   private static final String LABEL_VISIBLE = "LABEL_VISIBLE";
   private static final String MASTER_REQUIRED = "MASTER_REQUIRED";
@@ -91,7 +90,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper(IDimensions.VISIBLE, IDimensions.VISIBLE_GRANTED);
   private static final NamedBitMaskHelper LABEL_VISIBLE_BIT_HELPER = new NamedBitMaskHelper(LABEL_VISIBLE);
   private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED, IDimensions.ENABLED_GRANTED, ENABLED_SLAVE);
-  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INITIALIZED, TOUCHED, MASTER_REQUIRED);
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(TOUCHED, MASTER_REQUIRED);
 
   /**
    * Provides 8 dimensions for enabled state.<br>
@@ -117,7 +116,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   /**
    * Provides 8 boolean flags.<br>
-   * Currently used: {@link #INITIALIZED}, {@link #TOUCHED}, {@link #MASTER_REQUIRED}
+   * Currently used: {@link #TOUCHED}, {@link #MASTER_REQUIRED}
    */
   private byte m_flags;
 
@@ -172,11 +171,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   @Override
-  protected final void callInitializer() {
-    if (isInitialized()) {
-      return;
-    }
-
+  protected void initConfigInternal() {
     try {
       setValueChangeTriggerEnabled(false);
       interceptInitConfig();
@@ -184,7 +179,6 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     finally {
       setValueChangeTriggerEnabled(true);
     }
-    setInitialized();
   }
 
   @Override
@@ -875,20 +869,22 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     return viewOrder;
   }
 
+  /**
+   * @deprecated will be removed with 8.0, use {@link #isInitConfigDone()} instead
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public boolean isInitialized() {
-    return FLAGS_BIT_HELPER.isBitSet(INITIALIZED, m_flags);
-  }
-
-  private void setInitialized() {
-    m_flags = FLAGS_BIT_HELPER.setBit(INITIALIZED, m_flags);
+    return isInitConfigDone();
   }
 
   /**
    * do not use this method
    */
   @Override
-  public void postInitConfig() {
+  protected void postInitConfigInternal() {
+    super.postInitConfigInternal();
     // key strokes, now all inner fields are built
     updateKeyStrokes();
     // master listener, now the inner field is available
@@ -923,11 +919,9 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     return getForm().getFieldByClass(c);
   }
 
-  /**
-   * This is the init of the runtime model after the form and fields are built and configured
-   */
   @Override
-  public final void initField() {
+  protected final void initInternal() {
+    super.initInternal();
     try {
       setValueChangeTriggerEnabled(false);
       //
@@ -941,13 +935,23 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     }
   }
 
+  /**
+   * @deprecated will be removed with 8.0, use {@link #init()} {@link #reinit()} or {@link #initInternal()} instead
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  @Override
+  public final void initField() {
+    init();
+  }
+
   protected void initFieldInternal() {
     checkSaveNeeded();
     checkEmpty();
   }
 
   @Override
-  public final void disposeField() {
+  protected final void disposeInternal() {
     try {
       disposeFieldInternal();
     }
@@ -960,6 +964,13 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     catch (Exception e) {
       LOG.warn("Field [{}]", getClass().getName(), e);
     }
+    super.disposeInternal();
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public final void disposeField() {
+    dispose();
   }
 
   protected void disposeFieldInternal() {
@@ -1541,7 +1552,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   protected void calculateEnabledInternal() {
     final boolean enabled = NamedBitMaskHelper.allBitsSet(m_enabled);
     boolean changed = propertySupport.setPropertyBool(PROP_ENABLED, enabled);
-    if (!changed || !isInitialized()) {
+    if (!changed || !isInitConfigDone()) {
       return;
     }
 
@@ -1599,7 +1610,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    */
   @Override
   public final void checkSaveNeeded() {
-    if (isInitialized()) {
+    if (isInitConfigDone()) {
       try {
         propertySupport.setPropertyBool(PROP_SAVE_NEEDED, isTouched() || interceptIsSaveNeeded());
       }
@@ -1647,7 +1658,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * Default implementation just calls {@link #interceptIsEmpty()}
    */
   protected final void checkEmpty() {
-    if (isInitialized()) {
+    if (isInitConfigDone()) {
       try {
         propertySupport.setPropertyBool(PROP_EMPTY, interceptIsEmpty());
       }
@@ -2056,7 +2067,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     Map<String, IKeyStroke> ksMap = new HashMap<>(configuredKeyStrokes.size() + contributedKeyStrokes.size());
     for (Class<? extends IKeyStroke> keystrokeClazz : configuredKeyStrokes) {
       IKeyStroke ks = ConfigurationUtility.newInnerInstance(this, keystrokeClazz);
-      ks.initAction();
+      ks.init();
       if (ks.getKeyStroke() != null) {
         ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
       }
@@ -2064,7 +2075,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
     for (IKeyStroke ks : contributedKeyStrokes) {
       try {
-        ks.initAction();
+        ks.init();
         if (ks.getKeyStroke() != null) {
           ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
         }

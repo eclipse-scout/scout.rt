@@ -94,8 +94,8 @@ public class TreeBoxTest {
   }
 
   /**
-   * Tests that a initially checked node which is removed from the tree is not contained in the set of checked nodes
-   * after removal.
+   * Tests that a initially checked node which is removed from the tree is not contained in the set of checked nodes after
+   * removal.
    */
   @Test
   public void testCheckedNodesRemovedOn() throws Exception {
@@ -107,8 +107,8 @@ public class TreeBoxTest {
     assertEquals(initialValues.size(), tree.getCheckedNodesCount());
     assertTrue(CollectionUtility.equalsCollection(tree.findNodes(initialValues), tree.getCheckedNodes()));
 
-    // re-initialize field and ensures checked nodes equals initial values
-    treeBox.initField();
+    // re-initialize field and ensure checked nodes are equal to the initial values
+    treeBox.reinit();
     assertEquals(initialValues.size(), tree.getCheckedNodesCount());
     assertTrue(CollectionUtility.equalsCollection(tree.findNodes(initialValues), tree.getCheckedNodes()));
   }
@@ -121,7 +121,7 @@ public class TreeBoxTest {
   @Test
   public void testAutoSelectBehavior() throws Exception {
     AutoSelectTreeBox treeBox = new AutoSelectTreeBox();
-    treeBox.initField();
+    treeBox.init();
     ITree tree = treeBox.getTree();
 
     ITreeNode node = tree.findNode(1L); // A
@@ -148,7 +148,7 @@ public class TreeBoxTest {
   @Test
   public void testAutoSelectBehaviorExtended() throws Exception {
     AutoSelectTreeBox treeBox = new AutoSelectTreeBox();
-    treeBox.initField();
+    treeBox.init();
     ITree tree = treeBox.getTree();
 
     ITreeNode node = tree.findNode(9L); // C-B
@@ -196,7 +196,7 @@ public class TreeBoxTest {
   @Test
   public void testNullKeys() throws Exception {
     AutoSelectTreeBox treeBox = new AutoSelectTreeBox();
-    treeBox.initField();
+    treeBox.init();
     treeBox.checkAllKeys();
     assertEquals(14, treeBox.getCheckedKeyCount()); // assert the null key is not available
   }
@@ -286,7 +286,7 @@ public class TreeBoxTest {
 
   private SimpleTreeBox createSimpleTreeBox() {
     SimpleTreeBox treeBox = new SimpleTreeBox();
-    treeBox.initField();
+    treeBox.init();
     return treeBox;
   }
 
@@ -299,14 +299,14 @@ public class TreeBoxTest {
       }
 
     };
-    treeBox.initField();
+    treeBox.init();
     treeBox.resetValue();
     return treeBox;
   }
 
   private ValidatingTreeBox createValidatingTreeBox() {
     ValidatingTreeBox treeBox = new ValidatingTreeBox();
-    treeBox.initField();
+    treeBox.init();
     return treeBox;
   }
 

@@ -436,7 +436,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
    */
   @Override
   public void setStatusVisible(boolean statusVisible) {
-    setStatusVisible(statusVisible, isInitialized());
+    setStatusVisible(statusVisible, isInitConfigDone());
   }
 
   @Override

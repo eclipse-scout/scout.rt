@@ -37,12 +37,6 @@ public interface ITiles extends IWidget, ITypeWithClassId, IExtensibleObject, IC
   String LOGICAL_GRID_HORIZONTAL = "HorizontalGrid";
   String LOGICAL_GRID_VERTICAL_SMART = "VerticalSmartGrid";
 
-  void initTiles();
-
-  void postInitTilesConfig();
-
-  void disposeTiles();
-
   /**
    * @return list of tiles. Return value is never <code>null</code>.
    */

@@ -262,7 +262,7 @@ public class CheckRowsInTableTest {
 
   private P_Table createTable(boolean isMulticheck) {
     P_Table table = new P_Table();
-    table.initTable();
+    table.init();
     table.setMultiCheck(isMulticheck);
     table.addRowsByMatrix(new Object[][]{new Object[]{10, "Lorem"}, new Object[]{11, "Ipsum"}, new Object[]{12, "Zzz"}}, ITableRow.STATUS_NON_CHANGED);
 
