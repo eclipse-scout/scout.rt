@@ -73,8 +73,8 @@ public abstract class AbstractImageField extends AbstractFormField implements II
    * following order:
    * <ol>
    * <li>Image (Binary resource)
-   * <li>ImageId
    * <li>ImageUrl
+   * <li>ImageId
    * </ol>
    */
   @ConfigProperty(ConfigProperty.ICON_ID)
@@ -90,8 +90,8 @@ public abstract class AbstractImageField extends AbstractFormField implements II
    * following order:
    * <ol>
    * <li>Image (Binary resource)
-   * <li>ImageId
    * <li>ImageUrl
+   * <li>ImageId
    * </ol>
    */
   @ConfigProperty(ConfigProperty.ICON_ID)

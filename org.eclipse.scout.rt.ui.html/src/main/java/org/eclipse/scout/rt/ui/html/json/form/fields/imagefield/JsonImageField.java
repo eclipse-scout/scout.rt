@@ -165,11 +165,11 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
         return BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, imageResource.getFilename());
       }
     }
-    if (getModel().getImageId() != null) {
-      return BinaryResourceUrlUtility.createIconUrl(getModel().getImageId());
-    }
     if (getModel().getImageUrl() != null) {
       return getModel().getImageUrl();
+    }
+    if (getModel().getImageId() != null) {
+      return BinaryResourceUrlUtility.createIconUrl(getModel().getImageId());
     }
     return null;
   }
