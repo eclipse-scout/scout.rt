@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.server.commons.servlet.filter.gzip;
 
 import java.io.IOException;
-import java.util.regex.Pattern;
+import java.util.Set;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -22,7 +22,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,19 +47,18 @@ public class GzipServletFilter implements Filter {
   public static final String ACCEPT_ENCODING = "Accept-Encoding";
   public static final String CONTENT_ENCODING = "Content-Encoding";
   public static final String GZIP = "gzip";
+  public static final String CONTENT_TYPES = "text/html,text/css,text/xml,text/plain,application/json,application/javascript,image/svg+xml,text/vcard";
 
   private int m_getMinSize;
   private int m_postMinSize;
-  private Pattern m_getPattern;
-  private Pattern m_postPattern;
+  private Set<String> m_contentTypes;
 
   @Override
   public void init(FilterConfig config) throws ServletException {
     // read config
     m_getMinSize = Integer.parseInt(ObjectUtility.nvl(config.getInitParameter("get_min_size"), "256"));
     m_postMinSize = Integer.parseInt(ObjectUtility.nvl(config.getInitParameter("post_min_size"), "256"));
-    m_getPattern = Pattern.compile(ObjectUtility.nvl(config.getInitParameter("get_pattern"), ".*\\.(html|css|js|json|txt)"), Pattern.CASE_INSENSITIVE);
-    m_postPattern = Pattern.compile(ObjectUtility.nvl(config.getInitParameter("post_pattern"), ".*/json"), Pattern.CASE_INSENSITIVE);
+    m_contentTypes = CollectionUtility.hashSet(StringUtility.split(ObjectUtility.nvl(config.getInitParameter("content_types"), CONTENT_TYPES), ","));
   }
 
   @Override
@@ -76,7 +77,7 @@ public class GzipServletFilter implements Filter {
             req.getPathInfo());
       }
     }
-    if (requestAcceptsGzipEncoding(req) && supportsGzipEncoding(req)) {
+    if (requestAcceptsGzipEncoding(req)) {
       resp = new GzipServletResponseWrapper(resp);
     }
 
@@ -84,7 +85,12 @@ public class GzipServletFilter implements Filter {
 
     if (resp instanceof GzipServletResponseWrapper) {
       GzipServletResponseWrapper gzipResp = (GzipServletResponseWrapper) resp;
-      boolean compressed = gzipResp.finish(minimumLengthToCompress(req));
+      int minLength = minimumLengthToCompress(req);
+      if (!responseNeedsGzipEncoding(req, resp)) {
+        // Disable compression
+        minLength = -1;
+      }
+      boolean compressed = gzipResp.finish(minLength);
       if (compressed && LOG.isDebugEnabled()) {
         LOG.debug("GZIP response[size {}%, uncompressed: {}, compressed: {}]: {}",
             gzipResp.getCompressedLength() * 100 / gzipResp.getUncompressedLength(),
@@ -105,18 +111,11 @@ public class GzipServletFilter implements Filter {
     return h != null && h.contains(GZIP);
   }
 
-  protected boolean supportsGzipEncoding(HttpServletRequest req) {
+  protected boolean responseNeedsGzipEncoding(HttpServletRequest req, HttpServletResponse resp) {
     if (!UrlHints.isCompressHint(req)) {
       return false;
     }
-    String pathInfo = req.getPathInfo();
-    if (pathInfo == null) {
-      return false;
-    }
-    if ("GET".equals(req.getMethod()) && m_getPattern.matcher(pathInfo).matches()) {
-      return true;
-    }
-    if ("POST".equals(req.getMethod()) && m_postPattern.matcher(pathInfo).matches()) {
+    if (m_contentTypes.contains(resp.getContentType())) {
       return true;
     }
     return false;
