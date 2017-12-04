@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuListener;
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
 
@@ -15,6 +14,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
  * accordingly.
  */
 public class MenuMediator {
+
   private ContextMenuListener m_contextMenuListener;
   private final List<IMenu> m_menus = new ArrayList<>();
   private IContextMenuOwner m_source;
@@ -40,17 +40,22 @@ public class MenuMediator {
     }
     getSource().getContextMenu().removeContextMenuListener(m_contextMenuListener);
     m_contextMenuListener = null;
+    unmediateMenus();
+  }
+
+  protected void unmediateMenus() {
+    getDestination().getContextMenu().removeChildActions(getMenus());
   }
 
   protected void mediateMenus() {
-    IContextMenu contextMenu = getDestination().getContextMenu();
-    contextMenu.removeChildActions(getMenus());
+    // Remove old mediated menus
+    unmediateMenus();
 
     List<IMenu> sourceMenus = getSource().getMenus();
     for (IMenu menu : sourceMenus) {
       m_menus.add(OutlineMenuWrapper.wrapMenu(menu));
     }
-    contextMenu.addChildActions(m_menus);
+    getDestination().getContextMenu().addChildActions(m_menus);
   }
 
   public IContextMenuOwner getSource() {
@@ -73,5 +78,4 @@ public class MenuMediator {
       }
     }
   }
-
 }
