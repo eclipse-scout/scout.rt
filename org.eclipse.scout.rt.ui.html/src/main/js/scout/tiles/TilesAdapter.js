@@ -21,6 +21,11 @@ scout.TilesAdapter.prototype._syncSelectedTiles = function(tiles) {
   this.widget.selectTiles(tiles);
 };
 
+scout.TilesAdapter.prototype._syncTiles = function(tiles) {
+  this.addFilterForPropertyName('selectedTiles');
+  this.widget.setTiles(tiles);
+};
+
 scout.TilesAdapter.prototype._initProperties = function(model) {
   scout.TilesAdapter.parent.prototype._initProperties.call(this, model);
   if (!scout.objects.isNullOrUndefined(model.filteredTiles)) {
