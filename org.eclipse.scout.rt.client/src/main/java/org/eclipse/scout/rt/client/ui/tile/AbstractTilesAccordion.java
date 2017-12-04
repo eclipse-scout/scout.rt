@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 @ClassId("e1e96659-f922-45c8-b350-78f9de059a83")
-public abstract class AbstractTilesAccordion extends AbstractAccordion {
+public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAccordion {
 
   public static final String PROP_SHOW_FILTER_COUNT = "showFilterCount";
   public static final String PROP_SELECTED_TILES = "selectedTiles";
@@ -74,12 +74,12 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
     return false;
   }
 
-  public void addTile(ITile tile) {
+  public void addTile(T tile) {
     getTileGrid(getGroupByTile(tile)).addTile(tile);
     updateGroupStates();
   }
 
-  protected IGroup getGroupByTile(ITile tile) {
+  protected IGroup getGroupByTile(T tile) {
     Object groupId = m_groupManager.getGroupIdByTile(tile);
     return getGroupById(groupId);
   }
@@ -95,21 +95,21 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
    * The default group is always the last group.
    */
   @SuppressWarnings("unchecked")
-  protected <T extends IGroup> T getDefaultGroup() {
+  protected <G extends IGroup> G getDefaultGroup() {
     List<? extends IGroup> groups = getGroupsInternal();
     int lastGroup = groups.size() - 1;
-    return (T) groups.get(lastGroup);
+    return (G) groups.get(lastGroup);
   }
 
-  public void setTiles(List<ITile> tiles) {
-    Map<IGroup, List<ITile>> map = new HashMap<>();
+  public void setTiles(List<T> tiles) {
+    Map<IGroup, List<T>> map = new HashMap<>();
     for (IGroup group : getGroupsInternal()) {
       map.put(group, new ArrayList<>());
     }
-    for (ITile tile : tiles) {
+    for (T tile : tiles) {
       map.get(getGroupByTile(tile)).add(tile);
     }
-    for (Entry<IGroup, List<ITile>> entry : map.entrySet()) {
+    for (Entry<IGroup, List<T>> entry : map.entrySet()) {
       getTileGrid(entry.getKey()).setTiles(entry.getValue());
     }
     updateGroupStates();
@@ -140,7 +140,8 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
     }
   }
 
-  protected ITiles getTileGrid(IGroup group) {
+  @SuppressWarnings("unchecked")
+  protected ITiles<T> getTileGrid(IGroup group) {
     return (ITiles) group.getBody();
   }
 
@@ -186,7 +187,7 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
     }
     m_groupManager = groupManager;
 
-    List<ITile> allTiles = getAllTiles();
+    List<T> allTiles = getAllTiles();
     List<? extends IGroup> currentGroups = getGroupsInternal();
 
     // We always add a default group which is used when the DefaultGroupManager is active or
@@ -244,25 +245,26 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
     return group;
   }
 
-  public Stream<ITiles> streamAllTileGrids() {
+  public Stream<ITiles<T>> streamAllTileGrids() {
     return getAllTileGrids().stream();
   }
 
-  public List<ITiles> getAllTileGrids() {
-    List<ITiles> tileGrids = new ArrayList<>();
+  @SuppressWarnings("unchecked")
+  public List<ITiles<T>> getAllTileGrids() {
+    List<ITiles<T>> tileGrids = new ArrayList<>();
     for (IGroup group : getGroups()) {
       tileGrids.add((ITiles) group.getBody());
     }
     return tileGrids;
   }
 
-  public Stream<ITile> streamAllTiles() {
+  public Stream<T> streamAllTiles() {
     return getAllTiles().stream();
   }
 
-  public List<ITile> getAllTiles() {
-    List<ITile> allTiles = new ArrayList<>();
-    for (ITiles tiles : getAllTileGrids()) {
+  public List<T> getAllTiles() {
+    List<T> allTiles = new ArrayList<>();
+    for (ITiles<T> tiles : getAllTileGrids()) {
       allTiles.addAll(tiles.getTiles());
     }
     return allTiles;
@@ -290,7 +292,7 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
     streamAllTileGrids().forEach(ITiles::deleteAllTiles);
   }
 
-  public void deleteTile(ITile tile) {
+  public void deleteTile(T tile) {
     streamAllTileGrids().forEach(tileGrid -> tileGrid.deleteTile(tile));
   }
 
@@ -298,17 +300,17 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
     streamAllTileGrids().forEach(ITiles::filter);
   }
 
-  public void sortTiles(Comparator<ITile> comparator) {
+  public void sortTiles(Comparator<T> comparator) {
     streamAllTileGrids().forEach(tileGrid -> {
-      List<? extends ITile> sortedTiles = new ArrayList<>(tileGrid.getTiles());
+      List<T> sortedTiles = new ArrayList<>(tileGrid.getTiles());
       Collections.sort(sortedTiles, comparator);
       tileGrid.setTiles(sortedTiles);
     });
 
   }
 
-  public ITile getSelectedTile() {
-    for (ITiles tileGrid : getAllTileGrids()) {
+  public T getSelectedTile() {
+    for (ITiles<T> tileGrid : getAllTileGrids()) {
       if (tileGrid.getSelectedTile() != null) {
         return tileGrid.getSelectedTile();
       }
@@ -316,12 +318,11 @@ public abstract class AbstractTilesAccordion extends AbstractAccordion {
     return null;
   }
 
-  @SuppressWarnings("unchecked")
-  public List<ITile> getSelectedTiles() {
-    for (ITiles tileGrid : getAllTileGrids()) {
-      List<? extends ITile> selectedTiles = tileGrid.getSelectedTiles();
+  public List<T> getSelectedTiles() {
+    for (ITiles<T> tileGrid : getAllTileGrids()) {
+      List<T> selectedTiles = tileGrid.getSelectedTiles();
       if (selectedTiles != null && selectedTiles.size() != 0) {
-        return (List<ITile>) selectedTiles;
+        return selectedTiles;
       }
     }
     return Collections.emptyList();

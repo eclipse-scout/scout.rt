@@ -17,14 +17,14 @@ import org.eclipse.scout.rt.client.ui.tile.AbstractTiles;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 
-public abstract class AbstractTilesExtension<TABLE extends AbstractTiles> extends AbstractExtension<TABLE> implements ITilesExtension<TABLE> {
+public abstract class AbstractTilesExtension<T extends ITile, TILES extends AbstractTiles<T>> extends AbstractExtension<TILES> implements ITilesExtension<T, TILES> {
 
-  public AbstractTilesExtension(TABLE owner) {
+  public AbstractTilesExtension(TILES owner) {
     super(owner);
   }
 
   @Override
-  public void execTilesSelected(TilesSelectedChain chain, List<? extends ITile> tiles) {
+  public void execTilesSelected(TilesSelectedChain<T> chain, List<T> tiles) {
     chain.execTilesSelected(tiles);
   }
 

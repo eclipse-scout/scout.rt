@@ -21,23 +21,23 @@ public final class TilesChains {
   private TilesChains() {
   }
 
-  protected abstract static class AbstractTilesChain extends AbstractExtensionChain<ITilesExtension<? extends AbstractTiles>> {
+  protected abstract static class AbstractTilesChain<T extends ITile> extends AbstractExtensionChain<ITilesExtension<T, ? extends AbstractTiles>> {
 
-    public AbstractTilesChain(List<? extends ITilesExtension<? extends AbstractTiles>> extensions) {
+    public AbstractTilesChain(List<? extends ITilesExtension<T, ? extends AbstractTiles>> extensions) {
       super(extensions, ITilesExtension.class);
     }
   }
 
-  public static class TilesSelectedChain extends AbstractTilesChain {
+  public static class TilesSelectedChain<T extends ITile> extends AbstractTilesChain<T> {
 
-    public TilesSelectedChain(List<? extends ITilesExtension<? extends AbstractTiles>> extensions) {
+    public TilesSelectedChain(List<? extends ITilesExtension<T, ? extends AbstractTiles>> extensions) {
       super(extensions);
     }
 
-    public void execTilesSelected(final List<? extends ITile> tiles) {
+    public void execTilesSelected(final List<T> tiles) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITilesExtension<? extends AbstractTiles> next) {
+        protected void callMethod(ITilesExtension<T, ? extends AbstractTiles> next) {
           next.execTilesSelected(TilesSelectedChain.this, tiles);
         }
       };

@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.client.ui.tile;
 
 import java.util.List;
 
-public interface ITilesUIFacade {
+public interface ITilesUIFacade<T extends ITile> {
 
-  void setSelectedTilesFromUI(List<? extends ITile> tiles);
+  void setSelectedTilesFromUI(List<T> tiles);
 
 }

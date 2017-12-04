@@ -19,8 +19,6 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.group.AbstractGroup;
 import org.eclipse.scout.rt.client.ui.tile.AbstractTile;
 import org.eclipse.scout.rt.client.ui.tile.AbstractTiles;
-import org.eclipse.scout.rt.client.ui.tile.ITile;
-import org.eclipse.scout.rt.client.ui.tile.ITiles;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -36,7 +34,7 @@ public class AccordionTest {
   @Test
   public void testInitGroup() {
     P_Accordion accordion = new P_Accordion();
-    List<ITile> tiles = new ArrayList<>();
+    List<P_Tile> tiles = new ArrayList<>();
     P_Tile tile = new P_Tile();
     assertEquals(0, tile.initCalls);
     tiles.add(tile);
@@ -55,7 +53,7 @@ public class AccordionTest {
   @Test
   public void testDisposeGroup() {
     P_Accordion accordion = new P_Accordion();
-    List<ITile> tiles = new ArrayList<>();
+    List<P_Tile> tiles = new ArrayList<>();
     P_Tile tile = new P_Tile();
     assertEquals(0, tile.initCalls);
     tiles.add(tile);
@@ -97,12 +95,12 @@ public class AccordionTest {
     }
 
     @Override
-    public ITiles getBody() {
-      return (ITiles) super.getBody();
+    public Tiles getBody() {
+      return (Tiles) super.getBody();
     }
 
     @ClassId("1af3bcc9-5cb0-486a-bb5a-6ef5dfc63230")
-    public class Tiles extends AbstractTiles {
+    public class Tiles extends AbstractTiles<P_Tile> {
 
     }
 

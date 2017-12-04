@@ -17,8 +17,8 @@ import org.eclipse.scout.rt.client.ui.tile.AbstractTiles;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 
-public interface ITilesExtension<TILES extends AbstractTiles> extends IExtension<TILES> {
+public interface ITilesExtension<T extends ITile, TILES extends AbstractTiles<T>> extends IExtension<TILES> {
 
-  void execTilesSelected(TilesSelectedChain chain, List<? extends ITile> tiles);
+  void execTilesSelected(TilesSelectedChain<T> chain, List<T> tiles);
 
 }

@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 /**
  * @since 7.1
  */
-public interface ITiles extends IWidget, ITypeWithClassId, IExtensibleObject, IContributionOwner, IContextMenuOwner {
+public interface ITiles<T extends ITile> extends IWidget, ITypeWithClassId, IExtensibleObject, IContributionOwner, IContextMenuOwner {
 
   String PROP_TILES = "tiles";
   String PROP_SELECTED_TILES = "selectedTiles";
@@ -40,7 +40,7 @@ public interface ITiles extends IWidget, ITypeWithClassId, IExtensibleObject, IC
   /**
    * @return list of tiles. Return value is never <code>null</code>.
    */
-  List<? extends ITile> getTiles();
+  List<T> getTiles();
 
   int getTileCount();
 
@@ -48,7 +48,7 @@ public interface ITiles extends IWidget, ITypeWithClassId, IExtensibleObject, IC
    * @param tiles
    *          the new list of tiles to be set.
    */
-  void setTiles(List<? extends ITile> tiles);
+  void setTiles(List<T> tiles);
 
   /**
    * @return the preferred number of grid columns.
@@ -91,35 +91,35 @@ public interface ITiles extends IWidget, ITypeWithClassId, IExtensibleObject, IC
 
   TilesLayoutConfig getLayoutConfig();
 
-  void addTiles(List<? extends ITile> tiles);
+  void addTiles(List<T> tiles);
 
-  void addTile(ITile tile);
+  void addTile(T tile);
 
-  void deleteTiles(List<? extends ITile> tiles);
+  void deleteTiles(List<T> tiles);
 
-  void deleteTile(ITile tile);
+  void deleteTile(T tile);
 
   void deleteAllTiles();
 
-  void selectTiles(List<? extends ITile> tiles);
+  void selectTiles(List<T> tiles);
 
-  void selectTile(ITile tile);
+  void selectTile(T tile);
 
   void selectAllTiles();
 
-  void deselectTiles(List<? extends ITile> tiles);
+  void deselectTiles(List<T> tiles);
 
-  void deselectTile(ITile tile);
+  void deselectTile(T tile);
 
   void deselectAllTiles();
 
-  List<? extends ITile> getSelectedTiles();
+  List<T> getSelectedTiles();
 
   int getSelectedTileCount();
 
-  ITile getSelectedTile();
+  T getSelectedTile();
 
-  <T extends ITile> T getTileByClass(Class<T> tileClass);
+  T getTileByClass(Class<T> tileClass);
 
   /**
    * Container of the tiles.
@@ -154,7 +154,7 @@ public interface ITiles extends IWidget, ITypeWithClassId, IExtensibleObject, IC
    */
   void filter();
 
-  List<? extends ITile> getFilteredTiles();
+  List<T> getFilteredTiles();
 
   int getFilteredTileCount();
 

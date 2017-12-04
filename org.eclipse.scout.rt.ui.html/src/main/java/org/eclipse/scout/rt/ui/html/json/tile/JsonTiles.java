@@ -23,7 +23,7 @@ import org.json.JSONObject;
 /**
  * @since 7.1
  */
-public class JsonTiles<T extends ITiles> extends AbstractJsonWidget<T> implements IJsonContextMenuOwner {
+public class JsonTiles<T extends ITiles<? extends ITile>> extends AbstractJsonWidget<T> implements IJsonContextMenuOwner {
 
   private JsonContextMenu<IContextMenu> m_jsonContextMenu;
 
@@ -145,6 +145,7 @@ public class JsonTiles<T extends ITiles> extends AbstractJsonWidget<T> implement
     return json;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (ITiles.PROP_SELECTED_TILES.equals(propertyName)) {

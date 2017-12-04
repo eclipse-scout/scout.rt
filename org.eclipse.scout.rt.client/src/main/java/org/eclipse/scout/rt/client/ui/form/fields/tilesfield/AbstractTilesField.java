@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.tile.AbstractTiles;
+import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.client.ui.tile.ITiles;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
@@ -13,7 +14,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  * @since 7.1
  */
 @ClassId("ee6298ff-ef88-4abd-bae0-f5764f6344d8")
-public abstract class AbstractTilesField<T extends ITiles> extends AbstractFormField implements ITilesField<T> {
+public abstract class AbstractTilesField<T extends ITiles<? extends ITile>> extends AbstractFormField implements ITilesField<T> {
 
   public AbstractTilesField() {
     this(true);

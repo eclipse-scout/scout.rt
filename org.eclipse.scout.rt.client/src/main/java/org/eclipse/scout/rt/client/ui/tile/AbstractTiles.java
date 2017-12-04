@@ -39,9 +39,9 @@ import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
  * @since 7.1
  */
 @ClassId("c04e6cf7-fda0-4146-afea-6a0ff0a50c4b")
-public abstract class AbstractTiles extends AbstractWidget implements ITiles {
+public abstract class AbstractTiles<T extends ITile> extends AbstractWidget implements ITiles<T> {
   private ITilesUIFacade m_uiFacade;
-  private final ObjectExtensions<AbstractTiles, ITilesExtension<? extends AbstractTiles>> m_objectExtensions;
+  private final ObjectExtensions<AbstractTiles, ITilesExtension<T, ? extends AbstractTiles>> m_objectExtensions;
   private ContributionComposite m_contributionHolder;
   private List<ITileFilter> m_filters;
   private boolean m_filteredRowsDirty = false;
@@ -81,7 +81,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     setScrollable(getConfiguredScrollable());
     setWithPlaceholders(getConfiguredWithPlaceholders());
 
-    OrderedCollection<ITile> tiles = new OrderedCollection<>();
+    OrderedCollection<T> tiles = new OrderedCollection<>();
     injectTilesInternal(tiles);
     setSelectedTiles(new ArrayList<>());
     setFilteredTiles(new ArrayList<>());
@@ -113,18 +113,19 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     setContextMenu(contextMenu);
   }
 
-  protected void injectTilesInternal(OrderedCollection<ITile> tiles) {
+  protected void injectTilesInternal(OrderedCollection<T> tiles) {
     List<Class<? extends ITile>> tileClasses = getConfiguredTiles();
     for (Class<? extends ITile> tileClass : tileClasses) {
-      ITile tile = createTileInternal(tileClass);
+      T tile = createTileInternal(tileClass);
       if (tile != null) {
         tiles.addOrdered(tile);
       }
     }
   }
 
-  protected ITile createTileInternal(Class<? extends ITile> tileClass) {
-    return ConfigurationUtility.newInnerInstance(this, tileClass);
+  @SuppressWarnings("unchecked")
+  protected T createTileInternal(Class<? extends ITile> tileClass) {
+    return (T) ConfigurationUtility.newInnerInstance(this, tileClass);
   }
 
   protected List<Class<? extends ITile>> getConfiguredTiles() {
@@ -170,7 +171,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   }
 
   @Override
-  public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
+  public <M extends IMenu> M getMenuByClass(Class<M> menuType) {
     return MenuUtility.getMenuByClass(this, menuType);
   }
 
@@ -186,7 +187,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   @Override
   protected void initInternal() {
     super.initInternal();
-    for (ITile tile : getTilesInternal()) {
+    for (T tile : getTilesInternal()) {
       tile.init();
     }
   }
@@ -194,14 +195,14 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   @Override
   protected void postInitConfigInternal() {
     super.postInitConfigInternal();
-    for (ITile tile : getTilesInternal()) {
+    for (T tile : getTilesInternal()) {
       tile.postInitConfig();
     }
   }
 
   @Override
   protected void disposeInternal() {
-    for (ITile tile : getTilesInternal()) {
+    for (T tile : getTilesInternal()) {
       tile.dispose();
     }
     super.disposeInternal();
@@ -256,7 +257,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   }
 
   @Override
-  public List<? extends ITile> getTiles() {
+  public List<T> getTiles() {
     return CollectionUtility.arrayList(propertySupport.getPropertyList(PROP_TILES));
   }
 
@@ -268,22 +269,22 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   /**
    * @return the live list of the tiles
    */
-  protected List<? extends ITile> getTilesInternal() {
+  protected List<T> getTilesInternal() {
     return propertySupport.getPropertyList(PROP_TILES);
   }
 
   @Override
-  public void setTiles(List<? extends ITile> tiles) {
+  public void setTiles(List<T> tiles) {
     if (CollectionUtility.equalsCollection(getTilesInternal(), tiles, true)) {
       return;
     }
-    List<? extends ITile> existingTiles = ObjectUtility.nvl(getTilesInternal(), new ArrayList<>());
+    List<T> existingTiles = ObjectUtility.nvl(getTilesInternal(), new ArrayList<>());
     tiles = ObjectUtility.nvl(tiles, new ArrayList<>());
 
     // Dispose old tiles (only if they are not in the new list)
-    List<ITile> tilesToDelete = new ArrayList<ITile>(existingTiles);
+    List<T> tilesToDelete = new ArrayList<>(existingTiles);
     tilesToDelete.removeAll(tiles);
-    for (ITile tile : tilesToDelete) {
+    for (T tile : tilesToDelete) {
       tile.dispose();
     }
     deselectTiles(tilesToDelete);
@@ -291,14 +292,14 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     // Initialize new tiles
     // Only initialize when tiles are added later,
     // if they are added while initConfig runs, initTiles() will take care of the initialization which will be called by the container (e.g. TilesField)
-    List<ITile> tilesToInsert = new ArrayList<ITile>(tiles);
+    List<T> tilesToInsert = new ArrayList<>(tiles);
     tilesToInsert.removeAll(existingTiles);
-    for (ITile tile : tilesToInsert) {
+    for (T tile : tilesToInsert) {
       tile.setContainer(this);
     }
     // Initialize after every tile has been linked to the container, so that it is possible to access other tiles in tile.execInit
     if (isInitConfigDone()) {
-      for (ITile tile : tilesToInsert) {
+      for (T tile : tilesToInsert) {
         tile.postInitConfig();
         tile.init();
       }
@@ -311,32 +312,32 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   }
 
   @Override
-  public void addTiles(List<? extends ITile> tilesToAdd) {
-    List<ITile> tiles = new ArrayList<>(getTilesInternal());
+  public void addTiles(List<T> tilesToAdd) {
+    List<T> tiles = new ArrayList<>(getTilesInternal());
     tiles.addAll(tilesToAdd);
     setTiles(tiles);
   }
 
   @Override
-  public void addTile(ITile tile) {
+  public void addTile(T tile) {
     addTiles(CollectionUtility.arrayList(tile));
   }
 
   @Override
-  public void deleteTiles(List<? extends ITile> tilesToDelete) {
-    List<ITile> tiles = new ArrayList<>(getTilesInternal());
+  public void deleteTiles(List<T> tilesToDelete) {
+    List<T> tiles = new ArrayList<>(getTilesInternal());
     tiles.removeAll(tilesToDelete);
     setTiles(tiles);
   }
 
   @Override
-  public void deleteTile(ITile tile) {
+  public void deleteTile(T tile) {
     deleteTiles(CollectionUtility.arrayList(tile));
   }
 
   @Override
   public void deleteAllTiles() {
-    setTiles(new ArrayList<ITile>());
+    setTiles(new ArrayList<>());
   }
 
   @Override
@@ -419,19 +420,19 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
    */
   @ConfigOperation
   @Order(100)
-  protected void execTilesSelected(List<? extends ITile> tiles) {
+  protected void execTilesSelected(List<T> tiles) {
   }
 
   @Override
-  public void selectTiles(List<? extends ITile> tiles) {
+  public void selectTiles(List<T> tiles) {
     if (!isSelectable()) {
       setSelectedTiles(new ArrayList<>());
       return;
     }
 
-    List<ITile> newSelection = filterTiles(tiles);
+    List<T> newSelection = filterTiles(tiles);
     if (newSelection.size() > 1 && !isMultiSelect()) {
-      ITile first = newSelection.get(0);
+      T first = newSelection.get(0);
       newSelection.clear();
       newSelection.add(first);
     }
@@ -441,7 +442,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   }
 
   @Override
-  public void selectTile(ITile tile) {
+  public void selectTile(T tile) {
     selectTiles(CollectionUtility.arrayList(tile));
   }
 
@@ -451,8 +452,8 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   }
 
   @Override
-  public void deselectTiles(List<? extends ITile> tiles) {
-    List<? extends ITile> selectedTiles = getSelectedTiles();
+  public void deselectTiles(List<T> tiles) {
+    List<T> selectedTiles = getSelectedTiles();
     boolean selectionChanged = selectedTiles.removeAll(tiles);
     if (selectionChanged) {
       selectTiles(selectedTiles);
@@ -460,24 +461,24 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   }
 
   @Override
-  public void deselectTile(ITile tile) {
+  public void deselectTile(T tile) {
     deselectTiles(CollectionUtility.arrayList(tile));
   }
 
   @Override
   public void deselectAllTiles() {
-    selectTiles(new ArrayList<ITile>());
+    selectTiles(new ArrayList<>());
   }
 
   @Override
-  public List<? extends ITile> getSelectedTiles() {
+  public List<T> getSelectedTiles() {
     return CollectionUtility.arrayList(propertySupport.getPropertyList(PROP_SELECTED_TILES));
   }
 
   /**
    * @return the live list of the selected tiles
    */
-  protected List<? extends ITile> getSelectedTilesInternal() {
+  protected List<T> getSelectedTilesInternal() {
     return propertySupport.getPropertyList(PROP_SELECTED_TILES);
   }
 
@@ -486,12 +487,12 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     return getSelectedTilesInternal().size();
   }
 
-  protected void setSelectedTiles(List<? extends ITile> tiles) {
+  protected void setSelectedTiles(List<T> tiles) {
     propertySupport.setPropertyList(PROP_SELECTED_TILES, tiles);
   }
 
   @Override
-  public ITile getSelectedTile() {
+  public T getSelectedTile() {
     if (getSelectedTileCount() == 0) {
       return null;
     }
@@ -508,10 +509,10 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   }
 
   @Override
-  public <T extends ITile> T getTileByClass(Class<T> tileClass) {
+  public T getTileByClass(Class<T> tileClass) {
     // TODO [15.4] bsh: Make this method more sophisticated (@Replace etc.)
     T candidate = null;
-    for (ITile tile : getTilesInternal()) {
+    for (T tile : getTilesInternal()) {
       if (tile.getClass() == tileClass) {
         return tileClass.cast(tile);
       }
@@ -555,7 +556,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   public void ensureTileDataLoaded() {
     BEANS.get(TileDataLoadManager.class).cancel(getAsyncLoadIdentifier(), getWindowIdentifier());
 
-    for (ITile tile : getTilesInternal()) {
+    for (T tile : getTilesInternal()) {
       tile.ensureDataLoaded();
     }
   }
@@ -564,7 +565,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   public void loadTileData() {
     BEANS.get(TileDataLoadManager.class).cancel(getAsyncLoadIdentifier(), getWindowIdentifier());
 
-    for (ITile tile : getTilesInternal()) {
+    for (T tile : getTilesInternal()) {
       tile.loadData();
     }
   }
@@ -616,19 +617,19 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     return applyFilters(getTilesInternal(), fullReset);
   }
 
-  protected boolean applyFilters(List<? extends ITile> tiles) {
+  protected boolean applyFilters(List<T> tiles) {
     return applyFilters(tiles, false);
   }
 
-  protected boolean applyFilters(List<? extends ITile> tiles, boolean fullReset) {
+  protected boolean applyFilters(List<T> tiles, boolean fullReset) {
     if (m_filters.size() == 0 && !fullReset) {
       setFilteredTiles(getTilesInternal());
       m_filteredRowsDirty = false;
       return false;
     }
     boolean filterChanged = false;
-    List<ITile> newlyHiddenTiles = new ArrayList<>();
-    for (ITile tile : tiles) {
+    List<T> newlyHiddenTiles = new ArrayList<>();
+    for (T tile : tiles) {
       boolean wasFilterAccepted = tile.isFilterAccepted();
       applyFilters(tile);
       if (tile.isFilterAccepted() != wasFilterAccepted) {
@@ -660,11 +661,11 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   }
 
   @Override
-  public List<? extends ITile> getFilteredTiles() {
+  public List<T> getFilteredTiles() {
     return propertySupport.getPropertyList(PROP_FILTERED_TILES);
   }
 
-  protected void setFilteredTiles(List<? extends ITile> tiles) {
+  protected void setFilteredTiles(List<T> tiles) {
     propertySupport.setPropertyList(PROP_FILTERED_TILES, tiles);
   }
 
@@ -673,7 +674,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     return getFilteredTiles().size();
   }
 
-  protected List<ITile> filterTiles(List<? extends ITile> tiles) {
+  protected List<T> filterTiles(List<T> tiles) {
     if (m_filters.isEmpty()) {
       return new ArrayList<>(tiles);
     }
@@ -683,17 +684,17 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
         .collect(Collectors.toList());
   }
 
-  protected class P_TilesUIFacade implements ITilesUIFacade {
+  protected class P_TilesUIFacade implements ITilesUIFacade<T> {
 
     @Override
-    public void setSelectedTilesFromUI(List<? extends ITile> tiles) {
+    public void setSelectedTilesFromUI(List<T> tiles) {
       selectTiles(tiles);
     }
 
   }
 
   @Override
-  public final <T> T optContribution(Class<T> contribution) {
+  public final <C> C optContribution(Class<C> contribution) {
     return m_contributionHolder.optContribution(contribution);
   }
 
@@ -703,44 +704,44 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
   }
 
   @Override
-  public final <T> List<T> getContributionsByClass(Class<T> type) {
+  public final <C> List<C> getContributionsByClass(Class<C> type) {
     return m_contributionHolder.getContributionsByClass(type);
   }
 
   @Override
-  public final <T> T getContribution(Class<T> contribution) {
+  public final <C> C getContribution(Class<C> contribution) {
     return m_contributionHolder.getContribution(contribution);
   }
 
   @Override
-  public final List<? extends ITilesExtension<? extends AbstractTiles>> getAllExtensions() {
+  public final List<ITilesExtension<T, ? extends AbstractTiles>> getAllExtensions() {
     return m_objectExtensions.getAllExtensions();
   }
 
   @Override
-  public <T extends IExtension<?>> T getExtension(Class<T> c) {
+  public <E extends IExtension<?>> E getExtension(Class<E> c) {
     return m_objectExtensions.getExtension(c);
   }
 
-  protected ITilesExtension<? extends AbstractTiles> createLocalExtension() {
+  protected ITilesExtension<T, ? extends AbstractTiles> createLocalExtension() {
     return new LocalTilesExtension<>(this);
   }
 
-  protected static class LocalTilesExtension<TILES extends AbstractTiles> extends AbstractExtension<TILES> implements ITilesExtension<TILES> {
+  protected static class LocalTilesExtension<T extends ITile, TILES extends AbstractTiles<T>> extends AbstractExtension<TILES> implements ITilesExtension<T, TILES> {
 
     public LocalTilesExtension(TILES owner) {
       super(owner);
     }
 
     @Override
-    public void execTilesSelected(TilesSelectedChain chain, List<? extends ITile> tiles) {
+    public void execTilesSelected(TilesSelectedChain<T> chain, List<T> tiles) {
       getOwner().execTilesSelected(tiles);
     }
   }
 
-  protected final void interceptTilesSelected(List<? extends ITile> tiles) {
-    List<? extends ITilesExtension<? extends AbstractTiles>> extensions = getAllExtensions();
-    TilesSelectedChain chain = new TilesSelectedChain(extensions);
+  protected final void interceptTilesSelected(List<T> tiles) {
+    List<ITilesExtension<T, ? extends AbstractTiles>> extensions = getAllExtensions();
+    TilesSelectedChain<T> chain = new TilesSelectedChain<>(extensions);
     chain.execTilesSelected(tiles);
   }
 
@@ -750,7 +751,7 @@ public abstract class AbstractTiles extends AbstractWidget implements ITiles {
     public void propertyChange(PropertyChangeEvent event) {
       if (event.getPropertyName().equals(PROP_SELECTED_TILES)) {
         @SuppressWarnings("unchecked")
-        List<? extends ITile> tiles = (List<? extends ITile>) event.getNewValue();
+        List<T> tiles = (List<T>) event.getNewValue();
         try {
           interceptTilesSelected(tiles);
         }

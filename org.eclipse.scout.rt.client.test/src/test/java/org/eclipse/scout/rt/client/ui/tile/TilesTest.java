@@ -480,7 +480,7 @@ public class TilesTest {
     return new P_Tile();
   }
 
-  public static class P_Tiles extends AbstractTiles {
+  public static class P_Tiles extends AbstractTiles<P_Tile> {
 
   }
 

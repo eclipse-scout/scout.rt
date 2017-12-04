@@ -25,12 +25,12 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
  * The invisible root menu node of tiles. (internal usage only)
  */
 @ClassId("6c1c8e1a-bee2-49fc-8bcc-e2169037fb7e")
-public class TilesContextMenu extends AbstractContextMenu<ITiles> implements ITilesContextMenu {
+public class TilesContextMenu extends AbstractContextMenu<ITiles<? extends ITile>> implements ITilesContextMenu {
 
   /**
    * @param owner
    */
-  public TilesContextMenu(ITiles owner, List<? extends IMenu> initialChildMenus) {
+  public TilesContextMenu(ITiles<? extends ITile> owner, List<? extends IMenu> initialChildMenus) {
     super(owner, initialChildMenus);
   }
 
