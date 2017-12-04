@@ -26,7 +26,7 @@ public class GzipServletResponseWrapper extends HttpServletResponseWrapper {
   private BufferedServletOutputStream m_buf;
   private int m_compressedLength = -1;
   private int m_uncompressedLength = -1;
-  //one of these two is used
+  // one of these two is used
   private ServletOutputStream m_servletOut;
   private PrintWriter m_writer;
 
@@ -34,7 +34,7 @@ public class GzipServletResponseWrapper extends HttpServletResponseWrapper {
     super(resp);
   }
 
-  protected BufferedServletOutputStream ensureBufferedStream() throws IOException {
+  protected BufferedServletOutputStream ensureBufferedStream() {
     if (m_buf == null) {
       m_buf = new BufferedServletOutputStream();
     }
@@ -79,7 +79,7 @@ public class GzipServletResponseWrapper extends HttpServletResponseWrapper {
 
   @Override
   public void setContentLength(int len) {
-    //ignored
+    // ignored
   }
 
   @Override
