@@ -100,8 +100,8 @@ describe("TableControl", function() {
       var adapter = createTableControlAdapter(model);
       var action = adapter.createWidget(model, session.desktop);
       var model2 = createModel();
-      var adapter2 = createTableControlAdapter(model);
-      var action2 = adapter2.createWidget(model, session.desktop);
+      var adapter2 = createTableControlAdapter(model2);
+      var action2 = adapter2.createWidget(model2, session.desktop);
       table._setTableControls([action, action2]);
 
       action.selected = true;
