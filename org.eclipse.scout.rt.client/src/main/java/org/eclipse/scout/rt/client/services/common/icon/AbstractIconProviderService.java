@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractIconProviderService implements IIconProviderService {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractIconProviderService.class);
-  private static final String[] DEFAULT_ICON_EXTENSIONS = {"png", "gif", "jpg"};
+  private static final String[] DEFAULT_ICON_EXTENSIONS = {"png", "gif", "jpg", "svg"};
 
   private final ReentrantReadWriteLock m_cacheLock = new ReentrantReadWriteLock();
   private final Map<String, IconSpec> m_cache = new HashMap<>();
