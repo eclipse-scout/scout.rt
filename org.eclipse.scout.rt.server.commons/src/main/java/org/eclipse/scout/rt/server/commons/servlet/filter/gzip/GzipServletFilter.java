@@ -115,7 +115,13 @@ public class GzipServletFilter implements Filter {
     if (!UrlHints.isCompressHint(req)) {
       return false;
     }
-    if (m_contentTypes.contains(resp.getContentType())) {
+    String contentType = resp.getContentType();
+    if (contentType == null) {
+      return false;
+    }
+    // Content type may contain the charset parameter separated by ; -> remove it
+    contentType = contentType.split(";")[0];
+    if (m_contentTypes.contains(contentType)) {
       return true;
     }
     return false;
