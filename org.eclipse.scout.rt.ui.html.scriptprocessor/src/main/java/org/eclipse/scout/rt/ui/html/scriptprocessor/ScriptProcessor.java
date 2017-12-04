@@ -64,7 +64,7 @@ public class ScriptProcessor {
     return runInClassLoader(m_lessLoader, CompileCssWithLess.class.getName(), new Class[]{String.class}, new Object[]{content});
   }
 
-  public String compileJs(String content) throws IOException {
+  public String compileJs(String content) throws IOException {// NOSONAR
     return content;
   }
 

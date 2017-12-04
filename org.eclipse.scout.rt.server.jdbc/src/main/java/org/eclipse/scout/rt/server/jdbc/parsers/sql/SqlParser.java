@@ -220,7 +220,7 @@ public class SqlParser {
         s.addChild(nexts);
       }
       //restore incomplete
-      if (u != null && nexts == null) {
+      if (u != null && nexts == null) { // NOSONAR
         list.add(0, u);
       }
       return s;
@@ -590,7 +590,7 @@ public class SqlParser {
       IToken t = null;
       IToken close = null;
       ArrayList<IToken> backup = new ArrayList<IToken>(list);
-      if ((open = removeToken(list, OpenBracketToken.class)) != null && ((t = parseStatement(list, ctx)) != null || (t = parseListExpr(list, ctx)) != null || t == null) && (close = removeToken(list, CloseBracketToken.class)) != null) {
+      if ((open = removeToken(list, OpenBracketToken.class)) != null && ((t = parseStatement(list, ctx)) != null || (t = parseListExpr(list, ctx)) != null || t == null) && (close = removeToken(list, CloseBracketToken.class)) != null) {// NOSONAR
         //ok
       }
       else {

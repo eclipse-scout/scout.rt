@@ -311,7 +311,7 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
         return injectCons.newInstance(BeanInstanceUtil.getInjectionArguments(injectCons.getParameterTypes()));
       }
       catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-        throw new BeanCreationException(beanClass == null ? null : beanClass.getName(), e);
+        throw new BeanCreationException(beanClass.getName(), e);
       }
     }
     else {
