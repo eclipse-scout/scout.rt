@@ -642,14 +642,15 @@ scout.Tiles.prototype._selectTileOnMouseDown = function(event) {
   if (!this.selectable) {
     return;
   }
-  if (this.selected && event.which === 3) {
-    // Do not toggle if context menus should be shown and tile already is selected
-    return;
-  }
 
   var $tile = $(event.currentTarget);
   var tile = $tile.data('widget');
+
   if (tile instanceof scout.PlaceholderTile) {
+    return;
+  }
+  if (tile.selected && event.which === 3) {
+    // Do not toggle if context menus should be shown and tile already is selected
     return;
   }
 
