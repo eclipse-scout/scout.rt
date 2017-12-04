@@ -73,7 +73,9 @@ public abstract class AbstractDataModel implements IDataModel, Serializable, ICo
 
   protected List<IDataModelAttribute> createAttributes(Object holder) {
     Class[] all = ConfigurationUtility.getDeclaredPublicClasses(holder.getClass());
-    List<Class<IDataModelAttribute>> filtered = ConfigurationUtility.filterClasses(all, IDataModelAttribute.class);
+    List<Class<? extends IDataModelAttribute>> filtered = ConfigurationUtility
+        .removeReplacedClasses(ConfigurationUtility.sortFilteredClassesByOrderAnnotation(ConfigurationUtility.filterClasses(all, IDataModelAttribute.class),
+            IDataModelAttribute.class));
 
     List<IDataModelAttribute> contributedAttributes = m_contributionHolder.getContributionsByClass(IDataModelAttribute.class);
 
@@ -89,7 +91,10 @@ public abstract class AbstractDataModel implements IDataModel, Serializable, ICo
 
   protected List<IDataModelEntity> createEntities(Object holder) {
     Class[] all = ConfigurationUtility.getDeclaredPublicClasses(holder.getClass());
-    List<Class<IDataModelEntity>> filtered = ConfigurationUtility.filterClasses(all, IDataModelEntity.class);
+    List<Class<? extends IDataModelEntity>> filtered = ConfigurationUtility
+        .removeReplacedClasses(ConfigurationUtility.sortFilteredClassesByOrderAnnotation(ConfigurationUtility.filterClasses(all, IDataModelEntity.class),
+            IDataModelEntity.class));
+
     List<IDataModelEntity> contributedEntities = m_contributionHolder.getContributionsByClass(IDataModelEntity.class);
 
     OrderedCollection<IDataModelEntity> entities = new OrderedCollection<IDataModelEntity>();

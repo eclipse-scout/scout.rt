@@ -121,8 +121,8 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   }
 
   /**
-   * Calculates the column's view order, e.g. if the @Order annotation is set to 30.0, the method will return 30.0. If
-   * no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
+   * Calculates the column's view order, e.g. if the @Order annotation is set to 30.0, the method will return 30.0. If no
+   * {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
    *
    * @since 3.10.0-M4
    */
@@ -203,14 +203,16 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   protected void execInitEntity() {
   }
 
-  private List<Class<IDataModelAttribute>> getConfiguredAttributes() {
+  private List<Class<? extends IDataModelAttribute>> getConfiguredAttributes() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.filterClasses(dca, IDataModelAttribute.class);
+    List<Class<IDataModelAttribute>> filtered = ConfigurationUtility.filterClasses(dca, IDataModelAttribute.class);
+    return ConfigurationUtility.removeReplacedClasses(filtered);
   }
 
-  private List<Class<IDataModelEntity>> getConfiguredEntities() {
+  private List<Class<? extends IDataModelEntity>> getConfiguredEntities() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.filterClasses(dca, IDataModelEntity.class);
+    List<Class<IDataModelEntity>> filtered = ConfigurationUtility.filterClasses(dca, IDataModelEntity.class);
+    return ConfigurationUtility.removeReplacedClasses(filtered);
   }
 
   protected final void interceptInitConfig() {
@@ -231,7 +233,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
     setOneToMany(getConfiguredOneToMany());
     setOrder(calculateViewOrder());
 
-    List<Class<IDataModelAttribute>> configuredAttributes = getConfiguredAttributes();
+    List<Class<? extends IDataModelAttribute>> configuredAttributes = getConfiguredAttributes();
     List<IDataModelAttribute> contributedAttributes = m_contributionHolder.getContributionsByClass(IDataModelAttribute.class);
 
     OrderedCollection<IDataModelAttribute> attributes = new OrderedCollection<IDataModelAttribute>();
@@ -466,7 +468,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
       return;
     }
     setInitializedChildEntities();
-    List<Class<IDataModelEntity>> configuredEntities = getConfiguredEntities();
+    List<Class<? extends IDataModelEntity>> configuredEntities = getConfiguredEntities();
     List<IDataModelEntity> contributedEntities = m_contributionHolder.getContributionsByClass(IDataModelEntity.class);
     int numEntities = configuredEntities.size() + contributedEntities.size();
 
@@ -529,8 +531,8 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   }
 
   /**
-   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
-   * any further chain elements.
+   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call any
+   * further chain elements.
    */
   protected static class LocalDataModelEntityExtension<OWNER extends AbstractDataModelEntity> extends AbstractSerializableExtension<OWNER> implements IDataModelEntityExtension<OWNER> {
     private static final long serialVersionUID = 1L;
