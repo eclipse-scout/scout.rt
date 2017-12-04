@@ -104,9 +104,11 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
     m_hierarchy = hierarchy;
   }
 
-  protected final List<Class<ICode>> getConfiguredCodes() {
+  protected final List<Class<? extends ICode>> getConfiguredCodes() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.filterClasses(dca, ICode.class);
+    List<Class<? extends ICode>> filteredCodeClasses = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(ConfigurationUtility.filterClasses(dca, ICode.class), ICode.class);
+    filteredCodeClasses = ConfigurationUtility.removeReplacedClasses(filteredCodeClasses);
+    return filteredCodeClasses;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -147,14 +149,21 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   @ConfigOperation
   @Order(1)
   protected List<? extends CODE> execCreateCodes() {
-    List<Class<ICode>> configuredCodes = getConfiguredCodes();
+    List<Class<? extends ICode>> configuredCodes = getConfiguredCodes();
     List<ICode> contributedCodes = m_contributionHolder.getContributionsByClass(ICode.class);
     OrderedCollection<CODE> codes = new OrderedCollection<>();
     for (Class<? extends ICode> codeClazz : configuredCodes) {
       CODE code = (CODE) ConfigurationUtility.newInnerInstance(this, codeClazz);
+      if (codeClazz.isAnnotationPresent(Order.class)) {
+        code.setOrder(codeClazz.getAnnotation(Order.class).value());
+      }
       codes.addOrdered(code);
     }
     for (ICode c : contributedCodes) {
+      Class<? extends ICode> codeClazz = c.getClass();
+      if (codeClazz.isAnnotationPresent(Order.class)) {
+        c.setOrder(codeClazz.getAnnotation(Order.class).value());
+      }
       codes.addOrdered((CODE) c);
     }
 
@@ -632,8 +641,8 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   }
 
   /**
-   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
-   * any further chain elements.
+   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call any
+   * further chain elements.
    */
   protected static class LocalCodeTypeWithGenericExtension<CODE_TYPE_ID, CODE_ID, CODE extends ICode<CODE_ID>, OWNER extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>> extends AbstractSerializableExtension<OWNER>
       implements ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, OWNER> {
