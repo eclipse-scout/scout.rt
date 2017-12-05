@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.dnd.ResourceListTransferObject;
 import org.eclipse.scout.rt.client.ui.form.fields.imagefield.IImageField;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -153,8 +154,8 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
   }
 
   /**
-   * Returns an URL for the image or imageId, respectively (first one that is not <code>null</code>). If no image is
-   * set, <code>null</code> is returned.
+   * Returns an URL for the image or imageId, respectively (first one that is not <code>null</code>). If no image is set,
+   * <code>null</code> is returned.
    */
   protected String getImageUrl() {
     if (getModel().getImage() != null) {
@@ -168,10 +169,23 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
     if (getModel().getImageUrl() != null) {
       return getModel().getImageUrl();
     }
-    if (getModel().getImageId() != null) {
-      return BinaryResourceUrlUtility.createIconUrl(getModel().getImageId());
+    String imageId = getModel().getImageId();
+    if (imageId != null) {
+      if (isFontIcon(imageId)) {
+        return imageId;
+      }
+      else {
+        return BinaryResourceUrlUtility.createIconUrl(imageId);
+      }
     }
     return null;
+  }
+
+  protected boolean isFontIcon(String imageId) {
+    if (StringUtility.isNullOrEmpty(imageId)) {
+      return false;
+    }
+    return imageId.startsWith("font:");
   }
 
   protected BinaryResource extractBinaryResource(Object raw) {

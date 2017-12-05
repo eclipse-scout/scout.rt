@@ -65,16 +65,17 @@ scout.Icon.prototype._renderIconDesc = function() {
   } else {
     this._renderImageIcon();
   }
+
+  this.invalidateLayoutTree();
 };
 
-/**
- * @param {scout.IconDesc} icon
- */
 scout.Icon.prototype._renderFontIcon = function() {
   this.$container = this.$parent.appendIcon(this.iconDesc);
   if (this.prepend) {
     this.$container.prependTo(this.$parent);
   }
+
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
 };
 
 scout.Icon.prototype._removeFontIcon = function() {
@@ -103,10 +104,21 @@ scout.Icon.prototype._renderImageIcon = function() {
     this.trigger(event.type, event);
   }.bind(this));
   this.$container = this.image.$container;
+  this.htmlComp =  this.image.htmlComp;
 };
 
 scout.Icon.prototype._removeImageIcon = function() {
   if (this.image) {
     this.image.destroy();
+    this.image = null;
+  }
+};
+
+/**
+ * Delegates to this.image.setAutoFit, but only if Icon is an image. This method has no effect when icon is a font-icon.
+ */
+scout.Icon.prototype.setAutoFit = function(autoFit) {
+  if (this.image) {
+    this.image.setAutoFit(autoFit);
   }
 };

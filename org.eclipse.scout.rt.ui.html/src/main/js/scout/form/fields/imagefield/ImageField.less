@@ -28,8 +28,12 @@
     }
   }
 
+  & > .font-icon {
+    font-size: 20px;
+  }
+
   &.has-inner-alignment {
-    & > .image {
+    & > .icon {
       position: absolute;
       margin: auto;
     }
@@ -44,6 +48,10 @@
       right: -9999px;
     }
 
+    &.halign-center > .font-icon {
+      text-align: center;
+    }
+
     &.halign-right > .image {
       right: 0;
     }
@@ -55,6 +63,12 @@
     &.valign-middle > .image {
       top: 0;
       bottom: 0;
+    }
+
+    &.valign-middle > .font-icon {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     &.valign-bottom > .image {

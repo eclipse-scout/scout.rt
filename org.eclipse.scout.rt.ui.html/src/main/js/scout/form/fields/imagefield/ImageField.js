@@ -18,13 +18,13 @@ scout.inherits(scout.ImageField, scout.FormField);
 scout.ImageField.prototype._init = function(model) {
   scout.ImageField.parent.prototype._init.call(this, model);
 
-  this.image = scout.create('Image', {
+  this.icon = scout.create('Icon', {
     parent: this,
-    imageUrl: model.imageUrl,
+    iconDesc: model.imageUrl,
     autoFit: model.autoFit
   });
-  this.image.on('load', this._onImageLoad.bind(this));
-  this.image.on('error', this._onImageError.bind(this));
+  this.icon.on('load', this._onImageLoad.bind(this));
+  this.icon.on('error', this._onImageError.bind(this));
 };
 
 scout.ImageField.prototype._render = function() {
@@ -34,10 +34,10 @@ scout.ImageField.prototype._render = function() {
   // Complete the layout hierarchy between the image field and the image
   var htmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
   htmlComp.setLayout(new scout.SingleLayout());
-  this.image.render(this.$fieldContainer);
+  this.icon.render(this.$fieldContainer);
 
   this.addLabel();
-  this.addField(this.image.$container);
+  this.addField(this.icon.$container);
   this.addStatus();
 };
 
@@ -68,7 +68,7 @@ scout.ImageField.prototype.setImageUrl = function(imageUrl) {
 
 scout.ImageField.prototype._setImageUrl = function(imageUrl) {
   this._setProperty('imageUrl', imageUrl);
-  this.image.setImageUrl(imageUrl);
+  this.icon.setIconDesc(imageUrl);
 };
 
 scout.ImageField.prototype._renderImageUrl = function() {
@@ -83,7 +83,7 @@ scout.ImageField.prototype.setAutoFit = function(autoFit) {
 
 scout.ImageField.prototype._setAutoFit = function(autoFit) {
   this._setProperty('autoFit', autoFit);
-  this.image.setAutoFit(autoFit);
+  this.icon.setAutoFit(autoFit);
 };
 
 scout.ImageField.prototype._renderAutoFit = function() {
