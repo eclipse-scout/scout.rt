@@ -11,10 +11,7 @@
 .split-box {
 
   & > .split-area {
-    @splitter-line-size: 3px;
     @temp-splitter-line-size: 1px;
-    @x-splitter-padding: 19px;
-    @y-splitter-padding: 6px;
 
     & > .first-field,
     & > .second-field {
@@ -38,9 +35,9 @@
       /* | */
       &.x-axis {
         height: 100%;
-        width: @splitter-line-size + (2 * @x-splitter-padding) - @mandatory-indicator-width;
-        padding-left: @x-splitter-padding;
-        padding-right: (@x-splitter-padding - @mandatory-indicator-width);
+        width: @split-box-splitter-line-size + (2 * @split-box-x-splitter-padding) - @mandatory-indicator-width;
+        padding-left: @split-box-x-splitter-padding;
+        padding-right: (@split-box-x-splitter-padding - @mandatory-indicator-width);
         cursor: col-resize;
       }
 
@@ -48,9 +45,9 @@
       &.y-axis {
         margin-left: @mandatory-indicator-width;
         width: calc(~'100%' - @mandatory-indicator-width);
-        height: @splitter-line-size + (2 * @y-splitter-padding);
-        padding-top: @y-splitter-padding;
-        padding-bottom: @y-splitter-padding;
+        height: @split-box-splitter-line-size + (2 * @split-box-y-splitter-padding);
+        padding-top: @split-box-y-splitter-padding;
+        padding-bottom: @split-box-y-splitter-padding;
         cursor: row-resize;
       }
 
@@ -73,8 +70,8 @@
         height: 100%;
         width: @temp-splitter-line-size;
         border-left: @temp-splitter-line-size dashed @focus-border-color;
-        margin-left: @x-splitter-padding + ceil((@splitter-line-size - @temp-splitter-line-size) / 2);
-        margin-right: @x-splitter-padding + floor((@splitter-line-size - @temp-splitter-line-size) / 2) - @mandatory-indicator-width;
+        margin-left: @split-box-x-splitter-padding + ceil((@split-box-splitter-line-size - @temp-splitter-line-size) / 2);
+        margin-right: @split-box-x-splitter-padding + floor((@split-box-splitter-line-size - @temp-splitter-line-size) / 2) - @mandatory-indicator-width;
       }
 
       /* -- */
@@ -83,8 +80,8 @@
         width: calc(~'100%' - @mandatory-indicator-width);
         height: @temp-splitter-line-size;
         border-top: @temp-splitter-line-size dashed @focus-border-color;
-        margin-top: @y-splitter-padding + ceil((@splitter-line-size - @temp-splitter-line-size) / 2);
-        margin-bottom: @y-splitter-padding + floor((@splitter-line-size - @temp-splitter-line-size) / 2);
+        margin-top: @split-box-y-splitter-padding + ceil((@split-box-splitter-line-size - @temp-splitter-line-size) / 2);
+        margin-bottom: @split-box-y-splitter-padding + floor((@split-box-splitter-line-size - @temp-splitter-line-size) / 2);
       }
     }
   }
