@@ -72,7 +72,8 @@ scout.icons = {
 
   // UI only icons
   COLLAPSE: 'font:\uE600',
-  ELLIPSIS_V: 'font:\uE040',
+  ELLIPSIS_V_BOLD: 'font:\uE040',
+  ELLIPSIS_V: 'font:\uE041',
   AVG: 'font:\uE026',
   MAX: 'font:\uE027',
   MIN: 'font:\uE028',
