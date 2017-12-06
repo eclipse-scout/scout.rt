@@ -106,8 +106,10 @@ public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAc
     for (IGroup group : getGroupsInternal()) {
       map.put(group, new ArrayList<>());
     }
-    for (T tile : tiles) {
-      map.get(getGroupByTile(tile)).add(tile);
+    if (tiles != null) {
+      for (T tile : tiles) {
+        map.get(getGroupByTile(tile)).add(tile);
+      }
     }
     for (Entry<IGroup, List<T>> entry : map.entrySet()) {
       getTileGrid(entry.getKey()).setTiles(entry.getValue());
@@ -245,10 +247,6 @@ public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAc
     return group;
   }
 
-  public Stream<ITiles<T>> streamAllTileGrids() {
-    return getAllTileGrids().stream();
-  }
-
   @SuppressWarnings("unchecked")
   public List<ITiles<T>> getAllTileGrids() {
     List<ITiles<T>> tileGrids = new ArrayList<>();
@@ -276,7 +274,7 @@ public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAc
   }
 
   protected void addFilterToAllTileGrids(ITileFilter filter) {
-    streamAllTileGrids().forEach(tileGrid -> tileGrid.addFilter(filter));
+    getAllTileGrids().forEach(tileGrid -> tileGrid.addFilter(filter));
   }
 
   public void removeTilesFilter(ITileFilter filter) {
@@ -285,23 +283,23 @@ public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAc
   }
 
   protected void removeFilterFromAllTileGrids(ITileFilter filter) {
-    streamAllTileGrids().forEach(tileGrid -> tileGrid.removeFilter(filter));
+    getAllTileGrids().forEach(tileGrid -> tileGrid.removeFilter(filter));
   }
 
   public void deleteAllTiles() {
-    streamAllTileGrids().forEach(ITiles::deleteAllTiles);
+    getAllTileGrids().forEach(ITiles::deleteAllTiles);
   }
 
   public void deleteTile(T tile) {
-    streamAllTileGrids().forEach(tileGrid -> tileGrid.deleteTile(tile));
+    getAllTileGrids().forEach(tileGrid -> tileGrid.deleteTile(tile));
   }
 
   public void filterTiles() {
-    streamAllTileGrids().forEach(ITiles::filter);
+    getAllTileGrids().forEach(ITiles::filter);
   }
 
   public void sortTiles(Comparator<T> comparator) {
-    streamAllTileGrids().forEach(tileGrid -> {
+    getAllTileGrids().forEach(tileGrid -> {
       List<T> sortedTiles = new ArrayList<>(tileGrid.getTiles());
       Collections.sort(sortedTiles, comparator);
       tileGrid.setTiles(sortedTiles);
