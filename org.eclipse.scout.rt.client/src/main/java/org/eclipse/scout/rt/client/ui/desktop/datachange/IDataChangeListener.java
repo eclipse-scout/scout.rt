@@ -17,6 +17,7 @@ import java.util.EventListener;
  *
  * @since 7.1
  */
+@FunctionalInterface
 public interface IDataChangeListener extends EventListener {
 
   void dataChanged(DataChangeEvent event);
