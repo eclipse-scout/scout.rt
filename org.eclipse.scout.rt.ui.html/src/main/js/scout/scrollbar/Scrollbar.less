@@ -8,6 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+@scrollbar-size-transition-speed: 125ms;
+
 .scrollbar {
   position: absolute;
   z-index: 1;
@@ -66,17 +68,33 @@
   &.y-axis {
     width: @scrollbar-thumb-size;
     top: 0;
+    right: @scrollbar-size / 2 - @scrollbar-thumb-size / 2;
+    transition: width @scrollbar-size-transition-speed, right @scrollbar-size-transition-speed;
+
+    .scrollbar:hover > &,
+    &.scrollbar-thumb-move {
+      width: @scrollbar-thumb-hover-size;
+      right: 0;
+    }
   }
 
   &.x-axis {
     height: @scrollbar-thumb-size;
     left: 0;
+    bottom: @scrollbar-size / 2 - @scrollbar-thumb-size / 2;
+    transition: height @scrollbar-size-transition-speed, bottom @scrollbar-size-transition-speed;
+
+    .scrollbar:hover > &,
+    &.scrollbar-thumb-move {
+      height: @scrollbar-thumb-hover-size;
+      bottom: 0;
+    }
   }
 }
 
 .scrollbar-thumb-move,
 .scrollbar-thumb:hover {
-  background-color: fade(@scrollbar-thumb-color, 60%);
+  background-color: fade(@scrollbar-thumb-color, 45%);
 }
 
 .container-too-small-for-thumb {
