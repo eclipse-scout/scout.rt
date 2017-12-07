@@ -106,9 +106,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
 
   protected final List<Class<? extends ICode>> getConfiguredCodes() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    List<Class<? extends ICode>> filteredCodeClasses = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(ConfigurationUtility.filterClasses(dca, ICode.class), ICode.class);
-    filteredCodeClasses = ConfigurationUtility.removeReplacedClasses(filteredCodeClasses);
-    return filteredCodeClasses;
+    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(ConfigurationUtility.filterClasses(dca, ICode.class), ICode.class);
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
