@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.tile;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -288,6 +289,10 @@ public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAc
 
   public void deleteAllTiles() {
     getAllTileGrids().forEach(ITiles::deleteAllTiles);
+  }
+
+  public void deleteTiles(Collection<T> tiles) {
+    tiles.forEach(tile -> this.deleteTile(tile));
   }
 
   public void deleteTile(T tile) {
