@@ -51,10 +51,7 @@ scout.NavigateButton.prototype._render = function() {
   scout.NavigateButton.parent.prototype._render.call(this);
   this.$container.addClass('navigate-button small');
   this.$container.addClass(this._additionalCssClass);
-  // Note: Don't register with this.outline.keyStrokeContext! When the outline is collapsed,
-  // its keyStrokeContext is destroyed. The desktop's keyStrokeContext is more persistent.
-  // see also _remove().
-  this.outline.session.desktop.keyStrokeContext.registerKeyStroke(this);
+  this.altKeyStrokeContext.registerKeyStroke(this);
 };
 
 /**
@@ -62,7 +59,7 @@ scout.NavigateButton.prototype._render = function() {
  */
 scout.NavigateButton.prototype._remove = function() {
   scout.NavigateButton.parent.prototype._remove.call(this);
-  this.outline.session.desktop.keyStrokeContext.unregisterKeyStroke(this);
+  this.altKeyStrokeContext.unregisterKeyStroke(this);
 };
 
 scout.NavigateButton.prototype._setDetailVisible = function() {

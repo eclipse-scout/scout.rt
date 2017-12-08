@@ -258,11 +258,18 @@ scout.Outline.prototype._decorateNode = function(node) {
   }
 };
 
+// Info: we pass the keyStrokeContext of the parent (table or form) to
+// the created buttons, we cannot use keyStrokeContext of the outline
+// because that context is disabled when the outline is collapsed. We
+// cannot set the property 'keyStrokeContext' because this would interfere
+// with the default keyStrokeContext which is already created when the CTOR
+// of Widget runs.
 scout.Outline.prototype._createNavigateButtons = function(node, parent) {
   var menus = scout.arrays.ensure(parent.staticMenus);
   if (!this._hasMenu(menus, scout.NavigateUpButton)) {
     var upButton = scout.create('NavigateUpButton', {
       parent: parent,
+      altKeyStrokeContext: parent.keyStrokeContext,
       outline: this,
       node: node
     });
@@ -271,6 +278,7 @@ scout.Outline.prototype._createNavigateButtons = function(node, parent) {
   if (!this._hasMenu(menus, scout.NavigateDownButton)) {
     var downButton = scout.create('NavigateDownButton', {
       parent: parent,
+      altKeyStrokeContext: parent.keyStrokeContext,
       outline: this,
       node: node
     });
