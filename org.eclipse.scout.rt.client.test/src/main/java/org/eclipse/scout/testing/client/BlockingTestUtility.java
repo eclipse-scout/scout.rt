@@ -13,11 +13,13 @@ package org.eclipse.scout.testing.client;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.ToIntFunction;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
@@ -69,8 +71,7 @@ public final class BlockingTestUtility {
    * @param runnableOnceBlocked
    *          {@code IRunnable} to be executed once the 'runnableGettingBlocked' enters a blocking condition.
    * @param awaitBackgroundJobs
-   *          true waits for background jobs running in the same session to complete before runnableOnceBlocked is
-   *          called
+   *          true waits for background jobs running in the same session to complete before runnableOnceBlocked is called
    */
   public static void runBlockingAction(final IRunnable runnableGettingBlocked, final IRunnable runnableOnceBlocked, final boolean awaitBackgroundJobs) {
     final ClientRunContext runContext = ClientRunContexts.copyCurrent();
@@ -148,8 +149,8 @@ public final class BlockingTestUtility {
    * <p>
    * Adds a blocking condition timeout listener on {@link IJobManager} for the current {@link IClientSession}
    *
-   * @return the handle for the listener containing the first exception caught. Call
-   *         {@link IRegistrationHandle#dispose()} to remove the listener.
+   * @return the handle for the listener containing the first exception caught. Call {@link IRegistrationHandle#dispose()}
+   *         to remove the listener.
    */
   public static IBlockingConditionTimeoutHandle addBlockingConditionTimeoutListener(long timeout, TimeUnit unit) {
     final BlockingConditionTimeoutListener listener = new BlockingConditionTimeoutListener(IClientSession.CURRENT.get(), timeout, unit);
@@ -168,6 +169,45 @@ public final class BlockingTestUtility {
         handle.dispose();
       }
     };
+  }
+
+  /**
+   * Runs an action that will be blocked by a message box. All message boxes appearing during the execution of the action
+   * are answered by the specified option.
+   * <p>
+   * If you need a distinguish multiple message boxes and give different answers, use
+   * {@link #runBlockingActionWithMessageBoxHandler(IRunnable, ToIntFunction)} instead.
+   * </p>
+   *
+   * @param runnable
+   *          The action to be executed that will cause the message box to appear
+   * @param messageBoxResult
+   *          The return value for the message box. See {@link IMessageBox} for possible values.
+   */
+  public static void runBlockingActionWithMessageBoxDefaultResult(IRunnable runnable, int messageBoxResult) {
+    ClientRunContexts.copyCurrent()
+        .withThreadLocal(ClientSessionProviderWithCache.MESSAGE_BOX_HANDLER_STRATEGY, mBox -> messageBoxResult)
+        .run(runnable);
+  }
+
+  /**
+   * Runs an action that will be blocked by a message box. For each message box, the handling function is called to
+   * determine the return value.
+   * <p>
+   * If you need don't need to different return values for different message boxes, you can use
+   * {@link #runBlockingActionWithMessageBoxDefaultResult(IRunnable, int)} instead. See {@link IMessageBox} for possible
+   * values.
+   * </p>
+   *
+   * @param runnable
+   *          The action to be executed that will cause the message box to appear
+   * @param messageBoxHandler
+   *          The handling function that will be used to determine the return value in the message box.
+   */
+  public static void runBlockingActionWithMessageBoxHandler(IRunnable runnable, ToIntFunction<IMessageBox> messageBoxHandler) {
+    ClientRunContexts.copyCurrent()
+        .withThreadLocal(ClientSessionProviderWithCache.MESSAGE_BOX_HANDLER_STRATEGY, messageBoxHandler)
+        .run(runnable);
   }
 
   public interface IBlockingConditionTimeoutHandle extends IRegistrationHandle {

@@ -11,6 +11,7 @@
 package org.eclipse.scout.testing.client;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.ToIntFunction;
 
 import javax.security.auth.Subject;
 
@@ -43,6 +44,21 @@ import org.slf4j.LoggerFactory;
  */
 public class ClientSessionProviderWithCache extends ClientSessionProvider {
 
+  /**
+   * A thread local that stores an (optional) strategy how to handle message boxes in unit tests.
+   * <p>
+   * When running a unit test, {@link #handleMessageBox(IMessageBox)} closes all message boxes by default with the
+   * {@link IMessageBox#CANCEL_OPTION}. If this is insufficient, this thread local provides the means to return another
+   * value.
+   * </p>
+   * <p>
+   * For convenient ways how to use this, see the {@link BlockingTestUtility}.
+   * </p>
+   *
+   * @since 7.1.0
+   */
+  public static final ThreadLocal<ToIntFunction<IMessageBox>> MESSAGE_BOX_HANDLER_STRATEGY = new ThreadLocal<>();
+
   private static final Logger LOG = LoggerFactory.getLogger(ClientSessionProviderWithCache.class);
 
   private final ConcurrentExpiringMap<CompositeObject, IClientSession> m_cache;
@@ -72,8 +88,8 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
    *
    * @param sessionId
    *          unique session ID to identify the cached session. If <code>null</code>, the context's {@link Subject} is
-   *          used for identification. On cache miss, this <em>sessionId</em> is used to create a new session, or a
-   *          random UUID if <code>null</code>.
+   *          used for identification. On cache miss, this <em>sessionId</em> is used to create a new session, or a random
+   *          UUID if <code>null</code>.
    * @param clientRunContext
    *          applied during session start, and to get the session's {@link Subject}.
    * @return session found in cache, or a new session on cache miss.
@@ -155,10 +171,23 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
     ClientRunContexts.copyCurrent().getDesktop().addDesktopListener(e -> {
       switch (e.getType()) {
         case DesktopEvent.TYPE_MESSAGE_BOX_SHOW:
-          e.getMessageBox().getUIFacade().setResultFromUI(IMessageBox.CANCEL_OPTION);
+          handleMessageBox(e.getMessageBox());
           break;
       }
     });
+  }
+
+  /**
+   * Closes the message box with value determined by the {@link #MESSAGE_BOX_HANDLER_STRATEGY}, or as a default with
+   * {@link IMessageBox#CANCEL_OPTION}.
+   */
+  protected void handleMessageBox(IMessageBox messageBox) {
+    final ToIntFunction<IMessageBox> strategy = MESSAGE_BOX_HANDLER_STRATEGY.get();
+    int option = IMessageBox.CANCEL_OPTION;
+    if (strategy != null) {
+      option = strategy.applyAsInt(messageBox);
+    }
+    messageBox.getUIFacade().setResultFromUI(option);
   }
 
   @Override
