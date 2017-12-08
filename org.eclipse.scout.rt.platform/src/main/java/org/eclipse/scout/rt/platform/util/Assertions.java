@@ -528,44 +528,93 @@ public final class Assertions {
   }
 
   /**
-   * Asserts <code>instance</code> to be an instance of <code>clazz</code>
+   * Asserts <code>value</code> to be an instance of <code>clazz</code>. A <code>null</code> value is not instance of
+   * any type, therefore an {@link AssertionException} is thrown for value <code>null</code>.
    *
    * @param value
-   *          instance to be tested.
+   *          object to be tested.
    * @param clazz
    *          class to be tested against.
    * @param msg
    *          message contained in the {@link AssertionException} in case of an assertion error.
    * @param msgArgs
    *          arguments to be used in the message.
-   * @return <code>instance</code>, if it is an instance of <code>clazz</code>
+   * @return <code>value</code>, if it is an instance of <code>clazz</code>
    * @throws AssertionException
-   *           if <code>instance</code> is not an instance of <code>clazz</code>
+   *           if <code>value</code> is not an instance of <code>clazz</code>
+   * @see {@link #assertType(Object, Class)} for a null-tolerant assertion
    */
   public static <T> T assertInstance(final Object value, final Class<T> clazz) {
     return assertInstance(value, clazz, "expected 'value' to be an instance of 'class' [value={}, class={}]", value, clazz);
   }
 
   /**
-   * Asserts <code>instance</code> to be an instance of <code>clazz</code>
+   * Asserts <code>value</code> to be an instance of <code>clazz</code>. A <code>null</code> value is not instance of
+   * any type, therefore an {@link AssertionException} is thrown for value <code>null</code>.
    *
    * @param value
-   *          instance to be tested.
+   *          object to be tested.
    * @param clazz
    *          class to be tested against.
    * @param msg
    *          message if the assertion fails, with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param msgArgs
    *          optional arguments to substitute <em>formatting anchors</em> in the message.
-   * @return <code>instance</code>, if it is an instance of <code>clazz</code>
+   * @return <code>value</code>, if it is an instance of <code>clazz</code>
    * @throws AssertionException
-   *           if <code>instance</code> is not an instance of <code>clazz</code>
+   *           if <code>value</code> is not an instance of <code>clazz</code>
+   * @see {@link #assertType(Object, Class, String, Object...)} for a null-tolerant assertion
    */
   public static <T> T assertInstance(final Object value, final Class<T> clazz, final String msg, final Object... msgArgs) {
     if (!clazz.isInstance(value)) {
       fail(msg, msgArgs);
     }
     return clazz.cast(value);
+  }
+
+  /**
+   * Asserts <code>value</code> to be of type <code>clazz</code>. A <code>null</code> value may be of any type,
+   * therefore no {@link AssertionException} is thrown for value <code>null</code>.
+   *
+   * @param value
+   *          object to be tested.
+   * @param clazz
+   *          class to be tested against.
+   * @param msg
+   *          message contained in the {@link AssertionException} in case of an assertion error.
+   * @param msgArgs
+   *          arguments to be used in the message.
+   * @return <code>value</code>, if it is of type <code>clazz</code>
+   * @throws AssertionException
+   *           if <code>value</code> is not of type <code>clazz</code>
+   * @see {@link #assertInstance(Object, Class)} for a strict assertion rejecting null values
+   */
+  public static <T> T assertType(final Object value, final Class<T> clazz) {
+    return assertType(value, clazz, "expected 'value' to be of type 'class' [value={}, class={}]", value, clazz);
+  }
+
+  /**
+   * Asserts <code>value</code> to be of type <code>clazz</code>. A <code>null</code> value may be of any type,
+   * therefore no {@link AssertionException} is thrown for value <code>null</code>.
+   *
+   * @param value
+   *          object to be tested.
+   * @param clazz
+   *          class to be tested against.
+   * @param msg
+   *          message if the assertion fails, with support for <em>formatting anchors</em> in the form of {} pairs.
+   * @param msgArgs
+   *          optional arguments to substitute <em>formatting anchors</em> in the message.
+   * @return <code>value</code>, if it is of type <code>clazz</code>
+   * @throws AssertionException
+   *           if <code>value</code> is not of type <code>clazz</code>
+   * @see {@link #assertInstance(Object, Class, String, Object...)} for a strict assertion rejecting null values
+   */
+  public static <T> T assertType(final Object value, final Class<T> clazz, final String msg, final Object... msgArgs) {
+    if (value == null) {
+      return null;
+    }
+    return assertInstance(value, clazz, msg, msgArgs);
   }
 
   /**

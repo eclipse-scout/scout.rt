@@ -17,6 +17,9 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,11 +42,57 @@ public class AssertionsTest {
     Assertions.assertInstance(new Object(), String.class);
   }
 
+  @Test(expected = AssertionException.class)
+  public void testInstanceNullValue() {
+    Assertions.assertInstance(null, String.class);
+  }
+
   @Test
   public void testInstanceCustomMessage() {
     expectedEx.expect(AssertionException.class);
     expectedEx.expectMessage("custom arg1");
     Assertions.assertInstance(new Object(), String.class, "custom {}", "arg1");
+  }
+
+  @Test
+  public void testInstanceCustomMessageNullValue() {
+    expectedEx.expect(AssertionException.class);
+    expectedEx.expectMessage("custom arg1");
+    Assertions.assertInstance(null, String.class, "custom {}", "arg1");
+  }
+
+  @Test
+  public void testType() {
+    String s = "test";
+    String res = Assertions.assertType(s, String.class);
+    assertEquals(s, res);
+  }
+
+  @Test
+  public void testTypeNull() {
+    String s = null;
+    String res = Assertions.assertType(s, String.class);
+    assertEquals(s, res);
+
+    assertNull(Assertions.assertType(null, BigDecimal.class));
+    assertNull(Assertions.assertType(null, Date.class));
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testType_AssertionError() {
+    Assertions.assertType(new Object(), String.class);
+  }
+
+  @Test
+  public void testTypeCustomMessage() {
+    expectedEx.expect(AssertionException.class);
+    expectedEx.expectMessage("custom arg1");
+    Assertions.assertType(new Object(), String.class, "custom {}", "arg1");
+  }
+
+  @Test
+  public void testTypeCustomMessageNull() {
+    assertNull(Assertions.assertType(null, String.class, "custom {}", "arg1"));
   }
 
   @Test
