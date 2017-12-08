@@ -27,21 +27,23 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  * inline resources such as images for ImageField.
  *
  * @see http://stackoverflow.com/questions/93551/how-to-encode-the-filename-parameter-of-content-disposition-header-in-http
+ * @see https://stackoverflow.com/questions/18337630/what-is-x-content-type-options-nosniff
  * @see http://tools.ietf.org/html/rfc6266#section-5
  */
 public class DownloadHttpResponseInterceptor implements IHttpResponseInterceptor {
   private static final long serialVersionUID = 1L;
 
-  public static final String HEADER = "Content-Disposition";
   public static final String DEFAULT_FILENAME = "Download";
 
-  private final String m_headerValue;
+  private final String m_contentDispositionHeaderValue;
+  private final String m_contentTypeOptionsHeaderValue;
 
   public DownloadHttpResponseInterceptor(String originalFilename) {
-    m_headerValue = calculateHeaderValue(originalFilename);
+    m_contentDispositionHeaderValue = calcContentDispositionHeaderValue(originalFilename);
+    m_contentTypeOptionsHeaderValue = calcContentTypeOptionsHeaderValue();
   }
 
-  protected String calculateHeaderValue(String originalFilename) {
+  protected String calcContentDispositionHeaderValue(String originalFilename) {
     if (StringUtility.isNullOrEmpty(originalFilename)) {
       originalFilename = DEFAULT_FILENAME;
     }
@@ -56,13 +58,22 @@ public class DownloadHttpResponseInterceptor implements IHttpResponseInterceptor
     return "attachment; filename=\"" + isoFilename + "\"; filename*=utf-8''" + IOUtility.urlEncode(originalFilename);
   }
 
-  protected final String getHeaderValue() {
-    return m_headerValue;
+  protected String calcContentTypeOptionsHeaderValue() {
+    return "nosniff";
+  }
+
+  protected final String getContentDispositionHeaderValue() {
+    return m_contentDispositionHeaderValue;
+  }
+
+  protected final String getContentTypeOptionsHeaderValue() {
+    return m_contentTypeOptionsHeaderValue;
   }
 
   @Override
   public void intercept(HttpServletRequest req, HttpServletResponse resp) {
-    resp.setHeader(HEADER, m_headerValue);
+    resp.setHeader("Content-Disposition", m_contentDispositionHeaderValue);
+    resp.setHeader("X-Content-Type-Options", m_contentTypeOptionsHeaderValue);
   }
 
   /**
