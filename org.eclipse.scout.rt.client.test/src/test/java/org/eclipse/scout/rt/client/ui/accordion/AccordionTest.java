@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.client.ui.accordion;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -20,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.group.AbstractGroup;
 import org.eclipse.scout.rt.client.ui.tile.AbstractTile;
 import org.eclipse.scout.rt.client.ui.tile.AbstractTiles;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -74,6 +77,34 @@ public class AccordionTest {
     assertEquals(1, group.disposeCalls);
   }
 
+  @Test
+  public void testSortGroups() {
+    P_Accordion accordion = new P_Accordion();
+    P_TileGroup group0 = new P_TileGroup();
+    group0.setTitle("b");
+    P_TileGroup group1 = new P_TileGroup();
+    group1.setTitle("d");
+    P_TileGroup group2 = new P_TileGroup();
+    group2.setTitle("a");
+    accordion.addGroups(Arrays.asList(group0, group1, group2));
+    assertEquals(group0, accordion.getGroups().get(0));
+    assertEquals(group1, accordion.getGroups().get(1));
+    assertEquals(group2, accordion.getGroups().get(2));
+
+    accordion.setComparator(new P_Comparator());
+    assertEquals(group2, accordion.getGroups().get(0));
+    assertEquals(group0, accordion.getGroups().get(1));
+    assertEquals(group1, accordion.getGroups().get(2));
+
+    P_TileGroup group3 = new P_TileGroup();
+    group3.setTitle("c");
+    accordion.addGroup(group3);
+    assertEquals(group2, accordion.getGroups().get(0));
+    assertEquals(group0, accordion.getGroups().get(1));
+    assertEquals(group3, accordion.getGroups().get(2));
+    assertEquals(group1, accordion.getGroups().get(3));
+  }
+
   private static class P_Accordion extends AbstractAccordion {
 
   }
@@ -120,6 +151,13 @@ public class AccordionTest {
     protected void execDisposeTile() {
       super.execDisposeTile();
       disposeCalls++;
+    }
+  }
+
+  private static class P_Comparator implements Comparator<P_TileGroup> {
+    @Override
+    public int compare(P_TileGroup group1, P_TileGroup group2) {
+      return StringUtility.ALPHANUMERIC_COMPARATOR.compare(group1.getTitle(), group2.getTitle());
     }
   }
 }

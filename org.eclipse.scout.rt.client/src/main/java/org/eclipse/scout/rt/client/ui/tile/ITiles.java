@@ -1,5 +1,6 @@
 package org.eclipse.scout.rt.client.ui.tile;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.IWidget;
@@ -138,10 +139,16 @@ public interface ITiles<T extends ITile> extends IWidget, ITypeWithClassId, IExt
 
   List<ITileFilter> getFilters();
 
+  /**
+   * Adds a filter and calls {@link #filter()}.
+   */
   void addFilter(ITileFilter filter);
 
   void addFilter(ITileFilter filter, boolean applyFilters);
 
+  /**
+   * Removes a filter and calls {@link #filter()}.
+   */
   void removeFilter(ITileFilter filter);
 
   void removeFilter(ITileFilter filter, boolean applyFilters);
@@ -149,14 +156,33 @@ public interface ITiles<T extends ITile> extends IWidget, ITypeWithClassId, IExt
   /**
    * Applies every filter.
    * <p>
-   * This method is typically executed automatically, but if you add or remove filters with applyFilters parameter set
-   * to false, you need to call this method by yourself.
+   * This method is typically executed automatically, but if you add or remove filters with applyFilters parameter set to
+   * false, you need to call this method by yourself.
    */
   void filter();
 
   List<T> getFilteredTiles();
 
   int getFilteredTileCount();
+
+  /**
+   * Sets a comparator which is used by {@link #sort()} and calls {@link #sort()} immediately. The tiles are sorted as
+   * well whenever new tiles are added.
+   */
+  void setComparator(Comparator<T> comparator);
+
+  void setComparator(Comparator<T> comparator, boolean sortNow);
+
+  Comparator<T> getComparator();
+
+  /**
+   * Sorts the tiles by using the active {@link Comparator}. If no comparator is set the tiles are displayed according to
+   * the insertion order.
+   * <p>
+   * This method is typically executed automatically, but if you set a comparator with sortNow parameter set to false, you
+   * need to call this method by yourself.
+   */
+  void sort();
 
   /**
    * @param menus

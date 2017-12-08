@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.accordion;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.IWidget;
@@ -61,5 +62,24 @@ public interface IAccordion extends IWidget, ITypeWithClassId {
   void deleteGroup(IGroup group);
 
   void deleteAllGroups();
+
+  /**
+   * Sets a comparator which is used by {@link #sort()} and calls {@link #sort()} immediately. The groups are sorted as
+   * well whenever new groups are added.
+   */
+  void setComparator(Comparator<? extends IGroup> comparator);
+
+  void setComparator(Comparator<? extends IGroup> comparator, boolean sortNow);
+
+  Comparator<? extends IGroup> getComparator();
+
+  /**
+   * Sorts the groups by using the active {@link Comparator}. If no comparator is set the groups are displayed according
+   * to the insertion order.
+   * <p>
+   * This method is typically executed automatically, but if you set a comparator with sortNow parameter set to false, you
+   * need to call this method by yourself.
+   */
+  void sort();
 
 }

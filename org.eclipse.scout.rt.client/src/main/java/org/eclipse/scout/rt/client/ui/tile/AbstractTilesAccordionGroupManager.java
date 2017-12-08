@@ -10,23 +10,27 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.tile;
 
-/**
- * Default group handler has only a single group. The header of that group is invisible.
- */
-public class DefaultGroupManager<T extends ITile> extends AbstractTilesAccordionGroupManager<T> {
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
-  public static final Object ID = DefaultGroupManager.class;
+import org.eclipse.scout.rt.client.ui.group.IGroup;
 
-  public static final Object GROUP_ID_DEFAULT = "default";
+public abstract class AbstractTilesAccordionGroupManager<T extends ITile> implements ITilesAccordionGroupManager<T> {
 
   @Override
-  public Object getGroupIdByTile(ITile tile) {
-    return GROUP_ID_DEFAULT;
+  public List<GroupTemplate> createGroups() {
+    return Collections.emptyList();
   }
 
   @Override
-  public Object getId() {
-    return ID;
+  public GroupTemplate createGroupForTile(T tile) {
+    return null;
+  }
+
+  @Override
+  public Comparator<IGroup> getComparator() {
+    return null;
   }
 
 }

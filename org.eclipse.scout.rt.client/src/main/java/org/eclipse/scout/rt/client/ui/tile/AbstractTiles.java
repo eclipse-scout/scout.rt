@@ -3,6 +3,7 @@ package org.eclipse.scout.rt.client.ui.tile;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,6 +46,7 @@ public abstract class AbstractTiles<T extends ITile> extends AbstractWidget impl
   private ContributionComposite m_contributionHolder;
   private List<ITileFilter> m_filters;
   private boolean m_filteredRowsDirty = false;
+  private Comparator<T> m_comparator;
 
   public AbstractTiles() {
     this(true);
@@ -257,6 +259,44 @@ public abstract class AbstractTiles<T extends ITile> extends AbstractWidget impl
   }
 
   @Override
+  public void setComparator(Comparator<T> comparator) {
+    setComparator(comparator, true);
+  }
+
+  @Override
+  public void setComparator(Comparator<T> comparator, boolean sortNow) {
+    if (m_comparator == comparator) {
+      return;
+    }
+    m_comparator = comparator;
+    if (sortNow) {
+      sort();
+    }
+  }
+
+  @Override
+  public Comparator<T> getComparator() {
+    return m_comparator;
+  }
+
+  @Override
+  public void sort() {
+    if (m_comparator == null) {
+      return;
+    }
+    List<T> tiles = getTiles();
+    sortInternal(tiles);
+    setTilesInternal(tiles);
+  }
+
+  public void sortInternal(List<T> tiles) {
+    if (m_comparator == null) {
+      return;
+    }
+    tiles.sort(m_comparator);
+  }
+
+  @Override
   public List<T> getTiles() {
     return CollectionUtility.arrayList(propertySupport.getPropertyList(PROP_TILES));
   }
@@ -269,7 +309,7 @@ public abstract class AbstractTiles<T extends ITile> extends AbstractWidget impl
   /**
    * @return the live list of the tiles
    */
-  protected List<T> getTilesInternal() {
+  public List<T> getTilesInternal() {
     return propertySupport.getPropertyList(PROP_TILES);
   }
 
@@ -305,10 +345,15 @@ public abstract class AbstractTiles<T extends ITile> extends AbstractWidget impl
       }
     }
 
-    propertySupport.setPropertyList(PROP_TILES, tiles);
+    sortInternal(tiles);
+    setTilesInternal(tiles);
 
     m_filteredRowsDirty = true;
     applyFilters(tilesToInsert);
+  }
+
+  protected void setTilesInternal(List<T> tiles) {
+    propertySupport.setPropertyList(PROP_TILES, tiles);
   }
 
   @Override

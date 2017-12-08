@@ -15,10 +15,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.holders.BooleanHolder;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -467,6 +469,34 @@ public class TilesTest {
     assertEquals(tile4, tiles.getFilteredTiles().get(1));
   }
 
+  @Test
+  public void testSortTiles() {
+    P_Tiles tiles = createTestTiles();
+    P_Tile tile0 = createTestTile();
+    tile0.text = "b";
+    P_Tile tile1 = createTestTile();
+    tile1.text = "d";
+    P_Tile tile2 = createTestTile();
+    tile2.text = "a";
+    tiles.addTiles(Arrays.asList(tile0, tile1, tile2));
+    assertEquals(tile0, tiles.getTiles().get(0));
+    assertEquals(tile1, tiles.getTiles().get(1));
+    assertEquals(tile2, tiles.getTiles().get(2));
+
+    tiles.setComparator(new P_Comparator());
+    assertEquals(tile2, tiles.getTiles().get(0));
+    assertEquals(tile0, tiles.getTiles().get(1));
+    assertEquals(tile1, tiles.getTiles().get(2));
+
+    P_Tile tile3 = createTestTile();
+    tile3.text = "c";
+    tiles.addTile(tile3);
+    assertEquals(tile2, tiles.getTiles().get(0));
+    assertEquals(tile0, tiles.getTiles().get(1));
+    assertEquals(tile3, tiles.getTiles().get(2));
+    assertEquals(tile1, tiles.getTiles().get(3));
+  }
+
   /**
    * Creates an empty tiles element.
    */
@@ -487,6 +517,7 @@ public class TilesTest {
   public static class P_Tile extends AbstractTile {
     public int initCalls = 0;
     public int disposeCalls = 0;
+    public String text;
 
     @Override
     protected void execInitTile() {
@@ -498,6 +529,21 @@ public class TilesTest {
     protected void execDisposeTile() {
       super.execDisposeTile();
       disposeCalls++;
+    }
+
+    @Override
+    public String toString() {
+      if (text != null) {
+        return text;
+      }
+      return super.toString();
+    }
+  }
+
+  private static class P_Comparator implements Comparator<P_Tile> {
+    @Override
+    public int compare(P_Tile tile1, P_Tile tile2) {
+      return StringUtility.ALPHANUMERIC_COMPARATOR.compare(tile1.text, tile2.text);
     }
   }
 }

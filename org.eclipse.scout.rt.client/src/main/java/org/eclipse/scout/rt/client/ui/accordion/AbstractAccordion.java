@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.accordion;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
@@ -26,6 +27,7 @@ import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 @ClassId("0f4a0100-ef2b-46e2-809b-56ed62c56006")
 public abstract class AbstractAccordion extends AbstractWidget implements IAccordion {
+  private Comparator<? extends IGroup> m_comparator;
 
   public AbstractAccordion() {
     this(true);
@@ -149,6 +151,11 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
       }
     }
 
+    sortInternal(groups);
+    setGroupsInternal(groups);
+  }
+
+  protected void setGroupsInternal(List<? extends IGroup> groups) {
     propertySupport.setPropertyList(PROP_GROUPS, groups);
   }
 
@@ -211,6 +218,53 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
   @Override
   public void setScrollable(boolean scrollable) {
     propertySupport.setPropertyBool(PROP_SCROLLABLE, scrollable);
+  }
+
+  @Override
+  public void setComparator(Comparator<? extends IGroup> comparator) {
+    setComparator(comparator, true);
+  }
+
+  @Override
+  public void setComparator(Comparator<? extends IGroup> comparator, boolean sortNow) {
+    if (m_comparator == comparator) {
+      return;
+    }
+    m_comparator = comparator;
+    if (sortNow) {
+      sort();
+    }
+  }
+
+  @Override
+  public Comparator<? extends IGroup> getComparator() {
+    return m_comparator;
+  }
+
+  /**
+   * May be overridden to add some logic to determine the active comparator. Returns {@link #getComparator()} by default.
+   */
+  protected Comparator<? extends IGroup> resolveComparator() {
+    return getComparator();
+  }
+
+  @Override
+  public void sort() {
+    if (resolveComparator() == null) {
+      return;
+    }
+    List<? extends IGroup> tiles = getGroups();
+    sortInternal(tiles);
+    setGroupsInternal(tiles);
+  }
+
+  @SuppressWarnings("unchecked")
+  public void sortInternal(List<? extends IGroup> groups) {
+    Comparator<? extends IGroup> comparator = resolveComparator();
+    if (comparator == null) {
+      return;
+    }
+    groups.sort((Comparator<? super IGroup>) comparator);
   }
 
   @Override
