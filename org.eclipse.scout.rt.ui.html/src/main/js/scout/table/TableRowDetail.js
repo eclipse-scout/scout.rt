@@ -28,15 +28,45 @@ scout.TableRowDetail.prototype._render = function() {
 };
 
 scout.TableRowDetail.prototype._renderRow = function() {
-  this.table.visibleColumns().forEach(function(column) {
-    var name = column.text;
-    var value = this.table.cellText(column, this.row);
-    if (scout.strings.empty(value)) {
-      return;
-    }
-    var $field = this.$container.appendDiv('table-row-detail-field');
-    // TODO [7.0] cgu handle column without text or with icon, handle icon content, html content, bean content
-    $field.appendSpan('table-row-detail-name').text(name + ': ');
-    $field.appendSpan('table-row-detail-value').text(value);
-  }, this);
+  this.table.visibleColumns().forEach(this._renderCell.bind(this));
+};
+
+scout.TableRowDetail.prototype._renderCell = function(column) {
+  var cell = this.table.cell(column, this.row);
+  if (scout.strings.empty(cell.text) && !cell.iconId) {
+    return;
+  }
+
+  var headerText;
+  if (column.headerHtmlEnabled) {
+    headerText = scout.strings.plainText(column.text);
+  } else {
+    headerText = column.text;
+  }
+
+  if (scout.strings.empty(headerText)) {
+    headerText = column.headerTooltipText;
+  }
+
+  var cellText;
+  if (cell.htmlEnabled) {
+    cellText = scout.strings.plainText(cell.text);
+  } else {
+    cellText = cell.text;
+  }
+
+  var $field = this.$container.appendDiv('table-row-detail-field');
+  if (!scout.strings.empty(headerText)) {
+    $field.appendSpan('table-row-detail-name').text(headerText + ': ');
+  }
+
+  var iconId = cell.iconId;
+  var hasCellText = !scout.strings.empty(cellText);
+  if (iconId) {
+    var $icon = $field.appendIcon(iconId, 'table-row-detail-icon');
+    $icon.toggleClass('with-text', hasCellText);
+  }
+  if (hasCellText) {
+    $field.appendSpan('table-row-detail-value').text(cellText);
+  }
 };

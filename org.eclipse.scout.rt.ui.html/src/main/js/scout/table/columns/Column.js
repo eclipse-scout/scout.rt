@@ -218,6 +218,10 @@ scout.Column.prototype.buildCell = function(cell, row) {
     content = icon + text;
   }
 
+  return this._buildCell(content, style, cssClass);
+};
+
+scout.Column.prototype._buildCell = function(content, style, cssClass) {
   var cellHtml = '';
   cellHtml += '<div class="' + cssClass + '" style="' + style + '"' + scout.device.unselectableAttribute.string + '>';
   if (scout.device.tableAdditionalDivRequired) {

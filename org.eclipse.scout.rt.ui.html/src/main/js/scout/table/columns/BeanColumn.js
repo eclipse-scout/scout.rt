@@ -20,17 +20,21 @@ scout.BeanColumn.AdditionalDivMode = {
 };
 
 scout.BeanColumn.prototype.buildCellForRow = function(row) {
-  var $cell, value;
-  $cell = $(scout.BeanColumn.parent.prototype.buildCellForRow.call(this, row));
-  // Clear any content (e.g. nbsp due to empty text)
-  $cell.empty();
-  $cell.removeClass('empty');
+  var cell = this.cell(row);
+  var cssClass = this._cellCssClass(cell);
+  var style = this._cellStyle(cell);
+  var $cell = $(scout.BeanColumn.parent.prototype._buildCell.call(this, '', style, cssClass));
+  var value = this.table.cellValue(this, row);
 
-  value = this.table.cellValue(this, row);
+  if (cell.errorStatus) {
+    row.hasError = true;
+  }
+
   this._renderValue($cell, value);
   if (this.additionalDivMode === scout.BeanColumn.AdditionalDivMode.AUTO && scout.device.tableAdditionalDivRequired) {
     $cell.html('<div class="width-fix" style="max-width: ' + (this.width - this.table.cellHorizontalPadding - 2 /* unknown IE9 extra space */ ) + 'px; ' + '">' + $cell.html() + '</div>');
   }
+
   return $cell[0].outerHTML;
 };
 
