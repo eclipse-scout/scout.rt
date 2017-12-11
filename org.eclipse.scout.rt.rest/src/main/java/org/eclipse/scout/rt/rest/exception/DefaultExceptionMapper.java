@@ -14,7 +14,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.eclipse.scout.rt.platform.Bean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +27,6 @@ import org.slf4j.LoggerFactory;
  * {@link WebApplicationException} which won't be logged. Every other exception has to be logged in order to understand
  * the exception cause. But it must not be sent to the client due to security reason.
  */
-@Bean
 public class DefaultExceptionMapper extends AbstractExceptionMapper<Exception> {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultExceptionMapper.class);
 

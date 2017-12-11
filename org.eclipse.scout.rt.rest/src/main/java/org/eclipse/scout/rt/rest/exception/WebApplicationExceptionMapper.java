@@ -13,11 +13,9 @@ package org.eclipse.scout.rt.rest.exception;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
-import org.eclipse.scout.rt.platform.Bean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Bean
 public class WebApplicationExceptionMapper extends AbstractExceptionMapper<WebApplicationException> {
   private static final Logger LOG = LoggerFactory.getLogger(WebApplicationExceptionMapper.class);
 

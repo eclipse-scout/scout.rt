@@ -13,12 +13,10 @@ package org.eclipse.scout.rt.rest.exception;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Bean
 public class VetoExceptionMapper extends AbstractExceptionMapper<VetoException> {
   private static final Logger LOG = LoggerFactory.getLogger(VetoExceptionMapper.class);
 

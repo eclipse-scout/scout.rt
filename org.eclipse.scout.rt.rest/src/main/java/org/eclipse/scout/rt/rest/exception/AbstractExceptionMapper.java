@@ -14,15 +14,17 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 
 /**
- * Abstract default implementation of a REST {@link ExceptionMapper}.
+ * Abstract default implementation of a JAX-RS REST {@link ExceptionMapper}.
  * <p>
  * <b>NOTE:</b> Use {@link #notifyTransaction(Exception)} method to notify the Scout transaction before the exception is
  * mapped into a {@link Response} object and discarded as exception. If the Scout transaction is not notified about the
  * failure, the transaction will be committed afterwards.
  */
+@Bean
 public abstract class AbstractExceptionMapper<E extends Throwable> implements ExceptionMapper<E> {
 
   /**
