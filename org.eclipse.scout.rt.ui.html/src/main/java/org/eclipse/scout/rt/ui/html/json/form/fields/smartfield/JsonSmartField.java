@@ -240,9 +240,9 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
       handleUiLookupRowChange(data);
     }
     else if (ISmartField.PROP_ACTIVE_FILTER.equals(propertyName)) {
-      String activeFilterString = data.optString(ISmartField.PROP_ACTIVE_FILTER, null);
+      String activeFilterString = data.optString(propertyName, null);
       TriState activeFilter = TriState.valueOf(activeFilterString);
-      addPropertyEventFilterCondition(ISmartField.PROP_ACTIVE_FILTER, activeFilter);
+      addPropertyEventFilterCondition(propertyName, activeFilter);
       getModel().getUIFacade().setActiveFilterFromUI(activeFilter);
     }
     else if (IFormField.PROP_ERROR_STATUS.equals(propertyName)) {

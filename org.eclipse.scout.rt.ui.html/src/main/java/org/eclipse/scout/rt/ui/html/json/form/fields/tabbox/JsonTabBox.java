@@ -93,9 +93,9 @@ public class JsonTabBox<TAB_BOX extends ITabBox> extends JsonCompositeField<TAB_
   @Override
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (ITabBox.PROP_SELECTED_TAB.equals(propertyName)) {
-      String tabId = data.optString("selectedTab");
+      String tabId = data.optString(propertyName);
       IGroupBox selectedTab = getGroupBoxForId(tabId);
-      addPropertyEventFilterCondition(ITabBox.PROP_SELECTED_TAB, selectedTab);
+      addPropertyEventFilterCondition(propertyName, selectedTab);
       getModel().getUIFacade().setSelectedTabFromUI(selectedTab);
     }
     else {
@@ -113,5 +113,4 @@ public class JsonTabBox<TAB_BOX extends ITabBox> extends JsonCompositeField<TAB_
     }
     return null;
   }
-
 }

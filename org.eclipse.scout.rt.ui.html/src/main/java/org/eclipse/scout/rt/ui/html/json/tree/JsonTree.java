@@ -987,9 +987,12 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
   @Override
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (ITree.PROP_DISPLAY_STYLE.equals(propertyName)) {
-      String displayStyle = data.getString(ITree.PROP_DISPLAY_STYLE);
-      addPropertyEventFilterCondition(ITree.PROP_DISPLAY_STYLE, displayStyle);
+      String displayStyle = data.getString(propertyName);
+      addPropertyEventFilterCondition(propertyName, displayStyle);
       getModel().getUIFacade().setDisplayStyleFromUI(displayStyle);
+    }
+    else {
+      super.handleUiPropertyChange(propertyName, data);
     }
   }
 

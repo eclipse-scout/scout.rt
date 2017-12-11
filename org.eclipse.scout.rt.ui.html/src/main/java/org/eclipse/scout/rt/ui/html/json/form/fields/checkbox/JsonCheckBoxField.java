@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.checkbox;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -55,12 +54,12 @@ public class JsonCheckBoxField<CHECK_BOX_FIELD extends IBooleanField> extends Js
   @Override
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (IBooleanField.PROP_VALUE.equals(propertyName)) {
-      Object o = data.opt(IBooleanField.PROP_VALUE);
+      Object o = data.opt(propertyName);
       Boolean uiValue = null;
       if (ObjectUtility.isOneOf(o, Boolean.TRUE, Boolean.FALSE)) {
         uiValue = (Boolean) o;
       }
-      addPropertyEventFilterCondition(IBooleanField.PROP_VALUE, uiValue);
+      addPropertyEventFilterCondition(propertyName, uiValue);
       getModel().getUIFacade().setValueFromUI(uiValue);
 
       // In some cases the widget in the UI is clicked, which causes the check-box to be de-/selected, but the model rejects the value-change.
@@ -68,8 +67,11 @@ public class JsonCheckBoxField<CHECK_BOX_FIELD extends IBooleanField> extends Js
       // a VetoExeception in its execValidateValue() method.
       Boolean modelValue = getModel().getValue();
       if (ObjectUtility.notEquals(uiValue, modelValue)) {
-        addPropertyChangeEvent(IValueField.PROP_VALUE, modelValue);
+        addPropertyChangeEvent(propertyName, modelValue);
       }
+    }
+    else {
+      super.handleUiPropertyChange(propertyName, data);
     }
   }
 }

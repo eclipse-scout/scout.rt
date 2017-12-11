@@ -173,7 +173,6 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
    * JSONObject to retrieve the value. The default impl. does nothing.
    */
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
-
   }
 
   public final <A extends IJsonAdapter<? super M>, M> A attachAdapter(M model) {

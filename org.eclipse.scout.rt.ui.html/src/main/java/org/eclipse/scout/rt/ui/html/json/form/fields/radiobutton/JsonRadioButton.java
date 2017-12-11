@@ -33,13 +33,16 @@ public class JsonRadioButton<RADIO_BUTTON extends IRadioButton> extends JsonButt
   @Override
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (SELECTED.equals(propertyName)) {
-      boolean selected = data.getBoolean(IRadioButton.PROP_SELECTED);
-      addPropertyEventFilterCondition(IRadioButton.PROP_SELECTED, selected);
+      boolean selected = data.getBoolean(propertyName);
+      addPropertyEventFilterCondition(propertyName, selected);
       IButtonUIFacade uiFacade = getModel().getUIFacade();
       uiFacade.setSelectedFromUI(selected);
       if (selected) {
         uiFacade.fireButtonClickFromUI();
       }
+    }
+    else {
+      super.handleUiPropertyChange(propertyName, data);
     }
   }
 }

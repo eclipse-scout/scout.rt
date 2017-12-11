@@ -150,7 +150,7 @@ public class JsonTiles<T extends ITiles<? extends ITile>> extends AbstractJsonWi
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (ITiles.PROP_SELECTED_TILES.equals(propertyName)) {
       List<ITile> tiles = extractTiles(data);
-      addPropertyEventFilterCondition(ITiles.PROP_SELECTED_TILES, tiles);
+      addPropertyEventFilterCondition(propertyName, tiles);
       getModel().getUIFacade().setSelectedTilesFromUI(tiles);
     }
     else {

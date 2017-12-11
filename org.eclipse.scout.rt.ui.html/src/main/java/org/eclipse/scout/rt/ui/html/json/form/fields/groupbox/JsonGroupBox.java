@@ -123,8 +123,8 @@ public class JsonGroupBox<GROUP_BOX extends IGroupBox> extends JsonCompositeFiel
   @Override
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (IGroupBox.PROP_EXPANDED.equals(propertyName)) {
-      boolean expanded = data.getBoolean(IGroupBox.PROP_EXPANDED);
-      addPropertyEventFilterCondition(IGroupBox.PROP_EXPANDED, expanded);
+      boolean expanded = data.getBoolean(propertyName);
+      addPropertyEventFilterCondition(propertyName, expanded);
       getModel().getUIFacade().setExpandedFromUI(expanded);
     }
     else {

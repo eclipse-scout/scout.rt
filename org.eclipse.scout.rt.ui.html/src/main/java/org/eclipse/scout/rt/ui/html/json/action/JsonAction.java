@@ -155,8 +155,8 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonWid
   @Override
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (IAction.PROP_SELECTED.equals(propertyName)) {
-      boolean selected = data.getBoolean(IAction.PROP_SELECTED);
-      addPropertyEventFilterCondition(IAction.PROP_SELECTED, selected);
+      boolean selected = data.getBoolean(propertyName);
+      addPropertyEventFilterCondition(propertyName, selected);
       getModel().getUIFacade().setSelectedFromUI(selected);
     }
     else {

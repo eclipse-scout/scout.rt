@@ -181,19 +181,22 @@ public class JsonSplitBox<SPLIT_BOX extends ISplitBox> extends JsonFormField<SPL
   @Override
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (ISplitBox.PROP_FIELD_COLLAPSED.equals(propertyName)) {
-      boolean fieldCollapsed = data.getBoolean("fieldCollapsed");
-      addPropertyEventFilterCondition(ISplitBox.PROP_FIELD_COLLAPSED, fieldCollapsed);
+      boolean fieldCollapsed = data.getBoolean(propertyName);
+      addPropertyEventFilterCondition(propertyName, fieldCollapsed);
       getModel().getUIFacade().setFieldCollapsedFromUI(fieldCollapsed);
     }
     else if (ISplitBox.PROP_FIELD_MINIMIZED.equals(propertyName)) {
-      boolean fieldMinimized = data.getBoolean("fieldMinimized");
-      addPropertyEventFilterCondition(ISplitBox.PROP_FIELD_MINIMIZED, fieldMinimized);
+      boolean fieldMinimized = data.getBoolean(propertyName);
+      addPropertyEventFilterCondition(propertyName, fieldMinimized);
       getModel().getUIFacade().setFieldMinimizedFromUI(fieldMinimized);
     }
     else if (ISplitBox.PROP_MIN_SPLITTER_POSITION.equals(propertyName)) {
-      Double minSplitterPosition = JsonObjectUtility.optDouble(data, "minSplitterPosition");
-      addPropertyEventFilterCondition(ISplitBox.PROP_MIN_SPLITTER_POSITION, minSplitterPosition);
+      Double minSplitterPosition = JsonObjectUtility.optDouble(data, propertyName);
+      addPropertyEventFilterCondition(propertyName, minSplitterPosition);
       getModel().getUIFacade().setMinSplitterPositionFromUI(minSplitterPosition);
+    }
+    else {
+      super.handleUiPropertyChange(propertyName, data);
     }
   }
 }

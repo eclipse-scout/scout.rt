@@ -149,12 +149,6 @@ public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> im
     }
   }
 
-  protected void handleUiSelectedChange(JSONObject data) {
-    boolean selected = data.getBoolean(IButton.PROP_SELECTED);
-    addPropertyEventFilterCondition(IButton.PROP_SELECTED, selected);
-    getModel().getUIFacade().setSelectedFromUI(selected);
-  }
-
   @Override
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (IButton.PROP_SELECTED.equals(propertyName)) {
@@ -163,5 +157,11 @@ public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> im
     else {
       super.handleUiPropertyChange(propertyName, data);
     }
+  }
+
+  protected void handleUiSelectedChange(JSONObject data) {
+    boolean selected = data.getBoolean(IButton.PROP_SELECTED);
+    addPropertyEventFilterCondition(IButton.PROP_SELECTED, selected);
+    getModel().getUIFacade().setSelectedFromUI(selected);
   }
 }

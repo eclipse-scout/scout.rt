@@ -68,8 +68,8 @@ public class JsonGroup<T extends IGroup> extends AbstractJsonWidget<T> {
   @Override
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (IGroup.PROP_COLLAPSED.equals(propertyName)) {
-      boolean collapsed = data.getBoolean(IGroup.PROP_COLLAPSED);
-      addPropertyEventFilterCondition(IGroup.PROP_COLLAPSED, collapsed);
+      boolean collapsed = data.getBoolean(propertyName);
+      addPropertyEventFilterCondition(propertyName, collapsed);
       getModel().getUIFacade().setCollapsedFromUI(collapsed);
     }
     else {

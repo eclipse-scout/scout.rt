@@ -133,27 +133,27 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (IDesktop.PROP_NAVIGATION_VISIBLE.equals(propertyName)) {
       boolean visible = data.getBoolean(propertyName);
-      addPropertyEventFilterCondition(IDesktop.PROP_NAVIGATION_VISIBLE, visible);
+      addPropertyEventFilterCondition(propertyName, visible);
       getModel().getUIFacade().setNavigationVisibleFromUI(visible);
     }
     if (IDesktop.PROP_NAVIGATION_HANDLE_VISIBLE.equals(propertyName)) {
       boolean visible = data.getBoolean(propertyName);
-      addPropertyEventFilterCondition(IDesktop.PROP_NAVIGATION_HANDLE_VISIBLE, visible);
+      addPropertyEventFilterCondition(propertyName, visible);
       getModel().getUIFacade().setNavigationHandleVisibleFromUI(visible);
     }
     else if (IDesktop.PROP_BENCH_VISIBLE.equals(propertyName)) {
       boolean visible = data.getBoolean(propertyName);
-      addPropertyEventFilterCondition(IDesktop.PROP_BENCH_VISIBLE, visible);
+      addPropertyEventFilterCondition(propertyName, visible);
       getModel().getUIFacade().setBenchVisibleFromUI(visible);
     }
     else if (IDesktop.PROP_HEADER_VISIBLE.equals(propertyName)) {
       boolean visible = data.getBoolean(propertyName);
-      addPropertyEventFilterCondition(IDesktop.PROP_HEADER_VISIBLE, visible);
+      addPropertyEventFilterCondition(propertyName, visible);
       getModel().getUIFacade().setHeaderVisibleFromUI(visible);
     }
     else if (IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE.equals(propertyName)) {
       boolean available = data.getBoolean(propertyName);
-      addPropertyEventFilterCondition(IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE, available);
+      addPropertyEventFilterCondition(propertyName, available);
       getModel().getUIFacade().setGeoLocationServiceAvailableFromUI(available);
     }
     else {

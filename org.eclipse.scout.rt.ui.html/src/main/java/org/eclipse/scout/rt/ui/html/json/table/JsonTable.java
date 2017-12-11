@@ -545,8 +545,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     if (ITable.PROP_CONTEXT_COLUMN.equals(propertyName)) {
       String contextColumnId = data.optString(propertyName);
       IColumn column = optColumn(contextColumnId);
-      addPropertyEventFilterCondition(ITable.PROP_CONTEXT_COLUMN, column);
+      addPropertyEventFilterCondition(propertyName, column);
       getModel().getUIFacade().setContextColumnFromUI(column);
+    }
+    else {
+      super.handleUiPropertyChange(propertyName, data);
     }
   }
 
