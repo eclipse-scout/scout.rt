@@ -10,12 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui;
 
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -23,13 +21,11 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
-import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
 import org.eclipse.scout.rt.shared.services.common.prefs.Preferences;
@@ -75,13 +71,9 @@ public class ClientUIPreferences {
   protected static final String TABLE_COLUMN_BACKGROUND_EFFECT = "table.column.background.effect.";
   protected static final String TABLE_COLUMN_SORT_ASC = "table.column.sortAsc.";
   protected static final String TABLE_COLUMN_SORT_EXPLICIT = "table.column.sortExplicit.";
-  protected static final String APPLICATION_WINDOW_MAXIMIZED = "application.window.maximized";
-  protected static final String APPLICATION_WINDOW_BOUNDS = "application.window.bounds";
   protected static final String CALENDAR_DISPLAY_MODE = "calendar.display.mode";
   protected static final String CALENDAR_DISPLAY_CONDENSED = "calendar.display.condensed";
   protected static final String DESKTOP_COLUMN_SPLITS = "desktop.columnSplits";
-  // TODO [7.0] awe: Check if this property is still needed with the new Html UI
-  protected static final String FORM_BOUNDS = "form.bounds.";
 
   protected final IClientSession m_session;
   protected IPreferences m_prefs;
@@ -92,74 +84,6 @@ public class ClientUIPreferences {
     }
     m_session = session;
     load();
-  }
-
-  /**
-   * Since this property depends on the user agent it is saved separately for each combination of
-   * {@link org.eclipse.scout.rt.shared.ui.IUiLayer IUiLayer} and {@link org.eclipse.scout.rt.shared.ui.IUiDeviceType
-   * IUiDeviceType}.
-   */
-  public Rectangle getFormBounds(IForm form) {
-    String key = form.computeCacheBoundsKey();
-    if (key == null || m_prefs == null) {
-      return null;
-    }
-
-    key = getUserAgentPrefix() + FORM_BOUNDS + key;
-    String value = m_prefs.get(key, "");
-    if (StringUtility.isNullOrEmpty(value)) {
-      key = getLegacyFormBoundsKey(form);
-      value = m_prefs.get(key, "");
-    }
-
-    if (!StringUtility.isNullOrEmpty(value)) {
-      try {
-        StringTokenizer tok = new StringTokenizer(value, ",");
-        return new Rectangle(Integer.parseInt(tok.nextToken()), Integer.parseInt(tok.nextToken()), Integer.parseInt(tok.nextToken()), Integer.parseInt(tok.nextToken()));
-      }
-      catch (Exception e) {
-        LOG.warn("could not get form bounds for [{}]. Loaded value '{}'", form.getClass().getName(), value, e);
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Since this property depends on the user agent it is saved separately for each combination of
-   * {@link org.eclipse.scout.rt.shared.ui.IUiLayer IUiLayer} and {@link org.eclipse.scout.rt.shared.ui.IUiDeviceType
-   * IUiDeviceType}.
-   */
-  public void setFormBounds(IForm form, Rectangle bounds) {
-    String key = form.computeCacheBoundsKey();
-    if (key == null || m_prefs == null) {
-      return;
-    }
-
-    key = getUserAgentPrefix() + FORM_BOUNDS + key;
-    if (bounds == null) {
-      m_prefs.remove(key);
-    }
-    else {
-      m_prefs.put(key, bounds.x + "," + bounds.y + "," + bounds.width + "," + bounds.height);
-    }
-    flush();
-  }
-
-  protected String getLegacyFormBoundsKey(IForm form) {
-    String key = form.computeCacheBoundsKey();
-    if (key == null) {
-      return null;
-    }
-
-    //Add prefix only if not already added.
-    //This is mainly necessary due to backward compatibility because until 3.8.0 the prefix had to be returned by computeCacheBoundsKey
-    if (!key.startsWith("form.bounds")) {
-      key = "form.bounds_" + key;
-    }
-
-    //Explicitly don't consider user agent because before 3.8.0 there was no user agent and therefore the keys didn't contain this information.
-
-    return key;
   }
 
   protected String getUserAgentPrefix() {
@@ -720,58 +644,6 @@ public class ClientUIPreferences {
       return b != null ? b.booleanValue() : defaultValue;
     }
     return defaultValue;
-  }
-
-  public void setApplicationWindowPreferences(BoundsSpec r, boolean maximized) {
-    if (m_prefs == null) {
-      return;
-    }
-
-    if (r != null) {
-      String value = "" + r.x + "," + r.y + "," + r.width + "," + r.height;
-      m_prefs.put(APPLICATION_WINDOW_BOUNDS, value);
-    }
-    else {
-      m_prefs.remove(APPLICATION_WINDOW_BOUNDS);
-    }
-    //
-    if (maximized) {
-      m_prefs.put(APPLICATION_WINDOW_MAXIMIZED, "yes");
-    }
-    else {
-      m_prefs.remove(APPLICATION_WINDOW_MAXIMIZED);
-    }
-    flush();
-  }
-
-  public boolean getApplicationWindowMaximized() {
-    if (m_prefs == null) {
-      return false;
-    }
-
-    String key = APPLICATION_WINDOW_MAXIMIZED;
-    String value = m_prefs.get(key, null);
-    return "yes".equalsIgnoreCase(value);
-  }
-
-  public BoundsSpec getApplicationWindowBounds() {
-    if (m_prefs == null) {
-      return null;
-    }
-
-    String key = APPLICATION_WINDOW_BOUNDS;
-    String value = m_prefs.get(key, null);
-    if (value != null) {
-      try {
-        StringTokenizer tok = new StringTokenizer(value, ",");
-        BoundsSpec r = new BoundsSpec(Integer.parseInt(tok.nextToken()), Integer.parseInt(tok.nextToken()), Integer.parseInt(tok.nextToken()), Integer.parseInt(tok.nextToken()));
-        return r;
-      }
-      catch (Exception e) {
-        LOG.warn("could not get applicatoin window bounds. Loaded value '{}'", value, e);
-      }
-    }
-    return null;
   }
 
   public void setCalendarPreferences(int displayMode, boolean displayCondensed) {
