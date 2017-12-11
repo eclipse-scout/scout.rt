@@ -40,12 +40,18 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -258,6 +264,45 @@ public final class IOUtility {
       }
     }
     return out.toByteArray();
+  }
+
+  /**
+   * Unzips the given ZIP archive as a collection of BinaryResources. Unzipping happens in-memory, no files are written.
+   * The optional parameter <code>entryNameFilterPattern</code> allows to filter the ZIP for matching file entries.
+   *
+   * @return A collection of binary resources contained in the ZIP archive
+   * @param zipArchive
+   * @param filterPattern
+   *          optional filter, may be null
+   */
+  public static Collection<BinaryResource> unzip(byte[] zipArchive, Pattern filterPattern) throws IOException {
+    try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipArchive))) {
+      List<BinaryResource> list = new ArrayList<>();
+      ZipEntry entry;
+      while ((entry = zis.getNextEntry()) != null) {
+        if (filterPattern != null && !filterPattern.matcher(entry.getName()).matches()) {
+          continue;
+        }
+
+        // Skip directories, not relevant for binary resources
+        if (entry.isDirectory()) {
+          continue;
+        }
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        IOUtility.writeFromToStream(bos, zis);
+        bos.close();
+
+        BinaryResource res = BinaryResources.create()
+            .withFilename(entry.getName())
+            .withContent(bos.toByteArray())
+            .withLastModified(entry.getTime())
+            .build();
+
+        list.add(res);
+      }
+      return list;
+    }
   }
 
   public static byte[] readFromUrl(URL url) throws IOException {
