@@ -337,6 +337,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
             public void treeChanged(TreeEvent e) {
               switch (e.getType()) {
                 case TreeEvent.TYPE_NODES_DELETED:
+                case TreeEvent.TYPE_ALL_CHILD_NODES_DELETED:
                 case TreeEvent.TYPE_NODES_INSERTED:
                 case TreeEvent.TYPE_NODES_UPDATED:
                 case TreeEvent.TYPE_NODES_CHECKED: {
