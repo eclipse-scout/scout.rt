@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -719,7 +720,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
     try {
       table.setTableChanging(true);
-
       ensureSearchFormCreated();
       ensureSearchFormStarted();
       interceptPopulateTable();
@@ -875,14 +875,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     return result;
   }
 
-  private OutlineMediator getOutlineMediator() {
-    if (getOutline() == null) {
-      return null;
-    }
-
-    return getOutline().getOutlineMediator();
-  }
-
   /**
    * Called when a row gets inserted.
    * <p>
@@ -898,15 +890,53 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * the table is reflected in tree children only if the tree/page node is not marked as being a leaf
    */
   private class P_TableListener extends TableAdapter {
+
+    private Optional<OutlineMediator> getOutlineMediator() {
+      return Optional.ofNullable(getOutline())
+          .map(IOutline::getOutlineMediator);
+    }
+
+    private void onRowsInserted(TableEvent e) {
+      List<ITableRow> tableRows = e.getRows();
+      List<IPage<?>> childPageList = new ArrayList<>(tableRows.size());
+
+      for (ITableRow element : tableRows) {
+        try {
+          IPage<?> childPage = createChildPageInternalInRunContext(element);
+          if (childPage != null) {
+            childPage.setRejectedByUser(element.isRejectedByUser());
+            childPage.setFilterAccepted(element.isFilterAccepted());
+            childPage.setEnabled(element.isEnabled(), IDimensions.ENABLED);
+            T table = getTable();
+            if (table != null) {
+              ICell tableCell = table.getSummaryCell(element);
+              updateCellFromTableCell(childPage.getCellForUpdate(), tableCell);
+            }
+            linkTableRowWithPage(element, childPage);
+            childPageList.add(childPage);
+          }
+        }
+        catch (RuntimeException | PlatformError ex) {
+          BEANS.get(ExceptionHandler.class).handle(ex);
+        }
+      }
+
+      getOutlineMediator().ifPresent(mediator -> mediator.mediateTableRowsInserted(tableRows, childPageList, AbstractPageWithTable.this));
+
+      // check if a page was revoked
+      for (ITableRow tableRow : tableRows) {
+        IPage<?> page = getPageFor(tableRow);
+        if (page != null && page.getParentNode() == null) {
+          unlinkTableRowWithPage(tableRow);
+        }
+      }
+    }
+
     @Override
     public void tableChanged(final TableEvent e) {
-      final OutlineMediator outlineMediator = getOutlineMediator();
-
       switch (e.getType()) {
         case TableEvent.TYPE_ROW_ACTION: {
-          if (outlineMediator != null) {
-            outlineMediator.mediateTableRowAction(e, AbstractPageWithTable.this);
-          }
+          getOutlineMediator().ifPresent(mediator -> mediator.mediateTableRowAction(e, AbstractPageWithTable.this));
           break;
         }
         case TableEvent.TYPE_ALL_ROWS_DELETED:
@@ -917,79 +947,30 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
             for (ITableRow row : tableRows) {
               unlinkTableRowWithPage(row);
             }
-
-            if (outlineMediator != null) {
-              outlineMediator.mediateTableRowsDeleted(childNodes, AbstractPageWithTable.this);
-            }
+            getOutlineMediator().ifPresent(mediator -> mediator.mediateTableRowsDeleted(childNodes, AbstractPageWithTable.this));
           }
           break;
         }
         case TableEvent.TYPE_ROWS_INSERTED: {
           if (!isLeaf()) {
-            createDisplayParentRunContext()
-                .run(() -> {
-                  final List<ITableRow> tableRows = e.getRows();
-                  final List<IPage<?>> childPageList = new ArrayList<>(tableRows.size());
-
-                  for (ITableRow element : tableRows) {
-                    try {
-                      IPage<?> childPage = createChildPageInternalInRunContext(element);
-                      if (childPage != null) {
-                        childPage.setRejectedByUser(element.isRejectedByUser());
-                        childPage.setFilterAccepted(element.isFilterAccepted());
-                        childPage.setEnabled(element.isEnabled(), IDimensions.ENABLED);
-                        T table = getTable();
-                        if (table != null) {
-                          ICell tableCell = table.getSummaryCell(element);
-                          updateCellFromTableCell(childPage.getCellForUpdate(), tableCell);
-                        }
-                        linkTableRowWithPage(element, childPage);
-                        childPageList.add(childPage);
-                      }
-                    }
-                    catch (RuntimeException | PlatformError ex) {
-                      BEANS.get(ExceptionHandler.class).handle(ex);
-                    }
-                  }
-                  if (outlineMediator != null) {
-                    outlineMediator.mediateTableRowsInserted(tableRows, childPageList, AbstractPageWithTable.this);
-                  }
-
-                  // check if a page was revoked
-                  for (ITableRow tableRow : tableRows) {
-                    IPage<?> page = getPageFor(tableRow);
-                    if (page != null && page.getParentNode() == null) {
-                      unlinkTableRowWithPage(tableRow);
-                    }
-                  }
-                });
+            createDisplayParentRunContext().run(() -> onRowsInserted(e));
           }
           break;
         }
         case TableEvent.TYPE_ROWS_UPDATED: {
-          if (outlineMediator != null) {
-            outlineMediator.mediateTableRowsUpdated(e, AbstractPageWithTable.this);
-          }
+          getOutlineMediator().ifPresent(mediator -> mediator.mediateTableRowsUpdated(e, AbstractPageWithTable.this));
           break;
         }
         case TableEvent.TYPE_ROW_ORDER_CHANGED: {
-          if (outlineMediator != null) {
-            outlineMediator.mediateTableRowOrderChanged(e, AbstractPageWithTable.this);
-          }
-          break;
-        }
-        case TableEvent.TYPE_ROWS_SELECTED: {
+          getOutlineMediator().ifPresent(mediator -> mediator.mediateTableRowOrderChanged(e, AbstractPageWithTable.this));
           break;
         }
         case TableEvent.TYPE_ROW_FILTER_CHANGED: {
-          if (outlineMediator != null) {
-            outlineMediator.mediateTableRowFilterChanged(AbstractPageWithTable.this);
-          }
+          getOutlineMediator().ifPresent(mediator -> mediator.mediateTableRowFilterChanged(AbstractPageWithTable.this));
           break;
         }
       }// end switch
     }
-
   }
 
   protected void fireAfterSearchFormStart() {

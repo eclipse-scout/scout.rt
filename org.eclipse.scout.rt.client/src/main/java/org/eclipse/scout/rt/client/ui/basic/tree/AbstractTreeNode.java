@@ -460,8 +460,9 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public void setLeaf(boolean b) {
-    if (getTree() != null) {
-      getTree().setNodeLeaf(this, b);
+    ITree tree = getTree();
+    if (tree != null) {
+      tree.setNodeLeaf(this, b);
     }
     else {
       setLeafInternal(b);
@@ -964,9 +965,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
         }
         return;
       }
-    }
-    if (node.isChildrenLoaded()) {
-      node.setLeafInternal(node.getChildNodeCount() == 0);
     }
     if (includeSubtree) {
       for (ITreeNode ch : node.getChildNodes()) {
