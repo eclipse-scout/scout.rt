@@ -29,12 +29,13 @@ public interface IWidget extends IPropertyObserver, IStyleable {
    * if the widgets are used on a form, the form will initialize all the widgets on form startup.
    * <p>
    * After the execution of this method, {@link #isInitDone()} will return true. A repeated execution of {@link #init()}
-   * will do nothing unless initDone would be set to false again which is done by {@link #reinit()}.
+   * will do nothing unless initDone would be set to false again which is done by {@link #reinit()} and
+   * {@link #dispose()}. This means a widget may be initialized again after it has been disposed.
    */
   void init();
 
   /**
-   * @return true if {@link #init()} has been called, false if not
+   * @return true if {@link #init()} has been called, false if not. Also returns false if the widget has been disposed.
    */
   boolean isInitDone();
 
@@ -49,12 +50,14 @@ public interface IWidget extends IPropertyObserver, IStyleable {
    * widgets when the form closes.
    * <p>
    * After the execution of this method, {@link #isDisposeDone()} will return true. A repeated execution of
-   * {@link #dispose()} will do nothing.
+   * {@link #dispose()} will do nothing unless the disposeDone would be set to false which is done by {@link #init()}.
+   * This means a widget may be initialized again after it has been disposed.
    */
   void dispose();
 
   /**
-   * @return true if {@link #dispose()} has been called, false if not
+   * @return true if {@link #dispose()} has been called, false if not. Also returns false if the widget has been
+   *         initialized again after it was disposed.
    */
   boolean isDisposeDone();
 }

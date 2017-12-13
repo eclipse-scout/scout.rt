@@ -76,6 +76,34 @@ public class WidgetTest {
   }
 
   @Test
+  public void testInitAfterDispose() {
+    Widget widget = new Widget();
+    assertEquals(0, widget.disposeCalls);
+    assertEquals(false, widget.isDisposeDone());
+
+    widget.init();
+    assertEquals(0, widget.disposeCalls);
+    assertEquals(false, widget.isDisposeDone());
+
+    widget.dispose();
+    assertEquals(1, widget.disposeCalls);
+    assertEquals(false, widget.isInitDone());
+    assertEquals(true, widget.isDisposeDone());
+
+    // Init may be called again after dispose
+    // The reason is: it has always been like this for forms and we don't want to break existing code
+    widget.init();
+    assertEquals(2, widget.initCalls);
+    assertEquals(true, widget.isInitDone());
+    assertEquals(false, widget.isDisposeDone());
+
+    widget.dispose();
+    assertEquals(2, widget.disposeCalls);
+    assertEquals(false, widget.isInitDone());
+    assertEquals(true, widget.isDisposeDone());
+  }
+
+  @Test
   public void testAddCssClass() {
     IWidget widget = new Widget();
     widget.addCssClass("custom-class");

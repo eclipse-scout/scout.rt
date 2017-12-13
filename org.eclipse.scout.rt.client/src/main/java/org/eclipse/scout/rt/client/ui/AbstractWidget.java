@@ -79,6 +79,7 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
     }
     initInternal();
     setInitDone(true);
+    setDisposeDone(false);
   }
 
   /**
@@ -110,6 +111,7 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
     }
     disposeInternal();
     setDisposeDone(true);
+    setInitDone(false);
   }
 
   /**
