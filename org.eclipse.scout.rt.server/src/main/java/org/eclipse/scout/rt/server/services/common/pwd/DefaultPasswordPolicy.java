@@ -44,8 +44,11 @@ public class DefaultPasswordPolicy implements IPasswordPolicy {
     if (!containsOneOf(charsInPasswordSorted, "0123456789")) {
       throw new VetoException(TEXTS.get("PasswordMinOneDigit"));
     }
-    if (!containsOneOf(charsInPasswordSorted, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")) {
-      throw new VetoException(TEXTS.get("PasswordMinOneChar"));
+    if (!containsOneOf(charsInPasswordSorted, "abcdefghijklmnopqrstuvwxyz")) {
+      throw new VetoException(TEXTS.get("PasswordMinOneChar", "a-z"));
+    }
+    if (!containsOneOf(charsInPasswordSorted, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")) {
+      throw new VetoException(TEXTS.get("PasswordMinOneChar", "A-Z"));
     }
     if (!containsOneOf(charsInPasswordSorted, "!@#$%^&*()_+|~-=\\`{}[]:\";'<>?,./")) {
       throw new VetoException(TEXTS.get("PasswordMinOnNonStdChar"));
