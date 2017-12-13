@@ -925,6 +925,27 @@ scout.SmartField.prototype._onFieldKeyDown = function(event) {
     return;
   }
 
+  // For dropdowns, not only navigation keys trigger the popup (see code below).
+  // However, there are still some exceptions that should be ignored:
+  var w = event.which;
+  if (this.isDropdown() && (
+      event.ctrlKey ||
+      event.altKey ||
+      w === scout.keys.SHIFT ||
+      w === scout.keys.CTRL ||
+      w === scout.keys.ALT ||
+      w === scout.keys.WIN_LEFT ||
+      w === scout.keys.WIN_RIGHT ||
+      w === scout.keys.SELECT ||
+      w === scout.keys.NUM_LOCK ||
+      w === scout.keys.CAPS_LOCK ||
+      w === scout.keys.SCROLL_LOCK ||
+      w === scout.keys.PAUSE ||
+      this._isFunctionKey(event)
+    )) {
+    return;
+  }
+
   // If field has dropdown style, we open the popup immediately
   // because we must not wait until text has been typed
   if (this._isNavigationKey(event) || this.isDropdown()) {
