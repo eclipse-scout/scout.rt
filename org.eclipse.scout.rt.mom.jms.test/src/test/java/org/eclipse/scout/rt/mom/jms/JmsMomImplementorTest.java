@@ -1011,8 +1011,9 @@ public class JmsMomImplementorTest {
   }
 
   private void testRequestReplyCancellationInternal(final IBiDestination<String, String> destination) throws InterruptedException {
-    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
-    final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(2);
+    final CountDownLatch neverLatch = new CountDownLatch(1);
+    final CountDownLatch setupLatch = new CountDownLatch(1);
+    final CountDownLatch verifyLatch = new CountDownLatch(2);
 
     final AtomicBoolean requestorInterrupted = new AtomicBoolean();
     final AtomicBoolean replierInterrupted = new AtomicBoolean();
@@ -1023,8 +1024,9 @@ public class JmsMomImplementorTest {
 
       @Override
       public String onRequest(IMessage<String> request) {
+        setupLatch.countDown();
         try {
-          setupLatch.countDownAndBlock();
+          neverLatch.await();
         }
         catch (InterruptedException e) {
           replierInterrupted.set(true);
@@ -1037,28 +1039,9 @@ public class JmsMomImplementorTest {
       }
     }));
 
-    final String requestReplyJobId = UUID.randomUUID().toString();
-
-    // Prepare cancellation job
-    IFuture<Void> cancellationJob = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        // Wait until message processing started
-        assertTrue(setupLatch.await());
-
-        // Cancel the publishing thread
-        Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
-            .andMatchExecutionHint(requestReplyJobId)
-            .toFilter(), true);
-      }
-    }, Jobs.newInput()
-        .withName("canceller")
-        .withExecutionHint(m_testJobExecutionHint));
-
     // Initiate 'request-reply' communication
     final FinalValue<String> testee = new FinalValue<>();
-    Jobs.schedule(new IRunnable() {
+    IFuture<Void> requestFuture = Jobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -1075,13 +1058,16 @@ public class JmsMomImplementorTest {
       }
     }, Jobs.newInput()
         .withName("initiator")
-        .withExecutionHint(requestReplyJobId)
         .withExecutionHint(m_testJobExecutionHint));
 
-    // Wait until cancelled requestor thread
-    cancellationJob.awaitDoneAndGet();
+    // Wait until reply message processing started
+    setupLatch.await();
 
-    assertTrue(verifyLatch.await());
+    // Cancel the publishing thread
+    requestFuture.cancel(true);
+
+    // wait for request / reply interrupted
+    verifyLatch.await();
 
     // Verify
     assertTrue(requestorInterrupted.get());
