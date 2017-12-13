@@ -1919,21 +1919,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     try {
       // ensure all fields have the right save-needed-state
       checkSaveNeeded();
-      // find any fields that needs save
-      P_AbstractCollectingFieldVisitor<IFormField> collector = new P_AbstractCollectingFieldVisitor<IFormField>() {
-        @Override
-        public boolean visitField(IFormField field, int level, int fieldIndex) {
-          if (field.isSaveNeeded()) {
-            collect(field);
-            return false;
-          }
-          else {
-            return true;
-          }
-        }
-      };
-      visitFields(collector);
-      if (collector.getCollectionCount() > 0 && isAskIfNeedSave()) {
+      if (isSaveNeeded() && isAskIfNeedSave()) {
         int result = MessageBoxes.createYesNoCancel().withDisplayParent(this).withHeader(getCancelVerificationText()).withSeverity(IStatus.INFO).show();
 
         if (result == IMessageBox.YES_OPTION) {
