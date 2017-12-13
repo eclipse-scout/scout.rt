@@ -10,7 +10,7 @@
  ******************************************************************************/
 /**
  * Base class for lookup calls with static or local data. Implement the _data() and _dataToLookupRow()
- * functions to provide data for lookup calls. Results are resolved as a Promise, the _delay
+ * functions to provide data for lookup calls. Results are resolved as a Promise, the delay
  * property controls how long it takes until the promise is resolved. By default that value is 0.
  * You can set it to a higher value for testing purposes.
  *
@@ -22,7 +22,7 @@
 scout.StaticLookupCall = function() {
   scout.StaticLookupCall.parent.call(this);
 
-  this._delay = 0; // delay in [ms]
+  this.delay = 0; // delay in [ms]
   this.data = null;
 };
 scout.inherits(scout.StaticLookupCall, scout.LookupCall);
@@ -37,9 +37,17 @@ scout.StaticLookupCall.prototype._init = function(model) {
   }
 };
 
+scout.StaticLookupCall.prototype.refreshData = function(data) {
+  if (data === undefined) {
+    this.data = this._data();
+  } else {
+    this.data = data;
+  }
+};
+
 scout.StaticLookupCall.prototype.getAll = function() {
   var deferred = $.Deferred();
-  setTimeout(this._queryByAll.bind(this, deferred), this._delay);
+  setTimeout(this._queryByAll.bind(this, deferred), this.delay);
   return deferred.promise();
 };
 
@@ -53,7 +61,7 @@ scout.StaticLookupCall.prototype._queryByAll = function(deferred) {
 
 scout.StaticLookupCall.prototype.getByText = function(text) {
   var deferred = $.Deferred();
-  setTimeout(this._queryByText.bind(this, deferred, text), this._delay);
+  setTimeout(this._queryByText.bind(this, deferred, text), this.delay);
   return deferred.promise();
 };
 
@@ -100,7 +108,7 @@ scout.StaticLookupCall.prototype._queryByText = function(deferred, text) {
 
 scout.StaticLookupCall.prototype.getByKey = function(key) {
   var deferred = $.Deferred();
-  setTimeout(this._queryByKey.bind(this, deferred, key), this._delay);
+  setTimeout(this._queryByKey.bind(this, deferred, key), this.delay);
   return deferred.promise();
 };
 
@@ -117,7 +125,7 @@ scout.StaticLookupCall.prototype._queryByKey = function(deferred, key) {
 
 scout.StaticLookupCall.prototype.getByRec = function(rec) {
   var deferred = $.Deferred();
-  setTimeout(this._queryByRec.bind(this, deferred, rec), this._delay);
+  setTimeout(this._queryByRec.bind(this, deferred, rec), this.delay);
   return deferred.promise();
 };
 
@@ -136,7 +144,7 @@ scout.StaticLookupCall.prototype._queryByRec = function(deferred, rec) {
 };
 
 scout.StaticLookupCall.prototype.setDelay = function(delay) {
-  this._delay = delay;
+  this.delay = delay;
 };
 
 /**
