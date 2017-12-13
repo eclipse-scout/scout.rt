@@ -47,7 +47,7 @@ scout.StaticLookupCall.prototype._queryByAll = function(deferred) {
   var datas = this.data.slice(0, scout.StaticLookupCall.MAX_ROW_COUNT + 1);
   deferred.resolve({
     queryBy: scout.QueryBy.ALL,
-    lookupRows: datas.map(this._dataToLookupRow)
+    lookupRows: datas.map(this._dataToLookupRow, this)
   });
 };
 
@@ -61,7 +61,7 @@ scout.StaticLookupCall.prototype._queryByText = function(deferred, text) {
   var datas = this.data.filter(function(data) {
     return scout.strings.startsWith(data[1].toLowerCase(), text.toLowerCase());
   });
-  var lookupRows = datas.map(this._dataToLookupRow);
+  var lookupRows = datas.map(this._dataToLookupRow, this);
 
   // resolve non-hierarchical results immediately
   if (!this.hierarchical) {
