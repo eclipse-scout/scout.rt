@@ -453,7 +453,7 @@ scout.dates = {
   /**
    * Uses the default date and time format patterns from the locale to format the given date.
    */
-  formatDateTime: function(date, locale, pattern) {
+  formatDateTime: function(date, locale) {
     var dateFormat = new scout.DateFormat(locale, locale.dateFormatPatternDefault + ' ' + locale.timeFormatPatternDefault);
     return dateFormat.format(date);
   },
