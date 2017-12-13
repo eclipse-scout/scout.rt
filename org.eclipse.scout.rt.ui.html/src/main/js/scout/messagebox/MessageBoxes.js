@@ -121,6 +121,10 @@ scout.MessageBoxes.createYesNo = function(parent) {
   return this.create(parent).withYes().withNo();
 };
 
+scout.MessageBoxes.createYesNoCancel = function(parent) {
+  return this.create(parent).withYes().withNo().withCancel();
+};
+
 /**
  * Opens a message box with an Ok button.
  *
