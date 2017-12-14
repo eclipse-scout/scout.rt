@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.Accordion = function() {
   scout.Accordion.parent.call(this);
+  this.comparator = null;
   this.exclusiveExpand = true;
   this.groups = [];
   this.scrollable = true;
@@ -88,6 +89,7 @@ scout.Accordion.prototype.setGroups = function(groups) {
   var groupsToInsert = scout.arrays.diff(groups, this.groups);
   this._deleteGroups(groupsToDelete);
   this._insertGroups(groupsToInsert);
+  this._sort(groups);
   this._updateGroupOrder(groups);
 
   this._setProperty('groups', groups);
@@ -144,6 +146,25 @@ scout.Accordion.prototype._renderGroups = function() {
   }, this);
   this._updateFirstLastMarker();
   this.invalidateLayoutTree();
+};
+
+scout.Accordion.prototype.setComparator = function(comparator) {
+  if (this.comparator === comparator) {
+    return;
+  }
+  this.comparator = comparator;
+};
+
+scout.Accordion.prototype.sort = function() {
+  var groups = this.groups.slice();
+  this.setGroups(groups);
+};
+
+scout.Accordion.prototype._sort = function(groups) {
+  if (this.comparator === null) {
+    return;
+  }
+  groups.sort(this.comparator);
 };
 
 scout.Accordion.prototype._updateGroupOrder = function(groups) {

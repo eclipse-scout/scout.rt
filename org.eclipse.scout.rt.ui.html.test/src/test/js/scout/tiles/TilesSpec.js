@@ -483,6 +483,80 @@ describe("Tiles", function() {
 
   });
 
+  describe('sort', function() {
+
+    it('uses the comparator to sort the tiles and filteredTiles', function() {
+      var tiles = createTiles(0);
+      var tile0 = createTile({
+        label: "a"
+      });
+      var tile1 = createTile({
+        label: "b"
+      });
+      var tile2 = createTile({
+        label: "c"
+      });
+      tiles.insertTiles([tile0, tile1, tile2]);
+
+      tiles.setComparator(function(t0, t1) {
+        // desc
+        return (t0.label < t1.label ? 1 : ((t0.label > t1.label) ? -1 : 0));
+      });
+      tiles.sort();
+      expect(tiles.tiles[0]).toBe(tile2);
+      expect(tiles.tiles[1]).toBe(tile1);
+      expect(tiles.tiles[2]).toBe(tile0);
+      expect(tiles.filteredTiles[0]).toBe(tile2);
+      expect(tiles.filteredTiles[1]).toBe(tile1);
+      expect(tiles.filteredTiles[2]).toBe(tile0);
+
+      tiles.setComparator(function(t0, t1) {
+        // asc
+        return (t0.label < t1.label ? -1 : ((t0.label > t1.label) ? 1 : 0));
+      });
+      tiles.sort();
+      expect(tiles.tiles[0]).toBe(tile0);
+      expect(tiles.tiles[1]).toBe(tile1);
+      expect(tiles.tiles[2]).toBe(tile2);
+      expect(tiles.filteredTiles[0]).toBe(tile0);
+      expect(tiles.filteredTiles[1]).toBe(tile1);
+      expect(tiles.filteredTiles[2]).toBe(tile2);
+    });
+
+    it('is executed when new tiles are added', function() {
+      var tiles = createTiles(0);
+      var tile0 = createTile({
+        label: "a"
+      });
+      var tile1 = createTile({
+        label: "b"
+      });
+      var tile2 = createTile({
+        label: "c"
+      });
+      tiles.insertTiles([tile0, tile1]);
+
+      tiles.setComparator(function(t0, t1) {
+        // desc
+        return (t0.label < t1.label ? 1 : ((t0.label > t1.label) ? -1 : 0));
+      });
+      tiles.sort();
+      expect(tiles.tiles[0]).toBe(tile1);
+      expect(tiles.tiles[1]).toBe(tile0);
+      expect(tiles.filteredTiles[0]).toBe(tile1);
+      expect(tiles.filteredTiles[1]).toBe(tile0);
+
+      tiles.insertTiles([tile2]);
+      expect(tiles.tiles[0]).toBe(tile2);
+      expect(tiles.tiles[1]).toBe(tile1);
+      expect(tiles.tiles[2]).toBe(tile0);
+      expect(tiles.filteredTiles[0]).toBe(tile2);
+      expect(tiles.filteredTiles[1]).toBe(tile1);
+      expect(tiles.filteredTiles[2]).toBe(tile0);
+    });
+
+  });
+
   describe('mouseDown', function() {
 
     describe('with multiSelect = false', function() {

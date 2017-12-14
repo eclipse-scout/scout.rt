@@ -12,6 +12,7 @@ scout.Tiles = function() {
   scout.Tiles.parent.call(this);
   this.animateTileRemoval = true;
   this.animateTileInsertion = true;
+  this.comparator = null;
   this.empty = false;
   this.filters = [];
   this.filteredTiles = [];
@@ -155,6 +156,7 @@ scout.Tiles.prototype.setTiles = function(tiles, appendPlaceholders) {
 
   this._deleteTiles(tilesToDelete);
   this._insertTiles(tilesToInsert);
+  this._sort(tiles);
   this._updateTileOrder(tiles);
   this._setProperty('tiles', tiles);
 
@@ -251,6 +253,25 @@ scout.Tiles.prototype._onTileDelete = function(tile) {
       this.invalidateLayoutTree();
     }
   }.bind(this));
+};
+
+scout.Tiles.prototype.setComparator = function(comparator) {
+  if (this.comparator === comparator) {
+    return;
+  }
+  this.comparator = comparator;
+};
+
+scout.Tiles.prototype.sort = function() {
+  var tiles = this.tiles.slice();
+  this.setTiles(tiles);
+};
+
+scout.Tiles.prototype._sort = function(tiles) {
+  if (this.comparator === null) {
+    return;
+  }
+  tiles.sort(this.comparator);
 };
 
 scout.Tiles.prototype._updateTileOrder = function(tiles) {

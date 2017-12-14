@@ -281,6 +281,18 @@ scout.TilesAccordion.prototype.getSelectedTileCount = function() {
   return count;
 };
 
+scout.TilesAccordion.prototype.setTileComparator = function(comparator) {
+  this.groups.forEach(function(group) {
+    group.body.setComparator(comparator);
+  });
+};
+
+scout.TilesAccordion.prototype.sortTiles = function() {
+  this.groups.forEach(function(group) {
+    group.body.sort();
+  });
+};
+
 scout.TilesAccordion.prototype._onTileGridSelectedTilesChange = function(event) {
   if (this._selectionUpdateLocked) {
     // Don't execute when deselecting other tiles to minimize the amount of property change events

@@ -237,4 +237,54 @@ describe("Accordion", function() {
 
   });
 
+  describe('sort', function() {
+
+    it('uses the comparator to sort the groups', function() {
+      var accordion = createAccordion(0);
+      var group0 = createGroup({label: "a"});
+      var group1 = createGroup({label: "b"});
+      var group2 = createGroup({label: "c"});
+      accordion.insertGroups([group0, group1, group2]);
+
+      accordion.setComparator(function(g0, g1) {
+        // desc
+        return (g0.label < g1.label ? 1 : ((g0.label > g1.label) ? -1 : 0));
+      });
+      accordion.sort();
+      expect(accordion.groups[0]).toBe(group2);
+      expect(accordion.groups[1]).toBe(group1);
+      expect(accordion.groups[2]).toBe(group0);
+
+      accordion.setComparator(function(g0, g1) {
+        // asc
+        return (g0.label < g1.label ? -1 : ((g0.label > g1.label) ? 1 : 0));
+      });
+      accordion.sort();
+      expect(accordion.groups[0]).toBe(group0);
+      expect(accordion.groups[1]).toBe(group1);
+      expect(accordion.groups[2]).toBe(group2);
+    });
+
+    it('is executed when new groups are added', function() {
+      var accordion = createAccordion(0);
+      var group0 = createGroup({label: "a"});
+      var group1 = createGroup({label: "b"});
+      var group2 = createGroup({label: "c"});
+
+      accordion.setComparator(function(g0, g1) {
+        // desc
+        return (g0.label < g1.label ? 1 : ((g0.label > g1.label) ? -1 : 0));
+      });
+      accordion.insertGroups([group0, group1]);
+      expect(accordion.groups[0]).toBe(group1);
+      expect(accordion.groups[1]).toBe(group0);
+
+      accordion.insertGroups([group2]);
+      expect(accordion.groups[0]).toBe(group2);
+      expect(accordion.groups[1]).toBe(group1);
+      expect(accordion.groups[2]).toBe(group0);
+    });
+
+  });
+
 });
