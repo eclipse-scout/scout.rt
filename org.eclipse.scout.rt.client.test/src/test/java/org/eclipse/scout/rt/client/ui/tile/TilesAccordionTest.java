@@ -278,6 +278,112 @@ public class TilesAccordionTest {
     assertEquals(true, accordion.getTileGrids().get(2).isSelectable());
   }
 
+  @Test
+  public void testSelectTiles() {
+    P_Accordion accordion = new P_Accordion();
+    accordion.setGroupManager(new P_StaticTileGroupManager());
+    accordion.setSelectable(true);
+    accordion.setMultiSelect(false);
+
+    P_Tile tile1 = new P_Tile();
+    tile1.setGroup("Static A");
+    P_Tile tile2 = new P_Tile();
+    tile2.setGroup("Static B");
+    accordion.addTiles(Arrays.asList(tile1, tile2));
+    assertEquals(0, accordion.getSelectedTileCount());
+
+    accordion.selectTile(tile1);
+    assertEquals(1, accordion.getSelectedTileCount());
+    assertEquals(tile1, accordion.getSelectedTile());
+
+    accordion.selectTile(tile2);
+    assertEquals(1, accordion.getSelectedTileCount());
+    assertEquals(tile2, accordion.getSelectedTile());
+
+    accordion.selectTiles(Arrays.asList(tile1, tile2));
+    assertEquals(1, accordion.getSelectedTileCount());
+    assertEquals(tile1, accordion.getSelectedTile());
+  }
+
+  @Test
+  public void testMultiSelectTiles() {
+    P_Accordion accordion = new P_Accordion();
+    accordion.setGroupManager(new P_StaticTileGroupManager());
+    accordion.setSelectable(true);
+    accordion.setMultiSelect(true);
+
+    P_Tile tile1 = new P_Tile();
+    tile1.setGroup("Static A");
+    P_Tile tile2 = new P_Tile();
+    tile2.setGroup("Static B");
+    accordion.addTiles(Arrays.asList(tile1, tile2));
+    assertEquals(0, accordion.getSelectedTileCount());
+
+    accordion.selectTile(tile1);
+    assertEquals(1, accordion.getSelectedTileCount());
+    assertEquals(tile1, accordion.getSelectedTile());
+
+    accordion.selectTile(tile2);
+    assertEquals(1, accordion.getSelectedTileCount());
+    assertEquals(tile2, accordion.getSelectedTile());
+
+    accordion.selectTiles(Arrays.asList(tile1, tile2));
+    assertEquals(2, accordion.getSelectedTileCount());
+    assertEquals(tile1, accordion.getSelectedTiles().get(0));
+    assertEquals(tile2, accordion.getSelectedTiles().get(1));
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testSelectTilesEvent() {
+    P_Accordion accordion = new P_Accordion();
+    accordion.setGroupManager(new P_StaticTileGroupManager());
+    accordion.setSelectable(true);
+    accordion.setMultiSelect(false);
+
+    P_Tile tile1 = new P_Tile();
+    tile1.setGroup("Static A");
+    P_Tile tile2 = new P_Tile();
+    tile2.setGroup("Static B");
+    accordion.addTiles(Arrays.asList(tile1, tile2));
+    assertEquals(0, accordion.getSelectedTileCount());
+
+    final List<ITile> newSelection = new ArrayList<ITile>();
+    accordion.addPropertyChangeListener(event -> {
+      newSelection.clear();
+      newSelection.addAll((List<ITile>) event.getNewValue());
+    });
+    accordion.selectTiles(Arrays.asList(tile1, tile2));
+    assertEquals(1, newSelection.size());
+    assertEquals(tile1, newSelection.get(0));
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testSelectTilesMultiSelectEvent() {
+    P_Accordion accordion = new P_Accordion();
+    accordion.setGroupManager(new P_StaticTileGroupManager());
+    accordion.setSelectable(true);
+    accordion.setMultiSelect(true);
+
+    P_Tile tile1 = new P_Tile();
+    tile1.setGroup("Static A");
+    P_Tile tile2 = new P_Tile();
+    tile2.setGroup("Static B");
+    accordion.addTiles(Arrays.asList(tile1, tile2));
+    assertEquals(0, accordion.getSelectedTileCount());
+
+    final List<ITile> newSelection = new ArrayList<ITile>();
+    accordion.addPropertyChangeListener(event -> {
+      newSelection.clear();
+      newSelection.addAll((List<ITile>) event.getNewValue());
+    });
+    accordion.selectTiles(Arrays.asList(tile1, tile2));
+    assertEquals(2, newSelection.size());
+    assertEquals(tile1, newSelection.get(0));
+    assertEquals(tile2, newSelection.get(1));
+  }
+
   private static class P_Accordion extends AbstractTilesAccordion<P_Tile> {
 
     @ClassId("8f9c91d5-0907-4893-9b89-375851a79b1d")

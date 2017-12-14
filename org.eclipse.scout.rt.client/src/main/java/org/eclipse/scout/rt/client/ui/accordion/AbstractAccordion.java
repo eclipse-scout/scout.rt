@@ -56,7 +56,7 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
   }
 
   /**
-   * do not use this internal method unless you are implementing a container that holds and controls tiles.
+   * do not use this internal method unless you are implementing a container that holds and controls groups.
    */
   public void setContainerInternal(ITypeWithClassId container) {
     propertySupport.setProperty(PROP_CONTAINER, container);
@@ -131,17 +131,22 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
     // Dispose old groups (only if they are not in the new list)
     List<IGroup> groupsToDelete = new ArrayList<IGroup>(existingGroups);
     groupsToDelete.removeAll(groups);
-    for (IGroup group : groupsToDelete) {
-      group.dispose();
-    }
+    deleteGroupsInternal(groupsToDelete);
 
     // Initialize new groups
     // Only initialize when groups are added later,
     // if they are added while initConfig runs, initGroups() will take care of the initialization which will be called by the container (e.g. GroupsField)
     List<IGroup> groupsToInsert = new ArrayList<IGroup>(groups);
     groupsToInsert.removeAll(existingGroups);
+    addGroupsInternal(groupsToInsert);
+
+    sortInternal(groups);
+    setGroupsInternal(groups);
+  }
+
+  protected void addGroupsInternal(List<IGroup> groupsToInsert) {
     for (IGroup group : groupsToInsert) {
-      group.setContainer(this);
+      addGroupInternal(group);
     }
     // Initialize after every group has been linked to the container, so that it is possible to access other groups in group.execInit
     if (isInitConfigDone()) {
@@ -150,9 +155,20 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
         group.init();
       }
     }
+  }
 
-    sortInternal(groups);
-    setGroupsInternal(groups);
+  protected void addGroupInternal(IGroup group) {
+    group.setContainer(this);
+  }
+
+  protected void deleteGroupsInternal(List<IGroup> groupsToDelete) {
+    for (IGroup group : groupsToDelete) {
+      deleteGroupInternal(group);
+    }
+  }
+
+  protected void deleteGroupInternal(IGroup group) {
+    group.dispose();
   }
 
   protected void setGroupsInternal(List<? extends IGroup> groups) {
@@ -242,7 +258,8 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
   }
 
   /**
-   * May be overridden to add some logic to determine the active comparator. Returns {@link #getComparator()} by default.
+   * May be overridden to add some logic to determine the active comparator. Returns {@link #getComparator()} by
+   * default.
    */
   protected Comparator<? extends IGroup> resolveComparator() {
     return getComparator();
@@ -253,9 +270,9 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
     if (resolveComparator() == null) {
       return;
     }
-    List<? extends IGroup> tiles = getGroups();
-    sortInternal(tiles);
-    setGroupsInternal(tiles);
+    List<? extends IGroup> groups = getGroups();
+    sortInternal(groups);
+    setGroupsInternal(groups);
   }
 
   @SuppressWarnings("unchecked")

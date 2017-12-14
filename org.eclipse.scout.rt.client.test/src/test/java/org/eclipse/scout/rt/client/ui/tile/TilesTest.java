@@ -191,6 +191,35 @@ public class TilesTest {
     tiles.selectTile(tile1);
     assertEquals(1, tiles.getSelectedTiles().size());
     assertEquals(tile1, tiles.getSelectedTile());
+
+    tiles.selectTiles(Arrays.asList(tile0, tile1));
+    assertEquals(1, tiles.getSelectedTiles().size());
+    assertEquals(tile0, tiles.getSelectedTiles().get(0));
+  }
+
+  @Test
+  public void testMultiSelectTiles() {
+    P_Tiles tiles = createTestTiles();
+    tiles.setSelectable(true);
+    tiles.setMultiSelect(true);
+    P_Tile tile0 = createTestTile();
+    P_Tile tile1 = createTestTile();
+    P_Tile tile2 = createTestTile();
+    tiles.addTiles(Arrays.asList(tile0, tile1, tile2));
+
+    assertTrue(tiles.getSelectedTiles().isEmpty());
+    tiles.selectTile(tile0);
+    assertEquals(1, tiles.getSelectedTiles().size());
+    assertEquals(tile0, tiles.getSelectedTile());
+
+    tiles.selectTile(tile1);
+    assertEquals(1, tiles.getSelectedTiles().size());
+    assertEquals(tile1, tiles.getSelectedTile());
+
+    tiles.selectTiles(Arrays.asList(tile0, tile1));
+    assertEquals(2, tiles.getSelectedTiles().size());
+    assertEquals(tile0, tiles.getSelectedTiles().get(0));
+    assertEquals(tile1, tiles.getSelectedTiles().get(1));
   }
 
   @SuppressWarnings("unchecked")

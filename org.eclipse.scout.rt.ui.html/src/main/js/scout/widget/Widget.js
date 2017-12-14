@@ -1404,6 +1404,20 @@ scout.Widget.prototype.widget = function(widgetId) {
 };
 
 /**
+ * @returns the parent for which the given function returns true.
+ */
+scout.Widget.prototype.findParent = function(func) {
+  var parent = this.parent;
+  while (parent) {
+    if (func(parent)) {
+      return parent;
+    }
+    parent = parent.parent;
+  }
+  return parent;
+};
+
+/**
  * Tries to set the focus on the widget.
  * <p>
  * By default the focus is set on the container but this may vary from widget to widget.

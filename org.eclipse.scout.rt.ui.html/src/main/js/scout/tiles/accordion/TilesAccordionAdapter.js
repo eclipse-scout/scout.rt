@@ -8,18 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.tiles {
-  overflow: hidden;
-
-  &.selectable {
-    padding: 10px;
-  }
-
-  &.scrollable {
-    padding-right: 15px;
-  }
-
-  & > .scrollbar {
-    transition: opacity 80ms ease-out;
-  }
-}
+scout.TilesAccordionAdapter = function() {
+  scout.TilesAccordionAdapter.parent.call(this);
+};
+scout.inherits(scout.TilesAccordionAdapter, scout.AccordionAdapter);

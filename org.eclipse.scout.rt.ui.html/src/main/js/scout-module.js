@@ -472,6 +472,10 @@
   __include("scout/tiles/TilesGridConfig.js");
   __include("scout/tiles/TilesLayout.js");
   __include("scout/tiles/TilesLayoutConfig.js");
+  __include("scout/tiles/TilesSelectionHandler.js");
+  __include("scout/tiles/accordion/TilesAccordion.js");
+  __include("scout/tiles/accordion/TilesAccordionAdapter.js");
+  __include("scout/tiles/accordion/TilesAccordionSelectionHandler.js");
   __include("scout/tiles/RemoteTileFilter.js");
   __include("scout/tiles/WidgetTile.js");
   __include("scout/tiles/WidgetTileAdapter.js");

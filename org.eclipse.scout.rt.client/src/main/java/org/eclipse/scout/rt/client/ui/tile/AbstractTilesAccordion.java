@@ -15,9 +15,9 @@ import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,10 +35,7 @@ import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 @ClassId("e1e96659-f922-45c8-b350-78f9de059a83")
-public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAccordion {
-
-  public static final String PROP_SHOW_FILTER_COUNT = "showFilterCount";
-  public static final String PROP_SELECTED_TILES = "selectedTiles";
+public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAccordion implements ITilesAccordion<T> {
 
   private List<ITileFilter> m_tileFilters;
   private Map<Object, ITilesAccordionGroupManager<T>> m_groupManagers;
@@ -65,8 +62,14 @@ public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAc
     setShowFilterCount(getConfiguredShowFilterCount());
     setGroupManager(new DefaultGroupManager<T>());
     setComparator(new DefaultComparator());
-    IGroup firstGroup = getDefaultGroup();
-    getTileGrid(firstGroup).addPropertyChangeListener(new P_FilteredTilesListener(firstGroup));
+
+    // Copy properties from default grid to accordion
+    ITiles<T> defaultGrid = getTileGrid(getDefaultGroup());
+    setSelectable(defaultGrid.isSelectable());
+    setMultiSelect(defaultGrid.isMultiSelect());
+    setWithPlaceholders(defaultGrid.isWithPlaceholders());
+    setGridColumnCount(defaultGrid.getGridColumnCount());
+    setTileGridLayoutConfig(defaultGrid.getLayoutConfig());
   }
 
   @Override
@@ -80,10 +83,12 @@ public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAc
     return false;
   }
 
+  @Override
   public void addTile(T tile) {
     addTiles(CollectionUtility.arrayList(tile));
   }
 
+  @Override
   public void addTiles(List<T> tilesToAdd) {
     List<T> tiles = new ArrayList<>(getTiles());
     tiles.addAll(tilesToAdd);
@@ -109,6 +114,7 @@ public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAc
     return group;
   }
 
+  @Override
   public IGroup getGroupByTile(T tile) {
     Object groupId = m_groupManager.getGroupIdByTile(tile);
     return getGroupById(groupId);
@@ -121,11 +127,13 @@ public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAc
         .orElse(null);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <G extends IGroup> G getDefaultGroup() {
     return (G) getGroupById(DefaultGroupManager.GROUP_ID_DEFAULT);
   }
 
+  @Override
   public void setTiles(List<T> tiles) {
     tiles = ObjectUtility.nvl(tiles, new ArrayList<>());
     Map<IGroup, List<T>> map = new HashMap<>();
@@ -139,7 +147,7 @@ public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAc
     }
     for (Entry<IGroup, List<T>> entry : map.entrySet()) {
       IGroup group = entry.getKey();
-      getTileGrid(entry.getKey()).setTiles(entry.getValue());
+      getTileGrid(group).setTiles(entry.getValue());
       if (entry.getValue().size() == 0 && !m_staticGroups.contains(group)) {
         // Delete obsolete groups but never the static ones
         deleteGroup(group);
@@ -178,10 +186,12 @@ public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAc
     return (ITiles) group.getBody();
   }
 
+  @Override
   public boolean isShowFilterCount() {
     return propertySupport.getPropertyBool(PROP_SHOW_FILTER_COUNT);
   }
 
+  @Override
   public void setShowFilterCount(boolean showFilterCount) {
     propertySupport.setPropertyBool(PROP_SHOW_FILTER_COUNT, showFilterCount);
   }
@@ -189,6 +199,7 @@ public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAc
   /**
    * Adds and activates the given group manager.
    */
+  @Override
   public void setGroupManager(ITilesAccordionGroupManager<T> groupManager) {
     addGroupManager(groupManager);
     activateGroupManager(groupManager.getId());
@@ -197,14 +208,17 @@ public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAc
   /**
    * @returns the active group manager
    */
+  @Override
   public ITilesAccordionGroupManager<T> getGroupManager() {
     return m_groupManager;
   }
 
+  @Override
   public void addGroupManager(ITilesAccordionGroupManager<T> groupManager) {
     m_groupManagers.put(groupManager.getId(), groupManager);
   }
 
+  @Override
   public void removeGroupManager(ITilesAccordionGroupManager<T> groupManager) {
     m_groupManagers.remove(groupManager.getId());
     // when the current group handler is removed, activate the default group manager
@@ -216,6 +230,7 @@ public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAc
   /**
    * Activates a group manager that matches the given ID.
    */
+  @Override
   public void activateGroupManager(Object groupManagerId) {
     ITilesAccordionGroupManager<T> groupManager = m_groupManagers.get(groupManagerId);
     if (groupManager == null) {
@@ -316,6 +331,7 @@ public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAc
     return new GroupTemplate(DefaultGroupManager.GROUP_ID_DEFAULT, TEXTS.get("NotGrouped"));
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public List<ITiles<T>> getTileGrids() {
     List<ITiles<T>> tileGrids = new ArrayList<>();
@@ -325,10 +341,12 @@ public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAc
     return tileGrids;
   }
 
+  @Override
   public Stream<T> streamTiles() {
     return getTiles().stream();
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public List<T> getTiles() {
     List<T> allTiles = new ArrayList<>();
@@ -338,6 +356,7 @@ public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAc
     return allTiles;
   }
 
+  @Override
   public int getTileCount() {
     return getTileGrids()
         .stream()
@@ -345,6 +364,7 @@ public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAc
         .sum();
   }
 
+  @Override
   public void addTilesFilter(ITileFilter filter) {
     m_tileFilters.add(filter);
     addFilterToAllTileGrids(filter);
@@ -354,6 +374,7 @@ public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAc
     getTileGrids().forEach(tileGrid -> tileGrid.addFilter(filter));
   }
 
+  @Override
   public void removeTilesFilter(ITileFilter filter) {
     m_tileFilters.remove(filter);
     removeFilterFromAllTileGrids(filter);
@@ -363,161 +384,219 @@ public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAc
     getTileGrids().forEach(tileGrid -> tileGrid.removeFilter(filter));
   }
 
+  @Override
   public void deleteAllTiles() {
     setTiles(new ArrayList<>());
   }
 
+  @Override
   public void deleteTiles(Collection<T> tiles) {
     tiles.forEach(tile -> this.deleteTile(tile));
   }
 
+  @Override
   public void deleteTile(T tile) {
     deleteTiles(CollectionUtility.arrayList(tile));
   }
 
+  @Override
   public void deleteTiles(List<T> tilesToDelete) {
     List<T> tiles = new ArrayList<>(getTiles());
     tiles.removeAll(tilesToDelete);
     setTiles(tiles);
   }
 
+  @Override
   public void filterTiles() {
     getTileGrids().forEach(ITiles::filter);
   }
 
+  @Override
   public void setTileComparator(Comparator<T> comparator) {
     getTileGrids().forEach(tileGrid -> tileGrid.setComparator(comparator));
   }
 
   /**
-   * Returns the comparator of the active group manager if there is one, otherwise returns {@link #getComparator()}. This
-   * means the comparator of the group manager has higher priority.
+   * Returns the comparator of the active group manager if there is one, otherwise returns {@link #getComparator()}.
+   * This means the comparator of the group manager has higher priority.
    */
   @Override
-  public Comparator<? extends IGroup> resolveComparator() {
+  protected Comparator<? extends IGroup> resolveComparator() {
     if (getGroupManager() != null && getGroupManager().getComparator() != null) {
       return getGroupManager().getComparator();
     }
     return super.getComparator();
   }
 
+  @Override
   public T getSelectedTile() {
     for (ITiles<T> tileGrid : getTileGrids()) {
-      if (tileGrid.getSelectedTile() != null) {
-        return tileGrid.getSelectedTile();
+      T selectedTile = tileGrid.getSelectedTile();
+      if (selectedTile != null) {
+        return selectedTile;
       }
     }
     return null;
   }
 
+  @Override
+  @SuppressWarnings("unchecked")
   public List<T> getSelectedTiles() {
-    for (ITiles<T> tileGrid : getTileGrids()) {
-      List<T> selectedTiles = tileGrid.getSelectedTiles();
-      if (selectedTiles != null && selectedTiles.size() != 0) {
-        return selectedTiles;
-      }
+    List<T> selectedTiles = new ArrayList<>();
+    for (ITiles<T> tiles : getTileGrids()) {
+      selectedTiles.addAll(((AbstractTiles) tiles).getSelectedTilesInternal());
     }
-    return Collections.emptyList();
+    return selectedTiles;
   }
 
+  @Override
+  public int getSelectedTileCount() {
+    return getTileGrids()
+        .stream()
+        .mapToInt(ITiles::getSelectedTileCount)
+        .sum();
+  }
+
+  @Override
   public void selectTile(T tile) {
     selectTiles(CollectionUtility.arrayList(tile));
   }
 
+  @Override
   public void selectTiles(List<T> tiles) {
     // Split tiles into separate lists for each group
-    Map<IGroup, List<T>> tilesPerGroup = groupTiles(tiles);
+    // Process tiles in reverse order so that selectTiles(tile0, tile1) with multiSelect = false
+    // will lead to the same result as done with AbstractTiles directly
+    Map<IGroup, List<T>> tilesPerGroup = groupTilesReverse(tiles);
 
-    // Delegate to the corresponding tile grids
+    // Deselect tiles from groups which don't contain any of the newly selected tiles
+    List<? extends IGroup> groups = getGroups();
+    groups.removeAll(tilesPerGroup.keySet());
+    for (IGroup group : groups) {
+      getTileGrid(group).deselectAllTiles();
+    }
+
+    // Select the tiles in the the corresponding tile grids
     for (Entry<IGroup, List<T>> entry : tilesPerGroup.entrySet()) {
       getTileGrid(entry.getKey()).selectTiles(entry.getValue());
     }
   }
 
+  @Override
   public void selectAllTiles() {
     getTileGrids().forEach(ITiles::selectAllTiles);
   }
 
+  @Override
   public void deselectTile(T tile) {
     deselectTiles(CollectionUtility.arrayList(tile));
   }
 
+  @Override
   public void deselectTiles(List<T> tiles) {
     getTileGrids().forEach(tileGrid -> tileGrid.deselectTiles(tiles));
   }
 
+  @Override
   public void deselectAllTiles() {
     getTileGrids().forEach(ITiles::deselectAllTiles);
   }
 
-  protected Map<IGroup, List<T>> groupTiles(List<T> tiles) {
-    Map<IGroup, List<T>> tilesPerGroup = new HashMap<>();
+  protected Map<IGroup, List<T>> groupTilesReverse(List<T> tiles) {
+    Map<IGroup, List<T>> tilesPerGroup = new LinkedHashMap<>();
     // Split tiles to select into separate lists for each group
-    for (T tile : tiles) {
+    for (int i = tiles.size() - 1; i >= 0; i--) {
+      T tile = tiles.get(i);
       IGroup group = getGroupByTile(tile);
       tilesPerGroup.computeIfAbsent(group, t -> new ArrayList<>()).add(tile);
     }
     return tilesPerGroup;
   }
 
+  @Override
   public void setGridColumnCount(int gridColumnCount) {
+    propertySupport.setPropertyInt(PROP_GRID_COLUMN_COUNT, gridColumnCount);
     getTileGrids().forEach(tileGrid -> tileGrid.setGridColumnCount(gridColumnCount));
   }
 
-  /**
-   * @return the value of {@link ITiles#getGridColumnCount()} of the first tile grid assuming that all tile grids use the
-   *         same column count
-   */
+  @Override
   public int getGridColumnCount() {
-    return getTileGrids().get(0).getGridColumnCount();
+    return propertySupport.getPropertyInt(PROP_GRID_COLUMN_COUNT);
   }
 
+  @Override
   public void setSelectable(boolean selectable) {
+    propertySupport.setPropertyBool(PROP_SELECTABLE, selectable);
     getTileGrids().forEach(tileGrid -> tileGrid.setSelectable(selectable));
   }
 
-  /**
-   * @return the value of {@link ITiles#isSelectable()} of the first tile grid assuming that all tile grids use the same
-   *         value
-   */
+  @Override
   public boolean isSelectable() {
-    return getTileGrids().get(0).isSelectable();
+    return propertySupport.getPropertyBool(PROP_SELECTABLE);
   }
 
+  @Override
   public void setMultiSelect(boolean multiSelect) {
+    propertySupport.setPropertyBool(PROP_MULTI_SELECT, multiSelect);
     getTileGrids().forEach(tileGrid -> tileGrid.setMultiSelect(multiSelect));
   }
 
-  /**
-   * @return the value of {@link ITiles#isMultiSelect()} of the first tile grid assuming that all tile grids use the same
-   *         value
-   */
+  @Override
   public boolean isMultiSelect() {
-    return getTileGrids().get(0).isMultiSelect();
+    return propertySupport.getPropertyBool(PROP_MULTI_SELECT);
   }
 
+  @Override
   public void setWithPlaceholders(boolean withPlaceholders) {
+    propertySupport.setPropertyBool(PROP_WITH_PLACEHOLDERS, withPlaceholders);
     getTileGrids().forEach(tileGrid -> tileGrid.setWithPlaceholders(withPlaceholders));
   }
 
-  /**
-   * @return the value of {@link ITiles#isWithPlaceholders()} of the first tile grid assuming that all tile grids use the
-   *         same value
-   */
+  @Override
   public boolean isWithPlaceholders() {
-    return getTileGrids().get(0).isWithPlaceholders();
+    return propertySupport.getPropertyBool(PROP_WITH_PLACEHOLDERS);
   }
 
+  @Override
   public void setTileGridLayoutConfig(TilesLayoutConfig layoutConfig) {
+    propertySupport.setProperty(PROP_TILE_GRID_LAYOUT_CONFIG, layoutConfig);
     getTileGrids().forEach(tileGrid -> tileGrid.setLayoutConfig(layoutConfig));
   }
 
-  /**
-   * @return the value of {@link ITiles#getLayoutConfig()} of the first tile grid assuming that all tile grids use the
-   *         same value
-   */
+  @Override
   public TilesLayoutConfig getTileGridLayoutConfig() {
-    return getTileGrids().get(0).getLayoutConfig();
+    return (TilesLayoutConfig) propertySupport.getProperty(PROP_TILE_GRID_LAYOUT_CONFIG);
+  }
+
+  protected void handleSelectedTilesChange(IGroup changedGroup, PropertyChangeEvent event) {
+    if (m_selectionUpdateLocked) {
+      return;
+    }
+    List<? extends ITile> selectedTiles = getTileGrid(changedGroup).getSelectedTiles();
+    if (!isMultiSelect() && selectedTiles.size() > 0) {
+      m_selectionUpdateLocked = true;
+      try {
+        // make sure only one group has selected tiles
+        for (IGroup group : getGroupsInternal()) {
+          if (group != changedGroup) {
+            getTileGrid(group).deselectAllTiles();
+          }
+        }
+      }
+      finally {
+        m_selectionUpdateLocked = false;
+      }
+    }
+    propertySupport.setProperty(PROP_SELECTED_TILES, getSelectedTiles());
+  }
+
+  protected void handleFilteredTilesChange(IGroup changedGroup, PropertyChangeEvent event) {
+    updateGroupTitleSuffix(changedGroup);
+  }
+
+  protected void updateGroupTitleSuffix(IGroup group) {
+    int numFilteredTiles = getTileGrid(group).getFilteredTileCount();
+    group.setTitleSuffix("(" + numFilteredTiles + ")");
   }
 
   public class P_FilteredTilesListener implements PropertyChangeListener {
@@ -531,29 +610,10 @@ public abstract class AbstractTilesAccordion<T extends ITile> extends AbstractAc
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
       if (ITiles.PROP_FILTERED_TILES.equals(evt.getPropertyName())) {
-        int numFilteredTiles = getTileGrid(m_group).getFilteredTileCount();
-        m_group.setTitleSuffix("(" + numFilteredTiles + ")");
+        handleFilteredTilesChange(m_group, evt);
       }
       else if (ITiles.PROP_SELECTED_TILES.equals(evt.getPropertyName())) {
-        List<? extends ITile> selectedTiles = getTileGrid(m_group).getSelectedTiles();
-        if (selectedTiles.size() > 0) {
-          // make sure only one group has selected tiles
-          if (m_selectionUpdateLocked) {
-            return;
-          }
-          m_selectionUpdateLocked = true;
-          try {
-            for (IGroup group : getGroupsInternal()) {
-              if (group != m_group) {
-                getTileGrid(group).deselectAllTiles();
-              }
-            }
-          }
-          finally {
-            m_selectionUpdateLocked = false;
-          }
-        }
-        propertySupport.setProperty(PROP_SELECTED_TILES, selectedTiles);
+        handleSelectedTilesChange(m_group, evt);
       }
     }
   }

@@ -23,14 +23,15 @@ scout.Tiles = function() {
   this.layoutConfig = null;
   this.menus = [];
   this.multiSelect = true;
-  this.withPlaceholders = false;
+  this.renderAnimationEnabled = false;
   this.selectable = false;
   this.selectedTiles = [];
+  this.selectionHandler = new scout.TilesSelectionHandler(this);
   this.scrollable = true;
-  this.renderAnimationEnabled = false;
   this.startupAnimationDone = false;
   this.startupAnimationEnabled = false;
   this.tiles = [];
+  this.withPlaceholders = false;
   this._filterMenusHandler = this._filterMenus.bind(this);
   this._addWidgetProperties(['tiles', 'selectedTiles', 'menus']);
   this._addPreserveOnPropertyChangeProperties(['selectedTiles']);
@@ -563,7 +564,8 @@ scout.Tiles.prototype.setMultiSelect = function(multiSelect) {
  */
 scout.Tiles.prototype.selectTiles = function(tiles) {
   tiles = scout.arrays.ensure(tiles);
-  tiles = this._prepareWidgetProperty('selectedTiles', tiles);
+  // Ensure given tiles are real tiles (of type scout.Tile)
+  tiles = this._createChildren(tiles);
   tiles = this._filterTiles(tiles); // Selecting invisible tiles is not allowed
 
   // Deselect the tiles which are not part of the new selection
@@ -638,45 +640,12 @@ scout.Tiles.prototype._onTileMouseDown = function(event) {
   }
 };
 
+scout.Tiles.prototype.setSelectionHandler = function(selectionHandler) {
+  this.selectionHandler = selectionHandler;
+};
+
 scout.Tiles.prototype._selectTileOnMouseDown = function(event) {
-  if (!this.selectable) {
-    return;
-  }
-
-  var $tile = $(event.currentTarget);
-  var tile = $tile.data('widget');
-
-  if (tile instanceof scout.PlaceholderTile) {
-    return;
-  }
-  if (tile.selected && event.which === 3) {
-    // Do not toggle if context menus should be shown and tile already is selected
-    return;
-  }
-
-  // Click on a tile toggles the selection ...
-  var selected = !tile.selected;
-  if (tile.selected && this.selectedTiles.length > 1 && !event.ctrlKey) {
-    // ... but if multiple tiles are selected, click on an already selected tile deselects every other tile but keeps the selection of the clicked one
-    selected = true;
-  }
-
-  // CTRL click on a tile adds or removes that tile to or from the selection
-  if (this.multiSelect && event.ctrlKey) {
-    if (selected) {
-      this.addTilesToSelection(tile);
-    } else {
-      this.deselectTile(tile);
-    }
-    return;
-  }
-
-  // If multi selection is disabled or no CTRL key is pressed, only the clicked tile may be selected
-  if (selected) {
-    this.selectTile(tile);
-  } else {
-    this.deselectAllTiles();
-  }
+  this.selectionHandler.selectTileOnMouseDown(event);
 };
 
 scout.Tiles.prototype.addFilter = function(filter) {

@@ -88,6 +88,7 @@ import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.tile.IFormFieldTile;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.client.ui.tile.ITiles;
+import org.eclipse.scout.rt.client.ui.tile.ITilesAccordion;
 import org.eclipse.scout.rt.client.ui.tile.IWidgetTile;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.Order;
@@ -172,6 +173,7 @@ import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTextColumnUserFilt
 import org.eclipse.scout.rt.ui.html.json.tile.JsonFormFieldTile;
 import org.eclipse.scout.rt.ui.html.json.tile.JsonTile;
 import org.eclipse.scout.rt.ui.html.json.tile.JsonTiles;
+import org.eclipse.scout.rt.ui.html.json.tile.JsonTilesAccordion;
 import org.eclipse.scout.rt.ui.html.json.tile.JsonWidgetTile;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 
@@ -377,6 +379,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof ITiles) {
       return new JsonTiles<>((ITiles) model, session, id, parent);
+    }
+    if (model instanceof ITilesAccordion) {
+      return new JsonTilesAccordion<>((ITilesAccordion) model, session, id, parent);
     }
     if (model instanceof IGroup) {
       return new JsonGroup<>((IGroup) model, session, id, parent);

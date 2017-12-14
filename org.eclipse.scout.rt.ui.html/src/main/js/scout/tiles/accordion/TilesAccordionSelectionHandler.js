@@ -8,18 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.tiles {
-  overflow: hidden;
+scout.TilesAccordionSelectionHandler = function(tilesAccordion) {
+  scout.TilesAccordionSelectionHandler.parent.call(this, tilesAccordion);
+  // The difference to the main selectionHandler is that this one works on the TilesAccordion rather than on the Tiles
+};
+scout.inherits(scout.TilesAccordionSelectionHandler, scout.TilesSelectionHandler);
 
-  &.selectable {
-    padding: 10px;
-  }
-
-  &.scrollable {
-    padding-right: 15px;
-  }
-
-  & > .scrollbar {
-    transition: opacity 80ms ease-out;
-  }
-}
+/**
+ * @override
+ */
+scout.TilesAccordionSelectionHandler.prototype.getSelectedTiles = function(event) {
+  return this.tiles.getSelectedTiles();
+};

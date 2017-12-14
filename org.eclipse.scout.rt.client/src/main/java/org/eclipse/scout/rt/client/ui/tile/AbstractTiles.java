@@ -324,9 +324,7 @@ public abstract class AbstractTiles<T extends ITile> extends AbstractWidget impl
     // Dispose old tiles (only if they are not in the new list)
     List<T> tilesToDelete = new ArrayList<>(existingTiles);
     tilesToDelete.removeAll(tiles);
-    for (T tile : tilesToDelete) {
-      tile.dispose();
-    }
+    deleteTilesInternal(tilesToDelete);
     deselectTiles(tilesToDelete);
 
     // Initialize new tiles
@@ -334,8 +332,28 @@ public abstract class AbstractTiles<T extends ITile> extends AbstractWidget impl
     // if they are added while initConfig runs, initTiles() will take care of the initialization which will be called by the container (e.g. TilesField)
     List<T> tilesToInsert = new ArrayList<>(tiles);
     tilesToInsert.removeAll(existingTiles);
+    addTilesInternal(tilesToInsert);
+
+    sortInternal(tiles);
+    setTilesInternal(tiles);
+
+    m_filteredRowsDirty = true;
+    applyFilters(tilesToInsert);
+  }
+
+  protected void deleteTilesInternal(List<T> tilesToDelete) {
+    for (T tile : tilesToDelete) {
+      deleteTileInternal(tile);
+    }
+  }
+
+  protected void deleteTileInternal(T tile) {
+    tile.dispose();
+  }
+
+  protected void addTilesInternal(List<T> tilesToInsert) {
     for (T tile : tilesToInsert) {
-      tile.setContainer(this);
+      addTileInternal(tile);
     }
     // Initialize after every tile has been linked to the container, so that it is possible to access other tiles in tile.execInit
     if (isInitConfigDone()) {
@@ -344,12 +362,10 @@ public abstract class AbstractTiles<T extends ITile> extends AbstractWidget impl
         tile.init();
       }
     }
+  }
 
-    sortInternal(tiles);
-    setTilesInternal(tiles);
-
-    m_filteredRowsDirty = true;
-    applyFilters(tilesToInsert);
+  protected void addTileInternal(T tile) {
+    tile.setContainer(this);
   }
 
   protected void setTilesInternal(List<T> tiles) {
@@ -523,7 +539,7 @@ public abstract class AbstractTiles<T extends ITile> extends AbstractWidget impl
   /**
    * @return the live list of the selected tiles
    */
-  protected List<T> getSelectedTilesInternal() {
+  public List<T> getSelectedTilesInternal() {
     return propertySupport.getPropertyList(PROP_SELECTED_TILES);
   }
 
