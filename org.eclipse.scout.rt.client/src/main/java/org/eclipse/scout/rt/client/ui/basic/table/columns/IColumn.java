@@ -51,6 +51,10 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    */
   String PROP_MIN_WIDTH = "minWidth";
   /**
+   * type int
+   */
+  String PROP_AUTO_OPTIMIZE_MAX_WIDTH = "autoOptimizeMaxWidth";
+  /**
    * type boolean
    */
   String PROP_FIXED_WIDTH = "fixedWidth";
@@ -254,6 +258,10 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
   int getMinWidth();
 
   void setMinWidth(int w);
+
+  int getAutoOptimizeMaxWidth();
+
+  void setAutoOptimizeMaxWidth(int w);
 
   /**
    * @return <code>true</code>, if the column width is fixed, meaning that it is not changed by resizing/auto-resizing

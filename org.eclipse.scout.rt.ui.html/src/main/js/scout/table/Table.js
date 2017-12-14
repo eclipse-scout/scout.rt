@@ -2829,11 +2829,14 @@ scout.Table.prototype.resetFilter = function() {
   this._triggerFilterReset();
 };
 
-scout.Table.prototype.resizeToFit = function(column) {
+scout.Table.prototype.resizeToFit = function(column, maxWidth) {
   if (column.fixedWidth) {
     return;
   }
   var calculatedSize = column.calculateOptimalWidth();
+  if (maxWidth && maxWidth > 0 && calculatedSize > maxWidth){
+    calculatedSize = maxWidth;
+  }
   if (scout.device.isInternetExplorer() && calculatedSize !== column.minWidth) {
     calculatedSize++;
   }

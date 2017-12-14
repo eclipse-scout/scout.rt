@@ -32,6 +32,7 @@ scout.Column = function() {
   this.initialWidth = undefined; // the width the column initially has
   this.prefMinWidth = null;
   this.minWidth = scout.Column.DEFAULT_MIN_WIDTH; // the minimal width the column can have
+  this.autoOptimizeMaxWidth = -1;
   this.showSeparator = true;
   this.textWrap = false;
   this.filterType = 'TextColumnUserFilter';
