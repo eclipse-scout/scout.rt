@@ -195,7 +195,7 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
   }
 
   protected void handleUiValueChange(JSONObject data) {
-    String jsonValue = data.optString(IValueField.PROP_VALUE, null);
+    Object jsonValue = data.opt(IValueField.PROP_VALUE);
     Object value = jsonToValue(jsonValue);
     addPropertyEventFilterCondition(IValueField.PROP_VALUE, value);
     setValueFromUI(value);
@@ -205,7 +205,7 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
     // NOP may be implemented by sub-classes, using the individual UI facade implementation
   }
 
-  protected Object jsonToValue(String jsonValue) {
+  protected Object jsonToValue(Object jsonValue) {
     return jsonValue;
   }
 

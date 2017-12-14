@@ -140,8 +140,8 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
   }
 
   @Override
-  protected Object jsonToValue(String jsonValue) {
-    return new JsonDate(jsonValue).asJavaDate();
+  protected Object jsonToValue(Object jsonValue) {
+    return new JsonDate((String) jsonValue).asJavaDate();
   }
 
   @Override

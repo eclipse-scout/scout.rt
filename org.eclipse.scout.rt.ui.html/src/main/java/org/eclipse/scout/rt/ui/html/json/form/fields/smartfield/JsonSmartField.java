@@ -254,8 +254,8 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
   }
 
   @Override
-  protected Object jsonToValue(String jsonValue) {
-    return getLookupRowKeyForId(jsonValue); // jsonValue == mapped key
+  protected Object jsonToValue(Object jsonValue) {
+    return getLookupRowKeyForId((String) jsonValue); // jsonValue == mapped key
   }
 
   protected Object valueToJson(VALUE value) {

@@ -447,6 +447,11 @@
   __include("scout/form/fields/tabbox/TabItemLayout.js");
   __include("scout/form/fields/tablefield/TableField.js");
   __include("scout/form/fields/tablefield/TableFieldAdapter.js");
+  __include("scout/form/fields/tagfield/TagField.js");
+  __include("scout/form/fields/tagfield/TagFieldAdapter.js");
+  __include("scout/form/fields/tagfield/TagFieldEnterKeyStroke.js");
+  __include("scout/form/fields/tagfield/TagFieldLayout.js");
+  __include("scout/form/fields/tagfield/TagFieldPopup.js");
   __include("scout/form/fields/tilesfield/TilesField.js");
   __include("scout/form/fields/tilesfield/TilesFieldAdapter.js");
   __include("scout/form/fields/treebox/TreeBox.js");

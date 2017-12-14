@@ -77,6 +77,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
+import org.eclipse.scout.rt.client.ui.form.fields.tagfield.ITagField;
 import org.eclipse.scout.rt.client.ui.form.fields.tilesfield.ITilesField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
@@ -141,6 +142,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.stringfield.JsonStringField
 import org.eclipse.scout.rt.ui.html.json.form.fields.tabbox.JsonTabBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tabbox.JsonTabItem;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tablefield.JsonTableField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.tagfield.JsonTagField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tilesfield.JsonTilesField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.treebox.JsonTreeBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.treefield.JsonTreeField;
@@ -287,6 +289,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof IAccordionField<?>) {
       return new JsonAccordionField<IAccordionField<? extends IAccordion>>((IAccordionField<?>) model, session, id, parent);
+    }
+    if (model instanceof ITagField) {
+      return new JsonTagField((ITagField) model, session, id, parent);
     }
 
     // --- other model objects ---

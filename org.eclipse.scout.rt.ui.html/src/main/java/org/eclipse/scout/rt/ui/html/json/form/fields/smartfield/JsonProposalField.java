@@ -48,7 +48,7 @@ public class JsonProposalField<VALUE, MODEL extends IProposalField<VALUE>> exten
   }
 
   @Override
-  protected Object jsonToValue(String jsonValue) {
+  protected Object jsonToValue(Object jsonValue) {
     return jsonValue; // simply return the string
   }
 
