@@ -16,9 +16,9 @@ scout.inherits(scout.TagFieldLayout, scout.AbstractLayout);
 
 /**
  * When there is not a lot of space in a single line field, the input field should at least
- * have 25% of the available width, which means 75% is used to display tags.
+ * have 33% of the available width, which means 66% is used to display tags.
  */
-scout.TagFieldLayout.MIN_INPUT_TAG_RATIO = 0.25;
+scout.TagFieldLayout.MIN_INPUT_TAG_RATIO = 0.33;
 
 scout.TagFieldLayout.prototype.layout = function($container) {
   if (this.tagField.gridData.h > 1) {
@@ -44,29 +44,58 @@ scout.TagFieldLayout.prototype._layoutSingleLine = function($container) {
     var prefTagsWidth = 0;
     var overflow = false;
 
-    $container.find('.tag-element').each(function() {
-      var $tagElement = $(this);
-      $tagElement.removeClass('hidden');
+    // 1. check if overflow occurs
+    var $te, i;
+    var $tagElements = $container.find('.tag-element');
+    var numTagElements = $tagElements.length;
+    var teSizes = [];
+    $tagElements.removeClass('hidden');
 
-      if (!overflow) {
-        prefTagsWidth += scout.graphics.size($tagElement).width;
-        overflow = prefTagsWidth > maxTagsWidth;
-      }
-
+    // use a for loop, because don't want to loop all elements when we already know the rest is in overflow
+    for (i = numTagElements - 1; i >= 0; i--) {
+      $te = $($tagElements[i]);
+      teSizes[i] = scout.graphics.size($te, {includeMargin: true});
+      overflow = (prefTagsWidth + teSizes[i].width) > maxTagsWidth;
       if (overflow) {
-        $tagElement.addClass('hidden');
+        break;
       }
-    });
+      prefTagsWidth += teSizes[i].width;
+    }
 
+    // 2. add overflow icon
+    this.tagField.setOverflowVisible(overflow);
+
+    if (overflow) {
+      prefTagsWidth = scout.graphics.size(this.tagField.$overflowIcon, {includeMargin: true}).width;
+      for (i = numTagElements - 1; i >= 0; i--) {
+        $te = $($tagElements[i]);
+
+        // all elements with a greater index are hidden for sure
+        var teSize = teSizes[i];
+        if (!teSize) {
+          $te.addClass('hidden');
+          continue;
+        }
+
+        // we must re-check the rest again, because we have added the
+        // overflow icon and thus we have less space for tags
+        if ((prefTagsWidth + teSizes[i].width) > maxTagsWidth) {
+          $te.addClass('hidden');
+        } else {
+          prefTagsWidth += teSizes[i].width;
+        }
+      }
+    }
 
     var inputWidth = availableSize.width - prefTagsWidth;
-    this.tagField.setOverflowVisible(overflow); // FIXME [awe] must also subtract size from overflow icon
-
     scout.graphics.setSize(this.tagField.$field, inputWidth, 'auto');
 
+    if (this.tagField.modelClass === "org.eclipse.scout.widgets.client.ui.forms.TagFieldForm$MainBox$ExamplesBox$DefaultField") {
     console.log('aW=' + availableSize.width
+        + ' mTW=' + maxTagsWidth
         + ' pTW=' + prefTagsWidth
         + ' iW=' + inputWidth);
+    }
   } else {
     this.tagField.$field.addClass('fullwidth');
   }

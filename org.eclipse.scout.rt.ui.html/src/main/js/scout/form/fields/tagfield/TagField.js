@@ -55,14 +55,11 @@ scout.TagField.prototype._renderProperties = function() {
 };
 
 scout.TagField.prototype._renderValue = function() {
-  var $cont = this.$fieldContainer;
-  $cont.find('.tag-element').remove();
-
+  this.$fieldContainer.find('.tag-element').remove();
   var tags = scout.arrays.ensure(this.value);
   tags.forEach(function(tag) {
-
-    var $element = $cont
-      .prependDiv('tag-element')
+    var $element = this.$fieldContainer  // FIXME [awe] remove copy/paste, see TagFieldPopup.js
+      .makeDiv('tag-element')
       .text(tag);
 
     $element
@@ -71,9 +68,13 @@ scout.TagField.prototype._renderValue = function() {
       .on('click', this._onTagElementRemove.bind(this))
       .text('x');
 
+    $element.insertBefore(this.$field);
+
   }.bind(this));
 
-  this.fieldHtmlComp.revalidateLayout();
+  if (!this.rendering) {
+    this.fieldHtmlComp.revalidateLayout();
+  }
 };
 
 scout.TagField.prototype.formatValue = function(value) {
@@ -150,9 +151,9 @@ scout.TagField.prototype._renderOverflowVisible = function() {
   if (this.overflowVisible) {
     if (!this.$overflowIcon) {
       this.$overflowIcon = this.$fieldContainer
-      .prependDiv('overflow-icon')
-      .on('click', this._onOverflowIconClick.bind(this))
-      .text('V');
+        .prependDiv('overflow-icon')
+        .on('click', this._onOverflowIconClick.bind(this))
+        .text('V');
     }
   } else {
     if (this.$overflowIcon) {

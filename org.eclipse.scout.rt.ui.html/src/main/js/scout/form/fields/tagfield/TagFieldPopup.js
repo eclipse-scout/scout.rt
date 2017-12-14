@@ -35,7 +35,7 @@ scout.TagFieldPopup.prototype._renderTags = function() {
 
 scout.TagFieldPopup.prototype._renderTagElement = function(tag) {
   var $element = this.$body
-    .prependDiv('tag-element')
+    .appendDiv('tag-element')
     .text(tag);
 
   $element
