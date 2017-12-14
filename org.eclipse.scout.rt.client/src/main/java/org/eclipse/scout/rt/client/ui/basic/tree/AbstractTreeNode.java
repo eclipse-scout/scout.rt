@@ -971,9 +971,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
         return;
       }
     }
-    if (node.isChildrenLoaded()) {
-      node.setLeafInternal(node.getChildNodeCount() == 0);
-    }
     if (includeSubtree) {
       for (ITreeNode ch : node.getChildNodes()) {
         //quick-check: is node child of itself
