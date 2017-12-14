@@ -309,6 +309,7 @@
     },
     "Column": {
       "autoOptimizeWidth": false,
+      "autoOptimizeMaxWidth": -1,
       "editable": false,
       "enabled": true,
       "fixedWidth": false,

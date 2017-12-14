@@ -68,6 +68,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     json.put("text", getColumn().getHeaderCell().getText());
     json.put(IColumn.PROP_WIDTH, getColumn().getWidth());
     json.put(IColumn.PROP_MIN_WIDTH, getColumn().getMinWidth());
+    json.put(IColumn.PROP_AUTO_OPTIMIZE_MAX_WIDTH, getColumn().getAutoOptimizeMaxWidth());
     if (getColumn().getInitialWidth() != getColumn().getWidth()) {
       json.put("initialWidth", getColumn().getInitialWidth());
     }

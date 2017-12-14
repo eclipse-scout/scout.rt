@@ -106,7 +106,7 @@ scout.TableLayout.prototype._layoutColumns = function() {
 scout.TableLayout.prototype._autoOptimizeColumnsWidths = function() {
   this.table.visibleColumns().forEach(function(column) {
     if (column.autoOptimizeWidth && column.autoOptimizeWidthRequired) {
-      this.table.resizeToFit(column);
+      this.table.resizeToFit(column, column.autoOptimizeMaxWidth);
     }
   }, this);
 };

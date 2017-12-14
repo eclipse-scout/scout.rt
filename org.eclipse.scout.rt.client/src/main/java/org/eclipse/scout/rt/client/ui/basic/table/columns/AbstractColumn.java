@@ -556,6 +556,19 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
+   * Configures the maximum width of this column when auto optimized. The user can still make the column wider, though.
+   * <p>
+   * Subclasses can override this method. Default is {@code -1} (no maximum width restriction).
+   *
+   * @return Maximum width of this column when auto optimized, or {@code -1} if there is no maximum width restriction.
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(195)
+  protected int getConfiguredAutoOptimizeMaxWidth() {
+    return -1;
+  }
+
+  /**
    * Configures whether this column value is mandatory / required. This only affects editable columns (see
    * {@link #getConfiguredEditable()} ).
    * <p>
@@ -890,6 +903,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     setOrder(calculateViewOrder());
     setWidth(getConfiguredWidth());
     setMinWidth(getConfiguredMinWidth());
+    setAutoOptimizeMaxWidth(getConfiguredAutoOptimizeMaxWidth());
     setFixedWidth(getConfiguredFixedWidth());
     m_flags = FLAGS_BIT_HELPER.changeBit(PRIMARY_KEY, getConfiguredPrimaryKey(), m_flags);
     m_flags = FLAGS_BIT_HELPER.changeBit(SUMMARY, getConfiguredSummary(), m_flags);
@@ -1944,6 +1958,16 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public void setAutoOptimizeWidth(boolean optimize) {
     propertySupport.setPropertyBool(PROP_AUTO_OPTIMIZE_WIDTH, optimize);
+  }
+
+  @Override
+  public int getAutoOptimizeMaxWidth() {
+    return propertySupport.getPropertyInt(PROP_AUTO_OPTIMIZE_MAX_WIDTH);
+  }
+
+  @Override
+  public void setAutoOptimizeMaxWidth(int w) {
+    propertySupport.setPropertyInt(PROP_AUTO_OPTIMIZE_MAX_WIDTH, w);
   }
 
   @Override
