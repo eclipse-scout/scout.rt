@@ -11,10 +11,11 @@
   & > input {
     border: none;
     padding: 0 3px;
-/*     background-color: yellow; */
 
     &.fullwidth {
       width: 100%;
+      height: 100%;
+      padding: 0 10px;
     }
 
     &.focused, &:focus {
@@ -27,6 +28,7 @@
   display: inline-block;
   user-select: none;
   white-space: nowrap;
+  color: @tag-text-color;
 
   border-radius: 2px;
   background-color: @tag-element-background-color;
@@ -43,6 +45,9 @@
 
 .tag-element {
   & > .tag-text {
+    max-width: 85px;
+    overflow: hidden;
+    text-overflow: ellipsis;
     margin-bottom: 1px;
     display: inline-block;
     vertical-align: middle;

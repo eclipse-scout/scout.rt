@@ -37,14 +37,11 @@ scout.TagField.prototype._render = function() {
   this.addFieldContainer(this.$parent.makeDiv());
   this.fieldHtmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
   this.fieldHtmlComp.setLayout(new scout.TagFieldLayout(this));
-  var $field = this.$fieldContainer.appendElement('<input>', 'field');
+  var $field = this.$fieldContainer.appendElement('<input>', 'field'); // FIXME [awe] hide input field when disabled and no displayText is set
 
   this.addField($field);
   this.addStatus();
-
-  if (this.gridData.h > 1) {
-    this.$fieldContainer.addClass('multiline');
-  }
+  this._installTooltipSupport();
 };
 
 scout.TagField.prototype._renderProperties = function() {
@@ -52,6 +49,11 @@ scout.TagField.prototype._renderProperties = function() {
 
   this._renderValue();
   this._renderOverflowVisible();
+};
+
+scout.TagField.prototype._remove = function() {
+  scout.TagField.parent.prototype._remove.call(this);
+  this._uninstallTooltipSupport();
 };
 
 scout.TagField.prototype._renderValue = function() {
@@ -103,8 +105,28 @@ scout.TagField.prototype._parseValue = function(displayText) {
 };
 
 scout.TagField.prototype._renderDisplayText = function() {
-  this.$field.val(this.displayText);
   scout.TagField.parent.prototype._renderDisplayText.call(this);
+  this.$field.val(this.displayText);
+  this._updateInputVisible();
+};
+
+scout.TagField.prototype._renderEnabled = function() {
+  scout.TagField.parent.prototype._renderEnabled.call(this);
+  this._updateInputVisible();
+};
+
+scout.TagField.prototype._updateInputVisible = function() {
+  var visible, oldVisible = !this.$field.isVisible();
+  if (this.enabledComputed) {
+    visible = true;
+  } else {
+    visible = scout.strings.hasText(this.displayText);
+  }
+  this.$field.setVisible(visible);
+  // update tag-elements (must remove X when disabled)
+  if (visible !== oldVisible) {
+    this._renderValue();
+  }
 };
 
 scout.TagField.prototype._readDisplayText = function() {
@@ -179,4 +201,23 @@ scout.TagField.prototype._openOverflowPopup = function() {
     $anchor: this.$fieldContainer
   });
   popup.open();
+};
+
+scout.TagField.prototype._installTooltipSupport = function() {
+  scout.tooltips.install(this.$fieldContainer, {
+    parent: this,
+    selector: '.tag-text',
+    text: this._tagTooltipText.bind(this),
+    arrowPosition: 50,
+    arrowPositionUnit: '%',
+    nativeTooltip: !scout.device.isCustomEllipsisTooltipPossible()
+  });
+};
+
+scout.TagField.prototype._uninstallTooltipSupport = function() {
+  scout.tooltips.uninstall(this.$fieldContainer);
+};
+
+scout.TagField.prototype._tagTooltipText = function($tag) {
+  return $tag.isContentTruncated() ? $tag.text() : null;
 };

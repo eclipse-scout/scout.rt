@@ -60,6 +60,10 @@ scout.TagFieldPopup.prototype._onTagRemoveClick = function(event) {
 
 scout.TagFieldPopup.prototype._onTagFieldPropertyChange = function(event) {
   if (event.propertyName === 'value') {
-    this._renderValue();
+    if (scout.arrays.empty(this.parent.value)) {
+      this.close();
+    } else {
+      this._renderValue();
+    }
   }
 };

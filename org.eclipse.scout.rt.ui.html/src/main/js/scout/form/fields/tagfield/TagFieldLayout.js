@@ -21,18 +21,6 @@ scout.inherits(scout.TagFieldLayout, scout.AbstractLayout);
 scout.TagFieldLayout.MIN_INPUT_TAG_RATIO = 0.33;
 
 scout.TagFieldLayout.prototype.layout = function($container) {
-  if (this.tagField.gridData.h > 1) {
-    this._layoutMultiline($container);
-  } else {
-    this._layoutSingleLine($container);
-  }
-};
-
-scout.TagFieldLayout.prototype._layoutMultiline = function($container) {
-
-};
-
-scout.TagFieldLayout.prototype._layoutSingleLine = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container);
   var hasTags = this.tagField.value && this.tagField.value.length > 0;
 
@@ -40,9 +28,14 @@ scout.TagFieldLayout.prototype._layoutSingleLine = function($container) {
     this.tagField.$field.removeClass('fullwidth');
     var availableSize = htmlContainer.availableSize()
       .subtract(htmlContainer.insets());
-    var maxTagsWidth = availableSize.width * (1 - scout.TagFieldLayout.MIN_INPUT_TAG_RATIO);
+    var maxTagsWidth = availableSize.width;
     var prefTagsWidth = 0;
     var overflow = false;
+
+    // when input field is not visible, tags may use the whole width, otherwise only a part of it
+    if (this.tagField.$field.isVisible()) {
+      maxTagsWidth = availableSize.width * (1 - scout.TagFieldLayout.MIN_INPUT_TAG_RATIO);
+    }
 
     // 1. check if overflow occurs
     var $te, i;
@@ -89,14 +82,10 @@ scout.TagFieldLayout.prototype._layoutSingleLine = function($container) {
 
     var inputWidth = availableSize.width - prefTagsWidth;
     scout.graphics.setSize(this.tagField.$field, inputWidth, 'auto');
-
-    if (this.tagField.modelClass === "org.eclipse.scout.widgets.client.ui.forms.TagFieldForm$MainBox$ExamplesBox$DefaultField") {
-    console.log('aW=' + availableSize.width
-        + ' mTW=' + maxTagsWidth
-        + ' pTW=' + prefTagsWidth
-        + ' iW=' + inputWidth);
-    }
   } else {
-    this.tagField.$field.addClass('fullwidth');
+    // remove style to delete previously set layout attributes
+    this.tagField.$field
+      .addClass('fullwidth')
+      .removeAttr('style');
   }
 };
