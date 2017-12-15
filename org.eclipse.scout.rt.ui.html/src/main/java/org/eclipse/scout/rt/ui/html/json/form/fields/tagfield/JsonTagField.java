@@ -15,7 +15,6 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.tagfield.ITagField;
-import org.eclipse.scout.rt.client.ui.form.fields.tagfield.TagFieldValue;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -41,17 +40,17 @@ public class JsonTagField extends JsonValueField<ITagField> {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<ITagField>(IValueField.PROP_VALUE, model) {
       @Override
-      protected TagFieldValue modelValue() {
+      protected Set<String> modelValue() {
         return getModel().getValue();
       }
 
       @Override
+      @SuppressWarnings("unchecked")
       public Object prepareValueForToJson(Object value) {
         if (value == null) {
           return new JSONArray();
         }
-        Set<String> tags = ((TagFieldValue) value).getTags();
-        return new JSONArray(tags);
+        return new JSONArray((Set<String>) value);
       }
     });
   }
@@ -59,13 +58,13 @@ public class JsonTagField extends JsonValueField<ITagField> {
   @Override
   protected void handleUiAcceptInput(JsonEvent event) {
     JSONObject data = event.getData();
-    TagFieldValue valueFromUi = jsonToValue(data.opt(IValueField.PROP_VALUE));
+    Set<String> valueFromUi = jsonToValue(data.opt(IValueField.PROP_VALUE));
     handleUiValueChange(data);
 
     // In case the model changes its value to something other than what the UI
     // sends, we cannot set display text and error status. This can happen if
     // execValidateValue is overridden.
-    TagFieldValue valueFromModel = getModel().getValue();
+    Set<String> valueFromModel = getModel().getValue();
     if (!ObjectUtility.equals(valueFromUi, valueFromModel)) {
       return;
     }
@@ -74,19 +73,20 @@ public class JsonTagField extends JsonValueField<ITagField> {
   }
 
   @Override
-  protected TagFieldValue jsonToValue(Object jsonValue0) {
+  protected Set<String> jsonToValue(Object jsonValue0) {
     JSONArray jsonValue = (JSONArray) jsonValue0;
     int numTags = jsonValue.length();
     Set<String> tags = new HashSet<>(numTags);
     for (int i = 0; i < numTags; i++) {
       tags.add(jsonValue.getString(i));
     }
-    return new TagFieldValue(tags);
+    return tags;
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   protected void setValueFromUI(Object value) {
-    getModel().getUIFacade().setValueFromUI((TagFieldValue) value);
+    getModel().getUIFacade().setValueFromUI((Set<String>) value);
   }
 
 }

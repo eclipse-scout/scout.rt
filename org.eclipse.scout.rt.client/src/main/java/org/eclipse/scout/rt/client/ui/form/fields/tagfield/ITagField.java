@@ -11,10 +11,11 @@
 package org.eclipse.scout.rt.client.ui.form.fields.tagfield;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
-public interface ITagField extends IValueField<TagFieldValue> {
+public interface ITagField extends IValueField<Set<String>> {
 
   void addTag(String tag);
 

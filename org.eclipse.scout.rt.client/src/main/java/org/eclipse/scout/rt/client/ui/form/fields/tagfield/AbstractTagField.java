@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 @ClassId("c3e4f668-d55b-4748-b21d-8c539c25501a")
-public abstract class AbstractTagField extends AbstractValueField<TagFieldValue> implements ITagField {
+public abstract class AbstractTagField extends AbstractValueField<Set<String>> implements ITagField {
 
   private ITagFieldUIFacade m_uiFacade;
 
@@ -34,7 +34,7 @@ public abstract class AbstractTagField extends AbstractValueField<TagFieldValue>
   }
 
   @Override
-  protected String formatValueInternal(TagFieldValue value) {
+  protected String formatValueInternal(Set<String> value) {
     // Info: value and displayText are not related in the TagField
     return "";
   }
@@ -44,20 +44,20 @@ public abstract class AbstractTagField extends AbstractValueField<TagFieldValue>
     if (StringUtility.isNullOrEmpty(tag)) {
       return;
     }
-    Set<String> tags = getOrCreateValue().getTags();
+    Set<String> tags = getOrCreateValue();
     if (tags.contains(tag)) {
       return;
     }
 
     Set<String> newTags = new HashSet<String>(tags);
     newTags.add(tag);
-    setValue(new TagFieldValue(newTags));
+    setValue(new HashSet<String>(newTags));
   }
 
-  protected TagFieldValue getOrCreateValue() {
-    TagFieldValue value = getValue();
+  protected Set<String> getOrCreateValue() {
+    Set<String> value = getValue();
     if (value == null) {
-      value = new TagFieldValue(Collections.emptySet());
+      value = new HashSet<String>(Collections.emptySet());
     }
     return value;
   }
@@ -68,11 +68,11 @@ public abstract class AbstractTagField extends AbstractValueField<TagFieldValue>
       tags0 = Collections.emptySet();
     }
     Set<String> tags = new HashSet<>(tags0);
-    if (tags.equals(getOrCreateValue().getTags())) {
+    if (tags.equals(getOrCreateValue())) {
       return;
     }
 
-    setValue(new TagFieldValue(tags));
+    setValue(new HashSet<String>(tags));
   }
 
   @Override
@@ -80,14 +80,14 @@ public abstract class AbstractTagField extends AbstractValueField<TagFieldValue>
     if (StringUtility.isNullOrEmpty(tag)) {
       return;
     }
-    Set<String> tags = getOrCreateValue().getTags();
+    Set<String> tags = getOrCreateValue();
     if (!tags.contains(tag)) {
       return;
     }
 
     Set<String> newTags = new HashSet<>(tags);
     newTags.remove(tag);
-    setValue(new TagFieldValue(newTags));
+    setValue(new HashSet<String>(newTags));
   }
 
   @Override
@@ -103,7 +103,7 @@ public abstract class AbstractTagField extends AbstractValueField<TagFieldValue>
   class P_UIFacade implements ITagFieldUIFacade {
 
     @Override
-    public void setValueFromUI(TagFieldValue value) {
+    public void setValueFromUI(Set<String> value) {
       if (!isEnabled() || !isVisible()) {
         return;
       }

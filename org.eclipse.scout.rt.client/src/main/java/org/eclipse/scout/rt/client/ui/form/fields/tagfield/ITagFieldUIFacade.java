@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.tagfield;
 
+import java.util.Set;
+
 public interface ITagFieldUIFacade {
 
-  void setValueFromUI(TagFieldValue value);
+  void setValueFromUI(Set<String> value);
 
 }
