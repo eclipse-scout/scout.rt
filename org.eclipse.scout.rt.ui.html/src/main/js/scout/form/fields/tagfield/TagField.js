@@ -56,25 +56,29 @@ scout.TagField.prototype._renderProperties = function() {
 
 scout.TagField.prototype._renderValue = function() {
   this.$fieldContainer.find('.tag-element').remove();
+
   var tags = scout.arrays.ensure(this.value);
-  tags.forEach(function(tag) {
-    var $element = this.$fieldContainer  // FIXME [awe] remove copy/paste, see TagFieldPopup.js
-      .makeDiv('tag-element')
-      .text(tag);
-
-    $element
-      .appendSpan('tag-element-remove')
-      .data('tag', tag)
-      .on('click', this._onTagElementRemove.bind(this))
-      .text('x');
-
-    $element.insertBefore(this.$field);
-
+  tags.forEach(function(tagText) {
+    this._makeTagElement(this.$fieldContainer, tagText, this._onTagRemoveClick.bind(this))
+      .insertBefore(this.$field);
   }.bind(this));
 
   if (!this.rendering) {
     this.fieldHtmlComp.revalidateLayout();
   }
+};
+
+scout.TagField.prototype._makeTagElement = function($parent, tagText, clickHandler) {
+  var $element = this.$fieldContainer.makeDiv('tag-element');
+  $element.appendSpan('tag-text', tagText);
+  if (this.enabledComputed) {
+    $element.appendSpan('tag-remove-icon')
+      .data('tag', tagText)
+      .on('click', clickHandler);
+  } else {
+    $element.addClass('disabled');
+  }
+  return $element;
 };
 
 scout.TagField.prototype.formatValue = function(value) {
@@ -93,6 +97,7 @@ scout.TagField.prototype._parseValue = function(displayText) {
     return tags;
   }
 
+  tags = tags.slice();
   tags.push(tag);
   return tags;
 };
@@ -122,7 +127,7 @@ scout.TagField.prototype._triggerAcceptInput = function() {
   });
 };
 
-scout.TagField.prototype._onTagElementRemove = function(event) {
+scout.TagField.prototype._onTagRemoveClick = function(event) {
   if (this.enabledComputed) {
     var $element = $(event.currentTarget);
     this.removeTag($element.data('tag'));
@@ -138,6 +143,7 @@ scout.TagField.prototype.removeTag = function(tag) {
   if (tags.indexOf(tag) === -1) {
     return;
   }
+  tags = tags.slice();
   scout.arrays.remove(tags, tag);
   this.setValue(tags);
   this._triggerAcceptInput();
@@ -152,8 +158,7 @@ scout.TagField.prototype._renderOverflowVisible = function() {
     if (!this.$overflowIcon) {
       this.$overflowIcon = this.$fieldContainer
         .prependDiv('overflow-icon')
-        .on('click', this._onOverflowIconClick.bind(this))
-        .text('V');
+        .on('click', this._onOverflowIconClick.bind(this));
     }
   } else {
     if (this.$overflowIcon) {
@@ -171,7 +176,7 @@ scout.TagField.prototype._openOverflowPopup = function() {
   var popup = scout.create('TagFieldPopup', {
     parent: this,
     closeOnAnchorMouseDown: false,
-    $anchor: this.$overflowIcon
+    $anchor: this.$fieldContainer
   });
   popup.open();
 };

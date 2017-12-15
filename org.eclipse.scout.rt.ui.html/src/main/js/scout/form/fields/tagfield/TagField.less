@@ -11,7 +11,7 @@
   & > input {
     border: none;
     padding: 0 3px;
-    background-color: yellow;
+/*     background-color: yellow; */
 
     &.fullwidth {
       width: 100%;
@@ -29,30 +29,53 @@
   white-space: nowrap;
 
   border-radius: 2px;
-  background-color: #ddd;
+  background-color: @tag-element-background-color;
   padding: 0 5px;
   margin-right: 3px;
   height: 22px;
   line-height: 20px;
   margin: 3px 0 0 3px;
 
-  &:hover {
-    background-color: #aacbff;
+  &:hover:not(.disabled) {
+    background-color: @tag-element-background-color-hover;
+  }
+}
+
+.tag-element {
+  & > .tag-text {
+    margin-bottom: 1px;
+    display: inline-block;
+    vertical-align: middle;
   }
 }
 
 .overflow-icon {
-  font-weight: bold;
+  &::before {
+    #scout.font-icon();
+    position: relative;
+    font-size: 10px;
+    content: @icon-chevron-down;
+    color: @tag-icon-color;
+  }
 
   &:hover {
-    background-color: #aacbff;
+    background-color: @tag-element-background-color-hover;
     cursor: pointer;
   }
 }
 
-.tag-element-remove {
-  font-weight: bold;
-  padding-left: 6px;
+.tag-remove-icon {
+  padding-left: 3px;
+  margin-top: 1px;
+  display: inline-block;
+  vertical-align: middle;
+
+  &::before {
+    #scout.font-icon();
+    position: relative;
+    content: @icon-remove;
+    color: @tag-icon-color;
+  }
 
   &:hover {
     cursor: pointer;
