@@ -381,6 +381,8 @@ scout.Form.prototype._remove = function() {
   this._glassPaneRenderer.removeGlassPanes();
   this.off('propertyChange', this.glasspaneRendererHandler);
   this._uninstallFocusContext();
+  this.$close = null;
+  this.$saveNeeded = null;
   scout.Form.parent.prototype._remove.call(this);
 };
 
