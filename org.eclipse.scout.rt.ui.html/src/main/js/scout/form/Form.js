@@ -110,6 +110,8 @@ scout.Form.prototype._remove = function() {
     this._glassPaneRenderer = null;
   }
   this._uninstallFocusContext();
+  this.$close = null;
+  this.$saveNeeded = null;
   scout.Form.parent.prototype._remove.call(this);
 };
 
