@@ -89,7 +89,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     JsonRequest jsonRequest = null;
     try {
       // disable caching
-      m_httpCacheControl.checkAndSetCacheHeaders(req, resp, null, null);
+      m_httpCacheControl.checkAndSetCacheHeaders(req, resp, null);
 
       JSONObject jsonObject = m_jsonRequestHelper.readJsonRequest(req);
       jsonRequest = new JsonRequest(jsonObject);

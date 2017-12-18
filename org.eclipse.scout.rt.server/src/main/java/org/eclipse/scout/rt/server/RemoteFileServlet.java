@@ -156,7 +156,7 @@ public class RemoteFileServlet extends HttpServlet {
     }
 
     HttpCacheObject obj = new HttpCacheObject(new HttpCacheKey(resourcePath), remoteFile.toBinaryResource());
-    if (BEANS.get(HttpCacheControl.class).checkAndSetCacheHeaders(req, resp, resourcePath, obj)) {
+    if (BEANS.get(HttpCacheControl.class).checkAndSetCacheHeaders(req, resp, obj)) {
       return true;
     }
     rfs.streamRemoteFile(remoteFile, resp.getOutputStream());

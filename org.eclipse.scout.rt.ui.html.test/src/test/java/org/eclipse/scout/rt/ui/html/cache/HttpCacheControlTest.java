@@ -55,42 +55,6 @@ public class HttpCacheControlTest {
   }
 
   @Test
-  public void testCheckAndSet_DisableCaching_forward() throws Exception {
-    Mockito.when(req.getPathInfo()).thenReturn("/subPath");
-    Mockito.when(req.getAttribute("javax.servlet.forward.path_info")).thenReturn("/");
-
-    BinaryResource res = BinaryResources.create()
-        .withFilename("a.html")
-        .withContent("<html></html>".getBytes("UTF-8"))
-        .withCachingAllowed(false)
-        .build();
-    HttpCacheObject obj = new HttpCacheObject(new HttpCacheKey("/"), res);
-    boolean b = cc.checkAndSetCacheHeaders(req, resp, null, obj);
-    Assert.assertFalse(b);
-
-    Mockito.verify(req, ANY_TIMES).getPathInfo();
-    Mockito.verify(req, ANY_TIMES).getAttribute("javax.servlet.forward.path_info");
-  }
-
-  @Test
-  public void testCheckAndSet_EnableCaching_forward() throws Exception {
-    Mockito.when(req.getPathInfo()).thenReturn("/subPath");
-    Mockito.when(req.getAttribute("javax.servlet.forward.path_info")).thenReturn("/");
-
-    BinaryResource res = BinaryResources.create()
-        .withFilename("a.html")
-        .withContent("<html></html>".getBytes("UTF-8"))
-        .withCachingAllowed(true)
-        .build();
-    HttpCacheObject obj = new HttpCacheObject(new HttpCacheKey("/"), res);
-    boolean b = cc.checkAndSetCacheHeaders(req, resp, null, obj);
-    Assert.assertFalse(b);
-
-    Mockito.verify(req, ANY_TIMES).getPathInfo();
-    Mockito.verify(req, ANY_TIMES).getAttribute("javax.servlet.forward.path_info");
-  }
-
-  @Test
   public void testCheckAndSet_DisableCaching() throws Exception {
     Mockito.when(req.getPathInfo()).thenReturn("/");
 
@@ -100,7 +64,7 @@ public class HttpCacheControlTest {
         .withCachingAllowed(false)
         .build();
     HttpCacheObject obj = new HttpCacheObject(new HttpCacheKey("/"), res);
-    boolean b = cc.checkAndSetCacheHeaders(req, resp, null, obj);
+    boolean b = cc.checkAndSetCacheHeaders(req, resp, obj);
     Assert.assertFalse(b);
 
     Mockito.verify(req, ANY_TIMES).getPathInfo();
@@ -122,7 +86,7 @@ public class HttpCacheControlTest {
         .withLastModified(0L)
         .build();
     HttpCacheObject obj = new HttpCacheObject(new HttpCacheKey("/"), res);
-    boolean b = cc.checkAndSetCacheHeaders(req, resp, null, obj);
+    boolean b = cc.checkAndSetCacheHeaders(req, resp, obj);
     Assert.assertFalse(b);
 
     Mockito.verify(req, ANY_TIMES).getPathInfo();
@@ -149,7 +113,7 @@ public class HttpCacheControlTest {
         .withLastModified(0L)
         .build();
     HttpCacheObject obj = new HttpCacheObject(new HttpCacheKey("/"), res);
-    boolean b = cc.checkAndSetCacheHeaders(req, resp, null, obj);
+    boolean b = cc.checkAndSetCacheHeaders(req, resp, obj);
     Assert.assertFalse(b);
 
     Mockito.verify(req, ANY_TIMES).getPathInfo();
@@ -175,7 +139,7 @@ public class HttpCacheControlTest {
         .withLastModifiedNow()
         .build();
     HttpCacheObject obj = new HttpCacheObject(new HttpCacheKey("/"), res);
-    boolean b = cc.checkAndSetCacheHeaders(req, resp, null, obj);
+    boolean b = cc.checkAndSetCacheHeaders(req, resp, obj);
     Assert.assertFalse(b);
 
     Mockito.verify(req, ANY_TIMES).getPathInfo();
@@ -202,7 +166,7 @@ public class HttpCacheControlTest {
         .withLastModifiedNow()
         .build();
     HttpCacheObject obj = new HttpCacheObject(new HttpCacheKey("/"), res);
-    boolean b = cc.checkAndSetCacheHeaders(req, resp, null, obj);
+    boolean b = cc.checkAndSetCacheHeaders(req, resp, obj);
     Assert.assertFalse(b);
 
     Mockito.verify(req, ANY_TIMES).getPathInfo();
@@ -229,7 +193,7 @@ public class HttpCacheControlTest {
         .withLastModifiedNow()
         .build();
     HttpCacheObject obj = new HttpCacheObject(new HttpCacheKey("/"), res);
-    boolean b = cc.checkAndSetCacheHeaders(req, resp, null, obj);
+    boolean b = cc.checkAndSetCacheHeaders(req, resp, obj);
     Assert.assertTrue(b);
 
     Mockito.verify(req, ANY_TIMES).getPathInfo();
@@ -255,7 +219,7 @@ public class HttpCacheControlTest {
         .withLastModified(2000000L)
         .build();
     HttpCacheObject obj = new HttpCacheObject(new HttpCacheKey("/"), res);
-    boolean b = cc.checkAndSetCacheHeaders(req, resp, null, obj);
+    boolean b = cc.checkAndSetCacheHeaders(req, resp, obj);
     Assert.assertFalse(b);
 
     Mockito.verify(req, ANY_TIMES).getPathInfo();
@@ -282,7 +246,7 @@ public class HttpCacheControlTest {
         .withLastModified(1000000L + HttpCacheControl.IF_MODIFIED_SINCE_FIDELITY + 1L)
         .build();
     HttpCacheObject obj = new HttpCacheObject(new HttpCacheKey("/"), res);
-    boolean b = cc.checkAndSetCacheHeaders(req, resp, null, obj);
+    boolean b = cc.checkAndSetCacheHeaders(req, resp, obj);
     Assert.assertFalse(b);
 
     Mockito.verify(req, ANY_TIMES).getPathInfo();
@@ -309,7 +273,7 @@ public class HttpCacheControlTest {
         .withLastModified(1000000L + HttpCacheControl.IF_MODIFIED_SINCE_FIDELITY)
         .build();
     HttpCacheObject obj = new HttpCacheObject(new HttpCacheKey("/"), res);
-    boolean b = cc.checkAndSetCacheHeaders(req, resp, null, obj);
+    boolean b = cc.checkAndSetCacheHeaders(req, resp, obj);
     Assert.assertTrue(b);
 
     Mockito.verify(req, ANY_TIMES).getPathInfo();
@@ -335,7 +299,7 @@ public class HttpCacheControlTest {
         .withLastModified(900000L)
         .build();
     HttpCacheObject obj = new HttpCacheObject(new HttpCacheKey("/"), res);
-    boolean b = cc.checkAndSetCacheHeaders(req, resp, null, obj);
+    boolean b = cc.checkAndSetCacheHeaders(req, resp, obj);
     Assert.assertTrue(b);
 
     Mockito.verify(req, ANY_TIMES).getPathInfo();

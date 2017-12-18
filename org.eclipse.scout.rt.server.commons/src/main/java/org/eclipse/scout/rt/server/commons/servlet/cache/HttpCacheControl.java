@@ -55,6 +55,15 @@ public class HttpCacheControl {
   public static final int MAX_AGE_NONE = 0;
 
   /**
+   * @deprecated use {@link #checkAndSetCacheHeaders(HttpServletRequest, HttpServletResponse, HttpCacheObject)} instead,
+   *             the parameter pathInfo has no effect anymore. This method will be removed with 7.1
+   */
+  @Deprecated
+  public boolean checkAndSetCacheHeaders(HttpServletRequest req, HttpServletResponse resp, String pathInfo, HttpCacheObject obj) {
+    return checkAndSetCacheHeaders(req, resp, obj);
+  }
+
+  /**
    * Checks whether a cached response (304) can be returned or not, depending on the request headers and
    * {@link BinaryResources}.
    * <p>
@@ -67,8 +76,6 @@ public class HttpCacheControl {
    *
    * @param req
    * @param resp
-   * @param pathInfo
-   *          optional resolved pathInfo. If null then {@link HttpServletRequest#getPathInfo()} is used as default.
    * @param obj
    *          is the cache object that decides if cache is to be used or not, may be null to disable caching
    * @return true if the obj hasn't changed in the meantime. The {@link HttpServletResponse#SC_NOT_MODIFIED} response is
@@ -77,18 +84,7 @@ public class HttpCacheControl {
    *         false if the obj again needs to be fully returned, Etag, IfModifiedSince and MaxAge headers were set if
    *         appropriate. If no caching is desired then the disable headers were set.
    */
-  public boolean checkAndSetCacheHeaders(HttpServletRequest req, HttpServletResponse resp, String pathInfo, HttpCacheObject obj) {
-    // Check is only done if the request still processes the requested resource
-    // and hasn't been forwarded to another one (using req.getRequestDispatcher().forward)
-    if (pathInfo == null) {
-      pathInfo = req.getPathInfo();
-    }
-    String originalPathInfo = (String) req.getAttribute("javax.servlet.forward.path_info");
-    if (originalPathInfo != null && !pathInfo.equals(originalPathInfo)) {
-      //nop
-      return false;
-    }
-
+  public boolean checkAndSetCacheHeaders(HttpServletRequest req, HttpServletResponse resp, HttpCacheObject obj) {
     if (!UrlHints.isCacheHint(req)) {
       disableCaching(req, resp);
       return false;
