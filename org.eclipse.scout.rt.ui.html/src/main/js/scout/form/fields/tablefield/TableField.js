@@ -14,10 +14,10 @@ scout.TableField = function() {
   this.gridDataHints.weightY = 1.0;
   this.gridDataHints.h = 3;
   this._tableChangedHandler;
-  this._deletedRows = [];
-  this._insertedRows = [];
-  this._updatedRows = [];
-  this._checkedRows = [];
+  this._deletedRows = scout.objects.createMap();
+  this._insertedRows = scout.objects.createMap();
+  this._updatedRows = scout.objects.createMap();
+  this._checkedRows = scout.objects.createMap();
   this._addAdapterProperties(['table']);
 };
 scout.inherits(scout.TableField, scout.FormField);
@@ -83,46 +83,47 @@ scout.TableField.prototype._removeTable = function() {
 };
 
 scout.TableField.prototype.computeRequiresSave = function() {
-  return this._deletedRows.length > 0 ||
-      this._insertedRows.length > 0 ||
-      this._updatedRows.length > 0 ||
-      this._checkedRows.length > 0;
+  return Object.keys(this._deletedRows).length > 0 ||
+      Object.keys(this._insertedRows).length > 0 ||
+      Object.keys(this._updatedRows).length > 0 ||
+      Object.keys(this._checkedRows).length > 0;
 };
 
 scout.TableField.prototype._onTableChanged = function(event) {
   if (scout.isOneOf(event.type, 'rowsDeleted', 'allRowsDeleted')) {
-    scout.arrays.pushAll(this._deletedRows, event.rows);
-    this._updateInsertedRows();
-    return;
-  }
-  if (event.type === 'rowsInserted') {
-    scout.arrays.pushAll(this._insertedRows, event.rows);
-    return;
-  }
-  if (event.type === 'rowsUpdated') {
-    scout.arrays.pushAll(this._updatedRows, event.rows);
-    return;
-  }
-  if (event.type === 'rowsChecked') {
-    this._toggleCheckedRows(event.rows);
+    this._updateDeletedRows(event.rows);
+  } else if (event.type === 'rowsInserted') {
+    this._updateInsertedRows(event.rows);
+  } else if (event.type === 'rowsUpdated') {
+    this._updateUpdatedRows(event.rows);
+  } else if (event.type === 'rowsChecked') {
+    this._updateCheckedRows(event.rows);
   }
 };
 
-/**
- * If a row is contained in both arrays (_deletedRows, _insertedRows) an inserted row has been
- * deleted again. In that case we can remove that row from both arrays.
- */
-scout.TableField.prototype._updateInsertedRows = function () {
-  var insertedAndDeletedRows = [];
-  this._deletedRows.forEach(function(deletedRow) {
-    if (this._insertedRows.indexOf(deletedRow) !== -1) {
-      insertedAndDeletedRows.push(deletedRow);
+scout.TableField.prototype._updateDeletedRows = function (rows) {
+  rows.forEach(function(row) {
+    if (row.id in this._insertedRows) {
+      // If a row is contained in _insertedRows an inserted row has been deleted again.
+      // In that case we can remove that row from the maps and don't have to add it to deletedRows as well.
+      delete this._insertedRows[row.id];
+      delete this._updatedRows[row.id];
+      delete this._checkedRows[row.id];
+      return;
     }
+    this._deletedRows[row.id] = row;
   }, this);
+};
 
-  insertedAndDeletedRows.forEach(function(row) {
-    scout.arrays.remove(this._deletedRows, row);
-    scout.arrays.remove(this._insertedRows, row);
+scout.TableField.prototype._updateInsertedRows = function (rows) {
+  rows.forEach(function(row) {
+    this._insertedRows[row.id] = row;
+  }, this);
+};
+
+scout.TableField.prototype._updateUpdatedRows = function (rows) {
+  rows.forEach(function(row) {
+    this._updatedRows[row.id] = row;
   }, this);
 };
 
@@ -130,21 +131,22 @@ scout.TableField.prototype._updateInsertedRows = function () {
  * If a row already exists in the _checkedRows array, remove it (row was checked/unchecked again, which
  * means it is no longer changed). Add it to the array otherwise.
  */
-scout.TableField.prototype._toggleCheckedRows = function (rows) {
+scout.TableField.prototype._updateCheckedRows = function (rows) {
   rows.forEach(function(row) {
-    var removed = scout.arrays.remove(this._checkedRows, row);
-    if (!removed) {
-      this._checkedRows.push(row);
+    if (row.id in this._checkedRows) {
+      delete this._checkedRows[row.id];
+    } else {
+      this._checkedRows[row.id] = row;
     }
   }, this);
 };
 
 scout.TableField.prototype.markAsSaved = function() {
   scout.TableField.parent.prototype.markAsSaved.call(this);
-  this._deletedRows = [];
-  this._insertedRows = [];
-  this._updatedRows = [];
-  this._checkedRows = [];
+  this._deletedRows = scout.objects.createMap();
+  this._insertedRows = scout.objects.createMap();
+  this._updatedRows = scout.objects.createMap();
+  this._checkedRows = scout.objects.createMap();
 };
 
 scout.TableField.prototype.validate = function() {

@@ -111,6 +111,16 @@ describe("TableField", function() {
       expect(tableField.requiresSave).toBe(true);
     });
 
+    it('does not create a memory leak if same row is updated multiple times', function() {
+      tableField.table.updateRow(firstRow);
+      tableField.updateRequiresSave();
+      expect(Object.keys(tableField._updatedRows).length).toBe(1);
+
+      tableField.table.updateRow(firstRow);
+      tableField.updateRequiresSave();
+      expect(Object.keys(tableField._updatedRows).length).toBe(1);
+    });
+
     it('should require save when row has been deleted', function() {
       tableField.table.deleteRow(firstRow);
       tableField.updateRequiresSave();
@@ -128,6 +138,17 @@ describe("TableField", function() {
       var rowModel = tableHelper.createModelRow('new', ['foo', 'bar']);
       tableField.table.insertRow(rowModel);
       var insertedRow = tableField.table.rowsMap['new'];
+      tableField.table.deleteRow(insertedRow);
+      tableField.updateRequiresSave();
+      expect(tableField.requiresSave).toBe(false);
+    });
+
+    it('should NOT require save when row has been inserted and deleted again even if it was updated or checked in the meantime', function() {
+      var rowModel = tableHelper.createModelRow('new', ['foo', 'bar']);
+      tableField.table.insertRow(rowModel);
+      var insertedRow = tableField.table.rowsMap['new'];
+      tableField.table.updateRow(insertedRow);
+      tableField.table.checkRow(insertedRow);
       tableField.table.deleteRow(insertedRow);
       tableField.updateRequiresSave();
       expect(tableField.requiresSave).toBe(false);
