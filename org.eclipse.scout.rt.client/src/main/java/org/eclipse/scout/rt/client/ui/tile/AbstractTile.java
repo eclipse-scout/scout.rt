@@ -273,11 +273,11 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
     propertySupport.setPropertyBool(PROP_LOADING, loading);
   }
 
-  protected boolean isLoaded() {
+  public boolean isLoaded() {
     return m_loaded;
   }
 
-  protected void setLoaded(boolean loaded) {
+  public void setLoaded(boolean loaded) {
     m_loaded = loaded;
   }
 
