@@ -276,8 +276,7 @@ public class JmsMomImplementor implements IMomImplementor {
   protected <DTO> ISubscription subscribeImpl(IDestination<DTO> destination, IMessageListener<DTO> listener, SubscribeInput input) throws JMSException {
     IJmsSessionProvider sessionProvider = createSessionProvider(destination, SubscribeInput.ACKNOWLEDGE_TRANSACTED == input.getAcknowledgementMode());
     try {
-      IFuture<Void> jobMonitor = Jobs.schedule(createMessageConsumerJob(sessionProvider, destination, listener, input),
-          newJobInput().withName("JMS message listener [dest={}]", destination));
+      IFuture<Void> jobMonitor = Jobs.schedule(createMessageConsumerJob(sessionProvider, destination, listener, input), newJobInput().withName("JMS subscriber"));
       return new JmsSubscription(destination, input, sessionProvider, jobMonitor);
     }
     catch (JMSException | RuntimeException e) {
@@ -312,7 +311,7 @@ public class JmsMomImplementor implements IMomImplementor {
         }
       }
     }, newJobInput()
-        .withName("request on {}", destination)
+        .withName("request on {}", destination.getName())
         .withExceptionHandling(BEANS.get(MomExceptionHandler.class), false)
         .withRunContext(RunContexts.copyCurrent(true)
             .withDiagnostics(BEANS.all(IJmsRunContextDiagnostics.class))));
@@ -433,9 +432,7 @@ public class JmsMomImplementor implements IMomImplementor {
   protected <REQUEST, REPLY> ISubscription replyImpl(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final SubscribeInput input) throws JMSException {
     IJmsSessionProvider sessionProvider = createSessionProvider(destination, false);
     try {
-      IFuture<Void> jobMonitor = Jobs.schedule(createReplyMessageConsumerJob(sessionProvider, destination, listener, input),
-          newJobInput().withName("JMS message listener [dest={}]", destination));
-
+      IFuture<Void> jobMonitor = Jobs.schedule(createReplyMessageConsumerJob(sessionProvider, destination, listener, input), newJobInput().withName("JMS subscriber"));
       return new JmsSubscription(destination, input, sessionProvider, jobMonitor);
     }
     catch (JMSException | RuntimeException e) {
@@ -466,7 +463,7 @@ public class JmsMomImplementor implements IMomImplementor {
               .andMatchExecutionHint(jmsMessage.getStringProperty(JMS_PROP_REPLY_ID))
               .toFilter(), true);
         }
-      }, newJobInput().withName("JMS reply cancle message listener"));
+      }, newJobInput().withName("JMS reply cancel message listener"));
       return new JmsSubscription(cancellationTopic, input, sessionProvider, jobMonitor);
     }
     catch (JMSException | RuntimeException e) {
