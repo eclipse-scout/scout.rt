@@ -85,7 +85,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     }
 
     // disable caching
-    m_httpCacheControl.checkAndSetCacheHeaders(req, resp, null, null);
+    m_httpCacheControl.checkAndSetCacheHeaders(req, resp, null);
 
     try {
       // Get and validate existing UI session

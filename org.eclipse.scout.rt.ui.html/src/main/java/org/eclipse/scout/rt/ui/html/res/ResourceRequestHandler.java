@@ -73,7 +73,7 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
     }
 
     // cached in browser? -> returns 304 if the resource has not been modified
-    if (m_httpCacheControl.checkAndSetCacheHeaders(req, resp, pathInfoEx, resource)) {
+    if (m_httpCacheControl.checkAndSetCacheHeaders(req, resp, resource)) {
       return true;
     }
 

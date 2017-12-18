@@ -212,7 +212,7 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
 
     BEANS.get(HttpServletControl.class).doDefaults(this, req, resp);
 
-    BEANS.get(HttpCacheControl.class).checkAndSetCacheHeaders(req, resp, null, null);
+    BEANS.get(HttpCacheControl.class).checkAndSetCacheHeaders(req, resp, null);
     resp.setContentType(m_contentHandler.getContentType());
     m_contentHandler.writeResponse(resp.getOutputStream(), serviceResponse);
   }

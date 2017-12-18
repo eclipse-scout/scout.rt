@@ -110,7 +110,7 @@ public class ResourceServlet extends HttpServlet {
     contentLength = connection.getContentLength();
     BinaryResource res = BinaryResources.create().withFilename(pathInfo).withContentType(contentType).withLastModified(lastModified).build();
     HttpCacheObject obj = new HttpCacheObject(new HttpCacheKey(pathInfo), res);
-    if (BEANS.get(HttpCacheControl.class).checkAndSetCacheHeaders(req, resp, pathInfo, obj)) {
+    if (BEANS.get(HttpCacheControl.class).checkAndSetCacheHeaders(req, resp, obj)) {
       return true;
     }
 
