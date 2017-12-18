@@ -37,7 +37,7 @@ scout.TagField.prototype._render = function() {
   this.addFieldContainer(this.$parent.makeDiv());
   this.fieldHtmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
   this.fieldHtmlComp.setLayout(new scout.TagFieldLayout(this));
-  var $field = this.$fieldContainer.appendElement('<input>', 'field'); // FIXME [awe] hide input field when disabled and no displayText is set
+  var $field = this.$fieldContainer.appendElement('<input>', 'field');
 
   this.addField($field);
   this.addStatus();
@@ -52,8 +52,8 @@ scout.TagField.prototype._renderProperties = function() {
 };
 
 scout.TagField.prototype._remove = function() {
-  scout.TagField.parent.prototype._remove.call(this);
   this._uninstallTooltipSupport();
+  scout.TagField.parent.prototype._remove.call(this);
 };
 
 scout.TagField.prototype._renderValue = function() {
@@ -105,8 +105,8 @@ scout.TagField.prototype._parseValue = function(displayText) {
 };
 
 scout.TagField.prototype._renderDisplayText = function() {
+  this.$field.val(this.displayText); // needs to be before super call (otherwise updateHasText fails)
   scout.TagField.parent.prototype._renderDisplayText.call(this);
-  this.$field.val(this.displayText);
   this._updateInputVisible();
 };
 
@@ -140,6 +140,10 @@ scout.TagField.prototype.addField = function($field) { // FIXME [awe] copy/paste
       .on('focus', this._onFieldFocus.bind(this))
       .on('input', this._onFieldInput.bind(this));
   }
+};
+
+scout.TagField.prototype._clear = function() {
+  this.$field.val('');
 };
 
 scout.TagField.prototype._triggerAcceptInput = function() {
