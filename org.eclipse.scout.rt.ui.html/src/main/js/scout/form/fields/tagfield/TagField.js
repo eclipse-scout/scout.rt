@@ -15,6 +15,7 @@ scout.TagField = function() {
   this.fieldHtmlComp = null;
   this.overflowVisible = false;
   this.$overflowIcon = null;
+  this.popup = null;
 };
 scout.inherits(scout.TagField, scout.ValueField);
 
@@ -160,6 +161,7 @@ scout.TagField.prototype._triggerAcceptInput = function() {
 scout.TagField.prototype._onFieldFocus = function(event) {
   scout.TagField.parent.prototype._onFieldFocus.call(this, event);
   this._removeFocusFromTagElements();
+  this.closeOverflowPopup();
 };
 
 scout.TagField.prototype._onTagRemoveClick = function(event) {
@@ -219,12 +221,26 @@ scout.TagField.prototype._onOverflowIconClick = function(event) {
 };
 
 scout.TagField.prototype.openOverflowPopup = function() {
-  var popup = scout.create('TagFieldPopup', {
+  if (this.popup) {
+    return;
+  }
+  this.popup = scout.create('TagFieldPopup', {
     parent: this,
     closeOnAnchorMouseDown: false,
     $anchor: this.$fieldContainer
   });
-  popup.open();
+  this.popup.on('close', this._onOverflowPopupClose.bind(this));
+  this.popup.open();
+};
+
+scout.TagField.prototype.closeOverflowPopup = function() {
+  if (this.popup && !this.popup.destroying) {
+    this.popup.close();
+  }
+};
+
+scout.TagField.prototype._onOverflowPopupClose = function() {
+  this.popup = null;
 };
 
 scout.TagField.prototype._installTooltipSupport = function() {
@@ -247,7 +263,7 @@ scout.TagField.prototype._tagTooltipText = function($tag) {
 };
 
 scout.TagField.prototype._removeFocusFromTagElements = function() {
-  this.$fieldContainer.find('.tag-element:not(.hidden),.overflow-icon')
+  scout.TagField.findFocusableTagElements(this.$fieldContainer)
     .removeClass('focused')
     .setTabbable(false);
 };
@@ -279,4 +295,32 @@ scout.TagField.prototype.visibleTags = function() {
       tags.push(that.getTagData($(this)));
      });
   return tags;
+};
+
+// --- static helpers ---
+
+scout.TagField.focusFirstTagElement = function($container) {
+  scout.TagField.focusTagElement(
+      $container.find('.tag-element').first());
+};
+
+scout.TagField.focusTagElement = function($tagElement) {
+  $tagElement
+    .setTabbable(true)
+    .addClass('focused')
+    .focus();
+};
+
+scout.TagField.unfocusTagElement = function($tagElement) {
+  $tagElement
+    .setTabbable(false)
+    .removeClass('focused');
+};
+
+scout.TagField.findFocusedTagElement = function($container) {
+  return $container.find('.tag-element.focused');
+};
+
+scout.TagField.findFocusableTagElements = function($container) {
+  return $container.find('.tag-element:not(.hidden),.overflow-icon');
 };

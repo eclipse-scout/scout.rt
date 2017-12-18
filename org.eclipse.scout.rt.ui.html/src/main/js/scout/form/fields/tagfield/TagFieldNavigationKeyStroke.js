@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.TagFieldNavigationKeyStroke = function(tagField) {
+scout.TagFieldNavigationKeyStroke = function(fieldOrPopup) {
   scout.TagFieldNavigationKeyStroke.parent.call(this);
-  this.field = tagField;
+  this.field = new scout._TagFieldAdapter(fieldOrPopup);
   this.which = [scout.keys.LEFT, scout.keys.RIGHT];
   this.preventDefault = false;
   this.preventInvokeAcceptInputOnActiveValueField = true;
@@ -22,10 +22,7 @@ scout.TagFieldNavigationKeyStroke.prototype._accept = function(event) {
   if (!accepted) {
     return false;
   }
-  if (scout.strings.hasText(this.field._readDisplayText())) {
-    return false;
-  }
-  return true;
+  return this.field.enabled();
 };
 
 scout.TagFieldNavigationKeyStroke.prototype.handle = function(event) {
@@ -41,7 +38,7 @@ scout.TagFieldNavigationKeyStroke.prototype._focusTagElement = function(directio
   var INPUT = -2;
 
   // find overflow-icon and all tag-elements
-  var $focusTargets = this.field.$fieldContainer.find('.tag-element:not(.hidden),.overflow-icon');
+  var $focusTargets = scout.TagField.findFocusableTagElements(this.field.$container());
   var numTargets = $focusTargets.length;
   if (numTargets === 0) {
     return;
@@ -68,9 +65,7 @@ scout.TagFieldNavigationKeyStroke.prototype._focusTagElement = function(directio
     } else if (nextFocusIndex < 0) {
       focusIndex = UNDEFINED;
     } else {
-      $focusTargets.eq(focusIndex)
-        .removeClass('focused')
-        .setTabbable(false);
+      scout.TagField.unfocusTagElement($focusTargets.eq(focusIndex));
       focusIndex = nextFocusIndex;
     }
   }
@@ -78,11 +73,54 @@ scout.TagFieldNavigationKeyStroke.prototype._focusTagElement = function(directio
   if (focusIndex === UNDEFINED) {
     // leave focus untouched
   } else if (focusIndex === INPUT) {
-    this.field.$field.focus();
+    this.field.focus();
   } else {
-    $focusTargets.eq(focusIndex)
-    .addClass('focused')
-    .setTabbable(true)
-    .focus();
+    scout.TagField.focusTagElement($focusTargets.eq(focusIndex));
+  }
+};
+
+
+/**
+ * This adapter class acts as an interface so we can use the same key-stroke for TagField and TagFieldPopup.
+ */
+scout._TagFieldAdapter = function(adapted) {
+  this.adapted = adapted;
+};
+
+scout._TagFieldAdapter.prototype.$container = function() {
+  if (this.adapted instanceof scout.TagField) {
+    return this.adapted.$fieldContainer;
+  } else {
+    return this.adapted.$body;
+  }
+};
+
+scout._TagFieldAdapter.prototype.enabled = function() {
+  if (this.adapted instanceof scout.TagField) {
+    return scout.strings.empty(this.adapted._readDisplayText());
+  } else {
+    return true;
+  }
+};
+
+scout._TagFieldAdapter.prototype.focus = function() {
+  if (this.adapted instanceof scout.TagField) {
+    this.adapted.$field.focus();
+  }
+};
+
+scout._TagFieldAdapter.prototype.one = function(p1, p2) {
+  this.adapted.one(p1, p2);
+};
+
+scout._TagFieldAdapter.prototype.off = function(p1, p2) {
+  this.adapted.off(p1, p2);
+};
+
+scout._TagFieldAdapter.prototype.removeTagByElement = function($tag) {
+  if (this.adapted instanceof scout.TagField) {
+    this.adapted.removeTagByElement($tag);
+  } else {
+    this.adapted.parent.removeTagByElement($tag);
   }
 };

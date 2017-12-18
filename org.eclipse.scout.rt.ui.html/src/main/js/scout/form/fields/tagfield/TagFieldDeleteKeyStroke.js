@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.TagFieldDeleteKeyStroke = function(tagField) {
+scout.TagFieldDeleteKeyStroke = function(fieldOrPopup) {
   scout.TagFieldDeleteKeyStroke.parent.call(this);
-  this.field = tagField;
+  this.field = new scout._TagFieldAdapter(fieldOrPopup);
   this.which = [scout.keys.DELETE];
   this.renderingHints.render = false;
   this.preventDefault = false;
@@ -30,5 +30,5 @@ scout.TagFieldDeleteKeyStroke.prototype.handle = function(event) {
 };
 
 scout.TagFieldDeleteKeyStroke.prototype._$focusedTag = function() {
-  return this.field.$fieldContainer.find('.tag-element.focused');
+  return scout.TagField.findFocusedTagElement(this.field.$container());
 };

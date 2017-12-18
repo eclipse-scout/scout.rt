@@ -26,9 +26,18 @@ scout.TagFieldPopup.prototype._init = function(options) {
   this.parent.on('propertyChange', this._tagFieldPropertyChangeListener);
 };
 
+scout.TagFieldPopup.prototype._initKeyStrokeContext = function() {
+  scout.TagFieldPopup.parent.prototype._initKeyStrokeContext.call(this);
+
+  this.keyStrokeContext.registerKeyStroke([
+    new scout.TagFieldNavigationKeyStroke(this),
+    new scout.TagFieldDeleteKeyStroke(this)
+  ]);
+};
+
 scout.TagFieldPopup.prototype._destroy = function() {
-  scout.TagFieldPopup.parent.prototype._destroy.call(this);
   this.parent.off('propertyChange', this._tagFieldPropertyChangeListener);
+  scout.TagFieldPopup.parent.prototype._destroy.call(this);
 };
 
 scout.TagFieldPopup.prototype._modifyBody = function() {
@@ -58,6 +67,16 @@ scout.TagFieldPopup.prototype._renderValue = function() {
   }
 };
 
+scout.TagFieldPopup.prototype._postRender = function() {
+  scout.TagFieldPopup.parent.prototype._postRender.call(this);
+
+  this._focusFirstTagElement();
+};
+
+scout.TagFieldPopup.prototype._focusFirstTagElement = function() {
+  scout.TagField.focusFirstTagElement(this.$body);
+};
+
 scout.TagFieldPopup.prototype._onTagRemoveClick = function(event) {
   this.parent._onTagRemoveClick(event);
 };
@@ -72,6 +91,7 @@ scout.TagFieldPopup.prototype._onTagFieldPropertyChange = function(event) {
       this.close();
     } else {
       this._renderValue();
+      this._focusFirstTagElement();
     }
   }
 };
