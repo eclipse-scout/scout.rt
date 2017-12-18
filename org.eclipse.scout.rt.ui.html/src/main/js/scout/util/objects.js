@@ -11,6 +11,15 @@
 scout.objects = {
 
   /**
+   * Uses Object.create(null) to create an object without a prototype. This is different to use the literal {} which links the object to Object.prototype.
+   * <p>
+   * Not using the literal has the advantage that the object does not contain any inherited properties like `toString` so it is not necessary to use `o.hasOwnProperty(p)` instead of `p in o` to check for the existence.
+   */
+  createMap: function() {
+    return Object.create(null);
+  },
+
+  /**
    * Copies all the properties (including the ones from the prototype.) from dest to source
    * @memberOf scout.objects
    * @param filter an array of property names.
