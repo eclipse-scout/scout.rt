@@ -221,7 +221,7 @@ public class SqlParser {
         s.addChild(nexts);
       }
       //restore incomplete
-      if (u != null && nexts == null) {
+      if (u != null) {// and therefore  nexts == null
         list.add(0, u);
       }
       return s;
@@ -579,7 +579,7 @@ public class SqlParser {
     }
   }
 
-  @SuppressWarnings("squid:S2583")
+  @SuppressWarnings({"squid:S2583", "squid:S2589"})
   private BracketExpr parseBracketExpr(List<IToken> list, ParseContext ctx) {
     //BracketExpr = OpenBracketToken (Statement | ListExpr) CloseBracketToken
     ParseStep lock = ctx.checkAndAdd("BracketExpr", list);

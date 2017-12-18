@@ -65,7 +65,7 @@ public final class IOUtility {
   }
 
   public static byte[] getContent(String filename) {
-    return getContent(toFile(filename));
+    return getContent(Assertions.assertNotNull(toFile(filename)));
   }
 
   public static byte[] getContent(File file) {
