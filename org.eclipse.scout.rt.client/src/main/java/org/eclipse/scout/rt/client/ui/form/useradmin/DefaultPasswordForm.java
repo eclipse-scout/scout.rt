@@ -166,6 +166,12 @@ public class DefaultPasswordForm extends AbstractForm {
     }
   }
 
+  protected void clearPasswordFields() {
+    getOldPasswordField().setValue(null);
+    getNewPasswordField().setValue(null);
+    getRepeatPasswordField().setValue(null);
+  }
+
   public class ResetHandler extends AbstractFormHandler {
 
     @Override
@@ -177,6 +183,7 @@ public class DefaultPasswordForm extends AbstractForm {
     @Override
     protected void execStore() {
       if (getNewPasswordField().getValue() != null && !getNewPasswordField().getValue().equals(getRepeatPasswordField().getValue())) {
+        clearPasswordFields();
         throw new VetoException(TEXTS.get("PasswordsDoNotMatch"));
       }
       IPasswordManagementService svc = BEANS.get(IPasswordManagementService.class);
@@ -188,6 +195,7 @@ public class DefaultPasswordForm extends AbstractForm {
     @Override
     protected void execStore() {
       if (getNewPasswordField().getValue() != null && !getNewPasswordField().getValue().equals(getRepeatPasswordField().getValue())) {
+        clearPasswordFields();
         throw new VetoException(TEXTS.get("PasswordsDoNotMatch"));
       }
       IPasswordManagementService svc = BEANS.get(IPasswordManagementService.class);
