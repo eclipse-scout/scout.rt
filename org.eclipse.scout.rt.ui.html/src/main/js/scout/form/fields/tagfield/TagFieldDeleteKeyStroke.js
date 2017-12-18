@@ -8,23 +8,27 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.TagFieldEnterKeyStroke = function(tagField) {
-  scout.TagFieldEnterKeyStroke.parent.call(this);
+scout.TagFieldDeleteKeyStroke = function(tagField) {
+  scout.TagFieldDeleteKeyStroke.parent.call(this);
   this.field = tagField;
-  this.which = [scout.keys.ENTER];
+  this.which = [scout.keys.DELETE];
   this.renderingHints.render = false;
   this.preventDefault = false;
 };
-scout.inherits(scout.TagFieldEnterKeyStroke, scout.KeyStroke);
+scout.inherits(scout.TagFieldDeleteKeyStroke, scout.KeyStroke);
 
-scout.TagFieldEnterKeyStroke.prototype._accept = function(event) {
+scout.TagFieldDeleteKeyStroke.prototype._accept = function(event) {
   var accepted = scout.TagFieldDeleteKeyStroke.parent.prototype._accept.call(this, event);
   if (!accepted) {
     return false;
   }
-  return this.field.isInputFocused();
+  return this._$focusedTag().length > 0;
 };
 
-scout.TagFieldEnterKeyStroke.prototype.handle = function(event) {
-  this.field.acceptInput();
+scout.TagFieldDeleteKeyStroke.prototype.handle = function(event) {
+  this.field.removeTagByElement(this._$focusedTag());
+};
+
+scout.TagFieldDeleteKeyStroke.prototype._$focusedTag = function() {
+  return this.field.$fieldContainer.find('.tag-element.focused');
 };

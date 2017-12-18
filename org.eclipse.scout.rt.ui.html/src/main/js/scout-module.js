@@ -450,6 +450,9 @@
   __include("scout/form/fields/tagfield/TagField.js");
   __include("scout/form/fields/tagfield/TagFieldAdapter.js");
   __include("scout/form/fields/tagfield/TagFieldEnterKeyStroke.js");
+  __include("scout/form/fields/tagfield/TagFieldDeleteKeyStroke.js");
+  __include("scout/form/fields/tagfield/TagFieldNavigationKeyStroke.js");
+  __include("scout/form/fields/tagfield/TagFieldOpenPopupKeyStroke.js");
   __include("scout/form/fields/tagfield/TagFieldLayout.js");
   __include("scout/form/fields/tagfield/TagFieldPopup.js");
   __include("scout/form/fields/tilesfield/TilesField.js");

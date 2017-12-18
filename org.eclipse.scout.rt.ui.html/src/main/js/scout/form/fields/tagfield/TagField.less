@@ -29,6 +29,7 @@
   user-select: none;
   white-space: nowrap;
   color: @tag-text-color;
+  outline: none;
 
   border-radius: 2px;
   background-color: @tag-element-background-color;
@@ -40,6 +41,14 @@
 
   &:hover:not(.disabled) {
     background-color: @tag-element-background-color-hover;
+  }
+
+  &.focused {
+    background-color: @palette-cyan-4;
+
+    & > .tag-remove-icon::before {
+      color: black;
+    }
   }
 }
 
@@ -66,6 +75,10 @@
   &:hover {
     background-color: @tag-element-background-color-hover;
     cursor: pointer;
+  }
+
+  &.focused::before {
+    color: black;
   }
 }
 

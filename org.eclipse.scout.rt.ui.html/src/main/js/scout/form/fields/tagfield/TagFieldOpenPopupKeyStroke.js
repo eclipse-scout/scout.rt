@@ -8,23 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.TagFieldEnterKeyStroke = function(tagField) {
-  scout.TagFieldEnterKeyStroke.parent.call(this);
+scout.TagFieldOpenPopupKeyStroke = function(tagField) {
+  scout.TagFieldOpenPopupKeyStroke.parent.call(this);
   this.field = tagField;
-  this.which = [scout.keys.ENTER];
+  this.which = [scout.keys.ENTER, scout.keys.SPACE];
   this.renderingHints.render = false;
   this.preventDefault = false;
 };
-scout.inherits(scout.TagFieldEnterKeyStroke, scout.KeyStroke);
+scout.inherits(scout.TagFieldOpenPopupKeyStroke, scout.KeyStroke);
 
-scout.TagFieldEnterKeyStroke.prototype._accept = function(event) {
+scout.TagFieldOpenPopupKeyStroke.prototype._accept = function(event) {
   var accepted = scout.TagFieldDeleteKeyStroke.parent.prototype._accept.call(this, event);
   if (!accepted) {
     return false;
   }
-  return this.field.isInputFocused();
+  return this.field.isOverflowIconFocused();
 };
 
-scout.TagFieldEnterKeyStroke.prototype.handle = function(event) {
-  this.field.acceptInput();
+scout.TagFieldOpenPopupKeyStroke.prototype.handle = function(event) {
+  this.field.openOverflowPopup();
 };

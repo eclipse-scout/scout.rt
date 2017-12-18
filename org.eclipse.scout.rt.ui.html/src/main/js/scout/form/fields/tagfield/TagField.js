@@ -14,14 +14,17 @@ scout.TagField = function() {
   this.$field = null;
   this.fieldHtmlComp = null;
   this.overflowVisible = false;
-  this.$overflowIcon;
+  this.$overflowIcon = null;
 };
 scout.inherits(scout.TagField, scout.ValueField);
 
 scout.TagField.prototype._initKeyStrokeContext = function() {
   scout.TagField.parent.prototype._initKeyStrokeContext.call(this);
   this.keyStrokeContext.registerKeyStroke([
-    new scout.TagFieldEnterKeyStroke(this)
+    new scout.TagFieldEnterKeyStroke(this),
+    new scout.TagFieldNavigationKeyStroke(this),
+    new scout.TagFieldDeleteKeyStroke(this),
+    new scout.TagFieldOpenPopupKeyStroke(this)
   ]);
 };
 
@@ -71,11 +74,12 @@ scout.TagField.prototype._renderValue = function() {
 };
 
 scout.TagField.prototype._makeTagElement = function($parent, tagText, clickHandler) {
-  var $element = this.$fieldContainer.makeDiv('tag-element');
+  var $element = this.$fieldContainer
+      .makeDiv('tag-element')
+      .data('tag', tagText);
   $element.appendSpan('tag-text', tagText);
   if (this.enabledComputed) {
     $element.appendSpan('tag-remove-icon')
-      .data('tag', tagText)
       .on('click', clickHandler);
   } else {
     $element.addClass('disabled');
@@ -153,11 +157,27 @@ scout.TagField.prototype._triggerAcceptInput = function() {
   });
 };
 
+scout.TagField.prototype._onFieldFocus = function(event) {
+  scout.TagField.parent.prototype._onFieldFocus.call(this, event);
+  this._removeFocusFromTagElements();
+};
+
 scout.TagField.prototype._onTagRemoveClick = function(event) {
   if (this.enabledComputed) {
-    var $element = $(event.currentTarget);
-    this.removeTag($element.data('tag'));
+    this.removeTagByElement($(event.currentTarget));
   }
+};
+
+scout.TagField.prototype.getTagData = function($tag) {
+  var tagData = $tag.data('tag');
+  if (tagData) {
+    return tagData;
+  }
+  return $tag.parent().data('tag');
+};
+
+scout.TagField.prototype.removeTagByElement = function($tag) {
+  this.removeTag(this.getTagData($tag));
 };
 
 scout.TagField.prototype.removeTag = function(tag) {
@@ -195,10 +215,10 @@ scout.TagField.prototype._renderOverflowVisible = function() {
 };
 
 scout.TagField.prototype._onOverflowIconClick = function(event) {
-  this._openOverflowPopup();
+  this.openOverflowPopup();
 };
 
-scout.TagField.prototype._openOverflowPopup = function() {
+scout.TagField.prototype.openOverflowPopup = function() {
   var popup = scout.create('TagFieldPopup', {
     parent: this,
     closeOnAnchorMouseDown: false,
@@ -224,4 +244,39 @@ scout.TagField.prototype._uninstallTooltipSupport = function() {
 
 scout.TagField.prototype._tagTooltipText = function($tag) {
   return $tag.isContentTruncated() ? $tag.text() : null;
+};
+
+scout.TagField.prototype._removeFocusFromTagElements = function() {
+  this.$fieldContainer.find('.tag-element:not(.hidden),.overflow-icon')
+    .removeClass('focused')
+    .setTabbable(false);
+};
+
+scout.TagField.prototype.isInputFocused = function() {
+  var ae = this.$fieldContainer.activeElement();
+  return this.$field.is(ae);
+};
+
+scout.TagField.prototype.isOverflowIconFocused = function() {
+  if (!this.$overflowIcon) {
+    return false;
+  }
+  var ae = this.$fieldContainer.activeElement();
+  return this.$overflowIcon.is(ae);
+};
+
+/**
+ * Returns the tag-texts of the tag-elements currently visible in the UI (=not hidden).
+ */
+scout.TagField.prototype.visibleTags = function() {
+  if (!this.rendered) {
+    return [];
+  }
+  var tags = [], that = this;
+  this.$fieldContainer
+    .find('.tag-element:not(.hidden)')
+    .each(function() {
+      tags.push(that.getTagData($(this)));
+     });
+  return tags;
 };
