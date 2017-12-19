@@ -10,25 +10,18 @@
  ******************************************************************************/
 scout.TagFieldPopup = function() {
   scout.TagFieldPopup.parent.call(this);
-
-  // Make sure head won't be rendered, there is a css selector which is applied only if there is a head
-  this._headVisible = false;
   this._tagFieldPropertyChangeListener = null;
 };
 scout.inherits(scout.TagFieldPopup, scout.PopupWithHead);
 
 scout.TagFieldPopup.prototype._init = function(options) {
-  options.focusableContainer = true; // In order to allow keyboard navigation, the popup must gain focus. Because menu-items are not focusable, make the container focusable instead.
-
   scout.TagFieldPopup.parent.prototype._init.call(this, options);
-
   this._tagFieldPropertyChangeListener = this._onTagFieldPropertyChange.bind(this);
   this.parent.on('propertyChange', this._tagFieldPropertyChangeListener);
 };
 
 scout.TagFieldPopup.prototype._initKeyStrokeContext = function() {
   scout.TagFieldPopup.parent.prototype._initKeyStrokeContext.call(this);
-
   this.keyStrokeContext.registerKeyStroke([
     new scout.TagFieldNavigationKeyStroke(this),
     new scout.TagFieldDeleteKeyStroke(this)
@@ -67,9 +60,17 @@ scout.TagFieldPopup.prototype._renderValue = function() {
   }
 };
 
+scout.TagFieldPopup.prototype._renderHead = function() {
+  scout.TagFieldPopup.parent.prototype._renderHead.call(this);
+
+  // FIXME [awe] ask c.gu why the border around the head looks a bit broken (1 pixel issue)
+  this._copyCssClassToHead('overflow-icon');
+  this.$head.removeClass('popup-head menu-item');
+  this.$head.addClass('tagfield-popup-head');
+};
+
 scout.TagFieldPopup.prototype._postRender = function() {
   scout.TagFieldPopup.parent.prototype._postRender.call(this);
-
   this._focusFirstTagElement();
 };
 

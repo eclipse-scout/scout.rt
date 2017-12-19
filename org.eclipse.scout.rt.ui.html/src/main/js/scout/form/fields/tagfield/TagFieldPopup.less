@@ -1,5 +1,22 @@
 .tagfield-popup {
   padding: 5px 7px 9px 5px;
-
   max-width: 250px;
+}
+
+.tagfield-popup-head {
+  position: absolute;
+  background-color: @active-inverted-color;
+  color: @active-color;
+  border: 1px solid @border-color;
+  border-bottom-width: 0;
+
+  &:hover {
+    /* important to avoid super specific selector */
+    background-color: @active-inverted-color !important;
+  }
+
+  &.overflow-icon {
+    margin: 0;
+    border-radius: 0;
+  }
 }

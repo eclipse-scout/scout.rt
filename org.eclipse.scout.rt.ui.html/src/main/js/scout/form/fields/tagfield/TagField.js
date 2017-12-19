@@ -227,7 +227,8 @@ scout.TagField.prototype.openOverflowPopup = function() {
   this.popup = scout.create('TagFieldPopup', {
     parent: this,
     closeOnAnchorMouseDown: false,
-    $anchor: this.$fieldContainer
+    $anchor: this.$fieldContainer,
+    $headBlueprint: this.$overflowIcon
   });
   this.popup.on('close', this._onOverflowPopupClose.bind(this));
   this.popup.open();
