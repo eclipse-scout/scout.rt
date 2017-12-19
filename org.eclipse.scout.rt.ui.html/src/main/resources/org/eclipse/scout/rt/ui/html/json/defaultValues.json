@@ -387,7 +387,7 @@
         "heightInPixel": 0
       }
     },
-    "Tiles": {
+    "TileGrid": {
       "filteredTiles": null,
       "gridColumnCount": 4,
       "logicalGrid": "HorizontalGrid",
@@ -489,7 +489,7 @@
       "Planner": null,
       "DesktopNotification": null,
       "Tile": null,
-      "Tiles": null,
+      "TileGrid": null,
       "Accordion": null,
       "Group": null
     },

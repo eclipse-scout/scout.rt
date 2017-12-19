@@ -9,16 +9,16 @@
  ******************************************************************************/
 scout.TileOutlineOverview = function() {
   scout.TileOutlineOverview.parent.call(this);
-  this.pageTiles = null;
+  this.pageTileGrid = null;
   this.scrollable = true;
-  this._addWidgetProperties(['pageTiles']);
+  this._addWidgetProperties(['pageTileGrid']);
 };
 scout.inherits(scout.TileOutlineOverview, scout.OutlineOverview);
 
 scout.TileOutlineOverview.prototype._init = function(model) {
   scout.TileOutlineOverview.parent.prototype._init.call(this, model);
-  if (!this.pageTiles) {
-    this.pageTiles = this._createPageTiles();
+  if (!this.pageTileGrid) {
+    this.pageTileGrid = this._createPageTileGrid();
   }
 };
 
@@ -33,16 +33,16 @@ scout.TileOutlineOverview.prototype._render = function() {
 
 scout.TileOutlineOverview.prototype._renderProperties = function() {
   scout.TileOutlineOverview.parent.prototype._renderProperties.call(this);
-  this._renderPageTiles();
+  this._renderPageTileGrid();
   this._renderScrollable();
 };
 
-scout.TileOutlineOverview.prototype._renderPageTiles = function() {
-  this.pageTiles.render(this.$content);
+scout.TileOutlineOverview.prototype._renderPageTileGrid = function() {
+  this.pageTileGrid.render(this.$content);
 };
 
-scout.TileOutlineOverview.prototype._createPageTiles = function() {
-  return scout.create('PageTiles', {
+scout.TileOutlineOverview.prototype._createPageTileGrid = function() {
+  return scout.create('PageTileGrid', {
     parent: this,
     outline: this.outline
   });

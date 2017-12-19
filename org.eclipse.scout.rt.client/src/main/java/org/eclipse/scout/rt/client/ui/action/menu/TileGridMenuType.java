@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2016 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,17 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.action.menu.root;
-
-import org.eclipse.scout.rt.client.ui.tile.ITileGrid;
+package org.eclipse.scout.rt.client.ui.action.menu;
 
 /**
- * The tiles menu container is the invisible root container for all context menus on the tiles element.
+ * All possible menu types of a tile menu. These menu types are used by {@link AbstractMenu#getConfiguredMenuTypes()}.
  */
-public interface ITilesContextMenu extends IContextMenu {
-
-  @Override
-  ITileGrid getContainer();
-
-  void callOwnerValueChanged();
+public enum TileGridMenuType implements IMenuType {
+  EmptySpace,
+  SingleSelection,
+  MultiSelection
 }

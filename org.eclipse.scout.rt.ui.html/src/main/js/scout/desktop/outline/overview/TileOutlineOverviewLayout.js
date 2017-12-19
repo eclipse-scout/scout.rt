@@ -15,7 +15,7 @@ scout.inherits(scout.TileOutlineOverviewLayout, scout.AbstractLayout);
 
 scout.TileOutlineOverviewLayout.prototype.layout = function($container) {
   var htmlContainer = this.tileOutlineOverview.htmlComp;
-  var pageTiles = this.tileOutlineOverview.pageTiles;
+  var pageTileGrid = this.tileOutlineOverview.pageTileGrid;
   var $content = this.tileOutlineOverview.$content;
   var contentSize = htmlContainer.availableSize()
     .subtract(htmlContainer.insets())
@@ -23,11 +23,11 @@ scout.TileOutlineOverviewLayout.prototype.layout = function($container) {
       includeMargin: true
     }));
 
-  var htmlTiles = pageTiles.htmlComp;
-  var tilesPrefSize = pageTiles.htmlComp.prefSize({
+  var htmlTileGrid = pageTileGrid.htmlComp;
+  var tilesPrefSize = pageTileGrid.htmlComp.prefSize({
     widthHint: contentSize.width
   });
-  htmlTiles.setSize(tilesPrefSize);
+  htmlTileGrid.setSize(tilesPrefSize);
   this._positionContent();
 };
 

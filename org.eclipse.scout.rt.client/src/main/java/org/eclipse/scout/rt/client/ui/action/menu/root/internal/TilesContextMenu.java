@@ -18,19 +18,19 @@ import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITilesContextMenu;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
-import org.eclipse.scout.rt.client.ui.tile.ITiles;
+import org.eclipse.scout.rt.client.ui.tile.ITileGrid;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * The invisible root menu node of tiles. (internal usage only)
  */
 @ClassId("6c1c8e1a-bee2-49fc-8bcc-e2169037fb7e")
-public class TilesContextMenu extends AbstractContextMenu<ITiles<? extends ITile>> implements ITilesContextMenu {
+public class TilesContextMenu extends AbstractContextMenu<ITileGrid<? extends ITile>> implements ITilesContextMenu {
 
   /**
    * @param owner
    */
-  public TilesContextMenu(ITiles<? extends ITile> owner, List<? extends IMenu> initialChildMenus) {
+  public TilesContextMenu(ITileGrid<? extends ITile> owner, List<? extends IMenu> initialChildMenus) {
     super(owner, initialChildMenus);
   }
 
@@ -59,7 +59,7 @@ public class TilesContextMenu extends AbstractContextMenu<ITiles<? extends ITile
   @Override
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
     super.handleOwnerPropertyChanged(evt);
-    if (evt.getPropertyName() == ITiles.PROP_SELECTED_TILES) {
+    if (evt.getPropertyName() == ITileGrid.PROP_SELECTED_TILES) {
       handleOwnerValueChanged();
     }
     // FIXME [7.1] CGU tiles necessary to handle tile update events as done in table?

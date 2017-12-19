@@ -78,7 +78,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.client.ui.form.fields.tagfield.ITagField;
-import org.eclipse.scout.rt.client.ui.form.fields.tilesfield.ITilesField;
+import org.eclipse.scout.rt.client.ui.form.fields.tilefield.ITileField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
 import org.eclipse.scout.rt.client.ui.form.fields.wizard.IWizardProgressField;
@@ -87,8 +87,8 @@ import org.eclipse.scout.rt.client.ui.group.IGroup;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.tile.IFormFieldTile;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
-import org.eclipse.scout.rt.client.ui.tile.ITiles;
-import org.eclipse.scout.rt.client.ui.tile.ITilesAccordion;
+import org.eclipse.scout.rt.client.ui.tile.ITileGrid;
+import org.eclipse.scout.rt.client.ui.tile.ITileAccordion;
 import org.eclipse.scout.rt.client.ui.tile.IWidgetTile;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.Order;
@@ -144,7 +144,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.tabbox.JsonTabBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tabbox.JsonTabItem;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tablefield.JsonTableField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tagfield.JsonTagField;
-import org.eclipse.scout.rt.ui.html.json.form.fields.tilesfield.JsonTilesField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.tilesfield.JsonTileField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.treebox.JsonTreeBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.treefield.JsonTreeField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.wizard.JsonWizardProgressField;
@@ -172,8 +172,8 @@ import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTableTextUserFilte
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTextColumnUserFilter;
 import org.eclipse.scout.rt.ui.html.json.tile.JsonFormFieldTile;
 import org.eclipse.scout.rt.ui.html.json.tile.JsonTile;
-import org.eclipse.scout.rt.ui.html.json.tile.JsonTiles;
-import org.eclipse.scout.rt.ui.html.json.tile.JsonTilesAccordion;
+import org.eclipse.scout.rt.ui.html.json.tile.JsonTileGrid;
+import org.eclipse.scout.rt.ui.html.json.tile.JsonTileAccordion;
 import org.eclipse.scout.rt.ui.html.json.tile.JsonWidgetTile;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 
@@ -286,8 +286,8 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     if (model instanceof IClipboardField) {
       return new JsonClipboardField<>((IClipboardField) model, session, id, parent);
     }
-    if (model instanceof ITilesField<?>) {
-      return new JsonTilesField<ITilesField<? extends ITiles>>((ITilesField<?>) model, session, id, parent);
+    if (model instanceof ITileField<?>) {
+      return new JsonTileField<ITileField<? extends ITileGrid>>((ITileField<?>) model, session, id, parent);
     }
     if (model instanceof IAccordionField<?>) {
       return new JsonAccordionField<IAccordionField<? extends IAccordion>>((IAccordionField<?>) model, session, id, parent);
@@ -377,11 +377,11 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     if (model instanceof ITile) {
       return new JsonTile<>((ITile) model, session, id, parent);
     }
-    if (model instanceof ITiles) {
-      return new JsonTiles<>((ITiles) model, session, id, parent);
+    if (model instanceof ITileGrid) {
+      return new JsonTileGrid<>((ITileGrid) model, session, id, parent);
     }
-    if (model instanceof ITilesAccordion) {
-      return new JsonTilesAccordion<>((ITilesAccordion) model, session, id, parent);
+    if (model instanceof ITileAccordion) {
+      return new JsonTileAccordion<>((ITileAccordion) model, session, id, parent);
     }
     if (model instanceof IGroup) {
       return new JsonGroup<>((IGroup) model, session, id, parent);

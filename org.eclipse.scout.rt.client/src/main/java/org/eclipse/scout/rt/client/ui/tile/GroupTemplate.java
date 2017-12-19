@@ -14,8 +14,8 @@ import org.eclipse.scout.rt.client.ui.group.IGroup;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
- * Used by implementations of {@link ITilesAccordionGroupManager}. This is a template to create instances of
- * {@link IGroup} within the {@link AbstractTilesAccordion}.
+ * Used by implementations of {@link ITileAccordionGroupManager}. This is a template to create instances of
+ * {@link IGroup} within the {@link AbstractTileAccordion}.
  */
 @ClassId("66075cfe-6ef2-4a0c-9932-097038d16838")
 public class GroupTemplate {

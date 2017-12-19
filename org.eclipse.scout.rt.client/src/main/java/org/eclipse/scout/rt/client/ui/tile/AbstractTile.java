@@ -39,7 +39,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractTile.class);
 
   private final ObjectExtensions<AbstractTile, ITileExtension<? extends AbstractTile>> m_objectExtensions;
-  private ITiles<? extends ITile> m_container;
+  private ITileGrid<? extends ITile> m_container;
   private DataChangeListener m_internalDataChangeListener;
   private boolean m_filterAccepted = true;
   private boolean m_loaded = false;
@@ -332,12 +332,12 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   }
 
   @Override
-  public ITiles<? extends ITile> getContainer() {
+  public ITileGrid<? extends ITile> getContainer() {
     return m_container;
   }
 
   @Override
-  public void setContainer(ITiles<? extends ITile> container) {
+  public void setContainer(ITileGrid<? extends ITile> container) {
     m_container = container;
   }
 

@@ -455,8 +455,8 @@
   __include("scout/form/fields/tagfield/TagFieldOpenPopupKeyStroke.js");
   __include("scout/form/fields/tagfield/TagFieldLayout.js");
   __include("scout/form/fields/tagfield/TagFieldPopup.js");
-  __include("scout/form/fields/tilesfield/TilesField.js");
-  __include("scout/form/fields/tilesfield/TilesFieldAdapter.js");
+  __include("scout/form/fields/tilefield/TileField.js");
+  __include("scout/form/fields/tilefield/TileFieldAdapter.js");
   __include("scout/form/fields/treebox/TreeBox.js");
   __include("scout/form/fields/treebox/TreeBoxAdapter.js");
   __include("scout/form/fields/treebox/TreeBoxLayout.js");
@@ -467,25 +467,25 @@
   __include("scout/form/fields/wizard/WizardProgressFieldLayout.js");
   __include("scout/form/fields/wrappedform/WrappedFormField.js");
   __include("scout/form/fields/wrappedform/WrappedFormFieldAdapter.js");
-  // Tiles
-  __include("scout/tiles/Tile.js");
-  __include("scout/tiles/TileAdapter.js");
-  __include("scout/tiles/Tiles.js");
-  __include("scout/tiles/TilesAdapter.js");
-  __include("scout/tiles/TilesGridConfig.js");
-  __include("scout/tiles/TilesLayout.js");
-  __include("scout/tiles/TilesLayoutConfig.js");
-  __include("scout/tiles/TilesSelectionHandler.js");
-  __include("scout/tiles/accordion/TilesAccordion.js");
-  __include("scout/tiles/accordion/TilesAccordionAdapter.js");
-  __include("scout/tiles/accordion/TilesAccordionSelectionHandler.js");
-  __include("scout/tiles/RemoteTileFilter.js");
-  __include("scout/tiles/WidgetTile.js");
-  __include("scout/tiles/WidgetTileAdapter.js");
-  __include("scout/tiles/PlaceholderTile.js");
-  __include("scout/tiles/fields/FormFieldTile.js");
-  __include("scout/tiles/fields/FormFieldTileAdapter.js");
-  __include("scout/tiles/fields/button/TileButton.js");
+  // TileGrid
+  __include("scout/tile/Tile.js");
+  __include("scout/tile/TileAdapter.js");
+  __include("scout/tile/TileGrid.js");
+  __include("scout/tile/TileGridAdapter.js");
+  __include("scout/tile/TileGridGridConfig.js");
+  __include("scout/tile/TileGridLayout.js");
+  __include("scout/tile/TileGridLayoutConfig.js");
+  __include("scout/tile/TileGridSelectionHandler.js");
+  __include("scout/tile/accordion/TileAccordion.js");
+  __include("scout/tile/accordion/TileAccordionAdapter.js");
+  __include("scout/tile/accordion/TileAccordionSelectionHandler.js");
+  __include("scout/tile/RemoteTileFilter.js");
+  __include("scout/tile/WidgetTile.js");
+  __include("scout/tile/WidgetTileAdapter.js");
+  __include("scout/tile/PlaceholderTile.js");
+  __include("scout/tile/fields/FormFieldTile.js");
+  __include("scout/tile/fields/FormFieldTileAdapter.js");
+  __include("scout/tile/fields/button/TileButton.js");
   // Desktop
   __include("scout/desktop/Desktop.js");
   __include("scout/desktop/DesktopAdapter.js");
@@ -527,8 +527,8 @@
   __include("scout/desktop/outline/pages/PageWithNodes.js");
   __include("scout/desktop/outline/pages/PageWithTable.js");
   __include("scout/desktop/outline/pages/PageTileButton.js");
-  __include("scout/desktop/outline/pages/PageTiles.js");
-  __include("scout/desktop/outline/pages/PageTilesSelectKeyStroke.js");
+  __include("scout/desktop/outline/pages/PageTileGrid.js");
+  __include("scout/desktop/outline/pages/PageTileGridSelectKeyStroke.js");
   __include("scout/desktop/outline/pages/AutoLeafPageWithNodes.js");
   __include("scout/tabbox/SimpleTab.js");
   __include("scout/desktop/desktoptab/DesktopTab.js"); // requires SimpleTab.js

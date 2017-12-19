@@ -20,7 +20,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.group.AbstractGroup;
 import org.eclipse.scout.rt.client.ui.tile.AbstractTile;
-import org.eclipse.scout.rt.client.ui.tile.AbstractTiles;
+import org.eclipse.scout.rt.client.ui.tile.AbstractTileGrid;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -126,12 +126,12 @@ public class AccordionTest {
     }
 
     @Override
-    public Tiles getBody() {
-      return (Tiles) super.getBody();
+    public TileGrid getBody() {
+      return (TileGrid) super.getBody();
     }
 
     @ClassId("1af3bcc9-5cb0-486a-bb5a-6ef5dfc63230")
-    public class Tiles extends AbstractTiles<P_Tile> {
+    public class TileGrid extends AbstractTileGrid<P_Tile> {
 
     }
 

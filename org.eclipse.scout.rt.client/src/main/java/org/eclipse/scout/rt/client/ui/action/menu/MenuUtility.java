@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
-import org.eclipse.scout.rt.client.ui.tile.ITiles;
+import org.eclipse.scout.rt.client.ui.tile.ITileGrid;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.Range;
 
@@ -155,15 +155,15 @@ public final class MenuUtility {
     }
   }
 
-  public static Set<TilesMenuType> getMenuTypesForTilesSelection(List<? extends ITile> selection) {
+  public static Set<TileGridMenuType> getMenuTypesForTilesSelection(List<? extends ITile> selection) {
     if (CollectionUtility.isEmpty(selection)) {
-      return CollectionUtility.hashSet(TilesMenuType.EmptySpace);
+      return CollectionUtility.hashSet(TileGridMenuType.EmptySpace);
     }
     else if (CollectionUtility.size(selection) == 1) {
-      return CollectionUtility.hashSet(TilesMenuType.SingleSelection);
+      return CollectionUtility.hashSet(TileGridMenuType.SingleSelection);
     }
     else {
-      return CollectionUtility.hashSet(TilesMenuType.MultiSelection);
+      return CollectionUtility.hashSet(TileGridMenuType.MultiSelection);
     }
   }
 
@@ -203,16 +203,16 @@ public final class MenuUtility {
     throw new IllegalStateException("Ambiguous menu type " + menuType.getName() + "! More than one implementation was found: " + CollectionUtility.format(collectedMenus));
   }
 
-  public static void updateMenuVisibilitiesForTiles(ITiles tiles) {
+  public static void updateMenuVisibilitiesForTiles(ITileGrid tileGrid) {
     Set<IMenuType> acceptedMenuTypes = new HashSet<>();
-    acceptedMenuTypes.add(TilesMenuType.EmptySpace);
-    if (tiles.getSelectedTiles().size() == 1) {
-      acceptedMenuTypes.add(TilesMenuType.SingleSelection);
+    acceptedMenuTypes.add(TileGridMenuType.EmptySpace);
+    if (tileGrid.getSelectedTiles().size() == 1) {
+      acceptedMenuTypes.add(TileGridMenuType.SingleSelection);
     }
-    else if (tiles.getSelectedTiles().size() > 1) {
-      acceptedMenuTypes.add(TilesMenuType.MultiSelection);
+    else if (tileGrid.getSelectedTiles().size() > 1) {
+      acceptedMenuTypes.add(TileGridMenuType.MultiSelection);
     }
-    updateMenuVisibilities(tiles.getContextMenu(), acceptedMenuTypes);
+    updateMenuVisibilities(tileGrid.getContextMenu(), acceptedMenuTypes);
   }
 
   /**
