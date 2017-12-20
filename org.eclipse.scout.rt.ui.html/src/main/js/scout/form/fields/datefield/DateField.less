@@ -175,18 +175,20 @@
   }
 }
 
-.touch-popup-field.time{
-  input.date,
-  .icon.date,
-  .icon.date-clear {
-    display: none !important;
+.touch-popup-field.time > .field {
+
+  & > input.date,
+  & > .icon.date,
+  & > .icon.date-clear {
+    .hidden();
   }
 }
 
-.touch-popup-field.date{
-  input.time,
-  .icon.time,
-  .icon.time-clear {
-    display: none !important;
+.touch-popup-field.date > .field {
+
+  & > input.time,
+  & > .icon.time,
+  & > .icon.time-clear {
+    .hidden();
   }
 }
