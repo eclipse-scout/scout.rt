@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.smartfield.result;
+package org.eclipse.scout.rt.client.services.lookup;
 
 public interface IQueryParam<T> {
 

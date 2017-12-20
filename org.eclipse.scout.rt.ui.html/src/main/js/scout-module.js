@@ -61,6 +61,8 @@
   // Lookup calls
   __include("scout/lookup/LookupCall.js");
   __include("scout/lookup/LookupRow.js");
+  __include("scout/lookup/RemoteLookupCall.js");
+  __include("scout/lookup/RemoteLookupRequest.js");
   __include("scout/lookup/StaticLookupCall.js");
   __include("scout/lookup/HierarchicalLookupResultBuilder.js");
   // Code
@@ -421,8 +423,6 @@
   __include("scout/form/fields/smartfield/ProposalField.js");
   __include("scout/form/fields/smartfield/ProposalFieldAdapter.js");
   __include("scout/form/fields/smartfield/ProposalTreeNode.js");
-  __include("scout/form/fields/smartfield/RemoteLookupCall.js");
-  __include("scout/form/fields/smartfield/RemoteLookupRequest.js");
   __include("scout/form/fields/smartfield/ProposalChooser.js");
   __include("scout/form/fields/smartfield/ProposalChooserLayout.js");
   __include("scout/form/fields/smartfield/TableProposalChooser.js");
@@ -447,6 +447,7 @@
   __include("scout/form/fields/tabbox/TabItemLayout.js");
   __include("scout/form/fields/tablefield/TableField.js");
   __include("scout/form/fields/tablefield/TableFieldAdapter.js");
+  __include("scout/form/fields/tagfield/TagChooserPopup.js");
   __include("scout/form/fields/tagfield/TagField.js");
   __include("scout/form/fields/tagfield/TagFieldAdapter.js");
   __include("scout/form/fields/tagfield/TagFieldEnterKeyStroke.js");

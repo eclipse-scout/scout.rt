@@ -10,34 +10,28 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.smartfield;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.scout.rt.client.services.lookup.ILookupCallResult;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnDescriptor;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam.QueryBy;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.ISmartFieldResult;
-import org.eclipse.scout.rt.platform.exception.IThrowableWithContextInfo;
-import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
-import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
+import org.eclipse.scout.rt.ui.html.json.lookup.JsonLookupCallResult;
+import org.eclipse.scout.rt.ui.html.json.lookup.JsonLookupRow;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -83,7 +77,7 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
       @Override
       @SuppressWarnings("unchecked")
       public Object prepareValueForToJson(Object value) {
-        return resultToJson((ISmartFieldResult<VALUE>) value);
+        return resultToJson((ILookupCallResult<VALUE>) value);
       }
     });
     putJsonProperty(new JsonProperty<ISmartField<VALUE>>(ISmartField.PROP_LOOKUP_ROW, model) {
@@ -346,41 +340,8 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
     return getModel().getColumnDescriptors() != null;
   }
 
-  @SuppressWarnings("unchecked")
-  protected JSONObject resultToJson(ISmartFieldResult result) {
-    if (result == null) {
-      return null;
-    }
-    JSONObject json = new JSONObject();
-    JSONArray jsonLookupRows = new JSONArray();
-    for (LookupRow<?> lookupRow : (Collection<LookupRow<?>>) result.getLookupRows()) {
-      jsonLookupRows.put(lookupRowToJson(lookupRow, hasMultipleColumns()));
-    }
-    json.put("lookupRows", jsonLookupRows);
-    IQueryParam queryParam = result.getQueryParam();
-    json.put("queryBy", queryParam.getQueryBy());
-    if (queryParam.is(QueryBy.TEXT)) {
-      json.put("text", queryParam.getText());
-    }
-    else if (queryParam.is(QueryBy.KEY)) {
-      json.put("key", getIdForLookupRowKey(queryParam.getKey()));
-    }
-    else if (queryParam.is(QueryBy.REC)) {
-      json.put("rec", getIdForLookupRowKey(queryParam.getKey()));
-    }
-    if (result.getException() != null) {
-      json.put("exception", exceptionToJson(result.getException()));
-    }
-    return json;
-  }
-
-  protected Object exceptionToJson(Throwable exception) {
-    if (exception instanceof PlatformException) {
-      return ((IThrowableWithContextInfo) exception).getDisplayMessage();
-    }
-    else {
-      return exception.getMessage();
-    }
+  protected Object resultToJson(ILookupCallResult<VALUE> result) {
+    return JsonLookupCallResult.toJson(result, hasMultipleColumns(), this::getIdForLookupRowKey);
   }
 
   protected ILookupRow<VALUE> lookupRowFromJson(JSONObject json) {
@@ -401,52 +362,8 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
     return lookupRow;
   }
 
-  protected JSONObject lookupRowToJson(LookupRow<?> lookupRow, boolean multipleColumns) {
-    if (lookupRow == null) {
-      return null;
-    }
-
-    JSONObject json = new JSONObject();
-    json.put("key", getIdForLookupRowKey(lookupRow.getKey()));
-    json.put("text", lookupRow.getText());
-    if (StringUtility.hasText(lookupRow.getIconId())) {
-      json.put("iconId", BinaryResourceUrlUtility.createIconUrl(lookupRow.getIconId()));
-    }
-    if (StringUtility.hasText(lookupRow.getTooltipText())) {
-      json.put("tooltipText", lookupRow.getTooltipText());
-    }
-    if (StringUtility.hasText(lookupRow.getBackgroundColor())) {
-      json.put("backgroundColor", lookupRow.getBackgroundColor());
-    }
-    if (StringUtility.hasText(lookupRow.getForegroundColor())) {
-      json.put("foregroundColor", lookupRow.getForegroundColor());
-    }
-    if (lookupRow.getFont() != null) {
-      json.put("font", lookupRow.getFont().toPattern());
-    }
-    if (!lookupRow.isEnabled()) {
-      json.put("enabled", lookupRow.isEnabled());
-    }
-    if (lookupRow.getParentKey() != null) {
-      json.put("parentKey", getIdForLookupRowKey(lookupRow.getParentKey()));
-    }
-    if (!lookupRow.isActive()) {
-      json.put("active", lookupRow.isActive());
-    }
-    if (multipleColumns && lookupRow.getAdditionalTableRowData() != null) {
-      json.put("additionalTableRowData", tableRowDataToJson(lookupRow.getAdditionalTableRowData()));
-    }
-    if (StringUtility.hasText(lookupRow.getCssClass())) {
-      json.put("cssClass", lookupRow.getCssClass());
-    }
-    return json;
-  }
-
-  protected Object tableRowDataToJson(AbstractTableRowData tableRowData) {
-    if (tableRowData == null) {
-      return null;
-    }
-    return MainJsonObjectFactory.get().createJsonObject(tableRowData).toJson();
+  protected Object lookupRowToJson(LookupRow<?> lookupRow, boolean multipleColumns) {
+    return JsonLookupRow.toJson(lookupRow, multipleColumns, this::getIdForLookupRowKey);
   }
 
   @SuppressWarnings("unchecked")

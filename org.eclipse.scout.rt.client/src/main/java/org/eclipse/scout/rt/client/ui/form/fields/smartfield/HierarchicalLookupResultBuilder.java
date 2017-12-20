@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam.QueryBy;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.ISmartFieldResult;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.SmartFieldResult;
+import org.eclipse.scout.rt.client.services.lookup.ILookupCallResult;
+import org.eclipse.scout.rt.client.services.lookup.IQueryParam;
+import org.eclipse.scout.rt.client.services.lookup.LookupCallResult;
+import org.eclipse.scout.rt.client.services.lookup.IQueryParam.QueryBy;
 import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.slf4j.Logger;
@@ -151,7 +151,7 @@ public class HierarchicalLookupResultBuilder<VALUE> {
   /**
    * @return all new rows to be inserted (including parents of search result)
    */
-  public ISmartFieldResult<VALUE> addParentLookupRows(ISmartFieldResult<VALUE> result) {
+  public ILookupCallResult<VALUE> addParentLookupRows(ILookupCallResult<VALUE> result) {
     List<ILookupRow<VALUE>> lookupRows;
     if (m_smartField.isLoadParentNodes()) {
       if (m_smartField.isBrowseLoadIncremental()) {
@@ -170,7 +170,7 @@ public class HierarchicalLookupResultBuilder<VALUE> {
     else {
       lookupRows = result.getLookupRows();
     }
-    return new SmartFieldResult<>(lookupRows, result.getQueryParam(), result.getException());
+    return new LookupCallResult<>(lookupRows, result.getQueryParam(), result.getException());
   }
 
   private class P_KeyLookupRowProvider implements ILookupRowByKeyProvider<VALUE> {

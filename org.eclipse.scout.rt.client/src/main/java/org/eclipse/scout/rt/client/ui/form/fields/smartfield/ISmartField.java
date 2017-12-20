@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.client.services.lookup.ILookupCallResult;
+import org.eclipse.scout.rt.client.services.lookup.IQueryParam;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnDescriptor;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.ISmartFieldResult;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -69,7 +69,7 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
 
   void lookupByKey(VALUE key);
 
-  ISmartFieldResult getResult();
+  ILookupCallResult getResult();
 
   /**
    * true: inactive rows are display and can be also be parsed using the UI facade according to

@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.tagfield;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.services.lookup.ILookupCallResult;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.tagfield.ITagField;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -21,6 +22,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
+import org.eclipse.scout.rt.ui.html.json.lookup.JsonLookupCallResult;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -53,6 +55,18 @@ public class JsonTagField extends JsonValueField<ITagField> {
         return new JSONArray((Set<String>) value);
       }
     });
+    putJsonProperty(new JsonProperty<ITagField>(ITagField.PROP_RESULT, model) {
+      @Override
+      protected ILookupCallResult<String> modelValue() {
+        return getModel().getResult();
+      }
+
+      @Override
+      @SuppressWarnings("unchecked")
+      public Object prepareValueForToJson(Object value) {
+        return JsonLookupCallResult.toJson((ILookupCallResult<String>) value);
+      }
+    });
   }
 
   @Override
@@ -70,6 +84,21 @@ public class JsonTagField extends JsonValueField<ITagField> {
     }
 
     handleUiDisplayTextChange(data);
+  }
+
+  protected void handleUiLookupByText(JsonEvent event) {
+    String text = event.getData().optString("text");
+    getModel().getUIFacade().lookupByTextFromUI(text);
+  }
+
+  @Override
+  public void handleUiEvent(JsonEvent event) {
+    if ("lookupByText".equals(event.getType())) {
+      handleUiLookupByText(event);
+    }
+    else {
+      super.handleUiEvent(event);
+    }
   }
 
   @Override

@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.beans.PropertyChangeListener;
 
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.ISmartFieldResult;
+import org.eclipse.scout.rt.client.services.lookup.ILookupCallResult;
+import org.eclipse.scout.rt.client.services.lookup.IQueryParam;
 
 public interface ISmartFieldLookupRowFetcher<LOOKUP_KEY> {
 
@@ -25,6 +25,6 @@ public interface ISmartFieldLookupRowFetcher<LOOKUP_KEY> {
 
   void update(IQueryParam<LOOKUP_KEY> queryParam, boolean synchronous);
 
-  ISmartFieldResult<LOOKUP_KEY> getResult();
+  ILookupCallResult<LOOKUP_KEY> getResult();
 
 }

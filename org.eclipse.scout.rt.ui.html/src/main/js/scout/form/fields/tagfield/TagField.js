@@ -16,6 +16,7 @@ scout.TagField = function() {
   this.overflowVisible = false;
   this.$overflowIcon = null;
   this.popup = null;
+  this.chooser = null;
 };
 scout.inherits(scout.TagField, scout.ValueField);
 
@@ -41,7 +42,8 @@ scout.TagField.prototype._render = function() {
   this.addFieldContainer(this.$parent.makeDiv());
   this.fieldHtmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
   this.fieldHtmlComp.setLayout(new scout.TagFieldLayout(this));
-  var $field = this.$fieldContainer.appendElement('<input>', 'field');
+  var $field = this.$fieldContainer.appendElement('<input>', 'field')
+    .on('keyup', this._onInputKeyup.bind(this));
 
   this.addField($field);
   this.addStatus();
@@ -216,8 +218,48 @@ scout.TagField.prototype._renderOverflowVisible = function() {
   }
 };
 
+scout.TagField.prototype._onInputKeyup = function(event) {
+  this._lookupByText(this.$field.val());
+};
+
+scout.TagField.prototype._lookupByText = function(text) {
+  if (!this.lookupCall) {
+    return null;
+  }
+  return this.lookupCall.getByText(text)
+    .done(this._onLookupDone.bind(this));
+};
+
+scout.TagField.prototype._onLookupDone = function(result) {
+  if (!this.chooser) {
+    this.chooser = scout.create('TagChooserPopup', {
+      parent: this,
+      $anchor: this.$field,
+      closeOnAnchorMouseDown: false,
+      lookupResult: result
+    });
+    this.chooser.on('lookupRowSelected', this._onLookupRowSelected.bind(this));
+    this.chooser.one('remove', function() {
+      this.chooser = null;
+    }.bind(this));
+    this.chooser.open();
+  }
+
+  this.chooser.setLookupResult(result);
+};
+
 scout.TagField.prototype._onOverflowIconClick = function(event) {
   this.openOverflowPopup();
+};
+
+scout.TagField.prototype._onLookupRowSelected = function(event) {
+  this.addTag(event.lookupRow.key);
+  this.chooser.close();
+};
+
+scout.TagField.prototype.addTag = function(text) {
+  var value = this._parseValue(text);
+  this.setValue(value);
 };
 
 scout.TagField.prototype.openOverflowPopup = function() {

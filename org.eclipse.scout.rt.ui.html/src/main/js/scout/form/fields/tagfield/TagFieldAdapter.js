@@ -20,6 +20,33 @@ scout.TagFieldAdapter.prototype._initProperties = function(model) {
   }
 };
 
+scout.TagFieldAdapter.prototype._postCreateWidget = function() {
+  scout.TagFieldAdapter.parent.prototype._postCreateWidget.call(this);
+  this.widget.lookupCall = scout.create('RemoteLookupCall', this);
+};
+
+scout.TagFieldAdapter.prototype._syncResult = function(result) {
+  this.widget.lookupCall.resolveLookup(result);
+};
+
+// FIXME [awe] copy/paste from SmartFieldAdapter, move to helper?
+/**
+ * @param {scout.QueryBy} queryBy
+ * @param {object} [queryData] optional data (text, key, rec)
+ */
+scout.TagFieldAdapter.prototype.sendLookup = function(queryBy, queryData) {
+  var propertyName = queryBy.toLowerCase(),
+    requestType = 'lookupBy' + scout.strings.toUpperCaseFirstLetter(propertyName),
+    requestData = {
+      showBusyIndicator: false
+    };
+  if (!scout.objects.isNullOrUndefined(queryData)) {
+    requestData[propertyName] = queryData;
+  }
+  this._send(requestType, requestData);
+};
+
+
 scout.TagFieldAdapter.prototype._onWidgetAcceptInput = function(event) {
   this._send('acceptInput', {
     displayText: event.displayText,

@@ -8,13 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.smartfield.result;
+package org.eclipse.scout.rt.client.services.lookup;
 
 import java.util.List;
 
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
-public interface ISmartFieldResult<LOOKUP_KEY> {
+public interface ILookupCallResult<LOOKUP_KEY> {
 
   IQueryParam<LOOKUP_KEY> getQueryParam();
 

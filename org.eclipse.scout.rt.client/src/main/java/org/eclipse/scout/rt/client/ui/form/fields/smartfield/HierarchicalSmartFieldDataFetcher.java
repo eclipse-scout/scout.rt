@@ -15,9 +15,9 @@ import java.util.function.BiConsumer;
 
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam.QueryBy;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.SmartFieldResult;
+import org.eclipse.scout.rt.client.services.lookup.IQueryParam;
+import org.eclipse.scout.rt.client.services.lookup.LookupCallResult;
+import org.eclipse.scout.rt.client.services.lookup.IQueryParam.QueryBy;
 import org.eclipse.scout.rt.platform.exception.IProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
@@ -46,7 +46,7 @@ public class HierarchicalSmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmart
 
   private BiConsumer<List<ILookupRow<LOOKUP_KEY>>, Throwable> updateResult(final IQueryParam<LOOKUP_KEY> query) {
     return (rows, error) -> {
-      SmartFieldResult<LOOKUP_KEY> result = new SmartFieldResult<>(rows, query, error);
+      LookupCallResult<LOOKUP_KEY> result = new LookupCallResult<>(rows, query, error);
       if (error != null) {
         logException(error);
       }

@@ -13,9 +13,12 @@ package org.eclipse.scout.rt.client.ui.form.fields.tagfield;
 import java.util.Collection;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.services.lookup.ILookupCallResult;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
 public interface ITagField extends IValueField<Set<String>> {
+
+  String PROP_RESULT = "result";
 
   void addTag(String tag);
 
@@ -25,6 +28,10 @@ public interface ITagField extends IValueField<Set<String>> {
 
   void removeAllTags();
 
+  void lookupByText(String proposal);
+
   ITagFieldUIFacade getUIFacade();
+
+  ILookupCallResult<String> getResult();
 
 }

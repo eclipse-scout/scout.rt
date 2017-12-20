@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam.QueryBy;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.SmartFieldResult;
+import org.eclipse.scout.rt.client.services.lookup.IQueryParam;
+import org.eclipse.scout.rt.client.services.lookup.LookupCallResult;
+import org.eclipse.scout.rt.client.services.lookup.IQueryParam.QueryBy;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
 
@@ -76,12 +76,12 @@ public class SmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmartFieldLookupR
 
     @Override
     public void onSuccess(List<? extends ILookupRow<LOOKUP_KEY>> rows) {
-      setResult(new SmartFieldResult<>(new ArrayList<>(rows), m_param, null));
+      setResult(new LookupCallResult<>(new ArrayList<>(rows), m_param, null));
     }
 
     @Override
     public void onFailure(RuntimeException exception) {
-      setResult(new SmartFieldResult<>(null, m_param, exception));
+      setResult(new LookupCallResult<>(null, m_param, exception));
     }
   }
 }

@@ -13,24 +13,52 @@ package org.eclipse.scout.rt.client.ui.form.fields.tagfield;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.client.services.lookup.ILookupCallResult;
+import org.eclipse.scout.rt.client.services.lookup.IQueryParam;
+import org.eclipse.scout.rt.client.services.lookup.LookupCallResult;
+import org.eclipse.scout.rt.client.services.lookup.QueryParam;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
 
 @ClassId("c3e4f668-d55b-4748-b21d-8c539c25501a")
 public abstract class AbstractTagField extends AbstractValueField<Set<String>> implements ITagField {
 
   private ITagFieldUIFacade m_uiFacade;
+  private ILookupCall<String> m_lookupCall;
+  private IFuture<Void> m_runningLookup;
 
   @Override
   protected void initConfig() {
     super.initConfig();
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
+
+    Class<? extends ILookupCall<String>> lookupCallClass = getConfiguredLookupCall();
+    if (lookupCallClass != null) {
+      setLookupCall(BEANS.get(lookupCallClass));
+    }
+  }
+
+  @ConfigProperty(ConfigProperty.LOOKUP_CALL)
+  @Order(250)
+  protected Class<? extends ILookupCall<String>> getConfiguredLookupCall() {
+    return null;
   }
 
   @Override
@@ -96,6 +124,37 @@ public abstract class AbstractTagField extends AbstractValueField<Set<String>> i
   }
 
   @Override
+  public void lookupByText(String text) {
+    if (m_lookupCall == null) {
+      return;
+    }
+    if (m_runningLookup != null) {
+      m_runningLookup.cancel(false);
+    }
+    ILookupRowFetchedCallback<String> callback = new P_LookupByTextCallback(text);
+    m_lookupCall.setText(text);
+    m_runningLookup = m_lookupCall.getDataByTextInBackground(ClientRunContexts.copyCurrent(), callback);
+  }
+
+  public ILookupCall<String> getLookupCall() {
+    return m_lookupCall;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public ILookupCallResult<String> getResult() {
+    return (ILookupCallResult<String>) propertySupport.getProperty(PROP_RESULT);
+  }
+
+  public void setResult(ILookupCallResult<String> result) {
+    propertySupport.setProperty(PROP_RESULT, result);
+  }
+
+  protected void setLookupCall(ILookupCall<String> lookupCall) {
+    m_lookupCall = lookupCall;
+  }
+
+  @Override
   public ITagFieldUIFacade getUIFacade() {
     return m_uiFacade;
   }
@@ -109,6 +168,47 @@ public abstract class AbstractTagField extends AbstractValueField<Set<String>> i
       }
       setValue(value);
     }
+
+    @Override
+    public void lookupByTextFromUI(String text) {
+      if (!isEnabled() || !isVisible()) {
+        return;
+      }
+      lookupByText(text);
+    }
+
+  }
+
+  class P_LookupByTextCallback implements ILookupRowFetchedCallback<String> {
+
+    private final IQueryParam<String> m_queryParam;
+
+    public P_LookupByTextCallback(String text) {
+      m_queryParam = QueryParam.createByText(text);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void onSuccess(List<? extends ILookupRow<String>> lookupRows) {
+      try {
+        ClientRunContext runContext = ClientRunContexts.copyCurrent();
+        if (runContext.getRunMonitor().isCancelled()) {
+          return;
+        }
+        ModelJobs.schedule(() -> setResult(new LookupCallResult(lookupRows, m_queryParam, null)), ModelJobs.newInput(runContext)
+            .withName("Updating {}", AbstractTagField.this.getClass().getName()))
+            .awaitDone(); // block the current thread until completed
+      }
+      catch (ThreadInterruptedError e) { // NOSONAR
+        // NOP
+      }
+    }
+
+    @Override
+    public void onFailure(RuntimeException exception) {
+      // NOP
+    }
+
   }
 
 }

@@ -1,0 +1,90 @@
+/*******************************************************************************
+ * Copyright (c) 2017 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.ui.html.json.lookup;
+
+import java.util.function.Function;
+
+import org.eclipse.scout.rt.client.services.lookup.ILookupCallResult;
+import org.eclipse.scout.rt.client.services.lookup.IQueryParam;
+import org.eclipse.scout.rt.client.services.lookup.IQueryParam.QueryBy;
+import org.eclipse.scout.rt.platform.exception.IThrowableWithContextInfo;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.ui.html.json.IJsonObject;
+import org.json.JSONObject;
+
+public class JsonLookupCallResult<T> implements IJsonObject {
+
+  private final ILookupCallResult<T> m_result;
+  private final boolean m_multipleColumns;
+  private final Function<T, ? extends Object> m_keyMapper;
+
+  public JsonLookupCallResult(ILookupCallResult<T> result) {
+    this(result, false, null);
+  }
+
+  public JsonLookupCallResult(ILookupCallResult<T> result, boolean multipleColumns, Function<T, ? extends Object> keyMapper) {
+    Assertions.assertNotNull(result);
+    m_result = result;
+    m_multipleColumns = multipleColumns;
+    m_keyMapper = keyMapper;
+  }
+
+  @Override
+  public Object toJson() {
+    JSONObject json = new JSONObject();
+    json.put("lookupRows", JsonLookupRow.toJson(m_result.getLookupRows(), m_multipleColumns, m_keyMapper));
+    IQueryParam queryParam = m_result.getQueryParam();
+    json.put("queryBy", queryParam.getQueryBy());
+    if (queryParam.is(QueryBy.TEXT)) {
+      json.put("text", queryParam.getText());
+    }
+    else if (queryParam.is(QueryBy.KEY)) {
+      json.put("key", getKey(queryParam.getKey()));
+    }
+    else if (queryParam.is(QueryBy.REC)) {
+      json.put("rec", getKey(queryParam.getKey()));
+    }
+    if (m_result.getException() != null) {
+      json.put("exception", exceptionToJson(m_result.getException()));
+    }
+    return json;
+  }
+
+  @SuppressWarnings("unchecked")
+  protected Object getKey(Object key) {
+    if (key == null) {
+      return null;
+    }
+    return m_keyMapper == null ? key : m_keyMapper.apply((T) key);
+  }
+
+  protected Object exceptionToJson(Throwable exception) {
+    if (exception instanceof PlatformException) {
+      return ((IThrowableWithContextInfo) exception).getDisplayMessage();
+    }
+    else {
+      return exception.getMessage();
+    }
+  }
+
+  public static <T> Object toJson(ILookupCallResult<T> result) {
+    return toJson(result, false, null);
+  }
+
+  public static <T> Object toJson(ILookupCallResult<T> result, boolean multipleColumns, Function<T, ? extends Object> keyMapper) {
+    if (result == null) {
+      return null;
+    }
+    return new JsonLookupCallResult<T>(result, multipleColumns, keyMapper).toJson();
+  }
+
+}
