@@ -195,7 +195,13 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
   }
 
   protected void handleUiValueChange(JSONObject data) {
-    Object jsonValue = data.opt(IValueField.PROP_VALUE);
+    Object jsonValue;
+    if (data.isNull(IValueField.PROP_VALUE)) {
+      jsonValue = null;
+    }
+    else {
+      jsonValue = data.get(IValueField.PROP_VALUE);
+    }
     Object value = jsonToValue(jsonValue);
     addPropertyEventFilterCondition(IValueField.PROP_VALUE, value);
     setValueFromUI(value);
