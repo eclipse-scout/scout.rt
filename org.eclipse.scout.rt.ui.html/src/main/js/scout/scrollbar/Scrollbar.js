@@ -108,9 +108,7 @@ scout.Scrollbar.prototype._remove = function() {
  */
 scout.Scrollbar.prototype.scroll = function(diff) {
   var posOld = Math.max(0, this.$parent[this._scrollDir]());
-  var posNew = posOld + (diff * (this._scrollSize / this._offsetSize));
-
-  this._scrollToAbsolutePoint(posNew);
+  this._scrollToAbsolutePoint(posOld + diff);
 };
 
 /**
@@ -299,7 +297,6 @@ scout.Scrollbar.prototype._onScroll = function(event) {
 };
 
 scout.Scrollbar.prototype._onScrollWheel = function(event) {
-  var w, d;
   if (!this.$container.isVisible()) {
     return true; // ignore scroll wheel event if there is no scroll bar visible
   }
@@ -310,11 +307,10 @@ scout.Scrollbar.prototype._onScrollWheel = function(event) {
     return true; // only scroll if shift modifier matches
   }
   event = event.originalEvent || this.$container.window(true).event.originalEvent;
-  w = event.wheelDelta ? -event.wheelDelta / 2 : event.detail * 20;
-  d = this._scrollSize / this._offsetSize;
+  var w = event.wheelDelta ? -event.wheelDelta / 2 : event.detail * 20;
 
   this.notifyBeforeScroll();
-  this.scroll(w / d);
+  this.scroll(w);
   this.notifyAfterScroll();
 
   return false;
