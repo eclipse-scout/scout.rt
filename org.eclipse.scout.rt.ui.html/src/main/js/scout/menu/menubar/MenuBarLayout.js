@@ -11,83 +11,67 @@
 scout.MenuBarLayout = function(menuBar) {
   scout.MenuBarLayout.parent.call(this);
   this._menuBar = menuBar;
+
+  this._overflowMenuItems = [];
+  this._visibleMenuItems = [];
+  this._ellipsis = null;
+  this.collapsed = false;
 };
 scout.inherits(scout.MenuBarLayout, scout.AbstractLayout);
 
-/**
- * @override AbstractLayout.js
- */
 scout.MenuBarLayout.prototype.layout = function($container) {
-  // check if all menu items have enough room to be displayed without ellipsis
-  this._destroyEllipsis();
-  this._menuBar.rebuildItemsInternal();
+  var menuItems = this._menuBar.orderedMenuItems.left.concat(this._menuBar.orderedMenuItems.right),
+    htmlContainer = scout.HtmlComponent.get($container),
+    ellipsis;
 
-  // Temporarily add "overflow: hidden" to measure the available size. (The overflow
-  // is not hidden in the CSS, otherwise the focus border could get cut off.)
-  var oldStyle = $container.attr('style');
-  $container.css('overflow', 'hidden');
-  $container.css('display', 'inline-block'); // override "display: table"
-  var availableWidth = $container.width();
-  var leftWidth = this._menuBar.$left.outerWidth(true);
-  var rightWidth = this._menuBar.$right.outerWidth(true);
-  $container.attrOrRemove('style', oldStyle);
+  this._ensureCachedBounds(menuItems);
 
-  if (leftWidth + rightWidth <= availableWidth) {
-    // ok, no ellipsis required
-    this._menuBar.visibleMenuItems = this._menuBar.menuItems;
-  } else {
-    // create ellipsis menu
-    this._createAndRenderEllipsis(this._menuBar.$left, rightWidth === 0);
-    var ellipsisSize = scout.graphics.size(this._menuBar.ellipsis.$container, true);
+  ellipsis = scout.arrays.find(menuItems, function(menuItem) {
+    return menuItem.ellipsis;
+  });
 
-    var remainingLeftWidth = Math.min(availableWidth - rightWidth, leftWidth);
+  this.preferredLayoutSize($container, {
+    widthHint: htmlContainer.availableSize().width
+  });
 
-    // right-aligned menus are never put into the overflow ellipsis-menu
-    // or in other words: they're not responsive.
-    // for left-aligned menus: once we notice a menu-item that does not
-    // fit into the available space, all following items must also be
-    // put into the overflow ellipsis-menu. Otherwise you would put
-    // an item with a long text into the ellipsis-menu, but the next
-    // icon, with a short text would still be in the menu-bar. Which would
-    // be confusing, as it would look like we've changed the order of the
-    // menu-items.
-    var menuItemsCopy = [];
-    var overflown = false;
-    var previousMenuItem = null;
-    this._menuBar.menuItems.forEach(function(menuItem) {
-      if (!menuItem.visible) {
-        return;
-      }
-      if (menuItem.rightAligned) {
-        // Always add right-aligned menus
-        menuItemsCopy.push(menuItem);
-      } else {
-        var itemSize = scout.graphics.size(menuItem.$container, true);
-        remainingLeftWidth -= itemSize.width;
-        if (overflown || remainingLeftWidth < 0) {
-          // Menu does not fit -> add to ellipsis menu
-          if (!overflown) {
-            overflown = true;
-            // Check if ellipsis menu fits, otherwise the previous menu has to be removed as well
-            if (previousMenuItem && remainingLeftWidth + itemSize.width - ellipsisSize.width < 0) {
-              this._removeMenuItem(previousMenuItem);
-              scout.arrays.remove(menuItemsCopy, previousMenuItem);
-            }
-          }
-          this._removeMenuItem(menuItem);
-        } else {
-          // Menu fits, add to normal menu list
-          menuItemsCopy.push(menuItem);
-        }
-        previousMenuItem = menuItem;
-      }
-    }, this);
-
-    this._addEllipsisToMenuItems(menuItemsCopy);
-    this._menuBar.visibleMenuItems = menuItemsCopy;
+  // first set visible to ensure the correct menu gets the tabindex. Therefore the ellipsis visibility is split.
+  if (ellipsis && this._overflowMenuItems.length > 0) {
+    ellipsis.setHidden(false);
   }
+  this._visibleMenuItems.forEach(function(menuItem) {
+    menuItem._setOverflown(false);
+    menuItem.setParent(this._menuBar);
+  }, this);
 
-  this._menuBar.visibleMenuItems.forEach(function(menuItem) {
+  this._overflowMenuItems.forEach(function(menuItem) {
+    menuItem._setOverflown(true);
+  });
+  if (ellipsis && this._overflowMenuItems.length === 0) {
+    ellipsis.setHidden(true);
+  }
+  // remove all separators
+  this._overflowMenuItems = this._overflowMenuItems.filter(function(menuItem) {
+    return !menuItem.separator;
+  });
+
+  // set childActions to empty array to prevent the menuItems from calling remove.
+  if (ellipsis) {
+    ellipsis._closePopup();
+    /* workaround to ensure current child action will not be removed when setting the new ones.
+     * This workaround and also the setParent on all visible menu items (see above) can be removed
+     * with the context menu clean up planned in the UI team.
+     */
+    ellipsis.childActions = [];
+    ellipsis.setChildActions(this._overflowMenuItems);
+  }
+  this.updateFirstAndLastMenuMarker(this._visibleMenuItems);
+
+  // trigger menu items layout
+  this._visibleMenuItems.forEach(function(menuItem) {
+    menuItem.validateLayout();
+  });
+
+  this._visibleMenuItems.forEach(function(menuItem) {
     // Make sure open popups are at the correct position after layouting
     if (menuItem.popup) {
       menuItem.popup.position();
@@ -95,52 +79,124 @@ scout.MenuBarLayout.prototype.layout = function($container) {
   });
 };
 
-scout.MenuBarLayout.prototype._removeMenuItem = function(menuItem) {
-  menuItem.remove();
-  menuItem.overflow = true;
-  this._menuBar.ellipsis.childActions.push(menuItem);
-};
+scout.MenuBarLayout.prototype.preferredLayoutSize = function($container, options) {
+  var htmlContainer = scout.HtmlComponent.get($container),
+    menuItems = this._menuBar.orderedMenuItems.all,
+    preferredSize = new scout.Dimension(),
+    ellipsis,
+    ellipsisBoundsGross = new scout.Dimension(),
 
-scout.MenuBarLayout.prototype._addEllipsisToMenuItems = function(menuItems) {
-  // Add the ellipsis menu to the menu-items list. Order matters because we do not sort
-  // menu-items again.
-  var insertItemAt = 0;
-  menuItems.some(function(menuItem, i) {
-    if (menuItem.rightAligned) {
-      return true; // break
+    _widthHintFilter = function(itemWidth, totalWidth, wHint) {
+      // escape truthy
+      if (wHint === 0 || wHint) {
+        return totalWidth + itemWidth <= wHint;
+      }
+      return true;
+    },
+    unorderedVisibleMenus = [];
+
+  if (options.widthHint) {
+    options.widthHint = options.widthHint - htmlContainer.insets().horizontal();
+  }
+  this._visibleMenuItems = [];
+  this._overflowMenuItems = [];
+  this._ensureCachedBounds(menuItems);
+
+  ellipsis = scout.arrays.find(menuItems, function(menuItem) {
+    return menuItem.ellipsis;
+  });
+  if (ellipsis) {
+    ellipsisBoundsGross = ellipsis.htmlComp._cachedPrefSize.add(ellipsis.htmlComp._cachedMargins);
+    preferredSize.width += ellipsisBoundsGross.width;
+  }
+
+  // first all non stackable menus which are always visible
+  menuItems.filter(function(menuItem) {
+    var prefSizeGross;
+    if (!menuItem.isVisible()) {
+      return false;
     }
-    insertItemAt = i + 1;
-    return false; // keep looking
-  });
-  scout.arrays.insert(menuItems, this._menuBar.ellipsis, insertItemAt);
-};
+    if (ellipsis && ellipsis === menuItem) {
+      return false;
+    }
+    if (!menuItem.stackable) {
+      prefSizeGross = menuItem.htmlComp._cachedPrefSize.add(menuItem.htmlComp._cachedMargins);
+      preferredSize.width += prefSizeGross.width;
+      preferredSize.height = Math.max(preferredSize.height, prefSizeGross.height);
+      unorderedVisibleMenus.push(menuItem);
+      return false;
+    }
+    return true;
+  }, this).forEach(function(menuItem, index, items) {
+    var prefSizeGross = menuItem.htmlComp._cachedPrefSize.add(menuItem.htmlComp._cachedMargins),
+      totalWidth = preferredSize.width;
+    if (ellipsis && index === items.length - 1 && this._overflowMenuItems.length === 0) {
+      totalWidth -= ellipsisBoundsGross.width;
+    }
+    if (!this.collapsed && this._overflowMenuItems.length === 0 && _widthHintFilter(prefSizeGross.width, totalWidth, options.widthHint)) {
+      preferredSize.width += prefSizeGross.width;
+      preferredSize.height = Math.max(preferredSize.height, prefSizeGross.height);
+      unorderedVisibleMenus.push(menuItem);
+    } else {
+      this._overflowMenuItems.push(menuItem);
+    }
+  }, this);
 
-scout.MenuBarLayout.prototype._createAndRenderEllipsis = function($container, lastMenuInBar) {
-  var ellipsis = scout.create('Menu', {
-    parent: this._menuBar,
-    horizontalAlignment: 1,
-    iconId: scout.icons.ELLIPSIS_V,
-    imageLoadingInvalidatesLayout: false,
-    tabbable: false
-  });
-  ellipsis.render($container);
-  if (lastMenuInBar) {
-    ellipsis.$container.addClass('last');
+  if (ellipsis) {
+    if (this._overflowMenuItems.length === 0) {
+      preferredSize.width -= ellipsisBoundsGross.width;
+    } else {
+      unorderedVisibleMenus.push(ellipsis);
+      preferredSize.height = Math.max(preferredSize.height, ellipsisBoundsGross.height);
+    }
   }
-  this._menuBar.ellipsis = ellipsis;
+  // well order and push to visible menu items
+  menuItems.forEach(function(menuItem) {
+    if (unorderedVisibleMenus.indexOf(menuItem) >= 0) {
+      this._visibleMenuItems.push(menuItem);
+    }
+  }, this);
+
+  return preferredSize.add(htmlContainer.insets());
 };
 
-scout.MenuBarLayout.prototype._destroyEllipsis = function() {
-  if (this._menuBar.ellipsis) {
-    this._menuBar.ellipsis.destroy();
-    this._menuBar.ellipsis = null;
-  }
+scout.MenuBarLayout.prototype.invalidate = function() {
+  var menuItems = this._menuBar.orderedMenuItems.all;
+  menuItems.forEach(function(menuItem) {
+    if (menuItem.rendered) {
+      menuItem.htmlComp._cachedPrefSize = null;
+      menuItem.htmlComp._cachedMargins = null;
+    }
+  });
 };
 
-scout.MenuBarLayout.prototype.preferredLayoutSize = function($container) {
-  // Menubar has an absolute css height set -> useCssSize = true
-  return scout.graphics.prefSize($container, {
-    useCssSize: true
+scout.MenuBarLayout.prototype._ensureCachedBounds = function(menuItems) {
+  var classList;
+  menuItems.filter(function(menuItem) {
+    return menuItem.isVisible();
+  }).forEach(function(menuItem) {
+    if (!menuItem.htmlComp._cachedPrefSize || !menuItem.htmlComp._cachedMargins) {
+      classList = menuItem.$container.attr('class');
+
+      menuItem.$container.removeClass('overflown');
+      menuItem.$container.removeClass('hidden');
+
+      menuItem.htmlComp._cachedPrefSize = menuItem.htmlComp.prefSize({
+        useCssSize: true
+      });
+      menuItem.htmlComp._cachedMargins = scout.graphics.margins(menuItem.$container);
+      menuItem.$container.attrOrRemove('class', classList);
+    }
+  });
+};
+
+scout.MenuBarLayout.prototype.updateFirstAndLastMenuMarker = function(menus) {
+  // Find first and last rendered menu
+  (menus || []).filter(function(menu) {
+    return menu.rendered && menu.isVisible() && !this.overflown && !this.hidden;
+  }).forEach(function(menu, index, menus) {
+    menu.$container.toggleClass('fist', index === 0);
+    menu.$container.toggleClass('last', index === menus.length - 1);
   });
 };
 

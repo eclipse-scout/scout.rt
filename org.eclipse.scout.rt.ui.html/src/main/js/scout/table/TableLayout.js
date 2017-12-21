@@ -42,6 +42,9 @@ scout.TableLayout.prototype.layout = function($container) {
   }
   if (header) {
     headerHeight = scout.graphics.size(header.$container).height;
+    if(header.menuBar){
+      header.menuBar.validateLayout();
+    }
   }
   if (footer) {
     // Layout table footer and add size of footer (including the control content) to 'height'

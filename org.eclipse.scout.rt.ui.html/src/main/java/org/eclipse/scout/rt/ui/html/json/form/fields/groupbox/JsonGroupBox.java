@@ -58,6 +58,12 @@ public class JsonGroupBox<GROUP_BOX extends IGroupBox> extends JsonCompositeFiel
   @Override
   protected void initJsonProperties(GROUP_BOX model) {
     super.initJsonProperties(model);
+    putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_SUB_LABEL, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getSubLabel();
+      }
+    });
 
     putJsonProperty(new JsonProperty<GROUP_BOX>(IGroupBox.PROP_BORDER_DECORATION, model) {
       @Override

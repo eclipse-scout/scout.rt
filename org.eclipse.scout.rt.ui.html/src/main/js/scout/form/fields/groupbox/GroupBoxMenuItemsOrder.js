@@ -39,6 +39,7 @@ scout.GroupBoxMenuItemsOrder.prototype.order = function(items) {
 
   return {
     left: leftButtons.concat(leftMenus),
-    right: rightButtons.concat(rightMenus)
+    right: rightButtons.concat(rightMenus),
+    all: leftButtons.concat(leftMenus).concat(rightButtons.concat(rightMenus))
   };
 };

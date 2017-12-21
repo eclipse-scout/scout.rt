@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.accordion.IAccordion;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.form.fields.IFormFieldMenu;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
@@ -151,6 +152,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.wizard.JsonWizardProgressFi
 import org.eclipse.scout.rt.ui.html.json.form.fields.wrappedform.JsonWrappedFormField;
 import org.eclipse.scout.rt.ui.html.json.group.JsonGroup;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
+import org.eclipse.scout.rt.ui.html.json.menu.form.field.JsonFormFieldMenu;
 import org.eclipse.scout.rt.ui.html.json.messagebox.JsonMessageBox;
 import org.eclipse.scout.rt.ui.html.json.table.JsonAlphanumericSortingStringColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonBeanColumn;
@@ -302,6 +304,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof IFormMenu<?>) {
       return new JsonFormMenu((IFormMenu<?>) model, session, id, parent);
+    }
+    if (model instanceof IFormFieldMenu) {
+      return new JsonFormFieldMenu<IFormFieldMenu>((IFormFieldMenu) model, session, id, parent);
     }
     if (model instanceof IMenu) {
       return new JsonMenu<>((IMenu) model, session, id, parent);

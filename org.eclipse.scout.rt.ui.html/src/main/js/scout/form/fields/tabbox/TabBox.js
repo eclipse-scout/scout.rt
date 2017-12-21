@@ -36,24 +36,17 @@ scout.TabBox.prototype._init = function(model) {
   if (this.selectedTab) {
     this.selectedTab.setTabActive(true);
   }
-  this.menuBar = scout.create('MenuBar', {
+  this.header = scout.create('TabBoxHeader', {
     parent: this,
-    menuOrder: new scout.GroupBoxMenuItemsOrder()
+    tabBox: this
   });
-  this._updateMenuBar(this.menus);
 };
 
 scout.TabBox.prototype._render = function() {
   this.addContainer(this.$parent, 'tab-box', new scout.TabBoxLayout(this));
 
-  this._$tabArea = this.$container
-    .appendDiv('tab-area')
-    .on('keydown', this._onKeyDown.bind(this));
+  this.header.render(this.$container);
   this.addStatus();
-  var htmlAreaComp = scout.HtmlComponent.install(this._$tabArea, this.session);
-  htmlAreaComp.setLayout(new scout.TabAreaLayout(this));
-
-  this.menuBar.render(this._$tabArea);
 
   this._$tabContent = this.$container.appendDiv('tab-content');
   var htmlCompContent = scout.HtmlComponent.install(this._$tabContent, this.session);
@@ -65,7 +58,6 @@ scout.TabBox.prototype._render = function() {
  */
 scout.TabBox.prototype._renderProperties = function() {
   scout.TabBox.parent.prototype._renderProperties.call(this);
-  this._renderTabs();
   this._renderTabContent();
 };
 
@@ -78,16 +70,6 @@ scout.TabBox.prototype._remove = function() {
   this._removeTabContent();
 };
 
-scout.TabBox.prototype._renderTabs = function() {
-  this.tabItems.forEach(function(tabItem) {
-    tabItem.renderTab(this._$tabArea);
-    tabItem.on('propertyChange', this._tabItemPropertyChangeHandler);
-    tabItem.one('tabRemove', function() {
-      tabItem.off('propertyChange', this._tabItemPropertyChangeHandler);
-    }.bind(this));
-  }, this);
-};
-
 scout.TabBox.prototype._removeTabs = function() {
   this.tabItems.forEach(function(tabItem) {
     tabItem.removeTab();
@@ -98,27 +80,6 @@ scout.TabBox.prototype._removeTabContent = function() {
   this.tabItems.forEach(function(tabItem) {
     tabItem.remove();
   }, this);
-};
-
-scout.TabBox.prototype.rebuildTabs = function() {
-  // TODO [7.0] awe: (tab-box) refactor this and work with a clone in the TabBoxLayout - when we remove an existing
-  // DOM element which currently has the focus - the focus is lost. An other solution would be, to render the
-  // tab at the correct position but probably that's not so easy because the render impl. does always append.
-  // Temporary focus fix
-  var $focusedElement = $(document.activeElement),
-    focusedElement = null;
-  if ($focusedElement.is('.tab-item')) {
-    focusedElement = $focusedElement.data('tabItem');
-  }
-  this.tabItems.forEach(function(tabItem) {
-    if (tabItem._tabRendered) {
-      tabItem.removeTab();
-    }
-  }, this);
-  this._renderTabs();
-  if (focusedElement) {
-    focusedElement.focusTab();
-  }
 };
 
 scout.TabBox.prototype.selectTabById = function(tabId) {
@@ -149,50 +110,11 @@ scout.TabBox.prototype._setSelectedTab = function(tab) {
   this._setProperty('selectedTab', selectedTab);
 
   if (this.rendered) {
-    // revalidateLayoutTree layout when tab-area has changed, because overflow tabs must be re-arranged
-    if (!this.selectedTab || !this.selectedTab._tabRendered) {
-      scout.HtmlComponent.get(this._$tabArea).revalidateLayoutTree();
-    }
     if (oldSelectedTab) {
       oldSelectedTab.detach();
     }
     this._renderTabContent();
   }
-};
-
-// keyboard navigation in tab-box button area
-// TODO [7.0] awe: (tab-box) overflow menu should be accessible by keyboard navigation
-scout.TabBox.prototype._onKeyDown = function(event) {
-  var navigationKey =
-    event.which === scout.keys.LEFT ||
-    event.which === scout.keys.RIGHT;
-  if (!navigationKey) {
-    return true;
-  }
-
-  event.preventDefault();
-  event.stopPropagation();
-
-  var nextTab = this._getNextVisibleTabForKeyStroke(event.which);
-  if (nextTab && nextTab._tabRendered) {
-    this.setSelectedTab(nextTab);
-    nextTab.focus();
-  }
-};
-
-scout.TabBox.prototype._getNextVisibleTabForKeyStroke = function(keyStroke) {
-  var nextTab,
-    dir = (keyStroke === scout.keys.LEFT) ? -1 : 1,
-    i = this.tabItems.indexOf(this.selectedTab) + dir;
-
-  while (i >= 0 && i < this.tabItems.length) {
-    nextTab = this.tabItems[i];
-    if (nextTab.visible) {
-      return nextTab;
-    }
-    i += dir;
-  }
-  return null;
 };
 
 scout.TabBox.prototype._renderTabContent = function() {
@@ -214,27 +136,10 @@ scout.TabBox.prototype._renderTabContent = function() {
   }
 };
 
-scout.TabBox.prototype._setMenus = function(menus) {
-  scout.TabBox.parent.prototype._setMenus.call(this, menus);
-  if (this.menuBar) {
-    // updateMenuBar is required because menuBar is not created yet when synMenus is called initially
-    this._updateMenuBar(menus);
-  }
-};
-
-scout.TabBox.prototype._removeMenus = function() {
-  // menubar takes care about removal
-};
-
-scout.TabBox.prototype._updateMenuBar = function(menus) {
-  var menuItems = scout.menus.filter(this.menus, ['TabBox.Header']);
-  this.menuBar.setMenuItems(menuItems);
-};
-
 scout.TabBox.prototype._renderStatusPosition = function() {
   if (this.statusPosition === scout.FormField.StatusPosition.TOP) {
     // move into title
-    this.$status.appendTo(this._$tabArea);
+    this.$status.appendTo(this.header.$container);
   } else {
     this.$status.appendTo(this.$container);
   }

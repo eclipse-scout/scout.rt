@@ -19,9 +19,8 @@ scout.TabBoxLayout.prototype.layout = function($container) {
   var containerSize, tabContentSize, tabAreaMargins, innerTabAreaSize,
     htmlContainer = scout.HtmlComponent.get($container),
     htmlTabContent = scout.HtmlComponent.get(this._tabBox._$tabContent),
-    htmlTabArea = scout.HtmlComponent.get(this._tabBox._$tabArea),
-    tabAreaWidth = 0,
-    tabAreaHeight = 0,
+    htmlTabArea = scout.HtmlComponent.get(this._tabBox.header.$container),
+    tabAreaWidthHint = 0,
     tabAreaSize = new scout.Dimension(),
     $status = this._tabBox.$status,
     statusPosition = this._tabBox.statusPosition;
@@ -31,15 +30,22 @@ scout.TabBoxLayout.prototype.layout = function($container) {
 
   if (htmlTabArea.isVisible()) {
     tabAreaMargins = htmlTabArea.margins();
-    tabAreaHeight = htmlTabArea.prefSize().height;
-    tabAreaWidth = containerSize.subtract(tabAreaMargins).width;
+    tabAreaWidthHint = containerSize.subtract(tabAreaMargins).width;
     if ($status && $status.isVisible()) {
       this._layoutStatus();
       if (statusPosition === scout.FormField.StatusPosition.DEFAULT) {
-        tabAreaWidth -= $status.outerWidth(true);
+        tabAreaWidthHint -= (this._statusWidth + scout.graphics.margins($status).horizontal());
       }
     }
-    innerTabAreaSize = new scout.Dimension(tabAreaWidth, tabAreaHeight);
+    innerTabAreaSize = htmlTabArea.prefSize({
+      widthHint: tabAreaWidthHint
+    });
+
+    if ($status && $status.isVisible()) {
+      this._layoutStatus(innerTabAreaSize.height);
+    }
+
+    innerTabAreaSize.width = tabAreaWidthHint;
     htmlTabArea.setSize(innerTabAreaSize);
     tabAreaSize = innerTabAreaSize.add(tabAreaMargins);
   }
@@ -49,20 +55,19 @@ scout.TabBoxLayout.prototype.layout = function($container) {
   htmlTabContent.setSize(tabContentSize);
 };
 
-scout.TabBoxLayout.prototype._layoutStatus = function() {
+scout.TabBoxLayout.prototype._layoutStatus = function(height) {
   var htmlContainer = this._tabBox.htmlComp,
     containerPadding = htmlContainer.insets({
       includeBorder: false
     }),
     top = containerPadding.top,
     right = containerPadding.right,
-    $tabArea = this._tabBox._$tabArea,
-    tabAreaInnerHeight = $tabArea.innerHeight(),
+    $tabArea = this._tabBox.header.$container,
     $status = this._tabBox.$status,
     statusMargins = scout.graphics.margins($status),
     statusTop = top,
     statusPosition = this._tabBox.statusPosition,
-    statusHeight = tabAreaInnerHeight - statusMargins.vertical();
+    statusHeight = height - statusMargins.vertical();
 
   if (statusPosition === scout.FormField.StatusPosition.DEFAULT) {
     statusTop += $tabArea.cssMarginTop();
@@ -83,12 +88,22 @@ scout.TabBoxLayout.prototype._layoutStatus = function() {
 scout.TabBoxLayout.prototype.preferredLayoutSize = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container),
     htmlTabContent = scout.HtmlComponent.get(this._tabBox._$tabContent),
-    htmlTabArea = scout.HtmlComponent.get(this._tabBox._$tabArea),
+    htmlTabArea = scout.HtmlComponent.get(this._tabBox.header.$container),
     tabAreaSize = new scout.Dimension(),
-    tabContentSize = new scout.Dimension();
+    tabContentSize = new scout.Dimension(),
+    $status = this._tabBox.$status,
+    statusPosition = this._tabBox.statusPosition,
+    headerWidthHint = htmlContainer.availableSize().subtract(htmlContainer.insets()).width;
 
   if (htmlTabArea.isVisible()) {
-    tabAreaSize = htmlTabArea.prefSize()
+    if ($status && $status.isVisible()) {
+      if (statusPosition === scout.FormField.StatusPosition.DEFAULT) {
+        headerWidthHint -= $status.outerWidth(true);
+      }
+    }
+    tabAreaSize = htmlTabArea.prefSize({
+        widthHint: headerWidthHint
+      })
       .add(htmlTabArea.margins());
   }
 

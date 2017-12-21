@@ -13,15 +13,21 @@
   & > .menu-item {
     border-top: solid 1px @border-color;
     display: block;
-    height: @menu-item-height;
     width: 100%;
-    padding-left: 15px;
-    padding-right: 15px;
+    padding: 11px 15px;
 
     & > .text {
       #scout.overflow-ellipsis();
       /* default is inline, inline-block is necessary so that max-width set by JS is respected */
       display: inline-block;
+    }
+
+    & > .form-field {
+      width: 100%;
+      
+      & > .field {
+        min-width: 220px;
+      }
     }
 
     &.menu-textandicon > .icon {

@@ -15,39 +15,48 @@ scout.MenuBar = function() {
   this.position = 'top'; // or 'bottom'
   this.size = 'small'; // or 'large'
   this.tabbable = true;
-  this._internalMenuItems = []; // original list of menuItems that was passed to updateItems(), only used to check if menubar has changed
-  this.menuItems = []; // list of menuItems (ordered, may contain additional UI separators, some menus may not be rendered)
-  this._orderedMenuItems = {
+  this.menuboxLeft = null;
+  this.menuboxRight = null;
+  this.menuItems = []; // original list of menuItems that was passed to setMenuItems(), only used to check if menubar has changed
+  this.orderedMenuItems = {
     left: [],
-    right: []
-  }; // Object containing "left" and "right" menus
+    right: [],
+    all: []
+  };
   this.defaultMenu = null;
   this.visible = false;
-  this.ellipsis = null; // set by MenuBarLayout
 
-  /**
-   * This array is === menuItems when menu-bar is not over-sized.
-   * When the menu-bar is over-sized, we this property is set be the MenuBarLayout
-   * which adds an additional ellipsis-menu, and removes menu items that doesn't
-   * fit into the available menu-bar space.
-   */
-  this.visibleMenuItems = [];
-  this._menuItemPropertyChangeListener = this._onMenuItemPropertyChange.bind(this);
+  this._menuItemPropertyChangeHandler = this._onMenuItemPropertyChange.bind(this);
+
+  this._addWidgetProperties('menuItems');
 };
 scout.inherits(scout.MenuBar, scout.Widget);
 
 scout.MenuBar.prototype._init = function(options) {
   scout.MenuBar.parent.prototype._init.call(this, options);
 
-  this.menuSorter = options.menuOrder;
+  this.menuSorter = options.menuOrder || new scout.GroupBoxMenuItemsOrder();
   this.menuSorter.menuBar = this;
   this.menuFilter = options.menuFilter;
+
+  this.menuboxLeft = scout.create('MenubarBox', {
+    parent: this,
+    cssClass: 'left',
+    position: this.position
+  });
+  this.menuboxRight = scout.create('MenubarBox', {
+    parent: this,
+    cssClass: 'right',
+    position: this.position
+  });
+
+  this._setMenuItems(scout.arrays.ensure(this.menuItems));
   this.updateVisibility();
 };
 
 scout.MenuBar.prototype._destroy = function() {
   scout.MenuBar.parent.prototype._destroy.call(this);
-  this._removeMenuListeners();
+  this._removeMenuHandlers();
 };
 
 /**
@@ -76,14 +85,8 @@ scout.MenuBar.prototype._render = function() {
   this.$container = this.$parent.makeDiv('menubar')
     .toggleClass('main-menubar', this.size === 'large');
 
-  this.$left = this.$container.appendDiv('menubox left');
-  scout.HtmlComponent.install(this.$left, this.session);
-  this.$right = this.$container.appendDiv('menubox right');
-  scout.HtmlComponent.install(this.$right, this.session);
-
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.MenuBarLayout(this));
-  this.htmlComp.validateRoot = true;
 
   if (this.position === 'top') {
     this.$parent.prepend(this.$container);
@@ -91,14 +94,19 @@ scout.MenuBar.prototype._render = function() {
     this.$container.addClass('bottom');
     this.$parent.append(this.$container);
   }
-  this.rebuildItemsInternal();
+  this.menuboxRight.render(this.$container);
+  this.menuboxLeft.render(this.$container);
 };
+
+scout.MenuBar.prototype._renderProperties = function() {
+  scout.MenuBar.parent.prototype._renderProperties.call(this);
+  this._renderMenuItems();
+};
+
 
 scout.MenuBar.prototype._remove = function() {
   scout.MenuBar.parent.prototype._remove.call(this);
   this._removeMenuItems();
-  this.visibleMenuItems = [];
-  this.visible = false;
 };
 
 scout.MenuBar.prototype.bottom = function() {
@@ -113,118 +121,117 @@ scout.MenuBar.prototype.large = function() {
   this.size = 'large';
 };
 
-scout.MenuBar.prototype._destroyMenuSorterSeparators = function() {
-  this.menuItems.forEach(function(item) {
-    if (item.createdBy === this.menuSorter) {
-      item.destroy();
-    }
-  }, this);
-};
-
-/**
- * Forces the MenuBarLayout to be revalidated, which includes rebuilding the menu items.
- */
-scout.MenuBar.prototype.rebuildItems = function() {
-  this.htmlComp.revalidateLayout(); // this will trigger rebuildItemsInternal()
-};
-
-/**
- * Rebuilds the menu items without relayouting the menubar.
- * Do not call this internal method from outside (except from the MenuBarLayout).
- */
-scout.MenuBar.prototype.rebuildItemsInternal = function() {
-  this._updateItems();
-};
-
-scout.MenuBar.prototype._removeMenuListeners = function() {
-  this._internalMenuItems.forEach(function(item) {
-    item.off('propertyChange', this._menuItemPropertyChangeListener);
-  }.bind(this));
-};
-
-scout.MenuBar.prototype._initMenuItems = function(menuItems) {
-  // Attach a propertyChange listener to the new items, so the menu-bar
-  // can be updated when one of its items changes (e.g. visible, keystroke etc.)
-  menuItems.forEach(function(item) {
-    item.on('propertyChange', this._menuItemPropertyChangeListener);
-    item.imageLoadingInvalidatesLayout = false; // menubar is rebuilt on any layout change, hence image loading would create a loop
+scout.MenuBar.prototype._removeMenuHandlers = function() {
+  this.orderedMenuItems.all.forEach(function(item) {
+    item.off('propertyChange', this._menuItemPropertyChangeHandler);
   }.bind(this));
 };
 
 scout.MenuBar.prototype.setMenuItems = function(menuItems) {
   menuItems = scout.arrays.ensure(menuItems);
-  // Only update if list of menus changed. Don't compare this.menuItems, because that list
-  // may contain additional UI separators, and may not be in the same order
-  var sameMenuItems = scout.arrays.equals(this._internalMenuItems, menuItems);
-
-  if (!sameMenuItems) {
-    if (this.rendered) {
-      this._removeMenuItems();
-    }
-
-    // The menuSorter may add separators to the list of items -> destroy the old ones first
-    this._destroyMenuSorterSeparators();
-    this._removeMenuListeners();
-    this._internalMenuItems = menuItems;
-    this._orderedMenuItems = this.menuSorter.order(menuItems, this);
-    this.menuItems = this._orderedMenuItems.left.concat(this._orderedMenuItems.right);
-    this._initMenuItems(this.menuItems);
-    this.link(menuItems);
-  }
-
-  if (this.rendered) {
-    var hasUnrenderedMenuItems = this.menuItems.some(function(elem) {
-      return !elem.rendered;
-    });
-    if (!sameMenuItems || hasUnrenderedMenuItems) {
-      this.updateVisibility();
-      this.rebuildItems(); // Re-layout menubar
-    } else {
-      // Don't rebuild menubar, but update "markers"
-      this.updateVisibility();
-      this.updateDefaultMenu();
-      this.updateLastItemMarker();
-      this.updateLeftOfButtonMarker();
-    }
+  if (!scout.arrays.equals(this.menuItems, menuItems)) {
+    this.setProperty('menuItems', menuItems);
   }
 };
 
-scout.MenuBar.prototype._updateItems = function() {
-  // Figure out if an item is focused. If so, reset the focus after items have been removed and rendered again.
-  // This is required because focus is lost when an element is removed from DOM.
-  var focusedMenuItem = scout.arrays.find(this.menuItems, function(menuItem) {
-    return menuItem.isFocused();
-  });
+scout.MenuBar.prototype._setMenuItems = function(menuItems, rightFirst) {
+  // remove property listeners of old menu items.
+  this._removeMenuHandlers();
 
-  this._removeMenuItems();
-  this.visibleMenuItems = this.menuItems;
+  this.orderedMenuItems = this._createOrderedMenus(menuItems);
 
-  // Make sure menubar is visible before the items get rendered
-  // especially important for menu items with open popups to position them correctly
-  this.updateVisibility();
+  if(rightFirst){
+    this.menuboxRight.setMenuItems(this.orderedMenuItems.right);
+    this.menuboxLeft.setMenuItems(this.orderedMenuItems.left);
 
-  this._renderMenuItems(this._orderedMenuItems.left, false);
-  this._renderMenuItems(this._orderedMenuItems.right, true);
-  this.updateDefaultMenu();
-  this.updateLastItemMarker();
-  this.updateLeftOfButtonMarker();
-
-  // Make first valid MenuItem tabbable so that it can be focused. All other items
-  // are not tabbable. But they can be selected with the arrow keys.
-  if ((!this.defaultMenu || !this.defaultMenu.enabled) && this.tabbable) {
-    this.menuItems.some(function(item) {
-      if (item.isTabTarget()) {
-        this.setTabbableMenu(item);
-        return true;
-      } else {
-        return false;
-      }
-    }.bind(this));
+  }else{
+    this.menuboxLeft.setMenuItems(this.orderedMenuItems.left);
+    this.menuboxRight.setMenuItems(this.orderedMenuItems.right);
   }
 
-  // restore focus on previously focused item
-  if (focusedMenuItem) {
-    focusedMenuItem.focus();
+  // add property listener of new menus
+  this.orderedMenuItems.all.forEach(function(item) {
+    item.on('propertyChange', this._menuItemPropertyChangeHandler);
+  }, this);
+
+  this.updateVisibility();
+  this.updateDefaultMenu();
+  this._updateTabbableMenu();
+
+    this._setProperty('menuItems', menuItems);
+};
+
+scout.MenuBar.prototype._renderMenuItems = function() {
+  this.updateLastItemMarker();
+  this.updateLeftOfButtonMarker();
+  this.invalidateLayoutTree();
+};
+
+scout.MenuBar.prototype._removeMenuItems = function() {
+  this.setDefaultMenu(null);
+  this.setTabbableMenu(null);
+  this._removeMenuHandlers();
+};
+
+scout.MenuBar.prototype._createOrderedMenus = function(menuItems) {
+  var orderedMenuItems = this.menuSorter.order(menuItems, this),
+    ellipsisIndex = -1,
+    ellipsis;
+  orderedMenuItems.right.forEach(function(item) {
+    item.rightAligned = true;
+  });
+
+  if (orderedMenuItems.all.length > 0) {
+    ellipsis = scout.create('EllipsisMenu', {
+      parent: this,
+      cssClass: 'overflow-menu-item'
+    });
+    this._ellipsis = ellipsis;
+
+    // add ellipsis to the correct position
+    // try right
+    orderedMenuItems.right.slice().reverse().some(function(menu, index) {
+      if (menu.stackable) {
+        ellipsisIndex = orderedMenuItems.right.length - index;
+        return true;
+      }
+      return false;
+    }, this);
+
+    if (ellipsisIndex > -1) {
+      ellipsis.rightAligned = true;
+      orderedMenuItems.right.splice(ellipsisIndex, 0, ellipsis);
+      orderedMenuItems.all = orderedMenuItems.left.concat(orderedMenuItems.right);
+      return orderedMenuItems;
+    }
+    // try left
+    orderedMenuItems.left.slice().reverse().some(function(menu, index) {
+      if (menu.stackable) {
+        ellipsisIndex = orderedMenuItems.left.length - index;
+        return true;
+      }
+      return false;
+    }, this);
+    if (ellipsisIndex > -1) {
+      orderedMenuItems.left.splice(ellipsisIndex, 0, ellipsis);
+      orderedMenuItems.all = orderedMenuItems.left.concat(orderedMenuItems.right);
+      return orderedMenuItems;
+    }
+  }
+  return orderedMenuItems;
+};
+
+scout.MenuBar.prototype._updateTabbableMenu = function() {
+  // Make first valid MenuItem tabbable so that it can be focused. All other items
+  // are not tabbable. But they can be selected with the arrow keys.
+  if (this.tabbable) {
+    if (this.defaultMenu && this.defaultMenu.enabled) {
+      this.setTabbableMenu(this.defaultMenu);
+    } else {
+      this.setTabbableMenu(scout.arrays.find(this.orderedMenuItems.all, function(item) {
+        return item.isTabTarget();
+      }));
+    }
   }
 };
 
@@ -235,8 +242,10 @@ scout.MenuBar.prototype.setTabbableMenu = function(menu) {
   if (this.tabbableMenu) {
     this.tabbableMenu.setTabbable(false);
   }
-  menu.setTabbable(true);
   this.tabbableMenu = menu;
+  if (menu) {
+    menu.setTabbable(true);
+  }
 };
 
 /**
@@ -257,8 +266,8 @@ scout.MenuBar.prototype.updateLastItemMarker = function() {
       this._lastVisibleItem = item;
     }
   }.bind(this);
-  this._orderedMenuItems.left.forEach(setLastVisibleItemFn);
-  this._orderedMenuItems.right.forEach(setLastVisibleItemFn);
+  this.orderedMenuItems.left.forEach(setLastVisibleItemFn);
+  this.orderedMenuItems.right.forEach(setLastVisibleItemFn);
 
   // Assign the class to the found item
   if (this._lastVisibleItem && this._lastVisibleItem.rendered) {
@@ -267,9 +276,9 @@ scout.MenuBar.prototype.updateLastItemMarker = function() {
 };
 
 scout.MenuBar.prototype.updateVisibility = function() {
-  scout.menus.updateSeparatorVisibility(this.menuItems);
-  this.setVisible(!this.hiddenByUi && this.menuItems.some(function(m) {
-    return m.visible;
+  scout.menus.updateSeparatorVisibility(this.orderedMenuItems.all);
+  this.setVisible(!this.hiddenByUi && this.orderedMenuItems.all.some(function(m) {
+    return m.visible && !m.ellipsis;
   }));
 };
 
@@ -277,52 +286,43 @@ scout.MenuBar.prototype.updateVisibility = function() {
  * First rendered item that is enabled and reacts to ENTER keystroke shall be marked as 'defaultMenu'
  */
 scout.MenuBar.prototype.updateDefaultMenu = function() {
-  this.setDefaultMenu(null);
-  if (this._orderedMenuItems) {
-    var found = this._updateDefaultMenuInItems(this._orderedMenuItems.right);
-    if (!found) {
-      this._updateDefaultMenuInItems(this._orderedMenuItems.left);
-    }
-  }
-};
-
-scout.MenuBar.prototype._updateDefaultMenuInItems = function(items) {
-  var found = false;
-  items.some(function(item) {
+  var defaultMenu = scout.arrays.find(this.orderedMenuItems.all, function(item) {
     if (!item.visible || !item.enabled || item.defaultMenu === false) {
       // Invisible or disabled menus and menus that explicitly have the "defaultMenu"
       // property set to false cannot be the default menu.
       return false;
     }
-    if (item.defaultMenu === true || this._isDefaultKeyStroke(item.actionKeyStroke)) {
-      this.setDefaultMenu(item);
-      this.setTabbableMenu(item);
-      found = true;
-      return true;
-    }
-  }.bind(this));
-  return found;
+    return item.defaultMenu;
+  }, this);
+  this.setDefaultMenu(defaultMenu);
+  if (defaultMenu && defaultMenu.isTabTarget()) {
+    this.setTabbableMenu(defaultMenu);
+  }
 };
 
 scout.MenuBar.prototype.setDefaultMenu = function(defaultMenu) {
-  if (this.defaultMenu === defaultMenu) {
-    return;
+  this.setProperty('defaultMenu', defaultMenu);
+};
+
+scout.MenuBar.prototype._setDefaultMenu = function(defaultMenu) {
+  if (this.defaultMenu) {
+    this.defaultMenu.setDefaultMenu(this.defaultMenu._initialDefaultMenu);
+    this.defaultMenu_initialDefaultMenu = null;
   }
-  if (this.defaultMenu && this.defaultMenu.rendered) {
-    this.defaultMenu.$container.removeClass('default-menu');
+  if (defaultMenu) {
+    // backup
+    defaultMenu._initialDefaultMenu = defaultMenu.defaultMenu;
+    defaultMenu.setDefaultMenu(true);
   }
   this._setProperty('defaultMenu', defaultMenu);
-  if (this.defaultMenu && this.defaultMenu.rendered) {
-    this.defaultMenu.$container.addClass('default-menu');
-  }
 };
 
 /**
  * Add class 'left-of-button' to every menu item which is on the left of a button
  */
 scout.MenuBar.prototype.updateLeftOfButtonMarker = function() {
-  this._updateLeftOfButtonMarker(this._orderedMenuItems.left);
-  this._updateLeftOfButtonMarker(this._orderedMenuItems.right);
+  this._updateLeftOfButtonMarker(this.orderedMenuItems.left);
+  this._updateLeftOfButtonMarker(this.orderedMenuItems.right);
 };
 
 scout.MenuBar.prototype._updateLeftOfButtonMarker = function(items) {
@@ -342,56 +342,33 @@ scout.MenuBar.prototype._updateLeftOfButtonMarker = function(items) {
   }
 };
 
-scout.MenuBar.prototype._isDefaultKeyStroke = function(keyStroke) {
-  return scout.isOneOf(scout.keys.ENTER, keyStroke.which) &&
-    !keyStroke.ctrl &&
-    !keyStroke.alt &&
-    !keyStroke.shift;
-};
-
-scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
-  var $menuBox = right ? this.$right : this.$left;
-  var tooltipPosition = (this.position === 'top' ? 'bottom' : 'top');
-  menuItems.forEach(function(item) {
-    // Ensure all all items are non-tabbable by default. One of the items will get a tabindex
-    // assigned again later in updateItems().
-    item.setTabbable(false);
-    if (this.tabbableMenu === item) {
-      this.tabbableMenu = undefined;
-    }
-    item.tooltipPosition = tooltipPosition;
-    item.render($menuBox);
-    item.$container.addClass('menubar-item');
-    if (right) {
-      // Mark as right-aligned
-      item.rightAligned = true;
-    }
-  }.bind(this));
-
-  // Hide menu box with no menu items because on iOS the width of an empty menu box is 1px which breaks the menubar layout (rightWidth === 0 check)
-  $menuBox.setVisible(menuItems.length > 0);
-};
-
-scout.MenuBar.prototype._removeMenuItems = function() {
-  this.menuItems.forEach(function(item) {
-    item.overflow = false;
-    item.remove();
-  }, this);
-};
-
 scout.MenuBar.prototype._onMenuItemPropertyChange = function(event) {
+  var menuItems;
   // We do not update the items directly, because this listener may be fired many times in one
   // user request (because many menus change one or more properties). Therefore, we just invalidate
   // the MenuBarLayout. It will be updated automatically after the user request has finished,
   // because the layout calls rebuildItemsInternal().
-  if (event.propertyName === 'enabled') {
-    this.updateDefaultMenu();
-  } else if (event.propertyName === 'visible') {
+  if (event.propertyName === 'overflown' || event.propertyName === 'enabled' || event.propertyName === 'visible' || event.propertyName === 'hidden') {
+    if (!this.tabbableMenu || event.source === this.tabbableMenu) {
+      this._updateTabbableMenu();
+    }
+  }
+  if (event.propertyName === 'overflown' || event.propertyName === 'enabled' || event.propertyName === 'visible' || event.propertyName === 'hidden' || event.propertyName === 'defaultMenu') {
+    if (!this.defaultMenu || event.source === this.defaultMenu) {
+      this.updateDefaultMenu();
+    }
+  }
+  if (event.propertyName === 'horizontalAlignment') {
+    // reorder
+    menuItems = this.menuItems;
+    if (this.rendered) {
+      this._removeMenuItems();
+    }
+    this._setMenuItems(menuItems, event.newValue <= 0);
+  }
+  if (event.propertyName === 'visible') {
     var oldVisible = this.visible;
     this.updateVisibility();
-    // Mainly necessary for menus currently not rendered (e.g. in ellipsis menu).
-    // If the menu is rendered, the menu itself triggers invalidateLayoutTree (see Menu.js#_renderVisible)
-    this.invalidateLayoutTree();
     if (!oldVisible && this.visible) {
       // If the menubar was previously invisible (because all menus were invisible) but
       // is now visible, the menuboxes and the menus have to be rendered now. Otherwise,

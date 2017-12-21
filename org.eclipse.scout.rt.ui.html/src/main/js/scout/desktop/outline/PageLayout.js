@@ -23,7 +23,7 @@ scout.PageLayout.prototype.layout = function($container) {
     titleHeight = 0,
     iconHeight = 0,
     nodeMenuBar = this.outline.nodeMenuBar,
-    nodeMenuBarWidth = 0,
+    nodeMenuBarPrefSize = 0,
     detailMenuBar = this.outline.detailMenuBar,
     detailMenuBarHeight = 0;
 
@@ -31,8 +31,9 @@ scout.PageLayout.prototype.layout = function($container) {
     .subtract(htmlContainer.insets());
 
   if (nodeMenuBar.visible) {
-    nodeMenuBarWidth = nodeMenuBar.htmlComp.prefSize().width;
-    $text.cssWidth(containerSize.width - nodeMenuBarWidth);
+    nodeMenuBarPrefSize = nodeMenuBar.htmlComp.prefSize();
+    nodeMenuBar.htmlComp.setSize(nodeMenuBarPrefSize);
+    $text.cssWidth(containerSize.width - nodeMenuBarPrefSize.add(nodeMenuBar.htmlComp.margins()).width);
   }
 
   if (detailMenuBar.visible) {

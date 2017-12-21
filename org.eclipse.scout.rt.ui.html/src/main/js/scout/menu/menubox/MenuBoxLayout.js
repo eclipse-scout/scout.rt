@@ -195,7 +195,7 @@ scout.MenuBoxLayout.prototype.collapse = function(menus, containerSize, menusWid
 scout.MenuBoxLayout.prototype.undoCollapse = function(menus) {
   menus = menus || this.visibleMenus();
   this._destroyEllipsis();
-  this._removeMenusFromEllipsis(menus, this.menuBox.$container);
+  this._removeMenusFromEllipsis(menus);
 };
 
 scout.MenuBoxLayout.prototype._createAndRenderEllipsis = function($container) {

@@ -38,7 +38,7 @@ scout.SingleLayout.prototype.preferredLayoutSize = function($container) {
     htmlChild = this._getHtmlSingleChild($container);
   }
   if (htmlChild) {
-    return htmlChild.prefSize();
+    return htmlChild.prefSize().add(scout.graphics.insets($container));
   } else {
     return new scout.Dimension(1, 1);
   }

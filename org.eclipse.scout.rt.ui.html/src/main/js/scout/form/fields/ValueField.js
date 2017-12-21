@@ -26,7 +26,7 @@ scout.ValueField = function() {
 
   this.$clearIcon = null;
 
-  this._addCloneProperties(['value', 'displayText']);
+  this._addCloneProperties(['value', 'displayText', 'clearable']);
 };
 scout.inherits(scout.ValueField, scout.FormField);
 
@@ -80,8 +80,7 @@ scout.ValueField.prototype._renderDisplayText = function() {
   this._updateHasText();
 };
 
-
-scout.ValueField.prototype._remove = function(){
+scout.ValueField.prototype._remove = function() {
   scout.ValueField.parent.prototype._remove.call(this);
   this.$clearIcon = null;
 };

@@ -20,21 +20,29 @@ scout.Menu = function() {
    * when there's not enough space on the screen (see MenuBarLayout.js). When set
    * to true, button style menus must be displayed as regular menus.
    */
-  this.overflow = false;
+  this.overflown = false;
   /**
    * This property is set if this is a subMenu. The property is set when this submenu is rendered.
    */
   this.parentMenu = null;
   this.popup = null;
   this.preventDoubleClick = false;
+  this.stackable = true;
   this.separator = false;
 
-  this._addCloneProperties(['defaultMenu', 'menuTypes', 'overflow', 'separator']);
+  this._addCloneProperties(['defaultMenu', 'menuTypes', 'overflow', 'stackable', 'separator']);
   this._addWidgetProperties('childActions');
 };
 scout.inherits(scout.Menu, scout.Action);
 
 scout.Menu.SUBMENU_ICON = scout.icons.ANGLE_DOWN;
+
+scout.Menu.prototype._init = function(options) {
+  scout.Menu.parent.prototype._init.call(this, options);
+  if (options.defaultMenu !== false && options.defaultMenu !== true) {
+    this.defaultMenu = scout.menus.isDefaultKeyStroke(this.actionKeyStroke);
+  }
+};
 
 /**
  * @override
@@ -53,6 +61,12 @@ scout.Menu.prototype._render = function() {
   }
   this.$container.unfocusable();
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+};
+
+scout.Menu.prototype._renderProperties = function() {
+  scout.Menu.parent.prototype._renderProperties.call(this);
+  this._renderOverflown();
+  this._renderDefaultMenu();
 };
 
 scout.Menu.prototype._remove = function() {
@@ -81,7 +95,7 @@ scout.Menu.prototype._renderItem = function() {
 
   // when menus with button style are displayed in a overflow-menu,
   // render as regular menu, ignore button styles.
-  if (this.isButton() && !this.overflow) {
+  if (this.isButton() && !this.overflown) {
     this.$container.addClass('menu-button');
   }
 };
@@ -213,18 +227,20 @@ scout.Menu.prototype._renderText = function(text) {
   if (this.$submenuIcon) {
     this.$submenuIcon.appendTo(this.$container);
   }
+  this.$container.toggleClass('has-text', scout.strings.hasText(this.text) && this.textVisible);
   this._updateIconAndTextStyle();
   this.invalidateLayoutTree();
 };
 
 scout.Menu.prototype._renderIconId = function() {
   scout.Menu.parent.prototype._renderIconId.call(this);
+  this.$container.toggleClass('has-icon', !!this.iconId);
   this._updateIconAndTextStyle();
   this.invalidateLayoutTree();
 };
 
 scout.Menu.prototype.isTabTarget = function() {
-  return this.enabled && this.visible && (this.isButton() || !this.separator);
+  return this.enabled && this.visible && !this.overflown && (this.isButton() || !this.separator);
 };
 
 scout.Menu.prototype.isFocused = function() {
@@ -326,15 +342,38 @@ scout.Menu.prototype._handleSelectedInEllipsis = function() {
   }
 };
 
-scout.Menu.prototype.clone = function(model) {
-  var clone = scout.Menu.parent.prototype.clone.call(this, model);
-  var childClones = [];
-  this.childActions.forEach(function(child) {
-    var childClone = child.clone({
-      parent: clone
-    });
-    childClones.push(childClone);
-  });
-  clone.childActions = childClones;
+scout.Menu.prototype.setStackable = function(stackable) {
+  this.setProperty('stackable', stackable);
+};
+
+/**
+ * For internal usage only.
+ * Used by the MenuBarLayout when a menu is moved to the ellipsis drop down.
+ */
+scout.Menu.prototype._setOverflown = function(overflown) {
+  if (this.overflown === overflown) {
+    return;
+  }
+  this._setProperty('overflown', overflown);
+  if (this.rendered) {
+    this._renderOverflown();
+  }
+};
+
+scout.Menu.prototype._renderOverflown = function() {
+  this.$container.toggleClass('overflown', this.overflown);
+};
+
+scout.Menu.prototype.setDefaultMenu = function(defaultMenu) {
+  this.setProperty('defaultMenu', defaultMenu);
+};
+
+scout.Menu.prototype._renderDefaultMenu = function() {
+  this.$container.toggleClass('default-menu', !!this.defaultMenu);
+};
+
+scout.Menu.prototype.clone = function(model, options) {
+  var clone = scout.Menu.parent.prototype.clone.call(this, model, options);
+  this._deepCloneProperties(clone, 'childActions', options);
   return clone;
 };

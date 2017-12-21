@@ -47,7 +47,7 @@ scout.NavigateButton.prototype._render = function() {
     this.text = null;
     this.iconId = this._defaultIconId;
   }
-  this.enabled = this._buttonEnabled();
+  this.updateEnabled();
   scout.NavigateButton.parent.prototype._render.call(this);
   this.$container.addClass('navigate-button small');
   this.$container.addClass(this._additionalCssClass);
@@ -83,12 +83,5 @@ scout.NavigateButton.prototype.doAction = function() {
  * Called when enabled state must be re-calculated and probably rendered.
  */
 scout.NavigateButton.prototype.updateEnabled = function() {
-  this.enabled = this._buttonEnabled();
-  if (this.rendered) {
-    this._renderEnabled();
-    // Make sure default menu is correctly visualized (necessary if button is disabled and is being enabled on the fly (e.g. table reload))
-    if (this.enabled && this.parent instanceof scout.MenuBar) {
-      this.parent.updateDefaultMenu();
-    }
-  }
+  this.setEnabled(this._buttonEnabled());
 };

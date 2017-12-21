@@ -111,27 +111,30 @@
     border: none;
     color: @navigation-color;
 
-    & > .menubox > .menu-item:not(.disabled) {
-      color: @navigation-color;
+    & > .menubox {
 
-      &:hover,
-      &:active {
-        color: @navigation-color;
-      }
-
-      &:focus,
-      &:not(.menu-button):focus {
+      & > .menu-item:not(.disabled) {
         color: @navigation-color;
 
-        &::after {
-          border-color: @navigation-color;
-          #scout.glow(@navigation-color);
+        &:hover,
+        &:active {
+          color: @navigation-color;
+        }
+
+        &:focus,
+        &:not(.menu-button):focus {
+          color: @navigation-color;
+
+          &::after {
+            border-color: @navigation-color;
+            #scout.glow(@navigation-color);
+          }
         }
       }
-    }
 
-    & > .menubox > .menu-item:not(.menu-textandicon):focus::after  {
-      #scout.focus-border-inverted();
+      & > .menu-item:not(.menu-textandicon):focus::after  {
+        #scout.focus-border-inverted();
+      }
     }
   }
 }

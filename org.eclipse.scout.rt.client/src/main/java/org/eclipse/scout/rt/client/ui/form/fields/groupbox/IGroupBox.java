@@ -24,6 +24,11 @@ import org.eclipse.scout.rt.platform.util.TriState;
 public interface IGroupBox extends ICompositeField, IContextMenuOwner {
 
   /**
+   * {@link String}
+   */
+  String PROP_SUB_LABEL = "subLabel";
+
+  /**
    * {@link Boolean}
    */
   String PROP_BORDER_VISIBLE = "borderVisible";
@@ -91,6 +96,10 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
   /*
    * Runtime
    */
+
+  String getSubLabel();
+
+  void setSubLabel(String subLabel);
 
   /**
    * The index of the groupbox in the parent box

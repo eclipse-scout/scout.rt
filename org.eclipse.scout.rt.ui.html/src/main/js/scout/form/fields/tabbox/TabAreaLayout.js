@@ -8,170 +8,205 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.TabAreaLayout = function(tabBox) {
+scout.TabAreaLayout = function(tabArea) {
   scout.TabAreaLayout.parent.call(this);
-  this._tabBox = tabBox;
-  this._$ellipsis;
-  this._overflowTabs = [];
+  this.tabArea = tabArea;
+  this.$ellipsis;
+  this.overflowTabs = [];
+  this.visibleTabs = [];
+  this._tabAreaPropertyChangeHandler = this._onTabAreaPropertyChange.bind(this);
+
+  this.tabArea.on('propertyChange', this._tabAreaPropertyChangeHandler);
+  this.tabArea.one('remove', function(){
+   this.tabArea.off('propertyChange', this._tabAreaPropertyChangeHandler);
+  }.bind(this));
 };
 scout.inherits(scout.TabAreaLayout, scout.AbstractLayout);
 
 scout.TabAreaLayout.prototype.layout = function($container) {
-  if (!this._ellipsisBounds) {
-    this._createAndRenderEllipsis($container);
-    this._ellipsisBounds = scout.graphics.bounds(this._$ellipsis, true);
+  var ellipsis = this.tabArea.ellipsis,
+    htmlContainer = scout.HtmlComponent.get($container),
+    containerSize = htmlContainer.availableSize().subtract(htmlContainer.insets());
+
+  this._ensureCachedBounds();
+
+  // compute visible and overflown tabs
+  this.preferredLayoutSize($container, {
+    widthHint: containerSize.width
+  });
+
+  if (this.overflowTabs.length > 0) {
+    ellipsis.setHidden(false);
   }
 
-  this._destroyEllipsis();
-  this._tabBox.rebuildTabs();
+  this.visibleTabs.forEach(function(tabItem) {
+    tabItem.setTabOverflown(false);
+  });
 
-  var bounds,
-    tabArea = $container[0],
-    clientWidth = tabArea.clientWidth - scout.graphics.insets($container).horizontal(),
-    scrollWidth = tabArea.scrollWidth,
-    menuBar = this._tabBox.menuBar,
-    $status = this._tabBox.$status,
-    statusWidth = 0,
-    statusPosition = this._tabBox.statusPosition;
+  this.overflowTabs.forEach(function(tabItem) {
+    tabItem.setTabOverflown(true);
+  });
 
-  // If tab area contains a menubar, less space is available
-  clientWidth -= scout.graphics.size(menuBar.$container, true).width;
-
-  if (statusPosition === scout.FormField.StatusPosition.TOP) {
-    // Status on top means it is inside the tab area
-    if ($status && $status.isVisible()) {
-      statusWidth = $status.outerWidth(true);
-    }
-    if (statusWidth > 0) {
-      clientWidth -= statusWidth;
-      // Status is on the right of the menuBar
-      menuBar.$container.cssRight(statusWidth);
-    }
+  if (this.overflowTabs.length === 0) {
+    ellipsis.setHidden(true);
   }
 
-  this._overflowTabs = [];
-  if (clientWidth < scrollWidth) {
-
-    // determine visible range (at least selected tab must be visible)
-    var i, tab, numTabs,
-      tabs = [], // tabs that are visible by model
-      tabBounds = [], // bounds of visible tabs
-      visibleTabs = [], // tabs that are visible by model and visible in the UI (= not in overflow)
-      selectedTab = -1; // points to index of selected tab (in array of UI visible tabs)
-
-    // reduce list to tab-items that are visible by model
-    for (i = 0; i < this._tabBox.tabItems.length; i++) {
-      tab = this._tabBox.tabItems[i];
-      if (tab.visible) {
-        bounds = scout.graphics.bounds(tab.$tabContainer, true);
-        tabs.push(tab);
-        tabBounds.push(bounds);
-        // cannot use selectedTab property of TabBox, it points to the wrong index
-        // since this layout only works with visible tabs
-        if (tab._tabActive) {
-          selectedTab = tabs.length - 1;
-        }
-      }
-    }
-    numTabs = tabs.length;
-
-    if (selectedTab >= 0) {
-      // if we have too few space to even display the selected tab, only render the selected tab
-      visibleTabs.push(selectedTab);
-      bounds = tabBounds[selectedTab];
-
-      if (clientWidth > bounds.width) {
-        // in case of overflow, place selected tab at the left-most position...
-        var horizontalInsets = scout.graphics.insets($container).horizontal();
-
-        var viewWidth = bounds.width,
-          delta = bounds.x - horizontalInsets, // delta used to start from x=0
-          overflow = false;
-
-        // when viewWidth doesn't fit into clientWidth anymore, abort always
-        // expand to the right until the last tab is reached...
-        if (selectedTab < numTabs - 1) {
-          for (i = selectedTab + 1; i < numTabs; i++) {
-            bounds = tabBounds[i];
-            viewWidth = bounds.x - delta + bounds.width + this._ellipsisBounds.width;
-            if (viewWidth < clientWidth) {
-              visibleTabs.push(i);
-            } else {
-              overflow = true;
-            }
-          }
-        }
-
-        // than expand to the left until the first tab is reached
-        if (!overflow && selectedTab > 0) {
-          for (i = selectedTab - 1; i >= 0; i--) {
-            bounds = tabBounds[i];
-            if (viewWidth + delta - bounds.x < clientWidth) {
-              visibleTabs.push(i);
-            }
-          }
-        }
-      }
-
-      // remove all tabs which aren't visible
-      for (i = 0; i < numTabs; i++) {
-        tab = tabs[i];
-        if (visibleTabs.indexOf(i) === -1) {
-          $.log.isDebugEnabled() && $.log.debug('Overflow tab=' + tab);
-          this._overflowTabs.push(tab);
-          tab.removeTab();
-        }
-      }
-    }
-  }
-
-  if (this._overflowTabs.length > 0) {
-    this._createAndRenderEllipsis($container);
-  }
-};
-
-scout.TabAreaLayout.prototype._createAndRenderEllipsis = function($container) {
-  this._$ellipsis = $container
-    .appendDiv('overflow-tab-item')
-    .click(this._onClickEllipsis.bind(this));
-};
-
-scout.TabAreaLayout.prototype._destroyEllipsis = function() {
-  if (this._$ellipsis) {
-    this._$ellipsis.remove();
-    this._$ellipsis = null;
-  }
-};
-
-scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
-  var menu, popup,
-    overflowMenus = [],
-    tabBox = this._tabBox;
-  this._overflowTabs.forEach(function(tabItem) {
-    menu = scout.create('Menu', {
-      parent: tabBox,
+  // set childActions to empty array to prevent the menuItems from calling remove.
+  ellipsis.setChildActions(this.overflowTabs.map(function(tabItem) {
+    var menu = scout.create('Menu', {
+      parent: ellipsis,
       text: tabItem.label,
       tabItem: tabItem,
       visible: tabItem.visible
     });
     menu.on('action', function(event) {
       $.log.isDebugEnabled() && $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + tabItem);
-      tabBox.setSelectedTab(tabItem);
-        popup.one('remove', function(event) {
-          tabItem.focusTab();
-      });
-    });
-    overflowMenus.push(menu);
-  });
+      // first close popup to ensure the focus is handled in the correct focus context.
+      ellipsis.popup.close();
+      this.tabArea.setSelectedTab(tabItem);
+      tabItem.focusTab();
+    }.bind(this));
+    return menu;
+  }, this));
 
-  popup = scout.create('ContextMenuPopup', {
-    parent: tabBox,
-    menuItems: overflowMenus,
-    cloneMenuItems: false,
-    location: {
-      x: event.pageX,
-      y: event.pageY
+  this._layoutSelectionMarker();
+};
+
+scout.TabAreaLayout.prototype._layoutSelectionMarker = function() {
+  var $selectionMarker = this.tabArea.$selectionMarker,
+    selectedTab = this.tabArea.selectedTab,
+    selectedItemBounds;
+
+  if (selectedTab) {
+    $selectionMarker.setVisible(true);
+    selectedItemBounds = scout.graphics.bounds(selectedTab.$tabContainer);
+    $selectionMarker.cssLeft(selectedItemBounds.x);
+    $selectionMarker.cssWidth(selectedItemBounds.width);
+  } else {
+    $selectionMarker.setVisible(false);
+  }
+};
+
+scout.TabAreaLayout.prototype.preferredLayoutSize = function($container, options) {
+  var htmlContainer = scout.HtmlComponent.get($container),
+    tabItems = this.tabArea.tabItems,
+    ellipsis = this.tabArea.ellipsis,
+    ellipsisBoundsGross = new scout.Dimension(),
+    preferredSize = new scout.Dimension(),
+    _widthHintFilter = function(itemWidth, totalWidth, wHint) {
+      // escape truthy
+      if (wHint === 0 || wHint) {
+        return totalWidth + itemWidth <= wHint;
+      }
+      return true;
+    },
+    unorderedVisibleTabs = [];
+
+  if (options.widthHint) {
+    options.widthHint -= htmlContainer.insets().horizontal();
+  }
+
+  this.overflowTabs = [];
+  this.visibleTabs = [];
+
+  this._ensureCachedBounds();
+  ellipsisBoundsGross = ellipsis.htmlComp._cachedPrefSize.add(ellipsis.htmlComp._cachedMargins);
+
+  // add the ellipsis width, it will be removed if no ellipsis is needed later.
+  preferredSize.width += ellipsisBoundsGross.width;
+
+  tabItems.filter(function(tabItem) {
+    // filter for not active tabs and add the active already to the visible tabs, the active tab is always visible.
+    var prefSizeGross;
+    if (!tabItem.isVisible()) {
+      return false;
+    }
+    if (tabItem._tabActive) {
+      prefSizeGross = tabItem.tabHtmlComp._cachedPrefSize.add(tabItem.tabHtmlComp._cachedMargins);
+      preferredSize.width += prefSizeGross.width;
+      preferredSize.height = Math.max(preferredSize.height, prefSizeGross.height);
+      unorderedVisibleTabs.push(tabItem);
+      return false;
+    }
+    return true;
+
+  }).forEach(function(tabItem, index, items) {
+    var prefSizeGross = tabItem.tabHtmlComp._cachedPrefSize.add(tabItem.tabHtmlComp._cachedMargins),
+      totalWidth = preferredSize.width;
+
+    if (index === items.length - 1 && this.overflowTabs.length === 0) {
+      totalWidth -= ellipsisBoundsGross.width;
+    }
+
+    // if one item is already overflowed all following items will be overflowed as well.
+    if (this.overflowTabs.length > 0) {
+      this.overflowTabs.push(tabItem);
+      return;
+    }
+    if (_widthHintFilter(prefSizeGross.width, totalWidth, options.widthHint)) {
+      preferredSize.width += prefSizeGross.width;
+      preferredSize.height = Math.max(preferredSize.height, prefSizeGross.height);
+      unorderedVisibleTabs.push(tabItem);
+    } else {
+      this.overflowTabs.push(tabItem);
+    }
+  }, this);
+
+  if (this.overflowTabs.length === 0) {
+    preferredSize.width -= ellipsisBoundsGross.width;
+  } else {
+    preferredSize.height = Math.max(preferredSize.height, ellipsisBoundsGross.height);
+  }
+  // well order and push to visible tabs
+  tabItems.filter(function(tabItem) {
+    if (unorderedVisibleTabs.indexOf(tabItem) >= 0) {
+      this.visibleTabs.push(tabItem);
+    }
+  }, this);
+
+  return preferredSize.add(htmlContainer.insets());
+};
+
+scout.TabAreaLayout.prototype.invalidate = function() {
+  var allItems = this.tabArea.tabItems.slice();
+
+  this.tabArea.ellipsis.htmlComp._cachedPrefSize = null;
+  this.tabArea.ellipsis.htmlComp._cachedMargins = null;
+  allItems.forEach(function(item) {
+    if (item.tabHtmlComp) {
+      item.tabHtmlComp._cachedPrefSize = null;
+      item.tabHtmlComp._cachedMargins = null;
     }
   });
-  popup.open();
+};
+
+scout.TabAreaLayout.prototype._ensureCachedBounds = function() {
+  var htmlComps = this.tabArea.tabItems.filter(function(item) {
+    return item.isVisible();
+  }).map(function(item) {
+    return item.tabHtmlComp;
+  });
+  htmlComps.push(this.tabArea.ellipsis.htmlComp);
+  var classList;
+  htmlComps.forEach(function(htmlComp) {
+    if (!htmlComp._cachedPrefSize || !htmlComp._cachedMargins) {
+      classList = htmlComp.$comp.attr('class');
+
+      htmlComp.$comp.removeClass('overflown');
+      htmlComp.$comp.removeClass('hidden');
+
+      htmlComp._cachedPrefSize = htmlComp.prefSize({
+        useCssSize: true,
+        exact: true
+      });
+      htmlComp._cachedMargins = scout.graphics.margins(htmlComp.$comp);
+      htmlComp.$comp.attrOrRemove('class', classList);
+    }
+  });
+};
+
+scout.TabAreaLayout.prototype._onTabAreaPropertyChange = function(event) {
+  if (event.propertyName === 'selectedTab') {
+    this._layoutSelectionMarker();
+  }
 };

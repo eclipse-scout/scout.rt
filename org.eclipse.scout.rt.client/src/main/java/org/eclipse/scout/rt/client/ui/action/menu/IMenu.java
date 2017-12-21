@@ -24,6 +24,7 @@ public interface IMenu extends IActionNode<IMenu> {
 
   String PROP_MENU_TYPES = "menuTypes";
   String PROP_PREVENT_DOUBLE_CLICK = "preventDoubleClick";
+  String PROP_STACKABLE = "stackable";
 
   /**
    * A menu can have several {@link IMenuType}s each menu type describes a certain usage in a specific context (e.g.
@@ -36,6 +37,14 @@ public interface IMenu extends IActionNode<IMenu> {
   boolean isPreventDoubleClick();
 
   void setPreventDoubleClick(boolean preventDoubleClick);
+
+  boolean isStackable();
+
+  /**
+   * A stackable menu will be stacked in a dropdown menu if there is not enough space in the menubar. This property is
+   * usually set to false for right aligned menus with only an icon.
+   */
+  void setStackable(boolean stackable);
 
   Object getOwnerValue();
 

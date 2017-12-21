@@ -42,8 +42,12 @@ describe('TabBox', function() {
   describe('selection', function() {
 
     it('should select tabs by ID', function() {
-      var tabItemA = helper.createTabItem({id: 'Foo'});
-      var tabItemB = helper.createTabItem({id: 'Bar'});
+      var tabItemA = helper.createTabItem({
+        id: 'Foo'
+      });
+      var tabItemB = helper.createTabItem({
+        id: 'Bar'
+      });
       var tabBox = helper.createTabBoxWith([tabItemA, tabItemB]);
       tabBox.selectTabById('Foo');
       expect(tabBox.selectedTab).toBe(tabItemA);
@@ -56,25 +60,30 @@ describe('TabBox', function() {
   describe('key handling', function() {
 
     it('supports left/right keys to select a tab-item', function() {
-      var tabItemA = helper.createTabItem();
-      var tabItemB = helper.createTabItem();
+      var tabItemA = helper.createTabItem({
+        label: 'tab 01'
+      });
+      var tabItemB = helper.createTabItem({
+        label: 'tab 02'
+      });
       var tabBox = helper.createTabBoxWith([tabItemA, tabItemB]);
       tabBox.render();
 
+      tabItemA.focus();
       // check right/left keys
       expect(tabBox.selectedTab).toBe(tabItemA);
-      tabBox._$tabArea.triggerKeyDown(scout.keys.RIGHT);
+      tabBox.header.tabArea.$container.triggerKeyDownCapture(scout.keys.RIGHT);
       expect(tabBox.selectedTab).toBe(tabItemB);
-      tabBox._$tabArea.triggerKeyDown(scout.keys.LEFT);
+      tabBox.header.tabArea.$container.triggerKeyDownCapture(scout.keys.LEFT);
       expect(tabBox.selectedTab).toBe(tabItemA);
 
       // make sure that nothing happens when first or last tab is selected and left/right is pressed
       tabBox.setSelectedTab(tabItemA);
-      tabBox._$tabArea.triggerKeyDown(scout.keys.LEFT);
+      tabBox.header.tabArea.$container.triggerKeyDownCapture(scout.keys.LEFT);
       expect(tabBox.selectedTab).toBe(tabItemA); // still A
 
       tabBox.setSelectedTab(tabItemB);
-      tabBox._$tabArea.triggerKeyDown(scout.keys.RIGHT);
+      tabBox.header.tabArea.$container.triggerKeyDownCapture(scout.keys.RIGHT);
       expect(tabBox.selectedTab).toBe(tabItemB); // still B
     });
 

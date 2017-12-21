@@ -19,7 +19,7 @@ scout.MenuBarLeftKeyStroke = function(menuBar) {
 scout.inherits(scout.MenuBarLeftKeyStroke, scout.KeyStroke);
 
 scout.MenuBarLeftKeyStroke.prototype.handle = function(event) {
-  var menuItems = this.field.visibleMenuItems,
+  var menuItems = this.field.orderedMenuItems.all,
     $menuItemFocused = this.field.$container.find(':focus'),
     i, menuItem, lastValidItem;
 

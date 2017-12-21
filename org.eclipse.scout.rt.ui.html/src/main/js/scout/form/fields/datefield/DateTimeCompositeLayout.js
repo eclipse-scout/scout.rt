@@ -14,7 +14,9 @@ scout.DateTimeCompositeLayout = function(dateField) {
 
   // Minimum field with to normal state, for smaller widths the "compact" style is applied.
   this.MIN_DATE_FIELD_WIDTH = 90;
+  this.PREF_DATE_FIELD_WIDTH = 110;
   this.MIN_TIME_FIELD_WIDTH = 60;
+  this.PREF_TIME_FIELD_WIDTH = 90;
 };
 scout.inherits(scout.DateTimeCompositeLayout, scout.AbstractLayout);
 
@@ -174,16 +176,16 @@ scout.DateTimeCompositeLayout.prototype.preferredLayoutSize = function($containe
 
   // --- Date and time ---
   if (hasDate && hasTime) {
-    prefSize.width = this.MIN_DATE_FIELD_WIDTH + this._hgap() + this.MIN_TIME_FIELD_WIDTH;
+    prefSize.width = this.PREF_DATE_FIELD_WIDTH + this._hgap() + this.PREF_TIME_FIELD_WIDTH;
   }
 
   // --- Date only ---
   else if (hasDate) {
-    prefSize.width = this.MIN_DATE_FIELD_WIDTH;
+    prefSize.width = this.PREF_DATE_FIELD_WIDTH;
   }
   // --- Time only ---
   else if (hasTime) {
-    prefSize.width = this.MIN_TIME_FIELD_WIDTH;
+    prefSize.width = this.PREF_TIME_FIELD_WIDTH;
   }
   return prefSize;
 };

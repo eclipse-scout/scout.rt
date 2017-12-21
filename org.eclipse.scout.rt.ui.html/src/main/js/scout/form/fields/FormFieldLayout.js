@@ -52,7 +52,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
       }
     }
     if (scout.isOneOf(formField.labelPosition, scout.FormField.LabelPosition.DEFAULT, scout.FormField.LabelPosition.LEFT)) {
-      scout.graphics.setBounds(formField.$label, top, left, labelWidth, this.rowHeight);
+      scout.graphics.setBounds(formField.$label, left, top, labelWidth, this.rowHeight);
       left += labelWidth;
     } else if (formField.labelPosition === scout.FormField.LabelPosition.TOP) {
       formField.$label.cssHeight(this.rowHeight);
@@ -201,7 +201,10 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
   var prefSize, htmlField, labelPositionLeft,
     width = 0,
     htmlContainer = scout.HtmlComponent.get($container),
-    height = scout.HtmlEnvironment.formRowHeight,
+    containerPadding = htmlContainer.insets({
+      includeBorder: false
+    }),
+    height = scout.HtmlEnvironment.formRowHeight + $container.cssPaddingY(),
     labelWidth = this.labelWidth(),
     topLabelHeight = 0, // only set when label is on top
     formField = this.formField;
@@ -239,7 +242,7 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
     } else {
       prefSize = this.naturalSize(formField);
     }
-    prefSize.height += topLabelHeight;
+    prefSize.height = prefSize.height + topLabelHeight + $container.cssPaddingY();
   } else {
     prefSize = new scout.Dimension(0, 0);
   }

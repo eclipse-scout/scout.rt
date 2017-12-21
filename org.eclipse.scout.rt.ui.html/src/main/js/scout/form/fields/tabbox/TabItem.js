@@ -11,6 +11,7 @@
 scout.TabItem = function() {
   scout.TabItem.parent.call(this);
   this.marked = false;
+  this.tabOverflown = false;
   this.selectionKeystroke;
   this.$tabContainer;
   this._tabRendered = false;
@@ -59,10 +60,15 @@ scout.TabItem.prototype.renderTab = function($parent) {
     .on('mousedown', this._onTabMouseDown.bind(this));
   this.tabHtmlComp = scout.HtmlComponent.install(this.$tabContainer, this.session);
 
+  this.$title = this.$tabContainer.appendDiv('title');
+
   this.addLabel();
+  this.addSubLabel();
   this.addStatus();
   this._renderTabActive();
   this._renderLabel();
+  this._renderSubLabel();
+  this._renderTabbable();
   this._renderMarked();
   this._renderVisible();
   this._renderCssClass();
@@ -125,9 +131,28 @@ scout.TabItem.prototype.removeTab = function() {
     this.$tabContainer = null;
     this._removeStatus();
     this._removeLabel();
+    this._removeSubLabel();
     this._tabRendered = false;
     this.trigger('tabRemove');
   }
+};
+
+scout.TabItem.prototype.setTabOverflown = function(tabOverflown) {
+  this._setProperty('tabOverflown', tabOverflown);
+  if (this._tabRendered) {
+    this.$tabContainer.toggleClass('overflown', this.tabOverflown);
+  }
+};
+
+scout.TabItem.prototype.setTabbable = function(tabbable) {
+  this._setProperty('tabbable', tabbable);
+  if (this._tabRendered) {
+    this._renderTabbable();
+  }
+};
+
+scout.TabItem.prototype._renderTabbable = function() {
+  this.$tabContainer.setTabbable(this.tabbable && !scout.device.supportsTouch());
 };
 
 scout.TabItem.prototype.setMarked = function(marked) {
@@ -185,6 +210,9 @@ scout.TabItem.prototype.setLabel = function(label) {
 
 scout.TabItem.prototype._renderLabel = function() {
   this.$label.textOrNbsp(this.label);
+  if (this._tabRendered && !this.rendering) {
+    this.tabHtmlComp.invalidateLayoutTree();
+  }
 };
 
 scout.TabItem.prototype._renderLabelVisible = function() {
@@ -196,7 +224,40 @@ scout.TabItem.prototype.addLabel = function() {
   if (this.$label) {
     return;
   }
-  this.$label = this.$tabContainer.appendSpan('label');
+  this.$label = this.$title.appendSpan('label');
+};
+
+scout.TabItem.prototype.addSubLabel = function() {
+  if (this.$subLabel) {
+    return;
+  }
+  this.$subLabel = this.$title.appendSpan('sub-label');
+};
+
+scout.TabItem.prototype._removeSubLabel = function() {
+  if (!this.$subLabel) {
+    return;
+  }
+  this.$subLabel.remove();
+  this.$subLabel = null;
+};
+
+scout.TabItem.prototype.setSubLabel = function(subLabel) {
+  if (this.subLabel === subLabel) {
+    return;
+  }
+  this._setProperty('subLabel', subLabel);
+  // Label affects the tab item -> it needs to be rendered even if groupox is not
+  if (this._tabRendered) {
+    this._renderSubLabel();
+  }
+};
+
+scout.TabItem.prototype._renderSubLabel = function() {
+  this.$subLabel.textOrNbsp(this.subLabel);
+  if (this._tabRendered && !this.rendering) {
+    this.tabHtmlComp.invalidateLayoutTree();
+  }
 };
 
 scout.TabItem.prototype.addStatus = function() {

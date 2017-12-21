@@ -54,6 +54,7 @@
   margin-left: @mandatory-indicator-width;
   border-bottom: @group-title-border-width solid @group-box-title-border-color;
   #scout.overflow-ellipsis-nowrap();
+  padding: @group-title-padding-top 0 @group-title-padding-bottom 0;
 
   .group-box.collapsed:not(.with-line) > & {
     border-bottom-color: transparent;
@@ -101,11 +102,17 @@
 
   & > .label {
     #scout.font-text-normal(@font-weight-bold);
-    display: inline-block;
+    display: block;
     vertical-align: middle;
     color: @title-color;
-    padding: @group-title-padding-top 0 @group-title-padding-bottom 0;
     #scout.overflow-ellipsis();
+  }
+
+  & > .sub-label {
+    display: block;
+    font-size: 10px;
+    color: @text-disabled-color;
+    padding-top: 3px;
   }
 
   & > .status {
@@ -138,7 +145,8 @@
   }
 
   /* Move title span to right when control is rendered */
-  & > .group-box-control ~ .label {
+  & > .group-box-control ~ .label,
+  & > .group-box-control ~ .sub-label {
     padding-left: @group-box-control-size + 5px;
   }
 }

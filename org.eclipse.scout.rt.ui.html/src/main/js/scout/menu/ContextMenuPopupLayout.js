@@ -21,6 +21,30 @@ scout.ContextMenuPopupLayout.prototype.layout = function($container) {
   this._setMaxWidthFor($menuItems);
 };
 
+scout.ContextMenuPopupLayout.prototype.preferredLayoutSize = function($container, options) {
+  var prefSize,
+  $popup = this.popup.$container,
+  $popupBody = this.popup.$body,
+
+  oldContainerStyles = $popup.attr('style'),
+  oldBodyStyles=$popupBody.attr('style');
+
+  $popup.css({
+    'width': 'auto',
+    'height': 'auto'
+  });
+  $popupBody.css({
+    'width': 'auto',
+    'height': 'auto'
+  });
+  // set width of container to auto
+  prefSize = scout.ContextMenuPopupLayout.parent.prototype.preferredLayoutSize.call(this, $container, options);
+  //reset with
+  $popup.attrOrRemove('style', oldContainerStyles);
+  $popupBody.attrOrRemove('style', oldBodyStyles);
+  return prefSize;
+};
+
 scout.ContextMenuPopupLayout.prototype._adjustTextAlignment = function($menuItems) {
   // Calculate the text offset (= max icon width)
   var textOffset = 0;
@@ -47,6 +71,9 @@ scout.ContextMenuPopupLayout.prototype._adjustTextAlignment = function($menuItem
       iconWidth = $icon.outerWidth(true);
     }
     $text.css('padding-left', textOffset - iconWidth);
+    if(scout.HtmlComponent.optGet($menuItem)){
+      scout.HtmlComponent.optGet($menuItem).invalidateLayout();
+    }
   });
 };
 

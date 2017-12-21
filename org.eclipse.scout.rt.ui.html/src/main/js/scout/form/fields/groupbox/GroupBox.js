@@ -11,6 +11,7 @@
 scout.GroupBox = function() {
   scout.GroupBox.parent.call(this);
   this._addWidgetProperties(['fields', 'notification', 'staticMenus']);
+  this._addCloneProperties(['subLabel', 'fields', 'menus']);
 
   this.fields = [];
   this.menus = [];
@@ -37,6 +38,7 @@ scout.GroupBox = function() {
 
   this.$body;
   this.$title;
+  this.$subLabel = null;
 };
 scout.inherits(scout.GroupBox, scout.CompositeField);
 
@@ -48,12 +50,12 @@ scout.GroupBox.BorderDecoration = {
 
 scout.GroupBox.prototype._init = function(model) {
   scout.GroupBox.parent.prototype._init.call(this, model);
-  this._setFields(this.fields);
   this._setBodyLayoutConfig(this.bodyLayoutConfig);
   this.menuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
   });
+  this._setFields(this.fields);
   this._setMainBox(this.mainBox);
   this._updateMenuBar();
 };
@@ -120,6 +122,7 @@ scout.GroupBox.prototype._render = function() {
 
   this.$title = this.$container.appendDiv('group-box-title');
   this.addLabel();
+  this.addSubLabel();
   this.addStatus();
   this.$body = this.$container.appendDiv('group-box-body');
   this.htmlBody = scout.HtmlComponent.install(this.$body, this.session);
@@ -130,6 +133,7 @@ scout.GroupBox.prototype._remove = function() {
   if (this.scrollable) {
     scout.scrollbars.uninstall(this.$body, this.session);
   }
+  this._removeSubLabel();
   scout.GroupBox.parent.prototype._remove.call(this);
 };
 
@@ -143,6 +147,7 @@ scout.GroupBox.prototype._renderProperties = function() {
   this._renderExpandable();
   this._renderMenuBarVisible();
   this._renderScrollable();
+  this._renderSubLabel();
 };
 
 scout.GroupBox.prototype._createLayout = function() {
@@ -187,6 +192,31 @@ scout.GroupBox.prototype._renderControls = function() {
       control.setLayoutData(new scout.LogicalGridData(control));
     }
   }, this);
+};
+
+scout.GroupBox.prototype.addSubLabel = function() {
+  if (this.$subLabel) {
+    return;
+  }
+  this.$subLabel = this.$title.appendSpan('sub-label');
+};
+
+scout.GroupBox.prototype._removeSubLabel = function() {
+  if (!this.$subLabel) {
+    return;
+  }
+  this.$subLabel.remove();
+  this.$subLabel = null;
+};
+
+scout.GroupBox.prototype.setSubLabel = function(subLabel) {
+  this.setProperty('subLabel', subLabel);
+};
+
+scout.GroupBox.prototype._renderSubLabel = function() {
+  this.$subLabel.setVisible(scout.strings.hasText(this.subLabel));
+  this.$subLabel.textOrNbsp(this.subLabel);
+  this.invalidateLayoutTree();
 };
 
 scout.GroupBox.prototype.setScrollable = function(scrollable) {
@@ -296,13 +326,13 @@ scout.GroupBox.prototype._prepareFields = function() {
   }
 
   // Create menu for each process button
-  this.processButtons.forEach(function(button) {
-    var menu = scout.create('ButtonAdapterMenu',
-      scout.ButtonAdapterMenu.adaptButtonProperties(button, {
-        parent: this,
-        button: button
-      }));
-    this.processMenus.push(menu);
+  this.processMenus = this.processButtons.map(function(button){
+    return scout.create('ButtonAdapterMenu',
+        scout.ButtonAdapterMenu.adaptButtonProperties(button, {
+          parent: this,
+          menubar : this.menuBar,
+          button: button
+        }));
   }, this);
   this.registerKeyStrokes(this.processMenus);
 };
@@ -530,4 +560,11 @@ scout.GroupBox.prototype._onControlClick = function(event) {
     this.setExpanded(!this.expanded);
   }
   $.suppressEvent(event); // otherwise, the event would be triggered twice sometimes (by group-box-control and group-box-title)
+};
+
+scout.GroupBox.prototype.clone = function(model, options) {
+  var clone = scout.GroupBox.parent.prototype.clone.call(this, model);
+  this._deepCloneProperties(clone, ['fields', 'menus'], options);
+  clone._prepareFields();
+  return clone;
 };

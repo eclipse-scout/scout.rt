@@ -27,6 +27,7 @@ scout.FormField = function() {
   this.gridDataHints = new scout.GridData();
   this.mode = scout.FormField.Mode.DEFAULT;
   this.keyStrokes = [];
+  this.label = null;
   this.labelVisible = true;
   this.labelPosition = scout.FormField.LabelPosition.DEFAULT;
   this.labelWidthInPixel = 0;
@@ -68,7 +69,7 @@ scout.FormField = function() {
   this.$disabledCopyOverlay = null;
 
   this._addWidgetProperties(['keyStrokes', 'menus']);
-  this._addCloneProperties(['errorStatus']);
+  this._addCloneProperties(['label', 'labelVisible', 'labelPosition', 'labelWidthInPixel', 'mandatory', 'statusVisible', 'statusPosition', 'gridDataHints', 'errorStatus']);
 };
 scout.inherits(scout.FormField, scout.Widget);
 

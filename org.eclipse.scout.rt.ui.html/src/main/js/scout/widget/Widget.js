@@ -47,6 +47,7 @@ scout.Widget = function() {
   this.visible = true;
   this.focused = false;
   this.loading = false;
+  this.cssClass = null;
 
   this.$container;
   // If set to true, remove won't remove the element immediately but after the animation has been finished
@@ -56,6 +57,7 @@ scout.Widget = function() {
 
   this._widgetProperties = [];
   this._cloneProperties = ['visible', 'enabled', 'cssClass'];
+  this.eventDelegators = [];
   this._preserveOnPropertyChangeProperties = [];
   this._postRenderActions = [];
   this._parentDestroyHandler = this._onParentDestroy.bind(this);
@@ -1272,8 +1274,9 @@ scout.Widget.prototype._removeWidgetProperties = function(properties) {
  * Clones the widget and mirrors the events, see this.clone() and this.mirror() for details.
  */
 scout.Widget.prototype.cloneAndMirror = function(model) {
-  var clone = this.clone(model);
-  clone.mirror();
+  var clone = this.clone(model, {
+    delegateAllPropertiesToClone: true
+  });
   return clone;
 };
 
@@ -1291,74 +1294,140 @@ scout.Widget.prototype.original = function() {
 /**
  * Clones the widget and returns the clone. Only the properties defined in this._cloneProperties are copied to the clone.
  * The parameter model has to contain at least the property 'parent'.
+ *
+ * OPTION                          DEFAULT VALUE   DESCRIPTION
+ * --------------------------------------------------------------------------------------------------------
+ * delegatePropertiesToClone       []              An array of all properties to be delegated from the original
+ *                                                 to the to the clone when changed on the original widget.
+ *
+ * delegatePropertiesToOriginal    []              An array of all properties to be delegated from the clone
+ *                                                 to the original when changed on the clone widget.
+ *
+ * delegateEventsToOriginal        []              An array of all events to be delegated from the clone to
+ *                                                 the original when fired on the clone widget.
+ *
+ * delegateAllPropertiesToClone    false           True to delegate all property changes from the original to
+ *                                                 the clone.
+ *
+ * delegateAllPropertiesToOriginal false           True to delegate all property changes from the clone to
+ *                                                 the original.
+ *
  * @param model The model used to create the clone is a combination of the clone properties and this model.
  * Therefore this model may be used to override the cloned properties or to add additional properties.
+ * @param options Options used for the clone widgets. See above.
+ *
  */
-scout.Widget.prototype.clone = function(model) {
+scout.Widget.prototype.clone = function(model, options) {
   var clone, cloneModel;
   model = model || {};
+  options = options || {};
 
   cloneModel = scout.objects.extractProperties(this, model, this._cloneProperties);
   clone = scout.create(this.objectType, cloneModel);
   clone.cloneOf = this;
+  this._mirror(clone, options);
 
   return clone;
 };
 
-/**
- * Delegates every property change event from the original widget to this cloned widget by calling the appropriate setter.
- * Works only if this widget is a clone.
- */
-scout.Widget.prototype.mirror = function() {
-  if (!this.cloneOf) {
-    throw new Error('Widget is not a clone.');
+scout.Widget.prototype._deepCloneProperties = function(clone, properties, options) {
+  if (!properties) {
+    return clone;
   }
-  this._mirror(this.cloneOf);
-  this.children.forEach(function(childClone) {
-    if (childClone.cloneOf) {
-      childClone.mirror(childClone.cloneOf);
+  properties = (Array.isArray(properties)) ? properties : [properties];
+  properties.forEach(function(property) {
+    var propertyValue = this[property],
+      clonedProperty = null;
+    if (propertyValue === undefined) {
+      throw new Error('Property \'' + property + '\' is undefined. Deep copy not possible.');
     }
-  });
-};
+    if (this._widgetProperties.indexOf(property) > -1) {
+      if (Array.isArray(propertyValue)) {
+        clonedProperty = propertyValue.map(function(val) {
+          return val.clone({
+            parent: clone
+          }, options);
+        }.bind(this));
 
-scout.Widget.prototype._mirror = function(source) {
-  if (this._mirrorListener) {
-    return;
-  }
-  this._mirrorListener = {
-    func: this._onMirrorEvent.bind(this)
-  };
-  source.events.addListener(this._mirrorListener);
-  this.one('destroy', function() {
-    this.unmirror(source);
+      } else {
+        clonedProperty = propertyValue.clone({
+          parent: clone
+        }, options);
+      }
+    } else {
+      if (Array.isArray(propertyValue)) {
+        clonedProperty = propertyValue.map(function(val) {
+          return val;
+        });
+
+      } else {
+        clonedProperty = propertyValue;
+      }
+    }
+    clone[property] = clonedProperty;
   }.bind(this));
 };
 
-scout.Widget.prototype.unmirror = function() {
-  this.children.forEach(function(childClone) {
-    if (childClone.cloneOf) {
-      childClone.unmirror(childClone.cloneOf);
-    }
-  });
-  this._unmirror(this.cloneOf);
+/**
+ * Delegates every property change event from the original widget to this cloned widget by calling the appropriate setter.
+ * If no target is set it works only if this widget is a clone.
+ */
+scout.Widget.prototype.mirror = function(options, target) {
+  target = target || this.cloneOf;
+  if (!target) {
+    throw new Error('No target for mirroring.');
+  }
+  this._mirror(target, options);
 };
 
-scout.Widget.prototype._unmirror = function(source) {
-  if (!this._mirrorListener) {
+scout.Widget.prototype._mirror = function(clone, options) {
+  var eventDelegator = scout.arrays.find(this.eventDelegators, function(eventDelegator) {
+    return eventDelegator.clone === clone;
+  });
+  if (eventDelegator) {
+    throw new Error('_mirror can only be called on not mirrored widgets. call unmirror first.');
+  }
+  options = options || {};
+  eventDelegator = {
+    clone: clone,
+    originalToClone: scout.EventDelegator.create(this, clone, {
+      delegateProperties: options.delegatePropertiesToClone,
+      delegateAllProperties: options.delegateAllPropertiesToClone
+    }),
+    cloneToOriginal: scout.EventDelegator.create(clone, this, {
+      delegateProperties: options.delegatePropertiesToOriginal,
+      delegateAllProperties: options.delegateAllPropertiesToOriginal,
+      delegateEvents: options.delegateEventsToOriginal
+    })
+  };
+  this.eventDelegators.push(eventDelegator);
+  clone.one('destroy', function() {
+    this._unmirror(clone);
+  }.bind(this));
+};
+
+scout.Widget.prototype.unmirror = function(target) {
+  target = target || this.cloneOf;
+  if (!target) {
+    throw new Error('No target for unmirroring.');
+  }
+  this._unmirror(target);
+};
+
+scout.Widget.prototype._unmirror = function(target) {
+  var eventDelegatorIndex = scout.arrays.findIndex(this.eventDelegators, function(eventDelegator) {
+      return eventDelegator.clone === target;
+    }),
+    eventDelegator = (eventDelegatorIndex > -1) ? (this.eventDelegators.splice(eventDelegatorIndex, 1)[0]) : null;
+  if (!eventDelegator) {
     return;
   }
-  source.events.removeListener(this._mirrorListener);
-  this._mirrorListener = null;
-};
-
-scout.Widget.prototype._onMirrorEvent = function(event) {
-  if (event.type === 'propertyChange') {
-    this._onMirrorPropertyChange(event);
+  if (eventDelegator.originalToClone) {
+    eventDelegator.originalToClone.destroy();
   }
-};
-
-scout.Widget.prototype._onMirrorPropertyChange = function(event) {
-  this.callSetter(event.propertyName, event.newValue);
+  if (eventDelegator.cloneToOriginal) {
+    eventDelegator.cloneToOriginal.destroy();
+  }
 };
 
 scout.Widget.prototype._onParentDestroy = function(event) {

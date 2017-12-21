@@ -27,6 +27,7 @@
   // Basic utilities
   __include("scout/util/arrays.js");
   __include("scout/util/Call.js");
+  __include("scout/util/EventDelegator.js");
   __include("scout/util/dates.js");
   __include("scout/util/defaultValues.js");
   __include("scout/util/events.js");
@@ -102,6 +103,7 @@
   __include("scout/layout/logicalgrid/matrix/LogicalGridMatrixCursor.js");
   __include("scout/layout/logicalgrid/matrix/HorizontalGridMatrix.js");
   __include("scout/layout/logicalgrid/matrix/VerticalGridMatrix.js");
+  __include("scout/layout/ColumnLayout.js");
   __include("scout/layout/NullLayout.js");
   __include("scout/layout/RowLayout.js");
   __include("scout/layout/SingleLayout.js");
@@ -181,6 +183,7 @@
   __include("scout/notification/Notification.js");
   __include("scout/menu/menus.js");
   __include("scout/menu/Menu.js");
+  __include("scout/menu/EllipsisMenu.js");
   __include("scout/menu/MenuAdapter.js");
   __include("scout/menu/MenuKeyStroke.js");
   __include("scout/menu/MenuExecKeyStroke.js");
@@ -189,6 +192,8 @@
   __include("scout/menu/ContextMenuPopupLayout.js");
   __include("scout/menu/menuNavigationKeyStrokes.js");
   __include("scout/menu/ButtonAdapterMenu.js");
+  __include("scout/menu/form/field/FormFieldMenu.js");
+  __include("scout/menu/form/field/FormFieldMenuAdapter.js");
   __include("scout/menu/menubox/MenuBox.js");
   __include("scout/menu/menubox/MenuBoxLayout.js");
   __include("scout/menu/menubar/MenuBar.js");
@@ -196,6 +201,8 @@
   __include("scout/menu/menubar/MenuBarLeftKeyStroke.js");
   __include("scout/menu/menubar/MenuBarRightKeyStroke.js");
   __include("scout/menu/menubar/MenuBarPopup.js");
+  __include("scout/menu/menubar/MenubarBox.js");
+  __include("scout/menu/menubar/MenubarBoxLayout.js");
   __include("scout/calendar/Calendar.js");
   __include("scout/calendar/CalendarAdapter.js");
   __include("scout/calendar/CalendarComponent.js");
@@ -343,6 +350,8 @@
   __include("scout/form/fields/ValueFieldAdapter.js");
   __include("scout/form/fields/BasicField.js");
   __include("scout/form/fields/BasicFieldAdapter.js");
+  __include("scout/form/fields/WidgetField.js");
+  __include("scout/form/fields/WidgetFieldAdapter.js");
   __include("scout/form/FormController.js");
   // Basics for message boxes
   __include("scout/messagebox/MessageBox.js");
@@ -438,9 +447,14 @@
   __include("scout/form/fields/stringfield/StringFieldAdapter.js");
   __include("scout/form/fields/stringfield/StringFieldEnterKeyStroke.js");
   __include("scout/form/fields/stringfield/StringFieldCtrlEnterKeyStroke.js");
-  __include("scout/form/fields/tabbox/TabAreaLayout.js");
   __include("scout/form/fields/tabbox/TabBox.js");
+  __include("scout/form/fields/tabbox/TabAreaLeftKeyStroke.js");
+  __include("scout/form/fields/tabbox/TabAreaRightKeyStroke.js");
   __include("scout/form/fields/tabbox/TabBoxAdapter.js");
+  __include("scout/form/fields/tabbox/TabBoxHeaderLayout.js");
+  __include("scout/form/fields/tabbox/TabBoxHeader.js");
+  __include("scout/form/fields/tabbox/TabArea.js");
+  __include("scout/form/fields/tabbox/TabAreaLayout.js");
   __include("scout/form/fields/tabbox/TabBoxLayout.js");
   __include("scout/form/fields/tabbox/TabItem.js");
   __include("scout/form/fields/tabbox/TabItemAdapter.js");

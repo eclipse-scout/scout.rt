@@ -22,7 +22,7 @@ scout.MenuItemsOrder.prototype.order = function(items) {
     rightItems = [];
 
   var isEmptyspaceMenuVisible = false,
-  isSelectionMenuVisible =false;
+    isSelectionMenuVisible = false;
   items.forEach(function(item) {
     // skip separators added dynamically by this class
     if (item.createdBy === this) {
@@ -52,7 +52,8 @@ scout.MenuItemsOrder.prototype.order = function(items) {
 
   return {
     left: buttons.concat(emptySpaceItems, selectionItems),
-    right: rightItems
+    right: rightItems,
+    all: buttons.concat(emptySpaceItems, selectionItems).concat(rightItems)
   };
 };
 

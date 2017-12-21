@@ -14,7 +14,6 @@ scout.Action = function() {
   this.actionStyle = scout.Action.ActionStyle.DEFAULT;
   this.compact = false;
   this.iconId = null;
-  this.imageLoadingInvalidatesLayout = true;
   this.horizontalAlignment = -1;
   this.keyStroke = null;
   this.keyStrokeFirePolicy = scout.Action.KeyStrokeFirePolicy.ACCESSIBLE_ONLY;
@@ -85,7 +84,8 @@ scout.Action.prototype._renderText = function() {
   if (text && this.textVisible) {
     if (!this.$text) {
       // Create a separate text element to so that setting the text does not remove the icon
-      this.$text = this.$container.appendSpan('text');
+      this.$text = this.$container.appendSpan('content text');
+      scout.HtmlComponent.install(this.$text, this.session);
     }
     this.$text.text(text);
   } else {
@@ -106,29 +106,25 @@ scout.Action.prototype.setIconId = function(iconId) {
 
 scout.Action.prototype._renderIconId = function() {
   var iconId = this.iconId || '';
-  if (this.imageLoadingInvalidatesLayout) {
-    // If the icon is an image (and not a font icon), the scout.Icon class will invalidate the layout when the image has loaded
-    // This may not work for every container using the action (.e.g. MenuBar), so it may be disabled
-    if (!iconId) {
-      this._removeIconId();
-      return;
-    }
-    if (this.icon) {
-      this.icon.setIconDesc(iconId);
-      return;
-    }
-    this.icon = scout.create('Icon', {
-      parent: this,
-      iconDesc: iconId,
-      prepend: true
-    });
-    this.icon.one('destroy', function() {
-      this.icon = null;
-    }.bind(this));
-    this.icon.render();
-  } else {
-    this.$container.icon(iconId);
+  // If the icon is an image (and not a font icon), the scout.Icon class will invalidate the layout when the image has loaded
+  // This may not work for every container using the action (.e.g. MenuBar), so it may be disabled
+  if (!iconId) {
+    this._removeIconId();
+    return;
   }
+  if (this.icon) {
+    this.icon.setIconDesc(iconId);
+    return;
+  }
+  this.icon = scout.create('Icon', {
+    parent: this,
+    iconDesc: iconId,
+    prepend: true
+  });
+  this.icon.one('destroy', function() {
+    this.icon = null;
+  }.bind(this));
+  this.icon.render();
 };
 
 scout.Action.prototype.get$Icon = function() {
@@ -287,6 +283,10 @@ scout.Action.prototype.setCompact = function(compact) {
   if (this.rendered) {
     this._renderCompact();
   }
+};
+
+scout.Action.prototype.setHorizontalAlignment = function(horizontalAlignment) {
+  this.setProperty('horizontalAlignment', horizontalAlignment);
 };
 
 scout.Action.prototype._createActionKeyStroke = function() {

@@ -105,11 +105,14 @@ scout.menus = {
     var hasMenuBefore = false;
     var hasMenuAfter = false;
     menus.forEach(function(menu, i) {
+      if (menu.ellipsis) {
+        return;
+      }
       if (!menu.separator) {
         hasMenuBefore = true;
         return;
       }
-      hasMenuAfter = menus[i + 1] && !menus[i + 1].separator;
+      hasMenuAfter = menus[i + 1] && !menus[i + 1].separator && !menus[i + 1].ellipsis;
 
       // If the separator has a separator next to it, make it invisible
       if (!hasMenuBefore || !hasMenuAfter) {
@@ -155,6 +158,13 @@ scout.menus = {
         return true;
       }
     }
+  },
+
+  isDefaultKeyStroke: function(keyStroke) {
+    return scout.isOneOf(scout.keys.ENTER, keyStroke.which) &&
+      !keyStroke.ctrl &&
+      !keyStroke.alt &&
+      !keyStroke.shift;
   },
 
   createEllipsisMenu: function(options) {

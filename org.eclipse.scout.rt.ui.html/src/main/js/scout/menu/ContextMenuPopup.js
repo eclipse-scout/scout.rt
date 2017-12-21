@@ -43,6 +43,10 @@ scout.ContextMenuPopup.prototype._createLayout = function() {
   return new scout.ContextMenuPopupLayout(this);
 };
 
+scout.ContextMenuPopup.prototype._createBodyLayout = function() {
+  return new scout.RowLayout();
+};
+
 scout.ContextMenuPopup.prototype._render = function() {
   scout.ContextMenuPopup.parent.prototype._render.call(this);
   this._installScrollbars();
@@ -300,10 +304,13 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
     // prevent loosing original parent
     var parentMenu = menu.parent;
     if (this.cloneMenuItems && !menu.cloneOf) {
-      menu = menu.cloneAndMirror({
+      menu = menu.clone({
         parent: this
+      }, {
+        delegateEventsToOriginal: ['acceptInput', 'action'],
+        delegateAllPropertiesToClone: true,
+        delegateAllPropertiesToOriginal: true
       });
-      this._attachCloneMenuListeners(menu);
     }
 
     // just set once because on second execution of this menu.parent is set to a popup
@@ -344,25 +351,6 @@ scout.ContextMenuPopup.prototype._attachMenuListeners = function(menu) {
     menu.off('action', menuItemActionHandler);
     menu.off('propertyChange', menuItemPropertyChange);
   });
-};
-
-scout.ContextMenuPopup.prototype._attachCloneMenuListeners = function(menu) {
-  menu.on('action', this._onCloneMenuAction.bind(this));
-  menu.on('propertyChange', this._onCloneMenuPropertyChange.bind(this));
-  menu.childActions.forEach(this._attachCloneMenuListeners.bind(this));
-};
-
-scout.ContextMenuPopup.prototype._onCloneMenuAction = function(event) {
-  var menu = event.source;
-  menu.cloneOf.doAction();
-};
-
-scout.ContextMenuPopup.prototype._onCloneMenuPropertyChange = function(event) {
-  if (event.propertyName === 'selected') {
-    var menu = event.source;
-    // Only trigger property change, setSelected would try to render the selected state which must not happen for the original menu
-    menu.cloneOf.triggerPropertyChange('selected', event.oldValue, event.newValue);
-  }
 };
 
 /**

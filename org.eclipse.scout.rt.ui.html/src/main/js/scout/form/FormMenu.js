@@ -44,13 +44,13 @@ scout.FormMenu.prototype._renderForm = function() {
 /**
  * @override
  */
-scout.FormMenu.prototype.clone = function(modelOverride) {
+scout.FormMenu.prototype.clone = function(modelOverride, options) {
   modelOverride = modelOverride || {};
   // If the FormMenu is put into a context menu it will be cloned.
   // Cloning a form is not possible because it may non clonable components (Table, TabBox, etc.) -> exclude
   // Luckily, it is not necessary to clone it since the form is never shown multiple times at once -> Just use the same instance
   modelOverride.form = this.form;
-  return scout.FormMenu.parent.prototype.clone.call(this, modelOverride);
+  return scout.FormMenu.parent.prototype.clone.call(this, modelOverride, options);
 };
 
 /**

@@ -183,7 +183,7 @@ $.suppressEventIfDisabled = function(event, $target) {
 $.debounce = function(fx, options) {
   if (typeof options === 'number') {
     options = {
-        delay: options
+      delay: options
     };
   }
   options = $.extend({
@@ -1216,6 +1216,22 @@ $.fn.cssPaddingLeft = function(value) {
   return this.cssPxValue('padding-left', value);
 };
 
+$.fn.cssPaddingX = function(value) {
+  if (value === undefined) {
+    return this.cssPaddingLeft() + this.cssPaddingRight();
+  }
+  this.cssPaddingLeft(value);
+  this.cssPaddingRight(value);
+};
+
+$.fn.cssPaddingY = function(value) {
+  if (value === undefined) {
+    return this.cssPaddingTop() + this.cssPaddingBottom();
+  }
+  this.cssPaddingTop(value);
+  this.cssPaddingBottom(value);
+};
+
 $.fn.cssBorderBottomWidth = function(value) {
   return this.cssPxValue('border-bottom-width', value);
 };
@@ -1389,8 +1405,7 @@ $.fn.removeAnimated = function(cssClass, callback) {
     // Remove without animation
     this.remove();
     callback && callback.call(this);
-  }
-  else if (!scout.device.supportsCssAnimation()) {
+  } else if (!scout.device.supportsCssAnimation()) {
     // Cannot remove animated, remove with jQuery.fadeOut()
     this.fadeOutAndRemove(callback);
   } else {
@@ -1646,7 +1661,7 @@ $.fn.isContentTruncated = function() {
   var oldStyle = this.attr('style');
   this.css('width', 'auto');
   this.css('max-width', 'none');
-  scrollWidth =  this[0].getBoundingClientRect().width;
+  scrollWidth = this[0].getBoundingClientRect().width;
   this.attrOrRemove('style', oldStyle);
 
   return scrollWidth > clientWidth;

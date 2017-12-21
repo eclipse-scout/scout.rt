@@ -1,0 +1,29 @@
+/*******************************************************************************
+ * Copyright (c) 2017 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+ .menu-field {
+
+  & > .form-field {
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+
+    /* remove margin left since the menu-item already has a padding */
+    & > label {
+      margin-left: 8px;
+    }
+  }
+
+  &:not(.has-text):not(.has-icon) {
+    & > .form-field > label {
+      margin-left: 0;
+    }
+  }
+}

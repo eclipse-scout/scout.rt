@@ -14,40 +14,55 @@
   }
 }
 
-.tab-area {
+.tab-box-header {
   margin-top: @group-margin-top;
   margin-left: @mandatory-indicator-width;
   white-space: nowrap;
   position: relative;
+  margin-bottom: @tab-area-border-width;
 
-  &::after {
-    content: '';
-    display: block;
+  & > .tab-box-header-bottom-border {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    margin-bottom: -@tab-area-border-width;
     width: 100%;
-    height: 0;
-    border-bottom: @tab-area-border-width solid @tab-area-border-color;
-    margin-top: -@tab-area-border-width;
+    height: @tab-area-border-width;
+    background-color: @tab-area-border-color;
+  }
+
+  & > .tab-area {
+    position: absolute;
+    #scout.vertical-align-helper-before();
+
+    & > .selection-marker {
+      position: absolute;
+      bottom: 0;
+      margin-bottom: -@tab-area-border-width;
+      height: @tab-area-border-width;
+      background-color: @active-color;
+      transition: left 0.3s, width 0.3s;
+    }
+
+    & > .tab-item > .title > .sub-label {
+      display: none;
+    }
+
+    &.has-sublabel {
+      & > .tab-item > .title > .sub-label {
+        display: block;
+      }
+    }
   }
 
   & > .menubar {
     position: absolute;
-    right: 0;
-    top: 0;
-    padding: 0;
-    padding-left: 12px;
-    width: auto;
-    height: 100%;
-    border: none;
-    z-index: 1;
     #scout.menubar-background-color-inherit();
-    padding-bottom: @tab-area-border-width;
+    border-bottom: none;
+    padding-left: 12px;
+
 
     & > .menubox {
-
-      & > .menu-item {
-        height: 18px;
-      }
-
       & > .menu-item:not(.last),
       & > .menu-separator {
         margin-right: 10px;
@@ -59,7 +74,6 @@
     position: absolute;
     margin-left: @field-status-margin-left;
     #scout.status();
-    border-bottom: @tab-area-border-width solid transparent;
   }
 
   .tab-box.has-tooltip > & > .status {
@@ -82,22 +96,34 @@
 .tab-item {
   position: relative;
   display: inline-block;
-  vertical-align: middle;
+  vertical-align: bottom;
   #scout.font-text-normal(@font-weight-bold);
   color: @tab-item-color;
-  border: none;
   background-color: transparent;
-  padding: 0 @tab-item-padding-x;
-  border-bottom: solid @tab-area-border-width transparent;
-  cursor: pointer;
+  padding: @tab-item-padding-y @tab-item-padding-x;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: @tab-area-border-width;
+    margin-bottom: -@tab-area-border-width;
+    background-color: @palette-gray-6;
+    display: none;
+  }
+
+  &.overflown {
+    display: none;
+  }
 
   &.selected {
     color: @tab-item-active-color;
-    border-bottom-color: @tab-item-active-color;
   }
 
-  &.marked:not(.selected) {
-    border-bottom-color: @palette-gray-6;
+  &.marked::after {
+    display: block;
   }
 
   &:hover {
@@ -112,7 +138,7 @@
     outline: none;
   }
 
-  &:focus::before {
+  &:focus > .title::before {
     #scout.font-icon();
     content: @icon-angle-right;
     color: @tab-item-active-color;
@@ -120,20 +146,33 @@
     top: @group-title-padding-top;
     left: @tab-item-padding-x - @tab-item-focus-arrow-width;
     width: @tab-item-focus-arrow-width;
+    padding: @group-title-padding-top 0 @group-title-padding-bottom;
     text-align: center;
   }
 
-  & > .label {
-    padding: @group-title-padding-top 0 @group-title-padding-bottom;
+  & > .title {
     display: inline-block;
     vertical-align: middle;
+    padding: @group-title-padding-top 0 @group-title-padding-bottom;
+    & > .label {
+      display: block;
+      vertical-align: middle;
+    }
+
+    & > .sub-label {
+      display: block;
+      padding-top: 3px;
+      font-size: 10px;
+      color: @text-disabled-color;
+    }
   }
 
   & > .status {
-    margin-left: @field-status-margin-left;
-    padding: 4px 0;
     display: inline-block;
     vertical-align: middle;
+    margin-left: @field-status-margin-left;
+/*     padding: @group-title-padding-top 0 @group-title-padding-bottom; */
+/*     vertical-align: top; */
     #scout.status();
   }
 
@@ -176,4 +215,28 @@
     color: @icon-color;
     content: @icon-ellipsis-v;
   }
+   &:focus {
+     outline: none;
+
+     &:not(.disabled) {
+       color: @hover-color;
+
+       &:not(.menu-button) {
+         color: @focus-color;
+
+         &::after {
+           color: @focus-color;
+         }
+       }
+
+       /* Draw border for icon only items */
+       &.menu-icononly::after {
+         #scout.button-focus();
+       }
+
+       &:not(.menu-icononly):not(.menu-button) > .text {
+         text-decoration: underline;
+       }
+     }
+   }
 }

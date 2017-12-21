@@ -56,6 +56,11 @@ scout.OutlineLayout.prototype._layout = function($container) {
       node.height = $node.outerHeight(true);
     });
   }
+
+  // layout menu bars
+  this.outline.titleMenuBar.validateLayout();
+  this.outline.nodeMenuBar.validateLayout();
+  this.outline.detailMenuBar.validateLayout();
 };
 
 scout.OutlineLayout.prototype._setDataHeight = function(heightOffset) {

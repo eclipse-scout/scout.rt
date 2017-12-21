@@ -16,6 +16,8 @@ scout.ButtonAdapterMenu = function() {
   this._buttonDestroyHandler = this._onButtonDestroy.bind(this);
 
   this._addCloneProperties(['button']);
+  this.button;
+  this.menubar;
 };
 scout.inherits(scout.ButtonAdapterMenu, scout.Menu);
 
@@ -103,7 +105,7 @@ scout.ButtonAdapterMenu.prototype.focus = function() {
     this._postRenderActions.push(this.focus.bind(this));
     return false;
   }
-  this.parent.setTabbableMenu(this);
+  this.menubar.setTabbableMenu(this);
   return this.session.focusManager.requestFocus(this.$container[0]);
 };
 

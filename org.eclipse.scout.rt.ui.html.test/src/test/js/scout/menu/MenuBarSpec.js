@@ -44,8 +44,14 @@ describe("MenuBar", function() {
       menuBar.render();
       menuBar.setMenuItems(menus);
 
-      expect(menuBar.menuItems.length).toBe(3); // 2 + separator
-      expect(menuBar.menuItems[0]).toBe(menu1);
+      expect(menuBar.orderedMenuItems.all.length).toBe(4); // 2 + separator + ellipsis
+      expect(menuBar.orderedMenuItems.all[0]).toBe(menu1);
+      expect(menuBar.orderedMenuItems.all.map(function(mi) {
+        return mi.separator;
+      })).toEqual([false, true, false, false]);
+      expect(menuBar.orderedMenuItems.all.map(function(mi) {
+        return mi.ellipsis;
+      })).toEqual([undefined, undefined, undefined, true]);
     });
 
     it('must add/destroy dynamically created separators', function() {
@@ -59,9 +65,9 @@ describe("MenuBar", function() {
       menuBar.render();
       menuBar.setMenuItems(menus);
 
-      // a separator must be added between EmptySpace and Selection Menus
-      expect(menuBar.menuItems.length).toBe(3);
-      separator = menuBar.menuItems[1];
+      // a separator must be added between EmptySpace and Selection Menus and ellipsis at the end
+      expect(menuBar.orderedMenuItems.all.length).toBe(4);
+      separator = menuBar.orderedMenuItems.all[1];
       expect(separator.separator).toBe(true);
       expect(separator.createdBy).toBe(menuBar.menuSorter);
 
@@ -69,8 +75,8 @@ describe("MenuBar", function() {
       // and a new separator with different ID should be created
       menus = [menu1, menu3];
       menuBar.setMenuItems(menus);
-      expect(separator.destroyed).toBe(true);
-      expect(separator.id).not.toBe(menuBar.menuItems[1].id);
+      expect(separator.rendered).toBe(false);
+      expect(separator.id).not.toBe(menuBar.orderedMenuItems.all[1].id);
     });
 
     it('renders menu bar invisible if no visible menu items are available', function() {
@@ -162,7 +168,6 @@ describe("MenuBar", function() {
       menu2.visible = true;
       menuBar.setMenuItems(menus);
       menuBar.render();
-      menuBar.$right.setVisible(false); // Right box should not influence the layout (due to missing css)
       menuBar.htmlComp.setSize(new scout.Dimension(500, 50));
 
       expect(menu1.$container.isVisible()).toBe(true);
@@ -204,17 +209,17 @@ describe("MenuBar", function() {
       var modelMenu4 = createModel('xyz');
       var modelMenu5 = createModel('qux');
       var modelMenu6 = createModel('fum');
-      // menu2 should not be the default (even though it has the default key stroke), because it has defaultMenu=false set explicitly
+      // menu2 should not have the default menu class since the default menu is set to false
       modelMenu2.keyStroke = 'enter';
       modelMenu2.defaultMenu = false;
-      // menu3 should not be the default menu (even though it requests so), because it is not enabled
+      // menu3 should have  the default menu class but is not the default menu of the menu bar since it is disabled
       modelMenu3.defaultMenu = true;
       modelMenu3.enabled = false;
-      // menu4 should be the default menu
+      // menu4 has the default menu class and is the default menu of the menu bar.
       modelMenu4.defaultMenu = true;
-      // menu5 should not be the default menu (even though it requests so), because it is not the first to request so
+      // menu5 should have the default menu class but is not the default menu in the menu bar.
       modelMenu5.defaultMenu = true;
-      // menu6 should not be the default menu (event though it has the default key stroke), because another menu is already the default menu
+      // menu6 should have the default menu class but is not the default menu in the menu bar.
       modelMenu6.keyStroke = 'enter';
 
       var menuBar = createMenuBar(),
@@ -239,10 +244,11 @@ describe("MenuBar", function() {
 
       expect(menu1.$container).not.toHaveClass('default-menu');
       expect(menu2.$container).not.toHaveClass('default-menu');
-      expect(menu3.$container).not.toHaveClass('default-menu');
+      expect(menu3.$container).toHaveClass('default-menu');
       expect(menu4.$container).toHaveClass('default-menu');
-      expect(menu5.$container).not.toHaveClass('default-menu');
-      expect(menu6.$container).not.toHaveClass('default-menu');
+      expect(menu5.$container).toHaveClass('default-menu');
+      expect(menu6.$container).toHaveClass('default-menu');
+      expect(menu4).toBe(menuBar.defaultMenu);
     });
 
     it('updates state if menu gets enabled or disabled', function() {
@@ -270,7 +276,7 @@ describe("MenuBar", function() {
 
       menu2.setProperty('enabled', false);
       expect(menuBar.defaultMenu).toBe(null);
-      expect(menu2.$container).not.toHaveClass('default-menu');
+      expect(menu2.$container).toHaveClass('default-menu');
 
       menu2.setProperty('enabled', true);
       expect(menuBar.defaultMenu).toBe(menu2);

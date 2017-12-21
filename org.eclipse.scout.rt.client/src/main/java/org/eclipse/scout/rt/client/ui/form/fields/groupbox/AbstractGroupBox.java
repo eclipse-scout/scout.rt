@@ -72,6 +72,13 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   }
 
   /**
+   * Configures the text of the sub label. The sub label is usually displayed below the label.
+   */
+  protected String getConfiguredSubLabel() {
+    return null;
+  }
+
+  /**
    * Configures the number of columns used in this group box.<br>
    * A typical {@link IFormField} inside a group box spans one column. This behavior can be changed by setting
    * {@link AbstractFormField#getConfiguredGridW()}.
@@ -306,6 +313,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     super.initConfig();
     categorizeFields();
 
+    setSubLabel(getConfiguredSubLabel());
     setExpandable(getConfiguredExpandable());
     setExpanded(getConfiguredExpanded());
     setBorderVisible(getConfiguredBorderVisible());
@@ -435,6 +443,16 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     if (isInitConfigDone() && getForm() != null) {
       getForm().structureChanged(this);
     }
+  }
+
+  @Override
+  public String getSubLabel() {
+    return propertySupport.getPropertyString(PROP_SUB_LABEL);
+  }
+
+  @Override
+  public void setSubLabel(String subLabel) {
+    propertySupport.setPropertyString(PROP_SUB_LABEL, subLabel);
   }
 
   @Override

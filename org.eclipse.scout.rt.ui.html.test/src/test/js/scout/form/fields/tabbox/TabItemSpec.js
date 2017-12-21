@@ -22,20 +22,22 @@ describe('TabItem', function() {
     var tabBox;
 
     beforeEach(function() {
-      var tabItem = helper.createTabItem({label: 'Foo'});
+      var tabItem = helper.createTabItem({
+        label: 'Foo'
+      });
       tabBox = helper.createTabBoxWith([tabItem]);
     });
 
     it('invalidates tabarea if status visibility changes', function() {
       tabBox.render();
       tabBox.validateLayout();
-      expect(scout.HtmlComponent.get(tabBox._$tabArea).valid).toBe(true);
+      expect(scout.HtmlComponent.get(tabBox.header.tabArea.$container).valid).toBe(true);
       expect(tabBox.tabItems[0]._computeStatusVisible()).toBe(false);
 
       // TabArea needs to be invalidated, it may necessary to show ellipsis now because status got visible
       tabBox.tabItems[0].setTooltipText('test');
       expect(tabBox.tabItems[0]._computeStatusVisible()).toBe(true);
-      expect(scout.HtmlComponent.get(tabBox._$tabArea).valid).toBe(false);
+      expect(scout.HtmlComponent.get(tabBox.header.tabArea.$container).valid).toBe(false);
     });
 
   });
@@ -44,7 +46,9 @@ describe('TabItem', function() {
     var tabItem;
 
     beforeEach(function() {
-      tabItem = helper.createTabItem({cssClass: 'foo1'});
+      tabItem = helper.createTabItem({
+        cssClass: 'foo1'
+      });
       var tabBox = helper.createTabBoxWith([tabItem]);
       tabBox.render();
     });

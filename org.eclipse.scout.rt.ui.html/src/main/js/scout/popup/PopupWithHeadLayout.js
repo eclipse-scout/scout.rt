@@ -17,7 +17,8 @@ scout.PopupWithHeadLayout.prototype.layout = function($container) {
   scout.PopupWithHeadLayout.parent.prototype.layout.call(this, $container);
 
   var htmlComp = this.popup.htmlComp,
-    popupSize = htmlComp.size();
+    popupSize = htmlComp.size(),
+    htmlBody = scout.HtmlComponent.optGet(this.popup.$body);
 
   // While animating the body animation sets the size
   if (!this.popup.bodyAnimating) {
@@ -28,11 +29,9 @@ scout.PopupWithHeadLayout.prototype.layout = function($container) {
       // Adjust popup size if head changed size
       if (popupSize.width < headSize.width) {
         popupSize.width = headSize.width;
-        scout.graphics.setSize(htmlComp.$comp, popupSize);
       }
     }
-
-    scout.graphics.setSize(this.popup.$body, popupSize);
+    htmlBody.setSize(popupSize);
   }
 };
 
@@ -68,8 +67,10 @@ scout.PopupWithHeadLayout.prototype._calcMaxSizeAroundAnchor = function() {
   return new scout.Insets(maxHeightUp, maxWidthRight, maxHeightDown, maxWidthLeft);
 };
 
-scout.PopupWithHeadLayout.prototype.preferredLayoutSize = function($container) {
+
+scout.PopupWithHeadLayout.prototype.preferredLayoutSize = function($container, options) {
   var htmlComp = this.popup.htmlComp,
+    htmlBody,
     prefSize;
 
   if (!this.popup.bodyAnimating) {
@@ -81,8 +82,15 @@ scout.PopupWithHeadLayout.prototype.preferredLayoutSize = function($container) {
       height: 'auto'
     });
 
-    prefSize = scout.graphics.prefSize(this.popup.$body, true)
+    htmlBody = scout.HtmlComponent.optGet(this.popup.$body);
+    if (htmlBody) {
+      prefSize = htmlBody.prefSize()
+        .add(htmlComp.insets())
+        .add(htmlBody.margins());
+    } else {
+      prefSize = scout.graphics.prefSize(this.popup.$body, true)
       .add(htmlComp.insets());
+    }
 
     $siblingBodies.removeClass('hidden');
     this.popup.$container.attr('style', popupStyleBackup);

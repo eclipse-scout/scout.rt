@@ -13,15 +13,19 @@
   display: inline-block;
   vertical-align: middle;
   white-space: nowrap;
-  cursor: pointer;
+
   color: @text-color;
   #scout.vertical-align-helper-before();
+
+  &:not(.menu-field) {
+    cursor: pointer;
+  }
 
   & > .key-box {
     bottom: -3px;
   }
 
-  &:not(.disabled):hover {
+  &:not(.disabled):not(.menu-field):hover {
     color: @hover-color;
   }
 

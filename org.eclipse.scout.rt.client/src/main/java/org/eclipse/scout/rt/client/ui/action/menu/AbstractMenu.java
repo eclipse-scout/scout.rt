@@ -88,6 +88,16 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     return false;
   }
 
+  /**
+   * Configures if the menu is stackable. A stackable menu will be stacked in a dropdown menu if there is not enough
+   * space in the menubar. This property is usually set to false for right aligned menus with only an icon.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(57)
+  protected boolean getConfiguredStackable() {
+    return true;
+  }
+
   @Override
   public Object getOwnerValue() {
     return m_ownerValue;
@@ -177,6 +187,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     super.initConfig();
     setMenuTypes(getConfiguredMenuTypes());
     setPreventDoubleClick(getConfiguredPreventDoubleClick());
+    setStackable(getConfiguredStackable());
   }
 
   @Override
@@ -240,6 +251,16 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   @Override
   public void setPreventDoubleClick(boolean preventDoubleClick) {
     propertySupport.setPropertyBool(PROP_PREVENT_DOUBLE_CLICK, preventDoubleClick);
+  }
+
+  @Override
+  public boolean isStackable() {
+    return propertySupport.getPropertyBool(PROP_STACKABLE);
+  }
+
+  @Override
+  public void setStackable(boolean stackable) {
+    propertySupport.setPropertyBool(PROP_STACKABLE, stackable);
   }
 
   protected final void interceptOwnerValueChanged(Object newOwnerValue) {

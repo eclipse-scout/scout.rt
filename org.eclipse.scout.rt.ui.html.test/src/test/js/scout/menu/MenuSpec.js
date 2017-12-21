@@ -29,7 +29,7 @@ describe("Menu", function() {
   describe('defaults', function() {
 
     it('should have expected defaults', function() {
-      expect(menu1.overflow).toBe(false);
+      expect(menu1.overflown).toBe(false);
     });
 
   });
