@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.holders;
 
+import org.eclipse.scout.rt.platform.util.ChangeStatus;
+
 /**
  * Holder for rows of bean based table (see {@link ITableBeanHolder}).
  *
@@ -21,22 +23,22 @@ public interface ITableBeanRowHolder {
   /**
    * Describes a row that has not been changed.
    */
-  int STATUS_NON_CHANGED = 0;
+  int STATUS_NON_CHANGED = ChangeStatus.NOT_CHANGED;
 
   /**
    * Describes a row that was inserted.
    */
-  int STATUS_INSERTED = 1;
+  int STATUS_INSERTED = ChangeStatus.INSERTED;
 
   /**
    * Describes a row that was updated.
    */
-  int STATUS_UPDATED = 2;
+  int STATUS_UPDATED = ChangeStatus.UPDATED;
 
   /**
    * Describes a row that has been deleted.
    */
-  int STATUS_DELETED = 3;
+  int STATUS_DELETED = ChangeStatus.DELETED;
 
   /**
    * @return Returns this row's state.

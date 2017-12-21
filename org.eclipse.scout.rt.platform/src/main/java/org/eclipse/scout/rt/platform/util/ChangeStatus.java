@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.desktop.datachange;
+package org.eclipse.scout.rt.platform.util;
 
 /**
- * Provides constants to be used for the <code>changeStatus</code> property in a {@link DataChangeEvent}.
- *
  * @since 7.1
  */
 public final class ChangeStatus {

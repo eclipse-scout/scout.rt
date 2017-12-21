@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.client.ui.desktop.datachange;
 
 import java.util.EventObject;
 
+import org.eclipse.scout.rt.platform.util.ChangeStatus;
+
 /**
  * An event object to be used with the {@link IDataChangeManager}.
  *
