@@ -39,26 +39,7 @@ CalendarSpecHelper.prototype.createCompomentModel = function(options) {
   for (var prop in options) {
     c[prop] = options[prop];
   }
-
-  this.initCoveredDays(c);
   return c;
 };
 
-CalendarSpecHelper.prototype.initCoveredDays = function(c){
-  c.coveredDays = [];
-  var from = scout.dates.trunc(scout.dates.parseJsonDate(c.fromDate));
-  var to = scout.dates.trunc(scout.dates.parseJsonDate(c.toDate));
-  var d = from;
-  c.coveredDays.push(d);
-  while(!scout.dates.isSameDay(d,to)){
-    d = this.incDay(d);
-    c.coveredDays.push(d);
-  }
-};
-
-CalendarSpecHelper.prototype.incDay = function(d) {
-  var newDate = new Date(d.getTime());
-  newDate.setDate(d.getDate() + 1);
-  return newDate;
-};
 

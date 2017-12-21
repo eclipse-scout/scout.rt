@@ -10,11 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.calendar;
 
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
+import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarAppointment;
@@ -28,7 +27,7 @@ public class CalendarComponent implements Comparable<CalendarComponent> {
   // cache
   private Date m_fromDate;
   private Date m_toDate;
-  private Date[] m_coveredDays;
+  private Range<Date> m_coveredDaysRange;
   private boolean m_fullDay;
 
   protected CalendarComponent(ICalendar calendar, ICalendarItemProvider producer, ICalendarItem item) {
@@ -65,19 +64,10 @@ public class CalendarComponent implements Comparable<CalendarComponent> {
       d = new Date(0);
     }
     m_toDate = d;
+
     // cache covered days
-    ArrayList<Date> dayList = new ArrayList<Date>();
-    Calendar a = Calendar.getInstance();
-    a.setTime(m_fromDate);
-    DateUtility.truncCalendar(a);
-    Calendar b = Calendar.getInstance();
-    b.setTime(m_toDate);
-    DateUtility.truncCalendar(b);
-    while (a.compareTo(b) <= 0) {
-      dayList.add(a.getTime());
-      a.add(Calendar.DATE, 1);
-    }
-    m_coveredDays = DateUtility.getCoveredDays(m_fromDate, m_toDate);
+    m_coveredDaysRange = new Range<Date>(DateUtility.truncDate(m_fromDate), DateUtility.truncDate(m_toDate));
+
     // cache full day flag
     if (m_item instanceof ICalendarAppointment) {
       m_fullDay = ((ICalendarAppointment) m_item).isFullDay();
@@ -121,9 +111,20 @@ public class CalendarComponent implements Comparable<CalendarComponent> {
 
   /**
    * Convenience for getting all days this item is covering the dates returned have all time 00:00:00
+   *
+   * @deprecated will be removed in release 7.1; use {@link #getCoveredDaysRange} instead
    */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   public Date[] getCoveredDays() {
-    return m_coveredDays;
+    return DateUtility.getCoveredDays(getFromDate(), getToDate());
+  }
+
+  /**
+   * Convenience for getting days range from start to end date
+   */
+  public Range<Date> getCoveredDaysRange() {
+    return m_coveredDaysRange;
   }
 
   /**

@@ -21,6 +21,7 @@ import java.util.Locale;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 public final class DateUtility {
@@ -639,7 +640,9 @@ public final class DateUtility {
    * 13.3.2008 12:00 - 14.3.2008 12:00 covers 2 days (13.3., 14.3.)
    *
    * @return array of days that with time set to 00:00:00.000
+   * @deprecated will be removed in release 7.1; use {@link Range} with type Date instead
    */
+  @Deprecated
   public static Date[] getCoveredDays(Date from, Date to) {
     if (from == null) {
       from = to;

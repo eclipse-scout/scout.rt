@@ -29,6 +29,20 @@ scout.CalendarComponent.prototype._createKeyStrokeContext = function() {
   return null;
 };
 
+scout.CalendarComponent.prototype._init = function(model) {
+  scout.CalendarComponent.parent.prototype._init.call(this, model);
+
+  this._syncCoveredDaysRange(this.coveredDaysRange);
+};
+
+scout.CalendarComponent.prototype._syncCoveredDaysRange = function(coveredDaysRange) {
+  if (coveredDaysRange) {
+    this.coveredDaysRange = new scout.Range(
+      scout.dates.parseJsonDate(coveredDaysRange.from),
+      scout.dates.parseJsonDate(coveredDaysRange.to));
+  }
+};
+
 /**
  * @override ModelAdapter.js
  */
@@ -42,15 +56,42 @@ scout.CalendarComponent.prototype._remove = function() {
   scout.CalendarComponent.parent.prototype._remove.call(this);
 };
 
+scout.CalendarComponent.prototype._startLoopDay = function() {
+  // start date is either beginning of the component or beginning of viewRange
+  if (scout.dates.compare(this.coveredDaysRange.from, this.parent.viewRange.from) > 0) {
+    return this.coveredDaysRange.from;
+  } else {
+    return this.parent.viewRange.from;
+  }
+};
+
 scout.CalendarComponent.prototype._render = function($parent) {
   $.log.debug('(CalendarComponent#_render)');
-  var i, partDay, $day, $part;
+  var partDay, $day, $part;
+  if (!this.coveredDaysRange) {
+    // coveredDaysRange is not set on current CalendarComponent. Cannot show calendar component without from and to values.
+    return;
+  }
 
-  for (i = 0; i < this.coveredDays.length; i++) {
+  var loopDay = this._startLoopDay();
+  var lastComponentDay = scout.dates.shift(this.coveredDaysRange.to, 0, 0, 1);
+  if (scout.dates.compare(loopDay, lastComponentDay) > 0) {
+    // start day for the while loop is greater then the exit condition
+    return;
+  }
+
+  while (!scout.dates.isSameDay(loopDay, lastComponentDay)) {
+    partDay = loopDay;
+    loopDay = scout.dates.shift(loopDay, 0, 0, 1); // increase day for loop
+
     // check if day is in visible view range
-    partDay = scout.dates.parseJsonDate(this.coveredDays[i]);
+    if (scout.dates.compare(partDay, this.parent.viewRange.to) > 0) {
+      // break condition, partDay is now out of range.
+      break;
+    }
     $day = this._findDayInGrid(partDay);
     if ($day === undefined) {
+      // next day, partDay not found in grid
       continue;
     }
 
@@ -79,7 +120,7 @@ scout.CalendarComponent.prototype._render = function($parent) {
 
         // position and height depending on start and end date
         $part.addClass('component-day');
-        if (this.coveredDays.length === 1) {
+        if (scout.dates.isSameDay(scout.dates.trunc(this.coveredDaysRange.from), scout.dates.trunc(this.coveredDaysRange.to))) {
           this._partPosition($part, partFrom, partTo);
         } else if (scout.dates.isSameDay(partDay, fromDate)) {
           this._partPosition($part, partFrom, 24)
@@ -98,7 +139,7 @@ scout.CalendarComponent.prototype._render = function($parent) {
 };
 
 // FIXME awe: (calendar) tuning
-scout.CalendarComponent.prototype._getHours = function(date){
+scout.CalendarComponent.prototype._getHours = function(date) {
   var d = scout.dates.parseJsonDate(date);
   return d.getHours() + d.getMinutes() / 60;
 };
@@ -129,7 +170,7 @@ scout.CalendarComponent.prototype._isDayPart = function() {
   return !this.parent._isMonth() && !this.fullDay;
 };
 
-scout.CalendarComponent.prototype._getHourRange = function(day){
+scout.CalendarComponent.prototype._getHourRange = function(day) {
   var hourRange = new scout.Range(this._getHours(this.fromDate), this._getHours(this.toDate));
   var dateRange = new scout.Range(scout.dates.parseJsonDate(this.fromDate), scout.dates.parseJsonDate(this.toDate));
 
@@ -143,14 +184,14 @@ scout.CalendarComponent.prototype._getHourRange = function(day){
   return new scout.Range(0, 24);
 };
 
-scout.CalendarComponent.prototype.getPartDayPosition = function(day){
+scout.CalendarComponent.prototype.getPartDayPosition = function(day) {
   return this._getDisplayDayPosition(this._getHourRange(day));
 };
 
-scout.CalendarComponent.prototype._getDisplayDayPosition = function(range){
+scout.CalendarComponent.prototype._getDisplayDayPosition = function(range) {
   var preferredRange = new scout.Range(this.parent._dayPosition(range.from), this.parent._dayPosition(range.to));
   var minRangeSize = 2.5;
-  if(preferredRange.size() < minRangeSize){
+  if (preferredRange.size() < minRangeSize) {
     return new scout.Range(preferredRange.from, preferredRange.from + minRangeSize);
   }
   return preferredRange;
@@ -162,7 +203,7 @@ scout.CalendarComponent.prototype._partPosition = function($part, y1, y2) {
 
   return $part
     .css('top', r.from + '%')
-    .css('height', r.to - r.from  + '%');
+    .css('height', r.to - r.from + '%');
 };
 
 scout.CalendarComponent.prototype._renderProperties = function() {
