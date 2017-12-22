@@ -20,4 +20,6 @@ scout.TagChooserPopupLayout.prototype.layout = function($container) {
   var htmlComp = this.popup.htmlComp;
   var size = htmlComp.size().subtract(htmlComp.insets());
   this.popup.table.htmlComp.setSize(size);
+
+  this.popup.position();
 };
