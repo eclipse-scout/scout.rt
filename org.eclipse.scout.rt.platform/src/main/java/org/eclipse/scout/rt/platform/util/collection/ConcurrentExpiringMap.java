@@ -138,7 +138,7 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
    *          if greater than zero, entries may be evicted at a put operation until the map reaches this size
    */
   public ConcurrentExpiringMap(ConcurrentExpiringMap<K, V> map, int targetSize) {
-    this(map.m_elementMap, map.m_timeToLive, map.m_touchOnGet, map.m_touchOnIterate, targetSize, targetSize * map.m_overflowSize / map.m_targetSize);
+    this(map.m_elementMap, map.m_timeToLive, map.m_touchOnGet, map.m_touchOnIterate, targetSize, sameRatioOverflowSize(targetSize, map.m_targetSize, map.m_overflowSize));
   }
 
   /**
@@ -190,6 +190,16 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
       return 2;
     }
     return targetSize * 3 / 2;
+  }
+
+  private static final int sameRatioOverflowSize(int targetSize, int oldTargetSize, int oldOverflowSize) {
+    if (oldTargetSize == 0) {
+      // prevent division by 0
+      return defaultOverflowSize(targetSize);
+    }
+    else {
+      return targetSize * oldOverflowSize / oldTargetSize;
+    }
   }
 
   /**
@@ -340,7 +350,9 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
     if (currElement != null) {
       V currValue = currElement.getValue();
       if (currValue == oldValue /* null case too */ || (currValue != null && currValue.equals(oldValue))) {
-        return m_elementMap.replace(key, currElement, createElement(newValue));
+        boolean success = m_elementMap.replace(key, currElement, createElement(newValue));
+        validateSize();
+        return success;
       }
     }
     // did not contain mapping / not correct mapping / no replace (see containsKey)
@@ -353,6 +365,7 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
     if (e != null) {
       e = m_elementMap.replace(key, createElement(value));
     }
+    validateSize();
     return e != null ? e.getValue() : null;
   }
 
@@ -412,23 +425,43 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
   }
 
   protected void validateSize() {
-    // note: in JRE 1.8 the performance of ConcurrentHashMap#size() is increased
-    if (m_overflowSize > 0 && m_elementMap.size() >= m_overflowSize) {
-      // maximum one thread at the time should shrink the map
-      if (m_validateSizeLock.tryLock()) { // NOSONAR
-        try {
-          // recheck size
-          if (m_elementMap.size() >= m_overflowSize) {
-            evictOldestEntries();
-          }
+    // maximum one thread at the time should shrink the map
+    if (m_validateSizeLock.tryLock()) { // NOSONAR
+      try {
+        if (m_targetSize == 0 && m_timeToLive > 0) {
+          evictExpiredEntries();
         }
-        finally {
-          m_validateSizeLock.unlock();
+        else if (m_targetSize > 0 && m_elementMap.size() >= m_overflowSize) {
+          // note: in JRE 1.8 the performance of ConcurrentHashMap#size() is increased, however other ConcurrentMaps may be slower
+          evictOldestEntries();
+        }
+      }
+      finally {
+        m_validateSizeLock.unlock();
+      }
+    }
+  }
+
+  /**
+   * Evict all expired entries
+   */
+  protected void evictExpiredEntries() {
+    Iterator<Entry<K, ExpiringElement<V>>> it = m_elementMap.entrySet().iterator();
+    while (it.hasNext()) {
+      Entry<K, ExpiringElement<V>> entry = it.next();
+      K key = entry.getKey();
+      ExpiringElement<V> element = entry.getValue();
+      if (!isElementValid(element)) {
+        if (m_elementMap.remove(key, element)) {
+          execEntryEvicted(key, element.getValue());
         }
       }
     }
   }
 
+  /**
+   * Evict entries until targetsize is reached
+   */
   protected void evictOldestEntries() {
     TreeSet<Entry<K, ExpiringElement<V>>> set = new TreeSet<Entry<K, ExpiringElement<V>>>(new StableTimestampComparator<K, V>());
 
@@ -441,12 +474,19 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
     int numberOfEntriesToEvict = set.size() - m_targetSize;
     while (numberOfEntriesToEvict > 0) {
       Entry<K, ExpiringElement<V>> oldestEntry = set.pollFirst();
+      if (oldestEntry == null) {
+        break;
+      }
       // try to remove entry from element map
       K key = oldestEntry.getKey();
       ExpiringElement<V> element = oldestEntry.getValue();
       if (m_elementMap.remove(key, element)) {
         numberOfEntriesToEvict--;
         execEntryEvicted(key, element.getValue());
+      }
+      else if (!m_elementMap.containsKey(key)) {
+        // concurrently removed by another thread
+        numberOfEntriesToEvict--;
       }
     }
   }
