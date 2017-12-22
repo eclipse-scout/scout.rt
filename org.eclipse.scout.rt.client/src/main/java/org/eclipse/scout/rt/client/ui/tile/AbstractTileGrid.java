@@ -16,8 +16,8 @@ import org.eclipse.scout.rt.client.extension.ui.tile.TileGridChains.TilesSelecte
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
-import org.eclipse.scout.rt.client.ui.action.menu.root.ITilesContextMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.root.internal.TilesContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.ITileGridContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.internal.TileGridContextMenu;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
@@ -111,7 +111,7 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
     }
 
     new MoveActionNodesHandler<>(menus).moveModelObjects();
-    ITilesContextMenu contextMenu = new TilesContextMenu(this, menus.getOrderedList());
+    ITileGridContextMenu contextMenu = new TileGridContextMenu(this, menus.getOrderedList());
     setContextMenu(contextMenu);
   }
 
@@ -158,13 +158,13 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
     getContextMenu().setChildActions(menus);
   }
 
-  protected void setContextMenu(ITilesContextMenu contextMenu) {
+  protected void setContextMenu(ITileGridContextMenu contextMenu) {
     propertySupport.setProperty(PROP_CONTEXT_MENU, contextMenu);
   }
 
   @Override
-  public ITilesContextMenu getContextMenu() {
-    return (ITilesContextMenu) propertySupport.getProperty(PROP_CONTEXT_MENU);
+  public ITileGridContextMenu getContextMenu() {
+    return (ITileGridContextMenu) propertySupport.getProperty(PROP_CONTEXT_MENU);
   }
 
   @Override

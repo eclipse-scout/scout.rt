@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.client.ui.tile.ITileGrid;
 /**
  * The tiles menu container is the invisible root container for all context menus on the tiles element.
  */
-public interface ITilesContextMenu extends IContextMenu {
+public interface ITileGridContextMenu extends IContextMenu {
 
   @Override
   ITileGrid getContainer();

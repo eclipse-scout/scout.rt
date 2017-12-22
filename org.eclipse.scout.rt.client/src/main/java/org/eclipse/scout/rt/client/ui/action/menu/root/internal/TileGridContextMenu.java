@@ -16,21 +16,21 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractContextMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.root.ITilesContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.ITileGridContextMenu;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.client.ui.tile.ITileGrid;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
- * The invisible root menu node of tiles. (internal usage only)
+ * The invisible root menu node of tile grid. (internal usage only)
  */
 @ClassId("6c1c8e1a-bee2-49fc-8bcc-e2169037fb7e")
-public class TilesContextMenu extends AbstractContextMenu<ITileGrid<? extends ITile>> implements ITilesContextMenu {
+public class TileGridContextMenu extends AbstractContextMenu<ITileGrid<? extends ITile>> implements ITileGridContextMenu {
 
   /**
    * @param owner
    */
-  public TilesContextMenu(ITileGrid<? extends ITile> owner, List<? extends IMenu> initialChildMenus) {
+  public TileGridContextMenu(ITileGrid<? extends ITile> owner, List<? extends IMenu> initialChildMenus) {
     super(owner, initialChildMenus);
   }
 

@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.ui.html.json.form.fields.tilesfield;
+package org.eclipse.scout.rt.ui.html.json.form.fields.tilefield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.tilefield.ITileField;
 import org.eclipse.scout.rt.client.ui.tile.ITileGrid;

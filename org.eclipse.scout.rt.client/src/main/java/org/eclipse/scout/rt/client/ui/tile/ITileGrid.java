@@ -6,7 +6,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
-import org.eclipse.scout.rt.client.ui.action.menu.root.ITilesContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.ITileGridContextMenu;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
@@ -190,7 +190,7 @@ public interface ITileGrid<T extends ITile> extends IWidget, ITypeWithClassId, I
   void setMenus(List<? extends IMenu> menus);
 
   @Override
-  ITilesContextMenu getContextMenu();
+  ITileGridContextMenu getContextMenu();
 
   ITileGridUIFacade getUIFacade();
 }
