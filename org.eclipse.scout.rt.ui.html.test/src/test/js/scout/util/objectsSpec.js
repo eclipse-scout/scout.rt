@@ -351,4 +351,28 @@ describe("scout.objects", function() {
 
   });
 
+  describe('equals', function() {
+
+    it('works as expected', function() {
+      expect(scout.objects.equals()).toBe(true); // undefined === undefined
+      expect(scout.objects.equals(2)).toBe(false);
+      expect(scout.objects.equals(2, 2)).toBe(true);
+      expect(scout.objects.equals(2, 3)).toBe(false);
+      expect(scout.objects.equals(2, '2')).toBe(false);
+      expect(scout.objects.equals('2', '2')).toBe(true);
+      expect(scout.objects.equals('', false)).toBe(false);
+      expect(scout.objects.equals('', '')).toBe(true);
+      expect(scout.objects.equals(true, true)).toBe(true);
+      expect(scout.objects.equals(null, null)).toBe(true);
+      expect(scout.objects.equals([], [])).toBe(true);
+      expect(scout.objects.equals([1, 2, 3], [1, 2, 3])).toBe(true);
+      expect(scout.objects.equals([1, 2, 3], [3, 2, 1])).toBe(false);
+      var a = {};
+      expect(scout.objects.equals(a, a)).toBe(true);
+      expect(scout.objects.equals({}, {})).toBe(false);
+      expect(scout.objects.equals({equals: function() { return true; }}, {equals: function() { return true; }})).toBe(true);
+    });
+
+  });
+
 });

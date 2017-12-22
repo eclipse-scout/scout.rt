@@ -264,6 +264,7 @@ scout.TileGrid.prototype.setComparator = function(comparator) {
 
 scout.TileGrid.prototype.sort = function() {
   var tiles = this.tiles.slice();
+  this.setTiles([]);
   this.setTiles(tiles);
 };
 

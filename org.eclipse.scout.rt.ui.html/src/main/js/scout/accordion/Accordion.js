@@ -157,6 +157,7 @@ scout.Accordion.prototype.setComparator = function(comparator) {
 
 scout.Accordion.prototype.sort = function() {
   var groups = this.groups.slice();
+  this.setGroups([]);
   this.setGroups(groups);
 };
 
