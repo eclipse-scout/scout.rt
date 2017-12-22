@@ -41,6 +41,7 @@ scout.TagChooserPopup.prototype._init = function(model) {
 scout.TagChooserPopup.prototype._render = function() {
   scout.TagChooserPopup.parent.prototype._render.call(this);
 
+  this.$container.on('mousedown', this._onContainerMouseDown.bind(this));
   this._renderTable();
 };
 
@@ -118,3 +119,21 @@ scout.TagChooserPopup.prototype._onRowClick = function(event) {
     lookupRow: row.lookupRow
   });
 };
+
+/**
+ * This event handler is called before the mousedown handler on the _document_ is triggered
+ * This allows us to prevent the default, which is important for the CellEditorPopup which
+ * should stay open when the SmartField popup is closed. It also prevents the focus blur
+ * event on the SmartField input-field.
+ */
+scout.TagChooserPopup.prototype._onContainerMouseDown = function(event) {
+  // when user clicks on proposal popup with table or tree (prevent default,
+  // so input-field does not lose the focus, popup will be closed by the
+  // proposal chooser impl.
+  return false;
+};
+
+scout.TagChooserPopup.prototype._isMouseDownOnAnchor = function(event) {
+  return this.field.$field.isOrHas(event.target);
+};
+

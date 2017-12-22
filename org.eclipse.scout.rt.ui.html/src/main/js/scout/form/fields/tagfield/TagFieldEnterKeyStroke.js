@@ -18,7 +18,7 @@ scout.TagFieldEnterKeyStroke = function(tagField) {
 scout.inherits(scout.TagFieldEnterKeyStroke, scout.KeyStroke);
 
 scout.TagFieldEnterKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.TagFieldDeleteKeyStroke.parent.prototype._accept.call(this, event);
+  var accepted = scout.TagFieldEnterKeyStroke.parent.prototype._accept.call(this, event);
   if (!accepted) {
     return false;
   }

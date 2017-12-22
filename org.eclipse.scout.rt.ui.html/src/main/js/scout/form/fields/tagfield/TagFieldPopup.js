@@ -10,7 +10,16 @@
  ******************************************************************************/
 scout.TagFieldPopup = function() {
   scout.TagFieldPopup.parent.call(this);
+
   this._tagFieldPropertyChangeListener = null;
+
+  // We need not only to return which element receives the initial focus
+  // but we must also prepare this element so it can receive the focus
+  this.initialFocus = function() {
+    return scout.TagField.firstTagElement(this.$body)
+      .setTabbable(true)
+      .addClass('focused')[0];
+  };
 };
 scout.inherits(scout.TagFieldPopup, scout.PopupWithHead);
 
@@ -44,10 +53,11 @@ scout.TagFieldPopup.prototype._render = function() {
 
 scout.TagFieldPopup.prototype._renderValue = function() {
   this.$body.empty();
-  var visibleTags = this.parent.visibleTags();
+
   var tagField = this.parent;
-  var tags = scout.arrays.ensure(tagField.value);
-  tags.forEach(function(tagText) {
+  var visibleTags = tagField.visibleTags();
+  var allTags = scout.arrays.ensure(tagField.value);
+  allTags.forEach(function(tagText) {
     // only add tags that are currently in "overflow" and thus are not visible
     if (visibleTags.indexOf(tagText) === -1) {
       tagField._makeTagElement(this.$body, tagText, this._onTagRemoveClick.bind(this))
@@ -65,13 +75,9 @@ scout.TagFieldPopup.prototype._renderHead = function() {
 
   // FIXME [awe] ask c.gu why the border around the head looks a bit broken (1 pixel issue)
   this._copyCssClassToHead('overflow-icon');
-  this.$head.removeClass('popup-head menu-item');
-  this.$head.addClass('tagfield-popup-head');
-};
-
-scout.TagFieldPopup.prototype._postRender = function() {
-  scout.TagFieldPopup.parent.prototype._postRender.call(this);
-  this._focusFirstTagElement();
+  this.$head
+    .removeClass('popup-head menu-item')
+    .addClass('tagfield-popup-head');
 };
 
 scout.TagFieldPopup.prototype._focusFirstTagElement = function() {

@@ -153,11 +153,32 @@ scout.TagField.prototype._clear = function() {
   this.$field.val('');
 };
 
+scout.TagField.prototype.acceptInput = function() {
+  if (this.chooser) {
+    return;
+  }
+  scout.TagField.parent.prototype.acceptInput.call(this);
+};
+
 scout.TagField.prototype._triggerAcceptInput = function() {
   this.trigger('acceptInput', {
     displayText: this.displayText,
     value: this.value
   });
+};
+
+scout.TagField.prototype._onFieldBlur = function(event) {
+  scout.TagField.parent.prototype._onFieldBlur.call(this, event);
+
+  this.closeChooserPopup();
+
+  // when overflow popup opens it sets focus to the first tag element, this means:
+  // the input field loses focus. In that case we must prevent that the overflow popup is closed.
+  var popupRequestsFocus = this.popup && this.popup.$container.has(event.relatedTarget);
+  if (popupRequestsFocus) {
+    return;
+  }
+  this.closeOverflowPopup();
 };
 
 scout.TagField.prototype._onFieldFocus = function(event) {
@@ -178,6 +199,11 @@ scout.TagField.prototype.getTagData = function($tag) {
     return tagData;
   }
   return $tag.parent().data('tag');
+};
+
+scout.TagField.prototype.addTag = function(text) {
+  var value = this._parseValue(text);
+  this.setValue(value);
 };
 
 scout.TagField.prototype.removeTagByElement = function($tag) {
@@ -208,7 +234,7 @@ scout.TagField.prototype._renderOverflowVisible = function() {
     if (!this.$overflowIcon) {
       this.$overflowIcon = this.$fieldContainer
         .prependDiv('overflow-icon')
-        .on('click', this._onOverflowIconClick.bind(this));
+        .on('mousedown', this._onOverflowIconMousedown.bind(this));
     }
   } else {
     if (this.$overflowIcon) {
@@ -226,40 +252,56 @@ scout.TagField.prototype._lookupByText = function(text) {
   if (!this.lookupCall) {
     return null;
   }
+  if (scout.strings.empty(text) || text.length < 2) {
+    return;
+  }
   return this.lookupCall.getByText(text)
     .done(this._onLookupDone.bind(this));
 };
 
 scout.TagField.prototype._onLookupDone = function(result) {
-  if (!this.chooser) {
-    this.chooser = scout.create('TagChooserPopup', {
-      parent: this,
-      $anchor: this.$field,
-      closeOnAnchorMouseDown: false,
-      lookupResult: result
-    });
-    this.chooser.on('lookupRowSelected', this._onLookupRowSelected.bind(this));
-    this.chooser.one('remove', function() {
-      this.chooser = null;
-    }.bind(this));
-    this.chooser.open();
+  if (result.lookupRows.length === 0) {
+    this.closeChooserPopup();
+    return;
   }
 
+  this.openChooserPopup();
   this.chooser.setLookupResult(result);
 };
 
-scout.TagField.prototype._onOverflowIconClick = function(event) {
-  this.openOverflowPopup();
+scout.TagField.prototype.openChooserPopup = function() {
+  if (this.chooser) {
+    return;
+  }
+  this.chooser = scout.create('TagChooserPopup', {
+    parent: this,
+    $anchor: this.$field,
+    closeOnAnchorMouseDown: false,
+    field: this
+  });
+  this.chooser.on('lookupRowSelected', this._onLookupRowSelected.bind(this));
+  this.chooser.one('close', this._onChooserPopupClose.bind(this));
+  this.chooser.open();
+};
+
+scout.TagField.prototype.closeChooserPopup = function() {
+  if (this.chooser && !this.chooser.destroying) {
+    this.chooser.close();
+  }
 };
 
 scout.TagField.prototype._onLookupRowSelected = function(event) {
+  this._clear();
   this.addTag(event.lookupRow.key);
-  this.chooser.close();
+  this.closeChooserPopup();
 };
 
-scout.TagField.prototype.addTag = function(text) {
-  var value = this._parseValue(text);
-  this.setValue(value);
+scout.TagField.prototype._onChooserPopupClose = function(event) {
+  this.chooser = null;
+};
+
+scout.TagField.prototype._onOverflowIconMousedown = function(event) {
+  this.openOverflowPopup();
 };
 
 scout.TagField.prototype.openOverflowPopup = function() {
@@ -269,6 +311,7 @@ scout.TagField.prototype.openOverflowPopup = function() {
   this.popup = scout.create('TagFieldPopup', {
     parent: this,
     closeOnAnchorMouseDown: false,
+    focusableContainer: true,
     $anchor: this.$fieldContainer,
     $headBlueprint: this.$overflowIcon
   });
@@ -343,8 +386,11 @@ scout.TagField.prototype.visibleTags = function() {
 // --- static helpers ---
 
 scout.TagField.focusFirstTagElement = function($container) {
-  scout.TagField.focusTagElement(
-      $container.find('.tag-element').first());
+  this.focusTagElement(this.firstTagElement($container));
+};
+
+scout.TagField.firstTagElement = function($container) {
+  return $container.find('.tag-element').first();
 };
 
 scout.TagField.focusTagElement = function($tagElement) {
