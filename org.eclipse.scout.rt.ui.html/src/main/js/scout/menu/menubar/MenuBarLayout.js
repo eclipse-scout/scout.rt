@@ -80,6 +80,10 @@ scout.MenuBarLayout.prototype.layout = function($container) {
 };
 
 scout.MenuBarLayout.prototype.preferredLayoutSize = function($container, options) {
+  if (!this._menuBar.isVisible()) {
+    return new scout.Dimension(0, 0);
+  }
+
   var htmlContainer = scout.HtmlComponent.get($container),
     menuItems = this._menuBar.orderedMenuItems.all,
     preferredSize = new scout.Dimension(),
