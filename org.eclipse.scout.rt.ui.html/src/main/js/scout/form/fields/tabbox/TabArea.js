@@ -165,11 +165,11 @@ scout.TabArea.prototype.selectPreviousTab = function(focusTab) {
 
 scout.TabArea.prototype._moveSelectionHorizontal = function(directionRight, focusTab) {
   var tabItems = this.tabItems.slice(),
-    $fucusedElement = this.$container.find(':focus'),
+    $focusedElement = this.$container.activeElement(),
     selectNext = false;
   if (!directionRight) {
     tabItems.reverse();
-    selectNext = $fucusedElement[0] === this.ellipsis.$container[0];
+    selectNext = $focusedElement[0] === this.ellipsis.$container[0];
   }
 
   tabItems.forEach(function(item, index) {
@@ -182,7 +182,7 @@ scout.TabArea.prototype._moveSelectionHorizontal = function(directionRight, focu
       selectNext = false;
       return;
     }
-    if ($fucusedElement[0] === item.$tabContainer[0]) {
+    if ($focusedElement[0] === item.$tabContainer[0]) {
       selectNext = true;
     }
   }, this);

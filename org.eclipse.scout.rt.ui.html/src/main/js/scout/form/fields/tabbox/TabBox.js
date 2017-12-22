@@ -17,14 +17,11 @@ scout.TabBox = function() {
 
   this.gridDataHints.useUiHeight = true;
   this.gridDataHints.w = scout.FormField.FULL_WIDTH;
-  this.selectedTab;
+  this.selectedTab = null;
   this.tabItems = [];
   this._addWidgetProperties(['tabItems', 'selectedTab']);
   this._addPreserveOnPropertyChangeProperties(['selectedTab']); // TODO [7.0] awe: do this in Calendar too, for selectedComponent
-  this._$tabArea;
-  this._$tabContent;
-
-  this._tabItemPropertyChangeHandler = this._onTabItemPropertyChange.bind(this);
+  this._$tabContent = null;
 };
 scout.inherits(scout.TabBox, scout.CompositeField);
 
@@ -169,12 +166,5 @@ scout.TabBox.prototype.focus = function() {
   }
   if (this.selectedTab) {
     return this.selectedTab.focus();
-  }
-};
-
-scout.TabBox.prototype._onTabItemPropertyChange = function(event) {
-  // No need to invalidate if the enabled state has changed (this should not affect the layout).
-  if (event.propertyName !== 'enabled') {
-    scout.HtmlComponent.get(this._$tabArea).invalidateLayoutTree();
   }
 };
