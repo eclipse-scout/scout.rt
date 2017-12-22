@@ -845,11 +845,12 @@ scout.SmartField.prototype._onFieldKeyUp = function(event) {
 
   // Pop-ups shouldn't open when one of the following keys is pressed
   var w = event.which;
-  var pasteShortcut = event.ctrlKey && w === scout.keys.V;
+  var pasteShortcut = (event.ctrlKey || event.metaKey) && w === scout.keys.V;
 
   if (!pasteShortcut && (
       event.ctrlKey ||
       event.altKey ||
+      event.metaKey ||
       w === scout.keys.ENTER ||
       w === scout.keys.TAB ||
       w === scout.keys.SHIFT ||
@@ -931,6 +932,7 @@ scout.SmartField.prototype._onFieldKeyDown = function(event) {
   if (this.isDropdown() && (
       event.ctrlKey ||
       event.altKey ||
+      event.metaKey ||
       w === scout.keys.SHIFT ||
       w === scout.keys.CTRL ||
       w === scout.keys.ALT ||
