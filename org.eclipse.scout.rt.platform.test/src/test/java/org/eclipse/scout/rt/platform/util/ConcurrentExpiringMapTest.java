@@ -128,6 +128,30 @@ public class ConcurrentExpiringMapTest {
   }
 
   @Test
+  public void testPutExpires() {
+    ConcurrentExpiringMap<Integer, String> map = createMap(true);
+    assertEquals(1, map.size());
+    assertNull(map.put(2, "2"));
+    assertEquals(0, map.size());
+  }
+
+  @Test
+  public void testPutIfAbsentExpires() {
+    ConcurrentExpiringMap<Integer, String> map = createMap(true);
+    assertEquals(1, map.size());
+    assertNull(map.putIfAbsent(2, "2"));
+    assertEquals(0, map.size());
+  }
+
+  @Test
+  public void testReplaceExpires() {
+    ConcurrentExpiringMap<Integer, String> map = createMap(true);
+    assertEquals(1, map.size());
+    assertNull(map.replace(1, "2"));
+    assertEquals(0, map.size());
+  }
+
+  @Test
   public void testRemoveNotExpires() {
     ConcurrentExpiringMap<Integer, String> map = createMap(false);
     assertEquals("1", map.remove(1));
@@ -237,6 +261,13 @@ public class ConcurrentExpiringMapTest {
     assertEquals(Integer.valueOf(overflowSize), countEvicted.getValue());
   }
 
+  @Test
+  public void testCopyConstructorDivisionByZero() {
+    TestConcurrentExpiringMap map = new TestConcurrentExpiringMap(0, TimeUnit.MILLISECONDS, 0);
+    ConcurrentExpiringMap mapCopy = new ConcurrentExpiringMap<Integer, String>(map, 100);
+    assertEquals(0, mapCopy.size());
+  }
+
   /**
    * Map with mocked timestamp
    */
@@ -274,7 +305,5 @@ public class ConcurrentExpiringMapTest {
       m_elements.add(element);
       return element;
     }
-
   }
-
 }
