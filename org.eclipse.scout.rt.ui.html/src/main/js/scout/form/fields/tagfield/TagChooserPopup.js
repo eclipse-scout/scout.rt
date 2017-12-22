@@ -21,7 +21,8 @@ scout.TagChooserPopup.prototype._init = function(model) {
   var column = scout.create('Column', {
     index: 0,
     session: this.session,
-    text: 'Tag'
+    text: 'Tag',
+    autoOptimizeWidth: false
   });
 
   this.table = scout.create('Table', {
@@ -29,7 +30,6 @@ scout.TagChooserPopup.prototype._init = function(model) {
     headerVisible: false,
     autoResizeColumns: true,
     multiSelect: false,
-//    multilineText: false,
     scrollToSelection: true,
     columns: [column],
     headerMenusEnabled: false
@@ -38,10 +38,16 @@ scout.TagChooserPopup.prototype._init = function(model) {
   this.table.on('rowClick', this._onRowClick.bind(this));
 };
 
+scout.TagChooserPopup.prototype._createLayout = function() {
+  return new scout.TagChooserPopupLayout(this);
+};
+
 scout.TagChooserPopup.prototype._render = function() {
   scout.TagChooserPopup.parent.prototype._render.call(this);
 
-  this.$container.on('mousedown', this._onContainerMouseDown.bind(this));
+  this.$container
+    .addClass('tag-chooser-popup')
+    .on('mousedown', this._onContainerMouseDown.bind(this));
   this._renderTable();
 };
 

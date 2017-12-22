@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.TagFieldPopup = function() {
-  scout.TagFieldPopup.parent.call(this);
+scout.TagOverflowPopup = function() {
+  scout.TagOverflowPopup.parent.call(this);
 
   this._tagFieldPropertyChangeListener = null;
 
@@ -21,37 +21,35 @@ scout.TagFieldPopup = function() {
       .addClass('focused')[0];
   };
 };
-scout.inherits(scout.TagFieldPopup, scout.PopupWithHead);
+scout.inherits(scout.TagOverflowPopup, scout.PopupWithHead);
 
-scout.TagFieldPopup.prototype._init = function(options) {
-  scout.TagFieldPopup.parent.prototype._init.call(this, options);
+scout.TagOverflowPopup.prototype._init = function(options) {
+  scout.TagOverflowPopup.parent.prototype._init.call(this, options);
   this._tagFieldPropertyChangeListener = this._onTagFieldPropertyChange.bind(this);
   this.parent.on('propertyChange', this._tagFieldPropertyChangeListener);
 };
 
-scout.TagFieldPopup.prototype._initKeyStrokeContext = function() {
-  scout.TagFieldPopup.parent.prototype._initKeyStrokeContext.call(this);
+scout.TagOverflowPopup.prototype._initKeyStrokeContext = function() {
+  scout.TagOverflowPopup.parent.prototype._initKeyStrokeContext.call(this);
   this.keyStrokeContext.registerKeyStroke([
     new scout.TagFieldNavigationKeyStroke(this),
     new scout.TagFieldDeleteKeyStroke(this)
   ]);
 };
 
-scout.TagFieldPopup.prototype._destroy = function() {
+scout.TagOverflowPopup.prototype._destroy = function() {
   this.parent.off('propertyChange', this._tagFieldPropertyChangeListener);
-  scout.TagFieldPopup.parent.prototype._destroy.call(this);
+  scout.TagOverflowPopup.parent.prototype._destroy.call(this);
 };
 
-scout.TagFieldPopup.prototype._modifyBody = function() {
-  this.$body.addClass('tagfield-popup');
-};
+scout.TagOverflowPopup.prototype._render = function() {
+  scout.TagOverflowPopup.parent.prototype._render.call(this);
 
-scout.TagFieldPopup.prototype._render = function() {
-  scout.TagFieldPopup.parent.prototype._render.call(this);
+  this.$body.addClass('tag-overflow-popup');
   this._renderValue();
 };
 
-scout.TagFieldPopup.prototype._renderValue = function() {
+scout.TagOverflowPopup.prototype._renderValue = function() {
   this.$body.empty();
 
   var tagField = this.parent;
@@ -70,25 +68,25 @@ scout.TagFieldPopup.prototype._renderValue = function() {
   }
 };
 
-scout.TagFieldPopup.prototype._renderHead = function() {
-  scout.TagFieldPopup.parent.prototype._renderHead.call(this);
+scout.TagOverflowPopup.prototype._renderHead = function() {
+  scout.TagOverflowPopup.parent.prototype._renderHead.call(this);
 
   // FIXME [awe] ask c.gu why the border around the head looks a bit broken (1 pixel issue)
   this._copyCssClassToHead('overflow-icon');
   this.$head
     .removeClass('popup-head menu-item')
-    .addClass('tagfield-popup-head');
+    .addClass('tag-overflow-popup-head');
 };
 
-scout.TagFieldPopup.prototype._focusFirstTagElement = function() {
+scout.TagOverflowPopup.prototype._focusFirstTagElement = function() {
   scout.TagField.focusFirstTagElement(this.$body);
 };
 
-scout.TagFieldPopup.prototype._onTagRemoveClick = function(event) {
+scout.TagOverflowPopup.prototype._onTagRemoveClick = function(event) {
   this.parent._onTagRemoveClick(event);
 };
 
-scout.TagFieldPopup.prototype._onTagFieldPropertyChange = function(event) {
+scout.TagOverflowPopup.prototype._onTagFieldPropertyChange = function(event) {
   if (event.propertyName === 'value') {
     var allTags = scout.arrays.ensure(this.parent.value);
     var visibleTags = this.parent.visibleTags();

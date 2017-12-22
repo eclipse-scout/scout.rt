@@ -437,4 +437,27 @@
     cursor: -moz-grabbing;
     cursor: grabbing;
   }
+
+  /* Mixin for chooser popups as used in smart-field */
+  .chooser-popup {
+    position: absolute;
+    border: solid 1px @popup-border-color;
+    border-radius: @popup-border-radius;
+    overflow: hidden;
+    background-color: @palette-white;
+    #scout.drop-shadow();
+    #scout.focus-border();
+
+    &.down {
+      margin-top: 5px;
+    }
+
+    &.up {
+      margin-bottom: 5px;
+    }
+
+    &.touch {
+      background-color: @table-header-background-color;
+    }
+  }
 }

@@ -15,7 +15,7 @@ scout.TagField = function() {
   this.fieldHtmlComp = null;
   this.overflowVisible = false;
   this.$overflowIcon = null;
-  this.popup = null;
+  this.overflow = null;
   this.chooser = null;
 };
 scout.inherits(scout.TagField, scout.ValueField);
@@ -174,7 +174,7 @@ scout.TagField.prototype._onFieldBlur = function(event) {
 
   // when overflow popup opens it sets focus to the first tag element, this means:
   // the input field loses focus. In that case we must prevent that the overflow popup is closed.
-  var popupRequestsFocus = this.popup && this.popup.$container.has(event.relatedTarget);
+  var popupRequestsFocus = this.overflow && this.overflow.$container.has(event.relatedTarget);
   if (popupRequestsFocus) {
     return;
   }
@@ -305,28 +305,28 @@ scout.TagField.prototype._onOverflowIconMousedown = function(event) {
 };
 
 scout.TagField.prototype.openOverflowPopup = function() {
-  if (this.popup) {
+  if (this.overflow) {
     return;
   }
-  this.popup = scout.create('TagFieldPopup', {
+  this.overflow = scout.create('TagOverflowPopup', {
     parent: this,
     closeOnAnchorMouseDown: false,
     focusableContainer: true,
     $anchor: this.$fieldContainer,
     $headBlueprint: this.$overflowIcon
   });
-  this.popup.on('close', this._onOverflowPopupClose.bind(this));
-  this.popup.open();
+  this.overflow.on('close', this._onOverflowPopupClose.bind(this));
+  this.overflow.open();
 };
 
 scout.TagField.prototype.closeOverflowPopup = function() {
-  if (this.popup && !this.popup.destroying) {
-    this.popup.close();
+  if (this.overflow && !this.overflow.destroying) {
+    this.overflow.close();
   }
 };
 
 scout.TagField.prototype._onOverflowPopupClose = function() {
-  this.popup = null;
+  this.overflow = null;
 };
 
 scout.TagField.prototype._installTooltipSupport = function() {
