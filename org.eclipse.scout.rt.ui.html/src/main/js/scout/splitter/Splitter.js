@@ -16,7 +16,7 @@ scout.Splitter = function() {
   this.position = null; // current splitter position in pixels, updated by updatePosition()
   this.orientation = 'top'; // Direction set to position the splitter inside the root element ('top', 'right', 'bottom' or 'left')
   this._cursorOffset = 0; // distance from cursor to splitter, makes resizing smoother by preventing initial 'jump'
-  this._mouseDownHandler;
+  this._mouseDownHandler = this._onMouseDown.bind(this);
 };
 scout.inherits(scout.Splitter, scout.Widget);
 
@@ -41,15 +41,9 @@ scout.Splitter.prototype._renderProperties = function() {
 scout.Splitter.prototype._renderEnabled = function() {
   scout.Splitter.parent.prototype._renderEnabled.call(this);
   if (this.enabled) {
-    if (!this._mouseDownHandler) {
-      this._mouseDownHandler = this._onMouseDown.bind(this);
-      this.$container.on('mousedown', this._mouseDownHandler);
-    }
+    this.$container.on('mousedown', this._mouseDownHandler);
   } else {
-    if (this._mouseDownHandler) {
-      this.$container.off('mousedown', this._mouseDownHandler);
-      this._mouseDownHandler = null;
-    }
+    this.$container.off('mousedown', this._mouseDownHandler);
   }
 };
 
