@@ -192,6 +192,7 @@ public abstract class AbstractSeleniumTest {
    * and which is located somewhere beneath the given parent. In turn, that field is the focus owner.
    */
   public void fillInputField(WebElement parent, Class<? extends IValueField<?>> modelClass, String value) {
+    waitUntilDataRequestPendingDone();
     WebElement inputField = waitUntilInputFieldClickable(parent, modelClass);
     fillInputField(inputField, value);
   }
@@ -202,14 +203,23 @@ public abstract class AbstractSeleniumTest {
   public void fillInputField(WebElement inputField, String value) {
     inputField.click();
     variablePause(1);
+    waitUntilDataRequestPendingDone();
+
     inputField.clear();
     variablePause(2);
+    waitUntilDataRequestPendingDone();
+
     inputField.sendKeys(value);
     variablePause(2);
+    waitUntilDataRequestPendingDone();
+
     switchTo().activeElement().sendKeys(Keys.TAB);
     variablePause(2);
+    waitUntilDataRequestPendingDone();
+
     switchTo().activeElement().sendKeys(Keys.chord(Keys.SHIFT, Keys.TAB));
     shortPause();
+    waitUntilDataRequestPendingDone();
   }
 
   /**
@@ -350,6 +360,19 @@ public abstract class AbstractSeleniumTest {
     return waitUntilTableCellClickable(null, cellText);
   }
 
+  /**
+   * Waits for all pending server calls to finish.
+   */
+  public void waitUntilDataRequestPendingDone() {
+    // Always wait a short time, because session.sendEvent() schedules the sending via setTimeout. When an
+    // action is performed that causes a server request, this method might therefore not "see" the scheduled
+    // server call yet.
+    SeleniumUtil.pause(50, TimeUnit.MILLISECONDS);
+
+    WebElement entryPoint = findElement(By.className("scout"));
+    waitUntil(ExpectedConditions.not(SeleniumExpectedConditions.attributeToEqualsValue(entryPoint, "data-request-pending", "true")));
+  }
+
   public void clickCheckBox(WebElement parent, Class<?> modelClass) {
     clickCheckBox(parent.findElement(SeleniumUtil.byModelClass(modelClass)));
   }
@@ -455,8 +478,7 @@ public abstract class AbstractSeleniumTest {
     element.click();
 
     // Wait for pending server calls to finish
-    WebElement entryPoint = findElement(By.className("scout"));
-    waitUntil(ExpectedConditions.not(SeleniumExpectedConditions.attributeToEqualsValue(entryPoint, "data-request-pending", "true")));
+    waitUntilDataRequestPendingDone();
 
     // Wait for animations to finish
     for (WebElement animation : findElements(By.className("animation-wrapper"))) {
