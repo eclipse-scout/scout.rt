@@ -41,7 +41,7 @@ import com.google.common.base.Function;
 
 public abstract class AbstractSeleniumTest {
 
-  public static final int DEFAULT_WAIT_UNTIL_TIMEOUT = 10;
+  public static final int DEFAULT_WAIT_UNTIL_TIMEOUT = 10; // seconds
 
   private static WebDriver s_driver;
 
@@ -63,7 +63,7 @@ public abstract class AbstractSeleniumTest {
       .around(m_screenshotRule);
 
   private WebElement m_previousClickTarget;
-  private int m_waitUntilTimeout = DEFAULT_WAIT_UNTIL_TIMEOUT;
+  private int m_waitUntilTimeout = DEFAULT_WAIT_UNTIL_TIMEOUT; // seconds
 
   /**
    * When we're running in a suite, the suite deals with starting the Driver, When the test runs alone, it must start
@@ -420,14 +420,20 @@ public abstract class AbstractSeleniumTest {
   }
 
   /**
-   * Sets the timeout in seconds which is used internally for every waitUntil*() call. Use this method in your test,
-   * when you must wait longer than the default timeout which is 10 seconds. At the end of your test you should reset
-   * the timeout to the default value.
-   *
-   * @param waitUntilTimeout
+   * Sets the timeout in seconds which is used internally for every <i>waitUntil*()</i> call without explicit timeout.
+   * Use this method in your test, when you must wait longer than the default timeout which is
+   * {@value #DEFAULT_WAIT_UNTIL_TIMEOUT} seconds. At the end of your test you should reset the timeout to the default
+   * value.
    */
-  public void setWaitUntilTimeout(int waitUntilTimeout) {
-    m_waitUntilTimeout = waitUntilTimeout;
+  public void setWaitUntilTimeout(int timeoutInSeconds) {
+    m_waitUntilTimeout = timeoutInSeconds;
+  }
+
+  /**
+   * @return the timeout in seconds to be used by {@link #waitUntil(Function)}
+   */
+  public int getWaitUntilTimeout() {
+    return m_waitUntilTimeout;
   }
 
   public WebElement waitForFirstTableRow() {
