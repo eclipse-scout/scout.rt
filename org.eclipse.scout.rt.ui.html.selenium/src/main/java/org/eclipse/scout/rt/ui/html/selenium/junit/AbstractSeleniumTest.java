@@ -206,6 +206,7 @@ public abstract class AbstractSeleniumTest {
    * and which is located somewhere beneath the given parent. In turn, that field is the focus owner.
    */
   public WebElement fillInputField(WebElement parent, Class<? extends IValueField<?>> modelClass, String value) {
+    waitUntilDataRequestPendingDone();
     WebElement inputField = waitUntilInputFieldClickable(parent, modelClass);
     return fillInputField(inputField, value);
   }
@@ -216,14 +217,24 @@ public abstract class AbstractSeleniumTest {
   public WebElement fillInputField(WebElement inputField, String value) {
     inputField.click();
     variablePause(1);
+    waitUntilDataRequestPendingDone();
+
     inputField.clear();
     variablePause(2);
+    waitUntilDataRequestPendingDone();
+
     inputField.sendKeys(value);
     variablePause(2);
+    waitUntilDataRequestPendingDone();
+
     switchTo().activeElement().sendKeys(Keys.TAB);
     variablePause(2);
+    waitUntilDataRequestPendingDone();
+
     switchTo().activeElement().sendKeys(Keys.chord(Keys.SHIFT, Keys.TAB));
     shortPause();
+    waitUntilDataRequestPendingDone();
+
     return inputField;
   }
 
@@ -377,6 +388,11 @@ public abstract class AbstractSeleniumTest {
    * Waits for all pending server calls to finish.
    */
   public void waitUntilDataRequestPendingDone() {
+    // Always wait a short time, because session.sendEvent() schedules the sending via setTimeout. When an
+    // action is performed that causes a server request, this method might therefore not "see" the scheduled
+    // server call yet.
+    SeleniumUtil.pause(50, TimeUnit.MILLISECONDS);
+
     WebElement entryPoint = findElement(By.className("scout"));
     waitUntil(ExpectedConditions.not(SeleniumExpectedConditions.attributeToEqualsValue(entryPoint, "data-request-pending", "true")));
   }

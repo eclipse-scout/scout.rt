@@ -29,33 +29,42 @@ public final class GoToUtil {
    * corner of the application.
    */
   public static void goToOutline(AbstractSeleniumTest test, Class<? extends IOutlineViewButton> outlineViewButtonClass, Class<? extends IOutline> outlineClass) {
+    test.waitUntilDataRequestPendingDone();
     // When we're on another form-tab, we must click twice on the outline-switcher tab to open the menu
     if (!test.findElement(By.className("view-button-tab")).isDisplayed()) {
       Actions builder = new Actions(test.getDriver());
       builder.moveToElement(test.waitUntilElementClickable(By.className("view-button-box")), 5, 5).click().build().perform();
       SeleniumUtil.shortPause();
+      test.waitUntilDataRequestPendingDone();
     }
     test.waitUntilElementClickable(By.className("view-button-tab")).click();
     SeleniumUtil.shortPause();
+    test.waitUntilDataRequestPendingDone();
 
     // When popup is not open yet - click again on the outline-switcher tab
     if (test.findElements(By.className("popup")).isEmpty()) {
       test.waitUntilElementClickable(By.className("view-button-tab")).click();
       SeleniumUtil.shortPause();
+      test.waitUntilDataRequestPendingDone();
     }
 
     test.waitUntilElementClickable(byModelClass(outlineViewButtonClass)).click();
     SeleniumUtil.shortPause();
+    test.waitUntilDataRequestPendingDone();
+
     test.waitUntilElementClickable(outlineClass);
     SeleniumUtil.shortPause();
+    test.waitUntilDataRequestPendingDone();
   }
 
   /**
    * Activates the view at the given index (1-based), and returns the activated view.
    */
   public static WebElement goToView(AbstractSeleniumTest test, int viewTabIndex) {
+    test.waitUntilDataRequestPendingDone();
     WebElement viewTab = test.waitUntilElementClickable(By.cssSelector(String.format(".simple-tab:nth-child(%s)", viewTabIndex)));
     test.clickAtOffset(viewTab, 15, 5); // cannot click in the middle of the view-tab because its sometimes overlaid with a dialog
+    test.waitUntilDataRequestPendingDone();
     return test.waitUntilView();
   }
 
