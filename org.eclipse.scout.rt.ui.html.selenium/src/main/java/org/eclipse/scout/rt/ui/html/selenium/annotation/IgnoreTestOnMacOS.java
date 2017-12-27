@@ -25,7 +25,8 @@ import org.eclipse.scout.rt.ui.html.selenium.util.SeleniumUtil;
  * easy workaround (we could run a bit of JS code on the mac to do copy/paste but currently that's not worth the
  * effort).
  *
- * @see: https://bugs.chromium.org/p/chromedriver/issues/detail?id=30
+ * @see <a href="https://bugs.chromium.org/p/chromedriver/issues/detail?id=30">
+ *      https://bugs.chromium.org/p/chromedriver/issues/detail?id=30</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
