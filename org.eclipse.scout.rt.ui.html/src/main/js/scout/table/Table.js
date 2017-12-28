@@ -449,7 +449,9 @@ scout.Table.prototype.onContextMenu = function(event) {
       if (this.enabled) {
         this.$container.addClass('focused');
         this.popupMenu.on('close', function(event) {
-          this.$container.removeClass('focused');
+          if (this.rendered) {
+            this.$container.removeClass('focused');
+          }
           this.popupMenu = null;
         }.bind(this));
       }

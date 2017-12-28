@@ -2360,7 +2360,9 @@ scout.Tree.prototype._showContextMenu = function(event) {
     if (this.enabled) {
       this.$container.addClass('focused');
       this.contextMenu.on('close', function(event) {
-        this.$container.removeClass('focused');
+        if (this.rendered) {
+          this.$container.removeClass('focused');
+        }
         this.contextMenu = null;
       }.bind(this));
     }
