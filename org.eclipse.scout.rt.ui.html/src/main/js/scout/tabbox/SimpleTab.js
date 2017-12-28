@@ -407,6 +407,6 @@ scout.SimpleTab.prototype._onViewRemove = function() {
   if (this.rendered) {
     this.remove();
   } else {
-    this.trigger('remove'); // FIXME STUDIO why is this needed?
+    this.trigger('remove');
   }
 };

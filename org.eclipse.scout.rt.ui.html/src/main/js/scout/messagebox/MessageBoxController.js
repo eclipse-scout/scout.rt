@@ -61,7 +61,7 @@ scout.MessageBoxController.prototype._render = function(messageBox) {
     return;
   }
 
-  // Prevent "Already rendered" errors --> TODO [7.0] BSH: Remove this hack! Fix in on model if possible. See #162954.
+  // Prevent "Already rendered" errors --> TODO [7.0] bsh: Remove this hack! Fix it on model if possible. See #162954.
   if (messageBox.rendered) {
     return;
   }

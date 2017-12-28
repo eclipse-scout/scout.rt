@@ -140,7 +140,7 @@ scout.FormController.prototype._renderView = function(view, register, position, 
     return;
   }
 
-  // Prevent "Already rendered" errors --> TODO [7.0] BSH: Remove this hack! Fix in on model if possible. See #162954.
+  // Prevent "Already rendered" errors --> TODO [7.0] bsh: Remove this hack! Fix it on model if possible. See #162954.
   if (view.rendered) {
     return false;
   }
@@ -179,7 +179,7 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
     return;
   }
 
-  // Prevent "Already rendered" errors --> TODO [7.0] BSH: Remove this hack! Fix in on model if possible. See #162954.
+  // Prevent "Already rendered" errors --> TODO [7.0] bsh: Remove this hack! Fix it on model if possible. See #162954.
   if (dialog.rendered) {
     return false;
   }

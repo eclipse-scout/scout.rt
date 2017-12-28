@@ -242,7 +242,7 @@ scout.Session.prototype.createModelAdapter = function(adapterData) {
     objectType = objectInfo.objectType.toString() + 'Adapter';
   }
 
-  // TODO [7.0] BSH/CGU Add classId/modelClass? Think about if IDs should be different for widgets (maybe prefix with 'w')
+  // TODO [7.0] bsh, cgu: Add classId/modelClass? Think about if IDs should be different for widgets (maybe prefix with 'w')
   var adapterModel = {
     id: adapterData.id,
     session: this
@@ -1398,7 +1398,7 @@ scout.Session.prototype.switchLocale = function(locale, textMap) {
   }
   this.locale = locale;
   this.textMap = textMap;
-  // TODO [7.0] BSH: inform components to reformat display text? also check Collator in scout.comparators.TEXT
+  // TODO [7.0] bsh: inform components to reformat display text? also check Collator in scout.comparators.TEXT
 
   this.trigger('localeSwitch', {
     locale: this.locale
@@ -1417,7 +1417,7 @@ scout.Session.prototype._onLogout = function(event) {
 
 scout.Session.prototype.logout = function(logoutUrl) {
   this.loggedOut = true;
-  // TODO [7.0] BSH Check if there is a better solution (e.g. send a flag from server "action" = [ "redirect" | "closeWindow" ])
+  // TODO [7.0] bsh: Check if there is a better solution (e.g. send a flag from server "action" = [ "redirect" | "closeWindow" ])
   if (this.forceNewClientSession) {
     this.desktop.$container.window(true).close();
   } else {
@@ -1453,7 +1453,7 @@ scout.Session.prototype._onReloadPage = function(event) {
 
 scout.Session.prototype._onWindowBeforeUnload = function() {
   $.log.isInfoEnabled() && $.log.info('Session before unloading...');
-  // TODO [7.0] BSH Cancel pending requests
+  // TODO [7.0] bsh: Cancel pending requests
 
   // Set a flag that indicates unloading before _onWindowUnload() is called.
   // See goOffline() why this is necessary.

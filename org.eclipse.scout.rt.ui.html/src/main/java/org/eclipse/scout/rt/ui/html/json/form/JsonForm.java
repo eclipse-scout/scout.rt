@@ -196,7 +196,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonWidget<FORM> {
     }
   }
 
-  // TODO [7.0] BSH Try to replace PROP_INITIAL_FOCUS by protected EVENT_REQUEST_FOCUS (but check "initialFocusEnabled")
+  // TODO [7.0] bsh: Try to replace PROP_INITIAL_FOCUS by protected EVENT_REQUEST_FOCUS (but check "initialFocusEnabled")
   protected void setInitialFocusProperty(JSONObject json) {
     FormEvent event = findRecentEvent(FormEvent.TYPE_REQUEST_FOCUS);
     if (event != null) {

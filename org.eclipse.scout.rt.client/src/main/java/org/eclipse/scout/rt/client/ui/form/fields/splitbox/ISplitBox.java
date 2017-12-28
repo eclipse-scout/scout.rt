@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
  *
  * @since 1.0.9 16.07.2008
  */
-// TODO [7.0] BSH, AWE: Support caching of splitter position or remove from model
+// TODO [7.0] bsh, awe: Support caching of splitter position or remove from model
 // TODO [8.0] PBZ remove PROP_COLLAPSE_KEY_STROKE and according deprecated methods
 public interface ISplitBox extends ICompositeField {
 

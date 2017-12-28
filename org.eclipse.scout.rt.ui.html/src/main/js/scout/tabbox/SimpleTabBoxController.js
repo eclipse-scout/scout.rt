@@ -149,5 +149,5 @@ scout.SimpleTabBoxController.prototype.getTabs = function() {
 /* ----- static functions ----- */
 
 scout.SimpleTabBoxController.hasViewTab = function(view) {
-  return scout.objects.someProperties(view, ['title', 'subTitle', 'iconId']);  // FIXME STUDIO why???
+  return scout.objects.someProperties(view, ['title', 'subTitle', 'iconId']);
 };
