@@ -2868,7 +2868,9 @@ scout.Tree.prototype._onDesktopPopupOpen = function(event) {
   if (this.has(popup) && popup instanceof scout.ContextMenuPopup) {
     this.$container.addClass('focused');
     popup.one('destroy', function() {
-      this.$container.removeClass('focused');
+      if (this.rendered) {
+        this.$container.removeClass('focused');
+      }
     }.bind(this));
   }
 };
