@@ -509,7 +509,7 @@ public abstract class AbstractSeleniumTest {
    * If the click caused a server call, the methods waits until the request has finished. It also waits for UI
    * animations using a .animation-wrapper to complete.
    */
-  protected void clickAndWait(WebElement element) {
+  public void clickAndWait(WebElement element) {
     // If the same element is clicked twice in a row, add a small pause to prevent a double click
     if (m_previousClickTarget == element) {
       SeleniumUtil.pause(500, TimeUnit.MILLISECONDS);
@@ -522,6 +522,14 @@ public abstract class AbstractSeleniumTest {
     waitUntilDataRequestPendingDone();
 
     // Wait for animations to finish
+    waitUntilAnimationWrapperDone();
+  }
+
+  /**
+   * Waits until no elements with the CSS class <code>animation-wrapper</code> exist. Useful while testing tree node
+   * expansion.
+   */
+  public void waitUntilAnimationWrapperDone() {
     for (WebElement animation : findElements(By.className("animation-wrapper"))) {
       waitUntilElementStaleness(animation);
     }
