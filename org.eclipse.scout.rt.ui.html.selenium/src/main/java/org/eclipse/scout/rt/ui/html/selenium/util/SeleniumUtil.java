@@ -298,6 +298,25 @@ public final class SeleniumUtil {
   }
 
   /**
+   * @return the inner text of the given element. Unlike Selenium's {@link WebElement#getText()}, this method returns
+   *         the text even if the element is currently not visible on screen. If there is no text, <code>null</code> is
+   *         returned (instead of the empty string).
+   */
+  public static String getText(WebElement element) {
+    if (element == null) {
+      return null;
+    }
+    String text = StringUtility.nullIfEmpty(element.getText());
+    if (text == null) {
+      text = element.getAttribute("textContent");
+    }
+    if (text == null) {
+      text = element.getAttribute("innerText");
+    }
+    return text;
+  }
+
+  /**
    * Use this method to get some debug-output for a WebElement. This is useful when you're debugging Selenium tests with
    * System.out or logging.
    */
@@ -306,7 +325,7 @@ public final class SeleniumUtil {
       return "null";
     }
     else {
-      String text = element.getText();
+      String text = getText(element);
       if (text != null && text.length() > 250) {
         text = text.substring(0, 250) + "...";
       }
