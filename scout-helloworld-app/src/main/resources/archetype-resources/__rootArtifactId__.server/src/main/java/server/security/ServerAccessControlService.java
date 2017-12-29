@@ -11,8 +11,6 @@ import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 
 /**
- * <h3>{@link AccessControlService}</h3>
- *
  * @author ${userName}
  */
 @Replace

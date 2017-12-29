@@ -10,8 +10,6 @@ import org.eclipse.scout.rt.shared.services.common.security.AbstractAccessContro
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
 /**
- * <h3>{@link UserIdAccessControlService}</h3>
- *
  * {@link IAccessControlService} service that uses {@link ISession#getUserId()} as internal cache key required by
  * {@link AbstractAccessControlService} implementation.
  * <p>

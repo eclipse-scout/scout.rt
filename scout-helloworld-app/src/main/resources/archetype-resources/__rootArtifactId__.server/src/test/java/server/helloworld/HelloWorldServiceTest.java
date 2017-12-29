@@ -16,8 +16,6 @@ import ${package}.shared.helloworld.HelloWorldFormData;
 import ${package}.shared.helloworld.IHelloWorldService;
 
 /**
- * <h3>{@link HelloWorldServiceTest}</h3>
- *
  * @author ${userName}
  */
 @RunWith(ServerTestRunner.class)

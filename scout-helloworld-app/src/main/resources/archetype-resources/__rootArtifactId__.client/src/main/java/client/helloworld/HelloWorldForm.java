@@ -19,8 +19,6 @@ import ${package}.shared.helloworld.HelloWorldFormData;
 import ${package}.shared.helloworld.IHelloWorldService;
 
 /**
- * <h3>{@link HelloWorldForm}</h3>
- *
  * @author ${userName}
  */
 @FormData(value = HelloWorldFormData.class, sdkCommand = FormData.SdkCommand.CREATE)

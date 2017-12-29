@@ -7,8 +7,6 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService;
 
 /**
- * <h3>{@link DefaultTextProviderService}</h3>
- *
  * @author ${userName}
  */
 @Order(-2000)

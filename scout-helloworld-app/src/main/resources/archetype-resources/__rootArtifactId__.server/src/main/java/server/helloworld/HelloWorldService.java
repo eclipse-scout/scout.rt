@@ -8,8 +8,6 @@ import ${package}.shared.helloworld.HelloWorldFormData;
 import ${package}.shared.helloworld.IHelloWorldService;
 
 /**
- * <h3>{@link HelloWorldService}</h3>
- *
  * @author ${userName}
  */
 public class HelloWorldService implements IHelloWorldService {

@@ -9,8 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <h3>{@link ServerSession}</h3>
- *
  * @author ${userName}
  */
 public class ServerSession extends AbstractServerSession {

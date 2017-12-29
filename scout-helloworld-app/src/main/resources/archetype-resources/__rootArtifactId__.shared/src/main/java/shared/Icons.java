@@ -6,8 +6,6 @@ package ${package}.shared;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 
 /**
- * <h3>{@link Icons}</h3>
- *
  * @author ${userName}
  */
 public class Icons extends AbstractIcons {

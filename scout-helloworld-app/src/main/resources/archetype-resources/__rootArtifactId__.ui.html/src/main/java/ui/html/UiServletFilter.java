@@ -24,8 +24,7 @@ import org.eclipse.scout.rt.server.commons.authentication.TrivialAccessControlle
 import org.eclipse.scout.rt.server.commons.authentication.TrivialAccessController.TrivialAuthConfig;
 
 /**
- * <h3>{@link UiServletFilter}</h3>
- * This is the main servlet filter used for the HTML UI.
+ * This is the main servlet filter for the HTML UI.
  *
  * @author ${userName}
  */

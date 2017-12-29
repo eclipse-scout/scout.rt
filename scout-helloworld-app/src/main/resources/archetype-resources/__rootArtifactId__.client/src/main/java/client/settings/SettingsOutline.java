@@ -10,8 +10,6 @@ import org.eclipse.scout.rt.shared.TEXTS;
 import ${package}.shared.Icons;
 
 /**
- * <h3>{@link SettingsOutline}</h3>
- *
  * @author ${userName}
  */
 @Order(3000)

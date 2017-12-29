@@ -4,9 +4,9 @@
 package ${package}.client;
 
 /**
- * <h3>{@link ResourceBase}</h3>
- * This class is the base for resources contained in this module.<br>
- * Do not move it to another package, the package is part of the resource name.<br>
+ * This class is the base for resources contained in this module. <b>Do not move it to another package</b>, as the
+ * package is part of the resource name.
+ * <p>
  * Usage: <code>ResourceBase.class.getResource("relativeFolder/file.ext")</code>
  *
  * @author ${userName}

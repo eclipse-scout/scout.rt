@@ -8,8 +8,6 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 /**
- * <h3>{@link HelloWorldPage}</h3>
- *
  * @author ${userName}
  */
 public class HelloWorldPage extends AbstractPageWithNodes {

@@ -22,8 +22,6 @@ import ${package}.client.work.WorkOutline;
 import ${package}.shared.Icons;
 
 /**
- * <h3>{@link Desktop}</h3>
- *
  * @author ${userName}
  */
 public class Desktop extends AbstractDesktop {

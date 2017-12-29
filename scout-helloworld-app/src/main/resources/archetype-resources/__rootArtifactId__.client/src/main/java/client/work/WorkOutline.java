@@ -14,8 +14,6 @@ import ${package}.client.helloworld.HelloWorldPage;
 import ${package}.shared.Icons;
 
 /**
- * <h3>{@link WorkOutline}</h3>
- *
  * @author ${userName}
  */
 @Order(1000)

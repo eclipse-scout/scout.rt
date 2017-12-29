@@ -9,8 +9,6 @@ import org.eclipse.scout.rt.shared.TunnelToServer;
 import ${package}.shared.helloworld.HelloWorldFormData;
 
 /**
- * <h3>{@link IHelloWorldService}</h3>
- *
  * @author ${userName}
  */
 @TunnelToServer

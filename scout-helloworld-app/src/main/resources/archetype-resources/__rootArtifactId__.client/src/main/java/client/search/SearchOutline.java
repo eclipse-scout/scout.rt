@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import ${package}.shared.Icons;
 
 /**
- * <h3>{@link SearchOutline}</h3>
- *
  * @author ${userName}
  */
 @Order(2000)

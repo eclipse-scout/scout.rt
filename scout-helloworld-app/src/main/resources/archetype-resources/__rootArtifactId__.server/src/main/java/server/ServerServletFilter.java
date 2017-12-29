@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.server.commons.authentication.TrivialAccessControlle
 import org.eclipse.scout.rt.server.commons.authentication.TrivialAccessController.TrivialAuthConfig;
 
 /**
- * <h3>{@link ServerServletFilter}</h3>
  * This is the main server side servlet filter.
  *
  * @author ${userName}

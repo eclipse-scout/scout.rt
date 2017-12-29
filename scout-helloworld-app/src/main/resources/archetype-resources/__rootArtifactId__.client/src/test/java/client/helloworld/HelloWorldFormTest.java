@@ -21,8 +21,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * <h3>{@link HelloWorldFormTest}</h3> Contains Tests for the
- * {@link HelloWorldForm}.
+ * Contains Tests for the {@link HelloWorldForm}.
  *
  * @author ${userName}
  */

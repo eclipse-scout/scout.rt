@@ -11,8 +11,6 @@ import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import ${package}.client.Desktop;
 
 /**
- * <h3>{@link ClientSession}</h3>
- *
  * @author ${userName}
  */
 public class ClientSession extends AbstractClientSession {
