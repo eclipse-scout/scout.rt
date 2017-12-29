@@ -21,8 +21,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * <h3>{@link DetailFormMenuTest}</h3>
- * <p>
  * Tests that resetting the detail form correctly connects the menus of the corresponding page instead of the menus
  * currently active on the outline.
  */

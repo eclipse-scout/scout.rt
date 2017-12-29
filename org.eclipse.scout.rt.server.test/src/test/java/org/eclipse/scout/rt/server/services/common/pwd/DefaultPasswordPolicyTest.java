@@ -14,9 +14,6 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- * <h3>{@link DefaultPasswordPolicyTest}</h3>
- */
 public class DefaultPasswordPolicyTest {
 
   @Test

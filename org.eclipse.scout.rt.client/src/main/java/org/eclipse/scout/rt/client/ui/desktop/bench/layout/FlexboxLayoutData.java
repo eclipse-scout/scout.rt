@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.desktop.bench.layout;
 
 /**
- * <h3>{@link FlexboxLayoutData}</h3><br>
  * The layout data for a FlexboxLayout (JS).
  */
 public class FlexboxLayoutData {

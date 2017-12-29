@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.shared.dimension;
 
 /**
- * <h3>{@link IDimensions}</h3><br>
  * Contains the dimension names.
  */
 public interface IDimensions {

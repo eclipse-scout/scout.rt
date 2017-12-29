@@ -22,8 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <h3>{@link ServiceTunnelProxyProducer}</h3>
- *
  * @author Matthias Villiger
  */
 public class ServiceTunnelProxyProducer<T> implements IBeanInstanceProducer<T>, IInstanceInvocationHandler<T> {

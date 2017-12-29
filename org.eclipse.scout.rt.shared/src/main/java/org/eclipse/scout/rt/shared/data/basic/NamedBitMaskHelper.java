@@ -18,10 +18,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 
 /**
- * <h3>{@link NamedBitMaskHelper}</h3> Helper class to access the bits of a bit-mask by names.<br>
+ * Helper class to access the bits of a bit-mask by names.<br>
  * The names are mapped to a bit position as needed. This means all uses of this class in an application share the bit
- * mapping positions.<br>
- * Currently there are {@value #NUM_BITS} bits supported.<br>
+ * mapping positions.
+ * <p>
+ * Currently there are {@value #NUM_BITS} bits supported.
  *
  * @since 6.1
  */
@@ -47,7 +48,7 @@ public final class NamedBitMaskHelper {
 
   /**
    * Creates a new instance of this helper with the given bit names already consumed in the order provided.
-   * 
+   *
    * @param usedBitNames
    *          The bit names to consume eagerly.
    */

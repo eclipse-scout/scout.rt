@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.platform.config;
 
 /**
- * <h3>{@link ConfigPropertyChangeEvent}</h3><br>
  * Describes the change of a {@link IConfigProperty}.
  */
 public class ConfigPropertyChangeEvent {

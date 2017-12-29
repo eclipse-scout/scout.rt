@@ -26,9 +26,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * <h3>{@link PreDestroyTest}</h3>
- */
 public class PreDestroyTest {
 
   private static Set<String> events = new HashSet<>();

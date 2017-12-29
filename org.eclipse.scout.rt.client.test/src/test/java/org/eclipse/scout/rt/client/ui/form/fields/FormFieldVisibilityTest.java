@@ -38,9 +38,6 @@ import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- * <h3>{@link FormFieldVisibilityTest}</h3>
- */
 public class FormFieldVisibilityTest {
 
   @Test

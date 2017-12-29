@@ -17,10 +17,6 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- * <h3>{@link ConfigPropertyTest}</h3>
- */
-
 public class ConfigPropertyTest {
 
   @Test

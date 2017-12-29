@@ -19,8 +19,8 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 
 /**
- * <h3>{@link ISecurityProvider}</h3> Provider class for encryption & decryption, hashing and creation of random
- * numbers, message authentication codes and digital signatures.<br>
+ * Provider class for encryption & decryption, hashing and creation of random numbers, message authentication codes and
+ * digital signatures.
  *
  * @since 6.1
  */

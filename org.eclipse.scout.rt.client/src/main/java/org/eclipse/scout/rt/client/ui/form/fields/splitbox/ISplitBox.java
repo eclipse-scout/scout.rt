@@ -14,8 +14,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
 /**
- * <h3>ISplitBox</h3> ...
- *
  * @since 1.0.9 16.07.2008
  */
 // TODO [7.0] bsh, awe: Support caching of splitter position or remove from model

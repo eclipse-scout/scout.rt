@@ -29,14 +29,15 @@ import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.xml.sax.SAXException;
 
 /**
- * <h3>{@link AbstractValidationHandler}</h3><br>
- * Abstract implementation of a {@link Handler} that validates incoming messages against a configured XML Schema
- * (XSD).<br>
+ * Abstract implementation of a {@link Handler} that validates incoming messages against a configured XML Schema (XSD).
+ * <p>
  * This may be useful for WebService providers that want to ensure that only valid requests are processed in case there
- * are data restrictions defined in the XSD.<br>
+ * are data restrictions defined in the XSD.
+ * <p>
  * To use this class create a sub class and provide the location of the XSD on the classpath using
  * {@link #getSchemaPath()}. Afterwards register the created handler in the chain of the WebService
- * EntryPointDefinition.<br>
+ * EntryPointDefinition.
+ * <p>
  * Note that activating this handler has some performance impact as every request is validated against the XSD first.
  */
 @ApplicationScoped

@@ -21,9 +21,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-/**
- * <h3>{@link BeanHierarchyTest}</h3>
- */
 public class BeanHierarchyTest {
 
   @Test(expected = AssertionException.class)

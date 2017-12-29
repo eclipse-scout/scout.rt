@@ -15,8 +15,6 @@ import org.eclipse.scout.rt.client.ui.desktop.bench.layout.FlexboxLayoutData;
 import org.json.JSONObject;
 
 /**
- * <h3>{@link JsonColumnData}</h3>
- *
  * @author Andreas Hoegger
  */
 public class JsonColumnData extends JsonLayoutData {

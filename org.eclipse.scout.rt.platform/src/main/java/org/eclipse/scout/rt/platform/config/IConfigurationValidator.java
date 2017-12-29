@@ -14,10 +14,10 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.Platform;
 
 /**
- * <h3>{@link IConfigurationValidator}</h3><br>
  * Interface for configuration validators. During the {@link Platform} startup all classes implementing this interface
  * are asked to validate configuration provided in the config.properties files (see {@link ConfigUtility} and
- * {@link PropertiesHelper}).<br>
+ * {@link PropertiesHelper}).
+ * <p>
  * If there is at least one {@link IConfigurationValidator} that accepts a given key-value-pair (see
  * {@link #isValid(String, String)}) the configuration is considered to be valid. Otherwise the platform will not start.
  */

@@ -35,10 +35,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 /**
- * <h3>{@link PiggyBackClientNotificationTest}</h3>
- * <p>
  * Tests that transactional client notifications are transferred with the response.
- * </p>
  *
  * @author jgu
  * @see ServiceTunnelServlet

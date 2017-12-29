@@ -21,8 +21,6 @@ import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 /**
- * <h3>{@link ListBoxTable}</h3>
- *
  * @author nbu
  */
 public class ListBoxTable extends AbstractListBox<Long> {

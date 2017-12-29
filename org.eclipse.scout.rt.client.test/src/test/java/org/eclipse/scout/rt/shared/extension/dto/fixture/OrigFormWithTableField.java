@@ -22,8 +22,6 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigFormWithTableField.MainBox.TableInOrigFormField;
 
 /**
- * <h3>{@link OrigFormWithTableField}</h3>
- *
  * @author Matthias Villiger
  */
 @FormData(value = OrigFormWithTableFieldData.class, sdkCommand = SdkCommand.CREATE)

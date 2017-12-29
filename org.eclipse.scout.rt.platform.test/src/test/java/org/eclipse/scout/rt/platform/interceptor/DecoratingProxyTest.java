@@ -21,8 +21,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * <h3>{@link DecoratingProxyTest}</h3>
- *
  * @author Matthias Villiger
  */
 public class DecoratingProxyTest {

@@ -16,10 +16,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-/**
- * <h3>{@link NamedBitMaskHelperTest}</h3>
- */
 public class NamedBitMaskHelperTest {
+
   private static String[] BIT_NAMES = new String[NamedBitMaskHelper.NUM_BITS + 1];
 
   @BeforeClass

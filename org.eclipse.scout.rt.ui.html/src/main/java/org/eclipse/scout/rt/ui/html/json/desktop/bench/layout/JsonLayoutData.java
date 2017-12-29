@@ -15,8 +15,6 @@ import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.json.JSONObject;
 
 /**
- * <h3>{@link JsonLayoutData}</h3>
- *
  * @author Andreas Hoegger
  */
 public class JsonLayoutData implements IJsonObject {

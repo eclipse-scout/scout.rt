@@ -34,9 +34,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-/**
- * <h3>{@link ClientRunContextWithInterceptorProducerTest}</h3>
- */
 @RunWith(PlatformTestRunner.class)
 public class ClientRunContextWithInterceptorProducerTest {
 

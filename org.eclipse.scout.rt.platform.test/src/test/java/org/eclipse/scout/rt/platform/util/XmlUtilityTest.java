@@ -37,8 +37,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * <h3>{@link XmlUtilityTest}</h3>
- *
  * @since 5.2
  */
 public class XmlUtilityTest {

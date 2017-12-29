@@ -11,8 +11,6 @@
 package org.eclipse.scout.rt.client.ui.dnd;
 
 /**
- * <h3>IDNDSupport</h3>
- *
  * @since 3.1.12 24.07.2008
  * @see TextTransferObject
  * @see JavaTransferObject

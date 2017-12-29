@@ -20,9 +20,6 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 
-/**
- * <h3>{@link DynamicResourceInfo}</h3>
- */
 public class DynamicResourceInfo {
 
   public static final String PATH_PREFIX = "dynamic";

@@ -14,7 +14,6 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 
 /**
- * <h3>{@link IVisibleDimension}</h3><br>
  * Interface for components having the capability to store multiple visibility dimensions. All dimensions must be
  * <code>true</code> so that the component is considered to be visible.
  *

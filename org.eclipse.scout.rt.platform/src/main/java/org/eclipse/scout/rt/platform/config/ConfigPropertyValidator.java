@@ -20,9 +20,6 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * <h3>{@link ConfigPropertyValidator}</h3>
- */
 public class ConfigPropertyValidator implements IConfigurationValidator {
 
   private static final Logger LOG = LoggerFactory.getLogger(ConfigPropertyValidator.class);

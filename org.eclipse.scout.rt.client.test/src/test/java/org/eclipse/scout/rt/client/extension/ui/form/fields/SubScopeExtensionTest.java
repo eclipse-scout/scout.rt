@@ -33,9 +33,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-/**
- * <h3>{@link SubScopeExtensionTest}</h3>
- */
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)

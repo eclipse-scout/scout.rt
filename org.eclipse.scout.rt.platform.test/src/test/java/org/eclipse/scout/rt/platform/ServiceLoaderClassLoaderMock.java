@@ -22,8 +22,6 @@ import java.util.Enumeration;
 import java.util.ServiceLoader;
 
 /**
- * <h3>{@link ServiceLoaderClassLoaderMock}</h3>
- * <p>
  * Testing utility used to create a {@link ClassLoader} that mocks a {@link ServiceLoader} resource.
  * <p>
  * It does this by emulating a <code>META-INF/services/interface-fully-qualified-name</code> resource file with the

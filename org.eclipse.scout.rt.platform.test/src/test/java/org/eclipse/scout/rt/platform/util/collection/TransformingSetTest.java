@@ -18,9 +18,6 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- * <h3>{@link TransformingSetTest}</h3>
- */
 public class TransformingSetTest {
 
   @Test

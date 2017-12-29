@@ -28,8 +28,8 @@ import org.eclipse.scout.rt.platform.util.XmlUtility;
 import org.junit.Assert;
 
 /**
- * <h3>{@link XmlFactoriesTestSupport}</h3> Testing helper class to detect XXE vulnerabilities because of direct use of
- * the corresponding JRE factories instead of using {@link XmlUtility} which provides hardened factory methods.
+ * Testing helper class to detect XXE vulnerabilities because of direct use of the corresponding JRE factories instead
+ * of using {@link XmlUtility} which provides hardened factory methods.
  *
  * @see https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet
  */

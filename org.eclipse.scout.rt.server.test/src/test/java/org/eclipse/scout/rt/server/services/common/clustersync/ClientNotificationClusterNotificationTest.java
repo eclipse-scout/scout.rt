@@ -46,9 +46,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-/**
- * <h3>{@link ClientNotificationClusterNotificationTest}</h3>
- */
 @RunWith(ServerTestRunner.class)
 @RunWithServerSession(TestServerSession.class)
 @RunWithSubject("default")

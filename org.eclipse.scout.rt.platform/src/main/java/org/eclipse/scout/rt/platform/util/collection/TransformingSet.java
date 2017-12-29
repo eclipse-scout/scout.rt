@@ -18,8 +18,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * <h3>{@link TransformingSet}</h3>
- * <p>
  * {@link Set} implementation that allows to wrap another {@link Set}. For each input or output operation of this set
  * the specified {@link ITransformer} is used to convert the values from the wrapped {@link Set} to this {@link Set}.
  * <p>

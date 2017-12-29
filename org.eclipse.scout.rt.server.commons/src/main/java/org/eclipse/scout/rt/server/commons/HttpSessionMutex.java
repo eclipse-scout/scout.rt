@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <h3>{@link HttpSessionMutex}</h3> Provides a mutex for {@link HttpSession}s to synchronize on.
+ * Provides a mutex for {@link HttpSession}s to synchronize on.
  * <p>
  * This class should be registered as listener in the {@code web.xml} to create a mutex for each session.
  * <p>

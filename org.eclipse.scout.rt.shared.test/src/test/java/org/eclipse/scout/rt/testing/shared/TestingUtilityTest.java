@@ -17,8 +17,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * <h3>{@link TestingUtilityTest}</h3>
- *
  * @author oca
  */
 public class TestingUtilityTest {

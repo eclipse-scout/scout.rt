@@ -16,8 +16,7 @@ import java.util.Locale;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
- * A Provider for {@link Collator}s to simplify replacements.
- * <h3>{@link CollatorProvider}</h3>
+ * A provider for {@link Collator}s to simplify replacements.
  *
  * @author jgu
  */
@@ -35,5 +34,4 @@ public class CollatorProvider {
   public Collator getInstance(Locale desiredLocale) {
     return Collator.getInstance(desiredLocale);
   }
-
 }

@@ -35,8 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <h3>{@link CookieAccessController}</h3>
- * <p>
  * This access controller can be used for demo, testing and tutorial purposes.
  * <p>
  * It is not recommended for production unless secure cookies are enabled in the web.xml and the corporate policy allows

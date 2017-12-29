@@ -15,8 +15,6 @@ import java.util.Arrays;
 import org.eclipse.scout.rt.platform.util.Assertions;
 
 /**
- * <h3>{@link BenchColumnData}</h3>
- *
  * @author Andreas Hoegger
  */
 public class BenchColumnData extends FlexboxLayoutData {

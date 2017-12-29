@@ -11,8 +11,6 @@
 package org.eclipse.scout.rt.platform.util.collection;
 
 /**
- * <h3>{@link ITransformer}</h3>
- * <p>
  * Interface to transform from one element to another and back.
  *
  * @see TransformingSet

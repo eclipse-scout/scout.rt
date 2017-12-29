@@ -21,8 +21,6 @@ import org.eclipse.scout.rt.platform.TypeParameterBeanRegistry;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 
 /**
- * <h3>{@link RunContextChainIntercepterRegistry}</h3>
- *
  * @author Andreas Hoegger
  */
 @ApplicationScoped
@@ -53,6 +51,5 @@ public class RunContextChainIntercepterRegistry {
       result.add(iRunContextChainInterceptorProducer);
     }
     return result;
-
   }
 }

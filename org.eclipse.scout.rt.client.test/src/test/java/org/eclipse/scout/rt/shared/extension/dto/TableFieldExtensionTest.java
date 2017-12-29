@@ -30,8 +30,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * <h3>{@link TableFieldExtensionTest}</h3> Test DTO handling of Extensions to TableFields inside an existing
- * FormExtension
+ * Test DTO handling of Extensions to TableFields inside an existing FormExtension
  *
  * @author Matthias Villiger
  */

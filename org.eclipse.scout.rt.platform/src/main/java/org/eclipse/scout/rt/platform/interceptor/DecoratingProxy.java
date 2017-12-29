@@ -21,8 +21,8 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.FinalValue;
 
 /**
- * <h3>{@link DecoratingProxy}</h3> Proxy implementation that can wrap around instances. It automatically handles the
- * methods equals(), hashCode() and toString() and delegates to the wrapped instance.
+ * Proxy implementation that can wrap around instances. It automatically handles the methods equals(), hashCode() and
+ * toString() and delegates to the wrapped instance.
  *
  * @author Matthias Villiger
  */

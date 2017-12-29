@@ -21,8 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <h3>Cache for {@link IServerSession}.</h3>
- * <p>
  * The Scout {@link IServerSession} is cached on the {@link HttpSession} and stopped and removed, when the
  * {@link HttpSession} expires.
  * </p>

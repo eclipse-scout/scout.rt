@@ -17,10 +17,10 @@ import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.mail.MailHelper;
 
 /**
- * <h3>ISMTPService</h3> The service to send messages over the smtp protocol. <br>
+ * The service to send messages over the smtp protocol.
  * <p>
  * Usage Example:
- *
+ * 
  * <pre>
  * DataSource att = MailUtility.createDataSource(new File(&quot;D:\\pictures\\backgroundCorsaire.jpg&quot;));
  * MimeMessage message = MailUtility.createMimeMessage(&quot;Some body part&quot;, &quot;&lt;html&gt;&lt;body&gt;&lt;b&gt;TEST&lt;/b&gt; Mail&lt;/body&gt;&lt;/html&gt;&quot;, new DataSource[]{att});

@@ -14,7 +14,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
 /**
- * <h3>{@link IFormFieldVisitor}</h3><br>
  * Visitor for {@link IFormField} trees.
  */
 @FunctionalInterface

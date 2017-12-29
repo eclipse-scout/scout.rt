@@ -12,9 +12,6 @@ package org.eclipse.scout.rt.client.ui.desktop.bench.layout;
 
 import java.util.Arrays;
 
-/**
- * <h3>{@link BenchLayoutData}</h3>
- */
 public class BenchLayoutData {
   public static final int WEST = 0;
   public static final int CENTER = 1;

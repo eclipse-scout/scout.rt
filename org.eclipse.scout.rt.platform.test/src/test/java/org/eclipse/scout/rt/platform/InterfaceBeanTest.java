@@ -16,8 +16,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * <h3>{@link InterfaceBeanTest}</h3>
- *
  * @author Matthias Villiger
  */
 public class InterfaceBeanTest {

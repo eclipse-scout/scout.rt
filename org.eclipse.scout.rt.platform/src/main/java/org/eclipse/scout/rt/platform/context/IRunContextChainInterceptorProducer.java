@@ -16,7 +16,6 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
- * <h3>{@link IRunContextChainInterceptorProducer}</h3><br>
  * Any instance of {@link IRunContextChainInterceptorProducer} will be added to the {@link RunContext} level defined as
  * generic parameter T. The producer is used to add additional information to a certain {@link RunContext} like
  * {@link ThreadLocal} variables or {@link Subject}.

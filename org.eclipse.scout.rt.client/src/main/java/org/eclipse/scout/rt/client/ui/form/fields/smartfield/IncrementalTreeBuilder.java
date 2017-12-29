@@ -23,8 +23,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 /**
- * <h3>{@link IncrementalTreeBuilder}</h3>
- * <p>
  * Builder to create a tree from a search result. The result may consist of child nodes without their parents.
  * <p>
  * In order to create the complete result, parent nodes may need to be loaded. Optimized in such a way that as few

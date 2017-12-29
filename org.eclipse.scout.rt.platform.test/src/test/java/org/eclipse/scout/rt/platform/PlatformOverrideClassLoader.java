@@ -11,8 +11,6 @@
 package org.eclipse.scout.rt.platform;
 
 /**
- * <h3>{@link PlatformOverrideClassLoader}</h3>
- * <p>
  * This {@link ClassLoader} is used to mock a {@link IPlatform} that is used in {@link Platform#get()}.
  * <p>
  * Therefore it emulates a <code>META-INF/services/org.eclipse.scout.rt.platform.IPlatform</code> resource file with the

@@ -29,8 +29,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * <h3>{@link RunContextChainInterceptorTest}</h3>
- *
  * @author Andreas Hoegger
  */
 @RunWith(PlatformTestRunner.class)

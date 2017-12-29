@@ -15,8 +15,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
 
 /**
- * <h3>{@link IInstanceInvocationHandler}</h3> Invocation handler that receives the instance to use in a call instead of
- * the proxy as used in {@link InvocationHandler}.<br>
+ * Invocation handler that receives the instance to use in a call instead of the proxy as used in
+ * {@link InvocationHandler}.<br>
  * {@link IInstanceInvocationHandler}s are e.g. used as callback in {@link DecoratingProxy}.
  *
  * @author Matthias Villiger

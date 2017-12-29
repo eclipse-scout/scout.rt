@@ -15,10 +15,8 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * <h3>{@link DefaultUserAgentParser}</h3>
- */
 public class DefaultUserAgentParserTest {
+
   private UserAgent m_defaultAgent;
 
   @Before

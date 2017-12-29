@@ -102,5 +102,4 @@ public class AdminSession {
   public TopView getTopView() {
     return m_topView;
   }
-
 }

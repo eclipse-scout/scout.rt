@@ -14,8 +14,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * <h3>{@link SearchFilterTest}</h3>
- *
  * @author Matthias Villiger
  */
 public class SearchFilterTest {

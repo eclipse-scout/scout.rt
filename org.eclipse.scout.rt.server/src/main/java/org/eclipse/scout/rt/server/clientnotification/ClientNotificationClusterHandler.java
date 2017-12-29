@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.shared.notification.INotificationHandler;
 
 /**
  * Publishes {@link ClientNotificationClusterNotification}s received via cluster synchronization into local registry.
- * <h3>{@link ClientNotificationClusterHandler}</h3>
  *
  * @author jgu
  */
@@ -29,5 +28,4 @@ public class ClientNotificationClusterHandler implements INotificationHandler<Cl
     Collection<? extends ClientNotificationMessage> messages = notification.getClientNotificationMessages();
     BEANS.get(ClientNotificationRegistry.class).publishWithoutClusterNotification(messages);
   }
-
 }

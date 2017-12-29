@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.server.commons.servlet.cache;
 
 /**
- * <h3>{@link IHttpResourceCache}</h3> Interface for HTTP resource caches.
+ * Interface for HTTP resource caches.
  */
 public interface IHttpResourceCache {
 
@@ -33,7 +33,7 @@ public interface IHttpResourceCache {
 
   /**
    * Removes a cached object with the given key.
-   * 
+   *
    * @param cacheKey
    *          The key of the object to return.
    * @return removed object or null, if it was not cached
@@ -44,5 +44,4 @@ public interface IHttpResourceCache {
    * Removes all entries from the cache.
    */
   void clear();
-
 }

@@ -35,8 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <h3>{@link DefaultAuthToken}</h3> Authentication Token used in {@link HttpServiceTunnel} to tell the backend which
- * user is making a request.
+ * Authentication Token used in {@link HttpServiceTunnel} to tell the backend which user is making a request.
  */
 @Bean
 public class DefaultAuthToken {

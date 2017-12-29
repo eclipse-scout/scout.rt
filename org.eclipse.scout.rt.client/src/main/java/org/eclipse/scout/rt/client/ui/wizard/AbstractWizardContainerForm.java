@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**
- * <h3>AbstractWizardContainerForm</h3> The form to extends to provide a customized wizard container form.
+ * The form to extends to provide a customized wizard container form.
  *
  * @since 24.11.2009
  */

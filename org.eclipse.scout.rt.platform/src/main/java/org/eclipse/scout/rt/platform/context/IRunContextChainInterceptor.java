@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.platform.context;
 import org.eclipse.scout.rt.platform.chain.callable.ICallableInterceptor;
 
 /**
- * <h3>{@link IRunContextChainInterceptor}</h3><br>
  * A {@link IRunContextChainInterceptor} should always be produced of a {@link IRunContextChainInterceptorProducer} to
  * add a certain variable (e.g. ThreadLocal) to a {@link RunContext}.
  */
