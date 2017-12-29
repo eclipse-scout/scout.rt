@@ -201,9 +201,6 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
   var prefSize, htmlField, labelPositionLeft,
     width = 0,
     htmlContainer = scout.HtmlComponent.get($container),
-    containerPadding = htmlContainer.insets({
-      includeBorder: false
-    }),
     height = scout.HtmlEnvironment.formRowHeight + $container.cssPaddingY(),
     labelWidth = this.labelWidth(),
     topLabelHeight = 0, // only set when label is on top
