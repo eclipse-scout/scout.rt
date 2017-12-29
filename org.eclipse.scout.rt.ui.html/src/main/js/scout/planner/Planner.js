@@ -939,9 +939,14 @@ scout.Planner.prototype._onResizeMousedown = function(event) {
   var swap,
     $target = $(event.target);
 
-  // find range on scale
-  if (($target.hasClass('selector-resize-right') && this.startRange.to > this.lastRange.to) ||
-    ($target.hasClass('selector-resize-left') && this.startRange.to < this.lastRange.to)) {
+  this.startRow = this.selectedResources[0],
+  this.lastRow = this.selectedResources[this.selectedResources.length - 1];
+
+  this.startRange = this._findScaleByFromDate(this.selectionRange.from);
+  this.lastRange = this._findScaleByToDate(this.selectionRange.to);
+
+  // Swap start and last range if resize-left is clicked
+  if ($target.hasClass('selector-resize-left')) {
     swap = this.startRange;
     this.startRange = this.lastRange;
     this.lastRange = swap;
@@ -993,20 +998,6 @@ scout.Planner.prototype._onDocumentMouseup = function(event) {
 scout.Planner.prototype._select = function(whileSelecting) {
   if (!this.startRow || !this.lastRow) {
     return;
-  }
-  // If startRange or lastRange are not given, use the existing range selection
-  // Happens if the user clicks a resource instead of making a range selection
-  if (!this.startRange && !this.lastRange) {
-    if (this.selectionRange.from) {
-      this.startRange = {};
-      this.startRange.from = this.selectionRange.from.getTime();
-      this.startRange.to = this.startRange.from;
-    }
-    if (this.selectionRange.to) {
-      this.lastRange = {};
-      this.lastRange.from = this.selectionRange.to.getTime();
-      this.lastRange.to = this.lastRange.from;
-    }
   }
   var rangeSelected = !!(this.startRange && this.lastRange);
   var $startRow = this.startRow.$resource,
@@ -1071,6 +1062,29 @@ scout.Planner.prototype._findScale = function(x) {
     return new scout.DateRange($scaleItem.data('date-from').valueOf(), $scaleItem.data('date-to').valueOf());
   }
   return null;
+};
+
+scout.Planner.prototype._findScaleByFromDate = function(from) {
+  return this._findScaleByFunction(function(i, elem) {
+    var $scaleItem = $(elem);
+    if ($scaleItem.data('date-from').getTime() === from.getTime()) {
+      return true;
+    }
+  });
+};
+
+scout.Planner.prototype._findScaleByToDate = function(to) {
+  return this._findScaleByFunction(function(i, elem) {
+    var $scaleItem = $(elem);
+    if ($scaleItem.data('date-to').getTime() === to.getTime()) {
+      return true;
+    }
+  });
+};
+
+scout.Planner.prototype._findScaleByFunction = function(func) {
+  var $scaleItem = this.$timelineSmall.children('.scale-item').filter(func);
+  return new scout.DateRange($scaleItem.data('date-from').valueOf(), $scaleItem.data('date-to').valueOf());
 };
 
 /* -- helper ---------------------------------------------------- */
