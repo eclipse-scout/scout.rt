@@ -391,6 +391,32 @@ describe('Widget', function() {
       expect(widget.rendered).toBe(true);
       expect(child0.rendered).toBe(true);
     });
+
+    it('removes the widget if removing is animated but parent is removed while animation is running', function() {
+      var parentWidget = createWidget({
+        parent: parent
+      });
+      var widget = createWidget({
+        parent: parentWidget,
+        animateRemoval: true
+      });
+      parentWidget.render(session.$entryPoint);
+      widget.render();
+      expect(widget.rendered).toBe(true);
+      expect(widget.$container).toBeDefined();
+
+      widget.remove();
+      expect(widget.rendered).toBe(true);
+      expect(widget.$container).toBeDefined();
+      expect(widget.removalPending).toBe(true);
+
+      // Even though animation has not run the widget needs to be removed because parent is removed
+      parentWidget.remove();
+      expect(parentWidget.rendered).toBe(false);
+      expect(widget.rendered).toBe(false);
+      expect(widget.$container).toBe(null);
+      expect(widget.removalPending).toBe(false);
+    });
   });
 
   describe('setProperty', function() {

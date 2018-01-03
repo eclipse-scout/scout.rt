@@ -247,7 +247,7 @@ scout.TileGrid.prototype._onTileDelete = function(tile) {
     return;
   }
   this.tileRemovalPending = true;
-  tile.$container.oneAnimationEnd(function() {
+  tile.one('remove', function() {
     this.tileRemovalPending = false;
     if (this.rendered && !this.htmlComp.layouting) {
       this.invalidateLayoutTree();
