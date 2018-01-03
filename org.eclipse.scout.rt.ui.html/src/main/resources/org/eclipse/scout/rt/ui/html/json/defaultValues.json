@@ -386,7 +386,8 @@
         "fillVertical": true,
         "widthInPixel": 0,
         "heightInPixel": 0
-      }
+      },
+      "loading": false
     },
     "TileGrid": {
       "filteredTiles": null,
@@ -401,11 +402,16 @@
         "minWidth": 0
       },
       "multiSelect": true,
-      "withPlaceholders": false,
+      "menus": [],
       "selectable": false,
       "selectedTiles": [],
       "scrollable": false,
-      "tiles": []
+      "tiles": [],
+      "withPlaceholders": false
+    },
+    "TileAccordion": {
+      "multiSelect": true,
+      "selectable": false
     },
     "Accordion": {
       "exclusiveExpand": true,
@@ -422,6 +428,7 @@
   "objectTypeHierarchy": {
     "Widget": {
       "FormField": {
+        "AccordionField": null,
         "Button": {
           "RadioButton": null,
           "TileButton": {
@@ -440,6 +447,7 @@
         "SplitBox": null,
         "TabBox": null,
         "TableField": null,
+        "TileField": null,
         "TreeField": null,
         "TreeBox": null,
         "ValueField": {
@@ -491,7 +499,9 @@
       "DesktopNotification": null,
       "Tile": null,
       "TileGrid": null,
-      "Accordion": null,
+      "Accordion": {
+        "TileAccordion": null
+      },
       "Group": null
     },
     "Column": {
