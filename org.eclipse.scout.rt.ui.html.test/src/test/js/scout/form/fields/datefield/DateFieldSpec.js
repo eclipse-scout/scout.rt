@@ -897,13 +897,13 @@ describe('DateField', function() {
     model.value = '2017-11-11';
     var dateField = createFieldAndFocusAndOpenPicker(model);
 
-    dateField.$dateField.val('11.11.68');
+    dateField.$dateField.val('11.11.98');
     dateField._onDateFieldBlur();
-    expect(dateField.$dateField.val()).toBe('11.11.1968');
+    expect(dateField.$dateField.val()).toBe('11.11.1998');
 
-    dateField.$dateField.val('11.11.68');
+    dateField.$dateField.val('11.11.98');
     dateField._onDateFieldBlur();
-    expect(dateField.$dateField.val()).toBe('11.11.1968');
+    expect(dateField.$dateField.val()).toBe('11.11.1998');
   });
 
   describe('allowed dates', function() {
