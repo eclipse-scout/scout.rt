@@ -188,9 +188,13 @@ scout.Group.prototype.animateToggleCollapse = function(options) {
       }.bind(this),
       complete: function() {
         this.bodyAnimating = false;
-        this.body.$container.cssMarginTop('');
-        this.body.$container.cssMarginBottom('');
-        this.$container.removeClass('collapsing');
+        if (this.body.rendered) {
+          this.body.$container.cssMarginTop('');
+          this.body.$container.cssMarginBottom('');
+        }
+        if (this.rendered) {
+          this.$container.removeClass('collapsing');
+        }
         this.trigger('bodyHeightChange');
       }.bind(this)
     })
