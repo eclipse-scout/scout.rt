@@ -45,7 +45,7 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   private final ObjectExtensions<AbstractTileGrid, ITileGridExtension<T, ? extends AbstractTileGrid>> m_objectExtensions;
   private ContributionComposite m_contributionHolder;
   private List<ITileFilter> m_filters;
-  private boolean m_filteredRowsDirty = false;
+  private boolean m_filteredTilesDirty = false;
   private Comparator<T> m_comparator;
 
   public AbstractTileGrid() {
@@ -287,6 +287,12 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
     List<T> tiles = getTiles();
     sortInternal(tiles);
     setTilesInternal(tiles);
+
+    // Sort list of filtered tiles as well
+    if (m_filters.size() > 0) {
+      m_filteredTilesDirty = true;
+      applyFilters(new ArrayList<>());
+    }
   }
 
   public void sortInternal(List<T> tiles) {
@@ -337,7 +343,7 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
     sortInternal(tiles);
     setTilesInternal(tiles);
 
-    m_filteredRowsDirty = true;
+    m_filteredTilesDirty = true;
     applyFilters(tilesToInsert);
   }
 
@@ -685,7 +691,7 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   protected boolean applyFilters(List<T> tiles, boolean fullReset) {
     if (m_filters.size() == 0 && !fullReset) {
       setFilteredTiles(getTilesInternal());
-      m_filteredRowsDirty = false;
+      m_filteredTilesDirty = false;
       return false;
     }
     boolean filterChanged = false;
@@ -704,9 +710,9 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
     // Non visible tiles must be deselected
     deselectTiles(newlyHiddenTiles);
 
-    if (filterChanged || m_filteredRowsDirty) {
+    if (filterChanged || m_filteredTilesDirty) {
       setFilteredTiles(filterTiles(getTilesInternal()));
-      m_filteredRowsDirty = false;
+      m_filteredTilesDirty = false;
     }
 
     return filterChanged;
@@ -723,6 +729,13 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
 
   @Override
   public List<T> getFilteredTiles() {
+    return CollectionUtility.arrayList(propertySupport.getPropertyList(PROP_FILTERED_TILES));
+  }
+
+  /**
+   * @return the live list of the filtered tiles
+   */
+  public List<T> getFilteredTilesInternal() {
     return propertySupport.getPropertyList(PROP_FILTERED_TILES);
   }
 
