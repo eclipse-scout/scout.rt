@@ -70,6 +70,7 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
     setWithPlaceholders(defaultGrid.isWithPlaceholders());
     setGridColumnCount(defaultGrid.getGridColumnCount());
     setTileGridLayoutConfig(defaultGrid.getLayoutConfig());
+    setTileComparator(defaultGrid.getComparator());
   }
 
   @Override
@@ -240,9 +241,19 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
       // manager already active, do nothing
       return;
     }
+    List<T> allTiles = getTiles();
+
+    if (m_groupManager instanceof DefaultGroupManager) {
+      // Delete default group when switching group manager (-> changing from ungrouped to grouped)
+      // This makes sure tiles from the default group are not removed with an animation while the same tiles are already added to a new group
+      IGroup defaultGroup = getDefaultGroup();
+      if (defaultGroup != null) {
+        deleteGroup(defaultGroup);
+        m_staticGroups.remove(defaultGroup);
+      }
+    }
     m_groupManager = groupManager;
 
-    List<T> allTiles = getTiles();
     // Each group manager may define a set of static groups which are shown even if they do not contain any tiles
     // These static groups may be reused when activating another group manager
     List<? extends IGroup> currentGroups = new ArrayList<>(m_staticGroups);
@@ -310,21 +321,22 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
     group.setCssClass(template.getCssClass());
     group.setCollapsed(template.isCollapsed());
     group.setHeaderVisible(template.isHeaderVisible());
-    if (group != getDefaultGroup()) {
-      // The default group maintains the properties to be set on each tile grid. Every tile grid uses the same values.
-      // If it is required to have different properties for each tile grid one may override applyTileGridProperties and handle them individually.
+
+    // Don't apply properties for the default grid while initConfig is running to not override the default values
+    if (getDefaultGroup() != group || isInitConfigDone()) {
       applyTileGridProperties(group);
     }
   }
 
   protected void applyTileGridProperties(IGroup group) {
-    ITileGrid<T> defaultGrid = getTileGrid(getDefaultGroup());
-    getTileGrid(group).setSelectable(defaultGrid.isSelectable());
-    getTileGrid(group).setMultiSelect(defaultGrid.isMultiSelect());
-    getTileGrid(group).setGridColumnCount(defaultGrid.getGridColumnCount());
-    getTileGrid(group).setWithPlaceholders(defaultGrid.isWithPlaceholders());
-    getTileGrid(group).setComparator(defaultGrid.getComparator());
-    getTileGrid(group).setLayoutConfig(defaultGrid.getLayoutConfig());
+    // Every tile grid uses the same values for the following properties.
+    // If it is required to have different properties for each tile grid one may override applyTileGridProperties and handle them individually.
+    getTileGrid(group).setSelectable(isSelectable());
+    getTileGrid(group).setMultiSelect(isMultiSelect());
+    getTileGrid(group).setGridColumnCount(getGridColumnCount());
+    getTileGrid(group).setWithPlaceholders(isWithPlaceholders());
+    getTileGrid(group).setLayoutConfig(getTileGridLayoutConfig());
+    getTileGrid(group).setComparator(getTileComparator());
   }
 
   protected GroupTemplate createDefaultGroupTemplate() {
@@ -413,7 +425,14 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
 
   @Override
   public void setTileComparator(Comparator<T> comparator) {
+    propertySupport.setProperty(PROP_TILE_COMPARATOR, comparator);
     getTileGrids().forEach(tileGrid -> tileGrid.setComparator(comparator));
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Comparator<T> getTileComparator() {
+    return (Comparator<T>) propertySupport.getProperty(PROP_TILE_COMPARATOR);
   }
 
   /**

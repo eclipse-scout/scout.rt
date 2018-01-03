@@ -25,6 +25,7 @@ public interface ITileAccordion<T extends ITile> extends IAccordion {
   String PROP_GRID_COLUMN_COUNT = "gridColumnCount";
   String PROP_WITH_PLACEHOLDERS = "withPlaceholders";
   String PROP_TILE_GRID_LAYOUT_CONFIG = "tileGridLayoutConfig";
+  String PROP_TILE_COMPARATOR = "tileComparator";
   String PROP_SHOW_FILTER_COUNT = "showFilterCount";
   String PROP_SELECTED_TILES = "selectedTiles";
 
@@ -85,6 +86,8 @@ public interface ITileAccordion<T extends ITile> extends IAccordion {
 
   void setTileComparator(Comparator<T> comparator);
 
+  Comparator<T> getTileComparator();
+
   T getSelectedTile();
 
   List<T> getSelectedTiles();
@@ -114,8 +117,8 @@ public interface ITileAccordion<T extends ITile> extends IAccordion {
   void setSelectable(boolean selectable);
 
   /**
-   * @return the value of {@link ITileGrid#isSelectable()} of the first tile grid assuming that all tile grids use the same
-   *         value
+   * @return the value of {@link ITileGrid#isSelectable()} of the first tile grid assuming that all tile grids use the
+   *         same value
    */
   boolean isSelectable();
 
@@ -138,8 +141,8 @@ public interface ITileAccordion<T extends ITile> extends IAccordion {
   void setTileGridLayoutConfig(TileGridLayoutConfig layoutConfig);
 
   /**
-   * @return the value of {@link ITileGrid#getLayoutConfig()} of the first tile grid assuming that all tile grids use the
-   *         same value
+   * @return the value of {@link ITileGrid#getLayoutConfig()} of the first tile grid assuming that all tile grids use
+   *         the same value
    */
   TileGridLayoutConfig getTileGridLayoutConfig();
 
