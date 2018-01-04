@@ -297,10 +297,6 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
     }
 
     setTiles(allTiles);
-
-    for (ITileFilter filter : m_tileFilters) {
-      addFilterToAllTileGrids(filter);
-    }
     sort();
   }
 
@@ -331,12 +327,16 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
   protected void applyTileGridProperties(IGroup group) {
     // Every tile grid uses the same values for the following properties.
     // If it is required to have different properties for each tile grid one may override applyTileGridProperties and handle them individually.
-    getTileGrid(group).setSelectable(isSelectable());
-    getTileGrid(group).setMultiSelect(isMultiSelect());
-    getTileGrid(group).setGridColumnCount(getGridColumnCount());
-    getTileGrid(group).setWithPlaceholders(isWithPlaceholders());
-    getTileGrid(group).setLayoutConfig(getTileGridLayoutConfig());
-    getTileGrid(group).setComparator(getTileComparator());
+    ITileGrid<T> tileGrid = getTileGrid(group);
+    tileGrid.setSelectable(isSelectable());
+    tileGrid.setMultiSelect(isMultiSelect());
+    tileGrid.setGridColumnCount(getGridColumnCount());
+    tileGrid.setWithPlaceholders(isWithPlaceholders());
+    tileGrid.setLayoutConfig(getTileGridLayoutConfig());
+    tileGrid.setComparator(getTileComparator());
+    for (ITileFilter filter : m_tileFilters) {
+      tileGrid.addFilter(filter);
+    }
   }
 
   protected GroupTemplate createDefaultGroupTemplate() {

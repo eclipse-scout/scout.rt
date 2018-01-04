@@ -65,7 +65,10 @@ scout.TileGrid.prototype._initTiles = function() {
 scout.TileGrid.prototype._initTile = function(tile) {
   tile.setSelectable(this.selectable);
   tile.setSelected(this.selectedTiles.indexOf(tile) >= 0);
+
+  // Set proper state in case tile was used in another grid
   tile.setParent(this);
+  tile.setFilterAccepted(true);
 };
 
 scout.TileGrid.prototype._render = function() {
@@ -138,7 +141,9 @@ scout.TileGrid.prototype.setTiles = function(tiles, appendPlaceholders) {
     this._deletePlaceholders(tiles);
   }
 
+  // Only insert those which are not already there
   var tilesToInsert = scout.arrays.diff(tiles, this.tiles);
+  this._insertTiles(tilesToInsert);
   this._applyFilters(tilesToInsert);
 
   // Append the existing placeholders, otherwise they would be unnecessarily deleted if a tile is deleted
@@ -151,11 +156,9 @@ scout.TileGrid.prototype.setTiles = function(tiles, appendPlaceholders) {
   }
 
   // Only delete those which are not in the new array
-  // Only insert those which are not already there
   var tilesToDelete = scout.arrays.diff(this.tiles, tiles);
-
   this._deleteTiles(tilesToDelete);
-  this._insertTiles(tilesToInsert);
+
   this._sort(tiles);
   this._updateTileOrder(tiles);
   this._setProperty('tiles', tiles);

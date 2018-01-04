@@ -42,60 +42,60 @@ describe("TileGrid", function() {
 
   describe('selectTiles', function() {
     it('selects the given tiles and unselects the previously selected ones', function() {
-      var tiles = createTileGrid(3, {
+      var tileGrid = createTileGrid(3, {
         selectable: true
       });
-      tiles.selectTiles(tiles.tiles[0]);
-      expect(tiles.selectedTiles.length).toBe(1);
-      expect(tiles.selectedTiles[0]).toBe(tiles.tiles[0]);
-      expect(tiles.tiles[0].selected).toBe(true);
-      expect(tiles.tiles[1].selected).toBe(false);
-      expect(tiles.tiles[2].selected).toBe(false);
+      tileGrid.selectTiles(tileGrid.tiles[0]);
+      expect(tileGrid.selectedTiles.length).toBe(1);
+      expect(tileGrid.selectedTiles[0]).toBe(tileGrid.tiles[0]);
+      expect(tileGrid.tiles[0].selected).toBe(true);
+      expect(tileGrid.tiles[1].selected).toBe(false);
+      expect(tileGrid.tiles[2].selected).toBe(false);
 
-      tiles.selectTiles(tiles.tiles[1]);
-      expect(tiles.selectedTiles.length).toBe(1);
-      expect(tiles.selectedTiles[0]).toBe(tiles.tiles[1]);
-      expect(tiles.tiles[0].selected).toBe(false);
-      expect(tiles.tiles[1].selected).toBe(true);
-      expect(tiles.tiles[2].selected).toBe(false);
+      tileGrid.selectTiles(tileGrid.tiles[1]);
+      expect(tileGrid.selectedTiles.length).toBe(1);
+      expect(tileGrid.selectedTiles[0]).toBe(tileGrid.tiles[1]);
+      expect(tileGrid.tiles[0].selected).toBe(false);
+      expect(tileGrid.tiles[1].selected).toBe(true);
+      expect(tileGrid.tiles[2].selected).toBe(false);
 
-      tiles.selectTiles([tiles.tiles[0], tiles.tiles[2]]);
-      expect(tiles.selectedTiles.length).toBe(2);
-      expect(tiles.selectedTiles[0]).toBe(tiles.tiles[0]);
-      expect(tiles.selectedTiles[1]).toBe(tiles.tiles[2]);
-      expect(tiles.tiles[0].selected).toBe(true);
-      expect(tiles.tiles[1].selected).toBe(false);
-      expect(tiles.tiles[2].selected).toBe(true);
+      tileGrid.selectTiles([tileGrid.tiles[0], tileGrid.tiles[2]]);
+      expect(tileGrid.selectedTiles.length).toBe(2);
+      expect(tileGrid.selectedTiles[0]).toBe(tileGrid.tiles[0]);
+      expect(tileGrid.selectedTiles[1]).toBe(tileGrid.tiles[2]);
+      expect(tileGrid.tiles[0].selected).toBe(true);
+      expect(tileGrid.tiles[1].selected).toBe(false);
+      expect(tileGrid.tiles[2].selected).toBe(true);
 
-      tiles.selectTiles([tiles.tiles[0], tiles.tiles[1], tiles.tiles[2]]);
-      expect(tiles.selectedTiles.length).toBe(3);
-      expect(tiles.selectedTiles[0]).toBe(tiles.tiles[0]);
-      expect(tiles.selectedTiles[1]).toBe(tiles.tiles[1]);
-      expect(tiles.selectedTiles[2]).toBe(tiles.tiles[2]);
-      expect(tiles.tiles[0].selected).toBe(true);
-      expect(tiles.tiles[1].selected).toBe(true);
-      expect(tiles.tiles[2].selected).toBe(true);
+      tileGrid.selectTiles([tileGrid.tiles[0], tileGrid.tiles[1], tileGrid.tiles[2]]);
+      expect(tileGrid.selectedTiles.length).toBe(3);
+      expect(tileGrid.selectedTiles[0]).toBe(tileGrid.tiles[0]);
+      expect(tileGrid.selectedTiles[1]).toBe(tileGrid.tiles[1]);
+      expect(tileGrid.selectedTiles[2]).toBe(tileGrid.tiles[2]);
+      expect(tileGrid.tiles[0].selected).toBe(true);
+      expect(tileGrid.tiles[1].selected).toBe(true);
+      expect(tileGrid.tiles[2].selected).toBe(true);
 
-      tiles.selectTiles([]);
-      expect(tiles.selectedTiles.length).toBe(0);
-      expect(tiles.tiles[0].selected).toBe(false);
-      expect(tiles.tiles[1].selected).toBe(false);
-      expect(tiles.tiles[2].selected).toBe(false);
+      tileGrid.selectTiles([]);
+      expect(tileGrid.selectedTiles.length).toBe(0);
+      expect(tileGrid.tiles[0].selected).toBe(false);
+      expect(tileGrid.tiles[1].selected).toBe(false);
+      expect(tileGrid.tiles[2].selected).toBe(false);
     });
 
     it('does not select if selectable is false', function() {
-      var tiles = createTileGrid(3, {
+      var tileGrid = createTileGrid(3, {
         selectable: false
       });
-      tiles.selectTiles(tiles.tiles[0]);
-      expect(tiles.tiles[0].selected).toBe(false);
+      tileGrid.selectTiles(tileGrid.tiles[0]);
+      expect(tileGrid.tiles[0].selected).toBe(false);
 
-      tiles.tiles[0].setSelected(true);
-      expect(tiles.tiles[0].selected).toBe(false);
+      tileGrid.tiles[0].setSelected(true);
+      expect(tileGrid.tiles[0].selected).toBe(false);
     });
 
     it('does not select tiles excluded by filter', function() {
-      var tiles = createTileGrid(3, {
+      var tileGrid = createTileGrid(3, {
         selectable: true
       });
 
@@ -104,200 +104,200 @@ describe("TileGrid", function() {
           return tile.label.indexOf('1') < 0;
         }
       };
-      tiles.addFilter(filter);
-      tiles.filter();
+      tileGrid.addFilter(filter);
+      tileGrid.filter();
 
-      tiles.selectTiles(tiles.tiles[1]);
-      expect(tiles.tiles[1].selected).toBe(false);
+      tileGrid.selectTiles(tileGrid.tiles[1]);
+      expect(tileGrid.tiles[1].selected).toBe(false);
 
-      tiles.selectTiles(tiles.tiles[0]);
-      expect(tiles.tiles[0].selected).toBe(true);
+      tileGrid.selectTiles(tileGrid.tiles[0]);
+      expect(tileGrid.tiles[0].selected).toBe(true);
 
-      tiles.removeFilter(filter);
-      tiles.filter();
+      tileGrid.removeFilter(filter);
+      tileGrid.filter();
 
-      tiles.selectTiles(tiles.tiles[1]);
-      expect(tiles.tiles[1].selected).toBe(true);
+      tileGrid.selectTiles(tileGrid.tiles[1]);
+      expect(tileGrid.tiles[1].selected).toBe(true);
     });
 
     it('triggers a property change event', function() {
-      var tiles = createTileGrid(3, {
+      var tileGrid = createTileGrid(3, {
         selectable: true
       });
       var eventTriggered = false;
-      tiles.on('propertyChange', function(event) {
+      tileGrid.on('propertyChange', function(event) {
         if (event.propertyName === 'selectedTiles') {
           eventTriggered = true;
         }
       });
-      tiles.selectTiles(tiles.tiles[0]);
+      tileGrid.selectTiles(tileGrid.tiles[0]);
       expect(eventTriggered).toBe(true);
     });
   });
 
   describe('deselectTiles', function() {
     it('deselects the given tiles', function() {
-      var tiles = createTileGrid(3, {
+      var tileGrid = createTileGrid(3, {
         selectable: true
       });
-      tiles.selectAllTiles();
-      expect(tiles.selectedTiles.length).toBe(3);
-      expect(tiles.selectedTiles[0]).toBe(tiles.tiles[0]);
-      expect(tiles.selectedTiles[1]).toBe(tiles.tiles[1]);
-      expect(tiles.selectedTiles[2]).toBe(tiles.tiles[2]);
-      expect(tiles.tiles[0].selected).toBe(true);
-      expect(tiles.tiles[1].selected).toBe(true);
-      expect(tiles.tiles[2].selected).toBe(true);
+      tileGrid.selectAllTiles();
+      expect(tileGrid.selectedTiles.length).toBe(3);
+      expect(tileGrid.selectedTiles[0]).toBe(tileGrid.tiles[0]);
+      expect(tileGrid.selectedTiles[1]).toBe(tileGrid.tiles[1]);
+      expect(tileGrid.selectedTiles[2]).toBe(tileGrid.tiles[2]);
+      expect(tileGrid.tiles[0].selected).toBe(true);
+      expect(tileGrid.tiles[1].selected).toBe(true);
+      expect(tileGrid.tiles[2].selected).toBe(true);
 
-      tiles.deselectTiles(tiles.tiles[1]);
-      expect(tiles.selectedTiles.length).toBe(2);
-      expect(tiles.selectedTiles[0]).toBe(tiles.tiles[0]);
-      expect(tiles.selectedTiles[1]).toBe(tiles.tiles[2]);
-      expect(tiles.tiles[0].selected).toBe(true);
-      expect(tiles.tiles[1].selected).toBe(false);
-      expect(tiles.tiles[2].selected).toBe(true);
+      tileGrid.deselectTiles(tileGrid.tiles[1]);
+      expect(tileGrid.selectedTiles.length).toBe(2);
+      expect(tileGrid.selectedTiles[0]).toBe(tileGrid.tiles[0]);
+      expect(tileGrid.selectedTiles[1]).toBe(tileGrid.tiles[2]);
+      expect(tileGrid.tiles[0].selected).toBe(true);
+      expect(tileGrid.tiles[1].selected).toBe(false);
+      expect(tileGrid.tiles[2].selected).toBe(true);
 
-      tiles.deselectAllTiles();
-      expect(tiles.selectedTiles.length).toBe(0);
-      expect(tiles.tiles[0].selected).toBe(false);
-      expect(tiles.tiles[1].selected).toBe(false);
-      expect(tiles.tiles[2].selected).toBe(false);
+      tileGrid.deselectAllTiles();
+      expect(tileGrid.selectedTiles.length).toBe(0);
+      expect(tileGrid.tiles[0].selected).toBe(false);
+      expect(tileGrid.tiles[1].selected).toBe(false);
+      expect(tileGrid.tiles[2].selected).toBe(false);
     });
 
     it('triggers a property change event', function() {
-      var tiles = createTileGrid(3, {
+      var tileGrid = createTileGrid(3, {
         selectable: true
       });
       var eventTriggered = false;
-      tiles.selectAllTiles();
-      tiles.on('propertyChange', function(event) {
+      tileGrid.selectAllTiles();
+      tileGrid.on('propertyChange', function(event) {
         if (event.propertyName === 'selectedTiles') {
           eventTriggered = true;
         }
       });
-      tiles.deselectTile(tiles.tiles[0]);
+      tileGrid.deselectTile(tileGrid.tiles[0]);
       expect(eventTriggered).toBe(true);
     });
   });
 
   describe('insertTiles', function() {
     it('inserts the given tiles', function() {
-      var tiles = createTileGrid(0);
+      var tileGrid = createTileGrid(0);
       var tile0 = createTile();
       var tile1 = createTile();
       var tile2 = createTile();
-      expect(tiles.tiles.length).toBe(0);
+      expect(tileGrid.tiles.length).toBe(0);
 
-      tiles.insertTiles(tile0);
-      expect(tiles.tiles.length).toBe(1);
-      expect(tiles.tiles[0]).toBe(tile0);
+      tileGrid.insertTiles(tile0);
+      expect(tileGrid.tiles.length).toBe(1);
+      expect(tileGrid.tiles[0]).toBe(tile0);
 
-      tiles.insertTiles([tile1, tile2]);
-      expect(tiles.tiles.length).toBe(3);
-      expect(tiles.tiles[0]).toBe(tile0);
-      expect(tiles.tiles[1]).toBe(tile1);
-      expect(tiles.tiles[2]).toBe(tile2);
+      tileGrid.insertTiles([tile1, tile2]);
+      expect(tileGrid.tiles.length).toBe(3);
+      expect(tileGrid.tiles[0]).toBe(tile0);
+      expect(tileGrid.tiles[1]).toBe(tile1);
+      expect(tileGrid.tiles[2]).toBe(tile2);
     });
 
     it('triggers a property change event', function() {
-      var tiles = createTileGrid(0);
+      var tileGrid = createTileGrid(0);
       var tile0 = createTile();
       var eventTriggered = false;
-      tiles.on('propertyChange', function(event) {
+      tileGrid.on('propertyChange', function(event) {
         if (event.propertyName === 'tiles') {
           eventTriggered = true;
         }
       });
-      tiles.insertTiles(tile0);
+      tileGrid.insertTiles(tile0);
       expect(eventTriggered).toBe(true);
     });
 
-    it('links the inserted tiles with the tiles container', function() {
-      var tiles = createTileGrid(0);
+    it('links the inserted tiles with the tileGrid', function() {
+      var tileGrid = createTileGrid(0);
       var tile0 = createTile();
       var tile1 = createTile();
       var tile2 = createTile();
-      expect(tiles.tiles.length).toBe(0);
+      expect(tileGrid.tiles.length).toBe(0);
       expect(tile0.parent).toBe(session.desktop);
       expect(tile1.parent).toBe(session.desktop);
       expect(tile2.parent).toBe(session.desktop);
 
-      tiles.insertTile(tile0);
-      expect(tile0.parent).toBe(tiles);
+      tileGrid.insertTile(tile0);
+      expect(tile0.parent).toBe(tileGrid);
 
-      tiles.insertTiles([tile1, tile2]);
-      expect(tile1.parent).toBe(tiles);
-      expect(tile2.parent).toBe(tiles);
+      tileGrid.insertTiles([tile1, tile2]);
+      expect(tile1.parent).toBe(tileGrid);
+      expect(tile2.parent).toBe(tileGrid);
     });
   });
 
   describe('deleteTiles', function() {
     it('deletes the given tiles', function() {
-      var tiles = createTileGrid(0);
+      var tileGrid = createTileGrid(0);
       var tile0 = createTile();
       var tile1 = createTile();
       var tile2 = createTile();
-      tiles.insertTiles([tile0, tile1, tile2]);
-      expect(tiles.tiles.length).toBe(3);
+      tileGrid.insertTiles([tile0, tile1, tile2]);
+      expect(tileGrid.tiles.length).toBe(3);
 
-      tiles.deleteTiles(tile1);
-      expect(tiles.tiles.length).toBe(2);
-      expect(tiles.tiles[0]).toBe(tile0);
-      expect(tiles.tiles[1]).toBe(tile2);
+      tileGrid.deleteTiles(tile1);
+      expect(tileGrid.tiles.length).toBe(2);
+      expect(tileGrid.tiles[0]).toBe(tile0);
+      expect(tileGrid.tiles[1]).toBe(tile2);
 
-      tiles.deleteTiles([tile0, tile2]);
-      expect(tiles.tiles.length).toBe(0);
+      tileGrid.deleteTiles([tile0, tile2]);
+      expect(tileGrid.tiles.length).toBe(0);
     });
 
     it('deselects the deleted tiles', function() {
-      var tiles = createTileGrid(0, {
+      var tileGrid = createTileGrid(0, {
         selectable: true
       });
       var tile0 = createTile();
       var tile1 = createTile();
       var tile2 = createTile();
-      tiles.insertTiles([tile0, tile1, tile2]);
-      expect(tiles.tiles.length).toBe(3);
+      tileGrid.insertTiles([tile0, tile1, tile2]);
+      expect(tileGrid.tiles.length).toBe(3);
 
-      tiles.selectAllTiles();
-      expect(tiles.selectedTiles.length).toBe(3);
+      tileGrid.selectAllTiles();
+      expect(tileGrid.selectedTiles.length).toBe(3);
 
-      tiles.deleteTiles(tile1);
-      expect(tiles.selectedTiles.length).toBe(2);
-      expect(tiles.selectedTiles[0]).toBe(tile0);
-      expect(tiles.selectedTiles[1]).toBe(tile2);
+      tileGrid.deleteTiles(tile1);
+      expect(tileGrid.selectedTiles.length).toBe(2);
+      expect(tileGrid.selectedTiles[0]).toBe(tile0);
+      expect(tileGrid.selectedTiles[1]).toBe(tile2);
 
-      tiles.deleteTiles([tile0, tile2]);
-      expect(tiles.selectedTiles.length).toBe(0);
+      tileGrid.deleteTiles([tile0, tile2]);
+      expect(tileGrid.selectedTiles.length).toBe(0);
     });
 
     it('triggers a property change event', function() {
-      var tiles = createTileGrid(3);
+      var tileGrid = createTileGrid(3);
       var eventTriggered = false;
-      tiles.on('propertyChange', function(event) {
+      tileGrid.on('propertyChange', function(event) {
         if (event.propertyName === 'tiles') {
           eventTriggered = true;
         }
       });
-      tiles.deleteTiles(tiles.tiles[0]);
+      tileGrid.deleteTiles(tileGrid.tiles[0]);
       expect(eventTriggered).toBe(true);
     });
 
     it('destroys the deleted tiles', function() {
-      var tiles = createTileGrid(0, {
+      var tileGrid = createTileGrid(0, {
         animateTileRemoval: false
       });
       var tile0 = createTile({
-        parent: tiles
+        parent: tileGrid
       });
       var tile1 = createTile({
-        parent: tiles
+        parent: tileGrid
       });
       var tile2 = createTile({
-        parent: tiles
+        parent: tileGrid
       });
-      tiles.render();
-      tiles.insertTiles([tile0, tile1, tile2]);
+      tileGrid.render();
+      tileGrid.insertTiles([tile0, tile1, tile2]);
       expect(tile0.destroyed).toBe(false);
       expect(tile0.rendered).toBe(true);
       expect(tile1.destroyed).toBe(false);
@@ -305,11 +305,11 @@ describe("TileGrid", function() {
       expect(tile2.destroyed).toBe(false);
       expect(tile2.rendered).toBe(true);
 
-      tiles.deleteTile(tile1);
+      tileGrid.deleteTile(tile1);
       expect(tile1.destroyed).toBe(true);
       expect(tile1.rendered).toBe(false);
 
-      tiles.deleteTiles([tile0, tile2]);
+      tileGrid.deleteTiles([tile0, tile2]);
       expect(tile0.destroyed).toBe(true);
       expect(tile0.rendered).toBe(false);
       expect(tile2.destroyed).toBe(true);
@@ -317,10 +317,10 @@ describe("TileGrid", function() {
     });
 
     /**
-     * This spec is important if a tile should be moved from one tiles container to another.
+     * This spec is important if a tile should be moved from one tileGrid to another.
      */
-    it('does not destroy the deleted tiles if the tiles container is not the owner', function() {
-      var tiles = createTileGrid(0, {
+    it('does not destroy the deleted tiles if the tileGrid is not the owner', function() {
+      var tileGrid = createTileGrid(0, {
         animateTileRemoval: false
       });
       var tile0 = createTile({
@@ -332,8 +332,8 @@ describe("TileGrid", function() {
       var tile2 = createTile({
         owner: session.desktop
       });
-      tiles.render();
-      tiles.insertTiles([tile0, tile1, tile2]);
+      tileGrid.render();
+      tileGrid.insertTiles([tile0, tile1, tile2]);
       expect(tile0.destroyed).toBe(false);
       expect(tile0.rendered).toBe(true);
       expect(tile1.destroyed).toBe(false);
@@ -341,11 +341,11 @@ describe("TileGrid", function() {
       expect(tile2.destroyed).toBe(false);
       expect(tile2.rendered).toBe(true);
 
-      tiles.deleteTile(tile1);
+      tileGrid.deleteTile(tile1);
       expect(tile1.destroyed).toBe(false);
       expect(tile1.rendered).toBe(false);
 
-      tiles.deleteTiles([tile0, tile2]);
+      tileGrid.deleteTiles([tile0, tile2]);
       expect(tile0.destroyed).toBe(false);
       expect(tile0.rendered).toBe(false);
       expect(tile2.destroyed).toBe(false);
@@ -355,130 +355,130 @@ describe("TileGrid", function() {
 
   describe('deleteAllTiles', function() {
     it('deletes all tiles', function() {
-      var tiles = createTileGrid(0);
+      var tileGrid = createTileGrid(0);
       var tile0 = createTile();
       var tile1 = createTile();
       var tile2 = createTile();
-      tiles.insertTiles([tile0, tile1, tile2]);
-      expect(tiles.tiles.length).toBe(3);
+      tileGrid.insertTiles([tile0, tile1, tile2]);
+      expect(tileGrid.tiles.length).toBe(3);
 
-      tiles.deleteAllTiles();
-      expect(tiles.tiles.length).toBe(0);
+      tileGrid.deleteAllTiles();
+      expect(tileGrid.tiles.length).toBe(0);
     });
 
     it('deselects the deleted tiles', function() {
-      var tiles = createTileGrid(0, {
+      var tileGrid = createTileGrid(0, {
         selectable: true
       });
       var tile0 = createTile();
       var tile1 = createTile();
       var tile2 = createTile();
-      tiles.insertTiles([tile0, tile1, tile2]);
-      expect(tiles.tiles.length).toBe(3);
+      tileGrid.insertTiles([tile0, tile1, tile2]);
+      expect(tileGrid.tiles.length).toBe(3);
 
-      tiles.selectAllTiles();
-      expect(tiles.selectedTiles.length).toBe(3);
+      tileGrid.selectAllTiles();
+      expect(tileGrid.selectedTiles.length).toBe(3);
 
-      tiles.deleteAllTiles();
-      expect(tiles.selectedTiles.length).toBe(0);
+      tileGrid.deleteAllTiles();
+      expect(tileGrid.selectedTiles.length).toBe(0);
     });
 
     it('adds empty marker', function() {
-      var tiles = createTileGrid(0);
+      var tileGrid = createTileGrid(0);
       var tile0 = createTile();
       var tile1 = createTile();
       var tile2 = createTile();
-      tiles.render();
-      expect(tiles.$container).toHaveClass('empty');
+      tileGrid.render();
+      expect(tileGrid.$container).toHaveClass('empty');
 
-      tiles.insertTiles([tile0, tile1, tile2]);
-      expect(tiles.$container).not.toHaveClass('empty');
+      tileGrid.insertTiles([tile0, tile1, tile2]);
+      expect(tileGrid.$container).not.toHaveClass('empty');
 
-      tiles.deleteAllTiles();
-      expect(tiles.$container).toHaveClass('empty');
+      tileGrid.deleteAllTiles();
+      expect(tileGrid.$container).toHaveClass('empty');
     });
   });
 
   describe('setTiles', function() {
 
     it('applies the order of the new tiles to tiles and filteredTiles', function() {
-      var tiles = createTileGrid(0);
+      var tileGrid = createTileGrid(0);
       var tile0 = createTile();
       var tile1 = createTile();
       var tile2 = createTile();
-      tiles.insertTiles([tile0, tile1, tile2]);
+      tileGrid.insertTiles([tile0, tile1, tile2]);
 
-      tiles.setTiles([tile2, tile1, tile0]);
-      expect(tiles.tiles[0]).toBe(tile2);
-      expect(tiles.tiles[1]).toBe(tile1);
-      expect(tiles.tiles[2]).toBe(tile0);
-      expect(tiles.filteredTiles[0]).toBe(tile2);
-      expect(tiles.filteredTiles[1]).toBe(tile1);
-      expect(tiles.filteredTiles[2]).toBe(tile0);
+      tileGrid.setTiles([tile2, tile1, tile0]);
+      expect(tileGrid.tiles[0]).toBe(tile2);
+      expect(tileGrid.tiles[1]).toBe(tile1);
+      expect(tileGrid.tiles[2]).toBe(tile0);
+      expect(tileGrid.filteredTiles[0]).toBe(tile2);
+      expect(tileGrid.filteredTiles[1]).toBe(tile1);
+      expect(tileGrid.filteredTiles[2]).toBe(tile0);
     });
 
     it('applies the order of the new tiles to the rendered elements', function() {
-      var tiles = createTileGrid(0);
+      var tileGrid = createTileGrid(0);
       var tile0 = createTile();
       var tile1 = createTile();
       var tile2 = createTile();
-      tiles.insertTiles([tile0, tile1, tile2]);
-      tiles.render();
-      var $tiles = tiles.$container.children('.tile');
+      tileGrid.insertTiles([tile0, tile1, tile2]);
+      tileGrid.render();
+      var $tiles = tileGrid.$container.children('.tile');
       expect($tiles.eq(0).data('widget')).toBe(tile0);
       expect($tiles.eq(1).data('widget')).toBe(tile1);
       expect($tiles.eq(2).data('widget')).toBe(tile2);
 
-      tiles.setTiles([tile2, tile1, tile0]);
-      $tiles = tiles.$container.children('.tile');
+      tileGrid.setTiles([tile2, tile1, tile0]);
+      $tiles = tileGrid.$container.children('.tile');
       expect($tiles.eq(0).data('widget')).toBe(tile2);
       expect($tiles.eq(1).data('widget')).toBe(tile1);
       expect($tiles.eq(2).data('widget')).toBe(tile0);
-      expect(tiles.tiles[0]).toBe(tile2);
-      expect(tiles.tiles[1]).toBe(tile1);
-      expect(tiles.tiles[2]).toBe(tile0);
-      expect(tiles.filteredTiles[0]).toBe(tile2);
-      expect(tiles.filteredTiles[1]).toBe(tile1);
-      expect(tiles.filteredTiles[2]).toBe(tile0);
+      expect(tileGrid.tiles[0]).toBe(tile2);
+      expect(tileGrid.tiles[1]).toBe(tile1);
+      expect(tileGrid.tiles[2]).toBe(tile0);
+      expect(tileGrid.filteredTiles[0]).toBe(tile2);
+      expect(tileGrid.filteredTiles[1]).toBe(tile1);
+      expect(tileGrid.filteredTiles[2]).toBe(tile0);
     });
 
     it('applies the order of the new tiles to the filteredTiles if a filter is active', function() {
-      var tiles = createTileGrid(3);
-      var tile0 = tiles.tiles[0];
-      var tile1 = tiles.tiles[1];
-      var tile2 = tiles.tiles[2];
+      var tileGrid = createTileGrid(3);
+      var tile0 = tileGrid.tiles[0];
+      var tile1 = tileGrid.tiles[1];
+      var tile2 = tileGrid.tiles[2];
 
       var filter = {
         accept: function(tile) {
           return tile.label.indexOf('1') < 0;
         }
       };
-      tiles.addFilter(filter);
-      tiles.filter();
+      tileGrid.addFilter(filter);
+      tileGrid.filter();
 
-      tiles.render();
-      var $tiles = tiles.$container.children('.tile');
+      tileGrid.render();
+      var $tiles = tileGrid.$container.children('.tile');
       expect($tiles.eq(0).data('widget')).toBe(tile0);
       expect($tiles.eq(1).data('widget')).toBe(tile1);
       expect($tiles.eq(2).data('widget')).toBe(tile2);
-      expect(tiles.tiles[0]).toBe(tile0);
-      expect(tiles.tiles[1]).toBe(tile1);
-      expect(tiles.tiles[2]).toBe(tile2);
-      expect(tiles.filteredTiles.length).toBe(2);
-      expect(tiles.filteredTiles[0]).toBe(tile0);
-      expect(tiles.filteredTiles[1]).toBe(tile2);
+      expect(tileGrid.tiles[0]).toBe(tile0);
+      expect(tileGrid.tiles[1]).toBe(tile1);
+      expect(tileGrid.tiles[2]).toBe(tile2);
+      expect(tileGrid.filteredTiles.length).toBe(2);
+      expect(tileGrid.filteredTiles[0]).toBe(tile0);
+      expect(tileGrid.filteredTiles[1]).toBe(tile2);
 
-      tiles.setTiles([tile2, tile1, tile0]);
-      $tiles = tiles.$container.children('.tile');
+      tileGrid.setTiles([tile2, tile1, tile0]);
+      $tiles = tileGrid.$container.children('.tile');
       expect($tiles.eq(0).data('widget')).toBe(tile2);
       expect($tiles.eq(1).data('widget')).toBe(tile1);
       expect($tiles.eq(2).data('widget')).toBe(tile0);
-      expect(tiles.tiles[0]).toBe(tile2);
-      expect(tiles.tiles[1]).toBe(tile1);
-      expect(tiles.tiles[2]).toBe(tile0);
-      expect(tiles.filteredTiles.length).toBe(2);
-      expect(tiles.filteredTiles[0]).toBe(tile2);
-      expect(tiles.filteredTiles[1]).toBe(tile0);
+      expect(tileGrid.tiles[0]).toBe(tile2);
+      expect(tileGrid.tiles[1]).toBe(tile1);
+      expect(tileGrid.tiles[2]).toBe(tile0);
+      expect(tileGrid.filteredTiles.length).toBe(2);
+      expect(tileGrid.filteredTiles[0]).toBe(tile2);
+      expect(tileGrid.filteredTiles[1]).toBe(tile0);
     });
 
   });
@@ -486,7 +486,7 @@ describe("TileGrid", function() {
   describe('sort', function() {
 
     it('uses the comparator to sort the tiles and filteredTiles', function() {
-      var tiles = createTileGrid(0);
+      var tileGrid = createTileGrid(0);
       var tile0 = createTile({
         label: "a"
       });
@@ -496,35 +496,35 @@ describe("TileGrid", function() {
       var tile2 = createTile({
         label: "c"
       });
-      tiles.insertTiles([tile0, tile1, tile2]);
+      tileGrid.insertTiles([tile0, tile1, tile2]);
 
-      tiles.setComparator(function(t0, t1) {
+      tileGrid.setComparator(function(t0, t1) {
         // desc
         return (t0.label < t1.label ? 1 : ((t0.label > t1.label) ? -1 : 0));
       });
-      tiles.sort();
-      expect(tiles.tiles[0]).toBe(tile2);
-      expect(tiles.tiles[1]).toBe(tile1);
-      expect(tiles.tiles[2]).toBe(tile0);
-      expect(tiles.filteredTiles[0]).toBe(tile2);
-      expect(tiles.filteredTiles[1]).toBe(tile1);
-      expect(tiles.filteredTiles[2]).toBe(tile0);
+      tileGrid.sort();
+      expect(tileGrid.tiles[0]).toBe(tile2);
+      expect(tileGrid.tiles[1]).toBe(tile1);
+      expect(tileGrid.tiles[2]).toBe(tile0);
+      expect(tileGrid.filteredTiles[0]).toBe(tile2);
+      expect(tileGrid.filteredTiles[1]).toBe(tile1);
+      expect(tileGrid.filteredTiles[2]).toBe(tile0);
 
-      tiles.setComparator(function(t0, t1) {
+      tileGrid.setComparator(function(t0, t1) {
         // asc
         return (t0.label < t1.label ? -1 : ((t0.label > t1.label) ? 1 : 0));
       });
-      tiles.sort();
-      expect(tiles.tiles[0]).toBe(tile0);
-      expect(tiles.tiles[1]).toBe(tile1);
-      expect(tiles.tiles[2]).toBe(tile2);
-      expect(tiles.filteredTiles[0]).toBe(tile0);
-      expect(tiles.filteredTiles[1]).toBe(tile1);
-      expect(tiles.filteredTiles[2]).toBe(tile2);
+      tileGrid.sort();
+      expect(tileGrid.tiles[0]).toBe(tile0);
+      expect(tileGrid.tiles[1]).toBe(tile1);
+      expect(tileGrid.tiles[2]).toBe(tile2);
+      expect(tileGrid.filteredTiles[0]).toBe(tile0);
+      expect(tileGrid.filteredTiles[1]).toBe(tile1);
+      expect(tileGrid.filteredTiles[2]).toBe(tile2);
     });
 
     it('is executed when new tiles are added', function() {
-      var tiles = createTileGrid(0);
+      var tileGrid = createTileGrid(0);
       var tile0 = createTile({
         label: "a"
       });
@@ -534,25 +534,25 @@ describe("TileGrid", function() {
       var tile2 = createTile({
         label: "c"
       });
-      tiles.insertTiles([tile0, tile1]);
+      tileGrid.insertTiles([tile0, tile1]);
 
-      tiles.setComparator(function(t0, t1) {
+      tileGrid.setComparator(function(t0, t1) {
         // desc
         return (t0.label < t1.label ? 1 : ((t0.label > t1.label) ? -1 : 0));
       });
-      tiles.sort();
-      expect(tiles.tiles[0]).toBe(tile1);
-      expect(tiles.tiles[1]).toBe(tile0);
-      expect(tiles.filteredTiles[0]).toBe(tile1);
-      expect(tiles.filteredTiles[1]).toBe(tile0);
+      tileGrid.sort();
+      expect(tileGrid.tiles[0]).toBe(tile1);
+      expect(tileGrid.tiles[1]).toBe(tile0);
+      expect(tileGrid.filteredTiles[0]).toBe(tile1);
+      expect(tileGrid.filteredTiles[1]).toBe(tile0);
 
-      tiles.insertTiles([tile2]);
-      expect(tiles.tiles[0]).toBe(tile2);
-      expect(tiles.tiles[1]).toBe(tile1);
-      expect(tiles.tiles[2]).toBe(tile0);
-      expect(tiles.filteredTiles[0]).toBe(tile2);
-      expect(tiles.filteredTiles[1]).toBe(tile1);
-      expect(tiles.filteredTiles[2]).toBe(tile0);
+      tileGrid.insertTiles([tile2]);
+      expect(tileGrid.tiles[0]).toBe(tile2);
+      expect(tileGrid.tiles[1]).toBe(tile1);
+      expect(tileGrid.tiles[2]).toBe(tile0);
+      expect(tileGrid.filteredTiles[0]).toBe(tile2);
+      expect(tileGrid.filteredTiles[1]).toBe(tile1);
+      expect(tileGrid.filteredTiles[2]).toBe(tile0);
     });
 
   });
@@ -562,45 +562,45 @@ describe("TileGrid", function() {
     describe('with multiSelect = false', function() {
 
       it('on a deselected tile selects the tile', function() {
-        var tiles = createTileGrid(3, {
+        var tileGrid = createTileGrid(3, {
           selectable: true
         });
-        tiles.render();
-        var tile0 = tiles.tiles[0];
+        tileGrid.render();
+        var tile0 = tileGrid.tiles[0];
 
         tile0.$container.triggerMouseDown();
         expect(tile0.selected).toBe(true);
-        expect(tiles.selectedTiles.length).toBe(1);
+        expect(tileGrid.selectedTiles.length).toBe(1);
       });
 
       it('on a deselected tile selects the tile and unselects others', function() {
-        var tiles = createTileGrid(3, {
+        var tileGrid = createTileGrid(3, {
           selectable: true
         });
-        tiles.render();
-        var tile0 = tiles.tiles[0];
-        var tile1 = tiles.tiles[1];
-        tiles.selectTile(tile1);
+        tileGrid.render();
+        var tile0 = tileGrid.tiles[0];
+        var tile1 = tileGrid.tiles[1];
+        tileGrid.selectTile(tile1);
         expect(tile1.selected).toBe(true);
 
         tile0.$container.triggerMouseDown();
         expect(tile0.selected).toBe(true);
         expect(tile1.selected).toBe(false);
-        expect(tiles.selectedTiles.length).toBe(1);
+        expect(tileGrid.selectedTiles.length).toBe(1);
       });
 
       it('on a selected tile deselects the tile', function() {
-        var tiles = createTileGrid(3, {
+        var tileGrid = createTileGrid(3, {
           selectable: true
         });
-        tiles.render();
-        var tile0 = tiles.tiles[0];
-        tiles.selectTile(tile0);
+        tileGrid.render();
+        var tile0 = tileGrid.tiles[0];
+        tileGrid.selectTile(tile0);
         expect(tile0.selected).toBe(true);
 
         tile0.$container.triggerMouseDown();
         expect(tile0.selected).toBe(false);
-        expect(tiles.selectedTiles.length).toBe(0);
+        expect(tileGrid.selectedTiles.length).toBe(0);
       });
 
     });
@@ -608,79 +608,79 @@ describe("TileGrid", function() {
     describe('with multiSelect = true', function() {
 
       it('on a deselected tile selects the tile', function() {
-        var tiles = createTileGrid(3, {
+        var tileGrid = createTileGrid(3, {
           selectable: true,
           multiSelect: true
         });
-        tiles.render();
-        var tile0 = tiles.tiles[0];
+        tileGrid.render();
+        var tile0 = tileGrid.tiles[0];
 
         tile0.$container.triggerMouseDown();
         expect(tile0.selected).toBe(true);
-        expect(tiles.selectedTiles.length).toBe(1);
+        expect(tileGrid.selectedTiles.length).toBe(1);
       });
 
       it('on a deselected tile selects the tile and unselects others', function() {
-        var tiles = createTileGrid(3, {
+        var tileGrid = createTileGrid(3, {
           selectable: true,
           multiSelect: true
         });
-        tiles.render();
-        var tile0 = tiles.tiles[0];
-        var tile1 = tiles.tiles[1];
-        tiles.selectTile(tile1);
+        tileGrid.render();
+        var tile0 = tileGrid.tiles[0];
+        var tile1 = tileGrid.tiles[1];
+        tileGrid.selectTile(tile1);
         expect(tile1.selected).toBe(true);
 
         tile0.$container.triggerMouseDown();
         expect(tile0.selected).toBe(true);
         expect(tile1.selected).toBe(false);
-        expect(tiles.selectedTiles.length).toBe(1);
+        expect(tileGrid.selectedTiles.length).toBe(1);
       });
 
       it('on a selected tile deselects the tile', function() {
-        var tiles = createTileGrid(3, {
+        var tileGrid = createTileGrid(3, {
           selectable: true,
           multiSelect: true
         });
-        tiles.render();
-        var tile0 = tiles.tiles[0];
-        tiles.selectTile(tile0);
+        tileGrid.render();
+        var tile0 = tileGrid.tiles[0];
+        tileGrid.selectTile(tile0);
         expect(tile0.selected).toBe(true);
 
         tile0.$container.triggerMouseDown();
         expect(tile0.selected).toBe(false);
-        expect(tiles.selectedTiles.length).toBe(0);
+        expect(tileGrid.selectedTiles.length).toBe(0);
       });
 
       it('on a selected tile keeps the selection but deselects others if other tiles are selected', function() {
-        var tiles = createTileGrid(3, {
+        var tileGrid = createTileGrid(3, {
           selectable: true,
           multiSelect: true
         });
-        tiles.render();
-        var tile0 = tiles.tiles[0];
-        var tile1 = tiles.tiles[1];
-        tiles.selectTiles([tile0, tile1]);
+        tileGrid.render();
+        var tile0 = tileGrid.tiles[0];
+        var tile1 = tileGrid.tiles[1];
+        tileGrid.selectTiles([tile0, tile1]);
         expect(tile0.selected).toBe(true);
         expect(tile1.selected).toBe(true);
 
         tile0.$container.triggerMouseDown();
         expect(tile0.selected).toBe(true);
         expect(tile1.selected).toBe(false);
-        expect(tiles.selectedTiles.length).toBe(1);
+        expect(tileGrid.selectedTiles.length).toBe(1);
       });
 
       describe('with CTRL pressed', function() {
 
         it('on a deselected tile adds the tile to the selection', function() {
-          var tiles = createTileGrid(3, {
+          var tileGrid = createTileGrid(3, {
             selectable: true,
             multiSelect: true
           });
-          tiles.render();
-          var tile0 = tiles.tiles[0];
-          var tile1 = tiles.tiles[1];
-          tiles.selectTile(tile1);
+          tileGrid.render();
+          var tile0 = tileGrid.tiles[0];
+          var tile1 = tileGrid.tiles[1];
+          tileGrid.selectTile(tile1);
           expect(tile0.selected).toBe(false);
           expect(tile1.selected).toBe(true);
 
@@ -689,18 +689,18 @@ describe("TileGrid", function() {
           });
           expect(tile0.selected).toBe(true);
           expect(tile1.selected).toBe(true);
-          expect(tiles.selectedTiles.length).toBe(2);
+          expect(tileGrid.selectedTiles.length).toBe(2);
         });
 
         it('on a selected tile removes the tile from the selection', function() {
-          var tiles = createTileGrid(3, {
+          var tileGrid = createTileGrid(3, {
             selectable: true,
             multiSelect: true
           });
-          tiles.render();
-          var tile0 = tiles.tiles[0];
-          var tile1 = tiles.tiles[1];
-          tiles.selectTiles([tile0, tile1]);
+          tileGrid.render();
+          var tile0 = tileGrid.tiles[0];
+          var tile1 = tileGrid.tiles[1];
+          tileGrid.selectTiles([tile0, tile1]);
           expect(tile0.selected).toBe(true);
           expect(tile1.selected).toBe(true);
 
@@ -709,7 +709,7 @@ describe("TileGrid", function() {
           });
           expect(tile0.selected).toBe(false);
           expect(tile1.selected).toBe(true);
-          expect(tiles.selectedTiles.length).toBe(1);
+          expect(tileGrid.selectedTiles.length).toBe(1);
         });
 
       });
@@ -721,76 +721,76 @@ describe("TileGrid", function() {
   describe('filter', function() {
 
     it('filters the tiles according to the added filters', function() {
-      var tiles = createTileGrid(3);
-      expect(tiles.filteredTiles.length).toBe(3);
+      var tileGrid = createTileGrid(3);
+      expect(tileGrid.filteredTiles.length).toBe(3);
 
       var filter1 = {
         accept: function(tile) {
           return tile.label.indexOf('1') < 0;
         }
       };
-      tiles.addFilter(filter1);
-      tiles.filter();
-      expect(tiles.filteredTiles.length).toBe(2);
-      expect(tiles.filteredTiles[0]).toBe(tiles.tiles[0]);
-      expect(tiles.filteredTiles[1]).toBe(tiles.tiles[2]);
-      expect(tiles.tiles[0].filterAccepted).toBe(true);
-      expect(tiles.tiles[1].filterAccepted).toBe(false);
-      expect(tiles.tiles[2].filterAccepted).toBe(true);
+      tileGrid.addFilter(filter1);
+      tileGrid.filter();
+      expect(tileGrid.filteredTiles.length).toBe(2);
+      expect(tileGrid.filteredTiles[0]).toBe(tileGrid.tiles[0]);
+      expect(tileGrid.filteredTiles[1]).toBe(tileGrid.tiles[2]);
+      expect(tileGrid.tiles[0].filterAccepted).toBe(true);
+      expect(tileGrid.tiles[1].filterAccepted).toBe(false);
+      expect(tileGrid.tiles[2].filterAccepted).toBe(true);
 
       var filter2 = {
         accept: function(tile) {
           return tile.label.indexOf('2') < 0;
         }
       };
-      tiles.addFilter(filter2);
-      tiles.filter();
-      expect(tiles.filteredTiles.length).toBe(1);
-      expect(tiles.filteredTiles[0]).toBe(tiles.tiles[0]);
-      expect(tiles.tiles[0].filterAccepted).toBe(true);
-      expect(tiles.tiles[1].filterAccepted).toBe(false);
-      expect(tiles.tiles[2].filterAccepted).toBe(false);
+      tileGrid.addFilter(filter2);
+      tileGrid.filter();
+      expect(tileGrid.filteredTiles.length).toBe(1);
+      expect(tileGrid.filteredTiles[0]).toBe(tileGrid.tiles[0]);
+      expect(tileGrid.tiles[0].filterAccepted).toBe(true);
+      expect(tileGrid.tiles[1].filterAccepted).toBe(false);
+      expect(tileGrid.tiles[2].filterAccepted).toBe(false);
 
-      tiles.removeFilter(filter1);
-      tiles.filter();
-      expect(tiles.filteredTiles.length).toBe(2);
-      expect(tiles.filteredTiles[0]).toBe(tiles.tiles[0]);
-      expect(tiles.filteredTiles[1]).toBe(tiles.tiles[1]);
-      expect(tiles.tiles[0].filterAccepted).toBe(true);
-      expect(tiles.tiles[1].filterAccepted).toBe(true);
-      expect(tiles.tiles[2].filterAccepted).toBe(false);
+      tileGrid.removeFilter(filter1);
+      tileGrid.filter();
+      expect(tileGrid.filteredTiles.length).toBe(2);
+      expect(tileGrid.filteredTiles[0]).toBe(tileGrid.tiles[0]);
+      expect(tileGrid.filteredTiles[1]).toBe(tileGrid.tiles[1]);
+      expect(tileGrid.tiles[0].filterAccepted).toBe(true);
+      expect(tileGrid.tiles[1].filterAccepted).toBe(true);
+      expect(tileGrid.tiles[2].filterAccepted).toBe(false);
 
-      tiles.removeFilter(filter2);
-      tiles.filter();
-      expect(tiles.filteredTiles.length).toBe(3);
-      expect(tiles.filters.length).toBe(0);
-      expect(tiles.filteredTiles[0]).toBe(tiles.tiles[0]);
-      expect(tiles.filteredTiles[1]).toBe(tiles.tiles[1]);
-      expect(tiles.filteredTiles[2]).toBe(tiles.tiles[2]);
-      expect(tiles.tiles[0].filterAccepted).toBe(true);
-      expect(tiles.tiles[1].filterAccepted).toBe(true);
-      expect(tiles.tiles[2].filterAccepted).toBe(true);
+      tileGrid.removeFilter(filter2);
+      tileGrid.filter();
+      expect(tileGrid.filteredTiles.length).toBe(3);
+      expect(tileGrid.filters.length).toBe(0);
+      expect(tileGrid.filteredTiles[0]).toBe(tileGrid.tiles[0]);
+      expect(tileGrid.filteredTiles[1]).toBe(tileGrid.tiles[1]);
+      expect(tileGrid.filteredTiles[2]).toBe(tileGrid.tiles[2]);
+      expect(tileGrid.tiles[0].filterAccepted).toBe(true);
+      expect(tileGrid.tiles[1].filterAccepted).toBe(true);
+      expect(tileGrid.tiles[2].filterAccepted).toBe(true);
 
       // Add same first filter again
-      tiles.addFilter(filter1);
-      tiles.filter();
-      expect(tiles.filteredTiles.length).toBe(2);
-      expect(tiles.filteredTiles[0]).toBe(tiles.tiles[0]);
-      expect(tiles.filteredTiles[1]).toBe(tiles.tiles[2]);
-      expect(tiles.tiles[0].filterAccepted).toBe(true);
-      expect(tiles.tiles[1].filterAccepted).toBe(false);
-      expect(tiles.tiles[2].filterAccepted).toBe(true);
+      tileGrid.addFilter(filter1);
+      tileGrid.filter();
+      expect(tileGrid.filteredTiles.length).toBe(2);
+      expect(tileGrid.filteredTiles[0]).toBe(tileGrid.tiles[0]);
+      expect(tileGrid.filteredTiles[1]).toBe(tileGrid.tiles[2]);
+      expect(tileGrid.tiles[0].filterAccepted).toBe(true);
+      expect(tileGrid.tiles[1].filterAccepted).toBe(false);
+      expect(tileGrid.tiles[2].filterAccepted).toBe(true);
     });
 
     it('considers newly inserted tiles', function() {
-      var tiles = createTileGrid(3);
+      var tileGrid = createTileGrid(3);
       var tile3 = createTile({
         label: "Tile 3"
       });
       var tile4 = createTile({
         label: "Tile 4"
       });
-      expect(tiles.tiles.length).toBe(3);
+      expect(tileGrid.tiles.length).toBe(3);
 
       var filter = {
         accept: function(tile) {
@@ -798,32 +798,32 @@ describe("TileGrid", function() {
           return tile.label.indexOf('1') >= 0 || tile.label.indexOf('4') >= 0;
         }
       };
-      tiles.addFilter(filter);
-      tiles.filter();
-      expect(tiles.filteredTiles.length).toBe(1);
+      tileGrid.addFilter(filter);
+      tileGrid.filter();
+      expect(tileGrid.filteredTiles.length).toBe(1);
 
       // Insert tile 3 which is not accepted -> still only tile 1 visible
-      tiles.insertTiles(tile3);
-      expect(tiles.tiles.length).toBe(4);
-      expect(tiles.filteredTiles.length).toBe(1);
+      tileGrid.insertTiles(tile3);
+      expect(tileGrid.tiles.length).toBe(4);
+      expect(tileGrid.filteredTiles.length).toBe(1);
 
       // Insert tile 4 which is accepted -> tile 1 and 4 are visible
-      tiles.insertTiles(tile4);
-      expect(tiles.tiles.length).toBe(5);
-      expect(tiles.filteredTiles.length).toBe(2);
-      expect(tiles.filteredTiles[0]).toBe(tiles.tiles[1]);
-      expect(tiles.filteredTiles[1]).toBe(tiles.tiles[4]);
+      tileGrid.insertTiles(tile4);
+      expect(tileGrid.tiles.length).toBe(5);
+      expect(tileGrid.filteredTiles.length).toBe(2);
+      expect(tileGrid.filteredTiles[0]).toBe(tileGrid.tiles[1]);
+      expect(tileGrid.filteredTiles[1]).toBe(tileGrid.tiles[4]);
     });
 
     it('deselects not accepted tiles', function() {
-      var tiles = createTileGrid(3, {
+      var tileGrid = createTileGrid(3, {
         selectable: true
       });
-      tiles.selectTiles([tiles.tiles[0], tiles.tiles[1]]);
-      expect(tiles.filteredTiles.length).toBe(3);
-      expect(tiles.selectedTiles.length).toBe(2);
-      expect(tiles.selectedTiles[0]).toBe(tiles.tiles[0]);
-      expect(tiles.selectedTiles[1]).toBe(tiles.tiles[1]);
+      tileGrid.selectTiles([tileGrid.tiles[0], tileGrid.tiles[1]]);
+      expect(tileGrid.filteredTiles.length).toBe(3);
+      expect(tileGrid.selectedTiles.length).toBe(2);
+      expect(tileGrid.selectedTiles[0]).toBe(tileGrid.tiles[0]);
+      expect(tileGrid.selectedTiles[1]).toBe(tileGrid.tiles[1]);
 
       var filter = {
         accept: function(tile) {
@@ -831,15 +831,15 @@ describe("TileGrid", function() {
           return tile.label.indexOf('1') >= 0;
         }
       };
-      tiles.addFilter(filter);
-      tiles.filter();
-      expect(tiles.filteredTiles.length).toBe(1);
-      expect(tiles.selectedTiles.length).toBe(1);
-      expect(tiles.selectedTiles[0]).toBe(tiles.tiles[1]);
+      tileGrid.addFilter(filter);
+      tileGrid.filter();
+      expect(tileGrid.filteredTiles.length).toBe(1);
+      expect(tileGrid.selectedTiles.length).toBe(1);
+      expect(tileGrid.selectedTiles[0]).toBe(tileGrid.tiles[1]);
     });
 
     it('applies the filters initially, if there is one', function() {
-      var tiles = createTileGrid(3, {
+      var tileGrid = createTileGrid(3, {
         filters: [{
           accept: function(tile) {
             // Accept tile 1 only
@@ -847,13 +847,13 @@ describe("TileGrid", function() {
           }
         }]
       });
-      expect(tiles.tiles.length).toBe(3);
-      expect(tiles.filteredTiles.length).toBe(1);
-      expect(tiles.filteredTiles[0]).toBe(tiles.tiles[1]);
+      expect(tileGrid.tiles.length).toBe(3);
+      expect(tileGrid.filteredTiles.length).toBe(1);
+      expect(tileGrid.filteredTiles[0]).toBe(tileGrid.tiles[1]);
     });
 
     it('applies the filters initially even if every tile is accepted', function() {
-      var tiles = createTileGrid(3, {
+      var tileGrid = createTileGrid(3, {
         filters: [{
           accept: function(tile) {
             // Accept all
@@ -861,17 +861,17 @@ describe("TileGrid", function() {
           }
         }]
       });
-      expect(tiles.tiles.length).toBe(3);
-      expect(tiles.filteredTiles.length).toBe(3);
-      expect(tiles.filteredTiles[0]).toBe(tiles.tiles[0]);
-      expect(tiles.filteredTiles[1]).toBe(tiles.tiles[1]);
-      expect(tiles.filteredTiles[2]).toBe(tiles.tiles[2]);
+      expect(tileGrid.tiles.length).toBe(3);
+      expect(tileGrid.filteredTiles.length).toBe(3);
+      expect(tileGrid.filteredTiles[0]).toBe(tileGrid.tiles[0]);
+      expect(tileGrid.filteredTiles[1]).toBe(tileGrid.tiles[1]);
+      expect(tileGrid.filteredTiles[2]).toBe(tileGrid.tiles[2]);
     });
 
     it('updates empty marker', function() {
-      var tiles = createTileGrid(3);
-      tiles.render();
-      expect(tiles.$container).not.toHaveClass('empty');
+      var tileGrid = createTileGrid(3);
+      tileGrid.render();
+      expect(tileGrid.$container).not.toHaveClass('empty');
 
       var filter = {
         accept: function(tile) {
@@ -879,13 +879,58 @@ describe("TileGrid", function() {
           return false;
         }
       };
-      tiles.addFilter(filter);
-      tiles.filter();
-      expect(tiles.$container).toHaveClass('empty');
+      tileGrid.addFilter(filter);
+      tileGrid.filter();
+      expect(tileGrid.$container).toHaveClass('empty');
 
-      tiles.removeFilter(filter);
-      tiles.filter();
-      expect(tiles.$container).not.toHaveClass('empty');
+      tileGrid.removeFilter(filter);
+      tileGrid.filter();
+      expect(tileGrid.$container).not.toHaveClass('empty');
+    });
+
+    it('still works if moved from one grid to anoter', function() {
+      var tileGrid = createTileGrid();
+      var tile0 = createTile({
+        owner: session.desktop,
+        label: 'Tile 0'
+      });
+      var tile1 = createTile({
+        owner: session.desktop,
+        label: 'Tile 1'
+      });
+      var tile2 = createTile({
+        owner: session.desktop,
+        label: 'Tile 2'
+      });
+
+      var filter1 = {
+        accept: function(tile) {
+          return tile.label.indexOf('1') < 0;
+        }
+      };
+      tileGrid.setTiles([tile0, tile1, tile2]);
+      tileGrid.addFilter(filter1);
+      tileGrid.filter();
+      expect(tileGrid.filteredTiles.length).toBe(2);
+      expect(tileGrid.filteredTiles[0]).toBe(tile0);
+      expect(tileGrid.filteredTiles[1]).toBe(tile2);
+      expect(tileGrid.tiles[0].filterAccepted).toBe(true);
+      expect(tileGrid.tiles[1].filterAccepted).toBe(false);
+      expect(tileGrid.tiles[2].filterAccepted).toBe(true);
+
+      tileGrid.deleteAllTiles();
+      expect(tileGrid.filteredTiles.length).toBe(0);
+
+      var tileGrid2 = createTileGrid(3);
+      tileGrid2.setTiles([tile0, tile1, tile2]);
+      tileGrid2.addFilter(filter1);
+      tileGrid2.filter();
+      expect(tileGrid2.filteredTiles.length).toBe(2);
+      expect(tileGrid2.filteredTiles[0]).toBe(tile0);
+      expect(tileGrid2.filteredTiles[1]).toBe(tile2);
+      expect(tileGrid2.tiles[0].filterAccepted).toBe(true);
+      expect(tileGrid2.tiles[1].filterAccepted).toBe(false);
+      expect(tileGrid2.tiles[2].filterAccepted).toBe(true);
     });
 
   });

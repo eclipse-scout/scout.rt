@@ -34,7 +34,7 @@ public class TileGridTest {
 
   @Test
   public void testAddTile() {
-    P_TileGrid tileGrid = createTestTiles();
+    P_TileGrid tileGrid = createTestTileGrid();
     P_Tile tile0 = createTestTile();
     P_Tile tile1 = createTestTile();
     P_Tile tile2 = createTestTile();
@@ -53,7 +53,7 @@ public class TileGridTest {
 
   @Test
   public void testDeleteTile() {
-    P_TileGrid tileGrid = createTestTiles();
+    P_TileGrid tileGrid = createTestTileGrid();
     P_Tile tile0 = createTestTile();
     P_Tile tile1 = createTestTile();
     P_Tile tile2 = createTestTile();
@@ -71,7 +71,7 @@ public class TileGridTest {
 
   @Test
   public void testDeleteAllTiles() {
-    P_TileGrid tileGrid = createTestTiles();
+    P_TileGrid tileGrid = createTestTileGrid();
     P_Tile tile0 = createTestTile();
     P_Tile tile1 = createTestTile();
     P_Tile tile2 = createTestTile();
@@ -84,7 +84,7 @@ public class TileGridTest {
 
   @Test
   public void testSetTiles() {
-    P_TileGrid tileGrid = createTestTiles();
+    P_TileGrid tileGrid = createTestTileGrid();
     P_Tile tile0 = createTestTile();
     P_Tile tile1 = createTestTile();
     P_Tile tile2 = createTestTile();
@@ -119,7 +119,7 @@ public class TileGridTest {
 
   @Test
   public void testSetTiles_checkOrder() {
-    P_TileGrid tileGrid = createTestTiles();
+    P_TileGrid tileGrid = createTestTileGrid();
     P_Tile tile0 = createTestTile();
     P_Tile tile1 = createTestTile();
     P_Tile tile2 = createTestTile();
@@ -147,7 +147,7 @@ public class TileGridTest {
 
   @Test
   public void testSetTiles_checkOrderWithFilter() {
-    P_TileGrid tileGrid = createTestTiles();
+    P_TileGrid tileGrid = createTestTileGrid();
     P_Tile tile0 = createTestTile();
     P_Tile tile1 = createTestTile();
     P_Tile tile2 = createTestTile();
@@ -175,7 +175,7 @@ public class TileGridTest {
 
   @Test
   public void testSelectTiles() {
-    P_TileGrid tileGrid = createTestTiles();
+    P_TileGrid tileGrid = createTestTileGrid();
     tileGrid.setSelectable(true);
     tileGrid.setMultiSelect(false);
     P_Tile tile0 = createTestTile();
@@ -199,7 +199,7 @@ public class TileGridTest {
 
   @Test
   public void testMultiSelectTiles() {
-    P_TileGrid tileGrid = createTestTiles();
+    P_TileGrid tileGrid = createTestTileGrid();
     tileGrid.setSelectable(true);
     tileGrid.setMultiSelect(true);
     P_Tile tile0 = createTestTile();
@@ -225,7 +225,7 @@ public class TileGridTest {
   @SuppressWarnings("unchecked")
   @Test
   public void testSelectTilesEvent() {
-    P_TileGrid tileGrid = createTestTiles();
+    P_TileGrid tileGrid = createTestTileGrid();
     tileGrid.setSelectable(true);
     tileGrid.setMultiSelect(false);
     P_Tile tile0 = createTestTile();
@@ -244,7 +244,7 @@ public class TileGridTest {
 
   @Test
   public void testSelectTiles_filtered() {
-    P_TileGrid tileGrid = createTestTiles();
+    P_TileGrid tileGrid = createTestTileGrid();
     tileGrid.setSelectable(true);
     P_Tile tile0 = createTestTile();
     P_Tile tile1 = createTestTile();
@@ -275,7 +275,7 @@ public class TileGridTest {
 
   @Test
   public void testDeselectTiles() {
-    P_TileGrid tileGrid = createTestTiles();
+    P_TileGrid tileGrid = createTestTileGrid();
     tileGrid.setSelectable(true);
     tileGrid.setMultiSelect(false);
     P_Tile tile0 = createTestTile();
@@ -295,7 +295,7 @@ public class TileGridTest {
   @SuppressWarnings("unchecked")
   @Test
   public void testDeselectTilesEvent() {
-    P_TileGrid tileGrid = createTestTiles();
+    P_TileGrid tileGrid = createTestTileGrid();
     tileGrid.setSelectable(true);
     tileGrid.setMultiSelect(false);
     P_Tile tile0 = createTestTile();
@@ -319,7 +319,7 @@ public class TileGridTest {
 
   @Test
   public void testDeselectTilesWhenDeleted() {
-    P_TileGrid tileGrid = createTestTiles();
+    P_TileGrid tileGrid = createTestTileGrid();
     tileGrid.setSelectable(true);
     tileGrid.setMultiSelect(true);
     P_Tile tile0 = createTestTile();
@@ -341,7 +341,7 @@ public class TileGridTest {
 
   @Test
   public void testSelectAllTiles() {
-    P_TileGrid tileGrid = createTestTiles();
+    P_TileGrid tileGrid = createTestTileGrid();
     tileGrid.setSelectable(true);
     tileGrid.setMultiSelect(true);
     P_Tile tile0 = createTestTile();
@@ -359,7 +359,7 @@ public class TileGridTest {
 
   @Test
   public void testDeselectAllTiles() {
-    P_TileGrid tileGrid = createTestTiles();
+    P_TileGrid tileGrid = createTestTileGrid();
     tileGrid.setSelectable(true);
     tileGrid.setMultiSelect(true);
     P_Tile tile0 = createTestTile();
@@ -377,7 +377,7 @@ public class TileGridTest {
 
   @Test
   public void testDeselectAllTilesWhenAllDeleted() {
-    P_TileGrid tileGrid = createTestTiles();
+    P_TileGrid tileGrid = createTestTileGrid();
     tileGrid.setSelectable(true);
     tileGrid.setMultiSelect(true);
     P_Tile tile0 = createTestTile();
@@ -396,7 +396,7 @@ public class TileGridTest {
 
   @Test
   public void testFilterTiles() {
-    P_TileGrid tileGrid = createTestTiles();
+    P_TileGrid tileGrid = createTestTileGrid();
     P_Tile tile0 = createTestTile();
     P_Tile tile1 = createTestTile();
     P_Tile tile2 = createTestTile();
@@ -445,7 +445,7 @@ public class TileGridTest {
 
   @Test
   public void testFilterTiles_deselectTiles() {
-    P_TileGrid tileGrid = createTestTiles();
+    P_TileGrid tileGrid = createTestTileGrid();
     tileGrid.setSelectable(true);
     P_Tile tile0 = createTestTile();
     P_Tile tile1 = createTestTile();
@@ -468,7 +468,7 @@ public class TileGridTest {
 
   @Test
   public void testFilterTiles_insertTiles() {
-    P_TileGrid tileGrid = createTestTiles();
+    P_TileGrid tileGrid = createTestTileGrid();
     P_Tile tile0 = createTestTile();
     P_Tile tile1 = createTestTile();
     P_Tile tile2 = createTestTile();
@@ -500,7 +500,7 @@ public class TileGridTest {
 
   @Test
   public void testSortTiles() {
-    P_TileGrid tileGrid = createTestTiles();
+    P_TileGrid tileGrid = createTestTileGrid();
     P_Tile tile0 = createTestTile();
     tile0.text = "b";
     P_Tile tile1 = createTestTile();
@@ -528,7 +528,7 @@ public class TileGridTest {
 
   @Test
   public void testSortFilteredTiles() {
-    P_TileGrid tileGrid = createTestTiles();
+    P_TileGrid tileGrid = createTestTileGrid();
     P_Tile tile0 = createTestTile();
     tile0.text = "c";
     P_Tile tile1 = createTestTile();
@@ -564,9 +564,53 @@ public class TileGridTest {
   }
 
   /**
+   * Moves tiles from one grid to another
+   */
+  @Test
+  public void test_ReuseTiles() {
+    P_TileGrid tileGrid = createTestTileGrid();
+    P_Tile tile0 = createTestTile();
+    P_Tile tile1 = createTestTile();
+    P_Tile tile2 = createTestTile();
+    tileGrid.addTiles(Arrays.asList(tile0, tile1, tile2));
+    assertEquals(tile0.getContainer(), tileGrid);
+    assertEquals(tile1.getContainer(), tileGrid);
+    assertEquals(tile2.getContainer(), tileGrid);
+
+    ITileFilter filter1 = (tile) -> tile != tile1; // accept tile0 and tile2
+    tileGrid.addFilter(filter1);
+    assertEquals(3, tileGrid.getTiles().size());
+    assertEquals(2, tileGrid.getFilteredTiles().size());
+    assertEquals(tile0, tileGrid.getFilteredTiles().get(0));
+    assertEquals(tile2, tileGrid.getFilteredTiles().get(1));
+    assertEquals(true, tileGrid.getTiles().get(0).isFilterAccepted());
+    assertEquals(false, tileGrid.getTiles().get(1).isFilterAccepted());
+    assertEquals(true, tileGrid.getTiles().get(2).isFilterAccepted());
+
+    // Delete tiles from grid and add them to another one
+    tileGrid.deleteAllTiles();
+
+    P_TileGrid tileGrid2 = createTestTileGrid();
+    tileGrid2.setTiles(Arrays.asList(tile0, tile1, tile2));
+    assertEquals(tile0.getContainer(), tileGrid2);
+    assertEquals(tile1.getContainer(), tileGrid2);
+    assertEquals(tile2.getContainer(), tileGrid2);
+
+    // Assert that filter works correctly
+    tileGrid2.addFilter(filter1);
+    assertEquals(3, tileGrid2.getTiles().size());
+    assertEquals(2, tileGrid2.getFilteredTiles().size());
+    assertEquals(tile0, tileGrid2.getFilteredTiles().get(0));
+    assertEquals(tile2, tileGrid2.getFilteredTiles().get(1));
+    assertEquals(true, tileGrid2.getTiles().get(0).isFilterAccepted());
+    assertEquals(false, tileGrid2.getTiles().get(1).isFilterAccepted());
+    assertEquals(true, tileGrid2.getTiles().get(2).isFilterAccepted());
+  }
+
+  /**
    * Creates an empty tiles element.
    */
-  private P_TileGrid createTestTiles() {
+  private P_TileGrid createTestTileGrid() {
     P_TileGrid tileGrid = new P_TileGrid();
     tileGrid.init();
     return tileGrid;

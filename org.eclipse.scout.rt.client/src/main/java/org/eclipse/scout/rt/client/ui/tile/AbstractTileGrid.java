@@ -372,6 +372,8 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
 
   protected void addTileInternal(T tile) {
     tile.setContainer(this);
+    // Reset state in case tile was used in another grid
+    tile.setFilterAccepted(true);
   }
 
   protected void setTilesInternal(List<T> tiles) {
@@ -745,7 +747,7 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
 
   @Override
   public int getFilteredTileCount() {
-    return getFilteredTiles().size();
+    return getFilteredTilesInternal().size();
   }
 
   protected List<T> filterTiles(List<T> tiles) {
