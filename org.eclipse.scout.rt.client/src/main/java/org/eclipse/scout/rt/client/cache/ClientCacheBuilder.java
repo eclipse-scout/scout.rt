@@ -29,7 +29,7 @@ public class ClientCacheBuilder<K, V> extends CacheBuilder<K, V> {
   @Override
   protected ICache<K, V> createBasicCache(Map<K, V> cacheMap) {
     ICacheValueResolver<K, V> valueResolver = getValueResolver();
-    if (isSharedAndRemoteAvailable()) {
+    if (isSharedAndRemoteAvailable() && isRemoteValueResolverEnabled()) {
       valueResolver = new RemoteCacheValueResolver<>(getCacheId());
     }
     BasicCache<K, V> cache = new BasicCache<>(getCacheId(), valueResolver, cacheMap, isAtomicInsertion());

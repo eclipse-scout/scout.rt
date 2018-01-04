@@ -40,6 +40,7 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
   private String m_cacheId;
   private ICacheValueResolver<K, V> m_valueResolver;
   private boolean m_shared;
+  private boolean m_remoteValueResolverEnabled;
   private boolean m_threadSafe;
   private boolean m_atomicInsertion;
   private boolean m_clusterEnabled;
@@ -54,6 +55,7 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
   public CacheBuilder() {
     m_cacheInstances = new ArrayList<>();
     m_customWrappers = new ArrayList<>();
+    m_remoteValueResolverEnabled = true;
     m_threadSafe = true;
   }
 
@@ -178,6 +180,16 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
 
   public boolean isShared() {
     return m_shared;
+  }
+
+  @Override
+  public CacheBuilder<K, V> withRemoteValueResolverEnabled(boolean remoteValueResolverEnabled) {
+    m_remoteValueResolverEnabled = remoteValueResolverEnabled;
+    return this;
+  }
+
+  public boolean isRemoteValueResolverEnabled() {
+    return m_remoteValueResolverEnabled;
   }
 
   @Override

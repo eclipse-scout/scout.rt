@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.cache;
 
+import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.Bean;
@@ -65,6 +66,15 @@ public interface ICacheBuilder<K, V> {
    * @return this builder
    */
   ICacheBuilder<K, V> withShared(boolean shared);
+
+  /**
+   * @param remoteValueResolverEnabled
+   *          Usually an application client of a shared cache uses the remote cache to resolve a cache value. With this
+   *          property, this behavior can be disabled and the client uses too the local value resolver. This may be
+   *          useful if a cache value is not {@link Serializable}. (Default true)
+   * @return this builder
+   */
+  CacheBuilder<K, V> withRemoteValueResolverEnabled(boolean remoteValueResolverEnabled);
 
   /**
    * @param threadSafe
