@@ -160,13 +160,6 @@ scout.menus = {
     }
   },
 
-  isDefaultKeyStroke: function(keyStroke) {
-    return scout.isOneOf(scout.keys.ENTER, keyStroke.which) &&
-      !keyStroke.ctrl &&
-      !keyStroke.alt &&
-      !keyStroke.shift;
-  },
-
   createEllipsisMenu: function(options) {
     var defaults = {
       iconId: scout.icons.ELLIPSIS_V,

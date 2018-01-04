@@ -39,9 +39,6 @@ scout.Menu.SUBMENU_ICON = scout.icons.ANGLE_DOWN;
 
 scout.Menu.prototype._init = function(options) {
   scout.Menu.parent.prototype._init.call(this, options);
-  if (options.defaultMenu !== false && options.defaultMenu !== true) {
-    this.defaultMenu = scout.menus.isDefaultKeyStroke(this.actionKeyStroke);
-  }
 };
 
 /**

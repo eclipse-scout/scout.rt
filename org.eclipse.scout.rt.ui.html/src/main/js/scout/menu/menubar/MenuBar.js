@@ -103,7 +103,6 @@ scout.MenuBar.prototype._renderProperties = function() {
   this._renderMenuItems();
 };
 
-
 scout.MenuBar.prototype._remove = function() {
   scout.MenuBar.parent.prototype._remove.call(this);
   this._removeMenuItems();
@@ -140,11 +139,11 @@ scout.MenuBar.prototype._setMenuItems = function(menuItems, rightFirst) {
 
   this.orderedMenuItems = this._createOrderedMenus(menuItems);
 
-  if(rightFirst){
+  if (rightFirst) {
     this.menuboxRight.setMenuItems(this.orderedMenuItems.right);
     this.menuboxLeft.setMenuItems(this.orderedMenuItems.left);
 
-  }else{
+  } else {
     this.menuboxLeft.setMenuItems(this.orderedMenuItems.left);
     this.menuboxRight.setMenuItems(this.orderedMenuItems.right);
   }
@@ -158,7 +157,7 @@ scout.MenuBar.prototype._setMenuItems = function(menuItems, rightFirst) {
   this.updateDefaultMenu();
   this._updateTabbableMenu();
 
-    this._setProperty('menuItems', menuItems);
+  this._setProperty('menuItems', menuItems);
 };
 
 scout.MenuBar.prototype._renderMenuItems = function() {
@@ -292,12 +291,19 @@ scout.MenuBar.prototype.updateDefaultMenu = function() {
       // property set to false cannot be the default menu.
       return false;
     }
-    return item.defaultMenu;
+    return item.defaultMenu || this._isDefaultKeyStroke(item.actionKeyStroke);
   }, this);
   this.setDefaultMenu(defaultMenu);
   if (defaultMenu && defaultMenu.isTabTarget()) {
     this.setTabbableMenu(defaultMenu);
   }
+};
+
+scout.MenuBar.prototype._isDefaultKeyStroke = function(keyStroke) {
+  return scout.isOneOf(scout.keys.ENTER, keyStroke.which) &&
+    !keyStroke.ctrl &&
+    !keyStroke.alt &&
+    !keyStroke.shift;
 };
 
 scout.MenuBar.prototype.setDefaultMenu = function(defaultMenu) {
