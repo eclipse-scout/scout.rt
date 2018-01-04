@@ -65,40 +65,34 @@
     }
   }
 
-  & .tab-box.in-table-control > .tab-area {
+  & .tab-box > .tab-box-header {
     margin-top: 0;
     margin-left: 0;
 
-    &::after {
+    & > .tab-box-header-bottom-border {
       display: none;
     }
 
-    & > .tab-item {
-      border-top: solid 3px transparent;
-      border-bottom-color: transparent;
-
-      &:focus::before {
-         top: @group-title-padding-bottom;
-       }
-
-      & > .label {
-        /* Reverse paddings because border is now on top */
-        padding-top: @group-title-padding-bottom;
-        padding-bottom: @group-title-padding-top;
+    & .tab-area {
+      > .selection-marker {
+        z-index: 2;
+        height: 3px;
+        bottom: auto;
+        top: 0;
+        margin-bottom: 0;
+        background-color: @tab-item-active-color;
       }
 
-      &.selected {
-        border-top-color: @tab-item-active-color;
-      }
+      & > .tab-item {
+        z-index: 2;
 
-      &.marked:not(.selected) {
-        border-top-color: @palette-gray-6;
+        &::after {
+          top: 0;
+          height: 3px;
+          margin-bottom: auto;
+        }
       }
     }
-  }
-
-  & .tab-area > .tab-item {
-    z-index: 2;
   }
 }
 
