@@ -124,7 +124,9 @@ scout.Table.prototype._initColumns = function() {
   if (this.rowIconVisible) {
     this._insertRowIconColumn();
   }
-  this._syncCheckable(this.checkable);
+  if (this.checkable && this.checkableStyle === scout.Table.CheckableStyle.CHECKBOX) {
+    this._insertBooleanColumn();
+  }
 
   // Sync head and tail sort columns
   this._syncHeadAndTailSortColumns();
