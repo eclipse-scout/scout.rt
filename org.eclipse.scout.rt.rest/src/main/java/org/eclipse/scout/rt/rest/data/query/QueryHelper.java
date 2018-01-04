@@ -55,16 +55,19 @@ public class QueryHelper {
     if (str == null || str.isEmpty()) {
       return splitted;
     }
-    boolean inBrackets = false;
+    int bracketCounter = 0;
     StringBuilder token = new StringBuilder();
     for (Character character : str.toCharArray()) {
       if (character.equals('(')) {
-        inBrackets = true;
+        bracketCounter++;
       }
       else if (character.equals(')')) {
-        inBrackets = false;
+        bracketCounter--;
+        if (bracketCounter < 0) {
+          throw new IllegalStateException("Parsing failed, closing bracket before opening bracket detected.");
+        }
       }
-      else if (character.equals(',') && !inBrackets) {
+      else if (character.equals(',') && bracketCounter == 0) {
         splitted.add(token.toString());
         token = new StringBuilder();
         continue;
@@ -72,6 +75,9 @@ public class QueryHelper {
       token.append(character);
     }
     splitted.add(token.toString());
+    if (bracketCounter != 0) {
+      throw new IllegalStateException("Parsing failed, number of opening brackets doesn't match the number of the closing brackets.");
+    }
     return splitted;
   }
 

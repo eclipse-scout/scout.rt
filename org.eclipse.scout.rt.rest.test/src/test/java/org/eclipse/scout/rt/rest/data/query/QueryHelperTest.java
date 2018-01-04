@@ -55,22 +55,39 @@ public class QueryHelperTest {
 
   @Test
   public void testSplit_Brackets() {
-    List<String> split = queryHelper.split("abc(ccc,ddd),qqq,aaa(xxx(bbb,asdf)))");
+    List<String> split = queryHelper.split("abc(ccc,ddd),qqq,aaa(xxx(bbb,asdf))");
     assertEquals(3, split.size());
     assertEquals("abc(ccc,ddd)", split.get(0));
     assertEquals("qqq", split.get(1));
-    assertEquals("aaa(xxx(bbb,asdf)))", split.get(2));
+    assertEquals("aaa(xxx(bbb,asdf))", split.get(2));
   }
 
-  /**
-   * Brackets are invalid -> should not affect splitting
-   */
   @Test
-  public void testSplit_BracketsInvalid() {
-    List<String> split = queryHelper.split("abc(ccc,)ddd),qqq,aaa(xxx(bbb,asdf)))");
+  public void testSplit_bracketsInBrackets() {
+    String bracketString = "abc(aaa(axx),bbb,ccc)";
+    List<String> split = queryHelper.split(bracketString);
+    assertEquals(1, split.size());
+    int indexOfOpeningBracket = bracketString.indexOf("(");
+    int indexOfClosingBracket = bracketString.lastIndexOf(")");
+    String subBracketString = bracketString.substring(indexOfOpeningBracket + 1, indexOfClosingBracket);
+    split = queryHelper.split(subBracketString);
     assertEquals(3, split.size());
-    assertEquals("abc(ccc,)ddd)", split.get(0));
-    assertEquals("qqq", split.get(1));
-    assertEquals("aaa(xxx(bbb,asdf)))", split.get(2));
+    assertEquals("aaa(axx)", split.get(0));
+    assertEquals("bbb", split.get(1));
+    assertEquals("ccc", split.get(2));
+  }
+
+  @Test
+  public void testSplit_bracketsInBrackets2Includes() {
+    String bracketString = "abc(aaa(axx),bbb,ccc),ddd";
+    List<String> split = queryHelper.split(bracketString);
+    assertEquals(2, split.size());
+    assertEquals("abc(aaa(axx),bbb,ccc)", split.get(0));
+    assertEquals("ddd", split.get(1));
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testSplit_BracketsInvalid() {
+    queryHelper.split("abc(ccc,)ddd),qqq,aaa(xxx(bbb,asdf)))");
   }
 }

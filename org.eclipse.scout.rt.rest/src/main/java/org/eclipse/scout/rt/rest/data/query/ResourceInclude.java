@@ -95,7 +95,7 @@ public class ResourceInclude extends Include {
     String subInclude = null;
     String includeName = includeParam;
     int indexOfOpeningBracket = includeParam.indexOf('(');
-    int indexOfClosingBracket = includeParam.indexOf(')');
+    int indexOfClosingBracket = includeParam.lastIndexOf(')');
     if (indexOfOpeningBracket > -1) {
       if (indexOfClosingBracket < 0) {
         throw new IllegalArgumentException("Missing closing bracket");
