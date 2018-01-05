@@ -153,7 +153,7 @@ public class TileGridTest {
     P_Tile tile2 = createTestTile();
     tileGrid.addTiles(Arrays.asList(tile0, tile1, tile2));
 
-    ITileFilter filter = (tile) -> tile != tile1; // accept tile0 and tile2
+    ITileFilter<P_Tile> filter = (tile) -> tile != tile1; // accept tile0 and tile2
     tileGrid.addFilter(filter);
     assertEquals(3, tileGrid.getTiles().size());
     assertEquals(tile0, tileGrid.getTiles().get(0));
@@ -255,7 +255,7 @@ public class TileGridTest {
     assertEquals(0, tileGrid.getSelectedTiles().size());
 
     // Only tile1 is visible -> only tile1 may be selected
-    ITileFilter filter = (tile) -> tile == tile1; // accept tile1
+    ITileFilter<P_Tile> filter = (tile) -> tile == tile1; // accept tile1
     tileGrid.addFilter(filter);
     tileGrid.selectTiles(Arrays.asList(tile0, tile1));
     assertEquals(3, tileGrid.getTiles().size());
@@ -404,7 +404,7 @@ public class TileGridTest {
     assertEquals(3, tileGrid.getTiles().size());
     assertEquals(3, tileGrid.getFilteredTiles().size());
 
-    ITileFilter filter1 = (tile) -> tile != tile1; // accept tile0 and tile2
+    ITileFilter<P_Tile> filter1 = (tile) -> tile != tile1; // accept tile0 and tile2
     tileGrid.addFilter(filter1);
     assertEquals(3, tileGrid.getTiles().size());
     assertEquals(2, tileGrid.getFilteredTiles().size());
@@ -414,7 +414,7 @@ public class TileGridTest {
     assertEquals(false, tileGrid.getTiles().get(1).isFilterAccepted());
     assertEquals(true, tileGrid.getTiles().get(2).isFilterAccepted());
 
-    ITileFilter filter2 = (tile) -> tile != tile0; // accept tile1 and tile2
+    ITileFilter<P_Tile> filter2 = (tile) -> tile != tile0; // accept tile1 and tile2
     tileGrid.addFilter(filter2);
     assertEquals(3, tileGrid.getTiles().size());
     assertEquals(1, tileGrid.getFilteredTiles().size());
@@ -458,7 +458,7 @@ public class TileGridTest {
     assertEquals(tile0, tileGrid.getSelectedTiles().get(0));
     assertEquals(tile1, tileGrid.getSelectedTiles().get(1));
 
-    ITileFilter filter = (tile) -> tile == tile1; // accept tile1
+    ITileFilter<P_Tile> filter = (tile) -> tile == tile1; // accept tile1
     tileGrid.addFilter(filter);
     assertEquals(3, tileGrid.getTiles().size());
     assertEquals(1, tileGrid.getFilteredTiles().size());
@@ -478,7 +478,7 @@ public class TileGridTest {
     assertEquals(3, tileGrid.getTiles().size());
     assertEquals(3, tileGrid.getFilteredTiles().size());
 
-    ITileFilter filter = (tile) -> tile == tile1 || tile == tile4; // accept tile1 and 4
+    ITileFilter<P_Tile> filter = (tile) -> tile == tile1 || tile == tile4; // accept tile1 and 4
     tileGrid.addFilter(filter);
     assertEquals(3, tileGrid.getTiles().size());
     assertEquals(1, tileGrid.getFilteredTiles().size());
@@ -550,7 +550,7 @@ public class TileGridTest {
     assertEquals(tile1, tileGrid.getTiles().get(1));
     assertEquals(tile2, tileGrid.getTiles().get(2));
 
-    ITileFilter filter = (tile) -> !((P_Tile) tile).text.equals("d"); // accept tile0, tile2 and tile3
+    ITileFilter<P_Tile> filter = (tile) -> !((P_Tile) tile).text.equals("d"); // accept tile0, tile2 and tile3
     tileGrid.addFilter(filter);
     assertEquals(2, tileGrid.getFilteredTiles().size());
     assertEquals(tile0, tileGrid.getFilteredTiles().get(0));
@@ -587,7 +587,7 @@ public class TileGridTest {
     assertEquals(tile1.getContainer(), tileGrid);
     assertEquals(tile2.getContainer(), tileGrid);
 
-    ITileFilter filter1 = (tile) -> tile != tile1; // accept tile0 and tile2
+    ITileFilter<P_Tile> filter1 = (tile) -> tile != tile1; // accept tile0 and tile2
     tileGrid.addFilter(filter1);
     assertEquals(3, tileGrid.getTiles().size());
     assertEquals(2, tileGrid.getFilteredTiles().size());

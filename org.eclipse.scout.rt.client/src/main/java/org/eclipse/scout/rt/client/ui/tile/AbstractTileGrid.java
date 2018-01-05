@@ -44,7 +44,7 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   private ITileGridUIFacade m_uiFacade;
   private final ObjectExtensions<AbstractTileGrid, ITileGridExtension<T, ? extends AbstractTileGrid>> m_objectExtensions;
   private ContributionComposite m_contributionHolder;
-  private List<ITileFilter> m_filters;
+  private List<ITileFilter<T>> m_filters;
   private boolean m_filteredTilesDirty = false;
   private Comparator<T> m_comparator;
 
@@ -638,12 +638,12 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   }
 
   @Override
-  public List<ITileFilter> getFilters() {
+  public List<ITileFilter<T>> getFilters() {
     return CollectionUtility.arrayList(m_filters);
   }
 
   @Override
-  public void addFilter(ITileFilter filter, boolean applyFilters) {
+  public void addFilter(ITileFilter<T> filter, boolean applyFilters) {
     if (filter == null || m_filters.contains(filter)) {
       return;
     }
@@ -654,19 +654,19 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   }
 
   @Override
-  public void addFilter(ITileFilter filter) {
+  public void addFilter(ITileFilter<T> filter) {
     addFilter(filter, true);
   }
 
   @Override
-  public void removeFilter(ITileFilter filter, boolean applyFilters) {
+  public void removeFilter(ITileFilter<T> filter, boolean applyFilters) {
     if (filter != null && m_filters.remove(filter) && applyFilters) {
       filter();
     }
   }
 
   @Override
-  public void removeFilter(ITileFilter filter) {
+  public void removeFilter(ITileFilter<T> filter) {
     removeFilter(filter, true);
   }
 
@@ -718,9 +718,9 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
     return filterChanged;
   }
 
-  protected void applyFilters(ITile tile) {
+  protected void applyFilters(T tile) {
     tile.setFilterAccepted(true);
-    for (ITileFilter filter : m_filters) {
+    for (ITileFilter<T> filter : m_filters) {
       if (!filter.accept(tile)) {
         tile.setFilterAccepted(false);
       }

@@ -137,27 +137,27 @@ public interface ITileGrid<T extends ITile> extends IWidget, ITypeWithClassId, I
 
   void ensureTileDataLoaded();
 
-  List<ITileFilter> getFilters();
+  List<ITileFilter<T>> getFilters();
 
   /**
    * Adds a filter and calls {@link #filter()}.
    */
-  void addFilter(ITileFilter filter);
+  void addFilter(ITileFilter<T> filter);
 
-  void addFilter(ITileFilter filter, boolean applyFilters);
+  void addFilter(ITileFilter<T> filter, boolean applyFilters);
 
   /**
    * Removes a filter and calls {@link #filter()}.
    */
-  void removeFilter(ITileFilter filter);
+  void removeFilter(ITileFilter<T> filter);
 
-  void removeFilter(ITileFilter filter, boolean applyFilters);
+  void removeFilter(ITileFilter<T> filter, boolean applyFilters);
 
   /**
    * Applies every filter.
    * <p>
-   * This method is typically executed automatically, but if you add or remove filters with applyFilters parameter set to
-   * false, you need to call this method by yourself.
+   * This method is typically executed automatically, but if you add or remove filters with applyFilters parameter set
+   * to false, you need to call this method by yourself.
    */
   void filter();
 
@@ -176,11 +176,11 @@ public interface ITileGrid<T extends ITile> extends IWidget, ITypeWithClassId, I
   Comparator<T> getComparator();
 
   /**
-   * Sorts the tiles by using the active {@link Comparator}. If no comparator is set the tiles are displayed according to
-   * the insertion order.
+   * Sorts the tiles by using the active {@link Comparator}. If no comparator is set the tiles are displayed according
+   * to the insertion order.
    * <p>
-   * This method is typically executed automatically, but if you set a comparator with sortNow parameter set to false, you
-   * need to call this method by yourself.
+   * This method is typically executed automatically, but if you set a comparator with sortNow parameter set to false,
+   * you need to call this method by yourself.
    */
   void sort();
 

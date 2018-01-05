@@ -70,9 +70,9 @@ public interface ITileAccordion<T extends ITile> extends IAccordion {
 
   int getTileCount();
 
-  void addTilesFilter(ITileFilter filter);
+  void addTileFilter(ITileFilter<T> filter);
 
-  void removeTilesFilter(ITileFilter filter);
+  void removeTileFilter(ITileFilter<T> filter);
 
   void deleteAllTiles();
 

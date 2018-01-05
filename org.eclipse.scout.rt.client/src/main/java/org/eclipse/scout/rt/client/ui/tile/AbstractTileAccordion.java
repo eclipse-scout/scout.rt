@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.shared.TEXTS;
 @ClassId("e1e96659-f922-45c8-b350-78f9de059a83")
 public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAccordion implements ITileAccordion<T> {
 
-  private List<ITileFilter> m_tileFilters;
+  private List<ITileFilter<T>> m_tileFilters;
   private Map<Object, ITileAccordionGroupManager<T>> m_groupManagers;
   private ITileAccordionGroupManager<T> m_groupManager;
   private boolean m_selectionUpdateLocked = false;
@@ -334,7 +334,7 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
     tileGrid.setWithPlaceholders(isWithPlaceholders());
     tileGrid.setLayoutConfig(getTileGridLayoutConfig());
     tileGrid.setComparator(getTileComparator());
-    for (ITileFilter filter : m_tileFilters) {
+    for (ITileFilter<T> filter : m_tileFilters) {
       tileGrid.addFilter(filter);
     }
   }
@@ -377,22 +377,14 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
   }
 
   @Override
-  public void addTilesFilter(ITileFilter filter) {
+  public void addTileFilter(ITileFilter<T> filter) {
     m_tileFilters.add(filter);
-    addFilterToAllTileGrids(filter);
-  }
-
-  protected void addFilterToAllTileGrids(ITileFilter filter) {
     getTileGrids().forEach(tileGrid -> tileGrid.addFilter(filter));
   }
 
   @Override
-  public void removeTilesFilter(ITileFilter filter) {
+  public void removeTileFilter(ITileFilter<T> filter) {
     m_tileFilters.remove(filter);
-    removeFilterFromAllTileGrids(filter);
-  }
-
-  protected void removeFilterFromAllTileGrids(ITileFilter filter) {
     getTileGrids().forEach(tileGrid -> tileGrid.removeFilter(filter));
   }
 

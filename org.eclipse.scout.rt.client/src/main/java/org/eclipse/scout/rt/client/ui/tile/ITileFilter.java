@@ -13,15 +13,15 @@ package org.eclipse.scout.rt.client.ui.tile;
 /**
  * A tile filter is used to mask out certain tiles. All tiles that are <i>not</i> accepted by a filter, are masked out.
  * The remaining tiles (i.e. tiles that are accepted by all filters) can be retrieved by
- * {@link ITileGrid#getFilteredTiles()}. The tiles themselves are not deleted, so {@link ITileGrid#getTiles()} will still
- * return all tiles.
+ * {@link ITileGrid#getFilteredTiles()}. The tiles themselves are not deleted, so {@link ITileGrid#getTiles()} will
+ * still return all tiles.
  */
 @FunctionalInterface
-public interface ITileFilter {
+public interface ITileFilter<T extends ITile> {
 
   /**
    * @return <code>true</code> if the given tile is accepted by the filter and should therefore be displayed, false if
    *         not.
    */
-  boolean accept(ITile tile);
+  boolean accept(T tile);
 }
