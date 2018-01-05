@@ -144,7 +144,6 @@ scout.TileGrid.prototype.setTiles = function(tiles, appendPlaceholders) {
   // Only insert those which are not already there
   var tilesToInsert = scout.arrays.diff(tiles, this.tiles);
   this._insertTiles(tilesToInsert);
-  this._applyFilters(tilesToInsert);
 
   // Append the existing placeholders, otherwise they would be unnecessarily deleted if a tile is deleted
   if (this.withPlaceholders && scout.nvl(appendPlaceholders, true)) {
@@ -184,6 +183,7 @@ scout.TileGrid.prototype._insertTiles = function(tiles) {
 
 scout.TileGrid.prototype._insertTile = function(tile) {
   this._initTile(tile);
+  this._applyFilters([tile]);
   if (this.rendered) {
     this._renderTile(tile);
     tile.$container.addClass('invisible');
