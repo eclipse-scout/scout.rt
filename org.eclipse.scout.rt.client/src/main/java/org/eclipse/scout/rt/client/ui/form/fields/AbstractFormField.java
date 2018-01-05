@@ -121,9 +121,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   private byte m_flags;
 
   private IForm m_form;
-  private byte m_labelPosition;
   private byte m_labelHorizontalAlignment;
-  private int m_labelWidthInPixel;
   private Permission m_visiblePermission;
   private Permission m_enabledPermission;
   private IValueField<?> m_masterField;
@@ -1310,22 +1308,22 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   @Override
   public byte getLabelPosition() {
-    return m_labelPosition;
+    return propertySupport.getPropertyByte(PROP_LABEL_POSITION);
   }
 
   @Override
   public void setLabelPosition(byte position) {
-    m_labelPosition = position;
+    propertySupport.setPropertyByte(PROP_LABEL_POSITION, position);
   }
 
   @Override
   public int getLabelWidthInPixel() {
-    return m_labelWidthInPixel;
+    return propertySupport.getPropertyInt(PROP_LABEL_WIDTH_IN_PIXEL);
   }
 
   @Override
   public void setLabelWidthInPixel(int w) {
-    m_labelWidthInPixel = w;
+    propertySupport.setPropertyInt(PROP_LABEL_WIDTH_IN_PIXEL, w);
   }
 
   @Override

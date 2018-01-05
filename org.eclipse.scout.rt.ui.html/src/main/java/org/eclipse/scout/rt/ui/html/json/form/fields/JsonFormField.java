@@ -34,8 +34,6 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
 
   private static final Logger LOG = LoggerFactory.getLogger(JsonFormField.class);
 
-  private static final String PROP_LABEL_WIDTH_IN_PIXEL = "labelWidthInPixel";
-
   public JsonFormField(FORM_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
@@ -60,7 +58,7 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
         return getModel().isLabelVisible();
       }
     });
-    putJsonProperty(new JsonProperty<FORM_FIELD>("labelPosition", model) {
+    putJsonProperty(new JsonProperty<FORM_FIELD>(IFormField.PROP_LABEL_POSITION, model) {
       @Override
       protected Integer modelValue() {
         return (int) getModel().getLabelPosition();
@@ -154,7 +152,7 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
         return getModel().getLabelForegroundColor();
       }
     });
-    putJsonProperty(new JsonProperty<FORM_FIELD>(PROP_LABEL_WIDTH_IN_PIXEL, model) {
+    putJsonProperty(new JsonProperty<FORM_FIELD>(IFormField.PROP_LABEL_WIDTH_IN_PIXEL, model) {
       @Override
       protected Integer modelValue() {
         return getModel().getLabelWidthInPixel();

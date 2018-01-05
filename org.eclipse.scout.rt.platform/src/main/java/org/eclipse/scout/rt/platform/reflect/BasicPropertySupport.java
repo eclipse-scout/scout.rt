@@ -38,8 +38,10 @@ import org.slf4j.LoggerFactory;
 public class BasicPropertySupport implements IEventListenerSource {
   private static final Logger LOG = LoggerFactory.getLogger(BasicPropertySupport.class);
 
+  public static final byte DEFAULT_BYTE_VALUE = 0;
   public static final int DEFAULT_INT_VALUE = 0;
   public static final int DEFAULT_DOUBLE_VALUE = 0;
+  public static final Byte DEFAULT_BYTE = DEFAULT_BYTE_VALUE;
   public static final Integer DEFAULT_INT = DEFAULT_INT_VALUE;
   public static final Double DEFAULT_DOUBLE = (double) DEFAULT_DOUBLE_VALUE;
   public static final long DEFAULT_LONG_VALUE = DEFAULT_INT_VALUE;
@@ -136,6 +138,15 @@ public class BasicPropertySupport implements IEventListenerSource {
    */
   public boolean hasProperty(String name) {
     return m_props.containsKey(name);
+  }
+
+  public boolean setPropertyByte(String name, byte b) {
+    return setProperty(name, b, DEFAULT_BYTE);
+  }
+
+  public byte getPropertyByte(String name) {
+    Number n = (Number) getProperty(name);
+    return n != null ? n.byteValue() : 0;
   }
 
   public boolean setPropertyInt(String name, int i) {

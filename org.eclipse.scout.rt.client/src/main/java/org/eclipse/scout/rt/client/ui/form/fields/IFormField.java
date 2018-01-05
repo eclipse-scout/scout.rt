@@ -91,7 +91,9 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
   String PROP_SAVE_NEEDED = "saveNeeded";
   String PROP_EMPTY = "empty";
   String PROP_LABEL = "label";
+  String PROP_LABEL_POSITION = "labelPosition";
   String PROP_LABEL_VISIBLE = "labelVisible";
+  String PROP_LABEL_WIDTH_IN_PIXEL = "labelWidthInPixel";
   String PROP_KEY_STROKES = "keyStrokes";
   String PROP_STATUS_VISIBLE = "statusVisible";
   String PROP_STATUS_POSITION = "statusPosition";
