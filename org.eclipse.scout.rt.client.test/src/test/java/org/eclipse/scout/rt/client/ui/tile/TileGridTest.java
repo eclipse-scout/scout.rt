@@ -511,11 +511,17 @@ public class TileGridTest {
     assertEquals(tile0, tileGrid.getTiles().get(0));
     assertEquals(tile1, tileGrid.getTiles().get(1));
     assertEquals(tile2, tileGrid.getTiles().get(2));
+    assertEquals(tile0, tileGrid.getFilteredTiles().get(0));
+    assertEquals(tile1, tileGrid.getFilteredTiles().get(1));
+    assertEquals(tile2, tileGrid.getFilteredTiles().get(2));
 
     tileGrid.setComparator(new P_Comparator());
     assertEquals(tile2, tileGrid.getTiles().get(0));
     assertEquals(tile0, tileGrid.getTiles().get(1));
     assertEquals(tile1, tileGrid.getTiles().get(2));
+    assertEquals(tile2, tileGrid.getFilteredTiles().get(0));
+    assertEquals(tile0, tileGrid.getFilteredTiles().get(1));
+    assertEquals(tile1, tileGrid.getFilteredTiles().get(2));
 
     P_Tile tile3 = createTestTile();
     tile3.text = "c";
@@ -524,6 +530,10 @@ public class TileGridTest {
     assertEquals(tile0, tileGrid.getTiles().get(1));
     assertEquals(tile3, tileGrid.getTiles().get(2));
     assertEquals(tile1, tileGrid.getTiles().get(3));
+    assertEquals(tile2, tileGrid.getFilteredTiles().get(0));
+    assertEquals(tile0, tileGrid.getFilteredTiles().get(1));
+    assertEquals(tile3, tileGrid.getFilteredTiles().get(2));
+    assertEquals(tile1, tileGrid.getFilteredTiles().get(3));
   }
 
   @Test

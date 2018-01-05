@@ -555,6 +555,37 @@ describe("TileGrid", function() {
       expect(tileGrid.filteredTiles[2]).toBe(tile0);
     });
 
+    it('reorders the DOM elements accordingly', function() {
+      var tileGrid = createTileGrid(0);
+      var tile0 = createTile({
+        label: "a"
+      });
+      var tile1 = createTile({
+        label: "b"
+      });
+      var tile2 = createTile({
+        label: "c"
+      });
+      tileGrid.insertTiles([tile0, tile1, tile2]);
+
+      tileGrid.setComparator(function(t0, t1) {
+        // desc
+        return (t0.label < t1.label ? 1 : ((t0.label > t1.label) ? -1 : 0));
+      });
+      tileGrid.render();
+      tileGrid.sort();
+      expect(tileGrid.tiles[0]).toBe(tile2);
+      expect(tileGrid.tiles[1]).toBe(tile1);
+      expect(tileGrid.tiles[2]).toBe(tile0);
+      expect(tileGrid.filteredTiles[0]).toBe(tile2);
+      expect(tileGrid.filteredTiles[1]).toBe(tile1);
+      expect(tileGrid.filteredTiles[2]).toBe(tile0);
+      var $tiles = tileGrid.$container.children('.tile');
+      expect($tiles.eq(0).data('widget')).toBe(tile2);
+      expect($tiles.eq(1).data('widget')).toBe(tile1);
+      expect($tiles.eq(2).data('widget')).toBe(tile0);
+    });
+
   });
 
   describe('mouseDown', function() {

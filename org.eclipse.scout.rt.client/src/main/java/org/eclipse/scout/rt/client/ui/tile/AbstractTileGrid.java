@@ -289,10 +289,8 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
     setTilesInternal(tiles);
 
     // Sort list of filtered tiles as well
-    if (m_filters.size() > 0) {
-      m_filteredTilesDirty = true;
-      applyFilters(new ArrayList<>());
-    }
+    m_filteredTilesDirty = true;
+    applyFilters(new ArrayList<>());
   }
 
   public void sortInternal(List<T> tiles) {

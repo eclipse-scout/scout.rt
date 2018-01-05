@@ -195,7 +195,7 @@ scout.Group.prototype.animateToggleCollapse = function(options) {
         if (this.rendered) {
           this.$container.removeClass('collapsing');
         }
-        this.trigger('bodyHeightChange');
+        this.trigger('bodyHeightChangeDone');
       }.bind(this)
     })
     .promise();

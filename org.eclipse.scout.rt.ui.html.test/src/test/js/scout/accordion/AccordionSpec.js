@@ -285,6 +285,28 @@ describe("Accordion", function() {
       expect(accordion.groups[2]).toBe(group0);
     });
 
+    it('reorders the DOM elements accordingly', function() {
+      var accordion = createAccordion(0);
+      var group0 = createGroup({label: "a"});
+      var group1 = createGroup({label: "b"});
+      var group2 = createGroup({label: "c"});
+      accordion.insertGroups([group0, group1, group2]);
+      accordion.render();
+
+      accordion.setComparator(function(g0, g1) {
+        // desc
+        return (g0.label < g1.label ? 1 : ((g0.label > g1.label) ? -1 : 0));
+      });
+      accordion.sort();
+      expect(accordion.groups[0]).toBe(group2);
+      expect(accordion.groups[1]).toBe(group1);
+      expect(accordion.groups[2]).toBe(group0);
+      var $groups = accordion.$container.children('.group');
+      expect($groups.eq(0).data('widget')).toBe(group2);
+      expect($groups.eq(1).data('widget')).toBe(group1);
+      expect($groups.eq(2).data('widget')).toBe(group0);
+    });
+
   });
 
 });

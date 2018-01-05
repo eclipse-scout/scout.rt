@@ -267,8 +267,12 @@ scout.TileGrid.prototype.setComparator = function(comparator) {
 
 scout.TileGrid.prototype.sort = function() {
   var tiles = this.tiles.slice();
-  this.setTiles([]);
-  this.setTiles(tiles);
+  this._sort(tiles);
+  this._updateTileOrder(tiles);
+  this._setProperty('tiles', tiles);
+
+  // Sort list of filtered tiles as well
+  this._updateFilteredTiles();
 };
 
 scout.TileGrid.prototype._sort = function(tiles) {
