@@ -64,7 +64,7 @@ public class QueryHelper {
       else if (character.equals(')')) {
         bracketCounter--;
         if (bracketCounter < 0) {
-          throw new IllegalStateException("Parsing failed, closing bracket before opening bracket detected.");
+          throw new IllegalArgumentException("Parsing failed, closing bracket before opening bracket detected.");
         }
       }
       else if (character.equals(',') && bracketCounter == 0) {
@@ -76,7 +76,7 @@ public class QueryHelper {
     }
     splitted.add(token.toString());
     if (bracketCounter != 0) {
-      throw new IllegalStateException("Parsing failed, number of opening brackets doesn't match the number of the closing brackets.");
+      throw new IllegalArgumentException("Parsing failed, number of opening brackets doesn't match the number of the closing brackets.");
     }
     return splitted;
   }

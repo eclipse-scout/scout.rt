@@ -9,7 +9,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.rest.data.query.QueryHelper;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -86,7 +85,7 @@ public class QueryHelperTest {
     assertEquals("ddd", split.get(1));
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testSplit_BracketsInvalid() {
     queryHelper.split("abc(ccc,)ddd),qqq,aaa(xxx(bbb,asdf)))");
   }
