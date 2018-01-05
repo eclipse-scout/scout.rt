@@ -73,7 +73,7 @@ scout.arrays = {
   },
 
   /**
-   * return index of replaced element
+   * @return the index of the replaced element
    */
   replace: function(arr, element, replacement) {
     var index = arr.indexOf(element);
@@ -84,22 +84,33 @@ scout.arrays = {
   },
 
   /**
-   * This function uses scout.arrays.insertArray() which relies on Array.prototype.splice(). Check its js-doc for details.
+   * Inserts the given element at the specified index.
+   * <p>
+   * This function uses scout.arrays.insertAll() which relies on Array.prototype.splice(). Check its js-doc for details.
    */
   insert: function(arr, element, index) {
-    scout.arrays.insertArray(arr, [element], index);
+    scout.arrays.insertAll(arr, [element], index);
   },
 
   /**
+   * Inserts all elements of the given array at the specified index.
+   * <p>
    * This function is based on Array.prototype.splice().
    * Thus, if the 'index' is greater than the length of the array, 'elements' will be added to the end of the array 'arr'.
    * This may cause unexpected behavior on accessing arr[index] after insertion.
    *
    * The caller must ensure the size of the array.
    */
-  insertArray: function(arr, elements, index) {
+  insertAll: function(arr, elements, index) {
     elements = scout.arrays.ensure(elements);
     Array.prototype.splice.apply(arr, [index, 0].concat(elements));
+  },
+
+  /**
+   * @deprecated use insertAll(arr, elements, index) instead
+   */
+  insertArray: function(arr, elements, index) {
+    return this.insertAll(arr, elements, index);
   },
 
   /**

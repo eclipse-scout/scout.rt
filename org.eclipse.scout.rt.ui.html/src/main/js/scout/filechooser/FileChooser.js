@@ -238,7 +238,7 @@ scout.FileChooser.prototype.addFiles = function(files) {
     // copy so that parameter stays untouched
     files = files.slice();
     // append new files to existing ones
-    scout.arrays.insertArray(files, this.files, 0);
+    scout.arrays.insertAll(files, this.files, 0);
     this.setFiles(files);
   }
 };

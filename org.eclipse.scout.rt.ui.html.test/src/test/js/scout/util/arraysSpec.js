@@ -132,19 +132,19 @@ describe("scout.arrays", function() {
 
   });
 
-  describe("insertArray", function() {
+  describe("insertAll", function() {
 
     it("insert element array at index", function() {
       var arr = ['a', 'b', 'c', 'd'];
-      scout.arrays.insertArray(arr, ['e', 'f', 'g'], 0);
+      scout.arrays.insertAll(arr, ['e', 'f', 'g'], 0);
       expect(arr).toEqual(['e', 'f', 'g', 'a', 'b', 'c', 'd']);
 
       arr = ['a', 'b', 'c', 'd'];
-      scout.arrays.insertArray(arr, ['e', 'f', 'g'], 1);
+      scout.arrays.insertAll(arr, ['e', 'f', 'g'], 1);
       expect(arr).toEqual(['a', 'e', 'f', 'g', 'b', 'c', 'd']);
 
       arr = ['a', 'b', 'c', 'd'];
-      scout.arrays.insertArray(arr, ['e', 'f', 'g'], 10);
+      scout.arrays.insertAll(arr, ['e', 'f', 'g'], 10);
       expect(arr).toEqual(['a', 'b', 'c', 'd', 'e', 'f', 'g']);
     });
 

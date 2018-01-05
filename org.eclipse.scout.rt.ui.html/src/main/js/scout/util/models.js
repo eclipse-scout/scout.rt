@@ -148,7 +148,7 @@ scout.models = {
         var extensionArray = scout.arrays.ensure(extensionConfig.extension);
         scout.models._bindExtensionsToBefore(target, extensionArray);
         var insertAt = scout.models._findExtensionIndex(target, targetArray);
-        scout.arrays.insertArray(targetArray, extensionArray, insertAt);
+        scout.arrays.insertAll(targetArray, extensionArray, insertAt);
       }
     }.bind(this));
     return parentModel;
