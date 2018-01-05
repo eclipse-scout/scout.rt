@@ -279,7 +279,14 @@ scout.TileGrid.prototype._sort = function(tiles) {
   if (this.comparator === null) {
     return;
   }
+
+  var placeholders = [];
+  if (this.withPlaceholders) {
+    // Don't reorder placeholders -> remove them first, then sort and add them afterwards again
+    placeholders = this._deletePlaceholders(tiles);
+  }
   tiles.sort(this.comparator);
+  scout.arrays.pushAll(tiles, placeholders);
 };
 
 scout.TileGrid.prototype._updateTileOrder = function(tiles) {
@@ -527,11 +534,14 @@ scout.TileGrid.prototype._insertMissingPlaceholders = function() {
 
 scout.TileGrid.prototype._deletePlaceholders = function(tiles) {
   var i;
+  var deletedPlaceholders = [];
   for (i = tiles.length - 1; i >= 0; i--) {
     if (tiles[i] instanceof scout.PlaceholderTile) {
+      deletedPlaceholders.push(tiles[i]);
       scout.arrays.remove(tiles, tiles[i]);
     }
   }
+  return deletedPlaceholders.reverse();
 };
 
 scout.TileGrid.prototype._replacePlaceholders = function(tiles, tilesToInsert) {
