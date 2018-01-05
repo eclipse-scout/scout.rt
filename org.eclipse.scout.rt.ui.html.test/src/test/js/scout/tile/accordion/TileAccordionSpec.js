@@ -58,6 +58,9 @@ describe("TileAccordion", function() {
 
   describe('init', function() {
     it('copies properties to tile grids', function() {
+      var comparator = function() {
+        return true;
+      };
       var accordion = createAccordion(0, {
         selectable: true,
         multiSelect: false,
@@ -65,6 +68,7 @@ describe("TileAccordion", function() {
           columnWidth: 100,
           rowHeight: 100
         },
+        tileComparator: comparator,
         gridColumnCount: 2,
         withPlaceholders: true
       });
@@ -80,11 +84,15 @@ describe("TileAccordion", function() {
         columnWidth: 100,
         rowHeight: 100
       }));
+      expect(accordion.groups[0].body.comparator).toBe(comparator);
       expect(accordion.groups[0].body.gridColumnCount).toBe(2);
       expect(accordion.groups[0].body.withPlaceholders).toBe(true);
     });
 
     it('does not override properties which are specified by the tile grid itself', function() {
+      var comparator = function() {
+        return true;
+      };
       var accordion = createAccordion(0);
       accordion.insertGroup({
         objectType: 'Group',
@@ -96,6 +104,7 @@ describe("TileAccordion", function() {
             columnWidth: 100,
             rowHeight: 100
           },
+          comparator: comparator,
           gridColumnCount: 2,
           withPlaceholders: true
         }
@@ -103,6 +112,7 @@ describe("TileAccordion", function() {
       expect(accordion.groups[0].body.selectable).toBe(accordion.selectable);
       expect(accordion.groups[0].body.multiSelect).toBe(accordion.multiSelect);
       expect(accordion.groups[0].body.layoutConfig).toEqual(accordion.tileGridLayoutConfig);
+      expect(accordion.groups[0].body.comparator).toEqual(accordion.tileComparator);
       expect(accordion.groups[0].body.gridColumnCount).toBe(accordion.gridColumnCount);
       expect(accordion.groups[0].body.withPlaceholders).toBe(accordion.withPlaceholders);
     });
