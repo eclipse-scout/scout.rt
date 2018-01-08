@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.smartfield;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallResult;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnDescriptor;
@@ -341,7 +342,7 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
   }
 
   protected Object resultToJson(ILookupCallResult<VALUE> result) {
-    return JsonLookupCallResult.toJson(result, hasMultipleColumns(), this::getIdForLookupRowKey);
+    return new P_JsonLookupCallResult(result, hasMultipleColumns(), this::getIdForLookupRowKey).toJson();
   }
 
   protected ILookupRow<VALUE> lookupRowFromJson(JSONObject json) {
@@ -362,7 +363,7 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
     return lookupRow;
   }
 
-  protected Object lookupRowToJson(LookupRow<?> lookupRow, boolean multipleColumns) {
+  protected Object lookupRowToJson(ILookupRow<?> lookupRow, boolean multipleColumns) {
     return JsonLookupRow.toJson(lookupRow, multipleColumns, this::getIdForLookupRowKey);
   }
 
@@ -398,5 +399,21 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
     json.put(ISmartField.PROP_DISPLAY_STYLE, getModel().getDisplayStyle());
     json.put(ISmartField.PROP_BROWSE_HIERARCHY, getModel().isBrowseHierarchy());
     return json;
+  }
+
+  /**
+   * Subclass is required so sub classes of the SmartField can provide their own lookupRowToJson method.
+   */
+  class P_JsonLookupCallResult extends JsonLookupCallResult<VALUE> {
+
+    public P_JsonLookupCallResult(ILookupCallResult<VALUE> result, boolean multipleColumns, Function<VALUE, ? extends Object> keyMapper) {
+      super(result, multipleColumns, keyMapper);
+    }
+
+    @Override
+    protected Object lookupRowToJson(ILookupRow<VALUE> lookupRow, boolean multipleColumns) {
+      return JsonSmartField.this.lookupRowToJson(lookupRow, multipleColumns);
+    }
+
   }
 }

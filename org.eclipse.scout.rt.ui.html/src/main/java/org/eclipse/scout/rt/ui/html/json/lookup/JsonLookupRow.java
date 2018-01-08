@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.lookup;
 
-import java.util.Collection;
 import java.util.function.Function;
 
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -20,7 +19,6 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonLookupRow<T> implements IJsonObject {
@@ -101,21 +99,6 @@ public class JsonLookupRow<T> implements IJsonObject {
       return null;
     }
     return new JsonLookupRow<T>(lookupRow, multipleColumns, keyMapper).toJson();
-  }
-
-  public static <T> JSONArray toJson(Collection<ILookupRow<T>> lookupRows) {
-    return toJson(lookupRows, false, null);
-  }
-
-  public static <T> JSONArray toJson(Collection<ILookupRow<T>> lookupRows, boolean multipleColumns, Function<T, ? extends Object> keyMapper) {
-    if (lookupRows == null) {
-      return null;
-    }
-    JSONArray json = new JSONArray();
-    for (ILookupRow<T> lookupRow : lookupRows) {
-      json.put(toJson(lookupRow, multipleColumns, keyMapper));
-    }
-    return json;
   }
 
 }

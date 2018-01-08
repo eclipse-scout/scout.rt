@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.lookup;
 
+import java.util.Collection;
 import java.util.function.Function;
 
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallResult;
@@ -18,7 +19,9 @@ import org.eclipse.scout.rt.client.services.lookup.IQueryParam.QueryBy;
 import org.eclipse.scout.rt.platform.exception.IThrowableWithContextInfo;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonLookupCallResult<T> implements IJsonObject {
@@ -41,7 +44,7 @@ public class JsonLookupCallResult<T> implements IJsonObject {
   @Override
   public Object toJson() {
     JSONObject json = new JSONObject();
-    json.put("lookupRows", JsonLookupRow.toJson(m_result.getLookupRows(), m_multipleColumns, m_keyMapper));
+    json.put("lookupRows", lookupRowsToJson(m_result.getLookupRows()));
     IQueryParam queryParam = m_result.getQueryParam();
     json.put("queryBy", queryParam.getQueryBy());
     if (queryParam.is(QueryBy.TEXT)) {
@@ -57,6 +60,21 @@ public class JsonLookupCallResult<T> implements IJsonObject {
       json.put("exception", exceptionToJson(m_result.getException()));
     }
     return json;
+  }
+
+  protected JSONArray lookupRowsToJson(Collection<ILookupRow<T>> lookupRows) {
+    if (lookupRows == null) {
+      return null;
+    }
+    JSONArray json = new JSONArray();
+    for (ILookupRow<T> lookupRow : lookupRows) {
+      json.put(lookupRowToJson(lookupRow, m_multipleColumns));
+    }
+    return json;
+  }
+
+  protected Object lookupRowToJson(ILookupRow<T> lookupRow, boolean multipleColumns) {
+    return JsonLookupRow.toJson(lookupRow, multipleColumns, m_keyMapper);
   }
 
   @SuppressWarnings("unchecked")
