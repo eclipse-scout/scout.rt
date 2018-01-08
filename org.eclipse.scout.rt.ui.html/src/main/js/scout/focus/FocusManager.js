@@ -195,7 +195,7 @@ scout.FocusManager.prototype.activateFocusContext = function(focusContextOr$Cont
   if (!(focusContextOr$Container instanceof scout.FocusContext)) {
     focusContext = this._findFocusContext(focusContextOr$Container);
   }
-  if (!focusContext) {
+  if (!focusContext || this.isElementCovertByGlassPane(focusContext.$container)) {
     return;
   }
   this._pushIfAbsendElseMoveTop(focusContext);
