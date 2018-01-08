@@ -631,21 +631,22 @@ scout.TileGrid.prototype.selectTiles = function(tiles) {
   tiles = this._createChildren(tiles);
   tiles = this._filterTiles(tiles); // Selecting invisible tiles is not allowed
 
+  // Ensure no tiles will be selected if selectable is disabled
+  if (!this.selectable) {
+    tiles = [];
+  }
+
+  // Ensure only one tile is selected if multiSelect is disabled
+  if (!this.multiSelect && tiles.length > 1) {
+    tiles = [tiles[0]];
+  }
+
   // Deselect the tiles which are not part of the new selection
   var tilesToUnselect = this.selectedTiles;
   scout.arrays.removeAll(tilesToUnselect, tiles);
   tilesToUnselect.forEach(function(tile) {
     tile.setSelected(false);
   }, this);
-
-  if (!this.selectable) {
-    this.setProperty('selectedTiles', []);
-    return;
-  }
-
-  if (!this.multiSelect && tiles.length > 1) {
-    tiles = [tiles[0]];
-  }
 
   // Select the tiles
   tiles.forEach(function(tile) {
