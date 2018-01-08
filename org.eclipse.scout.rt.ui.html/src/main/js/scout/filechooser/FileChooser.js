@@ -314,14 +314,11 @@ scout.FileChooser.prototype._onFileChange = function(event) {
 
 scout.FileChooser.prototype._onMouseDown = function(event, option) {
   // If there is a dialog in the parent-hierarchy activate it in order to bring it on top of other dialogs.
-  var parent = this.parent;
-  while (parent) {
-    if (!(parent instanceof scout.Form && parent.isDialog())) {
-      parent = parent.parent;
-    } else {
-      parent.activate();
-      return;
-    }
+  var parent = this.findParent(function(p) {
+    return p instanceof scout.Form && p.isDialog();
+  });
+  if(parent) {
+    parent.activate();
   }
 };
 
