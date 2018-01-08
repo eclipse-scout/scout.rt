@@ -37,14 +37,14 @@ scout.TableNavigationUpKeyStroke.prototype.handle = function(event) {
   if (rows.length > 1 && (selectedRows.length > 0 || lastActionRowIndex > -1)) {
     // last action row index maybe < 0 if row got invisible (e.g. due to filtering), or if the user has not made a selection before
     if (lastActionRowIndex < 0) {
-      if (rows.length === selectedRows.length){
+      if (rows.length === selectedRows.length) {
         lastActionRow = scout.arrays.last(rows);
       } else {
         lastActionRow = scout.arrays.first(selectedRows);
       }
       lastActionRowIndex = rows.indexOf(lastActionRow);
     }
-    if (lastActionRowIndex ===  0) {
+    if (lastActionRowIndex === 0) {
       return;
     }
 

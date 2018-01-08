@@ -1521,6 +1521,21 @@ scout.Widget.prototype.focusAndPreventDefault = function(event) {
 };
 
 /**
+ * Brings the widget into view by scrolling the first scrollable parent.
+ */
+scout.Widget.prototype.reveal = function() {
+  if (!this.rendered) {
+    return;
+  }
+  var $scrollParent = this.$container.scrollParent();
+  if ($scrollParent.length === 0) {
+    // No scrollable parent found -> scrolling is not possible
+    return;
+  }
+  scout.scrollbars.scrollTo($scrollParent, this.$container);
+};
+
+/**
  * Visits every child of the widget.
  * <p>
  * The children with a different parent are excluded.<br>

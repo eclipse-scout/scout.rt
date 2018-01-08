@@ -495,6 +495,14 @@
   __include("scout/tile/accordion/TileAccordion.js");
   __include("scout/tile/accordion/TileAccordionAdapter.js");
   __include("scout/tile/accordion/TileAccordionSelectionHandler.js");
+  __include("scout/tile/keystrokes/TileGridSelectKeyStroke.js");
+  __include("scout/tile/keystrokes/TileGridSelectAllKeyStroke.js");
+  __include("scout/tile/keystrokes/TileGridSelectLeftKeyStroke.js");
+  __include("scout/tile/keystrokes/TileGridSelectRightKeyStroke.js");
+  __include("scout/tile/keystrokes/TileGridSelectDownKeyStroke.js");
+  __include("scout/tile/keystrokes/TileGridSelectUpKeyStroke.js");
+  __include("scout/tile/keystrokes/TileGridSelectFirstKeyStroke.js");
+  __include("scout/tile/keystrokes/TileGridSelectLastKeyStroke.js");
   __include("scout/tile/RemoteTileFilter.js");
   __include("scout/tile/WidgetTile.js");
   __include("scout/tile/WidgetTileAdapter.js");

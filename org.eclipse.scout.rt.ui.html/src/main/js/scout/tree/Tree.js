@@ -1812,7 +1812,7 @@ scout.Tree.prototype.scrollTo = function(node) {
 
 scout.Tree.prototype.revealSelection = function() {
   if (!this.rendered) {
-    // Execute delayed because table may be not layouted yet
+    // Execute delayed because tree may be not layouted yet
     this.session.layoutValidator.schedulePostValidateFunction(this.revealSelection.bind(this));
     return;
   }

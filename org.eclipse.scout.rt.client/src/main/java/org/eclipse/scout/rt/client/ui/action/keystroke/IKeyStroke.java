@@ -25,6 +25,7 @@ public interface IKeyStroke extends IAction {
   String ALT = "alt";
 
   String DELETE = "delete";
+  String INSERT = "insert";
   String ENTER = "enter";
   String ESCAPE = "escape";
   String SPACE = "space";

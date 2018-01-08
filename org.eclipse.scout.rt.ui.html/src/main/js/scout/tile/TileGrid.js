@@ -56,6 +56,24 @@ scout.TileGrid.prototype._createKeyStrokeContext = function() {
   return new scout.KeyStrokeContext();
 };
 
+/**
+ * @override
+ */
+scout.TileGrid.prototype._initKeyStrokeContext = function() {
+  scout.TileGrid.parent.prototype._initKeyStrokeContext.call(this);
+
+  this.keyStrokeContext.registerKeyStroke([
+    new scout.TileGridSelectAllKeyStroke(this),
+    new scout.TileGridSelectLeftKeyStroke(this),
+    new scout.TileGridSelectRightKeyStroke(this),
+    new scout.TileGridSelectDownKeyStroke(this),
+    new scout.TileGridSelectUpKeyStroke(this),
+    new scout.TileGridSelectFirstKeyStroke(this),
+    new scout.TileGridSelectLastKeyStroke(this),
+    new scout.ContextMenuKeyStroke(this, this.showContextMenu, this)
+  ]);
+};
+
 scout.TileGrid.prototype._initTiles = function() {
   this.tiles.forEach(function(tile) {
     this._initTile(tile);
@@ -89,6 +107,12 @@ scout.TileGrid.prototype._renderProperties = function() {
   this._renderScrollable();
   this._renderSelectable();
   this._renderEmpty();
+};
+
+scout.TileGrid.prototype._renderEnabled = function() {
+  scout.TileGrid.parent.prototype._renderEnabled.call(this);
+
+  this.$container.setTabbable(this.enabled);
 };
 
 scout.TileGrid.prototype._renderTiles = function() {
@@ -658,6 +682,14 @@ scout.TileGrid.prototype.deselectAllTiles = function(tiles) {
   this.selectTiles([]);
 };
 
+scout.TileGrid.prototype.toggleSelection = function() {
+  if (this.selectedTiles.length === this.filteredTiles.length) {
+    this.deselectAllTiles();
+  } else {
+    this.selectAllTiles();
+  }
+};
+
 scout.TileGrid.prototype.addTilesToSelection = function(tiles) {
   tiles = scout.arrays.ensure(tiles);
   this.selectTiles(this.selectedTiles.concat(tiles));
@@ -685,6 +717,22 @@ scout.TileGrid.prototype.setSelectionHandler = function(selectionHandler) {
 
 scout.TileGrid.prototype._selectTileOnMouseDown = function(event) {
   this.selectionHandler.selectTileOnMouseDown(event);
+};
+
+scout.TileGrid.prototype.scrollTo = function(tile) {
+  tile.reveal();
+};
+
+scout.TileGrid.prototype.revealSelection = function() {
+  if (!this.rendered) {
+    // Execute delayed because tileGrid may be not layouted yet
+    this.session.layoutValidator.schedulePostValidateFunction(this.revealSelection.bind(this));
+    return;
+  }
+
+  if (this.selectedTiles.length > 0) {
+    this.scrollTo(this.selectedTiles[0]);
+  }
 };
 
 scout.TileGrid.prototype.addFilter = function(filter) {

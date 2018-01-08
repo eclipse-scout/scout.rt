@@ -525,15 +525,24 @@ $.fn.triggerMouseDownCapture = function(opts) {
   return this;
 };
 
-$.fn.triggerKeyDownCapture = function(which) {
-  return this.triggerKeyCapture('keydown', which);
+$.fn.triggerKeyDownCapture = function(which, modifier) {
+  return this.triggerKeyCapture('keydown', which, modifier);
 };
 
-$.fn.triggerKeyUpCapture = function(which) {
-  return this.triggerKeyCapture('keyup', which);
+$.fn.triggerKeyUpCapture = function(which, modifier) {
+  return this.triggerKeyCapture('keyup', which, modifier);
 };
 
-$.fn.triggerKeyCapture = function(eventType, which) {
+/**
+ * Triggers key down and key up events.
+ */
+$.fn.triggerKeyInput = function(which, modifier) {
+  this.triggerKeyCapture('keydown', which, modifier);
+  this.triggerKeyCapture('keyup', which, modifier);
+  return this;
+};
+
+$.fn.triggerKeyCapture = function(eventType, which, modifier) {
   // Due to a Chrome bug, "new KeyboardEvent" cannot be used,
   // as it doesn't set "which". We have to use this less specific
   // constructor.
@@ -551,9 +560,9 @@ $.fn.triggerKeyCapture = function(eventType, which) {
     eventObj.initEvent(eventType, true, true);
   }
 
-  eventObj.metaKey = eventObj.altKey = eventObj.shiftKey = eventObj.ctrlKey = false;
   eventObj.keyCode = which;
   eventObj.which = which;
+  extendEventWithModifier(eventObj, modifier);
 
   this[0].dispatchEvent(eventObj);
   return this;

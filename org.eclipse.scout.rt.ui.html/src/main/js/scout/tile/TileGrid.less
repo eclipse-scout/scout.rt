@@ -11,6 +11,11 @@
 .tile-grid {
   overflow: hidden;
 
+  &:focus,
+  &.focused {
+    outline: none;
+  }
+
   &.selectable {
     padding: 10px;
   }
