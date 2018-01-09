@@ -707,4 +707,22 @@ public class MailHelper {
     }
     return characterEncoding;
   }
+
+  /**
+   * @return {@code true} if syntax of specified {@code emailAddress} is valid, else {@code false}.
+   */
+  @SuppressWarnings("squid:S1166")
+  public boolean isEmailAddressValid(String emailAddress) {
+    if (StringUtility.isNullOrEmpty(emailAddress)) {
+      return false;
+    }
+
+    try {
+      new InternetAddress(IDN.toASCII(emailAddress), true);
+      return true;
+    }
+    catch (AddressException | IllegalArgumentException e) {
+      return false;
+    }
+  }
 }

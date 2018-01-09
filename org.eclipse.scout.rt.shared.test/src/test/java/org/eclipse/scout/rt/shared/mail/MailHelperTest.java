@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.mail;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -498,6 +499,19 @@ public class MailHelperTest {
   public void testFallbackForUnknownEncoding() throws IOException, MessagingException {
     MimeMessage mimeMessage = createMimeMessageUsingUnknownEncoding();
     Assert.assertEquals("a", BEANS.get(MailHelper.class).getPlainText(mimeMessage));
+  }
+
+  @Test
+  public void testIsEmailAddressValid() {
+    MailHelper mailHelper = BEANS.get(MailHelper.class);
+    assertTrue(mailHelper.isEmailAddressValid("foo@bär.de"));
+    assertTrue(mailHelper.isEmailAddressValid("foo@domaintest.みんな"));
+    assertTrue(mailHelper.isEmailAddressValid("füü@bär.de"));
+
+    assertFalse(mailHelper.isEmailAddressValid("foo@bär@de.de"));
+    assertFalse(mailHelper.isEmailAddressValid("foo@domain/test.みんな"));
+    assertFalse(mailHelper.isEmailAddressValid("foo@domain\test.みんな"));
+    assertFalse(mailHelper.isEmailAddressValid("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@example.com"));
   }
 
   /**
