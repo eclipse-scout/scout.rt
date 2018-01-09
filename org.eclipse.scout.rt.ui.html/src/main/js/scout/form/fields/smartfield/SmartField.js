@@ -747,10 +747,6 @@ scout.SmartField.prototype._renderPopup = function(result, status) {
   }.bind(this));
 };
 
-scout.SmartField.prototype.isFocused = function() {
-  return this.rendered && scout.focusUtils.isActiveElement(this.$field);
-};
-
 scout.SmartField.prototype.closePopup = function() {
   this._pendingOpenPopup = false;
   if (this.popup) {

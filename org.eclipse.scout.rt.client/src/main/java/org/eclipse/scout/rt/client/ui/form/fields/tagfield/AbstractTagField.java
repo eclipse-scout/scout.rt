@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.tagfield;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -77,15 +77,19 @@ public abstract class AbstractTagField extends AbstractValueField<Set<String>> i
       return;
     }
 
-    Set<String> newTags = new HashSet<String>(tags);
+    Set<String> newTags = newSet(tags);
     newTags.add(tag);
-    setValue(new HashSet<String>(newTags));
+    setValue(newTags);
+  }
+
+  protected Set<String> newSet(Collection<String> tags) {
+    return new LinkedHashSet<>(tags);
   }
 
   protected Set<String> getOrCreateValue() {
     Set<String> value = getValue();
     if (value == null) {
-      value = new HashSet<String>(Collections.emptySet());
+      value = newSet(Collections.emptySet());
     }
     return value;
   }
@@ -95,12 +99,11 @@ public abstract class AbstractTagField extends AbstractValueField<Set<String>> i
     if (tags0 == null) {
       tags0 = Collections.emptySet();
     }
-    Set<String> tags = new HashSet<>(tags0);
+    Set<String> tags = newSet(tags0);
     if (tags.equals(getOrCreateValue())) {
       return;
     }
-
-    setValue(new HashSet<String>(tags));
+    setValue(tags);
   }
 
   @Override
@@ -113,9 +116,9 @@ public abstract class AbstractTagField extends AbstractValueField<Set<String>> i
       return;
     }
 
-    Set<String> newTags = new HashSet<>(tags);
+    Set<String> newTags = newSet(tags);
     newTags.remove(tag);
-    setValue(new HashSet<String>(newTags));
+    setValue(newTags);
   }
 
   @Override

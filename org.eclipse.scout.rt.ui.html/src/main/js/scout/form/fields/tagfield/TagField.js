@@ -156,6 +156,7 @@ scout.TagField.prototype._clear = function() {
 
 scout.TagField.prototype.acceptInput = function() {
   if (this.chooser) {
+    this.chooser.triggerLookupRowSelected();
     return;
   }
   scout.TagField.parent.prototype.acceptInput.call(this);
@@ -205,6 +206,7 @@ scout.TagField.prototype.getTagData = function($tag) {
 scout.TagField.prototype.addTag = function(text) {
   var value = this._parseValue(text);
   this.setValue(value);
+  this._triggerAcceptInput();
 };
 
 scout.TagField.prototype.removeTagByElement = function($tag) {
@@ -251,7 +253,6 @@ scout.TagField.prototype._onInputKeydown = function(event) {
     return;
   }
 
-  // FIXME awe impl. isNavigationKey()
   if (this._isNavigationKey(event) && this.chooser) {
     this.chooser.delegateKeyEvent(event);
   }
@@ -291,7 +292,7 @@ scout.TagField.prototype._lookupByText = function(text) {
 };
 
 scout.TagField.prototype._onLookupDone = function(result) {
-  if (result.lookupRows.length === 0) {
+  if (!this.rendered || !this.isFocused() || result.lookupRows.length === 0) {
     this.closeChooserPopup();
     return;
   }
