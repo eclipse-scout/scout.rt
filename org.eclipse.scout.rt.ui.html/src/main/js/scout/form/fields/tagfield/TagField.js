@@ -171,6 +171,7 @@ scout.TagField.prototype._triggerAcceptInput = function() {
 
 scout.TagField.prototype._onFieldBlur = function(event) {
   scout.TagField.parent.prototype._onFieldBlur.call(this, event);
+  this.$fieldContainer.removeClass('focused');
 
   this.closeChooserPopup();
 
@@ -185,6 +186,7 @@ scout.TagField.prototype._onFieldBlur = function(event) {
 
 scout.TagField.prototype._onFieldFocus = function(event) {
   scout.TagField.parent.prototype._onFieldFocus.call(this, event);
+  this.$fieldContainer.addClass('focused');
   this._removeFocusFromTagElements();
   this.closeOverflowPopup();
 };
