@@ -43,6 +43,7 @@ scout.TagField.prototype._render = function() {
   this.fieldHtmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
   this.fieldHtmlComp.setLayout(new scout.TagFieldLayout(this));
   var $field = this.$fieldContainer.appendElement('<input>', 'field')
+    .on('keydown', this._onInputKeydown.bind(this))
     .on('keyup', this._onInputKeyup.bind(this));
 
   this.addField($field);
@@ -244,8 +245,38 @@ scout.TagField.prototype._renderOverflowVisible = function() {
   }
 };
 
+scout.TagField.prototype._onInputKeydown = function(event) {
+  if (event.which === scout.keys.ENTER) {
+    this._handleEnterKey(event);
+    return;
+  }
+
+  // FIXME awe impl. isNavigationKey()
+  if (this._isNavigationKey(event) && this.chooser) {
+    this.chooser.delegateKeyEvent(event);
+  }
+};
+
+scout.TagField.prototype._isNavigationKey = function(event) {
+  return scout.isOneOf(event.which, [
+    scout.keys.PAGE_UP,
+    scout.keys.PAGE_DOWN,
+    scout.keys.UP,
+    scout.keys.DOWN
+  ]);
+};
+
 scout.TagField.prototype._onInputKeyup = function(event) {
-  this._lookupByText(this.$field.val());
+  if (!this._isNavigationKey(event)) {
+    this._lookupByText(this.$field.val());
+  }
+};
+
+scout.TagField.prototype._handleEnterKey = function(event) {
+  if (this.chooser) {
+    this.chooser.triggerLookupRowSelected();
+    event.stopPropagation();
+  }
 };
 
 scout.TagField.prototype._lookupByText = function(text) {

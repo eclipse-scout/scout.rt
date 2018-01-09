@@ -1,6 +1,6 @@
 .tag-field > .field {
   height: 30px;
-  border: solid 1px gray;
+  border: solid 1px @border-color;
   border-radius: 3px;
   user-select: none;
 
@@ -47,7 +47,7 @@
     background-color: @palette-cyan-4;
 
     & > .tag-remove-icon::before {
-      color: black;
+      color: @palette-black;
     }
   }
 }
@@ -78,7 +78,7 @@
   }
 
   &.focused::before {
-    color: black;
+    color: @palette-black;
   }
 }
 

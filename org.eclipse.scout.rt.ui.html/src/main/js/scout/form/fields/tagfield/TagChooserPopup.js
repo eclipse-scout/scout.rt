@@ -71,6 +71,13 @@ scout.TagChooserPopup.prototype.setLookupResult = function(result) {
     tableRows.push(this._createTableRow(lookupRow, false));
   }, this);
   this.table.insertRows(tableRows);
+  this.selectFirstLookupRow();
+};
+
+scout.TagChooserPopup.prototype.selectFirstLookupRow = function() {
+  if (this.table.rows.length) {
+    this.table.selectRow(this.table.rows[0]);
+  }
 };
 
 scout.TagChooserPopup.prototype._createTableRow = function(lookupRow, multipleColumns) { // FIXME [awe] share code with TableProposalChooser.js
@@ -108,22 +115,11 @@ scout.TagChooserPopup.prototype._createTableRow = function(lookupRow, multipleCo
   if (lookupRow.cssClass) {
     row.cssClass = lookupRow.cssClass;
   }
-
-//  if (multipleColumns && lookupRow.additionalTableRowData) {
-//    scout.arrays.pushAll(cells, this._transformTableRowData(lookupRow.additionalTableRowData));
-//  }
-
   return row;
 };
 
 scout.TagChooserPopup.prototype._onRowClick = function(event) {
-  var row = this.table.selectedRow();
-  if (!row) {
-    return;
-  }
-  this.trigger('lookupRowSelected', {
-    lookupRow: row.lookupRow
-  });
+  this.triggerLookupRowSelected();
 };
 
 /**
@@ -143,3 +139,17 @@ scout.TagChooserPopup.prototype._isMouseDownOnAnchor = function(event) {
   return this.field.$field.isOrHas(event.target);
 };
 
+scout.TagChooserPopup.prototype.delegateKeyEvent = function(event) {
+  event.originalEvent.smartFieldEvent = true;
+  this.table.$container.trigger(event);
+};
+
+scout.TagChooserPopup.prototype.triggerLookupRowSelected = function() {
+  var row = this.table.selectedRow();
+  if (!row) {
+    return;
+  }
+  this.trigger('lookupRowSelected', {
+    lookupRow: row.lookupRow
+  });
+};
