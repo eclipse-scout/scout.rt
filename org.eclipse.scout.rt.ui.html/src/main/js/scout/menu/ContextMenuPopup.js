@@ -309,8 +309,11 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
       }, {
         delegateEventsToOriginal: ['acceptInput', 'action'],
         delegateAllPropertiesToClone: true,
-        delegateAllPropertiesToOriginal: true
+        delegateAllPropertiesToOriginal: true,
+        excludePropertiesToOriginal: ['selected']
       });
+      // attach listener
+      this._attachCloneMenuListeners(menu);
     }
 
     // just set once because on second execution of this menu.parent is set to a popup
@@ -331,6 +334,19 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
 
   this._handleInitialSubMenus(initialSubMenuRendering);
   this._updateFirstLastClass();
+};
+
+scout.ContextMenuPopup.prototype._attachCloneMenuListeners = function(menu) {
+  menu.on('propertyChange', this._onCloneMenuPropertyChange.bind(this));
+  menu.childActions.forEach(this._attachCloneMenuListeners.bind(this));
+};
+
+scout.ContextMenuPopup.prototype._onCloneMenuPropertyChange = function(event) {
+  if (event.propertyName === 'selected') {
+    var menu = event.source;
+    // Only trigger property change, setSelected would try to render the selected state which must not happen for the original menu
+    menu.cloneOf.triggerPropertyChange('selected', event.oldValue, event.newValue);
+  }
 };
 
 scout.ContextMenuPopup.prototype._handleInitialSubMenus = function(initialSubMenuRendering) {

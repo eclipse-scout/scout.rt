@@ -1309,6 +1309,9 @@ scout.Widget.prototype.original = function() {
  * delegatePropertiesToOriginal    []              An array of all properties to be delegated from the clone
  *                                                 to the original when changed on the clone widget.
  *
+ * excludePropertiesToOriginal     []              An array of all properties to be excluded from delegating
+ *                                                 from the clone to the original in any cases.
+ *
  * delegateEventsToOriginal        []              An array of all events to be delegated from the clone to
  *                                                 the original when fired on the clone widget.
  *
@@ -1403,6 +1406,7 @@ scout.Widget.prototype._mirror = function(clone, options) {
     cloneToOriginal: scout.EventDelegator.create(clone, this, {
       delegateProperties: options.delegatePropertiesToOriginal,
       delegateAllProperties: options.delegateAllPropertiesToOriginal,
+      excludeProperties: options.excludePropertiesToOriginal,
       delegateEvents: options.delegateEventsToOriginal
     })
   };

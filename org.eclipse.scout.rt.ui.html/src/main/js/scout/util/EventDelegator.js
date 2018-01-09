@@ -16,6 +16,8 @@
  * delegateProperties       []              An array of all properties to be delegated from the source
  *                                          to the to the target when changed on the source.
  *
+ * excludeProperties        []              An array of all properties to be excluded from delegating to the
+ *                                          in all cases.
  *
  * delegateEvents           []              An array of all events to be delegated from the source to
  *                                          the target when fired on the source.
@@ -32,6 +34,7 @@ scout.EventDelegator = function(source, target, options) {
   this.source = source;
   this.target = target;
   this.delegateProperties = options.delegateProperties || [];
+  this.excludeProperties = options.excludeProperties || [];
   this.delegateEvents = options.delegateEvents || [];
   this.delegateAllProperties = !!options.delegateAllProperties;
   this.delegateAllEvents = !!options.delegateAllEvents;
@@ -79,6 +82,9 @@ scout.EventDelegator.prototype._onSourceEvent = function(event) {
 };
 
 scout.EventDelegator.prototype._onSourcePropertyChange = function(event) {
+  if (this.excludeProperties.indexOf(event.propertyName) > -1) {
+    return;
+  }
   if (this.delegateAllProperties || this.delegateProperties.indexOf(event.type) > -1) {
     this.target.callSetter(event.propertyName, event.newValue);
   }
