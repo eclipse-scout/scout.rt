@@ -28,15 +28,14 @@ scout.TileGridSelectionHandler.prototype.selectTileOnMouseDown = function(event)
     return;
   }
 
-  // Click on a tile toggles the selection ...
-  var selected = !tile.selected;
-  if (tile.selected && this.getSelectedTiles().length > 1 && !event.ctrlKey) {
-    // ... but if multiple tiles are selected, click on an already selected tile deselects every other tile but keeps the selection of the clicked one
-    selected = true;
+  // Clicking a tile selects it, CTRL-click toggles the selection
+  var selected = true;
+  if (event.ctrlKey) {
+    selected = !tile.selected;
   }
 
-  // CTRL click on a tile adds or removes that tile to or from the selection
-  if (this.isMultiSelect() && event.ctrlKey) {
+  // If multiSelect is enabled, CTRL-Click on a tile adds or removes that tile to or from the selection
+  if (event.ctrlKey && this.isMultiSelect()) {
     if (selected) {
       this.addTilesToSelection(tile);
     } else {

@@ -620,7 +620,7 @@ describe("TileGrid", function() {
         expect(tileGrid.selectedTiles.length).toBe(1);
       });
 
-      it('on a selected tile deselects the tile', function() {
+      it('on a selected tile does nothing', function() {
         var tileGrid = createTileGrid(3, {
           selectable: true
         });
@@ -630,8 +630,8 @@ describe("TileGrid", function() {
         expect(tile0.selected).toBe(true);
 
         tile0.$container.triggerMouseDown();
-        expect(tile0.selected).toBe(false);
-        expect(tileGrid.selectedTiles.length).toBe(0);
+        expect(tile0.selected).toBe(true);
+        expect(tileGrid.selectedTiles.length).toBe(1);
       });
 
     });
@@ -668,7 +668,7 @@ describe("TileGrid", function() {
         expect(tileGrid.selectedTiles.length).toBe(1);
       });
 
-      it('on a selected tile deselects the tile', function() {
+      it('on a selected tile does nothing', function() {
         var tileGrid = createTileGrid(3, {
           selectable: true,
           multiSelect: true
@@ -679,8 +679,8 @@ describe("TileGrid", function() {
         expect(tile0.selected).toBe(true);
 
         tile0.$container.triggerMouseDown();
-        expect(tile0.selected).toBe(false);
-        expect(tileGrid.selectedTiles.length).toBe(0);
+        expect(tile0.selected).toBe(true);
+        expect(tileGrid.selectedTiles.length).toBe(1);
       });
 
       it('on a selected tile keeps the selection but deselects others if other tiles are selected', function() {
