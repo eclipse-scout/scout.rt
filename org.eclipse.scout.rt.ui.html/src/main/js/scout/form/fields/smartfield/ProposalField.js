@@ -108,10 +108,7 @@ scout.ProposalField.prototype._customTextAccepted = function(searchText) {
 };
 
 scout.ProposalField.prototype.getValueForSelection = function() {
-  if (!this._showSelection()) {
-    return null;
-  }
-  return this.lookupRow.key;
+  return this._showSelection() ? this.lookupRow.key : null;
 };
 
 /**
