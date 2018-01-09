@@ -24,6 +24,8 @@ import java.util.Map;
 @SuppressWarnings("squid:S2160")
 public class MutablePair<L, R> extends Pair<L, R> {
 
+  private static final long serialVersionUID = 1L;
+
   private L m_left;
   private R m_right;
 

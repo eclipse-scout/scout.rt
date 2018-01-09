@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util;
 
+import java.io.Serializable;
+
 /**
  * A simple abstract pair class, having two properties <code>left</code> and <code>right</code> with different generic
  * types. See {@link MutablePair} and {@link ImmutablePair} for implementations.
@@ -17,7 +19,9 @@ package org.eclipse.scout.rt.platform.util;
  * @since 6.0
  */
 @SuppressWarnings("squid:S00118")
-public abstract class Pair<L, R> {
+public abstract class Pair<L, R> implements Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   public abstract L getLeft();
 

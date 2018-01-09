@@ -19,6 +19,8 @@ package org.eclipse.scout.rt.platform.util;
 @SuppressWarnings("squid:S2160")
 public class ImmutablePair<L, R> extends Pair<L, R> {
 
+  private static final long serialVersionUID = 1L;
+
   private final L m_left;
   private final R m_right;
 
