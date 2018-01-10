@@ -20,6 +20,11 @@ scout.EllipsisMenu = function() {
 };
 scout.inherits(scout.EllipsisMenu, scout.Menu);
 
+scout.EllipsisMenu.prototype._render = function() {
+  scout.EllipsisMenu.parent.prototype._render.call(this);
+  this.$container.addClass('ellipsis');
+};
+
 scout.EllipsisMenu.prototype._renderProperties = function() {
   scout.EllipsisMenu.parent.prototype._renderProperties.call(this);
   this._renderHidden();
