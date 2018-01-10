@@ -304,6 +304,7 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
     // prevent loosing original parent
     var parentMenu = menu.parent;
     if (this.cloneMenuItems && !menu.cloneOf) {
+      // clone will recursively also clone all child actions.
       menu = menu.clone({
         parent: this
       }, {

@@ -60,9 +60,18 @@ scout.GroupBox.prototype._init = function(model) {
   this._updateMenuBar();
 };
 
+scout.GroupBox.prototype.setFields = function(fields) {
+  this.setProperty('fields', fields);
+};
+
 scout.GroupBox.prototype._setFields = function(fields) {
   this._setProperty('fields', fields);
   this._prepareFields();
+};
+
+scout.GroupBox.prototype._renderFields = function(fields) {
+  this._renderExpanded();
+  this.invalidateLogicalGrid(true);
 };
 
 /**

@@ -38,6 +38,10 @@ public final class CompositeFieldUtility {
     fields.sort(new OrderedComparator());
     f.setParentFieldInternal(compositeField);
     f.setFormInternal(compositeField.getForm());
+    if (compositeField.getForm().isInitConfigDone()) {
+      f.postInitConfig();
+      f.init();
+    }
   }
 
   public static void removeField(IFormField f, ICompositeField compositeField, List<IFormField> fields) {
@@ -75,14 +79,14 @@ public final class CompositeFieldUtility {
     if (form.getHandler() == null) {
       return;
     }
-    if (form.isShowing()) {
-      throw new IllegalStateException("field '" + f + "' is already showing on desktop. Structural changes are not allowed anymore.");
-    }
+//    if (form.isShowing()) {
+//      throw new IllegalStateException("field '" + f + "' is already showing on desktop. Structural changes are not allowed anymore.");
+//    }
   }
 
   /**
    * Applies the given {@link IFormFieldVisitor} to the given {@link IFormField}s.
-   * 
+   *
    * @param visitor
    *          The visitor
    * @param fieldToVisit

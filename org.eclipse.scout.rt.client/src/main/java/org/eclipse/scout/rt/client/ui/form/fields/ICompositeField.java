@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 public interface ICompositeField extends IFormField {
 
   String PROP_HAS_VISIBLE_FIELDS = "hasVisibleFields";
+  String PROP_FIELDS = "fields";
 
   /**
    * Returns the index of the first occurrence of the {@link IFormField} element, or -1 if the element can't be found.

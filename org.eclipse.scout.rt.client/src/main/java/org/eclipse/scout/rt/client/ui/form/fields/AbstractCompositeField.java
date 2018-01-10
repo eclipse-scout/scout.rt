@@ -40,7 +40,6 @@ import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 @ClassId("4a641cd4-801f-45d2-9f08-5798e20b03c4")
 public abstract class AbstractCompositeField extends AbstractFormField implements ICompositeField {
 
-  private List<IFormField> m_fields;
   private Map<Class<?>, Class<? extends IFormField>> m_formFieldReplacements;
   private Map<Class<? extends IFormField>, IFormField> m_movedFormFieldsByClass;
   private P_FieldPropertyChangeListener m_fieldPropertyChangeListener;
@@ -86,7 +85,8 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
      * E.g. setEnabled(getConfiguredEnabled()) would enable/disable all children when called
      * after field creation. -> all fields would have the enabled state of the MainBox.
      */
-    m_fields = CollectionUtility.emptyArrayList();
+
+    propertySupport.setPropertyList(PROP_FIELDS, CollectionUtility.emptyArrayList());
     m_movedFormFieldsByClass = new HashMap<>();
     m_fieldPropertyChangeListener = new P_FieldPropertyChangeListener();
     super.initConfig();
@@ -131,12 +131,9 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
         f.setParentFieldInternal(this);
       }
 
-      m_fields = fields.getOrderedList();
-
       // attach a proxy controller to each child field in the group for: visible, saveNeeded
-      for (IFormField f : m_fields) {
-        f.addPropertyChangeListener(m_fieldPropertyChangeListener);
-      }
+      fields.forEach(field -> field.addPropertyChangeListener(m_fieldPropertyChangeListener));
+      propertySupport.setPropertyList(PROP_FIELDS, fields.getOrderedList());
     }
     finally {
       if (injectedFields != null) {
@@ -150,14 +147,14 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
 
   @Override
   public void addField(IFormField f) {
-    CompositeFieldUtility.addField(f, this, m_fields);
+    CompositeFieldUtility.addField(f, this, getFieldsInternal());
     f.addPropertyChangeListener(m_fieldPropertyChangeListener);
     handleFieldsChanged();
   }
 
   @Override
   public void removeField(IFormField f) {
-    CompositeFieldUtility.removeField(f, this, m_fields);
+    CompositeFieldUtility.removeField(f, this, getFieldsInternal());
     f.removePropertyChangeListener(m_fieldPropertyChangeListener);
     handleFieldsChanged();
   }
@@ -179,6 +176,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
     handleFieldVisibilityChanged();
     checkSaveNeeded();
     checkEmpty();
+    propertySupport.setPropertyAlwaysFire(PROP_FIELDS, getFieldsInternal());
   }
 
   /**
@@ -213,7 +211,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
       // this is the root group box. Publish replacement map to form and keep local map for better performance (see getReplacingFieldClass)
       ((AbstractForm) form).registerFormFieldReplacementsInternal(m_formFieldReplacements);
     }
-    for (IFormField field : m_fields) {
+    for (IFormField field : getFieldsInternal()) {
       field.setFormInternal(form);
     }
   }
@@ -281,12 +279,12 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
 
   @Override
   public int getFieldIndex(IFormField f) {
-    return m_fields.indexOf(f);
+    return getFieldsInternal().indexOf(f);
   }
 
   @Override
   public int getFieldCount() {
-    return m_fields.size();
+    return getFieldsInternal().size();
   }
 
   @Override
@@ -372,7 +370,11 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
 
   @Override
   public List<IFormField> getFields() {
-    return CollectionUtility.arrayList(m_fields);
+    return CollectionUtility.arrayList(getFieldsInternal());
+  }
+
+  protected List<IFormField> getFieldsInternal() {
+    return propertySupport.getPropertyList(PROP_FIELDS);
   }
 
   @Override
@@ -381,7 +383,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
     if (includeThis) {
       thisField = this;
     }
-    return CompositeFieldUtility.applyFormFieldVisitor(visitor, thisField, m_fields, level, fieldIndex);
+    return CompositeFieldUtility.applyFormFieldVisitor(visitor, thisField, getFieldsInternal(), level, fieldIndex);
   }
 
   @Override
@@ -391,7 +393,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
 
   @Override
   protected boolean execIsSaveNeeded() {
-    for (IFormField f : m_fields) {
+    for (IFormField f : getFieldsInternal()) {
       if (f.isSaveNeeded()) {
         return true;
       }
@@ -402,14 +404,14 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   @Override
   protected void execMarkSaved() {
     super.execMarkSaved();
-    for (IFormField f : m_fields) {
+    for (IFormField f : getFieldsInternal()) {
       f.markSaved();
     }
   }
 
   @Override
   protected boolean execIsEmpty() {
-    for (IFormField f : m_fields) {
+    for (IFormField f : getFieldsInternal()) {
       if (!f.isEmpty()) {
         return false;
       }
@@ -423,7 +425,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   @Override
   public void setMandatory(boolean b) {
     // recursively down all children
-    for (IFormField f : m_fields) {
+    for (IFormField f : getFieldsInternal()) {
       f.setMandatory(b);
     }
   }
@@ -444,7 +446,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
     super.setStatusVisible(statusVisible);
 
     if (recursive) {
-      for (IFormField f : m_fields) {
+      for (IFormField f : getFieldsInternal()) {
         f.setStatusVisible(statusVisible);
       }
     }
@@ -457,10 +459,10 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   protected boolean calcHasVisibleFieldsInternal() {
-    if (CollectionUtility.isEmpty(m_fields)) {
+    if (CollectionUtility.isEmpty(getFieldsInternal())) {
       return false;
     }
-    for (IFormField field : m_fields) {
+    for (IFormField field : getFieldsInternal()) {
       if (field.isVisible()) {
         return true;
       }

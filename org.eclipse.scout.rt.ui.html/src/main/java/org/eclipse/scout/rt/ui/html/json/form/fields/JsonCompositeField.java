@@ -30,9 +30,24 @@ public class JsonCompositeField<COMPOSITE_FIELD extends ICompositeField, F exten
   }
 
   @Override
-  protected void attachChildAdapters() {
-    super.attachChildAdapters();
-    attachAdapters(getModelFields(), new DisplayableFormFieldFilter<>());
+  protected void initJsonProperties(COMPOSITE_FIELD model) {
+    super.initJsonProperties(model);
+    putJsonProperty(new JsonAdapterProperty<COMPOSITE_FIELD>(ICompositeField.PROP_FIELDS, model, getUiSession()) {
+      @Override
+      protected JsonAdapterPropertyConfig createConfig() {
+        return new JsonAdapterPropertyConfigBuilder().filter(new DisplayableFormFieldFilter<IFormField>()).build();
+      }
+
+      @Override
+      protected List<IFormField> modelValue() {
+        return getModel().getFields();
+      }
+
+      @Override
+      public String jsonPropertyName() {
+        return getModelFieldsPropertyName();
+      }
+    });
   }
 
   @Override

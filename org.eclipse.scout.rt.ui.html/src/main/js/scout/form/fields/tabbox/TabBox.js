@@ -63,14 +63,11 @@ scout.TabBox.prototype._renderProperties = function() {
  */
 scout.TabBox.prototype._remove = function() {
   scout.TabBox.parent.prototype._remove.call(this);
-  this._removeTabs();
   this._removeTabContent();
 };
 
-scout.TabBox.prototype._removeTabs = function() {
-  this.tabItems.forEach(function(tabItem) {
-    tabItem.removeTab();
-  }, this);
+scout.TabBox.prototype.setTabItems = function(tabItems) {
+  this.setProperty('tabItems', tabItems);
 };
 
 scout.TabBox.prototype._removeTabContent = function() {
