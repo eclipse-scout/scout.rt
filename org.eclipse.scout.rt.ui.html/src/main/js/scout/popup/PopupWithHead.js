@@ -15,7 +15,6 @@ scout.PopupWithHead = function() {
   this.$deco;
   this.$parent;
 
-  this.htmlBody = null;
   this._headVisible = true;
   this.resizeHandler = this._onResize.bind(this);
 };
@@ -66,8 +65,8 @@ scout.PopupWithHead.prototype._remove = function() {
 scout.PopupWithHead.prototype._$createBody = function() {
   this.$body = this.$container.appendDiv('popup-body');
   // Complete the layout hierarchy between the popup and the menu items
-  this.htmlBody = scout.HtmlComponent.install(this.$body, this.session);
-  this.htmlBody.setLayout(this._createBodyLayout());
+  var htmlBody = scout.HtmlComponent.install(this.$body, this.session);
+  htmlBody.setLayout(this._createBodyLayout());
 
   this._modifyBody();
 };
