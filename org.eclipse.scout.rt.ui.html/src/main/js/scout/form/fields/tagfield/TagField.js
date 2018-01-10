@@ -29,6 +29,7 @@ scout.TagField.prototype._init = function(model) {
 scout.TagField.prototype._initKeyStrokeContext = function() {
   scout.TagField.parent.prototype._initKeyStrokeContext.call(this);
   this.keyStrokeContext.registerKeyStroke([
+    new scout.TagFieldCancelKeyStroke(this),
     new scout.TagFieldEnterKeyStroke(this),
     new scout.TagFieldNavigationKeyStroke(this),
     new scout.TagFieldDeleteKeyStroke(this),
@@ -180,10 +181,11 @@ scout.TagField.prototype._triggerAcceptInput = function() {
 };
 
 scout.TagField.prototype._onFieldBlur = function(event) {
-  scout.TagField.parent.prototype._onFieldBlur.call(this, event);
   this.$fieldContainer.removeClass('focused');
-
   this.closeChooserPopup();
+
+  // We cannot call super until chooser popup has been closed (see #acceptInput)
+  scout.TagField.parent.prototype._onFieldBlur.call(this, event);
 
   // when overflow popup opens it sets focus to the first tag element, this means:
   // the input field loses focus. In that case we must prevent that the overflow popup is closed.
@@ -280,6 +282,11 @@ scout.TagField.prototype._isNavigationKey = function(event) {
 };
 
 scout.TagField.prototype._onInputKeyup = function(event) {
+  // Prevent chooser popup from being opened again, after it has been closed by pressing ESC
+  if (event.which === scout.keys.ESC) {
+    return;
+  }
+
   if (!this._isNavigationKey(event)) {
     this._lookupByText(this.$field.val());
   }

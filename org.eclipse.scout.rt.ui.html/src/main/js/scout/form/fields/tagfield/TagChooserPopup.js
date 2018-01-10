@@ -71,13 +71,6 @@ scout.TagChooserPopup.prototype.setLookupResult = function(result) {
     tableRows.push(this._createTableRow(lookupRow, false));
   }, this);
   this.table.insertRows(tableRows);
-  this.selectFirstLookupRow();
-};
-
-scout.TagChooserPopup.prototype.selectFirstLookupRow = function() {
-  if (this.table.rows.length) {
-    this.table.selectRow(this.table.rows[0]);
-  }
 };
 
 scout.TagChooserPopup.prototype._createTableRow = function(lookupRow, multipleColumns) { // FIXME [awe] share code with TableProposalChooser.js

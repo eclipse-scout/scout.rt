@@ -465,6 +465,7 @@
   __include("scout/form/fields/tagfield/TagChooserPopupLayout.js");
   __include("scout/form/fields/tagfield/TagField.js");
   __include("scout/form/fields/tagfield/TagFieldAdapter.js");
+  __include("scout/form/fields/tagfield/TagFieldCancelKeyStroke.js");
   __include("scout/form/fields/tagfield/TagFieldEnterKeyStroke.js");
   __include("scout/form/fields/tagfield/TagFieldDeleteKeyStroke.js");
   __include("scout/form/fields/tagfield/TagFieldNavigationKeyStroke.js");
