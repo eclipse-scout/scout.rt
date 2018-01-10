@@ -92,3 +92,19 @@ scout.LookupCall.prototype.getByKey = function(key) {
 scout.LookupCall.prototype.getByRec = function(rec) {
   throw new Error('getByRec() not implemented');
 };
+
+// ---- static helpers ----
+
+scout.LookupCall.ensure = function(lookupCall, session) {
+  if (lookupCall instanceof scout.LookupCall) {
+    // NOP - required to distinct instance from plain object (=model)
+  } else if (scout.objects.isPlainObject(lookupCall)) {
+    lookupCall.session = session;
+    lookupCall = scout.create(lookupCall);
+  } else if (typeof lookupCall === 'string') {
+    lookupCall = scout.create(lookupCall, {
+      session: session
+    });
+  }
+  return lookupCall;
+};

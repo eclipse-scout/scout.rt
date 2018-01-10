@@ -20,6 +20,12 @@ scout.TagField = function() {
 };
 scout.inherits(scout.TagField, scout.ValueField);
 
+scout.TagField.prototype._init = function(model) {
+  scout.TagField.parent.prototype._init.call(this, model);
+
+  this._setLookupCall(this.lookupCall);
+};
+
 scout.TagField.prototype._initKeyStrokeContext = function() {
   scout.TagField.parent.prototype._initKeyStrokeContext.call(this);
   this.keyStrokeContext.registerKeyStroke([
@@ -75,6 +81,10 @@ scout.TagField.prototype._renderValue = function() {
   if (!this.rendering) {
     this.fieldHtmlComp.revalidateLayout();
   }
+};
+
+scout.TagField.prototype._setLookupCall = function(lookupCall) {
+  this._setProperty('lookupCall', scout.LookupCall.ensure(lookupCall, this.session));
 };
 
 scout.TagField.prototype._makeTagElement = function($parent, tagText, clickHandler) {

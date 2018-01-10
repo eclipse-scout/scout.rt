@@ -460,17 +460,7 @@ scout.SmartField.prototype._renderEnabled = function() {
 };
 
 scout.SmartField.prototype._setLookupCall = function(lookupCall) {
-  if (lookupCall instanceof scout.LookupCall) {
-    // NOP - required to distinct instance from plain object (=model)
-  } else if (scout.objects.isPlainObject(lookupCall)) {
-    lookupCall.session = this.session;
-    lookupCall = scout.create(lookupCall);
-  } else if (typeof lookupCall === 'string') {
-    lookupCall = scout.create(lookupCall, {
-      session: this.session
-    });
-  }
-  this._setProperty('lookupCall', lookupCall);
+  this._setProperty('lookupCall', scout.LookupCall.ensure(lookupCall, this.session));
 };
 
 scout.SmartField.prototype._setCodeType = function(codeType) {
