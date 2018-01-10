@@ -19,13 +19,17 @@ scout.WidgetField.prototype._init = function(model) {
 };
 
 scout.WidgetField.prototype._render = function() {
-  this.addContainer(this.$parent, 'widget-field', new scout.SingleLayout());
+  this.addContainer(this.$parent, 'widget-field');
   this.addLabel();
   this.addMandatoryIndicator();
   this.addStatus();
-  this._renderFieldWidget();
-
 };
+
+scout.WidgetField.prototype._renderProperties = function() {
+  scout.WidgetField.parent.prototype._renderProperties.call(this);
+  this._renderFieldWidget();
+};
+
 scout.WidgetField.prototype.setFieldWidget = function(fieldWidget) {
   this.setProperty('fieldWidget', fieldWidget);
 };
@@ -33,9 +37,13 @@ scout.WidgetField.prototype.setFieldWidget = function(fieldWidget) {
 scout.WidgetField.prototype._renderFieldWidget = function() {
   if (this.fieldWidget) {
     this.fieldWidget.render();
+    this.addField(this.fieldWidget.$container);
   }
 };
 
 scout.WidgetField.prototype._removeFieldWidget = function() {
-  this.fieldWidget.remove();
+  if (this.fieldWidget) {
+    this.fieldWidget.remove();
+    this._removeField();
+  }
 };
