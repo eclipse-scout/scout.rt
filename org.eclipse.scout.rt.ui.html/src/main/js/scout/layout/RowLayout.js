@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.RowLayout = function(pixelSizedLayouting) {
+scout.RowLayout = function(pixelBasedSizing) {
   scout.RowLayout.parent.call(this);
-  this.pixelSizedLayouting = pixelSizedLayouting;
+  this.pixelBasedSizing = scout.nvl(pixelBasedSizing, true);
 };
 scout.inherits(scout.RowLayout, scout.AbstractLayout);
 
@@ -19,10 +19,10 @@ scout.RowLayout.prototype.layout = function($container) {
   var containerSize = htmlComp.availableSize()
     .subtract(htmlComp.insets());
 
-  $container.children().each(function() {
-    var htmlChild = scout.HtmlComponent.optGet($(this));
+  $container.children().each(function(index, child) {
+    var htmlChild = scout.HtmlComponent.optGet($(child));
     if (htmlChild) {
-      if (!this.pixelSizedLayouting) {
+      if (this.pixelBasedSizing) {
         var prefSize = htmlChild.prefSize({
           widthHint: containerSize.width
         });

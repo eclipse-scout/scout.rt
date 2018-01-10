@@ -44,7 +44,7 @@ scout.ContextMenuPopup.prototype._createLayout = function() {
 };
 
 scout.ContextMenuPopup.prototype._createBodyLayout = function() {
-  return new scout.RowLayout(true);
+  return new scout.RowLayout(false);
 };
 
 scout.ContextMenuPopup.prototype._render = function() {
