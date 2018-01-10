@@ -247,7 +247,7 @@ describe("MenuBar", function() {
       expect(menu3.$container).toHaveClass('default-menu');
       expect(menu4.$container).toHaveClass('default-menu');
       expect(menu5.$container).toHaveClass('default-menu');
-      expect(menu6.$container).toHaveClass('default-menu');
+      expect(menu6.$container).not.toHaveClass('default-menu');
       expect(menu4).toBe(menuBar.defaultMenu);
     });
 
