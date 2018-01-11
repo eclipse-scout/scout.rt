@@ -366,7 +366,7 @@ describe("TableKeyStrokes", function() {
       });
 
       it("if the row below the last action row is not selected, adds the row below to the selection", function() {
-        var model = helper.createModelFixture(2, 6);
+        var model = helper.createModelFixture(2, 7);
         var table = helper.createTable(model);
 
         var rows = table.rows;
@@ -379,6 +379,8 @@ describe("TableKeyStrokes", function() {
         helper.assertSelection(table, [rows[2], rows[3], rows[5]]);
         table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[2], rows[3], rows[4], rows[5]]);
+        table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
+        helper.assertSelection(table, [rows[2], rows[3], rows[4], rows[5], rows[6]]);
       });
 
     });

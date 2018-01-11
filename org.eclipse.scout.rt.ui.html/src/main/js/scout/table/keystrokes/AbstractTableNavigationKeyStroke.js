@@ -12,7 +12,7 @@ scout.AbstractTableNavigationKeyStroke = function(table) {
   scout.AbstractTableNavigationKeyStroke.parent.call(this);
   this.repeatable = true;
   this.field = table;
-  this.shift = table.multiSelect ? undefined : false; // multiselect tables have both, shift and not-shift functionality
+  this.shift = !table.multiSelect ? false : undefined;
   this.stopPropagation = true;
   this.keyStrokeMode = scout.KeyStrokeMode.DOWN;
 };
@@ -130,7 +130,7 @@ scout.AbstractTableNavigationKeyStroke.prototype._findLastSelectedRowAfter = fun
   if (rowIndex === rows.length - 1) {
     return rows[rowIndex];
   }
-  row = scout.arrays.findFromReverse(rows, rowIndex, function(row, i) {
+  row = scout.arrays.findFrom(rows, rowIndex, function(row, i) {
     var nextRow = rows[i + 1];
     if (!nextRow) {
       return false;
