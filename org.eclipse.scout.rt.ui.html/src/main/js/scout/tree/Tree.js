@@ -1310,7 +1310,10 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
 
     var filterStateChanged = this._applyFiltersForNode(node);
     if (filterStateChanged && renderExpansionOpts.expansionChanged) {
-      this._rebuildParent(node.parentNode, opts);
+      if (node.parentNode) {
+        // ensure node is visible under the parent node if there is a parent.
+        this._rebuildParent(node.parentNode, opts);
+      }
     } else if (renderExpansionOpts.expandLazyChanged) {
       node.childNodes.forEach(function(child) {
         this._applyFiltersForNode(child);
