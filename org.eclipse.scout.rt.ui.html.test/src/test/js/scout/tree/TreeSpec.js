@@ -1181,6 +1181,32 @@ describe("Tree", function() {
       expect(node0.expanded).toBe(true);
     });
 
+    it("also expands the parents in breadcrumb mode if a hidden node should be selected after being expanded and collapsed while in its hidden state", function() {
+      var model = helper.createModelFixture(3, 3, false);
+      var tree = helper.createTree(model);
+      var node0 = tree.nodes[0];
+      var node1 = tree.nodes[1];
+
+      tree.setDisplayStyle(scout.Tree.DisplayStyle.BREADCRUMB);
+      tree.render(session.$entryPoint);
+
+      expect(node0.expanded).toBe(false);
+      expect(node1.expanded).toBe(false);
+
+      tree.selectNodes([node0]);
+      expect(node0.$node.isSelected()).toBe(true);
+      expect(node0.expanded).toBe(true);
+      expect(tree.$selectedNodes().length).toBe(1);
+
+      tree.setNodeExpanded(node1, true);
+      tree.setNodeExpanded(node1, false);
+      tree.selectNode(node1);
+
+      expect(node1.$node.isSelected()).toBe(true);
+      expect(node1.expanded).toBe(true);
+      expect(tree.$selectedNodes().length).toBe(1);
+    });
+
     it("sets css class ancestor-of-selected on every ancestor of the selected element", function() {
       var model = helper.createModelFixture(3, 3);
       var tree = helper.createTree(model);
