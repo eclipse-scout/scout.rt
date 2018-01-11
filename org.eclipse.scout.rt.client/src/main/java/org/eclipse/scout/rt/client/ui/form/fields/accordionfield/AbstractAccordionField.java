@@ -113,16 +113,6 @@ public abstract class AbstractAccordionField<T extends IAccordion> extends Abstr
   }
 
   @Override
-  protected boolean getConfiguredLabelVisible() {
-    return false;
-  }
-
-  @Override
-  protected boolean getConfiguredStatusVisible() {
-    return false;
-  }
-
-  @Override
   protected boolean execIsEmpty() {
     return getAccordion().getGroups().isEmpty();
   }
