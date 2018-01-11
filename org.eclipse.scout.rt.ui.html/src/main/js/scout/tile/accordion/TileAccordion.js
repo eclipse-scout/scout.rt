@@ -301,6 +301,20 @@ scout.TileAccordion.prototype.sortTiles = function() {
   });
 };
 
+scout.TileAccordion.prototype.setFocusedTile = function(tile) {
+  var groupForTile = null;
+  if (tile !== null) {
+    groupForTile = this.getGroupByTile(tile);
+  }
+  this.groups.forEach(function(group) {
+    if (group === groupForTile) {
+      group.body.setFocusedTile(tile);
+    } else {
+      group.body.setFocusedTile(null);
+    }
+  });
+};
+
 scout.TileAccordion.prototype._onTileGridSelectedTilesChange = function(event) {
   if (this._selectionUpdateLocked) {
     // Don't execute when deselecting other tiles to minimize the amount of property change events
