@@ -13,6 +13,9 @@ package org.eclipse.scout.rt.client.ui.basic.tree;
 @FunctionalInterface
 public interface ITreeVisitor {
 
+  /**
+   * @returns true if visitor should proceed or false if visitor should stop recursion
+   */
   boolean visit(ITreeNode node);
 
 }
