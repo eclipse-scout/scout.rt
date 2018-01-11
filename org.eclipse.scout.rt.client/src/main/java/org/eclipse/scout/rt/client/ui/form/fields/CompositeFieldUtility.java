@@ -39,7 +39,7 @@ public final class CompositeFieldUtility {
     fields.sort(new OrderedComparator());
     f.setParentFieldInternal(compositeField);
     f.setFormInternal(compositeField.getForm());
-    if (compositeField.getForm().isInitConfigDone()) {
+    if (compositeField.isInitConfigDone()) {
       f.postInitConfig();
       f.init();
       FormUtility.rebuildFieldGrid(compositeField);
