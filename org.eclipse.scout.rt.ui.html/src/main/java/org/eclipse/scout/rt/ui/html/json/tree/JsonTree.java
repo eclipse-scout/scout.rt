@@ -29,9 +29,11 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeUtility;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.ResourceListTransferObject;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -638,24 +640,45 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   protected void handleModelNodesChecked(Collection<ITreeNode> modelNodes) {
     JSONArray jsonNodes = new JSONArray();
     for (ITreeNode node : modelNodes) {
-      if (!isNodeAccepted(node)) {
-        continue;
+      addJsonNodesChecked(jsonNodes, node);
+
+      if (getModel().isAutoCheckChildNodes()) {
+        for (ITreeNode childNode : collectChildNodesCheckedRec(node)) {
+          addJsonNodesChecked(jsonNodes, childNode);
+        }
       }
-      String nodeId = optNodeId(node);
-      if (nodeId == null) { // Ignore nodes that are not yet sent to the UI (may happen due to asynchronous event processing)
-        continue;
-      }
-      JSONObject json = new JSONObject();
-      putProperty(json, "id", nodeId);
-      putProperty(json, "checked", node.isChecked());
-      jsonNodes.put(json);
     }
     if (jsonNodes.length() == 0) {
       return;
     }
+
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_NODES, jsonNodes);
     addActionEvent(EVENT_NODES_CHECKED, jsonEvent);
+  }
+
+  protected void addJsonNodesChecked(JSONArray jsonNodes, ITreeNode node) {
+    if (!isNodeAccepted(node)) {
+      return;
+    }
+    String nodeId = optNodeId(node);
+    if (nodeId == null) { // Ignore nodes that are not yet sent to the UI (may happen due to asynchronous event processing)
+      return;
+    }
+    jsonNodes.put(nodeCheckedToJson(nodeId, node));
+  }
+
+  protected JSONObject nodeCheckedToJson(String nodeId, ITreeNode node) {
+    JSONObject json = new JSONObject();
+    putProperty(json, "id", nodeId);
+    putProperty(json, "checked", node.isChecked());
+    return json;
+  }
+
+  protected Collection<ITreeNode> collectChildNodesCheckedRec(ITreeNode node) {
+    P_ChildNodesVisitor visitor = new P_ChildNodesVisitor();
+    TreeUtility.visitNodes(node.getChildNodes(), visitor);
+    return visitor.getNodes();
   }
 
   protected void handleModelNodeChanged(ITreeNode modelNode) {
@@ -1093,4 +1116,21 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
       handleModelTreeEvent(e);
     }
   }
+
+  protected class P_ChildNodesVisitor implements ITreeVisitor {
+
+    Set<ITreeNode> m_nodes = new HashSet<>();
+
+    @Override
+    public boolean visit(ITreeNode node) {
+      m_nodes.add(node);
+      return true;
+    }
+
+    public Set<ITreeNode> getNodes() {
+      return m_nodes;
+    }
+
+  }
+
 }
