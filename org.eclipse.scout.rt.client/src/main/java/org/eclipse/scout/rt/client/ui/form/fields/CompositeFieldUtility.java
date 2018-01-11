@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.rt.client.ui.form.FormUtility;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.platform.OrderedComparator;
@@ -41,6 +42,7 @@ public final class CompositeFieldUtility {
     if (compositeField.getForm().isInitConfigDone()) {
       f.postInitConfig();
       f.init();
+      FormUtility.rebuildFieldGrid(compositeField);
     }
   }
 
@@ -79,9 +81,6 @@ public final class CompositeFieldUtility {
     if (form.getHandler() == null) {
       return;
     }
-//    if (form.isShowing()) {
-//      throw new IllegalStateException("field '" + f + "' is already showing on desktop. Structural changes are not allowed anymore.");
-//    }
   }
 
   /**

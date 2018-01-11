@@ -76,6 +76,12 @@ public final class FormUtility {
     }
   }
 
+  public static void rebuildFieldGrid(ICompositeField field) {
+    RebuildFieldGridVisitor v = new RebuildFieldGridVisitor();
+    field.visitFields(v);
+    v.handleResult();
+  }
+
   private static void initRootBoxGridData(IForm form, ICompositeField rootBox) {
     // layout data for root group box
     GridData rootData = new GridData(rootBox.getGridDataHints());
