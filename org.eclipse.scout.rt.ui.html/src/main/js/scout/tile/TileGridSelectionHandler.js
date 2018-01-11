@@ -38,8 +38,10 @@ scout.TileGridSelectionHandler.prototype.selectTileOnMouseDown = function(event)
   if (event.ctrlKey && this.isMultiSelect()) {
     if (selected) {
       this.addTilesToSelection(tile);
+      this.tileGrid.setFocusedTile(tile);
     } else {
       this.deselectTile(tile);
+      this.tileGrid.setFocusedTile(null);
     }
     return;
   }
@@ -47,8 +49,10 @@ scout.TileGridSelectionHandler.prototype.selectTileOnMouseDown = function(event)
   // If multi selection is disabled or no CTRL key is pressed, only the clicked tile may be selected
   if (selected) {
     this.selectTile(tile);
+    this.tileGrid.setFocusedTile(tile);
   } else {
     this.deselectAllTiles();
+    this.tileGrid.setFocusedTile(null);
   }
 };
 

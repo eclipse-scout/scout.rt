@@ -45,14 +45,14 @@ describe("TileGridKeyStrokes", function() {
       var tileGrid = createTileGrid(3, {
         selectable: true
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      expect(tileGrid.selectedTiles.length).toBe(0);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.A, 'ctrl');
       expect(tileGrid.selectedTiles.length).toBe(3);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.A, 'ctrl');
 
-      tileGrid.selectTile(tileGrid.tiles[0]);
+      tileGrid.selectTile(tiles[0]);
       expect(tileGrid.selectedTiles.length).toBe(1);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.A, 'ctrl');
@@ -66,7 +66,6 @@ describe("TileGridKeyStrokes", function() {
       });
       tileGrid.render();
       tileGrid.selectAllTiles();
-      expect(tileGrid.selectedTiles.length).toBe(3);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.A, 'ctrl');
       expect(tileGrid.selectedTiles.length).toBe(0);
@@ -88,16 +87,16 @@ describe("TileGridKeyStrokes", function() {
       var tileGrid = createTileGrid(4, {
         selectable: true
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      tileGrid.selectTile(tileGrid.tiles[1]);
-      expect(tileGrid.selectedTiles.length).toBe(1);
+      tileGrid.selectTile(tiles[1]);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.RIGHT);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[2]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[2]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.RIGHT);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.RIGHT);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[3]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[3]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.RIGHT);
     });
 
@@ -105,11 +104,11 @@ describe("TileGridKeyStrokes", function() {
       var tileGrid = createTileGrid(4, {
         selectable: true
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      expect(tileGrid.selectedTiles.length).toBe(0);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.RIGHT);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.RIGHT);
     });
 
@@ -117,12 +116,12 @@ describe("TileGridKeyStrokes", function() {
       var tileGrid = createTileGrid(4, {
         selectable: true
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      tileGrid.selectTile(scout.arrays.last(tileGrid.tiles));
-      expect(tileGrid.selectedTiles).toEqual([scout.arrays.last(tileGrid.tiles)]);
+      tileGrid.selectTile(scout.arrays.last(tiles));
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.RIGHT);
-      expect(tileGrid.selectedTiles).toEqual([scout.arrays.last(tileGrid.tiles)]);
+      expect(tileGrid.selectedTiles).toEqual([scout.arrays.last(tiles)]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.RIGHT);
     });
 
@@ -130,24 +129,123 @@ describe("TileGridKeyStrokes", function() {
       var tileGrid = createTileGrid(1, {
         selectable: true
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      expect(tileGrid.selectedTiles.length).toBe(0);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.RIGHT);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.RIGHT);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.RIGHT);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.RIGHT);
 
       tileGrid.deselectAllTiles();
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.RIGHT);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.RIGHT);
     });
 
+    describe('with shift', function() {
+      it("adds the next tile to the selection", function() {
+        var tileGrid = createTileGrid(4, {
+          selectable: true
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTile(tiles[1]);
+
+        tileGrid.$container.triggerKeyDownCapture(scout.keys.RIGHT, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2]]);
+        tileGrid.$container.triggerKeyUpCapture(scout.keys.RIGHT, 'shift');
+
+        tileGrid.$container.triggerKeyDownCapture(scout.keys.RIGHT, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3]]);
+        tileGrid.$container.triggerKeyUpCapture(scout.keys.RIGHT, 'shift');
+      });
+
+      it("removes the next tile from the selection if the focused tile is the first tile of the selection", function() {
+        var tileGrid = createTileGrid(4, {
+          selectable: true
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTiles([tiles[0], tiles[1], tiles[2]]);
+        tileGrid.focusedTile = tiles[0];
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.RIGHT, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2]]);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.RIGHT, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[2]]);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.RIGHT, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[2], tiles[3]]);
+      });
+
+      it("does nothing if the last tile is already selected", function() {
+        var tileGrid = createTileGrid(4, {
+          selectable: true
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTile(tiles[2]);
+
+        tileGrid.$container.triggerKeyDownCapture(scout.keys.RIGHT, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[2], tiles[3]]);
+        tileGrid.$container.triggerKeyUpCapture(scout.keys.RIGHT, 'shift');
+
+        tileGrid.$container.triggerKeyDownCapture(scout.keys.RIGHT, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[2], tiles[3]]);
+        tileGrid.$container.triggerKeyUpCapture(scout.keys.RIGHT, 'shift');
+      });
+
+      it("adds the correct tile to the selection if the focused tile gets invisible", function() {
+        var tileGrid = createTileGrid(4, {
+          selectable: true
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTiles([tiles[0], tiles[1]]);
+        tileGrid.focusedTile = tiles[0];
+
+        var filter = {
+          accept: function(tile) {
+            return tile !== tiles[0]; // Make tile 0 invisible
+          }
+        };
+        tileGrid.addFilter(filter);
+        tileGrid.filter();
+        expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
+        expect(tileGrid.focusedTile).toBe(null);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.RIGHT, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2]]);
+      });
+
+      it("connects two selections blocks and sets the focused tile to the beginning of the new block", function() {
+        var tileGrid = createTileGrid(6, {
+          selectable: true
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTiles([tiles[1], tiles[4]]);
+        tileGrid.focusedTile = tiles[1];
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.RIGHT, 'shift');
+        expect(scout.arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[1], tiles[2], tiles[4]])).toBe(true);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.RIGHT, 'shift');
+        expect(scout.arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[1], tiles[2], tiles[3], tiles[4]])).toBe(true);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.RIGHT, 'shift');
+        expect(scout.arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[1], tiles[2], tiles[3], tiles[4], tiles[5]])).toBe(true);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.RIGHT, 'shift');
+        expect(scout.arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[1], tiles[2], tiles[3], tiles[4], tiles[5]])).toBe(true);
+      });
+    });
   });
 
   describe('key left', function() {
@@ -155,16 +253,16 @@ describe("TileGridKeyStrokes", function() {
       var tileGrid = createTileGrid(4, {
         selectable: true
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      tileGrid.selectTile(tileGrid.tiles[2]);
-      expect(tileGrid.selectedTiles.length).toBe(1);
+      tileGrid.selectTile(tiles[2]);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.LEFT);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[1]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.LEFT);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.LEFT);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.LEFT);
     });
 
@@ -172,11 +270,11 @@ describe("TileGridKeyStrokes", function() {
       var tileGrid = createTileGrid(4, {
         selectable: true
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      expect(tileGrid.selectedTiles.length).toBe(0);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.LEFT);
-      expect(tileGrid.selectedTiles).toEqual([scout.arrays.last(tileGrid.tiles)]);
+      expect(tileGrid.selectedTiles).toEqual([scout.arrays.last(tiles)]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.LEFT);
     });
 
@@ -184,12 +282,12 @@ describe("TileGridKeyStrokes", function() {
       var tileGrid = createTileGrid(4, {
         selectable: true
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      tileGrid.selectTile(tileGrid.tiles[0]);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      tileGrid.selectTile(tiles[0]);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.LEFT);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.LEFT);
     });
 
@@ -197,22 +295,123 @@ describe("TileGridKeyStrokes", function() {
       var tileGrid = createTileGrid(1, {
         selectable: true
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      expect(tileGrid.selectedTiles.length).toBe(0);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.LEFT);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.LEFT);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.LEFT);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.LEFT);
 
       tileGrid.deselectAllTiles();
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.LEFT);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.LEFT);
+    });
+
+    describe('with shift', function() {
+      it("adds the previous tile to the selection", function() {
+        var tileGrid = createTileGrid(4, {
+          selectable: true
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTile(tiles[3]);
+
+        tileGrid.$container.triggerKeyDownCapture(scout.keys.LEFT, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[2], tiles[3]]);
+        tileGrid.$container.triggerKeyUpCapture(scout.keys.LEFT, 'shift');
+
+        tileGrid.$container.triggerKeyDownCapture(scout.keys.LEFT, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3]]);
+        tileGrid.$container.triggerKeyUpCapture(scout.keys.LEFT, 'shift');
+      });
+
+      it("does nothing if the first tile is already selected", function() {
+        var tileGrid = createTileGrid(4, {
+          selectable: true
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTile(tiles[1]);
+
+        tileGrid.$container.triggerKeyDownCapture(scout.keys.LEFT, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[0], tiles[1]]);
+        tileGrid.$container.triggerKeyUpCapture(scout.keys.LEFT, 'shift');
+
+        tileGrid.$container.triggerKeyDownCapture(scout.keys.LEFT, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[0], tiles[1]]);
+        tileGrid.$container.triggerKeyUpCapture(scout.keys.LEFT, 'shift');
+      });
+
+      it("removes the previous tile from the selection if the next tile is already selected", function() {
+        var tileGrid = createTileGrid(4, {
+          selectable: true
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTiles([tiles[1], tiles[2], tiles[3]]);
+        tileGrid.focusedTile = tiles[3];
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.LEFT, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2]]);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.LEFT, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.LEFT, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[0], tiles[1]]);
+      });
+
+      it("adds the correct tile to the selection if the focused tile gets invisible", function() {
+        var tileGrid = createTileGrid(4, {
+          selectable: true
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTiles([tiles[1], tiles[2]]);
+        tileGrid.focusedTile = tiles[2];
+
+        var filter = {
+          accept: function(tile) {
+            return tile !== tiles[2]; // Make tile 2 invisible
+          }
+        };
+        tileGrid.addFilter(filter);
+        tileGrid.filter();
+        expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
+        expect(tileGrid.focusedTile).toBe(null);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.LEFT, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[0], tiles[1]]);
+      });
+
+      it("connects two selections blocks and sets the focused tile to the beginning of the new block", function() {
+        var tileGrid = createTileGrid(5, {
+          selectable: true
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTiles([tiles[1], tiles[4]]);
+        tileGrid.focusedTile = tiles[4];
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.LEFT, 'shift');
+        expect(scout.arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[1], tiles[3], tiles[4]])).toBe(true);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.LEFT, 'shift');
+        expect(scout.arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[1], tiles[2], tiles[3], tiles[4]])).toBe(true);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.LEFT, 'shift');
+        expect(scout.arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4]])).toBe(true);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.LEFT, 'shift');
+        expect(scout.arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4]])).toBe(true);
+      });
+
     });
 
   });
@@ -223,16 +422,16 @@ describe("TileGridKeyStrokes", function() {
         selectable: true,
         gridColumnCount: 3
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      tileGrid.selectTile(tileGrid.tiles[0]);
-      expect(tileGrid.selectedTiles.length).toBe(1);
+      tileGrid.selectTile(tiles[0]);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.DOWN);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[3]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[3]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.DOWN);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.DOWN);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[6]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[6]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.DOWN);
     });
 
@@ -241,11 +440,11 @@ describe("TileGridKeyStrokes", function() {
         selectable: true,
         gridColumnCount: 3
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      expect(tileGrid.selectedTiles.length).toBe(0);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.DOWN);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.DOWN);
     });
 
@@ -254,19 +453,19 @@ describe("TileGridKeyStrokes", function() {
         selectable: true,
         gridColumnCount: 3
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      tileGrid.selectTile(tileGrid.tiles[6]);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[6]]);
+      tileGrid.selectTile(tiles[6]);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.DOWN);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[6]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[6]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.DOWN);
 
-      tileGrid.selectTile(scout.arrays.last(tileGrid.tiles));
-      expect(tileGrid.selectedTiles).toEqual([scout.arrays.last(tileGrid.tiles)]);
+      tileGrid.selectTile(scout.arrays.last(tiles));
+      expect(tileGrid.selectedTiles).toEqual([scout.arrays.last(tiles)]);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.DOWN);
-      expect(tileGrid.selectedTiles).toEqual([scout.arrays.last(tileGrid.tiles)]);
+      expect(tileGrid.selectedTiles).toEqual([scout.arrays.last(tiles)]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.DOWN);
     });
 
@@ -275,22 +474,128 @@ describe("TileGridKeyStrokes", function() {
         selectable: true,
         gridColumnCount: 3
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      expect(tileGrid.selectedTiles.length).toBe(0);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.DOWN);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.DOWN);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.DOWN);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.DOWN);
 
       tileGrid.deselectAllTiles();
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.DOWN);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.DOWN);
+    });
+
+    it("selects the last tile if below the focused tile is no tile", function() {
+      var tileGrid = createTileGrid(5, {
+        selectable: true,
+        gridColumnCount: 3
+      });
+      var tiles = tileGrid.tiles;
+      tileGrid.selectTile(tiles[2]);
+      tileGrid.render();
+
+      tileGrid.$container.triggerKeyDownCapture(scout.keys.DOWN);
+      expect(tileGrid.selectedTiles).toEqual([tiles[4]]);
+      tileGrid.$container.triggerKeyUpCapture(scout.keys.DOWN);
+    });
+
+    describe('with shift', function() {
+      it("adds the tiles between the focused and the newly focused tile to the selection", function() {
+        var tileGrid = createTileGrid(9, {
+          selectable: true,
+          gridColumnCount: 3
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTile(tiles[1]);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.DOWN, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3], tiles[4]]);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.DOWN, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
+      });
+
+      it("removes the tiles between the focused and the newly focused tiles from the selection if the focused tile is the first tile of the selection", function() {
+        var tileGrid = createTileGrid(9, {
+          selectable: true,
+          gridColumnCount: 3
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTiles([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
+        tileGrid.focusedTile = tiles[1];
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.DOWN, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[4], tiles[5], tiles[6], tiles[7]]);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.DOWN, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[7]]);
+      });
+
+      it("does nothing if a tile in the last row is already selected", function() {
+        var tileGrid = createTileGrid(5, {
+          selectable: true,
+          gridColumnCount: 3
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTiles([tiles[1], tiles[2], tiles[3]]);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.DOWN, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3]]);
+      });
+
+      it("adds the correct tile to the selection if the focused tile gets invisible", function() {
+        var tileGrid = createTileGrid(9, {
+          selectable: true,
+          gridColumnCount: 3
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTiles([tiles[2], tiles[3], tiles[4]]);
+        tileGrid.focusedTile = tiles[2];
+
+        var filter = {
+          accept: function(tile) {
+            return tile !== tiles[2]; // Make tile 2 invisible
+          }
+        };
+        tileGrid.addFilter(filter);
+        tileGrid.filter();
+        expect(tileGrid.selectedTiles).toEqual([tiles[3], tiles[4]]);
+        expect(tileGrid.focusedTile).toBe(null);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.DOWN, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
+      });
+
+      it("connects two selections blocks and sets the focused tile to the beginning of the new block", function() {
+        var tileGrid = createTileGrid(9, {
+          selectable: true,
+          gridColumnCount: 3
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTiles([tiles[0], tiles[1], tiles[5]]);
+        tileGrid.focusedTile = tiles[1];
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.DOWN, 'shift');
+        expect(scout.arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5]])).toBe(true);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.DOWN, 'shift');
+        expect(scout.arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]])).toBe(true);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.DOWN, 'shift');
+        expect(scout.arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]])).toBe(true);
+      });
     });
 
   });
@@ -301,16 +606,16 @@ describe("TileGridKeyStrokes", function() {
         selectable: true,
         gridColumnCount: 3
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      tileGrid.selectTile(scout.arrays.last(tileGrid.tiles));
-      expect(tileGrid.selectedTiles.length).toBe(1);
+      tileGrid.selectTile(scout.arrays.last(tiles));
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.UP);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[4]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[4]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.UP);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.UP);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[1]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.UP);
     });
 
@@ -319,11 +624,11 @@ describe("TileGridKeyStrokes", function() {
         selectable: true,
         gridColumnCount: 3
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      expect(tileGrid.selectedTiles.length).toBe(0);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.UP);
-      expect(tileGrid.selectedTiles).toEqual([scout.arrays.last(tileGrid.tiles)]);
+      expect(tileGrid.selectedTiles).toEqual([scout.arrays.last(tiles)]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.UP);
     });
 
@@ -332,19 +637,19 @@ describe("TileGridKeyStrokes", function() {
         selectable: true,
         gridColumnCount: 3
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      tileGrid.selectTile(tileGrid.tiles[2]);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[2]]);
+      tileGrid.selectTile(tiles[2]);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.UP);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[2]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[2]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.UP);
 
-      tileGrid.selectTile(tileGrid.tiles[0]);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      tileGrid.selectTile(tiles[0]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.UP);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.UP);
     });
 
@@ -353,24 +658,116 @@ describe("TileGridKeyStrokes", function() {
         selectable: true,
         gridColumnCount: 3
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      expect(tileGrid.selectedTiles.length).toBe(0);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.UP);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.UP);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.UP);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.UP);
 
       tileGrid.deselectAllTiles();
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.UP);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.UP);
     });
 
+    describe('with shift', function() {
+      it("adds the tiles between the focused and the newly focused tile to the selection", function() {
+        var tileGrid = createTileGrid(9, {
+          selectable: true,
+          gridColumnCount: 3
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTile(tiles[7]);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.UP, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[4], tiles[5], tiles[6], tiles[7]]);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.UP, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
+      });
+
+      it("removes the tiles between the focused and the newly focused tiles from the selection if the focused tile is the first tile of the selection", function() {
+        var tileGrid = createTileGrid(9, {
+          selectable: true,
+          gridColumnCount: 3
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTiles([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
+        tileGrid.focusedTile = tiles[7];
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.UP, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3], tiles[4]]);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.UP, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
+      });
+
+      it("does nothing if a tile in the first row is already selected", function() {
+        var tileGrid = createTileGrid(5, {
+          selectable: true,
+          gridColumnCount: 3
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTiles([tiles[1], tiles[2], tiles[3]]);
+        tileGrid.focusedTile = tiles[2];
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.UP, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3]]);
+      });
+
+      it("adds the correct tile to the selection if the focused tile gets invisible", function() {
+        var tileGrid = createTileGrid(9, {
+          selectable: true,
+          gridColumnCount: 3
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTiles([tiles[4], tiles[5], tiles[6]]);
+        tileGrid.focusedTile = tiles[6];
+
+        var filter = {
+          accept: function(tile) {
+            return tile !== tiles[6]; // Make tile 6 invisible
+          }
+        };
+        tileGrid.addFilter(filter);
+        tileGrid.filter();
+        expect(tileGrid.selectedTiles).toEqual([tiles[4], tiles[5]]);
+        expect(tileGrid.focusedTile).toBe(null);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.UP, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5]]);
+      });
+
+      it("connects two selections blocks and sets the focused tile to the beginning of the new block", function() {
+        var tileGrid = createTileGrid(9, {
+          selectable: true,
+          gridColumnCount: 3
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTiles([tiles[3], tiles[7], tiles[8]]);
+        tileGrid.focusedTile = tiles[7];
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.UP, 'shift');
+        expect(scout.arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]])).toBe(true);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.UP, 'shift');
+        expect(scout.arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]])).toBe(true);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.UP, 'shift');
+        expect(scout.arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]])).toBe(true);
+      });
+    });
   });
 
   describe('home', function() {
@@ -379,12 +776,12 @@ describe("TileGridKeyStrokes", function() {
         selectable: true,
         gridColumnCount: 3
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      tileGrid.selectTile(tileGrid.tiles[1]);
-      expect(tileGrid.selectedTiles.length).toBe(1);
+      tileGrid.selectTile(tiles[1]);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.HOME);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.HOME);
     });
 
@@ -392,12 +789,12 @@ describe("TileGridKeyStrokes", function() {
       var tileGrid = createTileGrid(4, {
         selectable: true
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      tileGrid.selectTile(tileGrid.tiles[0]);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      tileGrid.selectTile(tiles[0]);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.HOME);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.HOME);
     });
 
@@ -406,12 +803,13 @@ describe("TileGridKeyStrokes", function() {
         selectable: true,
         gridColumnCount: 3
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      tileGrid.selectTiles([tileGrid.tiles[0], tileGrid.tiles[1]]);
-      expect(tileGrid.selectedTiles.length).toBe(2);
+      tileGrid.selectTiles([tiles[0], tiles[1]]);
+      tileGrid.focusedTile = tiles[1];
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.HOME);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.HOME);
     });
 
@@ -420,22 +818,37 @@ describe("TileGridKeyStrokes", function() {
         selectable: true,
         gridColumnCount: 3
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      expect(tileGrid.selectedTiles.length).toBe(0);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.HOME);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.HOME);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.HOME);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.HOME);
 
       tileGrid.deselectAllTiles();
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.HOME);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.HOME);
+    });
+
+    describe('with shift', function() {
+      it("adds the tiles between the focused and the newly focused tile to the selection", function() {
+        var tileGrid = createTileGrid(9, {
+          selectable: true,
+          gridColumnCount: 3
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTiles([tiles[6], tiles[7]]);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.HOME, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
+      });
     });
 
   });
@@ -446,11 +859,11 @@ describe("TileGridKeyStrokes", function() {
         selectable: true,
         gridColumnCount: 3
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      expect(tileGrid.selectedTiles.length).toBe(0);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.END);
-      expect(tileGrid.selectedTiles).toEqual([scout.arrays.last(tileGrid.tiles)]);
+      expect(tileGrid.selectedTiles).toEqual([scout.arrays.last(tiles)]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.END);
     });
 
@@ -458,12 +871,12 @@ describe("TileGridKeyStrokes", function() {
       var tileGrid = createTileGrid(4, {
         selectable: true
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      tileGrid.selectTile(scout.arrays.last(tileGrid.tiles));
-      expect(tileGrid.selectedTiles).toEqual([scout.arrays.last(tileGrid.tiles)]);
+      tileGrid.selectTile(scout.arrays.last(tiles));
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.END);
-      expect(tileGrid.selectedTiles).toEqual([scout.arrays.last(tileGrid.tiles)]);
+      expect(tileGrid.selectedTiles).toEqual([scout.arrays.last(tiles)]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.END);
     });
 
@@ -472,12 +885,13 @@ describe("TileGridKeyStrokes", function() {
         selectable: true,
         gridColumnCount: 3
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      tileGrid.selectTiles([tileGrid.tiles[2], tileGrid.tiles[3]]);
-      expect(tileGrid.selectedTiles.length).toBe(2);
+      tileGrid.selectTiles([tiles[2], tiles[3]]);
+      tileGrid.focusedTile = tiles[2];
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.END);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[3]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[3]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.END);
     });
 
@@ -486,22 +900,41 @@ describe("TileGridKeyStrokes", function() {
         selectable: true,
         gridColumnCount: 3
       });
+      var tiles = tileGrid.tiles;
       tileGrid.render();
-      expect(tileGrid.selectedTiles.length).toBe(0);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.END);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.END);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.END);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.END);
 
       tileGrid.deselectAllTiles();
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.END);
-      expect(tileGrid.selectedTiles).toEqual([tileGrid.tiles[0]]);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       tileGrid.$container.triggerKeyUpCapture(scout.keys.END);
+    });
+
+    describe('with shift', function() {
+      it("adds the tiles between the focused and the newly focused tile to the selection", function() {
+        var tileGrid = createTileGrid(9, {
+          selectable: true,
+          gridColumnCount: 3
+        });
+        var tiles = tileGrid.tiles;
+        tileGrid.render();
+        tileGrid.selectTiles([tiles[4], tiles[5]]);
+
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.END, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]]);
+
+        // After pressing shift home afterwards all tiles should be selected
+        tileGrid.$container.triggerKeyInputCapture(scout.keys.HOME, 'shift');
+        expect(tileGrid.selectedTiles).toEqual([tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]]);
+      });
     });
 
   });

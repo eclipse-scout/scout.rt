@@ -536,7 +536,7 @@ $.fn.triggerKeyUpCapture = function(which, modifier) {
 /**
  * Triggers key down and key up events.
  */
-$.fn.triggerKeyInput = function(which, modifier) {
+$.fn.triggerKeyInputCapture = function(which, modifier) {
   this.triggerKeyCapture('keydown', which, modifier);
   this.triggerKeyCapture('keyup', which, modifier);
   return this;

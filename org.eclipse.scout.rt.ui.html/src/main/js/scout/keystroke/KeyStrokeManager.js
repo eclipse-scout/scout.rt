@@ -137,7 +137,7 @@ scout.KeyStrokeManager.prototype._handleKeyStrokeEvent = function(keyStrokeConte
   if (!keyStrokeContext.accept(event)) {
     return;
   }
-  
+
   if (keyStrokeContext.keyStrokes.length < 1) {
     return;
   }

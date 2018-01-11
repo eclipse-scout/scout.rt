@@ -634,6 +634,18 @@ describe("TileGrid", function() {
         expect(tileGrid.selectedTiles.length).toBe(1);
       });
 
+      it('sets focusedTile property to clicked tile when selected', function() {
+        var tileGrid = createTileGrid(3, {
+          selectable: true
+        });
+        tileGrid.render();
+        var tile0 = tileGrid.tiles[0];
+
+        tile0.$container.triggerMouseDown();
+        expect(tile0.selected).toBe(true);
+        expect(tileGrid.focusedTile).toBe(tile0);
+      });
+
     });
 
     describe('with multiSelect = true', function() {
@@ -741,6 +753,22 @@ describe("TileGrid", function() {
           expect(tile0.selected).toBe(false);
           expect(tile1.selected).toBe(true);
           expect(tileGrid.selectedTiles.length).toBe(1);
+        });
+
+        it('sets focusedTile property to null when when clicked tile is unselected', function() {
+          var tileGrid = createTileGrid(3, {
+            selectable: true
+          });
+          tileGrid.render();
+          var tile0 = tileGrid.tiles[0];
+          tileGrid.selectTile(tile0);
+          expect(tile0.selected).toBe(true);
+
+          tile0.$container.triggerMouseDown({
+            modifier: 'ctrl'
+          });
+          expect(tile0.selected).toBe(false);
+          expect(tileGrid.focusedTile).toBe(null);
         });
 
       });

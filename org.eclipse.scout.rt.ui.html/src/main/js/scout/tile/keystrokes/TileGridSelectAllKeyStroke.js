@@ -9,9 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.TileGridSelectAllKeyStroke = function(tileGrid) {
-  scout.TileGridSelectAllKeyStroke.parent.call(this);
-  this.field = tileGrid;
+  scout.TileGridSelectAllKeyStroke.parent.call(this, tileGrid);
   this.ctrl = true;
+  this.shift = false;
   this.which = [scout.keys.A];
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     var tile = this.field.filteredTiles[0];

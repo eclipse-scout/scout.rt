@@ -17,6 +17,7 @@ scout.TileGrid = function() {
   this.filters = [];
   this.filteredTiles = [];
   this.filteredTilesDirty = true;
+  this.focusedTile = null;
   // GridColumnCount will be modified by the layout, prefGridColumnCount remains unchanged
   this.gridColumnCount = 4;
   this.prefGridColumnCount = this.gridColumnCount;
@@ -259,6 +260,9 @@ scout.TileGrid.prototype._deleteTile = function(tile) {
   }
   this._onTileDelete(tile);
   tile.animateRemoval = false;
+  if (tile === this.focusedTile) {
+    this.setFocusedTile(null);
+  }
 };
 
 scout.TileGrid.prototype._animateTileRemoval = function(tile) {
@@ -603,6 +607,10 @@ scout.TileGrid.prototype._setLogicalGrid = function(logicalGrid) {
   }
 };
 
+scout.TileGrid.prototype.setFocusedTile = function(tile) {
+  this.focusedTile = tile;
+};
+
 scout.TileGrid.prototype.setSelectable = function(selectable) {
   this.setProperty('selectable', selectable);
   if (!selectable) {
@@ -764,6 +772,9 @@ scout.TileGrid.prototype._applyFilters = function(tiles, fullReset) {
     }
     if (!tile.filterAccepted && changed) {
       newlyHiddenTiles.push(tile);
+      if (tile === this.focusedTile) {
+        this.setFocusedTile(null);
+      }
     }
   }, this);
 

@@ -9,49 +9,43 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.TileGridSelectDownKeyStroke = function(tileGrid) {
-  scout.TileGridSelectDownKeyStroke.parent.call(this);
-  this.field = tileGrid;
+  scout.TileGridSelectDownKeyStroke.parent.call(this, tileGrid);
+  this.stopPropagation = true;
   this.repeatable = true;
   this.which = [scout.keys.DOWN];
   this.renderingHints.text = '↓';
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    var tiles = this._computeNewSelection();
-    if (tiles && tiles.length > 0) {
-      return scout.arrays.last(tiles).$container;
-    }
-  }.bind(this);
 };
 scout.inherits(scout.TileGridSelectDownKeyStroke, scout.TileGridSelectKeyStroke);
 
-scout.TileGridSelectDownKeyStroke.prototype.handle = function(event) {
-  var tileGrid = this.field;
-  var newSelectedTiles = this._computeNewSelection();
-
-  if (newSelectedTiles && newSelectedTiles.length > 0) {
-    tileGrid.selectTiles(newSelectedTiles);
-    tileGrid.scrollTo(scout.arrays.last(newSelectedTiles));
-  }
-};
-
-scout.TileGridSelectDownKeyStroke.prototype._computeNewSelection = function() {
+scout.TileGridSelectDownKeyStroke.prototype._computeNewSelection = function(extend) {
   var tileGrid = this.field;
   var tiles = tileGrid.filteredTiles;
-  var rowCount = Math.ceil(tiles.length / tileGrid.gridColumnCount);
   var selectedTiles = tileGrid.selectedTiles;
-  var selectedTileIndex = tiles.indexOf(scout.arrays.last(selectedTiles));
-  var selectedTileRow = Math.floor(selectedTileIndex / tileGrid.gridColumnCount);
-  var newSelectedTileIndex = [];
+  var rowCount = Math.ceil(tiles.length / tileGrid.gridColumnCount);
+  var focusedTile = tileGrid.focusedTile;
+  var focusedTileRow = -1;
+  var focusedTileIndex = -1;
 
-  if (selectedTiles.length > 0 && selectedTileRow === rowCount - 1) {
-    // Do nothing if one tile of the last row is already selected
-    return;
-  }
   if (selectedTiles.length === 0) {
     // Select first tile if no tiles are selected
-    newSelectedTileIndex = 0;
-  } else {
-    // Select next tile
-    newSelectedTileIndex = Math.min(tiles.length - 1, selectedTileIndex + tileGrid.gridColumnCount);
+    focusedTile = scout.arrays.first(tiles);
+    return {
+      selectedTiles: [focusedTile],
+      focusedTile: focusedTile
+    };
   }
-  return [tiles[newSelectedTileIndex]];
+
+  // Focused tile may be null if tile has been deleted or if the user has not made a selection before
+  if (!focusedTile) {
+    focusedTile = scout.arrays.last(selectedTiles);
+  }
+
+  focusedTileIndex = tiles.indexOf(focusedTile);
+  focusedTileRow = Math.floor(focusedTileIndex / tileGrid.gridColumnCount);
+  if (focusedTileRow === rowCount - 1) {
+    // Do nothing if focused tile is in the last row
+    return;
+  }
+
+  return this._computeSelectionBetween(focusedTileIndex, Math.min(tiles.length - 1, focusedTileIndex + tileGrid.gridColumnCount), extend);
 };
