@@ -64,7 +64,8 @@ import org.slf4j.LoggerFactory;
  * same key but different namespaces. A namespace is separated using the pipe character (|).
  * <p>
  * Properties may contain placeholders for other properties: <code>${variableName}</code>. These values are then
- * resolved once when the properties are initialized.
+ * resolved once when the properties are initialized. For system properties and environment variables they are resolved
+ * whenever the property is accessed.
  * <p>
  * The special key <code>import</code> is reserved and expects an URL pointing to other .properties files.<br>
  * Such a file can be on the classpath (use <code>classpath:</code>) or any other supported URL.
@@ -83,7 +84,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PropertiesHelper {
 
-  private static final String PLACEHOLDER_PATTERN = "\\$\\{([^\\}]+)\\}";
+  private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\$\\{([^\\}]+)\\}");
   public static final String CLASSPATH_PROTOCOL_NAME = "classpath";
   public static final char PROTOCOL_DELIMITER = ':';
   public static final char NAMESPACE_DELIMITER = '|';
@@ -133,9 +134,8 @@ public class PropertiesHelper {
     m_configProperties = new HashMap<>();
     if (propertiesFileUrl != null) {
       parse(propertiesFileUrl);
-      Pattern pat = Pattern.compile(PLACEHOLDER_PATTERN);
-      importAll(importsToIgnore, pat);
-      resolveAll(pat);
+      importAll(importsToIgnore, PLACEHOLDER_PATTERN);
+      resolveAll(PLACEHOLDER_PATTERN);
       m_isInitialized = true;
     }
     else {
@@ -210,7 +210,7 @@ public class PropertiesHelper {
     // system config
     value = System.getProperty(propKey);
     if (StringUtility.hasText(value)) {
-      return value;
+      return resolve(value, PLACEHOLDER_PATTERN);
     }
 
     // properties file
@@ -222,7 +222,7 @@ public class PropertiesHelper {
     // environment config
     value = System.getenv(propKey);
     if (StringUtility.hasText(value)) {
-      return value;
+      return resolve(value, PLACEHOLDER_PATTERN);
     }
 
     return defaultValue;

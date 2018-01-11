@@ -10,12 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.config;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -30,6 +24,12 @@ import java.util.Map;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for class {@link PropertiesHelper}.
@@ -427,5 +427,24 @@ public class PropertiesHelperTest {
     PropertiesHelper instance = new PropertiesHelper(SAMPLE_CONFIG_PROPS);
     assertEquals(17, instance.getAllPropertyNames().size());
     assertEquals(17, instance.getAllEntries().size());
+  }
+
+  @Test
+  public void testSystemResolveProperty() {
+    PropertiesHelper instance = new PropertiesHelper(SAMPLE_CONFIG_PROPS);
+    final String attrOtherSystemPropertyKey = "attrOtherSystemPropertyKey";
+    try {
+      System.setProperty(ATTR_STRING_KEY, "property ${" + attrOtherSystemPropertyKey + "}");
+      System.setProperty(attrOtherSystemPropertyKey, "resolved");
+
+      assertEquals("property resolved", instance.getProperty(ATTR_STRING_KEY));
+
+      System.setProperty(ATTR_STRING_KEY, "property ${" + ATTR_LONG_KEY + "}");
+      System.setProperty(attrOtherSystemPropertyKey, "property " + 777);
+    }
+    finally {
+      System.clearProperty(ATTR_STRING_KEY);
+      System.clearProperty(attrOtherSystemPropertyKey);
+    }
   }
 }
