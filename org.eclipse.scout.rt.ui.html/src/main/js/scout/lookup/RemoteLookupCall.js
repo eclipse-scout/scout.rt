@@ -58,6 +58,14 @@ scout.RemoteLookupCall.prototype.resolveLookup = function(lookupResult) {
 };
 
 scout.RemoteLookupCall.prototype._belongsToLatestRequest = function(lookupResult) {
+  // This case may happen when a lookup is initialized by the UI server (not the browser)
+  // Note: currently we simply ignore that case because it can only occur when the UI server
+  // calls doSearch in unexpected conditions. However, we could support this case in a similar
+  // way than we support requestInput().
+  if (!this.deferred) {
+    return false;
+  }
+
   var propertyName = lookupResult.queryBy.toLowerCase(),
     requestData = lookupResult[propertyName],
     resultParameter = new scout.RemoteLookupRequest(lookupResult.queryBy, requestData);
