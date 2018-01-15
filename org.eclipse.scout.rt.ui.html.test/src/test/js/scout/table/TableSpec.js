@@ -647,6 +647,42 @@ describe("Table", function() {
       expect(table.$rows().eq(1).data('row').checked).toBe(false);
     });
 
+    it("keeps added checkable column visible even when reloading factory settings", function() {
+      var model = helper.createModelFixture(2, 5);
+      model.checkable = true;
+      model.multiCheck = true;
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var rows = table.rows;
+      var checkedRows = findCheckedRows(rows);
+      expect(checkedRows.length).toBe(0);
+
+      table.checkRow(rows[0], true, true);
+      checkedRows = findCheckedRows(rows);
+      expect(checkedRows.length).toBe(1);
+
+      var colsDeepCopy = $.extend(true, [], table.columns);
+      expect(table.columns.length).toBe(3);
+      colsDeepCopy.shift();
+      table.updateColumnStructure(colsDeepCopy);
+      expect(table.columns.length).toBe(3);
+    });
+
+    it("does not add an additional checkable column if one is already configured", function() {
+      var model = helper.createModelSingleConfiguredCheckableColumn(5);
+      model.checkable = true;
+      model.multiCheck = true;
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var rows = table.rows;
+      var checkedRows = findCheckedRows(rows);
+      expect(checkedRows.length).toBe(0);
+
+      expect(table.columns.length).toBe(1);
+    });
+
   });
 
   describe("selectRows", function() {
