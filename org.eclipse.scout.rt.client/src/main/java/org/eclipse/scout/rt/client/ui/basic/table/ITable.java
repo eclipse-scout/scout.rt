@@ -647,6 +647,9 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   void deselectAllEnabledRows();
 
+  /**
+   * Sets the checkable column. Changing the column at runtime is not supported and has no effect.
+   */
   void setCheckableColumn(IBooleanColumn checkboxColumn);
 
   IBooleanColumn getCheckableColumn();
