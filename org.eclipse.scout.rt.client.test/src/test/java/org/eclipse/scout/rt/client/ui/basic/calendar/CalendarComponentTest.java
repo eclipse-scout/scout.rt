@@ -10,13 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.calendar;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 
+import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
+import org.eclipse.scout.rt.shared.services.common.calendar.CalendarAppointment;
 import org.eclipse.scout.rt.shared.services.common.calendar.HolidayItem;
+import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarAppointment;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,9 +33,8 @@ import org.junit.Test;
  * @author Adrian Moser
  */
 public class CalendarComponentTest {
-
-  private static final Date DATE_1 = DateUtility.parse("01072012", "ddmmyyyy");
-  private static final Date DATE_2 = DateUtility.parse("02072012", "ddmmyyyy");
+  private static final Date DATE_1 = DateUtility.parse("01.07.2012", "dd.MM.yyyy");
+  private static final Date DATE_2 = DateUtility.parse("02.07.2012", "dd.MM.yyyy");
 
   @Test
   public void testOrder1() throws Exception {
@@ -91,6 +96,36 @@ public class CalendarComponentTest {
     Set<CalendarComponent> set = createSet(comp1, comp2);
 
     Assert.assertEquals("Count", 2, set.size());
+  }
+
+  @Test
+  public void testCoveredDayRange1() throws Exception {
+    ICalendarAppointment appointment = new CalendarAppointment(UUID.randomUUID(), null, DATE_1, DATE_2, false, "Subject", "Body", null);
+    CalendarComponent component = createComponent(appointment);
+    Range<Date> coveredDayRange = component.getCoveredDaysRange();
+    assertNotNull(coveredDayRange);
+    assertEquals(DateUtility.truncDate(DATE_1), coveredDayRange.getFrom());
+    assertEquals(DateUtility.truncDate(DATE_2), coveredDayRange.getTo());
+  }
+
+  @Test
+  public void testCoveredDayRange2() throws Exception {
+    ICalendarAppointment appointment = new CalendarAppointment(UUID.randomUUID(), null, DATE_1, null, false, "Subject", "Body", null);
+    CalendarComponent component = createComponent(appointment);
+    Range<Date> coveredDayRange = component.getCoveredDaysRange();
+    assertNotNull(coveredDayRange);
+    assertEquals(DateUtility.truncDate(DATE_1), coveredDayRange.getFrom());
+    assertEquals(DateUtility.truncDate(DATE_1), coveredDayRange.getTo());
+  }
+
+  @Test
+  public void testCoveredDayRange3() throws Exception {
+    ICalendarAppointment appointment = new CalendarAppointment(UUID.randomUUID(), null, null, DATE_2, false, "Subject", "Body", null);
+    CalendarComponent component = createComponent(appointment);
+    Range<Date> coveredDayRange = component.getCoveredDaysRange();
+    assertNotNull(coveredDayRange);
+    assertEquals(DateUtility.truncDate(DATE_2), coveredDayRange.getFrom());
+    assertEquals(DateUtility.truncDate(DATE_2), coveredDayRange.getTo());
   }
 
   private CalendarComponent createComponent(ICalendarItem item) {
