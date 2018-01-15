@@ -20,6 +20,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -254,6 +256,41 @@ public class UriBuilderTest {
     assertEquals(2, builder.getParameters().size());
     assertEquals(VALUE1, builder.getParameters().get(NAME1));
     assertEquals(VALUE2, builder.getParameters().get(NAME2));
+  }
+
+  @Test
+  public void testParameters() throws Exception {
+    UriBuilder builder = new UriBuilder();
+    assertNotNull(builder.getParameters());
+    assertTrue(builder.getParameters().isEmpty());
+    //
+    builder.parameters(null);
+    assertEquals(0, builder.getParameters().size());
+
+    builder.parameters(toMap(null, null));
+    builder.parameters(toMap(NAME1, null));
+    builder.parameters(toMap(null, VALUE1));
+    builder.parameters(toMap(NAME2, VALUE2));
+    assertEquals(1, builder.getParameters().size());
+    assertEquals(VALUE2, builder.getParameters().get(NAME2));
+    builder.parameters(toMap(NAME2, null));
+    assertTrue(builder.getParameters().isEmpty());
+    //
+    assertSame(builder, builder.parameter(null, null));
+    //
+    builder = new UriBuilder();
+    Map<String, String> map = new HashMap<>();
+    map.put(NAME1, VALUE1);
+    map.put(NAME2, VALUE2);
+    builder.parameters(map);
+    assertEquals(VALUE1, builder.getParameters().get(NAME1));
+    assertEquals(VALUE2, builder.getParameters().get(NAME2));
+  }
+
+  protected Map<String, String> toMap(String key, String value) {
+    Map<String, String> map = new HashMap<>();
+    map.put(key, value);
+    return map;
   }
 
   @Test

@@ -159,6 +159,13 @@ public class UriBuilder {
     return this;
   }
 
+  public UriBuilder parameters(Map<String, String> parameters) {
+    if (parameters != null) {
+      parameters.forEach((name, value) -> parameter(name, value));
+    }
+    return this;
+  }
+
   public URL createURL() {
     return createURL(DEFAULT_ENCODING);
   }
