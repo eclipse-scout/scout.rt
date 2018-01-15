@@ -124,12 +124,22 @@ scout.Table.prototype._initColumns = function() {
   if (this.rowIconVisible) {
     this._insertRowIconColumn();
   }
-  if (this.checkable && this.checkableStyle === scout.Table.CheckableStyle.CHECKBOX) {
-    this._insertBooleanColumn();
-  }
+  this._syncCheckable(this.checkable);
 
   // Sync head and tail sort columns
   this._syncHeadAndTailSortColumns();
+};
+
+scout.Table.prototype._destroy = function() {
+  this._destroyColumns();
+  scout.Table.parent.prototype._destroy.call(this);
+};
+
+scout.Table.prototype._destroyColumns = function() {
+  this.columns.forEach(function(column) {
+    column.destroy();
+  });
+  this.checkableColumn = null;
 };
 
 scout.Table.prototype._initCells = function(row) {
@@ -3062,7 +3072,7 @@ scout.Table.prototype._syncCheckable = function(checkable, oldValue) {
   var column = this.checkableColumn;
   if (this.checkable && !column) {
     this._insertBooleanColumn();
-  } else if (!this.checkable && column) {
+  } else if (!this.checkable && column && column.guiOnly) {
     scout.arrays.remove(this.columns, column);
     this.checkableColumn = null;
   }
@@ -3716,7 +3726,7 @@ scout.Table.prototype._onRowOrderChanged = function(rowIds) {
  */
 scout.Table.prototype._onColumnStructureChanged = function(columns) {
   this._rebuildingTable = true;
-
+  this._destroyColumns();
   this.columns = columns;
   this._initColumns();
 

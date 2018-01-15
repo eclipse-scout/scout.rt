@@ -70,7 +70,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
       json.put("sortIndex", getColumn().getSortIndex());
       json.put("grouped", getColumn().isGroupingActive());
     }
-    if (getColumn().getTable().isCheckable() && getColumn().getTable().getCheckableColumn() == getColumn()) {
+    if (getColumn().getTable().getCheckableColumn() == getColumn()) {
       json.put("checkable", true);
     }
     //TODO [5.2] cgu: remove this properties, they get sent by cell, or change behaviour in model, see also todo in Column.js

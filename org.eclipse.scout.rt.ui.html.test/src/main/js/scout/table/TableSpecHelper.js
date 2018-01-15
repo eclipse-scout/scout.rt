@@ -192,6 +192,12 @@ scout.TableSpecHelper.prototype.createTableWithOneColumn = function() {
   return this.createTable(model);
 };
 
+scout.TableSpecHelper.prototype.createModelSingleConfiguredCheckableColumn = function(rowCount) {
+  var cols = this.createModelColumns(1);
+  cols[0].checkable = true;
+  return this.createModel(cols, this.createModelRows(1, rowCount));
+};
+
 scout.TableSpecHelper.prototype.createTable = function(model) {
   var table = new scout.Table();
   table.init(model);

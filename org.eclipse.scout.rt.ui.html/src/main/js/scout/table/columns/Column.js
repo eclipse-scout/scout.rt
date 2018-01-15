@@ -37,6 +37,10 @@ scout.Column.prototype.init = function(model) {
   }
 };
 
+scout.Column.prototype.destroy = function() {
+  // NOP
+};
+
 /**
  * Converts the cell if it is of type string to an object with
  * a property 'text' with the original value.
