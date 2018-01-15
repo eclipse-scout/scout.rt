@@ -47,6 +47,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.A, 'ctrl');
       expect(tileGrid.selectedTiles.length).toBe(3);
@@ -65,6 +66,7 @@ describe("TileGridKeyStrokes", function() {
         selectable: true
       });
       tileGrid.render();
+      tileGrid.validateLayout();
       tileGrid.selectAllTiles();
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.A, 'ctrl');
@@ -89,6 +91,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
       tileGrid.selectTile(tiles[1]);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.RIGHT);
@@ -106,6 +109,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.RIGHT);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
@@ -118,6 +122,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
       tileGrid.selectTile(scout.arrays.last(tiles));
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.RIGHT);
@@ -131,6 +136,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.RIGHT);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
@@ -154,6 +160,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTile(tiles[1]);
 
         tileGrid.$container.triggerKeyDownCapture(scout.keys.RIGHT, 'shift');
@@ -171,6 +178,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[0], tiles[1], tiles[2]]);
         tileGrid.focusedTile = tiles[0];
 
@@ -190,6 +198,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTile(tiles[2]);
 
         tileGrid.$container.triggerKeyDownCapture(scout.keys.RIGHT, 'shift');
@@ -207,6 +216,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[0], tiles[1]]);
         tileGrid.focusedTile = tiles[0];
 
@@ -230,6 +240,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[1], tiles[4]]);
         tileGrid.focusedTile = tiles[1];
 
@@ -255,6 +266,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
       tileGrid.selectTile(tiles[2]);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.LEFT);
@@ -272,6 +284,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.LEFT);
       expect(tileGrid.selectedTiles).toEqual([scout.arrays.last(tiles)]);
@@ -284,6 +297,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
       tileGrid.selectTile(tiles[0]);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.LEFT);
@@ -297,6 +311,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.LEFT);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
@@ -320,6 +335,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTile(tiles[3]);
 
         tileGrid.$container.triggerKeyDownCapture(scout.keys.LEFT, 'shift');
@@ -337,6 +353,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTile(tiles[1]);
 
         tileGrid.$container.triggerKeyDownCapture(scout.keys.LEFT, 'shift');
@@ -354,6 +371,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[1], tiles[2], tiles[3]]);
         tileGrid.focusedTile = tiles[3];
 
@@ -373,6 +391,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[1], tiles[2]]);
         tileGrid.focusedTile = tiles[2];
 
@@ -396,6 +415,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[1], tiles[4]]);
         tileGrid.focusedTile = tiles[4];
 
@@ -424,6 +444,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
       tileGrid.selectTile(tiles[0]);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.DOWN);
@@ -442,6 +463,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.DOWN);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
@@ -455,6 +477,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
       tileGrid.selectTile(tiles[6]);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.DOWN);
@@ -476,6 +499,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.DOWN);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
@@ -500,6 +524,7 @@ describe("TileGridKeyStrokes", function() {
       var tiles = tileGrid.tiles;
       tileGrid.selectTile(tiles[2]);
       tileGrid.render();
+      tileGrid.validateLayout();
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.DOWN);
       expect(tileGrid.selectedTiles).toEqual([tiles[4]]);
@@ -514,6 +539,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTile(tiles[1]);
 
         tileGrid.$container.triggerKeyInputCapture(scout.keys.DOWN, 'shift');
@@ -530,6 +556,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
         tileGrid.focusedTile = tiles[1];
 
@@ -547,6 +574,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[1], tiles[2], tiles[3]]);
 
         tileGrid.$container.triggerKeyInputCapture(scout.keys.DOWN, 'shift');
@@ -560,6 +588,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[2], tiles[3], tiles[4]]);
         tileGrid.focusedTile = tiles[2];
 
@@ -584,6 +613,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[0], tiles[1], tiles[5]]);
         tileGrid.focusedTile = tiles[1];
 
@@ -608,6 +638,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
       tileGrid.selectTile(scout.arrays.last(tiles));
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.UP);
@@ -626,6 +657,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.UP);
       expect(tileGrid.selectedTiles).toEqual([scout.arrays.last(tiles)]);
@@ -639,6 +671,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
       tileGrid.selectTile(tiles[2]);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.UP);
@@ -660,6 +693,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.UP);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
@@ -684,6 +718,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTile(tiles[7]);
 
         tileGrid.$container.triggerKeyInputCapture(scout.keys.UP, 'shift');
@@ -700,6 +735,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
         tileGrid.focusedTile = tiles[7];
 
@@ -717,6 +753,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[1], tiles[2], tiles[3]]);
         tileGrid.focusedTile = tiles[2];
 
@@ -731,6 +768,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[4], tiles[5], tiles[6]]);
         tileGrid.focusedTile = tiles[6];
 
@@ -755,6 +793,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[3], tiles[7], tiles[8]]);
         tileGrid.focusedTile = tiles[7];
 
@@ -778,6 +817,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
       tileGrid.selectTile(tiles[1]);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.HOME);
@@ -791,6 +831,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
       tileGrid.selectTile(tiles[0]);
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.HOME);
@@ -805,6 +846,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
       tileGrid.selectTiles([tiles[0], tiles[1]]);
       tileGrid.focusedTile = tiles[1];
 
@@ -820,6 +862,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.HOME);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
@@ -844,6 +887,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[6], tiles[7]]);
 
         tileGrid.$container.triggerKeyInputCapture(scout.keys.HOME, 'shift');
@@ -861,6 +905,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.END);
       expect(tileGrid.selectedTiles).toEqual([scout.arrays.last(tiles)]);
@@ -873,6 +918,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
       tileGrid.selectTile(scout.arrays.last(tiles));
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.END);
@@ -887,6 +933,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
       tileGrid.selectTiles([tiles[2], tiles[3]]);
       tileGrid.focusedTile = tiles[2];
 
@@ -902,6 +949,7 @@ describe("TileGridKeyStrokes", function() {
       });
       var tiles = tileGrid.tiles;
       tileGrid.render();
+      tileGrid.validateLayout();
 
       tileGrid.$container.triggerKeyDownCapture(scout.keys.END);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
@@ -926,6 +974,7 @@ describe("TileGridKeyStrokes", function() {
         });
         var tiles = tileGrid.tiles;
         tileGrid.render();
+        tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[4], tiles[5]]);
 
         tileGrid.$container.triggerKeyInputCapture(scout.keys.END, 'shift');

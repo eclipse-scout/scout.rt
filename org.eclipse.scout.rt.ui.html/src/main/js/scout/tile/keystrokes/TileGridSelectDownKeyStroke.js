@@ -18,13 +18,13 @@ scout.TileGridSelectDownKeyStroke = function(tileGrid) {
 scout.inherits(scout.TileGridSelectDownKeyStroke, scout.TileGridSelectKeyStroke);
 
 scout.TileGridSelectDownKeyStroke.prototype._computeNewSelection = function(extend) {
-  var tileGrid = this.field;
-  var tiles = tileGrid.filteredTiles;
-  var selectedTiles = tileGrid.selectedTiles;
-  var rowCount = Math.ceil(tiles.length / tileGrid.gridColumnCount);
-  var focusedTile = tileGrid.focusedTile;
+  var tiles = this.getSelectionHandler().getVisibleTiles();
+  var selectedTiles = this.getSelectionHandler().getSelectedTiles();
+  var focusedTile = this.getSelectionHandler().getFocusedTile();
   var focusedTileRow = -1;
+  var focusedTileColumn = -1;
   var focusedTileIndex = -1;
+  var rowCount = this.getSelectionHandler().getVisibleGridRowCount();
 
   if (selectedTiles.length === 0) {
     // Select first tile if no tiles are selected
@@ -41,11 +41,20 @@ scout.TileGridSelectDownKeyStroke.prototype._computeNewSelection = function(exte
   }
 
   focusedTileIndex = tiles.indexOf(focusedTile);
-  focusedTileRow = Math.floor(focusedTileIndex / tileGrid.gridColumnCount);
+  focusedTileRow = this.getSelectionHandler().getVisibleGridY(focusedTile);
+  focusedTileColumn = this.getSelectionHandler().getVisibleGridX(focusedTile);
   if (focusedTileRow === rowCount - 1) {
     // Do nothing if focused tile is in the last row
     return;
   }
 
-  return this._computeSelectionBetween(focusedTileIndex, Math.min(tiles.length - 1, focusedTileIndex + tileGrid.gridColumnCount), extend);
+  var newFocusedTileIndex = this.getSelectionHandler().findVisibleTileIndexAt(focusedTileColumn, focusedTileRow + 1, focusedTileIndex);
+  if (newFocusedTileIndex < 0) {
+    var tileGrid = this.getSelectionHandler().getTileGridByRow(focusedTileRow + 1);
+    if (!tileGrid) {
+      return;
+    }
+    newFocusedTileIndex = tiles.indexOf(scout.arrays.last(tileGrid.filteredTiles));
+  }
+  return this.getSelectionHandler().computeSelectionBetween(focusedTileIndex, newFocusedTileIndex, extend);
 };

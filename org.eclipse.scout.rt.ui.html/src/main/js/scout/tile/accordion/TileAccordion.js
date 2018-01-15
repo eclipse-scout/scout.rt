@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.TileAccordion = function() {
   scout.TileAccordion.parent.call(this);
+  this.exclusiveExpand = false;
   this.gridColumnCount = null;
   this.multiSelect = null;
   this.selectable = null;
@@ -64,6 +65,7 @@ scout.TileAccordion.prototype._initGroup = function(group) {
   this.setProperty('withPlaceholders', group.body.withPlaceholders);
 
   group.body.on('propertyChange', this._onTileGridPropertyChange.bind(this));
+  this._handleCollapsed(group);
 };
 
 scout.TileAccordion.prototype.setGridColumnCount = function(gridColumnCount) {
@@ -215,6 +217,35 @@ scout.TileAccordion.prototype.getFilteredTileCount = function() {
 };
 
 /**
+ * Compared to #getFilteredTiles(), this function considers the collapsed state of the group as well, meaning only filtered tiles of expanded groups are returned.
+ */
+scout.TileAccordion.prototype.getVisibleTiles = function() {
+  var tiles = [];
+  this.expandedGroups().forEach(function(group) {
+    scout.arrays.pushAll(tiles, group.body.filteredTiles);
+  });
+  return tiles;
+};
+
+/**
+ * Compared to #getFilteredTiles(), this function considers the collapsed state of the group as well, meaning only filtered tiles of expanded groups are counted.
+ */
+scout.TileAccordion.prototype.getVisibleTileCount = function() {
+  var count = 0;
+  this.expandedGroups().forEach(function(group) {
+    count += group.body.filteredTiles.length;
+  });
+  return count;
+};
+
+scout.TileAccordion.prototype.findVisibleTileIndexAt = function(x, y, startIndex, reverse) {
+  startIndex = scout.nvl(startIndex, 0);
+  return scout.arrays.findIndexFrom(this.getVisibleTiles(), startIndex, function(tile, i) {
+    return this.getVisibleGridX(tile) === x && this.getVisibleGridY(tile) === y;
+  }.bind(this), reverse);
+};
+
+/**
  * Selects the given tiles and deselects the previously selected ones.
  */
 scout.TileAccordion.prototype.selectTiles = function(tiles) {
@@ -288,6 +319,14 @@ scout.TileAccordion.prototype.getSelectedTileCount = function() {
   return count;
 };
 
+scout.TileAccordion.prototype.toggleSelection = function() {
+  if (this.getSelectedTileCount() === this.getFilteredTileCount()) {
+    this.deselectAllTiles();
+  } else {
+    this.selectAllTiles();
+  }
+};
+
 scout.TileAccordion.prototype.setTileComparator = function(comparator) {
   this.groups.forEach(function(group) {
     group.body.setComparator(comparator);
@@ -315,6 +354,73 @@ scout.TileAccordion.prototype.setFocusedTile = function(tile) {
   });
 };
 
+scout.TileAccordion.prototype.getFocusedTile = function() {
+  var focusedTile = null;
+  this.groups.some(function(group) {
+    if (group.body.focusedTile) {
+      focusedTile = group.body.focusedTile;
+      return true;
+    }
+  });
+  return focusedTile;
+};
+
+scout.TileAccordion.prototype.getVisibleGridRowCount = function() {
+  return this.expandedGroups().reduce(function(acc, group) {
+    return acc + group.body.logicalGrid.gridRows;
+  });
+};
+
+scout.TileAccordion.prototype.getVisibleGridX = function(tile) {
+  return tile.gridData.x;
+};
+
+scout.TileAccordion.prototype.getVisibleGridY = function(tile) {
+  var group = this.getGroupByTile(tile);
+  var yCorr = this.getVisibleRowByGroup(group);
+  return tile.gridData.y + yCorr;
+};
+
+scout.TileAccordion.prototype.getGroupByVisibleRow = function(rowToFind) {
+  if (rowToFind < 0 || rowToFind >= this.getVisibleGridRowCount()) {
+    return null;
+  }
+  var currentIndex = 0;
+  return this.expandedGroups().find(function(group) {
+    var rowCount = group.body.logicalGrid.gridRows;
+    if (currentIndex <= rowToFind && rowToFind < currentIndex + rowCount) {
+      return true;
+    }
+    currentIndex += rowCount;
+  });
+};
+
+/**
+ * @returns the index of the row where the group is located.<p>
+ *          Example: There are 3 rows and 2 groups. The first group contains 2 rows, the second 1 row.
+ *          The index of the first group is 0, the index of the second group is 2.
+ */
+scout.TileAccordion.prototype.getVisibleRowByGroup = function(groupToFind) {
+  var currentIndex = 0;
+  var found = this.expandedGroups().some(function(group) {
+    var rowCount = group.body.logicalGrid.gridRows;
+    if (group === groupToFind) {
+      return true;
+    }
+    currentIndex += rowCount;
+  });
+  if (!found) {
+    return -1;
+  }
+  return currentIndex;
+};
+
+scout.TileAccordion.prototype.expandedGroups = function() {
+  return this.groups.filter(function(group) {
+    return !group.collapsed;
+  });
+};
+
 scout.TileAccordion.prototype._onTileGridSelectedTilesChange = function(event) {
   if (this._selectionUpdateLocked) {
     // Don't execute when deselecting other tiles to minimize the amount of property change events
@@ -337,5 +443,21 @@ scout.TileAccordion.prototype._onTileGridSelectedTilesChange = function(event) {
 scout.TileAccordion.prototype._onTileGridPropertyChange = function(event) {
   if (event.propertyName === 'selectedTiles') {
     this._onTileGridSelectedTilesChange(event);
+  }
+};
+
+/**
+ * @override
+ */
+scout.TileAccordion.prototype._onGroupCollapsedChange = function(event) {
+  scout.TileAccordion.parent.prototype._onGroupCollapsedChange.call(this, event);
+
+  this._handleCollapsed(event.source);
+};
+
+scout.TileAccordion.prototype._handleCollapsed = function(group) {
+  if (group.collapsed) {
+    // Deselect tiles of a collapsed group (this will also set focusedTile to null) -> actions on invisible elements is confusing, and key strokes only operate on visible elements, too
+    group.body.deselectAllTiles();
   }
 };

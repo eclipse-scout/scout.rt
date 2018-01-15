@@ -243,7 +243,13 @@ scout.Accordion.prototype._collapseOthers = function(expandedGroup) {
 };
 
 scout.Accordion.prototype._onGroupPropertyChange = function(event) {
-  if (event.propertyName === 'collapsed' && !event.newValue && this.exclusiveExpand) {
+  if (event.propertyName === 'collapsed') {
+    this._onGroupCollapsedChange(event);
+  }
+};
+
+scout.Accordion.prototype._onGroupCollapsedChange = function(event) {
+  if (!event.newValue && this.exclusiveExpand) {
     this._collapseOthers(event.source);
   }
 };

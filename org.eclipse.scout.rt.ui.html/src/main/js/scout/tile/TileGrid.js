@@ -654,6 +654,9 @@ scout.TileGrid.prototype.selectTiles = function(tiles) {
   scout.arrays.removeAll(tilesToUnselect, tiles);
   tilesToUnselect.forEach(function(tile) {
     tile.setSelected(false);
+    if (tile === this.focusedTile) {
+      this.setFocusedTile(null);
+    }
   }, this);
 
   // Select the tiles
@@ -671,7 +674,7 @@ scout.TileGrid.prototype.selectTile = function(tile) {
 /**
  * Selects all visible tiles
  */
-scout.TileGrid.prototype.selectAllTiles = function(tile) {
+scout.TileGrid.prototype.selectAllTiles = function() {
   this.selectTiles(this.tiles);
 };
 
@@ -687,7 +690,7 @@ scout.TileGrid.prototype.deselectTile = function(tile) {
   this.deselectTiles([tile]);
 };
 
-scout.TileGrid.prototype.deselectAllTiles = function(tiles) {
+scout.TileGrid.prototype.deselectAllTiles = function() {
   this.selectTiles([]);
 };
 
@@ -852,4 +855,11 @@ scout.TileGrid.prototype._filterTiles = function(tiles) {
   return tiles.filter(function(tile) {
     return tile.filterAccepted;
   });
+};
+
+scout.TileGrid.prototype.findTileIndexAt = function(x, y, startIndex, reverse) {
+  startIndex = scout.nvl(startIndex, 0);
+  return scout.arrays.findIndexFrom(this.filteredTiles, startIndex, function(tile, i) {
+    return tile.gridData.x === x && tile.gridData.y === y;
+  }, reverse);
 };

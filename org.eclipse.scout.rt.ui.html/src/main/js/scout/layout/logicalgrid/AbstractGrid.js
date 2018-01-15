@@ -81,7 +81,7 @@ scout.AbstractGrid.prototype.getGridColumnCount = function() {
   return this.gridColumns;
 };
 
-scout.AbstractGrid.prototype.getGridRowCount = function() {
+scout.AbstractGrid.prototype.getVisibleGridRowCount = function() {
   return this.gridRows;
 };
 

@@ -14,7 +14,7 @@ scout.TileGridSelectAllKeyStroke = function(tileGrid) {
   this.shift = false;
   this.which = [scout.keys.A];
   this.renderingHints.$drawingArea = function($drawingArea, event) {
-    var tile = this.field.filteredTiles[0];
+    var tile = this.getSelectionHandler().getVisibleTiles()[0];
     if (tile) {
       // Draw in first tile so that other key stroke hints (e.g. left, right etc.) don't overlap this one
       return tile.$container;
@@ -28,12 +28,12 @@ scout.TileGridSelectAllKeyStroke.prototype._accept = function(event) {
   if (!accepted) {
     return false;
   }
-  if (!this.field.multiSelect) {
+  if (!this.getSelectionHandler().isMultiSelect()) {
     return false;
   }
   return true;
 };
 
 scout.TileGridSelectAllKeyStroke.prototype.handle = function(event) {
-  this.field.toggleSelection();
+  this.getSelectionHandler().toggleSelection();
 };

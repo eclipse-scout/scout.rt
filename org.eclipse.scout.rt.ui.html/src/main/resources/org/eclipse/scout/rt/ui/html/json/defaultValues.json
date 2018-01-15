@@ -410,6 +410,7 @@
       "withPlaceholders": false
     },
     "TileAccordion": {
+      "exclusiveExpand": false,
       "multiSelect": true,
       "selectable": false
     },

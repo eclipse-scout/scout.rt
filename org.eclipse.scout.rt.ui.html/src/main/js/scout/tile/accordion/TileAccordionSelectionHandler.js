@@ -11,12 +11,94 @@
 scout.TileAccordionSelectionHandler = function(tileAccordion) {
   scout.TileAccordionSelectionHandler.parent.call(this, tileAccordion);
   // The difference to the main selectionHandler is that this one works on the TileAccordion rather than on the TileGrid
+  this.tileAccordion = this.tileGrid;
 };
 scout.inherits(scout.TileAccordionSelectionHandler, scout.TileGridSelectionHandler);
 
 /**
  * @override
  */
+scout.TileAccordionSelectionHandler.prototype.getFilteredTiles = function() {
+  return this.tileAccordion.getFilteredTiles();
+};
+
+/**
+ * @override
+ */
+scout.TileAccordionSelectionHandler.prototype.getFilteredTileCount = function() {
+  return this.tileAccordion.getFilteredTileCount();
+};
+
+/**
+ * @override
+ */
+scout.TileAccordionSelectionHandler.prototype.getVisibleTiles = function() {
+  return this.tileAccordion.getVisibleTiles();
+};
+
+/**
+ * @override
+ */
+scout.TileAccordionSelectionHandler.prototype.getVisibleTileCount = function() {
+  return this.tileAccordion.getVisibleTileCount();
+};
+
+/**
+ * @override
+ */
 scout.TileAccordionSelectionHandler.prototype.getSelectedTiles = function(event) {
-  return this.tileGrid.getSelectedTiles();
+  return this.tileAccordion.getSelectedTiles();
+};
+
+/**
+ * @override
+ */
+scout.TileAccordionSelectionHandler.prototype.getFocusedTile = function() {
+  return this.tileAccordion.getFocusedTile();
+};
+
+/**
+ * @override
+ */
+scout.TileAccordionSelectionHandler.prototype.getVisibleGridRowCount = function() {
+  return this.tileAccordion.getVisibleGridRowCount();
+};
+
+/**
+ * @override
+ */
+scout.TileAccordionSelectionHandler.prototype.getVisibleGridX = function(tile) {
+  return this.tileAccordion.getVisibleGridX(tile);
+};
+
+/**
+ * @override
+ */
+scout.TileAccordionSelectionHandler.prototype.getVisibleGridY = function(tile) {
+  return this.tileAccordion.getVisibleGridY(tile);
+};
+
+/**
+ * @override
+ */
+scout.TileAccordionSelectionHandler.prototype.scrollTo = function(tile) {
+  tile.reveal();
+};
+
+/**
+ * @override
+ */
+scout.TileAccordionSelectionHandler.prototype.getTileGridByRow = function(rowIndex) {
+  var group = this.tileAccordion.getGroupByVisibleRow(rowIndex);
+  if (group) {
+    return group.body;
+  }
+  return null;
+};
+
+/**
+ * @override
+ */
+scout.TileAccordionSelectionHandler.prototype.findVisibleTileIndexAt = function(x, y, startIndex, reverse) {
+  return this.tileAccordion.findVisibleTileIndexAt(x, y, startIndex, reverse);
 };

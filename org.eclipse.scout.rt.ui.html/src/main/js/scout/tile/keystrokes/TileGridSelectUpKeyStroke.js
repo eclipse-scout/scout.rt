@@ -18,10 +18,11 @@ scout.TileGridSelectUpKeyStroke = function(tileGrid) {
 scout.inherits(scout.TileGridSelectUpKeyStroke, scout.TileGridSelectKeyStroke);
 
 scout.TileGridSelectUpKeyStroke.prototype._computeNewSelection = function(extend) {
-  var tileGrid = this.field;
-  var tiles = tileGrid.filteredTiles;
-  var selectedTiles = tileGrid.selectedTiles;
-  var focusedTile = tileGrid.focusedTile;
+  var tiles = this.getSelectionHandler().getVisibleTiles();
+  var selectedTiles = this.getSelectionHandler().getSelectedTiles();
+  var focusedTile = this.getSelectionHandler().getFocusedTile();
+  var focusedTileRow = -1;
+  var focusedTileColumn = -1;
   var focusedTileIndex = -1;
 
   if (selectedTiles.length === 0) {
@@ -39,5 +40,16 @@ scout.TileGridSelectUpKeyStroke.prototype._computeNewSelection = function(extend
   }
 
   focusedTileIndex = tiles.indexOf(focusedTile);
-  return this._computeSelectionBetween(focusedTileIndex, focusedTileIndex - tileGrid.gridColumnCount, extend);
+  focusedTileRow = this.getSelectionHandler().getVisibleGridY(focusedTile);
+  focusedTileColumn = this.getSelectionHandler().getVisibleGridX(focusedTile);
+
+  var newFocusedTileIndex = this.getSelectionHandler().findVisibleTileIndexAt(focusedTileColumn, focusedTileRow - 1, focusedTileIndex, true);
+  if (newFocusedTileIndex < 0) {
+    var tileGrid = this.getSelectionHandler().getTileGridByRow(focusedTileRow - 1);
+    if (!tileGrid) {
+      return;
+    }
+    newFocusedTileIndex = tiles.indexOf(scout.arrays.last(tileGrid.filteredTiles));
+  }
+  return this.getSelectionHandler().computeSelectionBetween(focusedTileIndex, newFocusedTileIndex, extend);
 };
