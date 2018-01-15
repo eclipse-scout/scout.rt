@@ -231,4 +231,44 @@ describe("scout.tooltips", function() {
 
   });
 
+  it("can update the text of an already visible tooltip", function() {
+    var $testElement = session.$entryPoint.appendDiv('tooltip-test')
+      .data('tooltipText', 'initial text');
+
+    scout.tooltips.install($testElement, {
+      parent: session.desktop,
+      session: session,
+      delay: 123
+    });
+
+    var tooltip = $('body').find('.tooltip');
+    expect(tooltip.length).toBe(0);
+
+    $testElement.triggerMouseEnter();
+    jasmine.clock().tick(100);
+
+    tooltip = $('body').find('.tooltip');
+    expect(tooltip.length).toBe(0);
+
+    jasmine.clock().tick(50);
+
+    tooltip = $('body').find('.tooltip');
+    expect(tooltip.length).toBe(1);
+    expect(tooltip.text()).toBe('initial text');
+
+    $testElement.data('tooltipText', 'updated text');
+
+    tooltip = $('body').find('.tooltip');
+    expect(tooltip.length).toBe(1);
+    expect(tooltip.text()).toBe('initial text');
+
+    scout.tooltips.update($testElement);
+
+    tooltip = $('body').find('.tooltip');
+    expect(tooltip.length).toBe(1);
+    expect(tooltip.text()).toBe('updated text');
+
+    scout.tooltips.uninstall($testElement);
+  });
+
 });

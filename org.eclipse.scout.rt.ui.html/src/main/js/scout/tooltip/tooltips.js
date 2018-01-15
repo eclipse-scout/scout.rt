@@ -28,6 +28,17 @@ scout.tooltips = {
   },
 
   /**
+   * If the tooltip is currently showing, its contents are updated immediately.
+   * Otherwise, nothing happens.
+   */
+  update: function($comp) {
+    var support = $comp.data('tooltipSupport');
+    if (support) {
+      support.update($comp);
+    }
+  },
+
+  /**
    * Convenient function to install tooltip support for ellipsis only.
    */
   installForEllipsis: function($comp, options) {
@@ -93,6 +104,12 @@ scout.TooltipSupport.prototype.uninstall = function($comp) {
     .off('mouseenter', this._options.selector, this._onMouseEnterHandler);
   this._destroyTooltip();
   clearTimeout(this._tooltipTimeoutId);
+};
+
+scout.TooltipSupport.prototype.update = function($comp) {
+  if (this._tooltip) {
+    this._showTooltip($comp);
+  }
 };
 
 scout.TooltipSupport.prototype._onMouseEnter = function(event) {
