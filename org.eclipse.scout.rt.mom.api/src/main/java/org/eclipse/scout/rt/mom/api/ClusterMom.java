@@ -72,6 +72,7 @@ public class ClusterMom extends AbstractMomTransport {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Specifies the MOM implementor.\n"
           + "Example to work with a JMS based implementor:\n" +

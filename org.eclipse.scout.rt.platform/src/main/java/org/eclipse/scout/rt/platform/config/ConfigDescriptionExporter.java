@@ -96,6 +96,7 @@ public class ConfigDescriptionExporter {
     private Path m_targetFile = Paths.get(System.getProperty("user.home"), "config_export", "config.adoc");
 
     @Override
+    @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE") // targetFile() cannot be null
     public void accept(final Stream<IConfigProperty> configProperties) {
       final StringBuilder adoc = asciiDoctorDescFor(configProperties);
       final byte[] rawContent = StandardCharsets.UTF_8.encode(wrap(adoc)).array();
@@ -128,6 +129,7 @@ public class ConfigDescriptionExporter {
       return builder.build();
     }
 
+    @SuppressWarnings("findbugs:RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE") // getGenericsParameterClass may return null
     protected String dataTypeOf(IConfigProperty<?> property) {
       if (property instanceof AbstractSubjectConfigProperty) {
         return "Subject name as " + String.class.getSimpleName();

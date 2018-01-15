@@ -41,6 +41,7 @@ public final class HttpServiceTunnelConfigurationProperties {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Specifies the default maximum connections per route property for the HTTP service tunnel.\n"
           + "Overrides the value from '%s' for the service tunnel.\n"
@@ -61,6 +62,7 @@ public final class HttpServiceTunnelConfigurationProperties {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Specifies the default total maximum connections property for the HTTP service tunnel.\n"
           + "Overrides the value from '%s' for the service tunnel.\n"

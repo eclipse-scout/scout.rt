@@ -215,6 +215,7 @@ public class CookieAccessController implements IAccessController {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("If the '%s' is enabled, specifies the name for the cookie.\n"
           + "The name must conform to RFC 2109. However, vendors may provide a configuration option that allows cookie names conforming to the original Netscape Cookie Specification to be accepted.\n"
@@ -234,6 +235,7 @@ public class CookieAccessController implements IAccessController {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("If the '%s' is enabled, specifies the maximum age in seconds for the cookie.\n"
           + "A positive value indicates that the cookie will expire after that many seconds have passed.\n"

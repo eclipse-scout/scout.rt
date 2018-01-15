@@ -38,6 +38,7 @@ public final class SharedConfigProperties {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Specifies the Base64 encoded private key for signing requests from the UI server to the backend server. By validating the signature the server can ensure the request is trustworthy.\n" +
           "Furthermore the CookieAccessController uses this private key to sign the cookie.\n" +
@@ -53,6 +54,7 @@ public final class SharedConfigProperties {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Specifies the Base64 encoded public key used to validate signed requests on the backend server. The public key must match the private key stored in the property '%s' on the UI server.\n" +
           "New public-private-key-pairs can be created by invoking the class '%s' on the command line.", BEANS.get(AuthTokenPrivateKeyProperty.class).getKey(), SecurityUtility.class.getName());
@@ -149,6 +151,7 @@ public final class SharedConfigProperties {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Specifies the URL to the ServiceTunnelServlet on the backend server.\n"
           + "By default this property points to the value of property '%s' with '%s' appended.", BEANS.get(BackendUrlProperty.class).getKey(), PROCESS_SERVLET_MAPPING);
@@ -188,6 +191,7 @@ public final class SharedConfigProperties {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Specifies if the Scout platform should create proxy beans for interfaces annotated with '%s'. Calls to beans of such types are then tunneled to the Scout backend.\n"
           + "By default this property is enabled if the property '%s' is set.", TunnelToServer.class.getSimpleName(), BEANS.get(ServiceTunnelTargetUrlProperty.class).getKey());
@@ -210,6 +214,7 @@ public final class SharedConfigProperties {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Technical subject under which received client notifications are executed.\n"
           + "By default '%s' is used.", NOTIFICATION_AUTHENTICATOR_SUBJECT_NAME);
@@ -244,6 +249,7 @@ public final class SharedConfigProperties {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format(
           "If this property is set to true, the '%s' will be registered with high priority, and each call to %s.get() will return the given text key instead of the translation.\n"

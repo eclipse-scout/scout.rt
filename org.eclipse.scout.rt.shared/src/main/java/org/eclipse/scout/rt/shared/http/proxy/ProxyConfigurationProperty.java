@@ -20,6 +20,7 @@ public class ProxyConfigurationProperty extends AbstractStringListConfigProperty
   }
 
   @Override
+  @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
   public String description() {
     return String.format("Configure proxies for the '%s'. If an URI matches a pattern the corresponding proxy will be used.\n"
         + "By default no proxy is used.\n"

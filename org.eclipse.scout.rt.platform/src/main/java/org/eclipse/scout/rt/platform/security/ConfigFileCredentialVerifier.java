@@ -139,6 +139,7 @@ public class ConfigFileCredentialVerifier implements ICredentialVerifier {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Specifies the known credentials (username & passwords) of the '%s'.\n"
           + "Credentials are separated by semicolon. Username and password information are separated by colon.\n"

@@ -60,6 +60,7 @@ public final class JaxWsConfigProperties {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Technical subject used to invoke JAX-WS handlers if the request is not authenticated yet; used by '%s'.\n"
           + "The default value is 'jaxws-handler'.", HandlerDelegate.class.getName());
@@ -97,6 +98,7 @@ public final class JaxWsConfigProperties {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Fully qualified class name of the JAX-WS implementor to use. The class must extend '%s'.\n"
           + "By default, JAX-WS Metro (not bundled with JRE) is used. For that to work, add the Maven dependency to JAX-WS Metro to your server application's pom.xml: com.sun.xml.ws:jaxws-rt:2.2.10.",
@@ -135,6 +137,7 @@ public final class JaxWsConfigProperties {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("To indicate whether to pool webservice clients.\n"
           + "Creating new service and Port instances is expensive due to WSDL and schema validation. Using the pool helps reducing these costs. The default value is true.\n"

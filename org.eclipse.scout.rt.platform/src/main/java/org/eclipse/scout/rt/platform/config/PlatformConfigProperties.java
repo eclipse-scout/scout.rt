@@ -116,6 +116,7 @@ public final class PlatformConfigProperties {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Specifies whether all threads of the core-pool should be started upon job manager startup, so that they are idle waiting for work.\n"
           + "By default this is disabled in development mode (property '%s' is true) and enabled otherwise.", BEANS.get(PlatformDevModeProperty.class).getKey());

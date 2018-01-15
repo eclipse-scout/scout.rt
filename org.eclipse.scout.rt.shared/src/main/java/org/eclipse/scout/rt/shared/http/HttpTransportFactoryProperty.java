@@ -28,6 +28,7 @@ public class HttpTransportFactoryProperty extends AbstractClassConfigProperty<IH
   }
 
   @Override
+  @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
   public String description() {
     return String.format("Fully qualified class name of the HTTP transport factory the application uses. The class must implement '%s'.\n"
         + "By default '%s' is used.", IHttpTransportFactory.class.getName(), ApacheHttpTransportFactory.class.getName());

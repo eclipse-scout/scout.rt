@@ -39,6 +39,7 @@ public final class ServerCommonsConfigProperties {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Enable or disable changing UrlHints using URL parameters in the browser address line.\n"
           + "By default has the same value as the config property '%s' meaning it is by default only enabled in development mode.",
@@ -59,6 +60,7 @@ public final class ServerCommonsConfigProperties {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Comma separated list of URLs the '%s' should access.\n"
           + "By default no URLs are set.", RemoteHealthChecker.class.getSimpleName());
@@ -103,6 +105,7 @@ public final class ServerCommonsConfigProperties {
       }
 
       @Override
+      @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
       public String description() {
         return String.format("Configures individual Content Security Policy (CSP) directives.\n"
             + "See https://www.w3.org/TR/CSP2/ and the Bean '%s' for more details.\n"

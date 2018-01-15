@@ -83,6 +83,7 @@ public final class HttpConfigurationProperties {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Enable/disable HTTP keep-alive connections.\n"
           + "The default value is defined by the system property '%s' or true if the system property is undefined.", HTTP_KEEP_ALIVE);
@@ -105,6 +106,7 @@ public final class HttpConfigurationProperties {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Enable or disable one retry for non-idempotent POST requests.\n"
           + "The default value is defined by the system property '%s' or true if the system property is undefined.", SUN_NET_HTTP_RETRY_POST);

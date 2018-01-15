@@ -68,6 +68,7 @@ public final class UiHtmlConfigProperties {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("When this property returns true, file pre-building is performed when the UI application server starts up.\n" +
           "This means the application start takes more time, but in return the first user request takes less time.\n" +
@@ -98,6 +99,7 @@ public final class UiHtmlConfigProperties {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Contains a comma separated list of files in '/WebContent/res' that should be pre-built when the (UI) application server starts up.\n" +
           "Since it takes a while to build files, especially JS and CSS (LESS) files, we want to do this when the server starts. Otherwise its always the first user who must wait a long time until all files are built.\n" +
@@ -165,6 +167,7 @@ public final class UiHtmlConfigProperties {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("The polling request (which waits for a background job to complete) stays open until a background job has completed or the specified number of seconds elapsed.\n"
           + "This property must have a value between 3 and the value of property '%s'.\n"
@@ -223,6 +226,7 @@ public final class UiHtmlConfigProperties {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Maximum time in seconds to wait for a client session to be stopped by the housekeeping job.\n" +
           "The value should be smaller than the session timeout (typically defined in the web.xml) and greater than the value of property '%s'\n"
