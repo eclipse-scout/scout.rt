@@ -10,6 +10,9 @@
  ******************************************************************************/
 scout.WidgetField = function() {
   scout.WidgetField.parent.call(this);
+
+  this.scrollable = true;
+
   this._addWidgetProperties(['fieldWidget']);
 };
 scout.inherits(scout.WidgetField, scout.FormField);
@@ -19,7 +22,7 @@ scout.WidgetField.prototype._init = function(model) {
 };
 
 scout.WidgetField.prototype._render = function() {
-  this.addContainer(this.$parent, 'widget-field');
+  this.addContainer(this.$parent, 'widget-field', new scout.WidgetFieldLayout(this));
   this.addLabel();
   this.addMandatoryIndicator();
   this.addStatus();
@@ -28,6 +31,12 @@ scout.WidgetField.prototype._render = function() {
 scout.WidgetField.prototype._renderProperties = function() {
   scout.WidgetField.parent.prototype._renderProperties.call(this);
   this._renderFieldWidget();
+  this._renderScrollable();
+};
+
+scout.WidgetField.prototype._remove = function() {
+  scout.scrollbars.uninstall(this.$fieldContainer, this.session);
+  scout.WidgetField.parent.prototype._remove.call(this);
 };
 
 scout.WidgetField.prototype.setFieldWidget = function(fieldWidget) {
@@ -45,5 +54,18 @@ scout.WidgetField.prototype._removeFieldWidget = function() {
   if (this.fieldWidget) {
     this.fieldWidget.remove();
     this._removeField();
+  }
+};
+
+scout.WidgetField.prototype.setScrollable = function(scrollable) {
+  this.setProperty('scrollable', scrollable);
+};
+
+scout.WidgetField.prototype._renderScrollable = function() {
+  scout.scrollbars.uninstall(this.$fieldContainer, this.session);
+  if (this.scrollable) {
+    scout.scrollbars.install(this.$fieldContainer, {
+      parent: this
+    });
   }
 };

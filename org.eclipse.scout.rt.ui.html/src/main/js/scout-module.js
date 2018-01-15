@@ -352,6 +352,7 @@
   __include("scout/form/fields/BasicFieldAdapter.js");
   __include("scout/form/fields/WidgetField.js");
   __include("scout/form/fields/WidgetFieldAdapter.js");
+  __include("scout/form/fields/WidgetFieldLayout.js");
   __include("scout/form/FormController.js");
   // Basics for message boxes
   __include("scout/messagebox/MessageBox.js");
