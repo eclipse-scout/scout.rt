@@ -107,16 +107,11 @@ public class DynamicResourceLoader extends AbstractResourceLoader {
    * http://tools.ietf.org/html/rfc6266#section-5</i> and <i>https://tools.ietf.org/html/rfc6266#appendix-D</i>
    */
   protected void addResponseHeaderForDownload(HttpCacheObject httpCacheObject, String originalFilename) {
-    // Set hint for browser to show the "save as" dialog (no in-line display, not even for known types, e.g. XML)
-    httpCacheObject.addHttpResponseInterceptor(new HttpResponseHeaderContributor(
-        "Content-Disposition",
-        getContentDispositionHeaderValue(originalFilename)));
-  }
-
-  protected static String getContentDispositionHeaderValue(String originalFilename) {
     // Internet Explorer 11 cannot parse names with characters 0x00-0x1F, neither in filename= nor encoded in filename*=
     // Note: 0x00-0x1F are the same in UTF-16 and ISO-8859-1, thus replacing them here is safe.
-    originalFilename = originalFilename.replaceAll("[\\x00-\\x1F]", "");
+    if (originalFilename != null) {
+      originalFilename = originalFilename.replaceAll("[\\x00-\\x1F]", "");
+    }
 
     if (StringUtility.isNullOrEmpty(originalFilename)) {
       originalFilename = DEFAULT_FILENAME;
@@ -128,13 +123,17 @@ public class DynamicResourceLoader extends AbstractResourceLoader {
     if (StringUtility.isNullOrEmpty(isoFilename)) { // in case no valid character remains
       isoFilename = DEFAULT_FILENAME;
     }
-    return "attachment; filename=\"" + isoFilename + "\"; filename*=utf-8''" + IOUtility.urlEncode(originalFilename);
+
+    // Set hint for browser to show the "save as" dialog (no in-line display, not even for known types, e.g. XML)
+    httpCacheObject.addHttpResponseInterceptor(new HttpResponseHeaderContributor(
+        "Content-Disposition",
+        "attachment; filename=\"" + isoFilename + "\"; filename*=utf-8''" + IOUtility.urlEncode(originalFilename)));
   }
 
   /**
    * Returns the given filename in ISO-8859-1. All characters that are not part of this charset are stripped.
    */
-  protected static String getIsoFilename(String originalFilename) {
+  protected String getIsoFilename(String originalFilename) {
     String isoFilename = originalFilename;
     CharsetEncoder iso8859Encoder = StandardCharsets.ISO_8859_1.newEncoder();
     if (iso8859Encoder.canEncode(originalFilename)) {
