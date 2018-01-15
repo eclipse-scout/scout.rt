@@ -323,6 +323,14 @@ scout.arrays = {
     }
   },
 
+  findIndexFrom: function(arr, startIndex, predicate, reverse) {
+    if (reverse) {
+      return scout.arrays.findIndexFromReverse(arr, startIndex, predicate);
+    } else {
+      return scout.arrays.findIndexFromForward(arr, startIndex, predicate);
+    }
+  },
+
   findFromForward: function(arr, startIndex, predicate) {
     var index = scout.arrays.findIndexFromForward(arr, startIndex, predicate);
     if (index === -1) {
@@ -333,7 +341,7 @@ scout.arrays = {
 
   findIndexFromForward: function(arr, startIndex, predicate) {
     if (!arr || !predicate) {
-      return null;
+      return -1;
     }
     for (var i = startIndex; i < arr.length; i++) {
       var element = arr[i];
@@ -341,6 +349,7 @@ scout.arrays = {
         return i;
       }
     }
+    return -1;
   },
 
   findFromReverse: function(arr, startIndex, predicate) {
@@ -353,7 +362,7 @@ scout.arrays = {
 
   findIndexFromReverse: function(arr, startIndex, predicate) {
     if (!arr || !predicate) {
-      return null;
+      return -1;
     }
     for (var i = startIndex; i >= 0; i--) {
       var element = arr[i];
@@ -361,6 +370,7 @@ scout.arrays = {
         return i;
       }
     }
+    return -1;
   },
 
   /**
