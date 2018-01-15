@@ -167,9 +167,7 @@ scout.Table.prototype._initColumns = function() {
   if (this.rowIconVisible) {
     this._insertRowIconColumn();
   }
-  if (this.checkable && this.checkableStyle === scout.Table.CheckableStyle.CHECKBOX) {
-    this._insertBooleanColumn();
-  }
+  this._setCheckable(this.checkable);
 
   // Sync head and tail sort columns
   this._setHeadAndTailSortColumns();
@@ -185,6 +183,7 @@ scout.Table.prototype._destroyColumns = function() {
   this.columns.forEach(function(column) {
     column.destroy();
   });
+  this.checkableColumn = null;
 };
 
 /**
@@ -3293,7 +3292,7 @@ scout.Table.prototype._updateCheckableColumn = function() {
   var showCheckBoxes = this.checkable && this.checkableStyle === scout.Table.CheckableStyle.CHECKBOX;
   if (showCheckBoxes && !column) {
     this._insertBooleanColumn();
-  } else if (!showCheckBoxes && column) {
+  } else if (!showCheckBoxes && column && column.guiOnly) {
     scout.arrays.remove(this.columns, column);
     this.checkableColumn = null;
   }
