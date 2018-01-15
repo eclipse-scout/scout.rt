@@ -80,7 +80,7 @@ public class DynamicFieldTest {
     }
 
     @Order(1000)
-    @ClassId("ff2429f7-0a9f-441e-9c33-c8dd63972482")
+    @ClassId("16ef7312-df19-4633-8c5d-43597ff51f7b")
     public class CancelButton extends AbstractCancelButton {
       @Override
       protected String getConfiguredLabel() {

@@ -83,7 +83,7 @@ public class DynamicFieldGridDataTest {
     }
 
     @Order(1000)
-    @ClassId("ff2429f7-0a9f-441e-9c33-c8dd63972482")
+    @ClassId("3410c2b6-ffa1-4d8a-b54b-ce4c7d18c6a8")
     public class CancelButton extends AbstractCancelButton {
       @Override
       protected String getConfiguredLabel() {
