@@ -65,7 +65,7 @@ public class DynamicFieldTest {
     }
 
     @Order(0)
-    @ClassId("e642b204-d0f1-4d42-baaf-32e350c419b5")
+    @ClassId("8b3d5608-e2fc-46ca-8776-18f9beab61e2")
     public class StaticStringField extends AbstractStringField {
       @Override
       protected String getConfiguredLabel() {

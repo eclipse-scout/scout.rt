@@ -68,7 +68,7 @@ public class DynamicFieldGridDataTest {
     }
 
     @Order(0)
-    @ClassId("e642b204-d0f1-4d42-baaf-32e350c419b5")
+    @ClassId("0bf5f199-75b7-48bf-946d-97b84b81fc8f")
     public class StaticStringField extends AbstractStringField {
       @Override
       protected String getConfiguredLabel() {
