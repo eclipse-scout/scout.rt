@@ -10,14 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.calendar;
 
-import java.util.Date;
-
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
-import org.json.JSONArray;
+import org.eclipse.scout.rt.ui.html.json.JsonDateRange;
 import org.json.JSONObject;
 
 public class JsonCalendarComponent<CALENDAR_COMPONENT extends CalendarComponent> extends AbstractJsonAdapter<CALENDAR_COMPONENT> {
@@ -37,13 +35,10 @@ public class JsonCalendarComponent<CALENDAR_COMPONENT extends CalendarComponent>
     json.put("item", new JsonCalendarItem(getModel().getItem()).toJson());
     json.put("fromDate", new JsonDate(getModel().getFromDate()).asJsonString());
     json.put("toDate", new JsonDate(getModel().getToDate()).asJsonString());
-    JSONArray coveredDays = new JSONArray();
-    if (getModel().getCoveredDays() != null) {
-      for (Date coveredDay : getModel().getCoveredDays()) {
-        coveredDays.put(new JsonDate(coveredDay).asJsonString());
-      }
+    if (getModel().getCoveredDaysRange() != null) {
+      Object coveredDaysRange = new JsonDateRange(getModel().getCoveredDaysRange()).toJson();
+      json.put("coveredDaysRange", coveredDaysRange);
     }
-    json.put("coveredDays", coveredDays);
     json.put("fullDay", getModel().isFullDay());
     json.put("draggable", getModel().getProvider().isMoveItemEnabled());
     return json;

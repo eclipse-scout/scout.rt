@@ -640,47 +640,6 @@ public final class DateUtility {
     }
   }
 
-  /**
-   * Correctly calculate covered days of a day range. 13.3.2008 00:00 - 14.3.2008 00:00 only covers 1 day (13.3.)
-   * 13.3.2008 12:00 - 14.3.2008 12:00 covers 2 days (13.3., 14.3.)
-   *
-   * @return array of days that with time set to 00:00:00.000
-   */
-  public static Date[] getCoveredDays(Date from, Date to) {
-    if (from == null && to == null) {
-      return new Date[0];
-    }
-    if (from == null) {
-      from = to;
-    }
-    if (to == null) {
-      to = from;
-    }
-    if (from.compareTo(to) > 0) {
-      to = from;
-    }
-    //
-    if (from.compareTo(to) == 0) {
-      return new Date[]{truncDate(from)};
-    }
-    else {
-      Calendar a = Calendar.getInstance();
-      a.setTime(from);
-      truncCalendar(a);
-      Calendar b = Calendar.getInstance();
-      b.setTime(to);
-      b.add(Calendar.MILLISECOND, -1);
-      truncCalendar(b);
-      long dayCount = ((b.getTimeInMillis() + DAY_MILLIS / 2 - a.getTimeInMillis()) / DAY_MILLIS) + 1;
-      Date[] array = new Date[(int) dayCount];
-      for (int i = 0; i < array.length; i++) {
-        array[i] = a.getTime();
-        a.add(Calendar.DATE, 1);
-      }
-      return array;
-    }
-  }
-
   public static Date convertCalendar(Calendar c) {
     if (c == null) {
       return null;
