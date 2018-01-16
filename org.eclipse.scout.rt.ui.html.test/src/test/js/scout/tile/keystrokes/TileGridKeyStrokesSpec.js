@@ -14,6 +14,13 @@ describe("TileGridKeyStrokes", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
+    // Set a fixed width to prevent tiles from wrapping on small screens (e.g. PhantomJS)
+    $('<style>' +
+        '.tile-grid {position: relative; border: 1px dotted black; padding: 5px; width: 1000px;}' +
+        '.tile {position: absolute; border: 1px solid black;}' +
+        '.tile.selected {border-color: blue;}' +
+        '.scrollbar {position: absolute;}' +
+        '</style>').appendTo($('#sandbox'));
   });
 
   function createTileGrid(numTiles, model) {

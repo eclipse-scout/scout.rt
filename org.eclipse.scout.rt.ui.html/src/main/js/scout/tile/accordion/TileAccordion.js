@@ -386,7 +386,7 @@ scout.TileAccordion.prototype.getGroupByVisibleRow = function(rowToFind) {
     return null;
   }
   var currentIndex = 0;
-  return this.expandedGroups().find(function(group) {
+  return scout.arrays.find(this.expandedGroups(), function(group) {
     var rowCount = group.body.logicalGrid.gridRows;
     if (currentIndex <= rowToFind && rowToFind < currentIndex + rowCount) {
       return true;

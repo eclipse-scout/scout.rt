@@ -14,7 +14,9 @@ describe("TileAccordionKeyStrokes", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
+    // Set a fixed width to prevent tiles from wrapping on small screens (e.g. PhantomJS)
     $('<style>' +
+        '.tile-accordion { width: 1000px;}' +
         '.tile-grid {position: relative; border: 1px dotted black; padding: 5px;}' +
         '.tile {position: absolute; border: 1px solid black;}' +
         '.tile.selected {border-color: blue;}' +
