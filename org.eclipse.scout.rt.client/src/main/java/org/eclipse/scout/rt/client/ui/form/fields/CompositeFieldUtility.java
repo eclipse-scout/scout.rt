@@ -41,7 +41,7 @@ public final class CompositeFieldUtility {
     f.setFormInternal(compositeField.getForm());
     if (compositeField.isInitConfigDone()) {
       f.postInitConfig();
-      f.init();
+      FormUtility.initFormField(f);
       FormUtility.rebuildFieldGrid(compositeField);
     }
   }

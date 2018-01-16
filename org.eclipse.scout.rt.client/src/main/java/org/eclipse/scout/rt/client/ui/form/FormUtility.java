@@ -100,6 +100,18 @@ public final class FormUtility {
     v.handleResult();
   }
 
+  /**
+   * Init the form field and any child-fields, if the field is a composite field.
+   */
+  public static void initFormField(IFormField f) {
+    if (f instanceof ICompositeField) {
+      initFormFields((ICompositeField) f);
+    }
+    else if (f != null) {
+      f.init();
+    }
+  }
+
   public static void initFormFields(ICompositeField field) {
     InitFieldVisitor v = new InitFieldVisitor();
     field.visitFields(v);
