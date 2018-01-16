@@ -26,7 +26,6 @@ public interface ITileAccordion<T extends ITile> extends IAccordion {
   String PROP_WITH_PLACEHOLDERS = "withPlaceholders";
   String PROP_TILE_GRID_LAYOUT_CONFIG = "tileGridLayoutConfig";
   String PROP_TILE_COMPARATOR = "tileComparator";
-  String PROP_SHOW_FILTER_COUNT = "showFilterCount";
   String PROP_SELECTED_TILES = "selectedTiles";
 
   void addTile(T tile);
@@ -38,10 +37,6 @@ public interface ITileAccordion<T extends ITile> extends IAccordion {
   <G extends IGroup> G getDefaultGroup();
 
   void setTiles(List<T> tiles);
-
-  boolean isShowFilterCount();
-
-  void setShowFilterCount(boolean showFilterCount);
 
   /**
    * Adds and activates the given group manager.

@@ -59,7 +59,6 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
   @Override
   protected void initConfig() {
     super.initConfig();
-    setShowFilterCount(getConfiguredShowFilterCount());
     setGroupManager(new DefaultGroupManager<T>());
     setComparator(new DefaultComparator());
 
@@ -185,16 +184,6 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
   @SuppressWarnings("unchecked")
   protected ITileGrid<T> getTileGrid(IGroup group) {
     return (ITileGrid) group.getBody();
-  }
-
-  @Override
-  public boolean isShowFilterCount() {
-    return propertySupport.getPropertyBool(PROP_SHOW_FILTER_COUNT);
-  }
-
-  @Override
-  public void setShowFilterCount(boolean showFilterCount) {
-    propertySupport.setPropertyBool(PROP_SHOW_FILTER_COUNT, showFilterCount);
   }
 
   /**
