@@ -672,10 +672,10 @@ scout.TileGrid.prototype.selectTile = function(tile) {
 };
 
 /**
- * Selects all visible tiles
+ * Selects all tiles. As for every selection operation: only filtered tiles are considered.
  */
 scout.TileGrid.prototype.selectAllTiles = function() {
-  this.selectTiles(this.tiles);
+  this.selectTiles(this.filteredTiles);
 };
 
 scout.TileGrid.prototype.deselectTiles = function(tiles) {

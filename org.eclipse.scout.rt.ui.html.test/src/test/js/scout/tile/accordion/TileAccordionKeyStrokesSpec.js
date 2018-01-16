@@ -128,6 +128,39 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[0].body.$container.triggerKeyUpCapture(scout.keys.A, 'ctrl');
     });
 
+    it('only considers tiles of expanded groups', function() {
+      var accordion = createAccordion(3, {
+        selectable: true
+      });
+      var tiles0 = createTiles(2);
+      var tiles1 = createTiles(3);
+      accordion.groups[0].body.insertTiles(tiles0);
+      accordion.groups[0].setCollapsed(true);
+      accordion.groups[1].body.insertTiles(tiles1);
+      var tiles = accordion.getTiles();
+      accordion.render();
+      accordion.validateLayout();
+
+      accordion.groups[1].body.$container.triggerKeyDownCapture(scout.keys.A, 'ctrl');
+      expect(accordion.getSelectedTiles().length).toBe(3);
+      accordion.groups[1].body.$container.triggerKeyUpCapture(scout.keys.A, 'ctrl');
+
+      accordion.selectTile(tiles[2]);
+      expect(accordion.getSelectedTiles().length).toBe(1);
+
+      accordion.groups[1].body.$container.triggerKeyDownCapture(scout.keys.A, 'ctrl');
+      expect(accordion.getSelectedTiles().length).toBe(3);
+      accordion.groups[1].body.$container.triggerKeyUpCapture(scout.keys.A, 'ctrl');
+
+      accordion.groups[1].body.$container.triggerKeyDownCapture(scout.keys.A, 'ctrl');
+      expect(accordion.getSelectedTiles().length).toBe(0);
+      accordion.groups[1].body.$container.triggerKeyUpCapture(scout.keys.A, 'ctrl');
+
+      accordion.groups[1].body.$container.triggerKeyDownCapture(scout.keys.A, 'ctrl');
+      expect(accordion.getSelectedTiles().length).toBe(3);
+      accordion.groups[1].body.$container.triggerKeyUpCapture(scout.keys.A, 'ctrl');
+    });
+
   });
 
   describe('key right', function() {
@@ -634,6 +667,40 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[0].body.$container.triggerKeyUpCapture(scout.keys.DOWN);
     });
 
+    it("considers filtered tiles", function() {
+      var accordion = createAccordion(2, {
+        selectable: true,
+        gridColumnCount: 3
+      });
+      var tiles0 = createTiles(3);
+      var tiles1 = createTiles(6);
+      accordion.groups[0].body.insertTiles(tiles0);
+      accordion.groups[1].body.insertTiles(tiles1);
+      var tiles = accordion.getTiles();
+      var filter = {
+        accept: function(tile) {
+          return tile !== tiles[3] && tile !== tiles[7]; // Make tile 3 and 7 invisible
+        }
+      };
+      accordion.groups[0].body.addFilter(filter);
+      accordion.groups[1].body.addFilter(filter);
+      accordion.groups[0].body.filter();
+      accordion.groups[1].body.filter();
+      accordion.render();
+      accordion.validateLayout();
+      accordion.selectTile(tiles[0]);
+
+      // Tile 3 is not accepted by filter -> tile 4 has to be selected
+      accordion.groups[0].body.$container.triggerKeyDownCapture(scout.keys.DOWN);
+      expect(accordion.getSelectedTiles()).toEqual([tiles[4]]);
+      accordion.groups[0].body.$container.triggerKeyUpCapture(scout.keys.DOWN);
+
+      // Tile 7 is not accepted by filter -> tile 8 has to be selected
+      accordion.groups[1].body.$container.triggerKeyDownCapture(scout.keys.DOWN);
+      expect(accordion.getSelectedTiles()).toEqual([tiles[8]]);
+      accordion.groups[1].body.$container.triggerKeyUpCapture(scout.keys.DOWN);
+    });
+
     it("selects the first tile if no tile is selected yet", function() {
       var accordion = createAccordion(2, {
         selectable: true,
@@ -843,7 +910,7 @@ describe("TileAccordionKeyStrokes", function() {
 
         var filter = {
           accept: function(tile) {
-            return tile !== tiles[0]; // Make tile 2 invisible
+            return tile !== tiles[0]; // Make tile 0 invisible
           }
         };
         accordion.groups[0].body.addFilter(filter);

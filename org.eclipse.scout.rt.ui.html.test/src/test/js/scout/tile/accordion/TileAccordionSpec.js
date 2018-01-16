@@ -234,5 +234,29 @@ describe("TileAccordion", function() {
       expect(selectedTiles[0]).toBe(tile0);
       expect(selectedTiles[1]).toBe(tile1);
     });
+
+    it("does not select tiles in a collapsed group", function() {
+      var accordion = createAccordion(2, {
+        selectable: true,
+        gridColumnCount: 3
+      });
+      var tile0 = createTile();
+      var tile1 = createTile();
+      accordion.groups[0].body.insertTile(tile0);
+      accordion.groups[0].setCollapsed(true);
+      accordion.groups[1].body.insertTile(tile1);
+      accordion.render();
+
+      accordion.selectTile(tile0);
+      expect(accordion.groups[0].body.selectedTiles.length).toBe(0);
+      expect(accordion.getSelectedTiles().length).toBe(0);
+      expect(tile0.selected).toBe(false);
+
+      accordion.groups[0].setCollapsed(false);
+      accordion.selectTile(tile0);
+      expect(accordion.groups[0].body.selectedTiles.length).toBe(1);
+      expect(accordion.getSelectedTiles().length).toBe(1);
+      expect(tile0.selected).toBe(true);
+    });
   });
 });

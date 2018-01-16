@@ -268,10 +268,10 @@ scout.TileAccordion.prototype.selectTile = function(tile) {
 };
 
 /**
- * Selects all visible tiles
+ * Selects all tiles. As for every selection operation: only considers filtered tiles and tiles of expanded groups
  */
-scout.TileAccordion.prototype.selectAllTiles = function(tile) {
-  this.selectTiles(this.getTiles());
+scout.TileAccordion.prototype.selectAllTiles = function() {
+  this.selectTiles(this.getVisibleTiles());
 };
 
 scout.TileAccordion.prototype.deselectTiles = function(tiles) {
@@ -286,7 +286,7 @@ scout.TileAccordion.prototype.deselectTile = function(tile) {
   this.deselectTiles([tile]);
 };
 
-scout.TileAccordion.prototype.deselectAllTiles = function(tiles) {
+scout.TileAccordion.prototype.deselectAllTiles = function() {
   this.selectTiles([]);
 };
 
@@ -320,7 +320,7 @@ scout.TileAccordion.prototype.getSelectedTileCount = function() {
 };
 
 scout.TileAccordion.prototype.toggleSelection = function() {
-  if (this.getSelectedTileCount() === this.getFilteredTileCount()) {
+  if (this.getSelectedTileCount() === this.getVisibleTileCount()) {
     this.deselectAllTiles();
   } else {
     this.selectAllTiles();
@@ -427,6 +427,12 @@ scout.TileAccordion.prototype._onTileGridSelectedTilesChange = function(event) {
     return;
   }
   var tileGrid = event.source;
+  var group = tileGrid.parent;
+  if (tileGrid.selectedTiles.length > 0 && group.collapsed) {
+    // Do not allow selection in a collapsed group (breaks keyboard navigation and is confusing for the user if invisible tiles are selected)
+    tileGrid.deselectAllTiles();
+    return;
+  }
   if (!this.multiSelect && tileGrid.selectedTiles.length > 0) {
     this._selectionUpdateLocked = true;
     // Ensure only one grid has a selected tile if multiSelect is false

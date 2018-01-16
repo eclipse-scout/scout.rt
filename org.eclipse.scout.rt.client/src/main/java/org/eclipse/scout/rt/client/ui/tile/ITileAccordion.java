@@ -70,6 +70,10 @@ public interface ITileAccordion<T extends ITile> extends IAccordion {
 
   int getTileCount();
 
+  List<T> getFilteredTiles();
+
+  int getFilteredTileCount();
+
   void addTileFilter(ITileFilter<T> filter);
 
   void removeTileFilter(ITileFilter<T> filter);

@@ -416,6 +416,24 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public List<T> getFilteredTiles() {
+    List<T> allTiles = new ArrayList<>();
+    for (ITileGrid<T> tiles : getTileGrids()) {
+      allTiles.addAll(((AbstractTileGrid) tiles).getFilteredTilesInternal());
+    }
+    return allTiles;
+  }
+
+  @Override
+  public int getFilteredTileCount() {
+    return getTileGrids()
+        .stream()
+        .mapToInt(ITileGrid::getFilteredTileCount)
+        .sum();
+  }
+
+  @Override
   public void setTileComparator(Comparator<T> comparator) {
     propertySupport.setProperty(PROP_TILE_COMPARATOR, comparator);
     getTileGrids().forEach(tileGrid -> tileGrid.setComparator(comparator));
