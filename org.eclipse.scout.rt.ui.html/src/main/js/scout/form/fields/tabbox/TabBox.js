@@ -55,7 +55,7 @@ scout.TabBox.prototype._render = function() {
  */
 scout.TabBox.prototype._renderProperties = function() {
   scout.TabBox.parent.prototype._renderProperties.call(this);
-  this._renderTabContent();
+  this._renderSelectedTab();
 };
 
 /**
@@ -63,11 +63,17 @@ scout.TabBox.prototype._renderProperties = function() {
  */
 scout.TabBox.prototype._remove = function() {
   scout.TabBox.parent.prototype._remove.call(this);
-  this._removeTabContent();
+  this._removeSelectedTab();
 };
 
 scout.TabBox.prototype.setTabItems = function(tabItems) {
   this.setProperty('tabItems', tabItems);
+};
+
+scout.TabBox.prototype._removeTabItems = function() {
+  this.tabItems.forEach(function(tabItem) {
+    tabItem.remove();
+  }, this);
 };
 
 scout.TabBox.prototype._removeTabContent = function() {
@@ -89,44 +95,35 @@ scout.TabBox.prototype.setSelectedTab = function(selectedTab) {
 };
 
 scout.TabBox.prototype._setSelectedTab = function(tab) {
-  if (this.selectedTab === tab) {
-    return;
-  }
   $.log.isDebugEnabled() && $.log.debug('(TabBox#_selectTab) tab=' + tab);
-  var oldSelectedTab = this.selectedTab;
-  var selectedTab = tab;
-  if (oldSelectedTab) {
-    oldSelectedTab.setTabActive(false);
+  if (this.selectedTab) {
+    this.selectedTab.setTabActive(false);
   }
-  if (selectedTab) {
-    selectedTab.setTabActive(true);
-  }
-  this._setProperty('selectedTab', selectedTab);
-
   if (this.rendered) {
-    if (oldSelectedTab) {
-      oldSelectedTab.detach();
-    }
-    this._renderTabContent();
+    this._removeSelectedTab();
   }
+  if (tab) {
+    tab.setTabActive(true);
+  }
+  this._setProperty('selectedTab', tab);
 };
 
-scout.TabBox.prototype._renderTabContent = function() {
-  // add new tab-content (use from cache or render)
-  var selectedTab = this.selectedTab;
-  if (selectedTab) {
-    if (selectedTab.rendered && !selectedTab.attached) {
-      selectedTab.attach();
+scout.TabBox.prototype._renderSelectedTab = function() {
+  if (this.selectedTab) {
+    if (this.selectedTab.rendered && !this.selectedTab.attached) {
+      this.selectedTab.attach();
     } else {
-      // in Swing there's some complicated logic dealing with borders and labels
-      // that determines whether the first group-box in a tab-box has a title or not.
-      // I decided to simplify this and always set the title of the first group-box
-      // to invisible.
-      selectedTab.render(this._$tabContent);
+      this.selectedTab.render(this._$tabContent);
     }
   }
   if (this.rendered) {
     scout.HtmlComponent.get(this._$tabContent).revalidateLayoutTree();
+  }
+};
+
+scout.TabBox.prototype._removeSelectedTab = function() {
+  if (this.selectedTab) {
+    this.selectedTab.detach();
   }
 };
 
