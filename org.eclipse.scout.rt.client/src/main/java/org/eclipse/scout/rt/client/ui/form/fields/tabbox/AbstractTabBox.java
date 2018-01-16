@@ -265,6 +265,12 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
   }
 
   @Override
+  protected void initFieldInternal() {
+    super.initFieldInternal();
+    ActionUtility.initActions(getMenus());
+  }
+
+  @Override
   protected void disposeFieldInternal() {
     super.disposeFieldInternal();
     ActionUtility.disposeActions(getMenus());
