@@ -32,6 +32,28 @@ scout.Group.prototype._init = function(model) {
   this._setBody(this.body);
 };
 
+/**
+ * @override
+ */
+scout.Group.prototype._createKeyStrokeContext = function() {
+  return new scout.KeyStrokeContext();
+};
+
+/**
+ * @override
+ */
+scout.Group.prototype._initKeyStrokeContext = function() {
+  scout.Group.parent.prototype._initKeyStrokeContext.call(this);
+
+  // Key stroke should only work when header is focused
+  this.keyStrokeContext.$bindTarget = function() {
+    return this.$header;
+  }.bind(this);
+  this.keyStrokeContext.registerKeyStroke([
+    new scout.GroupToggleCollapseKeyStroke(this)
+  ]);
+};
+
 scout.Group.prototype._render = function() {
   this.$container = this.$parent.appendDiv('group');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
@@ -63,6 +85,12 @@ scout.Group.prototype._remove = function() {
   this.$titleSuffix = null;
   this.$collapseIcon = null;
   scout.Group.parent.prototype._remove.call(this);
+};
+
+scout.Group.prototype._renderEnabled = function() {
+  scout.Group.parent.prototype._renderEnabled.call(this);
+
+  this.$header.setTabbable(this.enabled);
 };
 
 scout.Group.prototype.setTitle = function(title) {

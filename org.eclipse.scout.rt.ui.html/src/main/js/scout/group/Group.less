@@ -9,6 +9,10 @@
    padding: 10px 0;
    border-top: 1px solid @border-color;
    cursor: pointer;
+
+   &:focus {
+     outline: none;
+  }
 }
 
 .group-title {
@@ -16,9 +20,11 @@
   font-size: @font-size-plus;
   font-weight: @font-weight-bold;
   #scout.overflow-ellipsis-nowrap();
-}
 
-.group-title-suffix {
+  .group-header:focus > & {
+    color: @active-color;
+    text-decoration: underline;
+  }
 }
 
 .group-collapse-icon {

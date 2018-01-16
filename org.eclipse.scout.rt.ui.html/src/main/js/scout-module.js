@@ -176,6 +176,7 @@
   __include("scout/group/Group.js");
   __include("scout/group/GroupAdapter.js");
   __include("scout/group/GroupLayout.js");
+  __include("scout/group/keystrokes/GroupToggleCollapseKeyStroke.js");
   __include("scout/image/Icon.js");
   __include("scout/image/IconDesc.js");
   __include("scout/image/Image.js");
