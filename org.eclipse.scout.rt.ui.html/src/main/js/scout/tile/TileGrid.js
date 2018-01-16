@@ -113,7 +113,11 @@ scout.TileGrid.prototype._renderProperties = function() {
 scout.TileGrid.prototype._renderEnabled = function() {
   scout.TileGrid.parent.prototype._renderEnabled.call(this);
 
-  this.$container.setTabbable(this.enabled);
+  this._updateTabbable();
+};
+
+scout.TileGrid.prototype._updateTabbable = function() {
+  this.$container.setTabbable(this.enabled && this.selectable);
 };
 
 scout.TileGrid.prototype._renderTiles = function() {
@@ -623,6 +627,7 @@ scout.TileGrid.prototype.setSelectable = function(selectable) {
 
 scout.TileGrid.prototype._renderSelectable = function() {
   this.$container.toggleClass('selectable', this.selectable);
+  this._updateTabbable();
   this.invalidateLayoutTree();
 };
 
