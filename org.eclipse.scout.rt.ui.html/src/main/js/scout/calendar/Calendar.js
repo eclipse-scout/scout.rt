@@ -770,14 +770,11 @@ scout.Calendar.prototype._renderListPanel = function() {
     }
   }.bind(this));
 
-  // work with for-loop instead of forEach because of return statement
   function belongsToSelectedDate(component) {
-    var i, date;
-    for (i = 0; i < component.coveredDays.length; i++) {
-      date = scout.dates.parseJsonDate(component.coveredDays[i]);
-      if (scout.dates.isSameDay(this.selectedDate, date)) {
-        return true;
-      }
+    var selectedDate = scout.dates.trunc(this.selectedDate);
+    if (scout.dates.compare(selectedDate, component.coveredDaysRange.from) >= 0 &&
+      scout.dates.compare(selectedDate, component.coveredDaysRange.to) <= 0) {
+      return true;
     }
     return false;
   }

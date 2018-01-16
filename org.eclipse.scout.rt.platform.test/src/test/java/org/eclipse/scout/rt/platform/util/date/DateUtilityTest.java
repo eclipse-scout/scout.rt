@@ -865,7 +865,12 @@ public class DateUtilityTest {
     assertDateEquals("2015-02-29 00:00:00.000", dateOf("2015-02-29 00:00:00.000")); // fails with exception
   }
 
+  /**
+   * @deprecated will be removed in release 7.1; use {@link #getCoveredDaysRange} instead
+   */
   @Test
+  @SuppressWarnings("deprecation")
+  @Deprecated
   public void testGetCoveredDays() {
     // null from and to
     assertArrayEquals(new Date[0], DateUtility.getCoveredDays(null, null));
