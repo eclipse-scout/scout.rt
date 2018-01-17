@@ -15,6 +15,17 @@ scout.TileGridSelectFirstKeyStroke = function(tileGrid) {
 };
 scout.inherits(scout.TileGridSelectFirstKeyStroke, scout.TileGridSelectKeyStroke);
 
+scout.TileGridSelectFirstKeyStroke.prototype._accept = function(event) {
+  var accepted = scout.TileGridSelectFirstKeyStroke.parent.prototype._accept.call(this, event);
+  if (!accepted) {
+    return false;
+  }
+  if (!(this.getSelectionHandler().isHorizontalGridActive())) {
+    return false;
+  }
+  return true;
+};
+
 scout.TileGridSelectFirstKeyStroke.prototype._computeNewSelection = function(extend) {
   return this.getSelectionHandler().computeSelectionToFirst(extend);
 };

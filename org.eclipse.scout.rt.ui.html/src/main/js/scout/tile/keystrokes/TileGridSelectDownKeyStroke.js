@@ -17,6 +17,17 @@ scout.TileGridSelectDownKeyStroke = function(tileGrid) {
 };
 scout.inherits(scout.TileGridSelectDownKeyStroke, scout.TileGridSelectKeyStroke);
 
+scout.TileGridSelectDownKeyStroke.prototype._accept = function(event) {
+  var accepted = scout.TileGridSelectDownKeyStroke.parent.prototype._accept.call(this, event);
+  if (!accepted) {
+    return false;
+  }
+  if (!(this.getSelectionHandler().isHorizontalGridActive())) {
+    return false;
+  }
+  return true;
+};
+
 scout.TileGridSelectDownKeyStroke.prototype._computeNewSelection = function(extend) {
   return this.getSelectionHandler().computeSelectionY(1, extend);
 };

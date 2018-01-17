@@ -216,6 +216,12 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
     return 4;
   }
 
+  /**
+   * The grid defines how the tiles are arranged.
+   * <p>
+   * Note: the keyboard navigation support and multi selection using mouse and shift is only supported by the horizontal
+   * grid.
+   */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(8)
   protected String getConfiguredLogicalGrid() {

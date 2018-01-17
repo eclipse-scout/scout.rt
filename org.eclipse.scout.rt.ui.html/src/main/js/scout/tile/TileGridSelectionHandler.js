@@ -48,6 +48,9 @@ scout.TileGridSelectionHandler.prototype.selectTileOnMouseDown = function(event)
 
   // Shift-Click adds or removes the tiles between the last focused tile and the clicked tile to or from the selection
   if (event.shiftKey && this.isMultiSelect()) {
+    if (!this.isHorizontalGridActive()) {
+      return;
+    }
     var tiles = this.getVisibleTiles();
     var focusedTile = this.getFocusedTile();
     if (!focusedTile) {
@@ -164,6 +167,10 @@ scout.TileGridSelectionHandler.prototype.getTileGridByRow = function(rowIndex) {
     return null;
   }
   return this.tileGrid;
+};
+
+scout.TileGridSelectionHandler.prototype.isHorizontalGridActive = function() {
+  return this.tileGrid.logicalGrid instanceof scout.HorizontalGrid;
 };
 
 scout.TileGridSelectionHandler.prototype.computeSelectionX = function(xDiff, extend) {

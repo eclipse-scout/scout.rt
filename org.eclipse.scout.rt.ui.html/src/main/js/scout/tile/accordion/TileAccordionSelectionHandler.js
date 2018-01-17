@@ -102,3 +102,13 @@ scout.TileAccordionSelectionHandler.prototype.getTileGridByRow = function(rowInd
 scout.TileAccordionSelectionHandler.prototype.findVisibleTileIndexAt = function(x, y, startIndex, reverse) {
   return this.tileAccordion.findVisibleTileIndexAt(x, y, startIndex, reverse);
 };
+
+/**
+ * @override
+ */
+scout.TileAccordionSelectionHandler.prototype.isHorizontalGridActive = function() {
+  if (this.tileAccordion.groups.length === 0) {
+    return false;
+  }
+  return this.tileAccordion.groups[0].body.logicalGrid instanceof scout.HorizontalGrid;
+};

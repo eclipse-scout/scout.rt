@@ -17,6 +17,17 @@ scout.TileGridSelectUpKeyStroke = function(tileGrid) {
 };
 scout.inherits(scout.TileGridSelectUpKeyStroke, scout.TileGridSelectKeyStroke);
 
+scout.TileGridSelectUpKeyStroke.prototype._accept = function(event) {
+  var accepted = scout.TileGridSelectUpKeyStroke.parent.prototype._accept.call(this, event);
+  if (!accepted) {
+    return false;
+  }
+  if (!(this.getSelectionHandler().isHorizontalGridActive())) {
+    return false;
+  }
+  return true;
+};
+
 scout.TileGridSelectUpKeyStroke.prototype._computeNewSelection = function(extend) {
   return this.getSelectionHandler().computeSelectionY(-1, extend);
 };
