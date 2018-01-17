@@ -368,7 +368,7 @@ scout.TileAccordion.prototype.getFocusedTile = function() {
 scout.TileAccordion.prototype.getVisibleGridRowCount = function() {
   return this.expandedGroups().reduce(function(acc, group) {
     return acc + group.body.logicalGrid.gridRows;
-  });
+  }, 0);
 };
 
 scout.TileAccordion.prototype.getVisibleGridX = function(tile) {

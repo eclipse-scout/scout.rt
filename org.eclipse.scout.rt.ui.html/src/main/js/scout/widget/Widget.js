@@ -1525,6 +1525,13 @@ scout.Widget.prototype.focusAndPreventDefault = function(event) {
 };
 
 /**
+ * @returns whether the widget is the currently active element
+ */
+scout.Widget.prototype.isFocused = function() {
+  return this.rendered && scout.focusUtils.isActiveElement(this.$container);
+};
+
+/**
  * Brings the widget into view by scrolling the first scrollable parent.
  */
 scout.Widget.prototype.reveal = function() {

@@ -224,6 +224,9 @@ scout.ValueField.prototype.aboutToBlurByMouseDown = function(target) {
   }
 };
 
+/**
+ * @override
+ */
 scout.ValueField.prototype.isFocused = function() {
   return this.rendered && scout.focusUtils.isActiveElement(this.$field);
 };

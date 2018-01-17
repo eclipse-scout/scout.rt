@@ -612,7 +612,23 @@ scout.TileGrid.prototype._setLogicalGrid = function(logicalGrid) {
 };
 
 scout.TileGrid.prototype.setFocusedTile = function(tile) {
+  if (this.focusedTile === tile) {
+    return;
+  }
   this.focusedTile = tile;
+  if (!this.rendered || !tile || this.isFocused()) {
+    return;
+  }
+  var $scrollable = this.$container.scrollParent();
+  if ($scrollable.length === 0) {
+    return;
+  }
+  var oldScrollTop = $scrollable.scrollTop();
+  // Make sure the tile grid has the focus when focusing a tile
+  if (this.focus()) {
+    // Restore old scroll to prevent scrolling by the browser due to the focus() call
+    $scrollable[0].scrollTop = oldScrollTop;
+  }
 };
 
 scout.TileGrid.prototype.setSelectable = function(selectable) {

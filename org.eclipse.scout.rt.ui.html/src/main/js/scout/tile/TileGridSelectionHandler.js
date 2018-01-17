@@ -166,6 +166,131 @@ scout.TileGridSelectionHandler.prototype.getTileGridByRow = function(rowIndex) {
   return this.tileGrid;
 };
 
+scout.TileGridSelectionHandler.prototype.computeSelectionX = function(xDiff, extend) {
+  var tiles = this.getVisibleTiles();
+  var focusedTile = null;
+  var focusedTileIndex = -1;
+  var result = this._computeFocusedTile(xDiff, extend);
+  if (result.selectedTiles !== null) {
+    // New selection could be determined already -> return it;
+    return result;
+  }
+  focusedTile = result.focusedTile;
+  focusedTileIndex = tiles.indexOf(focusedTile);
+  return this.computeSelectionBetween(focusedTileIndex, focusedTileIndex + xDiff, extend);
+};
+
+scout.TileGridSelectionHandler.prototype.computeSelectionY = function(yDiff, extend) {
+  var tiles = this.getVisibleTiles();
+  var focusedTile = null;
+  var focusedTileRow = -1;
+  var focusedTileColumn = -1;
+  var focusedTileIndex = -1;
+  var rowCount = this.getVisibleGridRowCount();
+  var result = this._computeFocusedTile(yDiff, extend);
+  if (result.selectedTiles !== null) {
+    // New selection could be determined already -> return it;
+    return result;
+  }
+  focusedTile = result.focusedTile;
+  focusedTileIndex = tiles.indexOf(focusedTile);
+  focusedTileRow = this.getVisibleGridY(focusedTile);
+  focusedTileColumn = this.getVisibleGridX(focusedTile);
+  if (yDiff > 0 && focusedTileRow === rowCount - 1 ||
+      yDiff < 0 && focusedTileRow === 0) {
+    // Do nothing if focused tile is in the last row (navigate down) or first row (navigate up)
+    return;
+  }
+
+  var newFocusedTileIndex = this.findVisibleTileIndexAt(focusedTileColumn, focusedTileRow + yDiff, focusedTileIndex, yDiff < 0);
+  if (newFocusedTileIndex < 0) {
+    var tileGrid = this.getTileGridByRow(focusedTileRow + yDiff);
+    if (!tileGrid) {
+      return;
+    }
+    newFocusedTileIndex = tiles.indexOf(scout.arrays.last(tileGrid.filteredTiles));
+  }
+  return this.computeSelectionBetween(focusedTileIndex, newFocusedTileIndex, extend);
+};
+
+scout.TileGridSelectionHandler.prototype.computeSelectionToFirst = function(extend) {
+  var tiles = this.getVisibleTiles();
+  var focusedTile = this.getFocusedTile();
+  var focusedTileIndex = -1;
+  var selectedTiles = this.getSelectedTiles();
+  if (selectedTiles.length === 0) {
+    // Select first tile if no tiles are selected
+    focusedTile = scout.arrays.first(tiles);
+    return {
+      selectedTiles: [focusedTile],
+      focusedTile: focusedTile
+    };
+  }
+
+  // Focused tile may be null if tile has been deleted or if the user has not made a selection before
+  if (!focusedTile) {
+    focusedTile = scout.arrays.last(selectedTiles);
+  }
+  focusedTileIndex = tiles.indexOf(focusedTile);
+  return this.computeSelectionBetween(focusedTileIndex, 0, extend);
+};
+
+scout.TileGridSelectionHandler.prototype.computeSelectionToLast = function(extend) {
+  var tiles = this.getVisibleTiles();
+  var focusedTile = this.getFocusedTile();
+  var focusedTileIndex = -1;
+  var selectedTiles = this.getSelectedTiles();
+  if (selectedTiles.length === 0) {
+    // Select last tile if no tiles are selected
+    focusedTile = scout.arrays.last(tiles);
+    return {
+      selectedTiles: [focusedTile],
+      focusedTile: focusedTile
+    };
+  }
+
+  // Focused tile may be null if tile has been deleted or if the user has not made a selection before
+  if (!focusedTile) {
+    focusedTile = scout.arrays.last(selectedTiles);
+  }
+  focusedTileIndex = tiles.indexOf(focusedTile);
+  return this.computeSelectionBetween(focusedTileIndex, tiles.length - 1, extend);
+};
+
+scout.TileGridSelectionHandler.prototype._computeFocusedTile = function(diff, extend) {
+  var tiles = this.getVisibleTiles();
+  var selectedTiles = this.getSelectedTiles();
+  var focusedTile = this.getFocusedTile();
+  if (selectedTiles.length === 0) {
+    if (diff > 0) {
+      // Select first tile if no tiles are selected (navigate down/right)
+      focusedTile = scout.arrays.first(tiles);
+    } else {
+      // Select first tile if no tiles are selected (navigate up/left)
+      focusedTile = scout.arrays.last(tiles);
+    }
+    return {
+      focusedTile: focusedTile,
+      selectedTiles: [focusedTile]
+    };
+  }
+
+  // Focused tile may be null if tile has been deleted or if the user has not made a selection before
+  if (!focusedTile) {
+    if (diff > 0) {
+      // Navigate down/right
+      focusedTile = scout.arrays.last(selectedTiles);
+    } else {
+      // Navigate up/left
+      focusedTile = scout.arrays.first(selectedTiles);
+    }
+  }
+  return {
+    focusedTile: focusedTile,
+    selectedTiles: null
+  };
+};
+
 scout.TileGridSelectionHandler.prototype.computeSelectionBetween = function(focusedTileIndex, newFocusedTileIndex, extend) {
   var tiles = this.getVisibleTiles();
   var selectedTiles = this.getSelectedTiles();

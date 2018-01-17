@@ -18,25 +18,5 @@ scout.TileGridSelectLeftKeyStroke = function(tileGrid) {
 scout.inherits(scout.TileGridSelectLeftKeyStroke, scout.TileGridSelectKeyStroke);
 
 scout.TileGridSelectLeftKeyStroke.prototype._computeNewSelection = function(extend) {
-  var tiles = this.getSelectionHandler().getVisibleTiles();
-  var selectedTiles = this.getSelectionHandler().getSelectedTiles();
-  var focusedTile = this.getSelectionHandler().getFocusedTile();
-  var focusedTileIndex = -1;
-
-  if (selectedTiles.length === 0) {
-    // Select last tile if no tiles are selected
-    focusedTile = scout.arrays.last(tiles);
-    return {
-      selectedTiles: [focusedTile],
-      focusedTile: focusedTile
-    };
-  }
-
-  // Focused tile may be null if tile has been deleted or if the user has not made a selection before
-  if (!focusedTile) {
-    focusedTile = scout.arrays.first(selectedTiles);
-  }
-
-  focusedTileIndex = tiles.indexOf(focusedTile);
-  return this.getSelectionHandler().computeSelectionBetween(focusedTileIndex, focusedTileIndex - 1, extend);
+  return this.getSelectionHandler().computeSelectionX(-1, extend);
 };
