@@ -45,15 +45,7 @@ scout.TileGridSelectKeyStroke.prototype._accept = function(event) {
 };
 
 scout.TileGridSelectKeyStroke.prototype.handle = function(event) {
-  var result = this._computeNewSelection(event.shiftKey);
-  if (!result) {
-    return;
-  }
-  if (result.selectedTiles.length > 0) {
-    this.getSelectionHandler().selectTiles(result.selectedTiles);
-    this.getSelectionHandler().scrollTo(scout.arrays.last(result.selectedTiles));
-  }
-  this.getSelectionHandler().setFocusedTile(result.focusedTile);
+  this.getSelectionHandler().executeSelection(this._computeNewSelection(event.shiftKey));
 };
 
 scout.TileGridSelectKeyStroke.prototype._computeNewSelection = function(extend) {

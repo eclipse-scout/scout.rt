@@ -756,6 +756,14 @@ scout.TileGrid.prototype.scrollTo = function(tile) {
   tile.reveal();
 };
 
+scout.TileGrid.prototype.scrollToTop = function() {
+  scout.scrollbars.scrollTop(this.$container, 0);
+};
+
+scout.TileGrid.prototype.scrollToBottom = function() {
+  scout.scrollbars.scrollToBottom(this.$container);
+};
+
 scout.TileGrid.prototype.revealSelection = function() {
   if (!this.rendered) {
     // Execute delayed because tileGrid may be not layouted yet

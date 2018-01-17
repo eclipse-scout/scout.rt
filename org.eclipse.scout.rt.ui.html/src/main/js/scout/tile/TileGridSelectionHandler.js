@@ -158,6 +158,14 @@ scout.TileGridSelectionHandler.prototype.scrollTo = function(tile) {
   this.tileGrid.scrollTo(tile);
 };
 
+scout.TileGridSelectionHandler.prototype.scrollToTop = function() {
+  this.tileGrid.scrollToTop();
+};
+
+scout.TileGridSelectionHandler.prototype.scrollToBottom = function() {
+  this.tileGrid.scrollToBottom();
+};
+
 scout.TileGridSelectionHandler.prototype.findVisibleTileIndexAt = function(x, y, startIndex, reverse) {
   return this.tileGrid.findTileIndexAt(x, y, startIndex, reverse);
 };
@@ -204,7 +212,7 @@ scout.TileGridSelectionHandler.prototype.computeSelectionY = function(yDiff, ext
   focusedTileRow = this.getVisibleGridY(focusedTile);
   focusedTileColumn = this.getVisibleGridX(focusedTile);
   if (yDiff > 0 && focusedTileRow === rowCount - 1 ||
-      yDiff < 0 && focusedTileRow === 0) {
+    yDiff < 0 && focusedTileRow === 0) {
     // Do nothing if focused tile is in the last row (navigate down) or first row (navigate up)
     return;
   }
@@ -304,8 +312,8 @@ scout.TileGridSelectionHandler.prototype.computeSelectionBetween = function(focu
   var newFocusedTile = tiles[newFocusedTileIndex];
 
   if (focusedTileIndex < 0 || focusedTileIndex > tiles.length - 1 ||
-      newFocusedTileIndex < 0 || newFocusedTileIndex > tiles.length - 1 ||
-      focusedTileIndex === newFocusedTileIndex) {
+    newFocusedTileIndex < 0 || newFocusedTileIndex > tiles.length - 1 ||
+    focusedTileIndex === newFocusedTileIndex) {
     // Do nothing if indices are out of bounds or equal
     return;
   }
@@ -345,6 +353,27 @@ scout.TileGridSelectionHandler.prototype.computeSelectionBetween = function(focu
     selectedTiles: newSelectedTiles,
     focusedTile: newFocusedTile
   };
+};
+
+scout.TileGridSelectionHandler.prototype.executeSelection = function(instruction) {
+  if (!instruction) {
+    return;
+  }
+  if (instruction.selectedTiles.length > 0) {
+    this.selectTiles(instruction.selectedTiles);
+    this.scrollTo(instruction.focusedTile);
+
+    // Scroll to the very top or very bottom if newly focused tile is on top or on bottom
+    // Especially important for tile accordion because scrolling to top should reveal the group header as well
+    var focusedTileRow = this.getVisibleGridY(instruction.focusedTile);
+    var rowCount = this.getVisibleGridRowCount();
+    if (focusedTileRow === 0) {
+      this.scrollToTop();
+    } else if (focusedTileRow === rowCount - 1) {
+      this.scrollToBottom();
+    }
+  }
+  this.setFocusedTile(instruction.focusedTile);
 };
 
 /**
