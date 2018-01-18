@@ -153,32 +153,6 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
         deleteGroup(group);
       }
     }
-    updateGroupStates();
-  }
-
-  protected void updateGroupStates() {
-    updateDefaultGroupVisible();
-    updateCollapseStateOfGroups();
-  }
-
-  protected void updateDefaultGroupVisible() {
-    // When DGM is active, we never show the header
-    IGroup defaultGroup = getDefaultGroup();
-    if (m_groupManager instanceof DefaultGroupManager) {
-      defaultGroup.setHeaderVisible(false);
-    }
-    else {
-      // Make the default group invisible, when it has no tiles at all
-      ITileGrid defaultTiles = getTileGrid(defaultGroup);
-      defaultGroup.setHeaderVisible(defaultTiles.getTileCount() > 0);
-    }
-  }
-
-  protected void updateCollapseStateOfGroups() {
-    for (IGroup group : getGroupsInternal()) {
-      boolean collapsed = getTileGrid(group).getTileCount() == 0;
-      group.setCollapsed(collapsed);
-    }
   }
 
   @SuppressWarnings("unchecked")
@@ -287,6 +261,7 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
 
     setTiles(allTiles);
     sort();
+    updateDefaultGroupState();
   }
 
   protected IGroup createGroup() {
@@ -610,6 +585,22 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
 
   protected void handleFilteredTilesChange(IGroup changedGroup, PropertyChangeEvent event) {
     updateGroupTitleSuffix(changedGroup);
+    updateDefaultGroupState();
+  }
+
+  protected void updateDefaultGroupState() {
+    // When DGM is active, we never show the header
+    IGroup defaultGroup = getDefaultGroup();
+    ITileGrid defaultTileGrid = getTileGrid(defaultGroup);
+    if (m_groupManager instanceof DefaultGroupManager) {
+      defaultGroup.setHeaderVisible(false);
+    }
+    else {
+      // Make default group invisible if it has no tiles
+      defaultGroup.setHeaderVisible(defaultTileGrid.getFilteredTileCount() > 0);
+    }
+    // Collapse default group if it has no tiles
+    defaultGroup.setCollapsed(defaultTileGrid.getFilteredTileCount() == 0);
   }
 
   protected void updateGroupTitleSuffix(IGroup group) {
