@@ -93,7 +93,7 @@ describe("AbstractGrid09", function() {
       grid.validate(this.groupBox);
 
       // group box
-      expect(grid.getVisibleGridRowCount()).toEqual(4);
+      expect(grid.getGridRowCount()).toEqual(4);
       expect(grid.getGridColumnCount()).toEqual(2);
 
       // field01
@@ -115,7 +115,7 @@ describe("AbstractGrid09", function() {
       grid.validate(this.groupBox);
 
       // group box
-      expect(grid.getVisibleGridRowCount()).toEqual(4);
+      expect(grid.getGridRowCount()).toEqual(4);
       expect(grid.getGridColumnCount()).toEqual(2);
 
       // field01
