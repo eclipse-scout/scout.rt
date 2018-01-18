@@ -270,9 +270,15 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
     if (groups.size() != 1) {
       throw new IllegalStateException("Must have excatly one group as inner class, but there are " + groups.size() + " groups");
     }
-    IGroup group = groups.get(0);
+    return groups.get(0);
+  }
+
+  @Override
+  protected void addGroupInternal(IGroup group) {
+    super.addGroupInternal(group);
+    handleGroupCollapsedChange(group);
+    group.addPropertyChangeListener(new P_GroupPropertyChangeListener());
     getTileGrid(group).addPropertyChangeListener(new P_FilteredTilesListener(group));
-    return group;
   }
 
   protected void adaptGroup(IGroup group, GroupTemplate template) {
@@ -565,7 +571,13 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
     if (m_selectionUpdateLocked) {
       return;
     }
-    List<? extends ITile> selectedTiles = getTileGrid(changedGroup).getSelectedTiles();
+    ITileGrid<T> tileGrid = getTileGrid(changedGroup);
+    if (tileGrid.getSelectedTileCount() > 0 && changedGroup.isCollapsed()) {
+      // Do not allow selection in a collapsed group (breaks keyboard navigation and is confusing for the user if invisible tiles are selected)
+      tileGrid.deselectAllTiles();
+      return;
+    }
+    List<? extends ITile> selectedTiles = tileGrid.getSelectedTiles();
     if (!isMultiSelect() && selectedTiles.size() > 0) {
       m_selectionUpdateLocked = true;
       try {
@@ -623,6 +635,23 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
       }
       else if (ITileGrid.PROP_SELECTED_TILES.equals(evt.getPropertyName())) {
         handleSelectedTilesChange(m_group, evt);
+      }
+    }
+  }
+
+  protected void handleGroupCollapsedChange(IGroup group) {
+    if (group.isCollapsed()) {
+      // Deselect tiles of a collapsed group -> actions on invisible elements is confusing, and key strokes only operate on visible elements, too
+      getTileGrid(group).deselectAllTiles();
+    }
+  }
+
+  public class P_GroupPropertyChangeListener implements PropertyChangeListener {
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+      if (IGroup.PROP_COLLAPSED.equals(evt.getPropertyName())) {
+        handleGroupCollapsedChange((IGroup) evt.getSource());
       }
     }
   }

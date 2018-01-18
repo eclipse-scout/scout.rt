@@ -384,6 +384,55 @@ public class TileAccordionTest {
     assertEquals(tile2, newSelection.get(1));
   }
 
+  @Test
+  public void testPreventSelectionInCollapsedGroup() {
+    P_Accordion accordion = new P_Accordion();
+    accordion.setGroupManager(new P_StaticTileGroupManager());
+    accordion.setSelectable(true);
+    accordion.setMultiSelect(true);
+
+    P_Tile tile1 = new P_Tile();
+    tile1.setGroup("Static A");
+    P_Tile tile2 = new P_Tile();
+    tile2.setGroup("Static B");
+    accordion.addTiles(Arrays.asList(tile1, tile2));
+    assertEquals(0, accordion.getSelectedTileCount());
+
+    accordion.getGroups().get(0).setCollapsed(true);
+    accordion.selectTiles(Arrays.asList(tile1, tile2));
+    assertEquals(1, accordion.getSelectedTiles().size());
+    assertEquals(tile2, accordion.getSelectedTiles().get(0));
+
+    accordion.getGroups().get(0).setCollapsed(false);
+    accordion.selectTiles(Arrays.asList(tile1, tile2));
+    assertEquals(2, accordion.getSelectedTiles().size());
+    assertEquals(tile1, accordion.getSelectedTiles().get(0));
+    assertEquals(tile2, accordion.getSelectedTiles().get(1));
+  }
+
+  @Test
+  public void testDeselectTilesWhenCollapse() {
+    P_Accordion accordion = new P_Accordion();
+    accordion.setGroupManager(new P_StaticTileGroupManager());
+    accordion.setSelectable(true);
+    accordion.setMultiSelect(true);
+
+    P_Tile tile1 = new P_Tile();
+    tile1.setGroup("Static A");
+    P_Tile tile2 = new P_Tile();
+    tile2.setGroup("Static A");
+    P_Tile tile3 = new P_Tile();
+    tile3.setGroup("Static B");
+    accordion.addTiles(Arrays.asList(tile1, tile2, tile3));
+
+    accordion.selectTiles(Arrays.asList(tile1, tile2, tile3));
+    assertEquals(3, accordion.getSelectedTiles().size());
+
+    accordion.getGroups().get(0).setCollapsed(true);
+    assertEquals(1, accordion.getSelectedTiles().size());
+    assertEquals(tile3, accordion.getSelectedTiles().get(0));
+  }
+
   private static class P_Accordion extends AbstractTileAccordion<P_Tile> {
 
     @ClassId("8f9c91d5-0907-4893-9b89-375851a79b1d")
