@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -22,7 +22,7 @@ import org.json.JSONObject;
  */
 public class JsonPropertyChangeEvent extends JsonEvent {
 
-  private final Map<String, Object> m_properties = new HashMap<>();
+  private final Map<String, Object> m_properties = new LinkedHashMap<>();
 
   /**
    * @param target
