@@ -138,10 +138,21 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
     if (m_jsonProperties.containsKey(propertyName)) {
       JsonProperty<?> jsonProperty = m_jsonProperties.get(propertyName);
       handleLazyJsonProperties(jsonProperty);
+
+      // Use the current model value instead of newValue of the event
+      // This is necessary if the value is changed during a property change event sent by the UI
+      // Example:
+      // 1. UI sends value 'A' and calls setProperty with 'A',
+      // 2. Model calls setProperty with value 'B' during the setProperty('A') call (or in a property change listener)
+      // 3. AbstractJsonPropertyObserver processes setProperty('B') call
+      // 5. AbstractJsonPropertyObserver processes setProperty('A') call -> event.newValue is 'A' even though model value is 'B' -> A has to be sent to be in sync
+      newValue = jsonProperty.modelValue();
+
       jsonProperty.handlePropertyChange(oldValue, newValue);
       if (!jsonProperty.accept()) {
         return;
       }
+
       // Check if a property-event-filter prevents the property change to be added to the JSON response
       PropertyChangeEvent filteredEvent = filterPropertyChangeEvent(event);
       if (filteredEvent != null) {

@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.basic.planner;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -20,13 +23,18 @@ import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
 import org.eclipse.scout.rt.client.ui.basic.planner.PlannerAdapter;
 import org.eclipse.scout.rt.client.ui.basic.planner.PlannerEvent;
 import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
+import org.eclipse.scout.rt.platform.util.Range;
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.UiSessionTestUtility;
+import org.eclipse.scout.rt.ui.html.json.JsonDateRange;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +55,7 @@ public class JsonPlannerTest {
    * Tests whether the id maps are correctly cleaned up
    */
   @Test
-  public void testDeleteResources() throws JSONException {
+  public void testDeleteResources() {
     P_Planner planner = createPlanner();
     Resource<Integer> resource = createResource(1);
     Activity<Resource<Integer>, Integer> activity = createActivity(resource, 2);
@@ -84,6 +92,40 @@ public class JsonPlannerTest {
     Assert.assertNull(jsonPlanner.getActivityId(activity));
     Assert.assertNull(jsonPlanner.getResource(resourceId));
     Assert.assertNull(jsonPlanner.getActivity(activityId));
+  }
+
+  @Test
+  public void testUpdateSelectionRangeWhileChanging() {
+    Date from = new Date();
+    Date to = DateUtility.addDays(from, 2);
+    Range<Date> originalRange = new Range<>(from, to);
+
+    to = DateUtility.addDays(from, 3);
+    Range<Date> adjustedRange = new Range<>(from, to);
+
+    P_Planner planner = new P_Planner() {
+      @Override
+      protected void execSelectionRangeChanged(Range<Date> selectionRange) {
+        if (selectionRange.equals(originalRange)) {
+          setSelectionRange(adjustedRange);
+        }
+      }
+    };
+    JsonPlanner<IPlanner> jsonPlanner = UiSessionTestUtility.newJsonAdapter(m_uiSession, planner, null);
+    jsonPlanner.toJson();
+
+    JsonEvent event = createSelectionChangeEvent(jsonPlanner.getId(), originalRange);
+    jsonPlanner.handleUiEvent(event);
+    assertEquals(adjustedRange, planner.getSelectionRange());
+
+    Object value = JsonTestUtility.extractProperty(m_uiSession.currentJsonResponse(), jsonPlanner.getId(), IPlanner.PROP_SELECTION_RANGE);
+    assertEquals(adjustedRange, new Range<>(jsonPlanner.toJavaDate((JSONObject) value, "from"), jsonPlanner.toJavaDate((JSONObject) value, "to")));
+  }
+
+  public static JsonEvent createSelectionChangeEvent(String adapterId, Range<Date> range) throws JSONException {
+    JSONObject data = new JSONObject();
+    data.put("selectionRange", new JsonDateRange((Range<Date>) range).toJson());
+    return new JsonEvent(adapterId, "property", data);
   }
 
   /**
