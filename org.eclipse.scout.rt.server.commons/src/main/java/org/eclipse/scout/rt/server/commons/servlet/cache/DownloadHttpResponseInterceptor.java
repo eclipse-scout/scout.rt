@@ -22,12 +22,15 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 /**
  * Sets the <code>Content-Disposition</code> HTTP header for downloads (with value <code>attachment</code>).
  * Additionally, a hint for the filename is added according to RFC 5987, both in UTF-8 and ISO-8859-1 encoding.
+ * Newlines, tabs, and other control characters in filenames are removed, as Internet Explorer cannot parse or download
+ * filenames containing these.
  * <p>
  * This interceptor is useful when the user requested the download of a resource ("save as" dialog). Do not use it for
  * inline resources such as images for ImageField.
  *
  * @see http://stackoverflow.com/questions/93551/how-to-encode-the-filename-parameter-of-content-disposition-header-in-http
  * @see http://tools.ietf.org/html/rfc6266#section-5
+ * @see http://tools.ietf.org/html/rfc6266#appendix-D
  */
 public class DownloadHttpResponseInterceptor implements IHttpResponseInterceptor {
   private static final long serialVersionUID = 1L;
@@ -42,6 +45,12 @@ public class DownloadHttpResponseInterceptor implements IHttpResponseInterceptor
   }
 
   protected String calculateHeaderValue(String originalFilename) {
+    // Internet Explorer 11 cannot parse names with characters 0x00-0x1F, neither in filename= nor encoded in filename*=
+    // Note: 0x00-0x1F are the same in UTF-16 and ISO-8859-1, thus replacing them here is safe.
+    if (originalFilename != null) {
+      originalFilename = originalFilename.replaceAll("[\\x00-\\x1F]", "");
+    }
+
     if (StringUtility.isNullOrEmpty(originalFilename)) {
       originalFilename = DEFAULT_FILENAME;
     }
