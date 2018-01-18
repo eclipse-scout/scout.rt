@@ -23,6 +23,7 @@ scout.inherits(scout.TagField, scout.ValueField);
 scout.TagField.prototype._init = function(model) {
   scout.TagField.parent.prototype._init.call(this, model);
 
+  this.on('propertyChange', this._onValueChange.bind(this));
   this._setLookupCall(this.lookupCall);
 };
 
@@ -434,6 +435,21 @@ scout.TagField.prototype.visibleTags = function() {
   return tags;
 };
 
+scout.TagField.prototype._onValueChange = function(event) {
+  if ('value' === event.propertyName) {
+    this._renderLabel();
+  }
+};
+
+scout.TagField.prototype._renderPlaceholder = function($field) {
+  // only render placeholder when tag field is empty (has no tags)
+  var hasTags = !!scout.arrays.ensure(this.value).length;
+  $field = scout.nvl($field, this.$field);
+  if ($field) {
+    $field.placeholder(hasTags ? '' : this.label);
+  }
+};
+
 // --- static helpers ---
 
 scout.TagField.focusFirstTagElement = function($container) {
@@ -464,3 +480,4 @@ scout.TagField.findFocusedTagElement = function($container) {
 scout.TagField.findFocusableTagElements = function($container) {
   return $container.find('.tag-element:not(.hidden),.overflow-icon');
 };
+
