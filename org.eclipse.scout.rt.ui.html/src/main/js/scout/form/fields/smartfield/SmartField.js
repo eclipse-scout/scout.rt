@@ -1073,10 +1073,7 @@ scout.SmartField.prototype.setLookupRow = function(lookupRow) {
 };
 
 scout.SmartField.prototype.resetDisplayText = function() {
-  this._setProperty('displayText', this._formatValue(this.value));
-  if (this.rendered) {
-    this._renderDisplayText();
-  }
+  this._updateDisplayText();
 };
 
 scout.SmartField.prototype._getValueFromLookupRow = function(lookupRow) {
