@@ -44,6 +44,8 @@ public class UiTextContributor implements IUiTextContributor {
         "InvalidNumberMessageX",
         "ErrorWhileLoadingData",
         "FormSaveChangesQuestion",
+        "FormEmptyMandatoryFieldsMessage",
+        "FormInvalidFieldsMessage",
         // From org.eclipse.scout.rt.ui.html
         "ui.CodeUndefined",
         "ui.CalendarToday",
