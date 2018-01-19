@@ -13,6 +13,7 @@ describe("Menu", function() {
   var helper, session, $sandbox, menu1, menu2;
 
   beforeEach(function() {
+    jasmine.clock().install();
     setFixtures(sandbox());
     session = sandboxSession();
     $sandbox = $('#sandbox');
@@ -24,6 +25,10 @@ describe("Menu", function() {
       text: 'bar',
       keyStroke: 'enter'
     });
+  });
+
+  afterEach(function() {
+    jasmine.clock().uninstall();
   });
 
   describe('defaults', function() {
@@ -112,6 +117,49 @@ describe("Menu", function() {
       menu1.separator = false;
       menu1.enabled = false;
       expect(menu1.isTabTarget()).toBe(false);
+    });
+
+  });
+
+  describe('setTooltipText', function() {
+
+    it('can update the tooltip text', function() {
+      var testMenu = helper.createMenu({
+        text: 'My Test Menu',
+        tooltipText: 'moo'
+      });
+      testMenu.render();
+
+      var tooltip = $('body').find('.tooltip');
+      expect(tooltip.length).toBe(0);
+
+      testMenu.$container.triggerMouseEnter();
+      jasmine.clock().tick(1000);
+
+      tooltip = $('body').find('.tooltip');
+      expect(tooltip.length).toBe(1);
+      expect(tooltip.text()).toBe('moo');
+
+      testMenu.setTooltipText('quack');
+
+      tooltip = $('body').find('.tooltip');
+      expect(tooltip.length).toBe(1);
+      expect(tooltip.text()).toBe('quack');
+
+      testMenu.$container.triggerMouseLeave();
+      testMenu.$container.triggerMouseEnter();
+      jasmine.clock().tick(1000);
+
+      tooltip = $('body').find('.tooltip');
+      expect(tooltip.length).toBe(1);
+      expect(tooltip.text()).toBe('quack');
+
+      // Close
+      testMenu.setTooltipText('meeeep');
+      scout.tooltips.close(testMenu.$container);
+
+      tooltip = $('body').find('.tooltip');
+      expect(tooltip.length).toBe(0);
     });
 
   });

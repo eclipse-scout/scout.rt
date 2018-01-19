@@ -145,12 +145,16 @@ scout.Action.prototype._removeIconId = function() {
  */
 scout.Action.prototype._renderEnabled = function() {
   this.$container.setEnabled(this.enabled);
-  this._updateTooltip();
+  if (this.rendered) { // prevent unnecessary tooltip updates during initial rendering
+    this._updateTooltip();
+  }
 };
 
 scout.Action.prototype._renderSelected = function() {
   this.$container.select(this.selected);
-  this._updateTooltip();
+  if (this.rendered) { // prevent unnecessary tooltip updates during initial rendering
+    this._updateTooltip();
+  }
 };
 
 scout.Action.prototype._renderKeyStroke = function() {

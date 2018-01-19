@@ -232,6 +232,7 @@ describe("scout.tooltips", function() {
   });
 
   it("can update the text of an already visible tooltip", function() {
+    // 1. Test with 'tooltipText' data attribute in DOM
     var $testElement = session.$entryPoint.appendDiv('tooltip-test')
       .data('tooltipText', 'initial text');
 
@@ -262,11 +263,57 @@ describe("scout.tooltips", function() {
     expect(tooltip.length).toBe(1);
     expect(tooltip.text()).toBe('initial text');
 
+    var support = $testElement.data('tooltipSupport');
     scout.tooltips.update($testElement);
 
     tooltip = $('body').find('.tooltip');
     expect(tooltip.length).toBe(1);
     expect(tooltip.text()).toBe('updated text');
+    var support2 = $testElement.data('tooltipSupport');
+    expect(support2).toBe(support);
+
+    scout.tooltips.uninstall($testElement);
+
+    tooltip = $('body').find('.tooltip');
+    expect(tooltip.length).toBe(0);
+
+    // 2. Test with 'text' property in tooltip support
+    $testElement.removeData('tooltipText');
+
+    scout.tooltips.install($testElement, {
+      parent: session.desktop,
+      session: session,
+      delay: 123,
+      text: 'hard coded text'
+    });
+
+    $testElement.triggerMouseEnter();
+    jasmine.clock().tick(150);
+
+    tooltip = $('body').find('.tooltip');
+    expect(tooltip.length).toBe(1);
+    expect(tooltip.text()).toBe('hard coded text');
+
+    scout.tooltips.update($testElement, {
+      text: 'my new text',
+      delay: 70
+    });
+
+    tooltip = $('body').find('.tooltip');
+    expect(tooltip.length).toBe(1);
+    expect(tooltip.text()).toBe('my new text');
+
+    $testElement.triggerMouseLeave();
+
+    tooltip = $('body').find('.tooltip');
+    expect(tooltip.length).toBe(0);
+
+    $testElement.triggerMouseEnter();
+    jasmine.clock().tick(80);
+
+    tooltip = $('body').find('.tooltip');
+    expect(tooltip.length).toBe(1);
+    expect(tooltip.text()).toBe('my new text');
 
     scout.tooltips.uninstall($testElement);
   });
