@@ -1034,8 +1034,44 @@ scout.Planner.prototype._select = function(whileSelecting) {
       to = Math.max(this.lastRange.to, this.startRange.to);
 
     var selectionRange = new scout.DateRange(new Date(from), new Date(to));
+    selectionRange = this._adjustSelectionRange(selectionRange);
     this.selectRange(selectionRange, !whileSelecting);
   }
+};
+
+scout.Planner.prototype._adjustSelectionRange = function(range) {
+  var from = range.from.getTime();
+  var to = range.to.getTime();
+
+  // Ensure minimum size of selection range (interval is in minutes)
+  var minSelectionDuration = 0;
+  var options = this.displayModeOptions[this.displayMode];
+  if (options.interval > 0 && options.minSelectionIntervalCount > 0) {
+    minSelectionDuration = options.minSelectionIntervalCount * options.interval * 60000;
+  }
+  var viewRange = this._visibleViewRange();
+  if (this.lastRange.from < this.startRange.from) {
+    // Selecting to left
+    if (to - minSelectionDuration >= viewRange.from.getTime()) {
+      // extend to left side
+      from = Math.min(from, to - minSelectionDuration);
+    } else {
+      // extend to right side if from would be smaller than the minimum date (left border)
+      from = viewRange.from.getTime();
+      to = Math.max(to, Math.min(from + minSelectionDuration, viewRange.to.getTime()));
+    }
+  } else {
+    // Selecting to right
+    if (from + minSelectionDuration <= viewRange.to.getTime()) {
+      // extend to right side
+      to = Math.max(to, Math.max(from + minSelectionDuration, viewRange.from.getTime()));
+    } else {
+      // extend to left side if to would be greater than the maximum date (right border)
+      to = viewRange.to.getTime();
+      from = Math.min(from, to - minSelectionDuration);
+    }
+  }
+  return new scout.DateRange(new Date(from), new Date(to));
 };
 
 scout.Planner.prototype._findRow = function(y) {
@@ -1085,6 +1121,14 @@ scout.Planner.prototype._findScaleByToDate = function(to) {
 scout.Planner.prototype._findScaleByFunction = function(func) {
   var $scaleItem = this.$timelineSmall.children('.scale-item').filter(func);
   return new scout.DateRange($scaleItem.data('date-from').valueOf(), $scaleItem.data('date-to').valueOf());
+};
+
+/**
+ * @returns the visible view range (the difference to this.viewRange is that first and last hourOfDay are considered).
+ */
+scout.Planner.prototype._visibleViewRange = function() {
+  var $items = this.$timelineSmall.children('.scale-item');
+  return new scout.Range($items.first().data('date-from'), $items.last().data('date-to'));
 };
 
 /* -- helper ---------------------------------------------------- */
@@ -1175,13 +1219,14 @@ scout.Planner.prototype._filterMenus = function(allowedTypes, onlyVisible, enabl
   return scout.menus.filter(this.menus, allowedTypes, onlyVisible, enableDisableKeyStroke);
 };
 
-scout.Planner.prototype._renderWorkDayCount = function() {};
-
-scout.Planner.prototype._renderWorkDaysOnly = function() {};
+scout.Planner.prototype.setDisplayModeOptions = function(displayModeOptions) {
+  this.setProperty('displayModeOptions', displayModeOptions);
+};
 
 scout.Planner.prototype._renderDisplayModeOptions = function() {
   this._renderRange();
   this._renderScale();
+  this._select(); // adjust selection if minSelectionIntervalCount has changed
   this.invalidateLayoutTree();
 };
 
