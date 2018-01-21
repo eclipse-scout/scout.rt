@@ -17,6 +17,9 @@ scout.Range.prototype.equals = function(other) {
   return this.from === other.from && this.to === other.to;
 };
 
+/**
+ * Subtracts the given range and returns an array of the remaining ranges.
+ */
 scout.Range.prototype.subtract = function(other) {
   // other is empty
   if (other.size() === 0) {
@@ -50,6 +53,34 @@ scout.Range.prototype.subtract = function(other) {
   return [new scout.Range(this.from, this.to)];
 };
 
+/**
+ * Subtracts every given range and returns an array of the remaining ranges.
+ */
+scout.Range.prototype.subtractAll = function(others) {
+  var other = others.shift();
+  var remains = [this];
+  var newRemains = [];
+  // Subtract every other element from the remains of every subtraction
+  while (other) {
+    remains.forEach(subtract.bind(other));
+    remains = newRemains;
+    newRemains = [];
+    other = others.shift();
+  }
+  // Remove empty ranges
+  remains = remains.filter(function(remainingElem) {
+    return remainingElem.size() > 0;
+  });
+  // If nothing is left add one empty range to be consistent with .subtract()
+  if (remains.length === 0) {
+    remains.push(new scout.Range(0, 0));
+  }
+
+  function subtract(remainingElem) {
+    scout.arrays.pushAll(newRemains, remainingElem.subtract(other));
+  }
+  return remains;
+};
 
 scout.Range.prototype.shrink = function(other) {
   // other is empty
@@ -72,13 +103,12 @@ scout.Range.prototype.shrink = function(other) {
   if (this.from > other.from && this.from < other.to) {
     return new scout.Range(other.to, this.to);
   }
-  if(other.to<this.from){
-    return new scout.Range(this.from-other.size()-1, this.to-other.size()-1);
+  if (other.to < this.from) {
+    return new scout.Range(this.from - other.size() - 1, this.to - other.size() - 1);
   }
   // other is outside
   return new scout.Range(this.from, this.to);
 };
-
 
 scout.Range.prototype.union = function(other) {
   if (this.to < other.from || other.to < this.from) {
