@@ -125,6 +125,27 @@ describe('Range', function() {
 
   });
 
+  describe('subtractAll', function() {
+    it('subtracts all given ranges', function() {
+      var range1 = new scout.Range(0, 10);
+      var range2 = new scout.Range(5, 20);
+      var range3 = new scout.Range(0, 2);
+      expect(range1.subtractAll([range2, range3])).toEqual([new scout.Range(2, 5)]);
+
+      range1 = new scout.Range(5, 15);
+      range2 = new scout.Range(0, 10);
+      range3 = new scout.Range(10, 14);
+      expect(range1.subtractAll([range2, range3])).toEqual([new scout.Range(14, 15)]);
+    });
+
+    it('may return multiple ranges', function() {
+      var range1 = new scout.Range(0, 20);
+      var range2 = new scout.Range(5, 10);
+      var range3 = new scout.Range(12, 15);
+      expect(range1.subtractAll([range2, range3])).toEqual([new scout.Range(0, 5), new scout.Range(10, 12), new scout.Range(15, 20)]);
+    });
+  });
+
   describe('intersect', function() {
     it('returns a new range with the part where both ranges overlap', function() {
       var range1 = new scout.Range(0, 10);
