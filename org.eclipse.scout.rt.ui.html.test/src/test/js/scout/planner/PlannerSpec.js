@@ -553,7 +553,6 @@ describe("Planner", function() {
 
       expect(planner.transformLeft(scout.dates.create('2016-06-21 06:00:00'))).toBeCloseTo(5 * cellWidthPercent, 5);
       expect(planner.transformWidth(scout.dates.create('2016-06-20 06:00:00'), scout.dates.create('2016-06-21 12:00:00'))).toBeCloseTo(5 * cellWidthPercent, 5);
-
     });
 
     it("calculates left and width in WEEK mode for limitted day range", function() {
@@ -569,11 +568,51 @@ describe("Planner", function() {
       var options = planner.displayModeOptions[planner.displayMode];
       var cellWidthPercent = 100 / (((options.lastHourOfDay - options.firstHourOfDay + 1) * 7 * 60) / options.interval);
 
-      expect(planner.transformLeft(scout.dates.create('2016-06-20 09:00:00'))).toBeCloseTo(cellWidthPercent, 5);
+      // during a day
+      expect(planner.transformLeft(scout.dates.create('2016-06-20 09:00:00'))).toBeCloseTo(1 * cellWidthPercent, 5);
       expect(planner.transformWidth(scout.dates.create('2016-06-20 09:00:00'), scout.dates.create('2016-06-20 12:00:00'))).toBeCloseTo(3 * cellWidthPercent, 5);
 
+      // till the end of the day
+      expect(planner.transformLeft(scout.dates.create('2016-06-20 17:00:00'))).toBeCloseTo(9 * cellWidthPercent, 5);
+      expect(planner.transformWidth(scout.dates.create('2016-06-20 16:00:00'), scout.dates.create('2016-06-20 18:00:00'))).toBeCloseTo(2 * cellWidthPercent, 5);
+
+      // to the next day
       expect(planner.transformLeft(scout.dates.create('2016-06-21 08:00:00'))).toBeCloseTo(10 * cellWidthPercent, 5);
       expect(planner.transformWidth(scout.dates.create('2016-06-20 16:00:00'), scout.dates.create('2016-06-21 09:00:00'))).toBeCloseTo(3 * cellWidthPercent, 5);
+
+      // over two days
+      expect(planner.transformLeft(scout.dates.create('2016-06-22 08:00:00'))).toBeCloseTo(20 * cellWidthPercent, 5);
+      expect(planner.transformWidth(scout.dates.create('2016-06-20 16:00:00'), scout.dates.create('2016-06-22 09:00:00'))).toBeCloseTo(13 * cellWidthPercent, 5);
+    });
+
+    it("calculates left and width in WEEK mode for limitted day range (only firstHourOfDay set)", function() {
+      planner.viewRange = new scout.DateRange(scout.dates.create('2016-06-20'), scout.dates.create('2016-06-27'));
+      planner.displayMode = scout.Planner.DisplayMode.WEEK;
+      planner.displayModeOptions[planner.displayMode] = {
+        interval: 60,
+        firstHourOfDay: 8,
+        lastHourOfDay: 23
+      };
+      planner._renderDisplayModeOptions();
+
+      var options = planner.displayModeOptions[planner.displayMode];
+      var cellWidthPercent = 100 / (((options.lastHourOfDay - options.firstHourOfDay + 1) * 7 * 60) / options.interval);
+
+      // during a day
+      expect(planner.transformLeft(scout.dates.create('2016-06-20 09:00:00'))).toBeCloseTo(1 * cellWidthPercent, 5);
+      expect(planner.transformWidth(scout.dates.create('2016-06-20 09:00:00'), scout.dates.create('2016-06-20 12:00:00'))).toBeCloseTo(3 * cellWidthPercent, 5);
+
+      // till the end of the day
+      expect(planner.transformLeft(scout.dates.create('2016-06-20 23:00:00'))).toBeCloseTo(15 * cellWidthPercent, 5);
+      expect(planner.transformWidth(scout.dates.create('2016-06-20 16:00:00'), scout.dates.create('2016-06-20 24:00:00'))).toBeCloseTo(8 * cellWidthPercent, 5);
+
+      // to the next day
+      expect(planner.transformLeft(scout.dates.create('2016-06-21 08:00:00'))).toBeCloseTo(16 * cellWidthPercent, 5);
+      expect(planner.transformWidth(scout.dates.create('2016-06-20 16:00:00'), scout.dates.create('2016-06-21 09:00:00'))).toBeCloseTo(9 * cellWidthPercent, 5);
+
+      // over two days
+      expect(planner.transformLeft(scout.dates.create('2016-06-22 08:00:00'))).toBeCloseTo(32 * cellWidthPercent, 5);
+      expect(planner.transformWidth(scout.dates.create('2016-06-20 16:00:00'), scout.dates.create('2016-06-22 09:00:00'))).toBeCloseTo(25 * cellWidthPercent, 5);
     });
   });
 });

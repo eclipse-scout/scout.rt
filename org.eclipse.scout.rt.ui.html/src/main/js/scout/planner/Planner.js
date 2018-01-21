@@ -114,7 +114,6 @@ scout.Planner.prototype._init = function(model) {
     parent: this,
     arrowPosition: 50
   });
-
 };
 
 scout.Planner.prototype._initResource = function(resource) {
@@ -438,14 +437,14 @@ scout.Planner.prototype._renderScale = function() {
 
     this.transformWidth = function(begin, end, firstHour, lastHour, interval) {
       return function(t0, t1) {
-        t0 = new Date(t0);
-        t1 = new Date(t1);
         var fullRangeMillis = end - begin;
-        var selectedRangeMillis = t1 - t0;
-        var dayDiffT1T0 = scout.dates.compareDays(t1, t0);
-        var hiddenRangeMillis = (dayDiffT1T0 * (24 - (lastHour + 1) + firstHour) * 3600000);
+        var selectionRange = new scout.Range(new Date(t0), new Date(t1));
+        var hiddenRanges = this._findHiddenRangesInWeekMode();
+        var selectedRangeMillis = selectionRange.subtractAll(hiddenRanges).reduce(function(acc, range) {
+          return acc + range.size();
+        }, 0);
         var rangeScaling = (24 / (lastHour - firstHour + 1));
-        return ((selectedRangeMillis - hiddenRangeMillis) * rangeScaling) / fullRangeMillis * 100;
+        return (selectedRangeMillis * rangeScaling) / fullRangeMillis * 100;
       };
     }(this.viewRange.from, this.viewRange.to, firstHourOfDay, lastHourOfDay, interval);
   } else {
@@ -461,6 +460,37 @@ scout.Planner.prototype._renderScale = function() {
       };
     }(this.beginScale, this.endScale);
   }
+};
+
+/**
+ * Returns every hidden range of the view range created by first and last our of day.
+ */
+scout.Planner.prototype._findHiddenRangesInWeekMode = function() {
+  if (!scout.isOneOf(this.displayMode, scout.Planner.DisplayMode.WORK_WEEK, scout.Planner.DisplayMode.WEEK)) {
+    return [];
+  }
+  var ranges = [];
+  var options = this.displayModeOptions[this.displayMode];
+  var firstHourOfDay = options.firstHourOfDay;
+  var lastHourOfDay = options.lastHourOfDay;
+  var currentDate = new Date(this.viewRange.from.valueOf());
+  var hiddenRange;
+  while (currentDate < this.viewRange.to) {
+    // Start of day range
+    hiddenRange = new scout.Range(new Date(currentDate.valueOf()), scout.dates.shiftTime(currentDate, firstHourOfDay));
+    if (hiddenRange.size() > 0) {
+      ranges.push(hiddenRange);
+    }
+    // End of day range
+    hiddenRange = new scout.Range(scout.dates.shiftTime(currentDate, lastHourOfDay + 1), scout.dates.shiftTime(currentDate, 24));
+    if (hiddenRange.size() > 0) {
+      ranges.push(hiddenRange);
+    }
+    currentDate.setHours(0);
+    currentDate.setMinutes(0);
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+  return ranges;
 };
 
 scout.Planner.prototype._renderDayScale = function() {
@@ -593,7 +623,6 @@ scout.Planner.prototype._renderMonthScale = function() {
     this._incrementTimelineScaleItems($divLarge, $divSmall, loop, newLargeGroup);
     first = false;
   }
-
 };
 
 scout.Planner.prototype._renderCalendarWeekScale = function() {
@@ -939,7 +968,7 @@ scout.Planner.prototype._onResizeMousedown = function(event) {
   var swap,
     $target = $(event.target);
 
-  this.startRow = this.selectedResources[0],
+  this.startRow = this.selectedResources[0];
   this.lastRow = this.selectedResources[this.selectedResources.length - 1];
 
   this.startRange = this._findScaleByFromDate(this.selectionRange.from);
