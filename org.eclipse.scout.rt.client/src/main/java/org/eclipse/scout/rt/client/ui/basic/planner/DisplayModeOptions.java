@@ -11,6 +11,7 @@ public class DisplayModeOptions {
   private int m_labelPeriod = 1;
   private int m_firstHourOfDay = 0;
   private int m_lastHourOfDay = 23;
+  private int m_minSelectionIntervalCount = 1;
 
   /**
    * @return the interval of the small time line. <br>
@@ -45,6 +46,14 @@ public class DisplayModeOptions {
     return m_lastHourOfDay;
   }
 
+  /**
+   * @return the minimum number of small time line intervals the selection range may have<br>
+   *         For display mode {@link MONTH}, {@link YEAR} and {@link CALENDAR_WEEK} the parameter has no effect.
+   */
+  public int getMinSelectionIntervalCount() {
+    return m_minSelectionIntervalCount;
+  }
+
   public DisplayModeOptions withInterval(long interval) {
     m_interval = interval;
     return this;
@@ -65,6 +74,11 @@ public class DisplayModeOptions {
     return this;
   }
 
+  public DisplayModeOptions withMinSelectionIntervalCount(int minSelectionIntervalCount) {
+    m_minSelectionIntervalCount = minSelectionIntervalCount;
+    return this;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -73,6 +87,7 @@ public class DisplayModeOptions {
     result = prime * result + (int) (m_interval ^ (m_interval >>> 32));
     result = prime * result + m_labelPeriod;
     result = prime * result + m_lastHourOfDay;
+    result = prime * result + m_minSelectionIntervalCount;
     return result;
   }
 
@@ -98,6 +113,9 @@ public class DisplayModeOptions {
       return false;
     }
     if (m_lastHourOfDay != other.m_lastHourOfDay) {
+      return false;
+    }
+    if (m_minSelectionIntervalCount != other.m_minSelectionIntervalCount) {
       return false;
     }
     return true;

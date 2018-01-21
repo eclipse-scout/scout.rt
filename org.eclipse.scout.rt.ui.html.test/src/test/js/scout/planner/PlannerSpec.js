@@ -615,4 +615,57 @@ describe("Planner", function() {
       expect(planner.transformWidth(scout.dates.create('2016-06-20 16:00:00'), scout.dates.create('2016-06-22 09:00:00'))).toBeCloseTo(25 * cellWidthPercent, 5);
     });
   });
+
+  describe("select", function() {
+    var model, planner;
+
+    beforeEach(function() {
+      model = createPlannerModel(1);
+      planner = createPlanner(model);
+      planner.render(session.$entryPoint);
+    });
+
+    it("selects at least the number of intervals configured by display mode options", function() {
+      planner.viewRange = new scout.DateRange(scout.dates.create('2016-06-20'), scout.dates.create('2016-06-27'));
+      planner.displayMode = scout.Planner.DisplayMode.WEEK;
+      planner.displayModeOptions[planner.displayMode] = {
+        interval: 60,
+        firstHourOfDay: 0,
+        lastHourOfDay: 23,
+        minSelectionIntervalCount: 3
+      };
+      planner._renderDisplayModeOptions();
+
+      // start of view range
+      planner.startRow = planner.resources[0];
+      planner.lastRow = planner.resources[0];
+      planner.startRange = new scout.DateRange(scout.dates.create('2016-06-20 00:00:00').getTime(), scout.dates.create('2016-06-20 01:00:00').getTime());
+      planner.lastRange = new scout.DateRange(scout.dates.create('2016-06-20 00:00:00').getTime(), scout.dates.create('2016-06-20 01:00:00').getTime());
+      planner._select();
+      expect(planner.selectionRange.from.toISOString()).toBe(scout.dates.create('2016-06-20 00:00:00').toISOString());
+      expect(planner.selectionRange.to.toISOString()).toBe(scout.dates.create('2016-06-20 03:00:00').toISOString());
+
+      // end of view range
+      planner.startRange = new scout.DateRange(scout.dates.create('2016-06-26 23:00:00').getTime(), scout.dates.create('2016-06-20 24:00:00').getTime());
+      planner.lastRange = new scout.DateRange(scout.dates.create('2016-06-26 23:00:00').getTime(), scout.dates.create('2016-06-20 24:00:00').getTime());
+      planner._select();
+      expect(planner.selectionRange.from.toISOString()).toBe(scout.dates.create('2016-06-26 21:00:00').toISOString());
+      expect(planner.selectionRange.to.toISOString()).toBe(scout.dates.create('2016-06-26 24:00:00').toISOString());
+
+      // selection to right
+      planner.startRange = new scout.DateRange(scout.dates.create('2016-06-20 16:00:00').getTime(), scout.dates.create('2016-06-20 17:00:00').getTime());
+      planner.lastRange = new scout.DateRange(scout.dates.create('2016-06-20 17:00:00').getTime(), scout.dates.create('2016-06-20 18:00:00').getTime());
+      planner._select();
+      expect(planner.selectionRange.from.toISOString()).toBe(scout.dates.create('2016-06-20 16:00:00').toISOString());
+      expect(planner.selectionRange.to.toISOString()).toBe(scout.dates.create('2016-06-20 19:00:00').toISOString());
+
+      // selection to left
+      planner.startRange = new scout.DateRange(scout.dates.create('2016-06-20 16:00:00').getTime(), scout.dates.create('2016-06-20 17:00:00').getTime());
+      planner.lastRange = new scout.DateRange(scout.dates.create('2016-06-20 15:00:00').getTime(), scout.dates.create('2016-06-20 16:00:00').getTime());
+      planner._select();
+      expect(planner.selectionRange.from.toISOString()).toBe(scout.dates.create('2016-06-20 14:00:00').toISOString());
+      expect(planner.selectionRange.to.toISOString()).toBe(scout.dates.create('2016-06-20 17:00:00').toISOString());
+    });
+
+  });
 });
