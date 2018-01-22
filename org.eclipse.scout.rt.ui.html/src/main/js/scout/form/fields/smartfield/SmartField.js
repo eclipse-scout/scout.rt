@@ -978,7 +978,7 @@ scout.SmartField.prototype._handleEnterKey = function(event) {
 };
 
 scout.SmartField.prototype._isFunctionKey = function(event) {
-  return event.which >= scout.keys.F1 && event.which < scout.keys.F12;
+  return event.which >= scout.keys.F1 && event.which <= scout.keys.F12;
 };
 
 scout.SmartField.prototype._onLookupRowSelected = function(event) {
