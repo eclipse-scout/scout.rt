@@ -39,20 +39,17 @@ describe("GroupBox", function() {
   }
 
   describe("_render", function() {
-    var groupBox, model = {
-      id: '2',
-      label: "fooBar",
-      gridDataHints: {
-        x: 0,
-        y: 0
-      }
-    };
-
-    beforeEach(function() {
-      groupBox = createField(model);
-    });
 
     it("adds group-box div when label is set", function() {
+      var model = {
+        id: '2',
+        label: "fooBar",
+        gridDataHints: {
+          x: 0,
+          y: 0
+        }
+      };
+      var groupBox = createField(model);
       groupBox.render($('#sandbox'));
       expect($('#sandbox')).toContainElement('div.group-box');
       expect($('#sandbox')).toContainElement('div.group-box-title');
@@ -73,6 +70,41 @@ describe("GroupBox", function() {
       expect(groupBox._renderControls.calls.count()).toEqual(0);
       groupBox.setExpanded(true);
       expect(groupBox._renderControls.calls.count()).toEqual(1);
+    });
+
+    it("automatically hides the label if it is empty", function () {
+      // Test 1: render first
+      var groupBox = createField({});
+      groupBox.render();
+
+      expect(groupBox.labelVisible).toBe(true);
+      expect(groupBox._computeTitleVisible()).toBe(false);
+      expect(groupBox.$title.isVisible()).toBe(false);
+      groupBox.setLabel('test');
+      expect(groupBox.labelVisible).toBe(true);
+      expect(groupBox._computeTitleVisible()).toBe(true);
+      expect(groupBox.$title.isVisible()).toBe(true);
+      expect(groupBox.$title.text().trim()).toBe('test');
+      groupBox.setLabelVisible(false);
+      expect(groupBox.labelVisible).toBe(false);
+      expect(groupBox._computeTitleVisible()).toBe(false);
+      expect(groupBox.$title.isVisible()).toBe(false);
+      expect(groupBox.$title.text().trim()).toBe('test');
+
+      // Test 2: render later
+      var groupBox2 = createField({});
+      expect(groupBox2.labelVisible).toBe(true);
+      expect(groupBox2._computeTitleVisible()).toBe(false);
+      groupBox2.setLabel('test2');
+      expect(groupBox2.labelVisible).toBe(true);
+      expect(groupBox2._computeTitleVisible()).toBe(true);
+      groupBox2.render();
+      expect(groupBox2.$title.isVisible()).toBe(true);
+      expect(groupBox2.$title.text().trim()).toBe('test2');
+
+      // Cleanup
+      groupBox.destroy();
+      groupBox2.destroy();
     });
   });
 

@@ -304,6 +304,9 @@ scout.GroupBox.prototype.addLabel = function() {
 
 scout.GroupBox.prototype._renderLabel = function() {
   this.$label.textOrNbsp(this.label);
+  if (this.rendered) {
+    this._renderLabelVisible();
+  }
 };
 
 scout.GroupBox.prototype._renderStatusPosition = function() {
