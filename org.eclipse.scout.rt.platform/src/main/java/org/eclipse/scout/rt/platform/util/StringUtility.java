@@ -1099,18 +1099,21 @@ public final class StringUtility {
     if (s == null) {
       return null;
     }
-    else {
-      return s.toLowerCase();
-    }
+    return s.toLowerCase();
   }
 
   public static String uppercase(String s) {
     if (s == null) {
       return null;
     }
-    else {
-      return s.toUpperCase();
+    return s.toUpperCase();
+  }
+
+  public static String uppercaseFirst(String s) {
+    if (isNullOrEmpty(s)) {
+      return s;
     }
+    return s.substring(0, 1).toUpperCase() + s.substring(1);
   }
 
   /**
@@ -1121,7 +1124,7 @@ public final class StringUtility {
    * {@link String#split(String)}.
    */
   public static String[] split(String s, String regex) {
-    if (s == null || s.isEmpty()) {
+    if (isNullOrEmpty(s)) {
       return new String[0];
     }
     return s.split(regex);
@@ -1135,7 +1138,7 @@ public final class StringUtility {
    * method returns the result of {@link String#split(String, int)}.
    */
   public static String[] split(String s, String regex, int limit) {
-    if (s == null || s.isEmpty()) {
+    if (isNullOrEmpty(s)) {
       return new String[0];
     }
     return s.split(regex, limit);

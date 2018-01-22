@@ -690,4 +690,14 @@ public class StringUtilityTest {
     assertFalse(StringUtility.compare("a", "ä") == 0);
     assertFalse(StringUtility.compare("a", "b") == 0);
   }
+
+  @Test
+  public void testUppercaseFirst() throws Exception {
+    assertEquals(null, StringUtility.uppercaseFirst(null));
+    assertEquals("", StringUtility.uppercaseFirst(""));
+    assertEquals("A", StringUtility.uppercaseFirst("A"));
+    assertEquals("B", StringUtility.uppercaseFirst("b"));
+    assertEquals("Foo", StringUtility.uppercaseFirst("foo"));
+  }
+
 }
