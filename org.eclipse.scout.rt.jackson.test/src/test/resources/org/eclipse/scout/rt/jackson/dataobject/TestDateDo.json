@@ -1,0 +1,11 @@
+{
+  "_type" : "TestDate",
+  "customDateFormatCustomAttributeName" : "20171130",
+  "dateDefault" : "2017-11-30 17:29:12.583",
+  "dateOnly" : "1990-10-20",
+  "dateOnlyDoList" : [ "1990-10-20 00:00:00.000" ],
+  "dateOnlyList" : [ "1990-10-20 00:00:00.000" ],
+  "dateWithTimestamp" : "2017-11-30 17:29:12.583",
+  "dateWithTimestampWithTimezone" : "2017-11-30 17:29:12.583 +0100",
+  "dateYearMonth" : "90-10"
+}

@@ -1,0 +1,76 @@
+{
+  "_type" : "TestCollections",
+  "itemDoAttribute" : {
+    "_type" : "TestItem",
+    "id" : "d1",
+    "stringAttribute" : "itemDo-as-attribute"
+  },
+  "itemDoCollectionAttribute" : [ {
+    "_type" : "TestItem",
+    "id" : "d2",
+    "stringAttribute" : "itemDo-as-collection-item-1"
+  }, {
+    "_type" : "TestItem",
+    "id" : "d3",
+    "stringAttribute" : "itemDo-as-collection-item-2"
+  } ],
+  "itemDoListAttribute" : [ {
+    "_type" : "TestItem",
+    "id" : "d8",
+    "stringAttribute" : "itemDo-as-DoList-item-1"
+  }, {
+    "_type" : "TestItem",
+    "id" : "d9",
+    "stringAttribute" : "itemDo-as-DoList-item-2"
+  } ],
+  "itemListAttribute" : [ {
+    "_type" : "TestItem",
+    "id" : "d4",
+    "stringAttribute" : "itemDo-as-list-item-1"
+  }, {
+    "_type" : "TestItem",
+    "id" : "d5",
+    "stringAttribute" : "itemDo-as-list-item-2"
+  } ],
+  "itemPojo2DoListAttribute" : [ {
+    "_type" : "TestItem2",
+    "id" : "p10",
+    "stringAttribute" : "itemPojo2-as-DoList-item-1"
+  }, {
+    "_type" : "TestItem2",
+    "id" : "p11",
+    "stringAttribute" : "itemPojo2-as-DoList-item-2"
+  } ],
+  "itemPojoAttribute" : {
+    "_type" : "TestItem",
+    "id" : "p1",
+    "stringAttribute" : "itemPojo-as-attribute"
+  },
+  "itemPojoCollectionAttribute" : [ {
+    "_type" : "TestItem",
+    "id" : "p2",
+    "stringAttribute" : "itemPojo-as-collection-item-1"
+  }, {
+    "_type" : "TestItem",
+    "id" : "p3",
+    "stringAttribute" : "itemPojo-as-collection-item-2"
+  } ],
+  "itemPojoDoListAttribute" : [ {
+    "_type" : "TestItem",
+    "id" : "p8",
+    "stringAttribute" : "itemPojo-as-DoList-item-1"
+  }, {
+    "_type" : "TestItem",
+    "id" : "p9",
+    "stringAttribute" : "itemPojo-as-DoList-item-2"
+  } ],
+  "itemPojoListAttribute" : [ {
+    "_type" : "TestItem",
+    "id" : "p4",
+    "stringAttribute" : "itemPojo-as-list-item-1"
+  }, {
+    "_type" : "TestItem",
+    "id" : "p5",
+    "stringAttribute" : "itemPojo-as-list-item-2"
+  } ]
+}

@@ -1,0 +1,22 @@
+{
+  "_type" : "TestPerson",
+  "addresses" : [ {
+    "_type" : "TestElectronicAddress",
+    "email" : "foo@bar.de",
+    "id" : "elecAddress"
+  }, {
+    "_type" : "TestPhysicalAddress",
+    "city" : "Example",
+    "id" : "physicAddress"
+  }, {
+    "_type" : "TestPhysicalAddressEx",
+    "id" : "physicAddressEx",
+    "poBox" : "1234"
+  } ],
+  "birthday" : "1990-10-20 00:00:00.000",
+  "defaultAddress" : {
+    "_type" : "TestElectronicAddress",
+    "email" : "foo@bar.de",
+    "id" : "elecAddress"
+  }
+}

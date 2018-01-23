@@ -1,0 +1,52 @@
+{
+  "itemDoAttribute" : {
+    "id" : "d1",
+    "stringAttribute" : "itemDo-as-attribute"
+  },
+  "itemDoCollectionAttribute" : [ {
+    "id" : "d2",
+    "stringAttribute" : "itemDo-as-collection-item-1"
+  }, {
+    "id" : "d3",
+    "stringAttribute" : "itemDo-as-collection-item-2"
+  } ],
+  "itemDoListAttribute" : [ {
+    "id" : "d4",
+    "stringAttribute" : "itemDo-as-list-item-1"
+  }, {
+    "id" : "d5",
+    "stringAttribute" : "itemDo-as-list-item-2"
+  } ],
+  "itemDoSetAttribute" : [ {
+    "id" : "d6",
+    "stringAttribute" : "itemDo-as-set-item-1"
+  }, {
+    "id" : "d7",
+    "stringAttribute" : "itemDo-as-set-item-2"
+  } ],
+  "itemPojoAttribute" : {
+    "id" : "p1",
+    "stringAttribute" : "itemPojo-as-attribute"
+  },
+  "itemPojoCollectionAttribute" : [ {
+    "id" : "p2",
+    "stringAttribute" : "itemPojo-as-collection-item-1"
+  }, {
+    "id" : "p3",
+    "stringAttribute" : "itemPojo-as-collection-item-2"
+  } ],
+  "itemPojoListAttribute" : [ {
+    "id" : "p4",
+    "stringAttribute" : "itemPojo-as-list-item-1"
+  }, {
+    "id" : "p5",
+    "stringAttribute" : "itemPojo-as-list-item-2"
+  } ],
+  "itemPojoSetAttribute" : [ {
+    "id" : "p6",
+    "stringAttribute" : "itemPojo-as-set-item-1"
+  }, {
+    "id" : "p7",
+    "stringAttribute" : "itemPojo-as-set-item-2"
+  } ]
+}

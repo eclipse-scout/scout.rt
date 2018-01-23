@@ -1,0 +1,51 @@
+{
+  "_type" : "TestMap",
+  "dateUUIDMapAttribute" : {
+    "2017-11-30 17:29:12.583" : "ab8b13a4-b2a0-47a0-9d79-80039417b843",
+    "1990-10-20 00:00:00.000" : "87069a20-6fc5-4b6a-9bc2-2e6cb75d7571"
+  },
+  "doubleTestItemDoMapAttribute" : {
+    "1.11" : {
+      "_type" : "TestItem",
+      "id" : "item-key5",
+      "stringAttribute" : "value5"
+    },
+    "2.22" : {
+      "_type" : "TestItem",
+      "id" : "item-key6",
+      "stringAttribute" : "value6"
+    }
+  },
+  "integerIntegerMapAttribute" : {
+    "1" : 42,
+    "2" : 21
+  },
+  "stringDoTestItemMapAttribute" : {
+    "doKey1" : {
+      "_type" : "TestItem",
+      "id" : "item-key3",
+      "stringAttribute" : "value3"
+    },
+    "doKey2" : {
+      "_type" : "TestItem",
+      "id" : "item-key4",
+      "stringAttribute" : "value4"
+    }
+  },
+  "stringStringMapAttribute" : {
+    "foo1" : "bar",
+    "foo2" : "baz"
+  },
+  "stringTestItemPojoMapAttribute" : {
+    "pojoKey1" : {
+      "_type" : "TestItem",
+      "id" : "item-key1",
+      "stringAttribute" : "value1"
+    },
+    "pojoKey2" : {
+      "_type" : "TestItem",
+      "id" : "item-key2",
+      "stringAttribute" : "value2"
+    }
+  }
+}

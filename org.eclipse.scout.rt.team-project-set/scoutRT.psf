@@ -24,6 +24,7 @@
     <item elementID="=org.eclipse.scout.rt.server.jaxws" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
     <item elementID="=org.eclipse.scout.jaxws.apt" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
     <item elementID="=org.eclipse.scout.rt.server" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.rest.jackson" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 </workingSets>
 <workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1375704042674_2" label="scout.rt.client" name="scout.rt.client">
     <item elementID="=org.eclipse.scout.rt.svg.ui.html" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>

@@ -12,7 +12,11 @@ package org.eclipse.scout.rt.rest;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+
+import javax.ws.rs.ext.ContextResolver;
 
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -30,20 +34,29 @@ import org.junit.Test;
  */
 public class RestApplicationTest {
 
-  private static IBean<?> s_fixtureResourceBean;
+  private static List<IBean<?>> s_registeredBeans = new ArrayList<>();
 
   @IgnoreBean
   public static class FixtureResource implements IRestResource {
   }
 
+  @IgnoreBean
+  public static class FixtureContextResolver implements ContextResolver<Object> {
+    @Override
+    public Object getContext(Class<?> type) {
+      return null;
+    }
+  }
+
   @BeforeClass
   public static void beforeClass() {
-    s_fixtureResourceBean = TestingUtility.registerBean(new BeanMetaData(FixtureResource.class));
+    s_registeredBeans.add(TestingUtility.registerBean(new BeanMetaData(FixtureResource.class)));
+    s_registeredBeans.add(TestingUtility.registerBean(new BeanMetaData(FixtureContextResolver.class)));
   }
 
   @AfterClass
   public static void afterClass() {
-    TestingUtility.unregisterBean(s_fixtureResourceBean);
+    TestingUtility.unregisterBeans(s_registeredBeans);
   }
 
   @Test
@@ -53,7 +66,7 @@ public class RestApplicationTest {
     assertTrue(classes.contains(DefaultExceptionMapper.class));
     assertTrue(classes.contains(VetoExceptionMapper.class));
     assertTrue(classes.contains(WebApplicationExceptionMapper.class));
-    assertTrue(classes.contains(ObjectMapperResolver.class));
+    assertTrue(classes.contains(FixtureContextResolver.class));
     assertTrue(classes.contains(FixtureResource.class));
   }
 

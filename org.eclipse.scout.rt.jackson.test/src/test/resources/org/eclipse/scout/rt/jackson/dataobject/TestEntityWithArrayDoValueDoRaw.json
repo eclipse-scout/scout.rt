@@ -1,0 +1,11 @@
+{
+  "itemDoArrayAttribute" : [ {
+    "id" : "1",
+    "stringAttribute" : "foo"
+  }, {
+    "id" : "2",
+    "stringAttribute" : "bar"
+  } ],
+  "stringArrayAttribute" : [ "one", "two", "three" ]
+}
+

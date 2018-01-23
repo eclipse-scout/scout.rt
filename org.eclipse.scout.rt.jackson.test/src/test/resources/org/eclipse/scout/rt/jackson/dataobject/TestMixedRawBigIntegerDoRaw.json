@@ -1,0 +1,6 @@
+{
+  "bigDecimalAttribute" : 789.0,
+  "bigIntegerAttribute" : 123456,
+  "dateAttribute" : "2017-09-22 14:23:12.123",
+  "numberAttribute" : 42
+}

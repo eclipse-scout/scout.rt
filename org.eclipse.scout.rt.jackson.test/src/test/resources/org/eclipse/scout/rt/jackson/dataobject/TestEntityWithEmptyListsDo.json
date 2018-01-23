@@ -1,0 +1,7 @@
+{
+  "_type" : "TestEntityWithLists",
+  "itemsDoListAttribute" : [ ],
+  "itemsListAttribute" : [ ],
+  "stringDoListAttribute" : [ ],
+  "stringListAttribute" : null
+}

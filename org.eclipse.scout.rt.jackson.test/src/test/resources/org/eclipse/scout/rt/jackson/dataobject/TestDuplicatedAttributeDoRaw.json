@@ -1,0 +1,7 @@
+{
+  "stringAttribute" : "firstValue",
+  "bigDecimalAttribute" : 1.0,
+  "bigIntegerAttribute" : 1,
+  "bigDecimalAttribute" : 2.0,
+  "stringAttribute" : "secondValue"
+}

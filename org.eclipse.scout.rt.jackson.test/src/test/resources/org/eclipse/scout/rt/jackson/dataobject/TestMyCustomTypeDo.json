@@ -1,0 +1,6 @@
+{
+  "_type" : "TestMyCustomType",
+  "date" : "2017-11-30 17:29:12.583",
+  "integer" : 42,
+  "string" : "foo"
+}

@@ -1,0 +1,18 @@
+{
+  "mapAttribute1" : {
+    "key" : "value"
+  },
+  "mapAttribute2" : {
+    "123" : 45.69
+  },
+  "mapAttribute3" : {
+    "ab8b13a4-b2a0-47a0-9d79-80039417b843" : "2017-11-30 17:29:12.583"
+  },
+  "mapAttribute4" : {
+    "foo" : {
+      "_type" : "TestItem",
+      "id" : "key",
+      "stringAttribute" : "value"
+    }
+  }
+}

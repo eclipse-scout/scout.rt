@@ -1,0 +1,23 @@
+{
+  "_type" : "TestEntityWithLists",
+  "itemsDoListAttribute" : [ {
+    "_type" : "TestItem",
+    "id" : "foo-ID-3",
+    "stringAttribute" : "bar-string-attribute-3"
+  }, {
+    "_type" : "TestItem",
+    "id" : "foo-ID-4",
+    "stringAttribute" : "bar-string-attribute-4"
+  } ],
+  "itemsListAttribute" : [ {
+    "_type" : "TestItem",
+    "id" : "foo-ID-1",
+    "stringAttribute" : "bar-string-attribute-1"
+  }, {
+    "_type" : "TestItem",
+    "id" : "foo-ID-2",
+    "stringAttribute" : "bar-string-attribute-2"
+  } ],
+  "stringDoListAttribute" : [ "stringC", "stringD" ],
+  "stringListAttribute" : [ "stringA", "stringB" ]
+}

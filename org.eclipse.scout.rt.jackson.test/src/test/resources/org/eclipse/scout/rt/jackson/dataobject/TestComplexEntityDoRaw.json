@@ -1,0 +1,24 @@
+{
+  "bigDecimalAttribute" : 1.23456789,
+  "bigIntegerAttribute" : 123456789,
+  "dateAttribute" : "2017-11-30 17:29:12.583",
+  "doubleAttribute" : 56.78,
+  "floatAttribute" : 12.34,
+  "id" : "4d2abc01-afc0-49f2-9eee-a99878d49728",
+  "integerAttribute" : 42,
+  "itemAttribute" : {
+    "id" : "1234-3",
+    "stringAttribute" : "bar"
+  },
+  "itemsAttribute" : [ {
+    "id" : "1234-1"
+  }, {
+    "id" : "1234-2"
+  } ],
+  "localeAttribute" : "de_CH",
+  "longAttribute" : 123,
+  "objectAttribute" : "fooObject",
+  "stringAttribute" : "foo",
+  "stringListAttribute" : [ "foo", "bar" ],
+  "uuidAttribute" : "298d64f9-821d-49fe-91fb-6fb9860d4950"
+}

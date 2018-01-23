@@ -1,0 +1,5 @@
+[ {
+  "_type" : "TestItem",
+  "id" : "foo",
+  "stringAttribute" : "bar"
+} ]

@@ -1,0 +1,13 @@
+{
+  "_type" : "TestEntityWithArrayDoValue",
+  "itemDoArrayAttribute" : [ {
+    "_type" : "TestItem",
+    "id" : "1",
+    "stringAttribute" : "foo"
+  }, {
+    "_type" : "TestItem",
+    "id" : "2",
+    "stringAttribute" : "bar"
+  } ],
+  "stringArrayAttribute" : [ "one", "two", "three" ]
+}

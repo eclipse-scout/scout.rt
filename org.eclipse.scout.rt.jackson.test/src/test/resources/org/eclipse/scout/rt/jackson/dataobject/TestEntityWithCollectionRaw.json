@@ -1,0 +1,29 @@
+{
+  "attribute1" : [ "list-item-1", "list-item-2" ],
+  "attribute2" : [ 123, 45.69 ],
+  "attribute3" : [ "ab8b13a4-b2a0-47a0-9d79-80039417b843", "87069a20-6fc5-4b6a-9bc2-2e6cb75d7571" ],
+  "attribute4" : [ "2017-11-30 17:29:12.583", "1990-10-20 00:00:00.000" ],
+  "attribute5" : [ {
+    "_type" : "TestItem",
+    "id" : "item-do-key-1",
+    "stringAttribute" : "item-do-value-1"
+  }, {
+    "_type" : "TestItem",
+    "id" : "item-do-key-2",
+    "stringAttribute" : "item-do-value-2"
+  } ],
+  "attribute6" : [ {
+    "_type" : "TestItem",
+    "id" : "item-do-key-3",
+    "stringAttribute" : "item-do-value-3"
+  }, "bar" ],
+  "attribute7" : [ {
+    "_type" : "TestItem2",
+    "id" : "item-pojo-key-1",
+    "stringAttribute" : "item-pojo-value-1"
+  }, {
+    "_type" : "TestItem2",
+    "id" : "item-pojo-key-2",
+    "stringAttribute" : "item-pojo-value-2"
+  } ]
+}

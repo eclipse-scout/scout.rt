@@ -1,0 +1,9 @@
+{
+  "_type" : "TestEntityWithNestedEntity",
+  "bigIntegerAttribute" : 123456,
+  "itemAttribute" : {
+    "_type" : "TestItem",
+    "id" : "1234-3",
+    "stringAttribute" : "bar"
+  }
+}

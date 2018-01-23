@@ -1,0 +1,47 @@
+package org.eclipse.scout.rt.jackson.dataobject;
+
+import java.util.Date;
+
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.dataobject.DoEntity;
+import org.eclipse.scout.rt.platform.dataobject.DoList;
+import org.eclipse.scout.rt.platform.dataobject.DoValue;
+
+import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
+import com.fasterxml.jackson.databind.ser.Serializers;
+import com.fasterxml.jackson.databind.type.ReferenceType;
+
+/**
+ * Serializer provider for data object serializer for ({@code DoEntity}, {@code DoValue} and {@code DoList}.
+ */
+@ApplicationScoped
+public class DataObjectSerializers extends Serializers.Base {
+
+  @Override
+  public JsonSerializer<?> findReferenceSerializer(SerializationConfig config, ReferenceType refType, BeanDescription beanDesc, TypeSerializer contentTypeSerializer, JsonSerializer<Object> contentValueSerializer) {
+    if (DoValue.class.isAssignableFrom(refType.getRawClass())) {
+      boolean staticTyping = (contentTypeSerializer == null) && config.isEnabled(MapperFeature.USE_STATIC_TYPING);
+      return new DoValueSerializer(refType, staticTyping, contentTypeSerializer, contentValueSerializer);
+    }
+    return super.findReferenceSerializer(config, refType, beanDesc, contentTypeSerializer, contentValueSerializer);
+  }
+
+  @Override
+  public JsonSerializer<?> findSerializer(SerializationConfig config, JavaType type, BeanDescription beanDesc) {
+    if (DoEntity.class.isAssignableFrom(type.getRawClass())) {
+      return new DoEntitySerializer(type);
+    }
+    else if (DoList.class.isAssignableFrom(type.getRawClass())) {
+      return new DoListSerializer(type);
+    }
+    else if (Date.class.isAssignableFrom(type.getRawClass())) {
+      return new DoDateSerializer();
+    }
+    return super.findSerializer(config, type, beanDesc);
+  }
+}
