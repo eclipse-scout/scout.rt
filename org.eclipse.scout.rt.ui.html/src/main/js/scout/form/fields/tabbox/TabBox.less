@@ -15,7 +15,7 @@
 }
 
 .tab-box-header {
-  margin-top: @group-margin-top;
+  margin-top: @group-box-title-margin-top;
   margin-left: @mandatory-indicator-width;
   white-space: nowrap;
   position: relative;
@@ -61,7 +61,6 @@
     border-bottom: none;
     padding-left: 12px;
 
-
     & > .menubox {
       & > .menu-item:not(.last),
       & > .menu-separator {
@@ -100,7 +99,7 @@
   #scout.font-text-normal(@font-weight-bold);
   color: @tab-item-color;
   background-color: transparent;
-  padding: @tab-item-padding-y @tab-item-padding-x;
+  padding: 0 @tab-item-padding-x;
   cursor: pointer;
 
   &::after {
@@ -144,17 +143,18 @@
     content: @icon-angle-right;
     color: @tab-item-active-color;
     position: absolute;
-    top: @group-title-padding-top;
+    top: 0;
     left: @tab-item-padding-x - @tab-item-focus-arrow-width;
     width: @tab-item-focus-arrow-width;
-    padding: @group-title-padding-top 0 @group-title-padding-bottom;
+    padding: @tab-item-title-padding-top 0 @tab-item-title-padding-bottom;
     text-align: center;
   }
 
   & > .title {
     display: inline-block;
     vertical-align: middle;
-    padding: @group-title-padding-top 0 @group-title-padding-bottom;
+    padding: @tab-item-title-padding-top 0 @tab-item-title-padding-bottom;
+
     & > .label {
       display: block;
       vertical-align: middle;
@@ -172,8 +172,6 @@
     display: inline-block;
     vertical-align: middle;
     margin-left: @field-status-margin-left;
-/*     padding: @group-title-padding-top 0 @group-title-padding-bottom; */
-/*     vertical-align: top; */
     #scout.status();
   }
 
@@ -216,28 +214,29 @@
     color: @icon-color;
     content: @icon-ellipsis-v;
   }
-   &:focus {
-     outline: none;
 
-     &:not(.disabled) {
-       color: @hover-color;
+  &:focus {
+    outline: none;
 
-       &:not(.menu-button) {
-         color: @focus-color;
+    &:not(.disabled) {
+      color: @hover-color;
 
-         &::after {
-           color: @focus-color;
-         }
-       }
+      &:not(.menu-button) {
+        color: @focus-color;
 
-       /* Draw border for icon only items */
-       &.menu-icononly::after {
-         #scout.button-focus();
-       }
+        &::after {
+          color: @focus-color;
+        }
+      }
 
-       &:not(.menu-icononly):not(.menu-button) > .text {
-         text-decoration: underline;
-       }
-     }
-   }
+      /* Draw border for icon only items */
+      &.menu-icononly::after {
+        #scout.button-focus();
+      }
+
+      &:not(.menu-icononly):not(.menu-button) > .text {
+        text-decoration: underline;
+      }
+    }
+  }
 }

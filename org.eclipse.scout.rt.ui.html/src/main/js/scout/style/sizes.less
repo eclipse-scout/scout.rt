@@ -60,18 +60,19 @@
 @detail-table-row-padding-y: @table-row-padding-y + 5;
 @form-title-margin-top: 10px;
 @group-box-control-size: 20px;
-@group-margin-bottom: 16px;
-@group-margin-top: 14px;
-@group-title-border-width: 3px;
-@group-title-padding-bottom: 6px;
-@group-title-padding-top: 6px;
+@group-box-body-padding-bottom: 16px;
+@group-box-body-padding-top: 14px;
+@group-box-title-border-width: 3px;
+@group-box-title-margin-top: 8px;
+@group-box-title-padding-bottom: 12px;
+@group-box-title-padding-top: 12px;
 @header-menu-textandicon-padding-right: 11px;
 @menu-item-height: 39px;
 @menu-item-margin-right-between-buttons: 10px;
 @menu-item-margin-right: 20px;
 @menu-item-max-image-icon-height: 18px;
 @menu-item-min-image-icon-width: 18px;
-@menubar-height: @logical-grid-height;
+@menubar-field-menu-margin-y: 4px;
 @messagebox-label-padding: 20px;
 @messagebox-max-width: 330px;
 @mobile-popup-title-margin-right: 30px;
@@ -107,7 +108,9 @@
 @tab-area-border-width: 3px;
 @tab-item-focus-arrow-width: 15px;
 @tab-item-padding-x: 20px;
-@tab-item-padding-y: 6px;
+@tab-item-title-padding-bottom: @group-box-title-padding-bottom;
+@tab-item-title-padding-top: @group-box-title-padding-top;
+@tab-item-title-margin-top: @group-box-title-margin-top;
 @table-cell-padding-left: 8px; /* also used in scout.Column.prototype.buildCell */
 @table-cell-padding-right: 4px;  /* also used in scout.Column.prototype.buildCell */
 @table-control-content-padding: 10px;

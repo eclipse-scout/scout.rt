@@ -112,8 +112,6 @@ scout.TabArea.prototype.setTabItems = function(tabItems) {
   this.invalidateLayoutTree();
 };
 
-
-
 scout.TabArea.prototype._renderTabItems = function() {
   this.tabItems.slice().reverse().forEach(function(tabItem) {
     tabItem.renderTab(this.$container);

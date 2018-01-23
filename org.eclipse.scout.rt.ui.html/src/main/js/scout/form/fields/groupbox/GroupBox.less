@@ -50,11 +50,11 @@
 
 .group-box-title {
   width: calc(~'100%' - @mandatory-indicator-width);
-  margin-top: @group-margin-top;
+  margin-top: @group-box-title-margin-top;
   margin-left: @mandatory-indicator-width;
-  border-bottom: @group-title-border-width solid @group-box-title-border-color;
+  border-bottom: @group-box-title-border-width solid @group-box-title-border-color;
   #scout.overflow-ellipsis-nowrap();
-  padding: @group-title-padding-top 0 @group-title-padding-bottom 0;
+  padding: @group-box-title-padding-top 0 @group-box-title-padding-bottom 0;
 
   .group-box.collapsed:not(.with-line) > & {
     border-bottom-color: transparent;
@@ -67,7 +67,7 @@
     /* adjust control position (use absolute positioning, otherwise the layout would be disturbed, */
     /* because the control div is higher than the title span */
     position: absolute;
-    top: @group-margin-top + @group-title-padding-top - 3px;
+    top: @group-box-title-margin-top + @group-box-title-padding-top - 3px;
     left: @mandatory-indicator-width;
 
     /* for good animation, ensure that the control is a square and the icon is centered */
@@ -153,7 +153,7 @@
 
 .group-box-body {
   position: relative;
-  padding: @group-margin-top 0 @group-margin-bottom 0;
+  padding: @group-box-body-padding-top 0 @group-box-body-padding-bottom 0;
 
   &.y-padding-invisible {
     padding-top: 0;

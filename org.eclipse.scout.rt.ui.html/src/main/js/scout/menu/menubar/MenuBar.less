@@ -36,8 +36,6 @@
   position: relative;
   width: 100%;
   background-color: @menubar-background-color;
-  padding-top: 2px;
-  padding-bottom: 2px;
   border-bottom: 1px solid @border-color;
   /* default style is 'top' */
   vertical-align: middle;
@@ -47,7 +45,8 @@
     border-bottom: 0;
     border-top: 1px solid @border-color;
   }
- & > .menubox {
+
+  & > .menubox {
     display: inline-block;
     height: 100%;
     #scout.vertical-align-helper-before();
@@ -71,10 +70,8 @@
 
     & > .menu-item {
       display: inline-block;
-      margin-top: 1px;
-      margin-bottom: 1px;
-      padding-top: 4px;
-      padding-bottom: 4px;
+      padding-top: 6px;
+      padding-bottom: 6px;
 
       &.overflown {
         display: none;
@@ -110,16 +107,14 @@
       }
 
       &.menu-field {
-        & > .form-field {
-        /*XXX validate with CGU */
-/*           margin-bottom: 1px; */
-        }
+        padding-top: @menubar-field-menu-margin-y;
+        padding-bottom: @menubar-field-menu-margin-y;
       }
       /* ---------------------------------- */
 
       /* TODO [7.0] awe: reduce copy/paste --> Button.less */
       &.menu-button {
-        height: 25px;
+        height: @logical-grid-height;
         padding: @button-padding-y @button-padding-x;
         text-align: center;
         color: @menubar-button-color;
@@ -127,6 +122,8 @@
         border: 1px solid @menubar-button-border-color;
         border-radius: @button-border-radius;
         min-width: 110px;
+        margin-top: @menubar-field-menu-margin-y;
+        margin-bottom: @menubar-field-menu-margin-y;
 
         /* TODO [7.0] cgu/BSH: Actually, we wanted to use .overflow-ellipsis-nowrap to support */
         /* ellipsis, but this breaks the focus, because the ::before inline element gets */
@@ -229,6 +226,8 @@
   padding-left: @bench-padding-x;
   padding-right: @bench-padding-x;
   background-color: @main-menubar-background-color;
+  padding-top: 2px;
+  padding-bottom: 2px;
 
   & > .menubox {
 
@@ -238,7 +237,8 @@
       margin-bottom: 7px;
 
       &.menu-button {
-        height: @logical-grid-height;
+        margin-top: 8px;
+        margin-bottom: 7px;
       }
 
       &.menu-field {
