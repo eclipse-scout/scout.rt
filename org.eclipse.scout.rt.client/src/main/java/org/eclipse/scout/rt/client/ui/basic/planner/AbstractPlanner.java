@@ -807,16 +807,35 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
     }
   }
 
+  /**
+   * @deprecated
+   * @deprecated will be removed with 8.0 because it is not used. You may use
+   *             {@link DisplayModeOptions#getMinSelectionIntervalCount} instead.
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public long getMinimumActivityDuration() {
     return m_minimumActivityDuration;
   }
 
+  /**
+   * @deprecated will be removed with 8.0 because it is not used. You may use
+   *             {@link DisplayModeOptions#getMinSelectionIntervalCount} instead.
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public void setMinimumActivityDuration(long minDuration) {
     m_minimumActivityDuration = minDuration;
   }
 
+  /**
+   * @deprecated will be removed with 8.0 because it is not used. You may use
+   *             {@link DisplayModeOptions#getMinSelectionIntervalCount} instead.
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public void setMinimumActivityDurationInMinutes(long min) {
     setMinimumActivityDuration(min * 60000L);
