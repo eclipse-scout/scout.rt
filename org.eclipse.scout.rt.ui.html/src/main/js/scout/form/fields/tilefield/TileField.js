@@ -24,12 +24,18 @@ scout.TileField.prototype._render = function() {
   }
 };
 
+scout.TileField.prototype.setTileGrid = function(tileGrid) {
+  this.setProperty('tileGrid', tileGrid);
+};
+
 scout.TileField.prototype._renderTileGrid = function() {
   this.tileGrid.render();
   this.addField(this.tileGrid.$container);
+  this.invalidateLayoutTree();
 };
 
 scout.TileField.prototype._removeTileGrid = function() {
   this.tileGrid.remove();
   this._removeField();
+  this.invalidateLayoutTree();
 };

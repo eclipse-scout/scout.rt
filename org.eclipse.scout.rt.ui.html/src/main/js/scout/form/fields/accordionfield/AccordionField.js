@@ -24,6 +24,10 @@ scout.AccordionField.prototype._render = function() {
   }
 };
 
+scout.AccordionField.prototype.setTileGrid = function(accordion) {
+  this.setProperty('accordion', accordion);
+};
+
 scout.AccordionField.prototype._renderAccordion = function() {
   this.accordion.render();
   this.addField(this.accordion.$container);

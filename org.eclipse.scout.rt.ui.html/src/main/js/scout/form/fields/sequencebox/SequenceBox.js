@@ -16,6 +16,10 @@ scout.SequenceBox = function() {
 };
 scout.inherits(scout.SequenceBox, scout.CompositeField);
 
+scout.SequenceBox.prototype.setFields = function(fields) {
+  this.setProperty('fields', fields);
+};
+
 scout.SequenceBox.prototype._render = function() {
   var field, i;
   this.addContainer(this.$parent, 'sequence-box');
