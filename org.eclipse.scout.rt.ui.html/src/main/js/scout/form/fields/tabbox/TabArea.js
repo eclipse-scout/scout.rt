@@ -143,7 +143,7 @@ scout.TabArea.prototype._setHasSubLabel = function(hasSubLabel) {
 };
 
 scout.TabArea.prototype._renderHasSubLabel = function() {
-  this.$container.toggleClass('has-sublabel', this.hasSubLabel);
+  this.$container.toggleClass('has-sub-label', this.hasSubLabel);
   this.invalidateLayoutTree();
 };
 

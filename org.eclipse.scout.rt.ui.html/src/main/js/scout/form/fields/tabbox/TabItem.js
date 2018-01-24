@@ -231,7 +231,7 @@ scout.TabItem.prototype.addSubLabel = function() {
   if (this.$subLabel) {
     return;
   }
-  this.$subLabel = this.$title.appendSpan('sublabel');
+  this.$subLabel = this.$title.appendSpan('sub-label');
 };
 
 scout.TabItem.prototype._removeSubLabel = function() {

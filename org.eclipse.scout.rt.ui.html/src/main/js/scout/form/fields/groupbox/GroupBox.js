@@ -238,7 +238,7 @@ scout.GroupBox.prototype.addSubLabel = function() {
   if (this.$subLabel) {
     return;
   }
-  this.$subLabel = this.$title.appendSpan('sublabel');
+  this.$subLabel = this.$title.appendSpan('sub-label');
 };
 
 scout.GroupBox.prototype._removeSubLabel = function() {
@@ -256,7 +256,7 @@ scout.GroupBox.prototype.setSubLabel = function(subLabel) {
 scout.GroupBox.prototype._renderSubLabel = function() {
   this.$subLabel.setVisible(scout.strings.hasText(this.subLabel));
   this.$subLabel.textOrNbsp(this.subLabel);
-  this.$container.toggleClass('has-sublabel', this.$subLabel.isVisible());
+  this.$container.toggleClass('has-sub-label', this.$subLabel.isVisible());
   this.invalidateLayoutTree();
 };
 

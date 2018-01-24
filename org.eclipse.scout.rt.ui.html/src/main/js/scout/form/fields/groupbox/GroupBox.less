@@ -56,8 +56,8 @@
   #scout.overflow-ellipsis-nowrap();
   padding: @group-box-title-padding-top 0 @group-box-title-padding-bottom 0;
 
-  .group-box.has-sublabel > & {
-    padding-bottom: @group-box-title-with-sublabel-padding-bottom;
+  .group-box.has-sub-label > & {
+    padding-bottom: @group-box-title-with-sub-label-padding-bottom;
   }
 
   .group-box.collapsed:not(.with-line) > & {
@@ -112,7 +112,7 @@
     #scout.overflow-ellipsis();
   }
 
-  & > .sublabel {
+  & > .sub-label {
     display: block;
     font-size: 10px;
     color: @text-disabled-color;
@@ -150,7 +150,7 @@
 
   /* Move title span to right when control is rendered */
   & > .group-box-control ~ .label,
-  & > .group-box-control ~ .sublabel {
+  & > .group-box-control ~ .sub-label {
     padding-left: @group-box-control-size + 5px;
   }
 }

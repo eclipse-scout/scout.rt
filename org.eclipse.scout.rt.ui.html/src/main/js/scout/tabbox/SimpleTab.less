@@ -27,7 +27,7 @@
     cursor: pointer;
   }
 
-  &:not(.no-hover):hover {
+  &:not(.no-hover):hover > .title {
     color: @hover-color;
   }
 
@@ -35,7 +35,7 @@
     width: 130px;
   }
 
-  &:active {
+  &:active > .title {
     color: @active-color;
   }
 
@@ -47,9 +47,12 @@
   &.selected {
     cursor: default;
     background-color: @view-tab-active-background-color;
-    color: @view-tab-active-color;
     /* full size of header to draw over the border-bottom */
     height: 100%;
+
+    & > .title {
+      color: @view-tab-active-color;
+    }
   }
 
   &.animate-modality-highlight {
@@ -59,6 +62,10 @@
   & > .title,
   & > .sub-title {
     #scout.overflow-ellipsis-nowrap();
+  }
+
+  & > .sub-title {
+    padding-top: 2px;
   }
 
   & > .icon {
@@ -85,6 +92,7 @@
 
     & > .icon {
       margin-right: 5px;
+      vertical-align: middle;
 
       &.font-icon {
         font-size: 14px;

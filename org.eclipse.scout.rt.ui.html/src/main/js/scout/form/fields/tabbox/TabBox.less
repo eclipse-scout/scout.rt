@@ -44,12 +44,12 @@
       transition: left 0.3s, width 0.3s;
     }
 
-    & > .tab-item > .title > .sublabel {
+    & > .tab-item > .title > .sub-label {
       display: none;
     }
 
-    &.has-sublabel {
-      & > .tab-item > .title > .sublabel {
+    &.has-sub-label {
+      & > .tab-item > .title > .sub-label {
         display: block;
       }
     }
@@ -160,7 +160,7 @@
       vertical-align: middle;
     }
 
-    & > .sublabel {
+    & > .sub-label {
       display: block;
       padding-top: 3px;
       font-size: 10px;
@@ -168,13 +168,13 @@
     }
   }
 
-  .tab-area.has-sublabel > & {
+  .tab-area.has-sub-label > & {
     & > .title {
-      padding-bottom: @group-box-title-with-sublabel-padding-bottom;
+      padding-bottom: @group-box-title-with-sub-label-padding-bottom;
     }
 
     &:focus > .title::before {
-      padding-bottom: @group-box-title-with-sublabel-padding-bottom;
+      padding-bottom: @group-box-title-with-sub-label-padding-bottom;
     }
   }
 
