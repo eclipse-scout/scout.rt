@@ -135,4 +135,25 @@ public final class ScoutAssert {
     List<String> actualLines = IOUtility.readLines(actualFile, charsetName);
     assertListEquals(expectedLines, actualLines);
   }
+
+  /**
+   * Asserts that the given {@link ITestExecutable} throws an exception of expected type. <br/>
+   * This method was motivated by Junit 5 and could be replaced when upgrading form Junit 4.
+   */
+  public static <T extends Throwable> T assertThrows(Class<T> expectedType, ITestExecutable r) {
+    try {
+      r.execute();
+    }
+    catch (AssertionError e) {
+      throw e;
+    }
+    catch (Throwable t) { // NOSONAR squid:S1181
+      if (expectedType.isInstance(t)) {
+        return expectedType.cast(t);
+      }
+      throw new AssertionError("Expecting [" + expectedType.getName() + "] but a [" + t.getClass().getName() + "] was thrown", t);
+    }
+
+    throw new AssertionError("Expecting [" + expectedType.getName() + "] but nothing was thrown");
+  }
 }

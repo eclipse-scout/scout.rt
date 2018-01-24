@@ -18,11 +18,13 @@ import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
 
+import org.eclipse.scout.rt.platform.exception.PlatformError;
+import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.junit.Test;
 
 /**
  * Tests for {@link ScoutAssert}.
- * 
+ *
  * @since 3.10.0-M3
  */
 public class ScoutAssertTest {
@@ -30,7 +32,7 @@ public class ScoutAssertTest {
   /**
    * Test for {@link ScoutAssert#assertComparableEquals(Comparable, Comparable)} and
    * {@link ScoutAssert#assertComparableEquals(String, Comparable, Comparable)}.
-   * 
+   *
    * @See Bug 420183
    */
   @Test
@@ -96,4 +98,47 @@ public class ScoutAssertTest {
     }
   }
 
+  @Test
+  public void testAssertThrows() {
+    // runtime exception
+    final VetoException runtimeException = new VetoException("msg");
+    assertSame(runtimeException, ScoutAssert.assertThrows(VetoException.class, () -> raise(runtimeException)));
+    assertSame(runtimeException, ScoutAssert.assertThrows(RuntimeException.class, () -> raise(runtimeException)));
+    assertSame(runtimeException, ScoutAssert.assertThrows(Exception.class, () -> raise(runtimeException)));
+    assertSame(runtimeException, ScoutAssert.assertThrows(Throwable.class, () -> raise(runtimeException)));
+    try {
+      ScoutAssert.assertThrows(Error.class, () -> raise(runtimeException));
+      fail("expecting assertion to fail");
+    }
+    catch (AssertionError expected) {
+    }
+
+    // runtime exception
+    final InterruptedException exception = new InterruptedException("msg");
+    assertSame(exception, ScoutAssert.assertThrows(InterruptedException.class, () -> raise(exception)));
+    assertSame(exception, ScoutAssert.assertThrows(Exception.class, () -> raise(exception)));
+    assertSame(exception, ScoutAssert.assertThrows(Throwable.class, () -> raise(exception)));
+    try {
+      ScoutAssert.assertThrows(Error.class, () -> raise(exception));
+      fail("expecting assertion to fail");
+    }
+    catch (AssertionError expected) {
+    }
+
+    // error
+    final PlatformError error = new PlatformError("msg");
+    assertSame(error, ScoutAssert.assertThrows(PlatformError.class, () -> raise(error)));
+    assertSame(error, ScoutAssert.assertThrows(Error.class, () -> raise(error)));
+    assertSame(error, ScoutAssert.assertThrows(Throwable.class, () -> raise(error)));
+    try {
+      ScoutAssert.assertThrows(Exception.class, () -> raise(error));
+      fail("expecting assertion to fail");
+    }
+    catch (AssertionError expected) {
+    }
+  }
+
+  private void raise(Throwable t) throws Throwable {
+    throw t;
+  }
 }
