@@ -478,6 +478,7 @@ scout.SplitBox.prototype.setFieldMinimized = function(minimized) {
 };
 
 scout.SplitBox.prototype._renderFieldMinimized = function() {
+  this.$container.removeClass('first-field-minimized second-field-minimized');
   if (this.firstField) {
     this.firstField.$container.removeClass('minimized');
   }
@@ -486,6 +487,8 @@ scout.SplitBox.prototype._renderFieldMinimized = function() {
   }
   if (this.collapsibleField && this.fieldMinimized) {
     this.collapsibleField.$container.addClass('minimized');
+    this.$container.toggleClass('first-field-minimized', this.firstField === this.collapsibleField);
+    this.$container.toggleClass('second-field-minimized', this.secondField === this.collapsibleField);
   }
 
   // field minimized state is considered automatically when layout is updated
@@ -495,6 +498,7 @@ scout.SplitBox.prototype._renderFieldMinimized = function() {
 };
 
 scout.SplitBox.prototype._renderCollapsibleField = function() {
+  this.$container.removeClass('first-field-collapsed second-field-collapsed');
   if (this.firstField) {
     this.firstField.$container.removeClass('collapsed');
   }
@@ -503,6 +507,8 @@ scout.SplitBox.prototype._renderCollapsibleField = function() {
   }
   if (this.collapsibleField && this.fieldCollapsed) {
     this.collapsibleField.$container.addClass('collapsed');
+    this.$container.toggleClass('first-field-collapsed', this.firstField === this.collapsibleField);
+    this.$container.toggleClass('second-field-collapsed', this.secondField === this.collapsibleField);
   }
   if (this.rendered) { // don't invalidate layout on initial rendering
     this.htmlSplitArea.invalidateLayoutTree(false);
