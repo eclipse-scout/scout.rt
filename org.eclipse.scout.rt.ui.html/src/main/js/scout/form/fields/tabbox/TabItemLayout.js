@@ -23,3 +23,7 @@ scout.TabItemLayout.prototype._menuBarSize = function(htmlMenuBar, containerSize
   menuBarSize.width = tabBox.header.$container.outerWidth();
   return menuBarSize;
 };
+
+scout.TabItemLayout.prototype._titleHeight = function() {
+  return 0;
+};
