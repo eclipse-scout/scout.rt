@@ -168,6 +168,16 @@
     }
   }
 
+  .tab-area.has-sublabel > & {
+    & > .title {
+      padding-bottom: @group-box-title-with-sublabel-padding-bottom;
+    }
+
+    &:focus > .title::before {
+      padding-bottom: @group-box-title-with-sublabel-padding-bottom;
+    }
+  }
+
   & > .status {
     display: inline-block;
     vertical-align: middle;
