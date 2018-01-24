@@ -160,7 +160,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
         // We could do this by remembering the old value and if an event occurs with the same value as the stored old one -> removePropertyChangeEvent
         // But: This may not be done for every property! If the property event was fired using setPropertyAlwaysFire it must be always. We should probably mark those events, but how?
         // Maybe we should better generate a global event buffer concept -> buffer every event not just table or tree events. This would solve event race conditions too -> we should guarantee that events fired by the model are sent to the gui in the same order
-        addPropertyChangeEvent(jsonProperty, oldValue, newValue);
+        addPropertyChangeEvent(jsonProperty, newValue);
         return;
       }
 
@@ -180,7 +180,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
       // for 'A', so when displayText is changed to 'A' it is not sent back to the UI
       // which is wrong in that case.
       if (responseAlreadyContainsPropertyChangeEvent(jsonProperty)) {
-        addPropertyChangeEvent(jsonProperty, oldValue, newValue);
+        addPropertyChangeEvent(jsonProperty, newValue);
       }
     }
     else {
@@ -209,12 +209,16 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
       lazyProperty.handlePropertyChange(null, modelValue);
       // Note: at this point we don'check if the a property-change-event is filtered or not
       if (modelValue != null && lazyProperty.accept() && !lazyProperty.isValueSent()) {
-        addPropertyChangeEvent(lazyProperty, null, modelValue);
+        addPropertyChangeEvent(lazyProperty, modelValue);
       }
     }
   }
 
-  protected void addPropertyChangeEvent(JsonProperty<?> jsonProperty, Object oldValue, Object newValue) {
+  protected void addPropertyChangeEvent(JsonProperty<?> jsonProperty) {
+    addPropertyChangeEvent(jsonProperty, jsonProperty.modelValue());
+  }
+
+  protected void addPropertyChangeEvent(JsonProperty<?> jsonProperty, Object newValue) {
     String propertyName = jsonProperty.jsonPropertyName();
     addPropertyChangeEvent(propertyName, jsonProperty.prepareValueForToJson(newValue));
     jsonProperty.setValueSent(true);
