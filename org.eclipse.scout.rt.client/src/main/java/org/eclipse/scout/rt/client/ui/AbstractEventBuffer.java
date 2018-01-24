@@ -15,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.slf4j.Logger;
@@ -31,6 +32,7 @@ import org.slf4j.LoggerFactory;
  * @param T
  *          event type
  */
+@Bean
 public abstract class AbstractEventBuffer<T extends IModelEvent> {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractEventBuffer.class);
 

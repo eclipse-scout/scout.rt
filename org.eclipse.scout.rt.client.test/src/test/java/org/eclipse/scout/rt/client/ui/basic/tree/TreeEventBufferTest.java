@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Before;
@@ -56,7 +57,7 @@ public class TreeEventBufferTest {
 
   @Before
   public void setup() {
-    m_testBuffer = new TreeEventBuffer();
+    m_testBuffer = BEANS.get(TreeEventBuffer.class);
     m_mockNodes = new HashMap<>();
   }
 

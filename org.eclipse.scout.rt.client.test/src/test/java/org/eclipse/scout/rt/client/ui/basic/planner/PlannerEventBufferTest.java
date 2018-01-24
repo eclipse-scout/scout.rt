@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +39,7 @@ public class PlannerEventBufferTest {
 
   @Before
   public void setup() {
-    m_testBuffer = new PlannerEventBuffer();
+    m_testBuffer = BEANS.get(PlannerEventBuffer.class);
     m_mockResources = new HashMap<>();
   }
 

@@ -1012,7 +1012,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   @Override
   public AbstractEventBuffer<TableEvent> createEventBuffer() {
-    return new TableEventBuffer();
+    return BEANS.get(TableEventBuffer.class);
   }
 
   protected AbstractEventBuffer<TableEvent> getEventBuffer() {

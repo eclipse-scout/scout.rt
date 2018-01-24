@@ -873,7 +873,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
 
   @Override
   public AbstractEventBuffer<TreeEvent> createEventBuffer() {
-    return new TreeEventBuffer();
+    return BEANS.get(TreeEventBuffer.class);
   }
 
   protected AbstractEventBuffer<TreeEvent> getEventBuffer() {

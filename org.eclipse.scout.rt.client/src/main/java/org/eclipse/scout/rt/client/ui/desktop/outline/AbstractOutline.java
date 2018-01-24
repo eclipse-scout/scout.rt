@@ -318,7 +318,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   public AbstractEventBuffer<TreeEvent> createEventBuffer() {
-    return new OutlineEventBuffer();
+    return BEANS.get(OutlineEventBuffer.class);
   }
 
   /*

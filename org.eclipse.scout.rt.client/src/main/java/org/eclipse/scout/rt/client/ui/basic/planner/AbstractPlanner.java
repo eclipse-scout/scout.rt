@@ -115,7 +115,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
 
   @Override
   public AbstractEventBuffer<PlannerEvent> createEventBuffer() {
-    return new PlannerEventBuffer();
+    return BEANS.get(PlannerEventBuffer.class);
   }
 
   protected AbstractEventBuffer<PlannerEvent> getEventBuffer() {

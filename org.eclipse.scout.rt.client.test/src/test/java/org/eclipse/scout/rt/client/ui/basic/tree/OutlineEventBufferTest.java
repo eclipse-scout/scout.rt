@@ -22,6 +22,7 @@ import java.util.Map;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEventBuffer;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,7 +36,7 @@ public class OutlineEventBufferTest {
 
   @Before
   public void setup() {
-    m_testBuffer = new OutlineEventBuffer();
+    m_testBuffer = BEANS.get(OutlineEventBuffer.class);
     m_mockNodes = new HashMap<>();
   }
 

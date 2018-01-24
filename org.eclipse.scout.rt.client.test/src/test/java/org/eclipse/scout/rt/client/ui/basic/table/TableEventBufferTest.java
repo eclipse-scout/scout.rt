@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Before;
@@ -46,7 +47,7 @@ public class TableEventBufferTest {
 
   @Before
   public void setup() {
-    m_testBuffer = new TableEventBuffer();
+    m_testBuffer = BEANS.get(TableEventBuffer.class);
     m_mockRows = new HashMap<>();
     m_mockColumns = new HashMap<>();
   }
