@@ -16,7 +16,7 @@ scout.inherits(scout.FormFieldMenu, scout.Menu);
 
 scout.FormFieldMenu.prototype._render = function() {
   this.$container = this.$parent.appendDiv('menu-item');
-  this.$container.addClass('menu-field');
+  this.$container.addClass('form-field-menu');
   if (this.uiCssClass) {
     this.$container.addClass(this.uiCssClass);
   }

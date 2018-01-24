@@ -207,7 +207,7 @@ scout.GroupBox.prototype.addSubLabel = function() {
   if (this.$subLabel) {
     return;
   }
-  this.$subLabel = this.$title.appendSpan('sub-label');
+  this.$subLabel = this.$title.appendSpan('sublabel');
 };
 
 scout.GroupBox.prototype._removeSubLabel = function() {
