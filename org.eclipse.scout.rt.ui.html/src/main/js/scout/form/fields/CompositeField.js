@@ -20,6 +20,10 @@ scout.CompositeField.prototype.getFields = function() {
   throw new Error('Not implemented');
 };
 
+scout.CompositeField.prototype.setFields = function() {
+  throw new Error('Not implemented');
+};
+
 scout.CompositeField.prototype.visit = function(visitor) {
   scout.CompositeField.parent.prototype.visit.call(this, visitor);
   this.getFields().forEach(function(field) {

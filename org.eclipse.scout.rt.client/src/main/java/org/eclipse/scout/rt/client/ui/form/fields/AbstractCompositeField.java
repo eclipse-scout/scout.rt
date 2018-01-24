@@ -86,7 +86,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
      * after field creation. -> all fields would have the enabled state of the MainBox.
      */
 
-    propertySupport.setPropertyList(PROP_FIELDS, CollectionUtility.emptyArrayList());
+    setFieldsInternal(CollectionUtility.emptyArrayList());
     m_movedFormFieldsByClass = new HashMap<>();
     m_fieldPropertyChangeListener = new P_FieldPropertyChangeListener();
     super.initConfig();
@@ -133,7 +133,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
 
       // attach a proxy controller to each child field in the group for: visible, saveNeeded
       fields.forEach(field -> field.addPropertyChangeListener(m_fieldPropertyChangeListener));
-      propertySupport.setPropertyList(PROP_FIELDS, fields.getOrderedList());
+      setFieldsInternal(fields.getOrderedList());
     }
     finally {
       if (injectedFields != null) {
@@ -366,6 +366,15 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
     }
     // 4. field is not replaced
     return c;
+  }
+
+  @Override
+  public void setFields(List<IFormField> fields) {
+    setFieldsInternal(CollectionUtility.arrayList(fields));
+  }
+
+  protected void setFieldsInternal(List<IFormField> fields) {
+    propertySupport.setPropertyList(PROP_FIELDS, fields);
   }
 
   @Override

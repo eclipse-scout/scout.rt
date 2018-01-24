@@ -925,6 +925,11 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
   }
 
   @Override
+  public void setFields(List<IFormField> fields) {
+    m_fields = CollectionUtility.arrayList(fields);
+  }
+
+  @Override
   public List<IFormField> getFields() {
     return CollectionUtility.arrayList(m_fields);
   }

@@ -53,6 +53,9 @@ public final class CompositeFieldUtility {
       throw new IllegalArgumentException("field is not part of container '" + compositeField + "'");
     }
     f.setParentFieldInternal(null);
+    if (f.isInitConfigDone()) {
+      FormUtility.disposeFormField(f);
+    }
   }
 
   public static void moveFieldTo(IFormField f, ICompositeField oldContainer, ICompositeField newContainer, Map<Class<? extends IFormField>, IFormField> movedFormFieldsByClass) {

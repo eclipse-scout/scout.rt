@@ -60,6 +60,37 @@ scout.GroupBox.prototype._init = function(model) {
   this._updateMenuBar();
 };
 
+/**
+ * @override
+ */
+scout.GroupBox.prototype.getFields = function() {
+  return this.fields;
+};
+
+scout.GroupBox.prototype.insertField = function(field) {
+  this.insertFieldBefore(field);
+};
+
+scout.GroupBox.prototype.insertFieldBefore = function(field, sibling) {
+  var newFields = this.fields.slice(),
+    index = this.fields.length;
+  if (sibling) {
+    index = this.fields.indexOf(sibling);
+  }
+  newFields.splice(index, 0, field);
+  this.setFields(newFields);
+};
+
+scout.GroupBox.prototype.deleteField = function(field) {
+  var newFields = this.fields.slice(),
+    index = this.fields.indexOf(field);
+  if (index < 0) {
+    return;
+  }
+  newFields.splice(index, 1);
+  this.setFields(newFields);
+};
+
 scout.GroupBox.prototype.setFields = function(fields) {
   this.setProperty('fields', fields);
 };
@@ -336,13 +367,13 @@ scout.GroupBox.prototype._prepareFields = function() {
   }
 
   // Create menu for each process button
-  this.processMenus = this.processButtons.map(function(button){
+  this.processMenus = this.processButtons.map(function(button) {
     return scout.create('ButtonAdapterMenu',
-        scout.ButtonAdapterMenu.adaptButtonProperties(button, {
-          parent: this,
-          menubar : this.menuBar,
-          button: button
-        }));
+      scout.ButtonAdapterMenu.adaptButtonProperties(button, {
+        parent: this,
+        menubar: this.menuBar,
+        button: button
+      }));
   }, this);
   this.registerKeyStrokes(this.processMenus);
 };
@@ -353,13 +384,6 @@ scout.GroupBox.prototype._registerButtonKeyStrokes = function(button) {
       this.keyStrokeContext.registerKeyStroke(keyStroke);
     }, this);
   }
-};
-
-/**
- * @override
- */
-scout.GroupBox.prototype.getFields = function() {
-  return this.fields;
 };
 
 scout.GroupBox.prototype.setBorderVisible = function(borderVisible) {

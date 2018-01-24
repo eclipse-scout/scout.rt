@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -81,13 +80,17 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
     form.getTopBox().removeField(field);
   }
 
-  @Test(expected = IllegalStateException.class)
-  @Ignore
+  @Test
   public void testRemoveFieldAfterFormStarted() throws Exception {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.start();
 
-    form.getTopBox().removeField(form.getTopBoxField());
+    TopBoxField topBoxField = form.getTopBoxField();
+    Assert.assertTrue(topBoxField.isInitDone());
+    Assert.assertEquals(7, form.getAllFields().size());
+    form.getTopBox().removeField(topBoxField);
+    Assert.assertEquals(6, form.getAllFields().size());
+    Assert.assertFalse(topBoxField.isInitDone());
   }
 
   @Test
@@ -187,14 +190,18 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
     assertFieldPropertyChangeListener(field);
   }
 
-  @Test(expected = IllegalStateException.class)
-  @Ignore
+  @Test
   public void testAddFieldAfterFormStarted() throws Exception {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.start();
 
     AddRemoveStringField field = new AddRemoveStringField();
+    Assert.assertEquals(1, form.getTopBox().getFieldCount());
     form.getTopBox().addField(field);
+    Assert.assertEquals(2, form.getTopBox().getFieldCount());
+    Assert.assertTrue(field.isInitDone());
+    Assert.assertTrue(field.isInitConfigDone());
+    Assert.assertTrue(field.isPostInitConfigDone());
   }
 
   @Test
@@ -321,13 +328,44 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
     assertFieldPropertyChangeListener(field);
   }
 
-  @Test(expected = IllegalStateException.class)
-  @Ignore
+  @Test
   public void testMoveFieldAfterFormStarted() throws Exception {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.start();
+    TopBoxField field = form.getTopBoxField();
+    Assert.assertEquals(1, form.getTopBox().getFieldCount());
+    Assert.assertEquals(2, form.getBottomBox().getFieldCount());
+    Assert.assertEquals(form.getTopBox(), field.getParentField());
+    form.getTopBox().moveFieldTo(field, form.getBottomBox());
+    Assert.assertEquals(0, form.getTopBox().getFieldCount());
+    Assert.assertEquals(3, form.getBottomBox().getFieldCount());
+    Assert.assertEquals(form.getBottomBox(), field.getParentField());
+  }
 
-    form.getTopBox().moveFieldTo(form.getTopBoxField(), form.getBottomBox());
+  @Test
+  public void testRemoveAndAddFieldAfterFormStarted() throws Exception {
+    AddRemoveFieldsForm form = new AddRemoveFieldsForm();
+    form.start();
+    TopBoxField field = form.getTopBoxField();
+    Assert.assertEquals(1, form.getTopBox().getFieldCount());
+    Assert.assertEquals(2, form.getBottomBox().getFieldCount());
+    Assert.assertEquals(form.getTopBox(), field.getParentField());
+
+    // remove
+    form.getTopBox().removeField(field);
+    Assert.assertEquals(0, form.getTopBox().getFieldCount());
+    Assert.assertEquals(2, form.getBottomBox().getFieldCount());
+    Assert.assertFalse(field.isInitDone());
+    Assert.assertTrue(field.isInitConfigDone());
+    Assert.assertNull(field.getParentField());
+
+    // add
+    form.getBottomBox().addField(field);
+    Assert.assertTrue(field.isInitDone());
+    Assert.assertTrue(field.isInitConfigDone());
+    Assert.assertEquals(0, form.getTopBox().getFieldCount());
+    Assert.assertEquals(3, form.getBottomBox().getFieldCount());
+    Assert.assertEquals(form.getBottomBox(), field.getParentField());
   }
 
   @Test

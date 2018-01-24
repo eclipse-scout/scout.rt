@@ -545,6 +545,11 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   @Override
+  public void setFields(List<IFormField> fields) {
+    m_fields = CollectionUtility.arrayList(fields);
+  }
+
+  @Override
   public List<IFormField> getFields() {
     return CollectionUtility.arrayList(m_fields);
   }

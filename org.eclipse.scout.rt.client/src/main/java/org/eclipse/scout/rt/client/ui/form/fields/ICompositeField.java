@@ -57,6 +57,11 @@ public interface ICompositeField extends IFormField {
   List<IFormField> getFields();
 
   /**
+   * direct child fields including process buttons
+   */
+  void setFields(List<IFormField> fields);
+
+  /**
    * search all fields in this container and its subtree<br>
    * the field ID is the simple class name of a field without the suffixes "Box", "Field", "Button"
    */

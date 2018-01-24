@@ -126,6 +126,15 @@ public final class FormUtility {
     form.visitFields(v);
   }
 
+  public static void disposeFormField(IFormField field) {
+    if (field instanceof ICompositeField) {
+      disposeFormFields((ICompositeField) field);
+    }
+    else {
+      field.dispose();
+    }
+  }
+
   public static void disposeFormFields(ICompositeField field) {
     DisposeFieldVisitor v = new DisposeFieldVisitor();
     field.visitFields(v);
