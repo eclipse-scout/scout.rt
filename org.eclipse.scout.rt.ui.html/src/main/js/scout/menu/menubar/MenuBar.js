@@ -168,7 +168,6 @@ scout.MenuBar.prototype._renderMenuItems = function() {
 
 scout.MenuBar.prototype._removeMenuItems = function() {
   this.setDefaultMenu(null);
-  this.setTabbableMenu(null);
   this._removeMenuHandlers();
 };
 
