@@ -8,6 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+
+/* Mixins */
+
+#scout {
+  .tab-item-focus-marker {
+    #scout.font-icon();
+    content: @icon-angle-right;
+    color: @tab-item-active-color;
+    position: absolute;
+    top: 0;
+    left: @tab-item-padding-x - @tab-item-focus-arrow-width;
+    width: @tab-item-focus-arrow-width;
+    padding: @tab-item-title-padding-top 0 @tab-item-title-padding-bottom;
+    text-align: center;
+  }
+}
+
 .tab-box {
   & > .status {
     margin-bottom: @tab-area-border-width;
@@ -139,15 +156,7 @@
   }
 
   &:focus > .title::before {
-    #scout.font-icon();
-    content: @icon-angle-right;
-    color: @tab-item-active-color;
-    position: absolute;
-    top: 0;
-    left: @tab-item-padding-x - @tab-item-focus-arrow-width;
-    width: @tab-item-focus-arrow-width;
-    padding: @tab-item-title-padding-top 0 @tab-item-title-padding-bottom;
-    text-align: center;
+    #scout.tab-item-focus-marker();
   }
 
   & > .title {
@@ -209,44 +218,24 @@
   }
 }
 
-.overflow-tab-item {
-  position: relative;
-  display: inline-block;
-  vertical-align: middle;
-  text-align: center;
-  cursor: pointer;
-  padding: 0 0;
+.overflow-tab-item.menu-item {
+  padding: @tab-item-title-padding-top - 2px @tab-item-padding-x;
+  font-weight: bold;
 
-  &::before {
-    #scout.font-icon();
-    position: relative;
-    font-size: 17px;
-    color: @icon-color;
-    content: @icon-ellipsis-v;
+  & > .text {
+    padding: 0;
+  }
+
+  & > .submenu-icon {
+    padding-left: 4px;
   }
 
   &:focus {
     outline: none;
+    color: @focus-color;
 
-    &:not(.disabled) {
-      color: @hover-color;
-
-      &:not(.menu-button) {
-        color: @focus-color;
-
-        &::after {
-          color: @focus-color;
-        }
-      }
-
-      /* Draw border for icon only items */
-      &.menu-icononly::after {
-        #scout.button-focus();
-      }
-
-      &:not(.menu-icononly):not(.menu-button) > .text {
-        text-decoration: underline;
-      }
+    &::after {
+      #scout.tab-item-focus-marker();
     }
   }
 }

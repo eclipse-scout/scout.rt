@@ -25,7 +25,8 @@ scout.TabArea.prototype._init = function(options) {
 
   this.ellipsis = scout.create('EllipsisMenu', {
     parent: this,
-    cssClass: 'overflow-tab-item'
+    cssClass: 'overflow-tab-item unfocusable',
+    iconId: null
   });
 };
 

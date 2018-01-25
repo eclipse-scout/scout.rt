@@ -51,6 +51,8 @@ scout.TabAreaLayout.prototype.layout = function($container) {
     ellipsis.setHidden(true);
   }
 
+  ellipsis.setText(this.overflowTabs.length + '');
+
   // set childActions to empty array to prevent the menuItems from calling remove.
   ellipsis.setChildActions(this.overflowTabs.map(function(tabItem) {
     var menu = scout.create('Menu', {
