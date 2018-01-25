@@ -35,7 +35,11 @@ public class BeanAnnotationsCleanupStatement extends Statement {
 
   @Override
   public void evaluate() throws Throwable {
-    m_previous.evaluate();
-    BEANS.get(BeanAnnotations.class).clear();
+    try {
+      m_previous.evaluate();
+    }
+    finally {
+      BEANS.get(BeanAnnotations.class).clear();
+    }
   }
 }
