@@ -315,7 +315,7 @@ scout.FocusManager.prototype.findFirstFocusableElement = function($container, fi
     }
 
     $menuParents = $candidate.parents('.menubar');
-    $tabParents = $candidate.parents('.tab-area');
+    $tabParents = $candidate.parents('.tab-box-header');
     $boxButtons = $candidate.parents('.box-buttons');
     if (($menuParents.length > 0 || $tabParents.length > 0 || $boxButtons.length > 0) && !firstButton && ($candidate.hasClass('button') || $candidate.hasClass('menu-item'))) {
       firstButton = candidate;
@@ -327,9 +327,9 @@ scout.FocusManager.prototype.findFirstFocusableElement = function($container, fi
     return firstDefaultButton;
   } else if (firstButton) {
     if (firstButton !== firstElement && firstElement) {
-      var $tabParentsButton = $(firstButton).parents('.tab-area'),
+      var $tabParentsButton = $(firstButton).parents('.tab-box-header'),
         $firstItem = $(firstElement),
-        $tabParentsFirstElement = $(firstElement).parents('.tab-area');
+        $tabParentsFirstElement = $(firstElement).parents('.tab-box-header');
       if ($tabParentsFirstElement.length > 0 && $tabParentsButton.length > 0 && $firstItem.is('.tab-item')) {
         return firstElement;
       }
