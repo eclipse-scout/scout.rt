@@ -24,8 +24,6 @@ scout.MenuBarLayout.prototype.layout = function($container) {
     htmlContainer = scout.HtmlComponent.get($container),
     ellipsis;
 
-  this._ensureCachedBounds(menuItems);
-
   ellipsis = scout.arrays.find(menuItems, function(menuItem) {
     return menuItem.ellipsis;
   });
@@ -64,7 +62,6 @@ scout.MenuBarLayout.prototype.layout = function($container) {
     ellipsis.childActions = [];
     ellipsis.setChildActions(this._overflowMenuItems);
   }
-  this.updateFirstAndLastMenuMarker(this._visibleMenuItems);
 
   // trigger menu items layout
   this._visibleMenuItems.forEach(function(menuItem) {
@@ -104,6 +101,10 @@ scout.MenuBarLayout.prototype.preferredLayoutSize = function($container, options
   }
   this._visibleMenuItems = [];
   this._overflowMenuItems = [];
+
+  // update first last best guess
+  this._bestGuessFirstLast(menuItems);
+
   this._ensureCachedBounds(menuItems);
 
   ellipsis = scout.arrays.find(menuItems, function(menuItem) {
@@ -161,6 +162,8 @@ scout.MenuBarLayout.prototype.preferredLayoutSize = function($container, options
     }
   }, this);
 
+  this._updateFirstLastMenuMarker();
+
   return preferredSize.add(htmlContainer.insets());
 };
 
@@ -194,13 +197,42 @@ scout.MenuBarLayout.prototype._ensureCachedBounds = function(menuItems) {
   });
 };
 
-scout.MenuBarLayout.prototype.updateFirstAndLastMenuMarker = function(menus) {
-  // Find first and last rendered menu
-  (menus || []).filter(function(menu) {
-    return menu.rendered && menu.isVisible() && !this.overflown && !this.hidden;
-  }).forEach(function(menu, index, menus) {
-    menu.$container.toggleClass('fist', index === 0);
-    menu.$container.toggleClass('last', index === menus.length - 1);
+scout.MenuBarLayout.prototype._bestGuessFirstLast = function(menuItems) {
+  var ellipsis;
+  menuItems = menuItems.filter(function(menuItem) {
+    menuItem.$container.removeClass('first last');
+    return menuItem.isVisible();
+  });
+
+  scout.arrays.find(menuItems.slice().reverse(), function(menuItem) {
+    if (menuItem.ellipsis) {
+      ellipsis = menuItem;
+      ellipsis.$container.toggleClass('last', true);
+      return false;
+    } else if (ellipsis) {
+      menuItem.$container.toggleClass('last', true);
+      return true;
+    } else {
+      menuItem.$container.toggleClass('last', true);
+      return true;
+    }
+  }, this);
+
+  scout.arrays.first(menuItems).$container.toggleClass('first', true);
+};
+
+scout.MenuBarLayout.prototype._updateFirstLastMenuMarker = function() {
+  this._visibleMenuItems.forEach(function(menuItem, index, arr) {
+    if (index === 0) {
+      menuItem.$container.toggleClass('first', true);
+    } else if (index === arr.length - 1) {
+      menuItem.$container.toggleClass('last', true);
+    } else {
+      menuItem.$container.removeClass('first last');
+    }
+  });
+  this._overflowMenuItems.forEach(function(menuItem) {
+    menuItem.$container.removeClass('first last');
   });
 };
 
