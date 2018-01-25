@@ -33,7 +33,10 @@
       #scout.vendor(column-gap, 24px);
 
       & > .section {
-        margin-bottom: 16px;
+        margin-bottom: 30px;
+
+        /* Use full width to enlarge touch area */
+        width: 100%;
 
         &:last-child {
           margin-bottom: 0;
@@ -48,16 +51,12 @@
         display: table;
 
         & > .title {
-          line-height: 18px;
           font-weight: bold;
         }
 
         & > .section-node {
           cursor: pointer;
-          line-height: 18px;
-          /* Hanging indents: */
-          padding-left: 10px;
-          text-indent: -10px;
+          padding-top: 12px;
 
           &:hover {
             color: @hover-color;
