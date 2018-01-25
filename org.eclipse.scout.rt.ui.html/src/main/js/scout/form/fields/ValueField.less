@@ -25,6 +25,15 @@
     }
   }
 
+  &.alternative {
+    & > .icon,
+    & > .field > .icon,
+    & > .clear-icon,
+    & > .field > .clear-icon {
+      padding-right: @text-field-alternative-icon-padding-right;
+    }
+  }
+
   & > .clear-icon,
   & > .field > .clear-icon {
     cursor: pointer;
@@ -32,17 +41,28 @@
     &::before {
       content: @icon-remove;
     }
-  }
 
-  &.halign-right > .clear-icon,
-  &.halign-right > .field > .clear-icon {
-    padding-right: 0;
-    padding-left: @text-field-padding-x;
+    &:hover::before {
+      color: @highlight-color;
+    }
   }
 
   & > .icon,
   & > .field > .icon {
     cursor: text;
+  }
+
+  &.halign-right > .clear-icon,
+  &.halign-right > .field > .clear-icon {
+    padding-left: @text-field-padding-x;
+    padding-right: 0;
+  }
+
+  &.alternative.halign-right {
+    & > .clear-icon,
+    & > .field > .clear-icon {
+      padding-left: @text-field-alternative-icon-padding-right;
+    }
   }
 
   &.clearable-always.has-text&:not(.loading)&:not(.disabled)&:not(.compact),
@@ -57,12 +77,24 @@
       display: none;
     }
 
+    & > .clear-icon,
+    & > .field > .clear-icon {
+
+      &:hover::before {
+        color: @highlight-color;
+      }
+    }
+
     & > input,
     & > .input-field,
     & > .field > input,
     & > .field > .input-field,
     & > .file-input {
-      padding-right: @text-field-padding-x + 15px;
+      padding-right: @text-field-padding-x + @text-field-icon-outer-width;
+
+      &.alternative {
+        padding-right: @text-field-alternative-padding-right + @text-field-icon-outer-width;
+      }
     }
 
     &.halign-right {
@@ -72,16 +104,20 @@
       & > .field > input,
       & > .field > .input-field,
       & > .file-input {
-        padding-left: @text-field-padding-x + 15px;
+        padding-left: @text-field-padding-x + @text-field-icon-outer-width;
         padding-right: @text-field-padding-x;
 
-        &.cell-editor-field{
+        &.alternative {
+          padding-left: @text-field-alternative-padding-right + @text-field-icon-outer-width;
+          padding-right: @text-field-alternative-padding-left;
+        }
+
+        &.cell-editor-field {
           padding-right: @table-cell-padding-left - 1px;
         }
       }
     }
   }
-
 
   &.has-icon:not(.compact) {
     #scout.value-field-with-icon(~'.icon');
@@ -96,7 +132,11 @@
     & > .field > input,
     & > .field > .input-field,
     & > .file-input {
-      padding-right: @text-field-padding-x + 15px;
+      padding-right: @text-field-padding-x + @text-field-icon-outer-width;
+
+      &.alternative {
+        padding-right: @text-field-alternative-padding-right + @text-field-icon-outer-width;
+      }
     }
   }
 }

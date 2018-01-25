@@ -60,7 +60,7 @@
     }
 
     & > input.date {
-      padding-right: @text-field-padding-x + 15px;
+      padding-right: @text-field-padding-x + @text-field-icon-outer-width;
     }
   }
 
@@ -70,7 +70,7 @@
     }
 
     & > input.time {
-      padding-right: @text-field-padding-x + 15px;
+      padding-right: @text-field-padding-x + @text-field-icon-outer-width;
     }
   }
 
@@ -83,6 +83,16 @@
       color: @text-field-icon-focus-color;
     }
 
+    &.has-error.date-focused > .icon.date::before,
+    &.has-error.date-focused > .field > .icon.date-clear::before {
+      color: @text-field-icon-error-color;
+    }
+
+    &.date-focused > .icon.date::before,
+    &.date-focused > .field > .icon.date-clear:hover::before {
+      color: @highlight-color;
+    }
+
     & > .field >  .date-clear {
       display: block;
     }
@@ -92,7 +102,7 @@
     }
 
     & > .field > input.date {
-      padding-right: @text-field-padding-x + 15px;
+      padding-right: @text-field-padding-x + @text-field-icon-outer-width;
     }
   }
 
@@ -105,6 +115,16 @@
       color: @text-field-icon-focus-color;
     }
 
+    &.has-error.time-focused > .icon.time::before,
+    &.has-error.time-focused > .field > .icon.time-clear::before {
+      color: @text-field-icon-error-color;
+    }
+
+    &.time-focused > .icon.time::before,
+    &.time-focused > .field > .icon.time-clear:hover::before {
+      color: @highlight-color;
+    }
+
     & > .field >  .time-clear {
       display: block;
     }
@@ -114,7 +134,7 @@
     }
 
     & > .field > input.time {
-      padding-right: @text-field-padding-x + 15px;
+      padding-right: @text-field-padding-x + @text-field-icon-outer-width;
     }
   }
 }
@@ -133,6 +153,10 @@
   & > .predict {
     color: @disabled-color;
     background-color: @control-background-color;
+
+    &.alternative {
+      background-color: @text-field-alternative-background-color;
+    }
 
     &.has-error {
       background-color: @error-background-color;

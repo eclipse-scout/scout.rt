@@ -59,9 +59,11 @@ body {
   height: 0;
 }
 
-.disabled {
+.disabled:not(.read-only) {
   color: @text-disabled-color;
+}
 
+.disabled {
   &::-moz-selection {
     #scout.text-selection-disabled();
   }
@@ -152,6 +154,49 @@ textarea,
 
   &.read-only {
     #scout.read-only();
+  }
+}
+
+input.alternative,
+.input-field.alternative {
+  background-color: @text-field-alternative-background-color;
+  border-color: transparent;
+  border-bottom-color: @border-color;
+  border-radius: 0;
+  border-left-width: 0;
+  border-right-width: 0;
+  /* Add 1px padding to prevent the text from moving a little when field is focused due to the 2px focus border */
+  padding-bottom: 1px;
+  padding-left: @text-field-alternative-padding-left;
+  padding-right: @text-field-alternative-padding-right;
+
+  &.disabled {
+    color: @control-disabled-color;
+    border-bottom-style: dashed;
+    border-bottom-color: @palette-gray-5;
+  }
+
+  &:focus,
+  &.focused {
+    color: @focus-color;
+    #scout.alternative-focus-border();
+  }
+
+  &.has-error {
+    color: @error-color;
+    border-bottom-color: @error-border-color;
+  }
+
+  &.has-error:focus,
+  &.has-error.focused {
+    border-bottom-color: @error-border-color;
+    border-bottom-width: 2px;
+    box-shadow: none;
+    padding-bottom: 0;
+  }
+
+  &.read-only {
+    color: @text-color;
   }
 }
 

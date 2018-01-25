@@ -706,6 +706,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     IFormField f = prepareEditInternal(row);
     if (f != null) {
       f.setLabelVisible(false);
+      f.setFieldStyle(IFormField.FIELD_STYLE_CLASSIC);
       cellValueToEditor(row, f);
       f.markSaved();
     }

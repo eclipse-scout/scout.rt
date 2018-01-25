@@ -69,9 +69,17 @@ scout.FormTableControl.prototype._setForm = function(form) {
   }
   if (form) {
     form.on('destroy', this._formDestroyedHandler);
-    form.rootGroupBox.menuBar.bottom();
+    this._adaptForm(form);
   }
   this._setProperty('form', form);
+};
+
+scout.FormTableControl.prototype._adaptForm = function(form) {
+  form.rootGroupBox.menuBar.bottom();
+  if (form.rootGroupBox.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE) {
+    // Use default style because alternative style does not look as good with a background color
+    form.rootGroupBox.setFieldStyle(scout.FormField.FieldStyle.CLASSIC);
+  }
 };
 
 scout.FormTableControl.prototype.onControlContainerOpened = function() {

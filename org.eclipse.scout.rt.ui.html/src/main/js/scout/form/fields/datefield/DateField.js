@@ -186,6 +186,7 @@ scout.DateField.prototype._renderHasDate = function() {
 
   if (!this.rendering) {
     this._renderDisplayText();
+    this._renderFieldStyle();
     this.htmlDateTimeComposite.invalidateLayoutTree();
   }
   this._renderDateClearable();
@@ -238,6 +239,7 @@ scout.DateField.prototype._renderHasTime = function() {
 
   if (!this.rendering) {
     this._renderDisplayText();
+    this._renderFieldStyle();
     this.htmlDateTimeComposite.invalidateLayoutTree();
   }
   this._renderTimeClearable();
@@ -1718,7 +1720,25 @@ scout.DateField.prototype._formatValue = function(value) {
   return this._computeDisplayText(this.dateDisplayText, this.timeDisplayText);
 };
 
+/**
+ * @override
+ */
+scout.DateField.prototype._renderFieldStyle = function() {
+  this.$container.toggleClass('alternative', this.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE);
+  if (this.$dateField) {
+    this.$dateField.toggleClass('alternative', this.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE);
+  }
+  if (this.$timeField) {
+    this.$timeField.toggleClass('alternative', this.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE);
+  }
+};
+
+/**
+ * @override
+ */
 scout.DateField.prototype._renderDisabledStyle = function() {
+  this._renderDisabledStyleInternal(this.$container);
+  this._renderDisabledStyleInternal(this.$fieldContainer);
   this._renderDisabledStyleInternal(this.$dateField);
   this._renderDisabledStyleInternal(this.$timeField);
   this._renderDisabledStyleInternal(this.$mandatory);

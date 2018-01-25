@@ -52,6 +52,13 @@
     box-shadow: 0 0 0 0;
   }
 
+  .alternative-focus-border() {
+    border-bottom-color: @focus-border-color;
+    border-bottom-width: 2px;
+    box-shadow: none;
+    padding-bottom: 0;
+  }
+
   .transform(@args) {
     -webkit-transform: @args;
     -ms-transform: @args;
@@ -69,6 +76,7 @@
     background: @text-selection-background-color;
     color: @text-selection-color;
   }
+
   .text-selection-disabled() {
     background: @text-selection-disabled-background-color;
     color: @text-selection-disabled-color;
@@ -115,10 +123,10 @@
     }
 
     &.has-error > @{className}::before ,
+    &.has-error > .field > @{className}::before,
     &.has-error > .field > @{className}::before {
       color: @text-field-icon-error-color;
     }
-
 
     &.disabled > @{className},
     &.disabled > .field > @{className},
@@ -126,9 +134,16 @@
     &.compact > .field > @{className}  {
       display: none;
     }
+
+    &.alternative.has-error:focus > .field > @{className}::before,
+    &.alternative.has-error.focused > .field > @{className}::before {
+      color: @text-field-icon-error-color;
+    }
   }
 
   .status {
+    text-align: center;
+
     &::before  {
       #scout.font-icon();
       font-size: 16px;
@@ -141,15 +156,16 @@
 
     &::before {
       content: @icon-ellipsis-v;
-      color: @icon-light-color;
+      color: @status-menu-color;
+      font-size: 18px;
     }
 
     &:hover::before {
-      color: @icon-color;
+      color: @status-menu-hover-color;
     }
 
     &:active::before {
-      color: @icon-color;
+      color: @status-menu-hover-color;
     }
   }
 
@@ -452,6 +468,10 @@
 
     &.touch {
       background-color: @table-header-background-color;
+    }
+
+    &.alternative {
+      #scout.drop-shadow();
     }
   }
 }

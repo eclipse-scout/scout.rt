@@ -45,6 +45,7 @@ scout.SmartFieldPopup.prototype._render = function() {
   this.$container
     .addClass(cssClass)
     .on('mousedown', this._onContainerMouseDown.bind(this));
+  this.$container.toggleClass('alternative', this.smartField.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE);
   this.proposalChooser.render();
 };
 

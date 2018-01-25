@@ -48,6 +48,11 @@ scout.SmartFieldMultiline.prototype._render = function() {
   this.addStatus();
 };
 
+scout.SmartFieldMultiline.prototype._renderEnabled = function() {
+  scout.SmartFieldMultiline.parent.prototype._renderEnabled.call(this);
+  this._$multilineLines.setEnabled(this.enabled);
+};
+
 /**
  * Sets the focus to the input field when user clicks on text lines, but only if nothing is selected.
  * Otherwise it would be impossible for the user to select the text. That's why we cannot use the

@@ -43,6 +43,17 @@ scout.CompositeField.prototype.setDisabledStyle = function(disabledStyle) {
 };
 
 /**
+ * Sets the given fieldStyle recursively on all fields of the composite field.
+ * @override FormField.js
+ */
+scout.CompositeField.prototype.setFieldStyle = function(fieldStyle) {
+  this.getFields().forEach(function(field) {
+    field.setFieldStyle(fieldStyle);
+  });
+  scout.CompositeField.parent.prototype.setFieldStyle.call(this, fieldStyle);
+};
+
+/**
  * @override FormField.js
  */
 scout.CompositeField.prototype.recomputeEnabled = function(parentEnabled) {

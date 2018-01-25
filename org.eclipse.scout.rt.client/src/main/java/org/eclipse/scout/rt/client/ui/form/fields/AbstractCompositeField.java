@@ -461,6 +461,28 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
     }
   }
 
+  @Override
+  public void setDisabledStyle(int disabledStyle) {
+    super.setDisabledStyle(disabledStyle);
+
+    if (isInitConfigDone()) {
+      for (IFormField f : getFieldsInternal()) {
+        f.setDisabledStyle(disabledStyle);
+      }
+    }
+  }
+
+  @Override
+  public void setFieldStyle(String fieldStyle) {
+    super.setFieldStyle(fieldStyle);
+
+    if (isInitConfigDone()) {
+      for (IFormField f : getFieldsInternal()) {
+        f.setFieldStyle(fieldStyle);
+      }
+    }
+  }
+
   protected void handleFieldVisibilityChanged() {
     // box is only visible when it has at least one visible item
     setHasVisibleFieldsInternal(calcHasVisibleFieldsInternal());

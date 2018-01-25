@@ -50,6 +50,9 @@
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
 
+  /* Make it the same height as the menu bar */
+  min-height: @logical-grid-row-height;
+
   &.disabled {
     cursor: default;
     /* Override default disabled text color, because "disabled" in the table header means something different */

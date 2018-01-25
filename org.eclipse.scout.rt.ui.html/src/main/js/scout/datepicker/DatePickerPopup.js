@@ -31,6 +31,7 @@ scout.DatePickerPopup.prototype._createLayout = function() {
 
 scout.DatePickerPopup.prototype._render = function() {
   this.$container = this.$parent.appendDiv('date-picker-popup');
+  this.$container.toggleClass('alternative', this.field.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE);
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
   this.htmlComp.validateRoot = true;

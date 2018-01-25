@@ -114,9 +114,16 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
   String PROP_LOADING = "loading";
 
   /**
+   * The style of the field.
+   *
+   * @since 8.0
+   */
+  String PROP_FIELD_STYLE = "fieldStyle";
+
+  /**
    * Style to apply when the field is rendered as "disabled".
    * <p>
-   * Note that this property may be moved to the not-yet-existing "IWidget" in the future.
+   * Note that this property may be moved to the "IWidget" in the future.
    */
   String PROP_DISABLED_STYLE = "disabledStyle";
 
@@ -186,6 +193,10 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
   String STATUS_POSITION_DEFAULT = "default";
 
   String STATUS_POSITION_TOP = "top";
+
+  String FIELD_STYLE_CLASSIC = "classic";
+
+  String FIELD_STYLE_ALTERNATIVE = "alternative";
 
   int DISABLED_STYLE_DEFAULT = 0;
 
@@ -1001,6 +1012,10 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
    * @see IFormFieldVisitor#visitField(IFormField, int, int)
    */
   boolean visitParents(IFormFieldVisitor visitor);
+
+  void setFieldStyle(String fieldStyle);
+
+  String getFieldStyle();
 
   void setDisabledStyle(int disabledStyle);
 

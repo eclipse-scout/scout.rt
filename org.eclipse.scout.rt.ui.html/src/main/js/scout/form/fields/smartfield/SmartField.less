@@ -62,58 +62,76 @@
 
   &.popup-open {
 
-    & .multiline.field.focused {
+    & > .multiline.field.focused {
       box-shadow: none;
     }
 
-    & .multiline-input {
+    & > .field > .multiline-input {
 
       &.has-error:focus {
-        border-color: @error-border-color;
+        border-bottom-color: @error-border-color;
       }
 
       &:focus {
-        #scout.focus-border();
-        border-bottom-right-radius: 3px;
-        border-bottom-left-radius: 3px;
+        #scout.glow(@focus-glow-color);
+        border-bottom-color: @focus-color;
+        border-bottom-right-radius: @control-border-radius;
+        border-bottom-left-radius: @control-border-radius;
+      }
+
+      &.alternative {
+        &:focus {
+          box-shadow: none;
+        }
       }
     }
 
-    & .multiline-lines.focused {
+    & > .field > .multiline-lines.focused {
       border-color: @border-color;
     }
   }
 
-  &.has-error .multiline.field.focused {
+  &.has-error > .multiline.field.focused {
     #scout.glow(@error-glow-color);
   }
 
-  & .multiline.field.focused {
+  & > .multiline.field.focused {
     #scout.glow(@focus-glow-color);
   }
 
-  & .multiline-input {
+  & > .field > .multiline-input {
     border-bottom-color: @border-color;
     border-top-left-radius: @control-border-radius;
     border-top-right-radius: @control-border-radius;
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
     width: 100%;
-    padding-left: 10px;
-    height: 28px;
+    padding-left: @text-field-padding-x;
 
     &:focus {
       box-shadow: none;
     }
 
     &.has-error:focus {
-      border-color: @error-border-color;
-      border-bottom-color: @border-color;
+      border-bottom-color: @error-border-color;
+    }
+
+    &.alternative,
+    &.read-only {
+      padding-left: @text-field-alternative-padding-left;
+
+      &:focus {
+        border-bottom-color: @focus-color;
+      }
+
+      &.has-error:focus {
+        border-bottom-color: @error-border-color;
+      }
     }
   }
 
   /* DIV below the smart field containing the additional lines */
-  & .multiline-lines {
+  & > .field > .multiline-lines {
     background-color: @control-background-color;
     border: solid 1px @border-color;
     border-top-left-radius: 0;
@@ -121,11 +139,11 @@
     border-bottom-right-radius: @control-border-radius;
     border-bottom-left-radius: @control-border-radius;
     border-top: none;
-    padding: 3px 10px;
+    padding: 3px @text-field-padding-x;
     #scout.overflow-ellipsis-nowrap();
     #scout.user-select(text);
 
-    .disabled & {
+    &.disabled {
       background-color: @control-disabled-background-color;
     }
 
@@ -137,8 +155,22 @@
       border-color: @error-border-color;
     }
   }
-}
 
+  &.alternative > .field > .multiline-lines,
+  &.read-only > .field > .multiline-lines {
+    border: 0;
+    padding-top: 6px;
+    padding-left: @text-field-alternative-padding-left;
+
+    &.disabled {
+      background-color: transparent;
+    }
+  }
+
+  &.read-only > .field > .multiline-lines {
+    color: @text-color;
+  }
+}
 
 .proposal-field.loading,
 .smart-field.loading {
@@ -160,10 +192,11 @@
       padding-right: 0;
     }
   }
-
 }
 
-.dropdown-field-popup, .smart-field-popup, .proposal-field-popup {
+.dropdown-field-popup,
+.smart-field-popup,
+.proposal-field-popup {
   #scout.chooser-popup();
 }
 

@@ -73,16 +73,16 @@ scout.ValueField.prototype._renderProperties = function() {
   this._renderHasText();
 };
 
+scout.ValueField.prototype._remove = function() {
+  scout.ValueField.parent.prototype._remove.call(this);
+  this.$clearIcon = null;
+};
+
 /**
  * The default impl. is a NOP, because not every ValueField has a sensible display text.
  */
 scout.ValueField.prototype._renderDisplayText = function() {
   this._updateHasText();
-};
-
-scout.ValueField.prototype._remove = function() {
-  scout.ValueField.parent.prototype._remove.call(this);
-  this.$clearIcon = null;
 };
 
 /**

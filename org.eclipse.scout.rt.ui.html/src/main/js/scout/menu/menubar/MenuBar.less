@@ -73,6 +73,9 @@
       padding-top: 6px;
       padding-bottom: 6px;
 
+      /* By making sure menu items are always at least the same height as form fields, it is easier to align them with each other, especially when zoomed */
+      min-height: @logical-grid-row-height;
+
       &.overflown {
         display: none;
       }
@@ -232,7 +235,6 @@
   & > .menubox {
 
     & > .menu-item {
-      height: @logical-grid-row-height;
       margin-top: 8px;
       margin-bottom: 7px;
 

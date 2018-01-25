@@ -15,19 +15,24 @@
 
 @border-radius: 3px;
 @borderless-field-padding-y: @text-field-padding-y + 1px;
-@control-border-radius: @border-radius;
+@control-border-radius: 0;
+@popup-border-radius: 0;
 @logical-grid-row-height: 30px;
 @logical-grid-row-gap: 10px;
 @logical-grid-column-width: 420px;
 @logical-grid-column-gap: 40px - @mandatory-indicator-width;
 @logical-grid-small-column-gap: 4px;
-@mandatory-indicator-width: 8px;
+@mandatory-indicator-width: 10px;
 @mandatory-indicator-font-size: 15px;
 @field-label-width: 140px;
 @field-status-width: 20px;
 @field-status-margin-left: 10px;
 @text-field-padding-x: 10px;
 @text-field-padding-y: 7px;
+@text-field-alternative-padding-left: 0;
+@text-field-alternative-padding-right: 0;
+@text-field-alternative-icon-padding-right: 4px;
+@text-field-icon-outer-width: 20px;
 
 /* --------------------------------------------------------------------------- */
 /* The following CSS classes are used to to read the values from JavaScript,   */
@@ -131,7 +136,6 @@
 @planner-resource-minheight: @logical-grid-row-height;
 @planner-resource-title-width: 150px;
 @planner-scale-height: 45px;
-@popup-border-radius: @border-radius;
 @radio-button-circle-size: 18px;
 @radio-button-border-width: 1px;
 @radio-button-label-padding-top: 2px;

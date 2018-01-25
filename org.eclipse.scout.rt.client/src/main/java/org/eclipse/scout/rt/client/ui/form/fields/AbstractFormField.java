@@ -251,6 +251,12 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(32)
+  protected String getConfiguredFieldStyle() {
+    return FIELD_STYLE_ALTERNATIVE;
+  }
+
+  @ConfigProperty(ConfigProperty.INTEGER)
   @Order(35)
   protected int getConfiguredDisabledStyle() {
     return DISABLED_STYLE_DEFAULT;
@@ -804,6 +810,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     propertySupport.setPropertyBool(PROP_EMPTY, true);
     m_contributionHolder = new ContributionComposite(this);
 
+    setFieldStyle(getConfiguredFieldStyle());
     setEnabled(getConfiguredEnabled());
     setDisabledStyle(getConfiguredDisabledStyle());
     setVisible(getConfiguredVisible());
@@ -1567,6 +1574,16 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   @Override
   public boolean isEnabled() {
     return propertySupport.getPropertyBool(PROP_ENABLED);
+  }
+
+  @Override
+  public void setFieldStyle(String fieldStyle) {
+    propertySupport.setPropertyString(PROP_FIELD_STYLE, fieldStyle);
+  }
+
+  @Override
+  public String getFieldStyle() {
+    return propertySupport.getPropertyString(PROP_FIELD_STYLE);
   }
 
   @Override

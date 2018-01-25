@@ -16,12 +16,20 @@
    */
   #scout.user-select(none);
 
-  &:not(.disabled):active {
-    background-color: @palette-gray-2;
+  &:not(.disabled):not(.alternative):active {
+    background-color: @control-disabled-background-color;
   }
 
-  &.has-error:not(.disabled):active {
-    background-color: @palette-red-1;
+  &.alternative:not(.disabled):active {
+    #scout.alternative-focus-border();
+  }
+
+  &.has-error:not(.disabled):not(.alternative):active {
+    background-color:  @error-background-color;
+  }
+
+  &.has-error.alternative:not(.disabled):active {
+    border-bottom-color: @error-border-color;
   }
 
   &.disabled {

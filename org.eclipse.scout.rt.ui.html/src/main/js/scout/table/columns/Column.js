@@ -544,6 +544,7 @@ scout.Column.prototype.createDefaultEditor = function(row) {
   var field = this._createDefaultEditor(row);
   field.setLabelVisible(false);
   field.setValue(this.cell(row).value);
+  field.setFieldStyle(scout.FormField.FieldStyle.CLASSIC);
   return field;
 };
 

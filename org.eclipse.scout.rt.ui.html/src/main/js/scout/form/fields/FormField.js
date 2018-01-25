@@ -23,6 +23,7 @@ scout.FormField = function() {
    */
   this.enabledComputed = true;
   this.errorStatus = null;
+  this.fieldStyle = scout.FormField.FieldStyle.ALTERNATIVE;
   this.gridData = null;
   this.gridDataHints = new scout.GridData();
   this.mode = scout.FormField.Mode.DEFAULT;
@@ -72,6 +73,11 @@ scout.FormField = function() {
   this._addCloneProperties(['label', 'labelVisible', 'labelPosition', 'labelWidthInPixel', 'mandatory', 'statusVisible', 'statusPosition', 'gridDataHints', 'errorStatus']);
 };
 scout.inherits(scout.FormField, scout.Widget);
+
+scout.FormField.FieldStyle = {
+  CLASSIC: 'classic',
+  ALTERNATIVE: 'alternative'
+};
 
 scout.FormField.LabelPosition = {
   DEFAULT: 0,
@@ -190,6 +196,7 @@ scout.FormField.prototype._renderProperties = function() {
   this._renderLabelBackgroundColor();
   this._renderGridData();
   this._renderPreventInitialFocus();
+  this._renderFieldStyle();
 };
 
 scout.FormField.prototype._remove = function() {
@@ -201,6 +208,20 @@ scout.FormField.prototype._remove = function() {
   this.removeMandatoryIndicator();
   this._removeDisabledCopyOverlay();
   this._uninstallDragAndDropHandler();
+};
+
+scout.FormField.prototype.setFieldStyle = function(fieldStyle) {
+  this.setProperty('fieldStyle', fieldStyle);
+};
+
+scout.FormField.prototype._renderFieldStyle = function() {
+  this.$container.toggleClass('alternative', this.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE);
+  if (this.$fieldContainer) {
+    this.$fieldContainer.toggleClass('alternative', this.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE);
+  }
+  if (this.$field) {
+    this.$field.toggleClass('alternative', this.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE);
+  }
 };
 
 scout.FormField.prototype.setMandatory = function(mandatory) {
@@ -297,6 +318,7 @@ scout.FormField.prototype._renderLabel = function() {
     this._removePlaceholder();
     // Make sure an empty label is as height as the other labels, especially important for top labels
     this.$label.textOrNbsp(label, 'empty');
+    this.$label.toggleClass('top', this.labelPosition === scout.FormField.LabelPosition.TOP);
 
     // Invalidate layout if label width depends on its content
     if (this.labelUseUiWidth || this.labelWidthInPixel === scout.FormField.LabelWidth.UI) {
@@ -357,6 +379,9 @@ scout.FormField.prototype._renderStatusVisible = function() {
 };
 
 scout.FormField.prototype._renderStatusPosition = function() {
+  if (this.$status) {
+    this.$status.toggleClass('top', this.statusPosition === scout.FormField.StatusPosition.TOP);
+  }
   this.invalidateLayoutTree();
 };
 
@@ -465,6 +490,8 @@ scout.FormField.prototype._renderEnabled = function() {
  * @override Wigdet.js
  */
 scout.FormField.prototype._renderDisabledStyle = function() {
+  this._renderDisabledStyleInternal(this.$container);
+  this._renderDisabledStyleInternal(this.$fieldContainer);
   this._renderDisabledStyleInternal(this.$field);
   this._renderDisabledStyleInternal(this.$mandatory);
 };
