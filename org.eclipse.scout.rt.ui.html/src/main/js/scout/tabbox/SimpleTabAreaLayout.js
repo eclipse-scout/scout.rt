@@ -83,11 +83,9 @@ scout.SimpleTabAreaLayout.prototype.layout = function($container) {
   }
 
   this._$overflowTab = htmlContainer.$comp
-    .appendDiv('overflow-tab-item')
+    .appendDiv('simple-overflow-tab-item')
     .on('mousedown', this._onMouseDownOverflow.bind(this));
-  if (numOverflowTabs > 1) {
-    this._$overflowTab.appendDiv('num-tabs').text(numOverflowTabs);
-  }
+  this._$overflowTab.appendDiv('num-tabs').text(numOverflowTabs);
 
   var that = this;
   tabWidth = scout.SimpleTabAreaLayout.TAB_WIDTH_SMALL;

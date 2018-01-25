@@ -12,26 +12,20 @@
   position: absolute;
   top: 0;
 
-  & > .overflow-tab-item {
+  & > .simple-overflow-tab-item {
     border-right: 1px solid @border-color;
     display: inline-block;
-    height: 50px;
+    height: 100%;
     width: 30px;
     padding-top: 17px;
     text-align: center;
     cursor: pointer;
     vertical-align: top;
 
-    &::before {
+    &::after {
       #scout.font-icon();
       color: @icon-color;
-      content: @icon-chevron-right;
-    }
-
-    & .num-tabs {
-      color: @disabled-color;
-      font-size: 10px;
-      margin-top: -4px;
+      content: @icon-angle-down;
     }
 
     &.animate-modality-highlight {
