@@ -30,10 +30,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Loads JSON files containing model-configuration used in JavaScript-only / offline Scout apps. This loader excepts a
- * file matching the pattern <em>*-models.json</em>. The JSON file contains an array of files, pointing to other
- * *-models.json or regular *.json files containing the model- configuration for individual widgets. Example for a file
- * <i>myproject-models.json</i>:
+ * Loads JSON files containing model configurations used in JavaScript-only / offline Scout apps.
+ * <p>
+ * This loader expects a file matching the pattern <i>*-macro.json</i> or <i>*-module.json</i>. These JSON file contain
+ * an array of files, pointing to other <i>*.json</i> or regular <i>*.json</i> files containing model configurations for
+ * individual widgets.
+ * <p>
+ * Example for a file <i>myproject-models.json</i>:
  *
  * <pre>
  * {
@@ -44,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * }
  * </pre>
  *
- * <strong>Important:</strong> All files referenced in the files array must be available on the classpath. Typically
+ * <b>Important:</b> All files referenced in the <code>files</code> array must be available on the classpath. Typically
  * these files are placed in the JavaScript root of your Scout project. Example:
  * <i>scr/main/js/myproject-models.json</i>.
  */
@@ -52,23 +55,13 @@ public class JsonModelsLoader extends AbstractResourceLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(JsonModelsLoader.class);
 
-  private static final String REGEX_PATTERN = "^(.*?)(-module|-macro)?(.json)$";
+  private static final Pattern REGEX_PATTERN = Pattern.compile("^(.*?)(-module|-macro)?(.json)$");
 
-  /**
-   * Only file names for which a file (with '-macro' or '-module' suffix) exists are accepted.
-   */
   public static boolean acceptFile(String file) {
     if (StringUtility.isNullOrEmpty(file)) {
       return false;
     }
-
-    Pattern pattern = Pattern.compile(REGEX_PATTERN);
-    Matcher matcher = pattern.matcher(file);
-    if (!matcher.find()) {
-      return false;
-    }
-
-    return getJsonFileUrl(file) != null;
+    return REGEX_PATTERN.matcher(file).matches();
   }
 
   @Override
@@ -111,7 +104,7 @@ public class JsonModelsLoader extends AbstractResourceLoader {
         String modelId = jsonFragment.optString("id");
         if (StringUtility.isNullOrEmpty(modelId)) {
           modelId = toPropertyName(file);
-          LOG.error("JSON model file '{}' is missing mandatory property 'id'. Using file location as id: {}", file, modelId);
+          LOG.info("JSON model file '{}' is missing mandatory property 'id'. Using file location as ID: {}", file, modelId);
         }
         output.put(modelId, jsonFragment);
       }
@@ -126,18 +119,17 @@ public class JsonModelsLoader extends AbstractResourceLoader {
     return file.replace('/', '.');
   }
 
-  protected static boolean isModule(String file) {
+  protected boolean isModule(String file) {
     return file != null && file.endsWith("-module.json");
   }
 
-  protected static boolean isMacro(String file) {
+  protected boolean isMacro(String file) {
     return file != null && file.endsWith("-macro.json");
   }
 
-  protected static URL getJsonFileUrl(String pathInfo) {
-    Pattern pattern = Pattern.compile(REGEX_PATTERN);
-    Matcher matcher = pattern.matcher(pathInfo);
-    if (!matcher.find()) {
+  protected URL getJsonFileUrl(String pathInfo) {
+    Matcher matcher = REGEX_PATTERN.matcher(pathInfo);
+    if (!matcher.matches()) {
       return null;
     }
 
@@ -167,7 +159,7 @@ public class JsonModelsLoader extends AbstractResourceLoader {
       return null;
     }
     byte[] jsonBytes = IOUtility.readFromUrl(jsonUrl);
-    return new JSONObject(new String(jsonBytes, StandardCharsets.UTF_8));
+    String json = new String(jsonBytes, StandardCharsets.UTF_8);
+    return new JSONObject(json);
   }
-
 }
