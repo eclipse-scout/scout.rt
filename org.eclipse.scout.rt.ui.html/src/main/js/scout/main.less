@@ -208,9 +208,6 @@ button {
   border: 1px solid @button-border-color;
   border-radius: @button-border-radius;
   cursor: pointer;
-  /* TODO [7.0] cgu/BSH: Actually, we wanted to use .overflow-ellipsis-nowrap to support */
-  /* ellipsis, but this breaks the focus, because the ::before inline element gets */
-  /* cut off. We should find a better solution for this. */
   white-space: nowrap;
   padding: @button-padding-y @button-padding-x;
   /* Note: no vertical align helper here! this is very dependent on the content of the button */
@@ -283,6 +280,8 @@ button {
 
   & > .button-label {
     margin-top: 1px; /* SUPER HACK */
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   & > .icon {

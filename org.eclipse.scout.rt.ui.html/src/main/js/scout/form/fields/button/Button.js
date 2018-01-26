@@ -134,7 +134,7 @@ scout.Button.prototype._render = function() {
       $button.setTabbable(false);
     }
   }
-  this.addContainer(this.$parent, 'button-field');
+  this.addContainer(this.$parent, 'button-field', new scout.ButtonLayout(this));
   this.addField($button);
   // TODO [7.0] cgu: should we add a label? -> would make it possible to control the space left of the button using labelVisible, like it is possible with checkboxes
   this.addStatus();
@@ -154,10 +154,15 @@ scout.Button.prototype._render = function() {
     }
   }
   this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
+
+  scout.tooltips.installForEllipsis(this.$buttonLabel, {
+    parent: this
+  });
 };
 
 scout.Button.prototype._remove = function() {
   scout.Button.parent.prototype._remove.call(this);
+  scout.tooltips.uninstall(this.$buttonLabel);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.formKeyStrokeContext);
   this.$submenuIcon = null;
 };

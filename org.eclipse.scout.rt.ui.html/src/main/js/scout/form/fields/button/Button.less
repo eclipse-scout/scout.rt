@@ -45,6 +45,15 @@
 
     & > .text {
       text-decoration: underline;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    & > .text,
+    & > .submenu-icon,
+    & > .icon {
+      /* Reset IE hack for link buttons because it breaks ellipsis tooltip */
+      pointer-events: auto;
     }
   }
 

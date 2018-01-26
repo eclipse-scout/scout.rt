@@ -369,6 +369,7 @@
   __include("scout/form/fields/browserfield/BrowserField.js");
   __include("scout/form/fields/browserfield/BrowserFieldAdapter.js");
   __include("scout/form/fields/button/Button.js");
+  __include("scout/form/fields/button/ButtonLayout.js");
   __include("scout/form/fields/button/ButtonAdapter.js");
   __include("scout/form/fields/button/ButtonKeyStroke.js");
   __include("scout/form/fields/calendarfield/CalendarField.js");

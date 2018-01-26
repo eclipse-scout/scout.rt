@@ -12,7 +12,7 @@ scout.RadioButtonLayout = function(radioButton) {
   scout.RadioButtonLayout.parent.call(this, radioButton);
   this.radioButton = radioButton;
 };
-scout.inherits(scout.RadioButtonLayout, scout.FormFieldLayout);
+scout.inherits(scout.RadioButtonLayout, scout.ButtonLayout);
 
 scout.RadioButtonLayout.prototype.layout = function($container) {
   scout.RadioButtonLayout.parent.prototype.layout.call(this, $container);
