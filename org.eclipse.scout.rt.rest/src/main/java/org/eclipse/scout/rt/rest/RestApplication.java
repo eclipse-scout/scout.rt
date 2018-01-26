@@ -63,7 +63,7 @@ public class RestApplication extends Application {
       classes.add(bean.getBeanClazz());
       LOG.debug("{} registered as REST {}", bean.getBeanClazz(), lookupBeanClazz.getSimpleName());
     }
-    LOG.info("Registered {} classe(s) as REST {}", beans.size(), lookupBeanClazz.getSimpleName());
+    LOG.info("Registered {} classes as REST {}", beans.size(), lookupBeanClazz.getSimpleName());
   }
 
   @Override
