@@ -331,7 +331,7 @@ scout.GroupBox.prototype._renderNotification = function() {
 };
 
 scout.GroupBox.prototype._prepareFields = function() {
-  this.unregisterKeyStrokes(this.processButtons);
+  this.processButtons.forEach(this._unregisterButtonKeyStrokes.bind(this));
 
   this.controls = [];
   this.systemButtons = [];
@@ -376,6 +376,14 @@ scout.GroupBox.prototype._prepareFields = function() {
       }));
   }, this);
   this.registerKeyStrokes(this.processMenus);
+};
+
+scout.GroupBox.prototype._unregisterButtonKeyStrokes = function(button) {
+  if (button.keyStrokes) {
+    button.keyStrokes.forEach(function(keyStroke) {
+      this.keyStrokeContext.unregisterKeyStroke(keyStroke);
+    }, this);
+  }
 };
 
 scout.GroupBox.prototype._registerButtonKeyStrokes = function(button) {
