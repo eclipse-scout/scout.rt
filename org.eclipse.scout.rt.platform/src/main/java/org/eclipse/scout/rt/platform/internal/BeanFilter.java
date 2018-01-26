@@ -26,56 +26,64 @@ import org.slf4j.LoggerFactory;
 public class BeanFilter {
   private static final Logger LOG = LoggerFactory.getLogger(BeanFilter.class);
 
+  private IClassInventory m_classInventory;
+  private Set<Class> m_allBeans;
+
   /**
    * @return all {@link Bean} annotated classes
    *         <p>
    *         Includes all classes that implement an interface that has a {@link Bean} annotation
    */
   public Set<Class> collect(IClassInventory classInventory) {
-    Set<Class> allBeans = new HashSet<>();
+    m_classInventory = classInventory;
+    m_allBeans = new HashSet<>();
 
     // 1. collect all annotations annotated with @Bean and register all classes that are directly annotated with @Bean
-    Set<IClassInfo> beanAnnotations = new HashSet<>();
+    Set<IClassInfo> annotationsWithBeanAnnotation = new HashSet<>();
+    Set<IClassInfo> candidates = new HashSet<>();
     for (IClassInfo ci : classInventory.getKnownAnnotatedTypes(Bean.class)) {
       if (ci.isAnnotation()) {
-        beanAnnotations.add(ci);
+        annotationsWithBeanAnnotation.add(ci);
       }
       else {
-        collectWithSubClasses(classInventory, ci, allBeans);
+        candidates.add(ci);
       }
     }
 
-    // 2. register all classes that are somehow annotated with @Bean
-    for (IClassInfo annotation : beanAnnotations) {
+    // 2. get all candidates that are somehow annotated with @Bean
+    for (IClassInfo annotation : annotationsWithBeanAnnotation) {
       try {
-        for (IClassInfo ci : classInventory.getKnownAnnotatedTypes(annotation)) {
-          collectWithSubClasses(classInventory, ci, allBeans);
-        }
+        candidates.addAll(classInventory.getKnownAnnotatedTypes(annotation));
       }
       catch (Exception e) {
         LOG.warn("Could not resolve known annotated types for [{}]", annotation.name(), e);
       }
     }
 
-    return allBeans;
+    // find all classes that are somehow annotated with @Bean
+    candidates
+        .parallelStream()
+        .forEach(ci -> collectWithSubClasses(ci));
+
+    return m_allBeans;
   }
 
   /**
    * @param ci
    */
-  private void collectWithSubClasses(IClassInventory classInventory, IClassInfo ci, Set<Class> collector) {
+  private void collectWithSubClasses(IClassInfo ci) {
     if (ci.isEnum() || ci.isAnnotation() || ci.isSynthetic() || !ci.isPublic()) {
       LOG.debug("Skipping bean candidate '{}' because it is no supported class type (enum, annotation, anonymous class) or is not public.", ci.name());
       return;
     }
 
-    collect(ci, collector);
+    collect(ci);
 
     if (!ci.isFinal()) {
       try {
-        Set<IClassInfo> allKnownSubClasses = classInventory.getAllKnownSubClasses(ci);
+        Set<IClassInfo> allKnownSubClasses = m_classInventory.getAllKnownSubClasses(ci);
         for (IClassInfo subClass : allKnownSubClasses) {
-          collect(subClass, collector);
+          collect(subClass);
         }
       }
       catch (Exception e) {
@@ -84,7 +92,7 @@ public class BeanFilter {
     }
   }
 
-  private void collect(IClassInfo ci, Set<Class> collector) {
+  private void collect(IClassInfo ci) {
     if (ci.hasAnnotation(IgnoreBean.class)) {
       if (LOG.isDebugEnabled()) {
         LOG.debug("Skipping bean candidate '{}' because it is annotated with '{}'.", ci.name(), IgnoreBean.class.getSimpleName());
@@ -103,8 +111,15 @@ public class BeanFilter {
       }
       return;
     }
+    addBean(ci);
+  }
+
+  private void addBean(IClassInfo ci) {
     try {
-      collector.add(ci.resolveClass());
+      Class<?> clazz = ci.resolveClass();
+      synchronized (m_allBeans) {
+        m_allBeans.add(clazz);
+      }
     }
     catch (Exception ex) {
       LOG.warn("Could not resolve class [{}]", ci.name(), ex);

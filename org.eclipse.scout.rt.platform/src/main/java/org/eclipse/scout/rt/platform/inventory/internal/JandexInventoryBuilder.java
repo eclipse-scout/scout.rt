@@ -21,8 +21,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -94,11 +94,10 @@ public class JandexInventoryBuilder {
 
   public void scanAllModules() {
     try {
-      for (Enumeration<URL> en = getClass().getClassLoader().getResources(SCOUT_XML_PATH); en.hasMoreElements();) {
-        URL url = en.nextElement();
-        URI indexUri = findIndexUri(url);
-        scanModule(indexUri);
-      }
+      Collections.list(getClass().getClassLoader().getResources(SCOUT_XML_PATH))
+          .parallelStream()
+          .map(url -> findIndexUri(url))
+          .forEach(indexUri -> scanModule(indexUri));
     }
     catch (IOException ex) {
       throw new PlatformException("Error while reading resources '{}'", SCOUT_XML_PATH, ex);
@@ -109,7 +108,9 @@ public class JandexInventoryBuilder {
     try {
       Index index = scanModuleUnsafe(indexUri);
       if (index != null) {
-        m_indexList.add(index);
+        synchronized (m_indexList) {
+          m_indexList.add(index);
+        }
       }
       return index;
     }
