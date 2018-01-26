@@ -14,15 +14,15 @@ scout.Button = function() {
   this.defaultButton = false;
   this.displayStyle = scout.Button.DisplayStyle.DEFAULT;
   this.gridDataHints.fillHorizontal = false;
-  this.iconId;
-  this.keyStroke;
+  this.iconId = null;
+  this.keyStroke = null;
   this.processButton = true;
   this.selected = false;
   this.statusVisible = false;
   this.systemType = scout.Button.SystemType.NONE;
   this.preventDoubleClick = false;
 
-  this.$buttonLabel;
+  this.$buttonLabel = null;
   this.buttonKeyStroke = new scout.ButtonKeyStroke(this, null);
 };
 scout.inherits(scout.Button, scout.FormField);
@@ -331,6 +331,10 @@ scout.Button.prototype._updateLabelAndIconStyle = function() {
   var hasText = !!this.label;
   this.$buttonLabel.setVisible(hasText || !this.iconId);
   this.get$Icon().toggleClass('with-label', hasText);
+};
+
+scout.Button.prototype.setKeyStroke = function(keyStroke) {
+  this.setProperty('keyStroke', keyStroke);
 };
 
 scout.Button.prototype._setKeyStroke = function(keyStroke) {
