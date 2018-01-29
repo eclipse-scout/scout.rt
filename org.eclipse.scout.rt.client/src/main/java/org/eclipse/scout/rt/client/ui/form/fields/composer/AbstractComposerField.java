@@ -835,7 +835,10 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         }
         IDataModelAttributeOp op;
         try {
-          op = DataModelAttributeOp.create(anodeData.getOperator());
+          op = a.getOperators()
+              .stream()
+              .filter(p -> p.getOperator() == anodeData.getOperator())
+              .findFirst().orElseGet(() -> DataModelAttributeOp.create(anodeData.getOperator()));
         }
         catch (Exception e) {
           LOG.warn("read op {}", anodeData.getOperator(), e);
