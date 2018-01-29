@@ -1073,7 +1073,31 @@ scout.SmartField.prototype.setLookupRow = function(lookupRow) {
 };
 
 scout.SmartField.prototype.resetDisplayText = function() {
-  this._updateDisplayText();
+  var returned = this.formatValue(this.value);
+  if (returned && $.isFunction(returned.promise)) {
+    // Promise is returned -> set display text later
+    returned
+      .done(this._setAndRenderDisplayText.bind(this))
+      .fail(function() {
+        $.log.error('Error while formatting display text');
+      }.bind(this));
+  } else {
+    this._setAndRenderDisplayText(returned);
+  }
+};
+
+/**
+ * This method is very similar to setDisplayText(), but does _not_ check for equality with
+ * the current value. The property is always set and (if the field is rendered) the given
+ * display text is always rendered. This is important when resetting the display text,
+ * because the visible text in the input field may differ from the "displayText" property
+ * value. If setDisplayText() was used, the visible text would not always be reset.
+ */
+scout.SmartField.prototype._setAndRenderDisplayText = function(displayText) {
+  this._setProperty('displayText', displayText);
+  if (this.rendered) {
+    this._renderDisplayText();
+  }
 };
 
 scout.SmartField.prototype._getValueFromLookupRow = function(lookupRow) {
