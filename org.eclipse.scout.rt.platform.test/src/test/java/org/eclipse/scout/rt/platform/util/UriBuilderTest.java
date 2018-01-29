@@ -357,5 +357,20 @@ public class UriBuilderTest {
     builder = new UriBuilder(TEST_URI_PATH + "?init=1");
     builder.queryString("foo=1&bar=baz");
     assertEquals(3, builder.getParameters().size());
+
+    // No errors when query parts are null or empty
+    builder = new UriBuilder(TEST_URI_PATH);
+    builder.queryString(null);
+    assertEquals(0, builder.getParameters().size());
+    builder.queryString("");
+    assertEquals(0, builder.getParameters().size());
+    builder.queryString("a");
+    assertEquals(1, builder.getParameters().size());
+    builder.queryString("b&c");
+    assertEquals(3, builder.getParameters().size());
+    builder.queryString("d=&e&f=&g=h");
+    assertEquals(7, builder.getParameters().size());
+    builder.parameter("d", null);
+    assertEquals(6, builder.getParameters().size());
   }
 }

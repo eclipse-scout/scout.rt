@@ -138,10 +138,10 @@ public class UriBuilder {
    * @return
    */
   public UriBuilder queryString(String queryString) {
-    String[] keyValuePairs = queryString.split("&");
+    String[] keyValuePairs = StringUtility.split(queryString, "&");
     for (String keyValuePair : keyValuePairs) {
-      String[] keyValue = keyValuePair.split("=");
-      this.parameter(keyValue[0], keyValue[1]);
+      String[] keyValue = keyValuePair.split("=", 2);
+      this.parameter(keyValue[0], (keyValue.length == 2 ? keyValue[1] : ""));
     }
     return this;
   }
