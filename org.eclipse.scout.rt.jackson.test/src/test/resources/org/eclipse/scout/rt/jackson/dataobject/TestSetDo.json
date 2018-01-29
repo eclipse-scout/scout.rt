@@ -2,8 +2,7 @@
   "_type" : "TestSet",
   "dateSetAttribute" : [ "2017-11-30 17:29:12.583", "1990-10-20 00:00:00.000" ],
   "integerSetAttribute" : [ 21, 42 ],
-  "stringSetAttribute" : [ "foo", "bar" ],
-  "testItemDoSetAttribute" : [ {
+  "itemDoSetAttribute" : [ {
     "_type" : "TestItem",
     "id" : "item-key3",
     "stringAttribute" : "value3"
@@ -12,7 +11,7 @@
     "id" : "item-key4",
     "stringAttribute" : "value4"
   } ],
-  "testItemPojoSetAttribute" : [ {
+  "itemPojoSetAttribute" : [ {
     "_type" : "TestItem",
     "id" : "item-key1",
     "stringAttribute" : "value1"
@@ -20,5 +19,6 @@
     "_type" : "TestItem",
     "id" : "item-key2",
     "stringAttribute" : "value2"
-  } ]
+  } ],
+  "stringSetAttribute" : [ "foo", "bar" ]
 }

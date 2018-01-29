@@ -984,12 +984,12 @@ public class JsonDataObjectsSerializationTest {
     Set<TestItemPojo> pojoSet = new LinkedHashSet<>();
     pojoSet.add(createTestItemPojo("item-key1", "value1"));
     pojoSet.add(createTestItemPojo("item-key2", "value2"));
-    setDo.withTestItemPojoSetAttribute(pojoSet);
+    setDo.withItemPojoSetAttribute(pojoSet);
 
     Set<TestItemDo> doSet = new LinkedHashSet<>();
     doSet.add(createTestItemDo("item-key3", "value3"));
     doSet.add(createTestItemDo("item-key4", "value4"));
-    setDo.withTestItemDoSetAttribute(doSet);
+    setDo.withItemDoSetAttribute(doSet);
 
     Set<Date> dateSet = new LinkedHashSet<>();
     dateSet.add(DATE);
@@ -1007,18 +1007,18 @@ public class JsonDataObjectsSerializationTest {
     assertTrue(CollectionUtility.equalsCollection(setDo.getStringSetAttribute(), marshalled.getStringSetAttribute(), false));
 
     // set of TestItemDo must be unordered equals
-    List<TestItemDo> expected = new ArrayList<>(setDo.getTestItemDoSetAttribute());
+    List<TestItemDo> expected = new ArrayList<>(setDo.getItemDoSetAttribute());
     Collections.sort(expected, Comparator.comparing(TestItemDo::getId));
-    List<TestItemDo> actual = new ArrayList<>(marshalled.getTestItemDoSetAttribute());
+    List<TestItemDo> actual = new ArrayList<>(marshalled.getItemDoSetAttribute());
     Collections.sort(actual, Comparator.comparing(TestItemDo::getId));
     for (int i = 0; i < expected.size(); i++) {
       s_testHelper.assertDoEntityEquals(expected.get(i), actual.get(i));
     }
 
     // set of TestItemPojo must be unordered equals
-    List<TestItemPojo> expectedPojo = new ArrayList<>(setDo.getTestItemPojoSetAttribute());
+    List<TestItemPojo> expectedPojo = new ArrayList<>(setDo.getItemPojoSetAttribute());
     Collections.sort(expectedPojo, Comparator.comparing(TestItemPojo::getId));
-    List<TestItemPojo> actualPojo = new ArrayList<>(marshalled.getTestItemPojoSetAttribute());
+    List<TestItemPojo> actualPojo = new ArrayList<>(marshalled.getItemPojoSetAttribute());
     Collections.sort(actualPojo, Comparator.comparing(TestItemPojo::getId));
     for (int i = 0; i < expectedPojo.size(); i++) {
       assertEquals(expectedPojo.get(i).getId(), actualPojo.get(i).getId());

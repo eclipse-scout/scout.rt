@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
@@ -30,8 +31,8 @@ import org.eclipse.scout.rt.platform.dataobject.DoValue;
 public class DataObjectTestHelper {
 
   /**
-   * Asserts (deep) equality for specified {@link DoEntity} objects and additionally asserts, that concrete {@link DoEntity} class of
-   * expected entity and class of actual {@link DoEntity} is identical.
+   * Asserts (deep) equality for specified {@link DoEntity} objects and additionally asserts, that concrete
+   * {@link DoEntity} class of expected entity and class of actual {@link DoEntity} is identical.
    */
   public void assertDoEntityEquals(DoEntity expected, DoEntity actual) {
     assertDoEntityEquals(expected, actual, true);
@@ -91,13 +92,13 @@ public class DataObjectTestHelper {
       Map<?, ?> actualMap = (Map<?, ?>) actual;
       assertEquals("size of map does not match", expectedMap.size(), actualMap.size());
 
-      for (Object expectedKey : expectedMap.keySet()) {
-        assertTrue("actual map does not contain expected key " + expectedKey, actualMap.containsKey(expectedKey));
-        assertObjectEquals(expectedMap.get(expectedKey), actualMap.get(expectedKey), assertClassEquals);
+      for (Entry<?, ?> expectedEntry : expectedMap.entrySet()) {
+        assertTrue("actual map does not contain expected key " + expectedEntry.getKey(), actualMap.containsKey(expectedEntry.getKey()));
+        assertObjectEquals(expectedEntry.getValue(), actualMap.get(expectedEntry.getKey()), assertClassEquals);
       }
-      for (Object actualKey : actualMap.keySet()) {
-        assertTrue("expected map does not contain actual key " + actualKey, expectedMap.containsKey(actualKey));
-        assertObjectEquals(expectedMap.get(actualKey), actualMap.get(actualKey), assertClassEquals);
+      for (Entry<?, ?> actualEntry : actualMap.entrySet()) {
+        assertTrue("expected map does not contain actual key " + actualEntry.getKey(), expectedMap.containsKey(actualEntry.getKey()));
+        assertObjectEquals(expectedMap.get(actualEntry.getKey()), actualEntry.getValue(), assertClassEquals);
       }
     }
     else {

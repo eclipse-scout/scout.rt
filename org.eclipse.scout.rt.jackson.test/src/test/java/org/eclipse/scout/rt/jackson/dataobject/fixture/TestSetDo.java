@@ -24,12 +24,12 @@ public class TestSetDo extends DoEntity {
     return doValue("integerSetAttribute");
   }
 
-  public DoValue<Set<TestItemDo>> testItemDoSetAttribute() {
-    return doValue("testItemDoSetAttribute");
+  public DoValue<Set<TestItemDo>> itemDoSetAttribute() {
+    return doValue("itemDoSetAttribute");
   }
 
-  public DoValue<Set<TestItemPojo>> testItemPojoSetAttribute() {
-    return doValue("testItemPojoSetAttribute");
+  public DoValue<Set<TestItemPojo>> itemPojoSetAttribute() {
+    return doValue("itemPojoSetAttribute");
   }
 
   public DoValue<Set<Date>> dateSetAttribute() {
@@ -63,25 +63,25 @@ public class TestSetDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestSetDo withTestItemDoSetAttribute(Set<TestItemDo> testItemDoSetAttribute) {
-    testItemDoSetAttribute().set(testItemDoSetAttribute);
+  public TestSetDo withItemDoSetAttribute(Set<TestItemDo> itemDoSetAttribute) {
+    itemDoSetAttribute().set(itemDoSetAttribute);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public Set<TestItemDo> getTestItemDoSetAttribute() {
-    return testItemDoSetAttribute().get();
+  public Set<TestItemDo> getItemDoSetAttribute() {
+    return itemDoSetAttribute().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestSetDo withTestItemPojoSetAttribute(Set<TestItemPojo> testItemPojoSetAttribute) {
-    testItemPojoSetAttribute().set(testItemPojoSetAttribute);
+  public TestSetDo withItemPojoSetAttribute(Set<TestItemPojo> itemPojoSetAttribute) {
+    itemPojoSetAttribute().set(itemPojoSetAttribute);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public Set<TestItemPojo> getTestItemPojoSetAttribute() {
-    return testItemPojoSetAttribute().get();
+  public Set<TestItemPojo> getItemPojoSetAttribute() {
+    return itemPojoSetAttribute().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")

@@ -3,6 +3,7 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.TreeMap;
 
@@ -15,7 +16,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.type.WritableTypeId;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
@@ -108,16 +108,16 @@ public class DoEntitySerializer extends StdSerializer<DoEntity> {
       gen.writeFieldName(attributeName);
       gen.writeStartObject();
       gen.setCurrentValue(map);
-      for (Object key : map.keySet()) {
+      for (Entry<?, ?> entry : map.entrySet()) {
         // serialize map key
-        if (key == null) {
-          provider.getDefaultNullKeySerializer().serialize(key, gen, provider);
+        if (entry.getKey() == null) {
+          provider.getDefaultNullKeySerializer().serialize(entry.getKey(), gen, provider);
         }
         else {
-          provider.findKeySerializer(key.getClass(), null).serialize(key, gen, provider);
+          provider.findKeySerializer(entry.getKey().getClass(), null).serialize(entry.getKey(), gen, provider);
         }
         // serialize map value
-        gen.writeObject(map.get(key));
+        gen.writeObject(entry.getValue());
       }
       gen.writeEndObject();
     }
@@ -126,7 +126,7 @@ public class DoEntitySerializer extends StdSerializer<DoEntity> {
   /**
    * Serialize single attribute using appropriate typed value serializer
    */
-  protected void serializeTypedAttribute(String attributeName, Object obj, JsonGenerator gen, SerializerProvider provider, Optional<JavaType> type) throws JsonMappingException, IOException {
+  protected void serializeTypedAttribute(String attributeName, Object obj, JsonGenerator gen, SerializerProvider provider, Optional<JavaType> type) throws IOException {
     JsonSerializer<Object> ser = provider.findTypedValueSerializer(type.get(), true, null);
     gen.writeFieldName(attributeName);
     ser.serialize(obj, gen, provider);

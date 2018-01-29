@@ -11,7 +11,6 @@ import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.type.ResolvedType;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -34,7 +33,7 @@ public class DoListDeserializer extends StdDeserializer<DoList<?>> {
   }
 
   @Override
-  public DoList<?> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+  public DoList<?> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
     DoList<Object> list = new DoList<>();
     for (JsonToken t = p.nextToken(); t != JsonToken.END_ARRAY; t = p.nextToken()) {
       ResolvedType elementType = resolveListElementType(p);
