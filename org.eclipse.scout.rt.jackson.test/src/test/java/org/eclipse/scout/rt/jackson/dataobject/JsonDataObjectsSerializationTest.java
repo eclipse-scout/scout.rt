@@ -41,8 +41,10 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDuplicatedAttributeDo
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestElectronicAddressDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEmptyObject;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithArrayDoValueDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithGenericValuesDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithListsDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithNestedEntityDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestGenericDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemPojo2;
@@ -1331,6 +1333,36 @@ public class JsonDataObjectsSerializationTest {
     String json = s_dataObjectMapper.writeValueAsString(entity);
     DoEntity marshalled = s_dataObjectMapper.readValue(json, DoEntity.class);
     s_testHelper.assertDoEntityEquals(entity, marshalled);
+  }
+
+  // ------------------------------------ generic attribute definition tests -----------------------------
+
+  @Test
+  public void testSerializeDeserialize_EntityWithGenericValues() throws Exception {
+    TestEntityWithGenericValuesDo genericDo = BEANS.get(TestEntityWithGenericValuesDo.class);
+    TestGenericDo<String> stringValueDo = new TestGenericDo<>();
+    stringValueDo.withGenericAttribute("foo");
+    TestGenericDo<Double> doubleValueDo = new TestGenericDo<>();
+    doubleValueDo.withGenericAttribute(1234567890.1234567890);
+    genericDo.withGenericListAttribute(stringValueDo, doubleValueDo);
+
+    TestGenericDo<Double> doubleAttribute = new TestGenericDo<>();
+    doubleAttribute.withGenericAttribute(789.123);
+    genericDo.withGenericDoubleAttribute(doubleAttribute);
+
+    TestGenericDo<String> stringAttribute = new TestGenericDo<String>();
+    stringAttribute.withGenericAttribute("bar");
+    genericDo.withGenericStringAttribute(stringAttribute);
+
+    String json = s_dataObjectMapper.writeValueAsString(genericDo);
+    assertJsonResourceEquals("TestEntityWithGenericValuesDo.json", json);
+
+    TestEntityWithGenericValuesDo marshalled = s_dataObjectMapper.readValue(json, TestEntityWithGenericValuesDo.class);
+    assertEquals("foo", marshalled.getGenericListAttribute().get(0).genericAttribute().get());
+    assertEquals(1234567890.1234567890, marshalled.getGenericListAttribute().get(1).genericAttribute().get());
+    assertEquals("bar", marshalled.getGenericStringAttribute().genericAttribute().get());
+    assertEquals(new Double("789.123"), marshalled.getGenericDoubleAttribute().genericAttribute().get());
+    s_testHelper.assertDoEntityEquals(genericDo, marshalled);
   }
 
   // ------------------------------------ common test helper methods ------------------------------------

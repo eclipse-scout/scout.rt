@@ -152,7 +152,8 @@ public class DataObjectDefinitionRegistry {
   }
 
   /**
-   * @return Optional of {@link DataObjectAttributeDefinition} for specified {@code enttiyClass} and {@code attributeName}
+   * @return Optional of {@link DataObjectAttributeDefinition} for specified {@code enttiyClass} and
+   *         {@code attributeName}
    */
   public Optional<DataObjectAttributeDefinition> getAttributeDescription(Class<? extends DoEntity> entityClass, String attributeName) {
     ensureEntityDefinitionLoaded(entityClass);
@@ -190,7 +191,8 @@ public class DataObjectDefinitionRegistry {
           ParameterizedType pt = (ParameterizedType) returnType;
           // return type must be DoList or DoValue
           if (DoList.class == pt.getRawType()) {
-            addAttribute(attributes, TypeFactory.defaultInstance().constructParametricType((Class<?>) pt.getRawType(), (Class<?>) pt.getActualTypeArguments()[0]), method);
+            JavaType listItemsType = TypeFactory.defaultInstance().constructType(pt.getActualTypeArguments()[0]);
+            addAttribute(attributes, TypeFactory.defaultInstance().constructParametricType((Class<?>) pt.getRawType(), listItemsType), method);
           }
           else if (DoValue.class == pt.getRawType()) {
             addAttribute(attributes, TypeFactory.defaultInstance().constructType(pt.getActualTypeArguments()[0]), method);

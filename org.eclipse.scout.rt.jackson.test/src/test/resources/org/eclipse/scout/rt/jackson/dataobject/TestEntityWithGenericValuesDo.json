@@ -1,0 +1,18 @@
+{
+  "_type" : "TestEntityWithGenericValues",
+  "genericDoubleAttribute" : {
+    "_type" : "TestGeneric",
+    "genericAttribute" : 789.123
+  },
+  "genericListAttribute" : [ {
+    "_type" : "TestGeneric",
+    "genericAttribute" : "foo"
+  }, {
+    "_type" : "TestGeneric",
+    "genericAttribute" : 1.2345678901234567E9
+  } ],
+  "genericStringAttribute" : {
+    "_type" : "TestGeneric",
+    "genericAttribute" : "bar"
+  }
+}
