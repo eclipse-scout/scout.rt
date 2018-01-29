@@ -844,9 +844,18 @@ public abstract class AbstractComposerField extends AbstractFormField implements
           LOG.warn("could not find attribute for: {}", anodeData.getAttributeExternalId());
           return null;
         }
-        IDataModelAttributeOp op;
+        IDataModelAttributeOp op = null;
         try {
-          op = DataModelAttributeOp.create(anodeData.getOperator());
+          // prefer attributes provided operators over generic created operator
+          for (IDataModelAttributeOp attrOp : a.getOperators()) {
+            if (attrOp.getOperator() == anodeData.getOperator()) {
+              op = attrOp;
+              break;
+            }
+          }
+          if (op == null) {
+            op = DataModelAttributeOp.create(anodeData.getOperator());
+          }
         }
         catch (Exception e) {
           LOG.warn("read op {}", anodeData.getOperator(), e);
