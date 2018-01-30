@@ -60,4 +60,36 @@ describe('WrappedForm', function() {
     });
   });
 
+  describe('innerForm', function() {
+    it('is set to null when being destroyed', function() {
+      var innerForm = helper.createFormWithOneField();
+      var field = createField({innerForm: innerForm});
+      field.render();
+      expect(field.innerForm).toBe(innerForm);
+      expect(innerForm.rendered).toBe(true);
+
+      innerForm.destroy();
+      expect(field.innerForm).toBe(null);
+      expect(innerForm.rendered).toBe(false);
+      expect(innerForm.destroyed).toBe(true);
+    });
+
+    it('will be removed if set to null', function() {
+      var innerForm = helper.createFormWithOneField();
+      var field = createField({innerForm: innerForm});
+      field.render();
+      expect(field.innerForm).toBe(innerForm);
+      expect(innerForm.rendered).toBe(true);
+
+      field.setInnerForm(null);
+      expect(field.innerForm).toBe(null);
+      expect(innerForm.rendered).toBe(false);
+      expect(innerForm.destroyed).toBe(false);
+
+      // The desktop is the owner of the innerForm in this case -> destroy form explicitly
+      innerForm.destroy();
+      expect(innerForm.destroyed).toBe(true);
+    });
+  });
+
 });
