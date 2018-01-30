@@ -11,10 +11,12 @@
 package org.eclipse.scout.rt.ui.html;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.security.AccessController;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.security.auth.Subject;
 import javax.servlet.ServletConfig;
@@ -58,22 +60,17 @@ public class UiServlet extends AbstractHttpServlet {
 
   private static final Logger LOG = LoggerFactory.getLogger(UiServlet.class);
 
-  private final P_AbstractRequestHandler m_requestHandlerGet;
-  private final P_AbstractRequestHandler m_requestHandlerPost;
+  private static final Set<String> HTTP_METHODS_SUPPORTED_BY_JAVAX_HTTP_SERVLET = new HashSet<>(Arrays.asList(
+      "GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "TRACE"));
+
   private final HttpServletControl m_httpServletControl;
 
   public UiServlet() {
-    m_requestHandlerGet = createRequestHandlerGet();
-    m_requestHandlerPost = createRequestHandlerPost();
     m_httpServletControl = BEANS.get(HttpServletControl.class);
   }
 
-  protected P_AbstractRequestHandler createRequestHandlerGet() {
-    return new P_RequestHandlerGet();
-  }
-
-  protected P_AbstractRequestHandler createRequestHandlerPost() {
-    return new P_RequestHandlerPost();
+  protected boolean isHttpMethodSupportedByJavaxHttpServlet(String method) {
+    return HTTP_METHODS_SUPPORTED_BY_JAVAX_HTTP_SERVLET.contains(method);
   }
 
   protected RunContext createServletRunContext(final HttpServletRequest req, final HttpServletResponse resp) {
@@ -124,30 +121,6 @@ public class UiServlet extends AbstractHttpServlet {
     }
   }
 
-  @Override
-  protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-    m_httpServletControl.doDefaults(this, req, resp);
-    try {
-      createServletRunContext(req, resp).run(() -> m_requestHandlerGet.handleRequest(req, resp), DefaultExceptionTranslator.class);
-    }
-    catch (Exception e) {
-      LOG.error("Failed to process HTTP-GET request from UI", e);
-      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @Override
-  protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-    m_httpServletControl.doDefaults(this, req, resp);
-    try {
-      createServletRunContext(req, resp).run(() -> m_requestHandlerPost.handleRequest(req, resp), DefaultExceptionTranslator.class);
-    }
-    catch (Exception e) {
-      LOG.error("Failed to process HTTP-POST request from UI", e);
-      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-    }
-  }
-
   protected Locale getPreferredLocale(HttpServletRequest req) {
     Cookie cookie = CookieUtility.getCookieByName(req, IUiSession.PREFERRED_LOCALE_COOKIE_NAME);
     if (cookie == null) {
@@ -158,47 +131,70 @@ public class UiServlet extends AbstractHttpServlet {
     }
   }
 
-  /**
-   * Template pattern.
-   */
-  protected abstract static class P_AbstractRequestHandler implements Serializable {
-    private static final long serialVersionUID = 1L;
-
-    protected void handleRequest(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-      long start = System.nanoTime();
-      try {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Request started");
-        }
-        List<IUiServletRequestHandler> handlers = BEANS.all(IUiServletRequestHandler.class);
-        for (IUiServletRequestHandler handler : handlers) {
-          if (delegateRequest(handler, req, resp)) {
-            return;
-          }
-        }
-        // No handler was able to handle the request
-        LOG.info("404_NOT_FOUND: {} {}", req.getMethod(), req.getPathInfo());
-        resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-      }
-      catch (Exception t) {
-        LOG.error("Exception while processing request", t);
-        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      }
-      finally {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Request completed in {} ms", StringUtility.formatNanos(System.nanoTime() - start));
-        }
-      }
+  @Override
+  protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    // Use methods provided by javax.servlet.http.HttpServlet because HttpServlet#service contains some special behavior depending on the http method.
+    if (isHttpMethodSupportedByJavaxHttpServlet(req.getMethod())) {
+      // Will delegate to corresponding doX method below (which in turn will delegate to handleRequest).
+      // Wrapping the call is done is super.service (from AbstractHttpServlet).
+      super.service(req, resp);
     }
-
-    protected abstract boolean delegateRequest(IUiServletRequestHandler handler, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
+    else {
+      // Handle any other method too.
+      // Manual wrapping required because no super call is made.
+      wrap(req, resp, this::handleRequest);
+    }
   }
 
-  protected static class P_RequestHandlerGet extends P_AbstractRequestHandler {
-    private static final long serialVersionUID = 1L;
+  @Override
+  protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    handleRequest(req, resp);
+  }
 
-    @Override
-    protected void handleRequest(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+  @Override
+  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    handleRequest(req, resp);
+  }
+
+  @Override
+  protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    handleRequest(req, resp);
+  }
+
+  @Override
+  protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    handleRequest(req, resp);
+  }
+
+  @Override
+  protected void doHead(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    handleRequest(req, resp);
+  }
+
+  @Override
+  protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    handleRequest(req, resp);
+  }
+
+  @Override
+  protected void doTrace(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    handleRequest(req, resp);
+  }
+
+  protected void handleRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    m_httpServletControl.doDefaults(this, req, resp);
+    try {
+      createServletRunContext(req, resp).run(() -> handleRequestInternal(req, resp), DefaultExceptionTranslator.class);
+    }
+    catch (Exception e) {
+      LOG.error("Failed to process HTTP-{} request from UI", req.getMethod(), e);
+      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  protected void handleRequestInternal(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    String method = req.getMethod();
+    if ("GET".equals(method)) {
       // The servlet is registered at '/'. To make relative URLs work, we need to make sure the request URL has a trailing '/'.
       // It is not possible to just check for an empty pathInfo because the container returns "/" even if the user has not entered a '/' at the end.
       String contextPath = req.getServletContext().getContextPath();
@@ -206,21 +202,31 @@ public class UiServlet extends AbstractHttpServlet {
         resp.sendRedirect(req.getRequestURI() + "/");
         return;
       }
-      super.handleRequest(req, resp);
     }
 
-    @Override
-    protected boolean delegateRequest(IUiServletRequestHandler handler, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      return handler.handleGet(req, resp);
+    long start = System.nanoTime();
+    try {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Request started");
+      }
+      List<IUiServletRequestHandler> handlers = BEANS.all(IUiServletRequestHandler.class);
+      for (IUiServletRequestHandler handler : handlers) {
+        if (handler.handle(req, resp)) {
+          return;
+        }
+      }
+      // No handler was able to handle the request
+      LOG.info("404_NOT_FOUND: {} {}", req.getMethod(), req.getPathInfo());
+      resp.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
-  }
-
-  protected static class P_RequestHandlerPost extends P_AbstractRequestHandler {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    protected boolean delegateRequest(IUiServletRequestHandler handler, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      return handler.handlePost(req, resp);
+    catch (Exception t) {
+      LOG.error("Exception while processing request", t);
+      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+    finally {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Request completed in {} ms", StringUtility.formatNanos(System.nanoTime() - start));
+      }
     }
   }
 

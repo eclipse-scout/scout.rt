@@ -35,6 +35,10 @@ public abstract class AbstractHttpServlet extends HttpServlet {
 
   @Override
   protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    wrap(req, resp, super::service);
+  }
+
+  protected void wrap(HttpServletRequest req, HttpServletResponse resp, HttpServletConsumer consumer) throws ServletException, IOException {
     P_HttpInvocationHandler requestProxyHandler = new P_HttpInvocationHandler(req);
     P_HttpInvocationHandler responseProxyHandler = new P_HttpInvocationHandler(resp);
     try {
@@ -42,7 +46,7 @@ public abstract class AbstractHttpServlet extends HttpServlet {
           new Class[]{HttpServletRequest.class}, requestProxyHandler);
       HttpServletResponse response = (HttpServletResponse) Proxy.newProxyInstance(HttpServletResponse.class.getClassLoader(),
           new Class[]{HttpServletResponse.class}, responseProxyHandler);
-      super.service(request, response);
+      consumer.service(request, response);
     }
     finally {
       requestProxyHandler.invalidate();
@@ -70,5 +74,11 @@ public abstract class AbstractHttpServlet extends HttpServlet {
       }
       return method.invoke(m_origin, args);
     }
+  }
+
+  @FunctionalInterface
+  protected static interface HttpServletConsumer {
+
+    void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException;
   }
 }

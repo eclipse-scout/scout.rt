@@ -34,11 +34,5 @@ public interface IUiServletRequestHandler {
    * @return <code>true</code> if the request was consumed by the handler, no further action is then necessary. If
    *         <code>false</code> is returned, other handlers may handle the request afterwards.
    */
-  boolean handlePost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
-
-  /**
-   * @return <code>true</code> if the request was consumed by the handler, no further action is then necessary. If
-   *         <code>false</code> is returned, other handlers may handle the request afterwards.
-   */
-  boolean handleGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
+  boolean handle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
 }

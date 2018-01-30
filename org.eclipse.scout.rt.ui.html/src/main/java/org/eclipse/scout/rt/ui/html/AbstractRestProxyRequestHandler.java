@@ -51,31 +51,17 @@ public abstract class AbstractRestProxyRequestHandler extends AbstractUiServletR
   }
 
   @Override
-  public boolean handleGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean handle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     if (!acceptRequest(req)) {
       return false;
     }
-    proxyGet(req, resp);
+    proxy(req, resp);
     return true;
   }
 
-  protected void proxyGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+  protected void proxy(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     HttpProxyRequestOptions options = createHttpProxyRequestOptions(req, resp);
-    getProxy().proxyGet(req, resp, options);
-  }
-
-  @Override
-  public boolean handlePost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    if (!acceptRequest(req)) {
-      return false;
-    }
-    proxyPost(req, resp);
-    return true;
-  }
-
-  protected void proxyPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    HttpProxyRequestOptions options = createHttpProxyRequestOptions(req, resp);
-    getProxy().proxyPost(req, resp, options);
+    getProxy().proxy(req, resp, options);
   }
 
   /**

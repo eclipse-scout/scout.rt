@@ -19,12 +19,59 @@ import javax.servlet.http.HttpServletResponse;
 public abstract class AbstractUiServletRequestHandler implements IUiServletRequestHandler {
 
   @Override
-  public boolean handlePost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean handle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    String httpMethod = req.getMethod();
+    switch (httpMethod) {
+      case "GET":
+        return handleGet(req, resp);
+      case "POST":
+        return handlePost(req, resp);
+      case "PUT":
+        return handlePut(req, resp);
+      case "DELETE":
+        return handleDelete(req, resp);
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Convenience method for HTTP method GET.
+   *
+   * @return <code>true</code> if the request was consumed by the handler, no further action is then necessary. If
+   *         <code>false</code> is returned, other handlers may handle the request afterwards.
+   */
+  protected boolean handleGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     return false;
   }
 
-  @Override
-  public boolean handleGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  /**
+   * Convenience method for HTTP method POST.
+   *
+   * @return <code>true</code> if the request was consumed by the handler, no further action is then necessary. If
+   *         <code>false</code> is returned, other handlers may handle the request afterwards.
+   */
+  protected boolean handlePost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    return false;
+  }
+
+  /**
+   * Convenience method for HTTP method PUT.
+   *
+   * @return <code>true</code> if the request was consumed by the handler, no further action is then necessary. If
+   *         <code>false</code> is returned, other handlers may handle the request afterwards.
+   */
+  protected boolean handlePut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    return false;
+  }
+
+  /**
+   * Convenience method for HTTP method DELETE.
+   *
+   * @return <code>true</code> if the request was consumed by the handler, no further action is then necessary. If
+   *         <code>false</code> is returned, other handlers may handle the request afterwards.
+   */
+  protected boolean handleDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     return false;
   }
 }

@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.http.DefaultHttpTransportManager;
 import org.slf4j.Logger;
@@ -72,19 +73,20 @@ public class HttpProxy {
   }
 
   /**
-   * Convenience method for {@link #proxyGet(HttpServletRequest, HttpServletResponse, HttpProxyRequestOptions)} without
-   * options.
+   * @return <code>true</code> if the request payload should be included in the proxy call, <code>false</code>
+   *         otherwise. The default implementation returns <code>true</code> for POST and PUT requests.
    */
-  public void proxyGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    proxyGet(req, resp, null);
+  protected boolean shouldIncludeRequestPayload(HttpServletRequest req) {
+    return ObjectUtility.isOneOf(req.getMethod(), "POST", "PUT");
   }
 
   /**
-   * Forwards the given request to the remote URL using the <code>GET</code> method.
+   * Forwards the given request to the remote URL using the given method.
    * <ul>
-   * <li>Adds every request header beside the blacklisted to the forwarded request.
-   * <li>Writes the request payload to the forwarded request or adds every query parameter to the forwarded request if
-   * parameters are used.
+   * <li>Adds every request header beside the blacklisted to the forwarded request.<br>
+   * <li>If and only if {@link #shouldIncludeRequestPayload(HttpServletRequest)} returns <code>true</code>, writes
+   * the request payload to the forwarded request or adds every query parameter to the forwarded request if parameters
+   * are used.
    * <li>Writes the returned response body, headers and status to the response.
    * </ul>
    *
@@ -95,24 +97,35 @@ public class HttpProxy {
    * @param options
    *          optional options for this request
    */
-  public void proxyGet(HttpServletRequest req, HttpServletResponse resp, HttpProxyRequestOptions options) throws IOException {
+  public void proxy(HttpServletRequest req, HttpServletResponse resp, HttpProxyRequestOptions options) throws IOException {
     if (options == null) {
       options = new HttpProxyRequestOptions();
     }
 
     String url = rewriteUrl(req, options);
-    HttpRequest httpReq = BEANS.get(DefaultHttpTransportManager.class).getHttpRequestFactory().buildGetRequest(new GenericUrl(url));
+    HttpRequest httpReq = BEANS.get(DefaultHttpTransportManager.class).getHttpRequestFactory().buildRequest(req.getMethod(), new GenericUrl(url), null);
     httpReq = prepareRequest(httpReq);
 
     writeRequestHeaders(req, httpReq);
     writeCustomRequestHeaders(httpReq, options.getCustomRequestHeaders());
+
+    if (shouldIncludeRequestPayload(req)) {
+      // Payload is empty if parameters are used (usually with content type = application/x-www-form-urlencoded)
+      // -> write parameters if there are any, otherwise write the raw payload
+      if (!req.getParameterMap().isEmpty()) {
+        writeRequestParameters(req, httpReq);
+      }
+      else {
+        writeRequestPayload(req, httpReq);
+      }
+    }
     HttpResponse httpResp = httpReq.execute();
 
     writeResponseHeaders(resp, httpResp);
     writeResponseStatus(resp, httpResp);
     writeResponsePayload(resp, httpResp);
 
-    LOG.debug("Forwarded GET request to {}", url);
+    LOG.debug("Forwarded {} request to {}", req.getMethod(), url);
   }
 
   /**
@@ -126,59 +139,6 @@ public class HttpProxy {
       pathInfo = rewriteRule.rewrite(pathInfo);
     }
     return StringUtility.join("", getRemoteBaseUrl(), pathInfo, StringUtility.box("?", req.getQueryString(), ""));
-  }
-
-  /**
-   * Convenience method for {@link #proxyPost(HttpServletRequest, HttpServletResponse, HttpProxyRequestOptions)} without
-   * options.
-   */
-  public void proxyPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    proxyPost(req, resp, null);
-  }
-
-  /**
-   * Forwards the given request to the remote URL using the POST method.
-   * <ul>
-   * <li>Adds every request header (except the blacklisted ones) to the forwarded request.
-   * <li>Adds every form parameter to the forwarded request.
-   * <li>Writes the returned response body, headers and status to the response.
-   * </ul>
-   *
-   * @param req
-   *          original request
-   * @param resp
-   *          response where the response from the remote server is written to
-   * @param options
-   *          optional options for this request
-   */
-  public void proxyPost(HttpServletRequest req, HttpServletResponse resp, HttpProxyRequestOptions options) throws IOException {
-    if (options == null) {
-      options = new HttpProxyRequestOptions();
-    }
-
-    String url = rewriteUrl(req, options);
-    HttpRequest httpReq = BEANS.get(DefaultHttpTransportManager.class).getHttpRequestFactory().buildPostRequest(new GenericUrl(url), null);
-    httpReq.getHeaders().setCacheControl("no-cache");
-    httpReq = prepareRequest(httpReq);
-
-    writeRequestHeaders(req, httpReq);
-    writeCustomRequestHeaders(httpReq, options.getCustomRequestHeaders());
-
-    // Payload is empty if parameters are used (usually with content type = application/x-www-form-urlencoded)
-    // -> write parameters if there are any, otherwise write the raw payload
-    if (!req.getParameterMap().isEmpty()) {
-      writeRequestParameters(req, httpReq);
-    }
-    else {
-      writeRequestPayload(req, httpReq);
-    }
-    HttpResponse httpResp = httpReq.execute();
-
-    writeResponseHeaders(resp, httpResp);
-    writeResponseStatus(resp, httpResp);
-    writeResponsePayload(resp, httpResp);
-
-    LOG.debug("Forwarded POST request to {}", url);
   }
 
   protected HttpRequest prepareRequest(HttpRequest httpReq) {
