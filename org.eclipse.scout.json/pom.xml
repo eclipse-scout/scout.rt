@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.eclipse.scout.rt</groupId>
     <artifactId>org.eclipse.scout.rt</artifactId>
-    <version>7.1.0-SNAPSHOT</version>
+    <version>7.1.0.005_Photon_M5</version>
     <relativePath>../org.eclipse.scout.rt/pom.xml</relativePath>
   </parent>
 
