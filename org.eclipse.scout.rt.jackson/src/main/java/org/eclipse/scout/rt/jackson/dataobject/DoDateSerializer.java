@@ -5,7 +5,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.eclipse.scout.rt.platform.dataobject.DoEntity;
+import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.dataobject.IValueFormatConstants;
 import org.eclipse.scout.rt.platform.dataobject.ValueFormat;
 import org.eclipse.scout.rt.platform.util.LazyValue;
@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.DateSerializer;
 
 /**
- * Custom {@link DateSerializer} handling date values within {@link DoEntity} which are annotated with custom
+ * Custom {@link DateSerializer} handling date values within {@link IDoEntity} which are annotated with custom
  * {@link ValueFormat} format.
  */
 public class DoDateSerializer extends DateSerializer {
@@ -35,9 +35,8 @@ public class DoDateSerializer extends DateSerializer {
 
   @Override
   public void serialize(Date value, JsonGenerator g, SerializerProvider provider) throws IOException {
-    if (g.getCurrentValue() instanceof DoEntity && g.getOutputContext().hasCurrentName()) {
-      @SuppressWarnings("unchecked")
-      Class<? extends DoEntity> entityClass = (Class<? extends DoEntity>) g.getCurrentValue().getClass();
+    if (g.getCurrentValue() instanceof IDoEntity && g.getOutputContext().hasCurrentName()) {
+      Class<? extends IDoEntity> entityClass = g.getCurrentValue().getClass().asSubclass(IDoEntity.class);
       SimpleDateFormat formatter = findFormatter(entityClass, g.getOutputContext().getCurrentName());
       g.writeString(formatter.format(value));
     }
@@ -51,7 +50,7 @@ public class DoDateSerializer extends DateSerializer {
     return new DoDateSerializer(timestamp, customFormat);
   }
 
-  protected SimpleDateFormat findFormatter(Class<? extends DoEntity> entityClass, String name) {
+  protected SimpleDateFormat findFormatter(Class<? extends IDoEntity> entityClass, String name) {
     return m_dataObjectDefinitionRegistry.get().getAttributeDescription(entityClass, name)
         .flatMap(DataObjectAttributeDefinition::getFormatPattern)
         .map(pattern -> new SimpleDateFormat(pattern))

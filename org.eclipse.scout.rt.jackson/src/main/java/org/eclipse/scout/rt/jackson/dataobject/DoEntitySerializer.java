@@ -7,9 +7,9 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.TreeMap;
 
-import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoNode;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
+import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -22,9 +22,9 @@ import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 /**
- * Serializer for {@link DoEntity} and all sub-classes.
+ * Serializer for {@link IDoEntity} and all sub-classes.
  */
-public class DoEntitySerializer extends StdSerializer<DoEntity> {
+public class DoEntitySerializer extends StdSerializer<IDoEntity> {
   private static final long serialVersionUID = 1L;
 
   protected final LazyValue<DataObjectDefinitionRegistry> m_doEntityDefinitionRegistry = new LazyValue<>(DataObjectDefinitionRegistry.class);
@@ -34,23 +34,23 @@ public class DoEntitySerializer extends StdSerializer<DoEntity> {
   }
 
   @Override
-  public void serialize(DoEntity entity, JsonGenerator gen, SerializerProvider provider) throws IOException {
+  public void serialize(IDoEntity entity, JsonGenerator gen, SerializerProvider provider) throws IOException {
     gen.writeStartObject();
     serializeAttributes(entity, gen, provider);
     gen.writeEndObject();
   }
 
   @Override
-  public void serializeWithType(DoEntity entity, JsonGenerator gen, SerializerProvider provider, TypeSerializer typeSer) throws IOException {
+  public void serializeWithType(IDoEntity entity, JsonGenerator gen, SerializerProvider provider, TypeSerializer typeSer) throws IOException {
     WritableTypeId typeIdDef = typeSer.writeTypePrefix(gen, typeSer.typeId(entity, JsonToken.START_OBJECT));
     serializeAttributes(entity, gen, provider);
     typeSer.writeTypeSuffix(gen, typeIdDef);
   }
 
   /**
-   * Serialize all fields of specified {@link DoEntity} sorted alphabetically.
+   * Serialize all fields of specified {@link IDoEntity} sorted alphabetically.
    */
-  protected void serializeAttributes(DoEntity entity, JsonGenerator gen, SerializerProvider provider) throws IOException {
+  protected void serializeAttributes(IDoEntity entity, JsonGenerator gen, SerializerProvider provider) throws IOException {
     TreeMap<String, DoNode<?>> sortedMap = new TreeMap<>(entity.all());
     for (Map.Entry<String, DoNode<?>> e : sortedMap.entrySet()) {
       serializeAttributes(e.getKey(), e.getValue(), gen, provider);
@@ -74,7 +74,7 @@ public class DoEntitySerializer extends StdSerializer<DoEntity> {
   }
 
   /**
-   * Serializes a collection attribute within {@link DoEntity}
+   * Serializes a collection attribute within {@link IDoEntity}
    */
   protected void serializeCollection(String attributeName, Collection<?> collection, JsonGenerator gen, SerializerProvider provider) throws IOException {
     Optional<JavaType> type = getJavaType(attributeName);
@@ -95,7 +95,7 @@ public class DoEntitySerializer extends StdSerializer<DoEntity> {
   }
 
   /**
-   * Serializes a map attribute within {@link DoEntity}
+   * Serializes a map attribute within {@link IDoEntity}
    */
   protected void serializeMap(String attributeName, Map<?, ?> map, JsonGenerator gen, SerializerProvider provider) throws IOException {
     Optional<JavaType> type = getJavaType(attributeName);

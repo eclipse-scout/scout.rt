@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
 /**
- * Helper class dealing with {@link DoEntity} and it's attributes.
+ * Helper class dealing with {@link IDoEntity} and it's attributes.
  */
 @ApplicationScoped
 public class DataObjectHelper {
@@ -26,21 +26,21 @@ public class DataObjectHelper {
   /**
    * Returns attribute {@code attributeName} converted to a {@link Integer} value.
    */
-  public Integer getIntegerAttribute(DoEntity entity, String attributeName) {
+  public Integer getIntegerAttribute(IDoEntity entity, String attributeName) {
     return TypeCastUtility.castValue(entity.get(attributeName), Integer.class);
   }
 
   /**
    * Returns attribute {@code attributeName} converted to a {@link Double} value.
    */
-  public Double getDoubleAttribute(DoEntity entity, String attributeName) {
+  public Double getDoubleAttribute(IDoEntity entity, String attributeName) {
     return TypeCastUtility.castValue(entity.get(attributeName), Double.class);
   }
 
   /**
    * Returns attribute {@code attributeName} converted to a {@link BigInteger} value.
    */
-  public BigInteger getBigIntegerAttribute(DoEntity entity, String attributeName) {
+  public BigInteger getBigIntegerAttribute(IDoEntity entity, String attributeName) {
     return TypeCastUtility.castValue(entity.get(attributeName), BigInteger.class);
   }
 
@@ -50,7 +50,7 @@ public class DataObjectHelper {
    * @see {@link IValueFormatConstants#parseDefaultDate} for default parse method for string-formatted using default
    *      format
    */
-  public Date getDateAttribute(DoEntity entity, String attributeName) {
+  public Date getDateAttribute(IDoEntity entity, String attributeName) {
     Object value = entity.get(attributeName);
     if (value instanceof String) {
       return IValueFormatConstants.parseDefaultDate.apply(value);
@@ -63,7 +63,7 @@ public class DataObjectHelper {
   /**
    * Returns attribute {@code attributeName} converted to a {@link UUID} value.
    */
-  public UUID getUuidAttribute(DoEntity entity, String attributeName) {
+  public UUID getUuidAttribute(IDoEntity entity, String attributeName) {
     Object value = entity.get(attributeName);
     if (value == null) {
       return null;
@@ -80,7 +80,7 @@ public class DataObjectHelper {
   /**
    * Returns attribute {@code attributeName} converted to a {@link Locale} value.
    */
-  public Locale getLocaleAttribute(DoEntity entity, String attributeName) {
+  public Locale getLocaleAttribute(IDoEntity entity, String attributeName) {
     Object value = entity.get(attributeName);
     if (value == null) {
       return null;
@@ -95,10 +95,10 @@ public class DataObjectHelper {
   }
 
   /**
-   * Returns attribute {@code attributeName} converted to a {@link DoEntity} value.
+   * Returns attribute {@code attributeName} converted to a {@link IDoEntity} value.
    */
-  public DoEntity getEntityAttribute(DoEntity entity, String propertyName) {
-    return entity.get(propertyName, DoEntity.class);
+  public IDoEntity getEntityAttribute(IDoEntity entity, String propertyName) {
+    return entity.get(propertyName, IDoEntity.class);
   }
 
   /**
@@ -107,7 +107,7 @@ public class DataObjectHelper {
    * @see IDataObjectMapper#writeValue(Object)
    * @see IDataObjectMapper#readValue(String, Class)
    */
-  public <T extends DoEntity> T clone(T value) {
+  public <T extends IDoEntity> T clone(T value) {
     if (value == null) {
       return null;
     }
@@ -120,7 +120,7 @@ public class DataObjectHelper {
   /**
    * @return Serialized, human-readable representation of specified {@code entity}
    */
-  public String toString(DoEntity entity) {
+  public String toString(IDoEntity entity) {
     if (entity == null) {
       return Objects.toString(entity);
     }

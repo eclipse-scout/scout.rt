@@ -15,7 +15,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+import org.eclipse.scout.rt.jackson.dataobject.fixture.ITestBaseEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestComplexEntityDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCustomImplementedEntityDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithInterface1Do;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
@@ -115,4 +118,25 @@ public class JacksonDataObjectMapperTest {
     DoEntityHolder<TestComplexEntityDo> holderClone = CloneUtility.createDeepCopyBySerializing(holder);
     s_utility.assertDoEntityEquals(testDo, holderClone.getValue());
   }
+
+  @Test
+  public void testCloneDoEntityWithInterface() throws Exception {
+    DoEntityHolder<ITestBaseEntityDo> holder = new DoEntityHolder<>();
+    holder.setValue(BEANS.get(TestEntityWithInterface1Do.class));
+    holder.getValue().stringAttribute().set("foo");
+
+    DoEntityHolder<ITestBaseEntityDo> holderClone = CloneUtility.createDeepCopyBySerializing(holder);
+    s_utility.assertDoEntityEquals(holder.getValue(), holderClone.getValue());
+  }
+
+  @Test
+  public void testCloneCustomImplementedEntityDo() throws Exception {
+    DoEntityHolder<TestCustomImplementedEntityDo> holder = new DoEntityHolder<>();
+    holder.setValue(BEANS.get(TestCustomImplementedEntityDo.class));
+    holder.getValue().put("stringAttribute", "foo");
+
+    DoEntityHolder<TestCustomImplementedEntityDo> holderClone = CloneUtility.createDeepCopyBySerializing(holder);
+    s_utility.assertDoEntityEquals(holder.getValue(), holderClone.getValue());
+  }
+
 }

@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.junit.Test;
 
 /**
- * Test cases for {@link DoEntity}
+ * Test cases for {@link DoEntity} and default implemented {@link IDoEntity} methods.
  */
 public class DoEntityTest {
 

@@ -22,7 +22,7 @@ public class DataObjectTypeResolverBuilder extends DefaultTypeResolverBuilder {
 
   @Override
   public boolean useForType(JavaType t) {
-    // do not write type information for "raw" DoEntity and DoTypedEntity instances
+    // do not write type information for "raw" DoEntity and DoTypedEntity instances (only concrete instances, without IDoEntity marker interface)
     return !DoEntity.class.equals(t.getRawClass()) && !DoTypedEntity.class.equals(t.getRawClass());
   }
 }

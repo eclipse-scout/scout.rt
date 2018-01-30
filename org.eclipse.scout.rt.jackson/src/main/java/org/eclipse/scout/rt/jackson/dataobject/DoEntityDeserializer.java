@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoList;
+import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -22,7 +23,7 @@ import com.fasterxml.jackson.databind.util.TokenBuffer;
 /**
  * Deserializer for {@link DoEntity} and all sub-classes.
  */
-public class DoEntityDeserializer extends StdDeserializer<DoEntity> {
+public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
   private static final long serialVersionUID = 1L;
 
   protected final LazyValue<DataObjectDefinitionRegistry> m_doEntityDefinitionRegistry = new LazyValue<>(DataObjectDefinitionRegistry.class);
@@ -32,29 +33,29 @@ public class DoEntityDeserializer extends StdDeserializer<DoEntity> {
   }
 
   @Override
-  public DoEntity deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+  public IDoEntity deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
     return deserializeDoEntity(p, ctxt, null);
   }
 
   @Override
-  public DoEntity deserializeWithType(JsonParser p, DeserializationContext ctxt, TypeDeserializer typeDeserializer) throws IOException {
+  public IDoEntity deserializeWithType(JsonParser p, DeserializationContext ctxt, TypeDeserializer typeDeserializer) throws IOException {
     return deserializeDoEntity(p, ctxt, typeDeserializer);
   }
 
-  protected DoEntity deserializeDoEntity(JsonParser p, DeserializationContext ctxt, TypeDeserializer typeDeserializer) throws IOException {
+  protected IDoEntity deserializeDoEntity(JsonParser p, DeserializationContext ctxt, TypeDeserializer typeDeserializer) throws IOException {
     switch (p.nextToken()) {
       case FIELD_NAME:
         return deserializeDoEntityAttributes(p, ctxt);
       case END_OBJECT:
         // empty object without attributes consists only of START_OBJECT and END_OBJECT token, return empty entity object
-        return (DoEntity) newObject(ctxt, handledType());
+        return IDoEntity.class.cast(newObject(ctxt, handledType()));
       default:
         throw ctxt.wrongTokenException(p, handledType(), JsonToken.FIELD_NAME, null);
     }
   }
 
   @SuppressWarnings({"resource", "squid:S2095"})
-  protected DoEntity deserializeDoEntityAttributes(JsonParser p, DeserializationContext ctxt) throws IOException {
+  protected IDoEntity deserializeDoEntityAttributes(JsonParser p, DeserializationContext ctxt) throws IOException {
     // search for type property within attributes of DoEntity, cache other fields within token buffer
     TokenBuffer tb = null;
     for (JsonToken t = p.currentToken(); t == JsonToken.FIELD_NAME; t = p.nextToken()) {
@@ -94,8 +95,8 @@ public class DoEntityDeserializer extends StdDeserializer<DoEntity> {
     return derializeDoEntityAttributes(p, ctxt, null); // null = use default entity type
   }
 
-  protected DoEntity derializeDoEntityAttributes(JsonParser p, DeserializationContext ctxt, String entityType) throws IOException {
-    DoEntity entity = resolveEntityType(ctxt, entityType);
+  protected IDoEntity derializeDoEntityAttributes(JsonParser p, DeserializationContext ctxt, String entityType) throws IOException {
+    IDoEntity entity = resolveEntityType(ctxt, entityType);
     p.setCurrentValue(entity);
 
     // read and deserialize all fields of entity
@@ -118,12 +119,12 @@ public class DoEntityDeserializer extends StdDeserializer<DoEntity> {
     return entity;
   }
 
-  protected DoEntity resolveEntityType(DeserializationContext ctxt, String entityType) throws IOException {
+  protected IDoEntity resolveEntityType(DeserializationContext ctxt, String entityType) throws IOException {
     if (entityType != null) {
       // try to lookup DoEntity with specified entityType
-      Class<?> clazz = m_doEntityDefinitionRegistry.get().fromTypeName(entityType);
+      Class<? extends IDoEntity> clazz = m_doEntityDefinitionRegistry.get().fromTypeName(entityType);
       if (clazz != null) {
-        return (DoEntity) newObject(ctxt, clazz);
+        return newObject(ctxt, clazz);
       }
       else {
         // use generic DoTypedEntity to preserve type information even if correct DoEntity class could not be resolved
@@ -131,10 +132,10 @@ public class DoEntityDeserializer extends StdDeserializer<DoEntity> {
       }
     }
     // fallback to handled type of deserializer
-    return (DoEntity) newObject(ctxt, handledType());
+    return IDoEntity.class.cast(newObject(ctxt, handledType()));
   }
 
-  protected JavaType findResolvedAttributeType(DoEntity entityInstance, String attributeName, boolean isObject, boolean isArray) {
+  protected JavaType findResolvedAttributeType(IDoEntity entityInstance, String attributeName, boolean isObject, boolean isArray) {
     return m_doEntityDefinitionRegistry.get().getAttributeDescription(entityInstance.getClass(), attributeName)
         .map(DataObjectAttributeDefinition::getType)
         .orElseGet(() -> findResolvedFallbackAttributeType(isObject, isArray));

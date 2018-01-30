@@ -7,8 +7,10 @@ package org.eclipse.scout.rt.platform.dataobject;
 import org.eclipse.scout.rt.platform.Bean;
 
 /**
- * Interface to a data mapper implementation handling the mapping between data objects  and their serialized String
+ * Interface to a data mapper implementation handling the mapping between data objects and their serialized String
  * representation.
+ * 
+ * @see IDoEntity
  * @see DoEntity
  */
 @Bean

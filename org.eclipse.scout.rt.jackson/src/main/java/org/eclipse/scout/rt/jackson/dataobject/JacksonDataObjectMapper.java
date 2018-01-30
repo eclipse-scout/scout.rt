@@ -9,8 +9,8 @@ import java.text.SimpleDateFormat;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.dataobject.IValueFormatConstants;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.LazyValue;
@@ -62,7 +62,7 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
   }
 
   /**
-   * Creates new {@link ObjectMapper} instance configured to be used with {@link DoEntity}.
+   * Creates new {@link ObjectMapper} instance configured to be used with {@link IDoEntity}.
    */
   protected ObjectMapper createObjectMapperInstance() {
     ObjectMapper om = new ObjectMapper();

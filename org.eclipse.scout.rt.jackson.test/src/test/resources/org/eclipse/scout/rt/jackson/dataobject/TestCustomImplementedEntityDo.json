@@ -1,0 +1,11 @@
+{
+  "_type" : "TestCustomImplementedEntity",
+  "dateAttribute" : "1990-10-20",
+  "doubleAttribute" : 1234567.89,
+  "itemAttribute" : {
+    "_type" : "TestItem",
+    "id" : "id-1",
+    "stringAttribute" : "foo-item-1"
+  },
+  "stringAttribute" : "foo"
+}

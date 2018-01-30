@@ -16,9 +16,9 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.dataobject.AttributeName;
-import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
+import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.dataobject.TypeName;
 import org.eclipse.scout.rt.platform.dataobject.ValueFormat;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
 /**
- * Registry and cache for all {@link DoEntity} and their declared attributes.
+ * Registry and cache for all {@link IDoEntity} and their declared attributes.
  */
 @ApplicationScoped
 public class DataObjectDefinitionRegistry {
@@ -46,11 +46,11 @@ public class DataObjectDefinitionRegistry {
    * mapping by its declared type name, but is then on-the-fly replaced with the correct replacing class when a lookup
    * using {@link #fromTypeName(String)} method is performed.
    */
-  private final Map<String, Class<? extends DoEntity>> m_typeNameToClassMap = new HashMap<>();
-  private final Map<Class<? extends DoEntity>, String> m_classToTypeName = new HashMap<>();
+  private final Map<String, Class<? extends IDoEntity>> m_typeNameToClassMap = new HashMap<>();
+  private final Map<Class<? extends IDoEntity>, String> m_classToTypeName = new HashMap<>();
 
-  /** Map of {@link DoEntity} class to its attributes map */
-  private final Map<Class<? extends DoEntity>, Map<String, DataObjectAttributeDefinition>> m_classAttributeMap = new ConcurrentHashMap<>();
+  /** Map of {@link IDoEntity} class to its attributes map */
+  private final Map<Class<? extends IDoEntity>, Map<String, DataObjectAttributeDefinition>> m_classAttributeMap = new ConcurrentHashMap<>();
 
   @PostConstruct
   public void init() {
@@ -59,31 +59,30 @@ public class DataObjectDefinitionRegistry {
         .stream()
         .map(ci -> ci.resolveClass())
         .forEach(c -> registerClass(c));
-    LOG.info("Registry initialized, found {} {} classes with @{} annotation.", m_typeNameToClassMap.size(), DoEntity.class.getSimpleName(), TypeName.class.getSimpleName());
+    LOG.info("Registry initialized, found {} {} classes with @{} annotation.", m_typeNameToClassMap.size(), IDoEntity.class.getSimpleName(), TypeName.class.getSimpleName());
   }
 
   /**
    * Adds one class to registry.
    */
   protected void registerClass(Class<?> clazz) {
-    if (DoEntity.class.isAssignableFrom(clazz)) {
-      @SuppressWarnings("unchecked")
-      Class<? extends DoEntity> entityClass = (Class<? extends DoEntity>) clazz;
+    if (IDoEntity.class.isAssignableFrom(clazz)) {
+      Class<? extends IDoEntity> entityClass = clazz.asSubclass(IDoEntity.class);
       String name = jsonAnnotationName(clazz);
       String registeredName = m_classToTypeName.put(entityClass, name);
-      Class<? extends DoEntity> registeredClass = m_typeNameToClassMap.put(name, entityClass);
+      Class<? extends IDoEntity> registeredClass = m_typeNameToClassMap.put(name, entityClass);
       checkDuplicateClassMapping(clazz, name, registeredName, registeredClass);
       LOG.debug("Registered class {} with typename '{}'", entityClass, name);
     }
     else {
-      LOG.warn("Class {} is annotated with @{} but is not an instance of {}, skip registration", clazz.getName(), TypeName.class.getSimpleName(), DoEntity.class);
+      LOG.warn("Class {} is annotated with @{} but is not an instance of {}, skip registration", clazz.getName(), TypeName.class.getSimpleName(), IDoEntity.class);
     }
   }
 
   /**
-   * Checks for {@link DoEntity} classes with duplicated {@link TypeName} annotation values.
+   * Checks for {@link IDoEntity} classes with duplicated {@link TypeName} annotation values.
    */
-  protected void checkDuplicateClassMapping(Class<?> clazz, String name, String existingName, Class<? extends DoEntity> existingClass) {
+  protected void checkDuplicateClassMapping(Class<?> clazz, String name, String existingName, Class<? extends IDoEntity> existingClass) {
     Assertions.assertNull(existingClass, "{} and {} have the same type '{}', use an unique @{} annotation value.", clazz, existingClass, name, TypeName.class.getSimpleName());
     Assertions.assertNull(existingName, "{} was already registered with type name {}, register each class only once.", clazz, existingName, TypeName.class.getSimpleName());
   }
@@ -105,6 +104,7 @@ public class DataObjectDefinitionRegistry {
    *         hierarchy is searched for the first available type name.
    */
   public String toTypeName(Class<?> clazz) {
+    // FIXME [16.0] pbz: [JSON] check if we should assert/warn if name == null or use default json name instead?
     while (true) {
       String name = m_classToTypeName.get(clazz);
       if (name != null) {
@@ -124,12 +124,12 @@ public class DataObjectDefinitionRegistry {
    * @return class for specified {@code typeName}, if class is uniquely resolvable as scout bean, else {@code null}
    * @see IBeanManager#uniqueBean(Class)
    */
-  public Class<?> fromTypeName(String typeName) {
-    Class<?> rawClass = m_typeNameToClassMap.get(typeName);
+  public Class<? extends IDoEntity> fromTypeName(String typeName) {
+    Class<? extends IDoEntity> rawClass = m_typeNameToClassMap.get(typeName);
     if (rawClass != null) {
       // check if requested class is a valid registered bean, and the lookup to a concrete bean class is unique
       if (BEANS.getBeanManager().isBean(rawClass)) {
-        IBean<?> bean = BEANS.getBeanManager().uniqueBean(rawClass);
+        IBean<? extends IDoEntity> bean = BEANS.getBeanManager().uniqueBean(rawClass);
         if (bean != null) {
           return bean.getBeanClazz();
         }
@@ -145,9 +145,9 @@ public class DataObjectDefinitionRegistry {
   }
 
   /**
-   * @return Map with all type name to {@link DoEntity} class mappings
+   * @return Map with all type name to {@link IDoEntity} class mappings
    */
-  public Map<String, Class<? extends DoEntity>> getTypeNameToClassMap() {
+  public Map<String, Class<? extends IDoEntity>> getTypeNameToClassMap() {
     return Collections.unmodifiableMap(m_typeNameToClassMap);
   }
 
@@ -155,7 +155,7 @@ public class DataObjectDefinitionRegistry {
    * @return Optional of {@link DataObjectAttributeDefinition} for specified {@code enttiyClass} and
    *         {@code attributeName}
    */
-  public Optional<DataObjectAttributeDefinition> getAttributeDescription(Class<? extends DoEntity> entityClass, String attributeName) {
+  public Optional<DataObjectAttributeDefinition> getAttributeDescription(Class<? extends IDoEntity> entityClass, String attributeName) {
     ensureEntityDefinitionLoaded(entityClass);
     return Optional.ofNullable(m_classAttributeMap.get(entityClass).get(attributeName));
   }
@@ -163,7 +163,7 @@ public class DataObjectDefinitionRegistry {
   /**
    * @return Map with all name/attribute definitions for specified {@code entityClass}
    */
-  public Map<String, DataObjectAttributeDefinition> getAttributesDescription(Class<? extends DoEntity> entityClass) {
+  public Map<String, DataObjectAttributeDefinition> getAttributesDescription(Class<? extends IDoEntity> entityClass) {
     ensureEntityDefinitionLoaded(entityClass);
     return Collections.unmodifiableMap(m_classAttributeMap.get(entityClass));
   }
@@ -171,7 +171,7 @@ public class DataObjectDefinitionRegistry {
   /**
    * Ensures that attribute definition for specified {@code entityClass} is loaded and cached.
    */
-  protected void ensureEntityDefinitionLoaded(Class<? extends DoEntity> entityClass) {
+  protected void ensureEntityDefinitionLoaded(Class<? extends IDoEntity> entityClass) {
     if (!m_classAttributeMap.containsKey(entityClass)) {
       registerAllAttributes(entityClass);
     }
@@ -180,7 +180,7 @@ public class DataObjectDefinitionRegistry {
   /**
    * Add entity class to attribute definition registry
    */
-  protected void registerAllAttributes(Class<? extends DoEntity> entityClass) {
+  protected void registerAllAttributes(Class<? extends IDoEntity> entityClass) {
     LOG.debug("Adding attributes of class {} to registry.", entityClass);
     Map<String, DataObjectAttributeDefinition> attributes = new HashMap<>();
     for (Method method : entityClass.getMethods()) {

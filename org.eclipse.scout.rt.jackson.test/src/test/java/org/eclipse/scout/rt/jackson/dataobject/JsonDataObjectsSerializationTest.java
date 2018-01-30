@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.eclipse.scout.rt.jackson.dataobject.fixture.ITestBaseEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestBigIntegerDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCollectionsDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestComplexEntityDo;
@@ -35,6 +36,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestComplexEntityPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCoreExample1Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCoreExample2Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCoreExample3Do;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCustomImplementedEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDateDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDoValuePojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDuplicatedAttributeDo;
@@ -42,6 +44,8 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestElectronicAddressDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEmptyObject;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithArrayDoValueDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithGenericValuesDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithInterface1Do;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithInterface2Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithListsDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithNestedEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestGenericDo;
@@ -71,6 +75,7 @@ import org.eclipse.scout.rt.platform.dataobject.DataObjectHelper;
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
+import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.dataobject.IValueFormatConstants;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
@@ -528,7 +533,7 @@ public class JsonDataObjectsSerializationTest {
     assertEquals(expected.getLocaleAttribute(), s_dataObjectHelper.getLocaleAttribute(entity, "localeAttribute"));
 
     // check nested DoEntity
-    DoEntity itemAttribute = s_dataObjectHelper.getEntityAttribute(entity, "itemAttribute");
+    IDoEntity itemAttribute = s_dataObjectHelper.getEntityAttribute(entity, "itemAttribute");
     assertEquals(expected.getItemAttribute().getId(), itemAttribute.getString("id"));
     assertEquals(expected.getItemAttribute().getStringAttribute(), itemAttribute.getString("stringAttribute"));
 
@@ -1363,6 +1368,63 @@ public class JsonDataObjectsSerializationTest {
     assertEquals("bar", marshalled.getGenericStringAttribute().genericAttribute().get());
     assertEquals(new Double("789.123"), marshalled.getGenericDoubleAttribute().genericAttribute().get());
     s_testHelper.assertDoEntityEquals(genericDo, marshalled);
+  }
+
+  // ------------------------------------ entity with interface definition tests -----------------------------
+
+  @Test
+  public void testSerializeDeserialize_DoEntityWithInterface() throws Exception {
+    ITestBaseEntityDo baseEntity = BEANS.get(TestEntityWithInterface1Do.class)
+        .withDoubleAttribute(42.0)
+        .withStringAttribute("foo")
+        .withItemDoAttribute(createTestItemDo("id-1", "value-1"))
+        .withDoubleListAttribute(Arrays.asList(42.0, 43.0))
+        .withStringListAttribute("foo", "bar", "baz")
+        .withItemDoListAttribute(createTestItemDo("id-2", "value-2"), createTestItemDo("id-3", "value-3"));
+
+    String json = s_dataObjectMapper.writeValueAsString(baseEntity);
+    assertJsonResourceEquals("TestEntityWithInterface1Do.json", json);
+
+    ITestBaseEntityDo marshalled = s_dataObjectMapper.readValue(json, ITestBaseEntityDo.class);
+    s_testHelper.assertDoEntityEquals(baseEntity, marshalled);
+  }
+
+  @Test
+  public void testSerializeDeserialize_DoEntityWithInterfaceEx() throws Exception {
+    ITestBaseEntityDo baseEntity = BEANS.get(TestEntityWithInterface2Do.class)
+        .withDoubleAttribute(42.0)
+        .withStringAttribute("foo")
+        .withItemDoAttribute(createTestItemDo("id-1", "value-1"))
+        .withDoubleListAttribute(Arrays.asList(42.0, 43.0))
+        .withStringListAttribute("foo", "bar", "baz")
+        .withItemDoListAttribute(createTestItemDo("id-2", "value-2"), createTestItemDo("id-3", "value-3"))
+        .withStringAttributeEx("fooEx");
+
+    String json = s_dataObjectMapper.writeValueAsString(baseEntity);
+    assertJsonResourceEquals("TestEntityWithInterface2Do.json", json);
+
+    ITestBaseEntityDo marshalled = s_dataObjectMapper.readValue(json, ITestBaseEntityDo.class);
+    s_testHelper.assertDoEntityEquals(baseEntity, marshalled);
+
+    IDoEntity marshalledDoEntity = s_dataObjectMapper.readValue(json, IDoEntity.class);
+    s_testHelper.assertDoEntityEquals(baseEntity, marshalledDoEntity);
+  }
+
+  @Test
+  public void testSerializeDeserialize_CustomImplementedEntity() throws Exception {
+    TestCustomImplementedEntityDo entity = BEANS.get(TestCustomImplementedEntityDo.class);
+    entity.put("stringAttribute", "foo");
+    entity.put("doubleAttribute", new Double(1234567.89));
+    entity.put("itemAttribute", createTestItemDo("id-1", "foo-item-1"));
+    entity.dateAttribute().set(DATE_TRUNCATED);
+
+    String json = s_dataObjectMapper.writeValueAsString(entity);
+    System.out.println(json);
+
+    assertJsonResourceEquals("TestCustomImplementedEntityDo.json", json);
+
+    IDoEntity marshalledDoEntity = s_dataObjectMapper.readValue(json, IDoEntity.class);
+    s_testHelper.assertDoEntityEquals(entity, marshalledDoEntity);
   }
 
   // ------------------------------------ common test helper methods ------------------------------------

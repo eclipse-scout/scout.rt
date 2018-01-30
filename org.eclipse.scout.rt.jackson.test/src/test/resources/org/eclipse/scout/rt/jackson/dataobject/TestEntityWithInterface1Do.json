@@ -1,0 +1,21 @@
+{
+  "_type" : "TestEntityWithInterface1",
+  "doubleAttribute" : 42.0,
+  "doubleListAttribute" : [ 42.0, 43.0 ],
+  "itemDoAttribute" : {
+    "_type" : "TestItem",
+    "id" : "id-1",
+    "stringAttribute" : "value-1"
+  },
+  "itemDoListAttribute" : [ {
+    "_type" : "TestItem",
+    "id" : "id-2",
+    "stringAttribute" : "value-2"
+  }, {
+    "_type" : "TestItem",
+    "id" : "id-3",
+    "stringAttribute" : "value-3"
+  } ],
+  "stringAttribute" : "foo",
+  "stringListAttribute" : [ "foo", "bar", "baz" ]
+}

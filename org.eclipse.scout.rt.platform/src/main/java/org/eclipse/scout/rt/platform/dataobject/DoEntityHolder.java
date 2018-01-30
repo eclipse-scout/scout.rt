@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 /**
  * Serializable {@link IHolder} implementation for {@link DoEntity} subclasses
  */
-public class DoEntityHolder<T extends DoEntity> implements IHolder<T>, Serializable {
+public class DoEntityHolder<T extends IDoEntity> implements IHolder<T>, Serializable {
   private static final long serialVersionUID = 1L;
 
   private transient T m_value;

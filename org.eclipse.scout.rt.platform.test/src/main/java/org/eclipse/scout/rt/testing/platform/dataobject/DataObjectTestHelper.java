@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.dataobject.DoNode;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
+import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 
 /**
  * Helper for unit tests dealing with {@link DoEntity}.
@@ -34,7 +35,7 @@ public class DataObjectTestHelper {
    * Asserts (deep) equality for specified {@link DoEntity} objects and additionally asserts, that concrete
    * {@link DoEntity} class of expected entity and class of actual {@link DoEntity} is identical.
    */
-  public void assertDoEntityEquals(DoEntity expected, DoEntity actual) {
+  public void assertDoEntityEquals(IDoEntity expected, IDoEntity actual) {
     assertDoEntityEquals(expected, actual, true);
   }
 
@@ -44,7 +45,7 @@ public class DataObjectTestHelper {
    * @param if
    *          {@code true} concrete class of both {@link DoEntity} must be the identical
    */
-  public void assertDoEntityEquals(DoEntity expected, DoEntity actual, boolean assertClassEquals) {
+  public void assertDoEntityEquals(IDoEntity expected, IDoEntity actual, boolean assertClassEquals) {
     if (assertClassEquals) {
       assertEquals(expected.getClass(), actual.getClass());
     }
@@ -55,7 +56,7 @@ public class DataObjectTestHelper {
     assertMapKeyEqualsAttributeName(expected);
   }
 
-  protected void assertMapKeyEqualsAttributeName(DoEntity actual) {
+  protected void assertMapKeyEqualsAttributeName(IDoEntity actual) {
     for (String key : actual.all().keySet()) {
       assertEquals("key of attribute map is not equals to node attribute name", key, actual.getNode(key).getAttributeName());
     }
@@ -66,8 +67,8 @@ public class DataObjectTestHelper {
    * custom equality check.
    */
   public void assertObjectEquals(Object expected, Object actual, boolean assertClassEquals) {
-    if (expected instanceof DoEntity) {
-      assertDoEntityEquals((DoEntity) expected, (DoEntity) actual, assertClassEquals);
+    if (expected instanceof IDoEntity) {
+      assertDoEntityEquals((IDoEntity) expected, (IDoEntity) actual, assertClassEquals);
     }
     else if (expected instanceof DoValue) {
       assertEquals(expected.getClass(), actual.getClass());

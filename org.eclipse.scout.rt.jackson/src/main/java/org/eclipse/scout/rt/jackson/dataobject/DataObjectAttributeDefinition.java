@@ -3,12 +3,12 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
-import org.eclipse.scout.rt.platform.dataobject.DoEntity;
+import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 
 import com.fasterxml.jackson.databind.JavaType;
 
 /**
- * Holder for name, type, format definition and accessor method of one {@link DoEntity} attribute.
+ * Holder for name, type, format definition and accessor method of one {@link IDoEntity} attribute.
  */
 public class DataObjectAttributeDefinition {
   private final String m_name;

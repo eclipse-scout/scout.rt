@@ -3,9 +3,9 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import java.util.Date;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
+import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationConfig;
@@ -33,7 +33,7 @@ public class DataObjectDeserializers extends Deserializers.Base {
 
   @Override
   public JsonDeserializer<?> findBeanDeserializer(JavaType type, DeserializationConfig config, BeanDescription beanDesc) throws JsonMappingException {
-    if (DoEntity.class.isAssignableFrom(type.getRawClass())) {
+    if (IDoEntity.class.isAssignableFrom(type.getRawClass())) {
       return new DoEntityDeserializer(type.getRawClass());
     }
     else if (DoList.class.isAssignableFrom(type.getRawClass())) {
