@@ -14,6 +14,7 @@ scout.StringField = function() {
   this.format;
   this.hasAction = false;
   this.inputMasked = false;
+  this.inputObfuscated = false;
   this.maxLength = 4000;
   this.multilineText = false;
   this.selectionStart = 0;
@@ -97,6 +98,10 @@ scout.StringField.prototype._onFieldBlur = function() {
   scout.StringField.parent.prototype._onFieldBlur.call(this);
   if (this.multilineText) {
     this._updateSelection();
+  }
+  if (this.inputObfuscated) {
+    // Restore obfuscated display text.
+    this.$field.val(this.displayText);
   }
 };
 
@@ -210,6 +215,16 @@ scout.StringField.prototype._renderInputMasked = function() {
   this.$field.attr('type', (this.inputMasked ? 'password' : 'text'));
 };
 
+scout.StringField.prototype._renderInputObfuscated = function() {
+  if (this.inputObfuscated && this.focused) {
+    // If a new display text is set (e.g. because value in model changed) and field is focused,
+    // do not display new display text but clear content (as in _onFieldFocus).
+    // Depending on order of property render, either this or _renderDisplayText is called first
+    // (inputObfuscated flag might be still in the old state in _renderDisplayText).
+    this.$field.val('');
+  }
+};
+
 scout.StringField.prototype.setHasAction = function(hasAction) {
   this.setProperty('hasAction', hasAction);
 };
@@ -273,6 +288,15 @@ scout.StringField.prototype._renderSpellCheckEnabled = function() {
  * @override
  */
 scout.StringField.prototype._renderDisplayText = function() {
+  if (this.inputObfuscated && this.focused) {
+    // If a new display text is set (e.g. because value in model changed) and field is focused,
+    // do not display new display text but clear content (as in _onFieldFocus).
+    // Depending on order of property render, either this or _renderInputObfuscated is called first
+    // (inputObfuscated flag might be still in the old state in this method).
+    this.$field.val('');
+    return;
+  }
+
   var displayText = scout.strings.nvl(this.displayText);
   var oldDisplayText = scout.strings.nvl(this.$field.val());
   var oldSelection = this._getSelection();
@@ -303,6 +327,10 @@ scout.StringField.prototype._insertText = function(textToInsert) {
     return;
   }
   var text = this.$field.val();
+  if (this.inputObfuscated) {
+    // Use empty text when input is obfuscated, otherwise text will be added to obfuscated text.
+    text = '';
+  }
 
   // Prevent insert if new length would exceed maxLength to prevent unintended deletion of characters at the end of the string
   if (textToInsert.length + text.length > this.maxLength) {
@@ -439,6 +467,59 @@ scout.StringField.prototype._validateValue = function(value) {
 /**
  * @override ValueField.js
  */
+scout.StringField.prototype._clear = function() {
+  scout.StringField.parent.prototype._clear.call(this);
+
+  // Disable obfuscation when user clicks on clear icon.
+  this.inputObfuscated = false;
+};
+
+/**
+ * @override ValueField.js
+ */
 scout.StringField.prototype._updateEmpty = function() {
   this.empty = scout.strings.empty(this.value);
+};
+
+/**
+ * @override ValueField.js
+ */
+scout.StringField.prototype.acceptInput = function(whileTyping) {
+  var displayText = scout.nvl(this._readDisplayText(), '');
+  if (this.inputObfuscated && displayText !== '') {
+    // Disable obfuscation if user has typed text (on focus, field will be cleared if obfuscated, so any typed text is new text).
+    this.inputObfuscated = false;
+  }
+
+  scout.StringField.parent.prototype.acceptInput.call(this, whileTyping);
+};
+
+/**
+ * @override BasicField.js
+ */
+scout.StringField.prototype._onFieldFocus = function(event) {
+  scout.StringField.parent.prototype._onFieldFocus.call(this, event);
+  if (this.inputObfuscated) {
+    this.$field.val('');
+
+    // Without properly setting selection start and end, cursor is not visible in IE and Firefox.
+    setTimeout(function() {
+      this.$field[0].selectionStart = 0;
+      this.$field[0].selectionEnd = 0;
+    }.bind(this));
+  }
+};
+
+/**
+ * @override BasicField.js
+ */
+scout.StringField.prototype._checkDisplayTextChanged = function(displayText, whileTyping) {
+  var displayTextChanged = scout.StringField.parent.prototype._checkDisplayTextChanged.call(this, displayText, whileTyping);
+
+  // Display text hasn't changed if input is obfuscated and current display text is empty (because field will be cleared if user focuses obfuscated text field).
+  if (displayTextChanged && this.inputObfuscated && displayText === '') {
+    return false;
+  }
+
+  return displayTextChanged;
 };
