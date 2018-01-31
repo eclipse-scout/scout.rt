@@ -77,7 +77,7 @@ public final class BinaryResource implements Serializable {
         contentType = FileUtility.getMimeType(filename);
       }
       else if (content != null && content.length > 0) {
-        File f = IOUtility.createTempFile("file", content);
+        File f = IOUtility.createTempFile(null, content);
         contentType = FileUtility.getMimeType(f.toPath());
         f.delete();
       }
