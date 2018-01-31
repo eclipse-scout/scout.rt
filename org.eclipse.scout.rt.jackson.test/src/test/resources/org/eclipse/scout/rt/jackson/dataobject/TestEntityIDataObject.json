@@ -1,0 +1,9 @@
+{
+  "doubleAttribute" : 1234567.89,
+  "itemDoAttribute" : {
+    "_type" : "TestItem",
+    "id" : "id",
+    "stringAttribute" : "value"
+  },
+  "stringAttribute" : "value-string"
+}

@@ -19,7 +19,7 @@ import java.util.stream.Stream;
  *
  * @see DoEntity#doList(String) creator method
  */
-public final class DoList<V> extends DoNode<List<V>> implements Iterable<V> {
+public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Iterable<V> {
 
   public DoList() {
     this(null);

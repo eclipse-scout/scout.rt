@@ -56,7 +56,7 @@ public class DoEntityHolder<T extends IDoEntity> implements IHolder<T>, Serializ
   private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
     String text = (String) stream.readObject();
     @SuppressWarnings("unchecked")
-    T value = (T) BEANS.get(IDataObjectMapper.class).readValue(text, DoEntity.class);
+    T value = (T) BEANS.get(IDataObjectMapper.class).readValue(text, IDoEntity.class);
     setValue(value);
   }
 

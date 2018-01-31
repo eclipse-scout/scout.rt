@@ -75,6 +75,7 @@ import org.eclipse.scout.rt.platform.dataobject.DataObjectHelper;
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
+import org.eclipse.scout.rt.platform.dataobject.IDataObject;
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.dataobject.IValueFormatConstants;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -1370,7 +1371,7 @@ public class JsonDataObjectsSerializationTest {
     s_testHelper.assertDoEntityEquals(genericDo, marshalled);
   }
 
-  // ------------------------------------ entity with interface definition tests -----------------------------
+  // ------------------------------------ entity with IDoEntity interface definition tests -----------------------------
 
   @Test
   public void testSerializeDeserialize_DoEntityWithInterface() throws Exception {
@@ -1419,12 +1420,100 @@ public class JsonDataObjectsSerializationTest {
     entity.dateAttribute().set(DATE_TRUNCATED);
 
     String json = s_dataObjectMapper.writeValueAsString(entity);
-    System.out.println(json);
-
     assertJsonResourceEquals("TestCustomImplementedEntityDo.json", json);
 
     IDoEntity marshalledDoEntity = s_dataObjectMapper.readValue(json, IDoEntity.class);
     s_testHelper.assertDoEntityEquals(entity, marshalledDoEntity);
+  }
+
+  @Test
+  public void testSerializeDeserialize_IDoEntity() throws Exception {
+    IDoEntity entity = BEANS.get(DoEntity.class);
+    entity.put("attribute", "value");
+    String json = s_dataObjectMapper.writeValueAsString(entity);
+
+    IDoEntity marshalledDoEntity = s_dataObjectMapper.readValue(json, IDoEntity.class);
+    assertEquals(DoEntity.class, marshalledDoEntity.getClass());
+    s_testHelper.assertDoEntityEquals(entity, marshalledDoEntity);
+  }
+
+  // ------------------------------------ IDataObject interface tests -----------------------------------
+
+  @Test
+  public void testSerializeDeserialize_EmptyIDataObject() throws Exception {
+    IDataObject marshalledEntity = s_dataObjectMapper.readValue("{}", IDataObject.class);
+    assertEquals(DoEntity.class, marshalledEntity.getClass());
+    assertTrue(DoEntity.class.cast(marshalledEntity).all().isEmpty());
+
+    IDataObject marshalledList = s_dataObjectMapper.readValue("[]", IDataObject.class);
+    assertEquals(DoList.class, marshalledList.getClass());
+    assertTrue(DoList.class.cast(marshalledList).isEmpty());
+  }
+
+  @Test
+  public void testSerializeDeserialize_EntityIDataObject() throws Exception {
+    DoEntity entity = BEANS.get(DoEntity.class);
+    entity.put("stringAttribute", "value-string");
+    entity.put("doubleAttribute", 1234567.89);
+    entity.put("itemDoAttribute", createTestItemDo("id", "value"));
+
+    IDataObject dataObject = entity;
+    String json = s_dataObjectMapper.writeValueAsString(dataObject);
+    assertJsonResourceEquals("TestEntityIDataObject.json", json);
+
+    IDataObject marshalled = s_dataObjectMapper.readValue(json, IDataObject.class);
+    s_testHelper.assertDoEntityEquals(entity, (IDoEntity) marshalled);
+  }
+
+  @Test
+  public void testSerializeDeserialize_StringListIDataObject() throws Exception {
+    DoList<String> list = new DoList<>();
+    list.add("foo");
+    list.add("bar");
+
+    IDataObject dataObject = list;
+    String json = s_dataObjectMapper.writeValueAsString(dataObject);
+    assertJsonResourceEquals("TestStringListIDataObject.json", json);
+
+    IDataObject marshalled = s_dataObjectMapper.readValue(json, IDataObject.class);
+    s_testHelper.assertDoListEquals(list, DoList.class.cast(marshalled));
+  }
+
+  @Test
+  public void testSerializeDeserialize_ItemDoListIDataObject() throws Exception {
+    DoList<TestItemDo> list = new DoList<>();
+    list.add(createTestItemDo("id-1", "string-1"));
+    list.add(createTestItemDo("id-2", "string-2"));
+
+    IDataObject dataObject = list;
+    String json = s_dataObjectMapper.writeValueAsString(dataObject);
+    assertJsonResourceEquals("TestItemDoListIDataObject.json", json);
+
+    IDataObject marshalled = s_dataObjectMapper.readValue(json, IDataObject.class);
+    s_testHelper.assertDoListEquals(list, DoList.class.cast(marshalled));
+  }
+
+  @Test
+  public void testSerializeDeserialize_ObjectListIDataObject() throws Exception {
+    DoList<Object> list = new DoList<>();
+    list.add("foo");
+    TestItemDo item1 = createTestItemDo("id-1", "string-1");
+    list.add(item1);
+    list.add("bar");
+    TestItemDo item2 = createTestItemDo("id-2", "string-2");
+    list.add(item2);
+
+    IDataObject dataObject = list;
+    String json = s_dataObjectMapper.writeValueAsString(dataObject);
+    assertJsonResourceEquals("TestObjectListIDataObject.json", json);
+
+    IDataObject marshalled = s_dataObjectMapper.readValue(json, IDataObject.class);
+    s_testHelper.assertDoListEquals(list, DoList.class.cast(marshalled));
+    DoList marshalledList = DoList.class.cast(marshalled);
+    assertEquals("foo", marshalledList.get(0));
+    s_testHelper.assertDoEntityEquals(item1, TestItemDo.class.cast(marshalledList.get(1)));
+    assertEquals("bar", marshalledList.get(2));
+    s_testHelper.assertDoEntityEquals(item2, TestItemDo.class.cast(marshalledList.get(3)));
   }
 
   // ------------------------------------ common test helper methods ------------------------------------

@@ -1,0 +1,9 @@
+[ "foo", {
+  "_type" : "TestItem",
+  "id" : "id-1",
+  "stringAttribute" : "string-1"
+}, "bar", {
+  "_type" : "TestItem",
+  "id" : "id-2",
+  "stringAttribute" : "string-2"
+} ]

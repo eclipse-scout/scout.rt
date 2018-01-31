@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
  * @see {@link DoEntity} for a default base class implementation
  */
 @Bean
-public interface IDoEntity {
+public interface IDoEntity extends IDataObject {
 
   /**
    * @return Node of attribute {@code attributeName} or {@code null}, if attribute is not available.

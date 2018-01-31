@@ -56,6 +56,25 @@ public class DataObjectTestHelper {
     assertMapKeyEqualsAttributeName(expected);
   }
 
+  /**
+   * Asserts (deep) equality for specified {@link DoList} objects and additionally asserts, that all nested concrete
+   * {@link DoEntity} classes within the specified lists are identical.
+   */
+  public void assertDoListEquals(DoList<?> expected, DoList<?> actual) {
+    assertDoListEquals(expected, actual, true);
+  }
+
+  /**
+   * Asserts (deep) equality for specified {@link DoList} objects.
+   *
+   * @param if
+   *          {@code true} concrete class of all nested {@link DoEntity}'s must be the identical
+   */
+  public void assertDoListEquals(DoList<?> expected, DoList<?> actual, boolean assertClassEquals) {
+    assertEquals(expected.getClass(), actual.getClass());
+    assertObjectEquals(expected.get(), actual.get(), assertClassEquals);
+  }
+
   protected void assertMapKeyEqualsAttributeName(IDoEntity actual) {
     for (String key : actual.all().keySet()) {
       assertEquals("key of attribute map is not equals to node attribute name", key, actual.getNode(key).getAttributeName());
@@ -76,7 +95,7 @@ public class DataObjectTestHelper {
     }
     else if (expected instanceof DoList) {
       assertEquals(expected.getClass(), actual.getClass());
-      assertObjectEquals(((DoList<?>) expected).get(), ((DoList<?>) actual).get(), assertClassEquals);
+      assertDoListEquals(DoList.class.cast(expected), DoList.class.cast(actual), assertClassEquals);
     }
     else if (expected instanceof Collection) {
       Collection<?> expectedCollection = (Collection<?>) expected;

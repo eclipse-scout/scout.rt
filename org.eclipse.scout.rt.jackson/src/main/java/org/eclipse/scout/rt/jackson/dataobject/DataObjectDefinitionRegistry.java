@@ -59,7 +59,7 @@ public class DataObjectDefinitionRegistry {
         .stream()
         .map(ci -> ci.resolveClass())
         .forEach(c -> registerClass(c));
-    LOG.info("Registry initialized, found {} {} classes with @{} annotation.", m_typeNameToClassMap.size(), IDoEntity.class.getSimpleName(), TypeName.class.getSimpleName());
+    LOG.info("Registry initialized, found {} {} implementations with @{} annotation.", m_typeNameToClassMap.size(), IDoEntity.class.getSimpleName(), TypeName.class.getSimpleName());
   }
 
   /**

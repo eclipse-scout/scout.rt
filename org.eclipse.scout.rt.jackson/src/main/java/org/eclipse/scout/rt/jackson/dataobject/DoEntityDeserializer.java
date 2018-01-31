@@ -28,8 +28,11 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
 
   protected final LazyValue<DataObjectDefinitionRegistry> m_doEntityDefinitionRegistry = new LazyValue<>(DataObjectDefinitionRegistry.class);
 
-  public DoEntityDeserializer(Class<?> type) {
+  protected Class<? extends IDoEntity> m_handledType;
+
+  public DoEntityDeserializer(Class<? extends IDoEntity> type) {
     super(type);
+    m_handledType = type;
   }
 
   @Override
@@ -48,9 +51,9 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
         return deserializeDoEntityAttributes(p, ctxt);
       case END_OBJECT:
         // empty object without attributes consists only of START_OBJECT and END_OBJECT token, return empty entity object
-        return IDoEntity.class.cast(newObject(ctxt, handledType()));
+        return newObject(ctxt, m_handledType);
       default:
-        throw ctxt.wrongTokenException(p, handledType(), JsonToken.FIELD_NAME, null);
+        throw ctxt.wrongTokenException(p, m_handledType, JsonToken.FIELD_NAME, null);
     }
   }
 
@@ -132,7 +135,7 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       }
     }
     // fallback to handled type of deserializer
-    return IDoEntity.class.cast(newObject(ctxt, handledType()));
+    return newObject(ctxt, m_handledType);
   }
 
   protected JavaType findResolvedAttributeType(IDoEntity entityInstance, String attributeName, boolean isObject, boolean isArray) {
@@ -157,10 +160,14 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
     }
   }
 
-  protected <T> T newObject(DeserializationContext ctxt, Class<T> c) throws IOException {
-    if (BEANS.getBeanManager().isBean(c)) {
-      return BEANS.get(c);
+  protected <T extends IDoEntity> T newObject(DeserializationContext ctxt, Class<T> entityType) throws IOException {
+    if (entityType == IDoEntity.class) {
+      // fallback to default DoEntity implementation, if handled entity type is IDoEntity (e.g. class instance is unspecified)
+      return entityType.cast(BEANS.get(DoEntity.class));
     }
-    throw JsonMappingException.from(ctxt, "Could not instantiate bean,  " + c + " is not a Scout bean");
+    else if (BEANS.getBeanManager().isBean(entityType)) {
+      return BEANS.get(entityType);
+    }
+    throw JsonMappingException.from(ctxt, "Could not instantiate bean,  " + entityType + " is not a Scout bean");
   }
 }
