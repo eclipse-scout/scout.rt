@@ -81,6 +81,16 @@ scout.GroupBox.prototype.insertFieldBefore = function(field, sibling) {
   this.setFields(newFields);
 };
 
+scout.GroupBox.prototype.insertFieldAfter = function(field, sibling) {
+  var newFields = this.fields.slice(),
+    index = this.fields.length;
+  if (sibling) {
+    index = this.fields.indexOf(sibling);
+  }
+  newFields.splice(index + 1, 0, field);
+  this.setFields(newFields);
+};
+
 scout.GroupBox.prototype.deleteField = function(field) {
   var newFields = this.fields.slice(),
     index = this.fields.indexOf(field);
