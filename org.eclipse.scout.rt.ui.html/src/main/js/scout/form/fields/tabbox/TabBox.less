@@ -212,8 +212,15 @@
 }
 
 .overflow-tab-item.menu-item {
-  padding: @tab-item-title-padding-top - 2px @tab-item-padding-x;
+  padding: @tab-item-title-padding-top - 2px @tab-item-padding-x - 8px @tab-item-title-padding-bottom;
+  /* Reduce padding a little and compensate with margin to make popup header a little smaller */
+  margin: 0 8px;
+
   font-weight: bold;
+
+  /* This makes sure the overflow menu item is not larger than a tab item (especially if a larger font is used).
+  It also prevents the popup from jumping. */
+  line-height: 1;
 
   & > .text {
     padding: 0;
