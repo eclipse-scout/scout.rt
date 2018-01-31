@@ -316,7 +316,9 @@ public class PlatformImplementor implements IPlatform {
         long t0 = System.nanoTime();
         listener.stateChanged(event);
         long t1 = System.nanoTime();
-        LOG.info("StateEvent {} took {} ms for '{}' ", newState, StringUtility.formatNanos(t1 - t0), bean);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("StateEvent {} took {} ms for '{}' ", newState, StringUtility.formatNanos(t1 - t0), bean);
+        }
       }
     }
     catch (RuntimeException | Error e) {
