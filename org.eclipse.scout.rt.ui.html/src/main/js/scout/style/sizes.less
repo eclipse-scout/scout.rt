@@ -16,19 +16,45 @@
 @border-radius: 3px;
 @borderless-field-padding-y: 8px;
 @control-border-radius: @border-radius;
-
-/* ------------------------------- */
-/* IMPORTANT:
-/* The following constants are also defined in scout.HtmlEnvironment (graphics.js). */
-/* If you change them, be sure to apply them at both places. */
-/* ------------------------------- */
-@logical-grid-height: 30px;
+@logical-grid-row-height: 30px;
+@logical-grid-row-gap: 10px;
+@logical-grid-column-width: 420px;
+@logical-grid-column-gap: 40px - @mandatory-indicator-width;
+@logical-grid-small-column-gap: 4px;
 @mandatory-indicator-width: 8px;
+@field-label-width: 140px;
 @field-status-width: 20px;
 @field-status-margin-left: 10px;
 
+/* --------------------------------------------------------------------------- */
+/* The following CSS classes are used to to read the values from JavaScript,   */
+/* see scout.HtmlEnvironment (graphics.js)                                     */
+/* --------------------------------------------------------------------------- */
+.html-env-logical-grid-row {
+  height: @logical-grid-row-height;
+  margin-bottom: @logical-grid-row-gap;
+}
+
+.html-env-logical-grid-column {
+  width: @logical-grid-column-width;
+  margin-right: @logical-grid-column-gap;
+  margin-left: @logical-grid-small-column-gap;
+}
+
+.html-env-field-mandatory-indicator {
+  width: @mandatory-indicator-width;
+}
+
+.html-env-field-label {
+  width: @field-label-width;
+}
+
+.html-env-field-status {
+  width: @field-status-width;
+}
+
 /* -------------------------------- */
-/* Component specific sizes        */
+/* Component specific sizes         */
 /* -------------------------------- */
 @bench-padding-x: 20px;
 @bench-view-min-height: 50px;
@@ -117,6 +143,7 @@
 @table-cell-padding-left: 8px; /* also used in scout.Column.prototype.buildCell */
 @table-cell-padding-right: 4px;  /* also used in scout.Column.prototype.buildCell */
 @table-control-content-padding: 10px;
+@table-control-container-height: 345px;
 @table-control-padding: 14px;
 @table-footer-height: 52px;
 @table-header-menu-group-padding-top: 10px;

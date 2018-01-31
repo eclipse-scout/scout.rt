@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.TableControl = function() {
   scout.TableControl.parent.call(this);
+  scout.TableControl.CONTAINER_SIZE = scout.styles.getSize('table-control-container', 'height', 'height', scout.TableControl.CONTAINER_SIZE);
   this.tableFooter;
   this.contentRendered = false;
   this.height = scout.TableControl.CONTAINER_SIZE;
@@ -19,7 +20,7 @@ scout.TableControl = function() {
 };
 scout.inherits(scout.TableControl, scout.Action);
 
-scout.TableControl.CONTAINER_SIZE = 345;
+scout.TableControl.CONTAINER_SIZE = 345; // Defined in sizes.less
 scout.TableControl.CONTAINER_ANIMATE_DURATION = 350;
 
 scout.TableControl.prototype._init = function(model) {

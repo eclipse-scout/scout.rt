@@ -66,6 +66,15 @@ scout.styles = {
     return style;
   },
 
+  getSize: function(cssClass, cssProperty, property, defaultSize) {
+    var size = scout.styles.get(cssClass, cssProperty)[property];
+    if ('auto' === size) {
+      return defaultSize;
+    } else {
+      return $.pxToNumber(size);
+    }
+  },
+
   put: function(cssClass, style) {
     this.styleMap[cssClass] = style;
   },

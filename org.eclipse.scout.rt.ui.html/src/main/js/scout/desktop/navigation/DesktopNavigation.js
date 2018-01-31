@@ -24,23 +24,14 @@ scout.DesktopNavigation.MIN_WIDTH; // Configured in sizes.css
 
 scout.DesktopNavigation.prototype._init = function(model) {
   scout.DesktopNavigation.parent.prototype._init.call(this, model);
-  scout.DesktopNavigation.MIN_WIDTH = this._widthFromStyle('desktop-navigation', 'min-width', 'minWidth', 49);
-  scout.DesktopNavigation.DEFAULT_STYLE_WIDTH = this._widthFromStyle('desktop-navigation', 'width', 'width', 290);
-  scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH = this._widthFromStyle('desktop-navigation-breadcrumb', 'width', 'width', 240);
+  scout.DesktopNavigation.MIN_WIDTH = scout.styles.getSize('desktop-navigation', 'min-width', 'minWidth', 49);
+  scout.DesktopNavigation.DEFAULT_STYLE_WIDTH = scout.styles.getSize('desktop-navigation', 'width', 'width', 290);
+  scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH = scout.styles.getSize('desktop-navigation-breadcrumb', 'width', 'width', 240);
   this.desktop = this.parent;
   this.layoutData = model.layoutData || {};
   this.toolBoxVisible = scout.nvl(model.toolBoxVisible, false);
   this.updateHandleVisibility();
   this._setOutline(model.outline);
-};
-
-scout.DesktopNavigation.prototype._widthFromStyle = function(cssClass, cssProperty, property, defaultWidth) {
-  var width = scout.styles.get(cssClass, cssProperty)[property];
-  if ('auto' === width) {
-    return defaultWidth;
-  } else {
-    return $.pxToNumber(width);
-  }
 };
 
 scout.DesktopNavigation.prototype._render = function() {
