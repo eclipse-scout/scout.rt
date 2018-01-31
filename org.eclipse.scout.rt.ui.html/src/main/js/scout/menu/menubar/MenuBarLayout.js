@@ -189,7 +189,8 @@ scout.MenuBarLayout.prototype._ensureCachedBounds = function(menuItems) {
       menuItem.$container.removeClass('hidden');
 
       menuItem.htmlComp._cachedPrefSize = menuItem.htmlComp.prefSize({
-        useCssSize: true
+        useCssSize: true,
+        exact: true
       });
       menuItem.htmlComp._cachedMargins = scout.graphics.margins(menuItem.$container);
       menuItem.$container.attrOrRemove('class', classList);
