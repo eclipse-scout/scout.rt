@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.inventory.internal;
 
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -34,27 +35,48 @@ public class JandexClassInventory implements IClassInventory {
   @Override
   public Set<IClassInfo> getAllKnownSubClasses(Class<?> queryClass) {
     Assertions.assertNotNull(queryClass);
-    Collection<ClassInfo> subclasses;
+    Collection<ClassInfo> subclasses1;
+    Set<ClassInfo> subclasses2;
     if (queryClass.isInterface()) {
-      subclasses = m_index.getAllKnownImplementors(DotName.createSimple(queryClass.getName()));
+      //'getAllKnownImplementors' returns all subclasses but not all subinterfaces. It ignores subinterfaces that have no implementor class at all.
+      subclasses1 = m_index.getAllKnownImplementors(DotName.createSimple(queryClass.getName()));
+      subclasses2 = new HashSet<>();
+      collectAllKnownSubinterfacesRecursive(DotName.createSimple(queryClass.getName()), subclasses2);
     }
     else {
-      subclasses = m_index.getAllKnownSubclasses(DotName.createSimple(queryClass.getName()));
+      subclasses1 = m_index.getAllKnownSubclasses(DotName.createSimple(queryClass.getName()));
+      subclasses2 = null;
     }
-    return convertClassInfos(subclasses);
+    return convertClassInfos(subclasses1, subclasses2);
   }
 
   @Override
   public Set<IClassInfo> getAllKnownSubClasses(IClassInfo queryClassInfo) {
     Assertions.assertNotNull(queryClassInfo);
-    Collection<ClassInfo> subclasses;
+    Collection<ClassInfo> subclasses1;
+    Set<ClassInfo> subclasses2;
     if (queryClassInfo.isInterface()) {
-      subclasses = m_index.getAllKnownImplementors(DotName.createSimple(queryClassInfo.name()));
+      //'getAllKnownImplementors' returns all subclasses but not all subinterfaces. It ignores subinterfaces that have no implementor class at all.
+      subclasses1 = m_index.getAllKnownImplementors(DotName.createSimple(queryClassInfo.name()));
+      subclasses2 = new HashSet<>();
+      collectAllKnownSubinterfacesRecursive(DotName.createSimple(queryClassInfo.name()), subclasses2);
     }
     else {
-      subclasses = m_index.getAllKnownSubclasses(DotName.createSimple(queryClassInfo.name()));
+      subclasses1 = m_index.getAllKnownSubclasses(DotName.createSimple(queryClassInfo.name()));
+      subclasses2 = null;
     }
-    return convertClassInfos(subclasses);
+    return convertClassInfos(subclasses1, subclasses2);
+  }
+
+  protected void collectAllKnownSubinterfacesRecursive(DotName queryName, Set<ClassInfo> collector) {
+    Collection<ClassInfo> subinterfaces = m_index.getKnownDirectImplementors(queryName);
+    if (!subinterfaces.isEmpty()) {
+      for (ClassInfo ci : subinterfaces) {
+        if (Modifier.isInterface(ci.flags()) && collector.add(ci)) {
+          collectAllKnownSubinterfacesRecursive(ci.name(), collector);
+        }
+      }
+    }
   }
 
   @Override
@@ -91,10 +113,15 @@ public class JandexClassInventory implements IClassInventory {
     return new JandexClassInfo(ci);
   }
 
-  protected Set<IClassInfo> convertClassInfos(Collection<ClassInfo> classInfos) {
-    Set<IClassInfo> result = new HashSet<>(classInfos.size());
-    for (ClassInfo classInfo : classInfos) {
+  protected Set<IClassInfo> convertClassInfos(Collection<ClassInfo> classInfos1, Collection<ClassInfo> optionalClassInfos2) {
+    Set<IClassInfo> result = new HashSet<>(classInfos1.size() + (optionalClassInfos2 != null ? optionalClassInfos2.size() : 0));
+    for (ClassInfo classInfo : classInfos1) {
       result.add(new JandexClassInfo(classInfo));
+    }
+    if (optionalClassInfos2 != null) {
+      for (ClassInfo classInfo : optionalClassInfos2) {
+        result.add(new JandexClassInfo(classInfo));
+      }
     }
     return result;
   }

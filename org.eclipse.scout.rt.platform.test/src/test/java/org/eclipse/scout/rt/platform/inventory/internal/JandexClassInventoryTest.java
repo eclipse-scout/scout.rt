@@ -10,21 +10,40 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.inventory.internal;
 
-import java.util.HashSet;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.internal.BeanFilter;
+import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.jboss.jandex.Indexer;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class JandexClassInventoryTest {
 
+  private static void assertEqualClassInfos(Set<Class> expected, Set<IClassInfo> actual) {
+    assertEqualClasses(expected, actual
+        .stream()
+        .map(ci -> ci.resolveClass())
+        .collect(Collectors.toSet()));
+  }
+
+  private static void assertEqualClasses(Set<Class> expected, Set<Class> actual) {
+    if (!expected.equals(actual)) {
+      System.out.println("# Expected: " + expected.stream().map(c -> c.getName()).sorted().collect(Collectors.joining("\n")));
+      System.out.println("# Actual: " + actual.stream().map(c -> c.getName()).sorted().collect(Collectors.joining("\n")));
+    }
+    Assert.assertEquals(expected, actual);
+  }
+
   @Test
-  public void testJandex() throws Exception {
+  public void testFindInnerClasses() throws IOException {
     Indexer indexer = new Indexer();
     String basePath = TestingBean.class.getName().replace('.', '/');
     for (String path : new String[]{
@@ -52,12 +71,116 @@ public class JandexClassInventoryTest {
     JandexClassInventory classInventory = new JandexClassInventory(indexer.complete());
     final Set<Class> actual = new BeanFilter().collect(classInventory);
 
-    Set<Class> expected = new HashSet<>();
-    expected.add(org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean.class);
-    expected.add(org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean.S1.class);
-    expected.add(org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean.S1Sub1.class);
-    expected.add(org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean.S5.class);
+    Set<Class> expected = CollectionUtility.hashSet(
+        org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean.class,
+        org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean.S1.class,
+        org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean.S1Sub1.class,
+        org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean.S5.class);
 
-    Assert.assertEquals(expected, actual);
+    assertEqualClasses(expected, actual);
+  }
+
+  /**
+   * <pre>
+    IFixtureInterface1
+      FixtureImpl1
+        FixtureImpl1Sub
+      IFixtureInterface2
+        IFixtureInterface2Sub1
+        IFixtureInterface2Sub2
+          FixtureImpl2
+   * </pre>
+   */
+  @Test
+  public void testFindSubinterfacesAndSubclasses() throws IOException {
+    Indexer indexer = new Indexer();
+    for (Class clazz : Arrays.asList(
+        IFixtureInterface1.class,
+        FixtureImpl1.class,
+        FixtureImpl1Sub.class,
+        IFixtureInterface2.class,
+        IFixtureInterface2Sub1.class,
+        IFixtureInterface2Sub2.class,
+        FixtureImpl2.class)) {
+      String path = clazz.getName().replace('.', '/');
+      indexer.index(clazz.getClassLoader().getResource(path + ".class").openStream());
+    }
+    JandexClassInventory classInventory = new JandexClassInventory(indexer.complete());
+
+    assertEqualClassInfos(
+        CollectionUtility.hashSet(
+            FixtureImpl1.class,
+            FixtureImpl1Sub.class,
+            IFixtureInterface2.class,
+            IFixtureInterface2Sub1.class,
+            IFixtureInterface2Sub2.class,
+            FixtureImpl2.class),
+        classInventory.getAllKnownSubClasses(IFixtureInterface1.class));
+
+    assertEqualClassInfos(
+        CollectionUtility.hashSet(
+            FixtureImpl1Sub.class),
+        classInventory.getAllKnownSubClasses(FixtureImpl1.class));
+
+    assertEqualClassInfos(
+        CollectionUtility.hashSet(),
+        classInventory.getAllKnownSubClasses(FixtureImpl1Sub.class));
+
+    assertEqualClassInfos(
+        CollectionUtility.hashSet(
+            IFixtureInterface2Sub1.class,
+            IFixtureInterface2Sub2.class,
+            FixtureImpl2.class),
+        classInventory.getAllKnownSubClasses(IFixtureInterface2.class));
+
+    assertEqualClassInfos(
+        CollectionUtility.hashSet(),
+        classInventory.getAllKnownSubClasses(IFixtureInterface2Sub1.class));
+
+    assertEqualClassInfos(
+        CollectionUtility.hashSet(
+            FixtureImpl2.class),
+        classInventory.getAllKnownSubClasses(IFixtureInterface2Sub2.class));
+
+    assertEqualClassInfos(
+        CollectionUtility.hashSet(),
+        classInventory.getAllKnownSubClasses(FixtureImpl2.class));
+  }
+
+  /**
+   * interface that has implementor classes and some subinterfaces
+   *
+   * <pre>
+    IFixtureInterface1
+      FixtureImpl1
+        FixtureImpl1Sub
+      IFixtureInterface2
+        IFixtureInterface2Sub1
+        IFixtureInterface2Sub2
+          FixtureImpl2
+   * </pre>
+   */
+  public static interface IFixtureInterface1 {
+  }
+
+  public static class FixtureImpl1 implements IFixtureInterface1 {
+  }
+
+  public static class FixtureImpl1Sub extends FixtureImpl1 {
+  }
+
+  /**
+   * subinterface that has subinterfaces and on one of them an implementor class
+   */
+  public static interface IFixtureInterface2 extends IFixtureInterface1 {
+  }
+
+  public static interface IFixtureInterface2Sub1 extends IFixtureInterface2 {
+  }
+
+  public static interface IFixtureInterface2Sub2 extends IFixtureInterface2 {
+  }
+
+  public static class FixtureImpl2 implements IFixtureInterface2Sub2 {
   }
 }
