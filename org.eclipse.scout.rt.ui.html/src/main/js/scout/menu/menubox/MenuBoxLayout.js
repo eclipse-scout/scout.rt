@@ -80,7 +80,7 @@ scout.MenuBoxLayout.prototype.preferredLayoutSize = function($container) {
 
 scout.MenuBoxLayout.prototype.compact = function(menus) {
   if (this.menuBox.compactOrig === undefined) {
-    this.menuBox.compactOrig = this.compact;
+    this.menuBox.compactOrig = this.menuBox.compact;
     this.menuBox.htmlComp.suppressInvalidate = true;
     this.menuBox.setCompact(true);
     this.menuBox.htmlComp.suppressInvalidate = false;
@@ -92,7 +92,7 @@ scout.MenuBoxLayout.prototype.compact = function(menus) {
 scout.MenuBoxLayout.prototype.undoCompact = function(menus) {
   if (this.menuBox.compactOrig !== undefined) {
     this.menuBox.htmlComp.suppressInvalidate = true;
-    this.menuBox.setCompact(this.compactOrig);
+    this.menuBox.setCompact(this.menuBox.compactOrig);
     this.menuBox.htmlComp.suppressInvalidate = false;
     this.menuBox.compactOrig = undefined;
   }
