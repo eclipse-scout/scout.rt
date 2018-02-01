@@ -218,6 +218,7 @@ scout.SmartField.prototype._acceptInput = function(searchText, searchTextEmpty, 
     var lookupRowText = scout.strings.nvl(this.lookupRow.text);
     if (lookupRowText === searchText) {
       $.log.isDebugEnabled() && $.log.debug('(SmartField#acceptInput) unchanged: text is equals. Close popup');
+      this.clearErrorStatus();
       this._inputAccepted(false);
       return;
     }
