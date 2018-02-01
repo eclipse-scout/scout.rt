@@ -102,7 +102,9 @@ scout.FormFieldLayout.prototype.layout = function($container) {
       left - containerPadding.left);
     // Calculate field size: "available size" - "insets (border and padding)" - "additional offset" - "field's margin"
     var fieldMargins = scout.graphics.margins(formField.$fieldContainer);
-    fieldSize = htmlContainer.availableSize()
+    fieldSize = htmlContainer.availableSize({
+        exact: true
+      })
       .subtract(htmlContainer.insets())
       .subtract(fieldOffset)
       .subtract(fieldMargins);

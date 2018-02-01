@@ -10,10 +10,10 @@
  ******************************************************************************/
 scout.CellEditorPopup = function() {
   scout.CellEditorPopup.parent.call(this);
-  this.table;
-  this.column;
-  this.row;
-  this.cell;
+  this.table = null;
+  this.column = null;
+  this.row = null;
+  this.cell = null;
   this._pendingCompleteCellEdit = null;
 };
 scout.inherits(scout.CellEditorPopup, scout.Popup);
@@ -23,9 +23,6 @@ scout.CellEditorPopup.prototype._init = function(options) {
   scout.CellEditorPopup.parent.prototype._init.call(this, options);
 
   this.table = options.column.table;
-  this.column = options.column;
-  this.row = options.row;
-  this.cell = options.cell;
   this.link(this.cell.field);
 };
 

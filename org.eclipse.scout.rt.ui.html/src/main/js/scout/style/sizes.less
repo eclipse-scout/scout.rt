@@ -14,7 +14,7 @@
 /* -------------------------------- */
 
 @border-radius: 3px;
-@borderless-field-padding-y: 8px;
+@borderless-field-padding-y: @text-field-padding-y + 1px;
 @control-border-radius: @border-radius;
 @logical-grid-row-height: 30px;
 @logical-grid-row-gap: 10px;
@@ -26,6 +26,8 @@
 @field-label-width: 140px;
 @field-status-width: 20px;
 @field-status-margin-left: 10px;
+@text-field-padding-x: 10px;
+@text-field-padding-y: 7px;
 
 /* --------------------------------------------------------------------------- */
 /* The following CSS classes are used to to read the values from JavaScript,   */
@@ -67,11 +69,13 @@
 @button-padding-x: 7px;
 @button-padding-y: 2px;
 @calendar-component-margin-left: 32px;
+@calendar-day-selected-circle-size: 23px;
 @calendar-header-button-height: 30px;
 @calendar-title-height: 25px;
 @calendar-week-name-width: 45px;
 @check-box-border-radius: @border-radius;
 @check-box-border-width: 1px;
+@check-box-checked-line-height: @check-box-size;
 @check-box-field-label-padding-top: 2px;
 @check-box-size: 18px;
 @checkable-cell-padding-adjustment: 2px; /* Adjustment to shift the checkbox a little upwards to align it with the text (resp. first line of the text in case of multiline table cells) */
@@ -102,6 +106,7 @@
 @menu-item-margin-right: 20px;
 @menu-item-max-image-icon-height: 18px;
 @menu-item-min-image-icon-width: 18px;
+@menu-item-text-padding-top: 1px;
 @main-menubar-padding-y: 2px;
 @menubar-field-menu-margin-y: 4px;
 @messagebox-label-padding: 20px;
@@ -112,7 +117,8 @@
 @outline-node-control-size: 20px;
 @outline-node-control-padding-left: 17px;
 @outline-node-control-padding-y: @outline-node-padding-y;
-@outline-node-control-line-height: 14px;
+@outline-node-control-line-height: @tree-node-control-line-height;
+@outline-node-font-icon-line-height: @tree-node-font-icon-line-height;
 @outline-node-padding-left: 37px;
 @outline-node-padding-right: 8px;
 @outline-node-padding-y: 8px;
@@ -120,7 +126,7 @@
 @outline-title-margin-left: 12px;
 @outline-title-margin-right: 12px;
 @planner-header-button-height: 30px;
-@planner-resource-minheight: 30px;
+@planner-resource-minheight: @logical-grid-row-height;
 @planner-resource-title-width: 150px;
 @planner-scale-height: 45px;
 @popup-border-radius: @border-radius;
@@ -135,6 +141,7 @@
 @scrollbar-size: 8px;
 @scrollbar-thumb-size: 4px;
 @scrollbar-thumb-hover-size: 8px;
+@simple-overflow-tab-item-padding-top: 17px;
 @split-box-splitter-line-size: 3px;
 @split-box-x-splitter-padding: 19px;
 @split-box-y-splitter-padding: 6px;
@@ -162,8 +169,8 @@
 @table-header-sort-icon-size-2: @table-header-sort-icon-size-1 + 12px; /* bigger space when multiple icons are displayed */
 @table-menubar-padding: 8px;
 @table-row-padding-y: 7px;
-@text-field-padding-x: 10px;
-@text-field-padding-y: 7px;
+@tag-field-tag-height: @logical-grid-row-height - 2px - 2 * @tag-field-tag-margin-y;
+@tag-field-tag-margin-y: 3px;
 @tile-field-box-shadow-inset: 4px;
 @tile-field-padding-x: 24px;
 @tile-field-padding-y: 18px;
@@ -175,16 +182,20 @@
 @tooltip-padding-x: 12px;
 @tooltip-padding-y: 8px;
 @tree-node-bitmap-icon-size: 16px;
+@tree-node-bitmap-icon-margin-top: -2px;
 @tree-node-checkbox-size: 20px;
 @tree-node-checkbox-margin-top: -2px;
 @tree-node-control-checkbox-size: 20px + @tree-node-control-size;
 @tree-node-control-size: 16px;
+@tree-node-control-line-height: 14px;
 @tree-node-control-padding-left: 11px;
-@tree-node-control-padding-y: @tree-node-padding-y;
+@tree-node-font-icon-line-height: 15px;
 @tree-node-padding-left: 23px;
 @tree-node-padding-right: 6px;
 @tree-node-padding-y: 6px;
 @view-button-box-height: @desktop-header-height - 1px; /* minus the border */
+@year-panel-day-height: 24px;
+@year-panel-day-line-height: @year-panel-day-height;
 @wizard-progress-border-width: 1px;
 @wizard-progress-content-h-padding: 15px;
 @wizard-progress-height: 62px;

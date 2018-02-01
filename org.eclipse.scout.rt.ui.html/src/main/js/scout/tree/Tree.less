@@ -106,16 +106,16 @@
     box-sizing: content-box;
 
     &.image-icon {
-      margin-top: -2px;
+      margin-top: @tree-node-bitmap-icon-margin-top;
       /* required to reserve space for bitmap icons in the tree when image resource is not yet loaded */
       min-width: @tree-node-bitmap-icon-size;
       min-height: @tree-node-bitmap-icon-size;
     }
 
     &.font-icon {
-      /* add a bit of extra space so font icon is better aligned with text */
-      padding-top: 1px;
       padding-right: 10px;
+      /* Necessary to align with the text, depends on the used font size */
+      line-height: @tree-node-font-icon-line-height;
     }
   }
 }
@@ -175,9 +175,9 @@
   top: 0;
   left: 0;
   cursor: pointer;
-  padding: @tree-node-control-padding-y 8px @tree-node-control-padding-y @tree-node-control-padding-left;
+  padding: @tree-node-padding-y 8px @tree-node-padding-y @tree-node-control-padding-left;
   height: 100%;
-  line-height: 14px; /* Necessary to bottom align it with the text. Must not be the same size as the font-size, otherwise it is positioned too far on the bottom with IE */
+  line-height: @tree-node-control-line-height; /* Necessary to align with the text, depends on the used font size */
 
   &::before {
     display: block;

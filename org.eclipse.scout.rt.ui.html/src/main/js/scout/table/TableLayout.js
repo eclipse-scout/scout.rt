@@ -42,7 +42,7 @@ scout.TableLayout.prototype.layout = function($container) {
   }
   if (header) {
     headerHeight = scout.graphics.size(header.$container).height;
-    if(header.menuBar){
+    if (header.menuBar) {
       header.menuBar.validateLayout();
     }
   }

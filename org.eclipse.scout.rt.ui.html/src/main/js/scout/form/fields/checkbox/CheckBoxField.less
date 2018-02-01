@@ -89,18 +89,23 @@
   /* Same spacings as defined in CellEditorPopup.less, but as margin, not as padding */
   & > .cell-editor-field.check-box {
     padding: 0;
-    margin: 0 @table-cell-padding-right - 1px 0 @table-cell-padding-left - 1px;
+    margin: 0 @table-cell-padding-right 0 @table-cell-padding-left;
     vertical-align: top;
   }
 
   &.halign-right > .cell-editor-field.check-box {
-    margin-right: @table-cell-padding-left - 1px;
-    margin-left: @table-cell-padding-right - 1px;
+    margin-right: @table-cell-padding-left;
+    margin-left: @table-cell-padding-right;
   }
 
   &.halign-center > .cell-editor-field.check-box {
-    margin-right: @table-cell-padding-left - 1px;
+    margin-right: @table-cell-padding-left;
   }
+}
+
+.check-box-field.cell-editor-form-field > .field {
+  /* 1px because cell editor popup starts at the table row which has a 1px border and check box field does not have a border */
+  padding-top: @table-row-padding-y - @checkable-cell-padding-adjustment + 1px;
 }
 
 .check-box-field.disabled > .field {

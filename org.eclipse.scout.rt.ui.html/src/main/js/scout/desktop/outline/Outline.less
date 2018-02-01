@@ -64,8 +64,12 @@
         font-size: @font-size-plus;
       }
 
-      & > .icon {
+      & > .image-icon {
         margin-top: auto;
+      }
+
+      & > .font-icon {
+        line-height: @outline-node-font-icon-line-height;
       }
 
       & > .menubar {
@@ -263,10 +267,6 @@
 
       & > .icon {
         padding: @compact-outline-node-padding-y 0 @compact-outline-node-padding-y @compact-outline-node-padding-x;
-
-        &.font-icon {
-          padding-top: @compact-outline-node-padding-y + 2;
-        }
       }
 
       & > .node-menubar {

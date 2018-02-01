@@ -125,7 +125,7 @@
 
         &.checkable {
           padding-top: @detail-table-row-padding-y - @checkable-cell-padding-adjustment - 1px;
-          padding-bottom: @detail-table-row-padding-y - @checkable-cell-padding-adjustment - 1px;
+          padding-bottom: 0;
         }
       }
 
@@ -148,8 +148,7 @@
       border-bottom: 2px solid @item-selection-border-color;
 
       & > .field {
-        padding-top: 9px;
-        padding-bottom: 9px;
+        padding-top: @detail-table-row-padding-y - @checkable-cell-padding-adjustment - 1px;
       }
     }
 

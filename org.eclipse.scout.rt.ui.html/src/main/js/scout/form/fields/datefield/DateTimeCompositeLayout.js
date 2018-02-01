@@ -35,7 +35,9 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
     hasDate = ($dateField ? !$dateField.isDisplayNone() : false),
     hasTime = ($timeField ? !$timeField.isDisplayNone() : false);
 
-  var availableSize = htmlContainer.availableSize()
+  var availableSize = htmlContainer.availableSize({
+      exact: true
+    })
     .subtract(htmlContainer.insets());
 
   var dateFieldSize, timeFieldSize;

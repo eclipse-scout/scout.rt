@@ -20,7 +20,9 @@ scout.CellEditorPopupLayout.prototype.layout = function($container) {
   var size,
     htmlField = this._field.htmlComp;
 
-  size = this._htmlContainer.availableSize()
+  size = this._htmlContainer.availableSize({
+      exact: true
+    })
     .subtract(this._htmlContainer.insets())
     .subtract(htmlField.margins());
   htmlField.setSize(size);
@@ -31,9 +33,13 @@ scout.CellEditorPopupLayout.prototype.preferredLayoutSize = function($container)
     $row = this.cellEditorPopup.row.$row,
     $cell = this.cellEditorPopup.$anchor;
 
-  cellBounds = scout.graphics.bounds($cell);
+  cellBounds = scout.graphics.bounds($cell, {
+    exact: true
+  });
   cellBounds.x += $cell.cssMarginX(); // first cell popup has a negative left margin
-  rowBounds = scout.graphics.bounds($row);
+  rowBounds = scout.graphics.bounds($row, {
+    exact: true
+  });
   rowBounds.y += $row.cssMarginY(); // row has a negative top margin
   margin = this.cellEditorPopup.$container.cssMarginLeft();
   if (margin < 0) {
