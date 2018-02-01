@@ -24,12 +24,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * <p>
  * This class is intended to be registered in a REST application class.
  *
- * @see RestApplication
+ * @see RestApplication#registerContextResolver()
  */
 @Bean
 public class ObjectMapperResolver implements ContextResolver<ObjectMapper> {
 
   @Override
+  @SuppressWarnings("deprecation") // allow access to internal object mapper instance
   public ObjectMapper getContext(Class<?> type) {
     return BEANS.get(JacksonDataObjectMapper.class).getObjectMapper();
   }

@@ -43,5 +43,11 @@
       <artifactId>org.eclipse.scout.rt.shared.test</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- Jackson used to execute tests using JSON-serialization -->
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.jackson.test</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

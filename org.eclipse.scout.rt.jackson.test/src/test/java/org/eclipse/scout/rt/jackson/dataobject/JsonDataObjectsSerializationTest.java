@@ -68,6 +68,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestStringHolderPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestStringPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestSubPojo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
+import org.eclipse.scout.rt.jackson.testing.TestingJacksonDataObjectMapper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -112,7 +113,7 @@ public class JsonDataObjectsSerializationTest {
 
   @BeforeClass
   public static void beforeClass() {
-    s_dataObjectMapper = BEANS.get(JacksonDataObjectMapper.class).getObjectMapper();
+    s_dataObjectMapper = BEANS.get(TestingJacksonDataObjectMapper.class).getObjectMapper();
 
     s_defaultJacksonObjectMapper = new ObjectMapper()
         .setSerializationInclusion(Include.NON_DEFAULT)

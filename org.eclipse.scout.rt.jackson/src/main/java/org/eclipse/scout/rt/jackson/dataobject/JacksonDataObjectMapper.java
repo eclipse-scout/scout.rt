@@ -56,7 +56,10 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
    * <b>Note</b> This method is exposed only for internal framework usage. It is recommended to use the
    * {@link IDataObjectMapper} representation of the object mapper and not to use {@link ObjectMapper} instances
    * directly in code.
+   * 
+   * @deprecated Use Scout data object mapper instead, see BEANS.get(IDataObjectMapper.class)
    */
+  @Deprecated
   public ObjectMapper getObjectMapper() {
     return m_objectMapper.get();
   }

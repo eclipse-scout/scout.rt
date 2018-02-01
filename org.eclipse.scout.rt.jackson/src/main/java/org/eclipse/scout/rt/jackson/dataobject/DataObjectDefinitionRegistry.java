@@ -95,23 +95,28 @@ public class DataObjectDefinitionRegistry {
     return jsonDefaultName(c);
   }
 
+  /**
+   * @return default type name to use for classes without {@link TypeName} annotation
+   */
   protected String jsonDefaultName(Class<?> c) {
-    return c.getSimpleName();
+    return c != null ? c.getSimpleName() : null;
   }
 
   /**
    * @return type name for specified class {@code clazz}. If the class does not have a type name, the super class
    *         hierarchy is searched for the first available type name.
    */
-  public String toTypeName(Class<?> clazz) {
-    // FIXME [16.0] pbz: [JSON] check if we should assert/warn if name == null or use default json name instead?
+  public String toTypeName(Class<?> queryClazz) {
+    Class<?> clazz = queryClazz;
     while (true) {
       String name = m_classToTypeName.get(clazz);
       if (name != null) {
         return name;
       }
       if (clazz == null || clazz == Object.class) {
-        return null;
+        String defaultTypeName = jsonDefaultName(queryClazz);
+        LOG.warn("Could not find type name for {}, using default value {}", queryClazz, defaultTypeName);
+        return defaultTypeName;
       }
       clazz = clazz.getSuperclass();
     }

@@ -10,18 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.mom.api.marshaller;
 
-import java.io.IOException;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
- * This marshaller allows to transport an object's JSON representation as textual data across the network. It uses the
- * jackson-databind library.
+ * This marshaler allows to transport an object's JSON representation as textual data across the network. It uses the
+ * Scout {@link IDataObjectMapper} to serialize the content to a string representation.
  *
  * @see IMarshaller#MESSAGE_TYPE_TEXT
  * @since 6.1
@@ -31,10 +29,10 @@ public class JsonMarshaller implements IMarshaller {
 
   public static final String CTX_PROP_OBJECT_TYPE = "x-scout.mom.json.objecttype";
 
-  protected final ObjectMapper m_objectMapper;
+  protected final IDataObjectMapper m_dataObjectMapper;
 
   public JsonMarshaller() {
-    m_objectMapper = createObjectMapper();
+    m_dataObjectMapper = createDataObjectMapper();
   }
 
   @Override
@@ -42,14 +40,8 @@ public class JsonMarshaller implements IMarshaller {
     if (transferObject == null) {
       return null;
     }
-
-    try {
-      context.put(CTX_PROP_OBJECT_TYPE, transferObject.getClass().getName());
-      return m_objectMapper.writeValueAsString(transferObject);
-    }
-    catch (final IOException e) {
-      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
-    }
+    context.put(CTX_PROP_OBJECT_TYPE, transferObject.getClass().getName());
+    return m_dataObjectMapper.writeValue(transferObject);
   }
 
   @Override
@@ -61,9 +53,9 @@ public class JsonMarshaller implements IMarshaller {
 
     try {
       final Class<?> objectType = Class.forName(context.get(CTX_PROP_OBJECT_TYPE));
-      return m_objectMapper.readValue(jsonText, objectType);
+      return m_dataObjectMapper.readValue(jsonText, objectType);
     }
-    catch (final IOException | ClassNotFoundException e) {
+    catch (final ClassNotFoundException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
     }
   }
@@ -74,11 +66,9 @@ public class JsonMarshaller implements IMarshaller {
   }
 
   /**
-   * Create new {@link ObjectMapper} instance.<br/>
-   * Override or extend this method to create a custom configured {@link ObjectMapper} instance.
+   * Resolves {@link IDataObjectMapper} instance.
    */
-  // TODO [15.4] pbz,bsh: check if we can use org.eclipse.scout.rt.jackson.databind.ObjectMapperFactory, remove jackson dependency
-  protected ObjectMapper createObjectMapper() {
-    return new ObjectMapper();
+  protected IDataObjectMapper createDataObjectMapper() {
+    return BEANS.get(IDataObjectMapper.class);
   }
 }

@@ -42,7 +42,7 @@ public class DataObjectDefinitionRegistryTest {
   public static abstract class TestBaseFixtureEntityDo extends DoEntity {
   }
 
-  public static class TestFixtureSublclass1Do extends TestBaseFixtureEntityDo {
+  public static class TestFixtureSubclass1Do extends TestBaseFixtureEntityDo {
   }
 
   public static class TestFixtureSubclass2Do extends TestBaseFixtureEntityDo {
@@ -61,9 +61,12 @@ public class DataObjectDefinitionRegistryTest {
     assertEquals("TestItem", m_registry.toTypeName(TestItemDo.class));
     assertEquals("TestComplexEntity", m_registry.toTypeName(TestComplexEntityDo.class));
 
+    // fallback to simple class name
+    assertEquals("TestFixtureSubclass1Do", m_registry.toTypeName(TestFixtureSubclass1Do.class));
+
     assertNull(m_registry.toTypeName(null));
-    assertNull(m_registry.toTypeName(Object.class));
-    assertNull(m_registry.toTypeName(String.class));
+    assertEquals("Object", m_registry.toTypeName(Object.class));
+    assertEquals("String", m_registry.toTypeName(String.class));
   }
 
   @Test
@@ -119,7 +122,7 @@ public class DataObjectDefinitionRegistryTest {
   @Test
   public void testJsonAnnotationName() {
     assertEquals("TestItem", m_registry.jsonAnnotationName(TestItemDo.class));
-    assertEquals("TestBaseFixtureEntity", m_registry.jsonAnnotationName(TestFixtureSublclass1Do.class));
+    assertEquals("TestBaseFixtureEntity", m_registry.jsonAnnotationName(TestFixtureSubclass1Do.class));
     assertEquals("Object", m_registry.jsonAnnotationName(Object.class));
   }
 }
