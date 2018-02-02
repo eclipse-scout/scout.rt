@@ -101,6 +101,15 @@ public final class TestingUtility {
   }
 
   /**
+   * Register a new bean to replace an existing bean.
+   */
+  public static IBean<?> registerWithReplace(Class<?> beanClass) {
+    IBean<?> bean = BEANS.getBeanManager().getBean(beanClass);
+    BeanMetaData newBean = new BeanMetaData(bean).withReplace(true);
+    return BEANS.getBeanManager().registerBean(newBean);
+  }
+
+  /**
    * Register an existing bean with order {@link TESTING_BEAN_ORDER}
    */
   public static IBean<?> registerWithTestingOrder(Class<?> beanClass) {
