@@ -178,6 +178,9 @@ scout.SearchOutline.prototype._updateHasText = function() {
  * @override Outline.js
  */
 scout.SearchOutline.prototype.validateFocus = function() {
+  if (!this.rendered) {
+    return;
+  }
   var elementToFocus = this.$queryField[0];
   if (this.session.focusManager.requestFocus(elementToFocus)) {
     elementToFocus.select();
