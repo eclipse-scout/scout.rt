@@ -141,6 +141,9 @@ scout.SearchOutline.prototype._setSearchQuery = function(searchQuery) {
  * @override Outline.js
  */
 scout.SearchOutline.prototype.validateFocus = function() {
+  if (!this.rendered) {
+    return;
+  }
   var elementToFocus = this.$queryField[0];
   if (this.session.focusManager.requestFocus(elementToFocus)) {
     elementToFocus.select();
