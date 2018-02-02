@@ -20,8 +20,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
+import org.eclipse.scout.rt.server.commons.servlet.cache.GlobalHttpResourceCache;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
@@ -43,6 +45,7 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
   private static final Logger LOG = LoggerFactory.getLogger(ResourceRequestHandler.class);
 
   public static final String INDEX_HTML = "/index.html";
+  public static final String URL_PARAM_CLEAR_CACHE = "clearCache";
 
   // Remember bean instances to save lookups on each GET request
   private final List<ResourceLoaders> m_resourceLoaders = Collections.unmodifiableList(BEANS.all(ResourceLoaders.class));
@@ -63,6 +66,13 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
 
     if (resourceLoader == null) {
       return false;
+    }
+
+    // Clear global cache (only allowed in development mode) this allows to work with ?cache=true
+    // by default and clear the cache only when required --> rebuilds script/less files.
+    if (Platform.get().inDevelopmentMode() && req.getParameter(URL_PARAM_CLEAR_CACHE) != null) {
+      BEANS.get(GlobalHttpResourceCache.class).clear();
+      LOG.info("Resource cache has been cleared, requested by URL parameter {}", URL_PARAM_CLEAR_CACHE);
     }
 
     HttpCacheObject resource = resolveResourceFromCache(req, pathInfoEx, resourceLoader);
