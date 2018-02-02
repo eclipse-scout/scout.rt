@@ -31,7 +31,8 @@ scout.ButtonLayout.prototype.layout = function($container) {
     includeMargin: true,
     exact: true
   }).width : 0;
-  var labelMaxWidth = $fieldContainer.width() - (submenuIconWidth + iconWidth);
+  // Round up to make sure ellipsis are not shown unnecessarily when having rounding issues (e.g. in IE 11)
+  var labelMaxWidth = Math.ceil($fieldContainer.width() - (submenuIconWidth + iconWidth));
   $label.css('max-width', labelMaxWidth);
 };
 
