@@ -33,6 +33,7 @@ public class UiTextContributor implements IUiTextContributor {
         "NavigationBackward",
         "InvalidValueMessageX",
         "InvalidNumberMessageX",
+        "InactiveState",
         // From org.eclipse.scout.rt.ui.html
         "ui.CalendarToday",
         "ui.CalendarDay",

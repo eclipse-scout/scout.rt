@@ -255,7 +255,7 @@ scout.TreeNode.prototype._decorate = function() {
 
   this._renderText();
   this._renderIcon();
-  scout.styles.legacyStyle(this, $node);
+  scout.styles.legacyStyle(this._getStyles(), $node);
 
   // If parent node is marked as 'lazy', check if any visible child nodes remain.
   if (this.parentNode && this.parentNode.expandedLazy) {
@@ -269,6 +269,14 @@ scout.TreeNode.prototype._decorate = function() {
       this.parentNode.$node.removeClass('lazy');
     }
   }
+};
+
+/**
+ * @return The object that has the properties used for styles (colors, fonts, etc.)
+ *     The default impl. returns "this". Override this function to return another object.
+ */
+scout.TreeNode.prototype._getStyles = function() {
+  return this;
 };
 
 /**
