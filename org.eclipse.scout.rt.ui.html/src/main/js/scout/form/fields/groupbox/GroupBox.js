@@ -248,7 +248,7 @@ scout.GroupBox.prototype.addSubLabel = function() {
   if (this.$subLabel) {
     return;
   }
-  this.$subLabel = this.$title.appendSpan('sub-label');
+  this.$subLabel = this.$title.appendDiv('sub-label');
 };
 
 scout.GroupBox.prototype._removeSubLabel = function() {
@@ -309,7 +309,7 @@ scout.GroupBox.prototype.addLabel = function() {
   if (this.$label) {
     return;
   }
-  this.$label = this.$title.appendSpan('label');
+  this.$label = this.$title.appendDiv('label');
 };
 
 scout.GroupBox.prototype._renderLabel = function() {
@@ -482,7 +482,7 @@ scout.GroupBox.prototype._renderExpandable = function() {
       // Create control if necessary
       $control = this.$container.makeDiv('group-box-control')
         .on('click', this._onControlClick.bind(this))
-        .prependTo(this.$title);
+        .insertAfter(this.$label);
     }
     this.$title
       .addClass('expandable')
@@ -501,9 +501,6 @@ scout.GroupBox.prototype.setExpanded = function(expanded) {
 
 scout.GroupBox.prototype._renderExpanded = function() {
   this.$container.toggleClass('collapsed', !this.expanded);
-  if (this.borderDecoration === scout.GroupBox.BorderDecoration.LINE) {
-    this.$container.toggleClass('with-line', !this.expanded);
-  }
 
   // Group boxes have set "useUiHeight=true" by default. When a group box is collapsed, it should not
   // stretched vertically (no "weight Y"). However, because "weightY" is -1 by default, a calculated value

@@ -224,14 +224,14 @@ scout.TabItem.prototype.addLabel = function() {
   if (this.$label) {
     return;
   }
-  this.$label = this.$title.appendSpan('label');
+  this.$label = this.$title.appendDiv('label');
 };
 
 scout.TabItem.prototype.addSubLabel = function() {
   if (this.$subLabel) {
     return;
   }
-  this.$subLabel = this.$title.appendSpan('sub-label');
+  this.$subLabel = this.$title.appendDiv('sub-label');
 };
 
 scout.TabItem.prototype._removeSubLabel = function() {

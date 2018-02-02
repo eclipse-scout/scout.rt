@@ -55,40 +55,40 @@
   border-bottom: @group-box-title-border-width solid @group-box-title-border-color;
   #scout.overflow-ellipsis-nowrap();
   padding: @group-box-title-padding-top 0 @group-box-title-padding-bottom 0;
+  position: relative;
 
   .group-box.has-sub-label > & {
     padding-bottom: @group-box-title-with-sub-label-padding-bottom;
   }
 
-  .group-box.collapsed:not(.with-line) > & {
-    border-bottom-color: transparent;
-  }
-
   & > .group-box-control {
     display: inline-block;
-    transition: transform 0.3s;
+    color: @title-color;
     cursor: pointer;
     /* adjust control position (use absolute positioning, otherwise the layout would be disturbed, */
     /* because the control div is higher than the title span */
     position: absolute;
-    top: @group-box-title-margin-top + @group-box-title-padding-top - 3px;
-    left: @mandatory-indicator-width;
-
-    /* for good animation, ensure that the control is a square and the icon is centered */
-    width: @group-box-control-size;
-    height: @group-box-control-size;
-    line-height: @group-box-control-size;
+    padding-left: 15px;
     text-align: center;
+    vertical-align: middle;
+    width: @group-box-control-width;
 
     &::before {
       #scout.font-icon();
-      font-size: @group-box-control-size;
+      font-size: @group-box-control-font-size;
+      line-height: @group-box-control-line-height;
+      font-weight: bold;
       content: @icon-angle-down;
 
       .disabled & {
         color: @text-disabled-color;
       }
+
+      .group-box.collapsed > & {
+        content: @icon-angle-up;
+      }
     }
+
     &:hover::before {
       color: @hover-color;
 
@@ -96,24 +96,18 @@
         color: @text-disabled-color;
       }
     }
-
-    .group-box.collapsed > & {
-      /* This "imprecise" angle is a workround for firefox to prevent shifting the div a little when the animation finishes. */
-      /* See https://bugzilla.mozilla.org/show_bug.cgi?id=739176 */
-      #scout.transform(rotate(-89.99deg));
-    }
   }
 
   & > .label {
-    #scout.font-text-normal(@font-weight-bold);
-    display: block;
+    display: inline-block;
     vertical-align: middle;
+    font-weight: bold;
     color: @title-color;
     #scout.overflow-ellipsis();
+    max-width: calc(~'100%' - @group-box-control-width);
   }
 
   & > .sub-label {
-    display: block;
     font-size: 10px;
     color: @text-disabled-color;
     padding-top: 3px;
@@ -146,12 +140,6 @@
   &.expandable {
     /* Expansion can also be performed on the title itself */
     cursor: pointer;
-  }
-
-  /* Move title span to right when control is rendered */
-  & > .group-box-control ~ .label,
-  & > .group-box-control ~ .sub-label {
-    padding-left: @group-box-control-size + 5px;
   }
 }
 
