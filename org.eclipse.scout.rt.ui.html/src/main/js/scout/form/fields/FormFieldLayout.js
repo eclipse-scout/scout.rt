@@ -133,8 +133,8 @@ scout.FormFieldLayout.prototype.layout = function($container) {
 
   if (formField.$fieldContainer) {
     // Icons are placed inside the field (as overlay)
-    var fieldBorder = scout.graphics.borders(formField.$fieldContainer),
-      inputBounds = scout.graphics.offsetBounds(formField.$fieldContainer);
+    var fieldBorder = scout.graphics.borders(formField.$field),
+      inputBounds = scout.graphics.offsetBounds(formField.$field);
     top += fieldBorder.top;
     right += fieldBorder.right;
     fieldBounds.x += fieldBorder.left;
