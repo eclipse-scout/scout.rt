@@ -13,7 +13,7 @@
     "FormField": {
       "disabledStyle": 0,
       "enabled": true,
-      "fieldStyle": 'alternative',
+      "fieldStyle": "alternative",
       "visible": true,
       "keyStrokes": [],
       "labelVisible": true,
