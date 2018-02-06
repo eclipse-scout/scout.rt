@@ -16,23 +16,26 @@ scout.inherits(scout.ColumnLayout, scout.AbstractLayout);
 scout.ColumnLayout.prototype.layout = function($container) {
   $container.children().each(function() {
     var htmlChild = scout.HtmlComponent.optGet($(this)),
-      $child = $(this),
       childPrefSize;
-
     if (htmlChild) {
-      childPrefSize = htmlChild.prefSize();
-      htmlChild.setSize(childPrefSize);
-    } else {
-      childPrefSize = scout.graphics.prefSize($child, {
+      childPrefSize = htmlChild.prefSize({
         useCssSize: true
       });
+      // use layout data width if set.
+      if (htmlChild.layoutData && htmlChild.layoutData.widthHint) {
+        childPrefSize.width = htmlChild.layoutData.widthHint;
+      }
+      htmlChild.setSize(childPrefSize);
     }
   });
 };
 
 scout.ColumnLayout.prototype.preferredLayoutSize = function($container, options) {
   var prefSize = new scout.Dimension(),
-    htmlContainer = scout.HtmlComponent.get($container);
+    htmlContainer = scout.HtmlComponent.get($container),
+    childOptions = {
+      useCssSize: true
+    };
 
   $container.children().filter(function() {
     return $(this).isVisible();
@@ -41,8 +44,12 @@ scout.ColumnLayout.prototype.preferredLayoutSize = function($container, options)
       $child = $(this),
       htmlChild = scout.HtmlComponent.optGet($child);
     if (htmlChild) {
-      childPrefSize = htmlChild.prefSize(options)
-        .add(htmlChild.margins());
+      childPrefSize = htmlChild.prefSize(childOptions);
+      // use layout data width if set.
+      if (htmlChild.layoutData && htmlChild.layoutData.widthHint) {
+        childPrefSize.width = htmlChild.layoutData.widthHint;
+      }
+      childPrefSize = childPrefSize.add(htmlChild.margins());
       prefSize.width = prefSize.width + childPrefSize.width;
       prefSize.height = Math.max(prefSize.height, childPrefSize.height);
     }

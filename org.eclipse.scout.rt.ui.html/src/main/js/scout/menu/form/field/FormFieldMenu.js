@@ -20,13 +20,18 @@ scout.FormFieldMenu.prototype._render = function() {
   if (this.uiCssClass) {
     this.$container.addClass(this.uiCssClass);
   }
-  this.field.render(this.$container);
-  this.field.$container.addClass('content');
-
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.ColumnLayout());
 };
 
+scout.FormFieldMenu.prototype._renderProperties = function() {
+  scout.FormFieldMenu.parent.prototype._renderProperties.call(this);
+  this._renderField();
+};
+
+/**
+ * Override
+ */
 scout.FormFieldMenu.prototype._renderText = function(text) {
   scout.FormFieldMenu.parent.prototype._renderText.call(this, text);
   if (this.$text) {
@@ -36,6 +41,24 @@ scout.FormFieldMenu.prototype._renderText = function(text) {
 
 scout.FormFieldMenu.prototype.setField = function(field) {
   this.setProperty('field', field);
+};
+
+scout.FormFieldMenu.prototype._renderField = function() {
+  if (this.field) {
+    this.field.render(this.$container);
+    this.formFieldMenu = true;
+    this.field.gridData = scout.GridData.createFromHints(this.field, 1);
+    var layoutData = new scout.LogicalGridData(this.field);
+    layoutData.validate();
+    this.field.setLayoutData(layoutData);
+    this.field.$container.addClass('content');
+  }
+};
+
+scout.FormFieldMenu.prototype._removeField = function() {
+  if (this.field) {
+    this.field.remove();
+  }
 };
 
 scout.FormFieldMenu.prototype.clone = function(model, options) {
