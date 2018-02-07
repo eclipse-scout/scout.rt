@@ -42,6 +42,7 @@
     /* Draw underline in child element, otherwise the position would not be correct in FF */
     text-decoration: none;
     vertical-align: middle;
+    color: @link-color;
 
     & > .text {
       text-decoration: underline;
@@ -55,25 +56,17 @@
       /* Reset IE hack for link buttons because it breaks ellipsis tooltip */
       pointer-events: auto;
     }
+
+    &:active {
+      color: @link-active-color;
+    }
   }
 
   &:focus {
     outline: none;
 
-    & > .link.menu-item {
-      color: @hover-color;
-
-      &:not(.menu-button) {
-        color: @focus-color;
-
-        &::after {
-          color: @focus-color;
-        }
-      }
-
-      &::after {
-        #scout.button-focus();
-      }
+    & > .link.menu-item::after {
+      #scout.button-focus();
     }
   }
 
