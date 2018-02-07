@@ -49,7 +49,7 @@
 
 .date-picker-weekday {
   display: table-cell;
-  padding: 8px 0;
+  height: @date-picker-header-height;
   text-align: center;
   vertical-align: middle;
 }
@@ -156,8 +156,8 @@
 }
 
 .date-picker-header {
-  line-height: 30px;
-  height: 30px;
+  line-height: @date-picker-header-height;
+  height: @date-picker-header-height;
   padding: 0 10px;
   background-color: @date-picker-header-background-color;
   border-bottom: 1px solid @border-color;
@@ -178,7 +178,7 @@
 
 .date-picker-separator {
   position: absolute;
-  top: 59px;
+  top: @date-picker-header-height * 2 - 1px;
   left: 0;
   height: 1px;
   width: 100%;
@@ -198,8 +198,8 @@
 .date-picker-right-m {
   text-align: center;
   width: 22px;
-  line-height: 30px;
-  height: 30px;
+  line-height: @date-picker-header-height;
+  height: @date-picker-header-height;
   cursor: pointer;
   #scout.font-icon();
   font-size: 17px;
