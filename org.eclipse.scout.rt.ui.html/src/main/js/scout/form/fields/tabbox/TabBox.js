@@ -79,7 +79,7 @@ scout.TabBox.prototype.insertTabItem = function(tabItem, index) {
   if (!tabItem) {
     return;
   }
-  index = index || this.tabItems.length;
+  index = scout.nvl(index, this.tabItems.length);
   var newTabItems = this.tabItems.slice();
   newTabItems.splice(index, 0, tabItem);
   this.setTabItems(newTabItems);

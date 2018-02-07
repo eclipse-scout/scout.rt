@@ -325,4 +325,106 @@ describe("GroupBox", function() {
     });
   });
 
+  describe('insertField', function() {
+    it('inserts the field at the given index', function() {
+      var groupBox = helper.createGroupBoxWithFields(session.desktop, 2);
+      expect(groupBox.fields.length).toBe(2);
+      expect(groupBox.controls.length).toBe(2);
+
+      var newField = scout.create('StringField', {parent: groupBox});
+      groupBox.insertField(newField, 1);
+      expect(groupBox.fields.length).toBe(3);
+      expect(groupBox.controls.length).toBe(3);
+      expect(groupBox.fields[1]).toBe(newField);
+      expect(groupBox.controls[1]).toBe(newField);
+
+      // At the beginning
+      var newField2 = scout.create('StringField', {parent: groupBox});
+      groupBox.insertField(newField2, 0);
+      expect(groupBox.fields.length).toBe(4);
+      expect(groupBox.controls.length).toBe(4);
+      expect(groupBox.fields[0]).toBe(newField2);
+      expect(groupBox.controls[0]).toBe(newField2);
+
+      // At the end
+      var newField3 = scout.create('StringField', {parent: groupBox});
+      groupBox.insertField(newField3, 4);
+      expect(groupBox.fields.length).toBe(5);
+      expect(groupBox.controls.length).toBe(5);
+      expect(groupBox.fields[4]).toBe(newField3);
+      expect(groupBox.controls[4]).toBe(newField3);
+    });
+
+    it('inserts the field at the end if no index is provided', function() {
+      var groupBox = helper.createGroupBoxWithFields(session.desktop, 2);
+      expect(groupBox.fields.length).toBe(2);
+      expect(groupBox.controls.length).toBe(2);
+
+      var newField = scout.create('StringField', {parent: groupBox});
+      groupBox.insertField(newField);
+      expect(groupBox.fields.length).toBe(3);
+      expect(groupBox.controls.length).toBe(3);
+      expect(groupBox.fields[2]).toBe(newField);
+      expect(groupBox.controls[2]).toBe(newField);
+    });
+  });
+
+  describe('insertBefore', function() {
+    it('inserts the field before the given other field', function() {
+      var groupBox = helper.createGroupBoxWithFields(session.desktop, 2);
+      expect(groupBox.fields.length).toBe(2);
+      expect(groupBox.controls.length).toBe(2);
+
+      var newField = scout.create('StringField', {parent: groupBox});
+      var sibling = groupBox.fields[1];
+      groupBox.insertFieldBefore(newField, sibling);
+      expect(groupBox.fields.length).toBe(3);
+      expect(groupBox.controls.length).toBe(3);
+      expect(groupBox.fields[1]).toBe(newField);
+      expect(groupBox.controls[1]).toBe(newField);
+      expect(groupBox.fields[2]).toBe(sibling);
+      expect(groupBox.controls[2]).toBe(sibling);
+
+      // At the beginning
+      var newField2 = scout.create('StringField', {parent: groupBox});
+      sibling = groupBox.fields[0];
+      groupBox.insertFieldBefore(newField2, sibling);
+      expect(groupBox.fields.length).toBe(4);
+      expect(groupBox.controls.length).toBe(4);
+      expect(groupBox.fields[0]).toBe(newField2);
+      expect(groupBox.controls[0]).toBe(newField2);
+      expect(groupBox.fields[1]).toBe(sibling);
+      expect(groupBox.controls[1]).toBe(sibling);
+    });
+  });
+
+  describe('insertAfter', function() {
+    it('inserts the field after the given other field', function() {
+      var groupBox = helper.createGroupBoxWithFields(session.desktop, 2);
+      expect(groupBox.fields.length).toBe(2);
+      expect(groupBox.controls.length).toBe(2);
+
+      var newField = scout.create('StringField', {parent: groupBox});
+      var sibling = groupBox.fields[1];
+      groupBox.insertFieldAfter(newField, sibling);
+      expect(groupBox.fields.length).toBe(3);
+      expect(groupBox.controls.length).toBe(3);
+      expect(groupBox.fields[2]).toBe(newField);
+      expect(groupBox.controls[2]).toBe(newField);
+      expect(groupBox.fields[1]).toBe(sibling);
+      expect(groupBox.controls[1]).toBe(sibling);
+
+      // At the end
+      var newField3 = scout.create('StringField', {parent: groupBox});
+      sibling = groupBox.fields[2];
+      groupBox.insertFieldAfter(newField, sibling);
+      expect(groupBox.fields.length).toBe(4);
+      expect(groupBox.controls.length).toBe(4);
+      expect(groupBox.fields[3]).toBe(newField);
+      expect(groupBox.controls[3]).toBe(newField);
+      expect(groupBox.fields[2]).toBe(sibling);
+      expect(groupBox.controls[2]).toBe(sibling);
+    });
+  });
+
 });

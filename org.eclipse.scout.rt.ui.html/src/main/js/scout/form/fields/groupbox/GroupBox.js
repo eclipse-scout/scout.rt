@@ -67,28 +67,23 @@ scout.GroupBox.prototype.getFields = function() {
   return this.fields;
 };
 
-scout.GroupBox.prototype.insertField = function(field) {
-  this.insertFieldBefore(field);
-};
-
-scout.GroupBox.prototype.insertFieldBefore = function(field, sibling) {
-  var newFields = this.fields.slice(),
-    index = this.fields.length;
-  if (sibling) {
-    index = this.fields.indexOf(sibling);
-  }
+scout.GroupBox.prototype.insertField = function(field, index) {
+  var newFields = this.fields.slice();
+  index = scout.nvl(index, this.fields.length);
   newFields.splice(index, 0, field);
   this.setFields(newFields);
 };
 
+scout.GroupBox.prototype.insertFieldBefore = function(field, sibling) {
+  scout.assertParameter('sibling', sibling);
+  var index = this.fields.indexOf(sibling);
+  this.insertField(field, index);
+};
+
 scout.GroupBox.prototype.insertFieldAfter = function(field, sibling) {
-  var newFields = this.fields.slice(),
-    index = this.fields.length;
-  if (sibling) {
-    index = this.fields.indexOf(sibling);
-  }
-  newFields.splice(index + 1, 0, field);
-  this.setFields(newFields);
+  scout.assertParameter('sibling', sibling);
+  var index = this.fields.indexOf(sibling) + 1;
+  this.insertField(field, index);
 };
 
 scout.GroupBox.prototype.deleteField = function(field) {
