@@ -24,8 +24,8 @@ scout.PageTileGridSelectKeyStroke = function(pageTileGrid) {
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     var index = event.which - scout.keys['1'];
     var tiles = this._tiles();
-    if (index < tiles.length && tiles[index].widget instanceof scout.TileButton) {
-      return tiles[index].widget.$fieldContainer;
+    if (index < tiles.length && tiles[index].tileWidget instanceof scout.TileButton) {
+      return tiles[index].tileWidget.$fieldContainer;
     }
     return null;
   }.bind(this);
@@ -44,7 +44,7 @@ scout.PageTileGridSelectKeyStroke.prototype._accept = function(event) {
   var index = scout.codesToKeys[event.which] - 1;
   var tiles = this._tiles();
 
-  if (index < tiles.length && tiles[index].widget instanceof scout.TileButton) {
+  if (index < tiles.length && tiles[index].tileWidget instanceof scout.TileButton) {
     event._$element = tiles[index].$container;
     if (event._$element) {
       return true;
@@ -58,7 +58,7 @@ scout.PageTileGridSelectKeyStroke.prototype._accept = function(event) {
  */
 scout.PageTileGridSelectKeyStroke.prototype.handle = function(event) {
   var tile = event._$element.data('widget');
-  tile.widget.doAction();
+  tile.tileWidget.doAction();
 };
 
 scout.PageTileGridSelectKeyStroke.prototype._tiles = function() {
