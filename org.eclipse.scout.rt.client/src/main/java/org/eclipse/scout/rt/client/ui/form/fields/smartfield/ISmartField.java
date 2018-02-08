@@ -28,6 +28,8 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
  * Generic type V: value of the SmartField, which is also the key used in lookup-rows.
  */
 public interface ISmartField<VALUE> extends IValueField<VALUE> {
+  int NOT_UNIQUE_ERROR_CODE = 1;
+  int NO_RESULTS_ERROR_CODE = 2;
 
   String PROP_DISPLAY_STYLE = "displayStyle";
   String PROP_RESULT = "result";

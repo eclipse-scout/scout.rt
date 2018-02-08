@@ -344,6 +344,8 @@
   __include("scout/form/fields/FormFieldAdapter.js");
   __include("scout/form/fields/FormFieldLayout.js");
   __include("scout/form/fields/SimpleLoadingSupport.js");
+  __include("scout/form/fields/StatusMenuMapping.js");
+  __include("scout/form/fields/StatusMenuMappingAdapter.js");
   __include("scout/form/fields/GridData.js");
   __include("scout/form/fields/CompositeField.js");
   __include("scout/form/fields/CompositeFieldAdapter.js");

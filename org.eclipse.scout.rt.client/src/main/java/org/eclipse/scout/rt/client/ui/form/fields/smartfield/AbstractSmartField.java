@@ -81,9 +81,6 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 @ClassId("444e6fb6-3b0b-4917-933e-b6eb81345499")
 public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE> implements ISmartField<VALUE> {
 
-  public static final int NOT_UNIQUE_ERROR_CODE = 1;
-  public static final int NO_RESULTS_ERROR_CODE = 2;
-
   /**
    * Null object used for {@link #installLookupRowContext(ILookupRow)}.
    */
@@ -247,10 +244,10 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   /**
-   * This property has only an effect when the smart field has a table proposal chooser. When the returned value is null,
-   * no column headers are visible in the proposal chooser. If the returned value is a string array it contains the texts
-   * used for column headers, make sure that the number of elements in the array is equals to the number of cells in the
-   * proposal chooser table.
+   * This property has only an effect when the smart field has a table proposal chooser. When the returned value is
+   * null, no column headers are visible in the proposal chooser. If the returned value is a string array it contains
+   * the texts used for column headers, make sure that the number of elements in the array is equals to the number of
+   * cells in the proposal chooser table.
    *
    * @return
    */
@@ -1525,8 +1522,8 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
    * Loads lookup rows according to the specified {@link ILookupRowProvider}, and notifies the specified callback upon
    * fetching completed.
    *
-   * @return {@link IFuture} if data is fetched asynchronously, or <code>null</code> for synchronous fetching, or if using
-   *         {@link LocalLookupCall}.
+   * @return {@link IFuture} if data is fetched asynchronously, or <code>null</code> for synchronous fetching, or if
+   *         using {@link LocalLookupCall}.
    */
   private IFuture<Void> fetchLookupRows(final ILookupRowProvider<VALUE> dataProvider, final ILookupRowFetchedCallback<VALUE> callback, final boolean asynchronousFetching, final int maxRowCount) {
     cancelPotentialLookup();

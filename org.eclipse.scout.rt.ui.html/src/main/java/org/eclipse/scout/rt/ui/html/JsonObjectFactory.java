@@ -50,6 +50,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormMenu;
+import org.eclipse.scout.rt.client.ui.form.fields.IStatusMenuMapping;
 import org.eclipse.scout.rt.client.ui.form.fields.accordionfield.IAccordionField;
 import org.eclipse.scout.rt.client.ui.form.fields.beanfield.IBeanField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
@@ -88,8 +89,8 @@ import org.eclipse.scout.rt.client.ui.group.IGroup;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.tile.IFormFieldTile;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
-import org.eclipse.scout.rt.client.ui.tile.ITileGrid;
 import org.eclipse.scout.rt.client.ui.tile.ITileAccordion;
+import org.eclipse.scout.rt.client.ui.tile.ITileGrid;
 import org.eclipse.scout.rt.client.ui.tile.IWidgetTile;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.Order;
@@ -116,6 +117,7 @@ import org.eclipse.scout.rt.ui.html.json.desktop.JsonSearchOutline;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonViewButton;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonDateField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonStatusMenuMapping;
 import org.eclipse.scout.rt.ui.html.json.form.fields.accordionfield.JsonAccordionField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.beanfield.JsonBeanField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.browserfield.JsonBrowserField;
@@ -174,8 +176,8 @@ import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTableTextUserFilte
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTextColumnUserFilter;
 import org.eclipse.scout.rt.ui.html.json.tile.JsonFormFieldTile;
 import org.eclipse.scout.rt.ui.html.json.tile.JsonTile;
-import org.eclipse.scout.rt.ui.html.json.tile.JsonTileGrid;
 import org.eclipse.scout.rt.ui.html.json.tile.JsonTileAccordion;
+import org.eclipse.scout.rt.ui.html.json.tile.JsonTileGrid;
 import org.eclipse.scout.rt.ui.html.json.tile.JsonWidgetTile;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 
@@ -393,6 +395,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof IAccordion) {
       return new JsonAccordion<>((IAccordion) model, session, id, parent);
+    }
+    if (model instanceof IStatusMenuMapping) {
+      return new JsonStatusMenuMapping<>((IStatusMenuMapping) model, session, id, parent);
     }
     return null;
   }
