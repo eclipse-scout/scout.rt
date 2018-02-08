@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
+import org.eclipse.scout.rt.client.ui.form.fields.IStatusMenuMapping;
 import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.MasterListener;
@@ -1234,6 +1235,16 @@ public class SmartField2ContentAssistAdapter<VALUE> implements IContentAssistFie
 
   @Override
   public IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupRowFetchedCallback<VALUE> callback) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public List<IStatusMenuMapping> getStatusMenuMappings() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void setStatusMenuMappings(List<IStatusMenuMapping> mappings) {
     throw new UnsupportedOperationException();
   }
 

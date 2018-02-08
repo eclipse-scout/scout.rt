@@ -48,6 +48,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormMenu;
+import org.eclipse.scout.rt.client.ui.form.fields.IStatusMenuMapping;
 import org.eclipse.scout.rt.client.ui.form.fields.beanfield.IBeanField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
@@ -106,6 +107,7 @@ import org.eclipse.scout.rt.ui.html.json.desktop.JsonSearchOutline;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonViewButton;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonDateField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonStatusMenuMapping;
 import org.eclipse.scout.rt.ui.html.json.form.fields.beanfield.JsonBeanField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.browserfield.JsonBrowserField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.button.JsonButton;
@@ -348,6 +350,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof ITableControl) {
       return new JsonTableControl<ITableControl>((ITableControl) model, session, id, parent);
+    }
+    if (model instanceof IStatusMenuMapping) {
+      return new JsonStatusMenuMapping<IStatusMenuMapping>((IStatusMenuMapping) model, session, id, parent);
     }
     return null;
   }

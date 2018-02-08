@@ -23,8 +23,9 @@ scout.FormField = function() {
   this.mandatory = false;
   this.statusVisible = true;
   this.statusPosition = scout.FormField.StatusPosition.DEFAULT;
+  this.statusMenuMappings = [];
   this.menus = [];
-  this.menusVisible = false;
+  this.menusVisible = true;
   this.gridData;
   this.gridDataHints = new scout.GridData();
   this.$label;
@@ -51,7 +52,7 @@ scout.FormField = function() {
    * The status label is used for error-status, tooltip-icon and menus.
    */
   this.$status;
-  this._addWidgetProperties(['keyStrokes', 'menus']);
+  this._addWidgetProperties(['keyStrokes', 'menus', 'statusMenuMappings']);
   this._addCloneProperties(['errorStatus']);
   this.mode = scout.FormField.Mode.DEFAULT;
   this.touched = false;
@@ -561,6 +562,19 @@ scout.FormField.prototype._getCurrentMenus = function() {
   });
 };
 
+scout.FormField.prototype._getMenusForStatus = function(status) {
+  return this.statusMenuMappings.filter(function(mapping) {
+    if (!mapping.menu || !mapping.menu.visible) {
+      return;
+    }
+    // Show the menus which are mapped to the status code and severity (if set)
+    return (mapping.codes.length === 0 || mapping.codes.indexOf(status.code) > -1) &&
+      (mapping.severities.length === 0 || mapping.severities.indexOf(status.severity) > -1);
+  }).map(function(mapping) {
+    return mapping.menu;
+  });
+};
+
 scout.FormField.prototype._hasMenus = function() {
   return !!(this.menus && this._getCurrentMenus().length > 0);
 };
@@ -572,6 +586,13 @@ scout.FormField.prototype._updateMenus = function() {
 
 scout.FormField.prototype._renderMenus = function() {
   this._updateMenus();
+};
+
+scout.FormField.prototype._renderStatusMenuMappings = function() {
+  if (this.tooltip) {
+    // If tooltip is visible call showStatusMessage to update the menus
+    this._showStatusMessage();
+  }
 };
 
 scout.FormField.prototype.setMenusVisible = function(menusVisible) {
@@ -675,9 +696,12 @@ scout.FormField.prototype._showStatusMessage = function() {
     }
   }
 
-  // If there are menus, show them in the tooltip. But only if there is a tooltipText, don't do it if there is an error status.
-  // Menus make most likely no sense if an error status is displayed
-  if (!status && this.menusVisible && this._hasMenus()) {
+  if (status) {
+    // There may be menus which should be displayed in the tooltip
+    menus = this._getMenusForStatus(status);
+  } else if (this.menusVisible && this._hasMenus()) {
+    // If there are menus, show them in the tooltip. But only if there is a tooltipText, don't do it if there is an error status.
+    // Menus make most likely no sense if an error status is displayed
     menus = this._getCurrentMenus();
   }
 

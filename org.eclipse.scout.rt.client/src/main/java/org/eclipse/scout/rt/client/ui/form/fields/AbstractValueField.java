@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.List;
 
@@ -127,6 +128,25 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     IValueFieldContextMenu contextMenu = createContextMenu(menus);
     contextMenu.setContainerInternal(this);
     setContextMenu(contextMenu);
+    setStatusMenuMappings(createStatusMenuMappings());
+  }
+
+  protected List<IStatusMenuMapping> createStatusMenuMappings() {
+    List<Class<IStatusMenuMapping>> configuredMappings = getConfiguredStatusMenuMappings();
+    List<IStatusMenuMapping> mappings = new ArrayList<>();
+    for (Class<? extends IStatusMenuMapping> clazz : configuredMappings) {
+      IStatusMenuMapping mapping = ConfigurationUtility.newInnerInstance(this, clazz);
+      mappings.add(mapping);
+    }
+    for (IStatusMenuMapping mapping : mappings) {
+      mapping.setParentFieldInternal(this);
+    }
+    return mappings;
+  }
+
+  protected List<Class<IStatusMenuMapping>> getConfiguredStatusMenuMappings() {
+    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
+    return ConfigurationUtility.filterClasses(dca, IStatusMenuMapping.class);
   }
 
   protected IValueFieldContextMenu createContextMenu(OrderedCollection<IMenu> menus) {
@@ -168,12 +188,26 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     super.initFieldInternal();
     // init actions
     ActionUtility.initActions(getMenus());
+    for (IStatusMenuMapping mapping : getStatusMenuMappings()) {
+      mapping.init();
+    }
   }
 
   protected List<Class<? extends IMenu>> getDeclaredMenus() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
     return ConfigurationUtility.removeReplacedClasses(filtered);
+  }
+
+  @Override
+  public void setStatusMenuMappings(List<IStatusMenuMapping> mappings) {
+    propertySupport.setProperty(PROP_STATUS_MENU_MAPPINGS, new ArrayList<>(mappings));
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<IStatusMenuMapping> getStatusMenuMappings() {
+    return (List<IStatusMenuMapping>) propertySupport.getProperty(PROP_STATUS_MENU_MAPPINGS);
   }
 
   /*

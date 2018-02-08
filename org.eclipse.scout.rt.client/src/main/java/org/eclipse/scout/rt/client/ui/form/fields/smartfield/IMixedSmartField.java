@@ -19,4 +19,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
  * @param <LOOKUP_KEY>
  */
 public interface IMixedSmartField<VALUE, LOOKUP_KEY> extends IContentAssistField<VALUE, LOOKUP_KEY> {
+
+  int NOT_UNIQUE_ERROR_CODE = 1;
+  int NO_RESULTS_ERROR_CODE = 2;
 }

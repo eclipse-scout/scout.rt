@@ -773,7 +773,8 @@ scout.SmartField2.prototype.closePopup = function() {
 scout.SmartField2.prototype.aboutToBlurByMouseDown = function(target) {
   var eventOnField = this.$field.isOrHas(target) || this.$icon.isOrHas(target) || this.$clearIcon.isOrHas(target);
   var eventOnPopup = this.popup && this.popup.$container.isOrHas(target);
-  if (!eventOnField && !eventOnPopup) {
+  var eventOnTooltip = this.tooltip && this.tooltip.$container.isOrHas(target);
+  if (!eventOnField && !eventOnPopup && !eventOnTooltip) {
     this.acceptInput(); // event outside this value field
   }
 };

@@ -89,9 +89,6 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 @ClassId("444e6fb6-3b0b-4917-933e-b6eb81345499")
 public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALUE> implements ISmartField2<VALUE> {
 
-  public static final int NOT_UNIQUE_ERROR_CODE = 1;
-  public static final int NO_RESULTS_ERROR_CODE = 2;
-
   /**
    * Null object used for {@link #installLookupRowContext(ILookupRow)}.
    */

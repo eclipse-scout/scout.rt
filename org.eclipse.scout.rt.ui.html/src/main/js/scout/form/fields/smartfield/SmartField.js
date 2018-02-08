@@ -645,8 +645,8 @@ scout.SmartField.prototype.acceptInput = function(whileTyping) {
 scout.SmartField.prototype.aboutToBlurByMouseDown = function(target) {
   var eventOnField = this.$field.isOrHas(target);
   var eventOnPopup = this.popup && this.popup.$container.isOrHas(target);
-
-  if (!eventOnField && !eventOnPopup) {
+  var eventOnTooltip = this.tooltip && this.tooltip.$container.isOrHas(target);
+  if (!eventOnField && !eventOnPopup && !eventOnTooltip) {
     this.acceptInput(); // event outside this field.
   }
 };

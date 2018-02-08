@@ -180,7 +180,11 @@ public class Status implements IStatus, Serializable {
    * severity name ($NON-NLS-1$)
    */
   protected String getSeverityName() {
-    switch (getSeverity()) {
+    return Status.getSeverityName(getSeverity());
+  }
+
+  public static String getSeverityName(int severity) {
+    switch (severity) {
       case OK: {
         return "OK";
       }

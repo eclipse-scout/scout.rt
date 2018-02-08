@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
 
+import java.util.List;
+
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IValueFieldContextMenu;
@@ -32,6 +34,8 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IContext
    * {@link IContextMenu}
    */
   String PROP_CONTEXT_MENU = "contextMenu";
+
+  String PROP_STATUS_MENU_MAPPINGS = "statusMenuMappings";
 
   /**
    * set field value to initValue and clear all error flags
@@ -123,4 +127,15 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IContext
    */
   void setAutoAddDefaultMenus(boolean b);
 
+  /**
+   * @return the mappings between menu and status. The mappings may be set explicitly using
+   *         {@link #setStatusMenuMappings(List)} or by defining an inner class at the form field extending from
+   *         {@link AbstractStatusMenuMapping}.
+   */
+  List<IStatusMenuMapping> getStatusMenuMappings();
+
+  /**
+   * Defines which menus should be displayed when an error status is shown. If the list is empty no menus are displayed.
+   */
+  void setStatusMenuMappings(List<IStatusMenuMapping> mappings);
 }

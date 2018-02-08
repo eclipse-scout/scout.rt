@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.form.fields;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
@@ -19,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
+import org.eclipse.scout.rt.client.ui.form.fields.IStatusMenuMapping;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -72,6 +74,12 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
       @Override
       protected String modelValue() {
         return getModel().getDisplayText();
+      }
+    });
+    putJsonProperty(new JsonAdapterProperty<VALUE_FIELD>(IValueField.PROP_STATUS_MENU_MAPPINGS, model, getUiSession()) {
+      @Override
+      protected List<IStatusMenuMapping> modelValue() {
+        return getModel().getStatusMenuMappings();
       }
     });
   }
