@@ -375,4 +375,31 @@ describe("scout.objects", function() {
 
   });
 
+  describe('equalsRecursive', function() {
+
+    it('works as expected', function() {
+      expect(scout.objects.equalsRecursive()).toBe(true); // undefined === undefined
+      expect(scout.objects.equalsRecursive(2)).toBe(false);
+      expect(scout.objects.equalsRecursive(2, 2)).toBe(true);
+      expect(scout.objects.equalsRecursive(2, 3)).toBe(false);
+      expect(scout.objects.equalsRecursive(2, '2')).toBe(false);
+      expect(scout.objects.equalsRecursive('2', '2')).toBe(true);
+      expect(scout.objects.equalsRecursive('', false)).toBe(false);
+      expect(scout.objects.equalsRecursive('', '')).toBe(true);
+      expect(scout.objects.equalsRecursive(true, true)).toBe(true);
+      expect(scout.objects.equalsRecursive(null, null)).toBe(true);
+      expect(scout.objects.equalsRecursive([], [])).toBe(true);
+      expect(scout.objects.equalsRecursive([1, 2, 3], [1, 2, 3])).toBe(true);
+      expect(scout.objects.equalsRecursive([1, 2, 3], [3, 2, 1])).toBe(false);
+      var a = {};
+      expect(scout.objects.equalsRecursive(a, a)).toBe(true);
+      expect(scout.objects.equalsRecursive({}, {})).toBe(true);
+      expect(scout.objects.equalsRecursive({a : '1', b : '2'}, {b : '2', a : '1'})).toBe(true);
+      expect(scout.objects.equalsRecursive({a : [{a : '1', b : '2'}, {a : '3', b : '4'}]}, {a : [{a : '1', b : '2'}, {a : '3', b : '4'}]})).toBe(true);
+      expect(scout.objects.equalsRecursive({a : [{a : '3', b : '4'}, {a : '1', b : '2'}]}, {a : [{a : '1', b : '2'}, {a : '3', b : '4'}]})).toBe(false);
+      expect(scout.objects.equalsRecursive({equals: function() { return true; }}, {equals: function() { return true; }})).toBe(true);
+    });
+
+  });
+
 });

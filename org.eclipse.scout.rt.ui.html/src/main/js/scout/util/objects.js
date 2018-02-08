@@ -272,6 +272,44 @@ scout.objects = {
   },
 
   /**
+   * Compare two objects and all its child elements recursively.
+   * @returns True if both objects and all child elements are equals by value or implemented equals method
+   */
+  equalsRecursive: function(objA, objB) {
+    var i;
+    if(this.isPlainObject(objA) && this.isPlainObject(objB)){
+      if(this.isFunction(objA.equals) && this.isFunction(objB.equals)){
+        return objA.equals(objB);
+      }
+      var keysA = Object.keys(objA);
+      var keysB = Object.keys(objB);
+      if(!scout.arrays.equalsIgnoreOrder(keysA, keysB)){
+        return false;
+      }
+      for (i = 0; i < keysA.length; i++) {
+        if(!this.equalsRecursive(objA[keysA[i]], objB[keysA[i]])){
+          return false;
+        }
+      }
+      return true;
+    }
+    else if(this.isArray(objA) && this.isArray(objB)){
+      if(objA.length !== objB.length){
+        return false;
+      }
+      else{
+        for (i = 0; i < objA.length; i++) {
+          if(!this.equalsRecursive(objA[i], objB[i])){
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+    return objA === objB;
+  },
+
+  /**
    * Compares a list of properties of two objects by using the equals method for each property.
    */
   propertiesEquals: function(objA, objB, properties) {
