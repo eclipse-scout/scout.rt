@@ -1078,6 +1078,8 @@ scout.Planner.prototype._adjustSelectionRange = function(range) {
   if (options.interval > 0 && options.minSelectionIntervalCount > 0) {
     minSelectionDuration = options.minSelectionIntervalCount * options.interval * 60000;
   }
+  var lastHourOfDay = options.lastHourOfDay;
+  var endOfDay = scout.dates.shiftTime(scout.dates.trunc(range.from), lastHourOfDay + 1);
   var viewRange = this._visibleViewRange();
   if (this.lastRange.from < this.startRange.from) {
     // Selecting to left
@@ -1094,6 +1096,11 @@ scout.Planner.prototype._adjustSelectionRange = function(range) {
     if (from + minSelectionDuration <= viewRange.to.getTime()) {
       // extend to right side
       to = Math.max(to, Math.max(from + minSelectionDuration, viewRange.from.getTime()));
+      if (to >= endOfDay.getTime() && new scout.Range(from, to).size() === minSelectionDuration) {
+        // extend to left side when clicking at the end of a day
+        to = endOfDay.getTime();
+        from = Math.min(from, to - minSelectionDuration);
+      }
     } else {
       // extend to left side if to would be greater than the maximum date (right border)
       to = viewRange.to.getTime();
