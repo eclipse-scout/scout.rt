@@ -833,9 +833,10 @@ scout.SmartField.prototype._onFieldKeyUp = function(event) {
 
   // Pop-ups shouldn't open when one of the following keys is pressed
   var w = event.which;
-  var pasteShortcut = (event.ctrlKey || event.metaKey) && w === scout.keys.V;
+  var isPaste = ((event.ctrlKey || event.metaKey) && w === scout.keys.V) || (event.shiftKey && w === scout.keys.INSERT);
+  var isCut = ((event.ctrlKey || event.metaKey) && w === scout.keys.X) || (event.shiftKey && w === scout.keys.DELETE);
 
-  if (!pasteShortcut && (
+  if (!isPaste && !isCut && (
       event.ctrlKey ||
       event.altKey ||
       event.metaKey ||
@@ -921,6 +922,7 @@ scout.SmartField.prototype._onFieldKeyDown = function(event) {
       event.ctrlKey ||
       event.altKey ||
       event.metaKey ||
+      w === scout.keys.ESC ||
       w === scout.keys.SHIFT ||
       w === scout.keys.CTRL ||
       w === scout.keys.ALT ||
@@ -949,11 +951,36 @@ scout.SmartField.prototype._onFieldKeyDown = function(event) {
 
 scout.SmartField.prototype._updateUserWasTyping = function(event) {
   var w = event.which;
-  if (w === scout.keys.TAB) {
+  var isPaste = ((event.ctrlKey || event.metaKey) && w === scout.keys.V) || (event.shiftKey && w === scout.keys.INSERT);
+  var isCut = ((event.ctrlKey || event.metaKey) && w === scout.keys.X) || (event.shiftKey && w === scout.keys.DELETE);
+
+  if (!isPaste && !isCut && (
+      event.ctrlKey ||
+      event.altKey ||
+      event.metaKey ||
+      w === scout.keys.ESC ||
+      w === scout.keys.TAB ||
+      w === scout.keys.SHIFT ||
+      w === scout.keys.CTRL ||
+      w === scout.keys.ALT ||
+      w === scout.keys.HOME ||
+      w === scout.keys.END ||
+      w === scout.keys.LEFT ||
+      w === scout.keys.RIGHT ||
+      w === scout.keys.WIN_LEFT ||
+      w === scout.keys.WIN_RIGHT ||
+      w === scout.keys.SELECT ||
+      w === scout.keys.NUM_LOCK ||
+      w === scout.keys.CAPS_LOCK ||
+      w === scout.keys.SCROLL_LOCK ||
+      w === scout.keys.PAUSE ||
+      this._isFunctionKey(event)
+    )) {
     // neutral, don't change flag
-  } else {
-    this._userWasTyping = !(this._isNavigationKey(event) || w === scout.keys.ENTER);
+    return;
   }
+
+  this._userWasTyping = !(this._isNavigationKey(event) || w === scout.keys.ENTER);
 };
 
 scout.SmartField.prototype._isNavigationKey = function(event) {
