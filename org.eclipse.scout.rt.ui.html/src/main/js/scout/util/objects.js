@@ -277,29 +277,27 @@ scout.objects = {
    */
   equalsRecursive: function(objA, objB) {
     var i;
-    if(this.isPlainObject(objA) && this.isPlainObject(objB)){
-      if(this.isFunction(objA.equals) && this.isFunction(objB.equals)){
+    if (this.isPlainObject(objA) && this.isPlainObject(objB)) {
+      if (this.isFunction(objA.equals) && this.isFunction(objB.equals)) {
         return objA.equals(objB);
       }
       var keysA = Object.keys(objA);
       var keysB = Object.keys(objB);
-      if(!scout.arrays.equalsIgnoreOrder(keysA, keysB)){
+      if (!scout.arrays.equalsIgnoreOrder(keysA, keysB)) {
         return false;
       }
       for (i = 0; i < keysA.length; i++) {
-        if(!this.equalsRecursive(objA[keysA[i]], objB[keysA[i]])){
+        if (!this.equalsRecursive(objA[keysA[i]], objB[keysA[i]])) {
           return false;
         }
       }
       return true;
-    }
-    else if(this.isArray(objA) && this.isArray(objB)){
-      if(objA.length !== objB.length){
+    } else if (this.isArray(objA) && this.isArray(objB)) {
+      if (objA.length !== objB.length) {
         return false;
-      }
-      else{
+      } else {
         for (i = 0; i < objA.length; i++) {
-          if(!this.equalsRecursive(objA[i], objB[i])){
+          if (!this.equalsRecursive(objA[i], objB[i])) {
             return false;
           }
         }
