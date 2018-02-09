@@ -667,5 +667,46 @@ describe("Planner", function() {
       expect(planner.selectionRange.to.toISOString()).toBe(scout.dates.create('2016-06-20 17:00:00').toISOString());
     });
 
+    it("respects end of day if minSelectionIntervalCount is set", function() {
+      planner.viewRange = new scout.DateRange(scout.dates.create('2016-06-20'), scout.dates.create('2016-06-27'));
+      planner.displayMode = scout.Planner.DisplayMode.WEEK;
+      planner.displayModeOptions[planner.displayMode] = {
+        interval: 30,
+        firstHourOfDay: 8,
+        lastHourOfDay: 17,
+        minSelectionIntervalCount: 2
+      };
+      planner._renderDisplayModeOptions();
+      planner.startRow = planner.resources[0];
+      planner.lastRow = planner.resources[0];
+
+      // end of day
+      planner.startRange = new scout.DateRange(scout.dates.create('2016-06-26 17:00:00').getTime(), scout.dates.create('2016-06-20 17:30:00').getTime());
+      planner.lastRange = new scout.DateRange(scout.dates.create('2016-06-26 17:00:00').getTime(), scout.dates.create('2016-06-20 17:30:00').getTime());
+      planner._select();
+      expect(planner.selectionRange.from.toISOString()).toBe(scout.dates.create('2016-06-26 17:00:00').toISOString());
+      expect(planner.selectionRange.to.toISOString()).toBe(scout.dates.create('2016-06-26 18:00:00').toISOString());
+
+      // end of day, click in last interval -> actual end would be 18:30 but since this is not visible to the user use 18:00 as end
+      planner.startRange = new scout.DateRange(scout.dates.create('2016-06-26 17:30:00').getTime(), scout.dates.create('2016-06-20 18:00:00').getTime());
+      planner.lastRange = new scout.DateRange(scout.dates.create('2016-06-26 17:30:00').getTime(), scout.dates.create('2016-06-20 18:00:00').getTime());
+      planner._select();
+      expect(planner.selectionRange.from.toISOString()).toBe(scout.dates.create('2016-06-26 17:00:00').toISOString());
+      expect(planner.selectionRange.to.toISOString()).toBe(scout.dates.create('2016-06-26 18:00:00').toISOString());
+
+      // manual selection over end of day should still be possible
+      planner.startRange = new scout.DateRange(scout.dates.create('2016-06-20 17:30:00').getTime(), scout.dates.create('2016-06-20 18:00:00').getTime());
+      planner.lastRange = new scout.DateRange(scout.dates.create('2016-06-21 09:00:00').getTime(), scout.dates.create('2016-06-21 09:30:00').getTime());
+      planner._select();
+      expect(planner.selectionRange.from.toISOString()).toBe(scout.dates.create('2016-06-20 17:30:00').toISOString());
+      expect(planner.selectionRange.to.toISOString()).toBe(scout.dates.create('2016-06-21 09:30:00').toISOString());
+
+      // selection to left
+      planner.startRange = new scout.DateRange(scout.dates.create('2016-06-20 17:30:00').getTime(), scout.dates.create('2016-06-20 18:00:00').getTime());
+      planner.lastRange = new scout.DateRange(scout.dates.create('2016-06-20 15:00:00').getTime(), scout.dates.create('2016-06-20 15:30:00').getTime());
+      planner._select();
+      expect(planner.selectionRange.from.toISOString()).toBe(scout.dates.create('2016-06-20 15:00:00').toISOString());
+      expect(planner.selectionRange.to.toISOString()).toBe(scout.dates.create('2016-06-20 18:00:00').toISOString());
+    });
   });
 });
