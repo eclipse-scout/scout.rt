@@ -21,8 +21,11 @@ import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 
 /**
- * Abstract implementation of a REST client helper dealing with REST requests to a API server. This class is stateless
- * and may be reused for subsequent REST requests to the same API server.
+ * Abstract implementation of a REST client helper dealing with REST requests to a API server.
+ * <p>
+ * This class is stateless and may be reused for subsequent REST requests to the same API server.
+ * <p>
+ * Subclasses may bind this generic REST client helper to a concrete REST endpoint by implementing the {@link #getBaseUri()} method.
  */
 public abstract class AbstractRestClientHelper implements IRestClientHelper {
 
