@@ -17,6 +17,7 @@ scout.TabBox = function() {
 
   this.gridDataHints.useUiHeight = true;
   this.gridDataHints.w = scout.FormField.FULL_WIDTH;
+  this.menusVisible = false; // TabBox shows its menus in the tab box header -> don't draw an ellipsis status icon
   this.selectedTab;
   this.tabItems = [];
   this._addWidgetProperties(['tabItems', 'selectedTab']);
