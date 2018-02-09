@@ -1264,7 +1264,8 @@ scout.Session.prototype._onCancelProcessing = function(event) {
 
 scout.Session.prototype._sendCancelRequest = function() {
   var request = this._newRequest({
-    cancel: true
+    cancel: true,
+    showBusyIndicator: false
   });
   this._sendRequest(request);
 };
