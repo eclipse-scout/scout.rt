@@ -28,11 +28,13 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
 
   protected final LazyValue<DataObjectDefinitionRegistry> m_doEntityDefinitionRegistry = new LazyValue<>(DataObjectDefinitionRegistry.class);
 
-  protected Class<? extends IDoEntity> m_handledType;
+  protected final JavaType m_handledType;
+  protected final Class<? extends IDoEntity> m_handledClass;
 
-  public DoEntityDeserializer(Class<? extends IDoEntity> type) {
+  public DoEntityDeserializer(JavaType type) {
     super(type);
     m_handledType = type;
+    m_handledClass = type.getRawClass().asSubclass(IDoEntity.class);
   }
 
   @Override
@@ -51,7 +53,7 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
         return deserializeDoEntityAttributes(p, ctxt);
       case END_OBJECT:
         // empty object without attributes consists only of START_OBJECT and END_OBJECT token, return empty entity object
-        return newObject(ctxt, m_handledType);
+        return newObject(ctxt, m_handledClass);
       default:
         throw ctxt.wrongTokenException(p, m_handledType, JsonToken.FIELD_NAME, null);
     }
@@ -135,7 +137,7 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       }
     }
     // fallback to handled type of deserializer
-    return newObject(ctxt, m_handledType);
+    return newObject(ctxt, m_handledClass);
   }
 
   protected JavaType findResolvedAttributeType(IDoEntity entityInstance, String attributeName, boolean isObject, boolean isArray) {
@@ -147,17 +149,39 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
   protected JavaType findResolvedFallbackAttributeType(boolean isObject, boolean isArray) {
     // fallback to default handling, if no attribute definition could be found
     if (isObject) {
-      // all object-like JSON structure is deserialized as raw DoEntity
-      return TypeFactory.defaultInstance().constructType(DoEntity.class);
+      // DoMapEntity<T> structure is deserialized as typed Map<String, T>
+      if (DoMapEntity.class.isAssignableFrom(m_handledClass)) {
+        return findResolvedDoMapEntityType();
+      }
+      else {
+        // object-like JSON structure is deserialized as raw DoEntity
+        return TypeFactory.defaultInstance().constructType(DoEntity.class);
+      }
     }
     else if (isArray) {
-      // all array-like JSON structure is deserialized as raw DoList
+      // array-like JSON structure is deserialized as raw DoList
       return TypeFactory.defaultInstance().constructType(DoList.class);
     }
     else {
-      // all JSON scalar values are deserialized as raw object using default jackson typing
+      // JSON scalar values are deserialized as raw object using default jackson typing
       return TypeFactory.unknownType();
     }
+  }
+
+  /**
+   * Lookup generic type parameter of DoMapEntity super class 
+   */
+  protected JavaType findResolvedDoMapEntityType() {
+    JavaType type = m_handledType;
+    while (type.getRawClass() != DoMapEntity.class) {
+      if (type.getRawClass() == Object.class) {
+        // Fallback: object-like JSON structure is deserialized as raw DoEntity
+        return TypeFactory.defaultInstance().constructType(DoEntity.class);
+      }
+      type = type.getSuperClass();
+    }
+    // Use type parameter of DoMap<T> as attribute type
+    return type.getBindings().getBoundType(0);
   }
 
   protected <T extends IDoEntity> T newObject(DeserializationContext ctxt, Class<T> entityType) throws IOException {

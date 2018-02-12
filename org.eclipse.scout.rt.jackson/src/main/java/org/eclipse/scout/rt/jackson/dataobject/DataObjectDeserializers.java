@@ -35,7 +35,7 @@ public class DataObjectDeserializers extends Deserializers.Base {
   @Override
   public JsonDeserializer<?> findBeanDeserializer(JavaType type, DeserializationConfig config, BeanDescription beanDesc) throws JsonMappingException {
     if (IDoEntity.class.isAssignableFrom(type.getRawClass())) {
-      return new DoEntityDeserializer(type.getRawClass().asSubclass(IDoEntity.class));
+      return new DoEntityDeserializer(type);
     }
     else if (DoList.class.isAssignableFrom(type.getRawClass())) {
       return new DoListDeserializer(type);

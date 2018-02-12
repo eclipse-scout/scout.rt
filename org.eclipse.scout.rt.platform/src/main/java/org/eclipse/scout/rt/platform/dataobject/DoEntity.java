@@ -18,11 +18,11 @@ import org.eclipse.scout.rt.platform.util.Assertions;
  * &#64;TypeName("ExampleEntity")
  * public class ExampleEntityDo extends DoEntity {
  *
- *   public DoValue<Date> createdOn() {
+ *   public DoValue&lt;Date&gt; createdOn() {
  *     return doValue("createdOn");
  *   }
  *
- *   public DoList<String> nodes() {
+ *   public DoList&lt;String&gt; nodes() {
  *     return doList("nodes");
  *   }
  * }

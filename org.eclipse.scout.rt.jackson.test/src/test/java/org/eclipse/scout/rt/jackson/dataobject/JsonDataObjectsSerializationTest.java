@@ -38,6 +38,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCoreExample2Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCoreExample3Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCustomImplementedEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDateDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDoMapEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDoValuePojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDuplicatedAttributeDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestElectronicAddressDo;
@@ -49,6 +50,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithInterface2D
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithListsDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithNestedEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestGenericDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItem3Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemPojo2;
@@ -1070,6 +1072,33 @@ public class JsonDataObjectsSerializationTest {
     assertTrue(marshalled.getStringSetAttribute().contains("bar"));
   }
 
+  @Test
+  public void testSerializeDeserialize_DoMapEntity() throws Exception {
+    TestDoMapEntityDo mapDo = BEANS.get(TestDoMapEntityDo.class);
+    mapDo.put("mapAttribute1", createTestItemDo("id-1", "value-1"));
+    mapDo.put("mapAttribute2", createTestItemDo("id-2", "value-2"));
+    mapDo.withCount(42);
+    mapDo.withNamedItem(createTestItemDo("namedItem", "value-named"));
+    mapDo.withNamedItem3(createTestItem3Do("namedItem3", new BigDecimal("42")));
+
+    String json = s_dataObjectMapper.writeValueAsString(mapDo);
+    assertJsonResourceEquals("TestDoMapEntityDo.json", json);
+
+    TestDoMapEntityDo marshalled = s_dataObjectMapper.readValue(json, TestDoMapEntityDo.class);
+    s_testHelper.assertDoEntityEquals(mapDo, marshalled);
+
+    assertEquals("value-named", marshalled.getNamedItem().getStringAttribute());
+    assertEquals("value-named", marshalled.get("namedItem").getStringAttribute());
+    assertEquals(new BigDecimal("42"), marshalled.getNamedItem3().getBigDecimalAttribute());
+  }
+
+  @Test(expected = ClassCastException.class)
+  public void testSerializeDeserialize_DoMapEntity_illegalAccess() {
+    TestDoMapEntityDo mapDo = BEANS.get(TestDoMapEntityDo.class);
+    mapDo.put("namedItem3", createTestItemDo("id-1", "value-1"));
+    mapDo.getNamedItem3(); // access item with type TestItem3 which was filled with a wrong TestItemDo value
+  }
+
   // ------------------------------------ polymorphic test cases ------------------------------------
 
   /**
@@ -1581,6 +1610,10 @@ public class JsonDataObjectsSerializationTest {
 
   protected TestItemDo createTestItemDo(String id, String attribute) {
     return BEANS.get(TestItemDo.class).withId(id).withStringAttribute(attribute);
+  }
+
+  protected TestItem3Do createTestItem3Do(String id, BigDecimal attribute) {
+    return BEANS.get(TestItem3Do.class).withId(id).withBigDecimalAttribute(attribute);
   }
 
   protected TestItemPojo createTestItemPojo(String id, String attribute) {

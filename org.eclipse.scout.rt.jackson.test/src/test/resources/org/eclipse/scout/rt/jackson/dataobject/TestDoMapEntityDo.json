@@ -1,0 +1,24 @@
+{
+  "_type" : "TestDoMapEntity",
+  "count" : 42,
+  "mapAttribute1" : {
+    "_type" : "TestItem",
+    "id" : "id-1",
+    "stringAttribute" : "value-1"
+  },
+  "mapAttribute2" : {
+    "_type" : "TestItem",
+    "id" : "id-2",
+    "stringAttribute" : "value-2"
+  },
+  "namedItem" : {
+    "_type" : "TestItem",
+    "id" : "namedItem",
+    "stringAttribute" : "value-named"
+  },
+  "namedItem3" : {
+    "_type" : "TestItem3",
+    "bigDecimalAttribute" : 42,
+    "id" : "namedItem3"
+  }
+}
