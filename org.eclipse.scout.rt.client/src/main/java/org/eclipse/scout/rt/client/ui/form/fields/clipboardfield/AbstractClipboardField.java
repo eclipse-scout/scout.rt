@@ -87,9 +87,12 @@ public abstract class AbstractClipboardField extends AbstractValueField<Collecti
   }
 
   /**
-   * Configures the drag support of this string field.
    * <p>
-   * Subclasses can override this method. Default is {@code 0} (no drag support).
+   * Configures the drag support of this clipboard field.
+   * </p>
+   * <p>
+   * Method marked as final as currently only drop is implemented for this field.
+   * </p>
    *
    * @return {@code 0} for no support or one or more of {@link IDNDSupport#TYPE_FILE_TRANSFER},
    *         {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
@@ -97,7 +100,7 @@ public abstract class AbstractClipboardField extends AbstractValueField<Collecti
    */
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(40)
-  protected int getConfiguredDragType() {
+  protected final int getConfiguredDragType() {
     return 0;
   }
 
@@ -129,7 +132,7 @@ public abstract class AbstractClipboardField extends AbstractValueField<Collecti
 
   @ConfigOperation
   @Order(70)
-  protected TransferObject execDragRequest() {
+  protected final TransferObject execDragRequest() {
     return null;
   }
 

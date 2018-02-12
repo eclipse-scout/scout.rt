@@ -548,9 +548,12 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   /**
-   * Configures the drag support of this table.
    * <p>
-   * Subclasses can override this method. Default is {@code 0} (no drag support).
+   * Configures the drag support of this table.
+   * </p>
+   * <p>
+   * Method marked as final as currently only drop is implemented for this field.
+   * </p>
    *
    * @return {@code 0} for no support or one or more of {@link IDNDSupport#TYPE_FILE_TRANSFER},
    *         {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
@@ -558,7 +561,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    */
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(190)
-  protected int getConfiguredDragType() {
+  protected final int getConfiguredDragType() {
     return 0;
   }
 
@@ -627,9 +630,12 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   /**
-   * Called after a drag operation was executed on one or several table rows.
    * <p>
-   * Subclasses can override this method. The default does nothing.
+   * Called after a drag operation was executed on one or several table rows.
+   * </p>
+   * <p>
+   * Method marked as final as currently only drop is implemented for this field.
+   * </p>
    *
    * @param rows
    *          Table rows that were dragged (unmodifiable list).
@@ -637,7 +643,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    */
   @ConfigOperation
   @Order(10)
-  protected TransferObject execDrag(List<ITableRow> rows) {
+  protected final TransferObject execDrag(List<ITableRow> rows) {
     return null;
   }
 

@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.desktop.bookmark;
 
 import java.security.Permission;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -313,11 +312,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
 
     @Override
-    protected int getConfiguredDragType() {
-      return TYPE_JAVA_ELEMENT_TRANSFER;
-    }
-
-    @Override
     protected int getConfiguredDropType() {
       return TYPE_JAVA_ELEMENT_TRANSFER;
     }
@@ -328,14 +322,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
         Bookmark bm = (Bookmark) node.getCell().getValue();
         ClientSessionProvider.currentSession().getDesktop().activateBookmark(bm);
       }
-    }
-
-    @Override
-    protected TransferObject execDrag(Collection<ITreeNode> nodes) {
-      if (ACCESS.check(getUpdatePermission())) {
-        return new JavaTransferObject(nodes);
-      }
-      return null;
     }
 
     @Override

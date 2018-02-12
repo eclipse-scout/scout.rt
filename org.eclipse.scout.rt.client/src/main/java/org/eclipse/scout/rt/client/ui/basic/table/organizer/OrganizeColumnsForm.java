@@ -642,18 +642,8 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
           public class Table extends AbstractTable {
 
             @Override
-            protected int getConfiguredDragType() {
-              return IDNDSupport.TYPE_JAVA_ELEMENT_TRANSFER;
-            }
-
-            @Override
             protected int getConfiguredDropType() {
               return IDNDSupport.TYPE_JAVA_ELEMENT_TRANSFER;
-            }
-
-            @Override
-            protected TransferObject execDrag(List<ITableRow> rows) {
-              return new JavaTransferObject(rows);
             }
 
             @Override
