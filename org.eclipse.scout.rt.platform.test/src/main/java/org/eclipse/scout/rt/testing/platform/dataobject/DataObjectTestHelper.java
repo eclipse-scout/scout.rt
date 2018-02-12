@@ -11,12 +11,14 @@
 package org.eclipse.scout.rt.testing.platform.dataobject;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
@@ -86,7 +88,10 @@ public class DataObjectTestHelper {
    * custom equality check.
    */
   public void assertObjectEquals(Object expected, Object actual, boolean assertClassEquals) {
-    if (expected instanceof IDoEntity) {
+    if (expected == null) {
+      assertNull(actual);
+    }
+    else if (expected instanceof IDoEntity) {
       assertDoEntityEquals((IDoEntity) expected, (IDoEntity) actual, assertClassEquals);
     }
     else if (expected instanceof DoValue) {
@@ -120,6 +125,9 @@ public class DataObjectTestHelper {
         assertTrue("expected map does not contain actual key " + actualEntry.getKey(), expectedMap.containsKey(actualEntry.getKey()));
         assertObjectEquals(expectedMap.get(actualEntry.getKey()), actualEntry.getValue(), assertClassEquals);
       }
+    }
+    else if (expected.getClass().isArray()) {
+      assertTrue(Objects.deepEquals(expected, actual)); // delegates to Arrays.deepEquals0()
     }
     else {
       assertEquals(expected, actual);

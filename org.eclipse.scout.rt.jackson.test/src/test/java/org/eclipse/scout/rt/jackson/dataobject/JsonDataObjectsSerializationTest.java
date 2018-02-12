@@ -13,6 +13,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +31,7 @@ import java.util.UUID;
 
 import org.eclipse.scout.rt.jackson.dataobject.fixture.ITestBaseEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestBigIntegerDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestBinaryDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCollectionsDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestComplexEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestComplexEntityPojo;
@@ -81,7 +83,9 @@ import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.IDataObject;
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.dataobject.IValueFormatConstants;
+import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -90,6 +94,7 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -307,6 +312,25 @@ public class JsonDataObjectsSerializationTest {
     assertEquals("secondValue", entity.getString("stringAttribute"));
     assertEquals(new BigDecimal("2.0"), entity.getDecimal("bigDecimalAttribute"));
     assertEquals(new BigDecimal("1"), entity.getDecimal("bigIntegerAttribute"));
+  }
+
+  @Test
+  public void testSerializeDeserialize_BinaryDo() throws Exception {
+    TestBinaryDo binary = BEANS.get(TestBinaryDo.class);
+    byte[] content = IOUtility.readFromUrl(getResource("TestBinaryContent.jpg"));
+    binary.withContent(content);
+    String json = s_dataObjectMapper.writeValueAsString(binary);
+    assertJsonResourceEquals("TestBinaryDo.json", json);
+
+    TestBinaryDo marshalled = s_dataObjectMapper.readValue(json, TestBinaryDo.class);
+    assertArrayEquals(content, marshalled.getContent());
+
+    // read object as raw Map<String, String> object
+    Map<String, String> rawObject = s_dataObjectMapper.readValue(json, new TypeReference<Map<String, String>>() {
+    });
+    String base64encoded = Base64Utility.encode(content);
+    assertEquals(base64encoded, rawObject.get("content"));
+    s_testHelper.assertDoEntityEquals(binary, marshalled);
   }
 
   // ------------------------------------ plain POJO test cases ------------------------------------
@@ -1092,6 +1116,21 @@ public class JsonDataObjectsSerializationTest {
     assertEquals(new BigDecimal("42"), marshalled.getNamedItem3().getBigDecimalAttribute());
   }
 
+  @Test
+  public void testSerializeDeserialize_DoMapEntityRaw() throws Exception {
+    DoEntity mapDo = BEANS.get(DoEntity.class);
+    mapDo.put("mapAttribute1", createTestItemDo("id-1", "value-1"));
+    mapDo.put("mapAttribute2", createTestItemDo("id-2", "value-2"));
+    String json = s_dataObjectMapper.writeValueAsString(mapDo); // write TestDoMapEntityDo as DoEntity to exclude writing the _type property
+
+    // read object as raw Map<String, String> object
+    TypeReference<Map<String, TestItemDo>> typeRef = new TypeReference<Map<String, TestItemDo>>() {
+    };
+    Map<String, TestItemDo> marshalled = s_dataObjectMapper.readValue(json, typeRef);
+    s_testHelper.assertDoEntityEquals(mapDo.get("mapAttribute1", IDoEntity.class), marshalled.get("mapAttribute1"));
+    s_testHelper.assertDoEntityEquals(mapDo.get("mapAttribute2", IDoEntity.class), marshalled.get("mapAttribute2"));
+  }
+
   @Test(expected = ClassCastException.class)
   public void testSerializeDeserialize_DoMapEntity_illegalAccess() {
     TestDoMapEntityDo mapDo = BEANS.get(TestDoMapEntityDo.class);
@@ -1637,10 +1676,14 @@ public class JsonDataObjectsSerializationTest {
   }
 
   protected void assertJsonResourceEquals(String expectedResourceName, String actual) {
-    s_testHelper.assertJsonResourceEquals(JsonDataObjectsSerializationTest.class.getResource(expectedResourceName), actual);
+    s_testHelper.assertJsonResourceEquals(getResource(expectedResourceName), actual);
   }
 
   protected String readResourceAsString(String resourceName) throws IOException {
-    return s_testHelper.readResourceAsString(JsonDataObjectsSerializationTest.class.getResource(resourceName));
+    return s_testHelper.readResourceAsString(getResource(resourceName));
+  }
+
+  protected URL getResource(String expectedResourceName) {
+    return JsonDataObjectsSerializationTest.class.getResource(expectedResourceName);
   }
 }
