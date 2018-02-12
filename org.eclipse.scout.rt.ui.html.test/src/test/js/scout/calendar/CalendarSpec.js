@@ -31,7 +31,7 @@ describe("Calendar", function() {
 
     it("creates an empty calendar", function() {
       var cal = helper.createCalendar(helper.createSimpleModel());
-      expect(cal.viewRange).toBeDefined;
+      expect(cal.viewRange).toBeDefined();
     });
 
   });

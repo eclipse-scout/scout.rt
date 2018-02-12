@@ -514,6 +514,7 @@ describe('Widget', function() {
 
         widget.setChildWidget(child);
         widget.setChildWidget(null);
+        expect().nothing();
       });
     });
 

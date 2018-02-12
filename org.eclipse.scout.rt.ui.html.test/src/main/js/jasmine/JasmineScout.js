@@ -447,6 +447,17 @@ var jasmineScoutMatchers = {
         return result;
       }
     };
+  },
+
+  // TODO [?] bsh: Remove this matcher again, when a newer jasmine version is used (https://github.com/jasmine/jasmine/issues/1221)
+  nothing: function(util, customEqualityTesters) {
+    return {
+      compare: function() {
+        return {
+          pass: true
+        };
+      }
+    };
   }
 };
 

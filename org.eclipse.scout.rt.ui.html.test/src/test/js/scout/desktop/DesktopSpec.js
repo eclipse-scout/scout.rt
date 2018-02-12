@@ -1072,6 +1072,7 @@ describe('Desktop', function() {
 
         // Does not really work (meaning menu is not selected) but must not throw an exception either
         form.activate();
+        expect().nothing();
       });
 
     });

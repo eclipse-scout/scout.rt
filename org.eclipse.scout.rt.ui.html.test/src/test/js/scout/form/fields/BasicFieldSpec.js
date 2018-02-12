@@ -205,6 +205,7 @@ describe("BasicField", function() {
       field.remove();
       jasmine.clock().tick(251); // because of debounce
       // expect not to fail
+      expect().nothing();
     });
   });
 
