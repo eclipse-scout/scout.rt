@@ -184,10 +184,15 @@ scout.Form.prototype._createLifecycle = function() {
 };
 
 /**
- * Renders the form by adding it to the desktop.
+ * Renders the form by adding it to the desktop. Afterwards, the form life cycle's
+ * "load" phase is initiated and the corresponding promise is returned.
+ *
+ * Calling this method is equivalent to calling first show(), then load().
+ *
+ * @returns {Promise}.
  */
 scout.Form.prototype.open = function() {
-  this.session.desktop.showForm(this);
+  this.show();
   return this.load();
 };
 
@@ -306,7 +311,7 @@ scout.Form.prototype._onLifecycleClose = function() {
 };
 
 scout.Form.prototype._close = function() {
-  this.session.desktop.hideForm(this);
+  this.hide();
   this.destroy();
 };
 
@@ -396,6 +401,14 @@ scout.Form.prototype._onDialogMouseDown = function() {
 
 scout.Form.prototype.activate = function() {
   this.session.desktop.activateForm(this);
+};
+
+scout.Form.prototype.show = function() {
+  this.session.desktop.showForm(this);
+};
+
+scout.Form.prototype.hide = function() {
+  this.session.desktop.hideForm(this);
 };
 
 scout.Form.prototype._renderHeader = function() {
