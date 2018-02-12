@@ -12,8 +12,11 @@ import java.io.IOException;
 import java.net.URL;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.dataobject.DataObjectHelper;
+import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.testing.platform.dataobject.DataObjectTestHelper;
 
 /**
@@ -22,27 +25,50 @@ import org.eclipse.scout.rt.testing.platform.dataobject.DataObjectTestHelper;
 @ApplicationScoped
 public class DataObjectSerializationTestHelper extends DataObjectTestHelper {
 
-  protected static final String SINGLE_NEW_LINE = "\n";
+  protected static final LazyValue<IDataObjectMapper> s_dataObjectMapper = new LazyValue<>(IDataObjectMapper.class);
+
+  protected static final LazyValue<DataObjectHelper> s_dataObjectHelper = new LazyValue<>(DataObjectHelper.class);
 
   /**
-   * Asserts equality of two JSON strings allowing different line ending formats.
+   * Checks if the given data objects, represented as JSON strings, are equal. <br>
+   * Line endings and leading and trailing white spaces are ignored.
    */
   public void assertJsonEquals(String expected, String actual) {
-    expected = StringUtility.replaceNewLines(expected, SINGLE_NEW_LINE).trim();
-    actual = StringUtility.replaceNewLines(actual, SINGLE_NEW_LINE).trim();
+    expected = toUnixLineEndingsAndTrim(expected);
+    actual = toUnixLineEndingsAndTrim(actual);
     assertEquals(expected, actual);
   }
 
   /**
-   * Asserts equality of two JSON strings allowing different line ending formats.<br>
-   * The expected JSON string is loaded from the specified {@code expectedJsonResource} URL.
+   * Converts the given actual {@link IDoEntity} to a JSON string and invokes {@link #assertJsonEquals(String, String)}.
    */
-  public void assertJsonResourceEquals(URL expectedJsonResource, String actual) {
+  public void assertJsonEquals(String expected, IDoEntity actual) {
+    assertJsonEquals(expected, stringify(actual));
+  }
+
+  /**
+   * Converts the given expected {@link IDoEntity} to a string and invokes {@link #assertJsonEquals(String, String)}.
+   */
+  public void assertJsonEquals(IDoEntity expected, String actual) {
+    assertJsonEquals(stringify(expected), actual);
+  }
+
+  /**
+   * Converts the given actual and expected {@link IDoEntity} to strings and invokes
+   * {@link #assertJsonEquals(String, String)}.
+   */
+  public void assertJsonEquals(IDoEntity expected, IDoEntity actual) {
+    assertJsonEquals(stringify(expected), stringify(actual));
+  }
+
+  /**
+   * Loads the expected JSON string from the specified {@code expectedJsonResource} URL and invokes
+   * {@link #assertJsonEquals(String, String)}.
+   */
+  public void assertJsonEquals(URL expectedJsonResource, String actual) {
     try {
       String expected = readResourceAsString(expectedJsonResource);
-      expected = StringUtility.replaceNewLines(expected, SINGLE_NEW_LINE).trim();
-      actual = StringUtility.replaceNewLines(actual, SINGLE_NEW_LINE).trim();
-      assertEquals("JSON mismatch", expected, actual);
+      assertJsonEquals(expected, actual);
     }
     catch (IOException e) {
       fail("failed to load resource, error message=" + e.getMessage() + " exception=" + e);
@@ -50,10 +76,46 @@ public class DataObjectSerializationTestHelper extends DataObjectTestHelper {
   }
 
   /**
-   * Reads string from the specified {@code URL} resource.
+   * Loads the expected JSON string from the specified {@code expectedJsonResource} URL, converts the given actual
+   * {@link IDoEntity} to a JSON string and invokes {@link #assertJsonEquals(String, String)}.
+   */
+  public void assertJsonEquals(URL expectedJsonResource, IDoEntity actual) {
+    assertJsonEquals(expectedJsonResource, stringify(actual));
+  }
+
+  /**
+   * Reads a {@link String} from the specified {@code URL} resource.
    */
   public String readResourceAsString(URL url) throws IOException {
     assertNotNull("Invalid expected resource URL", url);
     return IOUtility.readStringUTF8(url.openStream());
+  }
+
+  /**
+   * Converts the specified {@code dataObject} to a JSON string
+   */
+  public String stringify(IDoEntity dataObject) {
+    return s_dataObjectMapper.get().writeValue(dataObject);
+  }
+
+  /**
+   * Parses the specified JSON string to a {@link IDoEntity}.
+   */
+  public <T extends IDoEntity> T parse(String json, Class<T> valueType) {
+    return s_dataObjectMapper.get().readValue(json, valueType);
+  }
+
+  /**
+   * Clones the given data object using data object serialization and deserialization.
+   */
+  public <T extends IDoEntity> T clone(T dataObject) {
+    return s_dataObjectHelper.get().clone(dataObject);
+  }
+
+  protected String toUnixLineEndingsAndTrim(String s) {
+    if (s == null) {
+      return s;
+    }
+    return s.replaceAll("\\r\\n", "\\\n").trim();
   }
 }

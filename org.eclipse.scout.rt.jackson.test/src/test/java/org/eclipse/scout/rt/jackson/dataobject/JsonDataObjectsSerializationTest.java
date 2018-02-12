@@ -140,7 +140,7 @@ public class JsonDataObjectsSerializationTest {
     TestDoValuePojo pojo = new TestDoValuePojo();
     pojo.setStringValue(createDoValue("foo"));
     String json = s_dataObjectMapper.writeValueAsString(pojo);
-    assertJsonResourceEquals("TestDoValuePojo.json", json);
+    assertJsonEquals("TestDoValuePojo.json", json);
 
     TestDoValuePojo pojoMarshalled = s_dataObjectMapper.readValue(json, TestDoValuePojo.class);
     assertEquals(pojo.getStringValue().get(), pojoMarshalled.getStringValue().get());
@@ -153,7 +153,7 @@ public class JsonDataObjectsSerializationTest {
     assertEquals("foo", pojo.getStringValue().get());
 
     String json = s_dataObjectMapper.writeValueAsString(pojo);
-    assertJsonResourceEquals("TestDoValuePojo.json", json);
+    assertJsonEquals("TestDoValuePojo.json", json);
   }
 
   /**
@@ -164,7 +164,7 @@ public class JsonDataObjectsSerializationTest {
     TestBigIntegerDo testDo = BEANS.get(TestBigIntegerDo.class);
     testDo.bigIntegerAttribute().set(new BigInteger("123456"));
     String json = s_dataObjectMapper.writeValueAsString(testDo);
-    assertJsonResourceEquals("TestBigIntegerDo.json", json);
+    assertJsonEquals("TestBigIntegerDo.json", json);
 
     TestBigIntegerDo pojoMarshalled = s_dataObjectMapper.readValue(json, TestBigIntegerDo.class);
     assertEquals(testDo.getBigIntegerAttribute(), pojoMarshalled.getBigIntegerAttribute());
@@ -177,7 +177,7 @@ public class JsonDataObjectsSerializationTest {
     assertEquals("123456", testDo.getBigIntegerAttribute().toString());
 
     String json = s_dataObjectMapper.writeValueAsString(testDo);
-    assertJsonResourceEquals("TestBigIntegerDo.json", json);
+    assertJsonEquals("TestBigIntegerDo.json", json);
   }
 
   @Test
@@ -187,7 +187,7 @@ public class JsonDataObjectsSerializationTest {
     assertEquals("123456", testDo.getBigIntegerAttribute().toString());
 
     String json = s_dataObjectMapper.writeValueAsString(testDo);
-    assertJsonResourceEquals("TestEntityWithNestedEntityDo.json", json);
+    assertJsonEquals("TestEntityWithNestedEntityDo.json", json);
   }
 
   @Test
@@ -196,7 +196,7 @@ public class JsonDataObjectsSerializationTest {
     testDo.stringArrayAttribute().set(new String[]{"one", "two", "three"});
     testDo.itemDoArrayAttribute().set(new TestItemDo[]{createTestItemDo("1", "foo"), createTestItemDo("2", "bar")});
     String json = s_dataObjectMapper.writeValueAsString(testDo);
-    assertJsonResourceEquals("TestEntityWithArrayDoValueDo.json", json);
+    assertJsonEquals("TestEntityWithArrayDoValueDo.json", json);
   }
 
   @Test
@@ -320,7 +320,7 @@ public class JsonDataObjectsSerializationTest {
     byte[] content = IOUtility.readFromUrl(getResource("TestBinaryContent.jpg"));
     binary.withContent(content);
     String json = s_dataObjectMapper.writeValueAsString(binary);
-    assertJsonResourceEquals("TestBinaryDo.json", json);
+    assertJsonEquals("TestBinaryDo.json", json);
 
     TestBinaryDo marshalled = s_dataObjectMapper.readValue(json, TestBinaryDo.class);
     assertArrayEquals(content, marshalled.getContent());
@@ -345,7 +345,7 @@ public class JsonDataObjectsSerializationTest {
     pojo.setString2("bar");
 
     String json = s_dataObjectMapper.writeValueAsString(pojo);
-    assertJsonResourceEquals("TestStringPojo.json", json);
+    assertJsonEquals("TestStringPojo.json", json);
 
     TestStringPojo testPojo = s_dataObjectMapper.readValue(json, TestStringPojo.class);
     assertEquals("foo", testPojo.getString());
@@ -359,7 +359,7 @@ public class JsonDataObjectsSerializationTest {
     pojo.getStringHolder().setString("foo");
 
     String json = s_dataObjectMapper.writeValueAsString(pojo);
-    assertJsonResourceEquals("TestStringHolderPojo.json", json);
+    assertJsonEquals("TestStringHolderPojo.json", json);
 
     TestStringHolderPojo testMarshalled = s_dataObjectMapper.readValue(json, TestStringHolderPojo.class);
     assertEquals("foo", testMarshalled.getStringHolder().getString());
@@ -407,7 +407,7 @@ public class JsonDataObjectsSerializationTest {
     testDo.putList("listAttributeWithNullValue", null);
 
     String json = s_dataObjectMapper.writeValueAsString(testDo);
-    assertJsonResourceEquals("TestSimpleDoRaw.json", json);
+    assertJsonEquals("TestSimpleDoRaw.json", json);
   }
 
   @Test
@@ -428,7 +428,7 @@ public class JsonDataObjectsSerializationTest {
     testDo.put("itemsAttributeList", Arrays.asList(testDo2, testDo2));
 
     String json = s_dataObjectMapper.writeValueAsString(testDo);
-    assertJsonResourceEquals("TestSimpleDoWithPojoRaw.json", json);
+    assertJsonEquals("TestSimpleDoWithPojoRaw.json", json);
   }
 
   @Test
@@ -457,7 +457,7 @@ public class JsonDataObjectsSerializationTest {
   public void testSerialize_EmptyRawDo() throws Exception {
     DoEntity testDo = new DoEntity();
     String json = s_dataObjectMapper.writeValueAsString(testDo);
-    assertJsonResourceEquals("TestEmptyDoEntity.json", json);
+    assertJsonEquals("TestEmptyDoEntity.json", json);
   }
 
   @Test
@@ -467,7 +467,7 @@ public class JsonDataObjectsSerializationTest {
     testDo.put("emptyList", Arrays.asList());
     testDo.put("emptyEntity", new DoEntity());
     String json = s_dataObjectMapper.writeValueAsString(testDo);
-    assertJsonResourceEquals("TestEntityWithEmptyObjectDo.json", json);
+    assertJsonEquals("TestEntityWithEmptyObjectDo.json", json);
   }
 
   @Test
@@ -490,7 +490,7 @@ public class JsonDataObjectsSerializationTest {
     dataObject.withNumberAttribute(42);
 
     String json = s_dataObjectMapper.writeValueAsString(dataObject);
-    assertJsonResourceEquals("TestMixedRawBigIntegerDo.json", json);
+    assertJsonEquals("TestMixedRawBigIntegerDo.json", json);
   }
 
   @Test
@@ -619,7 +619,7 @@ public class JsonDataObjectsSerializationTest {
     assertEquals(Integer.valueOf(123456), testDo.get("bigIntegerAttribute"));
 
     String json = s_dataObjectMapper.writeValueAsString(testDo);
-    assertJsonResourceEquals("TestBigIntegerDoRaw.json", json); // is written without type information
+    assertJsonEquals("TestBigIntegerDoRaw.json", json); // is written without type information
   }
 
   // ------------------------------------ Raw data object test cases with type name ------------------------
@@ -632,7 +632,7 @@ public class JsonDataObjectsSerializationTest {
     typedEntity.put("string", "foo");
     typedEntity.put("integer", 42);
     String json = s_dataObjectMapper.writeValueAsString(typedEntity);
-    assertJsonResourceEquals("TestMyCustomTypeDo.json", json); // is written with type information
+    assertJsonEquals("TestMyCustomTypeDo.json", json); // is written with type information
   }
 
   @Test
@@ -640,7 +640,7 @@ public class JsonDataObjectsSerializationTest {
     DoTypedEntity typedEntity = BEANS.get(DoTypedEntity.class);
     typedEntity.withType("TestMyCustomTypeEmpty");
     String json = s_dataObjectMapper.writeValueAsString(typedEntity);
-    assertJsonResourceEquals("TestMyCustomTypeEmptyDo.json", json); // is written with type information
+    assertJsonEquals("TestMyCustomTypeEmptyDo.json", json); // is written with type information
   }
 
   @Test
@@ -658,7 +658,7 @@ public class JsonDataObjectsSerializationTest {
     assertEquals(new BigDecimal("42"), typedEntity.getDecimal("integer"));
 
     String json = s_dataObjectMapper.writeValueAsString(typedEntity);
-    assertJsonResourceEquals("TestMyCustomTypeDo.json", json); // is written with type information
+    assertJsonEquals("TestMyCustomTypeDo.json", json); // is written with type information
   }
 
   @Test
@@ -669,7 +669,7 @@ public class JsonDataObjectsSerializationTest {
 
     assertEquals("TestMyCustomTypeEmpty", ((DoTypedEntity) typedEntity).getType());
     String json = s_dataObjectMapper.writeValueAsString(typedEntity);
-    assertJsonResourceEquals("TestMyCustomTypeEmptyDo.json", json); // is written with type information
+    assertJsonEquals("TestMyCustomTypeEmptyDo.json", json); // is written with type information
   }
 
   // ------------------------------------ DoEntity with list test cases ------------------------------------
@@ -691,7 +691,7 @@ public class JsonDataObjectsSerializationTest {
     testDo.withStringDoListAttribute("stringC", "stringD");
 
     String json = s_dataObjectMapper.writeValueAsString(testDo);
-    assertJsonResourceEquals("TestEntityWithListsDo.json", json);
+    assertJsonEquals("TestEntityWithListsDo.json", json);
   }
 
   @Test
@@ -717,7 +717,7 @@ public class JsonDataObjectsSerializationTest {
     testDo.stringListAttribute().create();
     testDo.stringDoListAttribute().create();
     String json = s_dataObjectMapper.writeValueAsString(testDo);
-    assertJsonResourceEquals("TestEntityWithEmptyListsDo.json", json);
+    assertJsonEquals("TestEntityWithEmptyListsDo.json", json);
   }
 
   @Test
@@ -726,7 +726,7 @@ public class JsonDataObjectsSerializationTest {
     List<TestItemDo> list = new ArrayList<>();
     testDo.withItemsListAttribute(list);
     String json = s_dataObjectMapper.writeValueAsString(testDo);
-    assertJsonResourceEquals("TestEntityWithOneEmptyListDo.json", json);
+    assertJsonEquals("TestEntityWithOneEmptyListDo.json", json);
   }
 
   @Test
@@ -744,7 +744,7 @@ public class JsonDataObjectsSerializationTest {
   public void testSerialize_EmptyDoList() throws Exception {
     DoList<String> list = new DoList<>();
     String json = s_dataObjectMapper.writeValueAsString(list);
-    assertJsonResourceEquals("TestEmptyDoList.json", json);
+    assertJsonEquals("TestEmptyDoList.json", json);
   }
 
   @Test
@@ -759,7 +759,7 @@ public class JsonDataObjectsSerializationTest {
     DoList<String> list = new DoList<>();
     list.add("foo");
     String json = s_dataObjectMapper.writeValueAsString(list);
-    assertJsonResourceEquals("TestStringDoList.json", json);
+    assertJsonEquals("TestStringDoList.json", json);
   }
 
   @Test
@@ -775,7 +775,7 @@ public class JsonDataObjectsSerializationTest {
     DoList<TestItemDo> list = new DoList<>();
     list.add(createTestItemDo("foo", "bar"));
     String json = s_dataObjectMapper.writeValueAsString(list);
-    assertJsonResourceEquals("TestItemDoList.json", json);
+    assertJsonEquals("TestItemDoList.json", json);
   }
 
   @Test
@@ -793,13 +793,13 @@ public class JsonDataObjectsSerializationTest {
   public void testSerialize_ComplexDoEntity() throws Exception {
     TestComplexEntityDo testDo = createTestDo();
     String doJson = s_dataObjectMapper.writeValueAsString(testDo);
-    assertJsonResourceEquals("TestComplexEntityDo.json", doJson);
+    assertJsonEquals("TestComplexEntityDo.json", doJson);
 
     // comparison with plain jackson object mapper and POJO object -> must result in same JSON
     ObjectMapper defaultOm = s_defaultJacksonObjectMapper;
     TestComplexEntityPojo testPoJo = createTestPoJo();
     String pojoJson = defaultOm.writeValueAsString(testPoJo);
-    assertJsonResourceEquals("TestComplexEntityDo.json", doJson);
+    assertJsonEquals("TestComplexEntityDo.json", doJson);
     assertEquals(doJson, pojoJson);
   }
 
@@ -818,7 +818,7 @@ public class JsonDataObjectsSerializationTest {
     assertEquals(new BigInteger("123456"), testDo.getBigIntegerAttribute());
 
     String json = s_dataObjectMapper.writeValueAsString(testDo);
-    assertJsonResourceEquals("TestBigIntegerDo.json", json);
+    assertJsonEquals("TestBigIntegerDo.json", json);
   }
 
   // ------------------------------------ DoEntity with collections test cases ------------------------------------
@@ -827,7 +827,7 @@ public class JsonDataObjectsSerializationTest {
   public void testSerialize_TestCollectionsDo() throws Exception {
     TestCollectionsDo testDo = createTestCollectionsDo();
     String json = s_dataObjectMapper.writeValueAsString(testDo);
-    assertJsonResourceEquals("TestCollectionsDo.json", json);
+    assertJsonEquals("TestCollectionsDo.json", json);
   }
 
   @Test
@@ -884,7 +884,7 @@ public class JsonDataObjectsSerializationTest {
     entity.put("attribute7", Arrays.asList(createTestItemPojo2("item-pojo-key-1", "item-pojo-value-1"), createTestItemPojo2("item-pojo-key-2", "item-pojo-value-2")));
 
     String json = s_dataObjectMapper.writeValueAsString(entity);
-    assertJsonResourceEquals("TestEntityWithCollectionRaw.json", json);
+    assertJsonEquals("TestEntityWithCollectionRaw.json", json);
 
     DoEntity doMarshalled = s_dataObjectMapper.readValue(json, DoEntity.class);
     assertEquals("list-item-1", doMarshalled.get("attribute1", List.class).get(0));
@@ -951,7 +951,7 @@ public class JsonDataObjectsSerializationTest {
     mapDo.withDateUUIDMapAttribute(dateUUIDMap);
 
     String json = s_dataObjectMapper.writeValueAsString(mapDo);
-    assertJsonResourceEquals("TestMapDo.json", json);
+    assertJsonEquals("TestMapDo.json", json);
 
     TestMapDo marshalled = s_dataObjectMapper.readValue(json, TestMapDo.class);
     s_testHelper.assertDoEntityEquals(mapDo, marshalled);
@@ -987,7 +987,7 @@ public class JsonDataObjectsSerializationTest {
     entity.put("mapAttribute4", Collections.singletonMap("foo", createTestItemDo("key", "value")));
 
     String json = s_dataObjectMapper.writeValueAsString(entity);
-    assertJsonResourceEquals("TestEntityWithMapRaw.json", json);
+    assertJsonEquals("TestEntityWithMapRaw.json", json);
 
     DoEntity marshalled = s_dataObjectMapper.readValue(json, DoEntity.class);
 
@@ -1032,7 +1032,7 @@ public class JsonDataObjectsSerializationTest {
     setDo.withDateSetAttribute(dateSet);
 
     String json = s_dataObjectMapper.writeValueAsString(setDo);
-    assertJsonResourceEquals("TestSetDo.json", json);
+    assertJsonEquals("TestSetDo.json", json);
 
     TestSetDo marshalled = s_dataObjectMapper.readValue(json, TestSetDo.class);
 
@@ -1106,7 +1106,7 @@ public class JsonDataObjectsSerializationTest {
     mapDo.withNamedItem3(createTestItem3Do("namedItem3", new BigDecimal("42")));
 
     String json = s_dataObjectMapper.writeValueAsString(mapDo);
-    assertJsonResourceEquals("TestDoMapEntityDo.json", json);
+    assertJsonEquals("TestDoMapEntityDo.json", json);
 
     TestDoMapEntityDo marshalled = s_dataObjectMapper.readValue(json, TestDoMapEntityDo.class);
     s_testHelper.assertDoEntityEquals(mapDo, marshalled);
@@ -1157,7 +1157,7 @@ public class JsonDataObjectsSerializationTest {
   public void testSerialize_TestPersonDo() throws Exception {
     TestPersonDo personDo = createTestPersonDo();
     String json = s_dataObjectMapper.writeValueAsString(personDo);
-    assertJsonResourceEquals("TestPersonDo.json", json);
+    assertJsonEquals("TestPersonDo.json", json);
   }
 
   @Test
@@ -1430,7 +1430,7 @@ public class JsonDataObjectsSerializationTest {
     genericDo.withGenericStringAttribute(stringAttribute);
 
     String json = s_dataObjectMapper.writeValueAsString(genericDo);
-    assertJsonResourceEquals("TestEntityWithGenericValuesDo.json", json);
+    assertJsonEquals("TestEntityWithGenericValuesDo.json", json);
 
     TestEntityWithGenericValuesDo marshalled = s_dataObjectMapper.readValue(json, TestEntityWithGenericValuesDo.class);
     assertEquals("foo", marshalled.getGenericListAttribute().get(0).genericAttribute().get());
@@ -1453,7 +1453,7 @@ public class JsonDataObjectsSerializationTest {
         .withItemDoListAttribute(createTestItemDo("id-2", "value-2"), createTestItemDo("id-3", "value-3"));
 
     String json = s_dataObjectMapper.writeValueAsString(baseEntity);
-    assertJsonResourceEquals("TestEntityWithInterface1Do.json", json);
+    assertJsonEquals("TestEntityWithInterface1Do.json", json);
 
     ITestBaseEntityDo marshalled = s_dataObjectMapper.readValue(json, ITestBaseEntityDo.class);
     s_testHelper.assertDoEntityEquals(baseEntity, marshalled);
@@ -1471,7 +1471,7 @@ public class JsonDataObjectsSerializationTest {
         .withStringAttributeEx("fooEx");
 
     String json = s_dataObjectMapper.writeValueAsString(baseEntity);
-    assertJsonResourceEquals("TestEntityWithInterface2Do.json", json);
+    assertJsonEquals("TestEntityWithInterface2Do.json", json);
 
     ITestBaseEntityDo marshalled = s_dataObjectMapper.readValue(json, ITestBaseEntityDo.class);
     s_testHelper.assertDoEntityEquals(baseEntity, marshalled);
@@ -1489,7 +1489,7 @@ public class JsonDataObjectsSerializationTest {
     entity.dateAttribute().set(DATE_TRUNCATED);
 
     String json = s_dataObjectMapper.writeValueAsString(entity);
-    assertJsonResourceEquals("TestCustomImplementedEntityDo.json", json);
+    assertJsonEquals("TestCustomImplementedEntityDo.json", json);
 
     IDoEntity marshalledDoEntity = s_dataObjectMapper.readValue(json, IDoEntity.class);
     s_testHelper.assertDoEntityEquals(entity, marshalledDoEntity);
@@ -1528,7 +1528,7 @@ public class JsonDataObjectsSerializationTest {
 
     IDataObject dataObject = entity;
     String json = s_dataObjectMapper.writeValueAsString(dataObject);
-    assertJsonResourceEquals("TestEntityIDataObject.json", json);
+    assertJsonEquals("TestEntityIDataObject.json", json);
 
     IDataObject marshalled = s_dataObjectMapper.readValue(json, IDataObject.class);
     s_testHelper.assertDoEntityEquals(entity, (IDoEntity) marshalled);
@@ -1542,7 +1542,7 @@ public class JsonDataObjectsSerializationTest {
 
     IDataObject dataObject = list;
     String json = s_dataObjectMapper.writeValueAsString(dataObject);
-    assertJsonResourceEquals("TestStringListIDataObject.json", json);
+    assertJsonEquals("TestStringListIDataObject.json", json);
 
     IDataObject marshalled = s_dataObjectMapper.readValue(json, IDataObject.class);
     s_testHelper.assertDoListEquals(list, DoList.class.cast(marshalled));
@@ -1556,7 +1556,7 @@ public class JsonDataObjectsSerializationTest {
 
     IDataObject dataObject = list;
     String json = s_dataObjectMapper.writeValueAsString(dataObject);
-    assertJsonResourceEquals("TestItemDoListIDataObject.json", json);
+    assertJsonEquals("TestItemDoListIDataObject.json", json);
 
     IDataObject marshalled = s_dataObjectMapper.readValue(json, IDataObject.class);
     s_testHelper.assertDoListEquals(list, DoList.class.cast(marshalled));
@@ -1574,7 +1574,7 @@ public class JsonDataObjectsSerializationTest {
 
     IDataObject dataObject = list;
     String json = s_dataObjectMapper.writeValueAsString(dataObject);
-    assertJsonResourceEquals("TestObjectListIDataObject.json", json);
+    assertJsonEquals("TestObjectListIDataObject.json", json);
 
     IDataObject marshalled = s_dataObjectMapper.readValue(json, IDataObject.class);
     s_testHelper.assertDoListEquals(list, DoList.class.cast(marshalled));
@@ -1675,8 +1675,8 @@ public class JsonDataObjectsSerializationTest {
     return wrapper;
   }
 
-  protected void assertJsonResourceEquals(String expectedResourceName, String actual) {
-    s_testHelper.assertJsonResourceEquals(getResource(expectedResourceName), actual);
+  protected void assertJsonEquals(String expectedResourceName, String actual) {
+    s_testHelper.assertJsonEquals(getResource(expectedResourceName), actual);
   }
 
   protected String readResourceAsString(String resourceName) throws IOException {

@@ -37,7 +37,7 @@ import org.junit.Test;
  */
 public class JacksonDataObjectMapperTest {
 
-  protected static final DataObjectSerializationTestHelper s_utility = BEANS.get(DataObjectSerializationTestHelper.class);
+  protected static final DataObjectSerializationTestHelper s_testHelper = BEANS.get(DataObjectSerializationTestHelper.class);
 
   protected final JacksonDataObjectMapper m_mapper = BEANS.get(JacksonDataObjectMapper.class);
 
@@ -53,7 +53,7 @@ public class JacksonDataObjectMapperTest {
     String json = m_mapper.writeValue(entity);
     DoEntity parsedEntity = m_mapper.readValue(json, DoEntity.class);
     String jsonParsedEntity = m_mapper.writeValue(parsedEntity);
-    s_utility.assertJsonEquals(json, jsonParsedEntity);
+    s_testHelper.assertJsonEquals(json, jsonParsedEntity);
   }
 
   @Test(expected = PlatformException.class)
@@ -93,7 +93,7 @@ public class JacksonDataObjectMapperTest {
     holder.setValue(entity);
 
     DoEntityHolder<DoEntity> holderClone = CloneUtility.createDeepCopyBySerializing(holder);
-    s_utility.assertDoEntityEquals(entity, holderClone.getValue());
+    s_testHelper.assertDoEntityEquals(entity, holderClone.getValue());
   }
 
   @Test
@@ -116,7 +116,7 @@ public class JacksonDataObjectMapperTest {
     holder.setValue(testDo);
 
     DoEntityHolder<TestComplexEntityDo> holderClone = CloneUtility.createDeepCopyBySerializing(holder);
-    s_utility.assertDoEntityEquals(testDo, holderClone.getValue());
+    s_testHelper.assertDoEntityEquals(testDo, holderClone.getValue());
   }
 
   @Test
@@ -126,7 +126,7 @@ public class JacksonDataObjectMapperTest {
     holder.getValue().stringAttribute().set("foo");
 
     DoEntityHolder<ITestBaseEntityDo> holderClone = CloneUtility.createDeepCopyBySerializing(holder);
-    s_utility.assertDoEntityEquals(holder.getValue(), holderClone.getValue());
+    s_testHelper.assertDoEntityEquals(holder.getValue(), holderClone.getValue());
   }
 
   @Test
@@ -136,7 +136,7 @@ public class JacksonDataObjectMapperTest {
     holder.getValue().put("stringAttribute", "foo");
 
     DoEntityHolder<TestCustomImplementedEntityDo> holderClone = CloneUtility.createDeepCopyBySerializing(holder);
-    s_utility.assertDoEntityEquals(holder.getValue(), holderClone.getValue());
+    s_testHelper.assertDoEntityEquals(holder.getValue(), holderClone.getValue());
   }
 
 }
