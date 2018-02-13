@@ -89,7 +89,7 @@ public class DataObjectHelper {
       return Locale.class.cast(value);
     }
     else if (value instanceof String) {
-      return LocaleUtility.parse(String.class.cast(value));
+      return LocaleUtility.parse(String.class.cast(value)); // FIXME [16.0] pbz: language tag!
     }
     throw new IllegalArgumentException("Cannot convert value " + value + " to Locale");
   }
