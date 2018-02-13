@@ -17,6 +17,10 @@ public final class LocaleUtility {
   }
 
   /**
+   * <b>Note:</b> Since Java 1.7, it is recommended to use {@link Locale#toLanguageTag()} and
+   * {@link Locale#forLanguageTag(String)} instead of this method as {@link Locale#toString()} should be used for
+   * debugging only.
+   *
    * @return the parsed locale such as created by {@link Locale#toString()}
    */
   public static Locale parse(String s) {
