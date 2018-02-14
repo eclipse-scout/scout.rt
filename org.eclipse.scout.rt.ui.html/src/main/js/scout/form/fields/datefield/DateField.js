@@ -975,7 +975,7 @@ scout.DateField.prototype._predictDate = function(inputText) {
     };
   }
 
-  var analyzeInfo = this.isolatedDateFormat.analyze(inputText, this.timestampAsDate || this._referenceDate());
+  var analyzeInfo = this._analyzeInputAsDate(inputText, this.timestampAsDate || this._referenceDate());
   if (analyzeInfo.error) {
     this._setDateValid(false);
     return null;
@@ -1014,7 +1014,7 @@ scout.DateField.prototype._predictDate = function(inputText) {
 scout.DateField.prototype._predictTime = function(inputText) {
   inputText = inputText || '';
 
-  var analyzeInfo = this.isolatedTimeFormat.analyze(inputText, this._referenceDate());
+  var analyzeInfo = this._analyzeInputAsTime(inputText, this._referenceDate());
   if (analyzeInfo.error) {
     this._setTimeValid(false);
     return null;
@@ -1045,6 +1045,14 @@ scout.DateField.prototype._predictTime = function(inputText) {
     date: predictedDate,
     text: predictedTimeFormatted
   };
+};
+
+scout.DateField.prototype._analyzeInputAsDate = function(inputText, startDate) {
+  return this.isolatedDateFormat.analyze(inputText, startDate);
+};
+
+scout.DateField.prototype._analyzeInputAsTime = function(inputText, startDate) {
+  return this.isolatedTimeFormat.analyze(inputText, startDate);
 };
 
 /**
