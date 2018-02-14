@@ -21,7 +21,8 @@ scout.ImageField.prototype._init = function(model) {
   this.icon = scout.create('Icon', {
     parent: this,
     iconDesc: model.imageUrl,
-    autoFit: model.autoFit
+    autoFit: model.autoFit,
+    prepend: true
   });
   this.icon.on('load', this._onImageLoad.bind(this));
   this.icon.on('error', this._onImageError.bind(this));
