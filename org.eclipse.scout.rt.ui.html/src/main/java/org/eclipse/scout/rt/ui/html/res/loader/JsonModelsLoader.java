@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.ui.html.res.WebContentService;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -61,7 +62,23 @@ public class JsonModelsLoader extends AbstractResourceLoader {
     if (StringUtility.isNullOrEmpty(file)) {
       return false;
     }
-    return REGEX_PATTERN.matcher(file).matches();
+    if (!REGEX_PATTERN.matcher(file).matches()) {
+      return false;
+    }
+    // Check if file can really be resolved
+    return new JsonModelsLoader(null).getJsonFileUrl(file) != null;
+  }
+
+  public JsonModelsLoader() {
+    super();
+  }
+
+  /**
+   * This constructor is only used to create a "cheap" instance of this class (without cache) in the static
+   * {@link #acceptFile(String)} method. This allows
+   */
+  private JsonModelsLoader(IHttpResourceCache cache) {
+    super(cache);
   }
 
   @Override

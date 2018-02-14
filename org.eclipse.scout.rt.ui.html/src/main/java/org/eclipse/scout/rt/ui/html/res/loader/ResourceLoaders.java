@@ -46,10 +46,10 @@ public class ResourceLoaders {
     if (resourcePath.endsWith("/texts.json")) {
       return new TextsLoader();
     }
-    if (JsonModelsLoader.acceptFile(resourcePath)) {
-      return new JsonModelsLoader();
-    }
     if (resourcePath.endsWith(".json")) {
+      if (JsonModelsLoader.acceptFile(resourcePath)) {
+        return new JsonModelsLoader();
+      }
       return new JsonFileLoader();
     }
     return new BinaryFileLoader();
