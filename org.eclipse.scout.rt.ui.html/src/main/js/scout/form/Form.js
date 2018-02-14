@@ -13,6 +13,7 @@ scout.Form = function() {
   this._addWidgetProperties(['rootGroupBox', 'views', 'dialogs', 'initialFocus', 'messageBoxes', 'fileChoosers']);
 
   this.askIfNeedSave = true;
+  this.askIfNeedSaveText; // if not set, a default text is used (see Lifecycle.js)
   this.data = {};
   this.displayHint = scout.Form.DisplayHint.DIALOG;
   this.displayParent; // only relevant if form is opened, not relevant if form is just rendered into another widget (not managed by a form controller)
@@ -53,7 +54,7 @@ scout.Form.DisplayHint = {
 scout.Form.prototype._init = function(model) {
   scout.Form.parent.prototype._init.call(this, model);
 
-  this.resolveTextKeys(['title']);
+  this.resolveTextKeys(['title', 'askIfNeedSaveText']);
   this._setViews(this.views);
   this.formController = scout.create('FormController', {
     displayParent: this,
@@ -179,7 +180,8 @@ scout.Form.prototype._installLifecycle = function() {
 scout.Form.prototype._createLifecycle = function() {
   return scout.create('FormLifecycle', {
     widget: this,
-    askIfNeedSave: this.askIfNeedSave
+    askIfNeedSave: this.askIfNeedSave,
+    askIfNeedSaveText: this.askIfNeedSaveText
   });
 };
 

@@ -13,6 +13,7 @@ scout.FormLifecycle = function() {
 
   this.emptyMandatoryElementsTextKey = 'FormEmptyMandatoryFieldsMessage';
   this.invalidElementsTextKey = 'FormInvalidFieldsMessage';
+  this.saveChangesQuestionTextKey = 'FormSaveChangesQuestion';
 };
 scout.inherits(scout.FormLifecycle, scout.Lifecycle);
 

@@ -10,9 +10,10 @@
  ******************************************************************************/
 /**
  * Abstract base class for validation lifecycles as used for forms.
- * A subclass must set the properties, in order to display error messages:
+ * A subclass must set the properties, in order to display messages:
  * - emptyMandatoryElementsTextKey
  * - invalidElementsTextKey
+ * - saveChangesQuestionTextKey
  *
  * @class
  * @constructor
@@ -21,6 +22,7 @@
 scout.Lifecycle = function() {
   this.emptyMandatoryElementsTextKey = null;
   this.invalidElementsTextKey = null;
+  this.saveChangesQuestionTextKey = null;
 
   this.askIfNeedSave = true;
   this.askIfNeedSaveText = null; // Java: cancelVerificationText
@@ -36,7 +38,9 @@ scout.Lifecycle = function() {
 scout.Lifecycle.prototype.init = function(model) {
   scout.assertParameter('widget', model.widget);
   $.extend(this, model);
-  this.askIfNeedSaveText = this.session().text('FormSaveChangesQuestion');
+  if (this.askIfNeedSaveText === null) {
+    this.askIfNeedSaveText = this.session().text(this.saveChangesQuestionTextKey);
+  }
 };
 
 scout.Lifecycle.prototype.load = function() {
