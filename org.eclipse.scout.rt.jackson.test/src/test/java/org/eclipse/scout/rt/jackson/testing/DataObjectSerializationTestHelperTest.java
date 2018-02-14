@@ -18,7 +18,7 @@ import org.junit.Test;
 
 public class DataObjectSerializationTestHelperTest {
 
-  protected static final DataObjectSerializationTestHelper s_testHelper = BEANS.get(DataObjectSerializationTestHelper.class);
+  protected static DataObjectSerializationTestHelper s_testHelper;
 
   protected static String JSON = "{\n" +
       "  \"_type\" : \"foo\",\n" +
@@ -29,6 +29,7 @@ public class DataObjectSerializationTestHelperTest {
 
   @BeforeClass
   public static void beforeClass() {
+    s_testHelper = BEANS.get(DataObjectSerializationTestHelper.class);
     ENTITY = BEANS.get(DoTypedEntity.class).withType("foo");
     ENTITY.put("attribute", "bar");
   }

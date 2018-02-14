@@ -112,14 +112,16 @@ public class JsonDataObjectsSerializationTest {
   protected static final UUID UUID_1 = UUID.fromString("ab8b13a4-b2a0-47a0-9d79-80039417b843");
   protected static final UUID UUID_2 = UUID.fromString("87069a20-6fc5-4b6a-9bc2-2e6cb75d7571");
 
-  protected static final DataObjectSerializationTestHelper s_testHelper = BEANS.get(DataObjectSerializationTestHelper.class);
-  protected static final DataObjectHelper s_dataObjectHelper = BEANS.get(DataObjectHelper.class);
+  protected static DataObjectSerializationTestHelper s_testHelper;
+  protected static DataObjectHelper s_dataObjectHelper;
 
   protected static ObjectMapper s_dataObjectMapper;
   protected static ObjectMapper s_defaultJacksonObjectMapper;
 
   @BeforeClass
   public static void beforeClass() {
+    s_testHelper = BEANS.get(DataObjectSerializationTestHelper.class);
+    s_dataObjectHelper = BEANS.get(DataObjectHelper.class);
     s_dataObjectMapper = BEANS.get(TestingJacksonDataObjectMapper.class).getObjectMapper();
 
     s_defaultJacksonObjectMapper = new ObjectMapper()
