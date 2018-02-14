@@ -43,7 +43,9 @@ scout.DateFormatPatternType = {
   MILLISECOND: 'millisecond'
 };
 
-scout.DateFormat = function(locale, pattern) { // NOSONAR
+scout.DateFormat = function(locale, pattern, options) { // NOSONAR
+  options = options || {};
+
   /*jshint sub:true*/
   this.locale = locale;
   scout.assertParameter('locale', this.locale);
@@ -56,6 +58,11 @@ scout.DateFormat = function(locale, pattern) { // NOSONAR
   this.symbols.weekdaysShortOrdered = scout.dates.orderWeekdays(this.symbols.weekdaysShort, this.symbols.firstDayOfWeek);
   this.symbols.monthsToNumber;
   this.symbols.monthsShortToNumber;
+
+  // Relevant during analyze(). When this is true (default), terms of the same "pattern type" (e.g. "d" and "dd") will
+  // also be considered. Otherwise, analyze() behaves like parse(), i.g. the pattern must match exactly.
+  // Example: "2.10" will match the pattern "dd.MM.yyy" when lenient=true. If lenient is false, it won't match.
+  this.lenient = scout.nvl(options.lenient, true);
 
   // List of terms, e.g. split up parts of this.pattern. The length of this array is equal
   // to the length of this._formatFunctions, this._parseFunctions and this._analyzeFunctions.
@@ -807,11 +814,16 @@ scout.DateFormat.prototype._compile = function() {
         // 2. Create and install parse function
         this._parseFunctions.push(patternDefinition.createParseFunction(acceptedTerm));
 
-        // 3. Create and install analyze functions (= all parse functions for the same type)
-        patternDefinitions = this._patternLibrary[patternDefinition.type];
-        analyseFunctions = [];
-        for (j = 0; j < patternDefinitions.length; j++) {
-          analyseFunctions.push(patternDefinitions[j].createParseFunction(acceptedTerm));
+        // 3. Create and install analyze functions
+        analyseFunctions = [patternDefinition.createParseFunction(acceptedTerm)];
+        if (this.lenient) {
+          // In lenient mode, add all other parse functions of the same type
+          patternDefinitions = this._patternLibrary[patternDefinition.type];
+          for (j = 0; j < patternDefinitions.length; j++) {
+            if (patternDefinitions[j] !== patternDefinition) {
+              analyseFunctions.push(patternDefinitions[j].createParseFunction(acceptedTerm));
+            }
+          }
         }
         this._analyzeFunctions.push(analyseFunctions);
 
@@ -923,6 +935,10 @@ scout.DateFormat.prototype.format = function(date, exactLength) {
  *   The pattern that was used to parse the input. This may differ from the date format's pattern.
  *   Example: dateFormat="dd.MM.YYYY", inputString="5.7.2015" --> parsedPattern="d.M.yyyy"
  *
+ * matchedPattern:
+ *   The pattern that was recognized in the input. Unlike "parsedPattern", this may not be a full pattern.
+ *   Example: dateFormat="dd.MM.YYYY", inputString="5.7." --> parsedPattern="d.M.yyyy", matchedPattern="d.M."
+ *
  * predictedDate:
  *   The date that could be predicted from the recognized inputs. If the second method argument
  *   'startDate' is set, this date is used as basis for this predicted date. Otherwise, 'today' is used.
@@ -940,6 +956,7 @@ scout.DateFormat.prototype.analyze = function(text, startDate) {
   var parseContext = this._createParseContext(text);
   parseContext.analyze = true; // Mark context as "analyze mode"
   parseContext.startDate = startDate;
+  var matchedPattern = '';
   for (var i = 0; i < this._terms.length; i++) {
     if (parseContext.inputString.length > 0) {
       var parseFunctions = this._analyzeFunctions[i];
@@ -956,6 +973,7 @@ scout.DateFormat.prototype.analyze = function(text, startDate) {
         analyzeInfo.error = true;
         return analyzeInfo;
       }
+      matchedPattern = parseContext.parsedPattern;
     } else {
       // Input is fully consumed, now just add the remaining terms from the pattern
       parseContext.parsedPattern += this._terms[i];
@@ -980,6 +998,7 @@ scout.DateFormat.prototype.analyze = function(text, startDate) {
   analyzeInfo.matchInfo = parseContext.matchInfo;
   analyzeInfo.hints = parseContext.hints;
   analyzeInfo.parsedPattern = parseContext.parsedPattern;
+  analyzeInfo.matchedPattern = matchedPattern;
   analyzeInfo.predictedDate = predictedDate;
   analyzeInfo.error = (!predictedDate);
   return analyzeInfo;
@@ -1222,6 +1241,7 @@ scout.DateFormat.prototype._createAnalyzeInfo = function(inputText) {
     matchInfo: {},
     hints: {},
     parsedPattern: '',
+    matchedPattern: '',
     predictedDate: null,
     error: false
   };
