@@ -1,5 +1,6 @@
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
@@ -9,6 +10,10 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Entity object with same fields as {@link TestComplexEntityDo} but using POJO style getter/setter and plain jackson
@@ -17,6 +22,14 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "_type")
 @JsonTypeName("TestComplexEntity")
 public class TestComplexEntityPojo {
+
+  // TODO [8.x] pbz: Remove this class when Jackson issue 1600 is fixed
+  static class P_CustomLocaleSerializer extends JsonSerializer<Locale> {
+    @Override
+    public void serialize(Locale value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+      gen.writeObject(value.toLanguageTag());
+    }
+  }
 
   private String id;
   private String stringAttribute;
@@ -32,6 +45,7 @@ public class TestComplexEntityPojo {
   private TestItemPojo itemAttribute;
   private List<TestItemPojo> itemsAttribute;
   private UUID uuidAttribute;
+  @JsonSerialize(using = P_CustomLocaleSerializer.class)
   private Locale localeAttribute;
 
   public String getId() {

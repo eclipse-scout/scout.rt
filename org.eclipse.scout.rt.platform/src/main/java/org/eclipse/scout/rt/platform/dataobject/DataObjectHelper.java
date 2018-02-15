@@ -11,7 +11,6 @@ import java.util.Objects;
 import java.util.UUID;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.nls.LocaleUtility;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
@@ -89,7 +88,7 @@ public class DataObjectHelper {
       return Locale.class.cast(value);
     }
     else if (value instanceof String) {
-      return LocaleUtility.parse(String.class.cast(value)); // FIXME [16.0] pbz: language tag!
+      return Locale.forLanguageTag(String.class.cast(value));
     }
     throw new IllegalArgumentException("Cannot convert value " + value + " to Locale");
   }

@@ -335,6 +335,18 @@ public class JsonDataObjectsSerializationTest {
     s_testHelper.assertDoEntityEquals(binary, marshalled);
   }
 
+  @Test
+  public void testSerializeDeserialize_Locale() throws Exception {
+    String jsonPlainLocale = s_dataObjectMapper.writeValueAsString(Locale.GERMANY);
+    // Locale not wrapped within DoEntity structure is serialized by default Jackson behavior, could change when Issue 1600 is fixed, see https://github.com/FasterXML/jackson-databind/issues/1600
+    assertEquals("\"de_DE\"", jsonPlainLocale);
+
+    DoEntity entity = BEANS.get(DoEntity.class);
+    entity.put("locale", Locale.GERMANY);
+    String jsonEntity = s_dataObjectMapper.writeValueAsString(entity);
+    assertJsonEquals("TestLocale.json", jsonEntity);
+  }
+
   // ------------------------------------ plain POJO test cases ------------------------------------
 
   /**

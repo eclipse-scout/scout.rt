@@ -1,6 +1,7 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.util.Date;
+import java.util.Locale;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.dataobject.DoList;
@@ -41,6 +42,9 @@ public class DataObjectSerializers extends Serializers.Base {
     }
     else if (Date.class.isAssignableFrom(type.getRawClass())) {
       return new DoDateSerializer();
+    }
+    else if (Locale.class.isAssignableFrom(type.getRawClass())) {
+      return new DoLocaleSerializer();
     }
     return super.findSerializer(config, type, beanDesc);
   }

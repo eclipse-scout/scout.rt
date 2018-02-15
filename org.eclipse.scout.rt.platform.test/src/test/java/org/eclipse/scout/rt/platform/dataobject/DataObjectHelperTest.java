@@ -66,7 +66,8 @@ public class DataObjectHelperTest {
     m_entity.put("uuidString", TEST_UUID.toString());
     m_entity.put("uuidInvalid", BigInteger.TEN);
     m_entity.put("locale", Locale.GERMANY);
-    m_entity.put("localeString", "de_DE");
+    m_entity.put("localeStringGER", "de-DE");
+    m_entity.put("localeStringITA", Locale.ITALY.toLanguageTag());
     m_entity.put("localeInvalid", BigDecimal.ONE);
     m_entity.put("entity", m_subEntity);
   }
@@ -121,7 +122,8 @@ public class DataObjectHelperTest {
   @Test
   public void testGetLocaleAttribute() {
     assertEquals(Locale.GERMANY, m_helper.getLocaleAttribute(m_entity, "locale"));
-    assertEquals(Locale.GERMANY, m_helper.getLocaleAttribute(m_entity, "localeString"));
+    assertEquals(Locale.GERMANY, m_helper.getLocaleAttribute(m_entity, "localeStringGER"));
+    assertEquals(Locale.ITALY, m_helper.getLocaleAttribute(m_entity, "localeStringITA"));
     assertNull(m_helper.getLocaleAttribute(m_entity, "foo"));
   }
 

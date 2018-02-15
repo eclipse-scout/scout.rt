@@ -51,6 +51,7 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
    * Serialize all fields of specified {@link IDoEntity} sorted alphabetically.
    */
   protected void serializeAttributes(IDoEntity entity, JsonGenerator gen, SerializerProvider provider) throws IOException {
+    gen.setCurrentValue(entity);
     TreeMap<String, DoNode<?>> sortedMap = new TreeMap<>(entity.all());
     for (Map.Entry<String, DoNode<?>> e : sortedMap.entrySet()) {
       serializeAttributes(e.getKey(), e.getValue(), gen, provider);
