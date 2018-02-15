@@ -285,7 +285,7 @@ public class JobManager implements IJobManager {
   /**
    * Returns the internal Executor Service.
    */
-  protected ExecutorService getExecutor() {
+  public ExecutorService getExecutor() {
     return m_executor;
   }
 
