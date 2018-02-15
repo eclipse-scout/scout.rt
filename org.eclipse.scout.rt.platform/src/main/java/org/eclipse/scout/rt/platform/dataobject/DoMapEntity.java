@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.jackson.dataobject;
+package org.eclipse.scout.rt.platform.dataobject;
 
 import java.util.Map;
-
-import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 
 /**
  * Base type for data objects with {@link Map}-like structure using key type {@link String} and generic value type

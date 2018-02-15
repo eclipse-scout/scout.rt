@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoList;
+import org.eclipse.scout.rt.platform.dataobject.DoMapEntity;
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
