@@ -1605,8 +1605,8 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
         catch (FutureCancelledError | ThreadInterruptedError e) { // NOSONAR
           callback.onSuccess(Collections.emptyList());
         }
-        catch (final RuntimeException e) { // NOSONAR
-          callback.onFailure(exception);
+        catch (final RuntimeException e) {
+          callback.onFailure(e);
         }
       }
     };
