@@ -52,7 +52,7 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
    */
   protected void serializeAttributes(IDoEntity entity, JsonGenerator gen, SerializerProvider provider) throws IOException {
     gen.setCurrentValue(entity);
-    TreeMap<String, DoNode<?>> sortedMap = new TreeMap<>(entity.all());
+    TreeMap<String, DoNode<?>> sortedMap = new TreeMap<>(entity.allNodes());
     for (Map.Entry<String, DoNode<?>> e : sortedMap.entrySet()) {
       serializeAttributes(e.getKey(), e.getValue(), gen, provider);
     }

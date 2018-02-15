@@ -490,9 +490,9 @@ public class JsonDataObjectsSerializationTest {
     DoEntity entity = s_dataObjectMapper.readValue(input, DoEntity.class);
     assertTrue(entity.getList("emptyList", Object.class).isEmpty());
     DoEntity emptyObject = entity.get("emptyObject", DoEntity.class);
-    assertTrue(emptyObject.all().isEmpty());
+    assertTrue(emptyObject.allNodes().isEmpty());
     DoEntity emptyEntity = entity.get("emptyEntity", DoEntity.class);
-    assertTrue(emptyEntity.all().isEmpty());
+    assertTrue(emptyEntity.allNodes().isEmpty());
   }
 
   @Test
@@ -981,8 +981,8 @@ public class JsonDataObjectsSerializationTest {
     DoEntity marshalled = s_dataObjectMapper.readValue(json, DoEntity.class);
 
     DoEntity marshalledMapAttribute = marshalled.get("mapAttribute", DoEntity.class);
-    assertEquals(illegalKeyTypeMap.values().iterator().next(), marshalledMapAttribute.all().values().iterator().next().get());
-    assertNotEquals(illegalKeyTypeMap.keySet().iterator().next(), marshalledMapAttribute.all().keySet().iterator().next()); // TestItemDo cannot be used as key, is serialized using toString() default serializer
+    assertEquals(illegalKeyTypeMap.values().iterator().next(), marshalledMapAttribute.allNodes().values().iterator().next().get());
+    assertNotEquals(illegalKeyTypeMap.keySet().iterator().next(), marshalledMapAttribute.allNodes().keySet().iterator().next()); // TestItemDo cannot be used as key, is serialized using toString() default serializer
   }
 
   @Test(expected = JsonMappingException.class)
@@ -1526,7 +1526,7 @@ public class JsonDataObjectsSerializationTest {
   public void testSerializeDeserialize_EmptyIDataObject() throws Exception {
     IDataObject marshalledEntity = s_dataObjectMapper.readValue("{}", IDataObject.class);
     assertEquals(DoEntity.class, marshalledEntity.getClass());
-    assertTrue(DoEntity.class.cast(marshalledEntity).all().isEmpty());
+    assertTrue(DoEntity.class.cast(marshalledEntity).allNodes().isEmpty());
 
     IDataObject marshalledList = s_dataObjectMapper.readValue("[]", IDataObject.class);
     assertEquals(DoList.class, marshalledList.getClass());

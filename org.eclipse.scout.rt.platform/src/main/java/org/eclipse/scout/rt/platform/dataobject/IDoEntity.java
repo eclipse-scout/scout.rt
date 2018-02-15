@@ -28,10 +28,9 @@ public interface IDoEntity extends IDataObject {
   DoNode<?> getNode(String attributeName);
 
   /**
-   * @return {@code true} if attribute with name {@code attributeName} exists (attribute value could be null), otherwise
-   *         {@code false}
+   * @return the <i>read-only</i> map of all attributes as (key, value wrapped within DoNode)
    */
-  boolean has(String attributeName);
+  Map<String, DoNode<?>> allNodes();
 
   /**
    * Adds new {@link DoValue} or {@link DoList} node to attributes map and assigns attribute name to specified
@@ -42,6 +41,12 @@ public interface IDoEntity extends IDataObject {
     Assertions.assertNotNull(attribute, "attribute node cannot be null for attribute name {}", attributeName);
     attribute.setAttributeName(attributeName);
   }
+
+  /**
+   * @return {@code true} if attribute with name {@code attributeName} exists (attribute value could be null), otherwise
+   *         {@code false}
+   */
+  boolean has(String attributeName);
 
   /**
    * Adds new value to attribute map. The value is wrapped within a {@link DoValue}.
@@ -59,9 +64,9 @@ public interface IDoEntity extends IDataObject {
   void remove(String attributeName);
 
   /**
-   * @return the read-only map of all attributes.
+   * @return the map of all attributes as (key, unwrapped value)
    */
-  Map<String, DoNode<?>> all();
+  Map<String, ?> all();
 
   // ----- convenience accessor methods ----- //
 

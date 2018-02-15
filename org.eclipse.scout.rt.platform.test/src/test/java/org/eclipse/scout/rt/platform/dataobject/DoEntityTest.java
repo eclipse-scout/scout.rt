@@ -16,8 +16,10 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -48,7 +50,7 @@ public class DoEntityTest {
     entity.put("foo", childEntity);
     assertEquals(childEntity, entity.get("foo"));
     assertEquals("foo", entity.getNode("foo").getAttributeName());
-    assertEquals("foo", entity.all().values().iterator().next().getAttributeName());
+    assertEquals("foo", entity.allNodes().values().iterator().next().getAttributeName());
 
     entity.remove("foo");
     assertNull(entity.get("foo"));
@@ -99,15 +101,42 @@ public class DoEntityTest {
   }
 
   @Test
-  public void testAllAttributes() {
+  public void testAllAttributeNodes() {
     DoEntity entity = new DoEntity();
-    assertTrue(entity.all().isEmpty());
+    assertTrue(entity.allNodes().isEmpty());
     entity.put("attribute", "foo");
     entity.put("attribute2", "bar");
     Set<String> expected = new LinkedHashSet<>();
     expected.add("attribute");
     expected.add("attribute2");
-    assertEquals(expected, entity.all().keySet());
+    assertEquals(expected, entity.allNodes().keySet());
+  }
+
+  @Test
+  public void testAllAttributes() {
+    DoEntity entity = new DoEntity();
+    assertTrue(entity.all().isEmpty());
+    entity.put("attribute", "foo");
+    entity.put("attribute2", "bar");
+    Set<String> expectedKeys = new LinkedHashSet<>();
+    expectedKeys.add("attribute");
+    expectedKeys.add("attribute2");
+    Set<String> expectedValues = new LinkedHashSet<>();
+    expectedValues.add("foo");
+    expectedValues.add("bar");
+    assertEquals(expectedKeys, entity.all().keySet());
+    assertEquals(expectedValues, new HashSet<>(entity.all().values()));
+  }
+
+  @Test
+  public void testAllAttributesMapper() {
+    DoEntity entity = new DoEntity();
+    assertTrue(entity.all().isEmpty());
+    entity.put("attribute", 100);
+    entity.put("attribute2", 200);
+    Map<String, Integer> all = entity.all((value) -> (Integer) value);
+    assertEquals(new Integer(100), all.get("attribute"));
+    assertEquals(new Integer(200), all.get("attribute2"));
   }
 
   @Test
@@ -133,9 +162,9 @@ public class DoEntityTest {
   }
 
   @Test(expected = UnsupportedOperationException.class)
-  public void testAllAttributesImmutable() {
+  public void testAllAttributeNodesImmutable() {
     DoEntity entity = new DoEntity();
-    entity.all().put("foo", null);
+    entity.allNodes().put("foo", null);
   }
 
   @Test(expected = AssertionException.class)

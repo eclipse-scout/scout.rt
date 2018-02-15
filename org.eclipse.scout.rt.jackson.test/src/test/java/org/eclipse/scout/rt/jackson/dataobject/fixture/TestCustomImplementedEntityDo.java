@@ -15,6 +15,8 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoList;
@@ -83,8 +85,13 @@ public class TestCustomImplementedEntityDo implements IDoEntity {
   }
 
   @Override
-  public Map<String, DoNode<?>> all() {
+  public Map<String, DoNode<?>> allNodes() {
     return Collections.unmodifiableMap(m_attributes);
+  }
+
+  @Override
+  public Map<String, ?> all() {
+    return allNodes().entrySet().stream().collect(Collectors.toMap(Entry::getKey, entry -> entry.getValue().get()));
   }
 
   @Override

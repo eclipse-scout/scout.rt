@@ -51,7 +51,7 @@ public class DataObjectTestHelper {
     if (assertClassEquals) {
       assertEquals(expected.getClass(), actual.getClass());
     }
-    assertObjectEquals(expected.all(), actual.all(), assertClassEquals);
+    assertObjectEquals(expected.allNodes(), actual.allNodes(), assertClassEquals);
 
     // assert all attribute names are set correctly to be equals to the corresponding map key
     assertMapKeyEqualsAttributeName(actual);
@@ -78,7 +78,7 @@ public class DataObjectTestHelper {
   }
 
   protected void assertMapKeyEqualsAttributeName(IDoEntity actual) {
-    for (String key : actual.all().keySet()) {
+    for (String key : actual.allNodes().keySet()) {
       assertEquals("key of attribute map is not equals to node attribute name", key, actual.getNode(key).getAttributeName());
     }
   }

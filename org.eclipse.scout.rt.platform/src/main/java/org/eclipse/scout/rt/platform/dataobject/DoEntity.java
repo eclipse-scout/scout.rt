@@ -4,6 +4,9 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -84,12 +87,22 @@ public class DoEntity implements IDoEntity {
     m_attributes.remove(attributeName);
   }
 
-  /**
-   * @return the read-only map of all attributes.
-   */
   @Override
-  public Map<String, DoNode<?>> all() {
+  public Map<String, DoNode<?>> allNodes() {
     return Collections.unmodifiableMap(m_attributes);
+  }
+
+  @Override
+  public Map<String, ?> all() {
+    return all(Function.identity());
+  }
+
+  /**
+   * @return the map of all attribute values mapped using specified {@code mapper} function.
+   */
+  protected <T> Map<String, T> all(Function<Object, T> mapper) {
+    return allNodes().entrySet().stream()
+        .collect(Collectors.toMap(Entry::getKey, entry -> mapper.apply(entry.getValue().get())));
   }
 
   /**
