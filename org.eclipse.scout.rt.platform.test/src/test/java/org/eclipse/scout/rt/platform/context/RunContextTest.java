@@ -26,6 +26,10 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.job.IBlockingCondition;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -48,6 +52,7 @@ public class RunContextTest {
     RunContext runContext = RunContexts.empty();
     assertNull(runContext.getSubject());
     assertNull(runContext.getLocale());
+    assertNull(runContext.getParentRunMonitor());
     assertTrue(toSet(runContext.getPropertyMap().iterator()).isEmpty());
     assertNotNull(runContext.getRunMonitor());
   }
@@ -59,6 +64,7 @@ public class RunContextTest {
     runContext.withSubject(new Subject());
     runContext.withLocale(Locale.CANADA_FRENCH);
     runContext.withRunMonitor(new RunMonitor());
+    runContext.withParentRunMonitor(new RunMonitor());
 
     RunContext copy = runContext.copy();
 
@@ -66,6 +72,7 @@ public class RunContextTest {
     assertSame(runContext.getSubject(), copy.getSubject());
     assertSame(runContext.getLocale(), copy.getLocale());
     assertSame(runContext.getRunMonitor(), copy.getRunMonitor());
+    assertSame(runContext.getParentRunMonitor(), copy.getParentRunMonitor());
   }
 
   @Test
@@ -194,7 +201,6 @@ public class RunContextTest {
     final RunMonitor newRunMonitor = runContext.getRunMonitor();
 
     assertNotSame("RunMonitor should not be same instance a current RunMonitor", currentRunMonitor, newRunMonitor);
-    assertTrue("RunMonitor should be registered within current RunMonitor", currentRunMonitor.getCancellables().contains(newRunMonitor));
 
     runContext.run(new IRunnable() {
 
@@ -207,7 +213,7 @@ public class RunContextTest {
 
     assertSame(currentRunMonitor, RunMonitor.CURRENT.get());
     assertSame(newRunMonitor, runContext.getRunMonitor());
-    assertTrue("RunMonitor should still be registered within current RunMonitor (by default)", currentRunMonitor.getCancellables().contains(newRunMonitor));
+    assertFalse("RunMonitor should not be registered within current RunMonitor anymore", currentRunMonitor.getCancellables().contains(newRunMonitor));
   }
 
   /**
@@ -225,12 +231,10 @@ public class RunContextTest {
 
     RunMonitor.CURRENT.set(currentRunMonitor);
     RunContext runContext = RunContexts.copyCurrent();
-    final RunMonitor defaultRunMonitor = runContext.getRunMonitor();
 
     runContext.withRunMonitor(explicitRunMonitor); // explicit RunMonitor
     assertSame(explicitRunMonitor, runContext.getRunMonitor());
 
-    assertTrue("No deregistration of default RunMonitor", currentRunMonitor.getCancellables().contains(defaultRunMonitor));
     assertFalse("Explicit RunMonitor should NOT be automatically registered within current RunMonitor (by default)", currentRunMonitor.getCancellables().contains(explicitRunMonitor));
 
     runContext.run(new IRunnable() {
@@ -238,15 +242,122 @@ public class RunContextTest {
       @Override
       public void run() throws Exception {
         assertSame(explicitRunMonitor, RunMonitor.CURRENT.get());
-        assertTrue("No deregistration of default RunMonitor", currentRunMonitor.getCancellables().contains(defaultRunMonitor));
         assertFalse("Explicit RunMonitor should NOT be automatically registered within current RunMonitor (by default)", currentRunMonitor.getCancellables().contains(RunMonitor.CURRENT.get()));
       }
     });
 
     assertSame(currentRunMonitor, RunMonitor.CURRENT.get());
     assertSame(explicitRunMonitor, runContext.getRunMonitor());
-    assertTrue("No deregistration of default RunMonitor", currentRunMonitor.getCancellables().contains(defaultRunMonitor));
     assertFalse("Explicit RunMonitor should NOT be automatically registered within current RunMonitor (by default)", currentRunMonitor.getCancellables().contains(explicitRunMonitor));
+  }
+
+  /**
+   * <p>
+   * Tests RunMonitor functionality with:
+   * </p>
+   * <ul>
+   * <li>Current RunMonitor available</li>
+   * <li>Explicit RunMonitor not set</li>
+   * <li>Run context is used to start two {@link Jobs} in new threads</li>
+   * </ul>
+   * <p>
+   * Expected: exactly one new RunMonitor is created, registered as child and set as current for the time of execution,
+   * must be removed after the last job finishes.
+   * </p>
+   */
+  @Test
+  public void testCopyCurrent_RunMonitorTwoConcurrentJobs() {
+    final RunMonitor currentRunMonitor = new RunMonitor();
+    RunMonitor.CURRENT.set(currentRunMonitor);
+    RunContext runContext = RunContexts.copyCurrent();
+    final RunMonitor newRunMonitor = runContext.getRunMonitor();
+    assertNotNull(newRunMonitor);
+    assertNotSame(currentRunMonitor, newRunMonitor);
+    assertSame(currentRunMonitor, runContext.getParentRunMonitor());
+
+    final IBlockingCondition startedCondition1 = Jobs.newBlockingCondition(true);
+    final IBlockingCondition startedCondition2 = Jobs.newBlockingCondition(true);
+    final IBlockingCondition blockingCondition1 = Jobs.newBlockingCondition(true);
+    final IBlockingCondition blockingCondition2 = Jobs.newBlockingCondition(true);
+
+    assertFalse("New run monitor must not be registered with current run monitor", currentRunMonitor.getCancellables().contains(newRunMonitor));
+
+    IFuture<Void> future1 = Jobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        startedCondition1.setBlocking(false);
+        blockingCondition1.waitFor();
+        assertSame(newRunMonitor, RunMonitor.CURRENT.get());
+        assertTrue("New run monitor must be registered with current run monitor", currentRunMonitor.getCancellables().contains(newRunMonitor));
+      }
+    }, Jobs.newInput().withRunContext(runContext));
+
+    IFuture<Void> future2 = Jobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        startedCondition2.setBlocking(false);
+        blockingCondition2.waitFor();
+        assertSame(newRunMonitor, RunMonitor.CURRENT.get());
+        assertTrue("New run monitor must be registered with current run monitor", currentRunMonitor.getCancellables().contains(newRunMonitor));
+      }
+    }, Jobs.newInput().withRunContext(runContext));
+
+    assertSame(currentRunMonitor, RunMonitor.CURRENT.get());
+
+    // Wait for jobs to be started
+    startedCondition1.waitFor();
+    startedCondition2.waitFor();
+
+    // Stop latter job first
+    blockingCondition2.setBlocking(false);
+    future2.awaitDoneAndGet();
+
+    // Stop first job
+    blockingCondition1.setBlocking(false);
+    future1.awaitDoneAndGet();
+
+    assertSame(currentRunMonitor, RunMonitor.CURRENT.get());
+    assertFalse("New run monitor must not be registered with current run monitor", currentRunMonitor.getCancellables().contains(newRunMonitor));
+  }
+
+  /**
+   * Tests RunMonitor functionality with:
+   * <ul>
+   * <li>Current RunMonitor available</li>
+   * <li>Explicit RunMonitor not set</li>
+   * <li>Runnable throws an Exception</li>
+   * </ul>
+   * Expected: a new RunMonitor is CREATED, registered as child and set as CURRENT for the time of execution.
+   */
+  @Test
+  public void testCopyCurrent_RunMonitorException() {
+    final RunMonitor currentRunMonitor = new RunMonitor();
+    RunMonitor.CURRENT.set(currentRunMonitor);
+
+    RunContext runContext = RunContexts.copyCurrent();
+    final RunMonitor newRunMonitor = runContext.getRunMonitor();
+
+    assertNotSame("RunMonitor should not be same instance a current RunMonitor", currentRunMonitor, newRunMonitor);
+
+    final Exception exception = new Exception();
+    try {
+      runContext.run(new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
+          throw exception;
+        }
+      });
+    }
+    catch (PlatformException e) {
+      assertEquals(exception, e.getCause());
+    }
+
+    assertSame(currentRunMonitor, RunMonitor.CURRENT.get());
+    assertSame(newRunMonitor, runContext.getRunMonitor());
+    assertFalse("RunMonitor should not be registered within current RunMonitor anymore", currentRunMonitor.getCancellables().contains(newRunMonitor));
   }
 
   @Test(expected = AssertionException.class)
