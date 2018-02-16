@@ -19,11 +19,17 @@ scout.fonts = {
   loadingComplete: true,
 
   /**
-   * Start preloading the specified fonts.
+   * Start preloading the specified fonts. If no fonts are specified, the list of fonts
+   * to preload is automatically calculated from the available CSS "@font-face" definitions.
+   * To disable preloading entirely, pass an empty array to this function.
+   *
    * @param fonts (optional) array of fonts
+   * @return promise that is resolved when all fonts are loaded
    */
   bootstrap: function(fonts) {
-    if (!fonts || fonts.length === 0) {
+    fonts = fonts || this.autoDetectFonts();
+
+    if (fonts.length === 0) {
       this.loadingComplete = true;
       return $.resolvedPromise();
     }
@@ -62,7 +68,7 @@ scout.fonts = {
    *   [fonts]
    *     A single string or object (or an array of them) specifying which fonts should
    *     be preloaded. A string is interpreted as font-family. If the style is relevant,
-   *     too, an object with the properties 'font-family' and 'style' should be provided.
+   *     too, an object with the properties 'family' and 'style' should be provided.
    *     Alternatively, the style can be specified in the string after the font name,
    *     separated by a pipe character ('|').
    *     The property 'testString' (or a third component in a '|' separated string) may
@@ -132,7 +138,7 @@ scout.fonts = {
       font.testString = font.testString || options.testString || scout.fonts.DEFAULT_TEST_STRING;
 
       // Create DIV with default fonts
-      // (Because preloader functionality should not depend on a CSS stylesheet we set the required properties programmatically.)
+      // (Because preloader functionality should not depend on a CSS style sheet we set the required properties programmatically.)
       var $div = $('body').appendDiv('font-preloader')
           .text(font.testString)
           .css('display', 'block')
@@ -223,5 +229,53 @@ scout.fonts = {
     function complete(success) {
       options.onComplete(success);
     }
+  },
+
+  /**
+   * Reads all "@font-face" CSS rules from the current document and returns an array of
+   * font definition objects, suitable for passing to the preload() function (see above).
+   */
+  autoDetectFonts: function() {
+    var fonts = [];
+    // Implementation note: "styleSheets" and "cssRules" are not arrays (they only look like arrays)
+    for (var i = 0; i < document.styleSheets.length; i++) {
+      var styleSheet = document.styleSheets[i];
+      for (var j = 0; j < styleSheet.cssRules.length; j++) {
+        var cssRule = styleSheet.cssRules[j];
+        if (cssRule.type == window.CSSRule.FONT_FACE_RULE) {
+          var style = cssRule.style;
+          var ff = style.getPropertyValue('font-family');
+          var fw = style.getPropertyValue('font-weight');
+          var fs = style.getPropertyValue('font-style');
+          var fv = style.getPropertyValue('font-variant');
+          var ft = style.getPropertyValue('font-stretch');
+          if (ff) {
+            ff = ff.replace(/^"|"$/g, ''); // Unquote strings, they will be quoted again automatically
+            var s = [];
+            if (fw && fw !== 'normal') {
+              s.push('font-weight:' + fw);
+            }
+            if (fs && fs !== 'normal') {
+              s.push('font-style:' + fs);
+            }
+            if (fv && fv !== 'normal') {
+              s.push('font-variant:' + fv);
+            }
+            if (ft && ft !== 'normal') {
+              s.push('font-stretch:' + ft);
+            }
+            var font = {
+              family: ff
+            };
+            if (s.length) {
+              font.style = s.join(';');
+            }
+            fonts.push(font);
+          }
+        }
+      }
+    }
+    return fonts;
   }
+
 };
