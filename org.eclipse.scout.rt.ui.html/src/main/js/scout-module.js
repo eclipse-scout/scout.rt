@@ -59,6 +59,7 @@
   __include("scout/util/hAlign.js");
   __include("scout/util/aggregation.js");
   __include("scout/util/webstorage.js");
+  __include("scout/util/cookies.js");
   // Lookup calls
   __include("scout/lookup/LookupCall.js");
   __include("scout/lookup/LookupRow.js");
