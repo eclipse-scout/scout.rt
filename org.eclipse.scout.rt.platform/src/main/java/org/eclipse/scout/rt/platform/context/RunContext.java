@@ -53,6 +53,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 public class RunContext implements IAdaptable {
 
   protected RunMonitor m_runMonitor = BEANS.get(RunMonitor.class);
+  protected RunMonitor m_parentRunMonitor;
   protected Subject m_subject;
   protected Locale m_locale;
   protected PropertyMap m_propertyMap = new PropertyMap();
@@ -155,6 +156,7 @@ public class RunContext implements IAdaptable {
    */
   protected <RESULT> void interceptCallableChain(final CallableChain<RESULT> callableChain) {
     callableChain
+        .add(new RunMonitorCancellableProcessor(m_parentRunMonitor, m_runMonitor))
         .add(new ThreadLocalProcessor<>(CorrelationId.CURRENT, m_correlationId))
         .add(new ThreadLocalProcessor<>(RunMonitor.CURRENT, Assertions.assertNotNull(m_runMonitor)))
         .add(new SubjectProcessor<RESULT>(m_subject))
@@ -175,16 +177,13 @@ public class RunContext implements IAdaptable {
   /**
    * Set a specific {@link RunMonitor} to be used, which must not be <code>null</code>. However, even if there is a
    * current {@link RunMonitor}, it is NOT registered as child monitor, meaning that it will not be cancelled once the
-   * current {@link RunMonitor} is cancelled. If such a linking is needed, you have to do that yourself:
+   * current {@link RunMonitor} is cancelled. If such a linking is needed, you have to register the current run monitor
+   * as a parent:
    *
    * <pre>
    * <code>
    *     RunMonitor monitor = BEANS.get(RunMonitor.class);
-   *
-   *     // Register your monitor to be cancelled as well
-   *     RunMonitor.CURRENT.get().registerCancellable(monitor);
-   *
-   *     RunContexts.copyCurrent().withRunMonitor(monitor).run(new IRunnable() {
+   *     RunContexts.copyCurrent().withRunMonitor(monitor).withParentRunMonitor(RunMonitor.CURRENT.get()).run(new IRunnable() {
    *
    *       &#064;Override
    *       public void run() throws Exception {
@@ -195,7 +194,27 @@ public class RunContext implements IAdaptable {
    * </pre>
    */
   public RunContext withRunMonitor(final RunMonitor runMonitor) {
+    m_parentRunMonitor = null; // for compatibility reasons, registering a new run monitor must also clear parent run monitor
     m_runMonitor = Assertions.assertNotNull(runMonitor, "RunMonitor must not be null");
+    return this;
+  }
+
+  /**
+   * @see #withParentRunMonitor(RunMonitor)
+   */
+  public RunMonitor getParentRunMonitor() {
+    return m_parentRunMonitor;
+  }
+
+  /**
+   * Set a specific {@link RunMonitor} as parent run monitor. The run monitor for this context specified by
+   * {@link #withRunMonitor(RunMonitor)} is registered as a {@link ICancellable} for the parent run monitor. The parent
+   * run monitor may be <code>null</code>, in this case the run monitor for this context is just not registered as a
+   * {@link ICancellable}. It is registered as soon as execution is started and unregistered again after finishing
+   * execution.
+   */
+  public RunContext withParentRunMonitor(RunMonitor parentRunMonitor) {
+    m_parentRunMonitor = parentRunMonitor;
     return this;
   }
 
@@ -345,6 +364,7 @@ public class RunContext implements IAdaptable {
    */
   protected void copyValues(final RunContext origin) {
     m_runMonitor = origin.m_runMonitor;
+    m_parentRunMonitor = origin.m_parentRunMonitor;
     m_subject = origin.m_subject;
     m_locale = origin.m_locale;
     m_correlationId = origin.m_correlationId;
@@ -368,10 +388,8 @@ public class RunContext implements IAdaptable {
     m_propertyMap = new PropertyMap(PropertyMap.CURRENT.get());
 
     // RunMonitor
-    m_runMonitor = BEANS.get(RunMonitor.class);
-    if (RunMonitor.CURRENT.get() != null) {
-      RunMonitor.CURRENT.get().registerCancellable(m_runMonitor);
-    }
+    // a new run monitor for m_runMonitor is created implicitly, see member definition
+    m_parentRunMonitor = RunMonitor.CURRENT.get();
 
     // RunContextIdentifiers
     m_identifiers = new LinkedList<>();
@@ -392,7 +410,7 @@ public class RunContext implements IAdaptable {
     m_subject = null;
     m_locale = null;
     m_correlationId = null;
-    m_runMonitor = BEANS.get(RunMonitor.class);
+    // a new run monitor for m_runMonitor is created implicitly, see member definition
     m_propertyMap = new PropertyMap();
     m_identifiers = new LinkedList<>();
   }
