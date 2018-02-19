@@ -971,8 +971,9 @@ scout.Planner.prototype._onResizeMousedown = function(event) {
   this.startRow = this.selectedResources[0];
   this.lastRow = this.selectedResources[this.selectedResources.length - 1];
 
-  this.startRange = this._findScaleByFromDate(this.selectionRange.from);
-  this.lastRange = this._findScaleByToDate(this.selectionRange.to);
+  // Get the start and last range based on the clicked resize handle. If the ranges cannot be determined it likely means that the selectionRange is out of the current viewRange or dayRange (set by firstHourOfDay, lastHourOfDay)
+  this.startRange = scout.nvl(this._findScaleByFromDate(this.selectionRange.from), new scout.Range(this.selectionRange.from.getTime(), this.selectionRange.from.getTime()));
+  this.lastRange = scout.nvl(this._findScaleByToDate(this.selectionRange.to), new scout.Range(this.selectionRange.to.getTime(), this.selectionRange.to.getTime()));
 
   // Swap start and last range if resize-left is clicked
   if ($target.hasClass('selector-resize-left')) {
@@ -1156,6 +1157,9 @@ scout.Planner.prototype._findScaleByToDate = function(to) {
 
 scout.Planner.prototype._findScaleByFunction = function(func) {
   var $scaleItem = this.$timelineSmall.children('.scale-item').filter(func);
+  if (!$scaleItem.length) {
+    return null;
+  }
   return new scout.DateRange($scaleItem.data('date-from').valueOf(), $scaleItem.data('date-to').valueOf());
 };
 
@@ -1356,6 +1360,10 @@ scout.Planner.prototype._renderSelectionRange = function() {
   }
   $startRow = startRow.$resource;
   $lastRow = lastRow.$resource;
+
+  // Make sure selection fits into scale
+  from = Math.max(from, this.beginScale);
+  to = Math.min(to, this.endScale);
 
   // top and height
   var $parent = ($startRow[0].offsetTop <= $lastRow[0].offsetTop) ? $startRow : $lastRow;
