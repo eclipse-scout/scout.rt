@@ -54,7 +54,7 @@ public class RunMonitorJobTest {
 
         assertSame(explicitMonitor, RunMonitor.CURRENT.get());
         assertNotSame(explicitMonitor, currentMonitor);
-        assertEquals(0, currentMonitor.getCancellablesCount());//nothing from RunContexts.copyCurrent
+        assertEquals(1, currentMonitor.getCancellablesCount());//+1 from RunContexts.copyCurrent
         assertEquals(2, explicitMonitor.getCancellablesCount());//+1 from job cancellable, +1 from run monitor
       }
     }, Jobs.newInput()
@@ -65,7 +65,7 @@ public class RunMonitorJobTest {
     setupLatch.unblock();
 
     future.awaitDoneAndGet();
-    assertEquals(0, currentMonitor.getCancellablesCount());//nothing from RunContexts.copyCurrent
+    assertEquals(1, currentMonitor.getCancellablesCount());//+1 from RunContexts.copyCurrent
     waitUntilCancellableCount(explicitMonitor, 0);
     assertSame(currentMonitor, RunMonitor.CURRENT.get());
   }
@@ -120,7 +120,7 @@ public class RunMonitorJobTest {
     setupLatch.unblock();
 
     future.awaitDoneAndGet();
-    assertEquals(0, currentMonitor.getCancellablesCount());//nothing anymore from RunContexts.copyCurrent (has been removed again)
+    assertEquals(1, currentMonitor.getCancellablesCount());//+1 from RunContexts.copyCurrent
     assertSame(currentMonitor, RunMonitor.CURRENT.get());
   }
 

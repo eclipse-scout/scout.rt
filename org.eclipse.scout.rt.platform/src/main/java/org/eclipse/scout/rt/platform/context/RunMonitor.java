@@ -11,9 +11,7 @@
 package org.eclipse.scout.rt.platform.context;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -86,13 +84,9 @@ public class RunMonitor implements ICancellable {
       m_cancelled = true;
     }
 
-    // Cancel the cancellables outside the lock.
+    // Cancel the Cancellables outside the lock.
     boolean success = true;
-    Set<ICancellable> processed = new HashSet<>();
     for (final ICancellable cancellable : getCancellables()) {
-      if (!processed.add(cancellable)) {
-        continue; // already cancelled this cancellable during this loop
-      }
       if (!cancel(cancellable, interruptIfRunning)) {
         success = false;
       }
@@ -120,7 +114,9 @@ public class RunMonitor implements ICancellable {
 
         m_registrationLock.writeLock().lock();
         try {
-          m_cancellables.add(cancellable);
+          if (!m_cancellables.contains(cancellable)) {
+            m_cancellables.add(cancellable);
+          }
         }
         finally {
           m_registrationLock.writeLock().unlock();
