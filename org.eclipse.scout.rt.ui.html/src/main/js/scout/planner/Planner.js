@@ -389,18 +389,20 @@ scout.Planner.prototype._renderScale = function() {
   width = 100 / $smallScaleItems.length;
   $largeScaleItems.each(function() {
     var $scaleItem = $(this);
+    var $largeGridLine = that.$grid.prependDiv('planner-large-scale-item-line');
     $scaleItem.css('width', $scaleItem.data('count') * width + '%')
-      .data('scale-item-line', that.$grid.appendDiv('planner-large-scale-item-line'));
-    $scaleItem.appendDiv('planner-large-scale-item-line')
+      .data('scale-item-line', $largeGridLine);
+    $scaleItem.prependDiv('planner-large-scale-item-line')
       .css('left', 0);
   });
   $smallScaleItems.each(function(index) {
     var $scaleItem = $(this);
     $scaleItem.css('width', width + '%');
     if (!$scaleItem.data('first')) {
-      var $lineGrid = that.$grid.appendDiv('planner-small-scale-item-line');
-      $scaleItem.data('scale-item-line', $lineGrid);
-      $scaleItem.appendDiv('planner-small-scale-item-line').css('left', 0);
+      var $smallGridLine = that.$grid.prependDiv('planner-small-scale-item-line');
+      $scaleItem.data('scale-item-line', $smallGridLine);
+      $scaleItem.prependDiv('planner-small-scale-item-line')
+        .css('left', 0);
     }
   });
 
