@@ -73,9 +73,10 @@ public final class RunContexts {
    * {@link AssertionException} otherwise.
    * <p>
    * {@link RunMonitor}<br>
-   * Uses a new {@link RunMonitor} which is registered as child monitor of {@link RunMonitor#CURRENT}, meaning that the
-   * context is cancelled upon cancellation of the current (parent) monitor. Cancellation works top-down, so
-   * cancellation of the context's monitor has no effect to the current (parent) monitor.
+   * Uses a new {@link RunMonitor} which is registered as child monitor of {@link RunMonitor#CURRENT} during execution
+   * of the new run context using a {@link RunMonitorCancellableProcessor} meaning that the context is cancelled upon
+   * cancellation of the current (parent) monitor. Cancellation works top-down, so cancellation of the context's monitor
+   * has no effect to the current (parent) monitor.
    * <p>
    * {@link TransactionScope}<br>
    * Uses the transaction scope {@link TransactionScope#REQUIRED} which starts a new transaction only if not running in
@@ -128,7 +129,7 @@ public final class RunContexts {
     }
 
     public RunContext copyCurrent() {
-      final RunContext currentRunContext = Assertions.assertNotNull(RunContext.CURRENT.get());
+      Assertions.assertNotNull(RunContext.CURRENT.get());
       final RunContext newRunContext = newInstance();
 
       // Take a snapshot of the calling context, and apply it to the new context.
@@ -141,7 +142,7 @@ public final class RunContexts {
           .withoutTransactionMembers();
 
       // Register the run monitor for propagated cancellation.
-      currentRunContext.getRunMonitor().registerCancellable(newRunContext.getRunMonitor());
+      newRunContext.withParentRunMonitor(RunMonitor.CURRENT.get());
 
       return newRunContext;
     }
