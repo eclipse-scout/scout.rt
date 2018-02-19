@@ -400,11 +400,7 @@ scout.Planner.prototype._renderScale = function() {
     if (!$scaleItem.data('first')) {
       var $lineGrid = that.$grid.appendDiv('planner-small-scale-item-line');
       $scaleItem.data('scale-item-line', $lineGrid);
-      var $lineScale = $scaleItem.appendDiv('planner-small-scale-item-line').css('left', 0);
-      if ($scaleItem.hasClass('label-invisible')) {
-        $lineGrid.addClass('first-in-range');
-        $lineScale.addClass('first-in-range');
-      }
+      $scaleItem.appendDiv('planner-small-scale-item-line').css('left', 0);
     }
   });
 
