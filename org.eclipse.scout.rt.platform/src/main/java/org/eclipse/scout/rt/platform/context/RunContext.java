@@ -69,7 +69,7 @@ public class RunContext implements IAdaptable {
   public static final ThreadLocal<RunContext> CURRENT = new ThreadLocal<>();
 
   protected RunMonitor m_runMonitor = BEANS.get(RunMonitor.class);
-
+  protected RunMonitor m_parentRunMonitor;
   protected Subject m_subject;
   protected Locale m_locale;
   protected String m_correlationId;
@@ -181,6 +181,7 @@ public class RunContext implements IAdaptable {
         .withTransactionMembers(m_transactionMembers);
 
     return new CallableChain<RESULT>()
+        .add(new RunMonitorCancellableProcessor(m_parentRunMonitor, m_runMonitor))
         .add(new ThreadLocalProcessor<>(CURRENT, this))
         .add(new ThreadLocalProcessor<>(CorrelationId.CURRENT, m_correlationId))
         .add(new ThreadLocalProcessor<>(RunMonitor.CURRENT, Assertions.assertNotNull(m_runMonitor)))
@@ -222,12 +223,39 @@ public class RunContext implements IAdaptable {
    *
    * <pre>
    * <code>
-   *     RunMonitor.CURRENT.get().registerCancellable(monitor);
+   *     RunMonitor monitor = BEANS.get(RunMonitor.class);
+   *     RunContexts.copyCurrent().withRunMonitor(monitor).withParentRunMonitor(RunMonitor.CURRENT.get()).run(new IRunnable() {
+   *
+   *       &#064;Override
+   *       public void run() throws Exception {
+   *         // do something
+   *       }
+   *     });
    * </code>
    * </pre>
    */
   public RunContext withRunMonitor(final RunMonitor runMonitor) {
+    m_parentRunMonitor = null; // for compatibility reasons, registering a new run monitor must also clear parent run monitor
     m_runMonitor = Assertions.assertNotNull(runMonitor, "RunMonitor must not be null");
+    return this;
+  }
+
+  /**
+   * @see #withParentRunMonitor(RunMonitor)
+   */
+  public RunMonitor getParentRunMonitor() {
+    return m_parentRunMonitor;
+  }
+
+  /**
+   * Set a specific {@link RunMonitor} as parent run monitor. The run monitor for this context specified by
+   * {@link #withRunMonitor(RunMonitor)} is registered as a {@link ICancellable} for the parent run monitor. The parent
+   * run monitor may be <code>null</code>, in this case the run monitor for this context is just not registered as a
+   * {@link ICancellable}. It is registered as soon as execution is started and unregistered again after finishing
+   * execution.
+   */
+  public RunContext withParentRunMonitor(RunMonitor parentRunMonitor) {
+    m_parentRunMonitor = parentRunMonitor;
     return this;
   }
 
@@ -466,6 +494,7 @@ public class RunContext implements IAdaptable {
    */
   protected void copyValues(final RunContext origin) {
     m_runMonitor = origin.m_runMonitor;
+    m_parentRunMonitor = origin.m_parentRunMonitor;
     m_subject = origin.m_subject;
     m_locale = origin.m_locale;
     m_correlationId = origin.m_correlationId;

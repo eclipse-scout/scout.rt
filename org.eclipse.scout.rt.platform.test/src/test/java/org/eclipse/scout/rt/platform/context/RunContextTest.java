@@ -36,6 +36,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.job.IBlockingCondition;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
@@ -44,6 +47,7 @@ import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
@@ -337,10 +341,10 @@ public class RunContextTest {
         final RunMonitor currentMonitor = RunMonitor.CURRENT.get();
         assertNotNull(currentMonitor);
 
-        // Test new run monitor and registration as child monitor
+        // Test new run monitor and no registration as child monitor
         RunMonitor childMonitor = RunContexts.copyCurrent().getRunMonitor();
         assertNotSame(currentMonitor, childMonitor);
-        assertTrue(currentMonitor.getCancellables().contains(childMonitor));
+        assertFalse(currentMonitor.getCancellables().contains(childMonitor));
 
         // Test specific monitor and no registration as child monitor
         final RunMonitor specificRunMonitor = BEANS.get(RunMonitor.class);
@@ -374,7 +378,7 @@ public class RunContextTest {
             assertNotNull(RunMonitor.CURRENT.get());
             assertNotSame(newMonitor, RunMonitor.CURRENT.get());
             assertNotSame(currentMonitor, RunMonitor.CURRENT.get());
-            assertFalse(newMonitor.getCancellables().contains(RunMonitor.CURRENT.get()));
+            assertTrue(newMonitor.getCancellables().contains(RunMonitor.CURRENT.get()));
           }
         }, Jobs.newInput()
             .withRunContext(RunContexts.copyCurrent()))
@@ -792,6 +796,257 @@ public class RunContextTest {
         });
   }
 
+  /**
+   * Tests RunMonitor functionality with:
+   * <ul>
+   * <li>Current RunMonitor available</li>
+   * <li>Explicit RunMonitor not set</li>
+   * <li>Runnable throws an Exception</li>
+   * </ul>
+   * Expected: a new RunMonitor is CREATED, registered as child and set as CURRENT for the time of execution.
+   */
+  @Test
+  public void testCopyCurrent_RunMonitorException() {
+    final RunMonitor currentRunMonitor = new RunMonitor();
+    RunMonitor.CURRENT.set(currentRunMonitor);
+
+    RunContext runContext = RunContexts.copyCurrent();
+    final RunMonitor newRunMonitor = runContext.getRunMonitor();
+
+    assertNotSame("RunMonitor should not be same instance a current RunMonitor", currentRunMonitor, newRunMonitor);
+
+    final Exception exception = new Exception();
+    try {
+      runContext.run(new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
+          throw exception;
+        }
+      });
+    }
+    catch (PlatformException e) {
+      assertEquals(exception, e.getCause());
+    }
+
+    assertSame(currentRunMonitor, RunMonitor.CURRENT.get());
+    assertSame(newRunMonitor, runContext.getRunMonitor());
+    assertFalse("RunMonitor should not be registered within current RunMonitor anymore", currentRunMonitor.getCancellables().contains(newRunMonitor));
+  }
+
+  /**
+   * Tests RunMonitor functionality with:
+   * <ul>
+   * <li>Current RunMonitor available</li>
+   * <li>Explicit RunMonitor not set</li>
+   * <li>Additional cancellables are registered as new child which are not removed until some time after completion of
+   * run context</li>
+   * </ul>
+   * Expected: a new RunMonitor is CREATED, registered as child and set as CURRENT for the time of execution until the
+   * last cancellable is removed.
+   */
+  @Test
+  public void testCopyCurrent_RunMonitorLeftoverCancellables() {
+    final RunMonitor currentRunMonitor = new RunMonitor();
+    RunMonitor.CURRENT.set(currentRunMonitor);
+
+    RunContext runContext = RunContexts.copyCurrent();
+    final RunMonitor newRunMonitor = runContext.getRunMonitor();
+
+    assertNotSame("Run monitor should not be same instance a current run monitor", currentRunMonitor, newRunMonitor);
+
+    class LocalCancellable implements ICancellable {
+
+      @Override
+      public boolean isCancelled() {
+        return false;
+      }
+
+      @Override
+      public boolean cancel(boolean interruptIfRunning) {
+        return true;
+      }
+    }
+    final ICancellable c1 = new LocalCancellable();
+    final ICancellable c2 = new LocalCancellable();
+
+    runContext.run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        assertSame(newRunMonitor, RunMonitor.CURRENT.get());
+        newRunMonitor.registerCancellable(c1);
+        newRunMonitor.registerCancellable(c2);
+        assertTrue("Run monitor should be registered within current run monitor", currentRunMonitor.getCancellables().contains(RunMonitor.CURRENT.get()));
+      }
+    });
+
+    assertSame(currentRunMonitor, RunMonitor.CURRENT.get());
+    assertSame(newRunMonitor, runContext.getRunMonitor());
+    assertEquals(2, newRunMonitor.getCancellables().size());
+    assertTrue("New run monitor should be registered within current run monitor as long a cancellables remain", currentRunMonitor.getCancellables().contains(newRunMonitor));
+
+    // Remove cancellable 1/2
+    newRunMonitor.unregisterCancellable(c1);
+    assertEquals(1, newRunMonitor.getCancellables().size());
+    assertTrue("New run monitor should be registered within current run monitor as long a cancellables remain", currentRunMonitor.getCancellables().contains(newRunMonitor));
+
+    // Remove cancellable 2/2
+    newRunMonitor.unregisterCancellable(c2);
+    assertEquals(0, newRunMonitor.getCancellables().size());
+    assertFalse("New run monitor should not be registered within current run monitor anymore", currentRunMonitor.getCancellables().contains(newRunMonitor));
+  }
+
+  /**
+   * Tests RunMonitor functionality with:
+   * <ul>
+   * <li>Different parent current run monitors available</li>
+   * <li>Explicit run monitor not set (e.g. new one created)</li>
+   * <li>Additional cancellables are registered as new child which are not removed until some time after completion of
+   * run context</li>
+   * </ul>
+   * Expected: One new run monitor is <b>created</b>, registered as child and set as <b>current</b> for the time of
+   * execution until the last cancellable is removed.
+   */
+  @Test
+  public void testCopyCurrent_RunMonitorLeftoverMultipleParent() {
+    final RunMonitor currentRunMonitor1 = new RunMonitor();
+    RunMonitor.CURRENT.set(currentRunMonitor1);
+
+    RunContext runContext = RunContexts.copyCurrent();
+    final RunMonitor newRunMonitor = runContext.getRunMonitor();
+
+    assertNotSame("Run monitor should not be same instance a current run monitor", currentRunMonitor1, newRunMonitor);
+
+    class LocalCancellable implements ICancellable {
+
+      @Override
+      public boolean isCancelled() {
+        return false;
+      }
+
+      @Override
+      public boolean cancel(boolean interruptIfRunning) {
+        return true;
+      }
+    }
+    final ICancellable c1 = new LocalCancellable();
+    final ICancellable c2 = new LocalCancellable();
+
+    runContext.run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        assertSame(newRunMonitor, RunMonitor.CURRENT.get());
+        newRunMonitor.registerCancellable(c1);
+        assertTrue("Run monitor should be registered within current run monitor", currentRunMonitor1.getCancellables().contains(RunMonitor.CURRENT.get()));
+      }
+    });
+
+    // set new current run monitor
+    assertSame(currentRunMonitor1, RunMonitor.CURRENT.get());
+    final RunMonitor currentRunMonitor2 = new RunMonitor();
+    RunMonitor.CURRENT.set(currentRunMonitor2);
+
+    runContext.withParentRunMonitor(currentRunMonitor2).run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        assertSame(newRunMonitor, RunMonitor.CURRENT.get());
+        newRunMonitor.registerCancellable(c2);
+        assertTrue("Run monitor should be registered within current run monitor", currentRunMonitor1.getCancellables().contains(RunMonitor.CURRENT.get()));
+      }
+    });
+
+    assertSame(currentRunMonitor2, RunMonitor.CURRENT.get());
+    assertSame(newRunMonitor, runContext.getRunMonitor());
+    assertEquals(2, newRunMonitor.getCancellables().size());
+
+    assertTrue("New run monitor should be registered within parent run monitor as long a cancellables remain", currentRunMonitor1.getCancellables().contains(newRunMonitor));
+    assertTrue("New run monitor should be registered within parent run monitor as long a cancellables remain", currentRunMonitor2.getCancellables().contains(newRunMonitor));
+
+    // Remove cancellable 1/2
+    newRunMonitor.unregisterCancellable(c1);
+    assertTrue("New run monitor should be registered within parent run monitor as long a cancellables remain", currentRunMonitor1.getCancellables().contains(newRunMonitor));
+    assertTrue("New run monitor should be registered within parent run monitor as long a cancellables remain", currentRunMonitor2.getCancellables().contains(newRunMonitor));
+
+    // Remove cancellable 2/2
+    newRunMonitor.unregisterCancellable(c2);
+    assertFalse("New run monitor should not be registered within parent run monitor anymore", currentRunMonitor1.getCancellables().contains(newRunMonitor));
+    assertFalse("New run monitor should not be registered within parent run monitor anymore", currentRunMonitor2.getCancellables().contains(newRunMonitor));
+  }
+
+  /**
+   * <p>
+   * Tests RunMonitor functionality with:
+   * </p>
+   * <ul>
+   * <li>Current RunMonitor available</li>
+   * <li>Explicit RunMonitor not set</li>
+   * <li>Run context is used to start two {@link Jobs} in new threads</li>
+   * </ul>
+   * <p>
+   * Expected: exactly one new RunMonitor is created, registered as child and set as current for the time of execution,
+   * must be removed after the last job finishes.
+   * </p>
+   */
+  @Test
+  public void testCopyCurrent_RunMonitorTwoConcurrentJobs() {
+    final RunMonitorEx currentRunMonitor = new RunMonitorEx();
+    RunMonitor.CURRENT.set(currentRunMonitor);
+    RunContext runContext = RunContexts.copyCurrent();
+    final RunMonitor newRunMonitor = runContext.getRunMonitor();
+    assertNotNull(newRunMonitor);
+    assertNotSame(currentRunMonitor, newRunMonitor);
+    assertSame(currentRunMonitor, runContext.getParentRunMonitor());
+
+    final IBlockingCondition startedCondition1 = Jobs.newBlockingCondition(true);
+    final IBlockingCondition startedCondition2 = Jobs.newBlockingCondition(true);
+    final IBlockingCondition blockingCondition1 = Jobs.newBlockingCondition(true);
+    final IBlockingCondition blockingCondition2 = Jobs.newBlockingCondition(true);
+
+    assertFalse("New run monitor must not be registered with current run monitor", currentRunMonitor.containsCancellable(newRunMonitor));
+
+    IFuture<Void> future1 = Jobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        startedCondition1.setBlocking(false);
+        blockingCondition1.waitFor();
+        assertSame(newRunMonitor, RunMonitor.CURRENT.get());
+        assertTrue("New run monitor must be registered with current run monitor", currentRunMonitor.containsCancellable(newRunMonitor));
+      }
+    }, Jobs.newInput().withRunContext(runContext));
+
+    IFuture<Void> future2 = Jobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        startedCondition2.setBlocking(false);
+        blockingCondition2.waitFor();
+        assertSame(newRunMonitor, RunMonitor.CURRENT.get());
+        assertTrue("New run monitor must be registered with current run monitor", currentRunMonitor.containsCancellable(newRunMonitor));
+      }
+    }, Jobs.newInput().withRunContext(runContext));
+
+    assertSame(currentRunMonitor, RunMonitor.CURRENT.get());
+
+    // Wait for jobs to be started
+    startedCondition1.waitFor();
+    startedCondition2.waitFor();
+
+    // Stop latter job first
+    blockingCondition2.setBlocking(false);
+    future2.awaitDoneAndGet();
+
+    // Stop first job
+    blockingCondition1.setBlocking(false);
+    future1.awaitDoneAndGet();
+
+    assertSame(currentRunMonitor, RunMonitor.CURRENT.get());
+    assertFalse("New run monitor must not be registered with current run monitor", currentRunMonitor.containsCancellable(newRunMonitor));
+  }
+
   private static Set<Object> toSet(Iterator<?> iterator) {
     Set<Object> set = new HashSet<>();
     while (iterator.hasNext()) {
@@ -805,5 +1060,12 @@ public class RunContextTest {
     subject.getPrincipals().add(new SimplePrincipal(principal));
     subject.setReadOnly();
     return subject;
+  }
+
+  private static class RunMonitorEx extends RunMonitor {
+
+    public boolean containsCancellable(ICancellable cancellable) {
+      return getCancellables().contains(cancellable);
+    }
   }
 }
