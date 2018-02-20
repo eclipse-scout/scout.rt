@@ -51,7 +51,7 @@ public class CalendarContextMenu extends AbstractContextMenu<ICalendar> implemen
     if (container != null) {
       final CalendarComponent ownerValue = container.getSelectedComponent();
       setCurrentMenuTypes(MenuUtility.getMenuTypesForCalendarSelection(ownerValue));
-      acceptVisitor(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()));
+      visit(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()), IMenu.class);
       calculateLocalVisibility();
     }
   }

@@ -24,22 +24,6 @@ public class WidgetTest {
   }
 
   @Test
-  public void testPostInitConfig() {
-    Widget widget = new Widget();
-    assertEquals(0, widget.postInitConfigCalls);
-    assertEquals(false, widget.isPostInitConfigDone());
-
-    widget.postInitConfig();
-    assertEquals(1, widget.postInitConfigCalls);
-    assertEquals(true, widget.isPostInitConfigDone());
-
-    // Does not execute postInitConfig again
-    widget.postInitConfig();
-    assertEquals(1, widget.postInitConfigCalls);
-    assertEquals(true, widget.isPostInitConfigDone());
-  }
-
-  @Test
   public void testInit() {
     Widget widget = new Widget();
     assertEquals(0, widget.initCalls);
@@ -137,19 +121,12 @@ public class WidgetTest {
 
     public int initCalls = 0;
     public int initConfigCalls;
-    public int postInitConfigCalls = 0;
     public int disposeCalls = 0;
 
     @Override
     protected void initConfigInternal() {
       super.initConfigInternal();
       initConfigCalls++;
-    }
-
-    @Override
-    protected void postInitConfigInternal() {
-      super.postInitConfigInternal();
-      postInitConfigCalls++;
     }
 
     @Override

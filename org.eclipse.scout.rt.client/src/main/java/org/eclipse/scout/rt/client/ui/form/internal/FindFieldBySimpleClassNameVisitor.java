@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.internal;
 
-import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import java.util.function.Function;
 
-public class FindFieldBySimpleClassNameVisitor implements IFormFieldVisitor {
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
+
+public class FindFieldBySimpleClassNameVisitor implements Function<IFormField, TreeVisitResult> {
   private final String m_simpleName;
   private IFormField m_found;
 
@@ -22,15 +24,15 @@ public class FindFieldBySimpleClassNameVisitor implements IFormFieldVisitor {
   }
 
   @Override
-  public boolean visitField(IFormField field, int level, int fieldIndex) {
+  public TreeVisitResult apply(IFormField field) {
     if (field.getClass().getSimpleName().equalsIgnoreCase(m_simpleName)) {
       m_found = field;
+      return TreeVisitResult.TERMINATE;
     }
-    return m_found == null;
+    return TreeVisitResult.CONTINUE;
   }
 
   public IFormField getField() {
     return m_found;
   }
-
 }

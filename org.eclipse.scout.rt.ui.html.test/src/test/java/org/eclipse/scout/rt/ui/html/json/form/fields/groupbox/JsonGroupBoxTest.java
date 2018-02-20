@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.ui.html.UiSessionTestUtility;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.fields.BaseFormFieldTest;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
-import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -69,7 +68,7 @@ public class JsonGroupBoxTest extends BaseFormFieldTest {
   @Test
   public void testDontSendNonDisplayableFields() throws Exception {
     IGroupBox groupBox = new GroupBoxWithNonDisplayableField();
-    JsonTestUtility.initField(groupBox);
+    groupBox.init();
 
     JsonGroupBox<IGroupBox> jsonGroupBox = UiSessionTestUtility.newJsonAdapter(m_uiSession, groupBox, null);
     JsonFormField<IFormField> jsonDisplayableField = m_uiSession.getJsonAdapter(groupBox.getFieldByClass(GroupBoxWithNonDisplayableField.DisplayableField.class), jsonGroupBox);

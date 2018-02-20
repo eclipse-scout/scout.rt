@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -162,9 +161,10 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     }
     List<IMenu> newActions = new ArrayList<>();
     for (Bookmark b : folder.getBookmarks()) {
-      newActions.add(new ActivateBookmarkMenu(b));
+      ActivateBookmarkMenu menu = new ActivateBookmarkMenu(b);
+      menu.init();
+      newActions.add(menu);
     }
-    ActionUtility.initActions(newActions);
     actionList.addAll(newActions);
   }
 

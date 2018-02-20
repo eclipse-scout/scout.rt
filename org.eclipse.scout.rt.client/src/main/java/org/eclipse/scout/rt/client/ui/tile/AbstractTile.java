@@ -58,11 +58,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   }
 
   @Override
-  protected void callInitializer() {
-    interceptInitConfig();
-  }
-
-  protected final void interceptInitConfig() {
+  protected void initConfigInternal() {
     m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), this::initConfig);
   }
 

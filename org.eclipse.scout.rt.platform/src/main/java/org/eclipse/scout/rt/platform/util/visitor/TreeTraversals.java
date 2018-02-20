@@ -1,0 +1,82 @@
+/*******************************************************************************
+ * Copyright (c) 2018 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.platform.util.visitor;
+
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+
+import java.util.List;
+import java.util.function.Function;
+
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+
+/**
+ * Factory to create {@link ITreeTraversal} instances.
+ * <p>
+ * Depending on the type of visitor a <i>Depth-First</i> (DFS) or a <i>Breadth-First</i> (BFS) strategy is returned.<br>
+ * A traversal is called <i>Depth-First</i> if the search tree is deepened as much as possible on each child before
+ * going to the next sibling (top-down=pre-order or bottom-up=post-order).<br>
+ * A traversal is called <i>Breadth-First</i> if a level is traversed completely before deepened to the next level (also
+ * known as level-order).
+ * <p>
+ * It is guaranteed that every element is only visited once per traversal.<br>
+ * Except the traversal strategy the order of the elements is undefined.
+ *
+ * @since 7.1
+ * @see IDepthFirstTreeVisitor
+ * @see IBreadthFirstTreeVisitor
+ * @see ITreeTraversal
+ * @see TreeVisitResult
+ */
+public final class TreeTraversals {
+
+  private TreeTraversals() {
+  }
+
+  /**
+   * Creates a new {@link ITreeTraversal} using a <i>Breadth-First</i> traversal strategy.
+   *
+   * @param visitor
+   *          The {@link IBreadthFirstTreeVisitor} to use during the traversal. Must not be {@code null}.
+   * @param childrenSupplier
+   *          A {@link Function} that returns the child elements of a given parent. Must not be {@code null}.<br>
+   *          The result of the {@link Function} itself may be {@code null}. The element passed to the {@link Function}
+   *          is never {@code null}.
+   * @return A <i>Breadth-First</i> {@link ITreeTraversal} that calls the specified {@link IBreadthFirstTreeVisitor} and
+   *         uses the specified {@link Function} to calculate child elements. Never returns {@code null}.
+   * @throws AssertionException
+   *           if one of the arguments is {@code null}.
+   * @see IBreadthFirstTreeVisitor
+   * @see ITreeTraversal
+   */
+  public static <T> ITreeTraversal<T> create(IBreadthFirstTreeVisitor<T> visitor, Function<T, List<? extends T>> childrenSupplier) {
+    return new BreadthFirstTraversal<T>(assertNotNull(visitor), assertNotNull(childrenSupplier));
+  }
+
+  /**
+   * Creates a new {@link ITreeTraversal} using a <i>Depth-First</i> traversal strategy.
+   *
+   * @param visitor
+   *          The {@link IDepthFirstTreeVisitor} to use during the traversal. Must not be {@code null}.
+   * @param childrenSupplier
+   *          A {@link Function} that returns the child elements of a given parent. Must not be {@code null}.<br>
+   *          The result of the {@link Function} itself may be {@code null}. The element passed to the {@link Function}
+   *          is never {@code null}.
+   * @return A <i>Depth-First</i> {@link ITreeTraversal} that calls the specified {@link IDepthFirstTreeVisitor} and
+   *         uses the specified {@link Function} to calculate child elements. Never returns {@code null}.
+   * @throws AssertionException
+   *           if one of the arguments is {@code null}.
+   * @see IDepthFirstTreeVisitor
+   * @see ITreeTraversal
+   */
+  public static <T> ITreeTraversal<T> create(IDepthFirstTreeVisitor<T> visitor, Function<T, List<? extends T>> childrenSupplier) {
+    return new DepthFirstTraversal<T>(assertNotNull(visitor), assertNotNull(childrenSupplier));
+  }
+}

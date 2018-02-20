@@ -195,8 +195,6 @@ public interface IAction extends IWidget, ITypeWithClassId, IOrdered, IStyleable
    */
   IActionUIFacade getUIFacade();
 
-  int acceptVisitor(IActionVisitor visitor);
-
   /**
    * Checks if this action and all its parent actions are enabled
    *

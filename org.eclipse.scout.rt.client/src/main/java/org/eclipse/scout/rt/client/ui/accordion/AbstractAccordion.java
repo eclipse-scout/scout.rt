@@ -15,6 +15,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.group.IGroup;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
@@ -83,27 +84,6 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
   }
 
   @Override
-  protected void initInternal() {
-    for (IGroup group : getGroupsInternal()) {
-      group.init();
-    }
-  }
-
-  @Override
-  protected void postInitConfigInternal() {
-    for (IGroup group : getGroupsInternal()) {
-      group.postInitConfig();
-    }
-  }
-
-  @Override
-  protected void disposeInternal() {
-    for (IGroup group : getGroupsInternal()) {
-      group.dispose();
-    }
-  }
-
-  @Override
   public List<? extends IGroup> getGroups() {
     return CollectionUtility.arrayList(propertySupport.getPropertyList(PROP_GROUPS));
   }
@@ -151,7 +131,6 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
     // Initialize after every group has been linked to the container, so that it is possible to access other groups in group.execInit
     if (isInitConfigDone()) {
       for (IGroup group : groupsToInsert) {
-        group.postInitConfig();
         group.init();
       }
     }
@@ -173,6 +152,11 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
 
   protected void setGroupsInternal(List<? extends IGroup> groups) {
     propertySupport.setPropertyList(PROP_GROUPS, groups);
+  }
+
+  @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), getGroups());
   }
 
   @Override

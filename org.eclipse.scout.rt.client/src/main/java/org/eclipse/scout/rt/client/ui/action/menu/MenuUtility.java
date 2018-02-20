@@ -10,16 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
+import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
-import org.eclipse.scout.rt.client.ui.action.IActionFilter;
-import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
+import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
@@ -171,8 +172,6 @@ public final class MenuUtility {
    * @return the sub-menu of the given context menu owner that implements the given type. If no implementation is found,
    *         <code>null</code> is returned. Note: This method uses instance-of checks, hence the menu replacement
    *         mapping is not required.
-   * @throws IllegalStateException
-   *           when more than one menu implements the given type
    * @throws IllegalArgumentException
    *           when no context menu owner is provided.
    */
@@ -180,27 +179,17 @@ public final class MenuUtility {
     if (contextMenuOwner == null) {
       throw new IllegalArgumentException("Argument 'contextMenuOwner' must not be null");
     }
-    IContextMenu contextMenu = contextMenuOwner.getContextMenu();
-    if (contextMenu == null || menuType == null) {
-      return null;
-    }
 
-    final List<T> collectedMenus = new ArrayList<>();
-    contextMenu.acceptVisitor(action -> {
-      if (menuType.isInstance(action)) {
-        T menu = menuType.cast(action);
-        collectedMenus.add(menu);
-      }
-      return IActionVisitor.CONTINUE;
-    });
-
-    if (collectedMenus.isEmpty()) {
-      return null;
+    List<IMenu> rootMenus;
+    IContextMenu root = contextMenuOwner.getContextMenu();
+    if (root == null) {
+      // some components have no root menu but directly contain child menus (e.g. Desktop)
+      rootMenus = contextMenuOwner.getMenus();
     }
-    if (collectedMenus.size() == 1) {
-      return collectedMenus.get(0);
+    else {
+      rootMenus = Collections.singletonList(root);
     }
-    throw new IllegalStateException("Ambiguous menu type " + menuType.getName() + "! More than one implementation was found: " + CollectionUtility.format(collectedMenus));
+    return new ActionFinder().findAction(rootMenus, menuType);
   }
 
   public static void updateMenuVisibilitiesForTiles(ITileGrid tileGrid) {
@@ -219,17 +208,11 @@ public final class MenuUtility {
    * Updates the visibility of every single menu (including child menus) according to the given acceptedMenuTypes.
    */
   public static void updateMenuVisibilities(IContextMenu contextMenu, Set<IMenuType> acceptedMenuTypes) {
-    final IActionFilter activeFilter = ActionUtility.createMenuFilterMenuTypes(acceptedMenuTypes, false);
-    contextMenu.acceptVisitor(action -> {
-      if (!(action instanceof IMenu)) {
-        return IActionVisitor.CONTINUE;
+    final Predicate<IAction> activeFilter = ActionUtility.createMenuFilterMenuTypes(acceptedMenuTypes, false);
+    contextMenu.visit(menu -> {
+      if (!menu.isSeparator()) {
+        menu.setVisible(activeFilter.test(menu));
       }
-      IMenu menu = (IMenu) action;
-      if (menu.isSeparator()) {
-        return IActionVisitor.CONTINUE;
-      }
-      menu.setVisible(activeFilter.accept(menu));
-      return IActionVisitor.CONTINUE;
-    });
+    }, IMenu.class);
   }
 }

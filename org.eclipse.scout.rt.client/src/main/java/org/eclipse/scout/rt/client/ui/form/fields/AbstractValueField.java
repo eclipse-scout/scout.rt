@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.Val
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldFormatValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldParseValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldValidateValueChain;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IValueFieldContextMenu;
@@ -43,6 +43,7 @@ import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -190,10 +191,13 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   }
 
   @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), getMenus());
+  }
+
+  @Override
   protected void initFieldInternal() {
     super.initFieldInternal();
-    // init actions
-    ActionUtility.initActions(getMenus());
     for (IStatusMenuMapping mapping : getStatusMenuMappings()) {
       mapping.init();
     }
@@ -332,6 +336,10 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
 
   @Override
   protected boolean execIsSaveNeeded() {
+    boolean saveNeeded = super.execIsSaveNeeded();
+    if (saveNeeded) {
+      return true;
+    }
     return ObjectUtility.notEquals(getValue(), getInitValue());
   }
 
@@ -344,6 +352,9 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
 
   @Override
   protected boolean execIsEmpty() {
+    if (!areChildrenEmpty()) {
+      return false;
+    }
     return getValue() == null;
   }
 
@@ -659,12 +670,6 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
 
   public void updateFrom(IHolder<VALUE> other) {
     setValue(other.getValue());
-  }
-
-  @Override
-  protected void disposeFieldInternal() {
-    super.disposeFieldInternal();
-    ActionUtility.disposeActions(getMenus());
   }
 
   /**

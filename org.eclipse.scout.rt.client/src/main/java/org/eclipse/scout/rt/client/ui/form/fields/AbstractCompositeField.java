@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,11 +18,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ICompositeFieldExtension;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.DefaultFormFieldInjection;
 import org.eclipse.scout.rt.client.ui.form.FormFieldInjectionThreadLocal;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.AbstractSplitBox;
@@ -36,13 +34,13 @@ import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 
 @ClassId("4a641cd4-801f-45d2-9f08-5798e20b03c4")
 public abstract class AbstractCompositeField extends AbstractFormField implements ICompositeField {
 
   private Map<Class<?>, Class<? extends IFormField>> m_formFieldReplacements;
   private Map<Class<? extends IFormField>, IFormField> m_movedFormFieldsByClass;
-  private P_FieldPropertyChangeListener m_fieldPropertyChangeListener;
 
   public AbstractCompositeField() {
     this(true);
@@ -88,7 +86,6 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
 
     setFieldsInternal(CollectionUtility.emptyArrayList());
     m_movedFormFieldsByClass = new HashMap<>();
-    m_fieldPropertyChangeListener = new P_FieldPropertyChangeListener();
     super.initConfig();
     // prepare injected fields
     DefaultFormFieldInjection injectedFields = null;
@@ -131,8 +128,6 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
         f.setParentFieldInternal(this);
       }
 
-      // attach a proxy controller to each child field in the group for: visible, saveNeeded
-      fields.forEach(field -> field.addPropertyChangeListener(m_fieldPropertyChangeListener));
       setFieldsInternal(fields.getOrderedList());
     }
     finally {
@@ -142,20 +137,19 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
       }
       FormFieldInjectionThreadLocal.popContainerField(this);
     }
-    handleFieldVisibilityChanged();
   }
 
   @Override
   public void addField(IFormField f) {
     CompositeFieldUtility.addField(f, this, getFieldsInternal());
-    f.addPropertyChangeListener(m_fieldPropertyChangeListener);
+    addChildFieldPropertyChangeListener(f);
     handleFieldsChanged();
   }
 
   @Override
   public void removeField(IFormField f) {
     CompositeFieldUtility.removeField(f, this, getFieldsInternal());
-    f.removePropertyChangeListener(m_fieldPropertyChangeListener);
+    removeChildFieldPropertyChangeListener(f);
     handleFieldsChanged();
   }
 
@@ -173,7 +167,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
    * Updates this composite field's state after a child field has been added or removed.
    */
   protected void handleFieldsChanged() {
-    handleFieldVisibilityChanged();
+    handleChildFieldVisibilityChanged();
     checkSaveNeeded();
     checkEmpty();
     propertySupport.setPropertyAlwaysFire(PROP_FIELDS, getFieldsInternal());
@@ -210,9 +204,6 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
     if (form instanceof AbstractForm && this == form.getRootGroupBox()) {
       // this is the root group box. Publish replacement map to form and keep local map for better performance (see getReplacingFieldClass)
       ((AbstractForm) form).registerFormFieldReplacementsInternal(m_formFieldReplacements);
-    }
-    for (IFormField field : getFieldsInternal()) {
-      field.setFormInternal(form);
     }
   }
 
@@ -387,114 +378,23 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   @Override
-  public boolean acceptVisitor(IFormFieldVisitor visitor, int level, int fieldIndex, boolean includeThis) {
-    IFormField thisField = null;
-    if (includeThis) {
-      thisField = this;
-    }
-    return CompositeFieldUtility.applyFormFieldVisitor(visitor, thisField, getFieldsInternal(), level, fieldIndex);
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), getFieldsInternal());
   }
 
   @Override
-  public boolean visitFields(IFormFieldVisitor visitor) {
-    return acceptVisitor(visitor, 0, 0, true);
-  }
+  protected void handleChildFieldVisibilityChanged() {
+    super.handleChildFieldVisibilityChanged();
 
-  @Override
-  protected boolean execIsSaveNeeded() {
-    for (IFormField f : getFieldsInternal()) {
-      if (f.isSaveNeeded()) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  @Override
-  protected void execMarkSaved() {
-    super.execMarkSaved();
-    for (IFormField f : getFieldsInternal()) {
-      f.markSaved();
-    }
-  }
-
-  @Override
-  protected boolean execIsEmpty() {
-    for (IFormField f : getFieldsInternal()) {
-      if (!f.isEmpty()) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
-   * broadcast this change to all children
-   */
-  @Override
-  public void setMandatory(boolean b) {
-    // recursively down all children
-    for (IFormField f : getFieldsInternal()) {
-      f.setMandatory(b);
-    }
-  }
-
-  /**
-   * Sets the property on the field and on every child. <br>
-   * During the initialization phase the children are not informed.
-   *
-   * @see #getConfiguredStatusVisible()
-   */
-  @Override
-  public void setStatusVisible(boolean statusVisible) {
-    setStatusVisible(statusVisible, isInitConfigDone());
-  }
-
-  @Override
-  public void setStatusVisible(boolean statusVisible, boolean recursive) {
-    super.setStatusVisible(statusVisible);
-
-    if (recursive) {
-      for (IFormField f : getFieldsInternal()) {
-        f.setStatusVisible(statusVisible);
-      }
-    }
-  }
-
-  @Override
-  public void setDisabledStyle(int disabledStyle) {
-    super.setDisabledStyle(disabledStyle);
-
-    if (isInitConfigDone()) {
-      for (IFormField f : getFieldsInternal()) {
-        f.setDisabledStyle(disabledStyle);
-      }
-    }
-  }
-
-  @Override
-  public void setFieldStyle(String fieldStyle) {
-    super.setFieldStyle(fieldStyle);
-
-    if (isInitConfigDone()) {
-      for (IFormField f : getFieldsInternal()) {
-        f.setFieldStyle(fieldStyle);
-      }
-    }
-  }
-
-  protected void handleFieldVisibilityChanged() {
     // box is only visible when it has at least one visible item
     setHasVisibleFieldsInternal(calcHasVisibleFieldsInternal());
     calculateVisibleInternal();
   }
 
   protected boolean calcHasVisibleFieldsInternal() {
-    if (CollectionUtility.isEmpty(getFieldsInternal())) {
-      return false;
-    }
-    for (IFormField field : getFieldsInternal()) {
-      if (field.isVisible()) {
+    for (IWidget w : getChildren()) {
+      boolean hasVisibleChildren = w.visit(field -> field.isVisible() ? TreeVisitResult.TERMINATE : TreeVisitResult.CONTINUE, IFormField.class) == TreeVisitResult.TERMINATE;
+      if (hasVisibleChildren) {
         return true;
       }
     }
@@ -511,25 +411,6 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
 
   protected boolean hasVisibleFieldsInternal() {
     return propertySupport.getPropertyBool(PROP_HAS_VISIBLE_FIELDS);
-  }
-
-  /**
-   * Implementation of PropertyChangeListener Proxy on all attached fields (not groups)
-   */
-  protected class P_FieldPropertyChangeListener implements PropertyChangeListener {
-    @Override
-    public void propertyChange(PropertyChangeEvent e) {
-      if (e.getPropertyName().equals(IFormField.PROP_VISIBLE)) {
-        // fire group box visibility
-        handleFieldVisibilityChanged();
-      }
-      else if (e.getPropertyName().equals(IFormField.PROP_SAVE_NEEDED)) {
-        checkSaveNeeded();
-      }
-      else if (e.getPropertyName().equals(IFormField.PROP_EMPTY)) {
-        checkEmpty();
-      }
-    }
   }
 
   protected static class LocalCompositeFieldExtension<OWNER extends AbstractCompositeField> extends LocalFormFieldExtension<OWNER> implements ICompositeFieldExtension<OWNER> {

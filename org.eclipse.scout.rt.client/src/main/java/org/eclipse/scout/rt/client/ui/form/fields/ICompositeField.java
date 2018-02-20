@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
-
 /**
  * A {@link IFormField} that contains other {@link IFormField}s.
  */
@@ -27,17 +25,6 @@ public interface ICompositeField extends IFormField {
    * Returns the index of the first occurrence of the {@link IFormField} element, or -1 if the element can't be found.
    */
   int getFieldIndex(IFormField comp);
-
-  /**
-   * Visits this field and all of its child fields recursively.
-   *
-   * @param visitor
-   *          The visitor to use. Must not be <code>null</code>.
-   * @return <code>true</code> if all fields have been visited. <code>false</code> if the visitor cancelled the visit.
-   * @see IFormField#acceptVisitor(IFormFieldVisitor, int, int, boolean)
-   * @see IFormFieldVisitor#visitField(IFormField, int, int)
-   */
-  boolean visitFields(IFormFieldVisitor visitor);
 
   /**
    * recalculate and re-assign the logical x,y,w,h to each field in the groupbox
@@ -78,13 +65,6 @@ public interface ICompositeField extends IFormField {
    * @return the field with the exact type c in the subtree
    */
   <T extends IFormField> T getFieldByClass(Class<T> c);
-
-  /**
-   * @param statusVisible
-   * @param recursive
-   *          true, if statusVisible property of the children should be changed as well
-   */
-  void setStatusVisible(boolean statusVisible, boolean recursive);
 
   /**
    * for recursion

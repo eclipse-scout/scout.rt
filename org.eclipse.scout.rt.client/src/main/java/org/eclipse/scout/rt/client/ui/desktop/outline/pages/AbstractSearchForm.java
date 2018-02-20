@@ -24,13 +24,13 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 public abstract class AbstractSearchForm extends AbstractForm implements ISearchForm {
 
   @Override
-  public void initInternal() {
+  protected void initInternal() {
     // form
     initFormInternal();
-    // fields
-    FormUtility.initFormFields(this);
+
     // mark strategy
     FormUtility.setTabBoxMarkStrategy(this, ITabBox.MARK_STRATEGY_SAVE_NEEDED);
+
     // custom
     interceptInitForm();
   }

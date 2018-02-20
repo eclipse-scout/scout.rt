@@ -13,10 +13,9 @@ package org.eclipse.scout.rt.platform.interceptor.internal;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.UndeclaredThrowableException;
 
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.interceptor.DecoratingProxy;
 import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
@@ -77,7 +76,7 @@ public class BeanProxyImplementor<T> implements IInstanceInvocationHandler<T> {
           throw new ProcessingException("argument mismatch", e);
         }
         catch (InvocationTargetException e) {
-          throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
+          throw new UndeclaredThrowableException(e); // must be an exception of a type that DefaultExceptionTranslator can unwrap again (see DefaultExceptionTranslator#isWrapperException()).
         }
       }
     };

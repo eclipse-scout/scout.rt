@@ -18,11 +18,9 @@ import static org.junit.Assert.assertSame;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -85,7 +83,7 @@ public class JsonMenuTest {
   @Test
   public void testDontSendNonDisplayableMenus() throws Exception {
     IMenu menu = new MenuWithNonDisplayableChild();
-    ActionUtility.initActions(CollectionUtility.arrayList(menu));
+    menu.init();
 
     JsonMenu<IMenu> jsonMenu = UiSessionTestUtility.newJsonAdapter(m_uiSession, menu, null);
 
@@ -121,7 +119,7 @@ public class JsonMenuTest {
     assertNotNull(jsonNonDisplayableMenu);
 
     // After attachment of adapter!
-    ActionUtility.initActions(CollectionUtility.arrayList(menu));
+    menu.init();
     jsonDisplayableMenu = jsonMenu.getAdapter(displayableMenu);
     jsonNonDisplayableMenu = jsonMenu.getAdapter(nonDisplayableMenu);
     // Now only one adapter exists anymore
@@ -195,7 +193,7 @@ public class JsonMenuTest {
 
     // ------------------
     // After attachment of adapter!
-    ActionUtility.initActions(CollectionUtility.arrayList(menu));
+    menu.init();
 
     // Test:
     // - 0 adapters in response (-1 menu)

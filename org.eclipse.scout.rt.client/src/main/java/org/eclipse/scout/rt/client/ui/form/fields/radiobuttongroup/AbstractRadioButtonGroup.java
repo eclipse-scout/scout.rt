@@ -25,8 +25,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.radiobuttongroup.Rad
 import org.eclipse.scout.rt.client.extension.ui.form.fields.radiobuttongroup.RadioButtonGroupChains.RadioButtonGroupPrepareLookupChain;
 import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
-import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility;
@@ -409,14 +408,6 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   @Override
-  public void setFormInternal(IForm form) {
-    super.setFormInternal(form);
-    for (IFormField f : getFields()) {
-      f.setFormInternal(form);
-    }
-  }
-
-  @Override
   protected void valueChangedInternal() {
     super.valueChangedInternal();
     syncValueToButtons();
@@ -497,28 +488,6 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    * Implementation of ICompositeField
    */
 
-  /**
-   * Sets the property on the field and on every child. <br>
-   * During the initialization phase the children are not informed.
-   *
-   * @see #getConfiguredStatusVisible()
-   */
-  @Override
-  public void setStatusVisible(boolean statusVisible) {
-    setStatusVisible(statusVisible, isInitConfigDone());
-  }
-
-  @Override
-  public void setStatusVisible(boolean statusVisible, boolean recursive) {
-    super.setStatusVisible(statusVisible);
-
-    if (recursive) {
-      for (IFormField f : m_fields) {
-        f.setStatusVisible(statusVisible);
-      }
-    }
-  }
-
   @Override
   public <F extends IFormField> F getFieldByClass(Class<F> c) {
     return CompositeFieldUtility.getFieldByClass(this, c);
@@ -563,17 +532,8 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   @Override
-  public boolean acceptVisitor(IFormFieldVisitor visitor, int level, int fieldIndex, boolean includeThis) {
-    IFormField thisField = null;
-    if (includeThis) {
-      thisField = this;
-    }
-    return CompositeFieldUtility.applyFormFieldVisitor(visitor, thisField, m_fields, level, fieldIndex);
-  }
-
-  @Override
-  public boolean visitFields(IFormFieldVisitor visitor) {
-    return acceptVisitor(visitor, 0, 0, true);
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), m_fields);
   }
 
   private void syncValueToButtons() {

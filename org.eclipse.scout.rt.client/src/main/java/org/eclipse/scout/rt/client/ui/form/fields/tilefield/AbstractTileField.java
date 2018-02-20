@@ -1,7 +1,9 @@
 package org.eclipse.scout.rt.client.ui.form.fields.tilefield;
 
+import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.tile.AbstractTileGrid;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
@@ -50,6 +52,11 @@ public abstract class AbstractTileField<T extends ITileGrid<? extends ITile>> ex
     return ConfigurationUtility.filterClass(dca, ITileGrid.class);
   }
 
+  @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), Collections.singletonList(getTileGrid()));
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public T getTileGrid() {
@@ -72,30 +79,6 @@ public abstract class AbstractTileField<T extends ITileGrid<? extends ITile>> ex
     }
   }
 
-  @Override
-  protected void initFieldInternal() {
-    super.initFieldInternal();
-    if (getTileGrid() != null) {
-      getTileGrid().init();
-    }
-  }
-
-  @Override
-  protected void postInitConfigInternal() {
-    super.postInitConfigInternal();
-    if (getTileGrid() != null) {
-      getTileGrid().postInitConfig();
-    }
-  }
-
-  @Override
-  protected void disposeFieldInternal() {
-    if (getTileGrid() != null) {
-      getTileGrid().dispose();
-    }
-    super.disposeFieldInternal();
-  }
-
   /**
    * {@inheritDoc}
    * <p>
@@ -113,6 +96,9 @@ public abstract class AbstractTileField<T extends ITileGrid<? extends ITile>> ex
 
   @Override
   protected boolean execIsEmpty() {
+    if (!super.execIsEmpty()) {
+      return false;
+    }
     return getTileGrid().getTiles().isEmpty();
   }
 }

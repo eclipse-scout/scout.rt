@@ -14,23 +14,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class ActionUtility {
-  private static final Logger LOG = LoggerFactory.getLogger(ActionUtility.class);
 
   private ActionUtility() {
   }
 
-  public static final IActionFilter FALSE_FILTER = action -> false;
+  public static final Predicate<IAction> FALSE_FILTER = action -> false;
 
-  public static final IActionFilter TRUE_FILTER = action -> true;
+  public static final Predicate<IAction> TRUE_FILTER = action -> true;
 
   /**
    * Removes invisible actions. Also removes leading and trailing separators as well as multiple consecutive separators.
@@ -41,7 +39,7 @@ public final class ActionUtility {
     return normalizedActions(actionNodes, createVisibleFilter());
   }
 
-  public static <T extends IAction> List<T> normalizedActions(List<T> actionNodes, IActionFilter filter) {
+  public static <T extends IAction> List<T> normalizedActions(List<T> actionNodes, Predicate<IAction> filter) {
     if (actionNodes == null) {
       return CollectionUtility.emptyArrayList();
     }
@@ -77,14 +75,14 @@ public final class ActionUtility {
     }
   }
 
-  public static <T extends IAction> List<T> getActions(List<T> actions, final IActionFilter filter) {
+  public static <T extends IAction> List<T> getActions(List<T> actions, final Predicate<IAction> filter) {
     if (actions != null) {
       List<T> result = new ArrayList<>(actions.size());
       for (T a : actions) {
         if (a.isSeparator()) {
           result.add(a);
         }
-        else if (filter.accept(a)) {
+        else if (filter.test(a)) {
           result.add(a);
         }
       }
@@ -93,62 +91,10 @@ public final class ActionUtility {
     return CollectionUtility.emptyArrayList();
   }
 
-  public static void initActions(List<? extends IAction> actions) {
-    InitActionVisitor v = new InitActionVisitor();
-    for (IAction a : actions) {
-      a.acceptVisitor(v);
-    }
-    v.handleResult();
-  }
-
-  public static void disposeActions(List<? extends IAction> actions) {
-    DisposeActionVisitor v = new DisposeActionVisitor();
-    for (IAction a : actions) {
-      a.acceptVisitor(v);
-    }
-  }
-
-  public static class InitActionVisitor implements IActionVisitor {
-    private RuntimeException m_firstEx;
-
-    @Override
-    public int visit(IAction action) {
-      try {
-        action.init();
-      }
-      catch (RuntimeException e) {
-        if (m_firstEx == null) {
-          m_firstEx = e;
-        }
-      }
-      return CONTINUE;
-    }
-
-    public void handleResult() {
-      if (m_firstEx != null) {
-        throw m_firstEx;
-      }
-    }
-  }
-
-  public static class DisposeActionVisitor implements IActionVisitor {
-    @Override
-    public int visit(IAction action) {
-      try {
-        action.dispose();
-      }
-      catch (Exception t) {
-        LOG.warn("Could not dispose action '{}'", action, t);
-      }
-      return CONTINUE;
-    }
-  }
-
-  public static IActionFilter createVisibleFilter() {
-    return new IActionFilter() {
-
+  public static Predicate<IAction> createVisibleFilter() {
+    return new Predicate<IAction>() {
       @Override
-      public boolean accept(IAction action) {
+      public boolean test(IAction action) {
         if (action.isVisible()) {
           // remove menu groups with no visible child action
           if (action instanceof IActionNode<?> && ((IActionNode<?>) action).hasChildActions()) {
@@ -162,7 +108,7 @@ public final class ActionUtility {
     };
   }
 
-  public static IActionFilter createMenuFilterMenuTypes(boolean visibleOnly, IMenuType... menuTypes) {
+  public static Predicate<IAction> createMenuFilterMenuTypes(boolean visibleOnly, IMenuType... menuTypes) {
     return createMenuFilterMenuTypes(CollectionUtility.hashSet(menuTypes), visibleOnly);
 
   }
@@ -180,16 +126,17 @@ public final class ActionUtility {
    * @param visibleOnly
    * @return
    */
-  public static IActionFilter createMenuFilterMenuTypes(Set<? extends IMenuType> menuTypes, boolean visibleOnly) {
+  public static Predicate<IAction> createMenuFilterMenuTypes(Set<? extends IMenuType> menuTypes, boolean visibleOnly) {
     return new MenuTypeFilter(menuTypes, visibleOnly);
 
   }
 
-  public static IActionFilter createCombinedFilter(final IActionFilter... actionFilters) {
+  @SafeVarargs
+  public static Predicate<IAction> createCombinedFilter(final Predicate<IAction>... actionFilters) {
     if (actionFilters != null) {
       return action -> {
-        for (IActionFilter f : actionFilters) {
-          if (!f.accept(action)) {
+        for (Predicate<IAction> f : actionFilters) {
+          if (!f.test(action)) {
             return false;
           }
         }
@@ -199,7 +146,7 @@ public final class ActionUtility {
     return TRUE_FILTER;
   }
 
-  public static class MenuTypeFilter implements IActionFilter {
+  public static class MenuTypeFilter implements Predicate<IAction> {
 
     private final boolean m_visibleOnly;
     private final Set<? extends IMenuType> m_menuTypes;
@@ -211,7 +158,7 @@ public final class ActionUtility {
     }
 
     @Override
-    public boolean accept(IAction action) {
+    public boolean test(IAction action) {
       if (action instanceof IMenu) {
         IMenu menu = (IMenu) action;
         if (isVisibleOnly() && !menu.isVisible()) {

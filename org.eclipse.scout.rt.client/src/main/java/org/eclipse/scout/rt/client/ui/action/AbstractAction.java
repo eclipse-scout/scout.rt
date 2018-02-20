@@ -105,7 +105,7 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
 
   @Override
   protected void initConfigInternal() {
-    interceptInitConfig();
+    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
   @Override
@@ -300,10 +300,6 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   protected void execSelectionChanged(boolean selection) {
   }
 
-  protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
-  }
-
   @Override
   protected void initConfig() {
     super.initConfig();
@@ -338,20 +334,6 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   @Override
   public <T extends IExtension<?>> T getExtension(Class<T> c) {
     return m_objectExtensions.getExtension(c);
-  }
-
-  @Override
-  public int acceptVisitor(IActionVisitor visitor) {
-    switch (visitor.visit(this)) {
-      case IActionVisitor.CANCEL:
-        return IActionVisitor.CANCEL;
-      case IActionVisitor.CANCEL_SUBTREE:
-        return IActionVisitor.CONTINUE;
-      case IActionVisitor.CONTINUE_BRANCH:
-        return IActionVisitor.CANCEL;
-      default:
-        return IActionVisitor.CONTINUE;
-    }
   }
 
   /**

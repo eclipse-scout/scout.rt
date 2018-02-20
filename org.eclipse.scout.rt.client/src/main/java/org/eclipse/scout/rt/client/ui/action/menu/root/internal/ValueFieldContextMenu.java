@@ -60,7 +60,7 @@ public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField<?>> 
     if (container != null) {
       final Object ownerValue = container.getValue();
       setCurrentMenuTypes(MenuUtility.getMenuTypesForValueFieldValue(ownerValue));
-      acceptVisitor(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()));
+      visit(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()), IMenu.class);
     }
     calculateLocalVisibility();
   }

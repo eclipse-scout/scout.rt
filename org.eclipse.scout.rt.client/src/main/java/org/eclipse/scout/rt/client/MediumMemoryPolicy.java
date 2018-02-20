@@ -18,13 +18,16 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
+import org.eclipse.scout.rt.platform.util.visitor.DepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,18 +112,21 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
           preservationSet.add(p);
           p = p.getParentPage();
         }
-        ITreeVisitor v = node -> {
-          IPage<?> page = (IPage) node;
-          if (preservationSet.contains(page)) {
-            // nop
+        IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+          @Override
+          public TreeVisitResult preVisit(ITreeNode node, int level, int index) {
+            IPage<?> page = (IPage) node;
+            if (preservationSet.contains(page)) {
+              // nop
+            }
+            else if (page.getParentPage() == null) {
+              // nop, InvisibleRootPage
+            }
+            else if (page.isChildrenLoaded()) {
+              nodeCount.getAndAdd(page.getChildNodeCount());
+            }
+            return TreeVisitResult.CONTINUE;
           }
-          else if (page.getParentPage() == null) {
-            // nop, InvisibleRootPage
-          }
-          else if (page.isChildrenLoaded()) {
-            nodeCount.getAndAdd(page.getChildNodeCount());
-          }
-          return true;
         };
         for (IOutline outline : desktop.getAvailableOutlines()) {
           outline.visitNode(outline.getRootNode(), v);

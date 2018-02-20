@@ -34,6 +34,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -67,6 +70,7 @@ import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
@@ -126,6 +130,8 @@ import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.PreferredValue;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.util.visitor.CollectingVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
@@ -265,9 +271,10 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
     // Run the initialization on behalf of this Form.
     ClientRunContexts.copyCurrent().withForm(this).run(() -> {
-      interceptInitConfig();
-      postInitConfig();
+      m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
     });
+
+    FormUtility.rebuildFieldGrid(this, true);
   }
 
   protected IFormExtension<? extends AbstractForm> createLocalExtension() {
@@ -636,28 +643,6 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     return ConfigurationUtility.filterClassesWithInjectFieldAnnotation(dca, IFormField.class);
   }
 
-  protected final void interceptInitConfig() {
-    final Holder<RuntimeException> exceptionHolder = new Holder<>(RuntimeException.class, null);
-    final Holder<PlatformError> errorHolder = new Holder<>(PlatformError.class, null);
-    m_objectExtensions.initConfig(createLocalExtension(), () -> {
-      try {
-        initConfig();
-      }
-      catch (RuntimeException e) {
-        exceptionHolder.setValue(e);
-      }
-      catch (PlatformError e) {
-        errorHolder.setValue(e);
-      }
-    });
-    if (exceptionHolder.getValue() != null) {
-      throw exceptionHolder.getValue();
-    }
-    else if (errorHolder.getValue() != null) {
-      throw errorHolder.getValue();
-    }
-  }
-
   @Override
   protected void initConfig() {
     super.initConfig();
@@ -698,7 +683,6 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       }
     }
     if (rootBox != null) {
-      rootBox.setFormInternal(this);
       rootBox.setMainBox(true);
       rootBox.updateKeyStrokes();
       if (rootBox.isScrollable().isUndefined()) {
@@ -757,16 +741,12 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
     // visit all system buttons and attach observer
     m_systemButtonListener = new P_SystemButtonListener();// is auto-detaching
-    IFormFieldVisitor v2 = (field, level, fieldIndex) -> {
-      if (field instanceof IButton) {
-        final IButton button = (IButton) field;
-        if (button.getSystemType() != IButton.SYSTEM_TYPE_NONE) {
-          button.addButtonListener(m_systemButtonListener);
-        }
+    Consumer<IButton> v2 = button -> {
+      if (button.getSystemType() != IButton.SYSTEM_TYPE_NONE) {
+        button.addButtonListener(m_systemButtonListener);
       }
-      return true;
     };
-    visitFields(v2);
+    visit(v2, IButton.class);
     getRootGroupBox().addPropertyChangeListener(new P_MainBoxPropertyChangeProxy());
     setButtonsArmed(true);
   }
@@ -1131,7 +1111,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
         AbstractFormFieldData data = e.getValue();
 
         FindFieldByFormDataIdVisitor v = new FindFieldByFormDataIdVisitor(fieldQId, this);
-        visitFields(v);
+        visit(v, IFormField.class);
         IFormField f = v.getField();
         if (f != null) {
           // field properties
@@ -1152,12 +1132,10 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     }
 
     // visit remaining fields (there could be an extension with properties e.g. on a groupbox)
-    final Holder<RuntimeException> exHolder = new Holder<>(RuntimeException.class);
-    final Holder<PlatformError> errorHolder = new Holder<>(PlatformError.class);
-    visitFields((field, level, fieldIndex) -> {
+    visit(field -> {
       if (exportedFields.contains(field)) {
         // already exported -> skip
-        return true;
+        return;
       }
 
       final IForm formOfField = field.getForm();
@@ -1166,31 +1144,14 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
         LOG.info("Extension properties are not exported for fields on which getForm() returns null. "
             + "Ensure that the form is initialized and that the field's parent invokes field.setFormInternal(IForm) [exportingForm={}, field={}]",
             AbstractForm.this.getClass().getName(), field.getClass().getName());
-        return true;
+        return;
       }
       if (formOfField != AbstractForm.this) {
         // field belongs to another form -> skip
-        return true;
+        return;
       }
-
-      try {
-        exportExtensionProperties(field, target);
-      }
-      catch (RuntimeException e) {
-        exHolder.setValue(e);
-      }
-      catch (PlatformError e) {
-        errorHolder.setValue(e);
-      }
-
-      return exHolder.getValue() == null && errorHolder.getValue() == null;
-    });
-    if (exHolder.getValue() != null) {
-      throw exHolder.getValue();
-    }
-    else if (errorHolder.getValue() != null) {
-      throw errorHolder.getValue();
-    }
+      exportExtensionProperties(field, target);
+    }, IFormField.class);
   }
 
   @Override
@@ -1278,15 +1239,12 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
     // search for the extension in the children
     final IHolder<Object> result = new Holder<>(Object.class);
-    IFormFieldVisitor visitor = (field, level, fieldIndex) -> {
+    Function<IFormField, TreeVisitResult> visitor = field -> {
       result.setValue(getClientPartOfExtensionOrContribution(extToSearch, field));
-      return result.getValue() == null;
+      return result.getValue() == null ? TreeVisitResult.CONTINUE : TreeVisitResult.TERMINATE;
     };
-    if (owner instanceof IForm) {
-      ((IForm) owner).visitFields(visitor);
-    }
-    else if (owner instanceof IFormField) {
-      ((IFormField) owner).acceptVisitor(visitor, 0, 0, true);
+    if (owner instanceof IWidget) {
+      ((IWidget) owner).visit(visitor, IFormField.class);
     }
     return result.getValue();
   }
@@ -1320,7 +1278,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
         String fieldQId = e.getKey();
         AbstractFormFieldData data = e.getValue();
         FindFieldByFormDataIdVisitor v = new FindFieldByFormDataIdVisitor(fieldQId, this);
-        visitFields(v);
+        visit(v, IFormField.class);
         IFormField f = v.getField();
         if (f != null) {
           if (formFieldFilter == null || formFieldFilter.accept(f)) {
@@ -1428,20 +1386,9 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
   @Override
   public List<IFormField> getAllFields() {
-    P_AbstractCollectingFieldVisitor<IFormField> v = new P_AbstractCollectingFieldVisitor<IFormField>() {
-      @Override
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
-        collect(field);
-        return true;
-      }
-    };
-    visitFields(v);
+    CollectingVisitor<IFormField> v = new CollectingVisitor<>();
+    visit(v, IFormField.class);
     return v.getCollection();
-  }
-
-  @Override
-  public boolean visitFields(IFormFieldVisitor visitor) {
-    return getRootGroupBox().visitFields(visitor);
   }
 
   /**
@@ -1629,22 +1576,12 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     return getRootGroupBox().getFieldByClass(c);
   }
 
-  /**
-   * override in subclasses to perform form initialization before handler starts
-   */
-  @Override
-  public void postInitConfig() {
-    FormUtility.postInitConfig(this);
-    FormUtility.rebuildFieldGrid(this, true);
-  }
-
   @Override
   protected void initInternal() {
     super.initInternal();
     // form
     initFormInternal();
-    // fields
-    FormUtility.initFormFields(this);
+
     // custom
     interceptInitForm();
   }
@@ -1765,6 +1702,11 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     }
   }
 
+  @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), Collections.singletonList(getRootGroupBox()));
+  }
+
   /**
    * do not use or override this internal method
    */
@@ -1800,9 +1742,10 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     // check all fields that might be invalid
     final List<String> invalidTexts = new ArrayList<>();
     final List<String> mandatoryTexts = new ArrayList<>();
-    P_AbstractCollectingFieldVisitor<IValidateContentDescriptor> v = new P_AbstractCollectingFieldVisitor<IValidateContentDescriptor>() {
+    final AtomicReference<IValidateContentDescriptor> firstProblemRef = new AtomicReference<>();
+    Consumer<IFormField> v = new Consumer<IFormField>() {
       @Override
-      public boolean visitField(IFormField f, int level, int fieldIndex) {
+      public void accept(IFormField f) {
         IValidateContentDescriptor desc = f.validateContent();
         if (desc != null) {
           if (desc.getErrorStatus() != null) {
@@ -1811,22 +1754,18 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
           else {
             mandatoryTexts.add(desc.getDisplayText());
           }
-          if (getCollectionCount() == 0) {
-            collect(desc);
-          }
+          firstProblemRef.compareAndSet(null, desc);
         }
-        return true;
       }
     };
-    visitFields(v);
-    if (v.getCollectionCount() > 0) {
-      IValidateContentDescriptor firstProblem = v.getCollection().get(0);
+
+    visit(v, IFormField.class);
+    IValidateContentDescriptor firstProblem = firstProblemRef.get();
+    if (firstProblem != null) {
       if (LOG.isInfoEnabled()) {
         LOG.info("there are fields with errors");
       }
-      if (firstProblem != null) {
-        firstProblem.activateProblemLocation();
-      }
+      firstProblem.activateProblemLocation();
       throw new VetoException().withHtmlMessage(createValidationMessageBoxHtml(invalidTexts, mandatoryTexts));
     }
     if (!interceptValidate()) {
@@ -1951,9 +1890,9 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   public void doReset() {
     setFormLoading(true);
     // reset values
-    P_AbstractCollectingFieldVisitor v = new P_AbstractCollectingFieldVisitor() {
+    Consumer<IFormField> v = new Consumer<IFormField>() {
       @Override
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
+      public void accept(IFormField field) {
         if (field instanceof IValueField) {
           IValueField f = (IValueField) field;
           f.resetValue();
@@ -1962,11 +1901,10 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
           IComposerField f = (IComposerField) field;
           f.resetValue();
         }
-        return true;
       }
     };
     try {
-      visitFields(v);
+      visit(v, IFormField.class);
       // init again
       reinit();
       // load again
@@ -2093,48 +2031,35 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   @Override
   public List<? extends IFormField> getInvalidFields() {
     // check all fields that might be invalid
-    P_AbstractCollectingFieldVisitor<IFormField> v = new P_AbstractCollectingFieldVisitor<IFormField>() {
+    CollectingVisitor<IFormField> v = new CollectingVisitor<IFormField>() {
       @Override
-      public boolean visitField(IFormField f, int level, int fieldIndex) {
-        if (!f.isContentValid()) {
-          collect(f);
-        }
-        return true;
+      protected boolean accept(IFormField field) {
+        return !field.isContentValid();
       }
     };
-    visitFields(v);
+    visit(v, IFormField.class);
     return v.getCollection();
   }
 
   @Override
   public final void checkSaveNeeded() {
     // call checkSaveNeeded on all fields
-    P_AbstractCollectingFieldVisitor<IFormField> v = new P_AbstractCollectingFieldVisitor<IFormField>() {
-      @Override
-      public boolean visitField(IFormField f, int level, int fieldIndex) {
-        f.checkSaveNeeded();
-        return true;
-      }
-    };
-    visitFields(v);
+    visit(IFormField::checkSaveNeeded, IFormField.class);
     calculateSaveNeeded();
   }
 
   private boolean/* ok */ checkForVerifyingFields() {
     // check all fields that might be invalid
-    P_AbstractCollectingFieldVisitor v = new P_AbstractCollectingFieldVisitor() {
+    Function<IValueField, TreeVisitResult> v = new Function<IValueField, TreeVisitResult>() {
       @Override
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
-        if (field instanceof IValueField) {
-          IValueField f = (IValueField) field;
-          if (f.isValueChanging() || f.isValueParsing()) {
-            return false;
-          }
+      public TreeVisitResult apply(IValueField f) {
+        if (f.isValueChanging() || f.isValueParsing()) {
+          return TreeVisitResult.TERMINATE;
         }
-        return true;
+        return TreeVisitResult.CONTINUE;
       }
     };
-    return visitFields(v);
+    return visit(v, IValueField.class) != TreeVisitResult.TERMINATE;
   }
 
   private void closeFormInternal(boolean kill) {
@@ -2142,16 +2067,12 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       try {
         // check if there is an active close, cancel or finish button
         final Set<Integer> enabledSystemTypes = new HashSet<>();
-        IFormFieldVisitor v = (field, level, fieldIndex) -> {
-          if (field instanceof IButton) {
-            IButton b = (IButton) field;
-            if (b.isEnabled() && b.isVisible()) {
-              enabledSystemTypes.add(b.getSystemType());
-            }
+        Consumer<IButton> v = b -> {
+          if (b.isEnabled() && b.isVisible()) {
+            enabledSystemTypes.add(b.getSystemType());
           }
-          return true;
         };
-        visitFields(v);
+        visit(v, IButton.class);
         interceptOnCloseRequest(kill, enabledSystemTypes);
       }
       catch (RuntimeException | PlatformError e) {
@@ -2186,7 +2107,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   @Override
-  protected void disposeInternal() {
+  protected final void disposeInternal() {
     disposeFormInternal();
     super.disposeInternal();
   }
@@ -2211,9 +2132,8 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
         iterator.remove();
       }
 
-      // Dispose Fields and Form
+      // Dispose Form
       try {
-        FormUtility.disposeFormFields(this);
         interceptDisposeForm();
         unregisterDataChangeListener((Object[]) null);
       }
@@ -2344,38 +2264,20 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     // add fields
     final Element xFields = root.getOwnerDocument().createElement("fields");
     root.appendChild(xFields);
-    final Holder<RuntimeException> exceptionHolder = new Holder<>(RuntimeException.class);
-    final Holder<PlatformError> errorHolder = new Holder<>(PlatformError.class);
-    P_AbstractCollectingFieldVisitor v = new P_AbstractCollectingFieldVisitor() {
+    Function<IFormField, TreeVisitResult> v = new Function<IFormField, TreeVisitResult>() {
       @Override
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
+      public TreeVisitResult apply(IFormField field) {
         if (field.getForm() != AbstractForm.this) {
           // field is part of a wrapped form and is handled by the AbstractWrappedFormField
-          return true;
+          return TreeVisitResult.CONTINUE;
         }
         Element xField = xFields.getOwnerDocument().createElement("field");
-        try {
-          field.storeToXml(xField);
-          xFields.appendChild(xField);
-        }
-        catch (RuntimeException e) {
-          exceptionHolder.setValue(e);
-          return false;
-        }
-        catch (PlatformError e) {
-          errorHolder.setValue(e);
-          return false;
-        }
-        return true;
+        field.storeToXml(xField);
+        xFields.appendChild(xField);
+        return TreeVisitResult.CONTINUE;
       }
     };
-    visitFields(v);
-    if (exceptionHolder.getValue() != null) {
-      throw exceptionHolder.getValue();
-    }
-    else if (errorHolder.getValue() != null) {
-      throw errorHolder.getValue();
-    }
+    visit(v, IFormField.class);
   }
 
   /**
@@ -2435,7 +2337,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
         }
         xmlFieldIds.add(xField.getAttribute("fieldId"));
         FindFieldByXmlIdsVisitor v = new FindFieldByXmlIdsVisitor(xmlFieldIds.toArray(new String[xmlFieldIds.size()]));
-        visitFields(v);
+        visit(v, IFormField.class);
         IFormField f = v.getField();
         if (f != null) {
           f.loadFromXml(xField);
@@ -2444,21 +2346,17 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     }
     // in all tabboxes select the first tab that contains data, iff the current
     // tab has no values set
-    getRootGroupBox().visitFields((field, level, fieldIndex) -> {
-      if (field instanceof ITabBox) {
-        ITabBox tabBox = (ITabBox) field;
-        IGroupBox selbox = tabBox.getSelectedTab();
-        if (selbox == null || !selbox.isSaveNeeded()) {
-          for (IGroupBox g : tabBox.getGroupBoxes()) {
-            if (g.isSaveNeeded()) {
-              tabBox.setSelectedTab(g);
-              break;
-            }
+    getRootGroupBox().visit(tabBox -> {
+      IGroupBox selbox = tabBox.getSelectedTab();
+      if (selbox == null || !selbox.isSaveNeeded()) {
+        for (IGroupBox g : tabBox.getGroupBoxes()) {
+          if (g.isSaveNeeded()) {
+            tabBox.setSelectedTab(g);
+            break;
           }
         }
       }
-      return true;
-    });
+    }, ITabBox.class);
   }
 
   /**
@@ -3101,23 +2999,6 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
         .withExceptionHandling(null, false)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever())));
-  }
-
-  private abstract static class P_AbstractCollectingFieldVisitor<T> implements IFormFieldVisitor {
-    private final List<T> m_list = new ArrayList<>();
-
-    public void collect(T o) {
-      m_list.add(o);
-    }
-
-    public int getCollectionCount() {
-      return m_list.size();
-    }
-
-    public List<T> getCollection() {
-      return m_list;
-    }
-
   }
 
   protected class P_UIFacade implements IFormUIFacade {

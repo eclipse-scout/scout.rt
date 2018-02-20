@@ -309,7 +309,7 @@ public final class CollectionUtility {
    */
   @SafeVarargs
   public static <T> ArrayList<T> arrayList(T... values) {
-    if (values == null) {
+    if (values == null || values.length < 1) {
       return emptyArrayList();
     }
     ArrayList<T> list = new ArrayList<>(values.length);
@@ -329,10 +329,12 @@ public final class CollectionUtility {
   }
 
   public static <T> ArrayList<T> arrayList(T value) {
-    ArrayList<T> list = new ArrayList<>(1);
-    if (value != null) {
-      list.add(value);
+    if (value == null) {
+      return emptyArrayList();
     }
+
+    ArrayList<T> list = new ArrayList<>(1);
+    list.add(value);
     return list;
   }
 
@@ -356,10 +358,10 @@ public final class CollectionUtility {
    * @return an {@link ArrayList} containing the given collection's elements. Never null.
    */
   public static <T> ArrayList<T> arrayList(Collection<? extends T> c) {
-    if (c != null) {
-      return new ArrayList<>(c);
+    if (c == null || c.isEmpty()) {
+      return emptyArrayList();
     }
-    return emptyArrayList();
+    return new ArrayList<>(c);
   }
 
   /**
@@ -370,16 +372,17 @@ public final class CollectionUtility {
    * @return an {@link ArrayList} containing the given collection's elements. Never null
    */
   public static <T> ArrayList<T> arrayListWithoutNullElements(Collection<? extends T> c) {
-    if (c != null) {
-      ArrayList<T> list = new ArrayList<>(c.size());
-      for (T o : c) {
-        if (o != null) {
-          list.add(o);
-        }
-      }
-      return list;
+    if (c == null || c.isEmpty()) {
+      return emptyArrayList();
     }
-    return emptyArrayList();
+
+    ArrayList<T> list = new ArrayList<>(c.size());
+    for (T o : c) {
+      if (o != null) {
+        list.add(o);
+      }
+    }
+    return list;
   }
 
   /**
@@ -390,10 +393,10 @@ public final class CollectionUtility {
    * @return an {@link HashSet} containing the given collection's elements. Never null.
    */
   public static <T> HashSet<T> hashSet(Collection<? extends T> c) {
-    if (c != null) {
-      return new HashSet<>(c);
+    if (c == null || c.isEmpty()) {
+      return new HashSet<>(0);
     }
-    return new HashSet<>(0);
+    return new HashSet<>(c);
   }
 
   /**
@@ -418,10 +421,10 @@ public final class CollectionUtility {
    * @return an {@link LinkedHashSet} containing the given collection's elements. Never null.
    */
   public static <T> LinkedHashSet<T> orderedHashSet(Collection<? extends T> c) {
-    if (c != null) {
-      return new LinkedHashSet<>(c);
+    if (c == null || c.isEmpty()) {
+      return new LinkedHashSet<>(0);
     }
-    return new LinkedHashSet<>(0);
+    return new LinkedHashSet<>(c);
   }
 
   /**
@@ -441,18 +444,16 @@ public final class CollectionUtility {
   @SuppressWarnings("unchecked")
   public static <T> T[] toArray(Collection<T> c, Class<T> clazz) {
     if (c == null || c.isEmpty()) {
-      T[] a = (T[]) Array.newInstance(clazz, 0);
-      return Collections.<T> emptyList().toArray(a);
+      return (T[]) Array.newInstance(clazz, 0);
     }
-    else {
-      T[] a = (T[]) Array.newInstance(clazz, c.size());
-      return c.toArray(a);
-    }
+
+    T[] a = (T[]) Array.newInstance(clazz, c.size());
+    return c.toArray(a);
   }
 
   public static <T, V extends T> List<T> appendList(List<T> list, V o) {
     if (list == null) {
-      list = new ArrayList<>();
+      list = new ArrayList<>(1);
     }
     list.add(o);
     return list;
@@ -460,7 +461,7 @@ public final class CollectionUtility {
 
   public static <T, V extends T> List<T> appendList(List<T> list, int index, V o) {
     if (list == null) {
-      list = new ArrayList<>(1);
+      list = new ArrayList<>(index + 1);
     }
     if (index > list.size()) {
       for (int i = list.size(); i < index; i++) {
@@ -473,7 +474,7 @@ public final class CollectionUtility {
 
   public static <T> List<T> appendAllList(List<T> list, Collection<? extends T> c) {
     if (list == null) {
-      list = new ArrayList<>(1);
+      list = new ArrayList<>(size(c));
     }
     if (c != null && !c.isEmpty()) {
       list.addAll(c);
@@ -483,23 +484,25 @@ public final class CollectionUtility {
 
   public static <T, V extends T> List<T> removeObjectList(List<T> list, V o) {
     if (list == null) {
-      list = new ArrayList<>(1);
+      return emptyArrayList();
     }
+
     list.remove(o);
     return list;
   }
 
   public static <T> List<T> removeObjectList(List<T> list, int i) {
     if (list == null) {
-      list = new ArrayList<>(1);
+      return emptyArrayList();
     }
+
     list.remove(i);
     return list;
   }
 
   public static <T, V extends T> Set<T> removeObjectSet(Set<T> set, V o) {
     if (set == null) {
-      set = new HashSet<>(1);
+      return emptyHashSet();
     }
     set.remove(o);
     return set;
@@ -542,16 +545,14 @@ public final class CollectionUtility {
 
   public static <T, U> Map<T, U> copyMap(Map<T, U> m) {
     if (m == null || m.isEmpty()) {
-      return new HashMap<>(0);
+      return emptyHashMap();
     }
-    else {
-      return new HashMap<>(m);
-    }
+    return new HashMap<>(m);
   }
 
   public static <T, U, V extends T, W extends U> Map<T, U> putObject(Map<T, U> map, V key, W value) {
     if (map == null) {
-      map = new HashMap<>();
+      map = new HashMap<>(1);
     }
     map.put(key, value);
     return map;
@@ -566,7 +567,7 @@ public final class CollectionUtility {
 
   public static <T, U> Map<T, U> removeObject(Map<T, U> map, T key) {
     if (map == null) {
-      return new HashMap<>();
+      return emptyHashMap();
     }
     map.remove(key);
     return map;
@@ -588,7 +589,7 @@ public final class CollectionUtility {
 
   public static <T, U> Map<T, U> putAllObjects(Map<T, U> targetMap, Map<T, U> sourceMap) {
     if (targetMap == null && sourceMap == null) {
-      return new HashMap<>();
+      return emptyHashMap();
     }
     if (targetMap == null) {
       return new HashMap<>(sourceMap);
@@ -607,22 +608,18 @@ public final class CollectionUtility {
   @SuppressWarnings("unchecked")
   public static <T, U> U[] getSortedValueArray(SortedMap<T, U> m, Class<U> clazz) {
     if (m == null || m.isEmpty()) {
-      U[] a = (U[]) Array.newInstance(clazz, 0);
-      return Collections.<U> emptyList().toArray(a);
+      return (U[]) Array.newInstance(clazz, 0);
     }
-    else {
-      U[] a = (U[]) Array.newInstance(clazz, m.size());
-      return m.values().toArray(a);
-    }
+
+    U[] a = (U[]) Array.newInstance(clazz, m.size());
+    return m.values().toArray(a);
   }
 
   public static <T, U> SortedMap<T, U> copySortedMap(SortedMap<T, U> m) {
     if (m == null || m.isEmpty()) {
       return new TreeMap<>();
     }
-    else {
-      return new TreeMap<>(m);
-    }
+    return new TreeMap<>(m);
   }
 
   public static <T extends Comparable, U> SortedMap<T, U> putObjectSortedMap(SortedMap<T, U> map, T key, U value) {
@@ -692,7 +689,7 @@ public final class CollectionUtility {
    */
   @SafeVarargs
   public static <T> HashSet<T> hashSet(T... values) {
-    if (values == null) {
+    if (values == null || values.length < 1) {
       return emptyHashSet();
     }
     HashSet<T> set = new HashSet<>(values.length);
@@ -701,10 +698,12 @@ public final class CollectionUtility {
   }
 
   public static <T> HashSet<T> hashSet(T value) {
-    HashSet<T> set = new HashSet<T>();
-    if (value != null) {
-      set.add(value);
+    if (value == null) {
+      return emptyHashSet();
     }
+
+    HashSet<T> set = new HashSet<T>(1);
+    set.add(value);
     return set;
   }
 
@@ -731,7 +730,10 @@ public final class CollectionUtility {
   }
 
   /**
-   * combine all lists into one list containing all elements. the order of the items is preserved
+   * combine all lists into one list containing all elements. the order of the items is preserved.
+   * <p>
+   * See {@link #flatten(Collection...)} for a type safe implementation whose results do not contain any {@code null}
+   * elements.
    */
   @SuppressWarnings("unchecked")
   public static <T> List<T> combine(Collection<?>... collections) {
@@ -744,6 +746,36 @@ public final class CollectionUtility {
       }
     }
     return list;
+  }
+
+  /**
+   * Flattens all specified {@link Collection}s to one single {@link List}.
+   * <p>
+   * The order of the specified {@link Collections} is preserved and the resulting {@link List} does not contain any
+   * {@code null} elements.
+   * <p>
+   * The difference to {@link #combine(Collection...)} is that this implementation is type safe and removes {@code null}
+   * elements.
+   *
+   * @param collections
+   *          The {@link Collection}s to flatten.
+   * @return A {@link List} holding all non-{@code null} elements of the specified {@link Collection}s. Is never
+   *         {@code null}.
+   * @see #combine(Collection...)
+   */
+  @SafeVarargs
+  public static <T> List<? extends T> flatten(Collection<? extends T>... collections) {
+    if (collections == null || collections.length < 1) {
+      return CollectionUtility.emptyArrayList();
+    }
+    List<T> result = new ArrayList<>();
+    for (Collection<? extends T> c : collections) {
+      if (c == null || c.isEmpty()) {
+        continue;
+      }
+      result.addAll(arrayListWithoutNullElements(c));
+    }
+    return result;
   }
 
   public static boolean isEmpty(Map<?, ?> m) {
@@ -875,6 +907,5 @@ public final class CollectionUtility {
     else {
       return o.toString();
     }
-
   }
 }

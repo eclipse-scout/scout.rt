@@ -15,9 +15,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.action.tree.IActionNodeExtension;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
-import org.eclipse.scout.rt.client.ui.action.IAction;
-import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.OrderedComparator;
@@ -162,6 +161,11 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
   }
 
   @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), getChildActionsInternal());
+  }
+
+  @Override
   public void setChildActions(Collection<? extends T> newList) {
     // remove old
     removeChildActions(getChildActionsInternal());
@@ -213,31 +217,6 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
         propertySupport.setPropertyAlwaysFire(PROP_CHILD_ACTIONS, childList);
       }
     }
-  }
-
-  @Override
-  public int acceptVisitor(IActionVisitor visitor) {
-    switch (visitor.visit(this)) {
-      case IActionVisitor.CANCEL:
-        return IActionVisitor.CANCEL;
-      case IActionVisitor.CANCEL_SUBTREE:
-        return IActionVisitor.CONTINUE;
-      case IActionVisitor.CONTINUE_BRANCH:
-        visitChildren(visitor);
-        return IActionVisitor.CANCEL;
-      default:
-        return visitChildren(visitor);
-    }
-  }
-
-  private int visitChildren(IActionVisitor visitor) {
-    for (IAction t : getChildActions()) {
-      switch (t.acceptVisitor(visitor)) {
-        case IActionVisitor.CANCEL:
-          return IActionVisitor.CANCEL;
-      }
-    }
-    return IActionVisitor.CONTINUE;
   }
 
   protected static class LocalActionNodeExtension<T extends IActionNode, OWNER extends AbstractActionNode<T>> extends LocalActionExtension<OWNER> implements IActionNodeExtension<T, OWNER> {

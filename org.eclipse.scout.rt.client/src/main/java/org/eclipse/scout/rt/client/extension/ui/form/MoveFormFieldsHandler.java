@@ -14,9 +14,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -40,7 +40,7 @@ public class MoveFormFieldsHandler {
 
   public void moveFields() {
     P_FormFieldVisitor visitor = new P_FormFieldVisitor();
-    m_form.visitFields(visitor);
+    m_form.visit(visitor, IFormField.class);
 
     if (m_moveDescriptors.isEmpty()) {
       return;
@@ -152,11 +152,11 @@ public class MoveFormFieldsHandler {
     return !identifierIterator.hasNext();
   }
 
-  private class P_FormFieldVisitor implements IFormFieldVisitor {
+  private class P_FormFieldVisitor implements Consumer<IFormField> {
     private final P_FormFieldParentIterator m_parentIterator = new P_FormFieldParentIterator();
 
     @Override
-    public boolean visitField(IFormField field, int level, int fieldIndex) {
+    public void accept(IFormField field) {
       // setup parent field iterator
       m_parentIterator.setCurrentField(field);
       // lookup move items
@@ -164,7 +164,6 @@ public class MoveFormFieldsHandler {
       if (moveDesc != null) {
         m_moveDescriptors.add(moveDesc);
       }
-      return true;
     }
   }
 

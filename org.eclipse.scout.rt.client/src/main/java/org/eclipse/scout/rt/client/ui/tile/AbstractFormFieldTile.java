@@ -1,7 +1,5 @@
 package org.eclipse.scout.rt.client.ui.tile;
 
-import org.eclipse.scout.rt.client.ui.form.FormUtility;
-import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
@@ -70,39 +68,6 @@ public abstract class AbstractFormFieldTile<T extends IFormField> extends Abstra
     widget.setStatusVisible(false);
     // Pull up status into label, let field fill entire tile
     widget.setStatusPosition(IFormField.STATUS_POSITION_TOP);
-  }
-
-  @Override
-  protected void postInitTileWidgetConfig() {
-    T widget = getTileWidget();
-    if (widget instanceof ICompositeField) {
-      FormUtility.postInitConfig(((ICompositeField) widget));
-    }
-    else {
-      super.postInitTileWidgetConfig();
-    }
-  }
-
-  @Override
-  protected void initTileWidget() {
-    T widget = getTileWidget();
-    if (widget instanceof ICompositeField) {
-      FormUtility.initFormFields((ICompositeField) widget);
-    }
-    else {
-      super.initTileWidget();
-    }
-  }
-
-  @Override
-  protected void disposeTileWidget() {
-    T widget = getTileWidget();
-    if (widget instanceof ICompositeField) {
-      FormUtility.disposeFormFields((ICompositeField) widget);
-    }
-    else {
-      super.disposeTileWidget();
-    }
   }
 
   // ----- Configuration delegated to tile field: -----

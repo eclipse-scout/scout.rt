@@ -243,15 +243,14 @@ public final class ScoutClientAssert {
     Assert.assertNotNull(fields);
     final Set<IFormField> expectedFields = new HashSet<>(Arrays.asList(fields));
     final List<IFormField> unexpectedFields = new ArrayList<>();
-    form.visitFields((field, level, fieldIndex) -> {
+    form.visit(field -> {
       if (viewKind.testField(field)) {
         boolean expected = expectedFields.remove(field);
         if (strict && !expected) {
           unexpectedFields.add(field);
         }
       }
-      return true;
-    });
+    }, IFormField.class);
     if (!expectedFields.isEmpty() || !unexpectedFields.isEmpty()) {
       StringBuilder builder = new StringBuilder();
       builder.append(viewKind.getName());

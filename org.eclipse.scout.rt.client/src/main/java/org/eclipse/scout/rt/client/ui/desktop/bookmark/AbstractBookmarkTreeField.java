@@ -47,6 +47,9 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.visitor.DepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.security.PublishUserBookmarkPermission;
@@ -233,36 +236,39 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
    * The structure of the folders has changed, completely rebuild the model
    */
   private void rebuildBookmarkModel() {
-    getTree().visitTree(node -> {
-      BookmarkFolder bmFolder = null;
-      if (node == getTree().getRootNode()) {
-        bmFolder = getBookmarkRootFolder();
-      }
-      else if (isFolderNode(node)) {
-        bmFolder = (BookmarkFolder) node.getCell().getValue();
-      }
-      if (bmFolder != null) {
-        bmFolder.getFolders().clear();
-        bmFolder.getBookmarks().clear();
-        //sort folders
-        List<BookmarkFolder> folderList = new ArrayList<>();
-        for (ITreeNode n : node.getChildNodes()) {
-          if (isFolderNode(n)) {
-            BookmarkFolder f = (BookmarkFolder) n.getCell().getValue();
-            folderList.add(f);
+    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+      @Override
+      public TreeVisitResult preVisit(ITreeNode node, int level, int index) {
+        BookmarkFolder bmFolder = null;
+        if (node == getTree().getRootNode()) {
+          bmFolder = getBookmarkRootFolder();
+        }
+        else if (isFolderNode(node)) {
+          bmFolder = (BookmarkFolder) node.getCell().getValue();
+        }
+        if (bmFolder != null) {
+          bmFolder.getFolders().clear();
+          bmFolder.getBookmarks().clear();
+          //sort folders
+          List<BookmarkFolder> folderList = new ArrayList<>();
+          for (ITreeNode n : node.getChildNodes()) {
+            if (isFolderNode(n)) {
+              BookmarkFolder f = (BookmarkFolder) n.getCell().getValue();
+              folderList.add(f);
+            }
+          }
+          folderList.sort((f1, f2) -> StringUtility.compareIgnoreCase(f1.getTitle(), f2.getTitle()));
+          bmFolder.getFolders().addAll(folderList);
+          for (ITreeNode n : node.getChildNodes()) {
+            if (isBookmarkNode(n)) {
+              bmFolder.getBookmarks().add((Bookmark) n.getCell().getValue());
+            }
           }
         }
-        folderList.sort((f1, f2) -> StringUtility.compareIgnoreCase(f1.getTitle(), f2.getTitle()));
-        bmFolder.getFolders().addAll(folderList);
-        for (ITreeNode n : node.getChildNodes()) {
-          if (isBookmarkNode(n)) {
-            bmFolder.getBookmarks().add((Bookmark) n.getCell().getValue());
-          }
-        }
+        return TreeVisitResult.CONTINUE;
       }
-      return true;
-    });
-    //save
+    };
+    getTree().visitTree(v);
     BEANS.get(IBookmarkService.class).storeBookmarks();
   }
 
@@ -270,29 +276,32 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
    * Only some values have changed, just save the model
    */
   private void refreshBookmarkModel() {
-    getTree().visitTree(node -> {
-      BookmarkFolder bmFolder = null;
-      if (node == getTree().getRootNode()) {
-        bmFolder = getBookmarkRootFolder();
-      }
-      else if (isFolderNode(node)) {
-        bmFolder = (BookmarkFolder) node.getCell().getValue();
-      }
-      if (bmFolder != null) {
-        bmFolder.getFolders().clear();
-        bmFolder.getBookmarks().clear();
-        for (ITreeNode n : node.getChildNodes()) {
-          if (isFolderNode(n)) {
-            bmFolder.getFolders().add((BookmarkFolder) n.getCell().getValue());
-          }
-          else if (isBookmarkNode(n)) {
-            bmFolder.getBookmarks().add((Bookmark) n.getCell().getValue());
+    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+      @Override
+      public TreeVisitResult preVisit(ITreeNode node, int level, int index) {
+        BookmarkFolder bmFolder = null;
+        if (node == getTree().getRootNode()) {
+          bmFolder = getBookmarkRootFolder();
+        }
+        else if (isFolderNode(node)) {
+          bmFolder = (BookmarkFolder) node.getCell().getValue();
+        }
+        if (bmFolder != null) {
+          bmFolder.getFolders().clear();
+          bmFolder.getBookmarks().clear();
+          for (ITreeNode n : node.getChildNodes()) {
+            if (isFolderNode(n)) {
+              bmFolder.getFolders().add((BookmarkFolder) n.getCell().getValue());
+            }
+            else if (isBookmarkNode(n)) {
+              bmFolder.getBookmarks().add((Bookmark) n.getCell().getValue());
+            }
           }
         }
+        return TreeVisitResult.CONTINUE;
       }
-      return true;
-    });
-    //save
+    };
+    getTree().visitTree(v);
     BEANS.get(IBookmarkService.class).storeBookmarks();
   }
 
@@ -747,13 +756,17 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
           if (ObjectUtility.notEquals(oldBmFolder, newBmFolder)) {
             //find new folder node
             final AtomicReference<ITreeNode> newContainerNode = new AtomicReference<>(getTree().getRootNode());
-            tree.visitTree(n -> {
-              if (isFolderNode(n) && newBmFolder.equals(n.getCell().getValue())) {
-                newContainerNode.set(n);
-                return false;
+            IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+              @Override
+              public TreeVisitResult preVisit(ITreeNode n, int level, int index) {
+                if (isFolderNode(n) && newBmFolder.equals(n.getCell().getValue())) {
+                  newContainerNode.set(n);
+                  return TreeVisitResult.TERMINATE;
+                }
+                return TreeVisitResult.CONTINUE;
               }
-              return true;
-            });
+            };
+            tree.visitTree(v);
             tree.removeNode(node);
             tree.addChildNode(newContainerNode.get(), node);
             rebuildBookmarkModel();

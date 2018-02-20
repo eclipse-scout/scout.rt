@@ -13,12 +13,10 @@ package org.eclipse.scout.rt.client.ui.form;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class FormUtility {
-  private static final Logger LOG = LoggerFactory.getLogger(FormUtility.class);
 
   private FormUtility() {
   }
@@ -47,39 +45,22 @@ public final class FormUtility {
 
   /**
    * Complete the configurations of the complete field tree of the form. This method is normally called by the form's
-   * constructor after the form initConfig. This method is normally called before {@link #initFormFields(IForm)}.
-   */
-  public static void postInitConfig(IForm form) {
-    PostInitConfigFieldVisitor v = new PostInitConfigFieldVisitor();
-    form.visitFields(v);
-    v.handleResult();
-  }
-
-  public static void postInitConfig(ICompositeField compositeField) {
-    PostInitConfigFieldVisitor v = new PostInitConfigFieldVisitor();
-    compositeField.visitFields(v);
-    v.handleResult();
-  }
-
-  /**
-   * Complete the configurations of the complete field tree of the form. This method is normally called by the form's
    * constructor after the form initConfig and postInitConfig. This method is normally called before
    * {@link #initFormFields(IForm)}.
    */
   public static void rebuildFieldGrid(IForm form, boolean initMainBoxGridData) {
-    RebuildFieldGridVisitor v = new RebuildFieldGridVisitor();
-    form.visitFields(v);
-    v.handleResult();
-    //
+    IGroupBox rootGroupBox = form.getRootGroupBox();
+    if (rootGroupBox == null) {
+      return;
+    }
+    rebuildFieldGrid(rootGroupBox);
     if (initMainBoxGridData) {
-      initRootBoxGridData(form, form.getRootGroupBox());
+      initRootBoxGridData(form, rootGroupBox);
     }
   }
 
   public static void rebuildFieldGrid(ICompositeField field) {
-    RebuildFieldGridVisitor v = new RebuildFieldGridVisitor();
-    field.visitFields(v);
-    v.handleResult();
+    field.visit(ICompositeField::rebuildFieldGrid, ICompositeField.class);
   }
 
   private static void initRootBoxGridData(IForm form, ICompositeField rootBox) {
@@ -92,55 +73,6 @@ public final class FormUtility {
   }
 
   /**
-   * Initialize the complete field tree of the form
-   */
-  public static void initFormFields(IForm form) {
-    InitFieldVisitor v = new InitFieldVisitor();
-    form.visitFields(v);
-    v.handleResult();
-  }
-
-  /**
-   * Init the form field and any child-fields, if the field is a composite field.
-   */
-  public static void initFormField(IFormField f) {
-    if (f instanceof ICompositeField) {
-      initFormFields((ICompositeField) f);
-    }
-    else if (f != null) {
-      f.init();
-    }
-  }
-
-  public static void initFormFields(ICompositeField field) {
-    InitFieldVisitor v = new InitFieldVisitor();
-    field.visitFields(v);
-    v.handleResult();
-  }
-
-  /**
-   * Dispose the complete field tree of the form
-   */
-  public static void disposeFormFields(IForm form) {
-    DisposeFieldVisitor v = new DisposeFieldVisitor();
-    form.visitFields(v);
-  }
-
-  public static void disposeFormField(IFormField field) {
-    if (field instanceof ICompositeField) {
-      disposeFormFields((ICompositeField) field);
-    }
-    else {
-      field.dispose();
-    }
-  }
-
-  public static void disposeFormFields(ICompositeField field) {
-    DisposeFieldVisitor v = new DisposeFieldVisitor();
-    field.visitFields(v);
-  }
-
-  /**
    * With this method it's possible to set the mark strategy of all tab boxes of the given form.
    *
    * @param form
@@ -150,107 +82,6 @@ public final class FormUtility {
    * @since 3.8.2
    */
   public static void setTabBoxMarkStrategy(IForm form, int strategy) {
-    form.visitFields(new TabBoxMarkStrategyVisitor(strategy));
-  }
-
-  private static class PostInitConfigFieldVisitor implements IFormFieldVisitor {
-    private RuntimeException m_firstEx;
-
-    @Override
-    public boolean visitField(IFormField field, int level, int fieldIndex) {
-      try {
-        field.postInitConfig();
-      }
-      catch (RuntimeException e) {
-        if (m_firstEx == null) {
-          m_firstEx = e;
-        }
-      }
-      return true;
-    }
-
-    public void handleResult() {
-      if (m_firstEx != null) {
-        throw m_firstEx;
-      }
-    }
-  }
-
-  private static class RebuildFieldGridVisitor implements IFormFieldVisitor {
-    private RuntimeException m_firstEx;
-
-    @Override
-    public boolean visitField(IFormField field, int level, int fieldIndex) {
-      try {
-        if (field instanceof ICompositeField) {
-          ((ICompositeField) field).rebuildFieldGrid();
-        }
-      }
-      catch (RuntimeException e) {
-        if (m_firstEx == null) {
-          m_firstEx = e;
-        }
-      }
-      return true;
-    }
-
-    public void handleResult() {
-      if (m_firstEx != null) {
-        throw m_firstEx;
-      }
-    }
-  }
-
-  private static class InitFieldVisitor implements IFormFieldVisitor {
-    private RuntimeException m_firstEx;
-
-    @Override
-    public boolean visitField(IFormField field, int level, int fieldIndex) {
-      try {
-        field.init();
-      }
-      catch (RuntimeException e) {
-        if (m_firstEx == null) {
-          m_firstEx = e;
-        }
-      }
-      return true;
-    }
-
-    public void handleResult() {
-      if (m_firstEx != null) {
-        throw m_firstEx;
-      }
-    }
-  }
-
-  private static class DisposeFieldVisitor implements IFormFieldVisitor {
-    @Override
-    public boolean visitField(IFormField field, int level, int fieldIndex) {
-      try {
-        field.dispose();
-      }
-      catch (Exception t) {
-        LOG.warn("Could not dispose field '{}'", field, t);
-        // nop
-      }
-      return true;
-    }
-  }
-
-  private static final class TabBoxMarkStrategyVisitor implements IFormFieldVisitor {
-    private final int m_strategy;
-
-    private TabBoxMarkStrategyVisitor(int strategy) {
-      m_strategy = strategy;
-    }
-
-    @Override
-    public boolean visitField(IFormField field, int level, int fieldIndex) {
-      if (field instanceof ITabBox) {
-        ((ITabBox) field).setMarkStrategy(m_strategy);
-      }
-      return true;
-    }
+    form.<ITabBox> visit(box -> box.setMarkStrategy(strategy), ITabBox.class);
   }
 }

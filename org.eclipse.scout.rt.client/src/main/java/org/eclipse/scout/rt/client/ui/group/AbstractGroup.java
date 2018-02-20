@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.group;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
@@ -54,11 +55,7 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
   }
 
   @Override
-  protected void callInitializer() {
-    interceptInitConfig();
-  }
-
-  protected final void interceptInitConfig() {
+  protected void initConfigInternal() {
     m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), this::initConfig);
   }
 
@@ -72,12 +69,6 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
     setTitle(getConfiguredTitle());
     setHeaderVisible(getConfiguredHeaderVisible());
     setBody(createBody());
-  }
-
-  @Override
-  protected void postInitConfigInternal() {
-    super.postInitConfigInternal();
-    getBody().postInitConfig();
   }
 
   @Override
@@ -96,7 +87,6 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
     if (getContainer() == null) {
       throw new IllegalStateException("Group is not connected to a container");
     }
-    getBody().init();
   }
 
   protected void handleInitException(Exception exception) {
@@ -109,12 +99,8 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
 
   @Override
   protected final void disposeInternal() {
-    disposeGroupInternal();
     interceptDisposeGroup();
-  }
-
-  protected void disposeGroupInternal() {
-    getBody().dispose();
+    super.disposeInternal();
   }
 
   protected void execDisposeGroup() {
@@ -229,6 +215,11 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
   @Override
   public boolean isHeaderVisible() {
     return propertySupport.getPropertyBool(PROP_HEADER_VISIBLE);
+  }
+
+  @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), Collections.singletonList(getBody()));
   }
 
   protected IWidget createBody() {

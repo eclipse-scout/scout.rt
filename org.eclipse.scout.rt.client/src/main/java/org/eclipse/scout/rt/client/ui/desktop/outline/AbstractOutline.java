@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 
 import java.security.Permission;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +27,7 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.Ou
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineDeactivatedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineInitDefaultDetailFormChain;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
@@ -34,7 +36,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper.IMenuTypeMapper;
@@ -58,6 +59,9 @@ import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
+import org.eclipse.scout.rt.platform.util.visitor.DepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
@@ -101,10 +105,10 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   @Override
-  protected void callInitializer() {
+  protected void initConfigInternal() {
     // Run the initialization on behalf of this Outline.
     createDisplayParentRunContext()
-        .run(() -> AbstractOutline.super.callInitializer());
+        .run(() -> AbstractOutline.super.initConfigInternal());
   }
 
   @Override
@@ -370,18 +374,18 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   @Override
   public void refreshPages(final List<Class<? extends IPage>> pageTypes) {
     final List<IPage<?>> candidates = new ArrayList<>();
-    ITreeVisitor v = node -> {
-      IPage<?> page = (IPage) node;
-      if (page == null) {
-        return true;
-      }
-      Class<? extends IPage> pageClass = page.getClass();
-      for (Class<? extends IPage> c : pageTypes) {
-        if (c.isAssignableFrom(pageClass)) {
-          candidates.add(page);
+    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+      @Override
+      public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
+        IPage<?> page = (IPage) element;
+        Class<? extends IPage> pageClass = page.getClass();
+        for (Class<? extends IPage> c : pageTypes) {
+          if (c.isAssignableFrom(pageClass)) {
+            candidates.add(page);
+          }
         }
+        return TreeVisitResult.CONTINUE;
       }
-      return true;
     };
     visitNode(getRootNode(), v);
     for (IPage<?> page : candidates) {
@@ -402,21 +406,25 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
         p = p.getParentPage();
       }
     }
-    ITreeVisitor v = node -> {
-      IPage<?> page = (IPage) node;
-      if (preservationSet.contains(page)) {
-        // nop
-      }
-      else if (page.isChildrenLoaded() && (!page.isExpanded() || !(page.getParentPage() != null && page.getParentPage().isChildrenLoaded()))) {
-        try {
-          unloadNode(page);
+    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+      @Override
+      public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
+        IPage<?> page = (IPage) element;
+        if (preservationSet.contains(page)) {
+          // nop
         }
-        catch (RuntimeException | PlatformError e) {
-          BEANS.get(ExceptionHandler.class).handle(e);
+        else if (page.isChildrenLoaded() && (!page.isExpanded() || !(page.getParentPage() != null && page.getParentPage().isChildrenLoaded()))) {
+          try {
+            unloadNode(page);
+          }
+          catch (RuntimeException | PlatformError e) {
+            BEANS.get(ExceptionHandler.class).handle(e);
+          }
         }
+        return TreeVisitResult.CONTINUE;
       }
-      return true;
     };
+
     try {
       setTreeChanging(true);
       visitNode(getRootNode(), v);
@@ -444,14 +452,18 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   @Override
   public <T extends IPage> T findPage(final Class<T> pageType) {
     final Holder<T> result = new Holder<>(pageType, null);
-    @SuppressWarnings("unchecked")
-    ITreeVisitor v = node -> {
-      IPage<?> page = (IPage) node;
-      Class<? extends IPage> pageClass = page.getClass();
-      if (pageType.isAssignableFrom(pageClass)) {
-        result.setValue((T) page);
+    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+      @Override
+      @SuppressWarnings("unchecked")
+      public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
+        IPage<?> page = (IPage) element;
+        Class<? extends IPage> pageClass = page.getClass();
+        if (pageType.isAssignableFrom(pageClass)) {
+          result.setValue((T) page);
+          return TreeVisitResult.TERMINATE;
+        }
+        return TreeVisitResult.CONTINUE;
       }
-      return result.getValue() == null;
     };
     visitNode(getRootNode(), v);
     return result.getValue();
@@ -649,6 +661,11 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     return result;
   }
 
+  @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), Collections.singletonList(getDefaultDetailForm()));
+  }
+
   /**
    * @see IOutline#getMenusForPage(IPage)
    */
@@ -770,8 +787,9 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   protected void disposeDefaultDetailForm() {
-    if (getDefaultDetailForm() != null) {
-      getDefaultDetailForm().doClose();
+    IForm defaultDetailForm = getDefaultDetailForm();
+    if (defaultDetailForm != null) {
+      defaultDetailForm.doClose();
       setDefaultDetailForm(null);
     }
   }
@@ -1037,14 +1055,19 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   @Override
+  protected void disposeChildren(List<? extends IWidget> widgetsToDispose) {
+    widgetsToDispose.remove(getDefaultDetailForm()); // is disposed using IForm#doClose in disposeDefaultDetailForm()
+    super.disposeChildren(widgetsToDispose);
+  }
+
+  @Override
   protected void disposeTreeInternal() {
-    super.disposeTreeInternal();
     try {
       disposeDefaultDetailForm();
     }
     catch (RuntimeException | PlatformError e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
-
+    super.disposeTreeInternal();
   }
 }

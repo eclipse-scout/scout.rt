@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -59,11 +58,13 @@ import org.eclipse.scout.rt.client.ui.Coordinates;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -199,9 +200,13 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   @Override
-  protected final void callInitializer() {
+  protected void initConfigInternal() {
     // Run the initialization on behalf of this Desktop.
     ClientRunContexts.copyCurrent().withDesktop(this).run(this::interceptInitConfig);
+  }
+
+  private void interceptInitConfig() {
+    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
   protected IEventHistory<DesktopEvent> createEventHistory() {
@@ -231,6 +236,12 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   @Override
   public final <T> T optContribution(Class<T> contribution) {
     return m_contributionHolder.optContribution(contribution);
+  }
+
+  @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), m_availableOutlines, getActions() /* contains keystrokes, menus, view-buttons*/,
+        m_notifications, m_messageBoxStore.values(), m_selectedViewTabs.values(), m_formStore.values());
   }
 
   /*
@@ -567,10 +578,6 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     return m_objectExtensions.getExtension(c);
   }
 
-  protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
-  }
-
   @Override
   protected void initConfig() {
     super.initConfig();
@@ -617,12 +624,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     // actions (keyStroke, menu, viewButton, toolButton)
     List<IAction> actionList = new ArrayList<>();
     for (IDesktopExtension ext : extensions) {
-      try {
-        ext.contributeActions(actionList);
-      }
-      catch (Exception t) {
-        LOG.error("contributing actions by {}", ext, t);
-      }
+      ext.contributeActions(actionList);
     }
     List<IAction> contributedActions = m_contributionHolder.getContributionsByClass(IAction.class);
     actionList.addAll(contributedActions);
@@ -642,25 +644,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
     // add dynamic keyStrokes
     List<IKeyStroke> ksList = new ActionFinder().findActions(actionList, IKeyStroke.class, true);
-    for (IKeyStroke ks : ksList) {
-      try {
-        ks.init();
-      }
-      catch (RuntimeException | PlatformError e) {
-        LOG.error("could not initialize key stroke '{}'.", ks, e);
-      }
-    }
     addKeyStrokes(ksList.toArray(new IKeyStroke[ksList.size()]));
-
-    // init outlines
-    for (IOutline o : m_availableOutlines) {
-      try {
-        o.init();
-      }
-      catch (Exception e) {
-        LOG.error("Could not init outline {}", o, e);
-      }
-    }
     addPropertyChangeListener(new P_LocalPropertyChangeListener());
   }
 
@@ -671,7 +655,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   private void initDesktopExtensions() {
-    m_desktopExtensions = new LinkedList<>();
+    m_desktopExtensions = new ArrayList<>();
     m_desktopExtensions.add(getLocalDesktopExtension());
     injectDesktopExtensions(m_desktopExtensions);
   }
@@ -702,17 +686,11 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     super.initInternal();
     // extensions
     for (IDesktopExtension ext : getDesktopExtensions()) {
-      try {
-        ContributionCommand cc = ext.initDelegate();
-        if (cc == ContributionCommand.Stop) {
-          break;
-        }
-      }
-      catch (Exception t) {
-        LOG.error("extension {} failed", ext, t);
+      ContributionCommand cc = ext.initDelegate();
+      if (cc == ContributionCommand.Stop) {
+        break;
       }
     }
-    ActionUtility.initActions(getActions());
   }
 
   /**
@@ -832,6 +810,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public <T extends IMenu> T findMenu(Class<T> menuType) {
     return findAction(menuType);
   }
@@ -1305,7 +1284,14 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   @Override
   public Set<IKeyStroke> getKeyStrokes() {
-    return CollectionUtility.hashSet(propertySupport.<IKeyStroke> getPropertySet(PROP_KEY_STROKES));
+    return CollectionUtility.hashSet(getKeyStrokesInternal());
+  }
+
+  /**
+   * @return the internal key stroke list. May be {@code null}.
+   */
+  protected Set<IKeyStroke> getKeyStrokesInternal() {
+    return propertySupport.getPropertySet(PROP_KEY_STROKES);
   }
 
   @Override
@@ -1317,8 +1303,11 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   public void addKeyStrokes(IKeyStroke... keyStrokes) {
     if (keyStrokes != null && keyStrokes.length > 0) {
       Map<String, IKeyStroke> map = new HashMap<>();
-      for (IKeyStroke ks : getKeyStrokes()) {
-        map.put(ks.getKeyStroke(), ks);
+      Set<IKeyStroke> currentKeyStrokes = getKeyStrokesInternal();
+      if (CollectionUtility.hasElements(currentKeyStrokes)) {
+        for (IKeyStroke ks : currentKeyStrokes) {
+          map.put(ks.getKeyStroke(), ks);
+        }
       }
       for (IKeyStroke ks : keyStrokes) {
         map.put(ks.getKeyStroke(), ks);
@@ -1331,8 +1320,11 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   public void removeKeyStrokes(IKeyStroke... keyStrokes) {
     if (keyStrokes != null && keyStrokes.length > 0) {
       Map<String, IKeyStroke> map = new HashMap<>();
-      for (IKeyStroke ks : getKeyStrokes()) {
-        map.put(ks.getKeyStroke(), ks);
+      Set<IKeyStroke> currentKeyStrokes = getKeyStrokesInternal();
+      if (CollectionUtility.hasElements(currentKeyStrokes)) {
+        for (IKeyStroke ks : currentKeyStrokes) {
+          map.put(ks.getKeyStroke(), ks);
+        }
       }
       for (IKeyStroke ks : keyStrokes) {
         map.remove(ks.getKeyStroke());
@@ -1342,23 +1334,35 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   @Override
+  @SuppressWarnings("deprecation")
+  public <T extends IMenu> T getMenu(Class<? extends T> searchType) {
+    return getMenuByClass(searchType);
+  }
+
+  @Override
+  public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
+    // ActionFinder performs instance-of checks. Hence the menu replacement mapping is not required
+    return MenuUtility.getMenuByClass(this, menuType);
+  }
+
+  @Override
+  public IContextMenu getContextMenu() {
+    return null;
+  }
+
+  @Override
   public List<IMenu> getMenus() {
     return CollectionUtility.arrayList(m_menus);
   }
 
   @Override
   public List<IAction> getActions() {
-    List<IAction> result = new ArrayList<>();
-    result.addAll(getKeyStrokes());
-    result.addAll(getMenus());
-    result.addAll(getViewButtons());
+    Set<IKeyStroke> keyStrokes = getKeyStrokesInternal();
+    List<IAction> result = new ArrayList<>(CollectionUtility.size(keyStrokes) + CollectionUtility.size(m_menus) + CollectionUtility.size(m_viewButtons));
+    CollectionUtility.appendAllList(result, keyStrokes);
+    CollectionUtility.appendAllList(result, m_menus);
+    CollectionUtility.appendAllList(result, m_viewButtons);
     return result;
-  }
-
-  @Override
-  public <T extends IMenu> T getMenu(Class<? extends T> searchType) {
-    // ActionFinder performs instance-of checks. Hence the menu replacement mapping is not required
-    return new ActionFinder().findAction(getMenus(), searchType);
   }
 
   @Override
@@ -1980,8 +1984,28 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   @Override
-  protected void disposeInternal() {
-    closeInternal();
+  protected void disposeChildren(List<? extends IWidget> widgetsToDispose) {
+    // do not include child forms in dispose because they will be disposed in closeInternal() using IForm#doClose
+    widgetsToDispose.removeAll(m_formStore.values());
+    super.disposeChildren(widgetsToDispose);
+  }
+
+  @Override
+  protected void initChildren(List<? extends IWidget> widgets) {
+    // same as in dispose: exclude the forms. Form will be initialized when they are started.
+    widgets.removeAll(m_formStore.values());
+    super.initChildren(widgets);
+  }
+
+  @Override
+  protected final void disposeInternal() {
+    try {
+      closeInternal();
+    }
+    catch (RuntimeException e) {
+      LOG.warn("Exception while disposing desktop.", e);
+    }
+    super.disposeInternal();
   }
 
   @Override
@@ -1995,6 +2019,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       hideForm(form);
       showedForms.add(form);
     }
+
     //extensions
     for (IDesktopExtension ext : getDesktopExtensions()) {
       try {
@@ -2056,18 +2081,6 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
         }
       }
     }
-
-    // dispose outlines
-    for (IOutline outline : getAvailableOutlines()) {
-      try {
-        outline.dispose();
-      }
-      catch (RuntimeException | PlatformError e) {
-        LOG.warn("Exception while disposing outline.", e);
-      }
-    }
-
-    ActionUtility.disposeActions(getActions());
 
     fireDesktopClosed();
   }

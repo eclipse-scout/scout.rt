@@ -15,11 +15,11 @@ import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.extension.ui.action.menu.root.IContextMenuExtension;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
-import org.eclipse.scout.rt.client.ui.action.IActionFilter;
-import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
+import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.holders.BooleanHolder;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 
 @ClassId("b34571a2-032b-4910-921a-bec4acd110ed")
 public abstract class AbstractContextMenu<T extends IPropertyObserver> extends AbstractMenu implements IContextMenu {
@@ -133,22 +134,19 @@ public abstract class AbstractContextMenu<T extends IPropertyObserver> extends A
   }
 
   protected void calculateLocalVisibility() {
-    final IActionFilter activeFilter = ActionUtility.createMenuFilterMenuTypes(getCurrentMenuTypes(), true);
+    final Predicate<IAction> activeFilter = ActionUtility.createMenuFilterMenuTypes(getCurrentMenuTypes(), true);
     if (activeFilter != null) {
       final BooleanHolder visibleHolder = new BooleanHolder(false);
-      acceptVisitor(action -> {
-        if (action instanceof IMenu) {
-          IMenu menu = (IMenu) action;
-          if (menu.hasChildActions() || menu.isSeparator() || menu instanceof IContextMenu) {
-            return IActionVisitor.CONTINUE;
-          }
-          else if (activeFilter.accept(menu)) {
-            visibleHolder.setValue(true);
-            return IActionVisitor.CANCEL;
-          }
+      visit(menu -> {
+        if (menu.hasChildActions() || menu.isSeparator() || menu instanceof IContextMenu) {
+          return TreeVisitResult.CONTINUE;
         }
-        return IActionVisitor.CONTINUE;
-      });
+        else if (activeFilter.test(menu)) {
+          visibleHolder.setValue(true);
+          return TreeVisitResult.TERMINATE;
+        }
+        return TreeVisitResult.CONTINUE;
+      }, IMenu.class);
       setVisible(visibleHolder.getValue());
     }
   }

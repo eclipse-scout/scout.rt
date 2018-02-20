@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.plannerfield;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -17,6 +18,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.IPlannerFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.PlannerFieldChains.PlannerFieldLoadResourcesChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.PlannerFieldChains.PlannerFieldPopulateResourcesChain;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.basic.planner.AbstractPlanner;
 import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
 import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
@@ -54,6 +56,11 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
   @Override
   protected void execChangedMasterValue(Object newMasterValue) {
     loadResources();
+  }
+
+  @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), Collections.singletonList(getPlanner()));
   }
 
   /**
@@ -118,18 +125,6 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
     if (m_planner instanceof AbstractPlanner) {
       ((AbstractPlanner) m_planner).setContainerInternal(this);
     }
-  }
-
-  @Override
-  protected void initFieldInternal() {
-    getPlanner().init();
-    super.initFieldInternal();
-  }
-
-  @Override
-  protected void disposeFieldInternal() {
-    super.disposeFieldInternal();
-    getPlanner().dispose();
   }
 
   @Override

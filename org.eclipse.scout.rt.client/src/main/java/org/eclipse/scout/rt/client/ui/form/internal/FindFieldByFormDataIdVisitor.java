@@ -14,15 +14,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
 
@@ -32,7 +33,7 @@ import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
  * @see IFormField#getFieldId()
  * @see FormDataUtility#getFieldDataId(String)
  */
-public class FindFieldByFormDataIdVisitor implements IFormFieldVisitor {
+public class FindFieldByFormDataIdVisitor implements Function<IFormField, TreeVisitResult> {
 
   private static final CompositeObject PERFECT_VALUE_FIELD_MATCH_KEY = new CompositeObject(0, 0);
   private static final Pattern FIELD_PATH_SPLIT_PATTERN = Pattern.compile("[" + AbstractFormData.FIELD_PATH_DELIM + "]");
@@ -64,7 +65,7 @@ public class FindFieldByFormDataIdVisitor implements IFormFieldVisitor {
   }
 
   @Override
-  public boolean visitField(IFormField field, int level, int fieldIndex) {
+  public TreeVisitResult apply(IFormField field) {
     if (m_searchContextRootForm == null) {
       // auto-initialize search context
       // we assume the form field tree is traversed pre-order (i.e. first node itself, then its children)
@@ -97,7 +98,12 @@ public class FindFieldByFormDataIdVisitor implements IFormFieldVisitor {
       int enclosingFieldPathRank = getEnclosingFieldPathRank(field);
       m_prioMap.put(new CompositeObject(fieldTypeRank, enclosingFieldPathRank), field);
     }
-    return !m_prioMap.containsKey(PERFECT_VALUE_FIELD_MATCH_KEY);
+    boolean found = m_prioMap.containsKey(PERFECT_VALUE_FIELD_MATCH_KEY);
+
+    if (found) {
+      return TreeVisitResult.TERMINATE;
+    }
+    return TreeVisitResult.CONTINUE;
   }
 
   /**

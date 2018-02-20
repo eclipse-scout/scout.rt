@@ -30,7 +30,6 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
-import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -92,7 +91,7 @@ public class JsonTabBoxTest {
   @Test
   public void testDontSendNonDisplayableGroups() throws Exception {
     ITabBox tabBox = new TabBoxWithNonDisplayableGroup();
-    JsonTestUtility.initField(tabBox);
+    tabBox.init();
 
     JsonTabBox<ITabBox> jsonTabBox = UiSessionTestUtility.newJsonAdapter(m_uiSession, tabBox, null);
     JsonGroupBox<IGroupBox> jsonDisplayableGroup = m_uiSession.getJsonAdapter(tabBox.getFieldByClass(TabBoxWithNonDisplayableGroup.DisplayableGroup.class), jsonTabBox);
@@ -124,5 +123,4 @@ public class JsonTabBoxTest {
       }
     }
   }
-
 }

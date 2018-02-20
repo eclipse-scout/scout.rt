@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.Plan
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerViewRangeChangedChain;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IPlannerContextMenu;
@@ -109,8 +109,13 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
   }
 
   @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), getMenus());
+  }
+
+  @Override
   protected void initConfigInternal() {
-    interceptInitConfig();
+    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
   @Override
@@ -259,10 +264,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
   protected void execDisposePlanner() {
   }
 
-  protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
-  }
-
   @Override
   @SuppressWarnings("unchecked")
   protected void initConfig() {
@@ -401,8 +402,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
     super.initInternal();
     initPlannerInternal();
     interceptInitPlanner();
-    // init actions
-    ActionUtility.initActions(getMenus());
   }
 
   /**
@@ -438,7 +437,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
   }
 
   protected void disposePlannerInternal() {
-    ActionUtility.disposeActions(getMenus());
+    // nop
   }
 
   /*

@@ -18,6 +18,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
@@ -34,12 +37,11 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
@@ -55,11 +57,13 @@ import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.MultiStatus;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
@@ -128,6 +132,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   protected int m_valueChangeTriggerEnabled = 1;// >=1 is true
   private BasicPropertySupport m_subtreePropertyChangeSupport;
   private P_MasterListener m_currentMasterListener;// my master
+  private final P_FieldPropertyChangeListener m_fieldPropertyChangeListener;
   private DataChangeListener m_internalDataChangeListener;
   protected ContributionComposite m_contributionHolder;
   private String m_initialLabel;
@@ -143,6 +148,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     m_visible = NamedBitMaskHelper.ALL_BITS_SET; // default visible
     m_labelVisible = NamedBitMaskHelper.ALL_BITS_SET; // default label visible
     m_objectExtensions = new ObjectExtensions<>(this, false);
+    m_fieldPropertyChangeListener = new P_FieldPropertyChangeListener();
     if (callInitializer) {
       callInitializer();
     }
@@ -172,7 +178,12 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   protected void initConfigInternal() {
     try {
       setValueChangeTriggerEnabled(false);
-      interceptInitConfig();
+      m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), this::initConfig);
+      handleChildFieldVisibilityChanged();
+      // attach a proxy controller to each child field in the group for: visible, saveNeeded, isEmpty
+      for (IWidget w : getFirstChildFormFields(false)) {
+        addChildFieldPropertyChangeListener(w);
+      }
     }
     finally {
       setValueChangeTriggerEnabled(true);
@@ -721,6 +732,11 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     return ConfigurationUtility.removeReplacedClasses(fca);
   }
 
+  @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), getKeyStrokesInternal());
+  }
+
   @ConfigOperation
   @Order(10)
   protected void execInitField() {
@@ -733,15 +749,29 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   @ConfigOperation
   @Order(11)
   protected boolean execIsSaveNeeded() {
+    for (IFormField f : getFirstChildFormFields(false)) {
+      if (f.isSaveNeeded()) {
+        return true;
+      }
+    }
     return false;
   }
 
   /**
-   * Make field saved, for example a table is maring all rows as non-changed
+   * Make field saved, for example a table is marking all rows as non-changed
    */
   @ConfigOperation
   @Order(12)
   protected void execMarkSaved() {
+  }
+
+  protected boolean areChildrenEmpty() {
+    for (IFormField f : getFirstChildFormFields(false)) {
+      if (!f.isEmpty()) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
@@ -751,7 +781,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   @ConfigOperation
   @Order(13)
   protected boolean execIsEmpty() {
-    return true;
+    return areChildrenEmpty();
   }
 
   /**
@@ -798,10 +828,6 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   protected void execChangedMasterValue(Object newMasterValue) {
   }
 
-  protected final void interceptInitConfig() {
-    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), this::initConfig);
-  }
-
   @Override
   protected void initConfig() {
     super.initConfig();
@@ -809,7 +835,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     setGridDataHints(new GridData(-1, -1, 1, 1, -1, -1));
     propertySupport.setPropertyBool(PROP_EMPTY, true);
     m_contributionHolder = new ContributionComposite(this);
-
+    m_form = IForm.CURRENT.get();
     setFieldStyle(getConfiguredFieldStyle());
     setEnabled(getConfiguredEnabled());
     setDisabledStyle(getConfiguredDisabledStyle());
@@ -885,21 +911,6 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   /**
-   * do not use this method
-   */
-  @Override
-  protected void postInitConfigInternal() {
-    super.postInitConfigInternal();
-    // key strokes, now all inner fields are built
-    updateKeyStrokes();
-    // master listener, now the inner field is available
-    if (getConfiguredMasterField() != null) {
-      IValueField master = findNearestFieldByClass(getConfiguredMasterField());
-      setMasterField(master);
-    }
-  }
-
-  /**
    * Searching the nearest field implementing the specified class by processing the enclosing field list bottom-up.
    *
    * @since 3.8.1
@@ -925,19 +936,74 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   @Override
-  protected final void initInternal() {
+  protected void initInternal() {
     super.initInternal();
+
+    // key strokes, now all inner fields are built
+    updateKeyStrokes();
+
+    // master listener, now the inner field is available
+    if (getConfiguredMasterField() != null) {
+      IValueField master = findNearestFieldByClass(getConfiguredMasterField());
+      setMasterField(master);
+    }
+
     try {
       setValueChangeTriggerEnabled(false);
-      //
       initFieldInternal();
       interceptInitField();
-      // init key strokes
-      ActionUtility.initActions(getKeyStrokes());
     }
     finally {
       setValueChangeTriggerEnabled(true);
     }
+  }
+
+  /**
+   * Gets the next child form fields that exist in the child tree of this form field. Only the first level is
+   * returned.<br>
+   * This means the resulting {@link List} contains all the direct child form fields event if a non-form-field-widget
+   * exists in the child tree between this instance and the child.
+   * <p>
+   * <b>Example:</b>
+   *
+   * <pre>
+   *                            this
+   *              ----------------|----------------
+   *              |                               |
+   *      child form field A                    menu X
+   *              |                               |
+   *      ------------------                      |
+   *      |                |                      |
+   *  form field B      form field C      form field in menu D
+   * </pre>
+   *
+   * In this scenario this method would return field A and D.
+   *
+   * @param limitToSameFieldTree
+   *          Specifies if only the same-field-tree should be considered. A same-field-tree is a tree that only consists
+   *          of {@link IFormField}s and {@link IForm}s. So if this parameter is {@code true}, {@link IFormField}s in
+   *          e.g. menus are not returned because they don't belong to the same-field-tree according to the
+   *          specification above.
+   * @return A {@link List} with the child {@link IFormField}s. Is never {@code null}.
+   */
+  protected List<IFormField> getFirstChildFormFields(boolean limitToSameFieldTree) {
+    List<IFormField> nextFormFieldCollector = new ArrayList<>();
+    Function<IWidget, TreeVisitResult> nextFormFieldsVisitor = w -> {
+      if (w == AbstractFormField.this) {
+        return TreeVisitResult.CONTINUE; // the first visited item is the current instance. Always skip.
+      }
+      if (w instanceof IFormField) {
+        nextFormFieldCollector.add((IFormField) w);
+        return TreeVisitResult.SKIP_SUBTREE;
+      }
+      if (limitToSameFieldTree) {
+        // only step into forms. form fields that are not part of the inner forms are skipped because not part of the same field tree (new tree like in a menu).
+        return w instanceof IForm ? TreeVisitResult.CONTINUE : TreeVisitResult.SKIP_SUBTREE;
+      }
+      return TreeVisitResult.CONTINUE;
+    };
+    visit(nextFormFieldsVisitor);
+    return nextFormFieldCollector;
   }
 
   /**
@@ -960,26 +1026,26 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     try {
       disposeFieldInternal();
     }
-    catch (Exception e) {
-      LOG.warn("Field [{}]", getClass().getName(), e);
+    catch (RuntimeException e) {
+      LOG.warn("Cannot dispose field [{}]", getClass().getName(), e);
     }
     try {
       interceptDisposeField();
     }
-    catch (Exception e) {
-      LOG.warn("Field [{}]", getClass().getName(), e);
+    catch (RuntimeException e) {
+      LOG.warn("Cannot dispose field [{}]", getClass().getName(), e);
     }
     super.disposeInternal();
+  }
+
+  protected void disposeFieldInternal() {
+    // nop
   }
 
   @SuppressWarnings("deprecation")
   @Override
   public final void disposeField() {
     dispose();
-  }
-
-  protected void disposeFieldInternal() {
-    ActionUtility.disposeActions(getKeyStrokes());
   }
 
   /**
@@ -1024,14 +1090,6 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   @Override
-  public boolean acceptVisitor(IFormFieldVisitor visitor, int level, int fieldIndex, boolean includeThis) {
-    if (!includeThis) {
-      return true;
-    }
-    return CompositeFieldUtility.applyFormFieldVisitor(visitor, this, null, level, fieldIndex);
-  }
-
-  @Override
   public IForm getForm() {
     return m_form;
   }
@@ -1055,12 +1113,16 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     propertySupport.setProperty(PROP_PARENT_FIELD, f);
   }
 
-  /**
-   * do not use this internal method
-   */
   @Override
   public void setFormInternal(IForm form) {
     m_form = form;
+    setFormOnChildren(form);
+  }
+
+  protected void setFormOnChildren(IForm form) {
+    for (IFormField child : getFirstChildFormFields(false)) {
+      child.setFormInternal(form);
+    }
   }
 
   @Override
@@ -1480,7 +1542,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
     if (enabled && updateParents) {
       // also enable all parents
-      visitParents((field, level, fieldIndex) -> {
+      visitParents(field -> {
         field.setEnabled(true, dimension);
         return true;
       });
@@ -1488,10 +1550,9 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
     if (updateChildren) {
       // propagate change to children
-      acceptVisitor((field, level, fieldIndex) -> {
-        field.setEnabled(enabled, dimension);
-        return true;
-      }, 0, 0, false);
+      for (IWidget w : getChildren()) {
+        w.<IFormField> visit(field -> field.setEnabled(enabled, dimension), IFormField.class);
+      }
     }
   }
 
@@ -1506,38 +1567,40 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
       return false;
     }
 
-    return visitParents((field, level, fieldIndex) -> field.isEnabled());
+    Predicate<IFormField> visitor = IFormField::isEnabled;
+    return visitParents(visitor);
+  }
+
+  public boolean visitParents(Consumer<IFormField> v) {
+    return visitParents(field -> {
+      v.accept(field);
+      return true;
+    });
   }
 
   @Override
-  public boolean visitParents(IFormFieldVisitor v) {
-    return visitParents(v, -1);
-  }
-
-  protected boolean visitParents(IFormFieldVisitor v, int level) {
-    IFormField curField = this.getParentField();
-    IFormField lastField = this;
+  public boolean visitParents(Predicate<IFormField> v) {
+    IFormField curField = findParentField(this);
     if (curField == null) {
-      curField = getOuterFormField(lastField);
-      if (curField == null) {
-        return true;
-      }
+      return true;
     }
 
     do {
-      lastField = curField;
-      boolean continueVisiting = v.visitField(curField, level, 0);
-      if (!continueVisiting) {
+      if (!v.test(curField)) {
         return false;
       }
-      curField = curField.getParentField();
-      if (curField == null) {
-        curField = getOuterFormField(lastField);
-      }
-      level--;
+      curField = findParentField(curField);
     }
     while (curField != null);
     return true;
+  }
+
+  protected IFormField findParentField(IFormField f) {
+    IFormField parent = f.getParentField();
+    if (parent != null) {
+      return parent;
+    }
+    return getOuterFormField(f);
   }
 
   protected IFormField getOuterFormField(IFormField owner) {
@@ -1562,13 +1625,10 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     }
 
     // notify myself and children that their inherited value might have changed
-    acceptVisitor((field, level, fieldIndex) -> {
-      if (field instanceof AbstractFormField) {
-        boolean b = (enabled ? field.isEnabledIncludingParents() : false);
-        ((AbstractFormField) field).propertySupport.firePropertyChange(PROP_ENABLED_COMPUTED, !b, b);
-      }
-      return true;
-    }, 0, 0, true);
+    visit(field -> {
+      boolean b = (enabled ? field.isEnabledIncludingParents() : false);
+      field.propertySupport.firePropertyChange(PROP_ENABLED_COMPUTED, !b, b);
+    }, AbstractFormField.class);
   }
 
   @Override
@@ -1578,7 +1638,18 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   @Override
   public void setFieldStyle(String fieldStyle) {
+    setFieldStyle(fieldStyle, isInitConfigDone());
+  }
+
+  @Override
+  public void setFieldStyle(String fieldStyle, boolean recursive) {
     propertySupport.setPropertyString(PROP_FIELD_STYLE, fieldStyle);
+
+    if (recursive) {
+      for (IFormField f : getFirstChildFormFields(true)) {
+        f.setFieldStyle(fieldStyle, true);
+      }
+    }
   }
 
   @Override
@@ -1588,7 +1659,17 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   @Override
   public void setDisabledStyle(int disabledStyle) {
+    setDisabledStyle(disabledStyle, isInitConfigDone());
+  }
+
+  @Override
+  public void setDisabledStyle(int disabledStyle, boolean recursive) {
     propertySupport.setPropertyInt(PROP_DISABLED_STYLE, disabledStyle);
+    if (recursive) {
+      for (IFormField f : getFirstChildFormFields(true)) {
+        f.setDisabledStyle(disabledStyle, true);
+      }
+    }
   }
 
   @Override
@@ -1649,11 +1730,12 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     checkSaveNeeded();
   }
 
-  /**
-   * Default implementation does nothing
-   */
   @Override
   public final void markSaved() {
+    for (IFormField f : getFirstChildFormFields(false)) {
+      f.markSaved();
+    }
+
     try {
       setTouched(false);
       interceptMarkSaved();
@@ -1735,7 +1817,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
     if (visible && updateParents) {
       // also enable all parents
-      visitParents((field, level, fieldIndex) -> {
+      visitParents(field -> {
         field.setVisible(true, dimension);
         return true;
       });
@@ -1743,11 +1825,11 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
     if (updateChildren) {
       // propagate change to children
-      acceptVisitor((field, level, fieldIndex) -> {
-        field.setVisible(visible, dimension);
-        return true;
-      }, 0, 0, false);
+      for (IWidget w : getChildren()) {
+        w.<IFormField> visit(field -> field.setVisible(visible, dimension), IFormField.class);
+      }
     }
+
   }
 
   @Override
@@ -1771,7 +1853,8 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
       return false;
     }
 
-    return visitParents((field, level, fieldIndex) -> field.isVisible());
+    Predicate<IFormField> visitor = IFormField::isVisible;
+    return visitParents(visitor);
   }
 
   /**
@@ -1796,7 +1879,18 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   @Override
   public void setMandatory(boolean b) {
+    setMandatory(b, isInitConfigDone());
+  }
+
+  @Override
+  public void setMandatory(boolean b, boolean recursive) {
     propertySupport.setPropertyBool(PROP_MANDATORY, b);
+
+    if (recursive) {
+      for (IFormField f : getFirstChildFormFields(false)) {
+        f.setMandatory(b, true);
+      }
+    }
   }
 
   @Override
@@ -2089,14 +2183,9 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     }
 
     for (IKeyStroke ks : contributedKeyStrokes) {
-      try {
-        ks.init();
-        if (ks.getKeyStroke() != null) {
-          ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
-        }
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error initializing key stroke '" + ks.getClass().getName() + "'.", e));
+      ks.init();
+      if (ks.getKeyStroke() != null) {
+        ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
       }
     }
     return CollectionUtility.arrayListWithoutNullElements(ksMap.values());
@@ -2104,7 +2193,11 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   @Override
   public List<IKeyStroke> getKeyStrokes() {
-    return CollectionUtility.arrayList(propertySupport.<IKeyStroke> getPropertyList(PROP_KEY_STROKES));
+    return CollectionUtility.arrayList(getKeyStrokesInternal());
+  }
+
+  protected List<IKeyStroke> getKeyStrokesInternal() {
+    return propertySupport.<IKeyStroke> getPropertyList(PROP_KEY_STROKES);
   }
 
   @Override
@@ -2114,7 +2207,17 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   @Override
   public void setStatusVisible(boolean statusVisible) {
+    setStatusVisible(statusVisible, isInitConfigDone());
+  }
+
+  @Override
+  public void setStatusVisible(boolean statusVisible, boolean recursive) {
     propertySupport.setPropertyBool(PROP_STATUS_VISIBLE, statusVisible);
+    if (recursive) {
+      for (IFormField f : getFirstChildFormFields(true)) {
+        f.setStatusVisible(statusVisible, true);
+      }
+    }
   }
 
   @Override
@@ -2135,6 +2238,36 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   @Override
   public boolean isLoading() {
     return propertySupport.getPropertyBool(PROP_LOADING);
+  }
+
+  protected void handleChildFieldVisibilityChanged() {
+    // nop
+  }
+
+  protected void removeChildFieldPropertyChangeListener(IPropertyObserver f) {
+    f.removePropertyChangeListener(m_fieldPropertyChangeListener);
+  }
+
+  protected void addChildFieldPropertyChangeListener(IPropertyObserver f) {
+    f.addPropertyChangeListener(m_fieldPropertyChangeListener);
+  }
+
+  /**
+   * Implementation of PropertyChangeListener Proxy on all attached fields (not groups)
+   */
+  class P_FieldPropertyChangeListener implements PropertyChangeListener {
+    @Override
+    public void propertyChange(PropertyChangeEvent e) {
+      if (e.getPropertyName().equals(PROP_VISIBLE)) {
+        handleChildFieldVisibilityChanged();
+      }
+      else if (e.getPropertyName().equals(PROP_SAVE_NEEDED)) {
+        checkSaveNeeded();
+      }
+      else if (e.getPropertyName().equals(PROP_EMPTY)) {
+        checkEmpty();
+      }
+    }
   }
 
   private class P_MasterListener implements MasterListener {

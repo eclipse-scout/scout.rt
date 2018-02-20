@@ -10,11 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.controls;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.controls.FormTableControlChains.TableControlInitFormChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.controls.IFormTableControlExtension;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -25,6 +27,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * @since 6.0
@@ -107,6 +110,11 @@ public abstract class AbstractFormTableControl extends AbstractTableControl impl
     ensureFormStarted();
   }
 
+  @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), Collections.singletonList(getForm()));
+  }
+
   public void ensureFormCreated() {
     if (getForm() != null) {
       return;
@@ -145,6 +153,18 @@ public abstract class AbstractFormTableControl extends AbstractTableControl impl
     List<? extends IActionExtension<? extends AbstractAction>> extensions = getAllExtensions();
     TableControlInitFormChain chain = new TableControlInitFormChain(extensions);
     chain.execInitForm();
+  }
+
+  @Override
+  protected void disposeChildren(List<? extends IWidget> widgetsToDispose) {
+    widgetsToDispose.remove(getForm()); // form is closed in disposeActionInternal
+    super.disposeChildren(widgetsToDispose);
+  }
+
+  @Override
+  protected void initChildren(List<? extends IWidget> widgets) {
+    widgets.remove(getForm()); // is initialized on first use
+    super.initChildren(widgets);
   }
 
   @Override

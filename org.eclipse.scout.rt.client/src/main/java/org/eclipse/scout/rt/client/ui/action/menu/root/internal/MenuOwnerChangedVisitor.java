@@ -12,19 +12,16 @@ package org.eclipse.scout.rt.client.ui.action.menu.root.internal;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.function.Consumer;
 
-import org.eclipse.scout.rt.client.ui.action.IAction;
-import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.IReadOnlyMenu;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**
  * Visitor calling {@link IMenu#handleOwnerValueChanged(Object)} on menus, if the menu type allows it.
  */
-public class MenuOwnerChangedVisitor implements IActionVisitor {
+public class MenuOwnerChangedVisitor implements Consumer<IMenu> {
 
   private final Object m_ownerValue;
   private final Set<? extends IMenuType> m_menuTypes;
@@ -35,17 +32,9 @@ public class MenuOwnerChangedVisitor implements IActionVisitor {
   }
 
   @Override
-  public int visit(IAction action) {
-    if (action instanceof IMenu && !Collections.disjoint(((IMenu) action).getMenuTypes(), m_menuTypes) && !(action instanceof IReadOnlyMenu)) {
-      IMenu menu = (IMenu) action;
-      try {
-        menu.handleOwnerValueChanged(m_ownerValue);
-      }
-      catch (RuntimeException ex) {
-        BEANS.get(ExceptionHandler.class).handle(ex);
-      }
+  public void accept(IMenu menu) {
+    if (!Collections.disjoint(menu.getMenuTypes(), m_menuTypes) && !(menu instanceof IReadOnlyMenu)) {
+      menu.handleOwnerValueChanged(m_ownerValue);
     }
-    return CONTINUE;
   }
-
 }

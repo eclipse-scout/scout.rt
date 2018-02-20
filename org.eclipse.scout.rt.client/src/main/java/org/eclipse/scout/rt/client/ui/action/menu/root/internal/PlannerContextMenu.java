@@ -52,7 +52,7 @@ public class PlannerContextMenu extends AbstractContextMenu<IPlanner<?, ?>> impl
     if (container != null) {
       final CompositeObject ownerValue = new CompositeObject(container.getSelectedResources(), container.getSelectedActivity(), container.getSelectionRange());
       setCurrentMenuTypes(MenuUtility.getMenuTypesForPlannerSelection(container.getSelectedResources(), container.getSelectedActivity(), container.getSelectionRange()));
-      acceptVisitor(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()));
+      visit(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()), IMenu.class);
       calculateLocalVisibility();
     }
   }

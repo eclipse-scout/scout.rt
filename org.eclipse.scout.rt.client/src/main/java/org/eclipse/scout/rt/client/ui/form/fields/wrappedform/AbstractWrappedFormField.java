@@ -12,21 +12,18 @@ package org.eclipse.scout.rt.client.ui.form.fields.wrappedform;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.wrappedform.IWrappedFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.wrappedform.WrappedFormFieldChains.WrappedFormFieldInnerFormChangedChain;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
@@ -34,6 +31,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.w3c.dom.Element;
 
 @ClassId("535cfd11-39cf-4804-beef-2bc1bc3d34cc")
@@ -61,6 +59,11 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
   @Override
   protected boolean getConfiguredStatusVisible() {
     return false;
+  }
+
+  @Override
+  protected void setFormOnChildren(IForm form) {
+    // do not propagate the outer form into the form-fields of the inner form.
   }
 
   /**
@@ -95,6 +98,10 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
 
   @Override
   protected boolean execIsSaveNeeded() {
+    boolean saveNeeded = super.execIsSaveNeeded();
+    if (saveNeeded) {
+      return true;
+    }
     return getInnerForm() != null && getInnerForm().isSaveNeeded();
   }
 
@@ -132,10 +139,22 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
   }
 
   @Override
+  protected void disposeChildren(List<? extends IWidget> widgetsToDispose) {
+    widgetsToDispose.remove(getInnerForm()); // is disposed using IForm#doClose in disposeDefaultDetailForm()
+    super.disposeChildren(widgetsToDispose);
+  }
+
+  @Override
+  protected void initChildren(List<? extends IWidget> widgets) {
+    widgets.remove(getInnerForm()); // is initialized later
+    super.initChildren(widgets);
+  }
+
+  @Override
   protected void disposeFieldInternal() {
-    super.disposeFieldInternal();
     // Remove listeners, close the form if life cycle is not externally managed
     uninstallInnerForm();
+    super.disposeFieldInternal();
   }
 
   @Override
@@ -246,25 +265,8 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
   }
 
   @Override
-  public boolean acceptVisitor(IFormFieldVisitor visitor, int level, int fieldIndex, boolean includeThis) {
-    Collection<IFormField> innerFormRootGroupBox = null;
-    FORM innerForm = getInnerForm();
-    if (innerForm != null) {
-      IGroupBox rootGroupBox = innerForm.getRootGroupBox();
-      if (rootGroupBox != null) {
-        innerFormRootGroupBox = Collections.singletonList(rootGroupBox);
-      }
-    }
-    IFormField thisField = null;
-    if (includeThis) {
-      thisField = this;
-    }
-    return CompositeFieldUtility.applyFormFieldVisitor(visitor, thisField, innerFormRootGroupBox, level, fieldIndex);
-  }
-
-  @Override
-  public boolean visitFields(IFormFieldVisitor visitor) {
-    return acceptVisitor(visitor, 0, 0, true);
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), Collections.singletonList(getInnerForm()));
   }
 
   @Override

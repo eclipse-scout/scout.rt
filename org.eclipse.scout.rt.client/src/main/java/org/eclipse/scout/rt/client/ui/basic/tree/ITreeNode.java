@@ -14,8 +14,8 @@ import java.security.Permission;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.shared.dimension.IEnabledDimension;
@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.shared.dimension.IVisibleDimension;
 /**
  * Tree node used in {@link ITree}.
  */
-public interface ITreeNode extends IVisibleDimension, IEnabledDimension {
+public interface ITreeNode extends IVisibleDimension, IEnabledDimension, IContextMenuOwner {
   int STATUS_NON_CHANGED = 0;
   int STATUS_INSERTED = 1;
   int STATUS_UPDATED = 2;
@@ -230,11 +230,10 @@ public interface ITreeNode extends IVisibleDimension, IEnabledDimension {
 
   void setLazyExpandingEnabled(boolean lazyExpandingEnabled);
 
-  List<IMenu> getMenus();
-
   /**
-   * Convenience to find a menu, uses {@link ActionFinder}
+   * @deprecated Will be removed in Scout 8.0. use {@link #getMenuByClass(Class)} instead.
    */
+  @Deprecated
   <T extends IMenu> T getMenu(Class<T> menuType);
 
   void setMenus(List<? extends IMenu> a);

@@ -98,8 +98,8 @@ public class DynamicFieldTest {
     }
 
     @Override
-    public void init() {
-      super.init();
+    protected void initFieldInternal() {
+      super.initFieldInternal();
       System.out.println("init");
     }
 

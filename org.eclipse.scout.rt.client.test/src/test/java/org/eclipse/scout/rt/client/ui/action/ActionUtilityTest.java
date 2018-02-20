@@ -15,7 +15,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -100,10 +99,9 @@ public class ActionUtilityTest {
     m1.addChildAction(m2);
     m2.addChildAction(m3);
     m2.addChildAction(m4);
-    List<IMenu> rootActions = new LinkedList<>();
-    rootActions.add(m0);
-    rootActions.add(m1);
-    ActionUtility.disposeActions(rootActions);
+    m0.dispose();
+    m1.dispose();
+
     assertTrue(m0.isExecDisposeCalled());
     assertTrue(m1.isExecDisposeCalled());
     assertTrue(m2.isExecDisposeCalled());

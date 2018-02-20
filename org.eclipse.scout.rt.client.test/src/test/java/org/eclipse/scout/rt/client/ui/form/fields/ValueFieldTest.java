@@ -210,6 +210,9 @@ public class ValueFieldTest {
   static class MandatoryErrorField extends AbstractValueField<String> {
     @Override
     protected boolean execIsEmpty() {
+      if (!areChildrenEmpty()) {
+        return false;
+      }
       return EMPTY_VALUE.equals(getValue());
     }
   }

@@ -10,11 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.calendarfield;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.form.fields.calendarfield.ICalendarFieldExtension;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.basic.calendar.AbstractCalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendarDisplayMode;
@@ -102,21 +104,19 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
     }
   }
 
+  @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), Collections.singletonList(getCalendar()));
+  }
+
   /*
    * Runtime
    */
 
   @Override
-  protected void initFieldInternal() {
-    getCalendar().init();
-    super.initFieldInternal();
-  }
-
-  @Override
   protected void disposeFieldInternal() {
     ClientUIPreferences.getInstance().setCalendarPreferences(getCalendar().getDisplayMode(), getCalendar().isDisplayCondensed());
     super.disposeFieldInternal();
-    getCalendar().dispose();
   }
 
   @Override

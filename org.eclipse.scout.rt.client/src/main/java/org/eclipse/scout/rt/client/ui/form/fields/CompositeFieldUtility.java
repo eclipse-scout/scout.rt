@@ -10,16 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNull;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.eclipse.scout.rt.client.ui.form.FormUtility;
-import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.platform.OrderedComparator;
 import org.eclipse.scout.rt.platform.holders.Holder;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 
 public final class CompositeFieldUtility {
 
@@ -27,101 +31,45 @@ public final class CompositeFieldUtility {
   }
 
   public static void addField(IFormField f, ICompositeField compositeField, List<IFormField> fields) {
-    checkFieldStateForMove(f);
-    checkFieldStateForMove(compositeField);
-    if (f.getParentField() != null) {
-      throw new IllegalArgumentException("field is already contained in '" + f.getParentField() + "'");
-    }
-    if (f.getForm() != null && f.getForm() != compositeField.getForm()) {
-      throw new IllegalArgumentException("field is part of a different form,  '" + f.getForm() + "' instead of '" + compositeField.getForm() + "'");
-    }
+    assertNotNull(f);
+    assertNotNull(compositeField);
+    assertNotNull(fields);
+    assertNull(f.getParentField(), "field is already contained in '{}'.", f.getParentField());
+
+    Assertions.assertTrue(f.getForm() == null || f.getForm() == compositeField.getForm(),
+        "field is part of a different form,  '{}' instead of '{}'", f.getForm(), compositeField.getForm());
+
     fields.add(f);
     fields.sort(new OrderedComparator());
     f.setParentFieldInternal(compositeField);
     f.setFormInternal(compositeField.getForm());
     if (compositeField.isInitConfigDone()) {
-      f.postInitConfig();
-      FormUtility.initFormField(f);
+      f.init();
       FormUtility.rebuildFieldGrid(compositeField);
     }
   }
 
   public static void removeField(IFormField f, ICompositeField compositeField, List<IFormField> fields) {
-    checkFieldStateForMove(f);
-    checkFieldStateForMove(compositeField);
-    if (!fields.remove(f)) {
-      throw new IllegalArgumentException("field is not part of container '" + compositeField + "'");
-    }
+    assertNotNull(fields);
+    assertNotNull(f, "field must not be null");
+
+    boolean removed = fields.remove(f);
+    assertTrue(removed, "field is not part of container '{}'.", compositeField);
+
     f.setParentFieldInternal(null);
     if (f.isInitConfigDone()) {
-      FormUtility.disposeFormField(f);
+      f.dispose();
     }
   }
 
   public static void moveFieldTo(IFormField f, ICompositeField oldContainer, ICompositeField newContainer, Map<Class<? extends IFormField>, IFormField> movedFormFieldsByClass) {
-    if (f == null) {
-      throw new IllegalArgumentException("field must not be null");
-    }
-    if (oldContainer == null) {
-      throw new IllegalArgumentException("old container must not be null");
-    }
-    if (newContainer == null) {
-      throw new IllegalArgumentException("new container must not be null");
-    }
+    assertNotNull(f, "field must not be null");
+    assertNotNull(oldContainer, "old container must not be null");
+    assertNotNull(newContainer, "new container must not be null");
+
     oldContainer.removeField(f);
     newContainer.addField(f);
     movedFormFieldsByClass.put(f.getClass(), f);
-  }
-
-  private static void checkFieldStateForMove(IFormField f) {
-    if (f == null) {
-      throw new IllegalArgumentException("field must not be null");
-    }
-    IForm form = f.getForm();
-    if (form == null) {
-      return;
-    }
-    if (form.getHandler() == null) {
-      return;
-    }
-  }
-
-  /**
-   * Applies the given {@link IFormFieldVisitor} to the given {@link IFormField}s.
-   *
-   * @param visitor
-   *          The visitor
-   * @param fieldToVisit
-   *          The field to visit. May be <code>null</code>.
-   * @param childrenOfField
-   *          The children of the given field to visit or <code>null</code> if no children should be visited.
-   * @param level
-   *          The level of the current visit.
-   * @param fieldIndex
-   *          The index of the field currently visited.
-   * @return <code>true</code> if all fields have been visited, <code>false</code> if the visit was aborted by the
-   *         {@link IFormFieldVisitor}.
-   */
-  public static boolean applyFormFieldVisitor(IFormFieldVisitor visitor, IFormField fieldToVisit, Collection<IFormField> childrenOfField, int level, int fieldIndex) {
-    boolean continueVisiting = false;
-    if (fieldToVisit != null) {
-      continueVisiting = visitor.visitField(fieldToVisit, level, fieldIndex);
-      if (!continueVisiting) {
-        return false;
-      }
-    }
-    if (CollectionUtility.isEmpty(childrenOfField)) {
-      return true; // finished
-    }
-    int index = 0;
-    for (IFormField field : childrenOfField) {
-      continueVisiting = field.acceptVisitor(visitor, level + 1, index, true);
-      if (!continueVisiting) {
-        return false;
-      }
-      index++;
-    }
-    return true;
   }
 
   public static <T extends IFormField> T getFieldByClass(ICompositeField compositeField, final Class<T> formFieldClass) {
@@ -132,7 +80,7 @@ public final class CompositeFieldUtility {
     }
     // visit child fields
     final Holder<T> found = new Holder<>(formFieldClass);
-    IFormFieldVisitor v = (field, level, fieldIndex) -> {
+    Function<IFormField, TreeVisitResult> v = field -> {
       if (field.getClass() == formFieldClass) {
         found.setValue(formFieldClass.cast(field));
       }
@@ -142,9 +90,9 @@ public final class CompositeFieldUtility {
           found.setValue(movedFieldByClass);
         }
       }
-      return found.getValue() == null;
+      return found.getValue() == null ? TreeVisitResult.CONTINUE : TreeVisitResult.TERMINATE;
     };
-    compositeField.visitFields(v);
+    compositeField.visit(v, IFormField.class);
     return found.getValue();
   }
 
@@ -166,7 +114,7 @@ public final class CompositeFieldUtility {
     }
     // visit child fields
     final Holder<T> found = new Holder<>(type);
-    IFormFieldVisitor v = (field, level, fieldIndex) -> {
+    Function<IFormField, TreeVisitResult> v = field -> {
       if (type.isAssignableFrom(field.getClass()) && field.getFieldId().equals(id)) {
         found.setValue(type.cast(field));
       }
@@ -176,9 +124,9 @@ public final class CompositeFieldUtility {
           found.setValue(movedFieldById);
         }
       }
-      return found.getValue() == null;
+      return found.getValue() == null ? TreeVisitResult.CONTINUE : TreeVisitResult.TERMINATE;
     };
-    compositeField.visitFields(v);
+    compositeField.visit(v, IFormField.class);
     return found.getValue();
   }
 

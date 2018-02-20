@@ -15,12 +15,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.extension.ui.action.menu.IMenuExtension;
 import org.eclipse.scout.rt.client.extension.ui.action.menu.MenuChains.MenuOwnerValueChangedChain;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
-import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.tree.AbstractActionNode;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -33,12 +33,9 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @ClassId("e8dbfee4-503c-401e-8579-d0aa8618f59d")
 public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements IMenu {
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractMenu.class);
 
   private Object m_ownerValue;
 
@@ -209,22 +206,13 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   protected void afterChildMenusAdd(Collection<? extends IMenu> newChildMenus) {
     if (CollectionUtility.hasElements(newChildMenus)) {
       final Object ownerValue = m_ownerValue;
-      IActionVisitor visitor = action -> {
-        if (action instanceof IMenu) {
-          IMenu menu = (IMenu) action;
-          try {
-            if (ObjectUtility.notEquals(menu.getOwnerValue(), ownerValue)) {
-              menu.handleOwnerValueChanged(ownerValue);
-            }
-          }
-          catch (RuntimeException e) {
-            LOG.error("error during handle owner value changed.", e);
-          }
+      Consumer<IMenu> visitor = menu -> {
+        if (ObjectUtility.notEquals(menu.getOwnerValue(), ownerValue)) {
+          menu.handleOwnerValueChanged(ownerValue);
         }
-        return IActionVisitor.CONTINUE;
       };
       for (IMenu m : newChildMenus) {
-        m.acceptVisitor(visitor);
+        m.visit(visitor, IMenu.class);
       }
     }
   }

@@ -17,8 +17,8 @@ import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Consumer;
 
-import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @since 3.8.0
  */
-public class FindFieldByXmlIdsVisitor implements IFormFieldVisitor {
+public class FindFieldByXmlIdsVisitor implements Consumer<IFormField> {
   private static final Logger LOG = LoggerFactory.getLogger(FindFieldByXmlIdsVisitor.class);
 
   private final String[] m_xmlFieldIds;
@@ -52,7 +52,7 @@ public class FindFieldByXmlIdsVisitor implements IFormFieldVisitor {
   }
 
   @Override
-  public boolean visitField(IFormField field, int level, int fieldIndex) {
+  public void accept(IFormField field) {
     int fieldIdRank = getFieldIdRank(field);
     if (fieldIdRank > 0) {
       int enclosingFieldPathRank = getEnclosingFieldPathRank(field);
@@ -73,7 +73,6 @@ public class FindFieldByXmlIdsVisitor implements IFormFieldVisitor {
         m_prioMap.put(key, field);
       }
     }
-    return true;
   }
 
   /**

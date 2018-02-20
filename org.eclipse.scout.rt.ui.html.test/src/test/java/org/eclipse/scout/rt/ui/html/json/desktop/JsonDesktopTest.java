@@ -235,10 +235,10 @@ public class JsonDesktopTest {
     desktop.init();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
 
-    JsonMenu<IMenu> jsonDisplayableMenu = jsonDesktop.getAdapter(desktop.getMenu(DesktopWithNonDisplayableActions.DisplayableMenu.class));
-    JsonMenu<IMenu> jsonNonDisplayableMenu = jsonDesktop.getAdapter(desktop.getMenu(DesktopWithNonDisplayableActions.NonDisplayableMenu.class));
-    JsonFormMenu<IFormMenu<IForm>> jsonDisplayableFormMenu = jsonDesktop.getAdapter(desktop.getMenu(DesktopWithNonDisplayableActions.DisplayableFormMenu.class));
-    JsonFormMenu<IFormMenu<IForm>> jsonNonDisplayableFormMenu = jsonDesktop.getAdapter(desktop.getMenu(DesktopWithNonDisplayableActions.NonDisplayableFormMenu.class));
+    JsonMenu<IMenu> jsonDisplayableMenu = jsonDesktop.getAdapter(desktop.getMenuByClass(DesktopWithNonDisplayableActions.DisplayableMenu.class));
+    JsonMenu<IMenu> jsonNonDisplayableMenu = jsonDesktop.getAdapter(desktop.getMenuByClass(DesktopWithNonDisplayableActions.NonDisplayableMenu.class));
+    JsonFormMenu<IFormMenu<IForm>> jsonDisplayableFormMenu = jsonDesktop.getAdapter(desktop.getMenuByClass(DesktopWithNonDisplayableActions.DisplayableFormMenu.class));
+    JsonFormMenu<IFormMenu<IForm>> jsonNonDisplayableFormMenu = jsonDesktop.getAdapter(desktop.getMenuByClass(DesktopWithNonDisplayableActions.NonDisplayableFormMenu.class));
 
     // Adapter for NonDisplayableMenu/Menu must not exist
     assertNull(jsonNonDisplayableMenu);

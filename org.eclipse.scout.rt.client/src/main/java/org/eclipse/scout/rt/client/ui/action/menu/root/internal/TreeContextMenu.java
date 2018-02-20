@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractContextMenu;
@@ -64,15 +63,11 @@ public class TreeContextMenu extends AbstractContextMenu<ITree> implements ITree
     ITree container = getContainer();
     if (container != null) {
       final boolean enabled = container.isEnabled();
-      acceptVisitor(action -> {
-        if (action instanceof IMenu) {
-          IMenu menu = (IMenu) action;
-          if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
-            menu.setEnabledInheritAccessibility(enabled);
-          }
+      visit(menu -> {
+        if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
+          menu.setEnabledInheritAccessibility(enabled);
         }
-        return IActionVisitor.CONTINUE;
-      });
+      }, IMenu.class);
     }
   }
 
@@ -86,7 +81,7 @@ public class TreeContextMenu extends AbstractContextMenu<ITree> implements ITree
       final Set<ITreeNode> ownerSelection = getContainer().getSelectedNodes();
       m_currentSelection = CollectionUtility.hashSet(ownerSelection);
       setCurrentMenuTypes(MenuUtility.getMenuTypesForTreeSelection(ownerSelection));
-      acceptVisitor(new MenuOwnerChangedVisitor(ownerSelection, getCurrentMenuTypes()));
+      visit(new MenuOwnerChangedVisitor(ownerSelection, getCurrentMenuTypes()), IMenu.class);
       // update menu types
       calculateLocalVisibility();
       calculateEnableState(ownerSelection);
@@ -105,15 +100,11 @@ public class TreeContextMenu extends AbstractContextMenu<ITree> implements ITree
       }
     }
     final boolean inheritedEnability = enabled;
-    acceptVisitor(action -> {
-      if (action instanceof IMenu) {
-        IMenu menu = (IMenu) action;
-        if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
-          menu.setEnabledInheritAccessibility(inheritedEnability);
-        }
+    visit(menu -> {
+      if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
+        menu.setEnabledInheritAccessibility(inheritedEnability);
       }
-      return IActionVisitor.CONTINUE;
-    });
+    }, IMenu.class);
   }
 
   @Override

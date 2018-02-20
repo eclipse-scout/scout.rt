@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandl
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tabbox.ITabBoxExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tabbox.TabBoxChains.TabBoxTabSelectedChain;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +83,11 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
   }
 
   @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), getMenus());
+  }
+
+  @Override
   public int getMarkStrategy() {
     return propertySupport.getPropertyInt(PROP_MARK_STRATEGY);
   }
@@ -97,16 +103,14 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
     m_grid = new TabBoxGrid();
     setMarkStrategy(getConfiguredMarkStrategy());
     super.initConfig();
-    addPropertyChangeListener(PROP_SELECTED_TAB, e -> {
-      // single observer exec
-      try {
-        interceptTabSelected(getSelectedTab());
-      }
-      catch (Exception ex) {
-        BEANS.get(ExceptionHandler.class).handle(ex);
-      }
-    });
     initMenus();
+  }
+
+  @Override
+  protected void initConfigInternal() {
+    super.initConfigInternal();
+    // add listener after init-config has been executed to ensure no events are fired during init-config.
+    addPropertyChangeListener(PROP_SELECTED_TAB, e -> interceptTabSelected(getSelectedTab()));
   }
 
   private void initMenus() {
@@ -153,9 +157,9 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
   }
 
   @Override
-  protected void handleFieldVisibilityChanged() {
+  protected void handleChildFieldVisibilityChanged() {
     // box is only visible when it has at least one visible item
-    super.handleFieldVisibilityChanged();
+    super.handleChildFieldVisibilityChanged();
 
     if (isInitConfigDone()) {
       rebuildFieldGrid();
@@ -262,18 +266,6 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
   @Override
   public ITabBoxUIFacade getUIFacade() {
     return m_uiFacade;
-  }
-
-  @Override
-  protected void initFieldInternal() {
-    super.initFieldInternal();
-    ActionUtility.initActions(getMenus());
-  }
-
-  @Override
-  protected void disposeFieldInternal() {
-    super.disposeFieldInternal();
-    ActionUtility.disposeActions(getMenus());
   }
 
   protected class P_UIFacade implements ITabBoxUIFacade {

@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
@@ -38,6 +37,8 @@ import org.eclipse.scout.rt.client.ui.dnd.ResourceListTransferObject;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.visitor.DepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
@@ -1113,20 +1114,18 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     }
   }
 
-  protected class P_ChildNodesVisitor implements ITreeVisitor {
+  protected class P_ChildNodesVisitor extends DepthFirstTreeVisitor<ITreeNode> {
 
-    Set<ITreeNode> m_nodes = new HashSet<>();
+    private final Set<ITreeNode> m_nodes = new HashSet<>();
 
     @Override
-    public boolean visit(ITreeNode node) {
+    public TreeVisitResult preVisit(ITreeNode node, int level, int index) {
       m_nodes.add(node);
-      return true;
+      return TreeVisitResult.CONTINUE;
     }
 
     public Set<ITreeNode> getNodes() {
       return m_nodes;
     }
-
   }
-
 }

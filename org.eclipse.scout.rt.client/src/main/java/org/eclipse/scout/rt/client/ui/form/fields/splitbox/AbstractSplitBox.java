@@ -176,8 +176,8 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
   }
 
   @Override
-  protected void handleFieldVisibilityChanged() {
-    super.handleFieldVisibilityChanged();
+  protected void handleChildFieldVisibilityChanged() {
+    super.handleChildFieldVisibilityChanged();
     if (isInitConfigDone()) {
       rebuildFieldGrid();
     }

@@ -27,6 +27,8 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
+import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 import org.eclipse.scout.rt.shared.dimension.IEnabledDimension;
 
@@ -492,11 +494,11 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
 
   Set<ITreeNode> getUpdatedNodes();
 
-  boolean visitTree(ITreeVisitor v);
+  TreeVisitResult visitTree(IDepthFirstTreeVisitor<ITreeNode> v);
 
-  boolean visitVisibleTree(ITreeVisitor v);
+  TreeVisitResult visitVisibleTree(IDepthFirstTreeVisitor<ITreeNode> v);
 
-  boolean visitNode(ITreeNode node, ITreeVisitor v);
+  TreeVisitResult visitNode(ITreeNode node, IDepthFirstTreeVisitor<ITreeNode> v);
 
   /**
    * unload all children and mark node as not loaded

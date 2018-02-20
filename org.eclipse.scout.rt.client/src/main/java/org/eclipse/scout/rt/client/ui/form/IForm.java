@@ -353,8 +353,6 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
 
   void validateForm();
 
-  boolean visitFields(IFormFieldVisitor visitor);
-
   IGroupBox getRootGroupBox();
 
   /**

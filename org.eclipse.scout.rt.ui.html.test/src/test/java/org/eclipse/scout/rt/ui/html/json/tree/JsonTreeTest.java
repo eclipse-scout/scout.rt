@@ -27,12 +27,14 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.visitor.DepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -889,17 +891,17 @@ public class JsonTreeTest {
 
   public static List<ITreeNode> getAllTreeNodes(final ITree tree) {
     final List<ITreeNode> nodes = new LinkedList<ITreeNode>();
-    tree.visitTree(new ITreeVisitor() {
-
+    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
       @Override
-      public boolean visit(ITreeNode node) {
+      public TreeVisitResult preVisit(ITreeNode node, int level, int index) {
         if (!tree.isRootNodeVisible() && tree.getRootNode() == node) {
-          return true;
+          return TreeVisitResult.CONTINUE;
         }
         nodes.add(node);
-        return true;
+        return TreeVisitResult.CONTINUE;
       }
-    });
+    };
+    tree.visitTree(v);
     return nodes;
   }
 }

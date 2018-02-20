@@ -21,8 +21,9 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.IImageField
 import org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.ImageFieldChains.ImageFieldDragRequestChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.ImageFieldChains.ImageFieldDropRequestChain;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
@@ -34,6 +35,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.data.basic.AffineTransformSpec;
@@ -67,7 +69,8 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   }
 
   /**
-   * Configures the image id of the field. Use this method instead of {@link #getConfiguredImageUrl()} if you have an image id which may be resolved by the {@link IconLocator} rather than an URL.
+   * Configures the image id of the field. Use this method instead of {@link #getConfiguredImageUrl()} if you have an
+   * image id which may be resolved by the {@link IconLocator} rather than an URL.
    * <p>
    * If multiple image properties are set, the UI will read the first property which is not null according to the
    * following order:
@@ -84,7 +87,8 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   }
 
   /**
-   * Configures the image URL of the field. Use this method instead of {@link #getConfiguredImageId()} if you have a real URL pointing to the image.
+   * Configures the image URL of the field. Use this method instead of {@link #getConfiguredImageId()} if you have a
+   * real URL pointing to the image.
    * <p>
    * If multiple image properties are set, the UI will read the first property which is not null according to the
    * following order:
@@ -223,13 +227,6 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     m_contextMenu.setContainerInternal(this);
   }
 
-  @Override
-  protected void initFieldInternal() {
-    super.initFieldInternal();
-    // init actions
-    ActionUtility.initActions(getMenus());
-  }
-
   /**
    * Override this internal method only in order to make use of dynamic menus<br>
    * Used to add and/or remove menus<br>
@@ -314,6 +311,11 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   @Override
   public List<IMenu> getMenus() {
     return getContextMenu().getChildActions();
+  }
+
+  @Override
+  public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
+    return MenuUtility.getMenuByClass(this, menuType);
   }
 
   @Override
@@ -501,9 +503,8 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   }
 
   @Override
-  protected void disposeFieldInternal() {
-    super.disposeFieldInternal();
-    ActionUtility.disposeActions(getMenus());
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), getMenus());
   }
 
   protected class P_UIFacade implements IImageFieldUIFacade {

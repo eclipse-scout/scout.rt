@@ -12,8 +12,10 @@ package org.eclipse.scout.rt.client.ui.action;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
-import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 
 /**
  * search an actions tree to find an action
@@ -22,10 +24,7 @@ public class ActionFinder {
 
   public <T extends IAction> T findAction(List<? extends IAction> actionTree, Class<T> searchType) {
     List<T> filteredActions = findActions(actionTree, searchType, true, true);
-    if (!filteredActions.isEmpty()) {
-      return filteredActions.get(0);
-    }
-    return null;
+    return CollectionUtility.firstElement(filteredActions);
   }
 
   public <T extends IAction> List<T> findActions(List<? extends IAction> actionTree, Class<T> searchType, boolean recursive) {
@@ -33,24 +32,31 @@ public class ActionFinder {
   }
 
   @SuppressWarnings("unchecked")
-  private <T extends IAction> List<T> findActions(List<? extends IAction> actionTree, Class<T> searchType, boolean recursive, boolean oneMatchSearch) {
-    List<T> list = new ArrayList<>();
+  protected <T extends IAction> List<T> findActions(List<? extends IAction> actionTree, Class<T> searchType, boolean recursive, boolean oneMatchSearch) {
+    if (CollectionUtility.isEmpty(actionTree) || searchType == null) {
+      return CollectionUtility.emptyArrayList();
+    }
 
-    for (IAction action : actionTree) {
-      if (searchType.isAssignableFrom(action.getClass())) {
-        list.add((T) action);
+    List<T> result = new ArrayList<>();
+    Function<IAction, TreeVisitResult> collector = action -> {
+      if (searchType.isInstance(action)) {
+        result.add((T) action);
         if (oneMatchSearch) {
-          return list;
+          return TreeVisitResult.TERMINATE;
         }
       }
 
-      if (recursive && action instanceof IActionNode<?>) {
-        List<? extends IAction> childActions = ((IActionNode<?>) action).getChildActions();
-        List<T> filteredChildActions = findActions(childActions, searchType, true, oneMatchSearch);
-        list.addAll(filteredChildActions);
+      return recursive ? TreeVisitResult.CONTINUE : TreeVisitResult.SKIP_SUBTREE;
+    };
+    for (IAction action : actionTree) {
+      if (action == null) {
+        continue;
+      }
+      TreeVisitResult continueSearch = action.visit(collector, IAction.class);
+      if (continueSearch == TreeVisitResult.TERMINATE) {
+        return result;
       }
     }
-
-    return list;
+    return result;
   }
 }

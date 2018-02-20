@@ -21,8 +21,9 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.button.ButtonChains.
 import org.eclipse.scout.rt.client.extension.ui.form.fields.button.ButtonChains.ButtonSelectionChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.button.IButtonExtension;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
@@ -35,6 +36,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
@@ -270,10 +272,8 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   @Override
-  protected void initFieldInternal() {
-    super.initFieldInternal();
-    // init actions
-    ActionUtility.initActions(getMenus());
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), getMenus());
   }
 
   /**
@@ -392,6 +392,11 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   @Override
+  public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
+    return MenuUtility.getMenuByClass(this, menuType);
+  }
+
+  @Override
   public IContextMenu getContextMenu() {
     return (IContextMenu) propertySupport.getProperty(PROP_CONTEXT_MENU);
   }
@@ -494,12 +499,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   public void setView(boolean visible, boolean enabled) {
     setVisible(visible);
     setEnabled(enabled);
-  }
-
-  @Override
-  protected void disposeFieldInternal() {
-    super.disposeFieldInternal();
-    ActionUtility.disposeActions(getMenus());
   }
 
   /**

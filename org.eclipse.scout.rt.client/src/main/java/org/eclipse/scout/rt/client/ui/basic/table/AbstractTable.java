@@ -51,8 +51,8 @@ import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.MouseButton;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -241,8 +241,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   @Override
-  protected void callInitializer() {
-    interceptInitConfig();
+  protected void initConfigInternal() {
+    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), this::initConfig);
   }
 
   @Override
@@ -839,10 +839,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     return ConfigurationUtility.removeReplacedClasses(fca);
   }
 
-  protected final void interceptInitConfig() {
-    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), this::initConfig);
-  }
-
   @Override
   protected void initConfig() {
     super.initConfig();
@@ -1027,14 +1023,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     getColumnSet().disposeColumns();
   }
 
-  private void disposeMenus() {
-    ActionUtility.disposeActions(getMenus());
-  }
-
-  private void disposeTableControls() {
-    ActionUtility.disposeActions(getTableControls());
-  }
-
   private void createTableControlsInternal() {
     List<Class<? extends ITableControl>> tcs = getConfiguredTableControls();
     OrderedCollection<ITableControl> tableControls = new OrderedCollection<>();
@@ -1145,7 +1133,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         try {
           setTableChanging(true);
           initTableInternal();
-          ActionUtility.initActions(getMenus());
           interceptInitTable();
         }
         finally {
@@ -1195,8 +1182,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   protected void disposeTableInternal() {
     disposeColumnsInternal();
-    disposeMenus();
-    disposeTableControls();
   }
 
   @Override
@@ -1669,7 +1654,19 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   @Override
   public List<IKeyStroke> getKeyStrokes() {
-    return CollectionUtility.arrayList(propertySupport.<IKeyStroke> getPropertyList(PROP_KEY_STROKES));
+    return CollectionUtility.arrayList(getKeyStrokesInternal());
+  }
+
+  /**
+   * Returns a modifiable live list
+   */
+  protected List<IKeyStroke> getKeyStrokesInternal() {
+    return propertySupport.<IKeyStroke> getPropertyList(PROP_KEY_STROKES);
+  }
+
+  @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), getMenus(), getKeyStrokesInternal(), m_tableControls);
   }
 
   @Override

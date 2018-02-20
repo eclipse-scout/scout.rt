@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -64,7 +65,7 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
  * <li>top-level menus (menu tree)
  * </ul>
  */
-public interface IDesktop extends IWidget, IDisplayParent, IStyleable {
+public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextMenuOwner {
 
   /**
    * The {@link IDesktop} which is currently associated with the current thread.
@@ -195,8 +196,9 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable {
   <T extends IAction> T findAction(Class<T> actionType);
 
   /**
-   * Convenience alias for {@link #findAction(Class)}
+   * deprecated Will be removed with Scout 8.0. Use {@link #getMenuByClass(Class)} instead.
    */
+  @Deprecated
   <T extends IMenu> T findMenu(Class<T> menuType);
 
   /**
@@ -480,12 +482,9 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable {
   void releaseUnusedPages();
 
   /**
-   * @return the top level menus
-   *         <p>
-   *         normally presented in the menubar
+   * @deprecated Will be removed with Scout 8.0. Use {@link #getMenuByClass(Class)} instead.
    */
-  List<IMenu> getMenus();
-
+  @Deprecated
   <T extends IMenu> T getMenu(Class<? extends T> searchType);
 
   /**

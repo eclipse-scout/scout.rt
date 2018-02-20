@@ -18,15 +18,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.Coordinates;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -47,6 +51,9 @@ import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.visitor.IBreadthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 
 /**
@@ -400,6 +407,17 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public IContextMenu getContextMenu() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  @SuppressWarnings("deprecation")
   public <T extends IMenu> T getMenu(Class<? extends T> searchType) {
     throw createUnsupportedOperationException();
   }
@@ -525,6 +543,51 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public List<? extends IWidget> getChildren() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public void visit(Consumer<IWidget> visitor) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public <T extends IWidget> void visit(Consumer<T> visitor, Class<T> type) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public TreeVisitResult visit(Function<IWidget, TreeVisitResult> visitor) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public <T extends IWidget> TreeVisitResult visit(Function<T, TreeVisitResult> visitor, Class<T> type) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public TreeVisitResult visit(IDepthFirstTreeVisitor<IWidget> visitor) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public <T extends IWidget> TreeVisitResult visit(IDepthFirstTreeVisitor<T> visitor, Class<T> type) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public <T extends IWidget> TreeVisitResult visit(IBreadthFirstTreeVisitor<T> visitor, Class<T> type) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public TreeVisitResult visit(IBreadthFirstTreeVisitor<IWidget> visitor) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
   public void init() {
     throw createUnsupportedOperationException();
   }
@@ -536,11 +599,6 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public boolean isInitConfigDone() {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
-  public boolean isPostInitConfigDone() {
     throw createUnsupportedOperationException();
   }
 
@@ -557,11 +615,6 @@ public class VirtualDesktop implements IDesktop {
   @SuppressWarnings("deprecation")
   @Override
   public void initDesktop() {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
-  public void postInitConfig() {
     throw createUnsupportedOperationException();
   }
 
@@ -766,6 +819,7 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public <T extends IMenu> T findMenu(Class<T> menuType) {
     return null;
   }

@@ -18,13 +18,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
-import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.IActionUIFacade;
-import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.IReadOnlyMenu;
@@ -50,10 +49,10 @@ public class OutlineMenuWrapper extends AbstractWidget implements IMenu, IReadOn
   private final IMenu m_wrappedMenu;
   private final PropertyChangeListener m_wrappedMenuPropertyChangeListener;
   private final Set<IMenuType> m_menuTypes;
-  private final IActionFilter m_menuFilter;
+  private final Predicate<IAction> m_menuFilter;
   private final IMenuTypeMapper m_menuTypeMapper;
 
-  public static final IActionFilter ACCEPT_ALL_FILTER = action -> true;
+  public static final Predicate<IAction> ACCEPT_ALL_FILTER = action -> true;
 
   public static final IMenuTypeMapper AUTO_MENU_TYPE_MAPPER = menuType -> menuType;
 
@@ -122,7 +121,7 @@ public class OutlineMenuWrapper extends AbstractWidget implements IMenu, IReadOn
    *          the menuTypes for the menu and for each menu in the sub-hierarchy are individually computed with this
    *          mapper
    */
-  public OutlineMenuWrapper(IMenu menu, IMenuTypeMapper menuTypeMapper, IActionFilter menuFilter) {
+  public OutlineMenuWrapper(IMenu menu, IMenuTypeMapper menuTypeMapper, Predicate<IAction> menuFilter) {
     m_wrappedMenu = menu;
     m_menuTypeMapper = menuTypeMapper;
     m_menuFilter = menuFilter;
@@ -241,13 +240,9 @@ public class OutlineMenuWrapper extends AbstractWidget implements IMenu, IReadOn
   }
 
   @Override
-  public void postInitConfig() {
-    // NOP
-  }
-
-  @Override
-  public void dispose() {
+  protected void disposeInternal() {
     m_wrappedMenu.removePropertyChangeListener(m_wrappedMenuPropertyChangeListener);
+    super.disposeInternal();
   }
 
   @Override
@@ -428,31 +423,6 @@ public class OutlineMenuWrapper extends AbstractWidget implements IMenu, IReadOn
   @Override
   public IActionUIFacade getUIFacade() {
     return m_wrappedMenu.getUIFacade();
-  }
-
-  @Override
-  public int acceptVisitor(IActionVisitor visitor) {
-    switch (visitor.visit(this)) {
-      case IActionVisitor.CANCEL:
-        return IActionVisitor.CANCEL;
-      case IActionVisitor.CANCEL_SUBTREE:
-        return IActionVisitor.CONTINUE;
-      case IActionVisitor.CONTINUE_BRANCH:
-        visitChildren(visitor);
-        return IActionVisitor.CANCEL;
-      default:
-        return visitChildren(visitor);
-    }
-  }
-
-  private int visitChildren(IActionVisitor visitor) {
-    for (IAction t : getChildActions()) {
-      switch (t.acceptVisitor(visitor)) {
-        case IActionVisitor.CANCEL:
-          return IActionVisitor.CANCEL;
-      }
-    }
-    return IActionVisitor.CONTINUE;
   }
 
   @Override

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.tablefield;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFiel
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldSaveDeletedRowChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldSaveInsertedRowChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldSaveUpdatedRowChain;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -190,19 +192,19 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
    */
 
   @Override
-  protected void initFieldInternal() {
-    if (m_table != null && !m_tableExternallyManaged) {
-      m_table.init();
+  protected void disposeChildren(List<? extends IWidget> widgetsToDispose) {
+    if (m_tableExternallyManaged) {
+      widgetsToDispose.remove(getTable());
     }
-    super.initFieldInternal();
+    super.disposeChildren(widgetsToDispose);
   }
 
   @Override
-  protected void disposeFieldInternal() {
-    super.disposeFieldInternal();
-    if (m_table != null && !m_tableExternallyManaged) {
-      m_table.dispose();
+  protected void initChildren(List<? extends IWidget> widgets) {
+    if (m_tableExternallyManaged) {
+      widgets.remove(getTable());
     }
+    super.initChildren(widgets);
   }
 
   @Override
@@ -360,6 +362,11 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
 
   @Override
   protected boolean execIsSaveNeeded() {
+    boolean saveNeeded = super.execIsSaveNeeded();
+    if (saveNeeded) {
+      return true;
+    }
+
     if (m_table == null || m_tableExternallyManaged) {
       return false;
     }
@@ -374,7 +381,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     if (m_table != null && !m_tableExternallyManaged) {
       try {
         m_table.setTableChanging(true);
-        //
         for (int i = 0; i < m_table.getRowCount(); i++) {
           ITableRow row = m_table.getRow(i);
           if (!row.isStatusNonchanged()) {
@@ -391,6 +397,9 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
 
   @Override
   protected boolean execIsEmpty() {
+    if (!super.execIsEmpty()) {
+      return false;
+    }
     if (m_table != null) {
       return m_table.getRowCount() == 0;
     }
@@ -439,6 +448,11 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
       columnName = col.getClass().getSimpleName();
     }
     return columnName;
+  }
+
+  @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), Collections.singletonList(getTable()));
   }
 
   @Override

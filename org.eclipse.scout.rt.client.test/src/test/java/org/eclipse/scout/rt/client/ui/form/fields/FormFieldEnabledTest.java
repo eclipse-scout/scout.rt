@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -27,7 +29,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_BoxWithCancelButton.InnerBox;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_BoxWithCancelButton.InnerBox.CancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_BoxWithComposer.ComposerField;
@@ -68,6 +69,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.AbstractWrappedFormField;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -165,35 +167,33 @@ public class FormFieldEnabledTest {
   public void testWrappedFormField() {
     P_OuterForm frm = new P_OuterForm();
     final AtomicReference<P_String> ref = new AtomicReference<>();
-    frm.visitFields(new IFormFieldVisitor() {
+    frm.visit(new Function<IFormField, TreeVisitResult>() {
       @Override
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
+      public TreeVisitResult apply(IFormField field) {
         if (field instanceof P_String) {
           ref.set((P_String) field);
         }
-        return ref.get() == null;
+        return ref.get() == null ? TreeVisitResult.CONTINUE : TreeVisitResult.TERMINATE;
       }
-    });
+    }, IFormField.class);
     P_String stringField = ref.get();
     Assert.assertNotNull(stringField);
 
     final AtomicInteger counter = new AtomicInteger(0);
-    stringField.visitParents(new IFormFieldVisitor() {
+    stringField.visitParents(new Consumer<IFormField>() {
       @Override
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
+      public void accept(IFormField field) {
         counter.incrementAndGet();
-        return true;
       }
     });
     Assert.assertEquals(7, counter.intValue());
 
     MainBox innerMainBox = frm.getFieldByClass(Wrapped.class).getInnerForm().getFieldByClass(MainBox.class);
     final AtomicInteger counter2 = new AtomicInteger(0);
-    innerMainBox.visitParents(new IFormFieldVisitor() {
+    innerMainBox.visitParents(new Consumer<IFormField>() {
       @Override
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
+      public void accept(IFormField field) {
         counter2.incrementAndGet();
-        return true;
       }
     });
     Assert.assertEquals(2, counter2.intValue());

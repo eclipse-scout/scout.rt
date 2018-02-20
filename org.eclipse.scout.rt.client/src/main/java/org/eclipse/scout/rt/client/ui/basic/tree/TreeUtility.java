@@ -10,11 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.TreeTraversals;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 
 /**
  * @since 3.8.0
@@ -116,34 +121,47 @@ public final class TreeUtility {
     return node;
   }
 
-  public static void visitNodes(Collection<ITreeNode> nodes, ITreeVisitor v) {
+  public static TreeVisitResult visitNodes(Collection<ITreeNode> nodes, IDepthFirstTreeVisitor<ITreeNode> v) {
+    return visitNodes(nodes, v, ITreeNode::getChildNodes);
+  }
+
+  public static TreeVisitResult visitNodes(Collection<ITreeNode> nodes, IDepthFirstTreeVisitor<ITreeNode> v, Function<ITreeNode, List<? extends ITreeNode>> childrenSupplier) {
+    if (CollectionUtility.isEmpty(nodes)) {
+      return TreeVisitResult.CONTINUE;
+    }
+
     for (ITreeNode node : nodes) {
-      visitNode(node, v);
-    }
-  }
-
-  public static boolean visitNode(ITreeNode node, ITreeVisitor v) {
-    return visitNodeRec(node, v);
-  }
-
-  public static boolean visitNodeRec(ITreeNode node, ITreeVisitor v) {
-    if (node == null) {
-      return true;
-    }
-    boolean b = v.visit(node);
-    if (!b) {
-      return b;
-    }
-    List<ITreeNode> a = node.getChildNodes();
-    for (ITreeNode childNode : a) {
-      // it might be that the visit of a node detached the node from the tree
-      if (childNode.getTree() != null) {
-        b = visitNodeRec(childNode, v);
-        if (!b) {
-          return b;
-        }
+      if (node == null) {
+        continue;
+      }
+      TreeVisitResult result = visitNode(node, v, childrenSupplier);
+      if (result == TreeVisitResult.TERMINATE || result == TreeVisitResult.SKIP_SIBLINGS) {
+        return result;
       }
     }
-    return true;
+    return TreeVisitResult.CONTINUE;
+  }
+
+  public static TreeVisitResult visitNode(ITreeNode node, IDepthFirstTreeVisitor<ITreeNode> visitor) {
+    return visitNode(node, visitor, ITreeNode::getChildNodes);
+  }
+
+  public static TreeVisitResult visitNode(ITreeNode node, IDepthFirstTreeVisitor<ITreeNode> visitor, Function<ITreeNode, List<? extends ITreeNode>> childrenSupplier) {
+    return TreeTraversals.create(visitor, childrenSupplier.andThen(TreeUtility::filterNodesWithoutTree)).traverse(node);
+  }
+
+  private static List<? extends ITreeNode> filterNodesWithoutTree(List<? extends ITreeNode> candidates) {
+    List<ITreeNode> result = new ArrayList<>(candidates.size());
+    for (ITreeNode childNode : candidates) {
+      if (childNode == null) {
+        continue;
+      }
+      if (childNode.getTree() == null) {
+        // it might be that the visit of a node detached the node from the tree
+        continue;
+      }
+      result.add(childNode);
+    }
+    return result;
   }
 }

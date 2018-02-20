@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandl
 import org.eclipse.scout.rt.client.extension.ui.tile.ITileGridExtension;
 import org.eclipse.scout.rt.client.extension.ui.tile.TileGridChains.TilesSelectedChain;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITileGridContextMenu;
@@ -63,11 +64,12 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
 
   @Override
   protected void initConfigInternal() {
-    interceptInitConfig();
+    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), this::initConfig);
   }
 
-  protected final void interceptInitConfig() {
-    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), this::initConfig);
+  @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), getTilesInternal(), getMenus());
   }
 
   @Override
@@ -184,30 +186,6 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   @Override
   public ITileGridUIFacade getUIFacade() {
     return m_uiFacade;
-  }
-
-  @Override
-  protected void initInternal() {
-    super.initInternal();
-    for (T tile : getTilesInternal()) {
-      tile.init();
-    }
-  }
-
-  @Override
-  protected void postInitConfigInternal() {
-    super.postInitConfigInternal();
-    for (T tile : getTilesInternal()) {
-      tile.postInitConfig();
-    }
-  }
-
-  @Override
-  protected void disposeInternal() {
-    for (T tile : getTilesInternal()) {
-      tile.dispose();
-    }
-    super.disposeInternal();
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -368,7 +346,6 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
     // Initialize after every tile has been linked to the container, so that it is possible to access other tiles in tile.execInit
     if (isInitConfigDone()) {
       for (T tile : tilesToInsert) {
-        tile.postInitConfig();
         tile.init();
       }
     }

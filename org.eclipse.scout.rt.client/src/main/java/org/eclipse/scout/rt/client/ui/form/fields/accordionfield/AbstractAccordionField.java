@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.accordionfield;
 
+import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.accordion.AbstractAccordion;
 import org.eclipse.scout.rt.client.ui.accordion.IAccordion;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
@@ -79,27 +81,8 @@ public abstract class AbstractAccordionField<T extends IAccordion> extends Abstr
   }
 
   @Override
-  protected void initFieldInternal() {
-    super.initFieldInternal();
-    if (getAccordion() != null) {
-      getAccordion().init();
-    }
-  }
-
-  @Override
-  protected void postInitConfigInternal() {
-    super.postInitConfigInternal();
-    if (getAccordion() != null) {
-      getAccordion().postInitConfig();
-    }
-  }
-
-  @Override
-  protected void disposeFieldInternal() {
-    if (getAccordion() != null) {
-      getAccordion().dispose();
-    }
-    super.disposeFieldInternal();
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), Collections.singletonList(getAccordion()));
   }
 
   /**
@@ -114,6 +97,9 @@ public abstract class AbstractAccordionField<T extends IAccordion> extends Abstr
 
   @Override
   protected boolean execIsEmpty() {
+    if (!super.execIsEmpty()) {
+      return false;
+    }
     return getAccordion().getGroups().isEmpty();
   }
 

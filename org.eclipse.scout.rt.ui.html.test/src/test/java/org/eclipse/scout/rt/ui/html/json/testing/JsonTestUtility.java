@@ -20,9 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionBindingListener;
 
-import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
-import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.commons.HttpSessionMutex;
@@ -164,35 +161,4 @@ public final class JsonTestUtility {
   public static JSONObject getPropertyChange(JSONObject json, int index) throws JSONException {
     return getEvent(json, index).getJSONObject("properties");
   }
-
-  public static void initField(ICompositeField compositeField) {
-    InitFieldVisitor visitor = new InitFieldVisitor();
-    compositeField.visitFields(visitor);
-    visitor.handleResult();
-  }
-
-  // copy from FormUtility
-  private static class InitFieldVisitor implements IFormFieldVisitor {
-    private RuntimeException m_firstEx;
-
-    @Override
-    public boolean visitField(IFormField field, int level, int fieldIndex) {
-      try {
-        field.init();
-      }
-      catch (RuntimeException e) {
-        if (m_firstEx == null) {
-          m_firstEx = e;
-        }
-      }
-      return true;
-    }
-
-    public void handleResult() {
-      if (m_firstEx != null) {
-        throw m_firstEx;
-      }
-    }
-  }
-
 }

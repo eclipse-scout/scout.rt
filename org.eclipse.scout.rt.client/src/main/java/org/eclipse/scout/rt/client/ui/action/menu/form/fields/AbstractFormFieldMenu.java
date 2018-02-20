@@ -10,10 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu.form.fields;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 @ClassId("eb87dee2-72ae-4a15-90d7-ce3b38beb10a")
 public abstract class AbstractFormFieldMenu extends AbstractMenu implements IFormFieldMenu {
@@ -32,6 +37,11 @@ public abstract class AbstractFormFieldMenu extends AbstractMenu implements IFor
   protected Class<? extends IFormField> getConfiguredField() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     return ConfigurationUtility.filterClassIgnoringInjectFieldAnnotation(dca, IFormField.class);
+  }
+
+  @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), Collections.singletonList(m_field));
   }
 
   @Override

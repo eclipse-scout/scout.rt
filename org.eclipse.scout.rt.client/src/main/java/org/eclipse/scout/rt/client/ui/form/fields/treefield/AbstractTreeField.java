@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.treefield;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.dto.FormData;
@@ -23,11 +24,11 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.treefield.TreeFieldC
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treefield.TreeFieldChains.TreeFieldSaveDeletedNodeChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treefield.TreeFieldChains.TreeFieldSaveInsertedNodeChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treefield.TreeFieldChains.TreeFieldSaveUpdatedNodeChain;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
@@ -41,12 +42,16 @@ import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.visitor.DepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 
 @ClassId("bfbf00d0-b70a-48d4-8481-4faff294f37f")
 @FormData(value = AbstractTreeFieldData.class, sdkCommand = SdkCommand.USE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE)
 public abstract class AbstractTreeField extends AbstractFormField implements ITreeField {
+
   private ITree m_tree;
   private boolean m_treeExternallyManaged;
   private boolean m_autoExpandAll;
@@ -88,6 +93,11 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
   @Override
   protected int getConfiguredGridH() {
     return 3;
+  }
+
+  @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), Collections.singletonList(getTree()));
   }
 
   /**
@@ -186,22 +196,19 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
   }
 
   @Override
-  protected void initFieldInternal() {
-    if (m_tree != null && !m_treeExternallyManaged) {
-      m_tree.init();
+  protected void disposeChildren(List<? extends IWidget> widgetsToDispose) {
+    if (m_treeExternallyManaged) {
+      widgetsToDispose.remove(getTree());
     }
-    if (getConfiguredAutoLoad()) {
-      loadRootNode();
-    }
-    super.initFieldInternal();
+    super.disposeChildren(widgetsToDispose);
   }
 
   @Override
-  protected void disposeFieldInternal() {
-    super.disposeFieldInternal();
-    if (m_tree != null && !m_treeExternallyManaged) {
-      m_tree.dispose();
+  protected void initChildren(List<? extends IWidget> widgets) {
+    if (m_treeExternallyManaged) {
+      widgets.remove(getTree());
     }
+    super.initChildren(widgets);
   }
 
   @Override
@@ -320,6 +327,10 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
 
   @Override
   protected boolean execIsSaveNeeded() {
+    boolean saveNeeded = super.execIsSaveNeeded();
+    if (saveNeeded) {
+      return true;
+    }
     if (m_tree == null) {
       return false;
     }
@@ -333,13 +344,15 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
     if (m_tree != null && !m_treeExternallyManaged) {
       try {
         m_tree.setTreeChanging(true);
-        //
-        ITreeVisitor v = node -> {
-          if (!node.isStatusNonchanged()) {
-            node.setStatusInternal(ITreeNode.STATUS_NON_CHANGED);
-            m_tree.updateNode(node);
+        IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+          @Override
+          public TreeVisitResult preVisit(ITreeNode node, int level, int index) {
+            if (!node.isStatusNonchanged()) {
+              node.setStatusInternal(ITreeNode.STATUS_NON_CHANGED);
+              m_tree.updateNode(node);
+            }
+            return TreeVisitResult.CONTINUE;
           }
-          return true;
         };
         m_tree.visitNode(m_tree.getRootNode(), v);
         m_tree.clearDeletedNodes();
@@ -352,6 +365,9 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
 
   @Override
   protected boolean execIsEmpty() {
+    if (!super.execIsEmpty()) {
+      return false;
+    }
     if (m_tree != null) {
       if (m_tree.isRootNodeVisible()) {
         if (m_tree.getRootNode() != null) {

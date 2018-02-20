@@ -213,6 +213,12 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     updateLabelComposition();
     hideFieldStatusOfChildren();
     // attach change triggers
+  }
+
+  @Override
+  protected void initConfigInternal() {
+    super.initConfigInternal();
+    // add listener after init-config has been executed to ensure no events are fired during init-config.
     attachCheckFromToListeners();
   }
 
@@ -286,8 +292,8 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   }
 
   @Override
-  protected void handleFieldVisibilityChanged() {
-    super.handleFieldVisibilityChanged();
+  protected void handleChildFieldVisibilityChanged() {
+    super.handleChildFieldVisibilityChanged();
     if (isInitConfigDone()) {
       // box is only visible when it has at least one visible item
       rebuildFieldGrid();

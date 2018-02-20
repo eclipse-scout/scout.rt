@@ -20,6 +20,9 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.platform.util.visitor.DepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 /**
@@ -147,16 +150,21 @@ public class IncrementalTreeBuilder<LOOKUP_KEY> {
    */
   public Map<LOOKUP_KEY, ILookupRow<LOOKUP_KEY>> createParentMap(ITree tree) {
     final Map<LOOKUP_KEY, ILookupRow<LOOKUP_KEY>> map = new HashMap<>();
-    tree.visitTree(node -> {
-      ITreeNode parent = node.getParentNode();
-      ILookupRow<LOOKUP_KEY> row = getLookupRow(node);
-      if (row != null) {
-        LOOKUP_KEY key = row.getKey();
-        m_keyCache.put(key, row);
-        map.put(key, getLookupRow(parent));
+    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+      @Override
+      public TreeVisitResult preVisit(ITreeNode node, int level, int index) {
+        ITreeNode parent = node.getParentNode();
+        ILookupRow<LOOKUP_KEY> row = getLookupRow(node);
+        if (row != null) {
+          LOOKUP_KEY key = row.getKey();
+          m_keyCache.put(key, row);
+          map.put(key, getLookupRow(parent));
+        }
+        return TreeVisitResult.CONTINUE;
       }
-      return true;
-    });
+    };
+
+    tree.visitTree(v);
     return map;
   }
 

@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.client.ui.form.fields;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
-import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldVisibilityTest.P_GroupBox.P_RadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldVisibilityTest.P_GroupBox.P_RadioButtonGroup.P_Button1;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldVisibilityTest.P_GroupBox.P_RadioButtonGroup.P_Button2;
@@ -44,16 +44,15 @@ public class FormFieldVisibilityTest {
   public void testVisitFields() {
     ICompositeField field = createFixture();
     final AtomicInteger counter = new AtomicInteger(0);
-    field.visitFields(new IFormFieldVisitor() {
+    field.visit(new Consumer<IFormField>() {
       @Override
-      public boolean visitField(IFormField f, int level, int fieldIndex) {
+      public void accept(IFormField f) {
         if (f.getClass().getName().startsWith(FormFieldVisibilityTest.class.getName())) {
           // ignore the filter boxes of treebox and listbox
           counter.incrementAndGet();
         }
-        return true;
       }
-    });
+    }, IFormField.class);
     Assert.assertEquals(12, counter.intValue());
   }
 
@@ -61,44 +60,32 @@ public class FormFieldVisibilityTest {
   public void testVisitParents() {
     ICompositeField root = createFixture();
     final AtomicInteger counter01 = new AtomicInteger(0);
-    root.getFieldByClass(P_Seq.class).visitParents(new IFormFieldVisitor() {
-      @Override
-      public boolean visitField(IFormField f, int level, int fieldIndex) {
-        counter01.incrementAndGet();
-        return true;
-      }
+    root.getFieldByClass(P_Seq.class).visitParents(field -> {
+      counter01.incrementAndGet();
+      return true;
     });
     Assert.assertEquals(4, counter01.intValue());
 
     final AtomicInteger counter02 = new AtomicInteger(0);
-    root.getFieldByClass(P_Button2.class).visitParents(new IFormFieldVisitor() {
-      @Override
-      public boolean visitField(IFormField f, int level, int fieldIndex) {
-        counter02.incrementAndGet();
-        return true;
-      }
+    root.getFieldByClass(P_Button2.class).visitParents(field -> {
+      counter02.incrementAndGet();
+      return true;
     });
     Assert.assertEquals(2, counter02.intValue());
 
     final AtomicInteger counter03 = new AtomicInteger(0);
-    root.visitParents(new IFormFieldVisitor() {
-      @Override
-      public boolean visitField(IFormField f, int level, int fieldIndex) {
-        counter03.incrementAndGet();
-        return true;
-      }
+    root.visitParents(field -> {
+      counter03.incrementAndGet();
+      return true;
     });
     Assert.assertEquals(0, counter03.intValue());
 
     final AtomicInteger counter04 = new AtomicInteger(0);
     final Holder<Object> lastVisited = new Holder<>(Object.class);
-    root.getFieldByClass(P_Seq.class).visitParents(new IFormFieldVisitor() {
-      @Override
-      public boolean visitField(IFormField f, int level, int fieldIndex) {
-        counter04.incrementAndGet();
-        lastVisited.setValue(f);
-        return counter04.intValue() <= 1;
-      }
+    root.getFieldByClass(P_Seq.class).visitParents(field -> {
+      counter04.incrementAndGet();
+      lastVisited.setValue(field);
+      return counter04.intValue() <= 1;
     });
     Assert.assertEquals(2, counter04.intValue());
     Assert.assertSame(lastVisited.getValue(), root.getFieldByClass(Tab1.class));

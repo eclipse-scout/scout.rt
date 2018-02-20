@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields.wrappedform;
 
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 import org.eclipse.scout.rt.client.ui.form.NullFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -61,14 +60,4 @@ public interface IWrappedFormField<T extends IForm> extends IFormField {
   boolean isInitialFocusEnabled();
 
   void setInitialFocusEnabled(boolean initialFocusEnabled);
-
-  /**
-   * Visits this field and all fields of the inner form recursively.
-   *
-   * @param visitor
-   *          The visitor to use. Must not be <code>null</code>.
-   * @return <code>true</code> if all fields have been visited. <code>false</code> if the visitor cancelled the visit.
-   * @see IFormFieldVisitor#visitField(IFormField, int, int)
-   */
-  boolean visitFields(IFormFieldVisitor visitor);
 }

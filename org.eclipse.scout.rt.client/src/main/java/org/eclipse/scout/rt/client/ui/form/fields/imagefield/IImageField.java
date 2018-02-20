@@ -10,11 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.imagefield;
 
-import java.util.List;
-
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.data.basic.AffineTransformSpec;
@@ -35,7 +31,7 @@ import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
  * <li>The ZoomOutKeyStroke reacts on '-' and calls doRelativeZoom(1.0/getZoomDeltaValue(),1.0/getZoomDeltaValue())
  * </ul>
  */
-public interface IImageField extends IFormField, IDNDSupport {
+public interface IImageField extends IFormField, IDNDSupport, IContextMenuOwner {
   String PROP_IMAGE_URL = "imageUrl";
   String PROP_IMAGE_ID = "imageId";
   String PROP_IMAGE = "image";
@@ -57,9 +53,6 @@ public interface IImageField extends IFormField, IDNDSupport {
   void setImage(Object imgObj);
 
   byte[] getByteArrayValue();
-
-  @Override
-  List<IKeyStroke> getKeyStrokes();
 
   boolean isAutoFit();
 
@@ -120,14 +113,4 @@ public interface IImageField extends IFormField, IDNDSupport {
   boolean isScrollBarEnabled();
 
   void setScrollBarEnabled(boolean b);
-
-  /**
-   * @return
-   */
-  List<IMenu> getMenus();
-
-  /**
-   * @return
-   */
-  IContextMenu getContextMenu();
 }

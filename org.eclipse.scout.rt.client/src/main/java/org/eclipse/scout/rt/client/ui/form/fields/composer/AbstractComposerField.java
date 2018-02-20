@@ -33,11 +33,11 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFie
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFieldChains.ComposerFieldResolveRootPathForTopLevelAttributeChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFieldChains.ComposerFieldResolveRootPathForTopLevelEntityChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.IComposerFieldExtension;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
@@ -55,6 +55,9 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
+import org.eclipse.scout.rt.platform.util.visitor.DepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerAttributeNodeData;
@@ -366,16 +369,10 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   /*
    * Runtime
    */
-  @Override
-  protected void initFieldInternal() {
-    getTree().init();
-    super.initFieldInternal();
-  }
 
   @Override
-  protected void disposeFieldInternal() {
-    super.disposeFieldInternal();
-    getTree().dispose();
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), Collections.singletonList(getTree()));
   }
 
   @Override
@@ -692,6 +689,11 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   @Override
   protected boolean execIsSaveNeeded() {
+    boolean saveNeeded = super.execIsSaveNeeded();
+    if (saveNeeded) {
+      return true;
+    }
+
     if (m_tree == null) {
       return false;
     }
@@ -704,13 +706,15 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   protected void execMarkSaved() {
     try {
       m_tree.setTreeChanging(true);
-      //
-      ITreeVisitor v = node -> {
-        if (!node.isStatusNonchanged()) {
-          node.setStatusInternal(ITreeNode.STATUS_NON_CHANGED);
-          m_tree.updateNode(node);
+      IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+        @Override
+        public TreeVisitResult preVisit(ITreeNode node, int level, int index) {
+          if (!node.isStatusNonchanged()) {
+            node.setStatusInternal(ITreeNode.STATUS_NON_CHANGED);
+            m_tree.updateNode(node);
+          }
+          return TreeVisitResult.CONTINUE;
         }
-        return true;
       };
       m_tree.visitNode(m_tree.getRootNode(), v);
       m_tree.clearDeletedNodes();
@@ -724,6 +728,9 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   @Override
   protected boolean execIsEmpty() {
+    if (!super.execIsEmpty()) {
+      return false;
+    }
     if (m_tree.getRootNode() != null && m_tree.getRootNode().getChildNodeCount() > 0) {
       return false;
     }
@@ -757,12 +764,16 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       super.execDisposeTree();
 
       // dispose nodes (not necessary to remove them, dispose is sufficient)
-      visitTree(node -> {
-        if (node instanceof AbstractComposerNode) {
-          ((AbstractComposerNode) node).dispose();
+      IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+        @Override
+        public TreeVisitResult preVisit(ITreeNode node, int level, int index) {
+          if (node instanceof AbstractComposerNode) {
+            ((AbstractComposerNode) node).dispose();
+          }
+          return TreeVisitResult.CONTINUE;
         }
-        return true;
-      });
+      };
+      visitTree(v);
     }
 
     @Override

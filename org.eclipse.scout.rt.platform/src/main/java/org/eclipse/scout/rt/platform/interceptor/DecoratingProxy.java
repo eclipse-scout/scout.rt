@@ -23,8 +23,6 @@ import org.eclipse.scout.rt.platform.util.FinalValue;
 /**
  * Proxy implementation that can wrap around instances. It automatically handles the methods equals(), hashCode() and
  * toString() and delegates to the wrapped instance.
- *
- * @author Matthias Villiger
  */
 public class DecoratingProxy<INSTANCE> {
 

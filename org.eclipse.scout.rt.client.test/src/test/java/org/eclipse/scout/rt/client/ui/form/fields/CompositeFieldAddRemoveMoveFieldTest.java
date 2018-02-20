@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.fixture.AddRemoveFie
 import org.eclipse.scout.rt.client.extension.ui.form.fields.fixture.AddRemoveFieldsForm.MainBox.TopBox.TopBoxField;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.fixture.AddRemoveStringField;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -37,7 +38,7 @@ import org.junit.runner.RunWith;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtensionTestCase {
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testRemoveFieldNull() throws Exception {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.getTopBox().removeField(null);
@@ -54,20 +55,20 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
     assertNoFieldPropertyChangeListener(field);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testRemoveFieldForeignBox() throws Exception {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.getTopBox().removeField(form.getBottomBoxField());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testRemoveFieldForeignForm() throws Exception {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     AddRemoveFieldsForm otherForm = new AddRemoveFieldsForm();
     form.getTopBox().removeField(otherForm.getTopBoxField());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testRemoveFieldTwice() throws Exception {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     TopBoxField field = form.getTopBoxField();
@@ -107,25 +108,25 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
     assertNoFieldPropertyChangeListener(field);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testAddFieldNull() throws Exception {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.getTopBox().addField(null);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testAddFieldExistingInBox() throws Exception {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.getTopBox().addField(form.getTopBoxField());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testAddFieldExistingInOtherBox() throws Exception {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.getTopBox().addField(form.getBottomBoxField());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testAddFieldExistingInOtherForm() throws Exception {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     AddRemoveFieldsForm otherForm = new AddRemoveFieldsForm();
@@ -146,7 +147,7 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
     assertFieldPropertyChangeListener(field);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testAddFieldRemovedFromOtherForm() throws Exception {
     AddRemoveFieldsForm otherForm = new AddRemoveFieldsForm();
     TopBoxField field = otherForm.getTopBoxField();
@@ -166,7 +167,7 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
     assertFieldPropertyChangeListener(field);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testAddFieldDynamicTwice() throws Exception {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     AddRemoveStringField field = new AddRemoveStringField();
@@ -201,7 +202,6 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
     Assert.assertEquals(2, form.getTopBox().getFieldCount());
     Assert.assertTrue(field.isInitDone());
     Assert.assertTrue(field.isInitConfigDone());
-    Assert.assertTrue(field.isPostInitConfigDone());
   }
 
   @Test
@@ -217,13 +217,13 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
     assertSame(form, field.getForm());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testMoveFieldNullField() throws Exception {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.getTopBox().moveFieldTo(null, form.getBottomBox());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testMoveFieldNullNewContainer() throws Exception {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.getTopBox().moveFieldTo(form.getTopBoxField(), null);
@@ -301,13 +301,13 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
     assertEquals(0, count);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testMoveFieldForeignBox() throws Exception {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.getTopBox().moveFieldTo(form.getBottomBoxField(), form.getBottomBox());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testMoveFieldForeignForm() throws Exception {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     AddRemoveFieldsForm otherForm = new AddRemoveFieldsForm();

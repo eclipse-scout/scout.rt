@@ -85,7 +85,7 @@ public class FindFieldByFormDataIdVisitorTest {
   @Test
   public void testGetFirstFieldWithoutForm() throws Exception {
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(FIRST_FIELD_DATA_ID);
-    m_mainForm.visitFields(visitor);
+    m_mainForm.visit(visitor, IFormField.class);
     IFormField field = visitor.getField();
     assertNotNull(field);
     assertSame(m_mainForm.getFirstField(), field);
@@ -94,7 +94,7 @@ public class FindFieldByFormDataIdVisitorTest {
   @Test
   public void testGetFirstFieldOnMainForm() throws Exception {
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(FIRST_FIELD_DATA_ID, m_mainForm);
-    m_mainForm.visitFields(visitor);
+    m_mainForm.visit(visitor, IFormField.class);
     IFormField field = visitor.getField();
     assertNotNull(field);
     assertSame(m_mainForm.getFirstField(), field);
@@ -104,7 +104,7 @@ public class FindFieldByFormDataIdVisitorTest {
   public void testGetFirstFieldOnInnerForm() throws Exception {
     InnerForm innerForm = m_mainForm.getWrappedFormField().getInnerForm();
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(FIRST_FIELD_DATA_ID, innerForm);
-    innerForm.visitFields(visitor);
+    innerForm.visit(visitor, IFormField.class);
     IFormField field = visitor.getField();
     assertNotNull(field);
     assertSame(innerForm.getFirstField(), field);
@@ -114,7 +114,7 @@ public class FindFieldByFormDataIdVisitorTest {
   public void testGetFirstFieldOnInnerInnerForm() throws Exception {
     InnerInnerForm innerInnerForm = m_mainForm.getWrappedFormField().getInnerForm().getWrappedFormField().getInnerForm();
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(FIRST_FIELD_DATA_ID, innerInnerForm);
-    innerInnerForm.visitFields(visitor);
+    innerInnerForm.visit(visitor, IFormField.class);
     IFormField field = visitor.getField();
     assertNotNull(field);
     assertSame(innerInnerForm.getFirstField(), field);
@@ -127,7 +127,7 @@ public class FindFieldByFormDataIdVisitorTest {
   @Test
   public void testGetSecondFieldWithoutForm() throws Exception {
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(SECOND_FIELD_DATA_ID);
-    m_mainForm.visitFields(visitor);
+    m_mainForm.visit(visitor, IFormField.class);
     IFormField field = visitor.getField();
     assertNotNull(field);
     assertSame(m_mainForm.getWrappedFormField().getInnerForm().getSecondField(), field);
@@ -136,7 +136,7 @@ public class FindFieldByFormDataIdVisitorTest {
   @Test
   public void testGetSecondFieldOnMainForm() throws Exception {
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(SECOND_FIELD_DATA_ID, m_mainForm);
-    m_mainForm.visitFields(visitor);
+    m_mainForm.visit(visitor, IFormField.class);
     IFormField field = visitor.getField();
     assertNotNull(field);
     assertSame(m_mainForm.getWrappedFormField().getInnerForm().getSecondField(), field);
@@ -146,7 +146,7 @@ public class FindFieldByFormDataIdVisitorTest {
   public void testGetSecondFieldOnInnerForm() throws Exception {
     InnerForm innerForm = m_mainForm.getWrappedFormField().getInnerForm();
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(SECOND_FIELD_DATA_ID, innerForm);
-    innerForm.visitFields(visitor);
+    innerForm.visit(visitor, IFormField.class);
     IFormField field = visitor.getField();
     assertNotNull(field);
     assertSame(innerForm.getSecondField(), field);
@@ -156,7 +156,7 @@ public class FindFieldByFormDataIdVisitorTest {
   public void testGetSecondFieldOnInnerInnerForm() throws Exception {
     InnerInnerForm innerInnerForm = m_mainForm.getWrappedFormField().getInnerForm().getWrappedFormField().getInnerForm();
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(SECOND_FIELD_DATA_ID, innerInnerForm);
-    innerInnerForm.visitFields(visitor);
+    innerInnerForm.visit(visitor, IFormField.class);
     IFormField field = visitor.getField();
     assertNotNull(field);
     assertSame(innerInnerForm.getSecondField(), field);
@@ -169,7 +169,7 @@ public class FindFieldByFormDataIdVisitorTest {
   @Test
   public void testGetThirdFieldWithoutForm() throws Exception {
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(THIRD_FIELD_DATA_ID);
-    m_mainForm.visitFields(visitor);
+    m_mainForm.visit(visitor, IFormField.class);
     IFormField field = visitor.getField();
     assertNotNull(field);
     assertSame(m_mainForm.getWrappedFormField().getInnerForm().getWrappedFormField().getInnerForm().getThirdField(), field);
@@ -178,7 +178,7 @@ public class FindFieldByFormDataIdVisitorTest {
   @Test
   public void testGetThirdFieldOnMainForm() throws Exception {
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(THIRD_FIELD_DATA_ID, m_mainForm);
-    m_mainForm.visitFields(visitor);
+    m_mainForm.visit(visitor, IFormField.class);
     IFormField field = visitor.getField();
     assertNotNull(field);
     assertSame(m_mainForm.getWrappedFormField().getInnerForm().getWrappedFormField().getInnerForm().getThirdField(), field);
@@ -188,7 +188,7 @@ public class FindFieldByFormDataIdVisitorTest {
   public void testGetThirdFieldOnInnerForm() throws Exception {
     InnerForm innerForm = m_mainForm.getWrappedFormField().getInnerForm();
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(THIRD_FIELD_DATA_ID, innerForm);
-    innerForm.visitFields(visitor);
+    innerForm.visit(visitor, IFormField.class);
     IFormField field = visitor.getField();
     assertNotNull(field);
     assertSame(innerForm.getWrappedFormField().getInnerForm().getThirdField(), field);
@@ -198,7 +198,7 @@ public class FindFieldByFormDataIdVisitorTest {
   public void testGetThirdFieldOnInnerInnerForm() throws Exception {
     InnerInnerForm innerInnerForm = m_mainForm.getWrappedFormField().getInnerForm().getWrappedFormField().getInnerForm();
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(THIRD_FIELD_DATA_ID, innerInnerForm);
-    innerInnerForm.visitFields(visitor);
+    innerInnerForm.visit(visitor, IFormField.class);
     IFormField field = visitor.getField();
     assertNotNull(field);
     assertSame(innerInnerForm.getThirdField(), field);

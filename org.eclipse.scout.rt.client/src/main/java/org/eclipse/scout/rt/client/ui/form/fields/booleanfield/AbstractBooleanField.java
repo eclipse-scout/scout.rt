@@ -162,6 +162,9 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
    */
   @Override
   protected boolean execIsEmpty() {
+    if (!areChildrenEmpty()) {
+      return false;
+    }
     return !isChecked();
   }
 

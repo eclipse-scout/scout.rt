@@ -1,8 +1,12 @@
 package org.eclipse.scout.rt.client.ui.tile;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * @since 7.1
@@ -29,16 +33,6 @@ public abstract class AbstractWidgetTile<T extends IWidget> extends AbstractTile
     if (getTileWidget() == null) {
       throw new IllegalStateException("TileWidget must not be null]");
     }
-  }
-
-  @Override
-  public void postInitConfigInternal() {
-    super.postInitConfigInternal();
-    postInitTileWidgetConfig();
-  }
-
-  protected void postInitTileWidgetConfig() {
-    getTileWidget().postInitConfig();
   }
 
   /**
@@ -72,23 +66,7 @@ public abstract class AbstractWidgetTile<T extends IWidget> extends AbstractTile
   }
 
   @Override
-  protected void initTileInternal() {
-    super.initTileInternal();
-    initTileWidget();
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), Collections.singletonList(getTileWidget()));
   }
-
-  @Override
-  protected void disposeTileInternal() {
-    disposeTileWidget();
-    super.disposeTileInternal();
-  }
-
-  protected void initTileWidget() {
-    getTileWidget().init();
-  }
-
-  protected void disposeTileWidget() {
-    getTileWidget().dispose();
-  }
-
 }

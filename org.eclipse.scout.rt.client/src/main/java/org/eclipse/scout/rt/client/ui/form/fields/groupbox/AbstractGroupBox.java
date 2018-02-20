@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.groupbox.IGroupBoxExtension;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
@@ -225,7 +225,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   }
 
   /**
-   * Configures whether this group box should be scrollable in horizontal direction.</br>
+   * Configures whether this group box should be scrollable in vertical direction.</br>
    * If the property is set to {@link TriState#TRUE}, a vertical scrollbar will appear if the content is too large to be
    * displayed.<br>
    * If the property is set to {@link TriState#UNDEFINED}, it will be true if the groupbox is the mainbox in a form.
@@ -344,13 +344,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     setContextMenu(contextMenu);
   }
 
-  @Override
-  protected void initFieldInternal() {
-    super.initFieldInternal();
-    // init actions
-    ActionUtility.initActions(getMenus());
-  }
-
   private void categorizeFields() {
     // categorize items
     List<IFormField> controlList = new ArrayList<>();
@@ -408,6 +401,11 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    *          live and mutable collection of configured menus
    */
   protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
+  }
+
+  @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), getMenus());
   }
 
   protected void setContextMenu(IFormFieldContextMenu contextMenu) {
@@ -584,8 +582,8 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
 
   // box is only visible when it has at least one visible item
   @Override
-  protected void handleFieldVisibilityChanged() {
-    super.handleFieldVisibilityChanged();
+  protected void handleChildFieldVisibilityChanged() {
+    super.handleChildFieldVisibilityChanged();
     if (isInitConfigDone()) {
       rebuildFieldGrid();
     }
@@ -698,12 +696,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   public int getBackgroundImageHorizontalAlignment() {
     return propertySupport.getPropertyInt(PROP_BACKGROUND_IMAGE_HORIZONTAL_ALIGNMENT);
-  }
-
-  @Override
-  protected void disposeFieldInternal() {
-    super.disposeFieldInternal();
-    ActionUtility.disposeActions(getMenus());
   }
 
   protected class P_UIFacade implements IGroupBoxUIFacade {

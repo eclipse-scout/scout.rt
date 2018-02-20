@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.Ca
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.CalendarInitCalendarChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.ICalendarExtension;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.CalendarMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -71,7 +72,6 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractCalendar extends AbstractWidget implements ICalendar, IContributionOwner, IExtensibleObject {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractCalendar.class);
 
-  private boolean m_initConfigDone;
   private List<ICalendarItemProvider> m_providers;
   private final Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> m_componentsByProvider;
   private ICalendarUIFacade m_uiFacade;
@@ -122,11 +122,13 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
   }
 
   @Override
-  protected void callInitializer() {
-    if (!m_initConfigDone) {
-      interceptInitConfig();
-      m_initConfigDone = true;
-    }
+  protected void initConfigInternal() {
+    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
+  }
+
+  @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), getMenus());
   }
 
   /*
@@ -216,10 +218,6 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
   @ConfigOperation
   @Order(20)
   protected void execFilterCalendarItems(Set<Class<? extends ICalendarItemProvider>> changedProviderTypes, Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> componentsByProvider) {
-  }
-
-  protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
   @Override
@@ -323,18 +321,12 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
   @Override
   protected void initInternal() {
     super.initInternal();
-    // init menus
-    ActionUtility.initActions(getMenus());
+
     interceptInitCalendar();
-    /*
-     * add property change listener to - reload calendar items when view range
-     * changes
-     */
-    addPropertyChangeListener(e -> {
-      if (e.getPropertyName().equals(PROP_VIEW_RANGE)) {
-        updateComponentsInternal(m_providers);
-      }
-    });
+
+    // add property change listener to - reload calendar items when view range changes
+    addPropertyChangeListener(PROP_VIEW_RANGE, e -> updateComponentsInternal(m_providers));
+
     updateComponentsInternal(m_providers);
   }
 
@@ -348,8 +340,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     init();
   }
 
-  private void disposeCalendarInternal() {
-    ActionUtility.disposeActions(getMenus());
+  protected void disposeCalendarInternal() {
     for (ICalendarItemProvider p : m_providers) {
       try {
         p.disposeProvider();
@@ -361,7 +352,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
   }
 
   @Override
-  protected void disposeInternal() {
+  protected final void disposeInternal() {
     disposeCalendarInternal();
     try {
       interceptDisposeCalendar();

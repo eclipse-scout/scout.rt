@@ -12,11 +12,9 @@ package org.eclipse.scout.rt.client.ui.action.menu;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -69,20 +67,6 @@ public class MenuUtilityTest {
     TestContextMenu contextMenu = new TestContextMenu(mock(IPropertyObserver.class), Collections.singletonList(menu));
     when(m_contextMenuOwner.getContextMenu()).thenReturn(contextMenu);
     assertSame(menu, MenuUtility.getMenuByClass(m_contextMenuOwner, TestMenu.class));
-  }
-
-  @Test
-  public void testGetMenuByClassMenuExistsTwice() {
-    TestMenu menu1 = new TestMenu();
-    TestMenu menu2 = new TestMenu();
-    TestContextMenu contextMenu = new TestContextMenu(mock(IPropertyObserver.class), Arrays.asList(menu1, menu2));
-    when(m_contextMenuOwner.getContextMenu()).thenReturn(contextMenu);
-    try {
-      MenuUtility.getMenuByClass(m_contextMenuOwner, TestMenu.class);
-      fail("expecting an " + IllegalStateException.class.getName());
-    }
-    catch (IllegalStateException expected) {
-    }
   }
 
   private static class TestContextMenu extends AbstractContextMenu<IPropertyObserver> {

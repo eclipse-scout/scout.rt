@@ -16,10 +16,11 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
-import org.eclipse.scout.rt.client.ui.action.IActionFilter;
+import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.fixture.OwnerValueCapturingMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -75,7 +76,7 @@ public class TableMenuTest {
 
     // single hugo boss
     t.selectRows(CollectionUtility.arrayList(t.getRow(0)), false);
-    IActionFilter filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+    Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
     List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
     assertEquals(2, visibleMenus.size());
     assertEquals("SingleSelectionMenu", visibleMenus.get(0).getClass().getSimpleName());
@@ -99,7 +100,7 @@ public class TableMenuTest {
     ITableContextMenu contextMenu = t.getContextMenu();
     // multi selection
     t.selectRows(CollectionUtility.arrayList(t.getRow(0), t.getRow(1)), false);
-    IActionFilter filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+    Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
     List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
     assertEquals(1, visibleMenus.size());
     assertEquals("MultiSelectionMenu", visibleMenus.get(0).getClass().getSimpleName());
@@ -116,7 +117,7 @@ public class TableMenuTest {
     ITableContextMenu contextMenu = t.getContextMenu();
     // empty selection
     t.selectRows(CollectionUtility.<ITableRow> emptyArrayList(), false);
-    IActionFilter filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+    Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
     List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
     assertEquals(1, visibleMenus.size());
     assertEquals("EmptySpaceMenu", visibleMenus.get(0).getClass().getSimpleName());
@@ -133,7 +134,7 @@ public class TableMenuTest {
     ITableContextMenu contextMenu = t.getContextMenu();
 
     t.selectRows(CollectionUtility.<ITableRow> emptyArrayList(), false);
-    IActionFilter filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+    Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
     List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
     assertEquals(false, visibleMenus.get(0).isEnabled());
   }
@@ -149,7 +150,7 @@ public class TableMenuTest {
     ITableContextMenu contextMenu = t.getContextMenu();
 
     t.selectRows(CollectionUtility.arrayList(t.getRow(0)), false);
-    IActionFilter filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+    Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
     List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
     assertEquals(false, visibleMenus.get(0).isEnabled());
   }
@@ -166,7 +167,7 @@ public class TableMenuTest {
     t.getRow(0).setEnabled(false);
 
     t.selectRows(CollectionUtility.<ITableRow> emptyArrayList(), false);
-    IActionFilter filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+    Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
     List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
     assertEquals(true, visibleMenus.get(0).isEnabled());
   }
@@ -183,7 +184,7 @@ public class TableMenuTest {
     t.getRow(0).setEnabled(false);
 
     t.selectRows(CollectionUtility.arrayList(t.getRow(0)), false);
-    IActionFilter filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+    Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
     List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
     assertEquals(false, visibleMenus.get(0).isEnabled());
   }

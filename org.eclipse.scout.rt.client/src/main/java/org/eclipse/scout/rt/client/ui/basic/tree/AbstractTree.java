@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -42,8 +43,8 @@ import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.MouseButton;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -65,6 +66,11 @@ import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
+import org.eclipse.scout.rt.platform.util.visitor.CollectingVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.DepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.TreeTraversals;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.TreeNodeData;
@@ -147,7 +153,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
 
   @Override
   protected void initConfigInternal() {
-    interceptInitConfig();
+    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
   @Override
@@ -546,10 +552,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     }
   }
 
-  protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
-  }
-
   @Override
   protected void initConfig() {
     super.initConfig();
@@ -705,8 +707,12 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   protected final void initInternal() {
     super.initInternal();
     initTreeInternal();
-    ActionUtility.initActions(getMenus());
     interceptInitTree();
+  }
+
+  @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), getMenus(), getKeyStrokesInternal());
   }
 
   /**
@@ -741,7 +747,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   }
 
   protected void disposeTreeInternal() {
-    ActionUtility.disposeActions(getMenus());
     getRootNode().dispose();
     clearDeletedNodes();
   }
@@ -1129,17 +1134,24 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     }
 
     final Set<Object> keySet = new HashSet<>(primaryKeys);
-    P_AbstractCollectingTreeVisitor v = new P_AbstractCollectingTreeVisitor() {
+    CollectingVisitor<ITreeNode> v = new CollectingVisitor<ITreeNode>() {
+
       @Override
-      public boolean visit(ITreeNode node) {
-        if (keySet.remove(node.getPrimaryKey())) {
-          addNodeToList(node);
+      public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
+        super.preVisit(element, level, index);
+        if (keySet.isEmpty()) {
+          return TreeVisitResult.TERMINATE;
         }
-        return !keySet.isEmpty();
+        return TreeVisitResult.CONTINUE;
+      }
+
+      @Override
+      protected boolean accept(ITreeNode node) {
+        return keySet.remove(node.getPrimaryKey());
       }
     };
     visitNode(getRootNode(), v);
-    return v.getNodes();
+    return v.getCollection();
   }
 
   @Override
@@ -1595,7 +1607,11 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
 
   @Override
   public List<IKeyStroke> getKeyStrokes() {
-    return CollectionUtility.arrayList(propertySupport.<IKeyStroke> getPropertyList(PROP_KEY_STROKES));
+    return CollectionUtility.arrayList(getKeyStrokesInternal());
+  }
+
+  protected List<IKeyStroke> getKeyStrokesInternal() {
+    return propertySupport.<IKeyStroke> getPropertyList(PROP_KEY_STROKES);
   }
 
   @Override
@@ -1828,44 +1844,25 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   }
 
   @Override
-  public boolean visitTree(ITreeVisitor v) {
-    return TreeUtility.visitNodeRec(getRootNode(), v);
+  public TreeVisitResult visitTree(IDepthFirstTreeVisitor<ITreeNode> v) {
+    return TreeUtility.visitNode(getRootNode(), v);
   }
 
   @Override
-  public boolean visitNode(ITreeNode node, ITreeVisitor v) {
+  public TreeVisitResult visitNode(ITreeNode node, IDepthFirstTreeVisitor<ITreeNode> v) {
     return TreeUtility.visitNode(node, v);
   }
 
   @Override
-  public boolean visitVisibleTree(ITreeVisitor v) {
-    return visitVisibleNodeRec(getRootNode(), v, isRootNodeVisible());
-  }
+  public TreeVisitResult visitVisibleTree(IDepthFirstTreeVisitor<ITreeNode> v) {
+    Function<ITreeNode, List<? extends ITreeNode>> childrenSupplier = ITreeNode::getFilteredChildNodes;
 
-  private boolean visitVisibleNodeRec(ITreeNode node, ITreeVisitor v, boolean includeParent) {
-    if (node.isVisible()) {
-      if (includeParent) {
-        boolean b = v.visit(node);
-        if (!b) {
-          return b;
-        }
-      }
-      if (node.isExpanded()) {
-        List<ITreeNode> a = node.getFilteredChildNodes();
-        for (ITreeNode filteredChildNode : a) {
-          // it might be that the visit of a node detached the node from the
-          // tree
-          if (filteredChildNode.getTree() != null) {
-            boolean b = visitVisibleNodeRec(filteredChildNode, v, true);
-            if (!b) {
-              return b;
-            }
-          }
-        }
-
-      }
+    if (isRootNodeVisible()) {
+      return TreeTraversals.create(v, childrenSupplier).traverse(getRootNode());
     }
-    return true;
+
+    List<ITreeNode> visibleTopLevel = new ArrayList<>(childrenSupplier.apply(getRootNode()));
+    return TreeUtility.visitNodes(visibleTopLevel, v, childrenSupplier);
   }
 
   @Override
@@ -1882,11 +1879,8 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   public int getInsertedNodeCount() {
     P_AbstractCountingTreeVisitor v = new P_AbstractCountingTreeVisitor() {
       @Override
-      public boolean visit(ITreeNode node) {
-        if (node.isStatusInserted()) {
-          addCount(1);
-        }
-        return true;
+      protected boolean accept(ITreeNode node) {
+        return node.isStatusInserted();
       }
     };
     visitNode(getRootNode(), v);
@@ -1895,28 +1889,22 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
 
   @Override
   public Set<ITreeNode> getInsertedNodes() {
-    P_AbstractCollectingTreeVisitor v = new P_AbstractCollectingTreeVisitor() {
+    CollectingVisitor<ITreeNode> v = new CollectingVisitor<ITreeNode>() {
       @Override
-      public boolean visit(ITreeNode node) {
-        if (node.isStatusInserted()) {
-          addNodeToList(node);
-        }
-        return true;
+      protected boolean accept(ITreeNode element) {
+        return element.isStatusInserted();
       }
     };
     visitNode(getRootNode(), v);
-    return CollectionUtility.hashSet(v.getNodes());
+    return CollectionUtility.hashSet(v.getCollection());
   }
 
   @Override
   public int getUpdatedNodeCount() {
     P_AbstractCountingTreeVisitor v = new P_AbstractCountingTreeVisitor() {
       @Override
-      public boolean visit(ITreeNode node) {
-        if (node.isStatusUpdated()) {
-          addCount(1);
-        }
-        return true;
+      protected boolean accept(ITreeNode node) {
+        return node.isStatusUpdated();
       }
     };
     visitNode(getRootNode(), v);
@@ -1925,17 +1913,14 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
 
   @Override
   public Set<ITreeNode> getUpdatedNodes() {
-    P_AbstractCollectingTreeVisitor v = new P_AbstractCollectingTreeVisitor() {
+    CollectingVisitor<ITreeNode> v = new CollectingVisitor<ITreeNode>() {
       @Override
-      public boolean visit(ITreeNode node) {
-        if (node.isStatusUpdated()) {
-          addNodeToList(node);
-        }
-        return true;
+      protected boolean accept(ITreeNode element) {
+        return element.isStatusUpdated();
       }
     };
     visitNode(getRootNode(), v);
-    return CollectionUtility.hashSet(v.getNodes());
+    return CollectionUtility.hashSet(v.getCollection());
   }
 
   @Override
@@ -2019,29 +2004,27 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   public void selectNextNode() {
     final ITreeNode current = getSelectedNode();
     if (current != null) {
-      final Holder<ITreeNode> foundVisited = new Holder<>(ITreeNode.class);
-      ITreeVisitor v = new ITreeVisitor() {
+      final Holder<ITreeNode> next = new Holder<>(ITreeNode.class);
+      IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
         boolean m_foundCurrent;
 
         @Override
-        public boolean visit(ITreeNode node) {
+        public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
           if (m_foundCurrent) {
-            if (node.isFilterAccepted()) {
-              foundVisited.setValue(node);
+            if (element.isFilterAccepted()) {
+              next.setValue(element);
+              return TreeVisitResult.TERMINATE;
             }
-            return foundVisited.getValue() == null;
           }
           else {
-            if (node == current) {
-              m_foundCurrent = true;
-            }
-            return true;
+            m_foundCurrent = element == current;
           }
+          return TreeVisitResult.CONTINUE;
         }
       };
       visitVisibleTree(v);
-      if (foundVisited.getValue() != null) {
-        selectNode(foundVisited.getValue());
+      if (next.getValue() != null) {
+        selectNode(next.getValue());
       }
     }
     else {
@@ -2054,21 +2037,16 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     final ITreeNode current = getSelectedNode();
     if (current != null) {
       final Holder<ITreeNode> foundVisited = new Holder<>(ITreeNode.class);
-      ITreeVisitor v = new ITreeVisitor() {
-        boolean m_foundCurrent;
-
+      IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
         @Override
-        public boolean visit(ITreeNode node) {
-          if (m_foundCurrent) {
-            return false;
+        public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
+          if (element == current) {
+            return TreeVisitResult.TERMINATE;
           }
-          if (node == current) {
-            m_foundCurrent = true;
+          if (element.isFilterAccepted()) {
+            foundVisited.setValue(element);
           }
-          else if (node.isFilterAccepted()) {
-            foundVisited.setValue(node);
-          }
-          return true;
+          return TreeVisitResult.CONTINUE;
         }
       };
       visitVisibleTree(v);
@@ -2092,15 +2070,17 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
       }
     }
     final Holder<ITreeNode> foundVisited = new Holder<>(ITreeNode.class);
-    ITreeVisitor v = node -> {
-      if (foundVisited.getValue() != null) {
-        return false;
+    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+      @Override
+      public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
+        if (element.isFilterAccepted()) {
+          foundVisited.setValue(element);
+          return TreeVisitResult.TERMINATE;
+        }
+        return TreeVisitResult.CONTINUE;
       }
-      if (node.isFilterAccepted()) {
-        foundVisited.setValue(node);
-      }
-      return true;
     };
+
     visitVisibleTree(v);
     if (foundVisited.getValue() != null) {
       selectNode(foundVisited.getValue());
@@ -2118,11 +2098,14 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
       }
     }
     final Holder<ITreeNode> foundVisited = new Holder<>(ITreeNode.class);
-    ITreeVisitor v = node -> {
-      if (node.isFilterAccepted()) {
-        foundVisited.setValue(node);
+    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+      @Override
+      public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
+        if (element.isFilterAccepted()) {
+          foundVisited.setValue(element);
+        }
+        return TreeVisitResult.CONTINUE;
       }
-      return true;
     };
     visitVisibleTree(v);
     if (foundVisited.getValue() != null) {
@@ -2813,23 +2796,20 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     m_flags = FLAGS_BIT_HELPER.changeBit(SAVE_AND_RESTORE_SCROLLBARS, b, m_flags);
   }
 
-  private abstract static class P_AbstractCollectingTreeVisitor implements ITreeVisitor {
-    private final List<ITreeNode> m_list = new ArrayList<>();
+  private abstract static class P_AbstractCountingTreeVisitor extends DepthFirstTreeVisitor<ITreeNode> {
 
-    protected void addNodeToList(ITreeNode node) {
-      m_list.add(node);
-    }
-
-    public List<ITreeNode> getNodes() {
-      return CollectionUtility.arrayList(m_list);
-    }
-  }// end private class
-
-  private abstract static class P_AbstractCountingTreeVisitor implements ITreeVisitor {
     private int m_count;
 
-    protected void addCount(int n) {
-      m_count += n;
+    @Override
+    public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
+      if (accept(element)) {
+        m_count++;
+      }
+      return TreeVisitResult.CONTINUE;
+    }
+
+    protected boolean accept(ITreeNode node) {
+      return true;
     }
 
     public int getCount() {

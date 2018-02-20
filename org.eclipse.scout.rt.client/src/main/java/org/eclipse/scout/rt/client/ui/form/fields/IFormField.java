@@ -13,12 +13,12 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 import java.beans.PropertyChangeListener;
 import java.security.Permission;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
@@ -219,7 +219,7 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
   void removeSubtreePropertyChangeListener(String propName, PropertyChangeListener listener);
 
   /**
-   * do not use this internal method
+   * do not use this internal method. Sets the form of this field and all its child fields.
    */
   void setFormInternal(IForm form);
 
@@ -424,6 +424,8 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
 
   void setMandatory(boolean b);
 
+  void setMandatory(boolean b, boolean recursive);
+
   /**
    * Adds an error status to field. use {@link ScoutFieldStatus} in order to set a custom icon.
    *
@@ -592,6 +594,8 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
    *          {@code true} if status icon should be visible, {@code false} otherwise
    */
   void setStatusVisible(boolean statusVisible);
+
+  void setStatusVisible(boolean statusVisible, boolean recursive);
 
   String getStatusPosition();
 
@@ -985,40 +989,58 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
   void setEnabled(boolean enabled, boolean updateParents, boolean updateChildren, String dimension);
 
   /**
-   * Accepts the given {@link IFormFieldVisitor}. This {@link IFormField} and all child {@link IFormField}s are visited
-   * recursively.
-   *
-   * @param visitor
-   *          The {@link IFormFieldVisitor} to use. Must not be <code>null</code>.
-   * @param level
-   *          The start level. Usually zero.
-   * @param fieldIndex
-   *          The field index of this {@link IFormField} in its parent list.
-   * @param includeThis
-   *          <code>true</code> if this {@link IFormField} and all children should be visited. <code>false</code> if
-   *          only the child {@link IFormField}s should be visited.
-   * @return <code>true</code> if all fields have been visited. <code>false</code> if the visitor cancelled the visit.
-   * @see IFormFieldVisitor#visitField(IFormField, int, int)
-   */
-  boolean acceptVisitor(IFormFieldVisitor visitor, int level, int fieldIndex, boolean includeThis);
-
-  /**
    * Visits all parent {@link IFormField}s
    *
    * @param v
-   *          The {@link IFormFieldVisitor} to use. Must not be <code>null</code>.
+   *          The visitor to use. Must not be <code>null</code>.
    * @return <code>true</code> if all parent fields have been visited. <code>false</code> if the visitor cancelled the
    *         visit.
-   * @see IFormFieldVisitor#visitField(IFormField, int, int)
    */
-  boolean visitParents(IFormFieldVisitor visitor);
+  boolean visitParents(Predicate<IFormField> visitor);
 
+  /**
+   * Sets the field style on this field and on every child field.<br>
+   * During the initialization phase the children are not changed.
+   *
+   * @param fieldStyle
+   *          One of {@link #FIELD_STYLE_CLASSIC}, {@link #FIELD_STYLE_ALTERNATIVE}.
+   */
   void setFieldStyle(String fieldStyle);
 
+  /**
+   * Sets the field style on this field and on every child field if requested.
+   *
+   * @param fieldStyle
+   *          One of {@link #FIELD_STYLE_CLASSIC}, {@link #FIELD_STYLE_ALTERNATIVE}.
+   * @param {@code true} if the field style property of the children should be changed as well.
+   */
+  void setFieldStyle(String fieldStyle, boolean recursive);
+
+  /**
+   * @return the field style. One of {@link #FIELD_STYLE_CLASSIC}, {@link #FIELD_STYLE_ALTERNATIVE}.
+   */
   String getFieldStyle();
 
+  /**
+   * Sets the disabled style on this field and on every child field.<br>
+   * During the initialization phase the children are not changed.
+   *
+   * @param disabledStyle
+   *          One of {@link #DISABLED_STYLE_DEFAULT}, {@link #DISABLED_STYLE_READ_ONLY}.
+   */
   void setDisabledStyle(int disabledStyle);
 
-  int getDisabledStyle();
+  /**
+   * Sets the disabled style on this field and on every child field if requested.
+   *
+   * @param disabledStyle
+   *          One of {@link #DISABLED_STYLE_DEFAULT}, {@link #DISABLED_STYLE_READ_ONLY}.
+   * @param {@code true} if the disabled style property of the children should be changed as well.
+   */
+  void setDisabledStyle(int disabledStyle, boolean recursive);
 
+  /**
+   * @return the disabled style. One of {@link #DISABLED_STYLE_DEFAULT}, {@link #DISABLED_STYLE_READ_ONLY}.
+   */
+  int getDisabledStyle();
 }

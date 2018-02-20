@@ -28,17 +28,15 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.TreeBoxChain
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.TreeBoxChains.TreeBoxPrepareLookupChain;
 import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNodeBuilder;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
-import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility;
@@ -54,6 +52,9 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
+import org.eclipse.scout.rt.platform.util.visitor.DepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -237,6 +238,9 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
    */
   @Override
   protected boolean execIsEmpty() {
+    if (!areChildrenEmpty()) {
+      return false;
+    }
     return getValue().isEmpty();
   }
 
@@ -421,11 +425,9 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   @Override
   protected void initFieldInternal() {
-    getTree().init();
     if (getConfiguredAutoLoad()) {
       try {
         setValueChangeTriggerEnabled(false);
-        //
         loadRootNode();
       }
       finally {
@@ -433,12 +435,6 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       }
     }
     super.initFieldInternal();
-  }
-
-  @Override
-  protected void disposeFieldInternal() {
-    super.disposeFieldInternal();
-    getTree().dispose();
   }
 
   @SuppressWarnings("unchecked")
@@ -469,14 +465,17 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
         interceptLoadChildNodes(parentNode);
         // when tree is non-incremental, mark all leaf cadidates as leafs
         if (!isLoadIncremental()) {
-          ITreeVisitor v = node -> {
-            if (node.getChildNodeCount() == 0) {
-              node.setLeafInternal(true);
+          IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+            @Override
+            public TreeVisitResult preVisit(ITreeNode node, int level, int index) {
+              if (node.getChildNodeCount() == 0) {
+                node.setLeafInternal(true);
+              }
+              else {
+                node.setLeafInternal(false);
+              }
+              return TreeVisitResult.CONTINUE;
             }
-            else {
-              node.setLeafInternal(false);
-            }
-            return true;
           };
           getTree().visitNode(getTree().getRootNode(), v);
         }
@@ -743,12 +742,15 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   @Override
   public void checkAllKeys() {
     final Set<T> keySet = new HashSet<>();
-    @SuppressWarnings("unchecked")
-    ITreeVisitor v = node -> {
-      if (node.getPrimaryKey() != null) {
-        keySet.add((T) node.getPrimaryKey());
+    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+      @Override
+      @SuppressWarnings("unchecked")
+      public TreeVisitResult preVisit(ITreeNode node, int level, int index) {
+        if (node.getPrimaryKey() != null) {
+          keySet.add((T) node.getPrimaryKey());
+        }
+        return TreeVisitResult.CONTINUE;
       }
-      return true;
     };
     m_tree.visitNode(m_tree.getRootNode(), v);
     checkKeys(keySet);
@@ -895,10 +897,14 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       //
       Set<T> checkedKeys = getCheckedKeys();
       Collection<ITreeNode> checkedNodes = m_tree.findNodes(checkedKeys);
-      getTree().visitTree(node -> {
-        node.setChecked(false);
-        return true;
-      });
+      IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+        @Override
+        public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
+          element.setChecked(false);
+          return TreeVisitResult.CONTINUE;
+        }
+      };
+      getTree().visitTree(v);
       for (ITreeNode node : checkedNodes) {
         node.setChecked(true);
       }
@@ -943,10 +949,14 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       }
       if (!getTree().isCheckable()) {
         //checks follow selection
-        getTree().visitTree(node -> {
-          node.setChecked(node.isSelectedNode());
-          return true;
-        });
+        IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+          @Override
+          public TreeVisitResult preVisit(ITreeNode node, int level, int index) {
+            node.setChecked(node.isSelectedNode());
+            return TreeVisitResult.CONTINUE;
+          }
+        };
+        getTree().visitTree(v);
       }
       getTree().applyNodeFilters();
     }
@@ -962,39 +972,9 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     }
   }
 
-  @Override
-  public void setFormInternal(IForm form) {
-    super.setFormInternal(form);
-    for (IFormField field : m_fields) {
-      field.setFormInternal(form);
-    }
-  }
-
 /*
  * Implementation of ICompositeField
  */
-
-  /**
-   * Sets the property on the field and on every child. <br>
-   * During the initialization phase the children are not informed.
-   *
-   * @see #getConfiguredStatusVisible()
-   */
-  @Override
-  public void setStatusVisible(boolean statusVisible) {
-    setStatusVisible(statusVisible, isInitConfigDone());
-  }
-
-  @Override
-  public void setStatusVisible(boolean statusVisible, boolean recursive) {
-    super.setStatusVisible(statusVisible);
-
-    if (recursive) {
-      for (IFormField f : m_fields) {
-        f.setStatusVisible(statusVisible);
-      }
-    }
-  }
 
   @Override
   public <F extends IFormField> F getFieldByClass(Class<F> c) {
@@ -1032,17 +1012,8 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   @Override
-  public boolean acceptVisitor(IFormFieldVisitor visitor, int level, int fieldIndex, boolean includeThis) {
-    IFormField thisField = null;
-    if (includeThis) {
-      thisField = this;
-    }
-    return CompositeFieldUtility.applyFormFieldVisitor(visitor, thisField, m_fields, level, fieldIndex);
-  }
-
-  @Override
-  public boolean visitFields(IFormFieldVisitor visitor) {
-    return acceptVisitor(visitor, 0, 0, true);
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), m_fields, Collections.singletonList(getTree()));
   }
 
   @Override

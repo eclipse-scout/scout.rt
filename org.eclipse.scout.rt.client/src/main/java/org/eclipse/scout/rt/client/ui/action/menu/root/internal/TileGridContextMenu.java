@@ -51,7 +51,7 @@ public class TileGridContextMenu extends AbstractContextMenu<ITileGrid<? extends
     if (getContainer() != null) {
       final List<? extends ITile> ownerValue = getContainer().getSelectedTiles();
       setCurrentMenuTypes(MenuUtility.getMenuTypesForTilesSelection(ownerValue));
-      acceptVisitor(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()));
+      visit(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()), IMenu.class);
       calculateLocalVisibility();
     }
   }

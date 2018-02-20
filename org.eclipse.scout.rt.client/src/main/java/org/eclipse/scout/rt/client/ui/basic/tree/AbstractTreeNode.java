@@ -21,9 +21,9 @@ import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeDisposeChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeInitTreeNodeChain;
-import org.eclipse.scout.rt.client.ui.action.ActionFinder;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICellObserver;
@@ -297,12 +297,12 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   public void initTreeNode() {
     setInitializing(true);
     try {
-      // init menus
-      try {
-        ActionUtility.initActions(getMenus());
+      for (ITreeNode childNode : getChildNodes()) {
+        childNode.initTreeNode();
       }
-      catch (RuntimeException e) {
-        LOG.error("could not initialize actions.", e);
+      // init menus
+      for (IMenu m : getMenus()) {
+        m.init();
       }
       interceptInitTreeNode();
     }
@@ -707,9 +707,20 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   @Override
-  public <T extends IMenu> T getMenu(Class<T> menuType) {
+  public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
     // ActionFinder performs instance-of checks. Hence the menu replacement mapping is not required
-    return new ActionFinder().findAction(getMenus(), menuType);
+    return MenuUtility.getMenuByClass(this, menuType);
+  }
+
+  @Override
+  public IContextMenu getContextMenu() {
+    return null;
+  }
+
+  @Override
+  @SuppressWarnings("deprecation")
+  public <T extends IMenu> T getMenu(Class<T> menuType) {
+    return getMenuByClass(menuType);
   }
 
   @Override
@@ -1148,8 +1159,20 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   protected void disposeInternal() {
     for (ITreeNode childNode : getChildNodes()) {
-      childNode.dispose();
+      try {
+        childNode.dispose();
+      }
+      catch (RuntimeException e) {
+        LOG.warn("Exception while disposing node.", e);
+      }
     }
-    ActionUtility.disposeActions(getMenus());
+    for (IMenu m : getMenus()) {
+      try {
+        m.dispose();
+      }
+      catch (RuntimeException e) {
+        LOG.warn("Exception while disposing node.", e);
+      }
+    }
   }
 }
