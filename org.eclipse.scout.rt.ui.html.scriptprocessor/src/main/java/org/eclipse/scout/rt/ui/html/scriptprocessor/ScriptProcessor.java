@@ -64,7 +64,7 @@ public class ScriptProcessor {
     return runInClassLoader(m_lessLoader, CompileCssWithLess.class.getName(), new Class[]{String.class}, new Object[]{content});
   }
 
-  public String compileJs(String content) {
+  public String compileJs(String content) throws IOException {
     return content;
   }
 
@@ -73,10 +73,10 @@ public class ScriptProcessor {
   }
 
   public String minifyJs(String content) throws IOException {
-    return runInClassLoader(m_yuiLoader, MinifyJsWithYui.class.getName(), new Class[]{String.class, boolean.class}, new Object[]{content, obfuscateJS()});
+    return runInClassLoader(m_yuiLoader, MinifyJsWithYui.class.getName(), new Class[]{String.class, boolean.class}, new Object[]{content, obfuscateJs()});
   }
 
-  protected boolean obfuscateJS() {
+  protected boolean obfuscateJs() {
     return true;
   }
 
