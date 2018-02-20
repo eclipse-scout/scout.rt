@@ -114,7 +114,7 @@ public final class HttpConfigurationProperties {
 
     @Override
     public String getKey() {
-      return "scout.http.retryHost";
+      return "scout.http.retryPost";
     }
   }
 }
