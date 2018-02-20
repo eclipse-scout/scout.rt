@@ -81,7 +81,17 @@
   }
 
   &.disabled {
+    /* Tree node is disabled -> use lighter disabled color */
     color: @disabled-color;
+  }
+
+  .disabled > & {
+    /* Whole tree is disabled -> use darker disabled color */
+    color: @text-disabled-color;
+  }
+
+  .disabled.read-only > .tree-data > & {
+    color: @text-color;
   }
 
   /*first child is the scrollbar*/

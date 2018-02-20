@@ -19,6 +19,7 @@
     margin-left: @mandatory-indicator-width;
     /* Add small spacing between label and field */
     padding-right: @mandatory-indicator-width;
+
     &.empty {
       /* explicitly disable ellipsis, because IE would display it for very narrow columns even if content is '&nbsp;' */
       text-overflow: clip;
@@ -49,9 +50,12 @@
     visibility: visible;
   }
 
-  /* keep space so that fields don't move when changing from disabled to enabled */
-  &.disabled > .mandatory-indicator {
-    visibility: hidden;
+  &.disabled > label {
+    color: @text-disabled-color;
+  }
+
+  &.disabled.alternative > .mandatory-indicator {
+    color: @disabled-color;
   }
 
   &.read-only > label {

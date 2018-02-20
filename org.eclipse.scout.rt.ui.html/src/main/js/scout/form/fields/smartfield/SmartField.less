@@ -163,11 +163,12 @@
     padding-left: @text-field-alternative-padding-left;
 
     &.disabled {
+      color: @disabled-color;    
       background-color: transparent;
     }
   }
 
-  &.read-only > .field > .multiline-lines {
+  &.disabled.read-only > .field > .multiline-lines {
     color: @text-color;
   }
 }

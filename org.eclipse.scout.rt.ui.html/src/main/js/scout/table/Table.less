@@ -158,10 +158,6 @@
     margin-top: -1px;
   }
 
-  &.disabled:not(.read-only) {
-    background-color: @control-disabled-background-color;
-  }
-
   &.checked {
     background-color: @table-row-checked-background-color;
   }
@@ -182,8 +178,18 @@
     /* An additional max-width: must be added in browser. */
   }
 
-  .disabled:not(.read-only) > .table-row > & {
+  .table-row.disabled > & {
+    /* Table row is disabled -> use lighter disabled color */
     color: @disabled-color;
+  }
+
+  .disabled > .table-row > & {
+    /* Whole table is disabled -> use darker disabled color */
+    color: @text-disabled-color;
+  }
+
+  .disabled.read-only > .table-data > .table-row > & {
+    color: @text-color;
   }
 
   .table-row.checked > & {
@@ -242,20 +248,6 @@
   & > .check-box {
     #scout.checkbox();
 
-    &.disabled,
-    .table.disabled > .table-data > .table-row > & {
-      #scout.checkbox-disabled();
-
-      &::before {
-        #scout.checkbox-before-disabled();
-      }
-    }
-
-    .table.disabled > .table-data > .table-row > &.undefined::before {
-      /* tri-state */
-      #scout.checkbox-before-undefined-disabled();
-    }
-
     &::before {
       #scout.checkbox-before();
     }
@@ -267,6 +259,21 @@
     &.undefined::before {
       /* tri-state */
       #scout.checkbox-before-undefined();
+    }
+
+    &.disabled,
+    .table.disabled > .table-data > .table-row > & {
+      #scout.checkbox-disabled();
+
+      &::before {
+        #scout.checkbox-before-disabled();
+      }
+    }
+
+    &.disabled.undefined::before,
+    .table.disabled > .table-data > .table-row > &.undefined::before {
+      /* tri-state */
+      #scout.checkbox-before-undefined-disabled();
     }
   }
 
