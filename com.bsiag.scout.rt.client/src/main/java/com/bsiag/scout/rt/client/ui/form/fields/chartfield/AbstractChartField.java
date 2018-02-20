@@ -9,8 +9,10 @@
  ******************************************************************************/
 package com.bsiag.scout.rt.client.ui.form.fields.chartfield;
 
+import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
@@ -63,6 +65,11 @@ public abstract class AbstractChartField<T extends IChart> extends AbstractFormF
       }
       return null;
     }
+  }
+
+  @Override
+  public List<? extends IWidget> getChildren() {
+    return CollectionUtility.flatten(super.getChildren(), Collections.singletonList(getChart()));
   }
 
   @SuppressWarnings("unchecked")
