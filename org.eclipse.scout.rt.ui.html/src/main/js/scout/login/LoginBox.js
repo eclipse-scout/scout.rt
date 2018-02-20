@@ -60,10 +60,12 @@ scout.LoginBox.prototype._render = function() {
     .attr('autocapitalize', 'off')
     .attr('autocorrect', 'off')
     .placeholder(this.texts.get('ui.User'))
+    .addClass('alternative')
     .appendTo(this.$form);
   this.$password = $('<input>')
     .attr('type', 'password')
     .placeholder(this.texts.get('ui.Password'))
+    .addClass('alternative')
     .appendTo(this.$form);
   this.$button = $('<button>')
     .attr('type', 'submit')
@@ -150,11 +152,18 @@ scout.LoginBox.prototype._onPostFailImpl = function(jqXHR, textStatus, errorThro
     .addClass('login-error');
   this.$user
     .val('')
-    .focus()
-    .one('input.resetLoginError', this._resetButtonText.bind(this));
+    .focus();
   this.$password
-    .val('')
-    .one('input.resetLoginError', this._resetButtonText.bind(this));
+    .val('');
+
+  // async bind reset function because focus method on username field (see above) already triggers an input event on IE.
+  var box = this;
+  setTimeout(function() {
+    box.$user
+      .one('input.resetLoginError', box._resetButtonText.bind(box));
+    box.$password
+      .one('input.resetLoginError', box._resetButtonText.bind(box));
+  }, 0);
 };
 
 // ----- Helper functions -----
