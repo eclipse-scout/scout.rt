@@ -157,6 +157,15 @@ textarea,
   }
 }
 
+input[type="text"].alternative {
+  /* Add 1px padding to prevent the text from moving a little when field is focused due to the 2px focus border */
+  padding-bottom: 1px;
+
+  /* Compensate padding-bottom to align input text with label on the left */
+  /* It won't be perfect (especially when zoomed) but should be good enough */
+  padding-top: @text-field-padding-top-compensation;
+}
+
 input.alternative,
 .input-field.alternative {
   background-color: @text-field-alternative-background-color;
@@ -165,8 +174,6 @@ input.alternative,
   border-radius: 0;
   border-left-width: 0;
   border-right-width: 0;
-  /* Add 1px padding to prevent the text from moving a little when field is focused due to the 2px focus border */
-  padding-bottom: 1px;
   padding-left: @text-field-alternative-padding-left;
   padding-right: @text-field-alternative-padding-right;
 
