@@ -74,7 +74,7 @@ public class ApacheMultiSessionCookieStore extends AbstractMultiSessionCookieSto
         e = new Exception("stack trace for debugging");
       }
       LOG.warn("adding cookie to default cookie store which could be used by other users too [cookie: {}]", cookie, e);
-
+      m_cookieStore.addCookie(cookie);
     }
 
     @Override
