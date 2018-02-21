@@ -38,6 +38,8 @@ scout.RadioButton.prototype._render = function() {
   this.$buttonLabel = this.$fieldContainer
     .appendDiv('label');
 
+  scout.fields.linkElementWithLabel(this.$radioButton, this.$buttonLabel);
+
   this.$fieldContainer.on('mousedown', this._onMouseDown.bind(this));
 
   scout.tooltips.installForEllipsis(this.$buttonLabel, {

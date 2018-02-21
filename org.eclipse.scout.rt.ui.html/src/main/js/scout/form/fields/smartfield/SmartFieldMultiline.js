@@ -37,6 +37,7 @@ scout.SmartFieldMultiline.prototype._render = function() {
       .on('input', this._onFieldInput.bind(this));
   }
   this.addField($input);
+
   this._$multilineLines = this.$fieldContainer
     .appendDiv('multiline-lines')
     .on('click', this._onMultilineLinesClick.bind(this));

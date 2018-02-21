@@ -42,4 +42,20 @@ describe("RadioButtonGroup", function() {
     });
   });
 
+  describe('label', function() {
+
+    it('is linked with the buttons', function() {
+      var group = helper.createRadioButtonGroup(session.desktop, 2);
+      group.setLabel('label');
+      group.radioButtons[0].setLabel('label 0');
+      group.radioButtons[1].setLabel('label 1');
+      group.render();
+      expect(group.radioButtons[0].$field.attr('aria-labelledby')).toBeTruthy();
+      expect(group.radioButtons[0].$field.attr('aria-labelledby')).toBe(group.$label.attr('id') + ' ' + group.radioButtons[0].$buttonLabel.attr('id'));
+      expect(group.radioButtons[1].$field.attr('aria-labelledby')).toBeTruthy();
+      expect(group.radioButtons[1].$field.attr('aria-labelledby')).toBe(group.$label.attr('id') + ' ' + group.radioButtons[1].$buttonLabel.attr('id'));
+    });
+
+  });
+
 });

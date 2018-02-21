@@ -44,6 +44,13 @@ scout.SequenceBox.prototype._render = function() {
   }
 };
 
+/**
+ * @override
+ */
+scout.SequenceBox.prototype.activate = function() {
+  scout.fields.activateFirstField(this, this.fields);
+};
+
 scout.SequenceBox.prototype._onFieldPropertyChange = function(event) {
   var visibiltyChanged = (event.propertyName === 'visible');
   if (scout.isOneOf(event.propertyName, ['errorStatus', 'tooltipText', 'visible', 'menus', 'menusVisible'])) {
@@ -107,6 +114,19 @@ scout.SequenceBox.prototype._updateStatusVisible = function() {
 scout.SequenceBox.prototype._modifyLabel = function(field) {
   if (field instanceof scout.CheckBoxField) {
     field.labelVisible = false;
+  }
+
+  if (field instanceof scout.DateField) {
+    // The DateField has two inputs ($dateField and $timeField), field.$field refers to the composite which is irrelevant here
+    // In order to support aria-labelledby for date fields also, the individual inputs have to be linked with the label rather than the composite
+    if (field.$dateField) {
+      this._linkWithLabel(field.$dateField);
+    }
+    if (field.$timeField) {
+      this._linkWithLabel(field.$timeField);
+    }
+  } else {
+    this._linkWithLabel(field.$field);
   }
 };
 

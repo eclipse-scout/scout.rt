@@ -44,6 +44,8 @@ scout.CheckBoxField.prototype._render = function() {
     .appendDiv('label')
     .on('mousedown', this._onMouseDown.bind(this));
 
+  scout.fields.linkElementWithLabel(this.$checkBox, this.$checkBoxLabel);
+
   scout.tooltips.installForEllipsis(this.$checkBoxLabel, {
     parent: this
   });

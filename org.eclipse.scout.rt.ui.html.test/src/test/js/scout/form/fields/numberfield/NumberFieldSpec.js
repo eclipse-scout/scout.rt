@@ -426,4 +426,28 @@ describe('NumberField', function() {
 
   });
 
+  describe('label', function() {
+
+    it('is linked with the field', function() {
+      var field = scout.create('NumberField', {
+        parent: session.desktop,
+        label: 'label'
+      });
+      field.render();
+      expect(field.$field.attr('aria-labelledby')).toBeTruthy();
+      expect(field.$field.attr('aria-labelledby')).toBe(field.$label.attr('id'));
+    });
+
+    it('focuses the field when clicked', function() {
+      var field = scout.create('NumberField', {
+        parent: session.desktop,
+        label: 'label'
+      });
+      field.render();
+      field.$label.triggerClick();
+      expect(field.$field).toBeFocused();
+    });
+
+  });
+
 });

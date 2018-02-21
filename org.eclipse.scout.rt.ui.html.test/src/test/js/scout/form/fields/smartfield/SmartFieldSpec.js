@@ -263,7 +263,9 @@ describe('SmartField', function() {
 
     // ticket #214831
     it('should not be triggered, when search text is (still) empty or equals to the text of the lookup row (lookupRow.text is null)', function() {
-      var field = createFieldWithLookupCall({}, {showText: false});
+      var field = createFieldWithLookupCall({}, {
+        showText: false
+      });
       var eventTriggered = false;
       field.render();
       field.on('acceptInput', function() {
@@ -300,8 +302,12 @@ describe('SmartField', function() {
 
     it('_executeLookup should always remove lookup-status (but not the error-status)', function() {
       var field = createFieldWithLookupCall();
-      var lookupStatus = scout.Status.warn({message: 'bar'});
-      var errorStatus = scout.Status.error({message: 'foo'});
+      var lookupStatus = scout.Status.warn({
+        message: 'bar'
+      });
+      var errorStatus = scout.Status.error({
+        message: 'foo'
+      });
       field.setLookupStatus(lookupStatus);
       field.setErrorStatus(errorStatus);
       var getByKeyFunc = field.lookupCall.getByKey.bind(field.lookupCall, 1);
@@ -364,7 +370,9 @@ describe('SmartField', function() {
         parent: session.desktop
       });
       embeddedField.setLookupRow(new scout.LookupRow(123, 'baz'));
-      embeddedField.setErrorStatus(scout.Status.error({message: 'bar'}));
+      embeddedField.setErrorStatus(scout.Status.error({
+        message: 'bar'
+      }));
       embeddedField.setDisplayText('Foo');
 
       touchField._copyValuesFromField(embeddedField);
@@ -420,19 +428,15 @@ describe('SmartField', function() {
       field.render();
       field.openPopup = function(browse) {};
 
-      var keyEvents = [
-        {
-          which: scout.keys.TAB
-        },
-        {
-          ctrlKey: true,
-          which: scout.keys.A
-        },
-        {
-          altKey: true,
-          which: scout.keys.A
-        }
-      ];
+      var keyEvents = [{
+        which: scout.keys.TAB
+      }, {
+        ctrlKey: true,
+        which: scout.keys.A
+      }, {
+        altKey: true,
+        which: scout.keys.A
+      }];
 
       spyOn(field, 'openPopup');
       keyEvents.forEach(function(event) {
@@ -552,6 +556,57 @@ describe('SmartField', function() {
       expect(scout.fields.valOrText(smartFieldMultiline.$field)).toBe('1:Foo');
       expect(smartFieldMultiline._$multilineLines.text()).toEqual('2:Foo');
     });
+  });
+
+  describe('label', function() {
+
+    it('is linked with the field', function() {
+      var smartField = scout.create('SmartField', {
+        parent: session.desktop
+      });
+      smartField.render();
+      expect(smartField.$field.attr('aria-labelledby')).toBeTruthy();
+      expect(smartField.$field.attr('aria-labelledby')).toBe(smartField.$label.attr('id'));
+    });
+
+    it('focuses the field when clicked', function() {
+      var smartField = scout.create('SmartField', {
+        parent: session.desktop,
+        label: 'label',
+        lookupCall: 'DummyLookupCall'
+      });
+      smartField.render();
+      smartField.$label.triggerClick();
+      jasmine.clock().tick(500);
+      expect(smartField.popup).toBeTruthy();
+
+      smartField.popup.close();
+    });
+
+    it('is linked with the field (also in multiline mode)', function() {
+      var smartField = scout.create('SmartFieldMultiline', {
+        parent: session.desktop,
+        label: 'label'
+      });
+      smartField.render();
+      expect(smartField.$field.attr('aria-labelledby')).toBeTruthy();
+      expect(smartField.$field.attr('aria-labelledby')).toBe(smartField.$label.attr('id'));
+    });
+
+    it('focuses the field when clicked (also in multiline mode)', function() {
+      var smartField = scout.create('SmartFieldMultiline', {
+        parent: session.desktop,
+        label: 'label',
+        lookupCall: 'DummyLookupCall'
+      });
+      smartField.render();
+      smartField.$label.triggerClick();
+      jasmine.clock().tick(500);
+      expect(smartField.popup).toBeTruthy();
+
+      smartField.popup.close();
+    });
+
   });
 
 });

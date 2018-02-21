@@ -168,7 +168,7 @@ scout.DateField.prototype._renderHasDate = function() {
         .on('blur', this._onDateFieldBlur.bind(this))
         .on('focus', this._onDateFieldFocus.bind(this));
     }
-
+    this._linkWithLabel(this.$dateField);
     scout.HtmlComponent.install(this.$dateField, this.session);
 
     this.$dateFieldIcon = scout.fields.appendIcon(this.$field, 'date')
@@ -221,7 +221,7 @@ scout.DateField.prototype._renderHasTime = function() {
         .on('blur', this._onTimeFieldBlur.bind(this))
         .on('focus', this._onTimeFieldFocus.bind(this));
     }
-
+    this._linkWithLabel(this.$timeField);
     scout.HtmlComponent.install(this.$timeField, this.session);
 
     this.$timeFieldIcon = scout.fields.appendIcon(this.$field, 'time')
@@ -508,11 +508,42 @@ scout.DateField.prototype._renderForegroundColor = function() {
 };
 
 /**
- * @Override FormField.js
+ * @override FormField.js
  */
 scout.DateField.prototype._renderBackgroundColor = function() {
   this.$dateField && scout.styles.legacyStyle(this, this.$dateField);
   this.$timeField && scout.styles.legacyStyle(this, this.$timeField);
+};
+
+/**
+ * @override
+ */
+scout.DateField.prototype.activate = function() {
+  if (!this.enabledComputed || !this.rendered) {
+    return;
+  }
+  if (this.$dateField) {
+    this.$dateField.focus();
+    this._onDateFieldMouseDown();
+  } else if (this.$timeField) {
+    this.$timeField.focus();
+    this._onTimeFieldMouseDown();
+  }
+};
+
+/**
+ * @override
+ */
+scout.DateField.prototype.focus = function() {
+  if (!this.rendered) {
+    this._postRenderActions.push(this.focus.bind(this));
+    return false;
+  }
+  if (this.$dateField) {
+    return this.session.focusManager.requestFocus(this.$dateField[0]);
+  } else if (this.$timeField) {
+    return this.session.focusManager.requestFocus(this.$timeField[0]);
+  }
 };
 
 scout.DateField.prototype._onDateFieldMouseDown = function() {

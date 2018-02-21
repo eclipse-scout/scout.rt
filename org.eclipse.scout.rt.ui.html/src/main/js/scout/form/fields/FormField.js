@@ -642,6 +642,20 @@ scout.FormField.prototype._setKeyStrokes = function(keyStrokes) {
 };
 
 /**
+ * When calling this function, the same should happen as when clicking into the field. It is used when the label is clicked.<br>
+ * The most basic action is focusing the field but this may differ from field to field.
+ */
+scout.FormField.prototype.activate = function() {
+  if (!this.enabledComputed || !this.rendered) {
+    return;
+  }
+  // Explicitly don't use this.focus() because this.focus uses the focus manager which may be disabled (e.g. on mobile devices)
+  if (this.$field) {
+    this.$field.focus();
+  }
+};
+
+/**
  * Sets the focus on this field. If the field is not rendered, the focus will be set as soon as it is rendered.
  */
 scout.FormField.prototype.focus = function() {
@@ -844,6 +858,18 @@ scout.FormField.prototype.addLabel = function() {
   scout.tooltips.installForEllipsis(this.$label, {
     parent: this
   });
+
+  // Setting the focus programmatically does not work in a mousedown listener on mobile devices,
+  // that is why a click listener is used instead
+  this.$label.on('click', this._onLabelClick.bind(this));
+};
+
+scout.FormField.prototype._onLabelClick = function(event) {
+  if (!scout.strings.hasText(this.label)) {
+    // Clicking on "invisible" labels should not have any effect since it is confusing
+    return;
+  }
+  this.activate();
 };
 
 scout.FormField.prototype._removeLabel = function() {
@@ -852,6 +878,18 @@ scout.FormField.prototype._removeLabel = function() {
   }
   this.$label.remove();
   this.$label = null;
+};
+
+/**
+ * Links the given element with the label by setting aria-labelledby.<br>
+ * This allows screen readers to build a catalog of the elements on the screen and their relationships, for example, to read the label when the input is focused.
+ */
+scout.FormField.prototype._linkWithLabel = function($element) {
+  if (!this.$label) {
+    return;
+  }
+
+  scout.fields.linkElementWithLabel($element, this.$label);
 };
 
 scout.FormField.prototype._removeIcon = function() {
@@ -870,6 +908,7 @@ scout.FormField.prototype.addField = function($field) {
     this.addFieldContainer($field);
   }
   this.$field = $field;
+  this._linkWithLabel($field);
 };
 
 /**

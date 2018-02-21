@@ -63,6 +63,8 @@ scout.RadioButtonGroup.prototype._render = function() {
     htmlBodyContainer;
 
   this.addContainer(this.$parent, 'radiobutton-group');
+  this.addLabel();
+  this.addMandatoryIndicator();
 
   this.$body = this.$container.appendDiv('radiobutton-group-body');
   htmlBodyContainer = scout.HtmlComponent.install(this.$body, this.session);
@@ -76,12 +78,23 @@ scout.RadioButtonGroup.prototype._render = function() {
 
     // set each children layout data to logical grid data
     formField.setLayoutData(new scout.LogicalGridData(formField));
+
+    this._linkWithLabel(formField.$field);
   }, this);
 
-  this.addLabel();
-  this.addMandatoryIndicator();
   this.addField(this.$body);
   this.addStatus();
+};
+
+/**
+ * @override
+ */
+scout.RadioButtonGroup.prototype.activate = function() {
+  // The first button may not be focusable because it is not selected and therefore has no tab index -> find the first focusable button
+  var element = this.session.focusManager.findFirstFocusableElement(this.$container);
+  if (element) {
+    element.focus();
+  }
 };
 
 /**

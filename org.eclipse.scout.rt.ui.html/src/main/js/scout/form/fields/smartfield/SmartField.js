@@ -760,7 +760,11 @@ scout.SmartField.prototype.aboutToBlurByMouseDown = function(target) {
 
 scout.SmartField.prototype._onFieldMouseDown = function(event) {
   $.log.isDebugEnabled() && $.log.debug('(SmartField#_onFieldMouseDown)');
-  if (!this.enabledComputed) {
+  this.activate();
+};
+
+scout.SmartField.prototype.activate = function() {
+  if (!this.enabledComputed || !this.rendered) {
     return;
   }
   if (!this.isDropdown() && !scout.fields.handleOnClick(this)) {

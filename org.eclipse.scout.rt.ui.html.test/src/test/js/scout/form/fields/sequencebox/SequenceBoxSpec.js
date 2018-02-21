@@ -212,4 +212,36 @@ describe('SequenceBox', function() {
 
   });
 
+  describe('label', function() {
+
+    it('is linked with the fields (also considers fields own label)', function() {
+      var field = createField();
+      field.setLabel('box label');
+      field.fields[0].setLabel('first label');
+      field.fields[1].setLabel('second label');
+      field.fields[1].setHasTime(true);
+      field.render();
+      expect(field.fields[0].$field.attr('aria-labelledby')).toBeTruthy();
+      expect(field.fields[0].$field.attr('aria-labelledby')).toBe(field.$label.attr('id') + ' ' + field.fields[0].$label.attr('id'));
+      expect(field.fields[1].$dateField.attr('aria-labelledby')).toBeTruthy();
+      expect(field.fields[1].$dateField.attr('aria-labelledby')).toBe(field.$label.attr('id') + ' ' + field.fields[1].$label.attr('id'));
+      expect(field.fields[1].$timeField.attr('aria-labelledby')).toBeTruthy();
+      expect(field.fields[1].$timeField.attr('aria-labelledby')).toBe(field.$label.attr('id') + ' ' + field.fields[1].$label.attr('id'));
+    });
+
+    it('focuses the first visible field when clicked', function() {
+      var field = createField();
+      field.render();
+      field.setLabel('box label');
+      field.$label.triggerClick();
+      expect(field.fields[0].$field).toBeFocused();
+
+      field.fields[0].setVisible(false);
+      field.$label.triggerClick();
+      expect(field.fields[1].$dateField).toBeFocused();
+    });
+
+  });
+
+
 });

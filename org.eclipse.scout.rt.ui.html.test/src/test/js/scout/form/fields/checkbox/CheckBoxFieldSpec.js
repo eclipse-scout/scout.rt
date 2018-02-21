@@ -9,16 +9,18 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 describe("CheckBoxField", function() {
+  var session;
+
+  beforeEach(function() {
+    setFixtures(sandbox());
+    session = sandboxSession();
+  });
 
   describe("inheritance", function() {
-
-    var session;
     var checkBox;
     var model;
 
     beforeEach(function() {
-      setFixtures(sandbox());
-      session = sandboxSession();
       model = createSimpleModel('CheckBoxField', session);
       checkBox = new scout.CheckBoxField();
       checkBox.init(model);
@@ -52,4 +54,19 @@ describe("CheckBoxField", function() {
 
   });
 
+  describe('label', function() {
+
+    it('is linked with the field', function() {
+      var field = scout.create('CheckBoxField', {
+        parent: session.desktop,
+        label: 'label'
+      });
+      field.render();
+      expect(field.$field.attr('aria-labelledby')).toBeTruthy();
+      // Actually only $checkBoxLabel needs to be linked, but since addField does it automatically $label is linked as well.
+      // It doesn't matter because it will always be empty anyway.
+      expect(field.$field.attr('aria-labelledby')).toBe(field.$checkBoxLabel.attr('id') + ' ' + field.$label.attr('id'));
+    });
+
+  });
 });

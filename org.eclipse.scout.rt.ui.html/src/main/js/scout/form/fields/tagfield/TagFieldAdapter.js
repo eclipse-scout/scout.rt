@@ -11,7 +11,7 @@
 scout.TagFieldAdapter = function() {
   scout.TagFieldAdapter.parent.call(this);
 };
-scout.inherits(scout.TagFieldAdapter, scout.BasicFieldAdapter);
+scout.inherits(scout.TagFieldAdapter, scout.ValueFieldAdapter);
 
 scout.TagFieldAdapter.prototype._initProperties = function(model) {
   if (model.insertText !== undefined) {

@@ -90,6 +90,44 @@ scout.fields = {
   // why this check is required.
   handleOnClick: function(field) {
     return field.enabledComputed && !field.embedded && !field.popup;
+  },
+
+  /**
+   * Calls activate() on the first visible and enabled field of the given fields. Does nothing if the widget is disabled or not rendered.
+   *
+   * @param {scout.Widget} field
+   * @param {scout.FormField[]} fields
+   */
+  activateFirstField: function(widget, fields) {
+    if (!widget.enabledComputed || !widget.rendered) {
+      return;
+    }
+    var firstField = fields.filter(function(field) {
+      return field.visible && field.enabledComputed;
+    })[0];
+
+    if (firstField) {
+      firstField.activate();
+    }
+  },
+
+  /**
+   * Links the given element with the given label by setting aria-labelledby.<br>
+   * This allows screen readers to build a catalog of the elements on the screen and their relationships, for example, to read the label when the input is focused.
+   */
+  linkElementWithLabel: function($elem, $label) {
+    var labelId = $label.attr('id');
+    if (!labelId) {
+      // Create an id if the element does not have one yet
+      labelId = scout.Widget.createUniqueId('lbl');
+      $label.attr('id', labelId);
+    }
+    var labelledBy = $elem.attr('aria-labelledby') || '';
+    if (labelledBy) {
+      // Add to the existing value if there is one
+      labelId += ' ' + labelledBy;
+    }
+    $elem.attr('aria-labelledby', labelId);
   }
 
 };

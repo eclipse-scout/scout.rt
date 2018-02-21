@@ -61,37 +61,42 @@ scout.StringField.prototype._render = function() {
 
   var $field;
   if (this.multilineText) {
-    var mouseDownHandler = function() {
-      this.mouseClicked = true;
-    }.bind(this);
-    $field = this.$parent.makeElement('<textarea>')
-      .on('DOMMouseScroll mousewheel', function(event) {
-        // otherwise scout.Scrollbar.prototype would handle this event for scrollable group boxes and prevent scrolling on textarea
-        event.stopPropagation();
-      })
-      .on('mousedown', mouseDownHandler)
-      .on('focus', function(event) {
-        this.$field.off('mousedown', mouseDownHandler);
-        if (!this.mouseClicked) { // only trigger on tab focus in
-          setTimeout(function() {
-            if (!this.rendered || this.session.focusManager.isElementCovertByGlassPane(this.$field)) {
-              return;
-            }
-            this._renderSelectionStart();
-            this._renderSelectionEnd();
-          }.bind(this));
-        }
-        this.mouseClicked = false;
-      }.bind(this))
-      .on('focusout', function() {
-        this.$field.on('mousedown', mouseDownHandler);
-      }.bind(this));
+    $field = this._makeMultilineField();
   } else {
     $field = scout.fields.makeTextField(this.$parent);
   }
 
   this.addField($field);
   this.addStatus();
+};
+
+scout.StringField.prototype._makeMultilineField = function() {
+  var mouseDownHandler = function() {
+    this.mouseClicked = true;
+  }.bind(this);
+
+  return this.$parent.makeElement('<textarea>')
+    .on('DOMMouseScroll mousewheel', function(event) {
+      // otherwise scout.Scrollbar.prototype would handle this event for scrollable group boxes and prevent scrolling on textarea
+      event.stopPropagation();
+    })
+    .on('mousedown', mouseDownHandler)
+    .on('focus', function(event) {
+      this.$field.off('mousedown', mouseDownHandler);
+      if (!this.mouseClicked) { // only trigger on tab focus in
+        setTimeout(function() {
+          if (!this.rendered || this.session.focusManager.isElementCovertByGlassPane(this.$field)) {
+            return;
+          }
+          this._renderSelectionStart();
+          this._renderSelectionEnd();
+        }.bind(this));
+      }
+      this.mouseClicked = false;
+    }.bind(this))
+    .on('focusout', function() {
+      this.$field.on('mousedown', mouseDownHandler);
+    }.bind(this));
 };
 
 scout.StringField.prototype._onFieldBlur = function() {

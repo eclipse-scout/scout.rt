@@ -93,6 +93,17 @@ scout.FileChooserField.prototype._clear = function() {
 
 scout.FileChooserField.prototype._onIconMouseDown = function(event) {
   scout.FileChooserField.parent.prototype._onIconMouseDown.call(this, event);
+  this.activate();
+};
+
+/**
+ * @override
+ */
+scout.FileChooserField.prototype.activate = function() {
+  if (!this.enabledComputed || !this.rendered) {
+    return;
+  }
+  this.$field.focus();
   this.fileInput.browse();
 };
 

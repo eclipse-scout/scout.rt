@@ -76,6 +76,8 @@ scout.Widget.DisabledStyle = {
   READ_ONLY: 1
 };
 
+scout.Widget.uniqueIdSeqNo = 0;
+
 scout.Widget.prototype.init = function(model) {
   var staticModel = this._jsonModel();
   if (staticModel) {
@@ -1596,4 +1598,17 @@ scout.Widget.cssClassAsArray = function(cssClass) {
     cssClasses = cssClassesStr.split(' ');
   }
   return cssClasses;
+};
+
+/**
+ * Creates a "unique" id which may be used in the id attribute of a HTML element.
+ * <p>
+ * It actually just increases a sequence number prefixed by 'sc' or the given prefix.
+ * 'sc' (short for Scout) is added to reduce the possibility of a duplication
+ * if scout widgets are embedded into a foreign web site which already uses numbers in its id attributes.
+ * So it is not really unique but should be good enough when you know what you are doing.
+ */
+scout.Widget.createUniqueId = function(prefix) {
+  prefix = prefix || 'sc';
+  return prefix + scout.Widget.uniqueIdSeqNo++;
 };

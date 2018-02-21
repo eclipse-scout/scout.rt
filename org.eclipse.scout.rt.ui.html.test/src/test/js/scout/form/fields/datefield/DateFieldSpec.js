@@ -1422,4 +1422,49 @@ describe('DateField', function() {
 
   });
 
+  describe('label', function() {
+
+    it('is linked with the date and time fields', function() {
+      var field = scout.create('DateField', {
+        parent: session.desktop,
+        label: 'label',
+        hasTime: true
+      });
+      field.render();
+      expect(field.$dateField.attr('aria-labelledby')).toBeTruthy();
+      expect(field.$dateField.attr('aria-labelledby')).toBe(field.$label.attr('id'));
+      expect(field.$timeField.attr('aria-labelledby')).toBeTruthy();
+      expect(field.$timeField.attr('aria-labelledby')).toBe(field.$label.attr('id'));
+    });
+
+    it('focuses the date field when clicked', function() {
+      var field = scout.create('DateField', {
+        parent: session.desktop,
+        label: 'label'
+      });
+      field.render();
+      field.$label.triggerClick();
+      expect(field.$dateField).toBeFocused();
+      expect(field.popup.rendered).toBe(true);
+
+      field.popup.close();
+    });
+
+    it('focuses the time field when clicked if hasDate is false and hasTime is true', function() {
+      var field = scout.create('DateField', {
+        parent: session.desktop,
+        label: 'label',
+        hasDate: false,
+        hasTime: true
+      });
+      field.render();
+      field.$label.triggerClick();
+      expect(field.$timeField).toBeFocused();
+      expect(field.popup.rendered).toBe(true);
+
+      field.popup.close();
+    });
+
+  });
+
 });
