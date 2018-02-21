@@ -12,8 +12,8 @@ scout.BusyIndicator = function() {
   scout.BusyIndicator.parent.call(this);
   this.cancellable = true;
   this.showTimeout = 2500;
-  this.label;
-  this.details;
+  this.label = null;
+  this.details = null;
 };
 scout.inherits(scout.BusyIndicator, scout.Widget);
 
@@ -42,7 +42,7 @@ scout.BusyIndicator.prototype._initKeyStrokeContext = function() {
 
 scout.BusyIndicator.prototype._init = function(model) {
   scout.BusyIndicator.parent.prototype._init.call(this, model);
-  this.label = scout.nvl(model.label, this.session.text('ui.PleaseWait_'));
+  this.label = scout.nvl(this.label, this.session.text('ui.PleaseWait_'));
 };
 
 scout.BusyIndicator.prototype.render = function($parent) {
@@ -102,10 +102,6 @@ scout.BusyIndicator.prototype._render = function() {
   }.bind(this), this.showTimeout);
 };
 
-scout.BusyIndicator.prototype._onCancelClick = function(event) {
-  this.trigger('cancel', event);
-};
-
 scout.BusyIndicator.prototype._postRender = function() {
   scout.BusyIndicator.parent.prototype._postRender.call(this);
   this.session.focusManager.installFocusContext(this.$container, scout.focusRule.AUTO);
@@ -125,13 +121,22 @@ scout.BusyIndicator.prototype._remove = function() {
   scout.BusyIndicator.parent.prototype._remove.call(this);
 };
 
+scout.BusyIndicator.prototype.setLabel = function(label) {
+  this.setProperty('label', label);
+};
+
 scout.BusyIndicator.prototype._renderLabel = function() {
   this.$label.text(this.label || '');
 };
 
+scout.BusyIndicator.prototype.setDetails = function(details) {
+  this.setProperty('details', details);
+};
+
 scout.BusyIndicator.prototype._renderDetails = function() {
-  this.$details.html(scout.strings.nl2br(this.details));
-  this.$details.setVisible(this.details);
+  this.$details
+    .html(scout.strings.nl2br(this.details))
+    .setVisible(!!this.details);
 };
 
 scout.BusyIndicator.prototype._position = function() {
@@ -146,6 +151,10 @@ scout.BusyIndicator.prototype.close = function() {
     this.$cancelButton.focus();
     this.$cancelButton.click();
   }
+};
+
+scout.BusyIndicator.prototype._onCancelClick = function(event) {
+  this.trigger('cancel', event);
 };
 
 /**
