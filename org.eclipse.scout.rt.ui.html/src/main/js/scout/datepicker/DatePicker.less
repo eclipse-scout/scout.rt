@@ -70,7 +70,7 @@
 
   & > .text {
     display: inline-block;
-    padding: 5px;
+    padding: @date-picker-day-padding-y @date-picker-day-padding-x;
     margin-top: 2px;
     border-radius: 50%;
     border: 1px solid transparent;
@@ -78,7 +78,7 @@
 
   &.ten > .text {
     /* increase padding a bit to center days between 10 and 19 nicer */
-    padding-right: 6px;
+    padding-right: @date-picker-day-padding-x + 1px;
   }
 
   /* Hover effect is disabled on touch devices because the hover effect does not vanish on touch end which is annoying especially when swiping. */
