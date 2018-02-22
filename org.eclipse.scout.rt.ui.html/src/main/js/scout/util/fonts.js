@@ -242,7 +242,7 @@ scout.fonts = {
       var styleSheet = document.styleSheets[i];
       for (var j = 0; j < styleSheet.cssRules.length; j++) {
         var cssRule = styleSheet.cssRules[j];
-        if (cssRule.type == window.CSSRule.FONT_FACE_RULE) {
+        if (cssRule.type === window.CSSRule.FONT_FACE_RULE) {
           var style = cssRule.style;
           var ff = style.getPropertyValue('font-family');
           var fw = style.getPropertyValue('font-weight');

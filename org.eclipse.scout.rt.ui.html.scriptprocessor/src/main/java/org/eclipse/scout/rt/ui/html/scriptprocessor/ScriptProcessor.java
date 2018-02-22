@@ -64,6 +64,7 @@ public class ScriptProcessor {
     return runInClassLoader(m_lessLoader, CompileCssWithLess.class.getName(), new Class[]{String.class}, new Object[]{content});
   }
 
+  @SuppressWarnings("squid:RedundantThrowsDeclarationCheck")
   public String compileJs(String content) throws IOException {
     return content;
   }
