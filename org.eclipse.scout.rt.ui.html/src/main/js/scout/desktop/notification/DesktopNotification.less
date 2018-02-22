@@ -129,16 +129,14 @@
 }
 
 .desktop-notification-loader.animated::after {
-  #scout.animation(rotation 0.9s linear infinite);
+  #scout.animation(pulsate 2.2s cubic-bezier(0.5, 0.1, 0.1, 0.5) infinite);
   content: '';
   display: inline-block;
   vertical-align: middle;
   margin-left: 6px;
   margin-right: 6px;
   border-radius: 50%;
-  border: 1px solid rgba(0, 0, 0, 0);
-  border-top-color: @palette-gray-9;
-  border-left-color: @palette-gray-9;
+  border: 1px fade(@busyindicator-active-color, 80%) solid;
   width: 14px;
   height: 14px;
   margin-top: -3px;

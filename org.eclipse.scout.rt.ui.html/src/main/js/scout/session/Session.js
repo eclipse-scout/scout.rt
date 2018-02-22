@@ -1306,13 +1306,34 @@ scout.Session.prototype._setApplicationLoading = function(applicationLoading) {
   if (applicationLoading) {
     this._applicationLoadingTimeoutId = setTimeout(function() {
       if (!this.desktop || !this.desktop.rendered) {
-        this.$entryPoint.appendDiv('application-loading').hide().fadeIn();
+        this._renderApplicationLoading();
       }
-    }.bind(this), 500);
+    }.bind(this), 200);
   } else {
     clearTimeout(this._applicationLoadingTimeoutId);
     this._applicationLoadingTimeoutId = null;
-    this.$entryPoint.children('.application-loading').remove();
+    this._removeApplicationLoading();
+  }
+};
+
+scout.Session.prototype._renderApplicationLoading = function() {
+  var $loadingRoot = $('body').appendDiv('application-loading-root')
+    .addClass('application-loading-root')
+    .fadeIn();
+  $loadingRoot.appendDiv('application-loading01').hide().fadeIn();
+  $loadingRoot.appendDiv('application-loading02').hide().fadeIn();
+};
+
+scout.Session.prototype._removeApplicationLoading = function() {
+  var $loadingRoot = $('body').children('.application-loading-root');
+  $loadingRoot.addClass('application-loading-root-fadeOut');
+  if (scout.device.supportsCssAnimation()) {
+    $loadingRoot.oneAnimationEnd(function() {
+      $loadingRoot.remove();
+    });
+  } else {
+    // fallback for old browsers that do not support the animation-end event
+    $loadingRoot.remove();
   }
 };
 

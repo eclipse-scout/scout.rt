@@ -354,7 +354,7 @@ public class JobManager implements IJobManager {
    * Registers the given future.
    *
    * @throws AssertionException
-   *           if the job manager is shut donw.
+   *           if the job manager is shut down.
    */
   protected void registerFuture(final JobFutureTask<?> future) {
     m_shutdownLock.readLock().lock();

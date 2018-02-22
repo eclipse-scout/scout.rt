@@ -357,6 +357,10 @@
     50% {
       opacity: 1.0;
     }
+    80% {
+      #scout.transform(scale(1.2));
+      opacity: 0.1;
+    }
     100% {
       #scout.transform(scale(1.2));
       opacity: 0.0;
@@ -365,6 +369,45 @@
 
   @-webkit-keyframes pulsate { .keyframes-pulsate(); }
   @keyframes pulsate { .keyframes-pulsate(); }
+
+  /*** Pulsate Reverse ***/
+
+  .keyframes-pulsate-reverse () {
+    00% { /* see comment on top */
+      #scout.transform(scale(1.2));
+      opacity: 0.0;
+    }
+    50% {
+      opacity: 1.0;
+    }
+    100% {
+      #scout.transform(scale(0.1));
+      opacity: 0.0;
+    }
+  }
+
+  @-webkit-keyframes pulsate-reverse { .keyframes-pulsate-reverse(); }
+  @keyframes pulsate-reverse { .keyframes-pulsate-reverse(); }
+
+  /*** Pulsate In-Out ***/
+
+  .keyframes-pulsate-in-out () {
+    00% { /* see comment on top */
+      #scout.transform(scale(1));
+      opacity: 1.0;
+    }
+    50% {
+      #scout.transform(scale(0.1));
+      opacity: 0.01;
+    }
+    100% {
+      #scout.transform(scale(1));
+      opacity: 1.0;
+    }
+  }
+
+  @-webkit-keyframes pulsate-in-out { .keyframes-pulsate-in-out(); }
+  @keyframes pulsate-in-out { .keyframes-pulsate-in-out(); }
 
   /*** Attention ***/
 

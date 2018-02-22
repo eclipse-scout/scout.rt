@@ -177,11 +177,7 @@
 .smart-field.loading {
 
   & > .icon {
-    #scout.animation(rotation 1.25s linear infinite);
-
-    &::before {
-      content: @icon-spinner;
-    }
+    #scout.animation(pulsate-in-out 2.2s ease-in-out infinite);
   }
 
   & > input,
@@ -189,7 +185,7 @@
   & > .field > input,
   & > .field > .input-field {
     & ~ .icon {
-      margin-right: @text-field-padding-x;
+      margin-right: 4px;
       padding-right: 0;
     }
   }

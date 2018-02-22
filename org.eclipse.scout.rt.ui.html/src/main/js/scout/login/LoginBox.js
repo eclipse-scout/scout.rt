@@ -157,13 +157,12 @@ scout.LoginBox.prototype._onPostFailImpl = function(jqXHR, textStatus, errorThro
     .val('');
 
   // async bind reset function because focus method on username field (see above) already triggers an input event on IE.
-  var box = this;
   setTimeout(function() {
-    box.$user
-      .one('input.resetLoginError', box._resetButtonText.bind(box));
-    box.$password
-      .one('input.resetLoginError', box._resetButtonText.bind(box));
-  }, 0);
+    this.$user
+      .one('input.resetLoginError', this._resetButtonText.bind(this));
+    this.$password
+      .one('input.resetLoginError', this._resetButtonText.bind(this));
+  }.bind(this));
 };
 
 // ----- Helper functions -----

@@ -53,6 +53,12 @@
 
 .detail-table.table {
 
+  &.loading {
+    & > .loading-indicator {
+      #scout.loading-indicator(@busyindicator-large-size, @busyindicator-large-border-width);
+    }
+  }
+
   & > .table-header {
     padding-left: @detail-table-header-padding-x;
     padding-right: @detail-table-header-padding-x;

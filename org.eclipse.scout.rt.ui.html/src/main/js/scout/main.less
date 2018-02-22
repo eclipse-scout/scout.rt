@@ -478,31 +478,60 @@ button::-moz-focus-inner {
   #scout.user-select(text)
 }
 
-.application-loading {
-  @application-loading-size: 50px;
-
-  /* Make it use the whole available size, to show the 'wait' mouse cursor */
+.application-loading-root {
   position: absolute;
+  width: 100%;
+  height: 100%;
   top: 0;
   left: 0;
-  bottom: 0;
-  right: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background-color: @palette-white;
+}
+
+.application-loading-root-fadeOut {
+  #scout.animation(fade-out 300ms linear 1);
+}
+
+.application-loading01 {
+  height: @application-loading01-size;
+  width: @application-loading01-size;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 
   &::before {
     content: '';
-    border-radius: @application-loading-size;
-    border: 3px solid @palette-gray-5;
-    border-right-color: @palette-blue-6;
-    width: @application-loading-size;
-    height: @application-loading-size;
     position: absolute;
-    top: 50%;
-    left: 50%;
-    margin-left: -(@application-loading-size / 2);
-    margin-top: -((@application-loading-size / 2) + 20px);
-    #scout.animation(rotation 1.0s infinite linear);
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    box-shadow: 0 0 6px 3px fade(@palette-blue-5, 90%);
+    #scout.animation(pulsate 2.5s ease-out infinite);
   }
 }
+
+.application-loading02 {
+  height: @application-loading02-size;
+  width: @application-loading02-size;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  &::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    box-shadow: inset 0 0 4px 2px @palette-cyan-4;
+    #scout.animation(pulsate 3.85s ease-out infinite);
+  }
+}
+
 
 a,
 .link,
