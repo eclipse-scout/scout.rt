@@ -152,9 +152,13 @@ scout.GlassPaneRenderer.prototype._onMouseDown = function(event) {
     // If the blocking widget is a view, the $container cannot be animated (this only works for dialogs). Instead,
     // highlight the view tab (or the overflow item, if the view tab is not visible).
 
-    $animationTarget = this.session.desktop.bench.getViewTab(this._widget).$container;
-    if (!$animationTarget.isVisible()) {
-      $animationTarget = $animationTarget.siblings('.overflow-tab-item');
+    var viewTab = this.session.desktop.bench.getViewTab(this._widget);
+    // View tab may not exist if view has neither a title nor a subtitle
+    if (viewTab) {
+      $animationTarget = viewTab.$container;
+      if (!$animationTarget.isVisible()) {
+        $animationTarget = $animationTarget.siblings('.overflow-tab-item');
+      }
     }
   } else if (this._widget.$container) {
     $animationTarget = this._widget.$container;
