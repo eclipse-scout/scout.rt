@@ -23,7 +23,7 @@ scout.FormField = function() {
    */
   this.enabledComputed = true;
   this.errorStatus = null;
-  this.fieldStyle = scout.FormField.FieldStyle.ALTERNATIVE;
+  this.fieldStyle = scout.FormField.DEFAULT_FIELD_STYLE;
   this.gridData = null;
   this.gridDataHints = new scout.GridData();
   this.mode = scout.FormField.Mode.DEFAULT;
@@ -79,6 +79,9 @@ scout.FormField.FieldStyle = {
   CLASSIC: 'classic',
   ALTERNATIVE: 'alternative'
 };
+
+/** Global variable to make it easier to adjust the default field style for all fields */
+scout.FormField.DEFAULT_FIELD_STYLE = scout.FormField.FieldStyle.ALTERNATIVE;
 
 scout.FormField.LabelPosition = {
   DEFAULT: 0,
