@@ -17,6 +17,7 @@ import java.util.Set;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.ParamConverterProvider;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
@@ -39,13 +40,14 @@ public class RestApplication extends Application {
 
   protected Set<Class<?>> initClasses() {
     Set<Class<?>> classes = new HashSet<>();
-    registerContextResolver(classes);
+    registerContextResolvers(classes);
     registerExceptionMappers(classes);
+    registerParamConverterProviders(classes);
     registerRestResources(classes);
     return classes;
   }
 
-  protected void registerContextResolver(Set<Class<?>> classes) {
+  protected void registerContextResolvers(Set<Class<?>> classes) {
     registerClasses(classes, ContextResolver.class);
   }
 
@@ -55,6 +57,10 @@ public class RestApplication extends Application {
 
   protected void registerRestResources(Set<Class<?>> classes) {
     registerClasses(classes, IRestResource.class);
+  }
+
+  protected void registerParamConverterProviders(Set<Class<?>> classes) {
+    registerClasses(classes, ParamConverterProvider.class);
   }
 
   protected <T> void registerClasses(Set<Class<?>> classes, Class<T> lookupBeanClazz) {
