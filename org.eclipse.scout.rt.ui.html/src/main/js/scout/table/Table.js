@@ -566,8 +566,7 @@ scout.Table.prototype._uninstallCellTooltipSupport = function() {
 scout.Table.prototype._cellTooltipText = function($cell) {
   var cell, tooltipText,
     $row = $cell.parent(),
-    cellIndex = this.$cellsForRow($row).index($cell),
-    column = this.columns[cellIndex],
+    column = this.columnFor$Cell($cell, $row),
     row = $row.data('row');
 
   if (row) {
@@ -2639,6 +2638,17 @@ scout.Table.prototype.columnById = function(columnId) {
   return scout.arrays.find(this.columns, function(column) {
     return column.id === columnId;
   });
+};
+
+/**
+ * @param {$} $cell the $cell to get the column for
+ * @param {$} [$row] the $row which contains the $cell. If not passed it will be determined automatically
+ * @returns {scout.Column} the column for the given $cell
+ */
+scout.Table.prototype.columnFor$Cell = function($cell, $row) {
+  $row = $row || $cell.closest('.table-row');
+  var cellIndex = this.$cellsForRow($row).index($cell);
+  return this.visibleColumns()[cellIndex];
 };
 
 scout.Table.prototype.columnsByIds = function(columnIds) {
