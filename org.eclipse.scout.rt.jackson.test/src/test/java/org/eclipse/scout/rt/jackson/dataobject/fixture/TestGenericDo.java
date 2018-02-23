@@ -28,7 +28,7 @@ public class TestGenericDo<T> extends DoEntity {
    * *************************************************************************/
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestGenericDo withGenericAttribute(T genericAttribute) {
+  public TestGenericDo<T> withGenericAttribute(T genericAttribute) {
     genericAttribute().set(genericAttribute);
     return this;
   }
