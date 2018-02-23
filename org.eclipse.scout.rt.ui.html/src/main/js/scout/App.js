@@ -153,7 +153,6 @@ scout.App.prototype._initVersion = function(options) {
     $('scout-version').data('value'));
 };
 
-
 scout.App.prototype._prepareDOM = function() {
   scout.prepareDOM(document);
 };
@@ -241,7 +240,9 @@ scout.App.prototype._loadSession = function($entryPoint, options) {
     session.focusManager.validateFocus();
 
     session.ready = true;
-    this.trigger('sessionReady', {session: session});
+    this.trigger('sessionReady', {
+      session: session
+    });
     $.log.isInfoEnabled() && $.log.info('Session initialized. Detected ' + scout.device);
   }.bind(this));
   return session;
@@ -277,7 +278,53 @@ scout.App.prototype._fail = function(options, error) {
   $.log.error('App initialization failed', error);
   var $error = $('body').appendDiv('startup-error');
   $error.appendDiv('startup-error-title').text('The application could not be started');
-  $error.appendDiv('startup-error-message').text(error);
+
+  // Helper function to determine if an object is of type "jqXHR" (http://api.jquery.com/jQuery.ajax/#jqXHR)
+  function isJqXHR(obj) {
+    return (typeof obj === 'object' && obj.hasOwnProperty('readyState') && obj.hasOwnProperty('status') && obj.hasOwnProperty('statusText'));
+  }
+
+  var message = '';
+  var log = '';
+  if (error instanceof Error) {
+    // 1. Errors
+    message = String(error.message || error);
+    log = 'Unexpected error: ' + message;
+    if (error.fileName) {
+      log += ' at ' + error.fileName + scout.strings.join('', scout.strings.box(':', error.lineNumber), scout.strings.box(':', error.columnNumber));
+    }
+    if (error.stack) {
+      log += '\n' + error.stack;
+    }
+  } else if (isJqXHR(error)) {
+    // 2. jQuery $.ajax() error (arguments: jqXHR, textStatus, errorThrown, requestOptions)
+    var jqXHR = error;
+    var errorThrown = arguments[3];
+    var requestOptions = arguments[4];
+    var ajaxRequest = (requestOptions ? scout.strings.join(' ', requestOptions.type, requestOptions.url) : '');
+    var ajaxStatus = (jqXHR.status ? scout.strings.join(' ', jqXHR.status, errorThrown) : 'Connection error');
+    message = 'AJAX call' + scout.strings.box(' "', ajaxRequest, '"') + ' failed' + scout.strings.box(' [', ajaxStatus, ']');
+    log = message + (error.responseText ? '\nResponse text:\n' + error.responseText : '');
+  } else if (!error) {
+    // 3. No reason provided
+    message = 'Unknwon reason';
+    log = 'Unexpected failure (no reason provided)';
+  } else {
+    // 4. Everything else
+    message = String(error);
+    log += 'Unexpected failure: ' + message;
+  }
+
+  if (message) {
+    $error.appendDiv('startup-error-message').text(message);
+  }
+  if (log) {
+    if (window.console.error) {
+      window.console.error(log);
+    } else if (window.console.log) {
+      window.console.log(log);
+    }
+  }
   throw error;
 };
 

@@ -467,18 +467,23 @@ $.promiseAll = function(promises, asArray) {
 };
 
 /**
- * Shorthand for an AJAX request for a JSON file with UTF8 encoding
- * and a default fail handler which simply throws an Error.
+ * Shorthand for an AJAX request for a JSON file with UTF8 encoding.
+ * Errors are caught and converted to a rejected promise with the following
+ * arguments: jqXHR, textStatus, errorThrown, requestOptions.
  *
- * @returns a promise form JQuery function $.ajax
+ * @returns a promise from JQuery function $.ajax
  */
 $.ajaxJson = function(url) {
   return $.ajax({
     url: url,
     dataType: 'json',
     contentType: 'application/json; charset=UTF-8'
-  }).fail(function(jqXHR, textStatus, errorThrown) {
-    throw new Error('Error while loading URL \'' + url + '\'. Error=' + errorThrown);
+  }).catch(function() {
+    // Reject the promise with usual arguments (jqXHR, textStatus, errorThrown), but add the request
+    // options as additional argument (e.g. to make the URL available to the error handler)
+    var args = scout.objects.argumentsToArray(arguments);
+    args.push(this);
+    return $.rejectedPromise.apply($, args);
   });
 };
 
