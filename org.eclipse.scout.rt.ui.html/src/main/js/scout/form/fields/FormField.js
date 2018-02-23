@@ -219,13 +219,16 @@ scout.FormField.prototype.setFieldStyle = function(fieldStyle) {
 };
 
 scout.FormField.prototype._renderFieldStyle = function() {
-  this.$container.toggleClass('alternative', this.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE);
-  if (this.$fieldContainer) {
-    this.$fieldContainer.toggleClass('alternative', this.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE);
+  this._renderFieldStyleInternal(this.$container);
+  this._renderFieldStyleInternal(this.$fieldContainer);
+  this._renderFieldStyleInternal(this.$field);
+};
+
+scout.FormField.prototype._renderFieldStyleInternal = function($element) {
+  if (!$element) {
+    return;
   }
-  if (this.$field) {
-    this.$field.toggleClass('alternative', this.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE);
-  }
+  $element.toggleClass('alternative', this.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE);
 };
 
 scout.FormField.prototype.setMandatory = function(mandatory) {

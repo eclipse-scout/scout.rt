@@ -1,7 +1,11 @@
 .tag-field > .field {
   border: solid 1px @border-color;
-  border-radius: 3px;
+  border-radius: @control-border-radius;
   user-select: none;
+
+  &.alternative {
+    border-radius: @control-alternative-border-radius;
+  }
 
   &:not(.multiline) {
     white-space: nowrap;

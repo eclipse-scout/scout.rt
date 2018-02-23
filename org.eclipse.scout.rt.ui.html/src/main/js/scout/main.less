@@ -171,7 +171,7 @@ input.alternative,
   background-color: @text-field-alternative-background-color;
   border-color: transparent;
   border-bottom-color: @border-color;
-  border-radius: 0;
+  border-radius: @control-alternative-border-radius;
   border-left-width: 0;
   border-right-width: 0;
   padding-left: @text-field-alternative-padding-left;
@@ -385,6 +385,10 @@ textarea {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+
+  &.alternative {
+    border-radius: @control-alternative-border-radius;
+  }
 }
 
 /* cursor handling */

@@ -30,6 +30,7 @@ scout.TimePickerPopup.prototype._createLayout = function() {
 
 scout.TimePickerPopup.prototype._render = function() {
   this.$container = this.$parent.appendDiv('time-picker-popup');
+  this.$container.toggleClass('alternative', this.field.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE);
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
   this.htmlComp.validateRoot = true;

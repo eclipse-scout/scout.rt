@@ -12,12 +12,13 @@
   position: absolute;
   width: 252px;
   border: 1px solid @popup-border-color;
-  border-radius: @popup-border-radius;
+  border-radius: @control-popup-border-radius;
   #scout.focus-border();
   overflow: hidden;
 
   &.alternative {
     #scout.drop-shadow();
+    border-radius: @control-alternative-border-radius;
   }
 }
 

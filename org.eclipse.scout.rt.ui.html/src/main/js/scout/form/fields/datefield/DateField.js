@@ -1764,24 +1764,18 @@ scout.DateField.prototype._formatValue = function(value) {
  * @override
  */
 scout.DateField.prototype._renderFieldStyle = function() {
-  this.$container.toggleClass('alternative', this.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE);
-  if (this.$dateField) {
-    this.$dateField.toggleClass('alternative', this.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE);
-  }
-  if (this.$timeField) {
-    this.$timeField.toggleClass('alternative', this.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE);
-  }
+  scout.DateField.parent.prototype._renderFieldStyle.call(this);
+  this._renderFieldStyleInternal(this.$dateField);
+  this._renderFieldStyleInternal(this.$timeField);
 };
 
 /**
  * @override
  */
 scout.DateField.prototype._renderDisabledStyle = function() {
-  this._renderDisabledStyleInternal(this.$container);
-  this._renderDisabledStyleInternal(this.$fieldContainer);
+  scout.DateField.parent.prototype._renderDisabledStyle.call(this);
   this._renderDisabledStyleInternal(this.$dateField);
   this._renderDisabledStyleInternal(this.$timeField);
-  this._renderDisabledStyleInternal(this.$mandatory);
 };
 
 /**

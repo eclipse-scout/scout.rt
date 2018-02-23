@@ -16,6 +16,10 @@
     background-color: @control-background-color;
     overflow: hidden; /* necessary due to rounded borders and background color*/
 
+    &.alternative {
+      border-radius: @control-alternative-border-radius;
+    }
+
     &:focus,
     &.focused {
       #scout.focus-border();

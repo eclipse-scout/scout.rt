@@ -453,7 +453,7 @@
   .chooser-popup {
     position: absolute;
     border: solid 1px @popup-border-color;
-    border-radius: @popup-border-radius;
+    border-radius: @control-popup-border-radius;
     overflow: hidden;
     background-color: @palette-white;
     #scout.focus-border();
@@ -472,6 +472,7 @@
 
     &.alternative {
       #scout.drop-shadow();
+      border-radius: @control-alternative-border-radius;
     }
   }
 }
