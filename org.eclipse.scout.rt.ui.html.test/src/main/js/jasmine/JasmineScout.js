@@ -675,3 +675,20 @@ $.fn.triggerDoubleClick = function() {
   }));
   return this;
 };
+
+$.fn.triggerImageLoadCapture = function(opts) {
+  var event;
+  try {
+    event = new Event('load', {
+      'view': window,
+      'bubbles': true,
+      'cancelable': true
+    });
+  } catch (e) {
+    // Phantom JS only supports the old, deprecated API
+    event = document.createEvent('Event');
+    event.initEvent('load', true, true);
+  }
+  this[0].dispatchEvent(event);
+  return this;
+};

@@ -11,6 +11,7 @@
 scout.Column = function() {
   this.autoOptimizeWidth = false;
   this.autoOptimizeWidthRequired = false; // true if content of the column changed and width has to be optimized
+  this.autoOptimizeMaxWidth = -1;
   this.cssClass = null;
   this.editable = false;
   this.removable = false;
@@ -23,6 +24,7 @@ scout.Column = function() {
   this.index = -1;
   this.initialized = false;
   this.mandatory = false;
+  this.optimalWidthMeasurer = new scout.ColumnOptimalWidthMeasurer(this);
   this.sortActive = false;
   this.sortAscending = true;
   this.sortIndex = -1;
@@ -32,7 +34,6 @@ scout.Column = function() {
   this.initialWidth = undefined; // the width the column initially has
   this.prefMinWidth = null;
   this.minWidth = scout.Column.DEFAULT_MIN_WIDTH; // the minimal width the column can have
-  this.autoOptimizeMaxWidth = -1;
   this.showSeparator = true;
   this.textWrap = false;
   this.filterType = 'TextColumnUserFilter';
@@ -493,36 +494,7 @@ scout.Column.prototype.createAggrEmptyCell = function() {
 };
 
 scout.Column.prototype.calculateOptimalWidth = function() {
-  // Prepare a temporary container that is not (yet) part of the DOM to prevent
-  // expensive "forced reflow" while adding the cell divs. Only after all cells
-  // are rendered, the container is added to the DOM.
-  var $tmp = this.table.$data.makeDiv('invisible');
-  var addDivForMeasurement = function($div) {
-    $div.removeAttr('style').appendTo($tmp);
-  };
-
-  // Create divs for all relevant cells of the column
-  if (this.$header) {
-    addDivForMeasurement(this.$header.clone()); // header
-  }
-  this.table.rows.forEach(function(row) {
-    addDivForMeasurement($(this.buildCellForRow(row))); // model rows
-  }, this);
-  this.table._aggregateRows.forEach(function(row) {
-    addDivForMeasurement($(this.buildCellForAggregateRow(row))); // aggregate rows
-  }, this);
-
-  // Add to DOM and measure optimal width
-  this.table.$data.append($tmp);
-  var optimalWidth = this.minWidth;
-  $tmp.children().each(function() {
-    optimalWidth = Math.max(optimalWidth, scout.graphics.size($(this)).width);
-  });
-
-  // Remove
-  $tmp.remove();
-
-  return optimalWidth;
+  return this.optimalWidthMeasurer.measure();
 };
 
 /**

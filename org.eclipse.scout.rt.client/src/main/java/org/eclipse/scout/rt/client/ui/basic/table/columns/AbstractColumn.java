@@ -540,8 +540,15 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
-   * Configures whether the column width is auto optimized. If true: Whenever the table content changes, the optimized
+   * Configures whether the column width is auto optimized. If true: whenever the table content changes, the optimized
    * column width is automatically calculated so that all column content is displayed without cropping.
+   * <p>
+   * Keep in mind that if images (png, jpg etc., not font icons) are used, every image will have to be loaded in order
+   * to calculate the width properly. Normally, only the images in the viewport are loaded initially, the others are
+   * loaded while scrolling. This means if you have a lot of different images in a table it will create a lot of
+   * requests when the column is auto optimized. If the images are cashed (which is the default for static images), it
+   * will only happen the first time the image is loaded. So if you have a lot of images you should consider manually
+   * setting a width instead of using this property.
    * <p>
    * This may display a horizontal scroll bar on the table.
    * <p>

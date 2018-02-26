@@ -435,6 +435,29 @@ describe('Column', function() {
       expect(table.resizeToFit.calls.count()).toBe(1);
     });
 
+    it('considers images', function() {
+      var model = helper.createModelFixture(3, 2);
+      model.columns[1].autoOptimizeWidth = true;
+      model.rows[0].cells[1].iconId = 'fancyIcon.png';
+      var table = helper.createTable(model);
+      spyOn(table, 'resizeToFit').and.callThrough();
+      spyOn(table, '_resizeToFit').and.callThrough();
+      table.render();
+      expect(table.resizeToFit).not.toHaveBeenCalled();
+      expect(table._resizeToFit).not.toHaveBeenCalled();
+
+      table.validateLayout();
+      expect(table.resizeToFit.calls.count()).toBe(1);
+      // _resizeToFit must not be called yet because fancyImage.png is not loaded yet
+      expect(table._resizeToFit.calls.count()).toBe(0);
+
+      // Simulate imaeg load event
+      table.columns[1].optimalWidthMeasurer.$measurement.find('img').triggerImageLoadCapture();
+      // Image has been loaded and the promise is resolved -> _resizeToFit will be called
+      expect(table.resizeToFit.calls.count()).toBe(1);
+      expect(table._resizeToFit.calls.count()).toBe(1);
+    });
+
     describe('autoOptimizeWidthRequired', function() {
       it('will be set to true if a row is updated and the content changed', function() {
         var model = helper.createModelFixture(3, 2);
