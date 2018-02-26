@@ -285,6 +285,13 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     return m_lookupCall;
   }
 
+  @Override
+  public void setMandatory(boolean b, boolean recursive) {
+    // do not propagate to children
+    // for backwards-compatibility because radio-button-group does not extend AbstractCompositeField which contained the auto-propagation in older releases
+    super.setMandatory(b, false);
+  }
+
   public void setLookupCall(ILookupCall<T> call) {
     m_lookupCall = call;
   }

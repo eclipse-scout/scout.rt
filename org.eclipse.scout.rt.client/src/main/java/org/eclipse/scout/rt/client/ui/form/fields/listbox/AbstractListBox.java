@@ -430,6 +430,13 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
   }
 
   @Override
+  public void setMandatory(boolean b, boolean recursive) {
+    // do not propagate to children
+    // for backwards-compatibility because list-box does not extend AbstractCompositeField which contained the auto-propagation in older releases
+    super.setMandatory(b, false);
+  }
+
+  @Override
   public boolean isFilterCheckedRows() {
     return propertySupport.getPropertyBool(PROP_FILTER_CHECKED_ROWS);
   }

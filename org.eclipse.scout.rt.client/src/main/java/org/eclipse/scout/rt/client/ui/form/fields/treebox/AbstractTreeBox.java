@@ -414,6 +414,13 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   @Override
+  public void setMandatory(boolean b, boolean recursive) {
+    // do not propagate to children
+    // for backwards-compatibility because tree-box does not extend AbstractCompositeField which contained the auto-propagation in older releases
+    super.setMandatory(b, false);
+  }
+
+  @Override
   public void moveFieldTo(IFormField f, ICompositeField newContainer) {
     CompositeFieldUtility.moveFieldTo(f, this, newContainer, m_movedFormFieldsByClass);
   }
