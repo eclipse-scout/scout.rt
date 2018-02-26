@@ -15,7 +15,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.interceptor.DecoratingProxy;
 import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
@@ -76,7 +78,13 @@ public class BeanProxyImplementor<T> implements IInstanceInvocationHandler<T> {
           throw new ProcessingException("argument mismatch", e);
         }
         catch (InvocationTargetException e) {
-          throw new UndeclaredThrowableException(e); // must be an exception of a type that DefaultExceptionTranslator can unwrap again (see DefaultExceptionTranslator#isWrapperException()).
+          // Do not use DefaultRuntimeExceptionTranslator here because it would wrap checked exceptions into a PlatformException.
+          // But this method must return an exception of a type that DefaultExceptionTranslator can unwrap again (see DefaultExceptionTranslator#isWrapperException()).
+          Throwable originalException = BEANS.get(DefaultExceptionTranslator.class).unwrap(e);
+          if (originalException instanceof RuntimeException) {
+            throw ((RuntimeException) originalException);
+          }
+          throw new UndeclaredThrowableException(originalException);
         }
       }
     };
