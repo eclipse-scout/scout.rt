@@ -20,12 +20,17 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.eclipse.scout.rt.client.ui.form.FormUtility;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.OrderedComparator;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class CompositeFieldUtility {
+
+  private static final Logger LOG = LoggerFactory.getLogger(CompositeFieldUtility.class);
 
   private CompositeFieldUtility() {
   }
@@ -41,22 +46,50 @@ public final class CompositeFieldUtility {
 
     fields.add(f);
     fields.sort(new OrderedComparator());
-    f.setParentFieldInternal(compositeField);
-    f.setFormInternal(compositeField.getForm());
+    connectFields(f, compositeField);
     if (compositeField.isInitConfigDone()) {
       f.init();
       FormUtility.rebuildFieldGrid(compositeField);
     }
   }
 
+  /**
+   * Connects the specified fields. This includes setting the parent form field and form of the specified child.
+   *
+   * @param child
+   *          The child to connect. May not be {@code null}.
+   * @param parent
+   *          The parent form field. May be {@code null}.
+   */
+  public static void connectFields(IFormField child, ICompositeField parent) {
+    child.setParentFieldInternal(parent);
+
+    if (parent == null) {
+      return;
+    }
+
+    IForm formOfParentField = parent.getForm();
+    IForm formOfChildField = child.getForm();
+    if (formOfChildField == formOfParentField) {
+      return; // nothing to do. already set correctly.
+    }
+
+    if (formOfChildField == null) {
+      // e.g. if an external field is injected using injectFieldsInternal
+      child.setFormInternal(formOfParentField);
+    }
+    else {
+      LOG.warn("Field '{}' is already connected to form '{}' but is now added to form '{}' as well.", child, formOfChildField, formOfParentField);
+    }
+  }
+
   public static void removeField(IFormField f, ICompositeField compositeField, List<IFormField> fields) {
     assertNotNull(fields);
     assertNotNull(f, "field must not be null");
-
     boolean removed = fields.remove(f);
     assertTrue(removed, "field is not part of container '{}'.", compositeField);
 
-    f.setParentFieldInternal(null);
+    connectFields(f, null);
     if (f.isInitConfigDone()) {
       f.dispose();
     }

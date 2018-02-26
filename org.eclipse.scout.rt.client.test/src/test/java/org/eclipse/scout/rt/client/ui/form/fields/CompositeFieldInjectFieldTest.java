@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -20,10 +21,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldInjectFieldTest.
 import org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldInjectFieldTest.TestForm.PresentationBox;
 import org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldInjectFieldTest.TestForm.PresentationBox2;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.extension.InjectFieldTo;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -35,9 +39,30 @@ import org.junit.runner.RunWith;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class CompositeFieldInjectFieldTest extends AbstractLocalExtensionTestCase {
 
-  public class TestForm extends AbstractForm {
+  public static class TestForm extends AbstractForm {
+
+    private final IFormField m_injected;
+
+    public TestForm() {
+      this(null);
+    }
+
+    public TestForm(IFormField injected) {
+      super(false);
+      m_injected = injected;
+      callInitializer();
+    }
+
     @Order(10)
     public class MainBox extends AbstractGroupBox {
+
+      @Override
+      protected void injectFieldsInternal(OrderedCollection<IFormField> fields) {
+        if (m_injected != null) {
+          fields.addLast(m_injected);
+        }
+        super.injectFieldsInternal(fields);
+      }
 
       @Order(10)
       public class TabBox extends AbstractTabBox {
@@ -64,11 +89,29 @@ public class CompositeFieldInjectFieldTest extends AbstractLocalExtensionTestCas
     }
   }
 
+  public static class StringFieldToInject extends AbstractStringField {
+  }
+
   @Test
   public void test() {
     TestForm form = new TestForm();
-    assertNotNull(form.getFieldByClass(PresentationBox.class));
-    assertNotNull(form.getFieldByClass(PresentationBox2.class));
+    PresentationBox box1 = form.getFieldByClass(PresentationBox.class);
+    PresentationBox2 box2 = form.getFieldByClass(PresentationBox2.class);
+
+    assertNotNull(box1);
+    assertNotNull(box2);
     assertEquals(2, form.getFieldByClass(TabBox.class).getFieldCount());
+    assertSame(form, box1.getForm());
+    assertSame(form, box2.getForm());
+  }
+
+  @Test
+  public void testInjectWithExternalField() {
+    IStringField toInject = new StringFieldToInject();
+    TestForm form = new TestForm(toInject);
+
+    IStringField field = form.getFieldByClass(StringFieldToInject.class);
+    assertNotNull(field);
+    assertSame(form, field.getForm());
   }
 }

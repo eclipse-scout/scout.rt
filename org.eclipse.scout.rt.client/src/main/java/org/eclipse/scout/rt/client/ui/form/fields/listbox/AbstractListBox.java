@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.listbox;
 
+import static org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility.connectFields;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -376,7 +378,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     fieldList.sort(new OrderedComparator());
 
     for (IFormField f : fieldList) {
-      f.setParentFieldInternal(this);
+      connectFields(f, this);
     }
     m_fields = fieldList;
   }

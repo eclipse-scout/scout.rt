@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup;
 
+import static org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility.connectFields;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -158,7 +160,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     fields.addAllOrdered(contributedFields);
     injectFieldsInternal(fields);
     for (IFormField f : fields) {
-      f.setParentFieldInternal(this);
+      connectFields(f, this);
     }
     m_fields = fields.getOrderedList();
     //attach a proxy controller to each child field in the group for: visible, saveNeeded

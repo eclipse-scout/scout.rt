@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
 
+import static org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility.connectFields;
+
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -125,7 +127,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
 
       // connect
       for (IFormField f : fields) {
-        f.setParentFieldInternal(this);
+        connectFields(f, this);
       }
 
       setFieldsInternal(fields.getOrderedList());
