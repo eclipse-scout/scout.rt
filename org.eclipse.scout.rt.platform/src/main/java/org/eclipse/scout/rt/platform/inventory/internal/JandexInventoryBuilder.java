@@ -197,12 +197,12 @@ public class JandexInventoryBuilder {
 
   protected Index scanJar(URI indexUri) throws URISyntaxException, IOException {
     String s = indexUri.getRawSchemeSpecificPart();
-    File jarFile = new File(new URI(s.substring(0, s.lastIndexOf('!'))));
     Index index = readIndex(indexUri);
     if (index != null) {
       return index;
     }
     LOG.info("Found no pre-built '{}'. Scanning location...", indexUri);
+    File jarFile = new File(new URI(s.substring(0, s.lastIndexOf('!'))));
     Indexer indexer = new Indexer();
     return JarIndexer.createJarIndex(jarFile, indexer, false, false, false).getIndex();
   }
