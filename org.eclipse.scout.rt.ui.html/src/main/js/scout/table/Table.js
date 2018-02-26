@@ -389,11 +389,20 @@ scout.Table.prototype._setTableControls = function(controls) {
  * Note: we don't change the width of the row or table.
  */
 scout.Table.prototype._onImageLoadOrError = function(event) {
-  var
-    $row = $(event.target).closest('.table-row'),
-    row = $row.data('row');
+  var $target = $(event.target);
+  if ($target.data('measure') === 'in-progress') {
+    // Ignore events created by autoOptimizeWidth measurement (see ColumnOptimalWidthMeasurer)
+    // Using event.stopPropagation() is not possible because the image load event does not bubble
+    return;
+  }
+
+  var $row = $target.closest('.table-row');
+  var row = $row.data('row');
+  var oldRowHeight = row.height;
   row.height = $row.outerHeight(true);
-  this.invalidateLayoutTree();
+  if (oldRowHeight !== row.height) {
+    this.invalidateLayoutTree();
+  }
 };
 
 scout.Table.prototype._onRowMouseDown = function(event) {
@@ -2844,7 +2853,20 @@ scout.Table.prototype.resizeToFit = function(column, maxWidth) {
   if (column.fixedWidth) {
     return;
   }
-  var calculatedSize = column.calculateOptimalWidth();
+  var returnValue = column.calculateOptimalWidth();
+  if (scout.objects.isPlainObject(returnValue)) {
+    // Function returned a promise -> delay resizing
+    returnValue.always(this._resizeToFit.bind(this, column, maxWidth));
+  } else {
+    this._resizeToFit(column, maxWidth, returnValue);
+  }
+};
+
+scout.Table.prototype._resizeToFit = function(column, maxWidth, calculatedSize) {
+  if (calculatedSize === -1) {
+    // Calculation has been aborted -> don't resize
+    return;
+  }
   if (maxWidth && maxWidth > 0 && calculatedSize > maxWidth){
     calculatedSize = maxWidth;
   }
@@ -3522,6 +3544,7 @@ scout.Table.prototype._uninstallDragAndDropHandler = function(event) {
  */
 scout.Table.prototype._installImageListeners = function() {
   this._imageLoadListener = this._onImageLoadOrError.bind(this);
+  // Image events don't bubble -> use capture phase instead
   this.$data[0].addEventListener('load', this._imageLoadListener, true);
   this.$data[0].addEventListener('error', this._imageLoadListener, true);
 };
