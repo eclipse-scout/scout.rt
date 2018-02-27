@@ -12,3 +12,15 @@ scout.FormFieldMenuAdapter = function() {
   scout.FormFieldMenuAdapter.parent.call(this);
 };
 scout.inherits(scout.FormFieldMenuAdapter, scout.MenuAdapter);
+
+
+/**
+ * @override
+ */
+scout.FormFieldMenuAdapter.prototype._postCreateWidget = function() {
+  scout.FormFieldMenuAdapter.parent.prototype._postCreateWidget.call(this);
+  // Set gridDataHints to null -> Calculation happens on server side
+  if(this.widget.field){
+    this.widget.field.gridDataHints = null;
+  }
+};

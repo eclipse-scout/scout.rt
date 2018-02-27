@@ -31,6 +31,7 @@ public abstract class AbstractFormFieldMenu extends AbstractMenu implements IFor
     Class<? extends IFormField> fieldClass = getConfiguredField();
     if (fieldClass != null) {
       m_field = ConfigurationUtility.newInnerInstance(this, fieldClass);
+      m_field.setGridDataInternal(m_field.getGridDataHints());
     }
   }
 

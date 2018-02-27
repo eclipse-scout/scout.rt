@@ -47,7 +47,9 @@ scout.FormFieldMenu.prototype._renderField = function() {
   if (this.field) {
     this.field.render(this.$container);
     this.formFieldMenu = true;
-    this.field.gridData = scout.GridData.createFromHints(this.field, 1);
+    if(this.field.gridDataHints){
+      this.field.gridData = scout.GridData.createFromHints(this.field, 1);
+    }
     var layoutData = new scout.LogicalGridData(this.field);
     layoutData.validate();
     this.field.setLayoutData(layoutData);
