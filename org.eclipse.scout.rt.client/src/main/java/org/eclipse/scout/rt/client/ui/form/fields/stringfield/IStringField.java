@@ -15,9 +15,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 
 public interface IStringField extends IBasicField<String>, IDNDSupport {
 
-  /**
-   * @see IDNDSupport
-   */
   String PROP_HAS_ACTION = "hasAction";
   String PROP_INPUT_MASKED = "inputMasked";
   String PROP_WRAP_TEXT = "wrapText";

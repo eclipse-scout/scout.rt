@@ -147,7 +147,6 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
    * see {@link #setLabelPosition(int)} and {@link #getLabelPosition()}
    */
   byte LABEL_POSITION_RIGHT = 3;
-
   /**
    * position the label on the top of the field
    */
@@ -163,7 +162,6 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
    * use the systemwide default label with see {@link #setLabelWidthInPixel(int)} and {@link #getLabelWidthInPixel()}
    */
   int LABEL_WIDTH_DEFAULT = 0;
-
   /**
    * use the ui-specific "real" with of the label see {@link #setLabelWidthInPixel(int)} and
    * {@link #getLabelWidthInPixel()}
@@ -174,32 +172,26 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
    * use the default label alignment of the UI
    */
   byte LABEL_HORIZONTAL_ALIGNMENT_DEFAULT = 127;
-
   /**
    * left alignment
    */
   byte LABEL_HORIZONTAL_ALIGNMENT_LEFT = -1;
-
   /**
    * center alignment
    */
   byte LABEL_HORIZONTAL_ALIGNMENT_CENTER = 0;
-
   /**
    * right alignment
    */
   byte LABEL_HORIZONTAL_ALIGNMENT_RIGHT = 1;
 
   String STATUS_POSITION_DEFAULT = "default";
-
   String STATUS_POSITION_TOP = "top";
 
   String FIELD_STYLE_CLASSIC = "classic";
-
   String FIELD_STYLE_ALTERNATIVE = "alternative";
 
   int DISABLED_STYLE_DEFAULT = 0;
-
   int DISABLED_STYLE_READ_ONLY = 1;
 
   IForm getForm();
