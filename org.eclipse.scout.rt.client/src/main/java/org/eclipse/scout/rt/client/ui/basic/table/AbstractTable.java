@@ -1602,43 +1602,51 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     else {
       // all calls to further methods are wrapped into a try-catch block so that the change counters are adjusted correctly
       if (m_tableChanging > 0) {
-        Exception saveEx = null;
-        if (m_tableChanging == 1) {
-          try {
+        Throwable saveEx = null;
+        try {
+          if (m_tableChanging == 1) {
             //will be going to zero, but process decorations here, so events are added to the event buffer
             processDecorationBuffer();
             if (!m_sortValid) {
               sort();
             }
           }
-          catch (Exception t) {
-            saveEx = t;
-          }
         }
-        m_tableChanging--;
-        if (m_tableChanging == 0) {
-          try {
-            processEventBuffer();
-          }
-          catch (Exception t) {
-            if (saveEx == null) {
-              saveEx = t;
+        catch (RuntimeException | Error t) {
+          // covers all unchecked exceptions
+          saveEx = t;
+          throw t;
+        }
+        finally {
+          // exceptions in above try-block will not be thrown if the finally-block throws, thus we suppress them.
+          m_tableChanging--;
+          if (m_tableChanging == 0) {
+            try {
+              processEventBuffer();
+            }
+            catch (RuntimeException | Error t) {
+              if (saveEx != null) {
+                saveEx.addSuppressed(t);
+              }
+              else {
+                saveEx = t;
+                throw t;
+              }
+            }
+            finally {
+              try {
+                propertySupport.setPropertiesChanging(false);
+              }
+              catch (RuntimeException | Error t) {
+                if (saveEx != null) {
+                  saveEx.addSuppressed(t);
+                }
+                else {
+                  throw t;
+                }
+              }
             }
           }
-          try {
-            propertySupport.setPropertiesChanging(false);
-          }
-          catch (Exception t) {
-            if (saveEx == null) {
-              saveEx = t;
-            }
-          }
-        }
-        if (saveEx == null) {
-          return;
-        }
-        else if (saveEx instanceof RuntimeException) {
-          throw (RuntimeException) saveEx;
         }
       }
     }
