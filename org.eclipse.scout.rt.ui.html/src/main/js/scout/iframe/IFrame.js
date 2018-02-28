@@ -68,7 +68,9 @@ scout.IFrame.prototype._renderScrollBarEnabled = function() {
 
   // re-render location otherwise the attribute change would have no effect, see
   // https://html.spec.whatwg.org/multipage/embedded-content.html#attr-iframe-sandbox
-  this._renderLocation();
+  if (this.rendered) {
+    this._renderLocation();
+  }
 };
 
 scout.IFrame.prototype.setSandboxEnabled = function(sandboxEnabled) {
