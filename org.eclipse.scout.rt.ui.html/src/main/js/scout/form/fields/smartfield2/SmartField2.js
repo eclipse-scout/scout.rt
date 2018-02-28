@@ -814,7 +814,6 @@ scout.SmartField2.prototype._onIconMouseDown = function(event) {
   var clearable = this.clearable;
   this.$field.focus();
   if (clearable) {
-    this._lastSearchText = this._readDisplayText();
     this.clear();
     return;
   }
@@ -835,12 +834,11 @@ scout.SmartField2.prototype._onClearIconMouseDown = function(event) {
   }
   event.preventDefault();
   this.$field.focus();
-  this._lastSearchText = this._readDisplayText();
   this.clear();
 };
 
 scout.SmartField2.prototype._clear = function() {
-  this._userWasTyping = true;
+  this._lastSearchText = this._readDisplayText();
   this.$field.val('');
   if (this.isPopupOpen()) {
     // When cleared, browse by all again, need to do it in setTimeout because sending acceptInput and lookupAll at the same time does not seem to work
