@@ -343,10 +343,6 @@ scout.strings = {
     return this.empty(string) ? null : string;
   },
 
-  emptyIfNull: function(string) {
-    return string === undefined || string === null ? "" : string;
-  },
-
   /**
    * Null safe case sensitive comparison of two strings.
    *
