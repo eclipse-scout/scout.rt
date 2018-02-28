@@ -72,7 +72,7 @@ scout.TabBox.prototype.deleteTabItem = function(tabItem) {
   var newTabItems = this.tabItems.slice();
   if (index >= 0) {
     newTabItems.splice(index, 1);
-    this.setTabItems(newTabItems);
+    this._setTabItems(newTabItems);
   }
 };
 
@@ -83,10 +83,10 @@ scout.TabBox.prototype.insertTabItem = function(tabItem, index) {
   index = scout.nvl(index, this.tabItems.length);
   var newTabItems = this.tabItems.slice();
   newTabItems.splice(index, 0, tabItem);
-  this.setTabItems(newTabItems);
+  this._setTabItems(newTabItems);
 };
 
-scout.TabBox.prototype.setTabItems = function(tabItems) {
+scout.TabBox.prototype._setTabItems = function(tabItems) {
   tabItems = tabItems || [];
   var tabsToRemove = this.tabItems || [];
   tabsToRemove.filter(function(tabItem) {
@@ -95,7 +95,7 @@ scout.TabBox.prototype.setTabItems = function(tabItems) {
     tabItem.remove();
   });
 
-  this.setProperty('tabItems', tabItems);
+  this._setProperty('tabItems', tabItems);
   if (this.tabItems.indexOf(this.selectedTab) < 0) {
     // select first
     this.setSelectedTab(this.tabItems[0]);
