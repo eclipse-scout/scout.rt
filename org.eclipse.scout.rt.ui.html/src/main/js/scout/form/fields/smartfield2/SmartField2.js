@@ -34,6 +34,7 @@ scout.SmartField2 = function() {
   this._acceptInputEnabled = true; // used to prevent multiple execution of blur/acceptInput
   this._acceptInputDeferred = $.Deferred();
   this._notUnique = false; // used to store the error state 'not unique' which must not be showed while typing, but when the field loses focus
+  this._lastSearchText = null;
   this.lookupStatus = null;
 
   this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilter', 'activeFilterEnabled', 'activeFilterLabels',
@@ -182,7 +183,7 @@ scout.SmartField2.prototype.acceptInput = function() {
   var
     searchText = this._readSearchText(),
     searchTextEmpty = scout.strings.empty(searchText),
-    searchTextChanged = this._checkDisplayTextChanged(searchText),
+    searchTextChanged = this._checkSearchTextChanged(searchText),
     selectedLookupRow = this.isPopupOpen() ? this.popup.getSelectedLookupRow() : null;
 
   this._setProperty('displayText', searchText);
@@ -191,7 +192,7 @@ scout.SmartField2.prototype.acceptInput = function() {
 
   // in case the user has typed something after he has selected a lookup row
   // --> ignore the selection.
-  if (this._userWasTyping) {
+  if (searchTextChanged) {
     selectedLookupRow = null;
   }
 
@@ -208,6 +209,12 @@ scout.SmartField2.prototype.acceptInput = function() {
   }
 
   return this._acceptInput(searchText, searchTextEmpty, searchTextChanged, selectedLookupRow);
+};
+
+scout.SmartField2.prototype._checkSearchTextChanged = function(searchText) {
+  var a = scout.strings.nullIfEmpty(this._firstTextLine(searchText));
+  var b = scout.strings.nullIfEmpty(this._lastSearchText);
+  return !scout.strings.equalsIgnoreCase(a, b);
 };
 
 /**
@@ -295,6 +302,7 @@ scout.SmartField2.prototype._firstTextLine = function(text) {
  */
 scout.SmartField2.prototype._acceptByText = function(searchText) {
   $.log.debug('(SmartField2#_acceptByText) searchText=', searchText);
+  this._lastSearchText = searchText;
   this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText))
     .done(this._acceptByTextDone.bind(this));
 };
@@ -421,6 +429,7 @@ scout.SmartField2.prototype._acceptInputFail = function(result) {
 
 scout.SmartField2.prototype.lookupByRec = function(rec) {
   $.log.debug('(SmartField2#lookupByRec) rec=', rec);
+  this._lastSearchText = null;
   return this._executeLookup(this.lookupCall.getByRec.bind(this.lookupCall, rec))
     .then(function(result) {
 
@@ -501,6 +510,7 @@ scout.SmartField2.prototype._formatValue = function(value) {
 
   // we must do a lookup first to get the display text
   // Note: this has a side-effect as it sets the property lookupRow on the smart field
+  this._lastSearchText = null;
   return this._executeLookup(this.lookupCall.getByKey.bind(this.lookupCall, value))
     .then(this._lookupByKeyDone.bind(this));
 };
@@ -602,12 +612,14 @@ scout.SmartField2.prototype._lookupByTextOrAll = function(browse, searchText) {
   // execute lookup byAll immediately
   if (browse) {
     $.log.debug('(SmartField2#_lookupByTextOrAll) lookup byAll (seachText empty)');
+    this._lastSearchText = null;
     this._executeLookup(this.lookupCall.getAll.bind(this.lookupCall))
       .done(doneHandler);
   } else {
     // execute lookup byText with a debounce/delay
     this._pendingLookup = setTimeout(function() {
       $.log.debug('(SmartField2#_lookupByTextOrAll) lookup byText searchText=' + searchText);
+      this._lastSearchText = searchText;
       this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText))
         .done(doneHandler);
     }.bind(this), scout.SmartField2.DEBOUNCE_DELAY);
@@ -802,6 +814,7 @@ scout.SmartField2.prototype._onIconMouseDown = function(event) {
   var clearable = this.clearable;
   this.$field.focus();
   if (clearable) {
+    this._lastSearchText = this._readDisplayText();
     this.clear();
     return;
   }
@@ -822,6 +835,7 @@ scout.SmartField2.prototype._onClearIconMouseDown = function(event) {
   }
   event.preventDefault();
   this.$field.focus();
+  this._lastSearchText = this._readDisplayText();
   this.clear();
 };
 
