@@ -337,5 +337,39 @@ scout.strings = {
     var last = array.slice(limit - 1).join(separator); // combine the rest
     arrayShort.push(last);
     return arrayShort;
+  },
+
+  nullIfEmpty: function(string) {
+    return this.empty(string) ? null : string;
+  },
+
+  emptyIfNull: function(string) {
+    return string === undefined || string === null ? "" : string;
+  },
+
+  /**
+   * Null safe case sensitive comparison of two strings.
+   *
+   * @param [ignoreCase] optional flag to perform case insensitive comparison
+   */
+  equals: function(a, b, ignoreCase) {
+    a = this.nullIfEmpty(a);
+    b = this.nullIfEmpty(b);
+    if (!a && !b) {
+      return true;
+    }
+    if (!a || !b) {
+      return false;
+    }
+    if (ignoreCase) {
+      return a.toLowerCase() === b.toLowerCase();
+    } else {
+      return a === b;
+    }
+  },
+
+  equalsIgnoreCase: function(a, b) {
+    return this.equals(a, b, true);
   }
+
 };

@@ -32,6 +32,7 @@ scout.SmartField = function() {
   this._acceptInputEnabled = true; // used to prevent multiple execution of blur/acceptInput
   this._acceptInputDeferred = $.Deferred();
   this._notUnique = false; // used to store the error state 'not unique' which must not be showed while typing, but when the field loses focus
+  this._lastSearchText = null;
   this.lookupStatus = null;
 
   this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilter', 'activeFilterEnabled', 'activeFilterLabels',
@@ -174,7 +175,7 @@ scout.SmartField.prototype.acceptInput = function() {
   var
     searchText = this._readSearchText(),
     searchTextEmpty = scout.strings.empty(searchText),
-    searchTextChanged = this._checkDisplayTextChanged(searchText),
+    searchTextChanged = this._checkSearchTextChanged(searchText),
     selectedLookupRow = this.isPopupOpen() ? this.popup.getSelectedLookupRow() : null;
 
   this._setProperty('displayText', searchText);
@@ -183,7 +184,7 @@ scout.SmartField.prototype.acceptInput = function() {
 
   // in case the user has typed something after he has selected a lookup row
   // --> ignore the selection.
-  if (this._userWasTyping) {
+  if (searchTextChanged) {
     selectedLookupRow = null;
   }
 
@@ -196,6 +197,12 @@ scout.SmartField.prototype.acceptInput = function() {
   }
 
   return this._acceptInput(searchText, searchTextEmpty, searchTextChanged, selectedLookupRow);
+};
+
+scout.SmartField.prototype._checkSearchTextChanged = function(searchText) {
+  var a = scout.strings.nullIfEmpty(this._firstTextLine(searchText));
+  var b = scout.strings.nullIfEmpty(this._lastSearchText);
+  return !scout.strings.equalsIgnoreCase(a, b);
 };
 
 scout.SmartField.prototype._clearPendingLookup = function() {
@@ -290,6 +297,7 @@ scout.SmartField.prototype._firstTextLine = function(text) {
  */
 scout.SmartField.prototype._acceptByText = function(searchText) {
   $.log.isDebugEnabled() && $.log.debug('(SmartField#_acceptByText) searchText=', searchText);
+  this._lastSearchText = searchText;
   this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText))
     .done(this._acceptByTextDone.bind(this));
 };
@@ -420,6 +428,7 @@ scout.SmartField.prototype._acceptInputFail = function(result) {
 
 scout.SmartField.prototype.lookupByRec = function(rec) {
   $.log.isDebugEnabled() && $.log.debug('(SmartField#lookupByRec) rec=', rec);
+  this._lastSearchText = null;
   return this._executeLookup(this.lookupCall.getByRec.bind(this.lookupCall, rec))
     .then(function(result) {
 
@@ -489,6 +498,7 @@ scout.SmartField.prototype._formatValue = function(value) {
 
   // we must do a lookup first to get the display text
   // Note: this has a side-effect as it sets the property lookupRow on the smart field
+  this._lastSearchText = null;
   return this._executeLookup(this.lookupCall.getByKey.bind(this.lookupCall, value))
     .then(this._lookupByKeyDone.bind(this));
 };
@@ -585,12 +595,14 @@ scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText) {
   // execute lookup byAll immediately
   if (browse) {
     $.log.isDebugEnabled() && $.log.debug('(SmartField#_lookupByTextOrAll) lookup byAll (seachText empty)');
+    this._lastSearchText = null;
     this._executeLookup(this.lookupCall.getAll.bind(this.lookupCall))
       .done(doneHandler);
   } else {
     // execute lookup byText with a debounce/delay
     this._pendingLookup = setTimeout(function() {
       $.log.isDebugEnabled() && $.log.debug('(SmartField#_lookupByTextOrAll) lookup byText searchText=' + searchText);
+      this._lastSearchText = searchText;
       this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText))
         .done(doneHandler);
     }.bind(this), scout.SmartField.DEBOUNCE_DELAY);
@@ -801,7 +813,7 @@ scout.SmartField.prototype._onClearIconMouseDown = function(event) {
 };
 
 scout.SmartField.prototype._clear = function() {
-  this._userWasTyping = true;
+  this._lastSearchText = this._readDisplayText();
   this.$field.val('');
   if (this.isPopupOpen()) {
     // When cleared, browse by all again, need to do it in setTimeout because sending acceptInput and lookupAll at the same time does not seem to work

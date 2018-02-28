@@ -110,7 +110,7 @@ describe('SmartFieldRemote', function() {
     });
 
     it('don\'t send acceptInput event when display-text has not changed', function() {
-      smartField.displayText = 'foo';
+      smartField._lastSearchText = 'foo';
       smartField.render();
       smartField.$field.val('foo');
       smartField.acceptInput();
@@ -121,7 +121,7 @@ describe('SmartFieldRemote', function() {
 
     it('send acceptInput event when lookup row is set and display-text has not changed', function() {
       var lookupRow = new scout.LookupRow(123, 'foo');
-      smartField.displayText = 'foo';
+      smartField._lastSearchText = 'foo';
       smartField.render();
       smartField.$field.val('foo');
       smartField.popup = scout.create('SmartFieldPopup', {
