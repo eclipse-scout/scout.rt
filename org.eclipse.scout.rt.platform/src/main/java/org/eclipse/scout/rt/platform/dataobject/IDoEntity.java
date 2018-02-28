@@ -56,7 +56,7 @@ public interface IDoEntity extends IDataObject {
   /**
    * Adds new list value to attribute map. The value is wrapped within a {@link DoList}.
    */
-  void putList(String attributeName, List<Object> value);
+  <V> void putList(String attributeName, List<V> value);
 
   /**
    * Removes {@link DoValue} or {@link DoList} attribute from attributes map.

@@ -41,7 +41,7 @@ public class DoEntityBuilder {
   /**
    * Adds new list value to attribute map of entity.
    */
-  public DoEntityBuilder putList(String attributeName, List<Object> value) {
+  public <V> DoEntityBuilder putList(String attributeName, List<V> value) {
     m_entity.putList(attributeName, value);
     return this;
   }

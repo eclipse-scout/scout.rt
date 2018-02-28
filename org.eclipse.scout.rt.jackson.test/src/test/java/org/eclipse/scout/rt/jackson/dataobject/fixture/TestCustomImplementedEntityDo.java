@@ -73,8 +73,8 @@ public class TestCustomImplementedEntityDo implements IDoEntity {
   }
 
   @Override
-  public void putList(String attributeName, List<Object> value) {
-    DoList<Object> doList = new DoList<>();
+  public <V> void putList(String attributeName, List<V> value) {
+    DoList<V> doList = new DoList<>();
     doList.set(value);
     putNode(attributeName, doList);
   }

@@ -75,8 +75,9 @@ public class DoEntity implements IDoEntity {
    * Adds new list value to attribute map. The value is wrapped within a {@link DoList}.
    */
   @Override
-  public void putList(String attributeName, List<Object> value) {
-    doList(attributeName).set(value);
+  public <V> void putList(String attributeName, List<V> value) {
+    DoList<V> doList = doList(attributeName);
+    doList.set(value);
   }
 
   /**
