@@ -31,6 +31,13 @@ scout.RadioButtonGroup.prototype._initKeyStrokeContext = function() {
   ]);
 };
 
+/**
+ * @override ValueField.js
+ */
+scout.RadioButtonGroup.prototype.isClearable = function() {
+  return false;
+};
+
 scout.RadioButtonGroup.prototype.getFields = function() {
   return this.formFields;
 };

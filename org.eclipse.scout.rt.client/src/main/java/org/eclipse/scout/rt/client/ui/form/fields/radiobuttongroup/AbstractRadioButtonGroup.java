@@ -114,6 +114,14 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   /**
+   * a radio button group cannot be clearable
+   */
+  @Override
+  protected final String getConfiguredClearable() {
+    return CLEARABLE_NEVER;
+  }
+
+  /**
    * Called before any lookup is performed
    */
   @ConfigOperation
