@@ -10,21 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.transformation;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
 public abstract class AbstractDeviceTransformer implements IDeviceTransformer {
 
   private IDesktop m_desktop;
-  private final Set<IForm> m_dirtyGridData = new HashSet<>();
   private final DeviceTransformationConfig m_deviceTransformationConfig;
 
   public AbstractDeviceTransformer() {
@@ -114,17 +111,10 @@ public abstract class AbstractDeviceTransformer implements IDeviceTransformer {
   public void notifyPageSearchFormInit(IPageWithTable<ITable> page) {
   }
 
-  @Override
-  public boolean isGridDataDirty(IForm form) {
-    return m_dirtyGridData.contains(form);
-  }
-
-  @Override
-  public void gridDataRebuilt(IForm form) {
-    m_dirtyGridData.remove(form);
-  }
-
-  protected void markGridDataDirty(IForm form) {
-    m_dirtyGridData.add(form);
+  protected void rebuildParentGrid(IFormField field) {
+    ICompositeField parentField = field.getParentField();
+    if (parentField != null) {
+      parentField.rebuildFieldGrid();
+    }
   }
 }

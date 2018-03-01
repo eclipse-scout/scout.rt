@@ -10,18 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.transformation;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
-import org.eclipse.scout.rt.client.ui.form.FormUtility;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -32,8 +27,6 @@ public class MainDeviceTransformer implements IDeviceTransformer {
   private static final Logger LOG = LoggerFactory.getLogger(MainDeviceTransformer.class);
 
   private List<IDeviceTransformer> m_transformers;
-  private final Map<IForm, WeakReference<IForm>> m_transformedForms = new WeakHashMap<>();
-  private final Map<IOutline, WeakReference<IOutline>> m_transformedOutlines = new WeakHashMap<>();
 
   public List<IDeviceTransformer> getTransformers() {
     if (m_transformers == null) {
@@ -60,15 +53,6 @@ public class MainDeviceTransformer implements IDeviceTransformer {
     for (IDeviceTransformer transformer : getTransformers()) {
       transformer.dispose();
     }
-    if (!m_transformedForms.isEmpty()) {
-      List<IForm> forms = new ArrayList<>();
-      for (WeakReference<IForm> ref : m_transformedForms.values()) {
-        forms.add(ref.get());
-      }
-      LOG.warn("Transformed forms map is not empty. Make sure every form gets closed properly to free up memory as quickly as possible. Cleaning up now... Open forms: " + forms);
-      m_transformedForms.clear();
-    }
-    m_transformedOutlines.clear();
   }
 
   @Override
@@ -95,32 +79,14 @@ public class MainDeviceTransformer implements IDeviceTransformer {
       return;
     }
 
-    WeakReference<IForm> formRef = m_transformedForms.get(form);
-    if (formRef != null) {
-      // already transformed
-      // form may be reinitialized any time (e.g. using doReset()) -> don't transform again
-      return;
-    }
-
     for (IDeviceTransformer transformer : getTransformers()) {
       transformer.transformForm(form);
     }
-
-    if (isGridDataDirty(form)) {
-      FormUtility.rebuildFieldGrid(form, true);
-      gridDataRebuilt(form);
-      if (isGridDataDirty(form)) {
-        throw new IllegalStateException("Potential memory leak: gridData still marked as dirty for form " + form);
-      }
-    }
-
-    // mark form as transformed
-    m_transformedForms.put(form, new WeakReference<>(form));
   }
 
   @Override
   public void notifyFormDisposed(IForm form) {
-    m_transformedForms.remove(form);
+    // NOP
   }
 
   @Override
@@ -157,13 +123,6 @@ public class MainDeviceTransformer implements IDeviceTransformer {
       return;
     }
 
-    WeakReference<IForm> formRef = m_transformedForms.get(field.getForm());
-    if (formRef != null) {
-      // Already transformed
-      // fields can only be added during form initialization -> no need to transform again if form has already been initialized
-      return;
-    }
-
     for (IDeviceTransformer transformer : getTransformers()) {
       transformer.transformFormField(field);
     }
@@ -175,18 +134,9 @@ public class MainDeviceTransformer implements IDeviceTransformer {
       return;
     }
 
-    WeakReference<IOutline> outlineRef = m_transformedOutlines.get(outline);
-    if (outlineRef != null) {
-      // Already transformed
-      return;
-    }
-
     for (IDeviceTransformer transformer : getTransformers()) {
       transformer.transformOutline(outline);
     }
-
-    // mark as transformed
-    m_transformedOutlines.put(outline, new WeakReference<>(outline));
   }
 
   @Override
@@ -252,31 +202,6 @@ public class MainDeviceTransformer implements IDeviceTransformer {
 
     for (IDeviceTransformer transformer : getTransformers()) {
       transformer.notifyPageSearchFormInit(page);
-    }
-  }
-
-  @Override
-  public boolean isGridDataDirty(IForm form) {
-    if (!isActive()) {
-      return false;
-    }
-
-    for (IDeviceTransformer transformer : getTransformers()) {
-      if (transformer.isGridDataDirty(form)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  @Override
-  public void gridDataRebuilt(IForm form) {
-    if (!isActive()) {
-      return;
-    }
-
-    for (IDeviceTransformer transformer : getTransformers()) {
-      transformer.gridDataRebuilt(form);
     }
   }
 

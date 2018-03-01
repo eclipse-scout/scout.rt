@@ -57,9 +57,5 @@ public interface IDeviceTransformer {
 
   boolean isFormFieldExcluded(IFormField formField);
 
-  boolean isGridDataDirty(IForm form);
-
-  void gridDataRebuilt(IForm form);
-
   DeviceTransformationConfig getDeviceTransformationConfig();
 }

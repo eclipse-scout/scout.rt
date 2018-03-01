@@ -101,16 +101,6 @@ public class NullDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
-  public boolean isGridDataDirty(IForm form) {
-    return false;
-  }
-
-  @Override
-  public void gridDataRebuilt(IForm form) {
-    // NOP
-  }
-
-  @Override
   public DeviceTransformationConfig getDeviceTransformationConfig() {
     return null;
   }

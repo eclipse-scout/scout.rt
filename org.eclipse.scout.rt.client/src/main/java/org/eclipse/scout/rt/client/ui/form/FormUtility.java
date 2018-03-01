@@ -55,7 +55,7 @@ public final class FormUtility {
     }
     rebuildFieldGrid(rootGroupBox);
     if (initMainBoxGridData) {
-      initRootBoxGridData(form, rootGroupBox);
+      initRootBoxGridData(rootGroupBox);
     }
   }
 
@@ -63,7 +63,7 @@ public final class FormUtility {
     field.visit(ICompositeField::rebuildFieldGrid, ICompositeField.class);
   }
 
-  private static void initRootBoxGridData(IForm form, ICompositeField rootBox) {
+  public static void initRootBoxGridData(ICompositeField rootBox) {
     // layout data for root group box
     GridData rootData = new GridData(rootBox.getGridDataHints());
     if (rootData.w == IFormField.FULL_WIDTH) {

@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
+import org.eclipse.scout.rt.client.ui.form.FormUtility;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
@@ -87,7 +88,6 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     if (form.getDisplayHint() == IForm.DISPLAY_HINT_VIEW) {
       transformView(form);
     }
-
   }
 
   protected void transformView(IForm form) {
@@ -131,7 +131,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     IGroupBox mainBox = form.getRootGroupBox();
     if (mainBox.isScrollable().isTrue()) {
       mainBox.setScrollable(false);
-      markGridDataDirty(mainBox.getForm());
+      FormUtility.initRootBoxGridData(mainBox);
     }
   }
 
@@ -239,8 +239,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     if (gridDataHints.weightX == 0) {
       gridDataHints.weightX = 1;
       field.setGridDataHints(gridDataHints);
-
-      markGridDataDirty(field.getForm());
+      rebuildParentGrid(field);
     }
   }
 
@@ -291,7 +290,12 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
       groupBox.setScrollable(true);
 
       // GridDataHints have been modified by setScrollable. Update the actual gridData with those hints.
-      markGridDataDirty(groupBox.getForm());
+      if (groupBox.isMainBox()) {
+        FormUtility.initRootBoxGridData(groupBox);
+      }
+      else {
+        rebuildParentGrid(groupBox);
+      }
     }
   }
 
@@ -325,8 +329,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     if (!gridDataHints.useUiHeight) {
       gridDataHints.useUiHeight = true;
       box.setGridDataHints(gridDataHints);
-
-      markGridDataDirty(box.getForm());
+      rebuildParentGrid(box);
     }
   }
 
