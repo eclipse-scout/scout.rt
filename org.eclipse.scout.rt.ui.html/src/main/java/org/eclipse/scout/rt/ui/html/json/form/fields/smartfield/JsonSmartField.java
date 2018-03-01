@@ -200,6 +200,9 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
     if (valueSet) {
       VALUE valueFromModel = getModel().getValue();
       if (!ObjectUtility.equals(valueFromUi, valueFromModel)) {
+        addPropertyChangeEvent(ISmartField.PROP_LOOKUP_ROW, lookupRowToJson((LookupRow<?>) getModel().getLookupRow(), hasMultipleColumns()));
+        String displayTextFromModel = getModel().getDisplayText();
+        addPropertyChangeEvent(IValueField.PROP_DISPLAY_TEXT, displayTextFromModel);
         return;
       }
     }

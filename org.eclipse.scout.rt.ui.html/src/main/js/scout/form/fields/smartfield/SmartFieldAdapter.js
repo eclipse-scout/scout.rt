@@ -15,6 +15,8 @@ scout.SmartFieldAdapter = function() {
 };
 scout.inherits(scout.SmartFieldAdapter, scout.ValueFieldAdapter);
 
+scout.SmartFieldAdapter.PROPERTIES_ORDER = ['value', 'lookupRow', 'errorStatus', 'displayText'];
+
 scout.SmartFieldAdapter.prototype._postCreateWidget = function() {
   scout.SmartFieldAdapter.parent.prototype._postCreateWidget.call(this);
   this.widget.lookupCall = scout.create('RemoteLookupCall', this);
@@ -43,6 +45,10 @@ scout.SmartFieldAdapter.prototype.sendLookup = function(queryBy, queryData) {
     requestData[propertyName] = queryData;
   }
   this._send(requestType, requestData);
+};
+
+scout.SmartFieldAdapter.prototype._orderPropertyNamesOnSync = function(newProperties) {
+  return Object.keys(newProperties).sort(this._createPropertySortFunc(scout.SmartFieldAdapter.PROPERTIES_ORDER));
 };
 
 scout.SmartFieldAdapter.prototype._onWidgetAcceptInput = function(event) {

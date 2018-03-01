@@ -47,6 +47,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnDescriptor;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
@@ -54,6 +55,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -115,6 +117,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
       TEXTS.get("ui.Active")};
 
   private volatile IFuture<?> m_lookupFuture;
+  private ProcessingException m_validationError;
 
   public AbstractSmartField() {
     this(true);
@@ -744,15 +747,31 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   @Override
   public void setValueByLookupRow(ILookupRow<VALUE> row) {
-    if (row == null) {
-      setLookupRow(null);
-      setValue(null);
+    m_validationError = null;
+    try {
+      if (row == null) {
+        setValue(null);
+      }
+      else if (row.isEnabled()) {
+        setValue(getValueFromLookupRow(row));
+      }
+      // don't do anything if row is disabled
     }
-    else if (row.isEnabled()) {
-      setLookupRow(row);
-      setValue(getValueFromLookupRow(row));
+    finally {
+      // only set lookup-row when no validation error occurred during validation
+      // see: AbstractValueField#setValue
+      if (m_validationError == null && (row == null || row.isEnabled())) {
+        setLookupRow(row);
+      }
     }
-    // don't do anything if row is disabled
+  }
+
+  @Override
+  protected void handleValidationFailed(ProcessingException e, VALUE rawValue) {
+    // don't call super, because we don't want to update the display text
+    // because this would trigger execFormatValue and start a new lookup
+    addErrorStatus(new ValidationFailedStatus<VALUE>(e, rawValue));
+    m_validationError = e;
   }
 
   /**

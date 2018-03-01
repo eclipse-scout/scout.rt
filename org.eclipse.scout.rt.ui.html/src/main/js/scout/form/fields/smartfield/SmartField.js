@@ -225,7 +225,7 @@ scout.SmartField.prototype._acceptInput = function(searchText, searchTextEmpty, 
     var lookupRowText = scout.strings.nvl(this.lookupRow.text);
     if (lookupRowText === searchText) {
       $.log.isDebugEnabled() && $.log.debug('(SmartField#acceptInput) unchanged: text is equals. Close popup');
-      this.clearErrorStatus();
+      this._clearLookupStatus();
       this._inputAccepted(false);
       return;
     }
@@ -236,7 +236,7 @@ scout.SmartField.prototype._acceptInput = function(searchText, searchTextEmpty, 
   // a field is cleared, and the remote model must be updated (value=null)
   if (!selectedLookupRow && !this.lookupRow && searchTextEmpty) {
     $.log.isDebugEnabled() && $.log.debug('(SmartField#acceptInput) unchanged: text is empty. Close popup');
-    this.clearErrorStatus();
+    this._clearLookupStatus();
     this._inputAccepted(searchTextChanged);
     return;
   }
@@ -245,7 +245,7 @@ scout.SmartField.prototype._acceptInput = function(searchText, searchTextEmpty, 
   // Note: here we assume that a current lookup row is set.
   if (!selectedLookupRow && searchTextEmpty) {
     $.log.isDebugEnabled() && $.log.debug('(SmartField#acceptInput) empty. Set lookup-row to null, close popup');
-    this.clearErrorStatus();
+    this._clearLookupStatus();
     this.setLookupRow(null);
     this._inputAccepted();
     return;
@@ -254,7 +254,7 @@ scout.SmartField.prototype._acceptInput = function(searchText, searchTextEmpty, 
   // 2.) proposal chooser is open -> use the selected row as value
   if (selectedLookupRow) {
     $.log.isDebugEnabled() && $.log.debug('(SmartField#acceptInput) lookup-row selected. Set lookup-row, close popup lookupRow=', selectedLookupRow.toString());
-    this.clearErrorStatus();
+    this._clearLookupStatus();
     this.setLookupRow(selectedLookupRow);
     this._inputAccepted();
     return;
