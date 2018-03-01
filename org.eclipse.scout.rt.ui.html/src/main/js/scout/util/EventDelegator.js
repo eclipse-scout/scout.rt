@@ -57,8 +57,8 @@ scout.EventDelegator.prototype._installSourceListener = function() {
   };
   this.source.events.addListener(this._mirrorListener);
   this._destroyHandler = this._uninstallSourceListener.bind(this);
-  this.source.on('destroy', this._destroyHandler);
-  this.target.on('destroy', this._destroyHandler);
+  this.source.one('destroy', this._destroyHandler);
+  this.target.one('destroy', this._destroyHandler);
 };
 
 scout.EventDelegator.prototype._uninstallSourceListener = function() {
@@ -85,7 +85,7 @@ scout.EventDelegator.prototype._onSourcePropertyChange = function(event) {
   if (this.excludeProperties.indexOf(event.propertyName) > -1) {
     return;
   }
-  if (this.delegateAllProperties || this.delegateProperties.indexOf(event.type) > -1) {
+  if (this.delegateAllProperties || this.delegateProperties.indexOf(event.propertyName) > -1) {
     this.target.callSetter(event.propertyName, event.newValue);
   }
 };
