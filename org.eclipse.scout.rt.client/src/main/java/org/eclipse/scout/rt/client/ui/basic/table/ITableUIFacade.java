@@ -97,8 +97,6 @@ public interface ITableUIFacade {
 
   void cancelCellEditFromUI();
 
-  boolean fireKeyTypedFromUI(String keyStrokeText, char keyChar);
-
   void fireAppLinkActionFromUI(String ref);
 
   void fireTableReloadFromUI();

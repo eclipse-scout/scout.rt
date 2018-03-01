@@ -153,7 +153,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   private final Map<CompositeObject, ITableRow> m_deletedRows;
   private final List<ITableRowFilter> m_rowFilters;
   private final Map<String, BinaryResource> m_attachments;
-  private final KeyStrokeBuffer m_keyStrokeBuffer; // key stroke buffer for select-as-you-type
   private final EventListenerList m_listenerList;
   private final Object m_cachedFilteredRowsLock;
   private final ObjectExtensions<AbstractTable, ITableExtension<? extends AbstractTable>> m_objectExtensions;
@@ -209,7 +208,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     m_cachedFilteredRowsLock = new Object();
     m_rows = Collections.synchronizedList(new ArrayList<ITableRow>(1));
     m_deletedRows = new HashMap<>();
-    m_keyStrokeBuffer = new KeyStrokeBuffer(500L);
     m_rowFilters = new ArrayList<>(1);
     m_attachments = new HashMap<>(0);
     m_initLock = new OptimisticLock();
@@ -4045,88 +4043,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     }
   }
 
-  protected boolean handleKeyStroke(String keyName, char keyChar) {
-    if (keyName == null) {
-      return false;
-    }
-    keyName = keyName.toLowerCase();
-    // check if there is no menu keystroke with that name
-    for (IMenu m : getMenus()) {
-      if (m.getKeyStroke() != null && m.getKeyStroke().equalsIgnoreCase(keyName)) {
-        return false;
-      }
-    }
-    // check if there is no keystroke with that name (ticket 78234)
-    for (IKeyStroke k : getKeyStrokes()) {
-      if (k.getKeyStroke() != null && k.getKeyStroke().equalsIgnoreCase(keyName)) {
-        return false;
-      }
-    }
-    if (keyChar > ' ' && (!keyName.contains("control")) && (!keyName.contains("ctrl")) && (!keyName.contains("alt"))) {
-      // select first/next line with corresponding character
-      String newText = "" + Character.toLowerCase(keyChar);
-      m_keyStrokeBuffer.append(newText);
-      String prefix = m_keyStrokeBuffer.getText();
-
-      IColumn<?> col = getContextColumn();
-      if (col == null) {
-        List<IColumn<?>> sortCols = getColumnSet().getSortColumns();
-        if (!sortCols.isEmpty()) {
-          col = CollectionUtility.lastElement(sortCols);
-        }
-        else {
-          SortedMap<CompositeObject, IColumn<?>> sortMap = new TreeMap<>();
-          int index = 0;
-          for (IColumn<?> c : getColumnSet().getVisibleColumns()) {
-            if (c.getDataType() == String.class) {
-              sortMap.put(new CompositeObject(1, index), c);
-            }
-            else if (c.getDataType() == Boolean.class) {
-              sortMap.put(new CompositeObject(3, index), c);
-            }
-            else {
-              sortMap.put(new CompositeObject(2, index), c);
-            }
-            index++;
-          }
-          if (!sortMap.isEmpty()) {
-            col = sortMap.get(sortMap.firstKey());
-          }
-        }
-      }
-      if (col != null) {
-        int colIndex = col.getColumnIndex();
-        String pattern = StringUtility.toRegExPattern(prefix.toLowerCase());
-        pattern = pattern + ".*";
-        if (LOG.isInfoEnabled()) {
-          LOG.info("finding regex: '{}' in column '{}'", pattern, getColumnSet().getColumn(colIndex).getHeaderCell().getText());
-        }
-        // loop over values and find matching one
-        int rowCount = getRowCount();
-        ITableRow selRow = getSelectedRow();
-        int startIndex = 0;
-        if (selRow != null) {
-          if (prefix.length() <= 1) {
-            startIndex = selRow.getRowIndex() + 1;
-          }
-          else {
-            startIndex = selRow.getRowIndex();
-          }
-        }
-        for (int i = 0; i < rowCount; i++) {
-          ITableRow row = m_rows.get((startIndex + i) % rowCount);
-          String text = row.getCell(colIndex).getText();
-          if (text != null && text.toLowerCase().matches(pattern)) {
-            // handled
-            selectRow(row, false);
-            return true;
-          }
-        }
-      }
-    }
-    return false;
-  }
-
   @Override
   public ITableUIFacade getUIFacade() {
     return m_uiFacade;
@@ -4276,18 +4192,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         if (row != null) {
           fireRowAction(row);
         }
-      }
-      finally {
-        popUIProcessor();
-      }
-    }
-
-    @Override
-    public boolean fireKeyTypedFromUI(String keyStrokeText, char keyChar) {
-      try {
-        pushUIProcessor();
-        //
-        return handleKeyStroke(keyStrokeText, keyChar);
       }
       finally {
         popUIProcessor();
