@@ -39,7 +39,7 @@ scout.AccordionField.prototype._render = function() {
   }
 };
 
-scout.AccordionField.prototype.setTileGrid = function(accordion) {
+scout.AccordionField.prototype.setAccordion = function(accordion) {
   this.setProperty('accordion', accordion);
 };
 
@@ -60,11 +60,19 @@ scout.AccordionField.prototype._setAccordion = function(accordion) {
 };
 
 scout.AccordionField.prototype._renderAccordion = function() {
+  if (!this.accordion) {
+    return;
+  }
   this.accordion.render();
   this.addField(this.accordion.$container);
+  this.invalidateLayoutTree();
 };
 
 scout.AccordionField.prototype._removeAccordion = function() {
+  if (!this.accordion) {
+    return;
+  }
   this.accordion.remove();
   this._removeField();
+  this.invalidateLayoutTree();
 };

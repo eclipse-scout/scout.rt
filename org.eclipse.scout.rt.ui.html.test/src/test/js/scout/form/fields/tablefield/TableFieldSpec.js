@@ -56,7 +56,7 @@ describe("TableField", function() {
       tableField.render();
 
       expect(tableField.table).toBeUndefined();
-      tableField.setProperty('table', table);
+      tableField.setTable(table);
       expect(tableField.table.rendered).toBe(true);
 
       // Field is necessary for the FormFieldLayout
@@ -92,7 +92,7 @@ describe("TableField", function() {
       tableField.render();
 
       expect(tableField.table).toBeUndefined();
-      tableField.setProperty('table', table);
+      tableField.setTable(table);
       expect(tableField.table.$container).toHaveClass('field');
     });
   });

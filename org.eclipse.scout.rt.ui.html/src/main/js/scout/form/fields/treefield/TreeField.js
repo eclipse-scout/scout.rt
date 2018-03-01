@@ -27,16 +27,25 @@ scout.TreeField.prototype._render = function() {
   }
 };
 
-/**
- * Will also be called by model adapter on property change event
- */
+scout.TreeField.prototype.setTree = function(tree) {
+  this.setProperty('tree', tree);
+};
+
 scout.TreeField.prototype._renderTree = function() {
+  if (!this.tree) {
+    return;
+  }
   this.tree.render();
   this.addField(this.tree.$container);
   this.$field.addDeviceClass();
+  this.invalidateLayoutTree();
 };
 
 scout.TreeField.prototype._removeTree = function() {
+  if (!this.tree) {
+    return;
+  }
   this.tree.remove();
   this._removeField();
+  this.invalidateLayoutTree();
 };

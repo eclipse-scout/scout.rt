@@ -44,17 +44,21 @@ scout.WidgetField.prototype.setFieldWidget = function(fieldWidget) {
 };
 
 scout.WidgetField.prototype._renderFieldWidget = function() {
-  if (this.fieldWidget) {
-    this.fieldWidget.render();
-    this.addField(this.fieldWidget.$container);
+  if (!this.fieldWidget) {
+    return;
   }
+  this.fieldWidget.render();
+  this.addField(this.fieldWidget.$container);
+  this.invalidateLayoutTree();
 };
 
 scout.WidgetField.prototype._removeFieldWidget = function() {
-  if (this.fieldWidget) {
-    this.fieldWidget.remove();
-    this._removeField();
+  if (!this.fieldWidget) {
+    return;
   }
+  this.fieldWidget.remove();
+  this._removeField();
+  this.invalidateLayoutTree();
 };
 
 scout.WidgetField.prototype.setScrollable = function(scrollable) {

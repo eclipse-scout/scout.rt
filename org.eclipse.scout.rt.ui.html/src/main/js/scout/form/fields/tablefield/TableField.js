@@ -39,6 +39,10 @@ scout.TableField.prototype._render = function() {
   this._renderTable();
 };
 
+scout.TableField.prototype.setTable = function(table) {
+  this.setProperty('table', table);
+};
+
 scout.TableField.prototype._setTable = function(table) {
   if (this.table) {
     this.table.off(scout.TableField.TABLE_CHANGE_EVENTS, this._tableChangedHandler);
@@ -64,18 +68,22 @@ scout.TableField.prototype.setTable = function(table) {
 };
 
 scout.TableField.prototype._renderTable = function() {
-  if (this.table) {
-    this.table.render();
-    this.addField(this.table.$container);
-    this.$field.addDeviceClass();
+  if (!this.table) {
+    return;
   }
+  this.table.render();
+  this.addField(this.table.$container);
+  this.$field.addDeviceClass();
+  this.invalidateLayoutTree();
 };
 
 scout.TableField.prototype._removeTable = function() {
-  if (this.table) {
-    this.table.remove();
+  if (!this.table) {
+    return;
   }
+  this.table.remove();
   this._removeField();
+  this.invalidateLayoutTree();
 };
 
 scout.TableField.prototype.computeRequiresSave = function() {

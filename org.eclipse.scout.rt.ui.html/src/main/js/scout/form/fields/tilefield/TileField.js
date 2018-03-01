@@ -60,12 +60,18 @@ scout.TileField.prototype._setTileGrid = function(tileGrid) {
 };
 
 scout.TileField.prototype._renderTileGrid = function() {
+  if (!this.tileGrid) {
+    return;
+  }
   this.tileGrid.render();
   this.addField(this.tileGrid.$container);
   this.invalidateLayoutTree();
 };
 
 scout.TileField.prototype._removeTileGrid = function() {
+  if (!this.tileGrid) {
+    return;
+  }
   this.tileGrid.remove();
   this._removeField();
   this.invalidateLayoutTree();
