@@ -347,6 +347,11 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     return (VALUE) propertySupport.getProperty(PROP_VALUE);
   }
 
+  protected void handleValidationFailed(ProcessingException e, VALUE rawValue) {
+    addErrorStatus(new ValidationFailedStatus<VALUE>(e, rawValue));
+    updateDisplayText(rawValue);
+  }
+
   @Override
   public final void setValue(VALUE rawValue) {
     if (isValueChanging()) {
@@ -364,16 +369,14 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
         validatedValue = validateValue(rawValue);
       }
       catch (ProcessingException v) {
-        addErrorStatus(new ValidationFailedStatus<VALUE>(v, rawValue));
-        updateDisplayText(rawValue);
+        handleValidationFailed(v, rawValue);
         return;
       }
       catch (Exception e) {
         final String message = TEXTS.get("InvalidValueMessageX", StringUtility.emptyIfNull(rawValue));
         ProcessingException pe = new ProcessingException(message, e);
         LOG.warn("Unexpected Error: ", pe);
-        addErrorStatus(new ValidationFailedStatus<VALUE>(pe, rawValue));
-        updateDisplayText(rawValue);
+        handleValidationFailed(pe, rawValue);
         return;
       }
       //
