@@ -24,24 +24,39 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.rt.client.extension.ui.tile.ITileAccordionExtension;
+import org.eclipse.scout.rt.client.extension.ui.tile.TileAccordionChains.TileActionChain;
+import org.eclipse.scout.rt.client.extension.ui.tile.TileAccordionChains.TileClickChain;
+import org.eclipse.scout.rt.client.extension.ui.tile.TileAccordionChains.TilesSelectedChain;
+import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.accordion.AbstractAccordion;
 import org.eclipse.scout.rt.client.ui.group.IGroup;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.extension.AbstractExtension;
+import org.eclipse.scout.rt.shared.extension.IExtension;
+import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ClassId("e1e96659-f922-45c8-b350-78f9de059a83")
 public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAccordion implements ITileAccordion<T> {
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractTileAccordion.class);
 
   private List<ITileFilter<T>> m_tileFilters;
   private Map<Object, ITileAccordionGroupManager<T>> m_groupManagers;
   private ITileAccordionGroupManager<T> m_groupManager;
   private boolean m_selectionUpdateLocked = false;
   private List<IGroup> m_staticGroups = new ArrayList<>();
+  private final EventListenerList m_listenerList;
+  private final ObjectExtensions<AbstractTileAccordion, ITileAccordionExtension<T, ? extends AbstractTileAccordion>> m_objectExtensions;
 
   public AbstractTileAccordion() {
     this(true);
@@ -51,9 +66,16 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
     super(false);
     m_tileFilters = new ArrayList<>();
     m_groupManagers = new HashMap<>();
+    m_listenerList = new EventListenerList();
+    m_objectExtensions = new ObjectExtensions<>(this, false);
     if (callInitializer) {
       callInitializer();
     }
+  }
+
+  @Override
+  protected void initConfigInternal() {
+    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), this::initConfig);
   }
 
   @Override
@@ -278,7 +300,8 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
     super.addGroupInternal(group);
     handleGroupCollapsedChange(group);
     group.addPropertyChangeListener(new P_GroupPropertyChangeListener());
-    getTileGrid(group).addPropertyChangeListener(new P_FilteredTilesListener(group));
+    getTileGrid(group).addPropertyChangeListener(new P_TileGridPropertyChangeListener(group));
+    getTileGrid(group).addTileGridListener(new P_TileGridListener());
   }
 
   protected void adaptGroup(IGroup group, GroupTemplate template) {
@@ -592,7 +615,9 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
         m_selectionUpdateLocked = false;
       }
     }
-    propertySupport.setProperty(PROP_SELECTED_TILES, getSelectedTiles());
+    List<T> newSelectedTiles = getSelectedTiles();
+    interceptTilesSelected(newSelectedTiles);
+    propertySupport.setProperty(PROP_SELECTED_TILES, newSelectedTiles);
   }
 
   protected void handleFilteredTilesChange(IGroup changedGroup, PropertyChangeEvent event) {
@@ -620,11 +645,52 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
     group.setTitleSuffix("(" + numFilteredTiles + ")");
   }
 
-  public class P_FilteredTilesListener implements PropertyChangeListener {
+  @Override
+  public void addTileGridListener(TileGridListener listener) {
+    m_listenerList.add(TileGridListener.class, listener);
+  }
+
+  @Override
+  public void removeTileGridListener(TileGridListener listener) {
+    m_listenerList.remove(TileGridListener.class, listener);
+  }
+
+  protected void fireTileGridEventInternal(TileGridEvent e) {
+    TileGridListener[] listeners = m_listenerList.getListeners(TileGridListener.class);
+    for (TileGridListener l : listeners) {
+      l.tileGridChanged(e);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected void handleTileGridChanged(TileGridEvent e) {
+    switch (e.getType()) {
+      case TileGridEvent.TYPE_TILE_CLICK:
+        interceptTileClick((T) e.getTile(), e.getMouseButton());
+        fireTileGridEventInternal(e);
+        break;
+      case TileGridEvent.TYPE_TILE_ACTION:
+        interceptTileAction((T) e.getTile());
+        fireTileGridEventInternal(e);
+        break;
+      default:
+        LOG.debug("Unhandled event from TileGrid received " + e);
+    }
+  }
+
+  public class P_TileGridListener implements TileGridListener {
+
+    @Override
+    public void tileGridChanged(TileGridEvent event) {
+      handleTileGridChanged(event);
+    }
+  }
+
+  public class P_TileGridPropertyChangeListener implements PropertyChangeListener {
 
     private IGroup m_group;
 
-    public P_FilteredTilesListener(IGroup group) {
+    public P_TileGridPropertyChangeListener(IGroup group) {
       m_group = group;
     }
 
@@ -646,7 +712,101 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
     }
   }
 
-  public class P_GroupPropertyChangeListener implements PropertyChangeListener {
+  /**
+   * Called whenever the selection changes.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   *
+   * @param tiles
+   *          an unmodifiable list of the selected tiles, may be empty but not null.
+   */
+  @ConfigOperation
+  @Order(100)
+  protected void execTilesSelected(List<T> tiles) {
+  }
+
+  /**
+   * Called whenever the tile is clicked.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   *
+   * @param tile
+   *          that was clicked
+   */
+  @ConfigOperation
+  @Order(110)
+  protected void execTileClick(T tile, MouseButton mouseButton) {
+  }
+
+  /**
+   * Called whenever the tile is double clicked.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   *
+   * @param tile
+   *          to perform the action for
+   */
+  @ConfigOperation
+  @Order(120)
+  protected void execTileAction(T tile) {
+  }
+
+  @Override
+  public final List<ITileAccordionExtension<T, ? extends AbstractTileAccordion>> getAllExtensions() {
+    return m_objectExtensions.getAllExtensions();
+  }
+
+  @Override
+  public <E extends IExtension<?>> E getExtension(Class<E> c) {
+    return m_objectExtensions.getExtension(c);
+  }
+
+  protected ITileAccordionExtension<T, ? extends AbstractTileAccordion> createLocalExtension() {
+    return new LocalTileAccordionExtension<>(this);
+  }
+
+  protected static class LocalTileAccordionExtension<T extends ITile, TILES extends AbstractTileAccordion<T>> extends AbstractExtension<TILES> implements ITileAccordionExtension<T, TILES> {
+
+    public LocalTileAccordionExtension(TILES owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execTilesSelected(TilesSelectedChain<T> chain, List<T> tiles) {
+      getOwner().execTilesSelected(tiles);
+    }
+
+    @Override
+    public void execTileClick(TileClickChain<T> chain, T tile, MouseButton mouseButton) {
+      getOwner().execTileClick(tile, mouseButton);
+    }
+
+    @Override
+    public void execTileAction(TileActionChain<T> chain, T tile) {
+      getOwner().execTileAction(tile);
+    }
+
+  }
+
+  protected final void interceptTilesSelected(List<T> tiles) {
+    List<ITileAccordionExtension<T, ? extends AbstractTileAccordion>> extensions = getAllExtensions();
+    TilesSelectedChain<T> chain = new TilesSelectedChain<>(extensions);
+    chain.execTilesSelected(tiles);
+  }
+
+  protected final void interceptTileClick(T tile, MouseButton mouseButton) {
+    List<ITileAccordionExtension<T, ? extends AbstractTileAccordion>> extensions = getAllExtensions();
+    TileClickChain<T> chain = new TileClickChain<>(extensions);
+    chain.execTileClick(tile, mouseButton);
+  }
+
+  protected final void interceptTileAction(T tile) {
+    List<ITileAccordionExtension<T, ? extends AbstractTileAccordion>> extensions = getAllExtensions();
+    TileActionChain<T> chain = new TileActionChain<>(extensions);
+    chain.execTileAction(tile);
+  }
+
+  protected class P_GroupPropertyChangeListener implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -672,4 +832,5 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
       return 0;
     }
   }
+
 }

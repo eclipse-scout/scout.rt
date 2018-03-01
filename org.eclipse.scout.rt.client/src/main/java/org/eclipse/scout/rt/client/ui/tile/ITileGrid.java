@@ -192,5 +192,9 @@ public interface ITileGrid<T extends ITile> extends IWidget, ITypeWithClassId, I
   @Override
   ITileGridContextMenu getContextMenu();
 
+  void addTileGridListener(TileGridListener listener);
+
+  void removeTileGridListener(TileGridListener listener);
+
   ITileGridUIFacade getUIFacade();
 }

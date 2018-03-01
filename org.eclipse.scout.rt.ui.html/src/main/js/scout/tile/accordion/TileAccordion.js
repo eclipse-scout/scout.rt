@@ -19,6 +19,7 @@ scout.TileAccordion = function() {
   this.tileGridSelectionHandler = new scout.TileAccordionSelectionHandler(this);
   this.withPlaceholders = null;
   this._selectionUpdateLocked = false;
+  this._tileGridPropertyChangeHandler = this._onTileGridPropertyChange.bind(this);
 };
 scout.inherits(scout.TileAccordion, scout.Accordion);
 
@@ -64,8 +65,21 @@ scout.TileAccordion.prototype._initGroup = function(group) {
   }
   this.setProperty('withPlaceholders', group.body.withPlaceholders);
 
-  group.body.on('propertyChange', this._onTileGridPropertyChange.bind(this));
+  group.body.on('propertyChange', this._tileGridPropertyChangeHandler);
   this._handleCollapsed(group);
+
+  group.body.__tileAccordionEventDelegator = scout.EventDelegator.create(group.body, this, {
+    delegateEvents: ['tileClick', 'tileAction']
+  });
+};
+
+scout.TileAccordion.prototype._deleteGroup = function(group) {
+  if (group.body) {
+    group.body.off('propertyChange', this._tileGridPropertyChangeHandler);
+    group.body.__tileAccordionEventDelegator.destroy();
+    group.body.__tileAccordionEventDelegator = null;
+  }
+  scout.TileAccordion.parent.prototype._deleteGroup.call(this, group);
 };
 
 scout.TileAccordion.prototype.setGridColumnCount = function(gridColumnCount) {

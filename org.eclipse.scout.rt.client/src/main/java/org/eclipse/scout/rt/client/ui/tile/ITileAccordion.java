@@ -17,8 +17,9 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.client.ui.accordion.IAccordion;
 import org.eclipse.scout.rt.client.ui.group.IGroup;
+import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 
-public interface ITileAccordion<T extends ITile> extends IAccordion {
+public interface ITileAccordion<T extends ITile> extends IAccordion, IExtensibleObject {
 
   String PROP_SELECTABLE = "selectable";
   String PROP_MULTI_SELECT = "multiSelect";
@@ -144,5 +145,9 @@ public interface ITileAccordion<T extends ITile> extends IAccordion {
    *         the same value
    */
   TileGridLayoutConfig getTileGridLayoutConfig();
+
+  void addTileGridListener(TileGridListener listener);
+
+  void removeTileGridListener(TileGridListener listener);
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,16 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.tile;
 
-import java.util.List;
+import java.util.EventListener;
 
-import org.eclipse.scout.rt.client.ui.MouseButton;
+public interface TileGridListener extends EventListener {
 
-public interface ITileGridUIFacade<T extends ITile> {
-
-  void setSelectedTilesFromUI(List<T> tiles);
-
-  void handleTileClickFromUI(T tile, MouseButton mouseButton);
-
-  void handleTileActionFromUI(T tile);
-
+  void tileGridChanged(TileGridEvent event);
 }

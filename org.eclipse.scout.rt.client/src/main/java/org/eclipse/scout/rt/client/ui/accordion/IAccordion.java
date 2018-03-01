@@ -77,8 +77,8 @@ public interface IAccordion extends IWidget, ITypeWithClassId {
    * Sorts the groups by using the active {@link Comparator}. If no comparator is set the groups are displayed according
    * to the insertion order.
    * <p>
-   * This method is typically executed automatically, but if you set a comparator with sortNow parameter set to false, you
-   * need to call this method by yourself.
+   * This method is typically executed automatically, but if you set a comparator with sortNow parameter set to false,
+   * you need to call this method by yourself.
    */
   void sort();
 

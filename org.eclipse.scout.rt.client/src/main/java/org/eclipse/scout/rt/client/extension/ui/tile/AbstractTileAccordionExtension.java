@@ -12,20 +12,20 @@ package org.eclipse.scout.rt.client.extension.ui.tile;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.client.extension.ui.tile.TileGridChains.TileActionChain;
-import org.eclipse.scout.rt.client.extension.ui.tile.TileGridChains.TileClickChain;
 import org.eclipse.scout.rt.client.extension.ui.tile.TileGridChains.TilesSelectedChain;
-import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.tile.AbstractTileGrid;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
-import org.eclipse.scout.rt.shared.extension.IExtension;
+import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 
-public interface ITileGridExtension<T extends ITile, TG extends AbstractTileGrid<T>> extends IExtension<TG> {
+public abstract class AbstractTileAccordionExtension<T extends ITile, TILES extends AbstractTileGrid<T>> extends AbstractExtension<TILES> implements ITileGridExtension<T, TILES> {
 
-  void execTilesSelected(TilesSelectedChain<T> chain, List<T> tiles);
+  public AbstractTileAccordionExtension(TILES owner) {
+    super(owner);
+  }
 
-  void execTileClick(TileClickChain<T> chain, T tile, MouseButton mouseButton);
-
-  void execTileAction(TileActionChain<T> chain, T tile);
+  @Override
+  public void execTilesSelected(TilesSelectedChain<T> chain, List<T> tiles) {
+    chain.execTilesSelected(tiles);
+  }
 
 }

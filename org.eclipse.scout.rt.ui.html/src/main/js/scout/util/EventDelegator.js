@@ -39,7 +39,7 @@ scout.EventDelegator = function(source, target, options) {
   this.delegateAllProperties = !!options.delegateAllProperties;
   this.delegateAllEvents = !!options.delegateAllEvents;
   this._mirrorListener = null;
-  this._destroyHandler;
+  this._destroyHandler = null;
 
   this._installSourceListener();
 };
@@ -57,8 +57,8 @@ scout.EventDelegator.prototype._installSourceListener = function() {
   };
   this.source.events.addListener(this._mirrorListener);
   this._destroyHandler = this._uninstallSourceListener.bind(this);
-  this.source.one('destroy', this._destroyHandler);
-  this.target.one('destroy', this._destroyHandler);
+  this.source.on('destroy', this._destroyHandler);
+  this.target.on('destroy', this._destroyHandler);
 };
 
 scout.EventDelegator.prototype._uninstallSourceListener = function() {
@@ -92,7 +92,7 @@ scout.EventDelegator.prototype._onSourcePropertyChange = function(event) {
 
 scout.EventDelegator.create = function(source, target, options) {
   if ((options.delegateProperties && options.delegateProperties.length > 0) ||
-    (options.delegateProperties && options.delegateProperties.length > 0) ||
+    (options.delegateEvents && options.delegateEvents.length > 0) ||
     options.delegateAllProperties ||
     options.delegateAllEvents) {
     return new scout.EventDelegator(source, target, options);

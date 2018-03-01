@@ -13,32 +13,32 @@ package org.eclipse.scout.rt.client.extension.ui.tile;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.MouseButton;
-import org.eclipse.scout.rt.client.ui.tile.AbstractTileGrid;
+import org.eclipse.scout.rt.client.ui.tile.AbstractTileAccordion;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
-public final class TileGridChains {
+public final class TileAccordionChains {
 
-  private TileGridChains() {
+  private TileAccordionChains() {
   }
 
-  protected abstract static class AbstractTileGridChain<T extends ITile> extends AbstractExtensionChain<ITileGridExtension<T, ? extends AbstractTileGrid>> {
+  protected abstract static class AbstractTileAccordionChain<T extends ITile> extends AbstractExtensionChain<ITileAccordionExtension<T, ? extends AbstractTileAccordion>> {
 
-    public AbstractTileGridChain(List<? extends ITileGridExtension<T, ? extends AbstractTileGrid>> extensions) {
-      super(extensions, ITileGridExtension.class);
+    public AbstractTileAccordionChain(List<? extends ITileAccordionExtension<T, ? extends AbstractTileAccordion>> extensions) {
+      super(extensions, ITileAccordionExtension.class);
     }
   }
 
-  public static class TilesSelectedChain<T extends ITile> extends AbstractTileGridChain<T> {
+  public static class TilesSelectedChain<T extends ITile> extends AbstractTileAccordionChain<T> {
 
-    public TilesSelectedChain(List<? extends ITileGridExtension<T, ? extends AbstractTileGrid>> extensions) {
+    public TilesSelectedChain(List<? extends ITileAccordionExtension<T, ? extends AbstractTileAccordion>> extensions) {
       super(extensions);
     }
 
     public void execTilesSelected(final List<T> tiles) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITileGridExtension<T, ? extends AbstractTileGrid> next) {
+        protected void callMethod(ITileAccordionExtension<T, ? extends AbstractTileAccordion> next) {
           next.execTilesSelected(TilesSelectedChain.this, tiles);
         }
       };
@@ -46,16 +46,16 @@ public final class TileGridChains {
     }
   }
 
-  public static class TileClickChain<T extends ITile> extends AbstractTileGridChain<T> {
+  public static class TileClickChain<T extends ITile> extends AbstractTileAccordionChain<T> {
 
-    public TileClickChain(List<? extends ITileGridExtension<T, ? extends AbstractTileGrid>> extensions) {
+    public TileClickChain(List<? extends ITileAccordionExtension<T, ? extends AbstractTileAccordion>> extensions) {
       super(extensions);
     }
 
     public void execTileClick(final T tile, MouseButton mouseButton) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITileGridExtension<T, ? extends AbstractTileGrid> next) {
+        protected void callMethod(ITileAccordionExtension<T, ? extends AbstractTileAccordion> next) {
           next.execTileClick(TileClickChain.this, tile, mouseButton);
         }
       };
@@ -63,16 +63,16 @@ public final class TileGridChains {
     }
   }
 
-  public static class TileActionChain<T extends ITile> extends AbstractTileGridChain<T> {
+  public static class TileActionChain<T extends ITile> extends AbstractTileAccordionChain<T> {
 
-    public TileActionChain(List<? extends ITileGridExtension<T, ? extends AbstractTileGrid>> extensions) {
+    public TileActionChain(List<? extends ITileAccordionExtension<T, ? extends AbstractTileAccordion>> extensions) {
       super(extensions);
     }
 
     public void execTileAction(final T tile) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(ITileGridExtension<T, ? extends AbstractTileGrid> next) {
+        protected void callMethod(ITileAccordionExtension<T, ? extends AbstractTileAccordion> next) {
           next.execTileAction(TileActionChain.this, tile);
         }
       };

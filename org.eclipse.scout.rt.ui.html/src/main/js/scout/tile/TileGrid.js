@@ -13,6 +13,7 @@ scout.TileGrid = function() {
   this.animateTileRemoval = true;
   this.animateTileInsertion = true;
   this.comparator = null;
+  this._doubleClickSupport = new scout.DoubleClickSupport();
   this.empty = false;
   this.filters = [];
   this.filteredTiles = [];
@@ -103,7 +104,10 @@ scout.TileGrid.prototype._render = function() {
   this.$container = this.$parent.appendDiv('tile-grid');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
-  this.$container.on('mousedown', '.tile', this._onTileMouseDown.bind(this));
+  this.$container
+    .on('mousedown', '.tile', this._onTileMouseDown.bind(this))
+    .on('click', '.tile', this._onTileClick.bind(this))
+    .on('dblclick', '.tile', this._onTileDoubleClick.bind(this));
 };
 
 scout.TileGrid.prototype._createLayout = function() {
@@ -679,6 +683,11 @@ scout.TileGrid.prototype.selectTiles = function(tiles) {
     tiles = [tiles[0]];
   }
 
+  if (scout.arrays.equals(this.selectedTiles, tiles)) {
+    // Do nothing if new selection is same as old one
+    return;
+  }
+
   // Deselect the tiles which are not part of the new selection
   var tilesToUnselect = this.selectedTiles;
   scout.arrays.removeAll(tilesToUnselect, tiles);
@@ -742,6 +751,7 @@ scout.TileGrid.prototype.addTileToSelection = function(tile) {
 };
 
 scout.TileGrid.prototype._onTileMouseDown = function(event) {
+  this._doubleClickSupport.mousedown(event);
   this._selectTileOnMouseDown(event);
 
   if (event.which === 3) {
@@ -751,6 +761,46 @@ scout.TileGrid.prototype._onTileMouseDown = function(event) {
     });
     return false;
   }
+};
+
+scout.TileGrid.prototype._onTileClick = function(event) {
+  var $tile = $(event.currentTarget);
+  var tile = $tile.data('widget');
+  var mouseButton = event.which;
+
+  if (this._doubleClickSupport.doubleClicked()) {
+    // Don't execute on double click events
+    return;
+  }
+
+  this._triggerTileClick(tile, mouseButton);
+};
+
+scout.TileGrid.prototype._triggerTileClick = function(tile, mouseButton) {
+  var event = {
+    tile: tile,
+    mouseButton: mouseButton
+  };
+  this.trigger('tileClick', event);
+};
+
+scout.TileGrid.prototype._onTileDoubleClick = function(event) {
+  var $tile = $(event.currentTarget);
+  var tile = $tile.data('widget');
+  this.doTileAction(tile);
+};
+
+scout.TileGrid.prototype.doTileAction = function(tile) {
+  if (!tile) {
+    return;
+  }
+  this._triggerTileAction(tile);
+};
+
+scout.TileGrid.prototype._triggerTileAction = function(tile) {
+  this.trigger('tileAction', {
+    tile: tile
+  });
 };
 
 scout.TileGrid.prototype.setSelectionHandler = function(selectionHandler) {

@@ -3,6 +3,7 @@ package org.eclipse.scout.rt.ui.html.json.tile;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.client.ui.tile.ITileGrid;
@@ -11,6 +12,7 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
@@ -19,11 +21,16 @@ import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @since 7.1
  */
 public class JsonTileGrid<T extends ITileGrid<? extends ITile>> extends AbstractJsonWidget<T> implements IJsonContextMenuOwner {
+  private static final Logger LOG = LoggerFactory.getLogger(JsonTileGrid.class);
+  public static final String EVENT_TILE_CLICK = "tileClick";
+  public static final String EVENT_TILE_ACTION = "tileAction";
 
   private JsonContextMenu<IContextMenu> m_jsonContextMenu;
 
@@ -145,6 +152,19 @@ public class JsonTileGrid<T extends ITileGrid<? extends ITile>> extends Abstract
     return json;
   }
 
+  @Override
+  public void handleUiEvent(JsonEvent event) {
+    if (EVENT_TILE_CLICK.equals(event.getType())) {
+      handleUiTileClick(event);
+    }
+    else if (EVENT_TILE_ACTION.equals(event.getType())) {
+      handleUiTileAction(event);
+    }
+    else {
+      super.handleUiEvent(event);
+    }
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
@@ -158,18 +178,70 @@ public class JsonTileGrid<T extends ITileGrid<? extends ITile>> extends Abstract
     }
   }
 
+  @SuppressWarnings("unchecked")
+  protected void handleUiTileClick(JsonEvent event) {
+    ITile tile = extractTile(event.getData());
+    if (tile == null) {
+      LOG.info("Requested tile doesn't exist anymore -> skip tileClick event");
+      return;
+    }
+    MouseButton mouseButton = extractMouseButton(event.getData());
+    getModel().getUIFacade().handleTileClickFromUI(tile, mouseButton);
+  }
+
+  protected MouseButton extractMouseButton(JSONObject json) {
+    int mouseButton = json.getInt("mouseButton");
+    switch (mouseButton) {
+      case 1:
+        return MouseButton.Left;
+      case 3:
+        return MouseButton.Right;
+      default:
+        return MouseButton.Unknown;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected void handleUiTileAction(JsonEvent event) {
+    ITile tile = extractTile(event.getData());
+    if (tile == null) {
+      LOG.info("Requested tile doesn't exist anymore -> skip tileAction event");
+      return;
+    }
+    getModel().getUIFacade().handleTileActionFromUI(tile);
+  }
+
   protected List<ITile> extractTiles(JSONObject json) {
     JSONArray tileIds = json.getJSONArray(ITileGrid.PROP_SELECTED_TILES);
     List<ITile> tiles = new ArrayList<ITile>(tileIds.length());
     for (int i = 0; i < tileIds.length(); i++) {
       String tileId = tileIds.getString(i);
-      Object model = getUiSession().getJsonAdapter(tileId).getModel();
-      if (!(model instanceof ITile)) {
-        throw new IllegalStateException("Id does not belong to a tile. Id: " + tileId);
-      }
-      tiles.add((ITile) model);
+      tiles.add(getTile(tileId));
     }
     return tiles;
+  }
+
+  protected ITile extractTile(JSONObject json) {
+    return optTile(json.getString("tile"));
+  }
+
+  private ITile getTile(String tileId) {
+    Object model = getUiSession().getJsonAdapter(tileId).getModel();
+    if (!(model instanceof ITile)) {
+      throw new IllegalStateException("Id does not belong to a tile. Id: " + tileId);
+    }
+    return (ITile) model;
+  }
+
+  private ITile optTile(String tileId) {
+    Object model = getUiSession().getJsonAdapter(tileId).getModel();
+    if (model == null) {
+      return null;
+    }
+    if (!(model instanceof ITile)) {
+      throw new IllegalStateException("Id does not belong to a tile. Id: " + tileId);
+    }
+    return (ITile) model;
   }
 
   @Override

@@ -136,6 +136,162 @@ describe("TileAccordion", function() {
     });
   });
 
+  describe('click', function() {
+    it('triggers tileClick', function() {
+      var accordion = createAccordion(3, {
+        selectable: false,
+        multiSelect: false
+      });
+      var tile0 = createTile();
+      var tile1 = createTile();
+      accordion.groups[0].body.insertTile(tile0);
+      accordion.groups[1].body.insertTile(tile1);
+      accordion.render();
+      var clickEventCount = 0;
+      accordion.on('tileClick', function(event) {
+        if (event.tile === tile0 && event.mouseButton === 1) {
+          clickEventCount++;
+        }
+      });
+      expect(tile0.selected).toBe(false);
+      expect(clickEventCount).toBe(0);
+
+      tile0.$container.triggerClick();
+      expect(tile0.selected).toBe(false);
+      expect(clickEventCount).toBe(1);
+    });
+
+    it('triggers tileSelected and tileClick if selectable', function() {
+      var accordion = createAccordion(3, {
+        selectable: true,
+        multiSelect: false
+      });
+      var tile0 = createTile();
+      var tile1 = createTile();
+      accordion.groups[0].body.insertTile(tile0);
+      accordion.groups[1].body.insertTile(tile1);
+      accordion.render();
+      var clickEventCount = 0;
+      var selectEventCount = 0;
+      var events = [];
+      accordion.on('propertyChange', function(event) {
+        if (event.propertyName === 'selectedTiles') {
+          selectEventCount++;
+        }
+        events.push('select');
+      });
+      accordion.on('tileClick', function(event) {
+        if (event.tile === tile0 && event.mouseButton === 1) {
+          clickEventCount++;
+        }
+        events.push('click');
+      });
+      expect(tile0.selected).toBe(false);
+      expect(selectEventCount).toBe(0);
+      expect(clickEventCount).toBe(0);
+
+      tile0.$container.triggerClick();
+      expect(tile0.selected).toBe(true);
+      expect(selectEventCount).toBe(1);
+      expect(clickEventCount).toBe(1);
+      expect(events.length).toBe(2);
+      expect(events[0]).toBe('select');
+      expect(events[1]).toBe('click');
+    });
+
+    it('triggers tileAction when clicked twice', function() {
+      var accordion = createAccordion(3, {
+        selectable: true,
+        multiSelect: false
+      });
+      var tile0 = createTile();
+      var tile1 = createTile();
+      accordion.groups[0].body.insertTile(tile0);
+      accordion.groups[1].body.insertTile(tile1);
+      accordion.render();
+      var selectEventCount = 0;
+      var clickEventCount = 0;
+      var actionEventCount = 0;
+      var events = [];
+      accordion.on('propertyChange', function(event) {
+        if (event.propertyName === 'selectedTiles') {
+          selectEventCount++;
+        }
+        events.push('select');
+      });
+      accordion.on('tileClick', function(event) {
+        if (event.tile === tile0) {
+          clickEventCount++;
+        }
+        events.push('click');
+      });
+      accordion.on('tileAction', function(event) {
+        if (event.tile === tile0) {
+          actionEventCount++;
+        }
+        events.push('action');
+      });
+      expect(tile0.selected).toBe(false);
+      expect(selectEventCount).toBe(0);
+      expect(clickEventCount).toBe(0);
+      expect(actionEventCount).toBe(0);
+
+      tile0.$container.triggerDoubleClick();
+      expect(tile0.selected).toBe(true);
+      expect(selectEventCount).toBe(1);
+      expect(clickEventCount).toBe(1);
+      expect(actionEventCount).toBe(1);
+      expect(events.length).toBe(3);
+      expect(events[0]).toBe('select');
+      expect(events[1]).toBe('click');
+      expect(events[2]).toBe('action');
+    });
+
+    it('is not delegated anymore if group is deleted without being destroyed', function() {
+      // This is a theoretical proof of concept without any known practical use cases
+      var accordion = createAccordion(3, {
+        selectable: false,
+        multiSelect: false
+      });
+      var tile0 = createTile();
+      var tile1 = createTile();
+      accordion.groups[0].body.insertTile(tile0);
+      accordion.groups[1].body.insertTile(tile1);
+      accordion.render();
+      var clickEventCount = 0;
+      accordion.on('tileClick', function(event) {
+        if (event.tile === tile0 && event.mouseButton === 1) {
+          clickEventCount++;
+        }
+      });
+      expect(clickEventCount).toBe(0);
+
+      // Use desktop as owner to prevent destruction
+      var group0 = accordion.groups[0];
+      group0.setOwner(session.desktop);
+      accordion.deleteGroup(group0);
+      expect(group0.destroyed).toBe(false);
+      expect(group0.rendered).toBe(false);
+
+      // Move to another accordion
+      var accordion2 = createAccordion(0);
+      accordion2.insertGroup(group0);
+      accordion2.render();
+      var clickEventCount2 = 0;
+      accordion2.on('tileClick', function(event) {
+        if (event.tile === tile0 && event.mouseButton === 1) {
+          clickEventCount2++;
+        }
+      });
+      expect(group0.rendered).toBe(true);
+
+      // First accordion must not delegate anymore but second has to
+      tile0.$container.triggerClick();
+      expect(clickEventCount).toBe(0);
+      expect(clickEventCount2).toBe(1);
+    });
+  });
+
   describe('selectTiles', function() {
     it('selects one of the given tiles and unselects the previously selected ones', function() {
       var accordion = createAccordion(3, {

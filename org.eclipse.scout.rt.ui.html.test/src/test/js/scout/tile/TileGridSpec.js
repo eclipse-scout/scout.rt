@@ -629,9 +629,17 @@ describe("TileGrid", function() {
         tileGrid.selectTile(tile0);
         expect(tile0.selected).toBe(true);
 
+        var eventTriggered = false;
+        tileGrid.on('propertyChange', function(event) {
+          if (event.propertyName === 'selectedTiles') {
+            eventTriggered = true;
+          }
+        });
+
         tile0.$container.triggerMouseDown();
         expect(tile0.selected).toBe(true);
         expect(tileGrid.selectedTiles.length).toBe(1);
+        expect(eventTriggered).toBe(false);
       });
 
       it('sets focusedTile property to clicked tile when selected', function() {
@@ -690,9 +698,17 @@ describe("TileGrid", function() {
         tileGrid.selectTile(tile0);
         expect(tile0.selected).toBe(true);
 
+        var eventTriggered = false;
+        tileGrid.on('propertyChange', function(event) {
+          if (event.propertyName === 'selectedTiles') {
+            eventTriggered = true;
+          }
+        });
+
         tile0.$container.triggerMouseDown();
         expect(tile0.selected).toBe(true);
         expect(tileGrid.selectedTiles.length).toBe(1);
+        expect(eventTriggered).toBe(false);
       });
 
       it('on a selected tile keeps the selection but deselects others if other tiles are selected', function() {
@@ -775,6 +791,106 @@ describe("TileGrid", function() {
 
     });
 
+  });
+
+  describe('click', function() {
+    it('triggers tileClick', function() {
+      var tileGrid = createTileGrid(3, {
+        selectable: false
+      });
+      tileGrid.render();
+      var tile0 = tileGrid.tiles[0];
+      var clickEventCount = 0;
+      tileGrid.on('tileClick', function(event) {
+        if (event.tile === tile0 && event.mouseButton === 1) {
+          clickEventCount++;
+        }
+      });
+      expect(tile0.selected).toBe(false);
+      expect(clickEventCount).toBe(0);
+
+      tile0.$container.triggerClick();
+      expect(tile0.selected).toBe(false);
+      expect(clickEventCount).toBe(1);
+    });
+
+    it('triggers tileSelected and tileClick if selectable', function() {
+      var tileGrid = createTileGrid(3, {
+        selectable: true
+      });
+      tileGrid.render();
+      var tile0 = tileGrid.tiles[0];
+      var clickEventCount = 0;
+      var selectEventCount = 0;
+      var events = [];
+      tileGrid.on('propertyChange', function(event) {
+        if (event.propertyName === 'selectedTiles') {
+          selectEventCount++;
+        }
+        events.push('select');
+      });
+      tileGrid.on('tileClick', function(event) {
+        if (event.tile === tile0 && event.mouseButton === 1) {
+          clickEventCount++;
+        }
+        events.push('click');
+      });
+      expect(tile0.selected).toBe(false);
+      expect(selectEventCount).toBe(0);
+      expect(clickEventCount).toBe(0);
+
+      tile0.$container.triggerClick();
+      expect(tile0.selected).toBe(true);
+      expect(selectEventCount).toBe(1);
+      expect(clickEventCount).toBe(1);
+      expect(events.length).toBe(2);
+      expect(events[0]).toBe('select');
+      expect(events[1]).toBe('click');
+    });
+
+    it('triggers tileAction when clicked twice', function() {
+      var tileGrid = createTileGrid(3, {
+        selectable: true
+      });
+      tileGrid.render();
+      var tile0 = tileGrid.tiles[0];
+      var selectEventCount = 0;
+      var clickEventCount = 0;
+      var actionEventCount = 0;
+      var events = [];
+      tileGrid.on('propertyChange', function(event) {
+        if (event.propertyName === 'selectedTiles') {
+          selectEventCount++;
+        }
+        events.push('select');
+      });
+      tileGrid.on('tileClick', function(event) {
+        if (event.tile === tile0) {
+          clickEventCount++;
+        }
+        events.push('click');
+      });
+      tileGrid.on('tileAction', function(event) {
+        if (event.tile === tile0) {
+          actionEventCount++;
+        }
+        events.push('action');
+      });
+      expect(tile0.selected).toBe(false);
+      expect(selectEventCount).toBe(0);
+      expect(clickEventCount).toBe(0);
+      expect(actionEventCount).toBe(0);
+
+      tile0.$container.triggerDoubleClick();
+      expect(tile0.selected).toBe(true);
+      expect(selectEventCount).toBe(1);
+      expect(clickEventCount).toBe(1);
+      expect(actionEventCount).toBe(1);
+      expect(events.length).toBe(3);
+      expect(events[0]).toBe('select');
+      expect(events[1]).toBe('click');
+      expect(events[2]).toBe('action');
+    });
   });
 
   describe('filter', function() {

@@ -12,9 +12,12 @@ import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.tile.ITileGridExtension;
+import org.eclipse.scout.rt.client.extension.ui.tile.TileGridChains.TileActionChain;
+import org.eclipse.scout.rt.client.extension.ui.tile.TileGridChains.TileClickChain;
 import org.eclipse.scout.rt.client.extension.ui.tile.TileGridChains.TilesSelectedChain;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.IWidget;
+import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITileGridContextMenu;
@@ -30,6 +33,7 @@ import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -48,6 +52,7 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   private List<ITileFilter<T>> m_filters;
   private boolean m_filteredTilesDirty = false;
   private Comparator<T> m_comparator;
+  private final EventListenerList m_listenerList;
 
   public AbstractTileGrid() {
     this(true);
@@ -56,7 +61,8 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   public AbstractTileGrid(boolean callInitializer) {
     super(false);
     m_objectExtensions = new ObjectExtensions<>(this, false);
-    m_filters = new ArrayList<>(1);
+    m_filters = new ArrayList<>();
+    m_listenerList = new EventListenerList();
     if (callInitializer) {
       callInitializer();
     }
@@ -473,6 +479,32 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   protected void execTilesSelected(List<T> tiles) {
   }
 
+  /**
+   * Called whenever the tile is clicked.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   *
+   * @param tile
+   *          that was clicked
+   */
+  @ConfigOperation
+  @Order(110)
+  protected void execTileClick(T tile, MouseButton mouseButton) {
+  }
+
+  /**
+   * Called whenever the tile is double clicked.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   *
+   * @param tile
+   *          to perform the action for
+   */
+  @ConfigOperation
+  @Order(120)
+  protected void execTileAction(T tile) {
+  }
+
   @Override
   public void selectTiles(List<T> tiles) {
     if (!isSelectable()) {
@@ -560,7 +592,6 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
 
   @Override
   public T getTileByClass(Class<T> tileClass) {
-    // TODO [15.4] bsh: Make this method more sophisticated (@Replace etc.)
     T candidate = null;
     for (T tile : getTilesInternal()) {
       if (tile.getClass() == tileClass) {
@@ -741,11 +772,31 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
         .collect(Collectors.toList());
   }
 
+  protected void doTileClick(T tile, MouseButton mouseButton) {
+    interceptTileClick(tile, mouseButton);
+    fireTileClick(tile, mouseButton);
+  }
+
+  protected void doTileAction(T tile) {
+    interceptTileAction(tile);
+    fireTileAction(tile);
+  }
+
   protected class P_TileGridUIFacade implements ITileGridUIFacade<T> {
 
     @Override
     public void setSelectedTilesFromUI(List<T> tiles) {
       selectTiles(tiles);
+    }
+
+    @Override
+    public void handleTileClickFromUI(T tile, MouseButton mouseButton) {
+      doTileClick(tile, mouseButton);
+    }
+
+    @Override
+    public void handleTileActionFromUI(T tile) {
+      doTileAction(tile);
     }
 
   }
@@ -794,12 +845,63 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
     public void execTilesSelected(TilesSelectedChain<T> chain, List<T> tiles) {
       getOwner().execTilesSelected(tiles);
     }
+
+    @Override
+    public void execTileClick(TileClickChain<T> chain, T tile, MouseButton mouseButton) {
+      getOwner().execTileClick(tile, mouseButton);
+    }
+
+    @Override
+    public void execTileAction(TileActionChain<T> chain, T tile) {
+      getOwner().execTileAction(tile);
+    }
+
   }
 
   protected final void interceptTilesSelected(List<T> tiles) {
     List<ITileGridExtension<T, ? extends AbstractTileGrid>> extensions = getAllExtensions();
     TilesSelectedChain<T> chain = new TilesSelectedChain<>(extensions);
     chain.execTilesSelected(tiles);
+  }
+
+  protected final void interceptTileClick(T tile, MouseButton mouseButton) {
+    List<ITileGridExtension<T, ? extends AbstractTileGrid>> extensions = getAllExtensions();
+    TileClickChain<T> chain = new TileClickChain<>(extensions);
+    chain.execTileClick(tile, mouseButton);
+  }
+
+  protected final void interceptTileAction(T tile) {
+    List<ITileGridExtension<T, ? extends AbstractTileGrid>> extensions = getAllExtensions();
+    TileActionChain<T> chain = new TileActionChain<>(extensions);
+    chain.execTileAction(tile);
+  }
+
+  @Override
+  public void addTileGridListener(TileGridListener listener) {
+    m_listenerList.add(TileGridListener.class, listener);
+  }
+
+  @Override
+  public void removeTileGridListener(TileGridListener listener) {
+    m_listenerList.remove(TileGridListener.class, listener);
+  }
+
+  protected void fireTileClick(ITile tile, MouseButton mouseButton) {
+    TileGridEvent event = new TileGridEvent(this, TileGridEvent.TYPE_TILE_CLICK, tile);
+    event.setMouseButton(mouseButton);
+    fireTileGridEventInternal(event);
+  }
+
+  protected void fireTileAction(ITile tile) {
+    TileGridEvent event = new TileGridEvent(this, TileGridEvent.TYPE_TILE_ACTION, tile);
+    fireTileGridEventInternal(event);
+  }
+
+  protected void fireTileGridEventInternal(TileGridEvent e) {
+    TileGridListener[] listeners = m_listenerList.getListeners(TileGridListener.class);
+    for (TileGridListener l : listeners) {
+      l.tileGridChanged(e);
+    }
   }
 
   protected class P_PropertyChangeListener implements PropertyChangeListener {

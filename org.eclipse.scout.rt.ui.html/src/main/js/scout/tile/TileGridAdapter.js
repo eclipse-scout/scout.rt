@@ -55,3 +55,28 @@ scout.TileGridAdapter.prototype._syncFilteredTiles = function(tileIds) {
   }
   this.widget.filter();
 };
+
+scout.TileGridAdapter.prototype._onWidgetTileClick = function(event) {
+  var data = {
+    tile: event.tile.id,
+    mouseButton: event.mouseButton
+  };
+  this._send('tileClick', data);
+};
+
+scout.TileGridAdapter.prototype._onWidgetTileAction = function(event) {
+  var data = {
+    tile: event.tile.id
+  };
+  this._send('tileAction', data);
+};
+
+scout.TileGridAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'tileClick') {
+    this._onWidgetTileClick(event);
+  } else if (event.type === 'tileAction') {
+    this._onWidgetTileAction(event);
+  } else {
+    scout.TileGridAdapter.parent.prototype._onWidgetEvent.call(this, event);
+  }
+};

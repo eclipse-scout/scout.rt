@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.group.AbstractGroup;
 import org.eclipse.scout.rt.client.ui.group.IGroup;
 import org.eclipse.scout.rt.client.ui.tile.AbstractTileAccordion.DefaultComparator;
@@ -348,7 +349,7 @@ public class TileAccordionTest {
     accordion.addTiles(Arrays.asList(tile1, tile2));
     assertEquals(0, accordion.getSelectedTileCount());
 
-    final List<ITile> newSelection = new ArrayList<ITile>();
+    final List<ITile> newSelection = new ArrayList<>();
     accordion.addPropertyChangeListener(event -> {
       newSelection.clear();
       newSelection.addAll((List<ITile>) event.getNewValue());
@@ -373,7 +374,7 @@ public class TileAccordionTest {
     accordion.addTiles(Arrays.asList(tile1, tile2));
     assertEquals(0, accordion.getSelectedTileCount());
 
-    final List<ITile> newSelection = new ArrayList<ITile>();
+    final List<ITile> newSelection = new ArrayList<>();
     accordion.addPropertyChangeListener(event -> {
       newSelection.clear();
       newSelection.addAll((List<ITile>) event.getNewValue());
@@ -382,6 +383,62 @@ public class TileAccordionTest {
     assertEquals(2, newSelection.size());
     assertEquals(tile1, newSelection.get(0));
     assertEquals(tile2, newSelection.get(1));
+    // 2 because the tiles are from 2 different groups. 1 would be better but it should not do any harm...
+    assertEquals(2, accordion.selectCalls);
+  }
+
+  /**
+   * The click event is delegated from TileGrid to TileAccordion
+   */
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testTileClickEvent() {
+    P_Accordion accordion = new P_Accordion();
+    accordion.setGroupManager(new P_StaticTileGroupManager());
+    accordion.setSelectable(false);
+
+    P_Tile tile1 = new P_Tile();
+    tile1.setGroup("Static A");
+    P_Tile tile2 = new P_Tile();
+    tile2.setGroup("Static B");
+    accordion.addTiles(Arrays.asList(tile1, tile2));
+
+    List<ITile> clickedTiles = new ArrayList<>();
+    accordion.addTileGridListener(event -> {
+      if (event.getType() == TileGridEvent.TYPE_TILE_CLICK && event.getTile() == tile1) {
+        clickedTiles.add(tile1);
+      }
+    });
+    ((AbstractTileGrid) accordion.getTileGrids().get(0)).doTileClick(tile1, MouseButton.Left);
+    assertEquals(1, clickedTiles.size());
+    assertEquals(1, accordion.clickCalls);
+  }
+
+  /**
+   * The action event is delegated from TileGrid to TileAccordion
+   */
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testTileActionEvent() {
+    P_Accordion accordion = new P_Accordion();
+    accordion.setGroupManager(new P_StaticTileGroupManager());
+    accordion.setSelectable(false);
+
+    P_Tile tile1 = new P_Tile();
+    tile1.setGroup("Static A");
+    P_Tile tile2 = new P_Tile();
+    tile2.setGroup("Static B");
+    accordion.addTiles(Arrays.asList(tile1, tile2));
+
+    List<ITile> clickedTiles = new ArrayList<>();
+    accordion.addTileGridListener(event -> {
+      if (event.getType() == TileGridEvent.TYPE_TILE_ACTION && event.getTile() == tile1) {
+        clickedTiles.add(tile1);
+      }
+    });
+    ((AbstractTileGrid) accordion.getTileGrids().get(0)).doTileAction(tile1);
+    assertEquals(1, clickedTiles.size());
+    assertEquals(1, accordion.actionCalls);
   }
 
   @Test
@@ -434,6 +491,9 @@ public class TileAccordionTest {
   }
 
   private static class P_Accordion extends AbstractTileAccordion<P_Tile> {
+    public int selectCalls = 0;
+    public int clickCalls = 0;
+    public int actionCalls = 0;
 
     @ClassId("8f9c91d5-0907-4893-9b89-375851a79b1d")
     public class TileGroup extends AbstractGroup {
@@ -448,6 +508,21 @@ public class TileAccordionTest {
 
       }
 
+    }
+
+    @Override
+    protected void execTilesSelected(List<P_Tile> tiles) {
+      selectCalls++;
+    }
+
+    @Override
+    protected void execTileClick(P_Tile tile, MouseButton mouseButton) {
+      clickCalls++;
+    }
+
+    @Override
+    protected void execTileAction(P_Tile tile) {
+      actionCalls++;
     }
   }
 
