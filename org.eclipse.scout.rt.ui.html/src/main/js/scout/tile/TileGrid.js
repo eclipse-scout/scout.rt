@@ -60,6 +60,15 @@ scout.TileGrid.prototype._createKeyStrokeContext = function() {
 /**
  * @override
  */
+scout.TileGrid.prototype._createLoadingSupport = function() {
+  return new scout.LoadingSupport({
+    widget: this
+  });
+};
+
+/**
+ * @override
+ */
 scout.TileGrid.prototype._initKeyStrokeContext = function() {
   scout.TileGrid.parent.prototype._initKeyStrokeContext.call(this);
 

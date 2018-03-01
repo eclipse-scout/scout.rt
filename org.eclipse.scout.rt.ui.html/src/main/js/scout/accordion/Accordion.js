@@ -28,6 +28,15 @@ scout.Accordion.prototype._init = function(model) {
   this._setExclusiveExpand(this.exclusiveExpand);
 };
 
+/**
+ * @override
+ */
+scout.Accordion.prototype._createLoadingSupport = function() {
+  return new scout.LoadingSupport({
+    widget: this
+  });
+};
+
 scout.Accordion.prototype._render = function() {
   this.$container = this.$parent.appendDiv('accordion');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);

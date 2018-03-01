@@ -10,9 +10,24 @@
  ******************************************************************************/
 scout.AccordionField = function() {
   scout.AccordionField.parent.call(this);
+  this.eventDelegator = null;
   this._addWidgetProperties(['accordion']);
 };
 scout.inherits(scout.AccordionField, scout.FormField);
+
+scout.AccordionField.prototype._init = function(model) {
+  scout.AccordionField.parent.prototype._init.call(this, model);
+
+  this._setAccordion(this.accordion);
+};
+
+/**
+ * @override
+ */
+scout.AccordionField.prototype._createLoadingSupport = function() {
+  // Loading is delegated to accordion
+  return null;
+};
 
 scout.AccordionField.prototype._render = function() {
   this.addContainer(this.$parent, 'accordion-field');
@@ -26,6 +41,22 @@ scout.AccordionField.prototype._render = function() {
 
 scout.AccordionField.prototype.setTileGrid = function(accordion) {
   this.setProperty('accordion', accordion);
+};
+
+scout.AccordionField.prototype._setAccordion = function(accordion) {
+  if (this.accordion) {
+    if (this.eventDelegator) {
+      this.eventDelegator.destroy();
+      this.eventDelegator = null;
+    }
+  }
+  this._setProperty('accordion', accordion);
+  if (accordion) {
+    this.eventDelegator = scout.EventDelegator.create(this, accordion, {
+      delegateProperties: ['loading']
+    });
+    accordion.setLoading(this.loading);
+  }
 };
 
 scout.AccordionField.prototype._renderAccordion = function() {

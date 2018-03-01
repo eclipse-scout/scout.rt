@@ -87,3 +87,10 @@ scout.LoadingSupport.prototype._removeLoadingIndicator = function() {
     }
   }.bind(this));
 };
+
+scout.LoadingSupport.prototype.remove = function() {
+  if (this._$loadingIndicator) {
+    this._$loadingIndicator.remove();
+    this._$loadingIndicator = null;
+  }
+};

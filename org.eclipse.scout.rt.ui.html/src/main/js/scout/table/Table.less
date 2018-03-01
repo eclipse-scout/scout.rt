@@ -85,12 +85,6 @@
   &.checkable.header-invisible > .table-data > .table-row.selected.first  {
     border-top-color: @control-background-color;
   }
-
-  &.loading {
-    & > .loading-indicator {
-      #scout.loading-indicator(50px);
-    }
-  }
 }
 
 .table-data {
@@ -107,6 +101,23 @@
   & > .scrollbar.y-axis {
     /* Make scrollbar visually centered */
     margin-top: @scrollbar-margin + 1px;
+  }
+
+  & > .table-row,
+  & > .scrollbar {
+    opacity: 1;
+    transition: opacity @loading-fade-duration;
+  }
+
+  &.loading {
+    & > .table-row,
+    & > .scrollbar {
+      opacity: 0;
+    }
+
+    & > .loading-indicator {
+      #scout.loading-indicator();
+    }
   }
 }
 

@@ -365,7 +365,21 @@ button {
     padding-left: 8px;
   }
 
+  & > .button-label,
+  & > .icon,
+  & > .submenu-icon {
+    opacity: 1;
+    transition: opacity @loading-fade-duration;
+  }
+
   &.loading {
+    & > .button-label,
+    & > .icon,
+    & > .submenu-icon {
+      opacity: 0;
+      transition: opacity @loading-fade-duration;
+    }
+
     & > .loading-indicator {
       #scout.loading-indicator(20px);
     }
@@ -492,7 +506,7 @@ button::-moz-focus-inner {
 }
 
 .application-loading-root-fadeOut {
-  #scout.animation(fade-out 300ms linear 1);
+  #scout.animation(fade-out @loading-fade-duration linear 1);
 }
 
 .application-loading01 {

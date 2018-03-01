@@ -19,4 +19,21 @@
   & > .group > .group-body {
     margin-bottom: 10px;
   }
+
+  & > .group,
+  & > .scrollbar {
+    opacity: 1;
+    transition: opacity @loading-fade-duration;
+  }
+
+  &.loading {
+    & > .group,
+    & > .scrollbar {
+      opacity: 0;
+    }
+
+    & > .loading-indicator {
+      #scout.loading-indicator();
+    }
+  }
 }

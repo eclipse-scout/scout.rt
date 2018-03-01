@@ -27,4 +27,21 @@
   & > .scrollbar {
     transition: opacity 80ms ease-out;
   }
+
+  & > .tile,
+  & > .scrollbar {
+    opacity: 1;
+    transition: opacity @loading-fade-duration;
+  }
+
+  &.loading {
+    & > .tile,
+    & > .scrollbar {
+      opacity: 0;
+    }
+
+    & > .loading-indicator {
+      #scout.loading-indicator();
+    }
+  }
 }

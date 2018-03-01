@@ -191,7 +191,10 @@ scout.Table.prototype._destroyColumns = function() {
  */
 scout.Table.prototype._createLoadingSupport = function() {
   return new scout.LoadingSupport({
-    widget: this
+    widget: this,
+    $container: function() {
+      return this.$data;
+    }.bind(this)
   });
 };
 

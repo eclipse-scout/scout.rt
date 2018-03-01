@@ -10,9 +10,24 @@
  ******************************************************************************/
 scout.TileField = function() {
   scout.TileField.parent.call(this);
+  this.eventDelegator = null;
   this._addWidgetProperties(['tileGrid']);
 };
 scout.inherits(scout.TileField, scout.FormField);
+
+scout.TileField.prototype._init = function(model) {
+  scout.TileField.parent.prototype._init.call(this, model);
+
+  this._setTileGrid(this.tileGrid);
+};
+
+/**
+ * @override
+ */
+scout.TileField.prototype._createLoadingSupport = function() {
+  // Loading is delegated to tileGrid
+  return null;
+};
 
 scout.TileField.prototype._render = function() {
   this.addContainer(this.$parent, 'tile-field');
@@ -26,6 +41,22 @@ scout.TileField.prototype._render = function() {
 
 scout.TileField.prototype.setTileGrid = function(tileGrid) {
   this.setProperty('tileGrid', tileGrid);
+};
+
+scout.TileField.prototype._setTileGrid = function(tileGrid) {
+  if (this.tileGrid) {
+    if (this.eventDelegator) {
+      this.eventDelegator.destroy();
+      this.eventDelegator = null;
+    }
+  }
+  this._setProperty('tileGrid', tileGrid);
+  if (tileGrid) {
+    this.eventDelegator = scout.EventDelegator.create(this, tileGrid, {
+      delegateProperties: ['loading']
+    });
+    tileGrid.setLoading(this.loading);
+  }
 };
 
 scout.TileField.prototype._renderTileGrid = function() {

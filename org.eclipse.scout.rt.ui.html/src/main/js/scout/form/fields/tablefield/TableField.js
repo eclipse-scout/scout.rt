@@ -13,7 +13,8 @@ scout.TableField = function() {
 
   this.gridDataHints.weightY = 1.0;
   this.gridDataHints.h = 3;
-  this._tableChangedHandler;
+  this.eventDelegator = null;
+  this._tableChangedHandler = this._onTableChanged.bind(this);
   this._deletedRows = scout.objects.createMap();
   this._insertedRows = scout.objects.createMap();
   this._updatedRows = scout.objects.createMap();
@@ -27,22 +28,7 @@ scout.TableField.TABLE_CHANGE_EVENTS = 'rowsInserted rowsDeleted allRowsDeleted 
 scout.TableField.prototype._init = function(model) {
   scout.TableField.parent.prototype._init.call(this, model);
 
-  this._delegatePropertyChange('enabled');
-  this._delegatePropertyChange('disabledStyle');
-
-  this._tableChangedHandler = this._onTableChanged.bind(this);
-
-  if (this.table) {
-    this.table.on(scout.TableField.TABLE_CHANGE_EVENTS, this._tableChangedHandler);
-  }
-};
-
-scout.TableField.prototype._delegatePropertyChange = function(propertyName) {
-  this.on('propertyChange', function(event) {
-    if (event.propertyName === propertyName) {
-      this.table.callSetter(propertyName, event.newValue);
-    }
-  }.bind(this));
+  this._setTable(this.table);
 };
 
 scout.TableField.prototype._render = function() {
@@ -56,10 +42,20 @@ scout.TableField.prototype._render = function() {
 scout.TableField.prototype._setTable = function(table) {
   if (this.table) {
     this.table.off(scout.TableField.TABLE_CHANGE_EVENTS, this._tableChangedHandler);
+    if (this.eventDelegator) {
+      this.eventDelegator.destroy();
+      this.eventDelegator = null;
+    }
   }
   this._setProperty('table', table);
   if (table) {
     table.on(scout.TableField.TABLE_CHANGE_EVENTS, this._tableChangedHandler);
+    this.eventDelegator = scout.EventDelegator.create(this, table, {
+      delegateProperties: ['enabled', 'disabledStyle', 'loading']
+    });
+    table.setEnabled(this.enabled);
+    table.setDisabledStyle(this.disabledStyle);
+    table.setLoading(this.loading);
   }
 };
 

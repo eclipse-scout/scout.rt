@@ -373,6 +373,9 @@ scout.Widget.prototype._removeInternal = function() {
     }
   }, this);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.keyStrokeContext);
+  if (this.loadingSupport) {
+    this.loadingSupport.remove();
+  }
   this._cleanup();
   this._remove();
   this.$parent = null;
