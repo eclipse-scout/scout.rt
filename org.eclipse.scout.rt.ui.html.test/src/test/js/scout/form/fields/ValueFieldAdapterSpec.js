@@ -20,6 +20,9 @@ describe('ValueFieldAdapter', function() {
   describe('_createPropertySortFunc', function() {
 
     it('should order properties', function() {
+      if (!scout.device.supportsInternationalization()) {
+        return;
+      }
       var order = ['foo', 'baz', 'bar'];
       var properties = ['x', 'bar', 'foo', 'a', 'y', 'baz'];
       var adapter = new scout.ValueFieldAdapter();
