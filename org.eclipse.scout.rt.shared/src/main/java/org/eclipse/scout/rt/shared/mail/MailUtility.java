@@ -567,7 +567,7 @@ public class MailUtility {
       }
       return internetAddress;
     }
-    catch (UnsupportedEncodingException | AddressException e) {
+    catch (UnsupportedEncodingException | AddressException | IllegalArgumentException e) {
       throw new ProcessingException("Failed to create internet address for " + participant.toString(), e);
     }
   }
