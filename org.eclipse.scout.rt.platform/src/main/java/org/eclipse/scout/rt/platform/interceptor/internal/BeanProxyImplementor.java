@@ -80,11 +80,14 @@ public class BeanProxyImplementor<T> implements IInstanceInvocationHandler<T> {
         catch (InvocationTargetException e) {
           // Do not use DefaultRuntimeExceptionTranslator here because it would wrap checked exceptions into a PlatformException.
           // But this method must return an exception of a type that DefaultExceptionTranslator can unwrap again (see DefaultExceptionTranslator#isWrapperException()).
-          Throwable originalException = BEANS.get(DefaultExceptionTranslator.class).unwrap(e);
-          if (originalException instanceof RuntimeException) {
-            throw ((RuntimeException) originalException);
+          Throwable originalThrowable = BEANS.get(DefaultExceptionTranslator.class).unwrap(e);
+          if (originalThrowable instanceof Error) {
+            throw (Error) originalThrowable;
           }
-          throw new UndeclaredThrowableException(originalException);
+          if (originalThrowable instanceof RuntimeException) {
+            throw ((RuntimeException) originalThrowable);
+          }
+          throw new UndeclaredThrowableException(originalThrowable);
         }
       }
     };
