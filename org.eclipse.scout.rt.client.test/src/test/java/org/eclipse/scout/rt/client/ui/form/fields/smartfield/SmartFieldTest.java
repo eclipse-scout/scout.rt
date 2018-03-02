@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -50,13 +54,8 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 /**
  * Smartfield with rows having tooltip/color/icon. When some rows do not have tooltip/color/icon this info should be
@@ -397,7 +396,6 @@ public class SmartFieldTest {
    * should be performed.
    */
   @Test
-  @Ignore // FIXME mot temporarily disable this test, seems to be broken since 72de34091fb6515d2ae32c07dbd75fc7c5fb6fa2
   public void testLookupOnlyWhenNecessary() throws Exception {
     StyleField f = m_styleField;
     StyleLookupCall lookupCall = (StyleLookupCall) f.getLookupCall();
