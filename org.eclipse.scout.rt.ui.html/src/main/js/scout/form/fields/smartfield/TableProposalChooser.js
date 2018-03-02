@@ -14,30 +14,27 @@ scout.TableProposalChooser = function() {
 scout.inherits(scout.TableProposalChooser, scout.ProposalChooser);
 
 scout.TableProposalChooser.prototype._createModel = function() {
-  var headerVisible, column,
+  var headerVisible = false,
     columns = [],
-    descriptors = this.smartField.columnDescriptors,
-    autoResize = true;
+    descriptors = this.smartField.columnDescriptors;
 
   if (descriptors) {
-    headerVisible = true;
     descriptors.forEach(function(descriptor, index) {
-      column = scout.create('Column', {
+      headerVisible = headerVisible || !!descriptor.text;
+      var column = scout.create('Column', {
         index: index,
         session: this.session,
         text: descriptor.text
       });
-
-      // if at least one of the descriptors defines a width, we set autoResize to false
       if (descriptor.width) {
-        autoResize = false;
         column.width = descriptor.width;
       }
-
+      if (descriptor.fixedWidth) {
+        column.fixedWidth = true;
+      }
       columns.push(column);
     }, this);
   } else {
-    headerVisible = false;
     columns.push(scout.create('Column', {
       session: this.session
     }));
@@ -46,7 +43,7 @@ scout.TableProposalChooser.prototype._createModel = function() {
   var table = scout.create('Table', {
     parent: this,
     headerVisible: headerVisible,
-    autoResizeColumns: autoResize,
+    autoResizeColumns: true,
     multiSelect: false,
     multilineText: true,
     scrollToSelection: true,
