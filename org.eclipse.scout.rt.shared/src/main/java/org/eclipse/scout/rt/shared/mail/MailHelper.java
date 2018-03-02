@@ -646,7 +646,7 @@ public class MailHelper {
       }
       return internetAddress;
     }
-    catch (AddressException e) {
+    catch (AddressException | IllegalArgumentException e) {
       throw new ProcessingException("Failed to create internet address for {}", email, e);
     }
     catch (UnsupportedEncodingException e) {
