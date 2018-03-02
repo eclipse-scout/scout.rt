@@ -499,6 +499,15 @@ public class MailUtilityTest {
     Assert.assertEquals("a", MailUtility.getPlainText(mimeMessage));
   }
 
+  @Test(expected = ProcessingException.class)
+  public void testInternetAddress3() throws Exception {
+    // test an invalid address, expect a ProcessingException
+    MailParticipant participant = new MailParticipant()
+        .withEmail("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@example.com")
+        .withName("Invalid address");
+    MailUtility.createInternetAddress(participant);
+  }
+
   /**
    * Verifies the following properties of the mime message:
    * <ul>
