@@ -108,3 +108,16 @@ scout.LookupCall.ensure = function(lookupCall, session) {
   }
   return lookupCall;
 };
+
+scout.LookupCall.firstLookupRow = function(result) {
+  if (!result) {
+    return null;
+  }
+  if (!scout.objects.isArray(result.lookupRows)) {
+    return null;
+  }
+  if (result.lookupRows.length === 0) {
+    return null;
+  }
+  return result.lookupRows[0];
+};

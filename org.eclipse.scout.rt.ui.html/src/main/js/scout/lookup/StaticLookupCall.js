@@ -117,7 +117,10 @@ scout.StaticLookupCall.prototype._queryByKey = function(deferred, key) {
     return data[0] === key;
   });
   if (data) {
-    deferred.resolve(this._dataToLookupRow(data));
+    deferred.resolve({
+      queryBy: scout.QueryBy.KEY,
+      lookupRows: [this._dataToLookupRow(data)]
+    });
   } else {
     deferred.reject();
   }

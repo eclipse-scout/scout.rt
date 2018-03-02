@@ -200,6 +200,9 @@ scout.SmartField.prototype.acceptInput = function() {
 };
 
 scout.SmartField.prototype._checkSearchTextChanged = function(searchText) {
+  if (this.isDropdown()) {
+    return false; // search text cannot change
+  }
   var a = scout.strings.nullIfEmpty(this._firstTextLine(searchText));
   var b = scout.strings.nullIfEmpty(this._lastSearchText);
   return !scout.strings.equalsIgnoreCase(a, b);
@@ -503,8 +506,9 @@ scout.SmartField.prototype._formatValue = function(value) {
     .then(this._lookupByKeyDone.bind(this));
 };
 
-scout.SmartField.prototype._lookupByKeyDone = function(lookupRow) {
+scout.SmartField.prototype._lookupByKeyDone = function(result) {
   this._notUnique = false;
+  var lookupRow = scout.LookupCall.firstLookupRow(result);
   this.setLookupRow(lookupRow);
   return this._formatLookupRow(lookupRow);
 };

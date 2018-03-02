@@ -48,7 +48,8 @@ scout.HierarchicalLookupResultBuilder.prototype._addParent = function(lookupRow)
 
   // load parent and add it to the map
   return this.lookupCall.getByKey(key)
-    .then(function(lookupRow) {
+    .then(function(result) {
+      var lookupRow = scout.LookupCall.firstLookupRow(result);
       this._lookupRowMap[lookupRow.key] = lookupRow;
       return this._addParent(lookupRow);
     }.bind(this));
