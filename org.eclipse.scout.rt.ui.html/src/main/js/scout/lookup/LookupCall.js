@@ -63,30 +63,30 @@ scout.LookupCall.prototype._textByKey = function(key) {
 };
 
 /**
- * @return {Promise} resolves to an array of {scout.LookupRow}s
+ * @return {Promise} resolves to a result object with an array of {scout.LookupRow}s
  */
 scout.LookupCall.prototype.getAll = function() {
   throw new Error('getAll() not implemented');
 };
 
 /**
- * @return {Promise} resolves to an array of {scout.LookupRow}s
+ * @return {Promise} resolves to a result object with an array of {scout.LookupRow}s
  */
 scout.LookupCall.prototype.getByText = function(text) {
   throw new Error('getByText() not implemented');
 };
 
 /**
- * @return {Promise} resolves to a single {scout.LookupRow}
+ * @return {Promise} resolves to a result object with a single {scout.LookupRow}
  */
 scout.LookupCall.prototype.getByKey = function(key) {
   throw new Error('getByKey() not implemented');
 };
 
 /**
- * Returns a list of lookup rows for the given parent key. This is used for incremental lookups.
+ * Returns a result with lookup rows for the given parent key. This is used for incremental lookups.
  *
- * @return {Promise} resolves to an array of {scout.LookupRow}s.
+ * @return {Promise} resolves to a result object with an array of {scout.LookupRow}s
  * @param {object} rec references the parent key
  */
 scout.LookupCall.prototype.getByRec = function(rec) {
