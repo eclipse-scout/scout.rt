@@ -757,20 +757,23 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   @Override
   public void setValueByLookupRow(ILookupRow<VALUE> row) {
     m_validationError = null;
+    ILookupRow<VALUE> oldRow = getLookupRow();
     try {
       if (row == null) {
+        setLookupRow(null);
         setValue(null);
       }
       else if (row.isEnabled()) {
+        setLookupRow(row);
         setValue(getValueFromLookupRow(row));
       }
       // don't do anything if row is disabled
     }
     finally {
-      // only set lookup-row when no validation error occurred during validation
-      // see: AbstractValueField#setValue
-      if (m_validationError == null && (row == null || row.isEnabled())) {
-        setLookupRow(row);
+      // when an error occurred during validation, reset the lookup-row
+      // to the previously used row (because new value was not set).
+      if (m_validationError != null) {
+        setLookupRow(oldRow);
       }
     }
   }
@@ -778,7 +781,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   @Override
   protected void handleValidationFailed(ProcessingException e, VALUE rawValue) {
     // don't call super, because we don't want to update the display text
-	// because this would trigger execFormatValue and start a new lookup 
+    // because this would trigger execFormatValue and start a new lookup
     addErrorStatus(new ValidationFailedStatus<VALUE>(e, rawValue));
     m_validationError = e;
   }
