@@ -478,6 +478,7 @@
   __include("scout/form/fields/tagfield/TagFieldNavigationKeyStroke.js");
   __include("scout/form/fields/tagfield/TagFieldOpenPopupKeyStroke.js");
   __include("scout/form/fields/tagfield/TagFieldLayout.js");
+  __include("scout/form/fields/tagfield/TagInputLayout.js");
   __include("scout/form/fields/tagfield/TagOverflowPopup.js");
   __include("scout/form/fields/tilefield/TileField.js");
   __include("scout/form/fields/tilefield/TileFieldAdapter.js");

@@ -133,8 +133,9 @@ scout.FormFieldLayout.prototype.layout = function($container) {
 
   if (formField.$fieldContainer) {
     // Icons are placed inside the field (as overlay)
-    var fieldBorder = scout.graphics.borders(formField.$field),
-      inputBounds = scout.graphics.offsetBounds(formField.$field);
+    var $iconInput = this._$elementForIconLayout(formField);
+    var fieldBorder = scout.graphics.borders($iconInput);
+    var inputBounds = scout.graphics.offsetBounds($iconInput);
     top += fieldBorder.top;
     right += fieldBorder.right;
     fieldBounds.x += fieldBorder.left;
@@ -146,9 +147,9 @@ scout.FormFieldLayout.prototype.layout = function($container) {
       this._layoutIcon(formField, fieldBounds, right, top);
     }
 
-    // Clearable icon if present
+    // Clear icon if present
     if (formField.$clearIcon) {
-      this._layoutClearableIcon(formField, fieldBounds, right, top);
+      this._layoutClearIcon(formField, fieldBounds, right, top);
     }
   }
 
@@ -251,6 +252,13 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
   return new scout.Dimension(width, height);
 };
 
+/**
+ * @returns the input element used to position the icon. May be overridden if another element than $field should be used.
+ */
+scout.FormFieldLayout.prototype._$elementForIconLayout = function() {
+  return this.formField.$field;
+};
+
 scout.FormFieldLayout.prototype._layoutIcon = function(formField, fieldBounds, right, top) {
   var height = this.rowHeight;
   if (fieldBounds) {
@@ -264,7 +272,7 @@ scout.FormFieldLayout.prototype._layoutIcon = function(formField, fieldBounds, r
     .cssLineHeight(height);
 };
 
-scout.FormFieldLayout.prototype._layoutClearableIcon = function(formField, fieldBounds, right, top) {
+scout.FormFieldLayout.prototype._layoutClearIcon = function(formField, fieldBounds, right, top) {
   var height = this.rowHeight;
   if (fieldBounds) {
     // If field is bigger than rowHeight (e.g. if used in desktop cell editor), make sure icon is as height as field

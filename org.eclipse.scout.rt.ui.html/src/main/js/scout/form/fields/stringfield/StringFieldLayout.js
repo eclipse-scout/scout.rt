@@ -13,9 +13,9 @@ scout.StringFieldLayout = function(stringField) {
 };
 scout.inherits(scout.StringFieldLayout, scout.FormFieldLayout);
 
-scout.StringFieldLayout.prototype._layoutClearableIcon = function(formField, fieldBounds, right, top) {
+scout.StringFieldLayout.prototype._layoutClearIcon = function(formField, fieldBounds, right, top) {
   if (formField.$icon && formField.$icon.isVisible()) {
     right += scout.graphics.prefSize(formField.$icon, true).width;
   }
-  scout.StringFieldLayout.parent.prototype._layoutClearableIcon.call(this, formField, fieldBounds, right, top);
+  scout.StringFieldLayout.parent.prototype._layoutClearIcon.call(this, formField, fieldBounds, right, top);
 };

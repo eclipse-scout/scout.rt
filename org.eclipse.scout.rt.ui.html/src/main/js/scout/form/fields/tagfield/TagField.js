@@ -43,13 +43,13 @@ scout.TagField.prototype._createKeyStrokeContext = function() {
 };
 
 scout.TagField.prototype._render = function() {
-  this.addContainer(this.$parent, 'tag-field');
+  this.addContainer(this.$parent, 'tag-field', new scout.TagFieldLayout(this));
   this.addLabel();
   this.addMandatoryIndicator();
 
   this.addFieldContainer(this.$parent.makeDiv());
   this.fieldHtmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
-  this.fieldHtmlComp.setLayout(new scout.TagFieldLayout(this));
+  this.fieldHtmlComp.setLayout(new scout.TagInputLayout(this));
   var $field = this.$fieldContainer.appendElement('<input>', 'field')
     .on('keydown', this._onInputKeydown.bind(this))
     .on('keyup', this._onInputKeyup.bind(this));
@@ -133,6 +133,13 @@ scout.TagField.prototype._renderDisplayText = function() {
 scout.TagField.prototype._renderEnabled = function() {
   scout.TagField.parent.prototype._renderEnabled.call(this);
   this._updateInputVisible();
+};
+
+scout.TagField.prototype._renderFieldStyle = function() {
+  scout.TagField.parent.prototype._renderFieldStyle.call(this);
+  if (this.rendered) {
+    this.fieldHtmlComp.invalidateLayoutTree();
+  }
 };
 
 scout.TagField.prototype._updateInputVisible = function() {
@@ -481,3 +488,8 @@ scout.TagField.findFocusableTagElements = function($container) {
   return $container.find('.tag-element:not(.hidden),.overflow-icon');
 };
 
+scout.TagField.prototype._updateErrorStatusClasses = function(statusClass, hasStatus) {
+  scout.TagField.parent.prototype._updateErrorStatusClasses.call(this, statusClass, hasStatus);
+  this.$fieldContainer.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
+  this.$fieldContainer.addClass(statusClass, hasStatus);
+};

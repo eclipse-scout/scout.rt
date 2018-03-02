@@ -1,32 +1,39 @@
 .tag-field > .field {
-  border: solid 1px @border-color;
-  border-radius: @control-border-radius;
-  user-select: none;
+  .input-field();
 
   &.alternative {
-    border-radius: @control-alternative-border-radius;
+    .input-field.alternative();
   }
+
+  user-select: none;
+  padding: 0 0 0 @tag-field-tag-margin-right;
 
   &:not(.multiline) {
     white-space: nowrap;
   }
 
-  &.focused {
-    #scout.focus-border();
-  }
-
   & > input {
     border: none;
     padding: 0 3px;
+    height: 100%;
+    background-color: transparent;
 
     &.fullwidth {
       width: 100%;
-      height: 100%;
-      padding: 0 10px;
+      padding: 0 0 0 @text-field-padding-x - @tag-field-tag-margin-right;
+
+      &.alternative {
+        padding-left: @text-field-alternative-padding-left;
+        padding-right: @text-field-alternative-padding-right;
+      }
     }
 
     &.focused, &:focus {
       box-shadow: none;
+    }
+
+    &.has-error {
+      background-color: transparent;
     }
   }
 }
@@ -42,10 +49,9 @@
   border-radius: 2px;
   background-color: @tag-element-background-color;
   padding: 0 5px;
-  margin-right: 3px;
   height: @tag-field-tag-height;
   line-height: @tag-field-tag-height;
-  margin: @tag-field-tag-margin-y 0 0 @tag-field-tag-margin-y;
+  margin: @tag-field-tag-margin-y @tag-field-tag-margin-right 0 0;
 
   &:hover:not(.disabled) {
     background-color: @tag-element-background-color-hover;
@@ -104,6 +110,10 @@
 
   &:hover {
     cursor: pointer;
+
+    &::before {
+      color: @palette-black;
+    }
   }
 }
 
