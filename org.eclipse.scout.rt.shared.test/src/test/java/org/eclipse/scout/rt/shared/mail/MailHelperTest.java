@@ -10,13 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.mail;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -55,6 +48,13 @@ import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * JUnit tests for {@link MailHelper}
@@ -394,6 +394,15 @@ public class MailHelperTest {
     InternetAddress address2 = (InternetAddress) msg.getRecipients(RecipientType.TO)[0];
     assertEquals(addressToString, address2.toString());
     assertEquals(addressPersonal, address2.getPersonal());
+  }
+
+  @Test(expected = ProcessingException.class)
+  public void testInternetAddress3() throws Exception {
+    // test an invalid address, expect a ProcessingException
+    MailParticipant participant = new MailParticipant()
+        .withEmail("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@example.com")
+        .withName("Invalid address");
+    BEANS.get(MailHelper.class).createInternetAddress(participant);
   }
 
   @Test
