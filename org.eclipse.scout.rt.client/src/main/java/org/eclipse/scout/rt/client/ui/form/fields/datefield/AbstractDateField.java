@@ -151,6 +151,17 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   }
 
   /**
+   * <b>Important:</b> This function is never called by the UI. The only time it will be executed is when you call
+   * {@link #parseAndSetValue(String)} by yourself. So if you need custom parse logic you have to adjust the JavaScript
+   * parser.
+   */
+  @Override
+  @SuppressWarnings("squid:S1185")
+  protected Date execParseValue(String text) {
+    return super.execParseValue(text);
+  }
+
+  /**
    * <b>Important:</b> Make sure that this method only uses formats that are supported by the UI. Otherwise, a formatted
    * date cannot be parsed again.
    */
