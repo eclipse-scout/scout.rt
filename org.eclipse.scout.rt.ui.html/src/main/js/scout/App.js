@@ -175,6 +175,8 @@ scout.App.prototype._installGlobalMouseDownInterceptor = function() {
 scout.App.prototype._installErrorHandler = function() {
   var handler = this._createErrorHandler();
   window.onerror = handler.handle.bind(handler);
+  // FIXME bsh, cgu: use ErrorHandler to handle unhandled promise rejections
+  //                 --> replace jQuery.Deferred.exceptionHook(error, stack)
 };
 
 scout.App.prototype._createErrorHandler = function() {
@@ -319,13 +321,15 @@ scout.App.prototype._fail = function(options, error) {
     $error.appendDiv('startup-error-message').text(message);
   }
   if (log) {
-    if (window.console.error) {
+    if (window.console && window.console.error) {
       window.console.error(log);
-    } else if (window.console.log) {
+    } else if (window.console && window.console.log) {
       window.console.log(log);
     }
   }
-  throw error;
+
+  // Reject with original rejection arguments
+  return $.rejectedPromise.apply($, scout.objects.argumentsToArray(arguments).slice(1));
 };
 
 /**
