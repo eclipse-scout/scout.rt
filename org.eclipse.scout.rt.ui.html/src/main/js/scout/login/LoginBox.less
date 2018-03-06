@@ -8,14 +8,31 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-
 .login-box-content > form {
+
   & > input,
   & > .button {
     width: 100%;
     height: 45px;
     margin: 15px 0;
     font-size: 16px;
+  }
+
+  & > input.alternative:-webkit-autofill {
+    /* Improve Chrome's auto-fill style by overriding the forced yellow background and black text color. */
+    /* (Requires some hacks, see http://webagility.com/posts/remove-forced-yellow-input-background-in-chrome) */
+    border-top-width: 0;
+    padding-top: @text-field-padding-top-compensation + 1px;
+    -webkit-box-shadow: 0 0 0px 1000px @background-color inset;
+    -webkit-text-fill-color: @text-color !important;
+
+    &:focus {
+      -webkit-text-fill-color: @focus-color !important;
+    }
+
+    &::selection {
+      -webkit-text-fill-color: @text-selection-color !important;
+    }
   }
 }
 
