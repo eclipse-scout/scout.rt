@@ -16,6 +16,7 @@ import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * Simple builder for ad-hoc {@link DoEntity} instances.
@@ -43,6 +44,14 @@ public class DoEntityBuilder {
    */
   public <V> DoEntityBuilder putList(String attributeName, List<V> value) {
     m_entity.putList(attributeName, value);
+    return this;
+  }
+
+  /**
+   * Adds list of values to attribute map of entity.
+   */
+  public <V> DoEntityBuilder putList(String attributeName, @SuppressWarnings("unchecked") V... values) {
+    m_entity.putList(attributeName, CollectionUtility.arrayList(values));
     return this;
   }
 

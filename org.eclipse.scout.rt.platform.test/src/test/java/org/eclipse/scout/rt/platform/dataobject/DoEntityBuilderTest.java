@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.dataobject;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.testing.platform.dataobject.DataObjectTestHelper;
 import org.junit.Test;
 
@@ -21,11 +22,18 @@ public class DoEntityBuilderTest {
     DoEntity expected = BEANS.get(DoEntity.class);
     expected.put("attribute1", "foo");
     expected.put("attribute2", 42);
+    expected.putList("listAttribute", CollectionUtility.arrayList(1, 2, 3));
 
     DoEntity actual = BEANS.get(DoEntityBuilder.class)
         .put("attribute1", "foo")
         .put("attribute2", 42)
+        .putList("listAttribute", 1, 2, 3)
         .build();
+    BEANS.get(DataObjectTestHelper.class).assertDoEntityEquals(expected, actual);
+
+    // ensure lists are mutable
+    expected.getList("listAttribute").remove(1);
+    actual.getList("listAttribute").remove(1);
     BEANS.get(DataObjectTestHelper.class).assertDoEntityEquals(expected, actual);
   }
 }

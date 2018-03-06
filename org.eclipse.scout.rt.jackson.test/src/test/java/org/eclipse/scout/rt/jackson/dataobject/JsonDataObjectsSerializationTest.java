@@ -689,6 +689,35 @@ public class JsonDataObjectsSerializationTest {
   // ------------------------------------ DoEntity with list test cases ------------------------------------
 
   @Test
+  public void testEntityWithLists() {
+    TestEntityWithListsDo testDo = BEANS.get(TestEntityWithListsDo.class);
+    TestItemDo item1 = createTestItemDo("id-1", "foo");
+    TestItemDo item2 = createTestItemDo("id-2", "bar");
+
+    // test withItems(...) method
+    testDo.withItemsDoListAttribute(item1, item2);
+    assertEquals(2, testDo.itemsDoListAttribute().size());
+    testDo.getItemsDoListAttribute().remove(1); // check that remove is supported
+    assertEquals(1, testDo.itemsDoListAttribute().size());
+
+    // test withItems(List) method
+    testDo.withItemsDoListAttribute(Arrays.asList(item1, item2));
+    assertEquals(2, testDo.itemsDoListAttribute().size());
+
+    testDo.getItemsDoListAttribute().remove(1); // check that remove is supported
+    assertEquals(1, testDo.itemsDoListAttribute().size());
+
+    // test items.set() method
+    List<TestItemDo> list = new ArrayList<>();
+    list.add(item1);
+    list.add(item2);
+    testDo.itemsDoListAttribute().set(list);
+    assertEquals(2, testDo.itemsDoListAttribute().size());
+    testDo.getItemsDoListAttribute().remove(1); // check that remove is supported
+    assertEquals(1, testDo.itemsDoListAttribute().size());
+  }
+
+  @Test
   public void testSerialize_EntityWithLists() throws Exception {
     TestEntityWithListsDo testDo = new TestEntityWithListsDo();
 
