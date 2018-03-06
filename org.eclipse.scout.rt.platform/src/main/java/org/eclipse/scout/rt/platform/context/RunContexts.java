@@ -61,9 +61,8 @@ public final class RunContexts {
    * <p>
    * <strong>RunMonitor</strong><br>
    * a new {@link RunMonitor} is created, and if the current calling context contains a {@link RunMonitor}, it is also
-   * registered within that {@link RunMonitor} during execution of the new run context using a
-   * {@link RunMonitorCancellableProcessor}. That makes the <i>returned</i> {@link RunContext} to be cancelled as well
-   * once the current calling {@link RunContext} is cancelled, but DOES NOT cancel the current calling
+   * registered within that {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext} to be cancelled as
+   * well once the current calling {@link RunContext} is cancelled, but DOES NOT cancel the current calling
    * {@link RunContext} if the <i>returned</i> {@link RunContext} is cancelled.
    */
   public static RunContext copyCurrent() {

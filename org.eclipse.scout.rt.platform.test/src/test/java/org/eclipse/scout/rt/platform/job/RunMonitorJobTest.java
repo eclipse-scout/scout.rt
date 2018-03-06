@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.platform.job;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
@@ -21,7 +20,6 @@ import static org.junit.Assert.fail;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
@@ -56,7 +54,7 @@ public class RunMonitorJobTest {
 
         assertSame(explicitMonitor, RunMonitor.CURRENT.get());
         assertNotSame(explicitMonitor, currentMonitor);
-        assertEquals(0, currentMonitor.getCancellablesCount());//nothing from RunContexts.copyCurrent
+        assertEquals(1, currentMonitor.getCancellablesCount());//+1 from RunContexts.copyCurrent
         assertEquals(2, explicitMonitor.getCancellablesCount());//+1 from job cancellable, +1 from run monitor
       }
     }, Jobs.newInput()
@@ -67,7 +65,7 @@ public class RunMonitorJobTest {
     setupLatch.unblock();
 
     future.awaitDoneAndGet();
-    assertEquals(0, currentMonitor.getCancellablesCount());//nothing from RunContexts.copyCurrent
+    assertEquals(1, currentMonitor.getCancellablesCount());//+1 from RunContexts.copyCurrent
     waitUntilCancellableCount(explicitMonitor, 0);
     assertSame(currentMonitor, RunMonitor.CURRENT.get());
   }
@@ -122,7 +120,7 @@ public class RunMonitorJobTest {
     setupLatch.unblock();
 
     future.awaitDoneAndGet();
-    assertEquals(0, currentMonitor.getCancellablesCount());//nothing anymore from RunContexts.copyCurrent (has been removed again)
+    assertEquals(1, currentMonitor.getCancellablesCount());//+1 from RunContexts.copyCurrent
     assertSame(currentMonitor, RunMonitor.CURRENT.get());
   }
 
@@ -149,77 +147,6 @@ public class RunMonitorJobTest {
 
     future.awaitDoneAndGet();
     assertNull(RunMonitor.CURRENT.get());
-  }
-
-  /**
-   * <p>
-   * Tests RunMonitor functionality with:
-   * </p>
-   * <ul>
-   * <li>Current RunMonitor available</li>
-   * <li>Explicit RunMonitor not set</li>
-   * <li>Run context is used to start two {@link Jobs} in new threads</li>
-   * </ul>
-   * <p>
-   * Expected: exactly one new RunMonitor is created, registered as child and set as current for the time of execution,
-   * must be removed after the last job finishes.
-   * </p>
-   */
-  @Test
-  public void testCopyCurrent_RunMonitorTwoConcurrentJobs() {
-    final RunMonitorEx currentRunMonitor = new RunMonitorEx();
-    RunMonitor.CURRENT.set(currentRunMonitor);
-    RunContext runContext = RunContexts.copyCurrent();
-    final RunMonitor newRunMonitor = runContext.getRunMonitor();
-    assertNotNull(newRunMonitor);
-    assertNotSame(currentRunMonitor, newRunMonitor);
-    assertSame(currentRunMonitor, runContext.getParentRunMonitor());
-
-    final IBlockingCondition startedCondition1 = Jobs.newBlockingCondition(true);
-    final IBlockingCondition startedCondition2 = Jobs.newBlockingCondition(true);
-    final IBlockingCondition blockingCondition1 = Jobs.newBlockingCondition(true);
-    final IBlockingCondition blockingCondition2 = Jobs.newBlockingCondition(true);
-
-    assertFalse("New run monitor must not be registered with current run monitor", currentRunMonitor.containsCancellable(newRunMonitor));
-
-    IFuture<Void> future1 = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        startedCondition1.setBlocking(false);
-        blockingCondition1.waitFor();
-        assertSame(newRunMonitor, RunMonitor.CURRENT.get());
-        assertTrue("New run monitor must be registered with current run monitor", currentRunMonitor.containsCancellable(newRunMonitor));
-      }
-    }, Jobs.newInput().withRunContext(runContext));
-
-    IFuture<Void> future2 = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        startedCondition2.setBlocking(false);
-        blockingCondition2.waitFor();
-        assertSame(newRunMonitor, RunMonitor.CURRENT.get());
-        assertTrue("New run monitor must be registered with current run monitor", currentRunMonitor.containsCancellable(newRunMonitor));
-      }
-    }, Jobs.newInput().withRunContext(runContext));
-
-    assertSame(currentRunMonitor, RunMonitor.CURRENT.get());
-
-    // Wait for jobs to be started
-    startedCondition1.waitFor();
-    startedCondition2.waitFor();
-
-    // Stop latter job first
-    blockingCondition2.setBlocking(false);
-    future2.awaitDoneAndGet();
-
-    // Stop first job
-    blockingCondition1.setBlocking(false);
-    future1.awaitDoneAndGet();
-
-    assertSame(currentRunMonitor, RunMonitor.CURRENT.get());
-    assertFalse("New run monitor must not be registered with current run monitor", currentRunMonitor.containsCancellable(newRunMonitor));
   }
 
   private static class RunMonitorEx extends RunMonitor {
