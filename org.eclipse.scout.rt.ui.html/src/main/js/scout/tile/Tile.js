@@ -22,7 +22,8 @@ scout.inherits(scout.Tile, scout.Widget);
 // These constants need to correspond to the IDs defined in TileColorScheme.java
 scout.Tile.ColorSchemeId = {
   DEFAULT: 'default',
-  ALTERNATIVE: 'alternative'
+  ALTERNATIVE: 'alternative',
+  RAINBOW: 'rainbow'
 };
 
 /**
@@ -105,15 +106,17 @@ scout.Tile.prototype._ensureColorScheme = function(colorScheme) {
     if (scout.strings.startsWith(colorScheme, scout.Tile.ColorSchemeId.ALTERNATIVE)) {
       colorSchemeObj.scheme = scout.Tile.ColorSchemeId.ALTERNATIVE;
     }
-    if (scout.strings.endsWith(colorScheme, '-inverted')) {
-      colorSchemeObj.inverted = true;
+    if (scout.strings.startsWith(colorScheme, scout.Tile.ColorSchemeId.RAINBOW)) {
+      colorSchemeObj.scheme = scout.Tile.ColorSchemeId.RAINBOW;
     }
+    colorSchemeObj.inverted = scout.strings.endsWith(colorScheme, '-inverted');
   }
   return colorSchemeObj;
 };
 
 scout.Tile.prototype._renderColorScheme = function() {
   this.$container.toggleClass('color-alternative', (this.colorScheme.scheme === scout.Tile.ColorSchemeId.ALTERNATIVE));
+  this.$container.toggleClass('color-rainbow', (this.colorScheme.scheme === scout.Tile.ColorSchemeId.RAINBOW));
   this.$container.toggleClass('inverted', this.colorScheme.inverted);
 };
 

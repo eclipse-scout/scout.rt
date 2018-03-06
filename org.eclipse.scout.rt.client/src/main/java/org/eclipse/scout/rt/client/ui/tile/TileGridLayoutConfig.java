@@ -16,10 +16,12 @@ public class TileGridLayoutConfig extends LogicalGridLayoutConfig {
   private int m_maxWidth = -1;
 
   public TileGridLayoutConfig() {
+    // when changing these default values remember to also change the
+    // defaults in the java-script: 'tile-grid-layout-config' in TileButton.less
     setColumnWidth(200);
     setRowHeight(150);
-    setHGap(15);
-    setVGap(20);
+    setHGap(30);
+    setVGap(30);
   }
 
   public TileGridLayoutConfig(TileGridLayoutConfig config) {

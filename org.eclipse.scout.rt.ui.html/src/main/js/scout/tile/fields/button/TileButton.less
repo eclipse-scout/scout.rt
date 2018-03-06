@@ -29,10 +29,17 @@
   }
 
   & > .field {
-    text-align: center;
     display: table-cell;
-    vertical-align: middle;
     position: relative;
+
+    &.with-icon {
+      vertical-align: bottom;
+      padding-bottom: 20px;
+    }
+
+    &.without-icon {
+      vertical-align: middle;
+    }
 
     /* Make IE trigger the :active state if the field is pressed */
     pointer-events: none;
@@ -43,10 +50,11 @@
     }
 
     & > .icon-container {
-      margin-bottom: 15px;
+      position: absolute;
+      top: 17px;
 
       & > .font-icon {
-        font-size: 35px;
+        font-size: 40px;
         color: @tile-button-default-icon-color;
       }
     }
@@ -57,7 +65,6 @@
     }
 
     & > span:last-of-type {
-      padding-bottom: 5px;
     }
   }
 
@@ -129,4 +136,15 @@
       }
     }
   }
+}
+
+/* --------------------------------------------------------------------------- */
+/* The following CSS classes are used to to read the values from JavaScript,   */
+/* see TileGridLayoutConfig.js & TileGridLayoutConfig.java                     */
+/* --------------------------------------------------------------------------- */
+.tile-grid-layout-config {
+  width: 200px;
+  height: 150px;
+  margin-left: 30px; /* horizontal gap */
+  margin-top: 30px; /* vertical gap */
 }

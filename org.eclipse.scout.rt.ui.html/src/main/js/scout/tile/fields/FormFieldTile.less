@@ -9,13 +9,15 @@
  ******************************************************************************/
 .tile.form-field {
   border: 1px solid @tile-default-border-color;
+  border-radius: @border-radius;
   background-color: @tile-default-background-color;
   color: @tile-default-color;
-  padding: @tile-field-with-label-padding-top @tile-field-padding-x @tile-field-padding-y @tile-field-padding-x;
+  padding: @tile-field-padding;
+  padding-top: 12px;
   overflow: hidden;
 
   &.label-hidden {
-    padding-top: @tile-field-padding-y;
+    padding-top: @tile-field-padding;
   }
 
   &.no-padding {
@@ -28,12 +30,13 @@
   }
 
   & > label {
-    color: @tile-default-color;
-    font-weight: bold;
+    color: @tile-default-label-color;
     margin: 0;
+    font-size: 18px;
+    padding-top: 0px;
     padding-bottom: 5px;
-    border-bottom: 1px solid @tile-default-border-color;
-    margin-bottom: @tile-field-padding-y - @tile-field-box-shadow-inset;
+    margin-bottom: @tile-field-padding - @tile-field-box-shadow-inset;
+    font-weight: bold;
   }
 
   & > .field {
@@ -47,10 +50,6 @@
 
   & > .mandatory-indicator {
     display: none;
-  }
-
-  &:not(.inverted):not(.loading):not(.tile-button) {
-    box-shadow: inset 0 0 0 @tile-field-box-shadow-inset @tile-default-inner-border-color;
   }
 
   /* Define a short transition for opacity changes on all field elements (used in .loading state) */
@@ -81,16 +80,17 @@
   &.tile-list-field .app-link,
   &.tile-attributes-field .app-link {
     text-decoration: none;
+    color: @tile-default-link-color;
   }
 
   &.inverted {
     border-color: transparent;
+    border-radius: @border-radius;
     background-color: @tile-default-inverted-background-color;
     color: @tile-default-inverted-color;
 
     & > label {
-      color: @tile-default-inverted-color;
-      border-bottom: 1px solid @tile-default-inverted-border-color;
+      color: @tile-default-inverted-label-color;
     }
 
     /* Override link style in inverted tiles, otherwise app-links would not be readable */
@@ -140,8 +140,7 @@
     color: @tile-alternative-color;
 
     & > label {
-      color: @tile-alternative-color;
-      border-bottom: 1px solid @tile-alternative-border-color;
+      color: @tile-alternative-label-color;
     }
 
     & .app-link {
@@ -155,8 +154,7 @@
     color: @tile-alternative-inverted-color;
 
     & > label {
-      color: @tile-alternative-inverted-color;
-      border-bottom: 1px solid @tile-alternative-inverted-border-color;
+      color: @tile-alternative-inverted-label-color;
     }
 
     & .app-link {
@@ -204,7 +202,7 @@
   /* This makes it possible to draw the scrollbar (seemingly) outside the field. */
   &.scrollbar-y-outside {
     @offset: 14px;
-    padding-right: @tile-field-padding-x - @offset;
+    padding-right: @tile-field-padding - @offset;
 
     & > label {
       margin-right: @offset;

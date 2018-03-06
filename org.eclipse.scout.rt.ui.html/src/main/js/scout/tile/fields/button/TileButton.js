@@ -43,11 +43,13 @@ scout.TileButton.prototype._renderIconId = function() {
       this.$iconContainer = this.$field.prependDiv('icon-container');
     }
     this.$iconContainer.icon(this.iconId);
+    this.$field.addClass('with-icon');
   } else {
     if (this.$iconContainer) {
       this.$iconContainer.remove();
       this.$iconContainer = null;
     }
+    this.$field.addClass('without-icon');
   }
   // Invalidate layout because button may now be longer or shorter
   this.htmlComp.invalidateLayoutTree();

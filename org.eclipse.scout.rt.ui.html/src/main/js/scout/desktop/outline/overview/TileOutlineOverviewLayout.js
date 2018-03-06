@@ -28,25 +28,4 @@ scout.TileOutlineOverviewLayout.prototype.layout = function($container) {
     widthHint: contentSize.width
   });
   htmlTileGrid.setSize(tilesPrefSize);
-  this._positionContent();
-};
-
-/**
- * Positions the content in the middle of the container
- */
-scout.TileOutlineOverviewLayout.prototype._positionContent = function() {
-  var contentTop, contentLeft,
-    $container = this.tileOutlineOverview.$container,
-    $content = this.tileOutlineOverview.$content,
-    $title = this.tileOutlineOverview.$title,
-    containerSize = scout.graphics.size($container),
-    contentSize = scout.graphics.size($content, true),
-    titleSize = scout.graphics.size($title, true);
-
-  contentTop = containerSize.height / 2 - (contentSize.height + titleSize.height) / 2;
-  contentTop = Math.max(contentTop, 0);
-  contentLeft = containerSize.width / 2 - contentSize.width / 2;
-  contentLeft = Math.max(contentLeft, 0);
-  $content.cssTop(contentTop);
-  $content.cssLeft(contentLeft);
 };

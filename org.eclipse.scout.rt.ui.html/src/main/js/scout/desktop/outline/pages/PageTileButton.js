@@ -10,12 +10,11 @@
 scout.PageTileButton = function() {
   scout.PageTileButton.parent.call(this);
   this.page = null;
-  this.gridDataHints.heightInPixel = scout.PageTileButton.SIZE.height;
-  this.gridDataHints.widthInPixel = scout.PageTileButton.SIZE.width;
+  var dim = scout.TileGridLayoutConfig.getTileDimensions();
+  this.gridDataHints.heightInPixel = dim.height;
+  this.gridDataHints.widthInPixel = dim.width;
 };
 scout.inherits(scout.PageTileButton, scout.TileButton);
-
-scout.PageTileButton.SIZE = new scout.Dimension(200, 150);
 
 scout.PageTileButton.prototype._init = function(model) {
   scout.PageTileButton.parent.prototype._init.call(this, model);

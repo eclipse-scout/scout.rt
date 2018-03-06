@@ -16,7 +16,8 @@ public enum TileColorScheme implements ITileColorScheme {
   DEFAULT(SchemeIds.SCHEME_ID_DEFAULT, false),
   DEFAULT_INVERTED(SchemeIds.SCHEME_ID_DEFAULT, true),
   ALTERNATIVE(SchemeIds.SCHEME_ID_ALTERNATIVE, false),
-  ALTERNATIVE_INVERTED(SchemeIds.SCHEME_ID_ALTERNATIVE, true);
+  ALTERNATIVE_INVERTED(SchemeIds.SCHEME_ID_ALTERNATIVE, true),
+  RAINBOW(SchemeIds.SCHEME_ID_RAINBOW, false);
 
   private final String m_schemeId;
   private final boolean m_inverted;
@@ -45,9 +46,8 @@ public enum TileColorScheme implements ITileColorScheme {
       case ALTERNATIVE_INVERTED:
         return ALTERNATIVE;
       default:
-        // unknown scheme cannot be inverted
+        return this; // unknown scheme cannot be inverted
     }
-    return this;
   }
 
   /**
@@ -60,18 +60,20 @@ public enum TileColorScheme implements ITileColorScheme {
       case DEFAULT_INVERTED:
         return ALTERNATIVE_INVERTED;
       case ALTERNATIVE:
-        return DEFAULT;
+        return RAINBOW;
       case ALTERNATIVE_INVERTED:
-        return DEFAULT_INVERTED;
+        return RAINBOW;
+      case RAINBOW:
+        return DEFAULT;
       default:
-        // unknown scheme cannot be toggled
+        return this; // unknown scheme cannot be toggled
     }
-    return this;
   }
 
   // These constants need to correspond to the IDs defined in Tile.js
   public interface SchemeIds {
     String SCHEME_ID_DEFAULT = "default";
     String SCHEME_ID_ALTERNATIVE = "alternative";
+    String SCHEME_ID_RAINBOW = "rainbow";
   }
 }
