@@ -18,20 +18,20 @@
     font-size: 16px;
   }
 
-  & > input.alternative:-webkit-autofill {
+  & > input.alternative:-webkit-autofill { /* NOSONAR (for some reason, rule "less:overqualified-elements" is illegitimately triggered here)
     /* Improve Chrome's auto-fill style by overriding the forced yellow background and black text color. */
     /* (Requires some hacks, see http://webagility.com/posts/remove-forced-yellow-input-background-in-chrome) */
     border-top-width: 0;
     padding-top: @text-field-padding-top-compensation + 1px;
-    -webkit-box-shadow: 0 0 0px 1000px @background-color inset;
-    -webkit-text-fill-color: @text-color !important;
+    -webkit-box-shadow: inset 0 0 0 1000px @background-color;
+    -webkit-text-fill-color: @text-color !important; /* NOSONAR (!important is okay here) */
 
     &:focus {
-      -webkit-text-fill-color: @focus-color !important;
+      -webkit-text-fill-color: @focus-color !important; /* NOSONAR (!important is okay here) */
     }
 
     &::selection {
-      -webkit-text-fill-color: @text-selection-color !important;
+      -webkit-text-fill-color: @text-selection-color !important; /* NOSONAR (!important is okay here) */
     }
   }
 }
