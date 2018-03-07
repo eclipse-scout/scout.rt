@@ -95,15 +95,15 @@ public abstract class AbstractTagField extends AbstractValueField<Set<String>> i
   }
 
   @Override
-  public void setTags(Collection<String> tags0) {
-    if (tags0 == null) {
-      tags0 = Collections.emptySet();
+  public void setTags(Collection<String> tags) {
+    if (tags == null) {
+      tags = Collections.emptySet();
     }
-    Set<String> tags = newSet(tags0);
-    if (tags.equals(getOrCreateValue())) {
+    Set<String> tagSet = newSet(tags);
+    if (tagSet.equals(getOrCreateValue())) {
       return;
     }
-    setValue(tags);
+    setValue(tagSet);
   }
 
   @Override
@@ -162,7 +162,7 @@ public abstract class AbstractTagField extends AbstractValueField<Set<String>> i
     return m_uiFacade;
   }
 
-  class P_UIFacade implements ITagFieldUIFacade {
+  protected class P_UIFacade implements ITagFieldUIFacade {
 
     @Override
     public void setValueFromUI(Set<String> value) {
@@ -179,10 +179,9 @@ public abstract class AbstractTagField extends AbstractValueField<Set<String>> i
       }
       lookupByText(text);
     }
-
   }
 
-  class P_LookupByTextCallback implements ILookupRowFetchedCallback<String> {
+  protected class P_LookupByTextCallback implements ILookupRowFetchedCallback<String> {
 
     private final IQueryParam<String> m_queryParam;
 
@@ -211,7 +210,5 @@ public abstract class AbstractTagField extends AbstractValueField<Set<String>> i
     public void onFailure(RuntimeException exception) {
       // NOP
     }
-
   }
-
 }
