@@ -841,7 +841,7 @@ scout.Planner.prototype._buildActivityHtml = function(activity) {
     activityStyle += ' border-color: ' + backgroundColor + ';';
   }
   if (foregroundColor) {
-    activityStyle += ' foreground-color: ' + foregroundColor + ';';
+    activityStyle += ' color: ' + foregroundColor + ';';
   }
 
   // the background-color represents the fill level and not the image. This makes it easier to change the color using a css class
