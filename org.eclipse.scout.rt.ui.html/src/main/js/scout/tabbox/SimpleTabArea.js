@@ -33,8 +33,9 @@ scout.SimpleTabArea.prototype._renderProperties = function() {
 };
 
 scout.SimpleTabArea.prototype._renderTabs = function() {
-  // reverse since tabs rendered without a sibling will be prepended.
-  this.tabs.reverse()
+  // reverse since tab.renderAfter() called without sibling=true argument (see _renderTab)
+  // will _prepend_ themselves into the container.
+  this.tabs.slice().reverse()
     .forEach(function(tab) {
       this._renderTab(tab);
     }.bind(this));
