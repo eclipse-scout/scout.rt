@@ -363,6 +363,12 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
 
   ITableRow findRowByKey(List<?> keys);
 
+  List<Object> getParentRowKeys(int rowIndex);
+
+  List<Object> getParentRowKeys(ITableRow row);
+
+  ITableRow findParentRow(ITableRow row);
+
   /*
    * Service aspect
    */

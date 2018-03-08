@@ -19,10 +19,12 @@ scout.Table = function() {
   this.dropType = 0;
   this.dropMaximumSize = scout.dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
   this.enabled = true;
+  this.expandedRows = [];
   this.headerEnabled = true;
   this.headerVisible = true;
   this.headerMenusEnabled = true;
   this.hasReloadHandler = false;
+  this.hierarchicalStyle = scout.Table.HierarchicalStyle.DEFAULT;
   this.keyStrokes = [];
   this.keyboardNavigation = true;
   this.menus = [];
@@ -39,6 +41,8 @@ scout.Table = function() {
   this.footerVisible = false;
   this.filters = [];
   this.rows = [];
+  this.rootRows = [];
+  this.rowPaddingLevel = 15;
   this.rowsMap = {}; // rows by id
   this.rowWidth = 0;
   this.rowBorderWidth; // read-only, set by _calculateRowBorderWidth(), also used in TableLayout.js
@@ -52,6 +56,7 @@ scout.Table = function() {
   this._filterMap = {};
   this._filteredRows = [];
   this._filteredRowsDirty = true;
+  this.tableNodeColumn = null;
   this.tooltips = [];
   this._aggregateRows = [];
   this._animationRowLimit = 25;
@@ -82,6 +87,11 @@ scout.Table = function() {
 scout.inherits(scout.Table, scout.Widget);
 
 // TODO [7.0] cgu create StringColumn.js incl. defaultValues from defaultValues.json
+
+scout.Table.HierarchicalStyle = {
+  DEFAULT: 'default',
+  STRUCTURED: 'structured'
+};
 
 scout.Table.GroupingStyle = {
   /**
@@ -115,6 +125,7 @@ scout.Table.prototype._init = function(model) {
   this.rows.forEach(function(row, i) {
     this.rows[i] = this._initRow(row);
   }, this);
+  this._rebuildTreeStructure();
 
   this.menuBar = scout.create('MenuBar', {
     parent: this,
@@ -147,7 +158,8 @@ scout.Table.prototype._initRow = function(row) {
 };
 
 scout.Table.prototype._initColumns = function() {
-  var column, i;
+  var column, i,
+    tableNodeColumn;
   for (i = 0; i < this.columns.length; i++) {
     this.columns[i].session = this.session;
     this.columns[i].table = this;
@@ -161,13 +173,20 @@ scout.Table.prototype._initColumns = function() {
       // set checkable column if this column is the checkable one
       this.checkableColumn = column;
     }
+    if (!tableNodeColumn && column.isVisible()) {
+      tableNodeColumn = column;
+    }
   }
 
+  this.tableNodeColumn = tableNodeColumn;
+
   // Add gui only checkbox column at the beginning
+  this._setCheckable(this.checkable);
+
+  // Add gui only row icon column at the beginning
   if (this.rowIconVisible) {
     this._insertRowIconColumn();
   }
-  this._setCheckable(this.checkable);
 
   // Sync head and tail sort columns
   this._setHeadAndTailSortColumns();
@@ -342,6 +361,7 @@ scout.Table.prototype._renderProperties = function() {
   this._renderFooterVisible();
   this._renderDropType();
   this._renderCheckableStyle();
+  this._renderHierarchicalStyle();
 };
 
 scout.Table.prototype._remove = function() {
@@ -710,8 +730,7 @@ scout.Table.prototype._sortColumns = function() {
 };
 
 scout.Table.prototype._sortImpl = function(sortColumns) {
-  // compare rows
-  function compare(row1, row2) {
+  var sortFunction = function(row1, row2) {
     for (var s = 0; s < sortColumns.length; s++) {
       var column = sortColumns[s];
       var result = column.compare(row1, row2);
@@ -725,8 +744,37 @@ scout.Table.prototype._sortImpl = function(sortColumns) {
       }
     }
     return 0;
+  }.bind(this);
+
+  if (this.hierarchical) {
+    // sort tree and set flat row array afterwards.
+    this._sortHierarchical(sortFunction);
+    var sortedFlatRows = [];
+    this.visitRowsDeptFirst(function(row) {
+      sortedFlatRows.push(row);
+    }.bind(this));
+    this.rows = sortedFlatRows;
+  } else {
+    // sort the flat rows and set the rootRows afterwards.
+    this.rows.sort(sortFunction);
+    this.rootRows = this.rows;
   }
-  this.rows.sort(compare.bind(this));
+};
+
+scout.Table.prototype.visitRowsDeptFirst = function(visitFunc, rows) {
+  rows = rows || this.rootRows;
+  rows.forEach(function(row) {
+    visitFunc(row);
+    this.visitRowsDeptFirst(visitFunc, row.childRows);
+  }, this);
+};
+
+scout.Table.prototype._sortHierarchical = function(sortFunc, rows) {
+  rows = rows || this.rootRows;
+  rows.sort(sortFunc);
+  rows.forEach(function(row) {
+    this._sortHierarchical(sortFunc, row.childRows);
+  }, this);
 };
 
 scout.Table.prototype._renderRowOrderChanges = function() {
@@ -914,6 +962,10 @@ scout.Table.prototype._removeSortColumnInternal = function(column) {
 
 scout.Table.prototype.isGroupingPossible = function(column) {
   var possible = true;
+
+  if (this.hierarchical) {
+    return false;
+  }
 
   if (!this.sortEnabled) {
     // grouping without sorting is not possible
@@ -1107,6 +1159,14 @@ scout.Table.prototype._buildRowDiv = function(row) {
   if (row.checked && this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
     rowClass += ' checked';
   }
+  // if a row is not filterAccepted it must be visible since any of its child rows are filter accepted.
+  if (!row.filterAccepted) {
+    rowClass += ' filter-not-accepted';
+  }
+  if (scout.arrays.empty(row.childRows)) {
+    rowClass += ' leaf';
+  }
+
   var i, column,
     rowDiv = '<div class="' + rowClass + '" style="width: ' + rowWidth + 'px"' + scout.device.unselectableAttribute.string + '>';
   for (i = 0; i < this.columns.length; i++) {
@@ -1420,6 +1480,13 @@ scout.Table.prototype._installRow = function(row) {
     var editorField = this.cellEditorPopup.cell.field;
     this.startCellEdit(this.cellEditorPopup.column, row, editorField);
   }
+};
+
+scout.Table.prototype._calcRowPaddingLevel = function(row) {
+  if (!row) {
+    return -this.rowPaddingLevel;
+  }
+  return this._calcRowPaddingLevel(row.parentRow) + this.rowPaddingLevel;
 };
 
 scout.Table.prototype._showCellErrorForRow = function(row) {
@@ -2008,6 +2075,55 @@ scout.Table.prototype.uncheckRows = function(rows, options) {
   this.checkRows(rows, opts);
 };
 
+scout.Table.prototype.isTableNodeColumn = function(column) {
+  return this.hierarchical && this.tableNodeColumn === column;
+};
+
+scout.Table.prototype.collapseRow = function(row) {
+  this.expandRow(row, false);
+};
+
+scout.Table.prototype.collapseAll = function() {
+  this.setExpandedRows([]);
+};
+
+scout.Table.prototype.expandAll = function() {
+  this.rows.filter(function(row) {
+    return !scout.arrays.empty(row.childRows);
+  });
+  this.setExpandedRows(this.rows.filter(function(row) {
+    return !scout.arrays.empty(row.childRows);
+  }));
+};
+
+scout.Table.prototype.expandRow = function(row, expanded) {
+  if ((expanded && this.expandedRows.indexOf(row) > -1) ||
+    (!expanded && this.expandedRows.indexOf(row) === -1)) {
+    return;
+  }
+  row.expanded = expanded;
+  if (expanded) {
+    this.expandedRows.push(row);
+  } else {
+    scout.arrays.remove(this.expandedRows, row);
+  }
+
+  this.filter();
+  this._triggerRowsExpanded(this.expandedRows);
+};
+
+scout.Table.prototype.setExpandedRows = function(rows) {
+  if (scout.arrays.equalsIgnoreOrder(rows, this.expandedRows)) {
+    return;
+  }
+  this.rows.forEach(function(row) {
+    row.expanded = rows.indexOf(row) > -1;
+  });
+  this.expandedRows = rows;
+  this.filter();
+  this._triggerRowsExpanded(this.expandedRows);
+};
+
 scout.Table.prototype.doRowAction = function(row, column) {
   if (this.selectedRows.length !== 1 || this.selectedRows[0] !== row) {
     // Only allow row action if the selected row was double clicked because the handler of the event expects a selected row.
@@ -2042,6 +2158,7 @@ scout.Table.prototype.insertRows = function(rows) {
     this.rows.push(row);
   }, this);
 
+  this._rebuildTreeStructure();
   this._applyFilters(rows);
   this._calculateValuesForBackgroundEffect();
   this._markAutoOptimizeWidthColumnsAsDirty();
@@ -2104,6 +2221,7 @@ scout.Table.prototype.deleteRows = function(rows) {
   }.bind(this));
 
   this.deselectRows(rows);
+  this._rebuildTreeStructure();
   if (filterChanged) {
     this._rowsFiltered();
   }
@@ -2192,6 +2310,8 @@ scout.Table.prototype.updateRows = function(rows) {
     scout.arrays.replace(this.rows, oldRow, updatedRow);
     scout.arrays.replace(this.selectedRows, oldRow, updatedRow);
 
+    this._rebuildTreeStructure();
+
     // Apply row filter
     updatedRow.filterAccepted = oldRow.filterAccepted;
     if (this._filterCount() > 0) {
@@ -2237,6 +2357,54 @@ scout.Table.prototype.updateRows = function(rows) {
 
 scout.Table.prototype._sortAfterUpdate = function() {
   this._sort();
+};
+
+scout.Table.prototype.isHierarchical = function() {
+  return this.hierarchical;
+};
+
+scout.Table.prototype._rebuildTreeStructure = function() {
+  var hierarchical = false;
+  this.rows.forEach(function(row) {
+    row.childRows = [];
+    row.parentRow = null;
+    hierarchical = hierarchical || !scout.objects.isNullOrUndefined(row.parentId);
+  }, this);
+  if (!hierarchical) {
+    this.removeFilterByKey(scout.CollapsedRowsFilter.FILTER_KEY);
+    this.rootRows = this.rows;
+    this.hierarchical = hierarchical;
+    return;
+  }
+  if (this.hierarchical !== hierarchical) {
+    this.addFilter(new scout.CollapsedRowsFilter());
+  }
+
+  this.hierarchical = hierarchical;
+  this.rootRows = [];
+  var expandedRows = [];
+  this.rows.forEach(function(row) {
+    var parentRow;
+    // TODO expanded from model
+    row.expanded = true;
+    if (!scout.objects.isNullOrUndefined(row.parentId)) {
+      parentRow = this.rowsMap[row.parentId];
+      if (parentRow) {
+        row.parentRow = parentRow;
+        parentRow.childRows.push(row);
+      } else {
+        row.parentRow = null;
+        this.rootRows.push(row);
+      }
+    } else {
+      this.rootRows.push(row);
+    }
+    if (row.expanded) {
+      expandedRows.push(row);
+    }
+  }, this);
+  this.setExpandedRows(expandedRows);
+
 };
 
 scout.Table.prototype.updateRowOrder = function(rows) {
@@ -2582,7 +2750,7 @@ scout.Table.prototype.filteredRows = function() {
     } else {
       this._filteredRows = [];
       this.rows.forEach(function(row) {
-        if (row.filterAccepted) {
+        if (row.filterAccepted || row.hasFilterAcceptedChildren()) {
           this._filteredRows.push(row);
         }
       }, this);
@@ -2821,15 +2989,21 @@ scout.Table.prototype.filteredBy = function() {
   var filteredBy = [];
   for (var key in this._filterMap) { // NOSONAR
     var filter = this._filterMap[key];
-    filteredBy.push(filter.createLabel());
+    if (filter instanceof scout.TableUserFilter) {
+      filteredBy.push(filter.createLabel());
+    }
   }
   return filteredBy;
 };
 
 scout.Table.prototype.resetFilter = function() {
   // remove filters
+  var filter;
   for (var key in this._filterMap) { // NOSONAR
-    this.removeFilterByKey(key);
+    filter = this._filterMap[key];
+    if (filter instanceof scout.TableUserFilter) {
+      this.removeFilterByKey(key);
+    }
   }
   this._filterMap = {};
 
@@ -2856,7 +3030,7 @@ scout.Table.prototype._resizeToFit = function(column, maxWidth, calculatedSize) 
     // Calculation has been aborted -> don't resize
     return;
   }
-  if (maxWidth && maxWidth > 0 && calculatedSize > maxWidth){
+  if (maxWidth && maxWidth > 0 && calculatedSize > maxWidth) {
     calculatedSize = maxWidth;
   }
   if (scout.device.isInternetExplorer() && calculatedSize !== column.minWidth) {
@@ -2877,6 +3051,7 @@ scout.Table.prototype.addFilter = function(filter) {
     throw new Error('key has to be defined');
   }
   this._filterMap[key] = filter;
+
   this.trigger('filterAdded', {
     filter: filter
   });
@@ -2970,7 +3145,12 @@ scout.Table.prototype.moveColumn = function(column, visibleOldPos, visibleNewPos
   scout.arrays.remove(this.columns, column);
   scout.arrays.insert(this.columns, column, newPos);
 
-  visibleNewPos = this.visibleColumns().indexOf(column); // we must re-evaluate visible columns
+  visibleColumns = this.visibleColumns();
+  visibleNewPos = visibleColumns.indexOf(column); // we must re-evaluate visible columns
+  this.tableNodeColumn = scout.arrays.find(visibleColumns, function(col) {
+    return !col.guiOnly;
+  });
+
   this._triggerColumnMoved(column, visibleOldPos, visibleNewPos, dragged);
 
   // move aggregated rows
@@ -3045,6 +3225,12 @@ scout.Table.prototype._triggerRowsSelected = function(debounce) {
 
 scout.Table.prototype._triggerRowsChecked = function(rows) {
   this.trigger('rowsChecked', {
+    rows: rows
+  });
+};
+
+scout.Table.prototype._triggerRowsExpanded = function(rows) {
+  this.trigger('rowsExpanded', {
     rows: rows
   });
 };
@@ -3167,6 +3353,7 @@ scout.Table.prototype._setRowIconVisible = function(rowIconVisible) {
     scout.arrays.remove(this.columns, column);
     this.rowIconColumn = null;
   }
+
 };
 
 scout.Table.prototype._setSelectedRows = function(selectedRows) {
@@ -3248,6 +3435,14 @@ scout.Table.prototype._updateFooterVisibility = function() {
   this.setFooterVisible(this.tableStatusVisible || this._hasVisibleTableControls());
 };
 
+scout.Table.prototype.setHierarchicalStyle = function(style) {
+  this.setProperty('hierarchicalStyle', style);
+};
+
+scout.Table.prototype._renderHierarchicalStyle = function() {
+  this.$container.toggleClass('structured', scout.Table.HierarchicalStyle.STRUCTURED === this.hierarchicalStyle);
+};
+
 scout.Table.prototype.setFooterVisible = function(visible) {
   this._setProperty('footerVisible', visible);
   if (visible && !this.footer) {
@@ -3320,7 +3515,11 @@ scout.Table.prototype._updateCheckableColumn = function() {
 };
 
 scout.Table.prototype._renderCheckable = function() {
+  this._updateRowWidth();
+  this.$rows(true)
+    .css('width', this.rowWidth);
   this._redraw();
+  this.updateScrollbars();
 };
 
 scout.Table.prototype.setCheckableStyle = function(checkableStyle) {
@@ -3340,7 +3539,11 @@ scout.Table.prototype._renderCheckableStyle = function() {
 };
 
 scout.Table.prototype._renderRowIconVisible = function() {
+  this._updateRowWidth();
+  this.$rows(true)
+    .css('width', this.rowWidth);
   this._redraw();
+  this.updateScrollbars();
 };
 
 scout.Table.prototype.setGroupingStyle = function(groupingStyle) {
@@ -3935,10 +4138,11 @@ scout.Table.prototype.setCellValue = function(column, row, value) {
   column.setCellValue(row, value);
 };
 
-scout.Table.prototype.visibleColumns = function() {
+scout.Table.prototype.visibleColumns = function(includeGuiColumns) {
+  scout.nvl(includeGuiColumns, true);
   return this.columns.filter(function(column) {
-    return column.isVisible();
-  });
+    return column.isVisible() && !(includeGuiColumns && column.guiOnly);
+  }, this);
 };
 
 /**

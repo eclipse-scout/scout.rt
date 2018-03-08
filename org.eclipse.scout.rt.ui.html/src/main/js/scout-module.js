@@ -304,7 +304,9 @@
   __include("scout/table/keystrokes/TableNavigationPageUpKeyStroke.js");
   __include("scout/table/keystrokes/TableNavigationPageDownKeyStroke.js");
   __include("scout/table/keystrokes/TableFocusFilterFieldKeyStroke.js");
+  __include("scout/table/userfilter/TableFilter.js");
   __include("scout/table/userfilter/TableUserFilter.js");
+  __include("scout/table/userfilter/CollapsedRowsFilter.js");
   __include("scout/table/userfilter/ColumnUserFilter.js");
   __include("scout/table/userfilter/DateColumnUserFilter.js");
   __include("scout/table/userfilter/NumberColumnUserFilter.js");

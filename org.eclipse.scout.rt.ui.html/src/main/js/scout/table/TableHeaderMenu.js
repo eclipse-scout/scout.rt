@@ -18,6 +18,7 @@ scout.TableHeaderMenu = function() {
   this.filterCheckedMode = scout.TableHeaderMenu.CheckedMode.ALL;
   this.filterSortMode = scout.TableHeaderMenu.SortMode.ALPHABETICALLY;
 
+  this._onColumnMovedHandler = this._onColumnMoved.bind(this);
   this._tableHeaderScrollHandler = this._onAnchorScroll.bind(this);
   this.on('locationChange', this._onLocationChange.bind(this));
 };
@@ -54,6 +55,7 @@ scout.TableHeaderMenu.prototype._init = function(options) {
   this.table = this.tableHeader.table;
   this.$headerItem = this.$anchor;
 
+  this.table.on('columnMoved', this._onColumnMovedHandler);
   // Filtering
   this.filter = this.table.getFilter(this.column.id);
   if (!this.filter) {
@@ -73,6 +75,7 @@ scout.TableHeaderMenu.prototype._init = function(options) {
     this.table.on('filterRemoved', this._tableFilterHandler);
     this._filterTableRowsCheckedHandler = this._onFilterTableRowsChecked.bind(this);
   }
+
 };
 
 scout.TableHeaderMenu.prototype._createLayout = function() {
@@ -80,8 +83,8 @@ scout.TableHeaderMenu.prototype._createLayout = function() {
 };
 
 scout.TableHeaderMenu.prototype._render = function() {
-  var leftGroups = [],
-    $rightGroups = [];
+  this.leftGroups = [];
+  this.$rightGroups = [];
 
   this.$headerItem.select(true);
 
@@ -116,61 +119,72 @@ scout.TableHeaderMenu.prototype._render = function() {
     return !column.fixedPosition;
   });
   if (movableColumns.length > 1 && !this.column.fixedPosition) {
-    leftGroups.push(this._renderMovingGroup());
+    this.leftGroups.push(this._renderMovingGroup());
   }
   // Sorting
   if (this.table.sortEnabled) {
-    leftGroups.push(this._renderSortingGroup());
+    this.leftGroups.push(this._renderSortingGroup());
   }
   // Add/remove/change columns
   if (this._isColumnActionsGroupVisible()) {
-    leftGroups.push(this._renderColumnActionsGroup());
+    this.leftGroups.push(this._renderColumnActionsGroup());
   }
   // Grouping
   // column.grouped check necessary to make ungroup possible, even if grouping is not possible anymore
   if (this.table.isGroupingPossible(this.column) || this.column.grouped) {
-    leftGroups.push(this._renderGroupingGroup());
+    this.leftGroups.push(this._renderGroupingGroup());
   }
+
+  // Expand/Collapse
+  this.leftGroups.push(this._renderHierarchyGruop());
+
   // Aggregation
   if (this.table.isAggregationPossible(this.column)) {
-    leftGroups.push(this._renderAggregationGroup());
+    this.leftGroups.push(this._renderAggregationGroup());
   }
   // Coloring
   if (this.column instanceof scout.NumberColumn) {
-    leftGroups.push(this._renderColoringGroup());
+    this.leftGroups.push(this._renderColoringGroup());
   }
 
   // -- Right column -- //
   // Filter table
   if (this.hasFilterTable) {
-    $rightGroups.push(this._renderFilterTable());
+    this.$rightGroups.push(this._renderFilterTable());
   }
   // Filter fields
   if (this.hasFilterFields) {
-    $rightGroups.push(this._renderFilterFields());
+    this.$rightGroups.push(this._renderFilterFields());
   }
 
-  addFirstLastClass(leftGroups);
-  addFirstLastClass($rightGroups);
+  this._onColumnMoved();
 
   // Set table style to focused, so that it looks as it still has the focus.
   if (this.table.enabled) {
     this.table.$container.addClass('focused');
   }
 
+};
+
+scout.TableHeaderMenu.prototype._updateFirstLast = function() {
+  addFirstLastClass(this.leftGroups.filter(function(group) {
+    return group.isVisible();
+  }));
+  addFirstLastClass(this.$rightGroups);
+
   function addFirstLastClass(groups) {
-    if (groups.length) {
-      addCssClass(groups[0], 'first');
-      addCssClass(groups[groups.length - 1], 'last');
-    }
+    groups.forEach(function(group, index, arr) {
+      toggleCssClass(group, 'first', index === 0);
+      toggleCssClass(group, 'last', index === arr.length - 1);
+    }, this);
   }
 
   // Note: we should refactor code for filter-fields and filter-table so they could also
   // work with a model-class (like the button menu groups). Currently this would cause
   // to much work.
-  function addCssClass(group, cssClass) {
+  function toggleCssClass(group, cssClass, condition) {
     var $container = group instanceof scout.TableHeaderMenuGroup ? group.$container : group;
-    $container.addClass(cssClass);
+    $container.toggleClass(cssClass, condition);
   }
 };
 
@@ -180,6 +194,7 @@ scout.TableHeaderMenu.prototype._remove = function() {
   }
   this.tableHeader.$container.off('scroll', this._tableHeaderScrollHandler);
   this.$headerItem.select(false);
+  this.table.off('columnMoved', this._onColumnMovedHandler);
   this.table.off('filterAdded', this._tableFilterHandler);
   this.table.off('filterRemoved', this._tableFilterHandler);
   scout.scrollbars.uninstall(this.$body, this.session);
@@ -196,13 +211,13 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
     column = this.column,
     pos = table.visibleColumns().indexOf(column);
 
-  var group = scout.create('TableHeaderMenuGroup', {
+  this.moveGroup = scout.create('TableHeaderMenuGroup', {
     parent: this,
     textKey: 'ui.Move',
     cssClass: 'first'
   });
-  scout.create('TableHeaderMenuButton', {
-    parent: group,
+  this.toBeginButton = scout.create('TableHeaderMenuButton', {
+    parent: this.moveGroup,
     textKey: 'ui.toBegin',
     cssClass: 'move move-top',
     clickHandler: function() {
@@ -210,8 +225,8 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
       pos = table.visibleColumns().indexOf(column);
     }
   });
-  scout.create('TableHeaderMenuButton', {
-    parent: group,
+  this.forwardButton = scout.create('TableHeaderMenuButton', {
+    parent: this.moveGroup,
     textKey: 'ui.forward',
     cssClass: 'move move-up',
     clickHandler: function() {
@@ -219,17 +234,18 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
       pos = table.visibleColumns().indexOf(column);
     }
   });
-  scout.create('TableHeaderMenuButton', {
-    parent: group,
+  this.backwardButton = scout.create('TableHeaderMenuButton', {
+    parent: this.moveGroup,
     textKey: 'ui.backward',
     cssClass: 'move move-down',
     clickHandler: function() {
       table.moveColumn(column, pos, Math.min(pos + 1, table.header.findHeaderItems().length - 1));
       pos = table.visibleColumns().indexOf(column);
     }
+
   });
-  scout.create('TableHeaderMenuButton', {
-    parent: group,
+  this.toEndButton = scout.create('TableHeaderMenuButton', {
+    parent: this.moveGroup,
     textKey: 'ui.toEnd',
     cssClass: 'move move-bottom',
     clickHandler: function() {
@@ -238,8 +254,30 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
     }
   });
 
-  group.render(this.$columnActions);
-  return group;
+  this.moveGroup.render(this.$columnActions);
+  return this.moveGroup;
+};
+
+scout.TableHeaderMenu.prototype._onColumnMoved = function() {
+  var table = this.table,
+    column = this.column;
+
+  if (this.moveGroup) {
+    var backwardEnabled = scout.arrays.find(table.visibleColumns(), function(column) {
+        return !column.fixedPosition;
+      }) !== column,
+      forwardEnabled = scout.arrays.find(table.visibleColumns().slice().reverse(), function(column) {
+        return !column.fixedPosition;
+      }) !== column;
+
+    this.toBeginButton.setEnabled(backwardEnabled);
+    this.forwardButton.setEnabled(backwardEnabled);
+    this.backwardButton.setEnabled(forwardEnabled);
+    this.toEndButton.setEnabled(forwardEnabled);
+  }
+
+  this.hierarchyGroup.setVisible(this.table.isTableNodeColumn(column));
+  this._updateFirstLast();
 };
 
 scout.TableHeaderMenu.prototype._isColumnActionsGroupVisible = function() {
@@ -469,6 +507,46 @@ scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
   }
 };
 
+scout.TableHeaderMenu.prototype._renderHierarchyGruop = function() {
+  var table = this.table,
+    menuPopup = this;
+  this.hierarchyGroup = scout.create('TableHeaderMenuGroup', {
+    parent: this,
+    textKey: 'ui.Hierarchy',
+    visible: this.table.isTableNodeColumn(this.column)
+  });
+
+  scout.create('TableHeaderMenuButton', {
+    parent: this.hierarchyGroup,
+    textKey: 'ui.CollapseAll',
+    cssClass: 'hierarchy-collapse-all',
+    clickHandler: function() {
+      menuPopup.close();
+      table.collapseAll();
+    },
+    togglable: false,
+    enabled: !!scout.arrays.find(table.rows, function(row) {
+      return row.expanded && scout.arrays.empty(row.childRows);
+    })
+  });
+  scout.create('TableHeaderMenuButton', {
+    parent: this.hierarchyGroup,
+    textKey: 'ui.ExpandAll',
+    cssClass: 'hierarchy-expand-all',
+    clickHandler: function() {
+      menuPopup.close();
+      table.expandAll();
+    },
+    togglable: false,
+    enabled: !!scout.arrays.find(table.rows, function(row) {
+      return !row.expanded && !scout.arrays.empty(row.childRows);
+    })
+  });
+
+  this.hierarchyGroup.render(this.$columnActions);
+  return this.hierarchyGroup;
+};
+
 scout.TableHeaderMenu.prototype._renderAggregationGroup = function() {
   var table = this.table,
     column = this.column,
@@ -595,26 +673,22 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
     checkable: true,
     checkableStyle: scout.Table.CheckableStyle.TABLE_ROW,
     // column-texts are not visible since header is not visible
-    columns: [
-      {
-        objectType: 'Column',
-        text: 'filter-value',
-        width: 160,
-        sortActive: true,
-        sortIndex: 1
-      },
-      {
-        objectType: 'NumberColumn',
-        text: 'aggregate-count',
-        width: 40
-      },
-      {
-        objectType: 'NumberColumn',
-        displayable: false,
-        sortActive: true,
-        sortIndex: 0
-      }
-    ]
+    columns: [{
+      objectType: 'Column',
+      text: 'filter-value',
+      width: 160,
+      sortActive: true,
+      sortIndex: 1
+    }, {
+      objectType: 'NumberColumn',
+      text: 'aggregate-count',
+      width: 40
+    }, {
+      objectType: 'NumberColumn',
+      displayable: false,
+      sortActive: true,
+      sortIndex: 0
+    }]
   });
   this.filterTable.on('rowsChecked', this._filterTableRowsCheckedHandler);
   var tableRow, tableRows = [];
@@ -626,7 +700,7 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
           iconId: filterValue.iconId
         }),
         filterValue.count,
-        filterValue.key === null ? 1: 0 // empty cell should always be at the bottom
+        filterValue.key === null ? 1 : 0 // empty cell should always be at the bottom
       ],
       checked: this.filter.selectedValues.indexOf(filterValue.key) > -1,
       dataMap: {

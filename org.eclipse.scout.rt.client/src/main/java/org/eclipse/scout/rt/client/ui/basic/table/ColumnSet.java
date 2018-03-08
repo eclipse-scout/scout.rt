@@ -48,6 +48,11 @@ public class ColumnSet {
    * key index to model index
    */
   private int[] m_keyIndexes = new int[0];
+
+  /**
+   * parent key index to model index
+   */
+  private int[] m_parentKeyIndexes = new int[0];
   /**
    * view index to model index (regardless of visibility)
    */
@@ -399,6 +404,12 @@ public class ColumnSet {
   public int[] getKeyColumnIndexes() {
     int[] a = new int[m_keyIndexes.length];
     System.arraycopy(m_keyIndexes, 0, a, 0, a.length);
+    return a;
+  }
+
+  public int[] getParentKeyColumnIndexes() {
+    int[] a = new int[m_parentKeyIndexes.length];
+    System.arraycopy(m_parentKeyIndexes, 0, a, 0, a.length);
     return a;
   }
 
@@ -1337,6 +1348,7 @@ public class ColumnSet {
     calculateDisplayableIndexes();
     calculateVisibleIndexes();
     calculateKeyIndexes();
+    calculateParentKeyIndexes();
   }
 
   private void calculateDisplayableIndexes() {
@@ -1391,6 +1403,21 @@ public class ColumnSet {
     int viewIndex = 0;
     for (int modelIndex : keyIndexes) {
       m_keyIndexes[viewIndex++] = modelIndex;
+    }
+  }
+
+  private void calculateParentKeyIndexes() {
+    List<Integer> keyIndexes = new ArrayList<>();
+    for (int modelIndex = 0; modelIndex < getColumnCount(); modelIndex++) {
+      IColumn col = getColumn(modelIndex);
+      if (col.isParentKey()) {
+        keyIndexes.add(modelIndex);
+      }
+    }
+    m_parentKeyIndexes = new int[keyIndexes.size()];
+    int viewIndex = 0;
+    for (int modelIndex : keyIndexes) {
+      m_parentKeyIndexes[viewIndex++] = modelIndex;
     }
   }
 

@@ -63,11 +63,9 @@ scout.TableHeaderMenuButton.prototype._onClick = function() {
 
 // Show 'remove' text when button is already selected
 scout.TableHeaderMenuButton.prototype._onMouseOver = function() {
-  if (this.enabled) {
-    var text = this.selected ?
-        this.session.text('ui.remove') : this.text;
-    this.parent.appendText(text);
-  }
+  var text = this.selected ?
+    this.session.text('ui.remove') : this.text;
+  this.parent.appendText(text);
 };
 
 scout.TableHeaderMenuButton.prototype._onMouseOut = function() {

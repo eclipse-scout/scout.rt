@@ -72,7 +72,7 @@ scout.TabBox.prototype.deleteTabItem = function(tabItem) {
   var newTabItems = this.tabItems.slice();
   if (index >= 0) {
     newTabItems.splice(index, 1);
-    this._setTabItems(newTabItems);
+    this.setTabItems(newTabItems);
   }
 };
 
@@ -83,7 +83,11 @@ scout.TabBox.prototype.insertTabItem = function(tabItem, index) {
   index = scout.nvl(index, this.tabItems.length);
   var newTabItems = this.tabItems.slice();
   newTabItems.splice(index, 0, tabItem);
-  this._setTabItems(newTabItems);
+  this.setTabItems(newTabItems);
+};
+
+scout.TabBox.prototype.setTabItems = function(tabItems) {
+  this.setProperty('tabItems', tabItems);
 };
 
 scout.TabBox.prototype._setTabItems = function(tabItems) {

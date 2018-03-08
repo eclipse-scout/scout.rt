@@ -298,6 +298,11 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
   boolean isPrimaryKey();
 
   /**
+   * the value in this column is part of the parent primary key in hierarchical tables.
+   */
+  boolean isParentKey();
+
+  /**
    * the value in this column is part of the row summary text (for example in a explorer tree node)
    */
   boolean isSummary();

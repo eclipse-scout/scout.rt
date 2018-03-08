@@ -127,7 +127,7 @@
     margin-right: 0;
   }
 
-  &:hover {
+  &:not(.disabled):hover {
     color: @hover-color;
     border-color: @hover-color;
   }
@@ -138,6 +138,8 @@
   }
 
   &.disabled {
+    border-color: @button-disabled-border-color;
+    color: @button-disabled-color;
     cursor: default;
   }
 
@@ -236,6 +238,18 @@
 
     &::after {
       content: '';
+    }
+  }
+
+  &.hierarchy-collapse-all {
+    &::after {
+      content: @icon-minus;
+    }
+  }
+
+  &.hierarchy-expand-all {
+    &::after {
+      content: @icon-plus;
     }
   }
 

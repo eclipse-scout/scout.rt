@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.TableUserFilter = function() {};
+scout.inherits(scout.TableUserFilter, scout.TableFilter);
 
 scout.TableUserFilter.prototype.init = function(model) {
   this.session = model.session;

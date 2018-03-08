@@ -85,6 +85,13 @@
   &.checkable.header-invisible > .table-data > .table-row.selected.first  {
     border-top-color: @control-background-color;
   }
+
+  &.structured {
+    .table-row:not(.leaf) {
+      background-color: @table-structure-row-background-color;
+      font-weight: bold;
+    }
+  }
 }
 
 .table-data {
@@ -242,6 +249,40 @@
 
   .table:not(.disabled) > .table-data > .table-row:not(.disabled) > &.mandatory.has-error::before {
     color: @error-color;
+  }
+
+  &.table-node {
+
+    > .table-row-control {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding: @tree-node-padding-y 8px @tree-node-padding-y @tree-node-control-padding-left;
+      line-height: 14px;
+      cursor: pointer;
+
+      &::before {
+        display: block;
+        transition: transform 0.3s;
+        #scout.font-icon();
+        font-size: @tree-node-control-size;
+        content: @icon-angle-right;
+        color: @tree-node-control-color;
+
+        .expanded& {
+          /* This "imprecise" angle is a workround for firefox to prevent shifting the div a little when the animation finishes. */
+          /* See https://bugzilla.mozilla.org/show_bug.cgi?id=739176 */
+          #scout.transform(rotate(89.99deg));
+        }
+
+      }
+
+      &:hover::before {
+        color: @hover-color;
+      }
+    }
+
   }
 
   &.checkable {

@@ -19,6 +19,8 @@ scout.TableRow = function() {
   this.hasError = false;
   this.id;
   this.initialized = false;
+  this.parentRow;
+  this.childRows = [];
 };
 
 scout.TableRow.prototype.init = function(model) {
@@ -43,6 +45,12 @@ scout.TableRow.prototype._initCells = function() {
       this.cells[column.index] = cell;
     }
   }, this);
+};
+
+scout.TableRow.prototype.hasFilterAcceptedChildren = function() {
+  return this.childRows.some(function(childRow) {
+    return childRow.filterAccepted || childRow.hasFilterAcceptedChildren();
+  });
 };
 
 scout.TableRow.prototype.getTable = function() {

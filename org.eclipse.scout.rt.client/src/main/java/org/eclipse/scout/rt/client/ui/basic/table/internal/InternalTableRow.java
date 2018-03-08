@@ -227,6 +227,18 @@ public class InternalTableRow extends TableRow implements ICellObserver {
   }
 
   @Override
+  public List<Object> getParentKeyValues() {
+    List<Object> pk = new ArrayList<>();
+    if (getTable() != null) {
+      int[] keyColumns = getTable().getColumnSet().getParentKeyColumnIndexes();
+      for (int keyIndex : keyColumns) {
+        pk.add(getCell(keyIndex).getValue());
+      }
+    }
+    return pk;
+  }
+
+  @Override
   public boolean isRowChanging() {
     return m_rowChanging > 0;
   }

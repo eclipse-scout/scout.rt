@@ -108,6 +108,8 @@ public interface ITableRow {
 
   List<Object> getKeyValues();
 
+  List<Object> getParentKeyValues();
+
   int getStatus();
 
   void setStatus(int rowStatus);
@@ -214,4 +216,5 @@ public interface ITableRow {
    * move this row one down this method has no effect if sorting is activated on the table
    */
   void moveDown();
+
 }

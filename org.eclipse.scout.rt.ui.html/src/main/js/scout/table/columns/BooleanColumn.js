@@ -35,16 +35,28 @@ scout.BooleanColumn.prototype._formatValue = function(value) {
  * @override
  */
 scout.BooleanColumn.prototype.buildCell = function(cell, row) {
-  var style, content, tooltipText, tooltip, cssClass, checkBoxCssClass;
-  var enabled = row.enabled;
+  var style,
+    content = '',
+    tooltipText,
+    tooltip,
+    cssClass,
+    checkBoxCssClass,
+    enabled = row.enabled,
+    tableNodeColumn = this.table.isTableNodeColumn(this),
+    rowPadding = 0;
+
+  if (tableNodeColumn) {
+    rowPadding = this.table._calcRowPaddingLevel(row);
+  }
+
   if (cell.empty) {
     // if cell wants to be really empty (e.g. no checkbox icon, use logic of base class)
     return scout.BooleanColumn.parent.prototype.buildCell.call(this, cell, row);
   }
 
   enabled = enabled && cell.editable;
-  cssClass = this._cellCssClass(cell);
-  style = this._cellStyle(cell);
+  cssClass = this._cellCssClass(cell, tableNodeColumn);
+  style = this._cellStyle(cell, tableNodeColumn, rowPadding);
   if (!enabled) {
     cssClass += ' disabled';
   }
@@ -61,7 +73,15 @@ scout.BooleanColumn.prototype.buildCell = function(cell, row) {
   if (!enabled) {
     checkBoxCssClass += ' disabled';
   }
-  content = '<div class="' + checkBoxCssClass + '"/>';
+
+  if (tableNodeColumn && !scout.arrays.empty(row.childRows)) {
+    this.tableNodeColumn = true;
+    content = this._expandIcon(row.expanded, rowPadding) + content;
+    if (row.expanded) {
+      cssClass += ' expanded';
+    }
+  }
+  content = content + '<div class="' + checkBoxCssClass + '"/>';
 
   return '<div class="' + cssClass + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute.string + '>' + content + '</div>';
 };
@@ -71,10 +91,14 @@ scout.BooleanColumn.prototype.$checkBox = function($row) {
   return $cell.children('.check-box');
 };
 
-scout.BooleanColumn.prototype._cellCssClass = function(cell) {
+scout.BooleanColumn.prototype._cellCssClass = function(cell, tableNode) {
   var cssClass = scout.BooleanColumn.parent.prototype._cellCssClass.call(this, cell);
   cssClass = cssClass.replace(' editable', '');
   cssClass += ' checkable';
+  if (tableNode) {
+    cssClass += ' table-node';
+  }
+
   return cssClass;
 };
 
@@ -84,8 +108,13 @@ scout.BooleanColumn.prototype._cellCssClass = function(cell) {
  */
 scout.BooleanColumn.prototype.onMouseUp = function(event, $row) {
   var row = $row.data('row'),
-    cell = this.cell(row);
+    cell = this.cell(row),
+    $target = $(event.target);
 
+  if ($target.hasClass('table-row-control') ||
+    $target.parent().hasClass('table-row-control')) {
+    this.table.expandRow(row, !row.expanded);
+  }
   if (this.table.checkableColumn === this) {
     this.table.checkRow(row, !row.checked);
   } else if (this.isCellEditable(row, cell, event)) {

@@ -275,6 +275,19 @@ public class TableRow implements ITableRow {
   }
 
   @Override
+  public List<Object> getParentKeyValues() {
+    if (m_columnSet == null) {
+      throw new UnsupportedOperationException("can only be called when TableRow was constructed with a non-null columnSet");
+    }
+    int[] keyColumns = m_columnSet.getParentKeyColumnIndexes();
+    List<Object> pk = new ArrayList<>(keyColumns.length);
+    for (int keyIndex : keyColumns) {
+      pk.add(getCellValue(keyIndex));
+    }
+    return pk;
+  }
+
+  @Override
   public boolean isRowChanging() {
     return false;
   }

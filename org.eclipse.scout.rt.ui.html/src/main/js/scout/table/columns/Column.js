@@ -17,6 +17,7 @@ scout.Column = function() {
   this.removable = false;
   this.modifiable = false;
   this.fixedWidth = false;
+  this.fixedPosition = false;
   this.grouped = false;
   this.headerHtmlEnabled = false;
   this.horizontalAlignment = -1;
@@ -35,6 +36,7 @@ scout.Column = function() {
   this.prefMinWidth = null;
   this.minWidth = scout.Column.DEFAULT_MIN_WIDTH; // the minimal width the column can have
   this.showSeparator = true;
+  this.tableNodeColumn = false;
   this.textWrap = false;
   this.filterType = 'TextColumnUserFilter';
   this.comparator = scout.comparators.TEXT;
@@ -195,7 +197,13 @@ scout.Column.prototype.buildCellForAggregateRow = function(aggregateRow) {
 scout.Column.prototype.buildCell = function(cell, row) {
   scout.assertParameter('cell', cell, scout.Cell);
 
-  var text = cell.text || '';
+  var text = cell.text || '',
+    tableNodeColumn = this.table.isTableNodeColumn(this),
+    rowPadding = 0;
+
+  if (tableNodeColumn) {
+    rowPadding = this.table._calcRowPaddingLevel(row);
+  }
   if (!cell.htmlEnabled) {
     text = cell.encodedText() || '';
     if (this.table.multilineText) {
@@ -204,8 +212,8 @@ scout.Column.prototype.buildCell = function(cell, row) {
   }
   var iconId = cell.iconId;
   var icon = this._icon(iconId, !!text) || '';
-  var cssClass = this._cellCssClass(cell);
-  var style = this._cellStyle(cell);
+  var cssClass = this._cellCssClass(cell, tableNodeColumn);
+  var style = this._cellStyle(cell, tableNodeColumn, rowPadding);
 
   if (cell.errorStatus) {
     row.hasError = true;
@@ -218,6 +226,14 @@ scout.Column.prototype.buildCell = function(cell, row) {
     cssClass = scout.strings.join(' ', cssClass, 'empty');
   } else {
     content = icon + text;
+  }
+
+  if (tableNodeColumn && !scout.arrays.empty(row.childRows)) {
+    this.tableNodeColumn = true;
+    content = this._expandIcon(row.expanded, rowPadding) + content;
+    if (row.expanded) {
+      cssClass += ' expanded';
+    }
   }
 
   return this._buildCell(content, style, cssClass);
@@ -236,6 +252,16 @@ scout.Column.prototype._buildCell = function(content, style, cssClass) {
   }
   cellHtml += '</div>';
   return cellHtml;
+};
+
+scout.Column.prototype._expandIcon = function(expanded, rowPadding) {
+  var style = 'margin-left: ' + rowPadding + 'px';
+  var cssClasses = 'table-row-control';
+  if (expanded) {
+    cssClasses += ' expanded';
+  }
+  var html = '<div class="' + cssClasses + '" style="' + style + '"></div>';
+  return html;
 };
 
 scout.Column.prototype._icon = function(iconId, hasText) {
@@ -257,7 +283,7 @@ scout.Column.prototype._icon = function(iconId, hasText) {
   }
 };
 
-scout.Column.prototype._cellCssClass = function(cell) {
+scout.Column.prototype._cellCssClass = function(cell, tableNode) {
   var cssClass = 'table-cell';
   if (this.mandatory) {
     cssClass += ' mandatory';
@@ -273,12 +299,15 @@ scout.Column.prototype._cellCssClass = function(cell) {
   }
   cssClass += ' halign-' + scout.Table.parseHorizontalAlignment(cell.horizontalAlignment);
   var visibleColumns = this.table.visibleColumns();
-  var columnPosition = visibleColumns.indexOf(this);
-  if (columnPosition === 0) {
+  var overAllColumnPosition = visibleColumns.indexOf(this);
+  if (overAllColumnPosition === 0) {
     cssClass += ' first';
   }
-  if (columnPosition === visibleColumns.length - 1) {
+  if (overAllColumnPosition === visibleColumns.length - 1) {
     cssClass += ' last';
+  }
+  if (tableNode) {
+    cssClass += ' table-node';
   }
 
   if (cell.cssClass) {
@@ -287,23 +316,31 @@ scout.Column.prototype._cellCssClass = function(cell) {
   return cssClass;
 };
 
-scout.Column.prototype._cellStyle = function(cell) {
+scout.Column.prototype._cellStyle = function(cell, tableNodeColumn, rowPadding) {
   var style,
     width = this.width;
 
   if (width === 0) {
     return 'display: none;';
   }
-
   style = 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
+  if (tableNodeColumn) {
+    // calculate padding
+    style += ' padding-left: ' + (26 + rowPadding) + 'px';
+  }
   style += scout.styles.legacyStyle(cell);
   return style;
 };
 
 scout.Column.prototype.onMouseUp = function(event, $row) {
   var row = $row.data('row'),
-    cell = this.cell(row);
+    cell = this.cell(row),
+    $target = $(event.target);
 
+  if ($target.hasClass('table-row-control') ||
+    $target.parent().hasClass('table-row-control')) {
+    this.table.expandRow(row, !row.expanded);
+  }
   if (this.isCellEditable(row, cell, event)) {
     this.table.prepareCellEdit(this, row, true);
   }

@@ -84,6 +84,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   private static final String DISPLAYABLE = "DISPLAYABLE";
   private static final String INITIALIZED = "INITIALIZED";
   private static final String PRIMARY_KEY = "PRIMARY_KEY";
+  private static final String PARENT_KEY = "PARENT_KEY";
   private static final String SUMMARY = "SUMMARY";
   private static final String INITIALLY_VISIBLE = "INITIALLY_VISIBLE";
   private static final String INITIALLY_GROUPED = "INITIALLY_GROUPED";
@@ -95,6 +96,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper(IDimensions.VISIBLE, IDimensions.VISIBLE_GRANTED, DISPLAYABLE);
   private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INITIALIZED, PRIMARY_KEY, SUMMARY, INITIALLY_VISIBLE,
       INITIALLY_GROUPED, INITIALLY_SORTED_ASC, INITIALLY_ALWAYS_INCLUDE_SORT_AT_BEGIN, INITIALLY_ALWWAYS_INCLUDE_SORT_AT_END);
+
+  private static final NamedBitMaskHelper FLAGS2_BIT_HELPER = new NamedBitMaskHelper(PARENT_KEY);
 
   private ITable m_table;
 
@@ -112,6 +115,12 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * {@link #INITIALLY_ALWAYS_INCLUDE_SORT_AT_BEGIN}
    */
   private byte m_flags;
+
+  /**
+   * Provides 8 boolean flags.<br>
+   * Currently all are used: {@link #PARENT_KEY}
+   */
+  private byte m_flags2;
 
   private int m_initialWidth;
   private int m_initialSortIndex;
@@ -341,6 +350,18 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(90)
   protected boolean getConfiguredPrimaryKey() {
+    return false;
+  }
+
+  /**
+   * Configures if the column belongs to the primary key of the parent row. Typically there are the same amount of
+   * primary key columns ({@link AbstractColumn#getConfiguredPrimaryKey()}) as parent key columns. return {@code true}
+   * if the column value belongs to the the primary key of the parent row in a hierarchical table, {@code false}
+   * otherwise.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(91)
+  protected boolean getConfiguredParentKey() {
     return false;
   }
 
@@ -914,6 +935,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     setAutoOptimizeMaxWidth(getConfiguredAutoOptimizeMaxWidth());
     setFixedWidth(getConfiguredFixedWidth());
     m_flags = FLAGS_BIT_HELPER.changeBit(PRIMARY_KEY, getConfiguredPrimaryKey(), m_flags);
+    m_flags2 = FLAGS2_BIT_HELPER.changeBit(PARENT_KEY, getConfiguredParentKey(), m_flags);
     m_flags = FLAGS_BIT_HELPER.changeBit(SUMMARY, getConfiguredSummary(), m_flags);
     setEditable(getConfiguredEditable());
     setMandatory(getConfiguredMandatory());
@@ -1875,6 +1897,11 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public boolean isPrimaryKey() {
     return FLAGS_BIT_HELPER.isBitSet(PRIMARY_KEY, m_flags);
+  }
+
+  @Override
+  public boolean isParentKey() {
+    return FLAGS2_BIT_HELPER.isBitSet(PARENT_KEY, m_flags2);
   }
 
   @Override

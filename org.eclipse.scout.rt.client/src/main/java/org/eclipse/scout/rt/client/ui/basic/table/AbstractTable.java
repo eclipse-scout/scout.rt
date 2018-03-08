@@ -3240,6 +3240,25 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     return null;
   }
 
+  @Override
+  public List<Object> getParentRowKeys(int rowIndex) {
+    ITableRow row = getRow(rowIndex);
+    return getParentRowKeys(row);
+  }
+
+  @Override
+  public List<Object> getParentRowKeys(ITableRow row) {
+    if (row != null) {
+      return row.getParentKeyValues();
+    }
+    return CollectionUtility.emptyArrayList();
+  }
+
+  @Override
+  public ITableRow findParentRow(ITableRow row) {
+    return findRowByKey(getParentRowKeys(row));
+  }
+
   /**
    * Gets if the given cell values are equal to the given search values
    *
