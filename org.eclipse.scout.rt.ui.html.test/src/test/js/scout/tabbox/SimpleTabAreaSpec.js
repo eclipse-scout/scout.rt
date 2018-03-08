@@ -53,11 +53,11 @@ describe('SimpleTabArea', function() {
     expect(tabBox.$tabArea).toBeTruthy();
     expect(tabBox.$tabArea.children().length).toBe(3);
     expect(tabBox.$tabArea.children().eq(0)).toHaveClass('selected');
-    expect(tabBox.$tabArea.children().eq(0).text()).toBe('One');
+    expect(tabBox.$tabArea.children().eq(0).text().trim()).toBe('One');
     expect(tabBox.$tabArea.children().eq(1)).not.toHaveClass('selected');
-    expect(tabBox.$tabArea.children().eq(1).text()).toBe('Two');
+    expect(tabBox.$tabArea.children().eq(1).text().trim()).toBe('Two');
     expect(tabBox.$tabArea.children().eq(2)).not.toHaveClass('selected');
-    expect(tabBox.$tabArea.children().eq(2).text()).toBe('Three');
+    expect(tabBox.$tabArea.children().eq(2).text().trim()).toBe('Three');
 
     tabBox.remove();
     expect(tabBox.$tabArea).not.toBeTruthy;
@@ -66,11 +66,11 @@ describe('SimpleTabArea', function() {
     expect(tabBox.$tabArea).toBeTruthy();
     expect(tabBox.$tabArea.children().length).toBe(3);
     expect(tabBox.$tabArea.children().eq(0)).toHaveClass('selected');
-    expect(tabBox.$tabArea.children().eq(0).text()).toBe('One');
+    expect(tabBox.$tabArea.children().eq(0).text().trim()).toBe('One');
     expect(tabBox.$tabArea.children().eq(1)).not.toHaveClass('selected');
-    expect(tabBox.$tabArea.children().eq(1).text()).toBe('Two');
+    expect(tabBox.$tabArea.children().eq(1).text().trim()).toBe('Two');
     expect(tabBox.$tabArea.children().eq(2)).not.toHaveClass('selected');
-    expect(tabBox.$tabArea.children().eq(2).text()).toBe('Three');
+    expect(tabBox.$tabArea.children().eq(2).text().trim()).toBe('Three');
   });
 
 });
