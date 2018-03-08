@@ -192,24 +192,39 @@ public final class MenuUtility {
     return new ActionFinder().findAction(rootMenus, menuType);
   }
 
-  public static void updateMenuVisibilitiesForTiles(ITileGrid tileGrid) {
+  public static void updateMenuVisibilitiesForTiles(ITileGrid<? extends ITile> tileGrid) {
+    updateMenuVisibilitiesForTiles(tileGrid, null);
+  }
+
+  public static void updateMenuVisibilitiesForTiles(ITileGrid<? extends ITile> tileGrid, Predicate<IAction> filter) {
+    updateMenuVisibilitiesForTiles(tileGrid.getContextMenu(), tileGrid.getSelectedTiles(), filter);
+  }
+
+  public static void updateMenuVisibilitiesForTiles(IContextMenu contextMenu, List<? extends ITile> selectedTiles, Predicate<IAction> filter) {
     Set<IMenuType> acceptedMenuTypes = new HashSet<>();
     acceptedMenuTypes.add(TileGridMenuType.EmptySpace);
-    if (tileGrid.getSelectedTiles().size() == 1) {
+    if (selectedTiles.size() == 1) {
       acceptedMenuTypes.add(TileGridMenuType.SingleSelection);
     }
-    else if (tileGrid.getSelectedTiles().size() > 1) {
+    else if (selectedTiles.size() > 1) {
       acceptedMenuTypes.add(TileGridMenuType.MultiSelection);
     }
-    updateMenuVisibilities(tileGrid.getContextMenu(), acceptedMenuTypes);
+    updateMenuVisibilities(contextMenu, acceptedMenuTypes, filter);
   }
 
   /**
    * Updates the visibility of every single menu (including child menus) according to the given acceptedMenuTypes.
+   *
+   * @param filter
+   *          (optional) menus are filtered with this predicate before visibility is updated
    */
-  public static void updateMenuVisibilities(IContextMenu contextMenu, Set<IMenuType> acceptedMenuTypes) {
+  public static void updateMenuVisibilities(IContextMenu contextMenu, Set<IMenuType> acceptedMenuTypes, Predicate<IAction> filter) {
     final Predicate<IAction> activeFilter = ActionUtility.createMenuFilterMenuTypes(acceptedMenuTypes, false);
     contextMenu.visit(menu -> {
+      if (filter != null && !filter.test(menu)) {
+        return;
+      }
+
       if (!menu.isSeparator()) {
         menu.setVisible(activeFilter.test(menu));
       }
