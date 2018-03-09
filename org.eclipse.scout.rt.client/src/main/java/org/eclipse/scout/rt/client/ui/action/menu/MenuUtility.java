@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
 import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.client.ui.tile.ITileGrid;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -213,7 +214,9 @@ public final class MenuUtility {
   }
 
   /**
-   * Updates the visibility of every single menu (including child menus) according to the given acceptedMenuTypes.
+   * Updates the visibility of every single menu (including child menus) according to the given acceptedMenuTypes. If
+   * one of the given menu is an {@link OutlineMenuWrapper}, the visibility will be changed on the original menu,
+   * because the wrapper won't delegate the change.
    *
    * @param filter
    *          (optional) menus are filtered with this predicate before visibility is updated
@@ -224,10 +227,16 @@ public final class MenuUtility {
       if (filter != null && !filter.test(menu)) {
         return;
       }
-
-      if (!menu.isSeparator()) {
-        menu.setVisible(activeFilter.test(menu));
+      if (menu.isSeparator()) {
+        return;
       }
+
+      // The visibility can only be changed on the original menu
+      if (menu instanceof OutlineMenuWrapper) {
+        menu = ((OutlineMenuWrapper) menu).getOriginalMenu();
+      }
+
+      menu.setVisible(activeFilter.test(menu));
     }, IMenu.class);
   }
 }

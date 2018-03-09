@@ -160,6 +160,18 @@ public class OutlineMenuWrapper extends AbstractWidget implements IMenu, IReadOn
     return m_wrappedMenu;
   }
 
+  /**
+   * @return the original menu which has been wrapped even if the wrapped menu was wrapped again. Will never be of type
+   *         {@link OutlineMenuWrapper}.
+   */
+  public IMenu getOriginalMenu() {
+    IMenu originalMenu = m_wrappedMenu;
+    while (originalMenu instanceof OutlineMenuWrapper) {
+      originalMenu = ((OutlineMenuWrapper) originalMenu).getWrappedMenu();
+    }
+    return originalMenu;
+  }
+
   @Override
   public Object getOwnerValue() {
     return m_wrappedMenu.getOwnerValue();
