@@ -323,7 +323,7 @@ scout.HtmlComponent.prototype.setBounds = function(bounds) {
     return;
   }
   var oldBounds = this.offsetBounds();
-  if (!oldBounds.equals(bounds)) {
+  if (!oldBounds.dimension().equals(bounds.dimension())) {
     this.invalidateLayout();
   }
   scout.graphics.setBounds(this.$comp, bounds);
