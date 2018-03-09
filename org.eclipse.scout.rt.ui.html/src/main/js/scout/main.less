@@ -227,6 +227,13 @@ input {
   }
 }
 
+textarea.alternative {
+  &.disabled:not(.read-only) {
+    background-color: @control-alternative-disabled-background-color;
+    color: @disabled-color;
+  }
+}
+
 input[type="text"],
 textarea {
   /* Explicitly set 'user-select' to something other than 'none', otherwise the focus manager */
