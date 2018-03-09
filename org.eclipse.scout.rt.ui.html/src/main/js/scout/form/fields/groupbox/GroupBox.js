@@ -229,6 +229,22 @@ scout.GroupBox.prototype._renderBodyLayoutConfig = function() {
   }
 };
 
+/**
+ * Redraws the group box body by removing and rerendering every control.
+ * This may be necessary if a field does not support a dynamic property change and therefore needs to be redrawn completely to reflect the change.
+ */
+scout.GroupBox.prototype.rerenderControls = function() {
+  this._removeControls();
+  this._renderControls();
+  this.htmlBody.invalidateLayoutTree();
+};
+
+scout.GroupBox.prototype._removeControls = function() {
+  this.controls.forEach(function(control) {
+    control.remove();
+  }, this);
+};
+
 scout.GroupBox.prototype._renderControls = function() {
   this.controls.forEach(function(control) {
     if (!control.rendered) {
