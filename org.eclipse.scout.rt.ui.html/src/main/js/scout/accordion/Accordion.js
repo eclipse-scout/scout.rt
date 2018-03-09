@@ -127,7 +127,7 @@ scout.Accordion.prototype._insertGroup = function(group) {
 
 scout.Accordion.prototype._initGroup = function(group) {
   group.setParent(this);
-  group.on('propertyChange', this._groupPropertyChangeHandler.bind(this));
+  group.on('propertyChange', this._groupPropertyChangeHandler);
 };
 
 scout.Accordion.prototype._renderGroup = function(group) {
@@ -141,7 +141,7 @@ scout.Accordion.prototype._deleteGroups = function(groups) {
 };
 
 scout.Accordion.prototype._deleteGroup = function(group) {
-  group.off('propertyChange', this._groupPropertyChangeHandler.bind(this));
+  group.off('propertyChange', this._groupPropertyChangeHandler);
   if (group.owner === this) {
     group.destroy();
   } else if (this.rendered) {
