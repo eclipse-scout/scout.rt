@@ -23,6 +23,7 @@ import javax.jms.Destination;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
@@ -350,6 +351,7 @@ public class JmsMomImplementor implements IMomImplementor {
     IJmsSessionProvider sessionProvider = createSessionProvider(destination, false);
     try {
       TemporaryQueue temporaryQueue = sessionProvider.getTemporaryQueue();
+      MessageConsumer responseQueueConsumer = sessionProvider.getSession().createConsumer(temporaryQueue);
 
       // send request message
       JmsMessageWriter messageWriter = JmsMessageWriter.newInstance(sessionProvider.getSession(), resolveMarshaller(destination))
@@ -360,7 +362,7 @@ public class JmsMomImplementor implements IMomImplementor {
       send(sessionProvider, destination, messageWriter, input);
 
       // receive response message
-      responseMessage = sessionProvider.getSession().createConsumer(temporaryQueue).receive();
+      responseMessage = responseQueueConsumer.receive();
     }
     catch (JMSException e) {
       if (IFuture.CURRENT.get().isCancelled()) {
