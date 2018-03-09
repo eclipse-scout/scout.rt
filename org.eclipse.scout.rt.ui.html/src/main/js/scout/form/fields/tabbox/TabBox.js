@@ -67,6 +67,12 @@ scout.TabBox.prototype._remove = function() {
   this._removeSelectedTab();
 };
 
+
+
+scout.TabBox.prototype._removeMenus = function() {
+  // menubar takes care about removal
+};
+
 scout.TabBox.prototype.deleteTabItem = function(tabItem) {
   var index = this.tabItems.indexOf(tabItem);
   var newTabItems = this.tabItems.slice();
