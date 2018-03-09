@@ -32,6 +32,7 @@ import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
@@ -349,6 +350,7 @@ public class JmsMomImplementor implements IMomImplementor {
     IJmsSessionProvider sessionProvider = createSessionProvider(destination, false);
     try {
       TemporaryQueue temporaryQueue = sessionProvider.getTemporaryQueue();
+      MessageConsumer responseQueueConsumer = sessionProvider.getSession().createConsumer(temporaryQueue);
 
       // send request message
       JmsMessageWriter messageWriter = JmsMessageWriter.newInstance(sessionProvider.getSession(), resolveMarshaller(destination))
@@ -359,7 +361,7 @@ public class JmsMomImplementor implements IMomImplementor {
       send(sessionProvider, destination, messageWriter, input);
 
       // receive response message
-      responseMessage = sessionProvider.getSession().createConsumer(temporaryQueue).receive();
+      responseMessage = responseQueueConsumer.receive();
     }
     catch (JMSException e) {
       if (IFuture.CURRENT.get().isCancelled()) {
@@ -397,10 +399,12 @@ public class JmsMomImplementor implements IMomImplementor {
   protected void cancelRequest(final String replyId) {
     Jobs.schedule(() -> {
       assertNotNull(m_requestReplyCancellationTopic);
+
       IJmsSessionProvider sessionProvider = createSessionProvider();
       try {
         JmsMessageWriter writer = JmsMessageWriter.newInstance(sessionProvider.getSession(), BEANS.get(TextMarshaller.class))
             .writeReplyId(replyId);
+
         send(sessionProvider.getProducer(), resolveJmsDestination(m_requestReplyCancellationTopic, sessionProvider.getSession()), writer, Message.DEFAULT_DELIVERY_MODE, Message.DEFAULT_PRIORITY, Message.DEFAULT_TIME_TO_LIVE);
       }
       finally {
