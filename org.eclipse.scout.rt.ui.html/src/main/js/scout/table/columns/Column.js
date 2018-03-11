@@ -340,6 +340,7 @@ scout.Column.prototype.onMouseUp = function(event, $row) {
   if ($target.hasClass('table-row-control') ||
     $target.parent().hasClass('table-row-control')) {
     this.table.expandRow(row, !row.expanded);
+    return;
   }
   if (this.isCellEditable(row, cell, event)) {
     this.table.prepareCellEdit(this, row, true);

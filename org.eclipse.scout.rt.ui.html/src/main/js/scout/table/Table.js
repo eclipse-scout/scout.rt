@@ -470,11 +470,13 @@ scout.Table.prototype._onRowMouseUp = function(event) {
     // Don't execute click / appLinks when the mouse gets pressed and moved outside of a cell
     return;
   }
+  // TODO AHO: verify with CGU moved row assignemnt before column mouse up delegate. Since the column delegate forces
+  // a expansion event which ends in $row.data('row') === undefined.
+  row = $row.data('row');
   if (mouseButton === 1) {
     column.onMouseUp(event, $row);
     $appLink = this._find$AppLink(event);
   }
-  row = $row.data('row');
   if ($appLink) {
     this._triggerAppLinkAction(column, $appLink.data('ref'));
   } else {
@@ -3005,7 +3007,7 @@ scout.Table.prototype.resetFilter = function() {
       this.removeFilterByKey(key);
     }
   }
-  this._filterMap = {};
+//  this._filterMap = {};
 
   // reset rows
   this.filter();
@@ -3394,8 +3396,12 @@ scout.Table.prototype._setKeyStrokes = function(keyStrokes) {
 };
 
 scout.Table.prototype.setFilters = function(filters) {
+  var filter;
   for (var key in this._filterMap) { // NOSONAR
-    this.removeFilterByKey(key);
+    filter = this._filterMap[key];
+    if (filter instanceof scout.TableUserFilter) {
+      this.removeFilterByKey(key);
+    }
   }
   if (filters) {
     filters.forEach(function(filter) {

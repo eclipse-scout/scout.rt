@@ -114,6 +114,7 @@ scout.BooleanColumn.prototype.onMouseUp = function(event, $row) {
   if ($target.hasClass('table-row-control') ||
     $target.parent().hasClass('table-row-control')) {
     this.table.expandRow(row, !row.expanded);
+    return;
   }
   if (this.table.checkableColumn === this) {
     this.table.checkRow(row, !row.checked);
