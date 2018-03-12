@@ -334,14 +334,8 @@ scout.Column.prototype._cellStyle = function(cell, tableNodeColumn, rowPadding) 
 
 scout.Column.prototype.onMouseUp = function(event, $row) {
   var row = $row.data('row'),
-    cell = this.cell(row),
-    $target = $(event.target);
+    cell = this.cell(row);
 
-  if ($target.hasClass('table-row-control') ||
-    $target.parent().hasClass('table-row-control')) {
-    this.table.expandRow(row, !row.expanded);
-    return;
-  }
   if (this.isCellEditable(row, cell, event)) {
     this.table.prepareCellEdit(this, row, true);
   }

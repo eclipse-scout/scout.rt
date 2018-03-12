@@ -108,14 +108,7 @@ scout.BooleanColumn.prototype._cellCssClass = function(cell, tableNode) {
  */
 scout.BooleanColumn.prototype.onMouseUp = function(event, $row) {
   var row = $row.data('row'),
-    cell = this.cell(row),
-    $target = $(event.target);
-
-  if ($target.hasClass('table-row-control') ||
-    $target.parent().hasClass('table-row-control')) {
-    this.table.expandRow(row, !row.expanded);
-    return;
-  }
+    cell = this.cell(row);
   if (this.table.checkableColumn === this) {
     this.table.checkRow(row, !row.checked);
   } else if (this.isCellEditable(row, cell, event)) {

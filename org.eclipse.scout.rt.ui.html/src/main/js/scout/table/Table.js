@@ -449,7 +449,8 @@ scout.Table.prototype._onRowMouseDown = function(event) {
 
 scout.Table.prototype._onRowMouseUp = function(event) {
   var $row, $mouseUpRow, column, $appLink, row,
-    mouseButton = event.which;
+    mouseButton = event.which,
+    $target = $(event.target);
 
   if (this._doubleClickSupport.doubleClicked()) {
     // Don't execute on double click events
@@ -470,9 +471,14 @@ scout.Table.prototype._onRowMouseUp = function(event) {
     // Don't execute click / appLinks when the mouse gets pressed and moved outside of a cell
     return;
   }
-  // TODO AHO: verify with CGU moved row assignemnt before column mouse up delegate. Since the column delegate forces
-  // a expansion event which ends in $row.data('row') === undefined.
+
   row = $row.data('row');
+  // handle expansion
+  if ($target.hasClass('table-row-control') ||
+    $target.parent().hasClass('table-row-control')) {
+    this.expandRow(row, !row.expanded);
+    return;
+  }
   if (mouseButton === 1) {
     column.onMouseUp(event, $row);
     $appLink = this._find$AppLink(event);
@@ -3010,7 +3016,7 @@ scout.Table.prototype.resetFilter = function() {
       this.removeFilterByKey(key);
     }
   }
-//  this._filterMap = {};
+  //  this._filterMap = {};
 
   // reset rows
   this.filter();
