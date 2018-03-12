@@ -20,6 +20,8 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
+import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -79,9 +81,26 @@ public class ClientNotificationPoller {
 
     @Override
     public void run() {
-      while (!RunMonitor.CURRENT.get().isCancelled()) {
+      final RunMonitor outerRunMonitor = RunMonitor.CURRENT.get();
+      while (!outerRunMonitor.isCancelled()) {
         try {
-          handleMessagesReceived(BEANS.get(IClientNotificationService.class).getNotifications(IClientNode.ID));
+          // use temporary new run monitor to avoid registering anonymous new cancellables with parent (current) run monitor
+          // new local run monitor is registered with parent run monitor as cancellable, however it is unregistered from
+          // parent after handling received messages in any case to avoid memory overusage
+          RunContext contextCopy = RunContexts.copyCurrent();
+          final RunMonitor contextRunMonitor = contextCopy.getRunMonitor();
+          contextCopy.run(new IRunnable() {
+
+            @Override
+            public void run() throws Exception {
+              try {
+                handleMessagesReceived(BEANS.get(IClientNotificationService.class).getNotifications(IClientNode.ID));
+              }
+              finally {
+                outerRunMonitor.unregisterCancellable(contextRunMonitor);
+              }
+            }
+          });
         }
         catch (ThreadInterruptedException | FutureCancelledException e) {
           LOG.debug("Client notification polling has been interrupted.", e);
