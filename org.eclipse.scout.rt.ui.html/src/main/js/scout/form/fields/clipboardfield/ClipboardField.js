@@ -159,7 +159,7 @@ scout.ClipboardField.prototype._getSelection = function() {
   return selection;
 };
 
-  scout.ClipboardField.prototype._onKeyDown = function(event) {
+scout.ClipboardField.prototype._onKeyDown = function(event) {
   if (scout.isOneOf(event.which, scout.ClipboardField.ALWAYS_DESTRUCTIVE_KEYS)) {
     return false; // never allowed
   }
@@ -172,11 +172,15 @@ scout.ClipboardField.prototype._getSelection = function() {
 
 scout.ClipboardField.prototype._onInput = function(event) {
   // if the user somehow managed to fire to input something (e.g. "delete" menu in FF & IE), just reset the value to the previous content
-    this._renderDisplayText();
+  this._renderDisplayText();
   return false;
 };
 
 scout.ClipboardField.prototype._onCopy = function(event) {
+  if (scout.device.isIos() && this._onIosCopy(event) === false) {
+    return;
+  }
+
   var selection, text, dataTransfer, myWindow = this.$container.window(true);
   try {
     if (event.originalEvent.clipboardData) {
@@ -225,6 +229,21 @@ scout.ClipboardField.prototype._onCopy = function(event) {
     parent: this
   });
 
+  return false;
+};
+
+scout.ClipboardField.prototype._onIosCopy = function(event) {
+  // Setting custom clipboard data is not possible with iOS due to a WebKit bug.
+  // The default behavior copies rich text. Since it is not expected to copy the style of the clipboard field, temporarily set color and background-color
+  // https://bugs.webkit.org/show_bug.cgi?id=176980
+  var oldStyle = this.$field.attr('style');
+  this.$field.css({
+    'color': '#000',
+    'background-color': 'transparent'
+  });
+  setTimeout(function() {
+    this.$field.attrOrRemove('style', oldStyle);
+  }.bind(this));
   return false;
 };
 
