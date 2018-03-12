@@ -1326,7 +1326,7 @@ scout.Session.prototype._renderApplicationLoading = function() {
 
 scout.Session.prototype._removeApplicationLoading = function() {
   var $loadingRoot = $('body').children('.application-loading-root');
-  $loadingRoot.addClass('application-loading-root-fadeOut');
+  $loadingRoot.addClass('application-loading-root-fadeout');
   if (scout.device.supportsCssAnimation()) {
     $loadingRoot.oneAnimationEnd(function() {
       $loadingRoot.remove();

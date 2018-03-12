@@ -101,7 +101,7 @@ public class BreadthFirstTraversal<T> implements ITreeTraversal<T> {
     private final T m_element;
     private final int m_index;
 
-    private P_BreadthFirstNode(T element, int level, int index) {
+    protected P_BreadthFirstNode(T element, int level, int index) {
       m_element = element;
       m_level = level;
       m_index = index;
