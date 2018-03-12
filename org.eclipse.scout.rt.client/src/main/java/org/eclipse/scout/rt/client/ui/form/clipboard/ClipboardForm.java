@@ -178,6 +178,11 @@ public class ClipboardForm extends AbstractForm {
         }
 
         @Override
+        protected String getConfiguredFieldStyle() {
+          return FIELD_STYLE_CLASSIC;
+        }
+
+        @Override
         protected void execChangedValue() {
           checkOkButtonEnabled();
         }
