@@ -41,6 +41,7 @@ public class DisplayModeOptions {
 
   /**
    * @return the first hour of a day<br>
+   *         A value between 0 and 23, values smaller than 0 or greater than 23 are automatically adjusted<br/>
    *         When a working day starts at 08:00 and ends at 17:00, this value is 8.
    */
   public int getFirstHourOfDay() {
@@ -49,6 +50,7 @@ public class DisplayModeOptions {
 
   /**
    * @return the last hour of a day<br>
+   *         A value between 0 and 23, values smaller than 0 or greater than 23 are automatically adjusted<br/>
    *         When a working day starts at 08:00 and ends at 17:00, this value is 16 since the last hour starts at 16:00
    *         and ends at 16:59.
    */
@@ -75,13 +77,23 @@ public class DisplayModeOptions {
   }
 
   public DisplayModeOptions withFirstHourOfDay(int firstHourOfDay) {
-    m_firstHourOfDay = firstHourOfDay;
+    m_firstHourOfDay = validHour(firstHourOfDay);
     return this;
   }
 
   public DisplayModeOptions withLastHourOfDay(int lastHourOfDay) {
-    m_lastHourOfDay = lastHourOfDay;
+    m_lastHourOfDay = validHour(lastHourOfDay);
     return this;
+  }
+
+  protected int validHour(int hour) {
+    if (hour < 0) {
+      return 0;
+    }
+    if (hour > 23) {
+      return 23;
+    }
+    return hour;
   }
 
   public DisplayModeOptions withMinSelectionIntervalCount(int minSelectionIntervalCount) {

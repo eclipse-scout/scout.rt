@@ -109,6 +109,7 @@ scout.Planner.prototype._init = function(model) {
   this._setSelectedActivity(this.selectedActivity);
   this._setSelectionRange(this.selectionRange);
   this._setMenus(this.menus);
+  this._setDisplayModeOptions(this.displayModeOptions);
 
   this._tooltipSupport = new scout.TooltipSupport({
     parent: this,
@@ -1259,6 +1260,37 @@ scout.Planner.prototype._filterMenus = function(allowedTypes, onlyVisible, enabl
 
 scout.Planner.prototype.setDisplayModeOptions = function(displayModeOptions) {
   this.setProperty('displayModeOptions', displayModeOptions);
+};
+
+scout.Planner.prototype._setDisplayModeOptions = function(displayModeOptions) {
+  if (displayModeOptions) {
+    this._adjustHours(displayModeOptions);
+  }
+  this.displayModeOptions = displayModeOptions;
+};
+
+/**
+ * Make sure configured our is between 0 and 23.
+ */
+scout.Planner.prototype._adjustHours = function(optionsMap) {
+  scout.objects.values(optionsMap).forEach(function(options) {
+    if (options.firstHourOfDay) {
+      options.firstHourOfDay = validHour(options.firstHourOfDay);
+    }
+    if (options.lastHourOfDay) {
+      options.lastHourOfDay = validHour(options.lastHourOfDay);
+    }
+  });
+
+  function validHour(hour) {
+    if (hour < 0) {
+      return 0;
+    }
+    if (hour > 23) {
+      return 23;
+    }
+    return hour;
+  }
 };
 
 scout.Planner.prototype._renderDisplayModeOptions = function() {
