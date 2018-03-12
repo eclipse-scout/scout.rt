@@ -39,14 +39,12 @@ public class BasicCache<K, V> implements ICache<K, V> {
   private final String m_cacheId;
   private final ICacheValueResolver<K, V> m_resolver;
   private final Map<K, V> m_cacheMap;
-  private final Map<K, V> m_unmodifiableMap;
   private final boolean m_atomicInsertion;
 
   public BasicCache(String cacheId, ICacheValueResolver<K, V> resolver, Map<K, V> cacheMap, boolean atomicInsertion) {
     m_cacheId = Assertions.assertNotNullOrEmpty(cacheId);
     m_resolver = Assertions.assertNotNull(resolver);
     m_cacheMap = Assertions.assertNotNull(cacheMap);
-    m_unmodifiableMap = Collections.unmodifiableMap(m_cacheMap);
     m_atomicInsertion = atomicInsertion;
     if (m_atomicInsertion && !(cacheMap instanceof ConcurrentMap)) {
       throw new IllegalArgumentException("To use atomic insertions cacheMap must implement ConcurrentMap interface");
@@ -68,7 +66,7 @@ public class BasicCache<K, V> implements ICache<K, V> {
 
   @Override
   public Map<K, V> getUnmodifiableMap() {
-    return m_unmodifiableMap;
+    return Collections.unmodifiableMap(m_cacheMap); //DO NOT cache this, because entrySet/keySet/values are lazily initialized and only once.
   }
 
   @Override

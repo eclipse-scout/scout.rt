@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
@@ -40,6 +41,7 @@ import org.eclipse.scout.rt.testing.platform.mock.BeanMock;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -53,6 +55,19 @@ import org.mockito.ArgumentCaptor;
 public class CodeServiceTest {
   @BeanMock
   private ClientNotificationRegistry m_clientNotificationReg;
+
+  @Test
+  public void testFindCodeTypeByIdInSeparateTransactions() {
+    ICodeService codeService = BEANS.get(ICodeService.class);
+    RunContexts.empty().run(() -> {
+      Assert.assertNotNull(codeService.findCodeTypeById(DummyCodeType.ID));
+      codeService.reloadCodeType(DummyCodeType.class);
+    });
+    RunContexts.empty().run(() -> {
+      Assert.assertNotNull(codeService.getCodeType(DummyCodeType.class));
+      Assert.assertNotNull(codeService.findCodeTypeById(DummyCodeType.ID));
+    });
+  }
 
   @Test
   public void testCodeTypeRemoteAccess() {
@@ -202,11 +217,13 @@ public class CodeServiceTest {
 
   public static class DummyCodeType extends AbstractCodeType<Long, String> {
 
+    public static final long ID = 500;
+
     private static final long serialVersionUID = 1L;
 
     @Override
     public Long getId() {
-      return 500L;
+      return ID;
     }
   }
 }
