@@ -67,12 +67,21 @@ scout.ClipboardField.prototype._render = function() {
   // not work in IE9.
   this.addContainer(this.$parent, 'clipboard-field');
   this.addLabel();
-  this.addField(this.$parent.makeElement('<div>').addClass('input-field'));
+  this.addFieldContainer(this.$parent.makeDiv());
+  this.htmlField = scout.HtmlComponent.install(this.$fieldContainer, this.session);
+  this.htmlField.setLayout(new scout.ClipboardFieldLayout(this));
+  this.addField(this.$fieldContainer.appendDiv().addClass('input-field'));
+  this.copyButton = scout.create('CopyButton', {
+    parent: this,
+    processButton: false,
+    $input: this.$field
+  });
+  this.copyButton.render(this.$fieldContainer);
   this.addStatus();
 
   this.$field
     .disableSpellcheck()
-    .attr('contenteditable', true)
+    .attr('contenteditable', this._shouldBeContentEditable())
     .attr('tabindex', '0')
     .on('keydown', this._onKeyDown.bind(this))
     .on('input', this._onInput.bind(this))
@@ -81,13 +90,36 @@ scout.ClipboardField.prototype._render = function() {
     .on('cut', this._onCopy.bind(this));
 
   this.$parent.on('click', function(event) {
-    this.focus();
+//    this.focus(); // FIXME CGU what is this for
   }.bind(this));
+};
+
+scout.ClipboardField.prototype._remove = function() {
+  scout.ClipboardField.parent.prototype._remove.call(this);
+  this.copyButton.destroy();
 };
 
 scout.ClipboardField.prototype._renderProperties = function() {
   scout.ClipboardField.parent.prototype._renderProperties.call(this);
   this._renderDropType();
+};
+
+/**
+ * @override
+ */
+scout.ClipboardField.prototype.focus = function() {
+  if (!this.rendered) {
+    return;
+  }
+  // The copy button should be focused by default
+  this.copyButton.focus();
+};
+
+scout.ClipboardField.prototype._shouldBeContentEditable = function() {
+  // On iOS the on screen keyboard pops up which is very annoying.
+  // Drawback is that 'Select all' button disappears and text selection is not limited to the field anymore.
+  // But since the user can use the copy button this should not be a real problem.
+  return !scout.device.isIos();
 };
 
 scout.ClipboardField.prototype._createDragAndDropHandler = function() {

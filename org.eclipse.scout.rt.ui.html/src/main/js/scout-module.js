@@ -384,7 +384,9 @@
   __include("scout/form/fields/checkbox/CheckBoxField.js");
   __include("scout/form/fields/checkbox/CheckBoxFieldAdapter.js");
   __include("scout/form/fields/checkbox/CheckBoxToggleKeyStroke.js");
+  __include("scout/form/fields/clipboardfield/CopyButton.js");
   __include("scout/form/fields/clipboardfield/ClipboardField.js");
+  __include("scout/form/fields/clipboardfield/ClipboardFieldLayout.js");
   __include("scout/form/fields/clipboardfield/ClipboardFieldAdapter.js");
   __include("scout/form/fields/colorfield/ColorField.js");
   __include("scout/form/fields/colorfield/ColorFieldAdapter.js");
