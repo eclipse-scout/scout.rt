@@ -25,6 +25,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
@@ -43,7 +45,9 @@ import org.slf4j.LoggerFactory;
 /**
  * UI model customization wrapping a {@link IPreferences} object.
  */
+@Bean
 public class ClientUIPreferences {
+
   private static final Logger LOG = LoggerFactory.getLogger(ClientUIPreferences.class);
 
   /**
@@ -52,14 +56,16 @@ public class ClientUIPreferences {
    *           When no {@link IClientSession} is available in the current thread context ( {@link ISession#CURRENT}).
    */
   public static ClientUIPreferences getInstance() {
-    return new ClientUIPreferences(ClientSessionProvider.currentSession());
+    return getInstance(ClientSessionProvider.currentSession());
   }
 
   /**
-   * @return a new instance of the {@link ClientUIPreferences}
+   * @return a new instance of the {@link ClientUIPreferences} for the specified {@link IClientSession}.
    */
   public static ClientUIPreferences getInstance(IClientSession session) {
-    return new ClientUIPreferences(session);
+    ClientUIPreferences preferences = BEANS.get(ClientUIPreferences.class);
+    preferences.load(session);
+    return preferences;
   }
 
   protected static final String PREFERENCES_NODE_ID = "org.eclipse.scout.rt.client";
@@ -83,15 +89,9 @@ public class ClientUIPreferences {
   // TODO [7.0] awe: Check if this property is still needed with the new Html UI
   protected static final String FORM_BOUNDS = "form.bounds.";
 
-  protected final IClientSession m_session;
   protected IPreferences m_prefs;
 
-  protected ClientUIPreferences(IClientSession session) {
-    if (session == null) {
-      throw new IllegalArgumentException("No scout client session context. Calling client preferences from outside a scout client session job.");
-    }
-    m_session = session;
-    load();
+  protected ClientUIPreferences() {
   }
 
   /**
@@ -164,8 +164,8 @@ public class ClientUIPreferences {
 
   protected String getUserAgentPrefix() {
     UserAgent currentUserAgent = null;
-    if (getSession() != null) {
-      currentUserAgent = getSession().getUserAgent();
+    if (m_prefs != null && m_prefs.userScope() instanceof IClientSession) {
+      currentUserAgent = ((IClientSession) m_prefs.userScope()).getUserAgent();
     }
     else {
       currentUserAgent = UserAgentUtility.getCurrentUserAgent();
@@ -956,8 +956,8 @@ public class ClientUIPreferences {
     return null;
   }
 
-  protected void load() {
-    m_prefs = getClientPreferences(getSession());
+  protected void load(IClientSession session) {
+    m_prefs = getClientPreferences(session);
   }
 
   protected void flush() {
@@ -971,9 +971,5 @@ public class ClientUIPreferences {
     catch (RuntimeException | PlatformError t) {
       LOG.error("Unable to flush preferences.", t);
     }
-  }
-
-  public IClientSession getSession() {
-    return m_session;
   }
 }
