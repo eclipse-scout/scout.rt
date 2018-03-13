@@ -29,4 +29,38 @@ describe("RadioButton", function() {
     });
 
   });
+
+  describe('keyStroke', function() {
+
+    it('selects the button', function() {
+      var field = scout.create('RadioButton', {
+        parent: session.desktop,
+        keyStroke: 'ctrl-b'
+      });
+      field.render();
+      expect(field.selected).toBe(false);
+
+      session.desktop.$container.triggerKeyInputCapture(scout.keys.B, 'ctrl');
+      expect(field.selected).toBe(true);
+
+      // Another execution does not change the selection state
+      session.desktop.$container.triggerKeyInputCapture(scout.keys.B, 'ctrl');
+      expect(field.selected).toBe(true);
+
+      // Set another key stroke -> only the new one has to be active
+      field.setKeyStroke('ctrl-g');
+      field.setSelected(false);
+      session.desktop.$container.triggerKeyInputCapture(scout.keys.B, 'ctrl');
+      expect(field.selected).toBe(false);
+      session.desktop.$container.triggerKeyInputCapture(scout.keys.G, 'ctrl');
+      expect(field.selected).toBe(true);
+
+      // Remove key stroke -> selected property should stay unchanged because key stroke must not be executed
+      field.setKeyStroke(null);
+      field.setSelected(false);
+      session.desktop.$container.triggerKeyInputCapture(scout.keys.G, 'ctrl');
+      expect(field.selected).toBe(false);
+    });
+
+  });
 });

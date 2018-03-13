@@ -47,10 +47,12 @@ scout.RadioButton.prototype._render = function() {
   });
 
   this.addStatus();
+  this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
 };
 
 scout.RadioButton.prototype._remove = function() {
   scout.tooltips.uninstall(this.$buttonLabel);
+  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.formKeyStrokeContext);
   scout.RadioButton.parent.prototype._remove.call(this);
 };
 
