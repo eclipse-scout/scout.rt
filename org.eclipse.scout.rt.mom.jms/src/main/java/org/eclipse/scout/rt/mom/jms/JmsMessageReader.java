@@ -109,7 +109,7 @@ public class JmsMessageReader<DTO> {
   /**
    * Returns the message's correlation ID, or a random via {@link CorrelationId} if not set.
    */
-  protected String readCorrelationId() {
+  public String readCorrelationId() {
     try {
       final String cid = m_message.getJMSCorrelationID();
       if (cid != null) {
