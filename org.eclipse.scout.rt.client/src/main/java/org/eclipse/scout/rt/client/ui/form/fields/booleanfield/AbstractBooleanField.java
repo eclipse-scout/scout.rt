@@ -37,6 +37,7 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     super.initConfig();
     setTriStateEnabled(getConfiguredTriStateEnabled());
+    setKeyStroke(getConfiguredKeyStroke());
     propertySupport.setProperty(PROP_VALUE, false);
     // ticket 79554
     propertySupport.setProperty(PROP_DISPLAY_TEXT, interceptFormatValue(getValue()));
@@ -70,6 +71,15 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
     return false;
   }
 
+  /**
+   * Use IKeyStroke constants to define a key stroke for check box selection.
+   */
+  @Order(230)
+  @ConfigProperty(ConfigProperty.STRING)
+  protected String getConfiguredKeyStroke() {
+    return null;
+  }
+
   @Override
   public void setTriStateEnabled(boolean triStateEnabled) {
     propertySupport.setPropertyBool(PROP_TRI_STATE_ENABLED, triStateEnabled);
@@ -82,6 +92,16 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
   @Override
   public boolean isTriStateEnabled() {
     return propertySupport.getPropertyBool(PROP_TRI_STATE_ENABLED);
+  }
+
+  @Override
+  public String getKeyStroke() {
+    return propertySupport.getPropertyString(PROP_KEY_STROKE);
+  }
+
+  @Override
+  public void setKeyStroke(String keyStroke) {
+    propertySupport.setPropertyString(PROP_KEY_STROKE, keyStroke);
   }
 
   @Override

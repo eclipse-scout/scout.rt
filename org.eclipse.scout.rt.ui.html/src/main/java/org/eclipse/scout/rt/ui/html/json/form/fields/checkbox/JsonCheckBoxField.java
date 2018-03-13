@@ -48,6 +48,13 @@ public class JsonCheckBoxField<CHECK_BOX_FIELD extends IBooleanField> extends Js
         return getModel().isTriStateEnabled();
       }
     });
+    putJsonProperty(new JsonProperty<IBooleanField>(IBooleanField.PROP_KEY_STROKE, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getKeyStroke();
+      }
+    });
+
     // No need to send display text for check box
     removeJsonProperty(IBooleanField.PROP_DISPLAY_TEXT);
   }

@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 public interface IBooleanField extends IValueField<Boolean> {
 
   String PROP_TRI_STATE_ENABLED = "triStateEnabled";
+  String PROP_KEY_STROKE = "keyStroke";
 
   /**
    * Configuration
@@ -46,6 +47,10 @@ public interface IBooleanField extends IValueField<Boolean> {
    *         <code>null</code> to represent the "undefined" value.
    */
   boolean isTriStateEnabled();
+
+  String getKeyStroke();
+
+  void setKeyStroke(String keyStroke);
 
   /**
    * Toggle the value.
