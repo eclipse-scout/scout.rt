@@ -210,6 +210,12 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
     if (data.has(IValueField.PROP_DISPLAY_TEXT)) {
       handleUiDisplayTextChange(data);
     }
+
+    // Don't use error status from UI when value has been set
+    if (valueSet) {
+      return;
+    }
+
     if (data.has(IValueField.PROP_ERROR_STATUS)) {
       handleUiErrorStatusChange(data);
     }

@@ -57,7 +57,12 @@ scout.SmartFieldAdapter.prototype._onWidgetAcceptInput = function(event) {
     errorStatus: event.errorStatus
   };
 
-  if (!event.errorStatus) {
+  if (event.errorStatus) {
+    // 'clear' case
+    if (scout.strings.empty(event.displayText)) {
+      eventData.value = null;
+    }
+  } else {
     eventData.value = event.value;
     if (event.acceptByLookupRow) {
       eventData.lookupRow = event.lookupRow;
