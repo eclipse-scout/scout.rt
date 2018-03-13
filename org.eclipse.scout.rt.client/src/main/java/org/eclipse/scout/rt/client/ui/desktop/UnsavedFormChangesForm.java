@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
+import org.eclipse.scout.rt.client.ui.wizard.IWizardContainerForm;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -242,7 +243,12 @@ public class UnsavedFormChangesForm extends AbstractForm {
     @Override
     protected void execStore() {
       for (IForm f : getOpenFormsField().getValue()) {
-        f.doOk();
+        if (f instanceof IWizardContainerForm) {
+          ((IWizardContainerForm) f).getWizard().doFinish();
+        }
+        else {
+          f.doOk();
+        }
       }
     }
   }
