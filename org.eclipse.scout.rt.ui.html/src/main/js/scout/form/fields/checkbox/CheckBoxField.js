@@ -10,20 +10,42 @@
  ******************************************************************************/
 scout.CheckBoxField = function() {
   scout.CheckBoxField.parent.call(this);
+
   this.triStateEnabled = false;
-  this.$checkBox;
-  this.$checkBoxLabel;
+  this.keyStroke = null;
+  this.checkBoxKeyStroke = new scout.CheckBoxToggleKeyStroke(this);
+
+  this.$checkBox = null;
+  this.$checkBoxLabel = null;
 };
 scout.inherits(scout.CheckBoxField, scout.ValueField);
 
+scout.CheckBoxField.prototype._init = function(model) {
+  scout.CheckBoxField.parent.prototype._init.call(this, model);
+  this._setKeyStroke(this.keyStroke);
+};
+
 /**
- * The value of the CheckBoxField widget is: false, true (and null in tri-state mode)
  * @override
  */
 scout.CheckBoxField.prototype._initKeyStrokeContext = function() {
   scout.CheckBoxField.parent.prototype._initKeyStrokeContext.call(this);
 
   this.keyStrokeContext.registerKeyStroke(new scout.CheckBoxToggleKeyStroke(this));
+
+  // The key stroke configured by this.keyStroke has form scope
+  this.formKeyStrokeContext = new scout.KeyStrokeContext();
+  this.formKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
+  this.formKeyStrokeContext.registerKeyStroke(this.checkBoxKeyStroke);
+  this.formKeyStrokeContext.$bindTarget = function() {
+    // use form if available
+    var form = this.getForm();
+    if (form) {
+      return form.$container;
+    }
+    // use desktop otherwise
+    return this.session.desktop.$container;
+  }.bind(this);
 };
 
 scout.CheckBoxField.prototype._render = function() {
@@ -45,16 +67,16 @@ scout.CheckBoxField.prototype._render = function() {
     .on('mousedown', this._onMouseDown.bind(this));
 
   scout.fields.linkElementWithLabel(this.$checkBox, this.$checkBoxLabel);
-
   scout.tooltips.installForEllipsis(this.$checkBoxLabel, {
     parent: this
   });
-
   this.addStatus();
+  this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
 };
 
 scout.CheckBoxField.prototype._remove = function() {
   scout.tooltips.uninstall(this.$checkBoxLabel);
+  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.formKeyStrokeContext);
   scout.CheckBoxField.parent.prototype._remove.call(this);
 };
 
@@ -113,6 +135,16 @@ scout.CheckBoxField.prototype._renderProperties = function() {
   this._renderValue();
 };
 
+scout.CheckBoxField.prototype.setTriStateEnabled = function(triStateEnabled) {
+  this.setProperty('triStateEnabled', triStateEnabled);
+  if (this.rendered) {
+    this._renderValue();
+  }
+};
+
+/**
+ * The value may be false, true (and null in tri-state mode)
+ */
 scout.CheckBoxField.prototype._renderValue = function() {
   this.$fieldContainer.toggleClass('checked', this.value === true);
   this.$checkBox.toggleClass('checked', this.value === true);
@@ -168,4 +200,13 @@ scout.CheckBoxField.prototype._renderGridDataHints = function() {
 scout.CheckBoxField.prototype.prepareForCellEdit = function(opts) {
   scout.CheckBoxField.parent.prototype.prepareForCellEdit.call(this, opts);
   this.$checkBoxLabel.hide();
+};
+
+scout.CheckBoxField.prototype.setKeyStroke = function(keyStroke) {
+  this.setProperty('keyStroke', keyStroke);
+};
+
+scout.CheckBoxField.prototype._setKeyStroke = function(keyStroke) {
+  this._setProperty('keyStroke', keyStroke);
+  this.checkBoxKeyStroke.parseAndSetKeyStroke(this.keyStroke);
 };

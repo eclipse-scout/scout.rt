@@ -69,4 +69,35 @@ describe("CheckBoxField", function() {
     });
 
   });
+
+  describe('keyStroke', function() {
+
+    it('toggles the value', function() {
+      var field = scout.create('CheckBoxField', {
+        parent: session.desktop,
+        keyStroke: 'ctrl-b'
+      });
+      field.render();
+      expect(field.value).toBe(null);
+
+      session.desktop.$container.triggerKeyInputCapture(scout.keys.B, 'ctrl');
+      expect(field.value).toBe(true);
+
+      session.desktop.$container.triggerKeyInputCapture(scout.keys.B, 'ctrl');
+      expect(field.value).toBe(false);
+
+      // Set another key stroke -> only the new one has to be active
+      field.setKeyStroke('ctrl-g');
+      session.desktop.$container.triggerKeyInputCapture(scout.keys.B, 'ctrl');
+      expect(field.value).toBe(false);
+      session.desktop.$container.triggerKeyInputCapture(scout.keys.G, 'ctrl');
+      expect(field.value).toBe(true);
+
+      // Remove key stroke -> value should stay unchanged because key stroke must not be executed
+      field.setKeyStroke(null);
+      session.desktop.$container.triggerKeyInputCapture(scout.keys.G, 'ctrl');
+      expect(field.value).toBe(true);
+    });
+
+  });
 });
