@@ -8,8 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+ @tile-transition: transform 200ms ease-out, box-shadow 200ms ease-out;
+
 .tile {
-  transition: transform 200ms ease-out, box-shadow 200ms ease-out;
+  transition: @tile-transition;
 
   &.selectable {
     cursor: pointer;

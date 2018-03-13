@@ -766,13 +766,16 @@ scout.TileGrid.prototype._onTileMouseDown = function(event) {
 scout.TileGrid.prototype._onTileClick = function(event) {
   var $tile = $(event.currentTarget);
   var tile = $tile.data('widget');
-  var mouseButton = event.which;
+  if (tile instanceof scout.PlaceholderTile) {
+    return;
+  }
 
   if (this._doubleClickSupport.doubleClicked()) {
     // Don't execute on double click events
     return;
   }
 
+  var mouseButton = event.which;
   this._triggerTileClick(tile, mouseButton);
 };
 
@@ -787,6 +790,9 @@ scout.TileGrid.prototype._triggerTileClick = function(tile, mouseButton) {
 scout.TileGrid.prototype._onTileDoubleClick = function(event) {
   var $tile = $(event.currentTarget);
   var tile = $tile.data('widget');
+  if (tile instanceof scout.PlaceholderTile) {
+    return;
+  }
   this.doTileAction(tile);
 };
 

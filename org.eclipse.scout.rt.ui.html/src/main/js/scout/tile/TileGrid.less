@@ -30,7 +30,10 @@
     transition: opacity 80ms ease-out;
   }
 
-  & > .tile,
+  & > .tile {
+    transition: @tile-transition, opacity @loading-fade-duration;
+  }
+
   & > .scrollbar {
     opacity: 1;
     transition: opacity @loading-fade-duration;
