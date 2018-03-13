@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.RadioButtonKeyStroke = function(button, keyStroke) {
   scout.RadioButtonKeyStroke.parent.call(this, button, keyStroke);
+  this.renderingHints.hAlign = scout.hAlign.LEFT;
 };
 scout.inherits(scout.RadioButtonKeyStroke, scout.ButtonKeyStroke);
 
