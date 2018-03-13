@@ -14,7 +14,7 @@ scout.RadioButtonGroup = function() {
   this.formFields = [];
   this.radioButtons = [];
   this.selectedButton = null;
-  this.$body;
+  this.$body = null;
 };
 
 scout.inherits(scout.RadioButtonGroup, scout.ValueField);

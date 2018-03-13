@@ -333,6 +333,10 @@ scout.Button.prototype._updateLabelAndIconStyle = function() {
   this.get$Icon().toggleClass('with-label', hasText);
 };
 
+scout.Button.prototype.setKeyStroke = function(keyStroke) {
+  this.setProperty('keyStroke', keyStroke);
+};
+
 scout.Button.prototype._setKeyStroke = function(keyStroke) {
   this._setProperty('keyStroke', keyStroke);
   this.buttonKeyStroke.parseAndSetKeyStroke(this.keyStroke);
