@@ -19,7 +19,7 @@ import org.json.JSONObject;
 
 public class JsonRadioButtonGroup<RADIO_BUTTON_GROUP extends IRadioButtonGroup> extends JsonValueField<RADIO_BUTTON_GROUP> {
 
-  private static final String FORM_FIELDS = "formFields";
+  private static final String FIELDS = "fields";
 
   public JsonRadioButtonGroup(RADIO_BUTTON_GROUP model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -44,6 +44,6 @@ public class JsonRadioButtonGroup<RADIO_BUTTON_GROUP extends IRadioButtonGroup> 
 
   @Override
   public JSONObject toJson() {
-    return putAdapterIdsProperty(super.toJson(), FORM_FIELDS, getModel().getFields());
+    return putAdapterIdsProperty(super.toJson(), FIELDS, getModel().getFields());
   }
 }

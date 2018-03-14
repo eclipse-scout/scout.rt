@@ -87,6 +87,9 @@ scout.RadioButton.prototype.setSelected = function(selected) {
  * @override Button.js
  */
 scout.RadioButton.prototype.doAction = function(event) {
+  if (!this.enabledComputed || !this.visible) {
+    return false;
+  }
   // Since RadioButton extends Button, doAction should do something useful because it may be called (and actually is by ButtonKeyStroke)
   this.select();
   return true;

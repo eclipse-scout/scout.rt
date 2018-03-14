@@ -10,8 +10,8 @@
  ******************************************************************************/
 scout.RadioButtonGroup = function() {
   scout.RadioButtonGroup.parent.call(this);
-  this._addWidgetProperties('formFields');
-  this.formFields = [];
+  this._addWidgetProperties('fields');
+  this.fields = [];
   this.radioButtons = [];
   this.selectedButton = null;
   this.$body = null;
@@ -39,7 +39,7 @@ scout.RadioButtonGroup.prototype.isClearable = function() {
 };
 
 scout.RadioButtonGroup.prototype.getFields = function() {
-  return this.formFields;
+  return this.fields;
 };
 
 /**
@@ -47,7 +47,7 @@ scout.RadioButtonGroup.prototype.getFields = function() {
  */
 scout.RadioButtonGroup.prototype.visit = function(visitor) {
   scout.RadioButtonGroup.parent.prototype.visit.call(this, visitor);
-  this.formFields.forEach(function(field) {
+  this.fields.forEach(function(field) {
     field.visit(visitor);
   });
 };
@@ -55,7 +55,7 @@ scout.RadioButtonGroup.prototype.visit = function(visitor) {
 scout.RadioButtonGroup.prototype._init = function(model) {
   scout.RadioButtonGroup.parent.prototype._init.call(this, model);
 
-  this.formFields.forEach(function(formField) {
+  this.fields.forEach(function(formField) {
     if (formField instanceof scout.RadioButton) {
       this.radioButtons.push(formField);
       if (formField.selected) {
@@ -80,7 +80,7 @@ scout.RadioButtonGroup.prototype._render = function() {
     vgap: env.formRowGap
   }));
 
-  this.formFields.forEach(function(formField) {
+  this.fields.forEach(function(formField) {
     formField.render(this.$body);
 
     // set each children layout data to logical grid data
@@ -138,34 +138,32 @@ scout.RadioButtonGroup.prototype._provideTabIndex = function() {
   }, this);
 };
 
-scout.RadioButtonGroup.prototype.selectButton = function(radioButtonToSelect) {
-  this.selectedButton = null;
-  this.radioButtons.forEach(function(radioButton) {
-    if (radioButton === radioButtonToSelect) {
-      if (!radioButton.enabledComputed) {
-        return;
-      }
-      var tabbableButton = this.getTabbableButton();
-      var needsFocus = false;
-      if (tabbableButton) {
-        // Only one button in the group should have a tab index -> remove it from the current tabbable button after the new button is tabbable.
-        // If that button is focused the newly selected button needs to gain the focus otherwise the focus would fall back to the body.
-        needsFocus = tabbableButton.isFocused();
-      }
-      radioButton.setSelected(true);
-      radioButton.setTabbable(true);
-      if (needsFocus) {
-        radioButton.focus();
-      }
-      if (tabbableButton && tabbableButton !== radioButton) {
-        tabbableButton.setTabbable(false);
-      }
-      this.selectedButton = radioButton;
-    } else {
-      radioButton.setSelected(false);
-      // Do not unset tabbable here, because at least one button has to be tabbable even if the button is deselected
+scout.RadioButtonGroup.prototype.selectButton = function(radioButton) {
+  // Deselect previously selected button
+  if (this.selectedButton) {
+    // Do not unset tabbable here, because at least one button has to be tabbable even if the button is deselected
+    this.selectedButton.setSelected(false);
+  }
+
+  // Select new button
+  if (radioButton) {
+    var tabbableButton = this.getTabbableButton();
+    var needsFocus = false;
+    if (tabbableButton) {
+      // Only one button in the group should have a tab index -> remove it from the current tabbable button after the new button is tabbable.
+      // If that button is focused the newly selected button needs to gain the focus otherwise the focus would fall back to the body.
+      needsFocus = tabbableButton.isFocused();
     }
-  }, this);
+    radioButton.setSelected(true);
+    radioButton.setTabbable(true);
+    if (needsFocus) {
+      radioButton.focus();
+    }
+    if (tabbableButton && tabbableButton !== radioButton) {
+      tabbableButton.setTabbable(false);
+    }
+  }
+  this.setProperty('selectedButton', radioButton);
 };
 
 scout.RadioButtonGroup.prototype.getTabbableButton = function() {
@@ -175,6 +173,6 @@ scout.RadioButtonGroup.prototype.getTabbableButton = function() {
 };
 
 scout.RadioButtonGroup.prototype.addButton = function(radioButton) {
-  this.formFields.push(radioButton);
+  this.fields.push(radioButton);
   this.radioButtons.push(radioButton);
 };

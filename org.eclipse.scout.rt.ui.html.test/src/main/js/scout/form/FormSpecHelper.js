@@ -64,7 +64,7 @@ scout.FormSpecHelper.prototype.createRadioButtonGroup = function(parent, numRadi
       parent: radioButtonGroup
     }));
   }
-  radioButtonGroup.setProperty('formFields', fields);
+  radioButtonGroup.setProperty('fields', fields);
   radioButtonGroup.setProperty('radioButtons', fields);
   return radioButtonGroup;
 };
