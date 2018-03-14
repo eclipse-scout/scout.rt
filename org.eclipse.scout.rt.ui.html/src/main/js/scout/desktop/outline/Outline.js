@@ -65,7 +65,6 @@ scout.Outline.prototype._init = function(model) {
   this.messageBoxController = new scout.MessageBoxController(this, this.session);
   this.fileChooserController = new scout.FileChooserController(this, this.session);
   this.resolveTextKeys(['title']);
-  this._setDefaultDetailForm(this.defaultDetailForm);
 
   // menu bars
   this.titleMenuBar = scout.create('MenuBar', {
@@ -85,6 +84,8 @@ scout.Outline.prototype._init = function(model) {
 
   this._setDefaultDetailForm(this.defaultDetailForm);
   this._setOutlineOverviewVisible(this.outlineOverviewVisible);
+  this._setOutlineOverview(this.outlineOverview);
+  this._updateOutlineOverview();
 
   this._setViews(this.views);
   this._setMenus(this.menus);
@@ -354,32 +355,54 @@ scout.Outline.prototype.selectNodes = function(nodes, debounceSend) {
   this.updateDetailContent();
 };
 
+scout.Outline.prototype.setDefaultDetailForm = function(defaultDetailForm) {
+  this.setProperty('defaultDetailForm', defaultDetailForm);
+  this._updateOutlineOverview();
+};
+
 scout.Outline.prototype._setDefaultDetailForm = function(defaultDetailForm) {
   this._setProperty('defaultDetailForm', defaultDetailForm);
+};
+
+scout.Outline.prototype.setOutlineOverviewVisible = function(outlineOverviewVisible) {
+  this.setProperty('outlineOverviewVisible', outlineOverviewVisible);
   this._updateOutlineOverview();
 };
 
 scout.Outline.prototype._setOutlineOverviewVisible = function(outlineOverviewVisible) {
   this._setProperty('outlineOverviewVisible', outlineOverviewVisible);
+};
+
+scout.Outline.prototype.setOutlineOverview = function(outlineOverview) {
+  this.setProperty('outlineOverview', outlineOverview);
   this._updateOutlineOverview();
+};
+
+scout.Outline.prototype._setOutlineOverview = function(outlineOverview) {
+  // Ensure outlineOverview is of type OutlineOverview.
+  // Widget property cannot be used because nodes are not of type Page yet while _prepareWidgetProperty is running during initialization
+  if (outlineOverview) {
+    outlineOverview = this._createChild(outlineOverview);
+  }
+  this._setProperty('outlineOverview', outlineOverview);
 };
 
 scout.Outline.prototype._updateOutlineOverview = function() {
   if (this.defaultDetailForm) {
     if (this.outlineOverview) {
       this.outlineOverview.destroy();
-      this._setProperty('outlineOverview', null);
+      this._setOutlineOverview(null);
     }
   } else {
     if (this.outlineOverviewVisible) {
       if (!this.outlineOverview) {
         // Create outlineOverview if no defaultDetailForm is available
-        this._setProperty('outlineOverview', this._createOutlineOverview());
+        this._setOutlineOverview(this._createOutlineOverview());
       }
     } else {
       if (this.outlineOverview) {
         this.outlineOverview.destroy();
-        this._setProperty('outlineOverview', null);
+        this._setOutlineOverview(null);
       }
     }
   }

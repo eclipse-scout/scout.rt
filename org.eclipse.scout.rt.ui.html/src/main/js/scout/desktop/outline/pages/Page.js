@@ -24,10 +24,10 @@ scout.Page = function() {
   /**
    * This property is set by the server, see: JsonOutline#putNodeType.
    */
-  this.nodeType;
-  this.detailTable;
+  this.nodeType = null;
+  this.detailTable = null;
   this.detailTableVisible = true;
-  this.detailForm;
+  this.detailForm = null;
   this.detailFormVisible = true;
   this.detailFormVisibleByUi = true;
 
@@ -40,6 +40,10 @@ scout.Page = function() {
    * True to select the page linked with the selected row when the row was selected. May be useful on touch devices.
    */
   this.drillDownOnRowClick = false;
+  /**
+   * The icon id which is used for icons in the tile outline overview.
+   */
+  this.overviewIconId = null;
 };
 scout.inherits(scout.Page, scout.TreeNode);
 

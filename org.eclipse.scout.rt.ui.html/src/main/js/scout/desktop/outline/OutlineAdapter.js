@@ -30,25 +30,25 @@ scout.OutlineAdapter.prototype._postCreateWidget = function() {
 };
 
 scout.OutlineAdapter.prototype._onPageChanged = function(event) {
-  var page;
-  if (event.nodeId) {
-    page = this.widget._nodeById(event.nodeId);
+  var page = this.widget._nodeById(event.nodeId);
+  page.overviewIconId = event.overviewIconId;
 
-    page.detailFormVisible = event.detailFormVisible;
-    page.setDetailForm(this.session.getOrCreateWidget(event.detailForm, this.widget));
+  page.detailFormVisible = event.detailFormVisible;
+  var detailForm = this.session.getOrCreateWidget(event.detailForm, this.widget);
+  if (detailForm !== page.detailForm) {
+    page.setDetailForm(detailForm);
+  }
 
+  page.detailTableVisible = event.detailTableVisible;
+  var detailTable = this.session.getOrCreateWidget(event.detailTable, this.widget);
+  if (page.detailTable !== detailTable) {
     if (page.detailTable) {
       this._destroyDetailTable(page);
     }
-
-    page.detailTableVisible = event.detailTableVisible;
-    page.setDetailTable(this.session.getOrCreateWidget(event.detailTable, this.widget));
-
+    page.setDetailTable(detailTable);
     if (page.detailTable) {
       this._initDetailTable(page);
     }
-  } else {
-    this.widget.defaultDetailForm = this.session.getOrCreateWidget(event.detailForm, this.widget);
   }
 
   this.widget.pageChanged(page);

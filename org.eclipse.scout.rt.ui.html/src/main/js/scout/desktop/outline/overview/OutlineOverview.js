@@ -10,9 +10,17 @@
  ******************************************************************************/
 scout.OutlineOverview = function() {
   scout.OutlineOverview.parent.call(this);
-  this.outline;
+  this.outline = null;
 };
 scout.inherits(scout.OutlineOverview, scout.Widget);
+
+scout.OutlineOverview.prototype._init = function(model) {
+  scout.OutlineOverview.parent.prototype._init.call(this, model);
+  if (!this.outline && this.parent instanceof scout.Outline) {
+    this.outline = this.parent;
+  }
+  scout.assertProperty(this, 'outline', scout.Outline);
+};
 
 scout.OutlineOverview.prototype._render = function() {
   this.$container = this.$parent.appendDiv('outline-overview');

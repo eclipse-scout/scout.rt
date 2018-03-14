@@ -50,7 +50,7 @@ scout.PageTileGrid.prototype._initKeyStrokeContext = function() {
 scout.PageTileGrid.prototype._setOutline = function(outline) {
   var tiles = [];
   if (this.outline) {
-    this.outline.off('nodeChanged', this._outlineNodeChangedHandler);
+    this.outline.off('nodeChanged pageChanged', this._outlineNodeChangedHandler);
     this.outline.off('nodesDeleted', this._outlineStructureChangedHandler);
     this.outline.off('nodesInserted', this._outlineStructureChangedHandler);
     this.outline.off('allChildNodesDeleted', this._outlineStructureChangedHandler);
@@ -58,7 +58,7 @@ scout.PageTileGrid.prototype._setOutline = function(outline) {
   }
   this._setProperty('outline', outline);
   if (this.outline) {
-    this.outline.on('nodeChanged', this._outlineNodeChangedHandler);
+    this.outline.on('nodeChanged pageChanged', this._outlineNodeChangedHandler);
     this.outline.on('nodesDeleted', this._outlineStructureChangedHandler);
     this.outline.on('nodesInserted', this._outlineStructureChangedHandler);
     this.outline.on('allChildNodesDeleted', this._outlineStructureChangedHandler);
@@ -97,7 +97,8 @@ scout.PageTileGrid.prototype._rebuild = function() {
 };
 
 scout.PageTileGrid.prototype._onOutlineNodeChanged = function(event) {
-  var tile = event.node.tile;
+  var page = event.node || event.page;
+  var tile = page.tile;
   if (!tile) {
     return;
   }

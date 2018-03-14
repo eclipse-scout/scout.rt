@@ -421,8 +421,10 @@ scout.ModelAdapter.modifyWidgetPrototype = function() {
 
     // Remote case
     // If the widget has a model adapter use getOrCreateWidget of the session to resolve the child widget
-    if (this.modelAdapter) {
-      return this.session.getOrCreateWidget(model, this); // model is a String, contains (remote) object ID
+    // The model normally is a String containing the (remote) object ID.
+    // If it is not a string it may be a local model -> use default local case instead
+    if (this.modelAdapter && typeof model == 'string') {
+      return this.session.getOrCreateWidget(model, this);
     }
 
     // Local case (default)

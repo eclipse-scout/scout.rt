@@ -38,6 +38,7 @@ scout.TileButton.prototype._remove = function() {
 };
 
 scout.TileButton.prototype._renderIconId = function() {
+  this.$field.removeClass('with-icon without-icon');
   if (this.iconId) {
     if (!this.$iconContainer) {
       this.$iconContainer = this.$field.prependDiv('icon-container');

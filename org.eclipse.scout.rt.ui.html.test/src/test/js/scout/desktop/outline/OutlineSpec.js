@@ -9,13 +9,14 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 describe("Outline", function() {
-  var helper, menuHelper, session;
+  var helper, menuHelper, formHelper, session;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new scout.OutlineSpecHelper(session);
     menuHelper = new scout.MenuSpecHelper(session);
+    formHelper = new scout.FormSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -93,7 +94,6 @@ describe("Outline", function() {
     });
 
   });
-
 
   describe("deleteNodes", function() {
     var model, tree, node0;
@@ -304,6 +304,74 @@ describe("Outline", function() {
       // Outline must not react to clicks on tree nodes of the detail content tree
       expect(outline.selectNodes).not.toHaveBeenCalled();
       expect(tree.selectNodes).toHaveBeenCalledWith(tree.nodes[0]);
+    });
+
+  });
+
+  describe("outlineOverview", function() {
+
+    beforeEach(function() {
+      session = sandboxSession({
+        desktop: {
+          navigationVisible: true,
+          headerVisible: true,
+          benchVisible: true
+        }
+      });
+    });
+
+    it("is displayed when no node is selected", function() {
+      var outline = helper.createOutline(helper.createModelFixture(3, 2));
+      session.desktop.setOutline(outline);
+      expect(outline.outlineOverview.rendered).toBe(true);
+
+      outline.selectNodes(outline.nodes[0]);
+      expect(outline.outlineOverview.rendered).toBe(false);
+    });
+
+    it("is not displayed if outlineOverviewVisible is false", function() {
+      var outline = helper.createOutline(helper.createModelFixture(3, 2));
+      session.desktop.setOutline(outline);
+      expect(outline.outlineOverview.rendered).toBe(true);
+
+      outline.setOutlineOverviewVisible(false);
+      expect(outline.outlineOverview).toBe(null);
+
+      outline.setOutlineOverviewVisible(true);
+      expect(outline.outlineOverview.rendered).toBe(true);
+    });
+
+    it("uses the TileOutlineOverview by default", function() {
+      var outline = helper.createOutline(helper.createModelFixture(3, 2));
+      session.desktop.setOutline(outline);
+      expect(outline.outlineOverview instanceof scout.TileOutlineOverview).toBe(true);
+    });
+
+    it("may be replaced by another OutlineOverview", function() {
+      var model = helper.createModelFixture(3, 2);
+      model.outlineOverview = {
+        objectType: 'OutlineOverview'
+      };
+      var outline = helper.createOutline(model);
+      session.desktop.setOutline(outline);
+      expect(outline.outlineOverview instanceof scout.OutlineOverview).toBe(true);
+      expect(outline.outlineOverview instanceof scout.TileOutlineOverview).toBe(false);
+
+      var outlineOverview = scout.create('TileOutlineOverview', {parent: outline});
+      outline.setOutlineOverview(outlineOverview);
+      expect(outline.outlineOverview instanceof scout.TileOutlineOverview).toBe(true);
+      expect(outline.outlineOverview).toBe(outlineOverview);
+    });
+
+    it("is replaced by the default detail form if there is one", function() {
+      var outline = helper.createOutline(helper.createModelFixture(3, 2));
+      session.desktop.setOutline(outline);
+      expect(outline.outlineOverview.rendered).toBe(true);
+
+      var form = formHelper.createFormWithOneField();
+      outline.setDefaultDetailForm(form);
+      expect(outline.outlineOverview).toBe(null);
+      expect(outline.defaultDetailForm.rendered).toBe(true);
     });
 
   });

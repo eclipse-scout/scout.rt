@@ -70,6 +70,7 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
@@ -103,6 +104,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   private T m_table;
   private IForm m_detailForm;
+  private String m_overviewIconId;
   private DataChangeListener m_internalDataChangeListener;
   private final TreeListener m_treeListener;
   private final String m_userPreferenceContext;
@@ -321,6 +323,13 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(50)
   protected String getConfiguredIconId() {
+    return null;
+  }
+
+  /**
+   * @return the icon ID which is used for icons in the tile outline overview.
+   */
+  protected String getConfiguredOverviewIconId() {
     return null;
   }
 
@@ -546,6 +555,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     super.initConfig();
     setTableVisible(getConfiguredTableVisible());
     setDetailFormVisible(getConfiguredDetailFormVisible());
+    setOverviewIconId(getConfiguredOverviewIconId());
   }
 
   /*
@@ -990,6 +1000,20 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     }
     m_flags = FLAGS_BIT_HELPER.changeBit(DETAIL_FORM_VISIBLE, detailFormVisible, m_flags);
     firePageChanged();
+  }
+
+  @Override
+  public void setOverviewIconId(String overviewIconId) {
+    if (ObjectUtility.equals(getOverviewIconId(), overviewIconId)) {
+      return; // no change
+    }
+    m_overviewIconId = overviewIconId;
+    firePageChanged();
+  }
+
+  @Override
+  public String getOverviewIconId() {
+    return m_overviewIconId;
   }
 
   /**

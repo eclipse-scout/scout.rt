@@ -163,6 +163,16 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
   void setDetailFormVisible(boolean visible);
 
   /**
+   * Sets the icon ID which is used for icons in the tile outline overview.
+   */
+  void setOverviewIconId(String overviewIconId);
+
+  /**
+   * @return the icon ID which is used for icons in the tile outline overview.
+   */
+  String getOverviewIconId();
+
+  /**
    * @since 3.8.2
    */
   ITreeNode getTreeNodeFor(ITableRow tableRow);
