@@ -305,6 +305,7 @@ scout.SmartField2.prototype._acceptByText = function(searchText) {
   this._lastSearchText = searchText;
   this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText))
     .done(this._acceptByTextDone.bind(this));
+  this._triggerAcceptByText(searchText);
 };
 
 scout.SmartField2.prototype._inputAccepted = function(triggerEvent, acceptByLookupRow) {
@@ -1191,6 +1192,13 @@ scout.SmartField2.prototype._triggerAcceptInput = function(acceptByLookupRow, fa
     lookupRow: this.lookupRow,
     acceptByLookupRow: scout.nvl(acceptByLookupRow, true),
     failure: scout.nvl(failure, false)
+  });
+};
+
+scout.SmartField2.prototype._triggerAcceptByText = function(searchText) {
+  this.trigger('acceptByText', {
+    searchText: searchText,
+    errorStatus: this.errorStatus
   });
 };
 

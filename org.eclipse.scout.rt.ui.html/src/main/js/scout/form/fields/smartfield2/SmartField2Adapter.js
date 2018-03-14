@@ -62,6 +62,18 @@ scout.SmartField2Adapter.prototype._orderPropertyNamesOnSync = function(newPrope
   return Object.keys(newProperties).sort(this._createPropertySortFunc(scout.SmartField2Adapter.PROPERTIES_ORDER));
 };
 
+scout.SmartField2Adapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'acceptByText') {
+    this._onWidgetAcceptByText(event);
+  } else {
+    scout.SmartField2Adapter.parent.prototype._onWidgetEvent.call(this, event);
+  }
+};
+
+scout.SmartField2Adapter.prototype._onWidgetAcceptByText = function(event) {
+  this._sendProperty('errorStatus', event.errorStatus);
+};
+
 scout.SmartField2Adapter.prototype._onWidgetAcceptInput = function(event) {
   var eventData = {
     displayText: event.displayText,
