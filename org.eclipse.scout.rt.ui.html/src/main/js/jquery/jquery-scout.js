@@ -1305,8 +1305,7 @@ $.fn.removeAnimated = function(cssClass, callback) {
     // Remove without animation
     this.remove();
     callback && callback.call(this);
-  }
-  else if (!scout.device.supportsCssAnimation()) {
+  } else if (!scout.device.supportsCssAnimation()) {
     // Cannot remove animated, remove with jQuery.fadeOut()
     this.fadeOutAndRemove(callback);
   } else {
@@ -1561,11 +1560,33 @@ $.fn.isContentTruncated = function() {
   // but scrollWidth returns the same value.
   // As a workaround, we do a second measurement of the uncut width before returning false.
   clientWidth = this[0].getBoundingClientRect().width;
-  var oldStyle = this.attr('style');
-  this.css('width', 'auto');
-  this.css('max-width', 'none');
-  scrollWidth =  this[0].getBoundingClientRect().width;
-  this.attrOrRemove('style', oldStyle);
+  var oldStyleOfThis = this.attr('style'),
+    parent = this.parent(),
+    oldStyleOfParent;
+
+  if (parent) {
+    // change the parent in case the size of the current element is given by the container instead of this element (e.g. for chart-column-selection).
+    // the parent will be absolutely positioned using the scrollSize (the size the child-element would require to show the full content) plus some extra space.
+    // this allows the child to get the required size.
+    oldStyleOfParent = parent.attr('style');
+    parent.css({
+      position: 'absolute',
+      width: (scrollWidth + this.cssMarginX() + this.cssBorderWidthX() + 10 /* give some more space so that the child has enough space */ ) + 'px'
+    });
+  }
+
+  this.css({
+    width: 'auto',
+    maxWidth: 'none',
+    position: 'relative',
+    display: 'inline-block'
+  });
+  scrollWidth = this[0].getBoundingClientRect().width;
+
+  this.attrOrRemove('style', oldStyleOfThis);
+  if (parent) {
+    parent.attrOrRemove('style', oldStyleOfParent);
+  }
 
   return scrollWidth > clientWidth;
 };
