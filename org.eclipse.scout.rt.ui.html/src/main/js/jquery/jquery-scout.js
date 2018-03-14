@@ -837,6 +837,10 @@ $.fn.setTabbable = function(tabbable) {
   return this.attr('tabIndex', tabbable ? 0 : null);
 };
 
+$.fn.isTabbable = function() {
+  return this.attr('tabIndex') >= 0;
+};
+
 /**
  * @param {string} iconId
  * @param {function} [addToDomFunc] optional function which is used to add the new icon element to the DOM

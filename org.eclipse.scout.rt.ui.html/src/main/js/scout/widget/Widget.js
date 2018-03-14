@@ -1513,7 +1513,7 @@ scout.Widget.prototype.focus = function() {
     return false;
   }
 
-  return this.session.focusManager.requestFocus(this.$container);
+  return this.session.focusManager.requestFocus(this.getFocusableElement());
 };
 
 /**
@@ -1549,6 +1549,24 @@ scout.Widget.prototype.reveal = function() {
     return;
   }
   scout.scrollbars.scrollTo($scrollParent, this.$container);
+};
+
+/**
+ * @returns whether the widget is the currently active element
+ */
+scout.Widget.prototype.isFocused = function() {
+  return this.rendered && scout.focusUtils.isActiveElement(this.getFocusableElement());
+};
+
+/**
+ * This method returns the HtmlElement to be used as initial focus element.<br>
+ * It can be overridden, in case the widget needs to return something other than this.$container[0].
+ */
+scout.Widget.prototype.getFocusableElement = function() {
+  if (this.rendered && this.$container) {
+    return this.$container[0];
+  }
+  return null;
 };
 
 /**

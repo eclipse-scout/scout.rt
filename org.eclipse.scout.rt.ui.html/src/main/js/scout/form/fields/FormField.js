@@ -638,43 +638,9 @@ scout.FormField.prototype._renderMenusVisible = function() {
   this._updateMenus();
 };
 
-scout.FormField.prototype._renderPreventInitialFocus = function() {
-  this.$container.toggleClass('prevent-initial-focus', !!this.preventInitialFocus);
-};
-
 scout.FormField.prototype._setKeyStrokes = function(keyStrokes) {
   this.updateKeyStrokes(keyStrokes, this.keyStrokes);
   this._setProperty('keyStrokes', keyStrokes);
-};
-
-/**
- * When calling this function, the same should happen as when clicking into the field. It is used when the label is clicked.<br>
- * The most basic action is focusing the field but this may differ from field to field.
- */
-scout.FormField.prototype.activate = function() {
-  if (!this.enabledComputed || !this.rendered) {
-    return;
-  }
-  // Explicitly don't use this.focus() because this.focus uses the focus manager which may be disabled (e.g. on mobile devices)
-  if (this.$field) {
-    this.$field.focus();
-  }
-};
-
-/**
- * Sets the focus on this field. If the field is not rendered, the focus will be set as soon as it is rendered.
- */
-scout.FormField.prototype.focus = function() {
-  if (!this.rendered) {
-    this._postRenderActions.push(this.focus.bind(this));
-    return false;
-  }
-  if (this.$field) {
-    return this.session.focusManager.requestFocus(this.$field[0]);
-  } else {
-    var element = this.session.focusManager.findFirstFocusableElement(this.$container);
-    return this.session.focusManager.requestFocus(element);
-  }
 };
 
 scout.FormField.prototype.recomputeEnabled = function(parentEnabled) {
@@ -829,15 +795,55 @@ scout.FormField.prototype._hideContextMenu = function() {
   }
 };
 
+scout.FormField.prototype._renderPreventInitialFocus = function() {
+  this.$container.toggleClass('prevent-initial-focus', !!this.preventInitialFocus);
+};
+
+/**
+ * Sets the focus on this field. If the field is not rendered, the focus will be set as soon as it is rendered.
+ *
+ * @override
+ */
+scout.FormField.prototype.focus = function() {
+  if (!this.rendered) {
+    this._postRenderActions.push(this.focus.bind(this));
+    return false;
+  }
+
+  var focusableElement = this.getFocusableElement();
+  if (focusableElement) {
+    return this.session.focusManager.requestFocus(focusableElement);
+  }
+
+  var element = this.session.focusManager.findFirstFocusableElement(this.$container);
+  return this.session.focusManager.requestFocus(element);
+};
+
 /**
  * This method returns the HtmlElement to be used as initial focus element.
  * It can be overridden, in case the FormField needs to return something other than this.$field[0].
+ *
+ * @override
  */
 scout.FormField.prototype.getFocusableElement = function() {
-  if (this.rendered) {
+  if (this.rendered && this.$field) {
     return this.$field[0];
   }
   return null;
+};
+
+/**
+ * When calling this function, the same should happen as when clicking into the field. It is used when the label is clicked.<br>
+ * The most basic action is focusing the field but this may differ from field to field.
+ */
+scout.FormField.prototype.activate = function() {
+  if (!this.enabledComputed || !this.rendered) {
+    return;
+  }
+  // Explicitly don't use this.focus() because this.focus uses the focus manager which may be disabled (e.g. on mobile devices)
+  if (this.$field) {
+    this.$field.focus();
+  }
 };
 
 scout.FormField.prototype.getForm = function() {

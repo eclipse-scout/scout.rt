@@ -96,6 +96,10 @@ scout.RadioButton.prototype.setTabbable = function(tabbable) {
   this.$field.setTabbable(tabbable && !scout.device.supportsTouch());
 };
 
+scout.RadioButton.prototype.isTabbable = function() {
+  return this.rendered && this.$field.isTabbable();
+};
+
 /**
  * @override
  */

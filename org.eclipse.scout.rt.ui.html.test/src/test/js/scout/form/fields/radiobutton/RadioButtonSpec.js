@@ -62,5 +62,18 @@ describe("RadioButton", function() {
       expect(field.selected).toBe(false);
     });
 
+    it('does not focus the button', function() {
+      var field = scout.create('RadioButton', {
+        parent: session.desktop,
+        keyStroke: 'ctrl-b'
+      });
+      field.render();
+      expect(field.selected).toBe(false);
+
+      session.desktop.$container.triggerKeyInputCapture(scout.keys.B, 'ctrl');
+      expect(field.selected).toBe(true);
+      expect(field.isFocused()).toBe(false);
+    });
+
   });
 });

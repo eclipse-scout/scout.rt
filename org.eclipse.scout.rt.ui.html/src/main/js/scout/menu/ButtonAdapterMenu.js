@@ -88,16 +88,6 @@ scout.ButtonAdapterMenu.prototype.doAction = function(srcEvent) {
 };
 
 /**
- * @implements FormField.js
- */
-scout.ButtonAdapterMenu.prototype.getFocusableElement = function() {
-  if (this.rendered) {
-    return this.$container[0];
-  }
-  return null;
-};
-
-/**
  * @override
  */
 scout.ButtonAdapterMenu.prototype.focus = function() {
@@ -106,7 +96,7 @@ scout.ButtonAdapterMenu.prototype.focus = function() {
     return false;
   }
   this.menubar.setTabbableMenu(this);
-  return this.session.focusManager.requestFocus(this.$container[0]);
+  return this.session.focusManager.requestFocus(this.getFocusableElement());
 };
 
 

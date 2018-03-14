@@ -145,14 +145,33 @@ scout.RadioButtonGroup.prototype.selectButton = function(radioButtonToSelect) {
       if (!radioButton.enabledComputed) {
         return;
       }
+      var tabbableButton = this.getTabbableButton();
+      var needsFocus = false;
+      if (tabbableButton) {
+        // Only one button in the group should have a tab index -> remove it from the current tabbable button after the new button is tabbable.
+        // If that button is focused the newly selected button needs to gain the focus otherwise the focus would fall back to the body.
+        needsFocus = tabbableButton.isFocused();
+      }
       radioButton.setSelected(true);
       radioButton.setTabbable(true);
+      if (needsFocus) {
+        radioButton.focus();
+      }
+      if (tabbableButton && tabbableButton !== radioButton) {
+        tabbableButton.setTabbable(false);
+      }
       this.selectedButton = radioButton;
     } else {
       radioButton.setSelected(false);
-      radioButton.setTabbable(false);
+      // Do not unset tabbable here, because at least one button has to be tabbable even if the button is deselected
     }
   }, this);
+};
+
+scout.RadioButtonGroup.prototype.getTabbableButton = function() {
+  return scout.arrays.find(this.radioButtons, function(button) {
+    return button.visible && button.isTabbable();
+  });
 };
 
 scout.RadioButtonGroup.prototype.addButton = function(radioButton) {
