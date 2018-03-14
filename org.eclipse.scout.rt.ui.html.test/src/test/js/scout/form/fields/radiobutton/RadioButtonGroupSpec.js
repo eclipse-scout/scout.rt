@@ -42,4 +42,72 @@ describe("RadioButtonGroup", function() {
     });
   });
 
+  describe('selectButton', function() {
+    it('selects the new button and unselects the old one', function() {
+      var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
+      radioButtonGroup.render();
+
+      radioButtonGroup.selectButton(radioButtonGroup.radioButtons[0]);
+      expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[0]);
+      expect(radioButtonGroup.radioButtons[0].selected).toBe(true);
+      expect(radioButtonGroup.radioButtons[1].selected).toBe(false);
+
+      radioButtonGroup.selectButton(radioButtonGroup.radioButtons[1]);
+      expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[1]);
+      expect(radioButtonGroup.radioButtons[0].selected).toBe(false);
+      expect(radioButtonGroup.radioButtons[1].selected).toBe(true);
+    });
+
+    it('makes only the new button tabbable', function() {
+      var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
+      radioButtonGroup.render();
+
+      radioButtonGroup.selectButton(radioButtonGroup.radioButtons[0]);
+      expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[0]);
+      expect(radioButtonGroup.radioButtons[0].isTabbable()).toBe(true);
+      expect(radioButtonGroup.radioButtons[1].isTabbable()).toBe(false);
+
+      radioButtonGroup.selectButton(radioButtonGroup.radioButtons[1]);
+      expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[1]);
+      expect(radioButtonGroup.radioButtons[0].isTabbable()).toBe(false);
+      expect(radioButtonGroup.radioButtons[1].isTabbable()).toBe(true);
+    });
+
+    it('does not remove the tabindex if the button is deselected', function() {
+      var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
+      radioButtonGroup.render();
+
+      radioButtonGroup.selectButton(radioButtonGroup.radioButtons[0]);
+      expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[0]);
+      expect(radioButtonGroup.radioButtons[0].selected).toBe(true);
+      expect(radioButtonGroup.radioButtons[0].isTabbable()).toBe(true);
+      expect(radioButtonGroup.radioButtons[1].selected).toBe(false);
+      expect(radioButtonGroup.radioButtons[1].isTabbable()).toBe(false);
+
+      radioButtonGroup.selectButton(null);
+      expect(radioButtonGroup.selectedButton).toBe(null);
+      expect(radioButtonGroup.radioButtons[0].isTabbable()).toBe(true);
+      expect(radioButtonGroup.radioButtons[0].selected).toBe(false);
+      expect(radioButtonGroup.radioButtons[1].isTabbable()).toBe(false);
+      expect(radioButtonGroup.radioButtons[1].selected).toBe(false);
+    });
+
+    it('focuses the new button if the old button had the focus', function() {
+      var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
+      radioButtonGroup.render();
+      radioButtonGroup.selectButton(radioButtonGroup.radioButtons[0]);
+
+      // Previously selected button was not focused -> do not automatically focus the new button
+      radioButtonGroup.selectButton(radioButtonGroup.radioButtons[1]);
+      expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[1]);
+      expect(radioButtonGroup.radioButtons[0].isFocused()).toBe(false);
+
+      // Previously selected button was focused -> focus the new button
+      radioButtonGroup.radioButtons[1].focus();
+      radioButtonGroup.selectButton(radioButtonGroup.radioButtons[0]);
+      expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[0]);
+      expect(radioButtonGroup.radioButtons[0].isFocused()).toBe(true);
+    });
+  });
+
 });

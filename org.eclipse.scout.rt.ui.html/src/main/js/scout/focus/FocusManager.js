@@ -267,6 +267,9 @@ scout.FocusManager.prototype.validateFocus = function(filter) {
  */
 scout.FocusManager.prototype.requestFocus = function(element, filter) {
   element = element instanceof $ ? element[0] : element;
+  if (!element) {
+    return false;
+  }
 
   var activeContext = this._findActiveContext();
   if (activeContext) {
