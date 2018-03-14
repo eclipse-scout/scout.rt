@@ -92,10 +92,9 @@ scout.RadioButton.prototype.doAction = function(event) {
 };
 
 scout.RadioButton.prototype.setTabbable = function(tabbable) {
-  if (!this.rendered) {
-    return;
+  if (this.rendered) {
+    this.$field.setTabbable(tabbable && !scout.device.supportsTouch());
   }
-  this.$field.setTabbable(tabbable && !scout.device.supportsTouch());
 };
 
 scout.RadioButton.prototype.isTabbable = function() {
