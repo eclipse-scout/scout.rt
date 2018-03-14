@@ -472,8 +472,16 @@ scout.SmartField.prototype._renderEnabled = function() {
   this.$field.setTabbable(this.enabledComputed);
 };
 
+scout.SmartField.prototype.setLookupCall = function(lookupCall) {
+  this.setProperty('lookupCall', lookupCall);
+};
+
 scout.SmartField.prototype._setLookupCall = function(lookupCall) {
   this._setProperty('lookupCall', scout.LookupCall.ensure(lookupCall, this.session));
+};
+
+scout.SmartField.prototype._setCodeType = function(codeType) {
+  this.setProperty('codeType', codeType);
 };
 
 scout.SmartField.prototype._setCodeType = function(codeType) {
