@@ -93,6 +93,7 @@ scout.Icon.prototype._renderImageIcon = function() {
     parent: this,
     imageUrl: this.iconDesc.iconUrl,
     cssClass: 'icon image-icon',
+    autoFit: this.autoFit,
     prepend: this.prepend
   });
   this.image.render(this.$parent);
