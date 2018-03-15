@@ -142,57 +142,92 @@ public class UiServlet extends AbstractHttpServlet {
     else {
       // Handle any other method too.
       // Manual wrapping required because no super call is made.
-      wrap(req, resp, this::handleRequest);
+      wrap(req, resp, this::handleHttpMethodsNotSupportedByJavaxHttpServlet);
     }
   }
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-    handleRequest(req, resp);
+    if (!handleRequest(req, resp)) {
+      // Send 404 instead of 405 (super implementation) if resource has not been found
+      sendNotFound(req, resp);
+    }
   }
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    handleRequest(req, resp);
+    if (!handleRequest(req, resp)) {
+      // Send 404 instead of 405 (super implementation) if resource has not been found
+      sendNotFound(req, resp);
+    }
   }
 
   @Override
   protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    handleRequest(req, resp);
+    if (!handleRequest(req, resp)) {
+      // Send 404 instead of 405 (super implementation) if resource has not been found
+      sendNotFound(req, resp);
+    }
   }
 
   @Override
   protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    handleRequest(req, resp);
+    if (!handleRequest(req, resp)) {
+      // Send 404 instead of 405 (super implementation) if resource has not been found
+      sendNotFound(req, resp);
+    }
   }
 
   @Override
   protected void doHead(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    handleRequest(req, resp);
+    if (!handleRequest(req, resp)) {
+      super.doHead(req, resp);
+    }
   }
 
   @Override
   protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    handleRequest(req, resp);
+    if (!handleRequest(req, resp)) {
+      super.doOptions(req, resp);
+    }
   }
 
   @Override
   protected void doTrace(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    handleRequest(req, resp);
+    if (!handleRequest(req, resp)) {
+      super.doTrace(req, resp);
+    }
   }
 
-  protected void handleRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  /**
+   * Called in {@link #service(HttpServletRequest, HttpServletResponse)} when
+   * {@link #isHttpMethodSupportedByJavaxHttpServlet(String)} return <code>false</code>.
+   */
+  protected void handleHttpMethodsNotSupportedByJavaxHttpServlet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    if (!handleRequest(req, resp)) {
+      resp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "HTTP method not supported");
+    }
+  }
+
+  /**
+   * @return <code>true</code> if request was handled, <code>false</code> otherwise.
+   */
+  protected boolean handleRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     m_httpServletControl.doDefaults(this, req, resp);
     try {
-      createServletRunContext(req, resp).run(() -> handleRequestInternal(req, resp), DefaultExceptionTranslator.class);
+      return createServletRunContext(req, resp).call(() -> handleRequestInternal(req, resp), DefaultExceptionTranslator.class);
     }
     catch (Exception e) {
       LOG.error("Failed to process HTTP-{} request from UI", req.getMethod(), e);
       resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      return true;
     }
   }
 
-  protected void handleRequestInternal(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+  /**
+   * @return <code>true</code> if request was handled, <code>false</code> otherwise.
+   */
+  protected boolean handleRequestInternal(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     String method = req.getMethod();
     if ("GET".equals(method)) {
       // The servlet is registered at '/'. To make relative URLs work, we need to make sure the request URL has a trailing '/'.
@@ -200,7 +235,7 @@ public class UiServlet extends AbstractHttpServlet {
       String contextPath = req.getServletContext().getContextPath();
       if (StringUtility.hasText(contextPath) && req.getRequestURI().endsWith(contextPath)) {
         resp.sendRedirect(req.getRequestURI() + "/");
-        return;
+        return true;
       }
     }
 
@@ -212,22 +247,27 @@ public class UiServlet extends AbstractHttpServlet {
       List<IUiServletRequestHandler> handlers = BEANS.all(IUiServletRequestHandler.class);
       for (IUiServletRequestHandler handler : handlers) {
         if (handler.handle(req, resp)) {
-          return;
+          return true;
         }
       }
-      // No handler was able to handle the request
-      LOG.info("404_NOT_FOUND: {} {}", req.getMethod(), req.getPathInfo());
-      resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+      return false;
     }
     catch (Exception t) {
       LOG.error("Exception while processing request", t);
       resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      return true;
     }
     finally {
       if (LOG.isDebugEnabled()) {
         LOG.debug("Request completed in {} ms", StringUtility.formatNanos(System.nanoTime() - start));
       }
     }
+  }
+
+  protected void sendNotFound(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    // No handler was able to handle the request
+    LOG.info("404_NOT_FOUND: {} {}", req.getMethod(), req.getPathInfo());
+    resp.sendError(HttpServletResponse.SC_NOT_FOUND);
   }
 
   public static class CheckSessionCookieSecureFlagProperty extends AbstractBooleanConfigProperty {
