@@ -18,7 +18,11 @@
 .tile-outline-overview-content {
   position: absolute;
   color: @tile-default-inverted-background-color;
-  margin: 42px 55px;
+
+  margin: 42px 55px; /* for larger screens */
+  @media screen and (max-width: 800px) { /* for small screens */
+    margin: 20px 20px 20px 13px;
+  }
 
   & > .tile-grid {
     position: relative;
