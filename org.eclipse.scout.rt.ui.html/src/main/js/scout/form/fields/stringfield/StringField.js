@@ -89,6 +89,7 @@ scout.StringField.prototype._render = function() {
   } else {
     $field = scout.fields.makeTextField(this.$parent);
   }
+  $field.on('paste', this._onFieldPaste.bind(this));
 
   this.addField($field);
 
@@ -324,26 +325,16 @@ scout.StringField.prototype._insertText = function(textToInsert) {
   if (!textToInsert) {
     return;
   }
-  var text = this.$field.val();
-  if (this.inputObfuscated) {
-    // Use empty text when input is obfuscated, otherwise text will be added to obfuscated text.
-    text = '';
-  }
 
   // Prevent insert if new length would exceed maxLength to prevent unintended deletion of characters at the end of the string
-  if (textToInsert.length + text.length > this.maxLength) {
-    scout.create('DesktopNotification', {
-      parent: this,
-      severity: scout.Status.Severity.WARNING,
-      message: this.session.text('ui.CannotInsertTextTooLong')
-    }).show();
+  var selection = this._getSelection();
+  var text = this._applyTextToSelection(this.$field.val(), textToInsert, selection);
+  if (text.length > this.maxLength) {
+    this._showNotification('ui.CannotInsertTextTooLong');
     return;
   }
 
-  var selection = this._getSelection();
-  text = text.slice(0, selection.start) + textToInsert + text.slice(selection.end);
   this.$field.val(text);
-
   this._setSelection(selection.start + textToInsert.length);
 
   // Make sure display text gets sent (necessary if field does not have the focus)
@@ -352,6 +343,14 @@ scout.StringField.prototype._insertText = function(textToInsert) {
     this.acceptInput(true);
   }
   this.acceptInput();
+};
+
+scout.StringField.prototype._applyTextToSelection = function(text, textToInsert, selection) {
+  if (this.inputObfuscated) {
+    // Use empty text when input is obfuscated, otherwise text will be added to obfuscated text
+    text = '';
+  }
+  return text.slice(0, selection.start) + textToInsert + text.slice(selection.end);
 };
 
 scout.StringField.prototype.setWrapText = function(wrapText) {
@@ -499,6 +498,60 @@ scout.StringField.prototype._onFieldFocus = function(event) {
       this.$field[0].selectionEnd = 0;
     }.bind(this));
   }
+};
+
+/**
+ * Get clipboard data, different strategies for browsers.
+ * Must use a callback because this is required by Chrome's clipboard API.
+ */
+scout.StringField.prototype._getClipboardData = function(event, doneHandler) {
+  var data = event.originalEvent.clipboardData || this.$container.window(true).clipboardData;
+  if (data) {
+    // Chrome, Firefox
+    if (data.items && data.items.length) {
+      var item = scout.arrays.find(data.items, function(item) {
+        return item.type === 'text/plain';
+      });
+      if (item) {
+        item.getAsString(doneHandler);
+      }
+      return;
+    }
+
+    // IE, Safari
+    if (data.getData) {
+      doneHandler(data.getData('Text'));
+    }
+  }
+
+  // Can't access clipboard -> don't call done handler
+};
+
+scout.StringField.prototype._onFieldPaste = function(event) {
+   // must store text and selection because when the callback is executed, the clipboard content has already been applied to the input field
+   var text = this.$field.val();
+   var selection = this._getSelection();
+
+   this._getClipboardData(event, function(pastedText) {
+     if (!pastedText) {
+       return;
+     }
+
+     // Make sure the user is notified about pasted text which is cut off because of maxlength constraints
+     text = this._applyTextToSelection(text, pastedText, selection);
+     if (text.length > this.maxLength) {
+       this._showNotification('ui.PastedTextTooLong');
+     }
+
+   }.bind(this));
+};
+
+scout.StringField.prototype._showNotification = function(textKey) {
+  scout.create('DesktopNotification', {
+    parent: this,
+    severity: scout.Status.Severity.WARNING,
+    message: this.session.text(textKey)
+  }).show();
 };
 
 /**
