@@ -19,7 +19,12 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 
-@Priority(1) // override Jackson JsonMappingExceptionMapper implementation registered in JacksonFeature
+/**
+ * Override Jackson JsonMappingExceptionMapper implementation registered in JacksonFeature
+ *
+ * @see https://github.com/FasterXML/jackson-jaxrs-providers/issues/22
+ */
+@Priority(1)
 public class JsonMappingExceptionMapper extends AbstractExceptionMapper<JsonMappingException> {
 
   private static final Logger LOG = LoggerFactory.getLogger(JsonMappingExceptionMapper.class);
