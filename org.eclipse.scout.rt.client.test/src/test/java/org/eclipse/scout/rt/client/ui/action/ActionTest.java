@@ -22,6 +22,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.extension.ui.action.AbstractActionExtension;
 import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionDisposeChain;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.action.ActionTest.MenuInheritanceTestForm.MainBox.MyBigDecimalField;
 import org.eclipse.scout.rt.client.ui.action.fixture.TestFormWithTemplateSmartfield;
 import org.eclipse.scout.rt.client.ui.action.fixture.TestFormWithTemplateSmartfield.MainBox.SmartField1;
 import org.eclipse.scout.rt.client.ui.action.fixture.TestFormWithTemplateSmartfield.MainBox.SmartField2;
@@ -31,6 +32,9 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.form.AbstractForm;
+import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.classid.ClassId;
@@ -40,6 +44,7 @@ import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -171,6 +176,22 @@ public class ActionTest {
     }
   }
 
+  @Test
+  public void testActionInheritAccessibility() {
+    MenuInheritanceTestForm f = new MenuInheritanceTestForm();
+    f.start();
+    MyBigDecimalField menuOwner = f.getFieldByClass(MenuInheritanceTestForm.MainBox.MyBigDecimalField.class);
+    IAction menu = menuOwner.getMenus().get(0);
+    // validate setup
+    Assert.assertTrue(menu.isInheritAccessibility());
+    Assert.assertTrue(menuOwner.isEnabled());
+    Assert.assertFalse(menuOwner.isEnabledIncludingParents());
+    Assert.assertFalse(f.getRootGroupBox().isEnabled());
+
+    // check that the menu inherits the state of the field
+    Assert.assertFalse(menu.isEnabled());
+  }
+
   @ClassId(TEST_ACTION_CLASS_ID)
   static class AnnotatedAction extends AbstractAction {
   }
@@ -215,4 +236,18 @@ public class ActionTest {
   public static class ExtendedTestActionWithCustomActionId extends TestActionWithCustomActionId {
   }
 
+  public static class MenuInheritanceTestForm extends AbstractForm {
+
+    public class MainBox extends AbstractGroupBox {
+      @Override
+      protected boolean getConfiguredEnabled() {
+        return false;
+      }
+
+      public class MyBigDecimalField extends AbstractBigDecimalField {
+        public class MyMenuMenu extends AbstractMenu {
+        }
+      }
+    }
+  }
 }

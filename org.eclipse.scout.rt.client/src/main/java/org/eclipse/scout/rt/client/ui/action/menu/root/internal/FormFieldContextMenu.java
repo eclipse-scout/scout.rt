@@ -49,14 +49,16 @@ public class FormFieldContextMenu<T extends IFormField> extends AbstractContextM
   }
 
   protected void handleOwnerEnabledChanged() {
-    if (getContainer() != null) {
-      final boolean enabled = getContainer().isEnabled();
-      visit(menu -> {
-        if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
-          menu.setEnabledInheritAccessibility(enabled);
-        }
-      }, IMenu.class);
+    if (getContainer() == null) {
+      return;
     }
+
+    final boolean enabled = getContainer().isEnabledIncludingParents();
+    visit(menu -> {
+      if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
+        menu.setEnabledInheritAccessibility(enabled);
+      }
+    }, IMenu.class);
   }
 
   @Override

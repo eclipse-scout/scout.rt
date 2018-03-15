@@ -14,10 +14,13 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
 
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -44,6 +47,22 @@ public class CompositeFieldTest {
     compositeField.setFormInternal(null);
     assertNull(compositeField.getForm());
     assertNull(compositeField.getTextField().getForm());
+  }
+
+  @Test
+  public void testAddField() {
+    P_TestCompositeField compositeField = new P_TestCompositeField();
+    compositeField.setEnabled(false, false, false);
+    IStringField add = new AbstractStringField() {
+    };
+    AbstractMenu menu = new AbstractMenu() {
+    };
+    add.getContextMenu().addChildAction(menu);
+    compositeField.addField(add);
+
+    Assert.assertFalse(add.isEnabledIncludingParents());
+    Assert.assertTrue(add.isEnabled());
+    Assert.assertFalse(menu.isEnabled());
   }
 }
 

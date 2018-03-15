@@ -1111,6 +1111,11 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   @Override
   public void setParentFieldInternal(ICompositeField f) {
     propertySupport.setProperty(PROP_PARENT_FIELD, f);
+
+    if (f != null && f.isEnabled() != isEnabled()) {
+      // if the disabled state of this field is different than the new parent, it is required to inform the child fields so that they can update their state (e.g. menus).
+      fireEnabledComputetChangedRec();
+    }
   }
 
   @Override
@@ -1623,10 +1628,18 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     if (!changed || !isInitConfigDone()) {
       return;
     }
+    fireEnabledComputetChangedRec();
+  }
 
-    // notify myself and children that their inherited value might have changed
+  /**
+   * notify myself and children that their inherited value might have changed
+   *
+   * @param enabled
+   *          The enabled state of the root field.
+   */
+  protected void fireEnabledComputetChangedRec() {
     visit(field -> {
-      boolean b = (enabled ? field.isEnabledIncludingParents() : false);
+      boolean b = (isEnabled() ? field.isEnabledIncludingParents() : false);
       field.propertySupport.firePropertyChange(PROP_ENABLED_COMPUTED, !b, b);
     }, AbstractFormField.class);
   }
@@ -2258,13 +2271,13 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   class P_FieldPropertyChangeListener implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent e) {
-      if (e.getPropertyName().equals(PROP_VISIBLE)) {
+      if (PROP_VISIBLE.equals(e.getPropertyName())) {
         handleChildFieldVisibilityChanged();
       }
-      else if (e.getPropertyName().equals(PROP_SAVE_NEEDED)) {
+      else if (PROP_SAVE_NEEDED.equals(e.getPropertyName())) {
         checkSaveNeeded();
       }
-      else if (e.getPropertyName().equals(PROP_EMPTY)) {
+      else if (PROP_EMPTY.equals(e.getPropertyName())) {
         checkEmpty();
       }
     }
