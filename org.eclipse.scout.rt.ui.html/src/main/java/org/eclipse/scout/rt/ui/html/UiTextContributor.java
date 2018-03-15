@@ -57,6 +57,7 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.CalendarMonth",
         "ui.CalendarYear",
         "ui.CannotInsertTextTooLong",
+        "ui.PastedTextTooLong",
         "ui.Column",
         "ui.addColumn",
         "ui.removeColumn",
