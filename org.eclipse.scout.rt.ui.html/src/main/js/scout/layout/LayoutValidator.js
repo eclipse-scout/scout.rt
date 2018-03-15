@@ -16,20 +16,21 @@ scout.LayoutValidator = function() {
 
 scout.LayoutValidator.prototype.invalidateTree = function(htmlComp) {
   var validateRoot,
-    htmlCompParent = htmlComp;
+    htmlParent = htmlComp,
+    htmlSource = htmlComp;
 
   // Mark every parent as invalid until validate root
-  while (htmlCompParent) {
-    htmlComp = htmlCompParent;
-    htmlComp.invalidateLayout();
+  while (htmlParent) {
+    htmlComp = htmlParent;
+    htmlComp.invalidateLayout(htmlSource);
     if (htmlComp.isValidateRoot()) {
       validateRoot = htmlComp;
       break;
     }
-    htmlCompParent = htmlComp.getParent();
+    htmlParent = htmlComp.getParent();
   }
 
-  if (!htmlCompParent) {
+  if (!htmlParent) {
     validateRoot = htmlComp;
   }
 

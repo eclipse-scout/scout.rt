@@ -156,16 +156,7 @@ scout.Group.prototype._renderCollapsed = function() {
     this._renderBody();
   }
   if (this.rendered) {
-    this.animateToggleCollapse().done(function() {
-      if (this.bodyAnimating) {
-        // Another animation has been started in the mean time -> ignore done event
-        return;
-      }
-      if (this.collapsed) {
-        this.body.remove();
-      }
-      this.invalidateLayoutTree();
-    }.bind(this));
+    this.resizeBody();
   } else if (this.collapsed) {
     // Body will be removed after the animation, if there is no animation, remove it now
     this.body.remove();
@@ -174,6 +165,22 @@ scout.Group.prototype._renderCollapsed = function() {
 
 scout.Group.prototype._onHeaderClick = function(event) {
   this.setCollapsed(!this.collapsed);
+};
+
+/**
+ * Resizes the body to its preferred size by animating the height.
+ */
+scout.Group.prototype.resizeBody = function() {
+  this.animateToggleCollapse().done(function() {
+    if (this.bodyAnimating) {
+      // Another animation has been started in the mean time -> ignore done event
+      return;
+    }
+    if (this.collapsed) {
+      this.body.remove();
+    }
+    this.invalidateLayoutTree();
+  }.bind(this));
 };
 
 /**

@@ -98,12 +98,14 @@ scout.HtmlComponent.prototype.availableSize = function(options) {
 
 /**
  * Invalidates the component (sets the valid property to false and calls layout.invalidate()).
+ * @param {scout.HtmlComponent} htmlSource The component the invalidation originated from.
+ *        Is always set if the invalidation is triggered by using invalidateLayoutTree, may be undefined otherwise.
  */
-scout.HtmlComponent.prototype.invalidateLayout = function() {
+scout.HtmlComponent.prototype.invalidateLayout = function(htmlSource) {
   this.valid = false;
   this.prefSizeCached = {};
   if (this.layout) {
-    this.layout.invalidate();
+    this.layout.invalidate(htmlSource);
   }
 };
 

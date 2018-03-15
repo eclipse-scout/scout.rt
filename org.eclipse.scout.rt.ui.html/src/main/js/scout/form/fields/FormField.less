@@ -10,6 +10,8 @@
  ******************************************************************************/
 .form-field {
   border-spacing: 0;
+  /* FormFieldLayout uses absolute positioning, make sure it is positioned relatively to its container */
+  position: relative;
 
   & > label {
     position: absolute;

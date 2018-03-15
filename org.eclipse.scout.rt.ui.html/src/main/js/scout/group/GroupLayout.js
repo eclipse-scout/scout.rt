@@ -30,6 +30,19 @@ scout.GroupLayout.prototype.layout = function($container) {
   }
 };
 
+scout.GroupLayout.prototype.invalidate = function(htmlSource) {
+  var htmlBody = this.group.body.htmlComp;
+  // If a child triggers a layout invalidation, the animation should be stopped and restarted because the body will likely have another height.
+  // This will happen for sure if a child is an image which will be loaded during the animation.
+  if (htmlBody && this.group.bodyAnimating && htmlSource && htmlSource.isDescendantOf(this.group.htmlComp)) {
+    // Stop running animation
+    this.group.body.$container.stop();
+
+    // Resize to new height
+    this.group.resizeBody();
+  }
+};
+
 scout.GroupLayout.prototype.preferredLayoutSize = function($container, options) {
   var prefSize;
   var htmlComp = this.group.htmlComp;
