@@ -15,7 +15,12 @@ scout.SmartFieldAdapter = function() {
 };
 scout.inherits(scout.SmartFieldAdapter, scout.ValueFieldAdapter);
 
-scout.SmartFieldAdapter.PROPERTIES_ORDER = ['value', 'lookupRow', 'errorStatus', 'displayText'];
+/**
+ * Property lookup-row must be handled before value, since the smart-field has either a lookup-row
+ * or a value but never both (when we only have a value, the smart-field must perform a lookup by key
+ * in order to resolve the display name for that value).
+ */
+scout.SmartFieldAdapter.PROPERTIES_ORDER = ['lookupRow', 'value', 'errorStatus', 'displayText'];
 
 scout.SmartFieldAdapter.prototype._postCreateWidget = function() {
   scout.SmartFieldAdapter.parent.prototype._postCreateWidget.call(this);
