@@ -1073,6 +1073,11 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   @Override
   public void setParentFieldInternal(ICompositeField f) {
     propertySupport.setProperty(PROP_PARENT_FIELD, f);
+
+    if (f != null && f.isEnabled() != isEnabled()) {
+      // if the disabled state of this field is different than the new parent, it is required to inform the child fields so that they can update their state (e.g. menus).
+      fireEnabledComputetChangedRec();
+    }
   }
 
   /**
@@ -1591,13 +1596,21 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     if (!changed || !isInitialized()) {
       return;
     }
+    fireEnabledComputetChangedRec();
+  }
 
-    // notify myself and children that their inherited value might have changed
+  /**
+   * notify myself and children that their inherited value might have changed
+   *
+   * @param enabled
+   *          The enabled state of the root field.
+   */
+  protected void fireEnabledComputetChangedRec() {
     acceptVisitor(new IFormFieldVisitor() {
       @Override
       public boolean visitField(IFormField field, int level, int fieldIndex) {
         if (field instanceof AbstractFormField) {
-          boolean b = (enabled ? field.isEnabledIncludingParents() : false);
+          boolean b = (isEnabled() ? field.isEnabledIncludingParents() : false);
           ((AbstractFormField) field).propertySupport.firePropertyChange(PROP_ENABLED_COMPUTED, !b, b);
         }
         return true;

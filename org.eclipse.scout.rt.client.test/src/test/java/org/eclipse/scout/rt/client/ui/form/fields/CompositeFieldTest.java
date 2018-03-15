@@ -10,16 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.P_BadVisitorCompositeField.FirstGroupBox.FirstField;
 import org.eclipse.scout.rt.client.ui.form.fields.P_BadVisitorCompositeField.SecondGroupBox.SecondField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -64,6 +68,22 @@ public class CompositeFieldTest {
     assertSame(field, composite.getFieldByClass(FirstField.class));
     assertSame(field, composite.getFieldById(field.getFieldId()));
     assertSame(field, composite.getFieldById(field.getFieldId(), FirstField.class));
+  }
+
+  @Test
+  public void testAddField() {
+    P_TestCompositeField compositeField = new P_TestCompositeField();
+    compositeField.setEnabled(false, false, false);
+    IStringField add = new AbstractStringField() {
+    };
+    AbstractMenu menu = new AbstractMenu() {
+    };
+    add.getContextMenu().addChildAction(menu);
+    compositeField.addField(add);
+
+    assertFalse(add.isEnabledIncludingParents());
+    assertTrue(add.isEnabled());
+    assertFalse(menu.isEnabled());
   }
 }
 
