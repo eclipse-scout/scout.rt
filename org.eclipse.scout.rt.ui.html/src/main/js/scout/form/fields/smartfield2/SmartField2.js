@@ -839,6 +839,8 @@ scout.SmartField2.prototype._onClearIconMouseDown = function(event) {
 };
 
 scout.SmartField2.prototype._clear = function() {
+  // don't tab next field when user clicks on clear icon (acceptInput is called later)
+  this._tabPrevented = null;
   this._lastSearchText = this._readDisplayText();
   this.$field.val('');
   if (this.isPopupOpen()) {

@@ -168,6 +168,10 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
     boolean valueSet = false;
     VALUE valueFromUi = null;
 
+    if (data.has(IValueField.PROP_DISPLAY_TEXT)) {
+      handleUiDisplayTextChange(data);
+    }
+
     // When we have a lookup row, we prefer the lookup row over the value
     if (data.has(ISmartField2.PROP_LOOKUP_ROW)) {
       valueFromUi = valueFromJsonLookupRow(data);
@@ -189,19 +193,11 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
         addPropertyChangeEvent(ISmartField2.PROP_LOOKUP_ROW, lookupRowToJson((LookupRow<?>) getModel().getLookupRow(), hasMultipleColumns()));
         String displayTextFromModel = getModel().getDisplayText();
         addPropertyChangeEvent(IValueField.PROP_DISPLAY_TEXT, displayTextFromModel);
-        return;
       }
-    }
-
-    if (data.has(IValueField.PROP_DISPLAY_TEXT)) {
-      handleUiDisplayTextChange(data);
-    }
-
-    // Don't use error status from UI when value has been set
-    if (valueSet) {
       return;
     }
 
+    // Don't use error status from UI when value has been set
     if (data.has(IValueField.PROP_ERROR_STATUS)) {
       handleUiErrorStatusChange(data);
     }
