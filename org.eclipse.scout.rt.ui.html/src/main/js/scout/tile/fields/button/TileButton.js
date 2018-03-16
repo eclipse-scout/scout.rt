@@ -15,6 +15,10 @@ scout.TileButton = function() {
 scout.inherits(scout.TileButton, scout.Button);
 
 scout.TileButton.prototype._render = function() {
+  if (this.parent.displayStyle !== scout.FormFieldTile.DisplayStyle.DASHBOARD) {
+    scout.TileButton.parent.prototype._render.call(this);
+    return;
+  }
   var $button = this.$parent.makeDiv();
   this.$buttonLabel = $button.appendSpan('label');
 
@@ -38,6 +42,10 @@ scout.TileButton.prototype._remove = function() {
 };
 
 scout.TileButton.prototype._renderIconId = function() {
+  if (this.parent.displayStyle !== scout.FormFieldTile.DisplayStyle.DASHBOARD) {
+    scout.TileButton.parent.prototype._renderIconId.call(this);
+    return;
+  }
   this.$field.removeClass('with-icon without-icon');
   if (this.iconId) {
     if (!this.$iconContainer) {

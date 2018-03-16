@@ -31,6 +31,7 @@ public abstract class AbstractFormFieldTile<T extends IFormField> extends Abstra
   @Override
   protected void initConfig() {
     super.initConfig();
+    setDisplayStyle(getConfiguredDisplayStyle());
     initTileWidgetConfig();
   }
 
@@ -62,12 +63,31 @@ public abstract class AbstractFormFieldTile<T extends IFormField> extends Abstra
       widget.setLabelVisible(getConfiguredLabelVisible());
     }
 
-    // Adjust style
-    widget.setLabelPosition(IFormField.LABEL_POSITION_TOP);
-    widget.setMandatory(false);
-    widget.setStatusVisible(false);
-    // Pull up status into label, let field fill entire tile
-    widget.setStatusPosition(IFormField.STATUS_POSITION_TOP);
+    if (DISPLAY_STYLE_DASHBOARD.equals(getDisplayStyle())) {
+      // Adjust style
+      widget.setLabelPosition(IFormField.LABEL_POSITION_TOP);
+      widget.setMandatory(false);
+      widget.setStatusVisible(false);
+      // Pull up status into label, let field fill entire tile
+      widget.setStatusPosition(IFormField.STATUS_POSITION_TOP);
+    }
+  }
+
+  /**
+   * Configures the display style of the tile.
+   * <p>
+   * The available styles are:
+   * <ul>
+   * <li>{@link IFormFieldTile#DISPLAY_STYLE_PLAIN}</li>
+   * <li>{@link IFormFieldTile#DISPLAY_STYLE_DASHBOARD}</li>
+   * </ul>
+   * <p>
+   * Subclasses can override this method. The default is {@link IFormFieldTile#DISPLAY_STYLE_DASHBOARD}.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(140)
+  protected String getConfiguredDisplayStyle() {
+    return DISPLAY_STYLE_DASHBOARD;
   }
 
   // ----- Configuration delegated to tile field: -----
@@ -89,6 +109,18 @@ public abstract class AbstractFormFieldTile<T extends IFormField> extends Abstra
   @SuppressWarnings("findbugs:NP_BOOLEAN_RETURN_NULL")
   protected Boolean getConfiguredLabelVisible() {
     return null;
+  }
+
+  @Override
+  public String getDisplayStyle() {
+    return propertySupport.getPropertyString(PROP_DISPLAY_STYLE);
+  }
+
+  /**
+   * Calling this method after initialization won't have any effect
+   */
+  protected void setDisplayStyle(String style) {
+    propertySupport.setPropertyString(PROP_DISPLAY_STYLE, style);
   }
 
   @Override

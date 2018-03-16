@@ -390,6 +390,9 @@
       },
       "loading": false
     },
+    "FormFieldTile": {
+      "displayStyle": "dashboard"
+    },
     "TileGrid": {
       "filteredTiles": null,
       "gridColumnCount": 4,

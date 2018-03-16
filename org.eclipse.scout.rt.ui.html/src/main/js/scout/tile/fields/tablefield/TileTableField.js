@@ -21,6 +21,9 @@ scout.inherits(scout.TileTableField, scout.TableField);
  */
 scout.TileTableField.prototype._renderTable = function() {
   scout.TileTableField.parent.prototype._renderTable.call(this);
+  if (this.parent.displayStyle !== scout.FormFieldTile.DisplayStyle.DASHBOARD) {
+    return;
+  }
   if (this.table) {
     // Never show header menus for this widget
     this.table.setHeaderMenusEnabled(false);
@@ -41,6 +44,9 @@ scout.TileTableField.prototype._renderTable = function() {
  * @override
  */
 scout.TileTableField.prototype._removeTable = function() {
+  if (this.parent.displayStyle !== scout.FormFieldTile.DisplayStyle.DASHBOARD) {
+    return;
+  }
   if (this.table) {
     this.table.$container
       .off('blur', this._tableBlurHandler)

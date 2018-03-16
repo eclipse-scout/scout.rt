@@ -13,5 +13,17 @@ package org.eclipse.scout.rt.client.ui.tile;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
 public interface IFormFieldTile<T extends IFormField> extends IWidgetTile<T> {
+  String PROP_DISPLAY_STYLE = "displayStyle";
 
+  /**
+   * The plain style tries to render the form field as it is without adjusting the look or behavior. This gives you an
+   * easy possibility to style it as you like.
+   */
+  String DISPLAY_STYLE_PLAIN = "plain";
+  /**
+   * This style is designed to be used for tiles on a dashboard.
+   */
+  String DISPLAY_STYLE_DASHBOARD = "dashboard";
+
+  String getDisplayStyle();
 }
