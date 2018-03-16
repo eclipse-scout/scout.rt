@@ -225,11 +225,6 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
     }
 
     @Override
-    protected boolean getConfiguredStatusVisible() {
-      return false;
-    }
-
-    @Override
     protected boolean execCalculateVisible() {
       return getTable() != null;
     }
