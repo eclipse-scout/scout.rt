@@ -218,9 +218,9 @@ scout.Widget.prototype.destroy = function() {
   this._destroy();
 
   // Disconnect from owner and parent
-  this.owner.removeChild(this);
+  this.owner._removeChild(this);
   this.owner = null;
-  this.parent.removeChild(this);
+  this.parent._removeChild(this);
   this.parent.off('destroy', this._parentDestroyHandler);
   this.parent = null;
 
@@ -467,10 +467,10 @@ scout.Widget.prototype.setOwner = function(owner) {
 
   if (this.owner) {
     // Remove from old owner
-    this.owner.removeChild(this);
+    this.owner._removeChild(this);
   }
   this.owner = owner;
-  this.owner.addChild(this);
+  this.owner._addChild(this);
 };
 
 scout.Widget.prototype.setParent = function(parent) {
@@ -495,26 +495,26 @@ scout.Widget.prototype.setParent = function(parent) {
 
     if (this.parent !== this.owner) {
       // Remove from old parent if getting relinked
-      // If the old parent is still the owner, don't remove it because owner stays responsible for destryoing it
-      this.parent.removeChild(this);
+      // If the old parent is still the owner, don't remove it because owner stays responsible for destroying it
+      this.parent._removeChild(this);
     }
   }
   this.parent = parent;
-  this.parent.addChild(this);
+  this.parent._addChild(this);
   if (this.initialized) {
     this.recomputeEnabled(this.parent.enabledComputed);
   }
   this.parent.one('destroy', this._parentDestroyHandler);
 };
 
-scout.Widget.prototype.addChild = function(child) {
+scout.Widget.prototype._addChild = function(child) {
   $.log.isTraceEnabled() && $.log.trace('addChild(' + child + ') to ' + this);
   if (this.children.indexOf(child) === -1) {
     this.children.push(child);
   }
 };
 
-scout.Widget.prototype.removeChild = function(child) {
+scout.Widget.prototype._removeChild = function(child) {
   $.log.isTraceEnabled() && $.log.trace('removeChild(' + child + ') from ' + this);
   scout.arrays.remove(this.children, child);
 };
