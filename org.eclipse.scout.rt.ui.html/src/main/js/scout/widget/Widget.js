@@ -1642,7 +1642,8 @@ scout.Widget.prototype.getFocusableElement = function() {
 };
 
 /**
- * Visits every child of the widget.
+ * Visits every child of this widget in pre-order (top-down).<br>
+ * This widget itself is not visited! Only child widgets are visited recursively.
  * <p>
  * The children with a different parent are excluded.<br>
  * This makes sure the child is not visited twice if the owner and the parent are not the same

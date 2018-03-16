@@ -1142,7 +1142,10 @@ scout.FormField.prototype._createCopyContextMenu = function(event) {
   popup.open();
 };
 
-scout.FormField.prototype.visit = function(visitor) {
+/**
+ * Visits this field and all child formfields in pre-order (top-down).
+ */
+scout.FormField.prototype.visitFields = function(visitor) {
   visitor(this);
 };
 

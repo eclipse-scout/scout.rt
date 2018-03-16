@@ -40,6 +40,20 @@ describe('Widget', function() {
     return widget;
   }
 
+  describe('visitChildren', function() {
+    it('should traverse child items', function() {
+      widget.init({
+        session: session,
+        parent: parent
+      });
+      var counter = 0;
+      parent.visitChildren(function(item) {
+        counter++;
+      });
+      expect(counter).toBe(1); /* parent itself is not visited, only children */
+    });
+  });
+
   describe('enabled', function() {
     it('should be propagated correctly', function() {
       widget.init({

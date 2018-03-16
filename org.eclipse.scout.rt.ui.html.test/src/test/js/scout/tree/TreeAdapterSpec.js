@@ -260,7 +260,7 @@ describe("TreeAdapter", function() {
       tree.render();
 
       var allNodes = [];
-      tree._visitNodes(tree.nodes, function(node) {
+      tree.visitNodes(function(node) {
         allNodes.push(node);
       });
 

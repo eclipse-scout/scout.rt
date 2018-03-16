@@ -787,8 +787,11 @@ scout.Form.prototype.inFront = function() {
   return this.rendered && this.attached;
 };
 
+/**
+ * Visits all form-fields of this form in pre-order (top-down).
+ */
 scout.Form.prototype.visitFields = function(visitor) {
-  this.rootGroupBox.visit(visitor);
+  this.rootGroupBox.visitFields(visitor);
 };
 
 scout.Form.prototype.storeCacheBounds = function(bounds) {

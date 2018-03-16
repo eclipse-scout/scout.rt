@@ -223,10 +223,9 @@ describe("TreeKeyStrokes", function() {
 
       tree.$data.triggerKeyDown(scout.keys.HOME);
       helper.assertSelection(tree, [node0]);
-      tree._visitNodes(tree.nodes, function(node) {
+      tree.visitNodes(function(node) {
         expect(node.expanded).toBeFalsy();
       });
-
     });
   });
 
@@ -331,7 +330,7 @@ describe("TreeKeyStrokes", function() {
       tree.render();
       tree.$data.triggerKeyDown(scout.keys.SPACE);
 
-      tree._visitNodes(tree.nodes, function(node) {
+      tree.visitNodes(function(node) {
         if (node === node0) {
           expect(node.checked).toBeTruthy();
         } else {
@@ -352,7 +351,7 @@ describe("TreeKeyStrokes", function() {
 
       tree.$data.triggerKeyDown(scout.keys.SPACE);
 
-      tree._visitNodes(tree.nodes, function(node) {
+      tree.visitNodes(function(node) {
         if (node === node0) {
           expect(node.checked).toBeTruthy();
         } else {
@@ -374,7 +373,7 @@ describe("TreeKeyStrokes", function() {
 
       tree.$data.triggerKeyDown(scout.keys.SPACE);
 
-      tree._visitNodes(tree.nodes, function(node) {
+      tree.visitNodes(function(node) {
         expect(node.checked).toBeFalsy();
       });
     });

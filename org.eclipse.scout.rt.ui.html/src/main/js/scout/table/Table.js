@@ -752,7 +752,7 @@ scout.Table.prototype._sortImpl = function(sortColumns) {
     // sort tree and set flat row array afterwards.
     this._sortHierarchical(sortFunction);
     var sortedFlatRows = [];
-    this.visitRowsDeptFirst(function(row) {
+    this.visitRows(function(row) {
       sortedFlatRows.push(row);
     }.bind(this));
     this.rows = sortedFlatRows;
@@ -763,11 +763,14 @@ scout.Table.prototype._sortImpl = function(sortColumns) {
   }
 };
 
-scout.Table.prototype.visitRowsDeptFirst = function(visitFunc, rows) {
+/**
+ * Pre-order (top-down) traversal of all rows in this table (if hierarchical).
+ */
+scout.Table.prototype.visitRows = function(visitFunc, rows) {
   rows = rows || this.rootRows;
   rows.forEach(function(row) {
     visitFunc(row);
-    this.visitRowsDeptFirst(visitFunc, row.childRows);
+    this.visitRows(visitFunc, row.childRows);
   }, this);
 };
 

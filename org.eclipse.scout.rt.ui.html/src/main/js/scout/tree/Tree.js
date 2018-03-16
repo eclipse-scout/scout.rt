@@ -97,8 +97,8 @@ scout.Tree.prototype._init = function(model) {
   }
   this.initialTraversing = true;
   this._ensureTreeNodes(this.nodes);
-  this._visitNodes(this.nodes, this._initTreeNode.bind(this));
-  this._visitNodes(this.nodes, this._updateFlatListAndSelectionPath.bind(this));
+  this.visitNodes(this._initTreeNode.bind(this));
+  this.visitNodes(this._updateFlatListAndSelectionPath.bind(this));
   this.initialTraversing = false;
   this.selectedNodes = this._nodesByIds(this.selectedNodes);
   this.menuBar = scout.create('MenuBar', {
@@ -274,7 +274,7 @@ scout.Tree.prototype._initTreeNodeInternal = function(node, parentNode) {
 
 scout.Tree.prototype._destroy = function() {
   scout.Tree.parent.prototype._destroy.call(this);
-  this._visitNodes(this.nodes, this._destroyTreeNode.bind(this));
+  this.visitNodes(this._destroyTreeNode.bind(this));
 };
 
 scout.Tree.prototype._destroyTreeNode = function(node, parentNode) {
@@ -288,8 +288,12 @@ scout.Tree.prototype._destroyTreeNode = function(node, parentNode) {
   }
 };
 
-scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
-  return scout.Tree.visitNodes(nodes, func, parentNode);
+/**
+ * pre-order (top-down) traversal of the tree-nodes of this tree.<br>
+ * if func returns true the children of the visited node are not visited.
+ */
+scout.Tree.prototype.visitNodes = function(func, parentNode) {
+  return scout.Tree.visitNodes(func, this.nodes, parentNode);
 };
 
 scout.Tree.prototype._render = function() {
@@ -345,7 +349,7 @@ scout.Tree.prototype._remove = function() {
     this._$animationWrapper.stop(false, true);
   }
   // Detach nodes from jQuery objects (because those will be removed)
-  this._visitNodes(this.nodes, this._resetTreeNode.bind(this));
+  this.visitNodes(this._resetTreeNode.bind(this));
 
   scout.scrollbars.uninstall(this.$data, this.session);
   this._uninstallDragAndDropHandler();
@@ -1250,7 +1254,7 @@ scout.Tree.prototype.collapseNode = function(node, opts) {
 scout.Tree.prototype.collapseAll = function() {
   this.rebuildSuppressed = true;
   // Collapse all expanded child nodes (only model)
-  this._visitNodes(this.nodes, function(node) {
+  this.visitNodes(function(node) {
     this.collapseNode(node);
   }.bind(this));
 
@@ -1341,9 +1345,9 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
 };
 
 scout.Tree.prototype.setNodeExpandedRecursive = function(nodes, expanded, opts) {
-  this._visitNodes(nodes, function(childNode) {
+  scout.Tree.visitNodes(function(childNode) {
     this.setNodeExpanded(childNode, expanded, opts);
-  }.bind(this));
+  }.bind(this), nodes);
 };
 
 scout.Tree.prototype._rebuildParent = function(node, opts) {
@@ -1573,7 +1577,7 @@ scout.Tree.prototype._addChildrenToFlatListIfExpanded = function(indexOffset, no
 
 scout.Tree.prototype._showNodes = function(insertBatch) {
   return this.viewRangeRendered.from + this.viewRangeSize >= insertBatch.lastBatchInsertIndex() &&
-         this.viewRangeRendered.from <= insertBatch.lastBatchInsertIndex();
+    this.viewRangeRendered.from <= insertBatch.lastBatchInsertIndex();
 };
 
 /**
@@ -1625,7 +1629,7 @@ scout.Tree.prototype._findInsertPositionInFlatList = function(node) {
   // belong to the sub tree of the prev. sibling node.
   var i, checkNode;
   for (i = prevSiblingPos; i < this.visibleNodesFlat.length; i++) {
-    checkNode =  this.visibleNodesFlat[i];
+    checkNode = this.visibleNodesFlat[i];
     if (!this._isInSameSubTree(prevSiblingNode, checkNode)) {
       return i;
     }
@@ -1999,8 +2003,8 @@ scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
       }.bind(this));
     }
     //initialize node and add to visible list if node is visible
-    this._visitNodes(nodes, this._initTreeNode.bind(this), parentNode);
-    this._visitNodes(nodes, this._updateFlatListAndSelectionPath.bind(this), parentNode);
+    scout.Tree.visitNodes(this._initTreeNode.bind(this), nodes, parentNode);
+    scout.Tree.visitNodes(this._updateFlatListAndSelectionPath.bind(this), nodes, parentNode);
     if (this.groupedNodes[parentNode.id]) {
       this._updateItemPath(false, parentNode);
     }
@@ -2020,8 +2024,8 @@ scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
       scout.arrays.pushAll(this.nodes, nodes);
     }
     //initialize node and add to visible list if node is visible
-    this._visitNodes(nodes, this._initTreeNode.bind(this), parentNode);
-    this._visitNodes(nodes, this._updateFlatListAndSelectionPath.bind(this), parentNode);
+    scout.Tree.visitNodes(this._initTreeNode.bind(this), nodes, parentNode);
+    scout.Tree.visitNodes(this._updateFlatListAndSelectionPath.bind(this), nodes, parentNode);
   }
   if (this.rendered) {
     this.viewRangeDirty = true;
@@ -2135,7 +2139,7 @@ scout.Tree.prototype.deleteNodes = function(nodes, parentNode) {
     this._updateMarkChildrenChecked(node, false, false);
 
     // remove children from node map
-    this._visitNodes(node.childNodes, this._destroyTreeNode.bind(this));
+    scout.Tree.visitNodes(this._destroyTreeNode.bind(this), node.childNodes);
   }, this);
 
   this.deselectNodes(deletedNodes);
@@ -2175,7 +2179,7 @@ scout.Tree.prototype.deleteAllChildNodes = function(parentNode) {
     nodes = this.nodes;
     this.nodes = [];
   }
-  this._visitNodes(nodes, updateNodeMap.bind(this));
+  scout.Tree.visitNodes(updateNodeMap.bind(this), nodes);
 
   // remove node from html document
   if (this.rendered) {
@@ -2500,7 +2504,7 @@ scout.Tree.prototype.filter = function(notAnimated) {
     changedNodes = [],
     newHiddenNodes = [];
   // Filter nodes
-  this._visitNodes(this.nodes, function(node) {
+  this.visitNodes(function(node) {
     var changed = this._applyFiltersForNode(node);
     if (changed) {
       changedNodes.push(node);
@@ -2907,9 +2911,10 @@ scout.Tree.collectSubtree = function($rootNode, includeRootNodeInResult) {
 };
 
 /**
+ * pre-order (top-down) traversal of the tree-nodes provided.<br>
  * if func returns true the children of the visited node are not visited.
  */
-scout.Tree.visitNodes = function(nodes, func, parentNode) {
+scout.Tree.visitNodes = function(func, nodes, parentNode) {
   var i, node;
   if (!nodes) {
     return;
@@ -2919,7 +2924,7 @@ scout.Tree.visitNodes = function(nodes, func, parentNode) {
     node = nodes[i];
     var doNotProcessChildren = func(node, parentNode);
     if (!doNotProcessChildren && node.childNodes.length > 0) {
-      scout.Tree.visitNodes(node.childNodes, func, node);
+      scout.Tree.visitNodes(func, node.childNodes, node);
     }
   }
 };

@@ -24,10 +24,13 @@ scout.CompositeField.prototype.setFields = function() {
   throw new Error('Not implemented');
 };
 
-scout.CompositeField.prototype.visit = function(visitor) {
-  scout.CompositeField.parent.prototype.visit.call(this, visitor);
+/**
+ * @override FormField.js
+ */
+scout.CompositeField.prototype.visitFields = function(visitor) {
+  scout.CompositeField.parent.prototype.visitFields.call(this, visitor);
   this.getFields().forEach(function(field) {
-    field.visit(visitor);
+    field.visitFields(visitor);
   });
 };
 

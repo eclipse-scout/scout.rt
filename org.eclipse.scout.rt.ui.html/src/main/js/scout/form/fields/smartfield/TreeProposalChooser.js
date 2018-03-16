@@ -189,12 +189,11 @@ scout.TreeProposalChooser.prototype._createTreeNode = function(lookupRow) {
  */
 scout.TreeProposalChooser.prototype.findLeafs = function() {
   var leafs = [];
-  scout.Tree.visitNodes(this.model.nodes,
-    function(node, parentNode) {
-      if (node.leaf || !node.childNodes.length) {
-        leafs.push(node);
-      }
-    });
+  scout.Tree.visitNodes(function(node, parentNode) {
+    if (node.leaf || !node.childNodes.length) {
+      leafs.push(node);
+    }
+  }, this.model.nodes);
   return leafs;
 };
 

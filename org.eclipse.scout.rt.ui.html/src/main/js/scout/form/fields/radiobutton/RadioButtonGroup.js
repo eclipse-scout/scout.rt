@@ -47,10 +47,10 @@ scout.RadioButtonGroup.prototype.getFields = function() {
 /**
  * @override FormField.js
  */
-scout.RadioButtonGroup.prototype.visit = function(visitor) {
-  scout.RadioButtonGroup.parent.prototype.visit.call(this, visitor);
+scout.RadioButtonGroup.prototype.visitFields = function(visitor) {
+  scout.RadioButtonGroup.parent.prototype.visitFields.call(this, visitor);
   this.fields.forEach(function(field) {
-    field.visit(visitor);
+    field.visitFields(visitor);
   });
 };
 

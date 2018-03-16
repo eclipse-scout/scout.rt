@@ -312,7 +312,7 @@ scout.Outline.prototype.navigateToTop = function() {
 };
 
 scout.Outline.prototype.handleInitialExpanded = function() {
-  this._visitNodes(this.nodes, function(node) {
+  this.visitNodes(function(node) {
     if (node.initialExpanded) {
       this.expandNode(node, {
         renderExpansion: true
@@ -421,7 +421,7 @@ scout.Outline.prototype.setNavigateButtonsVisible = function(navigateButtonsVisi
 
 scout.Outline.prototype._setNavigateButtonsVisible = function(navigateButtonsVisible) {
   this._setProperty('navigateButtonsVisible', navigateButtonsVisible);
-  this._visitNodes(this.nodes, this._setNavigateButtonsVisibleForNode.bind(this));
+  this.visitNodes(this._setNavigateButtonsVisibleForNode.bind(this));
 };
 
 scout.Outline.prototype._setNavigateButtonsVisibleForNode = function(node, parentNode) {

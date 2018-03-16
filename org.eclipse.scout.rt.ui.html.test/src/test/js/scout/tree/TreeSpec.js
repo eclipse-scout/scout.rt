@@ -975,9 +975,9 @@ describe("Tree", function() {
       tree.checkNode(node, true);
       expect(node.checked).toEqual(true);
       // every descendant needs to be checked
-      scout.Tree.visitNodes(node.childNodes, function(node) {
+      scout.Tree.visitNodes(function(node) {
         expect(node.checked).toEqual(true);
-      });
+      }, node.childNodes);
     });
 
     it("does not check the children if autoCheckChildren is set to false", function() {
@@ -992,9 +992,9 @@ describe("Tree", function() {
       tree.checkNode(node, true);
       expect(node.checked).toEqual(true);
       // no descendant must be checked
-      scout.Tree.visitNodes(node.childNodes, function(node) {
+      scout.Tree.visitNodes(function(node) {
         expect(node.checked).toEqual(false);
-      });
+      }, node.childNodes);
     });
 
     it("does not check nodes if checkable is set to false", function() {
@@ -1492,7 +1492,7 @@ describe("Tree", function() {
       tree.render();
 
       var allNodes = [];
-      tree._visitNodes(tree.nodes, function(node) {
+      tree.visitNodes(function(node) {
         allNodes.push(node);
       });
 
@@ -2019,7 +2019,7 @@ describe("Tree", function() {
 
       it("init with all expanded in correct order", function() {
         var index = 0;
-        tree._visitNodes(tree.nodes, function(node) {
+        tree.visitNodes(function(node) {
           expect(tree.visibleNodesFlat.indexOf(node) === index).toBeTruthy();
           expect(tree.visibleNodesMap[node.id]).toBeTruthy();
           index++;
@@ -2034,15 +2034,15 @@ describe("Tree", function() {
           expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();
           expect(tree.visibleNodesMap[node.id]).toBeTruthy();
           if (node === collapseNode) {
-            tree._visitNodes(node.childNodes, function(childNode) {
+            scout.Tree.visitNodes(function(childNode) {
               expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeFalsy();
               expect(tree.visibleNodesMap[childNode.id]).toBeFalsy();
-            });
+            }, node.childNodes);
           } else {
-            tree._visitNodes(node.childNodes, function(childNode) {
+            scout.Tree.visitNodes(function(childNode) {
               expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeTruthy();
               expect(tree.visibleNodesMap[childNode.id]).toBeTruthy();
-            });
+            }, node.childNodes);
           }
         });
       });
@@ -2060,17 +2060,17 @@ describe("Tree", function() {
           if (node === filterNode) {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeFalsy();
             expect(tree.visibleNodesMap[node.id]).toBeFalsy();
-            tree._visitNodes(node.childNodes, function(childNode) {
+            scout.Tree.visitNodes(function(childNode) {
               expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeFalsy();
               expect(tree.visibleNodesMap[childNode.id]).toBeFalsy();
-            });
+            }, node.childNodes);
           } else {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();
             expect(tree.visibleNodesMap[node.id]).toBeTruthy();
-            tree._visitNodes(node.childNodes, function(childNode) {
+            scout.Tree.visitNodes(function(childNode) {
               expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeTruthy();
               expect(tree.visibleNodesMap[childNode.id]).toBeTruthy();
-            });
+            }, node.childNodes);
           }
         });
       });
@@ -2084,7 +2084,7 @@ describe("Tree", function() {
         };
         tree.addFilter(filter);
 
-        tree._visitNodes(tree.nodes, function(childNode) {
+        tree.visitNodes(function(childNode) {
           expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeTruthy();
           expect(tree.visibleNodesMap[childNode.id]).toBeTruthy();
         });
@@ -2109,17 +2109,17 @@ describe("Tree", function() {
           if (node === nodeToChange) {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeFalsy();
             expect(tree.visibleNodesMap[node.id]).toBeFalsy();
-            tree._visitNodes(node.childNodes, function(childNode) {
+            scout.Tree.visitNodes(function(childNode) {
               expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeFalsy();
               expect(tree.visibleNodesMap[childNode.id]).toBeFalsy();
-            });
+            }, node.childNodes);
           } else {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();
             expect(tree.visibleNodesMap[node.id]).toBeTruthy();
-            tree._visitNodes(node.childNodes, function(childNode) {
+            scout.Tree.visitNodes(function(childNode) {
               expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeTruthy();
               expect(tree.visibleNodesMap[childNode.id]).toBeTruthy();
-            });
+            }, node.childNodes);
           }
         });
       });
@@ -2154,17 +2154,17 @@ describe("Tree", function() {
           if (node === tree.nodes[0]) {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeFalsy();
             expect(tree.visibleNodesMap[node.id]).toBeFalsy();
-            tree._visitNodes(node.childNodes, function(childNode) {
+            scout.Tree.visitNodes(function(childNode) {
               expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeFalsy();
               expect(tree.visibleNodesMap[childNode.id]).toBeFalsy();
-            });
+            }, node.childNodes);
           } else {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();
             expect(tree.visibleNodesMap[node.id]).toBeTruthy();
-            tree._visitNodes(node.childNodes, function(childNode) {
+            scout.Tree.visitNodes(function(childNode) {
               expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeTruthy();
               expect(tree.visibleNodesMap[childNode.id]).toBeTruthy();
-            });
+            }, node.childNodes);
           }
         });
         tree.insertNodes([newNode0Child3], tree.nodes[0]);
@@ -2172,17 +2172,17 @@ describe("Tree", function() {
           if (node === tree.nodes[0]) {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeFalsy();
             expect(tree.visibleNodesMap[node.id]).toBeFalsy();
-            tree._visitNodes(node.childNodes, function(childNode) {
+            scout.Tree.visitNodes(function(childNode) {
               expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeFalsy();
               expect(tree.visibleNodesMap[childNode.id]).toBeFalsy();
-            });
+            }, node.childNodes);
           } else {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();
             expect(tree.visibleNodesMap[node.id]).toBeTruthy();
-            tree._visitNodes(node.childNodes, function(childNode) {
+            scout.Tree.visitNodes(function(childNode) {
               expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeTruthy();
               expect(tree.visibleNodesMap[childNode.id]).toBeTruthy();
-            });
+            }, node.childNodes);
           }
         });
 
@@ -2197,14 +2197,14 @@ describe("Tree", function() {
           }
         };
         tree.addFilter(filter);
-        tree._visitNodes(tree.nodes, function(childNode) {
+        tree.visitNodes(function(childNode) {
           expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeTruthy();
           expect(tree.visibleNodesMap[childNode.id]).toBeTruthy();
         });
         tree.insertNodes([newNode0Child3], tree.nodes[0]);
 
         var treeNode0C3 = tree._nodeById(newNode0Child3.id);
-        tree._visitNodes(tree.nodes, function(node) {
+        tree.visitNodes(function(node) {
           if (node === treeNode0C3) {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeFalsy();
             expect(tree.visibleNodesMap[node.id]).toBeFalsy();
@@ -2224,7 +2224,7 @@ describe("Tree", function() {
       });
 
       it("init with all collapsed", function() {
-        tree._visitNodes(tree.nodes, function(node) {
+        tree.visitNodes(function(node) {
           if (tree.nodes.indexOf(node) > -1) {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();
             expect(tree.visibleNodesMap[node.id]).toBeTruthy();
@@ -2250,7 +2250,7 @@ describe("Tree", function() {
       it("expand node", function() {
         var node0 = tree.nodes[0];
         tree.expandNode(node0);
-        tree._visitNodes(tree.nodes, function(node) {
+        tree.visitNodes(function(node) {
           if (node.parentNode === node0) {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();
             expect(tree.visibleNodesMap[node.id]).toBeTruthy();
@@ -2281,7 +2281,7 @@ describe("Tree", function() {
           node0_0 = node0.childNodes[0];
         tree.expandNode(node0);
         tree.expandNode(node0_0);
-        tree._visitNodes(tree.nodes, function(node) {
+        tree.visitNodes(function(node) {
           if (node.parentNode === node0) {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();
             expect(tree.visibleNodesMap[node.id]).toBeTruthy();
