@@ -19,6 +19,7 @@ scout.inherits(scout.RadioButtonGroupRightKeyStroke, scout.KeyStroke);
 scout.RadioButtonGroupRightKeyStroke.prototype.handle = function(event) {
   var fieldBefore,
     focusedButton = $(event.target).data('radiobutton');
+
   this.field.radioButtons.some(function(radioButton) {
     if (fieldBefore && radioButton.enabledComputed && radioButton.visible) {
       radioButton.select();

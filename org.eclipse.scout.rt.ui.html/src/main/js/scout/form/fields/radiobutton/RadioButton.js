@@ -68,15 +68,11 @@ scout.RadioButton.prototype._onMouseDown = function(event) {
   }
 };
 
+/**
+ * Convenience for {@link #setSelected(true)}
+ */
 scout.RadioButton.prototype.select = function() {
-  if (!this.enabledComputed) {
-    return;
-  }
-  if (this.parent instanceof scout.RadioButtonGroup) {
-    this.parent.selectButton(this);
-  } else {
-    this.setSelected(true);
-  }
+  this.setSelected(true);
 };
 
 scout.RadioButton.prototype.setSelected = function(selected) {
@@ -96,6 +92,9 @@ scout.RadioButton.prototype.doAction = function(event) {
 };
 
 scout.RadioButton.prototype.setTabbable = function(tabbable) {
+  if (!this.rendered) {
+    return;
+  }
   this.$field.setTabbable(tabbable && !scout.device.supportsTouch());
 };
 

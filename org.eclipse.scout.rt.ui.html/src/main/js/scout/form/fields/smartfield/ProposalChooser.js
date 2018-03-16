@@ -198,7 +198,7 @@ scout.ProposalChooser.prototype._renderActiveFilterButton = function(value, inde
     }
   }.bind(this));
 
-  this.activeFilterGroup.addButton(radio);
+  this.activeFilterGroup.insertButton(radio);
 };
 
 scout.ProposalChooser.prototype.setVirtual = function(virtual) {

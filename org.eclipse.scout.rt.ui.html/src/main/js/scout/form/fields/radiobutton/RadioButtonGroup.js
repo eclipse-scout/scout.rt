@@ -15,6 +15,8 @@ scout.RadioButtonGroup = function() {
   this.radioButtons = [];
   this.selectedButton = null;
   this.$body = null;
+  this._selectButtonLocked = false;
+  this._buttonPropertyChangeHandler = this._onButtonPropertyChange.bind(this);
 };
 
 scout.inherits(scout.RadioButtonGroup, scout.ValueField);
@@ -58,11 +60,16 @@ scout.RadioButtonGroup.prototype._init = function(model) {
   this.fields.forEach(function(formField) {
     if (formField instanceof scout.RadioButton) {
       this.radioButtons.push(formField);
-      if (formField.selected) {
-        this.selectedButton = formField;
-      }
+      this._initButton(formField);
     }
   }, this);
+};
+
+scout.RadioButtonGroup.prototype._initButton = function(button) {
+  button.on('propertyChange', this._buttonPropertyChangeHandler);
+  if (button.selected) {
+    this.selectButton(button);
+  }
 };
 
 scout.RadioButtonGroup.prototype._render = function() {
@@ -129,6 +136,16 @@ scout.RadioButtonGroup.prototype._provideTabIndex = function() {
 };
 
 scout.RadioButtonGroup.prototype.selectButton = function(radioButton) {
+  if (this.selectedButton === radioButton) {
+    // Already selected
+    return;
+  }
+  if (this._selectButtonLocked) {
+    // Don't execute when triggered by this function to make sure the states are updated before firing the selectButton event
+    return;
+  }
+  this._selectButtonLocked = true;
+
   // Deselect previously selected button
   if (this.selectedButton) {
     // Do not unset tabbable here, because at least one button has to be tabbable even if the button is deselected
@@ -153,6 +170,7 @@ scout.RadioButtonGroup.prototype.selectButton = function(radioButton) {
       tabbableButton.setTabbable(false);
     }
   }
+  this._selectButtonLocked = false;
   this.setProperty('selectedButton', radioButton);
 };
 
@@ -162,7 +180,22 @@ scout.RadioButtonGroup.prototype.getTabbableButton = function() {
   });
 };
 
-scout.RadioButtonGroup.prototype.addButton = function(radioButton) {
+scout.RadioButtonGroup.prototype.insertButton = function(radioButton) {
+  if (this.rendered) {
+    throw new Error('Inserting buttons is not supported if group is already rendered.');
+  }
   this.fields.push(radioButton);
   this.radioButtons.push(radioButton);
+  this._initButton(radioButton);
+};
+
+scout.RadioButtonGroup.prototype._onButtonPropertyChange = function(event) {
+  if (event.propertyName === 'selected') {
+    var selected = event.newValue;
+    if (selected) {
+      this.selectButton(event.source);
+    } else if (event.source === this.selectedButton) {
+      this.selectButton(null);
+    }
+  }
 };

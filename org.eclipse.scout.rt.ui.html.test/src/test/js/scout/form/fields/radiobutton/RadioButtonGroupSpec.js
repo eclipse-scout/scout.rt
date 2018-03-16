@@ -43,7 +43,6 @@ describe("RadioButtonGroup", function() {
   });
 
   describe('label', function() {
-
     it('is linked with the buttons', function() {
       var group = helper.createRadioButtonGroup(session.desktop, 2);
       group.setLabel('label');
@@ -55,9 +54,7 @@ describe("RadioButtonGroup", function() {
       expect(group.radioButtons[1].$field.attr('aria-labelledby')).toBeTruthy();
       expect(group.radioButtons[1].$field.attr('aria-labelledby')).toBe(group.$label.attr('id') + ' ' + group.radioButtons[1].$buttonLabel.attr('id'));
     });
-
   });
-  
 
   describe('selectButton', function() {
     it('selects the new button and unselects the old one', function() {
@@ -125,6 +122,97 @@ describe("RadioButtonGroup", function() {
       expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[0]);
       expect(radioButtonGroup.radioButtons[0].isFocused()).toBe(true);
     });
-  });  
+
+    it('is called when setting the button directly', function() {
+      var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
+      radioButtonGroup.render();
+
+      radioButtonGroup.radioButtons[0].setSelected(true);
+      expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[0]);
+      expect(radioButtonGroup.radioButtons[0].selected).toBe(true);
+      expect(radioButtonGroup.radioButtons[1].selected).toBe(false);
+
+      radioButtonGroup.radioButtons[1].setSelected(true);
+      expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[1]);
+      expect(radioButtonGroup.radioButtons[0].selected).toBe(false);
+      expect(radioButtonGroup.radioButtons[1].selected).toBe(true);
+    });
+
+    it('triggers a property change event', function() {
+      var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
+      radioButtonGroup.render();
+      var triggeredEvent = null;
+      var eventCount = 0;
+      radioButtonGroup.on('propertyChange', function(event) {
+        if (event.propertyName === 'selectedButton') {
+          triggeredEvent = event;
+          eventCount++;
+        }
+      });
+      radioButtonGroup.radioButtons[0].setSelected(true);
+      expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[0]);
+      expect(radioButtonGroup.radioButtons[0].selected).toBe(true);
+      expect(radioButtonGroup.radioButtons[1].selected).toBe(false);
+      expect(triggeredEvent.newValue).toBe(radioButtonGroup.radioButtons[0]);
+      expect(eventCount).toBe(1);
+
+      radioButtonGroup.radioButtons[1].setSelected(true);
+      expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[1]);
+      expect(radioButtonGroup.radioButtons[0].selected).toBe(false);
+      expect(radioButtonGroup.radioButtons[1].selected).toBe(true);
+      expect(triggeredEvent.newValue).toBe(radioButtonGroup.radioButtons[1]);
+      expect(eventCount).toBe(2);
+    });
+
+    it('makes sure only one button is selected even if multiple buttons are selected during init', function() {
+      var radioButtonGroup = scout.create('RadioButtonGroup', {
+        parent: session.desktop,
+        fields: [
+          {
+            objectType: 'RadioButton',
+            selected: true
+          },
+          {
+            objectType: 'RadioButton',
+            selected: true
+          }
+        ]
+      });
+      // Only the second button should be selected
+      expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[1]);
+      expect(radioButtonGroup.radioButtons[0].selected).toBe(false);
+      expect(radioButtonGroup.radioButtons[1].selected).toBe(true);
+    });
+  });
+
+  describe('insertButton', function() {
+    it('inserts the button at the end', function() {
+      var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
+      expect(radioButtonGroup.fields.length).toBe(2);
+      expect(radioButtonGroup.radioButtons.length).toBe(2);
+
+      var button = scout.create('RadioButton', {
+        parent: radioButtonGroup,
+        selected: true
+      });
+      radioButtonGroup.insertButton(button);
+      expect(radioButtonGroup.fields.length).toBe(3);
+      expect(radioButtonGroup.fields[2]).toBe(button);
+      expect(radioButtonGroup.radioButtons.length).toBe(3);
+      expect(radioButtonGroup.radioButtons[2]).toBe(button);
+      expect(radioButtonGroup.selectedButton).toBe(button);
+
+      var button2 = scout.create('RadioButton', {
+        parent: radioButtonGroup,
+        selected: true
+      });
+      radioButtonGroup.insertButton(button2);
+      expect(radioButtonGroup.fields.length).toBe(4);
+      expect(radioButtonGroup.fields[3]).toBe(button2);
+      expect(radioButtonGroup.radioButtons.length).toBe(4);
+      expect(radioButtonGroup.radioButtons[3]).toBe(button2);
+      expect(radioButtonGroup.selectedButton).toBe(button2);
+    });
+  });
 
 });

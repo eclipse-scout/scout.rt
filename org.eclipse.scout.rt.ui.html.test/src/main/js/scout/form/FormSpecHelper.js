@@ -53,19 +53,16 @@ scout.FormSpecHelper.prototype.createGroupBoxWithFields = function(parent, numFi
 scout.FormSpecHelper.prototype.createRadioButtonGroup = function(parent, numRadioButtons) {
   parent = scout.nvl(parent, this.session.desktop);
   numRadioButtons = scout.nvl(numRadioButtons, 2);
-  var
-    fields = [],
-    radioButtonGroup = scout.create('RadioButtonGroup', {
-      parent: parent
-    });
-
+  var fields = [];
   for (var i = 0; i < numRadioButtons; i++) {
-    fields.push(scout.create('RadioButton', {
-      parent: radioButtonGroup
-    }));
+    fields.push({
+      objectType: 'RadioButton'
+    });
   }
-  radioButtonGroup.setProperty('fields', fields);
-  radioButtonGroup.setProperty('radioButtons', fields);
+  var radioButtonGroup = scout.create('RadioButtonGroup', {
+    parent: parent,
+    fields: fields
+  });
   return radioButtonGroup;
 };
 
