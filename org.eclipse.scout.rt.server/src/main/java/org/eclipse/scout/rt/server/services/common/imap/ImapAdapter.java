@@ -35,6 +35,12 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * <p>
+ * Not all operations of this class are thread-safe (e.g. there are operation which operate on cached folders open and
+ * close them).
+ * </p>
+ */
 public class ImapAdapter implements IImapAdapter {
 
   private static final Logger LOG = LoggerFactory.getLogger(ImapAdapter.class);
@@ -75,6 +81,7 @@ public class ImapAdapter implements IImapAdapter {
     return getUnseenMessages(getDefaultFolderName());
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Message[] getUnseenMessages(String folderName) {
     connect();
@@ -105,6 +112,7 @@ public class ImapAdapter implements IImapAdapter {
     return getAllMessages(getDefaultFolderName());
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Message[] getAllMessages(String folderName) {
     connect();
@@ -140,12 +148,11 @@ public class ImapAdapter implements IImapAdapter {
   protected void copyMessages(String destFolderName, Message[] messages, boolean deleteSourceMessages) {
     connect();
 
-    Folder destFolder = null;
-    try {
-      destFolder = findFolder(destFolderName);
+    try (Folder destFolder = findFolder(destFolderName)) {
       if (destFolder != null) {
         Map<Folder, Set<Message>> messagesBySourceFolder = groupMessagesBySourceFolder(messages);
         for (Entry<Folder, Set<Message>> entry : messagesBySourceFolder.entrySet()) {
+          @SuppressWarnings("resource") // reason: message is an input parameter of this method
           final Folder sourceFolder = entry.getKey();
           final Set<Message> messageSet = entry.getValue();
           Message[] messagesForSourceFolder = messageSet.toArray(new Message[messageSet.size()]);
@@ -220,6 +227,7 @@ public class ImapAdapter implements IImapAdapter {
   public void removeFolder(String folderName) {
     connect();
     try {
+      @SuppressWarnings("resource") // reason: folder is explicitly closed if it is open and deleted afterwards
       Folder folder = findFolder(folderName);
       if (folder != null && folder.exists()) {
         if (folder.isOpen()) {
@@ -291,6 +299,7 @@ public class ImapAdapter implements IImapAdapter {
     return findFolder(name, false);
   }
 
+  @SuppressWarnings("resource") // reason: folder is returned for further work, it must be open
   protected Folder findFolder(String name, boolean createNonExisting) {
     connect();
     Folder folder = m_cachedFolders.get(name);
@@ -318,6 +327,12 @@ public class ImapAdapter implements IImapAdapter {
       }
     }
     catch (MessagingException e) {
+      try {
+        folder.close();
+      }
+      catch (IllegalStateException | MessagingException e1) {
+        LOG.trace("Could not close folder", e1);
+      }
       throw new ProcessingException("could not open folder: " + name, e);
     }
     return folder;

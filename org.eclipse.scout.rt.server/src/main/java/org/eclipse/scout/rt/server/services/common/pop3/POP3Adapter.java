@@ -34,6 +34,12 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * <p>
+ * Not all operations of this class are thread-safe (e.g. there are operation which operate on cached folders open and
+ * close them).
+ * </p>
+ */
 public class POP3Adapter {
 
   public static final String TRASH_FOLDER_NAME = "Trash";
@@ -74,10 +80,8 @@ public class POP3Adapter {
   public String[] getUnseenMessageSubjects(String folderName) {
     connect();
     ArrayList<Message> messages = new ArrayList<>();
-    Folder folder = null;
     String[] subjects = null;
-    try {
-      folder = findFolder(folderName);
+    try (Folder folder = findFolder(folderName)) {
       if (folder != null) {
         if (!folder.isOpen()) {
           folder.open(Folder.READ_WRITE);
@@ -97,7 +101,6 @@ public class POP3Adapter {
         for (int i = 0; i < messages.size(); i++) {
           subjects[i] = messageArray[i].getSubject();
         }
-        folder.close(true);
       }
     }
     catch (MessagingException e) {
@@ -119,9 +122,7 @@ public class POP3Adapter {
 
   public void visitUnseenMessages(String folderName, IPOP3MessageVisitor visitor) {
     connect();
-    Folder folder = null;
-    try {
-      folder = findFolder(folderName);
+    try (Folder folder = findFolder(folderName)) {
       if (folder != null) {
         if (!folder.isOpen()) {
           folder.open(Folder.READ_WRITE);
@@ -136,7 +137,6 @@ public class POP3Adapter {
             }
           }
         }
-        folder.close(true);
       }
     }
     catch (MessagingException e) {
@@ -173,6 +173,7 @@ public class POP3Adapter {
     return findFolder(name, false);
   }
 
+  @SuppressWarnings("resource")
   protected Folder findFolder(String name, boolean createNonExisting) {
     connect();
     Folder folder = m_cachedFolders.get(name);

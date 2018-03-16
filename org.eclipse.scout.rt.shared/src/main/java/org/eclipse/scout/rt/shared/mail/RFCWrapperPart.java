@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.util.Enumeration;
 
 import javax.activation.DataHandler;
+import javax.mail.Header;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
@@ -42,7 +43,7 @@ public class RFCWrapperPart implements Part {
   }
 
   @Override
-  public Enumeration getAllHeaders() throws MessagingException {
+  public Enumeration<Header> getAllHeaders() throws MessagingException {
     return m_rfcPart.getAllHeaders();
   }
 
@@ -87,12 +88,12 @@ public class RFCWrapperPart implements Part {
   }
 
   @Override
-  public Enumeration getMatchingHeaders(String[] headerNames) throws MessagingException {
+  public Enumeration<Header> getMatchingHeaders(String[] headerNames) throws MessagingException {
     return m_rfcPart.getMatchingHeaders(headerNames);
   }
 
   @Override
-  public Enumeration getNonMatchingHeaders(String[] headerNames) throws MessagingException {
+  public Enumeration<Header> getNonMatchingHeaders(String[] headerNames) throws MessagingException {
     return m_rfcPart.getNonMatchingHeaders(headerNames);
   }
 

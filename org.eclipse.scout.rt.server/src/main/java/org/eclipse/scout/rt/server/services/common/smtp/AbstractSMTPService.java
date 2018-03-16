@@ -194,58 +194,46 @@ public abstract class AbstractSMTPService implements ISMTPService {
 
   @Override
   public void sendMessage(MimeMessage message, Session session) {
-    Transport transport = null;
     try {
       if (session == null) {
         session = createSession();
       }
-      transport = session.getTransport(getProtocol());
-      if (!StringUtility.isNullOrEmpty(getUsername())) {
-        transport.connect(getHost(), getUsername(), getPassword());
-      }
-      else {
-        transport.connect();
-      }
-      // subject prefix
-      String subjectPrefix = getSubjectPrefix();
-      if (!StringUtility.isNullOrEmpty(subjectPrefix)) {
-        String subject = subjectPrefix + ((message.getSubject() != null) ? (message.getSubject()) : (""));
-        message.setSubject(subject);
-      }
-
-      Address[] allRecipients = message.getAllRecipients();
-      // check debug receiver
-      String debugReceiverEmail = getDebugReceiverEmail();
-      if (debugReceiverEmail != null) {
-        allRecipients = new Address[]{BEANS.get(MailHelper.class).createInternetAddress(debugReceiverEmail)};
-        LOG.debug("SMTP Service: debug receiver email set to: {}", debugReceiverEmail);
-      }
-      // from address
-      Address[] fromAddresses = message.getFrom();
-      if (fromAddresses == null || fromAddresses.length == 0) {
-        String defaultFromEmail = getDefaultFromEmail();
-        if (!StringUtility.isNullOrEmpty(defaultFromEmail)) {
-          message.setFrom(BEANS.get(MailHelper.class).createInternetAddress(defaultFromEmail));
+      try (Transport transport = session.getTransport(getProtocol())) {
+        if (!StringUtility.isNullOrEmpty(getUsername())) {
+          transport.connect(getHost(), getUsername(), getPassword());
         }
-      }
-      if (allRecipients != null && allRecipients.length > 0) {
-        transport.sendMessage(message, allRecipients);
-        transport.close();
-        transport = null;
+        else {
+          transport.connect();
+        }
+        // subject prefix
+        String subjectPrefix = getSubjectPrefix();
+        if (!StringUtility.isNullOrEmpty(subjectPrefix)) {
+          String subject = subjectPrefix + ((message.getSubject() != null) ? (message.getSubject()) : (""));
+          message.setSubject(subject);
+        }
+
+        Address[] allRecipients = message.getAllRecipients();
+        // check debug receiver
+        String debugReceiverEmail = getDebugReceiverEmail();
+        if (debugReceiverEmail != null) {
+          allRecipients = new Address[]{BEANS.get(MailHelper.class).createInternetAddress(debugReceiverEmail)};
+          LOG.debug("SMTP Service: debug receiver email set to: {}", debugReceiverEmail);
+        }
+        // from address
+        Address[] fromAddresses = message.getFrom();
+        if (fromAddresses == null || fromAddresses.length == 0) {
+          String defaultFromEmail = getDefaultFromEmail();
+          if (!StringUtility.isNullOrEmpty(defaultFromEmail)) {
+            message.setFrom(BEANS.get(MailHelper.class).createInternetAddress(defaultFromEmail));
+          }
+        }
+        if (allRecipients != null && allRecipients.length > 0) {
+          transport.sendMessage(message, allRecipients);
+        }
       }
     }
     catch (Exception e) {
       throw new ProcessingException("cannot send Mime Message.", e);
-    }
-    finally {
-      try {
-        if (transport != null) {
-          transport.close();
-        }
-      }
-      catch (Exception e) {
-        LOG.warn("Could not close transport", e);
-      }
     }
   }
 
