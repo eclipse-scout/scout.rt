@@ -521,6 +521,7 @@
   __include("scout/tile/fields/FormFieldTile.js");
   __include("scout/tile/fields/FormFieldTileAdapter.js");
   __include("scout/tile/fields/button/TileButton.js");
+  __include("scout/tile/fields/tablefield/TileTableField.js");
   // Desktop
   __include("scout/desktop/Desktop.js");
   __include("scout/desktop/DesktopAdapter.js");

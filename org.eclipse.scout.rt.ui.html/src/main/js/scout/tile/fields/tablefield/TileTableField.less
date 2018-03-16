@@ -1,0 +1,158 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the BSI CRM Software License v1.0
+ * which accompanies this distribution as bsi-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+.tile.table-field {
+
+  /* adjust menu bar when visible */
+  &.has-menubar {
+    padding-bottom: 10px;
+
+    & > .table > .menubar {
+      &.bottom {
+        padding-top: 8px;
+      }
+    }
+  }
+
+  & > .table {
+    border: 0; /* see .table-row definition below */
+    border-radius: 0;
+    background-color: transparent;
+
+    &:focus,
+    &.focused {
+      box-shadow: none;
+    }
+
+    & > .table-header {
+      background-color: transparent;
+      border-bottom-width: 2px;
+
+      & > .table-header-item > .table-header-item-state {
+        display: none;
+      }
+
+      & > .table-header-resize {
+        display: none;
+      }
+
+      /* show separator on mouseover only */
+      &:hover > .table-header-resize {
+        display: inline-block;
+      }
+    }
+
+    &.header-invisible > .table-data {
+      /* override negative margin top, otherwise selection border of first row would be cut off */
+      margin-top: 0;
+    }
+
+    /* No selection color for non-focused table tiles */
+    &:not(:focus):not(.focused) > .table-data > .table-row {
+      background-color: transparent;
+      border-top-color: transparent;
+    }
+
+    /* Draw left and right selection border (because tile tables have on border) */
+    & > .table-data > .table-row {
+      /* Do not use transparent left/right border, because otherwise the corners would not look good. */
+      /* Instead, a padding is used, which is replaced by a border in the selected state. */
+      padding-left: 1px;
+      padding-right: 1px;
+
+      &.selected {
+        border-left-width: 1px;
+        border-right-width: 1px;
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
+
+    & > .menubar {
+      background-color: transparent;
+
+      &.bottom {
+        border-top-width: 2px;
+      }
+    }
+  }
+
+  &:not(.label-hidden) > .table > .table-header {
+
+    & > .table-header-resize {
+      padding-top: 0;
+    }
+
+    & > .table-header-item {
+      padding-top: 0;
+    }
+  }
+
+  &.inverted > .table {
+
+    &:focus,
+    &.focused {
+
+      & > .table-data > .table-row.selected {
+        background-color: @tile-table-default-inverted-selection-background-color;
+        border-color: @tile-table-default-inverted-selection-border-color;
+      }
+    }
+
+    & > .table-header > .table-header-item,
+    & > .table-data > .table-row > .table-cell {
+      color: @tile-default-inverted-color;
+
+      & > .font-icon {
+        color: @tile-default-inverted-color;
+      }
+    }
+
+    & > .menubar > .menubox > .menu-item {
+      color: @tile-default-inverted-color;
+    }
+  }
+
+  &.color-alternative > .table {
+
+    &:focus,
+    &.focused {
+
+      & > .table-data > .table-row.selected {
+        background-color: @tile-table-alternative-selection-background-color;
+        border-color: @tile-table-alternative-selection-border-color;
+      }
+    }
+  }
+
+  &.color-alternative.inverted > .table {
+
+    &:focus,
+    &.focused {
+
+      & > .table-data > .table-row.selected {
+        background-color: @tile-table-alternative-inverted-selection-background-color;
+        border-color: @tile-table-alternative-inverted-selection-border-color;
+      }
+    }
+
+    & > .table-header > .table-header-item,
+    & > .table-data > .table-row > .table-cell {
+      color: @tile-alternative-inverted-color;
+
+      & > .font-icon {
+        color: @tile-alternative-inverted-color;
+      }
+    }
+
+    & > .menubar > .menubox > .menu-item {
+      color: @tile-alternative-inverted-color;
+    }
+  }
+}
