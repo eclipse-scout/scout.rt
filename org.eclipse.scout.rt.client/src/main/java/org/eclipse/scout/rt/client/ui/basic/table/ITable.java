@@ -821,8 +821,6 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
    */
   List<ITableRow> resolveRows(Collection<? extends ITableRow> rows);
 
-  void tablePopulated();
-
   void sort();
 
   void sort(List<? extends ITableRow> rowsInNewOrder);

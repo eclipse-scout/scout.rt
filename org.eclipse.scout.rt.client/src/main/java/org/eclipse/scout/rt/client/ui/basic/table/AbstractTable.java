@@ -3732,16 +3732,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   @Override
-  public void tablePopulated() {
-    if (getEventBuffer().isEmpty()) {
-      synchronized (m_cachedFilteredRowsLock) {
-        m_cachedFilteredRows = null;
-      }
-      fireTableEventInternal(new TableEvent(this, TableEvent.TYPE_TABLE_POPULATED, null));
-    }
-  }
-
-  @Override
   public ITableRow resolveRow(ITableRow row) {
     if (row == null) {
       return null;

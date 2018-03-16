@@ -376,14 +376,14 @@ public class TableEventBufferTest {
   }
 
   @Test
-  public void testPopulatedFollowedByDeleteNotRemoved() {
-    final TableEvent update = new TableEvent(mock(ITable.class), TableEvent.TYPE_TABLE_POPULATED, mockRows(0));
+  public void testScrollToSelectionFollowedByDeleteNotRemoved() {
+    final TableEvent update = new TableEvent(mock(ITable.class), TableEvent.TYPE_SCROLL_TO_SELECTION, mockRows(0));
     final TableEvent delete = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_DELETED, mockRows(0));
     m_testBuffer.add(update);
     m_testBuffer.add(delete);
     final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(2, events.size());
-    assertEquals(TableEvent.TYPE_TABLE_POPULATED, events.get(0).getType());
+    assertEquals(TableEvent.TYPE_SCROLL_TO_SELECTION, events.get(0).getType());
     assertEquals(TableEvent.TYPE_ROWS_DELETED, events.get(1).getType());
   }
 
@@ -418,13 +418,13 @@ public class TableEventBufferTest {
   @Test
   public void testCoalesceIdenticalEvents() {
     List<ITableRow> mockRows = mockRows(0, 1, 2, 3, 4);
-    final TableEvent event1 = new TableEvent(mock(ITable.class), TableEvent.TYPE_TABLE_POPULATED, mockRows);
-    final TableEvent event2 = new TableEvent(mock(ITable.class), TableEvent.TYPE_TABLE_POPULATED, mockRows);
+    final TableEvent event1 = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_SELECTED, mockRows);
+    final TableEvent event2 = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_SELECTED, mockRows);
     m_testBuffer.add(event1);
     m_testBuffer.add(event2);
     final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(1, events.size());
-    assertEquals(TableEvent.TYPE_TABLE_POPULATED, events.get(0).getType());
+    assertEquals(TableEvent.TYPE_ROWS_SELECTED, events.get(0).getType());
     assertEquals(5, events.get(0).getRowCount());
   }
 

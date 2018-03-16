@@ -136,8 +136,6 @@ public class TableEvent extends EventObject implements IModelEvent {
    */
   public static final int TYPE_ROW_CLICK = 810;
 
-  public static final int TYPE_TABLE_POPULATED = 820;
-
   /**
    * Advise to scroll to selection
    */
