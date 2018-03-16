@@ -73,6 +73,9 @@ scout.SplitBox.prototype._render = function() {
         .addClass('second-field')
         .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis');
       this.secondField.on('propertyChange', onInnerFieldPropertyChange.bind(this));
+    } else {
+      // no second field -> no splitter (but special marker class)
+      this.$container.addClass('single-field');
     }
   }
 
