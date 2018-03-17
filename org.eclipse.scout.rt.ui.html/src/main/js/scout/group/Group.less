@@ -5,6 +5,7 @@
 .group-header {
    position: relative;
    display: flex;
+   align-items: center;
    width: 100%;
    padding: 10px 0;
    border-top: 1px solid @border-color;
@@ -27,19 +28,20 @@
   }
 }
 
+.group-icon.with-title {
+  margin-right: 8px;
+}
+
 .group-collapse-icon {
   width: 30px;
   text-align: right;
-  position: relative;
+  /* Set to same height as before element to prevent header from getting larger */
+  height: @font-size-large;
 
   &::before {
     #scout.font-icon();
     content: @icon-angle-down;
     font-size: @font-size-large;
-    /* Position absolute to prevent cell getting larger */
-    position: absolute;
-    right: 5px;
-    top: 0;
   }
 
   &.collapsed::before {

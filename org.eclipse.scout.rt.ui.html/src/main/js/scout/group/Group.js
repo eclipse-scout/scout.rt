@@ -23,6 +23,8 @@ scout.Group = function() {
   this.htmlComp = null;
   this.htmlHeader = null;
   this.htmlBody = null;
+  this.iconId = null;
+  this.icon = null;
   this._addWidgetProperties(['body']);
 };
 scout.inherits(scout.Group, scout.Widget);
@@ -73,6 +75,7 @@ scout.Group.prototype._render = function() {
 
 scout.Group.prototype._renderProperties = function() {
   scout.Group.parent.prototype._renderProperties.call(this);
+  this._renderIconId();
   this._renderTitle();
   this._renderTitleSuffix();
   this._renderHeaderVisible();
@@ -84,6 +87,7 @@ scout.Group.prototype._remove = function() {
   this.$title = null;
   this.$titleSuffix = null;
   this.$collapseIcon = null;
+  this._removeIconId();
   scout.Group.parent.prototype._remove.call(this);
 };
 
@@ -93,12 +97,64 @@ scout.Group.prototype._renderEnabled = function() {
   this.$header.setTabbable(this.enabled);
 };
 
+scout.Group.prototype.setIconId = function(iconId) {
+  this.setProperty('iconId', iconId);
+};
+
+/**
+ * Adds an image or font-based icon to the group header by adding either an IMG or SPAN element.
+ */
+scout.Group.prototype._renderIconId = function() {
+  var iconId = this.iconId || '';
+  // If the icon is an image (and not a font icon), the scout.Icon class will invalidate the layout when the image has loaded
+  if (!iconId) {
+    this._removeIconId();
+    this._updateIconStyle();
+    return;
+  }
+  if (this.icon) {
+    this.icon.setIconDesc(iconId);
+    this._updateIconStyle();
+    return;
+  }
+  this.icon = scout.create('Icon', {
+    parent: this,
+    iconDesc: iconId,
+    prepend: true
+  });
+  this.icon.one('destroy', function() {
+    this.icon = null;
+  }.bind(this));
+  this.icon.render(this.$header);
+  this._updateIconStyle();
+};
+
+scout.Group.prototype._updateIconStyle = function() {
+  var hasTitle = !!this.title;
+  this.get$Icon().toggleClass('with-title', hasTitle);
+  this.get$Icon().addClass('group-icon');
+};
+
+scout.Group.prototype.get$Icon = function() {
+  if (this.icon) {
+    return this.icon.$container;
+  }
+  return $();
+};
+
+scout.Group.prototype._removeIconId = function() {
+  if (this.icon) {
+    this.icon.destroy();
+  }
+};
+
 scout.Group.prototype.setTitle = function(title) {
   this.setProperty('title', title);
 };
 
 scout.Group.prototype._renderTitle = function() {
   this.$title.textOrNbsp(this.title);
+  this._updateIconStyle();
 };
 
 scout.Group.prototype.setTitleSuffix = function(titleSuffix) {

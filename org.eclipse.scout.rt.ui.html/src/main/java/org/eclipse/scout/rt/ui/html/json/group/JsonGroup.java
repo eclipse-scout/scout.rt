@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
 public class JsonGroup<T extends IGroup> extends AbstractJsonWidget<T> {
@@ -61,6 +62,17 @@ public class JsonGroup<T extends IGroup> extends AbstractJsonWidget<T> {
       @Override
       protected IWidget modelValue() {
         return getModel().getBody();
+      }
+    });
+    putJsonProperty(new JsonProperty<T>(IGroup.PROP_ICON_ID, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getIconId();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return BinaryResourceUrlUtility.createIconUrl((String) value);
       }
     });
   }

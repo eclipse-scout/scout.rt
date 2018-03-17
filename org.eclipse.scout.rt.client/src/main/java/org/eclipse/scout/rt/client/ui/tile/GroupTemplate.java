@@ -22,6 +22,7 @@ public class GroupTemplate {
 
   private String m_title;
   private Object m_groupId;
+  private String m_iconId;
   private boolean m_collapsed;
   private String m_cssClass;
   private boolean m_headerVisible = true;
@@ -39,6 +40,10 @@ public class GroupTemplate {
     return m_groupId;
   }
 
+  public String getIconId() {
+    return m_iconId;
+  }
+
   public boolean isCollapsed() {
     return m_collapsed;
   }
@@ -49,6 +54,11 @@ public class GroupTemplate {
 
   public boolean isHeaderVisible() {
     return m_headerVisible;
+  }
+
+  public GroupTemplate withIconId(String iconId) {
+    m_iconId = iconId;
+    return this;
   }
 
   public GroupTemplate withCollapsed(boolean collapsed) {

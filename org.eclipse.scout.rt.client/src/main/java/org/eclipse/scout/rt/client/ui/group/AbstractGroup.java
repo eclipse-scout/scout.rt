@@ -272,6 +272,16 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
   }
 
   @Override
+  public String getIconId() {
+    return propertySupport.getPropertyString(PROP_ICON_ID);
+  }
+
+  @Override
+  public void setIconId(String iconId) {
+    propertySupport.setPropertyString(PROP_ICON_ID, iconId);
+  }
+
+  @Override
   public String classId() {
     String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), true);
     return getContainer().classId() + ID_CONCAT_SYMBOL + simpleClassId;

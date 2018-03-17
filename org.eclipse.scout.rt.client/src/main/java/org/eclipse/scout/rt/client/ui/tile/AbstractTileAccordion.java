@@ -307,6 +307,7 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
   protected void adaptGroup(IGroup group, GroupTemplate template) {
     group.setTitle(template.getTitle());
     group.setGroupId(template.getGroupId());
+    group.setIconId(template.getIconId());
     group.setCssClass(template.getCssClass());
     group.setCollapsed(template.isCollapsed());
     group.setHeaderVisible(template.isHeaderVisible());

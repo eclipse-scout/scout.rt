@@ -107,7 +107,6 @@ scout.Action.prototype.setIconId = function(iconId) {
 scout.Action.prototype._renderIconId = function() {
   var iconId = this.iconId || '';
   // If the icon is an image (and not a font icon), the scout.Icon class will invalidate the layout when the image has loaded
-  // This may not work for every container using the action (.e.g. MenuBar), so it may be disabled
   if (!iconId) {
     this._removeIconId();
     return;
@@ -131,7 +130,7 @@ scout.Action.prototype.get$Icon = function() {
   if (this.icon) {
     return this.icon.$container;
   }
-  return this.$container.data('$icon');
+  return $();
 };
 
 scout.Action.prototype._removeIconId = function() {

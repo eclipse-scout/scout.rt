@@ -25,6 +25,7 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
   String PROP_BODY = "body";
   String PROP_GROUP_ID = "groupId";
   String PROP_TITLE_SUFFIX = "titleSuffix";
+  String PROP_ICON_ID = "iconId";
 
   ITypeWithClassId getContainer();
 
@@ -57,4 +58,8 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
   Object getGroupId();
 
   void setGroupId(Object groupId);
+
+  String getIconId();
+
+  void setIconId(String iconId);
 }
