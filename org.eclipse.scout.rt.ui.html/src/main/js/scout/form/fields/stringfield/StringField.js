@@ -36,6 +36,15 @@ scout.StringField.Format = {
 scout.StringField.TRIM_REGEXP = new RegExp('^(\\s*)(.*?)(\\s*)$');
 
 /**
+ * Resolves the text key if value contains one.
+ * This cannot be done in _init because the value field would call _setValue first
+ */
+scout.StringField.prototype._initValue = function(value) {
+  value = scout.texts.resolveText(value, this.session.locale.languageTag);
+  scout.StringField.parent.prototype._initValue.call(this, value);
+};
+
+/**
  * @override ModelAdapter.js
  */
 scout.StringField.prototype._initKeyStrokeContext = function() {

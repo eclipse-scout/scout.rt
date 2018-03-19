@@ -16,6 +16,15 @@ scout.LabelField = function() {
 };
 scout.inherits(scout.LabelField, scout.ValueField);
 
+/**
+ * Resolves the text key if value contains one.
+ * This cannot be done in _init because the value field would call _setValue first
+ */
+scout.LabelField.prototype._initValue = function(value) {
+  value = scout.texts.resolveText(value, this.session.locale.languageTag);
+  scout.LabelField.parent.prototype._initValue.call(this, value);
+};
+
 scout.LabelField.prototype._render = function() {
   this.addContainer(this.$parent, 'label-field');
   this.addLabel();
@@ -29,6 +38,15 @@ scout.LabelField.prototype._renderProperties = function() {
   // TODO [7.0] cgu: render selectable
 };
 
+scout.LabelField.prototype.setHtmlEnabled = function(htmlEnabled) {
+  this.setProperty('htmlEnabled', htmlEnabled);
+};
+
+scout.LabelField.prototype._renderHtmlEnabled = function() {
+  // Render the display text again when html enabled changes dynamically
+  this._renderDisplayText();
+};
+
 /**
  * @override
  */
@@ -39,6 +57,10 @@ scout.LabelField.prototype._renderDisplayText = function() {
   } else {
     this.$field.html(scout.strings.nl2br(displayText));
   }
+};
+
+scout.LabelField.prototype.setWrapText = function(wrapText) {
+  this.setProperty('wrapText', wrapText);
 };
 
 scout.LabelField.prototype._renderWrapText = function() {
