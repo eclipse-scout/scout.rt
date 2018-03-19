@@ -36,7 +36,7 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
 
     installContextResolver(clientBuilder);
     installRequestFilters(clientBuilder);
-    installAuthenticationFeature(clientBuilder);
+    installFeatures(clientBuilder);
 
     Client client = clientBuilder.build();
     return client;
@@ -84,12 +84,12 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
   }
 
   protected void installRequestFilters(ClientBuilder clientBuilder) {
-    for (IRestRequestFilter filter : BEANS.all(IRestRequestFilter.class)) {
+    for (IGlobalRestRequestFilter filter : BEANS.all(IGlobalRestRequestFilter.class)) {
       clientBuilder.register(filter);
     }
   }
 
-  protected void installAuthenticationFeature(ClientBuilder clientBuilder) {
+  protected void installFeatures(ClientBuilder clientBuilder) {
     // NOP
   }
 
