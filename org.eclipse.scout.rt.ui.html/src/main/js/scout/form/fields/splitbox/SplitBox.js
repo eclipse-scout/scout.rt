@@ -574,11 +574,12 @@ scout.SplitBox.prototype.newSplitterPosition = function(newSplitterPosition, upd
     this.trigger('positionChange', {
       position: newSplitterPosition
     });
+
+    if (updateFieldMinimizedState) {
+      this._updateFieldMinimized();
+    }
   }
 
-  if (updateFieldMinimizedState) {
-    this._updateFieldMinimized();
-  }
   this._updateCollapseHandleButtons();
 
   // Mark layout as invalid
