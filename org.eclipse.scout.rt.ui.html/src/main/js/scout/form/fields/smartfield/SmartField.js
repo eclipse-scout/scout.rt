@@ -184,7 +184,7 @@ scout.SmartField.prototype.acceptInput = function() {
 
   // in case the user has typed something after he has selected a lookup row
   // --> ignore the selection.
-  if (searchTextChanged) {
+  if (this._checkResetLookupRow(searchTextChanged)) {
     selectedLookupRow = null;
   }
 
@@ -197,6 +197,10 @@ scout.SmartField.prototype.acceptInput = function() {
   }
 
   return this._acceptInput(searchText, searchTextEmpty, searchTextChanged, selectedLookupRow);
+};
+
+scout.SmartField.prototype._checkResetLookupRow = function(searchTextChanged) {
+  return searchTextChanged;
 };
 
 scout.SmartField.prototype._checkSearchTextChanged = function(searchText) {
