@@ -151,7 +151,7 @@ public final class ObjectUtility {
    * <li>Use {@link Objects#toString(Object)} if a a null value should be returned as string "null"
    * </ul>
    *
-   * @return {@code value.toString()} if {@code value} is not {@code null}, else returns {@code null} Objects.()
+   * @return {@code value.toString()} if {@code value} is not {@code null}, else {@code null}.
    */
   public static String toString(Object value) {
     return Objects.toString(value, null);
