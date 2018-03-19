@@ -2414,8 +2414,13 @@ scout.Table.prototype._rebuildTreeStructure = function() {
       expandedRows.push(row);
     }
   }, this);
-  this.setExpandedRows(expandedRows);
+  // rebuild minimal sort
+  this.rows = [];
+  this.visitRowsDeptFirst(function(row){
+    this.rows.push(row);
+  }.bind(this));
 
+  this.setExpandedRows(expandedRows);
 };
 
 scout.Table.prototype.updateRowOrder = function(rows) {
