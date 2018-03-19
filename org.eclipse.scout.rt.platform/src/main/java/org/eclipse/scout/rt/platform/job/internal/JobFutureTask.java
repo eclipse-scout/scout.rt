@@ -31,6 +31,8 @@ import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain.Chain;
+import org.eclipse.scout.rt.platform.chain.callable.ICallableInterceptor;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
@@ -92,9 +94,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected volatile Thread m_runner;
 
   public JobFutureTask(final JobManager jobManager, final RunMonitor runMonitor, final JobInput input, final CallableChain<RESULT> callableChain, final Callable<RESULT> callable) {
-    super(() -> {
-      return callableChain.call(callable); // Run all processors as contained in the chain before invoking the Callable.
-    });
+    super(() -> callableChain.call(callable) /* run all processors as contained in the chain before invoking the callable */ );
 
     m_jobManager = jobManager;
     m_runMonitor = runMonitor;
@@ -110,6 +110,21 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
     // Contribute to the CallableChain
     m_jobManager.interceptCallableChain(m_callableChain, this, m_runMonitor, m_input);
+    m_callableChain.addLast(new ICallableInterceptor<RESULT>() {
+
+      @Override
+      public RESULT intercept(Chain<RESULT> chain) throws Exception {
+        // do not run task if run monitor is cancelled, return null as FutureTask must have been cancelled as well
+        // (JobFutureTask is registered as a child of the run monitor), IFuture.awaitDoneAndGet will throw a FutureCancelledError
+        return null;
+      }
+
+      @Override
+      public boolean isEnabled() {
+        // intercept chain if run monitor is cancelled
+        return m_runMonitor.isCancelled();
+      }
+    });
     m_callableChain.addLast(() -> {
       changeState(JobState.RUNNING);
       return null;

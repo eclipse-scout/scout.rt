@@ -10,12 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,6 +29,7 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -42,6 +37,13 @@ import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.quartz.SimpleScheduleBuilder;
+
+import static org.mockito.Mockito.mock;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @RunWith(PlatformTestRunner.class)
 public class JobCancelTest {
@@ -601,6 +603,36 @@ public class JobCancelTest {
     future.awaitDone();
     assertFalse(executed.get());
     assertTrue(future.isCancelled());
+  }
+
+  /**
+   * Tests that a job is not run if the RunMonitor is already cancelled.
+   */
+  @Test(timeout = 60000, expected = FutureCancelledError.class)
+  public void testCancelParentRunContextPriorSchedulingJob() {
+    RunContext parentRunContext = RunContexts.copyCurrent();
+
+    // 1. Cancel the RunMonitor
+    parentRunContext.getRunMonitor().cancel(false);
+
+    RunContext runContext = RunContexts.copyCurrent()
+        .withParentRunMonitor(parentRunContext.getRunMonitor());
+
+    // 2. Schedule the job (should never)
+    final AtomicBoolean executed = new AtomicBoolean(false);
+    IFuture<Void> future = Jobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        executed.set(true);
+      }
+    }, Jobs.newInput().withRunContext(runContext));
+
+    future.awaitFinished(1, TimeUnit.MINUTES);
+    assertFalse(executed.get());
+    assertTrue(future.isCancelled());
+
+    future.awaitDoneAndGet(); // exception expected
   }
 
   @Test
