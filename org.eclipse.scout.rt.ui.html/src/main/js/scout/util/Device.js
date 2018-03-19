@@ -202,10 +202,10 @@ scout.Device.prototype.isSupportedBrowser = function(browser, version) {
   browser = scout.nvl(browser, this.browser);
   version = scout.nvl(version, this.browserVersion);
   var browsers = scout.Device.Browser;
-  if ((browser === browsers.INTERNET_EXPLORER && version < 9) ||
-    (browser === browsers.CHROME && version < 23) ||
-    (browser === browsers.FIREFOX && version < 21) ||
-    (browser === browsers.SAFARI && version < 7)) {
+  if ((browser === browsers.INTERNET_EXPLORER && version < 11) ||
+    (browser === browsers.CHROME && version < 40) ||
+    (browser === browsers.FIREFOX && version < 35) ||
+    (browser === browsers.SAFARI && version < 8)) {
     return false;
   }
   return true;
