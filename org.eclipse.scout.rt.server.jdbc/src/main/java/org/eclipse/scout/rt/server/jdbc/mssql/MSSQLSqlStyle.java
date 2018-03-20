@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.jdbc.mssql;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import org.eclipse.scout.rt.server.jdbc.style.AbstractSqlStyle;
 
@@ -63,6 +64,8 @@ public class MSSQLSqlStyle extends AbstractSqlStyle {
 
   @Override
   public void testConnection(Connection conn) throws SQLException {
-    //TODO [7.0] imo: what is the name of a dummy table or typical check statement to run as a test?
+    try (Statement testStatement = conn.createStatement()) {
+      testStatement.execute("SELECT 1");
+    }
   }
 }
