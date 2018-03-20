@@ -2416,7 +2416,7 @@ scout.Table.prototype._rebuildTreeStructure = function() {
   }, this);
   // rebuild minimal sort
   this.rows = [];
-  this.visitRowsDeptFirst(function(row){
+  this.visitRows(function(row) {
     this.rows.push(row);
   }.bind(this));
 
