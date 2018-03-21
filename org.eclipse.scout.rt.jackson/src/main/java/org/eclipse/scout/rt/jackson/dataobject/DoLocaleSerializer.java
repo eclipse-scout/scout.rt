@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import java.io.IOException;
 import java.util.Locale;
 
-import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
@@ -23,7 +21,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
  * Custom serializer for {@link Locale} using {@link Locale#toLanguageTag()} instead of {@link Locale#toString()}
  * default Jackson behavior.
  * <p>
- * TODO [8.x] pbz: Remove this class when Jackson issue 1600 is fixed
+ * TODO [8.x] pbz: Remove this class when Jackson is upgraded to 3.0 (issue 1600)
  *
  * @see https://github.com/FasterXML/jackson-databind/issues/1600
  */
@@ -41,11 +39,8 @@ public class DoLocaleSerializer extends ToStringSerializer {
 
   @Override
   public void serialize(Object value, JsonGenerator gen, SerializerProvider provider) throws IOException {
-    if (gen.getCurrentValue() instanceof IDoEntity) {
-      gen.writeString(Locale.class.cast(value).toLanguageTag());
-    }
-    else {
-      super.serialize(value, gen, provider);
-    }
+    // No restriction on if current value is instance of IDoEntity because otherwise Locales used as value in a Map aren't correctly serialized.
+    // Issue 1600 is fixed in 3.0, we enforce this behavior for Scout already.
+    gen.writeString(Locale.class.cast(value).toLanguageTag());
   }
 }

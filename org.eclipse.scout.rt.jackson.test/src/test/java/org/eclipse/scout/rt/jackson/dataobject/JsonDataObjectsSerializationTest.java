@@ -338,8 +338,9 @@ public class JsonDataObjectsSerializationTest {
   @Test
   public void testSerializeDeserialize_Locale() throws Exception {
     String jsonPlainLocale = s_dataObjectMapper.writeValueAsString(Locale.GERMANY);
-    // Locale not wrapped within DoEntity structure is serialized by default Jackson behavior, could change when Issue 1600 is fixed, see https://github.com/FasterXML/jackson-databind/issues/1600
-    assertEquals("\"de_DE\"", jsonPlainLocale);
+    // All locales (whether wrapped within DoEntity structure or not) are serialized by custom Scout behavior, as they will when Jackson is upgraded to 3.0.
+    // Issue 1600 (https://github.com/FasterXML/jackson-databind/issues/1600)
+    assertEquals("\"de-DE\"", jsonPlainLocale);
 
     DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("locale", Locale.GERMANY);
@@ -992,6 +993,15 @@ public class JsonDataObjectsSerializationTest {
     dateUUIDMap.put(DATE, UUID_1);
     dateUUIDMap.put(DATE_TRUNCATED, UUID_2);
     mapDo.withDateUUIDMapAttribute(dateUUIDMap);
+
+    Locale deCh = new Locale("de", "CH");
+    Locale enUs = new Locale("en", "US");
+    Locale frCh = new Locale("fr", "CH");
+    Locale en = new Locale("en");
+    Map<Locale, Locale> localeLocaleMap = new LinkedHashMap<>();
+    localeLocaleMap.put(deCh, frCh);
+    localeLocaleMap.put(enUs, en);
+    mapDo.withLocaleLocaleMapAttribute(localeLocaleMap);
 
     String json = s_dataObjectMapper.writeValueAsString(mapDo);
     assertJsonEquals("TestMapDo.json", json);

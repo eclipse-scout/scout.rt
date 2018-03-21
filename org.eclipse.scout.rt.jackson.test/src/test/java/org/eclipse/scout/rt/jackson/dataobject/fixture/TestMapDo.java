@@ -5,6 +5,7 @@
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -39,6 +40,10 @@ public class TestMapDo extends DoEntity {
 
   public DoValue<Map<Date, UUID>> dateUUIDMapAttribute() {
     return doValue("dateUUIDMapAttribute");
+  }
+
+  public DoValue<Map<Locale, Locale>> localeLocaleMapAttribute() {
+    return doValue("localeLocaleMapAttribute");
   }
 
   /* **************************************************************************
@@ -109,5 +114,16 @@ public class TestMapDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public Map<Date, UUID> getDateUUIDMapAttribute() {
     return dateUUIDMapAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestMapDo withLocaleLocaleMapAttribute(Map<Locale, Locale> localeLocaleMapAttribute) {
+    localeLocaleMapAttribute().set(localeLocaleMapAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Map<Locale, Locale> getLocaleLocaleMapAttribute() {
+    return localeLocaleMapAttribute().get();
   }
 }

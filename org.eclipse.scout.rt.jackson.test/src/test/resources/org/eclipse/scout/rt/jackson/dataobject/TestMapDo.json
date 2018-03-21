@@ -20,6 +20,10 @@
     "1" : 42,
     "2" : 21
   },
+  "localeLocaleMapAttribute" : {
+    "de-CH" : "fr-CH",
+    "en-US" : "en"
+  },
   "stringDoTestItemMapAttribute" : {
     "doKey1" : {
       "_type" : "TestItem",
