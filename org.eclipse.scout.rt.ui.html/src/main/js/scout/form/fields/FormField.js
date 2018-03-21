@@ -380,6 +380,10 @@ scout.FormField.prototype._renderStatusVisible = function() {
   }
 };
 
+scout.FormField.prototype.setStatusPosition = function(statusPosition) {
+  this.setProperty('statusPosition', statusPosition);
+};
+
 scout.FormField.prototype._renderStatusPosition = function() {
   if (this.$status) {
     this.$status.toggleClass('top', this.statusPosition === scout.FormField.StatusPosition.TOP);

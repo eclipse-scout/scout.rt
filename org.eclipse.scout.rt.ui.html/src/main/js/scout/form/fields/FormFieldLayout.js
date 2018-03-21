@@ -72,13 +72,16 @@ scout.FormFieldLayout.prototype.layout = function($container) {
       .cssWidth(statusWidth);
     // If both status and label position is "top", pull status up (without margin on the right side)
     if (formField.statusPosition === scout.FormField.StatusPosition.TOP && labelHasFieldWidth) {
-      var statusHeight = scout.graphics.prefSize(formField.$status).height;
+      var statusHeight = scout.graphics.prefSize(formField.$status, {
+        useCssSize: true
+      }).height;
       // Vertically center status with label
       var statusTop = containerPadding.top + formField.$label.cssPaddingTop() + (formField.$label.height() / 2) - (statusHeight / 2);
       formField.$status
         .cssTop(statusTop)
         .cssRight(right + formField.$label.cssMarginRight())
-        .cssHeight(statusHeight);
+        .cssHeight(statusHeight)
+        .cssLineHeight(null);
       // Add padding to label to prevent overlay of text and status icon
       var w = scout.graphics.size(formField.$status, true).width;
       formField.$label.cssPaddingRight(w);
