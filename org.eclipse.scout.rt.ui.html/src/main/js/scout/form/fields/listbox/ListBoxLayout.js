@@ -76,7 +76,6 @@ scout.ListBoxLayout.prototype.preferredLayoutSize = function($container) {
   height = Math.max(height, prefSizeTable.height + prefSizeFilterBox.height);
 
   return new scout.Dimension(width, height);
-
 };
 
 scout.ListBoxLayout.prototype.naturalSize = function(formField) {

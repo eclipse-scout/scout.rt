@@ -76,7 +76,6 @@ scout.TreeBoxLayout.prototype.preferredLayoutSize = function($container) {
   height = Math.max(height, prefSizeTree.height + prefSizeFilterBox.height);
 
   return new scout.Dimension(width, height);
-
 };
 
 scout.TreeBoxLayout.prototype.naturalSize = function(formField) {

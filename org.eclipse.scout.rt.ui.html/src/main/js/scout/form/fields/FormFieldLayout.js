@@ -53,7 +53,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     }
     if (scout.isOneOf(formField.labelPosition, scout.FormField.LabelPosition.DEFAULT, scout.FormField.LabelPosition.LEFT)) {
       scout.graphics.setBounds(formField.$label, left, top, labelWidth, this.rowHeight);
-      left += labelWidth;
+      left += labelWidth + formField.$label.cssMarginX();
     } else if (formField.labelPosition === scout.FormField.LabelPosition.TOP) {
       formField.$label.cssHeight(this.rowHeight);
       top += formField.$label.outerHeight(true);
@@ -200,56 +200,102 @@ scout.FormFieldLayout.prototype._isStatusVisible = function() {
   return this.formField.$status && (this.formField.statusVisible || this.formField.$status.isVisible());
 };
 
-scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
-  var prefSize, htmlField, labelPositionLeft,
-    width = 0,
-    htmlContainer = scout.HtmlComponent.get($container),
-    height = scout.HtmlEnvironment.formRowHeight + $container.cssPaddingY(),
-    labelWidth = this.labelWidth(),
-    topLabelHeight = 0, // only set when label is on top
-    formField = this.formField;
+scout.FormFieldLayout.prototype.preferredLayoutSize = function($container, options) {
+  var htmlContainer = scout.HtmlComponent.get(this.formField.$container);
+  var formField = this.formField;
+  var prefSizeLabel = new scout.Dimension();
+  var prefSizeMandatory = new scout.Dimension();
+  var prefSizeStatus = new scout.Dimension();
+  var prefSizeField = new scout.Dimension();
+  var widthHint = scout.nvl(options.widthHint, 0);
+  var heightHint = scout.nvl(options.heightHint, 0);
+  // Status is only pulled up if status AND label are on top
+  var statusOnTop = formField.statusPosition === scout.FormField.StatusPosition.TOP && formField.labelPosition === scout.FormField.LabelPosition.TOP;
 
+  // Calculate the preferred sizes of the individual parts
+  // Mandatory indicator
+  if (formField.$mandatory && formField.$mandatory.isVisible()) {
+    prefSizeMandatory.width = this.mandatoryIndicatorWidth + formField.$mandatory.cssMarginX();
+    widthHint -= prefSizeMandatory.width;
+  }
+
+  // Label
   if (this._isLabelVisible()) {
-    if (formField.labelWidthInPixel === scout.FormField.LabelWidth.UI || formField.labelUseUiWidth) {
+    prefSizeLabel.width = this.labelWidth() + formField.$label.cssMarginX();
+    if (formField.labelPosition === scout.FormField.LabelPosition.TOP) {
+      // Label is always as width as the field if it is on top
+      prefSizeLabel.width = 0;
+      prefSizeLabel.height = this.rowHeight;
+    } else if (formField.labelWidthInPixel === scout.FormField.LabelWidth.UI || formField.labelUseUiWidth) {
       if (formField.$label.hasClass('empty')) {
-        labelWidth = 0;
+        prefSizeLabel.width = 0;
       } else {
-        labelWidth = scout.graphics.prefSize(formField.$label, true).width;
+        prefSizeLabel = scout.graphics.prefSize(formField.$label, true);
       }
     }
-    labelPositionLeft = formField.labelPosition === scout.FormField.LabelPosition.DEFAULT ||
-      formField.labelPosition === scout.FormField.LabelPosition.LEFT;
-    if (labelPositionLeft) {
-      width += labelWidth;
-    } else if (formField.labelPosition === scout.FormField.LabelPosition.TOP) {
-      topLabelHeight = formField.$label.outerHeight(true);
-      height += topLabelHeight;
+
+    if (scout.isOneOf(formField.labelPosition, scout.FormField.LabelPosition.DEFAULT, scout.FormField.LabelPosition.LEFT)) {
+      widthHint -= prefSizeLabel.width;
+    } else if (formField.labelPosition === scout.FormField.LABEL_POSITION_TOP) {
+      heightHint -= prefSizeLabel.height;
     }
   }
-  if (formField.$mandatory && formField.$mandatory.isVisible()) {
-    width += this.mandatoryIndicatorWidth + formField.$mandatory.cssMarginX();
-  }
+
+  // Status
   if (this._isStatusVisible()) {
-    width += this.statusWidth + formField.$status.cssMarginX();
-  }
-
-  if (formField.$fieldContainer) {
-    htmlField = scout.HtmlComponent.optGet(formField.$fieldContainer);
-    if (htmlField) {
-      prefSize = htmlField.prefSize()
-        .add(htmlContainer.insets())
-        .add(htmlField.margins());
-    } else {
-      prefSize = this.naturalSize(formField);
+    prefSizeStatus.width = this.statusWidth + formField.$status.cssMarginX();
+    if (!statusOnTop) {
+      widthHint -= prefSizeStatus.width;
     }
-    prefSize.height = prefSize.height + topLabelHeight + $container.cssPaddingY();
-  } else {
-    prefSize = new scout.Dimension(0, 0);
   }
-  width += prefSize.width;
-  height = Math.max(height, prefSize.height);
 
-  return new scout.Dimension(width, height);
+  // Field
+  if (formField.$fieldContainer) {
+    var fieldMargins = scout.graphics.margins(formField.$fieldContainer);
+    widthHint -= fieldMargins.horizontal();
+    heightHint -= fieldMargins.vertical();
+    options.widthHint = widthHint <= 0 ? null : widthHint;
+    options.heightHint = heightHint <= 0 ? null : heightHint;
+    var htmlField = scout.HtmlComponent.optGet(formField.$fieldContainer);
+    if (htmlField) {
+      prefSizeField = htmlField.prefSize(options)
+        .add(fieldMargins);
+    } else {
+      prefSizeField = scout.graphics.prefSize(formField.$fieldContainer, options)
+        .add(fieldMargins);
+    }
+  }
+
+  // Now sum up to calculate the preferred size of the container
+  var prefSize = new scout.Dimension();
+
+  // Field is the base, and it should be at least as height as a form row height.
+  prefSize.width = prefSizeField.width;
+  prefSize.height = prefSizeField.height;
+
+  // Mandatory
+  prefSize.width += prefSizeMandatory.width;
+  prefSize.height = Math.max(prefSize.height, prefSizeMandatory.height);
+
+  // Label
+  if (scout.isOneOf(formField.labelPosition, scout.FormField.LabelPosition.DEFAULT, scout.FormField.LabelPosition.LEFT)) {
+    prefSize.width += prefSizeLabel.width;
+    prefSize.height = Math.max(prefSize.height, prefSizeLabel.height);
+  } else if (formField.labelPosition === scout.FormField.LabelPosition.TOP) {
+    prefSize.width = Math.max(prefSize.width, prefSizeLabel.width);
+    prefSize.height += prefSizeLabel.height;
+  }
+
+  // Status
+  if (!statusOnTop) {
+    prefSize.width += prefSizeStatus.width;
+    prefSize.height = Math.max(prefSize.height, prefSizeStatus.height);
+  }
+
+  // Add padding and border
+  prefSize = prefSize.add(htmlContainer.insets());
+
+  return prefSize;
 };
 
 /**
@@ -291,15 +337,6 @@ scout.FormFieldLayout.prototype._layoutClearIcon = function(formField, fieldBoun
       .cssHeight(height)
       .cssLineHeight(height);
   }
-};
-
-/**
- * Returns the 'natural' size of the field - which means the current size of the field in the browser.
- * By default we return the size of the $fieldContainer. Override this method when you must return
- * another size (which is required when the field-content is scrollable).
- */
-scout.FormFieldLayout.prototype.naturalSize = function(formField) {
-  return scout.graphics.prefSize(formField.$fieldContainer, true);
 };
 
 scout.FormFieldLayout.prototype.labelWidth = function() {

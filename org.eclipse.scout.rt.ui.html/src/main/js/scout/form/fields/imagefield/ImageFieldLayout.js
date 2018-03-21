@@ -17,11 +17,3 @@ scout.ImageFieldLayout.prototype.layout = function($container) {
   scout.ImageFieldLayout.parent.prototype.layout.call(this, $container);
   scout.scrollbars.update(this.formField.$fieldContainer);
 };
-
-scout.ImageFieldLayout.prototype.naturalSize = function(formField) {
-  if (formField.image && formField.image.htmlComp) {
-    return formField.image.htmlComp.prefSize()
-      .add(formField.image.htmlComp.margins());
-  }
-  scout.ImageFieldLayout.parent.prototype.naturalSize.call(this, formField);
-};

@@ -10,6 +10,15 @@
  ******************************************************************************/
 .value-field {
 
+  & > input,
+  & > .input-field,
+  & > .field > input,
+  & > .field > .input-field,
+  & > .file-input {
+    /* Mainly necessary if label is invisible or on top and use ui height is set -> Makes sure the status is aligned and inputs are always the same height*/
+    min-height: @logical-grid-row-height;
+  }
+
   & > .icon,
   & > .field > .icon,
   & > .clear-icon,

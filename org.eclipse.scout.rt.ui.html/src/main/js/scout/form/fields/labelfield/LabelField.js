@@ -57,6 +57,7 @@ scout.LabelField.prototype._renderDisplayText = function() {
   } else {
     this.$field.html(scout.strings.nl2br(displayText));
   }
+  this.invalidateLayoutTree();
 };
 
 scout.LabelField.prototype.setWrapText = function(wrapText) {
@@ -65,6 +66,7 @@ scout.LabelField.prototype.setWrapText = function(wrapText) {
 
 scout.LabelField.prototype._renderWrapText = function() {
   this.$field.toggleClass('white-space-nowrap', !this.wrapText);
+  this.invalidateLayoutTree();
 };
 
 scout.LabelField.prototype._renderGridData = function() {
