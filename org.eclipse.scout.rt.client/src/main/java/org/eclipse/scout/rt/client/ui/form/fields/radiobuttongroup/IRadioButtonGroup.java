@@ -19,6 +19,21 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 public interface IRadioButtonGroup<T> extends IValueField<T>, ICompositeField {
 
   /**
+   * int property that stores the number of columns of the group.
+   *
+   * @see #DEFAULT_GRID_COLUMN_COUNT
+   */
+  String PROP_GRID_COLUMN_COUNT = "gridColumnCount";
+
+  /**
+   * Use columns as required to display all radio buttons in the height of this group.<br>
+   * Can be used in {@link #setGridColumnCount(int)}.<br>
+   * Instructs the radio button group to calculate the number of columns based on the number of radio buttons and the
+   * configured height of the field.
+   */
+  int DEFAULT_GRID_COLUMN_COUNT = -1;
+
+  /**
    * @return the buttons controlled by this radio button group
    */
   List<IRadioButton<T>> getButtons();
@@ -48,4 +63,20 @@ public interface IRadioButtonGroup<T> extends IValueField<T>, ICompositeField {
    */
   void selectKey(T key);
 
+  /**
+   * Gets the number of columns this group uses to layout radio buttons.
+   */
+  int getGridColumnCount();
+
+  /**
+   * Sets a new grid column count which is used to layout radio buttons.
+   *
+   * @param c
+   *          the new number of columns. If a value < 0 is passed (e.g. {@link #DEFAULT_GRID_COLUMN_COUNT}), the number
+   *          of columns is reset to the default which means it uses the required number of columns to show all radio
+   *          buttons within the height of this group.
+   * @return {@code true} if the column count has been changed. This also triggers a rebuild of the grid for the current
+   *         group. {@code false} if it was already set to this value and nothing was updated.
+   */
+  boolean setGridColumnCount(int c);
 }

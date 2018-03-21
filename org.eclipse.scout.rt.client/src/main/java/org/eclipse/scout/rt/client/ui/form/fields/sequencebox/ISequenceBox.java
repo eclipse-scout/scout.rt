@@ -32,8 +32,16 @@ public interface ISequenceBox extends ICompositeField {
    */
   void setAutoCheckFromTo(boolean autoCheckFromTo);
 
+  /**
+   * @deprecated Has not been used. Can be removed without replacement. This method will be removed in Scout 9.0.
+   */
+  @Deprecated
   boolean isEqualColumnWidths();
 
+  /**
+   * @deprecated Has not been used. Can be removed without replacement. This method will be removed in Scout 9.0.
+   */
+  @Deprecated
   void setEqualColumnWidths(boolean equalColumnWidths);
 
 }

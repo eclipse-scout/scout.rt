@@ -11,8 +11,10 @@
 scout.RadioButtonGroup = function() {
   scout.RadioButtonGroup.parent.call(this);
   this._addWidgetProperties('fields');
+  this.logicalGrid = scout.create('scout.HorizontalGrid');
   this.fields = [];
   this.radioButtons = [];
+  this.gridColumnCount = scout.RadioButtonGroup.DEFAULT_GRID_COLUMN_COUNT;
   this.selectedButton = null;
   this.$body = null;
   this._selectButtonLocked = false;
@@ -20,6 +22,21 @@ scout.RadioButtonGroup = function() {
 };
 
 scout.inherits(scout.RadioButtonGroup, scout.ValueField);
+
+scout.RadioButtonGroup.DEFAULT_GRID_COLUMN_COUNT = -1;
+
+scout.RadioButtonGroup.prototype._init = function(model) {
+  scout.RadioButtonGroup.parent.prototype._init.call(this, model);
+
+  this.fields.forEach(function(formField) {
+    if (formField instanceof scout.RadioButton) {
+      this.radioButtons.push(formField);
+      this._initButton(formField);
+    }
+  }, this);
+
+  this._setGridColumnCount(this.gridColumnCount);
+};
 
 /**
  * @override ModelAdapter.js
@@ -31,6 +48,33 @@ scout.RadioButtonGroup.prototype._initKeyStrokeContext = function() {
     new scout.RadioButtonGroupLeftKeyStroke(this),
     new scout.RadioButtonGroupRightKeyStroke(this)
   ]);
+};
+
+scout.RadioButtonGroup.prototype._initButton = function(button) {
+  button.on('propertyChange', this._buttonPropertyChangeHandler);
+  if (button.selected) {
+    this.selectButton(button);
+  }
+};
+
+/**
+ * @override Widgets.js
+ */
+scout.RadioButtonGroup.prototype._setLogicalGrid = function(logicalGrid) {
+  scout.RadioButtonGroup.parent.prototype._setLogicalGrid.call(this, logicalGrid);
+  if (this.logicalGrid) {
+    this.logicalGrid.setGridConfig(new scout.RadioButtonGroupGridConfig());
+  }
+};
+
+/**
+ * @override Widgets.js
+ */
+scout.RadioButtonGroup.prototype.invalidateLogicalGrid = function(invalidateLayout) {
+  scout.RadioButtonGroup.parent.prototype.invalidateLogicalGrid.call(this, false);
+  if (scout.nvl(invalidateLayout, true) && this.rendered) {
+    this.htmlBody.invalidateLayoutTree();
+  }
 };
 
 /**
@@ -54,35 +98,27 @@ scout.RadioButtonGroup.prototype.visitFields = function(visitor) {
   });
 };
 
-scout.RadioButtonGroup.prototype._init = function(model) {
-  scout.RadioButtonGroup.parent.prototype._init.call(this, model);
-
-  this.fields.forEach(function(formField) {
-    if (formField instanceof scout.RadioButton) {
-      this.radioButtons.push(formField);
-      this._initButton(formField);
-    }
-  }, this);
-};
-
-scout.RadioButtonGroup.prototype._initButton = function(button) {
-  button.on('propertyChange', this._buttonPropertyChangeHandler);
-  if (button.selected) {
-    this.selectButton(button);
+/**
+ * @override
+ */
+scout.RadioButtonGroup.prototype.activate = function() {
+  // The first button may not be focusable because it is not selected and therefore has no tab index -> find the first focusable button
+  var element = this.session.focusManager.findFirstFocusableElement(this.$container);
+  if (element) {
+    element.focus();
   }
 };
 
 scout.RadioButtonGroup.prototype._render = function() {
-  var env = scout.HtmlEnvironment,
-    htmlBodyContainer;
+  var env = scout.HtmlEnvironment;
 
   this.addContainer(this.$parent, 'radiobutton-group');
   this.addLabel();
   this.addMandatoryIndicator();
 
   this.$body = this.$container.appendDiv('radiobutton-group-body');
-  htmlBodyContainer = scout.HtmlComponent.install(this.$body, this.session);
-  htmlBodyContainer.setLayout(new scout.LogicalGridLayout(this, {
+  this.htmlBody = scout.HtmlComponent.install(this.$body, this.session);
+  this.htmlBody.setLayout(new scout.LogicalGridLayout(this, {
     hgap: env.smallColumnGap,
     vgap: env.formRowGap
   }));
@@ -98,17 +134,6 @@ scout.RadioButtonGroup.prototype._render = function() {
 
   this.addField(this.$body);
   this.addStatus();
-};
-
-/**
- * @override
- */
-scout.RadioButtonGroup.prototype.activate = function() {
-  // The first button may not be focusable because it is not selected and therefore has no tab index -> find the first focusable button
-  var element = this.session.focusManager.findFirstFocusableElement(this.$container);
-  if (element) {
-    element.focus();
-  }
 };
 
 /**
@@ -133,6 +158,32 @@ scout.RadioButtonGroup.prototype._provideTabIndex = function() {
       radioButton.setTabbable(false);
     }
   }, this);
+};
+
+scout.RadioButtonGroup.prototype.setGridColumnCount = function(gridColumnCount) {
+  this.setProperty('gridColumnCount', gridColumnCount);
+};
+
+scout.RadioButtonGroup.prototype._setGridColumnCount = function(gridColumnCount) {
+  if (gridColumnCount < 0) {
+    gridColumnCount = this._calcDefaultGridColumnCount();
+  }
+  if (gridColumnCount === this.gridColumnCount) {
+    return false;
+  }
+
+  this._setProperty('gridColumnCount', gridColumnCount);
+  this.invalidateLogicalGrid();
+  return true;
+};
+
+scout.RadioButtonGroup.prototype._calcDefaultGridColumnCount = function() {
+  var height = 1,
+    hints = this.gridDataHints;
+  if (hints && hints.h > 1) {
+    height = hints.h;
+  }
+  return Math.ceil(this.fields.length / height);
 };
 
 scout.RadioButtonGroup.prototype.selectButton = function(radioButton) {

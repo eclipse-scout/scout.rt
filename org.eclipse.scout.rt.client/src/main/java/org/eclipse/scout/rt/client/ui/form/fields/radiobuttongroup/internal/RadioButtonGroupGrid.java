@@ -11,12 +11,14 @@
 package org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.internal;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeFieldGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder;
+import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,20 +32,22 @@ public class RadioButtonGroupGrid implements ICompositeFieldGrid<ICompositeField
 
   private static final Logger LOG = LoggerFactory.getLogger(RadioButtonGroupGrid.class);
 
-  private ICompositeField m_group = null;
-  private IFormField[] m_fields;
+  private IRadioButtonGroup<?> m_group = null;
+  private List<IFormField> m_fields;
   private int m_gridColumns;
   private int m_gridRows;
 
   @Override
   public void validate(ICompositeField compositeField) {
     // reset
-    m_group = compositeField;
+    m_group = (IRadioButtonGroup<?>) compositeField;
     m_gridColumns = 0;
     m_gridRows = 0;
-    ArrayList<IFormField> list = new ArrayList<>();
+    List<IFormField> fields = m_group.getFields();
+
     // filter
-    for (IFormField f : m_group.getFields()) {
+    List<IFormField> list = new ArrayList<>(fields.size());
+    for (IFormField f : fields) {
       if (f.isVisible()) {
         list.add(f);
       }
@@ -52,7 +56,8 @@ public class RadioButtonGroupGrid implements ICompositeFieldGrid<ICompositeField
         f.setGridDataInternal(data);
       }
     }
-    m_fields = list.toArray(new IFormField[list.size()]);
+
+    m_fields = list;
     applyGridData();
   }
 
@@ -65,24 +70,24 @@ public class RadioButtonGroupGrid implements ICompositeFieldGrid<ICompositeField
       LOG.error("{} has gridData.h={}; expected value>0", m_group.getClass().getName(), parentData.h);
       m_gridRows = 1;
     }
-    else if (m_fields.length <= 0) {
-      LOG.error("{} has fieldCount={}; expected value>0", m_group.getClass().getName(), m_fields.length);
+    else if (m_fields.size() <= 0) {
+      LOG.error("{} has fieldCount={}; expected value>0", m_group.getClass().getName(), m_fields.size());
       m_gridRows = 1;
     }
     else {
-      m_gridRows = Math.min(parentData.h, m_fields.length);
+      m_gridRows = Math.min(parentData.h, m_fields.size());
     }
-    m_gridColumns = (m_fields.length + m_gridRows - 1) / m_gridRows;
+    m_gridColumns = m_group.getGridColumnCount();
     int i = 0;
     for (int r = 0; r < m_gridRows; r++) {
       for (int c = 0; c < m_gridColumns; c++) {
-        if (i < m_fields.length) {
-          GridData data = GridDataBuilder.createFromHints(m_fields[i], 1);
+        if (i < m_fields.size()) {
+          GridData data = GridDataBuilder.createFromHints(m_fields.get(i), 1);
           data.x = c;
           data.y = r;
           data.w = 1;
           data.h = 1;
-          m_fields[i].setGridDataInternal(data);
+          m_fields.get(i).setGridDataInternal(data);
           i++;
         }
         else {

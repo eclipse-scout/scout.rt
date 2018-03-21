@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility;
+import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeFieldGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -114,6 +115,21 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   /**
+   * Configures how many columns that should be used to layout the group.
+   * <p>
+   * E.g. if the group is set to 3 grid-columns and {@link #getConfiguredGridUseUiHeight()}=true, it grows vertically as
+   * needed to show all radio-buttons having 3 buttons on one row.<br>
+   * Alternatively this property can be omitted and instead the height of the field can configured using
+   * {@link #getConfiguredGridH()}. In that case columns are created as required to show all radio buttons within the
+   * height specified.
+   */
+  @Order(255)
+  @ConfigProperty(ConfigProperty.INTEGER)
+  protected int getConfiguredGridColumnCount() {
+    return DEFAULT_GRID_COLUMN_COUNT;
+  }
+
+  /**
    * a radio button group cannot be clearable
    */
   @Override
@@ -188,6 +204,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     for (IRadioButton b : m_radioButtons) {
       b.addPropertyChangeListener(new P_ButtonPropertyChangeListener());
     }
+    setGridColumnCount(getConfiguredGridColumnCount());
     handleFieldVisibilityChanged();
   }
 
@@ -239,6 +256,19 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     }
   }
 
+  protected int calcDefaultGridColumnCount() {
+    int height = 1;
+    GridData hints = getGridDataHints();
+    if (hints != null && hints.h > 1) {
+      height = hints.h;
+    }
+    return roundUp(m_fields.size(), height);
+  }
+
+  private static int roundUp(int dividend, int divisor) {
+    return (dividend + divisor - 1) / divisor;
+  }
+
   /**
    * Returns a new instance of an empty radio button to be used when creating radio buttons dynamically from lookup
    * rows. Subclasses may override this method to use custom radio buttons. Please note that all lookup row values (e.g.
@@ -262,14 +292,14 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   public void addField(IFormField f) {
     CompositeFieldUtility.addField(f, this, m_fields);
     f.addPropertyChangeListener(m_fieldPropertyChangeListener);
-    handleFildsChanged();
+    handleFieldsChanged();
   }
 
   @Override
   public void removeField(IFormField f) {
     CompositeFieldUtility.removeField(f, this, m_fields);
     f.removePropertyChangeListener(m_fieldPropertyChangeListener);
-    handleFildsChanged();
+    handleFieldsChanged();
   }
 
   @Override
@@ -285,7 +315,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   /**
    * Updates this composite field's state after a child field has been added or removed.
    */
-  protected void handleFildsChanged() {
+  protected void handleFieldsChanged() {
     handleFieldVisibilityChanged();
     checkSaveNeeded();
     checkEmpty();
@@ -322,6 +352,23 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     if (getConfiguredLabel() == null) {
       setLabel(BEANS.get(codeTypeClass).getText());
     }
+  }
+
+  @Override
+  public boolean setGridColumnCount(int c) {
+    if (c < 0) {
+      c = calcDefaultGridColumnCount();
+    }
+    boolean changed = propertySupport.setPropertyInt(PROP_GRID_COLUMN_COUNT, c);
+    if (changed && isInitConfigDone()) {
+      rebuildFieldGrid();
+    }
+    return changed;
+  }
+
+  @Override
+  public int getGridColumnCount() {
+    return propertySupport.getPropertyInt(PROP_GRID_COLUMN_COUNT);
   }
 
   protected List<Class<? extends IFormField>> getConfiguredFields() {

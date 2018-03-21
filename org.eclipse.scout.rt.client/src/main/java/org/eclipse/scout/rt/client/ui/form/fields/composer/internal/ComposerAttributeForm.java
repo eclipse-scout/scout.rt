@@ -188,11 +188,6 @@ public class ComposerAttributeForm extends AbstractForm {
         return false;
       }
 
-      @Override
-      protected boolean getConfiguredEqualColumnWidths() {
-        return true;
-      }
-
       @Order(1)
       @ClassId("4d2fc7d9-186e-4ea6-bce8-cb35c1f3b35b")
       public class AttributeField extends AbstractListBox<IDataModelAttribute> {

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -23,6 +24,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.AbstractLabelField;
@@ -72,7 +74,7 @@ public class AbstractRadioButtonGroupTest {
   @Before
   public void setUp() {
     m_group = new P_StandardRadioButtonGroup();
-    m_group.initConfig();
+    m_group.init();
   }
 
   @Test
@@ -109,6 +111,39 @@ public class AbstractRadioButtonGroupTest {
     m_group.selectButton(new AbstractRadioButton<Long>() {
     });
     assertNull(m_group.getSelectedButton());
+  }
+
+  @Test
+  public void testGridColumnCount() {
+    IRadioButtonGroup<?> group = new P_StandardRadioButtonGroup();
+    int numFieldsInGroup = group.getFieldCount();
+
+    assertEquals(numFieldsInGroup, group.getGridColumnCount());
+    assertFalse(group.setGridColumnCount(numFieldsInGroup));
+
+    assertFalse(group.setGridColumnCount(IRadioButtonGroup.DEFAULT_GRID_COLUMN_COUNT));
+    assertEquals(numFieldsInGroup, group.getGridColumnCount());
+
+    GridData gridDataHints = group.getGridDataHints().copy();
+    gridDataHints.h = 2;
+    group.setGridDataHints(gridDataHints);
+    assertTrue(group.setGridColumnCount(IRadioButtonGroup.DEFAULT_GRID_COLUMN_COUNT));
+    assertEquals(2, group.getGridColumnCount());
+
+    gridDataHints = group.getGridDataHints().copy();
+    gridDataHints.h = numFieldsInGroup;
+    group.setGridDataHints(gridDataHints);
+    assertTrue(group.setGridColumnCount(-2 /* triggers 'set to default' */));
+    assertEquals(1, group.getGridColumnCount());
+
+    assertFalse(group.setGridColumnCount(IRadioButtonGroup.DEFAULT_GRID_COLUMN_COUNT));
+    assertEquals(1, group.getGridColumnCount());
+
+    assertTrue(group.setGridColumnCount(3));
+    assertEquals(3, group.getGridColumnCount());
+
+    assertTrue(group.setGridColumnCount(0));
+    assertEquals(0, group.getGridColumnCount());
   }
 
   @Test

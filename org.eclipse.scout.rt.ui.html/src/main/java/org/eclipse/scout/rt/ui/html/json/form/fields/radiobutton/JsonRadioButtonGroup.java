@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.json.JSONObject;
 
@@ -34,6 +35,12 @@ public class JsonRadioButtonGroup<RADIO_BUTTON_GROUP extends IRadioButtonGroup> 
   protected void initJsonProperties(RADIO_BUTTON_GROUP model) {
     super.initJsonProperties(model);
     removeJsonProperty(IValueField.PROP_DISPLAY_TEXT);
+    putJsonProperty(new JsonProperty<RADIO_BUTTON_GROUP>(IRadioButtonGroup.PROP_GRID_COLUMN_COUNT, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getGridColumnCount();
+      }
+    });
   }
 
   @Override

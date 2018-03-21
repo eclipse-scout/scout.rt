@@ -61,7 +61,6 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   private SequenceBoxGrid m_grid;
   private String m_labelBase;
   private String m_labelSuffix;
-  private boolean m_equalColumnWidths;
 
   public AbstractSequenceBox() {
     this(true);
@@ -92,8 +91,12 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     return true;
   }
 
-  @ConfigProperty(ConfigProperty.BOOLEAN)
+  /**
+   * @deprecated This property had no effect and can be deleted. This method will be removed in Scout 9.0.
+   */
   @Order(210)
+  @Deprecated
+  @ConfigProperty(ConfigProperty.BOOLEAN)
   protected boolean getConfiguredEqualColumnWidths() {
     return false;
   }
@@ -269,13 +272,14 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
  */
 
   @Override
+  @SuppressWarnings("deprecation")
   public boolean isEqualColumnWidths() {
-    return m_equalColumnWidths;
+    return true;
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void setEqualColumnWidths(boolean b) {
-    m_equalColumnWidths = b;
   }
 
   @Override

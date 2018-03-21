@@ -11,7 +11,7 @@
 scout.SequenceBox = function() {
   scout.SequenceBox.parent.call(this);
   this._addWidgetProperties('fields');
-
+  this.logicalGrid = scout.create('scout.HorizontalGrid');
   this.fields = [];
 };
 scout.inherits(scout.SequenceBox, scout.CompositeField);
@@ -27,8 +27,8 @@ scout.SequenceBox.prototype._render = function() {
   this.addField(this.$parent.makeDiv());
   this.addStatus();
   this._handleStatus();
-  var htmlComp = scout.HtmlComponent.install(this.$field, this.session);
-  htmlComp.setLayout(new scout.LogicalGridLayout(this, {
+  this.htmlBody = scout.HtmlComponent.install(this.$field, this.session);
+  this.htmlBody.setLayout(new scout.LogicalGridLayout(this, {
     hgap: scout.HtmlEnvironment.smallColumnGap,
     vgap: 0
   }));
@@ -41,6 +41,26 @@ scout.SequenceBox.prototype._render = function() {
 
     // set each children layout data to logical grid data
     field.setLayoutData(new scout.LogicalGridData(field));
+  }
+};
+
+/**
+ * @override Widgets.js
+ */
+scout.SequenceBox.prototype.invalidateLogicalGrid = function(invalidateLayout) {
+  scout.SequenceBox.parent.prototype.invalidateLogicalGrid.call(this, false);
+  if (scout.nvl(invalidateLayout, true) && this.rendered) {
+    this.htmlBody.invalidateLayoutTree();
+  }
+};
+
+/**
+ * @override Widgets.js
+ */
+scout.SequenceBox.prototype._setLogicalGrid = function(logicalGrid) {
+  scout.SequenceBox.parent.prototype._setLogicalGrid.call(this, logicalGrid);
+  if (this.logicalGrid) {
+    this.logicalGrid.setGridConfig(new scout.SequenceBoxGridConfig());
   }
 };
 

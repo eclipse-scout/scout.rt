@@ -26,6 +26,37 @@ describe("RadioButtonGroup", function() {
     }
   }
 
+  describe('gridColumnCount', function() {
+    it('calculates column count correctly', function() {
+      var numButtons = 3;
+      var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, numButtons);
+      radioButtonGroup.render();
+
+      expect(radioButtonGroup.gridColumnCount).toBe(numButtons);
+      expect(radioButtonGroup._setGridColumnCount(numButtons)).toBe(false);
+
+      expect(radioButtonGroup._setGridColumnCount(scout.RadioButtonGroup.DEFAULT_GRID_COLUMN_COUNT)).toBe(false);
+      expect(radioButtonGroup.gridColumnCount).toBe(numButtons);
+
+      radioButtonGroup.gridDataHints.h = 2;
+      expect(radioButtonGroup._setGridColumnCount(0)).toBe(true);
+      expect(radioButtonGroup.gridColumnCount).toBe(0);
+
+      radioButtonGroup.gridDataHints.h = numButtons;
+      expect(radioButtonGroup._setGridColumnCount(-2 /* also triggers 'set to default' */ )).toBe(true);
+      expect(radioButtonGroup.gridColumnCount).toBe(1);
+
+      expect(radioButtonGroup._setGridColumnCount(scout.RadioButtonGroup.DEFAULT_GRID_COLUMN_COUNT)).toBe(false);
+      expect(radioButtonGroup.gridColumnCount).toBe(1);
+
+      expect(radioButtonGroup._setGridColumnCount(4)).toBe(true);
+      expect(radioButtonGroup.gridColumnCount).toBe(4);
+
+      expect(radioButtonGroup.logicalGrid.dirty).toBe(true);
+      expect(radioButtonGroup.htmlBody.layout.valid).toBe(false);
+    });
+  });
+
   describe('enabled', function() {
     it('propagation', function() {
       var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
@@ -167,16 +198,13 @@ describe("RadioButtonGroup", function() {
     it('makes sure only one button is selected even if multiple buttons are selected during init', function() {
       var radioButtonGroup = scout.create('RadioButtonGroup', {
         parent: session.desktop,
-        fields: [
-          {
-            objectType: 'RadioButton',
-            selected: true
-          },
-          {
-            objectType: 'RadioButton',
-            selected: true
-          }
-        ]
+        fields: [{
+          objectType: 'RadioButton',
+          selected: true
+        }, {
+          objectType: 'RadioButton',
+          selected: true
+        }]
       });
       // Only the second button should be selected
       expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[1]);
