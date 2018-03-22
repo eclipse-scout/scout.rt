@@ -31,8 +31,11 @@ public class ScoutDataObjectModule extends Module {
   public void setupModule(SetupContext context) {
     context.addSerializers(BEANS.get(DataObjectSerializers.class));
     context.addDeserializers(BEANS.get(DataObjectDeserializers.class));
-    context.addTypeModifier(BEANS.get(DataObjectTypeModifier.class));
+    
     context.addKeySerializers(BEANS.get(DataObjectMapKeySerializers.class));
+    context.addKeyDeserializers(BEANS.get(DataObjectMapKeyDeserializers.class));
+
+    context.addTypeModifier(BEANS.get(DataObjectTypeModifier.class));
     context.insertAnnotationIntrospector(BEANS.get(DataObjectAnnotationIntrospector.class));
   }
 

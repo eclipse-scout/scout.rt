@@ -17,6 +17,8 @@ import com.fasterxml.jackson.databind.ser.Serializers;
 /**
  * Set of custom serializers handling map keys.
  * <p>
+ * Subclass and extend this class to provide support for additional serializer for Map keys of various types.
+ * <p>
  * <b>Note:</b> The difference between a key serializer and an ordinary one is that the former transforms a map key into
  * a JSON name (i.e. always typed string), whereas the latter writes a JSON value (i.e. any JSON type, including objects
  * and arrays).
