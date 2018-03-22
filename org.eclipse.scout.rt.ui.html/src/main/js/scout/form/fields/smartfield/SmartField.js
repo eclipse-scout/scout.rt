@@ -207,6 +207,9 @@ scout.SmartField.prototype._checkSearchTextChanged = function(searchText) {
   if (this.isDropdown()) {
     return false; // search text cannot change
   }
+  if (scout.strings.empty(this._lastSearchText)) {
+    return false; // no search was done before
+  }
   var a = scout.strings.nullIfEmpty(this._firstTextLine(searchText));
   var b = scout.strings.nullIfEmpty(this._lastSearchText);
   return !scout.strings.equalsIgnoreCase(a, b);
