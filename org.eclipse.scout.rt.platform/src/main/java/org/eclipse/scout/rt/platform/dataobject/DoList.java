@@ -29,6 +29,12 @@ public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Ite
     super(lazyCreate, new ArrayList<>());
   }
 
+  public static <V> DoList<V> of(List<V> list) {
+    DoList<V> doList = new DoList<>();
+    doList.set(list);
+    return doList;
+  }
+
   /**
    * @return modifiable list of all items, never {@code null}.
    */
