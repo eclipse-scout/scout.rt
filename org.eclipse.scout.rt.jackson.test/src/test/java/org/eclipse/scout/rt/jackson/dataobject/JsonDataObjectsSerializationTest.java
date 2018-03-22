@@ -140,7 +140,7 @@ public class JsonDataObjectsSerializationTest {
   @Test
   public void testSerialize_DoValuePojo() throws Exception {
     TestDoValuePojo pojo = new TestDoValuePojo();
-    pojo.setStringValue(createDoValue("foo"));
+    pojo.setStringValue(DoValue.of("foo"));
     String json = s_dataObjectMapper.writeValueAsString(pojo);
     assertJsonEquals("TestDoValuePojo.json", json);
 
@@ -407,12 +407,12 @@ public class JsonDataObjectsSerializationTest {
   @Test
   public void testSerialize_SimpleDoRaw() throws Exception {
     DoEntity testDo = new DoEntity();
-    testDo.put("bigIntegerAttribute", createDoValue(new BigInteger("123456")));
+    testDo.put("bigIntegerAttribute", DoValue.of(new BigInteger("123456")));
     testDo.put("bigDecimalAttribute", new BigDecimal("789.0"));
-    testDo.put("dateAttribute", createDoValue(DateUtility.parse("2017-09-22 14:23:12.123", IValueFormatConstants.DEFAULT_DATE_PATTERN)));
+    testDo.put("dateAttribute", DoValue.of(DateUtility.parse("2017-09-22 14:23:12.123", IValueFormatConstants.DEFAULT_DATE_PATTERN)));
 
     DoEntity testDo2 = new DoEntity();
-    testDo2.put("bigIntegerAttribute2", createDoValue(new BigInteger("789")));
+    testDo2.put("bigIntegerAttribute2", DoValue.of(new BigInteger("789")));
 
     testDo.put("itemAttributeNode", testDo2);
     testDo.put("itemAttributeRef", testDo2);
@@ -427,16 +427,16 @@ public class JsonDataObjectsSerializationTest {
   @Test
   public void testSerialize_SimpleDoWithPojoRaw() throws Exception {
     DoEntity testDo = new DoEntity();
-    testDo.put("bigIntegerAttribute", createDoValue(new BigInteger("123456")));
+    testDo.put("bigIntegerAttribute", DoValue.of(new BigInteger("123456")));
     testDo.put("bigDecimalAttribute", new BigDecimal("789.0"));
-    testDo.put("dateAttribute", createDoValue(DateUtility.parse("2017-09-22 14:23:12.123", IValueFormatConstants.DEFAULT_DATE_PATTERN)));
+    testDo.put("dateAttribute", DoValue.of(DateUtility.parse("2017-09-22 14:23:12.123", IValueFormatConstants.DEFAULT_DATE_PATTERN)));
 
     TestSubPojo sub = new TestSubPojo();
     sub.setBar("bar");
     testDo.put("sub", sub);
 
     DoEntity testDo2 = new DoEntity();
-    testDo2.put("bigIntegerAttribute2", createDoValue(new BigInteger("789")));
+    testDo2.put("bigIntegerAttribute2", DoValue.of(new BigInteger("789")));
     testDo.put("itemAttributeNode", testDo2);
     testDo.put("itemAttributeRef", testDo2);
     testDo.put("itemsAttributeList", Arrays.asList(testDo2, testDo2));
@@ -1444,7 +1444,7 @@ public class JsonDataObjectsSerializationTest {
           entity.put("attribute" + i, createTestItemDo("id" + i, "value" + i));
           break;
         case 4:
-          entity.putNode("attribute" + i, createDoValue("simple-value" + i));
+          entity.putNode("attribute" + i, DoValue.of("simple-value" + i));
           break;
       }
     }
@@ -1710,12 +1710,6 @@ public class JsonDataObjectsSerializationTest {
     testPojo.setId(id);
     testPojo.setStringAttribute(attribute);
     return testPojo;
-  }
-
-  protected <T> DoValue<T> createDoValue(T value) {
-    DoValue<T> wrapper = new DoValue<>();
-    wrapper.set(value);
-    return wrapper;
   }
 
   protected void assertJsonEquals(String expectedResourceName, String actual) {

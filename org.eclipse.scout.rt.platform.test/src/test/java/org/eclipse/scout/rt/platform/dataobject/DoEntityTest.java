@@ -77,8 +77,7 @@ public class DoEntityTest {
     entity.remove("foo");
     assertNull(entity.get("foo"));
 
-    DoValue<String> value = new DoValue<>();
-    value.set("bar2");
+    DoValue<String> value = DoValue.of("bar2");
     entity.putNode("foo2", value);
     assertTrue(((DoValue<String>) entity.getNode("foo2")).exists());
     assertEquals("bar2", entity.get("foo2", String.class));

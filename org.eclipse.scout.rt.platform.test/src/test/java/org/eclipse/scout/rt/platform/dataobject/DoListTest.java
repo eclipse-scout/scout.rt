@@ -1,6 +1,10 @@
 package org.eclipse.scout.rt.platform.dataobject;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,6 +62,22 @@ public class DoListTest {
     assertFalse(list.exists());
     list.get();
     assertTrue(list.exists());
+  }
+
+  @Test
+  public void testOf() {
+    DoList<String> list = DoList.of(Arrays.asList("foo", "bar"));
+    assertTrue(list.exists());
+    assertEquals("foo", list.get(0));
+    assertEquals("bar", list.get(1));
+  }
+
+  @Test
+  public void testOfNull() {
+    DoList<String> list = DoList.of(null);
+    assertTrue(list.exists());
+    assertTrue(list.isEmpty());
+    assertEquals(new ArrayList<>(), list.get());
   }
 
   @Test
@@ -304,9 +324,7 @@ public class DoListTest {
     public DoValue<String> apply(String input) {
       for (String item : m_testDoList.get()) {
         if (item.equals(input)) {
-          DoValue<String> itemWrapped = new DoValue<>();
-          itemWrapped.set(input);
-          return itemWrapped;
+          return DoValue.of(input);
         }
       }
       return null;

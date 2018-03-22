@@ -27,14 +27,12 @@ public class DoValueDeserializer extends ReferenceTypeDeserializer<DoValue<?>> {
 
   @Override
   public DoValue<?> getNullValue(DeserializationContext ctxt) {
-    return new DoValue<>();
+    return DoValue.of(null);
   }
 
   @Override
   public DoValue<?> referenceValue(Object contents) {
-    DoValue<Object> value = new DoValue<>();
-    value.set(contents);
-    return value;
+    return DoValue.of(contents);
   }
 
   @Override
