@@ -37,12 +37,17 @@ scout.ListBoxLayout.prototype.layout = function($container) {
   }
 };
 
-scout.ListBoxLayout.prototype.preferredLayoutSize = function($container) {
+scout.ListBoxLayout.prototype.preferredLayoutSize = function($container, options) {
+  options = options || {};
   var prefSizeTable, prefSizeFilterBox, tableContainer, filterContainer,
     width = 0,
     htmlContainer = scout.HtmlComponent.get($container),
     height = scout.HtmlEnvironment.formRowHeight,
     listBox = this.listBox;
+
+  // HeightHint not supported
+  options.heightHint = null;
+
   if (listBox.$label && listBox.labelVisible) {
     width += scout.HtmlEnvironment.fieldLabelWidth;
   }
@@ -56,7 +61,7 @@ scout.ListBoxLayout.prototype.preferredLayoutSize = function($container) {
   // size of table and size of filterBox
   tableContainer = scout.HtmlComponent.optGet(this.table.$container);
   if (tableContainer) {
-    prefSizeTable = tableContainer.prefSize()
+    prefSizeTable = tableContainer.prefSize(options)
       .add(htmlContainer.insets())
       .add(tableContainer.margins());
   } else {
@@ -65,7 +70,7 @@ scout.ListBoxLayout.prototype.preferredLayoutSize = function($container) {
 
   filterContainer = scout.HtmlComponent.optGet(this.filterBox.$container);
   if (filterContainer) {
-    prefSizeFilterBox = filterContainer.prefSize()
+    prefSizeFilterBox = filterContainer.prefSize(options)
       .add(htmlContainer.insets())
       .add(filterContainer.margins());
   } else {

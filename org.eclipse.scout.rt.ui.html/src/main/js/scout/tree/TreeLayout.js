@@ -79,7 +79,7 @@ scout.TreeLayout.prototype._setDataHeight = function(heightOffset) {
   $data.css('height', (heightOffset === 0 ? '100%' : 'calc(100% - ' + heightOffset + 'px)'));
 };
 
-scout.TreeLayout.prototype.preferredLayoutSize = function($container) {
+scout.TreeLayout.prototype.preferredLayoutSize = function($container, options) {
   // Make sure viewport is up to date before calculating pref size.
   // This is necessary because the tree does not render the view port on any change (like insert or delete nodes). Instead it just invalidates the layout.
   this.tree._renderViewport();
@@ -89,5 +89,5 @@ scout.TreeLayout.prototype.preferredLayoutSize = function($container) {
   if (!this.tree.htmlComp.layouted) {
     this.nodeDimensionsDirty = true;
   }
-  return scout.graphics.prefSize($container);
+  return scout.graphics.prefSize($container, options);
 };

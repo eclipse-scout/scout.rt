@@ -79,15 +79,27 @@ scout.HtmlComponent.prototype.isDescendantOf = function(htmlComp) {
 
 /**
  * Computes the preferred height if the component is scrollable and returns it if it is greater than the actual size.
- * If it is not scrollable, the actual height is returned.<p>
- * The returned width is always the actual width because there are no horizontal scrollbars.
+ * If it is not scrollable, the actual height is returned.
+ * <p>
+ * The returned size contains insets (padding and border) but no margin. The width is always the actual width because there are no horizontal scrollbars.
+ *
+ * OPTION    DEFAULT VALUE   DESCRIPTION
+ * -------------------------------------
+ * exact     false           When set to true the returned dimensions may contain fractional digits, otherwise the sizes are rounded up.
+ *
+ * @param (options) may contain the options of the above table
  */
 scout.HtmlComponent.prototype.availableSize = function(options) {
-  var size = this.size(options),
-    prefSize;
+  options = options || {};
+  var size = this.size({
+    exact: options.exact
+  });
 
   if (this.scrollable) {
-    prefSize = this.prefSize(options);
+    var prefSize = this.prefSize({
+      widthHint: size.width,
+      removeMarginFromHints: false // Since the width of this component is used as hint, the margin must not be removed
+    });
     if (prefSize.height > size.height) {
       size.height = prefSize.height;
     }
@@ -206,14 +218,34 @@ scout.HtmlComponent.prototype.setLayout = function(layout) {
 };
 
 /**
- * Returns the preferred size of the component, insets included.<p>
+ * Returns the preferred size of the component, insets included, margin excluded<p>
  * The preferred size is cached until the component will be invalidated.
  * Hence, subsequent calls to this function will return the cached preferred size unless the component is invalidated.
+ * <p>
  *
+ * OPTION                  DEFAULT VALUE   DESCRIPTION
+ * --------------------------------------------------
+ * includeMargin           false           Whether to include the margin in the returned size.
+ * widthHint               null            When set, horizontal padding, border and margin are removed from it so that the actual layout does not need to take care of it.
+ * heightHint              null            When set, vertical padding, border and margin are removed from it so that the actual layout does not need to take care of it.
+ * removeMarginFromHints   true            Whether or not to automatically remove the margin from the hints.
+ *
+ * @param (options) an optional options object. Short-hand version: If a boolean is passed instead of an object, the value is automatically converted to the option "includeMargin".
+ *                  May contain the options of the above table. All other options are passed as they are to the layout when @{link layout.preferredLayoutSize()} is called.
+ *                  Possible options may be found at @{link scout.graphics.prefSize()}, but it depends on the actual layout if these options have an effect or not.
  * @exception When component has no layout
  */
 scout.HtmlComponent.prototype.prefSize = function(options) {
-  options = options || {};
+  if (typeof options === 'boolean') {
+    options = {
+      includeMargin: options
+    };
+  } else {
+    // Create a copy to not modify the original options
+    options = $.extend({}, options);
+  }
+  var includeMargin = scout.nvl(options.includeMargin, false);
+  options.includeMargin = null;
   if (!this.layout) {
     throw new Error('Called prefSize() but component has no layout');
   }
@@ -222,6 +254,9 @@ scout.HtmlComponent.prototype.prefSize = function(options) {
   var prefSizeCached = this.prefSizeCached[prefSizeCacheKey];
   if (this.valid && !scout.objects.isNullOrUndefined(prefSizeCached)) {
     $.log.isTraceEnabled() && $.log.trace('(HtmlComponent#prefSize) ' + this.debug() + ' widthHint=' + options.widthHint + ' heightHint=' + options.heightHint + ' prefSizeCached=' + prefSizeCached);
+    if (includeMargin) {
+      prefSizeCached.add(this.margins());
+    }
     return prefSizeCached;
   }
 
@@ -233,6 +268,9 @@ scout.HtmlComponent.prototype.prefSize = function(options) {
   this.prefSizeCached[prefSizeCacheKey] = prefSize;
 
   $.log.isTraceEnabled() && $.log.trace('(HtmlComponent#prefSize) ' + this.debug() + ' widthHint=' + options.widthHint + ' heightHint=' + options.heightHint + ' prefSize=' + prefSize);
+  if (includeMargin) {
+    prefSize.add(this.margins());
+  }
   return prefSize;
 };
 
@@ -241,14 +279,14 @@ scout.HtmlComponent.prototype.computePrefSizeKey = function(options) {
 };
 
 scout.HtmlComponent.prototype._adjustSizeHintsForPrefSize = function(options) {
-  // Remove padding, border and margins from the width and heightHint so that the actual layout does not need to take care of it
-  // Create a copy to not modify the original options
-  options = $.extend({}, options);
+  // Remove padding, border and margin from the width and heightHint so that the actual layout does not need to take care of it
+  var removeMargin = scout.nvl(options.removeMarginFromHints, true);
+  options.removeMarginFromHints = null;
   if (options.widthHint) {
-    options.widthHint -= this.insets(true).horizontal();
+    options.widthHint -= this.insets(removeMargin).horizontal();
   }
   if (options.heightHint) {
-    options.heightHint -= this.insets(true).vertical();
+    options.heightHint -= this.insets(removeMargin).vertical();
   }
   return options;
 };

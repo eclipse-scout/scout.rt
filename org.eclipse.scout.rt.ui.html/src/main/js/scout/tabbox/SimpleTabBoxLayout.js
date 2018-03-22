@@ -52,19 +52,23 @@ scout.SimpleTabBoxLayout.prototype._layoutTabArea = function(containerSize) {
 /**
  * Preferred size of the tab-box aligns every tab-item in a single line, so that each item is visible.
  */
-scout.SimpleTabBoxLayout.prototype.preferredLayoutSize = function($container) {
+scout.SimpleTabBoxLayout.prototype.preferredLayoutSize = function($container, options) {
+  options = options || {};
   var htmlContainer = scout.HtmlComponent.get($container),
     htmlViewContent = scout.HtmlComponent.get(this.tabBox.$viewContent),
     htmlViewTabs = scout.HtmlComponent.get(this.tabBox.$tabArea),
     viewTabsSize = new scout.Dimension(),
     viewContentSize = new scout.Dimension();
 
+  // HeightHint not supported
+  options.heightHint = null;
+
   if (htmlViewTabs.isVisible()) {
     viewTabsSize = htmlViewTabs.prefSize()
       .add(htmlViewTabs.margins());
   }
 
-  viewContentSize = htmlViewContent.prefSize()
+  viewContentSize = htmlViewContent.prefSize(options)
     .add(htmlContainer.insets())
     .add(htmlViewContent.margins());
 

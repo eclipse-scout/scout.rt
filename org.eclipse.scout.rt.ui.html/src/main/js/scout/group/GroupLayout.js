@@ -44,10 +44,14 @@ scout.GroupLayout.prototype.invalidate = function(htmlSource) {
 };
 
 scout.GroupLayout.prototype.preferredLayoutSize = function($container, options) {
+  options = options || {};
   var prefSize;
   var htmlComp = this.group.htmlComp;
   var htmlHeader = this.group.htmlHeader;
   var htmlBody = this.group.body.htmlComp;
+
+  // HeightHint not supported
+  options.heightHint = null;
 
   if (this.group.bodyAnimating) {
     // Return the current size when the body is collapsing or expanding

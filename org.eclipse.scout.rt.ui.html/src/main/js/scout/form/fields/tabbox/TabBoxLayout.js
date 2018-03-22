@@ -85,7 +85,8 @@ scout.TabBoxLayout.prototype._layoutStatus = function(height) {
 /**
  * Preferred size of the tab-box aligns every tab-item in a single line, so that each item is visible.
  */
-scout.TabBoxLayout.prototype.preferredLayoutSize = function($container) {
+scout.TabBoxLayout.prototype.preferredLayoutSize = function($container, options) {
+  options = options || {};
   var htmlContainer = scout.HtmlComponent.get($container),
     htmlTabContent = scout.HtmlComponent.get(this._tabBox._$tabContent),
     htmlTabArea = scout.HtmlComponent.get(this._tabBox.header.$container),
@@ -94,6 +95,9 @@ scout.TabBoxLayout.prototype.preferredLayoutSize = function($container) {
     $status = this._tabBox.$status,
     statusPosition = this._tabBox.statusPosition,
     headerWidthHint = htmlContainer.availableSize().subtract(htmlContainer.insets()).width;
+
+  // HeightHint not supported
+  options.heightHint = null;
 
   if (htmlTabArea.isVisible()) {
     if ($status && $status.isVisible()) {
@@ -107,7 +111,7 @@ scout.TabBoxLayout.prototype.preferredLayoutSize = function($container) {
       .add(htmlTabArea.margins());
   }
 
-  tabContentSize = htmlTabContent.prefSize()
+  tabContentSize = htmlTabContent.prefSize(options)
     .add(htmlContainer.insets())
     .add(htmlTabContent.margins());
 

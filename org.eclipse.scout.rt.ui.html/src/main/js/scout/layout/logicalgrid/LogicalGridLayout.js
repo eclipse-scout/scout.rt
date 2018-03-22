@@ -30,25 +30,7 @@ scout.LogicalGridLayout = function(widget, options) {
 };
 scout.inherits(scout.LogicalGridLayout, scout.AbstractLayout);
 
-scout.LogicalGridLayout.prototype._verifyLayout = function($container) {
-  var htmlContainer = scout.HtmlComponent.get($container),
-    containerSize = htmlContainer.size();
-
-  if (!this.valid || !this.validityBasedOnContainerSize.equals(containerSize)) {
-    this.validityBasedOnContainerSize = containerSize;
-    this.validateLayout($container);
-    this.valid = true;
-  }
-};
-
-/**
- * @override
- */
-scout.LogicalGridLayout.prototype.invalidate = function() {
-  this.valid = false;
-};
-
-scout.LogicalGridLayout.prototype.validateLayout = function($container) {
+scout.LogicalGridLayout.prototype.validateLayout = function($container, options) {
   var visibleComps = [], visibleCons = [], cons;
 
   this.widget.validateLogicalGrid();
@@ -76,7 +58,9 @@ scout.LogicalGridLayout.prototype.validateLayout = function($container) {
     hgap: this.hgap,
     vgap: this.vgap,
     rowHeight: this.rowHeight,
-    columnWidth: this.columnWidth
+    columnWidth: this.columnWidth,
+    widthHint: options.widthHint,
+    heightHint: options.heightHint
   });
   $.log.isTraceEnabled() && $.log.trace('(LogicalGridLayout#validateLayout) $container=' + scout.HtmlComponent.get($container).debug());
 };
@@ -86,10 +70,13 @@ scout.LogicalGridLayout.prototype.layout = function($container) {
 };
 
 scout.LogicalGridLayout.prototype._layout = function($container) {
-  this._verifyLayout($container);
   var htmlContainer = scout.HtmlComponent.get($container),
     containerSize = htmlContainer.availableSize(),
     containerInsets = htmlContainer.insets();
+  this.validateLayout($container, {
+    widthHint: containerSize.width - containerInsets.horizontal(),
+    heightHint: containerSize.height - containerInsets.vertical()
+  });
   if (this.minWidth > 0 && containerSize.width < this.minWidth) {
     containerSize.width = this.minWidth;
   }
@@ -154,12 +141,11 @@ scout.LogicalGridLayout.prototype._layout = function($container) {
   }
 };
 
-scout.LogicalGridLayout.prototype.preferredLayoutSize = function($container) {
-  return this.getLayoutSize($container, scout.LayoutConstants.PREF);
-};
+scout.LogicalGridLayout.prototype.preferredLayoutSize = function($container, options) {
+  // widthHint and heightHint are already adjusted by HtmlComponent, no need to remove insets here
+  this.validateLayout($container, options);
 
-scout.LogicalGridLayout.prototype.getLayoutSize = function($container, sizeflag) {
-  this._verifyLayout($container);
+  var sizeflag = scout.LayoutConstants.PREF;
   var dim = new scout.Dimension();
   // w
   var i, w, h, useCount = 0;

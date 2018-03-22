@@ -104,10 +104,6 @@ scout.TabAreaLayout.prototype.preferredLayoutSize = function($container, options
     },
     unorderedVisibleTabs = [];
 
-  if (options.widthHint) {
-    options.widthHint -= htmlContainer.insets().horizontal();
-  }
-
   this.overflowTabs = [];
   this.visibleTabs = [];
 

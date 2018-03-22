@@ -15,8 +15,10 @@ scout.LogicalGridLayoutInfo = function(model) {
   this.gridDatas = [];
   this.$components = null;
   this.cols = 0;
+  this.compSize = [];
   this.rows = 0;
   this.width = [];
+  this.widthHints = [];
   this.height = [];
   this.weightX = [];
   this.weightY = [];
@@ -24,7 +26,8 @@ scout.LogicalGridLayoutInfo = function(model) {
   this.vgap = 0;
   this.rowHeight = 0;
   this.columnWidth = 0;
-  this.m_cellBounds = [];
+  this.cellBounds = [];
+  this.widthHint = null;
   $.extend(this, model);
 
   // create a modifiable copy of the grid datas
@@ -90,36 +93,18 @@ scout.LogicalGridLayoutInfo = function(model) {
   //
   this.cols = usedCols.size();
   this.rows = usedRows.size();
+
   $.log.isTraceEnabled() && $.log.trace('(LogicalGridLayoutInfo#CTOR) $components.length=' + this.$components.length + ' usedCols=' + this.cols + ' usedRows=' + this.rows);
   this._initializeInfo();
 };
 
 scout.LogicalGridLayoutInfo.prototype._initializeInfo = function() {
-  var comp,
-    compCount = this.$components.length,
-    compSize = [];
-  // cache component sizes and cleanup constraints
-  var $comp, cons, d;
+  var compCount = this.$components.length;
+  var uiHeightElements = [];
   for (var i = 0; i < compCount; i++) {
-    $comp = this.$components[i];
-    cons = this.gridDatas[i];
-    if (cons.useUiHeight || cons.useUiWidth || !cons.fillVertical || !cons.fillHorizontal) {
-      // Only read preferred size if really needed by the logical grid layout
-      d = this.uiSizeInPixel($comp);
-      if ($.log.isTraceEnabled()) {
-        comp = scout.HtmlComponent.optGet($comp);
-        $.log.trace('(LogicalGridLayoutInfo#initializeInfo $comp = ' + comp ? comp.debug() : '' + ' size=' + d);
-      }
-    } else {
-      d = new scout.Dimension(0, 0);
-    }
-    if (cons.widthHint > 0) {
-      d.width = cons.widthHint;
-    }
-    if (cons.heightHint > 0) {
-      d.height = cons.heightHint;
-    }
-    compSize[i] = d;
+    // cleanup constraints
+    var $comp = this.$components[i];
+    var cons = this.gridDatas[i];
     if (cons.gridx < 0) {
       cons.gridx = 0;
     }
@@ -144,13 +129,58 @@ scout.LogicalGridLayoutInfo.prototype._initializeInfo = function() {
     if (cons.gridy + cons.gridh >= this.rows) {
       cons.gridh = this.rows - cons.gridy;
     }
+
+    // Calculate and cache component size
+    var size = new scout.Dimension(0, 0);
+    // Use explicit width hint, if set
+    if (cons.widthHint > 0) {
+      size.width = cons.widthHint;
+    }
+    // Calculate preferred width otherwise
+    // This size is needed by _initializeColumns
+    else if (cons.useUiWidth || !cons.fillHorizontal) {
+      // But only if really needed by the logical grid layout (because it is expensive)
+      size = this.uiSizeInPixel($comp, cons);
+    }
+    // Use explicit height hint, if set
+    if (cons.heightHint > 0) {
+      size.height = cons.heightHint;
+    }
+    // Otherwise check if preferred height should be calculated.
+    // Don't do it now because because weightX need to be calculated first to get the correct width hints
+    else if (cons.useUiHeight || !cons.fillVertical) {
+      uiHeightElements.push({
+        cons: cons,
+        $comp: $comp,
+        index: i
+      });
+    }
+    this.compSize[i] = size;
   }
-  this.compSize = compSize;
-  this._initializeColumns(compSize);
-  this._initializeRows(compSize);
+
+  // Calculate this.width and this.weightX
+  this._initializeColumns();
+
+  // Calculate preferred heights using the width hints
+  if (this.widthHint && uiHeightElements.length > 0) {
+    var totalHGap = Math.max(0, (this.cols - 1) * this.hgap);
+    this.widthHints = this.layoutSizes(this.widthHint - totalHGap, this.width, this.weightX);
+  }
+  uiHeightElements.forEach(function(elem) {
+    var $comp = elem.$comp;
+    var cons = elem.cons;
+    var size = this.uiSizeInPixel($comp, cons, {
+      widthHint: this.widthHintForGridData(cons)
+    });
+    this.compSize[elem.index] = size;
+  }, this);
+
+  // Calculate this.height and this.weightY
+  this._initializeRows();
 };
 
-scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(compSize) {
+scout.LogicalGridLayoutInfo.prototype._initializeColumns = function() {
+  var compSize = this.compSize;
   var compCount = compSize.length;
   var prefWidths = scout.arrays.init(this.cols, 0);
   var fixedWidths = scout.arrays.init(this.cols, false);
@@ -257,7 +287,8 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(compSize) {
   }
 };
 
-scout.LogicalGridLayoutInfo.prototype._initializeRows = function(compSize) {
+scout.LogicalGridLayoutInfo.prototype._initializeRows = function() {
+  var compSize = this.compSize;
   var compCount = compSize.length;
   var prefHeights = scout.arrays.init(this.rows, 0);
   var fixedHeights = scout.arrays.init(this.rows, false);
@@ -366,21 +397,21 @@ scout.LogicalGridLayoutInfo.prototype._initializeRows = function(compSize) {
 scout.LogicalGridLayoutInfo.prototype.layoutCellBounds = function(size, insets) {
   var w = this.layoutSizes(size.width - insets.horizontal() - Math.max(0, (this.cols - 1) * this.hgap), this.width, this.weightX);
   var h = this.layoutSizes(size.height - insets.vertical() - Math.max(0, (this.rows - 1) * this.vgap), this.height, this.weightY);
-  this.m_cellBounds = scout.arrays.init(this.rows, null);
+  this.cellBounds = scout.arrays.init(this.rows, null);
   var y = insets.top,
     r, x, c;
   for (r = 0; r < this.rows; r++) {
     x = insets.left;
-    this.m_cellBounds[r] = scout.arrays.init(this.cols, null);
+    this.cellBounds[r] = scout.arrays.init(this.cols, null);
     for (c = 0; c < this.cols; c++) {
-      this.m_cellBounds[r][c] = new scout.Rectangle(x, y, w[c], h[r]);
+      this.cellBounds[r][c] = new scout.Rectangle(x, y, w[c], h[r]);
       x += w[c];
       x += this.hgap;
     }
     y += h[r];
     y += this.vgap;
   }
-  return this.m_cellBounds;
+  return this.cellBounds;
 };
 
 scout.LogicalGridLayoutInfo.prototype.layoutSizes = function(targetSize, sizes, weights) {
@@ -475,6 +506,21 @@ scout.LogicalGridLayoutInfo.prototype.logicalHeightInPixel = function(cons) {
   return (this.rowHeight * gridH) + (this.vgap * Math.max(0, gridH - 1)) + addition;
 };
 
-scout.LogicalGridLayoutInfo.prototype.uiSizeInPixel = function($comp) {
-  return scout.HtmlComponent.get($comp).prefSize();
+scout.LogicalGridLayoutInfo.prototype.uiSizeInPixel = function($comp, cons, options) {
+  var htmlComp = scout.HtmlComponent.get($comp);
+  return htmlComp.prefSize(options).add(htmlComp.margins());
+};
+
+/**
+ * @returns the width hint for the given gridData
+ */
+scout.LogicalGridLayoutInfo.prototype.widthHintForGridData = function(gridData) {
+  if (this.widthHints.length === 0) {
+    return null;
+  }
+  var widthHint = (gridData.gridw - 1) * this.hgap;
+  for (var i = gridData.gridx; i < gridData.gridx + gridData.gridw; i++) {
+    widthHint += this.widthHints[i];
+  }
+  return widthHint;
 };

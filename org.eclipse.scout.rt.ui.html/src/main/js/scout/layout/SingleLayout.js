@@ -32,13 +32,13 @@ scout.SingleLayout.prototype.layout = function($container) {
   }
 };
 
-scout.SingleLayout.prototype.preferredLayoutSize = function($container) {
+scout.SingleLayout.prototype.preferredLayoutSize = function($container, options) {
   var htmlChild = this._htmlChild;
   if (!htmlChild) {
     htmlChild = this._getHtmlSingleChild($container);
   }
   if (htmlChild) {
-    return htmlChild.prefSize().add(scout.graphics.insets($container));
+    return htmlChild.prefSize(options).add(scout.graphics.insets($container));
   } else {
     return new scout.Dimension(1, 1);
   }

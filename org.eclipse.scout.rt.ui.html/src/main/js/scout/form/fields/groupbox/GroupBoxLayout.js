@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.GroupBoxLayout = function(groupBox) {
   scout.GroupBoxLayout.parent.call(this);
-  this._groupBox = groupBox;
+  this.groupBox = groupBox;
   this._statusWidth = scout.HtmlEnvironment.fieldStatusWidth;
 };
 scout.inherits(scout.GroupBoxLayout, scout.AbstractLayout);
@@ -18,14 +18,14 @@ scout.inherits(scout.GroupBoxLayout, scout.AbstractLayout);
 scout.GroupBoxLayout.prototype.layout = function($container) {
   var titleMarginX, menuBarSize, gbBodySize,
     statusWidth = 0,
-    statusPosition = this._groupBox.statusPosition,
+    statusPosition = this.groupBox.statusPosition,
     labelMarginX = 0,
-    htmlContainer = this._groupBox.htmlComp,
+    htmlContainer = this.groupBox.htmlComp,
     htmlGbBody = this._htmlGbBody(),
     htmlMenuBar = this._htmlMenuBar(),
-    $groupBoxTitle = this._groupBox.$title,
-    $label = this._groupBox.$label,
-    $status = this._groupBox.$status,
+    $groupBoxTitle = this.groupBox.$title,
+    $label = this.groupBox.$label,
+    $status = this.groupBox.$status,
     containerSize = htmlContainer.availableSize()
     .subtract(htmlContainer.insets());
 
@@ -59,23 +59,23 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
   $.log.isTraceEnabled() && $.log.trace('(GroupBoxLayout#layout) gbBodySize=' + gbBodySize);
   htmlGbBody.setSize(gbBodySize);
 
-   if (htmlGbBody.scrollable || this._groupBox.bodyLayoutConfig.minWidth > 0 ) {
+   if (htmlGbBody.scrollable || this.groupBox.bodyLayoutConfig.minWidth > 0 ) {
     scout.scrollbars.update(htmlGbBody.$comp);
   }
 };
 
 scout.GroupBoxLayout.prototype._layoutStatus = function() {
-  var htmlContainer = this._groupBox.htmlComp,
+  var htmlContainer = this.groupBox.htmlComp,
     containerPadding = htmlContainer.insets({
       includeBorder: false
     }),
     top = containerPadding.top,
     right = containerPadding.right,
-    $groupBoxTitle = this._groupBox.$title,
+    $groupBoxTitle = this.groupBox.$title,
     titleInnerHeight = $groupBoxTitle.innerHeight(),
-    $status = this._groupBox.$status,
+    $status = this.groupBox.$status,
     statusMargins = scout.graphics.margins($status),
-    statusPosition = this._groupBox.statusPosition;
+    statusPosition = this.groupBox.statusPosition;
 
   $status.cssWidth(this._statusWidth);
   if (statusPosition === scout.FormField.StatusPosition.DEFAULT) {
@@ -87,52 +87,75 @@ scout.GroupBoxLayout.prototype._layoutStatus = function() {
   }
 };
 
-scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
-  var htmlContainer = this._groupBox.htmlComp,
+scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container, options) {
+  options = options || {};
+  var htmlContainer = this.groupBox.htmlComp,
     htmlGbBody = this._htmlGbBody(),
     htmlMenuBar,
-    prefSize;
+    prefSize,
+    widthInPixel = 0,
+    heightInPixel = 0,
+    gridData = this.groupBox.gridData;
 
-  if (this._groupBox.expanded) {
-    prefSize = htmlGbBody.prefSize()
+  if (gridData) {
+    widthInPixel = gridData.widthInPixel,
+    heightInPixel = gridData.heightInPixel;
+  }
+  if (widthInPixel && heightInPixel) {
+    // If width and height are set there is no need to calculate anything -> just return it as preferred size
+    prefSize = new scout.Dimension(widthInPixel, heightInPixel)
+      .add(htmlContainer.insets());
+    return prefSize;
+  }
+  // Use explicit width as hint if set (overrides existing hint)
+  if (widthInPixel) {
+    options.widthHint = widthInPixel;
+  }
+  // HeightHint not supported
+  options.heightHint = null;
+
+  if (this.groupBox.expanded) {
+    prefSize = htmlGbBody.prefSize(options)
       .add(htmlGbBody.margins());
 
     htmlMenuBar = this._htmlMenuBar();
     if (htmlMenuBar) {
-      prefSize.height += htmlMenuBar.prefSize().height;
+      prefSize.height += htmlMenuBar.prefSize(options).height;
     }
   } else {
     prefSize = new scout.Dimension(0, 0);
   }
   prefSize = prefSize.add(htmlContainer.insets());
   prefSize.height += this._titleHeight();
-  prefSize.height += this._notificationHeight();
+  prefSize.height += this._notificationHeight(options);
 
   // predefined height or width in pixel override other values
-  if (this._groupBox.gridData && this._groupBox.gridData.widthInPixel) {
-    prefSize.width = this._groupBox.gridData.widthInPixel;
+  if (widthInPixel) {
+    prefSize.width = widthInPixel;
   }
-  if (this._groupBox.gridData && this._groupBox.gridData.heightInPixel) {
-    prefSize.height = this._groupBox.gridData.heightInPixel;
+  if (heightInPixel) {
+    prefSize.height = heightInPixel;
   }
 
   return prefSize;
 };
 
 scout.GroupBoxLayout.prototype._titleHeight = function() {
-  return scout.graphics.prefSize(this._groupBox.$title, true).height;
+  return scout.graphics.prefSize(this.groupBox.$title, true).height;
 };
 
-scout.GroupBoxLayout.prototype._notificationHeight = function() {
-  if (!this._groupBox.notification) {
+scout.GroupBoxLayout.prototype._notificationHeight = function(options) {
+  options = options || {};
+  if (!this.groupBox.notification) {
     return 0;
   }
-  return this._groupBox.notification.htmlComp.prefSize(true).height;
+  options.includeMargin = true;
+  return this.groupBox.notification.htmlComp.prefSize(options).height;
 };
 
 scout.GroupBoxLayout.prototype._menuBarSize = function(htmlMenuBar, containerSize, statusWidth) {
   var menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
-  if (!this._groupBox.mainBox) {
+  if (!this.groupBox.mainBox) {
     // adjust size of menubar as well if it is in a regular group box
     menuBarSize.width -= statusWidth;
   }
@@ -143,8 +166,8 @@ scout.GroupBoxLayout.prototype._menuBarSize = function(htmlMenuBar, containerSiz
  * Return menu-bar when it exists and it is visible.
  */
 scout.GroupBoxLayout.prototype._htmlMenuBar = function() {
-  if (this._groupBox.menuBar && this._groupBox.menuBarVisible) {
-    var htmlMenuBar = scout.HtmlComponent.get(this._groupBox.menuBar.$container);
+  if (this.groupBox.menuBar && this.groupBox.menuBarVisible) {
+    var htmlMenuBar = scout.HtmlComponent.get(this.groupBox.menuBar.$container);
     if (htmlMenuBar.isVisible()) {
       return htmlMenuBar;
     }
@@ -153,5 +176,5 @@ scout.GroupBoxLayout.prototype._htmlMenuBar = function() {
 };
 
 scout.GroupBoxLayout.prototype._htmlGbBody = function() {
-  return scout.HtmlComponent.get(this._groupBox.$body);
+  return scout.HtmlComponent.get(this.groupBox.$body);
 };

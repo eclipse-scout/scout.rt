@@ -33,17 +33,22 @@ scout.FormLayout.prototype.layout = function($container) {
   htmlRootGb.setSize(rootGbSize);
 };
 
-scout.FormLayout.prototype.preferredLayoutSize = function($container) {
+scout.FormLayout.prototype.preferredLayoutSize = function($container, options) {
+  options = options || {};
   var htmlContainer = scout.HtmlComponent.get($container),
     htmlRootGb = this._htmlRootGroupBox(),
     prefSize;
 
   this.form.validateLogicalGrid();
 
-  prefSize = htmlRootGb.prefSize()
+  var titleHeight = this._titleHeight();
+  if (options.heightHint) {
+    options.heightHint -= titleHeight;
+  }
+  prefSize = htmlRootGb.prefSize(options)
     .add(htmlContainer.insets())
     .add(htmlRootGb.margins());
-  prefSize.height += this._titleHeight();
+  prefSize.height += titleHeight;
 
   return prefSize;
 };
