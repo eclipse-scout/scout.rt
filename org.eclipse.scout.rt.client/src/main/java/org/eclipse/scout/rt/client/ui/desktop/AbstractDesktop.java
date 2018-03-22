@@ -102,6 +102,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.SimpleEventListenerList;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
@@ -146,7 +147,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private final EventListenerList m_listenerList;
   private int m_dataChanging;
   private final List<Object[]> m_dataChangeEventBuffer;
-  private final Map<Object, EventListenerList> m_dataChangeListenerList;
+  private final Map<Object, SimpleEventListenerList<DataChangeListener>> m_dataChangeListenerList;
   private final IDesktopUIFacade m_uiFacade;
   private List<IOutline> m_availableOutlines;
   private IOutline m_outline;
@@ -1705,22 +1706,22 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void addDataChangeListener(DataChangeListener listener, Object... dataTypes) {
     if (dataTypes == null || dataTypes.length == 0) {
-      EventListenerList list = m_dataChangeListenerList.get(null);
+      SimpleEventListenerList<DataChangeListener> list = m_dataChangeListenerList.get(null);
       if (list == null) {
-        list = new EventListenerList();
+        list = new SimpleEventListenerList<DataChangeListener>();
         m_dataChangeListenerList.put(null, list);
       }
-      list.add(DataChangeListener.class, listener);
+      list.add(listener);
     }
     else {
       for (Object dataType : dataTypes) {
         if (dataType != null) {
-          EventListenerList list = m_dataChangeListenerList.get(dataType);
+          SimpleEventListenerList<DataChangeListener> list = m_dataChangeListenerList.get(dataType);
           if (list == null) {
-            list = new EventListenerList();
+            list = new SimpleEventListenerList<DataChangeListener>();
             m_dataChangeListenerList.put(dataType, list);
           }
-          list.add(DataChangeListener.class, listener);
+          list.add(listener);
         }
       }
     }
@@ -1729,10 +1730,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void removeDataChangeListener(DataChangeListener listener, Object... dataTypes) {
     if (dataTypes == null || dataTypes.length == 0) {
-      for (Iterator<EventListenerList> it = m_dataChangeListenerList.values().iterator(); it.hasNext();) {
-        EventListenerList list = it.next();
-        list.removeAll(DataChangeListener.class, listener);
-        if (list.getListenerCount(DataChangeListener.class) == 0) {
+      for (Iterator<SimpleEventListenerList<DataChangeListener>> it = m_dataChangeListenerList.values().iterator(); it.hasNext();) {
+        SimpleEventListenerList<DataChangeListener> list = it.next();
+        list.remove(listener);
+        if (list.isEmpty()) {
           it.remove();
         }
       }
@@ -1740,10 +1741,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     else {
       for (Object dataType : dataTypes) {
         if (dataType != null) {
-          EventListenerList list = m_dataChangeListenerList.get(dataType);
+          SimpleEventListenerList<DataChangeListener> list = m_dataChangeListenerList.get(dataType);
           if (list != null) {
-            list.remove(DataChangeListener.class, listener);
-            if (list.getListenerCount(DataChangeListener.class) == 0) {
+            list.remove(listener);
+            if (list.isEmpty()) {
               m_dataChangeListenerList.remove(dataType);
             }
           }
@@ -1802,9 +1803,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       HashMap<DataChangeListener, Set<Object>> map = new LinkedHashMap<>();
       for (Object dataType : dataTypes) {
         if (dataType != null) {
-          EventListenerList list = m_dataChangeListenerList.get(dataType);
+          SimpleEventListenerList<DataChangeListener> list = m_dataChangeListenerList.get(dataType);
           if (list != null) {
-            for (DataChangeListener listener : list.getListeners(DataChangeListener.class)) {
+            for (DataChangeListener listener : list) {
               Set<Object> typeSet = map.get(listener);
               if (typeSet == null) {
                 typeSet = new LinkedHashSet<Object>();

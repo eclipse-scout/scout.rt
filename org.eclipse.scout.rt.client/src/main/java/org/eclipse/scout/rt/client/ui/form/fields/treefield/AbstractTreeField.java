@@ -266,7 +266,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
     if (m_tree != null && !m_treeExternallyManaged) {
       m_tree.setAutoDiscardOnDelete(false);
       m_treeListener = new P_TreeListener();
-      m_tree.addTreeListener(m_treeListener);
+      m_tree.addTreeListener(m_treeListener, TreeEvent.TYPE_NODES_DELETED, TreeEvent.TYPE_NODES_INSERTED, TreeEvent.TYPE_NODES_UPDATED, TreeEvent.TYPE_NODES_CHECKED);
     }
     if (m_tree != null) {
       m_tree.setEnabled(isEnabled());

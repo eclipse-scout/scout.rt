@@ -58,6 +58,8 @@ public class AlphanumericComparator implements Comparator<String>, Serializable 
     return m_ignoreCase;
   }
 
+  private static final Pattern NUN_OR_TEXT_PATTERN = Pattern.compile("(?:([0-9]+)|([^0-9]+))", Pattern.DOTALL);
+
   @Override
   public int compare(String s1, String s2) {
     if (s1 == null && s2 == null) {
@@ -69,20 +71,23 @@ public class AlphanumericComparator implements Comparator<String>, Serializable 
     if (s2 == null) {
       return 1;
     }
-    Pattern p = Pattern.compile("(([0-9]+)|([^0-9]+))", Pattern.DOTALL);
-    Matcher matcher1 = p.matcher(s1);
-    Matcher matcher2 = p.matcher(s2);
-    boolean found1 = matcher1.find();
-    boolean found2 = matcher2.find();
+    Matcher m1 = NUN_OR_TEXT_PATTERN.matcher(s1);
+    Matcher m2 = NUN_OR_TEXT_PATTERN.matcher(s2);
+    boolean found1 = m1.find();
+    boolean found2 = m2.find();
+    int result;
     while (found1 && found2) {
-      String nextGroup1 = matcher1.group(1);
-      String nextGroup2 = matcher2.group(1);
-      int result = compareAsLongs(nextGroup1, nextGroup2);
+      if (m1.group(1) != null && m2.group(1) != null) {
+        result = compareAsLongs(Long.parseLong(m1.group(1)), Long.parseLong(m2.group(1)));
+      }
+      else {
+        result = compareAsStrings(m1.group(2), m2.group(2));
+      }
       if (result != 0) {
         return result;
       }
-      found1 = matcher1.find();
-      found2 = matcher2.find();
+      found1 = m1.find();
+      found2 = m2.find();
     }
     return compareFound(found1, found2);
   }
@@ -91,18 +96,8 @@ public class AlphanumericComparator implements Comparator<String>, Serializable 
    * Compares the two strings {@code s1} and {@code s2} as {@link Long}s if possible. If not, a string comparison is
    * done.
    */
-  protected int compareAsLongs(String s1, String s2) {
-    int result = 0;
-    try {
-      Long n1 = Long.parseLong(s1);
-      Long n2 = Long.parseLong(s2);
-      result = n1.compareTo(n2);
-    }
-    catch (NumberFormatException e) {
-      // At least one of the strings contains non-numeric characters --> use String comparison
-      result = compareAsStrings(s1, s2);
-    }
-    return result;
+  protected int compareAsLongs(Long n1, Long n2) {
+    return n1.compareTo(n2);
   }
 
   /**

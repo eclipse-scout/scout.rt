@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -126,6 +127,31 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * Currently used: {@link #PAGE_ACTIVATED}
    */
   byte m_flags2;
+
+  @Override
+  protected List<IMenu> lazyCreateAndInitializeMenus() {
+    if (isInitializing()) {
+      LOG.warn(
+          "Menus in page {} are now created during page init. This is not recommended. The menus should be created lazily when the page is activated. "
+              + "Use e.g. the execInitTable() callback to access the table after it has been created.",
+          getClass(), new Exception("origin"));
+    }
+    final AtomicReference<List<IMenu>> ref = new AtomicReference<>();
+    createDisplayParentRunContext()
+        .run(
+            new IRunnable() {
+              @Override
+              public void run() throws Exception {
+                runInExtensionContext(new Runnable() {
+                  @Override
+                  public void run() {
+                    ref.set(AbstractPage.super.lazyCreateAndInitializeMenus());
+                  }
+                });
+              }
+            });
+    return ref.get();
+  }
 
   @Override
   public T getTable() {
@@ -679,7 +705,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     if (tree == null) {
       return;
     }
-    tree.addTreeListener(m_treeListener);
+    tree.addTreeListener(m_treeListener, TreeEvent.TYPE_NODES_UPDATED);
   }
 
   @Override
@@ -958,7 +984,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     if (tree == null) {
       return;
     }
-
     try {
       tree.setTreeChanging(true);
       loadChildren();

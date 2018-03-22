@@ -22,6 +22,10 @@ public interface TreeListener extends EventListener {
 
   /**
    * batch event for fast processing of batch changes
+   * 
+   * @deprecated in order for better performance the most efficient way is to only register for the events that are
+   *             really handled. see the vararg parameter to {@link ITree#addTreeListener(TreeListener, int...)}
    */
+  @Deprecated
   void treeChangedBatch(List<? extends TreeEvent> batch);
 }

@@ -18,6 +18,7 @@ import java.util.List;
  */
 public class TreeAdapter implements TreeListener {
 
+  @SuppressWarnings("deprecation")
   @Override
   public void treeChangedBatch(List<? extends TreeEvent> events) {
     for (TreeEvent event : events) {

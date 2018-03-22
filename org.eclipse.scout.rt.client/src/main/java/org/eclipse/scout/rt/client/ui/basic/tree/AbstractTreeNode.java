@@ -240,26 +240,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     setExpandedLazyInternal(isLazyExpandingEnabled());
     setInitialExpanded(getConfiguredExpanded());
     m_contributionHolder = new ContributionComposite(this);
-    // menus
-    List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
-    List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
-
-    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
-    for (Class<? extends IMenu> menuClazz : declaredMenus) {
-      IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
-      menus.addOrdered(menu);
-    }
-
-    try {
-      injectMenusInternal(menus);
-    }
-    catch (Exception e) {
-      LOG.error("error occured while dynamically contribute menus.", e);
-    }
-    menus.addAllOrdered(contributedMenus);
-
-    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
-    m_menus = menus.getOrderedList();
+    // menus are lazy
   }
 
   @Override
@@ -303,13 +284,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   public void initTreeNode() {
     setInitializing(true);
     try {
-      // init menus
-      try {
-        ActionUtility.initActions(getMenus());
-      }
-      catch (RuntimeException e) {
-        LOG.error("could not initialize actions.", e);
-      }
       interceptInitTreeNode();
     }
     finally {
@@ -708,6 +682,39 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public List<IMenu> getMenus() {
+    if (m_menus == null) {
+      m_menus = lazyCreateAndInitializeMenus();
+    }
+    return m_menus;
+  }
+
+  protected List<IMenu> lazyCreateAndInitializeMenus() {
+    List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
+    List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
+
+    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
+    for (Class<? extends IMenu> menuClazz : declaredMenus) {
+      IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
+      menus.addOrdered(menu);
+    }
+
+    try {
+      injectMenusInternal(menus);
+    }
+    catch (Exception e) {
+      LOG.error("error occured while dynamically contribute menus.", e);
+    }
+    menus.addAllOrdered(contributedMenus);
+
+    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
+    m_menus = menus.getOrderedList();
+    // init menus
+    try {
+      ActionUtility.initActions(m_menus);
+    }
+    catch (RuntimeException e) {
+      LOG.error("could not initialize actions.", e);
+    }
     return m_menus;
   }
 
@@ -909,7 +916,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
    * do not use this internal method
    */
   public final void removeChildNodesInternal(Collection<? extends ITreeNode> nodes, boolean includeSubtree, boolean disposeNodes) {
-
     List<ITreeNode> removedNodes = new ArrayList<ITreeNode>();
     synchronized (m_childNodeListLock) {
       for (ITreeNode node : nodes) {
@@ -1155,6 +1161,8 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     for (ITreeNode childNode : getChildNodes()) {
       childNode.dispose();
     }
-    ActionUtility.disposeActions(getMenus());
+    if (m_menus != null) {
+      ActionUtility.disposeActions(m_menus);
+    }
   }
 }
