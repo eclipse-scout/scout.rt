@@ -200,15 +200,12 @@ scout.SmartField.prototype.acceptInput = function() {
 };
 
 scout.SmartField.prototype._checkResetLookupRow = function(searchTextChanged) {
-  return searchTextChanged;
+  return searchTextChanged && this._userWasTyping;
 };
 
 scout.SmartField.prototype._checkSearchTextChanged = function(searchText) {
   if (this.isDropdown()) {
     return false; // search text cannot change
-  }
-  if (scout.strings.empty(this._lastSearchText)) {
-    return false; // no search was done before
   }
   var a = scout.strings.nullIfEmpty(this._firstTextLine(searchText));
   var b = scout.strings.nullIfEmpty(this._lastSearchText);
@@ -835,7 +832,9 @@ scout.SmartField.prototype._onClearIconMouseDown = function(event) {
 scout.SmartField.prototype._clear = function() {
   // don't tab next field when user clicks on clear icon (acceptInput is called later)
   this._tabPrevented = null;
+  // the state of these two flags is important. See #_checkResetLookupRow
   this._lastSearchText = this._readDisplayText();
+  this._userWasTyping = true;
   this.$field.val('');
   if (this.isPopupOpen()) {
     // When cleared, browse by all again, need to do it in setTimeout because sending acceptInput and lookupAll at the same time does not seem to work
