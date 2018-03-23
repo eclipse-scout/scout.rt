@@ -139,6 +139,7 @@ scout.Desktop.prototype._render = function() {
   this._renderDisplayStyle();
   this._renderNavigationHandleVisible();
   this._renderNotifications();
+  this._renderBrowserHistoryEntry();
   this.addOns.forEach(function(addOn) {
     addOn.render();
   }, this);
@@ -407,9 +408,12 @@ scout.Desktop.prototype._renderBrowserHistoryEntry = function() {
   }
   var myWindow = this.$container.window(true),
     history = this.browserHistoryEntry;
-  myWindow.history.pushState({
-    deepLinkPath: history.deepLinkPath
-  }, history.title, history.path);
+  if (history) {
+    var setStateFunc = (this.rendered ? myWindow.history.pushState : myWindow.history.replaceState).bind(myWindow.history);
+    setStateFunc({
+      deepLinkPath: history.deepLinkPath
+    }, history.title, history.path);
+  }
 };
 
 scout.Desktop.prototype._setupDragAndDrop = function() {
