@@ -551,10 +551,10 @@ scout.SmartField.prototype.openPopup = function(browse) {
   if (scout.strings.empty(searchText)) {
     // if search text is empty - always do 'browse', no matter what the error code is
     browse = true;
-  } else if (this.errorStatus && !this._hasUiError(scout.SmartField.ErrorCode.NO_RESULTS)) {
-    // In case the field is invalid, we always want to start a lookup with the current display text
-    // unless the error was 'no results' because in that case it would be pointless to search for that text
-    browse = false;
+  } else if (this.errorStatus) {
+    // In case the search yields a not-unique error, we always want to start a lookup 
+    // with the current display text in every other case we better do browse again
+    browse = !this._hasNotUniqueError();
   }
 
   return this._lookupByTextOrAll(browse, searchText);

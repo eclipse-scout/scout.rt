@@ -70,9 +70,10 @@ describe('SmartFieldRemote', function() {
       expect(mostRecentJsonRequest()).toContainEvents([expectedEvent]);
     });
 
-    it('must "lookup by text" when field is invalid, even though the browse parameter is true', function() {
+    it('must "lookup by text" when error status is NOT_UNIQUE, even though the browse parameter is true', function() {
       smartField.errorStatus = scout.Status.error({
-        message: 'bar'
+        message: 'bar',
+        code: scout.SmartField.ErrorCode.NOT_UNIQUE
       });
       smartField.openPopup(true);
       jasmine.clock().tick(500); // because we use a debounce in SmartField
