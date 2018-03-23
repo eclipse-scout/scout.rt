@@ -41,7 +41,7 @@ public class TreeContextMenu extends AbstractContextMenu<ITree> implements ITree
   @Override
   protected void initConfig() {
     super.initConfig();
-    getContainer().addTreeListener(new P_OwnerTreeListener());
+    getContainer().addTreeListener(new P_OwnerTreeListener(), TreeEvent.TYPE_NODES_SELECTED, TreeEvent.TYPE_NODES_UPDATED);
     // init current menu types
     setCurrentMenuTypes(MenuUtility.getMenuTypesForTreeSelection(getContainer().getSelectedNodes()));
     calculateLocalVisibility();

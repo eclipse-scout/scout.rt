@@ -290,9 +290,9 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
    */
   boolean isAncestorNodeOf(ITreeNode parent, ITreeNode child);
 
-  void addTreeListener(TreeListener listener);
+  void addTreeListener(TreeListener listener, int... eventTypes);
 
-  void removeTreeListener(TreeListener listener);
+  void removeTreeListener(TreeListener listener, int... eventTypes);
 
   /**
    * Add the listener at the top (front) of the listener list (so it is called as LAST listener).
@@ -301,7 +301,7 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
    * <p>
    * Use {@link #addTreeListener(TreeListener)} in all other cases
    */
-  void addUITreeListener(TreeListener listener);
+  void addUITreeListener(TreeListener listener, int... eventTypes);
 
   /**
    * @return the {@link IEventHistory} associated with this tree

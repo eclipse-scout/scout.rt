@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.basic.tree;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -64,7 +63,6 @@ import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.visitor.CollectingVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.DepthFirstTreeVisitor;
@@ -95,7 +93,8 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED, IDimensions.ENABLED_GRANTED);
   private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(AUTO_DISCARD_ON_DELETE, AUTO_TITLE, ACTION_RUNNING, SAVE_AND_RESTORE_SCROLLBARS);
 
-  private final EventListenerList m_listenerList;
+  private final TreeListeners m_listeners = new TreeListeners();
+
   private final Set<ITreeNode> m_checkedNodes;
   private final Map<Object, ITreeNode> m_deletedNodes;
   private final List<ITreeNodeFilter> m_nodeFilters;
@@ -141,7 +140,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
 
   public AbstractTree(boolean callInitializer) {
     super(false);
-    m_listenerList = new EventListenerList();
     m_checkedNodes = new HashSet<>();
     m_deletedNodes = new HashMap<>();
     m_nodeFilters = new ArrayList<>(1);
@@ -2237,18 +2235,18 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
    * Tree Observer
    */
   @Override
-  public void addTreeListener(TreeListener listener) {
-    m_listenerList.add(TreeListener.class, listener);
+  public void addTreeListener(TreeListener listener, int... eventTypes) {
+    m_listeners.add(listener, false, eventTypes);
   }
 
   @Override
-  public void removeTreeListener(TreeListener listener) {
-    m_listenerList.remove(TreeListener.class, listener);
+  public void addUITreeListener(TreeListener listener, int... eventTypes) {
+    m_listeners.addLastCalled(listener, false, eventTypes);
   }
 
   @Override
-  public void addUITreeListener(TreeListener listener) {
-    m_listenerList.insertAtFront(TreeListener.class, listener);
+  public void removeTreeListener(TreeListener listener, int... eventTypes) {
+    m_listeners.remove(listener, eventTypes);
   }
 
   protected IEventHistory<TreeEvent> createEventHistory() {
@@ -2547,20 +2545,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   }
 
   protected void doFireTreeEvent(TreeEvent e) {
-    EventListener[] listeners = m_listenerList.getListeners(TreeListener.class);
-    for (EventListener l : listeners) {
-      ((TreeListener) l).treeChanged(e);
-    }
-  }
-
-  // batch handler
-  private void fireTreeEventBatchInternal(List<? extends TreeEvent> batch) {
-    if (CollectionUtility.hasElements(batch)) {
-      EventListener[] listeners = m_listenerList.getListeners(TreeListener.class);
-      for (EventListener l : listeners) {
-        ((TreeListener) l).treeChangedBatch(batch);
-      }
-    }
+    m_listeners.fireEvent(e);
   }
 
   /**
@@ -2648,7 +2633,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
       try {
         setTreeChanging(true);
         //
-        fireTreeEventBatchInternal(list);
+        m_listeners.fireEvents(list);
       }
       finally {
         setTreeChanging(false);

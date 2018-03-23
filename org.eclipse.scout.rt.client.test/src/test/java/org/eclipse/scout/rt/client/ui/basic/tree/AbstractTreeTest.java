@@ -17,7 +17,6 @@ import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.AbstractTreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeDisposeChain;
@@ -138,7 +137,7 @@ public class AbstractTreeTest {
       m_node1.getTree().setTreeChanging(false);
     }
     // custom check "assertNotification(1, 3)" because different nodes are involved
-    assertEquals("wrong number of notifications", 1, m_treeListener.m_notificationCounter);
+    assertEquals("wrong number of notifications", 3, m_treeListener.m_notificationCounter);
     assertEquals("wrong number of events", 3, m_treeListener.m_treeEvents.size());
     for (int i = 0; i < m_treeListener.m_treeEvents.size(); i++) {
       TreeEvent e = m_treeListener.m_treeEvents.get(i);
@@ -360,14 +359,6 @@ public class AbstractTreeTest {
 
     private void handleTreeEvent(TreeEvent e) {
       m_treeEvents.add(e);
-    }
-
-    @Override
-    public void treeChangedBatch(List<? extends TreeEvent> batch) {
-      ++m_notificationCounter;
-      for (TreeEvent e : batch) {
-        handleTreeEvent(e);
-      }
     }
   }
 
