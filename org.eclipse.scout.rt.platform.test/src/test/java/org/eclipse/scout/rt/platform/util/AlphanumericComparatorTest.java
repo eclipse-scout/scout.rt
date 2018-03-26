@@ -117,6 +117,25 @@ public class AlphanumericComparatorTest {
   }
 
   @Test
+  public void testCompareLargeNumbers() {
+    String s1, s2;
+
+    //18 digits
+    s1 = "999999999999999999";
+    s2 = "888888888888888888";
+    assertTrue("'" + "s1" + "' > '" + s2 + "'", StringUtility.ALPHANUMERIC_COMPARATOR.compare(s1, s2) > 0);
+
+    //19 digits
+    s1 = "9999999999999999999";
+    s2 = "8888888888888888888";
+    assertTrue("'" + "s1" + "' > '" + s2 + "'", StringUtility.ALPHANUMERIC_COMPARATOR.compare(s1, s2) > 0);
+
+    s1 = "88cfea-6578700000000477040000000473720035636.263562363265445634-32653";
+    s2 = "88cfea-685485800000477040000000473720035636.263562363265445634-fec54";
+    assertTrue("'" + "s1" + "' > '" + s2 + "'", StringUtility.ALPHANUMERIC_COMPARATOR.compare(s1, s2) > 0);
+  }
+
+  @Test
   public void testCompareText() {
     String s1 = "doc9.txt";
     String s2 = "myfile.txt";
