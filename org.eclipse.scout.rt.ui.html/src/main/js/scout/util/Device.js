@@ -149,6 +149,15 @@ scout.Device.prototype.hasOnScreenKeyboard = function() {
 };
 
 /**
+ * Returns if the current browser includes the padding-right-space in the scrollWidth calculations.<br>
+ * Such a browser increases the scrollWidth only if the text-content exceeds the space <i>including</i> the right-padding.
+ * This means the scrollWidth is equal to the clientWidth until the right-padding-space is consumed as well.
+ */
+scout.Device.prototype.isScrollWidthIncludingPadding = function() {
+  return scout.device.isInternetExplorer() || scout.device.isFirefox() || scout.device.isEdge();
+};
+
+/**
  * Safari shows a tooltip if ellipsis are displayed due to text truncation. This is fine but, unfortunately, it cannot be prevented.
  * Because showing two tooltips at the same time (native and custom) is bad, the custom tooltip cannot be displayed.
  * @returns {Boolean}
@@ -161,8 +170,16 @@ scout.Device.prototype.isIos = function() {
   return scout.Device.System.IOS === this.system;
 };
 
+scout.Device.prototype.isEdge = function() {
+  return scout.Device.Browser.EDGE === this.browser;
+};
+
 scout.Device.prototype.isInternetExplorer = function() {
   return scout.Device.Browser.INTERNET_EXPLORER === this.browser;
+};
+
+scout.Device.prototype.isFirefox = function() {
+  return scout.Device.Browser.FIREFOX === this.browser;
 };
 
 /**

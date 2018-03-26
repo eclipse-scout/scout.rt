@@ -1541,54 +1541,74 @@ $.fn.selectAllText = function() {
   return this;
 };
 
-/**
- * Checks if content is truncated.
- */
-$.fn.isContentTruncated = function() {
-  var clientWidth = this[0].clientWidth;
-  var scrollWidth = this[0].scrollWidth;
+$.fn._getClientAndScrollWidthRounded = function() {
+  var element = this[0];
 
-  // 1. Fast return if scrollWidth is larger than width
-  // IE sometimes returns a scrollWidth which is bigger than clientWidth but does not show an ellipsis.
-  if (scrollWidth > clientWidth && !scout.device.isInternetExplorer()) {
-    return true;
+  if (scout.device.isInternetExplorer() || scout.device.isEdge()) {
+    // IE and Edge seem to round up the scrollWidth. Therefore the clientWidth must be rounded up as well to have a valid comparison.
+    return {
+      clientWidth: Math.ceil(element.getBoundingClientRect().width) - this.cssBorderWidthX(), // getBoundingClientRect includes the border -> remove it again to have the clientWidth
+      scrollWidth: element.scrollWidth
+    };
   }
 
-  // 2. In some cases the browser returns the same values for clientWidth and scrollWidth,
+  return {
+    clientWidth: element.clientWidth,
+    scrollWidth: element.scrollWidth
+  };
+};
+
+$.fn._getClientAndScrollWidthReliable = function() {
+  var widths = this._getClientAndScrollWidthRounded();
+  if (!scout.device.isScrollWidthIncludingPadding()) {
+    // browser supports accurate client- and scroll widths.
+    return widths;
+  }
+  if (widths.scrollWidth > widths.clientWidth) {
+    // content is large enough so that the scroll-width is already larger than the client-width. Values are correct.
+    return widths;
+  }
+
+  var paddingRight = this.cssPaddingRight(),
+    oldStyle = this.attr('style');
+  if (paddingRight > 0) {
+    // Some browsers render text within the right-padding (even with overflow=hidden). This has an effect on the value of scrollWidth which may be wrong in these cases (scrollWidth == clientWidth but ellipsis is shown).
+    // Solution: temporary remove the padding and reduce the width by the padding-size to have the same space for the text but without padding.
+    this.css({
+      width: widths.clientWidth - paddingRight,
+      paddingRight: '0px'
+    });
+    widths = this._getClientAndScrollWidthRounded(); // read value again.
+    this.attrOrRemove('style', oldStyle);
+    if (widths.scrollWidth > widths.clientWidth) {
+      return widths;
+    }
+  }
+
+  // In some cases the browser returns the same values for clientWidth and scrollWidth,
   // but will cut off the text nevertheless. At least in FF this seems to be a bug related
   // to sub-pixel rendering. The text is "slightly" (0.2 pixels) larger than the clientWidth,
   // but scrollWidth returns the same value.
   // As a workaround, we do a second measurement of the uncut width before returning false.
-  clientWidth = this[0].getBoundingClientRect().width;
-  var oldStyleOfThis = this.attr('style'),
-    parent = this.parent(),
-    oldStyleOfParent;
+  var clientWidth = this[0].getBoundingClientRect().width;
+  this.css('width', 'auto');
+  this.css('max-width', 'none');
+  var scrollWidth = this[0].getBoundingClientRect().width;
+  this.attrOrRemove('style', oldStyle);
+  return {
+    clientWidth: clientWidth,
+    scrollWidth: scrollWidth
+  };
+};
 
-  if (parent) {
-    // change the parent in case the size of the current element is given by the container instead of this element (e.g. for chart-column-selection).
-    // the parent will be absolutely positioned using the scrollSize (the size the child-element would require to show the full content) plus some extra space.
-    // this allows the child to get the required size.
-    oldStyleOfParent = parent.attr('style');
-    parent.css({
-      position: 'absolute',
-      width: (scrollWidth + this.cssMarginX() + this.cssBorderWidthX() + 10 /* give some more space so that the child has enough space */ ) + 'px'
-    });
+/**
+ * Checks if content is truncated.
+ */
+$.fn.isContentTruncated = function() {
+  var widths = this._getClientAndScrollWidthReliable();
+  if (widths.scrollWidth > widths.clientWidth) {
+    return true;
   }
-
-  this.css({
-    width: 'auto',
-    maxWidth: 'none',
-    position: 'relative',
-    display: 'inline-block'
-  });
-  scrollWidth = this[0].getBoundingClientRect().width;
-
-  this.attrOrRemove('style', oldStyleOfThis);
-  if (parent) {
-    parent.attrOrRemove('style', oldStyleOfParent);
-  }
-
-  return scrollWidth > clientWidth;
 };
 
 // TODO [7.0] awe: (graph) consider moving this function to DoubleClickHandler.js
