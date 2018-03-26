@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.util;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,8 +78,15 @@ public class AlphanumericComparator implements Comparator<String>, Serializable 
     boolean found2 = m2.find();
     int result;
     while (found1 && found2) {
-      if (m1.group(1) != null && m2.group(1) != null) {
-        result = compareAsLongs(Long.parseLong(m1.group(1)), Long.parseLong(m2.group(1)));
+      String n1 = m1.group(1);
+      String n2 = m2.group(1);
+      if (n1 != null && n2 != null) {
+        if (n1.length() <= 18 && n2.length() <= 18) {
+          result = compareAsLongs(Long.parseLong(n1), Long.parseLong(n2));
+        }
+        else {
+          result = compareAsBigIntegers(new BigInteger(n1), new BigInteger(n2));
+        }
       }
       else {
         result = compareAsStrings(m1.group(2), m2.group(2));
@@ -93,10 +101,16 @@ public class AlphanumericComparator implements Comparator<String>, Serializable 
   }
 
   /**
-   * Compares the two strings {@code s1} and {@code s2} as {@link Long}s if possible. If not, a string comparison is
-   * done.
+   * Compares the two {@link Long}s done.
    */
   protected int compareAsLongs(Long n1, Long n2) {
+    return n1.compareTo(n2);
+  }
+
+  /**
+   * Compares the two {@link Long}s done.
+   */
+  protected int compareAsBigIntegers(BigInteger n1, BigInteger n2) {
     return n1.compareTo(n2);
   }
 
