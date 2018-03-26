@@ -1704,8 +1704,6 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
         if (list.isEmpty()) {
           it.remove();
         }
-        else {
-        }
       }
     }
     else {
