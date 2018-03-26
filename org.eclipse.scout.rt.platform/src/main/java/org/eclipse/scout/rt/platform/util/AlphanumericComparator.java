@@ -101,14 +101,14 @@ public class AlphanumericComparator implements Comparator<String>, Serializable 
   }
 
   /**
-   * Compares the two {@link Long}s done.
+   * Compares the two {@link Long} {@code s1} and {@code s2}.
    */
   protected int compareAsLongs(Long n1, Long n2) {
     return n1.compareTo(n2);
   }
 
   /**
-   * Compares the two {@link Long}s done.
+   * Compares the two {@link BigInteger} {@code s1} and {@code s2}.
    */
   protected int compareAsBigIntegers(BigInteger n1, BigInteger n2) {
     return n1.compareTo(n2);
