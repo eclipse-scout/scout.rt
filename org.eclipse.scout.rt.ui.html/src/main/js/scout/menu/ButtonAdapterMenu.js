@@ -71,6 +71,13 @@ scout.ButtonAdapterMenu.prototype._onButtonDestroy = function(event) {
 };
 
 /**
+ * @override Widget.js
+ */
+scout.ButtonAdapterMenu.prototype._computeEnabled = function(inheritAccessibility, parentEnabled) {
+  return this.button._computeEnabled(inheritAccessibility, parentEnabled);
+};
+
+/**
  * @override Action.js
  */
 scout.ButtonAdapterMenu.prototype.doAction = function(srcEvent) {
