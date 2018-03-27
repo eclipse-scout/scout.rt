@@ -196,11 +196,11 @@ scout.FormFieldLayout.prototype._layoutDisabledCopyOverlay = function() {
 };
 
 scout.FormFieldLayout.prototype._isLabelVisible = function() {
-  return this.formField.$label && this.formField.labelVisible;
+  return !!this.formField.$label && this.formField.labelVisible;
 };
 
 scout.FormFieldLayout.prototype._isStatusVisible = function() {
-  return this.formField.$status && (this.formField.statusVisible || this.formField.$status.isVisible());
+  return !!this.formField.$status && (this.formField.statusVisible || this.formField.$status.isVisible());
 };
 
 scout.FormFieldLayout.prototype.preferredLayoutSize = function($container, options) {
@@ -213,7 +213,7 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container, optio
   var widthHint = scout.nvl(options.widthHint, 0);
   var heightHint = scout.nvl(options.heightHint, 0);
   // Status is only pulled up if status AND label are on top
-  var statusOnTop = formField.statusPosition === scout.FormField.StatusPosition.TOP && formField.labelPosition === scout.FormField.LabelPosition.TOP;
+  var statusOnTop = formField.statusPosition === scout.FormField.StatusPosition.TOP && this._isLabelVisible() && formField.labelPosition === scout.FormField.LabelPosition.TOP;
 
   // Calculate the preferred sizes of the individual parts
   // Mandatory indicator

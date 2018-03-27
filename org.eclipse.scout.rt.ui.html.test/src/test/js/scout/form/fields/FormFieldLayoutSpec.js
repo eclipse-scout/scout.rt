@@ -59,6 +59,7 @@ describe('FormFieldLayout', function() {
   });
 
   describe('prefSize', function() {
+    // Sizes are with margin, static widths and heights are without margin
     var formField, rowHeight, mandatoryWidth, statusWidth, labelWidth,labelHeight;
     var mandatorySize, mandatoryMargins, labelSize, labelMargins, fieldSize, fieldMargins, statusSize, statusMargins;
 
@@ -74,10 +75,7 @@ describe('FormFieldLayout', function() {
       formField = new CustomFormField();
       formField.init({
         parent: session.desktop,
-        label: 'abc',
-        gridDataHints: {
-          useUiHeight: true
-        }
+        label: 'abc'
       });
       formField.render();
     });
