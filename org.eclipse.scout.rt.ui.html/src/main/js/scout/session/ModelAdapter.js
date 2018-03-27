@@ -80,7 +80,6 @@ scout.ModelAdapter.prototype._initModel = function(model, parent) {
   model.parent = parent;
   model.owner = parent; // Set it explicitly because server sends owner in inspector mode -> ignore the owner sent by server.
   model.modelAdapter = this;
-  model.inheritAccessibility = false; // Hierarchical "enabledness" is handled by the server-side model
 
   if (model.global) {
     // Use the root adapter as owner if global is set to true
