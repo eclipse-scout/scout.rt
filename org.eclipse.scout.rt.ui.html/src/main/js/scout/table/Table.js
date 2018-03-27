@@ -1295,7 +1295,8 @@ scout.Table.prototype._removeRows = function(rows) {
   rows.forEach(function(row) {
     var rowIndex = this.filteredRows().indexOf(row);
     if (rowIndex === -1) {
-      throw new Error('Row not found, cannot remove $row');
+      // row is not visible
+      return;
     }
     var rowRendered = !!row.$row;
     var rowInViewRange = this.viewRangeRendered.contains(rowIndex);
