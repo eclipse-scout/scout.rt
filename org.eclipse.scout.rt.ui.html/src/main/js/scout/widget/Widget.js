@@ -371,6 +371,7 @@ scout.Widget.prototype._removeInternal = function() {
   $.log.isTraceEnabled() && $.log.trace('Removing widget: ' + this);
   this.removing = true;
   this.removalPending = false;
+  this.trigger('removing');
 
   // remove children in reverse order.
   this.children.slice().reverse().forEach(function(child) {
@@ -419,9 +420,9 @@ scout.Widget.prototype._removeAnimated = function() {
     }.bind(this));
   }.bind(this));
 
-  // If the parent is removed while the animation is running, the animationEnd event will never fire
-  // -> Make sure remove is called nevertheless
-  this.parent.one('remove', function() {
+  // If the parent is being removed while the animation is running, the animationEnd event will never fire
+  // -> Make sure remove is called nevertheless. Important: remove it before the parent is removed to maintain the regular remove order
+  this.parent.one('removing', function() {
     this._removeInternal();
   }.bind(this));
 };

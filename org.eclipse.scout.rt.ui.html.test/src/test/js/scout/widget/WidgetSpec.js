@@ -502,13 +502,24 @@ describe('Widget', function() {
     });
 
     it('removes the widget if removing is animated but parent is removed while animation is running', function() {
+      var removeOrder = [];
       var parentWidget = createWidget({
         parent: parent
       });
+      var origRemove = parentWidget._remove;
+      parentWidget._remove = function() {
+        origRemove.call(this);
+        removeOrder.push('parent');
+      };
       var widget = createWidget({
         parent: parentWidget,
         animateRemoval: true
       });
+      origRemove = widget._remove;
+      widget._remove = function() {
+        origRemove.call(this);
+        removeOrder.push('child');
+      };
       parentWidget.render(session.$entryPoint);
       widget.render();
       expect(widget.rendered).toBe(true);
@@ -525,6 +536,9 @@ describe('Widget', function() {
       expect(widget.rendered).toBe(false);
       expect(widget.$container).toBe(null);
       expect(widget.removalPending).toBe(false);
+
+      // Expect that child is removed before parent
+      expect(removeOrder).toEqual(['child', 'parent']);
     });
   });
 
