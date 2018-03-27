@@ -207,6 +207,9 @@ scout.SmartField.prototype._checkSearchTextChanged = function(searchText) {
   if (this.isDropdown()) {
     return false; // search text cannot change
   }
+  if (!this._userWasTyping) {
+    return false;
+  }
   var a = scout.strings.nullIfEmpty(this._firstTextLine(searchText));
   var b = scout.strings.nullIfEmpty(this._lastSearchText);
   return !scout.strings.equalsIgnoreCase(a, b);
@@ -552,7 +555,7 @@ scout.SmartField.prototype.openPopup = function(browse) {
     // if search text is empty - always do 'browse', no matter what the error code is
     browse = true;
   } else if (this.errorStatus) {
-    // In case the search yields a not-unique error, we always want to start a lookup 
+    // In case the search yields a not-unique error, we always want to start a lookup
     // with the current display text in every other case we better do browse again
     browse = !this._hasNotUniqueError();
   }
@@ -1136,6 +1139,11 @@ scout.SmartField.prototype.setLookupRow = function(lookupRow) {
   // never called. That's why we always reset the display text to make sure the display
   // text is correct.
   this.resetDisplayText();
+};
+
+scout.SmartField.prototype.setDisplayText = function(displayText) {
+  scout.SmartField.parent.prototype.setDisplayText.call(this, displayText);
+  this._userWasTyping = false;
 };
 
 scout.SmartField.prototype.resetDisplayText = function() {

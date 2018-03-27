@@ -152,7 +152,11 @@ describe('SmartFieldRemote', function() {
     it('do a "lookup by text" when display-text has changed and no lookup row is set', function() {
       smartField.displayText = 'foo';
       smartField.render();
+      // simulate the user has typed some text. Normally this would be done in _onFieldKeyDown/Up
+      // since we don't want to work with key-event in this test, we must set the _userWasTyping flag manually
       smartField.$field.val('bar');
+      smartField._userWasTyping = true;
+      // --- end of simulation ---
       smartField.acceptInput();
 
       sendQueuedAjaxCalls();
