@@ -219,6 +219,9 @@ scout.SmartField2.prototype._checkSearchTextChanged = function(searchText) {
   if (this.isDropdown()) {
     return false; // search text cannot change
   }
+  if (!this._userWasTyping) {
+    return false;
+  }
   var a = scout.strings.nullIfEmpty(this._firstTextLine(searchText));
   var b = scout.strings.nullIfEmpty(this._lastSearchText);
   return !scout.strings.equalsIgnoreCase(a, b);
@@ -1102,6 +1105,11 @@ scout.SmartField2.prototype.setLookupRow = function(lookupRow) {
   // never called. That's why we always reset the display text to make sure the display
   // text is correct.
   this.resetDisplayText();
+};
+
+scout.SmartField2.prototype.setDisplayText = function(displayText) {
+  scout.SmartField.parent.prototype.setDisplayText.call(this, displayText);
+  this._userWasTyping = false;
 };
 
 scout.SmartField2.prototype.resetDisplayText = function() {

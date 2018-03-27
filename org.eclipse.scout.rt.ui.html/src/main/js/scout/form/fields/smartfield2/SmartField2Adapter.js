@@ -26,7 +26,7 @@ scout.SmartField2Adapter.prototype._syncResult = function(result) {
   this.widget.lookupCall.resolveLookup(result);
 };
 
-// When displayText comes from the server we don't we must not call parseAndSetValue here.
+// When displayText comes from the server we don't must not call parseAndSetValue here.
 scout.SmartField2Adapter.prototype._syncDisplayText = function(displayText) {
   this.widget.setDisplayText(displayText);
 };
