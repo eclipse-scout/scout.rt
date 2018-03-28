@@ -67,7 +67,6 @@ scout.PopupWithHeadLayout.prototype._calcMaxSizeAroundAnchor = function() {
   return new scout.Insets(maxHeightUp, maxWidthRight, maxHeightDown, maxWidthLeft);
 };
 
-
 scout.PopupWithHeadLayout.prototype.preferredLayoutSize = function($container, options) {
   var htmlComp = this.popup.htmlComp,
     htmlBody,
@@ -84,23 +83,25 @@ scout.PopupWithHeadLayout.prototype.preferredLayoutSize = function($container, o
 
     htmlBody = scout.HtmlComponent.optGet(this.popup.$body);
     if (htmlBody) {
-      prefSize = htmlBody.prefSize()
-        .add(htmlComp.insets())
+      prefSize = htmlBody.prefSize(options)
         .add(htmlBody.margins());
     } else {
-      prefSize = scout.graphics.prefSize(this.popup.$body, true)
-      .add(htmlComp.insets());
+      prefSize = scout.graphics.prefSize(this.popup.$body, options)
+        .add(scout.graphics.margins(this.popup.$body));
     }
 
     $siblingBodies.removeClass('hidden');
     this.popup.$container.attr('style', popupStyleBackup);
   } else {
-    prefSize = scout.graphics.size(this.popup.$body, true);
+    prefSize = scout.graphics.size(this.popup.$body, options)
+      .add(scout.graphics.margins(this.popup.$body));
   }
 
   if (this.popup._headVisible) {
-    var headSize = scout.graphics.size(this.popup.$head, true);
+    var headSize = scout.graphics.size(this.popup.$head, options)
+      .add(scout.graphics.margins(this.popup.$head));
     prefSize.width = prefSize.width < headSize.width ? headSize.width : prefSize.width;
   }
+  prefSize.add(htmlComp.insets());
   return prefSize;
 };
