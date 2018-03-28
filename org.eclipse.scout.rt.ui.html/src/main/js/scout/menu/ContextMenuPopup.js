@@ -185,6 +185,8 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
   var $insertAfterElement = parentMenu.$container.prev();
   var position = parentMenu.$container.position();
   parentMenu.$placeHolder = parentMenu.$container.clone();
+  // HtmlComponent is necessary for the row layout (it would normally be installed by Menu.js, but $placeholder is just a jquery clone of parentMenu.$container and is not managed by a real widget)
+  scout.HtmlComponent.install(parentMenu.$placeHolder, this.session);
   if ($insertAfterElement.length) {
     parentMenu.$placeHolder.insertAfter($insertAfterElement);
   } else {
