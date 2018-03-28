@@ -19,7 +19,7 @@ scout.TabItemLayout.prototype._layoutStatus = function() {
 
 scout.TabItemLayout.prototype._menuBarSize = function(htmlMenuBar, containerSize, statusWidth) {
   var menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
-  var tabBox = this._groupBox.parent;
+  var tabBox = this.groupBox.parent;
   menuBarSize.width = tabBox.header.$container.outerWidth();
   return menuBarSize;
 };
