@@ -12,3 +12,13 @@ scout.SequenceBoxAdapter = function() {
   scout.SequenceBoxAdapter.parent.call(this);
 };
 scout.inherits(scout.SequenceBoxAdapter, scout.CompositeFieldAdapter);
+
+/**
+ * @override
+ */
+scout.SequenceBoxAdapter.prototype._initModel = function(model, parent) {
+  model = scout.SequenceBoxAdapter.parent.prototype._initModel.call(this, model, parent);
+  // Set logical grid to null -> Calculation happens on server side
+  model.logicalGrid = null;
+  return model;
+};
