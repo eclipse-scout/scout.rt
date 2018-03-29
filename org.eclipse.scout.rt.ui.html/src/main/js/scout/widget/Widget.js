@@ -41,6 +41,7 @@ scout.Widget = function() {
   this.rendered = false;
   this.attached = false;
   this.destroyed = false;
+  this.destroying = false;
 
   this.enabled = true;
   this.disabledStyle = scout.Widget.DisabledStyle.DEFAULT;
@@ -1364,6 +1365,20 @@ scout.Widget.prototype.focusAndPreventDefault = function(event) {
     return true;
   }
   return false;
+};
+
+/**
+ * @returns the parent for which the given function returns true.
+ */
+scout.Widget.prototype.findParent = function(func) {
+  var parent = this.parent;
+  while (parent) {
+    if (func(parent)) {
+      return parent;
+    }
+    parent = parent.parent;
+  }
+  return parent;
 };
 
 /**

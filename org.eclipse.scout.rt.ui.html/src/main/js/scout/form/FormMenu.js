@@ -53,8 +53,46 @@ scout.FormMenu.prototype.clone = function(modelOverride) {
   return scout.FormMenu.parent.prototype.clone.call(this, modelOverride);
 };
 
+scout.FormMenu.prototype._addFormRemoveHandler = function() {
+  if (!this.form) {
+    return;
+  }
+
+  this.form.one('remove', function(event) {
+    this._onFormRemove(event);
+  }.bind(this));
+};
+
 /**
- * @override
+ * Called when the popup form is removed (closed). Either by clicking the FormMenu again (toggle), the menu closed or if the Form closed itself.
+ */
+scout.FormMenu.prototype._onFormRemove = function(event) {
+  if (!this.selected) {
+    return; // the menu is no longer selected. It was closed by the user (toggle). There is no need to unselect and close the popups
+  }
+  if (this.destroying) {
+    return; // the form is being removed because the menu is being destroyed. There is no need to call close again.
+  }
+
+  this.setSelected(false);
+  var parentContextMenuPopup = this.findParent(function(p) {
+    return p instanceof scout.ContextMenuPopup;
+  });
+  if (parentContextMenuPopup) {
+    parentContextMenuPopup.close();
+  }
+};
+
+/**
+ * @override Menu.js
+ */
+scout.FormMenu.prototype._openPopup = function() {
+  scout.FormMenu.parent.prototype._openPopup.call(this);
+  this._addFormRemoveHandler();
+};
+
+/**
+ * @override Menu.js
  */
 scout.FormMenu.prototype._createPopup = function() {
   // Menu bar should always be on the bottom
