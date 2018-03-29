@@ -429,6 +429,34 @@ describe('SmartField', function() {
 
   });
 
+  describe('_onFieldKeyDown', function() {
+
+    beforeEach(function() {
+      field = createFieldWithLookupCall();
+    });
+
+    it('must update flag _userWasTyping', function() {
+      // intial-state
+      expect(field._userWasTyping).toBe(false);
+
+      // send a regular key-press (no navigation)
+      field._onFieldKeyDown({
+        which: scout.keys.A
+      });
+      expect(field._userWasTyping).toBe(true);
+
+      // when the display text is set, reset the userWasTyping flag
+      // this is especially important in the remote case where the
+      // server may send a new display text as a result of execFormatValue
+      // in that case we don't want the SmartField to start a new search
+      // by text, because the user has not typed anything into the field.
+      field.setDisplayText('foo');
+      expect(field.displayText).toEqual('foo');
+      expect(field._userWasTyping).toBe(false);
+    });
+
+  });
+
   describe('_onFieldKeyUp', function() {
 
     beforeEach(function() {
