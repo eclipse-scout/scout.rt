@@ -225,10 +225,10 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container, optio
   // Label
   if (this._isLabelVisible()) {
     prefSizeLabel.width = this.labelWidth() + formField.$label.cssMarginX();
+    prefSizeLabel.height = this.rowHeight;
     if (formField.labelPosition === scout.FormField.LabelPosition.TOP) {
       // Label is always as width as the field if it is on top
       prefSizeLabel.width = 0;
-      prefSizeLabel.height = this.rowHeight;
     } else if (formField.labelWidthInPixel === scout.FormField.LabelWidth.UI || formField.labelUseUiWidth) {
       if (formField.$label.hasClass('empty')) {
         prefSizeLabel.width = 0;
@@ -248,6 +248,7 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container, optio
   if (this._isStatusVisible()) {
     prefSizeStatus.width = this.statusWidth + formField.$status.cssMarginX();
     if (!statusOnTop) {
+      prefSizeStatus.height = this.rowHeight;
       widthHint -= prefSizeStatus.width;
     }
   }

@@ -106,7 +106,8 @@ scout.StringField.prototype._makeMultilineField = function() {
     }.bind(this))
     .on('focusout', function() {
       this.$field.on('mousedown', mouseDownHandler);
-    }.bind(this));
+    }.bind(this))
+    .addDeviceClass();
 };
 
 scout.StringField.prototype._onFieldBlur = function() {
@@ -551,22 +552,22 @@ scout.StringField.prototype._getClipboardData = function(event, doneHandler) {
 };
 
 scout.StringField.prototype._onFieldPaste = function(event) {
-   // must store text and selection because when the callback is executed, the clipboard content has already been applied to the input field
-   var text = this.$field.val();
-   var selection = this._getSelection();
+  // must store text and selection because when the callback is executed, the clipboard content has already been applied to the input field
+  var text = this.$field.val();
+  var selection = this._getSelection();
 
-   this._getClipboardData(event, function(pastedText) {
-     if (!pastedText) {
-       return;
-     }
+  this._getClipboardData(event, function(pastedText) {
+    if (!pastedText) {
+      return;
+    }
 
-     // Make sure the user is notified about pasted text which is cut off because of maxlength constraints
-     text = this._applyTextToSelection(text, pastedText, selection);
-     if (text.length > this.maxLength) {
-       this._showNotification('ui.PastedTextTooLong');
-     }
+    // Make sure the user is notified about pasted text which is cut off because of maxlength constraints
+    text = this._applyTextToSelection(text, pastedText, selection);
+    if (text.length > this.maxLength) {
+      this._showNotification('ui.PastedTextTooLong');
+    }
 
-   }.bind(this));
+  }.bind(this));
 };
 
 scout.StringField.prototype._showNotification = function(textKey) {

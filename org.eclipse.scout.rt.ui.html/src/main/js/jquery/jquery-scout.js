@@ -781,6 +781,9 @@ $.fn.attrXLINK = function(attributeName, value) {
 $.fn.addDeviceClass = function() {
   if (scout.device.isInternetExplorer()) {
     this.addClass('ie');
+    if (scout.device.browserVersion === 9) {
+      this.addClass('ie9');
+    }
   }
   return this;
 };
