@@ -41,6 +41,7 @@ scout.Widget = function() {
   this.rendered = false;
   this.attached = false;
   this.destroyed = false;
+  this.destroying = false;
 
   this.enabled = true;
   /**
