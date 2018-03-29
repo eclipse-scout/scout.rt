@@ -25,12 +25,23 @@ scout.EllipsisMenu.prototype._render = function() {
   this.$container.addClass('ellipsis');
 };
 
+scout.EllipsisMenu.prototype.setChildActions = function(childActions) {
+  scout.EllipsisMenu.parent.prototype.setChildActions.call(this, childActions);
+
+  if (childActions) {
+    // close all actions that have been added to the ellipsis
+    childActions.forEach(function(ca) {
+      ca.setSelected(false);
+    });
+  }
+};
+
 scout.EllipsisMenu.prototype._renderProperties = function() {
   scout.EllipsisMenu.parent.prototype._renderProperties.call(this);
   this._renderHidden();
 };
 
-// add the set hidden function to the elliplis
+// add the set hidden function to the ellipsis
 scout.EllipsisMenu.prototype.setHidden = function(hidden) {
   this.setProperty('hidden', hidden);
 };
