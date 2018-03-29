@@ -42,6 +42,7 @@ scout.Table = function() {
   this.filters = [];
   this.rows = [];
   this.rootRows = [];
+  this.visibleRows = [];
   this.rowPaddingLevel = 15;
   this.rowsMap = {}; // rows by id
   this.rowWidth = 0;
@@ -55,7 +56,6 @@ scout.Table = function() {
   this.footer;
   this._filterMap = {};
   this._filteredRows = [];
-  this._filteredRowsDirty = true;
   this.tableNodeColumn = null;
   this.tooltips = [];
   this._aggregateRows = [];
@@ -125,7 +125,12 @@ scout.Table.prototype._init = function(model) {
   this.rows.forEach(function(row, i) {
     this.rows[i] = this._initRow(row);
   }, this);
-  this._rebuildTreeStructure();
+
+  this.setFilters(this.filters);
+
+  this._updateRowStructure({
+    updateTree: true
+  });
 
   this.menuBar = scout.create('MenuBar', {
     parent: this,
@@ -135,12 +140,11 @@ scout.Table.prototype._init = function(model) {
   this.menuBar.bottom();
 
   this._setSelectedRows(this.selectedRows);
-  this.setFilters(this.filters);
+
   this._setKeyStrokes(this.keyStrokes);
   this._setMenus(this.menus);
   this._setTableControls(this.tableControls);
   this._setTableStatus(this.tableStatus);
-  this._applyFilters(this.rows);
   this._calculateValuesForBackgroundEffect();
   this._group();
 };
@@ -657,7 +661,7 @@ scout.Table.prototype.setMultiSelect = function(multiSelect) {
 };
 
 scout.Table.prototype.toggleSelection = function() {
-  if (this.selectedRows.length === this.filteredRows().length) {
+  if (this.selectedRows.length === this.visibleRows.length) {
     this.deselectAll();
   } else {
     this.selectAll();
@@ -665,7 +669,7 @@ scout.Table.prototype.toggleSelection = function() {
 };
 
 scout.Table.prototype.selectAll = function() {
-  this.selectRows(this.filteredRows());
+  this.selectRows(this.visibleRows);
 };
 
 scout.Table.prototype.deselectAll = function() {
@@ -673,7 +677,7 @@ scout.Table.prototype.deselectAll = function() {
 };
 
 scout.Table.prototype.checkAll = function(checked) {
-  this.checkRows(this.filteredRows(), {
+  this.checkRows(this.visibleRows, {
     checked: checked
   });
 };
@@ -703,7 +707,6 @@ scout.Table.prototype._sort = function(animateAggregateRows) {
   sortColumns = scout.arrays.union(sortColumns, this.columns);
 
   this._sortImpl(sortColumns);
-  this._filteredRowsDirty = true; // order has been changed
   this._triggerRowOrderChanged();
   if (this.rendered) {
     this._renderRowOrderChanges();
@@ -767,6 +770,12 @@ scout.Table.prototype._sortImpl = function(sortColumns) {
     this.rows.sort(sortFunction);
     this.rootRows = this.rows;
   }
+
+  this._updateRowStructure({
+    filteredRows: true,
+    applyFilters: false,
+    visibleRows: true
+  });
 };
 
 /**
@@ -795,7 +804,7 @@ scout.Table.prototype._renderRowOrderChanges = function() {
 
   // store old position
   // animate only if every row is rendered, otherwise some rows would be animated and some not
-  if ($rows.length === this.filteredRows().length) {
+  if ($rows.length === this.visibleRows.length) {
     $rows.each(function(index, elem) {
       var rowWasInserted = false,
         $row = $(elem),
@@ -1246,7 +1255,7 @@ scout.Table.prototype._renderRowsInRange = function(range) {
     numRowsRendered = 0,
     prepend = false;
 
-  var rows = this.filteredRows();
+  var rows = this.visibleRows;
   if (rows.length === 0) {
     return;
   }
@@ -1312,7 +1321,7 @@ scout.Table.prototype._rowsRenderedInfo = function() {
 scout.Table.prototype._removeRowsInRange = function(range) {
   var fromRow, toRow, row, i,
     numRowsRemoved = 0,
-    rows = this.filteredRows();
+    rows = this.visibleRows;
 
   var maxRange = new scout.Range(0, rows.length);
   range = maxRange.intersect(range);
@@ -1367,9 +1376,10 @@ scout.Table.prototype._removeRows = function(rows) {
   var tableAttached = this.isAttachedAndRendered();
   rows = scout.arrays.ensure(rows);
   rows.forEach(function(row) {
-    var rowIndex = this.filteredRows().indexOf(row);
+    var rowIndex = this.visibleRows.indexOf(row);
     if (rowIndex === -1) {
-      throw new Error('Row not found, cannot remove $row');
+      // row is not visible
+      return;
     }
     var rowRendered = !!row.$row;
     var rowInViewRange = this.viewRangeRendered.contains(rowIndex);
@@ -1794,7 +1804,7 @@ scout.Table.prototype._group = function(animate) {
     return;
   }
 
-  rows = this.filteredRows();
+  rows = this.visibleRows;
   this._forEachVisibleColumn('aggrStart', states);
 
   rows.forEach(function(row, r) {
@@ -2108,6 +2118,7 @@ scout.Table.prototype.expandAll = function() {
 };
 
 scout.Table.prototype.expandRow = function(row, expanded) {
+  expanded = scout.nvl(expanded, true);
   if ((expanded && this.expandedRows.indexOf(row) > -1) ||
     (!expanded && this.expandedRows.indexOf(row) === -1)) {
     return;
@@ -2119,7 +2130,10 @@ scout.Table.prototype.expandRow = function(row, expanded) {
     scout.arrays.remove(this.expandedRows, row);
   }
 
-  this.filter();
+  this._updateRowStructure({
+    visibleRows: true
+  });
+  this._renderRowDelta();
   this._triggerRowsExpanded(this.expandedRows);
 };
 
@@ -2131,7 +2145,9 @@ scout.Table.prototype.setExpandedRows = function(rows) {
     row.expanded = rows.indexOf(row) > -1;
   });
   this.expandedRows = rows;
-  this.filter();
+  this._updateRowStructure({
+    visibleRows: true
+  });
   this._triggerRowsExpanded(this.expandedRows);
 };
 
@@ -2169,8 +2185,22 @@ scout.Table.prototype.insertRows = function(rows) {
     this.rows.push(row);
   }, this);
 
-  this._rebuildTreeStructure();
-  this._applyFilters(rows);
+  //  this._applyFilters(rows);
+
+  var filterAcceptedRows = rows.filter(function(row) {
+    this._applyFiltersForRow(row);
+    return row.filterAccepted;
+  }, this);
+  if (filterAcceptedRows.length > 0) {
+    this._updateFilteredRows(false, true);
+  }
+
+  this._updateRowStructure({
+    updateTree: true,
+    filteredRows: false,
+    visibleRows: true
+  });
+
   this._calculateValuesForBackgroundEffect();
   this._markAutoOptimizeWidthColumnsAsDirty();
 
@@ -2205,9 +2235,16 @@ scout.Table.prototype.deleteRow = function(row) {
 };
 
 scout.Table.prototype.deleteRows = function(rows) {
-  var invalidate, filterChanged;
+  var invalidate,
+    filterChanged,
+    removedRows = [];
 
-  rows.forEach(function(row) {
+  this.visitRows(function(row) {
+    if (!this.rowsMap[row.id]) {
+      return;
+    }
+
+    removedRows.push(row);
     // Update HTML
     if (this.rendered) {
       // Cancel cell editing if cell editor belongs to a cell of the deleted row
@@ -2221,6 +2258,7 @@ scout.Table.prototype.deleteRows = function(rows) {
 
     // Update model
     scout.arrays.remove(this.rows, row);
+    scout.arrays.remove(this.visibleRows, row);
     if (this._filterCount() > 0 && scout.arrays.remove(this._filteredRows, row)) {
       filterChanged = true;
     }
@@ -2229,13 +2267,16 @@ scout.Table.prototype.deleteRows = function(rows) {
     if (this.selectionHandler.lastActionRow === row) {
       this.selectionHandler.clearLastSelectedRowMarker();
     }
-  }.bind(this));
+  }.bind(this), rows);
 
-  this.deselectRows(rows);
-  this._rebuildTreeStructure();
-  if (filterChanged) {
-    this._rowsFiltered();
-  }
+  this.deselectRows(removedRows);
+
+  this._updateFilteredRows(false, filterChanged);
+  this._updateRowStructure({
+    updateTree: true,
+    filteredRows: false,
+    visibleRows: true
+  });
   this._group();
   this._updateBackgroundEffect();
   this._markAutoOptimizeWidthColumnsAsDirty();
@@ -2271,10 +2312,14 @@ scout.Table.prototype.deleteAllRows = function() {
   this._filteredRows = [];
   this.deselectAll();
 
+  this._updateFilteredRows(false, filterChanged);
+  this._updateRowStructure({
+    updateTree: true,
+    filteredRows: false,
+    visibleRows: true
+  });
+
   this._markAutoOptimizeWidthColumnsAsDirty();
-  if (filterChanged) {
-    this._rowsFiltered();
-  }
   this._group();
   this._updateBackgroundEffect();
   this._triggerAllRowsDeleted(rows);
@@ -2320,21 +2365,12 @@ scout.Table.prototype.updateRows = function(rows) {
     // TODO [7.0] cgu: remove this replace functions, they are slow due to indexOf. Either create maps (rowId/rowIndex) before the loop or even store rowIndex for each row
     scout.arrays.replace(this.rows, oldRow, updatedRow);
     scout.arrays.replace(this.selectedRows, oldRow, updatedRow);
+    scout.arrays.replace(this.visibleRows, oldRow, updatedRow);
 
-    this._rebuildTreeStructure();
-
-    // Apply row filter
+    // Apply row filters for and only for the new rows.
     updatedRow.filterAccepted = oldRow.filterAccepted;
     if (this._filterCount() > 0) {
-      if (this._applyFiltersForRow(updatedRow)) {
-        filterChanged = true;
-        if (!updatedRow.filterAccepted) {
-          newHiddenRows.push(updatedRow);
-        }
-      } else {
-        // If filter state has not changed, just make sure filteredRows will be recalculated the next time its used
-        this._filteredRowsDirty = true;
-      }
+      filterChanged = this._applyFiltersForRow(updatedRow) || filterChanged;
     }
 
     // Replace old $row
@@ -2352,13 +2388,18 @@ scout.Table.prototype.updateRows = function(rows) {
 
   this._triggerRowsUpdated(rows);
 
+  // update filterd rows before updateRowStructure to not apply filters again.
+  this._updateFilteredRows(false, filterChanged);
+  this._updateRowStructure({
+    updateTree: true,
+    filteredRows: false,
+    visibleRows: true
+  });
+
   if (filterChanged) {
-    this._rowsFiltered(newHiddenRows);
-    if (this.rendered) {
-      // Make sure filtered rows get removed and viewport is completely rendered
-      this._rerenderViewport();
-    }
+    this._renderRowDelta();
   }
+
   this._sortAfterUpdate();
   this._updateBackgroundEffect();
   if (autoOptimizeWidthColumnsDirty) {
@@ -2382,13 +2423,10 @@ scout.Table.prototype._rebuildTreeStructure = function() {
     hierarchical = hierarchical || !scout.objects.isNullOrUndefined(row.parentId);
   }, this);
   if (!hierarchical) {
-    this.removeFilterByKey(scout.CollapsedRowsFilter.FILTER_KEY);
     this.rootRows = this.rows;
     this.hierarchical = hierarchical;
+    this.expandedRows = [];
     return;
-  }
-  if (this.hierarchical !== hierarchical) {
-    this.addFilter(new scout.CollapsedRowsFilter());
   }
 
   this.hierarchical = hierarchical;
@@ -2410,19 +2448,22 @@ scout.Table.prototype._rebuildTreeStructure = function() {
     } else {
       this.rootRows.push(row);
     }
-    if (row.expanded) {
-      expandedRows.push(row);
-    }
   }, this);
   // rebuild minimal sort
   this.rows = [];
   this.visitRows(function(row) {
     this.rows.push(row);
+    if (row.childRows.length > 0 && row.expanded) {
+      expandedRows.push(row);
+    }
   }.bind(this));
-
-  this.setExpandedRows(expandedRows);
+  this.expandedRows = expandedRows;
 };
 
+/**
+ * The given rows must be rows of this table in desired order.
+ * @param {scout.TableRow[]} rows
+ */
 scout.Table.prototype.updateRowOrder = function(rows) {
   rows = scout.arrays.ensure(rows);
   if (rows.length !== this.rows.length) {
@@ -2431,8 +2472,12 @@ scout.Table.prototype.updateRowOrder = function(rows) {
 
   // update model (make a copy so that original array stays untouched)
   this.rows = rows.slice();
-  this._filteredRowsDirty = true; // order has changed
-
+  this._updateRowStructure({
+    updateTree: true,
+    filteredRows: true,
+    applyFilters: false,
+    visibleRows: true
+  });
   this.clearAggregateRows(this._animateAggregateRows);
   if (this.rendered) {
     this._renderRowOrderChanges();
@@ -2617,11 +2662,11 @@ scout.Table.prototype._renderSelection = function(rows) {
     }
 
     var thisRowSelected = this.selectedRows.indexOf(row) !== -1,
-      filteredRows = this.filteredRows(),
-      previousIndex = filteredRows.indexOf(row) - 1,
-      previousRowSelected = previousIndex >= 0 && this.selectedRows.indexOf(filteredRows[previousIndex]) !== -1,
-      followingIndex = filteredRows.indexOf(row) + 1,
-      followingRowSelected = followingIndex < filteredRows.length && this.selectedRows.indexOf(filteredRows[followingIndex]) !== -1;
+      visibleRows = this.visibleRows,
+      previousIndex = visibleRows.indexOf(row) - 1,
+      previousRowSelected = previousIndex >= 0 && this.selectedRows.indexOf(visibleRows[previousIndex]) !== -1,
+      followingIndex = visibleRows.indexOf(row) + 1,
+      followingRowSelected = followingIndex < visibleRows.length && this.selectedRows.indexOf(visibleRows[followingIndex]) !== -1;
 
     // Don't collapse selection borders if two consecutively selected (real) rows are separated by an aggregation row
     if (thisRowSelected && previousRowSelected && row.aggregateRowBefore) {
@@ -2641,11 +2686,11 @@ scout.Table.prototype._renderSelection = function(rows) {
       addOrRemoveClassIfNeededFunc(row.$row, thisRowSelected && !previousRowSelected && !followingRowSelected, 'select-single') +
       addOrRemoveClassIfNeededFunc(row.$row, thisRowSelected && previousRowSelected && followingRowSelected, 'select-middle');
 
-    if (classChanged && previousRowSelected && rows.indexOf(filteredRows[previousIndex]) === -1) {
-      rows.push(filteredRows[previousIndex]);
+    if (classChanged && previousRowSelected && rows.indexOf(visibleRows[previousIndex]) === -1) {
+      rows.push(visibleRows[previousIndex]);
     }
-    if (classChanged && followingRowSelected && rows.indexOf(filteredRows[followingIndex]) === -1) {
-      rows.push(filteredRows[followingIndex]);
+    if (classChanged && followingRowSelected && rows.indexOf(visibleRows[followingIndex]) === -1) {
+      rows.push(visibleRows[followingIndex]);
     }
   }
 
@@ -2759,20 +2804,6 @@ scout.Table.prototype._filterCount = function() {
 };
 
 scout.Table.prototype.filteredRows = function() {
-  // filtered rows are cached to avoid unnecessary loops
-  if (this._filteredRowsDirty) {
-    if (this._filterCount() === 0) {
-      this._filteredRows = this.rows;
-    } else {
-      this._filteredRows = [];
-      this.rows.forEach(function(row) {
-        if (row.filterAccepted || row.hasFilterAcceptedChildren()) {
-          this._filteredRows.push(row);
-        }
-      }, this);
-    }
-    this._filteredRowsDirty = false;
-  }
   return this._filteredRows;
 };
 
@@ -2851,52 +2882,121 @@ scout.Table.prototype.columnsByIds = function(columnIds) {
   return columnIds.map(this.columnById.bind(this));
 };
 
-scout.Table.prototype.filter = function() {
-  var animate = true,
-    numChangedRows = 0,
-    newHiddenRows = [],
-    newShownRows = [];
+scout.Table.prototype.getVisibleRows = function() {
+  return this.visibleRows;
+};
 
-  // Filter rows
-  this.rows.forEach(function(row) {
-    var changed = this._applyFiltersForRow(row);
-    if (changed) {
-      if (!row.filterAccepted) {
-        newHiddenRows.push(row);
-      } else {
-        newShownRows.push(row);
-      }
+scout.Table.prototype._updateRowStructure = function(options) {
+  var updateTree = scout.nvl(options.updateTree, false),
+    updateFilteredRows = scout.nvl(options.filteredRows, updateTree),
+    applyFilters = scout.nvl(options.applyFilters, updateFilteredRows),
+    updateVisibleRows = scout.nvl(options.visibleRows, updateFilteredRows);
+  if (updateTree) {
+    this._rebuildTreeStructure();
+  }
+  if (updateFilteredRows) {
+    this._updateFilteredRows(applyFilters);
+  }
+  if (updateVisibleRows) {
+    this._updateVisibleRows();
+  }
+};
+
+scout.Table.prototype._updateFilteredRows = function(applyFilters, changed) {
+  changed = !!changed;
+  applyFilters = scout.nvl(applyFilters, true);
+  this._filteredRows = this.rows.filter(function(row) {
+    if (applyFilters) {
+      changed = this._applyFiltersForRow(row) || changed;
     }
+    return row.filterAccepted;
   }, this);
 
-  numChangedRows = newHiddenRows.length + newShownRows.length;
-  if (numChangedRows === 0) {
+  if (changed) {
+    this._triggerFilter();
+  }
+};
+
+scout.Table.prototype._applyFilters = function(rows) {
+  var changed = false;
+  rows = rows || this.rows;
+  rows.forEach(function(row) {
+    changed = this._applyFiltersForRow(row) || changed;
+    return row.filterAccepted;
+  }, this);
+  return changed;
+};
+
+scout.Table.prototype._updateVisibleRows = function() {
+  var newHiddenRows = [],
+    visibleRows = this._computeVisibleRows();
+  // old - new  = to remove
+  newHiddenRows = this.visibleRows.filter(function(row) {
+    return visibleRows.indexOf(row) < 0;
+  }, this);
+  this.visibleRows = visibleRows;
+  this.deselectRows(newHiddenRows);
+};
+
+scout.Table.prototype._renderRowDelta = function() {
+  if (!this.rendered) {
     return;
   }
-
-  this._rowsFiltered(newHiddenRows);
-  this._group(animate);
-
-  if (this.rendered) {
-    animate = numChangedRows <= this._animationRowLimit;
-    if (!animate) {
-      this._rerenderViewport();
+  var renderedRows = [];
+  this.$rows().each(function(i, elem) {
+    var $row = $(elem),
+      row = $row.data('row');
+    if (this.visibleRows.indexOf(row) < 0) {
+      // remove animated
+      this._hideRow(row);
     } else {
-      newHiddenRows.forEach(function(row) {
-        this._hideRow(row);
-      }.bind(this));
-
-      this._rerenderViewport();
-      // Rows removed by an animation are still there, new rows were appended -> reset correct row order
-      this._order$Rows().insertAfter(this.$fillBefore);
-      // Also make sure aggregate rows are at the correct position (_renderAggregateRows does nothing because they are already rendered)
-      this._order$AggregateRows();
-      newShownRows.forEach(function(row) {
-        this._showRow(row);
-      }, this);
+      renderedRows.push(row);
     }
-    this._renderEmptyData();
-  }
+  }.bind(this));
+
+  this._rerenderViewport();
+  // Rows removed by an animation are still there, new rows were appended -> reset correct row order
+  this._order$Rows().insertAfter(this.$fillBefore);
+  // Also make sure aggregate rows are at the correct position (_renderAggregateRows does nothing because they are already rendered)
+  this._order$AggregateRows();
+
+  this.$rows().each(function(i, elem) {
+    var $row = $(elem),
+      row = $row.data('row');
+    if ($row.hasClass('hiding')) {
+      // Do not remove rows which are removed using an animation
+      // row.$row may already point to a new row -> don't call removeRow to not accidentally remove the new row
+      return;
+    }
+    if (renderedRows.indexOf(row) < 0) {
+      this._showRow(row);
+    }
+  }.bind(this));
+  this._renderEmptyData();
+};
+
+scout.Table.prototype._computeVisibleRows = function(rows) {
+  var visibleRows = [];
+  rows = rows || this.rootRows;
+  rows.forEach(function(row) {
+    var visibleChildRows = this._computeVisibleRows(row.childRows);
+    if (row.filterAccepted) {
+      visibleRows.push(row);
+    } else if (visibleChildRows.length > 0) {
+      visibleRows.push(row);
+    }
+    if (row.expanded) {
+      visibleRows = visibleRows.concat(visibleChildRows);
+    }
+  }, this);
+  return visibleRows;
+};
+
+scout.Table.prototype.filter = function() {
+  this._updateRowStructure({
+    filteredRows: true
+  });
+  this._renderRowDelta();
 };
 
 /**
@@ -2930,14 +3030,6 @@ scout.Table.prototype._order$AggregateRows = function($rows) {
   });
 };
 
-scout.Table.prototype._rowsFiltered = function(hiddenRows) {
-  // non visible rows must be deselected
-  this.deselectRows(hiddenRows);
-  // notify
-  this._filteredRowsDirty = true;
-  this._triggerFilter();
-};
-
 scout.Table.prototype._rowAcceptedByFilters = function(row) {
   for (var key in this._filterMap) { // NOSONAR
     var filter = this._filterMap[key];
@@ -2967,37 +3059,6 @@ scout.Table.prototype._applyFiltersForRow = function(row) {
 };
 
 /**
- * Applies the filters for the given rows.<p>
- * This function is intended to be used for new rows. That's why filter event is only triggered if there are accepted rows in the given list.
- */
-scout.Table.prototype._applyFilters = function(rows) {
-  var filterChanged,
-    newHiddenRows = [];
-
-  if (this._filterCount() === 0) {
-    this._filteredRowsDirty = true;
-    return;
-  }
-
-  rows.forEach(function(row) {
-    if (this._applyFiltersForRow(row)) {
-      filterChanged = true;
-      if (!row.filterAccepted) {
-        newHiddenRows.push(row);
-      }
-    }
-    // always notify if there are new rows which accept the filter
-    if (row.filterAccepted) {
-      filterChanged = true;
-    }
-  }, this);
-
-  if (filterChanged) {
-    this._rowsFiltered(newHiddenRows);
-  }
-};
-
-/**
  *
  * @returns array of filter names which are currently active
  */
@@ -3013,7 +3074,7 @@ scout.Table.prototype.filteredBy = function() {
 };
 
 scout.Table.prototype.resetFilter = function() {
-  // remove filters
+  // remove filters except TableUserFilters
   var filter;
   for (var key in this._filterMap) { // NOSONAR
     filter = this._filterMap[key];
@@ -3021,7 +3082,6 @@ scout.Table.prototype.resetFilter = function() {
       this.removeFilterByKey(key);
     }
   }
-  //  this._filterMap = {};
 
   // reset rows
   this.filter();
@@ -3619,7 +3679,7 @@ scout.Table.prototype._removeTableHeader = function() {
  * @param width optional width of emptyData, if omitted the width is set to the header's scrollWidth.
  */
 scout.Table.prototype._renderEmptyData = function(width) {
-  if (this.header && this.filteredRows().length === 0) {
+  if (this.header && this.visibleRows.length === 0) {
     if (!this.$emptyData) {
       this.$emptyData = this.$data.appendDiv().html('&nbsp;');
     }
@@ -3635,7 +3695,7 @@ scout.Table.prototype._renderEmptyData = function(width) {
 };
 
 scout.Table.prototype._removeEmptyData = function() {
-  if (this.filteredRows().length > 0 && this.$emptyData) {
+  if (this.visibleRows.length > 0 && this.$emptyData) {
     this.$emptyData.remove();
     this.$emptyData = undefined;
     this.updateScrollbars();
@@ -3812,7 +3872,7 @@ scout.Table.prototype._calculateCurrentViewRange = function() {
 scout.Table.prototype._rowIndexAtScrollTop = function(scrollTop) {
   var height = 0,
     index = -1;
-  this.filteredRows().some(function(row, i) {
+  this.visibleRows.some(function(row, i) {
     height += this._heightForRow(row);
     if (scrollTop < height) {
       index = i;
@@ -3852,7 +3912,7 @@ scout.Table.prototype._heightForRow = function(row) {
 scout.Table.prototype._calculateViewRangeForRowIndex = function(rowIndex) {
   // regular / non-virtual scrolling? -> all rows are already rendered in the DOM
   if (!this.virtual) {
-    return new scout.Range(0, this.filteredRows().length);
+    return new scout.Range(0, this.visibleRows.length);
   }
 
   var viewRange = new scout.Range(),
@@ -3860,7 +3920,7 @@ scout.Table.prototype._calculateViewRangeForRowIndex = function(rowIndex) {
     diff;
 
   viewRange.from = Math.max(rowIndex - quarterRange, 0);
-  viewRange.to = Math.min(viewRange.from + this.viewRangeSize, this.filteredRows().length);
+  viewRange.to = Math.min(viewRange.from + this.viewRangeSize, this.visibleRows.length);
 
   // Try to use the whole viewRangeSize (extend from if necessary)
   diff = this.viewRangeSize - viewRange.size();
@@ -3923,7 +3983,7 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
 
   // check if at least last and first row in range got correctly rendered
   if (this.viewRangeRendered.size() > 0) {
-    var rows = this.filteredRows();
+    var rows = this.visibleRows;
     var firstRow = rows[this.viewRangeRendered.from];
     var lastRow = rows[this.viewRangeRendered.to - 1];
     if (!firstRow.$row || !lastRow.$row) {
@@ -3953,7 +4013,7 @@ scout.Table.prototype._modifyRangeMarkers = function(funcName) {
   if (this.viewRangeRendered.size() === 0) {
     return;
   }
-  var filteredRows = this.filteredRows();
+  var filteredRows = this.visibleRows;
   modifyRangeMarker(filteredRows[this.viewRangeRendered.from], 'first');
   modifyRangeMarker(filteredRows[this.viewRangeRendered.to - 1], 'last');
 
@@ -3966,7 +4026,7 @@ scout.Table.prototype._modifyRangeMarkers = function(funcName) {
 
 scout.Table.prototype.ensureRowRendered = function(row) {
   if (!row.$row) {
-    var rowIndex = this.filteredRows().indexOf(row);
+    var rowIndex = this.visibleRows.indexOf(row);
     this._renderViewRangeForRowIndex(rowIndex);
   }
 };
@@ -3987,7 +4047,7 @@ scout.Table.prototype._renderFiller = function() {
     this._applyFillerStyle(this.$fillAfter);
   }
 
-  var fillAfterHeight = this._calculateFillerHeight(new scout.Range(this.viewRangeRendered.to, this.filteredRows().length));
+  var fillAfterHeight = this._calculateFillerHeight(new scout.Range(this.viewRangeRendered.to, this.visibleRows.length));
   this.$fillAfter.cssHeight(fillAfterHeight);
   this.$fillAfter.cssWidth(this.rowWidth);
   $.log.isTraceEnabled() && $.log.trace('FillAfter height: ' + fillAfterHeight);
@@ -4007,7 +4067,7 @@ scout.Table.prototype._applyFillerStyle = function($filler) {
 scout.Table.prototype._calculateFillerHeight = function(range) {
   var totalHeight = 0;
   for (var i = range.from; i < range.to; i++) {
-    var row = this.filteredRows()[i];
+    var row = this.visibleRows[i];
     totalHeight += this._heightForRow(row);
   }
   return totalHeight;

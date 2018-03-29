@@ -2462,10 +2462,10 @@ describe("Table", function() {
       table.render();
       expect(table.rows.length).toBe(3);
       var newRows = [helper.createModelRow(null, helper.createModelCells(2)), helper.createModelRow(null, helper.createModelCells(2))];
-      var orderedRows = [row1, row0, newRows[0], newRows[1], row2];
 
       // Insert new rows and switch rows 0 and 1
       table.insertRows(newRows);
+      var orderedRows = [table.rows[1],table.rows[0],table.rows[3],table.rows[4],table.rows[2]];
       table.updateRowOrder(orderedRows);
 
       // Check if rows were inserted
@@ -2476,15 +2476,13 @@ describe("Table", function() {
       // but we must disable jQuery animations completely during test execution, otherwise test will fail, since
       // the complete/done function is scheduled and executed to a time where the test that started the animation
       // is already finished. So this will lead to unpredictable failures.
-      var $row, rowId, expectedRowId,
-        i = 0,
-        $rows = table.$rows();
-      $rows.each(function() {
+      var uiOrderedRows = [],
+      $row;
+      table.$rows().each(function() {
         $row = $(this);
-        rowId = $row.data('row').id;
-        expectedRowId = orderedRows[i++].id;
-        expect(rowId).toBe(expectedRowId);
+        uiOrderedRows.push($row.data('row'));
       });
+      expect(orderedRows).toEqual(uiOrderedRows);
     });
 
   });
