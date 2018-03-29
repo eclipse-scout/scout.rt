@@ -39,6 +39,7 @@ scout.Widget = function() {
   this.rendered = false;
   this.attached = false;
   this.destroyed = false;
+  this.destroying = false;
 
   this.enabled = true;
   this.disabledStyle = scout.Widget.DisabledStyle.DEFAULT;
@@ -178,7 +179,7 @@ scout.Widget.prototype.destroy = function() {
     // Already destroyed, do nothing
     return;
   }
-
+  this.destroying = true;
   if (this.animateRemoval && this.rendered) {
     this.one('remove', function() {
       this.destroy();
@@ -199,6 +200,7 @@ scout.Widget.prototype.destroy = function() {
   this.parent.off('destroy', this._parentDestroyHandler);
   this.parent = null;
 
+  this.destroying = false;
   this.destroyed = true;
   this.trigger('destroy');
 };
@@ -1296,6 +1298,20 @@ scout.Widget.prototype.widget = function(widgetId) {
  */
 scout.Widget.prototype.getWidgetById = function(widgetId) {
   return this.widget(widgetId);
+};
+
+/**
+ * @returns the parent for which the given function returns true.
+ */
+scout.Widget.prototype.findParent = function(func) {
+  var parent = this.parent;
+  while (parent) {
+    if (func(parent)) {
+      return parent;
+    }
+    parent = parent.parent;
+  }
+  return parent;
 };
 
 scout.Widget.prototype.requestFocus = function() {
