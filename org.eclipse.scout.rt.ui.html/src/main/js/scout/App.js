@@ -124,6 +124,7 @@ scout.App.prototype._init = function(options) {
 
 scout.App.prototype._checkBrowserCompability = function(options) {
   var device = scout.device;
+  var app = this;
   $.log.isInfoEnabled() && $.log.info('Detected browser ' + device.browser + ' version ' + device.browserVersion);
   if (!scout.nvl(options.checkBrowserCompatibility, true) || device.isSupportedBrowser()) {
     // No check requested or browser is supported
@@ -139,7 +140,7 @@ scout.App.prototype._checkBrowserCompability = function(options) {
     $box.load('unsupported-browser.html', function() {
       $box.find('button').on('click', function() {
         $box.remove();
-        scout._init(newOptions);
+        app._init(newOptions);
       });
     });
   });
