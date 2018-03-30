@@ -17,7 +17,7 @@
   <parent>
     <groupId>org.eclipse.scout.rt</groupId>
     <artifactId>org.eclipse.scout.rt</artifactId>
-    <version>7.1.0-SNAPSHOT</version>
+    <version>8.0.0-SNAPSHOT</version>
     <relativePath>../org.eclipse.scout.rt/pom.xml</relativePath>
   </parent>
 
@@ -37,7 +37,7 @@
     </dependency>
 
     <!-- JAX-RS Jersey Client Apache Connector -->
-    <!-- FIXME 7.1 pbz: Temporary workaround, see Jersey Issue 3771: https://github.com/jersey/jersey/pull/3771 -->
+    <!-- FIXME 8.0 pbz: Temporary workaround, see Jersey Issue 3771: https://github.com/jersey/jersey/pull/3771 -->
    <dependency>
       <groupId>org.glassfish.jersey.connectors</groupId>
       <artifactId>jersey-apache-connector</artifactId>
