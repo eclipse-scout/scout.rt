@@ -1,6 +1,6 @@
 autoEnabled=true
 eclipse.preferences.version=1
 extraProperties=
-moduleKey=org.eclipse.scout.sdk\:org.eclipse.scout.sdk\:releases_7.1.x
-projectKey=org.eclipse.scout.sdk\:org.eclipse.scout.sdk\:releases_7.0.x
+moduleKey=org.eclipse.scout.sdk\:org.eclipse.scout.sdk\:releases_8.0.x
+projectKey=org.eclipse.scout.sdk\:org.eclipse.scout.sdk\:releases_8.0.x
 serverId=Scout
