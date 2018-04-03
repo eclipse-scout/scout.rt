@@ -37,14 +37,31 @@ scout.AbstractLayout.prototype.layout = function($container) { //
 };
 
 /**
+ * Reverts the adjustments made by {@link scout.HtmlComponent#_adjustSizeHintsForPrefSize} without the margin.
+ * More concrete: it adds border and padding to the hints again.
+ */
+scout.AbstractLayout.prototype._revertSizeHintsAdjustments = function($container, options) {
+  var htmlContainer = scout.HtmlComponent.get($container);
+  if (options.widthHint) {
+    options.widthHint += htmlContainer.insets().horizontal();
+  }
+  if (options.heightHint) {
+    options.heightHint += htmlContainer.insets().vertical();
+  }
+};
+
+/**
  * Returns the preferred size of the given $container.
  *
  * @return scout.Dimension preferred size
  */
 scout.AbstractLayout.prototype.preferredLayoutSize = function($container, options) {
+  options = $.extend({}, options);
   if (this.animateClasses.length > 0) {
-    options = $.extend({}, options);
     options.animateClasses = this.animateClasses;
   }
+  // Insets have been removed automatically by the html component with the assumption that the layout will pass it to its child elements.
+  // Since this is not the case in this generic layout the insets have to be added again, otherwise the sizes used to measure would too small.
+  this._revertSizeHintsAdjustments($container, options);
   return scout.graphics.prefSize($container, options);
 };

@@ -10,8 +10,8 @@
  ******************************************************************************/
 .string-field  {
 
-  & > textarea.ie9 {
-    width: 100%; /* must be set for IE9 */
+  & > textarea.ie9 { /* NOSONAR overqualify by purpose to only modify textareas on IE 9*/
+    width: 100%;
   }
 
   & > .field {

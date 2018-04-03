@@ -98,7 +98,7 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container, option
     gridData = this.groupBox.gridData;
 
   if (gridData) {
-    widthInPixel = gridData.widthInPixel,
+    widthInPixel = gridData.widthInPixel;
     heightInPixel = gridData.heightInPixel;
   }
   if (widthInPixel && heightInPixel) {
