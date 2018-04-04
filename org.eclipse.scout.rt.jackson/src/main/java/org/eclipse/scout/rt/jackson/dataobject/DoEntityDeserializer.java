@@ -144,6 +144,7 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
   protected JavaType findResolvedAttributeType(IDoEntity entityInstance, String attributeName, boolean isObject, boolean isArray) {
     return m_doEntityDefinitionRegistry.get().getAttributeDescription(entityInstance.getClass(), attributeName)
         .map(DataObjectAttributeDefinition::getType)
+        .filter(type -> type.getRawClass() != Object.class) // filter completely unknown types, forcing to use the default behavior for unknown types
         .orElseGet(() -> findResolvedFallbackAttributeType(isObject, isArray));
   }
 
@@ -170,7 +171,7 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
   }
 
   /**
-   * Lookup generic type parameter of DoMapEntity super class 
+   * Lookup generic type parameter of DoMapEntity super class
    */
   protected JavaType findResolvedDoMapEntityType() {
     JavaType type = m_handledType;

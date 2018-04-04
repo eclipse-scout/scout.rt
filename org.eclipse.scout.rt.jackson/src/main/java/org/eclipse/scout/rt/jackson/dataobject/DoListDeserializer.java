@@ -46,7 +46,12 @@ public class DoListDeserializer extends StdDeserializer<DoList<?>> {
   protected ResolvedType resolveListElementType(JsonParser p) {
     if (p.getCurrentToken() == JsonToken.START_OBJECT) {
       // deserialize object-like JSON structure using specified type binding (DoList<T> generic parameter), fallback to generic DoEntity if no type information available
-      return ObjectUtility.nvl(m_listType.getBindings().getBoundType(0), TypeFactory.defaultInstance().constructType(DoEntity.class));
+      JavaType listItemType = m_listType.getBindings().getBoundType(0);
+      if (listItemType == null || listItemType.getRawClass() == Object.class) {
+        // use DoEntity as default value for missing or unspecified object types
+        return TypeFactory.defaultInstance().constructType(DoEntity.class);
+      }
+      return listItemType;
     }
     else {
       // all JSON scalar values are deserialized as bound type (if available) and as fallback as raw object using default jackson typing

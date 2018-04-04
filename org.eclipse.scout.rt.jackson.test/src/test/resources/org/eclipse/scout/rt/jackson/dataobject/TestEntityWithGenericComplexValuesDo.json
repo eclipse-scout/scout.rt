@@ -1,0 +1,19 @@
+{
+  "_type" : "TestEntityWithGenericValues",
+  "genericAttribute" : {
+    "_type" : "TestGeneric",
+    "genericAttribute" : {
+      "_type" : "TestItem",
+      "id" : "foo-id",
+      "stringAttribute" : "foo-attribute"
+    }
+  },
+  "genericListAttribute" : [ {
+    "_type" : "TestGeneric",
+    "genericAttribute" : {
+      "_type" : "TestItem",
+      "id" : "foo-id-2",
+      "stringAttribute" : "foo-attribute-2"
+    }
+  } ]
+}

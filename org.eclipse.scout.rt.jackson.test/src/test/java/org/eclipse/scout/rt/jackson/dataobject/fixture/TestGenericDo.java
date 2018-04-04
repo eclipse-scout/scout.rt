@@ -10,17 +10,27 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
+import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.TypeName;
 
 @TypeName("TestGeneric")
+@SuppressWarnings("unchecked")
 public class TestGenericDo<T> extends DoEntity {
 
   public DoValue<T> genericAttribute() {
     return doValue("genericAttribute");
+  }
+
+  public DoList<T> genericListAttribute() {
+    return doList("genericListAttribute");
   }
 
   /* **************************************************************************
@@ -36,5 +46,22 @@ public class TestGenericDo<T> extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public T getGenericAttribute() {
     return genericAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestGenericDo<T> withGenericListAttribute(Collection<T> genericListAttribute) {
+    genericListAttribute().clear();
+    genericListAttribute().get().addAll(genericListAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestGenericDo<T> withGenericListAttribute(T... genericListAttribute) {
+    return withGenericListAttribute(Arrays.asList(genericListAttribute));
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public List<T> getGenericListAttribute() {
+    return genericListAttribute().get();
   }
 }

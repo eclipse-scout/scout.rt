@@ -1,0 +1,8 @@
+{
+  "_type" : "TestGeneric",
+  "genericAttribute" : {
+    "_type" : "TestItem",
+    "id" : "foo-id",
+    "stringAttribute" : "foo-attribute"
+  }
+}

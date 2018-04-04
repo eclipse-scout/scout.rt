@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.StreamUtility;
 
 /**
  * Base type for all data object beans. Attributes of a data object bean are defined using {@link #doValue(String)} and
@@ -103,7 +103,7 @@ public class DoEntity implements IDoEntity {
    */
   protected <T> Map<String, T> all(Function<Object, T> mapper) {
     return allNodes().entrySet().stream()
-        .collect(Collectors.toMap(Entry::getKey, entry -> mapper.apply(entry.getValue().get())));
+        .collect(StreamUtility.toLinkedHashMap(Entry::getKey, entry -> mapper.apply(entry.getValue().get())));
   }
 
   /**

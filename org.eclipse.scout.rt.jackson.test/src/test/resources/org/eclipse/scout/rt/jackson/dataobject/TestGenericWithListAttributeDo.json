@@ -1,0 +1,12 @@
+{
+  "_type" : "TestGeneric",
+  "genericListAttribute" : [ {
+    "_type" : "TestItem",
+    "id" : "foo-id-1",
+    "stringAttribute" : "foo-attribute-1"
+  }, {
+    "_type" : "TestItem",
+    "id" : "foo-id-2",
+    "stringAttribute" : "foo-attribute-2"
+  } ]
+}

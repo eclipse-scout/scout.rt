@@ -17,6 +17,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -52,6 +53,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithInterface2D
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithListsDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithNestedEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestGenericDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestGenericDoEntityMapDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItem3Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemPojo;
@@ -831,6 +833,16 @@ public class JsonDataObjectsSerializationTest {
     assertEquals("bar", testDo.get(0).getStringAttribute());
   }
 
+  @Test
+  public void testDeserialize_TestItemDoListAsObjectList() throws Exception {
+    String json = readResourceAsString("TestItemDoList.json");
+    // read value as raw DoList without concrete bind type information
+    DoList<TestItemDo> testDo = s_dataObjectMapper.readValue(json, new TypeReference<DoList<Object>>() {
+    });
+    assertEquals("foo", testDo.get(0).getId());
+    assertEquals("bar", testDo.get(0).getStringAttribute());
+  }
+
   // ------------------------------------ Complex DoEntity test cases ------------------------------------
 
   @Test
@@ -1466,7 +1478,7 @@ public class JsonDataObjectsSerializationTest {
   // ------------------------------------ generic attribute definition tests -----------------------------
 
   @Test
-  public void testSerializeDeserialize_EntityWithGenericValues() throws Exception {
+  public void testSerializeDeserialize_EntityWithGenericSimpleValues() throws Exception {
     TestEntityWithGenericValuesDo genericDo = BEANS.get(TestEntityWithGenericValuesDo.class);
     TestGenericDo<String> stringValueDo = new TestGenericDo<>();
     stringValueDo.withGenericAttribute("foo");
@@ -1483,7 +1495,7 @@ public class JsonDataObjectsSerializationTest {
     genericDo.withGenericStringAttribute(stringAttribute);
 
     String json = s_dataObjectMapper.writeValueAsString(genericDo);
-    assertJsonEquals("TestEntityWithGenericValuesDo.json", json);
+    assertJsonEquals("TestEntityWithGenericSimpleValuesDo.json", json);
 
     TestEntityWithGenericValuesDo marshalled = s_dataObjectMapper.readValue(json, TestEntityWithGenericValuesDo.class);
     assertEquals("foo", marshalled.getGenericListAttribute().get(0).genericAttribute().get());
@@ -1491,6 +1503,140 @@ public class JsonDataObjectsSerializationTest {
     assertEquals("bar", marshalled.getGenericStringAttribute().genericAttribute().get());
     assertEquals(new Double("789.123"), marshalled.getGenericDoubleAttribute().genericAttribute().get());
     s_testHelper.assertDoEntityEquals(genericDo, marshalled);
+  }
+
+  @Test
+  public void testSerializeDeserialize_GenericDoComplexValues() throws Exception {
+    TestGenericDo<TestItemDo> itemValueDo = new TestGenericDo<>();
+    itemValueDo.withGenericAttribute(createTestItemDo("foo-id", "foo-attribute"));
+
+    String json = s_dataObjectMapper.writeValueAsString(itemValueDo);
+    assertJsonEquals("TestGenericWithComplexValueDo.json", json);
+
+    // read value with complete generic type definition
+    TestGenericDo<TestItemDo> marshalled = s_dataObjectMapper.readValue(json, new TypeReference<TestGenericDo<TestItemDo>>() {
+    });
+    s_testHelper.assertDoEntityEquals(itemValueDo, marshalled);
+    assertEquals("foo-id", marshalled.getGenericAttribute().getId());
+
+    // read value with incomplete generic type definition
+    TestGenericDo<TestItemDo> marshalled2 = s_dataObjectMapper.readValue(json, new TypeReference<TestGenericDo>() {
+    });
+    s_testHelper.assertDoEntityEquals(itemValueDo, marshalled2);
+    assertEquals("foo-id", marshalled2.getGenericAttribute().getId());
+
+    // read value with no generic type definition
+    @SuppressWarnings("unchecked")
+    TestGenericDo<TestItemDo> marshalled3 = (TestGenericDo<TestItemDo>) s_dataObjectMapper.readValue(json, DoEntity.class);
+    s_testHelper.assertDoEntityEquals(itemValueDo, marshalled3);
+    assertEquals("foo-id", marshalled3.getGenericAttribute().getId());
+  }
+
+  @Test
+  public void testSerializeDeserialize_EntityWithGenericDoComplexValues() throws Exception {
+    TestEntityWithGenericValuesDo genericDo = BEANS.get(TestEntityWithGenericValuesDo.class);
+    TestGenericDo<TestItemDo> itemValueDo = new TestGenericDo<>();
+    itemValueDo.withGenericAttribute(createTestItemDo("foo-id", "foo-attribute"));
+    genericDo.withGenericAttribute(itemValueDo);
+
+    Collection<TestGenericDo<?>> itemsList = new ArrayList<>();
+    itemsList.add(new TestGenericDo<>().withGenericAttribute(createTestItemDo("foo-id-2", "foo-attribute-2")));
+    genericDo.withGenericListAttribute(itemsList);
+
+    String json = s_dataObjectMapper.writeValueAsString(genericDo);
+    assertJsonEquals("TestEntityWithGenericComplexValuesDo.json", json);
+
+    TestEntityWithGenericValuesDo marshalled = s_dataObjectMapper.readValue(json, new TypeReference<TestEntityWithGenericValuesDo>() {
+    });
+    s_testHelper.assertDoEntityEquals(genericDo, marshalled);
+    assertEquals("foo-id", marshalled.getGenericAttribute().get("genericAttribute", TestItemDo.class).getId());
+    assertEquals("foo-id-2", marshalled.getGenericListAttribute().get(0).get("genericAttribute", TestItemDo.class).getId());
+  }
+
+  @Test
+  public void testSerializeDeserialize_GenericDoListValues() throws Exception {
+    TestGenericDo<List<TestItemDo>> itemsValueDo = new TestGenericDo<>();
+    List<TestItemDo> items = new ArrayList<>();
+    items.add(createTestItemDo("foo-id-1", "foo-attribute-1"));
+    items.add(createTestItemDo("foo-id-2", "foo-attribute-2"));
+    itemsValueDo.withGenericAttribute(items);
+
+    String json = s_dataObjectMapper.writeValueAsString(itemsValueDo);
+    assertJsonEquals("TestGenericWithListValueDo.json", json);
+
+    TestGenericDo<List<TestItemDo>> marshalled = s_dataObjectMapper.readValue(json, new TypeReference<TestGenericDo<List<TestItemDo>>>() {
+    });
+    // Marshaled class is not equals to serialized class, since List<TestItemDo> is deserialized to DoList<TestItemDo>. Compare only the List<TestItemDo> content.
+    s_testHelper.assertObjectEquals(items, marshalled.get("genericAttribute"), true);
+
+    DoEntity entity = s_dataObjectMapper.readValue(json, DoEntity.class);
+    s_testHelper.assertObjectEquals(items, entity.get("genericAttribute"), true);
+  }
+
+  @Test
+  public void testSerializeDeserialize_GenericDoListAttribute() throws Exception {
+    TestGenericDo<TestItemDo> itemsDo = new TestGenericDo<>();
+    List<TestItemDo> list = new ArrayList<>();
+    list.add(createTestItemDo("foo-id-1", "foo-attribute-1"));
+    list.add(createTestItemDo("foo-id-2", "foo-attribute-2"));
+    itemsDo.withGenericListAttribute(list);
+
+    String json = s_dataObjectMapper.writeValueAsString(itemsDo);
+    assertJsonEquals("TestGenericWithListAttributeDo.json", json);
+
+    // read value with complete generic type definition
+    TestGenericDo<TestItemDo> marshalled = s_dataObjectMapper.readValue(json, new TypeReference<TestGenericDo<TestItemDo>>() {
+    });
+    s_testHelper.assertDoEntityEquals(itemsDo, marshalled);
+    assertEquals("foo-id-1", marshalled.getGenericListAttribute().get(0).getId());
+
+    // read value with incomplete generic type definition
+    TestGenericDo<TestItemDo> marshalled2 = s_dataObjectMapper.readValue(json, new TypeReference<TestGenericDo>() {
+    });
+    s_testHelper.assertDoEntityEquals(itemsDo, marshalled2);
+    assertEquals("foo-id-1", marshalled2.getGenericListAttribute().get(0).getId());
+
+    // read value with no generic type definition
+    @SuppressWarnings("unchecked")
+    TestGenericDo<TestItemDo> marshalled3 = (TestGenericDo<TestItemDo>) s_dataObjectMapper.readValue(json, DoEntity.class);
+    s_testHelper.assertDoEntityEquals(itemsDo, marshalled3);
+    assertEquals("foo-id-1", marshalled3.getGenericListAttribute().get(0).getId());
+  }
+
+  @Test
+  public void testSerializeDeserialize_GenericMap() throws Exception {
+    TestGenericDo<Map<String, TestItemDo>> itemsMapDo = new TestGenericDo<>();
+
+    Map<String, TestItemDo> map = new LinkedHashMap<>();
+    map.put("foo-1", createTestItemDo("foo-id-1", "foo-attribute-1"));
+    map.put("foo-2", createTestItemDo("foo-id-2", "foo-attribute-2"));
+    itemsMapDo.withGenericAttribute(map);
+
+    String json = s_dataObjectMapper.writeValueAsString(itemsMapDo);
+    assertJsonEquals("TestGenericWithMapValueDo.json", json);
+
+    TestGenericDo<Map<String, TestItemDo>> marshalled = s_dataObjectMapper.readValue(json, new TypeReference<TestGenericDo<Map<String, TestItemDo>>>() {
+    });
+    // Marshaled class is not equals to serialized class, since Map<String, TestItemDo> is deserialized to a DoEntity. Compare only the attributes values.
+    s_testHelper.assertObjectEquals(map.values(), marshalled.get("genericAttribute", DoEntity.class).all().values(), true);
+  }
+
+  @Test
+  public void testSerializeDeserialize_GenericDoEntityMap() throws Exception {
+    TestGenericDoEntityMapDo<Map<String, TestItemDo>> itemsMapDo = new TestGenericDoEntityMapDo<>();
+
+    Map<String, TestItemDo> map = new LinkedHashMap<>();
+    map.put("foo-1", createTestItemDo("foo-id-1", "foo-attribute-1"));
+    map.put("foo-2", createTestItemDo("foo-id-2", "foo-attribute-2"));
+    itemsMapDo.withGenericMapAttribute(map);
+
+    String json = s_dataObjectMapper.writeValueAsString(itemsMapDo);
+    assertJsonEquals("TestGenericDoEntityMapDo.json", json);
+
+    TestGenericDoEntityMapDo<Map<String, TestItemDo>> marshalled = s_dataObjectMapper.readValue(json, new TypeReference<TestGenericDoEntityMapDo<Map<String, TestItemDo>>>() {
+    });
+    s_testHelper.assertDoEntityEquals(itemsMapDo, marshalled);
+    assertEquals("foo-id-1", marshalled.genericMapAttribute().get().get("foo-1").getId());
   }
 
   // ------------------------------------ entity with IDoEntity interface definition tests -----------------------------

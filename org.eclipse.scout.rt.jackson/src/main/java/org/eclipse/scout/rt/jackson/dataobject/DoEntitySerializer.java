@@ -135,6 +135,7 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
 
   protected Optional<JavaType> getJavaType(String attributeName) {
     return m_doEntityDefinitionRegistry.get().getAttributeDescription(handledType(), attributeName)
-        .map(DataObjectAttributeDefinition::getType);
+        .map(DataObjectAttributeDefinition::getType)
+        .filter(t -> t.getRawClass() != Object.class); // filter completely unknown types, forcing to use the default behavior for unknown types
   }
 }
