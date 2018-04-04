@@ -24,7 +24,7 @@ scout.ViewMenuTab = function() {
 
   this.$arrowIcon = null; // small "arrow down" icon at the right side of the icon
 
-  this.defaultIconId = scout.icons.OUTLINE;
+  this.defaultIconId = scout.icons.FOLDER_BOLD;
   this._viewMenuPropertyChangeHandler = this._onViewMenuPropertyChange.bind(this);
   this._addWidgetProperties('viewMenus');
 };

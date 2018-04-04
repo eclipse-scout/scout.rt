@@ -757,23 +757,23 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
               // sort
               if (selectedCol.isSortActive() && selectedCol.isSortAscending()) {
-                getMenuByClass(SortAscAdditionalMenu.class).setText("x");
+                getMenuByClass(SortAscAdditionalMenu.class).setIconId(AbstractIcons.LongArrowUpRemove);
               }
               else {
-                getMenuByClass(SortAscAdditionalMenu.class).setText("+");
+                getMenuByClass(SortAscAdditionalMenu.class).setIconId(AbstractIcons.LongArrowUpPlus);
               }
               if (selectedCol.isSortActive() && !selectedCol.isSortAscending()) {
-                getMenuByClass(SortDescAdditionalMenu.class).setText("x");
+                getMenuByClass(SortDescAdditionalMenu.class).setIconId(AbstractIcons.LongArrowDownRemove);
               }
               else {
-                getMenuByClass(SortDescAdditionalMenu.class).setText("+");
+                getMenuByClass(SortDescAdditionalMenu.class).setIconId(AbstractIcons.LongArrowDownPlus);
               }
               // group
               if (selectedCol.isGroupingActive()) {
-                getMenuByClass(GroupAdditionalMenu.class).setText("x");
+                getMenuByClass(GroupAdditionalMenu.class).setIconId(AbstractIcons.GroupRemove);
               }
               else {
-                getMenuByClass(GroupAdditionalMenu.class).setText("+");
+                getMenuByClass(GroupAdditionalMenu.class).setIconId(AbstractIcons.GroupPlus);
               }
             }
 
@@ -1249,7 +1249,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
               @Override
               protected String getConfiguredIconId() {
-                return AbstractIcons.LongArrowUp;
+                return AbstractIcons.LongArrowUpPlus;
               }
 
               @Override
@@ -1274,7 +1274,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
               @Override
               protected String getConfiguredIconId() {
-                return AbstractIcons.LongArrowDown;
+                return AbstractIcons.LongArrowDownPlus;
               }
 
               @Override
@@ -1329,7 +1329,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
               @Override
               protected String getConfiguredIconId() {
-                return AbstractIcons.Group;
+                return AbstractIcons.GroupPlus;
               }
 
               @Override
@@ -1380,8 +1380,8 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
 
               @Override
-              protected String getConfiguredText() {
-                return TEXTS.get("FilterAbbreviation") + " x";
+              protected String getConfiguredIconId() {
+                return AbstractIcons.FilterRemove;
               }
 
               @Override

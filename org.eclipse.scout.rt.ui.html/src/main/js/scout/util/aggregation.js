@@ -25,7 +25,7 @@ scout.aggregation = {
     return currentState;
   },
 
-  sumSymbol: scout.icons.SUM,
+  sumSymbol: scout.icons.SUM_BOLD,
 
   avgStart: function() {
     return {
@@ -48,7 +48,7 @@ scout.aggregation = {
     }
   },
 
-  avgSymbol: scout.icons.AVG,
+  avgSymbol: scout.icons.AVG_BOLD,
 
   minStart: function() {
     return null;
@@ -71,7 +71,7 @@ scout.aggregation = {
     return currentState;
   },
 
-  minSymbol: scout.icons.MIN,
+  minSymbol: scout.icons.MIN_BOLD,
 
   maxStart: function() {
     return null;
@@ -94,6 +94,6 @@ scout.aggregation = {
     return currentState;
   },
 
-  maxSymbol: scout.icons.MAX
+  maxSymbol: scout.icons.MAX_BOLD
 
 };

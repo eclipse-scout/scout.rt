@@ -94,8 +94,8 @@
   #scout.font-text-normal(@font-weight-bold);
   font-weight: bold;
   color: @text-color;
-  line-height: 22px;
-  height: 22px;
+  line-height: 24px;
+  height: 24px;
   #scout.overflow-ellipsis-nowrap();
 }
 
@@ -103,10 +103,10 @@
   float: left;
   width: 43px;
   margin-right: 10px;
-  height: 29px;
+  height: 30px;
   #scout.font-icon();
-  font-size: 17px;
-  line-height: 29px;
+  font-size: 18px;
+  line-height: 30px;
   color: @icon-color;
   border: 1px solid @table-header-menu-cmd-border-color;
   background-color: @control-background-color;
@@ -132,13 +132,13 @@
     border-color: @hover-color;
   }
 
-  &:active {
+  &:active:not(.disabled) {
     color: @button-active-color;
     background-color: @button-active-background-color;
   }
 
   &.disabled {
-    border-color: @button-disabled-border-color;
+    border-color: @palette-gray-4;
     color: @button-disabled-color;
     cursor: default;
   }
@@ -147,8 +147,7 @@
     position: relative;
     left: 3px;
     top: -6px;
-    font-size: 10px;
-    line-height: 10px;
+    font-size: 13px;
   }
 
   &.selected {
@@ -170,20 +169,18 @@
     }
   }
 
-  &.move::before {
-    font-size: 20px;
-    line-height: 20px;
-  }
-
   &.move-top::before {
     content: @icon-angle-double-left;
   }
+
   &.move-up::before {
     content: @icon-angle-left;
   }
+
   &.move-down::before {
    content: @icon-angle-right;
   }
+
   &.move-bottom::before {
     content: @icon-angle-double-right;
   }
@@ -218,10 +215,8 @@
   }
 
   &.change-column {
-    font-size: 15px;
-
     &::before {
-      content: @icon-pencil-solid;
+      content: @icon-pencil;
     }
   }
 
@@ -229,9 +224,7 @@
     border-width: 0;
 
     &::before {
-      top: -1px;
       font-size: 17px;
-      line-height: 20px;
       #scout.font-icon();
       content: @icon-remove;
     }
@@ -242,23 +235,20 @@
   }
 
   &.hierarchy-collapse-all {
-    &::after {
-      content: @icon-minus;
+    &::before {
+      content: @icon-collapse-all;
     }
   }
 
   &.hierarchy-expand-all {
-    &::after {
-      content: @icon-plus;
+    &::before {
+      content: @icon-expand-all;
     }
   }
 
   &.group::before,
   &.group-add::before {
     position: relative;
-    top: 0;
-    font-size: 20px;
-    line-height: 20px;
     content: @icon-group;
   }
 
@@ -275,9 +265,6 @@
   &.aggregation-function {
     &::before {
       position: relative;
-      top: 0;
-      font-size: 20px;
-      line-height: 20px;
     }
 
     &.sum::before {
@@ -285,15 +272,15 @@
     }
 
     &.avg::before {
-      content: @icon-avg;
+      content: @icon-avg-bold;
     }
 
     &.max::before {
-      content: @icon-max;
+      content: @icon-max-bold;
     }
 
     &.min::before {
-      content: @icon-min;
+      content: @icon-min-bold;
     }
   }
 
@@ -376,7 +363,7 @@
 
 .table-header-menu-filter-actions {
   float: right;
-  line-height: 22px;
+  line-height: 24px;
 }
 
 .table-header-menu-filter-toggle-checked {
@@ -394,11 +381,11 @@
 }
 
 .table-header-menu-toggle-sort-order-alphabetically::before {
-  content: @icon-sort-alpha-asc;
+  content: @icon-sort-alpha-asc-bold;
 }
 
 .table-header-menu-toggle-sort-order-amount::before {
-  content: @icon-sort-amount-desc;
+  content: @icon-sort-amount-desc-bold;
 }
 
 /* Filter fields group-box */

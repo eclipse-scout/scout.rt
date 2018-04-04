@@ -35,7 +35,7 @@ scout.Menu = function() {
 };
 scout.inherits(scout.Menu, scout.Action);
 
-scout.Menu.SUBMENU_ICON = scout.icons.ANGLE_DOWN;
+scout.Menu.SUBMENU_ICON = scout.icons.ANGLE_DOWN_BOLD;
 
 scout.Menu.prototype._init = function(options) {
   scout.Menu.parent.prototype._init.call(this, options);
