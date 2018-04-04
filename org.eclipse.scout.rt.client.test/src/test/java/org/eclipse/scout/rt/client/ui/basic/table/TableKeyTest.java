@@ -19,7 +19,6 @@ import static org.junit.Assert.fail;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -261,7 +260,7 @@ public class TableKeyTest {
     Field f = AbstractTable.class.getDeclaredField("m_rowsByKey");
     f.setAccessible(true);
     @SuppressWarnings("unchecked")
-    HashMap<CompositeObject, ITableRow> rows = (HashMap<CompositeObject, ITableRow>) f.get(table);
+    Map<CompositeObject, ITableRow> rows = (Map<CompositeObject, ITableRow>) f.get(table);
     return rows.entrySet().stream().collect(Collectors.<Entry<CompositeObject, ITableRow>, CompositeObject, ITableRow> toMap(e -> e.getKey(), e -> e.getValue()));
   }
 
