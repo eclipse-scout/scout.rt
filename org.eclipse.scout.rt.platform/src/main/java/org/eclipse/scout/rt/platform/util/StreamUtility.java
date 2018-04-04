@@ -10,11 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
@@ -156,5 +159,26 @@ public final class StreamUtility {
           l2.addAll(l1);
           return l2;
         });
+  }
+
+  /**
+   * Returns a {@code Collector} that accumulates elements into a {@code LinkedHashMap} whose keys and values are the
+   * result of applying the provided mapping functions to the input elements.
+   *
+   * @see Collectors#toMap(Function, Function, BinaryOperator, java.util.function.Supplier)
+   */
+  public static <T, K, U> Collector<T, ?, LinkedHashMap<K, U>> toLinkedHashMap(Function<? super T, ? extends K> keyMapper, Function<? super T, ? extends U> valueMapper) {
+    return Collectors.toMap(keyMapper, valueMapper, throwingMerger(), LinkedHashMap::new);
+  }
+
+  /**
+   * Returns a merge function which always throws {@code IllegalStateException}.
+   *
+   * @see Collectors#throwingMerger
+   */
+  public static <T> BinaryOperator<T> throwingMerger() {
+    return (u, v) -> {
+      throw new IllegalStateException(String.format("Duplicate key %s", u));
+    };
   }
 }

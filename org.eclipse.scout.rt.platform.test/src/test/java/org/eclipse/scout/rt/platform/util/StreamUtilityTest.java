@@ -10,12 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -212,4 +214,18 @@ public class StreamUtilityTest {
     fail("unexpected invocation of unaryOperator");
     return t; // actually value is never returned
   }
+
+  @Test
+  public void testToLinkedHashMap() {
+    String[] values = new String[]{"one", "two", "three"};
+    LinkedHashMap<String, Integer> map = Stream.of(values).collect(StreamUtility.toLinkedHashMap(t -> t, t -> t.length()));
+    assertArrayEquals(values, map.keySet().toArray());
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testToLinkedHashMapDuplicatedKey() {
+    String[] values = new String[]{"one", "one"};
+    Stream.of(values).collect(StreamUtility.toLinkedHashMap(t -> t, t -> t));
+  }
+
 }
