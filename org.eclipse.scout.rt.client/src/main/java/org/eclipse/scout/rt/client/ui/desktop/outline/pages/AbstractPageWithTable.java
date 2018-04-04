@@ -803,7 +803,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
           newSelectedNode = getTreeNodeFor(row);
         }
         else {
-          row = table.findRowByKey(oldSelectedRowKeys);
+          row = table.getRowByKey(oldSelectedRowKeys);
           if (row != null) {
             newSelectedNode = getTreeNodeFor(row);
           }

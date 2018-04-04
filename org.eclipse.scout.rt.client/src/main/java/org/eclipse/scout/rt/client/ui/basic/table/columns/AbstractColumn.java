@@ -340,7 +340,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   /**
    * Configures whether this column value belongs to the primary key of the surrounding table. The table's primary key
    * might consist of several columns. The primary key can be used to find the appropriate row by calling
-   * {@link AbstractTable#findRowByKey(List)}.
+   * {@link AbstractTable#getRowByKey(List)}.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
    *

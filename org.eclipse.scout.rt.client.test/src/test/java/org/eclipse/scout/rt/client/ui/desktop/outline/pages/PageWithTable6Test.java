@@ -108,7 +108,7 @@ public class PageWithTable6Test {
     @Override
     protected void execPopulateTable() {
       super.execPopulateTable();
-      getTable().findRowByKey(CollectionUtility.arrayList((Object) Integer.valueOf(2))).setEnabled(false);
+      getTable().getRowByKey(CollectionUtility.arrayList((Object) Integer.valueOf(2))).setEnabled(false);
     }
 
     public class Table extends AbstractTable {

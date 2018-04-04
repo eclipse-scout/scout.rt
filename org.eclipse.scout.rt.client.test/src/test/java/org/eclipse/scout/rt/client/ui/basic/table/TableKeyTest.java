@@ -56,9 +56,9 @@ public class TableKeyTest {
     rows.add(table.createRow(new Object[]{3, 1}));
     table.replaceRows(rows);
     rows = table.getRows();
-    assertEquals(rows.get(0), table.findRowByKey(table.getRowKeys(rows.get(0))));
-    assertEquals(rows.get(1), table.findRowByKey(table.getRowKeys(rows.get(1))));
-    assertEquals(rows.get(2), table.findRowByKey(table.getRowKeys(rows.get(2))));
+    assertEquals(rows.get(0), table.getRowByKey(table.getRowKeys(rows.get(0))));
+    assertEquals(rows.get(1), table.getRowByKey(table.getRowKeys(rows.get(1))));
+    assertEquals(rows.get(2), table.getRowByKey(table.getRowKeys(rows.get(2))));
     assertEquals(rows.get(0), table.findParentRow(rows.get(2)));
     assertNull(table.findParentRow(rows.get(0)));
     assertNull(table.findParentRow(rows.get(1)));
@@ -75,9 +75,9 @@ public class TableKeyTest {
     rows.add(table.createRow(new Object[]{3, 4}));
     table.replaceRows(rows);
     rows = table.getRows();
-    assertEquals(rows.get(0), table.findRowByKey(table.getRowKeys(rows.get(0))));
-    assertEquals(rows.get(1), table.findRowByKey(table.getRowKeys(rows.get(1))));
-    assertEquals(rows.get(2), table.findRowByKey(table.getRowKeys(rows.get(2))));
+    assertEquals(rows.get(0), table.getRowByKey(table.getRowKeys(rows.get(0))));
+    assertEquals(rows.get(1), table.getRowByKey(table.getRowKeys(rows.get(1))));
+    assertEquals(rows.get(2), table.getRowByKey(table.getRowKeys(rows.get(2))));
     assertNull(table.findParentRow(rows.get(2)));
     assertNull(table.findParentRow(rows.get(0)));
     assertNull(table.findParentRow(rows.get(1)));

@@ -363,16 +363,16 @@ public class TableTest {
   }
 
   @Test
-  public void testFindRowByKey() {
+  public void testgetRowByKey() {
     P_Table table = createTestTable(ITableRow.STATUS_NON_CHANGED);
 
-    Assert.assertNull(table.findRowByKey(null));
-    Assert.assertNull(table.findRowByKey(Collections.singletonList(null)));
-    Assert.assertNull(table.findRowByKey(Collections.singletonList(13)));
-    Assert.assertNull(table.findRowByKey(Collections.singletonList("13")));
-    Assert.assertNull(table.findRowByKey(Collections.singletonList("10")));
-    Assert.assertEquals("Lorem", table.getSecondColumn().getValue(table.findRowByKey(Collections.singletonList(10))));
-    Assert.assertEquals("Ipsum", table.getSecondColumn().getValue(table.findRowByKey(Arrays.asList(11))));
+    Assert.assertNull(table.getRowByKey(null));
+    Assert.assertNull(table.getRowByKey(Collections.singletonList(null)));
+    Assert.assertNull(table.getRowByKey(Collections.singletonList(13)));
+    Assert.assertNull(table.getRowByKey(Collections.singletonList("13")));
+    Assert.assertNull(table.getRowByKey(Collections.singletonList("10")));
+    Assert.assertEquals("Lorem", table.getSecondColumn().getValue(table.getRowByKey(Collections.singletonList(10))));
+    Assert.assertEquals("Ipsum", table.getSecondColumn().getValue(table.getRowByKey(Arrays.asList(11))));
   }
 
   /**

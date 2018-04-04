@@ -194,7 +194,7 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
 
   /**
    * The strategy how to display parent rows.
-   * 
+   *
    * @since 8.0
    */
   String PROP_HIERARCHICAL_STYLE = "hierarchicalStyle";
@@ -368,6 +368,12 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
 
   List<Object> getRowKeys(ITableRow row);
 
+  ITableRow getRowByKey(List<?> keys);
+
+  /**
+   * @deprecated use {@link ITable#getRowByKey(List)} instead. This method will be removed in Scout 9.0.
+   */
+  @Deprecated
   ITableRow findRowByKey(List<?> keys);
 
   List<Object> getParentRowKeys(int rowIndex);

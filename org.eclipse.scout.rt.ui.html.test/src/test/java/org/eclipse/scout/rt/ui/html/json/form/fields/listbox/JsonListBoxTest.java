@@ -88,7 +88,7 @@ public class JsonListBoxTest {
     listBox.loadListBoxData();
 
     // Filter second row as well
-    String row1Id = jsonTable.getTableRowId(table.findRowByKey(Arrays.asList(1L)));
+    String row1Id = jsonTable.getTableRowId(table.getRowByKey(Arrays.asList(1L)));
     table.addRowFilter(new ITableRowFilter() {
       @Override
       public boolean accept(ITableRow row) {

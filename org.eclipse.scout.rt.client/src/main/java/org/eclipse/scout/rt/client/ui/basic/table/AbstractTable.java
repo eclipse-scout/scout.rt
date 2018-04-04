@@ -3249,8 +3249,14 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     return CollectionUtility.emptyArrayList();
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public ITableRow findRowByKey(List<?> keys) {
+    return getRowByKey(keys);
+  }
+
+  @Override
+  public ITableRow getRowByKey(List<?> keys) {
     if (!CollectionUtility.hasElements(keys)) {
       return null;
     }
@@ -3273,7 +3279,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   @Override
   public ITableRow findParentRow(ITableRow row) {
-    return findRowByKey(getParentRowKeys(row));
+    return getRowByKey(getParentRowKeys(row));
   }
 
   /**
