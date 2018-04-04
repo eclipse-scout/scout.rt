@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.platform.util.visitor;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.function.Function;
 
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
@@ -56,7 +56,7 @@ public final class TreeTraversals {
    * @see IBreadthFirstTreeVisitor
    * @see ITreeTraversal
    */
-  public static <T> ITreeTraversal<T> create(IBreadthFirstTreeVisitor<T> visitor, Function<T, List<? extends T>> childrenSupplier) {
+  public static <T> ITreeTraversal<T> create(IBreadthFirstTreeVisitor<T> visitor, Function<T, Collection<? extends T>> childrenSupplier) {
     return new BreadthFirstTraversal<T>(assertNotNull(visitor), assertNotNull(childrenSupplier));
   }
 
@@ -76,7 +76,7 @@ public final class TreeTraversals {
    * @see IDepthFirstTreeVisitor
    * @see ITreeTraversal
    */
-  public static <T> ITreeTraversal<T> create(IDepthFirstTreeVisitor<T> visitor, Function<T, List<? extends T>> childrenSupplier) {
+  public static <T> ITreeTraversal<T> create(IDepthFirstTreeVisitor<T> visitor, Function<T, Collection<? extends T>> childrenSupplier) {
     return new DepthFirstTraversal<T>(assertNotNull(visitor), assertNotNull(childrenSupplier));
   }
 }

@@ -193,6 +193,13 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
   String PROP_GROUPING_STYLE = "groupingStyle";
 
   /**
+   * The strategy how to display parent rows.
+   * 
+   * @since 8.0
+   */
+  String PROP_HIERARCHICAL_STYLE = "hierarchicalStyle";
+
+  /**
    * @deprecated will be removed with 8.0, use {@link #init()} or {@link #reinit()} instead
    */
   @Deprecated
@@ -1144,5 +1151,9 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
   GroupingStyle getGroupingStyle();
 
   void setGroupingStyle(GroupingStyle groupingStyle);
+
+  HierarchicalStyle getHierarchicalStyle();
+
+  void setHierarchicalStyle(HierarchicalStyle hierarchicalStyle);
 
 }

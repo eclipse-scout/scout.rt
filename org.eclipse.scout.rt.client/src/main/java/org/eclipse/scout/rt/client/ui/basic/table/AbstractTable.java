@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +27,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -107,6 +110,8 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
+import org.eclipse.scout.rt.platform.util.visitor.CollectingVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.TreeTraversals;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
@@ -150,6 +155,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   private final OptimisticLock m_initLock;
   private final List<ITableRow> m_rows; // synchronized list
   private final Object m_cachedRowsLock;
+  private final Map<CompositeObject, ITableRow> m_rowsByKey;
   private final Map<CompositeObject, ITableRow> m_deletedRows;
   private final List<ITableRowFilter> m_rowFilters;
   private final Map<String, BinaryResource> m_attachments;
@@ -207,6 +213,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     m_cachedRowsLock = new Object();
     m_cachedFilteredRowsLock = new Object();
     m_rows = Collections.synchronizedList(new ArrayList<ITableRow>(1));
+    m_rowsByKey = Collections.synchronizedMap(new HashMap<>());
     m_deletedRows = new HashMap<>();
     m_rowFilters = new ArrayList<>(1);
     m_attachments = new HashMap<>(0);
@@ -563,6 +570,12 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     return GroupingStyle.BOTTOM;
   }
 
+  @ConfigProperty(ConfigProperty.OBJECT)
+  @Order(250)
+  protected HierarchicalStyle getConfiguredHierarchicalStyle() {
+    return HierarchicalStyle.DEFAULT;
+  }
+
   /**
    * Called after a drag operation was executed on one or several table rows.
    * <p>
@@ -847,6 +860,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     setEnabled(true);
     setLoading(false);
     setGroupingStyle(getConfiguredGroupingStyle());
+    setHierarchicalStyle(getConfiguredHierarchicalStyle());
     setTitle(getConfiguredTitle());
     setAutoDiscardOnDelete(getConfiguredAutoDiscardOnDelete());
     setSortEnabled(getConfiguredSortEnabled());
@@ -2119,15 +2133,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       if (!resolvedRowList.isEmpty()) {
         fireRowsUpdated(resolvedRowList);
       }
-      if (getColumnSet().getSortColumnCount() > 0) {
-        // restore order of rows according to sort criteria
-        if (isTableChanging()) {
-          setSortValid(false);
-        }
-        else {
-          sort();
-        }
-      }
     }
     finally {
       setTableChanging(false);
@@ -2141,6 +2146,21 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
        */
       ensureInvalidColumnsVisible(row);
       Set<Integer> changedColumnValues = row.getUpdatedColumnIndexes(ICell.VALUE_BIT);
+      if (CollectionUtility.containsAny(changedColumnValues, IntStream.of(getColumnSet().getKeyColumnIndexes()).boxed().toArray(Integer[]::new))) {
+        // update primary key
+        m_rowsByKey.values().remove(row);
+        m_rowsByKey.put(new CompositeObject(row.getKeyValues()), row);
+      }
+      if (CollectionUtility.containsAny(changedColumnValues, getColumnSet().getSortColumns().stream().map(col -> col.getColumnIndex()).collect(Collectors.toSet()))) {
+        // sort has to be updated
+        // restore order of rows according to sort criteria
+        if (isTableChanging()) {
+          setSortValid(false);
+        }
+        else {
+          sort();
+        }
+      }
       if (!changedColumnValues.isEmpty()) {
         enqueueValueChangeTasks(row, changedColumnValues);
       }
@@ -2908,6 +2928,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       newIRow.setRowIndex(newIndex);
       newIRow.setTableInternal(this);
       m_rows.add(newIRow);
+      m_rowsByKey.put(new CompositeObject(newIRow.getKeyValues()), newIRow);
     }
 
     Set<Integer> indexes = new HashSet<>();
@@ -3060,6 +3081,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
           //remove all of them
           synchronized (m_cachedRowsLock) {
             m_rows.clear();
+            m_rowsByKey.clear();
             m_cachedRows = null;
           }
           for (int i = deletedRows.size() - 1; i >= 0; i--) {
@@ -3077,6 +3099,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
               boolean removed = false;
               synchronized (m_cachedRowsLock) {
                 removed = m_rows.remove(candidateRow);
+                m_rowsByKey.remove(new CompositeObject(candidateRow.getKeyValues()));
                 if (removed) {
                   m_cachedRows = null;
                 }
@@ -3231,21 +3254,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     if (!CollectionUtility.hasElements(keys)) {
       return null;
     }
-
-    List<IColumn<?>> keyColumns = getColumnSet().getKeyColumns();
-    if (keyColumns.isEmpty()) {
-      keyColumns = getColumnSet().getColumns();
-    }
-    if (keyColumns.isEmpty()) {
-      return null; // no columns in the table: cannot search by keys
-    }
-
-    for (ITableRow row : m_rows) {
-      if (areCellsEqual(keys, keyColumns, row)) {
-        return row;
-      }
-    }
-    return null;
+    return m_rowsByKey.get(new CompositeObject(keys));
   }
 
   @Override
@@ -3376,15 +3385,31 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
           // first make sure decorations and lookups are up-to-date
           processDecorationBuffer();
-          List<ITableRow> a = new ArrayList<>(getRows());
-          a.sort(new TableRowComparator(new ArrayList<>(sortCols)));
-          sortInternal(a);
+          sortInternal(sortRows(getRows(), new TableRowComparator(sortCols)));
         }
       }
     }
     finally {
       setSortValid(true);
     }
+  }
+
+  protected List<ITableRow> sortRows(List<? extends ITableRow> rows, Comparator<ITableRow> comparator) {
+    Set<ITableRow> rootNodes = new TreeSet<ITableRow>(comparator);
+    Map<ITableRow/*parent*/, Set<ITableRow> /*sorted child rows*/> parentToChildren = new HashMap<>();
+    rows.forEach(row -> {
+      ITableRow parentRow = findParentRow(row);
+      if (parentRow == null) {
+        rootNodes.add(row);
+      }
+      else {
+        parentToChildren.computeIfAbsent(parentRow, children -> new TreeSet<ITableRow>(comparator))
+            .add(row);
+      }
+    });
+    CollectingVisitor<ITableRow> collector = new CollectingVisitor<ITableRow>();
+    rootNodes.forEach(root -> TreeTraversals.create(collector, parentToChildren::get).traverse(root));
+    return collector.getCollection();
   }
 
   @Override
@@ -3417,7 +3442,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     }
     //sort selection and checked rows without firing an event
     if (m_selectedRows != null && !m_selectedRows.isEmpty()) {
-      TreeSet<ITableRow> newSelection = new TreeSet<>(new RowIndexComparator());
+      Set<ITableRow> newSelection = new TreeSet<>(new RowIndexComparator());
       newSelection.addAll(m_selectedRows);
       m_selectedRows = new ArrayList<>(newSelection);
     }
@@ -4907,5 +4932,15 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   @Override
   public void setGroupingStyle(GroupingStyle groupingStyle) {
     propertySupport.setProperty(PROP_GROUPING_STYLE, groupingStyle);
+  }
+
+  @Override
+  public HierarchicalStyle getHierarchicalStyle() {
+    return (HierarchicalStyle) propertySupport.getProperty(PROP_HIERARCHICAL_STYLE);
+  }
+
+  @Override
+  public void setHierarchicalStyle(HierarchicalStyle hierarchicalStyle) {
+    propertySupport.setProperty(PROP_HIERARCHICAL_STYLE, hierarchicalStyle);
   }
 }

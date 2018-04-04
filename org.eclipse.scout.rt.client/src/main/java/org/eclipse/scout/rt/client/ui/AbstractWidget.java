@@ -2,6 +2,7 @@ package org.eclipse.scout.rt.client.ui;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -208,9 +209,9 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
   }
 
   @SuppressWarnings("unchecked")
-  protected <T extends IWidget> TreeVisitResult visit(IDepthFirstTreeVisitor<T> visitor, Function<T, List<? extends IWidget>> childrenSupplier, Class<T> type) {
+  protected <T extends IWidget> TreeVisitResult visit(IDepthFirstTreeVisitor<T> visitor, Function<T, Collection<? extends IWidget>> childrenSupplier, Class<T> type) {
     IDepthFirstTreeVisitor<IWidget> widgetVisitorTypeAdapter = new WidgetVisitorTypeAdapter<T>(visitor, type);
-    Function<IWidget, List<? extends IWidget>> cs = widget -> {
+    Function<IWidget, Collection<? extends IWidget>> cs = widget -> {
       if (type.isAssignableFrom(widget.getClass())) {
         childrenSupplier.apply((T) widget);
       }
@@ -219,7 +220,7 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
     return visit(widgetVisitorTypeAdapter, cs);
   }
 
-  protected TreeVisitResult visit(IDepthFirstTreeVisitor<IWidget> visitor, Function<IWidget, List<? extends IWidget>> childrenSupplier) {
+  protected TreeVisitResult visit(IDepthFirstTreeVisitor<IWidget> visitor, Function<IWidget, Collection<? extends IWidget>> childrenSupplier) {
     return TreeTraversals.create(visitor, childrenSupplier).traverse(this);
   }
 

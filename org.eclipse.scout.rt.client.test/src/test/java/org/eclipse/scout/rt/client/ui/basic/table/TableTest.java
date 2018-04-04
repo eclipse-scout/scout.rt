@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 
 /**
  * Tests for {@link AbstractTable}
@@ -247,8 +248,8 @@ public class TableTest {
   }
 
   /**
-   * Test of {@link AbstractTable#sort()}. If {@link AbstractTable#isSortEnabled()} is false (e.g. sort not enabled), rows
-   * will stay in the order they were added to the table.
+   * Test of {@link AbstractTable#sort()}. If {@link AbstractTable#isSortEnabled()} is false (e.g. sort not enabled),
+   * rows will stay in the order they were added to the table.
    */
   @Test
   public void testSortNotEnabled() throws Exception {
@@ -463,6 +464,26 @@ public class TableTest {
     assertNull(table.getContextColumn());
   }
 
+  @Test
+  public void testResortOnSortCellUpdate() {
+    P_Table table = Mockito.spy(new P_Table());
+    table.init();
+    fillTable(table);
+    Mockito.verify(table, Mockito.times(2)).sort();
+    table.getRow(0).getCellForUpdate(table.getThirdColumn()).setValue(4);
+    Mockito.verify(table, Mockito.times(3)).sort();
+  }
+
+  @Test
+  public void testNoResortOnCellUpdate() {
+    P_Table table = Mockito.spy(new P_Table());
+    table.init();
+    fillTable(table);
+    Mockito.verify(table, Mockito.times(2)).sort();
+    table.getRow(0).getCellForUpdate(table.getSecondColumn()).setValue("Baluu");
+    Mockito.verify(table, Mockito.times(2)).sort();
+  }
+
   private void assertValidTestTable(P_Table table, int status) {
     assertRowCount(2, 0, table);
     assertStatusAndTable(table, status, table.getRow(0));
@@ -480,12 +501,17 @@ public class TableTest {
   }
 
   private void fillTable(P_Table table) {
-    addTableRow(table, 10, "Lorem", 1);
-    addTableRow(table, 1, "A Total", 2);
-    addTableRow(table, 30, "Ipsum", 1);
-    addTableRow(table, 25, "Lorem", 1);
-    addTableRow(table, 20, "Ipsum", 1);
-
+    table.setTableChanging(true);
+    try {
+      addTableRow(table, 10, "Lorem", 1);
+      addTableRow(table, 1, "A Total", 2);
+      addTableRow(table, 30, "Ipsum", 1);
+      addTableRow(table, 25, "Lorem", 1);
+      addTableRow(table, 20, "Ipsum", 1);
+    }
+    finally {
+      table.setTableChanging(false);
+    }
     assertRowCount(5, 0, table);
   }
 

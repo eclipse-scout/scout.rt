@@ -125,7 +125,7 @@ public final class TreeUtility {
     return visitNodes(nodes, v, ITreeNode::getChildNodes);
   }
 
-  public static TreeVisitResult visitNodes(Collection<ITreeNode> nodes, IDepthFirstTreeVisitor<ITreeNode> v, Function<ITreeNode, List<? extends ITreeNode>> childrenSupplier) {
+  public static TreeVisitResult visitNodes(Collection<ITreeNode> nodes, IDepthFirstTreeVisitor<ITreeNode> v, Function<ITreeNode, Collection<? extends ITreeNode>> childrenSupplier) {
     if (CollectionUtility.isEmpty(nodes)) {
       return TreeVisitResult.CONTINUE;
     }
@@ -146,11 +146,11 @@ public final class TreeUtility {
     return visitNode(node, visitor, ITreeNode::getChildNodes);
   }
 
-  public static TreeVisitResult visitNode(ITreeNode node, IDepthFirstTreeVisitor<ITreeNode> visitor, Function<ITreeNode, List<? extends ITreeNode>> childrenSupplier) {
+  public static TreeVisitResult visitNode(ITreeNode node, IDepthFirstTreeVisitor<ITreeNode> visitor, Function<ITreeNode, Collection<? extends ITreeNode>> childrenSupplier) {
     return TreeTraversals.create(visitor, childrenSupplier.andThen(TreeUtility::filterNodesWithoutTree)).traverse(node);
   }
 
-  private static List<? extends ITreeNode> filterNodesWithoutTree(List<? extends ITreeNode> candidates) {
+  private static List<? extends ITreeNode> filterNodesWithoutTree(Collection<? extends ITreeNode> candidates) {
     List<ITreeNode> result = new ArrayList<>(candidates.size());
     for (ITreeNode childNode : candidates) {
       if (childNode == null) {

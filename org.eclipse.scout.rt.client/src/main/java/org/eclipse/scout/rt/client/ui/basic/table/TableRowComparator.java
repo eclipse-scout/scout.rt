@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
+import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
@@ -20,9 +20,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
  */
 @SuppressWarnings("squid:S2063")
 public class TableRowComparator implements Comparator<ITableRow> {
-  private final List<IColumn<?>> m_columns;
+  private final Collection<IColumn<?>> m_columns;
 
-  public TableRowComparator(List<IColumn<?>> columns) {
+  public TableRowComparator(Collection<IColumn<?>> columns) {
     m_columns = columns;
   }
 

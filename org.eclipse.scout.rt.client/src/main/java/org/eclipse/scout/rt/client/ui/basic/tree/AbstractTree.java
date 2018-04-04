@@ -1853,7 +1853,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
 
   @Override
   public TreeVisitResult visitVisibleTree(IDepthFirstTreeVisitor<ITreeNode> v) {
-    Function<ITreeNode, List<? extends ITreeNode>> childrenSupplier = ITreeNode::getFilteredChildNodes;
+    Function<ITreeNode, Collection<? extends ITreeNode>> childrenSupplier = ITreeNode::getFilteredChildNodes;
 
     if (isRootNodeVisible()) {
       return TreeTraversals.create(v, childrenSupplier).traverse(getRootNode());

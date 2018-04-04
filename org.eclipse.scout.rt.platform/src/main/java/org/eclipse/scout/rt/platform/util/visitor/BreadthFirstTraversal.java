@@ -14,19 +14,19 @@ import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 import static org.eclipse.scout.rt.platform.util.CollectionUtility.isEmpty;
 
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
 public class BreadthFirstTraversal<T> implements ITreeTraversal<T> {
 
   private final IBreadthFirstTreeVisitor<T> m_visitor;
-  private final Function<T, List<? extends T>> m_childrenSupplier;
+  private final Function<T, Collection<? extends T>> m_childrenSupplier;
 
-  protected BreadthFirstTraversal(IBreadthFirstTreeVisitor<T> visitor, Function<T, List<? extends T>> childrenSupplier) {
+  protected BreadthFirstTraversal(IBreadthFirstTreeVisitor<T> visitor, Function<T, Collection<? extends T>> childrenSupplier) {
     m_visitor = visitor;
     m_childrenSupplier = childrenSupplier;
   }
@@ -58,7 +58,7 @@ public class BreadthFirstTraversal<T> implements ITreeTraversal<T> {
   }
 
   private void enqueueChildren(Deque<P_BreadthFirstNode<T>> dek, Set<T> alreadyEnqueued, P_BreadthFirstNode<T> node) {
-    List<? extends T> children = m_childrenSupplier.apply(node.m_element);
+    Collection<? extends T> children = m_childrenSupplier.apply(node.m_element);
     if (isEmpty(children)) {
       return;
     }

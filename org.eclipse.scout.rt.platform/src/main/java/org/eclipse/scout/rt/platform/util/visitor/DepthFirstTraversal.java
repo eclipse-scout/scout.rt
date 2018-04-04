@@ -13,17 +13,17 @@ package org.eclipse.scout.rt.platform.util.visitor;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 import static org.eclipse.scout.rt.platform.util.CollectionUtility.isEmpty;
 
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
 public class DepthFirstTraversal<T> implements ITreeTraversal<T> {
 
   private final IDepthFirstTreeVisitor<T> m_visitor;
-  private final Function<T, List<? extends T>> m_childrenSupplier;
+  private final Function<T, Collection<? extends T>> m_childrenSupplier;
 
-  protected DepthFirstTraversal(IDepthFirstTreeVisitor<T> visitor, Function<T, List<? extends T>> childrenSupplier) {
+  protected DepthFirstTraversal(IDepthFirstTreeVisitor<T> visitor, Function<T, Collection<? extends T>> childrenSupplier) {
     m_visitor = visitor;
     m_childrenSupplier = childrenSupplier;
   }
@@ -61,7 +61,7 @@ public class DepthFirstTraversal<T> implements ITreeTraversal<T> {
   }
 
   protected TreeVisitResult visitChildren(T parent, Set<T> alreadyVisited, int level) {
-    List<? extends T> children = m_childrenSupplier.apply(parent);
+    Collection<? extends T> children = m_childrenSupplier.apply(parent);
     if (isEmpty(children)) {
       return TreeVisitResult.CONTINUE;
     }
