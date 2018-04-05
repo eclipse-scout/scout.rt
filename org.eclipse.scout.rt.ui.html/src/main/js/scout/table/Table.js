@@ -1555,7 +1555,8 @@ scout.Table.prototype._columnAtX = function(x) {
   }
 
   columnOffsetLeft -= scrollLeft;
-  var column = scout.arrays.find(this.columns, function(column) {
+  var visibleColumns = this.visibleColumns();
+  var column = scout.arrays.find(visibleColumns, function(column) {
     columnOffsetRight = columnOffsetLeft + column.width;
     if (x >= columnOffsetLeft && x < columnOffsetRight) {
       return true;
@@ -1564,7 +1565,7 @@ scout.Table.prototype._columnAtX = function(x) {
   });
   if (!column) {
     // No column found (clicked right of last column, on selection border) --> return last column
-    column = this.columns[this.columns.length - 1];
+    column = visibleColumns[visibleColumns.length - 1];
   }
   return column;
 };
@@ -2855,7 +2856,7 @@ scout.Table.prototype.$cellsForRow = function($row) {
 };
 
 scout.Table.prototype.$cell = function(column, $row) {
-  var columnIndex = this.columns.indexOf(column);
+  var columnIndex = this.visibleColumns().indexOf(column);
   return $row.children().eq(columnIndex);
 };
 
