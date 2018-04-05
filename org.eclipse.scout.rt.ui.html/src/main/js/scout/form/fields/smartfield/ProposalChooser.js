@@ -77,12 +77,13 @@ scout.ProposalChooser.prototype._render = function() {
     this.activeFilterGroup = scout.create('RadioButtonGroup', {
       parent: this,
       labelVisible: false,
-      statusVisible: false
+      statusVisible: false,
+      gridColumnCount: scout.SmartField.ACTIVE_FILTER_VALUES.length
     });
 
     // add radio buttons
     scout.SmartField.ACTIVE_FILTER_VALUES.forEach(function(value, index) {
-      this._renderActiveFilterButton(value, index);
+      this._insertActiveFilterButton(value, index);
     }, this);
 
     this.activeFilterGroup.render();
@@ -176,16 +177,14 @@ scout.ProposalChooser.prototype._setStatusMessage = function(message) {
   scout.Status.animateStatusMessage(this.$status, message);
 };
 
-scout.ProposalChooser.prototype._renderActiveFilterButton = function(value, index) {
+scout.ProposalChooser.prototype._insertActiveFilterButton = function(value, index) {
   var radio = scout.create('RadioButton', {
       parent: this.activeFilterGroup,
       label: this._activeFilterLabel(index),
       radioValue: scout.SmartField.ACTIVE_FILTER_VALUES[index],
       selected: this.smartField.activeFilter === value,
       focusWhenSelected: false,
-      gridData: {
-        x: index,
-        y: 1,
+      gridDataHints: {
         useUiWidth: true
       }
     });

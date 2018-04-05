@@ -2341,7 +2341,7 @@ scout.Table.prototype.updateRows = function(rows) {
     this.updateBuffer.buffer(rows);
     return;
   }
-  var filterChanged, autoOptimizeWidthColumnsDirty, newHiddenRows = [];
+  var filterChanged, autoOptimizeWidthColumnsDirty;
   var autoOptimizeWidthColumns = this.columns.filter(function(column) {
     return column.autoOptimizeWidth && !column.autoOptimizeWidthRequired;
   });

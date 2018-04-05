@@ -20,7 +20,6 @@ scout.RadioButtonGroup = function() {
   this._selectButtonLocked = false;
   this._buttonPropertyChangeHandler = this._onButtonPropertyChange.bind(this);
 };
-
 scout.inherits(scout.RadioButtonGroup, scout.ValueField);
 
 scout.RadioButtonGroup.DEFAULT_GRID_COLUMN_COUNT = -1;
