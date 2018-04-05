@@ -258,7 +258,7 @@
       position: absolute;
       top: 0;
       left: 0;
-      padding: @table-row-padding-y 8px @table-row-padding-y @tree-node-control-padding-left;
+      padding: @table-row-padding-y 8px @table-row-padding-y @table-row-control-padding-left;
       line-height: 14px;
       cursor: pointer;
 
@@ -266,9 +266,9 @@
         display: block;
         transition: transform 0.3s;
         #scout.font-icon();
-        font-size: @tree-node-control-size;
+        font-size: @table-row-control-size;
         content: @icon-angle-right;
-        color: @tree-node-control-color;
+        color: @table-row-control-color;
 
         .expanded& {
           /* This "imprecise" angle is a workround for firefox to prevent shifting the div a little when the animation finishes. */
