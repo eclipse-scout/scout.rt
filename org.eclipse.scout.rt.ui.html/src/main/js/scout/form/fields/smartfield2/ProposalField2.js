@@ -101,10 +101,6 @@ scout.ProposalField2.prototype._acceptByTextDone = function(result) {
   this._customTextAccepted(result.searchText);
 };
 
-scout.ProposalField2.prototype._checkResetLookupRow = function(searchTextChanged) {
-  return this._userWasTyping;
-};
-
 scout.ProposalField2.prototype._checkSearchTextChanged = function(searchText) {
   return this._checkDisplayTextChanged(searchText);
 };

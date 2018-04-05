@@ -279,6 +279,17 @@ describe('SmartField2', function() {
 
   describe('lookup', function() {
 
+    it('should increase lookupSeqNo when a lookup is executed', function() {
+      var field = createFieldWithLookupCall();
+      field.render();
+      field.$field.focus();
+      expect(field.lookupSeqNo).toBe(0);
+      field._lookupByTextOrAll(false, 'Bar');
+      jasmine.clock().tick(500);
+      expect(field.lookupSeqNo).toBe(1);
+      expect(field.popup.lookupResult.seqNo).toBe(1); // seqNo must be set on the lookupResult of the popup
+    });
+
     it('should set error status when result has an exception', function() {
       var field = createFieldWithLookupCall();
       field._lookupByTextOrAllDone({
