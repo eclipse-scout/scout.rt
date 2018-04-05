@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.util;
+package org.eclipse.scout.rt.platform.util.event;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -19,8 +20,6 @@ import java.util.Map;
 import org.eclipse.scout.rt.platform.eventlistprofiler.EventListenerProfiler;
 import org.eclipse.scout.rt.platform.eventlistprofiler.IEventListenerSnapshot;
 import org.eclipse.scout.rt.platform.eventlistprofiler.IEventListenerSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Thread safe event listener list with a single listener type and events with int type
@@ -33,17 +32,17 @@ import org.slf4j.LoggerFactory;
  * @since 7.1
  */
 public abstract class AbstractCompositeEventListenerList<LISTENER, EVENT> implements IEventListenerSource {
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractCompositeEventListenerList.class);
-
-  private final Object m_lock = new Object();
-
-  private final Map<Integer, SimpleEventListenerList<LISTENER>> m_listenerMap = new HashMap<>();
-  private final Map<Integer, SimpleEventListenerList<LISTENER>> m_lastListenerMap = new HashMap<>();
+  private final Map<Integer, UnsafeSimpleEventListenerList<LISTENER>> m_listenerMap = new HashMap<>();
+  private final Map<Integer, UnsafeSimpleEventListenerList<LISTENER>> m_lastListenerMap = new HashMap<>();
 
   public AbstractCompositeEventListenerList() {
     if (EventListenerProfiler.getInstance().isEnabled()) {
       EventListenerProfiler.getInstance().registerSourceAsWeakReference(this);
     }
+  }
+
+  protected Object lockObject() {
+    return m_listenerMap;
   }
 
   protected int allEventsType() {
@@ -57,7 +56,7 @@ public abstract class AbstractCompositeEventListenerList<LISTENER, EVENT> implem
   /**
    * used for unit testing only
    */
-  SimpleEventListenerList internalSize(int eventType, boolean lastCalled) {
+  UnsafeSimpleEventListenerList internalListenerList(int eventType, boolean lastCalled) {
     return (lastCalled ? m_lastListenerMap : m_listenerMap).get(eventType);
   }
 
@@ -65,16 +64,23 @@ public abstract class AbstractCompositeEventListenerList<LISTENER, EVENT> implem
     if (events == null || events.isEmpty()) {
       return;
     }
-    synchronized (m_lock) {
-      for (EVENT e : events) {
-        fireEventInsideLock(e);
+    for (EVENT e : events) {
+      fireEvent(e);
+    }
+  }
+
+  public void fireEvent(EVENT event) {
+    List<LISTENER> listeners = list(eventType(event));
+    if (!listeners.isEmpty()) {
+      for (LISTENER listener : listeners) {
+        handleEvent(listener, event);
       }
     }
   }
 
-  public void fireEvent(EVENT e) {
-    synchronized (m_lock) {
-      fireEventInsideLock(e);
+  public List<LISTENER> list(int eventType) {
+    synchronized (lockObject()) {
+      return collectListenersInsideLock(eventType);
     }
   }
 
@@ -85,7 +91,7 @@ public abstract class AbstractCompositeEventListenerList<LISTENER, EVENT> implem
     if (listener == null) {
       return;
     }
-    synchronized (m_lock) {
+    synchronized (lockObject()) {
       if (eventTypes == null || eventTypes.length == 0) {
         addInsideLock(m_listenerMap, listener, weak, allEventsType());
       }
@@ -104,7 +110,7 @@ public abstract class AbstractCompositeEventListenerList<LISTENER, EVENT> implem
     if (listener == null) {
       return;
     }
-    synchronized (m_lock) {
+    synchronized (lockObject()) {
       if (eventTypes == null || eventTypes.length == 0) {
         addInsideLock(m_lastListenerMap, listener, weak, allEventsType());
       }
@@ -123,7 +129,7 @@ public abstract class AbstractCompositeEventListenerList<LISTENER, EVENT> implem
     if (listener == null) {
       return;
     }
-    synchronized (m_lock) {
+    synchronized (lockObject()) {
       if (eventTypes == null || eventTypes.length == 0) {
         removeInsideLock(m_listenerMap, listener, allEventsType());
         removeInsideLock(m_lastListenerMap, listener, allEventsType());
@@ -137,11 +143,11 @@ public abstract class AbstractCompositeEventListenerList<LISTENER, EVENT> implem
     }
   }
 
-  private void addInsideLock(Map<Integer, SimpleEventListenerList<LISTENER>> listenerMap, LISTENER listener, boolean weak, int eventType) {
+  private void addInsideLock(Map<Integer, UnsafeSimpleEventListenerList<LISTENER>> listenerMap, LISTENER listener, boolean weak, int eventType) {
     if (listener == null) {
       return;
     }
-    SimpleEventListenerList<LISTENER> listeners = listenerMap.get(eventType);
+    UnsafeSimpleEventListenerList<LISTENER> listeners = listenerMap.get(eventType);
     if (listeners == null) {
       listeners = new SimpleEventListenerList<>();
       listenerMap.put(eventType, listeners);
@@ -149,7 +155,7 @@ public abstract class AbstractCompositeEventListenerList<LISTENER, EVENT> implem
     listeners.add(listener, weak);
   }
 
-  private void removeInsideLock(Map<Integer, SimpleEventListenerList<LISTENER>> listenerMap, LISTENER listener, int queryType) {
+  private void removeInsideLock(Map<Integer, UnsafeSimpleEventListenerList<LISTENER>> listenerMap, LISTENER listener, int queryType) {
     if (listener == null) {
       return;
     }
@@ -157,7 +163,7 @@ public abstract class AbstractCompositeEventListenerList<LISTENER, EVENT> implem
       if (queryType != allEventsType() && queryType != eventType) {
         continue;
       }
-      SimpleEventListenerList<LISTENER> listeners = listenerMap.get(eventType);
+      UnsafeSimpleEventListenerList<LISTENER> listeners = listenerMap.get(eventType);
       if (listeners == null) {
         continue;
       }
@@ -168,16 +174,18 @@ public abstract class AbstractCompositeEventListenerList<LISTENER, EVENT> implem
     }
   }
 
-  private void fireEventInsideLock(EVENT e) {
+  private List<LISTENER> collectListenersInsideLock(int type) {
+    ArrayList<LISTENER> result = new ArrayList<>();
     //lists are in reverse order
-    fireEventInsideLock(m_listenerMap, eventType(e), e);
-    fireEventInsideLock(m_listenerMap, allEventsType(), e);
-    fireEventInsideLock(m_lastListenerMap, eventType(e), e);
-    fireEventInsideLock(m_lastListenerMap, allEventsType(), e);
+    collectListenersInsideLock(m_listenerMap, type, result);
+    collectListenersInsideLock(m_listenerMap, allEventsType(), result);
+    collectListenersInsideLock(m_lastListenerMap, type, result);
+    collectListenersInsideLock(m_lastListenerMap, allEventsType(), result);
+    return result;
   }
 
-  private void fireEventInsideLock(Map<Integer, SimpleEventListenerList<LISTENER>> listenerMap, int eventType, EVENT event) {
-    SimpleEventListenerList<LISTENER> listeners = listenerMap.get(eventType);
+  private void collectListenersInsideLock(Map<Integer, UnsafeSimpleEventListenerList<LISTENER>> listenerMap, int eventType, ArrayList<LISTENER> result) {
+    UnsafeSimpleEventListenerList<LISTENER> listeners = listenerMap.get(eventType);
     if (listeners == null) {
       return;
     }
@@ -185,33 +193,25 @@ public abstract class AbstractCompositeEventListenerList<LISTENER, EVENT> implem
       listenerMap.remove(eventType);
       return;
     }
-    //fire
-    for (LISTENER listener : listeners) {
-      try {
-        handleEvent(listener, event);
-      }
-      catch (Exception e) {//NOSONAR
-        LOG.error("calling '{}' with event '{}'", listener, event, e);
-      }
-    }
+    result.addAll(listeners.list());
   }
 
   @Override
   public void dumpListenerList(IEventListenerSnapshot snapshot) {
-    synchronized (m_lock) {
-      for (Map.Entry<Integer, SimpleEventListenerList<LISTENER>> e : m_listenerMap.entrySet()) {
+    synchronized (lockObject()) {
+      for (Map.Entry<Integer, UnsafeSimpleEventListenerList<LISTENER>> e : m_listenerMap.entrySet()) {
         int eventType = e.getKey();
-        SimpleEventListenerList<LISTENER> listeners = e.getValue();
+        UnsafeSimpleEventListenerList<LISTENER> listeners = e.getValue();
         String context = eventType == allEventsType() ? null : "eventType: " + eventType;
-        for (LISTENER listener : listeners) {
+        for (LISTENER listener : listeners.list()) {
           snapshot.add(listener.getClass(), context, listener);
         }
       }
-      for (Map.Entry<Integer, SimpleEventListenerList<LISTENER>> e : m_lastListenerMap.entrySet()) {
+      for (Map.Entry<Integer, UnsafeSimpleEventListenerList<LISTENER>> e : m_lastListenerMap.entrySet()) {
         int eventType = e.getKey();
-        SimpleEventListenerList<LISTENER> listeners = e.getValue();
+        UnsafeSimpleEventListenerList<LISTENER> listeners = e.getValue();
         String context = eventType == allEventsType() ? "lastListeners" : "lastListeners of eventType: " + eventType;
-        for (LISTENER listener : listeners) {
+        for (LISTENER listener : listeners.list()) {
           snapshot.add(listener.getClass(), context, listener);
         }
       }
@@ -221,14 +221,14 @@ public abstract class AbstractCompositeEventListenerList<LISTENER, EVENT> implem
   @Override
   public String toString() {
     LinkedHashSet<String> namesInReverseOrder = new LinkedHashSet<>();
-    synchronized (m_lock) {
-      for (SimpleEventListenerList<LISTENER> listeners : m_lastListenerMap.values()) {
-        for (LISTENER listener : listeners) {
+    synchronized (lockObject()) {
+      for (UnsafeSimpleEventListenerList<LISTENER> listeners : m_lastListenerMap.values()) {
+        for (LISTENER listener : listeners.list()) {
           namesInReverseOrder.add(listener.toString());
         }
       }
-      for (SimpleEventListenerList<LISTENER> listeners : m_listenerMap.values()) {
-        for (LISTENER listener : listeners) {
+      for (UnsafeSimpleEventListenerList<LISTENER> listeners : m_listenerMap.values()) {
+        for (LISTENER listener : listeners.list()) {
           namesInReverseOrder.add(listener.toString());
         }
       }

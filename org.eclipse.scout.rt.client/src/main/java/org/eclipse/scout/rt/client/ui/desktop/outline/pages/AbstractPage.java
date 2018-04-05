@@ -130,12 +130,15 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   @Override
   protected List<IMenu> lazyCreateAndInitializeMenus() {
+    /* NOSONAR
     if (isInitializing()) {
+      //do not warn in 15.4, this code was introduced in 16.0
       LOG.warn(
           "Menus in page {} are now created during page init. This is not recommended. The menus should be created lazily when the page is activated. "
               + "Use e.g. the execInitTable() callback to access the table after it has been created.",
           getClass(), new Exception("origin"));
     }
+     */
     final AtomicReference<List<IMenu>> ref = new AtomicReference<>();
     createDisplayParentRunContext()
         .run(

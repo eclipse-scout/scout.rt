@@ -8,49 +8,34 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.util;
+package org.eclipse.scout.rt.platform.util.event;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.WeakHashMap;
+
+import org.eclipse.scout.rt.platform.util.WeakEventListener;
 
 /**
  * High performance event listener list with support for frequent add/remove and weak listners.
  * <p>
  * The high performance is reached by setting removed and garbage collected weak listeners to null instead on completely
  * removing them. The rebuild of the internal listener list is done lazy when there are enough accumulated null values.
+ * <p>
+ * This listener list is not thread-safe
  *
  * @since 7.1
  */
-public class SimpleEventListenerList<LISTENER> implements Iterable<LISTENER> {
+public class UnsafeSimpleEventListenerList<LISTENER> {
   private final List<Object> m_refs = new ArrayList<>();
   private final Map<LISTENER, Integer> m_indexes = new WeakHashMap<>();
 
   public boolean isEmpty() {
     return m_indexes.isEmpty();
-  }
-
-  /**
-   * @return the listener count, this may not be the precise count of listeners since null values are lazy removed for
-   *         better performance. Also weak references may be cleared at any time.
-   */
-  public int size() {
-    return m_indexes.size();
-  }
-
-  /**
-   * @return the listener count, this may not be the precise count of listeners since null values are lazy removed for
-   *         better performance. Also weak references may be cleared at any time.
-   *         <p>
-   *         Synonym for {@link #size()}
-   */
-  public Object getListenerCount() {
-    return size();
   }
 
   public void add(LISTENER listener) {
@@ -85,41 +70,19 @@ public class SimpleEventListenerList<LISTENER> implements Iterable<LISTENER> {
   /**
    * Iterates all listeners in the order to be called listeners. Null values are skipped automatically.
    */
-  @Override
-  public Iterator<LISTENER> iterator() {
+  public List<LISTENER> list() {
     maintain();
-    return new Iterator<LISTENER>() {
-      private int m_index = m_refs.size();
-      private LISTENER m_nextValue;
-
-      private LISTENER ensureNext() {
-        while (m_nextValue == null && m_index > 0) {
-          m_index--;
-          m_nextValue = get(m_index);
-        }
-        return m_nextValue;
+    if (m_indexes.isEmpty()) {
+      return Collections.emptyList();
+    }
+    ArrayList<LISTENER> result = new ArrayList<>(m_indexes.size());
+    for (int i = m_refs.size() - 1; i >= 0; i--) {
+      LISTENER listener = get(i);
+      if (listener != null) {
+        result.add(listener);
       }
-
-      @Override
-      public boolean hasNext() {
-        return ensureNext() != null;
-      }
-
-      @Override
-      public LISTENER next() {
-        LISTENER val = ensureNext();
-        m_nextValue = null;
-        if (val == null) {
-          throw new NoSuchElementException();
-        }
-        return val;
-      }
-
-      @Override
-      public void remove() {
-        throw new UnsupportedOperationException("remove");
-      }
-    };
+    }
+    return result;
   }
 
   /**
@@ -129,7 +92,7 @@ public class SimpleEventListenerList<LISTENER> implements Iterable<LISTENER> {
    * @return the listener, potentially null if a weak referenced listener was garbage collected
    */
   @SuppressWarnings("unchecked")
-  private LISTENER get(int i) {
+  protected LISTENER get(int i) {
     Object ref = m_refs.get(i);
     if (ref instanceof WeakReference) {
       ref = ((Reference) ref).get();
@@ -140,7 +103,7 @@ public class SimpleEventListenerList<LISTENER> implements Iterable<LISTENER> {
     return (LISTENER) ref;
   }
 
-  private void maintain() {
+  protected void maintain() {
     if (m_indexes.isEmpty()) {
       if (!m_refs.isEmpty()) {
         m_refs.clear();
@@ -178,14 +141,14 @@ public class SimpleEventListenerList<LISTENER> implements Iterable<LISTENER> {
   /**
    * Used for unit testing
    */
-  List<Object> refs() {
+  protected List<Object> refs() {
     return m_refs;
   }
 
   /**
    * Used for unit testing
    */
-  Map<LISTENER, Integer> indexes() {
+  protected Map<LISTENER, Integer> indexes() {
     return m_indexes;
   }
 

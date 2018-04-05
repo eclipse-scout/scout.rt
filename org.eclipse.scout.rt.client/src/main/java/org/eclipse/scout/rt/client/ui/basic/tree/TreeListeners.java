@@ -1,6 +1,6 @@
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
-import org.eclipse.scout.rt.platform.util.AbstractCompositeEventListenerList;
+import org.eclipse.scout.rt.platform.util.event.AbstractCompositeEventListenerList;
 
 public final class TreeListeners extends AbstractCompositeEventListenerList<TreeListener, TreeEvent> {
 

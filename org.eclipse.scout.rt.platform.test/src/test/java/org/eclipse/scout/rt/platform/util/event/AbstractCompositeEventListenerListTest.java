@@ -8,12 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.util;
+package org.eclipse.scout.rt.platform.util.event;
 
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 
+import org.eclipse.scout.rt.platform.util.TuningUtility;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -125,7 +126,7 @@ public class AbstractCompositeEventListenerListTest {
       observer.add(listener, false);
     }
     TuningUtility.stopTimer("add1 " + listeners.size());
-    SimpleEventListenerList<?> map1 = observer.internalSize(-1, false);
+    UnsafeSimpleEventListenerList<?> map1 = observer.internalListenerList(-1, false);
     assertEquals(n, map1.refs().size());
     assertEquals(n, map1.indexes().size());
 
@@ -134,7 +135,7 @@ public class AbstractCompositeEventListenerListTest {
       observer.addLastCalled(listener, false);
     }
     TuningUtility.stopTimer("add1-last " + listeners.size());
-    SimpleEventListenerList<?> map1Last = observer.internalSize(-1, true);
+    UnsafeSimpleEventListenerList<?> map1Last = observer.internalListenerList(-1, true);
     assertEquals(n, map1Last.refs().size());
     assertEquals(n, map1Last.indexes().size());
 
@@ -143,7 +144,7 @@ public class AbstractCompositeEventListenerListTest {
       observer.add(listener, false, FixtureEvent.TYPE_NODE_ACTION);
     }
     TuningUtility.stopTimer("add2 " + listeners.size());
-    SimpleEventListenerList<?> map2 = observer.internalSize(FixtureEvent.TYPE_NODE_ACTION, false);
+    UnsafeSimpleEventListenerList<?> map2 = observer.internalListenerList(FixtureEvent.TYPE_NODE_ACTION, false);
     assertEquals(n, map2.refs().size());
     assertEquals(n, map2.indexes().size());
 
@@ -152,7 +153,7 @@ public class AbstractCompositeEventListenerListTest {
       observer.addLastCalled(listener, false, FixtureEvent.TYPE_NODE_ACTION);
     }
     TuningUtility.stopTimer("add2-last " + listeners.size());
-    SimpleEventListenerList<?> map2Last = observer.internalSize(FixtureEvent.TYPE_NODE_ACTION, true);
+    UnsafeSimpleEventListenerList<?> map2Last = observer.internalListenerList(FixtureEvent.TYPE_NODE_ACTION, true);
     assertEquals(n, map2Last.refs().size());
     assertEquals(n, map2Last.indexes().size());
 

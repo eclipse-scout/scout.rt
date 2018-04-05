@@ -102,12 +102,12 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
-import org.eclipse.scout.rt.platform.util.SimpleEventListenerList;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.platform.util.event.SimpleEventListenerList;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -1803,9 +1803,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       HashMap<DataChangeListener, Set<Object>> map = new LinkedHashMap<>();
       for (Object dataType : dataTypes) {
         if (dataType != null) {
-          SimpleEventListenerList<DataChangeListener> list = m_dataChangeListenerList.get(dataType);
-          if (list != null) {
-            for (DataChangeListener listener : list) {
+          SimpleEventListenerList<DataChangeListener> listenerList = m_dataChangeListenerList.get(dataType);
+          if (listenerList != null) {
+            for (DataChangeListener listener : listenerList.list()) {
               Set<Object> typeSet = map.get(listener);
               if (typeSet == null) {
                 typeSet = new LinkedHashSet<Object>();
