@@ -39,9 +39,10 @@ public abstract class AbstractIcons implements Serializable {
   /* custom icons */
   public static final String ExclamationMark = "font:\uE001";
   public static final String Info = "font:\uE002";
-  public static final String Calendar = "font:\uE003";
-  public static final String Clock = "font:\uE004";
-  public static final String Checked = "font:\uE005";
+  public static final String Calendar = "font:\uE029";
+  public static final String CalendarBold = "font:\uE003";
+  public static final String ClockBold = "font:\uE004";
+  public static final String CheckedBold = "font:\uE005";
   public static final String Group = "font:\uE006";
   public static final String GroupPlus = "font:\uE007";
   public static final String GroupRemove = "font:\uE009";

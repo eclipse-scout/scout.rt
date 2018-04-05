@@ -9,6 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.icons = {
+  /* These icon ids can either be used directly using JavaScript.
+   * Or in a JSON based model file using the syntax ${iconId:ID}. */
 
   /* default font icons (sans-serif, arial) */
   TABLE_SORT_ASC: 'font:\u2191',
@@ -17,9 +19,10 @@ scout.icons = {
   /* scoutIcons: custom icons */
   EXCLAMATION_MARK: 'font:\uE001',
   INFO: 'font:\uE002',
-  CALENDAR: 'font:\uE003',
-  CLOCK: 'font:\uE004',
-  CHECKED: 'font:\uE005',
+  CALENDAR: 'font:\uE029',
+  CALENDAR_BOLD: 'font:\uE003',
+  CLOCK_BOLD: 'font:\uE004',
+  CHECKED_BOLD: 'font:\uE005',
   GROUP: 'font:\uE006',
   GROUP_PLUS: 'font:\uE007',
   ANGLE_DOUBLE_LEFT: 'font:\uE010',
@@ -51,6 +54,7 @@ scout.icons = {
   SEARCH_BOLD: 'font:\uE042',
   FOLDER: 'font:\uE02B',
   FOLDER_BOLD: 'font:\uE043',
+  SUM: 'font:\uE02C',
   SUM_BOLD: 'font:\uE025',
   AVG_BOLD: 'font:\uE026',
   MAX_BOLD: 'font:\uE027',

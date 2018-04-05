@@ -16,11 +16,14 @@ scout.AggregateTableControl = function() {
   this._tableColumnStructureChangedHandler = this._onTableColumnStructureChanged.bind(this);
   this._tableChangedHandler = this._onTableChanged.bind(this);
   this._aggregationFunctionChangedHandler = this._onAggregationFunctionChanged.bind(this);
+
+  this.animateDuration = scout.AggregateTableControl.CONTAINER_ANIMATE_DURATION;
+  this.aggregateRow = [];
   this.cssClass = 'aggregate';
   this.height = 0; // Will be as height as a row
-  this.animateDuration = scout.AggregateTableControl.CONTAINER_ANIMATE_DURATION;
+  this.iconId = scout.icons.SUM;
+  this.tooltipText = '${textKey:ui.Total}';
   this.resizerVisible = false;
-  this.aggregateRow;
 };
 scout.inherits(scout.AggregateTableControl, scout.TableControl);
 
