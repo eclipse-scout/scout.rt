@@ -10,9 +10,9 @@ import org.eclipse.scout.rt.client.extension.ui.tile.TileChains.TileLoadDataTile
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
-import org.eclipse.scout.rt.client.ui.DataChangeListener;
-import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeListener;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IOrdered;
@@ -40,7 +40,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
 
   private final ObjectExtensions<AbstractTile, ITileExtension<? extends AbstractTile>> m_objectExtensions;
   private ITileGrid<? extends ITile> m_container;
-  private DataChangeListener m_internalDataChangeListener;
+  private IDataChangeListener m_internalDataChangeListener;
   private boolean m_filterAccepted = true;
   private boolean m_loaded = false;
   private boolean m_loadingLocked = false;
@@ -251,11 +251,11 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
     propertySupport.setProperty(PROP_COLOR_SCHEME, colorScheme);
   }
 
-  protected DataChangeListener getInternalDataChangeListener() {
+  protected IDataChangeListener getInternalDataChangeListener() {
     return m_internalDataChangeListener;
   }
 
-  protected void setInternalDataChangeListener(DataChangeListener internalDataChangeListener) {
+  protected void setInternalDataChangeListener(IDataChangeListener internalDataChangeListener) {
     m_internalDataChangeListener = internalDataChangeListener;
   }
 
@@ -278,7 +278,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   }
 
   /**
-   * Register a {@link DataChangeListener} on the desktop for these dataTypes<br>
+   * Register a {@link IDataChangeListener} on the desktop for these dataTypes<br>
    * Example:
    *
    * <pre>
@@ -287,17 +287,17 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
    */
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
-      m_internalDataChangeListener = (WeakDataChangeListener) innerDataTypes -> {
+      m_internalDataChangeListener = event -> {
         if (isLoaded()) {
-          execDataChanged(innerDataTypes);
+          execDataChanged(event);
         }
       };
     }
-    IDesktop.CURRENT.get().addDataChangeListener(m_internalDataChangeListener, dataTypes);
+    IDesktop.CURRENT.get().dataChangeListeners().add(m_internalDataChangeListener, true, dataTypes);
   }
 
   /**
-   * Unregister the {@link DataChangeListener} from the desktop for these dataTypes<br>
+   * Unregister the {@link IDataChangeListener} from the desktop for these dataTypes<br>
    * Example:
    *
    * <pre>
@@ -313,7 +313,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   /**
    * see {@link IDesktop#dataChanged(Object...)}
    */
-  protected void execDataChanged(Object... dataTypes) {
+  protected void execDataChanged(DataChangeEvent event) {
     loadData();
   }
 

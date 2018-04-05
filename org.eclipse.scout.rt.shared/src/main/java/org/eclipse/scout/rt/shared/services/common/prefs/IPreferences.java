@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.ISession;
 
 /**
@@ -371,13 +372,17 @@ public interface IPreferences extends Serializable {
    */
   boolean flush();
 
+  IFastListenerList<IPreferenceChangeListener> preferenceChangeListeners();
+
   /**
    * Adds the given {@link IPreferenceChangeListener} to the list of listeners to be notified about preference changes.
    *
    * @param listener
    *          The listener to add.
    */
-  void addPreferenceChangeListener(IPreferenceChangeListener listener);
+  default void addPreferenceChangeListener(IPreferenceChangeListener listener) {
+    preferenceChangeListeners().add(listener);
+  }
 
   /**
    * Removes the given {@link IPreferenceChangeListener} from the list of listeners to be notified about preference
@@ -386,5 +391,7 @@ public interface IPreferences extends Serializable {
    * @param listener
    *          The listener to remove.
    */
-  void removePreferenceChangeListener(IPreferenceChangeListener listener);
+  default void removePreferenceChangeListener(IPreferenceChangeListener listener) {
+    preferenceChangeListeners().remove(listener);
+  }
 }

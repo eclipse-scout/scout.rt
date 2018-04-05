@@ -37,7 +37,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNodeBuilder;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
@@ -331,25 +330,24 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       updateActiveNodesFilter();
       updateCheckedNodesFilter();
       m_tree.addTreeListener(
-          new TreeAdapter() {
-            @Override
-            public void treeChanged(TreeEvent e) {
-              switch (e.getType()) {
-                case TreeEvent.TYPE_NODES_SELECTED: {
-                  if (!getTree().isCheckable()) {
-                    syncTreeToValue();
-                  }
-                  break;
+          e -> {
+            switch (e.getType()) {
+              case TreeEvent.TYPE_NODES_SELECTED: {
+                if (!getTree().isCheckable()) {
+                  syncTreeToValue();
                 }
-                case TreeEvent.TYPE_NODES_CHECKED: {
-                  if (getTree().isCheckable()) {
-                    syncTreeToValue();
-                  }
-                  break;
+                break;
+              }
+              case TreeEvent.TYPE_NODES_CHECKED: {
+                if (getTree().isCheckable()) {
+                  syncTreeToValue();
                 }
+                break;
               }
             }
-          });
+          },
+          TreeEvent.TYPE_NODES_SELECTED,
+          TreeEvent.TYPE_NODES_CHECKED);
       m_tree.setEnabled(isEnabled());
       // default icon
       if (this.getConfiguredIconId() != null) {

@@ -36,9 +36,10 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -55,7 +56,7 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
   private ITileAccordionGroupManager<T> m_groupManager;
   private boolean m_selectionUpdateLocked = false;
   private List<IGroup> m_staticGroups = new ArrayList<>();
-  private final EventListenerList m_listenerList;
+  private final FastListenerList<TileGridListener> m_listenerList;
   private final ObjectExtensions<AbstractTileAccordion, ITileAccordionExtension<T, ? extends AbstractTileAccordion>> m_objectExtensions;
 
   public AbstractTileAccordion() {
@@ -66,7 +67,7 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
     super(false);
     m_tileFilters = new ArrayList<>();
     m_groupManagers = new HashMap<>();
-    m_listenerList = new EventListenerList();
+    m_listenerList = new FastListenerList<>();
     m_objectExtensions = new ObjectExtensions<>(this, false);
     if (callInitializer) {
       callInitializer();
@@ -647,20 +648,12 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
   }
 
   @Override
-  public void addTileGridListener(TileGridListener listener) {
-    m_listenerList.add(TileGridListener.class, listener);
-  }
-
-  @Override
-  public void removeTileGridListener(TileGridListener listener) {
-    m_listenerList.remove(TileGridListener.class, listener);
+  public IFastListenerList<TileGridListener> tileGridListeners() {
+    return m_listenerList;
   }
 
   protected void fireTileGridEventInternal(TileGridEvent e) {
-    TileGridListener[] listeners = m_listenerList.getListeners(TileGridListener.class);
-    for (TileGridListener l : listeners) {
-      l.tileGridChanged(e);
-    }
+    tileGridListeners().list().forEach(listener -> listener.tileGridChanged(e));
   }
 
   @SuppressWarnings("unchecked")

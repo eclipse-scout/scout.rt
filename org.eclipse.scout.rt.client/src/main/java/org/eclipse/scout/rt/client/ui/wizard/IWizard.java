@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 
 public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCapable {
 
@@ -66,9 +67,15 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
    */
   String PROP_CLOSE_TYPE = "closeType";
 
-  void addWizardListener(WizardListener listener);
+  IFastListenerList<WizardListener> wizardListeners();
 
-  void removeWizardListener(WizardListener listener);
+  default void addWizardListener(WizardListener listener) {
+    wizardListeners().add(listener);
+  }
+
+  default void removeWizardListener(WizardListener listener) {
+    wizardListeners().remove(listener);
+  }
 
   String getTitle();
 

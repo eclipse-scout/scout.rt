@@ -26,13 +26,14 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.holders.BooleanHolder;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 
 @ClassId("b34571a2-032b-4910-921a-bec4acd110ed")
 public abstract class AbstractContextMenu<T extends IPropertyObserver> extends AbstractMenu implements IContextMenu {
 
-  private final EventListenerList m_listeners = new EventListenerList();
+  private final FastListenerList<ContextMenuListener> m_listeners = new FastListenerList<>();
   private final PropertyChangeListener m_menuVisibilityListener = new P_VisibilityOfMenuItemChangedListener();
 
   public AbstractContextMenu(T container, List<? extends IMenu> initialChildList) {
@@ -72,19 +73,12 @@ public abstract class AbstractContextMenu<T extends IPropertyObserver> extends A
   }
 
   @Override
-  public void addContextMenuListener(ContextMenuListener listener) {
-    m_listeners.add(ContextMenuListener.class, listener);
-  }
-
-  @Override
-  public void removeContextMenuListener(ContextMenuListener listener) {
-    m_listeners.remove(ContextMenuListener.class, listener);
+  public IFastListenerList<ContextMenuListener> contextMenuListeners() {
+    return m_listeners;
   }
 
   protected void fireContextMenuEvent(ContextMenuEvent event) {
-    for (ContextMenuListener l : m_listeners.getListeners(ContextMenuListener.class)) {
-      l.contextMenuChanged(event);
-    }
+    contextMenuListeners().list().forEach(listener -> listener.contextMenuChanged(event));
   }
 
   @Override

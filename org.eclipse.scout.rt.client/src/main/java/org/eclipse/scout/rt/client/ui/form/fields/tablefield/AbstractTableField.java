@@ -30,8 +30,8 @@ import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
+import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
@@ -58,7 +58,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
 
   private T m_table;
   private boolean m_tableExternallyManaged;
-  private P_ManagedTableListener m_managedTableListener;
+  private TableListener m_managedTableListener;
 
   public AbstractTableField() {
     this(true);
@@ -242,8 +242,17 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     }
     if (m_table != null) {
       if (!m_tableExternallyManaged) {
-        m_managedTableListener = new P_ManagedTableListener();
-        m_table.addTableListener(m_managedTableListener);
+        m_managedTableListener = e -> {
+          checkSaveNeeded();
+          checkEmpty();
+        };
+        m_table.addTableListener(
+            m_managedTableListener,
+            TableEvent.TYPE_ALL_ROWS_DELETED,
+            TableEvent.TYPE_ROWS_DELETED,
+            TableEvent.TYPE_ROWS_INSERTED,
+            TableEvent.TYPE_ROWS_UPDATED,
+            TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED);
       }
       if (isInitConfigDone()) {
         for (int i = m_valueChangeTriggerEnabled; i <= 0; ++i) {
@@ -539,23 +548,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   @Override
   public void reloadTableData() {
     interceptReloadTableData();
-  }
-
-  private class P_ManagedTableListener extends TableAdapter {
-    @Override
-    public void tableChanged(TableEvent e) {
-      switch (e.getType()) {
-        case TableEvent.TYPE_ALL_ROWS_DELETED:
-        case TableEvent.TYPE_ROWS_DELETED:
-        case TableEvent.TYPE_ROWS_INSERTED:
-        case TableEvent.TYPE_ROWS_UPDATED:
-        case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED: {
-          checkSaveNeeded();
-          checkEmpty();
-          break;
-        }
-      }
-    }
   }
 
   protected static class LocalTableFieldExtension<T extends ITable, OWNER extends AbstractTableField<T>> extends LocalFormFieldExtension<OWNER> implements ITableFieldExtension<T, OWNER> {

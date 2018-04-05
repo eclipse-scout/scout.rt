@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.services.common.bookmark;
 
 import java.util.ArrayList;
-import java.util.EventListener;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -22,7 +21,8 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.menu.ActivateBookmarkKeyStroke;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkData;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
@@ -187,15 +187,8 @@ public class BookmarkService implements IBookmarkService {
   }
 
   @Override
-  public void addBookmarkServiceListener(BookmarkServiceListener listener) {
-    ServiceState state = getServiceState();
-    state.m_listenerList.add(BookmarkServiceListener.class, listener);
-  }
-
-  @Override
-  public void removeBookmarkServiceListener(BookmarkServiceListener listener) {
-    ServiceState state = getServiceState();
-    state.m_listenerList.remove(BookmarkServiceListener.class, listener);
+  public IFastListenerList<BookmarkServiceListener> bookmarkServiceListeners() {
+    return getServiceState().m_listenerList;
   }
 
   private void fireBookmarksChanged() {
@@ -204,13 +197,7 @@ public class BookmarkService implements IBookmarkService {
   }
 
   private void fireBookmarkSeviceEvent(BookmarkServiceEvent e) {
-    ServiceState state = getServiceState();
-    EventListener[] a = state.m_listenerList.getListeners(BookmarkServiceListener.class);
-    if (a != null) {
-      for (EventListener anA : a) {
-        ((BookmarkServiceListener) anA).bookmarksChanged(e);
-      }
-    }
+    bookmarkServiceListeners().list().forEach(listener -> listener.bookmarksChanged(e));
   }
 
   private void importBookmarks(BookmarkData model) {
@@ -221,7 +208,7 @@ public class BookmarkService implements IBookmarkService {
   }
 
   private static class ServiceState {
-    EventListenerList m_listenerList = new EventListenerList();
+    FastListenerList<BookmarkServiceListener> m_listenerList = new FastListenerList<>();
     BookmarkData m_model;
   }
 }

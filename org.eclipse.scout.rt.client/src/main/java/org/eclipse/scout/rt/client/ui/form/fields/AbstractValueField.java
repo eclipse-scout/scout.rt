@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.EventListener;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.dto.FormData;
@@ -44,13 +43,14 @@ import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.VerboseUtility;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
@@ -67,7 +67,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   private int m_valueParsing;
   private int m_valueValidating;
   private VALUE m_initValue;
-  private EventListenerList m_listeningSlaves;// my slaves
+  private FastListenerList<MasterListener> m_listeningSlaves;// my slaves
 
   {
     propertySupport.setPropertyNoFire(PROP_DISPLAY_TEXT, "");
@@ -111,7 +111,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   protected void initConfig() {
     super.initConfig();
     setClearable(getConfiguredClearable());
-    m_listeningSlaves = new EventListenerList();
+    m_listeningSlaves = new FastListenerList<>();
     setAutoAddDefaultMenus(getConfiguredAutoAddDefaultMenus());
 
     // menus
@@ -307,23 +307,15 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   }
 
   @Override
-  public void addMasterListener(MasterListener listener) {
-    m_listeningSlaves.add(MasterListener.class, listener);
-  }
-
-  @Override
-  public void removeMasterListener(MasterListener listener) {
-    m_listeningSlaves.remove(MasterListener.class, listener);
+  public IFastListenerList<MasterListener> masterListeners() {
+    return m_listeningSlaves;
   }
 
   private void fireMasterChanged() {
-    // fire listeners
-    EventListener[] a = m_listeningSlaves.getListeners(MasterListener.class);
-    if (a != null && a.length > 0) {
+    List<MasterListener> listeners = masterListeners().list();
+    if (!listeners.isEmpty()) {
       VALUE masterValue = getValue();
-      for (EventListener anA : a) {
-        ((MasterListener) anA).masterChanged(masterValue);
-      }
+      listeners.forEach(listener -> listener.masterChanged(masterValue));
     }
   }
 

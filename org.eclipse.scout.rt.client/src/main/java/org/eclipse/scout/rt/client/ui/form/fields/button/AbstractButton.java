@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
-import java.util.EventListener;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
@@ -37,15 +36,15 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
 
 @ClassId("998788cf-df0f-480b-bd5a-5037805610c9")
 public abstract class AbstractButton extends AbstractFormField implements IButton {
-
-  private final EventListenerList m_listenerList;
+  private final FastListenerList<ButtonListener> m_listenerList;
   private final IButtonUIFacade m_uiFacade;
   private final OptimisticLock m_uiFacadeSetSelectedLock;
 
@@ -60,7 +59,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
 
   public AbstractButton(boolean callInitializer) {
     super(false);
-    m_listenerList = new EventListenerList();
+    m_listenerList = new FastListenerList<>();
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     m_uiFacadeSetSelectedLock = new OptimisticLock();
     if (callInitializer) {
@@ -454,17 +453,9 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     return m_uiFacade;
   }
 
-  /**
-   * Model Observer
-   */
   @Override
-  public void addButtonListener(ButtonListener listener) {
-    m_listenerList.add(ButtonListener.class, listener);
-  }
-
-  @Override
-  public void removeButtonListener(ButtonListener listener) {
-    m_listenerList.remove(ButtonListener.class, listener);
+  public IFastListenerList<ButtonListener> buttonListeners() {
+    return m_listenerList;
   }
 
   private void fireButtonClicked() {
@@ -477,12 +468,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
 
   // main handler
   private void fireButtonEvent(ButtonEvent e) {
-    EventListener[] listeners = m_listenerList.getListeners(ButtonListener.class);
-    if (listeners != null && listeners.length > 0) {
-      for (EventListener listener : listeners) {
-        ((ButtonListener) listener).buttonChanged(e);
-      }
-    }
+    buttonListeners().list().forEach(listener -> listener.buttonChanged(e));
   }
 
   @Override

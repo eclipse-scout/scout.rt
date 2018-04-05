@@ -290,18 +290,36 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
    */
   boolean isAncestorNodeOf(ITreeNode parent, ITreeNode child);
 
-  void addTreeListener(TreeListener listener, int... eventTypes);
-
-  void removeTreeListener(TreeListener listener, int... eventTypes);
+  /**
+   * Accessor to the tree listener registry
+   */
+  TreeListeners treeListeners();
 
   /**
-   * Add the listener at the top (front) of the listener list (so it is called as LAST listener).
-   * <p>
-   * This method is normally only used by the ui layer to update its state before other listeners handle them
+   * @param listener
+   * @param eventTypes
+   *          of {@link TreeEvent} TYPE_*
+   */
+  default void addTreeListener(TreeListener listener, Integer... eventTypes) {
+    treeListeners().add(listener, false, eventTypes);
+  }
+
+  default void removeTreeListener(TreeListener listener, Integer... eventTypes) {
+    treeListeners().remove(listener, eventTypes);
+  }
+
+  /**
+   * Add the listener so it is called as <em>last</em> listener
    * <p>
    * Use {@link #addTreeListener(TreeListener)} in all other cases
+   *
+   * @param listener
+   * @param eventTypes
+   *          of {@link TreeEvent} TYPE_*
    */
-  void addUITreeListener(TreeListener listener, int... eventTypes);
+  default void addUITreeListener(TreeListener listener, Integer... eventTypes) {
+    treeListeners().addLastCalled(listener, false, eventTypes);
+  }
 
   /**
    * @return the {@link IEventHistory} associated with this tree

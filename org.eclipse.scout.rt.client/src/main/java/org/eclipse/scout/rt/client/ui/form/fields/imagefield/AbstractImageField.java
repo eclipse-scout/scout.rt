@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.imagefield;
 
-import java.util.EventListener;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
@@ -36,15 +35,16 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.data.basic.AffineTransformSpec;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
 
 @ClassId("480ea07e-9cec-4591-ba73-4bb9aa45a60d")
 public abstract class AbstractImageField extends AbstractFormField implements IImageField {
   private IImageFieldUIFacade m_uiFacade;
-  private final EventListenerList m_listenerList = new EventListenerList();
+  private final FastListenerList<ImageFieldListener> m_listenerList = new FastListenerList<>();
   private IContextMenu m_contextMenu;
   private double m_zoomDelta;
   private double m_panDelta;
@@ -238,22 +238,9 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
   }
 
-  /*
-   * Runtime
-   */
-
-  /**
-   * model observer
-   */
-
   @Override
-  public void addImageFieldListener(ImageFieldListener listener) {
-    m_listenerList.add(ImageFieldListener.class, listener);
-  }
-
-  @Override
-  public void removeImageFieldListener(ImageFieldListener listener) {
-    m_listenerList.remove(ImageFieldListener.class, listener);
+  public IFastListenerList<ImageFieldListener> imageFieldListeners() {
+    return m_listenerList;
   }
 
   private void fireZoomRectangle(BoundsSpec r) {
@@ -265,12 +252,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   }
 
   private void fireImageBoxEventInternal(ImageFieldEvent e) {
-    EventListener[] a = m_listenerList.getListeners(ImageFieldListener.class);
-    if (a != null) {
-      for (EventListener anA : a) {
-        ((ImageFieldListener) anA).imageFieldChanged(e);
-      }
-    }
+    imageFieldListeners().list().forEach(listener -> listener.imageFieldChanged(e));
   }
 
   @Override

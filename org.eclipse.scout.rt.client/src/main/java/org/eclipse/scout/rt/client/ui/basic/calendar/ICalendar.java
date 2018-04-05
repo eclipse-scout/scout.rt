@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvi
 import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
 import org.eclipse.scout.rt.platform.util.Range;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 
 public interface ICalendar extends IWidget, IContextMenuOwner {
@@ -163,12 +164,18 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
    */
   void reloadCalendarItems();
 
-  /*
-   * modification observer
+  /**
+   * Model Observer
    */
-  void addCalendarListener(CalendarListener listener);
+  IFastListenerList<CalendarListener> calendarListeners();
 
-  void removeCalendarListener(CalendarListener listener);
+  default void addCalendarListener(CalendarListener listener) {
+    calendarListeners().add(listener);
+  }
+
+  default void removeCalendarListener(CalendarListener listener) {
+    calendarListeners().remove(listener);
+  }
 
   /**
    * when performing a batch mutation use this marker like

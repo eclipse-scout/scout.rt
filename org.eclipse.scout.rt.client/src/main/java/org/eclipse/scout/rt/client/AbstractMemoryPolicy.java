@@ -20,8 +20,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -56,9 +56,11 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
   }
 
   private boolean m_active;
+  private IOutline m_activeOutline;
   private final Map<IForm, String> m_formToIdentifierMap;
   private final Map<ITable, String> m_tableToIdentifierMap;
-  private final MemoryPolicyListener m_memoryPolicyListener;
+  private final DesktopListener m_desktopListener;
+  private final TreeListener m_treeListener;
 
   private final FormListener m_formListener = new FormListener() {
     @Override
@@ -102,7 +104,8 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
   public AbstractMemoryPolicy() {
     m_formToIdentifierMap = new WeakHashMap<>();
     m_tableToIdentifierMap = new WeakHashMap<>();
-    m_memoryPolicyListener = new MemoryPolicyListener();
+    m_desktopListener = createDesktopListener();
+    m_treeListener = createTreeListener();
   }
 
   @Override
@@ -113,6 +116,14 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
   @Override
   public void removeNotify() {
     m_active = false;
+  }
+
+  public IOutline getActiveOutline() {
+    return m_activeOutline;
+  }
+
+  public void setActiveOutline(IOutline activeOutline) {
+    m_activeOutline = activeOutline;
   }
 
   @Override
@@ -169,7 +180,10 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
     String id = createUniqueIdForPage(p, t);
     m_tableToIdentifierMap.put(t, id);
     t.removeTableListener(m_tableListener);
-    t.addTableListener(m_tableListener);
+    t.addTableListener(
+        m_tableListener,
+        TableEvent.TYPE_USER_FILTER_ADDED,
+        TableEvent.TYPE_USER_FILTER_REMOVED);
     return id;
   }
 
@@ -281,47 +295,54 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
 
   @Override
   public void registerOutline(IOutline outline) {
-    outline.addTreeListener(m_memoryPolicyListener);
+    outline.addTreeListener(
+        m_treeListener,
+        TreeEvent.TYPE_NODES_SELECTED,
+        OutlineEvent.TYPE_PAGE_AFTER_PAGE_INIT,
+        OutlineEvent.TYPE_PAGE_AFTER_TABLE_INIT,
+        OutlineEvent.TYPE_PAGE_BEFORE_DATA_LOADED,
+        OutlineEvent.TYPE_PAGE_AFTER_DATA_LOADED,
+        OutlineEvent.TYPE_PAGE_AFTER_SEARCH_FORM_START);
   }
 
   @Override
   public void deregisterOutline(IOutline outline) {
-    outline.removeTreeListener(m_memoryPolicyListener);
+    outline.removeTreeListener(m_treeListener);
   }
 
   @Override
   public void registerDesktop(IDesktop desktop) {
-    desktop.addDesktopListener(m_memoryPolicyListener);
+    desktop.addDesktopListener(m_desktopListener);
   }
 
   @Override
   public void deregisterDesktop(IDesktop desktop) {
-    desktop.removeDesktopListener(m_memoryPolicyListener);
+    desktop.removeDesktopListener(m_desktopListener);
   }
 
-  protected class MemoryPolicyListener extends TreeAdapter implements DesktopListener {
-
-    IOutline m_activeOutline;
-
-    @Override
-    public void desktopChanged(DesktopEvent e) {
-      switch (e.getType()) {
-        case DesktopEvent.TYPE_OUTLINE_CHANGED: {
-          m_activeOutline = e.getOutline();
-          break;
-        }
-        case DesktopEvent.TYPE_DESKTOP_CLOSED: {
-          if (e.getSource() instanceof IDesktop) {
-            deregisterDesktop((IDesktop) e.getSource());
+  protected DesktopListener createDesktopListener() {
+    return new DesktopListener() {
+      @Override
+      public void desktopChanged(DesktopEvent e) {
+        switch (e.getType()) {
+          case DesktopEvent.TYPE_OUTLINE_CHANGED: {
+            setActiveOutline(e.getOutline());
+            break;
+          }
+          case DesktopEvent.TYPE_DESKTOP_CLOSED: {
+            if (e.getSource() instanceof IDesktop) {
+              deregisterDesktop((IDesktop) e.getSource());
+            }
           }
         }
       }
-    }
+    };
+  }
 
-    @Override
-    public void treeChanged(TreeEvent e) {
+  protected TreeListener createTreeListener() {
+    return e -> {
       try {
-        if (e.getType() == TreeEvent.TYPE_NODES_SELECTED && e.getSource() == m_activeOutline) {
+        if (e.getType() == TreeEvent.TYPE_NODES_SELECTED && e.getSource() == getActiveOutline()) {
           afterOutlineSelectionChanged(ClientSessionProvider.currentSession().getDesktop());
         }
         if (e.getNode() instanceof IPage) {
@@ -358,6 +379,6 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
       catch (RuntimeException | PlatformError t) {
         BEANS.get(ExceptionHandler.class).handle(t);
       }
-    }
+    };
   }
 }

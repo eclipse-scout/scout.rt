@@ -62,14 +62,14 @@ public class TableEventOrderTest {
   }
 
   private static class P_TableListener extends TableAdapter {
-    private List<? extends TableEvent> m_batch;
+    private List<TableEvent> m_batch = new ArrayList<>();
 
     @Override
-    public void tableChangedBatch(List<? extends TableEvent> batch) {
-      m_batch = batch;
+    public void tableChanged(TableEvent e) {
+      m_batch.add(e);
     }
 
-    public List<? extends TableEvent> getBatch() {
+    public List<TableEvent> getBatch() {
       return m_batch;
     }
   }

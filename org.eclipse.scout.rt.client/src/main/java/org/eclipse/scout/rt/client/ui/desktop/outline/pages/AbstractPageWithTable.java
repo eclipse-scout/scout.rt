@@ -358,7 +358,15 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       if (table instanceof AbstractTable) {
         ((AbstractTable) table).setContainerInternal(this);
       }
-      table.addTableListener(new P_TableListener());
+      table.addTableListener(
+          new P_TableListener(),
+          TableEvent.TYPE_ROW_ACTION,
+          TableEvent.TYPE_ALL_ROWS_DELETED,
+          TableEvent.TYPE_ROWS_DELETED,
+          TableEvent.TYPE_ROWS_INSERTED,
+          TableEvent.TYPE_ROWS_UPDATED,
+          TableEvent.TYPE_ROW_ORDER_CHANGED,
+          TableEvent.TYPE_ROW_FILTER_CHANGED);
       table.setEnabled(isEnabled());
       table.setAutoDiscardOnDelete(true);
       table.setUserPreferenceContext(getUserPreferenceContext());

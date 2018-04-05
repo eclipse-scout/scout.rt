@@ -29,8 +29,8 @@ import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -55,7 +55,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
   private ITree m_tree;
   private boolean m_treeExternallyManaged;
   private boolean m_autoExpandAll;
-  private P_TreeListener m_treeListener;
+  private TreeListener m_treeListener;
 
   public AbstractTreeField() {
     this(true);
@@ -267,8 +267,16 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
     }
     if (m_tree != null && !m_treeExternallyManaged) {
       m_tree.setAutoDiscardOnDelete(false);
-      m_treeListener = new P_TreeListener();
-      m_tree.addTreeListener(m_treeListener, TreeEvent.TYPE_NODES_DELETED, TreeEvent.TYPE_NODES_INSERTED, TreeEvent.TYPE_NODES_UPDATED, TreeEvent.TYPE_NODES_CHECKED);
+      m_treeListener = e -> {
+        checkSaveNeeded();
+        checkEmpty();
+      };
+      m_tree.addTreeListener(
+          m_treeListener,
+          TreeEvent.TYPE_NODES_DELETED,
+          TreeEvent.TYPE_NODES_INSERTED,
+          TreeEvent.TYPE_NODES_UPDATED,
+          TreeEvent.TYPE_NODES_CHECKED);
     }
     if (m_tree != null) {
       m_tree.setEnabled(isEnabled());
@@ -425,22 +433,6 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
     @Override
     public void loadChildren() {
       AbstractTreeField.this.loadChildNodes(this);
-    }
-  }
-
-  private class P_TreeListener extends TreeAdapter {
-    @Override
-    public void treeChanged(TreeEvent e) {
-      switch (e.getType()) {
-        case TreeEvent.TYPE_NODES_DELETED:
-        case TreeEvent.TYPE_NODES_INSERTED:
-        case TreeEvent.TYPE_NODES_UPDATED:
-        case TreeEvent.TYPE_NODES_CHECKED: {
-          checkSaveNeeded();
-          checkEmpty();
-          break;
-        }
-      }
     }
   }
 

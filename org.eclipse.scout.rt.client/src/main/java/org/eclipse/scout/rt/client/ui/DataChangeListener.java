@@ -10,18 +10,26 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui;
 
-import java.util.EventListener;
-
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeListener;
 
 /**
  * Listener to observe arbitrary changes on any abstract data model or enumerations see
- * {@link IDesktop#addDataChangeListener(DataChangeListener, Object...)} and
- * {@link IDesktop#removeDataChangeListener(DataChangeListener, Object...)}
+ * {@link IDesktop#addDataChangeListener(IDataChangeListener, Object...)} and
+ * {@link IDesktop#removeDataChangeListener(IDataChangeListener, Object...)}
+ * <p>
+ *
+ * @deprecated use {@link IDataChangeListener} instead
  */
+@Deprecated
 @FunctionalInterface
-public interface DataChangeListener extends EventListener {
+public interface DataChangeListener extends IDataChangeListener {
 
-  void dataChanged(Object... dataTypes);
+  void dataChanged(Object... eventTypes);
 
+  @Override
+  default void dataChanged(DataChangeEvent event) {
+    dataChanged(event.getEventType());
+  }
 }

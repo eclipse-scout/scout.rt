@@ -8,19 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.util;
+package org.eclipse.scout.rt.platform.util.event;
 
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
+import org.eclipse.scout.rt.platform.util.TuningUtility;
 import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * @since 7.1
  */
-public class CompositeEventListenerListTest {
+public class AbstractGroupedListenerListTest {
 
   private int fireCount;
 
@@ -125,7 +127,7 @@ public class CompositeEventListenerListTest {
       observer.add(listener, false);
     }
     TuningUtility.stopTimer("add1 " + listeners.size());
-    SimpleEventListenerList<?> map1 = observer.internalSize(-1, false);
+    UnsafeFastListenerList<?> map1 = observer.internalListenerMap(false).get(null);
     assertEquals(n, map1.refs().size());
     assertEquals(n, map1.indexes().size());
 
@@ -134,7 +136,7 @@ public class CompositeEventListenerListTest {
       observer.addLastCalled(listener, false);
     }
     TuningUtility.stopTimer("add1-last " + listeners.size());
-    SimpleEventListenerList<?> map1Last = observer.internalSize(-1, true);
+    UnsafeFastListenerList<?> map1Last = observer.internalListenerMap(true).get(null);
     assertEquals(n, map1Last.refs().size());
     assertEquals(n, map1Last.indexes().size());
 
@@ -143,7 +145,7 @@ public class CompositeEventListenerListTest {
       observer.add(listener, false, FixtureEvent.TYPE_NODE_ACTION);
     }
     TuningUtility.stopTimer("add2 " + listeners.size());
-    SimpleEventListenerList<?> map2 = observer.internalSize(FixtureEvent.TYPE_NODE_ACTION, false);
+    UnsafeFastListenerList<?> map2 = observer.internalListenerMap(false).get(FixtureEvent.TYPE_NODE_ACTION);
     assertEquals(n, map2.refs().size());
     assertEquals(n, map2.indexes().size());
 
@@ -152,7 +154,7 @@ public class CompositeEventListenerListTest {
       observer.addLastCalled(listener, false, FixtureEvent.TYPE_NODE_ACTION);
     }
     TuningUtility.stopTimer("add2-last " + listeners.size());
-    SimpleEventListenerList<?> map2Last = observer.internalSize(FixtureEvent.TYPE_NODE_ACTION, true);
+    UnsafeFastListenerList<?> map2Last = observer.internalListenerMap(true).get(FixtureEvent.TYPE_NODE_ACTION);
     assertEquals(n, map2Last.refs().size());
     assertEquals(n, map2Last.indexes().size());
 
@@ -187,6 +189,44 @@ public class CompositeEventListenerListTest {
     TuningUtility.finishAll();
   }
 
+  @Test
+  public void testAddAll() {
+    FixtureEventListeners src = new FixtureEventListeners();
+    FixtureEventListener a = e -> {
+    };
+    FixtureEventListener aw = e -> {
+    };
+    FixtureEventListener a1 = e -> {
+    };
+    FixtureEventListener a12w = e -> {
+    };
+    FixtureEventListener b = e -> {
+    };
+    FixtureEventListener bw = e -> {
+    };
+    FixtureEventListener b1 = e -> {
+    };
+    FixtureEventListener b12w = e -> {
+    };
+    src.add(a, false);
+    src.add(aw, true);
+    src.add(a1, false, 1);
+    src.add(a12w, true, 1, 2);
+    src.addLastCalled(b, false);
+    src.addLastCalled(bw, true);
+    src.addLastCalled(b1, false, 1);
+    src.addLastCalled(b12w, true, 1, 2);
+    assertEquals(Arrays.asList(a12w, a1, aw, a, b12w, b1, bw, b), src.list(1));
+    assertEquals(Arrays.asList(a12w, aw, a, b12w, bw, b), src.list(2));
+    assertEquals(Arrays.asList(aw, a, bw, b), src.list(9));
+
+    FixtureEventListeners dst = new FixtureEventListeners();
+    dst.addAll(src);
+    assertEquals(Arrays.asList(a12w, a1, aw, a, b12w, b1, bw, b), dst.list(1));
+    assertEquals(Arrays.asList(a12w, aw, a, b12w, bw, b), dst.list(2));
+    assertEquals(Arrays.asList(aw, a, bw, b), dst.list(9));
+  }
+
   private static class FixtureEvent {
     public static final int TYPE_REQUEST_FOCUS = 10;
     public static final int TYPE_NODE_ACTION = 20;
@@ -202,10 +242,15 @@ public class CompositeEventListenerListTest {
     void handle(FixtureEvent event);
   }
 
-  private static class FixtureEventListeners extends AbstractCompositeEventListenerList<FixtureEventListener, FixtureEvent> {
+  private static class FixtureEventListeners extends AbstractGroupedListenerList<FixtureEventListener, FixtureEvent, Integer> {
     @Override
-    protected int eventType(FixtureEvent event) {
+    protected Integer eventType(FixtureEvent event) {
       return event.type;
+    }
+
+    @Override
+    protected Integer allEventsType() {
+      return null;
     }
 
     @Override

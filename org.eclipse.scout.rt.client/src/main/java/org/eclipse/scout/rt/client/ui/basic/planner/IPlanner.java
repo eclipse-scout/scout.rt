@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IPlannerContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
 import org.eclipse.scout.rt.platform.util.Range;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 
 /**
  * The planner contains a list of {@link Resource}s that are associated with 0..n {@link Activity}s.
@@ -95,9 +96,15 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IWidget, IContextMen
   @Deprecated
   void disposePlanner();
 
-  void addPlannerListener(PlannerListener listener);
+  IFastListenerList<PlannerListener> plannerListeners();
 
-  void removePlannerListener(PlannerListener listener);
+  default void addPlannerListener(PlannerListener listener) {
+    plannerListeners().add(listener);
+  }
+
+  default void removePlannerListener(PlannerListener listener) {
+    plannerListeners().remove(listener);
+  }
 
   boolean isPlannerChanging();
 
@@ -260,5 +267,4 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IWidget, IContextMen
   AbstractEventBuffer<PlannerEvent> createEventBuffer();
 
   IPlannerUIFacade getUIFacade();
-
 }

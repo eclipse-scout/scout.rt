@@ -562,18 +562,36 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
    */
   void requestFocusInCell(IColumn<?> column, ITableRow row);
 
-  void addTableListener(TableListener listener);
-
-  void removeTableListener(TableListener listener);
+  /**
+   * Accessor to the table listener registry
+   */
+  TableListeners tableListeners();
 
   /**
-   * Add the listener at the top (front) of the listener list (so it is called as LAST listener).
-   * <p>
-   * This method is normally only used by the ui layer to update its state before other listeners handle them
+   * @param listener
+   * @param eventTypes
+   *          of {@link TableEvent} TYPE_*
+   */
+  default void addTableListener(TableListener listener, Integer... eventTypes) {
+    tableListeners().add(listener, false, eventTypes);
+  }
+
+  default void removeTableListener(TableListener listener, Integer... eventTypes) {
+    tableListeners().remove(listener, eventTypes);
+  }
+
+  /**
+   * Add the listener so it is called as <em>last</em> listener.
    * <p>
    * Use {@link #addTableListener(TableListener)} in all other cases
+   *
+   * @param listener
+   * @param eventTypes
+   *          of {@link TableEvent} TYPE_*
    */
-  void addUITableListener(TableListener listener);
+  default void addUITableListener(TableListener listener, Integer... eventTypes) {
+    tableListeners().addLastCalled(listener, false, eventTypes);
+  }
 
   /**
    * @return the {@link IEventHistory} associated with this table

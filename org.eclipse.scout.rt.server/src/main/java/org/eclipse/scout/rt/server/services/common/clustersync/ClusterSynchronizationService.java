@@ -37,7 +37,6 @@ import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ClusterSyncUserProperty;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -55,7 +54,6 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
 
   private static final String TRANSACTION_MEMBER_ID = ClusterSynchronizationService.class.getName();
 
-  private final EventListenerList m_listenerList = new EventListenerList();
   private final ClusterNodeStatusInfo m_statusInfo = new ClusterNodeStatusInfo();
   private final ConcurrentMap<Class<? extends Serializable>, ClusterNodeStatusInfo> m_messageStatusMap = new ConcurrentHashMap<>();
 
@@ -70,10 +68,6 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
     m_subject = new Subject();
     m_subject.getPrincipals().add(new SimplePrincipal(CONFIG.getPropertyValue(ClusterSyncUserProperty.class)));
     m_subject.setReadOnly();
-  }
-
-  protected EventListenerList getListenerList() {
-    return m_listenerList;
   }
 
   @Override

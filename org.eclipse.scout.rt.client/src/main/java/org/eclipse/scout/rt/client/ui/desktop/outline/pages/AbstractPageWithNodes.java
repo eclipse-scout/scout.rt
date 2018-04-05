@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -106,7 +105,35 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     P_Table table = null;
     table = new P_Table();
     table.setContainerInternal(this);
-    table.addTableListener(new P_TableListener());
+    table.addTableListener(
+        e -> {
+          OutlineMediator outlineMediator = getOutlineMediator();
+          if (outlineMediator == null) {
+            return;
+          }
+          switch (e.getType()) {
+            case TableEvent.TYPE_ROW_ACTION: {
+              outlineMediator.mediateTableRowAction(e, AbstractPageWithNodes.this);
+              break;
+            }
+            case TableEvent.TYPE_ROW_DROP_ACTION: {
+              outlineMediator.mediateTableRowDropAction(e, AbstractPageWithNodes.this);
+              break;
+            }
+            case TableEvent.TYPE_ROW_FILTER_CHANGED: {
+              outlineMediator.mediateTableRowFilterChanged(AbstractPageWithNodes.this);
+              break;
+            }
+            case TableEvent.TYPE_ROWS_SELECTED: {
+              updateContextMenusForSelection();
+              break;
+            }
+          }
+        },
+        TableEvent.TYPE_ROW_ACTION,
+        TableEvent.TYPE_ROW_DROP_ACTION,
+        TableEvent.TYPE_ROW_FILTER_CHANGED,
+        TableEvent.TYPE_ROWS_SELECTED);
     table.setAutoDiscardOnDelete(true);
     table.setReloadHandler(new PageReloadHandler(this));
     return table;
@@ -391,39 +418,6 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     }
 
     return getOutline().getOutlineMediator();
-  }
-
-  /**
-   * Table listener for delegation of actions to tree
-   */
-  private class P_TableListener extends TableAdapter {
-    @Override
-    public void tableChanged(TableEvent e) {
-      OutlineMediator outlineMediator = getOutlineMediator();
-      if (outlineMediator == null) {
-        return;
-      }
-
-      switch (e.getType()) {
-        case TableEvent.TYPE_ROW_ACTION: {
-          outlineMediator.mediateTableRowAction(e, AbstractPageWithNodes.this);
-          break;
-        }
-        case TableEvent.TYPE_ROW_DROP_ACTION: {
-          outlineMediator.mediateTableRowDropAction(e, AbstractPageWithNodes.this);
-          break;
-        }
-        case TableEvent.TYPE_ROW_FILTER_CHANGED: {
-          outlineMediator.mediateTableRowFilterChanged(AbstractPageWithNodes.this);
-          break;
-        }
-        case TableEvent.TYPE_ROWS_SELECTED: {
-          updateContextMenusForSelection();
-          break;
-        }
-      }
-
-    }
   }
 
   protected final void interceptCreateChildPages(List<IPage<?>> pageList) {

@@ -11,12 +11,10 @@
 package org.eclipse.scout.rt.client.clientnotification;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.WeakHashMap;
 
 import org.eclipse.scout.rt.client.IClientSession;
@@ -26,7 +24,7 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.IDispatchingNotificationHandler;
@@ -47,7 +45,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractObservableNotificationHandler<T extends Serializable> implements IDispatchingNotificationHandler<T>, IGlobalSessionListener {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractObservableNotificationHandler.class);
 
-  private final Map<IClientSession, EventListenerList> m_listeners = new WeakHashMap<>();
+  private final Map<IClientSession, FastListenerList<INotificationListener<T>>> m_listeners = new WeakHashMap<>();
 
   /**
    * Add a notification listener for notifications of type T. Upon receipt of a notification,
@@ -75,12 +73,12 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
     Assertions.assertNotNull(session, "client session can not be null");
     Assertions.assertNotNull(listener, "listener can not be null");
     synchronized (m_listeners) {
-      EventListenerList listeners = m_listeners.get(Assertions.assertNotNull(session));
+      FastListenerList<INotificationListener<T>> listeners = m_listeners.get(Assertions.assertNotNull(session));
       if (listeners == null) {
-        listeners = new EventListenerList();
+        listeners = new FastListenerList<>();
         m_listeners.put(session, listeners);
       }
-      listeners.add(INotificationListener.class, listener);
+      listeners.add(listener);
     }
   }
 
@@ -102,10 +100,10 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
     Assertions.assertNotNull(session, "client session can not be null");
     Assertions.assertNotNull(listener, "listener can not be null");
     synchronized (m_listeners) {
-      EventListenerList listeners = m_listeners.get(session);
+      FastListenerList<INotificationListener<T>> listeners = m_listeners.get(session);
       if (listeners != null) {
-        listeners.remove(INotificationListener.class, listener);
-        if (listeners.getListenerCount(INotificationListener.class) == 0) {
+        listeners.remove(listener);
+        if (listeners.isEmpty()) {
           m_listeners.remove(session);
         }
       }
@@ -121,16 +119,19 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
    */
   public List<INotificationListener<T>> getListeners(IClientSession session) {
     synchronized (m_listeners) {
-      List<INotificationListener<T>> res = new ArrayList<>();
-      EventListenerList listeners = m_listeners.get(session);
+      FastListenerList<INotificationListener<T>> listeners = m_listeners.get(session);
       if (listeners != null) {
-        @SuppressWarnings("unchecked")
-        INotificationListener<T>[] notificationListeners = listeners.getListeners(INotificationListener.class);
-        if (notificationListeners != null) {
-          Collections.addAll(res, notificationListeners);
-        }
+        return listeners.list();
       }
-      return res;
+      else {
+        return Collections.emptyList();
+      }
+    }
+  }
+
+  protected FastListenerList<INotificationListener<T>> getListenerList(IClientSession session) {
+    synchronized (m_listeners) {
+      return m_listeners.get(session);
     }
   }
 
@@ -149,17 +150,13 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
    */
   protected void notifyListenersOfAllSessions(final T notification) {
     // create copy of m_listeners (EventListenerList is thread-safe)
-    Map<IClientSession, EventListenerList> listenerMap;
+    Map<IClientSession, FastListenerList<INotificationListener<T>>> listenerCopy;
     synchronized (m_listeners) {
-      listenerMap = new HashMap<>(m_listeners);
+      listenerCopy = new HashMap<>(m_listeners);
     }
 
     //schedule model job per session to handle notifications
-    for (Entry<IClientSession, EventListenerList> entry : listenerMap.entrySet()) {
-      final IClientSession session = entry.getKey();
-      final EventListenerList list = entry.getValue();
-      scheduleHandlingNotifications(notification, list, session);
-    }
+    listenerCopy.forEach((session, listenerList) -> scheduleHandlingNotifications(notification, listenerList, session));
   }
 
   /**
@@ -176,20 +173,12 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
     }
   }
 
-  private EventListenerList getListenerList(IClientSession session) {
-    synchronized (m_listeners) {
-      return m_listeners.get(session);
+  protected void scheduleHandlingNotifications(final T notification, final FastListenerList<INotificationListener<T>> listenerList, final IClientSession session) {
+    if (listenerList == null) {
+      return;
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  protected void scheduleHandlingNotifications(final T notification, final EventListenerList list, final IClientSession session) {
     Jobs.schedule(() -> {
-      if (list != null && list.getListenerCount(INotificationListener.class) > 0) {
-        for (INotificationListener<T> l : list.getListeners(INotificationListener.class)) {
-          l.handleNotification(notification);
-        }
-      }
+      listenerList.list().forEach(listener -> listener.handleNotification(notification));
     }, Jobs
         .newInput()
         .withName("Handling Client Notification")
@@ -206,7 +195,6 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
       ISession session = Assertions.assertNotNull(event.getSource());
       if (session instanceof IClientSession) {
         IClientSession clientSession = (IClientSession) session;
-
         synchronized (m_listeners) {
           for (INotificationListener<T> notificationListener : getListeners(clientSession)) {
             removeListener(clientSession, notificationListener);

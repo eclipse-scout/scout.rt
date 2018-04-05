@@ -10,16 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
-import java.beans.PropertyChangeListener;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Semaphore;
@@ -34,10 +30,7 @@ import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLo
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
 import org.eclipse.scout.rt.client.job.filter.future.ModelJobFutureFilter;
-import org.eclipse.scout.rt.client.ui.DataChangeListener;
-import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.internal.VirtualDesktop;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -55,11 +48,12 @@ import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
@@ -82,7 +76,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractClientSession.class);
 
-  private final EventListenerList m_eventListeners;
+  private final FastListenerList<ISessionListener> m_eventListeners;
   private final IExecutionSemaphore m_modelJobSemaphore = Jobs.newExecutionSemaphore(1).seal();
 
   // state
@@ -107,7 +101,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   private URI m_browserUri;
 
   public AbstractClientSession(boolean autoInitConfig) {
-    m_eventListeners = new EventListenerList();
+    m_eventListeners = new FastListenerList<>();
     m_sessionData = new SessionData();
     m_stateLock = new Object();
     m_userAgent = UserAgent.get();
@@ -346,40 +340,18 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     }
     m_desktop = desktop;
     if (m_virtualDesktop != null) {
-      for (DesktopListener listener : m_virtualDesktop.getDesktopListeners()) {
-        m_desktop.addDesktopListener(listener);
-      }
-      for (Entry<String, EventListenerList> e : m_virtualDesktop.getPropertyChangeListenerMap().entrySet()) {
-        String propName = e.getKey();
-        EventListenerList list = e.getValue();
-        if (propName == null) {
-          for (PropertyChangeListener listener : list.getListeners(PropertyChangeListener.class)) {
-            m_desktop.addPropertyChangeListener(listener);
-          }
-        }
-        else {
-          for (PropertyChangeListener listener : list.getListeners(PropertyChangeListener.class)) {
-            m_desktop.addPropertyChangeListener(propName, listener);
-          }
-        }
-      }
-      for (IDataChangeListener listener : m_virtualDesktop.getDataChangeListeners()) {
-        m_desktop.addDataChangeListener(listener);
-      }
-      for (Entry<Object, EventListenerList> e : m_virtualDesktop.getDataChangeListenerMap().entrySet()) {
-        Object dataType = e.getKey();
-        EventListenerList list = e.getValue();
-        if (dataType == null) {
-          for (DataChangeListener listener : list.getListeners(DataChangeListener.class)) {
-            m_desktop.addDataChangeListener(listener);
-          }
-        }
-        else {
-          for (DataChangeListener listener : list.getListeners(DataChangeListener.class)) {
-            m_desktop.addDataChangeListener(listener, dataType);
-          }
-        }
-      }
+      m_desktop.desktopListeners().addAll(m_virtualDesktop.desktopListeners());
+      m_virtualDesktop.getPropertyChangeListenerMap()
+          .forEach((propName, listeners) -> listeners
+              .forEach(listener -> {
+                if (propName == null) {
+                  m_desktop.addPropertyChangeListener(listener);
+                }
+                else {
+                  m_desktop.addPropertyChangeListener(propName, listener);
+                }
+              }));
+      m_desktop.dataChangeListeners().addAll(m_virtualDesktop.dataChangeListeners());
       m_virtualDesktop = null;
     }
     m_desktop.init();
@@ -596,13 +568,8 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   @Override
-  public void addListener(ISessionListener sessionListener) {
-    m_eventListeners.add(ISessionListener.class, sessionListener);
-  }
-
-  @Override
-  public void removeListener(ISessionListener sessionListener) {
-    m_eventListeners.remove(ISessionListener.class, sessionListener);
+  public IFastListenerList<ISessionListener> sessionListeners() {
+    return m_eventListeners;
   }
 
   @Override
@@ -611,20 +578,22 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   protected void fireSessionChangedEvent(final SessionEvent event) {
-    List<ISessionListener> listeners = new ArrayList<>();
-    listeners.addAll(Arrays.asList(m_eventListeners.getListeners(ISessionListener.class))); // session specific listeners
-    listeners.addAll(BEANS.all(IGlobalSessionListener.class)); // global listeners
-    for (final ISessionListener listener : listeners) {
-      try {
-        listener.sessionChanged(event);
+    // session specific listeners
+    sessionListeners().list().forEach(listener -> handleSessionEvent(listener, event));
+    // global listeners
+    BEANS.all(IGlobalSessionListener.class).forEach(listener -> handleSessionEvent(listener, event));
+  }
+
+  protected void handleSessionEvent(ISessionListener listener, SessionEvent event) {
+    try {
+      listener.sessionChanged(event);
+    }
+    catch (RuntimeException e) {
+      if (event.getType() != SessionEvent.TYPE_STOPPED && event.getType() != SessionEvent.TYPE_STOPPING) {
+        throw e; // throw if not stopping
       }
-      catch (RuntimeException e) {
-        if (event.getType() != SessionEvent.TYPE_STOPPED && event.getType() != SessionEvent.TYPE_STOPPING) {
-          throw e; // throw if not stopping
-        }
-        // stopping: give all listeners a chance to do their cleanup
-        LOG.warn("Error in session listener {}.", listener.getClass(), e);
-      }
+      // stopping: give all listeners a chance to do their cleanup
+      LOG.warn("Error in session listener {}.", listener.getClass(), e);
     }
   }
 

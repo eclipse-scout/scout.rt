@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.client.ui.accordion.IAccordion;
 import org.eclipse.scout.rt.client.ui.group.IGroup;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 
 public interface ITileAccordion<T extends ITile> extends IAccordion, IExtensibleObject {
@@ -146,8 +147,14 @@ public interface ITileAccordion<T extends ITile> extends IAccordion, IExtensible
    */
   TileGridLayoutConfig getTileGridLayoutConfig();
 
-  void addTileGridListener(TileGridListener listener);
+  IFastListenerList<TileGridListener> tileGridListeners();
 
-  void removeTileGridListener(TileGridListener listener);
+  default void addTileGridListener(TileGridListener listener) {
+    tileGridListeners().add(listener);
+  }
+
+  default void removeTileGridListener(TileGridListener listener) {
+    tileGridListeners().remove(listener);
+  }
 
 }

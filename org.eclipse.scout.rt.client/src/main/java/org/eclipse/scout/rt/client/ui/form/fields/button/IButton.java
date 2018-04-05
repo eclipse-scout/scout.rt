@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.button;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 
 /**
  * A Button has 2 aspects
@@ -67,9 +68,18 @@ public interface IButton extends IFormField, IContextMenuOwner {
 
   void setDefaultButton(boolean on);
 
-  void addButtonListener(ButtonListener listener);
+  /**
+   * Model Observer
+   */
+  IFastListenerList<ButtonListener> buttonListeners();
 
-  void removeButtonListener(ButtonListener listener);
+  default void addButtonListener(ButtonListener listener) {
+    buttonListeners().add(listener);
+  }
+
+  default void removeButtonListener(ButtonListener listener) {
+    buttonListeners().remove(listener);
+  }
 
   String getIconId();
 

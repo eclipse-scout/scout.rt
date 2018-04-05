@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 
 public interface IFileChooser {
 
@@ -50,9 +51,15 @@ public interface IFileChooser {
    */
   void setDisplayParent(IDisplayParent displayParent);
 
-  void addFileChooserListener(FileChooserListener listener);
+  IFastListenerList<FileChooserListener> fileChooserListeners();
 
-  void removeFileChooserListener(FileChooserListener listener);
+  default void addFileChooserListener(FileChooserListener listener) {
+    fileChooserListeners().add(listener);
+  }
+
+  default void removeFileChooserListener(FileChooserListener listener) {
+    fileChooserListeners().remove(listener);
+  }
 
   /**
    * @return a list containing any of media types, mime types and file extensions.

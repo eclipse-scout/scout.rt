@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.svg.client.svgfield;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.EventListener;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
@@ -23,7 +22,8 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.svg.client.SVGUtility;
 import org.eclipse.scout.rt.svg.client.extension.svgfield.ISvgFieldExtension;
 import org.eclipse.scout.rt.svg.client.extension.svgfield.SvgFieldChains.SvgFieldAppLinkActionChain;
@@ -38,7 +38,7 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
   private static final Logger LOG = LoggerFactory.getLogger(AbstractSvgField.class);
 
   private ISvgFieldUIFacade m_uiFacade;
-  private final EventListenerList m_listenerList = new EventListenerList();
+  private final FastListenerList<ISvgFieldListener> m_listenerList = new FastListenerList<>();
   // only do one action at a time
   private boolean m_actionRunning;
 
@@ -87,13 +87,8 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
   }
 
   @Override
-  public void addSvgFieldListener(ISvgFieldListener listener) {
-    m_listenerList.add(ISvgFieldListener.class, listener);
-  }
-
-  @Override
-  public void removeSvgFieldListener(ISvgFieldListener listener) {
-    m_listenerList.remove(ISvgFieldListener.class, listener);
+  public IFastListenerList<ISvgFieldListener> svgFieldListeners() {
+    return m_listenerList;
   }
 
   @Override
@@ -167,12 +162,7 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
   }
 
   private void fireSvgFieldEventInternal(SvgFieldEvent e) {
-    EventListener[] a = m_listenerList.getListeners(ISvgFieldListener.class);
-    if (a != null) {
-      for (EventListener anA : a) {
-        ((ISvgFieldListener) anA).handleSvgFieldEvent(e);
-      }
-    }
+    svgFieldListeners().list().forEach(listener -> listener.handleSvgFieldEvent(e));
   }
 
   protected class P_UIFacade implements ISvgFieldUIFacade {

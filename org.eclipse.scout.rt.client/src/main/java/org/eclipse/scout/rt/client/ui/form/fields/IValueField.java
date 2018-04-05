@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IValueFieldContextMenu;
 import org.eclipse.scout.rt.platform.holders.IHolder;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 
 /**
  * Basic interface for all user fields where user inputs a value
@@ -87,9 +88,15 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IContext
    */
   boolean isValueValidating();
 
-  void addMasterListener(MasterListener listener);
+  IFastListenerList<MasterListener> masterListeners();
 
-  void removeMasterListener(MasterListener listener);
+  default void addMasterListener(MasterListener listener) {
+    masterListeners().add(listener);
+  }
+
+  default void removeMasterListener(MasterListener listener) {
+    masterListeners().remove(listener);
+  }
 
   /**
    * Value

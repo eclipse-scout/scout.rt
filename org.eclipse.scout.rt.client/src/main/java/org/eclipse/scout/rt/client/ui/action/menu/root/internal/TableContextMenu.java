@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -42,7 +41,21 @@ public class TableContextMenu extends AbstractContextMenu<ITable> implements ITa
   @Override
   protected void initConfig() {
     super.initConfig();
-    getContainer().addTableListener(new P_OwnerTableListener());
+    getContainer().addTableListener(
+        e -> {
+          switch (e.getType()) {
+            case TableEvent.TYPE_ROWS_SELECTED:
+              handleOwnerValueChanged();
+              break;
+            case TableEvent.TYPE_ROWS_UPDATED:
+              if (CollectionUtility.containsAny(e.getRows(), m_currentSelection)) {
+                handleOwnerValueChanged();
+              }
+              break;
+          }
+        },
+        TableEvent.TYPE_ROWS_SELECTED,
+        TableEvent.TYPE_ROWS_UPDATED);
     // set active filter
     setCurrentMenuTypes(MenuUtility.getMenuTypesForTableSelection(getContainer().getSelectedRows()));
     calculateLocalVisibility();
@@ -114,18 +127,6 @@ public class TableContextMenu extends AbstractContextMenu<ITable> implements ITa
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
     if (ITable.PROP_ENABLED.equals(evt.getPropertyName())) {
       handleOwnerEnabledChanged();
-    }
-  }
-
-  private class P_OwnerTableListener extends TableAdapter {
-    @Override
-    public void tableChanged(TableEvent e) {
-      if (e.getType() == TableEvent.TYPE_ROWS_SELECTED) {
-        handleOwnerValueChanged();
-      }
-      else if (e.getType() == TableEvent.TYPE_ROWS_UPDATED && CollectionUtility.containsAny(e.getRows(), m_currentSelection)) {
-        handleOwnerValueChanged();
-      }
     }
   }
 }

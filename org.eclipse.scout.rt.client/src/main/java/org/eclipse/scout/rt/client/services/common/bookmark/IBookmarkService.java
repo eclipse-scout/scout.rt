@@ -11,14 +11,21 @@
 package org.eclipse.scout.rt.client.services.common.bookmark;
 
 import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkData;
 
 public interface IBookmarkService extends IService {
 
-  void addBookmarkServiceListener(BookmarkServiceListener listener);
+  IFastListenerList<BookmarkServiceListener> bookmarkServiceListeners();
 
-  void removeBookmarkServiceListener(BookmarkServiceListener listener);
+  default void addBookmarkServiceListener(BookmarkServiceListener listener) {
+    bookmarkServiceListeners().add(listener);
+  }
+
+  default void removeBookmarkServiceListener(BookmarkServiceListener listener) {
+    bookmarkServiceListeners().remove(listener);
+  }
 
   /**
    * @return life reference to current model, this reference is always valid and will never change
@@ -60,5 +67,4 @@ public interface IBookmarkService extends IService {
    * setting start-up view).
    */
   void updateBookmark(Bookmark bm);
-
 }

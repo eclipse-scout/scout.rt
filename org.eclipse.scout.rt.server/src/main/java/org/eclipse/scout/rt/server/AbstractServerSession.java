@@ -11,8 +11,6 @@
 package org.eclipse.scout.rt.server;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -24,8 +22,9 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
 import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
 import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry;
@@ -52,7 +51,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractServerSession.class);
 
-  private final transient EventListenerList m_eventListeners;
+  private final transient FastListenerList<ISessionListener> m_eventListeners;
 
   private String m_id;
   private boolean m_initialized;
@@ -62,7 +61,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   private final ObjectExtensions<AbstractServerSession, IServerSessionExtension<? extends AbstractServerSession>> m_objectExtensions;
 
   public AbstractServerSession(boolean autoInitConfig) {
-    m_eventListeners = new EventListenerList();
+    m_eventListeners = new FastListenerList<>();
     m_sessionData = new SessionData();
     m_sharedVariableMap = new SharedVariableMap();
     m_objectExtensions = new ObjectExtensions<>(this, true);
@@ -242,30 +241,27 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   }
 
   @Override
-  public void addListener(ISessionListener sessionListener) {
-    m_eventListeners.add(ISessionListener.class, sessionListener);
-  }
-
-  @Override
-  public void removeListener(ISessionListener sessionListener) {
-    m_eventListeners.remove(ISessionListener.class, sessionListener);
+  public IFastListenerList<ISessionListener> sessionListeners() {
+    return m_eventListeners;
   }
 
   protected void fireSessionChangedEvent(final SessionEvent event) {
-    List<ISessionListener> listeners = new ArrayList<>();
-    listeners.addAll(Arrays.asList(m_eventListeners.getListeners(ISessionListener.class))); // session specific listeners
-    listeners.addAll(BEANS.all(IGlobalSessionListener.class)); // global listeners
-    for (final ISessionListener listener : listeners) {
-      try {
-        listener.sessionChanged(event);
+    // session specific listeners
+    sessionListeners().list().forEach(listener -> handleSessionEvent(listener, event));
+    // global listeners
+    BEANS.all(IGlobalSessionListener.class).forEach(listener -> handleSessionEvent(listener, event));
+  }
+
+  protected void handleSessionEvent(ISessionListener listener, SessionEvent event) {
+    try {
+      listener.sessionChanged(event);
+    }
+    catch (RuntimeException e) {
+      if (event.getType() != SessionEvent.TYPE_STOPPED && event.getType() != SessionEvent.TYPE_STOPPING) {
+        throw e; // throw if not stopping
       }
-      catch (RuntimeException e) {
-        if (event.getType() != SessionEvent.TYPE_STOPPED && event.getType() != SessionEvent.TYPE_STOPPING) {
-          throw e; // throw if not stopping
-        }
-        // stopping: give all listeners a chance to do their cleanup
-        LOG.warn("Error in session listener {}.", listener.getClass(), e);
-      }
+      // stopping: give all listeners a chance to do their cleanup
+      LOG.warn("Error in session listener {}.", listener.getClass(), e);
     }
   }
 

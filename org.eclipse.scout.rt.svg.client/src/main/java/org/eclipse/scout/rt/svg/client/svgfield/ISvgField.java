@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.svg.client.svgfield;
 
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGPoint;
 
@@ -32,9 +33,15 @@ public interface ISvgField extends IFormField, IAppLinkCapable {
 
   void setSvgDocument(SVGDocument doc);
 
-  void addSvgFieldListener(ISvgFieldListener listener);
+  IFastListenerList<ISvgFieldListener> svgFieldListeners();
 
-  void removeSvgFieldListener(ISvgFieldListener listener);
+  default void addSvgFieldListener(ISvgFieldListener listener) {
+    svgFieldListeners().add(listener);
+  }
+
+  default void removeSvgFieldListener(ISvgFieldListener listener) {
+    svgFieldListeners().remove(listener);
+  }
 
   ISvgFieldUIFacade getUIFacade();
 
@@ -50,5 +57,4 @@ public interface ISvgField extends IFormField, IAppLinkCapable {
    * to find affected elements
    */
   void setSelection(SVGPoint point);
-
 }

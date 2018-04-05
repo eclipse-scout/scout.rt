@@ -38,8 +38,6 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDeactivatedChain;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.client.ui.DataChangeListener;
-import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
@@ -52,10 +50,10 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper.IMenuTypeMapper;
@@ -106,8 +104,8 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   private T m_table;
   private IForm m_detailForm;
   private String m_overviewIconId;
-  private DataChangeListener m_internalDataChangeListener;
-  private final TreeListener m_treeListener;
+  private IDataChangeListener m_internalDataChangeListener;
+  private final TreeListener m_localTreeListener;
   private final String m_userPreferenceContext;
   private final Map<ITableRow, IPage> m_tableRowToPageMap = new HashMap<>();
   private final Map<IPage, ITableRow> m_pageToTableRowMap = new HashMap<>();
@@ -276,7 +274,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   public AbstractPage(boolean callInitializer, String userPreferenceContext) {
     super(false);
     m_userPreferenceContext = userPreferenceContext;
-    m_treeListener = new InteralTreeListener();
+    m_localTreeListener = createLocalTreeListener();
     if (callInitializer) {
       callInitializer();
     }
@@ -689,13 +687,13 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   public void setTreeInternal(ITree tree, boolean includeSubtree) {
     ITree oldTree = getTree();
     if (oldTree != null) {
-      oldTree.removeTreeListener(m_treeListener);
+      oldTree.removeTreeListener(m_localTreeListener);
     }
     super.setTreeInternal(tree, includeSubtree);
     if (tree == null) {
       return;
     }
-    tree.addTreeListener(m_treeListener, TreeEvent.TYPE_NODES_UPDATED);
+    tree.addTreeListener(m_localTreeListener, TreeEvent.TYPE_NODES_UPDATED);
   }
 
   @Override
@@ -746,7 +744,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     // automatically remove all data change listeners
     ITree tree = getTree();
     if (tree != null) {
-      tree.removeTreeListener(m_treeListener);
+      tree.removeTreeListener(m_localTreeListener);
     }
     if (m_internalDataChangeListener != null) {
       IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
@@ -911,7 +909,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   /**
-   * Register a {@link DataChangeListener} on the desktop for these dataTypes<br>
+   * Register a {@link IDataChangeListener} on the desktop for these dataTypes<br>
    * Example:
    *
    * <pre>
@@ -920,10 +918,9 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    */
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
-      m_internalDataChangeListener = (WeakDataChangeListener) AbstractPage.this::dataChanged;
+      m_internalDataChangeListener = event -> dataChanged(event.getEventType());
     }
-
-    IDesktop.CURRENT.get().addDataChangeListener(m_internalDataChangeListener, dataTypes);
+    IDesktop.CURRENT.get().dataChangeListeners().add(m_internalDataChangeListener, true, dataTypes);
   }
 
   @Override
@@ -940,7 +937,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   /**
-   * Unregister the {@link DataChangeListener} from the desktop for these dataTypes<br>
+   * Unregister the {@link IDataChangeListener} from the desktop for these dataTypes<br>
    * Example:
    *
    * <pre>
@@ -1165,14 +1162,13 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   /**
    * Adapter listener that delegates NODE_UPDATED tree events to pageChanged events
    */
-  protected class InteralTreeListener extends TreeAdapter {
-    @Override
-    public void treeChanged(TreeEvent e) {
+  protected TreeListener createLocalTreeListener() {
+    return e -> {
       AbstractPage<T> page = AbstractPage.this;
       if (TreeEvent.TYPE_NODES_UPDATED == e.getType() && e.getChildNodes().contains(page)) {
         AbstractPage.this.firePageChanged();
       }
-    }
+    };
   }
 
   protected static class LocalPageExtension<OWNER extends AbstractPage> extends LocalTreeNodeExtension<OWNER> implements IPageExtension<OWNER> {

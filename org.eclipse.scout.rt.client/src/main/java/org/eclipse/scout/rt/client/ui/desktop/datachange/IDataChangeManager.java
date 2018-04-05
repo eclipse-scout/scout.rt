@@ -21,10 +21,13 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
  */
 public interface IDataChangeManager {
 
-  void addDataChangeListener(IDataChangeListener listener);
+  void add(IDataChangeListener listener, boolean weak, Object... dataTypes);
 
-  void removeDataChangeListener(IDataChangeListener listener);
+  void addLastCalled(IDataChangeListener listener, boolean weak, Object... dataTypes);
 
-  void fireDataChangeEvent(DataChangeEvent event);
+  void addAll(IDataChangeManager dataChangeListeners);
 
+  void remove(IDataChangeListener listener, Object... dataTypes);
+
+  void fireEvent(DataChangeEvent event);
 }

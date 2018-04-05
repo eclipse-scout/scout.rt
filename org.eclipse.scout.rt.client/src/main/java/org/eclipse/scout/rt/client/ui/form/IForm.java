@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.reflect.IPropertyFilter;
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.w3c.dom.Document;
@@ -677,16 +678,22 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    */
   void requestInput(IFormField field);
 
+  IFastListenerList<FormListener> formListeners();
+
   /**
    * Add a {@link FormListener}. These listeners will be called when the form is activated, closed, discarded, before
    * loading, after loading, before storing, after storing, when the structure changes, when it is printed, etc.
    */
-  void addFormListener(FormListener listener);
+  default void addFormListener(FormListener listener) {
+    formListeners().add(listener);
+  }
 
   /**
    * Remove a {@link FormListener} that was added to the form before.
    */
-  void removeFormListener(FormListener listener);
+  default void removeFormListener(FormListener listener) {
+    formListeners().remove(listener);
+  }
 
   /**
    * @return the {@link IEventHistory} associated with this form

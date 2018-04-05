@@ -16,6 +16,7 @@ import java.util.List;
 /**
  * @see TreeAdapter
  */
+@FunctionalInterface
 public interface TreeListener extends EventListener {
 
   void treeChanged(TreeEvent e);
@@ -25,6 +26,8 @@ public interface TreeListener extends EventListener {
    *
    * @deprecated in order for better performance the most efficient way is to only register for the events that are
    *             really handled. see the vararg parameter to {@link ITree#addTreeListener(TreeListener, int...)}
+   *             <p>
+   *             This method will be removed in 9.x
    */
   @Deprecated
   default void treeChangedBatch(List<? extends TreeEvent> events) {

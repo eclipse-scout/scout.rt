@@ -14,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,11 +43,12 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements IPlanner<RI, AI>, IContributionOwner, IExtensibleObject {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractPlanner.class);
 
-  private EventListenerList m_listenerList;
+  private FastListenerList<PlannerListener> m_listenerList;
   private IPlannerUIFacade m_activityMapUIFacade;
   private long m_minimumActivityDuration;// millis
   private final List<Resource<RI>> m_resources;
@@ -268,7 +268,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
   @SuppressWarnings("unchecked")
   protected void initConfig() {
     super.initConfig();
-    m_listenerList = new EventListenerList();
+    m_listenerList = new FastListenerList<>();
     m_activityMapUIFacade = createUIFacade();
     //
     setLabel(getConfiguredLabel());
@@ -440,17 +440,12 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
     // nop
   }
 
-  /*
+  /**
    * Model Observer
    */
   @Override
-  public void addPlannerListener(PlannerListener listener) {
-    m_listenerList.add(PlannerListener.class, listener);
-  }
-
-  @Override
-  public void removePlannerListener(PlannerListener listener) {
-    m_listenerList.remove(PlannerListener.class, listener);
+  public IFastListenerList<PlannerListener> plannerListeners() {
+    return m_listenerList;
   }
 
   @Override
@@ -723,22 +718,14 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
       getEventBuffer().add(e);
     }
     else {
-      EventListener[] listeners = m_listenerList.getListeners(PlannerListener.class);
-      if (listeners != null && listeners.length > 0) {
-        for (EventListener listener : listeners) {
-          ((PlannerListener) listener).plannerChanged(e);
-        }
-      }
+      plannerListeners().list().forEach(listener -> listener.plannerChanged(e));
     }
   }
 
   // batch handler
   private void firePlannerEventBatchInternal(List<PlannerEvent> batch) {
     if (CollectionUtility.hasElements(batch)) {
-      EventListener[] listeners = m_listenerList.getListeners(PlannerListener.class);
-      for (EventListener l : listeners) {
-        ((PlannerListener) l).plannerChangedBatch(batch);
-      }
+      plannerListeners().list().forEach(listener -> listener.plannerChangedBatch(batch));
     }
   }
 

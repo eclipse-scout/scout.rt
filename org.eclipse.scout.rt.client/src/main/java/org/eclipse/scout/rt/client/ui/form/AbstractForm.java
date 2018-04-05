@@ -24,7 +24,6 @@ import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
-import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -67,15 +66,14 @@ import org.eclipse.scout.rt.client.extension.ui.form.MoveFormFieldsHandler;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
-import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.IWidget;
-import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.OpenUriAction;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -126,10 +124,11 @@ import org.eclipse.scout.rt.platform.status.MultiStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.BeanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.PreferredValue;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.platform.util.visitor.CollectingVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -171,7 +170,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   private static final NamedBitMaskHelper STATE_BIT_HELPER = new NamedBitMaskHelper(FORM_STORED, FORM_LOADING, FORM_STARTED);
 
   private final PreferredValue<IDisplayParent> m_displayParent;
-  private final EventListenerList m_listenerList;
+  private final FastListenerList<FormListener> m_listenerList;
   private final PreferredValue<Boolean> m_modal; // no property, is fixed
   private final IBlockingCondition m_blockingCondition;
   private final ObjectExtensions<AbstractForm, IFormExtension<? extends AbstractForm>> m_objectExtensions;
@@ -207,7 +206,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   // current timers
   private IFuture<?> m_closeTimerFuture;
   private Map<String, IFuture<Void>> m_timerFutureMap;
-  private DataChangeListener m_internalDataChangeListener;
+  private IDataChangeListener m_internalDataChangeListener;
 
   // field replacement support
   private Map<Class<?>, Class<? extends IFormField>> m_fieldReplacements;
@@ -219,7 +218,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
   public AbstractForm(boolean callInitializer) {
     super(false);
-    m_listenerList = new EventListenerList();
+    m_listenerList = new FastListenerList<>();
     m_modal = new PreferredValue<>(false, false);
     m_closeType = IButton.SYSTEM_TYPE_NONE;
     m_displayParent = new PreferredValue<>(null, false);
@@ -914,7 +913,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   /**
-   * Register a {@link DataChangeListener} on the desktop for these dataTypes<br>
+   * Register a {@link IDataChangeListener} on the desktop for these dataTypes<br>
    * Example:
    *
    * <pre>
@@ -923,13 +922,13 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
    */
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
-      m_internalDataChangeListener = (WeakDataChangeListener) this::interceptDataChanged;
+      m_internalDataChangeListener = event -> interceptDataChanged(event.getEventType());
     }
-    getDesktop().addDataChangeListener(m_internalDataChangeListener, dataTypes);
+    getDesktop().dataChangeListeners().add(m_internalDataChangeListener, true, dataTypes);
   }
 
   /**
-   * Unregister the {@link DataChangeListener} from the desktop for these dataTypes<br>
+   * Unregister the {@link IDataChangeListener} from the desktop for these dataTypes<br>
    * Example:
    *
    * <pre>
@@ -2485,13 +2484,8 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
    * Model Observer.
    */
   @Override
-  public void addFormListener(FormListener listener) {
-    m_listenerList.add(FormListener.class, listener);
-  }
-
-  @Override
-  public void removeFormListener(FormListener listener) {
-    m_listenerList.remove(FormListener.class, listener);
+  public IFastListenerList<FormListener> formListeners() {
+    return m_listenerList;
   }
 
   protected IEventHistory<FormEvent> createEventHistory() {
@@ -2561,23 +2555,21 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   protected void fireFormEvent(FormEvent e) {
-    EventListener[] listeners = m_listenerList.getListeners(FormListener.class);
-    if (listeners != null && listeners.length > 0) {
-      RuntimeException pe = null;
-      for (EventListener listener : listeners) {
-        try {
-          ((FormListener) listener).formChanged(e);
-        }
-        catch (RuntimeException ex) {
-          if (pe == null) {
-            pe = ex;
-          }
-        }
+    RuntimeException pe = null;
+    for (FormListener listener : formListeners().list()) {
+      try {
+        listener.formChanged(e);
       }
-      if (pe != null) {
-        throw pe;
+      catch (RuntimeException ex) {
+        if (pe == null) {
+          pe = ex;
+        }
       }
     }
+    if (pe != null) {
+      throw pe;
+    }
+
     IEventHistory<FormEvent> h = getEventHistory();
     if (h != null) {
       h.notifyEvent(e);

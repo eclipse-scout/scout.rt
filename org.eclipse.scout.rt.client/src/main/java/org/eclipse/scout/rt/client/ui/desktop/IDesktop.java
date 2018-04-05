@@ -20,7 +20,6 @@ import java.util.concurrent.Future;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DefaultDesktopEventHistory;
 import org.eclipse.scout.rt.client.ui.Coordinates;
-import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.IStyleable;
@@ -196,7 +195,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   <T extends IAction> T findAction(Class<T> actionType);
 
   /**
-   * deprecated Will be removed with Scout 8.0. Use {@link #getMenuByClass(Class)} instead.
+   * @deprecated Will be removed with Scout 8.0. Use {@link #getMenuByClass(Class)} instead.
    */
   @Deprecated
   <T extends IMenu> T findMenu(Class<T> menuType);
@@ -423,27 +422,55 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);
 
   /**
-   * add Model Observer
+   * Accessor to the table listener registry
    */
-  void addDesktopListener(DesktopListener l);
+  DesktopListeners desktopListeners();
+
+  /**
+   * @param listener
+   * @param eventTypes
+   *          of {@link DesktopEvent} TYPE_*
+   */
+  default void addDesktopListener(DesktopListener listener, Integer... eventTypes) {
+    desktopListeners().add(listener, false, eventTypes);
+  }
+
+  default void removeDesktopListener(DesktopListener listener, Integer... eventTypes) {
+    desktopListeners().remove(listener, eventTypes);
+  }
+
+  /**
+   * Add the listener so it is called as <em>last</em> listener.
+   * <p>
+   * Use {@link #addDesktopListener(DesktopListener)} in all other cases
+   *
+   * @param listener
+   * @param eventTypes
+   *          of {@link DesktopEvent} TYPE_*
+   */
+  default void addUIDesktopListener(DesktopListener listener, Integer... eventTypes) {
+    desktopListeners().addLastCalled(listener, false, eventTypes);
+  }
 
   /**
    * add Model Observer as last informed listener.
+   *
+   * @deprecated use {@link #addUIDesktopListener(DesktopListener, int...)}
    */
-  void addDesktopListenerAtExecutionEnd(DesktopListener l);
+  @Deprecated
+  default void addDesktopListenerAtExecutionEnd(DesktopListener listener) {
+    addUIDesktopListener(listener);
+  }
 
-  void removeDesktopListener(DesktopListener l);
+  IDataChangeManager dataChangeListeners();
 
-  /**
-   * add Data Change Observer
-   */
-  void addDataChangeListener(DataChangeListener listener, Object... dataTypes);
+  default void addDataChangeListener(IDataChangeListener listener, Object... dataTypes) {
+    dataChangeListeners().add(listener, false, dataTypes);
+  }
 
-  void addDataChangeListener(IDataChangeListener listener);
-
-  void removeDataChangeListener(DataChangeListener listener, Object... dataTypes);
-
-  void removeDataChangeListener(IDataChangeListener listener);
+  default void removeDataChangeListener(IDataChangeListener listener, Object... dataTypes) {
+    dataChangeListeners().remove(listener, dataTypes);
+  }
 
   /**
    * Call this method to refresh all listeners on that dataTypes.<br>
@@ -849,5 +876,4 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * @since 6.1
    */
   Future<Coordinates> requestGeolocation();
-
 }

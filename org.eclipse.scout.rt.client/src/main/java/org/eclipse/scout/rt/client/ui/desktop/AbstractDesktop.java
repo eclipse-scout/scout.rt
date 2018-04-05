@@ -16,13 +16,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -55,7 +51,6 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.transformation.IDeviceTransformationService;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.Coordinates;
-import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.IWidget;
@@ -71,7 +66,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.bench.layout.BenchLayoutData;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent;
-import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeManager;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
@@ -102,9 +96,8 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.ChangeStatus;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
-import org.eclipse.scout.rt.platform.util.SimpleEventListenerList;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
@@ -145,10 +138,9 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   private IEventHistory<DesktopEvent> m_eventHistory;
   private final IDesktopExtension m_localDesktopExtension;
   private List<IDesktopExtension> m_desktopExtensions;
-  private final EventListenerList m_listenerList;
+  private final DesktopListeners m_listeners;
   private int m_dataChanging;
-  private final List<Object[]> m_dataChangeEventBuffer;
-  private final Map<Object, SimpleEventListenerList<DataChangeListener>> m_dataChangeListenerList;
+  private final List<DataChangeEvent> m_dataChangeEventBuffer;
   private final IDesktopUIFacade m_uiFacade;
   private List<IOutline> m_availableOutlines;
   private IOutline m_outline;
@@ -171,7 +163,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   private final ObjectExtensions<AbstractDesktop, org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> m_objectExtensions;
   private final List<ClientCallback<Coordinates>> m_pendingPositionResponses = Collections.synchronizedList(new ArrayList<ClientCallback<Coordinates>>());
   private int m_attachedGuis = 0;
-  private IDataChangeManager m_dataChangeManager;
+  private IDataChangeManager m_dataChangeListeners;
 
   /**
    * do not instantiate a new desktop<br>
@@ -184,8 +176,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   public AbstractDesktop(boolean callInitializer) {
     super(false);
     m_localDesktopExtension = new P_LocalDesktopExtension();
-    m_listenerList = new EventListenerList();
-    m_dataChangeListenerList = new HashMap<>();
+    m_listeners = new DesktopListeners();
     m_dataChangeEventBuffer = new ArrayList<>();
     m_formStore = BEANS.get(FormStore.class);
     m_selectedViewTabs = new HashMap<>();
@@ -194,7 +185,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent().withDesktop(this));
     m_addOns = new ArrayList<>();
     m_objectExtensions = new ObjectExtensions<>(this, true);
-    m_dataChangeManager = BEANS.get(IDataChangeManager.class);
+    m_dataChangeListeners = BEANS.get(IDataChangeManager.class);
     if (callInitializer) {
       callInitializer();
     }
@@ -1660,70 +1651,13 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   @Override
-  public void addDesktopListener(DesktopListener l) {
-    m_listenerList.add(DesktopListener.class, l);
+  public DesktopListeners desktopListeners() {
+    return m_listeners;
   }
 
   @Override
-  public void addDesktopListenerAtExecutionEnd(DesktopListener l) {
-    m_listenerList.insertAtFront(DesktopListener.class, l);
-  }
-
-  @Override
-  public void removeDesktopListener(DesktopListener l) {
-    m_listenerList.remove(DesktopListener.class, l);
-  }
-
-  @Override
-  public void addDataChangeListener(DataChangeListener listener, Object... dataTypes) {
-    if (dataTypes == null || dataTypes.length == 0) {
-      SimpleEventListenerList<DataChangeListener> list = m_dataChangeListenerList.computeIfAbsent(null, k -> new SimpleEventListenerList<>());
-      list.add(listener);
-    }
-    else {
-      for (Object dataType : dataTypes) {
-        if (dataType != null) {
-          SimpleEventListenerList<DataChangeListener> list = m_dataChangeListenerList.computeIfAbsent(dataType, k -> new SimpleEventListenerList<>());
-          list.add(listener);
-        }
-      }
-    }
-  }
-
-  @Override
-  public void addDataChangeListener(IDataChangeListener listener) {
-    m_dataChangeManager.addDataChangeListener(listener);
-  }
-
-  @Override
-  public void removeDataChangeListener(DataChangeListener listener, Object... dataTypes) {
-    if (dataTypes == null || dataTypes.length == 0) {
-      for (Iterator<SimpleEventListenerList<DataChangeListener>> it = m_dataChangeListenerList.values().iterator(); it.hasNext();) {
-        SimpleEventListenerList<DataChangeListener> list = it.next();
-        list.remove(listener);
-        if (list.isEmpty()) {
-          it.remove();
-        }
-      }
-    }
-    else {
-      for (Object dataType : dataTypes) {
-        if (dataType != null) {
-          SimpleEventListenerList<DataChangeListener> list = m_dataChangeListenerList.get(dataType);
-          if (list != null) {
-            list.remove(listener);
-            if (list.isEmpty()) {
-              m_dataChangeListenerList.remove(dataType);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  @Override
-  public void removeDataChangeListener(IDataChangeListener listener) {
-    m_dataChangeManager.removeDataChangeListener(listener);
+  public IDataChangeManager dataChangeListeners() {
+    return m_dataChangeListeners;
   }
 
   @Override
@@ -1748,84 +1682,47 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   @Override
   public void dataChanged(Object... arguments) {
-    List<DataChangeEvent> changeEvents = new ArrayList<>();
-    List<Object> dataTypes = new ArrayList<>();
-
     for (Object arg : arguments) {
       if (arg instanceof DataChangeEvent) {
-        changeEvents.add((DataChangeEvent) arg);
+        /**
+         * This is the new way of handling data change events. The event object may contain data, a listener can use
+         * this data directly without the need to load data from a data source.
+         */
+        handleDataChanged((DataChangeEvent) arg);
       }
       else {
-        dataTypes.add(arg);
+        DataChangeEvent e = new DataChangeEvent(this, arg, ChangeStatus.UPDATED, null, null);
+        /**
+         * This is the traditional way of handling data change events. It's based on a data-type, the event does not
+         * contain any data.
+         */
+        handleDataChanged(e);
       }
     }
-
-    if (changeEvents.size() > 0) {
-      handleDataChanged(changeEvents);
-    }
-    if (dataTypes.size() > 0) {
-      handleDataChangedByType(dataTypes.toArray());
-    }
   }
 
-  /**
-   * This is the new way of handling data change events. The event object may contain data, a listener can use this data
-   * directly without the need to load data from a data source.
-   */
-  protected void handleDataChanged(Collection<DataChangeEvent> events) {
-    for (DataChangeEvent event : events) {
-      m_dataChangeManager.fireDataChangeEvent(event);
-    }
-  }
-
-  /**
-   * This is the traditional way of handling data change events. It's based on a data-type, the event does not contain
-   * any data.
-   */
-  protected void handleDataChangedByType(Object[] dataTypes) {
+  protected void handleDataChanged(DataChangeEvent event) {
     if (isDataChanging()) {
-      if (dataTypes != null && dataTypes.length > 0) {
-        m_dataChangeEventBuffer.add(dataTypes);
-      }
+      m_dataChangeEventBuffer.add(event);
     }
     else {
-      fireDataChangedImpl(dataTypes);
+      fireDataChangeEventInternal(event);
     }
   }
 
   private void processDataChangeBuffer() {
-    Set<Object> knownEvents = new HashSet<>();
-    for (Object[] dataTypes : m_dataChangeEventBuffer) {
-      Collections.addAll(knownEvents, dataTypes);
+    if (m_dataChangeEventBuffer.isEmpty()) {
+      return;
     }
+    LinkedHashSet<DataChangeEvent> coalescedEvents = new LinkedHashSet<>(m_dataChangeEventBuffer);
     m_dataChangeEventBuffer.clear();
-    fireDataChangedImpl(knownEvents.toArray(new Object[knownEvents.size()]));
+    for (DataChangeEvent event : coalescedEvents) {
+      fireDataChangeEventInternal(event);
+    }
   }
 
-  private void fireDataChangedImpl(Object... dataTypes) {
-    if (dataTypes != null && dataTypes.length > 0) {
-      // Important: Use LinkedHashMaps to make event firing deterministic!
-      // (If listeners would be called in random order, bugs may not be reproduced very well.)
-      Map<DataChangeListener, Set<Object>> map = new LinkedHashMap<>();
-      for (Object dataType : dataTypes) {
-        if (dataType != null) {
-          SimpleEventListenerList<DataChangeListener> list = m_dataChangeListenerList.get(dataType);
-          if (list != null) {
-            for (DataChangeListener listener : list) {
-              if (listener != null) {
-                Set<Object> typeSet = map.computeIfAbsent(listener, k -> new LinkedHashSet<>());
-                typeSet.add(dataType);
-              }
-            }
-          }
-        }
-      }
-      for (Entry<DataChangeListener, Set<Object>> e : map.entrySet()) {
-        DataChangeListener listener = e.getKey();
-        Set<Object> typeSet = e.getValue();
-        listener.dataChanged(typeSet.toArray());
-      }
-    }
+  private void fireDataChangeEventInternal(DataChangeEvent event) {
+    m_dataChangeListeners.fireEvent(event);
   }
 
   private void fireDesktopClosed() {
@@ -1920,13 +1817,8 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   // main handler
-  private void fireDesktopEvent(DesktopEvent event) {
-    DesktopListener[] listeners = m_listenerList.getListeners(DesktopListener.class);
-    if (listeners != null && listeners.length > 0) {
-      for (DesktopListener listener : listeners) {
-        listener.desktopChanged(event);
-      }
-    }
+  protected void fireDesktopEvent(DesktopEvent e) {
+    desktopListeners().fireEvent(e);
   }
 
   @Override

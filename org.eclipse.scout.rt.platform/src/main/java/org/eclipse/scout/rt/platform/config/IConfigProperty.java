@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.config;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 
 /**
  * Represents a scout application configuration property. This property may be stored in any source but typically it is
@@ -48,19 +49,17 @@ public interface IConfigProperty<DATA_TYPE> {
    */
   DATA_TYPE getValue();
 
+  IFastListenerList<IConfigChangedListener> configChangedListeners();
+
   /**
    * Adds a new {@link IConfigChangedListener} to this property.
    *
    * @param listener
    *          The new listener. May not be <code>null</code>.
    */
-  void addListener(IConfigChangedListener listener);
-
-  /**
-   * @return The description of the property. This may contain a textual description of what the property configures and
-   *         may also include data type restrictions.
-   */
-  String description();
+  default void addListener(IConfigChangedListener listener) {
+    configChangedListeners().add(listener);
+  }
 
   /**
    * Removes an {@link IConfigChangedListener} from this property.
@@ -68,7 +67,15 @@ public interface IConfigProperty<DATA_TYPE> {
    * @param listener
    *          The listener to remove. May not be <code>null</code>.
    */
-  void removeListener(IConfigChangedListener listener);
+  default void removeListener(IConfigChangedListener listener) {
+    configChangedListeners().remove(listener);
+  }
+
+  /**
+   * @return The description of the property. This may contain a textual description of what the property configures and
+   *         may also include data type restrictions.
+   */
+  String description();
 
   /**
    * Invalidates the value of this property.<br>

@@ -15,7 +15,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -48,7 +50,6 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -59,6 +60,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
+@SuppressWarnings("deprecation")
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
@@ -288,30 +290,28 @@ public class AbstractDesktopTest {
   public void testDataChangedSimple() {
     TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
 
-    final Holder<Object[]> resultHolder = new Holder<Object[]>(Object[].class);
+    final HashSet<Object> resultHolder = new HashSet<>();
     desktop.addDataChangeListener(new DataChangeListener() {
-
       @Override
       public void dataChanged(Object... dataTypes) {
-        resultHolder.setValue(dataTypes);
+        resultHolder.addAll(Arrays.asList(dataTypes));
       }
     }, TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
 
     desktop.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
 
-    verifyDataChanged(resultHolder);
+    assertEquals(CollectionUtility.hashSet(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2), resultHolder);
   }
 
   @Test
   public void testDataChangedChanging() {
     TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
 
-    final Holder<Object[]> resultHolder = new Holder<Object[]>(Object[].class);
+    final HashSet<Object> resultHolder = new HashSet<>();
     desktop.addDataChangeListener(new DataChangeListener() {
-
       @Override
       public void dataChanged(Object... dataTypes) {
-        resultHolder.setValue(dataTypes);
+        resultHolder.addAll(Arrays.asList(dataTypes));
       }
     }, TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
 
@@ -323,7 +323,7 @@ public class AbstractDesktopTest {
     desktop.dataChanged(TEST_DATA_TYPE_1);
     desktop.dataChanged(TEST_DATA_TYPE_2);
     desktop.setDataChanging(false);
-    verifyDataChanged(resultHolder);
+    assertEquals(CollectionUtility.hashSet(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2), resultHolder);
   }
 
   @Test
@@ -428,13 +428,6 @@ public class AbstractDesktopTest {
     catch (ExecutionException e) {
       throw e.getCause();
     }
-  }
-
-  protected void verifyDataChanged(Holder<Object[]> resultHolder) {
-    Object[] result = resultHolder.getValue();
-    assertTrue(result.length == 2);
-    assertTrue(result[0] == TEST_DATA_TYPE_1 && result[1] == TEST_DATA_TYPE_2
-        || result[0] == TEST_DATA_TYPE_2 && result[1] == TEST_DATA_TYPE_1);
   }
 
   @Test

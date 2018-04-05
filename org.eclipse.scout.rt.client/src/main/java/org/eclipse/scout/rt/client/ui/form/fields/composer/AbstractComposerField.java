@@ -38,7 +38,6 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.AbstractComposerNode;
@@ -335,22 +334,15 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       m_tree.setNodeExpanded(rootNode, true);
       m_tree.setEnabled(isEnabled());
       m_tree.addTreeListener(
-          new TreeAdapter() {
-            @Override
-            public void treeChanged(TreeEvent e) {
-              switch (e.getType()) {
-                case TreeEvent.TYPE_NODES_DELETED:
-                case TreeEvent.TYPE_ALL_CHILD_NODES_DELETED:
-                case TreeEvent.TYPE_NODES_INSERTED:
-                case TreeEvent.TYPE_NODES_UPDATED:
-                case TreeEvent.TYPE_NODES_CHECKED: {
-                  checkSaveNeeded();
-                  checkEmpty();
-                  break;
-                }
-              }
-            }
-          });
+          e -> {
+            checkSaveNeeded();
+            checkEmpty();
+          },
+          TreeEvent.TYPE_NODES_DELETED,
+          TreeEvent.TYPE_ALL_CHILD_NODES_DELETED,
+          TreeEvent.TYPE_NODES_INSERTED,
+          TreeEvent.TYPE_NODES_UPDATED,
+          TreeEvent.TYPE_NODES_CHECKED);
 
       // local enabled listener
       addPropertyChangeListener(PROP_ENABLED_COMPUTED, e -> {

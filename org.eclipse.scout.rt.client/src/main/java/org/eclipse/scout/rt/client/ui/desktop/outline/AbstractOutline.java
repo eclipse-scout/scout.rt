@@ -36,8 +36,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper.IMenuTypeMapper;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -306,7 +306,16 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     m_contextPageOptimisticLock = new OptimisticLock();
     setPageChangeStrategy(createPageChangeStrategy());
     m_outlineMediator = createOutlineMediator();
-    addTreeListener(new P_OutlineListener());
+    addTreeListener(
+        createLocalTreeListener(),
+        TreeEvent.TYPE_NODE_ACTION,
+        TreeEvent.TYPE_NODES_DRAG_REQUEST,
+        TreeEvent.TYPE_NODE_DROP_ACTION,
+        TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED,
+        TreeEvent.TYPE_NODES_DELETED,
+        TreeEvent.TYPE_NODES_INSERTED,
+        TreeEvent.TYPE_NODES_UPDATED,
+        TreeEvent.TYPE_NODES_CHECKED);
     addNodeFilter(new P_TableFilterBasedTreeNodeFilter());
     super.initConfig();
     IPage<?> rootPage = interceptCreateRootPage();
@@ -840,9 +849,8 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     return m_pageChangeStrategy;
   }
 
-  private class P_OutlineListener extends TreeAdapter {
-    @Override
-    public void treeChanged(TreeEvent e) {
+  protected TreeListener createLocalTreeListener() {
+    return e -> {
       ITreeNode commonParentNode = e.getCommonParentNode();
       if (commonParentNode instanceof IPageWithNodes) {
         handlePageWithNodesTreeEvent(e, (IPageWithNodes) commonParentNode);
@@ -850,47 +858,46 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       else if (commonParentNode instanceof IPageWithTable<?>) {
         handlePageWithTableTreeEvent(e, (IPageWithTable<?>) commonParentNode);
       }
+    };
+  }
+
+  protected void handlePageWithTableTreeEvent(TreeEvent e, IPageWithTable<?> pageWithTable) {
+    OutlineMediator outlineMediator = getOutlineMediator();
+    if (outlineMediator == null) {
+      return;
     }
 
-    private void handlePageWithNodesTreeEvent(TreeEvent e, IPageWithNodes pageWithNodes) {
-      OutlineMediator outlineMediator = getOutlineMediator();
-      if (outlineMediator == null) {
-        return;
+    switch (e.getType()) {
+      case TreeEvent.TYPE_NODE_ACTION: {
+        outlineMediator.mediateTreeNodeAction(e, pageWithTable);
+        break;
       }
-
-      switch (e.getType()) {
-        case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED:
-        case TreeEvent.TYPE_NODES_DELETED:
-        case TreeEvent.TYPE_NODES_INSERTED:
-        case TreeEvent.TYPE_NODES_UPDATED:
-        case TreeEvent.TYPE_NODES_CHECKED: {
-          outlineMediator.mediateTreeNodesChanged(pageWithNodes);
-          break;
-        }
+      case TreeEvent.TYPE_NODES_DRAG_REQUEST: {
+        outlineMediator.mediateTreeNodesDragRequest(e, pageWithTable);
+        break;
+      }
+      case TreeEvent.TYPE_NODE_DROP_ACTION: {
+        outlineMediator.mediateTreeNodeDropAction(e, pageWithTable);
+        break;
       }
     }
+  }
 
-    private void handlePageWithTableTreeEvent(TreeEvent e, IPageWithTable<?> pageWithTable) {
-      OutlineMediator outlineMediator = getOutlineMediator();
-      if (outlineMediator == null) {
-        return;
+  protected void handlePageWithNodesTreeEvent(TreeEvent e, IPageWithNodes pageWithNodes) {
+    OutlineMediator outlineMediator = getOutlineMediator();
+    if (outlineMediator == null) {
+      return;
+    }
+
+    switch (e.getType()) {
+      case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED:
+      case TreeEvent.TYPE_NODES_DELETED:
+      case TreeEvent.TYPE_NODES_INSERTED:
+      case TreeEvent.TYPE_NODES_UPDATED:
+      case TreeEvent.TYPE_NODES_CHECKED: {
+        outlineMediator.mediateTreeNodesChanged(pageWithNodes);
+        break;
       }
-
-      switch (e.getType()) {
-        case TreeEvent.TYPE_NODE_ACTION: {
-          outlineMediator.mediateTreeNodeAction(e, pageWithTable);
-          break;
-        }
-        case TreeEvent.TYPE_NODES_DRAG_REQUEST: {
-          outlineMediator.mediateTreeNodesDragRequest(e, pageWithTable);
-          break;
-        }
-        case TreeEvent.TYPE_NODE_DROP_ACTION: {
-          outlineMediator.mediateTreeNodeDropAction(e, pageWithTable);
-          break;
-        }
-      }
-
     }
   }
 

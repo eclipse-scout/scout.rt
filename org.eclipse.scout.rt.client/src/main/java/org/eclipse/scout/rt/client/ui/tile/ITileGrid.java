@@ -9,6 +9,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITileGridContextMenu;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 
@@ -192,9 +193,15 @@ public interface ITileGrid<T extends ITile> extends IWidget, ITypeWithClassId, I
   @Override
   ITileGridContextMenu getContextMenu();
 
-  void addTileGridListener(TileGridListener listener);
+  IFastListenerList<TileGridListener> tileGridListeners();
 
-  void removeTileGridListener(TileGridListener listener);
+  default void addTileGridListener(TileGridListener listener) {
+    tileGridListeners().add(listener);
+  }
+
+  default void removeTileGridListener(TileGridListener listener) {
+    tileGridListeners().remove(listener);
+  }
 
   ITileGridUIFacade getUIFacade();
 }

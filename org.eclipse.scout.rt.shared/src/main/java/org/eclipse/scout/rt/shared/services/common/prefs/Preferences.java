@@ -21,9 +21,10 @@ import java.util.Set;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.ISession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +65,7 @@ public class Preferences implements IPreferences {
   private final String m_name;
   private final transient ISession m_session;
   private final Map<String, String> m_prefs;
-  private final transient EventListenerList m_eventListeners;
+  private final transient FastListenerList<IPreferenceChangeListener> m_eventListeners;
   private boolean m_dirty;
 
   protected Preferences(String name, ISession userScope) {
@@ -79,7 +80,7 @@ public class Preferences implements IPreferences {
     m_name = name;
     m_session = userScope;
     m_prefs = prefs;
-    m_eventListeners = new EventListenerList();
+    m_eventListeners = new FastListenerList<>();
     m_dirty = dirty;
   }
 
@@ -352,9 +353,7 @@ public class Preferences implements IPreferences {
   }
 
   protected void fireEvent(PreferenceChangeEvent event) {
-    for (IPreferenceChangeListener listener : m_eventListeners.getListeners(IPreferenceChangeListener.class)) {
-      listener.preferenceChange(event);
-    }
+    preferenceChangeListeners().list().forEach(listener -> listener.preferenceChange(event));
   }
 
   protected synchronized boolean isDirty() {
@@ -381,13 +380,8 @@ public class Preferences implements IPreferences {
   }
 
   @Override
-  public void addPreferenceChangeListener(IPreferenceChangeListener listener) {
-    m_eventListeners.add(IPreferenceChangeListener.class, listener);
-  }
-
-  @Override
-  public void removePreferenceChangeListener(IPreferenceChangeListener listener) {
-    m_eventListeners.remove(IPreferenceChangeListener.class, listener);
+  public IFastListenerList<IPreferenceChangeListener> preferenceChangeListeners() {
+    return m_eventListeners;
   }
 
   @Override

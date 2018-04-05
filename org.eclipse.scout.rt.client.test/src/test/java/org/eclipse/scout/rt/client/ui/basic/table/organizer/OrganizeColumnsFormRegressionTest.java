@@ -12,14 +12,11 @@ package org.eclipse.scout.rt.client.ui.basic.table.organizer;
 
 import static org.mockito.Mockito.mock;
 
-import java.util.List;
-
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
-import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ProfilesBox.ProfilesTableField;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ProfilesBox.ProfilesTableField.Table;
@@ -77,27 +74,15 @@ public class OrganizeColumnsFormRegressionTest {
 
     profilesTable = form.getProfilesTableField().getTable();
 
-    profilesTable.addTableListener(new TableListener() {
-
-      @Override
-      public void tableChangedBatch(List<? extends TableEvent> batch) {
-        for (TableEvent e : batch) {
-          tableChanged(e);
-        }
-      }
-
-      @Override
-      public void tableChanged(TableEvent e) {
-        if (e.getType() == TableEvent.TYPE_REQUEST_FOCUS_IN_CELL) {
+    profilesTable.addTableListener(
+        e -> {
           IColumn focusedColumn = CollectionUtility.firstElement(e.getColumns());
           ITableRow focusedRow = CollectionUtility.firstElement(e.getRows());
-
           if (focusedColumn.equals(profilesTable.getConfigNameColumn())) {
             lastFocusedRowIndex.setValue(focusedRow.getRowIndex());
           }
-        }
-      }
-    });
+        },
+        TableEvent.TYPE_REQUEST_FOCUS_IN_CELL);
 
     profilesTable.deselectAllRows();
   }

@@ -13,12 +13,24 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import java.util.EventListener;
 import java.util.List;
 
+/**
+ * see {@link TableAdapter}
+ */
+@FunctionalInterface
 public interface TableListener extends EventListener {
 
   void tableChanged(TableEvent e);
 
   /**
-   * batch event for fast processing of batch changes
+   * @deprecated in order for better performance the most efficient way is to only register for the events that are
+   *             really handled. see the vararg parameter to {@link ITable#addTableListener(TableListener, int...)}
+   *             <p>
+   *             This method will be removed in 9.x
    */
-  void tableChangedBatch(List<? extends TableEvent> batch);
+  @Deprecated
+  default void tableChangedBatch(List<? extends TableEvent> events) {
+    for (TableEvent event : events) {
+      tableChanged(event);
+    }
+  }
 }

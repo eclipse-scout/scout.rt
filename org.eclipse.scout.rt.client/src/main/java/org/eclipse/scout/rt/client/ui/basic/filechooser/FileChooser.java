@@ -24,12 +24,13 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 
 public class FileChooser implements IFileChooser {
 
   private final IFileChooserUIFacade m_uiFacade;
-  private final EventListenerList m_listenerList = new EventListenerList();
+  private final FastListenerList<FileChooserListener> m_listenerList = new FastListenerList<>();
 
   private final List<String> m_fileExtensions;
   private final boolean m_multiSelect;
@@ -82,13 +83,8 @@ public class FileChooser implements IFileChooser {
   }
 
   @Override
-  public void addFileChooserListener(FileChooserListener listener) {
-    m_listenerList.add(FileChooserListener.class, listener);
-  }
-
-  @Override
-  public void removeFileChooserListener(FileChooserListener listener) {
-    m_listenerList.remove(FileChooserListener.class, listener);
+  public IFastListenerList<FileChooserListener> fileChooserListeners() {
+    return m_listenerList;
   }
 
   @Override
@@ -149,10 +145,7 @@ public class FileChooser implements IFileChooser {
   }
 
   protected void fireFileChooserEvent(FileChooserEvent e) {
-    FileChooserListener[] listeners = m_listenerList.getListeners(FileChooserListener.class);
-    for (FileChooserListener listener : listeners) {
-      listener.fileChooserChanged(e);
-    }
+    fileChooserListeners().list().forEach(listener -> listener.fileChooserChanged(e));
   }
 
   protected class P_UIFacade implements IFileChooserUIFacade {

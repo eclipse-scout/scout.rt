@@ -55,10 +55,11 @@ import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.ExtensionUtility;
@@ -74,7 +75,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   private static final Logger LOG = LoggerFactory.getLogger(AbstractWizard.class);
 
   private boolean m_initialized;
-  private final EventListenerList m_listenerList;
+  private final FastListenerList<WizardListener> m_listenerList;
   private List<IWizardStep<? extends IForm>> m_availableStepList;
   private List<IWizardStep<? extends IForm>> m_stepList;
   private IWizardStep<? extends IForm> m_activeStep;
@@ -92,7 +93,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   public AbstractWizard(boolean callInitializer) {
-    m_listenerList = new EventListenerList();
+    m_listenerList = new FastListenerList<>();
     m_changingLock = new OptimisticLock();
     m_accumulatedEvents = new ArrayList<>(3);
     m_availableStepList = new ArrayList<>(0);
@@ -405,18 +406,9 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   protected void injectStepsInternal(OrderedCollection<IWizardStep<? extends IForm>> steps) {
   }
 
-  /*
-   * Runtime
-   */
-
   @Override
-  public void addWizardListener(WizardListener listener) {
-    m_listenerList.add(WizardListener.class, listener);
-  }
-
-  @Override
-  public void removeWizardListener(WizardListener listener) {
-    m_listenerList.remove(WizardListener.class, listener);
+  public IFastListenerList<WizardListener> wizardListeners() {
+    return m_listenerList;
   }
 
   private void fireStateChanged() {
@@ -434,12 +426,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
       m_accumulatedEvents.add(e);
     }
     else {
-      WizardListener[] a = m_listenerList.getListeners(WizardListener.class);
-      if (a != null && a.length > 0) {
-        for (WizardListener element : a) {
-          element.wizardChanged(e);
-        }
-      }
+      wizardListeners().list().forEach(listener -> listener.wizardChanged(e));
     }
   }
 
@@ -1028,8 +1015,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   /**
-   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call any
-   * further chain elements.
+   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
+   * any further chain elements.
    */
   protected static class LocalWizardExtension<OWNER extends AbstractWizard> extends AbstractExtension<OWNER> implements IWizardExtension<OWNER> {
 

@@ -33,9 +33,10 @@ import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -52,7 +53,7 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   private List<ITileFilter<T>> m_filters;
   private boolean m_filteredTilesDirty = false;
   private Comparator<T> m_comparator;
-  private final EventListenerList m_listenerList;
+  private final FastListenerList<TileGridListener> m_listenerList;
 
   public AbstractTileGrid() {
     this(true);
@@ -62,7 +63,7 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
     super(false);
     m_objectExtensions = new ObjectExtensions<>(this, false);
     m_filters = new ArrayList<>();
-    m_listenerList = new EventListenerList();
+    m_listenerList = new FastListenerList<>();
     if (callInitializer) {
       callInitializer();
     }
@@ -877,13 +878,8 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   }
 
   @Override
-  public void addTileGridListener(TileGridListener listener) {
-    m_listenerList.add(TileGridListener.class, listener);
-  }
-
-  @Override
-  public void removeTileGridListener(TileGridListener listener) {
-    m_listenerList.remove(TileGridListener.class, listener);
+  public IFastListenerList<TileGridListener> tileGridListeners() {
+    return m_listenerList;
   }
 
   protected void fireTileClick(ITile tile, MouseButton mouseButton) {
@@ -898,10 +894,7 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   }
 
   protected void fireTileGridEventInternal(TileGridEvent e) {
-    TileGridListener[] listeners = m_listenerList.getListeners(TileGridListener.class);
-    for (TileGridListener l : listeners) {
-      l.tileGridChanged(e);
-    }
+    tileGridListeners().list().forEach(listener -> listener.tileGridChanged(e));
   }
 
   protected class P_PropertyChangeListener implements PropertyChangeListener {

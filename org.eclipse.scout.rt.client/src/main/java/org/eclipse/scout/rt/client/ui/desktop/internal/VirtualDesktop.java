@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.client.ui.desktop.internal;
 
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +21,6 @@ import java.util.function.Function;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.Coordinates;
-import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.IWidget;
@@ -36,12 +33,12 @@ import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.BrowserHistoryEntry;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
-import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
+import org.eclipse.scout.rt.client.ui.desktop.DesktopListeners;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
 import org.eclipse.scout.rt.client.ui.desktop.IOpenUriAction;
 import org.eclipse.scout.rt.client.ui.desktop.bench.layout.BenchLayoutData;
-import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeListener;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeManager;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -49,8 +46,9 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.visitor.IBreadthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
@@ -63,134 +61,48 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
  * initialization of an object with self-references.
  */
 public class VirtualDesktop implements IDesktop {
-
-  private final EventListenerList m_listenerList;
-  private final EventListenerList m_dataChangeListenerList;
-  private final Map<String, EventListenerList> m_propertyChangeListenerMap;
-  private final Map<Object, EventListenerList> m_dataChangeListenerMap;
+  private final DesktopListeners m_listeners;
+  private final BasicPropertySupport m_propertyChangeListeners;
+  private final IDataChangeManager m_dataChangeListeners;
 
   public VirtualDesktop() {
-    m_listenerList = new EventListenerList();
-    m_dataChangeListenerList = new EventListenerList();
-    m_propertyChangeListenerMap = new HashMap<>();
-    m_dataChangeListenerMap = new HashMap<>();
+    m_listeners = new DesktopListeners();
+    m_propertyChangeListeners = new BasicPropertySupport(this);
+    m_dataChangeListeners = BEANS.get(IDataChangeManager.class);
   }
 
-  public DesktopListener[] getDesktopListeners() {
-    return m_listenerList.getListeners(DesktopListener.class);
-  }
-
-  public IDataChangeListener[] getDataChangeListeners() {
-    return m_dataChangeListenerList.getListeners(IDataChangeListener.class);
-  }
-
-  public Map<Object, EventListenerList> getDataChangeListenerMap() {
-    return m_dataChangeListenerMap;
-  }
-
-  public Map<String, EventListenerList> getPropertyChangeListenerMap() {
-    return m_propertyChangeListenerMap;
+  public Map<String, List<PropertyChangeListener>> getPropertyChangeListenerMap() {
+    return m_propertyChangeListeners.getSpecificPropertyChangeListeners();
   }
 
   @Override
   public void addPropertyChangeListener(PropertyChangeListener listener) {
-    EventListenerList list = m_propertyChangeListenerMap.computeIfAbsent(null, k -> new EventListenerList());
-    list.add(PropertyChangeListener.class, listener);
+    m_propertyChangeListeners.addPropertyChangeListener(listener);
   }
 
   @Override
   public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-    EventListenerList list = m_propertyChangeListenerMap.computeIfAbsent(propertyName, k -> new EventListenerList());
-    list.add(PropertyChangeListener.class, listener);
+    m_propertyChangeListeners.addPropertyChangeListener(propertyName, listener);
   }
 
   @Override
   public void removePropertyChangeListener(PropertyChangeListener listener) {
-    for (Iterator<EventListenerList> it = m_dataChangeListenerMap.values().iterator(); it.hasNext();) {
-      EventListenerList list = it.next();
-      list.remove(PropertyChangeListener.class, listener);
-      if (list.getListenerCount(DataChangeListener.class) == 0) {
-        it.remove();
-      }
-    }
+    m_propertyChangeListeners.removePropertyChangeListener(listener);
   }
 
   @Override
   public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-    for (Iterator<EventListenerList> it = m_dataChangeListenerMap.values().iterator(); it.hasNext();) {
-      EventListenerList list = it.next();
-      list.remove(PropertyChangeListener.class, listener);
-      if (list.getListenerCount(DataChangeListener.class) == 0) {
-        it.remove();
-      }
-    }
+    m_propertyChangeListeners.removePropertyChangeListener(propertyName, listener);
   }
 
   @Override
-  public void addDesktopListener(DesktopListener l) {
-    m_listenerList.add(DesktopListener.class, l);
+  public DesktopListeners desktopListeners() {
+    return m_listeners;
   }
 
   @Override
-  public void addDesktopListenerAtExecutionEnd(DesktopListener l) {
-    m_listenerList.insertAtFront(DesktopListener.class, l);
-  }
-
-  @Override
-  public void removeDesktopListener(DesktopListener l) {
-    m_listenerList.remove(DesktopListener.class, l);
-  }
-
-  @Override
-  public void addDataChangeListener(DataChangeListener listener, Object... dataTypes) {
-    if (dataTypes == null || dataTypes.length == 0) {
-      EventListenerList list = m_dataChangeListenerMap.computeIfAbsent(null, k -> new EventListenerList());
-      list.add(DataChangeListener.class, listener);
-    }
-    else {
-      for (Object dataType : dataTypes) {
-        if (dataType != null) {
-          EventListenerList list = m_dataChangeListenerMap.computeIfAbsent(dataType, k -> new EventListenerList());
-          list.add(DataChangeListener.class, listener);
-        }
-      }
-    }
-  }
-
-  @Override
-  public void addDataChangeListener(IDataChangeListener listener) {
-    m_dataChangeListenerList.add(IDataChangeListener.class, listener);
-  }
-
-  @Override
-  public void removeDataChangeListener(DataChangeListener listener, Object... dataTypes) {
-    if (dataTypes == null || dataTypes.length == 0) {
-      for (Iterator<EventListenerList> it = m_dataChangeListenerMap.values().iterator(); it.hasNext();) {
-        EventListenerList list = it.next();
-        list.removeAll(DataChangeListener.class, listener);
-        if (list.getListenerCount(DataChangeListener.class) == 0) {
-          it.remove();
-        }
-      }
-    }
-    else {
-      for (Object dataType : dataTypes) {
-        if (dataType != null) {
-          EventListenerList list = m_dataChangeListenerMap.get(dataType);
-          if (list != null) {
-            list.remove(DataChangeListener.class, listener);
-            if (list.getListenerCount(DataChangeListener.class) == 0) {
-              m_dataChangeListenerMap.remove(dataType);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  @Override
-  public void removeDataChangeListener(IDataChangeListener listener) {
-    m_dataChangeListenerList.remove(IDataChangeListener.class, listener);
+  public IDataChangeManager dataChangeListeners() {
+    return m_dataChangeListeners;
   }
 
   private UnsupportedOperationException createUnsupportedOperationException() {

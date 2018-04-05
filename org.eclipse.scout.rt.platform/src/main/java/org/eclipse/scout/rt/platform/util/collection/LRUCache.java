@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 
 /**
  * Default implementation of a last recently used cache mechanism. This implementation is thread-safe.
@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.platform.util.EventListenerList;
  */
 @SuppressWarnings("squid:S2160")
 public class LRUCache<K, V> extends ConcurrentExpiringMap<K, V> {
-  private final EventListenerList m_listenerList = new EventListenerList();
+  private final FastListenerList<LRUCache.DisposeListener> m_listenerList = new FastListenerList<>();
 
   public LRUCache(int targetSize, long timeToLive) {
     super(timeToLive, TimeUnit.MILLISECONDS, targetSize);
@@ -104,18 +104,19 @@ public class LRUCache<K, V> extends ConcurrentExpiringMap<K, V> {
     void valueDisposed(Object key, Object value);
   }
 
+  public FastListenerList<LRUCache.DisposeListener> disposeListeners() {
+    return m_listenerList;
+  }
+
   public void addDisposeListener(DisposeListener listener) {
-    m_listenerList.add(DisposeListener.class, listener);
+    disposeListeners().add(listener);
   }
 
   public void removeDisposeListener(DisposeListener listener) {
-    m_listenerList.remove(DisposeListener.class, listener);
+    disposeListeners().remove(listener);
   }
 
   private void fireValueDisposed(Object key, Object value) {
-    EventListener[] a = m_listenerList.getListeners(DisposeListener.class);
-    for (EventListener anA : a) {
-      ((DisposeListener) anA).valueDisposed(key, value);
-    }
+    disposeListeners().list().forEach(listener -> listener.valueDisposed(key, value));
   }
 }

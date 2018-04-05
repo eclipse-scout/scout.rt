@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 
 /**
  * This is an invisible root menu container. Subclasses of this interface are used of form fields as an invisible root
@@ -28,8 +29,13 @@ public interface IContextMenu extends IMenu {
    */
   Set<? extends IMenuType> getCurrentMenuTypes();
 
-  void addContextMenuListener(ContextMenuListener listener);
+  IFastListenerList<ContextMenuListener> contextMenuListeners();
 
-  void removeContextMenuListener(ContextMenuListener listener);
+  default void addContextMenuListener(ContextMenuListener listener) {
+    contextMenuListeners().add(listener);
+  }
 
+  default void removeContextMenuListener(ContextMenuListener listener) {
+    contextMenuListeners().remove(listener);
+  }
 }

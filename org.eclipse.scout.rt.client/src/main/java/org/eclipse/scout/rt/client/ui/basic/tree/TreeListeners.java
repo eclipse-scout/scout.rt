@@ -1,12 +1,17 @@
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
-import org.eclipse.scout.rt.platform.util.AbstractCompositeEventListenerList;
+import org.eclipse.scout.rt.platform.util.event.AbstractGroupedListenerList;
 
-public final class TreeListeners extends AbstractCompositeEventListenerList<TreeListener, TreeEvent> {
+public final class TreeListeners extends AbstractGroupedListenerList<TreeListener, TreeEvent, Integer> {
 
   @Override
-  protected int eventType(TreeEvent event) {
+  protected Integer eventType(TreeEvent event) {
     return event.getType();
+  }
+
+  @Override
+  protected Integer allEventsType() {
+    return null;
   }
 
   @Override

@@ -36,11 +36,10 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.Form
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
-import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IWidget;
-import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
@@ -133,7 +132,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   private BasicPropertySupport m_subtreePropertyChangeSupport;
   private P_MasterListener m_currentMasterListener;// my master
   private final P_FieldPropertyChangeListener m_fieldPropertyChangeListener;
-  private DataChangeListener m_internalDataChangeListener;
+  private IDataChangeListener m_internalDataChangeListener;
   protected ContributionComposite m_contributionHolder;
   private String m_initialLabel;
   private final ObjectExtensions<AbstractFormField, IFormFieldExtension<? extends AbstractFormField>> m_objectExtensions;
@@ -1049,7 +1048,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   /**
-   * Register a {@link DataChangeListener} on the desktop for these dataTypes<br>
+   * Register a {@link IDataChangeListener} on the desktop for these dataTypes<br>
    * Example:
    *
    * <pre>
@@ -1058,13 +1057,13 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    */
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
-      m_internalDataChangeListener = (WeakDataChangeListener) this::interceptDataChanged;
+      m_internalDataChangeListener = event -> interceptDataChanged(event.getEventType());
     }
-    IDesktop.CURRENT.get().addDataChangeListener(m_internalDataChangeListener, dataTypes);
+    IDesktop.CURRENT.get().dataChangeListeners().add(m_internalDataChangeListener, true, dataTypes);
   }
 
   /**
-   * Unregister the {@link DataChangeListener} from the desktop for these dataTypes<br>
+   * Unregister the {@link IDataChangeListener} from the desktop for these dataTypes<br>
    * Example:
    *
    * <pre>

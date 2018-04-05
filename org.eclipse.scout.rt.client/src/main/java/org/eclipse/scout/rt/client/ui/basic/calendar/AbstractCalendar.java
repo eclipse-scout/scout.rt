@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Deque;
-import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -51,11 +50,12 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
@@ -78,7 +78,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
   private int m_calendarChanging;
   private final DateTimeFormatFactory m_dateTimeFormatFactory;
   private List<CalendarEvent> m_calendarEventBuffer;
-  private final EventListenerList m_listenerList;
+  private final FastListenerList<CalendarListener> m_listenerList;
   private IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractCalendar, ICalendarExtension<? extends AbstractCalendar>> m_objectExtensions;
 
@@ -92,7 +92,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
   public AbstractCalendar(boolean callInitializer) {
     super(false);
     m_calendarEventBuffer = new ArrayList<>();
-    m_listenerList = new EventListenerList();
+    m_listenerList = new FastListenerList<>();
     m_dateTimeFormatFactory = new DateTimeFormatFactory();
     m_componentsByProvider = new HashMap<>();
     m_objectExtensions = new ObjectExtensions<>(this, false);
@@ -814,13 +814,8 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
    * Model Observer
    */
   @Override
-  public void addCalendarListener(CalendarListener listener) {
-    m_listenerList.add(CalendarListener.class, listener);
-  }
-
-  @Override
-  public void removeCalendarListener(CalendarListener listener) {
-    m_listenerList.remove(CalendarListener.class, listener);
+  public IFastListenerList<CalendarListener> calendarListeners() {
+    return m_listenerList;
   }
 
   private void fireCalendarComponentAction() {
@@ -844,12 +839,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
       m_calendarEventBuffer.add(e);
     }
     else {
-      EventListener[] listeners = m_listenerList.getListeners(CalendarListener.class);
-      if (listeners != null && listeners.length > 0) {
-        for (EventListener listener : listeners) {
-          ((CalendarListener) listener).calendarChanged(e);
-        }
-      }
+      calendarListeners().list().forEach(listener -> listener.calendarChanged(e));
     }
   }
 
@@ -859,12 +849,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
       LOG.error("Illegal State: firing a event batch while calendar is changing");
     }
     else {
-      EventListener[] listeners = m_listenerList.getListeners(CalendarListener.class);
-      if (listeners != null && listeners.length > 0) {
-        for (EventListener listener : listeners) {
-          ((CalendarListener) listener).calendarChangedBatch(batch);
-        }
-      }
+      calendarListeners().list().forEach(listener -> listener.calendarChangedBatch(batch));
     }
   }
 

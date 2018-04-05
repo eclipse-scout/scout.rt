@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -105,7 +104,6 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
@@ -159,7 +157,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   private final Map<CompositeObject, ITableRow> m_deletedRows;
   private final List<ITableRowFilter> m_rowFilters;
   private final Map<String, BinaryResource> m_attachments;
-  private final EventListenerList m_listenerList;
+  private final TableListeners m_listeners;
   private final Object m_cachedFilteredRowsLock;
   private final ObjectExtensions<AbstractTable, ITableExtension<? extends AbstractTable>> m_objectExtensions;
 
@@ -209,7 +207,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     m_checkedRows = new LinkedHashSet<>();
     m_rowDecorationBuffer = new HashSet<>();
     m_rowValueChangeBuffer = new HashMap<>();
-    m_listenerList = new EventListenerList();
+    m_listeners = new TableListeners();
     m_cachedRowsLock = new Object();
     m_cachedFilteredRowsLock = new Object();
     m_rows = Collections.synchronizedList(new ArrayList<ITableRow>(1));
@@ -220,7 +218,14 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     m_initLock = new OptimisticLock();
     m_objectExtensions = new ObjectExtensions<>(this, false);
     //add single observer listener
-    addTableListener(new P_TableListener());
+    addTableListener(e -> {
+      try {
+        interceptRowsSelected(e.getRows());
+      }
+      catch (Exception ex) {
+        BEANS.get(ExceptionHandler.class).handle(ex);
+      }
+    }, TableEvent.TYPE_ROWS_SELECTED);
     if (callInitializer) {
       callInitializer();
     }
@@ -989,7 +994,17 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
             break;
         }
       }
-    });
+    },
+        TableEvent.TYPE_ROWS_DRAG_REQUEST,
+        TableEvent.TYPE_ROW_DROP_ACTION,
+        TableEvent.TYPE_ROWS_COPY_REQUEST,
+        TableEvent.TYPE_ALL_ROWS_DELETED,
+        TableEvent.TYPE_ROWS_DELETED,
+        TableEvent.TYPE_ROWS_INSERTED,
+        TableEvent.TYPE_ROWS_UPDATED,
+        TableEvent.TYPE_ROWS_CHECKED,
+        TableEvent.TYPE_COLUMN_HEADERS_UPDATED,
+        TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED);
   }
 
   protected void initMenus() {
@@ -3732,13 +3747,13 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       }
       //
       if (!getEventBuffer().isEmpty()) {
-        List<TableEvent> coalescedEvents = getEventBuffer().consumeAndCoalesceEvents();
+        List<TableEvent> list = getEventBuffer().consumeAndCoalesceEvents();
         // fire the batch and set tree to changing, otherwise a listener might trigger another events that
         // then are processed before all other listeners received that batch
         try {
           setTableChanging(true);
           //
-          fireTableEventBatchInternal(coalescedEvents);
+          m_listeners.fireEvents(list);
         }
         finally {
           setTableChanging(false);
@@ -3873,22 +3888,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   protected void execResetColumns(Set<String> options) {
   }
 
-  /**
-   * Model Observer
-   */
   @Override
-  public void addTableListener(TableListener listener) {
-    m_listenerList.add(TableListener.class, listener);
-  }
-
-  @Override
-  public void removeTableListener(TableListener listener) {
-    m_listenerList.remove(TableListener.class, listener);
-  }
-
-  @Override
-  public void addUITableListener(TableListener listener) {
-    m_listenerList.insertAtFront(TableListener.class, listener);
+  public TableListeners tableListeners() {
+    return m_listeners;
   }
 
   protected IEventHistory<TableEvent> createEventHistory() {
@@ -4082,21 +4084,12 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       getEventBuffer().add(e);
     }
     else {
-      TableListener[] listeners = m_listenerList.getListeners(TableListener.class);
-      for (TableListener l : listeners) {
-        l.tableChanged(e);
-      }
+      doFireTableEvent(e);
     }
   }
 
-  // batch handler
-  private void fireTableEventBatchInternal(List<? extends TableEvent> batch) {
-    if (CollectionUtility.hasElements(batch)) {
-      EventListener[] listeners = m_listenerList.getListeners(TableListener.class);
-      for (EventListener l : listeners) {
-        ((TableListener) l).tableChangedBatch(batch);
-      }
-    }
+  protected void doFireTableEvent(TableEvent e) {
+    m_listeners.fireEvent(e);
   }
 
   @Override
@@ -4687,24 +4680,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       return new TableRow(getColumnSet());
     }
 
-  }
-
-  private class P_TableListener extends TableAdapter {
-    @Override
-    public void tableChanged(TableEvent e) {
-      switch (e.getType()) {
-        case TableEvent.TYPE_ROWS_SELECTED: {
-          // single observer exec
-          try {
-            interceptRowsSelected(e.getRows());
-          }
-          catch (Exception ex) {
-            BEANS.get(ExceptionHandler.class).handle(ex);
-          }
-          break;
-        }
-      }
-    }
   }
 
   private static class P_CellEditorContext {

@@ -15,7 +15,6 @@ import static org.junit.Assert.assertEquals;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -173,8 +172,31 @@ abstract class AbstractTestRowDataColumn<T> extends AbstractColumn<T> {
       if (m_updateTableRowListener != null) {
         getTable().removeTableListener(m_updateTableRowListener);
       }
-      m_updateTableRowListener = new P_UpdateTableRowListener(this);
-      getTable().addTableListener(m_updateTableRowListener);
+      AbstractTestRowDataColumn<T> self = this;
+      m_updateTableRowListener = e -> {
+        try {
+          getTable().setTableChanging(true);
+          for (ITableRow row : e.getRows()) {
+            // Trigger "updateTableColumn" when a row was inserted, or the value of this column is changed.
+            // Do _not_ trigger the method when other columns change their values (this might lead to loops).
+            if (e.getType() == TableEvent.TYPE_ROWS_INSERTED || e.getUpdatedColumns(row).contains(self)) {
+              final int origStatus = row.getStatus();
+              updateTableColumns(row, getValue(row));
+              row.setStatus(origStatus);
+            }
+          }
+        }
+        catch (ProcessingException ex) {
+          BEANS.get(ExceptionHandler.class).handle(ex);
+        }
+        finally {
+          getTable().setTableChanging(false);
+        }
+      };
+      getTable().addTableListener(
+          m_updateTableRowListener,
+          TableEvent.TYPE_ROWS_INSERTED,
+          TableEvent.TYPE_ROWS_UPDATED);
     }
   }
 
@@ -193,42 +215,4 @@ abstract class AbstractTestRowDataColumn<T> extends AbstractColumn<T> {
    * Updates all other columns based on this column's value.
    */
   protected abstract void updateTableColumns(ITableRow r, T newValue);
-
-  protected class P_UpdateTableRowListener extends TableAdapter {
-
-    private final IColumn<?> m_column;
-
-    public P_UpdateTableRowListener(IColumn<?> column) {
-      m_column = column;
-    }
-
-    @Override
-    public void tableChanged(TableEvent e) {
-      switch (e.getType()) {
-        case TableEvent.TYPE_ROWS_INSERTED:
-        case TableEvent.TYPE_ROWS_UPDATED: {
-          try {
-            getTable().setTableChanging(true);
-            for (ITableRow row : e.getRows()) {
-              // Trigger "updateTableColumn" when a row was inserted, or the value of this column is changed.
-              // Do _not_ trigger the method when other columns change their values (this might lead to loops).
-              if (e.getType() == TableEvent.TYPE_ROWS_INSERTED || e.getUpdatedColumns(row).contains(m_column)) {
-                final int origStatus = row.getStatus();
-                updateTableColumns(row, getValue(row));
-                row.setStatus(origStatus);
-              }
-            }
-          }
-          catch (ProcessingException ex) {
-            BEANS.get(ExceptionHandler.class).handle(ex);
-          }
-          finally {
-            getTable().setTableChanging(false);
-          }
-          break;
-        }
-      }
-    }
-  }
-
 }

@@ -584,76 +584,79 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     setRootNode(new AbstractTreeNode() {
     });
     // add Convenience observer for drag & drop callbacks and event history
-    addTreeListener(new TreeAdapter() {
-
-      @Override
-      public void treeChanged(TreeEvent e) {
-        //event history
-        IEventHistory<TreeEvent> h = getEventHistory();
-        if (h != null) {
-          h.notifyEvent(e);
-        }
-        //dnd
-        switch (e.getType()) {
-          case TreeEvent.TYPE_NODES_DRAG_REQUEST: {
-            m_lastSeenDropNode = null;
-            if (e.getDragObject() == null) {
-              try {
-                TransferObject transferObject = interceptDrag(e.getNode());
-                if (transferObject == null) {
-                  transferObject = interceptDrag(e.getNodes());
+    addTreeListener(
+        e -> {
+          //event history
+          IEventHistory<TreeEvent> h = getEventHistory();
+          if (h != null) {
+            h.notifyEvent(e);
+          }
+          //dnd
+          switch (e.getType()) {
+            case TreeEvent.TYPE_NODES_DRAG_REQUEST: {
+              m_lastSeenDropNode = null;
+              if (e.getDragObject() == null) {
+                try {
+                  TransferObject transferObject = interceptDrag(e.getNode());
+                  if (transferObject == null) {
+                    transferObject = interceptDrag(e.getNodes());
+                  }
+                  e.setDragObject(transferObject);
                 }
-                e.setDragObject(transferObject);
+                catch (Exception t) {
+                  LOG.error("Drag", t);
+                }
               }
-              catch (Exception t) {
-                LOG.error("Drag", t);
-              }
+              break;
             }
-            break;
-          }
-          case TreeEvent.TYPE_NODE_DROP_ACTION: {
-            m_lastSeenDropNode = null;
-            if (e.getDropObject() != null) {
+            case TreeEvent.TYPE_NODE_DROP_ACTION: {
+              m_lastSeenDropNode = null;
+              if (e.getDropObject() != null) {
+                try {
+                  interceptDrop(e.getNode(), e.getDropObject());
+                }
+                catch (Exception t) {
+                  LOG.error("Drop", t);
+                }
+              }
+              break;
+            }
+            case TreeEvent.TYPE_NODES_SELECTED: {
+              rebuildKeyStrokesInternal();
+              break;
+            }
+            case TreeEvent.TYPE_NODES_CHECKED: {
               try {
-                interceptDrop(e.getNode(), e.getDropObject());
+                interceptNodesChecked(CollectionUtility.arrayList(e.getNodes()));
               }
-              catch (Exception t) {
-                LOG.error("Drop", t);
+              catch (RuntimeException ex) {
+                BEANS.get(ExceptionHandler.class).handle(ex);
               }
+              break;
             }
-            break;
-          }
-          case TreeEvent.TYPE_NODES_SELECTED: {
-            rebuildKeyStrokesInternal();
-            break;
-          }
-          case TreeEvent.TYPE_NODES_CHECKED: {
-            try {
-              interceptNodesChecked(CollectionUtility.arrayList(e.getNodes()));
-            }
-            catch (RuntimeException ex) {
-              BEANS.get(ExceptionHandler.class).handle(ex);
-            }
-            break;
-          }
-          case TreeEvent.TYPE_NODE_DROP_TARGET_CHANGED: {
-            try {
-              if (m_lastSeenDropNode == null || m_lastSeenDropNode != e.getNode()) {
-                m_lastSeenDropNode = e.getNode();
-                interceptDropTargetChanged(e.getNode());
+            case TreeEvent.TYPE_NODE_DROP_TARGET_CHANGED: {
+              try {
+                if (m_lastSeenDropNode == null || m_lastSeenDropNode != e.getNode()) {
+                  m_lastSeenDropNode = e.getNode();
+                  interceptDropTargetChanged(e.getNode());
+                }
               }
+              catch (RuntimeException ex) {
+                LOG.error("DropTargetChanged", ex);
+              }
+              break;
             }
-            catch (RuntimeException ex) {
-              LOG.error("DropTargetChanged", ex);
+            case TreeEvent.TYPE_DRAG_FINISHED: {
+              m_lastSeenDropNode = null;
             }
-            break;
           }
-          case TreeEvent.TYPE_DRAG_FINISHED: {
-            m_lastSeenDropNode = null;
-          }
-        }
-      }
-    });
+        },
+        TreeEvent.TYPE_NODES_DRAG_REQUEST,
+        TreeEvent.TYPE_NODE_DROP_ACTION,
+        TreeEvent.TYPE_NODES_SELECTED,
+        TreeEvent.TYPE_NODES_CHECKED,
+        TreeEvent.TYPE_NODE_DROP_TARGET_CHANGED,
+        TreeEvent.TYPE_DRAG_FINISHED);
     // key shortcuts
     List<Class<? extends IKeyStroke>> configuredKeyStrokes = getConfiguredKeyStrokes();
     List<IKeyStroke> ksList = new ArrayList<>(configuredKeyStrokes.size());
@@ -2231,22 +2234,9 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     return resolvedNodes;
   }
 
-  /*
-   * Tree Observer
-   */
   @Override
-  public void addTreeListener(TreeListener listener, int... eventTypes) {
-    m_listeners.add(listener, false, eventTypes);
-  }
-
-  @Override
-  public void addUITreeListener(TreeListener listener, int... eventTypes) {
-    m_listeners.addLastCalled(listener, false, eventTypes);
-  }
-
-  @Override
-  public void removeTreeListener(TreeListener listener, int... eventTypes) {
-    m_listeners.remove(listener, eventTypes);
+  public TreeListeners treeListeners() {
+    return m_listeners;
   }
 
   protected IEventHistory<TreeEvent> createEventHistory() {

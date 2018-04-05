@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
 
 /**
@@ -54,16 +55,22 @@ public interface ISession {
 
   Object computeDataIfAbsent(String key, Callable<?> producer);
 
+  IFastListenerList<ISessionListener> sessionListeners();
+
   /**
    * Registers the given listener to be notified about session state changes. Typically, a listener is installed in
    * <code>execLoadSession</code>.
    */
-  void addListener(ISessionListener sessionListener);
+  default void addListener(ISessionListener sessionListener) {
+    sessionListeners().add(sessionListener);
+  }
 
   /**
    * Removes the given listener; has no effect if not registered.
    */
-  void removeListener(ISessionListener sessionListener);
+  default void removeListener(ISessionListener sessionListener) {
+    sessionListeners().remove(sessionListener);
+  }
 
   /**
    * Invoke this method to initialize the session. The session is active just after this method returns.

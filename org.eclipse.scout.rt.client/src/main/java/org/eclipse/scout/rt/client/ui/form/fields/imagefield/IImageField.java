@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.imagefield;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.data.basic.AffineTransformSpec;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
 
@@ -68,9 +69,15 @@ public interface IImageField extends IFormField, IDNDSupport, IContextMenuOwner 
 
   void setImageTransform(AffineTransformSpec t);
 
-  void addImageFieldListener(ImageFieldListener listener);
+  IFastListenerList<ImageFieldListener> imageFieldListeners();
 
-  void removeImageFieldListener(ImageFieldListener listener);
+  default void addImageFieldListener(ImageFieldListener listener) {
+    imageFieldListeners().add(listener);
+  }
+
+  default void removeImageFieldListener(ImageFieldListener listener) {
+    imageFieldListeners().remove(listener);
+  }
 
   double getZoomDeltaValue();
 

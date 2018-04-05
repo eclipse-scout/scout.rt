@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.html.IHtmlContent;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 
 /**
  * Interface for message box.<br/>
@@ -62,9 +63,15 @@ public interface IMessageBox extends IWidget {
   /*
    * Model observer
    */
-  void addMessageBoxListener(MessageBoxListener listener);
+  IFastListenerList<MessageBoxListener> messageBoxListeners();
 
-  void removeMessageBoxListener(MessageBoxListener listener);
+  default void addMessageBoxListener(MessageBoxListener listener) {
+    messageBoxListeners().add(listener);
+  }
+
+  default void removeMessageBoxListener(MessageBoxListener listener) {
+    messageBoxListeners().remove(listener);
+  }
 
   /*
    * ui messaging

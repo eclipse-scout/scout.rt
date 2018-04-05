@@ -14,14 +14,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 
 @SuppressWarnings("findbugs:UG_SYNC_SET_UNSYNC_GET")
 public abstract class AbstractConfigProperty<DATA_TYPE, RAW_TYPE> implements IConfigProperty<DATA_TYPE> {
 
   private final Map<String /* namespace, may be null */, P_ParsedPropertyValueEntry<DATA_TYPE>> m_values = new HashMap<>();
-  private final EventListenerList m_listeners = new EventListenerList();
+  private final FastListenerList<IConfigChangedListener> m_listeners = new FastListenerList<>();
 
   @Override
   public DATA_TYPE getDefaultValue() {
@@ -105,25 +106,13 @@ public abstract class AbstractConfigProperty<DATA_TYPE, RAW_TYPE> implements ICo
     fireConfigChangedEvent(new ConfigPropertyChangeEvent(this, oldValue, newValue, namespace, ConfigPropertyChangeEvent.TYPE_VALUE_CHANGED));
   }
 
+  @Override
+  public IFastListenerList<IConfigChangedListener> configChangedListeners() {
+    return m_listeners;
+  }
+
   protected void fireConfigChangedEvent(ConfigPropertyChangeEvent e) {
-    IConfigChangedListener[] listeners = m_listeners.getListeners(IConfigChangedListener.class);
-    if (listeners == null || listeners.length < 1) {
-      return;
-    }
-
-    for (IConfigChangedListener listener : listeners) {
-      listener.configPropertyChanged(e);
-    }
-  }
-
-  @Override
-  public void addListener(IConfigChangedListener listener) {
-    m_listeners.add(IConfigChangedListener.class, listener);
-  }
-
-  @Override
-  public void removeListener(IConfigChangedListener listener) {
-    m_listeners.remove(IConfigChangedListener.class, listener);
+    configChangedListeners().list().forEach(listener -> listener.configPropertyChanged(e));
   }
 
   private static final class P_ParsedPropertyValueEntry<TYPE> {

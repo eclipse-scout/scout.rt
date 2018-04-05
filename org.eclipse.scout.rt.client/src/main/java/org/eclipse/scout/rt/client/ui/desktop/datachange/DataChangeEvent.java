@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.desktop.datachange;
 
 import java.util.EventObject;
+import java.util.Objects;
 
 import org.eclipse.scout.rt.platform.util.ChangeStatus;
 
@@ -20,13 +21,12 @@ import org.eclipse.scout.rt.platform.util.ChangeStatus;
  * @since 7.1
  */
 public class DataChangeEvent extends EventObject {
-
   private static final long serialVersionUID = 1L;
 
-  private Object m_eventType;
-  private int m_changeStatus;
-  private Object m_key;
-  private Object m_data;
+  private final Object m_eventType;
+  private final int m_changeStatus;
+  private final Object m_key;
+  private final Object m_data;
 
   /**
    * @param source
@@ -67,4 +67,50 @@ public class DataChangeEvent extends EventObject {
     return m_data;
   }
 
+  @Override
+  public int hashCode() {
+    return Objects.hash(m_eventType, m_changeStatus, m_key, m_data);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    DataChangeEvent other = (DataChangeEvent) obj;
+    if (m_changeStatus != other.m_changeStatus) {
+      return false;
+    }
+    if (m_eventType == null) {
+      if (other.m_eventType != null) {
+        return false;
+      }
+    }
+    else if (!m_eventType.equals(other.m_eventType)) {
+      return false;
+    }
+    if (m_key == null) {
+      if (other.m_key != null) {
+        return false;
+      }
+    }
+    else if (!m_key.equals(other.m_key)) {
+      return false;
+    }
+    if (m_data == null) {
+      if (other.m_data != null) {
+        return false;
+      }
+    }
+    else if (!m_data.equals(other.m_data)) {
+      return false;
+    }
+    return true;
+  }
 }

@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -41,7 +40,23 @@ public class TreeContextMenu extends AbstractContextMenu<ITree> implements ITree
   @Override
   protected void initConfig() {
     super.initConfig();
-    getContainer().addTreeListener(new P_OwnerTreeListener(), TreeEvent.TYPE_NODES_SELECTED, TreeEvent.TYPE_NODES_UPDATED);
+    getContainer().addTreeListener(
+        e -> {
+          switch (e.getType()) {
+            case TreeEvent.TYPE_NODES_SELECTED: {
+              handleOwnerValueChanged();
+              break;
+            }
+            case TreeEvent.TYPE_NODES_UPDATED: {
+              if (CollectionUtility.containsAny(e.getNodes(), m_currentSelection)) {
+                handleOwnerValueChanged();
+              }
+              break;
+            }
+          }
+        },
+        TreeEvent.TYPE_NODES_SELECTED,
+        TreeEvent.TYPE_NODES_UPDATED);
     // init current menu types
     setCurrentMenuTypes(MenuUtility.getMenuTypesForTreeSelection(getContainer().getSelectedNodes()));
     calculateLocalVisibility();
@@ -111,19 +126,6 @@ public class TreeContextMenu extends AbstractContextMenu<ITree> implements ITree
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
     if (ITable.PROP_ENABLED.equals(evt.getPropertyName())) {
       handleOwnerEnabledChanged();
-    }
-  }
-
-  private class P_OwnerTreeListener extends TreeAdapter {
-
-    @Override
-    public void treeChanged(TreeEvent e) {
-      if (e.getType() == TreeEvent.TYPE_NODES_SELECTED) {
-        handleOwnerValueChanged();
-      }
-      else if (e.getType() == TreeEvent.TYPE_NODES_UPDATED && CollectionUtility.containsAny(e.getNodes(), m_currentSelection)) {
-        handleOwnerValueChanged();
-      }
     }
   }
 }

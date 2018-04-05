@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 
 /**
  * This model represents a separate "website" inside the application.
@@ -68,9 +69,15 @@ public interface IBrowserField extends IFormField {
 
   IBrowserFieldUIFacade getUIFacade();
 
-  void addBrowserFieldListener(BrowserFieldListener listener);
+  IFastListenerList<BrowserFieldListener> browserFieldListeners();
 
-  void removeBrowserFieldListener(BrowserFieldListener listener);
+  default void addBrowserFieldListener(BrowserFieldListener listener) {
+    browserFieldListeners().add(listener);
+  }
+
+  default void removeBrowserFieldListener(BrowserFieldListener listener) {
+    browserFieldListeners().remove(listener);
+  }
 
   /**
    * Sets the content of the field to the given location. The location should be an URI. A validation is performed by

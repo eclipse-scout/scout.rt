@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.messagebox;
 
 import java.beans.PropertyChangeListener;
-import java.util.EventListener;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
@@ -33,8 +32,9 @@ import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +47,7 @@ public class MessageBox extends AbstractWidget implements IMessageBox {
 
   private static final Logger LOG = LoggerFactory.getLogger(MessageBox.class);
 
-  private final EventListenerList m_listenerList = new EventListenerList();
+  private final FastListenerList<MessageBoxListener> m_listenerList = new FastListenerList<>();
   private final IMessageBoxUIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
 
   private IDisplayParent m_displayParent;
@@ -78,7 +78,7 @@ public class MessageBox extends AbstractWidget implements IMessageBox {
   @Override
   @PostConstruct
   protected void initConfig() {
-    super.initConfig();	  
+    super.initConfig();
     m_displayParent = BEANS.get(DisplayParentResolver.class).resolve(this);
   }
 
@@ -261,17 +261,9 @@ public class MessageBox extends AbstractWidget implements IMessageBox {
     }
   }
 
-  /*
-   * Model observer
-   */
   @Override
-  public void addMessageBoxListener(MessageBoxListener listener) {
-    m_listenerList.add(MessageBoxListener.class, listener);
-  }
-
-  @Override
-  public void removeMessageBoxListener(MessageBoxListener listener) {
-    m_listenerList.remove(MessageBoxListener.class, listener);
+  public IFastListenerList<MessageBoxListener> messageBoxListeners() {
+    return m_listenerList;
   }
 
   protected void fireClosed() {
@@ -279,12 +271,7 @@ public class MessageBox extends AbstractWidget implements IMessageBox {
   }
 
   protected void fireMessageBoxEvent(MessageBoxEvent e) {
-    EventListener[] listeners = m_listenerList.getListeners(MessageBoxListener.class);
-    if (listeners != null && listeners.length > 0) {
-      for (EventListener listener : listeners) {
-        ((MessageBoxListener) listener).messageBoxChanged(e);
-      }
-    }
+    messageBoxListeners().list().forEach(listener -> listener.messageBoxChanged(e));
   }
 
   @Override

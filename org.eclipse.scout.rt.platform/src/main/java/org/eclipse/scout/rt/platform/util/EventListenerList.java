@@ -18,8 +18,16 @@ import java.util.EventListener;
 import org.eclipse.scout.rt.platform.eventlistprofiler.EventListenerProfiler;
 import org.eclipse.scout.rt.platform.eventlistprofiler.IEventListenerSnapshot;
 import org.eclipse.scout.rt.platform.eventlistprofiler.IEventListenerSource;
+import org.eclipse.scout.rt.platform.util.event.AbstractGroupedListenerList;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 
 /**
+ * NOTE: This class has poor performance with large numbers of listeners and add /remove operations. Therefore since 8.0
+ * there are two alternatives {@link FastListenerList} and {@link AbstractGroupedListenerList} that are
+ * also thread-safe and high performance capable.
+ * <p>
+ * Consider refactoring the use of this class by one of the alternatives.
+ * <p>
  * Thread safe Listener list supports @see WeakEventListener
  */
 public class EventListenerList implements IEventListenerSource {

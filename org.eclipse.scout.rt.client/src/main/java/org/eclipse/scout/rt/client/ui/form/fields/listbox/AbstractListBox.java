@@ -38,7 +38,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.AbstractTableRowBuilder;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
-import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
@@ -309,25 +308,25 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
       }
       updateActiveRowsFilter();
       updateCheckedRowsFilter();
-      m_table.addTableListener(new TableAdapter() {
-        @Override
-        public void tableChanged(TableEvent e) {
-          switch (e.getType()) {
-            case TableEvent.TYPE_ROWS_SELECTED: {
-              if (!getTable().isCheckable()) {
-                syncTableToValue();
+      m_table.addTableListener(
+          e -> {
+            switch (e.getType()) {
+              case TableEvent.TYPE_ROWS_SELECTED: {
+                if (!getTable().isCheckable()) {
+                  syncTableToValue();
+                }
+                break;
               }
-              break;
-            }
-            case TableEvent.TYPE_ROWS_CHECKED: {
-              if (getTable().isCheckable()) {
-                syncTableToValue();
+              case TableEvent.TYPE_ROWS_CHECKED: {
+                if (getTable().isCheckable()) {
+                  syncTableToValue();
+                }
+                break;
               }
-              break;
             }
-          }
-        }
-      });
+          },
+          TableEvent.TYPE_ROWS_SELECTED,
+          TableEvent.TYPE_ROWS_CHECKED);
       // default icon
       if (m_table.getDefaultIconId() == null && this.getConfiguredIconId() != null) {
         m_table.setDefaultIconId(this.getConfiguredIconId());

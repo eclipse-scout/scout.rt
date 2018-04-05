@@ -1,43 +1,28 @@
-/*******************************************************************************
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.datachange;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.util.event.AbstractGroupedListenerList;
 
-/**
- * @since 7.1
- */
 @Bean
-public class DataChangeManager implements IDataChangeManager {
-
-  private List<IDataChangeListener> m_listeners = new ArrayList<>();
+public class DataChangeManager extends AbstractGroupedListenerList<IDataChangeListener, DataChangeEvent, Object> implements IDataChangeManager {
 
   @Override
-  public void addDataChangeListener(IDataChangeListener listener) {
-    m_listeners.add(listener);
+  public void addAll(IDataChangeManager other) {
+    super.addAll((DataChangeManager) other);
   }
 
   @Override
-  public void removeDataChangeListener(IDataChangeListener listener) {
-    m_listeners.remove(listener);
+  protected Object allEventsType() {
+    return null;
   }
 
   @Override
-  public void fireDataChangeEvent(DataChangeEvent event) {
-    for (IDataChangeListener listener : m_listeners) {
-      listener.dataChanged(event);
-    }
+  protected Object eventType(DataChangeEvent event) {
+    return event.getEventType();
   }
 
+  @Override
+  protected void handleEvent(IDataChangeListener listener, DataChangeEvent event) {
+    listener.dataChanged(event);
+  }
 }

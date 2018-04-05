@@ -13,9 +13,10 @@ package org.eclipse.scout.rt.client.ui;
 import org.eclipse.scout.rt.platform.util.WeakEventListener;
 
 /**
- * see {@link DataChangeListener}
+ * @deprecated see {@link DataChangeListener}
  */
-@FunctionalInterface
+@SuppressWarnings("deprecation")
+@Deprecated
 public interface WeakDataChangeListener extends DataChangeListener, WeakEventListener {
 
 }

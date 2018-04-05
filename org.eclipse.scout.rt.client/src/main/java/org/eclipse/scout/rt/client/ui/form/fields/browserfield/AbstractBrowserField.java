@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.EnumSet;
-import java.util.EventListener;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,8 +34,9 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.browserfield.AbstractBrowserFieldData;
@@ -50,7 +50,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractBrowserField.class);
 
   private IBrowserFieldUIFacade m_uiFacade;
-  private final EventListenerList m_listenerList = new EventListenerList();
+  private final FastListenerList<BrowserFieldListener> m_listenerList = new FastListenerList<>();
 
   public AbstractBrowserField() {
     this(true);
@@ -231,13 +231,8 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   }
 
   @Override
-  public void addBrowserFieldListener(BrowserFieldListener listener) {
-    m_listenerList.add(BrowserFieldListener.class, listener);
-  }
-
-  @Override
-  public void removeBrowserFieldListener(BrowserFieldListener listener) {
-    m_listenerList.remove(BrowserFieldListener.class, listener);
+  public IFastListenerList<BrowserFieldListener> browserFieldListeners() {
+    return m_listenerList;
   }
 
   protected void fireContentChanged() {
@@ -245,12 +240,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   }
 
   protected void fireBrowserFieldEvent(BrowserFieldEvent e) {
-    EventListener[] listeners = m_listenerList.getListeners(BrowserFieldListener.class);
-    if (listeners != null && listeners.length > 0) {
-      for (EventListener listener : listeners) {
-        ((BrowserFieldListener) listener).browserFieldChanged(e);
-      }
-    }
+    browserFieldListeners().list().forEach(listener -> listener.browserFieldChanged(e));
   }
 
   @Override
