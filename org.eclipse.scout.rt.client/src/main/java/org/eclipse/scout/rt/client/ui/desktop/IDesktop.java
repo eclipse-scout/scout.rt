@@ -395,7 +395,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * If currently active page(s) are affected they reload their data, otherwise the pages is simply marked dirty and
    * reloaded on next activation
    */
-  void refreshPages(List<Class<? extends IPage>> pages);
+  void refreshPages(List<Class<? extends IPage<?>>> pages);
 
   /**
    * @see IDesktop#refreshPages(List)

@@ -95,7 +95,7 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
    * If currently active page(s) are affected they reload their data, otherwise the pages is simply marked dirty and
    * reloaded on next activation
    */
-  void refreshPages(List<Class<? extends IPage>> pageTypes);
+  void refreshPages(List<Class<? extends IPage<?>>> pageTypes);
 
   /**
    * @param pageTypes

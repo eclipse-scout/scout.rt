@@ -634,7 +634,7 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public void refreshPages(List<Class<? extends IPage>> pages) {
+  public void refreshPages(List<Class<? extends IPage<?>>> pages) {
     throw createUnsupportedOperationException();
   }
 

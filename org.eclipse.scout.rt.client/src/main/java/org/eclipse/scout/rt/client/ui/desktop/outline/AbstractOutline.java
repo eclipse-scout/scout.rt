@@ -362,17 +362,17 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     if (pageTypes == null || pageTypes.length < 1) {
       return;
     }
-    List<Class<? extends IPage>> list = new ArrayList<>(pageTypes.length);
+    List<Class<? extends IPage<?>>> list = new ArrayList<>(pageTypes.length);
     for (Class<?> c : pageTypes) {
       if (IPage.class.isAssignableFrom(c)) {
-        list.add((Class<? extends IPage>) c);
+        list.add((Class<? extends IPage<?>>) c);
       }
     }
     refreshPages(list);
   }
 
   @Override
-  public void refreshPages(final List<Class<? extends IPage>> pageTypes) {
+  public void refreshPages(final List<Class<? extends IPage<?>>> pageTypes) {
     final List<IPage<?>> candidates = new ArrayList<>();
     IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
       @Override

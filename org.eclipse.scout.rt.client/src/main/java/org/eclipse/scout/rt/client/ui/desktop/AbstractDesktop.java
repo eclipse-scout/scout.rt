@@ -1957,7 +1957,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   @Override
-  public void refreshPages(List<Class<? extends IPage>> pages) {
+  public void refreshPages(List<Class<? extends IPage<?>>> pages) {
     for (IOutline outline : getAvailableOutlines()) {
       outline.refreshPages(pages);
     }
