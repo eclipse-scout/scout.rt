@@ -24,12 +24,7 @@ scout.SmartColumn.prototype._init = function(model) {
 };
 
 scout.SmartColumn.prototype._setLookupCall = function(lookupCall) {
-  if (typeof lookupCall === 'string') {
-    lookupCall = scout.create(lookupCall, {
-      session: this.session
-    });
-  }
-  this.lookupCall = lookupCall;
+  this.lookupCall = scout.LookupCall.ensure(lookupCall, this.session);
 };
 
 scout.SmartColumn.prototype._setCodeType = function(codeType) {

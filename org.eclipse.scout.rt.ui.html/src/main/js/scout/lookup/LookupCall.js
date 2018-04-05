@@ -54,11 +54,9 @@ scout.LookupCall.prototype.textByKey = function(key) {
  */
 scout.LookupCall.prototype._textByKey = function(key) {
   return this.getByKey(key)
-    .then(function(lookupRow) {
-      if (!lookupRow) {
-        return '';
-      }
-      return lookupRow.text;
+    .then(function(result) {
+      var lookupRow = scout.LookupCall.firstLookupRow(result);
+      return lookupRow ? lookupRow.text : '';
     });
 };
 
