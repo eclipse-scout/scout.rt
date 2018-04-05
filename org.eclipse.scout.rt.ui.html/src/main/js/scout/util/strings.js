@@ -258,6 +258,22 @@ scout.strings = {
   },
 
   /**
+   * If the given 'string' has text, its first letter is returned in upper case,
+   * the remainder is unchanged. Otherwise, the empty string is returned.
+   */
+  uppercaseFirstLetter: function(string) {
+    if (string === undefined || string === null) {
+      return string;
+    }
+    string = this.asString(string);
+    var s = '';
+    if (this.hasText(string)) {
+      s = string.charAt(0).toUpperCase() + string.slice(1);
+    }
+    return s;
+  },
+
+  /**
    * Quotes a string for use in a regular expression, i.e. escapes all characters with special meaning.
    */
   quote: function(string) {
