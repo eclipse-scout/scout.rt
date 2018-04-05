@@ -2185,8 +2185,6 @@ scout.Table.prototype.insertRows = function(rows) {
     this.rows.push(row);
   }, this);
 
-  //  this._applyFilters(rows);
-
   var filterAcceptedRows = rows.filter(function(row) {
     this._applyFiltersForRow(row);
     return row.filterAccepted;

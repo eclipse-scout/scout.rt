@@ -37,7 +37,7 @@ public class SqlConnectionBuilder {
     //
     Connection conn;
     if (user != null && pass != null) {
-      conn = DriverManager.getConnection(sqlService.getJdbcMappingName(), user, pass);
+      conn = DriverManager.getConnection(sqlService.getJdbcMappingName(), user, pass); // NOSONAR
     }
     else {
       Properties p = null;
@@ -57,10 +57,10 @@ public class SqlConnectionBuilder {
         }
       }
       if (p != null) {
-        conn = DriverManager.getConnection(sqlService.getJdbcMappingName(), p);
+        conn = DriverManager.getConnection(sqlService.getJdbcMappingName(), p); // NOSONAR
       }
       else {
-        conn = DriverManager.getConnection(sqlService.getJdbcMappingName());
+        conn = DriverManager.getConnection(sqlService.getJdbcMappingName()); // NOSONAR
       }
     }
     conn.setAutoCommit(false);
@@ -99,10 +99,10 @@ public class SqlConnectionBuilder {
       // Grab a connection
       Connection conn;
       if (user != null && pass != null) {
-        conn = dataSource.getConnection(user, pass);
+        conn = dataSource.getConnection(user, pass); // NOSONAR
       }
       else {
-        conn = dataSource.getConnection();
+        conn = dataSource.getConnection(); // NOSONAR
       }
       conn.setAutoCommit(false);
       return conn;

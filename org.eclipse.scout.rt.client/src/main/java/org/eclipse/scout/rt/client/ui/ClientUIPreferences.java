@@ -809,7 +809,7 @@ public class ClientUIPreferences {
       int[] a = new int[rowCount * colCount];
       int index = 0;
       for (int[] split : splits) {
-        for (int c = 0; c < colCount; c++) {
+        for (int c = 0; c < colCount; c++) { // NOSONAR
           a[index] = split[c];
           index++;
         }
