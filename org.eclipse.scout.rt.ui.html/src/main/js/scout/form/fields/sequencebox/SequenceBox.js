@@ -145,7 +145,7 @@ scout.SequenceBox.prototype._modifyLabel = function(field) {
     if (field.$timeField) {
       this._linkWithLabel(field.$timeField);
     }
-  } else {
+  } else if (field.$field) { // If $field is set depends on the concrete field e.g. a group box does not have a $field
     this._linkWithLabel(field.$field);
   }
 };
