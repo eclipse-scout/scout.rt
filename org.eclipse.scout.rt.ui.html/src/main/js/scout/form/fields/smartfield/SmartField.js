@@ -34,6 +34,8 @@ scout.SmartField = function() {
   this._notUnique = false; // used to store the error state 'not unique' which must not be showed while typing, but when the field loses focus
   this._lastSearchText = null;
   this.lookupStatus = null;
+  this.lookupSeqNo = 0; // used to detect if the proposal chooser contains the results of the latest lookup, or an out-dated result.
+                        // only when the result is up-to-date, we can use the selected lookup row
 
   this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilter', 'activeFilterEnabled', 'activeFilterLabels',
     'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental'
@@ -176,18 +178,11 @@ scout.SmartField.prototype.acceptInput = function() {
     searchText = this._readSearchText(),
     searchTextEmpty = scout.strings.empty(searchText),
     searchTextChanged = this._checkSearchTextChanged(searchText),
-    selectedLookupRow = this.isPopupOpen() ? this.popup.getSelectedLookupRow() : null;
+    selectedLookupRow = this._getSelectedLookupRow(searchText);
 
   this._setProperty('displayText', searchText);
   this._acceptInputDeferred = $.Deferred();
   this._flushLookupStatus();
-
-  // in case the user has typed something after he has selected a lookup row
-  // --> ignore the selection.
-  if (this._checkResetLookupRow(searchTextChanged)) {
-    selectedLookupRow = null;
-  }
-
   this._clearPendingLookup();
 
   if (this.touch) {
@@ -199,17 +194,23 @@ scout.SmartField.prototype.acceptInput = function() {
   return this._acceptInput(searchText, searchTextEmpty, searchTextChanged, selectedLookupRow);
 };
 
-scout.SmartField.prototype._checkResetLookupRow = function(searchTextChanged) {
-  return searchTextChanged && this._userWasTyping;
+scout.SmartField.prototype._getSelectedLookupRow = function(searchText) {
+  if (!this.isPopupOpen() || this._userWasTyping) {
+    return null;
+  }
+
+  return this.lookupSeqNo === this.popup.lookupResult.seqNo ?
+      this.popup.getSelectedLookupRow() : null;
 };
 
 scout.SmartField.prototype._checkSearchTextChanged = function(searchText) {
-  if (this.isDropdown()) {
-    return false; // search text cannot change
+  if (this.isDropdown() || !this._userWasTyping) {
+    return false; // search text cannot change in drop-down fields
   }
-  if (!this._userWasTyping) {
-    return false;
-  }
+
+  // check if search text has changed since the last search, when it has changed
+  // we cannot use the currently selected lookup row, because these proposals are
+  // out-dated.
   var a = scout.strings.nullIfEmpty(this._firstTextLine(searchText));
   var b = scout.strings.nullIfEmpty(this._lastSearchText);
   return !scout.strings.equalsIgnoreCase(a, b);
@@ -373,6 +374,7 @@ scout.SmartField.prototype._acceptByTextDone = function(result) {
  * The implementation is different depending on the browseHierarchy property.
  */
 scout.SmartField.prototype._extendResult = function(result) {
+  result.seqNo = this.lookupSeqNo;
   result.uniqueMatch = null;
 
   // Set query type on result, e.g. 'byAll'
@@ -835,7 +837,7 @@ scout.SmartField.prototype._onClearIconMouseDown = function(event) {
 scout.SmartField.prototype._clear = function() {
   // don't tab next field when user clicks on clear icon (acceptInput is called later)
   this._tabPrevented = null;
-  // the state of these two flags is important. See #_checkResetLookupRow
+  // the state of these two flags is important. See #_checkSearchTextChanged
   this._lastSearchText = this._readDisplayText();
   this._userWasTyping = true;
   this.$field.val('');
@@ -1088,6 +1090,7 @@ scout.SmartField.prototype.setActiveFilterEnabled = function(activeFilterEnabled
  * A wrapper function around lookup calls used to set the _lookupInProgress flag, and display the state in the UI.
  */
 scout.SmartField.prototype._executeLookup = function(lookupFunc) {
+  this.lookupSeqNo++;
   this._lookupInProgress = true;
   this.setLoading(true);
   return lookupFunc()

@@ -50,6 +50,7 @@ scout.SmartFieldPopup.prototype._render = function() {
 };
 
 scout.SmartFieldPopup.prototype.setLookupResult = function(result) {
+  this._setProperty('lookupResult', result);
   this.proposalChooser.setLookupResult(result);
 };
 

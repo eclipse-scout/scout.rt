@@ -128,6 +128,7 @@ describe('SmartFieldRemote', function() {
       smartField.popup = scout.create('SmartFieldPopup', {
         parent: smartField,
         lookupResult: {
+          seqNo: 0, // must match smartField.lookupSeqNo
           lookupRows: [lookupRow]
         }
       });
