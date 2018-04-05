@@ -526,7 +526,7 @@ scout.TableHeaderMenu.prototype._renderHierarchyGruop = function() {
     },
     togglable: false,
     enabled: !!scout.arrays.find(table.rows, function(row) {
-      return row.expanded && scout.arrays.empty(row.childRows);
+      return row.expanded && !scout.arrays.empty(row.childRows);
     })
   });
   scout.create('TableHeaderMenuButton', {

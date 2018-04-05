@@ -1238,32 +1238,32 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   }
 
   @Override
-  public void setNodeExpanded(ITreeNode node, boolean b) {
-    setNodeExpanded(node, b, node.isLazyExpandingEnabled());
+  public void setNodeExpanded(ITreeNode node, boolean expand) {
+    setNodeExpanded(node, expand, node.isLazyExpandingEnabled());
   }
 
   @Override
-  public void setNodeExpanded(ITreeNode node, boolean b, boolean lazy) {
+  public void setNodeExpanded(ITreeNode node, boolean expand, boolean lazy) {
     // Never do lazy expansion if it is disabled on the tree
     if (!isLazyExpandingEnabled()) {
       lazy = false;
     }
 
     node = resolveNode(node);
-    if (node != null && (node.isExpanded() != b || node.isExpandedLazy() != lazy)) {
-      setNodeExpandedInternal(node, b, lazy);
+    if (node != null && (node.isExpanded() != expand || node.isExpandedLazy() != lazy)) {
+      setNodeExpandedInternal(node, expand, lazy);
     }
   }
 
   @Override
-  public void setNodeExpandedInternal(ITreeNode node, boolean b, boolean lazy) {
-    if (b) {
+  public void setNodeExpandedInternal(ITreeNode node, boolean expand, boolean lazy) {
+    if (expand) {
       node.ensureChildrenLoaded();
       ensureParentExpanded(node.getParentNode());
     }
-    node.setExpandedInternal(b);
+    node.setExpandedInternal(expand);
     node.setExpandedLazyInternal(lazy);
-    fireNodeExpanded(node, b);
+    fireNodeExpanded(node, expand);
   }
 
   @Override

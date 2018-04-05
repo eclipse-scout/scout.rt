@@ -2149,6 +2149,7 @@ scout.Table.prototype.setExpandedRows = function(rows) {
   this._updateRowStructure({
     visibleRows: true
   });
+  this._renderRowDelta();
   this._triggerRowsExpanded(this.expandedRows);
 };
 
