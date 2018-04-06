@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <!-- Make IE8 behave like IE7, having gone to all the trouble of making IE work -->
     <meta http-equiv="X-UA-Compatible" content="IE=7" />
-    <script type="text/javascript" src="console_uncompressed.js"></script>
+
     <style type="text/css">
       body {
         background-color: white;
@@ -278,36 +278,36 @@
       <div id="switches">
         <div id="levels" class="toolbar">
           Filters:
-          <input type="checkbox" id="switch_TRACE" onclick="applyFilters(); checkAllLevels()" checked="checked" title="Show/hide trace messages" /><label for="switch_TRACE" id="label_TRACE">trace</label>
-          <input type="checkbox" id="switch_DEBUG" onclick="applyFilters(); checkAllLevels()" checked="checked" title="Show/hide debug messages" /><label for="switch_DEBUG" id="label_DEBUG">debug</label>
-          <input type="checkbox" id="switch_INFO" onclick="applyFilters(); checkAllLevels()" checked="checked" title="Show/hide info messages" /><label for="switch_INFO" id="label_INFO">info</label>
-          <input type="checkbox" id="switch_WARN" onclick="applyFilters(); checkAllLevels()" checked="checked" title="Show/hide warn messages" /><label for="switch_WARN" id="label_WARN">warn</label>
-          <input type="checkbox" id="switch_ERROR" onclick="applyFilters(); checkAllLevels()" checked="checked" title="Show/hide error messages" /><label for="switch_ERROR" id="label_ERROR">error</label>
-          <input type="checkbox" id="switch_FATAL" onclick="applyFilters(); checkAllLevels()" checked="checked" title="Show/hide fatal messages" /><label for="switch_FATAL" id="label_FATAL">fatal</label>
-          <input type="checkbox" id="switch_ALL" onclick="toggleAllLevels(); applyFilters()" checked="checked" title="Show/hide all messages" /><label for="switch_ALL" id="label_ALL">all</label>
+          <input type="checkbox" id="switch_TRACE" checked="checked" title="Show/hide trace messages" /><label for="switch_TRACE" id="label_TRACE">trace</label>
+          <input type="checkbox" id="switch_DEBUG" checked="checked" title="Show/hide debug messages" /><label for="switch_DEBUG" id="label_DEBUG">debug</label>
+          <input type="checkbox" id="switch_INFO" checked="checked" title="Show/hide info messages" /><label for="switch_INFO" id="label_INFO">info</label>
+          <input type="checkbox" id="switch_WARN" checked="checked" title="Show/hide warn messages" /><label for="switch_WARN" id="label_WARN">warn</label>
+          <input type="checkbox" id="switch_ERROR" checked="checked" title="Show/hide error messages" /><label for="switch_ERROR" id="label_ERROR">error</label>
+          <input type="checkbox" id="switch_FATAL" checked="checked" title="Show/hide fatal messages" /><label for="switch_FATAL" id="label_FATAL">fatal</label>
+          <input type="checkbox" id="switch_ALL" checked="checked" title="Show/hide all messages" /><label for="switch_ALL" id="label_ALL">all</label>
         </div>
         <div id="search" class="toolbar">
-          <label for="searchBox" class="searchboxlabel">Search:</label> <input type="text" id="searchBox" onclick="toggleSearchEnabled(true)" onkeyup="scheduleSearch()" size="20" />
-          <input type="button" id="searchReset" disabled="disabled" value="Reset" onclick="clearSearch()" class="button" title="Reset the search" />
-          <input type="checkbox" id="searchRegex" onclick="doSearch()" title="If checked, search is treated as a regular expression" /><label for="searchRegex">Regex</label>
-          <input type="checkbox" id="searchCaseSensitive" onclick="doSearch()" title="If checked, search is case sensitive" /><label for="searchCaseSensitive">Match case</label>
-          <input type="checkbox" id="searchDisable" onclick="toggleSearchEnabled()" title="Enable/disable search" /><label for="searchDisable" class="alwaysenabled">Disable</label>
+          <label for="searchBox" class="searchboxlabel">Search:</label> <input type="text" id="searchBox" size="20" />
+          <input type="button" id="searchReset" disabled="disabled" value="Reset" class="button" title="Reset the search" />
+          <input type="checkbox" id="searchRegex" title="If checked, search is treated as a regular expression" /><label for="searchRegex">Regex</label>
+          <input type="checkbox" id="searchCaseSensitive"  title="If checked, search is case sensitive" /><label for="searchCaseSensitive">Match case</label>
+          <input type="checkbox" id="searchDisable" title="Enable/disable search" /><label for="searchDisable" class="alwaysenabled">Disable</label>
           <div id="searchNav">
-            <input type="button" id="searchNext" disabled="disabled" value="Next" onclick="searchNext()" class="button" title="Go to the next matching log entry" />
-            <input type="button" id="searchPrevious" disabled="disabled" value="Previous" onclick="searchPrevious()" class="button" title="Go to the previous matching log entry" />
-            <input type="checkbox" id="searchFilter" onclick="toggleSearchFilter()" title="If checked, non-matching log entries are filtered out" /><label for="searchFilter">Filter</label>
-            <input type="checkbox" id="searchHighlight" onclick="toggleSearchHighlight()" title="Highlight matched search terms" /><label for="searchHighlight" class="alwaysenabled">Highlight all</label>
+            <input type="button" id="searchNext" disabled="disabled" value="Next" class="button" title="Go to the next matching log entry" />
+            <input type="button" id="searchPrevious" disabled="disabled" value="Previous" class="button" title="Go to the previous matching log entry" />
+            <input type="checkbox" id="searchFilter"  title="If checked, non-matching log entries are filtered out" /><label for="searchFilter">Filter</label>
+            <input type="checkbox" id="searchHighlight" title="Highlight matched search terms" /><label for="searchHighlight" class="alwaysenabled">Highlight all</label>
           </div>
         </div>
         <div id="options" class="toolbar">
           Options:
-          <input type="checkbox" id="enableLogging" onclick="toggleLoggingEnabled()" checked="checked" title="Enable/disable logging" /><label for="enableLogging" id="enableLoggingLabel">Log</label>
-          <input type="checkbox" id="wrap" onclick="toggleWrap()" title="Enable / disable word wrap" /><label for="wrap" id="wrapLabel">Wrap</label>
-          <input type="checkbox" id="newestAtTop" onclick="toggleNewestAtTop()" title="If checked, causes newest messages to appear at the top" /><label for="newestAtTop" id="newestAtTopLabel">Newest at the top</label>
-          <input type="checkbox" id="scrollToLatest" onclick="toggleScrollToLatest()" checked="checked" title="If checked, window automatically scrolls to a new message when it is added" /><label for="scrollToLatest" id="scrollToLatestLabel">Scroll to latest</label>
-          <input type="button" id="clearButton" value="Clear" onclick="clearLog()" class="button" title="Clear all log messages"  />
-          <input type="button" id="hideButton" value="Hide" onclick="hide()" class="hidden button" title="Hide the console" />
-          <input type="button" id="closeButton" value="Close" onclick="closeWindow()" class="hidden button" title="Close the window" />
+          <input type="checkbox" id="enableLogging" checked="checked" title="Enable/disable logging" /><label for="enableLogging" id="enableLoggingLabel">Log</label>
+          <input type="checkbox" id="wrap" title="Enable / disable word wrap" /><label for="wrap" id="wrapLabel">Wrap</label>
+          <input type="checkbox" id="newestAtTop" title="If checked, causes newest messages to appear at the top" /><label for="newestAtTop" id="newestAtTopLabel">Newest at the top</label>
+          <input type="checkbox" id="scrollToLatest" checked="checked" title="If checked, window automatically scrolls to a new message when it is added" /><label for="scrollToLatest" id="scrollToLatestLabel">Scroll to latest</label>
+          <input type="button" id="clearButton" value="Clear" class="button" title="Clear all log messages"  />
+          <input type="button" id="hideButton" value="Hide" class="hidden button" title="Hide the console" />
+          <input type="button" id="closeButton" value="Close" class="hidden button" title="Close the window" />
         </div>
       </div>
     </div>
@@ -315,8 +315,10 @@
     <div id="commandLine" class="toolbar">
       <div id="commandLineContainer">
         <input type="text" id="command" title="Enter a JavaScript command here and hit return or press 'Evaluate'" />
-        <input type="button" id="evaluateButton" value="Evaluate" class="button" title="Evaluate the command" onclick="evalCommandLine()" />
+        <input type="button" id="evaluateButton" value="Evaluate" class="button" title="Evaluate the command" />
       </div>
     </div>
+
+    <script type="text/javascript" src="console_uncompressed.js"></script>
   </body>
 </html>

@@ -23,6 +23,51 @@ function copyProperties(obj, props) {
   }
 }
 
+// Inline event handlers are not allowed -> attach them here
+$('switch_TRACE').addEventListener('click', function() {
+  applyFilters(); checkAllLevels();
+});
+$('switch_DEBUG').addEventListener('click', function() {
+  applyFilters(); checkAllLevels();
+});
+$('switch_INFO').addEventListener('click', function() {
+  applyFilters(); checkAllLevels();
+});
+$('switch_WARN').addEventListener('click', function() {
+  applyFilters(); checkAllLevels();
+});
+$('switch_ERROR').addEventListener('click', function() {
+  applyFilters(); checkAllLevels();
+});
+$('switch_FATAL').addEventListener('click', function() {
+  applyFilters(); checkAllLevels();
+});
+$('switch_ALL').addEventListener('click', function() {
+  toggleAllLevels(); applyFilters();
+});
+
+$('searchBox').addEventListener('click', function() {
+  toggleSearchEnabled(true); applyFilters();
+});
+$('searchBox').addEventListener('keyup', scheduleSearch);
+$('searchReset').addEventListener('click', clearSearch);
+$('searchRegex').addEventListener('click', doSearch);
+$('searchCaseSensitive').addEventListener('click', doSearch);
+$('searchDisable').addEventListener('click', toggleSearchEnabled);
+
+$('searchNext').addEventListener('click', searchNext);
+$('searchPrevious').addEventListener('click', searchPrevious);
+$('searchFilter').addEventListener('click', searchFilter);
+$('searchHighlight').addEventListener('click', toggleSearchHighlight);
+
+$('enableLogging').addEventListener('click', toggleLoggingEnabled);
+$('wrap').addEventListener('click', toggleWrap);
+$('newestAtTop').addEventListener('click', toggleNewestAtTop);
+$('scrollToLatest').addEventListener('click', toggleScrollToLatest);
+$('clearButton').addEventListener('click', clearLog);
+$('hideButton').addEventListener('click', hide);
+$('closeButton').addEventListener('click', closeWindow);
+$('evaluateButton').addEventListener('click', evalCommandLine);
 /*----------------------------------------------------------------*/
 
 function LogItem() {
