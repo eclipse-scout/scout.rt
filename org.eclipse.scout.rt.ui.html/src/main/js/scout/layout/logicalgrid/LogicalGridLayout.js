@@ -31,16 +31,37 @@ scout.LogicalGridLayout = function(widget, options) {
 scout.inherits(scout.LogicalGridLayout, scout.AbstractLayout);
 
 scout.LogicalGridLayout.prototype.validateLayout = function($container, options) {
-  var visibleComps = [], visibleCons = [], cons;
+  var visibleComps = [],
+    visibleCons = [],
+    cons;
 
-  this.widget.validateLogicalGrid();
+  // If there is a logical grid, validate it (= recalculate if it is dirty) and use the grid config to get the grid relevant widgets (Scout JS).
+  // If there is no logical grid the grid relevant widgets are found using DOM by selecting the children with a html component (Scout classic).
+  if (this.widget.logicalGrid) {
+    this.widget.validateLogicalGrid();
+    // It is important that the logical grid and the layout use the same widgets. Otherwise there may be widgets without a gridData which is required by the layout.
+    // This can happen if the widgets are inserted and removed by an animation before the layout has been done. If the widget is removed using an animation it is not in the list of getGridWidgets() anymore but may still be in the DOM.
+    this.widget.logicalGrid.gridConfig.getGridWidgets().forEach(function(widget) {
+      if (!widget.htmlComp) {
+        $.log.isWarnEnabled() && $.log.warn('(LogicalGridLayout#validateLayout) no htmlComp found, widget cannot be layouted. Widget: ' + widget);
+        return;
+      }
+      validateGridData(widget.htmlComp);
+    });
+  } else {
+    $container.children().each(function(idx, elem) {
+      var $comp = $(elem);
+      var htmlComp = scout.HtmlComponent.optGet($comp);
+      if (!htmlComp) {
+        // Only consider elements with a html component
+        return;
+      }
+      validateGridData(htmlComp);
+    });
+  }
 
-  $container.children().each(function (idx, elem) {
-    var $comp = $(elem);
-    var htmlComp = scout.HtmlComponent.optGet($comp);
-    if (!htmlComp) {
-      return;
-    }
+  function validateGridData(htmlComp) {
+    var $comp = htmlComp.$comp;
     var widget = $comp.data('widget');
     // Prefer the visibility state of the widget, if there is one.
     // This allows for transitions, because the $component may still be in the process of being made invisible
@@ -51,7 +72,8 @@ scout.LogicalGridLayout.prototype.validateLayout = function($container, options)
       cons.validate();
       visibleCons.push(cons);
     }
-  });
+  }
+
   this.info = new scout.LogicalGridLayoutInfo({
     $components: visibleComps,
     cons: visibleCons,
