@@ -259,7 +259,6 @@
       top: 0;
       left: 0;
       padding: @table-row-padding-y 8px @table-row-padding-y @table-row-control-padding-left;
-      line-height: 14px;
       cursor: pointer;
 
       &::before {
@@ -433,7 +432,7 @@
     #scout.transform(rotate(0deg));
   }
   100% {
-    #scout.transform(rotate(90deg));
+    #scout.transform(rotate(89.99deg));
   }
 }
 
@@ -463,7 +462,7 @@
 
 .keyframes-collapse-rotate() {
   00% { /* see comment on top */
-    #scout.transform(rotate(90deg));
+    #scout.transform(rotate(89.99deg));
   }
   100% {
     #scout.transform(rotate(0deg));
