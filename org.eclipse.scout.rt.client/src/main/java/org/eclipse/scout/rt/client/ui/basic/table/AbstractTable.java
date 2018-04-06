@@ -3401,20 +3401,28 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   protected List<ITableRow> sortRows(List<? extends ITableRow> rows, Comparator<ITableRow> comparator) {
-    Set<ITableRow> rootNodes = new TreeSet<ITableRow>(comparator);
-    Map<ITableRow/*parent*/, Set<ITableRow> /*sorted child rows*/> parentToChildren = new HashMap<>();
+    List<ITableRow> rootNodes = new ArrayList<>();
+    Map<ITableRow/*parent*/, List<ITableRow> /*child rows*/> parentToChildren = new HashMap<>();
     rows.forEach(row -> {
       ITableRow parentRow = findParentRow(row);
       if (parentRow == null) {
         rootNodes.add(row);
       }
       else {
-        parentToChildren.computeIfAbsent(parentRow, children -> new TreeSet<ITableRow>(comparator))
+        parentToChildren.computeIfAbsent(parentRow, children -> new ArrayList<>())
             .add(row);
       }
     });
+
     CollectingVisitor<ITableRow> collector = new CollectingVisitor<ITableRow>();
-    rootNodes.forEach(root -> TreeTraversals.create(collector, parentToChildren::get).traverse(root));
+    rootNodes.sort(comparator);
+    rootNodes.forEach(root -> TreeTraversals.create(collector, node -> {
+      List<ITableRow> childRows = parentToChildren.get(node);
+      if (CollectionUtility.hasElements(childRows)) {
+        childRows.sort(comparator);
+      }
+      return childRows;
+    }).traverse(root));
     return collector.getCollection();
   }
 
