@@ -503,6 +503,20 @@ scout.Column.prototype.setCellText = function(row, text, cell) {
   }
 };
 
+scout.Column.prototype.setCssClass = function(cssClass) {
+  if (this.cssClass === cssClass) {
+    return;
+  }
+
+  this.cssClass = cssClass;
+
+  this.table.rows.forEach(function(row) {
+    this.cell(row).setCssClass(cssClass);
+  }, this);
+
+  this.table.updateRows(this.table.rows);
+};
+
 scout.Column.prototype.createAggrGroupCell = function(row) {
   var cell = this.cell(row);
   return this.initCell(scout.create('Cell', {

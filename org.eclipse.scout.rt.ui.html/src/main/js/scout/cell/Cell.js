@@ -67,6 +67,10 @@ scout.Cell.prototype.encodedText = function() {
   return this._cachedEncodedText;
 };
 
+scout.Cell.prototype.setCssClass = function(cssClass) {
+  this.cssClass = cssClass;
+};
+
 scout.Cell.prototype.isContentValid = function() {
   var validByErrorStatus = !this.errorStatus || this.errorStatus.severity !== scout.Status.Severity.ERROR;
   var validByMandatory = !this.mandatory || !!this.value;
@@ -76,4 +80,3 @@ scout.Cell.prototype.isContentValid = function() {
     validByMandatory: validByMandatory
   };
 };
-
