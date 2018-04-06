@@ -255,7 +255,7 @@ scout.Column.prototype._buildCell = function(content, style, cssClass) {
 };
 
 scout.Column.prototype._expandIcon = function(expanded, rowPadding) {
-  var style = 'margin-left: ' + rowPadding + 'px';
+  var style = 'padding-left: ' + (rowPadding + 13) + 'px';
   var cssClasses = 'table-row-control';
   if (expanded) {
     cssClasses += ' expanded';
@@ -326,7 +326,7 @@ scout.Column.prototype._cellStyle = function(cell, tableNodeColumn, rowPadding) 
   style = 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
   if (tableNodeColumn) {
     // calculate padding
-    style += ' padding-left: ' + (26 + rowPadding) + 'px';
+    style += ' padding-left: ' + (28 + rowPadding) + 'px';
   }
   style += scout.styles.legacyStyle(cell);
   return style;
