@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -674,6 +675,66 @@ public class JsonTreeTest {
     ITree tree = createTree(Collections.<ITreeNode> emptyList());
     JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
     jsonTree.getTreeNodeForNodeId("foo");
+  }
+
+  @Test
+  public void testInsertAndDeleteInSameRequest() throws Exception {
+    // Note: A test for the same problem (but without a real tree) can be found here:
+    // org.eclipse.scout.rt.client.ui.basic.tree.TreeEventBufferTest.testInsertAndRemoveInSameRequest()
+
+    ITree tree = new Tree();
+    tree.setRootNode(new TreeNode("Root"));
+
+    final List<TreeEvent> treeEventCollector = new ArrayList<>();
+    tree.addTreeListener(new TreeAdapter() {
+      @Override
+      public void treeChanged(TreeEvent e) {
+        treeEventCollector.add(e);
+      }
+    });
+
+    IJsonAdapter<? super ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
+    m_uiSession.currentJsonResponse().addAdapter(jsonTree);
+    JSONObject response = m_uiSession.currentJsonResponse().toJson();
+    System.out.println("Response #1: " + response);
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // ----------------
+
+    // (root)
+    //   +-[A]
+    //      +-[B]
+    ITreeNode nodeA = new TreeNode("A");
+    ITreeNode nodeB = new TreeNode("B");
+
+    // Insert A and B in one "tree changing" batch
+    // -> TreeEventBuffer should remove the second event (because B is a sub-node of A)
+    tree.setTreeChanging(true);
+    tree.addChildNode(tree.getRootNode(), nodeA);
+    tree.addChildNode(nodeA, nodeB);
+    tree.setTreeChanging(false);
+    assertEquals(1, treeEventCollector.size());
+    treeEventCollector.clear();
+
+    // Remove B, then A (in two separate calls)
+    // -> TreeEventBuffer should remove the second event (because B is a sub-node of A), altough
+    // only an insertion event for A exists (and A.getChildNodes() returns nothing)
+    tree.removeAllChildNodes(nodeA);
+    tree.removeAllChildNodes(tree.getRootNode());
+    assertEquals(2, treeEventCollector.size());
+    treeEventCollector.clear();
+    assertEquals(0, nodeA.getChildNodeCount());
+    assertEquals(0, tree.getRootNode().getChildNodeCount());
+
+    // Process the buffer
+    // -> TreeEventBuffer should remove all events
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    List<JsonEvent> events = m_uiSession.currentJsonResponse().getEventList();
+    assertEquals(0, events.size());
+
+    response = m_uiSession.currentJsonResponse().toJson();
+    System.out.println("Response #2: " + response);
+    JsonTestUtility.endRequest(m_uiSession);
   }
 
   @Test

@@ -280,6 +280,45 @@ public class TreeEventBufferTest {
   }
 
   /**
+   * Insert a tree of nodes, and then remove them again (from inner to outer node)
+   */
+  @Test
+  public void testInsertAndRemoveInSameRequest() {
+    // Note: A similar test but with a real tree can be found here:
+    // org.eclipse.scout.rt.ui.html.json.tree.JsonTreeTest.testInsertAndDeleteInSameRequest()
+
+    // A      <-- InvisibleRootNode
+    // +-B
+    //   +-C
+    //     +-D
+    ITreeNode nodeA = mockNode("A");
+    ITreeNode nodeB = mockNode("B");
+    ITreeNode nodeC = mockNode("C");
+    ITreeNode nodeD = mockNode("D");
+    installChildNodes(nodeA, nodeB);
+    installChildNodes(nodeB, nodeC);
+    installChildNodes(nodeC, nodeD);
+
+    TreeEvent e1 = mockEvent(nodeA, TreeEvent.TYPE_NODES_INSERTED, nodeB);
+    m_testBuffer.add(e1);
+
+    // Simulate nodes deleted from inner to outer node
+    installChildNodes(nodeC, new ITreeNode[0]);
+    installChildNodes(nodeB, new ITreeNode[0]);
+    installChildNodes(nodeA, new ITreeNode[0]);
+    TreeEvent e2 = mockEvent(nodeC, TreeEvent.TYPE_ALL_CHILD_NODES_DELETED, nodeD);
+    TreeEvent e3 = mockEvent(nodeB, TreeEvent.TYPE_ALL_CHILD_NODES_DELETED, nodeC);
+    TreeEvent e4 = mockEvent(nodeA, TreeEvent.TYPE_ALL_CHILD_NODES_DELETED, nodeB);
+    m_testBuffer.add(e2);
+    m_testBuffer.add(e3);
+    m_testBuffer.add(e4);
+
+    // We expect that all events are removed, because the same nodes that have been inserted have been deleted afterwards
+    List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(Collections.emptyList(), coalesced);
+  }
+
+  /**
    * Insert some nodes, then delete some children of them --> only insert event should remain
    */
   @Test
