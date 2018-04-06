@@ -2135,6 +2135,7 @@ scout.Table.prototype.expandRow = function(row, expanded) {
     visibleRows: true
   });
   this._renderRowDelta();
+  row.animateExpansion();
   this._triggerRowsExpanded(this.expandedRows);
 };
 

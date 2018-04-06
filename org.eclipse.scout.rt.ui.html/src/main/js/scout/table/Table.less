@@ -264,7 +264,6 @@
 
       &::before {
         display: block;
-        transition: transform 0.3s;
         #scout.font-icon();
         font-size: @table-row-control-size;
         content: @icon-angle-right;
@@ -418,4 +417,69 @@
 
 .table .key-box.char {
   top: calc(~'50%' - 21px/2);
+}
+
+/*** Animation: rotate from 0 -> 90 deg ***/
+
+@-webkit-keyframes expand-rotate {
+  .keyframes-expand-rotate();
+}
+@keyframes expand-rotate {
+  .keyframes-expand-rotate();
+}
+
+.keyframes-expand-rotate() {
+  00% { /* see comment on top */
+    #scout.transform(rotate(0deg));
+  }
+  100% {
+    #scout.transform(rotate(90deg));
+  }
+}
+
+.animation-expand-rotate() {
+  #scout.animation-name(expand-rotate);
+  #scout.animation-duration(0.3s);
+  #scout.animation-iteration-count(1);
+  #scout.animation-timing-function(ease-out);
+}
+
+.expand-rotate {
+
+  &::before {
+    .animation-expand-rotate();
+  }
+}
+
+
+/*** Animation: rotate collapse  90 -> 0 deg ***/
+
+@-webkit-keyframes collapse-rotate {
+  .keyframes-collapse-rotate();
+}
+@keyframes collapse-rotate {
+  .keyframes-collapse-rotate();
+}
+
+.keyframes-collapse-rotate() {
+  00% { /* see comment on top */
+    #scout.transform(rotate(90deg));
+  }
+  100% {
+    #scout.transform(rotate(0deg));
+  }
+}
+
+.animation-collapse-rotate() {
+  #scout.animation-name(collapse-rotate);
+  #scout.animation-duration(0.3s);
+  #scout.animation-iteration-count(1);
+  #scout.animation-timing-function(ease-out);
+}
+
+.collapse-rotate {
+
+  &::before {
+    .animation-collapse-rotate();
+  }
 }

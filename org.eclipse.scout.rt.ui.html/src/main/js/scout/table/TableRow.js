@@ -49,6 +49,14 @@ scout.TableRow.prototype._initCells = function() {
   }, this);
 };
 
+scout.TableRow.prototype.animateExpansion = function() {
+  if (this.expanded) {
+    this.$row.find('.table-row-control').addClassForAnimation('expand-rotate');
+  } else {
+    this.$row.find('.table-row-control').addClassForAnimation('collapse-rotate');
+  }
+};
+
 scout.TableRow.prototype.hasFilterAcceptedChildren = function() {
   return this.childRows.some(function(childRow) {
     return childRow.filterAccepted || childRow.hasFilterAcceptedChildren();
