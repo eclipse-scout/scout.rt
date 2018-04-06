@@ -237,6 +237,20 @@ describe("scout.strings", function() {
 
   });
 
+  describe("uppercaseFirstLetter", function() {
+
+    it("converts first letter to uppercase", function() {
+      expect(scout.strings.uppercaseFirstLetter()).toBe(undefined);
+      expect(scout.strings.uppercaseFirstLetter(null)).toBe(null);
+      expect(scout.strings.uppercaseFirstLetter(0)).toBe('0');
+      expect(scout.strings.uppercaseFirstLetter('0')).toBe('0');
+      expect(scout.strings.uppercaseFirstLetter('hans müller')).toBe('Hans müller');
+      expect(scout.strings.uppercaseFirstLetter('Hans Müller')).toBe('Hans Müller');
+      expect(scout.strings.uppercaseFirstLetter('äöü sind Umlaute')).toBe('Äöü sind Umlaute');
+    });
+
+  });
+
   describe("quote", function() {
 
     it("quotes special characters for regexp", function() {

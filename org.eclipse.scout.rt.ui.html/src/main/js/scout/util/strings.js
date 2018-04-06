@@ -246,15 +246,7 @@ scout.strings = {
    * the remainder is unchanged. Otherwise, the empty string is returned.
    */
   lowercaseFirstLetter: function(string) {
-    if (string === undefined || string === null) {
-      return string;
-    }
-    string = this.asString(string);
-    var s = '';
-    if (this.hasText(string)) {
-      s = string.charAt(0).toLowerCase() + string.slice(1);
-    }
-    return s;
+    return this._changeFirstLetter(string, 'toLowerCase');
   },
 
   /**
@@ -262,13 +254,17 @@ scout.strings = {
    * the remainder is unchanged. Otherwise, the empty string is returned.
    */
   uppercaseFirstLetter: function(string) {
+    return this._changeFirstLetter(string, 'toUpperCase');
+  },
+
+  _changeFirstLetter: function(string, funcName) {
     if (string === undefined || string === null) {
       return string;
     }
     string = this.asString(string);
     var s = '';
     if (this.hasText(string)) {
-      s = string.charAt(0).toUpperCase() + string.slice(1);
+      s = string.charAt(0)[funcName]() + string.slice(1);
     }
     return s;
   },
