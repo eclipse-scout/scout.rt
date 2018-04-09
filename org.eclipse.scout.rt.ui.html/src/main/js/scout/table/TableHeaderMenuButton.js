@@ -10,27 +10,11 @@
  ******************************************************************************/
 scout.TableHeaderMenuButton = function() {
   scout.TableHeaderMenuButton.parent.call(this);
-  this.text;
-  this.cssClass;
-  this.enabled = true;
-  this.visible = true;
-  this.selected = false;
-  this.togglable = false;
-  this.icon;
+  this.clickHandler = null;
+  this.textVisible = false;
+  this.tabbable = true;
 };
-scout.inherits(scout.TableHeaderMenuButton, scout.Widget);
-
-scout.TableHeaderMenuButton.prototype._init = function(options) {
-  scout.TableHeaderMenuButton.parent.prototype._init.call(this, options);
-  this.text = scout.nvl(this.text, this.session.text(this.textKey));
-};
-
-/**
- * @override
- */
-scout.TableHeaderMenuButton.prototype._createKeyStrokeContext = function() {
-  return new scout.KeyStrokeContext();
-};
+scout.inherits(scout.TableHeaderMenuButton, scout.Action);
 
 /**
  * @override
@@ -47,18 +31,18 @@ scout.TableHeaderMenuButton.prototype._render = function() {
     .on('click', this._onClick.bind(this))
     .on('mouseenter', this._onMouseOver.bind(this))
     .on('mouseleave', this._onMouseOut.bind(this));
-  if (this.cssClass) {
-    this.$container.addClass(this.cssClass);
-  }
-  this._renderSelected();
-  this._renderTogglable();
-  this._renderIcon();
+  this.$icon = this.$container.appendSpan('icon');
 };
 
 scout.TableHeaderMenuButton.prototype._onClick = function() {
   if (this.enabled) {
     this.clickHandler.call(this);
   }
+};
+
+scout.TableHeaderMenuButton.prototype._renderProperties = function() {
+  scout.TableHeaderMenuButton.parent.prototype._renderProperties.call(this);
+  this._renderToggleAction();
 };
 
 // Show 'remove' text when button is already selected
@@ -72,50 +56,17 @@ scout.TableHeaderMenuButton.prototype._onMouseOut = function() {
   this.parent.resetText();
 };
 
-scout.TableHeaderMenuButton.prototype._renderSelected = function() {
-  this.$container.select(this.selected);
-};
-
-scout.TableHeaderMenuButton.prototype._renderTogglable = function() {
-  this.$container.toggleClass('togglable', this.togglable);
-};
-
-scout.TableHeaderMenuButton.prototype._renderIcon = function() {
-  if (this.icon) {
-    this.$container.attr('data-icon', this.icon);
-  } else {
-    this.$container.removeAttr('data-icon');
-  }
-};
-
-scout.TableHeaderMenuButton.prototype.setSelected = function(selected) {
-  this.setProperty('selected', selected);
-  this._updateEnabled();
-};
-
-scout.TableHeaderMenuButton.prototype._updateEnabled = function() {
-  var enabled = true;
-  if (this.selected) {
-    enabled = this.togglable;
-  }
-  this.enabled = enabled;
-  if (this.rendered) {
-    this._renderEnabled();
-  }
+scout.TableHeaderMenuButton.prototype._renderToggleAction = function() {
+  this.$container.toggleClass('togglable', this.toggleAction);
 };
 
 /**
  * @override
  */
-scout.TableHeaderMenuButton.prototype._renderEnabled = function() {
-  this.$container.toggleClass('disabled', !this.enabled);
-  this.$container.setTabbable(this.enabled && !scout.device.supportsTouch());
-};
-
-scout.TableHeaderMenuButton.prototype.setIcon = function(icon) {
-  this.setProperty('icon', icon);
-};
-
-scout.TableHeaderMenuButton.prototype.toggle = function() {
-  this.setSelected(!this.selected);
+scout.TableHeaderMenuButton.prototype._renderIconId = function() {
+  if (this.iconId) {
+    this.$icon.attr('data-icon', this.iconId);
+  } else {
+    this.$icon.removeAttr('data-icon');
+  }
 };

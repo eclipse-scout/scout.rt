@@ -73,7 +73,7 @@ public abstract class AbstractIcons implements Serializable {
   public static final String StarBold = "font:\uE032";
   public static final String StarSolid = "font:\uE033";
   public static final String PersonSolid = "font:\uE034";
-  public static final String RemoveLarge = "font:\uE035";
+  public static final String Remove = "font:\uE035";
   public static final String EllipsisVBold = "font:\uE040";
   public static final String EllipsisV = "font:\uE041";
   public static final String Search = "font:\uE02A";
@@ -81,7 +81,7 @@ public abstract class AbstractIcons implements Serializable {
   public static final String Folder = "font:\uE02B";
   public static final String FolderBold = "font:\uE043";
   public static final String Spinner = "font:\uE044";
-  public static final String Remove = "font:\uE045";
+  public static final String RemoveBold = "font:\uE045";
   public static final String Sum = "font:\ue02C";
   public static final String SumBold = "font:\ue025";
   public static final String Pencil = "font:\uE02F";

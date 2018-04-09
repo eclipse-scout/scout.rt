@@ -1111,7 +1111,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
               @Override
               protected String getConfiguredIconId() {
-                return AbstractIcons.CaretUp;
+                return AbstractIcons.AngleUp;
               }
 
               @Override
@@ -1154,7 +1154,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
               @Override
               protected String getConfiguredIconId() {
-                return AbstractIcons.CaretDown;
+                return AbstractIcons.AngleDown;
               }
 
               @Override
