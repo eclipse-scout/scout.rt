@@ -10,7 +10,6 @@
  ******************************************************************************/
 body {
   #scout.font-text-normal();
-  position: fixed;
   height: 100%;
   width: 100%;
   margin: 0;
@@ -23,6 +22,15 @@ body {
   -webkit-text-size-adjust: none;
   /* Disable highlight color. May be enabled for specific elements if required */
   -webkit-tap-highlight-color: rgba(0,0,0,0);
+
+  &.ios {
+    /* Body can be moved on ios even if it isn't scrollable. Prevent it by using position: fixed.
+    Drawback: it seems something invisible happens nevertheless, actions like a button click won't be executed if the user tried to scroll right before.
+    He has to wait until the invisible scrolling has finished before he can try to click the button.
+    Another drawback: there is a flickering effect of labels on certain screens (e.g. beamer) with chrome when a popup (e.g. smart field popup) is shown and position is set to fixed.
+    Hence it is important to only activate it on ios. */
+    position: fixed;
+  }
 }
 
 /* -moz variant is required, see https://bugzilla.mozilla.org/show_bug.cgi?id=509958 */

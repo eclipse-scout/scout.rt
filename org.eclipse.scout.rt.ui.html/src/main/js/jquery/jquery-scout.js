@@ -785,6 +785,9 @@ $.fn.addDeviceClass = function() {
       this.addClass('ie9');
     }
   }
+  if (scout.device.isIos()) {
+    this.addClass('ios');
+  }
   return this;
 };
 
