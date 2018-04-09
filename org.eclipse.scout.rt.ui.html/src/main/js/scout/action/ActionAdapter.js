@@ -34,3 +34,8 @@ scout.ActionAdapter.prototype._onWidgetEvent = function(event) {
     scout.ActionAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }
 };
+
+scout.ActionAdapter.prototype._initModel = function(model, parent) {
+  model.inheritAccessibility = false; // Hierarchical "enabledness" is handled by the server-side model
+  return scout.ActionAdapter.parent.prototype._initModel.call(this, model, parent);
+};
