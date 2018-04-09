@@ -256,10 +256,14 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container, optio
   // Field
   if (formField.$fieldContainer) {
     var fieldMargins = scout.graphics.margins(formField.$fieldContainer);
-    widthHint -= fieldMargins.horizontal();
-    heightHint -= fieldMargins.vertical();
-    options.widthHint = widthHint <= 0 ? null : widthHint;
-    options.heightHint = heightHint <= 0 ? null : heightHint;
+    if (options.widthHint) {
+      widthHint -= fieldMargins.horizontal();
+      options.widthHint = widthHint;
+    }
+    if (options.heightHint) {
+      heightHint -= fieldMargins.vertical();
+      options.heightHint = heightHint;
+    }
     var htmlField = scout.HtmlComponent.optGet(formField.$fieldContainer);
     if (htmlField) {
       prefSizeField = htmlField.prefSize(options)

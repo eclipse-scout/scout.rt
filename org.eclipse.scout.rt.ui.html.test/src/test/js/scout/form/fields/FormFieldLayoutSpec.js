@@ -94,12 +94,13 @@ describe('FormFieldLayout', function() {
     function spyForWidthHint(func) {
       var spy = spyOn(scout.graphics, 'prefSize');
       spy.and.callFake(function($elem, options) {
-        var widthHint;
+        var widthHint, heightHint;
         if ($elem[0] === formField.$fieldContainer[0]) {
           widthHint = options.widthHint;
+          heightHint = options.heightHint;
         }
         spy.and.callThrough(); // Replace with original function again
-        func(widthHint);
+        func(widthHint, heightHint);
         return scout.graphics.prefSize($elem, options);
       });
     }
@@ -129,6 +130,35 @@ describe('FormFieldLayout', function() {
           });
           expect(formField.htmlComp.prefSize({widthHint: 400}).width).toBe(400);
           expect(widthHint).toBe(expectedWidthHint);
+        });
+
+        it('does not adjust widthHint or heightHint if it is not set', function() {
+          readSizes();
+          var widthHint;
+          var heightHint;
+          spyForWidthHint(function(spiedWidthHint, spiedHeightHint) {
+            widthHint = spiedWidthHint;
+            heightHint = spiedHeightHint;
+          });
+          formField.htmlComp.prefSize();
+          expect(widthHint).toBe(undefined);
+          expect(heightHint).toBe(undefined);
+        });
+
+        it('does not adjust widthHint or heightHint even if margins are negative', function() {
+          formField.$fieldContainer.css({
+            margin: -5
+          });
+          readSizes();
+          var widthHint;
+          var heightHint;
+          spyForWidthHint(function(spiedWidthHint, spiedHeightHint) {
+            widthHint = spiedWidthHint;
+            heightHint = spiedHeightHint;
+          });
+          formField.htmlComp.prefSize();
+          expect(widthHint).toBe(undefined);
+          expect(heightHint).toBe(undefined);
         });
 
         it('ignores label if label is invisible', function() {
