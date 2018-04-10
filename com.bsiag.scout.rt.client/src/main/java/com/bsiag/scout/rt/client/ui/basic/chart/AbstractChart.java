@@ -21,7 +21,8 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 
 import com.bsiag.scout.rt.shared.data.basic.chart.ChartBean;
 import com.bsiag.scout.rt.shared.data.basic.chart.ChartValueGroupBean;
@@ -92,7 +93,7 @@ public abstract class AbstractChart extends AbstractWidget implements IChart {
   // TODO [15.4] bsh: make extensible
 
   private IChartUIFacade m_uiFacade;
-  private final EventListenerList m_listenerList = new EventListenerList();
+  private final FastListenerList<ChartListener> m_listenerList = new FastListenerList<>();
 
   public AbstractChart() {
     this(true);
@@ -216,23 +217,15 @@ public abstract class AbstractChart extends AbstractWidget implements IChart {
   }
 
   @Override
-  public void addChartListener(ChartListener listener) {
-    m_listenerList.add(ChartListener.class, listener);
-  }
-
-  @Override
-  public void removeChartListener(ChartListener listener) {
-    m_listenerList.remove(ChartListener.class, listener);
+  public IFastListenerList<ChartListener> chartListeners() {
+    return m_listenerList;
   }
 
   public void fireValueClicked(int[] axesPosition, BigDecimal value) {
     ChartEvent event = new ChartEvent(this, ChartEvent.TYPE_VALUE_CLICKED);
     event.setAxesPosition(axesPosition);
     event.setValue(value);
-    ChartListener[] listeners = m_listenerList.getListeners(ChartListener.class);
-    for (ChartListener listener : listeners) {
-      listener.chartChanged(event);
-    }
+    chartListeners().list().forEach(listener -> listener.chartChanged(event));
   }
 
   @Override

@@ -11,6 +11,7 @@ package com.bsiag.scout.rt.client.ui.basic.chart;
 
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartBean;
 
@@ -46,9 +47,15 @@ public interface IChart extends IWidget, ITypeWithClassId {
 
   ITypeWithClassId getContainer();
 
-  void addChartListener(ChartListener listener);
+  IFastListenerList<ChartListener> chartListeners();
 
-  void removeChartListener(ChartListener listener);
+  default void addChartListener(ChartListener listener) {
+    chartListeners().add(listener);
+  }
+
+  default void removeChartListener(ChartListener listener) {
+    chartListeners().remove(listener);
+  }
 
   /**
    * Triggers a property change event for {@link #PROP_CHART_DATA}. Useful when the contents of the chart data bean has
