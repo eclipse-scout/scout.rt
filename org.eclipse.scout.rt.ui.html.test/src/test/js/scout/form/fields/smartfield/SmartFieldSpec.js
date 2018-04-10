@@ -406,6 +406,61 @@ describe('SmartField', function() {
 
   });
 
+  describe('searchRequired', function() {
+
+    it('opens popup if search available and searchRequired=true', function() {
+      var field = createFieldWithLookupCall();
+      field.render();
+      field.$field.focus(); // must be focused, otherwise popup will not open
+      field.setSearchRequired(true);
+      field.setDisplayText('Fo'); // DummyLookupCall contains row named 'Foo'.
+      var result = field.openPopup();
+      jasmine.clock().tick(500);
+
+      expect(field.isPopupOpen()).toBe(true);
+      expect(findTableProposals()).toEqual(['Foo']);
+      expect(field.lookupStatus).toBe(null);
+    });
+
+    it('opens popup if no search available and searchRequired=false', function() {
+      var field = createFieldWithLookupCall();
+      field.render();
+      field.$field.focus(); // must be focused, otherwise popup will not open
+      var result = field.openPopup();
+      jasmine.clock().tick(500);
+
+      expect(field.isPopupOpen()).toBe(true);
+      expect(findTableProposals()).toEqual(['Foo', 'Bar', 'Baz']);
+    });
+
+    it('has no popup if no search available and searchRequired=true', function() {
+      var field = createFieldWithLookupCall();
+      field.render();
+      field.$field.focus(); // must be focused, otherwise popup will not open
+      field.setSearchRequired(true);
+      var result = field.openPopup();
+      jasmine.clock().tick(500);
+
+      expect(field.isPopupOpen()).toBe(false);
+      expect(field.lookupStatus.code).toBe(scout.SmartField.ErrorCode.SEARCH_REQUIRED);
+    });
+
+    it('has empty popup if no search available and searchRequired=true and touch', function() {
+      var field = createFieldWithLookupCall({
+        touch: true
+      });
+      field.render();
+      field.setSearchRequired(true);
+      var result = field.openPopup();
+      jasmine.clock().tick(500);
+
+      expect(field.isPopupOpen()).toBe(true);
+      expect(findTableProposals().length).toBe(0);
+      expect(field.lookupStatus.code).toBe(scout.SmartField.ErrorCode.SEARCH_REQUIRED);
+    });
+
+  });
+
   describe('maxBrowseRowCount', function() {
 
     it('default - don\'t limit lookup rows', function() {

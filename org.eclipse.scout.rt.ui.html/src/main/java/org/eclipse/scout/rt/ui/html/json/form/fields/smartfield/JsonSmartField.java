@@ -117,6 +117,12 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
         return getModel().isActiveFilterEnabled();
       }
     });
+    putJsonProperty(new JsonProperty<ISmartField<VALUE>>(ISmartField.PROP_SEARCH_REQUIRED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isSearchRequired();
+      }
+    });
     putJsonProperty(new JsonProperty<ISmartField<VALUE>>(ISmartField.PROP_ACTIVE_FILTER, model) {
       @Override
       protected TriState modelValue() {

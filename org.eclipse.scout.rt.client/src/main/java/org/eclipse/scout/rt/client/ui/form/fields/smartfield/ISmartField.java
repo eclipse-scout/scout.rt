@@ -36,7 +36,7 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
   String PROP_ACTIVE_FILTER_ENABLED = "activeFilterEnabled";
   String PROP_ACTIVE_FILTER = "activeFilter";
   String PROP_ACTIVE_FILTER_LABELS = "activeFilterLabels";
-
+  String PROP_SEARCH_REQUIRED = "searchRequired";
   String PROP_STATUS = "status";
   String PROP_STATUS_VISIBLE = "statusVisible";
 
@@ -336,5 +336,21 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
    * @param lookupRow
    */
   void setValueByLookupRow(ILookupRow<VALUE> lookupRow);
+
+  /**
+   * @return {@code true} if the smartfield should only show a proposal list if a search text is entered by the user.
+   *         {@code false} (which is the default) if all proposals should be shown if no text search is done.
+   */
+  boolean isSearchRequired();
+
+  /**
+   * Configures whether this smartfield only shows proposals if a text search string has been entered.<br>
+   * Set this property to {@code true} if you expect a large amount of data for an unconstrained search.
+   *
+   * @param searchRequired
+   *          {@code true} if the smartfield should only show a proposal list if a search text is entered by the user.
+   *          {@code false} (which is the default) if all proposals should be shown if no text search is done.
+   */
+  void setSearchRequired(boolean searchRequired);
 
 }

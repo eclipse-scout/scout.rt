@@ -44,6 +44,7 @@ public class UiTextContributor implements IUiTextContributor {
         "SmartFieldInactiveRow",
         "SmartFieldMoreThanXRows",
         "SmartFieldNoDataFound",
+        "TooManyRows",
         "SmartFieldNotUnique",
         "Yes",
         "YesButton",

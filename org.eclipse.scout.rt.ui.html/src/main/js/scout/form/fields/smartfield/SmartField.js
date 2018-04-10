@@ -23,6 +23,7 @@ scout.SmartField = function() {
   this.browseMaxRowCount = scout.SmartField.DEFAULT_BROWSE_MAX_COUNT;
   this.browseAutoExpandAll = true;
   this.browseLoadIncremental = false;
+  this.searchRequired = false;
   this.activeFilterEnabled = false;
   this.activeFilter = null;
   this.activeFilterLabels = [];
@@ -38,7 +39,7 @@ scout.SmartField = function() {
                         // only when the result is up-to-date, we can use the selected lookup row
 
   this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilter', 'activeFilterEnabled', 'activeFilterLabels',
-    'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental'
+    'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental', 'searchRequired'
   ]);
 };
 scout.inherits(scout.SmartField, scout.ValueField);
@@ -51,7 +52,8 @@ scout.SmartField.DisplayStyle = {
 scout.SmartField.ErrorCode = {
   NOT_UNIQUE: 1,
   NO_RESULTS: 2,
-  NO_DATA: 3
+  NO_DATA: 3,
+  SEARCH_REQUIRED: 4
 };
 
 scout.SmartField.DEBOUNCE_DELAY = 200;
@@ -200,7 +202,7 @@ scout.SmartField.prototype._getSelectedLookupRow = function(searchText) {
   }
 
   return this.lookupSeqNo === this.popup.lookupResult.seqNo ?
-      this.popup.getSelectedLookupRow() : null;
+    this.popup.getSelectedLookupRow() : null;
 };
 
 scout.SmartField.prototype._checkSearchTextChanged = function(searchText) {
@@ -248,6 +250,10 @@ scout.SmartField.prototype._acceptInput = function(searchText, searchTextEmpty, 
   if (!selectedLookupRow && !this.lookupRow && searchTextEmpty) {
     $.log.isDebugEnabled() && $.log.debug('(SmartField#acceptInput) unchanged: text is empty. Close popup');
     this._clearLookupStatus();
+    if (this.errorStatus && this.errorStatus.code === scout.SmartField.ErrorCode.NO_RESULTS) {
+      // clear the error status from previous search which did not find any results. This error status is no longer valid as we accept the null content here.
+      this.clearErrorStatus();
+    }
     this._inputAccepted(searchTextChanged);
     return;
   }
@@ -559,7 +565,7 @@ scout.SmartField.prototype.openPopup = function(browse) {
   } else if (this.errorStatus) {
     // In case the search yields a not-unique error, we always want to start a lookup
     // with the current display text in every other case we better do browse again
-    browse = !this._hasNotUniqueError();
+    browse = !this._hasNotUniqueError() && !this.searchRequired;
   }
 
   return this._lookupByTextOrAll(browse, searchText);
@@ -618,8 +624,19 @@ scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText) {
   if (browse) {
     $.log.isDebugEnabled() && $.log.debug('(SmartField#_lookupByTextOrAll) lookup byAll (seachText empty)');
     this._lastSearchText = null;
-    this._executeLookup(this.lookupCall.getAll.bind(this.lookupCall))
-      .done(doneHandler);
+    if (this.searchRequired) {
+      doneHandler({
+        queryBy: scout.QueryBy.TEXT,
+        lookupRows: []
+      });
+      this.setLookupStatus(scout.Status.warn({
+        message: this.session.text('TooManyRows'),
+        code: scout.SmartField.ErrorCode.SEARCH_REQUIRED
+      }));
+    } else {
+      this._executeLookup(this.lookupCall.getAll.bind(this.lookupCall))
+        .done(doneHandler);
+    }
   } else {
     // execute lookup byText with a debounce/delay
     this._pendingLookup = setTimeout(function() {
@@ -819,7 +836,7 @@ scout.SmartField.prototype._onIconMouseDown = function(event) {
     if (this.isDropdown()) {
       this.togglePopup();
     } else if (!this.popup) {
-      this.openPopup(true);
+      this.openPopup(!this.searchRequired);
     }
   }
 };
@@ -853,7 +870,7 @@ scout.SmartField.prototype.togglePopup = function() {
   if (this.isPopupOpen()) {
     this.closePopup();
   } else {
-    this.openPopup(true);
+    this.openPopup(!this.searchRequired);
   }
 };
 
@@ -986,7 +1003,7 @@ scout.SmartField.prototype._onFieldKeyDown = function(event) {
     if (this.isPopupOpen()) {
       this.popup.delegateKeyEvent(event);
     } else if (!this._pendingOpenPopup) {
-      this.openPopup(true);
+      this.openPopup(!this.searchRequired);
     }
   }
 };
@@ -1060,7 +1077,7 @@ scout.SmartField.prototype._onLookupRowSelected = function(event) {
 
 scout.SmartField.prototype._onActiveFilterSelected = function(event) {
   this.setActiveFilter(event.activeFilter);
-  this._lookupByTextOrAll(true);
+  this._lookupByTextOrAll(!this.searchRequired);
 };
 
 scout.SmartField.prototype.setBrowseMaxRowCount = function(browseMaxRowCount) {
@@ -1084,6 +1101,10 @@ scout.SmartField.prototype.setActiveFilter = function(activeFilter) {
 
 scout.SmartField.prototype.setActiveFilterEnabled = function(activeFilterEnabled) {
   this.setProperty('activeFilterEnabled', activeFilterEnabled);
+};
+
+scout.SmartField.prototype.setSearchRequired = function(searchRequired) {
+  this.setProperty('searchRequired', searchRequired);
 };
 
 /**
@@ -1266,7 +1287,7 @@ scout.SmartField.prototype._triggerAcceptByText = function(searchText) {
 scout.SmartField.prototype.onCellEditorRendered = function(options) {
   if (options.openFieldPopup) {
     this._cellEditorPopup = options.cellEditorPopup;
-    this.openPopup(true);
+    this.openPopup(!this.searchRequired);
   }
 };
 
@@ -1380,6 +1401,6 @@ scout.SmartField.prototype._flushLookupStatus = function() {
 scout.SmartField.prototype.requestInput = function() {
   if (this.enabledComputed && this.rendered) {
     this.focus();
-    this.openPopup(true);
+    this.openPopup(!this.searchRequired);
   }
 };

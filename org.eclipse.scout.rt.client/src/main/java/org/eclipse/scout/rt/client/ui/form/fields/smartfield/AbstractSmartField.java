@@ -196,6 +196,20 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   /**
+   * Configures whether this smartfield only shows proposals if a text search string has been entered.<br>
+   * Set this property to {@code true} if you expect a large amount of data for an unconstrained search.<br>
+   * The default value is {@code false}.
+   *
+   * @return {@code true} if the smartfield should only show a proposal list if a search text is entered by the user.
+   *         {@code false} (which is the default) if all proposals should be shown if no text search is done.
+   */
+  @Order(315)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredSearchRequired() {
+    return false;
+  }
+
+  /**
    * variant A: lookup by code type
    */
   @ConfigProperty(ConfigProperty.CODE_TYPE)
@@ -417,6 +431,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     setBrowseHierarchy(getConfiguredBrowseHierarchy());
     setBrowseAutoExpandAll(getConfiguredBrowseAutoExpandAll());
     setBrowseLoadIncremental(getConfiguredBrowseLoadIncremental());
+    setSearchRequired(getConfiguredSearchRequired());
     setLoadParentNodes(getConfiguredLoadParentNodes());
     setMultilineText(getConfiguredMultilineText());
     setBrowseMaxRowCount(getConfiguredBrowseMaxRowCount());
@@ -546,6 +561,16 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   public void setBrowseHierarchy(boolean browseHierarchy) {
     propertySupport.setPropertyBool(PROP_BROWSE_HIERARCHY, browseHierarchy);
     initLookupRowFetcher();
+  }
+
+  @Override
+  public boolean isSearchRequired() {
+    return propertySupport.getPropertyBool(PROP_SEARCH_REQUIRED);
+  }
+
+  @Override
+  public void setSearchRequired(boolean searchRequired) {
+    propertySupport.setPropertyBool(PROP_SEARCH_REQUIRED, searchRequired);
   }
 
   @Override
