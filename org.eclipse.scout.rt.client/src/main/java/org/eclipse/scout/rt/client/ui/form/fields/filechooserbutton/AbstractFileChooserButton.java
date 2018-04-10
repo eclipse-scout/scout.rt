@@ -8,34 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.filechooserfield;
+package org.eclipse.scout.rt.client.ui.form.fields.filechooserbutton;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ModelContextProxy;
-import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.filechooserfield.IFileChooserFieldExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.filechooserbutton.IFileChooserButtonExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.StringUtility;
 
 @ClassId("8d2818c2-5659-4c03-87ef-09441302fbdd")
-public abstract class AbstractFileChooserField extends AbstractValueField<BinaryResource> implements IFileChooserField {
+public abstract class AbstractFileChooserButton extends AbstractValueField<BinaryResource> implements IFileChooserButton {
 
-  private IFileChooserFieldUIFacade m_uiFacade;
-  private boolean m_showFileExtension;
   private List<String> m_fileExtensions;
 
-  public AbstractFileChooserField() {
+  public AbstractFileChooserButton() {
     this(true);
   }
 
-  public AbstractFileChooserField(boolean callInitializer) {
+  public AbstractFileChooserButton(boolean callInitializer) {
     super(callInitializer);
   }
 
@@ -61,28 +55,15 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
   }
 
   @Override
+  protected boolean getConfiguredLabelVisible() {
+    return false;
+  }
+
+  @Override
   protected void initConfig() {
-    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     super.initConfig();
-    setShowFileExtension(getConfiguredShowFileExtension());
     setFileExtensions(getConfiguredFileExtensions());
     setMaximumUploadSize(getConfiguredMaximumUploadSize());
-  }
-
-  @Override
-  public IFileChooserFieldUIFacade getUIFacade() {
-    return m_uiFacade;
-  }
-
-  @Override
-  public void setShowFileExtension(boolean b) {
-    m_showFileExtension = b;
-    refreshDisplayText();
-  }
-
-  @Override
-  public boolean isShowFileExtension() {
-    return m_showFileExtension;
   }
 
   @Override
@@ -125,51 +106,15 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
     return 0;
   }
 
-  // format value for display
-  @Override
-  protected String formatValueInternal(BinaryResource validValue) {
-    if (validValue == null) {
-      return null;
-    }
-    String filename = validValue.getFilename();
-    if (StringUtility.hasText(filename)) {
-      if (!isShowFileExtension() && filename.indexOf('.') >= 0) {
-        return filename.substring(0, filename.lastIndexOf('.'));
-      }
-      return filename;
-    }
-    return null;
-  }
+  protected static class LocalFileChooserButtonExtension<OWNER extends AbstractFileChooserButton> extends LocalValueFieldExtension<BinaryResource, OWNER> implements IFileChooserButtonExtension<OWNER> {
 
-  @Override
-  protected BinaryResource parseValueInternal(String text) {
-    // Don't allow to edit the value - except to completely delete it!
-    if (StringUtility.hasText(text)) {
-      return getValue();
-    }
-    return null;
-  }
-
-  protected class P_UIFacade implements IFileChooserFieldUIFacade {
-
-    @Override
-    public void parseAndSetValueFromUI(String value) {
-      if (!isEnabled() || !isVisible()) {
-        return;
-      }
-      parseAndSetValue(value);
-    }
-  }
-
-  protected static class LocalFileChooserFieldExtension<OWNER extends AbstractFileChooserField> extends LocalValueFieldExtension<BinaryResource, OWNER> implements IFileChooserFieldExtension<OWNER> {
-
-    public LocalFileChooserFieldExtension(OWNER owner) {
+    public LocalFileChooserButtonExtension(OWNER owner) {
       super(owner);
     }
   }
 
   @Override
-  protected IFileChooserFieldExtension<? extends AbstractFileChooserField> createLocalExtension() {
-    return new LocalFileChooserFieldExtension<>(this);
+  protected IFileChooserButtonExtension<? extends AbstractFileChooserButton> createLocalExtension() {
+    return new LocalFileChooserButtonExtension<>(this);
   }
 }

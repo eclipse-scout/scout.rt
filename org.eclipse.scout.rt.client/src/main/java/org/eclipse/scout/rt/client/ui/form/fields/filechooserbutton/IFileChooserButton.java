@@ -8,14 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.filechooserfield;
+package org.eclipse.scout.rt.client.ui.form.fields.filechooserbutton;
 
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
-public interface IFileChooserField extends IValueField<BinaryResource> {
+public interface IFileChooserButton extends IValueField<BinaryResource> {
 
   String PROP_MAXIMUM_UPLOAD_SIZE = "maximumUploadSize";
 
@@ -23,12 +23,6 @@ public interface IFileChooserField extends IValueField<BinaryResource> {
    * Default maximum upload size.
    */
   long DEFAULT_MAXIMUM_UPLOAD_SIZE = 50 * 1024 * 1024; // default: 50 MB
-
-  IFileChooserFieldUIFacade getUIFacade();
-
-  void setShowFileExtension(boolean showFileExtension);
-
-  boolean isShowFileExtension();
 
   void setFileExtensions(List<String> extensions);
 
@@ -54,5 +48,4 @@ public interface IFileChooserField extends IValueField<BinaryResource> {
    * @return maximum size for upload in bytes
    */
   long getMaximumUploadSize();
-
 }

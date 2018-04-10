@@ -391,6 +391,8 @@
   __include("scout/form/fields/datefield/DateField.js");
   __include("scout/form/fields/datefield/DateFieldAdapter.js");
   __include("scout/form/fields/datefield/DateTimeCompositeLayout.js");
+  __include("scout/form/fields/filechooserbutton/FileChooserButton.js");
+  __include("scout/form/fields/filechooserbutton/FileChooserButtonAdapter.js");
   __include("scout/form/fields/filechooserfield/FileChooserField.js");
   __include("scout/form/fields/filechooserfield/FileChooserFieldAdapter.js");
   __include("scout/form/fields/filechooserfield/FileChooserFieldBrowseKeyStroke.js");
