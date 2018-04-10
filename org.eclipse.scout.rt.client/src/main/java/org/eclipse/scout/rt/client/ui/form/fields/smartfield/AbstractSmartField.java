@@ -416,7 +416,6 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     setActiveFilterEnabled(getConfiguredActiveFilterEnabled());
     setBrowseHierarchy(getConfiguredBrowseHierarchy());
     setBrowseAutoExpandAll(getConfiguredBrowseAutoExpandAll());
-    setBrowseIconId(getConfiguredBrowseIconId());
     setBrowseLoadIncremental(getConfiguredBrowseLoadIncremental());
     setLoadParentNodes(getConfiguredLoadParentNodes());
     setMultilineText(getConfiguredMultilineText());
@@ -496,26 +495,6 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   protected void setResult(ILookupCallResult<VALUE> result) {
     propertySupport.setProperty(PROP_RESULT, result);
-  }
-
-  @Override
-  public String getBrowseIconId() {
-    return propertySupport.getPropertyString(PROP_BROWSE_ICON_ID);
-  }
-
-  @Override
-  public void setBrowseIconId(String s) {
-    propertySupport.setPropertyString(PROP_BROWSE_ICON_ID, s);
-  }
-
-  @Override
-  public String getIconId() {
-    return propertySupport.getPropertyString(PROP_ICON_ID);
-  }
-
-  @Override
-  public void setIconId(String s) {
-    propertySupport.setPropertyString(PROP_ICON_ID, s);
   }
 
   @Override

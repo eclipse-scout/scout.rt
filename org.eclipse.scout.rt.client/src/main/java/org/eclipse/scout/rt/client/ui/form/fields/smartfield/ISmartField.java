@@ -48,12 +48,10 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
    */
   String EXECUTION_HINT_INITIAL_LOOKUP = "initialLookup";
 
-  String PROP_BROWSE_ICON_ID = "browseIconId";
   String PROP_BROWSE_HIERARCHY = "browseHierarchy";
   String PROP_BROWSE_LOAD_INCREMENTAL = "browseLoadIncremental";
   String PROP_BROWSE_LOAD_PARENT_NODES = "browseLoadParentNodes";
   String PROP_BROWSE_AUTO_EXPAND_ALL = "browseAutoExpandAll";
-  String PROP_ICON_ID = "iconId";
   String PROP_MULTILINE_TEXT = "multilineText";
   String PROP_BROWSE_MAX_ROW_COUNT = "browseMaxRowCount";
   String PROP_COLUMN_DESCRIPTORS = "columnDescriptors";
@@ -111,17 +109,9 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
    */
   void setActiveFilter(TriState state);
 
-  String getBrowseIconId();
-
-  void setBrowseIconId(String s);
-
   int getBrowseMaxRowCount();
 
   void setBrowseMaxRowCount(int n);
-
-  String getIconId();
-
-  void setIconId(String s);
 
   /**
    * @since 5.1
