@@ -313,6 +313,17 @@ describe('SmartField2', function() {
       expect(field.lookupStatus).toBe(null);
     });
 
+    it('lookupByKey should set first lookup-row from result as this.lookupRow', function() {
+      var field = createFieldWithLookupCall();
+      var displayText = null;
+      field._formatValue(3) // triggers lookup by key
+        .then(function(displayText0) {
+          displayText = displayText0;
+        });
+      jasmine.clock().tick(500);
+      expect(displayText).toBe('Baz');
+    });
+
   });
 
   describe('touch / embed', function() {

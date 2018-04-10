@@ -93,3 +93,18 @@ scout.LookupCall.prototype.getByKey = function(key) {
 scout.LookupCall.prototype.getByRec = function(rec) {
   throw new Error('getByRec() not implemented');
 };
+
+//---- static helpers ----
+
+scout.LookupCall.firstLookupRow = function(result) {
+  if (!result) {
+    return null;
+  }
+  if (!scout.objects.isArray(result.lookupRows)) {
+    return null;
+  }
+  if (result.lookupRows.length === 0) {
+    return null;
+  }
+  return result.lookupRows[0];
+};

@@ -529,8 +529,9 @@ scout.SmartField2.prototype._formatValue = function(value) {
     .then(this._lookupByKeyDone.bind(this));
 };
 
-scout.SmartField2.prototype._lookupByKeyDone = function(lookupRow) {
+scout.SmartField2.prototype._lookupByKeyDone = function(result) {
   this._notUnique = false;
+  var lookupRow = scout.LookupCall.firstLookupRow(result);
   this.setLookupRow(lookupRow);
   return this._formatLookupRow(lookupRow);
 };
