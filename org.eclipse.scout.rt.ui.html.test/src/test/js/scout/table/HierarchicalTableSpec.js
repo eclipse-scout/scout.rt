@@ -46,49 +46,205 @@ describe("HierarchicalTableSpec", function() {
     }, session);
   }
 
+  function expectRowIds(rows, ids) {
+    expect(rows.map(function(row) {
+      return row.id;
+    })).toEqual(ids);
+  }
+
+  function getTreeRows(table) {
+    var flatTreeRows = [];
+    table.visitRows(function(row) {
+      flatTreeRows.push(row);
+    }.bind(this));
+    return flatTreeRows;
+  }
+
+  function getUiRows(table) {
+    return $.makeArray(table.$rows()).map(function(row) {
+      return $(row).data('row');
+    });
+  }
+
+  describe("add", function() {
+    var table, rowIds, rows;
+
+    /**
+     * inital table
+     * -------------
+     * 1
+     * |-- 2
+     * 3
+     **/
+    beforeEach(function() {
+      rowIds = [1, 2, 3];
+      rows = rowIds.map(function(id) {
+        return helper.createModelRow(id, ['row' + id]);
+      });
+      var model = helper.createModel(helper.createModelColumns(1), rows);
+      table = helper.createTable(model),
+        rows = table.rows;
+      rows[1].parentId = rows[0].id,
+        table.updateRows(rows);
+      table.render();
+    });
+
+    it("a root row", function() {
+      table.insertRow(helper.createModelRow(33, ['newRow']));
+      expect(table.rows.length).toBe(4);
+      expect(table._filteredRows.length).toBe(4);
+      expect(table.visibleRows.length).toBe(4);
+      expect(table.rootRows.length).toBe(3);
+      expect(table.rootRows[2].id).toBe(33);
+
+      var expectedRowIds = rowIds.slice();
+      expectedRowIds.splice(3, 0, 33);
+      expectRowIds(table.rows, expectedRowIds);
+      expectRowIds(getTreeRows(table), expectedRowIds);
+      expectRowIds(table._filteredRows, expectedRowIds);
+      expectRowIds(table.visibleRows, expectedRowIds);
+      expectRowIds(getUiRows(table), expectedRowIds);
+    });
+
+    it("a child row to a row which is already a parent row", function() {
+      var newRow = helper.createModelRow(33, ['newRow']),
+        parentRow = table.rows[0];
+      newRow.parentId = parentRow.id;
+      table.insertRow(newRow);
+      expect(table.rows.length).toBe(4);
+      expect(table._filteredRows.length).toBe(4);
+      expect(table.visibleRows.length).toBe(4);
+      expect(table.rootRows.length).toBe(2);
+      expect(table.rowsMap[parentRow.id].childRows.length).toBe(2);
+      expect(table.rowsMap[33].parentRow).toBe(parentRow);
+
+      var expectedRowIds = rowIds.slice();
+      expectedRowIds.splice(2, 0, 33);
+      expectRowIds(table.rows, expectedRowIds);
+      expectRowIds(getTreeRows(table), expectedRowIds);
+      expectRowIds(table._filteredRows, expectedRowIds);
+      expectRowIds(table.visibleRows, expectedRowIds);
+      expectRowIds(getUiRows(table), expectedRowIds);
+
+    });
+
+    it("a child row to a row which is leaf", function() {
+      var newRow = helper.createModelRow(33, ['newRow']),
+        parentRow = table.rows[2];
+      newRow.parentId = parentRow.id;
+      table.insertRow(newRow);
+      expect(table.rows.length).toBe(4);
+      expect(table._filteredRows.length).toBe(4);
+      expect(table.visibleRows.length).toBe(4);
+      expect(table.rootRows.length).toBe(2);
+      expect(table.rowsMap[parentRow.id].childRows.length).toBe(1);
+      expect(table.rowsMap[33].parentRow).toBe(parentRow);
+
+      var expectedRowIds = rowIds.slice();
+      expectedRowIds.splice(3, 0, 33);
+      expectRowIds(table.rows, expectedRowIds);
+      expectRowIds(getTreeRows(table), expectedRowIds);
+      expectRowIds(table._filteredRows, expectedRowIds);
+      expectRowIds(table.visibleRows, expectedRowIds);
+      expectRowIds(getUiRows(table), expectedRowIds);
+    });
+
+    it("a child row to a collapsed row", function() {
+      var newRow = helper.createModelRow(33, ['newRow']),
+        parentRow = table.rows[0];
+      newRow.parentId = parentRow.id;
+      table.collapseRow(parentRow);
+      table.insertRow(newRow);
+
+      expect(table.rowsMap[parentRow.id].childRows.length).toBe(2);
+      expect(table.rowsMap[33].parentRow).toBe(parentRow);
+
+      expectRowIds(table.rows, [1, 2, 33, 3]);
+      expectRowIds(getTreeRows(table), [1, 2, 33, 3]);
+      expectRowIds(table._filteredRows, [1, 2, 33, 3]);
+      expectRowIds(table.visibleRows, [1, 3]);
+      expectRowIds(getUiRows(table), [1, 3]);
+    });
+  });
+
   describe("delete", function() {
     var table, rows, rowIds;
+    /**
+     * inital table
+     * -------------
+     * 1
+     * |-- 2
+     *     |-- 3
+     * 4
+     * |-- 5
+     * |-- 6
+     * 7
+     **/
     beforeEach(function() {
-      var model = helper.createModelFixture(1, 7);
+      rowIds = [1, 2, 3, 4, 5, 6, 7];
+      rows = rowIds.map(function(id) {
+        return helper.createModelRow(id, ['row' + id]);
+      });
+      var model = helper.createModel(helper.createModelColumns(1), rows);
       table = helper.createTable(model),
-        rows = table.rows,
-        rowIds = table.rows.map(function(r) {
-          return r.id;
-        });
+        rows = table.rows;
       rows[1].parentId = rows[0].id;
       rows[2].parentId = rows[1].id;
       rows[4].parentId = rows[3].id;
       rows[5].parentId = rows[3].id;
       table.updateRows(rows);
       table.render();
+
     });
 
     it("leaf row and expect the row structure to be valid", function() {
       table.deleteRow(rows[5]);
-      expect(table.rows.length).toBe(6);
-      expect(table._filteredRows.length).toBe(6);
-      expect(table.visibleRows.length).toBe(6);
       expect(table.visibleRows.indexOf(rows[5])).toBe(-1);
       expect(rows[3].childRows.length).toBe(1);
+
+      var expectedRowIds = rowIds.slice();
+      expectedRowIds.splice(5, 1);
+      expectRowIds(table.rows, expectedRowIds);
+      expectRowIds(getTreeRows(table), expectedRowIds);
+      expectRowIds(table._filteredRows, expectedRowIds);
+      expectRowIds(table.visibleRows, expectedRowIds);
+      expectRowIds(getUiRows(table), expectedRowIds);
     });
 
     it("leaf row with collapsed parent and expect the structure to be valid", function() {
       table.collapseRow(rows[3]);
+      expect(table.visibleRows.length).toBe(5);
       table.deleteRow(rows[5]);
-      expect(table.rows.length).toBe(6);
-      expect(table._filteredRows.length).toBe(6);
-      expect(table.visibleRows.length).toBe(6);
+      expect(rows[3].expanded).toBeFalsy();
       expect(table.visibleRows.indexOf(rows[5])).toBe(-1);
       expect(rows[3].childRows.length).toBe(1);
+
+      // structure
+      var expectedRowIds = rowIds.slice();
+      expectedRowIds.splice(5, 1);
+      expectRowIds(table.rows, expectedRowIds);
+      expectRowIds(getTreeRows(table), expectedRowIds);
+      expectRowIds(table._filteredRows, expectedRowIds);
+      expectedRowIds.splice(4, 1);
+      expectRowIds(table.visibleRows, expectedRowIds);
+      expectRowIds(getUiRows(table), expectedRowIds);
+
     });
 
     it("a parent row and expect all children are deleted cascading.", function() {
       table.deleteRow(rows[3]);
-      expect(table.rows.length).toBe(4);
-      expect(table._filteredRows.length).toBe(4);
-      expect(table.visibleRows.length).toBe(4);
+      expect(table.visibleRows.indexOf(rows[3])).toBe(-1);
       expect(table.visibleRows.indexOf(rows[4])).toBe(-1);
       expect(table.visibleRows.indexOf(rows[5])).toBe(-1);
+
+      // structure
+      var expectedRowIds = rowIds.slice();
+      expectedRowIds.splice(3, 3);
+      expectRowIds(table.rows, expectedRowIds);
+      expectRowIds(getTreeRows(table), expectedRowIds);
+      expectRowIds(table._filteredRows, expectedRowIds);
+      expectRowIds(table.visibleRows, expectedRowIds);
+      expectRowIds(getUiRows(table), expectedRowIds);
     });
   });
 
@@ -113,7 +269,7 @@ describe("HierarchicalTableSpec", function() {
 
       row.parentId = rows[0].id;
       table.insertRow(row);
-      expect(table._renderViewport.calls.count()).toBe(1);
+      expect(table._renderViewport.calls.count()).toBe(2);
 
       row = scout.arrays.find(table.rows, function(r) {
         return r.cells[0].text === 'newRow';

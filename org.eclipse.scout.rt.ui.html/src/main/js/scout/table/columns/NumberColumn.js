@@ -185,7 +185,7 @@ scout.NumberColumn.prototype._resolveBackgroundEffectFunc = function() {
 };
 
 scout.NumberColumn.prototype._renderBackgroundEffect = function() {
-  this.table.filteredRows().forEach(function(row) {
+  this.table.visibleRows.forEach(function(row) {
     if (!row.$row) {
       return;
     }

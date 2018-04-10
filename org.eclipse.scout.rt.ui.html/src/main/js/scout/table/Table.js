@@ -2192,15 +2192,16 @@ scout.Table.prototype.insertRows = function(rows) {
     this._applyFiltersForRow(row);
     return row.filterAccepted;
   }, this);
-  if (filterAcceptedRows.length > 0) {
-    this._updateFilteredRows(false, true);
-  }
 
   this._updateRowStructure({
     updateTree: true,
-    filteredRows: false,
+    filteredRows: true,
+    applyFilters: false,
     visibleRows: true
   });
+  if (filterAcceptedRows.length > 0) {
+    this._triggerFilter();
+  }
 
   this._calculateValuesForBackgroundEffect();
   this._markAutoOptimizeWidthColumnsAsDirty();
@@ -2228,6 +2229,15 @@ scout.Table.prototype.insertRows = function(rows) {
 };
 
 scout.Table.prototype._sortAfterInsert = function(wasEmpty) {
+  var sortColumns = this._sortColumns();
+
+  if (this.hierarchical && (!this._isSortingPossible(sortColumns) || !sortColumns.length)) {
+    // respect minimal sort order after insert a new row
+    if (this.rendered) {
+      this._renderRowOrderChanges();
+    }
+    return;
+  }
   this._sort();
 };
 
@@ -2272,12 +2282,15 @@ scout.Table.prototype.deleteRows = function(rows) {
 
   this.deselectRows(removedRows);
 
-  this._updateFilteredRows(false, filterChanged);
   this._updateRowStructure({
     updateTree: true,
-    filteredRows: false,
+    filteredRows: true,
+    applyFilters: false,
     visibleRows: true
   });
+  if (filterChanged) {
+    this._triggerFilter();
+  }
   this._group();
   this._updateBackgroundEffect();
   this._markAutoOptimizeWidthColumnsAsDirty();
@@ -2313,12 +2326,15 @@ scout.Table.prototype.deleteAllRows = function() {
   this._filteredRows = [];
   this.deselectAll();
 
-  this._updateFilteredRows(false, filterChanged);
   this._updateRowStructure({
     updateTree: true,
-    filteredRows: false,
+    filteredRows: true,
+    applyFilters: false,
     visibleRows: true
   });
+  if (filterChanged) {
+    this._triggerFilter();
+  }
 
   this._markAutoOptimizeWidthColumnsAsDirty();
   this._group();
@@ -2389,15 +2405,15 @@ scout.Table.prototype.updateRows = function(rows) {
 
   this._triggerRowsUpdated(rows);
 
-  // update filterd rows before updateRowStructure to not apply filters again.
-  this._updateFilteredRows(false, filterChanged);
   this._updateRowStructure({
     updateTree: true,
-    filteredRows: false,
+    filteredRows: true,
+    applyFilters: false,
     visibleRows: true
   });
 
   if (filterChanged) {
+    this._triggerFilter();
     this._renderRowDelta();
   }
 
@@ -2435,8 +2451,6 @@ scout.Table.prototype._rebuildTreeStructure = function() {
   var expandedRows = [];
   this.rows.forEach(function(row) {
     var parentRow;
-    // TODO expanded from model
-    row.expanded = true;
     if (!scout.objects.isNullOrUndefined(row.parentId)) {
       parentRow = this.rowsMap[row.parentId];
       if (parentRow) {
@@ -4014,9 +4028,9 @@ scout.Table.prototype._modifyRangeMarkers = function(funcName) {
   if (this.viewRangeRendered.size() === 0) {
     return;
   }
-  var filteredRows = this.visibleRows;
-  modifyRangeMarker(filteredRows[this.viewRangeRendered.from], 'first');
-  modifyRangeMarker(filteredRows[this.viewRangeRendered.to - 1], 'last');
+  var visibleRows = this.visibleRows;
+  modifyRangeMarker(visibleRows[this.viewRangeRendered.from], 'first');
+  modifyRangeMarker(visibleRows[this.viewRangeRendered.to - 1], 'last');
 
   function modifyRangeMarker(row, cssClass) {
     if (row && row.$row) {

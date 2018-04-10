@@ -47,7 +47,7 @@ scout.TableSelectionHandler.prototype.onMouseDown = function(event) {
     oldSelectedState = $row.isSelected();
   this._mouseDown = true;
 
-  this._allRows = this.table.filteredRows();
+  this._allRows = this.table.visibleRows;
   this.select = true;
   if (this.table.multiSelect && event.shiftKey) {
     // when a selected row in the middle of a selection-block has
@@ -197,7 +197,7 @@ scout.TableSelectionHandler.prototype._selectRange = function(fromIndex, toIndex
 scout.TableSelectionHandler.prototype.getMinMaxSelectionIndizes = function() {
   var
     selectedRows = this.table.selectedRows,
-    allRows = this.table.filteredRows();
+    allRows = this.table.visibleRows;
 
   if (!selectedRows || selectedRows.length === 0) {
     return [-1, -1];
