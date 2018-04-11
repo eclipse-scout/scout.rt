@@ -28,7 +28,6 @@ public interface IButton extends IFormField, IContextMenuOwner {
    * Properties
    */
   String PROP_ICON_ID = "iconId";
-  String PROP_IMAGE = "image";
   String PROP_SELECTED = "selected";
   String PROP_CONTEXT_MENU = "contextMenu";
   String PROP_KEY_STROKE = "keyStroke";
@@ -75,10 +74,6 @@ public interface IButton extends IFormField, IContextMenuOwner {
   String getIconId();
 
   void setIconId(String iconId);
-
-  Object getImage();
-
-  void setImage(Object nativeImg);
 
   String getKeyStroke();
 

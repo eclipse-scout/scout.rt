@@ -333,11 +333,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   @Override
-  public Object getImage() {
-    return propertySupport.getProperty(PROP_IMAGE);
-  }
-
-  @Override
   public String getKeyStroke() {
     return propertySupport.getPropertyString(PROP_KEY_STROKE);
   }
@@ -345,11 +340,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   @Override
   public void setKeyStroke(String keyStroke) {
     propertySupport.setPropertyString(PROP_KEY_STROKE, keyStroke);
-  }
-
-  @Override
-  public void setImage(Object nativeImg) {
-    propertySupport.setProperty(PROP_IMAGE, nativeImg);
   }
 
   @Override
