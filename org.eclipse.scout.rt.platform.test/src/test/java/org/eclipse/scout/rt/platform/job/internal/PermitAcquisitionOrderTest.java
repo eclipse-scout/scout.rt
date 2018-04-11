@@ -84,7 +84,7 @@ public class PermitAcquisitionOrderTest {
 
     IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(1);
 
-    final Date date = new Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(2));
+    final Date date = new Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(10));
 
     // Schedule 100 jobs to start at the same time
     for (int i = 0; i < regressionCount; i++) {
@@ -104,7 +104,7 @@ public class PermitAcquisitionOrderTest {
 
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(jobIdentifier)
-        .toFilter(), 10, TimeUnit.SECONDS);
+        .toFilter(), 60, TimeUnit.SECONDS);
 
     List<String> expectedProtocol = new ArrayList<>();
     for (int i = 0; i < regressionCount; i++) {

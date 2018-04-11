@@ -83,32 +83,32 @@ public class ConcurrentBeanCreationDeadlockDetectionTest {
     m_beans = null;
   }
 
-  @Test(timeout = 2500)
+  @Test(timeout = 10000)
   public void testConcurrentConstructorSingleThread() throws Exception {
     testConcurrentTestBeanSingleThread(ConcurrentConstructorTestBean.class);
   }
 
-  @Test(timeout = 2500)
+  @Test(timeout = 10000)
   public void testConcurrentPostConstructSingleThread() throws Exception {
     testConcurrentTestBeanSingleThread(ConcurrentPostConstructTestBean.class);
   }
 
-  @Test(timeout = 2500)
+  @Test(timeout = 10000)
   public void testConcurrentConstructorWithTwoIndependentThreads() throws Exception {
     testConcurrentTestBeanWithTwoIndependentThreads(ConcurrentConstructorTestBean.class);
   }
 
-  @Test(timeout = 2500)
+  @Test(timeout = 10000)
   public void testConcurrentPostConstructWithTwoIndependentThreads() throws Exception {
     testConcurrentTestBeanWithTwoIndependentThreads(ConcurrentPostConstructTestBean.class);
   }
 
-  @Test(timeout = 2500)
+  @Test(timeout = 10000)
   public void testConcurrentConstructorWithTwoDependingThreads() throws Exception {
     testConcurrentSelfReferencingTestBean(ConcurrentConstructorSelfReferencingTestBean.class);
   }
 
-  @Test(timeout = 2500)
+  @Test(timeout = 10000)
   public void testConcurrentPostConstructWithTwoDependingThreads() throws Exception {
     testConcurrentSelfReferencingTestBean(ConcurrentPostConstructSelfReferencingTestBean.class);
   }
