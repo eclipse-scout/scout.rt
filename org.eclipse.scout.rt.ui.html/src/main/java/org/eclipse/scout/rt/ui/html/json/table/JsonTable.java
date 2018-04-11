@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.GroupingStyle;
+import org.eclipse.scout.rt.client.ui.basic.table.HierarchicalStyle;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
@@ -319,6 +320,18 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       @Override
       public Object prepareValueForToJson(Object value) {
         return ((GroupingStyle) value).name().toLowerCase();
+      }
+    });
+
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_HIERARCHICAL_STYLE, model) {
+      @Override
+      protected HierarchicalStyle modelValue() {
+        return getModel().getHierarchicalStyle();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return ((HierarchicalStyle) value).name().toLowerCase();
       }
     });
     putJsonProperty(new JsonAdapterProperty<ITable>(ITable.PROP_KEY_STROKES, model, getUiSession()) {
