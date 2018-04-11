@@ -645,19 +645,6 @@ scout.Form.prototype._renderIconId = function() {
   }
 };
 
-/**
- * Disables the form and calls setEnabled on the root group-box of the form.
- *
- * @param updateChildren
- *          (optional) If true the enabled property of all child form fields (recursive) are updated to same value as well.
- *
- * @override Widget.js
- */
-scout.Form.prototype.setEnabled = function(enabled, updateChildren) {
-  scout.Form.parent.prototype.setEnabled.call(this, enabled);
-  this.rootGroupBox.setEnabled(enabled, undefined, updateChildren);
-};
-
 scout.Form.prototype._setViews = function(views) {
   if (views) {
     views.forEach(function(view) {
