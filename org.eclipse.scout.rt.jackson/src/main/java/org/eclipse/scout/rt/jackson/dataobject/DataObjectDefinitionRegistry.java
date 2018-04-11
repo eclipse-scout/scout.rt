@@ -1,6 +1,7 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collections;
@@ -190,7 +191,7 @@ public class DataObjectDefinitionRegistry {
     Map<String, DataObjectAttributeDefinition> attributes = new HashMap<>();
     for (Method method : entityClass.getMethods()) {
       // consider only attribute accessor methods
-      if (method.getParameterCount() == 0) {
+      if (method.getParameterCount() == 0 && !Modifier.isStatic(method.getModifiers())) {
         Type returnType = method.getGenericReturnType();
         if (returnType instanceof ParameterizedType) {
           ParameterizedType pt = (ParameterizedType) returnType;

@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.Map;
@@ -23,6 +24,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDateDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemDo;
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoList;
+import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.IValueFormatConstants;
 import org.eclipse.scout.rt.platform.dataobject.TypeName;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
@@ -48,12 +50,25 @@ public class DataObjectDefinitionRegistryTest {
   public static class TestFixtureSubclass2Do extends TestBaseFixtureEntityDo {
   }
 
+  @TypeName("TestFixtureEntity")
+  public static abstract class TestFixtureEntityDo extends DoEntity {
+    public DoValue<String> id() {
+      return doValue("id");
+    }
+
+    // static attribute definitions should be ignored
+    public static DoValue<String> idStatic() {
+      return new DoValue<>();
+    }
+  }
+
   @Before
   public void before() {
     m_registry = new DataObjectDefinitionRegistry();
     m_registry.registerClass(TestComplexEntityDo.class);
     m_registry.registerClass(TestItemDo.class);
     m_registry.registerClass(TestDateDo.class);
+    m_registry.registerClass(TestFixtureEntityDo.class);
   }
 
   @Test
@@ -103,6 +118,12 @@ public class DataObjectDefinitionRegistryTest {
 
     assertFalse(m_registry.getAttributeDescription(TestItemDo.class, "foo").isPresent());
     assertFalse(m_registry.getAttributeDescription(DoEntity.class, "foo").isPresent());
+
+    attributeDescription = m_registry.getAttributeDescription(TestFixtureEntityDo.class, "id");
+    assertTrue(attributeDescription.isPresent());
+
+    attributeDescription = m_registry.getAttributeDescription(TestFixtureEntityDo.class, "idStatic");
+    assertFalse(attributeDescription.isPresent());
   }
 
   @Test
