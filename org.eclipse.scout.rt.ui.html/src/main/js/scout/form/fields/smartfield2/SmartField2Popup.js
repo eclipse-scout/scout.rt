@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.SmartField2Popup = function() {
   scout.SmartField2Popup.parent.call(this);
-  this.animateRemoval = true;
+  this.animateRemoval = scout.SmartField2Popup.hasPopupAnimation();
 };
 scout.inherits(scout.SmartField2Popup, scout.Popup);
 
@@ -117,4 +117,15 @@ scout.SmartField2Popup.prototype._isMouseDownOnAnchor = function(event) {
 
 scout.SmartField2Popup.prototype._onAnimationEnd = function() {
   this.proposalChooser.updateScrollbars();
+};
+
+// --- static helpers --- //
+
+/**
+ * Don't do popup animation on Internet Explorer, because IE is slow when
+ * it comes to rendering the popup and the additional CSS animation causes the popup
+ * to flicker. Every other browser (including Edge) that supports CSS animation is fine.
+ */
+scout.SmartField2Popup.hasPopupAnimation = function() {
+  return scout.device.supportsCssAnimation() && !scout.device.isInternetExplorer();
 };
