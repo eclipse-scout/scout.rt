@@ -37,21 +37,27 @@ public abstract class AbstractFileChooserButton extends AbstractValueField<Binar
    * Configuration
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(270)
+  @Order(100)
   protected boolean getConfiguredShowFileExtension() {
     return true;
   }
 
   @ConfigProperty(ConfigProperty.FILE_EXTENSIONS)
-  @Order(230)
+  @Order(200)
   protected List<String> getConfiguredFileExtensions() {
     return null;
   }
 
   @ConfigProperty(ConfigProperty.LONG)
-  @Order(310)
+  @Order(300)
   protected long getConfiguredMaximumUploadSize() {
     return DEFAULT_MAXIMUM_UPLOAD_SIZE;
+  }
+
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(400)
+  protected String getConfiguredIconId() {
+    return null;
   }
 
   @Override
@@ -64,6 +70,7 @@ public abstract class AbstractFileChooserButton extends AbstractValueField<Binar
     super.initConfig();
     setFileExtensions(getConfiguredFileExtensions());
     setMaximumUploadSize(getConfiguredMaximumUploadSize());
+    setIconId(getConfiguredIconId());
   }
 
   @Override
@@ -86,7 +93,15 @@ public abstract class AbstractFileChooserButton extends AbstractValueField<Binar
     return propertySupport.getPropertyInt(PROP_MAXIMUM_UPLOAD_SIZE);
   }
 
-  // Convenience file getter
+  @Override
+  public String getIconId() {
+    return propertySupport.getPropertyString(PROP_ICON_ID);
+  }
+
+  @Override
+  public void setIconId(String iconId) {
+    propertySupport.setPropertyString(PROP_ICON_ID, iconId);
+  }
 
   @Override
   public String getFileName() {

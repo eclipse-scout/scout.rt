@@ -50,6 +50,12 @@ public class JsonFileChooserButton<M extends IFileChooserButton> extends JsonVal
         return getModel().getMaximumUploadSize();
       }
     });
+    putJsonProperty(new JsonProperty<M>(IFileChooserButton.PROP_ICON_ID, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getIconId();
+      }
+    });
   }
 
   @Override

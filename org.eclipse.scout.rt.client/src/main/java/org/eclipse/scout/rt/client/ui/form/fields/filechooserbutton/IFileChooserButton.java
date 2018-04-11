@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 public interface IFileChooserButton extends IValueField<BinaryResource> {
 
   String PROP_MAXIMUM_UPLOAD_SIZE = "maximumUploadSize";
+  String PROP_ICON_ID = "iconId";
 
   /**
    * Default maximum upload size.
@@ -48,4 +49,8 @@ public interface IFileChooserButton extends IValueField<BinaryResource> {
    * @return maximum size for upload in bytes
    */
   long getMaximumUploadSize();
+
+  String getIconId();
+
+  void setIconId(String iconId);
 }

@@ -44,13 +44,12 @@ scout.FileChooserButton.prototype._init = function(model) {
 };
 
 scout.FileChooserButton.prototype._buttonLabel = function() {
-  return scout.strings.hasText(this.label) ? this.label : '%Upload'; // FIXME [awe] i18n text
+  return scout.strings.hasText(this.label) ? this.label : this.session.text('ui.Upload');
 };
 
 scout.FileChooserButton.prototype._render = function() {
   this.addContainer(this.$parent, 'file-chooser-button has-icon');
   this.addLabel();
-//  this.addMandatoryIndicator();
 
   var $field = this.$parent.makeDiv();
   var fieldHtmlComp = scout.HtmlComponent.install($field, this.session);
@@ -61,7 +60,6 @@ scout.FileChooserButton.prototype._render = function() {
   this.addField($field);
   $field.setTabbable(false);
 
-  this.addIcon();
   this.addStatus();
 };
 
