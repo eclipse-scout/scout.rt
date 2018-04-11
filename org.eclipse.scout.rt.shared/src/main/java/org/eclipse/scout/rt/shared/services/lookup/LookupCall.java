@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.shared.services.lookup;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -383,26 +384,22 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, ITypeWithCla
   /**
    * Loads data asynchronously, and calls the specified callback once completed.
    */
-  protected IFuture<Void> loadDataInBackground(final IDataProvider<KEY_TYPE> dataProvider, final RunContext runContext, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
-    return Jobs.schedule(() -> loadData(dataProvider, callback), Jobs.newInput()
+  protected IFuture<Void> loadDataInBackground(final Supplier<List<? extends ILookupRow<KEY_TYPE>>> supplier, final RunContext runContext, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
+    return Jobs.schedule(() -> loadData(supplier, callback), Jobs.newInput()
         .withRunContext(runContext)
-        .withName("Fetching lookup data [provider={}, lookupCall={}]", dataProvider.getClass().getName(), getClass().getName()));
+        .withName("Fetching lookup data [lookupCall={}]", getClass().getName()));
   }
 
   /**
    * Loads data synchronously, and calls the specified callback once completed.
    */
-  protected void loadData(final IDataProvider<KEY_TYPE> dataProvider, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
-    final List<? extends ILookupRow<KEY_TYPE>> rows;
+  protected void loadData(final Supplier<List<? extends ILookupRow<KEY_TYPE>>> supplier, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
     try {
-      rows = dataProvider.provide();
+      callback.onSuccess(supplier.get());
     }
     catch (RuntimeException e) {
       callback.onFailure(e);
-      return;
     }
-
-    callback.onSuccess(rows);
   }
 
   @Override
@@ -415,14 +412,5 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, ITypeWithCla
     builder.attr("master", m_master, false);
     builder.attr("maxRowCount", m_maxRowCount);
     return builder.toString();
-  }
-
-  @FunctionalInterface
-  protected interface IDataProvider<KEY_TYPE> {
-
-    /**
-     * Loads lookup rows according to this provider's strategy.
-     */
-    List<? extends ILookupRow<KEY_TYPE>> provide();
   }
 }

@@ -84,4 +84,7 @@ public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
   void setMultilineText(boolean b);
 
   boolean isMultilineText();
+
+  @SuppressWarnings("squid:S2975")
+  ILookupCall<KEY_TYPE> clone();
 }

@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.services.lookup;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 
 /**
  * @since 3.8.1
@@ -20,13 +19,8 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 @Order(5100)
 public class DefaultLookupCallProvisioningService implements ILookupCallProvisioningService {
 
-  @SuppressWarnings("unchecked")
   @Override
   public <T> ILookupCall<T> newClonedInstance(ILookupCall<T> templateCall, IProvisioningContext context) {
-    if (templateCall instanceof LookupCall<?>) {
-      return (ILookupCall<T>) ((LookupCall<?>) templateCall).clone();
-    }
-    return null;
+    return templateCall != null ? templateCall.clone() : null;
   }
-
 }
