@@ -2850,18 +2850,13 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         checkRow(newIRow, newRows.get(i).isChecked());
       }
 
-      if (getColumnSet().getSortColumnCount() > 0) {
-        // restore order of rows according to sort criteria
-        if (isTableChanging()) {
-          setSortValid(false);
-        }
-        else {
-          sort();
-        }
-      }
-      else if (insertIndexes != null) {
+      if (insertIndexes != null) {
         ITableRow[] sortArray = createSortArray(newIRows, insertIndexes, oldRowCount);
         sortInternal(Arrays.asList(sortArray));
+      }
+      else {
+        // restore order of rows according to sort criteria
+        setSortValid(false);
       }
     }
     finally {
@@ -3398,15 +3393,18 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         // This is to support reverse (implicit) sorting of columns, meaning that multiple column sort is done
         // without CTRL-key held. In contrast to explicit multiple column sort, the first clicked column
         // is the least significant sort column.
-        LinkedHashSet<IColumn<?>> sortCols = new LinkedHashSet<>(getColumnSet().getSortColumns());
-        if (!sortCols.isEmpty() && !getRows().isEmpty()) {
-          // add all visible columns (not already added, thus LinkedHashSet)
-          // as fallback sorting to guarantee same sorting as in JS.
-          sortCols.addAll(getColumnSet().getVisibleColumns());
-
+        if (!getRows().isEmpty()) {
+          Comparator<ITableRow> comparator = null;
+          LinkedHashSet<IColumn<?>> sortCols = new LinkedHashSet<>(getColumnSet().getSortColumns());
+          if (!sortCols.isEmpty()) {
+            // add all visible columns (not already added, thus LinkedHashSet)
+            // as fallback sorting to guarantee same sorting as in JS.
+            sortCols.addAll(getColumnSet().getVisibleColumns());
+            comparator = new TableRowComparator(sortCols);
+          }
           // first make sure decorations and lookups are up-to-date
           processDecorationBuffer();
-          sortInternal(sortRows(getRows(), new TableRowComparator(sortCols)));
+          sortInternal(sortRows(getRows(), comparator));
         }
       }
     }
@@ -3430,10 +3428,12 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     });
 
     CollectingVisitor<ITableRow> collector = new CollectingVisitor<ITableRow>();
-    rootNodes.sort(comparator);
+    if (comparator != null) {
+      rootNodes.sort(comparator);
+    }
     rootNodes.forEach(root -> TreeTraversals.create(collector, node -> {
       List<ITableRow> childRows = parentToChildren.get(node);
-      if (CollectionUtility.hasElements(childRows)) {
+      if (comparator != null && CollectionUtility.hasElements(childRows)) {
         childRows.sort(comparator);
       }
       return childRows;

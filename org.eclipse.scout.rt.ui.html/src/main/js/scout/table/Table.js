@@ -2212,6 +2212,9 @@ scout.Table.prototype.insertRows = function(rows) {
 
   // Update HTML
   if (this.rendered) {
+    if(this.hierarchical){
+      this._renderRowOrderChanges();
+    }
     // Remember inserted rows for future events like rowOrderChanged
     if (!this._insertedRows) {
       this._insertedRows = rows;
@@ -2229,15 +2232,6 @@ scout.Table.prototype.insertRows = function(rows) {
 };
 
 scout.Table.prototype._sortAfterInsert = function(wasEmpty) {
-  var sortColumns = this._sortColumns();
-
-  if (this.hierarchical && (!this._isSortingPossible(sortColumns) || !sortColumns.length)) {
-    // respect minimal sort order after insert a new row
-    if (this.rendered) {
-      this._renderRowOrderChanges();
-    }
-    return;
-  }
   this._sort();
 };
 

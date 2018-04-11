@@ -299,7 +299,9 @@ public final class TableUtility {
    * @param filter
    *          (optional) is used to further narrow which cells are editable. This filter is checked after the check to
    *          {@link ITable#isCellEditable(ITableRow, IColumn)}
+   * @deprecated will be removed with Scout 9.0. There is no replacement planned.
    */
+  @Deprecated
   public static void editNextTableCell(ITable table, ITableRow currentRow, IColumn<?> currentCol, boolean forward, ITableCellEditorFilter filter) {
     if (table == null) {
       return;

@@ -85,7 +85,9 @@ public class TableKeyTest {
     // insert new parent row
     table.addRow(table.createRow(new Object[]{4, null}));
     rows = table.getRows();
-    assertEquals(rows.get(3), table.findParentRow(rows.get(2)));
+    assertArrayEquals(new Integer[]{Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(4), Integer.valueOf(3)}, table.getRows().stream().map(row -> row.getCellValue(0)).collect(Collectors.toList()).toArray());
+
+    assertEquals(rows.get(2), table.findParentRow(rows.get(3)));
   }
 
   @Test
