@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
-@ClassId("8d2818c2-5659-4c03-87ef-09441302fbdd")
+@ClassId("20038f90-75fa-4796-8a08-a9417ae69c60")
 public abstract class AbstractFileChooserButton extends AbstractValueField<BinaryResource> implements IFileChooserButton {
 
   private List<String> m_fileExtensions;
