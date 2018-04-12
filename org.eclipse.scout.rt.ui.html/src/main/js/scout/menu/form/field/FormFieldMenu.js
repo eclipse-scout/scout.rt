@@ -21,7 +21,9 @@ scout.FormFieldMenu.prototype._render = function() {
     this.$container.addClass(this.uiCssClass);
   }
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.ColumnLayout());
+  this.htmlComp.setLayout(new scout.ColumnLayout({
+    stretch: false
+  }));
 };
 
 scout.FormFieldMenu.prototype._renderProperties = function() {
@@ -47,7 +49,7 @@ scout.FormFieldMenu.prototype._renderField = function() {
   if (this.field) {
     this.field.render(this.$container);
     this.formFieldMenu = true;
-    if(this.field.gridDataHints){
+    if (this.field.gridDataHints) {
       this.field.gridData = scout.GridData.createFromHints(this.field, 1);
     }
     var layoutData = new scout.LogicalGridData(this.field);

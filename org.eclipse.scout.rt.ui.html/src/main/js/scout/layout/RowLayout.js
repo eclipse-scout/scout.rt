@@ -8,9 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.RowLayout = function(pixelBasedSizing) {
+scout.RowLayout = function(options) {
   scout.RowLayout.parent.call(this);
-  this.pixelBasedSizing = scout.nvl(pixelBasedSizing, true);
+  options = options || {};
+  this.pixelBasedSizing = scout.nvl(options.pixelBasedSizing, true);
+  this.stretch = scout.nvl(options.stretch, true);
 };
 scout.inherits(scout.RowLayout, scout.AbstractLayout);
 
@@ -19,20 +21,26 @@ scout.RowLayout.prototype.layout = function($container) {
   var containerSize = htmlComp.availableSize()
     .subtract(htmlComp.insets());
 
-  $container.children().each(function(index, child) {
-    var htmlChild = scout.HtmlComponent.optGet($(child));
-    if (htmlChild) {
-      if (this.pixelBasedSizing) {
-        var prefSize = htmlChild.prefSize({
-          widthHint: containerSize.width
-        });
-        // All elements in a row layout have the same width which is the width of the container
-        prefSize.width = containerSize.width;
-        htmlChild.setSize(prefSize);
-      } else {
-        htmlChild.validateLayout();
-      }
+  $container.children().each(function(index, elem) {
+    var $elem = $(elem);
+    var htmlChild = scout.HtmlComponent.optGet($elem);
+    if (!htmlChild || !$elem.isVisible()) {
+      return;
     }
+    if (!this.pixelBasedSizing) {
+      htmlChild.validateLayout();
+      return;
+    }
+    var prefSize = htmlChild.prefSize({
+      widthHint: containerSize.width
+    });
+
+    if (this.stretch) {
+      // All elements in a row layout have the same width which is the width of the container
+      prefSize.width = containerSize.width;
+    }
+
+    htmlChild.setSize(prefSize);
   }.bind(this));
 };
 
@@ -41,16 +49,17 @@ scout.RowLayout.prototype.preferredLayoutSize = function($container, options) {
     htmlContainer = scout.HtmlComponent.get($container),
     maxWidth = 0;
 
-  $container.children().each(function() {
-    var htmlChildPrefSize,
-      htmlChild = scout.HtmlComponent.optGet($(this));
-    if (htmlChild) {
-      htmlChildPrefSize = htmlChild.prefSize(options)
-        .add(htmlChild.margins());
-      maxWidth = Math.max(htmlChildPrefSize.width, maxWidth);
-      prefSize.height += htmlChildPrefSize.height;
-      prefSize.width = maxWidth;
+  $container.children().each(function(index, elem) {
+    var $elem = $(elem);
+    var htmlChild = scout.HtmlComponent.optGet($elem);
+    if (!htmlChild || !$elem.isVisible()) {
+      return;
     }
+    var htmlChildPrefSize = htmlChild.prefSize(options)
+      .add(htmlChild.margins());
+    maxWidth = Math.max(htmlChildPrefSize.width, maxWidth);
+    prefSize.height += htmlChildPrefSize.height;
+    prefSize.width = maxWidth;
   });
 
   prefSize = prefSize.add(htmlContainer.insets());

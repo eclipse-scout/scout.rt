@@ -8,26 +8,40 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.ColumnLayout = function() {
+scout.ColumnLayout = function(options) {
   scout.ColumnLayout.parent.call(this);
+  options = options || {};
+  this.stretch = scout.nvl(options.stretch, true);
 };
 scout.inherits(scout.ColumnLayout, scout.AbstractLayout);
 
 scout.ColumnLayout.prototype.layout = function($container) {
-  $container.children().each(function() {
-    var htmlChild = scout.HtmlComponent.optGet($(this)),
-      childPrefSize;
-    if (htmlChild) {
-      childPrefSize = htmlChild.prefSize({
-        useCssSize: true
-      });
-      // use layout data width if set.
-      if (htmlChild.layoutData && htmlChild.layoutData.widthHint) {
-        childPrefSize.width = htmlChild.layoutData.widthHint;
-      }
-      htmlChild.setSize(childPrefSize);
+  var htmlComp = scout.HtmlComponent.get($container);
+  var containerSize = htmlComp.availableSize()
+    .subtract(htmlComp.insets());
+
+  $container.children().each(function(i, elem) {
+    var $elem = $(elem);
+    var htmlChild = scout.HtmlComponent.optGet($elem);
+    if (!htmlChild || !$elem.isVisible()) {
+      return;
     }
-  });
+
+    var childPrefSize = htmlChild.prefSize({
+      useCssSize: true
+    });
+
+    if (this.stretch) {
+      // All elements in a column layout have the same height which is the height of the container
+      childPrefSize.height = containerSize.height;
+    }
+
+    // Use layout data width if set
+    if (htmlChild.layoutData && htmlChild.layoutData.widthHint) {
+      childPrefSize.width = htmlChild.layoutData.widthHint;
+    }
+    htmlChild.setSize(childPrefSize);
+  }.bind(this));
 };
 
 scout.ColumnLayout.prototype.preferredLayoutSize = function($container, options) {
@@ -37,23 +51,22 @@ scout.ColumnLayout.prototype.preferredLayoutSize = function($container, options)
       useCssSize: true
     };
 
-  $container.children().filter(function() {
-    return $(this).isVisible();
-  }).each(function() {
-    var childPrefSize,
-      $child = $(this),
-      htmlChild = scout.HtmlComponent.optGet($child);
-    if (htmlChild) {
-      childPrefSize = htmlChild.prefSize(childOptions);
-      // use layout data width if set.
-      if (htmlChild.layoutData && htmlChild.layoutData.widthHint) {
-        childPrefSize.width = htmlChild.layoutData.widthHint;
-      }
-      childPrefSize = childPrefSize.add(htmlChild.margins());
-      prefSize.width = prefSize.width + childPrefSize.width;
-      prefSize.height = Math.max(prefSize.height, childPrefSize.height);
+  $container.children().each(function(i, elem) {
+    var $elem = $(elem);
+    var htmlChild = scout.HtmlComponent.optGet($elem);
+    if (!htmlChild || !$elem.isVisible()) {
+      return;
     }
-  });
+
+    var childPrefSize = htmlChild.prefSize(childOptions);
+    // Use layout data width if set
+    if (htmlChild.layoutData && htmlChild.layoutData.widthHint) {
+      childPrefSize.width = htmlChild.layoutData.widthHint;
+    }
+    childPrefSize = childPrefSize.add(htmlChild.margins());
+    prefSize.width = prefSize.width + childPrefSize.width;
+    prefSize.height = Math.max(prefSize.height, childPrefSize.height);
+  }.bind(this));
 
   prefSize = prefSize.add(htmlContainer.insets());
   return prefSize;
