@@ -1647,7 +1647,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
             }
           }
         }
-        catch (RuntimeException | Error t) {
+        catch (Throwable t) {//NOSONAR
           // covers all unchecked exceptions
           saveEx = t;
           throw t;
@@ -1659,25 +1659,25 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
             try {
               processEventBuffer();
             }
-            catch (RuntimeException | Error t) {
+            catch (Throwable t) {//NOSONAR
               if (saveEx != null) {
                 saveEx.addSuppressed(t);
               }
               else {
                 saveEx = t;
-                throw t;
+                throw t;//NOSONAR
               }
             }
             finally {
               try {
                 propertySupport.setPropertiesChanging(false);
               }
-              catch (RuntimeException | Error t) {
+              catch (Throwable t) {//NOSONAR
                 if (saveEx != null) {
                   saveEx.addSuppressed(t);
                 }
                 else {
-                  throw t;
+                  throw t;//NOSONAR
                 }
               }
             }
@@ -3393,7 +3393,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         // This is to support reverse (implicit) sorting of columns, meaning that multiple column sort is done
         // without CTRL-key held. In contrast to explicit multiple column sort, the first clicked column
         // is the least significant sort column.
-        if (!getRows().isEmpty()) {
+        if (!getRows().isEmpty()) {//NOSONAR
           Comparator<ITableRow> comparator = null;
           LinkedHashSet<IColumn<?>> sortCols = new LinkedHashSet<>(getColumnSet().getSortColumns());
           if (!sortCols.isEmpty()) {
