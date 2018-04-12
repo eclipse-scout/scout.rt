@@ -1029,15 +1029,13 @@ public class JsonTableTest {
     // Events should not yet be in the response
     assertEquals(0, m_uiSession.currentJsonResponse().getEventList().size());
     // But they should be in the event buffer
-    // TODO AHO: change 4 -> 2 after disabling sort after insert in non hierarchical cases
-    assertEquals(4, jsonTable.eventBuffer().size());
+    assertEquals(2, jsonTable.eventBuffer().size());
     // When converting to JSON, the event buffer should be cleared and the events should
     // be coalesced and written to the response. -->  Only one insert event (with two rows)
     JSONObject response = m_uiSession.currentJsonResponse().toJson();
     assertEquals(0, jsonTable.eventBuffer().size());
     JSONArray events = response.getJSONArray("events");
-    // TODO AHO: change 2 -> 1 after disabling sort after insert in non hierarchical cases
-    assertEquals(2, events.length());
+    assertEquals(1, events.length());
     assertEquals(2, events.getJSONObject(0).getJSONArray("rows").length());
   }
 
@@ -1062,15 +1060,13 @@ public class JsonTableTest {
     // Events should not yet be in the response
     assertEquals(0, m_uiSession.currentJsonResponse().getEventList().size());
     // But they should be in the event buffer
-    // TODO AHO: change 3 -> 2 after disabling sort after insert in non hierarchical cases
-    assertEquals(3, jsonTable.eventBuffer().size());
+    assertEquals(2, jsonTable.eventBuffer().size());
     // When converting to JSON, the event buffer should be cleared and the events should
     // be coalesced and written to the response. --> Update should be merged with inserted
     JSONObject response = m_uiSession.currentJsonResponse().toJson();
     assertEquals(0, jsonTable.eventBuffer().size());
     JSONArray events = response.getJSONArray("events");
-    // TODO AHO: change 3 -> 1 after disabling sort after insert in non hierarchical cases
-    assertEquals(3, events.length());
+    assertEquals(1, events.length());
     assertEquals(1, events.getJSONObject(0).getJSONArray("rows").length());
     assertEquals("UPDATED", events.getJSONObject(0).getJSONArray("rows").getJSONObject(0).getJSONArray("cells").getString(0));
   }
@@ -1096,15 +1092,13 @@ public class JsonTableTest {
     // Events should not yet be in the response
     assertEquals(0, m_uiSession.currentJsonResponse().getEventList().size());
     // But they should be in the event buffer
-    // TODO AHO: change 3 -> 2 after disabling sort after insert in non hierarchical cases
-    assertEquals(3, jsonTable.eventBuffer().size());
+    assertEquals(2, jsonTable.eventBuffer().size());
     // When converting to JSON, the event buffer should be cleared and the events should
     // be coalesced and written to the response. --> Both events should cancel each other
     JSONObject response = m_uiSession.currentJsonResponse().toJson();
     assertEquals(0, jsonTable.eventBuffer().size());
-    // TODO AHO: uncomment assertNull after disabling sort after insert in non hierarchical cases
     JSONArray events = response.optJSONArray("events");
-//    assertNull(events);
+    assertNull(events);
   }
 
   /**
@@ -1156,8 +1150,7 @@ public class JsonTableTest {
     response = m_uiSession.currentJsonResponse().toJson();
     assertEquals(0, jsonTable.eventBuffer().size());
     JSONArray events = response.optJSONArray("events");
-    // TODO AHO: uncomment assertNull after disabling sort after insert in non hierarchical cases
-//    assertNull(events); // No events should be emitted
+    assertNull(events); // No events should be emitted
   }
 
   @Test
