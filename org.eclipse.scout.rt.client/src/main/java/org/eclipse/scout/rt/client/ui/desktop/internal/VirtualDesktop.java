@@ -106,10 +106,10 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void removePropertyChangeListener(PropertyChangeListener listener) {
-    for (Iterator<EventListenerList> it = m_dataChangeListenerMap.values().iterator(); it.hasNext();) {
+    for (Iterator<EventListenerList> it = m_propertyChangeListenerMap.values().iterator(); it.hasNext();) {
       EventListenerList list = it.next();
       list.remove(PropertyChangeListener.class, listener);
-      if (list.getListenerCount(DataChangeListener.class) == 0) {
+      if (list.getListenerCount(PropertyChangeListener.class) == 0) {
         it.remove();
       }
     }
@@ -117,11 +117,11 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-    for (Iterator<EventListenerList> it = m_dataChangeListenerMap.values().iterator(); it.hasNext();) {
-      EventListenerList list = it.next();
+    EventListenerList list = m_propertyChangeListenerMap.get(propertyName);
+    if (list != null) {
       list.remove(PropertyChangeListener.class, listener);
-      if (list.getListenerCount(DataChangeListener.class) == 0) {
-        it.remove();
+      if (list.getListenerCount(PropertyChangeListener.class) == 0) {
+        m_propertyChangeListenerMap.remove(propertyName);
       }
     }
   }
