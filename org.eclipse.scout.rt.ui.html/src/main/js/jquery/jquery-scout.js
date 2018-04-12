@@ -1167,7 +1167,17 @@ $.fn.cssMinWidth = function(minWidth) {
   return this.cssPxValue('min-width', minWidth);
 };
 
+/**
+ * @returns the max-width as number. If max-width is not set (resp. defaults to 'none') Number.MAX_VALUE is returned.
+ */
 $.fn.cssMaxWidth = function(maxWidth) {
+  if (maxWidth === undefined) {
+    var value = this.css('max-width');
+    if (value === 'none') {
+      return Number.MAX_VALUE;
+    }
+    return $.pxToNumber(value);
+  }
   return this.cssPxValue('max-width', maxWidth);
 };
 
@@ -1179,7 +1189,17 @@ $.fn.cssMinHeight = function(minHeight) {
   return this.cssPxValue('min-height', minHeight);
 };
 
+/**
+ * @returns the max-height as number. If max-height is not set (resp. defaults to 'none') Number.MAX_VALUE is returned.
+ */
 $.fn.cssMaxHeight = function(maxHeight) {
+  if (maxHeight === undefined) {
+    var value = this.css('max-height');
+    if (value === 'none') {
+      return Number.MAX_VALUE;
+    }
+    return $.pxToNumber(value);
+  }
   return this.cssPxValue('max-height', maxHeight);
 };
 
