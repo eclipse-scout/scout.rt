@@ -51,6 +51,16 @@ scout.tooltips = {
   },
 
   /**
+   * Cancels the scheduled task to show the tooltip.
+   */
+  cancel: function($comp) {
+    var support = $comp.data('tooltipSupport');
+    if (support) {
+      support.cancel($comp);
+    }
+  },
+
+  /**
    * Convenient function to install tooltip support for ellipsis only.
    */
   installForEllipsis: function($comp, options) {
@@ -122,6 +132,10 @@ scout.TooltipSupport.prototype.update = function($comp, options) {
   if (this._tooltip) {
     this._showTooltip($comp);
   }
+};
+
+scout.TooltipSupport.prototype.cancel = function($comp) {
+  clearTimeout(this._tooltipTimeoutId);
 };
 
 scout.TooltipSupport.prototype.close = function() {

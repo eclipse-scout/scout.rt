@@ -160,12 +160,13 @@ scout.Menu.prototype._getSubMenuLevel = function() {
 };
 
 scout.Menu.prototype._onMouseEvent = function(event) {
-  if (event.which !== 1) {
-    return; // Other button than left mouse button --> nop
+  if (!this._allowMouseEvent(event)) {
+    return;
   }
-  if (event.type === 'click' && event.detail > 1 && this.preventDoubleClick) {
-    return; // More than one consecutive click --> nop
-  }
+
+  // When the action is clicked the user wants to execute the action and not see the tooltip -> cancel the task
+  // If it is already displayed it will stay
+  scout.tooltips.cancel(this.$container);
 
   // If menu has childActions, a popup should be rendered on click. To create
   // the impression of a faster UI, open the popup already on 'mousedown', not

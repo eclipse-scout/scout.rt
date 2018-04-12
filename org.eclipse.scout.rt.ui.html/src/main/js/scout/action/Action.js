@@ -31,6 +31,7 @@ scout.Action = function() {
   this.textVisible = true;
   this.toggleAction = false;
   this.tooltipText = null;
+  this.showTooltipWhenSelected = true;
 
   this._addCloneProperties(['actionStyle', 'horizontalAlignment', 'iconId', 'selected', 'tabbable', 'text', 'tooltipText', 'toggleAction']);
 };
@@ -61,6 +62,17 @@ scout.Action.prototype._init = function(model) {
   this._setKeyStroke(this.keyStroke);
 };
 
+scout.Action.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('action')
+    .on('click', this._onClick.bind(this));
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(this._createLayout());
+};
+
+scout.Action.prototype._createLayout = function() {
+  return new scout.NullLayout();
+};
+
 scout.Action.prototype._renderProperties = function() {
   scout.Action.parent.prototype._renderProperties.call(this);
 
@@ -77,6 +89,10 @@ scout.Action.prototype._remove = function() {
   this._removeText();
   this._removeIconId();
   scout.Action.parent.prototype._remove.call(this);
+};
+
+scout.Action.prototype.setText = function(text) {
+  this.setProperty('text', text);
 };
 
 scout.Action.prototype._renderText = function() {
@@ -149,22 +165,6 @@ scout.Action.prototype._renderEnabled = function() {
   }
 };
 
-scout.Action.prototype._renderSelected = function() {
-  this.$container.select(this.selected);
-  if (this.rendered) { // prevent unnecessary tooltip updates during initial rendering
-    this._updateTooltip();
-  }
-};
-
-scout.Action.prototype._renderKeyStroke = function() {
-  var keyStroke = this.keyStroke;
-  if (keyStroke === undefined) {
-    this.$container.removeAttr('data-shortcut');
-  } else {
-    this.$container.attr('data-shortcut', keyStroke);
-  }
-};
-
 scout.Action.prototype.setTooltipText = function(tooltipText) {
   this.setProperty('tooltipText', tooltipText);
 };
@@ -185,7 +185,11 @@ scout.Action.prototype._updateTooltip = function() {
 };
 
 scout.Action.prototype._shouldInstallTooltip = function() {
-  return this.tooltipText && !this.selected && this.enabledComputed;
+  var show = this.tooltipText && this.enabledComputed;
+  if (!this.showTooltipWhenSelected && this.selected) {
+    show = false;
+  }
+  return show;
 };
 
 scout.Action.prototype._renderTabbable = function() {
@@ -251,17 +255,29 @@ scout.Action.prototype._doAction = function() {
   this.trigger('action');
 };
 
-scout.Action.prototype.setText = function(text) {
-  this.setProperty('text', text);
-};
-
 scout.Action.prototype.setSelected = function(selected) {
   this.setProperty('selected', selected);
+};
+
+scout.Action.prototype._renderSelected = function() {
+  this.$container.toggleClass('selected', this.selected);
+  if (this.rendered) { // prevent unnecessary tooltip updates during initial rendering
+    this._updateTooltip();
+  }
 };
 
 scout.Action.prototype._setKeyStroke = function(keyStroke) {
   this._setProperty('keyStroke', keyStroke);
   this.actionKeyStroke.parseAndSetKeyStroke(keyStroke);
+};
+
+scout.Action.prototype._renderKeyStroke = function() {
+  var keyStroke = this.keyStroke;
+  if (keyStroke === undefined) {
+    this.$container.removeAttr('data-shortcut');
+  } else {
+    this.$container.attr('data-shortcut', keyStroke);
+  }
 };
 
 scout.Action.prototype.setTabbable = function(tabbable) {
@@ -294,4 +310,26 @@ scout.Action.prototype.setHorizontalAlignment = function(horizontalAlignment) {
 
 scout.Action.prototype._createActionKeyStroke = function() {
   return new scout.ActionKeyStroke(this);
+};
+
+scout.Action.prototype._allowMouseEvent = function(event) {
+  if (event.which !== 1) {
+    return false; // Other button than left mouse button --> nop
+  }
+  if (event.type === 'click' && event.detail > 1 && this.preventDoubleClick) {
+    return false; // More than one consecutive click --> nop
+  }
+  return true;
+};
+
+scout.Action.prototype._onClick = function(event) {
+  if (!this._allowMouseEvent(event)) {
+    return;
+  }
+
+  // When the action is clicked the user wants to execute the action and not see the tooltip -> cancel the task
+  // If it is already displayed it will stay
+  scout.tooltips.cancel(this.$container);
+
+  this.doAction();
 };

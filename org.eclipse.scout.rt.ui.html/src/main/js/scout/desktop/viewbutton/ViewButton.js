@@ -11,6 +11,7 @@
 scout.ViewButton = function() {
   scout.ViewButton.parent.call(this);
   this.inBackground = false;
+  this.showTooltipWhenSelected = false;
 };
 scout.inherits(scout.ViewButton, scout.Action);
 

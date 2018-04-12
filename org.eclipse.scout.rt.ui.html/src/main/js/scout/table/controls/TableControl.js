@@ -17,6 +17,7 @@ scout.TableControl = function() {
   this.animateDuration = scout.TableControl.CONTAINER_ANIMATE_DURATION;
   this.resizerVisible = true;
   this.toggleAction = true;
+  this.showTooltipWhenSelected = false;
 };
 scout.inherits(scout.TableControl, scout.Action);
 
