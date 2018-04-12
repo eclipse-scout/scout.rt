@@ -683,7 +683,7 @@ scout.Desktop.prototype.removeNotification = function(notification) {
 scout.Desktop.prototype.destroyPopupsFor = function(widget) {
   this.$container.children('.popup').each(function(i, elem) {
     var $popup = $(elem),
-      popup = scout.Widget.getWidgetFor($popup);
+      popup = scout.widget($popup);
 
     if (widget.has(popup)) {
       popup.destroy();

@@ -158,15 +158,7 @@ scout.DesktopBench.prototype._remove = function() {
 };
 
 scout.DesktopBench.prototype.updateFirstLastMarker = function() {
-  this.visibleColumns().forEach(function(column, index, arr) {
-    column.$container.removeClass('first last');
-    if (index === 0) {
-      column.$container.addClass('first');
-    }
-    if (index === arr.length - 1) {
-      column.$container.addClass('last');
-    }
-  }, this);
+  scout.widgets.updateFirstLastMarker(this.visibleColumns());
 };
 
 scout.DesktopBench.prototype._renderOutlineContent = function() {

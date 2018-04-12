@@ -212,7 +212,7 @@ scout.FocusManager.prototype.isElementCovertByGlassPane = function(element) {
     return false; // no glasspanes active.
   }
 
-  if (this._glassPaneDisplayParents.indexOf(scout.Widget.getWidgetFor($(element))) >= 0) {
+  if (this._glassPaneDisplayParents.indexOf(scout.widget($(element))) >= 0) {
     return true;
   } else {
     // Checks whether the element is a child of a glasspane target.

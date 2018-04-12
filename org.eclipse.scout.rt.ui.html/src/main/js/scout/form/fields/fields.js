@@ -119,7 +119,7 @@ scout.fields = {
     var labelId = $label.attr('id');
     if (!labelId) {
       // Create an id if the element does not have one yet
-      labelId = scout.Widget.createUniqueId('lbl');
+      labelId = scout.widgets.createUniqueId('lbl');
       $label.attr('id', labelId);
     }
     var labelledBy = $elem.attr('aria-labelledby') || '';

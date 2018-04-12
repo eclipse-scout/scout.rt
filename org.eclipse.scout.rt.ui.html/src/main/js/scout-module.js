@@ -21,6 +21,7 @@
   __include("scout/widget/LoadingSupport.js");
   __include("scout/session/ModelAdapter.js");
   __include("scout/widget/Widget.js");
+  __include("scout/widget/widgets.js");
   __include("scout/widget/Composite.js");
   __include("scout/widget/NullWidget.js");
   __include("scout/widget/NullWidgetAdapter.js");

@@ -1601,7 +1601,7 @@ $.fn.appendAppLink = function(appLinkBean, func) {
 $.fn.appLink = function(appLinkBean, func) {
   if (!func) {
     func = function(event) {
-      var widget = scout.Widget.getWidgetFor(this);
+      var widget = scout.widget(this);
       if (widget && widget._onAppLinkAction) {
         widget._onAppLinkAction(event);
       }

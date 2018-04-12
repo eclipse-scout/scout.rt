@@ -360,13 +360,5 @@ scout.BenchColumn.prototype.visibleTabBoxes = function() {
 };
 
 scout.BenchColumn.prototype.updateFirstLastMarker = function() {
-  this.visibleTabBoxes().forEach(function(tab, index, arr) {
-    tab.$container.removeClass('first last');
-    if (index === 0) {
-      tab.$container.addClass('first');
-    }
-    if (index === arr.length - 1) {
-      tab.$container.addClass('last');
-    }
-  }, this);
+  scout.widgets.updateFirstLastMarker(this.visibleTabBoxes());
 };

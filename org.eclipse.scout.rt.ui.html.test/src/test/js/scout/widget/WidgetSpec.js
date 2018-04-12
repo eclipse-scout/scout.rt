@@ -749,6 +749,33 @@ describe('Widget', function() {
       });
 
     });
+
+    describe("toggleCssClass", function() {
+
+      it("toggles the cssClass based on a predicate", function() {
+        var widget = createWidget({
+          parent: parent
+        });
+        widget.render(session.$entryPoint);
+        widget.setCssClass('cls1 cls2 cls3');
+        expect(widget.$container).toHaveClass('cls1');
+        expect(widget.$container).toHaveClass('cls2');
+        expect(widget.$container).toHaveClass('cls3');
+
+        widget.toggleCssClass('cls2', false);
+        expect(widget.cssClass).toBe('cls1 cls3');
+        expect(widget.$container).toHaveClass('cls1');
+        expect(widget.$container).not.toHaveClass('cls2');
+        expect(widget.$container).toHaveClass('cls3');
+
+        widget.toggleCssClass('cls2', true);
+        expect(widget.cssClass).toBe('cls1 cls3 cls2');
+        expect(widget.$container).toHaveClass('cls1');
+        expect(widget.$container).toHaveClass('cls2');
+        expect(widget.$container).toHaveClass('cls3');
+      });
+
+    });
   });
 
   describe('focus', function() {

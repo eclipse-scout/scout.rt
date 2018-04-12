@@ -230,7 +230,7 @@ scout.Popup.prototype._isMouseDownOutside = function(event) {
     return false;
   }
 
-  targetWidget = scout.Widget.getWidgetFor($target);
+  targetWidget = scout.widget($target);
 
   // close the popup only if the click happened outside of the popup and its children
   // It is not sufficient to check the dom hierarchy using $container.has($target)

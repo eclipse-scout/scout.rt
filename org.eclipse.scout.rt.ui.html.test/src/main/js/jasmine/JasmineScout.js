@@ -123,7 +123,7 @@ function uninstallUnloadHandlers(session) {
 function removePopups(session, cssClass) {
   cssClass = cssClass || '.popup';
   session.$entryPoint.children(cssClass).each(function() {
-    var popup = scout.Widget.getWidgetFor($(this));
+    var popup = scout.widget($(this));
     popup.animateRemoval = false;
     popup.remove();
   });

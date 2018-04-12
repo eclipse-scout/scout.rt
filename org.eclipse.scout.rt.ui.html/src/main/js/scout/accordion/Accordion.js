@@ -195,12 +195,7 @@ scout.Accordion.prototype._updateGroupOrder = function(groups) {
 };
 
 scout.Accordion.prototype._updateFirstLastMarker = function() {
-  this.groups.forEach(function(group, i, groups) {
-    if (group.rendered) {
-      group.$container.toggleClass('first', i === 0);
-      group.$container.toggleClass('last', i === groups.length - 1);
-    }
-  });
+  scout.widgets.updateFirstLastMarker(this.groups);
 };
 
 scout.Accordion.prototype.setScrollable = function(scrollable) {

@@ -83,8 +83,6 @@ scout.Widget.DisabledStyle = {
   READ_ONLY: 1
 };
 
-scout.Widget.uniqueIdSeqNo = 0;
-
 scout.Widget.prototype.init = function(model) {
   var staticModel = this._jsonModel();
   if (staticModel) {
@@ -739,6 +737,14 @@ scout.Widget.prototype.removeCssClass = function(cssClass) {
   var cssClassesToRemove = scout.Widget.cssClassAsArray(cssClass);
   if (scout.arrays.removeAll(cssClasses, cssClassesToRemove)) {
     this.setProperty('cssClass', scout.arrays.format(cssClasses, ' '));
+  }
+};
+
+scout.Widget.prototype.toggleCssClass = function(cssClass, predicate) {
+  if (predicate) {
+    this.addCssClass(cssClass);
+  } else {
+    this.removeCssClass(cssClass);
   }
 };
 
@@ -1670,19 +1676,10 @@ scout.Widget.prototype.isAttachedAndRendered = function() {
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
 /**
- * @param a HTML or jQuery element
- * @returns the widget for the given element. If the element is not linked with a widget directly, it searches its ancestors for the widget.
+ * @deprecated use {@link scout.widgets.get}
  */
 scout.Widget.getWidgetFor = function($elem) {
-  $elem = $.ensure($elem);
-  while ($elem && $elem.length > 0) {
-    var widget = $elem.data('widget');
-    if (widget) {
-      return widget;
-    }
-    $elem = $elem.parent();
-  }
-  return null;
+  return scout.widgets.get($elem);
 };
 
 scout.Widget.cssClassAsArray = function(cssClass) {
@@ -1694,17 +1691,4 @@ scout.Widget.cssClassAsArray = function(cssClass) {
     cssClasses = cssClassesStr.split(' ');
   }
   return cssClasses;
-};
-
-/**
- * Creates a "unique" id which may be used in the id attribute of a HTML element.
- * <p>
- * It actually just increases a sequence number prefixed by 'sc' or the given prefix.
- * 'sc' (short for Scout) is added to reduce the possibility of a duplication
- * if scout widgets are embedded into a foreign web site which already uses numbers in its id attributes.
- * So it is not really unique but should be good enough when you know what you are doing.
- */
-scout.Widget.createUniqueId = function(prefix) {
-  prefix = prefix || 'sc';
-  return prefix + scout.Widget.uniqueIdSeqNo++;
 };

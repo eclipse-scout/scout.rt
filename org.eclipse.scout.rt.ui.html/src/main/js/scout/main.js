@@ -163,7 +163,7 @@ scout.installGlobalMouseDownInterceptor = function(myDocument) {
  * Resolves the widget using the given widget id or HTML element.
  * <p>
  * If the argument is a string or a number, it will search the widget hierarchy for the given id using Widget#widget(id).
- * If the argument is a HTML or jQuery element, it will use scout.Widget#getWidgetFor() to get the widget which belongs to the given element.
+ * If the argument is a HTML or jQuery element, it will use scout.widgets.get() to get the widget which belongs to the given element.
  *
  * @param widgetIdOrElement
  *          a widget ID or a HTML or jQuery element
@@ -186,7 +186,7 @@ scout.widget = function(widgetIdOrElement, partId) {
       return session.root.widget(widgetIdOrElement);
     }
   }
-  return scout.Widget.getWidgetFor($elem);
+  return scout.widgets.get($elem);
 };
 
 /**

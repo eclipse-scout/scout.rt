@@ -324,7 +324,7 @@ scout.Tooltip.prototype._onDocumentMouseDown = function(event) {
 
 scout.Tooltip.prototype._isMouseDownOutside = function(event) {
   var $target = $(event.target),
-    targetWidget = scout.Widget.getWidgetFor($target);
+    targetWidget = scout.widget($target);
 
   // Only remove the tooltip if the click is outside of the container or the $anchor (= status icon)
   // Also ignore clicks if the tooltip is covert by a glasspane
