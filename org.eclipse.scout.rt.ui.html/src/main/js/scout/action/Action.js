@@ -160,8 +160,9 @@ scout.Action.prototype._removeIconId = function() {
  */
 scout.Action.prototype._renderEnabled = function() {
   scout.Action.parent.prototype._renderEnabled.call(this);
-  if (this.rendered) { // prevent unnecessary tooltip updates during initial rendering
+  if (this.rendered) { // No need to do this during initial rendering
     this._updateTooltip();
+    this._renderTabbable();
   }
 };
 
@@ -193,7 +194,7 @@ scout.Action.prototype._shouldInstallTooltip = function() {
 };
 
 scout.Action.prototype._renderTabbable = function() {
-  this.$container.setTabbable(this.tabbable && !scout.device.supportsTouch());
+  this.$container.setTabbable(this.tabbable && this.enabled && !scout.device.supportsTouch());
 };
 
 scout.Action.prototype._renderCompact = function() {
