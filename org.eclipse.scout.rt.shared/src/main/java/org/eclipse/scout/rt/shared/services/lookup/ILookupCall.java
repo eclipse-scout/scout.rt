@@ -21,6 +21,22 @@ import org.eclipse.scout.rt.platform.util.TriState;
 @Bean
 public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
 
+  /*
+   * Actually, interfaces are not required to have a serialVersionUID. But this interface is a very special case:
+   *
+   * o The method clone is declared on java.lang.Object and the Java compiler creates a synthetic default method
+   *   if clone is declared on an interface as well, using a narrowed return type (i.e. something more specific than Object).
+   *
+   * o Class instrumentation is used that modifies interfaces with default methods as well by adding additional methods or fields
+   *   or by implementing additional interfaces.
+   *
+   * o Objects implementing the interface are sent to another JVM using Java serialization and the classes of the other JVM
+   *   were not instrumented in the same way as in the source JVM. Consequently the dynamically computed serialVersionUids will not match.
+   *
+   * -> A statically declared serialVersionUid resolves the issue.
+   */
+  long serialVersionUID = 1L;
+
   /**
    * @return In case lookup call is a "by key" query, getAll returns the key
    */
