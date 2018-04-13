@@ -22,7 +22,7 @@ import java.nio.ByteBuffer;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class SerializationUtilityTest {
+public class SerializationUtilityTest1 {
 
   private static final class FixtureClassWithSerialVersionUID1 implements Serializable {
     private static final long serialVersionUID = 0x1234567890123456L;
@@ -64,39 +64,6 @@ public class SerializationUtilityTest {
     ser = createSerialVersionIndependentObjectSerializer();
     FixtureClassWithSerialVersionUID2 deser2x = ser.deserialize(b2x, FixtureClassWithSerialVersionUID2.class);
     Assert.assertSame(FixtureClassWithSerialVersionUID2.class, deser2x.getClass());
-  }
-
-  private interface IAnimal {
-  }
-
-  private interface ISerializableAnimal extends Serializable {
-  }
-
-  private interface ISerializableAnimalWithUID extends Serializable {
-    long serialVersionUID = 0x1234567890123456L;
-  }
-
-  private static final class Cat implements IAnimal {
-  }
-
-  private static final class Cat1a implements ISerializableAnimal {
-  }
-
-  private static final class Cat1b implements ISerializableAnimal {
-    private static final long serialVersionUID = 0x1b1b1b1b1b1b1b1bL;
-  }
-
-  private static final class Cat2a implements ISerializableAnimalWithUID {
-  }
-
-  private static final class Cat2b implements ISerializableAnimalWithUID {
-    private static final long serialVersionUID = 0x2b2b2b2b2b2b2b2bL;
-  }
-
-  @Test
-  public void testInterfaceWithClone() throws Exception {
-    IObjectSerializer ser = new BasicObjectSerializer(null);
-    byte[] b1 = ser.serialize(new FixtureClassWithSerialVersionUID1());
   }
 
   private static byte[] mockSerialData(Class<?> clazz, long serialVersionUID) {
