@@ -390,7 +390,8 @@ scout.Session.prototype._processStartupResponse = function(data) {
   }
 
   this.locale = new scout.Locale(data.startupData.locale);
-  this.textMap = new scout.TextMap(data.startupData.textMap);
+  this.textMap = scout.texts.get(this.locale.languageTag);
+  this.textMap.addAll(data.startupData.textMap);
 
   // Create the desktop
   // Extract client session data without creating a model adapter for it. It is (currently) only used to transport the desktop's adapterId.
