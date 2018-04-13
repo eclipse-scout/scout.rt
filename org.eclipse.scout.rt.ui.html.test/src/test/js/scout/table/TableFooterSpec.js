@@ -26,6 +26,13 @@ describe("TableFooterSpec", function() {
     jasmine.clock().uninstall();
   });
 
+  function createTableControl() {
+    var control = scout.create('TableControl', {
+      parent: session.desktop
+    });
+    return control;
+  }
+
   describe("render", function() {
 
     it("attaches listener to the table but only once", function() {
@@ -45,13 +52,60 @@ describe("TableFooterSpec", function() {
 
   });
 
-  describe("controls", function() {
+  describe("remove", function() {
 
-    function createTableControl() {
-      var action = new scout.TableControl();
-      action.init(createSimpleModel('TableControl', session));
-      return action;
-    }
+    it("stops the open animation of the selected control", function() {
+      var model = helper.createModelFixture(2);
+      var table = helper.createTable(model);
+      var control = createTableControl();
+      table.setTableControls([control]);
+      control.setSelected(true);
+      table.render(session.$entryPoint);
+      expect(table.footer.animating).toBe(true);
+      expect(table.footer.open).toBe(true);
+
+      // Remove before open animation has been finished
+      table.remove();
+      expect(table.footer.animating).toBe(false);
+      expect(table.footer.open).toBe(false);
+
+      // Expect that it may be opened again
+      table.render(session.$entryPoint);
+      expect(table.footer.animating).toBe(true);
+      expect(table.footer.open).toBe(true);
+    });
+
+    it("stops the close animation of the selected control", function() {
+      var model = helper.createModelFixture(2);
+      var table = helper.createTable(model);
+      var control = createTableControl();
+      table.setTableControls([control]);
+      control.setSelected(true);
+      table.render(session.$entryPoint);
+      expect(table.footer.animating).toBe(true);
+      expect(table.footer.open).toBe(true);
+      // Give some time to open the container
+      jasmine.clock().tick(500);
+
+      // Start close animation
+      control.setSelected(false);
+      expect(table.footer.animating).toBe(true);
+      expect(table.footer.open).toBe(false);
+
+      // Remove before close animation has been finished
+      table.remove();
+      expect(table.footer.animating).toBe(false);
+      expect(table.footer.open).toBe(false);
+
+      // Expect that it is still closed after re rendering
+      table.render(session.$entryPoint);
+      expect(table.footer.animating).toBe(false);
+      expect(table.footer.open).toBe(false);
+    });
+
+  });
+
+  describe("controls", function() {
 
     it("removes old and renders new controls on property change", function() {
       var model = helper.createModelFixture(2);
