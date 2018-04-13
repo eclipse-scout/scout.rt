@@ -22,7 +22,7 @@ scout.AjaxCall.prototype.init = function(model) {
     throw new Error('Missing model property "ajaxOptions"');
   }
   if (!model.name) {
-    model.name = this.ajaxOptions.url;
+    model.name = model.ajaxOptions.url;
   }
   scout.AjaxCall.parent.prototype.init.call(this, model);
 };
