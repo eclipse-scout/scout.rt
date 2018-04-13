@@ -66,6 +66,16 @@ public abstract class AbstractFileChooserButton extends AbstractValueField<Binar
   }
 
   @Override
+  protected boolean getConfiguredFillHorizontal() {
+    return false;
+  }
+
+  @Override
+  protected boolean getConfiguredStatusVisible() {
+    return false;
+  }
+
+  @Override
   protected void initConfig() {
     super.initConfig();
     setFileExtensions(getConfiguredFileExtensions());
