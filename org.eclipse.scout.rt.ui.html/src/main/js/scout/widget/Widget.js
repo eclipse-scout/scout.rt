@@ -556,8 +556,18 @@ scout.Widget.prototype.has = function(widget) {
   return false;
 };
 
+/**
+ * @returns {scout.Form} the form the widget belongs to (returns the first parent which is a {@link scout.Form}.
+ */
 scout.Widget.prototype.getForm = function() {
   return scout.Form.findForm(this);
+};
+
+/**
+ * @returns the first form which is not an inner form of a wrapped form field
+ */
+scout.Widget.prototype.findNonWrappedForm = function() {
+  return scout.Form.findNonWrappedForm(this);
 };
 
 /**

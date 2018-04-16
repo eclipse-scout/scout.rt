@@ -14,28 +14,6 @@ scout.ButtonAdapter = function() {
 };
 scout.inherits(scout.ButtonAdapter, scout.FormFieldAdapter);
 
-scout.ButtonAdapter.prototype._postCreateWidget = function() {
-  if (!this.widget.keyStrokeScope) {
-    return;
-  }
-
-  var formAdapter = this.widget.getForm().modelAdapter;
-  if (formAdapter.attached) {
-    this._resolveKeyStrokeScope();
-    return;
-  }
-  // KeyStrokeScope is another widget (form or formfield) which may not be initialized and attached to the adapter yet.
-  // The widget must be on the same form as the button, so once that form is attached the keyStrokeScope has to be available
-  formAdapter.events.one('attach', this._resolveKeyStrokeScope.bind(this));
-};
-
-scout.ButtonAdapter.prototype._resolveKeyStrokeScope = function() {
-  this.widget.keyStrokeScope = this.session.getWidget(this.widget.keyStrokeScope);
-  if (!this.widget.keyStrokeScope) {
-    throw new Error('Could not resolve keyStrokeScope: ' + this.widget.keyStrokeScope);
-  }
-};
-
 scout.ButtonAdapter.prototype._onWidgetClick = function(event) {
   this._send('click');
 };
@@ -46,13 +24,4 @@ scout.ButtonAdapter.prototype._onWidgetEvent = function(event) {
   } else {
     scout.ButtonAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }
-};
-
-/**
- * @override ModelAdapter.js
- */
-scout.ButtonAdapter.prototype.exportAdapterData = function(adapterData) {
-  adapterData = scout.ButtonAdapter.parent.prototype.exportAdapterData.call(this, adapterData);
-  delete adapterData.keyStrokeScope;
-  return adapterData;
 };

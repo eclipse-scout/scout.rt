@@ -49,6 +49,7 @@ scout.Button.SUBMENU_ICON = scout.icons.ANGLE_DOWN_BOLD;
 scout.Button.prototype._init = function(model) {
   scout.Button.parent.prototype._init.call(this, model);
   this._setKeyStroke(this.keyStroke);
+  this._setKeyStrokeScope(this.keyStrokeScope);
 };
 
 /**
@@ -343,6 +344,39 @@ scout.Button.prototype.setKeyStroke = function(keyStroke) {
 scout.Button.prototype._setKeyStroke = function(keyStroke) {
   this._setProperty('keyStroke', keyStroke);
   this.buttonKeyStroke.parseAndSetKeyStroke(this.keyStroke);
+};
+
+scout.Button.prototype._setKeyStrokeScope = function(keyStrokeScope) {
+  if (typeof keyStrokeScope === 'string') {
+    keyStrokeScope = this._resolveKeyStrokeScope(keyStrokeScope);
+    if (!keyStrokeScope) {
+      // Will be resolved later
+      return;
+    }
+  }
+
+  this._setProperty('keyStrokeScope', keyStrokeScope);
+};
+
+scout.Button.prototype._resolveKeyStrokeScope = function(keyStrokeScope) {
+  // Basically, the desktop could be used to find the scope, but that would mean to traverse the whole widget tree.
+  // To make it faster the form is used instead but that limits the resolving to the form.
+  // This should be acceptable because the scope can still be set explicitly without using an id.
+  var form = this.findNonWrappedForm();
+  if (!form) {
+    throw new Error('Could not resolve keyStrokeScope ' + keyStrokeScope + ' because no form has been found.');
+  }
+  if (!form.initialized) {
+    // KeyStrokeScope is another widget (form or formfield) which may not be initialized yet.
+    // The widget must be on the same form as the button, so once that form is initialized the keyStrokeScope has to be available
+    form.one('init', this._setKeyStrokeScope.bind(this, keyStrokeScope));
+    return;
+  }
+  keyStrokeScope = form.widget(keyStrokeScope);
+  if (!keyStrokeScope) {
+    throw new Error('Could not resolve keyStrokeScope ' + keyStrokeScope + ' using form ' + form);
+  }
+  return keyStrokeScope;
 };
 
 scout.Button.prototype._onClick = function(event) {

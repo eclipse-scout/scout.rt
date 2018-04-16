@@ -803,7 +803,7 @@ scout.Form.prototype.readCacheBounds = function() {
 };
 
 /**
- * Returns the form the widget belongs to (returns the first parent which is a {@link scout.Form}.
+ * @returns {scout.Form} the form the widget belongs to (returns the first parent which is a {@link scout.Form}.
  */
 scout.Form.findForm = function(widget) {
   var parent = widget.parent;
@@ -811,4 +811,23 @@ scout.Form.findForm = function(widget) {
     parent = parent.parent;
   }
   return parent;
+};
+
+/**
+ * @returns {scout.Form} the first form which is not an inner form of a wrapped form field
+ */
+scout.Form.findNonWrappedForm = function(widget) {
+  var form;
+  widget.findParent(function(parent) {
+    if (parent instanceof scout.Form) {
+      form = parent;
+      // If form is an inner form of a wrapped form field -> continue search
+      if (form.parent instanceof scout.WrappedFormField) {
+        return false;
+      }
+      // Otherwise use that form
+      return true;
+    }
+  });
+  return form;
 };
