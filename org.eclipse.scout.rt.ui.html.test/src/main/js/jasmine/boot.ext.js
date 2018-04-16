@@ -25,5 +25,3 @@ if (!Function.prototype.bind) {
     };
   };
 }
-
-$.fx.off = true;
