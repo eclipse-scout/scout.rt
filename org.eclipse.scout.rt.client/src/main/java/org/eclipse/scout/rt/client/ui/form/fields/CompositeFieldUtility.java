@@ -25,12 +25,8 @@ import org.eclipse.scout.rt.platform.OrderedComparator;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class CompositeFieldUtility {
-
-  private static final Logger LOG = LoggerFactory.getLogger(CompositeFieldUtility.class);
 
   private CompositeFieldUtility() {
   }
@@ -62,25 +58,20 @@ public final class CompositeFieldUtility {
    *          The parent form field. May be {@code null}.
    */
   public static void connectFields(IFormField child, ICompositeField parent) {
-    child.setParentFieldInternal(parent);
-
     if (parent == null) {
+      child.setParentFieldInternal(null);
+      child.setFormInternal(null);
       return;
     }
 
+    assertNull(child.getParentField());
+    child.setParentFieldInternal(parent);
     IForm formOfParentField = parent.getForm();
     IForm formOfChildField = child.getForm();
     if (formOfChildField == formOfParentField) {
       return; // nothing to do. already set correctly.
     }
-
-    if (formOfChildField == null) {
-      // e.g. if an external field is injected using injectFieldsInternal
-      child.setFormInternal(formOfParentField);
-    }
-    else {
-      LOG.warn("Field '{}' is already connected to form '{}' but is now added to form '{}' as well.", child, formOfChildField, formOfParentField);
-    }
+    child.setFormInternal(formOfParentField);
   }
 
   public static void removeField(IFormField f, ICompositeField compositeField, List<IFormField> fields) {

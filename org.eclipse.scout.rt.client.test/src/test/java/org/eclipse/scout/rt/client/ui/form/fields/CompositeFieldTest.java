@@ -14,12 +14,18 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
 
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +35,9 @@ import org.junit.runner.RunWith;
  *
  * @since 4.0.1
  */
-@RunWith(PlatformTestRunner.class)
+@RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class CompositeFieldTest {
 
   @Test
@@ -39,6 +47,23 @@ public class CompositeFieldTest {
     compositeField.setFormInternal(formMock);
     assertSame(formMock, compositeField.getForm());
     assertSame(formMock, compositeField.getTextField().getForm());
+  }
+
+  @Test
+  public void testGetFormConsistency() {
+    IForm formMock = mock(IForm.class);
+    IFormField dynamicField = new AbstractStringField() {
+    };
+    dynamicField.init();
+    // Form may be set during a load handler because the form thread local is read while initConfig runs.
+    // It could also be set explicitly as done here
+    // In both cases the form needs to be set to the form of the parent field when connected
+    dynamicField.setFormInternal(formMock);
+
+    P_TestForm form = new P_TestForm(dynamicField);
+    assertSame(form, form.getRootGroupBox().getForm());
+    assertSame(form, form.getDynamicField().getForm());
+    assertSame(form.getRootGroupBox(), form.getDynamicField().getParentField());
   }
 
   @Test
@@ -79,5 +104,31 @@ class P_TestCompositeField extends AbstractCompositeField {
 
   @Order(10)
   public class TextField extends AbstractStringField {
+  }
+}
+
+class P_TestForm extends AbstractForm {
+  private IFormField m_dynamicField;
+
+  public P_TestForm() {
+  }
+
+  public P_TestForm(IFormField dynamicField) {
+    super(false);
+    m_dynamicField = dynamicField;
+    callInitializer();
+  }
+
+  public IFormField getDynamicField() {
+    return m_dynamicField;
+  }
+
+  @Order(10)
+  public class MainBox extends AbstractGroupBox {
+    @Override
+    protected void injectFieldsInternal(OrderedCollection<IFormField> fields) {
+      super.injectFieldsInternal(fields);
+      fields.addLast(m_dynamicField);
+    }
   }
 }
