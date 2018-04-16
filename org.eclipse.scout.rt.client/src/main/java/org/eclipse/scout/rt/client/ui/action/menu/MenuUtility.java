@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.action.menu;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
@@ -52,34 +51,6 @@ public final class MenuUtility {
       return visible;
     }
     return true;
-  }
-
-  /**
-   * @param original
-   * @return a list of all visible menus an eliminated multiple occurrences of separators.
-   */
-  public static <T extends IActionNode<?>> List<T> consolidateMenus(List<T> original) { // FIXME [awe] check with A.HO - remove?
-    LinkedList<T> consolidatedMenus = new LinkedList<>();
-    T lastMenu = null;
-    for (T m : original) {
-      if (isVisible(m)) {
-        if (m.isSeparator()) {
-          if (lastMenu != null && !lastMenu.isSeparator()) {
-            consolidatedMenus.add(m);
-          }
-        }
-        else {
-          consolidatedMenus.add(m);
-        }
-        lastMenu = m;
-      }
-    }
-
-    // remove tailing separators
-    while (!consolidatedMenus.isEmpty() && consolidatedMenus.getLast().isSeparator()) {
-      consolidatedMenus.removeLast();
-    }
-    return consolidatedMenus;
   }
 
   /**
