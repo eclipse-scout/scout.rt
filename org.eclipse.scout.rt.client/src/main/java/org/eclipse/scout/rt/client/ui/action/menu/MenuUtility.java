@@ -11,28 +11,13 @@
 package org.eclipse.scout.rt.client.ui.action.menu;
 
 import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
-import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
-import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
-import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
-import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
-import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.tile.ITile;
-import org.eclipse.scout.rt.client.ui.tile.ITileGrid;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.Range;
 
 /**
  * Utility class for menus
@@ -73,7 +58,7 @@ public final class MenuUtility {
    * @param original
    * @return a list of all visible menus an eliminated multiple occurrences of separators.
    */
-  public static <T extends IActionNode<?>> List<T> consolidateMenus(List<T> original) {
+  public static <T extends IActionNode<?>> List<T> consolidateMenus(List<T> original) { // FIXME [awe] check with A.HO - remove?
     LinkedList<T> consolidatedMenus = new LinkedList<>();
     T lastMenu = null;
     for (T m : original) {
@@ -95,77 +80,6 @@ public final class MenuUtility {
       consolidatedMenus.removeLast();
     }
     return consolidatedMenus;
-  }
-
-  public static Set<PlannerMenuType> getMenuTypesForPlannerSelection(List<? extends Resource<?>> selectedResources, Activity<?, ?> selectedActivity, Range<Date> selectionRange) {
-    if (CollectionUtility.isEmpty(selectedResources)) {
-      return CollectionUtility.hashSet(PlannerMenuType.EmptySpace);
-    }
-    Set<PlannerMenuType> menuTypes = new HashSet<>();
-    if (CollectionUtility.size(selectedResources) > 0) {
-      menuTypes.add(PlannerMenuType.Resource);
-    }
-    if (selectedActivity != null) {
-      menuTypes.add(PlannerMenuType.Activity);
-    }
-    else if (selectionRange.getFrom() != null || selectionRange.getTo() != null) {
-      menuTypes.add(PlannerMenuType.Range);
-    }
-    return menuTypes;
-  }
-
-  public static Set<CalendarMenuType> getMenuTypesForCalendarSelection(CalendarComponent selectedComponent) {
-    if (selectedComponent == null) {
-      return CollectionUtility.hashSet(CalendarMenuType.EmptySpace);
-    }
-    else {
-      return CollectionUtility.hashSet(CalendarMenuType.CalendarComponent);
-    }
-  }
-
-  public static Set<TableMenuType> getMenuTypesForTableSelection(List<? extends ITableRow> selection) {
-    if (CollectionUtility.isEmpty(selection)) {
-      return CollectionUtility.hashSet(TableMenuType.EmptySpace);
-    }
-    else if (CollectionUtility.size(selection) == 1) {
-      return CollectionUtility.hashSet(TableMenuType.SingleSelection);
-    }
-    else {
-      return CollectionUtility.hashSet(TableMenuType.MultiSelection);
-    }
-  }
-
-  public static Set<ValueFieldMenuType> getMenuTypesForValueFieldValue(Object value) {
-    if (value == null) {
-      return CollectionUtility.hashSet(ValueFieldMenuType.Null);
-    }
-    else {
-      return CollectionUtility.hashSet(ValueFieldMenuType.NotNull);
-    }
-  }
-
-  public static Set<TreeMenuType> getMenuTypesForTreeSelection(Set<? extends ITreeNode> selection) {
-    if (CollectionUtility.isEmpty(selection)) {
-      return CollectionUtility.hashSet(TreeMenuType.EmptySpace);
-    }
-    else if (CollectionUtility.size(selection) == 1) {
-      return CollectionUtility.hashSet(TreeMenuType.SingleSelection);
-    }
-    else {
-      return CollectionUtility.hashSet(TreeMenuType.MultiSelection);
-    }
-  }
-
-  public static Set<TileGridMenuType> getMenuTypesForTilesSelection(List<? extends ITile> selection) {
-    if (CollectionUtility.isEmpty(selection)) {
-      return CollectionUtility.hashSet(TileGridMenuType.EmptySpace);
-    }
-    else if (CollectionUtility.size(selection) == 1) {
-      return CollectionUtility.hashSet(TileGridMenuType.SingleSelection);
-    }
-    else {
-      return CollectionUtility.hashSet(TileGridMenuType.MultiSelection);
-    }
   }
 
   /**
@@ -192,42 +106,4 @@ public final class MenuUtility {
     return new ActionFinder().findAction(rootMenus, menuType);
   }
 
-  public static void updateMenuVisibilitiesForTiles(ITileGrid<? extends ITile> tileGrid) {
-    updateMenuVisibilitiesForTiles(tileGrid, null);
-  }
-
-  public static void updateMenuVisibilitiesForTiles(ITileGrid<? extends ITile> tileGrid, Predicate<IAction> filter) {
-    updateMenuVisibilitiesForTiles(tileGrid.getContextMenu(), tileGrid.getSelectedTiles(), filter);
-  }
-
-  public static void updateMenuVisibilitiesForTiles(IContextMenu contextMenu, List<? extends ITile> selectedTiles, Predicate<IAction> filter) {
-    Set<IMenuType> acceptedMenuTypes = new HashSet<>();
-    acceptedMenuTypes.add(TileGridMenuType.EmptySpace);
-    if (selectedTiles.size() == 1) {
-      acceptedMenuTypes.add(TileGridMenuType.SingleSelection);
-    }
-    else if (selectedTiles.size() > 1) {
-      acceptedMenuTypes.add(TileGridMenuType.MultiSelection);
-    }
-    updateMenuVisibilities(contextMenu, acceptedMenuTypes, filter);
-  }
-
-  /**
-   * Updates the visibility of every single menu (including child menus) according to the given acceptedMenuTypes.
-   *
-   * @param filter
-   *          (optional) menus are filtered with this predicate before visibility is updated
-   */
-  public static void updateMenuVisibilities(IContextMenu contextMenu, Set<IMenuType> acceptedMenuTypes, Predicate<IAction> filter) {
-    final Predicate<IAction> activeFilter = ActionUtility.createMenuFilterMenuTypes(acceptedMenuTypes, false);
-    contextMenu.visit(menu -> {
-      if (filter != null && !filter.test(menu)) {
-        return;
-      }
-
-      if (!menu.isSeparator()) {
-        menu.setVisible(activeFilter.test(menu));
-      }
-    }, IMenu.class);
-  }
 }

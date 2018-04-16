@@ -13,9 +13,10 @@ package org.eclipse.scout.rt.client.ui.action.menu.root.internal;
 import java.beans.PropertyChangeEvent;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -57,7 +58,7 @@ public class TableContextMenu extends AbstractContextMenu<ITable> implements ITa
         TableEvent.TYPE_ROWS_SELECTED,
         TableEvent.TYPE_ROWS_UPDATED);
     // set active filter
-    setCurrentMenuTypes(MenuUtility.getMenuTypesForTableSelection(getContainer().getSelectedRows()));
+    setCurrentMenuTypes(getMenuTypesForSelection(getContainer().getSelectedRows()));
     calculateLocalVisibility();
   }
 
@@ -95,7 +96,7 @@ public class TableContextMenu extends AbstractContextMenu<ITable> implements ITa
     if (getContainer() != null) {
       final List<ITableRow> ownerValue = getContainer().getSelectedRows();
       m_currentSelection = CollectionUtility.arrayList(ownerValue);
-      setCurrentMenuTypes(MenuUtility.getMenuTypesForTableSelection(ownerValue));
+      setCurrentMenuTypes(getMenuTypesForSelection(ownerValue));
       visit(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()), IMenu.class);
       calculateLocalVisibility();
       calculateEnableState(ownerValue);
@@ -127,6 +128,18 @@ public class TableContextMenu extends AbstractContextMenu<ITable> implements ITa
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
     if (ITable.PROP_ENABLED.equals(evt.getPropertyName())) {
       handleOwnerEnabledChanged();
+    }
+  }
+
+  protected Set<TableMenuType> getMenuTypesForSelection(List<? extends ITableRow> selection) {
+    if (CollectionUtility.isEmpty(selection)) {
+      return CollectionUtility.hashSet(TableMenuType.EmptySpace);
+    }
+    else if (CollectionUtility.size(selection) == 1) {
+      return CollectionUtility.hashSet(TableMenuType.SingleSelection);
+    }
+    else {
+      return CollectionUtility.hashSet(TableMenuType.MultiSelection);
     }
   }
 }

@@ -11,17 +11,24 @@
 package org.eclipse.scout.rt.client.ui.action.menu.root.internal;
 
 import java.beans.PropertyChangeEvent;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
+import org.eclipse.scout.rt.client.ui.action.menu.PlannerMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IPlannerContextMenu;
+import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
 import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
 import org.eclipse.scout.rt.client.ui.basic.planner.PlannerAdapter;
 import org.eclipse.scout.rt.client.ui.basic.planner.PlannerEvent;
+import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
+import org.eclipse.scout.rt.platform.util.Range;
 
 /**
  * The invisible root menu node of any activity map. (internal usage only)
@@ -38,7 +45,7 @@ public class PlannerContextMenu extends AbstractContextMenu<IPlanner<?, ?>> impl
     super.initConfig();
     getContainer().addPlannerListener(new P_OwnerPlannerListener());
     // set active filter
-    setCurrentMenuTypes(MenuUtility.getMenuTypesForPlannerSelection(getContainer().getSelectedResources(), getContainer().getSelectedActivity(), getContainer().getSelectionRange()));
+    setCurrentMenuTypes(getMenuTypesForSelection(getContainer().getSelectedResources(), getContainer().getSelectedActivity(), getContainer().getSelectionRange()));
     calculateLocalVisibility();
   }
 
@@ -51,7 +58,7 @@ public class PlannerContextMenu extends AbstractContextMenu<IPlanner<?, ?>> impl
     IPlanner<?, ?> container = getContainer();
     if (container != null) {
       final CompositeObject ownerValue = new CompositeObject(container.getSelectedResources(), container.getSelectedActivity(), container.getSelectionRange());
-      setCurrentMenuTypes(MenuUtility.getMenuTypesForPlannerSelection(container.getSelectedResources(), container.getSelectedActivity(), container.getSelectionRange()));
+      setCurrentMenuTypes(getMenuTypesForSelection(container.getSelectedResources(), container.getSelectedActivity(), container.getSelectionRange()));
       visit(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()), IMenu.class);
       calculateLocalVisibility();
     }
@@ -65,6 +72,23 @@ public class PlannerContextMenu extends AbstractContextMenu<IPlanner<?, ?>> impl
     else if (IPlanner.PROP_SELECTION_RANGE.equals(evt.getPropertyName())) {
       handleOwnerValueChanged();
     }
+  }
+
+  protected Set<PlannerMenuType> getMenuTypesForSelection(List<? extends Resource<?>> selectedResources, Activity<?, ?> selectedActivity, Range<Date> selectionRange) {
+    if (CollectionUtility.isEmpty(selectedResources)) {
+      return CollectionUtility.hashSet(PlannerMenuType.EmptySpace);
+    }
+    Set<PlannerMenuType> menuTypes = new HashSet<>();
+    if (CollectionUtility.size(selectedResources) > 0) {
+      menuTypes.add(PlannerMenuType.Resource);
+    }
+    if (selectedActivity != null) {
+      menuTypes.add(PlannerMenuType.Activity);
+    }
+    else if (selectionRange.getFrom() != null || selectionRange.getTo() != null) {
+      menuTypes.add(PlannerMenuType.Range);
+    }
+    return menuTypes;
   }
 
   private class P_OwnerPlannerListener extends PlannerAdapter {

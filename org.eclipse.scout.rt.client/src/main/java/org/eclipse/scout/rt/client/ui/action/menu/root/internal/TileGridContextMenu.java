@@ -12,14 +12,16 @@ package org.eclipse.scout.rt.client.ui.action.menu.root.internal;
 
 import java.beans.PropertyChangeEvent;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
+import org.eclipse.scout.rt.client.ui.action.menu.TileGridMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITileGridContextMenu;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.client.ui.tile.ITileGrid;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * The invisible root menu node of tile grid. (internal usage only)
@@ -38,7 +40,7 @@ public class TileGridContextMenu extends AbstractContextMenu<ITileGrid<? extends
   protected void initConfig() {
     super.initConfig();
     // set active filter
-    setCurrentMenuTypes(MenuUtility.getMenuTypesForTilesSelection(getContainer().getSelectedTiles()));
+    setCurrentMenuTypes(getMenuTypesForSelection(getContainer().getSelectedTiles()));
     calculateLocalVisibility();
   }
 
@@ -50,7 +52,7 @@ public class TileGridContextMenu extends AbstractContextMenu<ITileGrid<? extends
   protected void handleOwnerValueChanged() {
     if (getContainer() != null) {
       final List<? extends ITile> ownerValue = getContainer().getSelectedTiles();
-      setCurrentMenuTypes(MenuUtility.getMenuTypesForTilesSelection(ownerValue));
+      setCurrentMenuTypes(getMenuTypesForSelection(ownerValue));
       visit(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()), IMenu.class);
       calculateLocalVisibility();
     }
@@ -65,4 +67,15 @@ public class TileGridContextMenu extends AbstractContextMenu<ITileGrid<? extends
     // FIXME [7.1] CGU tiles necessary to handle tile update events as done in table?
   }
 
+  protected Set<TileGridMenuType> getMenuTypesForSelection(List<? extends ITile> selection) {
+    if (CollectionUtility.isEmpty(selection)) {
+      return CollectionUtility.hashSet(TileGridMenuType.EmptySpace);
+    }
+    else if (CollectionUtility.size(selection) == 1) {
+      return CollectionUtility.hashSet(TileGridMenuType.SingleSelection);
+    }
+    else {
+      return CollectionUtility.hashSet(TileGridMenuType.MultiSelection);
+    }
+  }
 }

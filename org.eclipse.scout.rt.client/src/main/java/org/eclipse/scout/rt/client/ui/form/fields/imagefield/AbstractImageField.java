@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.internal.ImageFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
@@ -223,7 +223,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     menus.addAllOrdered(contributedMenus);
     injectMenusInternal(menus);
     new MoveActionNodesHandler<>(menus).moveModelObjects();
-    m_contextMenu = new FormFieldContextMenu<IImageField>(this, menus.getOrderedList());
+    m_contextMenu = new ImageFieldContextMenu(this, menus.getOrderedList());
     m_contextMenu.setContainerInternal(this);
   }
 

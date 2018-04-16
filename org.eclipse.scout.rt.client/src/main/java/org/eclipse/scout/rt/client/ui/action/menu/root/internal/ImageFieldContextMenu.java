@@ -12,23 +12,26 @@ package org.eclipse.scout.rt.client.ui.action.menu.root.internal;
 
 import java.beans.PropertyChangeEvent;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.ValueFieldMenuType;
-import org.eclipse.scout.rt.client.ui.action.menu.root.IValueFieldContextMenu;
-import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.ImageFieldMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
+import org.eclipse.scout.rt.client.ui.form.fields.imagefield.IImageField;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CompositeObject;
 
 @ClassId("c07663cf-fbe6-4514-8653-81e547b58445")
-public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField<?>> implements IValueFieldContextMenu {
+public class ImageFieldContextMenu extends FormFieldContextMenu<IImageField> implements IFormFieldContextMenu {
 
   /**
    * @param owner
    */
-  public ValueFieldContextMenu(IValueField owner, List<? extends IMenu> initialChildMenus) {
+  public ImageFieldContextMenu(IImageField owner, List<? extends IMenu> initialChildMenus) {
     super(owner, initialChildMenus);
   }
 
@@ -36,8 +39,28 @@ public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField<?>> 
   protected void initConfig() {
     super.initConfig();
     // init current menu types
-    setCurrentMenuTypes(getMenuTypesForValue(getContainer().getValue()));
+    setCurrentMenuTypes(getMenuTypesForValues());
     calculateLocalVisibility();
+  }
+
+  protected Set<IMenuType> getMenuTypesForValues() {
+    IImageField field = getContainer();
+    Set<IMenuType> menuTypes = new HashSet<>();
+    if (field.getImageId() != null) {
+      menuTypes.add(ImageFieldMenuType.ImageId);
+    }
+    if (field.getImageUrl() != null) {
+      menuTypes.add(ImageFieldMenuType.ImageUrl);
+    }
+    if (field.getImage() != null) {
+      menuTypes.add(ImageFieldMenuType.Image);
+    }
+    if (menuTypes.isEmpty()) {
+      return Collections.singleton(ImageFieldMenuType.Null);
+    }
+    else {
+      return menuTypes;
+    }
   }
 
   @Override
@@ -52,16 +75,11 @@ public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField<?>> 
     handleOwnerEnabledChanged();
   }
 
-  @Override
-  public void callOwnerValueChanged() {
-    handleOwnerValueChanged();
-  }
-
   protected void handleOwnerValueChanged() {
-    IValueField<?> container = getContainer();
+    IImageField container = getContainer();
     if (container != null) {
-      final Object ownerValue = container.getValue();
-      setCurrentMenuTypes(getMenuTypesForValue(ownerValue));
+      final Object ownerValue = new CompositeObject(container.getImageId(), container.getImageUrl(), container.getImage());
+      setCurrentMenuTypes(getMenuTypesForValues());
       visit(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()), IMenu.class);
     }
     calculateLocalVisibility();
@@ -69,18 +87,14 @@ public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField<?>> 
 
   @Override
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
-    super.handleOwnerPropertyChanged(evt);
-    if (IValueField.PROP_VALUE.equals(evt.getPropertyName())) {
+    String propertyName = evt.getPropertyName();
+    if (IImageField.PROP_IMAGE_ID.equals(propertyName) ||
+        IImageField.PROP_IMAGE_URL.equals(propertyName) ||
+        IImageField.PROP_IMAGE.equals(propertyName)) {
       handleOwnerValueChanged();
     }
-  }
-
-  protected Set<ValueFieldMenuType> getMenuTypesForValue(Object value) {
-    if (value == null) {
-      return CollectionUtility.hashSet(ValueFieldMenuType.Null);
-    }
     else {
-      return CollectionUtility.hashSet(ValueFieldMenuType.NotNull);
+      super.handleOwnerPropertyChanged(evt);
     }
   }
 

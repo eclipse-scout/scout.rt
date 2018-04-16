@@ -12,14 +12,16 @@ package org.eclipse.scout.rt.client.ui.action.menu.root.internal;
 
 import java.beans.PropertyChangeEvent;
 import java.util.List;
+import java.util.Set;
 
+import org.eclipse.scout.rt.client.ui.action.menu.CalendarMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ICalendarContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * The invisible root menu node of any calendar. (internal usage only)
@@ -37,7 +39,7 @@ public class CalendarContextMenu extends AbstractContextMenu<ICalendar> implemen
   protected void initConfig() {
     super.initConfig();
     // set active filter
-    setCurrentMenuTypes(MenuUtility.getMenuTypesForCalendarSelection(getContainer().getSelectedComponent()));
+    setCurrentMenuTypes(getMenuTypesForSelection(getContainer().getSelectedComponent()));
     calculateLocalVisibility();
   }
 
@@ -50,7 +52,7 @@ public class CalendarContextMenu extends AbstractContextMenu<ICalendar> implemen
     ICalendar container = getContainer();
     if (container != null) {
       final CalendarComponent ownerValue = container.getSelectedComponent();
-      setCurrentMenuTypes(MenuUtility.getMenuTypesForCalendarSelection(ownerValue));
+      setCurrentMenuTypes(getMenuTypesForSelection(ownerValue));
       visit(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()), IMenu.class);
       calculateLocalVisibility();
     }
@@ -60,6 +62,15 @@ public class CalendarContextMenu extends AbstractContextMenu<ICalendar> implemen
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
     if (ICalendar.PROP_SELECTED_COMPONENT.equals(evt.getPropertyName())) {
       handleOwnerValueChanged();
+    }
+  }
+
+  protected Set<CalendarMenuType> getMenuTypesForSelection(CalendarComponent selectedComponent) {
+    if (selectedComponent == null) {
+      return CollectionUtility.hashSet(CalendarMenuType.EmptySpace);
+    }
+    else {
+      return CollectionUtility.hashSet(CalendarMenuType.CalendarComponent);
     }
   }
 

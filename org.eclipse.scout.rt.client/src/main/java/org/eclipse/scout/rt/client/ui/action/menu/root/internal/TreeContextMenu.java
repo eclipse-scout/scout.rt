@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
+import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -58,7 +58,7 @@ public class TreeContextMenu extends AbstractContextMenu<ITree> implements ITree
         TreeEvent.TYPE_NODES_SELECTED,
         TreeEvent.TYPE_NODES_UPDATED);
     // init current menu types
-    setCurrentMenuTypes(MenuUtility.getMenuTypesForTreeSelection(getContainer().getSelectedNodes()));
+    setCurrentMenuTypes(getMenuTypesForSelection(getContainer().getSelectedNodes()));
     calculateLocalVisibility();
   }
 
@@ -95,7 +95,7 @@ public class TreeContextMenu extends AbstractContextMenu<ITree> implements ITree
     if (getContainer() != null) {
       final Set<ITreeNode> ownerSelection = getContainer().getSelectedNodes();
       m_currentSelection = CollectionUtility.hashSet(ownerSelection);
-      setCurrentMenuTypes(MenuUtility.getMenuTypesForTreeSelection(ownerSelection));
+      setCurrentMenuTypes(getMenuTypesForSelection(ownerSelection));
       visit(new MenuOwnerChangedVisitor(ownerSelection, getCurrentMenuTypes()), IMenu.class);
       // update menu types
       calculateLocalVisibility();
@@ -126,6 +126,18 @@ public class TreeContextMenu extends AbstractContextMenu<ITree> implements ITree
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
     if (ITable.PROP_ENABLED.equals(evt.getPropertyName())) {
       handleOwnerEnabledChanged();
+    }
+  }
+
+  protected Set<TreeMenuType> getMenuTypesForSelection(Set<? extends ITreeNode> selection) {
+    if (CollectionUtility.isEmpty(selection)) {
+      return CollectionUtility.hashSet(TreeMenuType.EmptySpace);
+    }
+    else if (CollectionUtility.size(selection) == 1) {
+      return CollectionUtility.hashSet(TreeMenuType.SingleSelection);
+    }
+    else {
+      return CollectionUtility.hashSet(TreeMenuType.MultiSelection);
     }
   }
 }
