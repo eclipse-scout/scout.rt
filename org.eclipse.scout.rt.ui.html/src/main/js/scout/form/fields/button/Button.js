@@ -179,22 +179,21 @@ scout.Button.prototype._renderProperties = function() {
 scout.Button.prototype._renderForegroundColor = function() {
   scout.Button.parent.prototype._renderForegroundColor.call(this);
   // Color button label as well, otherwise the color would not be visible because button label has already a color set using css
-  scout.styles.legacyStyle(this, this.$buttonLabel);
+  scout.styles.legacyForegroundColor(this, this.$buttonLabel);
+  scout.styles.legacyForegroundColor(this, this.get$Icon());
+  scout.styles.legacyForegroundColor(this, this.$submenuIcon);
 };
 
 scout.Button.prototype._renderBackgroundColor = function() {
   scout.Button.parent.prototype._renderBackgroundColor.call(this);
-  scout.styles.legacyStyle(this, this.$fieldContainer);
+  scout.styles.legacyBackgroundColor(this, this.$fieldContainer);
 };
 
 scout.Button.prototype._renderFont = function() {
   scout.Button.parent.prototype._renderFont.call(this);
-  scout.styles.legacyStyle(this, this.$buttonLabel);
-};
-
-scout.Button.prototype._renderFontStyle = function() {
-  scout.Button.parent.prototype._renderFontStyle.call(this);
-  scout.styles.legacyStyle(this, this.$buttonLabel);
+  scout.styles.legacyFont(this, this.$buttonLabel, ['font']);
+  // Changing the font may enlarge or shrink the field (e.g. set the style to bold makes the text bigger) -> invalidate layout
+  this.invalidateLayoutTree();
 };
 
 /**
@@ -310,6 +309,9 @@ scout.Button.prototype._renderIconId = function() {
         .off('load error')
         .on('load', updateButtonLayoutAfterImageLoaded.bind(this, true))
         .on('error', updateButtonLayoutAfterImageLoaded.bind(this, false));
+    }
+    if (!this.rendered) {
+      scout.styles.legacyForegroundColor(this, $icon);
     }
   }
 
