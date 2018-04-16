@@ -499,24 +499,24 @@ scout.DateField.prototype._errorStatusClass = function() {
  * @Override FormField.js
  */
 scout.DateField.prototype._renderFont = function() {
-  this.$dateField && scout.styles.legacyStyle(this, this.$dateField);
-  this.$timeField && scout.styles.legacyStyle(this, this.$timeField);
+  this.$dateField && scout.styles.legacyFont(this, this.$dateField);
+  this.$timeField && scout.styles.legacyFont(this, this.$timeField);
 };
 
 /**
  * @Override FormField.js
  */
 scout.DateField.prototype._renderForegroundColor = function() {
-  this.$dateField && scout.styles.legacyStyle(this, this.$dateField);
-  this.$timeField && scout.styles.legacyStyle(this, this.$timeField);
+  this.$dateField && scout.styles.legacyForegroundColor(this, this.$dateField);
+  this.$timeField && scout.styles.legacyForegroundColor(this, this.$timeField);
 };
 
 /**
  * @Override FormField.js
  */
 scout.DateField.prototype._renderBackgroundColor = function() {
-  this.$dateField && scout.styles.legacyStyle(this, this.$dateField);
-  this.$timeField && scout.styles.legacyStyle(this, this.$timeField);
+  this.$dateField && scout.styles.legacyBackgroundColor(this, this.$dateField);
+  this.$timeField && scout.styles.legacyBackgroundColor(this, this.$timeField);
 };
 
 scout.DateField.prototype._onDateFieldMouseDown = function() {

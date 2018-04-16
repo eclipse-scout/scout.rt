@@ -151,7 +151,7 @@ scout.CheckBoxField.prototype._renderLabel = function() {
  * @override
  */
 scout.CheckBoxField.prototype._renderFont = function() {
-  scout.styles.legacyStyle(this, this.$fieldContainer);
+  scout.styles.legacyFont(this, this.$fieldContainer);
   // Changing the font may enlarge or shrink the field (e.g. set the style to bold makes the text bigger) -> invalidate layout
   this.invalidateLayoutTree();
 };
@@ -160,14 +160,14 @@ scout.CheckBoxField.prototype._renderFont = function() {
  * @override
  */
 scout.CheckBoxField.prototype._renderForegroundColor = function() {
-  scout.styles.legacyStyle(this, this.$fieldContainer);
+  scout.styles.legacyForegroundColor(this, this.$fieldContainer);
 };
 
 /**
  * @override
  */
 scout.CheckBoxField.prototype._renderBackgroundColor = function() {
-  scout.styles.legacyStyle(this, this.$fieldContainer);
+  scout.styles.legacyBackgroundColor(this, this.$fieldContainer);
 };
 
 scout.CheckBoxField.prototype._renderGridData = function() {

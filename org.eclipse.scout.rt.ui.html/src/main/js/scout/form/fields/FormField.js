@@ -476,7 +476,7 @@ scout.FormField.prototype.setFont = function(font) {
 };
 
 scout.FormField.prototype._renderFont = function() {
-  scout.styles.legacyStyle(this, this.$field);
+  scout.styles.legacyFont(this, this.$field);
 };
 
 scout.FormField.prototype.setForegroundColor = function(foregroundColor) {
@@ -484,7 +484,7 @@ scout.FormField.prototype.setForegroundColor = function(foregroundColor) {
 };
 
 scout.FormField.prototype._renderForegroundColor = function() {
-  scout.styles.legacyStyle(this, this.$field);
+  scout.styles.legacyForegroundColor(this, this.$field);
 };
 
 scout.FormField.prototype.setBackgroundColor = function(backgroundColor) {
@@ -492,7 +492,7 @@ scout.FormField.prototype.setBackgroundColor = function(backgroundColor) {
 };
 
 scout.FormField.prototype._renderBackgroundColor = function() {
-  scout.styles.legacyStyle(this, this.$field);
+  scout.styles.legacyBackgroundColor(this, this.$field);
 };
 
 scout.FormField.prototype.setLabelFont = function(labelFont) {
@@ -500,7 +500,7 @@ scout.FormField.prototype.setLabelFont = function(labelFont) {
 };
 
 scout.FormField.prototype._renderLabelFont = function() {
-  scout.styles.legacyStyle(this, this.$label, 'label');
+  scout.styles.legacyFont(this, this.$label, 'label');
 };
 
 scout.FormField.prototype.setLabelForegroundColor = function(labelForegroundColor) {
@@ -508,7 +508,7 @@ scout.FormField.prototype.setLabelForegroundColor = function(labelForegroundColo
 };
 
 scout.FormField.prototype._renderLabelForegroundColor = function() {
-  scout.styles.legacyStyle(this, this.$label, 'label');
+  scout.styles.legacyForegroundColor(this, this.$label, 'label');
 };
 
 scout.FormField.prototype.setLabelBackgroundColor = function(labelBackgroundColor) {
@@ -516,7 +516,7 @@ scout.FormField.prototype.setLabelBackgroundColor = function(labelBackgroundColo
 };
 
 scout.FormField.prototype._renderLabelBackgroundColor = function() {
-  scout.styles.legacyStyle(this, this.$label, 'label');
+  scout.styles.legacyBackgroundColor(this, this.$label, 'label');
 };
 
 scout.FormField.prototype.setGridDataHints = function(gridData) {

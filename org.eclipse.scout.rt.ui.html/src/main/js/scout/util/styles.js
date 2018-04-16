@@ -105,7 +105,7 @@ scout.styles = {
           if (/^\d+$/.test(token)) {
             fontSpec.size = token;
           } else if (token !== 'NULL') {
-            fontSpec.name = token;
+            fontSpec.name = tokens[i];
           }
         }
       }
@@ -114,6 +114,9 @@ scout.styles = {
   },
 
   modelToCssColor: function(color) {
+    if (!color) { // prevent conversion from null to 'null' by regex
+      return '';
+    }
     var cssColor = '';
     if (/^[A-Fa-f0-9]{3}([A-Fa-f0-9]{3})?$/.test(color)) { // hex color
       cssColor = '#' + color;
@@ -136,56 +139,81 @@ scout.styles = {
    * just font, backgroundColor and foregroundColor.
    */
   legacyStyle: function(obj, $element, propertyPrefix) {
-    var cssColor = '',
-      cssBackgroundColor = '',
-      cssFontWeight = '',
-      cssFontStyle = '',
-      cssFontSize = '',
-      cssFontFamily = '';
+    var style = '';
+    style += this.legacyForegroundColor(obj, $element, propertyPrefix);
+    style += this.legacyBackgroundColor(obj, $element, propertyPrefix);
+    style += this.legacyFont(obj, $element, propertyPrefix);
+    return style;
+  },
 
+
+  legacyForegroundColor: function(obj, $element, propertyPrefix) {
     propertyPrefix = propertyPrefix || '';
 
-    if (typeof obj === 'object' && obj !== null) {
-      cssColor = scout.styles.modelToCssColor(obj[scout.strings.lowercaseFirstLetter(propertyPrefix + 'ForegroundColor')]);
-      cssBackgroundColor = scout.styles.modelToCssColor(obj[scout.strings.lowercaseFirstLetter(propertyPrefix + 'BackgroundColor')]);
+    var cssColor = '';
+    if (obj) {
+      var foregroundColorProperty = scout.strings.lowercaseFirstLetter(propertyPrefix + 'ForegroundColor');
+      cssColor = this.modelToCssColor(obj[foregroundColorProperty]);
+    }
+    if ($element) {
+      $element.css('color', cssColor);
+    }
+    var style = '';
+    if (cssColor) {
+      style += 'color: ' + cssColor + '; ';
+    }
+    return style;
+  },
 
+  legacyBackgroundColor: function(obj, $element, propertyPrefix) {
+    propertyPrefix = propertyPrefix || '';
+
+    var cssBackgroundColor = '';
+    if (obj) {
+      var backgroundColorProperty = scout.strings.lowercaseFirstLetter(propertyPrefix + 'BackgroundColor');
+      cssBackgroundColor = this.modelToCssColor(obj[backgroundColorProperty]);
+    }
+    if ($element) {
+      $element.css('background-color', cssBackgroundColor);
+    }
+    var style = '';
+    if (cssBackgroundColor) {
+      style += 'background-color: ' + cssBackgroundColor + '; ';
+    }
+    return style;
+  },
+
+  legacyFont: function(obj, $element, propertyPrefix) {
+    propertyPrefix = propertyPrefix || '';
+
+    var cssFontWeight = '';
+    var cssFontStyle = '';
+    var cssFontSize = '';
+    var cssFontFamily = '';
+    if (obj) {
       var fontProperty = scout.strings.lowercaseFirstLetter(propertyPrefix + 'Font');
-      if (fontProperty in obj) {
-        var fontSpec = this.parseFontSpec(obj[fontProperty]);
-        if (fontSpec.bold) {
-          cssFontWeight = 'bold';
-        }
-        if (fontSpec.italic) {
-          cssFontStyle = 'italic';
-        }
-        if (fontSpec.size) {
-          cssFontSize = fontSpec.size + 'pt';
-        }
-        if (fontSpec.name) {
-          cssFontFamily = fontSpec.name;
-        }
+      var fontSpec = this.parseFontSpec(obj[fontProperty]);
+      if (fontSpec.bold) {
+        cssFontWeight = 'bold';
+      }
+      if (fontSpec.italic) {
+        cssFontStyle = 'italic';
+      }
+      if (fontSpec.size) {
+        cssFontSize = fontSpec.size + 'pt';
+      }
+      if (fontSpec.name) {
+        cssFontFamily = fontSpec.name;
       }
     }
-
-    // Apply CSS properties
     if ($element) {
       $element
-        .css('color', cssColor)
-        .css('background-color', cssBackgroundColor)
         .css('font-weight', cssFontWeight)
         .css('font-style', cssFontStyle)
         .css('font-size', cssFontSize)
         .css('font-family', cssFontFamily);
     }
-
-    // Build style string
     var style = '';
-    if (cssColor) {
-      style += 'color: ' + cssColor + '; ';
-    }
-    if (cssBackgroundColor) {
-      style += 'background-color: ' + cssBackgroundColor + '; ';
-    }
     if (cssFontWeight) {
       style += 'font-weight: ' + cssFontWeight + '; ';
     }
@@ -198,7 +226,7 @@ scout.styles = {
     if (cssFontFamily) {
       style += 'font-family: ' + cssFontFamily + '; ';
     }
-
     return style;
   }
+
 };
