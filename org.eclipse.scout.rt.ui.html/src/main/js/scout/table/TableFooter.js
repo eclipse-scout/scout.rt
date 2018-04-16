@@ -121,6 +121,7 @@ scout.TableFooter.prototype._remove = function() {
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.searchFieldKeyStrokeContext);
   this._hideTableStatusTooltip();
   this.$resizer = null;
+  this.$controlContainer.stop(false, true);
   this.open = false;
 
   this.table.off('rowsInserted', this._tableRowsChangedHandler);
