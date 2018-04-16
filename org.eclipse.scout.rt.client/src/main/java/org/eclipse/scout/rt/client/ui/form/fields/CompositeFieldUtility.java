@@ -60,7 +60,6 @@ public final class CompositeFieldUtility {
   public static void connectFields(IFormField child, ICompositeField parent) {
     if (parent == null) {
       child.setParentFieldInternal(null);
-      child.setFormInternal(null);
       return;
     }
 
