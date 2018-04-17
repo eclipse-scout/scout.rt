@@ -30,12 +30,6 @@ describe("AggregateTableControl", function() {
     $.fx.off = false;
   });
 
-  function createModel(table) {
-    var model = createSimpleModel('TableControl', session);
-    model.table = table;
-    return model;
-  }
-
   function createFormMock() {
     var form = {
       render: function() {},
@@ -50,9 +44,11 @@ describe("AggregateTableControl", function() {
   }
 
   function createAggregateTC(model) {
-    var action = new scout.AggregateTableControl();
-    action.init(model);
-    return action;
+    var defaults = {
+      parent: session.desktop
+    };
+    model = $.extend({}, defaults, model);
+    return scout.create('AggregateTableControl', model);
   }
 
   function $aggregateRow(tableControl) {
@@ -86,7 +82,9 @@ describe("AggregateTableControl", function() {
       model = helper.createModel(columns, rows);
       table = helper.createTable(model);
 
-      tableControl = createAggregateTC(createModel(table));
+      tableControl = createAggregateTC({
+        table: table
+      });
       tableControl.selected = true;
       table._setTableControls([tableControl]);
 
@@ -227,10 +225,11 @@ describe("AggregateTableControl", function() {
 
     it("is false if there are no number columns", function() {
       prepareTable();
-      var tcModel = createModel(table);
-      tcModel.enabled = true;
-      tcModel.selected = true;
-      tableControl = createAggregateTC(createModel(table));
+      tableControl = createAggregateTC({
+        enabled: true,
+        selected: true,
+        table: table
+      });
       table._setTableControls([tableControl]);
       table.render();
 
@@ -250,10 +249,11 @@ describe("AggregateTableControl", function() {
       table = helper.createTable(model);
       table.columns[1].setAggregationFunction('sum');
 
-      var tcModel = createModel(table);
-      tcModel.enabled = false;
-      tcModel.selected = true;
-      tableControl = createAggregateTC(tcModel);
+      tableControl = createAggregateTC({
+        enabled: false,
+        selected: true,
+        table: table
+      });
       table._setTableControls([tableControl]);
       table.render();
 
@@ -273,13 +273,61 @@ describe("AggregateTableControl", function() {
       table = helper.createTable(model);
       table.columns[1].setAggregationFunction('none');
 
-      var tcModel = createModel(table);
-      tcModel.enabled = false;
-      tcModel.selected = false;
-      tableControl = createAggregateTC(tcModel);
+      tableControl = createAggregateTC({
+        enabled: false,
+        selected: false,
+        table: table
+      });
       table._setTableControls([tableControl]);
       table.render();
 
+      expect(tableControl.enabled).toBe(false);
+      expect(tableControl.selected).toBe(false);
+    });
+
+  });
+
+  describe("selected state", function() {
+    var table;
+
+    function prepareTable() {
+      var columns = [helper.createModelColumn('col1'),
+        helper.createModelColumn('col2')
+      ];
+      columns[0].index = 0;
+      columns[1].index = 1;
+      var rows = helper.createModelRows(2, 3);
+      var model = helper.createModel(columns, rows);
+      table = helper.createTable(model);
+    }
+
+    it("is false if control is not enabled initially", function() {
+      prepareTable();
+      var tableControl = createAggregateTC({
+        enabled: false,
+        selected: true,
+        table: table
+      });
+      table.setTableControls([tableControl]);
+      table.render();
+      expect(tableControl.enabled).toBe(false);
+      expect(tableControl.selected).toBe(false);
+    });
+
+    it("is set to false if control will be disabled", function() {
+      prepareTable();
+      var tableControl = createAggregateTC({
+        enabled: false,
+        selected: true,
+        table: table
+      });
+      table.setTableControls([tableControl]);
+      table.render();
+      expect(tableControl.enabled).toBe(false);
+      expect(tableControl.selected).toBe(false);
+
+      // Setting it explicitly to true has no effect either
+      tableControl.setSelected(true);
       expect(tableControl.enabled).toBe(false);
       expect(tableControl.selected).toBe(false);
     });

@@ -28,6 +28,7 @@ scout.TableControl.prototype._init = function(model) {
   this.parent = model.parent;
   this.table = this.getTable();
   scout.TableControl.parent.prototype._init.call(this, model);
+  this._setSelected(this.selected);
 };
 
 /**
@@ -180,13 +181,18 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
 
   // Instead of calling parent.setSelected(), we manually execute the required code. Otherwise
   // we would not be able to pass 'closeWhenUnselected' to _renderSelected().
-  this._setProperty('selected', selected);
+  this._setSelected(selected);
   closeWhenUnselected = scout.nvl(closeWhenUnselected, true);
   if (this.rendered) {
     this._renderSelected(selected, closeWhenUnselected);
-  } else if (closeWhenUnselected && this === this.tableFooter.selectedControl && !selected) {
+  } else if (closeWhenUnselected && this.tableFooter && this === this.tableFooter.selectedControl && !selected) {
     this.tableFooter.onControlSelected(null);
   }
+};
+
+scout.TableControl.prototype._setSelected = function(selected) {
+  // Does not nothing more than the default but allows for extension by a subclass
+  this._setProperty('selected', selected);
 };
 
 scout.TableControl.prototype._configureTooltip = function() {
