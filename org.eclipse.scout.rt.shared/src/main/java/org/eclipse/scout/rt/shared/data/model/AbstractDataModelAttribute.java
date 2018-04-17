@@ -75,6 +75,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   private String m_iconId;
   private Class<? extends ICodeType> m_codeTypeClass;
   private ILookupCall<?> m_lookupCall;
+  private boolean m_searchRequired;
   private Permission m_visiblePermission;
   private IDataModelEntity m_parentEntity;
   private final ObjectExtensions<AbstractDataModelAttribute, IDataModelAttributeExtension<? extends AbstractDataModelAttribute>> m_objectExtensions;
@@ -174,6 +175,21 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     return null;
   }
 
+  /**
+   * Configures whether this data model only shows proposals if a text search string has been entered.<br>
+   * Set this property to {@code true} if you expect a large amount of data for an unconstrained search.<br>
+   * The default value is {@code false}.<br>
+   * This property is only supported for {@link DataModelConstants#TYPE_SMART}.
+   *
+   * @return {@code true} if the data model should only show a proposal list if a search text is entered by the user.
+   *         {@code false} (which is the default) if all proposals should be shown if no text search is done.
+   */
+  @Order(50)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredSearchRequired() {
+    return false;
+  }
+
   @ConfigProperty(ConfigProperty.COMPOSER_ATTRIBUTE_TYPE)
   @Order(70)
   protected int getConfiguredType() {
@@ -254,6 +270,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     setText(getConfiguredText());
     setType(getConfiguredType());
     setVisible(getConfiguredVisible());
+    setSearchRequired(getConfiguredSearchRequired());
     setActiveFilterEnabled(getConfiguredActiveFilterEnabled());
     setOrder(calculateViewOrder());
 
@@ -460,6 +477,16 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   @Override
   public void setLookupCall(ILookupCall<?> call) {
     m_lookupCall = call;
+  }
+
+  @Override
+  public boolean isSearchRequired() {
+    return m_searchRequired;
+  }
+
+  @Override
+  public void setSearchRequired(boolean searchRequired) {
+    m_searchRequired = searchRequired;
   }
 
   @Override

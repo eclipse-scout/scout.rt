@@ -85,6 +85,25 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
 
   void setLookupCall(ILookupCall<?> call);
 
+  /**
+   * This property is only supported for {@link DataModelConstants#TYPE_SMART}.
+   *
+   * @return {@code true} if the attribute should only show a proposal list if a search text is entered by the user.
+   *         {@code false} (which is the default) if all proposals should be shown if no text search is done.
+   */
+  boolean isSearchRequired();
+
+  /**
+   * Configures whether this attribute only shows proposals if a text search string has been entered.<br>
+   * Set this property to {@code true} if you expect a large amount of data for an unconstrained search.<br>
+   * This property is only supported for {@link DataModelConstants#TYPE_SMART}.
+   *
+   * @param searchRequired
+   *          {@code true} if the attribute should only show a proposal list if a search text is entered by the user.
+   *          {@code false} (which is the default) if all proposals should be shown if no text search is done.
+   */
+  void setSearchRequired(boolean searchRequired);
+
   Permission getVisiblePermission();
 
   void setVisiblePermission(Permission p);

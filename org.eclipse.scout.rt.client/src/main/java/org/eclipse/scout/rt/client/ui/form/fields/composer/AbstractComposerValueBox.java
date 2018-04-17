@@ -873,6 +873,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
       if (getLookupCall() != newCall) {
         setLookupCall(newCall);
       }
+      setSearchRequired(attribute.isSearchRequired());
       try {
         setValue(CollectionUtility.firstElement(values));
       }
