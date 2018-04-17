@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.imagefield.IImageField;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
 
-@ClassId("c07663cf-fbe6-4514-8653-81e547b58445")
+@ClassId("ea5a9db8-b80c-4795-9e33-187a1750dc48")
 public class ImageFieldContextMenu extends FormFieldContextMenu<IImageField> implements IFormFieldContextMenu {
 
   /**
