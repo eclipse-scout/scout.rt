@@ -882,7 +882,7 @@ public class TableEventBufferTest {
     eventMerger.merge(e1);
 
     // add second event
-    TableEvent e2 = new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, null);
+    TableEvent e2 = new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED);
     IColumn<?> c2 = mockColumn(2);
     e2.setColumns(Arrays.asList(c0, c2));
     eventMerger.merge(e2);

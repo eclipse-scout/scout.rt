@@ -22,7 +22,7 @@ scout.TableRow = function() {
   this.parentId;
   this.parentRow;
   this.childRows = [];
-  this.expanded = true;
+  this.expanded = false;
 };
 
 scout.TableRow.prototype.init = function(model) {
@@ -50,10 +50,16 @@ scout.TableRow.prototype._initCells = function() {
 };
 
 scout.TableRow.prototype.animateExpansion = function() {
+  var $row = this.$row,
+  $rowControl;
+  if(!$row){
+    return;
+  }
+  $rowControl = $row.find('.table-row-control');
   if (this.expanded) {
-    this.$row.find('.table-row-control').addClassForAnimation('expand-rotate');
+    $rowControl.addClassForAnimation('expand-rotate');
   } else {
-    this.$row.find('.table-row-control').addClassForAnimation('collapse-rotate');
+    $rowControl.addClassForAnimation('collapse-rotate');
   }
 };
 

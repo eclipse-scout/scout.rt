@@ -198,8 +198,20 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
 
   void ensureVisible(ITreeNode node);
 
+  /**
+   * to expand all nodes under the given parent node, parent node inclusive.
+   *
+   * @param parent
+   *          the start node for the expansion.
+   */
   void expandAll(ITreeNode parent);
 
+  /**
+   * to collapse all nodes under the given parent node, parent node inclusive.
+   *
+   * @param parent
+   *          the start node for collapsing.
+   */
   void collapseAll(ITreeNode parent);
 
   boolean isEnabled();

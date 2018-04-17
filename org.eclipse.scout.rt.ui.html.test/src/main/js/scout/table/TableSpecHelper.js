@@ -30,7 +30,7 @@ scout.TableSpecHelper.prototype.createModel = function(columns, rows) {
 
 scout.TableSpecHelper.prototype.createModelRow = function(id, cells) {
   return {
-    id: id || scout.objectFactory.createUniqueId(),
+    id: scout.nvl(id, scout.objectFactory.createUniqueId()),
     cells: cells,
     enabled: true
   };

@@ -146,6 +146,11 @@ public class TableEvent extends EventObject implements IModelEvent {
    */
   public static final int TYPE_ROWS_CHECKED = 850;
 
+  /**
+   * Rows have been expanded or collapsed check the expanded flag on the row.
+   */
+  public static final int TYPE_ROWS_EXPANDED = 860;
+
   public static final int TYPE_USER_FILTER_ADDED = 900;
   public static final int TYPE_USER_FILTER_REMOVED = 910;
 
@@ -165,7 +170,11 @@ public class TableEvent extends EventObject implements IModelEvent {
   private IUserFilterState m_userFilter;
 
   public TableEvent(ITable source, int type) {
-    this(source, type, null);
+    this(source, type, (ITableRow) null);
+  }
+
+  public TableEvent(ITable source, int type, ITableRow row) {
+    this(source, type, CollectionUtility.arrayList(row));
   }
 
   public TableEvent(ITable source, int type, List<? extends ITableRow> rows) {

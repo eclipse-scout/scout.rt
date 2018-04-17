@@ -270,6 +270,14 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
 
   void setAutoResizeColumns(boolean b);
 
+  void collapseAll(ITableRow startRow);
+
+  void expandAll(ITableRow startRow);
+
+  boolean isExpanded(ITableRow row);
+
+  void setRowExpanded(ITableRow row, boolean expanded);
+
   /**
    * Convenience for getColumnSet().getColumnCount()
    */

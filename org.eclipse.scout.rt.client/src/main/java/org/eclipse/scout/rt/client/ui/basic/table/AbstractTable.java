@@ -151,7 +151,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   private final OptimisticLock m_initLock;
-  private final List<ITableRow> m_rows; // synchronized list
+  private List<ITableRow> m_rows; // synchronized list
+  private List<ITableRow> m_rootRows; // synchronized list
   private final Object m_cachedRowsLock;
   private final Map<CompositeObject, ITableRow> m_rowsByKey;
   private final Map<CompositeObject, ITableRow> m_deletedRows;
@@ -195,6 +196,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   private IReloadHandler m_reloadHandler;
   private int m_valueChangeTriggerEnabled = 1;// >=1 is true
   private ITableOrganizer m_tableOrganizer;
+  private boolean m_treeStructureDirty;
 
   public AbstractTable() {
     this(true);
@@ -210,7 +212,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     m_listeners = new TableListeners();
     m_cachedRowsLock = new Object();
     m_cachedFilteredRowsLock = new Object();
-    m_rows = Collections.synchronizedList(new ArrayList<ITableRow>(1));
+    m_rows = Collections.synchronizedList(new ArrayList<>(1));
+    m_rootRows = Collections.synchronizedList(new ArrayList<>(1));
     m_rowsByKey = Collections.synchronizedMap(new HashMap<>());
     m_deletedRows = new HashMap<>();
     m_rowFilters = new ArrayList<>(1);
@@ -1364,6 +1367,66 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   @Override
+  public void expandAll(ITableRow startRow) {
+    expandAllInternal(startRow, true);
+  }
+
+  @Override
+  public void collapseAll(ITableRow startRow) {
+    expandAllInternal(startRow, false);
+  }
+
+  public void expandRows(List<ITableRow> rows) {
+    expandRowsInternal(rows, true);
+  }
+
+  public void collapseRows(List<ITableRow> rows) {
+    expandRowsInternal(rows, false);
+  }
+
+  private void expandAllInternal(ITableRow startRow, boolean expanded) {
+    final List<ITableRow> rows;
+    if (startRow != null) {
+      rows = CollectionUtility.arrayList(startRow);
+    }
+    else {
+      rows = m_rootRows;
+    }
+    CollectingVisitor<ITableRow> collector = new CollectingVisitor<ITableRow>() {
+      @Override
+      protected boolean accept(ITableRow element) {
+        return element.isExpanded() != expanded;
+      }
+    };
+    rows.forEach(root -> TreeTraversals.create(collector, ITableRow::getChildRows).traverse(root));
+    expandRowsInternal(collector.getCollection(), expanded);
+  }
+
+  protected void expandRowsInternal(List<? extends ITableRow> rows, boolean expanded) {
+    try {
+      setTableChanging(true);
+      List<? extends ITableRow> changedRows = rows.stream().filter(row -> row.setExpanded(expanded)).collect(Collectors.toList());
+      fireRowsExpanded(changedRows);
+    }
+    finally {
+      setTableChanging(false);
+    }
+  }
+
+  @Override
+  public boolean isExpanded(ITableRow row) {
+    return false;
+  }
+
+  @Override
+  public void setRowExpanded(ITableRow row, boolean expanded) {
+    if (row == null || row.isExpanded() == expanded) {
+      return;
+    }
+    expandRowsInternal(CollectionUtility.arrayList(row), expanded);
+  }
+
+  @Override
   public ColumnSet getColumnSet() {
     return m_columnSet;
   }
@@ -1640,6 +1703,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         Throwable saveEx = null;
         try {
           if (m_tableChanging == 1) {
+            if (m_treeStructureDirty) {
+              rebuildTreeStructureInternal();
+            }
             //will be going to zero, but process decorations here, so events are added to the event buffer
             processDecorationBuffer();
             if (!isSortValid()) {
@@ -2850,13 +2916,13 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         checkRow(newIRow, newRows.get(i).isChecked());
       }
 
-      if (insertIndexes != null) {
-        ITableRow[] sortArray = createSortArray(newIRows, insertIndexes, oldRowCount);
-        sortInternal(Arrays.asList(sortArray));
-      }
-      else {
+      if (getColumnSet().getSortColumnCount() > 0) {
         // restore order of rows according to sort criteria
         setSortValid(false);
+      }
+      else if (insertIndexes != null) {
+        ITableRow[] sortArray = createSortArray(newIRows, insertIndexes, oldRowCount);
+        sortInternal(Arrays.asList(sortArray));
       }
     }
     finally {
@@ -2940,6 +3006,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       m_rows.add(newIRow);
       m_rowsByKey.put(new CompositeObject(newIRow.getKeyValues()), newIRow);
     }
+    rebuildTreeStructure();
 
     Set<Integer> indexes = new HashSet<>();
     for (int idx : getColumnSet().getAllColumnIndexes()) {
@@ -2949,6 +3016,49 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     enqueueValueChangeTasks(newIRow, indexes);
     enqueueDecorationTasks(newIRow);
     return newIRow;
+  }
+
+  private void rebuildTreeStructure() {
+    if (isTableChanging()) {
+      m_treeStructureDirty = true;
+    }
+    else {
+      rebuildTreeStructureInternal();
+    }
+  }
+
+  private void rebuildTreeStructureInternal() {
+    List<ITableRow> rootNodes = new ArrayList<>();
+    Map<ITableRow/*parent*/, List<ITableRow> /*child rows*/> parentToChildren = new HashMap<>();
+    m_rows.forEach(row -> {
+      List<Object> parentRowKeys = getParentRowKeys(row);
+      if (parentRowKeys.stream().filter(k -> k != null).findAny().orElse(null) != null) {
+        ITableRow parentRow = getRowByKey(parentRowKeys);
+        if (parentRow == null) {
+          throw new IllegalArgumentException("Could not find the parent row of '" + row + "'. parent keys are defined.");
+        }
+        parentToChildren.computeIfAbsent(parentRow, children -> new ArrayList<>())
+            .add(row);
+      }
+      else {
+
+        row.setParentRowInternal(null);
+        rootNodes.add(row);
+      }
+    });
+
+    m_rootRows = Collections.synchronizedList(rootNodes);
+    if (parentToChildren.size() > 0) {
+      CollectingVisitor<ITableRow> collector = new CollectingVisitor<ITableRow>();
+      rootNodes.forEach(root -> TreeTraversals.create(collector, node -> {
+        List<ITableRow> childRows = parentToChildren.getOrDefault(node, Collections.emptyList());
+        node.setChildRowsInternal(childRows);
+        childRows.forEach(childRow -> childRow.setParentRowInternal(node));
+        return childRows;
+      }).traverse(root));
+      m_rows = Collections.synchronizedList(collector.getCollection());
+    }
+    m_treeStructureDirty = false;
   }
 
   @Override
@@ -3091,6 +3201,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
           //remove all of them
           synchronized (m_cachedRowsLock) {
             m_rows.clear();
+            m_rootRows.clear();
             m_rowsByKey.clear();
             m_cachedRows = null;
           }
@@ -3116,6 +3227,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
               }
               if (removed) {
                 deleteRowImpl(candidateRow);
+                rebuildTreeStructure();
               }
             }
           }
@@ -3807,6 +3919,11 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     if (rows == null) {
       rows = CollectionUtility.emptyArrayList();
     }
+    CollectingVisitor<ITableRow> collector = new CollectingVisitor<ITableRow>();
+    rows.forEach(parent -> TreeTraversals.create(collector, node -> {
+      return node.getChildRows();
+    }).traverse(parent));
+    rows = collector.getCollection();
     List<ITableRow> resolvedRows = new ArrayList<>(rows.size());
     for (ITableRow row : rows) {
       if (resolveRow(row) == row) {
@@ -3958,6 +4075,10 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   private void fireRowsChecked(List<? extends ITableRow> rows) {
     fireTableEventInternal(new TableEvent(this, TableEvent.TYPE_ROWS_CHECKED, rows));
+  }
+
+  private void fireRowsExpanded(List<? extends ITableRow> rows) {
+    fireTableEventInternal(new TableEvent(this, TableEvent.TYPE_ROWS_EXPANDED, rows));
   }
 
   private void fireRowClick(ITableRow row, MouseButton mouseButton) {
@@ -4363,6 +4484,20 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       try {
         pushUIProcessor();
         checkRows(rows, checked, true);
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void setExpandedRowsFromUI(List<? extends ITableRow> rows, boolean expanded) {
+      if (CollectionUtility.isEmpty(rows)) {
+        return;
+      }
+      try {
+        pushUIProcessor();
+        expandRowsInternal(rows, expanded);
       }
       finally {
         popUIProcessor();

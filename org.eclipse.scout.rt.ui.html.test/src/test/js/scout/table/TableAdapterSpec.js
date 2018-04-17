@@ -102,6 +102,64 @@ describe("TableAdapter", function() {
 
   });
 
+  describe("expandRows", function() {
+
+    it("sends rowsExpanded event containing rowIds", function() {
+      var rowIds = [0, 1, 2],
+        rows = rowIds.map(function(id) {
+          var rowData = helper.createModelRow(id, ['row' + id]);
+          rowData.expanded = true;
+          return rowData;
+        });
+      var model = helper.createModel(helper.createModelColumns(1), rows);
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.createWidget(model, session.desktop);
+      rows = table.rows;
+      rows[1].parentId = rows[0].id;
+      table.updateRows(rows);
+      table.render();
+
+      table.collapseRow(rows[0]);
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      var event = new scout.RemoteEvent(table.id, 'rowsExpanded', {
+        rows: [{
+          rowId: rows[0].id,
+          expanded: false
+        }]
+      });
+      expect(mostRecentJsonRequest()).toContainEvents(event);
+    });
+
+    it("does not send rowsChecked event if triggered by server", function() {
+      var rowIds = [0, 1, 2],
+        rows = rowIds.map(function(id) {
+          var rowData = helper.createModelRow(id, ['row' + id]);
+          rowData.expanded = true;
+          return rowData;
+        });
+      var model = helper.createModel(helper.createModelColumns(1), rows);
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.createWidget(model, session.desktop);
+      rows[1].parentId = rows[0].id;
+      table.updateRows(rows);
+      table.render();
+
+      adapter._onRowsExpanded(
+        [{
+          id: 0,
+          expanded: false
+        }]
+      );
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+      expect(table.rows[0].expanded).toBe(false);
+    });
+
+  });
+
   describe("onModelAction", function() {
 
     function createRowsInsertedEvent(model, rows) {
@@ -351,10 +409,11 @@ describe("TableAdapter", function() {
 
         // Check if order in the DOM is correct
         var $row, rowId, expectedRowId,
-          i = 0, $rows = table.$rows();
+          i = 0,
+          $rows = table.$rows();
         $rows.each(function() {
           $row = $(this),
-          rowId = $row.data('row').id;
+            rowId = $row.data('row').id;
           expectedRowId = orderedRowIds[i++];
           expect(rowId).toBe(expectedRowId);
         });

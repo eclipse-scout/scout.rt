@@ -66,26 +66,38 @@ describe("HierarchicalTableSpec", function() {
     });
   }
 
+  function getExpandedRows(table) {
+    var expandedRows = [];
+    table.visitRows(function(row) {
+      if (row.expanded && row.childRows.length > 0) {
+        expandedRows.push(row);
+      }
+    }.bind(this));
+    return expandedRows;
+  }
+
   describe("add", function() {
     var table, rowIds, rows;
 
     /**
      * inital table
      * -------------
-     * 1
-     * |-- 2
-     * 3
+     * 0
+     * |-- 1
+     * 2
      **/
     beforeEach(function() {
-      rowIds = [1, 2, 3];
+      rowIds = [0, 1, 2];
       rows = rowIds.map(function(id) {
-        return helper.createModelRow(id, ['row' + id]);
+        var rowData = helper.createModelRow(id, ['row' + id]);
+        rowData.expanded = true;
+        return rowData;
       });
       var model = helper.createModel(helper.createModelColumns(1), rows);
       table = helper.createTable(model),
         rows = table.rows;
-      rows[1].parentId = rows[0].id,
-        table.updateRows(rows);
+      rows[1].parentId = rows[0].id;
+      table.updateRows(rows);
       table.render();
     });
 
@@ -159,11 +171,11 @@ describe("HierarchicalTableSpec", function() {
       expect(table.rowsMap[parentRow.id].childRows.length).toBe(2);
       expect(table.rowsMap[33].parentRow).toBe(parentRow);
 
-      expectRowIds(table.rows, [1, 2, 33, 3]);
-      expectRowIds(getTreeRows(table), [1, 2, 33, 3]);
-      expectRowIds(table._filteredRows, [1, 2, 33, 3]);
-      expectRowIds(table.visibleRows, [1, 3]);
-      expectRowIds(getUiRows(table), [1, 3]);
+      expectRowIds(table.rows, [0, 1, 33, 2]);
+      expectRowIds(getTreeRows(table), [0, 1, 33, 2]);
+      expectRowIds(table._filteredRows, [0, 1, 33, 2]);
+      expectRowIds(table.visibleRows, [0, 2]);
+      expectRowIds(getUiRows(table), [0, 2]);
     });
   });
 
@@ -172,18 +184,20 @@ describe("HierarchicalTableSpec", function() {
     /**
      * inital table
      * -------------
-     * 1
-     * |-- 2
-     *     |-- 3
-     * 4
+     * 0
+     * |-- 1
+     *     |-- 2
+     * 3
+     * |-- 4
      * |-- 5
-     * |-- 6
-     * 7
+     * 6
      **/
     beforeEach(function() {
-      rowIds = [1, 2, 3, 4, 5, 6, 7];
+      rowIds = [0, 1, 2, 3, 4, 5, 6];
       rows = rowIds.map(function(id) {
-        return helper.createModelRow(id, ['row' + id]);
+        var rowData = helper.createModelRow(id, ['row' + id]);
+        rowData.expanded = true;
+        return rowData;
       });
       var model = helper.createModel(helper.createModelColumns(1), rows);
       table = helper.createTable(model),
@@ -250,13 +264,24 @@ describe("HierarchicalTableSpec", function() {
 
   describe("structure", function() {
     var table, rows, rowIds;
+    /**
+     * inital table
+     * -------------
+     * 0
+     * |-- 1
+     *     |-- 2
+     * 3
+     **/
     beforeEach(function() {
-      var model = helper.createModelFixture(1, 4);
+      rowIds = [0, 1, 2, 3];
+      rows = rowIds.map(function(id) {
+        var rowData = helper.createModelRow(id, ['row' + id]);
+        rowData.expanded = true;
+        return rowData;
+      });
+      var model = helper.createModel(helper.createModelColumns(1), rows);
       table = helper.createTable(model),
-        rows = table.rows,
-        rowIds = table.rows.map(function(r) {
-          return r.id;
-        });
+        rows = table.rows;
       rows[1].parentId = rows[0].id;
       rows[2].parentId = rows[1].id;
       table.updateRows(rows);
@@ -264,47 +289,64 @@ describe("HierarchicalTableSpec", function() {
     });
 
     it("is updated when insert a new child row", function() {
-      var row = helper.createModelRow(undefined, ['newRow']),
+      var row = helper.createModelRow(33, ['newRow']),
         spyRenderViewPort = spyOn(table, '_renderViewport').and.callThrough();
 
       row.parentId = rows[0].id;
       table.insertRow(row);
+      row = table._rowById(33);
       expect(table._renderViewport.calls.count()).toBe(2);
 
-      row = scout.arrays.find(table.rows, function(r) {
-        return r.cells[0].text === 'newRow';
-      });
-      expect(row).not.toBe(null);
-      expect(table.visibleRows.length).toBe(5);
-      expect(table.expandedRows.length).toBe(2);
+      expectRowIds(table.visibleRows, [0, 1, 2, 33, 3]);
+      expectRowIds(getExpandedRows(table), [0, 1]);
       expect(rows[0].childRows.length).toBe(2);
       expect(rows[0].childRows[1]).toBe(row);
       expect(row.parentRow).toBe(rows[0]);
     });
 
     it("is updated when deleting a child row", function() {
+      var expectedRowIds = [0, 1, 3];
       table.deleteRow(rows[2]);
-      expect(table.visibleRows.length).toBe(3);
-      expect(table.expandedRows.length).toBe(1);
+      expectRowIds(table.rows, expectedRowIds);
+      expectRowIds(getTreeRows(table), expectedRowIds);
+      expectRowIds(table._filteredRows, expectedRowIds);
+      expectRowIds(table.visibleRows, expectedRowIds);
+      expectRowIds(getUiRows(table), expectedRowIds);
     });
 
     it("is updated when deleting a row and its children", function() {
       // cascade deleted row
-      var childRowToBeDeleted = rows[2];
+      var childRowToBeDeleted = rows[2],
+        expectedRowIds = [0, 3];
       table.deleteRow(rows[1]);
-      expect(scout.arrays.find(table.visibleRows, function(r) {
-        return r.id === childRowToBeDeleted.id;
-      }.bind(this))).toBe(null);
-      expect(table.visibleRows.length).toBe(2);
-      expect(table.expandedRows.length).toBe(0);
+
+      expectRowIds(table.rows, expectedRowIds);
+      expectRowIds(getTreeRows(table), expectedRowIds);
+      expectRowIds(table._filteredRows, expectedRowIds);
+      expectRowIds(table.visibleRows, expectedRowIds);
+      expectRowIds(getUiRows(table), expectedRowIds);
     });
 
   });
 
   describe("expanded rows", function() {
-    var table, rows;
+    var table, rowIds, rows;
+    /**
+     * inital table
+     * -------------
+     * 0
+     * |-- 1
+     *     |-- 2
+     * 3
+     **/
     beforeEach(function() {
-      var model = helper.createModelFixture(1, 4);
+      rowIds = [0, 1, 2, 3];
+      rows = rowIds.map(function(id) {
+        var rowData = helper.createModelRow(id, ['row' + id]);
+        rowData.expanded = true;
+        return rowData;
+      });
+      var model = helper.createModel(helper.createModelColumns(1), rows);
       table = helper.createTable(model),
         rows = table.rows;
       rows[1].parentId = rows[0].id;
@@ -314,25 +356,95 @@ describe("HierarchicalTableSpec", function() {
     });
 
     it("are valid after expand parent and its child row and expand parent again.", function() {
-      expect(table.visibleRows.length).toBe(4);
-      expect(table.expandedRows.length).toBe(2);
+      var expectedRowIds = [0, 1, 2, 3];
+      expectRowIds(table.rows, expectedRowIds);
+      expectRowIds(getTreeRows(table), expectedRowIds);
+      expectRowIds(table._filteredRows, expectedRowIds);
+      expectRowIds(table.visibleRows, expectedRowIds);
+      expectRowIds(getExpandedRows(table), [0, 1]);
+      expectRowIds(getUiRows(table), expectedRowIds);
+
       table.collapseRow(rows[1]);
-      expect(table.visibleRows.length).toBe(3);
-      expect(table.expandedRows.length).toBe(1);
+
+      expectRowIds(table.rows, expectedRowIds);
+      expectRowIds(getTreeRows(table), expectedRowIds);
+      expectRowIds(table._filteredRows, expectedRowIds);
+      expectRowIds(table.visibleRows, [0, 1, 3]);
+      expectRowIds(getExpandedRows(table), [0]);
+      expectRowIds(getUiRows(table), [0, 1, 3]);
+
       table.collapseRow(rows[0]);
-      expect(table.visibleRows.length).toBe(2);
-      expect(table.expandedRows.length).toBe(0);
+
+      expectRowIds(table.rows, expectedRowIds);
+      expectRowIds(getTreeRows(table), expectedRowIds);
+      expectRowIds(table._filteredRows, expectedRowIds);
+      expectRowIds(table.visibleRows, [0, 3]);
+      expectRowIds(getExpandedRows(table), []);
+      expectRowIds(getUiRows(table), [0, 3]);
+
       table.expandRow(rows[0]);
-      expect(table.visibleRows.length).toBe(3);
-      expect(table.expandedRows.length).toBe(1);
+
+      expectRowIds(table.rows, expectedRowIds);
+      expectRowIds(getTreeRows(table), expectedRowIds);
+      expectRowIds(table._filteredRows, expectedRowIds);
+      expectRowIds(table.visibleRows, [0, 1, 3]);
+      expectRowIds(getExpandedRows(table), [0]);
+      expectRowIds(getUiRows(table), [0, 1, 3]);
+
+    });
+
+    it("are valid after expand all and collapse all.", function() {
+
+      var expectedRowIds = [0, 1, 2, 3];
+      expectRowIds(table.rows, expectedRowIds);
+      expectRowIds(getTreeRows(table), expectedRowIds);
+      expectRowIds(table._filteredRows, expectedRowIds);
+      expectRowIds(table.visibleRows, expectedRowIds);
+      expectRowIds(getExpandedRows(table), [0, 1]);
+      expectRowIds(getUiRows(table), expectedRowIds);
+
+      table.collapseAll();
+
+      expectRowIds(table.rows, expectedRowIds);
+      expectRowIds(getTreeRows(table), expectedRowIds);
+      expectRowIds(table._filteredRows, expectedRowIds);
+      expectRowIds(table.visibleRows, [0, 3]);
+      expectRowIds(getExpandedRows(table), []);
+      expectRowIds(getUiRows(table), [0, 3]);
+
+      table.expandAll();
+      expectRowIds(table.rows, expectedRowIds);
+      expectRowIds(getTreeRows(table), expectedRowIds);
+      expectRowIds(table._filteredRows, expectedRowIds);
+      expectRowIds(table.visibleRows, expectedRowIds);
+      expectRowIds(getExpandedRows(table), [0, 1]);
+      expectRowIds(getUiRows(table), expectedRowIds);
+
     });
 
   });
 
   describe("selection", function() {
-    var table, rows;
+    var table, rowIds, rows;
+    /**
+     * inital table
+     * -------------
+     * 0
+     * |-- 1
+     *     |-- 2
+     * 3
+     * |-- 4
+     * |-- 5
+     * 6
+     **/
     beforeEach(function() {
-      var model = helper.createModelFixture(1, 7);
+      rowIds = [0, 1, 2, 3, 4, 5, 6];
+      rows = rowIds.map(function(id) {
+        var rowData = helper.createModelRow(id, ['row' + id]);
+        rowData.expanded = true;
+        return rowData;
+      });
+      var model = helper.createModel(helper.createModelColumns(1), rows);
       table = helper.createTable(model),
         rows = table.rows;
       rows[1].parentId = rows[0].id;
@@ -420,12 +532,25 @@ describe("HierarchicalTableSpec", function() {
   });
 
   describe("filtered visible", function() {
-    var table, rows;
-
+    var table, rowIds, rows;
+    /**
+     * inital table
+     * -------------
+     * 0
+     * |-- 1
+     *     |-- 2
+     * 3
+     **/
     beforeEach(function() {
-      var model = helper.createModelFixture(1, 4);
-      table = helper.createTable(model);
-      rows = table.rows;
+      rowIds = [0, 1, 2, 3];
+      rows = rowIds.map(function(id) {
+        var rowData = helper.createModelRow(id, ['row' + id]);
+        rowData.expanded = true;
+        return rowData;
+      });
+      var model = helper.createModel(helper.createModelColumns(1), rows);
+      table = helper.createTable(model),
+        rows = table.rows;
       // create hierarchie
       rows[1].parentId = rows[0].id;
       rows[2].parentId = rows[1].id;
@@ -437,7 +562,7 @@ describe("HierarchicalTableSpec", function() {
       var column0 = table.columns[0];
 
       // expects 1 row and its parents are visible
-      createAndRegisterColumnFilter(table, column0, ['2_0']);
+      createAndRegisterColumnFilter(table, column0, ['row2']);
       table.filter();
       expect(table.getVisibleRows().length).toBe(3);
 

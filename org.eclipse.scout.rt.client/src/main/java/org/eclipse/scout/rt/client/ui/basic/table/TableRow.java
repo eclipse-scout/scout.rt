@@ -28,11 +28,15 @@ import org.eclipse.scout.rt.shared.dimension.IDimensions;
 public class TableRow implements ITableRow {
 
   private static final String CHECKED = "CHECKED";
+  protected static final String EXPANDED = "EXPANDED";
   private static final String ROW_PROPERTIES_CHANGED = "ROW_PROPERTIES_CHANGED";
   protected static final String REJECTED_BY_USER = "REJECTED_BY_USER";
   protected static final String FILTER_ACCEPTED = "FILTER_ACCEPTED";
 
-  protected static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(CHECKED, IDimensions.ENABLED, ROW_PROPERTIES_CHANGED, REJECTED_BY_USER, FILTER_ACCEPTED);
+  protected static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(CHECKED, EXPANDED, IDimensions.ENABLED, ROW_PROPERTIES_CHANGED, REJECTED_BY_USER, FILTER_ACCEPTED);
+
+  private final Object m_childRowListLock;
+  private List<ITableRow> m_childRowList;
 
   private final ColumnSet m_columnSet;
   private final Map<String, Object> m_customValues;
@@ -40,7 +44,7 @@ public class TableRow implements ITableRow {
 
   /**
    * Provides 8 boolean flags.<br>
-   * Currently used: {@link IDimensions#ENABLED}, {@link #CHECKED}, {@link #ROW_PROPERTIES_CHANGED},
+   * Currently used: {@link IDimensions#ENABLED}, {@link #CHECKED}, {@link #EXPANDED}, {@link #ROW_PROPERTIES_CHANGED},
    * {@link #FILTER_ACCEPTED} (in subclass), {@link #REJECTED_BY_USER} (in subclass).
    */
   protected byte m_flags;
@@ -49,12 +53,15 @@ public class TableRow implements ITableRow {
   private String m_iconId;
   private String m_cssClass;
   private Set<Integer> m_updatedColumnIndexes;
+  private ITableRow m_parentRow;
 
   /**
    * @param columnSet
    *          may be null
    */
   public TableRow(ColumnSet columnSet) {
+    m_childRowListLock = new Object();
+    m_childRowList = new ArrayList<>();
     m_columnSet = columnSet;
     m_customValues = new HashMap<>(0);
 
@@ -65,6 +72,8 @@ public class TableRow implements ITableRow {
   }
 
   public TableRow(ColumnSet columnSet, ITableRow row) {
+    m_childRowListLock = new Object();
+    m_childRowList = new ArrayList<>();
     m_columnSet = columnSet;
     m_customValues = new HashMap<>(row.getCustomValues());
 
@@ -174,6 +183,20 @@ public class TableRow implements ITableRow {
   @Override
   public void setChecked(boolean checked) {
     m_flags = FLAGS_BIT_HELPER.changeBit(CHECKED, checked, m_flags);
+  }
+
+  @Override
+  public boolean isExpanded() {
+    return FLAGS_BIT_HELPER.isBitSet(EXPANDED, m_flags);
+  }
+
+  @Override
+  public boolean setExpanded(boolean expanded) {
+    boolean changed = expanded != isExpanded();
+    if (changed) {
+      m_flags = FLAGS_BIT_HELPER.changeBit(EXPANDED, expanded, m_flags);
+    }
+    return changed;
   }
 
   @Override
@@ -344,6 +367,48 @@ public class TableRow implements ITableRow {
   @Override
   public ITable getTable() {
     return null;
+  }
+
+  @Override
+  public List<ITableRow> getChildRows() {
+    synchronized (m_childRowListLock) {
+      return CollectionUtility.arrayList(m_childRowList);
+    }
+  }
+
+  @Override
+  public final void setChildRowsInternal(List<ITableRow> childRows) {
+    synchronized (m_childRowListLock) {
+      m_childRowList = childRows;
+    }
+  }
+
+  /**
+   * do not use internal method
+   */
+  public final void addChildRowInternal(ITableRow row) {
+    synchronized (m_childRowListLock) {
+      m_childRowList.add(row);
+    }
+  }
+
+  /**
+   * do not use internal method
+   */
+  public final void removeChildRowInternal(ITableRow childRow) {
+    synchronized (m_childRowListLock) {
+      m_childRowList.remove(childRow);
+    }
+  }
+
+  @Override
+  public ITableRow getParentRow() {
+    return m_parentRow;
+  }
+
+  @Override
+  public final void setParentRowInternal(ITableRow parentRow) {
+    m_parentRow = parentRow;
   }
 
   @Override

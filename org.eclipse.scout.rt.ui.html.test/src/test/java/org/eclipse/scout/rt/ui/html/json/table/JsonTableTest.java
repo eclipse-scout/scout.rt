@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -23,6 +24,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -51,6 +53,7 @@ import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.fixtures.Menu;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.FormTableControl;
+import org.eclipse.scout.rt.ui.html.json.table.fixtures.HierarchicalTable;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.ListBoxTable;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.Table;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWith3Cols;
@@ -1452,6 +1455,54 @@ public class JsonTableTest {
   public void testGetTableRow() throws Exception {
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, new TableWith3Cols(), null);
     jsonTable.getTableRow("foo");
+  }
+
+  /**
+   * <pre>
+   * 1
+   * |--2
+   * |--3
+   * 4
+   * |--5
+   *    |--6
+   * </pre>
+   */
+  @Test
+  public void testExpandAll() {
+    HierarchicalTable table = new HierarchicalTable();
+    table.init();
+    List<ITableRow> rows = new ArrayList<>();
+    rows.add(table.createRow(new Object[]{0, null}));
+    rows.add(table.createRow(new Object[]{1, 0}));
+    rows.add(table.createRow(new Object[]{2, 0}));
+    rows.add(table.createRow(new Object[]{3, null}));
+    rows.add(table.createRow(new Object[]{4, 3}));
+    rows.add(table.createRow(new Object[]{5, 4}));
+    table.replaceRows(rows);
+    rows = table.getRows();
+    table.collapseAll(null);
+
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+
+    // Response should contain no events
+    assertEquals(0, m_uiSession.currentJsonResponse().getEventList().size());
+
+    table.expandAll(null);
+    assertEquals(1, jsonTable.eventBuffer().size());
+    TableEvent tableEvent = jsonTable.eventBuffer().getBufferInternal().get(0);
+    assertEquals(TableEvent.TYPE_ROWS_EXPANDED, tableEvent.getType());
+    assertArrayEquals(new Integer[]{0, 1, 2, 3, 4, 5},
+        tableEvent.getRows().stream()
+            .map(row -> (Integer) row.getCellValue(0))
+            .collect(Collectors.toList())
+            .toArray(new Integer[0]));
+
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+
+    // expect that
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
+        m_uiSession.currentJsonResponse(), JsonTable.EVENT_ROWS_EXPANDED);
+    assertTrue(responseEvents.size() == 1);
   }
 
   public static Table createTableFixture(int numRows) {

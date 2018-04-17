@@ -38,6 +38,8 @@ public interface ITableUIFacade {
    */
   void setCheckedRowsFromUI(List<? extends ITableRow> rows, boolean checked);
 
+  void setExpandedRowsFromUI(List<? extends ITableRow> rows, boolean expanded);
+
   /**
    * A mouse double click on a row triggers this action
    */

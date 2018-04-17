@@ -19,7 +19,6 @@ scout.Table = function() {
   this.dropType = 0;
   this.dropMaximumSize = scout.dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
   this.enabled = true;
-  this.expandedRows = [];
   this.headerEnabled = true;
   this.headerVisible = true;
   this.headerMenusEnabled = true;
@@ -480,7 +479,11 @@ scout.Table.prototype._onRowMouseUp = function(event) {
   // handle expansion
   if ($target.hasClass('table-row-control') ||
     $target.parent().hasClass('table-row-control')) {
-    this.expandRow(row, !row.expanded);
+    if (row.expanded) {
+      this.collapseRow(row);
+    } else {
+      this.expandRow(row);
+    }
     return;
   }
   if (mouseButton === 1) {
@@ -2102,56 +2105,71 @@ scout.Table.prototype.isTableNodeColumn = function(column) {
 };
 
 scout.Table.prototype.collapseRow = function(row) {
-  this.expandRow(row, false);
+  this.collapseRows(scout.arrays.ensure(row));
 };
 
 scout.Table.prototype.collapseAll = function() {
-  this.setExpandedRows([]);
+  this.expandRowsInternal(this.rootRows, false, true);
 };
 
 scout.Table.prototype.expandAll = function() {
-  this.rows.filter(function(row) {
-    return !scout.arrays.empty(row.childRows);
-  });
-  this.setExpandedRows(this.rows.filter(function(row) {
-    return !scout.arrays.empty(row.childRows);
-  }));
+  this.expandRowsInternal(this.rootRows, true, true);
 };
 
-scout.Table.prototype.expandRow = function(row, expanded) {
+scout.Table.prototype.collapseRows = function(rows, recursive) {
+  this.expandRowsInternal(rows, false, recursive);
+};
+
+scout.Table.prototype.expandRow = function(row, recursive) {
+  this.expandRows(scout.arrays.ensure(row));
+};
+
+scout.Table.prototype.expandRows = function(rows, recursive) {
+  this.expandRowsInternal(rows, true, recursive);
+};
+
+scout.Table.prototype.expandRowsInternal = function(rows, expanded, recursive) {
+  var changedRows = [],
+    rowsForAnimation = [];
+  rows = rows || this.rootRows;
   expanded = scout.nvl(expanded, true);
-  if ((expanded && this.expandedRows.indexOf(row) > -1) ||
-    (!expanded && this.expandedRows.indexOf(row) === -1)) {
-    return;
-  }
-  row.expanded = expanded;
-  if (expanded) {
-    this.expandedRows.push(row);
+  recursive = scout.nvl(recursive, false);
+  if (recursive) {
+    // collect rows
+    this.visitRows(function(row) {
+      var changed = row.expanded !== expanded;
+      if (changed) {
+        row.expanded = expanded;
+        changedRows.push(row);
+        if (row.$row) {
+          rowsForAnimation.push(row);
+        }
+      }
+    }.bind(this), rows);
   } else {
-    scout.arrays.remove(this.expandedRows, row);
+    changedRows = rows.filter(function(row) {
+      var changed = row.expanded !== expanded;
+      if (changed && row.$row) {
+        rowsForAnimation.push(row);
+      }
+      row.expanded = expanded;
+      return changed;
+    });
   }
-
-  this._updateRowStructure({
-    visibleRows: true
-  });
-  this._renderRowDelta();
-  row.animateExpansion();
-  this._triggerRowsExpanded(this.expandedRows);
-};
-
-scout.Table.prototype.setExpandedRows = function(rows) {
-  if (scout.arrays.equalsIgnoreOrder(rows, this.expandedRows)) {
+  if (changedRows.length === 0) {
     return;
   }
-  this.rows.forEach(function(row) {
-    row.expanded = rows.indexOf(row) > -1;
-  });
-  this.expandedRows = rows;
   this._updateRowStructure({
     visibleRows: true
   });
-  this._renderRowDelta();
-  this._triggerRowsExpanded(this.expandedRows);
+  this._triggerRowsExpanded(changedRows);
+
+  if (this.rendered) {
+    this._renderRowDelta();
+    rowsForAnimation.forEach(function(row) {
+      row.animateExpansion();
+    });
+  }
 };
 
 scout.Table.prototype.doRowAction = function(row, column) {
@@ -2212,7 +2230,7 @@ scout.Table.prototype.insertRows = function(rows) {
 
   // Update HTML
   if (this.rendered) {
-    if(this.hierarchical){
+    if (this.hierarchical) {
       this._renderRowOrderChanges();
     }
     // Remember inserted rows for future events like rowOrderChanged
@@ -2436,13 +2454,11 @@ scout.Table.prototype._rebuildTreeStructure = function() {
   if (!hierarchical) {
     this.rootRows = this.rows;
     this.hierarchical = hierarchical;
-    this.expandedRows = [];
     return;
   }
 
   this.hierarchical = hierarchical;
   this.rootRows = [];
-  var expandedRows = [];
   this.rows.forEach(function(row) {
     var parentRow;
     if (!scout.objects.isNullOrUndefined(row.parentId)) {
@@ -2462,11 +2478,7 @@ scout.Table.prototype._rebuildTreeStructure = function() {
   this.rows = [];
   this.visitRows(function(row) {
     this.rows.push(row);
-    if (row.childRows.length > 0 && row.expanded) {
-      expandedRows.push(row);
-    }
   }.bind(this));
-  this.expandedRows = expandedRows;
 };
 
 /**

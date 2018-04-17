@@ -99,6 +99,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   public static final String EVENT_RELOAD = "reload";
   public static final String EVENT_RESET_COLUMNS = "resetColumns";
   public static final String EVENT_ROWS_CHECKED = "rowsChecked";
+  public static final String EVENT_ROWS_EXPANDED = "rowsExpanded";
   public static final String EVENT_COLUMN_ORDER_CHANGED = "columnOrderChanged";
   public static final String EVENT_COLUMN_STRUCTURE_CHANGED = "columnStructureChanged";
   public static final String EVENT_COLUMN_HEADERS_UPDATED = "columnHeadersUpdated";
@@ -121,6 +122,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   public static final String PROP_ROWS = "rows";
   public static final String PROP_ROW_IDS = "rowIds";
   public static final String PROP_ROW_ID = "rowId";
+  public static final String PROP_EXPANDED = "expanded";
   public static final String PROP_COLUMN_ID = "columnId";
   public static final String PROP_COLUMN_IDS = "columnIds";
   public static final String PROP_COLUMNS = "columns";
@@ -518,6 +520,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     else if (EVENT_ROWS_CHECKED.equals(event.getType())) {
       handleUiRowChecked(event);
     }
+    else if (EVENT_ROWS_EXPANDED.equals(event.getType())) {
+      handleUiRowsExpanded(event);
+    }
     else if (EVENT_PREPARE_CELL_EDIT.equals(event.getType())) {
       handleUiPrepareCellEdit(event);
     }
@@ -615,6 +620,32 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     }
     if (!checkedInfo.getUncheckedRows().isEmpty()) {
       getModel().getUIFacade().setCheckedRowsFromUI(checkedInfo.getUncheckedRows(), false);
+    }
+  }
+
+  protected void handleUiRowsExpanded(JsonEvent event) {
+    List<ITableRow> expandedRows = new ArrayList<>();
+    List<ITableRow> collapsedRows = new ArrayList<>();
+    JSONArray jsonRows = event.getData().optJSONArray("rows");
+    if (jsonRows != null) {
+      for (int i = 0; i < jsonRows.length(); i++) {
+        JSONObject jsonRow = jsonRows.getJSONObject(i);
+        ITableRow row = optTableRow(jsonRow.getString("rowId"));
+        if (row != null) {
+          if (jsonRow.optBoolean("expanded")) {
+            expandedRows.add(row);
+          }
+          else {
+            collapsedRows.add(row);
+          }
+        }
+      }
+    }
+    if (!expandedRows.isEmpty()) {
+      getModel().getUIFacade().setExpandedRowsFromUI(expandedRows, true);
+    }
+    if (!collapsedRows.isEmpty()) {
+      getModel().getUIFacade().setExpandedRowsFromUI(collapsedRows, false);
     }
   }
 
@@ -869,6 +900,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     putProperty(jsonRow, "cells", jsonCells);
     putProperty(jsonRow, "checked", row.isChecked());
     putProperty(jsonRow, "enabled", row.isEnabled());
+    putProperty(jsonRow, "expanded", row.isExpanded());
     putProperty(jsonRow, "iconId", BinaryResourceUrlUtility.createIconUrl(row.getIconId()));
     putProperty(jsonRow, "cssClass", row.getCssClass());
     if (row.getCustomValue(AbstractTableRowData.CUSTOM_VALUES_ID_GEO_LOCATION) != null) {
@@ -1181,6 +1213,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       case TableEvent.TYPE_ROWS_CHECKED:
         handleModelRowsChecked(event.getRows());
         break;
+      case TableEvent.TYPE_ROWS_EXPANDED:
+        handleModelRowsExpanded(event.getRows());
+        break;
       case TableEvent.TYPE_ROW_FILTER_CHANGED:
         // See special handling in bufferModelEvent()
         throw new IllegalStateException("Unsupported event type: " + event);
@@ -1301,6 +1336,21 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_ROWS, jsonRows);
     addActionEvent(EVENT_ROWS_CHECKED, jsonEvent);
+  }
+
+  protected void handleModelRowsExpanded(List<ITableRow> rows) {
+    JSONArray jsonRows = new JSONArray();
+    rows.stream().filter(row -> isRowAccepted(row))
+        .map(row -> {
+          JSONObject jsonRow = new JSONObject();
+          putProperty(jsonRow, "id", getTableRowId(row));
+          putProperty(jsonRow, "expanded", row.isExpanded());
+          return jsonRow;
+        }).forEach(jo -> jsonRows.put(jo));
+
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, PROP_ROWS, jsonRows);
+    addActionEvent(EVENT_ROWS_EXPANDED, jsonEvent);
   }
 
   protected void handleModelRowOrderChanged(Collection<ITableRow> modelRows) {

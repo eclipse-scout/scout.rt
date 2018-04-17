@@ -47,6 +47,14 @@ public interface ITableRow {
 
   ITable getTable();
 
+  ITableRow getParentRow();
+
+  void setParentRowInternal(ITableRow parentRow);
+
+  List<ITableRow> getChildRows();
+
+  void setChildRowsInternal(List<ITableRow> childRows);
+
   int getRowIndex();
 
   boolean isEnabled();
@@ -58,6 +66,13 @@ public interface ITableRow {
   boolean isChecked();
 
   void setChecked(boolean b);
+
+  boolean isExpanded();
+
+  /**
+   * @return whether or not the expansion state changed
+   */
+  boolean setExpanded(boolean expanded);
 
   boolean isFilterAccepted();
 

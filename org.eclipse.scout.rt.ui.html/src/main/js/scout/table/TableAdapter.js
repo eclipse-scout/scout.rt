@@ -194,6 +194,22 @@ scout.TableAdapter.prototype._sendRowsChecked = function(rows) {
   this._send('rowsChecked', data);
 };
 
+scout.TableAdapter.prototype._onWidgetRowsExpanded = function(event) {
+  this._sendRowsExpanded(event.rows);
+};
+
+scout.TableAdapter.prototype._sendRowsExpanded = function(rows) {
+  var data = {
+    rows: rows.map(function(row) {
+      return {
+        rowId: row.id,
+        expanded: row.expanded
+      };
+    })
+  };
+  this._send('rowsExpanded', data);
+};
+
 scout.TableAdapter.prototype._onWidgetFilter = function(event) {
   var rowIds = this.widget._rowsToIds(this.widget.filteredRows());
   this._sendFilter(rowIds);
@@ -287,11 +303,13 @@ scout.TableAdapter.prototype._onWidgetEvent = function(event) {
     this._onWidgetRowsSelected(event);
   } else if (event.type === 'rowsChecked') {
     this._onWidgetRowsChecked(event);
+  } else if (event.type === 'rowsExpanded') {
+    this._onWidgetRowsExpanded(event);
   } else if (event.type === 'filter') {
     this._onWidgetFilter(event);
-  } else  if (event.type === 'sort') {
+  } else if (event.type === 'sort') {
     this._onWidgetSort(event);
-  } else  if (event.type === 'group') {
+  } else if (event.type === 'group') {
     this._onWidgetGroup(event);
   } else if (event.type === 'rowClick') {
     this._onWidgetRowClick(event);
@@ -377,6 +395,23 @@ scout.TableAdapter.prototype._onRowsChecked = function(rows) {
   this.widget.uncheckRows(uncheckedRows, {
     checkOnlyEnabled: false
   });
+};
+
+scout.TableAdapter.prototype._onRowsExpanded = function(rows) {
+  var expandedRows = [],
+    collapsedRows = [];
+  rows.forEach(function(rowData) {
+    var row = this.widget._rowById(rowData.id);
+    if (rowData.expanded) {
+      expandedRows.push(row);
+    } else {
+      collapsedRows.push(row);
+    }
+  }, this);
+  this.addFilterForWidgetEventType('rowsExpanded');
+
+  this.widget.expandRows(expandedRows);
+  this.widget.collapseRows(collapsedRows);
 };
 
 scout.TableAdapter.prototype._onRowOrderChanged = function(rowIds) {
@@ -493,6 +528,8 @@ scout.TableAdapter.prototype.onModelAction = function(event) {
     this._onFiltersChanged(event.filters);
   } else if (event.type === 'rowsChecked') {
     this._onRowsChecked(event.rows);
+  } else if (event.type === 'rowsExpanded') {
+    this._onRowsExpanded(event.rows);
   } else if (event.type === 'columnStructureChanged') {
     this._onColumnStructureChanged(event.columns);
   } else if (event.type === 'columnOrderChanged') {
@@ -600,9 +637,9 @@ scout.TableAdapter.modifyTablePrototype = function() {
   // uiSortPossible
   scout.objects.replacePrototypeFunction(scout.Table, '_isSortingPossible', function(sortColumns) {
     if (this.modelAdapter) {
-       // In a JS only app the flag 'uiSortPossible' is never set and thus defaults to true. Additionally we check if each column can install
-       // its comparator used to sort. If installation failed for some reason, sorting is not possible. In a remote app the server sets the
-       // 'uiSortPossible' flag, which decides if the column must be sorted by the server or can be sorted by the client.
+      // In a JS only app the flag 'uiSortPossible' is never set and thus defaults to true. Additionally we check if each column can install
+      // its comparator used to sort. If installation failed for some reason, sorting is not possible. In a remote app the server sets the
+      // 'uiSortPossible' flag, which decides if the column must be sorted by the server or can be sorted by the client.
       var uiSortPossible = scout.nvl(this.uiSortPossible, true);
       return uiSortPossible && this._isSortingPossibleOrig(sortColumns);
     }
@@ -651,7 +688,7 @@ scout.TableAdapter.modifyColumnPrototype = function() {
         // It is also necessary for custom columns which don't have a UI representation and never send the value.
         // Do not parse the value if there is an error status.
         // If editing fails, the display text will be the user input, the value unchanged, and the server will set the error status.
-        if (model.text && model.value === undefined  && !model.errorStatus) {
+        if (model.text && model.value === undefined && !model.errorStatus) {
           model.value = this._parseValue(model.text);
         }
         // use null instead of undefined
@@ -673,11 +710,11 @@ scout.TableAdapter.modifyColumnPrototype = function() {
   // uiSortPossible
   scout.objects.replacePrototypeFunction(scout.Column, 'isSortingPossible', function() {
     if (this.table.modelAdapter) {
-       // Returns whether or not this column can be used to sort on the client side. In a JS only app the flag 'uiSortPossible'
-       // is never set and defaults to true. As a side effect of this function a comparator is installed.
-       // The comparator returns false if it could not be installed which means sorting should be delegated to server (e.g. collator is not available).
-       // In a remote app the server sets the 'uiSortPossible' flag, which decides if the column must be sorted by the
-       // server or can be sorted by the client.
+      // Returns whether or not this column can be used to sort on the client side. In a JS only app the flag 'uiSortPossible'
+      // is never set and defaults to true. As a side effect of this function a comparator is installed.
+      // The comparator returns false if it could not be installed which means sorting should be delegated to server (e.g. collator is not available).
+      // In a remote app the server sets the 'uiSortPossible' flag, which decides if the column must be sorted by the
+      // server or can be sorted by the client.
       var uiSortPossible = scout.nvl(this.uiSortPossible, true);
       return uiSortPossible && this.installComparator();
     }

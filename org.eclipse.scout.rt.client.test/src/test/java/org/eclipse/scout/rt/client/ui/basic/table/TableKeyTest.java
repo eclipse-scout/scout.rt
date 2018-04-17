@@ -66,50 +66,6 @@ public class TableKeyTest {
   }
 
   @Test
-  public void testAddParentRow() throws Exception {
-    P_SinglePrimaryKeyColumnTable table = new P_SinglePrimaryKeyColumnTable();
-    table.init();
-    List<ITableRow> rows = new ArrayList<>();
-    rows.add(table.createRow(new Object[]{1, null}));
-    rows.add(table.createRow(new Object[]{2, null}));
-    rows.add(table.createRow(new Object[]{3, 4}));
-    table.replaceRows(rows);
-    rows = table.getRows();
-    assertEquals(rows.get(0), table.getRowByKey(table.getRowKeys(rows.get(0))));
-    assertEquals(rows.get(1), table.getRowByKey(table.getRowKeys(rows.get(1))));
-    assertEquals(rows.get(2), table.getRowByKey(table.getRowKeys(rows.get(2))));
-    assertNull(table.findParentRow(rows.get(2)));
-    assertNull(table.findParentRow(rows.get(0)));
-    assertNull(table.findParentRow(rows.get(1)));
-
-    // insert new parent row
-    table.addRow(table.createRow(new Object[]{4, null}));
-    rows = table.getRows();
-    assertArrayEquals(new Integer[]{Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(4), Integer.valueOf(3)}, table.getRows().stream().map(row -> row.getCellValue(0)).collect(Collectors.toList()).toArray());
-
-    assertEquals(rows.get(2), table.findParentRow(rows.get(3)));
-  }
-
-  @Test
-  public void testRemoveParentRow() throws Exception {
-    P_SinglePrimaryKeyColumnTable table = new P_SinglePrimaryKeyColumnTable();
-    table.init();
-    List<ITableRow> rows = new ArrayList<>();
-    rows.add(table.createRow(new Object[]{1, null}));
-    rows.add(table.createRow(new Object[]{2, null}));
-    rows.add(table.createRow(new Object[]{3, 1}));
-    table.replaceRows(rows);
-    rows = table.getRows();
-    assertEquals(rows.get(0), table.findParentRow(rows.get(2)));
-
-    // remove parent row
-    table.deleteRow(rows.get(0));
-    rows = table.getRows();
-    assertArrayEquals(new Object[]{1}, rows.get(1).getParentKeyValues().toArray());
-    assertNull(table.findParentRow(rows.get(1)));
-  }
-
-  @Test
   public void testKeyAndParentKeyWithMultipleKeyColumn() throws Exception {
     P_MultiplePrimaryKeyColumnTable table = new P_MultiplePrimaryKeyColumnTable();
     table.init();
