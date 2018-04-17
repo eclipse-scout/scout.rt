@@ -1005,6 +1005,7 @@ scout.SmartField.prototype._onFieldKeyDown = function(event) {
     } else if (!this._pendingOpenPopup) {
       this.openPopup(!this.searchRequired);
     }
+    event.stopPropagation(); // key has been handled (popup open). do not allow propagation to other listeners because this could remove tooltips
   }
 };
 
