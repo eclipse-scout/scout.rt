@@ -101,6 +101,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
@@ -1017,8 +1018,20 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   @Override
   public void activateOutline(IOutline outline) {
+    if (m_outlineChanging) {
+      return;
+    }
+
     final IOutline newOutline = resolveOutline(outline);
-    if (m_outline == newOutline || m_outlineChanging) {
+    if (m_outline == newOutline) {
+      if (m_outline != null && getActiveForm() != null) {
+        m_outline.createDisplayParentRunContext().run(new IRunnable() {
+          @Override
+          public void run() throws Exception {
+            fireOutlineContentActivate();
+          }
+        });
+      }
       return;
     }
 
