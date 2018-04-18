@@ -182,7 +182,7 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
   closeWhenUnselected = scout.nvl(closeWhenUnselected, true);
   if (this.rendered) {
     this._renderSelected(selected, closeWhenUnselected);
-  } else if (closeWhenUnselected && this === this.tableFooter.selectedControl && !selected) {
+  } else if (closeWhenUnselected && this.tableFooter && this === this.tableFooter.selectedControl && !selected) {
     this.tableFooter.onControlSelected(null);
   }
 };
