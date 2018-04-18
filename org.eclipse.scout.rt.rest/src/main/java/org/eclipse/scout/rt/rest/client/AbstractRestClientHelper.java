@@ -8,6 +8,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.ext.ContextResolver;
@@ -25,7 +26,8 @@ import org.glassfish.jersey.client.ClientConfig;
  * <p>
  * This class is stateless and may be reused for subsequent REST requests to the same API server.
  * <p>
- * Subclasses may bind this generic REST client helper to a concrete REST endpoint by implementing the {@link #getBaseUri()} method.
+ * Subclasses may bind this generic REST client helper to a concrete REST endpoint by implementing the
+ * {@link #getBaseUri()} method.
  */
 public abstract class AbstractRestClientHelper implements IRestClientHelper {
 
@@ -43,7 +45,20 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
   }
 
   protected void initClientBuilder(ClientBuilder clientBuilder) {
-    clientBuilder.withConfig(new ClientConfig().connectorProvider(new ApacheConnectorProvider()));
+    ClientConfig clientConfig = new ClientConfig();
+    // TODO 8.0 pbz: Temporary workaround, see Jersey Issue 3771: https://github.com/jersey/jersey/pull/3771 (remove this code line when issue is resolved, see also TODO in pom.xml)
+    clientConfig.connectorProvider(new ApacheConnectorProvider());
+
+    initConfigurable(clientConfig);
+    clientBuilder.withConfig(clientConfig);
+  }
+
+  /**
+   * Override this method to setup the {@link Configurable} with custom properties. <br>
+   * This default method does not setup any properties.
+   */
+  protected void initConfigurable(Configurable<?> configurable) {
+    // NOP
   }
 
   @Override
