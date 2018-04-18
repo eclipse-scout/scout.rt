@@ -232,6 +232,10 @@
     margin-top: -(@loading-animation-size / 2);
     margin-left: -(@loading-animation-size / 2);
     #scout.animation(fade-in 0.15s);
+    #scout.loading-indicator-before(@loading-animation-size, @border-width);
+  }
+
+  .loading-indicator-before(@loading-animation-size: 30px, @border-width: 1px) {
 
     &::before {
       #scout.animation(pulsate 2.2s cubic-bezier(0.5, 0.1, 0.1, 0.5) infinite);
