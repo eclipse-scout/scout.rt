@@ -1061,8 +1061,20 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void activateOutline(IOutline outline) {
+    if (m_outlineChanging) {
+      return;
+    }
+
     final IOutline newOutline = resolveOutline(outline);
-    if (m_outline == newOutline || m_outlineChanging) {
+    if (m_outline == newOutline) {
+      if (m_outline != null && getActiveForm() != null) {
+        m_outline.createDisplayParentRunContext().run(new IRunnable() {
+          @Override
+          public void run() throws Exception {
+            fireOutlineContentActivate();
+          }
+        });
+      }
       return;
     }
 
