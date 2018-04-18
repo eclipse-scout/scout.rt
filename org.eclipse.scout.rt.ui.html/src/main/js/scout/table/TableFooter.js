@@ -122,6 +122,7 @@ scout.TableFooter.prototype._remove = function() {
   this._hideTableStatusTooltip();
   this.$resizer = null;
   this.$controlContainer.stop(false, true);
+  this.animating = false; // Animation may not be started yet due to the delay, hence complete callback may not be executed -> make sure the flag is reset anyway
   this.open = false;
 
   this.table.off('rowsInserted', this._tableRowsChangedHandler);

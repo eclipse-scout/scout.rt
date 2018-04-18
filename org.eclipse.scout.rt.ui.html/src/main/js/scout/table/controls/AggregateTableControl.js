@@ -133,6 +133,10 @@ scout.AggregateTableControl.prototype._reconcileScrollPos = function() {
 };
 
 scout.AggregateTableControl.prototype._updateEnabledAndSelectedState = function(aggregationFunctionChanged) {
+  if (!this.initialized) {
+    // During init the columns are not resolved yet -> containsAggregatedNumberColumn won't return a correct value
+    return;
+  }
   var enabled = this.table.containsAggregatedNumberColumn();
 
   // Select control if enabled, aggregation function changed and table is not grouped
