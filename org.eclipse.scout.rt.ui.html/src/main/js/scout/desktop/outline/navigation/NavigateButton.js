@@ -28,6 +28,7 @@ scout.NavigateButton = function() {
    */
   this._additionalCssClass = '';
   this._addCloneProperties(['node', 'outline']);
+  this.inheritAccessibility = false;
 };
 scout.inherits(scout.NavigateButton, scout.Menu);
 
