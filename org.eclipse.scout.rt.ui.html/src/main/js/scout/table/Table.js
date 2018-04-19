@@ -42,6 +42,7 @@ scout.Table = function() {
   this.rows = [];
   this.rootRows = [];
   this.visibleRows = [];
+  this.visibleRowsMap = {}; // visible rows by id
   this.rowPaddingLevel = 15;
   this.rowsMap = {}; // rows by id
   this.rowWidth = 0;
@@ -2375,47 +2376,43 @@ scout.Table.prototype.updateRows = function(rows) {
     return column.autoOptimizeWidth && !column.autoOptimizeWidthRequired;
   });
 
-  // Update model
-  rows.forEach(function(updatedRow) {
-    var oldRow = this.rowsMap[updatedRow.id];
-    if (!oldRow) {
-      throw new Error('Update event received for non existing row. RowId: ' + updatedRow.id);
-    }
-
-    // Replace old row
-    updatedRow = this._initRow(updatedRow);
-    if (this.selectionHandler.lastActionRow === oldRow) {
-      this.selectionHandler.lastActionRow = updatedRow;
-    }
-
-    // Check if cell content changed and if yes mark auto optimize width column as dirty
-    autoOptimizeWidthColumnsDirty = this._markAutoOptimizeWidthColumnsAsDirtyIfNeeded(autoOptimizeWidthColumns, oldRow, updatedRow);
-
-    // TODO [7.0] cgu: remove this replace functions, they are slow due to indexOf. Either create maps (rowId/rowIndex) before the loop or even store rowIndex for each row
-    scout.arrays.replace(this.rows, oldRow, updatedRow);
-    scout.arrays.replace(this.selectedRows, oldRow, updatedRow);
-    scout.arrays.replace(this.visibleRows, oldRow, updatedRow);
-
-    // Apply row filters for and only for the new rows.
-    updatedRow.filterAccepted = oldRow.filterAccepted;
-    if (this._filterCount() > 0) {
-      filterChanged = this._applyFiltersForRow(updatedRow) || filterChanged;
-    }
-
-    // Replace old $row
-    if (this.rendered && oldRow.$row) {
-      // render row and replace div in DOM
-      var $updatedRow = $(this._buildRowDiv(updatedRow));
-      $updatedRow.copyCssClasses(oldRow.$row, scout.Table.SELECTION_CLASSES + ' first last');
-      oldRow.$row.replaceWith($updatedRow);
-      scout.Table.linkRowToDiv(updatedRow, $updatedRow);
-      this._destroyTooltipsForRow(updatedRow);
-      this._removeCellEditorForRow(updatedRow);
-      this._installRow(updatedRow);
-    }
+  var rowsToIndex = {};
+  this.rows.forEach(function(row, index) {
+    rowsToIndex[row.id] = index;
   }, this);
 
-  this._triggerRowsUpdated(rows);
+  var oldRowsMap = {};
+  var structureChanged = false;
+  rows = rows.map(function(row) {
+    var parentRowId = row.parentRow,
+      oldRow = this.rowsMap[row.id];
+    // collect old rows
+    oldRowsMap[row.id] = oldRow;
+    if (!oldRow) {
+      throw new Error('Update event received for non existing row. RowId: ' + row.id);
+    }
+    // check structure changes
+    if (row.parentRow && !scout.objects.isNullOrUndefined(row.parentRow.id)) {
+      parentRowId = row.parentRow.id;
+    }
+    structureChanged = structureChanged || row._parentRowId !== parentRowId;
+    row = this._initRow(row);
+    // selection
+    if (this.selectionHandler.lastActionRow === oldRow) {
+      this.selectionHandler.lastActionRow = row;
+    }
+    scout.arrays.replace(this.selectedRows, oldRow, row);
+    // replace row use index lookup for performance reasons
+    this.rows[rowsToIndex[row.id]] = row;
+    // filter
+    row.filterAccepted = oldRow.filterAccepted;
+    if (this._filterCount() > 0) {
+      filterChanged = this._applyFiltersForRow(row) || filterChanged;
+    }
+    // Check if cell content changed and if yes mark auto optimize width column as dirty
+    autoOptimizeWidthColumnsDirty = this._markAutoOptimizeWidthColumnsAsDirtyIfNeeded(autoOptimizeWidthColumns, oldRow, row);
+    return row;
+  }, this);
 
   this._updateRowStructure({
     updateTree: true,
@@ -2423,6 +2420,30 @@ scout.Table.prototype.updateRows = function(rows) {
     applyFilters: false,
     visibleRows: true
   });
+
+  this._triggerRowsUpdated(rows);
+
+  if (this.rendered) {
+    // render row and replace div in DOM
+    rows.forEach(function(row) {
+      var oldRow = oldRowsMap[row.id],
+        $updatedRow;
+      if (!oldRow.$row) {
+        return;
+      }
+      $updatedRow = $(this._buildRowDiv(row));
+      $updatedRow.copyCssClasses(oldRow.$row, scout.Table.SELECTION_CLASSES + ' first last');
+      oldRow.$row.replaceWith($updatedRow);
+      scout.Table.linkRowToDiv(row, $updatedRow);
+      this._destroyTooltipsForRow(row);
+      this._removeCellEditorForRow(row);
+      this._installRow(row);
+    }, this);
+
+    if (structureChanged) {
+      this._renderRowOrderChanges();
+    }
+  }
 
   if (filterChanged) {
     this._triggerFilter();
@@ -2442,43 +2463,6 @@ scout.Table.prototype._sortAfterUpdate = function() {
 
 scout.Table.prototype.isHierarchical = function() {
   return this.hierarchical;
-};
-
-scout.Table.prototype._rebuildTreeStructure = function() {
-  var hierarchical = false;
-  this.rows.forEach(function(row) {
-    row.childRows = [];
-    row.parentRow = null;
-    hierarchical = hierarchical || !scout.objects.isNullOrUndefined(row.parentId);
-  }, this);
-  if (!hierarchical) {
-    this.rootRows = this.rows;
-    this.hierarchical = hierarchical;
-    return;
-  }
-
-  this.hierarchical = hierarchical;
-  this.rootRows = [];
-  this.rows.forEach(function(row) {
-    var parentRow;
-    if (!scout.objects.isNullOrUndefined(row.parentId)) {
-      parentRow = this.rowsMap[row.parentId];
-      if (parentRow) {
-        row.parentRow = parentRow;
-        parentRow.childRows.push(row);
-      } else {
-        row.parentRow = null;
-        this.rootRows.push(row);
-      }
-    } else {
-      this.rootRows.push(row);
-    }
-  }, this);
-  // rebuild minimal sort
-  this.rows = [];
-  this.visitRows(function(row) {
-    this.rows.push(row);
-  }.bind(this));
 };
 
 /**
@@ -2772,10 +2756,10 @@ scout.Table.prototype.selectRow = function(row, debounceSend) {
 };
 
 scout.Table.prototype.selectRows = function(rows, debounceSend) {
-  // Exclude rows that are currently not showing because of a filter (they cannot be selected)
+  // Exclude rows that are currently not visible because of a filter (they cannot be selected)
   rows = scout.arrays.ensure(rows).filter(function(row) {
-    return row.filterAccepted;
-  });
+    return !!this.visibleRowsMap[row.id];
+  }, this);
 
   var selectedEqualRows = scout.arrays.equalsIgnoreOrder(rows, this.selectedRows);
   // TODO [7.0] cgu: maybe make sure selectedRows are in correct order, this would make logic in AbstractTableNavigationKeyStroke or renderSelection easier
@@ -2923,6 +2907,52 @@ scout.Table.prototype._updateRowStructure = function(options) {
   }
 };
 
+scout.Table.prototype._rebuildTreeStructure = function() {
+  var hierarchical = false;
+  this.rows.forEach(function(row) {
+    row.childRows = [];
+    hierarchical = hierarchical || !scout.objects.isNullOrUndefined(row.parentRow);
+  }, this);
+  if (!hierarchical) {
+    this.rootRows = this.rows;
+    this.hierarchical = hierarchical;
+    return;
+  }
+
+  this.hierarchical = hierarchical;
+  this.rootRows = [];
+  this.rows.forEach(function(row) {
+    var parentRow;
+    if (scout.objects.isNullOrUndefined(row.parentRow)) {
+      // root row
+      row.parentRow = null;
+      row._parentRowId = null;
+      this.rootRows.push(row);
+      return;
+    }
+    if (!scout.objects.isNullOrUndefined(row.parentRow.id)) {
+      parentRow = this.rowsMap[row.parentRow.id];
+    } else {
+      // expect id
+      parentRow = this.rowsMap[row.parentRow];
+    }
+    if (parentRow) {
+      row.parentRow = parentRow;
+      row._parentRowId = parentRow.id;
+      parentRow.childRows.push(row);
+    } else {
+      // do not allow unresolvable parent rows.
+      throw new Error('Parent row of ' + row + ' can not be resolved.');
+    }
+  }, this);
+
+  // traverse row tree to have minimal order of rows.
+  this.rows = [];
+  this.visitRows(function(row) {
+    this.rows.push(row);
+  }.bind(this));
+};
+
 scout.Table.prototype._updateFilteredRows = function(applyFilters, changed) {
   changed = !!changed;
   applyFilters = scout.nvl(applyFilters, true);
@@ -2938,25 +2968,35 @@ scout.Table.prototype._updateFilteredRows = function(applyFilters, changed) {
   }
 };
 
-scout.Table.prototype._applyFilters = function(rows) {
-  var changed = false;
-  rows = rows || this.rows;
-  rows.forEach(function(row) {
-    changed = this._applyFiltersForRow(row) || changed;
-    return row.filterAccepted;
-  }, this);
-  return changed;
+scout.Table.prototype._updateVisibleRows = function() {
+  this.visibleRows = this._computeVisibleRows();
+  // rebuild the rows by id map of visible rows
+  this.visibleRowsMap = this.visibleRows.reduce(function(map, row) {
+    map[row.id] = row;
+    return map;
+  }, {});
+
+  // deselect not visible rows
+  this.deselectRows(this.selectedRows.filter(function(selectedRow) {
+    return !this.visibleRowsMap[selectedRow.id];
+  }, this));
 };
 
-scout.Table.prototype._updateVisibleRows = function() {
-  var newHiddenRows = [],
-    visibleRows = this._computeVisibleRows();
-  // old - new  = to remove
-  newHiddenRows = this.visibleRows.filter(function(row) {
-    return visibleRows.indexOf(row) < 0;
+scout.Table.prototype._computeVisibleRows = function(rows) {
+  var visibleRows = [];
+  rows = rows || this.rootRows;
+  rows.forEach(function(row) {
+    var visibleChildRows = this._computeVisibleRows(row.childRows);
+    if (row.filterAccepted) {
+      visibleRows.push(row);
+    } else if (visibleChildRows.length > 0) {
+      visibleRows.push(row);
+    }
+    if (row.expanded) {
+      visibleRows = visibleRows.concat(visibleChildRows);
+    }
   }, this);
-  this.visibleRows = visibleRows;
-  this.deselectRows(newHiddenRows);
+  return visibleRows;
 };
 
 scout.Table.prototype._renderRowDelta = function() {
@@ -2994,23 +3034,6 @@ scout.Table.prototype._renderRowDelta = function() {
     }
   }.bind(this));
   this._renderEmptyData();
-};
-
-scout.Table.prototype._computeVisibleRows = function(rows) {
-  var visibleRows = [];
-  rows = rows || this.rootRows;
-  rows.forEach(function(row) {
-    var visibleChildRows = this._computeVisibleRows(row.childRows);
-    if (row.filterAccepted) {
-      visibleRows.push(row);
-    } else if (visibleChildRows.length > 0) {
-      visibleRows.push(row);
-    }
-    if (row.expanded) {
-      visibleRows = visibleRows.concat(visibleChildRows);
-    }
-  }, this);
-  return visibleRows;
 };
 
 scout.Table.prototype.filter = function() {

@@ -19,7 +19,6 @@ scout.TableRow = function() {
   this.hasError = false;
   this.id;
   this.initialized = false;
-  this.parentId;
   this.parentRow;
   this.childRows = [];
   this.expanded = false;

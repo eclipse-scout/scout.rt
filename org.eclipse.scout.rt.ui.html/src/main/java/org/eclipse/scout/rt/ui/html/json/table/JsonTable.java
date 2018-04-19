@@ -896,7 +896,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     }
     JSONObject jsonRow = new JSONObject();
     putProperty(jsonRow, "id", getOrCreateRowId(row));
-    putProperty(jsonRow, "parentId", getOrCreateRowId(getModel().findParentRow(row)));
+    putProperty(jsonRow, "parentRow", getOrCreateRowId(getModel().findParentRow(row)));
     putProperty(jsonRow, "cells", jsonCells);
     putProperty(jsonRow, "checked", row.isChecked());
     putProperty(jsonRow, "enabled", row.isEnabled());

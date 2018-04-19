@@ -3179,6 +3179,11 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     //peformance quick-check
     if (rows != existingRows) {
       rows = resolveRows(rows);
+      CollectingVisitor<ITableRow> collector = new CollectingVisitor<ITableRow>();
+      rows.forEach(parent -> TreeTraversals.create(collector, node -> {
+        return node.getChildRows();
+      }).traverse(parent));
+      rows = collector.getCollection();
     }
     if (CollectionUtility.hasElements(rows)) {
       try {
@@ -3919,11 +3924,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     if (rows == null) {
       rows = CollectionUtility.emptyArrayList();
     }
-    CollectingVisitor<ITableRow> collector = new CollectingVisitor<ITableRow>();
-    rows.forEach(parent -> TreeTraversals.create(collector, node -> {
-      return node.getChildRows();
-    }).traverse(parent));
-    rows = collector.getCollection();
     List<ITableRow> resolvedRows = new ArrayList<>(rows.size());
     for (ITableRow row : rows) {
       if (resolveRow(row) == row) {
