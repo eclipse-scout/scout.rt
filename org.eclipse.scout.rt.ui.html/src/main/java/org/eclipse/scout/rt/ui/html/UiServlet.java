@@ -230,10 +230,10 @@ public class UiServlet extends AbstractHttpServlet {
   protected boolean handleRequestInternal(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     String method = req.getMethod();
     if ("GET".equals(method)) {
-      // The servlet is registered at '/'. To make relative URLs work, we need to make sure the request URL has a trailing '/'.
+      // To make relative URLs work, we need to make sure the request URL has a trailing '/'.
       // It is not possible to just check for an empty pathInfo because the container returns "/" even if the user has not entered a '/' at the end.
-      String contextPath = req.getServletContext().getContextPath();
-      if (StringUtility.hasText(contextPath) && req.getRequestURI().endsWith(contextPath)) {
+      String path = req.getServletContext().getContextPath() + req.getServletPath();
+      if (StringUtility.hasText(path) && req.getRequestURI().endsWith(path)) {
         resp.sendRedirect(req.getRequestURI() + "/");
         return true;
       }

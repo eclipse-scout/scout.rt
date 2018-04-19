@@ -20,6 +20,9 @@ import org.eclipse.scout.rt.ui.html.UiThemeUtility;
 public class ResourceLoaders {
 
   public IResourceLoader create(HttpServletRequest req, String resourcePath) {
+    if (resourcePath == null) {
+      return null;
+    }
     if (resourcePath.matches("^/icon/.*")) {
       return new IconLoader();
     }
