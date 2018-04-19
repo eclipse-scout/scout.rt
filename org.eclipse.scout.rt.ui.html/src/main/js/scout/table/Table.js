@@ -245,7 +245,6 @@ scout.Table.prototype._initTableKeyStrokeContext = function() {
     new scout.TableNavigationPageDownKeyStroke(this),
     new scout.TableNavigationHomeKeyStroke(this),
     new scout.TableNavigationEndKeyStroke(this),
-
     new scout.TableFocusFilterFieldKeyStroke(this),
     new scout.TableStartCellEditKeyStroke(this),
     new scout.TableSelectAllKeyStroke(this),
@@ -2976,10 +2975,12 @@ scout.Table.prototype._updateVisibleRows = function() {
     return map;
   }, {});
 
-  // deselect not visible rows
-  this.deselectRows(this.selectedRows.filter(function(selectedRow) {
-    return !this.visibleRowsMap[selectedRow.id];
-  }, this));
+  if (this.initialized) {
+    // deselect not visible rows
+    this.deselectRows(this.selectedRows.filter(function(selectedRow) {
+      return !this.visibleRowsMap[selectedRow.id];
+    }, this));
+  }
 };
 
 scout.Table.prototype._computeVisibleRows = function(rows) {
