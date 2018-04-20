@@ -95,6 +95,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
@@ -1618,6 +1619,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
+  @SuppressWarnings("squid:S1143")
   public void setTableChanging(boolean b) {
     // use a stack counter because setTableChanging might be called in nested
     // loops
@@ -1641,7 +1643,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             }
           }
         }
-        catch (RuntimeException | Error t) {
+        catch (RuntimeException | PlatformError t) {
           // covers all unchecked exceptions
           saveEx = t;
           throw t;
@@ -1653,7 +1655,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             try {
               processEventBuffer();
             }
-            catch (RuntimeException | Error t) {
+            catch (RuntimeException | PlatformError t) {
               if (saveEx != null) {
                 saveEx.addSuppressed(t);
               }
@@ -1666,7 +1668,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
               try {
                 propertySupport.setPropertiesChanging(false);
               }
-              catch (RuntimeException | Error t) {
+              catch (RuntimeException | PlatformError t) {
                 if (saveEx != null) {
                   saveEx.addSuppressed(t);
                 }
