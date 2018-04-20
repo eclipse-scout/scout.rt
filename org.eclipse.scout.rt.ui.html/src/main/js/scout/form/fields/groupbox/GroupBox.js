@@ -260,12 +260,16 @@ scout.GroupBox.prototype.addSubLabel = function() {
     return;
   }
   this.$subLabel = this.$title.appendDiv('sub-label');
+  scout.tooltips.installForEllipsis(this.$subLabel, {
+    parent: this
+  });
 };
 
 scout.GroupBox.prototype._removeSubLabel = function() {
   if (!this.$subLabel) {
     return;
   }
+  scout.tooltips.uninstall(this.$subLabel);
   this.$subLabel.remove();
   this.$subLabel = null;
 };
@@ -321,6 +325,9 @@ scout.GroupBox.prototype.addLabel = function() {
     return;
   }
   this.$label = this.$title.appendDiv('label');
+  scout.tooltips.installForEllipsis(this.$label, {
+    parent: this
+  });
 };
 
 scout.GroupBox.prototype._renderLabel = function() {

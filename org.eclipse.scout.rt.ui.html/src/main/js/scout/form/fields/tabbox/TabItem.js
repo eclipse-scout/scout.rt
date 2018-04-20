@@ -89,6 +89,10 @@ scout.TabItem.prototype._onTabMouseDown = function(event) {
   if (!this.session.focusManager.active) {
     this.$tabContainer.focus();
   }
+
+  // When the tab is clicked the user wants to execute the action and not see the tooltip
+  scout.tooltips.cancel(this.$label);
+  scout.tooltips.cancel(this.$subLabel);
 };
 
 scout.TabItem.prototype._onStatusMouseDown = function(event) {
@@ -225,6 +229,14 @@ scout.TabItem.prototype.addLabel = function() {
     return;
   }
   this.$label = this.$title.appendDiv('label');
+  scout.tooltips.installForEllipsis(this.$label, {
+    parent: this,
+    $parent: this._$tooltipParent(),
+    renderLaterPredicate: function() {
+      // See comment in _createTooltip
+      return !this.$anchor.isAttached();
+    }
+  });
 };
 
 scout.TabItem.prototype.addSubLabel = function() {
@@ -232,12 +244,21 @@ scout.TabItem.prototype.addSubLabel = function() {
     return;
   }
   this.$subLabel = this.$title.appendDiv('sub-label');
+  scout.tooltips.installForEllipsis(this.$subLabel, {
+    parent: this,
+    $parent: this._$tooltipParent(),
+    renderLaterPredicate: function() {
+      // See comment in _createTooltip
+      return !this.$anchor.isAttached();
+    }
+  });
 };
 
 scout.TabItem.prototype._removeSubLabel = function() {
   if (!this.$subLabel) {
     return;
   }
+  scout.tooltips.uninstall(this.$subLabel);
   this.$subLabel.remove();
   this.$subLabel = null;
 };

@@ -195,6 +195,6 @@ scout.TooltipSupport.prototype._showTooltip = function($comp) {
       text: text
     });
     this._tooltip = scout.create('Tooltip', options);
-    this._tooltip.render();
+    this._tooltip.render(options.$parent);
   }
 };

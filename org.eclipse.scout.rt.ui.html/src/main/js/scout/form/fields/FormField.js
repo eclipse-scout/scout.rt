@@ -835,6 +835,7 @@ scout.FormField.prototype._removeLabel = function() {
   if (!this.$label) {
     return;
   }
+  scout.tooltips.uninstall(this.$label);
   this.$label.remove();
   this.$label = null;
 };
