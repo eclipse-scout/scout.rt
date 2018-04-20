@@ -254,6 +254,10 @@ scout.SmartField2.prototype._acceptInput = function(searchText, searchTextEmpty,
   if (!selectedLookupRow && !this.lookupRow && searchTextEmpty) {
     $.log.debug('(SmartField2#acceptInput) unchanged: text is empty. Close popup');
     this._clearLookupStatus();
+    if (this.errorStatus && this.errorStatus.code === scout.SmartField2.ErrorCode.NO_RESULTS) {
+      // clear the error status from previous search which did not find any results. This error status is no longer valid as we accept the null content here.
+      this.clearErrorStatus();
+    }
     this._inputAccepted(searchTextChanged);
     return;
   }
