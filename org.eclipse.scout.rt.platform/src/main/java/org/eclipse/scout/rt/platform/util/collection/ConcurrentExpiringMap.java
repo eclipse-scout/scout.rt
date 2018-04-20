@@ -451,10 +451,8 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
       Entry<K, ExpiringElement<V>> entry = it.next();
       K key = entry.getKey();
       ExpiringElement<V> element = entry.getValue();
-      if (!isElementValid(element)) {
-        if (m_elementMap.remove(key, element)) {
-          execEntryEvicted(key, element.getValue());
-        }
+      if (!isElementValid(element) && m_elementMap.remove(key, element)) {
+        execEntryEvicted(key, element.getValue());
       }
     }
   }

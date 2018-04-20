@@ -97,6 +97,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -1687,6 +1688,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   @Override
+  @SuppressWarnings("squid:S1143")
   public void setTableChanging(boolean b) {
     // use a stack counter because setTableChanging might be called in nested
     // loops
@@ -1713,7 +1715,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
             }
           }
         }
-        catch (Throwable t) {//NOSONAR
+        catch (RuntimeException | PlatformError t) {
           // covers all unchecked exceptions
           saveEx = t;
           throw t;
@@ -1725,25 +1727,25 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
             try {
               processEventBuffer();
             }
-            catch (Throwable t) {//NOSONAR
+            catch (RuntimeException | PlatformError t) {
               if (saveEx != null) {
                 saveEx.addSuppressed(t);
               }
               else {
                 saveEx = t;
-                throw t;//NOSONAR
+                throw t;
               }
             }
             finally {
               try {
                 propertySupport.setPropertiesChanging(false);
               }
-              catch (Throwable t) {//NOSONAR
+              catch (RuntimeException | PlatformError t) {
                 if (saveEx != null) {
                   saveEx.addSuppressed(t);
                 }
                 else {
-                  throw t;//NOSONAR
+                  throw t;
                 }
               }
             }
