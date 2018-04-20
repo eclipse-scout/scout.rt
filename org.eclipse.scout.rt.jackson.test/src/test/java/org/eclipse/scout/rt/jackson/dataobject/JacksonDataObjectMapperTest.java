@@ -4,9 +4,14 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -28,6 +33,7 @@ import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoEntityHolder;
 import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CloneUtility;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.Before;
@@ -50,8 +56,8 @@ public class JacksonDataObjectMapperTest {
   @Test
   public void testReadWriteValue() {
     assertNull(m_mapper.writeValue(null));
-    assertNull(m_mapper.readValue(null, null));
-    assertNull(m_mapper.readValue(null, Object.class));
+    assertNull(m_mapper.readValue((String) null, null));
+    assertNull(m_mapper.readValue((String) null, Object.class));
 
     DoEntity entity = new DoEntity();
     entity.put("foo", "bar");
@@ -60,6 +66,38 @@ public class JacksonDataObjectMapperTest {
     DoEntity parsedEntity = m_mapper.readValue(json, DoEntity.class);
     String jsonParsedEntity = m_mapper.writeValue(parsedEntity);
     m_testHelper.assertJsonEquals(json, jsonParsedEntity);
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testReadValueWithNullInputStream() {
+    m_mapper.readValue((InputStream) null, Object.class);
+  }
+
+  @Test(expected = IllegalArgumentException.class) // thrown by Jackson
+  public void testReadValueWithNullValueType() {
+    m_mapper.readValue(new ByteArrayInputStream(new byte[0]), null);
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testWriteValueWithNullOutputStream() {
+    m_mapper.writeValue((OutputStream) null, null);
+  }
+
+  @Test
+  public void testReadWriteValueWithStreams() {
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    m_mapper.writeValue(bos, null);
+    assertEquals(0, bos.toByteArray().length);
+
+    DoEntity entity = new DoEntity();
+    entity.put("foo", "bar");
+    entity.put("baz", 42);
+    ByteArrayOutputStream expected = new ByteArrayOutputStream();
+    m_mapper.writeValue(expected, entity);
+    DoEntity parsedEntity = m_mapper.readValue(new ByteArrayInputStream(expected.toByteArray()), DoEntity.class);
+    ByteArrayOutputStream actual = new ByteArrayOutputStream();
+    m_mapper.writeValue(actual, parsedEntity);
+    assertArrayEquals(expected.toByteArray(), actual.toByteArray());
   }
 
   @Test(expected = PlatformException.class)
