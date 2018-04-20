@@ -228,7 +228,7 @@ scout.Column.prototype.buildCell = function(cell, row) {
     content = icon + text;
   }
 
-  if (tableNodeColumn && !scout.arrays.empty(row.childRows)) {
+  if (tableNodeColumn && row._expandable) {
     this.tableNodeColumn = true;
     content = this._expandIcon(row.expanded, rowPadding) + content;
     if (row.expanded) {

@@ -14,8 +14,12 @@ scout.TableStartCellEditKeyStroke = function(table) {
   this.ctrl = true;
   this.which = [scout.keys.ENTER];
   this.renderingHints.$drawingArea = function($drawingArea, event) {
-    var editPosition = event._editPosition;
-    return this.field.$cell(editPosition.column, editPosition.row.$row);
+    var editPosition = event._editPosition,
+    columnIndex = this.field.visibleColumns().indexOf(editPosition.column);
+    if(columnIndex === 0){
+      return editPosition.row.$row;
+    }
+    return this.field.$cell(columnIndex, editPosition.row.$row);
   }.bind(this);
 };
 scout.inherits(scout.TableStartCellEditKeyStroke, scout.KeyStroke);

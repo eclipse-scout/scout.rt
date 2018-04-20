@@ -4510,20 +4510,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     public void setSelectedRowsFromUI(List<? extends ITableRow> rows) {
       try {
         pushUIProcessor();
-        //
-        Set<ITableRow> requestedRows = new HashSet<>(resolveRows(rows));
-        List<ITableRow> validRows = new ArrayList<>();
-        // add existing selected rows that are masked by filter
-        for (ITableRow row : getSelectedRows()) {
-          if (!row.isFilterAccepted()) {
-            validRows.add(row);
-          }
-        }
-        // remove all filtered from requested
-        requestedRows.removeAll(validRows);
-        // add remainder
-        validRows.addAll(requestedRows);
-        selectRows(validRows, false);
+        selectRows(rows, false);
       }
       finally {
         popUIProcessor();

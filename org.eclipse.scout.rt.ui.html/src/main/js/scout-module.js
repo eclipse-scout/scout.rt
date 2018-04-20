@@ -294,6 +294,8 @@
   __include("scout/table/keystrokes/AbstractTableNavigationKeyStroke.js");
   __include("scout/table/keystrokes/TableControlCloseKeyStroke.js");
   __include("scout/table/keystrokes/TableCopyKeyStroke.js");
+  __include("scout/table/keystrokes/TableNavigationCollapseKeyStroke.js");
+  __include("scout/table/keystrokes/TableNavigationExpandKeyStroke.js");
   __include("scout/table/keystrokes/TableSelectAllKeyStroke.js");
   __include("scout/table/keystrokes/TableStartCellEditKeyStroke.js");
   __include("scout/table/keystrokes/TableRefreshKeyStroke.js");

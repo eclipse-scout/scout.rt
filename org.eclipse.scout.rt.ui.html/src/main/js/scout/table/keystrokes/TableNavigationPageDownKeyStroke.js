@@ -24,7 +24,7 @@ scout.inherits(scout.TableNavigationPageDownKeyStroke, scout.AbstractTableNaviga
 scout.TableNavigationPageDownKeyStroke.prototype.handle = function(event) {
   var table = this.field,
     viewport = this._viewportInfo(),
-    rows = table.filteredRows(),
+    rows = table.visibleRows,
     selectedRows = table.selectedRows,
     lastSelectedRow = scout.arrays.last(selectedRows),
     lastActionRow = table.selectionHandler.lastActionRow,

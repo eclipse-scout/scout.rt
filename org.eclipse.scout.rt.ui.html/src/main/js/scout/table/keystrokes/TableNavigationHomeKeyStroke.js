@@ -23,7 +23,7 @@ scout.inherits(scout.TableNavigationHomeKeyStroke, scout.AbstractTableNavigation
 
 scout.TableNavigationHomeKeyStroke.prototype.handle = function(event) {
   var table = this.field,
-    rows = table.filteredRows(),
+    rows = table.visibleRows,
     firstRow = scout.arrays.first(rows),
     selectedRows = table.selectedRows,
     newSelectedRows = [],

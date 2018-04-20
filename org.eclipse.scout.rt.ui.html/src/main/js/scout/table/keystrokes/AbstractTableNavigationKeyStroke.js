@@ -24,7 +24,7 @@ scout.AbstractTableNavigationKeyStroke.prototype._accept = function(event) {
     return false;
   }
 
-  if (!this.field.filteredRows().length) {
+  if (!this.field.visibleRows.length) {
     return false;
   }
 
@@ -46,7 +46,7 @@ scout.AbstractTableNavigationKeyStroke.prototype._viewportInfo = function() {
   var x, y, viewportBounds, dataInsets, dataMarginTop, firstRow, lastRow,
     table = this.field,
     viewport = {},
-    rows = table.filteredRows();
+    rows = table.visibleRows;
 
   if (rows.length === 0) {
     return viewport;
@@ -81,7 +81,7 @@ scout.AbstractTableNavigationKeyStroke.prototype.firstRowAfterSelection = functi
     return;
   }
 
-  var rows = this.field.filteredRows(),
+  var rows = this.field.visibleRows,
     row = $selectedRows.last().data('row'),
     rowIndex = this.field.filteredRows().indexOf(row);
 
@@ -93,9 +93,9 @@ scout.AbstractTableNavigationKeyStroke.prototype.firstRowBeforeSelection = funct
   if (!$selectedRows.length) {
     return;
   }
-  var rows = this.field.filteredRows(),
+  var rows = this.field.visibleRows,
     row = $selectedRows.first().data('row'),
-    rowIndex = this.field.filteredRows().indexOf(row);
+    rowIndex = this.field.visibleRows.indexOf(row);
 
   return rows[rowIndex - 1];
 };
@@ -104,7 +104,7 @@ scout.AbstractTableNavigationKeyStroke.prototype.firstRowBeforeSelection = funct
  * Searches for the last selected row in the current selection block, starting from rowIndex. Expects row at rowIndex to be selected.
  */
 scout.AbstractTableNavigationKeyStroke.prototype._findLastSelectedRowBefore = function(table, rowIndex) {
-  var row, rows = table.filteredRows();
+  var row, rows = table.visibleRows;
   if (rowIndex === 0) {
     return rows[rowIndex];
   }
@@ -126,7 +126,7 @@ scout.AbstractTableNavigationKeyStroke.prototype._findLastSelectedRowBefore = fu
  * Searches for the last selected row in the current selection block, starting from rowIndex. Expects row at rowIndex to be selected.
  */
 scout.AbstractTableNavigationKeyStroke.prototype._findLastSelectedRowAfter = function(table, rowIndex) {
-  var row, rows = table.filteredRows();
+  var row, rows = table.visibleRows;
   if (rowIndex === rows.length - 1) {
     return rows[rowIndex];
   }
@@ -145,7 +145,7 @@ scout.AbstractTableNavigationKeyStroke.prototype._findLastSelectedRowAfter = fun
 };
 
 scout.AbstractTableNavigationKeyStroke.prototype._findFirstRowInViewport = function(table, viewportBounds) {
-  var rows = table.filteredRows();
+  var rows = table.visibleRows;
   return scout.arrays.find(rows, function(row, i) {
     var rowOffset, rowMarginTop,
       $row = row.$row;
@@ -168,7 +168,7 @@ scout.AbstractTableNavigationKeyStroke.prototype._findFirstRowInViewport = funct
 };
 
 scout.AbstractTableNavigationKeyStroke.prototype._findLastRowInViewport = function(table, startRowIndex, viewportBounds) {
-  var rows = table.filteredRows();
+  var rows = table.visibleRows;
   if (startRowIndex === rows.length - 1) {
     return rows[startRowIndex];
   }

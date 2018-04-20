@@ -24,7 +24,7 @@ scout.inherits(scout.TableNavigationPageUpKeyStroke, scout.AbstractTableNavigati
 scout.TableNavigationPageUpKeyStroke.prototype.handle = function(event) {
   var table = this.field,
     viewport = this._viewportInfo(),
-    rows = table.filteredRows(),
+    rows = table.visibleRows,
     selectedRows = table.selectedRows,
     firstSelectedRow = scout.arrays.first(selectedRows),
     lastActionRow = table.selectionHandler.lastActionRow,

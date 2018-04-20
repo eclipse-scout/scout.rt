@@ -23,7 +23,7 @@ scout.inherits(scout.TableNavigationEndKeyStroke, scout.AbstractTableNavigationK
 
 scout.TableNavigationEndKeyStroke.prototype.handle = function(event) {
   var table = this.field,
-    rows = table.filteredRows(),
+    rows = table.visibleRows,
     lastRow = scout.arrays.last(rows),
     selectedRows = table.selectedRows,
     newSelectedRows = [],

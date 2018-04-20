@@ -245,6 +245,8 @@ scout.Table.prototype._initTableKeyStrokeContext = function() {
     new scout.TableNavigationPageDownKeyStroke(this),
     new scout.TableNavigationHomeKeyStroke(this),
     new scout.TableNavigationEndKeyStroke(this),
+    new scout.TableNavigationCollapseKeyStroke(this),
+    new scout.TableNavigationExpandKeyStroke(this),
     new scout.TableFocusFilterFieldKeyStroke(this),
     new scout.TableStartCellEditKeyStroke(this),
     new scout.TableSelectAllKeyStroke(this),
@@ -2861,8 +2863,11 @@ scout.Table.prototype.$cellsForRow = function($row) {
 };
 
 scout.Table.prototype.$cell = function(column, $row) {
-  var columnIndex = this.visibleColumns().indexOf(column);
-  return $row.children().eq(columnIndex);
+  var columnIndex = column;
+  if (typeof column !== 'number') {
+    columnIndex = this.visibleColumns().indexOf(column);
+  }
+  return $row.children('.table-cell').eq(columnIndex);
 };
 
 scout.Table.prototype.columnById = function(columnId) {
@@ -2993,11 +2998,18 @@ scout.Table.prototype._computeVisibleRows = function(rows) {
     } else if (visibleChildRows.length > 0) {
       visibleRows.push(row);
     }
+    row._expandable = visibleChildRows.length > 0;
     if (row.expanded) {
       visibleRows = visibleRows.concat(visibleChildRows);
     }
   }, this);
   return visibleRows;
+};
+
+scout.Table.prototype.visibleChildRows = function(row) {
+  return row.childRows.filter(function(child) {
+    return !!this.visibleRowsMap[child.id];
+  }, this);
 };
 
 scout.Table.prototype._renderRowDelta = function() {

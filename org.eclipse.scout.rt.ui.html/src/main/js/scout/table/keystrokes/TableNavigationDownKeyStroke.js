@@ -23,7 +23,7 @@ scout.inherits(scout.TableNavigationDownKeyStroke, scout.AbstractTableNavigation
 
 scout.TableNavigationDownKeyStroke.prototype.handle = function(event) {
   var table = this.field,
-    rows = table.filteredRows(),
+    rows = table.visibleRows,
     selectedRows = table.selectedRows,
     lastActionRow = table.selectionHandler.lastActionRow,
     lastActionRowIndex = -1,
