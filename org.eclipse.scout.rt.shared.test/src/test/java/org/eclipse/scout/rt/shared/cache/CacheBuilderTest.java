@@ -31,7 +31,7 @@ public class CacheBuilderTest {
   @Test
   public void testCacheBuilder() {
     @SuppressWarnings("unchecked")
-    ICacheValueResolver<Integer, String> resolver = mock(AbstractCacheValueResolver.class);
+    ICacheValueResolver<Integer, String> resolver = mock(ICacheValueResolver.class);
 
     @SuppressWarnings("unchecked")
     ICacheBuilder<Integer, String> cacheBuilder = BEANS.get(ICacheBuilder.class);

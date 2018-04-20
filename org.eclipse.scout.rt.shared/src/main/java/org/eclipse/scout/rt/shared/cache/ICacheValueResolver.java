@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.cache;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * In case of a cache miss, a value resolver is called to fetch or recompute the value corresponding to the given key.
@@ -32,5 +33,7 @@ public interface ICacheValueResolver<K, V> {
    *          never null, empty or contains null elements
    * @return non null modifiable map
    */
-  Map<K, V> resolveAll(Set<K> keys);
+  default Map<K, V> resolveAll(Set<K> keys) {
+    return keys.stream().collect(Collectors.toMap(key -> key, key -> resolve(key)));
+  }
 }

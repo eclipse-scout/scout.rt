@@ -26,7 +26,7 @@ public class BasicCacheTest {
   private final static String CACHE_ID = "BasicCacheTestCacheId";
 
   protected ICache<Integer, String> createCache() {
-    return createCache(new AbstractCacheValueResolver<Integer, String>() {
+    return createCache(new ICacheValueResolver<Integer, String>() {
       private int m_counter = 0;
 
       @Override

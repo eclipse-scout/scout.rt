@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.eclipse.scout.rt.shared.cache.AbstractCacheValueResolver;
 import org.eclipse.scout.rt.shared.cache.ICache;
 import org.eclipse.scout.rt.shared.cache.ICacheBuilder;
 import org.eclipse.scout.rt.shared.cache.ICacheValueResolver;
@@ -50,7 +49,8 @@ public class CodeService implements ICodeService {
   private volatile ICache<CodeTypeCacheKey, ICodeType<?, ?>> m_cache;
 
   /**
-   * Creates and initializes a new cache. Executed in {@link PostConstruct} to ensure that the cache created exactly once.
+   * Creates and initializes a new cache. Executed in {@link PostConstruct} to ensure that the cache created exactly
+   * once.
    */
   @PostConstruct
   protected void initCache() {
@@ -69,7 +69,7 @@ public class CodeService implements ICodeService {
   }
 
   protected ICacheValueResolver<CodeTypeCacheKey, ICodeType<?, ?>> createCacheValueResolver() {
-    return new AbstractCacheValueResolver<CodeTypeCacheKey, ICodeType<?, ?>>() {
+    return new ICacheValueResolver<CodeTypeCacheKey, ICodeType<?, ?>>() {
 
       @Override
       public ICodeType<?, ?> resolve(CodeTypeCacheKey key) {

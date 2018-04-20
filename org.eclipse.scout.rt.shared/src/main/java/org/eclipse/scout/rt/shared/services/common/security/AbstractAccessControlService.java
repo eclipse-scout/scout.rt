@@ -30,7 +30,6 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.cache.AbstractCacheValueResolver;
 import org.eclipse.scout.rt.shared.cache.AllCacheEntryFilter;
 import org.eclipse.scout.rt.shared.cache.ICache;
 import org.eclipse.scout.rt.shared.cache.ICacheBuilder;
@@ -137,7 +136,7 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
   }
 
   protected ICacheValueResolver<K, PermissionCollection> createCacheValueResolver() {
-    return new AbstractCacheValueResolver<K, PermissionCollection>() {
+    return new ICacheValueResolver<K, PermissionCollection>() {
 
       @Override
       public PermissionCollection resolve(K key) {
