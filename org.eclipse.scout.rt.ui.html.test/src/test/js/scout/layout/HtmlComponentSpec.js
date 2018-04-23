@@ -27,6 +27,16 @@ describe("HtmlComponent", function() {
   scout.inherits(LayoutMock, scout.AbstractLayout);
   LayoutMock.prototype.layout = function() {};
 
+  var StaticLayout = function() {
+    StaticLayout.parent.call(this);
+    this.prefSize = new scout.Dimension();
+  };
+  scout.inherits(StaticLayout, scout.AbstractLayout);
+
+  StaticLayout.prototype.preferredLayoutSize = function($container, options) {
+    return this.prefSize;
+  };
+
   var addWidthHeightMock = function(jqueryMock) {
     jqueryMock.width = function(val) {
       if (val !== undefined) {
@@ -192,6 +202,44 @@ describe("HtmlComponent", function() {
       expect(htmlChild.$comp.isEveryParentVisible).not.toHaveBeenCalled();
     });
 
+  });
+
+  describe("prefSize", function() {
+    var $comp;
+    var htmlComp;
+
+    beforeEach(function() {
+      $comp = $('<div>').appendTo(session.$entryPoint);
+      $comp.css({
+        minWidth: '10px',
+        maxWidth: '20px',
+        minHeight: '5px',
+        maxHeight: '30px'
+      });
+      htmlComp = scout.HtmlComponent.install($comp, session);
+      htmlComp.setLayout(new StaticLayout());
+    });
+
+    it("returns preferred size of the component", function() {
+      htmlComp.layout.prefSize = new scout.Dimension(15, 13);
+      var size = htmlComp.prefSize();
+      expect(size.width).toBe(15);
+      expect(size.height).toBe(13);
+    });
+
+    it("considers max width/height set by CSS", function() {
+      htmlComp.layout.prefSize = new scout.Dimension(500, 500);
+      var size = htmlComp.prefSize();
+      expect(size.width).toBe(20);
+      expect(size.height).toBe(30);
+    });
+
+    it("considers min width/height set by CSS", function() {
+      htmlComp.layout.prefSize = new scout.Dimension(2, 3);
+      var size = htmlComp.prefSize();
+      expect(size.width).toBe(10);
+      expect(size.height).toBe(5);
+    });
   });
 
 });

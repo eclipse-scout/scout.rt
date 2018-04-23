@@ -261,10 +261,11 @@ scout.HtmlComponent.prototype.prefSize = function(options) {
   }
 
   if (options.widthHint || options.heightHint) {
-    options = this._adjustSizeHintsForPrefSize(options);
+    this._adjustSizeHintsForPrefSize(options);
   }
 
   var prefSize = this.layout.preferredLayoutSize(this.$comp, options);
+  this._adjustPrefSizeWithMinMaxSize(prefSize);
   this.prefSizeCached[prefSizeCacheKey] = prefSize;
 
   $.log.isTraceEnabled() && $.log.trace('(HtmlComponent#prefSize) ' + this.debug() + ' widthHint=' + options.widthHint + ' heightHint=' + options.heightHint + ' prefSize=' + prefSize);
@@ -288,7 +289,18 @@ scout.HtmlComponent.prototype._adjustSizeHintsForPrefSize = function(options) {
   if (options.heightHint) {
     options.heightHint -= this.insets(removeMargin).vertical();
   }
-  return options;
+};
+
+scout.HtmlComponent.prototype._adjustPrefSizeWithMinMaxSize = function(prefSize) {
+  // Component may define a min or max height/height -> adjust the pref size accordingly
+  var minHeight = this.$comp.cssMinHeight();
+  var maxHeight = this.$comp.cssMaxHeight();
+  var minWidth = this.$comp.cssMinWidth();
+  var maxWidth = this.$comp.cssMaxWidth();
+  prefSize.height = Math.max(prefSize.height, minHeight);
+  prefSize.height = Math.min(prefSize.height, maxHeight);
+  prefSize.width = Math.max(prefSize.width, minWidth);
+  prefSize.width = Math.min(prefSize.width, maxWidth);
 };
 
 /**

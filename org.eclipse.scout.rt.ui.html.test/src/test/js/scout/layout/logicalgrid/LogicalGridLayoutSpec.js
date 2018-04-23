@@ -28,9 +28,6 @@ describe("LogicalGridLayout", function() {
   };
   scout.inherits(StaticLayout, scout.AbstractLayout);
 
-  StaticLayout.prototype.layout = function($container) {
-  };
-
   StaticLayout.prototype.preferredLayoutSize = function($container, options) {
     return this.prefSize;
   };

@@ -171,30 +171,26 @@ scout.DateTimeCompositeLayout.prototype._hgap = function() {
 
 scout.DateTimeCompositeLayout.prototype.preferredLayoutSize = function($container) {
   var prefSize = new scout.Dimension(),
-    compositePrefSize = new scout.Dimension(),
     $dateField = this._dateField.$dateField,
     $timeField = this._dateField.$timeField,
     hasDate = ($dateField ? !$dateField.isDisplayNone() : false),
     hasTime = ($timeField ? !$timeField.isDisplayNone() : false);
 
-  // Read the pref size of the composite because it may have a min-width defined by css (e.g. if used in a context-menu)
-  compositePrefSize = scout.graphics.prefSize(this._dateField.$fieldContainer);
-
   // --- Date and time ---
   if (hasDate && hasTime) {
     prefSize = scout.graphics.prefSize(this._dateField.$dateField);
-    prefSize.width = Math.max(compositePrefSize.width, this.PREF_DATE_FIELD_WIDTH + this._hgap() + this.PREF_TIME_FIELD_WIDTH);
+    prefSize.width = this.PREF_DATE_FIELD_WIDTH + this._hgap() + this.PREF_TIME_FIELD_WIDTH;
   }
 
   // --- Date only ---
   else if (hasDate) {
     prefSize = scout.graphics.prefSize(this._dateField.$dateField);
-    prefSize.width = Math.max(compositePrefSize.width, this.PREF_DATE_FIELD_WIDTH);
+    prefSize.width = this.PREF_DATE_FIELD_WIDTH;
   }
   // --- Time only ---
   else if (hasTime) {
     prefSize = scout.graphics.prefSize(this._dateField.$timeField);
-    prefSize.width = Math.max(compositePrefSize.width, this.PREF_TIME_FIELD_WIDTH);
+    prefSize.width = this.PREF_TIME_FIELD_WIDTH;
   }
   return prefSize;
 };
