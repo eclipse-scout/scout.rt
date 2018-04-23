@@ -501,21 +501,6 @@ $.ensure = function($elem) {
   return $($elem);
 };
 
-/**
- * Convenience function to use jQuery's animate() function to animate any arbitrary
- * numeric value without having to "abuse" a CSS property for that purpose or manually
- * having to create a dummy jQuery object.
- */
-$.animateValue = function(valueFrom, valueTo, animateOptions) {
-  var $state = $({
-    value: valueFrom
-  });
-  $state.animate({
-    value: valueTo
-  }, animateOptions);
-  return $state;
-};
-
 // === $.easing extensions ===
 
 $.extend($.easing, {
