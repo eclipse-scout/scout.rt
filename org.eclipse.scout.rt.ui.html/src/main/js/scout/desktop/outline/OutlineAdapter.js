@@ -15,10 +15,6 @@ scout.OutlineAdapter = function() {
 };
 scout.inherits(scout.OutlineAdapter, scout.TreeAdapter);
 
-scout.OutlineAdapter.prototype._init = function(model) {
-  scout.OutlineAdapter.parent.prototype._init.call(this, model);
-};
-
 /**
  * We must call onWidgetPageInit because this adapter cannot process the 'pageInit' event
  * while the widget is initialized, since the listener is not attached until the widget
