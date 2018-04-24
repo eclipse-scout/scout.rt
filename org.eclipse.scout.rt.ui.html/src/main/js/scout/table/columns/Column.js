@@ -326,7 +326,7 @@ scout.Column.prototype._cellStyle = function(cell, tableNodeColumn, rowPadding) 
   style = 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
   if (tableNodeColumn) {
     // calculate padding
-    style += ' padding-left: ' + (28 + rowPadding) + 'px';
+    style += ' padding-left: ' + (28 + rowPadding) + 'px; ';
   }
   style += scout.styles.legacyStyle(cell);
   return style;
