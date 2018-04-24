@@ -20,8 +20,8 @@ scout.DateFieldAdapter.PROPERTIES_ORDER = ['hasTime', 'hasDate'];
 /**
  * @override
  */
-scout.DateFieldAdapter.prototype._init = function(model) {
-  scout.DateFieldAdapter.parent.prototype._init.call(this, model);
+scout.DateFieldAdapter.prototype._initProperties = function(model) {
+  scout.DateFieldAdapter.parent.prototype._initProperties.call(this, model);
   this._errorStatus = scout.Status.ensure(model.errorStatus);
   if (this._errorStatus) {
     this._errorStatusDisplayText = model.displayText;
