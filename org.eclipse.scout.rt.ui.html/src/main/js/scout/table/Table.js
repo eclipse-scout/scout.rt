@@ -50,6 +50,7 @@ scout.Table = function() {
   this.rowBorderLeftWidth = 0; // read-only, set by _calculateRowBorderWidth(), also used in TableHeader.js
   this.rowBorderRightWidth = 0; // read-only, set by _calculateRowBorderWidth(), also used in TableHeader.js
   this.rowIconVisible = false;
+  this.rowIconColumnWidth = scout.Column.NARROW_MIN_WIDTH;
   this.staticMenus = [];
   this.selectionHandler = new scout.TableSelectionHandler(this);
   this.header;
@@ -299,7 +300,7 @@ scout.Table.prototype._insertRowIconColumn = function() {
       guiOnly: true,
       headerMenuEnabled: false,
       showSeparator: false,
-      width: scout.Column.NARROW_MIN_WIDTH,
+      width: this.rowIconColumnWidth,
       table: this
     });
   if (this.columns[0] === this.checkableColumn) {
@@ -786,11 +787,12 @@ scout.Table.prototype._sortImpl = function(sortColumns) {
 /**
  * Pre-order (top-down) traversal of all rows in this table (if hierarchical).
  */
-scout.Table.prototype.visitRows = function(visitFunc, rows) {
+scout.Table.prototype.visitRows = function(visitFunc, rows, level) {
+  level = scout.nvl(level, 0);
   rows = rows || this.rootRows;
   rows.forEach(function(row) {
-    visitFunc(row);
-    this.visitRows(visitFunc, row.childRows);
+    visitFunc(row, level);
+    this.visitRows(visitFunc, row.childRows, level + 1);
   }, this);
 };
 
@@ -2952,7 +2954,8 @@ scout.Table.prototype._rebuildTreeStructure = function() {
 
   // traverse row tree to have minimal order of rows.
   this.rows = [];
-  this.visitRows(function(row) {
+  this.visitRows(function(row, level) {
+    row._hierarchyLevel = level;
     this.rows.push(row);
   }.bind(this));
 };
@@ -3486,7 +3489,24 @@ scout.Table.prototype._setRowIconVisible = function(rowIconVisible) {
     scout.arrays.remove(this.columns, column);
     this.rowIconColumn = null;
   }
+};
 
+scout.Table.prototype.setRowIconColumnWidth = function(width) {
+  this.setProperty('rowIconColumnWidth', width);
+};
+
+scout.Table.prototype._setRowIconColumnWidth = function(width) {
+  this._setProperty('rowIconColumnWidth', width);
+  var column = this.rowIconColumn;
+  if (column) {
+    column.width = width;
+  }
+  if (this.rowIconVisible && !column) {
+    this._insertRowIconColumn();
+  } else if (!this.rowIconVisible && column) {
+    scout.arrays.remove(this.columns, column);
+    this.rowIconColumn = null;
+  }
 };
 
 scout.Table.prototype._setSelectedRows = function(selectedRows) {
@@ -3676,6 +3696,14 @@ scout.Table.prototype._renderCheckableStyle = function() {
 };
 
 scout.Table.prototype._renderRowIconVisible = function() {
+  this._updateRowWidth();
+  this.$rows(true)
+    .css('width', this.rowWidth);
+  this._redraw();
+  this.updateScrollbars();
+};
+
+scout.Table.prototype._renderRowIconColumnWidth = function() {
   this._updateRowWidth();
   this.$rows(true)
     .css('width', this.rowWidth);

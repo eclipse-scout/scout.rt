@@ -69,6 +69,11 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
    * Boolean
    */
   String PROP_ROW_ICON_VISIBLE = "rowIconVisible";
+
+  /**
+   * Integer
+   */
+  String PROP_ROW_ICON_COLUMN_WIDTH = "rowIconColumnWidth";
   /**
    * Boolean
    */
@@ -557,6 +562,10 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
   boolean isRowIconVisible();
 
   void setRowIconVisible(boolean rowIconVisible);
+
+  int getRowIconColumnWidth();
+
+  void setRowIconColumnWidth(int width);
 
   /**
    * Notify the ui factory to give focus to the table

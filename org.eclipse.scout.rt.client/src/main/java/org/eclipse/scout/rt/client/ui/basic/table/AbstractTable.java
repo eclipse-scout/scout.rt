@@ -320,8 +320,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   /**
    * Configures whether the row icon is visible.
    * <p>
-   * If set to true the gui creates a column which contains the row icons. The column has a fixed width, is not moveable
-   * and always the first column (resp. the second if the table is checkable). The column is not available in the model.
+   * If set to true the gui creates a column which contains the row icons. The column has a fixed width (@see
+   * {@link AbstractTable#getConfiguredRowIconColumnWidth()}, is not movable and always the first column (resp. the
+   * second if the table is checkable). The column is not available in the model.
    * <p>
    * If you need other settings or if you need the icon at another column position, you cannot use the row icons.
    * Instead you have to create a column and use {@link Cell#setIconId(String)} to set the icons on it's cells.
@@ -336,6 +337,20 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   @Order(25)
   protected boolean getConfiguredRowIconVisible() {
     return false;
+  }
+
+  /**
+   * Configures the row icon column width.
+   * <p>
+   * Has no effect if the row icon is not visible.
+   *
+   * @see #getConfiguredDefaultIconId()
+   * @see #getConfiguredRowIconVisible()
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(27)
+  protected int getConfiguredRowIconColumnWidth() {
+    return IColumn.NARROW_MIN_WIDTH;
   }
 
   /**
@@ -876,6 +891,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     setDefaultIconId(getConfiguredDefaultIconId());
     setCssClass((getConfiguredCssClass()));
     setRowIconVisible(getConfiguredRowIconVisible());
+    setRowIconColumnWidth(getConfiguredRowIconColumnWidth());
     setHeaderVisible(getConfiguredHeaderVisible());
     setHeaderEnabled(getConfiguredHeaderEnabled());
     setAutoResizeColumns(getConfiguredAutoResizeColumns());
@@ -2607,6 +2623,16 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   @Override
   public void setRowIconVisible(boolean rowIconVisible) {
     propertySupport.setPropertyBool(PROP_ROW_ICON_VISIBLE, rowIconVisible);
+  }
+
+  @Override
+  public int getRowIconColumnWidth() {
+    return propertySupport.getPropertyInt(PROP_ROW_ICON_COLUMN_WIDTH);
+  }
+
+  @Override
+  public void setRowIconColumnWidth(int width) {
+    propertySupport.setPropertyInt(PROP_ROW_ICON_COLUMN_WIDTH, width);
   }
 
   @Override

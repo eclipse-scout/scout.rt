@@ -225,6 +225,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
         return getModel().isRowIconVisible();
       }
     });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_ROW_ICON_COLUMN_WIDTH, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getRowIconColumnWidth();
+      }
+    });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_HEADER_VISIBLE, model) {
       @Override
       protected Boolean modelValue() {
