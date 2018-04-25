@@ -43,7 +43,7 @@ scout.Table = function() {
   this.rootRows = [];
   this.visibleRows = [];
   this.visibleRowsMap = {}; // visible rows by id
-  this.rowPaddingLevel = 15;
+  this.rowLevelPadding;
   this.rowsMap = {}; // rows by id
   this.rowWidth = 0;
   this.rowBorderWidth; // read-only, set by _calculateRowBorderWidth(), also used in TableLayout.js
@@ -370,6 +370,18 @@ scout.Table.prototype._renderProperties = function() {
   this._renderHierarchicalStyle();
 };
 
+scout.Table.prototype._setCssClass = function(cssClass) {
+  scout.Table.parent.prototype._setCssClass.call(this, cssClass);
+  // calculate row level padding
+  var paddingClasses = ['table-row-level-padding'];
+  if (this.cssClass) {
+    paddingClasses.push(this.cssClass);
+  }
+  this.setRowLevelPadding(scout.styles.getSize(paddingClasses.reduce(function(acc, cssClass) {
+    return acc + ' ' + cssClass;
+  }, ''), 'width', 'width', 15));
+};
+
 scout.Table.prototype._remove = function() {
   this.session.desktop.off('popupOpen', this._popupOpenHandler);
   scout.scrollbars.uninstall(this.$data, this.session);
@@ -386,6 +398,14 @@ scout.Table.prototype._remove = function() {
   this.$data = null;
   this.$emptyData = null;
   scout.Table.parent.prototype._remove.call(this);
+};
+
+scout.Table.prototype.setRowLevelPadding = function(rowLevelPadding) {
+  this.setProperty('rowLevelPadding', rowLevelPadding);
+};
+
+scout.Table.prototype._renderRowLevelPadding = function() {
+  this._rerenderViewport();
 };
 
 scout.Table.prototype.setTableControls = function(controls) {
@@ -1510,11 +1530,11 @@ scout.Table.prototype._installRow = function(row) {
   }
 };
 
-scout.Table.prototype._calcRowPaddingLevel = function(row) {
+scout.Table.prototype._calcRowLevelPadding = function(row) {
   if (!row) {
-    return -this.rowPaddingLevel;
+    return -this.rowLevelPadding;
   }
-  return this._calcRowPaddingLevel(row.parentRow) + this.rowPaddingLevel;
+  return this._calcRowLevelPadding(row.parentRow) + this.rowLevelPadding;
 };
 
 scout.Table.prototype._showCellErrorForRow = function(row) {

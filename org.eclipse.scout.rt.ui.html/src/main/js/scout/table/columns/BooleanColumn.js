@@ -46,7 +46,7 @@ scout.BooleanColumn.prototype.buildCell = function(cell, row) {
     rowPadding = 0;
 
   if (tableNodeColumn) {
-    rowPadding = this.table._calcRowPaddingLevel(row);
+    rowPadding = this.table._calcRowLevelPadding(row);
   }
 
   if (cell.empty) {

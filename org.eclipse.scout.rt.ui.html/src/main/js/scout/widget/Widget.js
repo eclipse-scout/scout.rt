@@ -123,6 +123,7 @@ scout.Widget.prototype._init = function(model) {
     this._initProperty(propertyName, value);
   }.bind(this));
 
+  this._setCssClass(this.cssClass);
   this._setLogicalGrid(this.logicalGrid);
   this._setEnabled(this.enabled);
 };
