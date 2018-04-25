@@ -367,15 +367,19 @@ scout.TagField.prototype.openOverflowPopup = function() {
   if (this.overflow) {
     return;
   }
-  this.overflow = scout.create('TagOverflowPopup', {
+  this.overflow = this._createOverflowPopup();
+  this.overflow.on('close', this._onOverflowPopupClose.bind(this));
+  this.overflow.open();
+};
+
+scout.TagField.prototype._createOverflowPopup = function() {
+  return scout.create('TagOverflowPopup', {
     parent: this,
     closeOnAnchorMouseDown: false,
     focusableContainer: true,
     $anchor: this.$fieldContainer,
     $headBlueprint: this.$overflowIcon
   });
-  this.overflow.on('close', this._onOverflowPopupClose.bind(this));
-  this.overflow.open();
 };
 
 scout.TagField.prototype.closeOverflowPopup = function() {
