@@ -29,12 +29,12 @@ public class DoValueTest {
 
   @Test
   public void testCreateExists() {
-    DoValue<String> value = new DoValue<>(m_lazyCreate);
+    DoValue<String> value = new DoValue<>(null, m_lazyCreate);
     assertFalse(value.exists());
     value.create();
     assertTrue(value.exists());
 
-    value = new DoValue<>(m_lazyCreate);
+    value = new DoValue<>(null, m_lazyCreate);
     assertFalse(value.exists());
     value.set("foo");
     assertTrue(value.exists());
@@ -62,5 +62,12 @@ public class DoValueTest {
     DoValue<String> value = DoValue.of(null);
     assertTrue(value.exists());
     assertNull(value.get());
+  }
+
+  @Test
+  public void testAttributeName() {
+    assertNull(new DoValue<>().getAttributeName());
+    assertNull(DoValue.of("").getAttributeName());
+    assertEquals("foo", new DoValue<>("foo", null).getAttributeName());
   }
 }

@@ -22,11 +22,11 @@ import java.util.stream.Stream;
 public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Iterable<V> {
 
   public DoList() {
-    this(null);
+    this(null, null);
   }
 
-  protected DoList(Consumer<DoNode<List<V>>> lazyCreate) {
-    super(lazyCreate, new ArrayList<>());
+  protected DoList(String attributeName, Consumer<DoNode<List<V>>> lazyCreate) {
+    super(attributeName, lazyCreate, new ArrayList<>());
   }
 
   public static <V> DoList<V> of(List<V> list) {

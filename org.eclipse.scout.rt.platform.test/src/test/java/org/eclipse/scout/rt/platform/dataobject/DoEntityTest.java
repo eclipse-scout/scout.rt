@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.dataobject.fixture.EntityFixtureDo;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.junit.Test;
@@ -486,5 +487,23 @@ public class DoEntityTest {
 
     assertFalse(entity.optNode("any value").isPresent());
     assertEquals("else-value", entity.optNode("any value").map(n -> (String) n.get()).orElse("else-value"));
+  }
+
+  @Test
+  public void testAttributeName() {
+    EntityFixtureDo fixture = BEANS.get(EntityFixtureDo.class);
+    assertEquals("id", fixture.id().getAttributeName());
+    assertEquals("otherEntities", fixture.otherEntities().getAttributeName());
+
+    fixture.put("foo", "bar");
+    assertEquals("foo", fixture.getNode("foo").getAttributeName());
+    assertEquals("bar", fixture.getNode("foo").get());
+
+    // attribute name gets set (or updated if already set) when DoValue/DoList become part of a DoEntity
+    DoValue<String> barAttribute = new DoValue<>();
+    barAttribute.set("bar");
+    barAttribute.setAttributeName("barAttribute");
+    fixture.put("newBarAttribute", barAttribute);
+    assertEquals("newBarAttribute", fixture.getNode("newBarAttribute").getAttributeName());
   }
 }

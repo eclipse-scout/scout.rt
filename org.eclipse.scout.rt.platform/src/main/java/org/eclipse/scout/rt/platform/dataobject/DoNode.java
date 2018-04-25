@@ -9,10 +9,11 @@ import java.util.function.Consumer;
 public class DoNode<T> {
 
   private String m_attributeName;
-  private T m_value;
   private Consumer<DoNode<T>> m_lazyCreate;
+  private T m_value;
 
-  protected DoNode(Consumer<DoNode<T>> lazyCreate, T initialValue) {
+  protected DoNode(String attributeName, Consumer<DoNode<T>> lazyCreate, T initialValue) {
+    m_attributeName = attributeName;
     m_lazyCreate = lazyCreate;
     m_value = initialValue;
   }

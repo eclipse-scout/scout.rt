@@ -20,7 +20,7 @@ public class DoNodeTest {
 
   protected static class FixtureDoNode extends DoNode<String> {
     FixtureDoNode() {
-      super((foo) -> {
+      super(null, (foo) -> {
       }, null);
     }
   }

@@ -10,11 +10,11 @@ import java.util.function.Consumer;
 public final class DoValue<V> extends DoNode<V> {
 
   public DoValue() {
-    this(null);
+    this(null, null);
   }
 
-  protected DoValue(Consumer<DoNode<V>> lazyCreate) {
-    super(lazyCreate, null);
+  protected DoValue(String attributeName, Consumer<DoNode<V>> lazyCreate) {
+    super(attributeName, lazyCreate, null);
   }
 
   public static <V> DoValue<V> of(V value) {

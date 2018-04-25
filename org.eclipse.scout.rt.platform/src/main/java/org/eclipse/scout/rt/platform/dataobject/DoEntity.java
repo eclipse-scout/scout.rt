@@ -118,7 +118,7 @@ public class DoEntity implements IDoEntity {
       DoValue<V> valueNode = (DoValue<V>) node;
       return valueNode;
     }
-    return new DoValue<>(attribute -> putNode(attributeName, attribute));
+    return new DoValue<>(attributeName, attribute -> putNode(attributeName, attribute));
   }
 
   /**
@@ -133,7 +133,7 @@ public class DoEntity implements IDoEntity {
       DoList<V> listNode = (DoList<V>) node;
       return listNode;
     }
-    return new DoList<>(attribute -> putNode(attributeName, attribute));
+    return new DoList<>(attributeName, attribute -> putNode(attributeName, attribute));
   }
 
   @Override

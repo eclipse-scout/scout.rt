@@ -48,17 +48,17 @@ public class DoListTest {
 
   @Test
   public void testCreateExists() {
-    DoList<String> list = new DoList<>(m_lazyCreate);
+    DoList<String> list = new DoList<>(null, m_lazyCreate);
     assertFalse(list.exists());
     list.create();
     assertTrue(list.exists());
 
-    list = new DoList<>(m_lazyCreate);
+    list = new DoList<>(null, m_lazyCreate);
     assertFalse(list.exists());
     list.set(Arrays.asList("foo", "bar"));
     assertTrue(list.exists());
 
-    list = new DoList<>(m_lazyCreate);
+    list = new DoList<>(null, m_lazyCreate);
     assertFalse(list.exists());
     list.get();
     assertTrue(list.exists());
@@ -351,5 +351,12 @@ public class DoListTest {
   public void testFind() {
     assertEquals(Arrays.asList("bar"), m_testDoList.find((input) -> input.equals("bar")));
     assertEquals(Arrays.asList("bar", "baz"), m_testDoList.find((input) -> input.equals("bar") || input.equals("baz")));
+  }
+
+  @Test
+  public void testAttributeName() {
+    assertNull(new DoList<>().getAttributeName());
+    assertNull(DoList.of(Collections.emptyList()).getAttributeName());
+    assertEquals("foo", new DoList<>("foo", null).getAttributeName());
   }
 }
