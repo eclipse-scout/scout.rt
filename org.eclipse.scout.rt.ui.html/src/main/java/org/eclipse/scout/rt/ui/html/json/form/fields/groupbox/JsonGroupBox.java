@@ -14,11 +14,13 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.LogicalGridLayoutConfig;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
+import org.eclipse.scout.rt.client.ui.notification.INotification;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonLogicalGridLayoutConfig;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonCompositeField;
 import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
@@ -28,8 +30,6 @@ import org.json.JSONObject;
  * This class creates JSON output for an <code>IGroupBox</code>.
  */
 public class JsonGroupBox<GROUP_BOX extends IGroupBox> extends JsonCompositeField<GROUP_BOX, IFormField> implements IJsonContextMenuOwner {
-
-  public static final String EVENT_EXPANDED = "expanded";
 
   private JsonContextMenu<IContextMenu> m_jsonContextMenu;
 
@@ -87,6 +87,12 @@ public class JsonGroupBox<GROUP_BOX extends IGroupBox> extends JsonCompositeFiel
       @Override
       protected Boolean modelValue() {
         return getModel().isExpanded();
+      }
+    });
+    putJsonProperty(new JsonAdapterProperty<GROUP_BOX>(IGroupBox.PROP_NOTIFICATION, model, getUiSession()) {
+      @Override
+      protected INotification modelValue() {
+        return getModel().getNotification();
       }
     });
     putJsonProperty(new JsonProperty<GROUP_BOX>(IGroupBox.PROP_GRID_COLUMN_COUNT, model) {

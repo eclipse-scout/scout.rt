@@ -12,15 +12,14 @@ package org.eclipse.scout.rt.client.ui.desktop.notification;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
-import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.notification.Notification;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
 
-public class DesktopNotification extends AbstractWidget implements IDesktopNotification {
+public class DesktopNotification extends Notification implements IDesktopNotification {
 
-  private final IStatus m_status;
   private final long m_duration;
   private final boolean m_closable;
   private final IDesktopNotificationUIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
@@ -36,7 +35,7 @@ public class DesktopNotification extends AbstractWidget implements IDesktopNotif
    * Creates a closable notification with a status and the default duration.
    */
   public DesktopNotification(IStatus status) {
-    m_status = status;
+    super(status);
     m_duration = DEFAULT_DURATION;
     m_closable = true;
   }
@@ -50,14 +49,9 @@ public class DesktopNotification extends AbstractWidget implements IDesktopNotif
    * @param closable
    */
   public DesktopNotification(IStatus status, long duration, boolean closable) {
-    m_status = status;
+    super(status);
     m_duration = duration;
     m_closable = closable;
-  }
-
-  @Override
-  public IStatus getStatus() {
-    return m_status;
   }
 
   @Override

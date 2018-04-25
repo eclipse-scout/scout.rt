@@ -88,6 +88,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.wizard.IWizardProgressField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.client.ui.group.IGroup;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.client.ui.notification.INotification;
 import org.eclipse.scout.rt.client.ui.tile.IFormFieldTile;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.client.ui.tile.ITileAccordion;
@@ -158,6 +159,7 @@ import org.eclipse.scout.rt.ui.html.json.group.JsonGroup;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.form.field.JsonFormFieldMenu;
 import org.eclipse.scout.rt.ui.html.json.messagebox.JsonMessageBox;
+import org.eclipse.scout.rt.ui.html.json.notification.JsonNotification;
 import org.eclipse.scout.rt.ui.html.json.table.JsonAlphanumericSortingStringColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonBeanColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonBooleanColumn;
@@ -332,6 +334,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof IDesktopNotification) {
       return new JsonDesktopNotification<>((IDesktopNotification) model, session, id, parent);
+    }
+    if (model instanceof INotification) {
+      return new JsonNotification<>((INotification) model, session, id, parent);
     }
     if (model instanceof IOutlineViewButton) {
       return new JsonOutlineViewButton<>((IOutlineViewButton) model, session, id, parent);

@@ -11,15 +11,13 @@
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
-import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.JsonStatus;
+import org.eclipse.scout.rt.ui.html.json.notification.JsonNotification;
 
-public class JsonDesktopNotification<DESKTOP_NOTIFICATION extends IDesktopNotification> extends AbstractJsonWidget<DESKTOP_NOTIFICATION> {
+public class JsonDesktopNotification<DESKTOP_NOTIFICATION extends IDesktopNotification> extends JsonNotification<DESKTOP_NOTIFICATION> {
 
   public static final String EVENT_CLOSE = "close";
 
@@ -35,18 +33,6 @@ public class JsonDesktopNotification<DESKTOP_NOTIFICATION extends IDesktopNotifi
   @Override
   protected void initJsonProperties(DESKTOP_NOTIFICATION model) {
     super.initJsonProperties(model);
-
-    putJsonProperty(new JsonProperty<DESKTOP_NOTIFICATION>("status", model) {
-      @Override
-      protected IStatus modelValue() {
-        return getModel().getStatus();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        return JsonStatus.toJson((IStatus) value);
-      }
-    });
 
     putJsonProperty(new JsonProperty<DESKTOP_NOTIFICATION>("duration", model) {
       @Override

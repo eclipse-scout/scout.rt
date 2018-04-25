@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.LogicalGridLayoutConfig;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
+import org.eclipse.scout.rt.client.ui.notification.INotification;
 import org.eclipse.scout.rt.platform.util.TriState;
 
 public interface IGroupBox extends ICompositeField, IContextMenuOwner {
@@ -93,6 +94,12 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
   String PROP_GRID_COLUMN_COUNT = "gridColumnCount";
 
   String PROP_BODY_LAYOUT_CONFIG = "bodyLayoutConfig";
+
+  /**
+   * {@link INotification}
+   */
+  String PROP_NOTIFICATION = "notification";
+
   /*
    * Runtime
    */
@@ -209,6 +216,19 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
   boolean isExpanded();
 
   void setExpanded(boolean b);
+
+  INotification getNotification();
+
+  /**
+   * Adds a {@link INotification} to the group box. To remove the notification set it to {@code null} or use
+   * {@link #removeNotification()}
+   */
+  void setNotification(INotification notification);
+
+  /**
+   * Removes the notification from the group box
+   */
+  void removeNotification();
 
   String getSelectionKeyStroke();
 

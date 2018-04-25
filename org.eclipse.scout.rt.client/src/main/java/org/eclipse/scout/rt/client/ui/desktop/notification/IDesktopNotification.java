@@ -12,8 +12,7 @@ package org.eclipse.scout.rt.client.ui.desktop.notification;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.rt.client.ui.IWidget;
-import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.client.ui.notification.INotification;
 
 /**
  * A notification is used to display a short information on the Desktop. The notification disappears automatically after
@@ -21,7 +20,7 @@ import org.eclipse.scout.rt.platform.status.IStatus;
  *
  * @since 5.2
  */
-public interface IDesktopNotification extends IWidget {
+public interface IDesktopNotification extends INotification {
 
   /**
    * Default duration a notification is displayed is 5 seconds.
@@ -32,8 +31,6 @@ public interface IDesktopNotification extends IWidget {
    * Duration is infinite which means notification is not automatically removed.
    */
   long INFINITE_DURATION = -1;
-
-  IStatus getStatus();
 
   /**
    * Duration in milliseconds while the notification is displayed.

@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.LogicalGridLayoutConfig;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxProcessButtonGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.VerticalSmartGroupBoxBodyGrid;
+import org.eclipse.scout.rt.client.ui.notification.INotification;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
@@ -664,6 +665,21 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   public String getBackgroundImageName() {
     return propertySupport.getPropertyString(PROP_BACKGROUND_IMAGE_NAME);
+  }
+
+  @Override
+  public INotification getNotification() {
+    return (INotification) propertySupport.getProperty(PROP_NOTIFICATION);
+  }
+
+  @Override
+  public void setNotification(INotification notification) {
+    propertySupport.setProperty(PROP_NOTIFICATION, notification);
+  }
+
+  @Override
+  public void removeNotification() {
+    propertySupport.setProperty(PROP_NOTIFICATION, null);
   }
 
   /**

@@ -184,6 +184,7 @@
   __include("scout/image/Image.js");
   __include("scout/image/ImageLayout.js");
   __include("scout/notification/Notification.js");
+  __include("scout/notification/NotificationAdapter.js");
   __include("scout/menu/menus.js");
   __include("scout/menu/Menu.js");
   __include("scout/menu/EllipsisMenu.js");

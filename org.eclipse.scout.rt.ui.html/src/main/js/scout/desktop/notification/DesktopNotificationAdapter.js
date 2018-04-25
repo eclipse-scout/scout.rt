@@ -11,7 +11,7 @@
 scout.DesktopNotificationAdapter = function() {
   scout.DesktopNotificationAdapter.parent.call(this);
 };
-scout.inherits(scout.DesktopNotificationAdapter, scout.ModelAdapter);
+scout.inherits(scout.DesktopNotificationAdapter, scout.NotificationAdapter);
 
 scout.DesktopNotificationAdapter.prototype._onWidgetClose = function(event) {
   this._send('close', {
