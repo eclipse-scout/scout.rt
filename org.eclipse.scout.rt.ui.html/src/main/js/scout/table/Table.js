@@ -163,27 +163,29 @@ scout.Table.prototype._initRow = function(row) {
 };
 
 scout.Table.prototype._initColumns = function() {
-  var column, i,
-    tableNodeColumn;
-  for (i = 0; i < this.columns.length; i++) {
-    this.columns[i].session = this.session;
-    this.columns[i].table = this;
-    column = scout.create(this.columns[i]);
-    this.columns[i] = column;
-    if (column.index < 0) {
-      column.index = i;
-    }
+  this.tableNodeColumn = null;
 
+  this.columns = this.columns.map(function(colModel, index) {
+    var column;
+    colModel.session = this.session;
+    if (colModel instanceof scout.Column) {
+      colModel._setTable(this);
+    } else {
+      colModel.table = this;
+    }
+    column = scout.create(colModel);
+    if (column.index < 0) {
+      column.index = index;
+    }
     if (column.checkable) {
       // set checkable column if this column is the checkable one
       this.checkableColumn = column;
     }
-    if (!tableNodeColumn && column.isVisible()) {
-      tableNodeColumn = column;
+    if (!this.tableNodeColumn && column.isVisible()) {
+      this.tableNodeColumn = column;
     }
-  }
-
-  this.tableNodeColumn = tableNodeColumn;
+    return column;
+  }, this);
 
   // Add gui only checkbox column at the beginning
   this._setCheckable(this.checkable);
@@ -3505,9 +3507,11 @@ scout.Table.prototype._setRowIconVisible = function(rowIconVisible) {
   var column = this.rowIconColumn;
   if (this.rowIconVisible && !column) {
     this._insertRowIconColumn();
+    this.trigger('columnStructureChanged');
   } else if (!this.rowIconVisible && column) {
     scout.arrays.remove(this.columns, column);
     this.rowIconColumn = null;
+    this.trigger('columnStructureChanged');
   }
 };
 
@@ -3520,12 +3524,6 @@ scout.Table.prototype._setRowIconColumnWidth = function(width) {
   var column = this.rowIconColumn;
   if (column) {
     column.width = width;
-  }
-  if (this.rowIconVisible && !column) {
-    this._insertRowIconColumn();
-  } else if (!this.rowIconVisible && column) {
-    scout.arrays.remove(this.columns, column);
-    this.rowIconColumn = null;
   }
 };
 
@@ -3685,9 +3683,11 @@ scout.Table.prototype._updateCheckableColumn = function() {
   var showCheckBoxes = this.checkable && this.checkableStyle === scout.Table.CheckableStyle.CHECKBOX;
   if (showCheckBoxes && !column) {
     this._insertBooleanColumn();
+    this.trigger('columnStructureChanged');
   } else if (!showCheckBoxes && column && column.guiOnly) {
     scout.arrays.remove(this.columns, column);
     this.checkableColumn = null;
+    this.trigger('columnStructureChanged');
   }
 };
 

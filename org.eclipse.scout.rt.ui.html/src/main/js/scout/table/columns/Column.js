@@ -36,6 +36,7 @@ scout.Column = function() {
   this.prefMinWidth = null;
   this.minWidth = scout.Column.DEFAULT_MIN_WIDTH; // the minimal width the column can have
   this.showSeparator = true;
+  this.table = null;
   this.tableNodeColumn = false;
   this.textWrap = false;
   this.filterType = 'TextColumnUserFilter';
@@ -44,6 +45,10 @@ scout.Column = function() {
   this.visible = true;
   this.textBased = true;
   this.headerMenuEnabled = true;
+  this.tableNodeLevel0CellPadding = 28;
+  this.expandableIconLevel0CellPadding = 13;
+
+  this._tableColumnsChangedHandler = this._onTableColumnsChanged.bind(this);
 };
 
 scout.Column.DEFAULT_MIN_WIDTH = 60;
@@ -71,10 +76,16 @@ scout.Column.prototype._init = function(model) {
   scout.icons.resolveIconProperty(this, 'headerIconId');
   this._setDisplayable(this.displayable);
   this._setAutoOptimizeWidth(this.autoOptimizeWidth);
+  if (this.table) {
+    this.table.on('columnMoved columnStructureChanged', this._tableColumnsChangedHandler);
+  }
 };
 
 scout.Column.prototype.destroy = function() {
   this._destroy();
+  if (this.table) {
+    this.table.off('columnMoved columnStructureChanged', this._tableColumnsChangedHandler);
+  }
 };
 
 /**
@@ -82,6 +93,20 @@ scout.Column.prototype.destroy = function() {
  */
 scout.Column.prototype._destroy = function(model) {
   // NOP
+};
+
+scout.Column.prototype._setTable = function(table) {
+  if (this.table === table) {
+    return;
+  }
+  if (this.table) {
+    this.table.off('columnMoved columnStructureChanged', this._tableColumnsChangedHandler);
+  }
+  this.table = table;
+  if (this.table) {
+    this.table.on('columnMoved columnStructureChanged', this._tableColumnsChangedHandler);
+  }
+
 };
 
 /**
@@ -256,7 +281,7 @@ scout.Column.prototype._buildCell = function(content, style, cssClass) {
 };
 
 scout.Column.prototype._expandIcon = function(expanded, rowPadding) {
-  var style = 'padding-left: ' + (rowPadding + 13) + 'px';
+  var style = 'padding-left: ' + (rowPadding + this.expandableIconLevel0CellPadding) + 'px';
   var cssClasses = 'table-row-control';
   if (expanded) {
     cssClasses += ' expanded';
@@ -327,7 +352,7 @@ scout.Column.prototype._cellStyle = function(cell, tableNodeColumn, rowPadding) 
   style = 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
   if (tableNodeColumn) {
     // calculate padding
-    style += ' padding-left: ' + (28 + rowPadding) + 'px; ';
+    style += ' padding-left: ' + (this.tableNodeLevel0CellPadding + rowPadding) + 'px; ';
   }
   style += scout.styles.legacyStyle(cell);
   return style;
@@ -648,4 +673,14 @@ scout.Column.prototype._setAutoOptimizeWidth = function(autoOptimizeWidth) {
 
 scout.Column.prototype.isContentValid = function(row) {
   return this.cell(row).isContentValid();
+};
+
+scout.Column.prototype._onTableColumnsChanged = function(event) {
+  if (this.table.visibleColumns().indexOf(this) === 0) {
+    this.tableNodeLevel0CellPadding = 28;
+    this.expandableIconLevel0CellPadding = 13;
+  } else {
+    this.tableNodeLevel0CellPadding = 23;
+    this.expandableIconLevel0CellPadding = 8;
+  }
 };
