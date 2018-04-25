@@ -12,12 +12,15 @@ package org.eclipse.scout.rt.client.ui.form.fields.sequencebox;
 
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.LogicalGridLayoutConfig;
 
 /**
  * A {@link IFormField} that contains an ordered sequence of {@link IFormField}s.<br>
  * E.g. a range with start and end date.
  */
 public interface ISequenceBox extends ICompositeField {
+
+  String PROP_LAYOUT_CONFIG = "layoutConfig";
 
   /**
    * @return true, if the sequence is validated automatically, whenever a value of the contained fields changes.
@@ -44,4 +47,7 @@ public interface ISequenceBox extends ICompositeField {
   @Deprecated
   void setEqualColumnWidths(boolean equalColumnWidths);
 
+  void setLayoutConfig(LogicalGridLayoutConfig config);
+
+  LogicalGridLayoutConfig getLayoutConfig();
 }

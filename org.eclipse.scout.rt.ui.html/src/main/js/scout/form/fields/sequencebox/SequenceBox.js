@@ -12,12 +12,15 @@ scout.SequenceBox = function() {
   scout.SequenceBox.parent.call(this);
   this._addWidgetProperties('fields');
   this.logicalGrid = scout.create('scout.HorizontalGrid');
+  this.layoutConfig = null;
   this.fields = [];
 };
 scout.inherits(scout.SequenceBox, scout.CompositeField);
 
-scout.SequenceBox.prototype.setFields = function(fields) {
-  this.setProperty('fields', fields);
+scout.SequenceBox.prototype._init = function(model) {
+  scout.SequenceBox.parent.prototype._init.call(this, model);
+
+  this._setLayoutConfig(this.layoutConfig);
 };
 
 scout.SequenceBox.prototype._render = function() {
@@ -28,10 +31,7 @@ scout.SequenceBox.prototype._render = function() {
   this.addStatus();
   this._handleStatus();
   this.htmlBody = scout.HtmlComponent.install(this.$field, this.session);
-  this.htmlBody.setLayout(new scout.LogicalGridLayout(this, {
-    hgap: scout.HtmlEnvironment.smallColumnGap,
-    vgap: 0
-  }));
+  this.htmlBody.setLayout(this._createBodyLayout());
   for (i = 0; i < this.fields.length; i++) {
     field = this.fields[i];
     field.labelUseUiWidth = true;
@@ -42,6 +42,15 @@ scout.SequenceBox.prototype._render = function() {
     // set each children layout data to logical grid data
     field.setLayoutData(new scout.LogicalGridData(field));
   }
+};
+
+scout.SequenceBox.prototype._renderProperties = function() {
+  scout.SequenceBox.parent.prototype._renderProperties.call(this);
+  this._renderLayoutConfig();
+};
+
+scout.SequenceBox.prototype._createBodyLayout = function() {
+  return new scout.LogicalGridLayout(this, this.layoutConfig);
 };
 
 /**
@@ -61,6 +70,24 @@ scout.SequenceBox.prototype._setLogicalGrid = function(logicalGrid) {
   scout.SequenceBox.parent.prototype._setLogicalGrid.call(this, logicalGrid);
   if (this.logicalGrid) {
     this.logicalGrid.setGridConfig(new scout.SequenceBoxGridConfig());
+  }
+};
+
+scout.SequenceBox.prototype.setLayoutConfig = function(layoutConfig) {
+  this.setProperty('layoutConfig', layoutConfig);
+};
+
+scout.SequenceBox.prototype._setLayoutConfig = function(layoutConfig) {
+  if (!layoutConfig) {
+    layoutConfig = new scout.SequenceBoxLayoutConfig();
+  }
+  this._setProperty('layoutConfig', scout.SequenceBoxLayoutConfig.ensure(layoutConfig));
+};
+
+scout.SequenceBox.prototype._renderLayoutConfig = function() {
+  this.layoutConfig.applyToLayout(this.htmlBody.layout);
+  if (this.rendered) {
+    this.htmlBody.invalidateLayoutTree();
   }
 };
 
@@ -148,6 +175,13 @@ scout.SequenceBox.prototype._modifyLabel = function(field) {
   } else if (field.$field) { // If $field is set depends on the concrete field e.g. a group box does not have a $field
     this._linkWithLabel(field.$field);
   }
+};
+
+scout.SequenceBox.prototype.setFields = function(fields) {
+  if (this.rendered) {
+    throw new Error('Setting fields is not supported if sequence box is already rendered.');
+  }
+  this.setProperty('fields', fields);
 };
 
 /**

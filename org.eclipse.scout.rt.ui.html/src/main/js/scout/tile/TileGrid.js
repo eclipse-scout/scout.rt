@@ -393,13 +393,8 @@ scout.TileGrid.prototype._setLayoutConfig = function(layoutConfig) {
 };
 
 scout.TileGrid.prototype._renderLayoutConfig = function() {
-  this.htmlComp.layout.hgap = this.layoutConfig.hgap;
-  this.htmlComp.layout.vgap = this.layoutConfig.vgap;
-  this.htmlComp.layout.columnWidth = this.layoutConfig.columnWidth;
-  this.htmlComp.layout.rowHeight = this.layoutConfig.rowHeight;
-  this.htmlComp.layout.maxWidth = this.layoutConfig.maxWidth;
   var oldMinWidth = this.htmlComp.layout.minWidth;
-  this.htmlComp.layout.minWidth = this.layoutConfig.minWidth;
+  this.layoutConfig.applyToLayout(this.htmlComp.layout);
   if (oldMinWidth !== this.layoutConfig.minWidth) {
     this._renderScrollable();
   }

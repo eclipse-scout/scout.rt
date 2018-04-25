@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeFieldGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.LogicalGridLayoutConfig;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
@@ -130,6 +131,17 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   /**
+   * Configures the layout hints.
+   * <p>
+   * The hints are set to -1 by default which means the values will be set by the UI.
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(260)
+  protected LogicalGridLayoutConfig getConfiguredLayoutConfig() {
+    return new LogicalGridLayoutConfig();
+  }
+
+  /**
    * a radio button group cannot be clearable
    */
   @Override
@@ -205,6 +217,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
       b.addPropertyChangeListener(new P_ButtonPropertyChangeListener());
     }
     setGridColumnCount(getConfiguredGridColumnCount());
+    setLayoutConfig(getConfiguredLayoutConfig());
     handleFieldVisibilityChanged();
   }
 
@@ -369,6 +382,16 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   @Override
   public int getGridColumnCount() {
     return propertySupport.getPropertyInt(PROP_GRID_COLUMN_COUNT);
+  }
+
+  @Override
+  public LogicalGridLayoutConfig getLayoutConfig() {
+    return (LogicalGridLayoutConfig) propertySupport.getProperty(PROP_LAYOUT_CONFIG);
+  }
+
+  @Override
+  public void setLayoutConfig(LogicalGridLayoutConfig layoutConfig) {
+    propertySupport.setProperty(PROP_LAYOUT_CONFIG, layoutConfig);
   }
 
   protected List<Class<? extends IFormField>> getConfiguredFields() {

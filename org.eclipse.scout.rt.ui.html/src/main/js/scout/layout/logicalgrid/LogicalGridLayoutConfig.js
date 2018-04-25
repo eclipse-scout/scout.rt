@@ -33,6 +33,14 @@ scout.LogicalGridLayoutConfig.prototype.clone = function() {
   return new scout.LogicalGridLayoutConfig(this);
 };
 
+scout.LogicalGridLayoutConfig.prototype.applyToLayout = function(layout) {
+  layout.hgap = this.hgap;
+  layout.vgap = this.vgap;
+  layout.columnWidth = this.columnWidth;
+  layout.rowHeight = this.rowHeight;
+  layout.minWidth = this.minWidth;
+};
+
 scout.LogicalGridLayoutConfig.ensure = function(layoutConfig) {
   if (!layoutConfig) {
     return layoutConfig;

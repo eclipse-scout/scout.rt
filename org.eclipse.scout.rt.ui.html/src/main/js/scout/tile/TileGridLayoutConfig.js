@@ -21,6 +21,11 @@ scout.TileGridLayoutConfig.prototype._extend = function(options) {
   }
 };
 
+scout.TileGridLayoutConfig.prototype.applyToLayout = function(layout) {
+  scout.TileGridLayoutConfig.parent.prototype.applyToLayout.call(this, layout);
+  layout.maxWidth = this.maxWidth;
+};
+
 scout.TileGridLayoutConfig.prototype.clone = function() {
   return new scout.TileGridLayoutConfig(this);
 };

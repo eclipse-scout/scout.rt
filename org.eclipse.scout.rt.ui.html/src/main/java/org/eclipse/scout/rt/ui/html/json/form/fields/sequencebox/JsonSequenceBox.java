@@ -11,9 +11,13 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields.sequencebox;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.LogicalGridLayoutConfig;
+import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonLogicalGridLayoutConfig;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonCompositeField;
 
 /**
@@ -29,6 +33,22 @@ public class JsonSequenceBox<T extends ISequenceBox> extends JsonCompositeField<
   @Override
   public String getObjectType() {
     return "SequenceBox";
+  }
+
+  @Override
+  protected void initJsonProperties(T model) {
+    super.initJsonProperties(model);
+    putJsonProperty(new JsonProperty<T>(IRadioButtonGroup.PROP_LAYOUT_CONFIG, model) {
+      @Override
+      protected LogicalGridLayoutConfig modelValue() {
+        return getModel().getLayoutConfig();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return new JsonLogicalGridLayoutConfig((LogicalGridLayoutConfig) value).toJson();
+      }
+    });
   }
 
 }

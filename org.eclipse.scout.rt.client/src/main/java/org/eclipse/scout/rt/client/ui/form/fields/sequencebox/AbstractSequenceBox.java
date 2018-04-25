@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.LogicalGridLayoutConfig;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.internal.SequenceBoxGrid;
@@ -99,6 +100,17 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   @ConfigProperty(ConfigProperty.BOOLEAN)
   protected boolean getConfiguredEqualColumnWidths() {
     return false;
+  }
+
+  /**
+   * Configures the layout hints.
+   * <p>
+   * The hints are set to -1 by default which means the values will be set by the UI.
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(220)
+  protected LogicalGridLayoutConfig getConfiguredLayoutConfig() {
+    return new LogicalGridLayoutConfig();
   }
 
   /**
@@ -195,6 +207,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     super.initConfig();
     setAutoCheckFromTo(getConfiguredAutoCheckFromTo());
     setEqualColumnWidths(getConfiguredEqualColumnWidths());
+    setLayoutConfig(getConfiguredLayoutConfig());
     // when range box has visible label, suppress first field's label and append
     // to own label
     propertySupport.addPropertyChangeListener(
@@ -280,6 +293,16 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   @Override
   @SuppressWarnings("deprecation")
   public void setEqualColumnWidths(boolean b) {
+  }
+
+  @Override
+  public LogicalGridLayoutConfig getLayoutConfig() {
+    return (LogicalGridLayoutConfig) propertySupport.getProperty(PROP_LAYOUT_CONFIG);
+  }
+
+  @Override
+  public void setLayoutConfig(LogicalGridLayoutConfig layoutConfig) {
+    propertySupport.setProperty(PROP_LAYOUT_CONFIG, layoutConfig);
   }
 
   @Override

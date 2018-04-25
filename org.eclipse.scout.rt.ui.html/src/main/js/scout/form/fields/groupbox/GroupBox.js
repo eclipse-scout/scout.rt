@@ -17,6 +17,7 @@ scout.GroupBox = function() {
   this.menus = [];
   this.menuBarVisible = true;
   this.notification;
+  this.bodyLayoutConfig = null;
   this.borderDecoration = scout.GroupBox.BorderDecoration.AUTO;
   this.borderVisible = true;
   this.mainBox = false;
@@ -215,12 +216,8 @@ scout.GroupBox.prototype._setBodyLayoutConfig = function(bodyLayoutConfig) {
 };
 
 scout.GroupBox.prototype._renderBodyLayoutConfig = function() {
-  this.htmlBody.layout.hgap = this.bodyLayoutConfig.hgap;
-  this.htmlBody.layout.vgap = this.bodyLayoutConfig.vgap;
-  this.htmlBody.layout.columnWidth = this.bodyLayoutConfig.columnWidth;
-  this.htmlBody.layout.rowHeight = this.bodyLayoutConfig.rowHeight;
   var oldMinWidth = this.htmlBody.layout.minWidth;
-  this.htmlBody.layout.minWidth = this.bodyLayoutConfig.minWidth;
+  this.bodyLayoutConfig.applyToLayout(this.htmlBody.layout);
   if (oldMinWidth !== this.bodyLayoutConfig.minWidth) {
     this._renderScrollable();
   }

@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.LogicalGridLayoutConfig;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 
 public interface IRadioButtonGroup<T> extends IValueField<T>, ICompositeField {
@@ -32,6 +33,8 @@ public interface IRadioButtonGroup<T> extends IValueField<T>, ICompositeField {
    * configured height of the field.
    */
   int DEFAULT_GRID_COLUMN_COUNT = -1;
+
+  String PROP_LAYOUT_CONFIG = "layoutConfig";
 
   /**
    * @return the buttons controlled by this radio button group
@@ -79,4 +82,8 @@ public interface IRadioButtonGroup<T> extends IValueField<T>, ICompositeField {
    *         group. {@code false} if it was already set to this value and nothing was updated.
    */
   boolean setGridColumnCount(int c);
+
+  void setLayoutConfig(LogicalGridLayoutConfig config);
+
+  LogicalGridLayoutConfig getLayoutConfig();
 }

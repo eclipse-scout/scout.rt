@@ -429,11 +429,13 @@
   __include("scout/form/fields/radiobutton/RadioButtonGroup.js");
   __include("scout/form/fields/radiobutton/RadioButtonGroupAdapter.js");
   __include("scout/form/fields/radiobutton/RadioButtonGroupGridConfig.js");
+  __include("scout/form/fields/radiobutton/RadioButtonGroupLayoutConfig.js");
   __include("scout/form/fields/radiobutton/RadioButtonGroupLeftKeyStroke.js");
   __include("scout/form/fields/radiobutton/RadioButtonGroupRightKeyStroke.js");
   __include("scout/form/fields/radiobutton/RadioButtonKeyStroke.js");
   __include("scout/form/fields/sequencebox/SequenceBox.js");
   __include("scout/form/fields/sequencebox/SequenceBoxGridConfig.js");
+  __include("scout/form/fields/sequencebox/SequenceBoxLayoutConfig.js");
   __include("scout/form/fields/sequencebox/SequenceBoxAdapter.js");
   __include("scout/form/fields/slider/SliderField.js");
   __include("scout/form/fields/smartfield/SmartField.js");

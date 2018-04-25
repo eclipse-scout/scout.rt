@@ -47,7 +47,9 @@
       "updateDisplayTextOnModify": false
     },
     "ValueField": {
-      "displayText": ""
+      "clearable": "focused",
+      "displayText": "",
+      "statusMenuMappings": []
     },
     "Action": {
       "enabled": true,
@@ -75,6 +77,17 @@
       "keyStroke": null,
       "statusVisible": false,
       "preventDoubleClick": false
+    },
+    "RadioButtonGroup": {
+      "clearable": "never",
+      "gridColumnCount": -1,
+      "layoutConfig": {
+        "hgap": -1,
+        "vgap": -1,
+        "columnWidth": -1,
+        "rowHeight": -1,
+        "minWidth": 0
+      }
     },
     "CheckBoxField": {
       "triStateEnabled": false
@@ -138,7 +151,14 @@
       "wrapText": false
     },
     "SequenceBox": {
-      "fields": []
+      "fields": [],
+      "layoutConfig": {
+        "hgap": -1,
+        "vgap": -1,
+        "columnWidth": -1,
+        "rowHeight": -1,
+        "minWidth": 0
+      }
     },
     "SmartFieldMultiline": {
     },

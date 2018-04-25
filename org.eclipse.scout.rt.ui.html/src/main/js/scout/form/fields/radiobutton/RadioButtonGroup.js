@@ -12,6 +12,7 @@ scout.RadioButtonGroup = function() {
   scout.RadioButtonGroup.parent.call(this);
   this._addWidgetProperties('fields');
   this.logicalGrid = scout.create('scout.HorizontalGrid');
+  this.layoutConfig = null;
   this.fields = [];
   this.radioButtons = [];
   this.gridColumnCount = scout.RadioButtonGroup.DEFAULT_GRID_COLUMN_COUNT;
@@ -27,6 +28,7 @@ scout.RadioButtonGroup.DEFAULT_GRID_COLUMN_COUNT = -1;
 scout.RadioButtonGroup.prototype._init = function(model) {
   scout.RadioButtonGroup.parent.prototype._init.call(this, model);
 
+  this._setLayoutConfig(this.layoutConfig);
   this.fields.forEach(function(formField) {
     if (formField instanceof scout.RadioButton) {
       this.radioButtons.push(formField);
@@ -56,6 +58,10 @@ scout.RadioButtonGroup.prototype._initButton = function(button) {
   }
 };
 
+scout.RadioButtonGroup.prototype._createBodyLayout = function() {
+  return new scout.LogicalGridLayout(this, this.layoutConfig);
+};
+
 /**
  * @override Widgets.js
  */
@@ -72,6 +78,24 @@ scout.RadioButtonGroup.prototype._setLogicalGrid = function(logicalGrid) {
 scout.RadioButtonGroup.prototype.invalidateLogicalGrid = function(invalidateLayout) {
   scout.RadioButtonGroup.parent.prototype.invalidateLogicalGrid.call(this, false);
   if (scout.nvl(invalidateLayout, true) && this.rendered) {
+    this.htmlBody.invalidateLayoutTree();
+  }
+};
+
+scout.RadioButtonGroup.prototype.setLayoutConfig = function(layoutConfig) {
+  this.setProperty('layoutConfig', layoutConfig);
+};
+
+scout.RadioButtonGroup.prototype._setLayoutConfig = function(layoutConfig) {
+  if (!layoutConfig) {
+    layoutConfig = new scout.RadioButtonGroupLayoutConfig();
+  }
+  this._setProperty('layoutConfig', scout.RadioButtonGroupLayoutConfig.ensure(layoutConfig));
+};
+
+scout.RadioButtonGroup.prototype._renderLayoutConfig = function() {
+  this.layoutConfig.applyToLayout(this.htmlBody.layout);
+  if (this.rendered) {
     this.htmlBody.invalidateLayoutTree();
   }
 };
@@ -117,10 +141,7 @@ scout.RadioButtonGroup.prototype._render = function() {
 
   this.$body = this.$container.appendDiv('radiobutton-group-body');
   this.htmlBody = scout.HtmlComponent.install(this.$body, this.session);
-  this.htmlBody.setLayout(new scout.LogicalGridLayout(this, {
-    hgap: env.smallColumnGap,
-    vgap: env.formRowGap
-  }));
+  this.htmlBody.setLayout(this._createBodyLayout());
 
   this.fields.forEach(function(formField) {
     formField.render(this.$body);
@@ -133,6 +154,11 @@ scout.RadioButtonGroup.prototype._render = function() {
 
   this.addField(this.$body);
   this.addStatus();
+};
+
+scout.RadioButtonGroup.prototype._renderProperties = function() {
+  scout.RadioButtonGroup.parent.prototype._renderProperties.call(this);
+  this._renderLayoutConfig();
 };
 
 /**
