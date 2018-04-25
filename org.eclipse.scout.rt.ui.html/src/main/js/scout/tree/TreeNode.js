@@ -12,26 +12,28 @@
  * @class
  */
 scout.TreeNode = function(tree) {
-  this.$node; // TODO [7.0] awe, cgu: properties without assignment do not exist after ctor call, use better initial values everywhere?
+  this.$node = null;
   this.$text = null;
   this.attached = false;
   this.checked = false;
   this.childNodes = [];
   this.childrenLoaded = false;
+  this.destroyed = false;
   this.enabled = true;
   this.expanded = false;
   this.expandedLazy = false;
   this.filterAccepted = true;
-  this.filterDirty;
-  this.id;
-  this.initialized;
+  this.filterDirty = false;
+  this.id = null;
+  this.initialized = false;
   this.lazyExpandingEnabled = false;
   this.leaf = false;
   this.level = 0;
-  this.parentNode;
-  this.destroyed = false;
+  this.parent = null;
+  this.parentNode = undefined;
   this.rendered = false;
-  this.text;
+  this.session = null;
+  this.text = null;
 
   /**
    * This internal variable stores the promise which is used when a loadChildren() operation is in progress.
@@ -86,7 +88,7 @@ scout.TreeNode.prototype.hasChildNodes = function() {
 scout.TreeNode.prototype.reset = function() {
   if (this.$node) {
     this.$node.remove();
-    delete this.$node;
+    this.$node = null;
   }
   this.rendered = false;
   this.attached = false;

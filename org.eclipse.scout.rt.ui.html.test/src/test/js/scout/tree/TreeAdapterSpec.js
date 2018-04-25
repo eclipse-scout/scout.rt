@@ -174,7 +174,7 @@ describe("TreeAdapter", function() {
 
       expect(node0.expanded).toBe(false);
       expect(child0.expanded).toBe(false);
-      expect(child0.$node).toBeUndefined();
+      expect(child0.$node).toBe(null);
 
       tree.selectNodes([grandchild0]);
       expect(node0.expanded).toBe(true);

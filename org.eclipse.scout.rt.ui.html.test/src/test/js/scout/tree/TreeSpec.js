@@ -181,7 +181,7 @@ describe("Tree", function() {
 
       //Check that no dom manipulation happened
       expect(helper.findAllNodes(tree).length).toBe(9);
-      expect(node0.childNodes[3].$node).toBeUndefined();
+      expect(node0.childNodes[3].$node).toBe(null);
     });
 
     it("expands the parent if parent.expanded = true and the new inserted nodes are the first child nodes", function() {
@@ -589,7 +589,7 @@ describe("Tree", function() {
 
         tree.deleteNodes([node2Child0], node2);
         expect(helper.findAllNodes(tree).length).toBe(35);
-        expect(node2Child0.$node).toBeUndefined();
+        expect(node2Child0.$node).toBe(null);
 
         expect(node0.$node).toBeDefined();
         expect(node0.childNodes[0].$node).toBeDefined();
@@ -690,11 +690,11 @@ describe("Tree", function() {
 
         tree.deleteNodes([node0]);
         expect(tree.visibleNodesFlat.length).toBe(26);
-        expect(node0.$node).toBeUndefined();
+        expect(node0.$node).toBe(null);
         expect(tree.nodes.indexOf(node0)).toBe(-1);
-        expect(node0.childNodes[0].$node).toBeUndefined();
-        expect(node0.childNodes[1].$node).toBeUndefined();
-        expect(node0.childNodes[2].$node).toBeUndefined();
+        expect(node0.childNodes[0].$node).toBe(null);
+        expect(node0.childNodes[1].$node).toBe(null);
+        expect(node0.childNodes[2].$node).toBe(null);
       });
 
       describe("deleting a collapsed root node", function() {
@@ -715,11 +715,11 @@ describe("Tree", function() {
 
           tree.deleteNodes([node0]);
           expect(helper.findAllNodes(tree).length).toBe(26);
-          expect(node0.$node).toBeUndefined();
+          expect(node0.$node).toBe(null);
           expect(tree.nodes.indexOf(node0)).toBe(-1);
-          expect(node0.childNodes[0].$node).toBeUndefined();
-          expect(node0.childNodes[1].$node).toBeUndefined();
-          expect(node0.childNodes[2].$node).toBeUndefined();
+          expect(node0.childNodes[0].$node).toBe(null);
+          expect(node0.childNodes[1].$node).toBe(null);
+          expect(node0.childNodes[2].$node).toBe(null);
         });
       });
     });
@@ -799,9 +799,9 @@ describe("Tree", function() {
 
       //Check that children are removed, parent must still exist
       expect(node1.$node).toBeDefined();
-      expect(node1Child0.$node).toBeUndefined();
-      expect(node1Child1.$node).toBeUndefined();
-      expect(node1Child2.$node).toBeUndefined();
+      expect(node1Child0.$node).toBe(null);
+      expect(node1Child1.$node).toBe(null);
+      expect(node1Child2.$node).toBe(null);
     });
 
   });
@@ -1158,7 +1158,7 @@ describe("Tree", function() {
 
       expect(node0.expanded).toBe(false);
       expect(child0.expanded).toBe(false);
-      expect(child0.$node).toBeUndefined();
+      expect(child0.$node).toBe(null);
 
       tree.selectNodes([grandchild0]);
       expect(node0.expanded).toBe(true);
