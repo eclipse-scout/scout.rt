@@ -31,6 +31,7 @@ scout.inherits(scout.Group, scout.Widget);
 
 scout.Group.prototype._init = function(model) {
   scout.Group.parent.prototype._init.call(this, model);
+  this.resolveIconIds(['iconId']);
   this._setBody(this.body);
 };
 

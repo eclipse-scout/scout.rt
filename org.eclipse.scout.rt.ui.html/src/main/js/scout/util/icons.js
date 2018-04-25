@@ -137,8 +137,8 @@ scout.icons = {
    * Resolves the value of an iconId property, where the value can contain a reference to
    * an icon constant in these formats:
    * <ul>
-   *   <li><code>${iconId:ANGLE_UP}</code> references constant scout.icon.ANGLE_UP</li>
-   *   <li><code>${iconId:foo.BAR}</code> references constant foo.icon.BAR, this is used for custom objects with icon constants</li>
+   *   <li><code>${iconId:ANGLE_UP}</code> references constant scout.icons.ANGLE_UP</li>
+   *   <li><code>${iconId:foo.BAR}</code> references constant foo.icons.BAR, this is used for custom objects with icon constants</li>
    * </ul>
    * @param {string} value
    * @returns {string}
@@ -160,6 +160,26 @@ scout.icons = {
       }
     }
     return value;
+  },
+
+  /**
+   * Resolves the value of an iconId property, where the value can contain a reference to
+   * an icon constant in these formats:
+   * <ul>
+   *   <li><code>${iconId:ANGLE_UP}</code> references constant scout.icons.ANGLE_UP</li>
+   *   <li><code>${iconId:foo.BAR}</code> references constant foo.icons.BAR, this is used for custom objects with icon constants</li>
+   * </ul>
+   * @param object object having an icon property which contains a iconId
+   * @param {string} iconProperty name of the property where an iconId placeholder should be replaced by the actual iconId. By default 'iconId' is used as property name.
+   * @returns {string}
+   */
+  resolveIconProperty: function(object, iconProperty) {
+    iconProperty = iconProperty || 'iconId';
+    var value = object[iconProperty];
+    var newValue = this.resolveIconId(value);
+    if (newValue !== value) {
+      object[iconProperty] = newValue;
+    }
   }
 
 };

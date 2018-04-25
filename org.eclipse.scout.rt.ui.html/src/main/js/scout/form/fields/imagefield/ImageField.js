@@ -18,10 +18,11 @@ scout.inherits(scout.ImageField, scout.FormField);
 scout.ImageField.prototype._init = function(model) {
   scout.ImageField.parent.prototype._init.call(this, model);
 
+  this.resolveIconIds(['imageUrl']);
   this.icon = scout.create('Icon', {
     parent: this,
-    iconDesc: model.imageUrl,
-    autoFit: model.autoFit,
+    iconDesc: this.imageUrl,
+    autoFit: this.autoFit,
     prepend: true
   });
   this.icon.on('load', this._onImageLoad.bind(this));

@@ -1301,7 +1301,7 @@ scout.Widget.prototype.resolveTextKeys = function(properties) {
 
 scout.Widget.prototype.resolveIconIds = function(properties) {
   properties.forEach(function(property) {
-    this[property] = scout.icons.resolveIconId(this[property]);
+    scout.icons.resolveIconProperty(this, property);
   }, this);
 };
 

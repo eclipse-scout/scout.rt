@@ -59,7 +59,6 @@ scout.Column.prototype.init = function(model) {
   if (this.initialWidth === undefined) {
     this.initialWidth = scout.nvl(this.width, 0);
   }
-  scout.texts.resolveTextProperty(this);
   this._init(model);
   this.initialized = true;
 };
@@ -68,6 +67,8 @@ scout.Column.prototype.init = function(model) {
  * Override this function in order to implement custom init logic.
  */
 scout.Column.prototype._init = function(model) {
+  scout.texts.resolveTextProperty(this, 'text');
+  scout.icons.resolveIconProperty(this, 'headerIconId');
   this._setDisplayable(this.displayable);
   this._setAutoOptimizeWidth(this.autoOptimizeWidth);
 };

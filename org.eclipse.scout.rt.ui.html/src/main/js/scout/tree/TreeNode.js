@@ -41,7 +41,6 @@ scout.TreeNode = function(tree) {
 
 scout.TreeNode.prototype.init = function(model) {
   this._init(model);
-  scout.texts.resolveTextProperty(this, 'text', this.parent.session);
 };
 
 scout.TreeNode.prototype.destroy = function() {
@@ -70,6 +69,9 @@ scout.TreeNode.prototype._init = function(model) {
 
   $.extend(this, model);
   scout.defaultValues.applyTo(this);
+
+  scout.texts.resolveTextProperty(this, 'text');
+  scout.icons.resolveIconProperty(this, 'iconId');
 
   // make sure all child nodes are TreeNodes too
   if (this.hasChildNodes()) {

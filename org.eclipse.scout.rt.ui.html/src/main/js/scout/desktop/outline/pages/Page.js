@@ -72,6 +72,7 @@ scout.Page.prototype.createDetailForm = function() {
  */
 scout.Page.prototype._init = function(model) {
   scout.Page.parent.prototype._init.call(this, model);
+  scout.icons.resolveIconProperty(this, 'overviewIconId');
   this._internalInitTable();
   this._internalInitDetailForm();
 };

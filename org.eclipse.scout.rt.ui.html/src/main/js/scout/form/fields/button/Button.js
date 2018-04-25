@@ -48,6 +48,7 @@ scout.Button.SUBMENU_ICON = scout.icons.ANGLE_DOWN_BOLD;
 
 scout.Button.prototype._init = function(model) {
   scout.Button.parent.prototype._init.call(this, model);
+  this.resolveIconIds(['iconId']);
   this._setKeyStroke(this.keyStroke);
   this._setKeyStrokeScope(this.keyStrokeScope);
 };
