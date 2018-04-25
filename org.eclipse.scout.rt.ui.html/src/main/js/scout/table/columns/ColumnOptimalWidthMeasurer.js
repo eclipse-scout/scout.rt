@@ -128,7 +128,10 @@ scout.ColumnOptimalWidthMeasurer.prototype._appendToMeasurement = function($calc
   }.bind(this));
 
   // Append to measurement element
-  $calc.removeAttr('style').appendTo(this.$measurement);
+  $calc.css({
+    minWidth: '',
+    maxWidth: ''
+  }).appendTo(this.$measurement);
 };
 
 scout.ColumnOptimalWidthMeasurer.prototype._onImageLoadOrError = function(event) {
