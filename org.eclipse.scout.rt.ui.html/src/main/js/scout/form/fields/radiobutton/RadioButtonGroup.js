@@ -133,8 +133,6 @@ scout.RadioButtonGroup.prototype.activate = function() {
 };
 
 scout.RadioButtonGroup.prototype._render = function() {
-  var env = scout.HtmlEnvironment;
-
   this.addContainer(this.$parent, 'radiobutton-group');
   this.addLabel();
   this.addMandatoryIndicator();
