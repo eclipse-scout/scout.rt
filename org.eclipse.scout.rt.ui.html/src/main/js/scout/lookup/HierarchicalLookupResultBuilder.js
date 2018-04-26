@@ -47,7 +47,9 @@ scout.HierarchicalLookupResultBuilder.prototype._addParent = function(lookupRow)
   }
 
   // load parent and add it to the map
-  return this.lookupCall.getByKey(key)
+  return this.lookupCall
+    .cloneForKey(key)
+    .execute()
     .then(function(result) {
       var lookupRow = scout.LookupCall.firstLookupRow(result);
       this._lookupRowMap[lookupRow.key] = lookupRow;
@@ -80,7 +82,9 @@ scout.HierarchicalLookupResultBuilder.prototype.addChildLookupRows = function(lo
  * @returns {Promise}
  */
 scout.HierarchicalLookupResultBuilder.prototype._addChildren = function(lookupRow) {
-  return this.lookupCall.getByRec(lookupRow.key)
+  return this.lookupCall
+    .cloneForRec(lookupRow.key)
+    .execute()
     .then(function(result) {
       if (result.lookupRows.length) {
         return this.addChildLookupRows(result.lookupRows);

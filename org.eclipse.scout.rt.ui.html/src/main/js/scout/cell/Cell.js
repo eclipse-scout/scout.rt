@@ -9,26 +9,22 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 /**
- * Note: this class does intentionally NOT set any default values in the constructor.
- * This is required because there's a subtle logic in Column.js which checks if a value is set in a Cell instance
- * and, if not, uses the value from the Column. This class is tightly coupled with Columns.js.
- *
  * @class
  * @constructor
  */
 scout.Cell = function() {
-  this.$cell;
-  this.cssClass;
-  this.editable;
-  this.errorStatus;
-  this.horizontalAlignment;
-  this.htmlEnabled;
-  this.iconId;
-  this.mandatory;
-  this._cachedEncodedText;
-  this.text;
-  this.value;
-  this.tooltipText;
+  this.$cell = null;
+  this.cssClass = null;
+  this.editable = null; /* do not initialize with false. This is required because there's a subtle logic in Column.js (_initCell) which checks if a value is set. */
+  this.errorStatus = null;
+  this.horizontalAlignment = null; /* do not initialize with -1. This is required because there's a subtle logic in Column.js (_initCell) which checks if a value is set. */
+  this.htmlEnabled = null; /* do not initialize with false. This is required because there's a subtle logic in Column.js (_initCell) which checks if a value is set. */
+  this.iconId = null;
+  this.mandatory = null;  /* do not initialize with false. This is required because there's a subtle logic in Column.js (_initCell) which checks if a value is set. */
+  this._cachedEncodedText = null;
+  this.text = null;
+  this.value = null;
+  this.tooltipText = null;
 };
 
 scout.Cell.prototype.init = function(model) {
@@ -42,6 +38,10 @@ scout.Cell.prototype._init = function(model) {
 scout.Cell.prototype.update = function(model) {
   this.setText(model.text);
   $.extend(this, model);
+};
+
+scout.Cell.prototype.setEditable = function(editable) {
+  this.editable = editable;
 };
 
 scout.Cell.prototype.setValue = function(value) {

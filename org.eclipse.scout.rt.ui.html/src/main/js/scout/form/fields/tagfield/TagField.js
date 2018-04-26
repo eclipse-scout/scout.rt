@@ -17,6 +17,7 @@ scout.TagField = function() {
   this.$overflowIcon = null;
   this.overflow = null;
   this.chooser = null;
+  this._currentLookupCall = null;
 };
 scout.inherits(scout.TagField, scout.ValueField);
 
@@ -91,8 +92,8 @@ scout.TagField.prototype._setLookupCall = function(lookupCall) {
 
 scout.TagField.prototype._makeTagElement = function($parent, tagText, clickHandler) {
   var $element = this.$fieldContainer
-      .makeDiv('tag-element')
-      .data('tag', tagText);
+    .makeDiv('tag-element')
+    .data('tag', tagText);
   $element.appendSpan('tag-text', tagText);
   if (this.enabledComputed) {
     $element.appendSpan('tag-remove-icon')
@@ -108,19 +109,24 @@ scout.TagField.prototype.formatValue = function(value) {
   return '';
 };
 
+/**
+ * @override ValueField.js
+ */
+scout.TagField.prototype._validateValue = function(value) {
+  var tags = scout.arrays.ensure(value);
+  var result = [];
+  tags.forEach(function(tag) {
+    if (!scout.strings.empty(tag) && result.indexOf(tag) < 0) {
+      result.push(tag.toLowerCase());
+    }
+  });
+  return result;
+};
+
 scout.TagField.prototype._parseValue = function(displayText) {
   var tags = scout.arrays.ensure(this.value);
-
-  if (scout.strings.empty(displayText)) {
-    return tags;
-  }
-  var tag = displayText.toLowerCase();
-  if (tags.indexOf(tag) > -1) {
-    return tags;
-  }
-
   tags = tags.slice();
-  tags.push(tag);
+  tags.push(displayText);
   return tags;
 };
 
@@ -263,8 +269,8 @@ scout.TagField.prototype._renderOverflowVisible = function() {
     }
   } else {
     if (this.$overflowIcon) {
-     this.$overflowIcon.remove();
-     this.$overflowIcon = null;
+      this.$overflowIcon.remove();
+      this.$overflowIcon = null;
     }
   }
 };
@@ -314,7 +320,16 @@ scout.TagField.prototype._lookupByText = function(text) {
   if (scout.strings.empty(text) || text.length < 2) {
     return;
   }
-  return this.lookupCall.getByText(text)
+
+  this._currentLookupCall = this.lookupCall.cloneForText(text);
+  this.trigger('prepareLookupCall', {
+    lookupCall: this._currentLookupCall
+  });
+  return this._currentLookupCall
+    .execute()
+    .always(function() {
+      this._currentLookupCall = null;
+    }.bind(this))
     .done(this._onLookupDone.bind(this));
 };
 
@@ -437,12 +452,13 @@ scout.TagField.prototype.visibleTags = function() {
   if (!this.rendered) {
     return [];
   }
-  var tags = [], that = this;
+  var tags = [],
+    that = this;
   this.$fieldContainer
     .find('.tag-element:not(.hidden)')
     .each(function() {
       tags.push(that.getTagData($(this)));
-     });
+    });
   return tags;
 };
 

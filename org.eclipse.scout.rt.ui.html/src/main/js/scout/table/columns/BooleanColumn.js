@@ -127,7 +127,7 @@ scout.BooleanColumn.prototype._toggleCellValue = function(row, cell) {
 /**
  * @override
  */
-scout.BooleanColumn.prototype._createDefaultEditor = function(row) {
+scout.BooleanColumn.prototype._createEditor = function(row) {
   return scout.create('CheckBoxField', {
     parent: this.table
   });

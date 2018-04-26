@@ -28,7 +28,14 @@ scout.SmartFieldAdapter.prototype._postCreateWidget = function() {
 };
 
 scout.SmartFieldAdapter.prototype._syncResult = function(result) {
-  this.widget.lookupCall.resolveLookup(result);
+  var executedLookupCall = this.widget._currentLookupCall;
+  if (!executedLookupCall && this.widget.touch && this.widget.popup && this.widget.popup._field) {
+    // in case lookupCall is executed from within the popup (touch):
+    executedLookupCall = this.widget.popup._field._currentLookupCall;
+  }
+  if (executedLookupCall) {
+    executedLookupCall.resolveLookup(result);
+  }
 };
 
 // When displayText comes from the server we don't must not call parseAndSetValue here.

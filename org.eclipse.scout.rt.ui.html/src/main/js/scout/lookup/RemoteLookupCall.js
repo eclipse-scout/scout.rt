@@ -20,25 +20,25 @@ scout.inherits(scout.RemoteLookupCall, scout.LookupCall);
  *
  * @returns {Promise} which returns {scout.LookupRow}s
  */
-scout.RemoteLookupCall.prototype.getAll = function() {
+scout.RemoteLookupCall.prototype._getAll = function() {
   this._newDeferred(new scout.RemoteLookupRequest(scout.QueryBy.ALL));
   this.adapter.sendLookup(scout.QueryBy.ALL);
   return this.deferred.promise();
 };
 
-scout.RemoteLookupCall.prototype.getByText = function(text) {
+scout.RemoteLookupCall.prototype._getByText = function(text) {
   this._newDeferred(new scout.RemoteLookupRequest(scout.QueryBy.TEXT, text));
   this.adapter.sendLookup(scout.QueryBy.TEXT, text);
   return this.deferred.promise();
 };
 
-scout.RemoteLookupCall.prototype.getByKey = function(key) {
+scout.RemoteLookupCall.prototype._getByKey = function(key) {
   this._newDeferred(new scout.RemoteLookupRequest(scout.QueryBy.KEY, key));
   this.adapter.sendLookup(scout.QueryBy.KEY, key);
   return this.deferred.promise();
 };
 
-scout.RemoteLookupCall.prototype.getByRec = function(rec) {
+scout.RemoteLookupCall.prototype._getByRec = function(rec) {
   this._newDeferred(new scout.RemoteLookupRequest(scout.QueryBy.REC, rec));
   this.adapter.sendLookup(scout.QueryBy.REC, rec);
   return this.deferred.promise();

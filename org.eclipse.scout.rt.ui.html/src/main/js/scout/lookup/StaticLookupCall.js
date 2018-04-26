@@ -45,7 +45,7 @@ scout.StaticLookupCall.prototype.refreshData = function(data) {
   }
 };
 
-scout.StaticLookupCall.prototype.getAll = function() {
+scout.StaticLookupCall.prototype._getAll = function() {
   var deferred = $.Deferred();
   setTimeout(this._queryByAll.bind(this, deferred), this.delay);
   return deferred.promise();
@@ -59,7 +59,7 @@ scout.StaticLookupCall.prototype._queryByAll = function(deferred) {
   });
 };
 
-scout.StaticLookupCall.prototype.getByText = function(text) {
+scout.StaticLookupCall.prototype._getByText = function(text) {
   var deferred = $.Deferred();
   setTimeout(this._queryByText.bind(this, deferred, text), this.delay);
   return deferred.promise();
@@ -106,7 +106,7 @@ scout.StaticLookupCall.prototype._queryByText = function(deferred, text) {
     });
 };
 
-scout.StaticLookupCall.prototype.getByKey = function(key) {
+scout.StaticLookupCall.prototype._getByKey = function(key) {
   var deferred = $.Deferred();
   setTimeout(this._queryByKey.bind(this, deferred, key), this.delay);
   return deferred.promise();
@@ -126,7 +126,7 @@ scout.StaticLookupCall.prototype._queryByKey = function(deferred, key) {
   }
 };
 
-scout.StaticLookupCall.prototype.getByRec = function(rec) {
+scout.StaticLookupCall.prototype._getByRec = function(rec) {
   var deferred = $.Deferred();
   setTimeout(this._queryByRec.bind(this, deferred, rec), this.delay);
   return deferred.promise();

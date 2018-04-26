@@ -35,6 +35,7 @@ scout.SmartField = function() {
   this._notUnique = false; // used to store the error state 'not unique' which must not be showed while typing, but when the field loses focus
   this._lastSearchText = null;
   this.lookupStatus = null;
+  this._currentLookupCall = null;
   this.lookupSeqNo = 0; // used to detect if the proposal chooser contains the results of the latest lookup, or an out-dated result.
                         // only when the result is up-to-date, we can use the selected lookup row
 
@@ -315,7 +316,7 @@ scout.SmartField.prototype._firstTextLine = function(text) {
 scout.SmartField.prototype._acceptByText = function(searchText) {
   $.log.isDebugEnabled() && $.log.debug('(SmartField#_acceptByText) searchText=', searchText);
   this._lastSearchText = searchText;
-  this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText))
+  this._executeLookup(this.lookupCall.cloneForText(searchText), true)
     .done(this._acceptByTextDone.bind(this));
   this._triggerAcceptByText(searchText);
 };
@@ -448,7 +449,7 @@ scout.SmartField.prototype._acceptInputFail = function(result) {
 scout.SmartField.prototype.lookupByRec = function(rec) {
   $.log.isDebugEnabled() && $.log.debug('(SmartField#lookupByRec) rec=', rec);
   this._lastSearchText = null;
-  return this._executeLookup(this.lookupCall.getByRec.bind(this.lookupCall, rec))
+  return this._executeLookup(this.lookupCall.cloneForRec(rec))
     .then(function(result) {
 
       // Since this function is only used for hierarchical trees we
@@ -526,7 +527,7 @@ scout.SmartField.prototype._formatValue = function(value) {
   // we must do a lookup first to get the display text
   // Note: this has a side-effect as it sets the property lookupRow on the smart field
   this._lastSearchText = null;
-  return this._executeLookup(this.lookupCall.getByKey.bind(this.lookupCall, value))
+  return this._executeLookup(this.lookupCall.cloneForKey(value), true)
     .then(this._lookupByKeyDone.bind(this));
 };
 
@@ -634,7 +635,7 @@ scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText) {
         code: scout.SmartField.ErrorCode.SEARCH_REQUIRED
       }));
     } else {
-      this._executeLookup(this.lookupCall.getAll.bind(this.lookupCall))
+      this._executeLookup(this.lookupCall.cloneForAll(), true)
         .done(doneHandler);
     }
   } else {
@@ -642,7 +643,7 @@ scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText) {
     this._pendingLookup = setTimeout(function() {
       $.log.isDebugEnabled() && $.log.debug('(SmartField#_lookupByTextOrAll) lookup byText searchText=' + searchText);
       this._lastSearchText = searchText;
-      this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText))
+      this._executeLookup(this.lookupCall.cloneForText(searchText), true)
         .done(doneHandler);
     }.bind(this), scout.SmartField.DEBOUNCE_DELAY);
   }
@@ -1092,6 +1093,7 @@ scout.SmartField.prototype.setBrowseAutoExpandAll = function(browseAutoExpandAll
 scout.SmartField.prototype.setBrowseLoadIncremental = function(browseLoadIncremental) {
   this.setProperty('browseLoadIncremental', browseLoadIncremental);
   if (this.lookupCall) {
+    // change template here. Will be used on the next clone
     this.lookupCall.setLoadIncremental(browseLoadIncremental);
   }
 };
@@ -1111,13 +1113,24 @@ scout.SmartField.prototype.setSearchRequired = function(searchRequired) {
 /**
  * A wrapper function around lookup calls used to set the _lookupInProgress flag, and display the state in the UI.
  */
-scout.SmartField.prototype._executeLookup = function(lookupFunc) {
+scout.SmartField.prototype._executeLookup = function(lookupCall, abortExisting) {
   this.lookupSeqNo++;
   this._lookupInProgress = true;
   this.setLoading(true);
-  return lookupFunc()
+
+  if (abortExisting && this._currentLookupCall) {
+    this._currentLookupCall.abort();
+  }
+  this._currentLookupCall = lookupCall;
+  this.trigger('prepareLookupCall', {
+    lookupCall: lookupCall
+  });
+
+  return lookupCall
+    .execute()
     .always(function() {
       this._lookupInProgress = false;
+      this._currentLookupCall = null;
       this.setLoading(false);
       this._clearLookupStatus();
     }.bind(this));

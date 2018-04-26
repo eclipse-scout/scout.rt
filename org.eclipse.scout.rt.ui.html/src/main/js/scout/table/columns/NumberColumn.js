@@ -254,3 +254,12 @@ scout.NumberColumn.prototype._barChart = function(value) {
     backgroundImage: 'linear-gradient(to left, ' + color + ' 0%, ' + color + ' ' + level + '%, transparent ' + level + '%, transparent 100% )'
   };
 };
+
+/**
+ * @override Column.js
+ */
+scout.NumberColumn.prototype._createEditor = function() {
+  return scout.create('NumberField', {
+    parent: this.table
+  });
+};

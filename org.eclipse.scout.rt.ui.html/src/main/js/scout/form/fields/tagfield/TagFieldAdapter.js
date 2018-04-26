@@ -26,7 +26,9 @@ scout.TagFieldAdapter.prototype._postCreateWidget = function() {
 };
 
 scout.TagFieldAdapter.prototype._syncResult = function(result) {
-  this.widget.lookupCall.resolveLookup(result);
+  if(this.widget._currentLookupCall) {
+    this.widget._currentLookupCall.resolveLookup(result);
+  }
 };
 
 // FIXME [awe] copy/paste from SmartFieldAdapter, move to helper?

@@ -69,12 +69,24 @@ describe('TagField', function() {
 
   describe('tag lookup', function() {
 
-    it('start a lookup call when typing', function() {
+    it('start and prepare a lookup call clone when typing', function() {
+      var templatePropertyValue = 11;
+      var preparedPropertyValue = 22;
+      var eventCounter = 0;
       field = scout.create('TagField', {
         parent: session.desktop,
         lookupCall: {
-          objectType: 'DummyLookupCall'
+          objectType: 'DummyLookupCall',
+          customProperty: templatePropertyValue
         }
+      });
+      field.on('prepareLookupCall', function(event) {
+        expect(event.lookupCall.customProperty).toBe(templatePropertyValue);
+        expect(event.lookupCall.id).not.toBe(field.lookupCall.id);
+        expect(event.type).toBe('prepareLookupCall');
+        expect(event.source).toBe(field);
+
+        eventCounter++;
       });
 
       expect(field.lookupCall instanceof scout.DummyLookupCall).toBe(true);
@@ -92,6 +104,7 @@ describe('TagField', function() {
       // expect popup is open and has 2 lookup rows (Bar, Baz)
       expect(field.chooser instanceof scout.TagChooserPopup).toBe(true);
       expect(field.chooser.table.rows.length).toBe(2);
+      expect(eventCounter).toBe(1);
     });
 
   });

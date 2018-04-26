@@ -1671,7 +1671,7 @@ scout.Table.prototype.prepareCellEdit = function(column, row, openFieldPopupOnCe
  */
 scout.Table.prototype.prepareCellEditInternal = function(column, row, openFieldPopupOnCellEdit) {
   this.openFieldPopupOnCellEdit = scout.nvl(openFieldPopupOnCellEdit, false);
-  var field = column.createDefaultEditor(row);
+  var field = column.createEditor(row);
   this.startCellEdit(column, row, field);
 };
 

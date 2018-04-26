@@ -84,7 +84,7 @@ scout.SmartColumn.prototype._formatValue = function(value) {
   return this.lookupCall.textByKey(value);
 };
 
-scout.SmartColumn.prototype._createDefaultEditor = function() {
+scout.SmartColumn.prototype._createEditor = function() {
   return scout.create('SmartField', {
     parent: this.table,
     codeType: this.codeType,

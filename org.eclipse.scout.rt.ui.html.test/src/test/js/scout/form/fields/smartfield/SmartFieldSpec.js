@@ -287,6 +287,43 @@ describe('SmartField', function() {
 
   });
 
+  describe('lookupCall', function() {
+
+    it('should be cloned and prepared for each lookup', function() {
+      var templatePropertyValue = 11;
+      var preparedPropertyValue = 22;
+      var eventCounter = 0;
+      var field = createFieldWithLookupCall({}, {
+        customProperty: templatePropertyValue,
+        _dataToLookupRow: function(data) { // overwrite mapping function to use the custom property
+          return new scout.LookupRow(data[0], data[1] + this.customProperty);
+        }
+      });
+      field.on('prepareLookupCall', function(event) {
+        expect(event.lookupCall.customProperty).toBe(templatePropertyValue);
+        expect(event.lookupCall.id).not.toBe(field.lookupCall.id);
+        expect(event.type).toBe('prepareLookupCall');
+        expect(event.source).toBe(field);
+
+        event.lookupCall.customProperty = preparedPropertyValue; // change property for this call. Must not have any effect on the next call
+        eventCounter++;
+      });
+
+      field.setValue(1); // triggers lookup call by key
+      jasmine.clock().tick(500);
+      expect(field.value).toBe(1);
+      expect(field.displayText).toBe('Foo' + preparedPropertyValue);
+
+      field._acceptByText('Bar'); // triggers lookup call by text
+      jasmine.clock().tick(500);
+      expect(field.value).toBe(2);
+      expect(field.displayText).toBe('Bar' + preparedPropertyValue);
+
+      expect(eventCounter).toBe(2);
+    });
+
+  });
+
   describe('lookup', function() {
 
     it('should increase lookupSeqNo when a lookup is executed', function() {
@@ -321,8 +358,7 @@ describe('SmartField', function() {
       });
       field.setLookupStatus(lookupStatus);
       field.setErrorStatus(errorStatus);
-      var getByKeyFunc = field.lookupCall.getByKey.bind(field.lookupCall, 1);
-      field._executeLookup(getByKeyFunc);
+      field._executeLookup(field.lookupCall.cloneForKey(1));
       jasmine.clock().tick(500);
       expect(field.errorStatus).toBe(errorStatus);
       expect(field.lookupStatus).toBe(null);

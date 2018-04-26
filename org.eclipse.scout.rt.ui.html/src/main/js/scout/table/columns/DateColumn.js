@@ -71,3 +71,14 @@ scout.DateColumn.prototype.cellTextForGrouping = function(row) {
   var val = this.table.cellValue(this, row);
   return this.groupFormat.format(val);
 };
+
+/**
+ * @override Column.js
+ */
+scout.DateColumn.prototype._createEditor = function() {
+  return scout.create('DateField', {
+    parent: this.table,
+    hasDate: this.hasDate,
+    hasTime: this.hasTime
+  });
+};

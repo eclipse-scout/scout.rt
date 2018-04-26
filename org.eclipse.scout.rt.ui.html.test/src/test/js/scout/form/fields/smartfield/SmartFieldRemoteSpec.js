@@ -39,7 +39,8 @@ describe('SmartFieldRemote', function() {
   }
 
   describe('openPopup', function() {
-    var events = [null], smartField;
+    var events = [null],
+      smartField;
 
     beforeEach(function() {
       smartField = createSmartFieldWithAdapter();
@@ -177,8 +178,8 @@ describe('SmartFieldRemote', function() {
       smartField = createSmartFieldWithAdapter();
     });
 
-    function resolveLookupCall(smartField) {
-      smartField.lookupCall.resolveLookup({
+    function resolveLookupCall(lookupCall) {
+      lookupCall.resolveLookup({
         queryBy: scout.QueryBy.ALL,
         lookupRows: [new scout.LookupRow(123, 'foo')]
       });
@@ -186,10 +187,15 @@ describe('SmartFieldRemote', function() {
     }
 
     it('opens a touch popup when smart field gets touched', function() {
+      var lookupCallClone = null;
       smartField.touch = true;
       smartField.render();
+      smartField.on('prepareLookupCall', function(event) {
+        lookupCallClone = event.lookupCall;
+      });
+
       smartField.$field.triggerClick();
-      resolveLookupCall(smartField);
+      resolveLookupCall(lookupCallClone);
       expect(smartField.popup.rendered).toBe(true);
       expect($('.touch-popup').length).toBe(1);
       expect($('.smart-field-popup').length).toBe(0);
@@ -201,7 +207,7 @@ describe('SmartFieldRemote', function() {
 
       // Expect same behavior after a second click
       smartField.$field.triggerClick();
-      resolveLookupCall(smartField);
+      resolveLookupCall(lookupCallClone);
       expect(smartField.popup.rendered).toBe(true);
       expect($('.touch-popup').length).toBe(1);
       expect($('.smart-field-popup').length).toBe(0);
@@ -209,12 +215,15 @@ describe('SmartFieldRemote', function() {
     });
 
     it('shows smartfield with same text as clicked smartfield', function() {
+      var lookupCallClone = null;
       smartField.touch = true;
       smartField.displayText = 'row 1';
       smartField.render();
-
+      smartField.on('prepareLookupCall', function(event) {
+        lookupCallClone = event.lookupCall;
+      });
       smartField.$field.triggerClick();
-      resolveLookupCall(smartField);
+      resolveLookupCall(lookupCallClone);
       expect(smartField.popup.rendered).toBe(true);
       expect(smartField.popup._field.displayText).toBe(smartField.displayText);
       expect(smartField.popup._field.$field.val()).toBe(smartField.displayText);

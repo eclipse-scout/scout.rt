@@ -76,16 +76,13 @@ scout.Column.prototype._init = function(model) {
   scout.icons.resolveIconProperty(this, 'headerIconId');
   this._setDisplayable(this.displayable);
   this._setAutoOptimizeWidth(this.autoOptimizeWidth);
-  if (this.table) {
-    this.table.on('columnMoved columnStructureChanged', this._tableColumnsChangedHandler);
-  }
+  this._setTable(this.table);
+  // no need to call setEditable here. cell propagation is done in _initCell
 };
 
 scout.Column.prototype.destroy = function() {
   this._destroy();
-  if (this.table) {
-    this.table.off('columnMoved columnStructureChanged', this._tableColumnsChangedHandler);
-  }
+  this._setTable(null);
 };
 
 /**
@@ -106,7 +103,6 @@ scout.Column.prototype._setTable = function(table) {
   if (this.table) {
     this.table.on('columnMoved columnStructureChanged', this._tableColumnsChangedHandler);
   }
-
 };
 
 /**
@@ -146,11 +142,6 @@ scout.Column.prototype._ensureCell = function(vararg) {
 
     // value may be set but may have the wrong type (e.g. text instead of date) -> ensure type
     cell.value = this._parseValue(cell.value);
-
-    // use null instead of undefined
-    if (cell.value === undefined) {
-      cell.value = null;
-    }
   } else {
     // in this case 'vararg' is only a scalar value, typically a string
     cell = scout.create('Cell', {
@@ -529,6 +520,19 @@ scout.Column.prototype.setCellText = function(row, text, cell) {
   }
 };
 
+scout.Column.prototype.setEditable = function(editable) {
+  if (this.editable === editable) {
+    return;
+  }
+  this.editable = editable;
+
+  this.table.rows.forEach(function(row) {
+    this.cell(row).setEditable(editable);
+  }.bind(this));
+
+  this.table.updateRows(this.table.rows);
+};
+
 scout.Column.prototype.setCssClass = function(cssClass) {
   if (this.cssClass === cssClass) {
     return;
@@ -584,15 +588,15 @@ scout.Column.prototype.createFilter = function(model) {
 /**
  * @returns a field instance used as editor when a cell of this column is in edit mode.
  */
-scout.Column.prototype.createDefaultEditor = function(row) {
-  var field = this._createDefaultEditor(row);
+scout.Column.prototype.createEditor = function(row) {
+  var field = this._createEditor(row);
   field.setLabelVisible(false);
   field.setValue(this.cell(row).value);
   field.setFieldStyle(scout.FormField.FieldStyle.CLASSIC);
   return field;
 };
 
-scout.Column.prototype._createDefaultEditor = function() {
+scout.Column.prototype._createEditor = function() {
   return scout.create('StringField', {
     parent: this.table
   });
