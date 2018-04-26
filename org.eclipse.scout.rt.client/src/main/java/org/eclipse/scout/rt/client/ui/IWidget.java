@@ -13,7 +13,7 @@ import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 /**
  * Root interface for Scout UI components.
  *
- * @since 7.1
+ * @since 8.0
  */
 public interface IWidget extends IPropertyObserver, IStyleable {
 

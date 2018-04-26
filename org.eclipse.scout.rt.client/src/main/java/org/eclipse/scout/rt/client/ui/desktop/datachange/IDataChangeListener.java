@@ -15,7 +15,7 @@ import java.util.EventListener;
 /**
  * An event listener to be used with the {@link IDataChangeManager}.
  *
- * @since 7.1
+ * @since 8.0
  */
 @FunctionalInterface
 public interface IDataChangeListener extends EventListener {

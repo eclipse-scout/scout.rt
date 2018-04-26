@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
  * Represents a specific tree traversal operation. This includes the type of traverse and the action performed during
  * traversal.
  *
- * @since 7.1
+ * @since 8.0
  * @see TreeTraversals
  * @see TreeVisitResult
  */

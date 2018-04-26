@@ -9,7 +9,7 @@ import org.eclipse.scout.rt.shared.data.tile.ITileColorScheme;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 
 /**
- * @since 7.1
+ * @since 8.0
  */
 public interface ITile extends IWidget, IOrdered, IStyleable, IExtensibleObject, ITypeWithClassId {
   String PROP_ORDER = "order";

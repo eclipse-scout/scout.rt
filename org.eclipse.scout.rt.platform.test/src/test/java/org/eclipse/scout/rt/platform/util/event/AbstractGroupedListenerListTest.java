@@ -20,7 +20,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * @since 7.1
+ * @since 8.0
  */
 public class AbstractGroupedListenerListTest {
 

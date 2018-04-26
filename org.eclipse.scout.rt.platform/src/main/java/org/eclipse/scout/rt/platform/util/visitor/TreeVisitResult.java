@@ -15,7 +15,7 @@ import java.util.function.Function;
 /**
  * Controls how the tree visiting should continue.
  *
- * @since 7.1
+ * @since 8.0
  * @see IBreadthFirstTreeVisitor
  * @see IDepthFirstTreeVisitor
  * @see ITreeTraversal

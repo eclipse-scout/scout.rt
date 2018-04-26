@@ -64,7 +64,7 @@ public class TileGridContextMenu extends AbstractContextMenu<ITileGrid<? extends
     if (evt.getPropertyName() == ITileGrid.PROP_SELECTED_TILES) {
       handleOwnerValueChanged();
     }
-    // FIXME [7.1] CGU tiles necessary to handle tile update events as done in table?
+    // FIXME [8.0] CGU tiles necessary to handle tile update events as done in table?
   }
 
   protected Set<TileGridMenuType> getMenuTypesForSelection(List<? extends ITile> selection) {

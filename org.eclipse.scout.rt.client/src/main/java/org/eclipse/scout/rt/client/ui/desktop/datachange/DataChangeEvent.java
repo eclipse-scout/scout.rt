@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.platform.util.ChangeStatus;
 /**
  * An event object to be used with the {@link IDataChangeManager}.
  *
- * @since 7.1
+ * @since 8.0
  */
 public class DataChangeEvent extends EventObject {
   private static final long serialVersionUID = 1L;

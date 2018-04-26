@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @since 7.1
+ * @since 8.0
  */
 @ClassId("126ee77e-7e43-4b7b-94b4-a00f255e2492")
 public abstract class AbstractTile extends AbstractWidget implements ITile {

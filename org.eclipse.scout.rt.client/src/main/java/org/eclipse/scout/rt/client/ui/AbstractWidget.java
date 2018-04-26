@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @since 7.1
+ * @since 8.0
  */
 public abstract class AbstractWidget extends AbstractPropertyObserver implements IWidget {
 

@@ -4,7 +4,7 @@ import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 
 /**
- * @since 7.1
+ * @since 8.0
  */
 public abstract class AbstractJsonWidget<T extends IWidget> extends AbstractJsonPropertyObserver<T> {
 

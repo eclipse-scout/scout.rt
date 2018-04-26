@@ -120,7 +120,7 @@ scout.Session.JsonResponseError = {
  *     icons. With Scout 6.1 and later trees can have icons and this init property
  *     has been added to support the old behavior (no icons at all) without changing
  *     existing code. From Scout 7.0 showTreeIcons will be true by default, which
- *     means projects have to (potentially) migrate existing code. With 7.1 the flag will be removed.
+ *     means projects have to (potentially) migrate existing code. With 8.0 the flag will be removed.
  *   [reconnectorOptions]
  *     Optional, properties of this object are copied to the Session's reconnector
  *     instance (see Reconnector.js).
@@ -170,7 +170,7 @@ scout.Session.prototype.init = function(model) {
   });
   this.keyStrokeManager = new scout.KeyStrokeManager(this);
 
-  this.showTreeIcons = scout.nvl(options.showTreeIcons, true); // TODO [awe] 7.1 remove this flag
+  this.showTreeIcons = scout.nvl(options.showTreeIcons, true); // TODO [awe] 8.0 remove this flag
 };
 
 scout.Session.prototype._throwError = function(message) {

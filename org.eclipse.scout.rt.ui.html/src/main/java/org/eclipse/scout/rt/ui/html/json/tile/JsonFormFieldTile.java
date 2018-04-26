@@ -6,7 +6,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 
 /**
- * @since 7.1
+ * @since 8.0
  */
 public class JsonFormFieldTile<T extends IFormFieldTile> extends JsonWidgetTile<T> {
 

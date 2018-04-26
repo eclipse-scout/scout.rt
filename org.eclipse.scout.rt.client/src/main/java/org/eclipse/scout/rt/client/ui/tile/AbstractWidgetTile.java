@@ -9,7 +9,7 @@ import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
- * @since 7.1
+ * @since 8.0
  */
 @ClassId("b9299ac7-2401-4ff5-9806-3dafbfce5d22")
 public abstract class AbstractWidgetTile<T extends IWidget> extends AbstractTile implements IWidgetTile<T> {

@@ -8,7 +8,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 
 /**
- * @since 7.1
+ * @since 8.0
  */
 public class JsonTileField<T extends ITileField> extends JsonFormField<T> {
 

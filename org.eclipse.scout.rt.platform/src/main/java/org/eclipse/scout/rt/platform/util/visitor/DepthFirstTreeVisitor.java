@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.platform.util.visitor;
 /**
  * Empty adapter implementation for {@link IDepthFirstTreeVisitor}.
  *
- * @since 7.1
+ * @since 8.0
  * @see TreeVisitResult
  * @see IDepthFirstTreeVisitor
  * @see TreeTraversals

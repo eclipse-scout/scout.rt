@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
  * accessed by the delegate methods the desktop provides. This is useful to update parts of the UI whenever an insert,
  * update or delete happens on a single entity or on a list of entities.
  *
- * @since 7.1
+ * @since 8.0
  */
 public interface IDataChangeManager {
 

@@ -10,7 +10,7 @@
 package org.eclipse.scout.rt.shared.data.tile;
 
 /**
- * @since 7.1
+ * @since 8.0
  */
 public interface ITileColorScheme {
 

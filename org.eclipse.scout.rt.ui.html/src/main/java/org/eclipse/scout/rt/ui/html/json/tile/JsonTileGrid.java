@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @since 7.1
+ * @since 8.0
  */
 public class JsonTileGrid<T extends ITileGrid<? extends ITile>> extends AbstractJsonWidget<T> implements IJsonContextMenuOwner {
   private static final Logger LOG = LoggerFactory.getLogger(JsonTileGrid.class);

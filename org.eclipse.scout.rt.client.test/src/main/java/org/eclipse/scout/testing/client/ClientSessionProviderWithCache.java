@@ -55,7 +55,7 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
    * For convenient ways how to use this, see the {@link BlockingTestUtility}.
    * </p>
    *
-   * @since 7.1.0
+   * @since 8.0.0
    */
   public static final ThreadLocal<ToIntFunction<IMessageBox>> MESSAGE_BOX_HANDLER_STRATEGY = new ThreadLocal<>();
 

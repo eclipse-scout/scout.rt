@@ -10,7 +10,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonGridData;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 
 /**
- * @since 7.1
+ * @since 8.0
  */
 public class JsonTile<T extends ITile> extends AbstractJsonWidget<T> {
 

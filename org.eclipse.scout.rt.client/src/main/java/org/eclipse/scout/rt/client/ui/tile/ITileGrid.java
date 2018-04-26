@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 
 /**
- * @since 7.1
+ * @since 8.0
  */
 public interface ITileGrid<T extends ITile> extends IWidget, ITypeWithClassId, IExtensibleObject, IContributionOwner, IContextMenuOwner {
 

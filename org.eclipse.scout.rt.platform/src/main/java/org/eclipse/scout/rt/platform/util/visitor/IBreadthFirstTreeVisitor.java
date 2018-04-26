@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.platform.util.visitor;
 /**
  * Visitor to traverse an element tree in a <i>Breadth-First</i> (BFS) strategy.
  *
- * @since 7.1
+ * @since 8.0
  * @see TreeVisitResult
  * @see TreeTraversals
  */

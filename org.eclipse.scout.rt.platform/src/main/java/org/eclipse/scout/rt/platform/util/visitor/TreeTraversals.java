@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
  * It is guaranteed that every element is only visited once per traversal.<br>
  * Except the traversal strategy the order of the elements is undefined.
  *
- * @since 7.1
+ * @since 8.0
  * @see IDepthFirstTreeVisitor
  * @see IBreadthFirstTreeVisitor
  * @see ITreeTraversal

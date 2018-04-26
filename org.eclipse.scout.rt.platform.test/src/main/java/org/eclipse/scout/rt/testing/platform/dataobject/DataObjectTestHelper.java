@@ -87,7 +87,7 @@ public class DataObjectTestHelper {
    * Asserts (deep) equality of two {@link Object}, taking into account nested {@link DoNode} elements which requires
    * custom equality check.
    * <p>
-   * TODO [7.1] pbz: Add assert-param object instead of 'boolean assertClassEquals', e.g. allow BigDecimal == double for
+   * TODO [8.0] pbz: Add assert-param object instead of 'boolean assertClassEquals', e.g. allow BigDecimal == double for
    * raw DO's
    */
   public void assertObjectEquals(Object expected, Object actual, boolean assertClassEquals) {

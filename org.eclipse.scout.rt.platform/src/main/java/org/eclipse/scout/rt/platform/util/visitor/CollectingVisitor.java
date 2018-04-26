@@ -19,7 +19,7 @@ import java.util.function.Predicate;
  * Converts the items of a tree into a {@link List}.<br>
  * The items are collected in pre-order (top-down).
  *
- * @since 7.1
+ * @since 8.0
  */
 public class CollectingVisitor<T> extends DepthFirstTreeVisitor<T> {
 

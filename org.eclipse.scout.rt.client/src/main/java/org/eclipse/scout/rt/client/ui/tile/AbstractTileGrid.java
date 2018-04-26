@@ -43,7 +43,7 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 
 /**
- * @since 7.1
+ * @since 8.0
  */
 @ClassId("c04e6cf7-fda0-4146-afea-6a0ff0a50c4b")
 public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget implements ITileGrid<T> {

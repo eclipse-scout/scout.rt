@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.platform.util;
 
 /**
- * @since 7.1
+ * @since 8.0
  */
 public final class ChangeStatus {
 
