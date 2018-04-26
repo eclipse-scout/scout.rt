@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.organizer;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,6 +46,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.AddColumnEmptySpaceMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.AddColumnMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.GroupAdditionalMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.GroupMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.ModifyCustomColumnMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.RemoveFilterMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.RemoveMenu;
@@ -80,6 +84,8 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
   private static final Logger LOG = LoggerFactory.getLogger(OrganizeColumnsForm.class);
 
+  private static final String VISIBLE_DIMMENSION_HIERARCHICAL = "dim_hierarchical";
+
   public enum ConfigType {
     DEFAULT, CUSTOM
   }
@@ -88,6 +94,8 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
   protected boolean m_loading;
 
+  private PropertyChangeListener m_organizedTablePropertyListener = new P_OrganizeColumnTablePropertyListener();
+
   public OrganizeColumnsForm(ITable table) {
     super(false);
     m_organizedTable = table;
@@ -95,9 +103,21 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
   }
 
   @Override
+  protected void execInitForm() {
+    getOrganizedTable().addPropertyChangeListener(ITable.PROP_HIERARCHICAL_ROWS, m_organizedTablePropertyListener);
+
+  }
+
+  @Override
+  protected void execDisposeForm() {
+    getOrganizedTable().removePropertyChangeListener(ITable.PROP_HIERARCHICAL_ROWS, m_organizedTablePropertyListener);
+  }
+
+  @Override
   protected void initConfig() {
     super.initConfig();
     getRootGroupBox().setScrollable(true);
+    updateGroupingMenuVisibility();
   }
 
   @Override
@@ -121,8 +141,22 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
     return getFieldByClass(MainBox.class);
   }
 
+  public GroupAdditionalMenu getGroupAdditionalMenu() {
+    return getColumnsTableField().getTable().getMenuByClass(GroupAdditionalMenu.class);
+  }
+
+  public GroupMenu getGroupMenu() {
+    return getColumnsTableField().getTable().getMenuByClass(GroupMenu.class);
+  }
+
   public ITable getOrganizedTable() {
     return m_organizedTable;
+  }
+
+  protected void updateGroupingMenuVisibility() {
+    boolean hierarchicalTable = getOrganizedTable().isHierarchical();
+    getGroupMenu().setVisible(!hierarchicalTable, VISIBLE_DIMMENSION_HIERARCHICAL);
+    getGroupAdditionalMenu().setVisible(!hierarchicalTable, VISIBLE_DIMMENSION_HIERARCHICAL);
   }
 
   @Order(10)
@@ -1706,4 +1740,10 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
     return m_organizedTable.isCustomizable();
   }
 
+  private class P_OrganizeColumnTablePropertyListener implements PropertyChangeListener {
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+      updateGroupingMenuVisibility();
+    }
+  }
 }

@@ -3076,7 +3076,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     });
 
     m_rootRows = Collections.synchronizedList(rootNodes);
-    if (parentToChildren.size() > 0) {
+    boolean hierarchical = parentToChildren.size() > 0;
+    setHierarchicalInternal(hierarchical);
+    if (hierarchical) {
       CollectingVisitor<ITableRow> collector = new CollectingVisitor<ITableRow>();
       rootNodes.forEach(root -> TreeTraversals.create(collector, node -> {
         List<ITableRow> childRows = parentToChildren.getOrDefault(node, Collections.emptyList());
@@ -3087,6 +3089,15 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       m_rows = Collections.synchronizedList(collector.getCollection());
     }
     m_treeStructureDirty = false;
+  }
+
+  @Override
+  public boolean isHierarchical() {
+    return propertySupport.getPropertyBool(PROP_HIERARCHICAL_ROWS);
+  }
+
+  protected void setHierarchicalInternal(boolean hierarchical) {
+    propertySupport.setPropertyBool(PROP_HIERARCHICAL_ROWS, hierarchical);
   }
 
   @Override

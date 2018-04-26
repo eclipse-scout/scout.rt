@@ -205,6 +205,13 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
   String PROP_HIERARCHICAL_STYLE = "hierarchicalStyle";
 
   /**
+   * type boolean
+   *
+   * @since 8.0
+   */
+  String PROP_HIERARCHICAL_ROWS = "hierarchicalRows";
+
+  /**
    * @deprecated will be removed with 8.0, use {@link #init()} or {@link #reinit()} instead
    */
   @Deprecated
@@ -1196,5 +1203,7 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
   HierarchicalStyle getHierarchicalStyle();
 
   void setHierarchicalStyle(HierarchicalStyle hierarchicalStyle);
+
+  boolean isHierarchical();
 
 }
