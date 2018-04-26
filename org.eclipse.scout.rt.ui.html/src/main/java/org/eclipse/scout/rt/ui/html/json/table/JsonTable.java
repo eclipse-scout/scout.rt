@@ -632,12 +632,14 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   protected void handleUiRowsExpanded(JsonEvent event) {
     List<ITableRow> expandedRows = new ArrayList<>();
     List<ITableRow> collapsedRows = new ArrayList<>();
+    List<ITableRow> rows = new ArrayList<>();
     JSONArray jsonRows = event.getData().optJSONArray("rows");
     if (jsonRows != null) {
       for (int i = 0; i < jsonRows.length(); i++) {
         JSONObject jsonRow = jsonRows.getJSONObject(i);
         ITableRow row = optTableRow(jsonRow.getString("rowId"));
         if (row != null) {
+          rows.add(row);
           if (jsonRow.optBoolean("expanded")) {
             expandedRows.add(row);
           }
@@ -647,6 +649,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
         }
       }
     }
+    addTableEventFilterCondition(TableEvent.TYPE_ROWS_EXPANDED).setRows(rows);
     if (!expandedRows.isEmpty()) {
       getModel().getUIFacade().setExpandedRowsFromUI(expandedRows, true);
     }
