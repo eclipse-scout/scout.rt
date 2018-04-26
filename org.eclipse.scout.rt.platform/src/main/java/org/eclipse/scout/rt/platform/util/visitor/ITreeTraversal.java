@@ -22,7 +22,8 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
  */
 public interface ITreeTraversal<T> {
   /**
-   * Creates a new {@link ITreeTraversal} using a <i>Breadth-First</i> traversal strategy.
+   * Traverses the tree rooted by the specified element. The traversal uses the strategy and visitor as specified during
+   * the creation of this {@link ITreeTraversal}.
    *
    * @param root
    *          The root node where to start the traversal. Must not be {@code null}.

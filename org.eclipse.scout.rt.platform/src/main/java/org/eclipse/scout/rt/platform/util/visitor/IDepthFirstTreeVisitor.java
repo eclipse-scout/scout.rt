@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.platform.util.visitor;
 
 /**
  * Visitor to traverse an element tree in a <i>Depth-First</i> (DFS) strategy.<br>
- * Using this visitor a pre-order (top-down) or post-order (bottom-op) traversal can be implemented.
+ * Using this visitor a pre-order (top-down) or post-order (bottom-up) traversal can be implemented.
  *
  * @since 8.0
  * @see TreeVisitResult
