@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.button;
 
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 
 @ClassId("a832c827-50ca-4a59-b8f3-31e620f329ec")
 public abstract class AbstractOkButton extends AbstractButton {

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.shared.text;
+package org.eclipse.scout.rt.platform.text;
 
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService;
 
 /**
  * Text provider service for texts used by org.eclipse.scout.rt.shared.test plugin.
@@ -20,6 +19,6 @@ import org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextPr
 public class TestTextProviderService extends AbstractDynamicNlsTextProviderService {
   @Override
   public String getDynamicNlsBaseName() {
-    return "org.eclipse.scout.rt.shared.test.Texts";
+    return "org.eclipse.scout.rt.platform.test.Texts";
   }
 }

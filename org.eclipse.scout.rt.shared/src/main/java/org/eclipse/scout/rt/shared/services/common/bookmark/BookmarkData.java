@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared.services.common.bookmark;
 
 import java.io.Serializable;
 
-import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 
 public class BookmarkData implements Serializable {
   private static final long serialVersionUID = 1L;

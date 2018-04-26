@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.shared.services.common.text;
+package org.eclipse.scout.rt.shared.services.common.text.dev;
 
 import java.util.Collections;
 import java.util.Locale;
@@ -22,8 +22,9 @@ import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.SharedConfigProperties.TextProvidersShowKeysProperty;
+import org.eclipse.scout.rt.platform.text.ITextProviderService;
+import org.eclipse.scout.rt.platform.text.ScoutTexts;
+import org.eclipse.scout.rt.shared.SharedConfigProperties.DevTextProvidersShowKeysProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +71,7 @@ public class TextKeyTextProviderService implements ITextProviderService {
 
     @Override
     public void stateChanged(PlatformEvent event) {
-      if (State.PlatformStarted == event.getState() && CONFIG.getPropertyValue(TextProvidersShowKeysProperty.class)) {
+      if (State.PlatformStarted == event.getState() && CONFIG.getPropertyValue(DevTextProvidersShowKeysProperty.class)) {
         register();
       }
     }

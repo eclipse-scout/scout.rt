@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.shared;
+package org.eclipse.scout.rt.platform.text;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.shared.services.common.text.ITextProviderService;
 
 /**
  * ScoutTexts provides support for text translations.

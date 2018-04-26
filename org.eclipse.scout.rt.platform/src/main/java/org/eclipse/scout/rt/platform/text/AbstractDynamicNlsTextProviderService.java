@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.shared.services.common.text;
+package org.eclipse.scout.rt.platform.text;
 
 import java.util.Locale;
 import java.util.Map;

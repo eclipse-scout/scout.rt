@@ -15,8 +15,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.shared.TEXTS;
 
 /**
  * Factory for message boxes.

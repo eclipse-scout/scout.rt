@@ -20,8 +20,8 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.PageWithTable2Test.S
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.PageWithTable2Test.SimpleTablePageData.SimpleTablePageRowData;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
-import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.page.AbstractTablePageData;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;

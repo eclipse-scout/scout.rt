@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.server.services.common.pwd;
 import java.util.Arrays;
 
 import org.eclipse.scout.rt.platform.exception.VetoException;
-import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 
 /**
  * Title: BSI Scout V3 Copyright: Copyright (c) 2001,2009 BSI AG

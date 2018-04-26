@@ -22,8 +22,9 @@ import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractSubjectConfigProperty;
 import org.eclipse.scout.rt.platform.config.ConfigUtility;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.shared.services.common.text.TextKeyTextProviderService;
+import org.eclipse.scout.rt.shared.services.common.text.dev.TextKeyTextProviderService;
 
 public final class SharedConfigProperties {
 
@@ -241,7 +242,7 @@ public final class SharedConfigProperties {
     }
   }
 
-  public static class TextProvidersShowKeysProperty extends AbstractBooleanConfigProperty {
+  public static class DevTextProvidersShowKeysProperty extends AbstractBooleanConfigProperty {
 
     @Override
     public String getKey() {

@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.shared.data.model;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.shared.TEXTS;
 
 @SuppressWarnings("squid:S2160")
 public class DataModelAttributeOperatorProvider implements IDataModelAttributeOperatorProvider, DataModelConstants {

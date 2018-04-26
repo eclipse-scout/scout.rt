@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.platform.html.HtmlHelper;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
@@ -32,7 +33,6 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.GlobalHttpResourceCache
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
-import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

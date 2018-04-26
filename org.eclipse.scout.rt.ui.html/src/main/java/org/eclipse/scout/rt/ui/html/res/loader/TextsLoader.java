@@ -29,8 +29,8 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.nls.NlsResourceBundle;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
+import org.eclipse.scout.rt.platform.text.AbstractDynamicNlsTextProviderService;
 import org.eclipse.scout.rt.platform.util.FileUtility;
-import org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiLocalesProperty;
 import org.json.JSONObject;
 

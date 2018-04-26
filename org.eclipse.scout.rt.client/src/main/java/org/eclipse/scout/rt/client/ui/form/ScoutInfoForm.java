@@ -37,10 +37,10 @@ import org.eclipse.scout.rt.platform.html.IHtmlTable;
 import org.eclipse.scout.rt.platform.html.IHtmlTableRow;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.OfficialVersion;
-import org.eclipse.scout.rt.shared.TEXTS;
 
 @ClassId("dee01442-979d-4231-a3f9-bd2a163e752a")
 public class ScoutInfoForm extends AbstractForm {

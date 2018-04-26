@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 
 @ClassId("3f14b55f-b49b-428a-92c4-05745d6d48c4")
 public abstract class AbstractBooleanField extends AbstractValueField<Boolean> implements IBooleanField {

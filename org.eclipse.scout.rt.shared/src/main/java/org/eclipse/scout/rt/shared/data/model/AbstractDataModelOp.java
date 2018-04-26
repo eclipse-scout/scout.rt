@@ -14,8 +14,8 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.shared.TEXTS;
 
 public abstract class AbstractDataModelOp implements IDataModelAttributeOp, DataModelConstants, Serializable {
 

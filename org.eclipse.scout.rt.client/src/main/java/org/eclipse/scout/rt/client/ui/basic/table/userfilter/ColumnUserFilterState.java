@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUti
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.AbstractUserFilterState;
-import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 
 public class ColumnUserFilterState extends AbstractUserFilterState {
   private static final long serialVersionUID = 1L;

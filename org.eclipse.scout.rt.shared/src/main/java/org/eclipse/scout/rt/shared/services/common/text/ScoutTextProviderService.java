@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.shared.services.common.text;
 
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.text.AbstractDynamicNlsTextProviderService;
 
 @Order(5050)
 public class ScoutTextProviderService extends AbstractDynamicNlsTextProviderService {
