@@ -50,5 +50,6 @@ scout.TableNavigationCollapseKeyStroke.prototype.handle = function(event) {
     table.collapseRow(selectedRow);
   } else if (selectedRow.parentRow) {
     table.selectRow(selectedRow.parentRow);
+    table.selectionHandler.lastActionRow = selectedRow.parentRow;
   }
 };

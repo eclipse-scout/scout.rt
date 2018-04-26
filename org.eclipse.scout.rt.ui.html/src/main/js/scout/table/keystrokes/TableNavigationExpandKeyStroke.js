@@ -46,6 +46,7 @@ scout.TableNavigationExpandKeyStroke.prototype.handle = function(event) {
       // select first child
       visibleChildRows = this.field.visibleChildRows(selectedRow);
       table.selectRow(visibleChildRows[0]);
+      table.selectionHandler.lastActionRow = visibleChildRows[0];
     } else {
       // expand
       table.expandRow(selectedRow);
