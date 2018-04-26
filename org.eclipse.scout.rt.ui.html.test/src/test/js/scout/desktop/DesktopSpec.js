@@ -25,11 +25,6 @@ describe('Desktop', function() {
     formHelper = new scout.FormSpecHelper(session);
     desktop = session.desktop;
     desktop.viewButtons = [];
-    jasmine.clock().install();
-  });
-
-  afterEach(function() {
-    jasmine.clock().uninstall();
   });
 
   describe('notification', function() {
@@ -151,6 +146,7 @@ describe('Desktop', function() {
     });
 
     it('removes the content after the animation', function() {
+      jasmine.clock().install();
       var form = formHelper.createFormWithOneField();
       var tabBox = desktop.bench.getTabBox('C');
       form.displayHint = scout.Form.DisplayHint.VIEW;
@@ -177,6 +173,7 @@ describe('Desktop', function() {
       desktop.bench._removeInternal();
       expect(desktop.bench).toBeFalsy();
       expect(form.rendered).toBe(false);
+      jasmine.clock().uninstall();
     });
 
   });
@@ -274,6 +271,7 @@ describe('Desktop', function() {
         });
       };
       jasmine.Ajax.install();
+      jasmine.clock().install();
     });
 
     it('asks the browser for its geographic location', function() {
@@ -299,6 +297,7 @@ describe('Desktop', function() {
     afterEach(function() {
       navigator.geolocation.getCurrentPosition = browserImpl;
       jasmine.Ajax.uninstall();
+      jasmine.clock().uninstall();
     });
 
   });
@@ -872,7 +871,7 @@ describe('Desktop', function() {
       session._renderDesktop();
     });
 
-    it('will be set to the display parent form if dialog closes', function() {
+    it('will be set to the display parent form if dialog closes', function(done) {
       var dialogParent = formHelper.createFormWithOneField({
         displayHint: 'dialog'
       });
@@ -880,45 +879,59 @@ describe('Desktop', function() {
         displayHint: 'dialog',
         displayParent: dialogParent
       });
-      dialogParent.open();
-      expect(desktop.activeForm).toBe(dialogParent);
+      dialogParent.open()
+        .then(function() {
+          expect(desktop.activeForm).toBe(dialogParent);
+        })
+        .then(dialog.open.bind(dialog))
+        .then(function() {
+          expect(desktop.activeForm).toBe(dialog);
 
-      dialog.open();
-      expect(desktop.activeForm).toBe(dialog);
-
-      dialog.close();
-      expect(desktop.activeForm).toBe(dialogParent);
+          dialog.close();
+          expect(desktop.activeForm).toBe(dialogParent);
+        })
+        .catch(fail)
+        .always(done);
     });
 
-    it('will be set to currentView if dialog closes and there is no display parent form', function() {
+    it('will be set to currentView if dialog closes and there is no display parent form', function(done) {
       var view = formHelper.createFormWithOneField({
         displayHint: 'view'
       });
       var dialog = formHelper.createFormWithOneField({
         displayHint: 'dialog'
       });
-      view.open();
-      expect(desktop.activeForm).toBe(view);
+      view.open()
+        .then(function() {
+          expect(desktop.activeForm).toBe(view);
+        })
+        .then(dialog.open.bind(dialog))
+        .then(function() {
+          expect(desktop.activeForm).toBe(dialog);
 
-      dialog.open();
-      expect(desktop.activeForm).toBe(dialog);
-
-      dialog.close();
-      expect(desktop.activeForm).toBe(view);
+          dialog.close();
+          expect(desktop.activeForm).toBe(view);
+        })
+        .catch(fail)
+        .always(done);
     });
 
-    it('will be set to undefined if dialog closes and there is no currentView and no display parent', function() {
+    it('will be set to undefined if dialog closes and there is no currentView and no display parent', function(done) {
       var dialog = formHelper.createFormWithOneField({
         displayHint: 'dialog'
       });
-      dialog.open();
-      expect(desktop.activeForm).toBe(dialog);
+      dialog.open()
+        .then(function() {
+          expect(desktop.activeForm).toBe(dialog);
 
-      dialog.close();
-      expect(desktop.activeForm).toBeUndefined();
+          dialog.close();
+          expect(desktop.activeForm).toBeUndefined();
+        })
+        .catch(fail)
+        .always(done);
     });
 
-    it('must not be the detail form', function() {
+    it('must not be the detail form', function(done) {
       var outline = outlineHelper.createOutlineWithOneDetailForm();
       desktop.setOutline(outline);
       outline.selectNodes(outline.nodes[0]);
@@ -926,14 +939,18 @@ describe('Desktop', function() {
       var dialog = formHelper.createFormWithOneField({
         displayHint: 'dialog'
       });
-      dialog.open();
-      expect(desktop.activeForm).toBe(dialog);
+      dialog.open()
+        .then(function() {
+          expect(desktop.activeForm).toBe(dialog);
 
-      dialog.close();
-      expect(desktop.activeForm).toBeUndefined();
+          dialog.close();
+          expect(desktop.activeForm).toBeUndefined();
+        })
+        .catch(fail)
+        .always(done);
     });
 
-    it('must not be the detail form even if it is the display parent', function() {
+    it('must not be the detail form even if it is the display parent', function(done) {
       var outline = outlineHelper.createOutlineWithOneDetailForm();
       desktop.setOutline(outline);
       outline.selectNodes(outline.nodes[0]);
@@ -942,25 +959,33 @@ describe('Desktop', function() {
         displayHint: 'dialog',
         displayParent: detailForm
       });
-      dialog.open();
-      expect(desktop.activeForm).toBe(dialog);
+      dialog.open()
+        .then(function() {
+          expect(desktop.activeForm).toBe(dialog);
 
-      dialog.close();
-      expect(desktop.activeForm).toBeUndefined();
+          dialog.close();
+          expect(desktop.activeForm).toBeUndefined();
+        })
+        .catch(fail)
+        .always(done);
     });
 
-    it('must be a form', function() {
+    it('must be a form', function(done) {
       var outline = outlineHelper.createOutlineWithOneDetailTable();
       desktop.setOutline(outline);
       outline.selectNodes(outline.nodes[0]);
       var dialog = formHelper.createFormWithOneField({
         displayHint: 'dialog'
       });
-      dialog.open();
-      expect(desktop.activeForm).toBe(dialog);
+      dialog.open()
+        .then(function() {
+          expect(desktop.activeForm).toBe(dialog);
 
-      dialog.close();
-      expect(desktop.activeForm).toBeUndefined();
+          dialog.close();
+          expect(desktop.activeForm).toBeUndefined();
+        })
+        .catch(fail)
+        .always(done);
     });
 
   });
@@ -993,6 +1018,7 @@ describe('Desktop', function() {
       });
 
       it('opens the bench again if a view is shown right after the last view was closed', function() {
+        jasmine.clock().install();
         var form = formHelper.createViewWithOneField();
         var form2 = formHelper.createViewWithOneField();
         expect(form.rendered).toBe(false);
@@ -1015,6 +1041,7 @@ describe('Desktop', function() {
         expect(form2.rendered).toBe(true);
         expect(desktop.navigationVisible).toBe(false);
         expect(desktop.benchVisible).toBe(true);
+        jasmine.clock().uninstall();
       });
 
       it('hides bench and shows navigation if the last view gets closed', function() {

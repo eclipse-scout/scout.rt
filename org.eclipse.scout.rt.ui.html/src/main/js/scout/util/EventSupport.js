@@ -78,6 +78,16 @@ scout.EventSupport.prototype.off = function(type, func) {
   }
 };
 
+/**
+ * Adds an event handler using {@link #one()} and returns a promise.
+ * The promise is resolved as soon as the event is triggered.
+ */
+scout.EventSupport.prototype.when = function(type) {
+  var deferred = $.Deferred();
+  this.one(type, deferred.resolve.bind(deferred));
+  return deferred.promise();
+};
+
 scout.EventSupport.prototype.addListener = function(listener) {
   this._eventListeners.push(listener);
 };

@@ -972,6 +972,14 @@ scout.Widget.prototype.removeListener = function(listener) {
 };
 
 /**
+ * Adds an event handler using {@link #one()} and returns a promise.
+ * The promise is resolved as soon as the event is triggered.
+ */
+scout.Widget.prototype.when = function(type) {
+  return this.events.when(type);
+};
+
+/**
  * @param $element (optional) element from which the entryPoint will be resolved. If not set this.parent.$container is used.
  * @returns the entry-point for this Widget. If the widget is part of the main-window it returns this.session.$entryPoint,
  * for popup-window this function will return the body of the document in the popup window.

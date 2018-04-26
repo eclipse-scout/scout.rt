@@ -244,7 +244,7 @@ describe("GroupBox", function() {
       expect(groupBox.logicalGrid instanceof scout.HorizontalGrid).toBe(true);
     });
 
-    it('uses widthInPixel and heightInPixel as dialog width and height if set on main box', function() {
+    it('uses widthInPixel and heightInPixel as dialog width and height if set on main box', function(done) {
       var $tmpStyle = $('<style type="text/css">.dialog { position: absolute; }</style>')
         .appendTo($('head'));
 
@@ -263,11 +263,15 @@ describe("GroupBox", function() {
           }
         }
       });
-      form.open();
-      expect(form.rootGroupBox.$container.cssHeight()).toBe(30);
-      expect(form.rootGroupBox.$container.cssWidth()).toBe(27);
-      form.close();
-      $tmpStyle.remove();
+      form.open()
+        .then(function() {
+          expect(form.rootGroupBox.$container.cssHeight()).toBe(30);
+          expect(form.rootGroupBox.$container.cssWidth()).toBe(27);
+          form.close();
+          $tmpStyle.remove();
+        })
+        .catch(fail)
+        .always(done);
     });
   });
 

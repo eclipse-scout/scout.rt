@@ -14,7 +14,6 @@ describe('Form', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     jasmine.Ajax.install();
-    jasmine.clock().install();
     session = sandboxSession({
       desktop: {
         headerVisible: true,
@@ -30,7 +29,6 @@ describe('Form', function() {
   afterEach(function() {
     session = null;
     jasmine.Ajax.uninstall();
-    jasmine.clock().uninstall();
   });
 
   describe('init', function() {
@@ -51,59 +49,178 @@ describe('Form', function() {
 
   describe('open', function() {
 
-    it('opens the form', function() {
+    it('opens the form', function(done) {
       var form = helper.createFormWithOneField();
-      form.open();
-      expect(form.rendered).toBe(true);
-      expect(session.desktop.dialogs.indexOf(form) > -1).toBe(true);
+      form.open()
+        .then(function() {
+          expect(form.rendered).toBe(true);
+          expect(session.desktop.dialogs.indexOf(form) > -1).toBe(true);
+        })
+        .catch(fail)
+        .always(done);
     });
 
-    it('adds it to the display parent', function() {
-      var parentForm = helper.createFormWithOneField();
-      parentForm.open();
-      expect(session.desktop.dialogs.indexOf(parentForm) > -1).toBe(true);
+    it('adds it to the desktop if no display parent is provided', function(done) {
+      var form = helper.createFormWithOneField();
+      form.open()
+        .then(function() {
+          expect(session.desktop.dialogs.indexOf(form) > -1).toBe(true);
+        })
+        .catch(fail)
+        .always(done);
+    });
 
+    it('adds it to the provided display parent', function(done) {
+      var parentForm = helper.createFormWithOneField();
       var form = helper.createFormWithOneField();
       form.displayParent = parentForm;
-      form.open();
-      expect(form.rendered).toBe(true);
-      expect(session.desktop.dialogs.indexOf(form) > -1).toBe(false);
-      expect(parentForm.dialogs.indexOf(form) > -1).toBe(true);
+      parentForm.open()
+        .then(form.open.bind(form))
+        .then(function() {
+          expect(form.rendered).toBe(true);
+          expect(session.desktop.dialogs.indexOf(form) > -1).toBe(false);
+          expect(parentForm.dialogs.indexOf(form) > -1).toBe(true);
+        })
+        .catch(fail)
+        .always(done);
     });
-
   });
 
   describe('close', function() {
 
-    it('closes the form', function() {
+    it('closes the form', function(done) {
       var form = helper.createFormWithOneField();
-      form.open();
-      form.close();
-      expect(session.desktop.dialogs.indexOf(form) > -1).toBe(false);
-      expect(form.rendered).toBe(false);
-      expect(form.destroyed).toBe(true);
+      form.open()
+        .then(function() {
+          form.close();
+          expect(session.desktop.dialogs.indexOf(form) > -1).toBe(false);
+          expect(form.rendered).toBe(false);
+          expect(form.destroyed).toBe(true);
+        })
+        .catch(fail)
+        .always(done);
     });
 
-    it('removes it from the display parent', function() {
-      var parentForm = helper.createFormWithOneField();
-      parentForm.open();
+    it('closes the form even if opening is still pending', function(done) {
+      var form = helper.createFormWithOneField();
+      form.open()
+        .then(function() {
+          expect(session.desktop.dialogs.indexOf(form) > -1).toBe(false);
+          expect(form.rendered).toBe(false);
+          expect(form.destroyed).toBe(true);
+        })
+        .catch(fail)
+        .always(done);
 
+      // Close immediately without waiting for the open promise to resolve
+      form.close();
+    });
+
+    it('removes it from the display parent', function(done) {
+      var parentForm = helper.createFormWithOneField();
       var form = helper.createFormWithOneField();
       form.displayParent = parentForm;
-      form.open();
-      expect(parentForm.dialogs.indexOf(form) > -1).toBe(true);
+      parentForm.open()
+        .then(form.open.bind(form))
+        .then(function() {
+          expect(parentForm.dialogs.indexOf(form) > -1).toBe(true);
 
-      form.close();
-      expect(parentForm.dialogs.indexOf(form) > -1).toBe(false);
-      expect(form.rendered).toBe(false);
-      expect(form.destroyed).toBe(true);
+          form.close();
+          expect(parentForm.dialogs.indexOf(form) > -1).toBe(false);
+          expect(form.rendered).toBe(false);
+          expect(form.destroyed).toBe(true);
+        })
+        .catch(fail)
+        .always(done);
+    });
+
+  });
+
+  describe('whenClose', function() {
+
+    it('returns a promise which is resolved when the form is closed', function(done) {
+      var form = helper.createFormWithOneField();
+      form.open()
+        .then(function() {
+          form.close();
+        })
+        .catch(fail);
+
+      form.whenClose()
+        .then(function() {
+          expect(form.rendered).toBe(false);
+          expect(form.destroyed).toBe(true);
+        })
+        .catch(fail)
+        .always(done);
+    });
+
+  });
+
+  describe('save', function() {
+
+    it('calls _save', function(done) {
+      var form = helper.createFormWithOneField();
+      var saveCalled = false;
+      form._save = function(data) {
+        saveCalled = true;
+        return $.resolvedPromise();
+      };
+
+      form.touch();
+      form.save()
+        .then(function() {
+          expect(saveCalled).toBe(true);
+        })
+        .catch(fail)
+        .always(done);
+    });
+
+    it('does not call save if save is not required', function(done) {
+      var form = helper.createFormWithOneField();
+      var saveCalled = false;
+      form._save = function(data) {
+        saveCalled = true;
+        return $.resolvedPromise();
+      };
+
+      // form.touch() has not been called -> _save must not be called
+      form.save()
+        .then(function() {
+          expect(saveCalled).toBe(false);
+        })
+        .catch(fail)
+        .always(done);
+    });
+
+  });
+
+  describe('whenSave', function() {
+
+    it('returns a promise which is resolved when the form is saved', function(done) {
+      var form = helper.createFormWithOneField();
+      var saveCalled = false;
+      form._save = function(data) {
+        saveCalled = true;
+        return $.resolvedPromise();
+      };
+
+      form.whenSave()
+        .then(function() {
+          expect(saveCalled).toBe(true);
+        })
+        .catch(fail)
+        .always(done);
+
+      form.touch();
+      form.save();
     });
 
   });
 
   describe('abort', function() {
 
-    it('closes the form if there is a close button', function() {
+    it('closes the form if there is a close button', function(done) {
       var form = scout.create('Form', {
         parent: session.desktop,
         rootGroupBox: {
@@ -115,14 +232,43 @@ describe('Form', function() {
       });
       spyOn(form, 'close').and.callThrough();
       spyOn(form, 'cancel').and.callThrough();
-      form.open();
-      form.abort();
-      expect(form.close.calls.count()).toEqual(1);
-      expect(form.cancel.calls.count()).toEqual(0);
-      expect(form.destroyed).toBe(true);
+      form.open()
+        .then(function() {
+          form.abort();
+          expect(form.close.calls.count()).toEqual(1);
+          expect(form.cancel.calls.count()).toEqual(0);
+          expect(form.destroyed).toBe(true);
+        })
+        .catch(fail)
+        .always(done);
     });
 
-    it('closes the form by using cancel if there is no close button', function() {
+    it('closes the form even if opening is still pending', function(done) {
+      var form = scout.create('Form', {
+        parent: session.desktop,
+        rootGroupBox: {
+          objectType: 'GroupBox',
+          menus: [{
+            objectType: 'CloseMenu',
+          }]
+        }
+      });
+      spyOn(form, 'close').and.callThrough();
+      spyOn(form, 'cancel').and.callThrough();
+      form.open()
+        .then(function() {
+          expect(form.close.calls.count()).toEqual(1);
+          expect(form.cancel.calls.count()).toEqual(0);
+          expect(form.destroyed).toBe(true);
+        })
+        .catch(fail)
+        .always(done);
+
+      // Abort immediately without waiting for the open promise to resolve
+      form.abort();
+    });
+
+    it('closes the form by using cancel if there is no close button', function(done) {
       var form = scout.create('Form', {
         parent: session.desktop,
         rootGroupBox: {
@@ -131,13 +277,16 @@ describe('Form', function() {
       });
       spyOn(form, 'close').and.callThrough();
       spyOn(form, 'cancel').and.callThrough();
-      form.open();
-      form.abort();
-      expect(form.close.calls.count()).toEqual(0);
-      expect(form.cancel.calls.count()).toEqual(1);
-      expect(form.destroyed).toBe(true);
+      form.open()
+        .then(function() {
+          form.abort();
+          expect(form.close.calls.count()).toEqual(0);
+          expect(form.cancel.calls.count()).toEqual(1);
+          expect(form.destroyed).toBe(true);
+        })
+        .catch(fail)
+        .always(done);
     });
-
   });
 
   describe('destroy', function() {
@@ -194,24 +343,32 @@ describe('Form', function() {
 
   describe('modal', function() {
 
-    it('creates a glass pane if true', function() {
+    it('creates a glass pane if true', function(done) {
       var form = helper.createFormWithOneField({
         modal: true
       });
-      form.open();
-      expect($('.glasspane').length).toBe(3);
-      form.close();
-      expect($('.glasspane').length).toBe(0);
+      form.open()
+        .then(function() {
+          expect($('.glasspane').length).toBe(3);
+          form.close();
+          expect($('.glasspane').length).toBe(0);
+        })
+        .catch(fail)
+        .always(done);
     });
 
-    it('does not create a glass pane if false', function() {
+    it('does not create a glass pane if false', function(done) {
       var form = helper.createFormWithOneField({
         modal: false
       });
-      form.open();
-      expect($('.glasspane').length).toBe(0);
-      form.close();
-      expect($('.glasspane').length).toBe(0);
+      form.open()
+        .then(function() {
+          expect($('.glasspane').length).toBe(0);
+          form.close();
+          expect($('.glasspane').length).toBe(0);
+        })
+        .catch(fail)
+        .always(done);
     });
 
   });
@@ -223,12 +380,16 @@ describe('Form', function() {
       desktop = session.desktop;
     });
 
-    it('is required if form is managed by a form controller, defaults to desktop', function() {
+    it('is required if form is managed by a form controller, defaults to desktop', function(done) {
       var form = helper.createFormWithOneField();
       expect(form.displayParent).toBeUndefined();
-      form.open();
-      expect(form.displayParent).toBe(desktop);
-      form.close();
+      form.open()
+        .then(function() {
+          expect(form.displayParent).toBe(desktop);
+          form.close();
+        })
+        .catch(fail)
+        .always(done);
     });
 
     it('is not required if form is just rendered', function() {
@@ -239,7 +400,7 @@ describe('Form', function() {
       form.destroy();
     });
 
-    it('always same as parent if display parent is set', function() {
+    it('always same as parent if display parent is set', function(done) {
       // Parent would be something different, removing the parent would remove the form which is not expected, because only removing the display parent has to remove the form
       var initialParent = new scout.NullWidget();
       var form = helper.createFormWithOneField({
@@ -248,27 +409,35 @@ describe('Form', function() {
       });
       expect(form.displayParent).toBeUndefined();
       expect(form.parent).toBe(initialParent);
-      form.open();
-      expect(form.displayParent).toBe(desktop);
-      expect(form.parent).toBe(desktop);
-      form.close();
+      form.open()
+        .then(function() {
+          expect(form.displayParent).toBe(desktop);
+          expect(form.parent).toBe(desktop);
+          form.close();
+        })
+        .catch(fail)
+        .always(done);
     });
 
-    it('blocks desktop if modal and displayParent is desktop', function() {
+    it('blocks desktop if modal and displayParent is desktop', function(done) {
       var form = helper.createFormWithOneField({
         modal: true,
         displayParent: desktop
       });
-      form.open();
-      expect($('.glasspane').length).toBe(3);
-      expect(desktop.navigation.$container.children('.glasspane').length).toBe(1);
-      expect(desktop.bench.$container.children('.glasspane').length).toBe(1);
-      expect(desktop.header.$container.children('.glasspane').length).toBe(1);
-      form.close();
-      expect($('.glasspane').length).toBe(0);
+      form.open()
+        .then(function() {
+          expect($('.glasspane').length).toBe(3);
+          expect(desktop.navigation.$container.children('.glasspane').length).toBe(1);
+          expect(desktop.bench.$container.children('.glasspane').length).toBe(1);
+          expect(desktop.header.$container.children('.glasspane').length).toBe(1);
+          form.close();
+          expect($('.glasspane').length).toBe(0);
+        })
+        .catch(fail)
+        .always(done);
     });
 
-    it('blocks detail form and outline if modal and displayParent is outline', function() {
+    it('blocks detail form and outline if modal and displayParent is outline', function(done) {
       var outline = outlineHelper.createOutlineWithOneDetailForm();
       desktop.setOutline(outline);
       outline.selectNodes(outline.nodes[0]);
@@ -276,16 +445,20 @@ describe('Form', function() {
         modal: true,
         displayParent: outline
       });
-      form.open();
-      expect($('.glasspane').length).toBe(2);
-      expect(desktop.navigation.$body.children('.glasspane').length).toBe(1);
-      expect(outline.nodes[0].detailForm.$container.children('.glasspane').length).toBe(1);
-      expect(desktop.header.$container.children('.glasspane').length).toBe(0);
-      form.close();
-      expect($('.glasspane').length).toBe(0);
+      form.open()
+        .then(function() {
+          expect($('.glasspane').length).toBe(2);
+          expect(desktop.navigation.$body.children('.glasspane').length).toBe(1);
+          expect(outline.nodes[0].detailForm.$container.children('.glasspane').length).toBe(1);
+          expect(desktop.header.$container.children('.glasspane').length).toBe(0);
+          form.close();
+          expect($('.glasspane').length).toBe(0);
+        })
+        .catch(fail)
+        .always(done);
     });
 
-    it('blocks form if modal and displayParent is form', function() {
+    it('blocks form if modal and displayParent is form', function(done) {
       var outline = outlineHelper.createOutlineWithOneDetailForm();
       var detailForm = outline.nodes[0].detailForm;
       desktop.setOutline(outline);
@@ -294,13 +467,17 @@ describe('Form', function() {
         modal: true,
         displayParent: detailForm
       });
-      form.open();
-      expect($('.glasspane').length).toBe(1);
-      expect(desktop.navigation.$body.children('.glasspane').length).toBe(0);
-      expect(detailForm.$container.children('.glasspane').length).toBe(1);
-      expect(desktop.header.$container.children('.glasspane').length).toBe(0);
-      form.close();
-      expect($('.glasspane').length).toBe(0);
+      form.open()
+        .then(function() {
+          expect($('.glasspane').length).toBe(1);
+          expect(desktop.navigation.$body.children('.glasspane').length).toBe(0);
+          expect(detailForm.$container.children('.glasspane').length).toBe(1);
+          expect(desktop.header.$container.children('.glasspane').length).toBe(0);
+          form.close();
+          expect($('.glasspane').length).toBe(0);
+        })
+        .catch(fail)
+        .always(done);
     });
 
   });

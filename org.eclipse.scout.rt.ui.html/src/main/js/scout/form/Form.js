@@ -187,28 +187,49 @@ scout.Form.prototype._createLifecycle = function() {
 };
 
 /**
- * Renders the form by adding it to the desktop. Afterwards, the form life cycle's
- * "load" phase is initiated and the corresponding promise is returned.
+ * Loads the data and renders the form afterwards by adding it to the desktop.
+ * <p>
+ * Calling this method is equivalent to calling load() first and once the promise is resolved, calling show().
+ * <p>
+ * Keep in mind that the form won't be rendered immediately after calling {@link open}. Because promises are always resolved asynchronously,
+ * {@link show} will be called delayed even if {@link load} does nothing but return a resolved promise.<br>
+ * This is only relevant if you need to access properties which are only available when the form is rendered (e.g. $container), which is not recommended anyway.
+ * <p>
  *
- * Calling this method is equivalent to calling first show(), then load().
- *
- * @returns {Promise}.
+ * @returns {Promise} the promise returned by the {@link load} function.
  */
 scout.Form.prototype.open = function() {
-  this.show();
-  return this.load();
+  return this.load()
+    .then(function() {
+      if (this.destroyed) {
+        // If form has been closed right after it was opened don't try to show it
+        return;
+      }
+      this.show();
+    }.bind(this));
 };
 
 /**
  * Initializes the life cycle and calls the {@link _load} function.
- * @returns {Promise}.
+ * @returns {Promise} promise which is resolved when the form is loaded.
  */
 scout.Form.prototype.load = function() {
   return this.lifecycle.load();
 };
 
+/**
+ * @returns {Promise} promise which is resolved when the form is loaded, respectively when the 'load' event is triggered'.
+ */
+scout.Form.prototype.whenLoad = function() {
+  return this.when('load');
+};
+
 scout.Form.prototype._onLifecycleLoad = function() {
   return this._load().then(function(data) {
+    if (this.destroyed) {
+      // If form has been closed right after it was opened ignore the load result
+      return;
+    }
     this.setData(data);
     this.importData();
     this.trigger('load');
@@ -222,6 +243,13 @@ scout.Form.prototype._load = function() {
   return $.resolvedPromise().then(function() {
     return this.data;
   }.bind(this));
+};
+
+/**
+ * @returns {Promise} promise which is resolved when the form is post loaded, respectively when the 'postLoad' event is triggered'.
+ */
+scout.Form.prototype.whenPostLoad = function() {
+  return this.when('postLoad');
 };
 
 scout.Form.prototype._onLifecyclePostLoad = function() {
@@ -248,7 +276,7 @@ scout.Form.prototype.exportData = function() {
 
 /**
  * Saves and closes the form.
- * @returns {Promise}.
+ * @returns {Promise} promise which is resolved when the form is closed.
  */
 scout.Form.prototype.ok = function() {
   return this.lifecycle.ok();
@@ -256,10 +284,19 @@ scout.Form.prototype.ok = function() {
 
 /**
  * Saves the changes without closing the form.
- * @returns {Promise}.
+ * @returns {Promise} promise which is resolved when the form is saved
+ *    Note: it will be resolved even if the form does not require save and therefore even if {@link @_save} is not called.
+ *    If you only want to be informed when save is required and {@link @_save} executed then you could use {@link whenSave()} or {@link on('save')} instead.
  */
 scout.Form.prototype.save = function() {
   return this.lifecycle.save();
+};
+
+/**
+ * @returns {Promise} promise which is resolved when the form is saved, respectively when the 'save' event is triggered'.
+ */
+scout.Form.prototype.whenSave = function() {
+  return this.when('save');
 };
 
 scout.Form.prototype._onLifecycleSave = function() {
@@ -282,6 +319,13 @@ scout.Form.prototype.reset = function() {
   this.lifecycle.reset();
 };
 
+/**
+ * @returns {Promise} promise which is resolved when the form is reset, respectively when the 'reset' event is triggered'.
+ */
+scout.Form.prototype.whenReset = function() {
+  return this.when('reset');
+};
+
 scout.Form.prototype._onLifecycleReset = function() {
   this.trigger('reset');
 };
@@ -295,11 +339,25 @@ scout.Form.prototype.cancel = function() {
 };
 
 /**
+ * @returns {Promise} promise which is resolved when the form is cancelled, respectively when the 'cancel' event is triggered'.
+ */
+scout.Form.prototype.whenCancel = function() {
+  return this.when('cancel');
+};
+
+/**
  * Closes the form and discards any unsaved changes.
  * @returns {Promise}.
  */
 scout.Form.prototype.close = function() {
   return this.lifecycle.close();
+};
+
+/**
+ * @returns {Promise} promise which is resolved when the form is closed, respectively when the 'close' event is triggered'.
+ */
+scout.Form.prototype.whenClose = function() {
+  return this.when('close');
 };
 
 /**
@@ -328,6 +386,13 @@ scout.Form.prototype.abort = function() {
   if (!event.defaultPrevented) {
     this._abort();
   }
+};
+
+/**
+ * @returns {Promise} promise which is resolved when the form is aborted, respectively when the 'abort' event is triggered'.
+ */
+scout.Form.prototype.whenAbort = function() {
+  return this.when('abort');
 };
 
 /**
@@ -411,6 +476,11 @@ scout.Form.prototype.show = function() {
 };
 
 scout.Form.prototype.hide = function() {
+  if (!this.rendered) {
+    // Form has already been removed or has never been rendered -> do nothing
+    // May also happen if close is called immediately after open() without waiting for the open promise to resolve
+    return;
+  }
   this.session.desktop.hideForm(this);
 };
 
