@@ -74,9 +74,9 @@ scout.Column.prototype.init = function(model) {
 scout.Column.prototype._init = function(model) {
   scout.texts.resolveTextProperty(this, 'text');
   scout.icons.resolveIconProperty(this, 'headerIconId');
+  this._setTable(this.table);
   this._setDisplayable(this.displayable);
   this._setAutoOptimizeWidth(this.autoOptimizeWidth);
-  this._setTable(this.table);
   // no need to call setEditable here. cell propagation is done in _initCell
 };
 

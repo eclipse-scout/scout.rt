@@ -166,14 +166,13 @@ scout.Table.prototype._initColumns = function() {
   this.tableNodeColumn = null;
 
   this.columns = this.columns.map(function(colModel, index) {
-    var column;
-    colModel.session = this.session;
-    if (colModel instanceof scout.Column) {
-      colModel._setTable(this);
-    } else {
-      colModel.table = this;
+    var column = colModel;
+    column.session = this.session;
+    if (!(column instanceof scout.Column)) {
+      column = scout.create(column);
     }
-    column = scout.create(colModel);
+    column._setTable(this);
+
     if (column.index < 0) {
       column.index = index;
     }
@@ -210,6 +209,7 @@ scout.Table.prototype._destroyColumns = function() {
     column.destroy();
   });
   this.checkableColumn = null;
+  this.columns = [];
 };
 
 /**

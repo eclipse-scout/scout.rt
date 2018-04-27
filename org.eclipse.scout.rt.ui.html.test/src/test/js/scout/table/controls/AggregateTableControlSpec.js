@@ -88,10 +88,10 @@ describe("AggregateTableControl", function() {
       tableControl.selected = true;
       table._setTableControls([tableControl]);
 
-      column0 = model.columns[0];
-      column1 = model.columns[1];
+      column0 = table.columns[0];
+      column1 = table.columns[1];
       column1.setAggregationFunction('sum');
-      column2 = model.columns[2];
+      column2 = table.columns[2];
       column2.setAggregationFunction('sum');
     }
 

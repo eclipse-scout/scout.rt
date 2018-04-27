@@ -1048,18 +1048,18 @@ describe("Table", function() {
     function prepareTable() {
       model = helper.createModelFixture(3, 3);
       table = helper.createTable(model);
-      column0 = model.columns[0];
-      column1 = model.columns[1];
-      column2 = model.columns[2];
+      column0 = table.columns[0];
+      column1 = table.columns[1];
+      column2 = table.columns[2];
     }
 
     function prepareTableWithAdapter() {
       model = helper.createModelFixture(3, 3);
       adapter = helper.createTableAdapter(model);
       table = adapter.createWidget(model, session.desktop);
-      column0 = model.columns[0];
-      column1 = model.columns[1];
-      column2 = model.columns[2];
+      column0 = table.columns[0];
+      column1 = table.columns[1];
+      column2 = table.columns[2];
     }
 
     function render(table) {
@@ -1337,7 +1337,7 @@ describe("Table", function() {
     it("restores selection after sorting", function() {
       var model = helper.createModelSingleColumnByValues([5, 2, 1, 3, 4], 'NumberColumn'),
         table = helper.createTable(model),
-        column0 = model.columns[0],
+        column0 = table.columns[0],
         rows = table.rows;
       table.render();
 
@@ -1389,7 +1389,7 @@ describe("Table", function() {
 
         var model = helper.createModelSingleColumnByTexts(['Österreich', 'Italien', 'Zypern']);
         var table = helper.createTable(model);
-        column0 = model.columns[0];
+        column0 = table.columns[0];
         table.render();
 
         table.sort(column0, 'desc');
@@ -1414,7 +1414,7 @@ describe("Table", function() {
       it("sorts number columns", function() {
         var model = helper.createModelSingleColumnByValues([100, 90, 300], 'NumberColumn');
         var table = helper.createTable(model);
-        column0 = model.columns[0];
+        column0 = table.columns[0];
         table.render();
 
         table.sort(column0, 'desc');
@@ -1427,7 +1427,7 @@ describe("Table", function() {
       it("sorts date columns", function() {
         var model = helper.createModelSingleColumnByValues([new Date('2012-08-10'), new Date('2014-03-01'), new Date('1999-01-10')], 'DateColumn');
         var table = helper.createTable(model);
-        column0 = model.columns[0];
+        column0 = table.columns[0];
         table.render();
 
         table.sort(column0, 'desc');
@@ -1445,8 +1445,8 @@ describe("Table", function() {
         var model = helper.createModelFixture(2, 4);
         var table = helper.createTable(model);
 
-        column0 = model.columns[0];
-        column1 = model.columns[1];
+        column0 = table.columns[0];
+        column1 = table.columns[1];
 
         column0.setCellValue(model.rows[0], 'zzz');
         column1.setCellValue(model.rows[0], 'same');
@@ -1504,11 +1504,11 @@ describe("Table", function() {
       } else {
         table = helper.createTable(model);
       }
-      column0 = model.columns[0];
-      column1 = model.columns[1];
-      column2 = model.columns[2];
-      column3 = model.columns[3];
-      column4 = model.columns[4];
+      column0 = table.columns[0];
+      column1 = table.columns[1];
+      column2 = table.columns[2];
+      column3 = table.columns[3];
+      column4 = table.columns[4];
       column3.setAggregationFunction('sum');
       column4.setAggregationFunction('sum');
     }
@@ -2465,7 +2465,7 @@ describe("Table", function() {
 
       // Insert new rows and switch rows 0 and 1
       table.insertRows(newRows);
-      var orderedRows = [table.rows[1],table.rows[0],table.rows[3],table.rows[4],table.rows[2]];
+      var orderedRows = [table.rows[1], table.rows[0], table.rows[3], table.rows[4], table.rows[2]];
       table.updateRowOrder(orderedRows);
 
       // Check if rows were inserted
@@ -2477,7 +2477,7 @@ describe("Table", function() {
       // the complete/done function is scheduled and executed to a time where the test that started the animation
       // is already finished. So this will lead to unpredictable failures.
       var uiOrderedRows = [],
-      $row;
+        $row;
       table.$rows().each(function() {
         $row = $(this);
         uiOrderedRows.push($row.data('row'));
@@ -2530,9 +2530,9 @@ describe("Table", function() {
     beforeEach(function() {
       model = helper.createModelFixture(3, 2);
       table = helper.createTable(model);
-      column0 = model.columns[0];
-      column1 = model.columns[1];
-      column2 = model.columns[2];
+      column0 = table.columns[0];
+      column1 = table.columns[1];
+      column2 = table.columns[2];
     });
 
     it("resets the model columns", function() {
@@ -2664,13 +2664,15 @@ describe("Table", function() {
 
     beforeEach(function() {
       model = helper.createModelFixture(3, 2);
-      column0 = model.columns[0];
-      column1 = model.columns[1];
-      column2 = model.columns[2];
+
     });
 
     it("updates the text and sorting state of model columns", function() {
       table = helper.createTable(model);
+      column0 = table.columns[0];
+      column1 = table.columns[1];
+      column2 = table.columns[2];
+
       var text0 = table.columns[0].text;
 
       column1 = $.extend({}, table.columns[1]);
@@ -2700,6 +2702,10 @@ describe("Table", function() {
       model.columns[2].sortIndex = 0;
 
       table = helper.createTable(model);
+      column0 = table.columns[0];
+      column1 = table.columns[1];
+      column2 = table.columns[2];
+
       expect(table.columns[1].sortActive).toBe(true);
       expect(table.columns[1].sortAscending).toBe(true);
       expect(table.columns[1].sortIndex).toBe(1);
@@ -2720,6 +2726,9 @@ describe("Table", function() {
 
     it("updates the text and sorting state of html table header nodes", function() {
       table = helper.createTable(model);
+      column0 = table.columns[0];
+      column1 = table.columns[1];
+      column2 = table.columns[2];
       table.render();
 
       var $colHeaders = table.header.findHeaderItems();
@@ -2745,6 +2754,9 @@ describe("Table", function() {
 
     it("updates the custom css class of table header nodes", function() {
       table = helper.createTable(model);
+      column0 = table.columns[0];
+      column1 = table.columns[1];
+      column2 = table.columns[2];
       table.render();
 
       var $colHeaders = table.header.findHeaderItems();
@@ -2768,10 +2780,10 @@ describe("Table", function() {
     it("considers html enabled property of table header cells", function() {
       model = helper.createModelFixture(4, 2);
       table = helper.createTable(model);
-      column0 = model.columns[0];
-      column1 = model.columns[1];
-      column2 = model.columns[2];
-      var column3 = model.columns[3];
+      column0 = table.columns[0];
+      column1 = table.columns[1];
+      column2 = table.columns[2];
+      var column3 = table.columns[3];
 
       column0 = helper.createModelColumn('test');
       column0.id = model.columns[0].id;
