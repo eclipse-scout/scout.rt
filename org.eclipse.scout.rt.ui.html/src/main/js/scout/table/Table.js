@@ -2195,6 +2195,7 @@ scout.Table.prototype.expandRowsInternal = function(rows, expanded, recursive) {
     rowsForAnimation.forEach(function(row) {
       row.animateExpansion();
     });
+    this.revealSelection();
   }
 };
 
@@ -3079,6 +3080,7 @@ scout.Table.prototype.filter = function() {
     filteredRows: true
   });
   this._renderRowDelta();
+  this.revealSelection();
 };
 
 /**
