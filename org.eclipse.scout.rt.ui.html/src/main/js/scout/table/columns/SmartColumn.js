@@ -24,6 +24,7 @@ scout.inherits(scout.SmartColumn, scout.Column);
  * @override
  */
 scout.SmartColumn.prototype._init = function(model) {
+  scout.SmartColumn.parent.prototype._init.call(this, model);
   this._setLookupCall(this.lookupCall);
   this._setCodeType(this.codeType);
 };
