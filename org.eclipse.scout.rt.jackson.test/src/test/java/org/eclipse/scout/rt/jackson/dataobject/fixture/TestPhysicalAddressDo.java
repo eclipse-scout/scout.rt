@@ -4,6 +4,8 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
+import javax.annotation.Generated;
+
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.TypeName;
 
@@ -25,5 +27,42 @@ public class TestPhysicalAddressDo extends AbstractTestAddressDo {
 
   public DoValue<String> zipCode() {
     return doValue("zipCode");
+  }
+
+  /* **************************************************************************
+   * GENERATED CONVENIENCE METHODS
+   * *************************************************************************/
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestPhysicalAddressDo withStreet(String street) {
+    street().set(street);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public String getStreet() {
+    return street().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestPhysicalAddressDo withCity(String city) {
+    city().set(city);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public String getCity() {
+    return city().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestPhysicalAddressDo withZipCode(String zipCode) {
+    zipCode().set(zipCode);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public String getZipCode() {
+    return zipCode().get();
   }
 }
