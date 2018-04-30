@@ -10,8 +10,8 @@ import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.shared.AbstractIcons;
-import org.eclipse.scout.rt.shared.TEXTS;
 
 import ${package}.client.helloworld.HelloWorldForm.MainBox.TopBox;
 import ${package}.client.helloworld.HelloWorldForm.MainBox.TopBox.MessageField;
