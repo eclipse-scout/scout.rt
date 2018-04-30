@@ -33,6 +33,7 @@ scout.EventDelegator = function(source, target, options) {
   options = options || {};
   this.source = source;
   this.target = target;
+  this.callSetter = scout.nvl(options.callSetter, true);
   this.delegateProperties = options.delegateProperties || [];
   this.excludeProperties = options.excludeProperties || [];
   this.delegateEvents = options.delegateEvents || [];
@@ -86,7 +87,11 @@ scout.EventDelegator.prototype._onSourcePropertyChange = function(event) {
     return;
   }
   if (this.delegateAllProperties || this.delegateProperties.indexOf(event.propertyName) > -1) {
-    this.target.callSetter(event.propertyName, event.newValue);
+    if (this.callSetter) {
+      this.target.callSetter(event.propertyName, event.newValue);
+    } else {
+      this.target.trigger(event.type, event);
+    }
   }
 };
 

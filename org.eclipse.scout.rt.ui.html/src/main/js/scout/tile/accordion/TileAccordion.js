@@ -15,6 +15,7 @@ scout.TileAccordion = function() {
   this.multiSelect = null;
   this.selectable = null;
   this.tileComparator = null;
+  this.tileFilters = [];
   this.tileGridLayoutConfig = null;
   this.tileGridSelectionHandler = new scout.TileAccordionSelectionHandler(this);
   this.withPlaceholders = null;
@@ -23,11 +24,17 @@ scout.TileAccordion = function() {
 };
 scout.inherits(scout.TileAccordion, scout.Accordion);
 
+/**
+ * @override
+ */
 scout.TileAccordion.prototype._render = function() {
   scout.TileAccordion.parent.prototype._render.call(this);
   this.$container.addClass('tile-accordion');
 };
 
+/**
+ * @override
+ */
 scout.TileAccordion.prototype._initGroup = function(group) {
   scout.TileAccordion.parent.prototype._initGroup.call(this, group);
   group.body.setSelectionHandler(this.tileGridSelectionHandler);
@@ -60,19 +67,33 @@ scout.TileAccordion.prototype._initGroup = function(group) {
   }
   this.setProperty('tileComparator', group.body.comparator);
 
+  if (this.tileFilters.length > 0) {
+    group.body.setFilters(this.tileFilters);
+    group.body.filter();
+  }
+  this.setProperty('tileFilters', group.body.filters);
+
   if (this.withPlaceholders !== null) {
     group.body.setWithPlaceholders(this.withPlaceholders);
   }
   this.setProperty('withPlaceholders', group.body.withPlaceholders);
 
+  if (group.body.selectedTiles.length > 0) {
+    this._handleSelectionChanged(group.body);
+  }
+
   group.body.on('propertyChange', this._tileGridPropertyChangeHandler);
   this._handleCollapsed(group);
 
+  // Delegate events so that consumers don't need to attach a listener to each tile grid by themselves
   group.body.__tileAccordionEventDelegator = scout.EventDelegator.create(group.body, this, {
     delegateEvents: ['tileClick', 'tileAction']
   });
 };
 
+/**
+ * @override
+ */
 scout.TileAccordion.prototype._deleteGroup = function(group) {
   if (group.body) {
     group.body.off('propertyChange', this._tileGridPropertyChangeHandler);
@@ -82,11 +103,37 @@ scout.TileAccordion.prototype._deleteGroup = function(group) {
   scout.TileAccordion.parent.prototype._deleteGroup.call(this, group);
 };
 
+/**
+ * @override
+ */
+scout.TileAccordion.prototype.setGroups = function(groups) {
+  var oldTileCount = this.getTileCount();
+  var oldFilteredTileCount = this.getFilteredTileCount();
+  var oldSelectedTileCount = this.getSelectedTileCount();
+  scout.TileAccordion.parent.prototype.setGroups.call(this, groups);
+
+  var tileCount = this.getTileCount();
+  var filteredTileCount = this.getFilteredTileCount();
+  var selectedTileCount = this.getSelectedTileCount();
+
+  // Trigger artificial property changes if necessary
+  // See _onTileGridPropertyChange why parameters are null
+  if (tileCount !== oldTileCount) {
+    this.triggerPropertyChange('tiles', null, null);
+  }
+  if (filteredTileCount !== oldFilteredTileCount) {
+    this.triggerPropertyChange('filteredTiles', null, null);
+  }
+  if (selectedTileCount !== oldSelectedTileCount) {
+    this.triggerPropertyChange('selectedTiles', null, null);
+  }
+};
+
 scout.TileAccordion.prototype.setGridColumnCount = function(gridColumnCount) {
   this.groups.forEach(function(group) {
     group.body.setGridColumnCount(gridColumnCount);
   });
-  this._setProperty('gridColumnCount', gridColumnCount);
+  this.setProperty('gridColumnCount', gridColumnCount);
 };
 
 scout.TileAccordion.prototype.setTileGridLayoutConfig = function(layoutConfig) {
@@ -94,28 +141,28 @@ scout.TileAccordion.prototype.setTileGridLayoutConfig = function(layoutConfig) {
     group.body.setLayoutConfig(layoutConfig);
     layoutConfig = group.body.layoutConfig; // May be converted from plain object to TileGridLayoutConfig
   });
-  this._setProperty('tileGridLayoutConfig', layoutConfig);
+  this.setProperty('tileGridLayoutConfig', layoutConfig);
 };
 
 scout.TileAccordion.prototype.setWithPlaceholders = function(withPlaceholders) {
   this.groups.forEach(function(group) {
     group.body.setWithPlaceholders(withPlaceholders);
   });
-  this._setProperty('withPlaceholders', withPlaceholders);
+  this.setProperty('withPlaceholders', withPlaceholders);
 };
 
 scout.TileAccordion.prototype.setSelectable = function(selectable) {
   this.groups.forEach(function(group) {
     group.body.setSelectable(selectable);
   });
-  this._setProperty('selectable', selectable);
+  this.setProperty('selectable', selectable);
 };
 
 scout.TileAccordion.prototype.setMultiSelect = function(multiSelect) {
   this.groups.forEach(function(group) {
     group.body.setMultiSelect(multiSelect);
   });
-  this._setProperty('multiSelect', multiSelect);
+  this.setProperty('multiSelect', multiSelect);
 };
 
 scout.TileAccordion.prototype.getGroupById = function(id) {
@@ -212,6 +259,37 @@ scout.TileAccordion.prototype.getTileCount = function() {
     count += group.body.tiles.length;
   });
   return count;
+};
+
+scout.TileAccordion.prototype.addTileFilter = function(filter) {
+  var filters = this.tileFilters.slice();
+  if (filters.indexOf(filter) >= 0) {
+    return;
+  }
+  filters.push(filter);
+  this.setTileFilters(filters);
+};
+
+scout.TileAccordion.prototype.removeTileFilter = function(filter) {
+  var filters = this.tileFilters.slice();
+  if (!scout.arrays.remove(filters, filter)) {
+    return;
+  }
+  this.setTileFilters(filters);
+};
+
+scout.TileAccordion.prototype.setTileFilters = function(filters) {
+  filters = scout.arrays.ensure(filters);
+  this.groups.forEach(function(group) {
+    group.body.setFilters(filters);
+  });
+  this.setProperty('tileFilters', filters.slice());
+};
+
+scout.TileAccordion.prototype.filterTiles = function() {
+  this.groups.forEach(function(group) {
+    group.body.filter();
+  });
 };
 
 scout.TileAccordion.prototype.getFilteredTiles = function() {
@@ -345,7 +423,7 @@ scout.TileAccordion.prototype.setTileComparator = function(comparator) {
   this.groups.forEach(function(group) {
     group.body.setComparator(comparator);
   });
-  this._setProperty('tileComparator', comparator);
+  this.setProperty('tileComparator', comparator);
 };
 
 scout.TileAccordion.prototype.sortTiles = function() {
@@ -443,12 +521,11 @@ scout.TileAccordion.prototype.scrollToBottom = function() {
   scout.scrollbars.scrollToBottom(this.$container);
 };
 
-scout.TileAccordion.prototype._onTileGridSelectedTilesChange = function(event) {
+scout.TileAccordion.prototype._handleSelectionChanged = function(tileGrid) {
   if (this._selectionUpdateLocked) {
     // Don't execute when deselecting other tiles to minimize the amount of property change events
     return;
   }
-  var tileGrid = event.source;
   var group = tileGrid.parent;
   if (tileGrid.selectedTiles.length > 0 && group.collapsed) {
     // Do not allow selection in a collapsed group (breaks keyboard navigation and is confusing for the user if invisible tiles are selected)
@@ -465,12 +542,20 @@ scout.TileAccordion.prototype._onTileGridSelectedTilesChange = function(event) {
     });
     this._selectionUpdateLocked = false;
   }
-  this.triggerPropertyChange('selectedTiles', null, this.getSelectedTiles());
 };
 
 scout.TileAccordion.prototype._onTileGridPropertyChange = function(event) {
+  // Trigger artificial property changes with newValue set to null.
+  // Reason: these property changes are fired for each grid. Creating the compound arrays using getFilteredTiles() etc.
+  // costs some time (even if only some ms) but may not be necessary at all. The consumer can still call these functions by himself.
+  // Also: oldValue cannot be estimated either way which makes it consistent
   if (event.propertyName === 'selectedTiles') {
-    this._onTileGridSelectedTilesChange(event);
+    this._handleSelectionChanged(event.source);
+    this.triggerPropertyChange('selectedTiles', null, null);
+  } else if (event.propertyName === 'filteredTiles') {
+    this.triggerPropertyChange('filteredTiles', null, null);
+  } else if (event.propertyName === 'tiles') {
+    this.triggerPropertyChange('tiles', null, null);
   }
 };
 

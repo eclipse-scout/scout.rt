@@ -160,6 +160,10 @@ scout.Tile.prototype._renderVisible = function() {
     return;
   }
   if (!this.isVisible()) {
+    // Remove animate-visible first to show correct animation even if tile is made invisible while visible animation is still in progress
+    // It is also necessary if the container is made invisible before the animation is finished because animationEnd won't fire in that case
+    // which means that animate-invisible is still on the element and will trigger the (wrong) animation when container is made visible again
+    this.$container.removeClass('animate-visible');
     this.$container.addClassForAnimation('animate-invisible');
     this.$container.oneAnimationEnd(function() {
       // Make the element invisible after the animation (but only if visibility has not changed again in the meantime)
@@ -167,6 +171,7 @@ scout.Tile.prototype._renderVisible = function() {
     }.bind(this));
   } else {
     this.$container.setVisible(true);
+    this.$container.removeClass('animate-invisible');
     this.$container.addClassForAnimation('animate-visible');
   }
   this.invalidateParentLogicalGrid();

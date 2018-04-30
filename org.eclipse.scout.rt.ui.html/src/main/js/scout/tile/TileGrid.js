@@ -837,13 +837,24 @@ scout.TileGrid.prototype.revealSelection = function() {
 };
 
 scout.TileGrid.prototype.addFilter = function(filter) {
-  if (this.filters.indexOf(filter) < 0) {
-    this.filters.push(filter);
+  var filters = this.filters.slice();
+  if (filters.indexOf(filter) >= 0) {
+    return;
   }
+  filters.push(filter);
+  this.setFilters(filters);
 };
 
 scout.TileGrid.prototype.removeFilter = function(filter) {
-  scout.arrays.remove(this.filters, filter);
+  var filters = this.filters.slice();
+  if (!scout.arrays.remove(filters, filter)) {
+    return;
+  }
+  this.setFilters(filters);
+};
+
+scout.TileGrid.prototype.setFilters = function(filters) {
+  this.setProperty('filters', filters.slice());
 };
 
 scout.TileGrid.prototype.filter = function() {

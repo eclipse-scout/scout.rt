@@ -100,7 +100,6 @@ scout.Accordion.prototype.setGroups = function(groups) {
   this._insertGroups(groupsToInsert);
   this._sort(groups);
   this._updateGroupOrder(groups);
-
   this._setProperty('groups', groups);
 
   if (groupsToInsert.length > 0) {
