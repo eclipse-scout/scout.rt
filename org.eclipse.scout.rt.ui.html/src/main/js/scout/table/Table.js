@@ -1349,6 +1349,88 @@ scout.Table.prototype._rowsRenderedInfo = function() {
   return text;
 };
 
+/**
+ * Moves the row to the top.
+ */
+scout.Table.prototype.moveRowToTop = function(row) {
+  var rowIndex = this.rows.indexOf(row);
+  this.moveRow(rowIndex, 0);
+};
+
+/**
+ * Moves the row to the bottom.
+ */
+scout.Table.prototype.moveRowToBottom = function(row) {
+  var rowIndex = this.rows.indexOf(row);
+  this.moveRow(rowIndex, this.rows.length - 1);
+};
+
+/**
+ * Moves the row one up, disregarding filtered rows.
+ */
+scout.Table.prototype.moveRowUp = function(row) {
+  var rowIndex = this.rows.indexOf(row);
+  this.moveRow(rowIndex, rowIndex - 1);
+};
+
+/**
+ * Moves the row one down, disregarding filtered rows.
+ */
+scout.Table.prototype.moveRowDown = function(row) {
+  var rowIndex = this.rows.indexOf(row);
+  this.moveRow(rowIndex, rowIndex + 1);
+};
+
+/**
+ * Moves the row one up with respected to filtered rows. Row must be one of the filtered rows.
+ */
+scout.Table.prototype.moveFilteredRowUp = function(row) {
+  var filteredRowIndex = this._filteredRows.indexOf(row);
+  this.moveFilteredRow(filteredRowIndex, filteredRowIndex - 1);
+};
+
+/**
+ * Moves the row one down with respected to filtered rows. Row must be one of the filtered rows.
+ */
+scout.Table.prototype.moveFilteredRowDown = function(row) {
+  var filteredRowIndex = this._filteredRows.indexOf(row);
+  this.moveFilteredRow(filteredRowIndex, filteredRowIndex + 1);
+};
+
+scout.Table.prototype.moveFilteredRow = function(filteredSourceIndex, filteredTargetIndex) {
+  var rowCount = this._filteredRows.length;
+  filteredSourceIndex = Math.max(filteredSourceIndex, 0);
+  filteredSourceIndex = Math.min(filteredSourceIndex, rowCount - 1);
+  filteredTargetIndex = Math.max(filteredTargetIndex, 0);
+  filteredTargetIndex = Math.min(filteredTargetIndex, rowCount - 1);
+
+  if (filteredSourceIndex === filteredTargetIndex) {
+    return;
+  }
+
+  var sourceRow = this._filteredRows[filteredSourceIndex];
+  var targetRow = this._filteredRows[filteredTargetIndex];
+  var sourceIndex = this.rows.indexOf(sourceRow);
+  var targetIndex = this.rows.indexOf(targetRow);
+
+  this.moveRow(sourceIndex, targetIndex);
+};
+
+scout.Table.prototype.moveRow = function(sourceIndex, targetIndex) {
+  var rowCount = this.rows.length;
+  sourceIndex = Math.max(sourceIndex, 0);
+  sourceIndex = Math.min(sourceIndex, rowCount - 1);
+  targetIndex = Math.max(targetIndex, 0);
+  targetIndex = Math.min(targetIndex, rowCount - 1);
+
+  if (sourceIndex === targetIndex) {
+    return;
+  }
+
+  scout.arrays.move(this.rows, sourceIndex, targetIndex);
+  this.updateRowOrder(this.rows);
+};
+
 scout.Table.prototype._removeRowsInRange = function(range) {
   var fromRow, toRow, row, i,
     numRowsRemoved = 0,
