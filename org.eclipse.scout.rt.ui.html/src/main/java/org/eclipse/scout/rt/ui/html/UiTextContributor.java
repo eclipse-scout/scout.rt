@@ -48,6 +48,10 @@ public class UiTextContributor implements IUiTextContributor {
         "SmartFieldNotUnique",
         "Yes",
         "YesButton",
+        "NumberTooLargeMessageXY",
+        "NumberTooLargeMessageX",
+        "NumberTooSmallMessageXY",
+        "NumberTooSmallMessageX",
         // From org.eclipse.scout.rt.ui.html
         "ui.CodeUndefined",
         "ui.CalendarToday",

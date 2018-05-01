@@ -11,9 +11,19 @@
 scout.NumberField = function() {
   scout.NumberField.parent.call(this);
   this.calc = new scout.Calculator();
+  this.minValue = null;
+  this.maxValue = null;
+  this.decimalFormat = null;
   this.invalidValueMessageKey = 'InvalidNumberMessageX';
 };
 scout.inherits(scout.NumberField, scout.BasicField);
+
+scout.NumberField.prototype._init = function(model) {
+  scout.NumberField.parent.prototype._init.call(this, model);
+  this._setMinValue(this.minValue);
+  this._setMaxValue(this.maxValue);
+  this._setDecimalFormat(this.decimalFormat);
+};
 
 /**
  * Initializes the decimal format before calling set value.
@@ -119,7 +129,27 @@ scout.NumberField.prototype._validateValue = function(value) {
   if (!scout.numbers.isNumber(value)) {
     throw this.session.text(this.invalidValueMessageKey, value);
   }
+  if (!scout.objects.isNullOrUndefined(this.minValue) && value < this.minValue) {
+    this._onNumberTooSmall();
+  }
+  if (!scout.objects.isNullOrUndefined(this.maxValue) && value > this.maxValue) {
+    this._onNumberTooLarge();
+  }
   return value;
+};
+
+scout.NumberField.prototype._onNumberTooLarge = function() {
+  if (scout.objects.isNullOrUndefined(this.minValue)) {
+    throw this.session.text("NumberTooLargeMessageX", this._formatValue(this.maxValue));
+  }
+  throw this.session.text("NumberTooLargeMessageXY", this._formatValue(this.minValue), this._formatValue(this.maxValue));
+};
+
+scout.NumberField.prototype._onNumberTooSmall = function() {
+  if (scout.objects.isNullOrUndefined(this.maxValue)) {
+    throw this.session.text("NumberTooSmallMessageX", this._formatValue(this.minValue));
+  }
+  throw this.session.text("NumberTooSmallMessageXY", this._formatValue(this.minValue), this._formatValue(this.maxValue));
 };
 
 /**
@@ -134,4 +164,46 @@ scout.NumberField.prototype._formatValue = function(value) {
     return value + '';
   }
   return this.decimalFormat.format(value, false); // parse does not support multiplier yet -> disable it for the formatting
+};
+
+/**
+ * Set the minimum value. Value <code>null</code> means no limitation.
+ * <p>
+ * If the new minimum value is bigger than the current maxValue, the current maximum value is changed to the new minimum value.
+ * @param {number} the new minimum value
+ */
+scout.NumberField.prototype.setMinValue = function(minValue) {
+  if (this.minValue === minValue) {
+    return;
+  }
+  this._setMinValue(minValue);
+  this.validate();
+};
+
+scout.NumberField.prototype._setMinValue = function(minValue) {
+  this._setProperty('minValue', minValue);
+  if (!scout.objects.isNullOrUndefined(this.maxValue) && minValue > this.maxValue) {
+    this._setMaxValue(minValue);
+  }
+};
+
+/**
+ * Set the maximum value. Value <code>null</code> means no limitation.
+ * <p>
+ * If the new maximum value is smaller than the current minValue, the current minimum value is changed to the new maximum value.
+ * @param {number} the new minimum value
+ */
+scout.NumberField.prototype.setMaxValue = function(maxValue) {
+  if (this.maxValue === maxValue) {
+    return;
+  }
+  this._setMaxValue(maxValue);
+  this.validate();
+};
+
+scout.NumberField.prototype._setMaxValue = function(maxValue) {
+  this._setProperty('maxValue', maxValue);
+  if (!scout.objects.isNullOrUndefined(this.minValue) && maxValue < this.minValue) {
+    this._setMinValue(maxValue);
+  }
 };

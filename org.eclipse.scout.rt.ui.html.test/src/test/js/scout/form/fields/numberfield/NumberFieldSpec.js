@@ -72,6 +72,56 @@ describe('NumberField', function() {
 
   });
 
+  describe('minMaxValue', function() {
+    it('is always in order', function() {
+      var field = helper.createField('NumberField');
+      field.setMinValue(2);
+      field.setMaxValue(1);
+
+      expect(field.minValue).toBe(1);
+      expect(field.maxValue).toBe(1);
+
+      field.setMaxValue(10);
+      field.setMinValue(11);
+
+      expect(field.minValue).toBe(11);
+      expect(field.maxValue).toBe(11);
+    });
+
+    it('is validated when setting new value', function() {
+      var field = helper.createField('NumberField');
+      field.setMinValue(1);
+      field.setMaxValue(10);
+
+      field.setValue(0);
+      expect(field.errorStatus instanceof scout.Status).toBe(true);
+
+      field.setValue(3);
+      expect(field.errorStatus).toBe(null);
+
+      field.setValue(13);
+      expect(field.errorStatus instanceof scout.Status).toBe(true);
+    });
+
+    it('is validated when changing minMaxValue', function() {
+      var field = helper.createField('NumberField');
+      field.setValue(5);
+      expect(field.errorStatus).toBe(null);
+
+      field.setMinValue(6);
+      expect(field.errorStatus instanceof scout.Status).toBe(true);
+
+      field.setMinValue(5);
+      expect(field.errorStatus).toBe(null);
+
+      field.setMaxValue(4);
+      expect(field.errorStatus instanceof scout.Status).toBe(true);
+
+      field.setMaxValue(5);
+      expect(field.errorStatus).toBe(null);
+    });
+  });
+
   describe('acceptInput', function() {
     it('updates the display text after calculation even if the value was not changed', function() {
       var field = helper.createField('NumberField');
