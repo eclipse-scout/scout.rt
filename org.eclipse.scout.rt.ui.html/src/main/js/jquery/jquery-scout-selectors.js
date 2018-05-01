@@ -13,9 +13,7 @@
  * Part of this file is copied with some modifications from jQuery UI.
  */
 function focusable(element, isTabIndexNotNaN) {
-  var map, mapName, img,
-    nodeName = element.nodeName.toLowerCase();
-
+  var nodeName = element.nodeName.toLowerCase();
   return (/input|select|textarea|button|object/.test(nodeName) ?
       !element.disabled :
       'a' === nodeName ?
