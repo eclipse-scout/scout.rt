@@ -169,9 +169,9 @@ scout.Table.prototype._initColumns = function() {
     var column = colModel;
     column.session = this.session;
     if (!(column instanceof scout.Column)) {
+      column.table = this;
       column = scout.create(column);
     }
-    column._setTable(this);
 
     if (column.index < 0) {
       column.index = index;

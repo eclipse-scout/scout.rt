@@ -93,9 +93,6 @@ scout.Column.prototype._destroy = function(model) {
 };
 
 scout.Column.prototype._setTable = function(table) {
-  if (this.table === table) {
-    return;
-  }
   if (this.table) {
     this.table.off('columnMoved columnStructureChanged', this._tableColumnsChangedHandler);
   }
