@@ -46,18 +46,20 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
 
   protected void initClientBuilder(ClientBuilder clientBuilder) {
     ClientConfig clientConfig = new ClientConfig();
-    // TODO 8.0 pbz: Temporary workaround, see Jersey Issue 3771: https://github.com/jersey/jersey/pull/3771 (remove this code line when issue is resolved, see also TODO in pom.xml)
+
+    // TODO 8.0 pbz: Temporary workaround, this code line and the direct dependency to the Apache connector will be removed as soon as the jersey issue is resolved.
+    // See Jersey Issue 3771: https://github.com/jersey/jersey/pull/3771 (see also TO DO in pom.xml)
     clientConfig.connectorProvider(new ApacheConnectorProvider());
 
-    initConfigurable(clientConfig);
+    initClientConfig(clientConfig);
     clientBuilder.withConfig(clientConfig);
   }
 
   /**
-   * Override this method to setup the {@link Configurable} with custom properties. <br>
-   * This default method does not setup any properties.
+   * Override this method to setup the JAX-RS client configuration with any custom properties. <br>
+   * The default implementation doesn't setup any properties.
    */
-  protected void initConfigurable(Configurable<?> configurable) {
+  protected void initClientConfig(Configurable<?> clientConfig) {
     // NOP
   }
 
