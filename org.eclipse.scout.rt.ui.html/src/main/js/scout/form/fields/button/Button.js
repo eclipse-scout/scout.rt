@@ -192,7 +192,7 @@ scout.Button.prototype._renderBackgroundColor = function() {
 
 scout.Button.prototype._renderFont = function() {
   scout.Button.parent.prototype._renderFont.call(this);
-  scout.styles.legacyFont(this, this.$buttonLabel, ['font']);
+  scout.styles.legacyFont(this, this.$buttonLabel);
   // Changing the font may enlarge or shrink the field (e.g. set the style to bold makes the text bigger) -> invalidate layout
   this.invalidateLayoutTree();
 };
