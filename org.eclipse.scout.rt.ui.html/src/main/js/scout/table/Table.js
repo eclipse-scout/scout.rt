@@ -58,6 +58,7 @@ scout.Table = function() {
   this._filterMap = {};
   this._filteredRows = [];
   this.tableNodeColumn = null;
+  this._maxLevel = 0;
   this.tooltips = [];
   this._aggregateRows = [];
   this._animationRowLimit = 25;
@@ -163,8 +164,6 @@ scout.Table.prototype._initRow = function(row) {
 };
 
 scout.Table.prototype._initColumns = function() {
-  this.tableNodeColumn = null;
-
   this.columns = this.columns.map(function(colModel, index) {
     var column = colModel;
     column.session = this.session;
@@ -182,9 +181,6 @@ scout.Table.prototype._initColumns = function() {
       // set checkable column if this column is the checkable one
       this.checkableColumn = column;
     }
-    if (!this.tableNodeColumn && column.isVisible()) {
-      this.tableNodeColumn = column;
-    }
     return column;
   }, this);
 
@@ -195,6 +191,8 @@ scout.Table.prototype._initColumns = function() {
   if (this.rowIconVisible) {
     this._insertRowIconColumn();
   }
+
+  this._calculateTableNodeColumn();
 
   // Sync head and tail sort columns
   this._setHeadAndTailSortColumns();
@@ -212,6 +210,27 @@ scout.Table.prototype._destroyColumns = function() {
   });
   this.checkableColumn = null;
   this.columns = [];
+};
+
+scout.Table.prototype._calculateTableNodeColumn = function() {
+  var tableNodeColumn = scout.arrays.first(this.visibleColumns(false));
+  if (this.tableNodeColumn && this.tableNodeColumn !== tableNodeColumn) {
+    // restore
+    this.tableNodeColumn.minWidth = this.tableNodeColumn._initialMinWidth;
+  }
+  this.tableNodeColumn = tableNodeColumn;
+  if (this.tableNodeColumn) {
+    this.tableNodeColumn._initialMinWidth = this.tableNodeColumn.minWidth;
+    this.tableNodeColumn.minWidth = this.rowLevelPadding * this._maxLevel + this.tableNodeColumn.tableNodeLevel0CellPadding + 8;
+
+    if (this.tableNodeColumn.minWidth > this.tableNodeColumn.width) {
+      if (this.rendered) {
+        this.resizeColumn(this.tableNodeColumn, this.tableNodeColumn.minWidth);
+      } else {
+        this.tableNodeColumn.width = this.tableNodeColumn.minWidth;
+      }
+    }
+  }
 };
 
 /**
@@ -3060,11 +3079,15 @@ scout.Table.prototype._rebuildTreeStructure = function() {
   }, this);
 
   // traverse row tree to have minimal order of rows.
+  this._maxLevel = 0;
   this.rows = [];
   this.visitRows(function(row, level) {
     row._hierarchyLevel = level;
+    this._maxLevel = Math.max(level, this._maxLevel);
     this.rows.push(row);
   }.bind(this));
+
+  this._calculateTableNodeColumn();
 };
 
 scout.Table.prototype._updateFilteredRows = function(applyFilters, changed) {
@@ -3391,9 +3414,7 @@ scout.Table.prototype.moveColumn = function(column, visibleOldPos, visibleNewPos
 
   visibleColumns = this.visibleColumns();
   visibleNewPos = visibleColumns.indexOf(column); // we must re-evaluate visible columns
-  this.tableNodeColumn = scout.arrays.find(visibleColumns, function(col) {
-    return !col.guiOnly;
-  });
+  this._calculateTableNodeColumn();
 
   this._triggerColumnMoved(column, visibleOldPos, visibleNewPos, dragged);
 
