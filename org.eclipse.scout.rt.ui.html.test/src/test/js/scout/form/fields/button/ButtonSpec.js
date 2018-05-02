@@ -52,4 +52,71 @@ describe("Button", function() {
     });
   });
 
+  describe('setting legacy styles', function() {
+    it('sets style attributes', function() {
+      var button = scout.create('Button', {
+        parent: session.desktop,
+        label: 'label',
+        foregroundColor: 'red',
+        backgroundColor: 'yellow',
+        font: '15-ITALIC-Times New Roman'
+      });
+      button.render();
+      expect(button.$field[0].style.color).toBe('red');
+      expect(button.$field[0].style.backgroundColor).toBe('yellow');
+      expect(button.$field[0].style.fontFamily).toMatch(/['"]?Times New Roman['"]?/);
+      expect(button.$field[0].style.fontSize).toBe('15pt');
+      expect(button.$field[0].style.fontStyle).toBe('italic');
+      expect(button.$field[0].style.fontWeight).toBe('');
+      expect(button.$buttonLabel[0].style.color).toBe('red');
+      expect(button.$buttonLabel[0].style.backgroundColor).toBe('');
+      expect(button.$buttonLabel[0].style.fontFamily).toMatch(/['"]?Times New Roman['"]?/);
+      expect(button.$buttonLabel[0].style.fontSize).toBe('15pt');
+      expect(button.$buttonLabel[0].style.fontStyle).toBe('italic');
+      expect(button.$buttonLabel[0].style.fontWeight).toBe('');
+
+      button.setFont(null);
+      expect(button.$field[0].style.color).toBe('red');
+      expect(button.$field[0].style.backgroundColor).toBe('yellow');
+      expect(button.$field[0].style.fontFamily).toBe('');
+      expect(button.$field[0].style.fontSize).toBe('');
+      expect(button.$field[0].style.fontStyle).toBe('');
+      expect(button.$field[0].style.fontWeight).toBe('');
+      expect(button.$buttonLabel[0].style.color).toBe('red');
+      expect(button.$buttonLabel[0].style.backgroundColor).toBe('');
+      expect(button.$buttonLabel[0].style.fontFamily).toBe('');
+      expect(button.$buttonLabel[0].style.fontSize).toBe('');
+      expect(button.$buttonLabel[0].style.fontStyle).toBe('');
+      expect(button.$buttonLabel[0].style.fontWeight).toBe('');
+
+      button.setForegroundColor('green');
+      expect(button.$field[0].style.color).toBe('green');
+      expect(button.$field[0].style.backgroundColor).toBe('yellow');
+      expect(button.$field[0].style.fontFamily).toBe('');
+      expect(button.$field[0].style.fontSize).toBe('');
+      expect(button.$field[0].style.fontStyle).toBe('');
+      expect(button.$field[0].style.fontWeight).toBe('');
+      expect(button.$buttonLabel[0].style.color).toBe('green');
+      expect(button.$buttonLabel[0].style.backgroundColor).toBe('');
+      expect(button.$buttonLabel[0].style.fontFamily).toBe('');
+      expect(button.$buttonLabel[0].style.fontSize).toBe('');
+      expect(button.$buttonLabel[0].style.fontStyle).toBe('');
+      expect(button.$buttonLabel[0].style.fontWeight).toBe('');
+
+      button.setFont('bold');
+      expect(button.$field[0].style.color).toBe('green');
+      expect(button.$field[0].style.backgroundColor).toBe('yellow');
+      expect(button.$field[0].style.fontFamily).toBe('');
+      expect(button.$field[0].style.fontSize).toBe('');
+      expect(button.$field[0].style.fontStyle).toBe('');
+      expect(button.$field[0].style.fontWeight).toBe('bold');
+      expect(button.$buttonLabel[0].style.color).toBe('green');
+      expect(button.$buttonLabel[0].style.backgroundColor).toBe('');
+      expect(button.$buttonLabel[0].style.fontFamily).toBe('');
+      expect(button.$buttonLabel[0].style.fontSize).toBe('');
+      expect(button.$buttonLabel[0].style.fontStyle).toBe('');
+      expect(button.$buttonLabel[0].style.fontWeight).toBe('bold');
+    });
+  });
+
 });
