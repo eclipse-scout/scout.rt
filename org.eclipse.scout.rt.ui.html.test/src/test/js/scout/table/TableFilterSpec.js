@@ -321,10 +321,10 @@ describe("TableFilter", function() {
 
       filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
       table.filter();
-      expect(table.$emptyData).toBeUndefined();
+      expect(table.$emptyData).toBe(null);
 
       table.resetFilter();
-      expect(table.$emptyData).toBeUndefined();
+      expect(table.$emptyData).toBe(null);
       expect(table.$rows().length).toBe(7);
     });
 

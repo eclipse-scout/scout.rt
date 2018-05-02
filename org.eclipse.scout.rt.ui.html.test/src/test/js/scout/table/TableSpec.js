@@ -2586,6 +2586,17 @@ describe("Table", function() {
       expect($colHeaders.eq(1).text()).toBe(column1.text);
       expect($colHeaders.eq(2).text()).toBe(column2.text);
     });
+
+    it("updates width of empty data", function() {
+      table.deleteAllRows();
+      table.render();
+      var rowWidth = table.rowWidth;
+      expect(table.$emptyData.width()).toBe(rowWidth);
+
+      table.updateColumnStructure([column0, column1]);
+      expect(table.rowWidth < rowWidth).toBe(true); // row width should be smaller now
+      expect(table.$emptyData.width()).toBe(table.rowWidth); // $empty data should be adjusted accordingly
+    });
   });
 
   describe("updateColumnOrder", function() {
