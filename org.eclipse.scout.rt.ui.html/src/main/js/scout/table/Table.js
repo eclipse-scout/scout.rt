@@ -1250,7 +1250,6 @@ scout.Table.prototype._removeRowsInRange = function(range) {
     throw new Error('Can only remove rows at the beginning or end of the existing range. ' + this.viewRangeRendered + '. New: ' + newRange);
   }
   this.viewRangeRendered = newRange[0];
-  this._removeEmptyData();
 
   for (i = range.from; i < range.to; i++) {
     row = rows[i];
@@ -2115,6 +2114,7 @@ scout.Table.prototype.deleteRows = function(rows) {
     // Update markers and filler because row may be removed by removeRows. RenderViewport doesn't do it if view range is already correctly rendered.
     this._renderRangeMarkers();
     this._renderFiller();
+    this._renderEmptyData();
     this.invalidateLayoutTree();
   }
 };
@@ -2152,6 +2152,7 @@ scout.Table.prototype.deleteAllRows = function() {
   if (this.rendered) {
     this._renderFiller();
     this._renderViewport();
+    this._renderEmptyData();
     this.invalidateLayoutTree();
   }
 };
@@ -2956,14 +2957,9 @@ scout.Table.prototype.resizeColumn = function(column, width) {
   this._renderFiller();
   this._renderViewport();
   this.updateScrollbars();
+  this._renderEmptyData();
 
   this._triggerColumnResized(column);
-
-  if (column.resizingInProgress) {
-    this._renderEmptyData();
-  } else {
-    this._renderEmptyData(this.rowWidth - this.rowBorderWidth);
-  }
 };
 
 scout.Table.prototype.moveColumn = function(column, visibleOldPos, visibleNewPos, dragged) {
@@ -3407,26 +3403,23 @@ scout.Table.prototype._removeTableHeader = function() {
 /**
  * @param width optional width of emptyData, if omitted the width is set to the header's scrollWidth.
  */
-scout.Table.prototype._renderEmptyData = function(width) {
-  if (this.header && this.filteredRows().length === 0) {
-    if (!this.$emptyData) {
-      this.$emptyData = this.$data.appendDiv().html('&nbsp;');
-    }
-    // measure header-width and subtract insets from table-data
-    var
-      horizInsets = scout.graphics.insets(this.$data).horizontal(),
-      headerWidth = scout.nvl(width, this.header.$container[0].scrollWidth) - horizInsets;
-    this.$emptyData
-      .css('min-width', headerWidth)
-      .css('max-width', headerWidth);
+scout.Table.prototype._renderEmptyData = function() {
+  if (!this.header || this.filteredRows().length > 0) {
+    return;
   }
+  if (!this.$emptyData) {
+    this.$emptyData = this.$data.appendDiv().html('&nbsp;');
+  }
+  this.$emptyData
+    .css('min-width', this.rowWidth)
+    .css('max-width', this.rowWidth);
   this.updateScrollbars();
 };
 
 scout.Table.prototype._removeEmptyData = function() {
   if (this.filteredRows().length > 0 && this.$emptyData) {
     this.$emptyData.remove();
-    this.$emptyData = undefined;
+    this.$emptyData = null;
     this.updateScrollbars();
   }
 };
@@ -3821,6 +3814,7 @@ scout.Table.prototype.updateColumnStructure = function(columns) {
     this._updateRowWidth();
     this.$rows(true).css('width', this.rowWidth);
     this._rerenderHeaderColumns();
+    this._renderEmptyData();
   }
   this.trigger('columnStructureChanged');
 };
