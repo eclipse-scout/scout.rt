@@ -9,8 +9,22 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 /* global removePopups */
+
 describe("Table", function() {
   var session, helper;
+
+  /**
+   * TestBeanColumn that validates that the table is available in _init
+   */
+  scout.TestBeanColumn = function() {
+    scout.TestBeanColumn.parent.call(this);
+  };
+  scout.inherits(scout.TestBeanColumn, scout.BeanColumn);
+  scout.TestBeanColumn.prototype._init = function(model) {
+    scout.TestBeanColumn.parent.prototype._init.call(this, model);
+    expect(this.table).toBeDefined();
+    expect(this.table).not.toBeNull();
+  };
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -2488,6 +2502,17 @@ describe("Table", function() {
   });
 
   describe("initColumns", function() {
+
+    it("table is available in _init", function() {
+      var table = scout.create('Table', {
+        parent: session.desktop,
+        columns: [{
+          objectType: 'scout.TestBeanColumn'
+        }]
+      });
+      // assertions are done in the TestBeanColumn
+    });
+
     it("sets the column indices if not already set", function() {
       var table = scout.create('Table', {
         parent: session.desktop,
