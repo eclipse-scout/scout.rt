@@ -1229,6 +1229,7 @@ $.fn.cssMarginX = function(value) {
   }
   this.cssMarginLeft(value);
   this.cssMarginRight(value);
+  return this;
 };
 
 $.fn.cssMarginY = function(value) {
@@ -1237,6 +1238,7 @@ $.fn.cssMarginY = function(value) {
   }
   this.cssMarginTop(value);
   this.cssMarginBottom(value);
+  return this;
 };
 
 $.fn.cssPaddingTop = function(value) {
@@ -1261,6 +1263,7 @@ $.fn.cssPaddingX = function(value) {
   }
   this.cssPaddingLeft(value);
   this.cssPaddingRight(value);
+  return this;
 };
 
 $.fn.cssPaddingY = function(value) {
@@ -1269,6 +1272,7 @@ $.fn.cssPaddingY = function(value) {
   }
   this.cssPaddingTop(value);
   this.cssPaddingBottom(value);
+  return this;
 };
 
 $.fn.cssBorderBottomWidth = function(value) {

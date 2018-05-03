@@ -15,19 +15,21 @@ scout.GroupLayout = function(group) {
 scout.inherits(scout.GroupLayout, scout.AbstractLayout);
 
 scout.GroupLayout.prototype.layout = function($container) {
+  // Set size only if group is expande
+  // Also there is no need to update it during the expand animation (the body will be layouted correctly before the animation starts)
+  if (this.group.collapsed || this.group.bodyAnimating) {
+    return;
+  }
   var bodySize;
   var htmlComp = this.group.htmlComp;
   var htmlHeader = this.group.htmlHeader;
   var htmlBody = this.group.body.htmlComp;
   var containerSize = htmlComp.availableSize();
-
   containerSize.subtract(htmlComp.insets());
-  if (!this.group.collapsed) {
-    bodySize = containerSize.subtract(htmlBody.margins());
-    bodySize.height -= htmlHeader.prefSize(true).height;
 
-    htmlBody.setSize(bodySize);
-  }
+  bodySize = containerSize.subtract(htmlBody.margins());
+  bodySize.height -= htmlHeader.prefSize(true).height;
+  htmlBody.setSize(bodySize);
 };
 
 scout.GroupLayout.prototype.invalidate = function(htmlSource) {

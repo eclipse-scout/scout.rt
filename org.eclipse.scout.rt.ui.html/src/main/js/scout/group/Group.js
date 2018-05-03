@@ -196,6 +196,7 @@ scout.Group.prototype._setBody = function(body) {
 scout.Group.prototype._renderBody = function() {
   this.body.render();
   this.body.$container.addClass('group-body');
+  this.body.invalidateLayoutTree();
 };
 
 scout.Group.prototype.toggleCollapse = function() {
@@ -245,20 +246,45 @@ scout.Group.prototype.resizeBody = function() {
  */
 scout.Group.prototype.animateToggleCollapse = function(options) {
   var currentHeight = this.body.$container.cssHeight();
-  var targetHeight = this.collapsed ? 0 : this.body.htmlComp.prefSize().height;
-  var currentMargins, targetMargins;
+  var currentMargins = scout.graphics.margins(this.body.$container);
+  var currentPaddings = scout.graphics.paddings(this.body.$container);
+  var targetHeight, targetMargins, targetPaddings;
+
   if (this.collapsed) {
-    currentMargins = scout.graphics.margins(this.body.$container);
+    // Collapsing
+    // Set target values to 0 when collapsing
+    targetHeight = 0;
     targetMargins = new scout.Insets();
+    targetPaddings = new scout.Insets();
   } else {
-    currentMargins = new scout.Insets();
-    targetMargins = scout.graphics.margins(this.body.$container);
+    // Expanding
+    // Expand to preferred size of the body
+    targetHeight = this.body.htmlComp.prefSize().height;
+
+    // Make sure body is layouted correctly before starting the animation (with the target size)
+    // Use setSize to explicitly call its layout (this might even be necessary during the animation, see GroupLayout.invalidate)
+    this.body.htmlComp.setSize(new scout.Dimension(this.body.$container.outerWidth(), targetHeight));
+
+    if (this.bodyAnimating) {
+      // The group may be expanded while being collapsed or vice verca.
+      // In that case, use the current values of the inline style as starting values
+
+      // Clear current insets to read target insets from CSS anew
+      this.body.$container
+        .cssMarginY('')
+        .cssPaddingY('');
+      targetMargins = scout.graphics.margins(this.body.$container);
+      targetPaddings = scout.graphics.paddings(this.body.$container);
+    } else {
+      // If toggling is not already in progress, start expanding from 0
+      currentHeight = 0;
+      currentMargins = new scout.Insets();
+      currentPaddings = new scout.Insets();
+      targetMargins = scout.graphics.margins(this.body.$container);
+      targetPaddings = scout.graphics.paddings(this.body.$container);
+    }
   }
 
-  if (targetHeight === currentHeight && currentMargins.top === targetMargins.top && currentMargins.bottom === targetMargins.bottom) {
-    // nothing to do
-    return $.resolvedPromise();
-  }
   this.bodyAnimating = true;
   if (this.collapsed) {
     this.$container.addClass('collapsing');
@@ -268,10 +294,14 @@ scout.Group.prototype.animateToggleCollapse = function(options) {
     .cssHeight(currentHeight)
     .cssMarginTop(currentMargins.top)
     .cssMarginBottom(currentMargins.bottom)
+    .cssPaddingTop(currentPaddings.top)
+    .cssPaddingBottom(currentPaddings.bottom)
     .animate({
       height: targetHeight,
       marginTop: targetMargins.top,
-      marginBottom: targetMargins.bottom
+      marginBottom: targetMargins.bottom,
+      paddingTop: targetPaddings.top,
+      paddingBottom: targetPaddings.bottom
     }, {
       duration: 350,
       progress: function() {
@@ -281,8 +311,9 @@ scout.Group.prototype.animateToggleCollapse = function(options) {
       complete: function() {
         this.bodyAnimating = false;
         if (this.body.rendered) {
-          this.body.$container.cssMarginTop('');
-          this.body.$container.cssMarginBottom('');
+          // Remove inline styles when finished
+          this.body.$container.cssMarginY('');
+          this.body.$container.cssPaddingY('');
         }
         if (this.rendered) {
           this.$container.removeClass('collapsing');
