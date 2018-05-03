@@ -1110,4 +1110,75 @@ describe("TileGrid", function() {
 
   });
 
+  describe('addFilters', function() {
+
+    it('adds the given filters', function() {
+      var tileGrid = createTileGrid(3);
+
+      var filter0 = {
+        accept: function(tile) {
+          return tile.label.indexOf('0') < 0;
+        }
+      };
+      tileGrid.addFilters([filter0]);
+      expect(tileGrid.filters.length).toBe(1);
+      expect(tileGrid.filters).toEqual([filter0]);
+
+      var filter1 = {
+        accept: function(tile) {
+          return tile.label.indexOf('1') < 0;
+        }
+      };
+      var filter2 = {
+        accept: function(tile) {
+          return tile.label.indexOf('2') < 0;
+        }
+      };
+      tileGrid.addFilters([filter1, filter2]);
+      expect(tileGrid.filters.length).toBe(3);
+      expect(tileGrid.filters).toEqual([filter0, filter1, filter2]);
+
+      // Does nothing if same filters are added again
+      tileGrid.addFilters([filter1, filter2]);
+      expect(tileGrid.filters.length).toBe(3);
+      expect(tileGrid.filters).toEqual([filter0, filter1, filter2]);
+    });
+
+  });
+
+  describe('removeFilters', function() {
+
+    it('removes the given filters', function() {
+      var tileGrid = createTileGrid(3);
+
+      var filter0 = {
+        accept: function(tile) {
+          return tile.label.indexOf('0') < 0;
+        }
+      };
+      var filter1 = {
+        accept: function(tile) {
+          return tile.label.indexOf('1') < 0;
+        }
+      };
+      var filter2 = {
+        accept: function(tile) {
+          return tile.label.indexOf('2') < 0;
+        }
+      };
+      tileGrid.setFilters([filter0, filter1, filter2]);
+      expect(tileGrid.filters.length).toBe(3);
+      expect(tileGrid.filters).toEqual([filter0, filter1, filter2]);
+
+      tileGrid.removeFilters([filter1, filter2]);
+      expect(tileGrid.filters.length).toBe(1);
+      expect(tileGrid.filters).toEqual([filter0]);
+
+      tileGrid.removeFilters([filter0, filter1]);
+      expect(tileGrid.filters.length).toBe(0);
+      expect(tileGrid.filters).toEqual([]);
+    });
+
+  });
+
 });

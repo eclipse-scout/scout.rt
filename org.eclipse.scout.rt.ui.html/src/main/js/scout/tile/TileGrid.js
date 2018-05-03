@@ -837,17 +837,32 @@ scout.TileGrid.prototype.revealSelection = function() {
 };
 
 scout.TileGrid.prototype.addFilter = function(filter) {
+  this.addFilters([filter]);
+};
+
+scout.TileGrid.prototype.addFilters = function(filtersToAdd) {
+  filtersToAdd = scout.arrays.ensure(filtersToAdd);
   var filters = this.filters.slice();
-  if (filters.indexOf(filter) >= 0) {
+  filtersToAdd.forEach(function(filter) {
+    if (filters.indexOf(filter) >= 0) {
+      return;
+    }
+    filters.push(filter);
+  });
+  if (filters.length === this.filters.length) {
     return;
   }
-  filters.push(filter);
   this.setFilters(filters);
 };
 
 scout.TileGrid.prototype.removeFilter = function(filter) {
+  this.removeFilters([filter]);
+};
+
+scout.TileGrid.prototype.removeFilters = function(filtersToRemove) {
+  filtersToRemove = scout.arrays.ensure(filtersToRemove);
   var filters = this.filters.slice();
-  if (!scout.arrays.remove(filters, filter)) {
+  if (!scout.arrays.removeAll(filters, filtersToRemove)) {
     return;
   }
   this.setFilters(filters);

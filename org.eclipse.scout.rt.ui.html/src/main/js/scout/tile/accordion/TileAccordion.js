@@ -14,6 +14,7 @@ scout.TileAccordion = function() {
   this.gridColumnCount = null;
   this.multiSelect = null;
   this.selectable = null;
+  this.takeTileFiltersFromGroup = true;
   this.tileComparator = null;
   this.tileFilters = [];
   this.tileGridLayoutConfig = null;
@@ -68,10 +69,12 @@ scout.TileAccordion.prototype._initGroup = function(group) {
   this.setProperty('tileComparator', group.body.comparator);
 
   if (this.tileFilters.length > 0) {
-    group.body.setFilters(this.tileFilters);
+    group.body.addFilters(this.tileFilters);
     group.body.filter();
   }
-  this.setProperty('tileFilters', group.body.filters);
+  if (this.takeTileFiltersFromGroup) {
+    this.setProperty('tileFilters', group.body.filters);
+  }
 
   if (this.withPlaceholders !== null) {
     group.body.setWithPlaceholders(this.withPlaceholders);
