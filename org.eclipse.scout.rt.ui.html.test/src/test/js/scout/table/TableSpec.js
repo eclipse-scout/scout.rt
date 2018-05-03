@@ -2855,6 +2855,48 @@ describe("Table", function() {
       expect(table.header).toBeFalsy();
     });
 
+    it("adds empty div when set to true if there are no rows", function() {
+      var model = helper.createModelFixture(0);
+      var table = helper.createTable(model);
+      table.setHeaderVisible(false);
+      table.render();
+      expect(table.$emptyData).toBe(null);
+
+      table.setHeaderVisible(true);
+      expect(table.$emptyData).not.toBe(null);
+
+      table.setHeaderVisible(false);
+      expect(table.$emptyData).toBe(null);
+
+      var row = helper.createModelRow();
+      table.insertRow(row);
+      table.setHeaderVisible(true);
+      // Still null because there are rows
+      expect(table.$emptyData).toBe(null);
+    });
+
+    it("removes empty div when set to false even if there are no rows", function() {
+      var model = helper.createModelFixture(0);
+      var table = helper.createTable(model);
+      table.render();
+      expect(table.$emptyData).not.toBe(null);
+
+      table.setHeaderVisible(false);
+      expect(table.$emptyData).toBe(null);
+
+      table.setHeaderVisible(true);
+      expect(table.$emptyData).not.toBe(null);
+
+      var row = helper.createModelRow();
+      table.insertRow(row);
+      table.setHeaderVisible(false);
+      expect(table.$emptyData).toBe(null);
+
+      table.deleteAllRows();
+      // Still null even if there are no rows
+      expect(table.$emptyData).toBe(null);
+    });
+
   });
 
   describe("View range markers", function() {

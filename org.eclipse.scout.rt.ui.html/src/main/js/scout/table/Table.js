@@ -15,10 +15,14 @@ scout.Table = function() {
   this.columnAddable = false;
   this.columnLayoutDirty = false;
   this.columns = [];
+  this.contextColumn = null;
   this.checkable = false;
+  this.checkableStyle = scout.Table.CheckableStyle.CHECKBOX;
   this.dropType = 0;
   this.dropMaximumSize = scout.dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
   this.enabled = true;
+  this.groupingStyle = scout.Table.GroupingStyle.BOTTOM;
+  this.header = null;
   this.headerEnabled = true;
   this.headerVisible = true;
   this.headerMenusEnabled = true;
@@ -27,7 +31,8 @@ scout.Table = function() {
   this.keyStrokes = [];
   this.keyboardNavigation = true;
   this.menus = [];
-  this.contextMenu;
+  this.menuBar = null;
+  this.contextMenu = null;
   this.multiCheck = true;
   this.multiSelect = true;
   this.multilineText = false;
@@ -37,6 +42,7 @@ scout.Table = function() {
   this.sortEnabled = true;
   this.tableControls = [];
   this.tableStatusVisible = false;
+  this.footer = null;
   this.footerVisible = false;
   this.filters = [];
   this.rows = [];
@@ -53,38 +59,32 @@ scout.Table = function() {
   this.rowIconColumnWidth = scout.Column.NARROW_MIN_WIDTH;
   this.staticMenus = [];
   this.selectionHandler = new scout.TableSelectionHandler(this);
-  this.header;
-  this.footer;
+  this.tooltips = [];
   this._filterMap = {};
   this._filteredRows = [];
   this.tableNodeColumn = null;
   this._maxLevel = 0;
-  this.tooltips = [];
   this._aggregateRows = [];
   this._animationRowLimit = 25;
   this._blockLoadThreshold = 25;
   this.updateBuffer = new scout.TableUpdateBuffer(this);
-  this.menuBar;
-  this._doubleClickSupport = new scout.DoubleClickSupport();
-  this.checkableStyle = scout.Table.CheckableStyle.CHECKBOX;
-  this.$container;
-  this.$data;
-  this._addWidgetProperties(['tableControls', 'menus', 'keyStrokes', 'staticMenus']);
-
-  this._permanentHeadSortColumns = [];
-  this._permanentTailSortColumns = [];
   // Initial value must be > 0 to make prefSize work (if it is 0, no filler will be generated).
   // If rows have a variable height, prefSize is only correct for 10 rows.
   // Layout will adjust this value depending on the view port size.
   this.viewRangeSize = 10;
   this.viewRangeRendered = new scout.Range(0, 0);
+  this.virtual = true;
+  this._doubleClickSupport = new scout.DoubleClickSupport();
+  this._permanentHeadSortColumns = [];
+  this._permanentTailSortColumns = [];
   this._filterMenusHandler = this._filterMenus.bind(this);
   this._popupOpenHandler = this._onDesktopPopupOpen.bind(this);
-  this.virtual = true;
-  this.contextColumn;
   this._rerenderViewPortAfterAttach = false;
   this._renderViewPortAfterAttach = false;
-  this.groupingStyle = scout.Table.GroupingStyle.BOTTOM;
+  this._addWidgetProperties(['tableControls', 'menus', 'keyStrokes', 'staticMenus']);
+
+  this.$data = null;
+  this.$emptyData = null;
 };
 scout.inherits(scout.Table, scout.Widget);
 
@@ -3351,15 +3351,12 @@ scout.Table.prototype.getFilter = function(key) {
 };
 
 /**
- * While resizing a column, this method is called for each change of the width. As long as the resizing is in
- * progress (e.g. the mouse button has not been released), the column is marked with the flag "resizingInProgress".
- * When the resizing has finished, this method has to be called again without the flag "resizingInProgress" to
- * correctly set the width of the "empty data" div.
+ * Resizes the given column to the new size.
  *
  * @param column
- *          (required) column to resize
+ *          column to resize
  * @param width
- *          (required) new column size
+ *          new column size
  */
 scout.Table.prototype.resizeColumn = function(column, width) {
   if (column.fixedWidth) {
@@ -3868,6 +3865,7 @@ scout.Table.prototype._renderTableHeader = function() {
     changed = true;
   } else if (!this.headerVisible && this.header) {
     this._removeTableHeader();
+    this._removeEmptyData();
     changed = true;
   }
   this.$container.toggleClass('header-invisible', !this.header);
@@ -3900,7 +3898,10 @@ scout.Table.prototype._renderEmptyData = function() {
 };
 
 scout.Table.prototype._removeEmptyData = function() {
-  if (this.visibleRows.length > 0 && this.$emptyData) {
+  if (this.header && this.visibleRows.length === 0) {
+    return;
+  }
+  if (this.$emptyData) {
     this.$emptyData.remove();
     this.$emptyData = null;
     this.updateScrollbars();

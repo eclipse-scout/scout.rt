@@ -705,8 +705,6 @@ scout.TableHeader.prototype._onSeparatorMouseDown = function(event) {
     that = this,
     headerWidth = column.width;
 
-  column.resizingInProgress = true;
-
   // Install resize helpers. Those helpers make sure the header and the data element keep their
   // current width until the resizing has finished. Otherwise, make a column smaller while the
   // table has been horizontally scrolled to the right would behave very strange.
@@ -736,8 +734,6 @@ scout.TableHeader.prototype._onSeparatorMouseDown = function(event) {
   }
 
   function resizeEnd(event) {
-    delete column.resizingInProgress;
-
     // Remove resize helpers
     that.$headerColumnResizedHelper.remove();
     that.$headerColumnResizedHelper = null;

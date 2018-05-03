@@ -309,7 +309,7 @@ describe("TableFilter", function() {
         row1 = table.rows[1];
 
       table.render();
-      expect(table.$emptyData).toBeUndefined();
+      expect(table.$emptyData).toBe(null);
 
       var filter = createAndRegisterColumnFilter(table, column0, ['asdf']);
       table.filter();
