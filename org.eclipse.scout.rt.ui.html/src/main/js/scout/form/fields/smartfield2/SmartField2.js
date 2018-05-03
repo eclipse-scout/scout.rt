@@ -186,7 +186,7 @@ scout.SmartField2.prototype.acceptInput = function() {
     searchText = this._readSearchText(),
     searchTextEmpty = scout.strings.empty(searchText),
     searchTextChanged = this._checkSearchTextChanged(searchText),
-    selectedLookupRow = this._getSelectedLookupRow(searchText);
+    selectedLookupRow = this._getSelectedLookupRow(searchTextChanged);
 
   this._setProperty('displayText', searchText);
   this._acceptInputDeferred = $.Deferred();
@@ -207,11 +207,18 @@ scout.SmartField2.prototype.acceptInput = function() {
   return this._acceptInput(searchText, searchTextEmpty, searchTextChanged, selectedLookupRow);
 };
 
-scout.SmartField2.prototype._getSelectedLookupRow = function(searchText) {
-  if (!this.isPopupOpen() || this._userWasTyping) {
+/**
+ * This function is used to determine if the currently selected lookup row can be
+ * used when acceptInput is called. Basically we don't want to use the row in case
+ * the result is out-dated.
+ */
+scout.SmartField2.prototype._getSelectedLookupRow = function(searchTextChanged) {
+  // don't use selected lookup row if...
+  if (!this.isPopupOpen() || // 1. popup has been closed
+     (searchTextChanged && this._userWasTyping)) { // 2. search text has changed, or user was typing
     return null;
   }
-
+  // 3. if the result row is from an out-dated result
   return this.lookupSeqNo === this.popup.lookupResult.seqNo ?
       this.popup.getSelectedLookupRow() : null;
 };

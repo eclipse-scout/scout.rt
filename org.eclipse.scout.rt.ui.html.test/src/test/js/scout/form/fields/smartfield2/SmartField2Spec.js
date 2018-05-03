@@ -275,6 +275,49 @@ describe('SmartField2', function() {
       expect(eventTriggered).toBe(false);
     });
 
+    // ticket #221944
+    describe('should (not) reset selected lookup row', function() {
+      var field, selectedLookupRow, searchTextChanged;
+
+      // mocks for popup, lookup-row
+      beforeEach(function() {
+        field = createFieldWithLookupCall();
+        selectedLookupRow = {};
+        field.popup = {
+          lookupResult: {
+            seqNo: 7
+          },
+          getSelectedLookupRow: function() {
+            return selectedLookupRow;
+          }
+        };
+        field._userWasTyping = false;
+        field.lookupSeqNo = 7;
+        searchTextChanged = false;
+      });
+
+      it('use lookup row', function() {
+        var lookupRow = field._getSelectedLookupRow(false);
+        expect(lookupRow).toBe(selectedLookupRow);
+      });
+
+      it('reset when popup is closed', function() {
+        field.popup = null;
+        expect(field._getSelectedLookupRow(false)).toBe(null);
+      });
+
+      it('reset when user was typing or search-text has changed', function() {
+        field._userWasTyping = true;
+        expect(field._getSelectedLookupRow(true)).toBe(null);
+      });
+
+      it('reset when lookup result is out-dated', function() {
+        field.lookupSeqNo = 8;
+        expect(field._getSelectedLookupRow(false)).toBe(null);
+      });
+
+    });
+
   });
 
   describe('lookup', function() {
