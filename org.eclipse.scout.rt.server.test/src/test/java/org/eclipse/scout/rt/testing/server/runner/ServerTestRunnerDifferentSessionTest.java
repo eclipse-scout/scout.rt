@@ -10,13 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.server.runner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
@@ -28,6 +25,10 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(ServerTestRunner.class)
 @RunWithServerSession(value = JUnitServerSession1.class, provider = ServerSessionProvider.class)
@@ -103,6 +104,7 @@ public class ServerTestRunnerDifferentSessionTest {
     assertEquals(5, m_transactions.size()); // (beforeClass), (before,test1,after), (before,test2,after), (before,test3,after), (afterClass)
   }
 
+  @IgnoreBean
   public static class JUnitServerSession1 extends AbstractServerSession {
 
     private static final long serialVersionUID = 1L;
@@ -112,6 +114,7 @@ public class ServerTestRunnerDifferentSessionTest {
     }
   }
 
+  @IgnoreBean
   public static class JUnitServerSession2 extends AbstractServerSession {
 
     private static final long serialVersionUID = 1L;

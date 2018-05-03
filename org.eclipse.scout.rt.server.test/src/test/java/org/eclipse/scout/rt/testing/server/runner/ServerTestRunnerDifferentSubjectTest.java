@@ -10,13 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.server.runner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
@@ -27,6 +24,10 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(ServerTestRunner.class)
 @RunWithServerSession(JUnitServerSession.class)
@@ -90,6 +91,7 @@ public class ServerTestRunnerDifferentSubjectTest {
     assertEquals(4, m_transactions.size()); // (beforeClass), (before,test1,after), (before,test2,after), (afterClass)
   }
 
+  @IgnoreBean
   public static class JUnitServerSession extends AbstractServerSession {
 
     private static final long serialVersionUID = 1L;
