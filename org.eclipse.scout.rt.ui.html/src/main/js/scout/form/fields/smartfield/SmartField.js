@@ -923,6 +923,7 @@ scout.SmartField.prototype._onFieldKeyUp = function(event) {
       w === scout.keys.CAPS_LOCK ||
       w === scout.keys.SCROLL_LOCK ||
       w === scout.keys.PAUSE ||
+      w === scout.keys.PRINT_SCREEN ||
       this._isNavigationKey(event) ||
       this._isFunctionKey(event)
     )) {
@@ -1000,6 +1001,7 @@ scout.SmartField.prototype._onFieldKeyDown = function(event) {
       w === scout.keys.CAPS_LOCK ||
       w === scout.keys.SCROLL_LOCK ||
       w === scout.keys.PAUSE ||
+      w === scout.keys.PRINT_SCREEN ||
       this._isFunctionKey(event)
     )) {
     return;
@@ -1042,6 +1044,7 @@ scout.SmartField.prototype._updateUserWasTyping = function(event) {
       w === scout.keys.CAPS_LOCK ||
       w === scout.keys.SCROLL_LOCK ||
       w === scout.keys.PAUSE ||
+      w === scout.keys.PRINT_SCREEN ||
       this._isFunctionKey(event)
     )) {
     // neutral, don't change flag

@@ -345,7 +345,7 @@ scout.Tooltip.prototype._onDocumentKeyDown = function(event) {
       scout.keys.CTRL, scout.keys.SHIFT, scout.keys.ALT,
       scout.keys.NUM_LOCK, scout.keys.CAPS_LOCK, scout.keys.SCROLL_LOCK,
       scout.keys.WIN_LEFT, scout.keys.WIN_RIGHT, scout.keys.SELECT,
-      scout.keys.PAUSE)) {
+      scout.keys.PAUSE, scout.keys.PRINT_SCREEN)) {
     return;
   }
 
