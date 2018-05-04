@@ -16,6 +16,10 @@ describe('FormLifecycle', function() {
     expect(session.$entryPoint.find('.messagebox').length).toBe(shown ? 1 : 0);
   }
 
+  function closeMessageBox() {
+    session.$entryPoint.find('.messagebox .box-button').click();
+  }
+
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
@@ -79,6 +83,52 @@ describe('FormLifecycle', function() {
       jasmine.clock().tick(1000);
       expectMessageBox(false);
       expect(saved).toBe(true);
+    });
+
+    it('stops lifecycle if severity is ERROR', function() {
+      var form2 = helper.createFormWithOneField();
+      form2.lifecycle = scout.create('FormLifecycle', {
+        widget: form
+      });
+      form2.lifecycle._validate = function() {
+        return $.resolvedPromise(scout.Status.error({
+          message: 'This is a fatal error'
+        }));
+      }.bind(form2.lifecycle);
+      var lifecycleComplete = false;
+      form2.lifecycle.on('close', function() {
+        lifecycleComplete = true;
+      });
+      form2.render();
+      form2.lifecycle.ok();
+      jasmine.clock().tick();
+      expectMessageBox(true);
+      closeMessageBox();
+      jasmine.clock().tick(1000); // <- important, otherwise the promise will not be resolved somehow (?)
+      expect(lifecycleComplete).toBe(false);
+    });
+
+    it('continues lifecycle if severity is WARNING', function() {
+      var form2 = helper.createFormWithOneField();
+      form2.lifecycle = scout.create('FormLifecycle', {
+        widget: form
+      });
+      form2.lifecycle._validate = function() {
+        return $.resolvedPromise(scout.Status.warn({
+          message: 'This is only a warning'
+        }));
+      }.bind(form2.lifecycle);
+      var lifecycleComplete = false;
+      form2.lifecycle.on('close', function() {
+        lifecycleComplete = true;
+      });
+      form2.render();
+      form2.lifecycle.ok();
+      jasmine.clock().tick();
+      expectMessageBox(true);
+      closeMessageBox();
+      jasmine.clock().tick(1000); // <- important, otherwise the promise will not be resolved somehow (?)
+      expect(lifecycleComplete).toBe(true);
     });
 
   });

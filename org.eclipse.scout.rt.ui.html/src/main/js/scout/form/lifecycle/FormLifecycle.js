@@ -39,13 +39,13 @@ scout.FormLifecycle.prototype._invalidElements = function() {
     if (result.valid) {
       return;
     }
-    // when mandatory is not fulfilled, do not add to invalid fields
-    if (!result.validByMandatory) {
-      missingFields.push(field);
-      return;
-    }
+    // error status has priority over mandatory
     if (!result.validByErrorStatus) {
       invalidFields.push(field);
+      return;
+    }
+    if (!result.validByMandatory) {
+      missingFields.push(field);
       return;
     }
   });

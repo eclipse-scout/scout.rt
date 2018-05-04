@@ -21,11 +21,15 @@
  */
 scout.Lifecycle = function() {
   this.emptyMandatoryElementsTextKey = null;
-  this.invalidElementsTextKey = null;
-  this.saveChangesQuestionTextKey = null;
+  this.emptyMandatoryElementsText = null;
 
+  this.invalidElementsTextKey = null;
+  this.invalidElementsText = null;
+
+  this.saveChangesQuestionTextKey = null;
   this.askIfNeedSave = true;
   this.askIfNeedSaveText = null; // Java: cancelVerificationText
+
   this.events = new scout.EventSupport();
   this.handlers = {
     'load': this._defaultLoad.bind(this),
@@ -38,7 +42,13 @@ scout.Lifecycle = function() {
 scout.Lifecycle.prototype.init = function(model) {
   scout.assertParameter('widget', model.widget);
   $.extend(this, model);
-  if (this.askIfNeedSaveText === null) {
+  if (scout.objects.isNullOrUndefined(this.emptyMandatoryElementsText)) {
+    this.emptyMandatoryElementsText = this.session().text(this.emptyMandatoryElementsTextKey);
+  }
+  if (scout.objects.isNullOrUndefined(this.invalidElementsText)) {
+    this.invalidElementsText = this.session().text(this.invalidElementsTextKey);
+  }
+  if (scout.objects.isNullOrUndefined(this.askIfNeedSaveText)) {
     this.askIfNeedSaveText = this.session().text(this.saveChangesQuestionTextKey);
   }
 };
@@ -201,27 +211,24 @@ scout.Lifecycle.prototype.setAskIfNeedSave = function(askIfNeedSave) {
  * Helper function to deal with functions that return a Status object.
  * Makes it easier to return early when that function returns an invalid status (= less code to write).
  *
- * @returns {Promise}
+ * @returns {Promise} If the resulting promise is resolved with "true", the life cycle is considered invalid.
+ *                    Otherwise, the life cycle is considered valid and the store/save operation continues.
+ *                    If the status returned by 'func' is absent or scout.Status.Severity.OK, a promise resolved with
+ *                    "false" is returned. Otherwise, the promise returned by _showStatusMessageBox() is returned.
  */
 scout.Lifecycle.prototype._whenInvalid = function(func) {
   return func.call(this)
     .then(function(status) {
-      if (!status || status.isValid()) {
-        return false;
+      if (!status || status.severity === scout.Status.Severity.OK) {
+        return $.resolvedPromise(false); // invalid=false
       }
-      return this._showStatusMessageBox(status)
-        .then(function() {
-          return true;
-        });
+      return this._showStatusMessageBox(status);
     }.bind(this))
     .catch(function(error) {
       var status = scout.Status.error({
         message: error.message
       });
-      return this._showStatusMessageBox(status)
-        .then(function() {
-          return true;
-        });
+      return this._showStatusMessageBox(status);
     }.bind(this));
 };
 
@@ -245,13 +252,19 @@ scout.Lifecycle.prototype._showYesNoCancelMessageBox = function(message, yesActi
 
 /**
  * @param status
- * @returns {Promise}
+ * @returns {Promise} If the resulting promise is resolved with "true", the life cycle is considered invalid.
+ *                    Otherwise, the life cycle is considered valid and the store/save operation continues.
+ *                    By default, a promise that is resolved with "true" is returned.
  */
 scout.Lifecycle.prototype._showStatusMessageBox = function(status) {
   return scout.MessageBoxes.createOk(this.widget)
     .withSeverity(status.severity)
     .withBody(status.message, true)
-    .buildAndOpen();
+    .buildAndOpen()
+    .then(function(option) {
+      var invalid = (status.severity === scout.Status.Severity.ERROR);
+      return $.resolvedPromise(invalid);
+    });
 };
 
 /**
@@ -290,27 +303,27 @@ scout.Lifecycle.prototype._invalidElements = function() {
  * Creates a HTML message used to display missing and invalid fields in a message box.
  */
 scout.Lifecycle.prototype._createInvalidElementsMessageHtml = function(missing, invalid) {
-  var $div = $('<div>'), // cannot use $.makeDiv here because this needs to work without any rendered elements at all
+  var $div = $('<div>'),
     hasMissing = missing.length > 0,
     hasInvalid = invalid.length > 0;
   if (hasMissing) {
-    appendTitleAndList.call(this, $div, this.emptyMandatoryElementsTextKey, missing, this._missingElementText);
+    appendTitleAndList.call(this, $div, this.emptyMandatoryElementsText, missing, this._missingElementText);
   }
   if (hasMissing && hasInvalid) {
     $div.appendElement('<br>');
   }
   if (hasInvalid) {
-    appendTitleAndList.call(this, $div, this.invalidElementsTextKey, invalid, this._invalidElementText);
+    appendTitleAndList.call(this, $div, this.invalidElementsText, invalid, this._invalidElementText);
   }
   return $div.html();
 
-  function appendTitleAndList($div, titleKey, elements, textFunc) {
-    $div
-      .appendElement('<strong>')
-      .text(this.session().text(titleKey));
+  // ----- Helper function -----
+
+  function appendTitleAndList($div, title, elements, elementTextFunc) {
+    $div.appendElement('<strong>').text(title);
     var $ul = $div.appendElement('<ul>');
     elements.forEach(function(element) {
-      $ul.appendElement('<li>').text(textFunc.call(this, element));
+      $ul.appendElement('<li>').text(elementTextFunc.call(this, element));
     }, this);
   }
 };
