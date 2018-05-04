@@ -70,15 +70,16 @@ scout.FormMenu.prototype._onFormRemove = function(event) {
   if (!this.selected) {
     return; // the menu is no longer selected. It was closed by the user (toggle). There is no need to unselect and close the popups
   }
-  if (this.destroying) {
-    return; // the form is being removed because the menu is being destroyed. There is no need to call close again.
+  if (!this.destroying && !this.removing) {
+    // no need to change the selection state if the widget is destroying.
+    this.setSelected(false);
   }
 
-  this.setSelected(false);
   var parentContextMenuPopup = this.findParent(function(p) {
     return p instanceof scout.ContextMenuPopup;
   });
-  if (parentContextMenuPopup) {
+  if (parentContextMenuPopup && !(parentContextMenuPopup.destroying || parentContextMenuPopup.removing)) {
+    // only explicitly close the popup if it is not already being closed. Otherwise it is removed twice.
     parentContextMenuPopup.close();
   }
 };
