@@ -51,7 +51,7 @@ describe('Desktop', function() {
 
     it('may be added with addNotification', function() {
       session._renderDesktop();
-      spyOn(ntfc, 'fadeIn');
+      spyOn(ntfc, 'fadeIn').and.callThrough();
       desktop.addNotification(ntfc);
       expect(ntfc.fadeIn).toHaveBeenCalled();
       expect(desktop.notifications.indexOf(ntfc)).toBe(0);
@@ -79,7 +79,7 @@ describe('Desktop', function() {
 
     it('removeNotification with object', function() {
       session._renderDesktop();
-      spyOn(ntfc, 'fadeOut');
+      spyOn(ntfc, 'fadeOut').and.callThrough();
       desktop.addNotification(ntfc); // first add -> create $notifications DIV
       desktop.removeNotification(ntfc);
       expect(ntfc.fadeOut).toHaveBeenCalled();
@@ -87,7 +87,7 @@ describe('Desktop', function() {
 
     it('removeNotification with (string) ID', function() {
       session._renderDesktop();
-      spyOn(ntfc, 'fadeOut');
+      spyOn(ntfc, 'fadeOut').and.callThrough();
       desktop.addNotification(ntfc); // first add -> create $notifications DIV
       desktop.removeNotification('theID');
       expect(ntfc.fadeOut).toHaveBeenCalled();
