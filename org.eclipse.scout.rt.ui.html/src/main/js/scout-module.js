@@ -490,7 +490,7 @@
   __include("scout/form/fields/tagfield/TagFieldNavigationKeyStroke.js");
   __include("scout/form/fields/tagfield/TagFieldOpenPopupKeyStroke.js");
   __include("scout/form/fields/tagfield/TagFieldLayout.js");
-  __include("scout/form/fields/tagfield/TagInputLayout.js");
+  __include("scout/form/fields/tagfield/TagFieldContainerLayout.js");
   __include("scout/form/fields/tagfield/TagOverflowPopup.js");
   __include("scout/form/fields/tilefield/TileField.js");
   __include("scout/form/fields/tilefield/TileFieldAdapter.js");
@@ -504,6 +504,9 @@
   __include("scout/form/fields/wizard/WizardProgressFieldLayout.js");
   __include("scout/form/fields/wrappedform/WrappedFormField.js");
   __include("scout/form/fields/wrappedform/WrappedFormFieldAdapter.js");
+  // TagBar
+  __include("scout/tagbar/TagBar.js");
+  __include("scout/tagbar/TagBarLayout.js");
   // TileGrid
   __include("scout/tile/Tile.js");
   __include("scout/tile/TileAdapter.js");

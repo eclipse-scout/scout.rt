@@ -18,7 +18,7 @@ scout.TagFieldOpenPopupKeyStroke = function(tagField) {
 scout.inherits(scout.TagFieldOpenPopupKeyStroke, scout.KeyStroke);
 
 scout.TagFieldOpenPopupKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.TagFieldDeleteKeyStroke.parent.prototype._accept.call(this, event);
+  var accepted = scout.TagFieldOpenPopupKeyStroke.parent.prototype._accept.call(this, event);
   if (!accepted) {
     return false;
   }

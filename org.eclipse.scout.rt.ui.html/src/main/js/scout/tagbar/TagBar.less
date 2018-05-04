@@ -1,0 +1,84 @@
+.tag-element,
+.overflow-icon {
+  display: inline-block;
+  user-select: none;
+  white-space: nowrap;
+  color: @tag-text-color;
+  outline: none;
+
+  border-radius: 2px;
+  background-color: @tag-element-background-color;
+  padding: 0 5px;
+  height: @tag-field-tag-height;
+  line-height: @tag-field-tag-height;
+  margin: @tag-field-tag-margin-y @tag-field-tag-margin-right 0 0;
+
+  &:hover:not(.disabled) {
+    background-color: @tag-element-background-color-hover;
+  }
+
+  &.focused {
+    background-color: @palette-cyan-4;
+
+    & > .tag-remove-icon::before {
+      color: @palette-black;
+    }
+  }
+}
+
+.tag-element {
+  & > .tag-text {
+    max-width: 85px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 1px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  &.clickable {
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+.overflow-icon {
+  &::before {
+    #scout.font-icon();
+    position: relative;
+    font-size: 10px;
+    content: @icon-chevron-down-bold;
+    color: @tag-icon-color;
+  }
+
+  &:hover {
+    background-color: @tag-element-background-color-hover;
+    cursor: pointer;
+  }
+
+  &.focused::before {
+    color: @palette-black;
+  }
+}
+
+.tag-remove-icon {
+  padding-left: 3px;
+  display: inline-block;
+  vertical-align: middle;
+
+  &::before {
+    #scout.font-icon();
+    position: relative;
+    content: @icon-remove-bold;
+    color: @tag-icon-color;
+  }
+
+  &:hover {
+    cursor: pointer;
+
+    &::before {
+      color: @palette-black;
+    }
+  }
+}

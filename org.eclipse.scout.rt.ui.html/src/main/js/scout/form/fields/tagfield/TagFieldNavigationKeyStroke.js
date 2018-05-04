@@ -38,7 +38,7 @@ scout.TagFieldNavigationKeyStroke.prototype._focusTagElement = function(directio
   var INPUT = -2;
 
   // find overflow-icon and all tag-elements
-  var $focusTargets = scout.TagField.findFocusableTagElements(this.field.$container());
+  var $focusTargets = scout.TagBar.findFocusableTagElements(this.field.$container());
   var numTargets = $focusTargets.length;
   if (numTargets === 0) {
     return;
@@ -65,7 +65,7 @@ scout.TagFieldNavigationKeyStroke.prototype._focusTagElement = function(directio
     } else if (nextFocusIndex < 0) {
       focusIndex = UNDEFINED;
     } else {
-      scout.TagField.unfocusTagElement($focusTargets.eq(focusIndex));
+      scout.TagBar.unfocusTagElement($focusTargets.eq(focusIndex));
       focusIndex = nextFocusIndex;
     }
   }
@@ -75,7 +75,7 @@ scout.TagFieldNavigationKeyStroke.prototype._focusTagElement = function(directio
   } else if (focusIndex === INPUT) {
     this.field.focus();
   } else {
-    scout.TagField.focusTagElement($focusTargets.eq(focusIndex));
+    scout.TagBar.focusTagElement($focusTargets.eq(focusIndex));
   }
 };
 
@@ -117,10 +117,10 @@ scout._TagFieldAdapter.prototype.off = function(p1, p2) {
   this.adapted.off(p1, p2);
 };
 
-scout._TagFieldAdapter.prototype.removeTagByElement = function($tag) {
+scout._TagFieldAdapter.prototype.removeTag = function(tag) {
   if (this.adapted instanceof scout.TagField) {
-    this.adapted.removeTagByElement($tag);
+    this.adapted.removeTag(tag);
   } else {
-    this.adapted.parent.removeTagByElement($tag);
+    this.adapted.parent.removeTag(tag);
   }
 };

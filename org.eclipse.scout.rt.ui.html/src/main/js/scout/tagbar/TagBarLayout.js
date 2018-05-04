@@ -8,34 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.TagInputLayout = function(tagField) {
-  this.tagField = tagField;
+scout.TagBarLayout = function(tagBar) {
+  scout.TagBarLayout.parent.call(this);
+  this.tagBar = tagBar;
 };
-scout.inherits(scout.TagInputLayout, scout.AbstractLayout);
+scout.inherits(scout.TagBarLayout, scout.AbstractLayout);
 
-
-/**
- * When there is not a lot of space in a single line field, the input field should at least
- * have 33% of the available width, which means 66% is used to display tags.
- */
-scout.TagInputLayout.MIN_INPUT_TAG_RATIO = 0.33;
-
-scout.TagInputLayout.prototype.layout = function($container) {
+scout.TagBarLayout.prototype.layout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container);
-  var hasTags = this.tagField.value && this.tagField.value.length > 0;
+  var hasTags = this.tagBar.tags && this.tagBar.tags.length > 0;
 
   if (hasTags) {
-    this.tagField.$field.removeClass('fullwidth');
     var availableSize = htmlContainer.availableSize()
       .subtract(htmlContainer.insets());
     var maxTagsWidth = availableSize.width;
     var prefTagsWidth = 0;
     var overflow = false;
-
-    // when input field is not visible, tags may use the whole width, otherwise only a part of it
-    if (this.tagField.$field.isVisible()) {
-      maxTagsWidth = availableSize.width * (1 - scout.TagInputLayout.MIN_INPUT_TAG_RATIO);
-    }
 
     // 1. check if overflow occurs
     var $te, i;
@@ -56,10 +44,10 @@ scout.TagInputLayout.prototype.layout = function($container) {
     }
 
     // 2. add overflow icon
-    this.tagField.setOverflowVisible(overflow);
+    this.tagBar.setOverflowVisible(overflow);
 
     if (overflow) {
-      prefTagsWidth = scout.graphics.size(this.tagField.$overflowIcon, {includeMargin: true}).width;
+      prefTagsWidth = scout.graphics.size(this.tagBar.$overflowIcon, {includeMargin: true}).width;
       for (i = numTagElements - 1; i >= 0; i--) {
         $te = $($tagElements[i]);
 
@@ -79,13 +67,24 @@ scout.TagInputLayout.prototype.layout = function($container) {
         }
       }
     }
-
-    var inputWidth = availableSize.width - prefTagsWidth;
-    this.tagField.$field.cssWidth(inputWidth);
-  } else {
-    // remove style to delete previously set layout attributes
-    this.tagField.$field
-      .addClass('fullwidth')
-      .removeAttr('style');
   }
 };
+
+scout.TagBarLayout.prototype.preferredLayoutSize = function($container, options) {
+  var htmlContainer = scout.HtmlComponent.get($container);
+  var hasTags = this.tagBar.tags && this.tagBar.tags.length > 0;
+  var availableSize = htmlContainer.availableSize();
+  var prefTagsWidth = 0;
+
+  if (!hasTags) {
+    return new scout.Dimension(0, availableSize.height);
+  }
+
+  var $tagElements = $container.find('.tag-element');
+  $tagElements.removeClass('hidden');
+  $tagElements.each(function() {
+    prefTagsWidth += scout.graphics.size($(this), {includeMargin: true}).width;
+  });
+  return new scout.Dimension(prefTagsWidth, availableSize.height);
+};
+

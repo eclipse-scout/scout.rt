@@ -26,9 +26,11 @@ scout.TagFieldDeleteKeyStroke.prototype._accept = function(event) {
 };
 
 scout.TagFieldDeleteKeyStroke.prototype.handle = function(event) {
-  this.field.removeTagByElement(this._$focusedTag());
+  var $tag = this._$focusedTag();
+  var tag = scout.TagBar.getTagData($tag);
+  this.field.removeTag(tag);
 };
 
 scout.TagFieldDeleteKeyStroke.prototype._$focusedTag = function() {
-  return scout.TagField.findFocusedTagElement(this.field.$container());
+  return scout.TagBar.findFocusedTagElement(this.field.$container());
 };
