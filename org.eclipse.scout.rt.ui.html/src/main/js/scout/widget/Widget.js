@@ -827,6 +827,9 @@ scout.Widget.prototype.revalidateLayout = function() {
   this.htmlComp.revalidateLayout();
 };
 
+/**
+ * @param [invalidateParents] optional, default is true
+ */
 scout.Widget.prototype.invalidateLayoutTree = function(invalidateParents) {
   if (!this.rendered || this.removing) {
     return;

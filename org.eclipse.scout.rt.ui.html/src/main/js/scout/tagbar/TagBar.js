@@ -34,9 +34,13 @@ scout.TagBar.prototype._render = function() {
 scout.TagBar.prototype._renderProperties = function() {
   scout.TagBar.parent.prototype._renderProperties.call(this);
   this._renderTags();
+  this._renderOverflowVisible();
 };
 
 scout.TagBar.prototype._remove = function() {
+  this.$overflowIcon = null;
+  this.overflowVisible = false;
+  this.closeOverflowPopup();
   this._uninstallTooltipSupport();
   scout.TagBar.parent.prototype._remove.call(this);
 };
@@ -56,9 +60,7 @@ scout.TagBar.prototype._renderTags = function() {
   tags.forEach(function(tagText) {
     this.appendTagElement(this.$container, tagText, clickHandler, removeHandler);
   }, this);
-  if (!this.rendering) {
-    this.htmlComp.invalidateLayoutTree(true);
-  }
+  this.invalidateLayoutTree();
 };
 
 /**

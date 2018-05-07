@@ -163,6 +163,7 @@ scout.Tile.prototype._renderVisible = function() {
     // Remove animate-visible first to show correct animation even if tile is made invisible while visible animation is still in progress
     // It is also necessary if the container is made invisible before the animation is finished because animationEnd won't fire in that case
     // which means that animate-invisible is still on the element and will trigger the (wrong) animation when container is made visible again
+    this._beforeAnimateVisible();
     this.$container.removeClass('animate-visible');
     this.$container.addClassForAnimation('animate-invisible');
     this.$container.oneAnimationEnd(function() {
@@ -171,10 +172,21 @@ scout.Tile.prototype._renderVisible = function() {
     }.bind(this));
   } else {
     this.$container.setVisible(true);
+    this._beforeAnimateVisible();
     this.$container.removeClass('animate-invisible');
     this.$container.addClassForAnimation('animate-visible');
   }
   this.invalidateParentLogicalGrid();
+};
+
+/**
+ * Override this function to do something before the visibility animation starts.
+ * Check the isVisible() function if you must distinct between visible/invisible.
+ * You can use this function if your tile uses a programmed layout and you need 
+ * the size of the tile, without the effects from the animation.
+ */
+scout.Tile.prototype._beforeAnimateVisible = function() {
+  // NOP
 };
 
 /**
