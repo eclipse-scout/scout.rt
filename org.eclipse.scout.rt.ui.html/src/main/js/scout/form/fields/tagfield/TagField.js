@@ -183,12 +183,16 @@ scout.TagField.prototype._onFieldBlur = function(event) {
   // We cannot call super until chooser popup has been closed (see #acceptInput)
   this.closeChooserPopup();
   scout.TagField.parent.prototype._onFieldBlur.call(this, event);
-  this.tagBar.blur();
+  if (this.rendered && !this.removing) {
+    this.tagBar.blur();
+  }
 };
 
 scout.TagField.prototype._onFieldFocus = function(event) {
   scout.TagField.parent.prototype._onFieldFocus.call(this, event);
-  this.tagBar.focus();
+  if (this.rendered && !this.removing) {
+    this.tagBar.focus();
+  }
 };
 
 scout.TagField.prototype.addTag = function(text) {
