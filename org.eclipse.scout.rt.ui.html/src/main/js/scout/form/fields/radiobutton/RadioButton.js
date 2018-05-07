@@ -14,6 +14,7 @@ scout.RadioButton = function() {
   this.gridDataHints.fillHorizontal = true;
   this.focusWhenSelected = true;
   this.buttonKeyStroke = new scout.RadioButtonKeyStroke(this, null);
+  this.radioValue = null;
 };
 scout.inherits(scout.RadioButton, scout.Button);
 

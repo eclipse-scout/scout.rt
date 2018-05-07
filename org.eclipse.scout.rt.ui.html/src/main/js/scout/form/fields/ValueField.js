@@ -361,9 +361,17 @@ scout.ValueField.prototype._setValue = function(value) {
     return;
   }
 
+  this._valueChanged();
   this._updateTouched();
   this._updateEmpty();
   this.triggerPropertyChange('value', oldValue, this.value);
+};
+
+/**
+ * Is called after a value is changed. May be implemented by subclasses. The default does nothing.
+ */
+scout.ValueField.prototype._valueChanged = function() {
+  // NOP
 };
 
 /**

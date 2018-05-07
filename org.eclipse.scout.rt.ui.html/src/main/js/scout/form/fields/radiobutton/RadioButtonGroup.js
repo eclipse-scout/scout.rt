@@ -29,14 +29,18 @@ scout.RadioButtonGroup.prototype._init = function(model) {
   scout.RadioButtonGroup.parent.prototype._init.call(this, model);
 
   this._setLayoutConfig(this.layoutConfig);
+  this._setGridColumnCount(this.gridColumnCount);
+};
+
+scout.RadioButtonGroup.prototype._initValue = function(value) {
+  // Initialize buttons first before calling set value, otherwise value could not be synchronized to the buttons
   this.fields.forEach(function(formField) {
     if (formField instanceof scout.RadioButton) {
       this.radioButtons.push(formField);
       this._initButton(formField);
     }
   }, this);
-
-  this._setGridColumnCount(this.gridColumnCount);
+  scout.RadioButtonGroup.parent.prototype._initValue.call(this, value);
 };
 
 /**
@@ -54,6 +58,7 @@ scout.RadioButtonGroup.prototype._initKeyStrokeContext = function() {
 scout.RadioButtonGroup.prototype._initButton = function(button) {
   button.on('propertyChange', this._buttonPropertyChangeHandler);
   if (button.selected) {
+    this.setValue(button.radioValue);
     this.selectButton(button);
   }
 };
@@ -209,6 +214,38 @@ scout.RadioButtonGroup.prototype._calcDefaultGridColumnCount = function() {
   return Math.ceil(this.fields.length / height);
 };
 
+scout.RadioButtonGroup.prototype.getButtonForRadioValue = function(radioValue) {
+  if (radioValue === null) {
+    return null;
+  }
+  return scout.arrays.find(this.radioButtons, function(button) {
+    return scout.objects.equals(button.radioValue, radioValue);
+  });
+};
+
+/**
+ * Search and then select the button with the corresponding radioValue
+ */
+scout.RadioButtonGroup.prototype._validateValue = function(value) {
+  scout.RadioButtonGroup.parent.prototype._validateValue.call(this, value);
+
+  // only show error if value is not null or undefined
+  var buttonToSelect = this.getButtonForRadioValue(value);
+  if (!buttonToSelect && value !== null && value !== undefined) {
+    throw this.session.text("InvalidValueMessageX", value);
+  }
+  return value;
+};
+
+scout.RadioButtonGroup.prototype._valueChanged = function() {
+  scout.RadioButtonGroup.parent.prototype._valueChanged.call(this);
+
+  // Don't select button during initialization if value is null to not override selected state of a button
+  if (this.value !== null || this.initialized) {
+    this.selectButton(this.getButtonForRadioValue(this.value));
+  }
+};
+
 scout.RadioButtonGroup.prototype.selectButton = function(radioButton) {
   if (this.selectedButton === radioButton) {
     // Already selected
@@ -267,6 +304,7 @@ scout.RadioButtonGroup.prototype._onButtonPropertyChange = function(event) {
   if (event.propertyName === 'selected') {
     var selected = event.newValue;
     if (selected) {
+      this.setValue(event.source.radioValue);
       this.selectButton(event.source);
     } else if (event.source === this.selectedButton) {
       this.selectButton(null);

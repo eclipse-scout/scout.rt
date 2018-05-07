@@ -73,6 +73,122 @@ describe("RadioButtonGroup", function() {
     });
   });
 
+  describe('init', function() {
+    it('sets the value if it is provided', function() {
+      var radioButtonGroup = scout.create('RadioButtonGroup', {
+        parent: session.desktop,
+        value: 1,
+        fields: [{
+          objectType: 'RadioButton',
+          radioValue: 0
+        }, {
+          objectType: 'RadioButton',
+          radioValue: 1
+        }]
+      });
+      expect(radioButtonGroup.value).toBe(1);
+      expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[1]);
+      expect(radioButtonGroup.radioButtons[0].selected).toBe(false);
+      expect(radioButtonGroup.radioButtons[1].selected).toBe(true);
+    });
+
+    it('selects the correct button if it is selected', function() {
+      var radioButtonGroup = scout.create('RadioButtonGroup', {
+        parent: session.desktop,
+        fields: [{
+          objectType: 'RadioButton'
+        }, {
+          objectType: 'RadioButton',
+          selected: true
+        }]
+      });
+      expect(radioButtonGroup.value).toBe(null);
+      expect(radioButtonGroup.errorStatus).toBe(null);
+      expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[1]);
+      expect(radioButtonGroup.radioButtons[0].selected).toBe(false);
+      expect(radioButtonGroup.radioButtons[1].selected).toBe(true);
+    });
+  });
+
+  describe('setValue', function() {
+    it('updates the currently selected button', function() {
+      var radioButtonGroup = scout.create('RadioButtonGroup', {
+        parent: session.desktop,
+        fields: [{
+          objectType: 'RadioButton',
+          radioValue: 0
+        }, {
+          objectType: 'RadioButton',
+          radioValue: 1
+        }]
+      });
+      radioButtonGroup.render();
+
+      radioButtonGroup.setValue(1);
+      expect(radioButtonGroup.value).toBe(1);
+      expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[1]);
+      expect(radioButtonGroup.radioButtons[0].selected).toBe(false);
+      expect(radioButtonGroup.radioButtons[1].selected).toBe(true);
+
+      radioButtonGroup.setValue(0);
+      expect(radioButtonGroup.value).toBe(0);
+      expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[0]);
+      expect(radioButtonGroup.radioButtons[0].selected).toBe(true);
+      expect(radioButtonGroup.radioButtons[1].selected).toBe(false);
+
+      // check that value does not change when an illegal value is set
+      radioButtonGroup.setValue(2);
+      expect(radioButtonGroup.value).toBe(0);
+    });
+
+    it('does nothing if radio buttons have no radioValue', function() {
+      var radioButtonGroup = scout.create('RadioButtonGroup', {
+        parent: session.desktop,
+        fields: [{
+          objectType: 'RadioButton'
+        }, {
+          objectType: 'RadioButton',
+          selected: true
+        }]
+      });
+      radioButtonGroup.render();
+
+      radioButtonGroup.setValue(1);
+      expect(radioButtonGroup.value).toBe(null);
+      expect(radioButtonGroup.errorStatus).not.toBe(null);
+      expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[1]);
+
+      radioButtonGroup.setValue(0);
+      expect(radioButtonGroup.value).toBe(null);
+      expect(radioButtonGroup.errorStatus).not.toBe(null);
+      expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[1]);
+    });
+
+    it('unselects every button when setting it to null', function() {
+      var radioButtonGroup = scout.create('RadioButtonGroup', {
+        parent: session.desktop,
+        fields: [{
+          objectType: 'RadioButton',
+          radioValue: 0
+        }, {
+          objectType: 'RadioButton',
+          radioValue: 1
+        }]
+      });
+      radioButtonGroup.render();
+
+      radioButtonGroup.setValue(1);
+      expect(radioButtonGroup.value).toBe(1);
+      expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[1]);
+
+      radioButtonGroup.setValue(null);
+      expect(radioButtonGroup.value).toBe(null);
+      expect(radioButtonGroup.selectedButton).toBe(null);
+      expect(radioButtonGroup.radioButtons[0].selected).toBe(false);
+      expect(radioButtonGroup.radioButtons[1].selected).toBe(false);
+    });
+  });
+
   describe('label', function() {
     it('is linked with the buttons', function() {
       var group = helper.createRadioButtonGroup(session.desktop, 2);
