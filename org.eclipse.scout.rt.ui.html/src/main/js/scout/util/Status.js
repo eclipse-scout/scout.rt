@@ -73,6 +73,8 @@ scout.Status.prototype.equals = function(o) {
   return scout.objects.propertiesEquals(this, o, ['severity', 'message', 'invalidDate', 'invalidTime']);
 };
 
+/* --- STATIC HELPERS ------------------------------------------------------------- */
+
 /**
  * Null-safe static clone method.
  */
@@ -133,42 +135,53 @@ scout.Status.ensure = function(status) {
  * @returns {scout.Status} a Status object with severity OK.
  */
 scout.Status.ok = function(model) {
-  model = model || {};
-  model = $.extend({}, model, {
-    severity: scout.Status.Severity.OK
-  });
-  return new scout.Status(model);
+  return scout.Status._create(model, scout.Status.Severity.OK);
 };
 
 /**
  * @returns {scout.Status} a Status object with severity INFO.
  */
 scout.Status.info = function(model) {
-  model = model || {};
-  model = $.extend({}, model, {
-    severity: scout.Status.Severity.INFO
-  });
-  return new scout.Status(model);
+  return scout.Status._create(model, scout.Status.Severity.INFO);
 };
 
 /**
- * @returns {scout.Status} a Status object with severity WARN.
+ * @returns {scout.Status} a Status object with severity WARNING.
+ * @deprecated do not use this legacy function, use scout.Status.warning() instead!
  */
+scout.Status._warnDeprecationLogged = false;
 scout.Status.warn = function(model) {
-  model = model || {};
-  model = $.extend({}, model, {
-    severity: scout.Status.Severity.WARNING
-  });
-  return new scout.Status(model);
+  if (!scout.Status._warnDeprecationLogged && window.console && (window.console.warn || window.console.log)) {
+    (window.console.warn || window.console.log)('scout.Status.warn() is deprecated and will be removed in a future release. Please use scout.Status.warning() instead.');
+    scout.Status._warnDeprecationLogged = true; // only warn once
+  }
+  return scout.Status.warning(model);
+};
+
+/**
+ * @returns {scout.Status} a Status object with severity WARNING.
+ */
+scout.Status.warning = function(model) {
+  return scout.Status._create(model, scout.Status.Severity.WARNING);
 };
 
 /**
  * @returns {scout.Status} a Status object with severity ERROR.
  */
 scout.Status.error = function(model) {
-  model = model || {};
+  return scout.Status._create(model, scout.Status.Severity.ERROR);
+};
+
+scout.Status._create = function(model, severity) {
+  if (typeof model === 'string') {
+    model = {
+      message: model
+    };
+  } else {
+    model = model || {};
+  }
   model = $.extend({}, model, {
-    severity: scout.Status.Severity.ERROR
+    severity: severity
   });
   return new scout.Status(model);
 };

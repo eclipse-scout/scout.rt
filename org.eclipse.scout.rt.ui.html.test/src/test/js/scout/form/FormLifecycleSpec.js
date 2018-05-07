@@ -114,7 +114,7 @@ describe('FormLifecycle', function() {
         widget: form
       });
       form2.lifecycle._validate = function() {
-        return $.resolvedPromise(scout.Status.warn({
+        return $.resolvedPromise(scout.Status.warning({
           message: 'This is only a warning'
         }));
       }.bind(form2.lifecycle);

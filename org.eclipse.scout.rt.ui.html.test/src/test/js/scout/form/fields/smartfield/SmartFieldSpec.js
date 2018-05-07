@@ -393,7 +393,7 @@ describe('SmartField', function() {
 
     it('_executeLookup should always remove lookup-status (but not the error-status)', function() {
       var field = createFieldWithLookupCall();
-      var lookupStatus = scout.Status.warn({
+      var lookupStatus = scout.Status.warning({
         message: 'bar'
       });
       var errorStatus = scout.Status.error({

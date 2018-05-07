@@ -635,7 +635,7 @@ scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText) {
         queryBy: scout.QueryBy.TEXT,
         lookupRows: []
       });
-      this.setLookupStatus(scout.Status.warn({
+      this.setLookupStatus(scout.Status.warning({
         message: this.session.text('TooManyRows'),
         code: scout.SmartField.ErrorCode.SEARCH_REQUIRED
       }));
@@ -691,7 +691,7 @@ scout.SmartField.prototype._lookupByTextOrAllDone = function(result) {
       this.closePopup();
     }
 
-    this.setLookupStatus(scout.Status.warn({
+    this.setLookupStatus(scout.Status.warning({
       message: this.session.text('SmartFieldNoDataFound'),
       code: scout.SmartField.ErrorCode.NO_DATA
     }));
@@ -700,7 +700,7 @@ scout.SmartField.prototype._lookupByTextOrAllDone = function(result) {
 
   if (result.empty) {
     this._handleEmptyResult();
-    this.setLookupStatus(scout.Status.warn({
+    this.setLookupStatus(scout.Status.warning({
       message: this.session.text('SmartFieldCannotComplete', result.text),
       code: scout.SmartField.ErrorCode.NO_RESULTS
     }));

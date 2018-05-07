@@ -195,7 +195,7 @@ scout.ListBox.prototype._lookupByAllDone = function(result) {
 
   // 'No data' case
   if (result.lookupRows.length === 0) {
-    this.setLookupStatus(scout.Status.warn({
+    this.setLookupStatus(scout.Status.warning({
       message: this.session.text('SmartFieldNoDataFound'),
       code: scout.ListBox.ErrorCode.NO_DATA
     }));
