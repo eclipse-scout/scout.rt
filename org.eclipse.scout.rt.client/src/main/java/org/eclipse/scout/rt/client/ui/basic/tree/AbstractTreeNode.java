@@ -499,6 +499,17 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   @Override
+  public void setExpanded(boolean b, boolean lazy) {
+    if (getTree() != null) {
+      getTree().setNodeExpanded(this, b, lazy);
+    }
+    else {
+      setExpandedInternal(b);
+      setExpandedLazyInternal(lazy);
+    }
+  }
+
+  @Override
   public boolean isExpandedLazy() {
     return EXPANDED_BIT_HELPER.isBitSet(EXPANDED_LAZY, m_expanded);
   }

@@ -69,6 +69,11 @@ public interface ITreeNode extends IVisibleDimension, IEnabledDimension, IContex
   void setExpanded(boolean b);
 
   /**
+   * Note: this method is a Convenience for {@link ITree#setNodeExpanded(ITreeNode, boolean, boolean)}
+   */
+  void setExpanded(boolean b, boolean lazy);
+
+  /**
    * Note: this method is a Convenience for {@link ITree#setNodeEnabledPermission(this, boolean)}
    */
   void setEnabledPermission(Permission p);
