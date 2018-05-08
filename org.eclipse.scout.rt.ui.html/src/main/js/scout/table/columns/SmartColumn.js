@@ -94,6 +94,9 @@ scout.SmartColumn.prototype._createEditor = function() {
     browseMaxRowCount: this.browseMaxRowCount,
     browseAutoExpandAll: this.browseAutoExpandAll,
     browseLoadIncremental: this.browseLoadIncremental,
-    activeFilterEnabled: this.activeFilterEnabled
+    activeFilterEnabled: this.activeFilterEnabled,
+    gridDataHints: {
+      horizontalAlignment: this.horizontalAlignment
+    }
   });
 };

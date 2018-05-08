@@ -44,6 +44,10 @@ scout.Cell.prototype.setEditable = function(editable) {
   this.editable = editable;
 };
 
+scout.Cell.prototype.setHorizontalAlignment = function(hAlign) {
+  this.horizontalAlignment = hAlign;
+};
+
 scout.Cell.prototype.setValue = function(value) {
   this.value = value;
 };

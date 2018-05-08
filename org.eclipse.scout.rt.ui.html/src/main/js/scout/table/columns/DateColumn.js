@@ -79,6 +79,9 @@ scout.DateColumn.prototype._createEditor = function() {
   return scout.create('DateField', {
     parent: this.table,
     hasDate: this.hasDate,
-    hasTime: this.hasTime
+    hasTime: this.hasTime,
+    gridDataHints: {
+      horizontalAlignment: this.horizontalAlignment
+    }
   });
 };

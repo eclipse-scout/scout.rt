@@ -15,6 +15,7 @@ scout.NumberField = function() {
   this.maxValue = null;
   this.decimalFormat = null;
   this.invalidValueMessageKey = 'InvalidNumberMessageX';
+  this.gridDataHints.horizontalAlignment = 1; // number fields are right aligned by default.
 };
 scout.inherits(scout.NumberField, scout.BasicField);
 

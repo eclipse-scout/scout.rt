@@ -517,6 +517,19 @@ scout.Column.prototype.setCellText = function(row, text, cell) {
   }
 };
 
+scout.Column.prototype.setHorizontalAlignment = function(hAlign) {
+  if (this.horizontalAlignment === hAlign) {
+    return;
+  }
+  this.horizontalAlignment = hAlign;
+
+  this.table.rows.forEach(function(row) {
+    this.cell(row).setHorizontalAlignment(hAlign);
+  }.bind(this));
+
+  this.table.updateRows(this.table.rows);
+};
+
 scout.Column.prototype.setEditable = function(editable) {
   if (this.editable === editable) {
     return;
@@ -595,7 +608,10 @@ scout.Column.prototype.createEditor = function(row) {
 
 scout.Column.prototype._createEditor = function() {
   return scout.create('StringField', {
-    parent: this.table
+    parent: this.table,
+    gridDataHints: {
+      horizontalAlignment: this.horizontalAlignment
+    }
   });
 };
 
