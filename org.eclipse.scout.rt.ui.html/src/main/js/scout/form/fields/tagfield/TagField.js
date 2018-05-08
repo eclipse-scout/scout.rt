@@ -13,9 +13,6 @@ scout.TagField = function() {
 
   this.$field = null;
   this.fieldHtmlComp = null;
-  this.overflowVisible = false;
-  this.$overflowIcon = null;
-  this.overflow = null;
   this.chooser = null;
   this._currentLookupCall = null;
   this.tagBar = null;

@@ -12,6 +12,8 @@
 scout.TagBar = function() {
   scout.TagBar.parent.call(this);
 
+  this.overflowEnabled = true;
+  this.$overflowIcon = null;
   this.overflowVisible = false;
   this.overflow = null;
   this.tags = [];
@@ -49,48 +51,25 @@ scout.TagBar.prototype.setTags = function(tags) {
   this.setProperty('tags', tags);
 };
 
-scout.TagBar.prototype._renderTags = function() {
-  this.$container.find('.tag-element').remove();
-  var tags = scout.arrays.ensure(this.tags);
-  var clickHandler = null;
-  var removeHandler = this._onTagRemoveClick.bind(this);
-  if (this.clickable) {
-    clickHandler = this._onTagClick.bind(this);
-  }
-  tags.forEach(function(tagText) {
-    this.appendTagElement(this.$container, tagText, clickHandler, removeHandler);
-  }, this);
-  this.invalidateLayoutTree();
-};
-
 /**
  * This function is also used by sub- and friend-classes like the TagOverflowPopup.
- * It's not a static helper because we must use the enabled state of the tag bar.
  */
-scout.TagBar.prototype.appendTagElement = function($parent, tagText, clickHandler, removeHandler) {
-  var $element = $parent
-    .appendDiv('tag-element')
-    .data('tag', tagText);
-  $element.appendSpan('tag-text', tagText);
-  if (this.enabledComputed) {
-    $element
-      .appendSpan('tag-remove-icon')
-      .on('click', removeHandler);
-  } else {
-    $element.addClass('disabled');
-  }
-  if (clickHandler) {
-    $element
-      .addClass('clickable')
-      .on('mousedown', clickHandler);
-  }
-  return $element;
+scout.TagBar.prototype._renderTags = function() {
+  var tags = scout.arrays.ensure(this.tags);
+  var clickHandler = this.clickable ? this._onTagClick.bind(this) : null;
+  var removeHandler = this._onTagRemoveClick.bind(this);
+  scout.TagBar.renderTags(this.$container, tags, this.enabledComputed, clickHandler, removeHandler);
+  this.invalidateLayoutTree();
 };
 
 scout.TagBar.prototype._onTagClick = function(event) {
   var tag = scout.TagBar.getTagData($(event.currentTarget));
-  this.trigger('tagClick', {tag: tag});
+  this._triggerTagClick(tag);
   return false;
+};
+
+scout.TagBar.prototype._triggerTagClick = function(tag) {
+  this.trigger('tagClick', {tag: tag});
 };
 
 scout.TagBar.prototype._onTagRemoveClick = function(event) {
@@ -103,11 +82,15 @@ scout.TagBar.prototype._onTagRemoveClick = function(event) {
 scout.TagBar.prototype.removeTagByElement = function($tag) {
   var tag = scout.TagBar.getTagData($tag);
   if (tag) {
-    this.trigger('tagRemove', {
-      tag: tag,
-      $tag: $tag
-    });
+    this._triggerTagRemove(tag, $tag);
   }
+};
+
+scout.TagBar.prototype._triggerTagRemove = function(tag, $tag) {
+  this.trigger('tagRemove', {
+    tag: tag,
+    $tag: $tag
+  });
 };
 
 scout.TagBar.prototype._onOverflowIconMousedown = function(event) {
@@ -133,7 +116,7 @@ scout.TagBar.prototype.openOverflowPopup = function() {
 };
 
 scout.TagBar.prototype._createOverflowPopup = function() {
-  return scout.create('TagOverflowPopup', {
+  return scout.create('TagBarOverflowPopup', {
     parent: this,
     closeOnAnchorMouseDown: false,
     focusableContainer: true,
@@ -274,3 +257,31 @@ scout.TagBar.getTagData = function($tag) {
   }
   return $tag.parent().data('tag');
 };
+
+scout.TagBar.renderTags = function($parent, tags, enabled, clickHandler, removeHandler) {
+  $parent.find('.tag-element').remove();
+  tags.forEach(function(tagText) {
+    scout.TagBar.renderTag($parent, tagText, enabled, clickHandler, removeHandler);
+  }, this);
+};
+
+scout.TagBar.renderTag = function($parent, tagText, enabled, clickHandler, removeHandler) {
+  var $element = $parent
+    .appendDiv('tag-element')
+    .data('tag', tagText);
+  var $tagText = $element.appendSpan('tag-text', tagText);
+  if (clickHandler) {
+    $tagText
+      .addClass('clickable')
+      .on('mousedown', clickHandler);
+  }
+  if (enabled) {
+    $element
+      .appendSpan('tag-remove-icon')
+      .on('click', removeHandler);
+  } else {
+    $element.addClass('disabled');
+  }
+  return $element;
+};
+

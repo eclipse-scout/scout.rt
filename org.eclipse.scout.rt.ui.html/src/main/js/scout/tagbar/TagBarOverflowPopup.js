@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.TagOverflowPopup = function() {
-  scout.TagOverflowPopup.parent.call(this); // FIXME [awe] move to tagbar folder
+scout.TagBarOverflowPopup = function() {
+  scout.TagBarOverflowPopup.parent.call(this);
 
   this._tagBarPropertyChangeListener = null;
 
@@ -21,71 +21,71 @@ scout.TagOverflowPopup = function() {
       .addClass('focused')[0];
   };
 };
-scout.inherits(scout.TagOverflowPopup, scout.PopupWithHead);
+scout.inherits(scout.TagBarOverflowPopup, scout.PopupWithHead);
 
-scout.TagOverflowPopup.prototype._init = function(options) {
-  scout.TagOverflowPopup.parent.prototype._init.call(this, options);
+scout.TagBarOverflowPopup.prototype._init = function(options) {
+  scout.TagBarOverflowPopup.parent.prototype._init.call(this, options);
   this._tagBarPropertyChangeListener = this._onTagBarPropertyChange.bind(this);
   this.parent.on('propertyChange', this._tagBarPropertyChangeListener);
 };
 
-scout.TagOverflowPopup.prototype._initKeyStrokeContext = function() {
-  scout.TagOverflowPopup.parent.prototype._initKeyStrokeContext.call(this);
+scout.TagBarOverflowPopup.prototype._initKeyStrokeContext = function() {
+  scout.TagBarOverflowPopup.parent.prototype._initKeyStrokeContext.call(this);
   this.keyStrokeContext.registerKeyStroke([
     new scout.TagFieldNavigationKeyStroke(this), // FIXME [awe] check key strokes
     new scout.TagFieldDeleteKeyStroke(this)
   ]);
 };
 
-scout.TagOverflowPopup.prototype._destroy = function() {
+scout.TagBarOverflowPopup.prototype._destroy = function() {
   this.parent.off('propertyChange', this._tagBarPropertyChangeListener);
-  scout.TagOverflowPopup.parent.prototype._destroy.call(this);
+  scout.TagBarOverflowPopup.parent.prototype._destroy.call(this);
 };
 
-scout.TagOverflowPopup.prototype._render = function() {
-  scout.TagOverflowPopup.parent.prototype._render.call(this);
+scout.TagBarOverflowPopup.prototype._render = function() {
+  scout.TagBarOverflowPopup.parent.prototype._render.call(this);
 
   this.$body.addClass('tag-overflow-popup');
   this._renderTags();
 };
 
-scout.TagOverflowPopup.prototype._renderTags = function() {
-  this.$body.empty();
-
+scout.TagBarOverflowPopup.prototype._renderTags = function() {
   var tagBar = this.parent;
   var visibleTags = tagBar.visibleTags();
   var allTags = scout.arrays.ensure(tagBar.tags);
-  allTags.forEach(function(tagText) {
-    // only add tags that are currently in "overflow" and thus are not visible
-    if (visibleTags.indexOf(tagText) === -1) {
-      tagBar.appendTagElement(this.$body, tagText, this._onTagRemoveClick.bind(this));
-    }
-  }.bind(this));
+  var overflowTags = allTags.filter(function(tagText) {
+    return visibleTags.indexOf(tagText) === -1;
+  });
+
+  var clickHandler = tagBar._onTagClick.bind(tagBar);
+  var removeHandler = tagBar._onTagRemoveClick.bind(tagBar);
+  scout.TagBar.renderTags(this.$body, overflowTags, tagBar.enabledComputed, clickHandler, removeHandler);
+  // FIXME [awe] flag machen, um die eigenschaften vom original zu übernehmen? popup schliessen nach klick
 
   if (!this.rendering) {
     this.revalidateLayout();
   }
+
 };
 
-scout.TagOverflowPopup.prototype._renderHead = function() {
-  scout.TagOverflowPopup.parent.prototype._renderHead.call(this);
+scout.TagBarOverflowPopup.prototype._renderHead = function() {
+  scout.TagBarOverflowPopup.parent.prototype._renderHead.call(this);
 
-  // FIXME [awe] ask c.gu why the border around the head looks a bit broken (1 pixel issue)
   this._copyCssClassToHead('overflow-icon');
   this.$head
     .removeClass('popup-head menu-item')
     .addClass('tag-overflow-popup-head');
 };
 
-scout.TagOverflowPopup.prototype._focusFirstTagElement = function() {
+scout.TagBarOverflowPopup.prototype._focusFirstTagElement = function() {
   scout.TagBar.focusFirstTagElement(this.$body);
 };
 
-scout.TagOverflowPopup.prototype._onTagRemoveClick = function(event) {
+scout.TagBarOverflowPopup.prototype._onTagRemoveClick = function(event) {
   this.parent._onTagRemoveClick(event);
 };
 
-scout.TagOverflowPopup.prototype._onTagBarPropertyChange = function(event) {
+scout.TagBarOverflowPopup.prototype._onTagBarPropertyChange = function(event) {
   if (event.propertyName === 'tags') {
     var allTags = scout.arrays.ensure(this.parent.tags);
     var visibleTags = this.parent.visibleTags();
