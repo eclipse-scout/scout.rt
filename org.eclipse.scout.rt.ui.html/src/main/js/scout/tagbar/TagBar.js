@@ -121,7 +121,8 @@ scout.TagBar.prototype._createOverflowPopup = function() {
     closeOnAnchorMouseDown: false,
     focusableContainer: true,
     $anchor: this.$container,
-    $headBlueprint: this.$overflowIcon
+    $headBlueprint: this.$overflowIcon,
+    cssClass: this.cssClass
   });
 };
 
