@@ -26,6 +26,7 @@ scout.TreeNode = function(tree) {
   this.filterDirty = false;
   this.id = null;
   this.initialized = false;
+  this.initialExpanded = false;
   this.lazyExpandingEnabled = false;
   this.leaf = false;
   this.level = 0;
@@ -43,6 +44,9 @@ scout.TreeNode = function(tree) {
 
 scout.TreeNode.prototype.init = function(model) {
   this._init(model);
+  if (model.initialExpanded === undefined) {
+    this.initialExpanded = this.expanded;
+  }
 };
 
 scout.TreeNode.prototype.destroy = function() {

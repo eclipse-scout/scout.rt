@@ -307,17 +307,14 @@ scout.Outline.prototype._onTitleClick = function(event) {
 
 scout.Outline.prototype.navigateToTop = function() {
   this.deselectAll();
-  this.collapseAll();
   this.handleInitialExpanded();
 };
 
 scout.Outline.prototype.handleInitialExpanded = function() {
   this.visitNodes(function(node) {
-    if (node.initialExpanded) {
-      this.expandNode(node, {
-        renderExpansion: true
-      });
-    }
+    this.setNodeExpanded(node, node.initialExpanded, {
+      renderExpansion: true
+    });
   }.bind(this));
 };
 
