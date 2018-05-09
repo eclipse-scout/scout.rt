@@ -10,8 +10,7 @@
 package org.eclipse.scout.rt.client.ui.tile.fields;
 
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
-import org.eclipse.scout.rt.client.ui.tile.AbstractFormFieldTile;
-import org.eclipse.scout.rt.client.ui.tile.fields.AbstractHtmlTile.HtmlField;
+import org.eclipse.scout.rt.client.ui.tile.fields.AbstractHtmlFieldTile.HtmlField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.classid.ClassId;
@@ -21,13 +20,13 @@ import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
  * @since 5.2
  */
 @ClassId("acffe2ec-3949-40dc-a5b5-cbe1a94fc934")
-public abstract class AbstractHtmlTile extends AbstractFormFieldTile<HtmlField> {
+public abstract class AbstractHtmlFieldTile extends AbstractFormFieldTile<HtmlField> {
 
-  public AbstractHtmlTile() {
+  public AbstractHtmlFieldTile() {
     this(true);
   }
 
-  public AbstractHtmlTile(boolean callInitializer) {
+  public AbstractHtmlFieldTile(boolean callInitializer) {
     super(callInitializer);
   }
 
@@ -42,12 +41,12 @@ public abstract class AbstractHtmlTile extends AbstractFormFieldTile<HtmlField> 
 
     @Override
     public String classId() {
-      return AbstractHtmlTile.this.classId() + ID_CONCAT_SYMBOL + ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), true);
+      return AbstractHtmlFieldTile.this.classId() + ID_CONCAT_SYMBOL + ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), true);
     }
 
     @Override
     protected void execAppLinkAction(String ref) {
-      AbstractHtmlTile.this.execAppLinkAction(ref);
+      AbstractHtmlFieldTile.this.execAppLinkAction(ref);
     }
   }
 }

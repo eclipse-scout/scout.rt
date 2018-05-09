@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tilefield.AbstractTileField;
 import org.eclipse.scout.rt.client.ui.tile.FormFieldTileTest.TestForm.TestMainBox.TestTileField.TestTileGrid;
 import org.eclipse.scout.rt.client.ui.tile.FormFieldTileTest.TestForm.TestMainBox.TestTileField.TestTileGrid.TestImageTile;
 import org.eclipse.scout.rt.client.ui.tile.FormFieldTileTest.TestForm.TestMainBox.TestTileField.TestTileGrid.TestImageTile.TestImageField;
+import org.eclipse.scout.rt.client.ui.tile.fields.AbstractFormFieldTile;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;

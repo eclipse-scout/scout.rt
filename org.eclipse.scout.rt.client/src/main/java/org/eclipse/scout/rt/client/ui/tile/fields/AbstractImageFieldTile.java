@@ -11,8 +11,7 @@ package org.eclipse.scout.rt.client.ui.tile.fields;
 
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.imagefield.AbstractImageField;
-import org.eclipse.scout.rt.client.ui.tile.AbstractFormFieldTile;
-import org.eclipse.scout.rt.client.ui.tile.fields.AbstractImageTile.ImageField;
+import org.eclipse.scout.rt.client.ui.tile.fields.AbstractImageFieldTile.ImageField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
@@ -22,13 +21,13 @@ import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
  * @since 5.2
  */
 @ClassId("5b8227fe-ab75-47c8-84f1-0e7bb27bdfd0")
-public abstract class AbstractImageTile extends AbstractFormFieldTile<ImageField> {
+public abstract class AbstractImageFieldTile extends AbstractFormFieldTile<ImageField> {
 
-  public AbstractImageTile() {
+  public AbstractImageFieldTile() {
     this(true);
   }
 
-  public AbstractImageTile(boolean callInitializer) {
+  public AbstractImageFieldTile(boolean callInitializer) {
     super(callInitializer);
   }
 
@@ -98,7 +97,7 @@ public abstract class AbstractImageTile extends AbstractFormFieldTile<ImageField
 
     @Override
     public String classId() {
-      return AbstractImageTile.this.classId() + ID_CONCAT_SYMBOL + ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), true);
+      return AbstractImageFieldTile.this.classId() + ID_CONCAT_SYMBOL + ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), true);
     }
   }
 }

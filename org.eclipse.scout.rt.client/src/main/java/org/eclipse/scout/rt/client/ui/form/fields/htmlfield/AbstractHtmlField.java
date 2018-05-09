@@ -79,6 +79,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   @Override
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
+    m_attachments = new HashMap<>();
     super.initConfig();
     setScrollBarEnabled(getConfiguredScrollBarEnabled());
     setHtmlEnabled(true);
@@ -154,16 +155,15 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   public void setAttachments(Collection<? extends BinaryResource> attachments) {
     if (attachments == null) {
       m_attachments = new HashMap<>(0);
+      return;
     }
-    else {
-      Map<String, BinaryResource> newMap = new HashMap<>(attachments.size());
-      for (BinaryResource attachment : attachments) {
-        if (attachment != null) {
-          newMap.put(attachment.getFilename(), attachment);
-        }
+    Map<String, BinaryResource> newMap = new HashMap<>(attachments.size());
+    for (BinaryResource attachment : attachments) {
+      if (attachment != null) {
+        newMap.put(attachment.getFilename(), attachment);
       }
-      m_attachments = newMap;
     }
+    m_attachments = newMap;
   }
 
   @Override

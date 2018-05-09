@@ -1,6 +1,8 @@
-package org.eclipse.scout.rt.client.ui.tile;
+package org.eclipse.scout.rt.client.ui.tile.fields;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.tile.AbstractWidgetTile;
+import org.eclipse.scout.rt.client.ui.tile.IFormFieldTile;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;

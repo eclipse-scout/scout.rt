@@ -14,9 +14,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
-import org.eclipse.scout.rt.client.ui.tile.AbstractFormFieldTile;
-import org.eclipse.scout.rt.client.ui.tile.fields.AbstractTableTile.TableField;
-import org.eclipse.scout.rt.client.ui.tile.fields.AbstractTableTile.TableField.Table;
+import org.eclipse.scout.rt.client.ui.tile.fields.AbstractTableFieldTile.TableField;
+import org.eclipse.scout.rt.client.ui.tile.fields.AbstractTableFieldTile.TableField.Table;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
@@ -28,13 +27,13 @@ import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
  * @since 5.2
  */
 @ClassId("78275a97-05ba-405a-a92b-1c6d6427683b")
-public abstract class AbstractTableTile extends AbstractFormFieldTile<TableField> {
+public abstract class AbstractTableFieldTile extends AbstractFormFieldTile<TableField> {
 
-  public AbstractTableTile() {
+  public AbstractTableFieldTile() {
     this(true);
   }
 
-  public AbstractTableTile(boolean callInitializer) {
+  public AbstractTableFieldTile(boolean callInitializer) {
     super(callInitializer);
   }
 
@@ -116,7 +115,7 @@ public abstract class AbstractTableTile extends AbstractFormFieldTile<TableField
 
     @Override
     public String classId() {
-      return AbstractTableTile.this.classId() + ID_CONCAT_SYMBOL + ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), true);
+      return AbstractTableFieldTile.this.classId() + ID_CONCAT_SYMBOL + ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), true);
     }
 
     @ClassId("787e34b0-e6a7-4ebb-9b24-8e5361280bcf")
@@ -137,19 +136,19 @@ public abstract class AbstractTableTile extends AbstractFormFieldTile<TableField
 
       @Override
       protected void execAppLinkAction(String ref) {
-        AbstractTableTile.this.execAppLinkAction(ref);
+        AbstractTableFieldTile.this.execAppLinkAction(ref);
       }
 
       @Override
       protected void injectColumnsInternal(OrderedCollection<IColumn<?>> columnList) {
         super.injectColumnsInternal(columnList);
-        AbstractTableTile.this.injectColumnsInternal(columnList);
+        AbstractTableFieldTile.this.injectColumnsInternal(columnList);
       }
 
       @Override
       protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
         super.injectMenusInternal(menus);
-        AbstractTableTile.this.injectMenusInternal(menus);
+        AbstractTableFieldTile.this.injectMenusInternal(menus);
       }
     }
   }

@@ -90,6 +90,7 @@ import org.eclipse.scout.rt.client.ui.group.IGroup;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.notification.INotification;
 import org.eclipse.scout.rt.client.ui.tile.IFormFieldTile;
+import org.eclipse.scout.rt.client.ui.tile.IHtmlTile;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.client.ui.tile.ITileAccordion;
 import org.eclipse.scout.rt.client.ui.tile.ITileGrid;
@@ -179,6 +180,7 @@ import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonNumberColumnUserFi
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTableTextUserFilter;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTextColumnUserFilter;
 import org.eclipse.scout.rt.ui.html.json.tile.JsonFormFieldTile;
+import org.eclipse.scout.rt.ui.html.json.tile.JsonHtmlTile;
 import org.eclipse.scout.rt.ui.html.json.tile.JsonTile;
 import org.eclipse.scout.rt.ui.html.json.tile.JsonTileAccordion;
 import org.eclipse.scout.rt.ui.html.json.tile.JsonTileGrid;
@@ -384,6 +386,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof ITableControl) {
       return new JsonTableControl<>((ITableControl) model, session, id, parent);
+    }
+    if (model instanceof IHtmlTile) {
+      return new JsonHtmlTile<>((IHtmlTile) model, session, id, parent);
     }
     if (model instanceof IFormFieldTile) {
       return new JsonFormFieldTile<>((IFormFieldTile) model, session, id, parent);

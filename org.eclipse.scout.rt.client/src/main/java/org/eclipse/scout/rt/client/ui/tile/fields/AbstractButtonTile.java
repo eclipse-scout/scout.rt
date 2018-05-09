@@ -11,7 +11,6 @@ package org.eclipse.scout.rt.client.ui.tile.fields;
 
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
-import org.eclipse.scout.rt.client.ui.tile.AbstractFormFieldTile;
 import org.eclipse.scout.rt.client.ui.tile.fields.AbstractButtonTile.Button;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;

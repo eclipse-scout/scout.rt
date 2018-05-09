@@ -13,8 +13,7 @@ import java.util.EnumSet;
 
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.AbstractBrowserField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField.SandboxPermission;
-import org.eclipse.scout.rt.client.ui.tile.AbstractFormFieldTile;
-import org.eclipse.scout.rt.client.ui.tile.fields.AbstractBrowserTile.BrowserField;
+import org.eclipse.scout.rt.client.ui.tile.fields.AbstractBrowserFieldTile.BrowserField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
@@ -24,13 +23,13 @@ import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
  * @since 5.2
  */
 @ClassId("9228f159-bc81-4dba-998c-168e0453865c")
-public abstract class AbstractBrowserTile extends AbstractFormFieldTile<BrowserField> {
+public abstract class AbstractBrowserFieldTile extends AbstractFormFieldTile<BrowserField> {
 
-  public AbstractBrowserTile() {
+  public AbstractBrowserFieldTile() {
     this(true);
   }
 
-  public AbstractBrowserTile(boolean callInitializer) {
+  public AbstractBrowserFieldTile(boolean callInitializer) {
     super(callInitializer);
   }
 
@@ -71,7 +70,7 @@ public abstract class AbstractBrowserTile extends AbstractFormFieldTile<BrowserF
 
     @Override
     public String classId() {
-      return AbstractBrowserTile.this.classId() + ID_CONCAT_SYMBOL + ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), true);
+      return AbstractBrowserFieldTile.this.classId() + ID_CONCAT_SYMBOL + ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), true);
     }
   }
 }
