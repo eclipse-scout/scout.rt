@@ -7,6 +7,8 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.text.TEXTS;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,13 +44,15 @@ public abstract class AbstractFormFieldTile<T extends IFormField> extends Abstra
   }
 
   @Override
-  protected void handleLoadDataException(Exception e) {
+  protected void handleLoadDataException(Throwable e) {
+    super.handleLoadDataException(e);
     if (e instanceof VetoException) {
-      LOG.info("VetoException on {}: {}", this.getClass().getName(), e.getMessage());
       getTileWidget().addErrorStatus(((ProcessingException) e).getStatus());
     }
+    else if (e instanceof FutureCancelledError || e instanceof ThreadInterruptedError) {
+      //NOP
+    }
     else {
-      LOG.error("Unexpected error on {}", this.getClass().getName(), e);
       getTileWidget().addErrorStatus(TEXTS.get("ErrorWhileLoadingData"));
     }
   }

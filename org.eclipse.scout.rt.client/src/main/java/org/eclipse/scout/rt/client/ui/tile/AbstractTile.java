@@ -23,6 +23,9 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.data.tile.ITileColorScheme;
 import org.eclipse.scout.rt.shared.data.tile.TileColorScheme;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -42,8 +45,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   private ITileGrid<? extends ITile> m_container;
   private IDataChangeListener m_internalDataChangeListener;
   private boolean m_filterAccepted = true;
-  private boolean m_loaded = false;
-  private boolean m_loadingLocked = false;
+  private volatile boolean m_loaded = false;
 
   public AbstractTile() {
     this(true);
@@ -362,11 +364,8 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
 
   @Override
   public void loadData() {
-    synchronized (this) {
-      if (m_loadingLocked) {
-        return;
-      }
-      m_loadingLocked = true;
+    if (isLoading()) {
+      return;
     }
     beforeLoadData();
     try {
@@ -374,9 +373,6 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
     }
     catch (Exception e) {
       handleLoadDataException(e);
-    }
-    finally {
-      m_loadingLocked = false;
     }
   }
 
@@ -409,9 +405,15 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   /**
    * Uses the exception to set a corresponding error status on the tile field.
    */
-  protected void handleLoadDataException(Exception e) {
+  protected void handleLoadDataException(Throwable e) {
     if (e instanceof VetoException) {
       LOG.info("VetoException on {}: {}", this.getClass().getName(), e.getMessage());
+    }
+    else if (e instanceof FutureCancelledError) {
+      LOG.debug("FutureCancelledError on {}: {}", this.getClass().getName(), e.getMessage());
+    }
+    else if (e instanceof ThreadInterruptedError) {
+      LOG.debug("ThreadInterruptedError on {}: {}", this.getClass().getName(), e.getMessage());
     }
     else {
       LOG.error("Unexpected error on {}", this.getClass().getName(), e);
@@ -444,11 +446,29 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
      */
     protected abstract void setTileData(DATA data);
 
+    @SuppressWarnings("squid:S1181")
     @Override
     public void loadData() {
+      if (isLoading()) {
+        return;
+      }
       setLoading(true);
       try {
-        BEANS.get(TileDataLoadManager.class).schedule(() -> doLoadData(), m_container.createAsyncLoadJobInput(AbstractTile.this));
+        BEANS.get(TileDataLoadManager.class).schedule(() -> {
+          try {
+            final DATA data = doLoadData();
+            runInModelJob(() -> {
+              setLoading(false);
+              updateModelData(data);
+            });
+          }
+          catch (final Throwable e) { // Catch Throwable so we can handle all AbstractInterruptionError accordingly
+            runInModelJob(() -> {
+              setLoading(false);
+              handleLoadDataException(e);
+            });
+          }
+        }, m_container.createAsyncLoadJobInput(AbstractTile.this));
       }
       catch (RuntimeException e) {
         setLoading(false);
@@ -456,32 +476,27 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
       }
     }
 
-    private void doLoadData() {
-      try {
-        final DATA data = loadDataAsync();
+    protected void runInModelJob(IRunnable r) {
+      ModelJobs.schedule(r,
+          ModelJobs.newInput(ClientRunContexts.copyCurrent()
+              .withRunMonitor(BEANS.get(RunMonitor.class))) // do not use same RunMonitor since it might have been canceled and job will not execute in that case
+              .withName("setting tile data"));
+    }
 
-        // currently not in model jobs, thus synchronize first to set field data
-        ModelJobs.schedule(() -> updateModelData(data), ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("setting tile data"));
+    protected DATA doLoadData() {
+      try {
+        DATA data = loadDataAsync();
         setLoaded(true);
+        return data;
       }
       catch (final Exception e) {
-        if (RunMonitor.CURRENT.get().isCancelled()) {
-          setLoaded(false);
-        }
-        else {
-          // if a general load error occurred loading will probably continue to fail, do not keep retrying
-          setLoaded(true);
-        }
-        // currently not in model jobs, thus synchronize first to set error status
-        ModelJobs.schedule(() -> {
-          setLoading(false);
-          handleLoadDataException(e);
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("handling exception while loading tile data"));
+        // if a general load error occurred loading will prob continue fail, do not keep retrying
+        setLoaded(!RunMonitor.CURRENT.get().isCancelled());
+        throw e;
       }
     }
 
-    private void updateModelData(final DATA data) {
-      setLoading(false);
+    protected void updateModelData(final DATA data) {
       try {
         setTileData(data);
       }
