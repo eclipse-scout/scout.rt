@@ -10,14 +10,16 @@ public class DesktopNotification implements IDesktopNotification {
   private final boolean m_closable;
 
   /**
-   * Creates a closable, simple info notification with a text and the default duration.
+   * Creates a closable, simple info notification with a text and the {@linkplain IDesktopNotification#DEFAULT_DURATION
+   * default duration}.
    */
   public DesktopNotification(String text) {
     this(new Status(text, IStatus.INFO));
   }
 
   /**
-   * Creates a closable, notification with a status and the default duration.
+   * Creates a closable, notification with a status and the {@linkplain IDesktopNotification#DEFAULT_DURATION default
+   * duration}.
    */
   public DesktopNotification(IStatus status) {
     m_status = status;
@@ -25,6 +27,15 @@ public class DesktopNotification implements IDesktopNotification {
     m_closable = true;
   }
 
+  /**
+   * Creates a notification with the given attributes.
+   *
+   * @param status
+   * @param duration
+   *          see {@link #getDuration()}
+   * @param closable
+   *          see {@link #isClosable()}
+   */
   public DesktopNotification(IStatus status, long duration, boolean closable) {
     m_status = status;
     m_duration = duration;
@@ -45,5 +56,4 @@ public class DesktopNotification implements IDesktopNotification {
   public boolean isClosable() {
     return m_closable;
   }
-
 }
