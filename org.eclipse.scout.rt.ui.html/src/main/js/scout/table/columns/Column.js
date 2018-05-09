@@ -299,7 +299,7 @@ scout.Column.prototype._icon = function(iconId, hasText) {
 
 scout.Column.prototype._cellCssClass = function(cell, tableNode) {
   var cssClass = 'table-cell';
-  if (this.mandatory) {
+  if (cell.mandatory) {
     cssClass += ' mandatory';
   }
   if (!this.table.multilineText || !this.textWrap) {
