@@ -12,3 +12,18 @@ scout.FileChooserButtonAdapter = function() {
   scout.FileChooserButtonAdapter.parent.call(this);
 };
 scout.inherits(scout.FileChooserButtonAdapter, scout.ValueFieldAdapter);
+
+scout.FileChooserButtonAdapter.prototype._onWidgetPropertyChange = function(event) {
+  scout.FileChooserButtonAdapter.parent.prototype._onWidgetPropertyChange.call(this, event);
+
+  if (event.propertyName === 'value') {
+    this._onValueChange(event);
+  }
+};
+
+scout.FileChooserButtonAdapter.prototype._onValueChange = function(event) {
+  var success = this.widget.fileInput.upload();
+  if (!success) {
+    this.widget.fileInput.clear();
+  }
+};

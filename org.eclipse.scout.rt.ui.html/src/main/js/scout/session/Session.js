@@ -1049,8 +1049,8 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
     }
   }.bind(this));
 
-  // 5 MB as default maximum size
-  maxTotalSize = scout.nvl(maxTotalSize, 5 * 1024 * 1024);
+  // 50 MB as default maximum size
+  maxTotalSize = scout.nvl(maxTotalSize, scout.FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE);
 
   // very large files must not be sent to server otherwise the whole system might crash (for all users).
   if (totalSize > maxTotalSize) {

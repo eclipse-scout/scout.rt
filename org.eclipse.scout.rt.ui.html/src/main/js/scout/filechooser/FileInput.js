@@ -11,12 +11,15 @@
 scout.FileInput = function() {
   scout.FileInput.parent.call(this);
   this.acceptTypes = null;
+  this.maximumUploadSize = scout.FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
   this.multiSelect = false;
   this.files = [];
   this.legacyFileUploadUrl = null;
   this.text = null;
 };
 scout.inherits(scout.FileInput, scout.Widget);
+
+scout.FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE = 50 * 1024 * 1024; // 50 MB
 
 scout.FileInput.prototype._init = function(model) {
   scout.FileInput.parent.prototype._init.call(this, model);
@@ -146,7 +149,7 @@ scout.FileInput.prototype.setMaximumUploadSize = function(maximumUploadSize) {
   this.setProperty('maximumUploadSize', maximumUploadSize);
 };
 
-scout.FileInput.prototype.clear = function(file) {
+scout.FileInput.prototype.clear = function() {
   this._setFiles([]);
   // _setFiles actually sets the text as well, but only if files have changed.
   // Make sure text is cleared as well if there are no files but a text set.
@@ -235,9 +238,25 @@ scout.FileInput.prototype._onDrop = function(event) {
 };
 
 scout.FileInput.fileListToArray = function(fileList) {
-  var files = [], i;
+  var files = [],
+    i;
   for (i = 0; i < fileList.length; i++) {
     files.push(fileList[i]);
   }
   return files;
+};
+
+scout.FileInput.prototype.validateMaximumUploadSize = function(files) {
+  files = scout.arrays.ensure(files);
+  if (files.length === 0) {
+    return;
+  }
+
+  var totalSize = files.reduce(function(total, file) {
+    return total + file.size;
+  }, 0);
+
+  if (this.maximumUploadSize !== null && totalSize > this.maximumUploadSize) {
+    throw this.session.text('ui.FileSizeLimit', (this.maximumUploadSize / 1024 / 1024));
+  }
 };

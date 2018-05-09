@@ -13,6 +13,8 @@ scout.FileChooserButton = function() {
 
   this.button = null;
   this.fileInput = null;
+  this.acceptTypes = null;
+  this.maximumUploadSize = scout.FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
 };
 scout.inherits(scout.FileChooserButton, scout.ValueField);
 
@@ -22,17 +24,12 @@ scout.FileChooserButton.prototype._init = function(model) {
   this.button = scout.create('Button', {
     parent: this,
     label: this._buttonLabel(),
-    iconId : this.iconId
+    iconId: this.iconId
   });
 
-  this.fileInput = scout.create('FileInput', {
-    parent: this,
-    acceptTypes: this.acceptTypes,
-    text: this.displayText,
-    enabled: this.enabledComputed,
-    maximumUploadSize: this.maximumUploadSize,
-    visible: !scout.device.supportsFile()
-  });
+  this.button.on('click', this._onButtonClick.bind(this));
+
+
   this.fileInput.on('change', this._onFileChange.bind(this));
   this.on('propertyChange', function(event) {
     if (event.propertyName === 'enabledComputed') {
@@ -41,6 +38,23 @@ scout.FileChooserButton.prototype._init = function(model) {
       this.fileInput.setEnabled(event.newValue);
     }
   }.bind(this));
+};
+
+/**
+ * Initializes the file input before calling set value.
+ * This cannot be done in _init because the value field would call _setValue first
+ */
+scout.FileChooserButton.prototype._initValue = function(value) {
+  this.fileInput = scout.create('FileInput', {
+    parent: this,
+    acceptTypes: this.acceptTypes,
+    text: this.displayText,
+    enabled: this.enabledComputed,
+    maximumUploadSize: this.maximumUploadSize,
+    visible: !scout.device.supportsFile()
+  });
+
+  scout.FileChooserButton.parent.prototype._initValue.call(this, value);
 };
 
 scout.FileChooserButton.prototype._buttonLabel = function() {
@@ -54,7 +68,7 @@ scout.FileChooserButton.prototype._render = function() {
   var $field = this.$parent.makeDiv();
   var fieldHtmlComp = scout.HtmlComponent.install($field, this.session);
   this.button.render($field);
-  this.button.on('click', this._onButtonClick.bind(this));
+
   fieldHtmlComp.setLayout(new scout.SingleLayout(this.button.htmlComp));
   this.fileInput.render($field);
   this.addField($field);
@@ -87,9 +101,21 @@ scout.FileChooserButton.prototype.setMaximumUploadSize = function(maximumUploadS
   this.fileInput.setMaximumUploadSize(maximumUploadSize);
 };
 
-scout.FileChooserButton.prototype._onFileChange = function() {
-  var success = this.fileInput.upload();
-  if (!success) {
-    this.fileInput.clear();
-  }
+scout.FileChooserButton.prototype._onFileChange = function(event) {
+  this.setValue(scout.arrays.first(event.files));
+};
+
+/**
+ * @override
+ */
+scout.FileChooserButton.prototype._validateValue = function(value) {
+  this.fileInput.validateMaximumUploadSize(value);
+  return value;
+};
+
+/**
+ * @override
+ */
+scout.FileChooserButton.prototype._formatValue = function(value) {
+  return !value ? '' : value.name;
 };

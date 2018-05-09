@@ -23,7 +23,31 @@ scout.FileChooserAdapter.prototype._onWidgetCancel = function(event) {
 scout.FileChooserAdapter.prototype._onWidgetEvent = function(event) {
   if (event.type === 'cancel') {
     this._onWidgetCancel(event);
+  } else if (event.type === 'upload') {
+    this._onUpload(event);
   } else {
     scout.FileChooserAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }
+};
+
+scout.FileChooserAdapter.prototype._onUpload = function(event) {
+  if (this.widget.rendered) {
+    this.widget.$uploadButton.setEnabled(false);
+  }
+
+  if (this.widget.files.length === 0) {
+    return;
+  }
+
+  if (this.widget.fileInput.legacy) {
+    this.widget.fileInput.upload();
+  } else {
+    this.session.uploadFiles(this, this.widget.files, undefined, this.widget.maximumUploadSize);
+  }
+
+  this.session.listen().done(function() {
+    if (this.widget && this.widget.rendered) {
+      this.widget.$uploadButton.setEnabled(true);
+    }
+  }.bind(this));
 };

@@ -10,19 +10,15 @@
  ******************************************************************************/
 scout.FileChooserField = function() {
   scout.FileChooserField.parent.call(this);
+
+  this.acceptTypes = null;
+  this.maximumUploadSize = scout.FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
 };
 scout.inherits(scout.FileChooserField, scout.ValueField);
 
 scout.FileChooserField.prototype._init = function(model) {
   scout.FileChooserField.parent.prototype._init.call(this, model);
 
-  this.fileInput = scout.create('FileInput', {
-    parent: this,
-    acceptTypes: this.acceptTypes,
-    text: this.displayText,
-    enabled: this.enabledComputed,
-    maximumUploadSize: this.maximumUploadSize
-  });
   this.fileInput.on('change', this._onFileChange.bind(this));
   this.on('propertyChange', function(event) {
     if (event.propertyName === 'enabledComputed') {
@@ -30,6 +26,22 @@ scout.FileChooserField.prototype._init = function(model) {
       this.fileInput.setEnabled(event.newValue);
     }
   }.bind(this));
+};
+
+/**
+ * Initializes the file input before calling set value.
+ * This cannot be done in _init because the value field would call _setValue first
+ */
+scout.FileChooserField.prototype._initValue = function(value) {
+  this.fileInput = scout.create('FileInput', {
+    parent: this,
+    acceptTypes: this.acceptTypes,
+    text: this.displayText,
+    enabled: this.enabledComputed,
+    maximumUploadSize: this.maximumUploadSize
+  });
+
+  scout.FileChooserField.parent.prototype._initValue.call(this, value);
 };
 
 scout.FileChooserField.prototype._initKeyStrokeContext = function() {
@@ -93,6 +105,10 @@ scout.FileChooserField.prototype._onIconMouseDown = function(event) {
   this.activate();
 };
 
+scout.FileChooserField.prototype._onFileChange = function(event) {
+  this.setValue(scout.arrays.first(event.files));
+};
+
 /**
  * @override
  */
@@ -104,11 +120,17 @@ scout.FileChooserField.prototype.activate = function() {
   this.fileInput.browse();
 };
 
-scout.FileChooserField.prototype._onFileChange = function() {
-  this.acceptInput();
-  var success = this.fileInput.upload();
-  if (!success) {
-    this.fileInput.clear();
-  }
-  this._updateHasText();
+/**
+ * @override
+ */
+scout.FileChooserField.prototype._validateValue = function(value) {
+  this.fileInput.validateMaximumUploadSize(value);
+  return value;
+};
+
+/**
+ * @override
+ */
+scout.FileChooserField.prototype._formatValue = function(value) {
+  return !value ? '' : value.name;
 };

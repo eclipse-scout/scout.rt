@@ -12,6 +12,7 @@ scout.FileChooser = function() {
   scout.FileChooser.parent.call(this);
   this.files = [];
   this._glassPaneRenderer;
+  this.maximumUploadSize = scout.FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
 };
 scout.inherits(scout.FileChooser, scout.Widget);
 
@@ -21,6 +22,7 @@ scout.FileChooser.prototype._init = function(model) {
   this.fileInput = scout.create('FileInput', {
     parent: this,
     acceptTypes: this.acceptTypes,
+    maximumUploadSize: this.maximumUploadSize,
     multiSelect: this.multiSelect,
     visible: !scout.device.supportsFile()
   });
@@ -147,18 +149,6 @@ scout.FileChooser.prototype._position = function() {
   this.$container.cssMarginLeft(-this.$container.outerWidth() / 2);
 };
 
-scout.FileChooser.prototype.upload = function() {
-  if (this.files.length === 0) {
-    return;
-  }
-
-  if (this.fileInput.legacy) {
-    this.fileInput.upload();
-  } else {
-    this.session.uploadFiles(this, this.files, undefined, this.maximumUploadSize);
-  }
-};
-
 scout.FileChooser.prototype.setDisplayParent = function(displayParent) {
   this.setProperty('displayParent', displayParent);
 };
@@ -168,6 +158,11 @@ scout.FileChooser.prototype._setDisplayParent = function(displayParent) {
   if (displayParent) {
     this.setParent(displayParent);
   }
+};
+
+scout.FileChooser.prototype.setMaximumUploadSize = function(maximumUploadSize) {
+  this.setProperty('maximumUploadSize', maximumUploadSize);
+  this.fileInput.setMaximumUploadSize(maximumUploadSize);
 };
 
 /**
@@ -256,6 +251,18 @@ scout.FileChooser.prototype.setFiles = function(files) {
     files = scout.FileInput.fileListToArray(files);
   }
   files = scout.arrays.ensure(files);
+
+  try {
+    this.fileInput.validateMaximumUploadSize(files);
+  } catch (errorMessage) {
+    scout.MessageBoxes.createOk(this)
+      .withHeader(this.session.text('ui.FileSizeLimitTitle'))
+      .withBody(errorMessage)
+      .withSeverity(scout.Status.Severity.ERROR)
+      .buildAndOpen();
+    return;
+  }
+
   this.setProperty('files', files);
 };
 
@@ -293,11 +300,7 @@ scout.FileChooser.prototype._onDrop = function(event) {
 };
 
 scout.FileChooser.prototype._onUploadButtonClicked = function(event) {
-  this.$uploadButton.setEnabled(false);
-  this.upload();
-  this.session.listen().done(function() {
-    this.$uploadButton.setEnabled(true);
-  }.bind(this));
+  this.trigger('upload');
 };
 
 scout.FileChooser.prototype._onCancelButtonClicked = function(event) {
@@ -317,7 +320,7 @@ scout.FileChooser.prototype._onMouseDown = function(event, option) {
   var parent = this.findParent(function(p) {
     return p instanceof scout.Form && p.isDialog();
   });
-  if(parent) {
+  if (parent) {
     parent.activate();
   }
 };
