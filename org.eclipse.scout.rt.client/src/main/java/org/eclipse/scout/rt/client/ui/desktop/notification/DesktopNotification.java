@@ -16,14 +16,16 @@ public class DesktopNotification extends AbstractPropertyObserver implements IDe
   private IDesktopNotificationUIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
 
   /**
-   * Creates a closable, simple info notification with a text and the default duration.
+   * Creates a closable, simple info notification with a text and the {@linkplain IDesktopNotification#DEFAULT_DURATION
+   * default duration}.
    */
   public DesktopNotification(String text) {
     this(new Status(text, IStatus.INFO));
   }
 
   /**
-   * Creates a closable notification with a status and the default duration.
+   * Creates a closable, notification with a status and the {@linkplain IDesktopNotification#DEFAULT_DURATION default
+   * duration}.
    */
   public DesktopNotification(IStatus status) {
     m_status = status;
@@ -32,12 +34,13 @@ public class DesktopNotification extends AbstractPropertyObserver implements IDe
   }
 
   /**
-   * Creates a notification.
+   * Creates a notification with the given attributes.
    *
    * @param status
    * @param duration
-   *          in milliseconds
+   *          see {@link #getDuration()}
    * @param closable
+   *          see {@link #isClosable()}
    */
   public DesktopNotification(IStatus status, long duration, boolean closable) {
     m_status = status;
