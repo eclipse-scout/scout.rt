@@ -52,8 +52,16 @@ scout.SimpleTab.prototype._render = function() {
   this.$container.on('mousedown', this._mouseListener);
   this.$statusContainer = this.$container.appendDiv('status-container');
   this.$icon = this.$container.appendDiv('icon-container');
+
   this._$title = this.$container.appendDiv('title');
+  scout.tooltips.installForEllipsis(this._$title, {
+    parent: this
+  });
+
   this._$subTitle = this.$container.appendDiv('sub-title');
+  scout.tooltips.installForEllipsis(this._$subTitle, {
+    parent: this
+  });
 
   this._renderTitle();
   this._renderSubTitle();
@@ -192,6 +200,12 @@ scout.SimpleTab.prototype.deselect = function() {
 
 scout.SimpleTab.prototype._onMouseDown = function(event) {
   this.trigger('click');
+
+  // When the tab is clicked the user wants to execute the action and not see the tooltip
+  scout.tooltips.cancel(this._$title);
+  scout.tooltips.cancel(this._$subTitle);
+  scout.tooltips.close(this._$title);
+  scout.tooltips.close(this._$subTitle);
 };
 
 scout.SimpleTab.prototype._onClose = function() {};

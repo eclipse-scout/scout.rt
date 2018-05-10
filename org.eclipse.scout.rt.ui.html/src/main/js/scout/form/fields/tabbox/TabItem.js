@@ -83,6 +83,10 @@ scout.TabItem.prototype._onTabMouseDown = function(event) {
   if (!this.session.focusManager.active) {
     this.$tabContainer.focus();
   }
+
+  // When the tab is clicked the user wants to execute the action and not see the tooltip
+  scout.tooltips.cancel(this.$label);
+  scout.tooltips.close(this.$label);
 };
 
 scout.TabItem.prototype._onStatusMouseDown = function(event) {
@@ -197,6 +201,14 @@ scout.TabItem.prototype.addLabel = function() {
     return;
   }
   this.$label = this.$tabContainer.appendSpan('label');
+  scout.tooltips.installForEllipsis(this.$label, {
+    parent: this,
+    $parent: this._$tooltipParent(),
+    renderLaterPredicate: function() {
+      // See comment in _createTooltip
+      return !this.$anchor.isAttached();
+    }
+  });
 };
 
 scout.TabItem.prototype.addStatus = function() {

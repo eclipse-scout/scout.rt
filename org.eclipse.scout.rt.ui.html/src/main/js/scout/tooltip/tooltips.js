@@ -10,14 +10,47 @@
  ******************************************************************************/
 scout.tooltips = {
   install: function($comp, options) {
-    var support = new scout.TooltipSupport(options);
-    support.install($comp);
+    var support = $comp.data('tooltipSupport');
+    if (!support) {
+      support = new scout.TooltipSupport(options);
+      support.install($comp);
+    } else {
+      support.update($comp, options);
+    }
   },
 
   uninstall: function($comp) {
     var support = $comp.data('tooltipSupport');
     if (support) {
       support.uninstall($comp);
+    }
+  },
+
+  /**
+   * If the tooltip is currently showing, its contents are updated immediately.
+   * Otherwise, nothing happens.
+   */
+  update: function($comp, options) {
+    var support = $comp.data('tooltipSupport');
+    if (support) {
+      support.update($comp, options);
+    }
+  },
+
+  close: function($comp) {
+    var support = $comp.data('tooltipSupport');
+    if (support) {
+      support.close();
+    }
+  },
+
+  /**
+   * Cancels the scheduled task to show the tooltip.
+   */
+  cancel: function($comp) {
+    var support = $comp.data('tooltipSupport');
+    if (support) {
+      support.cancel($comp);
     }
   },
 
@@ -66,8 +99,8 @@ scout.TooltipSupport = function(options) {
   this._options = options;
   this._mouseEnterHandler = this._onMouseEnter.bind(this);
   this._mouseLeaveHandler = this._onMouseLeave.bind(this);
-  this._tooltip;
-  this._tooltipTimeoutId;
+  this._tooltip = null;
+  this._tooltipTimeoutId = null;
 };
 
 scout.TooltipSupport.prototype.install = function($comp) {
@@ -86,7 +119,21 @@ scout.TooltipSupport.prototype.uninstall = function($comp) {
     .off('mouseleave', this._options.selector, this._mouseLeaveHandler)
     .off('mouseenter', this._options.selector, this._onMouseEnterHandler);
   this._destroyTooltip();
+};
+
+scout.TooltipSupport.prototype.update = function($comp, options) {
+  $.extend(this._options, options);
+  if (this._tooltip) {
+    this._showTooltip($comp);
+  }
+};
+
+scout.TooltipSupport.prototype.cancel = function($comp) {
   clearTimeout(this._tooltipTimeoutId);
+};
+
+scout.TooltipSupport.prototype.close = function() {
+  this._destroyTooltip();
 };
 
 scout.TooltipSupport.prototype._onMouseEnter = function(event) {
@@ -133,6 +180,8 @@ scout.TooltipSupport.prototype._showTooltip = function($comp) {
   if (this._tooltip && this._tooltip.rendered) {
     // update existing tooltip
     this._tooltip.setText(text);
+    this._tooltip.setSeverity(this._options.severity);
+    this._tooltip.setMenus(this._options.menus);
   } else {
     // create new tooltip
     var options = $.extend({}, this._options, {
@@ -140,6 +189,6 @@ scout.TooltipSupport.prototype._showTooltip = function($comp) {
       text: text
     });
     this._tooltip = scout.create('Tooltip', options);
-    this._tooltip.render();
+    this._tooltip.render(options.$parent);
   }
 };
