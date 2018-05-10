@@ -1666,11 +1666,15 @@ $.fn.selectAllText = function() {
     myWindow = this.window(true),
     element = this[0];
 
+  if (!myDocument || !myDocument.body || !myWindow || !element) {
+    return this;
+  }
+
   if (myDocument.body.createTextRange) {
     range = myDocument.body.createTextRange();
     range.moveToElementText(element);
     range.select();
-    return;
+    return this;
   }
 
   if (myWindow.getSelection) {
@@ -1679,6 +1683,7 @@ $.fn.selectAllText = function() {
     myWindow.getSelection().removeAllRanges();
     myWindow.getSelection().addRange(range);
   }
+
   return this;
 };
 
