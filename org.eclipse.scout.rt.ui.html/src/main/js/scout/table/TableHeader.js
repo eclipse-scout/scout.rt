@@ -548,6 +548,10 @@ scout.TableHeader.prototype._onHeaderItemClick = function(event) {
 };
 
 scout.TableHeader.prototype._onHeaderItemMousedown = function(event) {
+  if (event.button > 0) {
+    return; // ignore buttons other than the main (left) mouse button
+  }
+
   var diff = 0,
     that = this,
     startX = Math.floor(event.pageX),
@@ -663,6 +667,10 @@ scout.TableHeader.prototype._onHeaderItemMousedown = function(event) {
 };
 
 scout.TableHeader.prototype._onSeparatorDblclick = function(event) {
+  if (event.button > 0) {
+    return; // ignore buttons other than the main (left) mouse button
+  }
+
   if (event.shiftKey) {
     // Optimize all columns
     this._visibleColumns().forEach(function(column) {
@@ -677,6 +685,10 @@ scout.TableHeader.prototype._onSeparatorDblclick = function(event) {
 };
 
 scout.TableHeader.prototype._onSeparatorMousedown = function(event) {
+  if (event.button > 0) {
+    return; // ignore buttons other than the main (left) mouse button
+  }
+
   var startX = Math.floor(event.pageX),
     $header = $(event.target).prev(),
     column = $header.data('column'),
