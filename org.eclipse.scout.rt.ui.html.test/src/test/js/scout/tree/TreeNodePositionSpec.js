@@ -207,10 +207,10 @@ describe('TreeNodePosition', function() {
       var n5_1 = createNode('n5_1', 'Node 5.1', true);
 
       tree.insertNodes([n1, n2, n3, n4, n5], null);
-      tree.insertNodes([n2_1], n2);
-      tree.insertNodes([n3_1], n3);
-      tree.insertNodes([n4_1, n4_2, n4_3, n4_4, n4_5, n4_6, n4_7, n4_8, n4_9, n4_10, n4_11, n4_12, n4_13, n4_14, n4_15, n4_16, n4_17, n4_18, n4_19, n4_20, n4_21, n4_22, n4_23, n4_24], n4);
-      tree.insertNodes([n5_1], n5);
+      tree.insertNodes([n2_1], tree.nodes[1]);
+      tree.insertNodes([n3_1], tree.nodes[2]);
+      tree.insertNodes([n4_1, n4_2, n4_3, n4_4, n4_5, n4_6, n4_7, n4_8, n4_9, n4_10, n4_11, n4_12, n4_13, n4_14, n4_15, n4_16, n4_17, n4_18, n4_19, n4_20, n4_21, n4_22, n4_23, n4_24], tree.nodes[3]);
+      tree.insertNodes([n5_1], tree.nodes[4]);
 
       tree.render(session.$entryPoint);
       tree.htmlComp.pixelBasedSizing = true;
@@ -241,7 +241,7 @@ describe('TreeNodePosition', function() {
 
       // Expand "node 4" and check visibleNodesFlat again
 
-      tree.setNodeExpanded(n4, true, {
+      tree.setNodeExpanded(tree.nodes[3], true, {
         renderAnimated: false
       });
 
