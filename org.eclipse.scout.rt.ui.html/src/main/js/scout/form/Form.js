@@ -489,8 +489,16 @@ scout.Form.prototype._renderHeader = function() {
     this.$header = this.$container.appendDiv('header');
     this.$statusContainer = this.$header.appendDiv('status-container');
     this.$icon = this.$header.appendDiv('icon-container');
+
     this.$title = this.$header.appendDiv('title');
+    scout.tooltips.installForEllipsis(this.$title, {
+      parent: this
+    });
+
     this.$subTitle = this.$header.appendDiv('sub-title');
+    scout.tooltips.installForEllipsis(this.$subTitle, {
+      parent: this
+    });
   }
 };
 

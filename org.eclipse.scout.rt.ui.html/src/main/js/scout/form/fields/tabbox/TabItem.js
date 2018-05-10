@@ -93,6 +93,8 @@ scout.TabItem.prototype._onTabMouseDown = function(event) {
   // When the tab is clicked the user wants to execute the action and not see the tooltip
   scout.tooltips.cancel(this.$label);
   scout.tooltips.cancel(this.$subLabel);
+  scout.tooltips.close(this.$label);
+  scout.tooltips.close(this.$subLabel);
 };
 
 scout.TabItem.prototype._onStatusMouseDown = function(event) {

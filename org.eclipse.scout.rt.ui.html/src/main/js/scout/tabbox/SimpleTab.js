@@ -348,6 +348,12 @@ scout.SimpleTab.prototype._renderSelected = function() {
 
 scout.SimpleTab.prototype._onMouseDown = function(event) {
   this.trigger('click');
+
+  // When the tab is clicked the user wants to execute the action and not see the tooltip
+  scout.tooltips.cancel(this.$title);
+  scout.tooltips.cancel(this.$subTitle);
+  scout.tooltips.close(this.$title);
+  scout.tooltips.close(this.$subTitle);
 };
 
 scout.SimpleTab.prototype._onClose = function() {
