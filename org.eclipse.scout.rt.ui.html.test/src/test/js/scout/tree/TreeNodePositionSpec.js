@@ -146,6 +146,140 @@ describe('TreeNodePosition', function() {
       expect(tree.visibleNodesFlat[4].text).toBe('root1');
     });
 
+  });
+
+  describe('_addChildrenToFlatListIfExpanded', function() {
+
+    // Node 1
+    // Node 2
+    // +- Node 2.1
+    // Node 3
+    // +- Node 3.1
+    // Node 4
+    // +- Node 4.1
+    // +- Node 4.2
+    // +- Node 4.3
+    // +- (...)
+    // +- Node 4.24
+    // Node 5
+    // +- Node 5.1
+    it('expand collapsed node', function() {
+      // This tree does not use a root node
+      tree = helper.createTree(helper.createModel([]));
+
+      function createNode(id, text, expanded, childNodeIndex) {
+        var node = helper.createModelNode(id, text, childNodeIndex);
+        node.expanded = expanded;
+        return node;
+      }
+
+      var n1 = createNode('n1', 'Node 1', true, 0);
+      var n2 = createNode('n2', 'Node 2', true, 1);
+      var n2_1 = createNode('n2_1', 'Node 2.1', true);
+      var n3 = createNode('n3', 'Node 3', true, 2);
+      var n3_1 = createNode('n3_1', 'Node 3.1', true);
+      var n4 = createNode('n4', 'Node 4', false, 3);
+      var n4_1 = createNode('n4_1', 'Node 4.1', true, 0);
+      var n4_2 = createNode('n4_2', 'Node 4.2', true, 1);
+      var n4_3 = createNode('n4_3', 'Node 4.3', true, 2);
+      var n4_4 = createNode('n4_4', 'Node 4.4', true, 3);
+      var n4_5 = createNode('n4_5', 'Node 4.5', true, 4);
+      var n4_6 = createNode('n4_6', 'Node 4.6', true, 5);
+      var n4_7 = createNode('n4_7', 'Node 4.7', true, 6);
+      var n4_8 = createNode('n4_8', 'Node 4.8', true, 7);
+      var n4_9 = createNode('n4_9', 'Node 4.9', true, 8);
+      var n4_10 = createNode('n4_10', 'Node 4.10', true, 9);
+      var n4_11 = createNode('n4_11', 'Node 4.11', true, 10);
+      var n4_12 = createNode('n4_12', 'Node 4.12', true, 11);
+      var n4_13 = createNode('n4_13', 'Node 4.13', true, 12);
+      var n4_14 = createNode('n4_14', 'Node 4.14', true, 13);
+      var n4_15 = createNode('n4_15', 'Node 4.15', true, 14);
+      var n4_16 = createNode('n4_16', 'Node 4.16', true, 15);
+      var n4_17 = createNode('n4_17', 'Node 4.17', true, 16);
+      var n4_18 = createNode('n4_18', 'Node 4.18', true, 17);
+      var n4_19 = createNode('n4_19', 'Node 4.19', true, 18);
+      var n4_20 = createNode('n4_20', 'Node 4.20', true, 19);
+      var n4_21 = createNode('n4_21', 'Node 4.21', true, 20);
+      var n4_22 = createNode('n4_22', 'Node 4.22', true, 21);
+      var n4_23 = createNode('n4_23', 'Node 4.23', true, 22);
+      var n4_24 = createNode('n4_24', 'Node 4.24', true, 23);
+      var n5 = createNode('n5', 'Node 5', true, 4);
+      var n5_1 = createNode('n5_1', 'Node 5.1', true);
+
+      tree.insertNodes([n1, n2, n3, n4, n5], null);
+      tree.insertNodes([n2_1], n2);
+      tree.insertNodes([n3_1], n3);
+      tree.insertNodes([n4_1, n4_2, n4_3, n4_4, n4_5, n4_6, n4_7, n4_8, n4_9, n4_10, n4_11, n4_12, n4_13, n4_14, n4_15, n4_16, n4_17, n4_18, n4_19, n4_20, n4_21, n4_22, n4_23, n4_24], n4);
+      tree.insertNodes([n5_1], n5);
+
+      tree.render(session.$entryPoint);
+      tree.htmlComp.pixelBasedSizing = true;
+      tree.htmlComp.setSize(new scout.Dimension(192, 192));
+
+      function expectVisibleNodesFlatToBe(nodes) {
+        var expected = tree.visibleNodesFlat.map(function(node) {
+          return node.id;
+        }).join(', ');
+        var actual = nodes.map(function(node) {
+          return node.id;
+        }).join(', ');
+        expect(expected).toEqual(actual);
+      }
+
+      // Check visibleNodesFlat
+
+      expectVisibleNodesFlatToBe([
+        n1,
+        n2,
+        n2_1,
+        n3,
+        n3_1,
+        n4,
+        n5,
+        n5_1
+      ]);
+
+      // Expand "node 4" and check visibleNodesFlat again
+
+      tree.setNodeExpanded(n4, true, {
+        renderAnimated: false
+      });
+
+      expectVisibleNodesFlatToBe([
+        n1,
+        n2,
+        n2_1,
+        n3,
+        n3_1,
+        n4,
+        n4_1,
+        n4_2,
+        n4_3,
+        n4_4,
+        n4_5,
+        n4_6,
+        n4_7,
+        n4_8,
+        n4_9,
+        n4_10,
+        n4_11,
+        n4_12,
+        n4_13,
+        n4_14,
+        n4_15,
+        n4_16,
+        n4_17,
+        n4_18,
+        n4_19,
+        n4_20,
+        n4_21,
+        n4_22,
+        n4_23,
+        n4_24,
+        n5,
+        n5_1
+      ]);
+    });
 
   });
 

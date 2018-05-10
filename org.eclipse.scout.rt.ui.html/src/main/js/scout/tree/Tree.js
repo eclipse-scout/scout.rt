@@ -1560,7 +1560,7 @@ scout.Tree.prototype._addChildrenToFlatList = function(parentNode, parentIndex, 
  * @param {number} indexOffset either 0 or 1, offset is added to the insert index
  */
 scout.Tree.prototype._addChildrenToFlatListIfExpanded = function(indexOffset, node, insertIndex, animatedRendering, insertBatch, forceFilter) {
-  if (node.expanded) {
+  if (node.expanded && node.childNodes.length) {
     if (insertBatch.containsNode(node.parentNode)) {
       // if parent node is already in the batch, do not change the insertIndex,
       // only append child nodes below that parent node
