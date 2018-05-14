@@ -32,7 +32,7 @@ scout.ViewMenuTab.prototype._init = function(model) {
 
   this.dropdown = scout.create('Menu', {
     parent: this,
-    iconId: scout.icons.ANGLE_DOWN_BOLD,
+    iconId: scout.icons.ANGLE_DOWN,
     tabbable: false,
     cssClass: 'view-menu'
   });
