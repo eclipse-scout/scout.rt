@@ -1694,24 +1694,22 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   @Override
-  public void dataChanged(Object... arguments) {
-    for (Object arg : arguments) {
-      if (arg instanceof DataChangeEvent) {
-        /**
-         * This is the new way of handling data change events. The event object may contain data, a listener can use
-         * this data directly without the need to load data from a data source.
-         */
-        handleDataChanged((DataChangeEvent) arg);
+  public void dataChanged(Object... eventTypes) {
+    for (Object eventType : eventTypes) {
+      //this code is only used to manage the ambiguity of untyped Object... varargs
+      if (eventType instanceof DataChangeEvent) {
+        LOG.warn("Calling IDesktop.dataChanged with an argument of type '{}'. Call IDesktop.fireDataChangeEvent instead!", eventType.getClass());
+        fireDataChangeEvent((DataChangeEvent) eventType);
       }
       else {
-        DataChangeEvent e = new DataChangeEvent(this, arg, ChangeStatus.UPDATED, null, null);
-        /**
-         * This is the traditional way of handling data change events. It's based on a data-type, the event does not
-         * contain any data.
-         */
-        handleDataChanged(e);
+        fireDataChangeEvent(new DataChangeEvent(eventType, ChangeStatus.UPDATED));
       }
     }
+  }
+
+  @Override
+  public void fireDataChangeEvent(DataChangeEvent event) {
+    handleDataChanged(event);
   }
 
   protected void handleDataChanged(DataChangeEvent event) {

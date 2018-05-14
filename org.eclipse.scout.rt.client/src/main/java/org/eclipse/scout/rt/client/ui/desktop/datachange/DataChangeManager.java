@@ -18,7 +18,7 @@ public class DataChangeManager extends AbstractGroupedListenerList<IDataChangeLi
 
   @Override
   protected Object eventType(DataChangeEvent event) {
-    return event.getEventType();
+    return event.getDataType();
   }
 
   @Override

@@ -417,7 +417,8 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * <li>else the children of this page are marked dirty and the page itself is unloaded
    * </ol>
    *
-   * @see IDesktop#dataChanged(Object...)
+   * @see IDesktop#dataChanged(Object...) and
+   *      {@link IDesktop#fireDataChangeEvent(org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent)}
    */
   @ConfigOperation
   @Order(55)
@@ -918,7 +919,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    */
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
-      m_internalDataChangeListener = event -> dataChanged(event.getEventType());
+      m_internalDataChangeListener = event -> dataChanged(event.getDataType());
     }
     IDesktop.CURRENT.get().dataChangeListeners().add(m_internalDataChangeListener, true, dataTypes);
   }

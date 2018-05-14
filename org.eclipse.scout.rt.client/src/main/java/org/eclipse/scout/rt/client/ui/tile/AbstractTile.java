@@ -313,7 +313,8 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   }
 
   /**
-   * see {@link IDesktop#dataChanged(Object...)}
+   * see {@link IDesktop#dataChanged(Object...)} and
+   * {@link IDesktop#fireDataChangeEvent(org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent)}
    */
   protected void execDataChanged(DataChangeEvent event) {
     loadData();

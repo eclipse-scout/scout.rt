@@ -477,13 +477,24 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * These might include pages, forms, fields etc.<br>
    *
    * @param dataTypes
-   *          accepts either vararg Objects that act as data-type or since 8.0 one or more {@link DataChangeEvent}s
-   *          which are processed by the {@link IDataChangeManager}. It's also possible to mix both types.
+   *          accepts vararg Objects that act as {@link DataChangeEvent#getEventType())} in implicitly created
+   *          {@link DataChangeEvent}s.
    * @see {@link AbstractForm#execDataChanged(Object...)} {@link AbstractForm#execDataChanged(Object...)}
    *      {@link AbstractFormField#execDataChanged(Object...)} {@link AbstractFormField#execDataChanged(Object...)}
    *      {@link AbstractPage#execDataChanged(Object...)} {@link AbstractPage#execDataChanged(Object...)}
    */
   void dataChanged(Object... dataTypes);
+
+  /**
+   * Call this method to refresh all listeners on that {@link DataChangeEvent#getDataType()}.<br>
+   * These might include pages, forms, fields etc.<br>
+   *
+   * @see {@link AbstractForm#execDataChanged(Object...)} {@link AbstractForm#execDataChanged(Object...)}
+   *      {@link AbstractFormField#execDataChanged(Object...)} {@link AbstractFormField#execDataChanged(Object...)}
+   *      {@link AbstractPage#execDataChanged(Object...)} {@link AbstractPage#execDataChanged(Object...)}
+   * @since 8.0
+   */
+  void fireDataChangeEvent(DataChangeEvent event);
 
   /**
    * marks desktop data as changing and all data changed events are cached until the change is done

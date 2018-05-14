@@ -30,6 +30,6 @@ public interface DataChangeListener extends IDataChangeListener {
 
   @Override
   default void dataChanged(DataChangeEvent event) {
-    dataChanged(event.getEventType());
+    dataChanged(event.getDataType());
   }
 }

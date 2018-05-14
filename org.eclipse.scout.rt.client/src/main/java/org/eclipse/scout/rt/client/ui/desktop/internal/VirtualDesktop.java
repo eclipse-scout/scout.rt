@@ -38,6 +38,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
 import org.eclipse.scout.rt.client.ui.desktop.IOpenUriAction;
 import org.eclipse.scout.rt.client.ui.desktop.bench.layout.BenchLayoutData;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeManager;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -230,6 +231,11 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void dataChanged(Object... dataTypes) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public void fireDataChangeEvent(DataChangeEvent event) {
     throw createUnsupportedOperationException();
   }
 

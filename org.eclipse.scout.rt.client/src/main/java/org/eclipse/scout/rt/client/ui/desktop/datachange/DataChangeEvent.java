@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.desktop.datachange;
 import java.util.EventObject;
 import java.util.Objects;
 
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.util.ChangeStatus;
 
 /**
@@ -23,53 +24,48 @@ import org.eclipse.scout.rt.platform.util.ChangeStatus;
 public class DataChangeEvent extends EventObject {
   private static final long serialVersionUID = 1L;
 
-  private final Object m_eventType;
+  public static final Object DEFAULT_SOURCE = new Object();
+
+  private final Object m_dataType;
   private final int m_changeStatus;
-  private final Object m_key;
-  private final Object m_data;
 
   /**
+   * A {@link DataChangeEvent} is fired by calling {@link IDesktop#fireDataChangeEvent(DataChangeEvent)}
+   */
+  public DataChangeEvent(Object eventType, int changeStatus) {
+    this(DEFAULT_SOURCE, eventType, changeStatus);
+  }
+
+  /**
+   * A {@link DataChangeEvent} is fired by calling {@link IDesktop#fireDataChangeEvent(DataChangeEvent)}
+   * <p>
+   *
    * @param source
    *          the source of the event
-   * @param eventType
+   * @param dataType
    *          used so a listener can distinct between various data change event. Typically you'd use the
    *          <code>.class</code> property of that entity as eventType
    * @param changeStatus
    *          a constant value from {@link ChangeStatus}. Specifies the change status of the entity (e.g. inserted,
    *          updated, deleted or not changed)
-   * @param key
-   *          the key of the entity that has been modified
-   * @param data
-   *          (optional) data a listener can use, typically the data of an entity that has been inserted or updated or
-   *          the entity itself
    */
-  public DataChangeEvent(Object source, Object eventType, int changeStatus, Object key, Object data) {
-    super(source);
-    m_eventType = eventType;
+  public DataChangeEvent(Object source, Object dataType, int changeStatus) {
+    super(DEFAULT_SOURCE);
+    m_dataType = dataType;
     m_changeStatus = changeStatus;
-    m_key = key;
-    m_data = data;
   }
 
-  public Object getEventType() {
-    return m_eventType;
+  public Object getDataType() {
+    return m_dataType;
   }
 
   public int getChangeStatus() {
     return m_changeStatus;
   }
 
-  public Object getKey() {
-    return m_key;
-  }
-
-  public Object getData() {
-    return m_data;
-  }
-
   @Override
   public int hashCode() {
-    return Objects.hash(m_eventType, m_changeStatus, m_key, m_data);
+    return Objects.hash(m_dataType, m_changeStatus);
   }
 
   @Override
@@ -87,28 +83,12 @@ public class DataChangeEvent extends EventObject {
     if (m_changeStatus != other.m_changeStatus) {
       return false;
     }
-    if (m_eventType == null) {
-      if (other.m_eventType != null) {
+    if (m_dataType == null) {
+      if (other.m_dataType != null) {
         return false;
       }
     }
-    else if (!m_eventType.equals(other.m_eventType)) {
-      return false;
-    }
-    if (m_key == null) {
-      if (other.m_key != null) {
-        return false;
-      }
-    }
-    else if (!m_key.equals(other.m_key)) {
-      return false;
-    }
-    if (m_data == null) {
-      if (other.m_data != null) {
-        return false;
-      }
-    }
-    else if (!m_data.equals(other.m_data)) {
+    else if (!m_dataType.equals(other.m_dataType)) {
       return false;
     }
     return true;

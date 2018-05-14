@@ -784,7 +784,8 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   /**
-   * see {@link IDesktop#dataChanged(Object...)}
+   * see {@link IDesktop#dataChanged(Object...)} and
+   * {@link IDesktop#fireDataChangeEvent(org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent)}
    */
   @ConfigOperation
   @Order(14)
@@ -1057,7 +1058,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    */
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
-      m_internalDataChangeListener = event -> interceptDataChanged(event.getEventType());
+      m_internalDataChangeListener = event -> interceptDataChanged(event.getDataType());
     }
     IDesktop.CURRENT.get().dataChangeListeners().add(m_internalDataChangeListener, true, dataTypes);
   }

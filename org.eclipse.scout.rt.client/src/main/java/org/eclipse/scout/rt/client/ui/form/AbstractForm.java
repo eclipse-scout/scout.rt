@@ -507,7 +507,8 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   /**
-   * see {@link IDesktop#dataChanged(Object...)}
+   * see {@link IDesktop#dataChanged(Object...)} and
+   * {@link IDesktop#fireDataChangeEvent(org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent)}
    */
   @ConfigOperation
   @Order(13)
@@ -922,7 +923,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
    */
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
-      m_internalDataChangeListener = event -> interceptDataChanged(event.getEventType());
+      m_internalDataChangeListener = event -> interceptDataChanged(event.getDataType());
     }
     getDesktop().dataChangeListeners().add(m_internalDataChangeListener, true, dataTypes);
   }
