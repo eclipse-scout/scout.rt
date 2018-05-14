@@ -112,7 +112,7 @@
     width: auto;
     position: absolute;
     right: @outline-title-margin-right;
-    top: @outline-title-margin-bottom + 2; /* + 2 necessary to have it aligned with the text*/
+    top: @outline-title-margin-bottom + 1; /* + 1 necessary to have it aligned with the text*/
     border: none;
     color: @navigation-color;
 
@@ -146,7 +146,7 @@
 
 .outline-title-text {
   /* outline title height should be the same as main menubar and desktop header height (if there are no view buttons visible) */
-  padding: 20px 2px 12px 6px;
+  padding: 20px 2px 12px @outline-title-text-padding-left;
   cursor: pointer;
   display: block;
   width: auto;
@@ -156,8 +156,11 @@
 .outline.tree.breadcrumb {
 
   & > .outline-title {
-    text-align: center;
     margin: 0;
+
+    & > .outline-title-text {
+      padding-left: @outline-breadcrumb-node-padding-x;
+    }
   }
 
   & > .tree-data {
@@ -167,7 +170,7 @@
       border-bottom: 1px solid @outline-breadcrumb-border-color;
 
       /* !important is necessary here to override the element specific left-padding (calculated by Tree.js for level indentation). */
-      padding: @outline-breadcrumb-node-padding-y 6px !important; /* NOSONAR (see comment above) */
+      padding: @outline-breadcrumb-node-padding-y @outline-breadcrumb-node-padding-x !important; /* NOSONAR (see comment above) */
 
       &.ancestor-of-selected,
       &.child-of-selected {
@@ -247,8 +250,6 @@
 
 .compact.outline.breadcrumb {
   & > .outline-title {
-    text-align: left;
-
     & > .outline-title-text {
       padding-left: @compact-outline-node-padding-x;
     }
@@ -257,7 +258,6 @@
   & > .tree-data {
 
     & > .tree-node  {
-      text-align: left;
       padding: 0 !important; /* NOSONAR (necessary because this overrides another !important rule, see above) */
 
       & > .text {
