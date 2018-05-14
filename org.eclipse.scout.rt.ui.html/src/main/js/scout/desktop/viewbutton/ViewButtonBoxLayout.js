@@ -15,16 +15,23 @@ scout.ViewButtonBoxLayout = function(viewButtonBox) {
 scout.inherits(scout.ViewButtonBoxLayout, scout.AbstractLayout);
 
 scout.ViewButtonBoxLayout.prototype.layout = function($container) {
-  var htmlComp = this.viewButtonBox.htmlComp,
+  var tabs = this.viewButtonBox.viewTabs.slice(),
+    viewMenuTab = this.viewButtonBox.viewMenuTab,
+    htmlComp = this.viewButtonBox.htmlComp,
     containerSize = htmlComp.size(),
-    $visibleTabs = $container.children(':visible'),
-    tabCount = $visibleTabs.length,
-    tabWidth = (containerSize.width / tabCount);
+    tabWidth = containerSize.width / tabs.length;
 
-  $visibleTabs.each(function() {
-    var $tab = $(this);
-    // only set width, use css height
-    $tab.cssWidth(tabWidth);
+  if (viewMenuTab.visible) {
+    if (viewMenuTab.selectedButton) {
+      tabs.unshift(viewMenuTab.selectedButton);
+    }
+    tabWidth = (containerSize.width - scout.graphics.size(viewMenuTab.dropdown.$container, {
+      exact: true
+    }).width) / tabs.length;
+  }
+
+  tabs.forEach(function(tab) {
+    tab.$container.cssWidth(tabWidth);
   });
 };
 

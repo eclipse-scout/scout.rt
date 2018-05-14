@@ -1,0 +1,54 @@
+.view-tab {
+
+  & > .menu-item {
+    height: @view-button-box-height;
+    display: inline-block;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-right: solid 1px @border-color;
+  }
+
+  & > .view-button-tab {
+    display: inline-block;
+    height: @view-button-box-height;
+  }
+
+  & > .submenu-icon {
+    #scout.submenu-icon();
+    position: relative;
+    vertical-align: middle;
+    display: inline-block;
+    line-height: normal;
+    height: auto;
+
+    /* Make IE trigger the :active state if the text or icon is pressed */
+    pointer-events: none;
+  }
+}
+
+.view-menu {
+  padding-left: 10px;
+  padding-right: 10px;
+  border-right: solid 1px @border-color;
+  background-color: @view-button-tab-background-color;
+  color: @view-button-tab-color;
+
+}
+
+
+.view-menu {
+  &.view-menu-popup-head {
+    position: absolute;
+    background-color: @active-inverted-color;
+    color: @active-color;
+  }
+
+   &.selected {
+    background-color: @view-button-tab-active-background-color;
+    color: @view-button-tab-active-color;
+
+    &.last {
+      border-right-color: transparent;
+    }
+  }
+}

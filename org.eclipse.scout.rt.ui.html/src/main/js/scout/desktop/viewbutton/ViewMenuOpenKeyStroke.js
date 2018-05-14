@@ -28,12 +28,22 @@ scout.inherits(scout.ViewMenuOpenKeyStroke, scout.KeyStroke);
  * @override KeyStroke.js
  */
 scout.ViewMenuOpenKeyStroke.prototype.handle = function(event) {
-  this.field.togglePopup();
+  if (this.field.selected) {
+    this.field.togglePopup();
+  } else if (this.field.selectedButton) {
+    this.field.selectedButton.doAction();
+  }
 };
 
 scout.ViewMenuOpenKeyStroke.prototype._postRenderKeyBox = function($drawingArea) {
-  var width = $drawingArea.outerWidth();
-  var wKeybox = $drawingArea.find('.key-box').outerWidth();
-  var leftKeyBox = width / 2 - wKeybox / 2;
-  $drawingArea.find('.key-box').cssLeft(leftKeyBox);
+  var wKeybox = $drawingArea.find('.key-box').outerWidth(),
+    left = this.field.dropdown.$container.outerWidth();
+
+  if (this.field.selected) {
+    left = left / 2;
+  } else if (this.field.selectedButton) {
+    left = left + this.field.selectedButton.$container.outerWidth() / 2;
+  }
+  left -= wKeybox / 2;
+  $drawingArea.find('.key-box').cssLeft(left);
 };

@@ -80,9 +80,9 @@ scout.ViewMenuPopup.prototype._remove = function() {
 scout.ViewMenuPopup.prototype._renderHead = function() {
   scout.ViewMenuPopup.parent.prototype._renderHead.call(this);
 
-  this._copyCssClassToHead('view-button-tab');
+  this._copyCssClassToHead('view-menu');
   this._copyCssClassToHead('unfocusable');
-  this.$head.removeClass('popup-head menu-item');
+  this.$head.removeClass('popup-head');
   this.$head.addClass('view-menu-popup-head');
 };
 

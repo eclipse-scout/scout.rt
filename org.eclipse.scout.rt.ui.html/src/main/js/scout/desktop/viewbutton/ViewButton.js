@@ -74,6 +74,10 @@ scout.ViewButton.prototype.last = function() {
   this.$container.addClass('last');
 };
 
+scout.ViewButton.prototype.tab = function() {
+  this.$container.addClass('view-tab');
+};
+
 scout.ViewButton.prototype.sendToBack = function() {
   this.inBackground = true;
   if (this.rendered) {

@@ -28,7 +28,8 @@ scout.ViewButtonBox.prototype._render = function() {
   this.$container = this.$parent.appendDiv('view-button-box');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.ViewButtonBoxLayout(this));
-  this.viewMenuTab = scout.create('ViewMenuTab', {parent: this,
+  this.viewMenuTab = scout.create('ViewMenuTab', {
+    parent: this,
     viewMenus: this._viewButtons('MENU')
   });
   this.viewMenuTab.render();
@@ -36,6 +37,7 @@ scout.ViewButtonBox.prototype._render = function() {
   this.viewTabs = this._viewButtons('TAB');
   this.viewTabs.forEach(function(viewTab, i) {
     viewTab.render();
+    viewTab.tab();
     if (i === this.viewTabs.length - 1) {
       viewTab.last();
     }

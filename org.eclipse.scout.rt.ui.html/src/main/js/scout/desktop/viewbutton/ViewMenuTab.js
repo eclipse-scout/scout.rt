@@ -16,26 +16,37 @@
 scout.ViewMenuTab = function() {
   scout.ViewMenuTab.parent.call(this);
 
-  this.viewButton = null;
   this.viewMenus = [];
   this.selected = false;
-  this.iconId = null;
   this.inBackground = false;
-
-  this.$arrowIcon = null; // small "arrow down" icon at the right side of the icon
-
   this.defaultIconId = scout.icons.FOLDER_BOLD;
+
   this._viewMenuPropertyChangeHandler = this._onViewMenuPropertyChange.bind(this);
-  this._addWidgetProperties('viewMenus');
+  this._addWidgetProperties(['viewMenus', 'selectedButton']);
 };
 scout.inherits(scout.ViewMenuTab, scout.Widget);
 
 scout.ViewMenuTab.prototype._init = function(model) {
   scout.ViewMenuTab.parent.prototype._init.call(this, model);
+  var selectedButton = this._findSelectedViewButton();
+
+  this.dropdown = scout.create('Menu', {
+    parent: this,
+    iconId: scout.icons.ANGLE_DOWN_BOLD,
+    tabbable: false,
+    cssClass: 'view-menu'
+  });
+  this.dropdown.on('action', this.togglePopup.bind(this));
+
   this.viewMenus.forEach(function(viewMenu) {
     viewMenu.on('propertyChange', this._viewMenuPropertyChangeHandler);
   }, this);
-  this._update();
+  if (selectedButton) {
+    this.setSelectedButton(selectedButton);
+  } else {
+    this.setSelectedButton(this.viewMenus[0]);
+  }
+  this.setSelected(!!selectedButton);
   this.updateVisibility();
 };
 
@@ -52,33 +63,10 @@ scout.ViewMenuTab.prototype._initKeyStrokeContext = function() {
   ]);
 };
 
-/**
- * 1. look for a selected view-button
- * 2. look for any view-button
- * 3. if there is no view-button menu should not be visible
- */
-scout.ViewMenuTab.prototype._update = function() {
-  var viewButton = this._findSelectedViewButton();
-  if (viewButton) {
-    this.selected = true;
-  } else {
-    viewButton = this.viewMenus[0];
-    this.selected = false;
-  }
-  this.viewButton = viewButton;
-
-  // Use iconId from outline view button (defaultIconId as fallback)
-  this.iconId = (this.viewButton && this.viewButton.iconId) || this.defaultIconId;
-};
-
 scout.ViewMenuTab.prototype._render = function() {
-  this.$container = this.$parent.appendDiv('view-button-tab view-menu-tab')
-    .unfocusable()
-    .on('mousedown', this.togglePopup.bind(this));
+  this.$container = this.$parent.appendDiv('view-tab');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-
-  this._renderArrowIcon();
-
+  this.dropdown.render(this.$container);
   this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
 };
 
@@ -89,43 +77,46 @@ scout.ViewMenuTab.prototype._remove = function() {
 
 scout.ViewMenuTab.prototype._renderProperties = function() {
   scout.ViewMenuTab.parent.prototype._renderProperties.call(this);
-  this._renderIconId();
-  this._renderSelected();
+  this._renderSelectedButton();
   this._renderInBackground();
 };
 
-scout.ViewMenuTab.prototype._renderArrowIcon = function() {
-  this.$arrowIcon = this.$container.appendDiv('arrow-icon');
+scout.ViewMenuTab.prototype.setSelectedButton = function(viewButton) {
+  if (this.selectedButton && this.selectedButton.cloneOf === viewButton) {
+    return;
+  }
+  if (viewButton) {
+    this.setProperty('selectedButton', viewButton);
+  }
+};
 
-  // Create the SVG icon. Colors, rotation etc. are styled via CSS. (Source file: ViewMenuTab_arrow-icon.svg)
-  // Note that the arrow part is not transparent, otherwise the real tab icon might show through.
-  var $svg = this.$arrowIcon.appendSVG('svg', 'arrow-icon-svg')
-    .attr('width', '250')
-    .attr('height', '250')
-    .attr('viewBox', '0 0 250 250');
-  $svg.appendSVG('circle', 'circle')
-    .attr('cx', '125')
-    .attr('cy', '125')
-    .attr('r', '125');
-  $svg.appendSVG('path', 'arrow')
-    .attr('d', 'm159.64 98.85-34.63 34.638-34.636-34.638c-6.3692-6.3619-16.713-6.3619-23.086 0-6.3775 6.3775-6.3775 16.719 0 23.095l46.179 46.178c6.3692 6.3755 16.713 6.3755 23.087 4e-3l46.172-46.182c6.3713-6.3755 6.3713-16.717 0-23.095-6.3682-6.3703-16.716-6.3703-23.086 1.1e-5z');
+scout.ViewMenuTab.prototype._setSelectedButton = function(viewButton) {
+  viewButton = viewButton.clone({
+    parent: this,
+    displayStyle: 'TAB'
+  }, {
+    delegateEventsToOriginal: ['acceptInput', 'action'],
+    delegateAllPropertiesToClone: true,
+    delegateAllPropertiesToOriginal: true,
+    excludePropertiesToOriginal: ['selected']
+  });
+  viewButton.iconId = viewButton.iconId || this.defaultIconId;
+  this._setProperty('selectedButton', viewButton);
+};
+
+scout.ViewMenuTab.prototype._renderSelectedButton = function() {
+  if (this.selectedButton) {
+    this.selectedButton.render(this.$container);
+  }
+  this.htmlComp.invalidateLayoutTree();
 };
 
 scout.ViewMenuTab.prototype._renderSelected = function() {
   this.$container.select(this.selected);
-  this._updateArrowIconVisibility();
-};
-
-scout.ViewMenuTab.prototype._renderIconId = function() {
-  this.$container.icon(this.iconId);
 };
 
 scout.ViewMenuTab.prototype._renderInBackground = function() {
   this.$container.toggleClass('in-background', this.inBackground);
-};
-
-scout.ViewMenuTab.prototype._updateArrowIconVisibility = function() {
-  this.$arrowIcon.setVisible(this.selected && !this.inBackground);
 };
 
 scout.ViewMenuTab.prototype._findSelectedViewButton = function() {
@@ -143,20 +134,14 @@ scout.ViewMenuTab.prototype._findSelectedViewButton = function() {
  * Toggles the 'view menu popup', or brings the outline content to the front if in background.
  */
 scout.ViewMenuTab.prototype.togglePopup = function() {
-  if (this.selected) {
-    if (this.inBackground) {
-      this.session.desktop.bringOutlineToFront(this.viewButton.outline);
-    } else {
-      // Open or close the popup.
-      if (this.popup) {
-        this._closePopup();
-      } else {
-        this._openPopup();
-      }
-      return false; // menu won't open if we didn't abort the mousedown-event
-    }
+  if (this.inBackground) {
+    this.session.desktop.bringOutlineToFront(this.selectedButton.outline);
   } else {
-    this.viewButton.doAction();
+    if (this.popup) {
+      this._closePopup();
+    } else {
+      this._openPopup();
+    }
   }
 };
 
@@ -168,7 +153,7 @@ scout.ViewMenuTab.prototype._openPopup = function() {
   var naviBounds = scout.graphics.bounds(this.$container.parent(), true);
   this.popup = scout.create('ViewMenuPopup', {
     parent: this,
-    $tab: this.$container,
+    $tab: this.dropdown.$container,
     viewMenus: this.viewMenus,
     naviBounds: naviBounds
   });
@@ -190,10 +175,6 @@ scout.ViewMenuTab.prototype._closePopup = function() {
 
 scout.ViewMenuTab.prototype.setSelected = function(selected) {
   this.setProperty('selected', selected);
-};
-
-scout.ViewMenuTab.prototype.setIconId = function(iconId) {
-  this.setProperty('iconId', iconId);
 };
 
 scout.ViewMenuTab.prototype.updateVisibility = function() {
@@ -224,13 +205,8 @@ scout.ViewMenuTab.prototype._onViewMenuPropertyChange = function(event) {
 scout.ViewMenuTab.prototype.onViewButtonSelected = function() {
   var viewButton = this._findSelectedViewButton();
   if (viewButton) {
-    // only change if a new viewMenu was selected, otherwise keep old viewButton in order to reselect it when the viewMenu gets selected again
-    this.viewButton = viewButton;
-    // Use iconId from selected view button or defaultIconId as fallback
-    this.setIconId(this.viewButton.iconId || this.defaultIconId);
-    this.setSelected(true);
-  } else {
-    this.setSelected(false);
+    this.setSelectedButton(this._findSelectedViewButton());
   }
+  this.setSelected(!!viewButton);
   this._closePopup();
 };

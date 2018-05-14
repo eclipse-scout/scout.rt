@@ -31,19 +31,19 @@ public final class GoToUtil {
   public static void goToOutline(AbstractSeleniumTest test, Class<? extends IOutlineViewButton> outlineViewButtonClass, Class<? extends IOutline> outlineClass) {
     test.waitUntilDataRequestPendingDone();
     // When we're on another form-tab, we must click twice on the outline-switcher tab to open the menu
-    if (!test.findElement(By.className("view-button-tab")).isDisplayed()) {
+    if (!test.findElement(By.className("view-menu")).isDisplayed()) {
       Actions builder = new Actions(test.getDriver());
       builder.moveToElement(test.waitUntilElementClickable(By.className("view-button-box")), 5, 5).click().build().perform();
       SeleniumUtil.shortPause();
       test.waitUntilDataRequestPendingDone();
     }
-    test.waitUntilElementClickable(By.className("view-button-tab")).click();
+    test.waitUntilElementClickable(By.className("view-menu")).click();
     SeleniumUtil.shortPause();
     test.waitUntilDataRequestPendingDone();
 
     // When popup is not open yet - click again on the outline-switcher tab
     if (test.findElements(By.className("popup")).isEmpty()) {
-      test.waitUntilElementClickable(By.className("view-button-tab")).click();
+      test.waitUntilElementClickable(By.className("view-menu")).click();
       SeleniumUtil.shortPause();
       test.waitUntilDataRequestPendingDone();
     }
