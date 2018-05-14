@@ -9,7 +9,7 @@
  ******************************************************************************/
 package com.bsiag.scout.rt.client.ui.form.fields.tile;
 
-import org.eclipse.scout.rt.client.ui.tile.AbstractFormFieldTile;
+import org.eclipse.scout.rt.client.ui.tile.fields.AbstractFormFieldTile;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
