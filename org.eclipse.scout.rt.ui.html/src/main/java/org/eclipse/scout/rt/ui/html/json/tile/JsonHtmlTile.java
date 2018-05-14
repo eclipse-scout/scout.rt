@@ -40,7 +40,7 @@ public class JsonHtmlTile<T extends IHtmlTile> extends JsonTile<T> implements IB
 
   @Override
   public BinaryResourceHolder provideBinaryResource(String filename) {
-    BinaryResource att = getModel().getResource(filename);
+    BinaryResource att = getModel().getAttachment(filename);
     if (att != null) {
       return new BinaryResourceHolder(att);
     }
