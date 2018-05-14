@@ -54,6 +54,15 @@ public interface IStyleable {
     }
   }
 
+  default void toggleCssClass(String cssClass, boolean condition) {
+    if (condition) {
+      addCssClass(cssClass);
+    }
+    else {
+      removeCssClass(cssClass);
+    }
+  }
+
   /**
    * Converts the space separated CSS class string to a list.
    */

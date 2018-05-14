@@ -751,8 +751,8 @@ scout.Widget.prototype.removeCssClass = function(cssClass) {
   }
 };
 
-scout.Widget.prototype.toggleCssClass = function(cssClass, predicate) {
-  if (predicate) {
+scout.Widget.prototype.toggleCssClass = function(cssClass, condition) {
+  if (condition) {
     this.addCssClass(cssClass);
   } else {
     this.removeCssClass(cssClass);
