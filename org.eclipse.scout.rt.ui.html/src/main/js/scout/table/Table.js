@@ -3610,10 +3610,12 @@ scout.Table.prototype._setRowIconVisible = function(rowIconVisible) {
   var column = this.rowIconColumn;
   if (this.rowIconVisible && !column) {
     this._insertRowIconColumn();
+    this._calculateTableNodeColumn();
     this.trigger('columnStructureChanged');
   } else if (!this.rowIconVisible && column) {
     scout.arrays.remove(this.columns, column);
     this.rowIconColumn = null;
+    this._calculateTableNodeColumn();
     this.trigger('columnStructureChanged');
   }
 };
@@ -3786,10 +3788,12 @@ scout.Table.prototype._updateCheckableColumn = function() {
   var showCheckBoxes = this.checkable && this.checkableStyle === scout.Table.CheckableStyle.CHECKBOX;
   if (showCheckBoxes && !column) {
     this._insertBooleanColumn();
+    this._calculateTableNodeColumn();
     this.trigger('columnStructureChanged');
   } else if (!showCheckBoxes && column && column.guiOnly) {
     scout.arrays.remove(this.columns, column);
     this.checkableColumn = null;
+    this._calculateTableNodeColumn();
     this.trigger('columnStructureChanged');
   }
 };
@@ -4432,9 +4436,9 @@ scout.Table.prototype.setCellValue = function(column, row, value) {
 };
 
 scout.Table.prototype.visibleColumns = function(includeGuiColumns) {
-  scout.nvl(includeGuiColumns, true);
+  includeGuiColumns = scout.nvl(includeGuiColumns, true);
   return this.columns.filter(function(column) {
-    return column.isVisible() && !(includeGuiColumns && column.guiOnly);
+    return column.isVisible() && (includeGuiColumns || !column.guiOnly);
   }, this);
 };
 
