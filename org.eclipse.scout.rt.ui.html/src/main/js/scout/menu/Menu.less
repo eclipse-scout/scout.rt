@@ -62,9 +62,12 @@
     padding-bottom: 1px;
   }
 
-  & > .icon {
-    /* Move "a bit" towards the top, because the icon would not look centered with the text's baseline otherwise. */
+  &:not(.menu-button) > .icon {
+   /* Move "a bit" towards the top, because the icon would not look centered with the text's baseline otherwise. */
     top: -1px;
+  }
+
+  & > .icon {
 
     &.font-icon {
       font-size: 18px;
