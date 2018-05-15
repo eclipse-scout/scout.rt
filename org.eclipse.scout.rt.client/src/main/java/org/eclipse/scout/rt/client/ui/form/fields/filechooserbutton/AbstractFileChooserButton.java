@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.filechooserbutton;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.form.fields.filechooserbutton.IFileChooserButtonExtension;
@@ -23,7 +24,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 @ClassId("20038f90-75fa-4796-8a08-a9417ae69c60")
 public abstract class AbstractFileChooserButton extends AbstractValueField<BinaryResource> implements IFileChooserButton {
 
-  private List<String> m_fileExtensions;
+  private Collection<String> m_fileExtensions;
 
   public AbstractFileChooserButton() {
     this(true);
@@ -84,12 +85,12 @@ public abstract class AbstractFileChooserButton extends AbstractValueField<Binar
   }
 
   @Override
-  public void setFileExtensions(List<String> a) {
+  public void setFileExtensions(Collection<String> a) {
     m_fileExtensions = CollectionUtility.arrayListWithoutNullElements(a);
   }
 
   @Override
-  public List<String> getFileExtensions() {
+  public Collection<String> getFileExtensions() {
     return CollectionUtility.arrayList(m_fileExtensions);
   }
 
