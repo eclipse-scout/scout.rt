@@ -237,6 +237,10 @@ scout.Action.prototype.toggle = function() {
   }
 };
 
+scout.Action.prototype.setToggleAction = function(toggleAction) {
+  this.setProperty('toggleAction', toggleAction);
+};
+
 scout.Action.prototype.isToggleAction = function() {
   return this.toggleAction;
 };
@@ -265,6 +269,10 @@ scout.Action.prototype._renderSelected = function() {
   if (this.rendered) { // prevent unnecessary tooltip updates during initial rendering
     this._updateTooltip();
   }
+};
+
+scout.Action.prototype.setKeyStroke = function(keyStroke) {
+  this.setProperty('keyStroke', keyStroke);
 };
 
 scout.Action.prototype._setKeyStroke = function(keyStroke) {

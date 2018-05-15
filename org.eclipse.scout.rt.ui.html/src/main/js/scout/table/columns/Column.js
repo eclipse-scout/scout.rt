@@ -543,6 +543,19 @@ scout.Column.prototype.setEditable = function(editable) {
   this.table.updateRows(this.table.rows);
 };
 
+scout.Column.prototype.setMandatory = function(mandatory) {
+  if (this.mandatory === mandatory) {
+    return;
+  }
+  this.mandatory = mandatory;
+
+  this.table.rows.forEach(function(row) {
+    this.cell(row).setMandatory(mandatory);
+  }.bind(this));
+
+  this.table.updateRows(this.table.rows);
+};
+
 scout.Column.prototype.setCssClass = function(cssClass) {
   if (this.cssClass === cssClass) {
     return;
@@ -555,6 +568,13 @@ scout.Column.prototype.setCssClass = function(cssClass) {
   }, this);
 
   this.table.updateRows(this.table.rows);
+};
+
+scout.Column.prototype.setWidth = function(width) {
+  if (this.width === width) {
+    return;
+  }
+  this.table.resizeColumn(this, width);
 };
 
 scout.Column.prototype.createAggrGroupCell = function(row) {

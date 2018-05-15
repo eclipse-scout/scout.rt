@@ -44,6 +44,10 @@ scout.Cell.prototype.setEditable = function(editable) {
   this.editable = editable;
 };
 
+scout.Cell.prototype.setMandatory = function(mandatory) {
+  this.mandatory = mandatory;
+};
+
 scout.Cell.prototype.setHorizontalAlignment = function(hAlign) {
   this.horizontalAlignment = hAlign;
 };
