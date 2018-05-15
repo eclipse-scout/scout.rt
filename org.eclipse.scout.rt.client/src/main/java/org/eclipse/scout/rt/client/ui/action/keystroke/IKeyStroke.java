@@ -30,6 +30,7 @@ public interface IKeyStroke extends IAction {
   String ESCAPE = "escape";
   String SPACE = "space";
   String TAB = "tab";
+  String BACKSPACE = "backspace";
 
   String LEFT = "left";
   String RIGHT = "right";
