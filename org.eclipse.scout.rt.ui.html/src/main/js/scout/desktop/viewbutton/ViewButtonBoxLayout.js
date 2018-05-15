@@ -18,21 +18,31 @@ scout.ViewButtonBoxLayout.prototype.layout = function($container) {
   var tabs = this.viewButtonBox.viewTabs.slice(),
     viewMenuTab = this.viewButtonBox.viewMenuTab,
     htmlComp = this.viewButtonBox.htmlComp,
-    containerSize = htmlComp.size(),
-    tabWidth = containerSize.width / tabs.length;
+    containerWidth = htmlComp.size().width,
+    tabWidth = containerWidth / tabs.length;
 
   if (viewMenuTab.visible) {
     if (viewMenuTab.selectedButton) {
-      tabs.unshift(viewMenuTab.selectedButton);
+      tabWidth = (containerWidth - scout.graphics.size(viewMenuTab.dropdown.$container, {
+        exact: true
+      }).width) / (tabs.length + 1);
+      viewMenuTab.selectedButton.$container.cssWidth(tabWidth);
     }
-    tabWidth = (containerSize.width - scout.graphics.size(viewMenuTab.dropdown.$container, {
+
+    containerWidth -= scout.graphics.size(viewMenuTab.$container, {
       exact: true
-    }).width) / tabs.length;
+    }).width;
   }
 
-  tabs.forEach(function(tab) {
-    tab.$container.cssWidth(tabWidth);
-  });
+  tabs.forEach(function(tab, index) {
+    if (tabs.length - 1 === index) {
+      // to avoid pixel fault due to rounding issues calculate the rest for the last tab.
+      tab.$container.cssWidth(containerWidth);
+    } else {
+      tab.$container.cssWidth(tabWidth);
+      containerWidth -= tab.$container.cssWidth();
+    }
+  }, this);
 };
 
 scout.ViewButtonBoxLayout.prototype.preferredLayoutSize = function($container) {
