@@ -236,45 +236,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
           }
 
-          protected void resetAll() {
-            try {
-              m_organizedTable.setTableChanging(true);
-              //
-              m_organizedTable.resetColumns();
-              ClientUIPreferences.getInstance().setAllTableColumnPreferences(m_organizedTable);
-              TableUserFilterManager m = m_organizedTable.getUserFilterManager();
-              if (m != null) {
-                m.reset();
-              }
-              ITableCustomizer cst = m_organizedTable.getTableCustomizer();
-              if (cst != null) {
-                cst.removeAllColumns();
-              }
-            }
-            finally {
-              m_organizedTable.setTableChanging(false);
-            }
-            getColumnsTableField().reloadTableData();
-          }
-
-          protected void resetView() {
-            try {
-              m_organizedTable.setTableChanging(true);
-              //
-              m_organizedTable.resetColumnVisibilities();
-              m_organizedTable.resetColumnWidths();
-              m_organizedTable.resetColumnOrder();
-              ITableCustomizer cst = m_organizedTable.getTableCustomizer();
-              if (cst != null) {
-                cst.removeAllColumns();
-              }
-            }
-            finally {
-              m_organizedTable.setTableChanging(false);
-            }
-            getColumnsTableField().reloadTableData();
-          }
-
           @ClassId("359e1e7e-26f0-411d-baf1-2ba9f554212d")
           public class Table extends AbstractTable {
 
@@ -1536,6 +1497,45 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
         ((INumberColumn) col).setBackgroundEffect(prefs.getTableColumnBackgroundEffect(col, ((INumberColumn) col).getInitialBackgroundEffect(), configName));
       }
     }
+  }
+
+  public void resetAll() {
+    try {
+      m_organizedTable.setTableChanging(true);
+      //
+      m_organizedTable.resetColumns();
+      ClientUIPreferences.getInstance().setAllTableColumnPreferences(m_organizedTable);
+      TableUserFilterManager m = m_organizedTable.getUserFilterManager();
+      if (m != null) {
+        m.reset();
+      }
+      ITableCustomizer cst = m_organizedTable.getTableCustomizer();
+      if (cst != null) {
+        cst.removeAllColumns();
+      }
+    }
+    finally {
+      m_organizedTable.setTableChanging(false);
+    }
+    getColumnsTableField().reloadTableData();
+  }
+
+  public void resetView() {
+    try {
+      m_organizedTable.setTableChanging(true);
+      //
+      m_organizedTable.resetColumnVisibilities();
+      m_organizedTable.resetColumnWidths();
+      m_organizedTable.resetColumnOrder();
+      ITableCustomizer cst = m_organizedTable.getTableCustomizer();
+      if (cst != null) {
+        cst.removeAllColumns();
+      }
+    }
+    finally {
+      m_organizedTable.setTableChanging(false);
+    }
+    getColumnsTableField().reloadTableData();
   }
 
   /**
