@@ -21,33 +21,19 @@
     <relativePath>../org.eclipse.scout.rt/pom.xml</relativePath>
   </parent>
 
-  <artifactId>org.eclipse.scout.rt.rest</artifactId>
+  <artifactId>org.eclipse.scout.rt.rest.jersey.client</artifactId>
   <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.platform</artifactId>
+      <artifactId>org.eclipse.scout.rt.rest</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>javax.ws.rs-api</artifactId>
-    </dependency>
-
-    <!-- JAX-RS Jersey Client Apache Connector -->
-    <!-- FIXME 8.0 pbz: Temporary workaround, see Jersey Issue 3771: https://github.com/jersey/jersey/pull/3771 -->
-   <dependency>
-      <groupId>org.glassfish.jersey.connectors</groupId>
-      <artifactId>jersey-apache-connector</artifactId>
-      <optional>true</optional>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-client</artifactId>
     </dependency>
   </dependencies>
 </project>

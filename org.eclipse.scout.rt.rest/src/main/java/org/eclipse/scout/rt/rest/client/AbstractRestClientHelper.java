@@ -3,6 +3,7 @@ package org.eclipse.scout.rt.rest.client;
 import java.net.URI;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -24,35 +25,70 @@ import org.glassfish.jersey.client.ClientConfig;
 /**
  * Abstract implementation of a REST client helper dealing with REST requests to a API server.
  * <p>
- * This class is stateless and may be reused for subsequent REST requests to the same API server.
+ * This class may be reused for subsequent REST requests to the same API server.
  * <p>
  * Subclasses may bind this generic REST client helper to a concrete REST endpoint by implementing the
  * {@link #getBaseUri()} method.
  */
 public abstract class AbstractRestClientHelper implements IRestClientHelper {
 
-  @Override
-  public Client client() {
-    ClientBuilder clientBuilder = ClientBuilder.newBuilder();
-    initClientBuilder(clientBuilder);
+  private final Supplier<Client> m_clientSupplier = createClientSupplier();
 
-    installContextResolver(clientBuilder);
-    installRequestFilters(clientBuilder);
-    installFeatures(clientBuilder);
-
-    Client client = clientBuilder.build();
-    return client;
+  /**
+   * @return a supplier of {@link Client} instances used for {@link #target(String)}. The default implementation returns
+   *         a supplier that always provides the same {@link Client} instance.
+   */
+  protected Supplier<Client> createClientSupplier() {
+    Client client = createClient();
+    return () -> client;
   }
 
-  protected void initClientBuilder(ClientBuilder clientBuilder) {
+  protected Client createClient() {
+    // Prepare client config
+    // IMPORTANT: This must happen _before_ calling initClientBuilder() because "withConfig()" replaces the entire configuration!
     ClientConfig clientConfig = new ClientConfig();
-
     // TODO 8.0 pbz: Temporary workaround, this code line and the direct dependency to the Apache connector will be removed as soon as the jersey issue is resolved.
     // See Jersey Issue 3771: https://github.com/jersey/jersey/pull/3771 (see also TO DO in pom.xml)
     clientConfig.connectorProvider(new ApacheConnectorProvider());
-
     initClientConfig(clientConfig);
-    clientBuilder.withConfig(clientConfig);
+
+    ClientBuilder clientBuilder = ClientBuilder.newBuilder()
+        .withConfig(clientConfig);
+    initClientBuilder(clientBuilder);
+    return clientBuilder.build();
+  }
+
+  /**
+   * @return the {@link Client} used by {@link #target(String)}
+   */
+  protected Client client() {
+    return m_clientSupplier.get();
+  }
+
+  protected void initClientBuilder(ClientBuilder clientBuilder) {
+    registerContextResolvers(clientBuilder);
+    registerRequestFilters(clientBuilder);
+
+    configureClientBuilder(clientBuilder);
+  }
+
+  protected void registerContextResolvers(ClientBuilder clientBuilder) {
+    // Context resolver, e.g. resolver for ObjectMapper
+    for (IBean<ContextResolver> bean : BEANS.getBeanManager().getBeans(ContextResolver.class)) {
+      clientBuilder.register(bean.getBeanClazz());
+    }
+  }
+
+  protected void registerRequestFilters(ClientBuilder clientBuilder) {
+    for (IGlobalRestRequestFilter filter : BEANS.all(IGlobalRestRequestFilter.class)) {
+      clientBuilder.register(filter);
+    }
+  }
+
+  protected void configureClientBuilder(ClientBuilder clientBuilder) {
+    for (IGlobalRestClientConfigurator configurator : BEANS.all(IGlobalRestClientConfigurator.class)) {
+      configurator.configure(clientBuilder);
+    }
   }
 
   /**
@@ -66,12 +102,6 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
   @Override
   public WebTarget target(String resourcePath) {
     return client().target(buildUri(resourcePath));
-  }
-
-  @Override
-  public WebTarget target(String formatString, String... args) {
-    String resourcePath = String.format(formatString, (Object[]) args);
-    return target(resourcePath);
   }
 
   @Override
@@ -92,23 +122,6 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
    * @return base URI to use for REST requests using this helper
    */
   protected abstract String getBaseUri();
-
-  protected void installContextResolver(ClientBuilder clientBuilder) {
-    // Context resolver, e.g. resolver for ObjectMapper
-    for (IBean<ContextResolver> bean : BEANS.getBeanManager().getBeans(ContextResolver.class)) {
-      clientBuilder.register(bean.getBeanClazz());
-    }
-  }
-
-  protected void installRequestFilters(ClientBuilder clientBuilder) {
-    for (IGlobalRestRequestFilter filter : BEANS.all(IGlobalRestRequestFilter.class)) {
-      clientBuilder.register(filter);
-    }
-  }
-
-  protected void installFeatures(ClientBuilder clientBuilder) {
-    // NOP
-  }
 
   @Override
   public void throwOnResponseError(WebTarget target, Response response) {

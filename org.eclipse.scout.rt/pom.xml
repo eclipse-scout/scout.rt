@@ -58,6 +58,7 @@
     <module>../org.eclipse.scout.rt.jackson</module>
     <module>../org.eclipse.scout.rt.jackson.test</module>
     <module>../org.eclipse.scout.rt.rest.jackson</module>
+    <module>../org.eclipse.scout.rt.rest.jersey.client</module>
 
     <module>../org.eclipse.scout.jaxws.apt</module>
 
@@ -287,6 +288,12 @@
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.rest.jersey.client</artifactId>
+        <version>8.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.shared</artifactId>
         <version>8.0.0-SNAPSHOT</version>
       </dependency>
@@ -450,6 +457,15 @@
         <groupId>javax.xml.ws</groupId>
         <artifactId>jaxws-api</artifactId>
         <version>${master_dependency_jaxws_version}</version>
+      </dependency>
+
+      <!-- Jersey (REST) -->
+      <dependency>
+        <groupId>org.glassfish.jersey</groupId>
+        <artifactId>jersey-bom</artifactId>
+        <version>2.25.1</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
 
       <!-- JAX-WS with METRO (not bundled with JRE) -->
