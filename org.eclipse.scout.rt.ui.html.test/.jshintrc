@@ -34,6 +34,7 @@
     "createNullParent": false,
     "linkWidgetAndAdapter": false,
     "removePopups": false,
-    "createAdapterModel": false
+    "createAdapterModel": false,
+    "stripCommentsFromJson": false
   }
 }

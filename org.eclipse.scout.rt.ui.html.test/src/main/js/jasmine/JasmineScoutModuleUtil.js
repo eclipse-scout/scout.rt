@@ -36,11 +36,12 @@ function loadJsonModule(modulePath) {
 
 function loadAndResolveJsonContent(path, includePrefix) {
   var def = $.Deferred();
+  // dataType is text because we want to strip comments from json before parsing the json
   $.ajax({
     async: false,
     type: 'GET',
-    dataType: 'json',
-    contentType: 'application/json; charset=UTF-8',
+    dataType: 'text',
+    contentType: 'application/javascript; charset=UTF-8',
     cache: false,
     url: path
   })
@@ -50,16 +51,20 @@ function loadAndResolveJsonContent(path, includePrefix) {
   });
 
   function done(data) {
-    if (!data.files) {
-      return def.resolve(data);
+    // strip comments and parse json manually
+    var json = stripCommentsFromJson(data);
+    json = JSON.parse(json);
+
+    if (!json.files) {
+      return def.resolve(json);
     }
     var resolvedContent = {};
-    var promises = data.files.map(function(file, i) {
+    var promises = json.files.map(function(file, i) {
       return loadAndResolveJsonContent(includePrefix + file).then(function(part) {
         resolvedContent[part.id] = part;
       });
     });
-    $.promiseAll(promises).done(function(){
+    $.promiseAll(promises).done(function() {
       def.resolve(resolvedContent);
     });
   }
