@@ -8,20 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.DummyLookupCall = function() {
-  scout.DummyLookupCall.parent.call(this);
-  
+scout.AnotherDummyLookupCall = function() {
+  scout.AnotherDummyLookupCall.parent.call(this);
+
   this.multiline = false;
   this.showText = true;
   this.setDelay(250);
 };
-scout.inherits(scout.DummyLookupCall, scout.StaticLookupCall);
+scout.inherits(scout.AnotherDummyLookupCall, scout.StaticLookupCall);
 
-scout.DummyLookupCall.prototype._data = function() {
+scout.AnotherDummyLookupCall.prototype._data = function() {
   return [
-    [1, line.call(this, 'Foo'), 0],
-    [2, line.call(this, 'Bar'), 1],
-    [3, line.call(this, 'Baz'), 1]
+    [100, line.call(this, 'English'), 0],
+    [200, line.call(this, 'German'), 1],
+    [300, line.call(this, 'Italian'), 1],
+    [400, line.call(this, 'French'), 1],
+    [500, line.call(this, 'Swiss-German'), 1]
   ];
 
   function line(text) {

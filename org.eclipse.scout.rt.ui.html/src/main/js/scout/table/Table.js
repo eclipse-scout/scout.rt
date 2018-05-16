@@ -2180,6 +2180,12 @@ scout.Table.prototype.setMultiCheck = function(multiCheck) {
   this.setProperty('multiCheck', multiCheck);
 };
 
+scout.Table.prototype.checkedRows = function() {
+  return this.rows.filter(function(row) {
+    return row.checked;
+  });
+};
+
 scout.Table.prototype.checkRow = function(row, checked) {
   this.checkRows([row], {
     checked: checked
@@ -2192,7 +2198,8 @@ scout.Table.prototype.checkRows = function(rows, options) {
     checkOnlyEnabled: true
   }, options);
   var checkedRows = [];
-  if (!this.checkable || (!this.enabled && opts.checkOnlyEnabled)) {
+  // use enabled computed because when the parent of the table is disabled, it should not be allowed to check rows
+  if (!this.checkable || (!this.enabledComputed && opts.checkOnlyEnabled)) {
     return;
   }
   rows = scout.arrays.ensure(rows);
@@ -3153,7 +3160,7 @@ scout.Table.prototype._renderRowDelta = function() {
     return;
   }
   var renderedRows = [],
-  scrollTop = this.$data[0].scrollTop;
+    scrollTop = this.$data[0].scrollTop;
   this.$rows().each(function(i, elem) {
     var $row = $(elem),
       row = $row.data('row');

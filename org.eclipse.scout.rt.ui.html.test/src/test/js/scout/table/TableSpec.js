@@ -627,7 +627,7 @@ describe("Table", function() {
       model.checkable = true;
       model.multiCheck = true;
       var table = helper.createTable(model);
-      table.enabled = false;
+      table.setEnabled(false);
       table.render();
 
       var rows = table.rows;
