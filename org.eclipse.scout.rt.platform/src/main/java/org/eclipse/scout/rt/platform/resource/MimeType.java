@@ -17,6 +17,8 @@ import java.util.Collection;
  * Enumeration for a few well-known extensions and their mime types.
  */
 public enum MimeType {
+  AA("audio/audible", "aa"),
+  AMV("video/x-amv", "amv"),
   APPCACHE("text/cache-manifest", "appcache"),
   APPLICATION_OCTET_STREAM("application/octet-stream", "bin"),
   AVI("video/avi", "avi"),
@@ -26,6 +28,7 @@ public enum MimeType {
   DOCX("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx"),
   DOTX("application/vnd.openxmlformats-officedocument.wordprocessingml.template", "dotx"),
   EML("message/rfc822", "eml"),
+  FLV("video/x-flv", "flv"),
   GIF("image/gif", "gif"),
   GZ("application/gzip", "gz"),
   HTML("text/html", "html"),
@@ -48,6 +51,9 @@ public enum MimeType {
   MP4("video/mp4", "mp4"),
   MPG("video/mpeg", "mpg"),
   MSG("application/vnd.ms-outlook", "msg"),
+  M4P("audio/mp4a-latm", "m4p"),
+  OGA("audio/ogg", "oga"),
+  OGV("video/ogg", "ogv"),
   ONEPKG("application/onenote", "onepkg"),
   ONETMP("application/onenote", "onetmp"),
   ONETOC("application/onenote", "onetoc"),
@@ -67,6 +73,7 @@ public enum MimeType {
   VCARD("text/vcard", "vcard"),
   VCF("text/x-vcard", "vcf"),
   VCS("text/x-vcalendar", "vcs"),
+  WEBM("video/webm", "webm"),
   WOFF("application/font-woff", "woff"),
   XLSX("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx"),
   XLTX("application/vnd.openxmlformats-officedocument.spreadsheetml.template", "xltx"),
