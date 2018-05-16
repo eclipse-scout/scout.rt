@@ -19,7 +19,7 @@ scout.ViewMenuTab = function() {
   this.viewMenus = [];
   this.selected = false;
   this.inBackground = false;
-  this.defaultIconId = scout.icons.FOLDER_BOLD;
+  this.defaultIconId = scout.icons.FOLDER;
 
   this._viewMenuPropertyChangeHandler = this._onViewMenuPropertyChange.bind(this);
   this._addWidgetProperties(['viewMenus', 'selectedButton']);
@@ -100,6 +100,7 @@ scout.ViewMenuTab.prototype._setSelectedButton = function(viewButton) {
     delegateAllPropertiesToOriginal: true,
     excludePropertiesToOriginal: ['selected']
   });
+  // use default icon if outline does not define one.
   viewButton.iconId = viewButton.iconId || this.defaultIconId;
   this._setProperty('selectedButton', viewButton);
 };

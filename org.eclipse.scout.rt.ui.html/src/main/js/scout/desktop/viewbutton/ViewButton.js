@@ -56,16 +56,6 @@ scout.ViewButton.prototype._renderText = function() {
   }
 };
 
-/**
- * Use a default icon, when view-tab doesn't define one.
- * @override Action.js
- */
-scout.ViewButton.prototype._renderIconId = function() {
-  if (this._isTab()) {
-    this.$container.icon(this.iconId);
-  }
-};
-
 scout.ViewButton.prototype._renderInBackground = function() {
   this.$container.toggleClass('in-background', this.inBackground);
 };
