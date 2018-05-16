@@ -976,6 +976,75 @@ describe("Table", function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
+    it("always updates model width, but only resizes cells of visible columns ", function() {
+      var model = helper.createModelFixture(5, 1);
+      model.columns[0].width = 100;
+      model.columns[1].width = 101;
+      model.columns[1].visible = false;
+      model.columns[2].width = 102;
+      model.columns[2].displayable = false;
+      model.columns[3].width = 103;
+      model.columns[4].width = 104;
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.createWidget(model, session.desktop);
+      table.render();
+      // Manually set a "large" table width, because otherwise it will depend on the window size.
+      // When running with PhantomJS, the window size would be too small, causing the test to fail.
+      table.$container.width(9999);
+      table.revalidateLayout();
+
+      var $headerItems = table.header.$container.children('.table-header-item:not(.filler)');
+      var $rowCells = table.rows[0].$row.children('.table-cell');
+      expect($headerItems.length).toBe(3);
+      expect($rowCells.length).toBe(3);
+      expect($headerItems.eq(0).cssMinWidth()).toBe(100);
+      expect($rowCells.eq(0).cssWidth()).toBe(100);
+      expect($headerItems.eq(1).cssMinWidth()).toBe(103);
+      expect($rowCells.eq(1).cssWidth()).toBe(103);
+      expect($headerItems.eq(2).cssMinWidth()).toBe(104);
+      expect($rowCells.eq(2).cssWidth()).toBe(104);
+
+      table.resizeColumn(table.columns[0], 200);
+      expect($headerItems.eq(0).cssMinWidth()).toBe(200);
+      expect($rowCells.eq(0).cssWidth()).toBe(200);
+      expect($headerItems.eq(1).cssMinWidth()).toBe(103);
+      expect($rowCells.eq(1).cssWidth()).toBe(103);
+      expect($headerItems.eq(2).cssMinWidth()).toBe(104);
+      expect($rowCells.eq(2).cssWidth()).toBe(104);
+
+      table.resizeColumn(table.columns[1], 201); // invisible column, nothing should happen
+      expect($headerItems.eq(0).cssMinWidth()).toBe(200);
+      expect($rowCells.eq(0).cssWidth()).toBe(200);
+      expect($headerItems.eq(1).cssMinWidth()).toBe(103);
+      expect($rowCells.eq(1).cssWidth()).toBe(103);
+      expect($headerItems.eq(2).cssMinWidth()).toBe(104);
+      expect($rowCells.eq(2).cssWidth()).toBe(104);
+
+      table.resizeColumn(table.columns[2], 202); // not displayable column, nothing should happen
+      expect($headerItems.eq(0).cssMinWidth()).toBe(200);
+      expect($rowCells.eq(0).cssWidth()).toBe(200);
+      expect($headerItems.eq(1).cssMinWidth()).toBe(103);
+      expect($rowCells.eq(1).cssWidth()).toBe(103);
+      expect($headerItems.eq(2).cssMinWidth()).toBe(104);
+      expect($rowCells.eq(2).cssWidth()).toBe(104);
+
+      table.resizeColumn(table.columns[3], 203);
+      expect($headerItems.eq(0).cssMinWidth()).toBe(200);
+      expect($rowCells.eq(0).cssWidth()).toBe(200);
+      expect($headerItems.eq(1).cssMinWidth()).toBe(203);
+      expect($rowCells.eq(1).cssWidth()).toBe(203);
+      expect($headerItems.eq(2).cssMinWidth()).toBe(104);
+      expect($rowCells.eq(2).cssWidth()).toBe(104);
+
+      table.resizeColumn(table.columns[4], 204);
+      expect($headerItems.eq(0).cssMinWidth()).toBe(200);
+      expect($rowCells.eq(0).cssWidth()).toBe(200);
+      expect($headerItems.eq(1).cssMinWidth()).toBe(203);
+      expect($rowCells.eq(1).cssWidth()).toBe(203);
+      expect($headerItems.eq(2).cssMinWidth()).toBe(204);
+      expect($rowCells.eq(2).cssWidth()).toBe(204);
+    });
+
   });
 
   describe("autoResizeColumns", function() {

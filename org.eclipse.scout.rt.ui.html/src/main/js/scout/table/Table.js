@@ -3365,29 +3365,33 @@ scout.Table.prototype.resizeColumn = function(column, width) {
   if (column.fixedWidth) {
     return;
   }
-  var colNum = this.columns.indexOf(column) + 1;
   width = Math.floor(width);
   column.width = width;
-  this._updateRowWidth();
 
-  this.$cellsForColIndex(colNum, true)
-    .css('min-width', width)
-    .css('max-width', width);
-  if (scout.device.tableAdditionalDivRequired) {
-    this.$cellsForColIndexWidthFix(colNum, true)
-      .css('max-width', (width - this.cellHorizontalPadding - 2 /* unknown IE9 extra space */ ));
-    // same calculation in scout.Column.prototype.buildCellForRow;
+  var visibleColumnIndex = this.visibleColumns().indexOf(column);
+  if (visibleColumnIndex !== -1) {
+    var colNum = visibleColumnIndex + 1;
+    this.$cellsForColIndex(colNum, true)
+      .css('min-width', width)
+      .css('max-width', width);
+    if (scout.device.tableAdditionalDivRequired) {
+      this.$cellsForColIndexWidthFix(colNum, true)
+        .css('max-width', (width - this.cellHorizontalPadding - 2 /* unknown IE9 extra space */ ));
+      // same calculation in scout.Column.prototype.buildCellForRow;
+    }
+
+    this._updateRowWidth();
+    this.$rows(true)
+      .css('width', this.rowWidth);
+
+    // If resized column contains cells with wrapped text, view port needs to be updated
+    // Remove row height for non rendered rows because it may have changed due to resizing (wrap text)
+    this._updateRowHeights();
+    this._renderFiller();
+    this._renderViewport();
+    this.updateScrollbars();
+    this._renderEmptyData();
   }
-  this.$rows(true)
-    .css('width', this.rowWidth);
-
-  // If resized column contains cells with wrapped text, view port needs to be updated
-  // Remove row height for non rendered rows because it may have changed due to resizing (wrap text)
-  this._updateRowHeights();
-  this._renderFiller();
-  this._renderViewport();
-  this.updateScrollbars();
-  this._renderEmptyData();
 
   this._triggerColumnResized(column);
 };

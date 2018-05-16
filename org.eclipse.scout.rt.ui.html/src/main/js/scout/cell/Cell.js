@@ -13,7 +13,6 @@
  * @constructor
  */
 scout.Cell = function() {
-  this.$cell = null;
   this.cssClass = null;
   this.editable = null; /* do not initialize with false. This is required because there's a subtle logic in Column.js (_initCell) which checks if a value is set. */
   this.errorStatus = null;
