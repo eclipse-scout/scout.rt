@@ -30,8 +30,6 @@ scout.SmartFieldMultiline.prototype._render = function() {
 
   if (!this.touch) {
     $input
-      .blur(this._onFieldBlur.bind(this))
-      .focus(this._onFieldFocus.bind(this))
       .keyup(this._onFieldKeyUp.bind(this))
       .keydown(this._onFieldKeyDown.bind(this))
       .on('input', this._onFieldInput.bind(this));

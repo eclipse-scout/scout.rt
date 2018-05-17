@@ -71,6 +71,7 @@ scout.StringField.prototype._render = function() {
   var $field;
   if (this.multilineText) {
     $field = this._makeMultilineField();
+    this.$container.addClass('multiline');
   } else {
     $field = scout.fields.makeTextField(this.$parent);
   }

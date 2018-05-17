@@ -57,8 +57,6 @@ scout.CheckBoxField.prototype._render = function() {
   this.$checkBox = this.$fieldContainer
     .appendDiv('check-box')
     .on('mousedown', this._onMouseDown.bind(this))
-    .on('blur', this._onFieldBlur.bind(this))
-    .on('focus', this._onFieldFocus.bind(this))
     .data('valuefield', this);
   this.addField(this.$checkBox);
 
@@ -158,6 +156,7 @@ scout.CheckBoxField.prototype._renderLabel = function() {
   this.$checkBoxLabel.textOrNbsp(this.label, 'empty');
   // Make sure the empty label is as height as the other labels, especially important for top labels
   this.$label.html('&nbsp;');
+  this.$label.toggleClass('top', this.labelPosition === scout.FormField.LabelPosition.TOP);
 };
 
 /**

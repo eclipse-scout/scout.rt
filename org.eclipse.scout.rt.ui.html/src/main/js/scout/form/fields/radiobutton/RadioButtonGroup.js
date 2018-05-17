@@ -60,7 +60,37 @@ scout.RadioButtonGroup.prototype._initButton = function(button) {
   if (button.selected) {
     this.setValue(button.radioValue);
     this.selectButton(button);
+    if (button.focused) {
+      this.setFocused(true);
+    }
   }
+};
+
+scout.RadioButtonGroup.prototype._render = function() {
+  this.addContainer(this.$parent, 'radiobutton-group');
+  this.addLabel();
+  this.addMandatoryIndicator();
+
+  this.$body = this.$container.appendDiv('radiobutton-group-body');
+  this.htmlBody = scout.HtmlComponent.install(this.$body, this.session);
+  this.htmlBody.setLayout(this._createBodyLayout());
+
+  this.fields.forEach(function(formField) {
+    formField.render(this.$body);
+
+    // set each children layout data to logical grid data
+    formField.setLayoutData(new scout.LogicalGridData(formField));
+
+    this._linkWithLabel(formField.$field);
+  }, this);
+
+  this.addField(this.$body);
+  this.addStatus();
+};
+
+scout.RadioButtonGroup.prototype._renderProperties = function() {
+  scout.RadioButtonGroup.parent.prototype._renderProperties.call(this);
+  this._renderLayoutConfig();
 };
 
 scout.RadioButtonGroup.prototype._createBodyLayout = function() {
@@ -135,33 +165,6 @@ scout.RadioButtonGroup.prototype.activate = function() {
   if (element) {
     element.focus();
   }
-};
-
-scout.RadioButtonGroup.prototype._render = function() {
-  this.addContainer(this.$parent, 'radiobutton-group');
-  this.addLabel();
-  this.addMandatoryIndicator();
-
-  this.$body = this.$container.appendDiv('radiobutton-group-body');
-  this.htmlBody = scout.HtmlComponent.install(this.$body, this.session);
-  this.htmlBody.setLayout(this._createBodyLayout());
-
-  this.fields.forEach(function(formField) {
-    formField.render(this.$body);
-
-    // set each children layout data to logical grid data
-    formField.setLayoutData(new scout.LogicalGridData(formField));
-
-    this._linkWithLabel(formField.$field);
-  }, this);
-
-  this.addField(this.$body);
-  this.addStatus();
-};
-
-scout.RadioButtonGroup.prototype._renderProperties = function() {
-  scout.RadioButtonGroup.parent.prototype._renderProperties.call(this);
-  this._renderLayoutConfig();
 };
 
 /**
@@ -309,5 +312,7 @@ scout.RadioButtonGroup.prototype._onButtonPropertyChange = function(event) {
     } else if (event.source === this.selectedButton) {
       this.selectButton(null);
     }
+  } else if (event.propertyName === 'focused') {
+    this.setFocused(event.newValue);
   }
 };

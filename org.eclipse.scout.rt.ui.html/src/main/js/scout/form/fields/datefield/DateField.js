@@ -724,6 +724,7 @@ scout.DateField.prototype._onTimeIconMouseDown = function(event) {
 };
 
 scout.DateField.prototype._onDateFieldBlur = function(event) {
+  this.setFocused(false);
   this.setDateFocused(false);
   if (this.embedded) {
     // Don't execute, otherwise date would be accepted even though touch popup is still open.
@@ -743,11 +744,13 @@ scout.DateField.prototype._onDateFieldBlur = function(event) {
 };
 
 scout.DateField.prototype._onDateFieldFocus = function(event) {
+  this.setFocused(true);
   this.setDateFocused(true);
 };
 
 scout.DateField.prototype._onTimeFieldBlur = function(event) {
   this._tempTimeDate = null;
+  this.setFocused(false);
   this.setTimeFocused(false);
   if (this.embedded) {
     // Don't execute, otherwise time would be accepted even though touch popup is still open.
@@ -768,6 +771,7 @@ scout.DateField.prototype._onTimeFieldBlur = function(event) {
 };
 
 scout.DateField.prototype._onTimeFieldFocus = function() {
+  this.setFocused(true);
   this.setTimeFocused(true);
 };
 

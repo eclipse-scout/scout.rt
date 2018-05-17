@@ -22,9 +22,7 @@ scout.inherits(scout.BasicField, scout.ValueField);
 scout.BasicField.prototype.addField = function($field) {
   scout.BasicField.parent.prototype.addField.call(this, $field);
   if ($field) {
-    $field.on('blur', this._onFieldBlur.bind(this))
-      .on('focus', this._onFieldFocus.bind(this))
-      .on('input', this._onFieldInput.bind(this));
+    $field.on('input', this._onFieldInput.bind(this));
   }
 };
 
@@ -44,7 +42,7 @@ scout.BasicField.prototype._clear = function() {
 };
 
 scout.BasicField.prototype._onFieldInput = function() {
-  scout.BasicField.parent.prototype._onFieldInput.call(this);
+  this._updateHasText();
   if (this.updateDisplayTextOnModify) {
     this._onDisplayTextModified();
   }

@@ -14,6 +14,7 @@ describe('FormFieldLayout', function() {
   // Sizes are with margin, static widths and heights are without margin
   var formField, rowHeight, mandatoryWidth, statusWidth, labelWidth, labelHeight;
   var mandatorySize, mandatoryMargins, labelSize, labelMargins, fieldSize, fieldMargins, statusSize, statusMargins;
+  var origPrefSize;
 
   var CustomFormField = function() {
     CustomFormField.parent.call(this);
@@ -67,8 +68,7 @@ describe('FormFieldLayout', function() {
     mandatoryWidth = scout.HtmlEnvironment.fieldMandatoryIndicatorWidth;
     statusWidth = scout.HtmlEnvironment.fieldStatusWidth;
     labelWidth = scout.HtmlEnvironment.fieldLabelWidth;
-    // Label is currently always as height as a row, which is expected by LogicalGridData.logicalRowHeightAddition
-    // This may be changed in the future if multiline labels or smaller labels are demanded
+    // Label is always as height as a row if label position is set to LEFT
     labelHeight = rowHeight;
 
     formField = new CustomFormField();
@@ -94,17 +94,24 @@ describe('FormFieldLayout', function() {
    * Calls the given function when scout.graphics.prefSize is called for the $fieldContainer
    */
   function spyForWidthHint(func) {
-    var spy = spyOn(scout.graphics, 'prefSize');
-    spy.and.callFake(function($elem, options) {
-      var widthHint, heightHint;
+    if (origPrefSize) {
+      unspyForWidthHint();
+    }
+    origPrefSize = scout.graphics.prefSize;
+    scout.graphics.prefSize = function($elem, options) {
       if ($elem[0] === formField.$fieldContainer[0]) {
-        widthHint = options.widthHint;
-        heightHint = options.heightHint;
+        func(options.widthHint, options.heightHint);
       }
-      spy.and.callThrough(); // Replace with original function again
-      func(widthHint, heightHint);
-      return scout.graphics.prefSize($elem, options);
-    });
+      return origPrefSize($elem, options);
+    };
+  }
+
+  function unspyForWidthHint() {
+    if (!origPrefSize) {
+      return;
+    }
+    scout.graphics.prefSize = origPrefSize;
+    origPrefSize = null;
   }
 
   describe('prefSize', function() {
@@ -134,6 +141,7 @@ describe('FormFieldLayout', function() {
           });
           expect(formField.htmlComp.prefSize({widthHint: 400}).width).toBe(400);
           expect(widthHint).toBe(expectedWidthHint);
+          unspyForWidthHint();
         });
 
         it('does not adjust widthHint or heightHint if it is not set', function() {
@@ -147,6 +155,7 @@ describe('FormFieldLayout', function() {
           formField.htmlComp.prefSize();
           expect(widthHint).toBe(undefined);
           expect(heightHint).toBe(undefined);
+          unspyForWidthHint();
         });
 
         it('does not adjust widthHint or heightHint even if margins are negative', function() {
@@ -163,6 +172,7 @@ describe('FormFieldLayout', function() {
           formField.htmlComp.prefSize();
           expect(widthHint).toBe(undefined);
           expect(heightHint).toBe(undefined);
+          unspyForWidthHint();
         });
 
         it('ignores label if label is invisible', function() {
@@ -188,7 +198,7 @@ describe('FormFieldLayout', function() {
         it('adds label and field height if label is on top', function() {
           formField.setLabelPosition(scout.FormField.LabelPosition.TOP);
           readSizes();
-          var expectedHeight = labelHeight + fieldSize.height;
+          var expectedHeight = labelSize.height + fieldSize.height;
           expect(formField.htmlComp.prefSize().height).toBe(expectedHeight);
         });
 
@@ -213,7 +223,7 @@ describe('FormFieldLayout', function() {
           formField.setStatusVisible(false);
           formField.setLabelPosition(scout.FormField.LabelPosition.TOP);
           readSizes();
-          var expectedHeight = labelHeight + fieldSize.height;
+          var expectedHeight = labelSize.height + fieldSize.height;
           var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + fieldSize.width;
           expect(formField.htmlComp.prefSize().height).toBe(expectedHeight);
           expect(formField.htmlComp.prefSize().width).toBe(expectedWidth);
@@ -346,6 +356,7 @@ describe('FormFieldLayout', function() {
           });
           expect(formField.htmlComp.prefSize({widthHint: 400}).width).toBe(400);
           expect(widthHint).toBe(expectedWidthHint);
+          unspyForWidthHint();
         });
       });
 
@@ -370,12 +381,26 @@ describe('FormFieldLayout', function() {
           });
           expect(formField.htmlComp.prefSize({widthHint: 400}).width).toBe(400);
           expect(widthHint).toBe(expectedWidthHint);
+          unspyForWidthHint();
         });
       });
     });
   });
 
   describe('layout', function() {
+
+    describe('labelPosition', function() {
+
+      describe('top', function() {
+
+        it('positions the label on top of the field', function() {
+          formField.setLabelPosition(scout.FormField.LabelPosition.TOP);
+          readSizes();
+          formField.htmlComp.validateLayout();
+          expect(formField.$fieldContainer.cssTop()).toBe(labelSize.height);
+        });
+      });
+    });
 
     describe('labelWidthInPixel', function() {
 

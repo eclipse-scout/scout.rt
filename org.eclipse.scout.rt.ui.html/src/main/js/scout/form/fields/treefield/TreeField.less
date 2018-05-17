@@ -8,22 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.tree-field > .tree {
-  border: 1px solid @border-color;
-  border-radius: @control-border-radius;
-  background-color: @control-background-color;
-  overflow: hidden; /* necessary due to rounded borders and background color*/
-
-  &.alternative {
-    border-radius: @control-alternative-border-radius;
+.tree-field {
+  &.alternative > label.top {
+    padding-bottom: @top-label-border-padding-bottom;
   }
 
-  &:focus,
-  &.focused {
-    #scout.focus-border();
-  }
+  & > .tree {
+    border: 1px solid @border-color;
+    border-radius: @control-border-radius;
+    background-color: @control-background-color;
+    overflow: hidden; /* necessary due to rounded borders and background color*/
 
-  &.ie {
-    border-radius: 0;
+    &.alternative {
+      border-radius: @control-alternative-border-radius;
+    }
+
+    &:focus,
+    &.focused {
+      #scout.focus-border();
+    }
+
+    &.ie {
+      border-radius: 0;
+    }
   }
 }

@@ -97,13 +97,9 @@ scout.ValueField.prototype._onClearIconMouseDown = function(event) {
   event.preventDefault();
 };
 
-scout.ValueField.prototype._onFieldFocus = function(event) {
-  this.setFocused(true);
-};
-
 scout.ValueField.prototype._onFieldBlur = function() {
+  scout.ValueField.parent.prototype._onFieldBlur.call(this);
   this.acceptInput(false);
-  this.setFocused(false);
 };
 
 /**
@@ -559,10 +555,6 @@ scout.ValueField.prototype.addContainer = function($parent, cssClass, layout) {
 scout.ValueField.prototype.addField = function($field) {
   scout.ValueField.parent.prototype.addField.call(this, $field);
   this.$field.data('valuefield', this);
-};
-
-scout.ValueField.prototype._onFieldInput = function() {
-  this._updateHasText();
 };
 
 scout.ValueField.prototype._onStatusMouseDown = function(event) {

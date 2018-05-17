@@ -217,6 +217,14 @@ scout.FormField.prototype._renderFieldStyle = function() {
   this._renderFieldStyleInternal(this.$container);
   this._renderFieldStyleInternal(this.$fieldContainer);
   this._renderFieldStyleInternal(this.$field);
+  if (this.rendered) {
+    // See _renderLabelPosition why it is necessary to invalidate parent as well.
+    var htmlCompParent = this.htmlComp.getParent();
+    if (htmlCompParent) {
+      htmlCompParent.invalidateLayoutTree();
+    }
+    this.invalidateLayoutTree();
+  }
 };
 
 scout.FormField.prototype._renderFieldStyleInternal = function($element) {
@@ -433,6 +441,8 @@ scout.FormField.prototype.setLabelPosition = function(labelPosition) {
 scout.FormField.prototype._renderLabelPosition = function(position) {
   this._renderLabel();
   if (this.rendered) {
+    // Necessary to invalidate parent as well if parent uses the logical grid.
+    // LogicalGridData uses another row height depending of the label position
     var htmlCompParent = this.htmlComp.getParent();
     if (htmlCompParent) {
       htmlCompParent.invalidateLayoutTree();
@@ -783,6 +793,14 @@ scout.FormField.prototype.getFocusableElement = function() {
   return null;
 };
 
+scout.FormField.prototype._onFieldFocus = function(event) {
+  this.setFocused(true);
+};
+
+scout.FormField.prototype._onFieldBlur = function() {
+  this.setFocused(false);
+};
+
 /**
  * When calling this function, the same should happen as when clicking into the field. It is used when the label is clicked.<br>
  * The most basic action is focusing the field but this may differ from field to field.
@@ -869,6 +887,8 @@ scout.FormField.prototype.addField = function($field) {
   }
   this.$field = $field;
   this._linkWithLabel($field);
+  this.$field.on('blur', this._onFieldBlur.bind(this))
+    .on('focus', this._onFieldFocus.bind(this));
 };
 
 /**

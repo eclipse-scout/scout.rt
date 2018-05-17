@@ -60,7 +60,8 @@ scout.TagField.prototype._render = function() {
   this.tagBar.render($fieldContainer);
   var $field = $fieldContainer.appendElement('<input>', 'field')
     .on('keydown', this._onInputKeydown.bind(this))
-    .on('keyup', this._onInputKeyup.bind(this));
+    .on('keyup', this._onInputKeyup.bind(this))
+    .on('input', this._onFieldInput.bind(this));
   this.addFieldContainer($fieldContainer);
   this.addField($field);
   this.addStatus();
@@ -148,15 +149,6 @@ scout.TagField.prototype._readDisplayText = function() {
   return this.$field.val();
 };
 
-scout.TagField.prototype.addField = function($field) { // FIXME [awe] copy/paste from BasicField. check if it is better to inherit from that class
-  scout.TagField.parent.prototype.addField.call(this, $field);
-  if ($field) {
-    $field.on('blur', this._onFieldBlur.bind(this))
-      .on('focus', this._onFieldFocus.bind(this))
-      .on('input', this._onFieldInput.bind(this));
-  }
-};
-
 scout.TagField.prototype._clear = function() {
   this.$field.val('');
 };
@@ -176,6 +168,9 @@ scout.TagField.prototype._triggerAcceptInput = function() {
   });
 };
 
+/**
+ * @override
+ */
 scout.TagField.prototype._onFieldBlur = function(event) {
   // We cannot call super until chooser popup has been closed (see #acceptInput)
   this.closeChooserPopup();
@@ -185,11 +180,18 @@ scout.TagField.prototype._onFieldBlur = function(event) {
   }
 };
 
+/**
+ * @override
+ */
 scout.TagField.prototype._onFieldFocus = function(event) {
   scout.TagField.parent.prototype._onFieldFocus.call(this, event);
   if (this.rendered && !this.removing) {
     this.tagBar.focus();
   }
+};
+
+scout.TagField.prototype._onFieldInput = function() {
+  this._updateHasText();
 };
 
 scout.TagField.prototype.addTag = function(text) {

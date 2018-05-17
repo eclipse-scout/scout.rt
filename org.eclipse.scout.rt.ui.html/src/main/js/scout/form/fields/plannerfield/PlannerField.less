@@ -8,12 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.planner-field > .planner {
-  margin-left: @mandatory-indicator-width;
-  border: 1px solid @border-color;
-  border-radius: @control-border-radius;
+.planner-field {
+  &.alternative > label.top {
+    padding-bottom: @top-label-border-padding-bottom;
+  }
 
-  &.alternative {
-    border-radius: @control-alternative-border-radius;
+  & > .planner {
+    margin-left: @mandatory-indicator-width;
+    border: 1px solid @border-color;
+    border-radius: @control-border-radius;
+
+    &.alternative {
+      border-radius: @control-alternative-border-radius;
+    }
   }
 }

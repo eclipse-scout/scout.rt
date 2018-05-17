@@ -55,8 +55,11 @@ scout.FormFieldLayout.prototype.layout = function($container) {
       scout.graphics.setBounds(formField.$label, left, top, labelWidth, this.rowHeight);
       left += labelWidth + formField.$label.cssMarginX();
     } else if (formField.labelPosition === scout.FormField.LabelPosition.TOP) {
-      formField.$label.cssHeight(this.rowHeight);
-      top += formField.$label.outerHeight(true);
+      var labelHeight = scout.graphics.prefSize(formField.$label).height;
+      // prefSize rounds the value -> ensure label height is set to that value to prevent gaps between container and label.
+      // In addition, this also ensures that the correct height is set when changing the label position from left to top
+      formField.$label.cssHeight(labelHeight);
+      top += labelHeight + formField.$label.cssMarginY();
       labelHasFieldWidth = true;
     }
   }
@@ -229,6 +232,7 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container, optio
     if (formField.labelPosition === scout.FormField.LabelPosition.TOP) {
       // Label is always as width as the field if it is on top
       prefSizeLabel.width = 0;
+      prefSizeLabel.height = scout.graphics.prefSize(formField.$label, true).height;
     } else if (formField.labelWidthInPixel === scout.FormField.LabelWidth.UI || formField.labelUseUiWidth) {
       if (formField.$label.hasClass('empty')) {
         prefSizeLabel.width = 0;

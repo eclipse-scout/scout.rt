@@ -45,9 +45,6 @@ scout.FileChooserField.prototype._render = function() {
   this.addLabel();
   this.addMandatoryIndicator();
   this._renderFileInput();
-  this.$field
-    .on('focus', this._onFieldFocus.bind(this))
-    .on('blur', this._onFieldBlur.bind(this));
   this.addIcon();
   this.addStatus();
 };

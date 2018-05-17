@@ -26,6 +26,25 @@
       /* explicitly disable ellipsis, because IE would display it for very narrow columns even if content is '&nbsp;' */
       text-overflow: clip;
     }
+
+    &.top {
+      color: @top-label-alternative-color;
+      font-size: @top-label-font-size;
+      padding-bottom: @top-label-border-padding-bottom;
+
+      .alternative& {
+        /* Reduce space between input and label if there is no border */
+        padding-bottom: 0;
+      }
+    }
+
+    .focused& {
+      color: @focus-color;
+    }
+
+    .has-error& {
+      color: @error-color;
+    }
   }
 
   & > .field {

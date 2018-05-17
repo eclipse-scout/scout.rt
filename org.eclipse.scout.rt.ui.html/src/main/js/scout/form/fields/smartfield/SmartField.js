@@ -110,8 +110,6 @@ scout.SmartField.prototype._render = function() {
 
   if (!this.touch) {
     $field
-      .blur(this._onFieldBlur.bind(this))
-      .focus(this._onFieldFocus.bind(this))
       .keyup(this._onFieldKeyUp.bind(this))
       .keydown(this._onFieldKeyDown.bind(this))
       .on('input', this._onFieldInput.bind(this));
@@ -885,7 +883,7 @@ scout.SmartField.prototype.togglePopup = function() {
 scout.SmartField.prototype._onFieldBlur = function(event) {
   this.setFocused(false);
   this.setLoading(false);
-  if (this.embedded) {
+  if (this.embedded || this.touch) {
     return;
   }
   this.acceptInput(false);
@@ -1017,6 +1015,10 @@ scout.SmartField.prototype._onFieldKeyDown = function(event) {
     }
     event.stopPropagation(); // key has been handled (popup open). do not allow propagation to other listeners because this could remove tooltips
   }
+};
+
+scout.SmartField.prototype._onFieldInput = function() {
+  this._updateHasText();
 };
 
 scout.SmartField.prototype._updateUserWasTyping = function(event) {
