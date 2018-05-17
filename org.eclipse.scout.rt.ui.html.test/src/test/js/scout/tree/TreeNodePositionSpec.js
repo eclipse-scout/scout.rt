@@ -163,7 +163,7 @@ describe('TreeNodePosition', function() {
     // +- Node 4.24
     // Node 5
     // +- Node 5.1
-    it('expand collapsed node', function() {
+    it('expands collapsed node', function() {
       // This tree does not use a root node
       tree = helper.createTree(helper.createModel([]));
 
@@ -206,7 +206,7 @@ describe('TreeNodePosition', function() {
       var n5 = createNode('n5', 'Node 5', true, 4);
       var n5_1 = createNode('n5_1', 'Node 5.1', true);
 
-      tree.insertNodes([n1, n2, n3, n4, n5], tree.nodes[0]);
+      tree.insertNodes([n1, n2, n3, n4, n5], null);
       tree.insertNodes([n2_1], tree.nodes[1]);
       tree.insertNodes([n3_1], tree.nodes[2]);
       tree.insertNodes([n4_1, n4_2, n4_3, n4_4, n4_5, n4_6, n4_7, n4_8, n4_9, n4_10, n4_11, n4_12, n4_13, n4_14, n4_15, n4_16, n4_17, n4_18, n4_19, n4_20, n4_21, n4_22, n4_23, n4_24], tree.nodes[3]);
@@ -214,7 +214,8 @@ describe('TreeNodePosition', function() {
 
       tree.render(session.$entryPoint);
       tree.htmlComp.pixelBasedSizing = true;
-      tree.htmlComp.setSize(new scout.Dimension(192, 192));
+      tree.htmlComp.setSize(new scout.Dimension(190, 190));
+      tree.viewRangeSize = 14;
 
       function expectVisibleNodesFlatToBe(nodes) {
         var expected = tree.visibleNodesFlat.map(function(node) {
@@ -278,6 +279,126 @@ describe('TreeNodePosition', function() {
         n4_24,
         n5,
         n5_1
+      ]);
+    });
+
+    // Node 0
+    // +- Node 1
+    //    +- Node 1.1
+    //    +- Node 1.2
+    //    +- Node 1.3
+    //    +- (...)
+    //    +- Node 1.13
+    // +- Node 2
+    // +- Node 3
+    //    +- Node 3.1
+    it('expands collapsed node with different levels in insertBatch', function() {
+      // This tree does not use a root node
+      tree = helper.createTree(helper.createModel([]));
+
+      function createNode(id, text, expanded, childNodeIndex) {
+        var node = helper.createModelNode(id, text, childNodeIndex);
+        node.expanded = expanded;
+        return node;
+      }
+
+      var n0 = createNode('n0', 'Node 0', true, 0);
+      var n1 = createNode('n1', 'Node 1', true, 0);
+      var n1_1 = createNode('n1_1', 'Node 1.1', true, 0);
+      var n1_2 = createNode('n1_2', 'Node 1.2', true, 1);
+      var n1_3 = createNode('n1_3', 'Node 1.3', true, 2);
+      var n1_4 = createNode('n1_4', 'Node 1.4', true, 3);
+      var n1_5 = createNode('n1_5', 'Node 1.5', true, 4);
+      var n1_6 = createNode('n1_6', 'Node 1.6', true, 5);
+      var n1_7 = createNode('n1_7', 'Node 1.7', true, 6);
+      var n1_8 = createNode('n1_8', 'Node 1.8', true, 7);
+      var n1_9 = createNode('n1_9', 'Node 1.9', true, 8);
+      var n1_10 = createNode('n1_10', 'Node 1.10', true, 9);
+      var n1_11 = createNode('n1_11', 'Node 1.11', true, 10);
+      var n1_12 = createNode('n1_12', 'Node 1.12', true, 11);
+      var n1_13 = createNode('n1_13', 'Node 1.13', true, 12);
+      var n2 = createNode('n2', 'Node 2', true, 1);
+      var n3 = createNode('n3', 'Node 3', true, 2);
+      var n3_1 = createNode('n3_1', 'Node 3.1', true);
+
+      tree.insertNodes([n0], null);
+      tree.insertNodes([n1, n2, n3], tree.nodes[0]);
+      tree.insertNodes([n1_1, n1_2, n1_3, n1_4, n1_5, n1_6, n1_7, n1_8, n1_9, n1_10, n1_11, n1_12, n1_13], tree.nodes[0].childNodes[0]);
+      tree.insertNodes([n3_1], tree.nodes[0].childNodes[2]);
+
+      tree.render(session.$entryPoint);
+      tree.htmlComp.pixelBasedSizing = true;
+      tree.htmlComp.setSize(new scout.Dimension(190, 190));
+      tree.viewRangeSize = 14;
+
+      function expectVisibleNodesFlatToBe(nodes) {
+        var expected = tree.visibleNodesFlat.map(function(node) {
+          return node.id;
+        }).join(', ');
+        var actual = nodes.map(function(node) {
+          return node.id;
+        }).join(', ');
+        expect(expected).toEqual(actual);
+      }
+
+      // Check visibleNodesFlat
+
+      expectVisibleNodesFlatToBe([
+        n0,
+        n1,
+        n1_1,
+        n1_2,
+        n1_3,
+        n1_4,
+        n1_5,
+        n1_6,
+        n1_7,
+        n1_8,
+        n1_9,
+        n1_10,
+        n1_11,
+        n1_12,
+        n1_13,
+        n2,
+        n3,
+        n3_1
+      ]);
+
+      // Collapse "node 0" and check visibleNodesFlat again
+
+      tree.setNodeExpanded(tree.nodes[0], false, {
+        renderAnimated: false
+      });
+
+      expectVisibleNodesFlatToBe([
+        n0
+      ]);
+
+      // Expand "node 0" and check visibleNodesFlat again
+
+      tree.setNodeExpanded(tree.nodes[0], true, {
+        renderAnimated: false
+      });
+
+      expectVisibleNodesFlatToBe([
+        n0,
+        n1,
+        n1_1,
+        n1_2,
+        n1_3,
+        n1_4,
+        n1_5,
+        n1_6,
+        n1_7,
+        n1_8,
+        n1_9,
+        n1_10,
+        n1_11,
+        n1_12,
+        n1_13,
+        n2,
+        n3,
+        n3_1
       ]);
     });
 
