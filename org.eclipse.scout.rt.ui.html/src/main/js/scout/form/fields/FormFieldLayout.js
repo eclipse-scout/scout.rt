@@ -48,7 +48,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
       if (formField.$label.hasClass('empty')) {
         labelWidth = 0;
       } else {
-        labelWidth = scout.graphics.prefSize(formField.$label, true).width;
+        labelWidth = scout.graphics.prefSize(formField.$label).width;
       }
     }
     if (scout.isOneOf(formField.labelPosition, scout.FormField.LabelPosition.DEFAULT, scout.FormField.LabelPosition.LEFT)) {

@@ -11,6 +11,9 @@
 describe('FormFieldLayout', function() {
   var session;
   var helper;
+  // Sizes are with margin, static widths and heights are without margin
+  var formField, rowHeight, mandatoryWidth, statusWidth, labelWidth, labelHeight;
+  var mandatorySize, mandatoryMargins, labelSize, labelMargins, fieldSize, fieldMargins, statusSize, statusMargins;
 
   var CustomFormField = function() {
     CustomFormField.parent.call(this);
@@ -22,6 +25,7 @@ describe('FormFieldLayout', function() {
     this.addLabel();
     this.$label.css({
       display: 'inline-block',
+      position: 'absolute',
       minHeight: 30,
       minWidth: 80,
       margin: 5
@@ -30,14 +34,16 @@ describe('FormFieldLayout', function() {
     this.addMandatoryIndicator();
     this.$mandatory.css({
       display: 'inline-block',
+      position: 'absolute',
       minHeight: 25,
-      minWidth: 10,
+      minWidth: 5,
       margin: 2
     });
 
     this.addField(this.$parent.makeDiv());
     this.$fieldContainer.css({
       display: 'inline-block',
+      position: 'absolute',
       minHeight: 40,
       minWidth: 100,
       margin: 5
@@ -46,6 +52,7 @@ describe('FormFieldLayout', function() {
     this.addStatus();
     this.$status.css({
       display: 'inline-block',
+      position: 'absolute',
       minHeight: 30,
       minWidth: 40,
       margin: 5
@@ -56,54 +63,51 @@ describe('FormFieldLayout', function() {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new scout.FormSpecHelper(session);
+    rowHeight = scout.HtmlEnvironment.formRowHeight;
+    mandatoryWidth = scout.HtmlEnvironment.fieldMandatoryIndicatorWidth;
+    statusWidth = scout.HtmlEnvironment.fieldStatusWidth;
+    labelWidth = scout.HtmlEnvironment.fieldLabelWidth;
+    // Label is currently always as height as a row, which is expected by LogicalGridData.logicalRowHeightAddition
+    // This may be changed in the future if multiline labels or smaller labels are demanded
+    labelHeight = rowHeight;
+
+    formField = new CustomFormField();
+    formField.init({
+      parent: session.desktop,
+      label: 'abc'
+    });
+    formField.render();
   });
 
-  describe('prefSize', function() {
-    // Sizes are with margin, static widths and heights are without margin
-    var formField, rowHeight, mandatoryWidth, statusWidth, labelWidth,labelHeight;
-    var mandatorySize, mandatoryMargins, labelSize, labelMargins, fieldSize, fieldMargins, statusSize, statusMargins;
+  function readSizes() {
+    mandatorySize = scout.graphics.prefSize(formField.$mandatory, true);
+    mandatoryMargins = scout.graphics.margins(formField.$mandatory);
+    labelSize = scout.graphics.prefSize(formField.$label, true);
+    labelMargins = scout.graphics.margins(formField.$label);
+    fieldSize = scout.graphics.prefSize(formField.$fieldContainer, true);
+    fieldMargins = scout.graphics.margins(formField.$fieldContainer);
+    statusSize = scout.graphics.prefSize(formField.$status, true);
+    statusMargins = scout.graphics.margins(formField.$status);
+  }
 
-    beforeEach(function() {
-      rowHeight = scout.HtmlEnvironment.formRowHeight;
-      mandatoryWidth = scout.HtmlEnvironment.fieldMandatoryIndicatorWidth;
-      statusWidth = scout.HtmlEnvironment.fieldStatusWidth;
-      labelWidth = scout.HtmlEnvironment.fieldLabelWidth;
-      // Label is currently always as height as a row, which is expected by LogicalGridData.logicalRowHeightAddition
-      // This may be changed in the future if multiline labels or smaller labels are demanded
-      labelHeight = rowHeight;
-
-      formField = new CustomFormField();
-      formField.init({
-        parent: session.desktop,
-        label: 'abc'
-      });
-      formField.render();
+  /**
+   * Calls the given function when scout.graphics.prefSize is called for the $fieldContainer
+   */
+  function spyForWidthHint(func) {
+    var spy = spyOn(scout.graphics, 'prefSize');
+    spy.and.callFake(function($elem, options) {
+      var widthHint, heightHint;
+      if ($elem[0] === formField.$fieldContainer[0]) {
+        widthHint = options.widthHint;
+        heightHint = options.heightHint;
+      }
+      spy.and.callThrough(); // Replace with original function again
+      func(widthHint, heightHint);
+      return scout.graphics.prefSize($elem, options);
     });
+  }
 
-    function readSizes() {
-      mandatorySize = scout.graphics.prefSize(formField.$mandatory, true);
-      mandatoryMargins = scout.graphics.margins(formField.$mandatory);
-      labelSize = scout.graphics.prefSize(formField.$label, true);
-      labelMargins = scout.graphics.margins(formField.$label);
-      fieldSize = scout.graphics.prefSize(formField.$fieldContainer, true);
-      fieldMargins = scout.graphics.margins(formField.$fieldContainer);
-      statusSize = scout.graphics.prefSize(formField.$status, true);
-      statusMargins = scout.graphics.margins(formField.$status);
-    }
-
-    function spyForWidthHint(func) {
-      var spy = spyOn(scout.graphics, 'prefSize');
-      spy.and.callFake(function($elem, options) {
-        var widthHint, heightHint;
-        if ($elem[0] === formField.$fieldContainer[0]) {
-          widthHint = options.widthHint;
-          heightHint = options.heightHint;
-        }
-        spy.and.callThrough(); // Replace with original function again
-        func(widthHint, heightHint);
-        return scout.graphics.prefSize($elem, options);
-      });
-    }
+  describe('prefSize', function() {
 
     describe('labelPosition', function() {
 
@@ -366,6 +370,23 @@ describe('FormFieldLayout', function() {
           });
           expect(formField.htmlComp.prefSize({widthHint: 400}).width).toBe(400);
           expect(widthHint).toBe(expectedWidthHint);
+        });
+      });
+    });
+  });
+
+  describe('layout', function() {
+
+    describe('labelWidthInPixel', function() {
+
+      describe('UI', function() {
+
+        it('makes the label as width as its content', function() {
+          formField.setLabelWidthInPixel(scout.FormField.LabelWidth.UI);
+          readSizes();
+          formField.htmlComp.validateLayout();
+          expect(formField.$label.outerWidth(true)).toBe(labelSize.width);
+          expect(formField.$fieldContainer.cssLeft()).toBe(labelSize.width + mandatoryWidth + mandatoryMargins.horizontal());
         });
       });
     });
