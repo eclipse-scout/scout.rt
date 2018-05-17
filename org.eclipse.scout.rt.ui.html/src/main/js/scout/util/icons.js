@@ -70,6 +70,12 @@ scout.icons = {
   PENCIL: 'font:\uE02F',
   PENCIL_BOLD: 'font:\uE04B',
   PENCIL_SOLID: 'font:\uE04F',
+  BOLD: 'font:\uE051',
+  ITALIC: 'font:\uE052',
+  UNDERLINE: 'font:\uE053',
+  STRIKETHROUGH: 'font:\uE054',
+  LIST_UL: 'font:\uE055',
+  LIST_OL: 'font:\uE056',
 
   /* font awesome icons */
   ROTATE_LEFT_BOLD: 'font:\uF0E2',
