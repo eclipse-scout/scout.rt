@@ -215,7 +215,7 @@ scout.SmartField2.prototype.acceptInput = function() {
 scout.SmartField2.prototype._getSelectedLookupRow = function(searchTextChanged) {
   // don't use selected lookup row if...
   if (!this.isPopupOpen() || // 1. popup has been closed
-     (searchTextChanged && this._userWasTyping)) { // 2. search text has changed, or user was typing
+     (searchTextChanged && this._userWasTyping)) { // 2. search text has changed and or user was typing
     return null;
   }
   // 3. if the result row is from an out-dated result
@@ -265,7 +265,7 @@ scout.SmartField2.prototype._acceptInput = function(searchText, searchTextEmpty,
       // clear the error status from previous search which did not find any results. This error status is no longer valid as we accept the null content here.
       this.clearErrorStatus();
     }
-    this._inputAccepted(searchTextChanged);
+    this._inputAccepted(searchTextChanged || this._userWasTyping);
     return;
   }
 
