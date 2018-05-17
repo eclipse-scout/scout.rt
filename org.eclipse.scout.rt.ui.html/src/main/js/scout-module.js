@@ -87,6 +87,7 @@
   __include("scout/session/WidgetEventTypeFilter.js");
   // Basic layout
   __include("scout/layout/graphics.js");
+  __include("scout/layout/HtmlEnvironment.js");
   __include("scout/layout/AbstractLayout.js");
   __include("scout/layout/HtmlComponent.js");
   __include("scout/layout/LayoutConstants.js");
