@@ -1561,9 +1561,11 @@ scout.Tree.prototype._addChildrenToFlatList = function(parentNode, parentIndex, 
  */
 scout.Tree.prototype._addChildrenToFlatListIfExpanded = function(indexOffset, node, insertIndex, animatedRendering, insertBatch, forceFilter) {
   if (node.expanded && node.childNodes.length) {
-    if (insertBatch.containsNode(node.parentNode)) {
+    if (insertBatch.containsNode(node.parentNode) || insertBatch.length() > 1) {
       // if parent node is already in the batch, do not change the insertIndex,
       // only append child nodes below that parent node
+      // Also, if the batch is not empty (i.e. contains more nodes than the current node),
+      // the insert index was already calculated previously and must not be changed.
       insertIndex = insertBatch.insertAt();
     } else {
       insertIndex = this._findInsertPositionInFlatList(node);
@@ -1701,6 +1703,9 @@ scout.Tree.prototype.newInsertBatch = function(insertIndex) {
     },
     isEmpty: function() {
       return this.insertNodes.length === 2;
+    },
+    length: function() {
+      return this.insertNodes.length - 2;
     },
     insertAt: function() {
       return this.insertNodes[0];
