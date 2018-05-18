@@ -27,14 +27,28 @@
       text-overflow: clip;
     }
 
+    .disabled&{
+      color: @text-disabled-color;
+    }
+
+    .read-only& {
+      color: @text-color;
+    }
+
     &.top {
-      color: @top-label-alternative-color;
+      color: @top-label-color;
       font-size: @top-label-font-size;
       padding-bottom: @top-label-border-padding-bottom;
 
       .alternative& {
         /* Reduce space between input and label if there is no border */
         padding-bottom: 0;
+      }
+
+      .disabled&,
+      .read-only& {
+        /* Always use same color for top labels even if it is disabled or read only */
+        color: @top-label-color;
       }
     }
 
@@ -71,16 +85,8 @@
     visibility: visible;
   }
 
-  &.disabled > label {
-    color: @text-disabled-color;
-  }
-
   &.disabled.alternative > .mandatory-indicator {
     color: @disabled-color;
-  }
-
-  &.read-only > label {
-    color: @text-color;
   }
 
   & > .status {

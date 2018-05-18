@@ -362,6 +362,13 @@ scout.FormField.prototype._renderLabelVisible = function() {
   var visible = this.labelVisible;
   this._renderChildVisible(this.$label, visible);
   this.$container.toggleClass('label-hidden', !visible);
+  if (this.rendered && this.labelPosition === scout.FormField.LabelPosition.TOP) {
+    // See _renderLabelPosition why it is necessary to invalidate parent as well.
+    var htmlCompParent = this.htmlComp.getParent();
+    if (htmlCompParent) {
+      htmlCompParent.invalidateLayoutTree();
+    }
+  }
 };
 
 scout.FormField.prototype.setLabelWidthInPixel = function(labelWidthInPixel) {
