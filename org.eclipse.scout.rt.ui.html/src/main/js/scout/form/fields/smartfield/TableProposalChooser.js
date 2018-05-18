@@ -24,7 +24,8 @@ scout.TableProposalChooser.prototype._createModel = function() {
       var column = scout.create('Column', {
         index: index,
         session: this.session,
-        text: descriptor.text
+        text: descriptor.text,
+        width: scout.Column.NARROW_MIN_WIDTH
       });
       if (descriptor.width) {
         column.width = descriptor.width;
@@ -36,7 +37,8 @@ scout.TableProposalChooser.prototype._createModel = function() {
     }, this);
   } else {
     columns.push(scout.create('Column', {
-      session: this.session
+      session: this.session,
+      width: scout.Column.NARROW_MIN_WIDTH
     }));
   }
 
