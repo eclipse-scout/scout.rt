@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util;
 
+import static org.eclipse.scout.rt.platform.util.NumberUtility.divideAndCeil;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -72,6 +73,17 @@ public class NumberUtilityTest {
     ScoutAssert.assertComparableEquals(new BigDecimal("999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999"),
         NumberUtility.numberToBigDecimal(new BigInteger("999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999")));
     ScoutAssert.assertComparableEquals(BigDecimal.valueOf(Double.MAX_VALUE), NumberUtility.numberToBigDecimal(BigDecimal.valueOf(Double.MAX_VALUE)));
+  }
+
+  @Test
+  public void testDivideAndCeil() {
+    assertEquals(2, divideAndCeil(8, 4));
+    assertEquals(3, divideAndCeil(9, 4));
+    assertEquals(3, divideAndCeil(10, 4));
+    assertEquals(3, divideAndCeil(11, 4));
+    assertEquals(3, divideAndCeil(12, 4));
+    assertEquals(4, divideAndCeil(13, 4));
+    assertEquals(12, divideAndCeil(12, 1));
   }
 
   @Test

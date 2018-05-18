@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal;
 
+import static org.eclipse.scout.rt.platform.util.NumberUtility.divideAndCeil;
+
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
@@ -31,7 +33,7 @@ public class VerticalSmartGroupBoxBodyGrid extends AbstractGroupBoxBodyGrid {
       cellCount += hints.w * hints.h;
     }
 
-    int rowCount = (cellCount + getGridColumnCount() - 1) / getGridColumnCount();
+    int rowCount = divideAndCeil(cellCount, getGridColumnCount());
     VerticalGridMatrix matrix = new VerticalGridMatrix(getGridColumnCount(), rowCount);
     while (!matrix.computeGridData(fields)) {
       matrix.resetAll(getGridColumnCount(), ++rowCount);

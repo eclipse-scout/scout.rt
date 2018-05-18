@@ -18,6 +18,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 
@@ -118,7 +119,7 @@ public class HtmlComponent {
     int valueLen = value.length();
     int cols = 50;
     int rows = 1;
-    rows = Math.max(rows, (valueLen + cols - 1) / cols);
+    rows = Math.max(rows, NumberUtility.divideAndCeil(valueLen, cols));
     rows = Math.max(rows, StringUtility.getLineCount(value));
     m_out.print("<textarea rows=" + rows + " cols=" + cols + " name='" + fieldName + "'>");
     print(value);

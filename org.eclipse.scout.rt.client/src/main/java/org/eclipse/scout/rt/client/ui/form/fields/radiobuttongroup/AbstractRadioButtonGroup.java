@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup;
 
 import static org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility.connectFields;
+import static org.eclipse.scout.rt.platform.util.NumberUtility.divideAndCeil;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -275,11 +276,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     if (hints != null && hints.h > 1) {
       height = hints.h;
     }
-    return roundUp(m_fields.size(), height);
-  }
-
-  private static int roundUp(int dividend, int divisor) {
-    return (dividend + divisor - 1) / divisor;
+    return divideAndCeil(m_fields.size(), height);
   }
 
   /**

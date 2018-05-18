@@ -52,6 +52,24 @@ public final class NumberUtility {
   }
 
   /**
+   * Divides dividend by divisor and rounds up to the next integer value.
+   * <p>
+   * More formally: Performs the same calculation as {@code (int) Math.ceil((double) divident / divisor)} but without
+   * using floating point arithmetics.
+   *
+   * @param dividend
+   *          The dividend
+   * @param divisor
+   *          The divisor. Must not be zero!
+   * @return {@code (int)ceil(divident / divisor)}
+   * @throws ArithmeticException
+   *           if divisor is zero.
+   */
+  public static int divideAndCeil(int dividend, int divisor) {
+    return (dividend + divisor - 1) / divisor;
+  }
+
+  /**
    * Converts a Number to an Integer.
    *
    * @param n

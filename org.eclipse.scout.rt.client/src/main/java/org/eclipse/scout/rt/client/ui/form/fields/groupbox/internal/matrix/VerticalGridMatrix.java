@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.matrix;
 
+import static org.eclipse.scout.rt.platform.util.NumberUtility.divideAndCeil;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -146,7 +148,7 @@ public class VerticalGridMatrix implements IGridMatrix {
     });
     reorgBounds.y = minY;
 
-    VerticalGridMatrix reorgMatrix = new VerticalGridMatrix(reorgBounds.x, reorgBounds.y, reorgBounds.w, (usedCells + reorgBounds.w - 1) / reorgBounds.w);
+    VerticalGridMatrix reorgMatrix = new VerticalGridMatrix(reorgBounds.x, reorgBounds.y, reorgBounds.w, divideAndCeil(usedCells, reorgBounds.w));
     reorgMatrix.addCells(occupiedCells);
     while (!reorgMatrix.computeGridData(sortedFieldsToReorganize)) {
       reorgMatrix.resetAll(reorgMatrix.getColumnCount(), reorgMatrix.getRowCount() + 1);
