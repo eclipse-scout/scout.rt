@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.internal;
 
+import static org.eclipse.scout.rt.platform.util.NumberUtility.divideAndCeil;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +21,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.ICompositeFieldGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Grid (model) layout of radio button group only visible process-buttons are used. This class distributes all buttons
@@ -29,8 +29,6 @@ import org.slf4j.LoggerFactory;
  * field.
  */
 public class RadioButtonGroupGrid implements ICompositeFieldGrid<ICompositeField> {
-
-  private static final Logger LOG = LoggerFactory.getLogger(RadioButtonGroupGrid.class);
 
   private IRadioButtonGroup<?> m_group = null;
   private List<IFormField> m_fields;
@@ -65,19 +63,13 @@ public class RadioButtonGroupGrid implements ICompositeFieldGrid<ICompositeField
    * Sets GridData on each button (= field) of the group.
    */
   protected void applyGridData() {
-    GridData parentData = m_group.getGridData();
-    if (parentData.h <= 0) {
-      LOG.error("{} has gridData.h={}; expected value>0", m_group.getClass().getName(), parentData.h);
-      m_gridRows = 1;
-    }
-    else if (m_fields.size() <= 0) {
-      LOG.error("{} has fieldCount={}; expected value>0", m_group.getClass().getName(), m_fields.size());
-      m_gridRows = 1;
+    m_gridColumns = m_group.getGridColumnCount();
+    if (m_gridColumns == 0) {
+      m_gridRows = 0;
     }
     else {
-      m_gridRows = Math.min(parentData.h, m_fields.size());
+      m_gridRows = divideAndCeil(m_fields.size(), m_gridColumns);
     }
-    m_gridColumns = m_group.getGridColumnCount();
     int i = 0;
     for (int r = 0; r < m_gridRows; r++) {
       for (int c = 0; c < m_gridColumns; c++) {
