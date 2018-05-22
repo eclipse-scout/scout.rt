@@ -232,7 +232,7 @@ public final class Assertions {
   }
 
   /**
-   * Asserts <code>value1</code> not to be equals with <code>value2</code>.
+   * Asserts <code>value1</code> not to be equal with <code>value2</code>.
    *
    * @param value1
    *          the value to be tested.
@@ -243,11 +243,11 @@ public final class Assertions {
    *           if <code>value1</code> is equals with <code>value2</code>.
    */
   public static <T> T assertNotEquals(final T value1, final Object value2) {
-    return assertNotEquals(value1, value2, "expected value1 to be equals with value2 [value1={}, value2={}]", value1, value2);
+    return assertNotEquals(value1, value2, "expected value1 not to be equal with value2 [value1={}, value2={}]", value1, value2);
   }
 
   /**
-   * Asserts <code>value1</code> not to be equals with <code>value2</code>.
+   * Asserts <code>value1</code> not to be equal with <code>value2</code>.
    *
    * @param value1
    *          the value to be tested.
