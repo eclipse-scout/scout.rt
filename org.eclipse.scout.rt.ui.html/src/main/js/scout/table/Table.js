@@ -2300,7 +2300,7 @@ scout.Table.prototype.expandRowsInternal = function(rows, expanded, recursive) {
     rowsForAnimation.forEach(function(row) {
       row.animateExpansion();
     });
-    this.revealSelection();
+//    this.revealSelection();
   }
 };
 
@@ -3153,7 +3153,8 @@ scout.Table.prototype._renderRowDelta = function() {
   if (!this.rendered) {
     return;
   }
-  var renderedRows = [];
+  var renderedRows = [],
+  scrollTop = this.$data[0].scrollTop;
   this.$rows().each(function(i, elem) {
     var $row = $(elem),
       row = $row.data('row');
@@ -3183,6 +3184,7 @@ scout.Table.prototype._renderRowDelta = function() {
       this._showRow(row);
     }
   }.bind(this));
+  this._renderScrollTop();
   this._renderEmptyData();
 };
 
