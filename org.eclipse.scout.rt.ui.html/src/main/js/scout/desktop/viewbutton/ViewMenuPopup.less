@@ -32,6 +32,7 @@
   font-size: 16px;
   #scout.overflow-ellipsis-nowrap();
   position: relative;
+  #scout.vertical-align-helper-before();
 
   &:first-child {
     border-top-color: transparent;
@@ -69,6 +70,14 @@
   }
 
   & > .icon {
-    margin-right: 8px;
+    position: relative;
+    font-size: 20px;
+    margin-right: 10px;
+    vertical-align: middle;
+    top: -1px;
+  }
+
+  & > .content {
+    vertical-align: middle;
   }
 }
