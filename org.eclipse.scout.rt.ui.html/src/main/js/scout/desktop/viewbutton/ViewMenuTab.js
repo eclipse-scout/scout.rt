@@ -135,14 +135,10 @@ scout.ViewMenuTab.prototype._findSelectedViewButton = function() {
  * Toggles the 'view menu popup', or brings the outline content to the front if in background.
  */
 scout.ViewMenuTab.prototype.togglePopup = function() {
-  if (this.inBackground) {
-    this.session.desktop.bringOutlineToFront(this.selectedButton.outline);
+  if (this.popup) {
+    this._closePopup();
   } else {
-    if (this.popup) {
-      this._closePopup();
-    } else {
-      this._openPopup();
-    }
+    this._openPopup();
   }
 };
 
