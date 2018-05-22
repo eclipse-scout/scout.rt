@@ -194,8 +194,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   @Override
   protected void initConfigInternal() {
-    // Run the initialization on behalf of this Desktop.
-    ClientRunContexts.copyCurrent().withDesktop(this).run(this::interceptInitConfig);
+    runWithDesktop(this::interceptInitConfig);
   }
 
   private void interceptInitConfig() {
@@ -233,7 +232,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   @Override
   public List<? extends IWidget> getChildren() {
-    return CollectionUtility.flatten(super.getChildren(), m_availableOutlines, getActions() /* contains keystrokes, menus, view-buttons*/,
+    return CollectionUtility.flatten(super.getChildren(), getAvailableOutlines(), getActions() /* contains keystrokes, menus, view-buttons*/,
         m_notifications, m_messageBoxStore.values(), m_selectedViewTabs.values(), m_formStore.values());
   }
 
@@ -676,6 +675,10 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   @Override
   protected void initInternal() {
+    runWithDesktop(this::interceptInitInternal);
+  }
+
+  protected void interceptInitInternal() {
     super.initInternal();
     // extensions
     for (IDesktopExtension ext : getDesktopExtensions()) {
@@ -1898,9 +1901,20 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   @Override
   protected void initChildren(List<? extends IWidget> widgets) {
+    runWithDesktop(() -> interceptInitChildren(widgets));
+  }
+
+  protected void interceptInitChildren(List<? extends IWidget> widgets) {
     // same as in dispose: exclude the forms. Form will be initialized when they are started.
     widgets.removeAll(m_formStore.values());
     super.initChildren(widgets);
+  }
+
+  /**
+   * Run the initialization runnable on behalf of this Desktop instance.
+   */
+  protected void runWithDesktop(IRunnable runnable) {
+    ClientRunContexts.copyCurrent().withDesktop(this).run(runnable);
   }
 
   @Override

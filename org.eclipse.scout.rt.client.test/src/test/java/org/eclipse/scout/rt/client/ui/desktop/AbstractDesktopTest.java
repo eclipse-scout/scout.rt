@@ -59,6 +59,8 @@ import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 @SuppressWarnings("deprecation")
 @RunWith(ClientTestRunner.class)
@@ -456,6 +458,34 @@ public class AbstractDesktopTest {
     catch (DeepLinkException e) { // NOSONAR
       // expected
     }
+  }
+
+  @Test
+  public void testInit() {
+    prepareMockDesktopWithOutline();
+
+    m_desktop = new AbstractDesktop(true) {
+      @Override
+      public List<IOutline> getAvailableOutlines() {
+        return Collections.singletonList(m_outline);
+      }
+
+      @Override
+      protected void initConfig() {
+        assertEquals(IDesktop.CURRENT.get(), this); // initConfig must be called within run context with reference to currently initializing desktop
+        super.initConfig();
+      }
+    };
+
+    Mockito.doAnswer(new Answer<Void>() {
+      @Override
+      public Void answer(InvocationOnMock invocation) throws Throwable {
+        assertEquals(IDesktop.CURRENT.get(), m_desktop); // init must be called within run context with reference to currently initializing desktop
+        return null;
+      }
+    }).when(m_outline).init();
+
+    m_desktop.init();
   }
 
   @ClassId("d090cc19-ba7a-4f79-b147-e58765a837fb")
