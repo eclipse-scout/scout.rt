@@ -10,7 +10,6 @@
  ******************************************************************************/
 scout.RadioButtonGroup = function() {
   scout.RadioButtonGroup.parent.call(this);
-  this._addWidgetProperties('fields');
   this.logicalGrid = scout.create('scout.HorizontalGrid');
   this.layoutConfig = null;
   this.fields = [];
@@ -18,12 +17,25 @@ scout.RadioButtonGroup = function() {
   this.gridColumnCount = scout.RadioButtonGroup.DEFAULT_GRID_COLUMN_COUNT;
   this.selectedButton = null;
   this.$body = null;
+  this.lookupStatus = null;
+  this.lookupCall = null;
+
   this._selectButtonLocked = false;
+  this._pendingLookup = null;
+  this._lookupInProgress = false;
+  this._currentLookupCall = null;
+
+  this._addWidgetProperties(['fields']);
+  this._addCloneProperties(['lookupCall']);
   this._buttonPropertyChangeHandler = this._onButtonPropertyChange.bind(this);
 };
 scout.inherits(scout.RadioButtonGroup, scout.ValueField);
 
 scout.RadioButtonGroup.DEFAULT_GRID_COLUMN_COUNT = -1;
+
+scout.RadioButtonGroup.ErrorCode = {
+  NO_DATA: 1
+};
 
 scout.RadioButtonGroup.prototype._init = function(model) {
   scout.RadioButtonGroup.parent.prototype._init.call(this, model);
@@ -33,13 +45,17 @@ scout.RadioButtonGroup.prototype._init = function(model) {
 };
 
 scout.RadioButtonGroup.prototype._initValue = function(value) {
-  // Initialize buttons first before calling set value, otherwise value could not be synchronized to the buttons
-  this.fields.forEach(function(formField) {
-    if (formField instanceof scout.RadioButton) {
-      this.radioButtons.push(formField);
-      this._initButton(formField);
-    }
-  }, this);
+  if (this.lookupCall) {
+    this._setLookupCall(this.lookupCall);
+  } else {
+    // Initialize buttons first before calling set value, otherwise value could not be synchronized to the buttons
+    this.fields.forEach(function(formField) {
+      if (formField instanceof scout.RadioButton) {
+        this.radioButtons.push(formField);
+        this._initButton(formField);
+      }
+    }, this);
+  }
   scout.RadioButtonGroup.parent.prototype._initValue.call(this, value);
 };
 
@@ -234,7 +250,7 @@ scout.RadioButtonGroup.prototype._validateValue = function(value) {
 
   // only show error if value is not null or undefined
   var buttonToSelect = this.getButtonForRadioValue(value);
-  if (!buttonToSelect && value !== null && value !== undefined) {
+  if (!buttonToSelect && value !== null && value !== undefined && !this._lookupInProgress) {
     throw this.session.text("InvalidValueMessageX", value);
   }
   return value;
@@ -315,4 +331,147 @@ scout.RadioButtonGroup.prototype._onButtonPropertyChange = function(event) {
   } else if (event.propertyName === 'focused') {
     this.setFocused(event.newValue);
   }
+};
+
+scout.RadioButtonGroup.prototype._setLookupCall = function(lookupCall) {
+  this._setProperty('lookupCall', scout.LookupCall.ensure(lookupCall, this.session));
+  this._lookupByAll();
+};
+
+scout.RadioButtonGroup.prototype._lookupByAll = function() {
+  if (!this.lookupCall) {
+    return;
+  }
+
+  this._clearPendingLookup();
+
+  var deferred = $.Deferred();
+  var doneHandler = function(result) {
+    this._lookupByAllDone(result);
+    deferred.resolve(result);
+  }.bind(this);
+
+  this._executeLookup(this.lookupCall.cloneForAll(), true)
+    .done(doneHandler);
+
+  return deferred.promise();
+};
+
+scout.RadioButtonGroup.prototype._clearPendingLookup = function() {
+  if (this._pendingLookup) {
+    clearTimeout(this._pendingLookup);
+    this._pendingLookup = null;
+  }
+};
+
+/**
+ * A wrapper function around lookup calls used to set the _lookupInProgress flag, and display the state in the UI.
+ */
+scout.RadioButtonGroup.prototype._executeLookup = function(lookupCall, abortExisting) {
+  this._lookupInProgress = true;
+  this.setLoading(true);
+
+  if (abortExisting && this._currentLookupCall) {
+    this._currentLookupCall.abort();
+  }
+  this._currentLookupCall = lookupCall;
+  this.trigger('prepareLookupCall', {
+    lookupCall: lookupCall
+  });
+
+  return lookupCall
+    .execute()
+    .always(function() {
+      this._lookupInProgress = false;
+      this._currentLookupCall = null;
+      this.setLoading(false);
+      this._clearLookupStatus();
+    }.bind(this));
+};
+
+scout.RadioButtonGroup.prototype._lookupByAllDone = function(result) {
+  // Oops! Something went wrong while the lookup has been processed.
+  if (result.exception) {
+    this.setErrorStatus(scout.Status.error({
+      message: result.exception
+    }));
+    return;
+  }
+
+  // 'No data' case
+  if (result.lookupRows.length === 0) {
+    this.setLookupStatus(scout.Status.warn({
+      message: this.session.text('SmartFieldNoDataFound'),
+      code: scout.RadioButtonGroup.ErrorCode.NO_DATA
+    }));
+    return;
+  }
+
+  this._populateRadioButtonGroup(result);
+};
+
+scout.RadioButtonGroup.prototype._populateRadioButtonGroup = function(result) {
+  var lookupRows = result.lookupRows;
+  this.radioButtons = [];
+  lookupRows.forEach(function(lookupRow) {
+    var radioButton = this._createLookupRowRadioButton(lookupRow);
+    this.fields.push(radioButton);
+    this.radioButtons.push(radioButton);
+    this._initButton(radioButton);
+  }, this);
+  // because the lookup call is asynchronus, reset the value so that it is revalidated.
+  this.setValue(this.value);
+  // also select the button (the line above does not change the value, therefore _valueChanged is not called)
+  this.selectButton(this.getButtonForRadioValue(this.value));
+};
+
+scout.RadioButtonGroup.prototype._clearLookupStatus = function() {
+  this.setLookupStatus(null);
+};
+
+scout.RadioButtonGroup.prototype.setLookupStatus = function(lookupStatus) {
+  this.setProperty('lookupStatus', lookupStatus);
+  if (this.rendered) {
+    this._renderErrorStatus();
+  }
+};
+
+scout.RadioButtonGroup.prototype._errorStatus = function() {
+  return this.lookupStatus || this.errorStatus;
+};
+
+scout.RadioButtonGroup.prototype._createLookupRowRadioButton = function(lookupRow) {
+  var button = {
+    parent: this,
+    label: lookupRow.text,
+    radioValue: lookupRow.key,
+    lookupRow: lookupRow
+  };
+
+  if (lookupRow.iconId) {
+    button.iconId = lookupRow.iconId;
+  }
+  if (lookupRow.tooltipText) {
+    button.tooltipText = lookupRow.tooltipText;
+  }
+  if (lookupRow.backgroundColor) {
+    button.backgroundColor = lookupRow.backgroundColor;
+  }
+  if (lookupRow.foregroundColor) {
+    button.foregroundColor = lookupRow.foregroundColor;
+  }
+  if (lookupRow.font) {
+    button.font = lookupRow.font;
+  }
+  if (lookupRow.enabled === false) {
+    button.enabled = false;
+  }
+  if (lookupRow.active === false) {
+    button.visible = false;
+  }
+  if (lookupRow.cssClass) {
+    button.cssClass = lookupRow.cssClass;
+  }
+
+  return scout.create('RadioButton', button);
 };

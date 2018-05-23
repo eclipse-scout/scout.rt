@@ -16,6 +16,11 @@ describe("RadioButtonGroup", function() {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new scout.FormSpecHelper(session);
+    jasmine.clock().install();
+  });
+
+  afterEach(function() {
+    jasmine.clock().uninstall();
   });
 
   function expectEnabled(field, expectedEnabled, expectedEnabledComputed, hasClass) {
@@ -108,6 +113,51 @@ describe("RadioButtonGroup", function() {
       expect(radioButtonGroup.radioButtons[0].selected).toBe(false);
       expect(radioButtonGroup.radioButtons[1].selected).toBe(true);
     });
+  });
+
+  describe('lookupCall', function(){
+
+    it('creates a radio button for each lookup row', function(){
+      var radioButtonGroup = scout.create('RadioButtonGroup', {
+        parent: session.desktop,
+        lookupCall: "DummyLookupCall"
+      });
+
+      jasmine.clock().tick(300);
+      expect(radioButtonGroup.radioButtons.length).toBe(3);
+      expect(radioButtonGroup.lookupCall).not.toBe(null);
+      expect(radioButtonGroup.errorStatus).toBe(null);
+    });
+
+    it('selects correct radio button', function(){
+      var radioButtonGroup = scout.create('RadioButtonGroup', {
+        parent: session.desktop,
+        lookupCall: "DummyLookupCall",
+        value: 1
+      });
+
+      jasmine.clock().tick(300);
+      expect(radioButtonGroup.radioButtons.length).toBe(3);
+      expect(radioButtonGroup.errorStatus).toBe(null);
+      expect(radioButtonGroup.lookupCall).not.toBe(null);
+      expect(radioButtonGroup.value).toBe(1);
+      expect(radioButtonGroup.selectedButton.radioValue).toBe(1);
+    });
+
+    it('lookupRow lives on the radioButton', function(){
+      var radioButtonGroup = scout.create('RadioButtonGroup', {
+        parent: session.desktop,
+        lookupCall: "DummyLookupCall"
+      });
+
+      jasmine.clock().tick(300);
+      radioButtonGroup.setValue(2);
+      expect(radioButtonGroup.value).toBe(2);
+      expect(radioButtonGroup.errorStatus).toBe(null);
+      expect(radioButtonGroup.selectedButton.radioValue).toBe(2);
+      expect(radioButtonGroup.selectedButton.lookupRow.key).toBe(2);
+    });
+
   });
 
   describe('setValue', function() {
