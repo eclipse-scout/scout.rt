@@ -2300,7 +2300,6 @@ scout.Table.prototype.expandRowsInternal = function(rows, expanded, recursive) {
     rowsForAnimation.forEach(function(row) {
       row.animateExpansion();
     });
-//    this.revealSelection();
   }
 };
 

@@ -641,6 +641,9 @@ scout.Desktop.prototype._renderNotification = function(notification) {
   notification.fadeIn(this.$notifications);
   if (notification.duration > 0) {
     notification.removeTimeout = setTimeout(notification.hide.bind(notification), notification.duration);
+    notification.one('remove', function(){
+      this.removeNotification(notification);
+    }.bind(this));
   }
 };
 

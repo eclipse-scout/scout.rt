@@ -119,6 +119,10 @@ scout.DesktopNotification.prototype.fadeOut = function() {
     this.destroy();
     return;
   }
+
+  if(!this.rendered){
+    return;
+  }
   // prevent fadeOut from running more than once (for instance from the click of a user).
   if (this._removing) {
     return;
