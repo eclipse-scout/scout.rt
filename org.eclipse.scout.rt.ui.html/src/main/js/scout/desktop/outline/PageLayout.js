@@ -68,7 +68,7 @@ scout.PageLayout.prototype.preferredLayoutSize = function($container) {
   containerSize = htmlContainer.size()
     .subtract(htmlContainer.insets());
 
-  if (nodeMenuBar.visible) {
+  if (nodeMenuBar.visible && nodeMenuBar.rendered) {
     nodeMenuBarWidth = nodeMenuBar.htmlComp.prefSize().width;
   }
 
@@ -83,7 +83,7 @@ scout.PageLayout.prototype.preferredLayoutSize = function($container) {
   }
   titlePrefHeight = Math.max(textHeight, iconHeight);
 
-  if (detailMenuBar.visible) {
+  if (detailMenuBar.visible && detailMenuBar.rendered) {
     detailMenuBarPrefSize = detailMenuBar.htmlComp.prefSize();
   }
   if (this.outline.detailContent) {
