@@ -86,7 +86,7 @@ scout.SmartColumn.prototype._formatValue = function(value) {
 };
 
 scout.SmartColumn.prototype._createEditor = function() {
-  return scout.create('SmartField', {
+  var field = scout.create('SmartField', {
     parent: this.table,
     codeType: this.codeType,
     lookupCall: this.lookupCall,
@@ -99,4 +99,12 @@ scout.SmartColumn.prototype._createEditor = function() {
       horizontalAlignment: this.horizontalAlignment
     }
   });
+
+  field.on('prepareLookupCall', function(event) {
+    this.trigger('prepareLookupCall', {
+      lookupCall: event.lookupCall
+    });
+  }.bind(this));
+
+  return field;
 };

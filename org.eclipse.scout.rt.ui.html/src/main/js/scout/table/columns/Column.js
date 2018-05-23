@@ -48,6 +48,8 @@ scout.Column = function() {
   this.tableNodeLevel0CellPadding = 28;
   this.expandableIconLevel0CellPadding = 13;
 
+  this.events = this._createEventSupport();
+
   this._tableColumnsChangedHandler = this._onTableColumnsChanged.bind(this);
 };
 
@@ -720,4 +722,43 @@ scout.Column.prototype._onTableColumnsChanged = function(event) {
     this.tableNodeLevel0CellPadding = 23;
     this.expandableIconLevel0CellPadding = 8;
   }
+};
+
+//--- Event handling methods ---
+scout.Column.prototype._createEventSupport = function() {
+  return new scout.EventSupport();
+};
+
+scout.Column.prototype.trigger = function(type, event) {
+  event = event || {};
+  event.source = this;
+  this.events.trigger(type, event);
+};
+
+scout.Column.prototype.one = function(type, func) {
+  this.events.one(type, func);
+};
+
+scout.Column.prototype.on = function(type, func) {
+  return this.events.on(type, func);
+};
+
+scout.Column.prototype.off = function(type, func) {
+  this.events.off(type, func);
+};
+
+scout.Column.prototype.addListener = function(listener) {
+  this.events.addListener(listener);
+};
+
+scout.Column.prototype.removeListener = function(listener) {
+  this.events.removeListener(listener);
+};
+
+/**
+ * Adds an event handler using {@link #one()} and returns a promise.
+ * The promise is resolved as soon as the event is triggered.
+ */
+scout.Column.prototype.when = function(type) {
+  return this.events.when(type);
 };
