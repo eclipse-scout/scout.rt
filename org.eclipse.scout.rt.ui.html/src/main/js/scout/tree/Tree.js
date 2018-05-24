@@ -31,10 +31,12 @@ scout.Tree = function() {
   this.multiCheck = true;
   this.nodes = []; // top-level nodes
   this.nodesMap = {}; // all nodes by id
+  this.nodePaddingLevelCheckable = 23; /* padding for one tree-level if the tree is checkable */
+  this.nodePaddingLevelNotCheckable = 18; /* padding for one tree-level if the tree is not checkable. this includes outline trees! */
   this.nodePaddingLeft = null; /* is read from CSS */
   this.nodeCheckBoxPaddingLeft = 29;
   this.nodeControlPaddingLeft = null; /* is read from CSS */
-  this.nodePaddingLevel = 15;
+  this.nodePaddingLevel = this.nodePaddingLevelNotCheckable;
   this.scrollToSelection = false;
   this.scrollTop = 0;
   this.selectedNodes = [];
@@ -96,6 +98,7 @@ scout.Tree.prototype._init = function(model) {
     this.addFilter(this.breadcrumbFilter, true, true);
   }
   this.initialTraversing = true;
+  this._setCheckable(this.checkable);
   this._ensureTreeNodes(this.nodes);
   this.visitNodes(this._initTreeNode.bind(this));
   this.visitNodes(this._updateFlatListAndSelectionPath.bind(this));
@@ -520,9 +523,14 @@ scout.Tree.prototype._renderFiller = function() {
 };
 
 scout.Tree.prototype._calculateFillerDimension = function(range) {
+  var outerWidth = 0;
+  if (this.rendered) {
+    // the outer-width is only correct if this tree is already rendered. otherwise wrong values are returned.
+    outerWidth = this.$data.outerWidth();
+  }
   var dimension = {
     height: 0,
-    width: Math.max(this.$data.outerWidth(), this.maxNodeWidth)
+    width: Math.max(outerWidth, this.maxNodeWidth)
   };
   for (var i = range.from; i < range.to; i++) {
     var node = this.visibleNodesFlat[i];
@@ -884,6 +892,19 @@ scout.Tree.prototype._renderEnabled = function() {
   }
 };
 
+scout.Tree.prototype.setCheckable = function(checkable) {
+  this.setProperty('checkable', checkable);
+};
+
+scout.Tree.prototype._setCheckable = function(checkable) {
+  this._setProperty('checkable', checkable);
+  if (this.checkable) {
+    this.nodePaddingLevel = this.nodePaddingLevelCheckable;
+  } else {
+    this.nodePaddingLevel = this.nodePaddingLevelNotCheckable;
+  }
+};
+
 scout.Tree.prototype._renderCheckable = function() {
   // Define helper functions
   var isNodeRendered = function(node) {
@@ -894,13 +915,12 @@ scout.Tree.prototype._renderCheckable = function() {
     var $control = $node.children('.tree-node-control');
     var $checkbox = $node.children('.tree-node-checkbox');
 
+    node._updateControl($control, this);
     if (this.checkable) {
-      $control.addClass('checkable');
       if ($checkbox.length === 0) {
         node._renderCheckbox();
       }
     } else {
-      $control.removeClass('checkable');
       $checkbox.remove();
     }
 
@@ -1918,10 +1938,11 @@ scout.Tree.prototype.isNodeSelected = function(node) {
 
 scout.Tree.prototype._computeNodePaddingLeft = function(level) {
   this._computeNodePaddings();
+  var padding = level * this.nodePaddingLevel + this.nodePaddingLeft;
   if (this.checkable) {
-    return level * this.nodePaddingLevel + this.nodePaddingLeft + this.nodeCheckBoxPaddingLeft;
+    padding += this.nodeCheckBoxPaddingLeft;
   }
-  return level * this.nodePaddingLevel + this.nodePaddingLeft;
+  return padding;
 };
 
 /**

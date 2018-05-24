@@ -217,11 +217,12 @@ scout.TreeNode.prototype.$icon = function() {
 };
 
 scout.TreeNode.prototype._renderControl = function() {
-  var tree = this.getTree();
   var $control = this.$node.prependDiv('tree-node-control');
-  if (tree.checkable) {
-    $control.addClass('checkable');
-  }
+  this._updateControl($control, this.getTree());
+};
+
+scout.TreeNode.prototype._updateControl = function($control, tree) {
+  $control.toggleClass('checkable', tree.checkable);
   $control.cssPaddingLeft(tree.nodeControlPaddingLeft + this.level * tree.nodePaddingLevel);
   $control.setVisible(!this.leaf);
 };
@@ -312,7 +313,7 @@ scout.TreeNode.prototype._updateIconWidth = function() {
   if (this.iconId) {
     // always add 1 pixel to the result of outer-width to prevent rendering errors in IE, where
     // the complete text is replaced by an ellipsis, when the .text element is a bit too large
-    cssWidth = 'calc(100% - '+ (this.$icon().outerWidth() + 1) + 'px)';
+    cssWidth = 'calc(100% - ' + (this.$icon().outerWidth() + 1) + 'px)';
   }
   this.$text.css('max-width', cssWidth);
 };

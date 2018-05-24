@@ -46,7 +46,8 @@ scout.Outline = function() {
   this._detailContentDestroyHandler = this._onDetailContentDestroy.bind(this);
   this._detailMenusNodesSelectedHandler = null;
   this._additionalContainerClasses += ' outline';
-  this.nodePaddingLevel = 20;
+  this.nodePaddingLevelCheckable = 20; /* outline is not checkable. set to same value as not-checkable */
+  this.nodePaddingLevelNotCheckable = 20; /* outline uses different level-paddings that normal trees */
   this._scrolldirections = 'y';
   this._addWidgetProperties(['defaultDetailForm', 'views', 'selectedViewTabs', 'dialogs', 'messageBoxes', 'fileChoosers']);
 };
