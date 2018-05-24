@@ -190,12 +190,12 @@
     cursor: default;
 
     & > .table-info-button {
-      text-decoration: none;
+      color: @table-info-color;
     }
   }
 
   & > .table-info-button {
-    text-decoration: underline;
+    color: @link-color;
 
     & > .key-box {
       bottom: 2px;
@@ -203,7 +203,7 @@
   }
 
   &:hover > .table-info-button {
-    color: @hover-color;
+    color: lighten(@link-color, 10%);
   }
 
   &:active > .table-info-button {
