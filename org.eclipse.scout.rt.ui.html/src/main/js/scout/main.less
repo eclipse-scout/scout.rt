@@ -233,7 +233,8 @@ input {
 
 textarea.alternative {
   &.disabled:not(.read-only) {
-    background-color: @control-alternative-disabled-background-color;
+    background-color: transparent;
+    border: 1px dashed @border-color;
     color: @disabled-color;
   }
 }
