@@ -172,8 +172,10 @@ scout.TreeNode.prototype.render = function($parent, paddingLeft) {
   this.$node = $parent.makeDiv('tree-node')
     .data('node', this)
     .attr('data-nodeid', this.id)
-    .attr('data-level', this.level)
-    .css('padding-left', paddingLeft);
+    .attr('data-level', this.level);
+  if (!scout.objects.isNullOrUndefined(paddingLeft)) {
+    this.$node.css('padding-left', paddingLeft);
+  }
   this.$text = this.$node.appendSpan('text');
 
   this._renderControl();

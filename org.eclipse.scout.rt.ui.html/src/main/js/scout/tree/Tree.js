@@ -858,7 +858,7 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNode) {
 };
 
 scout.Tree.prototype._renderNode = function(node) {
-  var paddingLeft = this._computeNodePaddingLeft(node.level);
+  var paddingLeft = this._computeNodePaddingLeft(node);
   node.render(this.$container, paddingLeft, this.checkable, this.enabled);
   return node.$node;
 };
@@ -924,7 +924,7 @@ scout.Tree.prototype._renderCheckable = function() {
       $checkbox.remove();
     }
 
-    $node.css('padding-left', this._computeNodePaddingLeft(parseFloat($node.attr('data-level'))));
+    $node.css('padding-left', this._computeNodePaddingLeft(node));
 
     // Recursion
     if (node.childNodes) {
@@ -938,7 +938,7 @@ scout.Tree.prototype._renderCheckable = function() {
 
 scout.Tree.prototype._renderDisplayStyle = function() {
   this.$container.toggleClass('breadcrumb', this.isBreadcrumbStyleActive());
-
+  this._updateNodePaddingsLeft();
   // update scrollbar if mode has changed (from tree to bc or vice versa)
   this.invalidateLayoutTree();
 };
@@ -1241,6 +1241,15 @@ scout.Tree.prototype._setDisplayStyle = function(displayStyle) {
     this.removeFilter(this.breadcrumbFilter, true);
     this.filter();
   }
+};
+
+scout.Tree.prototype._updateNodePaddingsLeft = function() {
+  this.$nodes().each(function(index, element) {
+    var $node = $(element),
+      node = $node.data('node'),
+      paddingLeft = this._computeNodePaddingLeft(node);
+    $node.css('padding-left', scout.objects.isNullOrUndefined(paddingLeft) ? '' : paddingLeft);
+  }.bind(this));
 };
 
 scout.Tree.prototype.setBreadcrumbStyleActive = function(active) {
@@ -1936,9 +1945,9 @@ scout.Tree.prototype.isNodeSelected = function(node) {
   return this.selectedNodes.indexOf(node) > -1;
 };
 
-scout.Tree.prototype._computeNodePaddingLeft = function(level) {
+scout.Tree.prototype._computeNodePaddingLeft = function(node) {
   this._computeNodePaddings();
-  var padding = level * this.nodePaddingLevel + this.nodePaddingLeft;
+  var padding = node.level * this.nodePaddingLevel + this.nodePaddingLeft;
   if (this.checkable) {
     padding += this.nodeCheckBoxPaddingLeft;
   }

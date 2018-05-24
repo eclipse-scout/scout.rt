@@ -167,6 +167,25 @@ scout.Outline.prototype._renderProperties = function() {
 /**
  * @override Tree.js
  */
+scout.Outline.prototype._computeNodePaddingLeft = function(node) {
+  this._computeNodePaddings();
+
+  if(node.getOutline().compact){
+    if(node.row){
+      return node.row._hierarchyLevel * this.nodePaddingLevel;
+    }
+    return 0;
+  }else if(node.getOutline().isBreadcrumbStyleActive()){
+    return null;
+  }
+  else{
+    return scout.Outline.parent.prototype._computeNodePaddingLeft.call(this,node);
+  }
+};
+
+/**
+ * @override Tree.js
+ */
 scout.Outline.prototype._remove = function() {
   scout.Outline.parent.prototype._remove.call(this);
   this._removeTitle();

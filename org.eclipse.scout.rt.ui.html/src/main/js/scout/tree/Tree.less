@@ -228,9 +228,7 @@
       display: none;
       border-top: 0;
       border-bottom: 1px solid @border-color;
-
-      /* !important is necessary here to override the element specific left-padding (calculated by Tree.js for level indentation). */
-      padding: 8px !important; /* NOSONAR (see comment above) */
+      padding: 8px;
 
       &.ancestor-of-selected,
       &.child-of-selected,

@@ -75,6 +75,7 @@ scout.Desktop.prototype._init = function(model) {
   this._setMenus(this.menus);
   this._setKeyStrokes(this.keyStrokes);
   this._setBenchLayoutData(this.benchLayoutData);
+  this._setDisplayStyle(this.displayStyle);
   this.openUriHandler = scout.create('OpenUriHandler', {
     session: this.session
   });
@@ -136,7 +137,6 @@ scout.Desktop.prototype._render = function() {
   this._renderLogoUrl();
   this._renderSplitterVisible();
   this._renderInBackground();
-  this._renderDisplayStyle();
   this._renderNavigationHandleVisible();
   this._renderNotifications();
   this._renderBrowserHistoryEntry();
@@ -176,7 +176,7 @@ scout.Desktop.prototype._postRender = function() {
   this.initialFormRendering = false;
 };
 
-scout.Desktop.prototype._renderDisplayStyle = function() {
+scout.Desktop.prototype._setDisplayStyle = function() {
   var DisplayStyle = scout.Desktop.DisplayStyle,
     isCompact = this.displayStyle === DisplayStyle.COMPACT;
 
@@ -195,8 +195,6 @@ scout.Desktop.prototype._renderDisplayStyle = function() {
     this.outline.setCompact(isCompact);
     this.outline.setEmbedDetailContent(isCompact);
   }
-
-  this.invalidateLayoutTree();
 };
 
 scout.Desktop.prototype._createLayout = function() {
@@ -480,6 +478,7 @@ scout.Desktop.prototype.setOutline = function(outline) {
     }
 
     this.outline = outline;
+    this._setDisplayStyle(this.displayStyle);
     this._setOutlineActivated();
     if (this.navigation) {
       this.navigation.setOutline(this.outline);
@@ -489,7 +488,6 @@ scout.Desktop.prototype.setOutline = function(outline) {
 
     if (this.rendered) {
       this._renderDisplayChildsOfOutline();
-      this._renderDisplayStyle();
     }
   } finally {
     if (this.bench) {
@@ -641,7 +639,7 @@ scout.Desktop.prototype._renderNotification = function(notification) {
   notification.fadeIn(this.$notifications);
   if (notification.duration > 0) {
     notification.removeTimeout = setTimeout(notification.hide.bind(notification), notification.duration);
-    notification.one('remove', function(){
+    notification.one('remove', function() {
       this.removeNotification(notification);
     }.bind(this));
   }

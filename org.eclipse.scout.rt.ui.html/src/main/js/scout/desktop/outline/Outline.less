@@ -168,9 +168,7 @@
     & > .tree-node,
     & > .animation-wrapper > .tree-node {
       border-bottom: 1px solid @outline-breadcrumb-border-color;
-
-      /* !important is necessary here to override the element specific left-padding (calculated by Tree.js for level indentation). */
-      padding: @outline-breadcrumb-node-padding-y @outline-breadcrumb-node-padding-x !important; /* NOSONAR (see comment above) */
+      padding: @outline-breadcrumb-node-padding-y @outline-breadcrumb-node-padding-x;
 
       &.ancestor-of-selected,
       &.child-of-selected {
@@ -258,7 +256,7 @@
   & > .tree-data {
 
     & > .tree-node  {
-      padding: 0 !important; /* NOSONAR (necessary because this overrides another !important rule, see above) */
+       padding: 0;
 
       & > .text {
         display: inline-block;
