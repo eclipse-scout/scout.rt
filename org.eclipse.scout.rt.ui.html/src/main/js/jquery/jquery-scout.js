@@ -501,6 +501,13 @@ $.ensure = function($elem) {
   return $($elem);
 };
 
+/**
+ * Helper function to determine if an object is of type "jqXHR" (http://api.jquery.com/jQuery.ajax/#jqXHR)
+ */
+$.isJqXHR = function(obj) {
+  return (typeof obj === 'object' && obj.hasOwnProperty('readyState') && obj.hasOwnProperty('status') && obj.hasOwnProperty('statusText'));
+};
+
 // === $.easing extensions ===
 
 $.extend($.easing, {

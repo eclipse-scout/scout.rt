@@ -282,11 +282,6 @@ scout.App.prototype._fail = function(options, error) {
   var $error = $('body').appendDiv('startup-error');
   $error.appendDiv('startup-error-title').text('The application could not be started');
 
-  // Helper function to determine if an object is of type "jqXHR" (http://api.jquery.com/jQuery.ajax/#jqXHR)
-  function isJqXHR(obj) {
-    return (typeof obj === 'object' && obj.hasOwnProperty('readyState') && obj.hasOwnProperty('status') && obj.hasOwnProperty('statusText'));
-  }
-
   var message = '';
   var log = '';
   if (error instanceof Error) {
@@ -299,7 +294,7 @@ scout.App.prototype._fail = function(options, error) {
     if (error.stack) {
       log += '\n' + error.stack;
     }
-  } else if (isJqXHR(error)) {
+  } else if ($.isJqXHR(error)) {
     // 2. jQuery $.ajax() error (arguments: jqXHR, textStatus, errorThrown, requestOptions)
     var jqXHR = error;
     var errorThrown = arguments[3];
