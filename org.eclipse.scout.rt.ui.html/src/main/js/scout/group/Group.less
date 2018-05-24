@@ -8,7 +8,6 @@
    align-items: center;
    width: 100%;
    padding: 10px 0;
-   border-top: 1px solid @border-color;
    cursor: pointer;
 
    &:focus {
@@ -17,7 +16,6 @@
 }
 
 .group-title {
-  flex-grow: 1;
   font-size: @font-size-plus;
   font-weight: @font-weight-bold;
   #scout.overflow-ellipsis-nowrap();
@@ -28,15 +26,21 @@
   }
 }
 
+.group-title-suffix {
+  margin-left: 8px;
+  font-size: @font-size-plus;
+}
+
 .group-icon.with-title {
   margin-right: 8px;
 }
 
 .group-collapse-icon {
-  width: 30px;
-  text-align: right;
   /* Set to same height as before element to prevent header from getting larger */
   height: @font-size-large;
+  transition: transform 0.3s;
+  margin-right: 8px;
+  margin-top: @group-collapse-icon-margin-top; /* since icon height is reduced it needs to be moved up a little to center it again */
 
   &::before {
     #scout.font-icon();
@@ -44,7 +48,32 @@
     font-size: @font-size-large;
   }
 
-  &.collapsed::before {
-    content: @icon-angle-up;
+  &.collapsed {
+    #scout.transform(rotate(-90deg));
+  }
+}
+
+.group-header.collapse-right {
+  & > .group-title {
+    flex-grow: 1;
+  }
+
+  & > .group-title-suffix {
+    text-align: right;
+  }
+
+  & > .group-collapse-icon {
+    transition: transform 0s;
+    margin-right: 0;
+    margin-left: 8px;
+    margin-top: 0;
+
+    &::before {
+      content: @icon-angle-down;
+    }
+
+    &.collapsed {
+      #scout.transform(rotatex(180deg));
+    }
   }
 }

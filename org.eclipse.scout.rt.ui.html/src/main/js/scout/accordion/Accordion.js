@@ -11,6 +11,7 @@
 scout.Accordion = function() {
   scout.Accordion.parent.call(this);
   this.comparator = null;
+  this.collapseStyle = null;
   this.exclusiveExpand = true;
   this.groups = [];
   this.scrollable = true;
@@ -127,6 +128,13 @@ scout.Accordion.prototype._insertGroup = function(group) {
 scout.Accordion.prototype._initGroup = function(group) {
   group.setParent(this);
   group.on('propertyChange', this._groupPropertyChangeHandler);
+
+  // Copy properties from accordion to new group. If the properties are not set yet, copy them from the group to the accordion
+  // This gives the possibility to either define the properties on the accordion or on the group initially
+  if (this.collapseStyle !== null) {
+    group.setCollapseStyle(this.collapseStyle);
+  }
+  this.setProperty('collapseStyle', group.collapseStyle);
 };
 
 scout.Accordion.prototype._renderGroup = function(group) {
@@ -232,6 +240,13 @@ scout.Accordion.prototype._updateExclusiveExpand = function() {
     return !group.collapsed;
   });
   this._collapseOthers(expandedGroup);
+};
+
+scout.Accordion.prototype.setCollapseStyle = function(collapseStyle) {
+  this.groups.forEach(function(group) {
+    group.setCollapseStyle(collapseStyle);
+  });
+  this.setProperty('collapseStyle', collapseStyle);
 };
 
 scout.Accordion.prototype._collapseOthers = function(expandedGroup) {

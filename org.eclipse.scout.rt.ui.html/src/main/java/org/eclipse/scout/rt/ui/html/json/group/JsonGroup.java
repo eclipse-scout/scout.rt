@@ -40,6 +40,12 @@ public class JsonGroup<T extends IGroup> extends AbstractJsonWidget<T> {
         return getModel().isCollapsed();
       }
     });
+    putJsonProperty(new JsonProperty<T>(IGroup.PROP_COLLAPSE_STYLE, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getCollapseStyle();
+      }
+    });
     putJsonProperty(new JsonProperty<T>(IGroup.PROP_TITLE, model) {
       @Override
       protected String modelValue() {

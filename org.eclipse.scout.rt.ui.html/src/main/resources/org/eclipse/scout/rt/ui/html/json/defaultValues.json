@@ -445,6 +445,7 @@
     },
     "Group": {
       "collapsed": false,
+      "collapseStyle": "left",
       "headerVisible": true
     }
   },

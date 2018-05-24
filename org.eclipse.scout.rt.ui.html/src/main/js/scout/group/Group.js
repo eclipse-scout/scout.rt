@@ -13,6 +13,7 @@ scout.Group = function() {
   this.bodyAnimating = false;
   this.collapsed = false;
   this.title = null;
+  this.titleSuffix = null;
   this.headerVisible = true;
   this.body = null;
 
@@ -20,6 +21,7 @@ scout.Group = function() {
   this.$header = null;
   this.$title = null;
   this.$collapseIcon = null;
+  this.collapseStyle = scout.Group.CollapseStyle.LEFT;
   this.htmlComp = null;
   this.htmlHeader = null;
   this.htmlBody = null;
@@ -28,6 +30,11 @@ scout.Group = function() {
   this._addWidgetProperties(['body']);
 };
 scout.inherits(scout.Group, scout.Widget);
+
+scout.Group.CollapseStyle = {
+  LEFT: 'left',
+  RIGHT: 'right'
+};
 
 scout.Group.prototype._init = function(model) {
   scout.Group.parent.prototype._init.call(this, model);
@@ -63,7 +70,9 @@ scout.Group.prototype._render = function() {
   this.htmlComp.setLayout(new scout.GroupLayout(this));
 
   this.$header = this.$container.prependDiv('group-header')
-    .on('click', this._onHeaderClick.bind(this));
+    .on('mousedown', this._onHeaderMouseDown.bind(this))
+    .unfocusable()
+    .addClass('prevent-initial-focus');
   this.htmlHeader = scout.HtmlComponent.install(this.$header, this.session);
   this.$title = this.$header.appendDiv('group-title');
   this.$titleSuffix = this.$header.appendDiv('group-title-suffix');
@@ -81,6 +90,7 @@ scout.Group.prototype._renderProperties = function() {
   this._renderTitleSuffix();
   this._renderHeaderVisible();
   this._renderCollapsed();
+  this._renderCollapseStyle();
 };
 
 scout.Group.prototype._remove = function() {
@@ -134,6 +144,7 @@ scout.Group.prototype._updateIconStyle = function() {
   var hasTitle = !!this.title;
   this.get$Icon().toggleClass('with-title', hasTitle);
   this.get$Icon().addClass('group-icon');
+  this._renderCollapseStyle();
 };
 
 scout.Group.prototype.get$Icon = function() {
@@ -163,7 +174,7 @@ scout.Group.prototype.setTitleSuffix = function(titleSuffix) {
 };
 
 scout.Group.prototype._renderTitleSuffix = function() {
-  this.$titleSuffix.textOrNbsp(this.titleSuffix);
+  this.$titleSuffix.text(this.titleSuffix || '');
 };
 
 scout.Group.prototype.setHeaderVisible = function(headerVisible) {
@@ -221,7 +232,20 @@ scout.Group.prototype._renderCollapsed = function() {
   }
 };
 
-scout.Group.prototype._onHeaderClick = function(event) {
+scout.Group.prototype.setCollapseStyle = function(collapseStyle) {
+  this.setProperty('collapseStyle', collapseStyle);
+};
+
+scout.Group.prototype._renderCollapseStyle = function() {
+  this.$header.toggleClass('collapse-right', this.collapseStyle === scout.Group.CollapseStyle.RIGHT);
+  if (this.collapseStyle === scout.Group.CollapseStyle.RIGHT) {
+    this.$collapseIcon.appendTo(this.$header);
+  } else {
+    this.$collapseIcon.prependTo(this.$header);
+  }
+};
+
+scout.Group.prototype._onHeaderMouseDown = function(event) {
   this.setCollapsed(!this.collapsed);
 };
 
