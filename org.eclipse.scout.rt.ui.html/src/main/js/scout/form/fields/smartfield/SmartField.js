@@ -1145,7 +1145,18 @@ scout.SmartField.prototype._executeLookup = function(lookupCall, abortExisting) 
       this._currentLookupCall = null;
       this.setLoading(false);
       this._clearLookupStatus();
+      this._clearNoResultsErrorStatus();
     }.bind(this));
+};
+
+/**
+ * Reset error status NO_RESULTS when a lookup is performed, otherwise it would interfere with the
+ * temporary lookupStatus and we'd see an out-dated error-status message while the user is typing.
+ */
+scout.SmartField.prototype._clearNoResultsErrorStatus = function() {
+  if (this.errorStatus && this.errorStatus.code === scout.SmartField.ErrorCode.NO_RESULTS) {
+    this.setErrorStatus(null);
+  }
 };
 
 /**
