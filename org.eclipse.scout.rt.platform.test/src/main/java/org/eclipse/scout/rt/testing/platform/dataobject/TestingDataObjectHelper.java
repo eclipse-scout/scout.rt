@@ -1,0 +1,33 @@
+/*******************************************************************************
+ * Copyright (c) 2018 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.testing.platform.dataobject;
+
+import java.util.Objects;
+
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.dataobject.DataObjectHelper;
+import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
+
+@Order(10000) // see also TestingUtility.TESTING_RESOURSE_ORDER
+@Replace
+public class TestingDataObjectHelper extends DataObjectHelper {
+
+  /**
+   * In a test setup there is usually no [configured] {@link IDataObjectMapper}. Therefore usual {@code toString} method
+   * is used on values map.
+   */
+  @Override
+  public String toString(IDoEntity entity) {
+    return Objects.toString(entity != null ? entity.all() : null);
+  }
+}

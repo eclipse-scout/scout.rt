@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
+import org.eclipse.scout.rt.testing.platform.dataobject.TestingDataObjectHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -36,6 +37,7 @@ public class DataObjectHelperTest {
   protected static final String SERIALIZED_DO_ENTITY_VALUE = "Serialized_DoEntity";
   protected static final DoEntity DESERIALIZED_DO_ENTITY_VALUE = BEANS.get(DoEntity.class);
 
+  protected IBean<TestingDataObjectHelper> m_testDataObjectHelperRegistrationBackup;
   protected DoEntity m_entity;
   protected DoEntity m_subEntity;
   protected DataObjectHelper m_helper;
@@ -45,6 +47,8 @@ public class DataObjectHelperTest {
   @Before
   @SuppressWarnings("unchecked")
   public void before() {
+    m_testDataObjectHelperRegistrationBackup = Platform.get().getBeanManager().getBean(TestingDataObjectHelper.class);
+    Platform.get().getBeanManager().unregisterBean(m_testDataObjectHelperRegistrationBackup);
     // create a mock for IDataObjectMapper returning fixed values for serialized and deserialized objects
     m_dataObjectMapperMock = Mockito.mock(IDataObjectMapper.class);
     when(m_dataObjectMapperMock.readValue(Mockito.any(String.class), Mockito.any(Class.class))).thenReturn(DESERIALIZED_DO_ENTITY_VALUE);
@@ -74,6 +78,7 @@ public class DataObjectHelperTest {
 
   @After
   public void after() {
+    Platform.get().getBeanManager().registerBean(new BeanMetaData(m_testDataObjectHelperRegistrationBackup));
     Platform.get().getBeanManager().unregisterBean(m_dataObjectMapperMockRegistration);
   }
 

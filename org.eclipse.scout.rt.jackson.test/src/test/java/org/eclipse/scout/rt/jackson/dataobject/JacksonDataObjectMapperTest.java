@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.dataobject.DataObjectHelper;
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoEntityHolder;
@@ -35,7 +36,9 @@ import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CloneUtility;
+import org.eclipse.scout.rt.testing.platform.dataobject.TestingDataObjectHelper;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,13 +47,21 @@ import org.junit.Test;
  */
 public class JacksonDataObjectMapperTest {
 
+  protected IBean<TestingDataObjectHelper> m_testDataObjectHelperRegistrationBackup;
   protected DataObjectSerializationTestHelper m_testHelper;
   protected JacksonDataObjectMapper m_mapper;
 
   @Before
   public void before() {
+    m_testDataObjectHelperRegistrationBackup = Platform.get().getBeanManager().getBean(TestingDataObjectHelper.class);
+    Platform.get().getBeanManager().unregisterBean(m_testDataObjectHelperRegistrationBackup);
     m_testHelper = BEANS.get(DataObjectSerializationTestHelper.class);
     m_mapper = BEANS.get(JacksonDataObjectMapper.class);
+  }
+
+  @After
+  public void after() {
+    Platform.get().getBeanManager().registerBean(new BeanMetaData(m_testDataObjectHelperRegistrationBackup));
   }
 
   @Test
