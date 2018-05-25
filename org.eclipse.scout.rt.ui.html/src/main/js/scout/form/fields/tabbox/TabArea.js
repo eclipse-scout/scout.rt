@@ -101,7 +101,7 @@ scout.TabArea.prototype._removeTabHandlers = function() {
 
 scout.TabArea.prototype.setTabItems = function(tabItems) {
   this._removeTabHandlers();
-  if(this.rendered){
+  if (this.rendered) {
     this._removeTabItems();
   }
   tabItems.forEach(function(item) {
@@ -114,9 +114,14 @@ scout.TabArea.prototype.setTabItems = function(tabItems) {
 };
 
 scout.TabArea.prototype._renderTabItems = function() {
-  this.tabItems.slice().reverse().forEach(function(tabItem) {
+  this.tabItems.slice().reverse().forEach(function(tabItem, index, items) {
     tabItem.renderTab(this.$container);
     tabItem.$tabContainer.prependTo(this.$container);
+    if (index === 0) {
+      tabItem.$tabContainer.addClass("last");
+    } else if (index === items.length - 1) {
+      tabItem.$tabContainer.addClass("first");
+    }
   }, this);
 };
 
