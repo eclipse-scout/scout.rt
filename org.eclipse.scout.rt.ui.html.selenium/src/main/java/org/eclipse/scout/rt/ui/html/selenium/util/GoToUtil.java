@@ -17,7 +17,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
 import org.eclipse.scout.rt.ui.html.selenium.junit.AbstractSeleniumTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 
 public final class GoToUtil {
 
@@ -30,13 +29,6 @@ public final class GoToUtil {
    */
   public static void goToOutline(AbstractSeleniumTest test, Class<? extends IOutlineViewButton> outlineViewButtonClass, Class<? extends IOutline> outlineClass) {
     test.waitUntilDataRequestPendingDone();
-    // When we're on another form-tab, we must click twice on the outline-switcher tab to open the menu
-    if (!test.findElement(By.className("view-menu")).isDisplayed()) {
-      Actions builder = new Actions(test.getDriver());
-      builder.moveToElement(test.waitUntilElementClickable(By.className("view-button-box")), 5, 5).click().build().perform();
-      SeleniumUtil.shortPause();
-      test.waitUntilDataRequestPendingDone();
-    }
     test.waitUntilElementClickable(By.className("view-menu")).click();
     SeleniumUtil.shortPause();
     test.waitUntilDataRequestPendingDone();
