@@ -403,6 +403,8 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
       json.put("propertyName", desc.getPropertyName());
       json.put("width", desc.getWidth());
       json.put("text", desc.getText());
+      json.put("fixedWidth", desc.getFixedWidth());
+      json.put("horizontalAlignment", desc.getHorizontalAlignment());
       array.put(json);
     }
     return array;

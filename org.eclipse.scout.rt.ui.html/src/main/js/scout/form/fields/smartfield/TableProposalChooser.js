@@ -33,6 +33,7 @@ scout.TableProposalChooser.prototype._createModel = function() {
       if (descriptor.fixedWidth) {
         column.fixedWidth = true;
       }
+      column.horizontalAlignment = descriptor.horizontalAlignment;
       columns.push(column);
     }, this);
   } else {

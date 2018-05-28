@@ -20,9 +20,15 @@ public class ColumnDescriptor implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private final String m_propertyName;
-  private final int m_width;
-  private final String m_text;
+  private String m_propertyName;
+  private String m_text;
+  private int m_width;
+  private boolean m_fixedWidth;
+  private int m_horizontalAlignment = -1;
+
+  public ColumnDescriptor(String propertyName) {
+    m_propertyName = propertyName;
+  }
 
   public ColumnDescriptor(String propertyName, String text, int width) {
     m_propertyName = propertyName;
@@ -34,12 +40,40 @@ public class ColumnDescriptor implements Serializable {
     return m_propertyName;
   }
 
+  public String getText() {
+    return m_text;
+  }
+
+  public ColumnDescriptor withText(String text) {
+    m_text = text;
+    return this;
+  }
+
   public int getWidth() {
     return m_width;
   }
 
-  public String getText() {
-    return m_text;
+  public ColumnDescriptor withWidth(int width) {
+    m_width = width;
+    return this;
+  }
+
+  public boolean getFixedWidth() {
+    return m_fixedWidth;
+  }
+
+  public ColumnDescriptor withFixedWidth(boolean fixedWidth) {
+    m_fixedWidth = fixedWidth;
+    return this;
+  }
+
+  public int getHorizontalAlignment() {
+    return m_horizontalAlignment;
+  }
+
+  public ColumnDescriptor withHorizontalAlignment(int horizontalAlignment) {
+    m_horizontalAlignment = horizontalAlignment;
+    return this;
   }
 
 }
