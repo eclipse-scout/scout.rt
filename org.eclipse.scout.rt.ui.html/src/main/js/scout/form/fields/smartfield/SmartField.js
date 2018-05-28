@@ -673,7 +673,7 @@ scout.SmartField.prototype._lookupByTextOrAllDone = function(result) {
   // smart-field are still loading: don't show the proposal popup. In the case of a cell-editor
   // it's also possible that the smart-field is not rendered anymore when the lookup is done
   if (!this.rendered ||
-    !this.isFocused() && !this.touch && !this.embedded) {
+    !this.isFocused() && !this.isTouchable()) {
     this.closePopup();
     return;
   }
@@ -883,11 +883,18 @@ scout.SmartField.prototype.togglePopup = function() {
 scout.SmartField.prototype._onFieldBlur = function(event) {
   this.setFocused(false);
   this.setLoading(false);
-  if (this.embedded || this.touch) {
+  if (this.isTouchable()) {
     return;
   }
   this.acceptInput(false);
   this.closePopup();
+};
+
+/**
+ * @returns true if the field is either 'embedded' or 'touch'.
+ */
+scout.SmartField.prototype.isTouchable = function() {
+  return this.embedded || this.touch;
 };
 
 scout.SmartField.prototype._onFieldKeyUp = function(event) {
@@ -1154,6 +1161,9 @@ scout.SmartField.prototype._executeLookup = function(lookupCall, abortExisting) 
  * temporary lookupStatus and we'd see an out-dated error-status message while the user is typing.
  */
 scout.SmartField.prototype._clearNoResultsErrorStatus = function() {
+  if (this.isTouchable()) {
+    return;
+  }
   if (this.errorStatus && this.errorStatus.code === scout.SmartField.ErrorCode.NO_RESULTS) {
     this.setErrorStatus(null);
   }
