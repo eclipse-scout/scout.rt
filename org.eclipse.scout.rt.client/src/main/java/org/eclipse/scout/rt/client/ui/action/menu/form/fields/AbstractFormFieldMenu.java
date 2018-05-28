@@ -25,6 +25,14 @@ public abstract class AbstractFormFieldMenu extends AbstractMenu implements IFor
 
   private IFormField m_field;
 
+  public AbstractFormFieldMenu(boolean callInitializer) {
+    super(callInitializer);
+  }
+
+  public AbstractFormFieldMenu() {
+    super();
+  }
+
   @Override
   protected void initConfig() {
     super.initConfig();
