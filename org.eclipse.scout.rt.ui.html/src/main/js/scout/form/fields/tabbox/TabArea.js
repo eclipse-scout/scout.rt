@@ -122,7 +122,18 @@ scout.TabArea.prototype._renderTabItems = function() {
     } else if (index === items.length - 1) {
       tabItem.$tabContainer.addClass("first");
     }
+
+    tabItem.$tabContainer.on('blur', this._onTabItemBlur.bind(this))
+      .on('focus', this._onTabItemFocus.bind(this));
   }, this);
+};
+
+scout.TabArea.prototype._onTabItemFocus = function() {
+  this.setFocused(true);
+};
+
+scout.TabArea.prototype._onTabItemBlur = function() {
+  this.setFocused(false);
 };
 
 scout.TabArea.prototype._removeTabItems = function() {
