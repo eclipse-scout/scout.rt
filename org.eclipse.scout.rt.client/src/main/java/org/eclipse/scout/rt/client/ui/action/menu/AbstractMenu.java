@@ -70,7 +70,10 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
         ValueFieldMenuType.NotNull,
         CalendarMenuType.CalendarComponent,
         PlannerMenuType.Activity,
-        TabBoxMenuType.Header);
+        TabBoxMenuType.Header,
+        ImageFieldMenuType.Image,
+        ImageFieldMenuType.ImageId,
+        ImageFieldMenuType.ImageUrl);
   }
 
   /**
