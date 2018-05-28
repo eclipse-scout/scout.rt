@@ -47,6 +47,10 @@ scout.DateField = function() {
 };
 scout.inherits(scout.DateField, scout.ValueField);
 
+scout.DateField.ErrorCode = {
+  PARSE_ERROR: -1
+};
+
 /**
  * @override Widget.js
  */
@@ -1559,7 +1563,8 @@ scout.DateField.prototype._setErrorStatusPart = function(property, valid) {
 scout.DateField.prototype._createErrorStatus = function() {
   return new scout.Status({
     message: this.session.text('ui.InvalidDate'),
-    severity: scout.Status.Severity.ERROR
+    severity: scout.Status.Severity.ERROR,
+    code: scout.DateField.ErrorCode.PARSE_ERROR
   });
 };
 

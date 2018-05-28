@@ -22,10 +22,7 @@ scout.DateFieldAdapter.PROPERTIES_ORDER = ['hasTime', 'hasDate'];
  */
 scout.DateFieldAdapter.prototype._initProperties = function(model) {
   scout.DateFieldAdapter.parent.prototype._initProperties.call(this, model);
-  this._errorStatus = scout.Status.ensure(model.errorStatus);
-  if (this._errorStatus) {
-    this._errorStatusDisplayText = model.displayText;
-  }
+  this._updateErrorStatus(model.errorStatus, model.displayText);
 };
 
 /**
@@ -33,13 +30,15 @@ scout.DateFieldAdapter.prototype._initProperties = function(model) {
  */
 scout.DateFieldAdapter.prototype._attachWidget = function() {
   scout.DateFieldAdapter.parent.prototype._attachWidget.call(this);
-  this.widget.setParser(function(displayText) {
-    // If the server reported an error for that display text, make sure it will be shown in the UI if the user enters that display text again
+  this.widget.setValidator(function(value, defaultValidator) {
+    // If the server reported an error for current display text,
+    // make sure it will be shown in the UI if the user enters that display text again or selects the same date using the picker
+    var displayText = this.formatValue(value);
     if (this.modelAdapter._errorStatus && displayText === this.modelAdapter._errorStatusDisplayText) {
       throw this.modelAdapter._errorStatus;
     }
-    return this._parseValue(displayText);
-  }.bind(this.widget));
+    return defaultValidator(value);
+  }.bind(this.widget), false);
 };
 
 /**
@@ -70,10 +69,7 @@ scout.DateFieldAdapter.prototype._onWidgetAcceptInput = function(event) {
 scout.DateFieldAdapter.prototype._syncDisplayText = function(displayText) {
   // No need to call parseAndSetValue, the value will come separately
   this.widget.setDisplayText(displayText);
-
-  if (this._errorStatus) {
-    this._errorStatusDisplayText = displayText;
-  }
+  this._updateErrorStatus(this._errorStatus, displayText);
 };
 
 /**
@@ -100,8 +96,25 @@ scout.DateFieldAdapter.prototype._syncErrorStatus = function(errorStatus) {
     }
   }
 
-  // Remember errorStatus from model
-  this._errorStatus = scout.Status.ensure(errorStatus);
-  this._errorStatusDisplayText = this.widget.displayText;
+  this._updateErrorStatus(errorStatus, this.widget.displayText);
   this.widget.setErrorStatus(errorStatus);
+};
+
+scout.DateFieldAdapter.prototype._updateErrorStatus = function(errorStatus, displayText) {
+  // Find the first model error status. If server sends a UI error status (=PARSE_ERROR) then don't remember it
+  errorStatus = scout.Status.ensure(errorStatus);
+  var modelErrorStatus = null;
+  if (errorStatus) {
+    modelErrorStatus = scout.arrays.find(errorStatus.asFlatList(), function(status) {
+      return status.code !== scout.DateField.ErrorCode.PARSE_ERROR;
+    });
+  }
+  // Remember errorStatus from model
+  if (modelErrorStatus) {
+    this._errorStatus = modelErrorStatus;
+    this._errorStatusDisplayText = displayText;
+  } else {
+    this._errorStatus = null;
+    this._errorStatusDisplayText = null;
+  }
 };

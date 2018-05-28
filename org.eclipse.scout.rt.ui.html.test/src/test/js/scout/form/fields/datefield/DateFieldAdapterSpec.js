@@ -112,6 +112,25 @@ describe("DateFieldAdapter", function() {
       expect(field.errorStatus.message).toBe('error status from server');
     });
 
+    it('sets the server errorStatus if the displayText was reverted to the one provoking the error using picker', function() {
+      var field = createWithAdapter({
+        value: scout.dates.create('2017-05-23')
+      });
+      field.modelAdapter._syncErrorStatus({
+        message: 'error status from server'
+      });
+      field.render();
+      field.$dateField.focus();
+      expect(field.$dateField.val()).toBe('23.05.2017');
+      expect(field.errorStatus.message).toBe('error status from server');
+
+      // Open picker and select invalid date again -> error status must not vanish
+      openDatePicker(field);
+      find$Day(field.getDatePicker(), new Date(2017, 4, 23)).triggerClick();
+      expect(field.$dateField.val()).toBe('23.05.2017');
+      expect(field.errorStatus.message).toBe('error status from server');
+    });
+
     it('does not accidentially remove the model error status on acceptInput', function() {
       var field = createWithAdapter({
         value: scout.dates.create('2017-05-23')

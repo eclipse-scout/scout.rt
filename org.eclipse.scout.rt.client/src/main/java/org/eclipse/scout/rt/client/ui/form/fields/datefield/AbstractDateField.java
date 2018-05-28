@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.IDateFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
@@ -480,7 +481,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
 
     @Override
     public void setErrorStatusFromUI(IStatus errorStatus) {
-      clearErrorStatus();
+      removeErrorStatus(ParsingFailedStatus.class);
       if (errorStatus != null) {
         addErrorStatus(errorStatus);
       }
