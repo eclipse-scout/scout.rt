@@ -13,12 +13,16 @@ package org.eclipse.scout.rt.platform.util;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -216,16 +220,84 @@ public class StreamUtilityTest {
   }
 
   @Test
+  public void testToMap() {
+    String[] items = new String[]{"one", "two", "three"};
+    Map<String, String> map = Stream.of(items).collect(StreamUtility.toMap(t -> t, t -> t));
+    assertTrue(map instanceof HashMap);
+    assertEquals("one", map.get("one"));
+    assertEquals("two", map.get("two"));
+    assertEquals("three", map.get("three"));
+  }
+
+  @Test
+  public void testToMapWithNullKey() {
+    String[] items = new String[]{null, "one", "two", "three"};
+    Map<String, String> map = Stream.of(items).collect(StreamUtility.toMap(t -> t, t -> ObjectUtility.nvl(t, "null")));
+    assertTrue(map instanceof HashMap);
+    assertEquals("null", map.get(null));
+    assertEquals("one", map.get("one"));
+    assertEquals("two", map.get("two"));
+    assertEquals("three", map.get("three"));
+  }
+
+  @Test
+  public void testToMapWithNullValue() {
+    String[] items = new String[]{null, "one", "two", "three"};
+    Map<String, String> map = Stream.of(items).collect(StreamUtility.toMap(t -> ObjectUtility.nvl(t, "null"), t -> t));
+    assertTrue(map instanceof HashMap);
+    assertNull(map.get("null"));
+    assertEquals("one", map.get("one"));
+    assertEquals("two", map.get("two"));
+    assertEquals("three", map.get("three"));
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testToMapWithDuplicatedKey() {
+    String[] items = new String[]{"one", "one", "three"};
+    Stream.of(items).collect(StreamUtility.toMap(t -> t, t -> t));
+  }
+
+  @Test
   public void testToLinkedHashMap() {
     String[] values = new String[]{"one", "two", "three"};
-    LinkedHashMap<String, Integer> map = Stream.of(values).collect(StreamUtility.toLinkedHashMap(t -> t, t -> t.length()));
+    LinkedHashMap<String, Integer> map = Stream.of(values).collect(StreamUtility.toLinkedHashMap(t -> t, StringUtility::length));
     assertArrayEquals(values, map.keySet().toArray());
   }
 
   @Test(expected = IllegalStateException.class)
   public void testToLinkedHashMapDuplicatedKey() {
     String[] values = new String[]{"one", "one"};
-    Stream.of(values).collect(StreamUtility.toLinkedHashMap(t -> t, t -> t));
+    Stream.of(values).collect(StreamUtility.toLinkedHashMap(t -> t, StringUtility::length));
   }
 
+  @Test
+  public void testToMapWithRemapping() {
+    String[] items = new String[]{"one", "two", "three", "three"};
+    Map<String, String> map = Stream.of(items).collect(StreamUtility.toMap(HashMap::new, t -> t, t -> t, (u, v) -> u + v));
+    assertTrue(map instanceof HashMap);
+    assertEquals("one", map.get("one"));
+    assertEquals("two", map.get("two"));
+    assertEquals("threethree", map.get("three"));
+  }
+
+  @Test
+  public void testToMapWithRemappingAndNullValue() {
+    String[][] items = new String[][]{{"key1", "one"}, {"key2", "two"}, {"key3", null}, {"key3", "three"}, {"key4", "four-A"}, {"key4", "four-B"}, {"key5", "five"}, {"key5", null}};
+    Map<String, String> map = Stream.of(items).collect(StreamUtility.toMap(HashMap::new, t -> t[0], t -> t[1], (u, v) -> u + v));
+    assertTrue(map instanceof HashMap);
+    assertEquals("one", map.get("key1"));
+    assertEquals("two", map.get("key2"));
+    assertEquals("nullthree", map.get("key3"));
+    assertEquals("four-Afour-B", map.get("key4"));
+    assertEquals("fivenull", map.get("key5"));
+  }
+
+  @Test
+  public void testToMapParallelStream() {
+    String[] values = new String[]{"one", "two", "three"};
+    Map<String, Integer> map = Stream.of(values).parallel().collect(StreamUtility.toMap(t -> t, StringUtility::length));
+    assertEquals(new Integer(3), map.get("one"));
+    assertEquals(new Integer(3), map.get("two"));
+    assertEquals(new Integer(5), map.get("three"));
+  }
 }

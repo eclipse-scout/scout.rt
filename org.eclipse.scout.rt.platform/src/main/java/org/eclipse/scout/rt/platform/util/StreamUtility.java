@@ -10,17 +10,22 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
+import java.util.stream.Collector.Characteristics;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -162,13 +167,114 @@ public final class StreamUtility {
   }
 
   /**
+   * Returns a {@code Collector} that accumulates elements into a {@code HashMap} whose keys and values are the result
+   * of applying the provided mapping functions to the input elements.
+   * <p>
+   * <b>In difference to the default {@link Collectors#toMap()} collector, the map values may be {@code null}.</b> *
+   * <p>
+   * If the mapped keys contains duplicates (according to {@link Object#equals(Object)}), an
+   * {@code IllegalStateException} is thrown when the collection operation is performed. If the mapped keys may have
+   * duplicates, use {@link #toMap(Supplier, Function, Function, BiFunction, Characteristics...)} instead.
+   *
+   * @param <T>
+   *          the type of the input elements
+   * @param <K>
+   *          the output type of the key mapping function
+   * @param <U>
+   *          the output type of the value mapping function
+   * @param keyMapper
+   *          a mapping function to produce keys
+   * @param valueMapper
+   *          a mapping function to produce values
+   * @return a {@code Collector} which collects elements into a {@code HashMap} whose keys and values are the result of
+   *         applying mapping functions to the input elements
+   * @see StreamUtility#toMap(Supplier, Function, Function, BiFunction, Characteristics...)
+   */
+  public static <T, K, U> Collector<T, ?, Map<K, U>> toMap(Function<? super T, ? extends K> keyMapper, Function<? super T, ? extends U> valueMapper) {
+    return toMap(HashMap::new, keyMapper, valueMapper, throwingMerger());
+  }
+
+  /**
    * Returns a {@code Collector} that accumulates elements into a {@code LinkedHashMap} whose keys and values are the
    * result of applying the provided mapping functions to the input elements.
+   * <p>
+   * <b>In difference to the default {@link Collectors#toMap()} collector, the map values may be {@code null}.</b>
+   * <p>
+   * If the mapped keys contains duplicates (according to {@link Object#equals(Object)}), an
+   * {@code IllegalStateException} is thrown when the collection operation is performed. If the mapped keys may have
+   * duplicates, use {@link #toMap(Supplier, Function, Function, BiFunction, Characteristics...)} instead.
    *
-   * @see Collectors#toMap(Function, Function, BinaryOperator, java.util.function.Supplier)
+   * @param <T>
+   *          the type of the input elements
+   * @param <K>
+   *          the output type of the key mapping function
+   * @param <U>
+   *          the output type of the value mapping function
+   * @param keyMapper
+   *          a mapping function to produce keys
+   * @param valueMapper
+   *          a mapping function to produce values
+   * @return a {@code Collector} which collects elements into a {@code LinkedHashMap} whose keys and values are the
+   *         result of applying mapping functions to the input elements
+   * @see StreamUtility#toMap(Supplier, Function, Function, BiFunction, Characteristics...)
    */
   public static <T, K, U> Collector<T, ?, LinkedHashMap<K, U>> toLinkedHashMap(Function<? super T, ? extends K> keyMapper, Function<? super T, ? extends U> valueMapper) {
-    return Collectors.toMap(keyMapper, valueMapper, throwingMerger(), LinkedHashMap::new);
+    return toMap(LinkedHashMap::new, keyMapper, valueMapper, throwingMerger());
+  }
+
+  /**
+   * Returns a {@code Collector} that accumulates elements into a {@code Map} whose keys and values are the result of
+   * applying the provided mapping functions to the input elements.
+   * <p>
+   * <b>In difference to the default {@link Collectors#toMap()} collector, the map values may be {@code null}.</b>
+   * <p>
+   * Duplicated keys are merged by applying the specified {@code remappingFunction}.
+   *
+   * @param <T>
+   *          the type of the input elements
+   * @param <K>
+   *          the output type of the key mapping function
+   * @param <U>
+   *          the output type of the value mapping function
+   * @param <M>
+   *          the type of the resulting {@link Map}
+   * @param keyMapper
+   *          a mapping function to produce keys
+   * @param valueMapper
+   *          a mapping function to produce values
+   * @return a {@code Collector} which collects elements into a {@code Map} whose keys and values are the result of
+   *         applying mapping functions to the input elements
+   */
+  public static <T, K, U, M extends Map<K, U>> Collector<T, ?, M> toMap(Supplier<M> supplier, Function<? super T, ? extends K> keyMapper, Function<? super T, ? extends U> valueMapper,
+      BiFunction<? super U, ? super U, ? extends U> remappingFunction, Characteristics... characteristics) {
+    return Collector.of(
+        supplier,
+        (map, value) -> putEntry(map, keyMapper.apply(value), valueMapper.apply(value), remappingFunction),
+        (map1, map2) -> mergeMap(map1, map2, remappingFunction),
+        characteristics);
+  }
+
+  /**
+   * @returns Resulting merged map after putting all elements of {@code map2} into {@code map1}, applying the
+   *          {@code remappingFunction} for duplicated keys.
+   */
+  private static <K, U, M extends Map<K, U>> M mergeMap(M map1, M map2, BiFunction<? super U, ? super U, ? extends U> remappingFunction) {
+    map2.forEach((k, u) -> putEntry(map1, k, u, remappingFunction));
+    return map1;
+  }
+
+  /**
+   * Adds pair of {@code key} and {@code value} into {@code map} applying the {@code remapppingFunction} if the key is
+   * already contained within the specified {@code map}.
+   */
+  private static <K, U> void putEntry(Map<K, U> map, K key, U value, BiFunction<? super U, ? super U, ? extends U> remappingFunction) {
+    Objects.requireNonNull(remappingFunction);
+    U newValue = value;
+    if (map.containsKey(key)) {
+      U oldValue = map.get(key);
+      newValue = remappingFunction.apply(oldValue, value);
+    }
+    map.put(key, newValue);
   }
 
   /**
