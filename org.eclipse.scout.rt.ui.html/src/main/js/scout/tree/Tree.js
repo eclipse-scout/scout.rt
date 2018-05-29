@@ -1028,6 +1028,8 @@ scout.Tree.prototype._renderSelection = function() {
     }
   }
 
+  this._updateNodePaddingsLeft();
+
   if (this.scrollToSelection) {
     this.revealSelection();
   }

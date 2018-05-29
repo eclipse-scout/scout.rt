@@ -171,7 +171,7 @@ scout.Outline.prototype._computeNodePaddingLeft = function(node) {
   this._computeNodePaddings();
 
   if(node.getOutline().compact){
-    if(node.row){
+    if(node.row && node.getOutline().selectedNode() !== node){
       return node.row._hierarchyLevel * this.nodePaddingLevel;
     }
     return 0;
