@@ -24,7 +24,7 @@ scout.router = {
   },
 
   prepare: function($a, location) {
-    if (!location.startsWith('#')) {
+    if (!scout.strings.startsWith(location, '#')) {
       location = '#' + location;
     }
     $a
