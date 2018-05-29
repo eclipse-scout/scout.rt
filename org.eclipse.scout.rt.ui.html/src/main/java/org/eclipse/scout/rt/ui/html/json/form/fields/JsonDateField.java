@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -157,6 +158,18 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
   @Override
   protected void setErrorStatusFromUI(IStatus status) {
     getModel().getUIFacade().setErrorStatusFromUI(status);
+  }
+
+  @Override
+  protected void handleUiErrorStatusChange(JSONObject data) {
+    super.handleUiErrorStatusChange(data);
+    JSONObject jsonStatus = data.optJSONObject(IValueField.PROP_ERROR_STATUS);
+    if (jsonStatus == null && getModel().getErrorStatus() != null) {
+      // Always send the current model error status back when the UI cleared the UI error status
+      // Reason: setErrorStatusFromUI of IDateFieldUIFacade only removes the UI error but the UI always clears all. This means the model may still have one but the UI doesn't.
+      // When the model updates its error status with a new one which is equal to the old one it has to be sent to the UI even though no property change event is fired.
+      addPropertyChangeEvent(IValueField.PROP_ERROR_STATUS, JsonStatus.toJson(getModel().getErrorStatus()));
+    }
   }
 
 }

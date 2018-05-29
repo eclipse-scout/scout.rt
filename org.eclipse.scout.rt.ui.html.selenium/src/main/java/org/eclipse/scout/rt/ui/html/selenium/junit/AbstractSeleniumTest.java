@@ -551,6 +551,17 @@ public abstract class AbstractSeleniumTest {
   }
 
   /**
+   * Same as WebElement.clear, but triggers input and key up/down events (which clear does not). The methods simply
+   * calls clear, write 'a' and clears it again by sending an additional key press event for BACKSPACE. Ctrl-a delete
+   * would be more appropriate but os x seems to have problems with that (even if getOsDependentCtrlKey() is used).
+   */
+  public void clearInput(WebElement input) {
+    input.clear();
+    input.sendKeys("a");
+    input.sendKeys(Keys.BACK_SPACE);
+  }
+
+  /**
    * Fails when the given element does not contain all of the given CSS classes.
    *
    * @param element
