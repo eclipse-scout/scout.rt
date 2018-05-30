@@ -119,12 +119,18 @@ public class DoEntityTest {
     assertTrue(entity.all().isEmpty());
     entity.put("attribute", "foo");
     entity.put("attribute2", "bar");
+    entity.put("attribute3", null);
+
     Set<String> expectedKeys = new LinkedHashSet<>();
     expectedKeys.add("attribute");
     expectedKeys.add("attribute2");
+    expectedKeys.add("attribute3");
+
     Set<String> expectedValues = new LinkedHashSet<>();
     expectedValues.add("foo");
     expectedValues.add("bar");
+    expectedValues.add(null);
+
     assertEquals(expectedKeys, entity.all().keySet());
     assertEquals(expectedValues, new HashSet<>(entity.all().values()));
   }
