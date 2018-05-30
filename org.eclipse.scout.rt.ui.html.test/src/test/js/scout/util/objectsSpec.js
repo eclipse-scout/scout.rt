@@ -364,9 +364,10 @@ describe("scout.objects", function() {
       expect(scout.objects.equals('', '')).toBe(true);
       expect(scout.objects.equals(true, true)).toBe(true);
       expect(scout.objects.equals(null, null)).toBe(true);
-      expect(scout.objects.equals([], [])).toBe(true);
-      expect(scout.objects.equals([1, 2, 3], [1, 2, 3])).toBe(true);
-      expect(scout.objects.equals([1, 2, 3], [3, 2, 1])).toBe(false);
+      expect(scout.objects.equals([], [])).toBe(false);
+      var arr01 = [1, 2, 3];
+      expect(scout.objects.equals(arr01, arr01)).toBe(true);
+      expect(scout.objects.equals(arr01, [1, 2, 3])).toBe(false);
       var a = {};
       expect(scout.objects.equals(a, a)).toBe(true);
       expect(scout.objects.equals({}, {})).toBe(false);
@@ -389,8 +390,10 @@ describe("scout.objects", function() {
       expect(scout.objects.equalsRecursive(true, true)).toBe(true);
       expect(scout.objects.equalsRecursive(null, null)).toBe(true);
       expect(scout.objects.equalsRecursive([], [])).toBe(true);
-      expect(scout.objects.equalsRecursive([1, 2, 3], [1, 2, 3])).toBe(true);
-      expect(scout.objects.equalsRecursive([1, 2, 3], [3, 2, 1])).toBe(false);
+      var arr01 = [1, 2, 3];
+      expect(scout.objects.equalsRecursive(arr01, arr01)).toBe(true);
+      expect(scout.objects.equalsRecursive(arr01, [1, 2, 3])).toBe(true);
+      expect(scout.objects.equalsRecursive(arr01, [3, 2, 1])).toBe(false);
       var a = {};
       expect(scout.objects.equalsRecursive(a, a)).toBe(true);
       expect(scout.objects.equalsRecursive({}, {})).toBe(true);
