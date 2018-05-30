@@ -164,4 +164,34 @@ describe("Menu", function() {
 
   });
 
+  describe('clone', function() {
+
+    it('and change child actions', function() {
+      var clone,
+        menu = helper.createMenu({
+          text: 'menu',
+          keyStroke: 'F2'
+        });
+      menu.childActions = [menu1];
+      menu.render($sandbox);
+
+      clone = menu.clone({
+        parent: menu.parent
+      }, {
+        delegateEventsToOriginal: [],
+        delegateAllPropertiesToClone: true,
+        delegateAllPropertiesToOriginal: true,
+        excludePropertiesToOriginal: []
+      });
+
+      menu.setChildActions([menu1, menu2]);
+      expect(clone.childActions.length).toBe(2);
+      clone.setChildActions([menu2]);
+      expect(menu.childActions.length).toBe(1);
+
+      expect(menu.childActions[0]).toBe(menu2);
+    });
+
+  });
+
 });

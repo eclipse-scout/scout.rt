@@ -264,10 +264,6 @@ scout.objects = {
     if ((objA && objB) && (objA.equals && objB.equals)) {
       return objA.equals(objB);
     }
-    // Compare arrays using scout.arrays.equals()
-    if (Array.isArray(objA) && Array.isArray(objB)) {
-      return scout.arrays.equals(objA, objB);
-    }
     return false;
   },
 

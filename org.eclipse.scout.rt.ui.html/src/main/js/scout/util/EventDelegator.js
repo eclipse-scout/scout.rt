@@ -87,12 +87,24 @@ scout.EventDelegator.prototype._onSourcePropertyChange = function(event) {
     return;
   }
   if (this.delegateAllProperties || this.delegateProperties.indexOf(event.propertyName) > -1) {
+    if (scout.EventDelegator.equalsProperty(event.propertyName, this.target, event.newValue)) {
+      return;
+    }
     if (this.callSetter) {
       this.target.callSetter(event.propertyName, event.newValue);
     } else {
       this.target.trigger(event.type, event);
     }
   }
+};
+
+scout.EventDelegator.equalsProperty = function(propName, obj, value) {
+  var propValue = obj[propName];
+  // Compare arrays using scout.arrays.equals()
+  if (Array.isArray(value) && Array.isArray(propValue)) {
+    return scout.arrays.equals(value, propValue);
+  }
+  return scout.objects.equals(propValue, value);
 };
 
 scout.EventDelegator.create = function(source, target, options) {
