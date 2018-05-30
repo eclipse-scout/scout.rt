@@ -1,5 +1,8 @@
 package org.eclipse.scout.rt.client.ui.desktop.datachange;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.event.AbstractGroupedListenerList;
 
@@ -12,7 +15,12 @@ public class DataChangeManager extends AbstractGroupedListenerList<IDataChangeLi
   }
 
   @Override
-  protected Object allEventsType() {
+  protected Set<Object> knownEventTypes() {
+    return Collections.emptySet();
+  }
+
+  @Override
+  protected Object otherEventsType() {
     return null;
   }
 

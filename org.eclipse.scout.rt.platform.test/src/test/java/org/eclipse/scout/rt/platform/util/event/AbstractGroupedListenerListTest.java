@@ -14,6 +14,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.scout.rt.platform.util.TuningUtility;
 import org.junit.Ignore;
@@ -99,14 +102,14 @@ public class AbstractGroupedListenerListTest {
   }
 
   /*
-  #TUNING: add1 50000 took 64.890965ms
-  #TUNING: add1-last 50000 took 30.979520ms
-  #TUNING: add2 50000 took 39.396037ms
-  #TUNING: add2-last 50000 took 70.763682ms
-  #TUNING: event1 took 20.464705ms
-  #TUNING: event2 took 10.405189ms
-  #TUNING: remove1 50000 took 307.316241ms
-  #TUNING: remove2 50000 took 35.066489ms
+  #TUNING: add1 50000 took 150.052039ms
+  #TUNING: add1-last 50000 took 169.142794ms
+  #TUNING: add2 50000 took 30.777621ms
+  #TUNING: add2-last 50000 took 28.885945ms
+  #TUNING: event1 took 35.901238ms
+  #TUNING: event2 took 17.001749ms
+  #TUNING: remove1 50000 took 312.464108ms
+  #TUNING: remove2 50000 took 46.308949ms
   */
   @Test
   public void testBasicOperations() {
@@ -168,7 +171,7 @@ public class AbstractGroupedListenerListTest {
     TuningUtility.startTimer();
     observer.fireEvent(new FixtureEvent(FixtureEvent.TYPE_NODE_ACTION));
     TuningUtility.stopTimer("event2");
-    assertEquals(4 * n, fireCount);
+    assertEquals(2 * n, fireCount);
 
     TuningUtility.startTimer();
     for (FixtureEventListener listener : listeners) {
@@ -192,39 +195,44 @@ public class AbstractGroupedListenerListTest {
   @Test
   public void testAddAll() {
     FixtureEventListeners src = new FixtureEventListeners();
-    FixtureEventListener a = e -> {
-    };
-    FixtureEventListener aw = e -> {
-    };
-    FixtureEventListener a1 = e -> {
-    };
-    FixtureEventListener a12w = e -> {
-    };
-    FixtureEventListener b = e -> {
-    };
-    FixtureEventListener bw = e -> {
-    };
-    FixtureEventListener b1 = e -> {
-    };
-    FixtureEventListener b12w = e -> {
-    };
-    src.add(a, false);
-    src.add(aw, true);
-    src.add(a1, false, 1);
-    src.add(a12w, true, 1, 2);
+    FixtureEventListener a = createListener("a");
+    FixtureEventListener aw = createListener("aw");
+    FixtureEventListener a1 = createListener("a1");
+    FixtureEventListener a12w = createListener("a12w");
+    FixtureEventListener b = createListener("b");
+    FixtureEventListener bw = createListener("bw");
+    FixtureEventListener b1 = createListener("b1");
+    FixtureEventListener b12w = createListener("b12w");
+    src.add(a, false);//add for all event types
+    src.add(aw, true);//same, weak
+    src.add(a1, false, 1);//add for unknown event type 1
+    src.add(a12w, true, 1, FixtureEvent.TYPE_NODE_ACTION);//add for known event type 20, weak
     src.addLastCalled(b, false);
     src.addLastCalled(bw, true);
     src.addLastCalled(b1, false, 1);
-    src.addLastCalled(b12w, true, 1, 2);
+    src.addLastCalled(b12w, true, 1, FixtureEvent.TYPE_NODE_ACTION);
     assertEquals(Arrays.asList(a12w, a1, aw, a, b12w, b1, bw, b), src.list(1));
-    assertEquals(Arrays.asList(a12w, aw, a, b12w, bw, b), src.list(2));
+    assertEquals(Arrays.asList(a12w, aw, a, b12w, bw, b), src.list(FixtureEvent.TYPE_NODE_ACTION));
     assertEquals(Arrays.asList(aw, a, bw, b), src.list(9));
 
     FixtureEventListeners dst = new FixtureEventListeners();
     dst.addAll(src);
     assertEquals(Arrays.asList(a12w, a1, aw, a, b12w, b1, bw, b), dst.list(1));
-    assertEquals(Arrays.asList(a12w, aw, a, b12w, bw, b), dst.list(2));
+    assertEquals(Arrays.asList(a12w, aw, a, b12w, bw, b), dst.list(FixtureEvent.TYPE_NODE_ACTION));
     assertEquals(Arrays.asList(aw, a, bw, b), dst.list(9));
+  }
+
+  private static FixtureEventListener createListener(String name) {
+    return new FixtureEventListener() {
+      @Override
+      public void handle(FixtureEvent event) {
+      }
+
+      @Override
+      public String toString() {
+        return name;
+      }
+    };
   }
 
   private static class FixtureEvent {
@@ -243,13 +251,22 @@ public class AbstractGroupedListenerListTest {
   }
 
   private static class FixtureEventListeners extends AbstractGroupedListenerList<FixtureEventListener, FixtureEvent, Integer> {
+    private static final Set<Integer> KNOWN_EVENT_TYPES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+        FixtureEvent.TYPE_REQUEST_FOCUS,
+        FixtureEvent.TYPE_NODE_ACTION)));
+
     @Override
     protected Integer eventType(FixtureEvent event) {
       return event.type;
     }
 
     @Override
-    protected Integer allEventsType() {
+    protected Set<Integer> knownEventTypes() {
+      return KNOWN_EVENT_TYPES;
+    }
+
+    @Override
+    protected Integer otherEventsType() {
       return null;
     }
 

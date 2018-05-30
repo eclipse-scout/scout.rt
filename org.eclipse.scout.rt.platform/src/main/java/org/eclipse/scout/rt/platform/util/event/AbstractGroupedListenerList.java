@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.platform.util.event;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,18 @@ public abstract class AbstractGroupedListenerList<LISTENER, EVENT, EVENT_TYPE> i
     return m_listenerMap;
   }
 
-  protected abstract EVENT_TYPE allEventsType();
+  /**
+   * These are the known event types. This is used in {@link #add(Object, boolean, Object...)} when no event types are
+   * specified. The listener is the added for all known event types as well as for the special event type
+   * {@link #otherEventsType()}. That way all listeners per event type are in the correct order (last added, first
+   * called)
+   */
+  protected abstract Set<EVENT_TYPE> knownEventTypes();
+
+  /**
+   * see {@link #knownEventTypes()}
+   */
+  protected abstract EVENT_TYPE otherEventsType();
 
   protected abstract EVENT_TYPE eventType(EVENT event);
 
@@ -108,7 +120,10 @@ public abstract class AbstractGroupedListenerList<LISTENER, EVENT, EVENT_TYPE> i
     }
     synchronized (lockObject()) {
       if (eventTypes == null || eventTypes.length == 0) {
-        addInsideLock(m_listenerMap, listener, weak, allEventsType());
+        for (EVENT_TYPE eventType : knownEventTypes()) {
+          addInsideLock(m_listenerMap, listener, weak, eventType);
+        }
+        addInsideLock(m_listenerMap, listener, weak, otherEventsType());
       }
       else {
         for (EVENT_TYPE eventType : eventTypes) {
@@ -132,7 +147,10 @@ public abstract class AbstractGroupedListenerList<LISTENER, EVENT, EVENT_TYPE> i
     }
     synchronized (lockObject()) {
       if (eventTypes == null || eventTypes.length == 0) {
-        addInsideLock(m_lastListenerMap, listener, weak, allEventsType());
+        for (EVENT_TYPE eventType : knownEventTypes()) {
+          addInsideLock(m_lastListenerMap, listener, weak, eventType);
+        }
+        addInsideLock(m_lastListenerMap, listener, weak, otherEventsType());
       }
       else {
         for (EVENT_TYPE eventType : eventTypes) {
@@ -160,8 +178,8 @@ public abstract class AbstractGroupedListenerList<LISTENER, EVENT, EVENT_TYPE> i
     }
     synchronized (lockObject()) {
       if (eventTypes == null || eventTypes.length == 0) {
-        removeInsideLock(m_listenerMap, listener, allEventsType());
-        removeInsideLock(m_lastListenerMap, listener, allEventsType());
+        removeInsideLock(m_listenerMap, listener, null);
+        removeInsideLock(m_lastListenerMap, listener, null);
       }
       else {
         for (EVENT_TYPE eventType : eventTypes) {
@@ -194,28 +212,35 @@ public abstract class AbstractGroupedListenerList<LISTENER, EVENT, EVENT_TYPE> i
     if (listener == null) {
       return;
     }
-    for (EVENT_TYPE eventType : new HashSet<>(listenerMap.keySet())) {
-      if (queryType != allEventsType() && !Objects.equals(queryType, eventType)) {
+    for (Iterator<Map.Entry<EVENT_TYPE, UnsafeFastListenerList<LISTENER>>> it = listenerMap.entrySet().iterator(); it.hasNext();) {
+      Map.Entry<EVENT_TYPE, UnsafeFastListenerList<LISTENER>> e = it.next();
+      EVENT_TYPE eventType = e.getKey();
+      if (queryType != null && !Objects.equals(queryType, eventType)) {
         continue;
       }
-      UnsafeFastListenerList<LISTENER> listeners = listenerMap.get(eventType);
+      UnsafeFastListenerList<LISTENER> listeners = e.getValue();
       if (listeners == null) {
         continue;
       }
       listeners.remove(listener);
       if (listeners.isEmpty()) {
-        listenerMap.remove(eventType);
+        it.remove();
       }
     }
   }
 
-  private List<LISTENER> collectListenersInsideLock(EVENT_TYPE type) {
+  private List<LISTENER> collectListenersInsideLock(EVENT_TYPE eventType) {
     ArrayList<LISTENER> result = new ArrayList<>();
+    boolean knownEventType = knownEventTypes().contains(eventType);
     //lists are in reverse order
-    collectListenersInsideLock(m_listenerMap, type, result);
-    collectListenersInsideLock(m_listenerMap, allEventsType(), result);
-    collectListenersInsideLock(m_lastListenerMap, type, result);
-    collectListenersInsideLock(m_lastListenerMap, allEventsType(), result);
+    collectListenersInsideLock(m_listenerMap, eventType, result);
+    if (!knownEventType) {
+      collectListenersInsideLock(m_listenerMap, otherEventsType(), result);
+    }
+    collectListenersInsideLock(m_lastListenerMap, eventType, result);
+    if (!knownEventType) {
+      collectListenersInsideLock(m_lastListenerMap, otherEventsType(), result);
+    }
     return result;
   }
 
@@ -237,7 +262,7 @@ public abstract class AbstractGroupedListenerList<LISTENER, EVENT, EVENT_TYPE> i
       for (Map.Entry<EVENT_TYPE, UnsafeFastListenerList<LISTENER>> e : m_listenerMap.entrySet()) {
         EVENT_TYPE eventType = e.getKey();
         UnsafeFastListenerList<LISTENER> listeners = e.getValue();
-        String context = eventType == allEventsType() ? null : "eventType: " + eventType;
+        String context = "eventType: " + (eventType == otherEventsType() ? "unknown/other" : eventType);
         for (LISTENER listener : listeners.list()) {
           snapshot.add(listener.getClass(), context, listener);
         }
@@ -245,7 +270,7 @@ public abstract class AbstractGroupedListenerList<LISTENER, EVENT, EVENT_TYPE> i
       for (Map.Entry<EVENT_TYPE, UnsafeFastListenerList<LISTENER>> e : m_lastListenerMap.entrySet()) {
         EVENT_TYPE eventType = e.getKey();
         UnsafeFastListenerList<LISTENER> listeners = e.getValue();
-        String context = eventType == allEventsType() ? "lastListeners" : "lastListeners of eventType: " + eventType;
+        String context = "lastListeners of eventType: " + (eventType == otherEventsType() ? "unknown/other" : eventType);
         for (LISTENER listener : listeners.list()) {
           snapshot.add(listener.getClass(), context, listener);
         }
