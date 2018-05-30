@@ -138,7 +138,7 @@ describe("ListBox", function() {
 
   describe('lookupCall', function() {
 
-    it('switching should refill table and set value to null', function(){
+    it('switching should refill table', function(){
       var field = createFieldWithLookupCall({}, {
         objectType: 'AnotherDummyLookupCall'
       });
@@ -156,7 +156,8 @@ describe("ListBox", function() {
       });
       field.setLookupCall(newLookupCall);
       jasmine.clock().tick(300);
-      expect(field.value).toEqual([]);
+      // dont change value when lookupCall changes
+      expect(field.value).toEqual([100, 500]);
       expect(field.displayText).toBe('');
       expect(field.table.checkedRows().length).toBe(0);
       expect(field.table.rows.length).toBe(3);

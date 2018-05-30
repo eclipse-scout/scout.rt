@@ -302,7 +302,6 @@ scout.ListBox.prototype._createTableRow = function(lookupRow) {
 };
 
 scout.ListBox.prototype.setLookupCall = function(lookupCall) {
-  this._setValue([]);
   this.setProperty('lookupCall', lookupCall);
 };
 
