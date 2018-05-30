@@ -119,7 +119,8 @@ scout.TabArea.prototype._renderTabItems = function() {
     tabItem.$tabContainer.prependTo(this.$container);
     if (index === 0) {
       tabItem.$tabContainer.addClass("last");
-    } else if (index === items.length - 1) {
+    }
+    if (index === items.length - 1) {
       tabItem.$tabContainer.addClass("first");
     }
 
