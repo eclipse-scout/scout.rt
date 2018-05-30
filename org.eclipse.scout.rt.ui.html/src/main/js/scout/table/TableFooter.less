@@ -85,10 +85,24 @@
         top: 0;
         margin-bottom: 0;
         background-color: @tab-item-active-color;
+
+        &::after {
+          top: 3px;
+          #scout.transform(rotate(180deg));
+        }
+      }
+
+      &.first-selected > .selection-marker::after {
+        margin-left: @tab-box-focus-arrow-margin-left - @mandatory-indicator-width / 2;
       }
 
       & > .tab-item {
         z-index: 2;
+
+        &.first {
+          /* align with the form fields */
+          padding-left: @mandatory-indicator-width;
+        }
 
         &::after {
           top: 0;

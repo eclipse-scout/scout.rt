@@ -11,6 +11,7 @@
 scout.TabArea = function() {
   scout.TabArea.parent.call(this);
   this.tabBox = null;
+  this.tabItems = [];
 
   this._tabPropertyChangeHandler = this._onTabPropertyChange.bind(this);
   this.ellipsis = null;
@@ -71,6 +72,7 @@ scout.TabArea.prototype.setSelectedTab = function(tabItem) {
 };
 
 scout.TabArea.prototype._renderSelectedTab = function() {
+  this.htmlComp.layout._updateFirstMarker();
   // force a relayout in case the selected tab is overflown. The layout will ensure the selected tab is visible.
   if (this.selectedTab && this.selectedTab.tabOverflown) {
     this.invalidateLayoutTree();
@@ -117,16 +119,10 @@ scout.TabArea.prototype._renderTabItems = function() {
   this.tabItems.slice().reverse().forEach(function(tabItem, index, items) {
     tabItem.renderTab(this.$container);
     tabItem.$tabContainer.prependTo(this.$container);
-    if (index === 0) {
-      tabItem.$tabContainer.addClass("last");
-    }
-    if (index === items.length - 1) {
-      tabItem.$tabContainer.addClass("first");
-    }
-
     tabItem.$tabContainer.on('blur', this._onTabItemBlur.bind(this))
       .on('focus', this._onTabItemFocus.bind(this));
   }, this);
+  this.htmlComp.layout._updateFirstMarker();
 };
 
 scout.TabArea.prototype._onTabItemFocus = function() {

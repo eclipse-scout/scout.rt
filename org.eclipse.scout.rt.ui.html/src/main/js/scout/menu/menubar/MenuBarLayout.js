@@ -208,26 +208,26 @@ scout.MenuBarLayout.prototype._bestGuessFirstLast = function(menuItems) {
   scout.arrays.find(menuItems.slice().reverse(), function(menuItem) {
     if (menuItem.ellipsis) {
       ellipsis = menuItem;
-      ellipsis.$container.toggleClass('last', true);
+      ellipsis.$container.addClass('last');
       return false;
     } else if (ellipsis) {
-      menuItem.$container.toggleClass('last', true);
+      menuItem.$container.addClass('last');
       return true;
     } else {
-      menuItem.$container.toggleClass('last', true);
+      menuItem.$container.addClass('last');
       return true;
     }
   }, this);
 
-  scout.arrays.first(menuItems).$container.toggleClass('first', true);
+  scout.arrays.first(menuItems).$container.addClass('first');
 };
 
 scout.MenuBarLayout.prototype._updateFirstLastMenuMarker = function() {
   this._visibleMenuItems.forEach(function(menuItem, index, arr) {
     if (index === 0) {
-      menuItem.$container.toggleClass('first', true);
+      menuItem.$container.addClass('first');
     } else if (index === arr.length - 1) {
-      menuItem.$container.toggleClass('last', true);
+      menuItem.$container.addClass('last');
     } else {
       menuItem.$container.removeClass('first last');
     }

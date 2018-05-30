@@ -208,3 +208,13 @@ scout.TabAreaLayout.prototype._onTabAreaPropertyChange = function(event) {
     this._layoutSelectionMarker();
   }
 };
+
+scout.TabAreaLayout.prototype._updateFirstMarker = function() {
+  this.tabArea.$container.removeClass('first-selected');
+  this.tabArea.tabItems.forEach(function(tab, i, tabs) {
+    if (i === 0 && tab === this.tabArea.selectedTab) {
+      this.tabArea.$container.addClass('first-selected', i === 0 && tab === this.selectedTab);
+    }
+    tab.$tabContainer.toggleClass('first', i === 0);
+  }, this);
+};

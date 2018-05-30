@@ -9,21 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 
-/* Mixins */
-
-#scout {
-  .tab-item-focus-marker {
-    #scout.font-icon();
-    content: @icon-angle-right-bold;
-    color: @tab-item-active-color;
-    position: absolute;
-    top: 0;
-    left: @tab-item-padding-x - @tab-item-focus-arrow-width;
-    width: @tab-item-focus-arrow-width;
-    padding: @tab-item-focus-arrow-padding-top 0 0;
-    text-align: center;
-  }
-}
+@tab-box-focus-arrow-margin-left: -4px; /* arrow-width / 2 */
 
 .tab-box {
   & > .status {
@@ -65,16 +51,19 @@
       &::after {
         position: absolute;
         left: 50%;
-        margin-left: -11px;
-        border: solid @active-color;
-
-        border-width: 0 10px 5px 10px;
+        margin-left: @tab-box-focus-arrow-margin-left;
+        border-style: solid;
+        border-width: 0 4px 3px 4px;
         border-color: transparent transparent @active-color transparent;
         content: '';
         height: 0;
         width: 0;
         bottom: 2px;
       }
+    }
+
+    &.first-selected > .selection-marker::after {
+      margin-left: @tab-box-focus-arrow-margin-left - @tab-item-padding-x / 2;
     }
 
     & > .tab-item > .title > .sub-label {
@@ -188,10 +177,6 @@
     & > .title {
       padding-bottom: @group-box-title-with-sub-label-padding-bottom;
     }
-
-    &:focus > .title::before {
-      padding-bottom: @group-box-title-with-sub-label-padding-bottom;
-    }
   }
 
   & > .status {
@@ -248,8 +233,8 @@
     outline: none;
     color: @focus-color;
 
-    &::after {
-      #scout.tab-item-focus-marker();
+    & > .text {
+      text-decoration: underline;
     }
   }
 }
