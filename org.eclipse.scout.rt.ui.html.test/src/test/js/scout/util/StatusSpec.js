@@ -21,24 +21,40 @@ describe("scout.Status", function() {
       });
       expect(status.severity).toBe(scout.Status.Severity.ERROR);
       expect(status.message).toBe('Oops');
+      expect(status.isError()).toBe(true);
+      expect(status.isWarning()).toBe(false);
+      expect(status.isInfo()).toBe(false);
+      expect(status.isOk()).toBe(false);
 
       status = scout.Status.warning({
         message: 'foo'
       });
       expect(status.severity).toBe(scout.Status.Severity.WARNING);
       expect(status.message).toBe('foo');
+      expect(status.isError()).toBe(false);
+      expect(status.isWarning()).toBe(true);
+      expect(status.isInfo()).toBe(false);
+      expect(status.isOk()).toBe(false);
 
       status = scout.Status.info({
         message: 'bar'
       });
       expect(status.severity).toBe(scout.Status.Severity.INFO);
       expect(status.message).toBe('bar');
+      expect(status.isError()).toBe(false);
+      expect(status.isWarning()).toBe(false);
+      expect(status.isInfo()).toBe(true);
+      expect(status.isOk()).toBe(false);
 
       status = scout.Status.ok({
         message: 'Okay'
       });
       expect(status.severity).toBe(scout.Status.Severity.OK);
       expect(status.message).toBe('Okay');
+      expect(status.isError()).toBe(false);
+      expect(status.isWarning()).toBe(false);
+      expect(status.isInfo()).toBe(false);
+      expect(status.isOk()).toBe(true);
 
       // 2. String argument (convenience)
       status = scout.Status.error('Oops');

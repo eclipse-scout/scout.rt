@@ -51,6 +51,18 @@ scout.Status.prototype.isError = function() {
   return this.severity === scout.Status.Severity.ERROR;
 };
 
+scout.Status.prototype.isWarning = function() {
+  return this.severity === scout.Status.Severity.WARNING;
+};
+
+scout.Status.prototype.isInfo = function() {
+  return this.severity === scout.Status.Severity.INFO;
+};
+
+scout.Status.prototype.isOk = function() {
+  return this.severity === scout.Status.Severity.OK;
+};
+
 /**
  * @returns {scout.Status[]} status including children as flat list.
  */
