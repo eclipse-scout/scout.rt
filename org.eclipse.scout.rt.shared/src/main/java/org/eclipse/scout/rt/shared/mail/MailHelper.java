@@ -675,7 +675,10 @@ public class MailHelper {
     }
     ArrayList<InternetAddress> addrList = new ArrayList<>();
     for (MailParticipant participant : participants) {
-      addrList.add(createInternetAddress(participant));
+      InternetAddress internetAddress = createInternetAddress(participant);
+      if (internetAddress != null) {
+        addrList.add(internetAddress);
+      }
     }
     return addrList.toArray(new InternetAddress[addrList.size()]);
   }

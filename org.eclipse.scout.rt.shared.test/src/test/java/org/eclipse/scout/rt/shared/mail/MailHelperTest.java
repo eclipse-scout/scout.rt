@@ -10,6 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.mail;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -48,13 +55,6 @@ import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.junit.Assert;
 import org.junit.Test;
-
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * JUnit tests for {@link MailHelper}
@@ -199,6 +199,24 @@ public class MailHelperTest {
     assertEquals("Number of to recipients is wrong", 1, toRecipients.length);
     assertEquals("Number of cc recipients is wrong", 2, ccRecipients.length);
     assertEquals("Number of bcc recipients is wrong", 3, bccRecipients.length);
+  }
+
+  @Test
+  public void testCreateMimeMessageWithParticipantWithoutEmail() {
+    MailParticipant mailParticipant = new MailParticipant().withName("name only");
+
+    // sender, reply to, to, cc and bcc must work with mail participant that will result in null
+    // when MailHelper.createInternetAddress(MailParticipant) is called because no email address is present.
+    MailMessage mailMessage = new MailMessage()
+        .withSubject("Subject")
+        .withBodyPlainText("plain text")
+        .withSender(mailParticipant)
+        .addReplyTo(mailParticipant)
+        .addToRecipient(mailParticipant)
+        .addCcRecipient(mailParticipant)
+        .addBccRecipient(mailParticipant);
+
+    assertNotNull(BEANS.get(MailHelper.class).createMimeMessage(mailMessage));
   }
 
   @Test
