@@ -29,3 +29,19 @@
     #scout.animation-duration(0.2s);
   }
 }
+
+/* The default class is added if displayStyle is set to DEFAULT. If it is set to PLAIN no class will be added. */
+.default-tile {
+  background-color: @palette-gray-1;
+  border: 1px solid @border-color;
+  padding: @tile-padding-y @tile-padding-x;
+
+  &.selectable:active:not(.selected) {
+    background-color: @palette-gray-3;
+  }
+
+  &.selected {
+    background-color: @item-selection-background-color;
+    border-color: @item-selection-border-color;
+  }
+}

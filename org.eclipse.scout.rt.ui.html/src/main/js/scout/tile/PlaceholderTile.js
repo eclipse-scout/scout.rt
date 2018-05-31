@@ -11,6 +11,7 @@
 scout.PlaceholderTile = function() {
   scout.PlaceholderTile.parent.call(this);
   this.cssClass = 'placeholder-tile';
+  this.displayStyle = scout.Tile.DisplayStyle.PLAIN;
 };
 scout.inherits(scout.PlaceholderTile, scout.Tile);
 

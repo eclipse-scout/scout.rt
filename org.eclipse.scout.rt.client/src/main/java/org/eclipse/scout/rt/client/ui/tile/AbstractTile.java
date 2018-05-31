@@ -70,6 +70,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
     setOrder(calculateViewOrder());
     setColorScheme(getConfiguredColorScheme());
     setCssClass(getConfiguredCssClass());
+    setDisplayStyle(getConfiguredDisplayStyle());
     setGridDataHints(getConfiguredGridDataHints());
   }
 
@@ -158,6 +159,23 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   @Order(10)
   protected ITileColorScheme getConfiguredColorScheme() {
     return TileColorScheme.DEFAULT;
+  }
+
+  /**
+   * Configures the display style of the tile.
+   * <p>
+   * The available styles are:
+   * <ul>
+   * <li>{@link IFormFieldTile#DISPLAY_STYLE_PLAIN}</li>
+   * <li>{@link IFormFieldTile#DISPLAY_STYLE_DASHBOARD}</li>
+   * </ul>
+   * <p>
+   * Subclasses can override this method. The default is {@link IFormFieldTile#DISPLAY_STYLE_DASHBOARD}.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(140)
+  protected String getConfiguredDisplayStyle() {
+    return DISPLAY_STYLE_DEFAULT;
   }
 
   /**
@@ -251,6 +269,18 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   @Override
   public void setColorScheme(ITileColorScheme colorScheme) {
     propertySupport.setProperty(PROP_COLOR_SCHEME, colorScheme);
+  }
+
+  @Override
+  public String getDisplayStyle() {
+    return propertySupport.getPropertyString(PROP_DISPLAY_STYLE);
+  }
+
+  /**
+   * Calling this method after initialization won't have any effect
+   */
+  protected void setDisplayStyle(String style) {
+    propertySupport.setPropertyString(PROP_DISPLAY_STYLE, style);
   }
 
   protected IDataChangeListener getInternalDataChangeListener() {

@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.Tile = function() {
   scout.Tile.parent.call(this);
+  this.displayStyle = scout.Tile.DisplayStyle.DEFAULT;
   this.filterAccepted = true;
   this.gridData = null;
   this.gridDataHints = new scout.GridData();
@@ -24,6 +25,11 @@ scout.Tile.ColorSchemeId = {
   DEFAULT: 'default',
   ALTERNATIVE: 'alternative',
   RAINBOW: 'rainbow'
+};
+
+scout.Tile.DisplayStyle = {
+  DEFAULT: 'default',
+  PLAIN: 'plain'
 };
 
 /**
@@ -54,6 +60,7 @@ scout.Tile.prototype._renderProperties = function() {
   this._renderColorScheme();
   this._renderSelectable();
   this._renderSelected();
+  this._renderDisplayStyle();
 };
 
 scout.Tile.prototype._postRender = function() {
@@ -61,6 +68,10 @@ scout.Tile.prototype._postRender = function() {
   // Make sure prefSize returns the size the tile has after the animation even if it is called while the animation runs
   // Otherwise the tile may have the wrong size after making a tile with useUiHeight = true visible
   this.htmlComp.layout.animateClasses = ['animate-visible', 'animate-invisible'];
+};
+
+scout.Tile.prototype._renderDisplayStyle = function() {
+  this.$container.toggleClass('default-tile', this.displayStyle === scout.Tile.DisplayStyle.DEFAULT);
 };
 
 scout.Tile.prototype.setGridDataHints = function(gridData) {

@@ -15,17 +15,18 @@ scout.FormFieldTile = function() {
 scout.inherits(scout.FormFieldTile, scout.WidgetTile);
 
 scout.FormFieldTile.DisplayStyle = {
-  PLAIN: 'plain',
+  DEFAULT: scout.Tile.DEFAULT,
+  PLAIN: scout.Tile.PLAIN,
   DASHBOARD: 'dashboard'
 };
 
 scout.FormFieldTile.prototype._renderProperties = function() {
   scout.FormFieldTile.parent.prototype._renderProperties.call(this);
   this._renderFieldLabelVisible();
-  this._renderDisplayStyle();
 };
 
 scout.FormFieldTile.prototype._renderDisplayStyle = function() {
+  scout.FormFieldTile.parent.prototype._renderDisplayStyle.call(this);
   this.$container.toggleClass('dashboard', this.displayStyle === scout.FormFieldTile.DisplayStyle.DASHBOARD);
 };
 

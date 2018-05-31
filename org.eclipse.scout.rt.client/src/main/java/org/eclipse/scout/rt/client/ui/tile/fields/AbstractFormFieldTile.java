@@ -35,7 +35,6 @@ public abstract class AbstractFormFieldTile<T extends IFormField> extends Abstra
   @Override
   protected void initConfig() {
     super.initConfig();
-    setDisplayStyle(getConfiguredDisplayStyle());
     initTileWidgetConfig();
   }
 
@@ -92,6 +91,7 @@ public abstract class AbstractFormFieldTile<T extends IFormField> extends Abstra
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(140)
+  @Override
   protected String getConfiguredDisplayStyle() {
     return DISPLAY_STYLE_DASHBOARD;
   }
@@ -115,18 +115,6 @@ public abstract class AbstractFormFieldTile<T extends IFormField> extends Abstra
   @SuppressWarnings("findbugs:NP_BOOLEAN_RETURN_NULL")
   protected Boolean getConfiguredLabelVisible() {
     return null;
-  }
-
-  @Override
-  public String getDisplayStyle() {
-    return propertySupport.getPropertyString(PROP_DISPLAY_STYLE);
-  }
-
-  /**
-   * Calling this method after initialization won't have any effect
-   */
-  protected void setDisplayStyle(String style) {
-    propertySupport.setPropertyString(PROP_DISPLAY_STYLE, style);
   }
 
   @Override

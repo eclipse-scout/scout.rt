@@ -16,6 +16,20 @@ public interface ITile extends IWidget, IOrdered, IStyleable, IExtensibleObject,
   String PROP_COLOR_SCHEME = "colorScheme";
   String PROP_GRID_DATA_HINTS = "gridDataHints";
   String PROP_LOADING = "loading";
+  String PROP_DISPLAY_STYLE = "displayStyle";
+
+  /**
+   * This is the default display style. If it is active, default styling is applied like visualizing the selection.
+   */
+  String DISPLAY_STYLE_DEFAULT = "default";
+
+  /**
+   * The plain style tries to render the tile as it is without adjusting the look or behavior. This gives you an easy
+   * possibility to style it as you like.
+   */
+  String DISPLAY_STYLE_PLAIN = "plain";
+
+  String getDisplayStyle();
 
   ITileColorScheme getColorScheme();
 

@@ -392,6 +392,7 @@
     },
     "Tile": {
       "colorScheme": "default",
+      "displayStyle": "default",
       "gridDataHints": {
         "x": -1,
         "y": -1,
