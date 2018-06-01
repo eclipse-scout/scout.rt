@@ -53,6 +53,14 @@ scout.MenubarBox.prototype._setMenuItems = function(menuItems) {
   this._addMenuHandlers();
 };
 
+/**
+ * @override Widget.js
+ */
+scout.MenubarBox.prototype._remove = function() {
+  this._removeMenuItems();
+  scout.MenubarBox.parent.prototype._remove.call(this);
+};
+
 scout.MenubarBox.prototype._removeMenuItems = function() {
   this._removeMenuHandlers();
   this.menuItems.forEach(function(item) {
