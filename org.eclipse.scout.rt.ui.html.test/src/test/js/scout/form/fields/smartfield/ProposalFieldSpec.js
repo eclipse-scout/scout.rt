@@ -15,7 +15,10 @@ describe('ProposalField', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    field = new scout.ProposalField();
+    field = scout.create('ProposalField', {
+      parent: session.desktop,
+      lookupCall: 'DummyLookupCall'
+    });
     lookupRow = new scout.LookupRow(123, 'Foo');
     jasmine.clock().install();
   });
@@ -27,13 +30,6 @@ describe('ProposalField', function() {
   });
 
   describe('proposal field', function() {
-
-    beforeEach(function() {
-      field = scout.create('ProposalField', {
-        parent: session.desktop,
-        lookupCall: 'DummyLookupCall'
-      });
-    });
 
     it('defaults', function() {
       expect(field.maxLength).toBe(4000);
@@ -70,6 +66,26 @@ describe('ProposalField', function() {
       expect(field.lookupRow).toBe(null);
     });
 
+  });
+
+  /**
+   * When the lookupOnAcceptByText flag is set, make sure that when clear()
+   * _customTextAccepted is called and not _acceptByText. _customTextAccepted
+   * will trigger the acceptInput event which is also sent to the Scout server.
+   * # 221199
+   */
+  it('lookupOnAcceptByText', function() {
+    field.render();
+    field.lookupOnAcceptByText = true;
+    field.setValue('Foo');
+
+    var acceptInputCalled = false;
+    field.on('acceptInput', function() {
+      acceptInputCalled = true;
+    });
+    field.clear();
+
+    expect(acceptInputCalled).toBe(true);
   });
 
 });
