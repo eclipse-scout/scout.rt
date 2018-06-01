@@ -182,7 +182,7 @@ scout.Tile.prototype._renderVisible = function() {
 /**
  * Override this function to do something before the visibility animation starts.
  * Check the isVisible() function if you must distinct between visible/invisible.
- * You can use this function if your tile uses a programmed layout and you need 
+ * You can use this function if your tile uses a programmed layout and you need
  * the size of the tile, without the effects from the animation.
  */
 scout.Tile.prototype._beforeAnimateVisible = function() {

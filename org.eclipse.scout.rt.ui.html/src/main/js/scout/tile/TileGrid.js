@@ -911,6 +911,7 @@ scout.TileGrid.prototype._updateFilteredTiles = function() {
   }
   if (this.filteredTilesDirty) {
     this.setProperty('filteredTiles', tiles);
+    this.invalidateLogicalGrid(false);
     this.filteredTilesDirty = false;
   }
   this._updateEmpty();

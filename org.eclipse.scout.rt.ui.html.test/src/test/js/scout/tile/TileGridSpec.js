@@ -1148,6 +1148,45 @@ describe("TileGrid", function() {
 
   describe('removeFilters', function() {
 
+    it('invalidates the logical grid', function() {
+      var model = {
+        parent: session.desktop,
+        objectType: 'Group',
+        body: {
+          objectType: 'TileGrid',
+          tiles: []
+        }
+      };
+      var group = scout.create(model);
+      var tileGrid = group.body;
+      var tileFilter = scout.create('RemoteTileFilter');
+      tileFilter.setTileIds([4, 5, 6]);
+      tileGrid.addFilter(tileFilter);
+      group.render();
+      tileGrid.setTiles([{
+        objectType: 'Tile',
+        label: 'Tile 1"',
+        id: 1
+      }, {
+        objectType: 'Tile',
+        label: 'Tile 2',
+        id: 2
+      }, {
+        objectType: 'Tile',
+        label: 'Tile 3',
+        id: 3
+      }]);
+
+      expect(tileGrid.filters.length).toBe(1);
+      expect(tileGrid.filteredTiles.length).toBe(0);
+
+      tileGrid.removeFilter(tileFilter);
+      group.bodyAnimating = true; // simulate existing animation
+      tileGrid.filter();
+      expect(tileGrid.filters.length).toBe(0);
+      expect(tileGrid.filteredTiles.length).toBe(3);
+    });
+
     it('removes the given filters', function() {
       var tileGrid = createTileGrid(3);
 
