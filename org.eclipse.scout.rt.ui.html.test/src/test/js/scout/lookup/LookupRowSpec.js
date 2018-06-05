@@ -11,10 +11,9 @@
 describe('LookupRow', function() {
 
   it('constructor', function() {
-    var lookupRow = new scout.LookupRow(123, 'Foo');
-
-    expect(lookupRow.key).toBe(123);
-    expect(lookupRow.text).toBe('Foo');
+    var lookupRow = scout.create('LookupRow');
+    expect(lookupRow.key).toBe(null);
+    expect(lookupRow.text).toBe(null);
     expect(lookupRow.enabled).toBe(true);
     expect(lookupRow.active).toBe(true);
   });

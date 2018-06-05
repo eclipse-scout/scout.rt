@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.LookupRow = function(key, text) {
-  this.key = scout.nvl(key, null);
-  this.text = scout.nvl(text, null);
+scout.LookupRow = function() {
+  this.key = null;
+  this.text = null;
   this.enabled = true;
   this.active = true;
 };

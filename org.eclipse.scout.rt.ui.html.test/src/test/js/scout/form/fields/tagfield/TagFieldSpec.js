@@ -16,7 +16,10 @@ describe('TagField', function() {
     setFixtures(sandbox());
     session = sandboxSession();
     field = new scout.TagField();
-    lookupRow = new scout.LookupRow(123, 'Foo');
+    lookupRow = scout.create('LookupRow', {
+      key: 123,
+      data: 'Foo'
+    });
     helper = new scout.FormSpecHelper(session);
     jasmine.clock().install();
   });

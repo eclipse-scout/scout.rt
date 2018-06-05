@@ -154,10 +154,11 @@ scout.StaticLookupCall.prototype.setDelay = function(delay) {
  * Implement this function to convert a single data array into an instance of scout.LookupRow.
  */
 scout.StaticLookupCall.prototype._dataToLookupRow = function(data) {
-  var lookupRow = new scout.LookupRow(data[0], data[1]);
-  if (data.length >= 3) {
-    lookupRow.parentKey = data[2];
-  }
+  var lookupRow = scout.create('LookupRow', {
+    key: data[0],
+    text: data[1],
+    parentKey: data[2]
+  });
   return lookupRow;
 };
 

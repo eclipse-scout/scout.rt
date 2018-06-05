@@ -19,7 +19,10 @@ describe('ProposalField', function() {
       parent: session.desktop,
       lookupCall: 'DummyLookupCall'
     });
-    lookupRow = new scout.LookupRow(123, 'Foo');
+    lookupRow = scout.create('LookupRow', {
+      key: 123,
+      text: 'Foo'
+    });
     jasmine.clock().install();
   });
 

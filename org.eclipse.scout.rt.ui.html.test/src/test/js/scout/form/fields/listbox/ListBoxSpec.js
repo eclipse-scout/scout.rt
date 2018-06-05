@@ -171,7 +171,10 @@ describe("ListBox", function() {
       var field = createFieldWithLookupCall({}, {
         customProperty: templatePropertyValue,
         _dataToLookupRow: function(data) { // overwrite mapping function to use the custom property
-          return new scout.LookupRow(data[0], data[1] + this.customProperty);
+          return scout.create('LookupRow', {
+            key: data[0],
+            text: data[1] + this.customProperty
+          });
         }
       });
       field.on('prepareLookupCall', function(event) {

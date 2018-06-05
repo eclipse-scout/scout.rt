@@ -16,7 +16,10 @@ describe('SmartField', function() {
     setFixtures(sandbox());
     session = sandboxSession();
     field = new scout.SmartField();
-    lookupRow = new scout.LookupRow(123, 'Foo');
+    lookupRow = scout.create('LookupRow', {
+      key: 123,
+      text: 'Foo'
+    });
     helper = new scout.FormSpecHelper(session);
     jasmine.clock().install();
   });
@@ -339,7 +342,10 @@ describe('SmartField', function() {
       var field = createFieldWithLookupCall({}, {
         customProperty: templatePropertyValue,
         _dataToLookupRow: function(data) { // overwrite mapping function to use the custom property
-          return new scout.LookupRow(data[0], data[1] + this.customProperty);
+          return scout.create('LookupRow', {
+            key: data[0],
+            text: data[1] + this.customProperty
+          });
         }
       });
       field.on('prepareLookupCall', function(event) {
@@ -470,7 +476,10 @@ describe('SmartField', function() {
       var embeddedField = touchField.clone({
         parent: session.desktop
       });
-      embeddedField.setLookupRow(new scout.LookupRow(123, 'baz'));
+      embeddedField.setLookupRow(scout.create('LookupRow', {
+        key: 123,
+        text: 'baz'
+      }));
       embeddedField.setErrorStatus(scout.Status.error({
         message: 'bar'
       }));

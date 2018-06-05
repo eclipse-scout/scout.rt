@@ -122,7 +122,13 @@ describe('SmartFieldRemote', function() {
     });
 
     it('send acceptInput event when lookup row is set and display-text has not changed', function() {
-      var lookupRow = new scout.LookupRow(123, 'foo');
+      var lookupRow = scout.create('LookupRow', {
+        key: 123,
+        text: 'foo'
+      }, {
+        ensureUniqueId: false
+      });
+
       smartField._lastSearchText = 'foo';
       smartField.render();
       smartField.$field.val('foo');
@@ -141,10 +147,11 @@ describe('SmartFieldRemote', function() {
         displayText: 'foo',
         errorStatus: null,
         lookupRow: {
-          active: true,
-          enabled: true,
+          objectType: 'LookupRow',
           key: 123,
-          text: 'foo'
+          text: 'foo',
+          active: true,
+          enabled: true
         },
         showBusyIndicator: true
       });
@@ -181,7 +188,10 @@ describe('SmartFieldRemote', function() {
     function resolveLookupCall(lookupCall) {
       lookupCall.resolveLookup({
         queryBy: scout.QueryBy.ALL,
-        lookupRows: [new scout.LookupRow(123, 'foo')]
+        lookupRows: [scout.create('LookupRow', {
+          key: 123,
+          text: 'foo'
+        })]
       });
       jasmine.clock().tick(500);
     }
