@@ -136,6 +136,7 @@ scout.ButtonAdapterMenu.adaptButtonProperties = function(buttonProperties, menuP
   menuProperties.actionStyle = buttonStyleToActionStyle(buttonProperties.displayStyle);
   menuProperties.toggleAction = buttonProperties.displayStyle === scout.Button.DisplayStyle.TOGGLE;
   menuProperties.childActions = buttonProperties.menus;
+  menuProperties.defaultMenu = buttonProperties.defaultButton;
 
   // Cleanup: Remove all properties that have value 'undefined' from the result object,
   // otherwise, they would be applied to the model adapter.
