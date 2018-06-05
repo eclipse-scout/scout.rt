@@ -71,9 +71,13 @@ scout.ProposalField2.prototype._ensureValue = function(value) {
   return scout.strings.asString(value);
 };
 
+/**
+ * When 'clear' has been clicked (searchText is empty), we want to call customTextAccepted,
+ * so the new value is sent to the server #221199.
+ */
 scout.ProposalField2.prototype._acceptByText = function(searchText) {
   $.log.debug('(ProposalField2#_acceptByText) searchText=', searchText);
-  if (this.lookupOnAcceptByText) {
+  if (this.lookupOnAcceptByText && scout.strings.hasText(searchText)) {
     scout.ProposalField2.parent.prototype._acceptByText.call(this, searchText);
   } else {
     this._customTextAccepted(searchText);
