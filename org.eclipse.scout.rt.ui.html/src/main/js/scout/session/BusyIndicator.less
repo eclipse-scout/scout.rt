@@ -48,7 +48,6 @@
 
 .busyindicator-label {
   display: inline-block;
-  font-weight: bold;
   margin-left: @busyindicator-icon-size + 10px;
   text-indent: -(@busyindicator-icon-size + 10px);
 
@@ -62,11 +61,11 @@
     margin-right: 15px;
     border: 1px fade(@busyindicator-active-color, 80%) solid;
     border-radius: 50%;
-    #scout.animation(pulsate 2.2s cubic-bezier(0.5, 0.1, 0.1, 0.5) infinite);
+    #scout.animation(pulsate 2s cubic-bezier(0.5, 0.1, 0.1, 0.5) infinite);
   }
 
   &.cancelled::before {
-    #scout.animation(pulsate-reverse 2.2s cubic-bezier(0.5, 0.1, 0.1, 0.5) infinite);
+    #scout.animation(pulsate-reverse 2s cubic-bezier(0.5, 0.1, 0.1, 0.5) infinite);
   }
 }
 
