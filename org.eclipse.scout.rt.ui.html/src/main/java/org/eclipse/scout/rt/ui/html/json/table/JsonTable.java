@@ -849,6 +849,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   protected void handleUiFilterAdded(JsonEvent event) {
     JSONObject data = event.getData();
     IUserFilterState filterState = createFilterState(data);
+    if (filterState == null) {
+      // in case it is a JS only filter that has no Java representation.
+      return;
+    }
+
     TableEventFilterCondition condition = addTableEventFilterCondition(TableEvent.TYPE_USER_FILTER_ADDED);
     condition.setUserFilter(filterState);
     getModel().getUIFacade().fireFilterAddedFromUI(filterState);
@@ -861,7 +866,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       JsonColumn jsonColumn = m_jsonColumns.get(column);
       return jsonColumn.createFilterStateFromJson(data);
     }
-    else if ("text".equals(filterType)) {
+    if ("text".equals(filterType)) {
       String text = data.getString("text");
       return new TableTextUserFilterState(text);
     }
@@ -880,6 +885,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
 
   protected void handleUiFilterRemoved(JsonEvent event) {
     IUserFilterState filter = getFilterState(event.getData());
+    if (filter == null) {
+      // in case it is a JS only filter that has no Java representation.
+      return;
+    }
+
     TableEventFilterCondition condition = addTableEventFilterCondition(TableEvent.TYPE_USER_FILTER_REMOVED);
     condition.setUserFilter(filter);
     getModel().getUIFacade().fireFilterRemovedFromUI(filter);
