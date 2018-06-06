@@ -10,6 +10,8 @@
  ******************************************************************************/
 scout.OfflineDesktopNotification = function() {
   scout.OfflineDesktopNotification.parent.call(this);
+
+  this.connectFailedReset = null;
 };
 scout.inherits(scout.OfflineDesktopNotification, scout.DesktopNotification);
 
@@ -32,16 +34,26 @@ scout.OfflineDesktopNotification.prototype._render = function() {
 
 scout.OfflineDesktopNotification.prototype.reconnect = function() {
   this.setLoading(true);
+  if (this.connectFailedReset) {
+    clearTimeout(this.connectFailedReset);
+  }
   this.$messageText.hide();
 };
 
 scout.OfflineDesktopNotification.prototype.reconnectFailed = function() {
-  this.setLoading(false);
-  this.$messageText.show();
+  /* remove the connecting state with a small delay. otherwise it cannot be read because its only shown very shortly */
+  this.connectFailedReset = setTimeout(function() {
+    this.connectFailedReset = null;
+    this.setLoading(false);
+    this.$messageText.show();
+  }.bind(this), 1100 /* this delay must be < Reconnector.interval */ );
 };
 
 scout.OfflineDesktopNotification.prototype.reconnectSucceeded = function() {
   this.setLoading(false);
+  if (this.connectFailedReset) {
+    clearTimeout(this.connectFailedReset);
+  }
   this.setStatus({
     message: this.session.text('ui.ConnectionReestablished'),
     severity: scout.Status.Severity.OK
