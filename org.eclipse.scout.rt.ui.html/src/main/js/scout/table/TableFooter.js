@@ -670,7 +670,7 @@ scout.TableFooter.prototype._onInfoFilterClick = function() {
   if (this._compactStyle) {
     this._toggleTableInfoTooltip(this._$infoFilter, 'TableInfoFilterTooltip');
   } else {
-    this.table.resetFilter();
+    this.table.resetUserFilter();
   }
 };
 

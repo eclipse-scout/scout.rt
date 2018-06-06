@@ -323,7 +323,7 @@ describe("TableFilter", function() {
       table.filter();
       expect(table.$emptyData).toBe(null);
 
-      table.resetFilter();
+      table.resetUserFilter();
       expect(table.$emptyData).toBe(null);
       expect(table.$rows().length).toBe(7);
     });

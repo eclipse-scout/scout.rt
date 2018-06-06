@@ -3262,8 +3262,7 @@ scout.Table.prototype._applyFiltersForRow = function(row) {
 };
 
 /**
- *
- * @returns array of filter names which are currently active
+ * @returns {String[]} labels of the currently active TableUserFilters
  */
 scout.Table.prototype.filteredBy = function() {
   var filteredBy = [];
@@ -3276,8 +3275,7 @@ scout.Table.prototype.filteredBy = function() {
   return filteredBy;
 };
 
-scout.Table.prototype.resetFilter = function() {
-  // remove filters except TableUserFilters
+scout.Table.prototype.resetUserFilter = function() {
   var filter;
   for (var key in this._filterMap) { // NOSONAR
     filter = this._filterMap[key];
