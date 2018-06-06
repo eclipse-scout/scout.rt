@@ -75,7 +75,7 @@ public class FileUtilityTest {
     File zipFile = createTempFile(zipName);
     try {
       FileUtility.extractArchive(zipFile, target.toFile());
-      assertEquals(1, Files.list(target).count());
+      assertEquals(1, target.toFile().listFiles().length);
     }
     finally {
       IOUtility.deleteFile(zipFile);
