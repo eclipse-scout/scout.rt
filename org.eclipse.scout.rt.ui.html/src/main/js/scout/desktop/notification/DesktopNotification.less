@@ -16,7 +16,7 @@
   right: 10px;
   top: 0;
   height: 100%;
-  margin-top: 60px;
+  margin-top: @desktop-notifications-margin-top;
   width: 0; /* Don't block access to the elements in the background */
 }
 
@@ -129,15 +129,15 @@
 }
 
 .desktop-notification-loader.animated::after {
-  #scout.animation(pulsate 2.2s cubic-bezier(0.5, 0.1, 0.1, 0.5) infinite);
+  #scout.animation(pulsate 2s cubic-bezier(0.5, 0.1, 0.1, 0.5) infinite);
   content: '';
   display: inline-block;
   vertical-align: middle;
-  margin-left: 6px;
+  margin-top: -3px;
+  margin-left: 16px;
   margin-right: 6px;
   border-radius: 50%;
   border: 1px fade(@busyindicator-active-color, 80%) solid;
   width: 14px;
   height: 14px;
-  margin-top: -3px;
 }
