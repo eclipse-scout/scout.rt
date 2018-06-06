@@ -38,7 +38,6 @@ import org.eclipse.scout.rt.platform.resource.MimeType;
 /**
  * Utility class for managing directories and files
  *
- * @author BSI AG
  * @since 1.0
  */
 @SuppressWarnings("findbugs:RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
@@ -48,7 +47,9 @@ public final class FileUtility {
   private FileUtility() {
   }
 
-  public static void extractArchive(File archiveFile, File destinationDir) throws IOException {
+  public static void extractArchive(File archiveFile, File targetDir) throws IOException {
+    File destinationDir = targetDir.getCanonicalFile();
+    Path destinationPath = destinationDir.toPath();
     destinationDir.mkdirs();
     destinationDir.setLastModified(archiveFile.lastModified());
     String localFile = destinationDir.getName();
@@ -63,7 +64,12 @@ public final class FileUtility {
         while (name.startsWith("/") || name.startsWith("\\")) {
           name = name.substring(1);
         }
-        File f = new File(destinationDir, name);
+        File f = new File(destinationDir, name).getCanonicalFile();
+        if (!f.toPath().startsWith(destinationPath)) {
+          // security check (see https://github.com/snyk/zip-slip-vulnerability)
+          throw new IllegalArgumentException("Entry is outside of the target dir: " + name);
+        }
+
         if (file.isDirectory()) { // if its a directory, create it
           f.mkdirs();
           if (file.getTime() >= 0) {
