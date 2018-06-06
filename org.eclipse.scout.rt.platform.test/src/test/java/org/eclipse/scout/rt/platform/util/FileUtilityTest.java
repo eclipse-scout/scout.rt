@@ -18,6 +18,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.junit.Test;
@@ -48,6 +50,36 @@ public class FileUtilityTest {
     finally {
       IOUtility.deleteFile(zipFile);
       IOUtility.deleteFile(noZipFile);
+    }
+  }
+
+  @Test
+  public void testExtractArchive() throws IOException {
+    extractZipToDir("zip.zip");
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testExtractArchiveZipSlip() throws IOException {
+    String zipSlip;
+    if ('/' == File.separatorChar) {
+      zipSlip = "zip-slip.zip";
+    }
+    else {
+      zipSlip = "zip-slip-win.zip";
+    }
+    extractZipToDir(zipSlip);
+  }
+
+  private void extractZipToDir(String zipName) throws IOException {
+    Path target = Files.createTempDirectory("scoutExtractArchiveTest");
+    File zipFile = createTempFile(zipName);
+    try {
+      FileUtility.extractArchive(zipFile, target.toFile());
+      assertEquals(1, Files.list(target).count());
+    }
+    finally {
+      IOUtility.deleteFile(zipFile);
+      IOUtility.deleteDirectory(target.toFile());
     }
   }
 
