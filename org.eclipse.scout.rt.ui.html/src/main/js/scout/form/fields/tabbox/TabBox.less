@@ -43,27 +43,18 @@
       bottom: 0;
       margin-bottom: -@tab-area-border-width;
       height: @tab-area-border-width;
-      background-color: @active-color;
+      background-color: @tab-item-selection-marker-color;
       transition: left 0.3s, width 0.3s;
     }
 
-    &.focused  > .selection-marker {
-      &::after {
-        position: absolute;
-        left: 50%;
-        margin-left: @tab-box-focus-arrow-margin-left;
-        border-style: solid;
-        border-width: 0 4px 3px 4px;
-        border-color: transparent transparent @active-color transparent;
-        content: '';
-        height: 0;
-        width: 0;
-        bottom: 2px;
+    &.focused {
+      & > .tab-item.selected {
+        color: @tab-item-focus-color;
       }
-    }
 
-    &.first-selected > .selection-marker::after {
-      margin-left: @tab-box-focus-arrow-margin-left - @tab-item-padding-x / 2;
+      & > .selection-marker {
+        background: @tab-item-selection-marker-focus-color;
+      }
     }
 
     & > .tab-item > .title > .sub-label {
