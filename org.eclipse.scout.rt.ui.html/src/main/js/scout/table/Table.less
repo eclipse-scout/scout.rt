@@ -265,6 +265,7 @@
       left: 0;
       padding: @table-row-padding-y 8px @table-row-padding-y @table-row-control-padding-left;
       cursor: pointer;
+      line-height: @table-row-control-line-height; /* Necessary to align with the text, depends on the used font size */
 
       &::before {
         display: block;
@@ -282,7 +283,7 @@
       }
 
       &:hover::before {
-        color: @hover-color;
+        color: @highlight-color;
       }
     }
 
