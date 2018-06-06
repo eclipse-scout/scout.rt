@@ -22,6 +22,53 @@ describe('ButtonAdapterMenu', function() {
     adapterMenu.init({id:'234', button:button, parent: session.desktop});
   });
 
+  describe('maps defaultButton setting', function() {
+
+    describe('from not set to null', function() {
+
+      it('to defaultMenu = true', function() {
+        expect(adapterMenu.defaultMenu).toBe(null);
+      });
+
+    });
+
+    describe('from true', function() {
+      beforeEach(function() {
+        button.setProperty('defaultButton', false); // set other value first to trigger actual property change with following line
+        button.setProperty('defaultButton', true);
+      });
+
+      it('to defaultMenu = true', function() {
+        expect(adapterMenu.defaultMenu).toBe(true);
+      });
+
+    });
+
+    describe('from false (w/o other previous values) to null', function() {
+      beforeEach(function() {
+        button.setProperty('defaultButton', false);
+      });
+
+      it('to defaultMenu = null', function() {
+        expect(adapterMenu.defaultMenu).toBe(null);
+      });
+
+    });
+
+    describe('from false (with other previous values) to false', function() {
+      beforeEach(function() {
+        button.setProperty('defaultButton', true); // set other value first to trigger actual property change with following line
+        button.setProperty('defaultButton', false);
+      });
+
+      it('to defaultMenu = false', function() {
+        expect(adapterMenu.defaultMenu).toBe(false);
+      });
+
+    });
+
+  });
+
   describe('initialization / destroy', function() {
 
     it('should set/delete adaptedBy property on original button instance', function() {

@@ -23,10 +23,10 @@ describe("MenuBar", function() {
     return helper.createModel(text, iconId, menuTypes);
   }
 
-  function createMenuBar() {
+  function createMenuBar(menuOrder) {
     return scout.create('MenuBar', {
       parent: session.desktop,
-      menuOrder: new scout.MenuItemsOrder(session, 'Table')
+      menuOrder: scout.nvl(menuOrder, new scout.MenuItemsOrder(session, 'Table'))
     });
   }
 
@@ -200,6 +200,27 @@ describe("MenuBar", function() {
 
       expect(menu1.$container).not.toHaveClass('default-menu');
       expect(menu2.$container).toHaveClass('default-menu');
+    });
+
+    it('marks ButtonAdapterMenu that reacts to ENTER keystroke as default menu', function() {
+      var button = new scout.Button();
+      button.init({id:'123', parent: session.desktop});
+      var adapterMenu = new scout.ButtonAdapterMenu();
+      adapterMenu.init({id:'234', button:button, parent: session.desktop});
+
+      button.setProperty('defaultButton', false);
+      button.setProperty('keyStroke', 'enter');
+
+      var menuBar = createMenuBar(new scout.GroupBoxMenuItemsOrder()),
+        menus = [adapterMenu];
+
+      menuBar.setMenuItems(menus);
+      menuBar.render();
+
+      expect(menuBar.menuItems.length).toBe(1);
+      expect(menuBar.menuItems[0]).toBe(adapterMenu);
+
+      expect(adapterMenu.$container).toHaveClass('default-menu');
     });
 
     it('marks first visible and enabled menu that has the "defaultMenu" flag set as default menu', function() {

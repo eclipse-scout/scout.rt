@@ -106,7 +106,6 @@ scout.ButtonAdapterMenu.prototype.focus = function() {
   return this.session.focusManager.requestFocus(this.getFocusableElement());
 };
 
-
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
 /**
@@ -126,7 +125,12 @@ scout.ButtonAdapterMenu.adaptButtonProperties = function(buttonProperties, menuP
   menuProperties.actionStyle = buttonStyleToActionStyle(buttonProperties.displayStyle);
   menuProperties.toggleAction = buttonProperties.displayStyle === scout.Button.DisplayStyle.TOGGLE;
   menuProperties.childActions = buttonProperties.menus;
-  menuProperties.defaultMenu = buttonProperties.defaultButton;
+  if (menuProperties.defaultMenu === undefined) {
+    // buttonProperties.defaultButton property is only mapped if it is true, false should not be mapped as the default defaultMenu = null setting
+    // would be overridden if this default null setting is overridden scout.MenuBar.prototype.updateDefaultMenu would not consider these entries anymore
+    // on actual property changes defaultMenu will always be undefined which always maps the defaultButton property to the defaultMenu property
+    menuProperties.defaultMenu = buttonProperties.defaultButton;
+  }
 
   // Cleanup: Remove all properties that have value 'undefined' from the result object,
   // otherwise, they would be applied to the model adapter.

@@ -400,7 +400,10 @@ scout.GroupBox.prototype._prepareFields = function() {
       scout.ButtonAdapterMenu.adaptButtonProperties(button, {
         parent: this,
         menubar: this.menuBar,
-        button: button
+        button: button,
+        // initially defaultMenu should only be set if defaultButton is set to true, false should not be mapped as the default defaultMenu = null setting
+        // would be overridden if this default null setting is overridden scout.MenuBar.prototype.updateDefaultMenu would not consider these entries anymore
+        defaultMenu: button.defaultButton ? true : null
       }));
   }, this);
   this.registerKeyStrokes(this.processMenus);
