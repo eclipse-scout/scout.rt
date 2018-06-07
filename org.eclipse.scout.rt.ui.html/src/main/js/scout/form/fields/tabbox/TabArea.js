@@ -233,6 +233,7 @@ scout.TabArea.prototype._setTabbableItem = function(tabItem) {
 
 scout.TabArea.prototype._onTabPropertyChange = function(event) {
   if (event.propertyName === 'visible') {
+    this.htmlComp.layout._updateFirstMarker();
     this.invalidateLayoutTree();
   }
   if (event.propertyName === 'subLabel') {

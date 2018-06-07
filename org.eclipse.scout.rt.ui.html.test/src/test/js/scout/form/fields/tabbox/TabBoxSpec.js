@@ -89,4 +89,56 @@ describe('TabBox', function() {
 
   });
 
+  describe('first class', function() {
+    var tabBox;
+
+    beforeEach(function() {
+      tabBox = scout.create('TabBox', {
+        parent: session.desktop,
+        tabItems: [{
+          objectType: 'TabItem',
+          label: "first"
+        }, {
+          objectType: 'TabItem',
+          label: "second"
+        }]
+      });
+    });
+
+    it('is added to the first tab item', function() {
+      tabBox.render();
+      expect(tabBox.tabItems[0].$tabContainer).toHaveClass('first');
+      expect(tabBox.tabItems[1].$tabContainer).not.toHaveClass('first');
+    });
+
+    it('is added to the first visible tab item', function() {
+      tabBox = scout.create('TabBox', {
+        parent: session.desktop,
+        tabItems: [{
+          objectType: 'TabItem',
+          label: "first",
+          visible: false
+        }, {
+          objectType: 'TabItem',
+          label: "second"
+        }, {
+          objectType: 'TabItem',
+          label: "third"
+        }]
+      });
+      tabBox.render();
+      expect(tabBox.tabItems[0].$tabContainer.isVisible()).toBe(false);
+      expect(tabBox.tabItems[1].$tabContainer).toHaveClass('first');
+      expect(tabBox.tabItems[2].$tabContainer).not.toHaveClass('first');
+    });
+
+    it('is correctly updated when visibility changes', function() {
+      tabBox.render();
+      tabBox.tabItems[0].setVisible(false);
+      expect(tabBox.tabItems[0].$tabContainer.isVisible()).toBe(false);
+      expect(tabBox.tabItems[1].$tabContainer).toHaveClass('first');
+    });
+
+  });
+
 });

@@ -210,7 +210,9 @@ scout.TabAreaLayout.prototype._onTabAreaPropertyChange = function(event) {
 };
 
 scout.TabAreaLayout.prototype._updateFirstMarker = function() {
-  this.tabArea.tabItems.forEach(function(tab, i, tabs) {
+  this.tabArea.tabItems.filter(function(tab) {
+    return tab.visible;
+  }).forEach(function(tab, i, tabs) {
     tab.$tabContainer.toggleClass('first', i === 0);
   }, this);
 };
