@@ -14,6 +14,6 @@ scout.TableFilter.prototype.createKey = function() {
   return 'filterKey';
 };
 
-scout.TableFilter.prototype.accept = function($row) {
+scout.TableFilter.prototype.accept = function(row) {
   // to be implemented by subclasses
 };
