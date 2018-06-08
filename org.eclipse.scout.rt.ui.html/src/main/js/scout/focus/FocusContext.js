@@ -209,7 +209,5 @@ scout.FocusContext.prototype._focus = function(elementToFocus) {
   // Focus the requested element
   $elementToFocus.focus();
 
-  if ($.log.isDebugEnabled()) {
-    $.log.isDebugEnabled() && $.log.debug('Focus set to ' + scout.graphics.debugOutput(elementToFocus));
-  }
+  $.log.isDebugEnabled() && $.log.debug('Focus set to ' + scout.graphics.debugOutput(elementToFocus));
 };

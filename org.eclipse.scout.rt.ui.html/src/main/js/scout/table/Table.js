@@ -277,7 +277,7 @@ scout.Table.prototype._initTableKeyStrokeContext = function() {
     new scout.TableRefreshKeyStroke(this),
     new scout.TableToggleRowKeyStroke(this),
     new scout.TableCopyKeyStroke(this),
-    new scout.ContextMenuKeyStroke(this, this.onContextMenu, this),
+    new scout.ContextMenuKeyStroke(this, this.showContextMenu, this),
     new scout.AppLinkKeyStroke(this, this.handleAppLinkAction)
   ]);
 
@@ -492,10 +492,16 @@ scout.Table.prototype._onRowMouseDown = function(event) {
   }.bind(this));
   this.setContextColumn(this._columnAtX(event.pageX));
   this.selectionHandler.onMouseDown(event);
-
   if (this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
     var row = this._$mouseDownRow.data('row');
     this.checkRow(row, !row.checked);
+  }
+  if (event.which === 3) {
+    this.showContextMenu({
+      pageX: event.pageX,
+      pageY: event.pageY
+    });
+    return false;
   }
 };
 
@@ -553,42 +559,47 @@ scout.Table.prototype._onRowDoubleClick = function(event) {
   this.doRowAction($row.data('row'), column);
 };
 
-scout.Table.prototype.onContextMenu = function(event) {
-  var func = function(event) {
-    if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
-      return;
-    }
-    if (this.selectedRows.length > 0) {
-      var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
-      if (!event.pageX && !event.pageY) {
-        var $rowToDisplay = this.selectionHandler.lastActionRow ? this.selectionHandler.lastActionRow.$row : this.selectedRows[this.selectedRows.length - 1].$row;
-        var offset = $rowToDisplay.offset();
-        offset.left += this.$data.scrollLeft();
-        event.pageX = offset.left + 10;
-        event.pageY = offset.top + $rowToDisplay.outerHeight() / 2;
-      }
-      if (menuItems.length > 0) {
-        // Prevent firing of 'onClose'-handler during contextMenu.open()
-        // (Can lead to null-access when adding a new handler to this.contextMenu)
-        if (this.contextMenu) {
-          this.contextMenu.close();
-        }
-        this.contextMenu = scout.create('ContextMenuPopup', {
-          parent: this,
-          menuItems: menuItems,
-          location: {
-            x: event.pageX,
-            y: event.pageY
-          },
-          $anchor: this.$data,
-          menuFilter: this._filterMenusHandler
-        });
-        this.contextMenu.open();
-      }
-    }
-  };
+scout.Table.prototype.showContextMenu = function(options) {
+  this.session.onRequestsDone(this._showContextMenu.bind(this, options));
+};
 
-  this.session.onRequestsDone(func.bind(this), event);
+scout.Table.prototype._showContextMenu = function(options) {
+  options = options || {};
+  if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
+    return;
+  }
+  if (this.selectedRows.length === 0) {
+    return;
+  }
+  var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
+  if (menuItems.length === 0) {
+    return;
+  }
+  var pageX = scout.nvl(options.pageX, null);
+  var pageY = scout.nvl(options.pageY, null);
+  if (pageX === null || pageY === null) {
+    var $rowToDisplay = this.selectionHandler.lastActionRow ? this.selectionHandler.lastActionRow.$row : this.selectedRows[this.selectedRows.length - 1].$row;
+    var offset = $rowToDisplay.offset();
+    offset.left += this.$data.scrollLeft();
+    pageX = offset.left + 10;
+    pageY = offset.top + $rowToDisplay.outerHeight() / 2;
+  }
+  // Prevent firing of 'onClose'-handler during contextMenu.open()
+  // (Can lead to null-access when adding a new handler to this.contextMenu)
+  if (this.contextMenu) {
+    this.contextMenu.close();
+  }
+  this.contextMenu = scout.create('ContextMenuPopup', {
+    parent: this,
+    menuItems: menuItems,
+    location: {
+      x: pageX,
+      y: pageY
+    },
+    $anchor: this.$data,
+    menuFilter: this._filterMenusHandler
+  });
+  this.contextMenu.open();
 };
 
 scout.Table.prototype.onColumnVisibilityChanged = function(column) {
