@@ -17,6 +17,13 @@ public class ScoutDataObjectModule extends Module {
 
   private static final String NAME = "ScoutDataObjectModule";
 
+  /**
+   * Default name of type attribute used for serialization.
+   *
+   * @see #getTypeAttributeName()
+   */
+  protected static final String DEFAULT_TYPE_ATTRIBUTE_NAME = "_type";
+
   @Override
   public String getModuleName() {
     return NAME;
@@ -29,14 +36,24 @@ public class ScoutDataObjectModule extends Module {
 
   @Override
   public void setupModule(SetupContext context) {
-    context.addSerializers(BEANS.get(DataObjectSerializers.class));
-    context.addDeserializers(BEANS.get(DataObjectDeserializers.class));
-    
-    context.addKeySerializers(BEANS.get(DataObjectMapKeySerializers.class));
-    context.addKeyDeserializers(BEANS.get(DataObjectMapKeyDeserializers.class));
+    ScoutDataObjectModuleContext moduleContext = new ScoutDataObjectModuleContext();
+    prepareScoutDataModuleContext(moduleContext);
 
-    context.addTypeModifier(BEANS.get(DataObjectTypeModifier.class));
-    context.insertAnnotationIntrospector(BEANS.get(DataObjectAnnotationIntrospector.class));
+    context.addSerializers(BEANS.get(DataObjectSerializers.class).withModuleContext(moduleContext));
+    context.addDeserializers(BEANS.get(DataObjectDeserializers.class).withModuleContext(moduleContext));
+
+    context.addKeySerializers(BEANS.get(DataObjectMapKeySerializers.class).withModuleContext(moduleContext));
+    context.addKeyDeserializers(BEANS.get(DataObjectMapKeyDeserializers.class).withModuleContext(moduleContext));
+
+    context.addTypeModifier(BEANS.get(DataObjectTypeModifier.class).withModuleContext(moduleContext));
+    context.insertAnnotationIntrospector(BEANS.get(DataObjectAnnotationIntrospector.class).withModuleContext(moduleContext));
+  }
+
+  /**
+   * Override this method to add custom properties to {@code moduleContext}.
+   */
+  protected void prepareScoutDataModuleContext(ScoutDataObjectModuleContext moduleContext) {
+    moduleContext.setTypeAttributeName(DEFAULT_TYPE_ATTRIBUTE_NAME);
   }
 
   @Override

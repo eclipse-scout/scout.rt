@@ -3,7 +3,7 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import java.util.Date;
 import java.util.Locale;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
@@ -20,8 +20,15 @@ import com.fasterxml.jackson.databind.type.ReferenceType;
 /**
  * Serializer provider for data object serializer for ({@code DoEntity}, {@code DoValue} and {@code DoList}.
  */
-@ApplicationScoped
+@Bean
 public class DataObjectSerializers extends Serializers.Base {
+
+  protected ScoutDataObjectModuleContext m_moduleContext;
+
+  public DataObjectSerializers withModuleContext(ScoutDataObjectModuleContext moduleContext) {
+    m_moduleContext = moduleContext;
+    return this;
+  }
 
   @Override
   public JsonSerializer<?> findReferenceSerializer(SerializationConfig config, ReferenceType refType, BeanDescription beanDesc, TypeSerializer contentTypeSerializer, JsonSerializer<Object> contentValueSerializer) {

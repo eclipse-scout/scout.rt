@@ -2,7 +2,7 @@ package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.util.Date;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.IDataObject;
@@ -20,8 +20,15 @@ import com.fasterxml.jackson.databind.type.ReferenceType;
 /**
  * Deserializer provider for data object deserializer for ({@code DoEntity}, {@code DoValue} and {@code DoList}.
  */
-@ApplicationScoped
+@Bean
 public class DataObjectDeserializers extends Deserializers.Base {
+
+  protected ScoutDataObjectModuleContext m_moduleContext;
+
+  public DataObjectDeserializers withModuleContext(ScoutDataObjectModuleContext moduleContext) {
+    m_moduleContext = moduleContext;
+    return this;
+  }
 
   @Override
   public JsonDeserializer<?> findReferenceDeserializer(ReferenceType refType, DeserializationConfig config, BeanDescription beanDesc, TypeDeserializer contentTypeDeserializer, JsonDeserializer<?> contentDeserializer)
@@ -35,7 +42,7 @@ public class DataObjectDeserializers extends Deserializers.Base {
   @Override
   public JsonDeserializer<?> findBeanDeserializer(JavaType type, DeserializationConfig config, BeanDescription beanDesc) throws JsonMappingException {
     if (IDoEntity.class.isAssignableFrom(type.getRawClass())) {
-      return new DoEntityDeserializer(type);
+      return new DoEntityDeserializer(m_moduleContext, type);
     }
     else if (DoList.class.isAssignableFrom(type.getRawClass())) {
       return new DoListDeserializer(type);

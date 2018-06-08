@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.testing;
 
-import org.eclipse.scout.rt.jackson.dataobject.DoTypedEntity;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.junit.BeforeClass;
@@ -30,7 +29,8 @@ public class DataObjectSerializationTestHelperTest {
   @BeforeClass
   public static void beforeClass() {
     s_testHelper = BEANS.get(DataObjectSerializationTestHelper.class);
-    ENTITY = BEANS.get(DoTypedEntity.class).withType("foo");
+    ENTITY = BEANS.get(DoEntity.class);
+    ENTITY.put("_type", "foo");
     ENTITY.put("attribute", "bar");
   }
 

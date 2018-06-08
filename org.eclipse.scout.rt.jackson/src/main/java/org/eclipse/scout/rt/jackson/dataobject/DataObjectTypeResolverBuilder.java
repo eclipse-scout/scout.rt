@@ -11,18 +11,13 @@ import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
 public class DataObjectTypeResolverBuilder extends DefaultTypeResolverBuilder {
   private static final long serialVersionUID = 1L;
 
-  /**
-   * Used as constant value for to specify type of JSON object during serialization.
-   */
-  protected static final String JSON_TYPE_PROPERTY = "_type";
-
   public DataObjectTypeResolverBuilder() {
     super(DefaultTyping.NON_FINAL);
   }
 
   @Override
   public boolean useForType(JavaType t) {
-    // do not write type information for "raw" DoEntity and DoTypedEntity instances (only concrete instances, without IDoEntity marker interface)
-    return !DoEntity.class.equals(t.getRawClass()) && !DoTypedEntity.class.equals(t.getRawClass());
+    // do not write type information for "raw" DoEntity instances (only concrete instances, without IDoEntity marker interface)
+	  return !DoEntity.class.equals(t.getRawClass());
   }
 }

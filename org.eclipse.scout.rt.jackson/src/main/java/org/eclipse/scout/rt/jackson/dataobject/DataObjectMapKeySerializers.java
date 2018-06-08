@@ -6,7 +6,7 @@ package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.util.Locale;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.Bean;
 
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JavaType;
@@ -26,8 +26,15 @@ import com.fasterxml.jackson.databind.ser.Serializers;
  * TODO [8.x] pbz: Remove this class when Jackson is upgraded to 3.0 (issue 1600) (and LocaleMapKeySerializer is the
  * only key serializer)
  */
-@ApplicationScoped
+@Bean
 public class DataObjectMapKeySerializers extends Serializers.Base {
+
+  protected ScoutDataObjectModuleContext m_moduleContext;
+
+  public DataObjectMapKeySerializers withModuleContext(ScoutDataObjectModuleContext moduleContext) {
+    m_moduleContext = moduleContext;
+    return this;
+  }
 
   @Override
   public JsonSerializer<?> findSerializer(SerializationConfig config, JavaType type, BeanDescription beanDesc) {

@@ -1,7 +1,7 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -16,9 +16,17 @@ import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
  * Jackson {@link AnnotationIntrospector} implementation adding type resolver for all {@link IDoEntity} data object
  * instances.
  */
-@ApplicationScoped
+@Bean
 public class DataObjectAnnotationIntrospector extends JacksonAnnotationIntrospector {
+
   private static final long serialVersionUID = 1L;
+
+  protected ScoutDataObjectModuleContext m_moduleContext;
+
+  public DataObjectAnnotationIntrospector withModuleContext(ScoutDataObjectModuleContext moduleContext) {
+    m_moduleContext = moduleContext;
+    return this;
+  }
 
   @Override
   public TypeResolverBuilder<?> findTypeResolver(MapperConfig<?> config, AnnotatedClass ac, JavaType baseType) {
@@ -26,7 +34,7 @@ public class DataObjectAnnotationIntrospector extends JacksonAnnotationIntrospec
       DataObjectTypeResolverBuilder doTypeResolverBuilder = BEANS.get(DataObjectTypeResolverBuilder.class);
       doTypeResolverBuilder.init(JsonTypeInfo.Id.NAME, BEANS.get(DataObjectTypeIdResolver.class));
       doTypeResolverBuilder.inclusion(JsonTypeInfo.As.PROPERTY);
-      doTypeResolverBuilder.typeProperty(DataObjectTypeResolverBuilder.JSON_TYPE_PROPERTY);
+      doTypeResolverBuilder.typeProperty(m_moduleContext.getTypeAttributeName());
       return doTypeResolverBuilder;
     }
     return super.findTypeResolver(config, ac, baseType);

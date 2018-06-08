@@ -643,8 +643,8 @@ public class JsonDataObjectsSerializationTest {
 
   @Test
   public void testSerialize_TypedEntity() throws Exception {
-    DoTypedEntity typedEntity = BEANS.get(DoTypedEntity.class);
-    typedEntity.withType("TestMyCustomType");
+    DoEntity typedEntity = BEANS.get(DoEntity.class);
+    typedEntity.put(ScoutDataObjectModule.DEFAULT_TYPE_ATTRIBUTE_NAME, "TestMyCustomType");
     typedEntity.put("date", DATE);
     typedEntity.put("string", "foo");
     typedEntity.put("integer", 42);
@@ -654,8 +654,8 @@ public class JsonDataObjectsSerializationTest {
 
   @Test
   public void testSerialize_EmptyTypedEntity() throws Exception {
-    DoTypedEntity typedEntity = BEANS.get(DoTypedEntity.class);
-    typedEntity.withType("TestMyCustomTypeEmpty");
+    DoEntity typedEntity = BEANS.get(DoEntity.class);
+    typedEntity.put(ScoutDataObjectModule.DEFAULT_TYPE_ATTRIBUTE_NAME, "TestMyCustomTypeEmpty");
     String json = s_dataObjectMapper.writeValueAsString(typedEntity);
     assertJsonEquals("TestMyCustomTypeEmptyDo.json", json); // is written with type information
   }
@@ -664,11 +664,10 @@ public class JsonDataObjectsSerializationTest {
   public void testDeserialize_TypedEntity() throws Exception {
     String inputJson = readResourceAsString("TestMyCustomTypeDo.json");
     DoEntity typedEntity = s_dataObjectMapper.readValue(inputJson, DoEntity.class);
-    assertTrue(typedEntity instanceof DoTypedEntity);
+    assertTrue(typedEntity instanceof DoEntity);
 
-    assertEquals("TestMyCustomType", ((DoTypedEntity) typedEntity).getType());
-    assertEquals("TestMyCustomType", typedEntity.get(DataObjectTypeResolverBuilder.JSON_TYPE_PROPERTY));
-    assertEquals("TestMyCustomType", typedEntity.get(((DoTypedEntity) typedEntity).type().getAttributeName()));
+    assertEquals("TestMyCustomType", typedEntity.get(ScoutDataObjectModule.DEFAULT_TYPE_ATTRIBUTE_NAME));
+    assertEquals("TestMyCustomType", typedEntity.get(ScoutDataObjectModule.DEFAULT_TYPE_ATTRIBUTE_NAME));
 
     assertEquals(DATE, s_dataObjectHelper.getDateAttribute(typedEntity, "date"));
     assertEquals("foo", typedEntity.get("string"));
@@ -682,9 +681,9 @@ public class JsonDataObjectsSerializationTest {
   public void testDeserialize_EmptyTypedEntity() throws Exception {
     String inputJson = readResourceAsString("TestMyCustomTypeEmptyDo.json");
     DoEntity typedEntity = s_dataObjectMapper.readValue(inputJson, DoEntity.class);
-    assertTrue(typedEntity instanceof DoTypedEntity);
+    assertTrue(typedEntity instanceof DoEntity);
 
-    assertEquals("TestMyCustomTypeEmpty", ((DoTypedEntity) typedEntity).getType());
+    assertEquals("TestMyCustomTypeEmpty", typedEntity.get(ScoutDataObjectModule.DEFAULT_TYPE_ATTRIBUTE_NAME));
     String json = s_dataObjectMapper.writeValueAsString(typedEntity);
     assertJsonEquals("TestMyCustomTypeEmptyDo.json", json); // is written with type information
   }
@@ -966,11 +965,11 @@ public class JsonDataObjectsSerializationTest {
     assertEquals("bar", attribute6.get(1));
 
     // TestItemPojo2 is deserialized as DoTypedEntity with type 'TestItem2'
-    List<DoTypedEntity> attribute7 = doMarshalled.getList("attribute7", DoTypedEntity.class);
+    List<DoEntity> attribute7 = doMarshalled.getList("attribute7", DoEntity.class);
     assertEquals("item-pojo-key-1", attribute7.get(0).get("id"));
-    assertEquals("TestItem2", attribute7.get(0).getType());
+    assertEquals("TestItem2", attribute7.get(0).get(ScoutDataObjectModule.DEFAULT_TYPE_ATTRIBUTE_NAME));
     assertEquals("item-pojo-key-2", attribute7.get(1).get("id"));
-    assertEquals("TestItem2", attribute7.get(1).getType());
+    assertEquals("TestItem2", attribute7.get(1).get(ScoutDataObjectModule.DEFAULT_TYPE_ATTRIBUTE_NAME));
   }
 
   @Test
@@ -1144,8 +1143,8 @@ public class JsonDataObjectsSerializationTest {
   @Test
   public void testSerializeDeserialize_TestSetDoWithDuplicateValues() throws Exception {
     // simulate JSON for TestSetDo which contains duplicated values for stringSetAttribute
-    DoTypedEntity setDo = new DoTypedEntity();
-    setDo.withType("TestSet");
+    DoEntity setDo = BEANS.get(DoEntity.class);
+    setDo.put(ScoutDataObjectModule.DEFAULT_TYPE_ATTRIBUTE_NAME, "TestSet");
     List<String> stringList = new ArrayList<>();
     stringList.add("foo");
     stringList.add("bar");
@@ -1782,6 +1781,30 @@ public class JsonDataObjectsSerializationTest {
     s_testHelper.assertDoEntityEquals(item1, TestItemDo.class.cast(marshalledList.get(1)));
     assertEquals("bar", marshalledList.get(2));
     s_testHelper.assertDoEntityEquals(item2, TestItemDo.class.cast(marshalledList.get(3)));
+  }
+
+  // ------------------------------------ tests with custom JSOn type property name ------------------------------------
+
+  @Test
+  public void testSerializeDeserialize_CustomTypePropertyName() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new ScoutDataObjectModule() {
+
+      @Override
+      protected void prepareScoutDataModuleContext(ScoutDataObjectModuleContext moduleContext) {
+        super.prepareScoutDataModuleContext(moduleContext);
+        moduleContext.setTypeAttributeName("_customType");
+      }
+    });
+
+    TestComplexEntityDo entityDo = BEANS.get(TestComplexEntityDo.class);
+    entityDo.withId("foo");
+    String json = mapper.writeValueAsString(entityDo);
+    assertEquals("{\"_customType\":\"TestComplexEntity\",\"id\":\"foo\"}", json);
+
+    DoEntity marshalled = mapper.readValue(json, DoEntity.class);
+    assertEquals(TestComplexEntityDo.class, marshalled.getClass());
+    assertEquals("foo", ((TestComplexEntityDo) marshalled).getId());
   }
 
   // ------------------------------------ common test helper methods ------------------------------------

@@ -29,11 +29,13 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
 
   protected final LazyValue<DataObjectDefinitionRegistry> m_doEntityDefinitionRegistry = new LazyValue<>(DataObjectDefinitionRegistry.class);
 
+  protected final ScoutDataObjectModuleContext m_moduleContext;
   protected final JavaType m_handledType;
   protected final Class<? extends IDoEntity> m_handledClass;
 
-  public DoEntityDeserializer(JavaType type) {
+  public DoEntityDeserializer(ScoutDataObjectModuleContext moduleContext, JavaType type) {
     super(type);
+    m_moduleContext = moduleContext;
     m_handledType = type;
     m_handledClass = type.getRawClass().asSubclass(IDoEntity.class);
   }
@@ -69,7 +71,7 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       p.nextToken(); // let current token point to the value
 
       // check if found the type property
-      if (DataObjectTypeResolverBuilder.JSON_TYPE_PROPERTY.equals(attributeName)) {
+      if (m_moduleContext.getTypeAttributeName().equals(attributeName)) {
         String entityType = p.getText();
 
         // put back the cached fields of token buffer to parser, if any fields were cached while searching type property
@@ -133,8 +135,10 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
         return newObject(ctxt, clazz);
       }
       else {
-        // use generic DoTypedEntity to preserve type information even if correct DoEntity class could not be resolved
-        return newObject(ctxt, DoTypedEntity.class).withType(entityType);
+        // use generic DoEntity instance with a type attribute to preserve the type information even if correct DoEntity class could not be resolved
+        DoEntity entity = newObject(ctxt, DoEntity.class);
+        entity.put(m_moduleContext.getTypeAttributeName(), entityType);
+        return entity;
       }
     }
     // fallback to handled type of deserializer
