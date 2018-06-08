@@ -398,10 +398,13 @@ scout.Table.prototype._onRowMouseDown = function(event) {
   }.bind(this));
   this.setContextColumn(this._columnAtX(event.pageX));
   this.selectionHandler.onMouseDown(event);
-
   if (this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
     var row = this._$mouseDownRow.data('row');
     this.checkRow(row, !row.checked);
+  }
+  if (event.which === 3) {
+    this.onContextMenu(event);
+    return false;
   }
 };
 

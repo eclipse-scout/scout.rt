@@ -38,10 +38,6 @@ scout.TableSelectionHandler.prototype.clearLastSelectedRowMarker = function() {
 
 // TODO [7.0] bsh: Table Selection | Try to merge this with TableKeystrokeContext
 scout.TableSelectionHandler.prototype.onMouseDown = function(event) {
-  //detect context menu button event ie event.buttons is 4 others 0
-  if (event.which === 3 && event.button === 2 && (event.buttons === 0 || event.buttons === 4)) {
-    return false;
-  }
   var $row = $(event.currentTarget),
     row = $row.data('row'),
     oldSelectedState = $row.isSelected();
@@ -105,10 +101,6 @@ scout.TableSelectionHandler.prototype.onMouseDown = function(event) {
 
   $row.window().one('mouseup.selectionHandler', this.onMouseUp.bind(this));
   this.lastActionRow = row;
-  if (event.which === 3) {
-    this.table.onContextMenu(event);
-    return false;
-  }
 };
 
 scout.TableSelectionHandler.prototype.onMouseOver = function(event) {
