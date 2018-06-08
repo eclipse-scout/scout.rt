@@ -1171,6 +1171,13 @@ $.fn.cssWidth = function(width) {
 };
 
 $.fn.cssMinWidth = function(minWidth) {
+  if (minWidth === undefined) {
+    var value = this.css('min-width');
+    if (value === 'auto') {
+      return 0;
+    }
+    return $.pxToNumber(value);
+  }
   return this.cssPxValue('min-width', minWidth);
 };
 
@@ -1193,6 +1200,13 @@ $.fn.cssHeight = function(height) {
 };
 
 $.fn.cssMinHeight = function(minHeight) {
+  if (minHeight === undefined) {
+    var value = this.css('min-height');
+    if (value === 'auto') {
+      return 0;
+    }
+    return $.pxToNumber(value);
+  }
   return this.cssPxValue('min-height', minHeight);
 };
 

@@ -350,6 +350,65 @@ describe('jquery-scout', function() {
 
   });
 
+  describe('cssMinWidth/cssMinHeight', function() {
+
+    it('returns 0 if computed value is not a number', function() {
+      var $test = $('#sandbox').appendDiv('test');
+
+      expect($test.cssMinWidth()).toBe(0);
+      $test.attr('style', 'min-width: auto');
+      expect($test.cssMinWidth()).toBe(0);
+      $test.attr('style', 'min-width: 27px');
+      expect($test.cssMinWidth()).toBe(27);
+      $test.attr('style', 'min-width: invalid');
+      expect($test.cssMinWidth()).toBe(0);
+      $test.attr('style', 'min-width: 10%');
+      expect($test.cssMinWidth()).toBe(10); // assert the current behavior (not really correct)
+
+      expect($test.cssMinHeight()).toBe(0);
+      $test.attr('style', 'min-height: auto');
+      expect($test.cssMinHeight()).toBe(0);
+      $test.attr('style', 'min-height: 27px');
+      expect($test.cssMinHeight()).toBe(27);
+      $test.attr('style', 'min-height: invalid');
+      expect($test.cssMinHeight()).toBe(0);
+      $test.attr('style', 'min-height: 10%');
+      expect($test.cssMinHeight()).toBe(10); // assert the current behavior (not really correct)
+    });
+
+  });
+
+  describe('cssMaxWidth/cssMaxHeight', function() {
+
+    it('returns Number.MAX_VALUE if computed value is not a number', function() {
+      var $test = $('#sandbox').appendDiv('test');
+
+      // Note: Check for "> 99999" instead of "= Number.MAX_VALUE" to prevent
+      // potential rounding errors
+
+      expect($test.cssMaxWidth()).toBeGreaterThan(99999);
+      $test.attr('style', 'max-width: none');
+      expect($test.cssMaxWidth()).toBeGreaterThan(99999);
+      $test.attr('style', 'max-width: 27px');
+      expect($test.cssMaxWidth()).toBe(27);
+      $test.attr('style', 'max-width: invalid');
+      expect($test.cssMaxWidth()).toBeGreaterThan(99999);
+      $test.attr('style', 'max-width: 10%');
+      expect($test.cssMaxWidth()).toBe(10); // assert the current behavior (not really correct)
+
+      expect($test.cssMaxHeight()).toBeGreaterThan(99999);
+      $test.attr('style', 'max-height: none');
+      expect($test.cssMaxHeight()).toBeGreaterThan(99999);
+      $test.attr('style', 'max-height: 27px');
+      expect($test.cssMaxHeight()).toBe(27);
+      $test.attr('style', 'max-height: invalid');
+      expect($test.cssMaxHeight()).toBeGreaterThan(99999);
+      $test.attr('style', 'max-height: 10%');
+      expect($test.cssMaxHeight()).toBe(10); // assert the current behavior (not really correct)
+    });
+
+  });
+
   describe('debounce', function() {
 
     it('is debounces function calls', function() {
