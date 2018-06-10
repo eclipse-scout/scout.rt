@@ -10,12 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
+import java.util.Optional;
+
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
-import org.json.JSONObject;
 
 public class JsonViewButton<VIEW_BUTTON extends IViewButton> extends JsonAction<VIEW_BUTTON> {
 
@@ -29,16 +31,20 @@ public class JsonViewButton<VIEW_BUTTON extends IViewButton> extends JsonAction<
   }
 
   @Override
-  protected void handleUiAction(JsonEvent event) {
-    getModel().getUIFacade().setSelectedFromUI(true);
-    super.handleUiAction(event);
+  protected void initJsonProperties(VIEW_BUTTON model) {
+    super.initJsonProperties(model);
+    putJsonProperty(new JsonProperty<VIEW_BUTTON>(IViewButton.PROP_DISPLAY_STYLE, model) {
+      @Override
+      protected String modelValue() {
+        return Optional.ofNullable(getModel().getDisplayStyle()).map(displayStyle -> displayStyle.toString()).orElse(null);
+      }
+    });
   }
 
   @Override
-  public JSONObject toJson() {
-    JSONObject json = super.toJson();
-    json.put("displayStyle", getModel().getDisplayStyle());
-    return json;
+  protected void handleUiAction(JsonEvent event) {
+    getModel().getUIFacade().setSelectedFromUI(true);
+    super.handleUiAction(event);
   }
 
 }

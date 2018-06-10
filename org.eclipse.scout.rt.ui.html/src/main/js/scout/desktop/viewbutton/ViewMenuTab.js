@@ -16,20 +16,17 @@
 scout.ViewMenuTab = function() {
   scout.ViewMenuTab.parent.call(this);
 
-  this.viewMenus = [];
+  this.viewButtons = [];
   this.selected = false;
   this.inBackground = false;
+  this.viewTabVisible = true;
   this.defaultIconId = scout.icons.FOLDER;
-
-  this._viewMenuPropertyChangeHandler = this._onViewMenuPropertyChange.bind(this);
-  this._addWidgetProperties(['viewMenus', 'selectedButton']);
+  this._addWidgetProperties(['selectedButton']);
 };
 scout.inherits(scout.ViewMenuTab, scout.Widget);
 
 scout.ViewMenuTab.prototype._init = function(model) {
   scout.ViewMenuTab.parent.prototype._init.call(this, model);
-  var selectedButton = this._findSelectedViewButton();
-
   this.dropdown = scout.create('Menu', {
     parent: this,
     iconId: scout.icons.ANGLE_DOWN,
@@ -37,17 +34,7 @@ scout.ViewMenuTab.prototype._init = function(model) {
     cssClass: 'view-menu'
   });
   this.dropdown.on('action', this.togglePopup.bind(this));
-
-  this.viewMenus.forEach(function(viewMenu) {
-    viewMenu.on('propertyChange', this._viewMenuPropertyChangeHandler);
-  }, this);
-  if (selectedButton) {
-    this.setSelectedButton(selectedButton);
-  } else {
-    this.setSelectedButton(this.viewMenus[0]);
-  }
-  this.setSelected(!!selectedButton);
-  this.updateVisibility();
+  this._setViewButtons(this.viewButtons);
 };
 
 scout.ViewMenuTab.prototype._initKeyStrokeContext = function() {
@@ -73,12 +60,31 @@ scout.ViewMenuTab.prototype._render = function() {
 scout.ViewMenuTab.prototype._remove = function() {
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
   scout.ViewMenuTab.parent.prototype._remove.call(this);
+  if (this.selectedButton) {
+    this.selectedButton.remove();
+  }
 };
 
 scout.ViewMenuTab.prototype._renderProperties = function() {
   scout.ViewMenuTab.parent.prototype._renderProperties.call(this);
-  this._renderSelectedButton();
+  this._updateSelectedButton();
   this._renderInBackground();
+};
+
+scout.ViewMenuTab.prototype.setViewButtons = function(viewButtons) {
+  this.setProperty('viewButtons', viewButtons);
+};
+
+scout.ViewMenuTab.prototype._setViewButtons = function(viewButtons) {
+  this._setProperty('viewButtons', viewButtons);
+  this.setVisible(this.viewButtons.length > 0);
+  var selectedButton = this._findSelectedViewButton();
+  if (selectedButton) {
+    this.setSelectedButton(selectedButton);
+  } else {
+    this.setSelectedButton(this.viewButtons[0]);
+  }
+  this.setSelected(!!selectedButton);
 };
 
 scout.ViewMenuTab.prototype.setSelectedButton = function(viewButton) {
@@ -91,6 +97,10 @@ scout.ViewMenuTab.prototype.setSelectedButton = function(viewButton) {
 };
 
 scout.ViewMenuTab.prototype._setSelectedButton = function(viewButton) {
+  var outlineParent = null;
+  if (viewButton.outline) {
+    outlineParent = viewButton.outline.parent;
+  }
   viewButton = viewButton.clone({
     parent: this,
     displayStyle: 'TAB'
@@ -100,16 +110,40 @@ scout.ViewMenuTab.prototype._setSelectedButton = function(viewButton) {
     delegateAllPropertiesToOriginal: true,
     excludePropertiesToOriginal: ['selected']
   });
+  if (outlineParent) {
+    viewButton.outline.setParent(outlineParent);
+  }
   // use default icon if outline does not define one.
   viewButton.iconId = viewButton.iconId || this.defaultIconId;
   this._setProperty('selectedButton', viewButton);
 };
 
 scout.ViewMenuTab.prototype._renderSelectedButton = function() {
-  if (this.selectedButton) {
-    this.selectedButton.render(this.$container);
+  this._updateSelectedButton();
+};
+
+scout.ViewMenuTab.prototype._updateSelectedButton = function() {
+  if (!this.selectedButton) {
+    return;
   }
-  this.htmlComp.invalidateLayoutTree();
+  if (this.viewTabVisible) {
+    if (!this.selectedButton.rendered) {
+      this.selectedButton.render(this.$container);
+      this.invalidateLayoutTree();
+    }
+  } else {
+    if (this.selectedButton.rendered) {
+      this.selectedButton.remove();
+      this.invalidateLayoutTree();
+    }
+  }
+};
+
+scout.ViewMenuTab.prototype.setViewTabVisible = function(viewTabVisible) {
+  this.setProperty('viewTabVisible', viewTabVisible);
+  if (this.rendered) {
+    this._updateSelectedButton();
+  }
 };
 
 scout.ViewMenuTab.prototype._renderSelected = function() {
@@ -122,8 +156,8 @@ scout.ViewMenuTab.prototype._renderInBackground = function() {
 
 scout.ViewMenuTab.prototype._findSelectedViewButton = function() {
   var viewMenu;
-  for (var i = 0; i < this.viewMenus.length; i++) {
-    viewMenu = this.viewMenus[i];
+  for (var i = 0; i < this.viewButtons.length; i++) {
+    viewMenu = this.viewButtons[i];
     if (viewMenu.selected) {
       return viewMenu;
     }
@@ -151,7 +185,7 @@ scout.ViewMenuTab.prototype._openPopup = function() {
   this.popup = scout.create('ViewMenuPopup', {
     parent: this,
     $tab: this.dropdown.$container,
-    viewMenus: this.viewMenus,
+    viewMenus: this.viewButtons,
     naviBounds: naviBounds
   });
   // The class needs to be added to the container before the popup gets opened so that the modified style may be copied to the head.
@@ -174,12 +208,6 @@ scout.ViewMenuTab.prototype.setSelected = function(selected) {
   this.setProperty('selected', selected);
 };
 
-scout.ViewMenuTab.prototype.updateVisibility = function() {
-  this.setVisible(this.viewMenus.some(function(viewMenu) {
-    return viewMenu.visible;
-  }));
-};
-
 scout.ViewMenuTab.prototype.sendToBack = function() {
   this.inBackground = true;
   this._renderInBackground();
@@ -191,12 +219,6 @@ scout.ViewMenuTab.prototype.bringToFront = function() {
   this.inBackground = false;
   this._renderInBackground();
   this._renderSelected();
-};
-
-scout.ViewMenuTab.prototype._onViewMenuPropertyChange = function(event) {
-  if (event.propertyName === 'visible') {
-    this.updateVisibility();
-  }
 };
 
 scout.ViewMenuTab.prototype.onViewButtonSelected = function() {

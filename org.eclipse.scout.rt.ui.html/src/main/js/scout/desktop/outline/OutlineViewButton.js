@@ -15,6 +15,25 @@ scout.OutlineViewButton = function() {
 };
 scout.inherits(scout.OutlineViewButton, scout.ViewButton);
 
+scout.OutlineViewButton.prototype._init = function(model) {
+  scout.OutlineViewButton.parent.prototype._init.call(this, model);
+  this._setOutline(this.outline);
+};
+
+scout.OutlineViewButton.prototype._setOutline = function(outline) {
+  this._setProperty('outline', outline);
+  if (this.outline) {
+    this.outline.setIconId(this.iconId);
+  }
+};
+
+scout.OutlineViewButton.prototype._setIconId = function(iconId) {
+  this._setProperty('iconId', iconId);
+  if (this.outline) {
+    this.outline.setIconId(this.iconId);
+  }
+};
+
 /**
  * @override
  */

@@ -32,4 +32,6 @@ public interface IViewButton extends IAction {
 
   DisplayStyle getDisplayStyle();
 
+  void setDisplayStyle(DisplayStyle displayStyle);
+
 }

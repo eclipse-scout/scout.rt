@@ -28,7 +28,7 @@ scout.DesktopNavigationLayout.prototype.layout = function($container) {
 
   containerSize = containerSize.subtract(htmlContainer.insets());
 
-  if (viewButtonBox) {
+  if (viewButtonBox.visible) {
     viewButtonBoxPrefSize = viewButtonBox.htmlComp.prefSize();
     viewButtonBoxHeight = viewButtonBoxPrefSize.height;
     viewButtonBoxWidth = containerSize.width;
@@ -49,7 +49,12 @@ scout.DesktopNavigationLayout.prototype.layout = function($container) {
   bodySize = new scout.Dimension(containerSize.width, containerSize.height - viewButtonBoxHeight)
     .subtract(htmlBody.margins());
   htmlBody.setSize(bodySize);
-  htmlBody.$comp.cssTop(viewButtonBoxHeight);
+
+  if (this.navigation.singleViewButton) {
+    htmlBody.$comp.cssTop(0);
+  } else {
+    htmlBody.$comp.cssTop(viewButtonBoxHeight);
+  }
 };
 
 scout.DesktopNavigationLayout.prototype.preferredLayoutSize = function($container) {

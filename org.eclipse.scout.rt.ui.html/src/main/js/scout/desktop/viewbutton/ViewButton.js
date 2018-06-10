@@ -12,11 +12,22 @@ scout.ViewButton = function() {
   scout.ViewButton.parent.call(this);
   this.inBackground = false;
   this.showTooltipWhenSelected = false;
+  this.displayStyle = 'TAB';
+  this._renderedAsMenu = false;
 };
 scout.inherits(scout.ViewButton, scout.Action);
 
+scout.ViewButton.prototype.renderAsMenuItem = function($parent) {
+  this._renderedAsMenu = true;
+  scout.ViewButton.parent.prototype.render.call(this, $parent);
+};
+scout.ViewButton.prototype.renderAsTab = function($parent) {
+  this._renderedAsMenu = false;
+  scout.ViewButton.parent.prototype.render.call(this, $parent);
+};
+
 scout.ViewButton.prototype._render = function() {
-  if (this._isMenu()) {
+  if (this._renderedAsMenu) {
     this._renderAsMenuItem();
   } else {
     this._renderAsTab();
@@ -25,16 +36,7 @@ scout.ViewButton.prototype._render = function() {
 
 scout.ViewButton.prototype._renderProperties = function() {
   scout.ViewButton.parent.prototype._renderProperties.call(this);
-
   this._renderInBackground();
-};
-
-scout.ViewButton.prototype._isMenu = function() {
-  return this.displayStyle === 'MENU';
-};
-
-scout.ViewButton.prototype._isTab = function() {
-  return this.displayStyle === 'TAB';
 };
 
 scout.ViewButton.prototype._renderAsMenuItem = function() {
@@ -51,13 +53,17 @@ scout.ViewButton.prototype._renderAsTab = function() {
  * @override Action.js
  */
 scout.ViewButton.prototype._renderText = function() {
-  if (this._isMenu()) {
+  if (this._renderedAsMenu) {
     scout.ViewButton.parent.prototype._renderText.call(this);
   }
 };
 
 scout.ViewButton.prototype._renderInBackground = function() {
   this.$container.toggleClass('in-background', this.inBackground);
+};
+
+scout.ViewButton.prototype.setDisplayStyle = function(displayStyle) {
+  this.setProperty('displayStyle', displayStyle);
 };
 
 scout.ViewButton.prototype.last = function() {
@@ -103,7 +109,7 @@ scout.ViewButtonActionKeyStroke = function(action) {
 scout.inherits(scout.ViewButtonActionKeyStroke, scout.ActionKeyStroke);
 
 scout.ViewButtonActionKeyStroke.prototype._postRenderKeyBox = function($drawingArea) {
-  if (this.field.iconId && this.field._isTab()) {
+  if (this.field.iconId && !this.field._isMenuItem) {
     var width = $drawingArea.outerWidth();
     var wKeybox = $drawingArea.find('.key-box').outerWidth();
     var leftKeyBox = width / 2 - wKeybox / 2;
@@ -112,7 +118,7 @@ scout.ViewButtonActionKeyStroke.prototype._postRenderKeyBox = function($drawingA
 };
 
 scout.ViewButtonActionKeyStroke.prototype.renderKeyBox = function($drawingArea, event) {
-  if (this.field._isMenu()) {
+  if (this.field._isMenuItem) {
     this.renderingHints.hAlign = scout.hAlign.RIGHT;
   }
   return scout.ViewButtonActionKeyStroke.parent.prototype.renderKeyBox.call(this, $drawingArea, event);

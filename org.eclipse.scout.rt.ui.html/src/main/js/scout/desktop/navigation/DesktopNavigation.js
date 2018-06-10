@@ -15,6 +15,7 @@ scout.DesktopNavigation = function() {
   this.viewButtonBox;
   this._outlinePropertyChangeHandler = this._onOutlinePropertyChange.bind(this);
   this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
+  this._viewButtonBoxPropertyChangeHandler = this._onViewButtonBoxPropertyChange.bind(this);
 };
 scout.inherits(scout.DesktopNavigation, scout.Widget);
 
@@ -32,6 +33,13 @@ scout.DesktopNavigation.prototype._init = function(model) {
   this.toolBoxVisible = scout.nvl(model.toolBoxVisible, false);
   this.updateHandleVisibility();
   this._setOutline(model.outline);
+  this.viewButtonBox = scout.create('ViewButtonBox', {
+    parent: this,
+    viewButtons: this.desktop.viewButtons,
+    singleViewButton: this.singleViewButton
+  });
+  this.viewButtonBox.on('propertyChange', this._viewButtonBoxPropertyChangeHandler);
+  this._updateSingleViewButton();
 };
 
 scout.DesktopNavigation.prototype._render = function() {
@@ -59,17 +67,10 @@ scout.DesktopNavigation.prototype._renderProperties = function() {
   this._renderToolBoxVisible();
   this._renderOutline();
   this._renderHandleVisible();
+  this._renderSingleViewButton();
 };
 
 scout.DesktopNavigation.prototype._renderViewButtonBox = function() {
-  if (this.desktop.viewButtons.length === 0) {
-    return;
-  }
-
-  this.viewButtonBox = scout.create('ViewButtonBox', {
-    parent: this,
-    viewButtons: this.desktop.viewButtons
-  });
   this.viewButtonBox.render();
 };
 
@@ -108,17 +109,45 @@ scout.DesktopNavigation.prototype._setOutline = function(newOutline) {
   }
   this.outline = newOutline;
   if (this.outline) {
+    this.outline.setIconVisible(this.singleViewButton);
     this.outline.setParent(this);
     this.outline.setBreadcrumbTogglingThreshold(scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH);
     // if both have breadcrumb-toggling enabled: make sure new outline uses same display style as old
     if (this.outline.toggleBreadcrumbStyleEnabled && oldOutline && oldOutline.toggleBreadcrumbStyleEnabled &&
-        oldOutline.displayStyle) {
+      oldOutline.displayStyle) {
       this.outline.setDisplayStyle(oldOutline.displayStyle);
     }
     this.outline.inBackground = this.desktop.inBackground;
     this.outline.on('propertyChange', this._outlinePropertyChangeHandler);
     this._updateHandle();
   }
+};
+
+scout.DesktopNavigation.prototype._updateSingleViewButton = function() {
+  var menuCount = this.viewButtonBox.menuButtons.length,
+    tabCount = this.viewButtonBox.tabButtons.length;
+
+  if ((menuCount + tabCount) > 1) {
+    if (menuCount > 0) {
+      tabCount++;
+    }
+    this.setSingleViewButton(tabCount < 2);
+  } else {
+    this.setSingleViewButton(false);
+  }
+};
+
+scout.DesktopNavigation.prototype.setSingleViewButton = function(singleViewButton) {
+  this.setProperty('singleViewButton', singleViewButton);
+  if (this.outline) {
+    this.outline.setIconVisible(this.singleViewButton);
+  }
+  this.viewButtonBox.setMenuTabVisible(!singleViewButton);
+};
+
+scout.DesktopNavigation.prototype._renderSingleViewButton = function() {
+  this.$container.toggleClass('single-view-button', this.singleViewButton);
+  this.invalidateLayoutTree();
 };
 
 scout.DesktopNavigation.prototype.sendToBack = function() {
@@ -150,7 +179,7 @@ scout.DesktopNavigation.prototype.setHandleVisible = function(visible) {
 scout.DesktopNavigation.prototype._updateHandle = function() {
   if (this.handle) {
     this.handle.setRightVisible(this.outline && this.outline.toggleBreadcrumbStyleEnabled &&
-        this.desktop.outlineDisplayStyle() === scout.Tree.DisplayStyle.BREADCRUMB);
+      this.desktop.outlineDisplayStyle() === scout.Tree.DisplayStyle.BREADCRUMB);
   }
 };
 
@@ -223,6 +252,12 @@ scout.DesktopNavigation.prototype._removeHandle = function() {
 
 scout.DesktopNavigation.prototype._onNavigationBodyMouseDown = function(event) {
   this.desktop.bringOutlineToFront();
+};
+
+scout.DesktopNavigation.prototype._onViewButtonBoxPropertyChange = function(event) {
+  if (event.propertyName === 'menuButtons' || event.propertyName === 'tabButtons') {
+    this._updateSingleViewButton();
+  }
 };
 
 scout.DesktopNavigation.prototype._onOutlinePropertyChange = function(event) {

@@ -25,20 +25,55 @@ describe('DesktopNavigation', function() {
 
   describe('viewButtonBox', function() {
 
-    it('is rendered if there are view buttons', function() {
-      desktop.viewButtons = [scout.create('ViewButton', {
-        parent: desktop
-      })];
+    it('is visible when there are more than one ViewButtons', function() {
+      desktop.viewButtons = [
+        scout.create('ViewButton', {
+        parent: desktop,
+        text: 'Button1',
+        displayStyle: 'TAB'
+      }),
+      scout.create('ViewButton', {
+        parent: desktop,
+        text: 'Button2',
+        displayStyle: 'TAB'
+      })
+      ];
       desktop.render(session.$entryPoint);
-      expect(desktop.navigation.viewButtonBox.rendered).toBe(true);
+      expect(desktop.navigation.viewButtonBox.visible).toBe(true);
     });
 
-    it('is not rendered if there are no view buttons', function() {
+    it('is not visible if there are no view buttons', function() {
       desktop.viewButtons = [];
       desktop.render(session.$entryPoint);
-      expect(desktop.navigation.viewButtonBox).toBeFalsy();
+      expect(desktop.navigation.viewButtonBox.visible).toBeFalsy();
     });
 
+    it('is not visible when there is only one ViewButton', function() {
+      desktop.viewButtons = [scout.create('ViewButton', {
+        parent: desktop,
+        displayStyle: 'MENU'
+      })];
+      desktop.render(session.$entryPoint);
+      expect(desktop.navigation.viewButtonBox.visible).toBe(false);
+    });
+
+    it('has only one ViewButtonMenu if all buttons are displayType menu', function() {
+      desktop.viewButtons = [
+        scout.create('ViewButton', {
+          parent: desktop,
+          text: 'VB1',
+          displayStyle: 'MENU'
+        }),
+        scout.create('ViewButton', {
+          parent: desktop,
+          text: 'VB2',
+          displayStyle: 'MENU'
+        })
+      ];
+      desktop.render(session.$entryPoint);
+      expect(desktop.navigation.viewButtonBox.visible).toBe(true);
+      expect(desktop.navigation.viewButtonBox.viewMenuTab.visible).toBe(true);
+    });
   });
 
   describe('outline', function() {

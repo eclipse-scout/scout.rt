@@ -101,6 +101,15 @@
   #scout.overflow-ellipsis-nowrap();
   margin: 0 @outline-title-margin-right @outline-title-margin-bottom @outline-title-margin-left;
   border-bottom: 1px solid @outline-title-border-color;
+  #scout.vertical-align-helper-before();
+
+  & > .icon {
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+    font-size: 20px;
+    padding-right: 10px;
+  }
 
   & > .key-box {
     top: 19px;
@@ -148,8 +157,9 @@
   /* outline title height should be the same as main menubar and desktop header height (if there are no view buttons visible) */
   padding: 20px 2px 12px @outline-title-text-padding-left;
   cursor: pointer;
-  display: block;
+  display: inline-block;
   width: auto;
+  vertical-align: middle;
 }
 
 /* bread crumb style (different colors and bigger font and arrow than original breadcrumb style) */

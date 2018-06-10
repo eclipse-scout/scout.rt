@@ -44,7 +44,8 @@ public abstract class AbstractViewButton extends AbstractAction implements IView
     return (DisplayStyle) propertySupport.getProperty(PROP_DISPLAY_STYLE);
   }
 
-  protected void setDisplayStyle(DisplayStyle displayStyle) {
+  @Override
+  public void setDisplayStyle(DisplayStyle displayStyle) {
     propertySupport.setProperty(PROP_DISPLAY_STYLE, displayStyle);
   }
 

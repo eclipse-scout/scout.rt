@@ -14,6 +14,7 @@ scout.DesktopHeader = function() {
   this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
   this._desktopAnimationEndHandler = this._onDesktopAnimationEnd.bind(this);
   this._outlineContentMenuBarPropertyChangeHandler = this._onOutlineContentMenuBarPropertyChange.bind(this);
+  this._viewButtonBoxPropertyChangeHandler = this._onViewButtonBoxPropertyChange.bind(this);
 };
 scout.inherits(scout.DesktopHeader, scout.Widget);
 
@@ -54,7 +55,7 @@ scout.DesktopHeader.prototype._remove = function() {
 };
 
 scout.DesktopHeader.prototype._renderViewTabs = function() {
-   this.tabArea.render();
+  this.tabArea.render();
 };
 
 scout.DesktopHeader.prototype._renderToolBox = function() {
@@ -122,6 +123,7 @@ scout.DesktopHeader.prototype._renderViewButtonBox = function() {
     parent: this,
     viewButtons: this.desktop.viewButtons
   });
+  this.viewButtonBox.on('propertyChange', this._viewButtonBoxPropertyChangeHandler);
   this.viewButtonBox.render();
   this.viewButtonBox.$container.prependTo(this.$container);
   if (this.desktop.inBackground) {
@@ -134,6 +136,7 @@ scout.DesktopHeader.prototype._removeViewButtonBox = function() {
   if (!this.viewButtonBox) {
     return;
   }
+  this.viewButtonBox.off('propertyChange', this._viewButtonBoxPropertyChangeHandler);
   this.viewButtonBox.destroy();
   this.viewButtonBox = null;
 };
@@ -227,7 +230,7 @@ scout.DesktopHeader.prototype.updateViewButtonStyling = function() {
   } else {
     hasMenuBar = outlineContent.menuBar && outlineContent.menuBar.visible;
   }
-  this.viewButtonBox.viewTabs.forEach(function(tab) {
+  this.viewButtonBox.tabButtons.forEach(function(tab) {
     tab.$container.toggleClass('outline-content-has-menubar', !!hasMenuBar);
   }, this);
   this.viewButtonBox.viewMenuTab.$container.toggleClass('outline-content-has-menubar', !!hasMenuBar);
@@ -261,5 +264,11 @@ scout.DesktopHeader.prototype._onDesktopPropertyChange = function(event) {
 scout.DesktopHeader.prototype._onOutlineContentMenuBarPropertyChange = function(event) {
   if (event.propertyName === 'visible') {
     this.updateViewButtonStyling();
+  }
+};
+
+scout.DesktopHeader.prototype._onViewButtonBoxPropertyChange = function(event) {
+  if (event.propertyName === 'menuButtons' || event.propertyName === 'tabButtons') {
+    this.invalidateLayoutTree();
   }
 };

@@ -161,6 +161,7 @@ scout.Outline.prototype._render = function() {
 scout.Outline.prototype._renderProperties = function() {
   scout.Outline.parent.prototype._renderProperties.call(this);
   this._renderTitle();
+  this._updateIcon();
   this._renderTitleMenuBar();
 };
 
@@ -170,16 +171,15 @@ scout.Outline.prototype._renderProperties = function() {
 scout.Outline.prototype._computeNodePaddingLeft = function(node) {
   this._computeNodePaddings();
 
-  if(node.getOutline().compact){
-    if(node.row && node.getOutline().selectedNode() !== node){
+  if (node.getOutline().compact) {
+    if (node.row && node.getOutline().selectedNode() !== node) {
       return node.row._hierarchyLevel * this.nodePaddingLevel;
     }
     return 0;
-  }else if(node.getOutline().isBreadcrumbStyleActive()){
+  } else if (node.getOutline().isBreadcrumbStyleActive()) {
     return null;
-  }
-  else{
-    return scout.Outline.parent.prototype._computeNodePaddingLeft.call(this,node);
+  } else {
+    return scout.Outline.parent.prototype._computeNodePaddingLeft.call(this, node);
   }
 };
 
@@ -189,6 +189,7 @@ scout.Outline.prototype._computeNodePaddingLeft = function(node) {
 scout.Outline.prototype._remove = function() {
   scout.Outline.parent.prototype._remove.call(this);
   this._removeTitle();
+  this._removeIcon();
 };
 
 scout.Outline.prototype._renderTitle = function() {
@@ -208,6 +209,48 @@ scout.Outline.prototype._removeTitle = function() {
   if (this.titleVisible) {
     this.$title.remove();
     this.$title = null;
+  }
+};
+
+scout.Outline.prototype.setIconVisible = function(iconVisible) {
+  this.setProperty('iconVisible', iconVisible);
+  if (this.rendered) {
+    this._updateIcon();
+  }
+};
+
+scout.Outline.prototype.setIconId = function(iconId) {
+  this.setProperty('iconId', iconId);
+  if (this.rendered) {
+    this._updateIcon();
+  }
+};
+
+scout.Outline.prototype._updateIcon = function() {
+  if (this.iconVisible && this.iconId) {
+    if (this.icon) {
+      this.icon.setIconDesc(this.iconId);
+      return;
+    }
+    this.icon = scout.create('Icon', {
+      parent: this,
+      iconDesc: this.iconId,
+      prepend: true
+    });
+    this.icon.render(this.$title);
+  } else {
+    if (!this.icon) {
+      return;
+    }
+    this.icon.remove();
+    this.icon = null;
+  }
+};
+
+scout.Outline.prototype._removeIcon = function() {
+  if (this.icon) {
+    this.icon.remove();
+    this.icon = null;
   }
 };
 

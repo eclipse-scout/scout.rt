@@ -15,6 +15,33 @@
   min-width: @desktop-navigation-min-width;
   background-color: @navigation-background-color;
   color: @navigation-color;
+
+  &.single-view-button {
+  
+    & > .navigation-body {
+      & > .outline > .outline-title {
+        height: 50px;
+        margin-left: 35px;
+        border-bottom: none;
+        padding-left: 20px;
+
+        & > .outline-title-text {
+          padding-top: 0;
+          padding-bottom: 0;
+        }
+      }
+      & > .outline.breadcrumb > .outline-title > .outline-title-text {
+        padding-left: 0;
+      }
+    }
+
+    & > .view-button-box {
+      & .view-button-tab {
+        padding-left: 20px;
+        text-align: initial;
+      }
+    }
+  }
 }
 
 .desktop-navigation-breadcrumb {

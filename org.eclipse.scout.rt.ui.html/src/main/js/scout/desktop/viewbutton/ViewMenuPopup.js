@@ -50,7 +50,7 @@ scout.ViewMenuPopup.prototype._render = function() {
   scout.ViewMenuPopup.parent.prototype._render.call(this);
 
   this.viewMenus.forEach(function(viewMenu) {
-    viewMenu.render(this.$body);
+    viewMenu.renderAsMenuItem(this.$body);
     viewMenu.on('action', this._viewMenuActionHandler);
   }, this);
 

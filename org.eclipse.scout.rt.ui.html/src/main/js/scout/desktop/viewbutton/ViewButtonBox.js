@@ -11,43 +11,39 @@
 scout.ViewButtonBox = function() {
   scout.ViewButtonBox.parent.call(this);
   this.viewMenuTab;
-  this.viewTabs;
   this.viewButtons = [];
+  this.menuButtons = [];
+  this.tabButtons = [];
   this._desktopOutlineChangeHandler = this._onDesktopOutlineChange.bind(this);
   this._viewButtonPropertyChangeHandler = this._onViewButtonPropertyChange.bind(this);
-  this._addWidgetProperties(['viewButtons']);
+  this._addWidgetProperties(['tabButtons']);
 };
 scout.inherits(scout.ViewButtonBox, scout.Widget);
 
 scout.ViewButtonBox.prototype._init = function(model) {
   scout.ViewButtonBox.parent.prototype._init.call(this, model);
   this.desktop = this.session.desktop;
+  this.viewMenuTab = scout.create('ViewMenuTab', {
+    parent: this
+  });
+  this._setViewButtons(this.viewButtons);
+  this.desktop.on('outlineChange', this._desktopOutlineChangeHandler);
 };
 
 scout.ViewButtonBox.prototype._render = function() {
   this.$container = this.$parent.appendDiv('view-button-box');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.ViewButtonBoxLayout(this));
-  this.viewMenuTab = scout.create('ViewMenuTab', {
-    parent: this,
-    viewMenus: this._viewButtons('MENU')
-  });
+
   this.viewMenuTab.render();
 
-  this.viewTabs = this._viewButtons('TAB');
-  this.viewTabs.forEach(function(viewTab, i) {
-    viewTab.render();
-    viewTab.tab();
-    if (i === this.viewTabs.length - 1) {
-      viewTab.last();
-    }
-  }, this);
-
   this._onDesktopOutlineChange();
-  this.viewButtons.forEach(function(viewButton) {
-    viewButton.on('propertyChange', this._viewButtonPropertyChangeHandler);
-  }, this);
-  this.desktop.on('outlineChange', this._desktopOutlineChangeHandler);
+
+};
+
+scout.ViewButtonBox.prototype._renderProperties = function() {
+  scout.ViewButtonBox.parent.prototype._renderProperties.call(this);
+  this._renderTabButtons();
 };
 
 scout.ViewButtonBox.prototype._remove = function() {
@@ -59,27 +55,91 @@ scout.ViewButtonBox.prototype._remove = function() {
   scout.ViewButtonBox.parent.prototype._remove.call(this);
 };
 
-scout.ViewButtonBox.prototype._viewButtons = function(displayStyle) {
-  var viewButtons = [];
+scout.ViewButtonBox.prototype.setMenuTabVisible = function(menuTabVisible) {
+  this.viewMenuTab.setViewTabVisible(menuTabVisible);
+  this.invalidateLayoutTree();
+};
+
+scout.ViewButtonBox.prototype.setViewButtons = function(viewButtons) {
+  this.setProperty('viewButtons', viewButtons);
+};
+
+scout.ViewButtonBox.prototype._setViewButtons = function(viewButtons) {
+  if (this.viewButtons) {
+    this.viewButtons.forEach(function(viewButton) {
+      viewButton.off('propertyChange', this._viewButtonPropertyChangeHandler);
+    }, this);
+  }
+  this._setProperty('viewButtons', viewButtons);
   this.viewButtons.forEach(function(viewButton) {
-    if (displayStyle === undefined ||
-      displayStyle === viewButton.displayStyle) {
-      viewButtons.push(viewButton);
+    viewButton.on('propertyChange', this._viewButtonPropertyChangeHandler);
+  }, this);
+  this._updateViewButtons();
+};
+
+scout.ViewButtonBox.prototype.setTabButtons = function(tabButtons) {
+  this.setProperty('tabButtons', tabButtons);
+};
+
+scout.ViewButtonBox.prototype._renderTabButtons = function() {
+  this.tabButtons.forEach(function(viewTab, i) {
+    viewTab.renderAsTab();
+    viewTab.tab();
+    if (i === this.tabButtons.length - 1) {
+      viewTab.last();
     }
-  });
-  return viewButtons;
+  }, this);
+};
+
+scout.ViewButtonBox.prototype._updateViewButtons = function() {
+  var viewButtons = this.viewButtons.filter(function(b) {
+      return b.visible;
+    }),
+    menuButtons = viewButtons.filter(function(b) {
+      return b.displayStyle === 'MENU';
+    }),
+    tabButtons = null;
+  // render as tab if length is < 1
+  if (menuButtons.length > 1) {
+    tabButtons = viewButtons.filter(function(b) {
+      return b.displayStyle === 'TAB';
+    });
+  } else {
+    // all visible view buttons are rendered as tab
+    tabButtons = viewButtons;
+    menuButtons = [];
+  }
+
+  this._setMenuButtons(menuButtons);
+
+  this.setTabButtons(tabButtons);
+  this._updateVisibility();
+};
+
+scout.ViewButtonBox.prototype._updateVisibility = function(menuButtons) {
+  this.setVisible((this.tabButtons.length + this.menuButtons.length) > 1);
+};
+
+scout.ViewButtonBox.prototype.setMenuButtons = function(menuButtons) {
+  this.setProperty('menuButtons', menuButtons);
+  this._updateVisibility();
+};
+
+scout.ViewButtonBox.prototype._setMenuButtons = function(menuButtons) {
+  this._setProperty('menuButtons', menuButtons);
+  this.viewMenuTab.setViewButtons(this.menuButtons);
 };
 
 scout.ViewButtonBox.prototype.sendToBack = function() {
   this.viewMenuTab.sendToBack();
-  this.viewTabs.forEach(function(button) {
+  this.tabButtons.forEach(function(button) {
     button.sendToBack();
   }, this);
 };
 
 scout.ViewButtonBox.prototype.bringToFront = function() {
   this.viewMenuTab.bringToFront();
-  this.viewTabs.forEach(function(button) {
+  this.tabButtons.forEach(function(button) {
     button.bringToFront();
   }, this);
 };
@@ -90,7 +150,7 @@ scout.ViewButtonBox.prototype.bringToFront = function() {
  */
 scout.ViewButtonBox.prototype._onDesktopOutlineChange = function(event) {
   var outline = this.desktop.outline;
-  this._viewButtons().forEach(function(viewTab) {
+  this.viewButtons.forEach(function(viewTab) {
     if (viewTab instanceof scout.OutlineViewButton) {
       viewTab.onOutlineChange(outline);
     }
@@ -112,5 +172,8 @@ scout.ViewButtonBox.prototype._onViewButtonSelected = function(event) {
 scout.ViewButtonBox.prototype._onViewButtonPropertyChange = function(event) {
   if (event.propertyName === 'selected') {
     this._onViewButtonSelected(event);
+  } else if (event.propertyName === 'visible' ||
+    event.propertyName === 'displayStyle') {
+    this._updateViewButtons();
   }
 };
