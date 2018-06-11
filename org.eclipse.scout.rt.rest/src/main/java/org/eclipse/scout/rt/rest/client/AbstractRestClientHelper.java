@@ -16,11 +16,16 @@ import javax.ws.rs.ext.ContextResolver;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.util.UriBuilder;
+import org.eclipse.scout.rt.rest.error.ErrorDo;
+import org.eclipse.scout.rt.rest.error.ErrorResponse;
 import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract implementation of a REST client helper dealing with REST requests to a API server.
@@ -31,6 +36,8 @@ import org.glassfish.jersey.client.ClientConfig;
  * {@link #getBaseUri()} method.
  */
 public abstract class AbstractRestClientHelper implements IRestClientHelper {
+
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractRestClientHelper.class);
 
   private final Supplier<Client> m_clientSupplier = createClientSupplier();
 
@@ -125,6 +132,7 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
 
   @Override
   public void throwOnResponseError(WebTarget target, Response response) {
+    // TODO [8.0] pbz,abr: Remove special handling and exception wrapping, throw WebApplicationException with nested response, leave reading ErrorDo from response to caller
     if (response.getStatus() == Response.Status.FORBIDDEN.getStatusCode()) {
       handleForbiddenResponse(target, response);
     }
@@ -134,12 +142,33 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
   }
 
   protected void handleForbiddenResponse(WebTarget target, Response response) {
-    throw new VetoException(response.getStatusInfo().getReasonPhrase());
+    try {
+      ErrorDo error = response.readEntity(ErrorResponse.class).getError();
+      throw new VetoException(error.getMessage()).withTitle(error.getTitle()); // add other errordo attributes
+    }
+    catch (@SuppressWarnings("squid:S1166") javax.ws.rs.ProcessingException | IllegalStateException e) {
+      StatusType statusInfo = response.getStatusInfo();
+      LOG.debug("REST call to '{}' returned forbidden {} {} without error response object.", target.getUri(), statusInfo.getStatusCode(), statusInfo.getReasonPhrase());
+
+      VetoException vetoException = new VetoException(response.getStatusInfo().getReasonPhrase());
+      vetoException.addSuppressed(e);
+      throw vetoException;
+    }
   }
 
   protected void handleErrorResponse(WebTarget target, Response response) {
-    StatusType statusInfo = response.getStatusInfo();
-    throw new ProcessingException("REST call to '{}' failed: {} {}", target.getUri(), statusInfo.getStatusCode(), statusInfo.getReasonPhrase());
+    try {
+      ErrorDo error = response.readEntity(ErrorResponse.class).getError();
+      throw new PlatformException(error.getMessage());
+    }
+    catch (@SuppressWarnings("squid:S1166") javax.ws.rs.ProcessingException | IllegalStateException e) {
+      StatusType statusInfo = response.getStatusInfo();
+      LOG.debug("REST call to '{}' returned error {} {} without error response object.", target.getUri(), statusInfo.getStatusCode(), statusInfo.getReasonPhrase());
+
+      ProcessingException processingException = new ProcessingException("REST call to '{}' failed: {} {}", target.getUri(), statusInfo.getStatusCode(), statusInfo.getReasonPhrase());
+      processingException.addSuppressed(e);
+      throw processingException;
+    }
   }
 
   @Override

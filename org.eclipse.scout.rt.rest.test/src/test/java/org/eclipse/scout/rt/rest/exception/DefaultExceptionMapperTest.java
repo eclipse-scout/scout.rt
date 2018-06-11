@@ -23,6 +23,7 @@ import javax.ws.rs.ext.RuntimeDelegate;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.rest.error.ErrorResponse;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -61,6 +62,20 @@ public class DefaultExceptionMapperTest {
       @Override
       public ResponseBuilder answer(InvocationOnMock invocation) throws Throwable {
         return addStatus(responseBuilder, ((int) invocation.getArgument(0)));
+      }
+    });
+
+    when((responseBuilder.entity(Mockito.any(ErrorResponse.class)))).then(new Answer<ResponseBuilder>() {
+      @Override
+      public ResponseBuilder answer(InvocationOnMock invocation) throws Throwable {
+        return responseBuilder;
+      }
+    });
+
+    when((responseBuilder.type(Mockito.anyString()))).then(new Answer<ResponseBuilder>() {
+      @Override
+      public ResponseBuilder answer(InvocationOnMock invocation) throws Throwable {
+        return responseBuilder;
       }
     });
   }

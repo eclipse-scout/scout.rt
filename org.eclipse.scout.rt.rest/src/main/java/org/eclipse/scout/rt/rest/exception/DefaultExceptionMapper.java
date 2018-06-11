@@ -12,8 +12,9 @@ package org.eclipse.scout.rt.rest.exception;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.rest.error.ErrorResponseBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +29,12 @@ import org.slf4j.LoggerFactory;
  * the exception cause. But it must not be sent to the client due to security reason.
  */
 public class DefaultExceptionMapper extends AbstractExceptionMapper<Exception> {
+
   private static final Logger LOG = LoggerFactory.getLogger(DefaultExceptionMapper.class);
+
+  public static final String DEFAULT_ERROR_MESSAGE = "An internal server error has occured.";
+
+  protected ErrorResponseBuilder m_errorResponseBuilder = BEANS.get(ErrorResponseBuilder.class);
 
   @Override
   public Response toResponseImpl(Exception exception) {
@@ -37,6 +43,9 @@ public class DefaultExceptionMapper extends AbstractExceptionMapper<Exception> {
   }
 
   protected Response createResponse(Exception exception) {
-    return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+    return m_errorResponseBuilder
+        .withStatus(Response.Status.INTERNAL_SERVER_ERROR)
+        .withMessage(DEFAULT_ERROR_MESSAGE)
+        .build();
   }
 }

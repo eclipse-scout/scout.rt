@@ -13,11 +13,16 @@ package org.eclipse.scout.rt.rest.exception;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.rest.error.ErrorResponseBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WebApplicationExceptionMapper extends AbstractExceptionMapper<WebApplicationException> {
+
   private static final Logger LOG = LoggerFactory.getLogger(WebApplicationExceptionMapper.class);
+
+  protected ErrorResponseBuilder m_errorResponseBuilder = BEANS.get(ErrorResponseBuilder.class);
 
   @Override
   public Response toResponseImpl(WebApplicationException exception) {
@@ -26,6 +31,9 @@ public class WebApplicationExceptionMapper extends AbstractExceptionMapper<WebAp
   }
 
   protected Response createResponse(WebApplicationException exception) {
-    return exception.getResponse();
+    return m_errorResponseBuilder
+        .withStatus(exception.getResponse().getStatus())
+        .withMessage(exception.getMessage())
+        .build();
   }
 }
