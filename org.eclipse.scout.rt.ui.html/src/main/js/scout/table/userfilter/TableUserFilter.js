@@ -44,6 +44,6 @@ scout.TableUserFilter.prototype.createLabel = function() {
   return '';
 };
 
-scout.TableUserFilter.prototype.accept = function($row) {
+scout.TableUserFilter.prototype.accept = function(row) {
   // to be implemented by subclasses
 };
