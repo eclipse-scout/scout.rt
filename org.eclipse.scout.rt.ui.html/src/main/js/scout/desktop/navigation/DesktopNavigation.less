@@ -17,11 +17,12 @@
   color: @navigation-color;
 
   &.single-view-button {
-  
+
     & > .navigation-body {
       & > .outline > .outline-title {
-        height: 50px;
+        height: @desktop-header-height - 1px; /* minus the border */
         margin-left: 35px;
+        margin-bottom: @single-view-button-outline-title-margin-bottom;
         border-bottom: none;
         padding-left: 20px;
 
@@ -29,9 +30,50 @@
           padding-top: 0;
           padding-bottom: 0;
         }
+
+        & > .menubar {
+          height: 100%;
+          top: 0;
+        }
       }
+
       & > .outline.breadcrumb > .outline-title > .outline-title-text {
         padding-left: 0;
+      }
+
+      & > .outline.breadcrumb:not(.search-outline) {
+        & > .outline-title {
+          margin-bottom: 0;
+        }
+
+        & > .tree-data {
+          margin-top: @single-view-button-outline-title-margin-bottom;
+          border-top: 1px solid @outline-breadcrumb-border-color;
+        }
+      }
+
+      & > .search-outline {
+        & > .outline-title {
+          margin-bottom: 0;
+        }
+
+        & > .search-outline-panel {
+          padding-top: @single-view-button-search-outline-panel-padding-top;
+          padding-bottom: @single-view-button-search-outline-panel-padding-bottom;
+
+          &.has-status {
+            padding-bottom: @search-outline-panel-padding-bottom;
+          }
+
+          & > .search-outline-field {
+            height: @single-view-button-search-outline-field-height;
+          }
+
+          & > .clear-icon {
+            top: @single-view-button-search-outline-panel-padding-top;
+            height: @single-view-button-search-outline-field-height;
+          }
+        }
       }
     }
 

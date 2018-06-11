@@ -108,6 +108,7 @@ scout.SearchOutline.prototype._renderSearchStatus = function() {
     }
   }
   this.$searchStatus.textOrNbsp(this.searchStatus);
+  this.$searchPanel.toggleClass('has-status', !!this.searchStatus);
 };
 
 scout.SearchOutline.prototype.focusQueryField = function() {

@@ -10,7 +10,6 @@
  ******************************************************************************/
 scout.ViewButton = function() {
   scout.ViewButton.parent.call(this);
-  this.inBackground = false;
   this.showTooltipWhenSelected = false;
   this.displayStyle = 'TAB';
   this._renderedAsMenu = false;
@@ -34,11 +33,6 @@ scout.ViewButton.prototype._render = function() {
   }
 };
 
-scout.ViewButton.prototype._renderProperties = function() {
-  scout.ViewButton.parent.prototype._renderProperties.call(this);
-  this._renderInBackground();
-};
-
 scout.ViewButton.prototype._renderAsMenuItem = function() {
   this.$container = this.$parent.appendDiv('view-menu-item')
     .on('click', this._onMouseEvent.bind(this));
@@ -58,10 +52,6 @@ scout.ViewButton.prototype._renderText = function() {
   }
 };
 
-scout.ViewButton.prototype._renderInBackground = function() {
-  this.$container.toggleClass('in-background', this.inBackground);
-};
-
 scout.ViewButton.prototype.setDisplayStyle = function(displayStyle) {
   this.setProperty('displayStyle', displayStyle);
 };
@@ -72,20 +62,6 @@ scout.ViewButton.prototype.last = function() {
 
 scout.ViewButton.prototype.tab = function() {
   this.$container.addClass('view-tab');
-};
-
-scout.ViewButton.prototype.sendToBack = function() {
-  this.inBackground = true;
-  if (this.rendered) {
-    this._renderInBackground();
-  }
-};
-
-scout.ViewButton.prototype.bringToFront = function() {
-  this.inBackground = false;
-  if (this.rendered) {
-    this._renderInBackground();
-  }
 };
 
 scout.ViewButton.prototype._onMouseEvent = function(event) {

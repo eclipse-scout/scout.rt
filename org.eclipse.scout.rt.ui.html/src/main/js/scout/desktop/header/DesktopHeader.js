@@ -38,6 +38,7 @@ scout.DesktopHeader.prototype._render = function() {
   this._renderViewTabs();
   this._renderToolBoxVisible();
   this._renderLogoUrl();
+  this._renderInBackground();
   this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
   this.desktop.on('animationEnd', this._desktopAnimationEndHandler);
   if (this.desktop.bench) {
@@ -154,12 +155,22 @@ scout.DesktopHeader.prototype.sendToBack = function() {
   if (this.viewButtonBox) {
     this.viewButtonBox.sendToBack();
   }
+  if (this.rendered) {
+    this._renderInBackground();
+  }
 };
 
 scout.DesktopHeader.prototype.bringToFront = function() {
   if (this.viewButtonBox) {
     this.viewButtonBox.bringToFront();
   }
+  if (this.rendered) {
+    this._renderInBackground();
+  }
+};
+
+scout.DesktopHeader.prototype._renderInBackground = function() {
+  this.$container.toggleClass('in-background', this.desktop.inBackground);
 };
 
 scout.DesktopHeader.prototype.setLogoUrl = function(logoUrl) {
@@ -230,10 +241,7 @@ scout.DesktopHeader.prototype.updateViewButtonStyling = function() {
   } else {
     hasMenuBar = outlineContent.menuBar && outlineContent.menuBar.visible;
   }
-  this.viewButtonBox.tabButtons.forEach(function(tab) {
-    tab.$container.toggleClass('outline-content-has-menubar', !!hasMenuBar);
-  }, this);
-  this.viewButtonBox.viewMenuTab.$container.toggleClass('outline-content-has-menubar', !!hasMenuBar);
+  this.$container.toggleClass('outline-content-has-menubar', !!hasMenuBar);
 };
 
 scout.DesktopHeader.prototype._onDesktopNavigationVisibleChange = function(event) {

@@ -36,9 +36,7 @@ scout.ViewButtonBox.prototype._render = function() {
   this.htmlComp.setLayout(new scout.ViewButtonBoxLayout(this));
 
   this.viewMenuTab.render();
-
   this._onDesktopOutlineChange();
-
 };
 
 scout.ViewButtonBox.prototype._renderProperties = function() {
@@ -132,16 +130,10 @@ scout.ViewButtonBox.prototype._setMenuButtons = function(menuButtons) {
 
 scout.ViewButtonBox.prototype.sendToBack = function() {
   this.viewMenuTab.sendToBack();
-  this.tabButtons.forEach(function(button) {
-    button.sendToBack();
-  }, this);
 };
 
 scout.ViewButtonBox.prototype.bringToFront = function() {
   this.viewMenuTab.bringToFront();
-  this.tabButtons.forEach(function(button) {
-    button.bringToFront();
-  }, this);
 };
 
 /**

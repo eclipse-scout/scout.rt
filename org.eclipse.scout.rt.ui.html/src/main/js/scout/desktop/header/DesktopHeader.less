@@ -60,8 +60,9 @@
     height: 100%;
   }
 
-  & .view-button-tab,
-  & .view-menu {
+  & > .view-button-tab,
+  & > .view-tab > .view-button-tab,
+  & > .view-tab > .view-menu {
     /* 1px smaller than the header because of the bottom border (see .selected rule for .simple-tab) */
     height: calc(~'100% - 1px');
     vertical-align: top;
@@ -78,7 +79,7 @@
       }
     }
 
-    &.selected:not(.in-background) {
+    :not(.in-background)&.selected {
       background-color: @header-view-button-tab-active-background-color;
       color: @header-view-button-tab-active-color;
       height: 100%;
@@ -88,7 +89,7 @@
         height: calc(~'100% - 1px');
       }
 
-      &.outline-content-has-menubar {
+      .outline-content-has-menubar& {
         background-color: @main-menubar-background-color;
       }
     }

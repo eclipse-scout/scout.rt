@@ -124,9 +124,14 @@ scout.DesktopNavigation.prototype._setOutline = function(newOutline) {
 };
 
 scout.DesktopNavigation.prototype._updateSingleViewButton = function() {
+  if (this.desktop.displayStyle === scout.Desktop.DisplayStyle.COMPACT) {
+    // There is not enough space to move the title up due to the toolbar -> Never switch to that mode in compact mode
+    this.setSingleViewButton(false);
+    return;
+  }
+
   var menuCount = this.viewButtonBox.menuButtons.length,
     tabCount = this.viewButtonBox.tabButtons.length;
-
   if ((menuCount + tabCount) > 1) {
     if (menuCount > 0) {
       tabCount++;

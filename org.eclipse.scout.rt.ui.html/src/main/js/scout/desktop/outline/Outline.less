@@ -97,6 +97,8 @@
 }
 
 .outline-title {
+  position: relative;
+  cursor: pointer;
   #scout.font-text-large();
   #scout.overflow-ellipsis-nowrap();
   margin: 0 @outline-title-margin-right @outline-title-margin-bottom @outline-title-margin-left;
@@ -107,8 +109,8 @@
     display: inline-block;
     position: relative;
     vertical-align: middle;
-    font-size: 20px;
-    padding-right: 10px;
+    font-size: @outline-title-icon-font-size;
+    padding-right: @outline-title-icon-padding-right;
   }
 
   & > .key-box {
@@ -120,8 +122,8 @@
     background-color: transparent;
     width: auto;
     position: absolute;
-    right: @outline-title-margin-right;
-    top: @outline-title-margin-bottom + 1; /* + 1 necessary to have it aligned with the text*/
+    right: 0;
+    top: @outline-title-menubar-top;
     border: none;
     color: @navigation-color;
 
@@ -156,9 +158,7 @@
 .outline-title-text {
   /* outline title height should be the same as main menubar and desktop header height (if there are no view buttons visible) */
   padding: 20px 2px 12px @outline-title-text-padding-left;
-  cursor: pointer;
   display: inline-block;
-  width: auto;
   vertical-align: middle;
 }
 
@@ -170,6 +170,10 @@
 
     & > .outline-title-text {
       padding-left: @outline-breadcrumb-node-padding-x;
+    }
+
+    & > .menubar {
+      margin-right: @outline-title-margin-right;
     }
   }
 

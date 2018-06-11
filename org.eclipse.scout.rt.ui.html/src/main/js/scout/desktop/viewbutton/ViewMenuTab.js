@@ -18,7 +18,6 @@ scout.ViewMenuTab = function() {
 
   this.viewButtons = [];
   this.selected = false;
-  this.inBackground = false;
   this.viewTabVisible = true;
   this.defaultIconId = scout.icons.FOLDER;
   this._addWidgetProperties(['selectedButton']);
@@ -68,7 +67,6 @@ scout.ViewMenuTab.prototype._remove = function() {
 scout.ViewMenuTab.prototype._renderProperties = function() {
   scout.ViewMenuTab.parent.prototype._renderProperties.call(this);
   this._updateSelectedButton();
-  this._renderInBackground();
 };
 
 scout.ViewMenuTab.prototype.setViewButtons = function(viewButtons) {
@@ -150,10 +148,6 @@ scout.ViewMenuTab.prototype._renderSelected = function() {
   this.$container.select(this.selected);
 };
 
-scout.ViewMenuTab.prototype._renderInBackground = function() {
-  this.$container.toggleClass('in-background', this.inBackground);
-};
-
 scout.ViewMenuTab.prototype._findSelectedViewButton = function() {
   var viewMenu;
   for (var i = 0; i < this.viewButtons.length; i++) {
@@ -209,16 +203,11 @@ scout.ViewMenuTab.prototype.setSelected = function(selected) {
 };
 
 scout.ViewMenuTab.prototype.sendToBack = function() {
-  this.inBackground = true;
-  this._renderInBackground();
-  this._renderSelected();
   this._closePopup();
 };
 
 scout.ViewMenuTab.prototype.bringToFront = function() {
-  this.inBackground = false;
-  this._renderInBackground();
-  this._renderSelected();
+ // NOP
 };
 
 scout.ViewMenuTab.prototype.onViewButtonSelected = function() {

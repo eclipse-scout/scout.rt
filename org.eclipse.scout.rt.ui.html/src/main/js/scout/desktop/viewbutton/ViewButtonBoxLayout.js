@@ -39,7 +39,8 @@ scout.ViewButtonBoxLayout.prototype.layout = function($container) {
   tabs.forEach(function(tab, index) {
     if (tabs.length - 1 === index) {
       // to avoid pixel fault due to rounding issues calculate the rest for the last tab.
-      tab.$container.cssWidth(containerWidth);
+      // Round up to the second digit otherwise at least Chrome may still show the background of the view button box (at least in compact mode)
+      tab.$container.cssWidth(Math.ceil(containerWidth * 100) / 100);
     } else {
       tab.$container.cssWidth(tabWidth);
       containerWidth -= tab.$container.cssWidth();

@@ -195,11 +195,9 @@ scout.Outline.prototype._remove = function() {
 scout.Outline.prototype._renderTitle = function() {
   if (this.titleVisible) {
     if (!this.$title) {
-      this.$title = this.$container.prependDiv('outline-title');
-
-      // Listener is added to the text instead of the title to not get the clicks on the title menubar
-      this.$titleText = this.$title.prependDiv('outline-title-text')
+      this.$title = this.$container.prependDiv('outline-title')
         .on('click', this._onTitleClick.bind(this));
+      this.$titleText = this.$title.prependDiv('outline-title-text');
     }
     this.$titleText.text(this.title);
   }
@@ -227,7 +225,7 @@ scout.Outline.prototype.setIconId = function(iconId) {
 };
 
 scout.Outline.prototype._updateIcon = function() {
-  if (this.iconVisible && this.iconId) {
+  if (this.titleVisible && this.iconVisible && this.iconId) {
     if (this.icon) {
       this.icon.setIconDesc(this.iconId);
       return;
@@ -365,6 +363,10 @@ scout.Outline.prototype._hasMenu = function(menus, menuClass) {
 };
 
 scout.Outline.prototype._onTitleClick = function(event) {
+  if (this.titleMenuBar.rendered && this.titleMenuBar.$container.isOrHas(event.target)) {
+    // Ignore clicks on title menubar
+    return;
+  }
   this.navigateToTop();
 };
 
