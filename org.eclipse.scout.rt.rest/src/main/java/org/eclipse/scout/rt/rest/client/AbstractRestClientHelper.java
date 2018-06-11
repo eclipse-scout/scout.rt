@@ -54,7 +54,7 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
     // Prepare client config
     // IMPORTANT: This must happen _before_ calling initClientBuilder() because "withConfig()" replaces the entire configuration!
     ClientConfig clientConfig = new ClientConfig();
-    // TODO 8.0 pbz: Temporary workaround, this code line and the direct dependency to the Apache connector will be removed as soon as the jersey issue is resolved.
+    // TODO [8.0] pbz: Temporary workaround, this code line and the direct dependency to the Apache connector will be removed as soon as the jersey issue is resolved.
     // See Jersey Issue 3771: https://github.com/jersey/jersey/pull/3771 (see also TO DO in pom.xml)
     clientConfig.connectorProvider(new ApacheConnectorProvider());
     initClientConfig(clientConfig);
