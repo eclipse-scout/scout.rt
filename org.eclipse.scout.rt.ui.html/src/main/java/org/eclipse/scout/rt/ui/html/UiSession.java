@@ -393,14 +393,16 @@ public class UiSession implements IUiSession {
    *         has been initialized)
    */
   protected boolean initUiTheme(HttpServletRequest req, HttpServletResponse resp, HttpSession httpSession) {
+    UiThemeHelper uiThemeUtility = UiThemeHelper.get();
     String modelTheme = m_clientSession.getDesktop().getTheme();
-    String currentTheme = UiThemeUtility.getTheme(req);
+    String currentTheme = uiThemeUtility.getTheme(req);
+
     if (modelTheme == null) {
-      modelTheme = ObjectUtility.nvl(currentTheme, UiThemeUtility.getConfiguredTheme());
+      modelTheme = ObjectUtility.nvl(currentTheme, uiThemeUtility.getConfiguredTheme());
       m_clientSession.getDesktop().setTheme(currentTheme);
     }
     boolean reloadPage = !modelTheme.equals(currentTheme);
-    UiThemeUtility.storeTheme(resp, httpSession, modelTheme);
+    uiThemeUtility.storeTheme(resp, httpSession, modelTheme);
     LOG.debug("UI theme model={} current={} reloadPage={}", modelTheme, currentTheme, reloadPage);
     return reloadPage;
   }
@@ -1145,7 +1147,7 @@ public class UiSession implements IUiSession {
 
   @Override
   public void updateTheme(String theme) {
-    UiThemeUtility.storeTheme(currentHttpResponse(), sessionStore().getHttpSession(), theme);
+    UiThemeHelper.get().storeTheme(currentHttpResponse(), sessionStore().getHttpSession(), theme);
     sendReloadPageEvent();
     LOG.info("UI theme changed to: {}", theme);
   }

@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
-import org.eclipse.scout.rt.ui.html.UiThemeUtility;
+import org.eclipse.scout.rt.ui.html.UiThemeHelper;
 
 @ApplicationScoped
 public class ResourceLoaders {
@@ -30,12 +30,12 @@ public class ResourceLoaders {
       return new DynamicResourceLoader(req);
     }
     if (ScriptFileLoader.acceptFile(resourcePath)) {
-      String theme = UiThemeUtility.getTheme(req);
+      String theme = UiThemeHelper.get().getTheme(req);
       boolean minify = UrlHints.isMinifyHint(req);
       return new ScriptFileLoader(theme, minify);
     }
     if (resourcePath.endsWith(".html")) {
-      String theme = UiThemeUtility.getTheme(req);
+      String theme = UiThemeHelper.get().getTheme(req);
       boolean minify = UrlHints.isMinifyHint(req);
       boolean cacheEnabled = UrlHints.isCacheHint(req);
       return new HtmlFileLoader(theme, minify, cacheEnabled);

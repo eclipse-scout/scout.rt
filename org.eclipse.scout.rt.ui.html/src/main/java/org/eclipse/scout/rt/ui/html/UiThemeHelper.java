@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.server.commons.servlet.CookieUtility;
@@ -22,37 +24,40 @@ import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiThemeProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class UiThemeUtility {
+@ApplicationScoped
+public class UiThemeHelper {
 
-  private static final Logger LOG = LoggerFactory.getLogger(UiThemeUtility.class);
-  private static final String THEME_SESSION_ATTRIBUTE = UiThemeUtility.class.getName() + "#theme";
+  private static final Logger LOG = LoggerFactory.getLogger(UiThemeHelper.class);
+  private static final String THEME_SESSION_ATTRIBUTE = UiThemeHelper.class.getName() + "#theme";
 
   /**
    * Cookie name used to store the preferred theme of a user (even after user has logged out).
    */
   private static final String THEME_COOKIE_NAME = "scout.ui.theme";
 
-  private static String s_configTheme;
-  private static boolean s_configThemeRead;
+  private String m_configTheme;
+  private boolean m_configThemeRead;
 
-  private UiThemeUtility() {
-    // static access only
+  /**
+   * @return The {@link UiThemeHelper} instance.
+   */
+  public static UiThemeHelper get() {
+    return BEANS.get(UiThemeHelper.class);
   }
 
   /**
    * @return the value of the config property {@link UiThemeProperty}.
    */
-  public static String getConfiguredTheme() {
+  public String getConfiguredTheme() {
     // Only read configuration for UI theme once.
-    if (s_configThemeRead) {
-      return s_configTheme;
+    if (m_configThemeRead) {
+      return m_configTheme;
     }
-    else {
-      s_configTheme = CONFIG.getPropertyValue(UiThemeProperty.class);
-      s_configThemeRead = true;
-      LOG.info("UI theme configured in config.properties: {}", s_configTheme);
-      return s_configTheme;
-    }
+
+    m_configTheme = CONFIG.getPropertyValue(UiThemeProperty.class);
+    m_configThemeRead = true;
+    LOG.info("UI theme configured in config.properties: {}", m_configTheme);
+    return m_configTheme;
   }
 
   /**
@@ -62,7 +67,7 @@ public final class UiThemeUtility {
    * the parameter is not set). Thus we send ?theme=default to set the theme to null (which is means Scout loads the
    * default theme).
    */
-  public static String getTheme(HttpServletRequest req) {
+  public String getTheme(HttpServletRequest req) {
     String theme = null;
 
     // 1st - try to find the theme hint in the session attributes
@@ -86,12 +91,28 @@ public final class UiThemeUtility {
       theme = getConfiguredTheme();
     }
 
+    theme = validateTheme(theme);
+
     // store theme in session so we must not check 2 and 3 again for the next requests
     if (session != null && ObjectUtility.notEquals(theme, themeFromSession)) {
       session.setAttribute(THEME_SESSION_ATTRIBUTE, theme);
     }
 
     return theme;
+  }
+
+  /**
+   * Callback to validate the extracted theme name before returning to the application.
+   *
+   * @param themeName
+   *          The theme name as extracted. The name may come from the current {@link HttpSession}, the cookie associated
+   *          with the current {@link HttpServletRequest} or the application configuration. See
+   *          {@link #getTheme(HttpServletRequest)}.
+   * @return The validated name. Clients may modify the input value as required. The resulting theme name must exist in
+   *         the application.
+   */
+  protected String validateTheme(String themeName) {
+    return themeName;
   }
 
   /**
@@ -103,7 +124,7 @@ public final class UiThemeUtility {
    * @param theme
    *          <code>null</code> will reset the theme to the configured theme
    */
-  public static void storeTheme(HttpServletResponse resp, HttpSession session, String theme) {
+  public void storeTheme(HttpServletResponse resp, HttpSession session, String theme) {
     theme = ObjectUtility.nvl(theme, getConfiguredTheme());
     if (resp != null) {
       CookieUtility.addPersistentCookie(resp, THEME_COOKIE_NAME, theme);
@@ -115,7 +136,7 @@ public final class UiThemeUtility {
    * @return <code>true</code> if the given theme is equal to 'default'. Note that this is <b>not</b> the same as
    *         checking for equality to {@link #getConfiguredTheme()}!
    */
-  public static boolean isDefaultTheme(String theme) {
+  public boolean isDefaultTheme(String theme) {
     return ObjectUtility.equals(theme, UiThemeProperty.DEFAULT_THEME);
   }
 }

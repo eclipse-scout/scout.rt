@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiPrebuildFilesProperty;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiPrebuildProperty;
-import org.eclipse.scout.rt.ui.html.UiThemeUtility;
+import org.eclipse.scout.rt.ui.html.UiThemeHelper;
 import org.eclipse.scout.rt.ui.html.res.loader.HtmlFileLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +80,7 @@ public class PrebuildFiles implements IPlatformListener {
   }
 
   protected HttpCacheObject loadResource(String file) throws IOException {
-    String defaultTheme = UiThemeUtility.getConfiguredTheme();
+    String defaultTheme = UiThemeHelper.get().getConfiguredTheme();
     HtmlFileLoader loader = new HtmlFileLoader(defaultTheme, true, true);
     HttpCacheKey cacheKey = loader.createCacheKey(file);
     return loader.loadResource(cacheKey);
