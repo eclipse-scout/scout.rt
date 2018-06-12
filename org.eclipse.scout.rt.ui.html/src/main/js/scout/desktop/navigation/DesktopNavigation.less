@@ -20,7 +20,7 @@
 
     & > .navigation-body {
       & > .outline > .outline-title {
-        height: @desktop-header-height - 1px; /* minus the border */
+        height: @single-view-button-outline-title-height;
         margin-left: 35px;
         margin-bottom: @single-view-button-outline-title-margin-bottom;
         border-bottom: none;
@@ -32,7 +32,7 @@
         }
 
         & > .menubar {
-          height: 100%;
+          height: @single-view-button-outline-title-height; /* 100% not possible because outline-title must not be position relative due to menu item focus border */
           top: 0;
         }
       }

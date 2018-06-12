@@ -97,7 +97,6 @@
 }
 
 .outline-title {
-  position: relative;
   cursor: pointer;
   #scout.font-text-large();
   #scout.overflow-ellipsis-nowrap();
@@ -122,7 +121,7 @@
     background-color: transparent;
     width: auto;
     position: absolute;
-    right: 0;
+    right: @outline-title-margin-right;
     top: @outline-title-menubar-top;
     border: none;
     color: @navigation-color;
@@ -170,10 +169,6 @@
 
     & > .outline-title-text {
       padding-left: @outline-breadcrumb-node-padding-x;
-    }
-
-    & > .menubar {
-      margin-right: @outline-title-margin-right;
     }
   }
 
