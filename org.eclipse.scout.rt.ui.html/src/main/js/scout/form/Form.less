@@ -69,6 +69,18 @@
     margin-left: 20px;
     margin-right: 14px;
 
+    &.no-title {
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 1;
+
+      & > .title,
+      & > .sub-title {
+        .hidden();
+      }
+    }
+
     & > .icon-container {
       float: left;
       & > .icon {

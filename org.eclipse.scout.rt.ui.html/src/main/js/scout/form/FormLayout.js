@@ -59,6 +59,8 @@ scout.FormLayout.prototype._htmlRootGroupBox = function() {
 };
 
 scout.FormLayout.prototype._titleHeight = function() {
-  var $titleBox = this.form.$container.children('.header');
-  return scout.graphics.prefSize($titleBox, true).height;
+  if (this.form.$header && this.form.$header.css('position') !== 'absolute') {
+    return scout.graphics.prefSize(this.form.$header, true).height;
+  }
+  return 0;
 };

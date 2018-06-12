@@ -37,11 +37,19 @@ scout.Form = function() {
   this.messageBoxController = null;
   this.fileChooserController = null;
   this._glassPaneRenderer = null;
-  this.$statusIcons = [];
   /**
    * Whether this form should render its initial focus
    */
   this.renderInitialFocusEnabled = true;
+
+  this.$statusIcons = [];
+  this.$header = null;
+  this.$statusContainer = null;
+  this.$close = null;
+  this.$saveNeeded = null;
+  this.$icon = null;
+  this.$title = null;
+  this.$subTitle = null;
 };
 scout.inherits(scout.Form, scout.Widget);
 
@@ -112,6 +120,16 @@ scout.Form.prototype._remove = function() {
     this._glassPaneRenderer = null;
   }
   this._uninstallFocusContext();
+
+  this.$statusIcons = [];
+  this.$header = null;
+  this.$statusContainer = null;
+  this.$close = null;
+  this.$saveNeeded = null;
+  this.$icon = null;
+  this.$title = null;
+  this.$subTitle = null;
+
   scout.Form.parent.prototype._remove.call(this);
 };
 
@@ -691,6 +709,7 @@ scout.Form.prototype.setTitle = function(title) {
 scout.Form.prototype._renderTitle = function() {
   if (this.isDialog()) {
     this.$title.text(this.title);
+    this.$header.toggleClass('no-title', !this.title && !this.subTitle);
   } else if (this.isPopupWindow()) {
     this._updateTitleForWindow();
   }
@@ -705,6 +724,7 @@ scout.Form.prototype.setSubTitle = function(subTitle) {
 scout.Form.prototype._renderSubTitle = function() {
   if (this.isDialog()) {
     this.$subTitle.text(this.subTitle);
+    this.$header.toggleClass('no-title', !this.title && !this.subTitle);
   } else if (this.isPopupWindow()) {
     this._updateTitleForWindow();
   }
