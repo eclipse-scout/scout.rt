@@ -6,6 +6,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.eclipse.scout.rt.platform.dataobject.DataObjectAttributeDescriptor;
+import org.eclipse.scout.rt.platform.dataobject.DataObjectInventory;
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.dataobject.IValueFormatConstants;
 import org.eclipse.scout.rt.platform.dataobject.ValueFormat;
@@ -24,7 +26,7 @@ public class DoDateDeserializer extends DateDeserializer {
 
   protected final SimpleDateFormat m_defaultDateFormatter = new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN);
 
-  protected final LazyValue<DataObjectDefinitionRegistry> m_dataObjectDefinitionRegistry = new LazyValue<>(DataObjectDefinitionRegistry.class);
+  protected final LazyValue<DataObjectInventory> m_dataObjectInventory = new LazyValue<>(DataObjectInventory.class);
 
   public DoDateDeserializer() {
   }
@@ -50,8 +52,8 @@ public class DoDateDeserializer extends DateDeserializer {
   }
 
   protected SimpleDateFormat findFormatter(Class<? extends IDoEntity> entityClass, String name) {
-    return m_dataObjectDefinitionRegistry.get().getAttributeDescription(entityClass, name)
-        .flatMap(DataObjectAttributeDefinition::getFormatPattern)
+    return m_dataObjectInventory.get().getAttributeDescription(entityClass, name)
+        .flatMap(DataObjectAttributeDescriptor::getFormatPattern)
         .map(pattern -> new SimpleDateFormat(pattern))
         .orElse(m_defaultDateFormatter);
   }

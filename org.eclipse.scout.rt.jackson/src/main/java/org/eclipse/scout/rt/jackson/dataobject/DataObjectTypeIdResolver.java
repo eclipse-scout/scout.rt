@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.dataobject.DataObjectInventory;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
@@ -16,12 +17,12 @@ import com.fasterxml.jackson.databind.type.SimpleType;
 /**
  * {@link TypeIdResolver} implementation handling type resolution of data objects.
  *
- * @see DataObjectDefinitionRegistry
+ * @see DataObjectInventory
  */
 @Bean
 public class DataObjectTypeIdResolver extends TypeIdResolverBase {
 
-  private final LazyValue<DataObjectDefinitionRegistry> m_doEntityDefinitionRegistry = new LazyValue<>(DataObjectDefinitionRegistry.class);
+  private final LazyValue<DataObjectInventory> m_dataObjectInventory = new LazyValue<>(DataObjectInventory.class);
 
   private JavaType m_baseType;
 
@@ -59,17 +60,17 @@ public class DataObjectTypeIdResolver extends TypeIdResolverBase {
    * @returns type id to use for serialization of specified class.
    */
   protected String idFromClass(Class<?> c) {
-    return m_doEntityDefinitionRegistry.get().toTypeName(c);
+    return m_dataObjectInventory.get().toTypeName(c);
   }
 
   @Override
   public JavaType typeFromId(DatabindContext context, String id) throws IOException {
-    return SimpleType.constructUnsafe(m_doEntityDefinitionRegistry.get().fromTypeName(id));
+    return SimpleType.constructUnsafe(m_dataObjectInventory.get().fromTypeName(id));
   }
 
   @Override
   public String getDescForKnownTypeIds() {
-    return m_doEntityDefinitionRegistry.get().getTypeNameToClassMap()
+    return m_dataObjectInventory.get().getTypeNameToClassMap()
         .entrySet()
         .stream()
         .map(e -> e.getKey() + " -> " + e.getValue().getName())

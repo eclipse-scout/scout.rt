@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.jackson.dataobject;
+package org.eclipse.scout.rt.platform.dataobject;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -16,28 +16,21 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
-import org.eclipse.scout.rt.platform.dataobject.AttributeName;
-import org.eclipse.scout.rt.platform.dataobject.DoList;
-import org.eclipse.scout.rt.platform.dataobject.DoValue;
-import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
-import org.eclipse.scout.rt.platform.dataobject.TypeName;
-import org.eclipse.scout.rt.platform.dataobject.ValueFormat;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
+import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-
 /**
- * Registry and cache for all {@link IDoEntity} and their declared attributes.
+ * Inventory (and cache) for all {@link IDoEntity} with a {@link TypeName} annotation, listing all declared attributes for each {@link IDoEntity}.
  */
 @ApplicationScoped
-public class DataObjectDefinitionRegistry {
+public class DataObjectInventory {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DataObjectDefinitionRegistry.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DataObjectInventory.class);
 
   /**
    * <b>NOTE:</b> This from/to class maps contains the static, compile-time "class" to "type name" mapping as defined by
@@ -51,56 +44,16 @@ public class DataObjectDefinitionRegistry {
   private final Map<Class<? extends IDoEntity>, String> m_classToTypeName = new HashMap<>();
 
   /** Map of {@link IDoEntity} class to its attributes map */
-  private final Map<Class<? extends IDoEntity>, Map<String, DataObjectAttributeDefinition>> m_classAttributeMap = new ConcurrentHashMap<>();
+  private final Map<Class<? extends IDoEntity>, Map<String, DataObjectAttributeDescriptor>> m_classAttributeMap = new ConcurrentHashMap<>();
 
   @PostConstruct
-  public void init() {
+  protected void init() {
     ClassInventory.get()
         .getKnownAnnotatedTypes(TypeName.class)
         .stream()
-        .map(ci -> ci.resolveClass())
+        .map(IClassInfo::resolveClass)
         .forEach(c -> registerClass(c));
     LOG.info("Registry initialized, found {} {} implementations with @{} annotation.", m_typeNameToClassMap.size(), IDoEntity.class.getSimpleName(), TypeName.class.getSimpleName());
-  }
-
-  /**
-   * Adds one class to registry.
-   */
-  protected void registerClass(Class<?> clazz) {
-    if (IDoEntity.class.isAssignableFrom(clazz)) {
-      Class<? extends IDoEntity> entityClass = clazz.asSubclass(IDoEntity.class);
-      String name = jsonAnnotationName(clazz);
-      String registeredName = m_classToTypeName.put(entityClass, name);
-      Class<? extends IDoEntity> registeredClass = m_typeNameToClassMap.put(name, entityClass);
-      checkDuplicateClassMapping(clazz, name, registeredName, registeredClass);
-      LOG.debug("Registered class {} with typename '{}'", entityClass, name);
-    }
-    else {
-      LOG.warn("Class {} is annotated with @{} but is not an instance of {}, skip registration", clazz.getName(), TypeName.class.getSimpleName(), IDoEntity.class);
-    }
-  }
-
-  /**
-   * Checks for {@link IDoEntity} classes with duplicated {@link TypeName} annotation values.
-   */
-  protected void checkDuplicateClassMapping(Class<?> clazz, String name, String existingName, Class<? extends IDoEntity> existingClass) {
-    Assertions.assertNull(existingClass, "{} and {} have the same type '{}', use an unique @{} annotation value.", clazz, existingClass, name, TypeName.class.getSimpleName());
-    Assertions.assertNull(existingName, "{} was already registered with type name {}, register each class only once.", clazz, existingName, TypeName.class.getSimpleName());
-  }
-
-  protected String jsonAnnotationName(Class<?> c) {
-    TypeName typeNameAnn = c.getAnnotation(TypeName.class);
-    if (typeNameAnn != null && StringUtility.hasText(typeNameAnn.value())) {
-      return typeNameAnn.value();
-    }
-    return jsonDefaultName(c);
-  }
-
-  /**
-   * @return default type name to use for classes without {@link TypeName} annotation
-   */
-  protected String jsonDefaultName(Class<?> c) {
-    return c != null ? c.getSimpleName() : null;
   }
 
   /**
@@ -115,7 +68,7 @@ public class DataObjectDefinitionRegistry {
         return name;
       }
       if (clazz == null || clazz == Object.class) {
-        String defaultTypeName = jsonDefaultName(queryClazz);
+        String defaultTypeName = getDefaultName(queryClazz);
         LOG.warn("Could not find type name for {}, using default value {}", queryClazz, defaultTypeName);
         return defaultTypeName;
       }
@@ -158,10 +111,9 @@ public class DataObjectDefinitionRegistry {
   }
 
   /**
-   * @return Optional of {@link DataObjectAttributeDefinition} for specified {@code enttiyClass} and
-   *         {@code attributeName}
+   * @return Optional of {@link DataObjectAttributeDescriptor} for specified {@code enttiyClass} and {@code attributeName}
    */
-  public Optional<DataObjectAttributeDefinition> getAttributeDescription(Class<? extends IDoEntity> entityClass, String attributeName) {
+  public Optional<DataObjectAttributeDescriptor> getAttributeDescription(Class<? extends IDoEntity> entityClass, String attributeName) {
     ensureEntityDefinitionLoaded(entityClass);
     return Optional.ofNullable(m_classAttributeMap.get(entityClass).get(attributeName));
   }
@@ -169,26 +121,53 @@ public class DataObjectDefinitionRegistry {
   /**
    * @return Map with all name/attribute definitions for specified {@code entityClass}
    */
-  public Map<String, DataObjectAttributeDefinition> getAttributesDescription(Class<? extends IDoEntity> entityClass) {
+  public Map<String, DataObjectAttributeDescriptor> getAttributesDescription(Class<? extends IDoEntity> entityClass) {
     ensureEntityDefinitionLoaded(entityClass);
     return Collections.unmodifiableMap(m_classAttributeMap.get(entityClass));
+  }
+
+  /* **************************************************************************
+   * HELPER METHODS
+   * *************************************************************************/
+
+  /**
+   * Adds {@code clazz} to registry.
+   */
+  protected void registerClass(Class<?> clazz) {
+    if (IDoEntity.class.isAssignableFrom(clazz)) {
+      Class<? extends IDoEntity> entityClass = clazz.asSubclass(IDoEntity.class);
+      String name = getTypeName(clazz);
+      String registeredName = m_classToTypeName.put(entityClass, name);
+      Class<? extends IDoEntity> registeredClass = m_typeNameToClassMap.put(name, entityClass);
+      checkDuplicateClassMapping(clazz, name, registeredName, registeredClass);
+      LOG.debug("Registered class {} with typename '{}'", entityClass, name);
+    }
+    else {
+      LOG.warn("Class {} is annotated with @{} but is not an instance of {}, skip registration", clazz.getName(), TypeName.class.getSimpleName(), IDoEntity.class);
+    }
+  }
+
+  /**
+   * Checks for {@link IDoEntity} classes with duplicated {@link TypeName} annotation values.
+   */
+  protected void checkDuplicateClassMapping(Class<?> clazz, String name, String existingName, Class<? extends IDoEntity> existingClass) {
+    Assertions.assertNull(existingClass, "{} and {} have the same type '{}', use an unique @{} annotation value.", clazz, existingClass, name, TypeName.class.getSimpleName());
+    Assertions.assertNull(existingName, "{} was already registered with type name {}, register each class only once.", clazz, existingName, TypeName.class.getSimpleName());
   }
 
   /**
    * Ensures that attribute definition for specified {@code entityClass} is loaded and cached.
    */
   protected void ensureEntityDefinitionLoaded(Class<? extends IDoEntity> entityClass) {
-    if (!m_classAttributeMap.containsKey(entityClass)) {
-      registerAllAttributes(entityClass);
-    }
+    m_classAttributeMap.computeIfAbsent(entityClass, e -> createAllAttributes(e));
   }
 
   /**
    * Add entity class to attribute definition registry
    */
-  protected void registerAllAttributes(Class<? extends IDoEntity> entityClass) {
+  protected Map<String, DataObjectAttributeDescriptor> createAllAttributes(Class<? extends IDoEntity> entityClass) {
     LOG.debug("Adding attributes of class {} to registry.", entityClass);
-    Map<String, DataObjectAttributeDefinition> attributes = new HashMap<>();
+    Map<String, DataObjectAttributeDescriptor> attributes = new HashMap<>();
     for (Method method : entityClass.getMethods()) {
       // consider only attribute accessor methods
       if (method.getParameterCount() == 0 && !Modifier.isStatic(method.getModifiers())) {
@@ -196,24 +175,35 @@ public class DataObjectDefinitionRegistry {
         if (returnType instanceof ParameterizedType) {
           ParameterizedType pt = (ParameterizedType) returnType;
           // return type must be DoList or DoValue
-          if (DoList.class == pt.getRawType()) {
-            JavaType listItemsType = TypeFactory.defaultInstance().constructType(pt.getActualTypeArguments()[0]);
-            addAttribute(attributes, TypeFactory.defaultInstance().constructParametricType((Class<?>) pt.getRawType(), listItemsType), method);
-          }
-          else if (DoValue.class == pt.getRawType()) {
-            addAttribute(attributes, TypeFactory.defaultInstance().constructType(pt.getActualTypeArguments()[0]), method);
+          if (ObjectUtility.isOneOf(pt.getRawType(), DoValue.class, DoList.class)) {
+            addAttribute(attributes, pt, method);
           }
         }
       }
     }
-    m_classAttributeMap.put(entityClass, attributes);
+    return attributes;
   }
 
-  protected void addAttribute(Map<String, DataObjectAttributeDefinition> attributes, JavaType type, Method accessor) {
+  protected void addAttribute(Map<String, DataObjectAttributeDescriptor> attributes, ParameterizedType type, Method accessor) {
     String name = getAttributeName(accessor);
     Optional<String> formatPattern = getAttributeFormat(accessor);
-    attributes.put(name, new DataObjectAttributeDefinition(name, type, formatPattern, accessor));
+    attributes.put(name, new DataObjectAttributeDescriptor(name, type, formatPattern, accessor));
     LOG.debug("Adding attribute '{}' with type {} and format pattern '{}' to registry.", name, type, formatPattern.orElse("null"));
+  }
+
+  protected String getTypeName(Class<?> c) {
+    TypeName typeNameAnn = c.getAnnotation(TypeName.class);
+    if (typeNameAnn != null && StringUtility.hasText(typeNameAnn.value())) {
+      return typeNameAnn.value();
+    }
+    return getDefaultName(c);
+  }
+
+  /**
+   * @return default type name to use for classes without {@link TypeName} annotation
+   */
+  protected String getDefaultName(Class<?> c) {
+    return c != null ? c.getSimpleName() : null;
   }
 
   protected String getAttributeName(Method accessor) {

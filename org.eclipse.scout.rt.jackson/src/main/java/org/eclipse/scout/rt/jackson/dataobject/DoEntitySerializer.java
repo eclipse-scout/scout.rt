@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.TreeMap;
 
+import org.eclipse.scout.rt.platform.dataobject.DataObjectInventory;
 import org.eclipse.scout.rt.platform.dataobject.DoNode;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
@@ -27,7 +28,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 public class DoEntitySerializer extends StdSerializer<IDoEntity> {
   private static final long serialVersionUID = 1L;
 
-  protected final LazyValue<DataObjectDefinitionRegistry> m_doEntityDefinitionRegistry = new LazyValue<>(DataObjectDefinitionRegistry.class);
+  protected final LazyValue<DataObjectInventory> m_dataObjectInventory = new LazyValue<>(DataObjectInventory.class);
 
   public DoEntitySerializer(JavaType type) {
     super(type);
@@ -134,8 +135,8 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
   }
 
   protected Optional<JavaType> getJavaType(String attributeName) {
-    return m_doEntityDefinitionRegistry.get().getAttributeDescription(handledType(), attributeName)
-        .map(DataObjectAttributeDefinition::getType)
+    return m_dataObjectInventory.get().getAttributeDescription(handledType(), attributeName)
+        .map(a -> TypeFactoryUtility.toJavaType(a.getType()))
         .filter(t -> t.getRawClass() != Object.class); // filter completely unknown types, forcing to use the default behavior for unknown types
   }
 }
