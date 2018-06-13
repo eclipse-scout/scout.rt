@@ -283,6 +283,29 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
+  public void testDeserializeTestDateDo_UnorderedAttributes() throws Exception {
+    runTestDeserializeTestDateDo("TestDateDoUnorderedAttributes.json");
+  }
+
+  @Test
+  public void testDeserializeTestDateDo_OrderedAttributes() throws Exception {
+    runTestDeserializeTestDateDo("TestDateDoOrderedAttributes.json");
+  }
+
+  @Test
+  public void testDeserializeTestDateDo_WithoutTypeAttribute() throws Exception {
+    runTestDeserializeTestDateDo("TestDateDoWithoutTypeAttribute.json");
+  }
+
+  protected void runTestDeserializeTestDateDo(String resource) throws Exception {
+    String expectedJson = readResourceAsString(resource);
+    TestDateDo marshalled = s_dataObjectMapper.readValue(expectedJson, TestDateDo.class);
+    assertEquals(DATE, marshalled.dateDefault().get());
+    assertEquals(DATE_TRUNCATED, marshalled.dateOnly().get());
+    assertEquals(DateUtility.truncDateToMonth(DATE_TRUNCATED), marshalled.getDateYearMonth());
+  }
+
+  @Test
   public void testSerializeDeserialize_RenamedAttributeDo() throws Exception {
     TestRenamedAttributeDo testDo = BEANS.get(TestRenamedAttributeDo.class)
         .withAllAttribute(new BigDecimal("42"))

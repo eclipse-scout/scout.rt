@@ -73,6 +73,8 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       // check if found the type property
       if (m_moduleContext.getTypeAttributeName().equals(attributeName)) {
         String entityType = p.getText();
+        IDoEntity entity = resolveEntityType(ctxt, entityType);
+        p.setCurrentValue(entity); // set current entity object as current value on parser before parser is merged with token buffer holding cached fields
 
         // put back the cached fields of token buffer to parser, if any fields were cached while searching type property
         if (tb != null) {
@@ -80,7 +82,7 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
           p = JsonParserSequence.createFlattened(false, tb.asParser(p), p);
         }
         p.nextToken(); // skip type field value
-        return derializeDoEntityAttributes(p, ctxt, entityType);
+        return derializeDoEntityAttributes(p, ctxt, entity);
       }
 
       // lazy create token buffer to cache other fields
@@ -93,25 +95,26 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       tb.copyCurrentStructure(p);
     }
 
-    // no type information found within fields, if any fields where cached, finish token buffer and move parser back to cached token buffer fields
+    // if any fields where cached, finish token buffer and move parser back to cached token buffer fields
     if (tb != null) {
       tb.writeEndObject();
       p = tb.asParser(p);
       // initialize parser pointing to first field token
       p.nextToken();
     }
-    return derializeDoEntityAttributes(p, ctxt, null); // null = use default entity type
+
+    // no type information found within available attributes, resolve default entity type (null = use default entity type)
+    IDoEntity entity = resolveEntityType(ctxt, null);
+    p.setCurrentValue(entity); // set current value after new parser instance was created out of token buffer
+
+    return derializeDoEntityAttributes(p, ctxt, entity);
   }
 
-  protected IDoEntity derializeDoEntityAttributes(JsonParser p, DeserializationContext ctxt, String entityType) throws IOException {
-    IDoEntity entity = resolveEntityType(ctxt, entityType);
-    p.setCurrentValue(entity);
-
+  protected IDoEntity derializeDoEntityAttributes(JsonParser p, DeserializationContext ctxt, IDoEntity entity) throws IOException {
     // read and deserialize all fields of entity
     for (JsonToken t = p.currentToken(); t == JsonToken.FIELD_NAME; t = p.nextToken()) {
       String attributeName = p.getCurrentName();
       p.nextToken(); // let current token point to the value
-
       boolean isArray = p.getCurrentToken() == JsonToken.START_ARRAY;
       boolean isObject = p.getCurrentToken() == JsonToken.START_OBJECT;
       ResolvedType attributeType = findResolvedAttributeType(entity, attributeName, isObject, isArray);
