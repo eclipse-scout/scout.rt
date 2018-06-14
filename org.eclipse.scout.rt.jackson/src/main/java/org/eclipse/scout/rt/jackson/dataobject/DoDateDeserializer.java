@@ -45,7 +45,7 @@ public class DoDateDeserializer extends DateDeserializer {
         return formatter.parse(str);
       }
       catch (ParseException e) {
-        throw ctxt.weirdStringException(str, handledType(), "expected format [" + _formatString + "]");
+        throw ctxt.weirdStringException(str, handledType(), "expected format [" + formatter.toPattern() + "]");
       }
     }
     return super._parseDate(p, ctxt);
