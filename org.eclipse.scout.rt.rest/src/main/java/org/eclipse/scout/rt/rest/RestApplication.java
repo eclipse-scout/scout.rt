@@ -13,6 +13,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.rest.container.IRestContainerRequestFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,15 @@ public class RestApplication extends Application {
     registerObjectMapperResolver(classes);
     registerExceptionMappers(classes);
     registerRestResources(classes);
+    registerContainerRequestFilters(classes);
     return classes;
+  }
+
+  protected void registerContainerRequestFilters(Set<Class<?>> classes) {
+    for (IBean<IRestContainerRequestFilter> bean : BEANS.getBeanManager().getBeans(IRestContainerRequestFilter.class)) {
+      classes.add(bean.getBeanClazz());
+      LOG.info("{} registered as REST container request filter", bean.getBeanClazz());
+    }
   }
 
   protected void registerObjectMapperResolver(Set<Class<?>> classes) {

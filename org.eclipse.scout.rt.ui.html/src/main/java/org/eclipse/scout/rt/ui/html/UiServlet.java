@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
+import org.eclipse.scout.rt.platform.util.PathValidator;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
@@ -185,6 +186,11 @@ public class UiServlet extends AbstractHttpServlet {
         if (LOG.isDebugEnabled()) {
           LOG.debug("Request started");
         }
+        if (!PathValidator.isValid(req.getPathInfo())) {
+          resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+          return;
+        }
+
         List<IUiServletRequestHandler> handlers = BEANS.all(IUiServletRequestHandler.class);
         for (IUiServletRequestHandler handler : handlers) {
           if (delegateRequest(handler, req, resp)) {
