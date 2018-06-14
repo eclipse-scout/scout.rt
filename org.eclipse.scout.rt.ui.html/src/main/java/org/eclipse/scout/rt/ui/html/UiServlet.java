@@ -64,9 +64,11 @@ public class UiServlet extends AbstractHttpServlet {
       "GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "TRACE"));
 
   private final HttpServletControl m_httpServletControl;
+  private final GetRequestValidator m_getUriValidator;
 
   public UiServlet() {
     m_httpServletControl = BEANS.get(HttpServletControl.class);
+    m_getUriValidator = BEANS.get(GetRequestValidator.class);
   }
 
   protected boolean isHttpMethodSupportedByJavaxHttpServlet(String method) {
@@ -235,6 +237,15 @@ public class UiServlet extends AbstractHttpServlet {
       String path = req.getServletContext().getContextPath() + req.getServletPath();
       if (StringUtility.hasText(path) && req.getRequestURI().endsWith(path)) {
         resp.sendRedirect(req.getRequestURI() + "/");
+        return true;
+      }
+
+      try {
+        m_getUriValidator.validate(req);
+      }
+      catch (Exception e) {
+        LOG.info("GET request validation failed", e);
+        resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
         return true;
       }
     }
