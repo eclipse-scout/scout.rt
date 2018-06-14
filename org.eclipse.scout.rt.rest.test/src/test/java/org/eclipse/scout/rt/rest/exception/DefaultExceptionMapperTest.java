@@ -111,6 +111,14 @@ public class DefaultExceptionMapperTest {
   }
 
   @Test
+  public void testToResponseIllegalArgumentApplicationException() {
+    IllegalArgumentExceptionMapper mapper = new IllegalArgumentExceptionMapper();
+    IllegalArgumentException illegalArgException = new IllegalArgumentException("foo");
+    Response response = mapper.toResponse(illegalArgException);
+    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+
+  @Test
   public void testNotifyTransaction() {
     RunContexts.empty().run(new IRunnable() {
       @Override
