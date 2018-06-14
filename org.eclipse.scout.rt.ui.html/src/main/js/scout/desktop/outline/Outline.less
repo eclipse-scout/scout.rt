@@ -166,10 +166,19 @@
 
   & > .outline-title {
     margin: 0;
+    border-bottom-color: @outline-breadcrumb-border-color;
+
+    &.touch:active {
+      background-color: @outline-breadcrumb-node-active-background-color;
+    }
 
     & > .outline-title-text {
       padding-left: @outline-breadcrumb-node-padding-x;
     }
+  }
+
+  &.node-selected > .outline-title {
+    border-bottom-color: @outline-breadcrumb-ancestor-border-color;
   }
 
   & > .tree-data {
@@ -179,29 +188,32 @@
       border-bottom: 1px solid @outline-breadcrumb-border-color;
       padding: @outline-breadcrumb-node-padding-y @outline-breadcrumb-node-padding-x;
 
-      &.ancestor-of-selected,
+      &.group {
+        background-color: transparent;
+      }
+
       &.child-of-selected {
-        background-color: @outline-group-background-color;
+        background-color: @outline-breadcrumb-child-background-color;
+
+        &:active {
+          background-color: @outline-breadcrumb-child-active-background-color;
+        }
       }
 
-      &.ancestor-of-selected::before {
-        border-top-color: @outline-selection-background-color;
-        border-width: 8px 13px 0 13px;
-        bottom: -9px;
-      }
+      &.ancestor-of-selected {
+        border-bottom-color: @outline-breadcrumb-ancestor-border-color;
 
-      &.ancestor-of-selected::after {
-        border-top-color: @outline-group-background-color;
-        border-width: 8px 13px 0 13px;
-        bottom: -8px;
+        &::before {
+          display: none;
+        }
+
+        &::after {
+          display: none;
+        }
       }
 
       &:active {
-        background-color: @navigation-background-color;
-
-        &::after {
-          border-top-color: @navigation-background-color;
-        }
+        background-color: @outline-breadcrumb-node-active-background-color;
       }
 
       &.selected {

@@ -56,7 +56,7 @@ scout.SearchOutline.prototype._render = function() {
     .on('mousedown', this._onClearIconMouseDown.bind(this));
 
   this.$searchStatus = this.$searchPanel.appendDiv('search-outline-status')
-    .on('click', this._onTitleClick.bind(this));
+    .on('mousedown', this._onTitleMouseDown.bind(this));
   this.session.keyStrokeManager.installKeyStrokeContext(this.searchFieldKeyStrokeContext);
 };
 

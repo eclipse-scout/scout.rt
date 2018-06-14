@@ -171,16 +171,13 @@ scout.Outline.prototype._renderProperties = function() {
 scout.Outline.prototype._computeNodePaddingLeft = function(node) {
   this._computeNodePaddings();
 
-  if (node.getOutline().compact) {
+  if (this.compact) {
     if (node.row && node.getOutline().selectedNode() !== node) {
       return node.row._hierarchyLevel * this.nodePaddingLevel;
     }
     return 0;
-  } else if (node.getOutline().isBreadcrumbStyleActive()) {
-    return null;
-  } else {
-    return scout.Outline.parent.prototype._computeNodePaddingLeft.call(this, node);
   }
+  return scout.Outline.parent.prototype._computeNodePaddingLeft.call(this, node);
 };
 
 /**
@@ -196,7 +193,8 @@ scout.Outline.prototype._renderTitle = function() {
   if (this.titleVisible) {
     if (!this.$title) {
       this.$title = this.$container.prependDiv('outline-title')
-        .on('click', this._onTitleClick.bind(this));
+        .on('mousedown', this._onTitleMouseDown.bind(this))
+        .toggleClass('touch', scout.device.supportsTouch());
       this.$titleText = this.$title.prependDiv('outline-title-text');
     }
     this.$titleText.text(this.title);
@@ -362,7 +360,7 @@ scout.Outline.prototype._hasMenu = function(menus, menuClass) {
   return this._getMenu(menus, menuClass) !== null;
 };
 
-scout.Outline.prototype._onTitleClick = function(event) {
+scout.Outline.prototype._onTitleMouseDown = function(event) {
   if (this.titleMenuBar.rendered && this.titleMenuBar.$container.isOrHas(event.target)) {
     // Ignore clicks on title menubar
     return;
@@ -415,6 +413,11 @@ scout.Outline.prototype.selectNodes = function(nodes, debounceSend) {
   }
   scout.Outline.parent.prototype.selectNodes.call(this, nodes, debounceSend);
   this.updateDetailContent();
+};
+
+scout.Outline.prototype._renderSelection = function() {
+  scout.Outline.parent.prototype._renderSelection.call(this);
+  this.$container.toggleClass('node-selected', this.selectedNodes.length > 0);
 };
 
 scout.Outline.prototype.setDefaultDetailForm = function(defaultDetailForm) {

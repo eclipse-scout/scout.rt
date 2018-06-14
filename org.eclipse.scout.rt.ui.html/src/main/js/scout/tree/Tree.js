@@ -1949,6 +1949,9 @@ scout.Tree.prototype.isNodeSelected = function(node) {
 
 scout.Tree.prototype._computeNodePaddingLeft = function(node) {
   this._computeNodePaddings();
+  if (this.isBreadcrumbStyleActive()) {
+    return null;
+  }
   var padding = node.level * this.nodePaddingLevel + this.nodePaddingLeft;
   if (this.checkable) {
     padding += this.nodeCheckBoxPaddingLeft;
