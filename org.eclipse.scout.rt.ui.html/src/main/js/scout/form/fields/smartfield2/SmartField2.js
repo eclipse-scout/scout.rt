@@ -1096,7 +1096,7 @@ scout.SmartField2.prototype._clearNoResultsErrorStatus = function() {
   if (this.isTouchable()) {
     return;
   }
-  if (this.errorStatus && this.errorStatus.code === scout.SmartField2.ErrorCode.NO_RESULTS) {
+  if (this._userWasTyping && this.errorStatus && this.errorStatus.code === scout.SmartField2.ErrorCode.NO_RESULTS) {
     this.setErrorStatus(null);
   }
 };
