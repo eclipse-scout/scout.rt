@@ -7,6 +7,7 @@ import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.IDataObject;
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationConfig;
@@ -52,6 +53,9 @@ public class DataObjectDeserializers extends Deserializers.Base {
     }
     else if (IDataObject.class.isAssignableFrom(type.getRawClass())) {
       return new DataObjectDeserializer(type.getRawClass());
+    }
+    else if (BinaryResource.class.isAssignableFrom(type.getRawClass())) {
+      return new DoBinaryResourceDeserializer();
     }
     return super.findBeanDeserializer(type, config, beanDesc);
   }

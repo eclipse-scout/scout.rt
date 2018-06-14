@@ -1,0 +1,14 @@
+{
+  "_type" : "TestBinaryResource",
+  "brDefault" : {
+    "content" : "MTIz",
+    "contentLength" : 3,
+    "lastModified" : -1,
+    "contentType" : "image/jpeg",
+    "filename" : "unicorn.jpg",
+    "charset" : null,
+    "fingerprint" : 19726487,
+    "cachingAllowed" : false,
+    "cacheMaxAge" : 0
+  }
+}

@@ -7,6 +7,7 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JavaType;
@@ -52,6 +53,9 @@ public class DataObjectSerializers extends Serializers.Base {
     }
     else if (Locale.class.isAssignableFrom(type.getRawClass())) {
       return new DoLocaleSerializer();
+    }
+    else if (BinaryResource.class.isAssignableFrom(type.getRawClass())) {
+      return new DoBinaryResourceSerializer();
     }
     return super.findSerializer(config, type, beanDesc);
   }

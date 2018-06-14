@@ -33,6 +33,7 @@ import java.util.UUID;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.ITestBaseEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestBigIntegerDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestBinaryDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestBinaryResourceDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCollectionsDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestComplexEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestComplexEntityPojo;
@@ -85,6 +86,8 @@ import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.IDataObject;
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.dataobject.IValueFormatConstants;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
@@ -113,6 +116,12 @@ public class JsonDataObjectsSerializationTest {
 
   protected static final UUID UUID_1 = UUID.fromString("ab8b13a4-b2a0-47a0-9d79-80039417b843");
   protected static final UUID UUID_2 = UUID.fromString("87069a20-6fc5-4b6a-9bc2-2e6cb75d7571");
+
+  protected static final BinaryResource BINARY_RESOURCE = BinaryResources.create()
+      .withContent("123".getBytes())
+      .withContentType("image/jpeg")
+      .withFilename("unicorn.jpg")
+      .build();
 
   protected static DataObjectSerializationTestHelper s_testHelper;
   protected static DataObjectHelper s_dataObjectHelper;
@@ -280,6 +289,27 @@ public class JsonDataObjectsSerializationTest {
   public void testDeserialize_InvalidDate2Do() throws Exception {
     String expectedJson = readResourceAsString("TestInvalidDate2Do.json");
     s_dataObjectMapper.readValue(expectedJson, TestDateDo.class);
+  }
+
+  // FIXME [awe] imex - write test for BinaryResource, also add a raw test expect only a DoEntity (JSON without _type)
+  @Test
+  public void testSerialize_BinaryResource() throws Exception {
+    TestBinaryResourceDo testDo = BEANS.get(TestBinaryResourceDo.class).withBrDefault(BINARY_RESOURCE);
+    String json = s_dataObjectMapper.writeValueAsString(testDo);
+    assertJsonEquals("TestBinaryResourceDo.json", json);
+
+    TestBinaryResourceDo pojoMarshalled = s_dataObjectMapper.readValue(json, TestBinaryResourceDo.class);
+    assertEquals(testDo.getBrDefault(), pojoMarshalled.getBrDefault());
+  }
+
+  @Test
+  public void testDeserialize_BinaryResource() throws Exception {
+    String inputJson = readResourceAsString("TestBinaryResourceDo.json");
+    TestBinaryResourceDo testDo = s_dataObjectMapper.readValue(inputJson, TestBinaryResourceDo.class);
+    assertEquals(BINARY_RESOURCE, testDo.getBrDefault());
+
+    String json = s_dataObjectMapper.writeValueAsString(testDo);
+    assertJsonEquals("TestBinaryResourceDo.json", json);
   }
 
   @Test
@@ -660,6 +690,22 @@ public class JsonDataObjectsSerializationTest {
 
     String json = s_dataObjectMapper.writeValueAsString(testDo);
     assertJsonEquals("TestBigIntegerDoRaw.json", json); // is written without type information
+  }
+
+  @Test
+  public void testDeserialize_RawBinaryResource() throws Exception {
+    String inputJson = readResourceAsString("TestBinaryResourceDoWithoutType.json");
+    DoEntity testDo = s_dataObjectMapper.readValue(inputJson, DoEntity.class);
+
+    assertEquals("MTIz", testDo.get("content"));
+    assertEquals(3, testDo.get("contentLength"));
+    assertEquals(-1, testDo.get("lastModified")); // becomes an Integer (not long)
+    assertEquals("image/jpeg", testDo.get("contentType"));
+    assertEquals("unicorn.jpg", testDo.get("filename"));
+    assertNull(testDo.get("charset"));
+    assertEquals(19726487, testDo.get("fingerprint")); // becomes an Integer (not long)
+    assertEquals(false, testDo.get("cachingAllowed"));
+    assertEquals(0, testDo.get("cacheMaxAge"));
   }
 
   // ------------------------------------ Raw data object test cases with type name ------------------------
