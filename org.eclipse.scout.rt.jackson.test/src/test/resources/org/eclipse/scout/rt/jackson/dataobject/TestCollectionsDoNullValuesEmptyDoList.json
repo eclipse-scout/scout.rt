@@ -1,0 +1,12 @@
+{
+  "_type" : "TestCollections",
+  "itemDoAttribute" : null,
+  "itemDoCollectionAttribute" : null,
+  "itemDoListAttribute" : [ ],
+  "itemListAttribute" : null,
+  "itemPojo2DoListAttribute" : [ ],
+  "itemPojoAttribute" : null,
+  "itemPojoCollectionAttribute" : null,
+  "itemPojoDoListAttribute" : [ ],
+  "itemPojoListAttribute" : null
+}

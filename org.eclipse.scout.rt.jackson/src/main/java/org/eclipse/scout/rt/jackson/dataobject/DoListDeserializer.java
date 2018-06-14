@@ -63,4 +63,9 @@ public class DoListDeserializer extends StdDeserializer<DoList<?>> {
   public Object deserializeWithType(JsonParser p, DeserializationContext ctxt, TypeDeserializer typeDeserializer) throws IOException {
     return deserialize(p, ctxt);
   }
+
+  @Override
+  public DoList<?> getNullValue(DeserializationContext ctxt) {
+    return new DoList<>(); // create empty DoList for null value
+  }
 }

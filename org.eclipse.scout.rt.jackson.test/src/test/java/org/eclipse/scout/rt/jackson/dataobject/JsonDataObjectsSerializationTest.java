@@ -955,11 +955,47 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
+  public void testSerialize_TestCollectionsDoNullValues() throws Exception {
+    TestCollectionsDo testDo = BEANS.get(TestCollectionsDo.class)
+        .withItemDoAttribute(null)
+        .withItemDoCollectionAttribute(null)
+        .withItemListAttribute(null)
+        .withItemPojoAttribute(null)
+        .withItemPojoCollectionAttribute(null)
+        .withItemPojoListAttribute(null);
+    testDo.itemDoListAttribute().set(null);
+    testDo.itemPojoDoListAttribute().set(null);
+    testDo.itemPojo2DoListAttribute().set(null);
+
+    String json = s_dataObjectMapper.writeValueAsString(testDo);
+    assertJsonEquals("TestCollectionsDoNullValuesEmptyDoList.json", json);
+  }
+
+  @Test
   public void testDeserialize_TestCollectionsDo() throws Exception {
     String json = readResourceAsString("TestCollectionsDo.json");
     TestCollectionsDo doMarhalled = s_dataObjectMapper.readValue(json, TestCollectionsDo.class);
     TestCollectionsDo expectedDo = createTestCollectionsDo();
     s_testHelper.assertDoEntityEquals(expectedDo, doMarhalled);
+  }
+
+  @Test
+  public void testDeserialize_TestCollectionsDoNullValues() throws Exception {
+    String json = readResourceAsString("TestCollectionsDoNullValues.json");
+    TestCollectionsDo doMarhalled = s_dataObjectMapper.readValue(json, TestCollectionsDo.class);
+
+    assertNull(doMarhalled.getItemDoAttribute());
+    assertNull(doMarhalled.getItemDoCollectionAttribute());
+    assertNull(doMarhalled.getItemListAttribute());
+    assertNull(doMarhalled.getItemPojoAttribute());
+    assertNull(doMarhalled.getItemPojoCollectionAttribute());
+    assertNull(doMarhalled.getItemPojoListAttribute());
+    assertTrue(doMarhalled.getItemDoListAttribute().isEmpty());
+    assertTrue(doMarhalled.getItemPojoDoListAttribute().isEmpty());
+    assertTrue(doMarhalled.getItemPojo2DoListAttribute().isEmpty());
+
+    json = s_dataObjectMapper.writeValueAsString(doMarhalled);
+    assertJsonEquals("TestCollectionsDoNullValuesEmptyDoList.json", json);
   }
 
   @Test
