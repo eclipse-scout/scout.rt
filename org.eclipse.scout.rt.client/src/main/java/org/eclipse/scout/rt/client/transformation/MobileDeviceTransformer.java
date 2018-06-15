@@ -142,7 +142,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     if (parentPage == null) {
       return;
     }
-    ITable parentTable = parentPage.getTable();
+    ITable parentTable = parentPage.getTable(false);
     if (parentTable == null) {
       return;
     }

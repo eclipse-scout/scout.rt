@@ -537,7 +537,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   private void detachSearchTableControl() {
-    T table = getTable();
+    T table = getTable(false);
     if (table == null) {
       return;
     }

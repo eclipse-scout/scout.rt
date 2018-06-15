@@ -47,15 +47,16 @@ import org.mockito.Mockito;
 public class AbstractPageWithTableTest {
 
   @Test
-  public void doDisposeSearchForm() {
+  public void testDisposeSearchForm() {
     // Setup
     final TestSearchForm searchForm = new TestSearchForm();
     final TestSearchForm searchFormMock = Mockito.spy(searchForm);
+    final ITable tableMock = Mockito.mock(ITable.class);
     AbstractPageWithTable<ITable> pageWithSearchForm = new AbstractPageWithTable<ITable>() {
 
       @Override
       protected ITable createTable() {
-        return Mockito.mock(ITable.class);
+        return tableMock;
       }
 
       @Override
@@ -71,6 +72,10 @@ public class AbstractPageWithTableTest {
 
     pageWithSearchForm.dispose();
     Mockito.verify(searchFormMock, Mockito.times(1)).disposeFormInternal();
+
+    // Assert that the table is still null and not created again after detaching the search form -> Never create table while page is disposing
+    assertNull(pageWithSearchForm.getTable(false));
+    Mockito.verify(tableMock, Mockito.times(0)).initTable();
   }
 
   @Test

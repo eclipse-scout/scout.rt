@@ -337,4 +337,9 @@ public interface ITreeNode extends IVisibleDimension, IEnabledDimension, IContex
    * no need to call this method by the application's code.
    */
   void dispose();
+
+  /**
+   * @return {@code true} if this {@link ITreeNode} is disposing.
+   */
+  boolean isDisposing();
 }
