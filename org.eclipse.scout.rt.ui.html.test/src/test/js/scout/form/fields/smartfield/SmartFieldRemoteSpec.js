@@ -150,6 +150,7 @@ describe('SmartFieldRemote', function() {
           objectType: 'LookupRow',
           key: 123,
           text: 'foo',
+          parentKey: null,
           active: true,
           enabled: true
         },

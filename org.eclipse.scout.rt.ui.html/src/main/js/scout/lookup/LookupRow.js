@@ -11,6 +11,7 @@
 scout.LookupRow = function() {
   this.key = null;
   this.text = null;
+  this.parentKey = null;
   this.enabled = true;
   this.active = true;
 };
@@ -25,6 +26,10 @@ scout.LookupRow.prototype.setKey = function(key) {
 
 scout.LookupRow.prototype.setText = function(text) {
   this.text = text;
+};
+
+scout.LookupRow.prototype.setParentKey = function(parentKey) {
+  this.parentKey = parentKey;
 };
 
 scout.LookupRow.prototype.toString = function() {
