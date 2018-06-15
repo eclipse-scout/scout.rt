@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, IContributionOwner, IExtensibleObject {
 
   private static final String INITIALIZED = "INITIALIZED";
+  private static final String DISPOSING = "DISPOSING";
   private static final String CHILDREN_DIRTY = "CHILDREN_DIRTY";
   private static final String CHILDREN_LOADED = "CHILDREN_LOADED";
   private static final String CHILDREN_VOLATILE = "CHILDREN_VOLATILE";
@@ -65,7 +66,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   private static final Logger LOG = LoggerFactory.getLogger(AbstractTreeNode.class);
   private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper(IDimensions.VISIBLE, IDimensions.VISIBLE_GRANTED);
   private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED, IDimensions.ENABLED_GRANTED);
-  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INITIALIZED, CHILDREN_DIRTY, CHILDREN_LOADED, CHILDREN_VOLATILE, FILTER_ACCEPTED, LEAF, REJECTED_BY_USER);
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INITIALIZED, CHILDREN_DIRTY, CHILDREN_LOADED, CHILDREN_VOLATILE, FILTER_ACCEPTED, LEAF, REJECTED_BY_USER, DISPOSING);
   private static final NamedBitMaskHelper EXPANDED_BIT_HELPER = new NamedBitMaskHelper(EXPANDED, EXPANDED_LAZY, INITIALLY_EXPANDED, LAZY_EXPANDING_ENABLED);
 
   private int m_initializing = 0; // >0 is true
@@ -1143,17 +1144,23 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public final void dispose() {
+    setDisposing(true);
     try {
-      disposeInternal();
+      try {
+        disposeInternal();
+      }
+      catch (RuntimeException e) {
+        LOG.warn("Exception while disposing node.", e);
+      }
+      try {
+        interceptDispose();
+      }
+      catch (RuntimeException e) {
+        LOG.warn("Exception while disposing node.", e);
+      }
     }
-    catch (RuntimeException e) {
-      LOG.warn("Exception while disposing node.", e);
-    }
-    try {
-      interceptDispose();
-    }
-    catch (RuntimeException e) {
-      LOG.warn("Exception while disposing node.", e);
+    finally {
+      setDisposing(false);
     }
   }
 
@@ -1164,5 +1171,14 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     if (m_menus != null) {
       ActionUtility.disposeActions(m_menus);
     }
+  }
+
+  private void setDisposing(boolean disposing) {
+    m_flags = FLAGS_BIT_HELPER.changeBit(DISPOSING, disposing, m_flags);
+  }
+
+  @Override
+  public boolean isDisposing() {
+    return FLAGS_BIT_HELPER.isBitSet(DISPOSING, m_flags);
   }
 }

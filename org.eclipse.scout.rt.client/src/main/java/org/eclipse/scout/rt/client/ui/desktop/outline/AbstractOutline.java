@@ -604,7 +604,10 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       //
       super.unloadNode(node);
       if (node instanceof IPageWithTable) {
-        ((IPageWithTable) node).getTable().deleteAllRows();
+        ITable table = ((IPageWithTable) node).getTable(false);
+        if (table != null) {
+          table.deleteAllRows();
+        }
       }
     }
     finally {

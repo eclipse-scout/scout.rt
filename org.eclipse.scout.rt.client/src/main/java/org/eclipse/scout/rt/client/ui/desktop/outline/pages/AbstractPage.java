@@ -162,6 +162,11 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
                 + "Use e.g. the execInitTable() callback to access the table after it has been created.",
             getClass(), new Exception("origin"));
       }
+      if (isDisposing()) {
+        LOG.warn(
+            "Table in page {} is created during page disposal. This is not recommended. Consider using getTable(false) during the disposal phase.",
+            getClass(), new Exception("origin"));
+      }
 
       createDisplayParentRunContext()
           .run(

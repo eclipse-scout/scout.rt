@@ -333,4 +333,6 @@ public interface ITreeNode extends IVisibleDimension, IEnabledDimension {
    * no need to call this method by the application's code.
    */
   void dispose();
+
+  boolean isDisposing();
 }
