@@ -34,8 +34,6 @@ public class DefaultExceptionMapper extends AbstractExceptionMapper<Exception> {
 
   public static final String DEFAULT_ERROR_MESSAGE = "An internal server error has occured.";
 
-  protected ErrorResponseBuilder m_errorResponseBuilder = BEANS.get(ErrorResponseBuilder.class);
-
   @Override
   public Response toResponseImpl(Exception exception) {
     LOG.error("Exception occured while processing rest request", exception);
@@ -43,7 +41,7 @@ public class DefaultExceptionMapper extends AbstractExceptionMapper<Exception> {
   }
 
   protected Response createResponse(Exception exception) {
-    return m_errorResponseBuilder
+    return BEANS.get(ErrorResponseBuilder.class)
         .withStatus(Response.Status.INTERNAL_SERVER_ERROR)
         .withMessage(DEFAULT_ERROR_MESSAGE)
         .build();

@@ -22,8 +22,6 @@ public class WebApplicationExceptionMapper extends AbstractExceptionMapper<WebAp
 
   private static final Logger LOG = LoggerFactory.getLogger(WebApplicationExceptionMapper.class);
 
-  protected ErrorResponseBuilder m_errorResponseBuilder = BEANS.get(ErrorResponseBuilder.class);
-
   @Override
   public Response toResponseImpl(WebApplicationException exception) {
     LOG.debug("{}: {}", exception.getClass().getSimpleName(), exception.getMessage());
@@ -31,7 +29,7 @@ public class WebApplicationExceptionMapper extends AbstractExceptionMapper<WebAp
   }
 
   protected Response createResponse(WebApplicationException exception) {
-    return m_errorResponseBuilder
+    return BEANS.get(ErrorResponseBuilder.class)
         .withStatus(exception.getResponse().getStatus())
         .withMessage(exception.getMessage())
         .build();

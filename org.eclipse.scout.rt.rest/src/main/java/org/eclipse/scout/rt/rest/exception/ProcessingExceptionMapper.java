@@ -16,8 +16,6 @@ public class ProcessingExceptionMapper extends AbstractExceptionMapper<Processin
 
   private static final Logger LOG = LoggerFactory.getLogger(ProcessingExceptionMapper.class);
 
-  protected ErrorResponseBuilder m_errorResponseBuilder = BEANS.get(ErrorResponseBuilder.class);
-
   @Override
   public Response toResponseImpl(ProcessingException exception) {
     LOG.error("Exception occured while processing rest request", exception);
@@ -25,7 +23,7 @@ public class ProcessingExceptionMapper extends AbstractExceptionMapper<Processin
   }
 
   protected Response createResponse(ProcessingException exception) {
-    return m_errorResponseBuilder
+    return BEANS.get(ErrorResponseBuilder.class)
         .withStatus(Response.Status.INTERNAL_SERVER_ERROR)
         .withCode(exception.getStatus().getCode())
         .withMessage(defaultErrorMessage())
