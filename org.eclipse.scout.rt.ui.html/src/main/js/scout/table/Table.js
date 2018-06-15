@@ -3170,8 +3170,7 @@ scout.Table.prototype._renderRowDelta = function() {
   if (!this.rendered) {
     return;
   }
-  var renderedRows = [],
-    scrollTop = this.$data[0].scrollTop;
+  var renderedRows = [];
   this.$rows().each(function(i, elem) {
     var $row = $(elem),
       row = $row.data('row');
