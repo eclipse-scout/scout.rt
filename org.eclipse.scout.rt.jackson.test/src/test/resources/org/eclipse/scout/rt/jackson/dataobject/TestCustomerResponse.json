@@ -1,0 +1,6 @@
+{
+  "_type" : "TestCustomerResponse",
+  "customers" : [ {
+    "_type" : "TestCustomer"
+  } ]
+}
