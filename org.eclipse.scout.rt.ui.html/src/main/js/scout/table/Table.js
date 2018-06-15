@@ -2653,7 +2653,7 @@ scout.Table.prototype.$cellsForRow = function($row) {
 
 scout.Table.prototype.$cell = function(column, $row) {
   var columnIndex = this.columns.indexOf(column);
-  return $row.children().eq(columnIndex);
+  return $row.children('.table-cell').eq(columnIndex);
 };
 
 scout.Table.prototype.columnById = function(columnId) {
