@@ -19,19 +19,19 @@ scout.inherits(scout.DummyLookupCall, scout.StaticLookupCall);
 
 scout.DummyLookupCall.prototype._data = function() {
   return [
-    [1, line.call(this, 'Foo'), 0],
-    [2, line.call(this, 'Bar'), 1],
-    [3, line.call(this, 'Baz'), 1]
+    [1, 'Foo', 0],
+    [2, 'Bar', 1],
+    [3, 'Baz', 1]
   ];
+};
 
-  function line(text) {
-    if (!this.showText) {
-      return null;
-    }
-    if (this.multiline) {
-      return '1:' + text + '\n2:' + text;
-    } else {
-      return text;
-    }
+scout.DummyLookupCall.prototype._dataToLookupRow = function(data) {
+  var lookupRow = scout.DummyLookupCall.parent.prototype._dataToLookupRow.call(this, data);
+  lookupRow.cssClass = lookupRow.text.toLowerCase();
+  if (!this.showText) {
+    lookupRow.text = null;
+  } else if (this.multiline) {
+    lookupRow.text = '1:' + lookupRow.text + '\n2:' + lookupRow.text;
   }
+  return lookupRow;
 };

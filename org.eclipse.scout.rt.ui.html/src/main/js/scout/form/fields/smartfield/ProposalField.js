@@ -105,6 +105,10 @@ scout.ProposalField.prototype._acceptByTextDone = function(result) {
   this._customTextAccepted(result.text);
 };
 
+scout.ProposalField.prototype._checkResetLookupRow = function(value) {
+  return this.lookupRow && this.lookupRow.text !== value;
+};
+
 scout.ProposalField.prototype._checkSearchTextChanged = function(searchText) {
   return this._checkDisplayTextChanged(searchText);
 };

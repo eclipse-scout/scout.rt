@@ -135,15 +135,6 @@ public abstract class AbstractProposalField<VALUE> extends AbstractSmartField<VA
 
   @Override
   protected void valueChangedInternal() {
-    // When a current lookup-row is available, we don't need to perform a lookup
-    // Usually this happens after the user has selected a row from the proposal-chooser (table or tree).
-    final ILookupRow<VALUE> currentLookupRow = getLookupRow();
-    if (currentLookupRow != null) {
-      installLookupRowContext(currentLookupRow);
-      return;
-    }
-
-    // Other than the smart-field the proposal field does not do a lookup by key to find and set
-    // a lookup row. A lookup row is never set by value.
+    // NOP
   }
 }
