@@ -75,7 +75,7 @@ public class AbstractPageWithTableTest {
 
     // Assert that the table is still null and not created again after detaching the search form -> Never create table while page is disposing
     assertNull(pageWithSearchForm.getTable(false));
-    Mockito.verify(tableMock, Mockito.times(0)).initTable();
+    Mockito.verify(tableMock, Mockito.times(0)).init();
   }
 
   @Test
