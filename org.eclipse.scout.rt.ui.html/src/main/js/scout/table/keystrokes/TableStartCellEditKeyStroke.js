@@ -13,10 +13,12 @@ scout.TableStartCellEditKeyStroke = function(table) {
   this.field = table;
   this.ctrl = true;
   this.which = [scout.keys.ENTER];
+  this.stopPropagation = true;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     var editPosition = event._editPosition,
-    columnIndex = this.field.visibleColumns().indexOf(editPosition.column);
-    if(columnIndex === 0){
+      columnIndex = this.field.visibleColumns().indexOf(editPosition.column);
+    if (columnIndex === 0) {
+      // Other key strokes like PageDown, Home etc. are displayed in the row -> make sure the cell edit key stroke will be displayed next to the other ones
       return editPosition.row.$row;
     }
     return this.field.$cell(columnIndex, editPosition.row.$row);
