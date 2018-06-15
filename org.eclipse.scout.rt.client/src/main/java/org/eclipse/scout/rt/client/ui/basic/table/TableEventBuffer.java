@@ -53,6 +53,9 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     removeEmptyEvents(events);
     removeIdenticalEvents(events);
     coalesceSameType(events);
+
+    // search again for identical events because coalesceSameType may remove events which may lead to identical consecutive events again.
+    removeIdenticalEvents(events);
     applyRowOrderChangedToRowsInserted(events);
     return events;
   }
@@ -447,6 +450,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     res.add(TableEvent.TYPE_ROWS_INSERTED);
     res.add(TableEvent.TYPE_ROWS_SELECTED);
     res.add(TableEvent.TYPE_ROWS_UPDATED);
+    res.add(TableEvent.TYPE_ROWS_EXPANDED);
     res.add(TableEvent.TYPE_REQUEST_FOCUS_IN_CELL);
     res.add(TableEvent.TYPE_SCROLL_TO_SELECTION);
     return res;
@@ -509,6 +513,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
       case TableEvent.TYPE_ROWS_DRAG_REQUEST:
       case TableEvent.TYPE_ROWS_INSERTED:
       case TableEvent.TYPE_ROWS_UPDATED:
+      case TableEvent.TYPE_ROWS_EXPANDED:
       case TableEvent.TYPE_REQUEST_FOCUS_IN_CELL: {
         return true;
       }

@@ -122,6 +122,7 @@ public class TableEventBufferTest {
     m_testBuffer.add(mockEvent(TableEvent.TYPE_ROW_ORDER_CHANGED));
     m_testBuffer.add(mockEvent(TableEvent.TYPE_ROWS_INSERTED));
     m_testBuffer.add(mockEvent(TableEvent.TYPE_ROWS_DELETED));
+    m_testBuffer.add(mockEvent(TableEvent.TYPE_ROWS_EXPANDED));
     TableEvent rowsSelectedEvent = mockEvent(TableEvent.TYPE_ROWS_SELECTED, 2);
     m_testBuffer.add(rowsSelectedEvent);
     final TableEvent allDeletedEvent = mockEvent(TableEvent.TYPE_ALL_ROWS_DELETED);
@@ -132,6 +133,41 @@ public class TableEventBufferTest {
     assertSame(rowsSelectedEvent, events.get(1));
     assertSame(0, events.get(1).getRowCount());
     assertSame(allDeletedEvent, events.get(2));
+  }
+
+  /**
+   * Event protocol as it happens when a column is added to the table. Also tests the ROWS_EXPANDED coalesce.
+   */
+  @Test
+  public void testMultipleAllRowsDeleted() {
+    final TableEvent firstAllRowsDeleted = mockEvent(TableEvent.TYPE_ALL_ROWS_DELETED);
+    m_testBuffer.add(firstAllRowsDeleted);
+    m_testBuffer.add(mockEvent(TableEvent.TYPE_ROWS_EXPANDED));
+    final TableEvent colHeadersUpdated = mockEvent(TableEvent.TYPE_COLUMN_HEADERS_UPDATED);
+    m_testBuffer.add(colHeadersUpdated);
+    m_testBuffer.add(mockEvent(TableEvent.TYPE_ALL_ROWS_DELETED));
+    m_testBuffer.add(mockEvent(TableEvent.TYPE_ROWS_EXPANDED, 3));
+    m_testBuffer.add(mockEvent(TableEvent.TYPE_ALL_ROWS_DELETED));
+    m_testBuffer.add(mockEvent(TableEvent.TYPE_ALL_ROWS_DELETED));
+    m_testBuffer.add(mockEvent(TableEvent.TYPE_ALL_ROWS_DELETED));
+    m_testBuffer.add(mockEvent(TableEvent.TYPE_ALL_ROWS_DELETED));
+    m_testBuffer.add(mockEvent(TableEvent.TYPE_ALL_ROWS_DELETED));
+    m_testBuffer.add(colHeadersUpdated);
+    final TableEvent structureChanged = mockEvent(TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED);
+    m_testBuffer.add(structureChanged);
+    final TableEvent lastAllRowsDeleted = mockEvent(TableEvent.TYPE_ALL_ROWS_DELETED);
+    m_testBuffer.add(lastAllRowsDeleted);
+    TableEvent rowsInserted = mockEvent(TableEvent.TYPE_ROWS_INSERTED, 2);
+    m_testBuffer.add(rowsInserted);
+
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(5, events.size());
+    assertSame(firstAllRowsDeleted, events.get(0));
+    assertSame(colHeadersUpdated, events.get(1));
+    assertSame(structureChanged, events.get(2));
+    assertSame(lastAllRowsDeleted, events.get(3));
+    assertSame(rowsInserted, events.get(4));
+    assertSame(2, events.get(4).getRowCount());
   }
 
   /**
@@ -940,7 +976,7 @@ public class TableEventBufferTest {
   private TableEvent mockEvent(int type, int rowCount, int startRowIndex) {
     List<ITableRow> rows = null;
     if (rowCount > 0) {
-      rows = new ArrayList<>();
+      rows = new ArrayList<>(rowCount);
       for (int i = 0; i < rowCount; i++) {
         rows.add(mockRow(i));
       }
