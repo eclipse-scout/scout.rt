@@ -815,7 +815,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   protected void endCellEdit(String fieldId) {
     IJsonAdapter<?> jsonField = getUiSession().getJsonAdapter(fieldId);
     if (jsonField == null) {
-      throw new IllegalStateException("No field adapter found for cell-editor with id " + fieldId);
+      LOG.info("No field adapter found for cell-editor with id " + fieldId + ". Maybe the editor or the corresponding form had been closed during completeCellEdit.");
+      return;
     }
 
     // Confirm end cell edit so that gui can dispose the adapter.
