@@ -732,7 +732,7 @@ scout.TableAdapter.modifyBooleanColumnPrototype = function() {
     if (this.table.modelAdapter) {
       // NOP - do nothing, since server will handle the click, see Java AbstractTable#interceptRowClickSingleObserver
     } else {
-      this._toggleCellValueOrig();
+      this._toggleCellValueOrig(row, cell);
     }
   }, true);
 };
