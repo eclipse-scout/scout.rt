@@ -391,7 +391,7 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
       lookupRow.withFont(json.getString("font"));
     }
     if (json.has("parentKey")) {
-      lookupRow.withParentKey(getLookupRowKeyForId(json.getString("parentKey")));
+      lookupRow.withParentKey(getLookupRowKeyForId(json.optString("parentKey")));
     }
     if (json.has("active")) {
       lookupRow.withActive(json.getBoolean("active"));
@@ -414,9 +414,7 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
     if (StringUtility.isNullOrEmpty(id)) {
       return null;
     }
-    else {
-      return (VALUE) m_idToKeyMap.get(NumberUtility.parseInt(id));
-    }
+    return (VALUE) m_idToKeyMap.get(NumberUtility.parseInt(id));
   }
 
   protected JSONArray columnDescriptorsToJson(Object value) {
