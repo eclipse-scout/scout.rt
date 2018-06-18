@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup;
 
 import static org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility.connectFields;
-import static org.eclipse.scout.rt.platform.util.NumberUtility.divideAndCeil;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -32,7 +31,6 @@ import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility;
-import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeFieldGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -270,15 +268,6 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     }
   }
 
-  protected int calcDefaultGridColumnCount() {
-    int height = 1;
-    GridData hints = getGridDataHints();
-    if (hints != null && hints.h > 1) {
-      height = hints.h;
-    }
-    return divideAndCeil(m_fields.size(), height);
-  }
-
   /**
    * Returns a new instance of an empty radio button to be used when creating radio buttons dynamically from lookup
    * rows. Subclasses may override this method to use custom radio buttons. Please note that all lookup row values (e.g.
@@ -366,9 +355,6 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
 
   @Override
   public boolean setGridColumnCount(int c) {
-    if (c < 0) {
-      c = calcDefaultGridColumnCount();
-    }
     boolean changed = propertySupport.setPropertyInt(PROP_GRID_COLUMN_COUNT, c);
     if (changed && isInitConfigDone()) {
       rebuildFieldGrid();

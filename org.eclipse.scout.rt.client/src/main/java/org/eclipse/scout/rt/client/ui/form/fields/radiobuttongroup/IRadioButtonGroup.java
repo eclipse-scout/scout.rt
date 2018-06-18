@@ -67,7 +67,9 @@ public interface IRadioButtonGroup<T> extends IValueField<T>, ICompositeField {
   void selectKey(T key);
 
   /**
-   * Gets the number of columns this group uses to layout radio buttons.
+   * @return the number of columns this group uses to layout radio buttons. If the value is <=0, it is calculated based
+   *         on the height of {@link IRadioButtonGroup} and the number of visible radio buttons. In that case the value
+   *         might change on every layout (e.g. if buttons change visibility).
    */
   int getGridColumnCount();
 
@@ -75,9 +77,9 @@ public interface IRadioButtonGroup<T> extends IValueField<T>, ICompositeField {
    * Sets a new grid column count which is used to layout radio buttons.
    *
    * @param c
-   *          the new number of columns. If a value < 0 is passed (e.g. {@link #DEFAULT_GRID_COLUMN_COUNT}), the number
-   *          of columns is reset to the default which means it uses the required number of columns to show all radio
-   *          buttons within the height of this group.
+   *          the new number of columns. If a value <= 0 is passed (e.g. {@link #DEFAULT_GRID_COLUMN_COUNT}), the number
+   *          of columns is calculated on every layout based on the height of this {@link IRadioButtonGroup} and the
+   *          number of visible radio buttons.
    * @return {@code true} if the column count has been changed. This also triggers a rebuild of the grid for the current
    *         group. {@code false} if it was already set to this value and nothing was updated.
    */

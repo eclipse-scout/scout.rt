@@ -41,9 +41,9 @@ public class RadioButtonGroupGrid implements ICompositeFieldGrid<ICompositeField
     m_group = (IRadioButtonGroup<?>) compositeField;
     m_gridColumns = 0;
     m_gridRows = 0;
-    List<IFormField> fields = m_group.getFields();
 
-    // filter
+    // visible fields only
+    List<IFormField> fields = m_group.getFields();
     List<IFormField> list = new ArrayList<>(fields.size());
     for (IFormField f : fields) {
       if (f.isVisible()) {
@@ -63,17 +63,17 @@ public class RadioButtonGroupGrid implements ICompositeFieldGrid<ICompositeField
    * Sets GridData on each button (= field) of the group.
    */
   protected void applyGridData() {
-    m_gridColumns = m_group.getGridColumnCount();
-    if (m_gridColumns == 0) {
-      m_gridRows = 0;
+    int numVisibleFields = m_fields.size();
+    m_gridColumns = Math.min(m_group.getGridColumnCount(), numVisibleFields);
+    if (m_gridColumns <= 0) {
+      m_gridColumns = calcDefaultGridColumnCount();
     }
-    else {
-      m_gridRows = divideAndCeil(m_fields.size(), m_gridColumns);
-    }
+    m_gridRows = divideAndCeil(numVisibleFields, m_gridColumns);
+
     int i = 0;
     for (int r = 0; r < m_gridRows; r++) {
       for (int c = 0; c < m_gridColumns; c++) {
-        if (i < m_fields.size()) {
+        if (i < numVisibleFields) {
           GridData data = GridDataBuilder.createFromHints(m_fields.get(i), 1);
           data.x = c;
           data.y = r;
@@ -87,6 +87,27 @@ public class RadioButtonGroupGrid implements ICompositeFieldGrid<ICompositeField
         }
       }
     }
+  }
+
+  /**
+   * @return the default number of columns based on the height of the field and the number of visible buttons (legacy
+   *         case). The value is always > 0
+   */
+  protected int calcDefaultGridColumnCount() {
+    GridData parentData = m_group.getGridData();
+    if (parentData == null || parentData.h < 1) {
+      return 1; // by default: vertical align (one column)
+    }
+
+    int numVisibleFields = m_fields.size();
+    if (numVisibleFields < 1) {
+      return 1; // no fields
+    }
+    int height = Math.min(numVisibleFields, parentData.h);
+    if (height <= 1) {
+      return numVisibleFields;
+    }
+    return divideAndCeil(numVisibleFields, height);
   }
 
   @Override
