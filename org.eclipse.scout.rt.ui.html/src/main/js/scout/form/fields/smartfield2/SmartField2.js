@@ -86,6 +86,7 @@ scout.SmartField2.prototype._init = function(model) {
 scout.SmartField2.prototype._initValue = function(value) {
   this._setLookupCall(this.lookupCall);
   this._setCodeType(this.codeType);
+  this._setLookupRow(this.lookupRow);
   scout.SmartField2.parent.prototype._initValue.call(this, value);
 };
 
@@ -1117,7 +1118,17 @@ scout.SmartField2.prototype.isDropdown = function() {
 };
 
 scout.SmartField2.prototype._setLookupRow = function(lookupRow) {
+  // remove css classes from old lookup-row
+  if (this.lookupRow) {
+    this.removeCssClass(this.lookupRow.cssClass);
+  }
+
   this._setProperty('lookupRow', lookupRow);
+
+  // add css classes from new lookup-row
+  if (lookupRow) {
+    this.addCssClass(lookupRow.cssClass);
+  }
 };
 
 scout.SmartField2.prototype.setLookupRow = function(lookupRow) {
@@ -1169,13 +1180,20 @@ scout.SmartField2.prototype._setValue = function(value) {
       this._setLookupRow(null);
     } else {
       // when a value is set, we only keep the cached lookup row when the key of the lookup row is equals to the value
-      if (this.lookupRow && this.lookupRow.key !== value) {
+      if (this._checkResetLookupRow(value)) {
         this._setLookupRow(null);
       }
     }
   }
   scout.SmartField2.parent.prototype._setValue.call(this, value);
   this._notUnique = false;
+};
+
+/**
+ * Sub-classes like the proposal field may override this function to implement a different behavior.
+ */
+scout.SmartField2.prototype._checkResetLookupRow = function(value) {
+  return this.lookupRow && this.lookupRow.key !== value;
 };
 
 /**

@@ -133,15 +133,6 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
    */
   boolean isMultilineText();
 
-  /**
-   * For performance optimization, style loading is done lazily. However, sometimes it is useful to apply these changes
-   * immediately.
-   * <p>
-   * This method is called automatically by {@link #getDisplayText()}, {@link #getTooltipText()},
-   * {@link #getBackgroundColor()}, {@link #getForegroundColor()} and {@link #getFont()}
-   */
-  void applyLazyStyles();
-
   boolean isBrowseAutoExpandAll();
 
   void setBrowseAutoExpandAll(boolean browseAutoExpandAll);

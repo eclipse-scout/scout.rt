@@ -379,9 +379,36 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
 
   protected ILookupRow<VALUE> createLookupRow(VALUE key, String text, JSONObject json) {
     LookupRow<VALUE> lookupRow = new LookupRow<VALUE>(key, text);
+    if (json.has("iconId")) {
+      lookupRow.withIconId(json.getString("iconId"));
+    }
     if (json.has("enabled")) {
       lookupRow.withEnabled(json.getBoolean("enabled"));
     }
+    if (json.has("tooltipText")) {
+      lookupRow.withTooltipText(json.getString("tooltipText"));
+    }
+    if (json.has("backgroundColor")) {
+      lookupRow.withBackgroundColor(json.getString("backgroundColor"));
+    }
+    if (json.has("foregroundColor")) {
+      lookupRow.withForegroundColor(json.getString("foregroundColor"));
+    }
+    if (json.has("font")) {
+      lookupRow.withFont(json.getString("font"));
+    }
+    if (json.has("parentKey")) {
+      lookupRow.withParentKey(getLookupRowKeyForId(json.getString("parentKey")));
+    }
+    if (json.has("active")) {
+      lookupRow.withActive(json.getBoolean("active"));
+    }
+    if (json.has("cssClass")) {
+      lookupRow.withCssClass(json.getString("cssClass"));
+    }
+    // Info: cannot de-serialize 'additionalTableRowData' because it uses generic
+    // JSON serialization. See JsonLookupRow#tableRowDataToJson - this shouldn't
+    // be a problem because that data is only used in the proposal chooser
     return lookupRow;
   }
 

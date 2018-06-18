@@ -17,8 +17,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -62,11 +60,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
-import org.eclipse.scout.rt.platform.job.DoneEvent;
-import org.eclipse.scout.rt.platform.job.IBlockingCondition;
-import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.FinalValue;
@@ -78,7 +72,6 @@ import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -86,38 +79,17 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 @ClassId("444e6fb6-3b0b-4917-933e-b6eb81345499")
 public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALUE> implements ISmartField2<VALUE> {
 
-  /**
-   * Null object used for {@link #installLookupRowContext(ILookupRow)}.
-   */
-  private static final ILookupRow EMPTY_LOOKUP_ROW = new LookupRow<>(null, "");
-
-  @SuppressWarnings("unchecked")
-  private static final <KEY> ILookupRow<KEY> emptyLookupRow() {
-    return EMPTY_LOOKUP_ROW;
-  }
-
   private final ISmartField2UIFacade<VALUE> m_uiFacade;
-
-  // chooser security
   private Class<? extends ICodeType<?, VALUE>> m_codeTypeClass;
   private ILookupCall<VALUE> m_lookupCall;
-
-  // cached lookup row
   private IContentAssistFieldLookupRowFetcher<VALUE> m_lookupRowFetcher;
-  private boolean m_installingRowContext = false;
-  private LookupRow m_decorationRow;
-
   private String m_wildcard;
   private SmartField2Result m_result;
   private ProcessingException m_validationError;
-
-  private final IBlockingCondition m_contextInstalledCondition = Jobs.newBlockingCondition(false);
-  private final AtomicInteger m_valueChangedLookupCounter = new AtomicInteger();
 
   /**
    * Provides the label-texts for the radio-buttons of the active-filter.
@@ -382,45 +354,8 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   }
 
   @Override
-  public void setTooltipText(String text) {
-    super.setTooltipText(text);
-    if (!m_installingRowContext) {
-      // Ticket 85'572: background color gets reseted after selecting a value
-      m_decorationRow.withTooltipText(getTooltipText());
-    }
-  }
-
-  @Override
-  public void setBackgroundColor(String c) {
-    super.setBackgroundColor(c);
-    if (!m_installingRowContext) {
-      // Ticket 85'572: background color gets reseted after selecting a value
-      m_decorationRow.withBackgroundColor(getBackgroundColor());
-    }
-  }
-
-  @Override
-  public void setForegroundColor(String c) {
-    super.setForegroundColor(c);
-    if (!m_installingRowContext) {
-      // Ticket 85'572: background color gets reseted after selecting a value
-      m_decorationRow.withForegroundColor(getForegroundColor());
-    }
-  }
-
-  @Override
-  public void setFont(FontSpec f) {
-    super.setFont(f);
-    if (!m_installingRowContext) {
-      // Ticket 85'572: background color gets reseted after selecting a value
-      m_decorationRow.withFont(getFont());
-    }
-  }
-
-  @Override
   protected void initConfig() {
     setActiveFilter(TriState.TRUE);
-    m_decorationRow = new LookupRow<VALUE>(null, "");
     super.initConfig();
     setActiveFilterEnabled(getConfiguredActiveFilterEnabled());
     setBrowseHierarchy(getConfiguredBrowseHierarchy());
@@ -668,79 +603,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     }
 
     return validKey == getLookupRow().getKey() || (validKey != null && validKey.equals(getLookupRow().getKey()));
-  }
-
-  /**
-   * Notice: This method is called from a worker originated outside the scout thread (sync into scout model thread)
-   */
-  protected void installLookupRowContext(ILookupRow<VALUE> row) {
-    if (row == null) {
-      row = emptyLookupRow();
-    }
-
-    m_installingRowContext = true;
-    try {
-      if (StringUtility.hasText(row.getTooltipText())) {
-        setTooltipText(row.getTooltipText());
-      }
-      else {
-        setTooltipText(m_decorationRow.getTooltipText());
-      }
-
-      if (StringUtility.hasText(row.getBackgroundColor())) {
-        setBackgroundColor(row.getBackgroundColor());
-      }
-      else {
-        setBackgroundColor(m_decorationRow.getBackgroundColor());
-      }
-
-      if (StringUtility.hasText(row.getForegroundColor())) {
-        setForegroundColor(row.getForegroundColor());
-      }
-      else {
-        setForegroundColor(m_decorationRow.getForegroundColor());
-      }
-
-      if (row.getFont() != null) {
-        setFont(row.getFont());
-      }
-      else {
-        setFont(m_decorationRow.getFont());
-      }
-    }
-    finally {
-      m_installingRowContext = false;
-    }
-  }
-
-  @Override
-  public String getDisplayText() {
-    applyLazyStyles();
-    return super.getDisplayText();
-  }
-
-  @Override
-  public String getTooltipText() {
-    applyLazyStyles();
-    return super.getTooltipText();
-  }
-
-  @Override
-  public String getBackgroundColor() {
-    applyLazyStyles();
-    return super.getBackgroundColor();
-  }
-
-  @Override
-  public String getForegroundColor() {
-    applyLazyStyles();
-    return super.getForegroundColor();
-  }
-
-  @Override
-  public FontSpec getFont() {
-    applyLazyStyles();
-    return super.getFont();
   }
 
   @Override
@@ -1260,58 +1122,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   }
 
   @Override
-  public void applyLazyStyles() {
-    // Waits if necessary for the lookup row context to be installed (asynchronous operation)
-    m_contextInstalledCondition.waitFor(1, TimeUnit.MINUTES);
-  }
-
-  @Override
-  protected void valueChangedInternal() {
-    m_contextInstalledCondition.setBlocking(true);
-
-    // When a current lookup-row is available, we don't need to perform a lookup
-    // Usually this happens after the user has selected a row from the proposal-chooser (table or tree).
-    final ILookupRow<VALUE> currentLookupRow = getLookupRow();
-    if (currentLookupRow != null) {
-      installLookupRowContext(currentLookupRow);
-      m_contextInstalledCondition.setBlocking(false);
-      return;
-    }
-
-    if (getLookupCall() == null) {
-      m_contextInstalledCondition.setBlocking(false);
-      return;
-    }
-
-    // When no current-lookup row is available we must perform a lookup by key (local or remote)
-    final VALUE lookupKey = getValue();
-
-    m_valueChangedLookupCounter.incrementAndGet();
-    final IFuture<Void> future = callKeyLookupInBackground(lookupKey, new ILookupRowFetchedCallback<VALUE>() {
-
-      @Override
-      public void onSuccess(final List<? extends ILookupRow<VALUE>> rows) {
-        installLookupRowContext(CollectionUtility.firstElement(rows));
-      }
-
-      @Override
-      public void onFailure(final RuntimeException exception) {
-        BEANS.get(ExceptionHandler.class).handle(exception);
-      }
-    });
-    future.whenDone(new IDoneHandler<Void>() {
-
-      @Override
-      public void onDone(DoneEvent<Void> event) {
-        // Release guard only upon very recent lookup has been finished.
-        if (m_valueChangedLookupCounter.decrementAndGet() == 0) {
-          m_contextInstalledCondition.setBlocking(false);
-        }
-      }
-    }, null);
-  }
-
-  @Override
   protected String formatValueInternal(VALUE validKey) {
     if (validKey == null) {
       return "";
@@ -1356,15 +1166,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   @Override
   public void refreshDisplayText() {
-    if (getLookupCall() != null && getValue() != null) {
-      try {
-        List<? extends ILookupRow<VALUE>> rows = callKeyLookup(getValue());
-        installLookupRowContext(CollectionUtility.firstElement(rows));
-      }
-      catch (RuntimeException | PlatformError e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-      }
-    }
+    // NOP
   }
 
   @Override

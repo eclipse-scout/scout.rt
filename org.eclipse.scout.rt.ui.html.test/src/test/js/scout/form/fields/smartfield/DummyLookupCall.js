@@ -7,16 +7,18 @@ scout.DummyLookupCall = function() {
 scout.inherits(scout.DummyLookupCall, scout.StaticLookupCall);
 
 scout.DummyLookupCall.prototype._data = function() {
-  var showText = this.showText;
-
   return [
-    [1, text('Foo')],
-    [2, text('Bar')],
-    [3, text('Baz')]
+    [1, 'Foo'],
+    [2, 'Bar'],
+    [3, 'Baz']
   ];
-
-  function text(text) {
-    return showText ? text : null;
-  }
 };
 
+scout.DummyLookupCall.prototype._dataToLookupRow = function(data) {
+  var lookupRow = scout.DummyLookupCall.parent.prototype._dataToLookupRow.call(this, data);
+  lookupRow.cssClass = lookupRow.text.toLowerCase();
+  if (!this.showText) {
+    lookupRow.text = null;
+  }
+  return lookupRow;
+};

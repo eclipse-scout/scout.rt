@@ -316,6 +316,18 @@ describe('SmartField2', function() {
         expect(field._getSelectedLookupRow(false)).toBe(null);
       });
 
+      // test for ticket #228288
+      it('must add CSS class from selected lookup-row to field', function() {
+        var field = createFieldWithLookupCall();
+        expect(scout.strings.hasText(field.cssClass)).toBe(false);
+        field.setValue(1);
+        jasmine.clock().tick(500);
+        expect(field.cssClass).toEqual('foo');
+        field.setValue(null);
+        jasmine.clock().tick(500);
+        expect(scout.strings.hasText(field.cssClass)).toBe(false);
+      });
+
     });
 
   });
