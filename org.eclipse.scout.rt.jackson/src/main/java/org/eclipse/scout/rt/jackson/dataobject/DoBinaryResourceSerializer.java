@@ -31,7 +31,7 @@ public class DoBinaryResourceSerializer extends StdSerializer<BinaryResource> {
   @Override
   public void serialize(BinaryResource br, JsonGenerator gen, SerializerProvider provider) throws IOException {
     gen.writeStartObject();
-    gen.writeBinaryField("content", br.getContent());
+    writeNullsafeBinaryField(gen, "content", br.getContent());
     gen.writeNumberField("contentLength", br.getContentLength());
     gen.writeNumberField("lastModified", br.getLastModified());
     gen.writeStringField("contentType", br.getContentType());
@@ -41,6 +41,15 @@ public class DoBinaryResourceSerializer extends StdSerializer<BinaryResource> {
     gen.writeBooleanField("cachingAllowed", br.isCachingAllowed());
     gen.writeNumberField("cacheMaxAge", br.getCacheMaxAge());
     gen.writeEndObject();
+  }
+
+  protected void writeNullsafeBinaryField(JsonGenerator gen, String fieldName, byte[] data) throws IOException {
+    if (data == null) {
+      gen.writeNullField(fieldName);
+    }
+    else {
+      gen.writeBinaryField(fieldName, data);
+    }
   }
 
 }
