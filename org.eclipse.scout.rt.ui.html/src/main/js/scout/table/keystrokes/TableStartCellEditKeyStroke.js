@@ -32,6 +32,11 @@ scout.TableStartCellEditKeyStroke.prototype._accept = function(event) {
     return false;
   }
 
+  if (this.field.cellEditorPopup) {
+    // Already open
+    return false;
+  }
+
   var selectedRows = this.field.selectedRows;
   if (!selectedRows.length) {
     return false;
