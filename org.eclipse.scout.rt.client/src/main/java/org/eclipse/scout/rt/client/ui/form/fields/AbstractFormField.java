@@ -1562,6 +1562,11 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   @Override
+  public boolean isEnabled(Predicate<String> filter) {
+    return ENABLED_BIT_HELPER.allBitsEqual(m_enabled, filter);
+  }
+
+  @Override
   public boolean isEnabled(String dimension) {
     return ENABLED_BIT_HELPER.isBitSet(dimension, m_enabled);
   }

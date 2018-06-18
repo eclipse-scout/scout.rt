@@ -10,10 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.basic;
 
+import static java.util.Collections.unmodifiableSet;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 
@@ -223,6 +226,19 @@ public final class NamedBitMaskHelper {
    */
   public synchronized int usedBits() {
     return m_nextIndex;
+  }
+
+  public boolean allBitsEqual(byte holder, Predicate<String> filter) {
+    for (String name : bitNames()) {
+      if (!isBit(name, holder, filter == null || filter.test(name))) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public Set<String> bitNames() {
+    return unmodifiableSet(m_masksByBitName.keySet());
   }
 
   private byte bitMaskFor(String bitName) {

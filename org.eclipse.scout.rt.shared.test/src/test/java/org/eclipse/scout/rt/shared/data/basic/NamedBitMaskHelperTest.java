@@ -36,9 +36,24 @@ public class NamedBitMaskHelperTest {
   public void testUsedBitNames() {
     NamedBitMaskHelper bitMask = new NamedBitMaskHelper();
     Assert.assertEquals(0, bitMask.usedBits());
+    Assert.assertTrue(bitMask.bitNames().isEmpty());
 
     bitMask = new NamedBitMaskHelper(BIT_NAMES[0], BIT_NAMES[3]);
     Assert.assertEquals(2, bitMask.usedBits());
+    Assert.assertEquals(2, bitMask.bitNames().size());
+    Assert.assertArrayEquals(new Object[]{BIT_NAMES[0], BIT_NAMES[3]}, bitMask.bitNames().toArray());
+  }
+
+  @Test
+  public void testAllBitsEqual() {
+    byte holder = 0;
+    NamedBitMaskHelper bitMask = new NamedBitMaskHelper(BIT_NAMES[0], BIT_NAMES[1], BIT_NAMES[2], BIT_NAMES[3]);
+    holder = bitMask.setBit(BIT_NAMES[0], holder);
+    holder = bitMask.setBit(BIT_NAMES[3], holder);
+
+    Assert.assertTrue(bitMask.allBitsEqual(holder, name -> BIT_NAMES[0].equals(name) || BIT_NAMES[3].equals(name)));
+    Assert.assertFalse(bitMask.allBitsEqual(holder, name -> BIT_NAMES[0].equals(name) || BIT_NAMES[2].equals(name)));
+    Assert.assertFalse(bitMask.allBitsEqual(holder, null));
   }
 
   @Test

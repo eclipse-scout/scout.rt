@@ -131,6 +131,29 @@ public class ButtonTest {
 
   }
 
+  @Test
+  public void testEnabledOfSystemButtons() {
+    PushButton1 button1 = m_form.getFieldByClass(PushButton1.class);
+    button1.setSystemType(IButton.SYSTEM_TYPE_CANCEL);
+    Assert.assertTrue(button1.isEnabled());
+    Assert.assertTrue(button1.isEnabledIncludingParents());
+
+    m_form.setEnabledGranted(false);
+    Assert.assertTrue(button1.isEnabled());
+    Assert.assertTrue(button1.isEnabledIncludingParents());
+
+    m_form.setEnabledGranted(true);
+    m_form.getRootGroupBox().setEnabled(false);
+    Assert.assertTrue(button1.isEnabled());
+    Assert.assertFalse(button1.isEnabledIncludingParents());
+
+    m_form.setEnabledGranted(false);
+    m_form.getRootGroupBox().setEnabled(true);
+    button1.setSystemType(IButton.SYSTEM_TYPE_NONE);
+    Assert.assertTrue(button1.isEnabled());
+    Assert.assertFalse(button1.isEnabledIncludingParents());
+  }
+
   @After
   public void tearDown() throws Throwable {
     m_form.doClose();

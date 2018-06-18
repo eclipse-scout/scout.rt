@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -297,8 +298,22 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   protected boolean isIgnoreEnabledChange(final boolean enabled, final String dimension) {
-    boolean ignoreGrantedFlag = getSystemType() == IButton.SYSTEM_TYPE_CANCEL || getSystemType() == IButton.SYSTEM_TYPE_CLOSE;
-    return ignoreGrantedFlag && !enabled && IDimensions.ENABLED_GRANTED.equals(dimension); // cannot set the enabled_granted to false if this is a cancel or close button
+    // cannot set the enabled_granted to false if this is a cancel or close button
+    return isFormCloseButtonType() && !enabled && IDimensions.ENABLED_GRANTED.equals(dimension);
+  }
+
+  protected boolean isFormCloseButtonType() {
+    return getSystemType() == IButton.SYSTEM_TYPE_CANCEL || getSystemType() == IButton.SYSTEM_TYPE_CLOSE;
+  }
+
+  @Override
+  public boolean isEnabledIncludingParents() {
+    if (!isFormCloseButtonType()) {
+      return super.isEnabledIncludingParents();
+    }
+
+    Predicate<IFormField> visitor = f -> f.isEnabled() || f.isEnabled(dim -> !IDimensions.ENABLED_GRANTED.equals(dim));
+    return visitParents(visitor);
   }
 
   /*
@@ -483,7 +498,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   protected class P_UIFacade implements IButtonUIFacade {
     @Override
     public void fireButtonClickFromUI() {
-      if (isEnabled() && isVisible()) {
+      if (isEnabledIncludingParents() && isVisibleIncludingParents()) {
         doClick();
       }
     }

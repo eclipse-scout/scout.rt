@@ -981,6 +981,19 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
   void setEnabled(boolean enabled, boolean updateParents, boolean updateChildren, String dimension);
 
   /**
+   * Checks all existing enabled dimensions of this {@link IFormField} if their enabled state equals the value returned
+   * by the {@link Predicate} specified.
+   *
+   * @param filter
+   *          A {@link Predicate} that is called for each enabled dimension. The corresponding enabled-bit of this
+   *          {@link IFormField} must be equal to the result of the {@link Predicate}. In case {@code null} is passed
+   *          all bits are compared against {@code true} (which is the same as {@link #isEnabled()}).
+   * @return {@code true} if all enabled dimensions bits have the same value as returned by the specified
+   *         {@link Predicate}.
+   */
+  boolean isEnabled(Predicate<String> filter);
+
+  /**
    * Visits all parent {@link IFormField}s
    *
    * @param v
