@@ -197,7 +197,7 @@ public class AbstractMixedSmartColumnTest {
     Assertions.assertTrue(ModelJobs.isModelThread(), "must be invoked from model thread");
 
     // Wait until asynchronous load of lookup rows is completed and ready to be written back to the smart field.
-    JobTestUtil.waitForMinimalPermitCompetitors(ModelJobs.newInput(ClientRunContexts.copyCurrent()).getExecutionSemaphore(), 2); // 2:= 'current model job' + 'smartfield fetch model job'
+    JobTestUtil.waitForMinimalPermitCompetitors(ModelJobs.newInput(ClientRunContexts.copyCurrent()).getExecutionSemaphore(), 1);
     // Yield the current model job permit, so that the lookup rows can be written into the model.
     ModelJobs.yield();
   }

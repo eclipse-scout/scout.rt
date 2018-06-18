@@ -60,6 +60,11 @@ import org.junit.runner.RunWith;
 /**
  * Smartfield with rows having tooltip/color/icon. When some rows do not have tooltip/color/icon this info should be
  * taken from the initial values of tooltip/color/icon of the field.
+ * <p>
+ * Note: since Scout 7.0.300 and later the "styles" like fore-/background color are not copied automatically from the
+ * selected lookup-row to the field. In earlier versions of this test the methods testStyle* checked if the styles have
+ * been applied to the field, but now we only check if the right lookup-row is set. Styles must be applied manually in
+ * the execChangedValue() method.
  */
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
@@ -279,29 +284,34 @@ public class SmartFieldTest {
   public void testStyle_SetValue() throws Throwable {
     StyleField f = m_styleField;
     f.setValue(ID_RED);
-    assertRedFieldStyle(f);
+    assertRedLookupRow(f);
     f.setValue(ID_EMPTY);
-    assertDefaultFieldStyle(f);
+    assertLookupRow(f, ID_EMPTY);
     f.setValue(ID_YELLOW);
-    assertYellowFieldStyle(f);
+    assertYellowLookupRow(f);
     f.setValue(null);
-    assertDefaultFieldStyle(f);
+    assertLookupRow(f, null);
   }
 
-  private void assertYellowFieldStyle(StyleField f) {
-    assertFieldStyle(f, ICON_FILE, "Yellow tooltip", "ffff88", "888800", "italic");
+  private void assertLookupRow(StyleField f, Long expectedKey) {
+    if (expectedKey == null) {
+      assertNull(f.getLookupRow());
+    }
+    else {
+      assertEquals(expectedKey, f.getLookupRow().getKey());
+    }
   }
 
-  private void assertDefaultFieldStyle(StyleField f) {
-    assertFieldStyle(f, ICON_BOOKMARK, "Default tooltip", "000000", "cccccc", "bold");
+  private void assertYellowLookupRow(StyleField f) {
+    assertLookupRow(f, ID_YELLOW);
   }
 
-  private void assertRedFieldStyle(StyleField f) {
-    assertFieldStyle(f, ICON_FILE, "Red tooltip", "ff8888", "880000", "italic");
+  private void assertRedLookupRow(StyleField f) {
+    assertLookupRow(f, ID_RED);
   }
 
-  private void assertGreenFieldStyle(StyleField f) {
-    assertFieldStyle(f, ICON_FILE, "Green tooltip", "88ff88", "008800", "italic");
+  private void assertGreenLookupRow(StyleField f) {
+    assertLookupRow(f, ID_GREEN);
   }
 
   @Test
@@ -309,13 +319,13 @@ public class SmartFieldTest {
     StyleField f = m_styleField;
     f.setBrowseHierarchy(true);
     f.setValue(ID_RED);
-    assertRedFieldStyle(f);
+    assertRedLookupRow(f);
     f.setValue(ID_EMPTY);
-    assertDefaultFieldStyle(f);
+    assertLookupRow(f, ID_EMPTY);
     f.setValue(ID_YELLOW);
-    assertYellowFieldStyle(f);
+    assertYellowLookupRow(f);
     f.setValue(null);
-    assertDefaultFieldStyle(f);
+    assertLookupRow(f, null);
   }
 
   @Test
@@ -364,13 +374,13 @@ public class SmartFieldTest {
   public void testStyle_AcceptProposal() throws Throwable {
     StyleField f = m_styleField;
     f.getUIFacade().setLookupRowFromUI(createRedLookupRow());
-    assertRedFieldStyle(f);
+    assertRedLookupRow(f);
     f.getUIFacade().setLookupRowFromUI(new LookupRow<Long>(ID_EMPTY, "Empty"));
-    assertDefaultFieldStyle(f);
+    assertLookupRow(f, ID_EMPTY);
     f.getUIFacade().setLookupRowFromUI(createYellowLookupRow());
-    assertYellowFieldStyle(f);
+    assertYellowLookupRow(f);
     f.setValue(null);
-    assertDefaultFieldStyle(f);
+    assertLookupRow(f, null);
   }
 
   private static ILookupRow<Long> createRedLookupRow() {
@@ -402,19 +412,19 @@ public class SmartFieldTest {
     // expect lookup is performed
     lookupCall.allowLookup(true);
     f.setValue(ID_RED);
-    assertRedFieldStyle(f);
+    assertRedLookupRow(f);
 
     // expect lookup is not performed
     lookupCall.allowLookup(false);
     f.getUIFacade().setLookupRowFromUI(createYellowLookupRow());
-    assertYellowFieldStyle(f);
+    assertYellowLookupRow(f);
 
     // expect lookup is performed again
     // additionally this test ensures that the lookup-row from the previous test (value=20L)
     // is not reused by mistake.
     lookupCall.allowLookup(true);
     f.setValue(ID_GREEN);
-    assertGreenFieldStyle(f);
+    assertGreenLookupRow(f);
   }
 
   @After
@@ -432,12 +442,6 @@ public class SmartFieldTest {
 
     assertEquals("TestMenu2", smartfieldMenus.get(1).getText());
     assertEquals("control-alternate-f11", smartfieldMenus.get(1).getKeyStroke());
-  }
-
-  private static void assertFieldStyle(StyleField f, String icon, String tt, String bg, String fg, String font) {
-    String expectedStyle = tt + ", " + bg + ", " + fg + ", " + (font != null ? FontSpec.parse(font).toPattern() : null);
-    String actualStyle = f.getTooltipText() + ", " + f.getBackgroundColor() + ", " + f.getForegroundColor() + ", " + (f.getFont() != null ? f.getFont().toPattern() : null);
-    assertEquals(expectedStyle, actualStyle);
   }
 
   /**
