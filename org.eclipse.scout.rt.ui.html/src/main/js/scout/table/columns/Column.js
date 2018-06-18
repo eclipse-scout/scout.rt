@@ -75,6 +75,7 @@ scout.Column.prototype.init = function(model) {
  */
 scout.Column.prototype._init = function(model) {
   scout.texts.resolveTextProperty(this, 'text');
+  scout.texts.resolveTextProperty(this, 'headerTooltipText');
   scout.icons.resolveIconProperty(this, 'headerIconId');
   this._setTable(this.table);
   this._setDisplayable(this.displayable);
