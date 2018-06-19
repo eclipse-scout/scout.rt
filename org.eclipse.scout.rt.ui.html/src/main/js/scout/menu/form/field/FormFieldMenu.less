@@ -19,6 +19,18 @@
     & > label {
       margin-left: 8px;
     }
+
+    &.disabled:not(.read-only) > label {
+      /* Use same disabled color as for menu items */
+      color: @menu-item-disabled-color;
+    }
+  }
+
+  & > .check-box-field.disabled:not(.read-only) > .field > .label,
+  & > .radiobutton-group > .radiobutton-group-body > .radio-button.disabled:not(.read-only) > .field > .label,
+  & > .radio-button.disabled:not(.read-only) > .field > .label {
+    /* Use same disabled color as for menu items */
+    color: @menu-item-disabled-color;
   }
 
   &:not(.has-text):not(.has-icon) {
