@@ -142,6 +142,7 @@ scout.TableAdapter.prototype._sendColumnMoved = function(column, index) {
 };
 
 scout.TableAdapter.prototype._onWidgetPrepareCellEdit = function(event) {
+  event.preventDefault();
   this._sendPrepareCellEdit(event.row, event.column);
 };
 
@@ -154,6 +155,7 @@ scout.TableAdapter.prototype._sendPrepareCellEdit = function(row, column) {
 };
 
 scout.TableAdapter.prototype._onWidgetCompleteCellEdit = function(event) {
+  event.preventDefault();
   this._sendCompleteCellEdit(event.field);
 };
 
@@ -165,6 +167,7 @@ scout.TableAdapter.prototype._sendCompleteCellEdit = function(field) {
 };
 
 scout.TableAdapter.prototype._onWidgetCancelCellEdit = function(event) {
+  event.preventDefault();
   this._sendCancelCellEdit(event.field);
 };
 
@@ -576,41 +579,6 @@ scout.TableAdapter.modifyTablePrototype = function() {
   if (!scout.app.remote) {
     return;
   }
-
-  // prepareCellEdit
-  scout.objects.replacePrototypeFunction(scout.Table, 'prepareCellEditInternal', function(column, row, openFieldPopupOnCellEdit) {
-    if (this.modelAdapter) {
-      this.openFieldPopupOnCellEdit = scout.nvl(openFieldPopupOnCellEdit, false);
-      this.trigger('prepareCellEdit', {
-        column: column,
-        row: row
-      });
-    } else {
-      this.prepareCellEditInternalOrig(column, row, openFieldPopupOnCellEdit);
-    }
-  }, true);
-
-  // completeCellEdit
-  scout.objects.replacePrototypeFunction(scout.Table, 'completeCellEdit', function(field) {
-    if (this.modelAdapter) {
-      this.trigger('completeCellEdit', {
-        field: field
-      });
-    } else {
-      this.completeCellEditOrig(field);
-    }
-  }, true);
-
-  // cancelCellEdit
-  scout.objects.replacePrototypeFunction(scout.Table, 'cancelCellEdit', function(field) {
-    if (this.modelAdapter) {
-      this.trigger('cancelCellEdit', {
-        field: field
-      });
-    } else {
-      this.cancelCellEditOrig(field);
-    }
-  }, true);
 
   // _sortAfterInsert
   scout.objects.replacePrototypeFunction(scout.Table, '_sortAfterInsert', function(wasEmpty) {

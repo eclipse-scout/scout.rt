@@ -1786,9 +1786,17 @@ scout.Table.prototype.prepareCellEdit = function(column, row, openFieldPopupOnCe
  *    for Smart- and DateFields.
  */
 scout.Table.prototype.prepareCellEditInternal = function(column, row, openFieldPopupOnCellEdit) {
+  var event = new scout.Event({
+    column: column,
+    row: row
+  });
   this.openFieldPopupOnCellEdit = scout.nvl(openFieldPopupOnCellEdit, false);
-  var field = column.createEditor(row);
-  this.startCellEdit(column, row, field);
+  this.trigger('prepareCellEdit', event);
+
+  if (!event.defaultPrevented) {
+    var field = column.createEditor(row);
+    this.startCellEdit(column, row, field);
+  }
 };
 
 /**
@@ -2671,11 +2679,9 @@ scout.Table.prototype.startCellEdit = function(column, row, field) {
 };
 
 /**
- * In a remote app this function is overridden by RemoteApp.js, the default implementation is the local case.
  * @param saveEditorValue when this parameter is set to true, the value of the editor field is set as
  *    new value on the edited cell. In remote case this parameter is always false, because the cell
  *    value is updated by an updateRow event instead.
- * @see RemoteApp.js
  */
 scout.Table.prototype.endCellEdit = function(field, saveEditorValue) {
   if (!this.rendered || !this.isAttachedAndRendered()) {
@@ -2704,20 +2710,32 @@ scout.Table.prototype.endCellEdit = function(field, saveEditorValue) {
   field.destroy();
 };
 
-/**
- * In a remote app this function is overridden by RemoteApp.js, the default implementation is the local case.
- * @see TableAdapter.js
- */
 scout.Table.prototype.completeCellEdit = function(field) {
-  return this.endCellEdit(field, true);
+  var event = new scout.Event({
+    field: field,
+    row: this.cellEditorPopup ? this.cellEditorPopup.row : null,
+    column: this.cellEditorPopup ? this.cellEditorPopup.column : null,
+    cell: this.cellEditorPopup ? this.cellEditorPopup.cell : null
+  });
+  this.trigger('completeCellEdit', event);
+
+  if (!event.defaultPrevented) {
+    return this.endCellEdit(field, true);
+  }
 };
 
-/**
- * In a remote app this function is overridden by RemoteApp.js, the default implementation is the local case.
- * @see TableAdapter.js
- */
 scout.Table.prototype.cancelCellEdit = function(field) {
-  this.endCellEdit(field);
+  var event = new scout.Event({
+    field: field,
+    row: this.cellEditorPopup ? this.cellEditorPopup.row : null,
+    column: this.cellEditorPopup ? this.cellEditorPopup.column : null,
+    cell: this.cellEditorPopup ? this.cellEditorPopup.cell : null
+  });
+  this.trigger('cancelCellEdit', event);
+
+  if (!event.defaultPrevented) {
+    this.endCellEdit(field);
+  }
 };
 
 scout.Table.prototype.scrollTo = function(row) {
