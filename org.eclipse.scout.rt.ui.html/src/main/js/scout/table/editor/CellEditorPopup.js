@@ -15,6 +15,7 @@ scout.CellEditorPopup = function() {
   this.row = null;
   this.cell = null;
   this._pendingCompleteCellEdit = null;
+  this._keyStrokeHandler = this._onKeyStroke.bind(this);
 };
 scout.inherits(scout.CellEditorPopup, scout.Popup);
 
@@ -94,6 +95,7 @@ scout.CellEditorPopup.prototype._render = function() {
   if (this.table.enabled) {
     this.table.$container.addClass('focused');
   }
+  this.session.keyStrokeManager.on('keyStroke', this._keyStrokeHandler);
 };
 
 scout.CellEditorPopup.prototype._postRender = function() {
@@ -112,6 +114,7 @@ scout.CellEditorPopup.prototype._postRender = function() {
 scout.CellEditorPopup.prototype._remove = function() {
   scout.CellEditorPopup.parent.prototype._remove.call(this); // uninstalls the focus context for this popup
 
+  this.session.keyStrokeManager.off('keyStroke', this._keyStrokeHandler);
   this.table.off('rowOrderChanged', this._rowOrderChangedFunc);
   // table may have been removed in the meantime
   if (this.table.rendered) {
@@ -137,7 +140,7 @@ scout.CellEditorPopup.prototype.position = function() {
 /**
  * @returns {Promise} resolved when acceptInput is performed on the editor field
  */
-scout.CellEditorPopup.prototype.completeEdit = function() {
+scout.CellEditorPopup.prototype.completeEdit = function(waitForAcceptInput) {
   if (this._pendingCompleteCellEdit) {
     // Make sure complete cell edit does not get sent twice since it will lead to exceptions. This may happen if user clicks very fast multiple times.
     return this._pendingCompleteCellEdit;
@@ -145,12 +148,21 @@ scout.CellEditorPopup.prototype.completeEdit = function() {
 
   // There is no blur event when the popup gets closed -> trigger blur so that the field may react (accept display text, close popups etc.)
   // When acceptInput returns a promise, we must wait until input is accepted
+  // Otherwise call completeEdit immediately, also call it immediately if waitForAcceptInput is false (see _onKeyStroke)
   var field = this.cell.field;
-  this._pendingCompleteCellEdit = scout.nvl(field.acceptInput(), $.resolvedPromise())
-    .then(function() {
+  var acceptInputPromise = field.acceptInput();
+  if (!acceptInputPromise || !scout.nvl(waitForAcceptInput, true)) {
+    this._pendingCompleteCellEdit = $.resolvedPromise();
+    this.table.completeCellEdit(field);
+  } else {
+    this._pendingCompleteCellEdit = acceptInputPromise.then(function() {
       this.table.completeCellEdit(field);
-      this._pendingCompleteCellEdit = null;
     }.bind(this));
+  }
+
+  this._pendingCompleteCellEdit.then(function() {
+    this._pendingCompleteCellEdit = null;
+  }.bind(this));
 
   return this._pendingCompleteCellEdit;
 };
@@ -166,6 +178,15 @@ scout.CellEditorPopup.prototype.cancelEdit = function() {
 
 scout.CellEditorPopup.prototype._onMouseDownOutside = function(event) {
   this.completeEdit();
+};
+
+scout.CellEditorPopup.prototype._onKeyStroke = function(event) {
+  if (!this.session.keyStrokeManager.invokeAcceptInputOnActiveValueField(event.keyStroke, event.keyStrokeContext)) {
+    return;
+  }
+  // Make sure completeEdit is called immediately after calling acceptInput.
+  // Otherwise the key stroke will be executed before completing the edit which prevents the input from being saved
+  this.completeEdit(false);
 };
 
 scout.CellEditorPopup.prototype.waitForCompleteCellEdit = function() {

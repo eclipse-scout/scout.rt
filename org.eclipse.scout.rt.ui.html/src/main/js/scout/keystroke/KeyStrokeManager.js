@@ -13,6 +13,7 @@ scout.KeyStrokeManager = function(session) {
   this.session = session;
   this._helpRendered = false;
   this._renderedKeys = [];
+  this.events = this._createEventSupport();
 
   this.installTopLevelKeyStrokeHandlers($mainEntryPoint);
 };
@@ -158,9 +159,13 @@ scout.KeyStrokeManager.prototype._handleKeyStrokeEvent = function(keyStrokeConte
     }
 
     // Before handling the keystroke, accept the input of a potential active value field
-    if (!keyStroke.preventInvokeAcceptInputOnActiveValueField && (keyStroke.invokeAcceptInputOnActiveValueField || keyStrokeContext.invokeAcceptInputOnActiveValueField)) {
+    if (this.invokeAcceptInputOnActiveValueField(keyStroke, keyStrokeContext)) {
       scout.ValueField.invokeValueFieldAcceptInput(event.target);
     }
+    this.trigger('keyStroke', {
+      keyStroke: keyStroke,
+      keyStrokeContext: keyStrokeContext
+    });
 
     // Handle the keystroke
     keyStroke.invokeHandle(event);
@@ -168,6 +173,10 @@ scout.KeyStrokeManager.prototype._handleKeyStrokeEvent = function(keyStrokeConte
     // Break on 'stopImmediate'.
     return event.isImmediatePropagationStopped(); // 'some-loop' breaks on true.
   }, this);
+};
+
+scout.KeyStrokeManager.prototype.invokeAcceptInputOnActiveValueField = function(keyStroke, keyStrokeContext) {
+  return !keyStroke.preventInvokeAcceptInputOnActiveValueField && (keyStroke.invokeAcceptInputOnActiveValueField || keyStrokeContext.invokeAcceptInputOnActiveValueField);
 };
 
 scout.KeyStrokeManager.prototype._isHelpKeyStroke = function(event) {
@@ -221,4 +230,35 @@ scout.KeyStrokeManager.prototype._onKeyEvent = function(keyStrokeContext, event)
   } else {
     this._handleKeyStrokeEvent(keyStrokeContext, event);
   }
+};
+
+//--- Event handling methods ---
+scout.KeyStrokeManager.prototype._createEventSupport = function() {
+  return new scout.EventSupport();
+};
+
+scout.KeyStrokeManager.prototype.trigger = function(type, event) {
+  event = event || {};
+  event.source = this;
+  this.events.trigger(type, event);
+};
+
+scout.KeyStrokeManager.prototype.one = function(type, func) {
+  this.events.one(type, func);
+};
+
+scout.KeyStrokeManager.prototype.on = function(type, func) {
+  return this.events.on(type, func);
+};
+
+scout.KeyStrokeManager.prototype.off = function(type, func) {
+  this.events.off(type, func);
+};
+
+scout.KeyStrokeManager.prototype.addListener = function(listener) {
+  this.events.addListener(listener);
+};
+
+scout.KeyStrokeManager.prototype.removeListener = function(listener) {
+  this.events.removeListener(listener);
 };
