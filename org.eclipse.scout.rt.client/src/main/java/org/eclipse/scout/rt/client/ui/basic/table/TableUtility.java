@@ -190,6 +190,7 @@ public final class TableUtility {
    *         </ul>
    */
   public static Object[][] exportRowsAsCSV(List<? extends ITableRow> rows, List<? extends IColumn> columns, boolean includeLineForColumnNames, boolean includeLineForColumnTypes, boolean includeLineForColumnFormats) {
+    final HtmlHelper htmlHelper = BEANS.get(HtmlHelper.class);
     int nr = rows.size();
     Object[][] a = new Object[nr + (includeLineForColumnNames ? 1 : 0) + (includeLineForColumnTypes ? 1 : 0) + (includeLineForColumnFormats ? 1 : 0)][columns.size()];
     for (int c = 0; c < columns.size(); c++) {
@@ -242,7 +243,8 @@ public final class TableUtility {
       //
       int csvRowIndex = 0;
       if (includeLineForColumnNames) {
-        a[csvRowIndex][c] = columns.get(c).getHeaderCell().getText();
+        IHeaderCell headerCell = columns.get(c).getHeaderCell();
+        a[csvRowIndex][c] = headerCell.isHtmlEnabled() ? htmlHelper.toPlainText(headerCell.getText()) : headerCell.getText();
         csvRowIndex++;
       }
       if (includeLineForColumnTypes) {
@@ -274,7 +276,7 @@ public final class TableUtility {
           }
           //special intercept for html
           if (type == String.class && text != null && columns.get(c).isHtmlEnabled()) {
-            text = BEANS.get(HtmlHelper.class).toPlainText(text);
+            text = htmlHelper.toPlainText(text);
           }
           a[csvRowIndex][c] = text;
         }
