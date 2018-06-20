@@ -27,8 +27,13 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
   void initAttribute();
 
   /**
-   * For {@link #TYPE_CODE_LIST}, {@link #TYPE_CODE_TREE}, {@link #TYPE_NUMBER_LIST}, {@link #TYPE_NUMBER_TREE} and
-   * {@link #TYPE_SMART} only. Delegate of the callback {@link AbstractListBox#execPrepareLookup(LookupCall)} and
+   * For
+   * <ul>
+   * <li>{@link DataModelConstants#TYPE_LIST}</li>
+   * <li>{@link DataModelConstants#TYPE_TREE}</li>
+   * <li>{@link DataModelConstants#TYPE_SMART}</li>
+   * </ul>
+   * only. Delegate of the callback {@link AbstractListBox#execPrepareLookup(LookupCall)} and
    * {@link AbstractTreeBox#execPrepareLookup(LookupCall, org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode)}
    */
   void prepareLookup(ILookupCall<?> call);
@@ -139,10 +144,8 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
    * Describes whether this attribute holds a multi-value content. The default implementation derives the result from
    * {@link #getType()}. The following types are considered multi-valued:
    * <ul>
-   * <li>{@link DataModelConstants#TYPE_CODE_LIST}</li>
-   * <li>{@link DataModelConstants#TYPE_CODE_TREE}</li>
-   * <li>{@link DataModelConstants#TYPE_NUMBER_LIST}</li>
-   * <li>{@link DataModelConstants#TYPE_NUMBER_TREE}</li>
+   * <li>{@link DataModelConstants#TYPE_LIST}</li>
+   * <li>{@link DataModelConstants#TYPE_TREE}</li>
    * </ul>
    * <p>
    * A multi valued attribute behaves same as {@link IDataModelEntity#isOneToMany()}

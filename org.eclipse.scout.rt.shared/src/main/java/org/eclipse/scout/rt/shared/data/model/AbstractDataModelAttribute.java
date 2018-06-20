@@ -560,19 +560,21 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     m_parentEntity = parent;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public boolean isMultiValued() {
     switch (getType()) {
       case DataModelConstants.TYPE_CODE_LIST:
       case DataModelConstants.TYPE_CODE_TREE:
-      case DataModelConstants.TYPE_NUMBER_LIST:
-      case DataModelConstants.TYPE_NUMBER_TREE:
+      case DataModelConstants.TYPE_LIST:
+      case DataModelConstants.TYPE_TREE:
         return true;
       default:
         return false;
     }
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public String formatValue(Object rawValue) {
     if (rawValue == null) {
@@ -582,8 +584,8 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     switch (getType()) {
       case IDataModelAttribute.TYPE_CODE_LIST:
       case IDataModelAttribute.TYPE_CODE_TREE:
-      case IDataModelAttribute.TYPE_NUMBER_LIST:
-      case IDataModelAttribute.TYPE_NUMBER_TREE:
+      case IDataModelAttribute.TYPE_LIST:
+      case IDataModelAttribute.TYPE_TREE:
       case IDataModelAttribute.TYPE_SMART:
         return formatSmart(rawValue, getCodeTypeClass(), getLookupCall());
       case IDataModelAttribute.TYPE_DATE:
@@ -745,10 +747,8 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   /**
    * Formats the raw value for the following attribute types:
    * <ul>
-   * <li>{@link DataModelConstants#TYPE_CODE_LIST}</li>
-   * <li>{@link DataModelConstants#TYPE_CODE_TREE}</li>
-   * <li>{@link DataModelConstants#TYPE_NUMBER_LIST}</li>
-   * <li>{@link DataModelConstants#TYPE_NUMBER_TREE}</li>
+   * <li>{@link DataModelConstants#TYPE_LIST}</li>
+   * <li>{@link DataModelConstants#TYPE_TREE}</li>
    * <li>{@link DataModelConstants#TYPE_SMART}</li>
    * </ul>
    * If whether code type class nor lookup call is set, the return value will be null. The method does not throw an

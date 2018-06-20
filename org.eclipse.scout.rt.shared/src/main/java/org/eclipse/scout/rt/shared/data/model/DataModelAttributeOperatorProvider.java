@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 public class DataModelAttributeOperatorProvider implements IDataModelAttributeOperatorProvider, DataModelConstants {
 
   @Override
-  @SuppressWarnings("squid:S138")
+  @SuppressWarnings({"squid:S138", "deprecation"})
   public void injectOperators(IDataModelAttribute attribute, List<IDataModelAttributeOp> operatorList) {
     switch (attribute.getType()) {
       case IDataModelAttribute.TYPE_SMART: {
@@ -37,8 +37,8 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
       }
       case IDataModelAttribute.TYPE_CODE_LIST:
       case IDataModelAttribute.TYPE_CODE_TREE:
-      case IDataModelAttribute.TYPE_NUMBER_LIST:
-      case IDataModelAttribute.TYPE_NUMBER_TREE: {
+      case IDataModelAttribute.TYPE_LIST:
+      case IDataModelAttribute.TYPE_TREE: {
         operatorList.add(DataModelAttributeOp.create(OPERATOR_IN));
         if (attribute.isNotOperatorEnabled()) {
           operatorList.add(DataModelAttributeOp.create(OPERATOR_NOT_IN));

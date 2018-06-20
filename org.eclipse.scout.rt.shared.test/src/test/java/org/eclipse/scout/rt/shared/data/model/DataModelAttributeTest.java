@@ -71,6 +71,7 @@ public class DataModelAttributeTest {
 
   @Test
   public void testFormatAttributeTypeCodeList() {
+    @SuppressWarnings("deprecation")
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_CODE_LIST);
     att.setCodeTypeClass(AttributeTestCodeType.class);
     assertNull(att.formatValue(null));
@@ -80,6 +81,7 @@ public class DataModelAttributeTest {
 
   @Test
   public void testFormatAttributeTypeCodeTree() {
+    @SuppressWarnings("deprecation")
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_CODE_TREE);
     att.setCodeTypeClass(AttributeTestCodeType.class);
     assertNull(att.formatValue(null));
@@ -88,8 +90,8 @@ public class DataModelAttributeTest {
   }
 
   @Test
-  public void testFormatAttributeTypeNumberList() {
-    IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_NUMBER_LIST);
+  public void testFormatAttributeTypeList() {
+    IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_LIST);
     att.setLookupCall(new AttributeTestLookupCall());
     assertNull(att.formatValue(null));
     assertEquals("a", att.formatValue(1L));
@@ -97,8 +99,8 @@ public class DataModelAttributeTest {
   }
 
   @Test
-  public void testFormatAttributeTypeNumberTree() {
-    IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_NUMBER_TREE);
+  public void testFormatAttributeTypeTree() {
+    IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_TREE);
     att.setLookupCall(new AttributeTestLookupCall());
     assertNull(att.formatValue(null));
     assertEquals("b", att.formatValue(2L));
@@ -411,7 +413,7 @@ public class DataModelAttributeTest {
     assertEquals("First", att.formatValue(1L));
     assertEquals("Second", att.formatValue(2L));
 
-    att = new DynamicDataModelAttribute(DataModelConstants.TYPE_NUMBER_LIST);
+    att = new DynamicDataModelAttribute(DataModelConstants.TYPE_LIST);
     att.setLookupCall(new AttributeTestLookupCall());
     assertNull(att.formatValue(null));
     assertEquals("a", att.formatValue(1L));

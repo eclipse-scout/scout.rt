@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.model;
 
+import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
+import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
+
 public interface DataModelConstants {
   /**
    * internal type for operators that inherit type of attribute (default)
@@ -21,21 +24,74 @@ public interface DataModelConstants {
    */
   int TYPE_NONE = 0;
 
+  /**
+   * @deprecated since 9.x, will be deleted in 10.x, use {@link #TYPE_LIST} instead <br/>
+   *             TODO [10.x] imo delete this field
+   */
+  @Deprecated
   int TYPE_CODE_LIST = 1;
+
+  /**
+   * @deprecated since 9.x, will be deleted in 10.x, use {@link #TYPE_TREE} instead <br/>
+   *             TODO [10.x] imo delete this field
+   */
+  @Deprecated
   int TYPE_CODE_TREE = 2;
+
+  /**
+   * @deprecated since 9.x, will be deleted in 10.x, use {@link #TYPE_LIST} instead <br/>
+   *             TODO [10.x] imo delete this field
+   */
+  @Deprecated
   int TYPE_NUMBER_LIST = 3;
+
+  /**
+   * @deprecated since 9.x, will be deleted in 10.x, use {@link #TYPE_TREE} instead <br/>
+   *             TODO [10.x] imo delete this field
+   */
+  @Deprecated
   int TYPE_NUMBER_TREE = 4;
+
+  /**
+   * This is the {@link IDataModelAttribute#getType()} of list or {@link LookupCall} style attributes. The pre 9.x
+   * distinction between {@link ICodeType} based and number based attributes was dropped in 9.x and summarized in this
+   * new type
+   *
+   * @since 9.x
+   */
+  int TYPE_LIST = 3;
+
+  /**
+   * This is the {@link IDataModelAttribute#getType()} of tree or hierarchy {@link LookupCall} style attributes. The pre
+   * 9.x distinction between {@link ICodeType} based and number based attributes was dropped in 9.x and summarized in
+   * this new type
+   *
+   * @since 9.x
+   */
+  int TYPE_TREE = 4;
+
   int TYPE_DATE = 5;
+
   int TYPE_TIME = 6;
+
   int TYPE_DATE_TIME = 7;
+
   int TYPE_INTEGER = 8;
+
   int TYPE_LONG = 9;
+
   int TYPE_BIG_DECIMAL = 10;
+
   int TYPE_PLAIN_INTEGER = 11;
+
   int TYPE_PLAIN_LONG = 12;
+
   int TYPE_PLAIN_BIG_DECIMAL = 13;
+
   int TYPE_PERCENT = 14;
+
   int TYPE_STRING = 15;
+
   int TYPE_SMART = 16;
   /**
    * Attribute used to create a count(Entity) on the enclosing entity.

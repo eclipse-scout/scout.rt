@@ -147,6 +147,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   /**
    * Initializes the mapping from operator to field.
    */
+  @SuppressWarnings("deprecation")
   protected void execInitOperatorToFieldMap(Map<Integer /* operator */, Map<Integer /* field type */, IComposerValueField>> operatorTypeToFieldMap) {
     // specific operators
     Map<Integer, IComposerValueField> betweenMap = new HashMap<>();
@@ -173,8 +174,8 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     defaultMap.put(IDataModelAttribute.TYPE_BIG_DECIMAL, getFieldByClass(BigDecimalField.class));
     defaultMap.put(IDataModelAttribute.TYPE_AGGREGATE_COUNT, getFieldByClass(IntegerField.class));
     defaultMap.put(IDataModelAttribute.TYPE_INTEGER, getFieldByClass(IntegerField.class));
-    defaultMap.put(IDataModelAttribute.TYPE_NUMBER_LIST, getFieldByClass(ListBoxField.class));
-    defaultMap.put(IDataModelAttribute.TYPE_NUMBER_TREE, getFieldByClass(TreeBoxField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_LIST, getFieldByClass(ListBoxField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_TREE, getFieldByClass(TreeBoxField.class));
     defaultMap.put(IDataModelAttribute.TYPE_CODE_LIST, getFieldByClass(ListBoxField.class));
     defaultMap.put(IDataModelAttribute.TYPE_CODE_TREE, getFieldByClass(TreeBoxField.class));
     defaultMap.put(IDataModelAttribute.TYPE_LONG, getFieldByClass(LongField.class));
