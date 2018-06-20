@@ -148,7 +148,7 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
 
       @Override
       public Object prepareValueForToJson(Object value) {
-        return columnDescriptorsToJson(value);
+        return columnDescriptorsToJson((ColumnDescriptor[]) value);
       }
     });
   }
@@ -417,22 +417,32 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
     return (VALUE) m_idToKeyMap.get(NumberUtility.parseInt(id));
   }
 
-  protected JSONArray columnDescriptorsToJson(Object value) {
-    if (value == null) {
+  protected JSONArray columnDescriptorsToJson(ColumnDescriptor[] descriptors) {
+    if (descriptors == null) {
       return null;
     }
-    ColumnDescriptor[] descs = (ColumnDescriptor[]) value;
     JSONArray array = new JSONArray();
-    for (ColumnDescriptor desc : descs) {
-      JSONObject json = new JSONObject();
-      json.put("propertyName", desc.getPropertyName());
-      json.put("width", desc.getWidth());
-      json.put("text", desc.getText());
-      json.put("fixedWidth", desc.getFixedWidth());
-      json.put("horizontalAlignment", desc.getHorizontalAlignment());
-      array.put(json);
+    for (ColumnDescriptor desc : descriptors) {
+      JSONObject json = columnDescriptorToJson(desc);
+      if (json != null) {
+        array.put(json);
+      }
     }
     return array;
+  }
+
+  protected JSONObject columnDescriptorToJson(ColumnDescriptor descriptor) {
+    if (descriptor == null) {
+      return null;
+    }
+    JSONObject json = new JSONObject();
+    json.put("propertyName", descriptor.getPropertyName());
+    json.put("text", descriptor.getText());
+    json.put("width", descriptor.getWidth());
+    json.put("fixedWidth", descriptor.isFixedWidth());
+    json.put("horizontalAlignment", descriptor.getHorizontalAlignment());
+    json.put("visible", descriptor.isVisible());
+    return json;
   }
 
   @Override

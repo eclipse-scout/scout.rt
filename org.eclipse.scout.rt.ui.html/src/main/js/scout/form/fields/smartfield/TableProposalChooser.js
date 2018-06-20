@@ -27,13 +27,12 @@ scout.TableProposalChooser.prototype._createModel = function() {
         text: descriptor.text,
         width: scout.Column.NARROW_MIN_WIDTH
       });
-      if (descriptor.width) {
+      if (descriptor.width && descriptor.width > 0) { // 0 = default
         column.width = descriptor.width;
       }
-      if (descriptor.fixedWidth) {
-        column.fixedWidth = true;
-      }
+      column.fixedWidth = scout.nvl(descriptor.fixedWidth, false);
       column.horizontalAlignment = descriptor.horizontalAlignment;
+      column.visible = scout.nvl(descriptor.visible, true);
       columns.push(column);
     }, this);
   } else {

@@ -311,7 +311,7 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
 
   ColumnDescriptor[] getColumnDescriptors();
 
-  void setColumnDescriptors(ColumnDescriptor[] columnHeaders);
+  void setColumnDescriptors(ColumnDescriptor[] columnDescriptors);
 
   String getDisplayStyle();
 

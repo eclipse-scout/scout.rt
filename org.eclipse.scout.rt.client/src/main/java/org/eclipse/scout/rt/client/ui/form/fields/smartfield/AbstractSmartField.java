@@ -73,6 +73,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 @ClassId("444e6fb6-3b0b-4917-933e-b6eb81345499")
 public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE> implements ISmartField<VALUE> {
@@ -237,11 +238,11 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   /**
    * This property has only an effect when the smart field has a table proposal chooser. When the returned value is
-   * null, no column headers are visible in the proposal chooser. If the returned value is a string array it contains
-   * the texts used for column headers, make sure that the number of elements in the array is equals to the number of
-   * cells in the proposal chooser table.
-   *
-   * @return
+   * <code>null</code>, the table proposal chooser has only one column (showing the lookup row text) without column
+   * header.
+   * <p>
+   * To change this default behavior, return an array of {@link ColumnDescriptor}s. Additional columns are filled using
+   * {@link LookupRow#getAdditionalTableRowData()}, linked by the <code>propertyName</code>.
    */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(310)
