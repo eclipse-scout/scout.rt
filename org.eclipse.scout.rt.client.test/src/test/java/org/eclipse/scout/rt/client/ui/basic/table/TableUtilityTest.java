@@ -41,7 +41,7 @@ import org.junit.runner.RunWith;
 public class TableUtilityTest {
   private static final long DATE_IN_MILLIS = 1372324222000L; // Thu Jun 27 11:10:22 CEST 2013
   private static final long DATE_IN_MILLIS_2 = 1370324222000L; // Tue Jun 04 07:37:02 CEST 2013
-  private static final int COLUMNS_AMOUNT = 12;
+  private static final int COLUMNS_AMOUNT = 13;
 
   private static final Object OBJECT_ROW_1 = new Object();
   private static final Object OBJECT_ROW_2 = new Object();
@@ -154,6 +154,7 @@ public class TableUtilityTest {
     assertEquals("TestSmartColumn", columnNames[9]);
     assertEquals("TestStringColumn", columnNames[10]);
     assertEquals("TestStringHtmlColumn", columnNames[11]);
+    assertEquals("Header cell with html", columnNames[12]);
   }
 
   private void assertColumnTypes(Object[] columnTypes) {
@@ -170,6 +171,7 @@ public class TableUtilityTest {
     assertEquals(String.class, columnTypes[9]);
     assertEquals(String.class, columnTypes[10]);
     assertEquals(String.class, columnTypes[11]);
+    assertEquals(String.class, columnTypes[12]);
   }
 
   private void assertColumnFormats(Object[] columnFormats) {
@@ -203,6 +205,7 @@ public class TableUtilityTest {
     assertEquals("", row1[9]); // no display text
     assertEquals("Foo", row1[10]);
     assertEquals("Hello", row1[11]);
+    assertEquals("Plain hello", row1[12]);
   }
 
   private void assertRow2(Object[] row2) {
@@ -220,6 +223,7 @@ public class TableUtilityTest {
     assertEquals("", row2[9]); // no display text
     assertEquals("Bar", row2[10]);
     assertEquals("World", row2[11]);
+    assertEquals("Plain world", row2[12]);
   }
 
   private static P_Table createTable(int status) {
@@ -228,8 +232,8 @@ public class TableUtilityTest {
     Date date = new Date(DATE_IN_MILLIS);
     Date date2 = new Date(DATE_IN_MILLIS_2);
 
-    Object[] row1 = new Object[]{Boolean.TRUE, date, date, date, BigDecimal.valueOf(111.2233D), 111.223D, 3333, 4444L, OBJECT_ROW_1, 555L, "Foo", "<p>Hello</p>"};
-    Object[] row2 = new Object[]{Boolean.FALSE, date2, date2, date2, BigDecimal.valueOf(9999.8877D), 777.66D, 6666, 5555L, OBJECT_ROW_2, 444L, "Bar", "<h1>World</h1>"};
+    Object[] row1 = new Object[]{Boolean.TRUE, date, date, date, BigDecimal.valueOf(111.2233D), 111.223D, 3333, 4444L, OBJECT_ROW_1, 555L, "Foo", "<p>Hello</p>", "Plain hello"};
+    Object[] row2 = new Object[]{Boolean.FALSE, date2, date2, date2, BigDecimal.valueOf(9999.8877D), 777.66D, 6666, 5555L, OBJECT_ROW_2, 444L, "Bar", "<h1>World</h1>", "Plain world"};
 
     table.addRowsByMatrix(new Object[][]{row1, row2}, status);
 
@@ -396,6 +400,19 @@ public class TableUtilityTest {
 
       @Override
       protected boolean getConfiguredHtmlEnabled() {
+        return true;
+      }
+    }
+
+    @Order(130)
+    public class StringHtmlHeaderColumn extends AbstractStringColumn {
+      @Override
+      protected String getConfiguredHeaderText() {
+        return "<span>Header cell</span><span>with html</span>";
+      }
+
+      @Override
+      protected boolean getConfiguredHeaderHtmlEnabled() {
         return true;
       }
     }
