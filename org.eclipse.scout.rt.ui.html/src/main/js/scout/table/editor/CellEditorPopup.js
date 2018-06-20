@@ -153,10 +153,10 @@ scout.CellEditorPopup.prototype.completeEdit = function(waitForAcceptInput) {
   var acceptInputPromise = field.acceptInput();
   if (!acceptInputPromise || !scout.nvl(waitForAcceptInput, true)) {
     this._pendingCompleteCellEdit = $.resolvedPromise();
-    this.table.completeCellEdit(field);
+    this.table.completeCellEdit();
   } else {
     this._pendingCompleteCellEdit = acceptInputPromise.then(function() {
-      this.table.completeCellEdit(field);
+      this.table.completeCellEdit();
     }.bind(this));
   }
 
@@ -172,7 +172,7 @@ scout.CellEditorPopup.prototype.isCompleteCellEditRequested = function() {
 };
 
 scout.CellEditorPopup.prototype.cancelEdit = function() {
-  this.table.cancelCellEdit(this.cell.field);
+  this.table.cancelCellEdit();
   this.remove();
 };
 

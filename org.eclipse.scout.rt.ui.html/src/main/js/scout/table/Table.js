@@ -2710,12 +2710,13 @@ scout.Table.prototype.endCellEdit = function(field, saveEditorValue) {
   field.destroy();
 };
 
-scout.Table.prototype.completeCellEdit = function(field) {
+scout.Table.prototype.completeCellEdit = function() {
+  var field = this.cellEditorPopup.cell.field;
   var event = new scout.Event({
     field: field,
-    row: this.cellEditorPopup ? this.cellEditorPopup.row : null,
-    column: this.cellEditorPopup ? this.cellEditorPopup.column : null,
-    cell: this.cellEditorPopup ? this.cellEditorPopup.cell : null
+    row: this.cellEditorPopup.row,
+    column: this.cellEditorPopup.column,
+    cell: this.cellEditorPopup.celll
   });
   this.trigger('completeCellEdit', event);
 
@@ -2724,12 +2725,13 @@ scout.Table.prototype.completeCellEdit = function(field) {
   }
 };
 
-scout.Table.prototype.cancelCellEdit = function(field) {
+scout.Table.prototype.cancelCellEdit = function() {
+  var field = this.cellEditorPopup.cell.field;
   var event = new scout.Event({
     field: field,
-    row: this.cellEditorPopup ? this.cellEditorPopup.row : null,
-    column: this.cellEditorPopup ? this.cellEditorPopup.column : null,
-    cell: this.cellEditorPopup ? this.cellEditorPopup.cell : null
+    row: this.cellEditorPopup.row,
+    column: this.cellEditorPopup.column,
+    cell: this.cellEditorPopup.celll
   });
   this.trigger('cancelCellEdit', event);
 

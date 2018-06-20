@@ -260,9 +260,6 @@ scout.NumberColumn.prototype._barChart = function(value) {
  */
 scout.NumberColumn.prototype._createEditor = function() {
   return scout.create('NumberField', {
-    parent: this.table,
-    gridDataHints: {
-      horizontalAlignment: this.horizontalAlignment
-    }
+    parent: this.table
   });
 };

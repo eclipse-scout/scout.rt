@@ -623,18 +623,19 @@ scout.Column.prototype.createFilter = function(model) {
  */
 scout.Column.prototype.createEditor = function(row) {
   var field = this._createEditor(row);
+  var cell = this.cell(row);
   field.setLabelVisible(false);
-  field.setValue(this.cell(row).value);
+  field.setValue(cell.value);
   field.setFieldStyle(scout.FormField.FieldStyle.CLASSIC);
+  var hints = new scout.GridData(field.gridDataHints);
+  hints.horizontalAlignment = cell.horizontalAlignment;
+  field.setGridDataHints(hints);
   return field;
 };
 
 scout.Column.prototype._createEditor = function() {
   return scout.create('StringField', {
-    parent: this.table,
-    gridDataHints: {
-      horizontalAlignment: this.horizontalAlignment
-    }
+    parent: this.table
   });
 };
 

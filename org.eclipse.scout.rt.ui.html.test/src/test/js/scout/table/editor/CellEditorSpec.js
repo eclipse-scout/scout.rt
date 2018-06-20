@@ -28,15 +28,14 @@ describe("CellEditor", function() {
     jasmine.clock().uninstall();
     var popup = findPopup();
     if (popup) {
-      popup.remove();
+      popup.close();
     }
   });
 
-  function createStringField(table) {
-    var model = formHelper.createFieldModel('StringField', session.desktop);
-    var adapter = new scout.StringFieldAdapter();
-    adapter.init(model);
-    return adapter.createWidget(model, session.desktop);
+  function createStringField() {
+    return scout.create('StringField', {
+      parent: session.desktop
+    });
   }
 
   function $findPopup() {
@@ -47,33 +46,19 @@ describe("CellEditor", function() {
     return $findPopup().data('popup');
   }
 
-  function createTableAndStartCellEdit() {
-    var model = helper.createModelFixture(2, 2);
-    model.rows[0].cells[0].editable = true;
-    var adapter = helper.createTableAdapter(model) ;
-    var table = adapter.createWidget(model, session.desktop);
-    table.render();
-
-    var field = createStringField(table);
-    table.startCellEdit(table.columns[0], table.rows[0], field);
-    return findPopup();
-  }
-
-  function startAndAssertCellEdit(table, column, row) {
-    var field = createStringField(table);
-    var popup = table.startCellEdit(column, row, field);
-    expect($findPopup().length).toBe(1);
-    expect($findPopup().find('.form-field').length).toBe(1);
+  function assertCellEditorIsOpen(table, column, row) {
+    var popup = table.cellEditorPopup;
     expect(popup.cell.field.rendered).toBe(true);
+    expect(popup.column).toBe(column);
+    expect(popup.row).toBe(row);
+    var $popup = $findPopup();
+    expect($popup.length).toBe(1);
+    expect(popup.$container[0]).toBe($popup[0]);
+    expect($popup.find('.form-field').length).toBe(1);
   }
 
   describe("mouse click", function() {
     var table, model, $rows, $cells0, $cells1, $cell0_0, $cell0_1, $cell1_0;
-
-    afterEach(function() {
-      // Close popups
-      $('body').triggerClick();
-    });
 
     beforeEach(function() {
       model = helper.createModelFixture(2, 2);
@@ -169,127 +154,191 @@ describe("CellEditor", function() {
 
   });
 
-  describe("startCellEdit event", function() {
+  describe("prepareCellEdit", function() {
+    var table;
 
-    it("opens popup with field", function() {
-      var popup = createTableAndStartCellEdit();
-      expect($findPopup().length).toBe(1);
-      expect($findPopup().find('.form-field').length).toBe(1);
-      expect(popup.cell.field.rendered).toBe(true);
+    beforeEach(function() {
+      var model = helper.createModelFixture(2, 2);
+      table = helper.createTable(model);
+      table.render();
+      helper.applyDisplayStyle(table);
+    });
+
+    it("creates field and calls start", function() {
+      table.columns[0].setEditable(true);
+      spyOn(table, 'startCellEdit').and.callThrough();
+
+      table.prepareCellEdit(table.columns[0], table.rows[0]);
+      jasmine.clock().tick();
+      expect(table.startCellEdit).toHaveBeenCalled();
+      assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
+    });
+
+    it("triggers prepareCellEdit event", function() {
+      var triggeredEvent;
+      table.columns[0].setEditable(true);
+      table.on('prepareCellEdit', function(event) {
+        triggeredEvent = event;
+      });
+      table.prepareCellEdit(table.columns[0], table.rows[0]);
+      jasmine.clock().tick();
+      expect(triggeredEvent.column).toBe(table.columns[0]);
+      expect(triggeredEvent.row).toBe(table.rows[0]);
     });
 
   });
 
-  describe("endCellEdit event", function() {
+  describe("startCellEdit", function() {
+    var table;
 
-    function createEndCellEditEvent(model, fieldId) {
-      return {
-        target: model.id,
-        fieldId: fieldId,
-        type: 'endCellEdit'
-      };
-    }
+    beforeEach(function() {
+      var model = helper.createModelFixture(2, 2);
+      table = helper.createTable(model);
+      table.render();
+      helper.applyDisplayStyle(table);
+    });
+
+    it("opens popup with field", function() {
+      table.columns[0].setEditable(true);
+      var field = createStringField(table);
+      table.startCellEdit(table.columns[0], table.rows[0], field);
+      assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
+      expect(table.cellEditorPopup.cell.field).toBe(field);
+    });
+
+  });
+
+  describe("completeCellEdit", function() {
+    var table;
+
+    beforeEach(function() {
+      var model = helper.createModelFixture(2, 2);
+      table = helper.createTable(model);
+      table.render();
+      helper.applyDisplayStyle(table);
+    });
+
+    it("triggers completeCellEdit event", function() {
+      var triggeredEvent;
+      table.columns[0].setEditable(true);
+      table.prepareCellEdit(table.columns[0], table.rows[0]);
+      jasmine.clock().tick();
+      table.on('completeCellEdit', function(event) {
+        triggeredEvent = event;
+      });
+      table.completeCellEdit();
+      expect(triggeredEvent.column).toBe(table.columns[0]);
+      expect(triggeredEvent.row).toBe(table.rows[0]);
+      expect(triggeredEvent.field).toBe(table.rows[0].cells[0].field);
+    });
+
+    it("calls endCellEdit with saveEditorValue=true", function() {
+      table.columns[0].setEditable(true);
+      table.prepareCellEdit(table.columns[0], table.rows[0]);
+      jasmine.clock().tick();
+      spyOn(table, 'endCellEdit').and.callThrough();
+      var field = table.cellEditorPopup.cell.field;
+
+      table.completeCellEdit();
+      expect(table.endCellEdit).toHaveBeenCalledWith(field, true);
+      expect($findPopup().length).toBe(0);
+    });
+
+    it("saves editor value", function() {
+      table.columns[0].setEditable(true);
+      table.prepareCellEdit(table.columns[0], table.rows[0]);
+      jasmine.clock().tick();
+      table.cellEditorPopup.cell.field.setValue('my new value');
+
+      table.completeCellEdit();
+      expect(table.rows[0].cells[0].value).toBe('my new value');
+    });
+
+  });
+
+  describe("cancelCellEdit", function() {
+    var table;
+
+    beforeEach(function() {
+      var model = helper.createModelFixture(2, 2);
+      table = helper.createTable(model);
+      table.render();
+      helper.applyDisplayStyle(table);
+    });
+
+    it("triggers cancelCellEdit event", function() {
+      var triggeredEvent;
+      table.columns[0].setEditable(true);
+      table.prepareCellEdit(table.columns[0], table.rows[0]);
+      jasmine.clock().tick();
+      table.on('cancelCellEdit', function(event) {
+        triggeredEvent = event;
+      });
+      table.cancelCellEdit();
+      expect(triggeredEvent.column).toBe(table.columns[0]);
+      expect(triggeredEvent.row).toBe(table.rows[0]);
+      expect(triggeredEvent.field).toBe(table.rows[0].cells[0].field);
+    });
+
+    it("calls endCellEdit with saveEditorValue=false", function() {
+      table.columns[0].setEditable(true);
+      table.prepareCellEdit(table.columns[0], table.rows[0]);
+      jasmine.clock().tick();
+      spyOn(table, 'endCellEdit').and.callThrough();
+      var field = table.cellEditorPopup.cell.field;
+
+      table.cancelCellEdit();
+      expect(table.endCellEdit).toHaveBeenCalledWith(field);
+      expect($findPopup().length).toBe(0);
+    });
+
+    it("does not save editor value", function() {
+      table.columns[0].setEditable(true);
+      table.prepareCellEdit(table.columns[0], table.rows[0]);
+      jasmine.clock().tick();
+      table.cellEditorPopup.cell.field.setValue('my new value');
+
+      table.cancelCellEdit();
+      expect(table.rows[0].cells[0].value).toBe('cell0_0');
+    });
+
+  });
+
+  describe("endCellEdit", function() {
+    var table;
+
+    beforeEach(function() {
+      var model = helper.createModelFixture(2, 2);
+      table = helper.createTable(model);
+      table.render();
+      helper.applyDisplayStyle(table);
+    });
 
     it("destroys the field", function() {
-      var popup = createTableAndStartCellEdit();
+      table.prepareCellEdit(table.columns[0], table.rows[0]);
+      jasmine.clock().tick();
+      var popup = table.cellEditorPopup;
       var field = popup.cell.field;
+      expect(field.destroyed).toBe(false);
 
-      var message = {
-        events: [createEndCellEditEvent(popup.table, field.id)]
-      };
-      session._processSuccessResponse(message);
-
+      table.endCellEdit(field);
       expect(field.destroyed).toBe(true);
-      expect(session.getModelAdapter(field.id)).toBeFalsy();
     });
 
     it("removes the cell editor popup", function() {
-      var popup = createTableAndStartCellEdit();
+      table.prepareCellEdit(table.columns[0], table.rows[0]);
+      jasmine.clock().tick();
+      var popup = table.cellEditorPopup;
       var field = popup.cell.field;
+      expect(field.destroyed).toBe(false);
 
-      var message = {
-        events: [createEndCellEditEvent(popup.table, field.id)]
-      };
-      session._processSuccessResponse(message);
-
+      table.endCellEdit(field);
       expect($findPopup().length).toBe(0);
       expect($findPopup().find('.form-field').length).toBe(0);
       expect(popup.rendered).toBe(false);
       expect(popup.cell.field.rendered).toBe(false);
     });
 
-  });
-
-  describe("completeEdit", function() {
-
-    it("sends completeCellEdit", function(done) {
-      var popup = createTableAndStartCellEdit();
-      popup.completeEdit()
-        .then(function() {
-          sendQueuedAjaxCalls();
-          var event = new scout.RemoteEvent(popup.table.id, 'completeCellEdit', {
-            fieldId: popup.cell.field.id
-          });
-          expect(mostRecentJsonRequest()).toContainEvents(event);
-          done();
-        });
-      jasmine.clock().tick(5);
-    });
-
-    it("sends completeCellEdit only once", function(done) {
-      var popup = createTableAndStartCellEdit();
-      var doneFunc = function() {
-        sendQueuedAjaxCalls();
-
-        expect(jasmine.Ajax.requests.count()).toBe(1);
-        expect(mostRecentJsonRequest().events.length).toBe(1);
-        var event = new scout.RemoteEvent(popup.table.id, 'completeCellEdit', {
-          fieldId: popup.cell.field.id
-        });
-        expect(mostRecentJsonRequest()).toContainEvents(event);
-        done();
-      };
-
-      popup.completeEdit().then(doneFunc);
-      popup.completeEdit();
-      jasmine.clock().tick(5);
-    });
-
-
-    it("does not remove the popup and its field (will be done by endCellEdit)", function() {
-      var popup = createTableAndStartCellEdit();
-      popup.completeEdit();
-
-      expect($findPopup().length).toBe(1);
-      expect($findPopup().find('.form-field').length).toBe(1);
-      expect(popup.rendered).toBe(true);
-      expect(popup.cell.field.rendered).toBe(true);
-    });
-
-  });
-
-  describe("cancelEdit", function() {
-
-    it("sends cancelCellEdit", function() {
-      var popup = createTableAndStartCellEdit();
-      popup.cancelEdit();
-      sendQueuedAjaxCalls();
-
-      var event = new scout.RemoteEvent(popup.table.id, 'cancelCellEdit', {
-        fieldId: popup.cell.field.id
-      });
-      expect(mostRecentJsonRequest()).toContainEvents(event);
-    });
-
-    it("removes the popup and its field", function() {
-      var popup = createTableAndStartCellEdit();
-      popup.cancelEdit();
-
-      expect($findPopup().length).toBe(0);
-      expect($findPopup().find('.form-field').length).toBe(0);
-      expect(popup.rendered).toBe(false);
-      expect(popup.cell.field.rendered).toBe(false);
-    });
   });
 
   describe("validation", function() {
@@ -324,16 +373,7 @@ describe("CellEditor", function() {
   });
 
   describe("popup recovery", function() {
-
     var model, table, row0, $cells0, $cell0_0;
-
-    function createRowsUpdatedEvent(model, rows) {
-      return {
-        target: model.id,
-        rows: rows,
-        type: 'rowsUpdated'
-      };
-    }
 
     beforeEach(function() {
       model = helper.createModelFixture(2, 3);
@@ -346,7 +386,8 @@ describe("CellEditor", function() {
       table.render();
       $cells0 = table.$cellsForRow(row0.$row);
       $cell0_0 = $cells0.eq(0);
-      startAndAssertCellEdit(table, table.columns[0], row0);
+      table.prepareCellEdit(table.columns[0], row0);
+      jasmine.clock().tick();
       expect(table.cellEditorPopup.row).toBe(row0);
       expect(table.cellEditorPopup.$anchor[0]).toBe($cell0_0[0]);
 
@@ -366,7 +407,8 @@ describe("CellEditor", function() {
     it("closes popup if row gets deleted", function() {
       row0.cells[0].editable = true;
       table.render();
-      startAndAssertCellEdit(table, table.columns[0], row0);
+      table.prepareCellEdit(table.columns[0], row0);
+      jasmine.clock().tick();
       spyOn(table, 'cancelCellEdit');
 
       table.deleteRows([row0]);
@@ -381,7 +423,8 @@ describe("CellEditor", function() {
     it("closes popup if all rows get deleted", function() {
       row0.cells[0].editable = true;
       table.render();
-      startAndAssertCellEdit(table, table.columns[0], row0);
+      table.prepareCellEdit(table.columns[0], row0);
+      jasmine.clock().tick();
       spyOn(table, 'cancelCellEdit');
 
       table.deleteAllRows();
@@ -396,7 +439,8 @@ describe("CellEditor", function() {
     it("closes popup (before) table is detached", function() {
       row0.cells[0].editable = true;
       table.render();
-      startAndAssertCellEdit(table, table.columns[0], row0);
+      table.prepareCellEdit(table.columns[0], row0);
+      jasmine.clock().tick();
       expect(table.cellEditorPopup).toBeTruthy();
       table._beforeDetach(); // called by parent.detach();
       expect(table.cellEditorPopup).toBe(null);
@@ -405,7 +449,8 @@ describe("CellEditor", function() {
     it("closes popup when table is removed", function() {
       row0.cells[0].editable = true;
       table.render();
-      startAndAssertCellEdit(table, table.columns[0], row0);
+      table.prepareCellEdit(table.columns[0], row0);
+      jasmine.clock().tick();
       expect(table.cellEditorPopup).toBeTruthy();
       table.remove();
       expect(table.cellEditorPopup).toBe(null);

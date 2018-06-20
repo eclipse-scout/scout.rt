@@ -95,9 +95,6 @@ scout.SmartColumn.prototype._createEditor = function() {
     browseAutoExpandAll: this.browseAutoExpandAll,
     browseLoadIncremental: this.browseLoadIncremental,
     activeFilterEnabled: this.activeFilterEnabled,
-    gridDataHints: {
-      horizontalAlignment: this.horizontalAlignment
-    }
   });
 
   field.on('prepareLookupCall', function(event) {
