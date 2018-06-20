@@ -184,6 +184,10 @@ scout.CellEditorPopup.prototype._onKeyStroke = function(event) {
   if (!this.session.keyStrokeManager.invokeAcceptInputOnActiveValueField(event.keyStroke, event.keyStrokeContext)) {
     return;
   }
+  if (this.$container.isOrHas(event.keyStrokeContext.$scopeTarget())) {
+    // Don't interfere with key strokes of the popup or children of the popup (otherwise pressing enter would close both the popup and the form at once)
+    return;
+  }
   // Make sure completeEdit is called immediately after calling acceptInput.
   // Otherwise the key stroke will be executed before completing the edit which prevents the input from being saved
   this.completeEdit(false);
