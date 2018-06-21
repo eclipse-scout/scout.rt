@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
+import org.eclipse.scout.rt.platform.util.PathValidator;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
 import org.eclipse.scout.rt.server.commons.servlet.CookieUtility;
@@ -64,11 +65,9 @@ public class UiServlet extends AbstractHttpServlet {
       "GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "TRACE"));
 
   private final HttpServletControl m_httpServletControl;
-  private final GetRequestValidator m_getUriValidator;
 
   public UiServlet() {
     m_httpServletControl = BEANS.get(HttpServletControl.class);
-    m_getUriValidator = BEANS.get(GetRequestValidator.class);
   }
 
   protected boolean isHttpMethodSupportedByJavaxHttpServlet(String method) {
@@ -239,15 +238,6 @@ public class UiServlet extends AbstractHttpServlet {
         resp.sendRedirect(req.getRequestURI() + "/");
         return true;
       }
-
-      try {
-        m_getUriValidator.validate(req);
-      }
-      catch (Exception e) {
-        LOG.info("GET request validation failed", e);
-        resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
-        return true;
-      }
     }
 
     long start = System.nanoTime();
@@ -255,6 +245,11 @@ public class UiServlet extends AbstractHttpServlet {
       if (LOG.isDebugEnabled()) {
         LOG.debug("Request started");
       }
+      if (!PathValidator.isValid(req.getPathInfo())) {
+        resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        return true;
+      }
+
       List<IUiServletRequestHandler> handlers = BEANS.all(IUiServletRequestHandler.class);
       for (IUiServletRequestHandler handler : handlers) {
         if (handler.handle(req, resp)) {

@@ -1,18 +1,15 @@
-package org.eclipse.scout.rt.ui.html;
+package org.eclipse.scout.rt.platform.util;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import javax.servlet.http.HttpServletRequest;
-
+import org.eclipse.scout.rt.platform.util.PathValidator;
 import org.junit.Test;
 
 /**
- * <h3>{@link GetRequestValidatorTest}</h3>
+ * <h3>{@link PathValidatorTest}</h3>
  */
-public class GetRequestValidatorTest {
+public class PathValidatorTest {
 
   @Test
   public void testValidate() {
@@ -40,7 +37,7 @@ public class GetRequestValidatorTest {
   }
 
   private void assertValid(String pathInfo) {
-    new GetRequestValidator().validate(createRequest(pathInfo));
+    new PathValidator().validate(pathInfo);
   }
 
   private void assertInvalid(String path) {
@@ -51,11 +48,5 @@ public class GetRequestValidatorTest {
     catch (IllegalArgumentException expected) {
       assertNotNull(expected);
     }
-  }
-
-  private HttpServletRequest createRequest(String pathInfo) {
-    HttpServletRequest request = mock(HttpServletRequest.class);
-    when(request.getPathInfo()).thenReturn(pathInfo);
-    return request;
   }
 }

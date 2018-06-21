@@ -21,6 +21,7 @@ import javax.ws.rs.ext.ParamConverterProvider;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.rest.container.IRestContainerRequestFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +45,12 @@ public class RestApplication extends Application {
     registerExceptionMappers(classes);
     registerParamConverterProviders(classes);
     registerRestResources(classes);
+    registerContainerRequestFilters(classes);
     return classes;
+  }
+
+  protected void registerContainerRequestFilters(Set<Class<?>> classes) {
+    registerClasses(classes, IRestContainerRequestFilter.class);
   }
 
   protected void registerContextResolvers(Set<Class<?>> classes) {
