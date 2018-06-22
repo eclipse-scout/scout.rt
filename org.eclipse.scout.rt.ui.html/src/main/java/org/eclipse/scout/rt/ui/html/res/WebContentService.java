@@ -41,10 +41,6 @@ public class WebContentService implements IWebContentService {
   }
 
   protected URL getResourceImpl(String resourcePath) {
-    //disable hacker attacks using '..'
-    if (resourcePath.contains("..")) {
-      throw new IllegalArgumentException("path must not contain any '..'");
-    }
     return getClass().getClassLoader().getResource(resourcePath);
   }
 }
