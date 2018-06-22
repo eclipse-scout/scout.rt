@@ -3,7 +3,11 @@
 #set( $symbol_escape = '\' )
 package ${package}.client;
 
+import java.security.AccessController;
+import java.security.Principal;
 import java.util.List;
+
+import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -13,8 +17,9 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.text.TEXTS;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 import ${package}.client.search.SearchOutline;
 import ${package}.client.settings.SettingsOutline;
@@ -56,34 +61,23 @@ public class Desktop extends AbstractDesktop {
   }
 
   @Order(1000)
-  public class FileMenu extends AbstractMenu {
+  public class UserProfileMenu extends AbstractMenu {
+
+    @Override
+    protected String getConfiguredKeyStroke() {
+      return IKeyStroke.F10;
+    }
+
+    @Override
+    protected String getConfiguredIconId() {
+      return Icons.PersonSolid;
+    }
 
     @Override
     protected String getConfiguredText() {
-      return TEXTS.get("File");
-    }
-
-    @Order(1000)
-    public class ExitMenu extends AbstractMenu {
-
-      @Override
-      protected String getConfiguredText() {
-        return TEXTS.get("Exit");
-      }
-
-      @Override
-      protected void execAction() {
-        ClientSessionProvider.currentSession(ClientSession.class).stop();
-      }
-    }
-  }
-
-  @Order(2000)
-  public class HelpMenu extends AbstractMenu {
-
-    @Override
-    protected String getConfiguredText() {
-      return TEXTS.get("Help");
+      Subject subject = Subject.getSubject(AccessController.getContext());
+      Principal firstPrincipal = CollectionUtility.firstElement(subject.getPrincipals());
+      return StringUtility.uppercaseFirst(firstPrincipal.getName());
     }
 
     @Order(1000)
@@ -98,6 +92,20 @@ public class Desktop extends AbstractDesktop {
       protected void execAction() {
         ScoutInfoForm form = new ScoutInfoForm();
         form.startModify();
+      }
+    }
+
+    @Order(2000)
+    public class LogoutMenu extends AbstractMenu {
+
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("Logout");
+      }
+
+      @Override
+      protected void execAction() {
+        ClientSessionProvider.currentSession().stop();
       }
     }
   }
