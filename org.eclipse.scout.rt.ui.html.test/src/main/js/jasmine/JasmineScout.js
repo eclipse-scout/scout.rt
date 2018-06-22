@@ -463,6 +463,7 @@ var jasmineScoutMatchers = {
 
 beforeEach(function() {
   jasmine.addMatchers(jasmineScoutMatchers);
+  jasmine.addMatchers(scout.CloneSpecHelper.CUSTOM_MATCHER);
 });
 
 // JQuery extensions for testing purpose

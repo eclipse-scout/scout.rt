@@ -67,7 +67,7 @@ scout.FormField = function() {
   this.$disabledCopyOverlay = null;
 
   this._addWidgetProperties(['keyStrokes', 'menus', 'statusMenuMappings']);
-  this._addCloneProperties(['label', 'labelVisible', 'labelPosition', 'labelWidthInPixel', 'mandatory', 'statusVisible', 'statusPosition', 'gridDataHints', 'errorStatus']);
+  this._addCloneProperties(['dropType', 'dropMaximumSize', 'errorStatus', 'fieldStyle', 'gridDataHints', 'gridData', 'label', 'labelVisible', 'labelPosition', 'labelWidthInPixel', 'mandatory', 'mode', 'preventInitialFocus', 'requiresSave', 'touched', 'statusVisible', 'statusPosition', 'statusMenuMappings', 'tooltipText']);
 };
 scout.inherits(scout.FormField, scout.Widget);
 
@@ -1244,4 +1244,10 @@ scout.FormField.prototype.requestInput = function() {
   if (this.enabledComputed && this.rendered) {
     this.focus();
   }
+};
+
+scout.FormField.prototype.clone = function(model, options) {
+  var clone = scout.FormField.parent.prototype.clone.call(this, model, options);
+  this._deepCloneProperties(clone, 'menus', options);
+  return clone;
 };

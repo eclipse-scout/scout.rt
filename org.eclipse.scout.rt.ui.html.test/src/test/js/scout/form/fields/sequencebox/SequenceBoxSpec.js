@@ -243,5 +243,41 @@ describe('SequenceBox', function() {
 
   });
 
+  describe("clone", function() {
+    it("considers the clone properties and deep clones fields", function() {
+      var cloneHelper = new scout.CloneSpecHelper();
+      var seqBox = scout.create('SequenceBox', {
+        parent: session.desktop,
+        id: 'seq01',
+        label: 'abc',
+        fields: [{
+          objectType: 'StringField',
+          labelVisible: false
+        }, {
+          objectType: 'DateField',
+          label: 'a date field'
+        }],
+        menus: [{
+          objectType: 'Menu'
+        }]
+      });
+      var clone = seqBox.clone({
+        parent: seqBox.parent
+      });
+
+      cloneHelper.validateClone(seqBox, clone);
+      expect(clone.fields.length).toBe(2);
+      expect(clone.cloneOf).toBe(seqBox);
+      expect(clone.label).toBe('abc');
+      expect(clone.fields[0].cloneOf).toBe(seqBox.fields[0]);
+      expect(clone.fields[0].labelVisible).toBe(false);
+      expect(clone.fields[1].cloneOf).toBe(seqBox.fields[1]);
+      expect(clone.fields[1].label).toBe('a date field');
+
+      // Assert that logical grid is a new instance
+      expect(clone.logicalGrid).not.toBe(seqBox.logicalGrid);
+      expect(clone.logicalGrid.gridConfig instanceof scout.SequenceBoxGridConfig).toBe(true);
+    });
+  });
 
 });

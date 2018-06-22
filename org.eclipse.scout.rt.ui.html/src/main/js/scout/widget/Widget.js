@@ -1443,6 +1443,15 @@ scout.Widget.prototype.clone = function(model, options) {
   clone.cloneOf = this;
   this._mirror(clone, options);
 
+  if (this.logicalGrid) {
+    // Create a new logical grid to make sure it does not influence the original widget
+    // This also creates the correct grid config for the specific widget
+    clone.setLogicalGrid(this.logicalGrid.objectType);
+  } else {
+    // Remove the grid if the original does not have one either
+    clone.setLogicalGrid(null);
+  }
+
   return clone;
 };
 

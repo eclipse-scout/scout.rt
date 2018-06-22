@@ -26,7 +26,7 @@ scout.RadioButtonGroup = function() {
   this._currentLookupCall = null;
 
   this._addWidgetProperties(['fields']);
-  this._addCloneProperties(['lookupCall']);
+  this._addCloneProperties(['lookupCall', 'layoutConfig', 'gridColumnCount']);
   this._buttonPropertyChangeHandler = this._onButtonPropertyChange.bind(this);
 };
 scout.inherits(scout.RadioButtonGroup, scout.ValueField);
@@ -49,14 +49,18 @@ scout.RadioButtonGroup.prototype._initValue = function(value) {
     this._setLookupCall(this.lookupCall);
   } else {
     // Initialize buttons first before calling set value, otherwise value could not be synchronized to the buttons
-    this.fields.forEach(function(formField) {
-      if (formField instanceof scout.RadioButton) {
-        this.radioButtons.push(formField);
-        this._initButton(formField);
-      }
-    }, this);
+    this._initButtons();
   }
   scout.RadioButtonGroup.parent.prototype._initValue.call(this, value);
+};
+
+scout.RadioButtonGroup.prototype._initButtons = function() {
+  this.fields.forEach(function(formField) {
+    if (formField instanceof scout.RadioButton) {
+      this.radioButtons.push(formField);
+      this._initButton(formField);
+    }
+  }, this);
 };
 
 /**
@@ -474,4 +478,11 @@ scout.RadioButtonGroup.prototype._createLookupRowRadioButton = function(lookupRo
   }
 
   return scout.create('RadioButton', button);
+};
+
+scout.RadioButtonGroup.prototype.clone = function(model, options) {
+  var clone = scout.RadioButtonGroup.parent.prototype.clone.call(this, model, options);
+  this._deepCloneProperties(clone, 'fields', options);
+  clone._initButtons();
+  return clone;
 };

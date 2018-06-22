@@ -11,6 +11,7 @@
 scout.SequenceBox = function() {
   scout.SequenceBox.parent.call(this);
   this._addWidgetProperties('fields');
+  this._addCloneProperties(['layoutConfig']);
   this.logicalGrid = scout.create('scout.HorizontalGrid');
   this.layoutConfig = null;
   this.fields = [];
@@ -189,4 +190,10 @@ scout.SequenceBox.prototype.setFields = function(fields) {
  */
 scout.SequenceBox.prototype.getFields = function() {
   return this.fields;
+};
+
+scout.SequenceBox.prototype.clone = function(model, options) {
+  var clone = scout.SequenceBox.parent.prototype.clone.call(this, model, options);
+  this._deepCloneProperties(clone, 'fields', options);
+  return clone;
 };

@@ -14,7 +14,6 @@ describe("GroupBox", function() {
   var cloneHelper;
 
   beforeEach(function() {
-    jasmine.addMatchers(scout.CloneSpecHelper.CUSTOM_MATCHER);
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new scout.FormSpecHelper(session);
@@ -42,7 +41,47 @@ describe("GroupBox", function() {
   }
 
   describe("clone", function() {
-    it("rendered", function() {
+
+    it("considers the clone properties and deep clones fields and menus", function() {
+      var groupBox = scout.create('GroupBox', {
+        parent: session.desktop,
+        id: 'gb01',
+        subLabel: 'abc',
+        gridColumnCount: 3,
+        logicalGrid: 'HorizontalGrid',
+        fields: [{
+          objectType: 'StringField'
+        }, {
+          objectType: 'SmartField',
+          label: "a label"
+        }, {
+          objectType: 'DateField'
+        }],
+        menus: [{
+          objectType: 'Menu'
+        }]
+      });
+      var clone = groupBox.clone({
+        parent: groupBox.parent
+      });
+
+      cloneHelper.validateClone(groupBox, clone);
+      expect(clone.fields.length).toBe(3);
+      expect(clone.menus.length).toBe(1);
+      expect(clone.cloneOf).toBe(groupBox);
+      expect(clone.gridColumnCount).toBe(3);
+      expect(clone.fields[0].cloneOf).toBe(groupBox.fields[0]);
+      expect(clone.fields[1].cloneOf).toBe(groupBox.fields[1]);
+      expect(clone.fields[1].label).toBe('a label');
+      expect(clone.menus[0].cloneOf).toBe(groupBox.menus[0]);
+
+      // Assert that logical grid is a new instance
+      expect(clone.logicalGrid).not.toBe(groupBox.logicalGrid);
+      expect(clone.logicalGrid instanceof scout.HorizontalGrid).toBe(true);
+      expect(clone.logicalGrid.gridConfig instanceof scout.GroupBoxGridConfig).toBe(true);
+    });
+
+    it("does not render the cloned box", function() {
       var clone,
         groupBox = scout.create('GroupBox', {
           parent: session.desktop,

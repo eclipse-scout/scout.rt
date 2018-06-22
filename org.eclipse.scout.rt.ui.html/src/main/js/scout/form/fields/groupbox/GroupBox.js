@@ -11,7 +11,7 @@
 scout.GroupBox = function() {
   scout.GroupBox.parent.call(this);
   this._addWidgetProperties(['fields', 'notification', 'staticMenus']);
-  this._addCloneProperties(['subLabel', 'fields', 'menus']);
+  this._addCloneProperties(['menuBarVisible', 'bodyLayoutConfig', 'borderDecoration', 'borderVisible', 'expandable', 'expanded', 'gridColumnCount', 'scrollable', 'subLabel']);
 
   this.fields = [];
   this.menus = [];

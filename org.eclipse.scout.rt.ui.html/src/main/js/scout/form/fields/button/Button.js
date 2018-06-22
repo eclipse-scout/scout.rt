@@ -24,6 +24,7 @@ scout.Button = function() {
 
   this.$buttonLabel = null;
   this.buttonKeyStroke = new scout.ButtonKeyStroke(this, null);
+  this._addCloneProperties(['defaultButton', 'displayStyle', 'iconId', 'keyStroke', 'processButton', 'selected', 'systemType', 'preventDoubleClick']);
 };
 scout.inherits(scout.Button, scout.FormField);
 

@@ -315,7 +315,7 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
         delegateEventsToOriginal: ['acceptInput', 'action'],
         delegateAllPropertiesToClone: true,
         delegateAllPropertiesToOriginal: true,
-        excludePropertiesToOriginal: ['selected']
+        excludePropertiesToOriginal: ['selected', 'logicalGrid']
       });
       // attach listener
       this._attachCloneMenuListeners(menu);

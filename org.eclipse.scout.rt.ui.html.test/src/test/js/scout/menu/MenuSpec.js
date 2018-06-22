@@ -186,9 +186,9 @@ describe("Menu", function() {
 
       menu.setChildActions([menu1, menu2]);
       expect(clone.childActions.length).toBe(2);
+
       clone.setChildActions([menu2]);
       expect(menu.childActions.length).toBe(1);
-
       expect(menu.childActions[0]).toBe(menu2);
     });
 
