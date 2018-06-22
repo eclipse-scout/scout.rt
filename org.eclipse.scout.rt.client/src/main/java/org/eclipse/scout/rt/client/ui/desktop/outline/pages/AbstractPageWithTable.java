@@ -455,9 +455,14 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         case FormEvent.TYPE_LOAD_COMPLETE: {
           // do page reload to execute search
           try {
-            T table = getTable(false);
-            if (table != null) {
-              table.discardAllRows();
+            if (isSearchRequired()) {
+              T table = getTable(false);
+              if (table != null) {
+                table.discardAllRows();
+              }
+            }
+            else {
+              reloadPage();
             }
           }
           catch (RuntimeException | PlatformError ex) {
