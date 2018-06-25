@@ -21,9 +21,9 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import javax.jws.WebMethod;
-import javax.mail.MessageContext;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.handler.MessageContext;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
