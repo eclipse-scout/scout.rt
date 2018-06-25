@@ -8,32 +8,39 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.shared.mail;
+package org.eclipse.scout.rt.mail;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 
 /**
  * Class representing a mail message that is used to create a mime message with
  * {@link MailUtility#createMimeMessage(MailMessage)}.
- *
- * @deprecated Use {@link org.eclipse.scout.rt.mail.MailMessage} instead.
  */
-@Deprecated
 @Bean
-@SuppressWarnings("deprecation")
-public class MailMessage extends org.eclipse.scout.rt.mail.MailMessage {
+public class MailMessage {
+
+  // TODO sme [9.0] remove ? extends for collection operations
+
+  private final List<MailParticipant> m_toRecipients = new ArrayList<>();
+  private final List<MailParticipant> m_ccRecipients = new ArrayList<>();
+  private final List<MailParticipant> m_bccRecipients = new ArrayList<>();
+  private MailParticipant m_sender;
+  private final List<MailParticipant> m_replyTos = new ArrayList<>();
+  private String m_subject;
+  private String m_bodyPlainText;
+  private String m_bodyHtml;
+  private final List<MailAttachment> m_attachments = new ArrayList<>();
 
   /**
    * @return an unmodifiable list of TO recipients.
    */
-  @Override
-  public List<MailParticipant> getToRecipients() {
-    return mapParticipant(super.getToRecipients());
+  public List<? extends MailParticipant> getToRecipients() {
+    return Collections.unmodifiableList(m_toRecipients);
   }
 
   /**
@@ -43,7 +50,7 @@ public class MailMessage extends org.eclipse.scout.rt.mail.MailMessage {
    *          TO recipient to add
    */
   public MailMessage addToRecipient(MailParticipant toRecipient) {
-    super.addToRecipient(toRecipient);
+    m_toRecipients.add(toRecipient);
     return this;
   }
 
@@ -53,27 +60,26 @@ public class MailMessage extends org.eclipse.scout.rt.mail.MailMessage {
    * @param toRecipients
    *          TO recipients to add
    */
-  @Override
-  public MailMessage addToRecipients(Collection<? extends org.eclipse.scout.rt.mail.MailParticipant> toRecipients) {
-    super.addToRecipients(toRecipients);
+  public MailMessage addToRecipients(Collection<? extends MailParticipant> toRecipients) {
+    if (toRecipients != null) {
+      m_toRecipients.addAll(toRecipients);
+    }
     return this;
   }
 
   /**
    * Clears the list of the TO recipients.
    */
-  @Override
   public MailMessage clearToRecipients() {
-    super.clearToRecipients();
+    m_toRecipients.clear();
     return this;
   }
 
   /**
    * @return an unmodifiable list of CC recipients.
    */
-  @Override
-  public List<MailParticipant> getCcRecipients() {
-    return mapParticipant(super.getCcRecipients());
+  public List<? extends MailParticipant> getCcRecipients() {
+    return Collections.unmodifiableList(m_ccRecipients);
   }
 
   /**
@@ -83,7 +89,7 @@ public class MailMessage extends org.eclipse.scout.rt.mail.MailMessage {
    *          CC recipient to add
    */
   public MailMessage addCcRecipient(MailParticipant ccRecipient) {
-    super.addCcRecipient(ccRecipient);
+    m_ccRecipients.add(ccRecipient);
     return this;
   }
 
@@ -93,27 +99,26 @@ public class MailMessage extends org.eclipse.scout.rt.mail.MailMessage {
    * @param ccRecipients
    *          CC recipients to add
    */
-  @Override
-  public MailMessage addCcRecipients(Collection<? extends org.eclipse.scout.rt.mail.MailParticipant> ccRecipients) {
-    super.addCcRecipients(ccRecipients);
+  public MailMessage addCcRecipients(Collection<? extends MailParticipant> ccRecipients) {
+    if (ccRecipients != null) {
+      m_ccRecipients.addAll(ccRecipients);
+    }
     return this;
   }
 
   /**
    * Clears the list of the CC recipients.
    */
-  @Override
   public MailMessage clearCcRecipients() {
-    super.clearCcRecipients();
+    m_ccRecipients.clear();
     return this;
   }
 
   /**
    * @return an unmodifiable list of BCC recipients.
    */
-  @Override
-  public List<MailParticipant> getBccRecipients() {
-    return mapParticipant(super.getBccRecipients());
+  public List<? extends MailParticipant> getBccRecipients() {
+    return Collections.unmodifiableList(m_bccRecipients);
   }
 
   /**
@@ -123,7 +128,7 @@ public class MailMessage extends org.eclipse.scout.rt.mail.MailMessage {
    *          BCC recipient to add
    */
   public MailMessage addBccRecipient(MailParticipant bccRecipient) {
-    super.addBccRecipient(bccRecipient);
+    m_bccRecipients.add(bccRecipient);
     return this;
   }
 
@@ -133,27 +138,26 @@ public class MailMessage extends org.eclipse.scout.rt.mail.MailMessage {
    * @param bccRecipients
    *          BCC recipients to add
    */
-  @Override
-  public MailMessage addBccRecipients(Collection<? extends org.eclipse.scout.rt.mail.MailParticipant> bccRecipients) {
-    super.addBccRecipients(bccRecipients);
+  public MailMessage addBccRecipients(Collection<? extends MailParticipant> bccRecipients) {
+    if (bccRecipients != null) {
+      m_bccRecipients.addAll(bccRecipients);
+    }
     return this;
   }
 
   /**
    * Clears the list of the BCC recipients.
    */
-  @Override
   public MailMessage clearBccRecipients() {
-    super.clearBccRecipients();
+    m_bccRecipients.clear();
     return this;
   }
 
   /**
    * @return Sender
    */
-  @Override
   public MailParticipant getSender() {
-    return map(super.getSender());
+    return m_sender;
   }
 
   /**
@@ -163,16 +167,15 @@ public class MailMessage extends org.eclipse.scout.rt.mail.MailMessage {
    *          Sender
    */
   public MailMessage withSender(MailParticipant sender) {
-    super.withSender(sender);
+    m_sender = sender;
     return this;
   }
 
   /**
    * @return an unmodifiable list of reply TO's.
    */
-  @Override
-  public List<MailParticipant> getReplyTos() {
-    return mapParticipant(super.getReplyTos());
+  public List<? extends MailParticipant> getReplyTos() {
+    return Collections.unmodifiableList(m_replyTos);
   }
 
   /**
@@ -182,7 +185,7 @@ public class MailMessage extends org.eclipse.scout.rt.mail.MailMessage {
    *          TO recipient to add
    */
   public MailMessage addReplyTo(MailParticipant replyTo) {
-    super.addReplyTo(replyTo);
+    m_replyTos.add(replyTo);
     return this;
   }
 
@@ -192,45 +195,53 @@ public class MailMessage extends org.eclipse.scout.rt.mail.MailMessage {
    * @param replyTos
    *          reply TO recipients to add
    */
-  @Override
-  public MailMessage addReplyTos(Collection<? extends org.eclipse.scout.rt.mail.MailParticipant> replyTos) {
-    super.addReplyTos(replyTos);
+  public MailMessage addReplyTos(Collection<? extends MailParticipant> replyTos) {
+    if (replyTos != null) {
+      m_replyTos.addAll(replyTos);
+    }
     return this;
   }
 
   /**
    * Clears the list of the reply TO's.
    */
-  @Override
   public MailMessage clearReplyTos() {
-    super.clearReplyTos();
+    m_replyTos.clear();
     return this;
   }
 
-  @Override
+  public String getSubject() {
+    return m_subject;
+  }
+
   public MailMessage withSubject(String subject) {
-    super.withSubject(subject);
+    m_subject = subject;
     return this;
   }
 
-  @Override
+  public String getBodyPlainText() {
+    return m_bodyPlainText;
+  }
+
   public MailMessage withBodyPlainText(String bodyPlainText) {
-    super.withBodyPlainText(bodyPlainText);
+    m_bodyPlainText = bodyPlainText;
     return this;
   }
 
-  @Override
+  public String getBodyHtml() {
+    return m_bodyHtml;
+  }
+
   public MailMessage withBodyHtml(String bodyHtml) {
-    super.withBodyHtml(bodyHtml);
+    m_bodyHtml = bodyHtml;
     return this;
   }
 
   /**
    * @return an unmodifiable list of attachments.
    */
-  @Override
-  public List<MailAttachment> getAttachments() {
-    return mapAttachments(super.getAttachments());
+  public List<? extends MailAttachment> getAttachments() {
+    return Collections.unmodifiableList(m_attachments);
   }
 
   /**
@@ -239,7 +250,7 @@ public class MailMessage extends org.eclipse.scout.rt.mail.MailMessage {
    * @param attachment
    */
   public MailMessage withAttachment(MailAttachment attachment) {
-    super.withAttachment(attachment);
+    m_attachments.add(attachment);
     return this;
   }
 
@@ -248,52 +259,16 @@ public class MailMessage extends org.eclipse.scout.rt.mail.MailMessage {
    *
    * @param attachments
    */
-  @Override
-  public MailMessage withAttachments(Collection<? extends org.eclipse.scout.rt.mail.MailAttachment> attachments) {
-    super.withAttachments(attachments);
+  public MailMessage withAttachments(Collection<? extends MailAttachment> attachments) {
+    m_attachments.addAll(attachments);
     return this;
   }
 
   /**
    * Clears the attachment list.
    */
-  @Override
   public MailMessage clearAttachments() {
-    super.clearAttachments();
+    m_attachments.clear();
     return this;
-  }
-
-  protected List<MailParticipant> mapParticipant(List<? extends org.eclipse.scout.rt.mail.MailParticipant> mailParticipants) {
-    if (mailParticipants == null) {
-      return null;
-    }
-
-    return mailParticipants.stream().map(mailParticipant -> map(mailParticipant)).collect(Collectors.toList());
-  }
-
-  protected MailParticipant map(org.eclipse.scout.rt.mail.MailParticipant mailParticipant) {
-    if (mailParticipant == null) {
-      return null;
-    }
-
-    return BEANS.get(MailParticipant.class)
-        .withName(mailParticipant.getName())
-        .withEmail(mailParticipant.getEmail());
-  }
-
-  protected List<MailAttachment> mapAttachments(List<? extends org.eclipse.scout.rt.mail.MailAttachment> attachments) {
-    if (attachments == null) {
-      return null;
-    }
-
-    return attachments.stream().map(attachment -> mapAttachment(attachment)).collect(Collectors.toList());
-  }
-
-  protected MailAttachment mapAttachment(org.eclipse.scout.rt.mail.MailAttachment attachment) {
-    if (attachment == null) {
-      return null;
-    }
-
-    return new MailAttachment(attachment);
   }
 }

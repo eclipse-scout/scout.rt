@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpSubjectPrefixPrope
 import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpUseAuthenticationProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpUseSmtpsProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpUsernameProperty;
-import org.eclipse.scout.rt.shared.mail.MailHelper;
+import org.eclipse.scout.rt.mail.MailHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

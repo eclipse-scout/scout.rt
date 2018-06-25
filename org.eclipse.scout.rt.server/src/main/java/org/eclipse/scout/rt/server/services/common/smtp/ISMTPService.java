@@ -14,7 +14,7 @@ import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.eclipse.scout.rt.platform.service.IService;
-import org.eclipse.scout.rt.shared.mail.MailHelper;
+import org.eclipse.scout.rt.mail.MailHelper;
 
 /**
  * The service to send messages over the smtp protocol.

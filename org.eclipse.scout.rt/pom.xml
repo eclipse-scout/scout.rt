@@ -53,6 +53,9 @@
     <module>../org.eclipse.scout.rt.mom.jms</module>
     <module>../org.eclipse.scout.rt.mom.jms.test</module>
 
+    <module>../org.eclipse.scout.rt.mail</module>
+    <module>../org.eclipse.scout.rt.mail.test</module>
+
     <module>../org.eclipse.scout.rt.rest</module>
     <module>../org.eclipse.scout.rt.rest.test</module>
     <module>../org.eclipse.scout.rt.jackson</module>
@@ -255,6 +258,17 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.mom.jms.test</artifactId>
+        <version>8.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.mail</artifactId>
+        <version>8.0.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.mail.test</artifactId>
         <version>8.0.0-SNAPSHOT</version>
       </dependency>
 
