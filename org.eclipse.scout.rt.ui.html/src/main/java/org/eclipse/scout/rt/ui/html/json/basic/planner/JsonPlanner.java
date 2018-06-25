@@ -455,7 +455,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonWid
 
   @SuppressWarnings("unchecked")
   protected void handleUiSelectedActivityChange(JSONObject data) {
-    String activityId = data.optString("selectedActivity");
+    String activityId = data.optString("selectedActivity", null);
     Activity<?, ?> selectedActivity = getActivity(activityId);
     addPropertyEventFilterCondition(IPlanner.PROP_SELECTED_ACTIVITY, selectedActivity);
     getModel().getUIFacade().setSelectedActivityFromUI(selectedActivity);

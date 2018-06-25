@@ -125,7 +125,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
 
   protected void handleUiHistoryEntryActivate(JsonEvent event) {
     addPropertyEventFilterCondition(m_browserHistoryFilter);
-    String deepLinkPath = event.getData().optString("deepLinkPath");
+    String deepLinkPath = event.getData().optString("deepLinkPath", null);
     getModel().getUIFacade().historyEntryActivateFromUI(deepLinkPath);
   }
 

@@ -734,7 +734,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     addTableEventFilterCondition(TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED);
     IColumn column = extractColumn(event.getData());
     Assertions.assertInstance(column, INumberColumn.class, "BackgroundEffect can only be specified on numeric columns");
-    getModel().getUIFacade().setColumnBackgroundEffect((INumberColumn<?>) column, event.getData().optString("backgroundEffect"));
+    getModel().getUIFacade().setColumnBackgroundEffect((INumberColumn<?>) column, event.getData().optString("backgroundEffect", null));
   }
 
   protected void handleUiColumnMoved(JsonEvent event) {

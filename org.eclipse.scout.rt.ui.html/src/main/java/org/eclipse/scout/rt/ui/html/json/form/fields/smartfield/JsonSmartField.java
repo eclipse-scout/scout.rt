@@ -229,7 +229,7 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
 
   @SuppressWarnings("unchecked")
   protected VALUE valueFromJsonValue(JSONObject data) {
-    return (VALUE) jsonToValue(data.optString(IValueField.PROP_VALUE));
+    return (VALUE) jsonToValue(data.optString(IValueField.PROP_VALUE, null));
   }
 
   protected VALUE valueFromJsonLookupRow(JSONObject data) {
@@ -306,13 +306,13 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
   }
 
   protected void handleUiLookupByRec(JsonEvent event) {
-    String mappedParentKey = event.getData().optString("rec");
+    String mappedParentKey = event.getData().optString("rec", null);
     VALUE rec = getLookupRowKeyForId(mappedParentKey);
     getModel().lookupByRec(rec);
   }
 
   protected void handleUiLookupByKey(JsonEvent event) {
-    String mappedKey = event.getData().optString("key");
+    String mappedKey = event.getData().optString("key", null);
     VALUE key = getLookupRowKeyForId(mappedKey);
     getModel().lookupByKey(key);
   }
@@ -365,7 +365,7 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
       return null;
     }
 
-    VALUE lookupRowKey = getLookupRowKeyForId(json.optString("key"));
+    VALUE lookupRowKey = getLookupRowKeyForId(json.optString("key", null));
     String lookupRowText = json.optString("text");
     return createLookupRow(lookupRowKey, lookupRowText, json);
   }
@@ -373,31 +373,31 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
   protected ILookupRow<VALUE> createLookupRow(VALUE key, String text, JSONObject json) {
     LookupRow<VALUE> lookupRow = new LookupRow<>(key, text);
     if (json.has("iconId")) {
-      lookupRow.withIconId(json.getString("iconId"));
+      lookupRow.withIconId(json.optString("iconId", null));
     }
     if (json.has("enabled")) {
       lookupRow.withEnabled(json.getBoolean("enabled"));
     }
     if (json.has("tooltipText")) {
-      lookupRow.withTooltipText(json.getString("tooltipText"));
+      lookupRow.withTooltipText(json.optString("tooltipText", null));
     }
     if (json.has("backgroundColor")) {
-      lookupRow.withBackgroundColor(json.getString("backgroundColor"));
+      lookupRow.withBackgroundColor(json.optString("backgroundColor", null));
     }
     if (json.has("foregroundColor")) {
-      lookupRow.withForegroundColor(json.getString("foregroundColor"));
+      lookupRow.withForegroundColor(json.optString("foregroundColor", null));
     }
     if (json.has("font")) {
-      lookupRow.withFont(json.getString("font"));
+      lookupRow.withFont(json.optString("font", null));
     }
     if (json.has("parentKey")) {
-      lookupRow.withParentKey(getLookupRowKeyForId(json.optString("parentKey")));
+      lookupRow.withParentKey(getLookupRowKeyForId(json.optString("parentKey", null)));
     }
     if (json.has("active")) {
       lookupRow.withActive(json.getBoolean("active"));
     }
     if (json.has("cssClass")) {
-      lookupRow.withCssClass(json.getString("cssClass"));
+      lookupRow.withCssClass(json.optString("cssClass", null));
     }
     // Info: cannot de-serialize 'additionalTableRowData' because it uses generic
     // JSON serialization. See JsonLookupRow#tableRowDataToJson - this shouldn't
