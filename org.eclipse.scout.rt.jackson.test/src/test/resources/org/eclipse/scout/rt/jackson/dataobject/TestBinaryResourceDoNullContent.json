@@ -1,0 +1,14 @@
+{
+  "_type" : "TestBinaryResource",
+  "brDefault" : {
+    "content" : null,
+    "contentLength" : -1,
+    "lastModified" : -1,
+    "contentType" : "image/jpeg",
+    "filename" : "unicorn.jpg",
+    "charset" : null,
+    "fingerprint" : -1,
+    "cachingAllowed" : false,
+    "cacheMaxAge" : 0
+  }
+}

@@ -123,6 +123,11 @@ public class JsonDataObjectsSerializationTest {
       .withFilename("unicorn.jpg")
       .build();
 
+  protected static final BinaryResource BINARY_RESOURCE_NULL_CONTENT = BinaryResources.create()
+      .withContentType("image/jpeg")
+      .withFilename("unicorn.jpg")
+      .build();
+
   protected static DataObjectSerializationTestHelper s_testHelper;
   protected static DataObjectHelper s_dataObjectHelper;
 
@@ -291,12 +296,21 @@ public class JsonDataObjectsSerializationTest {
     s_dataObjectMapper.readValue(expectedJson, TestDateDo.class);
   }
 
-  // FIXME [awe] imex - write test for BinaryResource, also add a raw test expect only a DoEntity (JSON without _type)
   @Test
   public void testSerialize_BinaryResource() throws Exception {
     TestBinaryResourceDo testDo = BEANS.get(TestBinaryResourceDo.class).withBrDefault(BINARY_RESOURCE);
     String json = s_dataObjectMapper.writeValueAsString(testDo);
     assertJsonEquals("TestBinaryResourceDo.json", json);
+
+    TestBinaryResourceDo pojoMarshalled = s_dataObjectMapper.readValue(json, TestBinaryResourceDo.class);
+    assertEquals(testDo.getBrDefault(), pojoMarshalled.getBrDefault());
+  }
+
+  @Test
+  public void testSerialize_BinaryResource_NullContent() throws Exception {
+    TestBinaryResourceDo testDo = BEANS.get(TestBinaryResourceDo.class).withBrDefault(BINARY_RESOURCE_NULL_CONTENT);
+    String json = s_dataObjectMapper.writeValueAsString(testDo);
+    assertJsonEquals("TestBinaryResourceDoNullContent.json", json);
 
     TestBinaryResourceDo pojoMarshalled = s_dataObjectMapper.readValue(json, TestBinaryResourceDo.class);
     assertEquals(testDo.getBrDefault(), pojoMarshalled.getBrDefault());
@@ -310,6 +324,16 @@ public class JsonDataObjectsSerializationTest {
 
     String json = s_dataObjectMapper.writeValueAsString(testDo);
     assertJsonEquals("TestBinaryResourceDo.json", json);
+  }
+
+  @Test
+  public void testDeserialize_BinaryResource_NullContent() throws Exception {
+    String inputJson = readResourceAsString("TestBinaryResourceDoNullContent.json");
+    TestBinaryResourceDo testDo = s_dataObjectMapper.readValue(inputJson, TestBinaryResourceDo.class);
+    assertEquals(BINARY_RESOURCE_NULL_CONTENT, testDo.getBrDefault());
+
+    String json = s_dataObjectMapper.writeValueAsString(testDo);
+    assertJsonEquals("TestBinaryResourceDoNullContent.json", json);
   }
 
   @Test
