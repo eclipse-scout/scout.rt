@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form;
 
+import java.security.AccessController;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -17,6 +19,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
@@ -32,12 +36,14 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.platform.html.HTML;
+import org.eclipse.scout.rt.platform.html.IHtmlContent;
 import org.eclipse.scout.rt.platform.html.IHtmlElement;
 import org.eclipse.scout.rt.platform.html.IHtmlTable;
 import org.eclipse.scout.rt.platform.html.IHtmlTableRow;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.text.TEXTS;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.OfficialVersion;
@@ -75,17 +81,17 @@ public class ScoutInfoForm extends AbstractForm {
   }
 
   protected String createHtmlBody() {
-    final IHtmlElement html = HTML.div(
+    final IHtmlContent html = HTML.div(
         createLogoHtml(),
-        createTitleHtml(),
-        createHtmlTable(getProperties()));
+        HTML.div(createTitleHtml(), createHtmlTable(getProperties())).cssClass("scout-info-form-text-container"))
+        .cssClass("scout-info-form-container");
     return html.toHtml();
   }
 
   protected IHtmlElement createLogoHtml() {
     IconSpec logo = IconLocator.instance().getIconSpec(AbstractIcons.ApplicationLogo);
     if (logo != null) {
-      return HTML.p(HTML.imgByIconId(AbstractIcons.ApplicationLogo).cssClass("scout-info-form-logo"));
+      return HTML.div(HTML.imgByIconId(AbstractIcons.ApplicationLogo).cssClass("scout-info-form-logo")).cssClass("scout-info-form-logo-container");
     }
     return null;
   }
@@ -93,7 +99,8 @@ public class ScoutInfoForm extends AbstractForm {
   protected IHtmlElement createTitleHtml() {
     String title = StringUtility.join(" ", getProductName(), getProductVersion());
     if (StringUtility.hasText(title)) {
-      return HTML.h2(title);
+      // Set as form title instead of including in the info HTML
+      setTitle(title);
     }
     return null;
   }
@@ -108,7 +115,18 @@ public class ScoutInfoForm extends AbstractForm {
 
   protected Map<String, Object> getProperties() {
     Map<String, Object> props = new LinkedHashMap<>();
-    props.put(TEXTS.get("Username"), ClientSessionProvider.currentSession().getUserId());
+    String userId = ClientSessionProvider.currentSession().getUserId();
+    if (!StringUtility.hasText(userId)) {
+      try {
+        Subject subject = Subject.getSubject(AccessController.getContext());
+        Principal firstPrincipal = CollectionUtility.firstElement(subject.getPrincipals());
+        userId = firstPrincipal.getName();
+      }
+      catch (Exception e) { // NOSONAR (ignore exception)
+        userId = "-";
+      }
+    }
+    props.put(TEXTS.get("Username"), userId);
 
     Locale locale = NlsLocale.get();
     props.put(TEXTS.get("Language"), locale.getDisplayLanguage(locale));
@@ -122,18 +140,23 @@ public class ScoutInfoForm extends AbstractForm {
     for (Entry<String, ?> p : properties.entrySet()) {
       rows.add(createHtmlRow(p.getKey(), p.getValue()));
     }
-    return HTML.table(rows);
+    return HTML.table(rows).cssClass("scout-info-form-table");
   }
 
   protected IHtmlTableRow createHtmlRow(String property, Object value) {
     return HTML.tr(
-        HTML.td(StringUtility.emptyIfNull(StringUtility.box("", property, ":"))),
-        HTML.td(StringUtility.emptyIfNull(value)));
+        HTML.td(StringUtility.emptyIfNull(StringUtility.box("", property, ":"))).cssClass("scout-info-form-table-cell-description"),
+        HTML.td(StringUtility.emptyIfNull(value)).cssClass("scout-info-form-table-cell-value"));
   }
 
   @Order(10)
   @ClassId("794bf4a4-727b-44f3-a2eb-2d2187110036")
   public class MainBox extends AbstractGroupBox {
+
+    @Override
+    protected int getConfiguredWidthInPixel() {
+      return 450;
+    }
 
     @Order(10)
     @ClassId("e5b5d699-9e8a-49c7-84ea-128289f1e616")

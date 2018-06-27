@@ -8,7 +8,37 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+.scout-info-form-container {
+  width: 100%;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  display: flex;
+}
+
+.scout-info-form-logo-container {
+  flex: none;
+}
+
+.scout-info-form-text-container {
+  flex-grow: 1;
+}
+
 .scout-info-form-logo {
-  /* TODO [7.0] bsh: How to set height/width? */
-  margin-bottom: 20px;
+  display: inline-block;
+  max-height: 100px;
+  max-width: 200px;
+  margin-right: 20px;
+}
+
+.scout-info-form-table {
+  border-spacing: 0;
+}
+
+.scout-info-form-table-cell-description {
+  padding-right: 10px;
+  vertical-align: top;
+}
+
+.scout-info-form-table-cell-value {
+  vertical-align: top;
 }
