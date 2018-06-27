@@ -86,73 +86,73 @@
   &:active:not(.disabled),
   .date-picker:not(.touch) &:hover:not(.disabled) {
     & > .text {
-      border-color: @item-selection-border-color;
-      background-color: @palette-blue-0;
+      border-color: @date-picker-day-hover-border-color;
+      background-color: @date-picker-day-hover-background-color;
     }
 
     &.date-picker-now > .text {
-      border-color: @highlight-color;
-      background-color: @palette-orange-0;
+      border-color: @date-picker-now-hover-border-color;
+      background-color: @date-picker-now-hover-background-color;
     }
 
     &.selected {
       & > .text {
-        background-color: @palette-blue-4;
+        background-color: @date-picker-day-hover-selected-background-color;
       }
 
       &.date-picker-now > .text {
-        background-color: @palette-orange-3;
+        background-color: @date-picker-now-hover-selected-background-color;
       }
     }
   }
 
   &.date-picker-out {
-    color: @palette-gray-5;
+    color: @date-picker-out-color;
   }
 
   &.date-picker-weekend {
-    color: @palette-blue-6;
+    color: @date-picker-weekend-color;
   }
 
   &.date-picker-out-weekend {
-    color: @palette-blue-2 ;
+    color: @date-picker-out-weekend-color;
   }
 
   &.date-picker-now {
-    color: @highlight-color;
+    color: @date-picker-now-color;
     font-weight: bold;
   }
 
   &.preselected {
     & > .text {
-      border-color: @item-selection-border-color;
+      border-color: @date-picker-day-preselected-border-color;
       border-style: dashed;
     }
 
     &.date-picker-now > .text {
-      border-color: @highlight-color;
+      border-color: @date-picker-now-preselected-border-color;
     }
   }
 
   &.selected {
-    color: @palette-white;
+    color: @date-picker-day-selected-color;
 
     & > .text{
-      background-color: @item-selection-border-color;
+      background-color: @date-picker-day-selected-background-color;
     }
 
     &.date-picker-now {
-      color: @palette-white;
+      color: @date-picker-now-selected-color;
 
       & > .text {
-        background-color: @highlight-color;
+        background-color: @date-picker-now-selected-background-color;
       }
     }
   }
 
   /* Must be after other style definitions, because 'disabled' should overrule other definitions */
   &.disabled {
-    color: @palette-gray-5;
+    color: @date-picker-day-disabled-color;
   }
 }
 
