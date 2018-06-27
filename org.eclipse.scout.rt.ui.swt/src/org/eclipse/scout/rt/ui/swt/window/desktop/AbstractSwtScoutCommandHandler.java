@@ -127,7 +127,7 @@ public abstract class AbstractSwtScoutCommandHandler extends AbstractHandler {
   }
 
   protected void handlePropertyChanged(PropertyChangeEvent e) {
-    if (IAction.PROP_ENABLED == e.getPropertyName()) {
+    if (IAction.PROP_ENABLED.equals(e.getPropertyName())) {
       fireHandlerChanged(new HandlerEvent(this, true, false));
     }
   }
