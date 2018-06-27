@@ -19,7 +19,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,11 +64,11 @@ public class ScoutXmlDocument implements Serializable {
   private static final int INITIAL_NAMESPACE_MAP_SIZE = 5;
 
   private final static Pattern[] COMPILED_REGEX_PATTERNS = new Pattern[]{
-      Pattern.compile("(\\*)|(\\{\\*\\}\\*)|(\\*:\\*)"),
-      Pattern.compile("(\\{\\*\\}.*)|(\\*:.*)"),
-      Pattern.compile("\\{.*\\}\\*"),
-      Pattern.compile(".*:\\*"),
-      Pattern.compile("\\{.*\\}.*")};
+    Pattern.compile("(\\*)|(\\{\\*\\}\\*)|(\\*:\\*)"),
+    Pattern.compile("(\\{\\*\\}.*)|(\\*:.*)"),
+    Pattern.compile("\\{.*\\}\\*"),
+    Pattern.compile(".*:\\*"),
+    Pattern.compile("\\{.*\\}.*")};
 
   public static final Hashtable<String, String> XML_ENTITIES;
 
@@ -509,14 +508,18 @@ public class ScoutXmlDocument implements Serializable {
   @Override
   public String toString() {
     try {
-      StringWriter writer = new StringWriter();
-      this.write(writer);
-      writer.close();
-
-      return writer.toString();
+      StringWriter stringWriter = new StringWriter();
+      BufferedWriter bufferedWriter = new BufferedWriter(stringWriter);
+      try {
+        this.write(bufferedWriter);
+      }
+      finally {
+        bufferedWriter.close();
+      }
+      return stringWriter.toString();
     }
-    catch (Exception exception) {
-      return null;
+    catch (IOException exception) {
+      return "<an error occured during converting to string>";
     }
   }
 
@@ -524,7 +527,13 @@ public class ScoutXmlDocument implements Serializable {
    * @since 1.0
    */
   public File write(File file) throws IOException {
-    this.write(new FileOutputStream(file));
+    FileOutputStream os = new FileOutputStream(file);
+    try {
+      this.write(os);
+    }
+    finally {
+      os.close();
+    }
     return file;
   }
 
@@ -532,22 +541,19 @@ public class ScoutXmlDocument implements Serializable {
    * @since 1.0
    */
   public void write(OutputStream stream) throws IOException {
-    this.write(new BufferedWriter(new OutputStreamWriter(stream, m_xmlEncoding)));
+    BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(stream, m_xmlEncoding));
+    try {
+      this.write(bufferedWriter);
+    }
+    finally {
+      bufferedWriter.close();
+    }
   }
 
   /**
    * @since 1.0
    */
-  private void write(Writer writer) throws IOException {
-    BufferedWriter bufferedWriter = null;
-
-    if (writer instanceof BufferedWriter) {
-      bufferedWriter = (BufferedWriter) writer;
-    }
-    else {
-      bufferedWriter = new BufferedWriter(writer);
-    }
-
+  private void write(BufferedWriter bufferedWriter) throws IOException {
     bufferedWriter.write("<?xml version=\"" + m_xmlVersion + "\" encoding=\"" + m_xmlEncoding + "\"?>");
 
     if (ScoutXmlDocument.this.isPrettyPrint()) {
@@ -648,7 +654,7 @@ public class ScoutXmlDocument implements Serializable {
     /**
      * @since 1.0
      */
-    public abstract void write(Writer writer) throws IOException;
+    public abstract void write(BufferedWriter writer) throws IOException;
   }
 
   private class P_NodeCounter extends P_AbstractNodeVisitor<Integer> implements Serializable {
@@ -2531,7 +2537,13 @@ public class ScoutXmlDocument implements Serializable {
     public String export() {
       try {
         StringWriter stringWriter = new StringWriter();
-        this.write(stringWriter);
+        BufferedWriter bufferedWriter = new BufferedWriter(stringWriter);
+        try {
+          this.write(bufferedWriter);
+        }
+        finally {
+          bufferedWriter.close();
+        }
         return stringWriter.toString();
       }
       catch (IOException exception) {
@@ -2599,16 +2611,7 @@ public class ScoutXmlDocument implements Serializable {
      * @since 1.0
      */
     @Override
-    public void write(Writer writer) throws IOException {
-      BufferedWriter bufferedWriter = null;
-
-      if (writer instanceof BufferedWriter) {
-        bufferedWriter = (BufferedWriter) writer;
-      }
-      else {
-        bufferedWriter = new BufferedWriter(writer);
-      }
-
+    public void write(BufferedWriter bufferedWriter) throws IOException {
       this.write(bufferedWriter, "");
       bufferedWriter.flush();
     }
@@ -2884,7 +2887,13 @@ public class ScoutXmlDocument implements Serializable {
       public String toString() {
         try {
           StringWriter stringWriter = new StringWriter();
-          this.write(stringWriter);
+          BufferedWriter bufferedWriter = new BufferedWriter(stringWriter);
+          try {
+            this.write(bufferedWriter);
+          }
+          finally {
+            bufferedWriter.close();
+          }
           return stringWriter.toString();
         }
         catch (IOException exception) {
@@ -2896,15 +2905,7 @@ public class ScoutXmlDocument implements Serializable {
        * @since 1.0
        */
       @Override
-      public void write(Writer writer) throws IOException {
-        BufferedWriter bufferedWriter = null;
-
-        if (writer instanceof BufferedWriter) {
-          bufferedWriter = (BufferedWriter) writer;
-        }
-        else {
-          bufferedWriter = new BufferedWriter(writer);
-        }
+      public void write(BufferedWriter bufferedWriter) throws IOException {
 
         bufferedWriter.write(m_nameRegistry.getValueAsString(m_nameID));
         bufferedWriter.write('=');
