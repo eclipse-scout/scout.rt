@@ -631,7 +631,10 @@ scout.Session.prototype._requestToJson = function(request) {
 };
 
 scout.Session.prototype._callAjax = function(callOptions) {
-  var ajaxCall = scout.create('AjaxCall', $.extend({}, callOptions, this.ajaxCallOptions), {
+  var defaultOptions = {
+    retryIntervals: [100, 500, 500, 500]
+  };
+  var ajaxCall = scout.create('AjaxCall', $.extend(defaultOptions, callOptions, this.ajaxCallOptions), {
     ensureUniqueId: false
   });
   this.registerAjaxCall(ajaxCall);

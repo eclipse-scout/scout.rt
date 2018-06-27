@@ -14,8 +14,9 @@
  * by a subclass by overriding the _callImpl() method.
  */
 scout.Call = function() {
-  // Delays between retries (from left to right). The call eventually fails when this list gets empty.
-  this.retryIntervals = [100, 500, 500, 500]; // ms
+  // Delays in ms between retries (from left to right). The call eventually fails when this list gets empty.
+  // Example: [100, 500, 500, 500]
+  this.retryIntervals = [];
 
   // Minimal assumed call duration (throttles consecutive calls)
   this.minCallDuration = 500; // ms

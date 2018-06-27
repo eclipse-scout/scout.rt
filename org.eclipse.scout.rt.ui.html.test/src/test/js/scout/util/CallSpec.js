@@ -43,6 +43,7 @@ describe('scout.Call', function() {
 
   var FailOnFirstTryCall = function() {
     FailOnFirstTryCall.parent.call(this);
+    this.maxRetries = 5;
   };
   scout.inherits(FailOnFirstTryCall, scout.Call);
   FailOnFirstTryCall.prototype._callImpl = function() {
