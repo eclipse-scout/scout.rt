@@ -9,19 +9,19 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 describe('Action', function() {
-  var $sandbox, session, action;
+  var $sandbox, session;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
     $sandbox = $('#sandbox');
-    action = new scout.Action();
-    action.init(createSimpleModel('Action', session));
   });
 
   describe('defaults', function() {
 
     it('should be as expected', function() {
+      var action = new scout.Action();
+      action.init(createSimpleModel('Action', session));
       expect(action.tabbable).toBe(false);
       expect(action.actionStyle).toBe(scout.Action.ActionStyle.DEFAULT);
     });
@@ -31,6 +31,8 @@ describe('Action', function() {
   describe('setTabbable', function() {
 
     it('should modify $container tabindex', function() {
+      var action = new scout.Action();
+      action.init(createSimpleModel('Action', session));
       // because Action is 'abstract' and has no _render method yet
       // but _renderProperties() is called anyway
       action.$container = $sandbox;
@@ -43,5 +45,55 @@ describe('Action', function() {
 
   });
 
+  describe('key stroke', function() {
+
+    it('triggers action', function() {
+      var action = scout.create('Action', {
+        parent: session.desktop,
+        keyStroke: 'ctrl-x'
+      });
+      session.desktop.keyStrokeContext.registerKeyStroke(action);
+      action.render();
+      var executed = 0;
+      action.on('action', function(event) {
+        executed++;
+      });
+
+      expect(executed).toBe(0);
+      session.desktop.$container.triggerKeyInputCapture(scout.keys.X, 'ctrl');
+      expect(executed).toBe(1);
+    });
+
+    it('is not triggered if another action with the same key stroke handled it first', function() {
+      var action = scout.create('Action', {
+        parent: session.desktop,
+        keyStroke: 'ctrl-x'
+      });
+      session.desktop.keyStrokeContext.registerKeyStroke(action);
+      var actionExecuted = 0;
+      action.on('action', function(event) {
+        actionExecuted++;
+      });
+      action.render();
+
+      var action2 = scout.create('Action', {
+        parent: session.desktop,
+        keyStroke: 'ctrl-x'
+      });
+      session.desktop.keyStrokeContext.registerKeyStroke(action2);
+      var action2Executed = 0;
+      action2.on('action', function(event) {
+        action2Executed++;
+      });
+      action2.render();
+
+      expect(actionExecuted).toBe(0);
+      expect(action2Executed).toBe(0);
+      session.desktop.$container.triggerKeyInputCapture(scout.keys.X, 'ctrl');
+      expect(actionExecuted).toBe(1);
+      expect(action2Executed).toBe(0);
+    });
+
+  });
 
 });

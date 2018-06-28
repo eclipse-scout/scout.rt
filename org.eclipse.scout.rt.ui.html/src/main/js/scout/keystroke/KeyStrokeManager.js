@@ -86,6 +86,7 @@ scout.KeyStrokeManager.prototype.uninstallKeyStrokeContext = function(keyStrokeC
  */
 scout.KeyStrokeManager.prototype._renderKeys = function(keyStrokeContext, event) {
   var descendantContexts = event.originalEvent.keyStrokeContexts || [];
+  var immediatePropagationStoppedKeys = [];
 
   keyStrokeContext.keyStrokes
     .filter(function(keyStroke) {
@@ -95,14 +96,17 @@ scout.KeyStrokeManager.prototype._renderKeys = function(keyStrokeContext, event)
     .forEach(function(keyStroke) {
       var $drawingArea = (keyStroke.field ? keyStroke.field.$container : null) || keyStrokeContext.$getScopeTarget(); // Precedence: keystroke's field container, or the scope target otherwise.
       var keys = keyStroke.keys(); // Get all keys which are handled by the keystroke. Typically, this is a single key.
-
       keys.forEach(function(key) {
         var virtualKeyStrokeEvent = new scout.VirtualKeyStrokeEvent(key.which, key.ctrl, key.alt, key.shift, key.keyStrokeMode, event.target);
 
-        if (keyStrokeContext.accept(virtualKeyStrokeEvent) &&
+        if (immediatePropagationStoppedKeys.indexOf(key.toKeyStrokeString()) < 0 && keyStrokeContext.accept(virtualKeyStrokeEvent) &&
           keyStroke.accept(virtualKeyStrokeEvent) && !this._isPreventedByDescendantContext(key, event.target, descendantContexts)) {
           if (key.render($drawingArea, virtualKeyStrokeEvent)) {
             this._renderedKeys.push(key);
+          }
+          // If immediate propagation is stopped, key strokes on the same level which react to the same key won't be executed -> make sure they won't be displayed either
+          if (virtualKeyStrokeEvent.isImmediatePropagationStopped()) {
+            immediatePropagationStoppedKeys.push(key.toKeyStrokeString());
           }
         }
       }, this);
