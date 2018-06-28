@@ -230,19 +230,6 @@ public final class ServerConfigProperties {
     }
   }
 
-  public static class SmtpDebugReceiverEmailProperty extends AbstractStringConfigProperty {
-
-    @Override
-    public String getKey() {
-      return "scout.smtp.debugReceiverEmail";
-    }
-
-    @Override
-    public String description() {
-      return "If specified all emails are sent to this address instead of the real one. This may be useful during development to not send emails to real users by accident.";
-    }
-  }
-
   public static class SmtpSslProtocolsProperty extends AbstractStringConfigProperty {
 
     @Override

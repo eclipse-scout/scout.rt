@@ -541,6 +541,66 @@ public class MailHelperTest {
     assertFalse(mailHelper.isEmailAddressValid("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@example.com"));
   }
 
+  @Test
+  public void testEnsureFromAddressWithoutFromAndDefaultFrom() throws MessagingException {
+    MailMessage mailMessage = BEANS.get(MailMessage.class)
+        .withBodyPlainText("lorem");
+
+    MimeMessage message = BEANS.get(MailHelper.class).createMimeMessage(mailMessage);
+    BEANS.get(MailHelper.class).ensureFromAddress(message, null);
+
+    assertNull("No 'from'", message.getFrom());
+  }
+
+  @Test
+  public void testEnsureFromAddressWithoutFromButDefaultFrom() throws MessagingException {
+    MailMessage mailMessage = BEANS.get(MailMessage.class)
+        .withBodyPlainText("lorem");
+
+    MimeMessage message = BEANS.get(MailHelper.class).createMimeMessage(mailMessage);
+    BEANS.get(MailHelper.class).ensureFromAddress(message, "default@example.org");
+
+    assertNotNull("No 'from'", message.getFrom());
+    assertEquals("Number of 'from' is wrong", 1, message.getFrom().length);
+    assertEquals("Wrong 'from'", "default@example.org", ((InternetAddress) message.getFrom()[0]).getAddress());
+  }
+
+  @Test
+  public void testEnsureFromAddressWithFrom() throws MessagingException {
+    MailMessage mailMessage = BEANS.get(MailMessage.class)
+        .withBodyPlainText("lorem")
+        .withSender(BEANS.get(MailParticipant.class).withEmail("sender@example.org"));
+
+    MimeMessage message = BEANS.get(MailHelper.class).createMimeMessage(mailMessage);
+    BEANS.get(MailHelper.class).ensureFromAddress(message, "default@example.org");
+
+    assertNotNull("No 'from'", message.getFrom());
+    assertEquals("Number of 'from' is wrong", 1, message.getFrom().length);
+    assertEquals("Wrong 'from'", "sender@example.org", ((InternetAddress) message.getFrom()[0]).getAddress());
+  }
+
+  @Test
+  public void testAddPrefixToSubject() throws MessagingException {
+    BEANS.get(MailHelper.class).addPrefixToSubject(null, null);
+    verifyAddPrefixToSubject(null, null, null);
+    verifyAddPrefixToSubject("subject", null, "subject");
+    verifyAddPrefixToSubject(null, "prefix", "prefix");
+    verifyAddPrefixToSubject("subject", "prefix", "prefixsubject");
+    verifyAddPrefixToSubject("lorem", "lorem", "lorem"); // no adding of prefix is subject already starts with prefix
+
+  }
+
+  protected void verifyAddPrefixToSubject(String messageSubject, String subjectPrefix, String expectedSubject) throws MessagingException {
+    MailMessage mailMessage = BEANS.get(MailMessage.class)
+        .withSubject(messageSubject)
+        .withBodyPlainText("lorem");
+
+    MimeMessage message = BEANS.get(MailHelper.class).createMimeMessage(mailMessage);
+
+    BEANS.get(MailHelper.class).addPrefixToSubject(message, subjectPrefix);
+    assertEquals("Subject is wrong", expectedSubject, message.getSubject());
+  }
+
   /**
    * Verifies the following properties of the mime message:
    * <ul>

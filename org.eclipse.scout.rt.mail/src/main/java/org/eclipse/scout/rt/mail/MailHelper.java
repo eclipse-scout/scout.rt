@@ -29,6 +29,7 @@ import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.activation.MimetypesFileTypeMap;
+import javax.mail.Address;
 import javax.mail.BodyPart;
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
@@ -45,6 +46,7 @@ import javax.mail.internet.MimeUtility;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -726,6 +728,53 @@ public class MailHelper {
     }
     catch (AddressException | IllegalArgumentException e) {
       return false;
+    }
+  }
+
+  /**
+   * If {@link MimeMessage#getFrom()} contains no addresses, default from email is used instead.
+   */
+  public void ensureFromAddress(MimeMessage message, String defaultFromEmail) {
+    try {
+      Address[] fromAddresses = message.getFrom();
+      if (fromAddresses != null && fromAddresses.length != 0) {
+        // From address is already set
+        return;
+      }
+
+      if (StringUtility.hasText(defaultFromEmail)) {
+        message.setFrom(BEANS.get(MailHelper.class).createInternetAddress(defaultFromEmail));
+      }
+    }
+    catch (MessagingException e) {
+      throw new ProcessingException("Couldn't apply 'default from' to message", e);
+    }
+  }
+
+  /**
+   * Prepends the subject prefix to the existing subject if the subject doesn't already starts with the subject prefix.
+   * <p>
+   * If the subject prefix has not text, nothing is added. If there is no subject yet, the new subject is the subject
+   * prefix.
+   *
+   * @param message
+   *          Message to add the prefix to ({@link MimeMessage#getSubject()}.
+   * @param subjectPrefix
+   *          Subject prefix to add.
+   */
+  public void addPrefixToSubject(MimeMessage message, String subjectPrefix) {
+    if (message == null) {
+      return;
+    }
+
+    try {
+      String messageSubject = message.getSubject();
+      if (StringUtility.hasText(subjectPrefix) && !StringUtility.startsWith(messageSubject, subjectPrefix)) {
+        message.setSubject(StringUtility.join("", subjectPrefix, messageSubject), StandardCharsets.UTF_8.name());
+      }
+    }
+    catch (MessagingException e) {
+      throw new ProcessingException("Couldn't add the prefix to the message's subject", e);
     }
   }
 }

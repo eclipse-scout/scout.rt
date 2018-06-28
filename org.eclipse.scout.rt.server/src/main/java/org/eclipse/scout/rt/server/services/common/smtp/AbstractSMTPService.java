@@ -10,21 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.smtp;
 
-import java.util.Properties;
-
-import javax.mail.Address;
 import javax.mail.Session;
-import javax.mail.Transport;
 import javax.mail.internet.MimeMessage;
 
+import org.eclipse.scout.rt.mail.MailHelper;
+import org.eclipse.scout.rt.mail.smtp.SmtpHelper;
+import org.eclipse.scout.rt.mail.smtp.SmtpHelper.SmtpDebugReceiverEmailProperty;
+import org.eclipse.scout.rt.mail.smtp.SmtpServerConfig;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpDebugReceiverEmailProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpDefaultFromEmailProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpHostProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpPasswordProperty;
@@ -34,35 +31,30 @@ import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpSubjectPrefixPrope
 import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpUseAuthenticationProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpUseSmtpsProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpUsernameProperty;
-import org.eclipse.scout.rt.mail.MailHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+/**
+ * @deprecated See {@link ISMTPService}.
+ */
+@SuppressWarnings("deprecation")
+@Deprecated
 public abstract class AbstractSMTPService implements ISMTPService {
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractSMTPService.class);
 
-  private final String m_host;
-  private final int m_port;
-  private final String m_username;
-  private final String m_password;
-  private final boolean m_useAuthentication;
-  private String m_debugReceiverEmail;
   private final String m_subjectPrefix;
-  public final String m_defaultFromEmail;
-  private final String m_sslProtocols;
-  private final boolean m_useSmtps;
+  private final String m_defaultFromEmail;
+  private final SmtpServerConfig m_smtpServerConfig;
 
   public AbstractSMTPService() {
-    m_host = getPropertyValue(SmtpHostProperty.class, getConfiguredHost());
-    m_port = getPropertyValue(SmtpPortProperty.class, getConfiguredPort());
-    m_username = getPropertyValue(SmtpUsernameProperty.class, getConfiguredUsername());
-    m_password = getPropertyValue(SmtpPasswordProperty.class, getConfiguredPassword());
-    m_useAuthentication = getPropertyValue(SmtpUseAuthenticationProperty.class, getConfiguredUseAuthentication());
-    m_debugReceiverEmail = getPropertyValue(SmtpDebugReceiverEmailProperty.class, getConfiguredDefaultFromEmail());
     m_subjectPrefix = getPropertyValue(SmtpSubjectPrefixProperty.class, getConfiguredSubjectPrefix());
     m_defaultFromEmail = getPropertyValue(SmtpDefaultFromEmailProperty.class, getConfiguredDefaultFromEmail());
-    m_sslProtocols = getPropertyValue(SmtpSslProtocolsProperty.class, getConfiguredSslProtocols());
-    m_useSmtps = getPropertyValue(SmtpUseSmtpsProperty.class, getConfiguredUseSmtps());
+
+    m_smtpServerConfig = BEANS.get(SmtpServerConfig.class)
+        .withHost(getPropertyValue(SmtpHostProperty.class, getConfiguredHost()))
+        .withPort(getPropertyValue(SmtpPortProperty.class, getConfiguredPort()))
+        .withUsername(getPropertyValue(SmtpUsernameProperty.class, getConfiguredUsername()))
+        .withPassword(getPropertyValue(SmtpPasswordProperty.class, getConfiguredPassword()))
+        .withUseAuthentication(getPropertyValue(SmtpUseAuthenticationProperty.class, getConfiguredUseAuthentication()))
+        .withSslProtocols(getPropertyValue(SmtpSslProtocolsProperty.class, getConfiguredSslProtocols()))
+        .withUseSmtps(getPropertyValue(SmtpUseSmtpsProperty.class, getConfiguredUseSmtps()));
   }
 
   protected <DATA_TYPE> DATA_TYPE getPropertyValue(Class<? extends IConfigProperty<DATA_TYPE>> clazz, DATA_TYPE defaultValue) {
@@ -129,29 +121,33 @@ public abstract class AbstractSMTPService implements ISMTPService {
     return null;
   }
 
+  public SmtpServerConfig getSmtpServerConfig() {
+    return m_smtpServerConfig;
+  }
+
   @Override
   public String getHost() {
-    return m_host;
+    return getSmtpServerConfig().getHost();
   }
 
   @Override
   public int getPort() {
-    return m_port;
+    return getSmtpServerConfig().getPort();
   }
 
   @Override
   public boolean isUseAuthentication() {
-    return m_useAuthentication;
+    return getSmtpServerConfig().isUseAuthentication();
   }
 
   @Override
   public String getUsername() {
-    return m_username;
+    return getSmtpServerConfig().getUsername();
   }
 
   @Override
   public String getPassword() {
-    return m_password;
+    return getSmtpServerConfig().getPassword();
   }
 
   @Override
@@ -164,13 +160,9 @@ public abstract class AbstractSMTPService implements ISMTPService {
     return m_defaultFromEmail;
   }
 
-  public void setDebugReceiverEmail(String debugReceiverEmail) {
-    m_debugReceiverEmail = debugReceiverEmail;
-  }
-
   @Override
   public String getDebugReceiverEmail() {
-    return m_debugReceiverEmail;
+    return CONFIG.getPropertyValue(SmtpDebugReceiverEmailProperty.class);
   }
 
   public String getProtocol() {
@@ -179,12 +171,12 @@ public abstract class AbstractSMTPService implements ISMTPService {
 
   @Override
   public boolean isUseSmtps() {
-    return m_useSmtps;
+    return getSmtpServerConfig().isUseSmtps();
   }
 
   @Override
   public String getSslProtocols() {
-    return m_sslProtocols;
+    return getSmtpServerConfig().getSslProtocols();
   }
 
   @Override
@@ -194,66 +186,15 @@ public abstract class AbstractSMTPService implements ISMTPService {
 
   @Override
   public void sendMessage(MimeMessage message, Session session) {
-    try {
-      if (session == null) {
-        session = createSession();
-      }
-      try (Transport transport = session.getTransport(getProtocol())) {
-        if (!StringUtility.isNullOrEmpty(getUsername())) {
-          transport.connect(getHost(), getUsername(), getPassword());
-        }
-        else {
-          transport.connect();
-        }
-        // subject prefix
-        String subjectPrefix = getSubjectPrefix();
-        if (!StringUtility.isNullOrEmpty(subjectPrefix)) {
-          String subject = subjectPrefix + ((message.getSubject() != null) ? (message.getSubject()) : (""));
-          message.setSubject(subject);
-        }
+    MailHelper mailHelper = BEANS.get(MailHelper.class);
+    mailHelper.addPrefixToSubject(message, getSubjectPrefix());
+    mailHelper.ensureFromAddress(message, getDefaultFromEmail());
 
-        Address[] allRecipients = message.getAllRecipients();
-        // check debug receiver
-        String debugReceiverEmail = getDebugReceiverEmail();
-        if (debugReceiverEmail != null) {
-          allRecipients = new Address[]{BEANS.get(MailHelper.class).createInternetAddress(debugReceiverEmail)};
-          LOG.debug("SMTP Service: debug receiver email set to: {}", debugReceiverEmail);
-        }
-        // from address
-        Address[] fromAddresses = message.getFrom();
-        if (fromAddresses == null || fromAddresses.length == 0) {
-          String defaultFromEmail = getDefaultFromEmail();
-          if (!StringUtility.isNullOrEmpty(defaultFromEmail)) {
-            message.setFrom(BEANS.get(MailHelper.class).createInternetAddress(defaultFromEmail));
-          }
-        }
-        if (allRecipients != null && allRecipients.length > 0) {
-          transport.sendMessage(message, allRecipients);
-        }
-      }
+    if (session == null) {
+      BEANS.get(SmtpHelper.class).sendMessage(getSmtpServerConfig(), message);
     }
-    catch (Exception e) {
-      throw new ProcessingException("cannot send Mime Message.", e);
+    else {
+      BEANS.get(SmtpHelper.class).sendMessage(session, getPassword(), message);
     }
-  }
-
-  protected Session createSession() {
-    Properties props = new Properties();
-    props.setProperty("mail.transport.protocol", getProtocol());
-    props.setProperty("mail." + getProtocol() + ".quitwait", "false");
-    if (!StringUtility.isNullOrEmpty(m_host)) {
-      props.setProperty("mail." + getProtocol() + ".host", m_host);
-    }
-    if (m_port > 0) {
-      props.setProperty("mail." + getProtocol() + ".port", "" + m_port);
-    }
-    if (!StringUtility.isNullOrEmpty(m_username)) {
-      props.setProperty("mail." + getProtocol() + ".user", m_username);
-      props.setProperty("mail." + getProtocol() + ".auth", "" + m_useAuthentication);
-    }
-    if (!StringUtility.isNullOrEmpty(getSslProtocols())) {
-      props.setProperty("mail." + getProtocol() + ".ssl.protocols", getSslProtocols());
-    }
-    return Session.getInstance(props, null);
   }
 }

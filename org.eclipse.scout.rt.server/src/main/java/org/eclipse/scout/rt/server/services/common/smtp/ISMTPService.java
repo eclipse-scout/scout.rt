@@ -13,25 +13,17 @@ package org.eclipse.scout.rt.server.services.common.smtp;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
-import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.mail.MailHelper;
+import org.eclipse.scout.rt.mail.smtp.SmtpHelper;
+import org.eclipse.scout.rt.mail.smtp.SmtpServerConfig;
+import org.eclipse.scout.rt.platform.service.IService;
 
 /**
- * The service to send messages over the smtp protocol.
- * <p>
- * Usage Example:
- * 
- * <pre>
- * DataSource att = MailUtility.createDataSource(new File(&quot;D:\\pictures\\backgroundCorsaire.jpg&quot;));
- * MimeMessage message = MailUtility.createMimeMessage(&quot;Some body part&quot;, &quot;&lt;html&gt;&lt;body&gt;&lt;b&gt;TEST&lt;/b&gt; Mail&lt;/body&gt;&lt;/html&gt;&quot;, new DataSource[]{att});
- * message.setSubject(&quot;test mail java&quot;);
- * message.setRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(&quot;aho@bsiag.com&quot;, &quot;Andreas Hoegger&quot;));
- * message.setFrom(new InternetAddress(&quot;aho@bsiag.com&quot;, &quot;Andreas Hoegger&quot;));
- * service.sendMessage(message);
- * </pre>
- *
- * @see org.eclipse.scout.rt.shared.mail.MailUtility
+ * @deprecated Use {@link SmtpHelper} instead. Map properties to {@link SmtpServerConfig}. If a subject prefix is
+ *             required, the prefix must be prepended before calling
+ *             {@link SmtpHelper#sendMessage(SmtpServerConfig, MimeMessage)}.
  */
+@Deprecated
 public interface ISMTPService extends IService {
 
   /**

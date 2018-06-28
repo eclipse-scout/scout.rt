@@ -1,0 +1,106 @@
+/*******************************************************************************
+ * Copyright (c) 2018 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.mail.smtp;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import javax.mail.Address;
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+import org.eclipse.scout.rt.mail.MailHelper;
+import org.eclipse.scout.rt.mail.MailMessage;
+import org.eclipse.scout.rt.mail.MailParticipant;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.html.HTML;
+import org.junit.Ignore;
+import org.junit.Test;
+
+/**
+ * JUnit tests for {@link SmtpHelper}
+ */
+public class SmtpHelperTest {
+
+  @Test
+  public void testGetAllRecipients() throws MessagingException {
+    MailMessage mailMessage = BEANS.get(MailMessage.class)
+        .withBodyPlainText("lorem")
+        .addToRecipient(BEANS.get(MailParticipant.class).withEmail("ipsum@example.org"))
+        .addToRecipient(BEANS.get(MailParticipant.class).withEmail("dolor@example.org"))
+        .addCcRecipient(BEANS.get(MailParticipant.class).withEmail("sit@example.org"))
+        .addBccRecipient(BEANS.get(MailParticipant.class).withEmail("amet@example.org"));
+
+    MimeMessage message = BEANS.get(MailHelper.class).createMimeMessage(mailMessage);
+
+    // No debug recipient
+    Address[] allRecipients = BEANS.get(SmtpHelper.class).getAllRecipients(message);
+
+    assertNotNull("No recipients", allRecipients);
+    assertEquals("Number of recipients is wrong", 4, allRecipients.length);
+    assertEquals("Wrong recipient 1", "ipsum@example.org", ((InternetAddress) allRecipients[0]).getAddress());
+    assertEquals("Wrong recipient 2", "dolor@example.org", ((InternetAddress) allRecipients[1]).getAddress());
+    assertEquals("Wrong recipient 3", "sit@example.org", ((InternetAddress) allRecipients[2]).getAddress());
+    assertEquals("Wrong recipient 4", "amet@example.org", ((InternetAddress) allRecipients[3]).getAddress());
+
+    // With Debug recipient
+    // TODO sme implement as soon as testing helper is available in platform test
+//    SmtpDebugReceiverEmailProperty useSmtpProperty = Mockito.mock(SmtpDebugReceiverEmailProperty.class);
+//    Mockito.when(useSmtpProperty.getValue(null)).thenReturn("debug@example.org");
+//
+//    allRecipients = BEANS.get(SmtpHelper.class).getAllRecipients(message);
+//
+//    assertNotNull("No recipients", allRecipients);
+//    assertEquals("Number of recipients is wrong", 1, allRecipients.length);
+//    assertEquals("Wrong recipient", "debug@example.org", ((InternetAddress) allRecipients[0]).getAddress());
+  }
+
+  /**
+   * This test method provides an easy way to test an SMTP server access by sending an email. Remove the {@link Ignore}
+   * annotation before executing this test.
+   * <p>
+   * Provide the required configuration for your SMTP server and an appropriate recipient email address (see marker
+   * CHANGE_HERE)
+   */
+  @Ignore
+  @Test
+  public void testSendMessage() {
+    // <CHANGE_HERE>
+    String senderEmailAddress = "my-email-address@example.org";
+    String password = "password";
+    String smtpServerHost = "smtp.example.org";
+    String recipientEmailAddress = "recipient-address@example.org";
+    // </CHANGE_HERE>
+
+    MailMessage mailMessage = BEANS.get(MailMessage.class)
+        .withSubject("Lorem ipsum dolor")
+        .withBodyPlainText("Lorem ipsum dolor (plain text)")
+        .withBodyHtml(HTML.html(null, HTML.fragment(
+            HTML.h1("lorem"),
+            HTML.h2("ipsum"),
+            HTML.h3("dolor"),
+            HTML.p("html"))).toHtml())
+        .withSender(BEANS.get(MailParticipant.class).withName("Sender name").withEmail(senderEmailAddress))
+        .addToRecipient(BEANS.get(MailParticipant.class).withName("Recipient name").withEmail(recipientEmailAddress));
+
+    SmtpServerConfig config = BEANS.get(SmtpServerConfig.class)
+        .withHost(smtpServerHost)
+        .withUsername(senderEmailAddress)
+        .withPassword(password)
+        .withPort(465)
+        .withUseAuthentication(true)
+        .withUseSmtps(true);
+
+    MimeMessage message = BEANS.get(MailHelper.class).createMimeMessage(mailMessage);
+    BEANS.get(SmtpHelper.class).sendMessage(config, message);
+  }
+}
