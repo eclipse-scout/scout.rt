@@ -234,6 +234,9 @@ scout.objects = {
   values: function(obj, all) {
     var values = [];
     if (obj) {
+      if (typeof obj.hasOwnProperty !== 'function') {
+        all = true;
+      }
       for (var key in obj) {
         if (all || obj.hasOwnProperty(key)) {
           values.push(obj[key]);

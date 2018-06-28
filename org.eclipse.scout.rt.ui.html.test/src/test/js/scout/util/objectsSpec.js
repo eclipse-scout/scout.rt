@@ -244,6 +244,18 @@ describe("scout.objects", function() {
       expect(scout.objects.values(o2)).toContain('B');
       expect(scout.objects.values(o2)).toContain('C');
     });
+
+    it('can handle maps', function() {
+      var map1 = scout.objects.createMap();
+      var map2 = scout.objects.createMap();
+      map2['x'] = 'y'; // jshint ignore:line
+      map2[7] = 7;
+
+      expect(scout.objects.values(map1)).toEqual([]);
+      expect(scout.objects.values(map2).length).toBe(2);
+      expect(scout.objects.values(map2)).toContain('y');
+      expect(scout.objects.values(map2)).toContain(7);
+    });
   });
 
   describe('findChildObjectByKey', function() {
