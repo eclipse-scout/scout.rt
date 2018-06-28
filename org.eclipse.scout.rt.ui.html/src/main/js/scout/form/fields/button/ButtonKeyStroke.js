@@ -13,6 +13,7 @@ scout.ButtonKeyStroke = function(button, keyStroke) {
   this.field = button;
   this.parseAndSetKeyStroke(keyStroke);
   this.stopPropagation = true;
+  this.stopImmediatePropagation = true;
 
   this.renderingHints.hAlign = scout.hAlign.RIGHT;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
