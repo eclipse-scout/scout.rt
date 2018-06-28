@@ -79,7 +79,7 @@ scout.TagField.prototype._renderValue = function() {
 scout.TagField.prototype._setValue = function(value) {
   scout.TagField.parent.prototype._setValue.call(this, value);
   if (this.tagBar) { // required for _init case
-    this.tagBar.setTags(value);
+    this.tagBar.setTags(this.value /* do not use the function parameter here. instead use the member variable because the value might have changed in a validator. */ );
   }
 };
 
@@ -99,8 +99,11 @@ scout.TagField.prototype._validateValue = function(value) {
   var tags = scout.arrays.ensure(value);
   var result = [];
   tags.forEach(function(tag) {
-    if (!scout.strings.empty(tag) && result.indexOf(tag) < 0) {
-      result.push(tag.toLowerCase());
+    if (!scout.strings.empty(tag)) {
+      tag = tag.toLowerCase();
+      if (result.indexOf(tag) < 0) {
+        result.push(tag);
+      }
     }
   });
   return result;
@@ -337,4 +340,3 @@ scout.TagField.prototype._renderPlaceholder = function($field) {
     $field.placeholder(hasTags ? '' : this.label);
   }
 };
-
