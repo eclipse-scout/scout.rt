@@ -28,3 +28,22 @@ scout.Key.prototype.remove = function() {
   this.keyStroke.removeKeyBox(this.$drawingArea);
   this.$drawingArea = null;
 };
+
+scout.Key.prototype.toKeyStrokeString = function() {
+  var keyStroke = '';
+  if (this.ctrl) {
+    keyStroke += 'Ctrl-';
+  }
+  if (this.alt) {
+    keyStroke += 'Alt-';
+  }
+  if (this.shift) {
+    keyStroke += 'Shift-';
+  }
+  var key = scout.codesToKeys[this.which];
+  if (key === undefined) {
+    key = this.which;
+  }
+  keyStroke += key;
+  return keyStroke;
+};
