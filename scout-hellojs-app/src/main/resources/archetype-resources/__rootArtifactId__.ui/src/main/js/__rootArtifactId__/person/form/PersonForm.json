@@ -1,0 +1,44 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+{
+  "id": "${rootArtifactId}.PersonForm",
+  "type": "model",
+  "displayHint": "view",
+  "rootGroupBox": {
+    "id": "MainBox",
+    "objectType": "GroupBox",
+    "menus": [
+      {
+        "id": "OkMenu",
+        "objectType": "OkMenu",
+        "tooltipText": "${symbol_dollar}{textKey:OkMenuTooltip}"
+      },
+      {
+        "id": "CancelMenu",
+        "objectType": "CancelMenu",
+        "tooltipText": "${symbol_dollar}{textKey:CancelMenuTooltip}"
+      }
+    ],
+    "fields": [
+      {
+        "id": "DetailBox",
+        "objectType": "GroupBox",
+        "fields": [
+          {
+            "id": "FirstNameField",
+            "objectType": "StringField",
+            "label": "${symbol_dollar}{textKey:FirstName}",
+            "mandatory": true
+          },
+          {
+            "id": "LastNameField",
+            "objectType": "StringField",
+            "label": "${symbol_dollar}{textKey:LastName}",
+            "mandatory": true
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>${displayName}</title>
+    <scout:include template="head.html" />
+    <scout:stylesheet src="res/libs-all-macro.less" />
+    <scout:stylesheet src="res/${rootArtifactId}-all-macro.less" />
+    <scout:script src="res/libs-all-macro.js" />
+    <scout:script src="res/${rootArtifactId}-all-macro.js" />
+    <scout:script src="res/index.js" />
+  </head>
+  <body>
+    <scout:include template="no-script.html" />
+    <div class="scout" data-partid="1"></div>
+    <scout:version />
+  </body>
+</html>

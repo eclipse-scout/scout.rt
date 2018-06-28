@@ -1,0 +1,10 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+{
+    "id": "${rootArtifactId}.Desktop",
+    "title": "${symbol_dollar}{textKey:ApplicationTitle}",
+    "objectType": "Desktop",
+    "type": "model",
+    "logoUrl": "res/img/eclipse_scout_logo.png"
+}
