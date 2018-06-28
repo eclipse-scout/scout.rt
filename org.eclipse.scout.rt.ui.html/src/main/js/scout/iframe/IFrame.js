@@ -38,8 +38,8 @@ scout.IFrame.prototype._render = function() {
  */
 scout.IFrame.prototype._renderProperties = function() {
   scout.IFrame.parent.prototype._renderProperties.call(this);
+  this._renderScrollBarEnabled(); // Needs to be before _renderLocation, see comment in _renderScrollBarEnabled
   this._renderLocation();
-  this._renderScrollBarEnabled();
   this._renderSandboxEnabled(); // includes _renderSandboxPermissions()
 };
 
