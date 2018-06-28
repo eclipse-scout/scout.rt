@@ -9,19 +9,19 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 describe('Action', function() {
-  var $sandbox, session, action;
+  var $sandbox, session;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
     $sandbox = $('#sandbox');
-    action = new scout.Action();
-    action.init(createSimpleModel('Action', session));
   });
 
   describe('defaults', function() {
 
     it('should be as expected', function() {
+      var action = new scout.Action();
+      action.init(createSimpleModel('Action', session));
       expect(action.tabbable).toBe(false);
       expect(action.actionStyle).toBe(scout.Action.ActionStyle.DEFAULT);
     });
@@ -31,6 +31,8 @@ describe('Action', function() {
   describe('setTabbable', function() {
 
     it('should modify $container tabindex', function() {
+      var action = new scout.Action();
+      action.init(createSimpleModel('Action', session));
       // because Action is 'abstract' and has no _render method yet
       // but _renderProperties() is called anyway
       action.$container = $sandbox;
@@ -42,6 +44,5 @@ describe('Action', function() {
     });
 
   });
-
 
 });

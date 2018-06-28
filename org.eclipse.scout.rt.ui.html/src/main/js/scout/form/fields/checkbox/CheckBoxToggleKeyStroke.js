@@ -13,6 +13,7 @@ scout.CheckBoxToggleKeyStroke = function(checkbox) {
   this.field = checkbox;
   this.which = [scout.keys.SPACE];
   this.stopPropagation = true;
+  this.stopImmediatePropagation = true;
 
   this.renderingHints.offset = 4;
   this.renderingHints.hAlign = scout.hAlign.LEFT;
