@@ -10,6 +10,7 @@
 (function(scout, $, undefined) {
   __include("jquery/jquery-scout.js");
   __include("scout/App.js");
+  __include("scout/ErrorHandler.js");
   __include("scout/main.js");
   __include("scout/TypeDescriptor.js");
   __include("scout/ObjectFactory.js");
