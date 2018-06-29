@@ -233,7 +233,8 @@ scout.TileGridLayout.prototype.preferredLayoutSize = function($container, option
 scout.TileGridLayout.prototype.prefSizeForWidth = function(width) {
   var prefSize,
     htmlComp = this.widget.htmlComp,
-    contentFits = false;
+    contentFits = false,
+    gridColumnCount = this.widget.gridColumnCount;
 
   width += htmlComp.insets().horizontal();
   this._resetGridColumnCount();
@@ -254,5 +255,7 @@ scout.TileGridLayout.prototype.prefSizeForWidth = function(width) {
       contentFits = true;
     }
   }
+  // Reset to previous gridColumnCount (prefSize should not modify properties)
+  this.widget.gridColumnCount = gridColumnCount;
   return prefSize;
 };
