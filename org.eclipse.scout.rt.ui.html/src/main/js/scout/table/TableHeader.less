@@ -14,6 +14,8 @@
   overflow: hidden;
   background-color: @table-header-background-color;
   border-bottom: 1px solid @table-header-border-color;
+  /* Make it the same height as the menu bar */
+  min-height: @logical-grid-row-height - 1px; /* -1px border-width. Header-items itself must not get a min-height otherwise bottom alignment with multi line header items break */
 
   &.disabled:not(.read-only) {
     color: @text-disabled-color;
@@ -53,9 +55,6 @@
   /* Transparent border required for .selected state */
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
-
-  /* Make it the same height as the menu bar */
-  min-height: @logical-grid-row-height;
 
   &.disabled {
     cursor: default;

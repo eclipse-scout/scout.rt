@@ -34,8 +34,13 @@
     margin: 0;
     font-size: 18px;
     padding-top: 0;
-    padding-bottom: 5px;
+    padding-bottom: @dashboard-tile-label-padding-bottom;
     font-weight: bold;
+  }
+
+  &.html-field > label,
+  &.bean-field > label {
+    padding-bottom: @dashboard-tile-label-large-padding-bottom;
   }
 
   & > .field {

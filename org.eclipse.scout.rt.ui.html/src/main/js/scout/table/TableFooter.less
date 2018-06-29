@@ -25,7 +25,7 @@
   height: 16px;
   cursor: row-resize;
   z-index: 1;
-  border-top: 3px solid @table-control-resize-border-color;
+  border-top: @table-control-resize-border-width solid @table-control-resize-border-color;
 }
 
 .table-control-container {
@@ -78,17 +78,21 @@
     }
 
     & .tab-area {
-      > .selection-marker {
+      & > .selection-marker {
         z-index: 2;
         height: 3px;
         bottom: auto;
         top: 0;
         margin-bottom: 0;
-        background-color: @tab-item-active-color;
       }
 
       & > .tab-item {
         z-index: 2;
+
+        & > .title {
+          padding-top: @table-control-tab-item-title-padding-top;
+          padding-bottom: @table-control-tab-item-title-padding-bottom;
+        }
 
         &.first {
           /* align with the form fields */
