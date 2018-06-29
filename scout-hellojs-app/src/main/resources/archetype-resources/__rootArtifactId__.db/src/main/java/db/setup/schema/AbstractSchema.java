@@ -17,7 +17,6 @@ public abstract class AbstractSchema extends AbstractDatabaseObject implements I
   public void drop() {
     getContext()
         .dropSchemaIfExists(getName())
-        //        .cascade()
         .execute();
   }
 }

@@ -9,6 +9,10 @@ ${rootArtifactId}.PersonForm = function() {
 };
 scout.inherits(${rootArtifactId}.PersonForm, scout.Form);
 
+${rootArtifactId}.PersonForm.prototype._jsonModel = function() {
+  return scout.models.getModel('${rootArtifactId}.PersonForm');
+};
+
 ${rootArtifactId}.PersonForm.prototype._init = function(model) {
   ${rootArtifactId}.PersonForm.parent.prototype._init.call(this, model);
   this._initFields();
@@ -21,10 +25,6 @@ ${rootArtifactId}.PersonForm.prototype._init = function(model) {
 ${rootArtifactId}.PersonForm.prototype._initFields = function() {
   this.firstNameField = this.widget('FirstNameField');
   this.lastNameField = this.widget('LastNameField');
-};
-
-${rootArtifactId}.PersonForm.prototype._jsonModel = function() {
-  return scout.models.getModel('${rootArtifactId}.PersonForm');
 };
 
 ${rootArtifactId}.PersonForm.prototype.exportData = function() {

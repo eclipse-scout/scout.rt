@@ -64,7 +64,7 @@ ${rootArtifactId}.PersonTablePage.prototype._transformTableDataToTableRows = fun
     });
 };
 
-${rootArtifactId}.PersonTablePage.prototype._getSelectedPerson = function(event) {
+${rootArtifactId}.PersonTablePage.prototype._getSelectedPerson = function() {
   var selection = this.detailTable.selectedRow();
   if (selection) {
     return selection.person;
@@ -72,7 +72,7 @@ ${rootArtifactId}.PersonTablePage.prototype._getSelectedPerson = function(event)
   return null;
 };
 
-${rootArtifactId}.PersonTablePage.prototype._createPersonForm = function(event) {
+${rootArtifactId}.PersonTablePage.prototype._createPersonForm = function() {
   var outline = this.getOutline();
   var personForm = scout.create('${rootArtifactId}.PersonForm', {
     parent: outline

@@ -3,7 +3,7 @@
   __include("${rootArtifactId}/App.js");
   __include("${rootArtifactId}/repository/Repository.js");
 
-  __include("${rootArtifactId}/person/form/PersonForm.js");
+  __include("${rootArtifactId}/person/PersonForm.js");
   __include("${rootArtifactId}/person/PersonRepository.js");
   __include("${rootArtifactId}/person/Person.js");
   __include("${rootArtifactId}/person/PersonTablePage.js");

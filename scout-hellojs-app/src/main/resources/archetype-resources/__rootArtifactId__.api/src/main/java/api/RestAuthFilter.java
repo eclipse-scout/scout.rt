@@ -19,9 +19,9 @@ import org.eclipse.scout.rt.server.commons.authentication.DevelopmentAccessContr
 import org.eclipse.scout.rt.server.commons.authentication.DevelopmentAccessController.DevelopmentAuthConfig;
 
 /**
- * <h3>{@link RestServletFilter}</h3>
+ * <h3>{@link RestAuthFilter}</h3>
  */
-public class RestServletFilter implements Filter {
+public class RestAuthFilter implements Filter {
 
   private DevelopmentAccessController m_developmentAccessController;
 

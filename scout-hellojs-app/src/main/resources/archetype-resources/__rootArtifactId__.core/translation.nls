@@ -3,4 +3,4 @@
 # To ensure a properly working nls support of    #
 # keep this file untouched directly.             #
 ##################################################
-Nls-Class=${package}.core.DefaultTextProviderService
+Nls-Class=${package}.core.TextProviderService

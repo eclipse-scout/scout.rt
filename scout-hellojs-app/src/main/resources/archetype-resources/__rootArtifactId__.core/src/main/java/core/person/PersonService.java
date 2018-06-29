@@ -41,7 +41,7 @@ public class PersonService implements IService {
 
   public Stream<PersonDo> list() {
     //TODO add validation and business logic here
-    return BEANS.get(IPersonRepository.class).getAllPersons();
+    return BEANS.get(IPersonRepository.class).list();
   }
 
   protected PersonDo assertPersonDo(PersonDo person) {

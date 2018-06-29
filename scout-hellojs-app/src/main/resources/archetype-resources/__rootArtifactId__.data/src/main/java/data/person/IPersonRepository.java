@@ -13,7 +13,7 @@ public interface IPersonRepository {
 
   void store(String id, PersonDo person);
 
-  Stream<PersonDo> getAllPersons();
+  Stream<PersonDo> list();
 
   Optional<PersonDo> getById(String id);
 

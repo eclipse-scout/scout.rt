@@ -35,7 +35,7 @@ public class PersonRepository extends AbstractRepository<Person, PersonRecord, P
   }
 
   @Override
-  public Stream<PersonDo> getAllPersons() {
+  public Stream<PersonDo> list() {
     return getAll().map(this::recToDo);
   }
 

@@ -22,7 +22,7 @@
   <!-- filters for api access -->
   <filter>
     <filter-name>RestAuthFilter</filter-name>
-    <filter-class>${package}.api.RestServletFilter</filter-class>
+    <filter-class>${package}.api.RestAuthFilter</filter-class>
   </filter>
   <filter-mapping>
     <filter-name>RestAuthFilter</filter-name>
