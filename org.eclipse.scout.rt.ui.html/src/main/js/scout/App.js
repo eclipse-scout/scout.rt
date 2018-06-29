@@ -18,6 +18,7 @@ scout.App = function() {
   scout.appListeners = [];
 
   scout.app = this;
+  scout.errorHandler = this._createErrorHandler();
 };
 
 /**
@@ -174,8 +175,7 @@ scout.App.prototype._installGlobalMouseDownInterceptor = function() {
  * the stack trace is much longer :)
  */
 scout.App.prototype._installErrorHandler = function() {
-  var handler = this._createErrorHandler();
-  window.onerror = handler.handle.bind(handler);
+  window.onerror = scout.errorHandler.windowErrorHandler;
   // FIXME bsh, cgu: use ErrorHandler to handle unhandled promise rejections
   //                 --> replace jQuery.Deferred.exceptionHook(error, stack)
 };
@@ -282,50 +282,14 @@ scout.App.prototype._fail = function(options, error) {
   var $error = $('body').appendDiv('startup-error');
   $error.appendDiv('startup-error-title').text('The application could not be started');
 
-  var message = '';
-  var log = '';
-  if (error instanceof Error) {
-    // 1. Errors
-    message = String(error.message || error);
-    log = 'Unexpected error: ' + message;
-    if (error.fileName) {
-      log += ' at ' + error.fileName + scout.strings.join('', scout.strings.box(':', error.lineNumber), scout.strings.box(':', error.columnNumber));
-    }
-    if (error.stack) {
-      log += '\n' + error.stack;
-    }
-  } else if ($.isJqXHR(error)) {
-    // 2. jQuery $.ajax() error (arguments: jqXHR, textStatus, errorThrown, requestOptions)
-    var jqXHR = error;
-    var errorThrown = arguments[3];
-    var requestOptions = arguments[4];
-    var ajaxRequest = (requestOptions ? scout.strings.join(' ', requestOptions.type, requestOptions.url) : '');
-    var ajaxStatus = (jqXHR.status ? scout.strings.join(' ', jqXHR.status, errorThrown) : 'Connection error');
-    message = 'AJAX call' + scout.strings.box(' "', ajaxRequest, '"') + ' failed' + scout.strings.box(' [', ajaxStatus, ']');
-    log = message + (error.responseText ? '\nResponse text:\n' + error.responseText : '');
-  } else if (!error) {
-    // 3. No reason provided
-    message = 'Unknwon reason';
-    log = 'Unexpected failure (no reason provided)';
-  } else {
-    // 4. Everything else
-    message = String(error);
-    log += 'Unexpected failure: ' + message;
-  }
-
-  if (message) {
-    $error.appendDiv('startup-error-message').text(message);
-  }
-  if (log) {
-    if (window.console && window.console.error) {
-      window.console.error(log);
-    } else if (window.console && window.console.log) {
-      window.console.log(log);
-    }
+  var args = scout.objects.argumentsToArray(arguments).slice(1);
+  var errorInfo = scout.errorHandler.handle(args);
+  if (errorInfo.message) {
+    $error.appendDiv('startup-error-message').text(errorInfo.message);
   }
 
   // Reject with original rejection arguments
-  return $.rejectedPromise.apply($, scout.objects.argumentsToArray(arguments).slice(1));
+  return $.rejectedPromise.apply($, args);
 };
 
 /**

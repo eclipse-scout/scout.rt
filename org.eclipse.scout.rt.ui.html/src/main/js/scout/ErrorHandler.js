@@ -9,56 +9,163 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.ErrorHandler = function() {
+  this.logError = true;
   this.displayError = true;
   this.sendError = false;
+
+  this.windowErrorHandler = this._onWindowError.bind(this);
 };
 
 scout.ErrorHandler.prototype.init = function(options) {
   $.extend(this, options);
 };
 
-scout.ErrorHandler.prototype.handle = function(errorMessage, fileName, lineNumber, columnNumber, error) {
+// Signature matches the "window.onerror" event handler
+// https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror
+scout.ErrorHandler.prototype._onWindowError = function(errorMessage, fileName, lineNumber, columnNumber, error) {
   try {
-    var errorCode = this.getJsErrorCode(error),
-      logStr = this.createLogMessage(errorMessage, fileName, lineNumber, columnNumber, error, errorCode);
-
-    if (error) {
-      $.log.error(logStr, error);
+    if (error instanceof Error) {
+      this.handle(error);
     } else {
-      $.log.error(logStr);
-    }
-    if (window.console) {
-      window.console.log(logStr);
-    }
-
-    // Note: The error handler is installed globally and we cannot tell in which scout session the error happened.
-    // We simply use the first scout session to display the message box and log the error. This is not ideal in the
-    // multi-session-case (portlet), but currently there is no other way. Besides, this feature is not in use yet.
-    if (scout.sessions.length > 0) {
-      var session = scout.sessions[0];
-      if (this.displayError) {
-        this._showMessageBox(session, errorMessage, errorCode, logStr);
-      }
-      if (this.sendError) {
-        this._sendErrorMessage(session, logStr);
-      }
+      var code = 'J00';
+      var log = errorMessage + ' at ' + fileName + ':' + lineNumber + '\n(' + 'Code ' + code + ')';
+      this.handleErrorInfo({
+        code: code,
+        message: errorMessage,
+        log: log
+      });
     }
   } catch (err) {
     throw new Error('Error in global JavaScript error handler: ' + err.message + ' (original error: ' + errorMessage + ' at ' + fileName + ':' + lineNumber + ')');
   }
 };
 
-scout.ErrorHandler.prototype.createLogMessage = function(errorMessage, fileName, lineNumber, columnNumber, error, errorCode) {
-  var logStr = errorMessage + ' at ' + fileName + ':' + lineNumber;
-  if (error && error.stack) {
-    logStr += '\n' + error.stack;
+/**
+ * Handles unexpected JavaScript errors. The arguments are first analyzed and then handled.
+ *
+ * This method may be called by passing the arguments individually or as an array (or array-like object)
+ * in the first argument.
+ * Examples:
+ *   1. try { ... } catch (err) { handler.handle(err); }
+ *   2. $.get().fail(function(jqXHR, textStatus, errorThrown) { handler.handle(jqXHR, textStatus, errorThrown); }
+ *   3. $.get().fail(function(jqXHR, textStatus, errorThrown) { handler.handle(arguments); } // <-- recommended
+ *
+ * @return the analyzed errorInfo
+ */
+scout.ErrorHandler.prototype.handle = function() {
+  var args = arguments;
+  if (args.length === 1 && args[0] && (String(args[0]) === '[object Arguments]' || Array.isArray(args[0]))) {
+    args = args[0];
   }
-  logStr += '\n(' + 'Code ' + errorCode + ')';
-  if (error && error.debugInfo) {
-    // Error throwers may put a "debugInfo" string on the error object that is then added to the log string (this is a scout extension).
-    logStr += '\n----- Additional debug information: -----\n' + error.debugInfo;
+  var errorInfo = this.analyzeError.apply(this, args);
+  this.handleErrorInfo(errorInfo);
+  return errorInfo;
+};
+
+/**
+ * Returns an "errorInfo" object for the given arguments. The following cases are handled:
+ * 1. Error objects
+ * 2. jQuery AJAX errors
+ * 3. Nothing
+ * 4. Everything else
+ */
+scout.ErrorHandler.prototype.analyzeError = function(error) {
+  var errorInfo = {
+    code: null,
+    message: null,
+    location: null,
+    stack: null,
+    debugInfo: null,
+    log: null
+  };
+
+  if (error instanceof Error) {
+    // 1. Errors
+    errorInfo.code = this.getJsErrorCode(error);
+    errorInfo.message = String(error.message || error);
+    if (error.fileName) {
+      errorInfo.location = error.fileName + scout.strings.join('', scout.strings.box(':', error.lineNumber), scout.strings.box(':', error.columnNumber));
+    }
+    if (error.stack) {
+      errorInfo.stack = String(error.stack);
+    }
+    if (error.debugInfo) { // scout extension
+      errorInfo.debugInfo = error.debugInfo;
+    }
+    errorInfo.log = 'Unexpected error: ' + errorInfo.message;
+    if (errorInfo.location) {
+      errorInfo.log += ' at ' + errorInfo.location;
+    }
+    if (errorInfo.stack) {
+      errorInfo.log += '\n' + errorInfo.stack;
+    }
+    if (errorInfo.debugInfo) {
+      // Error throwers may put a "debugInfo" string on the error object that is then added to the log string (this is a scout extension).
+      errorInfo.log += '\n----- Additional debug information: -----\n' + errorInfo.debugInfo;
+    }
+
+  } else if ($.isJqXHR(error)) {
+    // 2. jQuery $.ajax() error (arguments: jqXHR, textStatus, errorThrown, requestOptions)
+    var jqXHR = error;
+    var errorThrown = arguments[2];
+    var requestOptions = arguments[3]; // scout extension
+    var ajaxRequest = (requestOptions ? scout.strings.join(' ', requestOptions.type, requestOptions.url) : '');
+    var ajaxStatus = (jqXHR.status ? scout.strings.join(' ', jqXHR.status, errorThrown) : 'Connection error');
+
+    errorInfo.code = 'X' + (jqXHR.status || '0');
+    errorInfo.message = 'AJAX call' + scout.strings.box(' "', ajaxRequest, '"') + ' failed' + scout.strings.box(' [', ajaxStatus, ']');
+    errorInfo.log = errorInfo.message;
+    if (jqXHR.responseText) {
+      errorInfo.debugInfo = 'Response text:\n' + jqXHR.responseText;
+      errorInfo.log += '\n' + errorInfo.debugInfo;
+    }
+
+  } else if (!error) {
+    // 3. No reason provided
+    errorInfo.code = 'P3';
+    errorInfo.message = 'Unknown error';
+    errorInfo.log = 'Unexpected error (no reason provided)';
+
+  } else {
+    // 4. Everything else (e.g. when strings are thrown)
+    var s = (typeof error === 'string' || typeof error === 'number') ? String(error) : null;
+    errorInfo.code = 'P4';
+    errorInfo.message = s || 'Unexpected error';
+    errorInfo.log = 'Unexpected error: ' + (s || error);
+
   }
-  return logStr;
+
+  return errorInfo;
+};
+
+/**
+ * Expects an object as returned by analyzeError() and handles it:
+ * - If the flag "logError" is set, the log message is printed to the console
+ * - If there is a scout session and the flag "displayError" is set, the error is shown in a a message box.
+ * - If there is a scout session and the flag "sendError" is set, the error is sent to the UI server.
+ */
+scout.ErrorHandler.prototype.handleErrorInfo = function(errorInfo) {
+  if (this.logError && errorInfo.log) {
+    $.log.error(errorInfo.log);
+    if (window && window.console && window.console.error) {
+      window.console.error(errorInfo.log);
+    } else if (window && window.console && window.console.log) {
+      window.console.log(errorInfo.log);
+    }
+  }
+
+  // Note: The error handler is installed globally and we cannot tell in which scout session the error happened.
+  // We simply use the first scout session to display the message box and log the error. This is not ideal in the
+  // multi-session-case (portlet), but currently there is no other way. Besides, this feature is not in use yet.
+  if (scout.sessions.length > 0) {
+    var session = scout.sessions[0];
+    if (this.displayError) {
+      this._showMessageBox(session, errorInfo.message, errorInfo.code, errorInfo.log);
+    }
+    if (this.sendError) {
+      this._sendErrorMessage(session, errorInfo.log);
+    }
+  }
 };
 
 /**
