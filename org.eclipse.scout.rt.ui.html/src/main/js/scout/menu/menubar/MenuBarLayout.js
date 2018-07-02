@@ -77,163 +77,122 @@ scout.MenuBarLayout.prototype.layout = function($container) {
 };
 
 scout.MenuBarLayout.prototype.preferredLayoutSize = function($container, options) {
+  this._overflowMenuItems = [];
   if (!this._menuBar.isVisible()) {
     return new scout.Dimension(0, 0);
   }
+  var visibleMenuItems = this._menuBar.orderedMenuItems.all.filter(function(menuItem) {
+      return menuItem.visible;
+    }, this),
+    overflowMenuItems = visibleMenuItems.filter(function(menuItem) {
+      var overflown = menuItem.overflown;
+      menuItem._setOverflown(false);
+      return overflown;
+    }),
+    overflowableIndexes = [],
+    htmlComp = scout.HtmlComponent.get($container),
+    prefSize = new scout.Dimension(0, 0),
+    prefWidth = Number.MAX_VALUE;
 
-  var htmlContainer = scout.HtmlComponent.get($container),
-    menuItems = this._menuBar.orderedMenuItems.all,
-    preferredSize = new scout.Dimension(),
-    ellipsis,
-    ellipsisBoundsGross = new scout.Dimension(),
-
-    _widthHintFilter = function(itemWidth, totalWidth, wHint) {
-      // escape truthy
-      if (wHint === 0 || wHint) {
-        return totalWidth + itemWidth <= wHint;
-      }
-      return true;
-    },
-    unorderedVisibleMenus = [];
-
-  if (options.widthHint) {
-    options.widthHint = options.widthHint - htmlContainer.insets().horizontal();
+  // consider avoid falsy 0 in tabboxes a 0 withHint will be used to calculate the minimum width
+  if (options.widthHint === 0 || options.widthHint) {
+    prefWidth = options.widthHint - htmlComp.insets().horizontal();
   }
-  this._visibleMenuItems = [];
-  this._overflowMenuItems = [];
+  // shortcut for minimum size.
+  if (prefWidth <= 0) {
+    return this._minSize(visibleMenuItems);
+  }
 
-  // update first last best guess
-  this._bestGuessFirstLast(menuItems);
-
-  this._ensureCachedBounds(menuItems);
-
-  ellipsis = scout.arrays.find(menuItems, function(menuItem) {
-    return menuItem.ellipsis;
+  // fill overflowable indexes
+  visibleMenuItems.forEach(function(menuItem, index) {
+    if (menuItem.stackable) {
+      overflowableIndexes.push(index);
+    }
   });
-  if (ellipsis) {
-    ellipsisBoundsGross = ellipsis.htmlComp._cachedPrefSize.add(ellipsis.htmlComp._cachedMargins);
-    preferredSize.width += ellipsisBoundsGross.width;
+
+  var overflowIndex = -1;
+  this._setFirstLastMenuMarker(visibleMenuItems);
+  prefSize = this._prefSize(visibleMenuItems);
+  while (prefSize.width > prefWidth && overflowableIndexes.length > 0) {
+    overflowIndex = overflowableIndexes.splice(-1)[0];
+    this._overflowMenuItems.splice(0, 0, visibleMenuItems[overflowIndex]);
+    visibleMenuItems.splice(overflowIndex, 1);
+    this._setFirstLastMenuMarker(visibleMenuItems);
+    prefSize = this._prefSize(visibleMenuItems);
   }
 
-  // first all non stackable menus which are always visible
-  menuItems.filter(function(menuItem) {
-    var prefSizeGross;
-    if (!menuItem.isVisible()) {
-      return false;
-    }
-    if (ellipsis && ellipsis === menuItem) {
-      return false;
-    }
-    if (!menuItem.stackable) {
-      prefSizeGross = menuItem.htmlComp._cachedPrefSize.add(menuItem.htmlComp._cachedMargins);
-      preferredSize.width += prefSizeGross.width;
-      preferredSize.height = Math.max(preferredSize.height, prefSizeGross.height);
-      unorderedVisibleMenus.push(menuItem);
-      return false;
-    }
-    return true;
-  }, this).forEach(function(menuItem, index, items) {
-    var prefSizeGross = menuItem.htmlComp._cachedPrefSize.add(menuItem.htmlComp._cachedMargins),
-      totalWidth = preferredSize.width;
-    if (ellipsis && index === items.length - 1 && this._overflowMenuItems.length === 0) {
-      totalWidth -= ellipsisBoundsGross.width;
-    }
-    if (!this.collapsed && this._overflowMenuItems.length === 0 && _widthHintFilter(prefSizeGross.width, totalWidth, options.widthHint)) {
-      preferredSize.width += prefSizeGross.width;
-      preferredSize.height = Math.max(preferredSize.height, prefSizeGross.height);
-      unorderedVisibleMenus.push(menuItem);
-    } else {
-      this._overflowMenuItems.push(menuItem);
-    }
-  }, this);
+  //reset overflown
+  overflowMenuItems.forEach(function(menuItem) {
+    menuItem._setOverflown(true);
+  });
 
-  if (ellipsis) {
-    if (this._overflowMenuItems.length === 0) {
-      preferredSize.width -= ellipsisBoundsGross.width;
-    } else {
-      unorderedVisibleMenus.push(ellipsis);
-      preferredSize.height = Math.max(preferredSize.height, ellipsisBoundsGross.height);
-    }
-  }
-  // well order and push to visible menu items
+  this._visibleMenuItems = visibleMenuItems;
+  return prefSize.add(htmlComp.insets());
+};
+
+scout.MenuBarLayout.prototype._minSize = function(visibleMenuItems) {
+  var prefSize,
+    minVisibleMenuItems = visibleMenuItems.filter(function(menuItem) {
+      return menuItem.ellisis || !menuItem.stackable;
+    }, this);
+  this._setFirstLastMenuMarker(minVisibleMenuItems, true);
+  prefSize = this._prefSize(minVisibleMenuItems, true);
+  return prefSize;
+};
+
+scout.MenuBarLayout.prototype._prefSize = function(menuItems, considerEllipsis) {
+  var prefSize = new scout.Dimension(0, 0),
+    itemSize = new scout.Dimension(0, 0);
+  considerEllipsis = scout.nvl(considerEllipsis, this._overflowMenuItems.length > 0);
   menuItems.forEach(function(menuItem) {
-    if (unorderedVisibleMenus.indexOf(menuItem) >= 0) {
-      this._visibleMenuItems.push(menuItem);
-    }
-  }, this);
-
-  this._updateFirstLastMenuMarker();
-
-  return preferredSize.add(htmlContainer.insets());
-};
-
-scout.MenuBarLayout.prototype.invalidate = function() {
-  var menuItems = this._menuBar.orderedMenuItems.all;
-  menuItems.forEach(function(menuItem) {
-    if (menuItem.rendered) {
-      menuItem.htmlComp._cachedPrefSize = null;
-      menuItem.htmlComp._cachedMargins = null;
-    }
-  });
-};
-
-scout.MenuBarLayout.prototype._ensureCachedBounds = function(menuItems) {
-  var classList;
-  menuItems.filter(function(menuItem) {
-    return menuItem.isVisible();
-  }).forEach(function(menuItem) {
-    if (!menuItem.htmlComp._cachedPrefSize || !menuItem.htmlComp._cachedMargins) {
-      classList = menuItem.$container.attr('class');
-
-      menuItem.$container.removeClass('overflown');
-      menuItem.$container.removeClass('hidden');
-
-      menuItem.htmlComp._cachedPrefSize = menuItem.htmlComp.prefSize({
-        useCssSize: true,
-        exact: true
-      });
-      menuItem.htmlComp._cachedMargins = scout.graphics.margins(menuItem.$container);
-      menuItem.$container.attrOrRemove('class', classList);
-    }
-  });
-};
-
-scout.MenuBarLayout.prototype._bestGuessFirstLast = function(menuItems) {
-  var ellipsis;
-  menuItems = menuItems.filter(function(menuItem) {
-    menuItem.$container.removeClass('first last');
-    return menuItem.isVisible();
-  });
-
-  scout.arrays.find(menuItems.slice().reverse(), function(menuItem) {
+    itemSize = new scout.Dimension(0, 0);
     if (menuItem.ellipsis) {
-      ellipsis = menuItem;
-      ellipsis.$container.addClass('last');
-      return false;
-    } else if (ellipsis) {
-      menuItem.$container.addClass('last');
-      return true;
+      if (considerEllipsis) {
+        itemSize = this._menuItemSize(menuItem);
+      }
     } else {
-      menuItem.$container.addClass('last');
-      return true;
+      itemSize = this._menuItemSize(menuItem);
     }
+    prefSize.height = Math.max(prefSize.height, itemSize.height);
+    prefSize.width += itemSize.width;
   }, this);
-
-  scout.arrays.first(menuItems).$container.addClass('first');
+  return prefSize;
 };
 
-scout.MenuBarLayout.prototype._updateFirstLastMenuMarker = function() {
-  this._visibleMenuItems.forEach(function(menuItem, index, arr) {
+scout.MenuBarLayout.prototype._menuItemSize = function(menuItem) {
+  var prefSize,
+    classList = menuItem.$container.attr('class');
+
+  menuItem.$container.removeClass('overflown');
+  menuItem.$container.removeClass('hidden');
+
+  prefSize = menuItem.htmlComp.prefSize({
+    useCssSize: true,
+    exact: true
+  }).add(scout.graphics.margins(menuItem.$container));
+
+  menuItem.$container.attrOrRemove('class', classList);
+  return prefSize;
+};
+
+scout.MenuBarLayout.prototype._setFirstLastMenuMarker = function(visibleMenuItems, considerEllipsis) {
+  var menuItems = visibleMenuItems;
+  considerEllipsis = scout.nvl(considerEllipsis, this._overflowMenuItems.length > 0);
+  if (!considerEllipsis) {
+    // remove ellipsis
+    menuItems = menuItems.filter(function(menuItem) {
+      return !menuItem.ellipsis;
+    });
+  }
+  menuItems.forEach(function(menuItem, index, arr) {
+    menuItem.$container.removeClass('first last');
     if (index === 0) {
       menuItem.$container.addClass('first');
-    } else if (index === arr.length - 1) {
-      menuItem.$container.addClass('last');
-    } else {
-      menuItem.$container.removeClass('first last');
     }
-  });
-  this._overflowMenuItems.forEach(function(menuItem) {
-    menuItem.$container.removeClass('first last');
+    // consider ellipsis
+    if (index === (arr.length - 1)) {
+      menuItem.$container.addClass('last');
+    }
   });
 };
 

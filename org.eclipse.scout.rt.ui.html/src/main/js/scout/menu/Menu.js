@@ -64,6 +64,7 @@ scout.Menu.prototype._renderProperties = function() {
   scout.Menu.parent.prototype._renderProperties.call(this);
   this._renderOverflown();
   this._renderDefaultMenu();
+  this._renderMenuButton();
 };
 
 scout.Menu.prototype._remove = function() {
@@ -89,12 +90,10 @@ scout.Menu.prototype._renderItem = function() {
     .on('click', mouseEventHandler);
 
   this._renderSubMenuIcon();
+};
 
-  // when menus with button style are displayed in a overflow-menu,
-  // render as regular menu, ignore button styles.
-  if (this.isButton() && !this.overflown) {
-    this.$container.addClass('menu-button');
-  }
+scout.Menu.prototype._renderMenuButton = function() {
+  this.$container.toggleClass('menu-button', this.isButton() && !this.overflown);
 };
 
 scout.Menu.prototype._renderSelected = function() {
@@ -356,6 +355,7 @@ scout.Menu.prototype._setOverflown = function(overflown) {
 
 scout.Menu.prototype._renderOverflown = function() {
   this.$container.toggleClass('overflown', this.overflown);
+  this._renderMenuButton();
 };
 
 scout.Menu.prototype.setDefaultMenu = function(defaultMenu) {
