@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
 import org.json.JSONArray;
@@ -154,5 +156,44 @@ public class JsonObjectUtilityTest {
     JsonObjectUtility.putIfNotNull(array2, 123);
     assertEquals(3, array2.length());
     assertEquals("[\"element\",null,123]", array2.toString());
+  }
+
+  @Test
+  public void testBeanWithOptionalJsonProperty() {
+    JSONArray a = new JSONArray("[{\"filename\": \"foo\", \"content\":\"\"}]");// intentionally not setting 'available'
+    FixtureDataBean b = JsonObjectUtility.jsonArrayElementToJava(a, 0, FixtureDataBean.class, false);
+    assertEquals("foo", b.getFilename());
+    assertArrayEquals(new byte[0], b.getContent());
+    assertFalse(b.isAvaliable());
+  }
+
+  public static class FixtureDataBean {
+    private String m_filename;
+    private byte[] m_content;
+    private boolean m_avaliable;
+
+    public String getFilename() {
+      return m_filename;
+    }
+
+    public void setFilename(String filename) {
+      m_filename = filename;
+    }
+
+    public byte[] getContent() {
+      return m_content;
+    }
+
+    public void setContent(byte[] content) {
+      m_content = content;
+    }
+
+    public boolean isAvaliable() {
+      return m_avaliable;
+    }
+
+    public void setAvaliable(boolean b) {
+      m_avaliable = b;
+    }
   }
 }
