@@ -82,6 +82,7 @@ public class InteractiveTestSuite extends Runner {
   public void run(final RunNotifier notifier) {
     System.out.println("Started interactive test console. (Auto-closing in 30 seconds when no input is entered, assuming it is a ci-test-run)");
     String lastLine = "";
+    int repeat = 0;
     while (true) {
       try {
         System.out.println("********");
@@ -89,7 +90,17 @@ public class InteractiveTestSuite extends Runner {
         if (!checkIfHumanInterface()) {
           return;
         }
-        String line = new BufferedReader(new InputStreamReader(System.in)).readLine();
+
+        String line;
+        if (repeat > 0 && System.in.available() == 0) {
+          repeat--;
+          line = "";
+        }
+        else {
+          repeat = 0;
+          line = new BufferedReader(new InputStreamReader(System.in)).readLine();
+        }
+
         if (StringUtility.isNullOrEmpty(line)) {
           if (!lastLine.isEmpty()) {
             line = lastLine;
@@ -100,6 +111,10 @@ public class InteractiveTestSuite extends Runner {
         }
         if (".".equalsIgnoreCase(line)) {
           return;
+        }
+        if (line.matches("[0-9]+")) {
+          repeat = Integer.parseInt(line);
+          line = lastLine;
         }
         lastLine = line;
         Method runMethod;
