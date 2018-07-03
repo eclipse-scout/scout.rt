@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
@@ -983,6 +984,19 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
    *           available by instance but by class!
    */
   void setEnabled(boolean enabled, boolean updateParents, boolean updateChildren, String dimension);
+
+  /**
+   * Checks all existing enabled dimensions of this {@link IFormField} if their enabled state equals the value returned
+   * by the {@link IFilter} specified.
+   *
+   * @param filter
+   *          A {@link IFilter} that is called for each enabled dimension. The corresponding enabled-bit of this
+   *          {@link IFormField} must be equal to the result of the {@link IFilter}. In case {@code null} is passed all
+   *          bits are compared against {@code true} (which is the same as {@link #isEnabled()}).
+   * @return {@code true} if all enabled dimensions bits have the same value as returned by the specified
+   *         {@link IFilter}.
+   */
+  boolean isEnabled(IFilter<String> filter);
 
   /**
    * Accepts the given {@link IFormFieldVisitor}. This {@link IFormField} and all child {@link IFormField}s are visited

@@ -52,6 +52,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
@@ -1524,6 +1525,11 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         }
       }, 0, 0, false);
     }
+  }
+
+  @Override
+  public boolean isEnabled(IFilter<String> filter) {
+    return ENABLED_BIT_HELPER.allBitsEqual(m_enabled, filter);
   }
 
   @Override

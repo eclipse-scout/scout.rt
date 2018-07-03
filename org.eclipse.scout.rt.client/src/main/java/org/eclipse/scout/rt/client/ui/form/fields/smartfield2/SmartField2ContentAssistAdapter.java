@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistSearc
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalChooserProvider;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
@@ -860,6 +861,11 @@ public class SmartField2ContentAssistAdapter<VALUE> implements IContentAssistFie
 
   @Override
   public boolean isEnabled(String dimension) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public boolean isEnabled(IFilter<String> filter) {
     throw new UnsupportedOperationException();
   }
 

@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
+import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -34,6 +35,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
@@ -298,8 +300,34 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   protected boolean isIgnoreEnabledChange(final boolean enabled, final String dimension) {
-    boolean ignoreGrantedFlag = getSystemType() == IButton.SYSTEM_TYPE_CANCEL || getSystemType() == IButton.SYSTEM_TYPE_CLOSE;
-    return ignoreGrantedFlag && !enabled && IDimensions.ENABLED_GRANTED.equals(dimension); // cannot set the enabled_granted to false if this is a cancel or close button
+    // cannot set the enabled_granted to false if this is a cancel or close button
+    return isFormCloseButtonType() && !enabled && IDimensions.ENABLED_GRANTED.equals(dimension);
+  }
+
+  protected boolean isFormCloseButtonType() {
+    return getSystemType() == IButton.SYSTEM_TYPE_CANCEL || getSystemType() == IButton.SYSTEM_TYPE_CLOSE;
+  }
+
+  @Override
+  public boolean isEnabledIncludingParents() {
+    if (!isFormCloseButtonType()) {
+      return super.isEnabledIncludingParents();
+    }
+
+    final IFilter<String> ignoreGrantedDimFilter = new IFilter<String>() {
+      @Override
+      public boolean accept(String dim) {
+        return !IDimensions.ENABLED_GRANTED.equals(dim);
+      }
+    };
+
+    IFormFieldVisitor visitor = new IFormFieldVisitor() {
+      @Override
+      public boolean visitField(IFormField f, int level, int fieldIndex) {
+        return f.isEnabled() || f.isEnabled(ignoreGrantedDimFilter);
+      }
+    };
+    return visitParents(visitor);
   }
 
   /*
@@ -508,7 +536,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   protected class P_UIFacade implements IButtonUIFacade {
     @Override
     public void fireButtonClickFromUI() {
-      if (isEnabled() && isVisible()) {
+      if (isEnabledIncludingParents() && isVisibleIncludingParents()) {
         doClick();
       }
     }
