@@ -294,11 +294,14 @@ public final class JsonObjectUtility {
       if (!missingNames.isEmpty()) {
         FastBeanInfo beanInfo = new FastBeanInfo(type, Object.class);
         for (FastPropertyDescriptor desc : beanInfo.getPropertyDescriptors()) {
+          String key = desc.getName();
+          if (!missingNames.contains(key)) {
+            continue;
+          }
           Method m = desc.getWriteMethod();
           if (m == null) {
             continue;
           }
-          String key = desc.getName();
           Object val = jsonObjectPropertyToJava(jbean, key, m.getParameterTypes()[0], throwForMissingProperty);
           m.invoke(o, val);
           missingNames.remove(key);
