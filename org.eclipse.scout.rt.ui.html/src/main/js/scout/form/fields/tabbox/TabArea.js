@@ -121,7 +121,6 @@ scout.TabArea.prototype._renderTabItems = function() {
     tabItem.$tabContainer.on('blur', this._onTabItemBlur.bind(this))
       .on('focus', this._onTabItemFocus.bind(this));
   }, this);
-  this.htmlComp.layout._updateFirstMarker();
 };
 
 scout.TabArea.prototype._onTabItemFocus = function() {
@@ -233,9 +232,6 @@ scout.TabArea.prototype._setTabbableItem = function(tabItem) {
 
 scout.TabArea.prototype._onTabPropertyChange = function(event) {
   if (event.propertyName === 'visible') {
-    if (this.rendered) {
-      this.htmlComp.layout._updateFirstMarker();
-    }
     this.invalidateLayoutTree();
   }
   if (event.propertyName === 'subLabel') {

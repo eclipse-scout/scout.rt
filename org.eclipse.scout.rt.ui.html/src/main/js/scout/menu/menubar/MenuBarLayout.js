@@ -178,22 +178,23 @@ scout.MenuBarLayout.prototype._menuItemSize = function(menuItem) {
 scout.MenuBarLayout.prototype._setFirstLastMenuMarker = function(visibleMenuItems, considerEllipsis) {
   var menuItems = visibleMenuItems;
   considerEllipsis = scout.nvl(considerEllipsis, this._overflowMenuItems.length > 0);
+
+  // reset
+  this._menuBar.orderedMenuItems.all.forEach(function(menuItem) {
+    menuItem.$container.removeClass('first last');
+  });
+
+  // set first and last
   if (!considerEllipsis) {
     // remove ellipsis
     menuItems = menuItems.filter(function(menuItem) {
       return !menuItem.ellipsis;
     });
   }
-  menuItems.forEach(function(menuItem, index, arr) {
-    menuItem.$container.removeClass('first last');
-    if (index === 0) {
-      menuItem.$container.addClass('first');
-    }
-    // consider ellipsis
-    if (index === (arr.length - 1)) {
-      menuItem.$container.addClass('last');
-    }
-  });
+  if (menuItems.length > 0) {
+    menuItems[0].$container.addClass('first');
+    menuItems[menuItems.length - 1].$container.addClass('last');
+  }
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
