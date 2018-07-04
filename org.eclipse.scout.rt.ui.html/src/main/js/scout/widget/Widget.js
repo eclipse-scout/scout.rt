@@ -1459,7 +1459,7 @@ scout.Widget.prototype._deepCloneProperties = function(clone, properties, option
   if (!properties) {
     return clone;
   }
-  properties = (Array.isArray(properties)) ? properties : [properties];
+  properties = scout.arrays.ensure(properties);
   properties.forEach(function(property) {
     var propertyValue = this[property],
       clonedProperty = null;

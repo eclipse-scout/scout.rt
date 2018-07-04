@@ -44,11 +44,11 @@ scout.widgets = {
    * Iterates through the given widgets and toggles the 'first' and 'last' classes on the corresponding widgets if the widgets are visible and rendered.
    */
   updateFirstLastMarker: function(widgets) {
-    widgets.forEach(function(widget, i, widgets) {
-      if (widget.rendered && widget.isVisible()) {
-        widget.$container.toggleClass('first', i === 0);
-        widget.$container.toggleClass('last', i === widgets.length - 1);
-      }
+    widgets.filter(function(widget, i, widgets) {
+      return widget.rendered && widget.isVisible();
+    }).forEach(function(widget, i, widgets) {
+      widget.$container.toggleClass('first', i === 0);
+      widget.$container.toggleClass('last', i === widgets.length - 1);
     });
   }
 

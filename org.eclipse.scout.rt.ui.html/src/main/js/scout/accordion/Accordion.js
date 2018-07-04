@@ -237,7 +237,7 @@ scout.Accordion.prototype._updateExclusiveExpand = function() {
     return;
   }
   var expandedGroup = scout.arrays.find(this.groups, function(group) {
-    return !group.collapsed;
+    return group.visible && !group.collapsed;
   });
   this._collapseOthers(expandedGroup);
 };
@@ -263,6 +263,8 @@ scout.Accordion.prototype._collapseOthers = function(expandedGroup) {
 scout.Accordion.prototype._onGroupPropertyChange = function(event) {
   if (event.propertyName === 'collapsed') {
     this._onGroupCollapsedChange(event);
+  } else if (event.propertyName === 'visible') {
+    this._updateFirstLastMarker();
   }
 };
 
