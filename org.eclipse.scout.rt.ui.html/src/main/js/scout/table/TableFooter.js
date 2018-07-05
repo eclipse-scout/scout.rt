@@ -223,13 +223,21 @@ scout.TableFooter.prototype._renderInfoLoad = function() {
 
   $info.empty();
   if (!this._compactStyle) {
-    $info.appendSpan().text(this.session.text('ui.NumRowsLoaded', this.computeCountInfo(numRows)));
+    if (numRows <= 1) {
+      $info.appendSpan().text(this.session.text('ui.NumRowLoaded', this.computeCountInfo(numRows)));
+    } else {
+      $info.appendSpan().text(this.session.text('ui.NumRowsLoaded', this.computeCountInfo(numRows)));
+    }
     if (this.table.hasReloadHandler) {
       $info.appendBr();
       $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadData')).appendTo($info);
     }
   } else {
-    $info.appendSpan().text(this.session.text('ui.NumRowsLoadedMin'));
+    if (numRows <= 1) {
+      $info.appendSpan().text(this.session.text('ui.NumRowLoadedMin'));
+    } else {
+      $info.appendSpan().text(this.session.text('ui.NumRowsLoadedMin'));
+    }
     $info.appendBr();
     $info.appendSpan('table-info-button').text(this.computeCountInfo(numRows));
   }
@@ -248,14 +256,26 @@ scout.TableFooter.prototype._renderInfoFilter = function() {
   $info.empty();
   if (!this._compactStyle) {
     if (filteredBy) {
-      $info.appendSpan().text(this.session.text('ui.NumRowsFilteredBy', this.computeCountInfo(numRowsFiltered), filteredBy));
+      if (numRowsFiltered <= 1) {
+        $info.appendSpan().text(this.session.text('ui.NumRowFilteredBy', this.computeCountInfo(numRowsFiltered), filteredBy));
+      } else {
+        $info.appendSpan().text(this.session.text('ui.NumRowsFilteredBy', this.computeCountInfo(numRowsFiltered), filteredBy));
+      }
     } else {
-      $info.appendSpan().text(this.session.text('ui.NumRowsFiltered', this.computeCountInfo(numRowsFiltered)));
+      if (numRowsFiltered <= 1) {
+        $info.appendSpan().text(this.session.text('ui.NumRowFiltered', this.computeCountInfo(numRowsFiltered)));
+      } else {
+        $info.appendSpan().text(this.session.text('ui.NumRowsFiltered', this.computeCountInfo(numRowsFiltered)));
+      }
     }
     $info.appendBr();
     $info.appendSpan('table-info-button').text(this.session.text('ui.RemoveFilter')).appendTo($info);
   } else {
-    $info.appendSpan().text(this.session.text('ui.NumRowsFilteredMin'));
+    if (numRowsFiltered <= 1) {
+      $info.appendSpan().text(this.session.text('ui.NumRowFilteredMin'));
+    } else {
+      $info.appendSpan().text(this.session.text('ui.NumRowsFilteredMin'));
+    }
     $info.appendBr();
     $info.appendSpan('table-info-button').text(this.computeCountInfo(numRowsFiltered));
   }
@@ -273,11 +293,20 @@ scout.TableFooter.prototype._renderInfoSelection = function() {
 
   $info.empty();
   if (!this._compactStyle) {
-    $info.appendSpan().text(this.session.text('ui.NumRowsSelected', this.computeCountInfo(numRowsSelected)));
+    if (numRowsSelected <= 1) {
+      $info.appendSpan().text(this.session.text('ui.NumRowSelected', this.computeCountInfo(numRowsSelected)));
+    }
+    else {
+      $info.appendSpan().text(this.session.text('ui.NumRowsSelected', this.computeCountInfo(numRowsSelected)));
+    }
     $info.appendBr();
     $info.appendSpan('table-info-button').text(this.session.text(all ? 'ui.SelectNone' : 'ui.SelectAll')).appendTo($info);
   } else {
-    $info.appendSpan().text(this.session.text('ui.NumRowsSelectedMin'));
+    if(numRowsSelected <= 1) {
+      $info.appendSpan().text(this.session.text('ui.NumRowSelectedMin'));
+    } else {
+      $info.appendSpan().text(this.session.text('ui.NumRowsSelectedMin'));
+    }
     $info.appendBr();
     $info.appendSpan('table-info-button').text(this.computeCountInfo(numRowsSelected));
   }
