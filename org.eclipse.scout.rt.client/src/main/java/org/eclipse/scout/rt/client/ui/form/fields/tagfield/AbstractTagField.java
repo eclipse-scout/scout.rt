@@ -166,7 +166,7 @@ public abstract class AbstractTagField extends AbstractValueField<Set<String>> i
 
     @Override
     public void setValueFromUI(Set<String> value) {
-      if (!isEnabled() || !isVisible()) {
+      if (!isEnabledIncludingParents() || !isVisibleIncludingParents()) {
         return;
       }
       setValue(value);
@@ -174,7 +174,7 @@ public abstract class AbstractTagField extends AbstractValueField<Set<String>> i
 
     @Override
     public void lookupByTextFromUI(String text) {
-      if (!isEnabled() || !isVisible()) {
+      if (!isEnabledIncludingParents() || !isVisibleIncludingParents()) {
         return;
       }
       lookupByText(text);

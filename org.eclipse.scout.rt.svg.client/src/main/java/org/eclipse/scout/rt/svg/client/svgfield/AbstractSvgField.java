@@ -173,7 +173,7 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
 
     @Override
     public void fireClickFromUI(SVGPoint point) {
-      if (!isEnabled() || !isVisible()) {
+      if (!isEnabledIncludingParents() || !isVisibleIncludingParents()) {
         return;
       }
       setSelection(point);

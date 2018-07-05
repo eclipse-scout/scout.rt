@@ -33,7 +33,7 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
 
     @Override
     public void setDisplayTextFromUI(String text) {
-      if (!isEnabled() || !isVisible()) {
+      if (!isEnabledIncludingParents() || !isVisibleIncludingParents()) {
         return;
       }
       setDisplayText(text);
@@ -41,7 +41,7 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
 
     @Override
     public void parseAndSetValueFromUI(String value) {
-      if (!isEnabled() || !isVisible()) {
+      if (!isEnabledIncludingParents() || !isVisibleIncludingParents()) {
         return;
       }
       if (value == null) {

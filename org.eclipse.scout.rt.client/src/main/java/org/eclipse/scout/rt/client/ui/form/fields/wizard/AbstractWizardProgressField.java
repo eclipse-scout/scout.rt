@@ -170,7 +170,7 @@ public abstract class AbstractWizardProgressField extends AbstractFormField impl
 
     @Override
     public void stepActionFromUI(int stepIndex) {
-      if (!isEnabled() || !isVisible()) {
+      if (!isEnabledIncludingParents() || !isVisibleIncludingParents()) {
         return;
       }
       interceptStepAction(stepIndex);

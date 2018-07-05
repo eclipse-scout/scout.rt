@@ -465,7 +465,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
 
     @Override
     public void setValueFromUI(Date date) {
-      if (!isEnabled() || !isVisible()) {
+      if (!isEnabledIncludingParents() || !isVisibleIncludingParents()) {
         return;
       }
       setValue(date);
@@ -473,7 +473,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
 
     @Override
     public void setDisplayTextFromUI(String text) {
-      if (!isEnabled() || !isVisible()) {
+      if (!isEnabledIncludingParents() || !isVisibleIncludingParents()) {
         return;
       }
       setDisplayText(text);

@@ -154,7 +154,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
 
     @Override
     public void parseAndSetValueFromUI(String value) {
-      if (!isEnabled() || !isVisible()) {
+      if (!isEnabledIncludingParents() || !isVisibleIncludingParents()) {
         return;
       }
       parseAndSetValue(value);
