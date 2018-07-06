@@ -504,14 +504,6 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     return m_sqlStyle;
   }
 
-  /*
-   * Internals
-   */
-  private Connection leaseConnection() {
-    Connection conn = execCreateConnection();
-    return conn;
-  }
-
   @SuppressWarnings("squid:S1193")
   private Connection leaseConnectionInternal() {
     try {
@@ -558,7 +550,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     }
   }
 
-  private synchronized SqlConnectionPool getSqlConnectionPool() {
+  protected synchronized SqlConnectionPool getSqlConnectionPool() {
     Assertions.assertFalse(isDestroyed(), "{} not available because the platform has been shut down.", getClass().getSimpleName());
     if (m_pool == null) {
       m_pool = BEANS.get(SqlConnectionPool.class);
@@ -588,7 +580,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     SqlTransactionMember member = (SqlTransactionMember) tx.getMember(getTransactionMemberId());
     if (member == null) {
       @SuppressWarnings("resource")
-      Connection connection = leaseConnection();
+      Connection connection = execCreateConnection();
       member = new SqlTransactionMember(getTransactionMemberId(), connection);
       tx.registerMember(member);
       // this is the start of the transaction
