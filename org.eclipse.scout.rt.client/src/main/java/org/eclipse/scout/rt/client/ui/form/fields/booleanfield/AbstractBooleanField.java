@@ -196,9 +196,10 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
   protected class P_UIFacade implements IBooleanFieldUIFacade {
     @Override
     public void setValueFromUI(Boolean value) {
-      if (isEnabled() && isVisible()) {
-        setValue(value);
+      if (!isEnabledIncludingParents() || !isVisibleIncludingParents()) {
+        return;
       }
+      setValue(value);
     }
   }
 
