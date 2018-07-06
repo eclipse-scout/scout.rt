@@ -110,13 +110,6 @@ scout.TabItem.prototype._onStatusMouseDown = function(event) {
   event.preventDefault();
 };
 
-scout.TabItem.prototype.focusTab = function() {
-  if (this._tabRendered) {
-    return this.session.focusManager.requestFocus(this.$tabContainer);
-  }
-  return false;
-};
-
 scout.TabItem.prototype.setTabActive = function(active) {
   var oldTabActive = this._tabActive;
   this._tabActive = active;
@@ -409,4 +402,22 @@ scout.TabItem.prototype.focus = function() {
     return false;
   }
   return this.focusTab();
+};
+
+/**
+ * @override
+ */
+scout.TabItem.prototype.getFocusableElement = function() {
+  if (!this._tabRendered) {
+    return null;
+  }
+  return this.$tabContainer[0];
+};
+
+scout.TabItem.prototype.focusTab = function() {
+  var elem = this.getFocusableElement();
+  if (elem) {
+    return this.session.focusManager.requestFocus(elem);
+  }
+  return false;
 };

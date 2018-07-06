@@ -167,7 +167,7 @@ scout.RadioButtonGroup.prototype.getFields = function() {
 };
 
 /**
- * @override FormField.js
+ * @override
  */
 scout.RadioButtonGroup.prototype.visitFields = function(visitor) {
   scout.RadioButtonGroup.parent.prototype.visitFields.call(this, visitor);
@@ -179,12 +179,9 @@ scout.RadioButtonGroup.prototype.visitFields = function(visitor) {
 /**
  * @override
  */
-scout.RadioButtonGroup.prototype.activate = function() {
+scout.RadioButtonGroup.prototype.getFocusableElement = function() {
   // The first button may not be focusable because it is not selected and therefore has no tab index -> find the first focusable button
-  var element = this.session.focusManager.findFirstFocusableElement(this.$container);
-  if (element) {
-    element.focus();
-  }
+  return this.session.focusManager.findFirstFocusableElement(this.$container);
 };
 
 /**

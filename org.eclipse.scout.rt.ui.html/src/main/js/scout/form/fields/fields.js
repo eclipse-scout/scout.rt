@@ -93,19 +93,13 @@ scout.fields = {
   },
 
   /**
-   * Calls activate() on the first visible and enabled field of the given fields. Does nothing if the widget is disabled or not rendered.
+   * Calls activate() on the first focusable field of the given fields. Does nothing if the widget is disabled or not rendered.
    *
    * @param {scout.Widget} field
    * @param {scout.FormField[]} fields
    */
   activateFirstField: function(widget, fields) {
-    if (!widget.enabledComputed || !widget.rendered) {
-      return;
-    }
-    var firstField = fields.filter(function(field) {
-      return field.visible && field.enabledComputed;
-    })[0];
-
+    var firstField = scout.widgets.findFirstFocusableWidget(fields, widget);
     if (firstField) {
       firstField.activate();
     }

@@ -397,7 +397,7 @@ scout.Button.prototype._onClick = function(event) {
 };
 
 /**
- * @override FormField.js
+ * @override
  */
 scout.Button.prototype.getFocusableElement = function() {
   if (this.adaptedBy) {
@@ -408,7 +408,18 @@ scout.Button.prototype.getFocusableElement = function() {
 };
 
 /**
- * @override FormField.js
+ * @override
+ */
+scout.Button.prototype.isFocusable = function() {
+  if (this.adaptedBy) {
+    return this.adaptedBy.isFocusable();
+  } else {
+    return scout.Button.parent.prototype.isFocusable.call(this);
+  }
+};
+
+/**
+ * @override
  */
 scout.Button.prototype.focus = function() {
   if (this.adaptedBy) {

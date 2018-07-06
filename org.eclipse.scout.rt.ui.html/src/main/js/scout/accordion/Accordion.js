@@ -223,6 +223,17 @@ scout.Accordion.prototype._renderScrollable = function() {
   this.invalidateLayoutTree();
 };
 
+/**
+ * @override
+ */
+scout.Accordion.prototype.getFocusableElement = function() {
+  var group = scout.widgets.findFirstFocusableWidget(this.groups, this);
+  if (group) {
+    return group.getFocusableElement();
+  }
+  return null;
+};
+
 scout.Accordion.prototype.setExclusiveExpand = function(exclusiveExpand) {
   this.setProperty('exclusiveExpand', exclusiveExpand);
 };

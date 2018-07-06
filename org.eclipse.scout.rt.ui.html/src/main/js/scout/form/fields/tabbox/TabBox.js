@@ -203,3 +203,13 @@ scout.TabBox.prototype.focus = function() {
     return this.selectedTab.focus();
   }
 };
+
+/**
+ * @override
+ */
+scout.TabBox.prototype.getFocusableElement = function() {
+  if (this.selectedTab) {
+    return this.selectedTab.getFocusableElement();
+  }
+  return null;
+};

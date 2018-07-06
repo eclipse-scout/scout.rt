@@ -76,3 +76,13 @@ scout.AccordionField.prototype._removeAccordion = function() {
   this._removeField();
   this.invalidateLayoutTree();
 };
+
+/**
+ * @override
+ */
+scout.AccordionField.prototype.getFocusableElement = function() {
+  if (this.accordion) {
+    return this.accordion.getFocusableElement();
+  }
+  return null;
+};

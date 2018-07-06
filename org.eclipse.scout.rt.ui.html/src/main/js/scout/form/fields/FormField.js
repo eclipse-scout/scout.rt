@@ -782,13 +782,11 @@ scout.FormField.prototype.focus = function() {
   if (focusableElement) {
     return this.session.focusManager.requestFocus(focusableElement);
   }
-
-  var element = this.session.focusManager.findFirstFocusableElement(this.$container);
-  return this.session.focusManager.requestFocus(element);
+  return false;
 };
 
 /**
- * This method returns the HtmlElement to be used as initial focus element.
+ * This method returns the HtmlElement to be used as initial focus element or when {@link #focus()} is called.
  * It can be overridden, in case the FormField needs to return something other than this.$field[0].
  *
  * @override
@@ -817,8 +815,9 @@ scout.FormField.prototype.activate = function() {
     return;
   }
   // Explicitly don't use this.focus() because this.focus uses the focus manager which may be disabled (e.g. on mobile devices)
-  if (this.$field) {
-    this.$field.focus();
+  var focusableElement = this.getFocusableElement();
+  if (focusableElement) {
+    $.ensure(focusableElement).focus();
   }
 };
 

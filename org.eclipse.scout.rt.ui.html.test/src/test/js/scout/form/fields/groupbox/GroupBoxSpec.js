@@ -109,12 +109,73 @@ describe("GroupBox", function() {
   });
 
   describe('focus', function() {
-    it('focus first focusable field in groupBox', function() {
-      var groupBox = helper.createGroupBoxWithOneField(session.desktop);
-      groupBox.render();
-      expect(scout.focusUtils.isActiveElement(groupBox.fields[0].$field[0])).toBe(false);
-      groupBox.focus();
-      expect(scout.focusUtils.isActiveElement(groupBox.fields[0].$field[0])).toBe(true);
+    it('focuses the first field', function() {
+      var box = scout.create('GroupBox', {
+        parent: session.desktop,
+        fields: [{
+          objectType: 'StringField'
+        }, {
+          objectType: 'StringField'
+        }]
+      });
+      box.render();
+      expect(box.fields[0].$field).not.toBeFocused();
+
+      box.focus();
+      expect(box.fields[0].$field).toBeFocused();
+    });
+
+    it('focuses the second field if the first is disabled', function() {
+      var box = scout.create('GroupBox', {
+        parent: session.desktop,
+        fields: [{
+          objectType: 'StringField',
+          enabled: false
+        }, {
+          objectType: 'StringField',
+          enabled: true
+        }]
+      });
+      box.render();
+      expect(box.fields[1].$field).not.toBeFocused();
+
+      box.focus();
+      expect(box.fields[1].$field).toBeFocused();
+    });
+
+    it('focuses the second field if the first not focusable', function() {
+      var box = scout.create('GroupBox', {
+        parent: session.desktop,
+        fields: [{
+          objectType: 'LabelField'
+        }, {
+          objectType: 'StringField'
+        }]
+      });
+      box.render();
+      expect(box.fields[1].$field).not.toBeFocused();
+
+      box.focus();
+      expect(box.fields[1].$field).toBeFocused();
+    });
+
+    it('considers child group boxes', function() {
+      var box = scout.create('GroupBox', {
+        parent: session.desktop,
+        fields: [{
+          objectType: 'GroupBox',
+          fields: [{
+            objectType: 'LabelField'
+          }, {
+            objectType: 'StringField'
+          }]
+        }]
+      });
+      box.render();
+      expect(box.fields[0].fields[1].$field).not.toBeFocused();
+
+      box.focus();
+      expect(box.fields[0].fields[1].$field).toBeFocused();
     });
   });
 

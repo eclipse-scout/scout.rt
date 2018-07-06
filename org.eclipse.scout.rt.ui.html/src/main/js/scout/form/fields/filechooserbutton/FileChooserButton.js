@@ -26,9 +26,7 @@ scout.FileChooserButton.prototype._init = function(model) {
     label: this._buttonLabel(),
     iconId: this.iconId
   });
-
   this.button.on('click', this._onButtonClick.bind(this));
-
 
   this.fileInput.on('change', this._onFileChange.bind(this));
   this.on('propertyChange', function(event) {
@@ -118,4 +116,11 @@ scout.FileChooserButton.prototype._validateValue = function(value) {
  */
 scout.FileChooserButton.prototype._formatValue = function(value) {
   return !value ? '' : value.name;
+};
+
+/**
+ * @override
+ */
+scout.FileChooserButton.prototype.getFocusableElement = function() {
+  return this.button.getFocusableElement();
 };

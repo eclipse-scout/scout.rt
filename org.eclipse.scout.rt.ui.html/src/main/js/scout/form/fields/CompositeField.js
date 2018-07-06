@@ -44,3 +44,21 @@ scout.CompositeField.prototype.setFieldStyle = function(fieldStyle) {
   });
   scout.CompositeField.parent.prototype.setFieldStyle.call(this, fieldStyle);
 };
+
+/**
+ * @override
+ */
+scout.CompositeField.prototype.activate = function() {
+  scout.fields.activateFirstField(this, this.getFields());
+};
+
+/**
+ * @override
+ */
+scout.CompositeField.prototype.getFocusableElement = function() {
+  var field = scout.widgets.findFirstFocusableWidget(this.getFields(), this);
+  if (field) {
+    return field.getFocusableElement();
+  }
+  return null;
+};

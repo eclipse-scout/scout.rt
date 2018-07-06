@@ -21,8 +21,12 @@ describe('SequenceBox', function() {
   function createField(modelProperties) {
     var seqBox = helper.createField('SequenceBox', session.desktop, modelProperties);
     var fields = [
-      helper.createField('StringField', seqBox, {statusVisible: false}),
-      helper.createField('DateField', seqBox, {statusVisible: false})
+      helper.createField('StringField', seqBox, {
+        statusVisible: false
+      }),
+      helper.createField('DateField', seqBox, {
+        statusVisible: false
+      })
     ];
     seqBox.setProperty('fields', fields);
     return seqBox;
@@ -32,7 +36,9 @@ describe('SequenceBox', function() {
 
     // Must not contain an indicator to prevent a double indicator if the first field is mandatory too
     it('does not exist', function() {
-      var field = createField({mandatory: true});
+      var field = createField({
+        mandatory: true
+      });
       field.render();
 
       expect(field.$mandatory).toBeUndefined();
@@ -57,7 +63,9 @@ describe('SequenceBox', function() {
   describe('status handling', function() {
 
     it('moves the error status of the last field to the seq box', function() {
-      var field = createField({statusVisible: false});
+      var field = createField({
+        statusVisible: false
+      });
       field.render();
 
       expect(field.$status.isVisible()).toBe(false);
@@ -65,7 +73,9 @@ describe('SequenceBox', function() {
       expect(field.fields[1].$status.isVisible()).toBe(false);
       expect(field.fields[1].errorStatus).toBeFalsy();
 
-      field.fields[1].setErrorStatus({message:'foo'});
+      field.fields[1].setErrorStatus({
+        message: 'foo'
+      });
 
       expect(field.$status.isVisible()).toBe(true);
       expect(field.errorStatus.message).toBe('foo');
@@ -74,7 +84,9 @@ describe('SequenceBox', function() {
     });
 
     it('moves the tooltip of the last field to the seq box', function() {
-      var field = createField({statusVisible: false});
+      var field = createField({
+        statusVisible: false
+      });
       field.render();
 
       expect(field.$status.isVisible()).toBe(false);
@@ -91,7 +103,9 @@ describe('SequenceBox', function() {
     });
 
     it('moves the menus of the last field to the seq box', function() {
-      var field = createField({statusVisible: false});
+      var field = createField({
+        statusVisible: false
+      });
       var menu0 = menuHelper.createMenu(menuHelper.createModel());
       field.fields[1].menus = [menu0];
       field.fields[1].menusVisible = false;
@@ -111,20 +125,26 @@ describe('SequenceBox', function() {
     });
 
     it('does not display the error message of the last field, only the one of the seq box', function() {
-      var field = createField({statusVisible: false});
+      var field = createField({
+        statusVisible: false
+      });
       field.render();
 
       expect(field.fields[1].tooltip).toBeFalsy();
       expect(field.tooltip).toBeFalsy();
 
-      field.fields[1].setProperty('errorStatus', {message:'foo'});
+      field.fields[1].setProperty('errorStatus', {
+        message: 'foo'
+      });
 
       expect(field.fields[1].tooltip).toBeFalsy();
       expect(field.tooltip.rendered).toBe(true);
     });
 
     it('removes the tooltip from the seq box if last field gets invisible', function() {
-      var field = createField({statusVisible: false});
+      var field = createField({
+        statusVisible: false
+      });
       field.fields[1].tooltipText = 'foo';
       field.render();
 
@@ -142,7 +162,9 @@ describe('SequenceBox', function() {
     });
 
     it('moves the tooltip from the first field to the seq box if it gets the last field after a visibility change', function() {
-      var field = createField({statusVisible: false});
+      var field = createField({
+        statusVisible: false
+      });
       field.fields[0].tooltipText = 'foo';
       field.render();
 
@@ -160,8 +182,12 @@ describe('SequenceBox', function() {
     });
 
     it('moves the error from the first field to the seq box if it gets the last field after a visibility change', function() {
-      var field = createField({statusVisible: false});
-      field.fields[0].errorStatus = new scout.Status({message: 'foo'});
+      var field = createField({
+        statusVisible: false
+      });
+      field.fields[0].errorStatus = new scout.Status({
+        message: 'foo'
+      });
       field.render();
 
       expect(field.$status.isVisible()).toBe(false);
@@ -181,8 +207,12 @@ describe('SequenceBox', function() {
     });
 
     it('makes sure the status may be displayed on the field again if the field was the last visible field once', function() {
-      var field = createField({statusVisible: false});
-      field.fields[0].errorStatus = new scout.Status({message: 'foo'});
+      var field = createField({
+        statusVisible: false
+      });
+      field.fields[0].errorStatus = new scout.Status({
+        message: 'foo'
+      });
       field.render();
 
       expect(field.$status.isVisible()).toBe(false);
@@ -280,4 +310,55 @@ describe('SequenceBox', function() {
     });
   });
 
+  describe('focus', function() {
+    it('focuses the first field', function() {
+      var box = scout.create('SequenceBox', {
+        parent: session.desktop,
+        fields: [{
+          objectType: 'StringField'
+        }, {
+          objectType: 'StringField'
+        }]
+      });
+      box.render();
+      expect(box.fields[0].$field).not.toBeFocused();
+
+      box.focus();
+      expect(box.fields[0].$field).toBeFocused();
+    });
+
+    it('focuses the second field if the first is disabled', function() {
+      var box = scout.create('SequenceBox', {
+        parent: session.desktop,
+        fields: [{
+          objectType: 'StringField',
+          enabled: false
+        }, {
+          objectType: 'StringField',
+          enabled: true
+        }]
+      });
+      box.render();
+      expect(box.fields[1].$field).not.toBeFocused();
+
+      box.focus();
+      expect(box.fields[1].$field).toBeFocused();
+    });
+
+    it('focuses the second field if the first is not focusable', function() {
+      var box = scout.create('SequenceBox', {
+        parent: session.desktop,
+        fields: [{
+          objectType: 'LabelField'
+        }, {
+          objectType: 'StringField'
+        }]
+      });
+      box.render();
+      expect(box.fields[1].$field).not.toBeFocused();
+
+      box.focus();
+      expect(box.fields[1].$field).toBeFocused();
+    });
+  });
 });

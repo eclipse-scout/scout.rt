@@ -1641,13 +1641,6 @@ scout.Widget.prototype.focusAndPreventDefault = function(event) {
 };
 
 /**
- * @returns whether the widget is the currently active element
- */
-scout.Widget.prototype.isFocused = function() {
-  return this.rendered && scout.focusUtils.isActiveElement(this.$container);
-};
-
-/**
  * Brings the widget into view by scrolling the first scrollable parent.
  */
 scout.Widget.prototype.reveal = function() {
@@ -1670,7 +1663,21 @@ scout.Widget.prototype.isFocused = function() {
 };
 
 /**
- * This method returns the HtmlElement to be used as initial focus element.<br>
+ * @return true if the element is focusable, false if not.
+ */
+scout.Widget.prototype.isFocusable = function() {
+  if (!this.rendered || !this.visible) {
+    return false;
+  }
+  var elem = this.getFocusableElement();
+  if (elem) {
+    return $.ensure(elem).is(':focusable');
+  }
+  return false;
+};
+
+/**
+ * This method returns the HtmlElement to be used when {@link #focus()} is called.
  * It can be overridden, in case the widget needs to return something other than this.$container[0].
  */
 scout.Widget.prototype.getFocusableElement = function() {

@@ -538,16 +538,14 @@ scout.DateField.prototype.activate = function() {
 /**
  * @override
  */
-scout.DateField.prototype.focus = function() {
-  if (!this.rendered) {
-    this._postRenderActions.push(this.focus.bind(this));
-    return false;
-  }
+scout.DateField.prototype.getFocusableElement = function() {
   if (this.$dateField) {
-    return this.session.focusManager.requestFocus(this.$dateField[0]);
-  } else if (this.$timeField) {
-    return this.session.focusManager.requestFocus(this.$timeField[0]);
+    return this.$dateField;
   }
+  if (this.$timeField) {
+    return this.$timeField;
+  }
+  return null;
 };
 
 scout.DateField.prototype._onDateFieldMouseDown = function() {

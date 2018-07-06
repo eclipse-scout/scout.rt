@@ -92,13 +92,6 @@ scout.SequenceBox.prototype._renderLayoutConfig = function() {
   }
 };
 
-/**
- * @override
- */
-scout.SequenceBox.prototype.activate = function() {
-  scout.fields.activateFirstField(this, this.fields);
-};
-
 scout.SequenceBox.prototype._onFieldPropertyChange = function(event) {
   var visibiltyChanged = (event.propertyName === 'visible');
   if (scout.isOneOf(event.propertyName, ['errorStatus', 'tooltipText', 'visible', 'menus', 'menusVisible'])) {

@@ -210,6 +210,16 @@ scout.Group.prototype._renderBody = function() {
   this.body.invalidateLayoutTree();
 };
 
+/**
+ * @override
+ */
+scout.Group.prototype.getFocusableElement = function() {
+  if (!this.rendered) {
+    return false;
+  }
+  return this.$header;
+};
+
 scout.Group.prototype.toggleCollapse = function() {
   this.setCollapsed(!this.collapsed);
 };

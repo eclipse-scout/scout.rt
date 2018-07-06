@@ -409,4 +409,25 @@ describe("RadioButtonGroup", function() {
     });
   });
 
+  describe('focus', function() {
+    it('focuses the selected button', function() {
+      var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
+      radioButtonGroup.render();
+      radioButtonGroup.selectButton(radioButtonGroup.radioButtons[1]);
+      expect(radioButtonGroup.radioButtons[1].$field).not.toBeFocused();
+
+      radioButtonGroup.focus();
+      expect(radioButtonGroup.radioButtons[1].$field).toBeFocused();
+    });
+
+    it('focuses the first button if no button is selected', function() {
+      var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
+      radioButtonGroup.render();
+      expect(radioButtonGroup.selectedButton).toBe(null);
+      expect(radioButtonGroup.radioButtons[0].$field).not.toBeFocused();
+
+      radioButtonGroup.focus();
+      expect(radioButtonGroup.radioButtons[0].$field).toBeFocused();
+    });
+  });
 });

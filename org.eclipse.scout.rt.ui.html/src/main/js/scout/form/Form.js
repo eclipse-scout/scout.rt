@@ -820,12 +820,14 @@ scout.Form.prototype._detach = function() {
 };
 
 scout.Form.prototype.renderInitialFocus = function() {
-  if (this.rendered) {
-    if (!this.initialFocus) {
-      this.session.focusManager.requestFocus(this.session.focusManager.findFirstFocusableElement(this.$container));
-    } else if (this.initialFocus instanceof scout.FormField) {
-      this.initialFocus.focus();
-    }
+  if (!this.rendered) {
+    return;
+  }
+
+  if (this.initialFocus) {
+    this.initialFocus.focus();
+  } else {
+    this.session.focusManager.requestFocus(this.session.focusManager.findFirstFocusableElement(this.$container));
   }
 };
 
