@@ -103,10 +103,15 @@ describe('TabBox', function() {
           label: "second"
         }]
       });
+      // set the tab-item to inline-block to ensure correct width calculation (e.g. PhantomJS)
+      $('<style>' +
+        '.tab-item { display: inline-block;}' +
+        '</style>').appendTo($('#sandbox'));
     });
 
     it('is added to the first tab item', function() {
       tabBox.render();
+      tabBox.validateLayout();
       expect(tabBox.tabItems[0].$tabContainer).toHaveClass('first');
       expect(tabBox.tabItems[1].$tabContainer).not.toHaveClass('first');
     });
@@ -127,6 +132,7 @@ describe('TabBox', function() {
         }]
       });
       tabBox.render();
+      tabBox.validateLayout();
       expect(tabBox.tabItems[0].$tabContainer.isVisible()).toBe(false);
       expect(tabBox.tabItems[1].$tabContainer).toHaveClass('first');
       expect(tabBox.tabItems[2].$tabContainer).not.toHaveClass('first');
@@ -134,7 +140,9 @@ describe('TabBox', function() {
 
     it('is correctly updated when visibility changes', function() {
       tabBox.render();
+      tabBox.validateLayout();
       tabBox.tabItems[0].setVisible(false);
+      tabBox.validateLayout();
       expect(tabBox.tabItems[0].$tabContainer.isVisible()).toBe(false);
       expect(tabBox.tabItems[1].$tabContainer).toHaveClass('first');
     });
