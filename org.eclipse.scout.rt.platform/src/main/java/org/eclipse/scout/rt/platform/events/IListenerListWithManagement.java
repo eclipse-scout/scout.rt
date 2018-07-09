@@ -8,11 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.eventlistprofiler;
+package org.eclipse.scout.rt.platform.events;
 
+/**
+ * event listener list with support for jmx management
+ */
 @FunctionalInterface
-public interface IEventListenerSnapshot {
+public interface IListenerListWithManagement {
 
-  void add(Class<?> listenerType, String context, Object listener);
+  void createSnapshot(ISnapshotCollector collector);
 
 }

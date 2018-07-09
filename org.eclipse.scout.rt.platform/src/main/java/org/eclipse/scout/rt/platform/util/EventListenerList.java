@@ -15,43 +15,40 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.util.EventListener;
 
-import org.eclipse.scout.rt.platform.eventlistprofiler.EventListenerProfiler;
-import org.eclipse.scout.rt.platform.eventlistprofiler.IEventListenerSnapshot;
-import org.eclipse.scout.rt.platform.eventlistprofiler.IEventListenerSource;
+import org.eclipse.scout.rt.platform.events.IListenerListWithManagement;
+import org.eclipse.scout.rt.platform.events.ISnapshotCollector;
+import org.eclipse.scout.rt.platform.events.ListenerListRegistry;
 import org.eclipse.scout.rt.platform.util.event.AbstractGroupedListenerList;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 
 /**
  * NOTE: This class has poor performance with large numbers of listeners and add /remove operations. Therefore since 8.0
- * there are two alternatives {@link FastListenerList} and {@link AbstractGroupedListenerList} that are
- * also thread-safe and high performance capable.
+ * there are two alternatives {@link FastListenerList} and {@link AbstractGroupedListenerList} that are also thread-safe
+ * and high performance capable.
  * <p>
  * Consider refactoring the use of this class by one of the alternatives.
  * <p>
  * Thread safe Listener list supports @see WeakEventListener
  */
-public class EventListenerList implements IEventListenerSource {
+public class EventListenerList implements IListenerListWithManagement {
   private static final Object[] NULL_ARRAY = new Object[0];
   private final Object m_listenerListLock = new Object();
   private Object[] m_listenerList = NULL_ARRAY;
 
   public EventListenerList() {
-    if (EventListenerProfiler.getInstance().isEnabled()) {
-      EventListenerProfiler.getInstance().registerSourceAsWeakReference(this);
-    }
+    ListenerListRegistry.globalInstance().registerAsWeakReference(this);
   }
 
   @Override
-  public void dumpListenerList(IEventListenerSnapshot snapshot) {
+  public void createSnapshot(ISnapshotCollector snapshot) {
     synchronized (m_listenerListLock) {
       for (int i = m_listenerList.length - 2; i >= 0; i -= 2) {
-        Class c = (Class) m_listenerList[i];
         Object o = m_listenerList[i + 1];
         if (o instanceof WeakReference) {
-          snapshot.add(c, null, ((Reference) o).get());
+          snapshot.add(null, ((Reference) o).get());
         }
         else {
-          snapshot.add(c, null, o);
+          snapshot.add(null, o);
         }
       }
     }

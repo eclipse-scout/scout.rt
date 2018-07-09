@@ -26,16 +26,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.eclipse.scout.rt.platform.eventlistprofiler.EventListenerProfiler;
-import org.eclipse.scout.rt.platform.eventlistprofiler.IEventListenerSnapshot;
-import org.eclipse.scout.rt.platform.eventlistprofiler.IEventListenerSource;
+import org.eclipse.scout.rt.platform.events.ListenerListRegistry;
+import org.eclipse.scout.rt.platform.events.IListenerListWithManagement;
+import org.eclipse.scout.rt.platform.events.ISnapshotCollector;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.WeakEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BasicPropertySupport implements IEventListenerSource {
+public class BasicPropertySupport implements IListenerListWithManagement {
   private static final Logger LOG = LoggerFactory.getLogger(BasicPropertySupport.class);
 
   public static final byte DEFAULT_BYTE_VALUE = 0;
@@ -58,21 +58,19 @@ public class BasicPropertySupport implements IEventListenerSource {
 
   public BasicPropertySupport(Object sourceBean) {
     m_source = sourceBean;
-    if (EventListenerProfiler.getInstance().isEnabled()) {
-      EventListenerProfiler.getInstance().registerSourceAsWeakReference(this);
-    }
+    ListenerListRegistry.globalInstance().registerAsWeakReference(this);
   }
 
   @Override
-  public void dumpListenerList(IEventListenerSnapshot snapshot) {
+  public void createSnapshot(ISnapshotCollector snapshot) {
     synchronized (m_listenerLock) {
       if (m_listeners != null) {
         for (Object o : m_listeners) {
           if (o instanceof WeakReference) {
-            snapshot.add(PropertyChangeListener.class, null, ((Reference) o).get());
+            snapshot.add(null, ((Reference) o).get());
           }
           else {
-            snapshot.add(PropertyChangeListener.class, null, o);
+            snapshot.add(null, o);
           }
         }
       }
@@ -81,10 +79,10 @@ public class BasicPropertySupport implements IEventListenerSource {
           String context = e.getKey();
           for (Object o : e.getValue()) {
             if (o instanceof WeakReference) {
-              snapshot.add(PropertyChangeListener.class, context, ((Reference) o).get());
+              snapshot.add(context, ((Reference) o).get());
             }
             else {
-              snapshot.add(PropertyChangeListener.class, context, o);
+              snapshot.add(context, o);
             }
           }
         }

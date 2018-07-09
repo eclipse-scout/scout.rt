@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.eventlistprofiler;
+package org.eclipse.scout.rt.platform.events;
 
 @FunctionalInterface
-public interface IEventListenerSource {
+public interface ISnapshotCollector {
 
-  void dumpListenerList(IEventListenerSnapshot snapshot);
+  void add(String context, Object listener);
 
 }

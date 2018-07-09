@@ -102,14 +102,14 @@ public class AbstractGroupedListenerListTest {
   }
 
   /*
-  #TUNING: add1 50000 took 150.052039ms
-  #TUNING: add1-last 50000 took 169.142794ms
-  #TUNING: add2 50000 took 30.777621ms
-  #TUNING: add2-last 50000 took 28.885945ms
-  #TUNING: event1 took 35.901238ms
-  #TUNING: event2 took 17.001749ms
-  #TUNING: remove1 50000 took 312.464108ms
-  #TUNING: remove2 50000 took 46.308949ms
+  #TUNING: add1 50000 took 150ms
+  #TUNING: add1-last 50000 took 170ms
+  #TUNING: add2 50000 took 30ms
+  #TUNING: add2-last 50000 took 29ms
+  #TUNING: event1 took 36ms
+  #TUNING: event2 took 17ms
+  #TUNING: remove1 50000 took 312ms
+  #TUNING: remove2 50000 took 46ms
   */
   @Test
   public void testBasicOperations() {

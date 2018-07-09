@@ -20,9 +20,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import org.eclipse.scout.rt.platform.eventlistprofiler.EventListenerProfiler;
-import org.eclipse.scout.rt.platform.eventlistprofiler.IEventListenerSnapshot;
-import org.eclipse.scout.rt.platform.eventlistprofiler.IEventListenerSource;
+import org.eclipse.scout.rt.platform.events.ListenerListRegistry;
+import org.eclipse.scout.rt.platform.events.IListenerListWithManagement;
+import org.eclipse.scout.rt.platform.events.ISnapshotCollector;
 
 /**
  * Thread safe event listener list with a single listener type, grouped by event types
@@ -34,14 +34,12 @@ import org.eclipse.scout.rt.platform.eventlistprofiler.IEventListenerSource;
  *
  * @since 8.0
  */
-public abstract class AbstractGroupedListenerList<LISTENER, EVENT, EVENT_TYPE> implements IEventListenerSource {
+public abstract class AbstractGroupedListenerList<LISTENER, EVENT, EVENT_TYPE> implements IListenerListWithManagement {
   private final Map<EVENT_TYPE, UnsafeFastListenerList<LISTENER>> m_listenerMap = new HashMap<>();
   private final Map<EVENT_TYPE, UnsafeFastListenerList<LISTENER>> m_lastListenerMap = new HashMap<>();
 
   public AbstractGroupedListenerList() {
-    if (EventListenerProfiler.getInstance().isEnabled()) {
-      EventListenerProfiler.getInstance().registerSourceAsWeakReference(this);
-    }
+    ListenerListRegistry.globalInstance().registerAsWeakReference(this);
   }
 
   protected Object lockObject() {
@@ -257,14 +255,14 @@ public abstract class AbstractGroupedListenerList<LISTENER, EVENT, EVENT_TYPE> i
   }
 
   @Override
-  public void dumpListenerList(IEventListenerSnapshot snapshot) {
+  public void createSnapshot(ISnapshotCollector snapshot) {
     synchronized (lockObject()) {
       for (Map.Entry<EVENT_TYPE, UnsafeFastListenerList<LISTENER>> e : m_listenerMap.entrySet()) {
         EVENT_TYPE eventType = e.getKey();
         UnsafeFastListenerList<LISTENER> listeners = e.getValue();
         String context = "eventType: " + (eventType == otherEventsType() ? "unknown/other" : eventType);
         for (LISTENER listener : listeners.list()) {
-          snapshot.add(listener.getClass(), context, listener);
+          snapshot.add(context, listener);
         }
       }
       for (Map.Entry<EVENT_TYPE, UnsafeFastListenerList<LISTENER>> e : m_lastListenerMap.entrySet()) {
@@ -272,7 +270,7 @@ public abstract class AbstractGroupedListenerList<LISTENER, EVENT, EVENT_TYPE> i
         UnsafeFastListenerList<LISTENER> listeners = e.getValue();
         String context = "lastListeners of eventType: " + (eventType == otherEventsType() ? "unknown/other" : eventType);
         for (LISTENER listener : listeners.list()) {
-          snapshot.add(listener.getClass(), context, listener);
+          snapshot.add(context, listener);
         }
       }
     }
