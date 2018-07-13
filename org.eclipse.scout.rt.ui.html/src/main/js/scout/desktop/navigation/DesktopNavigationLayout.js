@@ -46,15 +46,15 @@ scout.DesktopNavigationLayout.prototype.layout = function($container) {
     toolBox.htmlComp.setSize(new scout.Dimension(containerSize.width - viewButtonBoxWidth, viewButtonBoxHeight));
   }
 
-  bodySize = new scout.Dimension(containerSize.width, containerSize.height - viewButtonBoxHeight)
+  bodySize = new scout.Dimension(containerSize.width, containerSize.height)
     .subtract(htmlBody.margins());
-  htmlBody.setSize(bodySize);
-
   if (this.navigation.singleViewButton) {
     htmlBody.$comp.cssTop(0);
   } else {
     htmlBody.$comp.cssTop(viewButtonBoxHeight);
+    bodySize.height -= viewButtonBoxHeight;
   }
+  htmlBody.setSize(bodySize);
 };
 
 scout.DesktopNavigationLayout.prototype.preferredLayoutSize = function($container) {
