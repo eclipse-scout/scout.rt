@@ -38,7 +38,8 @@ scout.TableProposalChooser.prototype._createModel = function() {
   } else {
     columns.push(scout.create('Column', {
       session: this.session,
-      width: scout.Column.NARROW_MIN_WIDTH
+      width: scout.Column.NARROW_MIN_WIDTH,
+      horizontalAlignment: this.smartField.gridData.horizontalAlignment
     }));
   }
 

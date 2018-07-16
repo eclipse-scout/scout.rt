@@ -176,6 +176,74 @@
   }
 }
 
+.dropdown-field,
+.proposal-field,
+.smart-field {
+  & > .field {
+
+    &.halign-left,
+    &.halign-left > .multiline-input {
+      text-align: left;
+    }
+
+    &.halign-center,
+    &.halign-center > .multiline-input {
+      text-align: center;
+    }
+
+    &.halign-right,
+    &.halign-right > .multiline-input {
+      text-align: right;
+    }
+  }
+
+  &.clearable-always.has-text&:not(.loading)&:not(.disabled)&:not(.compact),
+  &.clearable-focused.has-text.focused&:not(.loading)&:not(.disabled)&:not(.compact) {
+
+    &.halign-right {
+
+      & > input,
+      & > .input-field,
+      & > .field > input,
+      & > .field > .input-field {
+        padding-left: 0;
+        padding-right: @text-field-icon-outer-width;
+
+        &.alternative {
+          padding-left: @text-field-alternative-padding-left;
+          padding-right: @text-field-alternative-icon-outer-width;
+        }
+
+        &.cell-editor-field {
+          padding-right: @text-field-icon-outer-width;
+        }
+      }
+    }
+  }
+
+  &.halign-right > .field > .multiline-lines {
+    padding-right: @text-field-icon-outer-width;
+  }
+
+  &.alternative.halign-right > .field > .multiline-lines {
+    padding-right: @text-field-alternative-icon-outer-width;
+  }
+
+  &.halign-right > .clear-icon,
+  &.halign-right > .field > .clear-icon {
+    padding-left: 0;
+    padding-right: @text-field-padding-x;
+  }
+
+  &.alternative.halign-right {
+    & > .clear-icon,
+    & > .field > .clear-icon {
+      padding-left: 0;
+      padding-right: @text-field-alternative-icon-padding-right;
+    }
+  }
+}
+
 .proposal-field.loading,
 .smart-field.loading {
 

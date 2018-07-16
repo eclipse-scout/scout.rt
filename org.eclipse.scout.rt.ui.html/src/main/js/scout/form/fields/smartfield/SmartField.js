@@ -125,6 +125,20 @@ scout.SmartField.prototype._render = function() {
   this.addStatus();
 };
 
+scout.SmartField.prototype._renderGridData = function() {
+  scout.SmartField.parent.prototype._renderGridData.call(this);
+  this.updateInnerAlignment({
+    useHorizontalAlignment: (this.browseHierarchy ? false : true)
+  });
+};
+
+scout.SmartField.prototype._renderGridDataHints = function() {
+  scout.SmartField.parent.prototype._renderGridDataHints.call(this);
+  this.updateInnerAlignment({
+    useHorizontalAlignment: (this.browseHierarchy ? false : true)
+  });
+};
+
 scout.SmartField.prototype.cssClassName = function() {
   var prefix = this.displayStyle;
   if (this.displayStyle === scout.SmartField.DisplayStyle.DEFAULT) {
