@@ -1362,6 +1362,36 @@ describe('DateField', function() {
       expect(field.displayText).toBe('01.05.2017\n02:30');
     });
 
+    it('sets enabled property correctly if hasDate is toggled', function() {
+      var field = scout.create('DateField', {
+        parent: session.desktop,
+        value: '2017-05-01 05:50:00.000',
+        hasDate: true,
+        hasTime: true
+      });
+      field.render();
+      field.setEnabled(false);
+      expect(field.$dateField.isEnabled()).toBe(false);
+      expect(field.$timeField.isEnabled()).toBe(false);
+
+      field.setHasDate(false);
+      expect(field.$timeField.isEnabled()).toBe(false);
+
+      field.setHasDate(true);
+      expect(field.$dateField.isEnabled()).toBe(false);
+      expect(field.$timeField.isEnabled()).toBe(false);
+
+      field.setEnabled(true);
+      expect(field.$dateField.isEnabled()).toBe(true);
+      expect(field.$timeField.isEnabled()).toBe(true);
+
+      field.setHasDate(false);
+      expect(field.$timeField.isEnabled()).toBe(true);
+
+      field.setHasDate(true);
+      expect(field.$dateField.isEnabled()).toBe(true);
+      expect(field.$timeField.isEnabled()).toBe(true);
+    });
   });
 
   describe('hasTime', function() {
@@ -1418,6 +1448,37 @@ describe('DateField', function() {
       expect(field.$timeField.val()).toBe('05:50');
       expect(field.value.toISOString()).toBe(scout.dates.create('2016-02-02 05:50:00.000').toISOString());
       expect(field.displayText).toBe('02.02.2016\n05:50');
+    });
+
+    it('sets enabled property correctly if hasTime is toggled', function() {
+      var field = scout.create('DateField', {
+        parent: session.desktop,
+        value: '2017-05-01 05:50:00.000',
+        hasDate: true,
+        hasTime: true
+      });
+      field.render();
+      field.setEnabled(false);
+      expect(field.$dateField.isEnabled()).toBe(false);
+      expect(field.$timeField.isEnabled()).toBe(false);
+
+      field.setHasTime(false);
+      expect(field.$dateField.isEnabled()).toBe(false);
+
+      field.setHasTime(true);
+      expect(field.$dateField.isEnabled()).toBe(false);
+      expect(field.$timeField.isEnabled()).toBe(false);
+
+      field.setEnabled(true);
+      expect(field.$dateField.isEnabled()).toBe(true);
+      expect(field.$timeField.isEnabled()).toBe(true);
+
+      field.setHasTime(false);
+      expect(field.$dateField.isEnabled()).toBe(true);
+
+      field.setHasTime(true);
+      expect(field.$dateField.isEnabled()).toBe(true);
+      expect(field.$timeField.isEnabled()).toBe(true);
     });
 
   });

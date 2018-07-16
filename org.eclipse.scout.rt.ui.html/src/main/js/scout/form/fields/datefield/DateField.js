@@ -192,6 +192,7 @@ scout.DateField.prototype._renderHasDate = function() {
 
   if (!this.rendering) {
     this._renderDisplayText();
+    this._renderEnabled();
     this.htmlDateTimeComposite.invalidateLayoutTree();
   }
 };
@@ -248,6 +249,7 @@ scout.DateField.prototype._renderHasTime = function() {
 
   if (!this.rendering) {
     this._renderDisplayText();
+    this._renderEnabled();
     this.htmlDateTimeComposite.invalidateLayoutTree();
   }
 };
