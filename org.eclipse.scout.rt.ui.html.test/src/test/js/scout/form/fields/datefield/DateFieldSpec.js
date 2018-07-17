@@ -1303,6 +1303,25 @@ describe('DateField', function() {
       });
     });
 
+    describe('clear', function() {
+      it('removes the display text and sets the value to null', function() {
+        var dateField = scout.create('DateField', {
+          parent: session.desktop,
+          touch: true,
+          hasTime: true,
+          value: '2017-05-01 05:50:00.000'
+        });
+        dateField.render();
+        expect(dateField.$dateField.text()).toBe('01.05.2017');
+        expect(dateField.$timeField.text()).toBe('05:50');
+
+        dateField.clear();
+        expect(dateField.$dateField.text()).toBe('');
+        expect(dateField.$timeField.text()).toBe('');
+        expect(dateField.value).toBe(null);
+        expect(dateField.displayText).toBe('');
+      });
+    });
   });
 
   describe('hasDate', function() {

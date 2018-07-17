@@ -621,12 +621,12 @@ scout.DateField.prototype.clear = function() {
 scout.DateField.prototype._clear = function() {
   this._removePredictionFields();
   if (this.hasDate && !this.timeFocused) {
-    this.$dateField.val('');
+    scout.fields.valOrText(this.$dateField, '');
     this._setDateValid(true);
     this._updateDateHasText();
   }
   if (this.hasTime && !this.dateFocused) {
-    this.$timeField.val('');
+    scout.fields.valOrText(this.$timeField, '');
     this._setTimeValid(true);
     this._updateTimeHasText();
   }
