@@ -40,7 +40,7 @@ scout.SmartField = function() {
                         // only when the result is up-to-date, we can use the selected lookup row
 
   this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilter', 'activeFilterEnabled', 'activeFilterLabels',
-    'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental', 'searchRequired'
+    'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental', 'searchRequired', 'columnDescriptors'
   ]);
 };
 scout.inherits(scout.SmartField, scout.ValueField);
@@ -878,7 +878,12 @@ scout.SmartField.prototype._clear = function() {
   // the state of these two flags is important. See #_checkSearchTextChanged
   this._lastSearchText = this._readDisplayText();
   this._userWasTyping = true;
-  this.$field.val('');
+  scout.fields.valOrText(this.$field, '');
+  if (this.touch) {
+    // There is actually no "x" the user can press in touch mode, but if the developer calls clear() manually, it should work too.
+    // Because accept input works differently in touch mode we need to explicitly set the value to null
+    this.setValue(null);
+  }
   if (this.isPopupOpen()) {
     // When cleared, browse by all again, need to do it in setTimeout because sending acceptInput and lookupAll at the same time does not seem to work
     setTimeout(this._lookupByTextOrAll.bind(this, true));

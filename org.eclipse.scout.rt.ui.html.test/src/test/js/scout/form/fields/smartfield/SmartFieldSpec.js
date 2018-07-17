@@ -141,7 +141,7 @@ describe('SmartField', function() {
       expect(field.popup.proposalChooser.model.selectedRows.length).toBe(0);
     });
 
-    it('clears the value, also in touch mode', function() {
+    it('clears the value, also in embedded mode', function() {
       var field = createFieldWithLookupCall({
         touch: true
       });
@@ -166,6 +166,25 @@ describe('SmartField', function() {
       field.popup.close();
       expect(field.value).toBe(null);
       expect(field.displayText).toBe('');
+      expect(field.$field.val()).toBe('');
+    });
+
+    it('clears the value, also in touch mode', function() {
+      var field = createFieldWithLookupCall({
+        touch: true
+      });
+      field.render();
+      field.setValue(1);
+      jasmine.clock().tick(500);
+      expect(field.value).toBe(1);
+      expect(field.displayText).toBe('Foo');
+      expect(field.$field.text()).toBe('Foo');
+
+      field.clear();
+      jasmine.clock().tick(500);
+      expect(field.value).toBe(null);
+      expect(field.displayText).toBe('');
+      expect(field.lookupRow).toBe(null);
       expect(field.$field.val()).toBe('');
     });
 

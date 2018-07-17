@@ -120,7 +120,6 @@ scout.TouchPopup.prototype._acceptInput = function() {
   } else {
     this.close();
   }
-
 };
 
 scout.TouchPopup.prototype._onCloseIconClick = function(event) {
