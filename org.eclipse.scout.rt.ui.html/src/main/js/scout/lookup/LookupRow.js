@@ -14,6 +14,13 @@ scout.LookupRow = function() {
   this.parentKey = null;
   this.enabled = true;
   this.active = true;
+  this.additionalTableRowData = null;
+  this.cssClass = null;
+  this.iconId = null;
+  this.tooltipText = null;
+  this.backgroundColor = null;
+  this.foregroundColor = null;
+  this.font = null;
 };
 
 scout.LookupRow.prototype.init = function(model) {
@@ -30,6 +37,34 @@ scout.LookupRow.prototype.setText = function(text) {
 
 scout.LookupRow.prototype.setParentKey = function(parentKey) {
   this.parentKey = parentKey;
+};
+
+scout.LookupRow.prototype.setCssClass = function(cssClass) {
+  this.cssClass = cssClass;
+};
+
+scout.LookupRow.prototype.setAdditionalTableRowData = function(additionalTableRowData) {
+  this.additionalTableRowData = additionalTableRowData;
+};
+
+scout.LookupRow.prototype.setIconId = function(iconId) {
+  this.iconId = iconId;
+};
+
+scout.LookupRow.prototype.setTooltipText = function(tooltipText) {
+  this.tooltipText = tooltipText;
+};
+
+scout.LookupRow.prototype.setBackgroundColor = function(backgroundColor) {
+  this.backgroundColor = backgroundColor;
+};
+
+scout.LookupRow.prototype.setForegroundColor = function(foregroundColor) {
+  this.foregroundColor = foregroundColor;
+};
+
+scout.LookupRow.prototype.setFont = function(font) {
+  this.font = font;
 };
 
 scout.LookupRow.prototype.toString = function() {

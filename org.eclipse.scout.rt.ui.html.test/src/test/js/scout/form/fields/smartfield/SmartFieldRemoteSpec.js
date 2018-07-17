@@ -152,7 +152,14 @@ describe('SmartFieldRemote', function() {
           text: 'foo',
           parentKey: null,
           active: true,
-          enabled: true
+          enabled: true,
+          additionalTableRowData: null,
+          cssClass: null,
+          iconId: null,
+          tooltipText: null,
+          backgroundColor: null,
+          foregroundColor: null,
+          font: null
         },
         showBusyIndicator: true
       });

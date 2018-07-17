@@ -21,29 +21,47 @@ scout.TableProposalChooser.prototype._createModel = function() {
   if (descriptors) {
     descriptors.forEach(function(descriptor, index) {
       headerVisible = headerVisible || !!descriptor.text;
-      var column = scout.create('Column', {
-        index: index,
-        session: this.session,
-        text: descriptor.text,
-        width: scout.Column.NARROW_MIN_WIDTH
-      });
-      if (descriptor.width && descriptor.width > 0) { // 0 = default
-        column.width = descriptor.width;
-      }
-      column.fixedWidth = scout.nvl(descriptor.fixedWidth, false);
-      column.horizontalAlignment = descriptor.horizontalAlignment;
-      column.visible = scout.nvl(descriptor.visible, true);
-      columns.push(column);
+      columns.push(this._createColumnForDescriptor(descriptor));
     }, this);
   } else {
-    columns.push(scout.create('Column', {
-      session: this.session,
-      width: scout.Column.NARROW_MIN_WIDTH,
-      horizontalAlignment: this.smartField.gridData.horizontalAlignment
-    }));
+    columns.push(this._createColumn());
   }
 
-  var table = scout.create('Table', {
+  var table = this._createTable(columns, headerVisible);
+  table.on('rowClick', this._onRowClick.bind(this));
+
+  return table;
+};
+
+scout.TableProposalChooser.prototype._createColumn = function() {
+  return scout.create('Column', {
+    session: this.session,
+    width: scout.Column.NARROW_MIN_WIDTH,
+    horizontalAlignment: this.smartField.gridData.horizontalAlignment
+  });
+};
+
+scout.TableProposalChooser.prototype._createColumnForDescriptor = function(descriptor) {
+  var width = scout.Column.NARROW_MIN_WIDTH;
+  if (descriptor.width && descriptor.width > 0) { // 0 = default
+    width = descriptor.width;
+  }
+  var column = scout.create('Column', {
+    session: this.session,
+    text: descriptor.text,
+    cssClass: scout.nvl(descriptor.cssClass, null),
+    width: width, // needs to be passed here to make sure initialWidth is also set, if set using setWidth() autoResizeColumn won't work because initalWidth would still be NARROW_MIN_WIDTH
+    autoOptimizeWidth: scout.nvl(descriptor.autoOptimizeWidth, false),
+    fixedWidth: scout.nvl(descriptor.fixedWidth, false),
+    fixedPosition: scout.nvl(descriptor.fixedPosition, false),
+    horizontalAlignment: scout.nvl(descriptor.horizontalAlignment, this.smartField.gridData.horizontalAlignment),
+    visible: scout.nvl(descriptor.visible, true)
+  });
+  return column;
+};
+
+scout.TableProposalChooser.prototype._createTable = function(columns, headerVisible) {
+  return scout.create('Table', {
     parent: this,
     headerVisible: headerVisible,
     autoResizeColumns: true,
@@ -53,10 +71,6 @@ scout.TableProposalChooser.prototype._createModel = function() {
     columns: columns,
     headerMenusEnabled: false
   });
-
-  table.on('rowClick', this._onRowClick.bind(this));
-
-  return table;
 };
 
 scout.TableProposalChooser.prototype._onRowClick = function(event) {
