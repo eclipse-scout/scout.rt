@@ -37,8 +37,8 @@ scout.fields = {
 
   initTouch: function(field, model) {
     field.embedded = scout.nvl(model.embedded, false);
-    // when 'touch' is not set explicitly, check the device
-    field.touch = scout.nvl(model.touch, scout.device.supportsTouch());
+    // when 'touchMode' is not set explicitly, check the device
+    field.touchMode = scout.nvl(model.touchMode, scout.device.supportsTouch());
   },
 
   /**
@@ -68,7 +68,7 @@ scout.fields = {
    * @param {string} [cssClass]
    */
   makeInputOrDiv: function(field, cssClass) {
-    if (field.touch) {
+    if (field.touchMode) {
       return this.makeInputDiv(field, cssClass);
     } else {
       return scout.fields.makeTextField(field.$container, cssClass);

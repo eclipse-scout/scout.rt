@@ -206,7 +206,7 @@ describe('SmartFieldRemote', function() {
 
     it('opens a touch popup when smart field gets touched', function() {
       var lookupCallClone = null;
-      smartField.touch = true;
+      smartField.touchMode = true;
       smartField.render();
       smartField.on('prepareLookupCall', function(event) {
         lookupCallClone = event.lookupCall;
@@ -234,7 +234,7 @@ describe('SmartFieldRemote', function() {
 
     it('shows smartfield with same text as clicked smartfield', function() {
       var lookupCallClone = null;
-      smartField.touch = true;
+      smartField.touchMode = true;
       smartField.displayText = 'row 1';
       smartField.render();
       smartField.on('prepareLookupCall', function(event) {

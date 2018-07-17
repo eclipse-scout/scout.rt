@@ -29,7 +29,7 @@ scout.SmartFieldAdapter.prototype._postCreateWidget = function() {
 
 scout.SmartFieldAdapter.prototype._syncResult = function(result) {
   var executedLookupCall = this.widget._currentLookupCall;
-  if (!executedLookupCall && this.widget.touch && this.widget.popup && this.widget.popup._field) {
+  if (!executedLookupCall && this.widget.touchMode && this.widget.popup && this.widget.popup._field) {
     // in case lookupCall is executed from within the popup (touch):
     executedLookupCall = this.widget.popup._field._currentLookupCall;
   }

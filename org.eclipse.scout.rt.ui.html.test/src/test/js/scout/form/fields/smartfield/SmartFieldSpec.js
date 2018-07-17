@@ -143,7 +143,7 @@ describe('SmartField', function() {
 
     it('clears the value, also in embedded mode', function() {
       var field = createFieldWithLookupCall({
-        touch: true
+        touchMode: true
       });
       field.render();
       field.setValue(1);
@@ -171,7 +171,7 @@ describe('SmartField', function() {
 
     it('clears the value, also in touch mode', function() {
       var field = createFieldWithLookupCall({
-        touch: true
+        touchMode: true
       });
       field.render();
       field.setValue(1);
@@ -211,7 +211,7 @@ describe('SmartField', function() {
 
     it('marks field as clearable even if the field is not focused', function() {
       var field = createFieldWithLookupCall({
-        touch: true
+        touchMode: true
       });
       field.render();
       field.$field.focus();
@@ -226,7 +226,7 @@ describe('SmartField', function() {
 
     it('stays open if active / inactive radio buttons are clicked', function() {
       var field = createFieldWithLookupCall({
-        touch: true,
+        touchMode: true,
         activeFilterEnabled: true
       });
       field.render();
@@ -241,7 +241,7 @@ describe('SmartField', function() {
     it('stays open even if there are no results (with active filter)', function() {
       // Use case: Click on touch smart field, select inactive radio button, clear the text in the field -> smart field has to stay open
       var field = createFieldWithLookupCall({
-        touch: true,
+        touchMode: true,
         activeFilterEnabled: true
       });
       field.render();
@@ -487,7 +487,7 @@ describe('SmartField', function() {
 
     it('must clone properties required for embedded field', function() {
       var field = createFieldWithLookupCall({
-        touch: true,
+        touchMode: true,
         activeFilter: 'TRUE',
         activeFilterEnabled: true,
         activeFilterLabels: ['a', 'b', 'c'],
@@ -566,7 +566,7 @@ describe('SmartField', function() {
 
     it('has empty popup if no search available and searchRequired=true and touch', function() {
       var field = createFieldWithLookupCall({
-        touch: true
+        touchMode: true
       });
       field.render();
       field.setSearchRequired(true);

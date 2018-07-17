@@ -28,7 +28,7 @@ scout.SmartFieldMultiline.prototype._render = function() {
     .on('mousedown', this._onFieldMouseDown.bind(this))
     .appendTo(this.$fieldContainer);
 
-  if (!this.touch) {
+  if (!this.touchMode) {
     $input
       .keyup(this._onFieldKeyUp.bind(this))
       .keydown(this._onFieldKeyDown.bind(this))

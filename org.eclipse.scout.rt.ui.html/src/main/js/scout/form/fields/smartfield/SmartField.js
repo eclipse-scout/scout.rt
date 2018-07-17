@@ -29,6 +29,8 @@ scout.SmartField = function() {
   this.activeFilterLabels = [];
   this.columnDescriptors = null;
   this.displayStyle = scout.SmartField.DisplayStyle.DEFAULT;
+  this.touchMode = false;
+  this.embedded = false;
   this._userWasTyping = false; // used to detect whether the last thing the user did was typing (a proposal) or something else, like selecting a proposal row
   this._acceptInputEnabled = true; // used to prevent multiple execution of blur/acceptInput
   this._acceptInputDeferred = $.Deferred();
@@ -109,7 +111,7 @@ scout.SmartField.prototype._render = function() {
   var $field = fieldFunc.call(scout.fields, this)
     .on('mousedown', this._onFieldMouseDown.bind(this));
 
-  if (!this.touch) {
+  if (!this.touchMode) {
     $field
       .keyup(this._onFieldKeyUp.bind(this))
       .keydown(this._onFieldKeyDown.bind(this))
@@ -201,7 +203,7 @@ scout.SmartField.prototype.acceptInput = function() {
   this._flushLookupStatus();
   this._clearPendingLookup();
 
-  if (this.touch) {
+  if (this.touchMode) {
     $.log.isDebugEnabled() && $.log.debug('(SmartField#acceptInput) Always send acceptInput for touch field');
     this._inputAccepted();
     return;
@@ -748,7 +750,7 @@ scout.SmartField.prototype._ensurePopup = function(result, status) {
 };
 
 scout.SmartField.prototype._handleEmptyResult = function() {
-  if (this.touch || this.activeFilterEnabled) {
+  if (this.touchMode || this.activeFilterEnabled) {
     // In mobile mode we always open the popup, event if we don't have a result
     // Otherwise it would be impossible to enter text in a proposal field with
     // an empty proposal list. The same goes for activeFilterEnabled state -
@@ -772,7 +774,7 @@ scout.SmartField.prototype._renderPopup = function(result, status) {
   this.$field.addClass('focused');
   this.$container.addClass('popup-open');
 
-  var useTouch = this.touch && !this.isDropdown();
+  var useTouch = this.touchMode && !this.isDropdown();
   var popupType = useTouch ? 'SmartFieldTouchPopup' : 'SmartFieldPopup';
   this._pendingOpenPopup = false;
   this.popup = scout.create(popupType, {
@@ -879,7 +881,7 @@ scout.SmartField.prototype._clear = function() {
   this._lastSearchText = this._readDisplayText();
   this._userWasTyping = true;
   scout.fields.valOrText(this.$field, '');
-  if (this.touch) {
+  if (this.touchMode) {
     // There is actually no "x" the user can press in touch mode, but if the developer calls clear() manually, it should work too.
     // Because accept input works differently in touch mode we need to explicitly set the value to null
     this.setValue(null);
@@ -911,10 +913,10 @@ scout.SmartField.prototype._onFieldBlur = function(event) {
 };
 
 /**
- * @returns true if the field is either 'embedded' or 'touch'.
+ * @returns true if the field is either 'embedded' or in 'touchMode'.
  */
 scout.SmartField.prototype.isTouchable = function() {
-  return this.embedded || this.touch;
+  return this.embedded || this.touchMode;
 };
 
 scout.SmartField.prototype._onFieldKeyUp = function(event) {
@@ -1340,7 +1342,7 @@ scout.SmartField.prototype._showSelection = function() {
  * override to ensure dropdown fields and touch mode smart fields does not have a clear icon.
  */
 scout.SmartField.prototype.isClearable = function() {
-  return scout.SmartField.parent.prototype.isClearable.call(this) && !this.isDropdown() && !this.touch;
+  return scout.SmartField.parent.prototype.isClearable.call(this) && !this.isDropdown() && !this.touchMode;
 };
 
 scout.SmartField.prototype._triggerAcceptInputFail = function() {
@@ -1397,7 +1399,7 @@ scout.SmartField.prototype._createLoadingSupport = function() {
  * @override FormField.js
  */
 scout.SmartField.prototype._showStatusMessage = function() {
-  if (this.touch && (this._pendingOpenPopup || this.isPopupOpen())) {
+  if (this.touchMode && (this._pendingOpenPopup || this.isPopupOpen())) {
     // Do not display a tooltip if the touch popup is open, the tooltip will be displayed there
     return;
   }

@@ -50,7 +50,7 @@ scout.TouchPopup.prototype._fieldOverrides = function() {
     popup: this,
     statusVisible: false,
     embedded: true,
-    touch: false,
+    touchMode: false,
     clearable: scout.ValueField.Clearable.ALWAYS
   };
 };

@@ -20,6 +20,8 @@ scout.DateField = function() {
   this.disabledCopyOverlay = true;
   this.hasDate = true;
   this.oldDisplayText = null;
+  this.touchMode = false;
+  this.embedded = false;
 
   this.hasTime = false;
   this.hasTimePopup = true;
@@ -79,11 +81,11 @@ scout.DateField.prototype._initValue = function(value) {
 };
 
 scout.DateField.prototype.createDatePopup = function() {
-  var popupType = this.touch ? 'DatePickerTouchPopup' : 'DatePickerPopup';
+  var popupType = this.touchMode ? 'DatePickerTouchPopup' : 'DatePickerPopup';
   return scout.create(popupType, {
     parent: this,
     $anchor: this.$field,
-    boundToAnchor: !this.touch,
+    boundToAnchor: !this.touchMode,
     cssClass: this._errorStatusClass(),
     closeOnAnchorMouseDown: false,
     field: this,
@@ -94,11 +96,11 @@ scout.DateField.prototype.createDatePopup = function() {
 };
 
 scout.DateField.prototype.createTimePopup = function() {
-  var popupType = this.touch ? 'TimePickerTouchPopup' : 'TimePickerPopup';
+  var popupType = this.touchMode ? 'TimePickerTouchPopup' : 'TimePickerPopup';
   return scout.create(popupType, {
     parent: this,
     $anchor: this.$timeField,
-    boundToAnchor: !this.touch,
+    boundToAnchor: !this.touchMode,
     cssClass: this._errorStatusClass(),
     closeOnAnchorMouseDown: false,
     field: this,
@@ -165,7 +167,7 @@ scout.DateField.prototype._renderHasDate = function() {
       // make sure date field comes before time field, otherwise tab won't work as expected
       this.$dateField.insertBefore(this.$timeField);
     }
-    if (!this.touch) {
+    if (!this.touchMode) {
       this.$dateField
         .on('keydown', this._onDateFieldKeyDown.bind(this))
         .on('input', this._onDateFieldInput.bind(this))
@@ -219,7 +221,7 @@ scout.DateField.prototype._renderHasTime = function() {
       // make sure time field comes after date field, otherwise tab won't work as expected
       this.$timeField.insertAfter(this.$dateField);
     }
-    if (!this.touch || !this.hasTimePopup) {
+    if (!this.touchMode || !this.hasTimePopup) {
       this.$timeField
         .on('keydown', this._onTimeFieldKeyDown.bind(this))
         .on('input', this._onTimeFieldInput.bind(this))
@@ -1616,13 +1618,13 @@ scout.DateField.prototype.onCellEditorRendered = function(options) {
       this.openDatePopupAndSelect(this.value);
     }
   }
-  if (this.touch) {
+  if (this.touchMode) {
     this._cellEditorPopup = options.cellEditorPopup;
   }
 };
 
 scout.DateField.prototype._onPopupRemove = function(event) {
-  if (!this.touch || !this._cellEditorPopup) {
+  if (!this.touchMode || !this._cellEditorPopup) {
     return;
   }
   if (this.hasDate && this.hasTime) {

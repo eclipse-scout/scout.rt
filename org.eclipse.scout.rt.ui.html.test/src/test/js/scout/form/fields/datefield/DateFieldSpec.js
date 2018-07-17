@@ -955,7 +955,7 @@ describe('DateField', function() {
       it('is opened if datefield is touched', function() {
         var dateField = scout.create('DateField', {
           parent: session.desktop,
-          touch: true
+          touchMode: true
         });
         dateField.render();
 
@@ -970,7 +970,7 @@ describe('DateField', function() {
       it('is closed when date in picker is selected', function() {
         var dateField = scout.create('DateField', {
           parent: session.desktop,
-          touch: true,
+          touchMode: true,
         });
         dateField.render();
 
@@ -984,7 +984,7 @@ describe('DateField', function() {
       it('unregisters clone after close', function() {
         var dateField = scout.create('DateField', {
           parent: session.desktop,
-          touch: true
+          touchMode: true
         });
         dateField.render();
 
@@ -1002,7 +1002,7 @@ describe('DateField', function() {
       it('updates displayText and value of datefield if date in picker is selected', function() {
         var dateField = scout.create('DateField', {
           parent: session.desktop,
-          touch: true
+          touchMode: true
         });
         dateField.render();
 
@@ -1019,7 +1019,7 @@ describe('DateField', function() {
       it('updates displayText and value of datefield if date in picker is entered', function() {
         var dateField = scout.create('DateField', {
           parent: session.desktop,
-          touch: true
+          touchMode: true
         });
         dateField.render();
 
@@ -1037,7 +1037,7 @@ describe('DateField', function() {
       it('updates displayText and value of datefield if date and time in picker are entered', function() {
         var dateField = scout.create('DateField', {
           parent: session.desktop,
-          touch: true,
+          touchMode: true,
           hasTime: true
         });
         dateField.render();
@@ -1066,7 +1066,7 @@ describe('DateField', function() {
       it('shows datefield with same date as clicked datefield', function() {
         var dateField = scout.create('DateField', {
           parent: session.desktop,
-          touch: true,
+          touchMode: true,
           value: '2012-07-01',
           displayText: '01.07.2012'
         });
@@ -1083,7 +1083,7 @@ describe('DateField', function() {
       it('shows datefield with same date as clicked datefield, if field empty initially', function() {
         var dateField = scout.create('DateField', {
           parent: session.desktop,
-          touch: true
+          touchMode: true
         });
         dateField.render();
 
@@ -1108,7 +1108,7 @@ describe('DateField', function() {
       it('clears displayText and value of datefield if date in picker was removed', function() {
         var dateField = scout.create('DateField', {
           parent: session.desktop,
-          touch: true,
+          touchMode: true,
           value: '2012-07-01',
           displayText: '01.07.2012'
         });
@@ -1129,7 +1129,7 @@ describe('DateField', function() {
       it('shows datefield with same date as clicked datefield, even if value was deleted before', function() {
         var dateField = scout.create('DateField', {
           parent: session.desktop,
-          touch: true,
+          touchMode: true,
           value: '2012-07-01',
           displayText: '01.07.2012'
         });
@@ -1167,7 +1167,7 @@ describe('DateField', function() {
       it('does not remove time if date was cleared but another date selected ', function() {
         var dateField = scout.create('DateField', {
           parent: session.desktop,
-          touch: true,
+          touchMode: true,
           hasTime: true,
           value: '2017-05-01 05:50:00.000'
         });
@@ -1201,7 +1201,7 @@ describe('DateField', function() {
       it('is opened if datefield is touched', function() {
         var dateField = scout.create('DateField', {
           parent: session.desktop,
-          touch: true,
+          touchMode: true,
           hasDate: false,
           hasTime: true
         });
@@ -1218,7 +1218,7 @@ describe('DateField', function() {
       it('is closed when time in picker is selected', function() {
         var dateField = scout.create('DateField', {
           parent: session.desktop,
-          touch: true,
+          touchMode: true,
           hasDate: false,
           hasTime: true
         });
@@ -1234,7 +1234,7 @@ describe('DateField', function() {
       it('updates displayText and value of datefield if date in picker is selected', function() {
         var dateField = scout.create('DateField', {
           parent: session.desktop,
-          touch: true,
+          touchMode: true,
           hasDate: false,
           hasTime: true
         });
@@ -1253,7 +1253,7 @@ describe('DateField', function() {
       it('updates displayText and value of datefield if date in picker is entered', function() {
         var dateField = scout.create('DateField', {
           parent: session.desktop,
-          touch: true,
+          touchMode: true,
           hasDate: false,
           hasTime: true
         });
@@ -1273,7 +1273,7 @@ describe('DateField', function() {
       it('does not remove date if time was cleared but another time selected ', function() {
         var dateField = scout.create('DateField', {
           parent: session.desktop,
-          touch: true,
+          touchMode: true,
           hasTime: true,
           value: '2017-05-01 05:50:00.000'
         });
@@ -1307,7 +1307,7 @@ describe('DateField', function() {
       it('removes the display text and sets the value to null', function() {
         var dateField = scout.create('DateField', {
           parent: session.desktop,
-          touch: true,
+          touchMode: true,
           hasTime: true,
           value: '2017-05-01 05:50:00.000'
         });
