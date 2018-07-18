@@ -13,14 +13,6 @@
   & > .icon::before {
     content: @icon-pencil;
   }
-
-  & > .input-field[placeholder]:empty::before {
-    #scout.fake-placeholder();
-  }
-
-  & > .input-field[placeholder].disabled:empty::before {
-    #scout.placeholder-disabled();
-  }
 }
 
 .smart-field {
@@ -28,11 +20,6 @@
   & > .icon::before,
   & > .field > .icon::before {
     content: @icon-search;
-  }
-
-
-  & > .input-field[placeholder]:empty::before {
-    #scout.fake-placeholder();
   }
 
   /* Multiline SmartField */
@@ -113,6 +100,20 @@
     &.has-error {
       border-color: @error-border-color;
     }
+  }
+}
+
+.dropdown-field,
+.proposal-field,
+.smart-field {
+  & > .input-field[placeholder]:empty::before,
+  & > .multiline > .input-field[placeholder]:empty::before {
+    #scout.fake-placeholder();
+  }
+
+  & > .input-field[placeholder].disabled:empty::before,
+  & > .multiline > .input-field[placeholder].disabled:empty::before {
+    #scout.placeholder-disabled();
   }
 }
 

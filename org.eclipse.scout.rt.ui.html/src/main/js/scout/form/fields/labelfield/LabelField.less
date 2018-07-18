@@ -15,6 +15,14 @@
   #scout.user-select(text);
   #scout.overflow-ellipsis();
 
+  &[placeholder]:empty::before {
+    #scout.fake-placeholder();
+  }
+
+  &[placeholder].disabled:empty::before {
+    #scout.placeholder-disabled();
+  }
+
   &.has-inner-alignment {
 
     &.halign-left {
