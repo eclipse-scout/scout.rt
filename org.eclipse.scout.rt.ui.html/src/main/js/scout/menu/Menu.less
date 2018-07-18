@@ -13,23 +13,19 @@
   display: inline-block;
   vertical-align: middle;
   white-space: nowrap;
-
   color: @text-color;
+  cursor: pointer;
   #scout.vertical-align-helper-before();
-
-  &:not(.form-field-menu) {
-    cursor: pointer;
-  }
 
   & > .key-box {
     bottom: -3px;
   }
 
-  &:not(.disabled):not(.form-field-menu):not(.view-menu):hover {
+  &:hover {
     color: @hover-color;
   }
 
-  &:not(.disabled):active {
+  &:active {
     color: @active-color;
   }
 

@@ -9,6 +9,17 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 .form-field-menu {
+  cursor: default;
+
+  &:hover {
+    color: @text-color;
+  }
+
+  &:not(.has-text):not(.has-icon) {
+    & > .form-field > label {
+      margin-left: 0;
+    }
+  }
 
   & > .form-field {
     display: inline-block;
@@ -31,11 +42,5 @@
   & > .radio-button.disabled:not(.read-only) > .field > .label {
     /* Use same disabled color as for menu items */
     color: @menu-item-disabled-color;
-  }
-
-  &:not(.has-text):not(.has-icon) {
-    & > .form-field > label {
-      margin-left: 0;
-    }
   }
 }
