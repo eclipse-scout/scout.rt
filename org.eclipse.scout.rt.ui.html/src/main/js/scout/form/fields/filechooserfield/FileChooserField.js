@@ -91,6 +91,20 @@ scout.FileChooserField.prototype._renderEnabled = function() {
   this.$field.setTabbable(this.enabledComputed);
 };
 
+scout.FileChooserField.prototype._renderPlaceholder = function() {
+  var $field = this.fileInput.$text;
+  if ($field) {
+    $field.placeholder(this.label);
+  }
+};
+
+scout.FileChooserField.prototype._removePlaceholder = function() {
+  var $field = this.fileInput.$text;
+  if ($field) {
+    $field.placeholder('');
+  }
+};
+
 scout.FileChooserField.prototype.setMaximumUploadSize = function(maximumUploadSize) {
   this.setProperty('maximumUploadSize', maximumUploadSize);
   this.fileInput.setMaximumUploadSize(maximumUploadSize);

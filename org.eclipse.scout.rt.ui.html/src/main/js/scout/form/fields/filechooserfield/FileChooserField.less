@@ -18,15 +18,21 @@
   }
 
   & > .file-input {
-
     & > input {
       display: none;
     }
 
     & > .file-input-text {
       overflow-x: hidden;
-    }
 
+      &[placeholder]:empty::before {
+        #scout.fake-placeholder();
+      }
+
+      &[placeholder].disabled:empty::before {
+        #scout.placeholder-disabled();
+      }
+    }
   }
 
   & > .legacy-upload-form {
@@ -35,5 +41,4 @@
       height: 100%;
     }
   }
-
 }

@@ -37,14 +37,6 @@
   & > .icon::before {
     content: @icon-pencil-solid;
   }
-
-  & > .input-field[placeholder]:empty::before {
-    #scout.fake-placeholder();
-  }
-
-  & > .input-field[placeholder].disabled:empty::before {
-    #scout.placeholder-disabled();
-  }
 }
 
 .smart-field {
@@ -52,11 +44,6 @@
   & > .icon::before,
   & > .field > .icon::before {
     content: @icon-search-bold;
-  }
-
-
-  & > .input-field[placeholder]:empty::before {
-    #scout.fake-placeholder();
   }
 
   /* Multiline SmartField */
@@ -179,6 +166,22 @@
 .dropdown-field,
 .proposal-field,
 .smart-field {
+  & > .input-field[placeholder]:empty::before,
+  & > .multiline > .input-field[placeholder]:empty::before {
+    #scout.fake-placeholder();
+  }
+
+  & > .input-field[placeholder].disabled:empty::before,
+  & > .multiline > .input-field[placeholder].disabled:empty::before {
+    #scout.placeholder-disabled();
+  }
+
+  &.loading {
+    & > .icon {
+      #scout.animation(pulsate-in-out 2.2s ease-in-out infinite);
+    }
+  }
+
   & > .field {
 
     &.halign-left,
@@ -240,24 +243,6 @@
     & > .field > .clear-icon {
       padding-left: 0;
       padding-right: @text-field-alternative-icon-padding-right;
-    }
-  }
-}
-
-.proposal-field.loading,
-.smart-field.loading {
-
-  & > .icon {
-    #scout.animation(pulsate-in-out 2.2s ease-in-out infinite);
-  }
-
-  & > input,
-  & > .input-field,
-  & > .field > input,
-  & > .field > .input-field {
-    & ~ .icon {
-      margin-right: 4px;
-      padding-right: 0;
     }
   }
 }
