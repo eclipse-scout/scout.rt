@@ -37,8 +37,8 @@
   }
 
   /* adjust paddings in case of both icons (icon and clear-icon) are visible */
-  &.has-icon.clearable-always.has-text&:not(.loading)&:not(.disabled)&:not(.compact),
-  &.has-icon.clearable-focused.has-text.focused&:not(.loading)&:not(.disabled)&:not(.compact) {
+  &.has-icon.clearable-always.has-text:not(.loading):not(.disabled):not(.compact),
+  &.has-icon.clearable-focused.has-text.focused:not(.loading):not(.disabled):not(.compact) {
 
     > input {
       padding-right: @text-field-padding-x + 40px;
