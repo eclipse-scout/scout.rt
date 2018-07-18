@@ -108,14 +108,17 @@
 
     &.alternative,
     &.read-only {
+      &.has-error {
+        border-bottom-color: @error-border-color;
+      }
+    }
+
+    &.alternative {
       padding-left: @text-field-alternative-padding-left;
+      padding-right: @text-field-alternative-padding-right;
 
       &:focus {
         border-bottom-color: @focus-color;
-      }
-
-      &.has-error {
-        border-bottom-color: @error-border-color;
       }
     }
   }
@@ -150,12 +153,16 @@
   &.read-only > .field > .multiline-lines {
     border: 0;
     padding-top: 6px;
-    padding-left: @text-field-alternative-padding-left;
 
     &.disabled {
       color: @disabled-color;
       background-color: transparent;
     }
+  }
+
+  &.alternative > .field > .multiline-lines {
+    padding-left: @text-field-alternative-padding-left;
+    padding-right: @text-field-alternative-padding-right;
   }
 
   &.disabled.read-only > .field > .multiline-lines {
@@ -224,11 +231,11 @@
     }
   }
 
-  &.halign-right > .field > .multiline-lines {
+  &.halign-right:not(.disabled) > .field > .multiline-lines {
     padding-right: @text-field-icon-outer-width;
   }
 
-  &.alternative.halign-right > .field > .multiline-lines {
+  &.alternative.halign-right:not(.disabled) > .field > .multiline-lines {
     padding-right: @text-field-alternative-icon-outer-width;
   }
 
