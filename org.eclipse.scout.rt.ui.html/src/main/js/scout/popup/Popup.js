@@ -38,6 +38,7 @@ scout.Popup = function() {
   // This is necessary because the mousedown listener is attached to the capture phase and therefore executed before any other.
   // If anchor was clicked, popup would already be closed and then opened again -> popup could never be closed by clicking the anchor
   this.closeOnAnchorMouseDown = true;
+  this._openLater = false;
 };
 scout.inherits(scout.Popup, scout.Widget);
 
@@ -89,6 +90,9 @@ scout.Popup.prototype.open = function($parent) {
   this._triggerPopupOpenEvent();
 
   this._open($parent);
+  if (this._openLater) {
+    return;
+  }
 
   // Focus the popup
   // It is important that this happens after layouting and positioning, otherwise we'd focus an element
@@ -101,13 +105,28 @@ scout.Popup.prototype.open = function($parent) {
 
 scout.Popup.prototype._open = function($parent) {
   this.render($parent);
+  if (this._openLater) {
+    return;
+  }
   this.revalidateLayout();
   this.position();
 };
 
 scout.Popup.prototype.render = function($parent) {
   var $popupParent = $parent || this.entryPoint();
+  // when the parent is detached it is not possible to render the popup -> do it later
+  if (!$popupParent || !$popupParent.length || !$popupParent.isAttached()) {
+    this._openLater = true;
+    return;
+  }
   scout.Popup.parent.prototype.render.call(this, $popupParent);
+};
+
+scout.Popup.prototype._afterAttach = function() {
+  if (this._openLater && !this.rendered) {
+    this._openLater = false;
+    this.open();
+  }
 };
 
 scout.Popup.prototype._render = function() {
