@@ -72,6 +72,7 @@ public class TextsLoader extends AbstractResourceLoader {
         .withCharset(StandardCharsets.UTF_8)
         .withContentType(FileUtility.getContentTypeForExtension("json"))
         .withContent(content)
+        .withCachingAllowed(true)
         .build();
   }
 

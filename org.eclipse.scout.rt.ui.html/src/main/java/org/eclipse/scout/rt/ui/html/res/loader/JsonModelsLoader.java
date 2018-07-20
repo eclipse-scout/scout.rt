@@ -91,6 +91,7 @@ public class JsonModelsLoader extends AbstractResourceLoader {
         .withCharset(StandardCharsets.UTF_8)
         .withContentType(FileUtility.getContentTypeForExtension("json"))
         .withContent(output.toString().getBytes(StandardCharsets.UTF_8))
+        .withCachingAllowed(true)
         .build();
   }
 

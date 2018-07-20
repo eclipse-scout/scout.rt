@@ -40,6 +40,7 @@ public class LocalesLoader extends AbstractResourceLoader {
         .withCharset(StandardCharsets.UTF_8)
         .withContentType(FileUtility.getContentTypeForExtension("json"))
         .withContent(localeBytes)
+        .withCachingAllowed(true)
         .build();
   }
 
