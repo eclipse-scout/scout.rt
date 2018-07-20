@@ -14,7 +14,18 @@ scout.locales = {
 
   bootstrap: function(url) {
     var promise = url ? $.ajaxJson(url) : $.resolvedPromise([]);
-    return promise.done(this.init.bind(this));
+    return promise.then(this._preInit.bind(this, url));
+  },
+
+  _preInit: function(url, data) {
+    if (data && data.error) {
+      // The result may contain a json error (e.g. session timeout) -> abort processing
+      throw {
+        error: data.error,
+        url: url
+      };
+    }
+    this.init(data);
   },
 
   init: function(data) {

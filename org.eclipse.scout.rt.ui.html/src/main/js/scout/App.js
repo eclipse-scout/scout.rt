@@ -84,7 +84,8 @@ scout.App.prototype._bootstrap = function(options) {
   });
 
   return $.promiseAll(promises)
-    .done(this._bootstrapDone.bind(this), options);
+    .done(this._bootstrapDone.bind(this, options))
+    .catch(this._bootstrapFail.bind(this, options));
 };
 
 scout.App.prototype._doBootstrap = function(options) {
@@ -99,10 +100,61 @@ scout.App.prototype._doBootstrap = function(options) {
 };
 
 scout.App.prototype._bootstrapDone = function(options) {
+  scout.webstorage.removeItem(sessionStorage, 'scout:timeoutPageReload');
   this.trigger('bootstrap', {
     options: options
   });
   $.log.isDebugEnabled() && $.log.debug('App bootstrapped');
+};
+
+scout.App.prototype._bootstrapFail = function(options, vararg, textStatus, errorThrown, requestOptions) {
+  $.log.isInfoEnabled() && $.log.info('App bootstrap failed');
+
+  // If one of the bootstrap ajax call fails due to a session timeout, the index.html is probably loaded from cache without asking the server for its validity.
+  // Normally, loading the index.html should already return a session timeout, but if it is loaded from the (back button) cache, no request will be done and therefore no timeout can be returned.
+  // The browser is allowed to display a page when navigating back without issuing a request even though cache-headers are set to must-revalidate.
+  // The only way to prevent it would be the no-store header but then pressing back would always reload the page and not only on a session timeout.
+  // Sometimes the JavaScript and therefore the ajax calls won't be executed in case the page is loaded from that cache, but sometimes they will nevertheless (we don't know the reasons).
+  // So, if it that happens, the server will return a session timeout and the best thing we can do is to reload the page hoping a request for the index.html will be done which eventually will be forwarded to the login page.
+  if ($.isJqXHR(vararg)) {
+    // Ajax error
+    // If a resource returns 401 (unauthorized) it is likely a session timeout.
+    // This may happen if no Scout backend is used or a reverse proxy returned the response, otherwise status 200 with an error object would be returned, see below
+    if (this._isSessionTimeoutStatus(vararg.status)) {
+      var url = requestOptions ? requestOptions.url : '';
+      this._handleBootstrapTimeoutError(vararg, url);
+      return;
+    }
+  } else if (scout.objects.isPlainObject(vararg) && vararg.error) {
+    // Json based error
+    // Json errors (normally processed by Session.js) are returned with http status 200
+    if (vararg.error.code === scout.Session.JsonResponseError.SESSION_TIMEOUT) {
+      this._handleBootstrapTimeoutError(vararg.error, vararg.url);
+      return;
+    }
+  }
+
+  // Make sure promise will be rejected with all original arguments so that it can be eventually handled by this._fail
+  var args = scout.objects.argumentsToArray(arguments).slice(1);
+  return $.rejectedPromise.apply($, args);
+};
+
+scout.App.prototype._isSessionTimeoutStatus = function(httpStatus) {
+  return httpStatus === 401;
+};
+
+scout.App.prototype._handleBootstrapTimeoutError = function(error, url) {
+  $.log.isInfoEnabled() && $.log.info('Timeout error for resource ' + url + '. Reloading page...');
+  if (scout.webstorage.getItem(sessionStorage, 'scout:timeoutPageReload')) {
+    // Prevent loop in case a reload did not solve the problem
+    $.log.isWarnEnabled() && $.log.warn('Prevented automatic reload, startup will likely fail', error, url);
+    scout.webstorage.removeItem(sessionStorage, 'scout:timeoutPageReload');
+    throw new Error('Resource ' + url + ' could not be loaded due to a session timeout, even after a page reload');
+  }
+  scout.webstorage.setItem(sessionStorage, 'scout:timeoutPageReload', true);
+
+  // See comment in _bootstrapFail for the reasons why to reload here
+  scout.reloadPage();
 };
 
 /**

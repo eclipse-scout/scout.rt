@@ -224,24 +224,23 @@ public class ServletFilterHelper {
    * {@link RequestDispatcher#forward(javax.servlet.ServletRequest, javax.servlet.ServletResponse)). This has the same
    * effect as if the user had requested the target location from the beginning.
    * </ul>
-   * This method detects if the request is a POST. If it is a JSON request, no redirection happens, but a JSON timeout
-   * message is sent. For other types of POST requests, a warning is logged, but forwarding/redirection will happen
-   * nevertheless.
+   * If the client expects JSON as response (accept header contains 'application/json'), no redirection happens, but a
+   * JSON timeout message is sent. Also for POST requests no forwarding/redirection will happen but error code 403
+   * (forbidden) returned.
    */
   protected void forwardOrRedirectTo(HttpServletRequest req, HttpServletResponse resp, String targetLocation, boolean redirect) throws IOException, ServletException {
+    String acceptedMimeTypes = req.getHeader("Accept");
+    if (StringUtility.containsString(acceptedMimeTypes, "application/json")) {
+      // Since the client expects JSON as response don't forward to the login page, instead send a json based timeout error
+      LOG.debug("Returning session timeout error as json for path {}, based on Accept header {}.", req.getPathInfo(), acceptedMimeTypes);
+      sendJsonSessionTimeout(resp);
+      return;
+    }
     if ("POST".equals(req.getMethod())) {
-      if ((req.getContentType() + "").startsWith("application/json")) {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Returning session timeout error as json.");
-        }
-        sendJsonSessionTimeout(resp);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("The request for '{}' is a POST request. " + (redirect ? "Redirecting" : "Forwarding") + " to '{}' will most likely fail. Sending HTTP status '403 Forbidden' instead.", req.getPathInfo(), targetLocation);
       }
-      else {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("The request for '{}' is a POST request. " + (redirect ? "Redirecting" : "Forwarding") + " to '{}' will most likely fail. Sending HTTP status '403 Forbidden' instead.", req.getPathInfo(), targetLocation);
-        }
-        resp.sendError(HttpServletResponse.SC_FORBIDDEN);
-      }
+      resp.sendError(HttpServletResponse.SC_FORBIDDEN);
       return;
     }
 
