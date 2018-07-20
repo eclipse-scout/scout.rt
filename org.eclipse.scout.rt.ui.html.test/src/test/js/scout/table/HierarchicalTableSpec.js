@@ -80,7 +80,7 @@ describe("HierarchicalTableSpec", function() {
     var table, rowIds, rows;
 
     /**
-     * inital table
+     * initial table
      * -------------
      * 0
      * |-- 1
@@ -227,7 +227,7 @@ describe("HierarchicalTableSpec", function() {
   describe("delete", function() {
     var table, rows, rowIds;
     /**
-     * inital table
+     * initial table
      * -------------
      * 0
      * |-- 1
@@ -308,7 +308,7 @@ describe("HierarchicalTableSpec", function() {
   describe("structure", function() {
     var table, rows, rowIds;
     /**
-     * inital table
+     * initial table
      * -------------
      * 0
      * |-- 1
@@ -375,7 +375,7 @@ describe("HierarchicalTableSpec", function() {
   describe("expanded rows", function() {
     var table, rowIds, rows;
     /**
-     * inital table
+     * initial table
      * -------------
      * 0
      * |-- 1
@@ -470,7 +470,7 @@ describe("HierarchicalTableSpec", function() {
   describe("selection", function() {
     var table, rowIds, rows;
     /**
-     * inital table
+     * initial table
      * -------------
      * 0
      * |-- 1
@@ -620,7 +620,7 @@ describe("HierarchicalTableSpec", function() {
   describe("update row", function() {
     var table, rowIds, rows;
     /**
-     * inital table
+     * initial table
      * -------------
      * 0
      * |-- 1
@@ -694,7 +694,7 @@ describe("HierarchicalTableSpec", function() {
   describe("filtered visible", function() {
     var table, rowIds, rows;
     /**
-     * inital table
+     * initial table
      * -------------
      * 0
      * |-- 1

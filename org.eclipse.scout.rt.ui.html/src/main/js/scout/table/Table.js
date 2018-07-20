@@ -3229,6 +3229,7 @@ scout.Table.prototype.filter = function() {
     filteredRows: true
   });
   this._renderRowDelta();
+  this._group();
   this.revealSelection();
 };
 

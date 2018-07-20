@@ -104,13 +104,25 @@ scout.TableSpecHelper.prototype.createModelColumns = function(count, columnType)
   if (!count) {
     return;
   }
+
   if (!columnType) {
     columnType = 'Column';
   }
 
-  var columns = [];
-  for (var i = 0; i < count; i++) {
-    columns[i] = this.createModelColumn('col' + i, columnType);
+  var columns = [],
+  columnTypes = [];
+  if(scout.objects.isArray(columnType)){
+    if(columnType.length !== count){
+      throw new Error('Column count('+count+') does not match with columnType.length ('+columnType.length+').');
+    }
+    columnTypes = columnType;
+  }else{
+    for(var i = 0; i < count; i++){
+      columnTypes.push(columnType);
+    }
+  }
+  for (var j = 0; j < count; j++) {
+    columns[j] = this.createModelColumn('col' + j, columnTypes[j]);
   }
   return columns;
 };
