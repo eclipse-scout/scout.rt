@@ -634,7 +634,7 @@ scout.GroupBox.prototype._onControlClick = function(event) {
 
 scout.GroupBox.prototype.clone = function(model, options) {
   var clone = scout.GroupBox.parent.prototype.clone.call(this, model);
-  this._deepCloneProperties(clone, ['fields', 'menus'], options);
+  this._deepCloneProperties(clone, ['fields'], options);
   clone._prepareFields();
   return clone;
 };

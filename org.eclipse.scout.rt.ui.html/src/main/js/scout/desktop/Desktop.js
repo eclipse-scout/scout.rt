@@ -769,6 +769,13 @@ scout.Desktop.prototype._glassPaneTargets = function(element) {
     $glassPaneTargets = $glassPaneTargets.not(element.$container);
   }
 
+  // Exclude all child elements of the given widget
+  // Use case: element is a popup and has tooltip open. The tooltip is displayed in the desktop and considered as glass pane target by the selector above
+  $glassPaneTargets = $glassPaneTargets.filter(function(i, targetElem) {
+    var target = scout.widget(targetElem);
+    return !element.has(target);
+  });
+
   var glassPaneTargets;
   if (element instanceof scout.Form && element.displayHint === scout.Form.DisplayHint.VIEW) {
     $glassPaneTargets = $glassPaneTargets

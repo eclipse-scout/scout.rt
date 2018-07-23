@@ -824,9 +824,12 @@ scout.SmartField.prototype.closePopup = function() {
  * @override
  */
 scout.SmartField.prototype.aboutToBlurByMouseDown = function(target) {
+  if (this.touchMode) {
+    return false;
+  }
   var eventOnField = this.$field.isOrHas(target) || this.$icon.isOrHas(target) || (this.$clearIcon && this.$clearIcon.isOrHas(target));
   var eventOnPopup = this.popup && this.popup.$container.isOrHas(target);
-  var eventOnTooltip = this.tooltip && this.tooltip.$container.isOrHas(target);
+  var eventOnTooltip = this.tooltip && this.tooltip.rendered && this.tooltip.$container.isOrHas(target);
   if (!eventOnField && !eventOnPopup && !eventOnTooltip) {
     this.acceptInput(); // event outside this value field
   }

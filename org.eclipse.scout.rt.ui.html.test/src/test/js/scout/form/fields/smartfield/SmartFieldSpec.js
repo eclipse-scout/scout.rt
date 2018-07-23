@@ -258,6 +258,42 @@ describe('SmartField', function() {
       expect(field.popup).not.toBe(null);
     });
 
+    it('removes tooltip from original field on open and displays it again when closed', function() {
+      // Use case: Click on touch smart field, select inactive radio button, clear the text in the field -> smart field has to stay open
+      var field = createFieldWithLookupCall({
+        touchMode: true,
+        errorStatus: scout.Status.error({
+          message: 'foo'
+        })
+      });
+      field.render();
+      jasmine.clock().tick(500);
+      field.$field.triggerClick();
+      jasmine.clock().tick(500);
+      expect(field.tooltip.rendered).toBe(false);
+      expect(field.popup._field.tooltip.rendered).toBe(true);
+
+      field.popup.close();
+      expect(field.popup).toBe(null);
+      expect(field.tooltip.rendered).toBe(true);
+    });
+
+    it('does not draw glass pane over tooltip', function() {
+      // Use case: Click on touch smart field, select inactive radio button, clear the text in the field -> smart field has to stay open
+      var field = createFieldWithLookupCall({
+        touchMode: true,
+        errorStatus: scout.Status.error({
+          message: 'foo'
+        })
+      });
+      field.render();
+      jasmine.clock().tick(500);
+      field.$field.triggerClick();
+      jasmine.clock().tick(500);
+      expect(field.popup._field.tooltip.rendered).toBe(true);
+      expect(field.popup._field.tooltip.$container.find('.glasspane').length).toBe(0);
+    });
+
   });
 
   describe('acceptInput', function() {

@@ -38,7 +38,7 @@ scout.SmartFieldAdapter.prototype._syncResult = function(result) {
   }
 };
 
-// When displayText comes from the server we don't must not call parseAndSetValue here.
+// When displayText comes from the server we must not call parseAndSetValue here.
 scout.SmartFieldAdapter.prototype._syncDisplayText = function(displayText) {
   this.widget.setDisplayText(displayText);
 };

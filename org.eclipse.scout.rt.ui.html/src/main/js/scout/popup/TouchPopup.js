@@ -13,6 +13,7 @@ scout.TouchPopup = function() {
 
   // the original touch field from the form
   this._touchField;
+  this._touchFieldTooltip = null;
   // the cloned field from the popup
   this._field;
   // the widget placed below the field
@@ -29,6 +30,11 @@ scout.inherits(scout.TouchPopup, scout.Popup);
 scout.TouchPopup.prototype._init = function(options) {
   scout.TouchPopup.parent.prototype._init.call(this, options);
   this._touchField = options.field;
+  if (this._touchField.tooltip && this._touchField.tooltip.rendered) {
+    // Hide existing tooltip to not show it twice (it will be shown on the popup too). It may even throw an exception if the tooltip contains a (not cloned) menu
+    this._touchFieldTooltip = this._touchField.tooltip;
+    this._touchFieldTooltip.remove();
+  }
 
   // clone original touch field
   // original and clone both point to the same popup instance
@@ -39,6 +45,10 @@ scout.TouchPopup.prototype._init = function(options) {
 
 scout.TouchPopup.prototype._destroy = function() {
   this._touchField.off('propertyChange', this._touchFieldPropertyChangeListener);
+  if (this._touchFieldTooltip && !this._touchFieldTooltip.destroyed) {
+    // Make tooltip visible again if not destroyed in the meantime
+    this._touchFieldTooltip.render(this._touchField._$tooltipParent());
+  }
   scout.TouchPopup.parent.prototype._destroy.call(this);
 };
 
@@ -49,6 +59,7 @@ scout.TouchPopup.prototype._fieldOverrides = function() {
     fieldStyle: scout.FormField.FieldStyle.CLASSIC,
     popup: this,
     statusVisible: false,
+    menusVisible: false, // menus don't work (action on clone is not propagated to original, currentMenuTypes is not updated correctly) -> don't show it on popup
     embedded: true,
     touchMode: false,
     clearable: scout.ValueField.Clearable.ALWAYS
