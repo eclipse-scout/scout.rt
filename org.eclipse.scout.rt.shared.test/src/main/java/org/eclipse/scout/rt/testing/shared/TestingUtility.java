@@ -50,7 +50,7 @@ public final class TestingUtility {
   /**
    * Order for testing beans to be used when needed
    */
-  public static final int TESTING_RESOURSE_ORDER = 10000;
+  public static final int TESTING_RESOURCE_ORDER = 10000;
 
   private TestingUtility() {
   }
