@@ -55,16 +55,28 @@ scout.FileChooserController.prototype.render = function() {
 };
 
 scout.FileChooserController.prototype._render = function(fileChooser) {
-  // Only render file chooser if 'displayParent' is rendered yet; if not, the file chooser will be rendered once 'displayParent' is rendered.
-  if (!this.displayParent.rendered) {
+  // Use parent's function or (if not implemented) our own.
+  if (this.displayParent.acceptView) {
+    if (!this.displayParent.acceptView(fileChooser)) {
+      return;
+    }
+  } else if (!this.acceptView(fileChooser)) {
     return;
   }
   // Prevent "Already rendered" errors --> TODO [7.0] bsh: Remove this hack! Fix it on model if possible. See #162954.
   if (fileChooser.rendered) {
     return;
   }
-
-  fileChooser.render(this.session.desktop.$container);
+  // Open all file choosers in the center of the desktop, except the ones that belong to a popup-window
+  // Since the file chooser doesn't have a DOM element as parent when render is called, we must find the
+  // entryPoint by using the model.
+  var $parent;
+  if (this.displayParent instanceof scout.Form && this.displayParent.isPopupWindow()) {
+    $parent = this.displayParent.popupWindow.$container;
+  } else {
+    $parent = this.session.desktop.$container;
+  }
+  fileChooser.render($parent);
 
   // Only display the file chooser if its 'displayParent' is visible to the user.
   if (!this.displayParent.inFront()) {
@@ -98,4 +110,8 @@ scout.FileChooserController.prototype.detach = function() {
   this.displayParent.fileChoosers.forEach(function(fileChooser) {
     fileChooser.detach();
   }, this);
+};
+
+scout.FileChooserController.prototype.acceptView = function(view) {
+  return this.displayParent.rendered;
 };
