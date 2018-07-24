@@ -37,7 +37,7 @@ scout.Desktop = function() {
   this.geolocationServiceAvailable = scout.device.supportsGeolocation();
   this.openUriHandler;
 
-  this._addWidgetProperties(['activeForm', 'viewButtons', 'menus', 'views', 'selectedViewTabs', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes']);
+  this._addWidgetProperties(['viewButtons', 'menus', 'views', 'selectedViewTabs', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes', 'activeForm']);
 
   // event listeners
   this._benchActiveViewChangedHandler = this._onBenchActivateViewChanged.bind(this);
@@ -169,7 +169,7 @@ scout.Desktop.prototype._postRender = function() {
 
   // Render attached forms, message boxes and file choosers.
   this.initialFormRendering = true;
-  this._renderDisplayChildsOfOutline();
+  this._renderDisplayChildrenOfOutline();
   this.formController.render();
   this.messageBoxController.render();
   this.fileChooserController.render();
@@ -205,7 +205,7 @@ scout.Desktop.prototype._createLayout = function() {
  * Displays attached forms, message boxes and file choosers.
  * Outline does not need to be rendered to show the child elements, it needs to be active (necessary if navigation is invisible)
  */
-scout.Desktop.prototype._renderDisplayChildsOfOutline = function() {
+scout.Desktop.prototype._renderDisplayChildrenOfOutline = function() {
   if (!this.outline) {
     return;
   }
@@ -220,13 +220,23 @@ scout.Desktop.prototype._renderDisplayChildsOfOutline = function() {
   }
 };
 
-scout.Desktop.prototype._removeDisplayChildsOfOutline = function() {
+scout.Desktop.prototype._removeDisplayChildrenOfOutline = function() {
   if (!this.outline) {
     return;
   }
   this.outline.formController.remove();
   this.outline.messageBoxController.remove();
   this.outline.fileChooserController.remove();
+};
+
+scout.Desktop.prototype.computeParentForDisplayParent = function(displayParent) {
+  // Outline must not be used as parent, otherwise the children (form, messageboxes etc.) would be removed if navigation is made invisible
+  // The functions _render/removeDisplayChildrenOfOutline take care that the elements are correctly rendered/removed on an outline switch
+  var parent = displayParent;
+  if (displayParent instanceof scout.Outline) {
+    parent = this;
+  }
+  return parent;
 };
 
 scout.Desktop.prototype._renderTitle = function() {
@@ -474,7 +484,7 @@ scout.Desktop.prototype.setOutline = function(outline) {
       this.bench.setChanging(true);
     }
     if (this.rendered) {
-      this._removeDisplayChildsOfOutline();
+      this._removeDisplayChildrenOfOutline();
     }
 
     this.outline = outline;
@@ -487,7 +497,7 @@ scout.Desktop.prototype.setOutline = function(outline) {
     this.trigger('outlineChange');
 
     if (this.rendered) {
-      this._renderDisplayChildsOfOutline();
+      this._renderDisplayChildrenOfOutline();
     }
   } finally {
     if (this.bench) {

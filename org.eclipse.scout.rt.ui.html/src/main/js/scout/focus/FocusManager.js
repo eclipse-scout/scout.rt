@@ -212,15 +212,14 @@ scout.FocusManager.prototype.isElementCovertByGlassPane = function(element) {
     return false; // no glasspanes active.
   }
 
-  if (this._glassPaneDisplayParents.indexOf(scout.widget($(element))) >= 0) {
+  if (this._glassPaneDisplayParents.indexOf(scout.widget(element)) >= 0) {
     return true;
-  } else {
-    // Checks whether the element is a child of a glasspane target.
-    // If so, the some-iterator returns immediately with true.
-    return this._glassPaneTargets.some(function($glassPaneTarget) {
-      return $(element).closest($glassPaneTarget).length !== 0;
-    });
   }
+  // Checks whether the element is a child of a glasspane target.
+  // If so, the some-iterator returns immediately with true.
+  return this._glassPaneTargets.some(function($glassPaneTarget) {
+    return $(element).closest($glassPaneTarget).length !== 0;
+  });
 };
 
 /**
@@ -239,7 +238,7 @@ scout.FocusManager.prototype.registerGlassPaneDisplayParent = function(displayPa
  * Unregisters the given glasspane target, so that the focus can be gained again for the target or one of its child controls.
  */
 scout.FocusManager.prototype.unregisterGlassPaneTarget = function($glassPaneTarget) {
-  scout.arrays.remove(this._glassPaneTargets, $glassPaneTarget);
+  scout.arrays.$remove(this._glassPaneTargets, $glassPaneTarget);
   this.validateFocus();
 };
 

@@ -16,7 +16,7 @@ scout.Form = function() {
   this.askIfNeedSaveText; // if not set, a default text is used (see Lifecycle.js)
   this.data = {};
   this.displayHint = scout.Form.DisplayHint.DIALOG;
-  this.displayParent; // only relevant if form is opened, not relevant if form is just rendered into another widget (not managed by a form controller)
+  this.displayParent = null; // only relevant if form is opened, not relevant if form is just rendered into another widget (not managed by a form controller)
   this.maximizeEnabled = true;
   this.maximized = false;
   this.minimizeEnabled = true;
@@ -64,6 +64,7 @@ scout.Form.prototype._init = function(model) {
 
   this.resolveTextKeys(['title', 'askIfNeedSaveText']);
   this.resolveIconIds(['iconId']);
+  this._setDisplayParent(this.displayParent);
   this._setViews(this.views);
   this.formController = scout.create('FormController', {
     displayParent: this,
@@ -767,7 +768,7 @@ scout.Form.prototype.setDisplayParent = function(displayParent) {
 scout.Form.prototype._setDisplayParent = function(displayParent) {
   this._setProperty('displayParent', displayParent);
   if (displayParent) {
-    this.setParent(displayParent);
+    this.setParent(this.findDesktop().computeParentForDisplayParent(displayParent));
   }
 };
 

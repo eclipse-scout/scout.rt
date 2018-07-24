@@ -48,7 +48,10 @@ scout.MessageBoxController.prototype.remove = function() {
  * Renders all message boxes registered with this controller.
  */
 scout.MessageBoxController.prototype.render = function() {
-  this.displayParent.messageBoxes.forEach(this._render.bind(this));
+  this.displayParent.messageBoxes.forEach(function(msgBox) {
+    msgBox.setDisplayParent(this.displayParent);
+    this._render(msgBox);
+  }.bind(this));
 };
 
 scout.MessageBoxController.prototype._render = function(messageBox) {

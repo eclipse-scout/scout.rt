@@ -29,7 +29,7 @@ scout.MessageBox = function() {
   this.$noButton;
   this.$cancelButton;
   this._$abortButton;
-  this.displayParent;
+  this.displayParent = null;
 };
 scout.inherits(scout.MessageBox, scout.Widget);
 
@@ -37,6 +37,11 @@ scout.MessageBox.Buttons = {
   YES: 'yes',
   NO: 'no',
   CANCEL: 'cancel'
+};
+
+scout.MessageBox.prototype._init = function(model) {
+  scout.MessageBox.parent.prototype._init.call(this, model);
+  this._setDisplayParent(this.displayParent);
 };
 
 /**
@@ -208,7 +213,7 @@ scout.MessageBox.prototype.setDisplayParent = function(displayParent) {
 scout.MessageBox.prototype._setDisplayParent = function(displayParent) {
   this._setProperty('displayParent', displayParent);
   if (displayParent) {
-    this.setParent(displayParent);
+    this.setParent(this.findDesktop().computeParentForDisplayParent(displayParent));
   }
 };
 

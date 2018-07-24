@@ -16,10 +16,11 @@ scout.GlassPaneRenderer = function(widget, enabled) {
   this.session = widget.session;
   this._enabled = scout.nvl(enabled, true);
   this._$glassPanes = [];
-  this._$glassPaneTargets = [];
   this._deferredGlassPanes = [];
   this._resolvedDisplayParent = null;
   this._registeredDisplayParent = null;
+  this._displayParentRenderHandler = this._onDisplayParentRender.bind(this);
+  this._glassPaneRemoveHandler = this._onGlassPaneRemove.bind(this);
 };
 
 scout.GlassPaneRenderer.prototype.renderGlassPanes = function() {
@@ -44,6 +45,17 @@ scout.GlassPaneRenderer.prototype.renderGlassPane = function($glassPaneTarget) {
     return;
   }
 
+  // If glassPaneTarget already has a glasspane added by this renderer, don't add another one
+  // May happen if a part of the display parent is removed and rendered again while covered by a glass pane
+  // E.g. display parent is set to outline and navigation is made invisible but bench is still there.
+  // When navigation is made visible again, renderGlassPanes is called but only the glass panes of the navigation need to be added and not the ones of the bench (because they are already there)
+  var alreadyRendered = this._$glassPanes.some(function($pane) {
+    return $pane.parent()[0] === $glassPaneTarget[0];
+  });
+  if (alreadyRendered) {
+    return;
+  }
+
   // Render glasspanes onto glasspane targets.
   var $glassPane = $glassPaneTarget
     .appendDiv('glasspane')
@@ -60,39 +72,40 @@ scout.GlassPaneRenderer.prototype.renderGlassPane = function($glassPaneTarget) {
   if ($glassPane.window(true).popupWindow) {
     $glassPane.addClass('dark');
   }
-
   this._$glassPanes.push($glassPane);
-  this._$glassPaneTargets.push($glassPaneTarget);
 
   // Register 'glassPaneTarget' in focus manager.
   this.session.focusManager.registerGlassPaneTarget($glassPaneTarget);
+
+  // Ensure glass pane is removed properly on remove, especially necessary when display parent is removed while glass pane renderer is still active (navigation collapse case)
+  $glassPane.one('remove', this._glassPaneRemoveHandler);
+
   this._registerDisplayParent();
 };
 
 scout.GlassPaneRenderer.prototype.removeGlassPanes = function() {
   // Remove glass-panes
-  this._$glassPanes.forEach(function($glassPane) {
-    if ($glassPane.parent()) {
-      $glassPane.parent().removeClass('no-hover');
-    }
-    $glassPane.remove();
-  });
+  this._$glassPanes.slice().forEach(function($glassPane) {
+    this._removeGlassPane($glassPane);
+  }, this);
 
   // Unregister all deferedGlassPaneTargets
   this._deferredGlassPanes.forEach(function(glassPaneTarget) {
     glassPaneTarget.removeGlassPaneRenderer(this);
   }, this);
-
   this._deferredGlassPanes = [];
 
-  // Unregister glasspane targets from focus manager
-  this._$glassPaneTargets.forEach(function($glassPaneTarget) {
-    this.session.focusManager.unregisterGlassPaneTarget($glassPaneTarget);
-  }, this);
   this._unregisterDisplayParent();
+};
 
-  this._$glassPanes = [];
-  this._$glassPaneTargets = [];
+scout.GlassPaneRenderer.prototype._removeGlassPane = function($glassPane) {
+  var $glassPaneTarget = $glassPane.parent();
+  $glassPane.off('remove', this._glassPaneRemoveHandler);
+  $glassPane.remove();
+  scout.arrays.$remove(this._$glassPanes, $glassPane);
+
+  $glassPaneTarget.removeClass('no-hover');
+  this.session.focusManager.unregisterGlassPaneTarget($glassPaneTarget);
 };
 
 scout.GlassPaneRenderer.prototype.eachGlassPane = function(func) {
@@ -133,6 +146,7 @@ scout.GlassPaneRenderer.prototype._registerDisplayParent = function() {
       // register this._resolvedDisplayParent and remember it as this._registeredDisplayParent
       this.session.focusManager.registerGlassPaneDisplayParent(this._resolvedDisplayParent);
       this._registeredDisplayParent = this._resolvedDisplayParent;
+      this._registeredDisplayParent.on('render', this._displayParentRenderHandler);
     }
   }
 };
@@ -141,6 +155,7 @@ scout.GlassPaneRenderer.prototype._unregisterDisplayParent = function() {
   // if this._registeredDisplayParent is defined, unregister it
   if (this._registeredDisplayParent) {
     this.session.focusManager.unregisterGlassPaneDisplayParent(this._registeredDisplayParent);
+    this._registeredDisplayParent.off('render', this._displayParentRenderHandler);
     this._registeredDisplayParent = null;
   }
 };
@@ -172,4 +187,13 @@ scout.GlassPaneRenderer.prototype._onMouseDown = function(event) {
   }
 
   $.suppressEvent(event);
+};
+
+scout.GlassPaneRenderer.prototype._onDisplayParentRender = function(event) {
+  this.renderGlassPanes();
+};
+
+scout.GlassPaneRenderer.prototype._onGlassPaneRemove = function(event) {
+  var $glassPane = $(event.target);
+  this._removeGlassPane($glassPane);
 };

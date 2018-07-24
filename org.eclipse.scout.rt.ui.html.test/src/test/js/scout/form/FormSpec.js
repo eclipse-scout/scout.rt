@@ -382,7 +382,7 @@ describe('Form', function() {
 
     it('is required if form is managed by a form controller, defaults to desktop', function(done) {
       var form = helper.createFormWithOneField();
-      expect(form.displayParent).toBeUndefined();
+      expect(form.displayParent).toBe(null);
       form.open()
         .then(function() {
           expect(form.displayParent).toBe(desktop);
@@ -394,24 +394,46 @@ describe('Form', function() {
 
     it('is not required if form is just rendered', function() {
       var form = helper.createFormWithOneField();
-      expect(form.displayParent).toBeUndefined();
+      expect(form.displayParent).toBe(null);
       form.render();
-      expect(form.displayParent).toBeUndefined();
+      expect(form.displayParent).toBe(null);
       form.destroy();
     });
 
-    it('always same as parent if display parent is set', function(done) {
+    it('same as parent if display parent is set', function(done) {
       // Parent would be something different, removing the parent would remove the form which is not expected, because only removing the display parent has to remove the form
       var initialParent = new scout.NullWidget();
       var form = helper.createFormWithOneField({
         parent: initialParent,
         session: session
       });
-      expect(form.displayParent).toBeUndefined();
+      expect(form.displayParent).toBe(null);
       expect(form.parent).toBe(initialParent);
       form.open()
         .then(function() {
           expect(form.displayParent).toBe(desktop);
+          expect(form.parent).toBe(desktop);
+          form.close();
+        })
+        .catch(fail)
+        .always(done);
+    });
+
+    it('not same as parent if display parent is outline', function(done) {
+      // Parent must not be outline if display parent is outline, otherwise making the outline invisible would remove the form, which is not expected. See also DesktopSpec
+      var outline = outlineHelper.createOutlineWithOneDetailForm();
+      desktop.setOutline(outline);
+      var initialParent = new scout.NullWidget();
+      var form = helper.createFormWithOneField({
+        parent: initialParent,
+        session: session,
+        displayParent: outline
+      });
+      expect(form.displayParent).toBe(outline);
+      expect(form.parent).toBe(desktop);
+      form.open()
+        .then(function() {
+          expect(form.displayParent).toBe(outline);
           expect(form.parent).toBe(desktop);
           form.close();
         })

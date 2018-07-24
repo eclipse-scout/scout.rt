@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.FileChooser = function() {
   scout.FileChooser.parent.call(this);
+  this.displayParent = null;
   this.files = [];
   this._glassPaneRenderer;
   this.maximumUploadSize = scout.FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
@@ -18,6 +19,7 @@ scout.inherits(scout.FileChooser, scout.Widget);
 
 scout.FileChooser.prototype._init = function(model) {
   scout.FileChooser.parent.prototype._init.call(this, model);
+  this._setDisplayParent(this.displayParent);
   this._glassPaneRenderer = new scout.GlassPaneRenderer(this);
   this.fileInput = scout.create('FileInput', {
     parent: this,
@@ -156,7 +158,7 @@ scout.FileChooser.prototype.setDisplayParent = function(displayParent) {
 scout.FileChooser.prototype._setDisplayParent = function(displayParent) {
   this._setProperty('displayParent', displayParent);
   if (displayParent) {
-    this.setParent(displayParent);
+    this.setParent(this.findDesktop().computeParentForDisplayParent(displayParent));
   }
 };
 

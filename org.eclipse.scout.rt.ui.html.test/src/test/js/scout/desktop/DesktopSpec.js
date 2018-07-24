@@ -106,11 +106,8 @@ describe('Desktop', function() {
 
   describe('outline', function() {
 
-    beforeEach(function() {
+    it('is displayed in desktop navigation', function() {
       session._renderDesktop();
-    });
-
-    it('gets displayed in desktop navigation ', function() {
       var model = outlineHelper.createModelFixture(3, 2);
       var outline = outlineHelper.createOutline(model);
 
@@ -180,11 +177,8 @@ describe('Desktop', function() {
 
   describe('navigationVisible', function() {
 
-    beforeEach(function() {
-      session._renderDesktop();
-    });
-
     it('controls visibility of the navigation', function() {
+      session._renderDesktop();
       expect(desktop.navigationVisible).toBe(true);
       expect(desktop.navigation.rendered).toBe(true);
 
@@ -200,6 +194,7 @@ describe('Desktop', function() {
     });
 
     it('only affects content in navigation, not in bench or header', function() {
+      session._renderDesktop();
       var outline = outlineHelper.createOutlineWithOneDetailForm();
       var detailForm = outline.nodes[0].detailForm;
       // because outline is the owner, it is parent as well if created by server -> simulate this
@@ -224,6 +219,142 @@ describe('Desktop', function() {
       expect(outline.rendered).toBe(false);
       expect(detailForm.rendered).toBe(true);
       expect(detailForm.$container.parent()[0]).toBe(desktop.bench.getTabBox('C').$viewContent[0]);
+    });
+
+    it('does not remove dialogs, message boxes and file choosers with display parent outline', function(done) {
+      session._renderDesktop();
+      var model = outlineHelper.createModelFixture(3, 2);
+      var outline = outlineHelper.createOutline(model);
+      desktop.setOutline(outline);
+      var msgBox = scout.create('MessageBox', {
+        parent: outline,
+        displayParent: outline
+      });
+      msgBox.open();
+      var fileChooser = scout.create('FileChooser', {
+        parent: outline,
+        displayParent: outline
+      });
+      fileChooser.open();
+      var dialog = formHelper.createFormWithOneField({
+        parent: outline,
+        displayParent: outline
+      });
+      var promises = [];
+      promises.push(dialog.open());
+      var view = formHelper.createFormWithOneField({
+        parent: outline,
+        displayHint: scout.Form.DisplayHint.VIEW,
+        displayParent: outline,
+        modal: true
+      });
+      promises.push(view.open());
+      $.promiseAll(promises).then(function() {
+          expect(desktop.navigationVisible).toBe(true);
+          expect(desktop.navigation.rendered).toBe(true);
+          expect(desktop.navigation.$body.children('.glasspane').length).toBe(4); // Every glass pane renderer added one
+          expect(session.focusManager._glassPaneTargets.length).toBe(8); // Every glass pane renderer added one for navigation and bench
+          expect(dialog.rendered).toBe(true);
+          expect(view.rendered).toBe(true);
+          expect(msgBox.rendered).toBe(true);
+          expect(fileChooser.rendered).toBe(true);
+
+          // Outline is not visible anymore, but form, msg box and file chooser still are
+          desktop.setNavigationVisible(false);
+          // Force removal of navigation
+          desktop.onLayoutAnimationComplete();
+          expect(desktop.navigationVisible).toBe(false);
+          expect(desktop.navigation).toBeFalsy();
+          expect(outline.rendered).toBe(false);
+          expect(dialog.rendered).toBe(true);
+          expect(view.rendered).toBe(true);
+          expect(msgBox.rendered).toBe(true);
+          expect(fileChooser.rendered).toBe(true);
+
+          // Make it visible again and expect that glass pane is correctly reverted
+          desktop.setNavigationVisible(true);
+          desktop.onLayoutAnimationComplete();
+          expect(desktop.navigationVisible).toBe(true);
+          expect(desktop.navigation.rendered).toBe(true);
+          expect(desktop.navigation.$body.children('.glasspane').length).toBe(4);
+          expect(session.focusManager._glassPaneTargets.length).toBe(8);
+
+          dialog.close();
+          view.close();
+          msgBox.close();
+          fileChooser.close();
+          expect(desktop.navigation.$body.children('.glasspane').length).toBe(0);
+          expect(session.focusManager._glassPaneTargets.length).toBe(0);
+        })
+        .catch(fail)
+        .always(done);
+    });
+
+    it('does not remove dialogs, message boxes and file choosers with display parent outline even when rendered along with the outline', function() {
+      // Simulate startup / reload case
+      session = sandboxSession({
+        desktop: {
+          navigationVisible: true,
+          headerVisible: true,
+          benchVisible: true,
+          activeForm: 'myView', // Actually a workaround because a modal view should always be active
+          outline: {
+            objectType: 'Outline',
+            dialogs: [{
+              objectType: 'Form',
+              displayHint: scout.Form.DisplayHint.DIALOG,
+              modal: true,
+              rootGroupBox: {
+                objectType: 'GroupBox'
+              }
+            }],
+            views: [{
+              id: 'myView',
+              objectType: 'Form',
+              displayHint: scout.Form.DisplayHint.VIEW,
+              modal: true,
+              rootGroupBox: {
+                objectType: 'GroupBox'
+              }
+            }],
+            messageBoxes: [{
+              objectType: 'MessageBox'
+            }],
+            fileChoosers: [{
+              objectType: 'FileChooser'
+            }]
+          }
+        }
+      });
+      desktop = session.desktop;
+      var outline = desktop.outline;
+      var dialog = outline.dialogs[0];
+      var view = outline.views[0];
+      var msgBox = outline.messageBoxes[0];
+      var fileChooser = outline.fileChoosers[0];
+      expect(desktop.navigationVisible).toBe(true);
+      expect(desktop.navigation.rendered).toBe(true);
+      expect(dialog.rendered).toBe(true);
+      expect(view.rendered).toBe(true);
+      expect(msgBox.rendered).toBe(true);
+      expect(fileChooser.rendered).toBe(true);
+
+      // Outline is not visible anymore, but form, msg box and file chooser still are
+      desktop.setNavigationVisible(false);
+      // Force removal of navigation
+      desktop.onLayoutAnimationComplete();
+      expect(desktop.navigationVisible).toBe(false);
+      expect(desktop.navigation).toBeFalsy();
+      expect(outline.rendered).toBe(false);
+      expect(dialog.rendered).toBe(true);
+      expect(view.rendered).toBe(true);
+      expect(msgBox.rendered).toBe(true);
+      expect(fileChooser.rendered).toBe(true);
+
+      dialog.close();
+      view.close();
+      msgBox.close();
+      fileChooser.close();
     });
 
   });

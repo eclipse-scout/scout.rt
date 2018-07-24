@@ -572,6 +572,19 @@ scout.Widget.prototype.findNonWrappedForm = function() {
 };
 
 /**
+ * @returns the desktop linked to the current session.
+ * If desktop is still initializing it might not be available yet, in that case it searches the parent hierarchy for it.
+ */
+scout.Widget.prototype.findDesktop = function() {
+  if (this.session.desktop) {
+    return this.session.desktop;
+  }
+  return this.findParent(function(parent) {
+    return parent instanceof scout.Desktop;
+  });
+};
+
+/**
  * Changes the enabled property of this form field to the given value.
  *
  * @param enabled

@@ -70,17 +70,18 @@ scout.FormController.prototype.render = function() {
 
 scout.FormController.prototype._renderViews = function() {
   this.displayParent.views.forEach(function(view, position) {
-    view._setProperty('displayParent', this.displayParent);
+    view.setDisplayParent(this.displayParent);
     this._renderView(view, false, position, false);
   }.bind(this));
 };
 
 scout.FormController.prototype._renderDialogs = function() {
   this.displayParent.dialogs.forEach(function(dialog) {
-    dialog._setProperty('displayParent', this.displayParent);
+    dialog.setDisplayParent(this.displayParent);
     this._renderDialog(dialog, false);
   }.bind(this));
 };
+
 /**
  * Removes all dialogs and views registered with this controller.
  */

@@ -48,7 +48,10 @@ scout.FileChooserController.prototype.remove = function() {
  * Renders all file choosers registered with this controller.
  */
 scout.FileChooserController.prototype.render = function() {
-  this.displayParent.fileChoosers.forEach(this._render.bind(this));
+  this.displayParent.fileChoosers.forEach(function(chooser) {
+    chooser.setDisplayParent(this.displayParent);
+    this._render(chooser);
+  }.bind(this));
 };
 
 scout.FileChooserController.prototype._render = function(fileChooser) {
