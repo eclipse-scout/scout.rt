@@ -876,6 +876,14 @@ scout.Desktop.prototype.showForm = function(form, position) {
 };
 
 scout.Desktop.prototype.hideForm = function(form) {
+  if (!form.displayParent) {
+    // showForm has probably never been called -> nothing to do here
+    // May happen if form.close() is called immediately after form.open() without waiting for the open promise to resolve
+    // Hint: it is not possible to check whether the form is rendered and then return (which would be the obvious thing to do).
+    // Reason: Forms in popup windows are removed before getting closed, see DesktopFormController._onPopupWindowUnload
+    return;
+  }
+
   if (this.displayStyle === scout.Desktop.DisplayStyle.COMPACT && form.isView() && this.benchVisible) {
     var openViews = this.bench.getViews().slice();
     scout.arrays.remove(openViews, form);

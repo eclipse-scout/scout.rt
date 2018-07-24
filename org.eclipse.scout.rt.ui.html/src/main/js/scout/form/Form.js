@@ -495,11 +495,6 @@ scout.Form.prototype.show = function() {
 };
 
 scout.Form.prototype.hide = function() {
-  if (!this.rendered) {
-    // Form has already been removed or has never been rendered -> do nothing
-    // May also happen if close is called immediately after open() without waiting for the open promise to resolve
-    return;
-  }
   this.session.desktop.hideForm(this);
 };
 
