@@ -861,6 +861,10 @@ scout.Desktop.prototype._getTabGlassPaneTargetsForView = function(view, tabBox) 
 
 scout.Desktop.prototype._pushPopupWindowGlassPaneTargets = function(glassPaneTargets, element) {
   this.formController._popupWindows.forEach(function(popupWindow) {
+    if (element === popupWindow.form) {
+      // Don't block form itself
+      return;
+    }
     glassPaneTargets.push(popupWindow.initialized ?
       popupWindow.$container[0] : this._deferredGlassPaneTarget(popupWindow));
   }, this);
