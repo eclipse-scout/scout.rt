@@ -44,6 +44,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTileField;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -114,6 +115,7 @@ import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktopNotification;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonFormMenu;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutline;
+import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutlineTileField;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutlineViewButton;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonSearchForm;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonSearchOutline;
@@ -342,6 +344,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof IOutlineViewButton) {
       return new JsonOutlineViewButton<>((IOutlineViewButton) model, session, id, parent);
+    }
+    if (model instanceof IOutlineTileField) {
+      return new JsonOutlineTileField((IOutlineTileField) model, session, id, parent);
     }
     if (model instanceof IViewButton) {
       return new JsonViewButton<>((IViewButton) model, session, id, parent);
