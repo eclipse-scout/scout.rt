@@ -897,7 +897,9 @@ scout.Desktop.prototype.hideForm = function(form) {
     }
   }
   form.displayParent.formController.unregisterAndRemove(form);
-  if (this.benchVisible && this.bench.getViews().length === 0) {
+  if (!this.benchVisible || this.bench.getViews().length === 0) {
+    // Bring outline to front if last view has been closed,
+    // even if bench is invisible (compact case) to update state correctly and reshow elements (dialog etc.) linked to the outline
     this.bringOutlineToFront();
   }
 };

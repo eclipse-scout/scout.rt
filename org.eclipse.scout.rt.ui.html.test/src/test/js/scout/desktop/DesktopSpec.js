@@ -223,8 +223,7 @@ describe('Desktop', function() {
 
     it('does not remove dialogs, message boxes and file choosers with display parent outline', function(done) {
       session._renderDesktop();
-      var model = outlineHelper.createModelFixture(3, 2);
-      var outline = outlineHelper.createOutline(model);
+      var outline = outlineHelper.createOutline();
       desktop.setOutline(outline);
       var msgBox = scout.create('MessageBox', {
         parent: outline,
@@ -1218,6 +1217,46 @@ describe('Desktop', function() {
         expect(desktop.navigationVisible).toBe(true);
         expect(desktop.benchVisible).toBe(false);
         expect(desktop.headerVisible).toBe(false);
+      });
+
+      it('shows outline dialog again when switching from bench to navigation', function() {
+        var outline = outlineHelper.createOutline();
+        desktop.setOutline(outline);
+        var dialog = formHelper.createFormWithOneField({
+          displayParent: desktop.outline
+        });
+        var view = formHelper.createViewWithOneField();
+        expect(dialog.rendered).toBe(false);
+        expect(desktop.navigationVisible).toBe(true);
+        expect(desktop.benchVisible).toBe(false);
+
+        // Show dialog -> navigation still visible
+        dialog.show();
+        expect(dialog.displayParent).toBe(desktop.outline);
+        expect(view.rendered).toBe(false);
+        expect(dialog.rendered).toBe(true);
+        expect(dialog.attached).toBe(true);
+        expect(desktop.navigationVisible).toBe(true);
+        expect(desktop.benchVisible).toBe(false);
+
+        // Show view -> switch to bench
+        view.show();
+        expect(view.rendered).toBe(true);
+        expect(dialog.rendered).toBe(true);
+        expect(dialog.attached).toBe(false);
+        expect(desktop.navigationVisible).toBe(false);
+        expect(desktop.benchVisible).toBe(true);
+
+        // Disable remove animation, otherwise view would not be removed immediately
+        desktop.bench.animateRemoval = false;
+
+        // Close view -> switch to navigation -> dialog needs to be shown again
+        view.close();
+        expect(view.rendered).toBe(false);
+        expect(dialog.rendered).toBe(true);
+        expect(dialog.attached).toBe(true);
+        expect(desktop.navigationVisible).toBe(true);
+        expect(desktop.benchVisible).toBe(false);
       });
 
       it('does not bring activateForm to fail for fake views', function() {

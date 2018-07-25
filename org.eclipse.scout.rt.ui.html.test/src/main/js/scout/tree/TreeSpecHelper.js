@@ -65,6 +65,10 @@ scout.TreeSpecHelper.prototype.createModelNodesInternal = function(nodeCount, de
 };
 
 scout.TreeSpecHelper.prototype.createTree = function(model) {
+  var defaults = {
+    parent: this.session.desktop
+  };
+  model = $.extend({}, defaults, model);
   var tree = new scout.Tree();
   tree.init(model);
   return tree;

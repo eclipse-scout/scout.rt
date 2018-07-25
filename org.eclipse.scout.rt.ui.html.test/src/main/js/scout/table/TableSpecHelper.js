@@ -205,6 +205,10 @@ scout.TableSpecHelper.prototype.createModelSingleConfiguredCheckableColumn = fun
 };
 
 scout.TableSpecHelper.prototype.createTable = function(model) {
+  var defaults = {
+    parent: this.session.desktop
+  };
+  model = $.extend({}, defaults, model);
   var table = new scout.Table();
   table.init(model);
   return table;
