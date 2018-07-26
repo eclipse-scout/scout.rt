@@ -304,6 +304,12 @@
         padding-left: @compact-outline-node-padding-x - @mandatory-indicator-width;
         padding-right: @compact-outline-node-padding-x;
       }
+
+      &.child-of-selected.animate-prev-selected {
+        #scout.animation-name(tree-node-prev-selection);
+        #scout.animation-duration(1s);
+        #scout.animation-timing-function(ease);
+      }
     }
 
     &.detail-content-visible > .tree-node > .menubar {
@@ -311,3 +317,13 @@
     }
   }
 }
+
+  /*** Previous Selection Animation ***/
+
+  .keyframes-tree-node-prev-selection() {
+    00%  { background-color: @outline-breadcrumb-child-active-background-color; }
+    100%  { background-color: @outline-breadcrumb-child-background-color; }
+  }
+
+  @-webkit-keyframes tree-node-prev-selection { .keyframes-tree-node-prev-selection(); }
+  @keyframes tree-node-prev-selection { .keyframes-tree-node-prev-selection(); }

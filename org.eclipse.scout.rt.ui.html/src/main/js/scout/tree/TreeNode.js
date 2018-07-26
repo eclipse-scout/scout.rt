@@ -32,6 +32,7 @@ scout.TreeNode = function(tree) {
   this.level = 0;
   this.parent = null;
   this.parentNode = undefined;
+  this.prevSelectionAnimationDone = false;
   this.rendered = false;
   this.session = null;
   this.text = null;

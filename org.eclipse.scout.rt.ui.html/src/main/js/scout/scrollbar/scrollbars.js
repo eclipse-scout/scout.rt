@@ -265,9 +265,26 @@ scout.scrollbars = {
 
   /**
    * Scrolls the $scrollable to the given $element (must be a child of $scrollable)
-   * align is one of top|center|bottom|undefined. Use undefined to ensure the element is in the visible area.
+   *
+   * OPTION                   DEFAULT VALUE   DESCRIPTION
+   * ------------------------------------------------------------------------------------------------------
+   * align                    undefined       Specifies where the element should be positioned in the view port. Can either be 'top', 'center' or 'bottom'.
+   *                                          If unspecified, the following rules apply:
+   *                                          - If the element is above the visible area it will be aligned to top.
+   *                                          - If the element is below the visible area it will be aligned to bottom.
+   *                                          - If the element is already in the visible area no scrolling is done.
+   *
+   * animate                  false           If true, the scroll position will be animated so that the element moves smoothly to its new position
+   *
+   * @param {$} $scrollable
+   *          the scrollable object
+   * @param {$} $element
+   *          the element to scroll to
+   * @param [options]
+   *          an optional options object, see table above. Short-hand version: If a string is passed instead
+   *          of an object, the value is automatically converted to the option "align".
    */
-  scrollTo: function($scrollable, $element, align) {
+  scrollTo: function($scrollable, $element, options) {
     var scrollTo,
       scrollOffsetUp = 4,
       scrollOffsetDown = 8,
@@ -279,7 +296,16 @@ scout.scrollbars = {
       elementH = elementBounds.height + scrollOffsetDown,
       elementBottom = elementTop + elementH;
 
-    if (align === undefined) {
+    if (typeof options === 'string') {
+      options = {
+        align: options
+      };
+    } else {
+      options = options || {};
+    }
+
+    var align = options.align;
+    if (!align) {
       // If the element is above the visible area it will be aligned to top.
       // If the element is below the visible area it will be aligned to bottom.
       // If the element is already in the visible area no scrolling is done.
@@ -311,15 +337,14 @@ scout.scrollbars = {
       }
     }
     if (scrollTo) {
-      scout.scrollbars.scrollTop($scrollable, scrollTo);
+      scout.scrollbars.scrollTop($scrollable, scrollTo, options);
     }
   },
 
   /**
    * Horizontally scrolls the $scrollable to the given $element (must be a child of $scrollable)
-   *
    */
-  scrollHorizontalTo: function($scrollable, $element) {
+  scrollHorizontalTo: function($scrollable, $element, options) {
     var scrollTo,
       scrollableW = $scrollable.width(),
       elementBounds = scout.graphics.bounds($element, true),
@@ -327,38 +352,70 @@ scout.scrollbars = {
       elementW = elementBounds.width;
 
     if (elementLeft < 0) {
-      scout.scrollbars.scrollLeft($scrollable, $scrollable.scrollLeft() + elementLeft);
+      scout.scrollbars.scrollLeft($scrollable, $scrollable.scrollLeft() + elementLeft, options);
     } else if (elementLeft + elementW > scrollableW) {
       // On IE, a fractional position gets truncated when using scrollTop -> ceil to make sure the full element is visible
       scrollTo = Math.ceil($scrollable.scrollLeft() + elementLeft + elementW - scrollableW);
-      scout.scrollbars.scrollLeft($scrollable, scrollTo);
+      scout.scrollbars.scrollLeft($scrollable, scrollTo, options);
     }
   },
 
-  scrollTop: function($scrollable, scrollTop) {
+  scrollTop: function($scrollable, scrollTop, options) {
+    options = options || {};
     var scrollbar = scout.scrollbars.scrollbar($scrollable, 'y');
     if (scrollbar) {
-      // js scrolling
       scrollbar.notifyBeforeScroll();
-      $scrollable.scrollTop(scrollTop);
-      scrollbar.notifyAfterScroll();
+    }
+    if (options.animate) {
+      this.animateScrollTop($scrollable, scrollTop);
     } else {
-      // native scrolling
-      $scrollable.scrollTop(scrollTop);
+      $scrollable
+        .stop('scroll')
+        .scrollTop(scrollTop);
+    }
+    if (scrollbar) {
+      scrollbar.notifyAfterScroll();
     }
   },
 
-  scrollLeft: function($scrollable, scrollLeft) {
+  scrollLeft: function($scrollable, scrollLeft, options) {
+    options = options || {};
     var scrollbar = scout.scrollbars.scrollbar($scrollable, 'x');
     if (scrollbar) {
-      // js scrolling
       scrollbar.notifyBeforeScroll();
-      $scrollable.scrollLeft(scrollLeft);
-      scrollbar.notifyAfterScroll();
-    } else {
-      // native scrolling
-      $scrollable.scrollLeft(scrollLeft);
     }
+    if (options.animate) {
+      this.animateScrollLeft($scrollable, scrollLeft);
+    } else {
+      $scrollable
+        .stop('scroll')
+        .scrollLeft(scrollLeft);
+    }
+    if (scrollbar) {
+      scrollbar.notifyAfterScroll();
+    }
+  },
+
+  animateScrollTop: function($scrollable, scrollTop) {
+    $scrollable
+      .stop('scroll')
+      .animate({
+        scrollTop: scrollTop
+      }, {
+        queue: 'scroll'
+      })
+      .dequeue('scroll');
+  },
+
+  animateScrollLeft: function($scrollable, scrollLeft) {
+    $scrollable
+      .stop('scroll')
+      .animate({
+        scrollLeft: scrollLeft
+      }, {
+        queue: 'scroll'
+      })
+      .dequeue('scroll');
   },
 
   scrollbar: function($scrollable, axis) {

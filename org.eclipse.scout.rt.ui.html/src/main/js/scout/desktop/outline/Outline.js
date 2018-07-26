@@ -394,6 +394,9 @@ scout.Outline.prototype._onNodeDeleted = function(node) {
   }
 };
 
+/**
+ * @override
+ */
 scout.Outline.prototype.selectNodes = function(nodes, debounceSend) {
   nodes = scout.arrays.ensure(nodes);
   if (nodes.length > 0 && this.isNodeSelected(nodes[0])) {
@@ -413,9 +416,33 @@ scout.Outline.prototype.selectNodes = function(nodes, debounceSend) {
     }
   }
   scout.Outline.parent.prototype.selectNodes.call(this, nodes, debounceSend);
+};
+
+/**
+ * @override
+ */
+scout.Outline.prototype._setSelectedNodes = function(nodes, debounceSend) {
+  scout.Outline.parent.prototype._setSelectedNodes.call(this, nodes, debounceSend);
+  // Needs to be done here so that tree.selectedNodes can restore scroll position correctly after the content has been updated
   this.updateDetailContent();
 };
 
+/**
+ * @override
+ */
+scout.Outline.prototype._nodesSelectedInternal = function() {
+  var activePage = this.activePage();
+  // This block here is similar to what's done in Java's DefaultPageChangeStrategy
+  if (activePage) {
+    activePage.activate();
+    activePage.ensureLoadChildren().done(
+      this._onLoadChildrenDone.bind(this, activePage));
+  }
+};
+
+/**
+ * @override
+ */
 scout.Outline.prototype._renderSelection = function() {
   scout.Outline.parent.prototype._renderSelection.call(this);
   this.$container.toggleClass('node-selected', this.selectedNodes.length > 0);
@@ -706,10 +733,22 @@ scout.Outline.prototype.updateDetailContent = function() {
   this.setDetailContent(this._computeDetailContent());
   this.updateDetailMenus();
 
-  // Layout immediate to prevent 'laggy' form visualization,
-  // but not initially while desktop gets rendered because it will be done at the end anyway
   if (this.rendered) {
+    // Layout immediate to prevent 'laggy' form visualization,
+    // but not initially while desktop gets rendered because it will be done at the end anyway
     this.validateLayoutTree();
+
+    // Scroll to the parent node to hide ancestor nodes and give as much room as possible for the content
+    if (this.selectedNodes[0] && this.selectedNodes[0].parentNode) {
+      if (this.prevSelectedNode && this.prevSelectedNode.isChildOf(this.selectedNodes[0])) {
+        // But don't do it on upwards navigation, in that case the tree will scroll to the optimal position by itself, see _updateScrollTopAfterSelection
+        return;
+      }
+      this.scrollTo(this.selectedNodes[0].parentNode, {
+        align: 'top',
+        animate: true
+      });
+    }
   }
 };
 
@@ -1056,19 +1095,6 @@ scout.Outline.prototype._triggerPageChanged = function(page) {
   this.trigger('pageChanged', {
     page: page
   });
-};
-
-/**
- * @override Tree.js
- */
-scout.Outline.prototype._nodesSelectedInternal = function() {
-  var activePage = this.activePage();
-  // This block here is similar to what's done in Java's DefaultPageChangeStrategy
-  if (activePage) {
-    activePage.activate();
-    activePage.ensureLoadChildren().done(
-      this._onLoadChildrenDone.bind(this, activePage));
-  }
 };
 
 scout.Outline.prototype._onLoadChildrenDone = function(activePage) {

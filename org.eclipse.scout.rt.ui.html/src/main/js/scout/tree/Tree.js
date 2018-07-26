@@ -39,7 +39,9 @@ scout.Tree = function() {
   this.nodePaddingLevel = this.nodePaddingLevelNotCheckable;
   this.scrollToSelection = false;
   this.scrollTop = 0;
+  this.scrollTopHistory = []; // Only necessary for breadcrumb mode
   this.selectedNodes = [];
+  this.prevSelectedNode = null; // The previously selected node, relevant for breadcrumb in compact mode
 
   // performance optimization: E.g. rather than iterating over the whole tree when unchecking all nodes,
   // we explicitly keep track of nodes to uncheck (useful e.g. for single-check mode in very large trees).
@@ -1035,10 +1037,24 @@ scout.Tree.prototype._renderSelection = function() {
   }
 
   this._updateNodePaddingsLeft();
+  this._highlightPrevSelectedNode();
 
   if (this.scrollToSelection) {
     this.revealSelection();
   }
+};
+
+scout.Tree.prototype._highlightPrevSelectedNode = function() {
+  if (!this.isBreadcrumbStyleActive()) {
+    return;
+  }
+  if (!this.prevSelectedNode || !this.prevSelectedNode.rendered || this.prevSelectedNode.prevSelectionAnimationDone) {
+    return;
+  }
+  // Highlight previously selected node, but do it only once
+  this.prevSelectedNode.$node.addClassForAnimation('animate-prev-selected').oneAnimationEnd(function() {
+    this.prevSelectedNode.prevSelectionAnimationDone = true;
+  }.bind(this));
 };
 
 scout.Tree.prototype._removeSelection = function() {
@@ -1049,6 +1065,11 @@ scout.Tree.prototype._removeSelection = function() {
         childNode.$node.removeClass('child-of-selected');
       }
     }, this);
+  }
+
+  // Ensure animate-prev-selected class is removed (in case animation did not start)
+  if (this.prevSelectedNode && this.prevSelectedNode.rendered) {
+    this.prevSelectedNode.$node.removeClass('animate-prev-selected');
   }
 
   this.selectedNodes.forEach(this._removeNodeSelection, this);
@@ -1848,7 +1869,7 @@ scout.Tree.prototype._addToVisibleFlatListNoCheck = function(node, insertIndex, 
   }
 };
 
-scout.Tree.prototype.scrollTo = function(node) {
+scout.Tree.prototype.scrollTo = function(node, options) {
   if (this.viewRangeRendered.size() === 0) {
     // Cannot scroll to a node if no node is rendered
     return;
@@ -1856,7 +1877,7 @@ scout.Tree.prototype.scrollTo = function(node) {
   if (!node.attached) {
     this._renderViewRangeForNode(node);
   }
-  scout.scrollbars.scrollTo(this.$data, node.$node);
+  scout.scrollbars.scrollTo(this.$data, node.$node, options);
 };
 
 scout.Tree.prototype.revealSelection = function() {
@@ -1883,7 +1904,6 @@ scout.Tree.prototype.selectNode = function(node, debounceSend) {
 };
 
 scout.Tree.prototype.selectNodes = function(nodes, debounceSend) {
-  var scrollTop;
   nodes = scout.arrays.ensure(nodes);
 
   // TODO [8.0] CGU Actually, the nodes should be filtered here so that invisible nodes may not be selected
@@ -1896,12 +1916,50 @@ scout.Tree.prototype.selectNodes = function(nodes, debounceSend) {
   }
 
   if (this.rendered) {
-    if (this.isBreadcrumbStyleActive()) {
-      scrollTop = this.$data[0].scrollTop;
-    }
+    this._rememberScrollTopBeforeSelection();
     this._removeSelection();
   }
+  if (this.prevSelectedNode) {
+    this.prevSelectedNode.prevSelectionAnimationDone = false;
+  }
+  this.prevSelectedNode = this.selectedNodes[0];
+  this._setSelectedNodes(nodes, debounceSend);
+  if (this.rendered) {
+    this._renderSelection();
+    this._updateScrollTopAfterSelection();
+  }
+};
 
+scout.Tree.prototype._rememberScrollTopBeforeSelection = function() {
+  if (this.isBreadcrumbStyleActive()) {
+    // Save the current scrollTop for future up navigation
+    if (this.selectedNodes.length > 0) {
+      this.scrollTopHistory[this.selectedNodes[0].level] = this.$data[0].scrollTop;
+    }
+  } else {
+    // Clear history if user now works with tree to not get confused when returning to bc mode
+    this.scrollTopHistory = [];
+  }
+};
+
+scout.Tree.prototype._updateScrollTopAfterSelection = function() {
+  if (!this.isBreadcrumbStyleActive()) {
+    return;
+  }
+  var currentLevel = -1;
+  if (this.selectedNodes.length > 0) {
+    currentLevel = this.selectedNodes[0].level;
+  }
+  // Remove positions after the current level (no restore when going down, only when going up)
+  this.scrollTopHistory.splice(currentLevel + 1);
+  // Read the scroll top for the current level and use that one if it is set
+  var scrollTopForLevel = this.scrollTopHistory[currentLevel];
+  if (scrollTopForLevel >= 0) {
+    this.setScrollTop(scrollTopForLevel);
+  }
+};
+
+scout.Tree.prototype._setSelectedNodes = function(nodes, debounceSend) {
   // Make a copy so that original array stays untouched
   this.selectedNodes = nodes.slice();
   this._nodesSelectedInternal();
@@ -1921,13 +1979,6 @@ scout.Tree.prototype.selectNodes = function(nodes, debounceSend) {
     this.filter(true);
   }
   this.session.onRequestsDone(this._updateMenuBar.bind(this));
-  if (this.rendered) {
-    this._renderSelection();
-    // restore scrollTop (removeSelection removes all the selection classes which makes a lot of elements invisible and therefore the scrollHeight smaller)
-    if (this.isBreadcrumbStyleActive()) {
-      this.$data[0].scrollTop = scrollTop;
-    }
-  }
 };
 
 /**
@@ -2660,6 +2711,9 @@ scout.Tree.prototype._insertNodeInDOM = function(node, indexHint) {
   node._decorate();
 
   this._insertNodeInDOMAtPlace(node, index);
+  if (this.prevSelectedNode === node) {
+    this._highlightPrevSelectedNode();
+  }
 
   node.height = node.$node.outerHeight(true);
   if (this.isHorizontalScrollingEnabled()) {
