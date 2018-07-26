@@ -391,6 +391,12 @@ scout.Tree.prototype.setScrollTop = function(scrollTop) {
   // call _renderViewport to make sure nodes are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
   if (this.rendered) {
     this._renderViewport();
+    // Render scroll top again to make sure the data really is at the expected position
+    // This seems only to be necessary for Chrome and the tree, it seems to work for IE and table.
+    // It is not optimal, because actually it should be possible to modify the $data[0].scrollTop without using this function
+    // Some debugging showed that after reducing the height of the afterFiller in _renderFiller the scrollTop will be wrong.
+    // Updating the scrollTop in renderFiller or other view range relevant function is bad because it corrupts smooth scrolling (see also commit c14ce92e0a7bff568d4f2d715e3061a782e728c2)
+    this._renderScrollTop();
   }
 };
 

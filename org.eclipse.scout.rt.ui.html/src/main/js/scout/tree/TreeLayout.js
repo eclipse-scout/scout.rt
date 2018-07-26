@@ -69,6 +69,11 @@ scout.TreeLayout.prototype._layout = function($container) {
 
   // Always render viewport (not only when viewRangeSize changes), because view range depends on scroll position and data height
   this.tree._renderViewport();
+
+  // Render scroll top again to make sure the data is really at the correct position after rendering viewport, see tree.setScrollTop for details
+  if (!htmlContainer.layouted) {
+    this.tree._renderScrollTop();
+  }
 };
 
 scout.TreeLayout.prototype._setDataHeight = function(heightOffset) {

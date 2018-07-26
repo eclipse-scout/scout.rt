@@ -371,6 +371,7 @@ scout.Outline.prototype._onTitleMouseDown = function(event) {
 scout.Outline.prototype.navigateToTop = function() {
   this.deselectAll();
   this.handleInitialExpanded();
+  this.setScrollTop(0);
 };
 
 scout.Outline.prototype.handleInitialExpanded = function() {
