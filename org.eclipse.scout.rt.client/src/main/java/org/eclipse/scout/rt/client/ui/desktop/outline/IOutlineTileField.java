@@ -14,4 +14,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
 public interface IOutlineTileField extends IFormField {
 
+  String PROP_OUTLINE = "outline";
+
+  void setOutline(IOutline outline);
+
+  IOutline getOutline();
+
 }

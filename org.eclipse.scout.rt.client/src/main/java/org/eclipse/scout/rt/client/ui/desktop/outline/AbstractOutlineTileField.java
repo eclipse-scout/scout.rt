@@ -16,6 +16,19 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 @ClassId("4c21c681-ff91-40ba-a841-406546150b1b")
 public abstract class AbstractOutlineTileField extends AbstractFormField implements IOutlineTileField {
 
-	// FIXME [awe] imex - check if we should provide the outline instance via model
-	
+  @Override
+  protected double getConfiguredGridWeightY() {
+    return 1;
+  }
+
+  @Override
+  public IOutline getOutline() {
+    return (IOutline) getProperty(PROP_OUTLINE);
+  }
+
+  @Override
+  public void setOutline(IOutline outline) {
+    setProperty(PROP_OUTLINE, outline);
+  }
+
 }
