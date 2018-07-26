@@ -83,7 +83,16 @@ public final class IOUtility {
    * If no encoding is provided, the system default encoding is used
    */
   public static String getContentInEncoding(String filepath, String encoding) {
-    try (FileInputStream in = new FileInputStream(filepath)) {
+    return getContentInEncoding(toFile(filepath), encoding);
+  }
+
+  /**
+   * Reads the content of a file in the specified encoding (charset-name) e.g. "UTF-8"
+   * <p>
+   * If no encoding is provided, the system default encoding is used
+   */
+  public static String getContentInEncoding(File file, String encoding) {
+    try (FileInputStream in = new FileInputStream(file)) {
       return readString(in, encoding);
     }
     catch (IOException e) {
