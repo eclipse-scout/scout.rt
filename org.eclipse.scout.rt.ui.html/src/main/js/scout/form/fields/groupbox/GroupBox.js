@@ -628,6 +628,8 @@ scout.GroupBox.prototype.setStaticMenus = function(staticMenus) {
 scout.GroupBox.prototype._onControlClick = function(event) {
   if (this.expandable) {
     this.setExpanded(!this.expanded);
+    // Prevent flickering when expanding the group box
+    this.validateLayoutTree();
   }
   $.suppressEvent(event); // otherwise, the event would be triggered twice sometimes (by group-box-control and group-box-title)
 };
