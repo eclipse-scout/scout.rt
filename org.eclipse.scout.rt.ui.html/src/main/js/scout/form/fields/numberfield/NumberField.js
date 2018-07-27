@@ -183,7 +183,7 @@ scout.NumberField.prototype.setMinValue = function(minValue) {
 
 scout.NumberField.prototype._setMinValue = function(minValue) {
   this._setProperty('minValue', minValue);
-  if (!scout.objects.isNullOrUndefined(this.maxValue) && minValue > this.maxValue) {
+  if (!scout.objects.isNullOrUndefined(this.maxValue) && !scout.objects.isNullOrUndefined(this.minValue) && minValue > this.maxValue) {
     this._setMaxValue(minValue);
   }
 };
@@ -204,7 +204,7 @@ scout.NumberField.prototype.setMaxValue = function(maxValue) {
 
 scout.NumberField.prototype._setMaxValue = function(maxValue) {
   this._setProperty('maxValue', maxValue);
-  if (!scout.objects.isNullOrUndefined(this.minValue) && maxValue < this.minValue) {
+  if (!scout.objects.isNullOrUndefined(this.maxValue) && !scout.objects.isNullOrUndefined(this.minValue) && maxValue < this.minValue) {
     this._setMinValue(maxValue);
   }
 };

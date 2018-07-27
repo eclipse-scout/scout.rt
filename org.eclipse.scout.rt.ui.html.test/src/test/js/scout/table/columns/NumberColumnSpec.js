@@ -292,8 +292,8 @@ describe('NumberColumn', function() {
       });
 
       column0.calculateMinMaxValues();
-      expect(column0.minValue).toBe(0.01);
-      expect(column0.maxValue).toBe(0.01);
+      expect(column0.calcMinValue).toBe(0.01);
+      expect(column0.calcMaxValue).toBe(0.01);
     });
   });
 });

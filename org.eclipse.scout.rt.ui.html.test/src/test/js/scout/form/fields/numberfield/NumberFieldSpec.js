@@ -120,6 +120,41 @@ describe('NumberField', function() {
       field.setMaxValue(5);
       expect(field.errorStatus).toBe(null);
     });
+
+    it('works when max or min is null', function() {
+      var field = helper.createField('NumberField', helper.session.desktop, {
+        minValue: 6,
+        maxValue: null
+      });
+      field.setValue(5);
+      expect(field.errorStatus instanceof scout.Status).toBe(true);
+
+      field = helper.createField('NumberField', helper.session.desktop, {
+        minValue: null,
+        maxValue: 6
+      });
+      field.setValue(7);
+      expect(field.errorStatus instanceof scout.Status).toBe(true);
+
+      field = helper.createField('NumberField');
+
+      field.setValue(5);
+      field.setMinValue(6);
+      field.setMaxValue(null);
+      expect(field.errorStatus instanceof scout.Status).toBe(true);
+
+      field.setMinValue(5);
+      field.setMaxValue(null);
+      expect(field.errorStatus).toBe(null);
+
+      field.setMaxValue(4);
+      field.setMinValue(null);
+      expect(field.errorStatus instanceof scout.Status).toBe(true);
+
+      field.setMaxValue(5);
+      field.setMinValue(null);
+      expect(field.errorStatus).toBe(null);
+    });
   });
 
   describe('acceptInput', function() {

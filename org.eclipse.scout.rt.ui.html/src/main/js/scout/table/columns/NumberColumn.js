@@ -13,6 +13,10 @@ scout.NumberColumn = function() {
   this.aggregationFunction = 'sum';
   this.backgroundEffect = null;
   this.decimalFormat = null;
+  this.minValue = null;
+  this.maxValue = null;
+  this.calcMinValue = null; // the calculated min value of all rows
+  this.calcMaxValue = null; // the calculated max value of all rows
   this.horizontalAlignment = 1;
   this.filterType = 'NumberColumnUserFilter';
   this.comparator = scout.comparators.NUMERIC;
@@ -137,7 +141,7 @@ scout.NumberColumn.prototype.setBackgroundEffect = function(effect) {
     column: this
   });
 
-  if (this.backgroundEffect && (this.minValue === undefined || this.maxValue === undefined)) {
+  if (this.backgroundEffect && (this.calcMinValue === null || this.calcMaxValue === null)) {
     // No need to calculate the values again when switching background effects
     // If background effect is turned off and on again values will be recalculated
     // This is necessary because in the meantime rows may got updated, deleted etc.
@@ -145,8 +149,8 @@ scout.NumberColumn.prototype.setBackgroundEffect = function(effect) {
   }
   if (!this.backgroundEffect) {
     // Clear to make sure values are calculated anew the next time a background effect gets set
-    this.minValue = undefined;
-    this.maxValue = undefined;
+    this.calcMinValue = null;
+    this.calcMaxValue = null;
   }
 
   if (this.table.rendered) {
@@ -199,22 +203,22 @@ scout.NumberColumn.prototype._renderBackgroundEffect = function() {
 };
 
 scout.NumberColumn.prototype.calculateMinMaxValues = function() {
-  var row, minValue, maxValue, value,
+  var row, calcMinValue, calcMaxValue, value,
     rows = this.table.rows;
 
   for (var i = 0; i < rows.length; i++) {
     row = rows[i];
     value = this.cellValueOrTextForCalculation(row);
 
-    if (value < minValue || minValue === undefined) {
-      minValue = value;
+    if (value < calcMinValue || calcMinValue === undefined) {
+      calcMinValue = value;
     }
-    if (value > maxValue || maxValue === undefined) {
-      maxValue = value;
+    if (value > calcMaxValue || calcMaxValue === undefined) {
+      calcMaxValue = value;
     }
   }
-  this.minValue = minValue;
-  this.maxValue = maxValue;
+  this.calcMinValue = scout.nvl(calcMinValue, null);
+  this.calcMaxValue = scout.nvl(calcMaxValue, null);
 };
 
 scout.NumberColumn.prototype._colorGradient1 = function(value) {
@@ -236,7 +240,7 @@ scout.NumberColumn.prototype._colorGradient2 = function(value) {
 };
 
 scout.NumberColumn.prototype._colorGradient = function(value, startColor, endColor) {
-  var level = (value - this.minValue) / (this.maxValue - this.minValue);
+  var level = (value - this.calcMinValue) / (this.calcMaxValue - this.calcMinValue);
 
   var r = Math.ceil(startColor.red - level * (startColor.red - endColor.red)),
     g = Math.ceil(startColor.green - level * (startColor.green - endColor.green)),
@@ -248,7 +252,7 @@ scout.NumberColumn.prototype._colorGradient = function(value, startColor, endCol
 };
 
 scout.NumberColumn.prototype._barChart = function(value) {
-  var level = Math.ceil((value - this.minValue) / (this.maxValue - this.minValue) * 100) + '';
+  var level = Math.ceil((value - this.calcMinValue) / (this.calcMaxValue - this.calcMinValue) * 100) + '';
   var color = scout.styles.get('column-background-effect-bar-chart', 'backgroundColor').backgroundColor;
   return {
     backgroundImage: 'linear-gradient(to left, ' + color + ' 0%, ' + color + ' ' + level + '%, transparent ' + level + '%, transparent 100% )'
@@ -260,6 +264,9 @@ scout.NumberColumn.prototype._barChart = function(value) {
  */
 scout.NumberColumn.prototype._createEditor = function() {
   return scout.create('NumberField', {
-    parent: this.table
+    parent: this.table,
+    maxValue: this.maxValue,
+    minValue: this.minValue,
+    decimalFormat: this.decimalFormat
   });
 };
