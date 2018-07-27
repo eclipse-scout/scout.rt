@@ -72,14 +72,23 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
 
       // Send the request to the server.
       HttpResponse resp = m_tunnel.executeRequest(m_serviceRequest, requestData);
-      // Receive the response.
-      m_tunnel.interceptHttpResponse(resp, m_serviceRequest);
-      if (resp.getStatusCode() != 0 && (resp.getStatusCode() < 200 || resp.getStatusCode() > 299)) {
-        return new ServiceTunnelResponse(new HttpException(resp.getStatusCode())); // request failed
-      }
+      try {
+        // Receive the response.
+        m_tunnel.interceptHttpResponse(resp, m_serviceRequest);
+        if (resp.getStatusCode() != 0 && (resp.getStatusCode() < 200 || resp.getStatusCode() > 299)) {
+          return new ServiceTunnelResponse(new HttpException(resp.getStatusCode())); // request failed
+        }
 
-      try (InputStream in = resp.getContent()) {
-        return m_tunnel.getContentHandler().readResponse(in);
+        try (InputStream in = resp.getContent()) {
+          return m_tunnel.getContentHandler().readResponse(in);
+        }
+      }
+      finally {
+        // response must always be disconnected even if an exception occurs during intermediate methods or
+        // an intermediate ServiceTunnelResponse is returned, for successful responses it is actually already
+        // disconnected as input stream close also disconnects the response, but a final call to disconnect in
+        // any case should not be harmful
+        resp.disconnect();
       }
     }
     catch (IOException e) {
