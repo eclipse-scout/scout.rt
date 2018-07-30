@@ -16,6 +16,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.text.ParseException;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -858,9 +859,16 @@ public class DateUtilityTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testLenientBehavior() {
+  public void testLenientBehaviorNonexistingDate() {
     assertDateEquals("2016-02-29 00:00:00.000", dateOf("2016-02-29 00:00:00.000")); // valid, does not fail
     assertDateEquals("2015-02-29 00:00:00.000", dateOf("2015-02-29 00:00:00.000")); // fails with exception
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testLenientBehaviorNonexistingTime() {
+    TimeZone.setDefault(TimeZone.getTimeZone(ZoneId.of("Europe/Paris")));
+    assertDateEquals("2016-03-29 02:00:00.000", dateOf("2016-03-29 02:00:00.000")); // valid, does not fail
+    assertDateEquals("2015-03-29 02:00:00.000", dateOf("2015-03-29 02:00:00.000")); // fails with exception
   }
 
   public static void assertDateEquals(String expectedDate, Date date) {
