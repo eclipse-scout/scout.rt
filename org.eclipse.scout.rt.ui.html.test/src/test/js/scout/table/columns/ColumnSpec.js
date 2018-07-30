@@ -264,6 +264,25 @@ describe('Column', function() {
       $cell0_0 = $cells0.eq(0);
       expect($cell0_0).toHaveClass('white-space-nowrap');
     });
+
+    it('can be toggled on the fly', function() {
+      table.multilineText = true;
+      table.columns[0].textWrap = false;
+      table.render();
+      $cells0 = table.$rows().eq(0).find('.table-cell');
+      $cell0_0 = $cells0.eq(0);
+      expect($cell0_0).toHaveClass('white-space-nowrap');
+
+      table.columns[0].setTextWrap(true);
+      $cells0 = table.$rows().eq(0).find('.table-cell');
+      $cell0_0 = $cells0.eq(0);
+      expect($cell0_0).not.toHaveClass('white-space-nowrap');
+
+      table.columns[0].setTextWrap(false);
+      $cells0 = table.$rows().eq(0).find('.table-cell');
+      $cell0_0 = $cells0.eq(0);
+      expect($cell0_0).toHaveClass('white-space-nowrap');
+    });
   });
 
   describe('initCell', function() {

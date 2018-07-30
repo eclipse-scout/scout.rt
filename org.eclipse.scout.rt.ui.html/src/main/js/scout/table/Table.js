@@ -4021,6 +4021,16 @@ scout.Table.prototype._renderAutoResizeColumns = function() {
   }
 };
 
+scout.Table.prototype.setMultilineText = function(multilineText) {
+  this.setProperty('multilineText', multilineText);
+};
+
+scout.Table.prototype._renderMultilineText = function() {
+  this._markAutoOptimizeWidthColumnsAsDirty();
+  this._redraw();
+  this.invalidateLayoutTree();
+};
+
 scout.Table.prototype._renderDropType = function() {
   if (this.dropType) {
     this._installDragAndDropHandler();

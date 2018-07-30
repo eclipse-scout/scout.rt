@@ -708,6 +708,20 @@ scout.Column.prototype._setAutoOptimizeWidth = function(autoOptimizeWidth) {
   this.autoOptimizeWidth = autoOptimizeWidth;
   this.autoOptimizeWidthRequired = autoOptimizeWidth;
   if (this.initialized) {
+    this.table.columnLayoutDirty = true;
+    this.table.invalidateLayoutTree();
+  }
+};
+
+scout.Column.prototype.setTextWrap = function(textWrap) {
+  if (this.textWrap === textWrap) {
+    return;
+  }
+  this.textWrap = textWrap;
+  if (this.table.rendered && this.table.multilineText) { // If multilineText is disabled toggling textWrap has no effect
+    // See also table._renderMultilineText(), requires similar operations
+    this.autoOptimizeWidthRequired = true;
+    this.table._redraw();
     this.table.invalidateLayoutTree();
   }
 };
