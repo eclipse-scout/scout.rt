@@ -129,12 +129,12 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   }
 
   // Icon is placed inside the field (as overlay)
-  if (formField.$field && formField.$icon && formField.$icon.isVisible()) {
+  if (formField.$field && formField.$icon) {
     this._layoutIcon(formField, fieldBounds, right, top);
   }
 
   // Clearable icon if present
-  if (formField.$field && formField.$clearIcon && formField.$clearIcon.isVisible()) {
+  if (formField.$field && formField.$clearIcon) {
     this._layoutClearableIcon(formField, fieldBounds, right, top);
   }
 

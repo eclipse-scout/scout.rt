@@ -236,12 +236,6 @@ scout.ValueField.prototype.setClearable = function(clearable) {
 
 scout.ValueField.prototype._renderClearable = function() {
   this.$container.toggleClass('clearable', this.clearable);
-  this.revalidateLayout();
-};
-
-scout.ValueField.prototype._renderEnabled = function() {
-  scout.ValueField.parent.prototype._renderEnabled.call(this);
-  this.revalidateLayout();
 };
 
 /**

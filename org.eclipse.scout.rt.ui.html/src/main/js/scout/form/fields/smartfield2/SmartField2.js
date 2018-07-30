@@ -1081,9 +1081,13 @@ scout.SmartField2.prototype._executeLookup = function(lookupFunc) {
   this._lookupInProgress = true;
   this.setLoading(true);
   return lookupFunc()
-    .always(function() {
+    .always(function(result) {
       this._lookupInProgress = false;
-      this.setLoading(false);
+      if (!result || !result.canceled) {
+        // The RemoteLookupCall aborts the current running lookup before a new one is scheduled
+        // This would reset the loading state even though a new lookup is running -> don't reset in that case
+        this.setLoading(false);
+      }
       this._clearLookupStatus();
       this._clearNoResultsErrorStatus();
     }.bind(this));
