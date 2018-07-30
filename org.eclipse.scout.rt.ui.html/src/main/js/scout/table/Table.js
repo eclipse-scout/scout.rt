@@ -603,9 +603,11 @@ scout.Table.prototype._showContextMenu = function(options) {
 };
 
 scout.Table.prototype.onColumnVisibilityChanged = function(column) {
+  this.columnLayoutDirty = true;
   if (this.rendered) {
     this._updateRowWidth();
     this._redraw();
+    this.invalidateLayoutTree();
   }
   this.trigger('columnStructureChanged');
 };
@@ -3840,11 +3842,10 @@ scout.Table.prototype._updateCheckableColumn = function() {
 };
 
 scout.Table.prototype._renderCheckable = function() {
+  this.columnLayoutDirty = true;
   this._updateRowWidth();
-  this.$rows(true)
-    .css('width', this.rowWidth);
   this._redraw();
-  this.updateScrollbars();
+  this.invalidateLayoutTree();
 };
 
 scout.Table.prototype.setCheckableStyle = function(checkableStyle) {
@@ -3864,19 +3865,17 @@ scout.Table.prototype._renderCheckableStyle = function() {
 };
 
 scout.Table.prototype._renderRowIconVisible = function() {
+  this.columnLayoutDirty = true;
   this._updateRowWidth();
-  this.$rows(true)
-    .css('width', this.rowWidth);
   this._redraw();
-  this.updateScrollbars();
+  this.invalidateLayoutTree();
 };
 
 scout.Table.prototype._renderRowIconColumnWidth = function() {
-  this._updateRowWidth();
-  this.$rows(true)
-    .css('width', this.rowWidth);
-  this._redraw();
-  this.updateScrollbars();
+  if (!this.rowIconVisible) {
+    return;
+  }
+  this._renderRowIconVisible();
 };
 
 scout.Table.prototype.setGroupingStyle = function(groupingStyle) {
