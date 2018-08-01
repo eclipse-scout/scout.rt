@@ -785,6 +785,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     call.setRec(null);
 
     try {
+      execPrepareLookup(call);
       List<? extends ILookupRow<?>> result = call.getDataByKey();
       if (result.size() == 1) {
         return result.get(0).getText();
