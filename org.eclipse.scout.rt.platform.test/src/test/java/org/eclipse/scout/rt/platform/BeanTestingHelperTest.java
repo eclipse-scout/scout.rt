@@ -8,25 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.testing.shared;
+package org.eclipse.scout.rt.platform;
 
-import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.config.AbstractLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * @author oca
  */
-public class TestingUtilityTest {
+public class BeanTestingHelperTest {
 
   @Test
   public void testMockConfigProperty() {
     Assert.assertEquals(1L, CONFIG.getPropertyValue(TestingUtilityLongConfigProperty.class).longValue());
-    IBean<?> mockProperty = TestingUtility.mockConfigProperty(TestingUtilityLongConfigProperty.class, 2L);
+    IBean<?> mockProperty = BeanTestingHelper.get().mockConfigProperty(TestingUtilityLongConfigProperty.class, 2L);
     Assert.assertEquals(2L, CONFIG.getPropertyValue(TestingUtilityLongConfigProperty.class).longValue());
-    TestingUtility.unregisterBean(mockProperty);
+    BeanTestingHelper.get().unregisterBean(mockProperty);
     Assert.assertEquals(1L, CONFIG.getPropertyValue(TestingUtilityLongConfigProperty.class).longValue());
   }
 

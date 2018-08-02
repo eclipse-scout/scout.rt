@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.testing.shared;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -23,122 +21,72 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IBeanManager;
-import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
-import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
-import org.eclipse.scout.rt.shared.TunnelToServer;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.Assert;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// TODO sme [9.0] mark as bean related methods as deprecated (use BeanTestingHelper instead) and remove in 10.0 (clearHttpAuthenticationCache will be removed completely)
 public final class TestingUtility {
 
   private static final Logger LOG = LoggerFactory.getLogger(TestingUtility.class);
 
   /**
-   * Order to make sure testing beans are preferred over regular beans
+   * @see TestingHelper#TESTING_BEAN_ORDER.
    */
-  public static final int TESTING_BEAN_ORDER = -10000;
+  public static final int TESTING_BEAN_ORDER = BeanTestingHelper.TESTING_BEAN_ORDER;
 
   /**
-   * Order for testing beans to be used when needed
+   * @see TestingHelper#TESTING_RESOURCE_ORDER.
    */
-  public static final int TESTING_RESOURCE_ORDER = 10000;
+  public static final int TESTING_RESOURCE_ORDER = BeanTestingHelper.TESTING_RESOURCE_ORDER;
 
   private TestingUtility() {
   }
 
   /**
-   * Registers the given beans in the {@link IBeanManager} of {@link Platform#get()} with an {@link Order} value of
-   * {@link #TESTING_BEAN_ORDER} (if none is already set) that overrides all other beans
-   * <p>
-   * If registering Mockito mocks, use {@link BeanMetaData#BeanData(Class, Object)}.
-   *
-   * @return the registrations
+   * @see TestingHelper#registerBeans(BeanMetaData...).
    */
   public static List<IBean<?>> registerBeans(BeanMetaData... beanDatas) {
-    if (beanDatas == null) {
-      return CollectionUtility.emptyArrayList();
-    }
-    List<IBean<?>> registeredBeans = new ArrayList<>();
-    for (BeanMetaData beanData : beanDatas) {
-      registeredBeans.add(registerBean(beanData));
-    }
-    return registeredBeans;
+    return BeanTestingHelper.get().registerBeans(beanDatas);
   }
 
   /**
-   * Registers the given bean in the {@link IBeanManager} of {@link Platform#get()} with an {@link Order} value of
-   * {@link #TESTING_BEAN_ORDER} (if none is already set) that overrides all other beans. If the underlying instance is
-   * mocked, any {@link TunnelToServer} annotation is removed.
-   * <p>
-   * If registering Mockito mocks, use {@link BeanMetaData#BeanData(Class, Object)}.
-   *
-   * @return the registration
+   * @see BeanTestingHelper#registerBean(BeanMetaData)
    */
   public static IBean<?> registerBean(BeanMetaData beanData) {
-    if (beanData == null) {
-      return null;
-    }
-    boolean isMock = Mockito.mockingDetails(beanData.getBeanClazz()).isMock();
-    Assertions.assertFalse(isMock && beanData.getInitialInstance() == null, "Cannot register mocked bean without initial instance. [mock={}]",
-        beanData.getBeanClazz());
-    if (beanData.getBeanAnnotation(Order.class) == null) {
-      beanData.withOrder(TESTING_BEAN_ORDER);
-    }
-    if (Mockito.mockingDetails(beanData.getInitialInstance()).isMock() && beanData.getBeanAnnotation(TunnelToServer.class) != null) {
-      LOG.info("removing TunnelToServer annotation on mocked bean: {}", beanData.getBeanClazz());
-      beanData.withoutAnnotation(TunnelToServer.class);
-    }
-    return Platform.get().getBeanManager().registerBean(beanData);
+    return BeanTestingHelper.get().registerBean(beanData);
   }
 
   /**
-   * Register a new bean to replace an existing bean.
+   * @see BeanTestingHelper#registerWithReplace(Class)
    */
   public static IBean<?> registerWithReplace(Class<?> beanClass) {
-    IBean<?> bean = BEANS.getBeanManager().getBean(beanClass);
-    BeanMetaData newBean = new BeanMetaData(bean).withReplace(true);
-    return BEANS.getBeanManager().registerBean(newBean);
+    return BeanTestingHelper.get().registerWithReplace(beanClass);
   }
 
   /**
-   * Register an existing bean with order {@link TESTING_BEAN_ORDER}
+   * @see BeanTestingHelper#registerWithTestingOrder(Class)
    */
   public static IBean<?> registerWithTestingOrder(Class<?> beanClass) {
-    IBean<?> bean = BEANS.getBeanManager().getBean(beanClass);
-    BeanMetaData newBean = new BeanMetaData(bean).withOrder(TESTING_BEAN_ORDER);
-    return BEANS.getBeanManager().registerBean(newBean);
+    return BeanTestingHelper.get().registerWithTestingOrder(beanClass);
   }
 
   /**
-   * Unregister a bean
+   * @see BeanTestingHelper#unregisterBean(IBean)
    */
   public static void unregisterBean(IBean<?> bean) {
-    LinkedList<IBean<?>> beans = new LinkedList<>();
-    beans.add(bean);
-    unregisterBeans(beans);
+    BeanTestingHelper.get().unregisterBean(bean);
   }
 
   /**
-   * Unregisters the given beans
-   *
-   * @param beans
+   * @see BeanTestingHelper#unregisterBeans(List)
    */
   public static void unregisterBeans(List<? extends IBean<?>> beans) {
-    if (beans == null) {
-      return;
-    }
-    for (IBean<?> bean : beans) {
-      Platform.get().getBeanManager().unregisterBean(bean);
-    }
+    BeanTestingHelper.get().unregisterBeans(beans);
   }
 
   /**
@@ -262,12 +210,7 @@ public final class TestingUtility {
     Assert.fail("Potential memory leak, object " + ref.get() + "still exists after gc");
   }
 
-  @SuppressWarnings("unchecked")
   public static <T> IBean<?> mockConfigProperty(Class<? extends IConfigProperty<T>> propertyClass, T value) {
-    IConfigProperty<?> mock = Mockito.mock(IConfigProperty.class);
-    Mockito.when((T) mock.getValue(ArgumentMatchers.any())).thenReturn(value);
-    Mockito.when((T) mock.getValue()).thenReturn(value);
-    return registerBean(new BeanMetaData(propertyClass, mock));
+    return BeanTestingHelper.get().mockConfigProperty(propertyClass, value);
   }
-
 }

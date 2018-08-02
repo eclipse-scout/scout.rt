@@ -13,6 +13,9 @@ package org.eclipse.scout.rt.mail.smtp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.mail.Address;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
@@ -21,8 +24,12 @@ import javax.mail.internet.MimeMessage;
 import org.eclipse.scout.rt.mail.MailHelper;
 import org.eclipse.scout.rt.mail.MailMessage;
 import org.eclipse.scout.rt.mail.MailParticipant;
+import org.eclipse.scout.rt.mail.smtp.SmtpHelper.SmtpDebugReceiverEmailProperty;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.html.HTML;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
+import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -30,6 +37,14 @@ import org.junit.Test;
  * JUnit tests for {@link SmtpHelper}
  */
 public class SmtpHelperTest {
+
+  private List<IBean<?>> m_replacedBeans = new ArrayList<>();
+
+  @After
+  public void after() {
+    BeanTestingHelper.get().unregisterBeans(m_replacedBeans);
+    m_replacedBeans.clear();
+  }
 
   @Test
   public void testGetAllRecipients() throws MessagingException {
@@ -53,15 +68,13 @@ public class SmtpHelperTest {
     assertEquals("Wrong recipient 4", "amet@example.org", ((InternetAddress) allRecipients[3]).getAddress());
 
     // With Debug recipient
-    // TODO sme implement as soon as testing helper is available in platform test
-//    SmtpDebugReceiverEmailProperty useSmtpProperty = Mockito.mock(SmtpDebugReceiverEmailProperty.class);
-//    Mockito.when(useSmtpProperty.getValue(null)).thenReturn("debug@example.org");
-//
-//    allRecipients = BEANS.get(SmtpHelper.class).getAllRecipients(message);
-//
-//    assertNotNull("No recipients", allRecipients);
-//    assertEquals("Number of recipients is wrong", 1, allRecipients.length);
-//    assertEquals("Wrong recipient", "debug@example.org", ((InternetAddress) allRecipients[0]).getAddress());
+    m_replacedBeans.add(BeanTestingHelper.get().mockConfigProperty(SmtpDebugReceiverEmailProperty.class, "debug@example.org"));
+
+    allRecipients = BEANS.get(SmtpHelper.class).getAllRecipients(message);
+
+    assertNotNull("No recipients", allRecipients);
+    assertEquals("Number of recipients is wrong", 1, allRecipients.length);
+    assertEquals("Wrong recipient", "debug@example.org", ((InternetAddress) allRecipients[0]).getAddress());
   }
 
   /**
