@@ -10,17 +10,21 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.mail;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.IDN;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -87,6 +91,8 @@ public class MailHelper {
   public static final String CONTENT_TYPE_MULTIPART_PREFIX = "multipart/";
 
   private static final Pattern PATTERN_MIME_CONTENT_TYPE_CHARSET = Pattern.compile(".*charset=(\")([^\1\\s;]+)\\1", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+
+  public static final String HEADER_IN_REPLY_TO = "In-Reply-To";
 
   /**
    * Returns a list of body parts.
@@ -360,7 +366,7 @@ public class MailHelper {
    *          Definition of mime message properties.
    * @return Mime message
    */
-  public MimeMessage createMimeMessage(MailMessage mailMessage) {
+  public CharsetSafeMimeMessage createMimeMessage(MailMessage mailMessage) {
     if (mailMessage == null) {
       throw new IllegalArgumentException("Mail message is missing");
     }
@@ -776,5 +782,69 @@ public class MailHelper {
     catch (MessagingException e) {
       throw new ProcessingException("Couldn't add the prefix to the message's subject", e);
     }
+  }
+
+  /**
+   * Extract message ids by reading the {@link #HEADER_IN_REPLY_TO} headers if available or otherwise try to read
+   * message id lines from the third part of the message (contains details of the DSN, see
+   * https://tools.ietf.org/html/rfc3461#section-6.2).
+   */
+  public List<String> extractInReplyMessageIds(MimeMessage mimeMessage) {
+    if (mimeMessage == null) {
+      return Collections.emptyList();
+    }
+
+    String messageId = null;
+    try {
+      messageId = mimeMessage.getMessageID();
+    }
+    catch (MessagingException e) {
+      // Message Id only required for logging, thus ok if it couldn't be read.
+      LOG.warn("Could not retrieve message id", e);
+    }
+
+    String[] replyToHeaders;
+    try {
+      replyToHeaders = mimeMessage.getHeader(HEADER_IN_REPLY_TO);
+    }
+    catch (MessagingException e1) {
+      LOG.warn("Could not parse headers for message with id: {}", messageId, e1);
+      return Collections.emptyList();
+    }
+
+    if (replyToHeaders == null || replyToHeaders.length == 0) {
+      try {
+        Object object = mimeMessage.getContent();
+        if (object instanceof Multipart) {
+          Multipart content = (Multipart) object;
+          if (content.getCount() >= 3) {
+            // Try third part of the message, contains details of the DSN (https://tools.ietf.org/html/rfc3461#section-6.2).
+            BodyPart part = content.getBodyPart(2);
+            try (InputStreamReader in = new InputStreamReader(part.getInputStream(), BEANS.get(MailHelper.class).getCharacterEncodingOfPart(part));
+                BufferedReader reader = new BufferedReader(in)) {
+              String s = null;
+              while ((s = reader.readLine()) != null) {
+                s = s.trim();
+                if (s.startsWith("Message-ID:")) {
+                  replyToHeaders = new String[]{s.substring("Message-ID:".length()).trim()};
+                  break;
+                }
+              }
+            }
+          }
+        }
+      }
+      catch (IOException | MessagingException e) {
+        LOG.warn("Unable to get third part of dsn-message for message with id: {}", messageId, e);
+        return Collections.emptyList();
+      }
+    }
+
+    if (replyToHeaders == null || replyToHeaders.length == 0) {
+      LOG.debug("Message IDs coulnd't be extracted because it does not have an 'In-Reply-To' header or other DSN information to with original Message-ID. Id: {}", messageId);
+      return Collections.emptyList();
+    }
+
+    return Arrays.asList(replyToHeaders);
   }
 }

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.mail;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.util.regex.Pattern;
 
 import javax.mail.Address;
 import javax.mail.Message;
@@ -21,7 +22,11 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 public class CharsetSafeMimeMessage extends MimeMessage {
+
+  private static final Pattern MESSAGE_ID_PATTERN = Pattern.compile("<.+@.+>");
+
   private final String m_charset;
+  private String m_customMessageId;
 
   public CharsetSafeMimeMessage() {
     super((Session) null);
@@ -31,6 +36,40 @@ public class CharsetSafeMimeMessage extends MimeMessage {
   public CharsetSafeMimeMessage(String charset) {
     super((Session) null);
     m_charset = charset;
+  }
+
+  public String getCharset() {
+    return m_charset;
+  }
+
+  public String getCustomMessageId() {
+    return m_customMessageId;
+  }
+
+  /**
+   * Sets a custom message id. The message ID must be in an appropriate format, see
+   * https://tools.ietf.org/html/rfc5322#section-3.6.4. If no custom message id is set, the default implementation from
+   * {@link MimeMessage} is used.
+   * <p>
+   * The message id must be a unique identifier, thus always create a new custom message id for a new mime message.
+   * <p>
+   * A call to {@link MimeMessage#saveChanges()} is required in order to update the message ID.
+   */
+  public void setCustomMessageId(String customMessageId) {
+    if (customMessageId != null && !MESSAGE_ID_PATTERN.matcher(customMessageId).matches()) {
+      throw new IllegalArgumentException("Provided custom message id doesn't match required format: " + customMessageId);
+    }
+    m_customMessageId = customMessageId;
+  }
+
+  @Override
+  protected void updateMessageID() throws MessagingException {
+    if (getCustomMessageId() == null) {
+      super.updateMessageID();
+    }
+    else {
+      setHeader("Message-ID", getCustomMessageId());
+    }
   }
 
   @Override

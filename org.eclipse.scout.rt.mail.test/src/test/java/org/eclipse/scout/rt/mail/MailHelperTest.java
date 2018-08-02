@@ -587,7 +587,57 @@ public class MailHelperTest {
     verifyAddPrefixToSubject(null, "prefix", "prefix");
     verifyAddPrefixToSubject("subject", "prefix", "prefixsubject");
     verifyAddPrefixToSubject("lorem", "lorem", "lorem"); // no adding of prefix is subject already starts with prefix
+  }
 
+  @Test
+  public void testExtractInReplyMessageIdsWithoutMessageId() throws MessagingException {
+    assertEquals(0, BEANS.get(MailHelper.class).extractInReplyMessageIds(null).size());
+
+    MailMessage mailMessage = BEANS.get(MailMessage.class)
+        .withBodyPlainText("lorem")
+        .addToRecipient(BEANS.get(MailParticipant.class).withEmail("recipient@example.org"))
+        .withSender(BEANS.get(MailParticipant.class).withEmail("sender@example.org"));
+
+    MimeMessage message = BEANS.get(MailHelper.class).createMimeMessage(mailMessage);
+    message.saveChanges();
+    assertEquals(0, BEANS.get(MailHelper.class).extractInReplyMessageIds(message).size());
+  }
+
+  @Test
+  public void testExtractInReplyMessageIds() throws MessagingException {
+    MailMessage mailMessage = BEANS.get(MailMessage.class)
+        .withBodyPlainText("lorem")
+        .addToRecipient(BEANS.get(MailParticipant.class).withEmail("recipient@example.org"))
+        .withSender(BEANS.get(MailParticipant.class).withEmail("sender@example.org"));
+
+    MimeMessage message = BEANS.get(MailHelper.class).createMimeMessage(mailMessage);
+    message.saveChanges();
+    String messageId = message.getMessageID();
+    assertNotNull(messageId);
+
+    MimeMessage replyMessage = (MimeMessage) message.reply(false);
+    List<String> replyMessageIds = BEANS.get(MailHelper.class).extractInReplyMessageIds(replyMessage);
+    assertEquals(1, replyMessageIds.size());
+    assertEquals(messageId, replyMessageIds.get(0));
+  }
+
+  @Test
+  public void testExtractInReplyMessageIdsWithCustomMessageId() throws MessagingException {
+    MailMessage mailMessage = BEANS.get(MailMessage.class)
+        .withBodyPlainText("lorem")
+        .addToRecipient(BEANS.get(MailParticipant.class).withEmail("recipient@example.org"))
+        .withSender(BEANS.get(MailParticipant.class).withEmail("sender@example.org"));
+
+    CharsetSafeMimeMessage message = BEANS.get(MailHelper.class).createMimeMessage(mailMessage);
+    message.setCustomMessageId("<my-message-id@my-host.org>");
+    message.saveChanges();
+    String messageId = message.getMessageID();
+    assertEquals("<my-message-id@my-host.org>", messageId);
+
+    MimeMessage replyMessage = (MimeMessage) message.reply(false);
+    List<String> replyMessageIds = BEANS.get(MailHelper.class).extractInReplyMessageIds(replyMessage);
+    assertEquals(1, replyMessageIds.size());
+    assertEquals(messageId, replyMessageIds.get(0));
   }
 
   protected void verifyAddPrefixToSubject(String messageSubject, String subjectPrefix, String expectedSubject) throws MessagingException {
