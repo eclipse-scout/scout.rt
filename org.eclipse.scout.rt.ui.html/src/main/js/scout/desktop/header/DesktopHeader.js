@@ -235,7 +235,7 @@ scout.DesktopHeader.prototype.updateViewButtonStyling = function() {
     return;
   }
   var hasMenuBar = false;
-  if (outlineContent instanceof scout.Form) {
+  if (outlineContent instanceof scout.Form && outlineContent.detailForm) {
     var rootGroupBox = outlineContent.rootGroupBox;
     hasMenuBar = rootGroupBox.menuBar && rootGroupBox.menuBarVisible && rootGroupBox.menuBar.visible;
   } else {
