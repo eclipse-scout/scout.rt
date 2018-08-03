@@ -50,11 +50,6 @@ scout.ImageField.prototype._renderProperties = function() {
   this._renderImageUrl();
 };
 
-scout.ImageField.prototype._remove = function() {
-  scout.scrollbars.uninstall(this.$fieldContainer, this.session);
-  scout.ImageField.parent.prototype._remove.call(this);
-};
-
 scout.ImageField.prototype._installDragAndDropHandler = function(event) {
   if (this.dragAndDropHandler) {
     return;
@@ -98,12 +93,17 @@ scout.ImageField.prototype._renderScrollBarEnabled = function() {
   this._updateInnerAlignment();
 
   if (this.scrollBarEnabled) {
-    scout.scrollbars.install(this.$fieldContainer, {
-      parent: this
-    });
+    this._installScrollbars();
   } else {
-    scout.scrollbars.uninstall(this.$fieldContainer, this.session);
+    this._uninstallScrollbars();
   }
+};
+
+/**
+ * @override
+ */
+scout.ImageField.prototype.get$Scrollable = function() {
+  return this.$fieldContainer;
 };
 
 scout.ImageField.prototype._renderGridData = function() {

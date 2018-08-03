@@ -55,8 +55,11 @@ scout.Widget = function() {
   this.focused = false;
   this.loading = false;
   this.cssClass = null;
+  this.scrollTop = 0;
+  this.scrollLeft = 0;
 
   this.$container;
+
   // If set to true, remove won't remove the element immediately but after the animation has been finished
   // This expects a css animation which may be triggered by the class 'animate-remove'
   // If browser does not support css animation, remove will be executed immediately
@@ -68,6 +71,7 @@ scout.Widget = function() {
   this._preserveOnPropertyChangeProperties = [];
   this._postRenderActions = [];
   this._parentDestroyHandler = this._onParentDestroy.bind(this);
+  this._scrollHandler = this._onScroll.bind(this);
   this.events = this._createEventSupport();
   this.loadingSupport = this._createLoadingSupport();
   this.keyStrokeContext = this._createKeyStrokeContext();
@@ -308,6 +312,8 @@ scout.Widget.prototype._renderProperties = function() {
   this._renderFocused();
   this._renderCssClass();
   this._renderLoading();
+  this._renderScrollTop();
+  this._renderScrollLeft();
 };
 
 /**
@@ -380,10 +386,6 @@ scout.Widget.prototype._removeInternal = function() {
       child.remove();
     }
   }, this);
-  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.keyStrokeContext);
-  if (this.loadingSupport) {
-    this.loadingSupport.remove();
-  }
   this._cleanup();
   this._remove();
   this.$parent = null;
@@ -446,8 +448,14 @@ scout.Widget.prototype._linkWithDOM = function() {
 /**
  * Called right before _remove is called.
  * Default calls LayoutValidator.cleanupInvalidComponents to make sure that child components are removed from the invalid components list.
+ * Also uninstalls key stroke context, loading support and scrollbars.
  */
 scout.Widget.prototype._cleanup = function() {
+  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.keyStrokeContext);
+  if (this.loadingSupport) {
+    this.loadingSupport.remove();
+  }
+  this._uninstallScrollbars();
   if (this.$container) {
     this.session.layoutValidator.cleanupInvalidComponents(this.$container);
   }
@@ -1654,21 +1662,6 @@ scout.Widget.prototype.focusAndPreventDefault = function(event) {
 };
 
 /**
- * Brings the widget into view by scrolling the first scrollable parent.
- */
-scout.Widget.prototype.reveal = function() {
-  if (!this.rendered) {
-    return;
-  }
-  var $scrollParent = this.$container.scrollParent();
-  if ($scrollParent.length === 0) {
-    // No scrollable parent found -> scrolling is not possible
-    return;
-  }
-  scout.scrollbars.scrollTo($scrollParent, this.$container);
-};
-
-/**
  * @returns whether the widget is the currently active element
  */
 scout.Widget.prototype.isFocused = function() {
@@ -1698,6 +1691,151 @@ scout.Widget.prototype.getFocusableElement = function() {
     return this.$container[0];
   }
   return null;
+};
+
+scout.Widget.prototype._installScrollbars = function(options) {
+  var $scrollable = this.get$Scrollable();
+  if (!$scrollable) {
+    throw new Error('Scrollable is not defined, cannot install scrollbars');
+  }
+  if ($scrollable.data('scrollable')) {
+    // already installed
+    return;
+  }
+  options = options || {};
+  var defaults = {
+    parent: this
+  };
+  options = $.extend({}, defaults, options);
+  scout.scrollbars.install($scrollable, options);
+  $scrollable.on('scroll', this._scrollHandler);
+};
+
+scout.Widget.prototype._uninstallScrollbars = function() {
+  var $scrollable = this.get$Scrollable();
+  if (!$scrollable || !$scrollable.data('scrollable')) {
+    return;
+  }
+  scout.scrollbars.uninstall($scrollable, this.session);
+  $scrollable.off('scroll', this._scrollHandler);
+};
+
+scout.Widget.prototype._onScroll = function() {
+  var $scrollable = this.get$Scrollable();
+  this.scrollTop = $scrollable[0].scrollTop;
+  this.scrollLeft = $scrollable[0].scrollLeft;
+};
+
+scout.Widget.prototype.setScrollTop = function(scrollTop) {
+  if (this.getDelegateScrollable()) {
+    this.getDelegateScrollable().setScrollTop(scrollTop);
+    return;
+  }
+  this.setProperty('scrollTop', scrollTop);
+};
+
+scout.Widget.prototype._renderScrollTop = function() {
+  var $scrollable = this.get$Scrollable();
+  if (!$scrollable || $scrollable[0].scrollTop === this.scrollTop) {
+    // Don't do anything for elements which are already at the correct scroll position
+    // Which also means: don't scroll non scrollable elements
+    return;
+  }
+  if (this.rendering || (this.htmlComp && !this.htmlComp.layouted)) {
+    // If the widget is not layouted yet (which is always true while rendering), the scroll position cannot be updated -> do it after the layout
+    this.session.layoutValidator.schedulePostValidateFunction(this._renderScrollTop.bind(this));
+    return;
+  }
+  scout.scrollbars.scrollTop($scrollable, this.scrollTop);
+};
+
+scout.Widget.prototype.setScrollLeft = function(scrollLeft) {
+  if (this.getDelegateScrollable()) {
+    this.getDelegateScrollable().setScrollLeft(scrollLeft);
+    return;
+  }
+  this.setProperty('scrollLeft', scrollLeft);
+};
+
+scout.Widget.prototype._renderScrollLeft = function() {
+  var $scrollable = this.get$Scrollable();
+  if (!$scrollable || $scrollable[0].scrollLeft === this.scrollLeft) {
+    // Don't do anything for elements which are already at the correct scroll position
+    // Which also means: don't scroll non scrollable elements
+    return;
+  }
+  if (this.rendering || (this.htmlComp && !this.htmlComp.layouted)) {
+    // If the widget is not layouted yet (which is always true while rendering), the scroll position cannot be updated -> do it after the layout
+    this.session.layoutValidator.schedulePostValidateFunction(this._renderScrollLeft.bind(this));
+    return;
+  }
+  scout.scrollbars.scrollLeft($scrollable, this.scrollLeft);
+};
+
+/**
+ * Returns the jQuery element which is supposed to be scrollable. This element will be used by the scroll functions like {@link #_installScrollbars}, {@link #setScrollTop}, {@link #setScrollLeft}, {@link #scrollToBottom} etc..
+ * The element won't be used unless {@link #_installScrollbars} is called.
+ * If the widget is mainly a wrapper for a scrollable widget and does not have a scrollable element by itself, you can use @{link #getDelegateScrollable} instead.
+ * @return {$}
+ */
+scout.Widget.prototype.get$Scrollable = function() {
+  return this.$container;
+};
+
+/**
+ * If the widget is mainly a wrapper for another widget, it is often the case that the other widget is scrollable and not the wrapper.
+ * In that case implement this method and return the other widget so that the calls to the scroll functions can be delegated.
+ * @return {scout.Widget}
+ */
+scout.Widget.prototype.getDelegateScrollable = function() {
+  return null;
+};
+
+scout.Widget.prototype.scrollToTop = function() {
+  if (this.getDelegateScrollable()) {
+    this.getDelegateScrollable().scrollToTop();
+    return;
+  }
+  var $scrollable = this.get$Scrollable();
+  if (!$scrollable) {
+    return;
+  }
+  if (!this.rendered) {
+    this.session.layoutValidator.schedulePostValidateFunction(this.scrollToTop.bind(this));
+    return;
+  }
+  scout.scrollbars.scrollTop($scrollable, 0);
+};
+
+scout.Widget.prototype.scrollToBottom = function() {
+  if (this.getDelegateScrollable()) {
+    this.getDelegateScrollable().scrollToBottom();
+    return;
+  }
+  var $scrollable = this.get$Scrollable();
+  if (!$scrollable) {
+    return;
+  }
+  if (!this.rendered) {
+    this.session.layoutValidator.schedulePostValidateFunction(this.scrollToBottom.bind(this));
+    return;
+  }
+  scout.scrollbars.scrollToBottom($scrollable);
+};
+
+/**
+ * Brings the widget into view by scrolling the first scrollable parent.
+ */
+scout.Widget.prototype.reveal = function() {
+  if (!this.rendered) {
+    return;
+  }
+  var $scrollParent = this.$container.scrollParent();
+  if ($scrollParent.length === 0) {
+    // No scrollable parent found -> scrolling is not possible
+    return;
+  }
+  scout.scrollbars.scrollTo($scrollParent, this.$container);
 };
 
 /**

@@ -31,6 +31,13 @@ scout.TreeField.prototype.setTree = function(tree) {
   this.setProperty('tree', tree);
 };
 
+scout.TreeField.prototype._setTree = function(tree) {
+  this._setProperty('tree', tree);
+  if (tree) {
+    tree.setScrollTop(this.scrollTop);
+  }
+};
+
 scout.TreeField.prototype._renderTree = function() {
   if (!this.tree) {
     return;
@@ -48,4 +55,11 @@ scout.TreeField.prototype._removeTree = function() {
   this.tree.remove();
   this._removeField();
   this.invalidateLayoutTree();
+};
+
+/**
+ * @override
+ */
+scout.TreeField.prototype.getDelegateScrollable = function() {
+  return this.tree;
 };

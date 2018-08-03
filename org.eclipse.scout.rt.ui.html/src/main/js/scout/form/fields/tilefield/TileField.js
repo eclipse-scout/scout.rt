@@ -56,6 +56,7 @@ scout.TileField.prototype._setTileGrid = function(tileGrid) {
       delegateProperties: ['loading']
     });
     tileGrid.setLoading(this.loading);
+    tileGrid.setScrollTop(this.scrollTop);
   }
 };
 
@@ -75,4 +76,11 @@ scout.TileField.prototype._removeTileGrid = function() {
   this.tileGrid.remove();
   this._removeField();
   this.invalidateLayoutTree();
+};
+
+/**
+ * @override
+ */
+scout.TileField.prototype.getDelegateScrollable = function() {
+  return this.tileGrid;
 };

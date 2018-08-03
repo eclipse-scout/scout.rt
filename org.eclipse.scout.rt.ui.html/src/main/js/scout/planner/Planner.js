@@ -163,9 +163,7 @@ scout.Planner.prototype._render = function() {
     }.bind(this)
   });
 
-  scout.scrollbars.install(this.$grid, {
-    parent: this
-  });
+  this._installScrollbars();
   this._gridScrollHandler = this._onGridScroll.bind(this);
   this.$grid.on('scroll', this._gridScrollHandler);
 };
@@ -183,9 +181,11 @@ scout.Planner.prototype._renderProperties = function() {
   setTimeout(this._renderSelectionRange.bind(this));
 };
 
-scout.Planner.prototype._remove = function() {
-  scout.scrollbars.uninstall(this.$grid, this.session);
-  scout.Planner.parent.prototype._remove.call(this);
+/**
+ * @override
+ */
+scout.Planner.prototype.get$Scrollable = function() {
+  return this.$grid;
 };
 
 /* -- basics, events -------------------------------------------- */

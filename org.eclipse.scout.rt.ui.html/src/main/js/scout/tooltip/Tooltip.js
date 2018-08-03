@@ -93,8 +93,8 @@ scout.Tooltip.prototype._render = function() {
   }
 
   if (this.$anchor && this.scrollType) {
-    this._scrollHandler = this._onAnchorScroll.bind(this);
-    scout.scrollbars.onScroll(this.$anchor, this._scrollHandler);
+    this._anchorScrollHandler = this._onAnchorScroll.bind(this);
+    scout.scrollbars.onScroll(this.$anchor, this._anchorScrollHandler);
   }
 
   // If the tooltip is rendered inside a (popup) dialog, get a reference to the dialog.
@@ -136,9 +136,9 @@ scout.Tooltip.prototype._remove = function() {
     this.$container.document().off('keydown', this._keydownHandler);
     this._keydownHandler = null;
   }
-  if (this._scrollHandler) {
-    scout.scrollbars.offScroll(this._scrollHandler);
-    this._scrollHandler = null;
+  if (this._anchorScrollHandler) {
+    scout.scrollbars.offScroll(this._anchorScrollHandler);
+    this._anchorScrollHandler = null;
   }
   if (this._moveHandler) {
     if (this.dialog) {

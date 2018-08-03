@@ -88,9 +88,7 @@ scout.FileChooser.prototype._render = function() {
 
     // List of files
     this.$files = this.$content.appendElement('<ul>', 'file-chooser-files');
-    scout.scrollbars.install(this.$files, {
-      parent: this
-    });
+    this._installScrollbars();
   }
 
   // Buttons
@@ -145,6 +143,13 @@ scout.FileChooser.prototype._remove = function() {
   this._glassPaneRenderer.removeGlassPanes();
   this.session.focusManager.uninstallFocusContext(this.$container);
   scout.FileChooser.parent.prototype._remove.call(this);
+};
+
+/**
+ * @override
+ */
+scout.FileChooser.prototype.get$Scrollable = function() {
+  return this.$files;
 };
 
 scout.FileChooser.prototype._position = function() {

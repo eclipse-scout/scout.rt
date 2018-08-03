@@ -60,8 +60,7 @@ scout.ViewMenuPopup.prototype._render = function() {
   }, this);
   lastVisibleMenu.$container.addClass('last');
 
-  scout.scrollbars.install(this.$body, {
-    parent: this,
+  this._installScrollbars({
     axis: 'y'
   });
 };
@@ -72,6 +71,13 @@ scout.ViewMenuPopup.prototype._remove = function() {
   }, this);
 
   scout.ViewMenuPopup.parent.prototype._remove.call(this);
+};
+
+/**
+ * @override
+ */
+scout.ViewMenuPopup.prototype.get$Scrollable = function() {
+  return this.$body;
 };
 
 /**

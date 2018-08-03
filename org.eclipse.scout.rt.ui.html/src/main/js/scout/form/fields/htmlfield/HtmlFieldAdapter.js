@@ -21,7 +21,7 @@ scout.HtmlFieldAdapter.prototype._initProperties = function(model) {
 };
 
 scout.HtmlFieldAdapter.prototype._syncScrollToEnd = function() {
-  this.widget.scrollToEnd();
+  this.widget.scrollToBottom();
 };
 
 scout.HtmlFieldAdapter.prototype._onWidgetAppLinkAction = function(event) {

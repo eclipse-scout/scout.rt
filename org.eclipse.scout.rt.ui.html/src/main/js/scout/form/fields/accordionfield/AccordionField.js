@@ -56,6 +56,7 @@ scout.AccordionField.prototype._setAccordion = function(accordion) {
       delegateProperties: ['loading']
     });
     accordion.setLoading(this.loading);
+    accordion.setScrollTop(this.scrollTop);
   }
 };
 
@@ -85,4 +86,11 @@ scout.AccordionField.prototype.getFocusableElement = function() {
     return this.accordion.getFocusableElement();
   }
   return null;
+};
+
+/**
+ * @override
+ */
+scout.AccordionField.prototype.getDelegateScrollable = function() {
+  return this.accordion;
 };

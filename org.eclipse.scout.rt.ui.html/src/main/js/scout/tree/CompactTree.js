@@ -41,8 +41,7 @@ scout.CompactTree.prototype._render = function() {
   this.htmlComp.setLayout(layout);
 
   this.$data = this.$container.appendDiv('tree-data');
-  scout.scrollbars.install(this.$data, {
-    parent: this,
+  this._installScrollbars({
     borderless: true
   });
   this.menuBar = scout.create('MenuBar', {
@@ -71,15 +70,6 @@ scout.CompactTree.prototype._calculateCurrentViewRange = function() {
 scout.CompactTree.prototype.calculateViewRangeSize = function() {
   return this.visibleNodesFlat.length;
 };
-
-/**
- * @override
- */
-scout.CompactTree.prototype._remove = function() {
-  scout.scrollbars.uninstall(this.$data, this.session);
-  scout.CompactTree.parent.prototype._remove.call(this);
-};
-
 
 /**
  * @override

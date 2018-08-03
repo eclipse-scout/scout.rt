@@ -75,7 +75,6 @@ scout.TableHeaderMenu.prototype._init = function(options) {
     this.table.on('filterRemoved', this._tableFilterHandler);
     this._filterTableRowsCheckedHandler = this._onFilterTableRowsChecked.bind(this);
   }
-
 };
 
 scout.TableHeaderMenu.prototype._createLayout = function() {
@@ -93,8 +92,7 @@ scout.TableHeaderMenu.prototype._render = function() {
   this.htmlComp.setLayout(this._createLayout());
   this.$body = this.$container.appendDiv('table-header-menu-body');
   scout.HtmlComponent.install(this.$body, this.session);
-  scout.scrollbars.install(this.$body, {
-    parent: this,
+  this._installScrollbars({
     axis: 'y'
   });
   this.$columnActions = this.$body.appendDiv('table-header-menu-actions');
@@ -163,7 +161,13 @@ scout.TableHeaderMenu.prototype._render = function() {
   if (this.table.enabled) {
     this.table.$container.addClass('focused');
   }
+};
 
+/**
+ * @override
+ */
+scout.TableHeaderMenu.prototype.get$Scrollable = function() {
+  return this.$body;
 };
 
 scout.TableHeaderMenu.prototype._updateFirstLast = function() {
@@ -197,7 +201,6 @@ scout.TableHeaderMenu.prototype._remove = function() {
   this.table.off('columnMoved', this._onColumnMovedHandler);
   this.table.off('filterAdded', this._tableFilterHandler);
   this.table.off('filterRemoved', this._tableFilterHandler);
-  scout.scrollbars.uninstall(this.$body, this.session);
   scout.TableHeaderMenu.parent.prototype._remove.call(this);
 
   // table may have been removed in the meantime

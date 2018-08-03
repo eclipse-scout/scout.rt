@@ -516,14 +516,6 @@ scout.TileAccordion.prototype.expandedGroups = function() {
   });
 };
 
-scout.TileAccordion.prototype.scrollToTop = function() {
-  scout.scrollbars.scrollTop(this.$container, 0);
-};
-
-scout.TileAccordion.prototype.scrollToBottom = function() {
-  scout.scrollbars.scrollToBottom(this.$container);
-};
-
 scout.TileAccordion.prototype._handleSelectionChanged = function(tileGrid) {
   if (this._selectionUpdateLocked) {
     // Don't execute when deselecting other tiles to minimize the amount of property change events

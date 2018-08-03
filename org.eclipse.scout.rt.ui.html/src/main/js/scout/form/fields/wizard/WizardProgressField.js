@@ -35,8 +35,7 @@ scout.WizardProgressField.prototype._render = function() {
 
   this.$wizardStepsBody = this.$field.appendDiv('wizard-steps-body');
 
-  scout.scrollbars.install(this.$field, {
-    parent: this,
+  this._installScrollbars({
     axis: 'x'
   });
 

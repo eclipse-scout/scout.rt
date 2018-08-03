@@ -109,8 +109,7 @@ scout.MessageBox.prototype._render = function() {
     this._$abortButton = this.$cancelButton;
   }
 
-  scout.scrollbars.install(this.$content, {
-    parent: this,
+  this._installScrollbars({
     axis: 'y'
   });
 
@@ -139,13 +138,16 @@ scout.MessageBox.prototype._render = function() {
   this.$container.addClassForAnimation('animate-open');
 };
 
+scout.MessageBox.prototype.get$Scrollable = function() {
+  return this.$content;
+};
+
 scout.MessageBox.prototype._postRender = function() {
   scout.MessageBox.parent.prototype._postRender.call(this);
   this.session.focusManager.installFocusContext(this.$container, scout.focusRule.AUTO);
 };
 
 scout.MessageBox.prototype._remove = function() {
-  scout.scrollbars.uninstall(this.$content, this.session);
   this._glassPaneRenderer.removeGlassPanes();
   this.session.focusManager.uninstallFocusContext(this.$container);
   scout.MessageBox.parent.prototype._remove.call(this);

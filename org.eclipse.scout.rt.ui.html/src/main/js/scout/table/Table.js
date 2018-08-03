@@ -353,12 +353,10 @@ scout.Table.prototype._render = function() {
   this.$data.on('mousedown', '.table-row', this._onRowMouseDown.bind(this))
     .on('mouseup', '.table-row', this._onRowMouseUp.bind(this))
     .on('dblclick', '.table-row', this._onRowDoubleClick.bind(this))
-    .on('scroll', this._onDataScroll.bind(this))
     .on('contextmenu', function(event) {
       event.preventDefault();
     });
-  scout.scrollbars.install(this.$data, {
-    parent: this,
+  this._installScrollbars({
     axis: 'both'
   });
   this._installImageListeners();
@@ -407,7 +405,6 @@ scout.Table.prototype._setCssClass = function(cssClass) {
 
 scout.Table.prototype._remove = function() {
   this.session.desktop.off('popupOpen', this._popupOpenHandler);
-  scout.scrollbars.uninstall(this.$data, this.session);
   this._uninstallDragAndDropHandler();
   // TODO [7.0] cgu do not delete header, implement according to footer
   this.header = null;
@@ -612,13 +609,17 @@ scout.Table.prototype.onColumnVisibilityChanged = function(column) {
   this.trigger('columnStructureChanged');
 };
 
-scout.Table.prototype._onDataScroll = function() {
+/**
+ * @override
+ */
+scout.Table.prototype._onScroll = function() {
   var scrollTop = this.$data[0].scrollTop;
-  if (this.scrollTop === scrollTop) {
-    return;
+  var scrollLeft = this.$data[0].scrollLeft;
+  if (this.scrollTop !== scrollTop) {
+    this._renderViewport();
   }
-  this._renderViewport();
   this.scrollTop = scrollTop;
+  this.scrollLeft = scrollLeft;
 };
 
 scout.Table.prototype._renderTableStatus = function() {
@@ -2761,6 +2762,9 @@ scout.Table.prototype.scrollPageDown = function() {
   this.setScrollTop(newScrollTop);
 };
 
+/**
+ * @override
+ */
 scout.Table.prototype.setScrollTop = function(scrollTop) {
   this.setProperty('scrollTop', scrollTop);
   // call _renderViewport to make sure rows are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
@@ -2769,8 +2773,22 @@ scout.Table.prototype.setScrollTop = function(scrollTop) {
   }
 };
 
+/**
+ * @override
+ */
 scout.Table.prototype._renderScrollTop = function() {
+  if (this.rendering) {
+    // Not necessary to do it while rendering since it will be done by the layout
+    return;
+  }
   scout.scrollbars.scrollTop(this.$data, this.scrollTop);
+};
+
+/**
+ * @override
+ */
+scout.Table.prototype.get$Scrollable = function() {
+  return this.$data;
 };
 
 scout.Table.prototype.setScrollToSelection = function(scrollToSelection) {

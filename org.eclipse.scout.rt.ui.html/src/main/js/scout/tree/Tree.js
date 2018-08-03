@@ -319,16 +319,14 @@ scout.Tree.prototype._render = function() {
     .on('dblclick', '.tree-node', this._onNodeDoubleClick.bind(this))
     .on('mousedown', '.tree-node-control', this._onNodeControlMouseDown.bind(this))
     .on('mouseup', '.tree-node-control', this._onNodeControlMouseUp.bind(this))
-    .on('dblclick', '.tree-node-control', this._onNodeControlDoubleClick.bind(this))
-    .on('scroll', this._onDataScroll.bind(this));
+    .on('dblclick', '.tree-node-control', this._onNodeControlDoubleClick.bind(this));
   scout.HtmlComponent.install(this.$data, this.session);
 
   if (this.isHorizontalScrollingEnabled()) {
     this.$data.toggleClass('scrollable-tree', true);
   }
 
-  scout.scrollbars.install(this.$data, {
-    parent: this,
+  this._installScrollbars({
     axis: this._scrolldirections
   });
   this._installNodeTooltipSupport();
@@ -356,7 +354,6 @@ scout.Tree.prototype._remove = function() {
   // Detach nodes from jQuery objects (because those will be removed)
   this.visitNodes(this._resetTreeNode.bind(this));
 
-  scout.scrollbars.uninstall(this.$data, this.session);
   this._uninstallDragAndDropHandler();
   this._uninstallNodeTooltipSupport();
   this.$fillBefore = null;
@@ -376,18 +373,25 @@ scout.Tree.prototype.isHorizontalScrollingEnabled = function() {
   return this._scrolldirections === 'both' || this._scrolldirections === 'x';
 };
 
-scout.Tree.prototype._onDataScroll = function() {
+/**
+ * @override
+ */
+scout.Tree.prototype._onScroll = function() {
   var scrollToSelectionBackup = this.scrollToSelection;
   this.scrollToSelection = false;
   var scrollTop = this.$data[0].scrollTop;
-  if (this.scrollTop === scrollTop) {
-    return;
+  var scrollLeft = this.$data[0].scrollLeft;
+  if (this.scrollTop !== scrollTop) {
+    this._renderViewport();
   }
-  this._renderViewport();
   this.scrollTop = scrollTop;
+  this.scrollLeft = scrollLeft;
   this.scrollToSelection = scrollToSelectionBackup;
 };
 
+/**
+ * @override
+ */
 scout.Tree.prototype.setScrollTop = function(scrollTop) {
   this.setProperty('scrollTop', scrollTop);
   // call _renderViewport to make sure nodes are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
@@ -402,8 +406,22 @@ scout.Tree.prototype.setScrollTop = function(scrollTop) {
   }
 };
 
+/**
+ * @override
+ */
 scout.Tree.prototype._renderScrollTop = function() {
+  if (this.rendering) {
+    // Not necessary to do it while rendering since it will be done by the layout
+    return;
+  }
   scout.scrollbars.scrollTop(this.$data, this.scrollTop);
+};
+
+/**
+ * @override
+ */
+scout.Tree.prototype.get$Scrollable = function() {
+  return this.$data;
 };
 
 scout.Tree.prototype._renderViewport = function() {

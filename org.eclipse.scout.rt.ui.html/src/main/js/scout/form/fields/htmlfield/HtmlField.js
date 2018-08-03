@@ -39,11 +39,6 @@ scout.HtmlField.prototype._renderProperties = function() {
   this._renderScrollToAnchor();
 };
 
-scout.HtmlField.prototype._remove = function() {
-  scout.scrollbars.uninstall(this.$field, this.session);
-  scout.HtmlField.parent.prototype._remove.call(this);
-};
-
 scout.HtmlField.prototype._readDisplayText = function() {
   return this.$field.html();
 };
@@ -86,22 +81,17 @@ scout.HtmlField.prototype.setScrollBarEnabled = function(scrollBarEnabled) {
 
 scout.HtmlField.prototype._renderScrollBarEnabled = function() {
   if (this.scrollBarEnabled) {
-    scout.scrollbars.install(this.$field, {
-      parent: this
-    });
+    this._installScrollbars();
   } else {
-    scout.scrollbars.uninstall(this.$field, this.session);
+    this._uninstallScrollbars();
   }
 };
 
+/**
+ * @deprecated use scrollToBottom instead
+ */
 scout.HtmlField.prototype.scrollToEnd = function() {
-  if (!this.rendered) {
-    this.session.layoutValidator.schedulePostValidateFunction(this.scrollToEnd.bind(this));
-    return;
-  }
-  if (this.scrollBarEnabled) {
-    scout.scrollbars.scrollToBottom(this.$fieldContainer);
-  }
+  this.scrollToBottom();
 };
 
 scout.HtmlField.prototype._renderScrollToAnchor = function() {
@@ -113,7 +103,7 @@ scout.HtmlField.prototype._renderScrollToAnchor = function() {
   if (this.scrollBarEnabled && anchor && this.$field.find(anchor)) {
     var anchorElem = this.$field.find('#'.concat(anchor));
     if (anchorElem && anchorElem.length > 0) {
-      scout.scrollbars.scrollTo(this.$fieldContainer, anchorElem);
+      scout.scrollbars.scrollTo(this.$field, anchorElem);
     }
   }
 };

@@ -821,6 +821,13 @@ scout.FormField.prototype.activate = function() {
   }
 };
 
+/**
+ * @override
+ */
+scout.FormField.prototype.get$Scrollable = function() {
+  return this.$field;
+};
+
 scout.FormField.prototype.getParentGroupBox = function() {
   var parent = this.parent;
   while (parent && !(parent instanceof scout.GroupBox)) {

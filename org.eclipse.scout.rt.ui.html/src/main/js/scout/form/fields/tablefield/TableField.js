@@ -60,6 +60,7 @@ scout.TableField.prototype._setTable = function(table) {
     table.setEnabled(this.enabled);
     table.setDisabledStyle(this.disabledStyle);
     table.setLoading(this.loading);
+    table.setScrollTop(this.scrollTop);
   }
 };
 
@@ -182,4 +183,11 @@ scout.TableField.prototype.validate = function() {
     validByErrorStatus: validByErrorStatus,
     validByMandatory: validByMandatory
   };
+};
+
+/**
+ * @override
+ */
+scout.TableField.prototype.getDelegateScrollable = function() {
+  return this.table;
 };

@@ -39,16 +39,19 @@ scout.YearPanel.prototype._render = function() {
 scout.YearPanel.prototype.renderContent = function() {
   this.removeContent();
   this._drawYear();
-  scout.scrollbars.install(this.$yearList, {
-    parent: this,
+  this._installScrollbars({
     axis: 'y'
   });
   this.yearRendered = true;
   this._colorYear();
 };
 
+scout.YearPanel.prototype.get$Scrollable = function() {
+  return this.$yearList;
+};
+
 scout.YearPanel.prototype.removeContent = function() {
-  scout.scrollbars.uninstall(this.$yearList, this.session);
+  this._uninstallScrollbars();
   this.$yearList.empty();
   this.yearRendered = false;
 };

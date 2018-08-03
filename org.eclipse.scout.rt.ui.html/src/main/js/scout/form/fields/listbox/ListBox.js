@@ -41,6 +41,7 @@ scout.ListBox.prototype._init = function(model) {
     this.filterBox.recomputeEnabled(true);
   }
   this.table.on('rowsChecked', this._onTableRowsChecked.bind(this));
+  this.table.setScrollTop(this.scrollTop);
 };
 
 scout.ListBox.prototype._initValue = function(value) {
@@ -359,6 +360,12 @@ scout.ListBox.prototype._createDefaultListBoxTable = function() {
     columns: [{
       objectType: "Column"
     }]
-
   });
+};
+
+/**
+ * @override
+ */
+scout.ListBox.prototype.getDelegateScrollable = function() {
+  return this.table;
 };

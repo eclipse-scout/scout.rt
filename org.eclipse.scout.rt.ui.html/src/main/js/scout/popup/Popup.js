@@ -12,7 +12,7 @@ scout.Popup = function() {
   scout.Popup.parent.call(this);
 
   this._mouseDownHandler = null;
-  this._scrollHandler = null;
+  this._anchorScrollHandler = null;
   this._popupOpenHandler = null;
   this._glassPaneRenderer = null;
   this.anchorBounds;
@@ -200,16 +200,16 @@ scout.Popup.prototype._attachCloseHandler = function() {
 
   // Install scroll close handler
   if (this.$anchor && this.boundToAnchor && this.scrollType) {
-    this._scrollHandler = this._onAnchorScroll.bind(this);
-    scout.scrollbars.onScroll(this.$anchor, this._scrollHandler);
+    this._anchorScrollHandler = this._onAnchorScroll.bind(this);
+    scout.scrollbars.onScroll(this.$anchor, this._anchorScrollHandler);
   }
 };
 
 scout.Popup.prototype._detachCloseHandler = function() {
   // Uninstall scroll close handler
-  if (this._scrollHandler) {
-    scout.scrollbars.offScroll(this._scrollHandler);
-    this._scrollHandler = null;
+  if (this._anchorScrollHandler) {
+    scout.scrollbars.offScroll(this._anchorScrollHandler);
+    this._anchorScrollHandler = null;
   }
 
   // Uninstall popup open close handler

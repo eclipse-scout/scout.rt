@@ -116,9 +116,7 @@ scout.ClipboardField.prototype._renderDisplayText = function() {
 
   if (scout.strings.hasText(displayText)) {
     this.$field.html(scout.strings.nl2br(displayText, true));
-    scout.scrollbars.install(this.$field, {
-      parent: this
-    });
+    this._installScrollbars();
 
     setTimeout(function() {
       this.$field.selectAllText();
@@ -200,7 +198,7 @@ scout.ClipboardField.prototype._onCopy = function(event) {
   }
 
   // scroll bar must not be in field when copying
-  scout.scrollbars.uninstall(this.$field, this.session);
+  this._uninstallScrollbars();
 
   selection = this._getSelection();
   if (!selection) {
@@ -225,9 +223,7 @@ scout.ClipboardField.prototype._onCopy = function(event) {
   }
 
   // (re)install scroll bars
-  scout.scrollbars.install(this.$field, {
-    parent: this
-  });
+  this._installScrollbars();
 
   return false;
 };
@@ -369,14 +365,12 @@ scout.ClipboardField.prototype._onPaste = function(event) {
   // (e.g. "Allow programmatic clipboard access" is disabled in IE)
   var uploadContentFunction = function() {
     // store old inner html (will be replaced)
-    scout.scrollbars.uninstall(this.$field, this.session);
+    this._uninstallScrollbars();
     var oldHtmlContent = this.$field.html();
     this.$field.html('');
     var restoreOldHtmlContent = function() {
       this.$field.html(oldHtmlContent);
-      scout.scrollbars.install(this.$field, {
-        parent: this
-      });
+      this._installScrollbars();
     }.bind(this);
     setTimeout(function() {
       var imgElementsFound = false;

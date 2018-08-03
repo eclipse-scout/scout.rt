@@ -50,11 +50,10 @@ scout.TileOutlineOverview.prototype._createPageTileGrid = function() {
 
 scout.TileOutlineOverview.prototype._renderScrollable = function() {
   if (this.scrollable) {
-    scout.scrollbars.install(this.$container, {
-      parent: this,
+    this._installScrollbars({
       axis: 'y'
     });
   } else {
-    scout.scrollbars.uninstall(this.$container, this.session);
+    this._uninstallScrollbars();
   }
 };

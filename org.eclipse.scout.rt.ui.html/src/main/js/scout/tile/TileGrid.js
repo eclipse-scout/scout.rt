@@ -457,17 +457,15 @@ scout.TileGrid.prototype.setScrollable = function(scrollable) {
 };
 
 scout.TileGrid.prototype._renderScrollable = function() {
-  scout.scrollbars.uninstall(this.$container, this.session);
+  this._uninstallScrollbars();
 
   // horizontal (x-axis) scrollbar is only installed when minWidth is > 0
   if (this.scrollable) {
-    scout.scrollbars.install(this.$container, {
-      parent: this,
+    this._installScrollbars({
       axis: ((this.layoutConfig.minWidth > 0) ? 'both' : 'y')
     });
   } else if (this.layoutConfig.minWidth > 0) {
-    scout.scrollbars.install(this.$container, {
-      parent: this,
+    this._installScrollbars({
       axis: 'x'
     });
   }
@@ -814,14 +812,6 @@ scout.TileGrid.prototype._selectTileOnMouseDown = function(event) {
 
 scout.TileGrid.prototype.scrollTo = function(tile) {
   tile.reveal();
-};
-
-scout.TileGrid.prototype.scrollToTop = function() {
-  scout.scrollbars.scrollTop(this.$container, 0);
-};
-
-scout.TileGrid.prototype.scrollToBottom = function() {
-  scout.scrollbars.scrollToBottom(this.$container);
 };
 
 scout.TileGrid.prototype.revealSelection = function() {

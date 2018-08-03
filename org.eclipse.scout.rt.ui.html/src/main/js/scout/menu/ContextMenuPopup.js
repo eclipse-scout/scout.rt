@@ -58,16 +58,17 @@ scout.ContextMenuPopup.prototype._render = function() {
 /**
  * @override
  */
-scout.ContextMenuPopup.prototype._remove = function() {
-  scout.scrollbars.uninstall(this.$body, this.session);
-  scout.ContextMenuPopup.parent.prototype._remove.call(this);
-};
-
 scout.ContextMenuPopup.prototype._installScrollbars = function() {
-  scout.scrollbars.install(this.$body, {
-    parent: this,
+  scout.ContextMenuPopup.parent.prototype._installScrollbars.call(this, {
     axis: 'y'
   });
+};
+
+/**
+ * @override
+ */
+scout.ContextMenuPopup.prototype.get$Scrollable = function() {
+  return this.$body;
 };
 
 scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, animated) {

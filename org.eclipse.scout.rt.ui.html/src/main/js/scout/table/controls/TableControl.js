@@ -122,6 +122,13 @@ scout.TableControl.prototype.renderContent = function() {
   }
 };
 
+/**
+ * @override
+ */
+scout.TableControl.prototype.get$Scrollable = function() {
+  return this.$contentContainer;
+};
+
 scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnselected) {
   selected = scout.nvl(selected, this.selected);
   closeWhenUnselected = scout.nvl(closeWhenUnselected, true);

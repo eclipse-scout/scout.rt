@@ -34,11 +34,6 @@ scout.WidgetField.prototype._renderProperties = function() {
   this._renderScrollable();
 };
 
-scout.WidgetField.prototype._remove = function() {
-  scout.scrollbars.uninstall(this.$fieldContainer, this.session);
-  scout.WidgetField.parent.prototype._remove.call(this);
-};
-
 scout.WidgetField.prototype.setFieldWidget = function(fieldWidget) {
   this.setProperty('fieldWidget', fieldWidget);
 };
@@ -66,10 +61,15 @@ scout.WidgetField.prototype.setScrollable = function(scrollable) {
 };
 
 scout.WidgetField.prototype._renderScrollable = function() {
-  scout.scrollbars.uninstall(this.$fieldContainer, this.session);
+  this._uninstallScrollbars();
   if (this.scrollable) {
-    scout.scrollbars.install(this.$fieldContainer, {
-      parent: this
-    });
+    this._installScrollbars();
   }
+};
+
+/**
+ * @override
+ */
+scout.WidgetField.prototype.get$Scrollable = function() {
+  return this.$fieldContainer;
 };

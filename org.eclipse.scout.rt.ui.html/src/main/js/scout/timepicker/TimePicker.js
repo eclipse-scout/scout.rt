@@ -75,10 +75,9 @@ scout.TimePicker.prototype._renderTimeSelection = function() {
 };
 
 scout.TimePicker.prototype._installScrollbars = function() {
-  scout.scrollbars.uninstall(this.$container, this.session);
+  this._uninstallScrollbars();
 
-  scout.scrollbars.install(this.$container, {
-    parent: this,
+  scout.TimePicker.parent.prototype._installScrollbars.call(this, {
     axis: 'y'
   });
 };

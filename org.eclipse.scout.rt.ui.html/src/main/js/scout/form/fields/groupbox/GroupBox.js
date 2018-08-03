@@ -176,9 +176,6 @@ scout.GroupBox.prototype._render = function() {
 };
 
 scout.GroupBox.prototype._remove = function() {
-  if (this.scrollable) {
-    scout.scrollbars.uninstall(this.$body, this.session);
-  }
   this._removeSubLabel();
   scout.GroupBox.parent.prototype._remove.call(this);
 };
@@ -287,20 +284,25 @@ scout.GroupBox.prototype.setScrollable = function(scrollable) {
 };
 
 scout.GroupBox.prototype._renderScrollable = function() {
-  scout.scrollbars.uninstall(this.$body, this.session);
+  this._uninstallScrollbars();
 
   // horizontal (x-axis) scrollbar is only installed when minWidth is > 0
   if (this.scrollable) {
-    scout.scrollbars.install(this.$body, {
-      parent: this,
+    this._installScrollbars({
       axis: ((this.bodyLayoutConfig.minWidth > 0) ? 'both' : 'y')
     });
   } else if (this.bodyLayoutConfig.minWidth > 0) {
-    scout.scrollbars.install(this.$body, {
-      parent: this,
+    this._installScrollbars({
       axis: 'x'
     });
   }
+};
+
+/**
+ * @override
+ */
+scout.GroupBox.prototype.get$Scrollable = function() {
+  return this.$body;
 };
 
 scout.GroupBox.prototype.setMainBox = function(mainBox) {

@@ -10,8 +10,10 @@
  ******************************************************************************/
 scout.TreeBox = function() {
   scout.TreeBox.parent.call(this);
+  this.filterBox = null;
   this.gridDataHints.weightY = 1.0;
   this.gridDataHints.h = 2;
+  this.tree = null;
   this._addWidgetProperties(['tree', 'filterBox']);
 };
 scout.inherits(scout.TreeBox, scout.ValueField);
@@ -21,6 +23,9 @@ scout.TreeBox.prototype._init = function(model) {
   if (this.filterBox) {
     this.filterBox.enabledComputed = true; // filter is always enabled
     this.filterBox.recomputeEnabled(true);
+  }
+  if (this.tree) {
+    this.tree.setScrollTop(this.scrollTop);
   }
 };
 
@@ -51,4 +56,11 @@ scout.TreeBox.prototype._renderTree = function($fieldContainer) {
 
 scout.TreeBox.prototype._renderFilterBox = function($fieldContainer) {
   this.filterBox.render(this.$fieldContainer);
+};
+
+/**
+ * @override
+ */
+scout.TreeBox.prototype.getDelegateScrollable = function() {
+  return this.tree;
 };

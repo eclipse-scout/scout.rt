@@ -164,7 +164,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     formField.tooltip.position();
   }
 
-  // Check for scrollbars, update them if neccessary
+  // Check for scrollbars, update them if necessary
   if (formField.$field) {
     scout.scrollbars.update(formField.$field);
   }
