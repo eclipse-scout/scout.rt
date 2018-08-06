@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.testing.platform;
  ******************************************************************************/
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -71,7 +71,7 @@ public class BeanTestingHelper {
    *
    * @return the registration
    */
-  public IBean<?> registerBean(BeanMetaData beanData) {
+  public <T> IBean<T> registerBean(BeanMetaData beanData) {
     if (beanData == null) {
       return null;
     }
@@ -92,7 +92,7 @@ public class BeanTestingHelper {
   /**
    * Register a new bean to replace an existing bean.
    */
-  public IBean<?> registerWithReplace(Class<?> beanClass) {
+  public <T> IBean<T> registerWithReplace(Class<T> beanClass) {
     IBean<?> bean = BEANS.getBeanManager().getBean(beanClass);
     BeanMetaData newBean = new BeanMetaData(bean).withReplace(true);
     return BEANS.getBeanManager().registerBean(newBean);
@@ -101,7 +101,7 @@ public class BeanTestingHelper {
   /**
    * Register an existing bean with order {@link TESTING_BEAN_ORDER}
    */
-  public IBean<?> registerWithTestingOrder(Class<?> beanClass) {
+  public <T> IBean<T> registerWithTestingOrder(Class<T> beanClass) {
     IBean<?> bean = BEANS.getBeanManager().getBean(beanClass);
     BeanMetaData newBean = new BeanMetaData(bean).withOrder(TESTING_BEAN_ORDER);
     return BEANS.getBeanManager().registerBean(newBean);
@@ -111,9 +111,7 @@ public class BeanTestingHelper {
    * Unregister a bean
    */
   public void unregisterBean(IBean<?> bean) {
-    LinkedList<IBean<?>> beans = new LinkedList<>();
-    beans.add(bean);
-    unregisterBeans(beans);
+    unregisterBeans(Arrays.asList(bean));
   }
 
   /**

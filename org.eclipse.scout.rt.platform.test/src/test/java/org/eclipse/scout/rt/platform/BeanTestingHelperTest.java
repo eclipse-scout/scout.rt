@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
+import static org.junit.Assert.assertEquals;
+
 import org.eclipse.scout.rt.platform.config.AbstractLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
@@ -20,6 +22,10 @@ import org.junit.Test;
  * @author oca
  */
 public class BeanTestingHelperTest {
+
+  @IgnoreBean
+  static class FixtureBean {
+  }
 
   @Test
   public void testMockConfigProperty() {
@@ -45,6 +51,53 @@ public class BeanTestingHelperTest {
     @Override
     public Long getDefaultValue() {
       return 1L;
+    }
+  }
+
+  @Test
+  public void testRegisterBean() {
+    // return value of type <T>
+    IBean<FixtureBean> bean1 = BeanTestingHelper.get().registerBean(new BeanMetaData(FixtureBean.class));
+    try {
+      assertEquals(FixtureBean.class, BEANS.get(FixtureBean.class).getClass());
+      assertEquals(BeanTestingHelper.TESTING_BEAN_ORDER, BEANS.getBeanManager().getBean(FixtureBean.class).getBeanAnnotation(Order.class).value(), 0);
+    }
+    finally {
+      BeanTestingHelper.get().unregisterBean(bean1);
+    }
+
+    // return value of type <?>
+    IBean<?> bean2 = BeanTestingHelper.get().registerBean(new BeanMetaData(FixtureBean.class));
+    try {
+      assertEquals(FixtureBean.class, BEANS.get(FixtureBean.class).getClass());
+      assertEquals(BeanTestingHelper.TESTING_BEAN_ORDER, BEANS.getBeanManager().getBean(FixtureBean.class).getBeanAnnotation(Order.class).value(), 0);
+    }
+    finally {
+      BeanTestingHelper.get().unregisterBean(bean2);
+    }
+
+    // return value of type <T>, custom order
+    IBean<FixtureBean> bean3 = BeanTestingHelper.get().registerBean(new BeanMetaData(FixtureBean.class).withOrder(42));
+    try {
+      assertEquals(FixtureBean.class, BEANS.get(FixtureBean.class).getClass());
+      assertEquals(42, BEANS.getBeanManager().getBean(FixtureBean.class).getBeanAnnotation(Order.class).value(), 0);
+    }
+    finally {
+      BeanTestingHelper.get().unregisterBean(bean3);
+    }
+  }
+
+  @Test
+  public void testRegisterWithTestingOrder() {
+    IBean<FixtureBean> bean1 = BeanTestingHelper.get().registerBean(new BeanMetaData(FixtureBean.class).withOrder(100));
+    IBean<FixtureBean> bean2 = BeanTestingHelper.get().registerWithTestingOrder(FixtureBean.class);
+    try {
+      assertEquals(FixtureBean.class, BEANS.get(FixtureBean.class).getClass());
+      assertEquals(BeanTestingHelper.TESTING_BEAN_ORDER, BEANS.getBeanManager().getBean(FixtureBean.class).getBeanAnnotation(Order.class).value(), 0);
+    }
+    finally {
+      BeanTestingHelper.get().unregisterBean(bean1);
+      BeanTestingHelper.get().unregisterBean(bean2);
     }
   }
 }
