@@ -429,7 +429,10 @@ scout.Scrollbar.prototype._fixScrollbar = function() {
  * Reverts the changes made by _fixScrollbar
  */
 scout.Scrollbar.prototype._unfixScrollbar = function() {
-  this._unfixTimeoutId = scout.scrollbars.unfix(this.$container, this._unfixTimeoutId);
+  // true = do it immediately without a timeout.
+  // This is important because scrollTop may be set during layout but before the element is positioned correctly (e.g. popup)
+  // which could have the effect that the scroll bar is drown outside the widget
+  scout.scrollbars.unfix(this.$container, null, true);
   this.update();
 };
 

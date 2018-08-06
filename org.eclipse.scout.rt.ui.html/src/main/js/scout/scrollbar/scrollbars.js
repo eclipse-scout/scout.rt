@@ -366,16 +366,25 @@ scout.scrollbars = {
     if (scrollbar) {
       scrollbar.notifyBeforeScroll();
     }
-    if (options.animate) {
-      this.animateScrollTop($scrollable, scrollTop);
-    } else {
+
+    // Not animated
+    if (!options.animate) {
       $scrollable
         .stop('scroll')
         .scrollTop(scrollTop);
+      if (scrollbar) {
+        scrollbar.notifyAfterScroll();
+      }
+      return;
     }
-    if (scrollbar) {
-      scrollbar.notifyAfterScroll();
-    }
+
+    // Animated
+    this.animateScrollTop($scrollable, scrollTop);
+    $scrollable.promise('scroll').always(function() {
+      if (scrollbar) {
+        scrollbar.notifyAfterScroll();
+      }
+    });
   },
 
   scrollLeft: function($scrollable, scrollLeft, options) {
@@ -384,16 +393,25 @@ scout.scrollbars = {
     if (scrollbar) {
       scrollbar.notifyBeforeScroll();
     }
-    if (options.animate) {
-      this.animateScrollLeft($scrollable, scrollLeft);
-    } else {
+
+    // Not animated
+    if (!options.animate) {
       $scrollable
         .stop('scroll')
         .scrollLeft(scrollLeft);
+      if (scrollbar) {
+        scrollbar.notifyAfterScroll();
+      }
+      return;
     }
-    if (scrollbar) {
-      scrollbar.notifyAfterScroll();
-    }
+
+    // Animated
+    this.animateScrollLeft($scrollable, scrollLeft);
+    $scrollable.promise('scroll').always(function() {
+      if (scrollbar) {
+        scrollbar.notifyAfterScroll();
+      }
+    });
   },
 
   animateScrollTop: function($scrollable, scrollTop) {
@@ -490,17 +508,25 @@ scout.scrollbars = {
   /**
    * Reverts the changes made by fix().
    */
-  unfix: function($elem, timeoutId) {
+  unfix: function($elem, timeoutId, immediate) {
     clearTimeout(timeoutId);
+    if (immediate) {
+      this._unfix($elem);
+      return;
+    }
     return setTimeout(function() {
-      $elem.css({
-        position: 'absolute',
-        left: '',
-        top: '',
-        width: '',
-        height: ''
-      });
+      this._unfix($elem);
     }.bind(this), 50);
+  },
+
+  _unfix: function($elem) {
+    $elem.css({
+      position: 'absolute',
+      left: '',
+      top: '',
+      width: '',
+      height: ''
+    });
   },
 
   /**
