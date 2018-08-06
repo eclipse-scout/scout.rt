@@ -445,6 +445,18 @@ scout.dates = {
     return undefined;
   },
 
+  /**
+   * Returns a new Date. Use this function in place of <code>new Date();</code> in your productive code
+   * when you want to provide a fixed date instead of the system time/date for unit tests. In your unit test
+   * you can replace this function with a function that provides a fixed date. Don't forget to restore the
+   * original function when you cleanup/tear-down the test.
+   *
+   * @returns Date
+   */
+  newDate: function() {
+    return new Date();
+  },
+
   format: function(date, locale, pattern) {
     var dateFormat = new scout.DateFormat(locale, pattern);
     return dateFormat.format(date);

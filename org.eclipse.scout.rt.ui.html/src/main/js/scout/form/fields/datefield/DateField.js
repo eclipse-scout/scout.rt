@@ -1318,13 +1318,13 @@ scout.DateField.prototype._newTimestampAsDate = function(date, time) {
  * - the current date/time
  */
 scout.DateField.prototype._referenceDate = function() {
-  var referenceDate = this.autoDate || scout.dates.ceil(new Date(), this.timePickerResolution);
+  var referenceDate = this.autoDate || scout.dates.ceil(scout.dates.newDate(), this.timePickerResolution);
   if (this.autoDate) {
     referenceDate = this.autoDate;
   } else if (this.hasTime) {
-    referenceDate = scout.dates.ceil(new Date(), this.timePickerResolution);
+    referenceDate = scout.dates.ceil(scout.dates.newDate(), this.timePickerResolution);
   } else {
-    referenceDate = scout.dates.trunc(new Date());
+    referenceDate = scout.dates.trunc(scout.dates.newDate());
   }
   if (this.allowedDates) {
     referenceDate = this._findAllowedReferenceDate(referenceDate);
@@ -1456,7 +1456,7 @@ scout.DateField.prototype._predictDate = function(inputText) {
   // "Date calculations"
   var m = inputText.match(/^([+-])(\d*)$/);
   if (m) {
-    var now = new Date();
+    var now = scout.dates.newDate();
     var daysToAdd = Number(m[1] + (m[2] || '0'));
     now.setDate(now.getDate() + daysToAdd);
     this._setDateValid(true);
