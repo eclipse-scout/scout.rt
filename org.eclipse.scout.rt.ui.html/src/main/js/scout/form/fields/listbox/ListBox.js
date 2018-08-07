@@ -22,7 +22,6 @@ scout.ListBox = function() {
   this._pendingLookup = null;
   this._currentLookupCall = null;
   this._pendingLookup = null;
-  this._lookupInProgress = false;
   this._valueSyncing = false; // true when value is either syncing to table or table to value
 
   this._addWidgetProperties(['table', 'filterBox']);
@@ -160,11 +159,7 @@ scout.ListBox.prototype._clearPendingLookup = function() {
   }
 };
 
-/**
- * A wrapper function around lookup calls used to set the _lookupInProgress flag, and display the state in the UI.
- */
 scout.ListBox.prototype._executeLookup = function(lookupCall, abortExisting) {
-  this._lookupInProgress = true;
   this.setLoading(true);
 
   if (abortExisting && this._currentLookupCall) {
@@ -178,7 +173,6 @@ scout.ListBox.prototype._executeLookup = function(lookupCall, abortExisting) {
   return lookupCall
     .execute()
     .always(function() {
-      this._lookupInProgress = false;
       this._currentLookupCall = null;
       this.setLoading(false);
       this._clearLookupStatus();

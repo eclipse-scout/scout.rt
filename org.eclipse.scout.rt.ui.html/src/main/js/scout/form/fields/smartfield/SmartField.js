@@ -16,7 +16,6 @@ scout.SmartField = function() {
   this.codeType = null;
   this._pendingLookup = null;
   this._pendingOpenPopup = false;
-  this._lookupInProgress = false;
   this._tabPrevented = null;
   this.lookupRow = null;
   this.browseHierarchy = false;
@@ -973,20 +972,6 @@ scout.SmartField.prototype._onFieldKeyUp = function(event) {
   }
 };
 
-/**
- * Prevent TABbing to the next field when popup is open. Because popup removal is animated,
- * we allow TAB, if the popup is still there but flagged as "to be removed" with the
- * removalPending flag.
- */
-scout.SmartField.prototype._isPreventDefaultTabHandling = function(event) {
-  var doPrevent = false;
-  if (this.isPopupOpen() || this._lookupInProgress) {
-    doPrevent = true;
-  }
-  $.log.isTraceEnabled() && $.log.trace('(SmartField#_isPreventDefaultTabHandling) must prevent default when TAB was pressed = ' + doPrevent);
-  return doPrevent;
-};
-
 scout.SmartField.prototype.isPopupOpen = function() {
   return !!(this.popup && !this.popup.removalPending);
 };
@@ -1155,11 +1140,10 @@ scout.SmartField.prototype.setSearchRequired = function(searchRequired) {
 };
 
 /**
- * A wrapper function around lookup calls used to set the _lookupInProgress flag, and display the state in the UI.
+ * A wrapper function around lookup calls used to display the state in the UI.
  */
 scout.SmartField.prototype._executeLookup = function(lookupCall, abortExisting) {
   this.lookupSeqNo++;
-  this._lookupInProgress = true;
   this.setLoading(true);
 
   if (abortExisting && this._currentLookupCall) {
@@ -1173,7 +1157,6 @@ scout.SmartField.prototype._executeLookup = function(lookupCall, abortExisting) 
   return lookupCall
     .execute()
     .always(function() {
-      this._lookupInProgress = false;
       this._currentLookupCall = null;
       this.setLoading(false);
       this._clearLookupStatus();
