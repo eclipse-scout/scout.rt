@@ -18,7 +18,6 @@ scout.SmartField2 = function() {
   this.codeType = null;
   this._pendingLookup = null;
   this._pendingOpenPopup = false;
-  this._lookupInProgress = false;
   this._tabPrevented = null;
   this.lookupRow = null;
   this.browseHierarchy = false;
@@ -951,20 +950,6 @@ scout.SmartField2.prototype._onFieldKeyUp = function(event) {
   }
 };
 
-/**
- * Prevent TABbing to the next field when popup is open. Because popup removal is animated,
- * we allow TAB, if the popup is still there but flagged as "to be removed" with the
- * removalPending flag.
- */
-scout.SmartField2.prototype._isPreventDefaultTabHandling = function(event) {
-  var doPrevent = false;
-  if (this.isPopupOpen() || this._lookupInProgress) {
-    doPrevent = true;
-  }
-  $.log.trace('(SmartField2#_isPreventDefaultTabHandling) must prevent default when TAB was pressed = ' + doPrevent);
-  return doPrevent;
-};
-
 scout.SmartField2.prototype.isPopupOpen = function() {
   return !!(this.popup && !this.popup.removalPending);
 };
@@ -1074,15 +1059,13 @@ scout.SmartField2.prototype.setActiveFilterEnabled = function(activeFilterEnable
 };
 
 /**
- * A wrapper function around lookup calls used to set the _lookupInProgress flag, and display the state in the UI.
+ * A wrapper function around lookup calls used to display the state in the UI.
  */
 scout.SmartField2.prototype._executeLookup = function(lookupFunc) {
   this.lookupSeqNo++;
-  this._lookupInProgress = true;
   this.setLoading(true);
   return lookupFunc()
     .always(function(result) {
-      this._lookupInProgress = false;
       if (!result || !result.canceled) {
         // The RemoteLookupCall aborts the current running lookup before a new one is scheduled
         // This would reset the loading state even though a new lookup is running -> don't reset in that case

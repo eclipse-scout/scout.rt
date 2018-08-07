@@ -100,14 +100,5 @@ scout.SmartField2TouchPopup.prototype._onPropertyChange = function(event) {
 };
 
 scout.SmartField2TouchPopup.prototype._beforeClosePopup = function(event) {
-  var embeddedField = this._field;
-  if (embeddedField._lookupInProgress) {
-    embeddedField.one('acceptInput acceptInputFail', done.bind(this, embeddedField));
-  } else {
-    done.call(this, embeddedField);
-  }
-
-  function done(embeddedField) {
-    this.smartField.acceptInputFromField(embeddedField);
-  }
+  this.smartField.acceptInputFromField(this._field);
 };
