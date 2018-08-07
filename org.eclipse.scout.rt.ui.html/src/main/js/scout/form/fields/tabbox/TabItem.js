@@ -218,7 +218,7 @@ scout.TabItem.prototype._renderLabel = function() {
   }
 };
 
-scout.TabItem.prototype._renderLabelVisible = function() {
+scout.TabItem.prototype._renderLabelVisible = function(labelVisible) {
   // Never make the title of the group box visible -> label is rendered into tabContainer
   scout.TabItem.parent.prototype._renderLabelVisible.call(this, false);
 };

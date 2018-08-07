@@ -363,12 +363,12 @@ scout.TileGrid.prototype._updateTileOrder = function(tiles) {
   }
 };
 
-scout.TileGrid.prototype.invalidateLayoutTree = function() {
+scout.TileGrid.prototype.invalidateLayoutTree = function(invalidateParents) {
   if (this.tileRemovalPending) {
     // Do not invalidate while tile removal is still pending
     return;
   }
-  scout.TileGrid.parent.prototype.invalidateLayoutTree.call(this);
+  scout.TileGrid.parent.prototype.invalidateLayoutTree.call(this, invalidateParents);
 };
 
 scout.TileGrid.prototype.setGridColumnCount = function(gridColumnCount) {

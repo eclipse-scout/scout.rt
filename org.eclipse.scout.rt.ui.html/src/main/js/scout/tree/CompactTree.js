@@ -94,7 +94,7 @@ scout.CompactTree.prototype._insertNodeInDOMAtPlace = function(node, index) {
 /**
  * @override
  */
-scout.CompactTree.prototype.selectNodes = function(nodes) {
+scout.CompactTree.prototype.selectNodes = function(nodes, debounceSend) {
   var selectedSectionNodes = [];
   nodes = scout.arrays.ensure(nodes);
   nodes.forEach(function(node) {

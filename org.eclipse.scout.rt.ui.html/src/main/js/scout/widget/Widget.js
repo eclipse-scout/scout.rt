@@ -1059,7 +1059,7 @@ scout.Widget.prototype._afterAttach = function() {
  *   itself must _not_ attach its own $container. That's why we should only
  *   attach when event.target is === this.
  */
-scout.Widget.prototype._attach = function(event) {
+scout.Widget.prototype._attach = function() {
   this.attached = true;
 };
 

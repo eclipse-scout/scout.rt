@@ -58,7 +58,7 @@ scout.ContextMenuPopup.prototype._render = function() {
 /**
  * @override
  */
-scout.ContextMenuPopup.prototype._installScrollbars = function() {
+scout.ContextMenuPopup.prototype._installScrollbars = function(options) {
   scout.ContextMenuPopup.parent.prototype._installScrollbars.call(this, {
     axis: 'y'
   });

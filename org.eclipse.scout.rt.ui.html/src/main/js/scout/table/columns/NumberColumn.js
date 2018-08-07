@@ -104,8 +104,8 @@ scout.NumberColumn.prototype.createAggrValueCell = function(value) {
   });
 };
 
-scout.NumberColumn.prototype._cellStyle = function(cell) {
-  var style = scout.NumberColumn.parent.prototype._cellStyle.call(this, cell);
+scout.NumberColumn.prototype._cellStyle = function(cell, tableNodeColumn, rowPadding) {
+  var style = scout.NumberColumn.parent.prototype._cellStyle.call(this, cell, tableNodeColumn, rowPadding);
 
   if (this.backgroundEffect && cell.value !== undefined) {
     if (!this.backgroundEffectFunc) {

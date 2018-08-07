@@ -14,10 +14,10 @@ scout.ImageLayout = function(image) {
 };
 scout.inherits(scout.ImageLayout, scout.AbstractLayout);
 
-scout.ImageLayout.prototype.preferredLayoutSize = function($container) {
+scout.ImageLayout.prototype.preferredLayoutSize = function($container, options) {
   var img = $container[0];
   if (img && img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
     return new scout.Dimension(img.naturalWidth, img.naturalHeight);
   }
-  return scout.ImageLayout.parent.prototype.preferredLayoutSize.call(this, $container);
+  return scout.ImageLayout.parent.prototype.preferredLayoutSize.call(this, $container, options);
 };

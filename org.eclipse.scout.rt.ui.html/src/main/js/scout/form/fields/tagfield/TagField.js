@@ -156,12 +156,15 @@ scout.TagField.prototype._clear = function() {
   this.$field.val('');
 };
 
-scout.TagField.prototype.acceptInput = function() {
+/**
+ * @override
+ */
+scout.TagField.prototype.acceptInput = function(whileTyping) {
   if (this.chooser) {
     this.chooser.triggerLookupRowSelected();
     return;
   }
-  scout.TagField.parent.prototype.acceptInput.call(this);
+  scout.TagField.parent.prototype.acceptInput.call(this, false);
 };
 
 scout.TagField.prototype._triggerAcceptInput = function() {

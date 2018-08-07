@@ -271,7 +271,7 @@ scout.DateField.prototype._setTimePickerResolution = function(timePickerResoluti
 /**
  * @override FormField.js
  */
-scout.DateField.prototype._renderPlaceholder = function() {
+scout.DateField.prototype._renderPlaceholder = function($field) {
   scout.DateField.parent.prototype._renderPlaceholder.call(this,
     this._fieldForPlaceholder());
 };
@@ -279,7 +279,7 @@ scout.DateField.prototype._renderPlaceholder = function() {
 /**
  * @override FormField.js
  */
-scout.DateField.prototype._removePlaceholder = function() {
+scout.DateField.prototype._removePlaceholder = function($field) {
   scout.DateField.parent.prototype._removePlaceholder.call(this,
     this._fieldForPlaceholder());
 };

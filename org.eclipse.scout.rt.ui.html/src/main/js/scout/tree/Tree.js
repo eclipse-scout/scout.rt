@@ -1918,7 +1918,7 @@ scout.Tree.prototype.deselectAll = function() {
 };
 
 scout.Tree.prototype.selectNode = function(node, debounceSend) {
-  this.selectNodes(node);
+  this.selectNodes(node, debounceSend);
 };
 
 scout.Tree.prototype.selectNodes = function(nodes, debounceSend) {

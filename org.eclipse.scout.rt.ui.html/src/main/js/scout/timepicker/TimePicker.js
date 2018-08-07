@@ -74,7 +74,10 @@ scout.TimePicker.prototype._renderTimeSelection = function() {
   return $box;
 };
 
-scout.TimePicker.prototype._installScrollbars = function() {
+/**
+ * @override
+ */
+scout.TimePicker.prototype._installScrollbars = function(options) {
   this._uninstallScrollbars();
 
   scout.TimePicker.parent.prototype._installScrollbars.call(this, {
