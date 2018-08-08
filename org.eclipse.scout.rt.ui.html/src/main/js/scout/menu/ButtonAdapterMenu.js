@@ -88,8 +88,12 @@ scout.ButtonAdapterMenu.prototype.doAction = function(srcEvent) {
 
   // Everything else is delegated to the button
   var actionExecuted = this.button.doAction();
-  if (actionExecuted && this.isToggleAction() && this.rendered) {
-    this.setSelected(!this.selected);
+  if (actionExecuted) {
+    if (this.isToggleAction()) {
+      this.setSelected(!this.selected);
+    } else {
+      this._doAction();
+    }
   }
   return actionExecuted;
 };
