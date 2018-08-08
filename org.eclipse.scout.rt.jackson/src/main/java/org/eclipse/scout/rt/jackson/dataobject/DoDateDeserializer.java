@@ -24,8 +24,6 @@ import com.fasterxml.jackson.databind.deser.std.DateDeserializers.DateDeserializ
 public class DoDateDeserializer extends DateDeserializer {
   private static final long serialVersionUID = 1L;
 
-  protected final SimpleDateFormat m_defaultDateFormatter = new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN);
-
   protected final LazyValue<DataObjectInventory> m_dataObjectInventory = new LazyValue<>(DataObjectInventory.class);
 
   public DoDateDeserializer() {
@@ -52,10 +50,10 @@ public class DoDateDeserializer extends DateDeserializer {
   }
 
   protected SimpleDateFormat findFormatter(Class<? extends IDoEntity> entityClass, String name) {
-    return m_dataObjectInventory.get().getAttributeDescription(entityClass, name)
+    String pattern = m_dataObjectInventory.get().getAttributeDescription(entityClass, name)
         .flatMap(DataObjectAttributeDescriptor::getFormatPattern)
-        .map(pattern -> new SimpleDateFormat(pattern))
-        .orElse(m_defaultDateFormatter);
+        .orElse(IValueFormatConstants.DEFAULT_DATE_PATTERN);
+    return new SimpleDateFormat(pattern);
   }
 
   @Override
