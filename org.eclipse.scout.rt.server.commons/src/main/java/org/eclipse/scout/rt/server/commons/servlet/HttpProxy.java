@@ -65,6 +65,9 @@ public class HttpProxy {
     // field is set by http client itself
     m_requestHeaderFilters.add(new HttpHeaderNameFilter("Content-Length"));
 
+    // field is set by http client itself
+    m_requestHeaderFilters.add(new HttpHeaderNameFilter("Host"));
+
     // remove null header from response headers
     m_responseHeaderFilters.add(new HttpHeaderNameFilter(null));
 
@@ -84,9 +87,9 @@ public class HttpProxy {
    * Forwards the given request to the remote URL using the given method.
    * <ul>
    * <li>Adds every request header beside the blacklisted to the forwarded request.<br>
-   * <li>If and only if {@link #shouldIncludeRequestPayload(HttpServletRequest)} returns <code>true</code>, writes
-   * the request payload to the forwarded request or adds every query parameter to the forwarded request if parameters
-   * are used.
+   * <li>If and only if {@link #shouldIncludeRequestPayload(HttpServletRequest)} returns <code>true</code>, writes the
+   * request payload to the forwarded request or adds every query parameter to the forwarded request if parameters are
+   * used.
    * <li>Writes the returned response body, headers and status to the response.
    * </ul>
    *
