@@ -56,7 +56,6 @@ scout.Tile.prototype._render = function() {
 
 scout.Tile.prototype._renderProperties = function() {
   scout.Tile.parent.prototype._renderProperties.call(this);
-  this._renderGridDataHints();
   this._renderColorScheme();
   this._renderSelectable();
   this._renderSelected();
@@ -76,6 +75,11 @@ scout.Tile.prototype._renderDisplayStyle = function() {
 
 scout.Tile.prototype.setGridDataHints = function(gridData) {
   this.setProperty('gridDataHints', gridData);
+  if (this.rendered) {
+    // Do it here instead of _renderGridDataHints because grid does not need to be invalidated when rendering, only when hints change
+    // Otherwise it forces too many unnecessary recalculations when tile grid is rendering tiles due to virtual scrolling
+    this.parent.invalidateLogicalGrid();
+  }
 };
 
 scout.Tile.prototype._setGridDataHints = function(gridData) {
@@ -83,10 +87,6 @@ scout.Tile.prototype._setGridDataHints = function(gridData) {
     gridData = new scout.GridData();
   }
   this._setProperty('gridDataHints', scout.GridData.ensure(gridData));
-};
-
-scout.Tile.prototype._renderGridDataHints = function() {
-  this.parent.invalidateLogicalGrid();
 };
 
 scout.Tile.prototype.setColorScheme = function(colorScheme) {
@@ -168,6 +168,12 @@ scout.Tile.prototype._renderFilterAccepted = function() {
 scout.Tile.prototype._renderVisible = function() {
   if (this.rendering) {
     this.$container.setVisible(this.isVisible());
+    return;
+  }
+  if (this.removalPending) {
+    // Do nothing if removal is in progress. May happen if filter is set, tile is removed by the filter animation, filter is removed again while animation is still running
+    // Adding animate-visible in that case would trigger the animationEnd listener of widget._removeAnimated even though it is not the remove animation which finishes
+    // That would cause the animate-visible animation to be executed twice because tileGrid._renderTile would render the tile and start the animation anew.
     return;
   }
   if (!this.isVisible()) {

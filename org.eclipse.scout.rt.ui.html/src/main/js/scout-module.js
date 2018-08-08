@@ -150,6 +150,7 @@
   __include("scout/iframe/IFrame.js");
   __include("scout/scrollbar/Scrollbar.js");
   __include("scout/scrollbar/scrollbars.js");
+  __include("scout/scrollbar/VirtualScrolling.js");
   __include("scout/splitter/Splitter.js");
   __include("scout/text/DateFormat.js");
   __include("scout/text/DecimalFormat.js");

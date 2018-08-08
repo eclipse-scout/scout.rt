@@ -9,6 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 .tile {
+  &.newly-rendered {
+    /* Tile should be invisible until it has the correct position, otherwise it might be visible in the top left corner in the time between rendering and layouting */
+    .invisible();
+  }
+
   &.animate-visible {
     #scout.animation-name(fadein-grow);
     #scout.animation-duration(0.4s);

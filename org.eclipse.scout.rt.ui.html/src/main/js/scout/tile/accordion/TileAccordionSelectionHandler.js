@@ -82,7 +82,8 @@ scout.TileAccordionSelectionHandler.prototype.getVisibleGridY = function(tile) {
  * @override
  */
 scout.TileAccordionSelectionHandler.prototype.scrollTo = function(tile) {
-  tile.reveal();
+  var group = this.tileAccordion.getGroupByTile(tile);
+  group.body.scrollTo(tile);
 };
 
 /**

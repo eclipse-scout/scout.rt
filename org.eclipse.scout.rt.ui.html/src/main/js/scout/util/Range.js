@@ -125,6 +125,21 @@ scout.Range.prototype.union = function(other) {
   return [new scout.Range(Math.min(this.from, other.from), Math.max(this.to, other.to))];
 };
 
+scout.Range.prototype.add = function(other) {
+  if (this.to < other.from || other.to < this.from) {
+    var range1 = new scout.Range(this.from, this.to);
+    var range2 = new scout.Range(other.from, other.to);
+    if (range1.size() === 0) {
+      return range2;
+    }
+    if (range2.size() === 0) {
+      return range1;
+    }
+    throw new Error('Range to add has to border on the existing range. ' + this + ', ' + other);
+  }
+  return new scout.Range(Math.min(this.from, other.from), Math.max(this.to, other.to));
+};
+
 scout.Range.prototype.intersect = function(other) {
   if (this.to <= other.from || other.to <= this.from) {
     return new scout.Range(0, 0);

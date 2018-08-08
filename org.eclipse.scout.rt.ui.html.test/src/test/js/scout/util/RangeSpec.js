@@ -16,6 +16,40 @@ describe('Range', function() {
     expect(new scout.Range(10, 20).equals(new scout.Range(20, 10))).toBe(false);
   });
 
+  describe('add', function() {
+    it('returns a new range with the sum of both ranges', function() {
+      var range1 = new scout.Range(0, 10);
+      var range2 = new scout.Range(5, 20);
+      expect(range1.add(range2)).toEqual(new scout.Range(0, 20));
+
+      range1 = new scout.Range(5, 20);
+      range2 = new scout.Range(0, 10);
+      expect(range1.add(range2)).toEqual(new scout.Range(0, 20));
+
+      range1 = new scout.Range(0, 10);
+      range2 = new scout.Range(10, 20);
+      expect(range1.add(range2)).toEqual(new scout.Range(0, 20));
+    });
+
+    it('fails if the new range does not border on the existing', function() {
+      var range1 = new scout.Range(0, 10);
+      var range2 = new scout.Range(11, 20);
+      expect(function() {
+        range1.add(range2);
+      }).toThrow(new Error("Range to add has to border on the existing range. scout.Range[from=0 to=10], scout.Range[from=11 to=20]"));
+    });
+
+    it('returns a copy of the non empty range if one range is empty', function() {
+      var range1 = new scout.Range(0, 10);
+      var range2 = new scout.Range(0, 0);
+      expect(range1.add(range2)).toEqual(new scout.Range(0, 10));
+
+      range1 = new scout.Range(0, 0);
+      range2 = new scout.Range(0, 10);
+      expect(range1.add(range2)).toEqual(new scout.Range(0, 10));
+    });
+  });
+
   describe('union', function() {
     it('returns a new range with the sum of both ranges', function() {
       var range1 = new scout.Range(0, 10);
