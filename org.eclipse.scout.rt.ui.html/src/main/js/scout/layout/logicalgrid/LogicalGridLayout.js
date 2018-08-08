@@ -42,12 +42,17 @@ scout.LogicalGridLayout.prototype.validateLayout = function($container, options)
     // It is important that the logical grid and the layout use the same widgets. Otherwise there may be widgets without a gridData which is required by the layout.
     // This can happen if the widgets are inserted and removed by an animation before the layout has been done. If the widget is removed using an animation it is not in the list of getGridWidgets() anymore but may still be in the DOM.
     this.widget.logicalGrid.gridConfig.getGridWidgets().forEach(function(widget) {
+      if (!widget.rendered) {
+        // getGridWidgets may return non rendered widgets, but grid should be calculated nevertheless
+        // XXX cgu is grid calculation important? should we use tileGrid.renderedWidgets here instead of gridWidgets (performance)?
+        return;
+      }
       if (!widget.htmlComp) {
         $.log.isWarnEnabled() && $.log.warn('(LogicalGridLayout#validateLayout) no htmlComp found, widget cannot be layouted. Widget: ' + widget);
         return;
       }
-      validateGridData(widget.htmlComp);
-    });
+      validateGridData.call(this, widget.htmlComp);
+    }, this);
   } else {
     $container.children().each(function(idx, elem) {
       var $comp = $(elem);
@@ -56,21 +61,14 @@ scout.LogicalGridLayout.prototype.validateLayout = function($container, options)
         // Only consider elements with a html component
         return;
       }
-      validateGridData(htmlComp);
-    });
+      validateGridData.call(this, htmlComp);
+    }.bind(this));
   }
 
   function validateGridData(htmlComp) {
-    var $comp = htmlComp.$comp;
-    var widget = $comp.data('widget');
-    // Prefer the visibility state of the widget, if there is one.
-    // This allows for transitions, because the $component may still be in the process of being made invisible
-    var visible = widget ? widget.isVisible() : $comp.isVisible();
-    if (visible) {
-      visibleComps.push($comp);
-      cons = htmlComp.layoutData;
-      cons.validate();
-      visibleCons.push(cons);
+    if (this._validateGridData(htmlComp)) {
+      visibleComps.push(htmlComp.$comp);
+      visibleCons.push(htmlComp.layoutData);
     }
   }
 
@@ -85,6 +83,18 @@ scout.LogicalGridLayout.prototype.validateLayout = function($container, options)
     heightHint: options.heightHint
   });
   $.log.isTraceEnabled() && $.log.trace('(LogicalGridLayout#validateLayout) $container=' + scout.HtmlComponent.get($container).debug());
+};
+
+scout.LogicalGridLayout.prototype._validateGridData = function(htmlComp) {
+  var $comp = htmlComp.$comp;
+  var widget = $comp.data('widget');
+  // Prefer the visibility state of the widget, if there is one.
+  // This allows for transitions, because the $component may still be in the process of being made invisible
+  var visible = widget ? widget.isVisible() : $comp.isVisible();
+  if (visible) {
+    htmlComp.layoutData.validate();
+    return true;
+  }
 };
 
 scout.LogicalGridLayout.prototype.layout = function($container) {
@@ -103,7 +113,7 @@ scout.LogicalGridLayout.prototype._layout = function($container) {
     containerSize.width = this.minWidth;
   }
   $.log.isTraceEnabled() && $.log.trace('(LogicalGridLayout#layout) container ' + htmlContainer.debug() + ' size=' + containerSize + ' insets=' + containerInsets);
-  var cellBounds = this.info.layoutCellBounds(containerSize, containerInsets);
+  var cellBounds = this._layoutCellBounds(containerSize, containerInsets);
 
   // Set bounds of components
   var r1, r2, r, d, $comp, i, htmlComp, data, delta, margins;
@@ -161,6 +171,10 @@ scout.LogicalGridLayout.prototype._layout = function($container) {
     $.log.isTraceEnabled() && $.log.trace('(LogicalGridLayout#layout) comp=' + htmlComp.debug() + ' bounds=' + r);
     htmlComp.setBounds(r);
   }
+};
+
+scout.LogicalGridLayout.prototype._layoutCellBounds = function(containerSize, containerInsets) {
+  return this.info.layoutCellBounds(containerSize, containerInsets);
 };
 
 scout.LogicalGridLayout.prototype.preferredLayoutSize = function($container, options) {

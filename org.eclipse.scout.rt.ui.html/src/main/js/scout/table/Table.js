@@ -51,6 +51,7 @@ scout.Table = function() {
   this.visibleRowsMap = {}; // visible rows by id
   this.rowLevelPadding;
   this.rowsMap = {}; // rows by id
+  this.rowHeight = 0;
   this.rowWidth = 0;
   this.rowBorderWidth; // read-only, set by _calculateRowBorderWidth(), also used in TableLayout.js
   this.rowBorderLeftWidth = 0; // read-only, set by _calculateRowBorderWidth(), also used in TableHeader.js
@@ -72,6 +73,7 @@ scout.Table = function() {
   // If rows have a variable height, prefSize is only correct for 10 rows.
   // Layout will adjust this value depending on the view port size.
   this.viewRangeSize = 10;
+  this.viewRangeDirty = false;
   this.viewRangeRendered = new scout.Range(0, 0);
   this.virtual = true;
   this._doubleClickSupport = new scout.DoubleClickSupport();
@@ -1316,9 +1318,6 @@ scout.Table.prototype._updateRowHeights = function() {
   });
 };
 
-/**
- * @param new rows to append at the end of this.$data. If undefined this.rows is used.
- */
 scout.Table.prototype._renderRowsInRange = function(range) {
   var $rows,
     rowString = '',
@@ -1471,14 +1470,12 @@ scout.Table.prototype.moveRow = function(sourceIndex, targetIndex) {
 };
 
 scout.Table.prototype._removeRowsInRange = function(range) {
-  var fromRow, toRow, row, i,
+  var row, i,
     numRowsRemoved = 0,
     rows = this.visibleRows;
 
   var maxRange = new scout.Range(0, rows.length);
   range = maxRange.intersect(range);
-  fromRow = rows[range.from];
-  toRow = rows[range.to];
 
   var newRange = this.viewRangeRendered.subtract(range);
   if (newRange.length === 2) {

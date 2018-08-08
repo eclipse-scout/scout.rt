@@ -13,21 +13,29 @@ scout.TileGridLayout = function(tiles) {
   this.maxWidth = -1;
   this.containerPos = null;
   this.containerScrollTop = null;
+  this.tiles = [];
 };
 scout.inherits(scout.TileGridLayout, scout.LogicalGridLayout);
 
 scout.TileGridLayout.prototype.layout = function($container) {
-  var contentFits;
   var htmlComp = this.widget.htmlComp;
+  if (this.widget.scrolling) {
+    // Try to layout only as much as needed while scrolling
+    // XXX cgu _layout will call prefSize each time while scrolling... set htmlComp.valid so that prefSize can be read from cache.
+    // What could go wrong when doing this? It should be faster... What happens, if tile is added right before scrolling with useUiHeight = true? probably, pref size will be wrong
+//    htmlComp.valid = true;
+    this.widget._renderViewPort();
+    this._layout($container);
+    return;
+  }
+
   // Animate only once on startup (if enabled) but animate every time on resize
   var animated = htmlComp.layouted || (this.widget.startupAnimationEnabled && !this.widget.startupAnimationDone) || this.widget.renderAnimationEnabled;
+  this.tiles = this.widget.renderedTiles();
 
   // Store the current position of the tiles
   if (animated) {
-    this.widget.filteredTiles.forEach(function(tile, i) {
-      var bounds = scout.graphics.cssBounds(tile.$container);
-      tile.$container.data('oldBounds', bounds);
-    }, this);
+    this._storeBounds(this.tiles);
   }
 
   this._updateMaxWidth();
@@ -35,6 +43,7 @@ scout.TileGridLayout.prototype.layout = function($container) {
 
   this.widget.invalidateLayout();
   this.widget.invalidateLogicalGrid(false);
+  var contentFits = false;
   var containerWidth = $container.outerWidth();
   containerWidth = Math.max(containerWidth, this.minWidth);
   if (htmlComp.prefSize().width <= containerWidth) {
@@ -58,6 +67,19 @@ scout.TileGridLayout.prototype.layout = function($container) {
     this._layout($container);
   }
 
+  if (!htmlComp.layouted) {
+    this.widget._renderScrollTop();
+  }
+  if (this.widget.virtual && (!htmlComp.layouted || this._sizeChanged(htmlComp))) {
+    // When changing size of the container, more or less tiles might be shown and some tiles might even change rows due to a new gridColumnCount -> ensure correct tiles are rendered in the range
+    this.widget.setViewRangeSize(this.widget.calculateViewRangeSize(), false);
+    var newTiles = this.widget._renderTileDelta(this.tiles);
+    // Make sure newly rendered tiles are animated (if enabled) and layouted as well
+    this._storeBounds(newTiles);
+    scout.arrays.pushAll(this.tiles, newTiles);
+    this._layout($container);
+  }
+
   var promises = [];
   if (animated) {
     promises = this._animateTiles();
@@ -72,6 +94,37 @@ scout.TileGridLayout.prototype.layout = function($container) {
   }
 };
 
+scout.TileGridLayout.prototype._sizeChanged = function(htmlComp) {
+  return htmlComp.sizeCached && !htmlComp.sizeCached.equals(htmlComp.size());
+};
+
+scout.TileGridLayout.prototype._storeBounds = function(tiles) {
+  tiles.forEach(function(tile, i) {
+    var bounds = scout.graphics.cssBounds(tile.$container);
+    tile.$container.data('oldBounds', bounds);
+    tile.$container.data('was-layouted', tile.htmlComp.layouted);
+  }, this);
+};
+
+/**
+ * @override
+ */
+scout.TileGridLayout.prototype._validateGridData = function(htmlComp) {
+  htmlComp.$comp.removeClass('newly-rendered');
+  return scout.TileGridLayout.parent.prototype._validateGridData.call(this, htmlComp);
+};
+
+/**
+ * @override
+ */
+scout.TileGridLayout.prototype._layoutCellBounds = function(containerSize, containerInsets) {
+  // Since the tiles are positioned absolutely it is necessary to add the height of the filler to the top insets
+  if (this.widget.virtual) {
+    containerInsets.top += this.widget.$fillBefore.outerHeight(true);
+  }
+  return scout.TileGridLayout.parent.prototype._layoutCellBounds.call(this, containerSize, containerInsets);
+};
+
 scout.TileGridLayout.prototype._animateTiles = function() {
   var htmlComp = this.widget.htmlComp;
   var $container = htmlComp.$comp;
@@ -84,53 +137,77 @@ scout.TileGridLayout.prototype._animateTiles = function() {
 
   // Animate the position change of the tiles
   var promises = [];
-  this.widget.filteredTiles.forEach(function(tile, i) {
-
-    // Stop running animations before starting the new ones to make sure existing promises are not resolved too early
-    // It may also happen that while the animation of a tile is in progress, the layout is triggered again but the tile should not be animated anymore
-    // (e.g. if it is not in the viewport anymore). In that case the animation must be stopped otherwise it may be placed at a wrong position
-    tile.$container.stop();
-
-    if (tile.$container.hasClass('invisible')) {
-      // When tiles are inserted they are invisible because a dedicated insert animation will be started after the layouting,
-      // the animation here is to animate the position change -> don't animate inserted tiles here
-      tile.$container.removeData('oldBounds');
+  this.tiles.forEach(function(tile, i) {
+    if (!tile.rendered) {
+      // Only animate tiles which were there at the beginning of the layout
+      // RenderViewPort may remove or render some, the removed ones cannot be animated because $container is missing and don't need to anyway, the rendered ones cannot because fromBounds are missing
       return;
     }
 
-    var bounds = scout.graphics.cssBounds(tile.$container);
-    var fromBounds = tile.$container.data('oldBounds');
-    if (tile instanceof scout.PlaceholderTile && !fromBounds) {
-      // Placeholders may not have fromBounds because they are added while layouting
-      // Just let them appear at the correct position
-      fromBounds = bounds.clone();
+    var promise = this._animateTile(tile);
+    if (promise) {
+      scout.arrays.pushAll(promises, promise);
     }
-
-    if (!htmlComp.layouted && this.widget.startupAnimationDone && this.widget.renderAnimationEnabled) {
-      // This is a small, discreet render animation, just move the tiles a little
-      // It will happen if the startup animation is disabled or done and every time the tiles are rendered anew
-      fromBounds = new scout.Rectangle(bounds.x * 0.95, bounds.y * 0.95, bounds.width, bounds.height);
-    }
-
-    if (fromBounds.equals(bounds)) {
-      // Don't animate if bounds are equals (otherwise promises would always resolve after 300ms even though no animation was visible)
-      tile.$container.removeData('oldBounds');
-      return;
-    }
-
-    if (!this._inViewport(bounds) && !this._inViewport(fromBounds)) {
-      // If neither the new nor the old position is in the viewport don't animate the tile. This will affect the animation performance in a positive way if there are many tiles
-      tile.$container.removeData('oldBounds');
-      return;
-    }
-
-    // Start animation
-    scout.arrays.pushAll(promises, this._animateTileBounds(tile, fromBounds, bounds));
 
     tile.$container.removeData('oldBounds');
+    tile.$container.removeData('was-layouted');
   }, this);
 
   return promises;
+};
+
+scout.TileGridLayout.prototype._animateTile = function(tile) {
+  var htmlComp = this.widget.htmlComp;
+
+  // Stop running animations before starting the new ones to make sure existing promises are not resolved too early
+  // It may also happen that while the animation of a tile is in progress, the layout is triggered again but the tile should not be animated anymore
+  // (e.g. if it is not in the viewport anymore). In that case the animation must be stopped otherwise it may be placed at a wrong position
+  tile.$container.stop();
+
+  if (tile.$container.hasClass('animate-visible')) {
+    // Don't animate tiles which are fading in (due to filtering), they should appear at the correct position.
+    // Already visible tiles which were in the view port before will be moved from the old position. Tiles which were not in the view port before will fly in from the top left corner (same happens when sorting).
+    // Reason: When sorting, if some tiles are in the viewport and some not, it is confusing if some tiles just appear and others are moved, even though all actually change position.
+    return;
+  }
+
+  if (tile.$container.hasClass('invisible')) {
+    // When tiles are inserted they are invisible because a dedicated insert animation will be started after the layouting,
+    // the animation here is to animate the position change -> don't animate inserted tiles here
+    return;
+  }
+
+  var bounds = scout.graphics.cssBounds(tile.$container);
+  var fromBounds = tile.$container.data('oldBounds');
+  if (tile instanceof scout.PlaceholderTile && !fromBounds) {
+    // Placeholders may not have fromBounds because they are added while layouting
+    // Just let them appear at the correct position
+    fromBounds = bounds.clone();
+  }
+
+  if (!htmlComp.layouted && this.widget.startupAnimationDone && this.widget.renderAnimationEnabled) {
+    // This is a small, discreet render animation, just move the tiles a little
+    // It will happen if the startup animation is disabled or done and every time the tiles are rendered anew
+    fromBounds = new scout.Rectangle(bounds.x * 0.95, bounds.y * 0.95, bounds.width, bounds.height);
+  }
+
+  if (fromBounds.equals(bounds)) {
+    // Don't animate if bounds are equals (otherwise promises would always resolve after 300ms even though no animation was visible)
+    return;
+  }
+
+  if (!this._inViewport(bounds) && !this._inViewport(fromBounds)) {
+    // If neither the new nor the old position is in the viewport don't animate the tile. This will affect the animation performance in a positive way if there are many tiles
+    return;
+  }
+
+  if (!tile.$container.data('was-layouted') && !this._inViewport(bounds)) {
+    // If a newly inserted tile will be rendered outside the view port, don't animate it. If it is rendered inside the view port it is fine if it will be moved from the top left corner
+    return;
+  }
+
+  // Start animation
+  return this._animateTileBounds(tile, fromBounds, bounds);
 };
 
 scout.TileGridLayout.prototype._inViewport = function(bounds) {
@@ -227,7 +304,23 @@ scout.TileGridLayout.prototype.preferredLayoutSize = function($container, option
   if (options.widthHint) {
     return this.prefSizeForWidth(options.widthHint);
   }
-  return scout.TileGridLayout.parent.prototype.preferredLayoutSize.call(this, $container, options);
+  var prefSize = scout.TileGridLayout.parent.prototype.preferredLayoutSize.call(this, $container, options);
+
+  if (this.widget.virtual) {
+    // XXX CGU always render some tiles (initial viewRangeSize > 0) like table or always calculate? FillerHeight won't be correct if prefSizeForWidth is used, filler would need to be recalculated every time
+//    var fillerHeight = this.widget.$fillBefore.outerHeight(true) + this.widget.$fillAfter.outerHeight(true);
+//    prefSize.height += fillerHeight;
+
+    prefSize.height = this.widget.rowCount() * this.widget.layoutConfig.rowHeight + (this.widget.rowCount() - 1) * this.widget.layoutConfig.vgap;
+    // XXX CGU use case: outline overview reads pref size, but there are no tiles yet... what about other grid settings (width in px etc...) which logical grid layout would consider
+    // And what if a tile uses useUiWidth?
+    // The filler height is actually the same as this calculation
+    prefSize.width = this.widget.gridColumnCount * this.widget.layoutConfig.columnWidth + (this.widget.gridColumnCount - 1) * this.widget.layoutConfig.hgap;
+    var insets = scout.HtmlComponent.get($container).insets();
+    prefSize.width += insets.horizontal();
+    prefSize.height += insets.vertical();
+  }
+  return prefSize;
 };
 
 scout.TileGridLayout.prototype.prefSizeForWidth = function(width) {

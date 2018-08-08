@@ -10,9 +10,6 @@
 scout.PageTileButton = function() {
   scout.PageTileButton.parent.call(this);
   this.page = null;
-  var dim = scout.TileGridLayoutConfig.getTileDimensions();
-  this.gridDataHints.heightInPixel = dim.height;
-  this.gridDataHints.widthInPixel = dim.width;
 };
 scout.inherits(scout.PageTileButton, scout.TileButton);
 

@@ -64,6 +64,7 @@ scout.Widget = function() {
   // This expects a css animation which may be triggered by the class 'animate-remove'
   // If browser does not support css animation, remove will be executed immediately
   this.animateRemoval = false;
+  this.animateRemovalClass = 'animate-remove';
 
   this._widgetProperties = [];
   this._cloneProperties = ['visible', 'enabled', 'inheritAccessibility', 'cssClass'];
@@ -357,8 +358,8 @@ scout.Widget.prototype._isRemovalPending = function() {
     return true;
   }
   var parent = this.parent;
-  if (!parent || parent.removing) {
-    // If parent is being removed, no need to check the ancestors because removing is already in progress
+  if (!parent || parent.removing || parent.rendering) {
+    // If parent is being removed or rendered, no need to check the ancestors because removing / rendering is already in progress
     return false;
   }
   while (parent) {
@@ -417,7 +418,10 @@ scout.Widget.prototype._removeAnimated = function() {
     if (!this.rendered) {
       return;
     }
-    this.$container.addClass('animate-remove');
+    if (!this.animateRemovalClass) {
+      throw new Error('Missing animate removal class. Cannot remove animated.');
+    }
+    this.$container.addClass(this.animateRemovalClass);
     this.$container.oneAnimationEnd(function() {
       this._removeInternal();
     }.bind(this));
@@ -1767,8 +1771,9 @@ scout.Widget.prototype._renderScrollTop = function() {
     // Don't do anything for non scrollable elements. Also, reading $scrollable[0].scrollTop must not be done while rendering because it would provoke a reflow
     return;
   }
-  if (this.rendering || (this.htmlComp && !this.htmlComp.layouted)) {
+  if (this.rendering || (this.htmlComp && !this.htmlComp.layouted && !this.htmlComp.layouting)) {
     // If the widget is not layouted yet (which is always true while rendering), the scroll position cannot be updated -> do it after the layout
+    // If scroll top is set while layouting, layout obviously wants to set it -> do it
     this.session.layoutValidator.schedulePostValidateFunction(this._renderScrollTop.bind(this));
     return;
   }
@@ -1795,8 +1800,9 @@ scout.Widget.prototype._renderScrollLeft = function() {
     // Don't do anything for non scrollable elements. Also, reading $scrollable[0].scrollLeft must not be done while rendering because it would provoke a reflow
     return;
   }
-  if (this.rendering || (this.htmlComp && !this.htmlComp.layouted)) {
+  if (this.rendering || (this.htmlComp && !this.htmlComp.layouted && !this.htmlComp.layouting)) {
     // If the widget is not layouted yet (which is always true while rendering), the scroll position cannot be updated -> do it after the layout
+    // If scroll left is set while layouting, layout obviously wants to set it -> do it
     this.session.layoutValidator.schedulePostValidateFunction(this._renderScrollLeft.bind(this));
     return;
   }
