@@ -59,6 +59,9 @@ public class HttpProxy {
     // field is set by http client itself
     m_requestHeaderFilters.add(new HttpHeaderNameFilter("Content-Length"));
 
+    // field is set by http client itself
+    m_requestHeaderFilters.add(new HttpHeaderNameFilter("Host"));
+
     // remove null header from response headers
     m_responseHeaderFilters.add(new HttpHeaderNameFilter(null));
 
