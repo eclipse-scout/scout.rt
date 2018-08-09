@@ -250,7 +250,7 @@ scout.fonts = {
           var fv = style.getPropertyValue('font-variant');
           var ft = style.getPropertyValue('font-stretch');
           if (ff) {
-            ff = ff.replace(/^"|"$/g, ''); // Unquote strings, they will be quoted again automatically
+            ff = ff.replace(/^["']|["']$/g, ''); // Unquote strings, they will be quoted again automatically
             var s = [];
             if (fw && fw !== 'normal') {
               s.push('font-weight:' + fw);
