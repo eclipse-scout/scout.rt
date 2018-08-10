@@ -515,7 +515,9 @@ scout.Column.prototype.setCellText = function(row, text, cell) {
   cell.setText(text);
 
   // Don't update row while initializing (it is either added to the table later, or being added / updated right now)
-  if (row.initialized) {
+  // The check for "this.table" is necessary, because the column could already have been destroyed (method is called
+  // asynchronously by setCellTextDeferred).
+  if (row.initialized && this.table) {
     this.table.updateRow(row);
   }
 };

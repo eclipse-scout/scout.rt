@@ -52,6 +52,10 @@ scout.TableUpdateBuffer.prototype.buffer = function(rows) {
  * Calls {@link scout.Table.prototype.updateRows} with the buffered rows and renders the viewport if the rendering was blocked.
  */
 scout.TableUpdateBuffer.prototype.process = function() {
+  if (this.table.destroyed) {
+    return;
+  }
+
   var rows = scout.objects.values(this._rowMap);
   this.table.updateRows(rows);
   this._rowMap = {};
