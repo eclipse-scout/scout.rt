@@ -118,6 +118,10 @@ scout.ColumnUserFilter.prototype.createFilterRemovedEventData = function() {
 };
 
 scout.ColumnUserFilter.prototype.createLabel = function() {
+  if (this.column.headerHtmlEnabled) {
+    var plainText = scout.strings.plainText(this.column.text);
+    return plainText.replace(/\n/g, ' ');
+  }
   return this.column.text || '';
 };
 
