@@ -70,6 +70,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
+import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -1694,6 +1695,9 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
         if (StringUtility.isNullOrEmpty(columnTitle)) {
           columnTitle = headerCell.getTooltipText();
           row.setFont(FontSpec.parse("ITALIC"));
+        }
+        else if (headerCell.isHtmlEnabled()) {
+          columnTitle = BEANS.get(HtmlHelper.class).toPlainText(columnTitle);
         }
         columnsTable.getTitleColumn().setValue(row, columnTitle);
 
