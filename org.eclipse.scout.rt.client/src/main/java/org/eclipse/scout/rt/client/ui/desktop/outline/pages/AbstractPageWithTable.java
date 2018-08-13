@@ -452,7 +452,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     // listen for search action
     m_searchFormListener = e -> {
       switch (e.getType()) {
-        case FormEvent.TYPE_LOAD_COMPLETE: {
+        case FormEvent.TYPE_RESET_COMPLETE: {
           // do page reload to execute search
           try {
             if (isSearchRequired()) {

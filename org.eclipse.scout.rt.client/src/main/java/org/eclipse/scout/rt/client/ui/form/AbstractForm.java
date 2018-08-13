@@ -1914,6 +1914,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
           .withContextInfo("form", getClass().getName());
     }
+    fireFormResetComplete();
   }
 
   /**
@@ -2512,6 +2513,10 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
   private void fireFormStoreBefore() {
     fireFormEvent(new FormEvent(this, FormEvent.TYPE_STORE_BEFORE));
+  }
+
+  private void fireFormResetComplete() {
+    fireFormEvent(new FormEvent(this, FormEvent.TYPE_RESET_COMPLETE));
   }
 
   private void fireFormDiscarded() {

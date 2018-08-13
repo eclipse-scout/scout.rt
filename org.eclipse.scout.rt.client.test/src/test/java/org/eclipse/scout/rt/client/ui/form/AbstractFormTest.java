@@ -327,4 +327,21 @@ public class AbstractFormTest {
     assertTrue(resultBlocking[0]);
   }
 
+  @Test
+  public void testFormEventResetComplete() throws Exception {
+    final Boolean[] called = {false};
+    final AbstractForm form = new TestForm(false);
+    form.addFormListener(new FormListener() {
+      @Override
+      public void formChanged(FormEvent e) {
+        if (e.getType() == FormEvent.TYPE_RESET_COMPLETE) {
+          called[0] = true;
+        }
+      }
+    });
+    form.start();
+    assertFalse(called[0]);
+    form.doReset();
+    assertTrue(called[0]);
+  }
 }

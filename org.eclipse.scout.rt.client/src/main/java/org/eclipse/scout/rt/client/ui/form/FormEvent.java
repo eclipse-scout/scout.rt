@@ -33,6 +33,7 @@ public class FormEvent extends EventObject implements IModelEvent {
   public static final int TYPE_STORE_AFTER = 2020;
   public static final int TYPE_DISCARDED = 3000;
   public static final int TYPE_CLOSED = 3010;
+  public static final int TYPE_RESET_COMPLETE = 3020;
   /**
    * When the field structure changes Examples: a field changes its "visible" property a {@link IWrappedFormField}
    * changes its inner form a {@link IPageField} changes its table/search/detail a custom field changes in a way that
