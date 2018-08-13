@@ -24,9 +24,12 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.dnd.JavaTransferObject;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.shared.AllAccessControlService;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -49,7 +52,8 @@ public class OrganizeColumnsFormTest {
 
   @Before
   public void before() {
-    m_reg = TestingUtility.registerWithTestingOrder(AllAccessControlService.class);
+    BeanMetaData newBean = new BeanMetaData(AllAccessControlService.class).withOrder(BeanTestingHelper.TESTING_BEAN_ORDER);
+    m_reg = BEANS.getBeanManager().registerBean(newBean);
   }
 
   @After

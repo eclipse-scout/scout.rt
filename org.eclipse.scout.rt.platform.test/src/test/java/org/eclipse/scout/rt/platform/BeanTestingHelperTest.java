@@ -86,18 +86,4 @@ public class BeanTestingHelperTest {
       BeanTestingHelper.get().unregisterBean(bean3);
     }
   }
-
-  @Test
-  public void testRegisterWithTestingOrder() {
-    IBean<FixtureBean> bean1 = BeanTestingHelper.get().registerBean(new BeanMetaData(FixtureBean.class).withOrder(100));
-    IBean<FixtureBean> bean2 = BeanTestingHelper.get().registerWithTestingOrder(FixtureBean.class);
-    try {
-      assertEquals(FixtureBean.class, BEANS.get(FixtureBean.class).getClass());
-      assertEquals(BeanTestingHelper.TESTING_BEAN_ORDER, BEANS.getBeanManager().getBean(FixtureBean.class).getBeanAnnotation(Order.class).value(), 0);
-    }
-    finally {
-      BeanTestingHelper.get().unregisterBean(bean1);
-      BeanTestingHelper.get().unregisterBean(bean2);
-    }
-  }
 }

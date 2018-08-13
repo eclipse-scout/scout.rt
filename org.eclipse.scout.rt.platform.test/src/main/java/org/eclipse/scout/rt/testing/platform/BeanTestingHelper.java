@@ -90,24 +90,6 @@ public class BeanTestingHelper {
   }
 
   /**
-   * Register a new bean to replace an existing bean.
-   */
-  public <T> IBean<T> registerWithReplace(Class<T> beanClass) {
-    IBean<?> bean = BEANS.getBeanManager().getBean(beanClass);
-    BeanMetaData newBean = new BeanMetaData(bean).withReplace(true);
-    return BEANS.getBeanManager().registerBean(newBean);
-  }
-
-  /**
-   * Register an existing bean with order {@link TESTING_BEAN_ORDER}
-   */
-  public <T> IBean<T> registerWithTestingOrder(Class<T> beanClass) {
-    IBean<?> bean = BEANS.getBeanManager().getBean(beanClass);
-    BeanMetaData newBean = new BeanMetaData(bean).withOrder(TESTING_BEAN_ORDER);
-    return BEANS.getBeanManager().registerBean(newBean);
-  }
-
-  /**
    * Unregister a bean
    */
   public void unregisterBean(IBean<?> bean) {

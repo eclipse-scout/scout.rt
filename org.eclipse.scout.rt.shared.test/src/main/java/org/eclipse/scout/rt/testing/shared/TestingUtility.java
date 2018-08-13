@@ -29,7 +29,8 @@ import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// TODO sme [9.0] mark as bean related methods as deprecated (use BeanTestingHelper instead) and remove in 10.0 (clearHttpAuthenticationCache will be removed completely)
+// TODO sme [9.0] mark as bean related methods as deprecated (use BeanTestingHelper instead) and remove in 10.0.
+// Methods clearHttpAuthenticationCache, registerWithReplace, registerWithTestingOrder will be removed completely.
 public final class TestingUtility {
 
   private static final Logger LOG = LoggerFactory.getLogger(TestingUtility.class);
@@ -62,17 +63,21 @@ public final class TestingUtility {
   }
 
   /**
-   * @see BeanTestingHelper#registerWithReplace(Class)
+   * Register a new bean to replace an existing bean.
    */
   public static IBean<?> registerWithReplace(Class<?> beanClass) {
-    return BeanTestingHelper.get().registerWithReplace(beanClass);
+    IBean<?> bean = BEANS.getBeanManager().getBean(beanClass);
+    BeanMetaData newBean = new BeanMetaData(bean).withReplace(true);
+    return BEANS.getBeanManager().registerBean(newBean);
   }
 
   /**
-   * @see BeanTestingHelper#registerWithTestingOrder(Class)
+   * Register an existing bean with order {@link TESTING_BEAN_ORDER}
    */
   public static IBean<?> registerWithTestingOrder(Class<?> beanClass) {
-    return BeanTestingHelper.get().registerWithTestingOrder(beanClass);
+    IBean<?> bean = BEANS.getBeanManager().getBean(beanClass);
+    BeanMetaData newBean = new BeanMetaData(bean).withOrder(TESTING_BEAN_ORDER);
+    return BEANS.getBeanManager().registerBean(newBean);
   }
 
   /**
