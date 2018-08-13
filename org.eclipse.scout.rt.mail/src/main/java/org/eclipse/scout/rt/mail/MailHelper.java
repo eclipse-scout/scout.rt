@@ -50,7 +50,6 @@ import javax.mail.internet.MimeUtility;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -749,7 +748,7 @@ public class MailHelper {
       }
 
       if (StringUtility.hasText(defaultFromEmail)) {
-        message.setFrom(BEANS.get(MailHelper.class).createInternetAddress(defaultFromEmail));
+        message.setFrom(createInternetAddress(defaultFromEmail));
       }
     }
     catch (MessagingException e) {
@@ -794,21 +793,12 @@ public class MailHelper {
       return Collections.emptyList();
     }
 
-    String messageId = null;
-    try {
-      messageId = mimeMessage.getMessageID();
-    }
-    catch (MessagingException e) {
-      // Message Id only required for logging, thus ok if it couldn't be read.
-      LOG.warn("Could not retrieve message id", e);
-    }
-
     String[] replyToHeaders;
     try {
       replyToHeaders = mimeMessage.getHeader(HEADER_IN_REPLY_TO);
     }
     catch (MessagingException e1) {
-      LOG.warn("Could not parse headers for message with id: {}", messageId, e1);
+      LOG.warn("Could not parse headers for message with id: {}", getMessageIdSafely(mimeMessage), e1);
       return Collections.emptyList();
     }
 
@@ -820,7 +810,7 @@ public class MailHelper {
           if (content.getCount() >= 3) {
             // Try third part of the message, contains details of the DSN (https://tools.ietf.org/html/rfc3461#section-6.2).
             BodyPart part = content.getBodyPart(2);
-            try (InputStreamReader in = new InputStreamReader(part.getInputStream(), BEANS.get(MailHelper.class).getCharacterEncodingOfPart(part));
+            try (InputStreamReader in = new InputStreamReader(part.getInputStream(), getCharacterEncodingOfPart(part));
                 BufferedReader reader = new BufferedReader(in)) {
               String s = null;
               while ((s = reader.readLine()) != null) {
@@ -835,16 +825,37 @@ public class MailHelper {
         }
       }
       catch (IOException | MessagingException e) {
-        LOG.warn("Unable to get third part of dsn-message for message with id: {}", messageId, e);
+        LOG.warn("Unable to get third part of dsn-message for message with id: {}", getMessageIdSafely(mimeMessage), e);
         return Collections.emptyList();
       }
     }
 
     if (replyToHeaders == null || replyToHeaders.length == 0) {
-      LOG.debug("Message IDs coulnd't be extracted because it does not have an 'In-Reply-To' header or other DSN information to with original Message-ID. Id: {}", messageId);
+      LOG.debug("Message IDs coulnd't be extracted because it does not have an 'In-Reply-To' header or other DSN information to with original Message-ID. Id: {}", getMessageIdSafely(mimeMessage));
       return Collections.emptyList();
     }
 
     return Arrays.asList(replyToHeaders);
+  }
+
+  /**
+   * Retrieves the value of the 'Message-Id' header field of the message, without throwing an exception.
+   *
+   * @param Mime
+   *          message
+   * @return Message-Id or <code>null</code>
+   */
+  protected String getMessageIdSafely(MimeMessage mimeMessage) {
+    if (mimeMessage == null) {
+      return null;
+    }
+
+    try {
+      return mimeMessage.getMessageID();
+    }
+    catch (MessagingException e) {
+      LOG.warn("Could not retrieve message id", e);
+      return null;
+    }
   }
 }
