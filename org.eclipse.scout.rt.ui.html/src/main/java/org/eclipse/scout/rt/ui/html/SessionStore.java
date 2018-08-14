@@ -297,7 +297,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
   }
 
   /**
-   * Checks if the client session is still used by a UI session. If not, it is stopped and removed form the store.
+   * Checks if the client session is still used by a UI session. If not, it is stopped and removed from the store.
    */
   protected void doHousekeeping(final IClientSession clientSession) {
     m_writeLock.lock();
