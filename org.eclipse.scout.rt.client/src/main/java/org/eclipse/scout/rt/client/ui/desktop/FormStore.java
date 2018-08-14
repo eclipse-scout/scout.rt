@@ -110,7 +110,11 @@ public class FormStore extends IndexedStore<IForm> {
    * Returns <code>true</code> if this store contains 'application-modal' dialogs, or <code>false</code> if not.
    */
   public boolean containsApplicationModalDialogs() {
-    return !m_applicationModalDialogIndex.get(Boolean.TRUE).isEmpty();
+    return !getApplicationModalDialogs().isEmpty();
+  }
+
+  public List<IForm> getApplicationModalDialogs() {
+    return m_applicationModalDialogIndex.get(Boolean.TRUE);
   }
 
   // ====  Index definitions ==== //

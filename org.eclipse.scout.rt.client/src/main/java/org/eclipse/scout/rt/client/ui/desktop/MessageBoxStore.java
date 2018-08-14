@@ -42,7 +42,11 @@ public class MessageBoxStore extends IndexedStore<IMessageBox> {
    * Returns <code>true</code> if this store contains 'application-modal' message boxes, or <code>false</code> if not.
    */
   public boolean containsApplicationModalMessageBoxes() {
-    return !m_applicationModalIndex.get(Boolean.TRUE).isEmpty();
+    return !getApplicationModalMessageBoxes().isEmpty();
+  }
+
+  public List<IMessageBox> getApplicationModalMessageBoxes() {
+    return m_applicationModalIndex.get(Boolean.TRUE);
   }
 
   // ====  Index definitions ==== //

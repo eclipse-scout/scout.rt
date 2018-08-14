@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -1164,12 +1165,34 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     // Ensure not to show a modal Form if the application is in 'application-modal' state. Otherwise, no user interaction would be possible.
     if (view && form.isModal()) {
       boolean applicationLocked = m_formStore.containsApplicationModalDialogs() || m_messageBoxStore.containsApplicationModalMessageBoxes() || m_fileChooserStore.containsApplicationModalFileChoosers();
-      Assertions.assertFalse(applicationLocked, "Modal view cannot be showed because application is in 'desktop-modal' state; otherwise, no user interaction would be possible.");
+      if (applicationLocked) {
+        Assertions.fail(generateApplicationModalErrorMessage());
+      }
     }
 
     m_formStore.add(form);
     activateForm(form);
     fireFormShow(form);
+  }
+
+  protected String generateApplicationModalErrorMessage() {
+    String message = "Modal view cannot be shown because application is in 'desktop-modal' state; otherwise, no user interaction would be possible.";
+    String applicationModalForms = m_formStore.getApplicationModalDialogs()
+        .stream()
+        .map(f -> f.getClass().getSimpleName() + "; " + f.getTitle())
+        .collect(Collectors.joining(", "));
+
+    String applicationModalMessageBoxes = m_messageBoxStore.getApplicationModalMessageBoxes()
+        .stream()
+        .map(f -> f.getClass().getSimpleName() + "; " + f.getHeader())
+        .collect(Collectors.joining(", "));
+
+    String applicationModalFileChoosers = m_fileChooserStore.getApplicationModalFileChoosers()
+        .stream()
+        .map(f -> f.getClass().getSimpleName())
+        .collect(Collectors.joining(", "));
+
+    return message + "\n" + "Forms: [" + applicationModalForms + "]; MessageBoxes: [" + applicationModalMessageBoxes + "]; FileChoosers: [" + applicationModalFileChoosers + "]";
   }
 
   @Override
