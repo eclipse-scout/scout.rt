@@ -398,6 +398,9 @@ scout.Table.prototype._onImageLoadOrError = function(event) {
 
   var $row = $target.closest('.table-row');
   var row = $row.data('row');
+  if (!row) {
+    return; // row was removed while loading the image
+  }
   var oldRowHeight = row.height;
   row.height = $row.outerHeight(true);
   if (oldRowHeight !== row.height) {
