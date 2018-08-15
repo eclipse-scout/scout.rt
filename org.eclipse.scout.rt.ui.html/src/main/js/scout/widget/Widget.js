@@ -71,6 +71,7 @@ scout.Widget = function() {
   this._preserveOnPropertyChangeProperties = [];
   this._postRenderActions = [];
   this._parentDestroyHandler = this._onParentDestroy.bind(this);
+  this._parentRemovingWhileAnimatingHandler = this._onParentRemovingWhileAnimating.bind(this);
   this._scrollHandler = this._onScroll.bind(this);
   this.events = this._createEventSupport();
   this.loadingSupport = this._createLoadingSupport();
@@ -424,9 +425,11 @@ scout.Widget.prototype._removeAnimated = function() {
 
   // If the parent is being removed while the animation is running, the animationEnd event will never fire
   // -> Make sure remove is called nevertheless. Important: remove it before the parent is removed to maintain the regular remove order
-  this.parent.one('removing', function() {
-    this._removeInternal();
-  }.bind(this));
+  this.parent.one('removing', this._parentRemovingWhileAnimatingHandler);
+};
+
+scout.Widget.prototype._onParentRemovingWhileAnimating = function() {
+  this._removeInternal();
 };
 
 scout.Widget.prototype._renderInspectorInfo = function() {
@@ -451,6 +454,7 @@ scout.Widget.prototype._linkWithDOM = function() {
  * Also uninstalls key stroke context, loading support and scrollbars.
  */
 scout.Widget.prototype._cleanup = function() {
+  this.parent.off('removing', this._parentRemovingWhileAnimatingHandler);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.keyStrokeContext);
   if (this.loadingSupport) {
     this.loadingSupport.remove();
@@ -501,6 +505,7 @@ scout.Widget.prototype.setParent = function(parent) {
     }
 
     this.parent.off('destroy', this._parentDestroyHandler);
+    this.parent.off('removing', this._parentRemovingWhileAnimatingHandler);
 
     if (this.parent !== this.owner) {
       // Remove from old parent if getting relinked
