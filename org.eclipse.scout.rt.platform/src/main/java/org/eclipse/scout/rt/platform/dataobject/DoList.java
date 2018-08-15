@@ -232,6 +232,6 @@ public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Ite
 
   @Override
   public String toString() {
-    return "DoList [m_list=" + get() + "]";
+    return "DoList [m_list=" + get() + " exists=" + exists() + "]";
   }
 }

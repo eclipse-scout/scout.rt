@@ -25,6 +25,6 @@ public final class DoValue<V> extends DoNode<V> {
 
   @Override
   public String toString() {
-    return "DoValue [m_value=" + get() + "]";
+    return "DoValue [m_value=" + get() + " exists=" + exists() + "]";
   }
 }
