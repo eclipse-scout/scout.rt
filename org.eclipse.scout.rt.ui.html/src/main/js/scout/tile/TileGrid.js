@@ -273,6 +273,9 @@ scout.TileGrid.prototype._insertTiles = function(tiles) {
 scout.TileGrid.prototype._insertTile = function(tile) {
   this._initTile(tile);
   this._applyFilters([tile]);
+  if (!this.virtual && this.rendered) {
+    this._renderTile(tile);
+  }
 };
 
 scout.TileGrid.prototype._renderTile = function(tile) {
@@ -316,12 +319,16 @@ scout.TileGrid.prototype._renderInsertTiles = function(tiles) {
 };
 
 scout.TileGrid.prototype._removeAllTiles = function() {
-  for (var row = this.viewRangeRendered.from; row < this.viewRangeRendered.to; row++) {
-    this.eachTileInRow(row, function(tile) {
-      tile.remove();
-    });
-  }
+  this.tiles.forEach(function(tile) {
+    tile.remove();
+  });
   this.viewRangeRendered = new scout.Range(0, 0);
+};
+
+scout.TileGrid.prototype._renderAllTiles = function() {
+  this.tiles.forEach(function(tile) {
+    this._renderTile(tile);
+  }, this);
 };
 
 scout.TileGrid.prototype._deleteTiles = function(tiles) {
@@ -1137,6 +1144,20 @@ scout.TileGrid.prototype._renderVirtual = function() {
     // No need to do it while rendering, will be done by the layout. But needs to be done if virtual changes on the fly
     this.setViewRangeSize(this.calculateViewRangeSize(), false);
   }
+
+  if (this.rendered) {
+    // When virtual toggles, remove all tiles and render them anew (to have the correct tiles rendered in the new mode)
+    this._removeAllTiles();
+    if (this.virtual) {
+      // RenderViewPort may do nothing if all tiles are already in the view port, but fillers may not be created yet
+      this._renderFiller();
+    }
+  }
+  if (!this.virtual) {
+    // Render all tiles (on toggle and initially) (_renderViewRange is not used in non virtual mode because filtered tiles need to be rendered as well)
+    this._renderAllTiles();
+  }
+
   this._renderViewPort();
   this.invalidateLayoutTree();
 };
@@ -1190,7 +1211,6 @@ scout.TileGrid.prototype._heightForRow = function(row) {
 };
 
 scout.TileGrid.prototype.rowCount = function() {
-  // XXX CGU this.gridColumnCount is not correct the first time when view range is calculated because layout did not run yet
   return Math.ceil(this.filteredTiles.length / this.gridColumnCount);
 };
 
@@ -1201,6 +1221,9 @@ scout.TileGrid.prototype._renderViewPort = function() {
   if (!this.isAttachedAndRendered()) {
     // if grid is not attached the correct viewPort can not be evaluated. Mark for render after attach.
     this._renderViewPortAfterAttach = true;
+    return;
+  }
+  if (!this.virtual) {
     return;
   }
   this.virtualScrolling._renderViewPort();
@@ -1277,6 +1300,9 @@ scout.TileGrid.prototype._renderTilesInRange = function(range) {
  * @returns the newly rendered tiles
  */
 scout.TileGrid.prototype._renderTileDelta = function(prevTiles, filterResult) {
+  if (!this.virtual) {
+    return;
+  }
   var newViewRange = this.virtualScrolling.calculateCurrentViewRange();
   var newTiles = this.findTilesInRange(newViewRange);
 
@@ -1356,14 +1382,19 @@ scout.TileGrid.prototype._renderTileOrder = function(prevTiles) {
   this.tiles.forEach(function(tile, i) {
     if (prevTiles[i] !== tile || different) {
       // Start ordering as soon as the order of the arrays starts to differ
-      if (!tile.rendered) {
-        // Filtered tiles are not rendered
+      if (this.virtual && !tile.rendered) {
+        // In non virtual mode, every tile is rendered, even the filtered one. So if a tile is not rendered ignore it in virtual, but fail in non virtual
         return;
       }
       different = true;
       tile.$container.appendTo(this.$container);
     }
   }, this);
+
+  if (different && !this.virtual) {
+    // In virtual mode this is done by _renderTileDelta()
+    this.invalidateLayoutTree();
+  }
 };
 
 scout.TileGrid.prototype._rowsRenderedInfo = function() {
