@@ -150,6 +150,36 @@ describe("VirtualTileGrid", function() {
       expect($tiles.eq(2).data('widget')).toBe(tileGrid.tiles[2]);
       expect($tiles.eq(3).data('widget')).toBe(tileGrid.tiles[3]);
     });
+
+    it('removes tiles correctly when enabled even if a filter is active', function() {
+      var tileGrid = createTileGrid(4, {
+        viewRangeSize: 1,
+        virtual: false
+      });
+      var filter = {
+        accept: function(tile) {
+          // Accept 0 and 1
+          return tile.label.indexOf('0') >= 0 || tile.label.indexOf('1') >= 0;
+        }
+      };
+      tileGrid.addFilter(filter);
+      tileGrid.filter();
+      tileGrid.render();
+      var $tiles = tileGrid.$container.children('.tile');
+      expect(tileGrid.filteredTiles.length).toBe(2);
+      expect($tiles.length).toBe(4); // All tiles rendered
+
+      tileGrid.virtualScrolling.calculateViewRangeSize = function() {
+        // Is called when toggling virtual, cannot determined correctly in the specs -> always return 2
+        return 2;
+      };
+      tileGrid.setVirtual(true);
+      $tiles = tileGrid.$container.children('.tile');
+      expect(tileGrid.viewRangeRendered.equals(new scout.Range(0, 1))).toBe(true);
+      expect($tiles.length).toBe(2); // Only first row has to be rendered
+      expect($tiles.eq(0).data('widget')).toBe(tileGrid.filteredTiles[0]);
+      expect($tiles.eq(1).data('widget')).toBe(tileGrid.filteredTiles[1]);
+    });
   });
 
   describe('selectTiles', function() {
