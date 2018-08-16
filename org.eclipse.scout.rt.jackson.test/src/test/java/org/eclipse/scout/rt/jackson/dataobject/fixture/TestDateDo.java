@@ -67,6 +67,11 @@ public class TestDateDo extends DoEntity {
     return doValue("customDateFormatCustomAttributeName");
   }
 
+  @ValueFormat(pattern = "yyyyMMddHHmm")
+  public DoList<Date> customDateDoList() {
+    return doList("customDateDoList");
+  }
+
   /* **************************************************************************
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
@@ -174,5 +179,22 @@ public class TestDateDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public Date getCustomDateFormat() {
     return customDateFormat().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestDateDo withCustomDateDoList(Collection<Date> customDateDoList) {
+    customDateDoList().clear();
+    customDateDoList().get().addAll(customDateDoList);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestDateDo withCustomDateDoList(Date... customDateDoList) {
+    return withCustomDateDoList(Arrays.asList(customDateDoList));
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public List<Date> getCustomDateDoList() {
+    return customDateDoList().get();
   }
 }

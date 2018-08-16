@@ -35,6 +35,7 @@ public class DoListDeserializer extends StdDeserializer<DoList<?>> {
   @Override
   public DoList<?> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
     DoList<Object> list = new DoList<>();
+    p.setCurrentValue(list);
     for (JsonToken t = p.nextToken(); t != JsonToken.END_ARRAY; t = p.nextToken()) {
       ResolvedType elementType = resolveListElementType(p);
       Object element = p.getCodec().readValue(p, elementType);

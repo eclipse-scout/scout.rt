@@ -113,6 +113,7 @@ public class JsonDataObjectsSerializationTest {
 
   protected static final Date DATE_TRUNCATED = DateUtility.parse("1990-10-20 00:00:00.000", IValueFormatConstants.DEFAULT_DATE_PATTERN);
   protected static final Date DATE = DateUtility.parse("2017-11-30 17:29:12.583", IValueFormatConstants.DEFAULT_DATE_PATTERN);
+  protected static final Date DATE_2 = DateUtility.parse("2017-12-30 16:13:44.879", IValueFormatConstants.DEFAULT_DATE_PATTERN);
 
   protected static final UUID UUID_1 = UUID.fromString("ab8b13a4-b2a0-47a0-9d79-80039417b843");
   protected static final UUID UUID_2 = UUID.fromString("87069a20-6fc5-4b6a-9bc2-2e6cb75d7571");
@@ -253,7 +254,8 @@ public class JsonDataObjectsSerializationTest {
         .withDateWithTimestamp(DATE)
         .withDateWithTimestampWithTimezone(dateWithTimezone)
         .withDateYearMonth(DATE_TRUNCATED)
-        .withCustomDateFormat(DATE);
+        .withCustomDateFormat(DATE)
+        .withCustomDateDoList(DATE, DATE_2);
 
     String json = s_dataObjectMapper.writeValueAsString(testDo);
     String expectedJson = readResourceAsString("TestDateDo.json");
