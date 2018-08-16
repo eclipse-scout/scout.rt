@@ -25,8 +25,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -143,6 +145,9 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
               if (StringUtility.isNullOrEmpty(columnTitle)) {
                 columnTitle = headerCell.getTooltipText();
                 row.setFont(FontSpec.parse("ITALIC"));
+              }
+              else if (headerCell.isHtmlEnabled()) {
+                columnTitle = BEANS.get(HtmlHelper.class).toPlainText(columnTitle);
               }
               getTable().getTitleColumn().setValue(row, columnTitle);
 
