@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
+import java.util.function.Function;
 
 import javax.activation.DataSource;
 import javax.mail.Address;
@@ -50,6 +52,7 @@ import javax.mail.util.ByteArrayDataSource;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -638,6 +641,134 @@ public class MailHelperTest {
     List<String> replyMessageIds = BEANS.get(MailHelper.class).extractInReplyMessageIds(replyMessage);
     assertEquals(1, replyMessageIds.size());
     assertEquals(messageId, replyMessageIds.get(0));
+  }
+
+  @Test
+  public void testGetPartCharset() throws MessagingException {
+    MailHelper mailHelper = BEANS.get(MailHelper.class);
+
+    assertNull(mailHelper.getPartCharset(null)); // no part
+
+    MimeBodyPart part = new MimeBodyPart();
+    assertNull(mailHelper.getPartCharset(part)); // no content type header
+
+    part.setHeader(MailHelper.CONTENT_TYPE_ID, "text/plain"); // no charset parameter
+    assertNull(mailHelper.getPartCharset(part));
+
+    part.setHeader(MailHelper.CONTENT_TYPE_ID, "text/plain; charset=us-ascii");
+    assertEquals(StandardCharsets.US_ASCII, mailHelper.getPartCharset(part));
+
+    part.setHeader(MailHelper.CONTENT_TYPE_ID, "text/plain; charset=us-ascii; lorem=ipsum");
+    assertEquals(StandardCharsets.US_ASCII, mailHelper.getPartCharset(part));
+
+    part.setHeader(MailHelper.CONTENT_TYPE_ID, "text/plain; lorem=ipsum; charset=us-ascii");
+    assertEquals(StandardCharsets.US_ASCII, mailHelper.getPartCharset(part));
+
+    part.setHeader(MailHelper.CONTENT_TYPE_ID, "text/plain; charset=\"us-ascii\"");
+    assertEquals(StandardCharsets.US_ASCII, mailHelper.getPartCharset(part));
+
+    part.setHeader(MailHelper.CONTENT_TYPE_ID, "text/plain; charset=\"us-ascii\"; lorem=ipsum");
+    assertEquals(StandardCharsets.US_ASCII, mailHelper.getPartCharset(part));
+
+    part.setHeader(MailHelper.CONTENT_TYPE_ID, "text/plain; lorem=\"ipsum\"; charset=\"us-ascii\";");
+    assertEquals(StandardCharsets.US_ASCII, mailHelper.getPartCharset(part));
+
+    part.setHeader(MailHelper.CONTENT_TYPE_ID, "text/plain; lorem=\"ipsum\"; charset=\"UTF-8\";");
+    assertEquals(StandardCharsets.UTF_8, mailHelper.getPartCharset(part));
+
+    part.setHeader(MailHelper.CONTENT_TYPE_ID, "text/plain; charset=\"us-ascii"); // not valid according to RFC
+    assertNull(mailHelper.getPartCharset(part));
+
+    part.setHeader(MailHelper.CONTENT_TYPE_ID, "text/plain; charset=us-ascii\""); // not valid according to RFC
+    assertNull(mailHelper.getPartCharset(part));
+
+    part.setHeader(MailHelper.CONTENT_TYPE_ID, "text/plain; charset=my-own-charset\""); // not a valid charset
+    assertNull(mailHelper.getPartCharset(part));
+  }
+
+  @Test
+  public void testGetPlainText() throws MessagingException {
+    MailHelper mailHelper = BEANS.get(MailHelper.class);
+
+    MimeMessage mimeMessage = mailHelper.createMimeMessage(BEANS.get(MailMessage.class).withBodyPlainText("plain text body\näpfel\nŻółw").withBodyHtml("<html><body>html body<br>äpfel<br>Żółw<body></html>"));
+    assertEquals("plain text body\näpfel\nŻółw", mailHelper.getPlainText(mimeMessage));
+  }
+
+  @Test
+  public void testGetHtmlBody() throws MessagingException {
+    MailHelper mailHelper = BEANS.get(MailHelper.class);
+
+    MimeMessage mimeMessage = mailHelper.createMimeMessage(BEANS.get(MailMessage.class).withBodyPlainText("plain text body\näpfel\nŻółw").withBodyHtml("<html><body>html body<br>äpfel<br>Żółw<body></html>"));
+    assertEquals("<html><body>html body<br>äpfel<br>Żółw<body></html>", mailHelper.getHtmlBody(mimeMessage));
+  }
+
+  @Test
+  public void testReadContentAsString() throws MessagingException {
+    MailHelper mailHelper = BEANS.get(MailHelper.class);
+
+    MimeMessage mimeMessage = mailHelper.createMimeMessage(BEANS.get(MailMessage.class).withBodyPlainText("plain text body\näpfel\nŻółw").withBodyHtml("<html><body>html body<br>äpfel<br>Żółw<body></html>"));
+    List<Part> bodyParts = mailHelper.getBodyParts(mimeMessage);
+    assertEquals("plain text body\näpfel\nŻółw", mailHelper.readContentAsString(mailHelper.getPlainTextPart(bodyParts)));
+    assertEquals("<html><body>html body<br>äpfel<br>Żółw<body></html>", mailHelper.readContentAsString(mailHelper.getHtmlPart(bodyParts)));
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testGetAttachmentFilenameNoPart() throws MessagingException, UnsupportedEncodingException {
+    BEANS.get(MailHelper.class).getAttachmentFilename(null, s -> s);
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testGetAttachmentFilenameNoDefaultFilenameFunction() throws MessagingException, UnsupportedEncodingException {
+    MimeBodyPart part = new MimeBodyPart();
+    BEANS.get(MailHelper.class).getAttachmentFilename(part, null);
+  }
+
+  @Test
+  public void testGetAttachmentFilename() throws MessagingException, UnsupportedEncodingException {
+    MailHelper mailHelper = BEANS.get(MailHelper.class);
+
+    String defaultFilenameWithoutFileExtension = UUID.randomUUID().toString();
+    Function<String, String> defaultFilenameFunction = (fileExtension) -> StringUtility.join(".", defaultFilenameWithoutFileExtension, fileExtension);
+
+    MimeBodyPart part = new MimeBodyPart();
+    assertEquals(defaultFilenameWithoutFileExtension + ".txt", mailHelper.getAttachmentFilename(part, defaultFilenameFunction)); // no filename or content type header, but MimeBodyPart#getContentType returns text/plain as fallback
+
+    part.setFileName(MimeUtility.encodeText("=?UTF-8?Q?=c3=84pfel.png?="));
+    assertEquals("Äpfel.png", mailHelper.getAttachmentFilename(part, defaultFilenameFunction));
+
+    part = new MimeBodyPart();
+    part.setHeader(MailHelper.CONTENT_TYPE_ID, "image/jpeg");
+    assertEquals(defaultFilenameWithoutFileExtension + ".jpg", mailHelper.getAttachmentFilename(part, defaultFilenameFunction));
+  }
+
+  @Test
+  public void testDecodeAttachmentFilename() throws MessagingException {
+    MailHelper mailHelper = BEANS.get(MailHelper.class);
+
+    assertNull(mailHelper.decodeAttachmentFilename(null));
+    assertEquals("", mailHelper.decodeAttachmentFilename(""));
+    assertEquals("turtle.png", mailHelper.decodeAttachmentFilename("turtle.png"));
+    assertEquals("Äpfel.png", mailHelper.decodeAttachmentFilename("=?UTF-8?Q?=c3=84pfel.png?="));
+    assertEquals("Äpfel.png", mailHelper.decodeAttachmentFilename("=?iso-8859-2?Q?=C4pfel.png?="));
+    assertEquals("żółw.png", mailHelper.decodeAttachmentFilename("=?UTF-8?B?xbzDs8WCdy5wbmc=?="));
+    assertEquals("żółw.png", mailHelper.decodeAttachmentFilename("=?iso-8859-2?B?v/Ozdy5wbmc=?="));
+    assertEquals("Żółw.png", mailHelper.decodeAttachmentFilename("=?utf-8?Q?Z=CC=87o=CC=81=C5=82w=2Epng?="));
+  }
+
+  @Test
+  public void testGuessAttachmentFileExtension() throws MessagingException {
+    MailHelper mailHelper = BEANS.get(MailHelper.class);
+
+    assertNull(mailHelper.guessAttachmentFileExtension(null));
+    assertNull(mailHelper.guessAttachmentFileExtension(""));
+    assertEquals("eml", mailHelper.guessAttachmentFileExtension(MailHelper.CONTENT_TYPE_MESSAGE_RFC822));
+    assertEquals("jpg", mailHelper.guessAttachmentFileExtension("image/jpeg"));
+    assertEquals("txt", mailHelper.guessAttachmentFileExtension("text/plain"));
+    assertEquals("html", mailHelper.guessAttachmentFileExtension("text/html"));
+    assertEquals("html", mailHelper.guessAttachmentFileExtension("text/html; charset=\"UTF-8\""));
+    assertEquals("docx", mailHelper.guessAttachmentFileExtension("application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
+    assertEquals("pdf", mailHelper.guessAttachmentFileExtension("application/pdf"));
+    assertEquals(null, mailHelper.guessAttachmentFileExtension("lorem/ipsum")); // unknown
   }
 
   protected void verifyAddPrefixToSubject(String messageSubject, String subjectPrefix, String expectedSubject) throws MessagingException {

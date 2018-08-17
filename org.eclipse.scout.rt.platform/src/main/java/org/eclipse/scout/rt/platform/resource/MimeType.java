@@ -15,6 +15,8 @@ import java.util.Collection;
 
 /**
  * Enumeration for a few well-known extensions and their mime types.
+ * <p>
+ * For file extension lookup based on mime type, the order of the mime types is relevant (first match returns).
  */
 public enum MimeType {
   AA("audio/audible", "aa"),

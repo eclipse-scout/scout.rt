@@ -22,12 +22,12 @@ import java.net.IDN;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.function.Function;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -41,20 +41,24 @@ import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.internet.AddressException;
+import javax.mail.internet.ContentType;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import javax.mail.internet.MimePart;
 import javax.mail.internet.MimeUtility;
+import javax.mail.internet.ParseException;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.MimeType;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,8 +92,6 @@ public class MailHelper {
   public static final String CONTENT_TYPE_MESSAGE_RFC822 = "message/rfc822";
   public static final String CONTENT_TYPE_IMAGE_PREFIX = "image/";
   public static final String CONTENT_TYPE_MULTIPART_PREFIX = "multipart/";
-
-  private static final Pattern PATTERN_MIME_CONTENT_TYPE_CHARSET = Pattern.compile(".*charset=(\")([^\1\\s;]+)\\1", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
   public static final String HEADER_IN_REPLY_TO = "In-Reply-To";
 
@@ -224,17 +226,11 @@ public class MailHelper {
    * </p>
    */
   protected void checkValidCharset(Part part) throws MessagingException {
-    String contentType = part.getContentType();
-    if (contentType == null) {
+    String charset = getPartCharsetInternal(part);
+    if (charset == null) {
       return;
     }
 
-    Matcher matcher = PATTERN_MIME_CONTENT_TYPE_CHARSET.matcher(contentType);
-    if (!matcher.find()) {
-      return;
-    }
-
-    String charset = matcher.group(2);
     try {
       Charset.forName(charset);
       return;
@@ -249,6 +245,7 @@ public class MailHelper {
     }
     catch (NullPointerException e) { // NOSONAR
       LOG.info("Mail part seems to use an unsupported character set {}, use UTF-8 as fallback.", charset, e);
+      String contentType = part.getContentType(); // cannot be null because otherwise charset would have been null already
       part.setHeader(CONTENT_TYPE_ID, contentType.replace(charset, StandardCharsets.UTF_8.name()));
     }
     catch (IOException e) {
@@ -258,36 +255,46 @@ public class MailHelper {
   }
 
   /**
-   * @param part
-   * @return the plainText part encoded with the encoding given in the MIME header or UTF-8 encoded or null if the
-   *         plainText Part is not given
+   * @param message
+   *          Message to look for html body part and read content from.
+   * @return Content from html body part encoded with the encoding given in the MIME header or UTF-8 encoded or null if
+   *         the html part is not given.
    */
-  public String getPlainText(Part part) {
-    String text = null;
-    try {
-      List<Part> bodyParts = getBodyParts(part);
-      Part plainTextPart = getPlainTextPart(bodyParts);
+  public String getHtmlBody(Part message) {
+    List<Part> bodyParts = getBodyParts(message);
+    Part htmlPart = getHtmlPart(bodyParts);
+    return readContentAsString(htmlPart);
+  }
 
-      if (plainTextPart instanceof MimePart) {
-        MimePart mimePart = (MimePart) plainTextPart;
-        try (InputStream in = mimePart.getInputStream()) {
-          if (in != null) {
-            byte[] content = IOUtility.readBytes(in);
-            try { // NOSONAR
-              text = new String(content, getCharacterEncodingOfPart(mimePart));
-            }
-            catch (UnsupportedEncodingException e) {
-              LOG.warn("unsupported encoding", e);
-              text = new String(content);
-            }
-          }
-        }
+  /**
+   * @param message
+   *          Message to look for plain text body part and read content from.
+   * @return Content from plain text part encoded with the encoding given in the MIME header or UTF-8 encoded or null if
+   *         the plainText Part is not given
+   */
+  public String getPlainText(Part message) {
+    List<Part> bodyParts = getBodyParts(message);
+    Part plainTextPart = getPlainTextPart(bodyParts);
+    return readContentAsString(plainTextPart);
+  }
+
+  /**
+   * Reads the content of the part as string, with the encoding given in the MIME header or UTF-8 encoded.
+   */
+  public String readContentAsString(Part part) {
+    if (part == null) {
+      return null;
+    }
+
+    try {
+      Charset charset = ObjectUtility.nvl(getPartCharset(part), StandardCharsets.UTF_8); // default, a good guess
+      try (InputStream in = part.getInputStream()) {
+        return in == null ? null : IOUtility.readString(in, charset.name());
       }
     }
-    catch (MessagingException | IOException e) {
-      throw new ProcessingException("Unexpected: ", e);
+    catch (IOException | MessagingException e) {
+      throw new ProcessingException("Failed to read content as string", e);
     }
-    return text;
   }
 
   public Part getHtmlPart(List<? extends Part> bodyParts) {
@@ -697,25 +704,51 @@ public class MailHelper {
    * @return
    * @throws MessagingException
    */
+  // TODO sme [9.0] mark deprecated in 9.0, use getPartCharset instead.
   public String getCharacterEncodingOfPart(Part part) throws MessagingException {
-    Pattern pattern = Pattern.compile("charset=\".*\"", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-    Matcher matcher = pattern.matcher(part.getContentType());
-    String characterEncoding = StandardCharsets.UTF_8.name(); // default, a good guess in Europe
-    if (matcher.find()) {
-      if (matcher.group(0).split("\"").length >= 2) {
-        characterEncoding = matcher.group(0).split("\"")[1];
-      }
+    return ObjectUtility.nvl(getPartCharset(part), StandardCharsets.UTF_8).name(); // default, a good guess in Europe
+  }
+
+  /**
+   * Detects the charset of the given part. If none or and invalid charset is found, <code>null</code> is returned.
+   */
+  @SuppressWarnings("squid:S1166") // catch of UnsupportedCharsetException without a rethrow
+  protected Charset getPartCharset(Part part) throws MessagingException {
+    String charset = getPartCharsetInternal(part);
+
+    try {
+      return charset == null ? null : Charset.forName(charset);
     }
-    else {
-      final String charsetEquals = "charset=";
-      if (part.getContentType().contains(charsetEquals)) {
-        String[] contentTypeParts = part.getContentType().split(charsetEquals);
-        if (contentTypeParts.length == 2) {
-          characterEncoding = contentTypeParts[1];
-        }
-      }
+    catch (UnsupportedCharsetException e) {
+      // ignore exception itself (use trace log)
+      LOG.trace("Part has an invalid charset '{}'", charset);
+      return null;
     }
-    return characterEncoding;
+  }
+
+  /**
+   * @return Charset as string
+   */
+  protected String getPartCharsetInternal(Part part) throws MessagingException {
+    if (part == null) {
+      return null;
+    }
+
+    String contentType = part.getContentType();
+    if (contentType == null) {
+      return null;
+    }
+
+    String charset;
+    try {
+      charset = new ContentType(contentType).getParameter("charset");
+    }
+    catch (ParseException e) {
+      LOG.trace("Failed to parse content type '{}'", contentType);
+      return null;
+    }
+
+    return charset;
   }
 
   /**
@@ -845,7 +878,7 @@ public class MailHelper {
    *          message
    * @return Message-Id or <code>null</code>
    */
-  protected String getMessageIdSafely(MimeMessage mimeMessage) {
+  public String getMessageIdSafely(MimeMessage mimeMessage) {
     if (mimeMessage == null) {
       return null;
     }
@@ -857,5 +890,85 @@ public class MailHelper {
       LOG.warn("Could not retrieve message id", e);
       return null;
     }
+  }
+
+  /**
+   * Returns the decoded and normalized filename from {@link Part#getFileName()} if available. Otherwise guesses the
+   * file extension via content type ({@link Part#getContentType()}) and calls the default filename function with the
+   * file extension (or <code>null</code> if none could be guessed).
+   *
+   * @param part
+   *          Attachment part
+   * @param defaultFilenameFunction
+   *          Mandatory function called with guessed file extension (might be null) if no filename was found.
+   * @return Filename of the given attachment part.
+   */
+  public String getAttachmentFilename(Part part, Function<String, String> defaultFilenameFunction) {
+    Assertions.assertNotNull(part, "Part must not be null");
+    Assertions.assertNotNull(defaultFilenameFunction, "Default filename function must not be null");
+    try {
+      String filename = decodeAttachmentFilename(part.getFileName());
+      if (filename != null) {
+        return filename;
+      }
+
+      String fileExtension = guessAttachmentFileExtension(part.getContentType());
+      return defaultFilenameFunction.apply(fileExtension);
+    }
+    catch (MessagingException e) {
+      LOG.warn("Failed to get attachment filename", e);
+      return null;
+    }
+  }
+
+  /**
+   * Decodes an attachment filename.
+   * <p>
+   * Used internal by {@link #getAttachmentFilename(Part)}.
+   *
+   * @param filename
+   *          Filename as provided by {@link Part#getFileName()}.
+   */
+  protected String decodeAttachmentFilename(String filename) {
+    if (filename == null) {
+      return null;
+    }
+
+    try {
+      String decoded = MimeUtility.decodeText(filename);
+      return Normalizer.normalize(decoded, Normalizer.Form.NFC);
+    }
+    catch (Exception e) {
+      LOG.warn("Failed to clean attachment filename", e);
+      return filename;
+    }
+  }
+
+  /**
+   * Guesses attachment file extension based on a content type.
+   * <p>
+   * Used internal by {@link #getAttachmentFilename(Part)} if not filename is available.
+   *
+   * @param contentType
+   *          Content type as provided by {@link Part#getContentType()}.
+   * @return File extension for content type (e.g. txt, eml, ...) if one is found, <code>null</code> otherwise.
+   */
+  protected String guessAttachmentFileExtension(String contentType) {
+    if (contentType == null) {
+      return null;
+    }
+
+    ContentType ct;
+    try {
+      ct = new ContentType(contentType);
+    }
+    catch (ParseException e) {
+      LOG.warn("Failed to parse content type '{}'", contentType);
+      return null;
+    }
+
+    String baseType = ct.getBaseType();
+    MimeType mimeType = MimeType.convertToMimeType(baseType);
+    return mimeType == null ? null : mimeType.getFileExtension();
   }
 }
