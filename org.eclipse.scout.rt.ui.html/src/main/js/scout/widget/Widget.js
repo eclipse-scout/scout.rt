@@ -55,8 +55,8 @@ scout.Widget = function() {
   this.focused = false;
   this.loading = false;
   this.cssClass = null;
-  this.scrollTop = 0;
-  this.scrollLeft = 0;
+  this.scrollTop = null;
+  this.scrollLeft = null;
 
   this.$container;
 
@@ -1718,6 +1718,16 @@ scout.Widget.prototype._uninstallScrollbars = function() {
   }
   scout.scrollbars.uninstall($scrollable, this.session);
   $scrollable.off('scroll', this._scrollHandler);
+  if (!this.removing) {
+    // If scrollbars are removed on the fly and not because the widget is removing, reset scroll positions to initial state
+    // Only reset if position is 0 to preserve the position (uninstalling does not reset the position of the scrollable either)
+    if ($scrollable[0].scrollTop === 0) {
+      this.scrollTop = null;
+    }
+    if ($scrollable[0].scrollLeft === 0) {
+      this.scrollLeft = null;
+    }
+  }
 };
 
 scout.Widget.prototype._onScroll = function() {
@@ -1731,14 +1741,19 @@ scout.Widget.prototype.setScrollTop = function(scrollTop) {
     this.getDelegateScrollable().setScrollTop(scrollTop);
     return;
   }
-  this.setProperty('scrollTop', scrollTop);
+  if (this.scrollTop === scrollTop) {
+    return;
+  }
+  this.scrollTop = scrollTop;
+  if (this.rendered) {
+    this._renderScrollTop();
+  }
 };
 
 scout.Widget.prototype._renderScrollTop = function() {
   var $scrollable = this.get$Scrollable();
-  if (!$scrollable || $scrollable[0].scrollTop === this.scrollTop) {
-    // Don't do anything for elements which are already at the correct scroll position
-    // Which also means: don't scroll non scrollable elements
+  if (!$scrollable || this.scrollTop === null) {
+    // Don't do anything for non scrollable elements. Also, reading $scrollable[0].scrollTop must not be done while rendering because it would provoke a reflow
     return;
   }
   if (this.rendering || (this.htmlComp && !this.htmlComp.layouted)) {
@@ -1754,14 +1769,19 @@ scout.Widget.prototype.setScrollLeft = function(scrollLeft) {
     this.getDelegateScrollable().setScrollLeft(scrollLeft);
     return;
   }
-  this.setProperty('scrollLeft', scrollLeft);
+  if (this.scrollLeft === scrollLeft) {
+    return;
+  }
+  this.scrollLeft = scrollLeft;
+  if (this.rendered) {
+    this._renderScrollLeft();
+  }
 };
 
 scout.Widget.prototype._renderScrollLeft = function() {
   var $scrollable = this.get$Scrollable();
-  if (!$scrollable || $scrollable[0].scrollLeft === this.scrollLeft) {
-    // Don't do anything for elements which are already at the correct scroll position
-    // Which also means: don't scroll non scrollable elements
+  if (!$scrollable || this.scrollLeft === null) {
+    // Don't do anything for non scrollable elements. Also, reading $scrollable[0].scrollLeft must not be done while rendering because it would provoke a reflow
     return;
   }
   if (this.rendering || (this.htmlComp && !this.htmlComp.layouted)) {

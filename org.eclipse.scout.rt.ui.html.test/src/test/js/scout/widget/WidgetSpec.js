@@ -19,6 +19,37 @@ describe('Widget', function() {
   TestWidget.prototype._render = function() {
     this.$container = this.$parent.appendDiv();
     this.$container.setTabbable(true);
+    this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+    this.htmlComp.getParent = function() {
+      return null; // Detach from parent because our parent does not layout children
+    };
+  };
+
+  var ScrollableWidget = function() {
+    ScrollableWidget.parent.call(this);
+  };
+  scout.inherits(ScrollableWidget, scout.NullWidget);
+  ScrollableWidget.prototype._render = function() {
+    this.$container = this.$parent.appendDiv();
+    this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+    this.htmlComp.getParent = function() {
+      return null; // Detach from parent because our parent does not layout children
+    };
+    this.$container.css({
+      position: 'absolute',
+      minHeight: 50,
+      minWidth: 50
+    });
+    this.$elem = this.$container.appendDiv();
+    this.$elem.css({
+      display: 'inline-block',
+      position: 'absolute',
+      minHeight: 100,
+      minWidth: 100
+    });
+    this._installScrollbars({
+      axis: 'both'
+    });
   };
 
   beforeEach(function() {
@@ -881,6 +912,104 @@ describe('Widget', function() {
       delete model3.items[0].linkedItem;
       var ctw3 = scout.create('testns.ComplexTestWidget', model3);
       ctw3.items[0].setProperty('linkedItem', ctw3.items[1]);
+    });
+  });
+
+  describe('scrollTop', function() {
+    beforeEach(function() {
+      jasmine.clock().install();
+    });
+
+    afterEach(function() {
+      jasmine.clock().uninstall();
+    });
+
+    it("is stored on scroll if scrollbars are installed", function() {
+      var widget = new ScrollableWidget();
+      widget.init({
+        parent: parent,
+        session: session
+      });
+      widget.render(session.$entryPoint);
+      widget.$container[0].scrollTop = 40;
+      widget.$container.trigger('scroll'); // Is executed later, trigger manually for testing
+      expect(widget.scrollTop).toBe(40);
+    });
+
+    it("is not stored on scroll if scrollbars are not installed", function() {
+      var widget = createWidget({
+        parent: parent
+      });
+      expect(widget.scrollTop).toBe(null);
+
+      widget.render(session.$entryPoint);
+      widget.$container[0].scrollTop = 40;
+      expect(widget.$container[0].scrollTop).toBe(0);
+      widget.$container.trigger('scroll');
+      expect(widget.scrollTop).toBe(null);
+    });
+
+    it("is applied again on render after remove", function() {
+      var widget = new ScrollableWidget();
+      widget.init({
+        parent: parent,
+        session: session
+      });
+      widget.render(session.$entryPoint);
+      expect(widget.$container[0].scrollTop).toBe(0);
+      expect(widget.$container[0].scrollHeight).toBe(100);
+
+      widget.$container[0].scrollTop = 40;
+      widget.$container.trigger('scroll');
+      jasmine.clock().tick(500);
+      expect(widget.scrollTop).toBe(40);
+
+      widget.remove();
+      widget.render(session.$entryPoint);
+      expect(widget.scrollTop).toBe(40);
+      expect(widget.$container[0].scrollTop).toBe(0);
+      widget.revalidateLayoutTree(); // Scroll top will be rendered after the layout
+      expect(widget.$container[0].scrollTop).toBe(40);
+    });
+
+    it("is set to null if scrollbars are not installed", function() {
+      var widget = createWidget({
+        parent: parent
+      });
+      expect(widget.scrollTop).toBe(null);
+
+      spyOn(widget, '_renderScrollTop').and.callThrough();
+      widget.render(session.$entryPoint);
+      expect(widget._renderScrollTop.calls.count()).toBe(1);
+      widget.revalidateLayoutTree(); // Scroll top will be rendered after the layout
+      expect(widget._renderScrollTop.calls.count()).toBe(1); // Must not be executed again for non scrollable widgets
+    });
+
+    it("is set to null if scrollbars are uninstalled on the fly", function() {
+      var widget = new ScrollableWidget();
+      widget.init({
+        parent: parent,
+        session: session,
+        scrollTop: 40
+      });
+      expect(widget.scrollTop).toBe(40);
+
+      spyOn(widget, '_renderScrollTop').and.callThrough();
+      widget.render(session.$entryPoint);
+      expect(widget._renderScrollTop.calls.count()).toBe(1);
+      widget.revalidateLayoutTree(); // Scroll top will be rendered after the layout
+      expect(widget._renderScrollTop.calls.count()).toBe(2); // Is executed again after layout
+      expect(widget.$container[0].scrollTop).toBe(40);
+
+      widget._uninstallScrollbars();
+      expect(widget.scrollTop).toBe(null);
+
+      widget.remove();
+      widget.render(session.$entryPoint);
+      expect(widget._renderScrollTop.calls.count()).toBe(3);
+      widget.revalidateLayoutTree();
+      expect(widget._renderScrollTop.calls.count()).toBe(3); // Must not be executed again
+      expect(widget.$container[0].scrollTop).toBe(0);
     });
   });
 
