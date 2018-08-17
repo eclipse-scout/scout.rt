@@ -59,6 +59,11 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
   $.log.isTraceEnabled() && $.log.trace('(GroupBoxLayout#layout) gbBodySize=' + gbBodySize);
   htmlGbBody.setSize(gbBodySize);
 
+  // Make sure tooltip is at correct position after layouting, if there is one
+  if (this.groupBox.tooltip && this.groupBox.tooltip.rendered) {
+    this.groupBox.tooltip.position();
+  }
+
    if (htmlGbBody.scrollable || this.groupBox.bodyLayoutConfig.minWidth > 0 ) {
     scout.scrollbars.update(htmlGbBody.$comp);
   }
