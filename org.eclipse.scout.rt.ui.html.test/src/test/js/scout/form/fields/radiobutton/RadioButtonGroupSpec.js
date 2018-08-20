@@ -113,6 +113,23 @@ describe("RadioButtonGroup", function() {
       expect(radioButtonGroup.radioButtons[0].selected).toBe(false);
       expect(radioButtonGroup.radioButtons[1].selected).toBe(true);
     });
+
+    it('syncs this.radioButtons with this.fields', function() {
+      var radioButtonGroup = scout.create('RadioButtonGroup', {
+        parent: session.desktop,
+        fields: [{
+          objectType: 'RadioButton'
+        }, {
+          objectType: 'RadioButton',
+          selected: true
+        }, {
+          objectType: 'LabelField',
+          label: 'XX'
+        }]
+      });
+      expect(radioButtonGroup.fields.length).toBe(3);
+      expect(radioButtonGroup.radioButtons.length).toBe(2);
+    });
   });
 
   describe('lookupCall', function(){
@@ -122,8 +139,9 @@ describe("RadioButtonGroup", function() {
         parent: session.desktop,
         lookupCall: "DummyLookupCall"
       });
-
+      expect(radioButtonGroup.isLoading()).toBe(true);
       jasmine.clock().tick(300);
+      expect(radioButtonGroup.isLoading()).toBe(false);
       expect(radioButtonGroup.radioButtons.length).toBe(3);
       expect(radioButtonGroup.lookupCall).not.toBe(null);
       expect(radioButtonGroup.errorStatus).toBe(null);

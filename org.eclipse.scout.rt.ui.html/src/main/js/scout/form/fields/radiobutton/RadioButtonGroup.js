@@ -47,20 +47,10 @@ scout.RadioButtonGroup.prototype._init = function(model) {
 scout.RadioButtonGroup.prototype._initValue = function(value) {
   if (this.lookupCall) {
     this._setLookupCall(this.lookupCall);
-  } else {
-    // Initialize buttons first before calling set value, otherwise value could not be synchronized to the buttons
-    this._initButtons();
   }
+  // must be called before value is set
+  this._setFields(this.fields);
   scout.RadioButtonGroup.parent.prototype._initValue.call(this, value);
-};
-
-scout.RadioButtonGroup.prototype._initButtons = function() {
-  this.fields.forEach(function(formField) {
-    if (formField instanceof scout.RadioButton) {
-      this.radioButtons.push(formField);
-      this._initButton(formField);
-    }
-  }, this);
 };
 
 /**
@@ -73,6 +63,16 @@ scout.RadioButtonGroup.prototype._initKeyStrokeContext = function() {
     new scout.RadioButtonGroupLeftKeyStroke(this),
     new scout.RadioButtonGroupRightKeyStroke(this)
   ]);
+};
+
+scout.RadioButtonGroup.prototype._initButtons = function() {
+  this.radioButtons = this.fields.filter(function(formField) {
+      return formField instanceof scout.RadioButton;
+    }, this)
+    .map(function(radioButton) {
+      this._initButton(radioButton);
+      return radioButton;
+    }, this);
 };
 
 scout.RadioButtonGroup.prototype._initButton = function(button) {
@@ -95,21 +95,14 @@ scout.RadioButtonGroup.prototype._render = function() {
   this.htmlBody = scout.HtmlComponent.install(this.$body, this.session);
   this.htmlBody.setLayout(this._createBodyLayout());
 
-  this.fields.forEach(function(formField) {
-    formField.render(this.$body);
-
-    // set each children layout data to logical grid data
-    formField.setLayoutData(new scout.LogicalGridData(formField));
-
-    this._linkWithLabel(formField.$field);
-  }, this);
-
+  // fields are rendered in _renderFields
   this.addField(this.$body);
   this.addStatus();
 };
 
 scout.RadioButtonGroup.prototype._renderProperties = function() {
   scout.RadioButtonGroup.parent.prototype._renderProperties.call(this);
+  this._renderFields();
   this._renderLayoutConfig();
 };
 
@@ -184,6 +177,29 @@ scout.RadioButtonGroup.prototype.getFocusableElement = function() {
   return this.session.focusManager.findFirstFocusableElement(this.$container);
 };
 
+scout.RadioButtonGroup.prototype.setFields = function(fields) {
+  this.setProperty('fields', fields);
+};
+
+scout.RadioButtonGroup.prototype._setFields = function(fields) {
+  this._setProperty('fields', fields);
+  this._initButtons();
+};
+
+scout.RadioButtonGroup.prototype._renderFields = function() {
+  this.fields.forEach(function(formField) {
+    formField.render(this.$body);
+
+    // set each children layout data to logical grid data
+    formField.setLayoutData(new scout.LogicalGridData(formField));
+
+    this._linkWithLabel(formField.$field);
+  }, this);
+  this._provideTabIndex(); // depends on rendered fields
+  this.invalidateLogicalGrid(false);
+  this.validateLayoutTree(false); // prevent flickering
+};
+
 /**
  * @override
  */
@@ -192,6 +208,10 @@ scout.RadioButtonGroup.prototype._renderEnabled = function() {
   this._provideTabIndex();
 };
 
+
+/**
+ * Set the selected (or first if none is selected) to tabbable
+ */
 scout.RadioButtonGroup.prototype._provideTabIndex = function() {
   var tabSet;
   this.radioButtons.forEach(function(radioButton) {
@@ -312,12 +332,9 @@ scout.RadioButtonGroup.prototype.getTabbableButton = function() {
 };
 
 scout.RadioButtonGroup.prototype.insertButton = function(radioButton) {
-  if (this.rendered) {
-    throw new Error('Inserting buttons is not supported if group is already rendered.');
-  }
-  this.fields.push(radioButton);
-  this.radioButtons.push(radioButton);
-  this._initButton(radioButton);
+  var newFields = this.fields.slice();
+  newFields.push(radioButton);
+  this.setFields(newFields);
 };
 
 scout.RadioButtonGroup.prototype._onButtonPropertyChange = function(event) {
@@ -339,12 +356,25 @@ scout.RadioButtonGroup.prototype._setLookupCall = function(lookupCall) {
   this._lookupByAll();
 };
 
+/**
+ * @override
+ */
+scout.RadioButtonGroup.prototype._createLoadingSupport = function() {
+  return new scout.LoadingSupport({
+    widget: this,
+    $container: function() {
+      return this.$body;
+    }.bind(this)
+  });
+};
+
 scout.RadioButtonGroup.prototype._lookupByAll = function() {
   if (!this.lookupCall) {
     return;
   }
 
   this._clearPendingLookup();
+  this.setLoading(true);
 
   var deferred = $.Deferred();
   var doneHandler = function(result) {
@@ -413,13 +443,12 @@ scout.RadioButtonGroup.prototype._lookupByAllDone = function(result) {
 
 scout.RadioButtonGroup.prototype._populateRadioButtonGroup = function(result) {
   var lookupRows = result.lookupRows;
-  this.radioButtons = [];
+  var newFields = this.fields.slice();
   lookupRows.forEach(function(lookupRow) {
-    var radioButton = this._createLookupRowRadioButton(lookupRow);
-    this.fields.push(radioButton);
-    this.radioButtons.push(radioButton);
-    this._initButton(radioButton);
+    newFields.push(this._createLookupRowRadioButton(lookupRow));
   }, this);
+  this.setFields(newFields);
+
   // because the lookup call is asynchronus, reset the value so that it is revalidated.
   this.setValue(this.value);
   // also select the button (the line above does not change the value, therefore _valueChanged is not called)
