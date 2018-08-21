@@ -489,11 +489,14 @@ scout.Table.prototype._onRowMouseDown = function(event) {
   }.bind(this));
   this.setContextColumn(this._columnAtX(event.pageX));
   this.selectionHandler.onMouseDown(event);
-  if (this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
-    var row = this._$mouseDownRow.data('row');
+  var isRightClick = event.which === 3;
+  var row = this._$mouseDownRow.data('row');
+
+  // For checkableStyle TableRow only: check row if left click OR clicked row was not checked yet
+  if (this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW && (!isRightClick || !row.checked)) {
     this.checkRow(row, !row.checked);
   }
-  if (event.which === 3) {
+  if (isRightClick) {
     this.showContextMenu({
       pageX: event.pageX,
       pageY: event.pageY
