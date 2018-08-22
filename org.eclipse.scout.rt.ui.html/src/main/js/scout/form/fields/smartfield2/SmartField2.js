@@ -169,8 +169,10 @@ scout.SmartField2.prototype._renderDisplayText = function() {
 /**
  * Accepts the selected lookup row and sets its id as value.
  * This function is called on blur, by a keystroke or programmatically at any time.
+  *
+ * @param [sync] optional boolean value (default: false), when set to true acceptInput is not allowed to start an asynchronous lookup for text search
  */
-scout.SmartField2.prototype.acceptInput = function() {
+scout.SmartField2.prototype.acceptInput = function(sync) {
   if (!this._acceptInputEnabled) {
     $.log.trace('(SmartField2#acceptInput) Skipped acceptInput because _acceptInputEnabled=false');
     return this._acceptInputDeferred.promise();
@@ -204,7 +206,7 @@ scout.SmartField2.prototype.acceptInput = function() {
     return;
   }
 
-  return this._acceptInput(searchText, searchTextEmpty, searchTextChanged, selectedLookupRow);
+  return this._acceptInput(sync, searchText, searchTextEmpty, searchTextChanged, selectedLookupRow);
 };
 
 /**
@@ -238,8 +240,10 @@ scout.SmartField2.prototype._checkSearchTextChanged = function(searchText) {
 
 /**
  * This function is intended to be overridden. Proposal field has another behavior than the smart field.
+ *
+ * @param [sync] optional boolean value (default: false), when set to true acceptInput is not allowed to start an asynchronous lookup for text search
  */
-scout.SmartField2.prototype._acceptInput = function(searchText, searchTextEmpty, searchTextChanged, selectedLookupRow) {
+scout.SmartField2.prototype._acceptInput = function(sync, searchText, searchTextEmpty, searchTextChanged, selectedLookupRow) {
   if (this._notUnique) {
     this._setNotUniqueError(searchText);
   }
@@ -292,7 +296,7 @@ scout.SmartField2.prototype._acceptInput = function(searchText, searchTextEmpty,
   // this causes a lookup which may fail and open a new proposal chooser (property
   // change for 'result').
   if (searchTextChanged || this._userWasTyping) {
-    this._acceptByText(this._firstTextLine(searchText));
+    this._acceptByText(sync, this._firstTextLine(searchText));
   } else if (!this._hasUiError()) {
     this._inputAccepted(false);
   } else if (this._hasNotUniqueError() && this.popup) {
@@ -322,9 +326,26 @@ scout.SmartField2.prototype._firstTextLine = function(text) {
 
 /**
  * This function is intended to be overridden. Proposal field has another behavior than the smart field.
+ *
+ * @param sync when set to true it's not allowed to start an asynchronous lookup to search by text, the
+ *     current search text is discarded. The flag is set to true in case we click on another field, where
+ *     we must make sure the order of (browser) events is not changed by the lookup that would return _after_
+ *     the events for the clicked field are handled.
  */
-scout.SmartField2.prototype._acceptByText = function(searchText) {
-  $.log.debug('(SmartField2#_acceptByText) searchText=', searchText);
+scout.SmartField2.prototype._acceptByText = function(sync, searchText) {
+  sync = scout.nvl(sync, false);
+  $.log.isDebugEnabled() && $.log.debug('(SmartField2#_acceptByText) sync=' + sync + ' searchText=', searchText);
+
+  if (sync) {
+    this._lastSearchText = null;
+    this._inputAccepted();
+    if (!this._hasUiError()) {
+      this.resetDisplayText();
+    }
+    return;
+  }
+
+  // async
   this._lastSearchText = searchText;
   this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText))
     .done(this._acceptByTextDone.bind(this));
@@ -813,7 +834,7 @@ scout.SmartField2.prototype.aboutToBlurByMouseDown = function(target) {
   var eventOnPopup = this.popup && this.popup.$container.isOrHas(target);
   var eventOnTooltip = this.tooltip && this.tooltip.$container.isOrHas(target);
   if (!eventOnField && !eventOnPopup && !eventOnTooltip) {
-    this.acceptInput(); // event outside this value field
+    this.acceptInput(true); // event outside this value field
   }
 };
 

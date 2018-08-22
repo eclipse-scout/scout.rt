@@ -418,6 +418,36 @@ describe('SmartField2', function() {
 
   });
 
+  describe('aboutToBlurByMouseDown', function() { // see ticket #228888
+
+    it('should not perform lookup for search by text', function() {
+      var field = createFieldWithLookupCall();
+      var eventTriggered = false;
+      field.render();
+      field.on('acceptInput', function() {
+        eventTriggered = true;
+      });
+      field.$field.focus();
+
+      field.setValue(1);
+      jasmine.clock().tick(300);
+      expect(field.displayText).toBe('Foo');
+
+      field.$field.val('search!');
+      field._userWasTyping = true;
+      field.aboutToBlurByMouseDown();
+      jasmine.clock().tick(300);
+
+      // test if _acceptByText has been called with sync=true
+      // this should reset the display text and trigger the acceptInput event
+      expect(field.displayText).toBe('Foo');
+      expect(field.$field.val()).toBe('Foo');
+      expect(field._lastSearchText).toBe(null);
+      expect(eventTriggered).toBe(true);
+    });
+
+  });
+
   describe('maxBrowseRowCount', function() {
 
     it('default - don\'t limit lookup rows', function() {
