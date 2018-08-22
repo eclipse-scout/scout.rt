@@ -430,7 +430,7 @@ describe('SmartField', function() {
       expect(field.value).toBe(1);
       expect(field.displayText).toBe('Foo' + preparedPropertyValue);
 
-      field._acceptByText('Bar'); // triggers lookup call by text
+      field._acceptByText(false, 'Bar'); // triggers lookup call by text
       jasmine.clock().tick(500);
       expect(field.value).toBe(2);
       expect(field.displayText).toBe('Bar' + preparedPropertyValue);
@@ -646,6 +646,36 @@ describe('SmartField', function() {
       expect(result.lookupRows.length).toBe(3);
       expect(result.lookupRows[2]).toBe(3); // last element in array should be '3'
       expect(field.popup.proposalChooser.status.severity).toBe(scout.Status.Severity.INFO);
+    });
+
+  });
+
+  describe('aboutToBlurByMouseDown', function() { // see ticket #228888
+
+    it('should not perform lookup for search by text', function() {
+      var field = createFieldWithLookupCall();
+      var eventTriggered = false;
+      field.render();
+      field.on('acceptInput', function() {
+        eventTriggered = true;
+      });
+      field.$field.focus();
+
+      field.setValue(1);
+      jasmine.clock().tick(300);
+      expect(field.displayText).toBe('Foo');
+
+      field.$field.val('search!');
+      field._userWasTyping = true;
+      field.aboutToBlurByMouseDown();
+      jasmine.clock().tick(300);
+
+      // test if _acceptByText has been called with sync=true
+      // this should reset the display text and trigger the acceptInput event
+      expect(field.displayText).toBe('Foo');
+      expect(field.$field.val()).toBe('Foo');
+      expect(field._lastSearchText).toBe(null);
+      expect(eventTriggered).toBe(true);
     });
 
   });

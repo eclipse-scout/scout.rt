@@ -75,10 +75,10 @@ scout.ProposalField.prototype._ensureValue = function(value) {
  * When 'clear' has been clicked (searchText is empty), we want to call customTextAccepted,
  * so the new value is sent to the server #221199.
  */
-scout.ProposalField.prototype._acceptByText = function(searchText) {
+scout.ProposalField.prototype._acceptByText = function(sync, searchText) {
   $.log.isDebugEnabled() && $.log.debug('(ProposalField#_acceptByText) searchText=', searchText);
   if (this.lookupOnAcceptByText && scout.strings.hasText(searchText)) {
-    scout.ProposalField.parent.prototype._acceptByText.call(this, searchText);
+    scout.ProposalField.parent.prototype._acceptByText.call(this, sync, searchText);
   } else {
     this._customTextAccepted(searchText);
   }
@@ -145,7 +145,7 @@ scout.ProposalField.prototype._copyValuesFromField = function(otherField) {
   }
 };
 
-scout.ProposalField.prototype._acceptInput = function(searchText, searchTextEmpty, searchTextChanged, selectedLookupRow) {
+scout.ProposalField.prototype._acceptInput = function(sync, searchText, searchTextEmpty, searchTextChanged, selectedLookupRow) {
   // Do nothing when search text is equals to the text of the current lookup row
   if (!selectedLookupRow && this.lookupRow && this.lookupRow.text === searchText) {
     $.log.isDebugEnabled() && $.log.debug('(ProposalField#_acceptInput) unchanged: text is equals. Close popup');
@@ -166,7 +166,7 @@ scout.ProposalField.prototype._acceptInput = function(searchText, searchTextEmpt
   // this causes a lookup which may fail and open a new proposal chooser (property
   // change for 'result').
   if (searchTextChanged) {
-    this._acceptByText(searchText);
+    this._acceptByText(sync, searchText);
   } else if (!this._hasUiError()) {
     this._inputAccepted(false);
   } else {
