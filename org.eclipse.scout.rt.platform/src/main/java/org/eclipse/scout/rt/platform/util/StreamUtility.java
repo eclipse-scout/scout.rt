@@ -39,6 +39,16 @@ public final class StreamUtility {
   }
 
   /**
+   * Negates a predicate or method reference, e.g. not(Objects::equals).
+   * <p>
+   * <b>Note:</b> This method is motivated by Java 11's {@link Predicate#not(Predicate)} and can be removed when
+   * upgrading.
+   */
+  public static <T> Predicate<T> not(Predicate<T> p) {
+    return p.negate();
+  }
+
+  /**
    * Returns a sequential ordered <code>Stream</code> produced by consecutive invocation of the <code>next</code>
    * function to an initial element, as long as the given <code>terminate</code> predicate returns <code>false</code>.
    * <p>
