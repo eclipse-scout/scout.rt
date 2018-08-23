@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
@@ -183,6 +184,9 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
       handleUiValueChange(data);
       valueSet = true;
     }
+    // ensure the correct model status is sent to the client.
+    // In case the UI resets the error status and the validation ends with the same error the field has before the status is not displayed correctly.
+    addPropertyChangeEvent(IValueField.PROP_ERROR_STATUS, JsonStatus.toJson(getModel().getErrorStatus()));
 
     // In case the model changes its value to something other than what the UI
     // sends, we cannot set display text and error status. This can happen if
