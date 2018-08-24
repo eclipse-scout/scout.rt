@@ -42,4 +42,24 @@ public final class EnumerationUtility {
     };
   }
 
+  /**
+   * Returns an {@link Enumeration} that traverses the remaining elements covered by this iterator. Traversal is
+   * undefined if any methods are called on this iterator after the call to {@code asEnumeration}.
+   *
+   * @return an Enumeration representing the remaining elements of this Iterator
+   */
+  public static <T> Enumeration<T> asEnumeration(final Iterator<T> iterator) {
+    return new Enumeration<T>() {
+      @Override
+      public boolean hasMoreElements() {
+        return iterator.hasNext();
+      }
+
+      @Override
+      public T nextElement() {
+        return iterator.next();
+      }
+    };
+  }
+
 }
