@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.rest.jackson;
 import javax.annotation.Priority;
 import javax.ws.rs.core.Response;
 
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.rest.error.ErrorResponseBuilder;
 import org.eclipse.scout.rt.rest.exception.AbstractExceptionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +34,9 @@ public class JsonMappingExceptionMapper extends AbstractExceptionMapper<JsonMapp
   @Override
   protected Response toResponseImpl(JsonMappingException exception) {
     LOG.info("{}: {}", exception.getClass().getSimpleName(), exception.getMessage(), exception);
-    return Response.status(Response.Status.BAD_REQUEST).build(); // do not return internal exception message
+    return BEANS.get(ErrorResponseBuilder.class)
+        .withStatus(Response.Status.BAD_REQUEST)
+        .withMessage(Response.Status.BAD_REQUEST.getReasonPhrase()) // do not return internal exception message
+        .build();
   }
 }
