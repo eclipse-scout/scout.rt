@@ -1,0 +1,42 @@
+{
+  "_type" : "ValueDoFixture",
+  "date" : "2018-08-23",
+  "dateTime" : "2018-08-23 13:30:25.000",
+  "dynamicDate" : "2018-08-23 13:30:25.000",
+  "dynamicTypedDate" : {
+    "_type" : "DateValue",
+    "value" : "2018-08-23"
+  },
+  "dynamicTypedDateTime" : {
+    "_type" : "DateTimeValue",
+    "value" : "2018-08-23 13:30:25.000"
+  },
+  "partlyTypedDate" : {
+    "_type" : "DateTimeValue",
+    "value" : "2018-08-23 13:30:25.000"
+  },
+  "typedDate" : {
+    "_type" : "DateValue",
+    "value" : "2018-08-23"
+  },
+  "typedDateTime" : {
+    "_type" : "DateTimeValue",
+    "value" : "2018-08-23 13:30:25.000"
+  },
+  "typedList" : [ {
+    "_type" : "DateValue",
+    "value" : "2018-08-23"
+  }, {
+    "_type" : "DateTimeValue",
+    "value" : "2018-08-23 13:30:25.000"
+  }, {
+    "_type" : "StringValue",
+    "value" : "aaabbbccc"
+  }, {
+    "_type" : "BooleanValue",
+    "value" : true
+  }, {
+    "_type" : "BigDecimalValue",
+    "value" : 0.1
+  } ]
+}
