@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.mail.smtp;
+package org.eclipse.scout.rt.mail.imap;
 
 import java.util.Map;
 
@@ -17,21 +17,20 @@ import javax.mail.Session;
 import org.eclipse.scout.rt.platform.Bean;
 
 /**
- * Configuration object for SMTP server used by
- * {@link SmtpHelper#sendMessage(SmtpServerConfig, javax.mail.internet.MimeMessage)}.
+ * Configuration object for IMAP server used by {@link ImapHelper#connect(ImapServerConfig)}.
  */
 @Bean
-public class SmtpServerConfig {
+public class ImapServerConfig {
 
   private String m_host;
   private Integer m_port;
   private String m_username;
   private String m_password;
 
-  private boolean m_useAuthentication;
-  private boolean m_useSmtps;
-  private boolean m_useStartTls;
+  private boolean m_useSsl;
   private String m_sslProtocols;
+
+  private String m_customStoreProtocol;
 
   private Map<String, String> m_additionalSessionProperties;
 
@@ -43,7 +42,7 @@ public class SmtpServerConfig {
    * @param host
    *          SMTP server host name.
    */
-  public SmtpServerConfig withHost(String host) {
+  public ImapServerConfig withHost(String host) {
     m_host = host;
     return this;
   }
@@ -56,7 +55,7 @@ public class SmtpServerConfig {
    * @param port
    *          The port to connect to the server.
    */
-  public SmtpServerConfig withPort(Integer port) {
+  public ImapServerConfig withPort(Integer port) {
     m_port = port;
     return this;
   }
@@ -69,7 +68,7 @@ public class SmtpServerConfig {
    * @param username
    *          SMTP server username.
    */
-  public SmtpServerConfig withUsername(String username) {
+  public ImapServerConfig withUsername(String username) {
     m_username = username;
     return this;
   }
@@ -82,49 +81,21 @@ public class SmtpServerConfig {
    * @param password
    *          SMTP server password.
    */
-  public SmtpServerConfig withPassword(String password) {
+  public ImapServerConfig withPassword(String password) {
     m_password = password;
     return this;
   }
 
-  public boolean isUseAuthentication() {
-    return m_useAuthentication;
+  public boolean isUseSsl() {
+    return m_useSsl;
   }
 
   /**
-   * A {@link #getUsername()} must be set, otherwise this setting has no effect.
-   *
-   * @param useAuthentication
-   *          If <code>true</code>, attempt to authenticate the user using the AUTH command.
-   */
-  public SmtpServerConfig withUseAuthentication(boolean useAuthentication) {
-    m_useAuthentication = useAuthentication;
-    return this;
-  }
-
-  public boolean isUseSmtps() {
-    return m_useSmtps;
-  }
-
-  /**
-   * @param useSmtps
+   * @param useSsl
    *          Specifies if a secure connection should be used.
    */
-  public SmtpServerConfig withUseSmtps(boolean useSmtps) {
-    m_useSmtps = useSmtps;
-    return this;
-  }
-
-  public boolean isUseStartTls() {
-    return m_useStartTls;
-  }
-
-  /**
-   * @param useStartTls
-   *          Enables STARTTLS support.
-   */
-  public SmtpServerConfig withUseStartTls(boolean useStartTls) {
-    m_useStartTls = useStartTls;
+  public ImapServerConfig withUseSsl(boolean useSsl) {
+    m_useSsl = useSsl;
     return this;
   }
 
@@ -138,8 +109,25 @@ public class SmtpServerConfig {
    *          separated list of tokens acceptable to the {@link javax.net.ssl.SSLSocket#setEnabledProtocols(String[])}
    *          method.
    */
-  public SmtpServerConfig withSslProtocols(String sslProtocols) {
+  public ImapServerConfig withSslProtocols(String sslProtocols) {
     m_sslProtocols = sslProtocols;
+    return this;
+  }
+
+  public String getCustomStoreProtocol() {
+    return m_customStoreProtocol;
+  }
+
+  /**
+   * For most IMAP server it's okay to always use 'imap' and enable SSL via 'mail.imap.ssl.enable', but certain IMAP
+   * servers seem to required 'imaps' as protocol when retrieving store (e.g. for accessing shared mailbox from
+   * Office365).
+   *
+   * @param customStoreProtocol
+   *          Protocol use in {@link Session#getStore(String)}. If none is provided, 'imap' is used.
+   */
+  public ImapServerConfig withCustomStoreProtocol(String customStoreProtocol) {
+    m_customStoreProtocol = customStoreProtocol;
     return this;
   }
 
@@ -152,9 +140,9 @@ public class SmtpServerConfig {
    * or user.
    *
    * @param additionalSessionProperties
-   *          Additional properties used to create {@link Session} for SMTP server connection.
+   *          Additional properties used to create {@link Session} for IMAP server connection.
    */
-  public SmtpServerConfig withAdditionalSessionProperties(Map<String, String> additionalSessionProperties) {
+  public ImapServerConfig withAdditionalSessionProperties(Map<String, String> additionalSessionProperties) {
     m_additionalSessionProperties = additionalSessionProperties;
     return this;
   }

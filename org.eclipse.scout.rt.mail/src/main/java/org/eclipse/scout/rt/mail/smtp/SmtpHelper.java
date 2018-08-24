@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.date.IDateProvider;
 import org.slf4j.Logger;
@@ -70,13 +71,13 @@ public class SmtpHelper {
 
   /**
    * Sends the message over the provided session.
+   *
    * @param session
    *          Session to use for sending the message.
    * @param password
    *          Optional password if authentication is required.
    * @param message
    *          Message to send.
-   *
    * @see {@link MailHelper} to create a message
    */
   public void sendMessage(Session session, String password, MimeMessage message) {
@@ -97,6 +98,8 @@ public class SmtpHelper {
         message.setSentDate(BEANS.get(IDateProvider.class).currentMillis());
         message.saveChanges();
         transport.sendMessage(message, allRecipients);
+
+        LOG.debug("Sent email with message id {}", BEANS.get(MailHelper.class).getMessageIdSafely(message));
       }
     }
     catch (MessagingException e) {
@@ -148,6 +151,10 @@ public class SmtpHelper {
     Integer readTimeout = CONFIG.getPropertyValue(SmtpReadTimeoutProperty.class);
     if (readTimeout != null) {
       props.setProperty(propertyBaseName + ".timeout", Integer.toString(readTimeout));
+    }
+
+    if (!CollectionUtility.isEmpty(config.getAdditionalSessionProperties())) {
+      props.putAll(config.getAdditionalSessionProperties());
     }
 
     LOG.debug("Session created with properties {}", props);

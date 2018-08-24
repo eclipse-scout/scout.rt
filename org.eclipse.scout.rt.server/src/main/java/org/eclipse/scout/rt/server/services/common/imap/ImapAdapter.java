@@ -40,7 +40,11 @@ import org.slf4j.LoggerFactory;
  * Not all operations of this class are thread-safe (e.g. there are operation which operate on cached folders open and
  * close them).
  * </p>
+ *
+ * @deprecated see {@link IImapAdapter}
  */
+@SuppressWarnings("deprecation")
+@Deprecated
 public class ImapAdapter implements IImapAdapter {
 
   private static final Logger LOG = LoggerFactory.getLogger(ImapAdapter.class);
@@ -244,7 +248,7 @@ public class ImapAdapter implements IImapAdapter {
   @Override
   public void connect() {
     if (!isConnected()) {
-      m_cachedFolders.clear();
+      getCachedFolders().clear();
       Properties props = new Properties();
       props.put("mail.transport.protocol", "imap");
       if (getHost() != null) {
@@ -266,18 +270,18 @@ public class ImapAdapter implements IImapAdapter {
       interceptProperties(props);
       Session session = Session.getInstance(props, null);
       try {
-        m_store = session.getStore("imap");
-        if (!m_store.isConnected()) {
+        setStoreInternal(session.getStore("imap"));
+        if (!getStoreInternal().isConnected()) {
           if (getUsername() != null && getHost() != null) {
-            m_store.connect(getHost(), getUsername(), getPassword());
+            getStoreInternal().connect(getHost(), getUsername(), getPassword());
           }
           else {
-            m_store.connect();
+            getStoreInternal().connect();
           }
         }
       }
       catch (AuthenticationFailedException e) { // NOSONAR
-        throw new ProcessingException("IMAP-Authentication failed on " + (m_host == null ? "?" : m_host) + ":" + m_port + ":" + m_username);
+        throw new ProcessingException("IMAP-Authentication failed on " + (getHost() == null ? "?" : getHost()) + ":" + getPort() + ":" + getUsername());
       }
       catch (MessagingException e) {
         throw new ProcessingException(e.getMessage(), e);
@@ -302,10 +306,10 @@ public class ImapAdapter implements IImapAdapter {
   @SuppressWarnings("resource") // reason: folder is returned for further work, it must be open
   protected Folder findFolder(String name, boolean createNonExisting) {
     connect();
-    Folder folder = m_cachedFolders.get(name);
+    Folder folder = getCachedFolders().get(name);
     if (folder == null) {
       try {
-        Folder f = m_store.getFolder(name);
+        Folder f = getStoreInternal().getFolder(name);
         if (f.exists()) {
           folder = f;
         }
@@ -314,7 +318,7 @@ public class ImapAdapter implements IImapAdapter {
           folder = f;
         }
         if (folder != null) {
-          m_cachedFolders.put(name, folder);
+          getCachedFolders().put(name, folder);
         }
       }
       catch (MessagingException e) {
@@ -342,7 +346,7 @@ public class ImapAdapter implements IImapAdapter {
   public void closeConnection() {
     if (isConnected()) {
       List<MessagingException> exceptions = new ArrayList<>();
-      for (Folder folder : m_cachedFolders.values()) {
+      for (Folder folder : getCachedFolders().values()) {
         try {
           if (folder.isOpen()) {
             folder.close(true);
@@ -363,14 +367,14 @@ public class ImapAdapter implements IImapAdapter {
         }
       }
       try {
-        if (m_store.isConnected()) {
-          m_store.close();
+        if (getStoreInternal().isConnected()) {
+          getStoreInternal().close();
         }
       }
       catch (MessagingException e) {
         exceptions.add(e);
       }
-      m_cachedFolders.clear();
+      getCachedFolders().clear();
       if (!exceptions.isEmpty()) {
         throw new ProcessingException(exceptions.get(0).getMessage());
       }
@@ -379,13 +383,25 @@ public class ImapAdapter implements IImapAdapter {
 
   @Override
   public boolean isConnected() {
-    return m_store != null && m_store.isConnected();
+    return getStoreInternal() != null && getStoreInternal().isConnected();
+  }
+
+  protected Map<String, Folder> getCachedFolders() {
+    return m_cachedFolders;
+  }
+
+  protected Store getStoreInternal() {
+    return m_store;
+  }
+
+  protected void setStoreInternal(Store store) {
+    m_store = store;
   }
 
   @Override
   public Store getStore() {
     connect();
-    return m_store;
+    return getStoreInternal();
   }
 
   @Override

@@ -37,6 +37,11 @@ import org.eclipse.scout.rt.server.ServerConfigProperties.ImapUsernameProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @deprecated See {@link IIMAPService}.
+ */
+@SuppressWarnings("deprecation")
+@Deprecated
 public abstract class AbstractIMAPService implements IIMAPService {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractIMAPService.class);

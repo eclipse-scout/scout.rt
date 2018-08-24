@@ -13,6 +13,14 @@ package org.eclipse.scout.rt.server.services.common.imap;
 import javax.mail.Message;
 import javax.mail.Store;
 
+import org.eclipse.scout.rt.mail.imap.ImapHelper;
+
+/**
+ * @deprecated Will be removed in 9.0, use {@link ImapHelper} and interact with {@link Message} directly where no
+ *             appropriate helper method is available. Direct interaction can reduce the number requests to the IMAP
+ *             server.
+ */
+@Deprecated
 public interface IImapAdapter {
 
   Message[] getUnseenMessages();

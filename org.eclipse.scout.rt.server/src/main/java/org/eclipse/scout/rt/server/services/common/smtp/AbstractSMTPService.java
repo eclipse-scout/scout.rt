@@ -37,6 +37,8 @@ import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpUsernameProperty;
  */
 @SuppressWarnings("deprecation")
 @Deprecated
+// TODO sme [9.0] remove deprecated classes including SMTP properties
+// Remove dependency from shared to mail module
 public abstract class AbstractSMTPService implements ISMTPService {
 
   private final String m_subjectPrefix;
