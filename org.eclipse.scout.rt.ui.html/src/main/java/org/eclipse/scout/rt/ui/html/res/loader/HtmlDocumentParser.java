@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res.loader;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -104,8 +103,7 @@ public class HtmlDocumentParser {
    * deals with caching, since we must build a script file first, before we can calculate its fingerprint.
    */
   protected String createExternalPath(String internalPath) throws IOException {
-    File srcFile = new File(internalPath);
-    String[] filenameParts = FileUtility.getFilenameParts(srcFile);
+    String[] filenameParts = FileUtility.getFilenameParts(internalPath);
     Pair<HttpCacheObject, String> scriptAndFingerprint = null;
 
     // When caching is enabled we must calculate the fingerprint for the script file
@@ -115,11 +113,8 @@ public class HtmlDocumentParser {
 
     // append path to file
     StringBuilder externalPathSb = new StringBuilder();
-    if (srcFile.getParent() != null) {
-      externalPathSb.append(srcFile.getParent()).append("/");
-    }
 
-    // append file name without file-extension
+    // append file name (including path, if present) without file-extension
     externalPathSb.append(getScriptFileName(filenameParts[0]));
 
     // append fingerprint
