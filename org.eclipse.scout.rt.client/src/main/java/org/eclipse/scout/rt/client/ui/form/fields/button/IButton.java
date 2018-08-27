@@ -35,6 +35,7 @@ public interface IButton extends IFormField, IContextMenuOwner {
   String PROP_KEY_STROKE_SCOPE_CLASS = "keyStrokeScopeClass";
   String PROP_KEY_STROKE_SCOPE = "keyStrokeScope";
   String PROP_PREVENT_DOUBLE_CLICK = "preventDoubleClick";
+  String PROP_DEFAULT_BUTTON = "defaultButton";
 
   /*
    * System Types
@@ -64,9 +65,9 @@ public interface IButton extends IFormField, IContextMenuOwner {
 
   void setProcessButton(boolean on);
 
-  boolean isDefaultButton();
+  Boolean getDefaultButton();
 
-  void setDefaultButton(boolean on);
+  void setDefaultButton(Boolean defaultButton);
 
   /**
    * Model Observer

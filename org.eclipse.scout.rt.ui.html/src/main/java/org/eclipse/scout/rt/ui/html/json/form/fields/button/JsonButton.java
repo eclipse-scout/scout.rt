@@ -61,7 +61,7 @@ public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> im
     putJsonProperty(new JsonProperty<IButton>(PROP_DEFAULT_BUTTON, model) {
       @Override
       protected Boolean modelValue() {
-        return getModel().isDefaultButton();
+        return getModel().getDefaultButton();
       }
     });
     putJsonProperty(new JsonProperty<IButton>(PROP_DISPLAY_STYLE, model) {

@@ -52,7 +52,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   private int m_systemType;
   private int m_displayStyle;
   private boolean m_processButton;
-  private boolean m_defaultButton;
 
   public AbstractButton() {
     this(true);
@@ -104,15 +103,17 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   /**
    * Configures whether this button is a default button. Default buttons typically have a dedicated look.
    * <p>
-   * Subclasses can override this method. Default is {@code false}.
+   * Subclasses can override this method. Default is {@code null}.
    *
-   * @return {@code true} if this button is a default button, {@code false} otherwise
+   * @return {@code Boolean.TRUE} if this button is a default button, {@code Boolean.FALSE} if this button is never a
+   *         default button and {@code null} if the button look should be calculated with respect to
+   *         {@link AbstractButton#getConfiguredKeyStroke()}
    * @see IButton
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(225)
-  protected boolean getConfiguredDefaultButton() {
-    return false;
+  protected Boolean getConfiguredDefaultButton() {
+    return null;
   }
 
   /**
@@ -377,13 +378,13 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   @Override
-  public boolean isDefaultButton() {
-    return m_defaultButton;
+  public Boolean getDefaultButton() {
+    return (Boolean) propertySupport.getProperty(PROP_DEFAULT_BUTTON);
   }
 
   @Override
-  public void setDefaultButton(boolean on) {
-    m_defaultButton = on;
+  public void setDefaultButton(Boolean defaultButton) {
+    propertySupport.setProperty(PROP_DEFAULT_BUTTON, defaultButton);
   }
 
   @Override

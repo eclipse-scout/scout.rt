@@ -58,4 +58,8 @@ public interface IWizardAction extends IVisibleDimension, IEnabledDimension {
   void setTooltipText(String tooltipText);
 
   String getTooltipText();
+
+  void setKeyStroke(String keyStroke);
+
+  String getKeyStroke();
 }

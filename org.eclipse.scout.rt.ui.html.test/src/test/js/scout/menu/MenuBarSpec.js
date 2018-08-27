@@ -265,9 +265,9 @@ describe("MenuBar", function() {
 
       expect(menu1.$container).not.toHaveClass('default-menu');
       expect(menu2.$container).not.toHaveClass('default-menu');
-      expect(menu3.$container).toHaveClass('default-menu');
+      expect(menu3.$container).not.toHaveClass('default-menu');
       expect(menu4.$container).toHaveClass('default-menu');
-      expect(menu5.$container).toHaveClass('default-menu');
+      expect(menu5.$container).not.toHaveClass('default-menu');
       expect(menu6.$container).not.toHaveClass('default-menu');
       expect(menu4).toBe(menuBar.defaultMenu);
     });
@@ -297,12 +297,64 @@ describe("MenuBar", function() {
 
       menu2.setProperty('enabled', false);
       expect(menuBar.defaultMenu).toBe(null);
-      expect(menu2.$container).toHaveClass('default-menu');
+      expect(menu2.$container).not.toHaveClass('default-menu');
 
       menu2.setProperty('enabled', true);
       expect(menuBar.defaultMenu).toBe(menu2);
       expect(menu2.$container).toHaveClass('default-menu');
     });
+
+    it('updates state if keyStroke or defaultMenu property of menu changes', function() {
+      var modelMenu1 = createModel('foo');
+      var modelMenu2 = createModel('bar');
+      modelMenu2.keyStroke = 'enter';
+
+      var menu1 = helper.createMenu(modelMenu1),
+        menu2 = helper.createMenu(modelMenu2),
+        menuBar = createMenuBar(),
+        menus = [menu1, menu2];
+
+      var ellipsisMenu = scout.menus.createEllipsisMenu({
+        parent: session.desktop
+      });
+      ellipsisMenu.render();
+
+      menuBar.setMenuItems(menus);
+      menuBar.render();
+      expect(menu1.rendered).toBe(true);
+      expect(menu2.rendered).toBe(true);
+      expect(menuBar.defaultMenu).toBe(menu2);
+      expect(menu1.$container).not.toHaveClass('default-menu');
+      expect(menu2.$container).toHaveClass('default-menu');
+
+      menu2.setProperty('keyStroke', null);
+      expect(menuBar.defaultMenu).toBe(null);
+      expect(menu1.$container).not.toHaveClass('default-menu');
+      expect(menu2.$container).not.toHaveClass('default-menu');
+
+      menu1.setProperty('keyStroke', 'enter');
+      expect(menuBar.defaultMenu).toBe(menu1);
+      expect(menu1.$container).toHaveClass('default-menu');
+      expect(menu2.$container).not.toHaveClass('default-menu');
+
+      menu2.setProperty('defaultMenu', true);
+      expect(menuBar.defaultMenu).toBe(menu2);
+      expect(menu1.$container).not.toHaveClass('default-menu');
+      expect(menu2.$container).toHaveClass('default-menu');
+
+      menu1.setProperty('defaultMenu', false);
+      menu2.setProperty('defaultMenu', false);
+      expect(menuBar.defaultMenu).toBe(null);
+      expect(menu1.$container).not.toHaveClass('default-menu');
+      expect(menu2.$container).not.toHaveClass('default-menu');
+
+      menu1.setProperty('defaultMenu', undefined);
+      menu2.setProperty('defaultMenu', undefined);
+      expect(menuBar.defaultMenu).toBe(menu1);
+      expect(menu1.$container).toHaveClass('default-menu');
+      expect(menu2.$container).not.toHaveClass('default-menu');
+    });
+
 
     it('considers rendered state of default menu', function() {
       var modelMenu1 = createModel('foo');

@@ -15,6 +15,7 @@ scout.Menu = function() {
   this.defaultMenu = null; // null = determined by the menu bar
   this.excludedByFilter = false;
   this.menuTypes = [];
+  this.menuStyle = scout.Menu.MenuStyle.NONE;
   /**
    * This property is true when the menu instance was moved into a overflow-menu
    * when there's not enough space on the screen (see MenuBarLayout.js). When set
@@ -36,6 +37,14 @@ scout.Menu = function() {
 scout.inherits(scout.Menu, scout.Action);
 
 scout.Menu.SUBMENU_ICON = scout.icons.ANGLE_DOWN_BOLD;
+
+/**
+ * Special styles of the menu, calculated by the MenuBar. The default value is MenuStyle.NONE.
+ */
+scout.Menu.MenuStyle = {
+  NONE: 0,
+  DEFAULT: 1
+};
 
 scout.Menu.prototype._init = function(options) {
   scout.Menu.parent.prototype._init.call(this, options);
@@ -63,7 +72,7 @@ scout.Menu.prototype._render = function() {
 scout.Menu.prototype._renderProperties = function() {
   scout.Menu.parent.prototype._renderProperties.call(this);
   this._renderOverflown();
-  this._renderDefaultMenu();
+  this._renderMenuStyle();
   this._renderMenuButton();
 };
 
@@ -358,12 +367,16 @@ scout.Menu.prototype._renderOverflown = function() {
   this._renderMenuButton();
 };
 
-scout.Menu.prototype.setDefaultMenu = function(defaultMenu) {
-  this.setProperty('defaultMenu', defaultMenu);
+scout.Menu.prototype.setMenuStyle = function(menuStyle) {
+  this.setProperty('menuStyle', menuStyle);
 };
 
-scout.Menu.prototype._renderDefaultMenu = function() {
-  this.$container.toggleClass('default-menu', !!this.defaultMenu);
+scout.Menu.prototype._renderMenuStyle = function() {
+  this.$container.toggleClass('default-menu', this.menuStyle === scout.Menu.MenuStyle.DEFAULT);
+};
+
+scout.Menu.prototype.setDefaultMenu = function(defaultMenu) {
+  this.setProperty('defaultMenu', defaultMenu);
 };
 
 scout.Menu.prototype.clone = function(model, options) {

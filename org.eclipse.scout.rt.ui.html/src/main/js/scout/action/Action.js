@@ -283,8 +283,8 @@ scout.Action.prototype.setKeyStroke = function(keyStroke) {
 };
 
 scout.Action.prototype._setKeyStroke = function(keyStroke) {
-  this._setProperty('keyStroke', keyStroke);
   this.actionKeyStroke.parseAndSetKeyStroke(keyStroke);
+  this._setProperty('keyStroke', keyStroke);
 };
 
 scout.Action.prototype._renderKeyStroke = function() {

@@ -56,7 +56,7 @@ scout.MenuBar.prototype._init = function(options) {
 
 scout.MenuBar.prototype._destroy = function() {
   scout.MenuBar.parent.prototype._destroy.call(this);
-  this._removeMenuHandlers();
+  this._detachMenuHandlers();
 };
 
 /**
@@ -120,7 +120,18 @@ scout.MenuBar.prototype.large = function() {
   this.size = 'large';
 };
 
-scout.MenuBar.prototype._removeMenuHandlers = function() {
+/**
+ * This function can be called multiple times. The function attaches the menu handlers only if they are not yet added.
+ */
+scout.MenuBar.prototype._attachMenuHandlers = function() {
+  this.orderedMenuItems.all.forEach(function(item) {
+    if (item.events.count('propertyChange', this._menuItemPropertyChangeHandler) === 0) {
+      item.on('propertyChange', this._menuItemPropertyChangeHandler);
+    }
+  }, this);
+};
+
+scout.MenuBar.prototype._detachMenuHandlers = function() {
   this.orderedMenuItems.all.forEach(function(item) {
     item.off('propertyChange', this._menuItemPropertyChangeHandler);
   }.bind(this));
@@ -135,7 +146,7 @@ scout.MenuBar.prototype.setMenuItems = function(menuItems) {
 
 scout.MenuBar.prototype._setMenuItems = function(menuItems, rightFirst) {
   // remove property listeners of old menu items.
-  this._removeMenuHandlers();
+  this._detachMenuHandlers();
 
   this.orderedMenuItems = this._createOrderedMenus(menuItems);
 
@@ -148,11 +159,7 @@ scout.MenuBar.prototype._setMenuItems = function(menuItems, rightFirst) {
     this.menuboxRight.setMenuItems(this.orderedMenuItems.right);
   }
 
-  // add property listener of new menus
-  this.orderedMenuItems.all.forEach(function(item) {
-    item.on('propertyChange', this._menuItemPropertyChangeHandler);
-  }, this);
-
+  this._attachMenuHandlers();
   this.updateVisibility();
   this.updateDefaultMenu();
   this._updateTabbableMenu();
@@ -161,14 +168,14 @@ scout.MenuBar.prototype._setMenuItems = function(menuItems, rightFirst) {
 };
 
 scout.MenuBar.prototype._renderMenuItems = function() {
+  this._attachMenuHandlers();
   this.updateLastItemMarker();
   this.updateLeftOfButtonMarker();
   this.invalidateLayoutTree();
 };
 
 scout.MenuBar.prototype._removeMenuItems = function() {
-  this.setDefaultMenu(null);
-  this._removeMenuHandlers();
+  this._detachMenuHandlers();
 };
 
 scout.MenuBar.prototype._createOrderedMenus = function(menuItems) {
@@ -284,14 +291,25 @@ scout.MenuBar.prototype.updateVisibility = function() {
  * First rendered item that is enabled and reacts to ENTER keystroke shall be marked as 'defaultMenu'
  */
 scout.MenuBar.prototype.updateDefaultMenu = function() {
-  var defaultMenu = scout.arrays.find(this.orderedMenuItems.all, function(item) {
+  var i, item;
+  var defaultMenu = null;
+  for (i = 0; i < this.orderedMenuItems.all.length; i++) {
+    item = this.orderedMenuItems.all[i];
+
     if (!item.visible || !item.enabled || item.defaultMenu === false) {
       // Invisible or disabled menus and menus that explicitly have the "defaultMenu"
       // property set to false cannot be the default menu.
-      return false;
+      continue;
     }
-    return item.defaultMenu || this._isDefaultKeyStroke(item.actionKeyStroke);
-  }, this);
+    if (item.defaultMenu) {
+      defaultMenu = item;
+      break;
+    }
+    if (!defaultMenu && this._isDefaultKeyStroke(item.actionKeyStroke)) {
+      defaultMenu = item;
+    }
+  }
+
   this.setDefaultMenu(defaultMenu);
   if (defaultMenu && defaultMenu.isTabTarget()) {
     this.setTabbableMenu(defaultMenu);
@@ -310,16 +328,13 @@ scout.MenuBar.prototype.setDefaultMenu = function(defaultMenu) {
 };
 
 scout.MenuBar.prototype._setDefaultMenu = function(defaultMenu) {
-  if (this.defaultMenu) {
-    this.defaultMenu.setDefaultMenu(this.defaultMenu._initialDefaultMenu);
-    this.defaultMenu_initialDefaultMenu = null;
-  }
-  if (defaultMenu) {
-    // backup
-    defaultMenu._initialDefaultMenu = defaultMenu.defaultMenu;
-    defaultMenu.setDefaultMenu(true);
-  }
-  this._setProperty('defaultMenu', defaultMenu);
+   if (this.defaultMenu) {
+     this.defaultMenu.setMenuStyle(scout.Menu.MenuStyle.NONE);
+   }
+   if (defaultMenu) {
+     defaultMenu.setMenuStyle(scout.Menu.MenuStyle.DEFAULT);
+   }
+   this._setProperty('defaultMenu', defaultMenu);
 };
 
 /**
@@ -358,7 +373,7 @@ scout.MenuBar.prototype._onMenuItemPropertyChange = function(event) {
       this._updateTabbableMenu();
     }
   }
-  if (event.propertyName === 'overflown' || event.propertyName === 'enabled' || event.propertyName === 'visible' || event.propertyName === 'hidden' || event.propertyName === 'defaultMenu') {
+  if (event.propertyName === 'overflown' || event.propertyName === 'hidden') {
     if (!this.defaultMenu || event.source === this.defaultMenu) {
       this.updateDefaultMenu();
     }
@@ -381,5 +396,8 @@ scout.MenuBar.prototype._onMenuItemPropertyChange = function(event) {
       // return the wrong value (even if the menubar itself is visible).
       this.revalidateLayout();
     }
+  }
+  if (event.propertyName === 'keyStroke' || event.propertyName === 'enabled' || event.propertyName === 'defaultMenu' || event.propertyName === 'visible') {
+    this.updateDefaultMenu();
   }
 };
