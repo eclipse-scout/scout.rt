@@ -876,7 +876,7 @@ scout.FormField.prototype._removeLabel = function() {
  * This allows screen readers to build a catalog of the elements on the screen and their relationships, for example, to read the label when the input is focused.
  */
 scout.FormField.prototype._linkWithLabel = function($element) {
-  if (!this.$label) {
+  if (!this.$label || !$element) {
     return;
   }
 
