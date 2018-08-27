@@ -118,7 +118,11 @@ scout.FileChooser.prototype._render = function() {
   this.$container.addClassForAnimation('animate-open');
   // Prevent resizing when file chooser is dragged off the viewport
   this.$container.addClass('calc-helper');
-  this.$container.css('min-width', this.$container.width());
+  var windowSize = this.$container.windowSize();
+  // Use css width, but ensure that it is not larger than the window (mobile)
+  var w = Math.min(this.$container.width(), windowSize.width - 20);
+  this.$container.css('min-width', w);
+  this.$container.css('max-width', w);
   this.$container.removeClass('calc-helper');
   boxButtons.updateButtonWidths(this.$container.width());
   // Now that all texts, paddings, widths etc. are set, we can calculate the position
