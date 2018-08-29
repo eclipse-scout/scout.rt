@@ -192,6 +192,7 @@ scout.TreeAdapter.prototype._onNodeChanged = function(nodeId, cell) {
   node.foregroundColor = cell.foregroundColor;
   node.backgroundColor = cell.backgroundColor;
   node.font = cell.font;
+  node.htmlEnabled = cell.htmlEnabled;
 
   this.widget.changeNode(node);
 };
