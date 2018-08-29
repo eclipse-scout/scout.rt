@@ -23,7 +23,6 @@
       </param-value>
     </init-param>
   </filter>
-
   <filter-mapping>
     <filter-name>AuthFilter</filter-name>
     <url-pattern>/*</url-pattern>
@@ -33,17 +32,15 @@
     <servlet-name>process</servlet-name>
     <servlet-class>org.eclipse.scout.rt.server.ServiceTunnelServlet</servlet-class>
   </servlet>
-
-  <servlet>
-    <servlet-name>diagnostics</servlet-name>
-    <servlet-class>org.eclipse.scout.rt.server.admin.diagnostic.DiagnosticServlet</servlet-class>
-  </servlet>
-
   <servlet-mapping>
     <servlet-name>process</servlet-name>
     <url-pattern>/process</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <servlet-name>diagnostics</servlet-name>
+    <servlet-class>org.eclipse.scout.rt.server.admin.diagnostic.DiagnosticServlet</servlet-class>
+  </servlet>
   <servlet-mapping>
     <servlet-name>diagnostics</servlet-name>
     <url-pattern>/diagnostics</url-pattern>

@@ -19,7 +19,7 @@
     <listener-class>org.eclipse.scout.rt.server.commons.HttpSessionMutex</listener-class>
   </listener>
 
-  <!-- filters for api access -->
+  <!-- filters for API access -->
   <filter>
     <filter-name>RestAuthFilter</filter-name>
     <filter-class>${package}.api.RestAuthFilter</filter-class>
@@ -28,6 +28,7 @@
     <filter-name>RestAuthFilter</filter-name>
     <url-pattern>/api/*</url-pattern>
   </filter-mapping>
+
   <filter>
     <filter-name>ServerRunContextFilter</filter-name>
     <filter-class>org.eclipse.scout.rt.server.context.ServerRunContextFilter</filter-class>
@@ -35,6 +36,15 @@
   <filter-mapping>
     <filter-name>ServerRunContextFilter</filter-name>
     <url-pattern>/api/*</url-pattern>
+  </filter-mapping>
+
+  <filter>
+    <filter-name>GzipServletFilter</filter-name>
+    <filter-class>org.eclipse.scout.rt.server.commons.servlet.filter.gzip.GzipServletFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>GzipServletFilter</filter-name>
+    <url-pattern>/*</url-pattern>
   </filter-mapping>
 
   <!-- JAX-RS Jersey Servlet that processes REST requests -->
