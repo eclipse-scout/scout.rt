@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -86,6 +87,15 @@ public class DoEntity implements IDoEntity {
   @Override
   public void remove(String attributeName) {
     m_attributes.remove(attributeName);
+  }
+
+  /**
+   * Removes all {@link DoValue} or {@link DoList} attribute from attributes map that satisfy the given predicate.
+   * Errors or runtime exceptions thrown during iteration or by the predicate are relayed to the caller.
+   */
+  @Override
+  public void removeIf(Predicate<? super DoNode<?>> filter) {
+    m_attributes.values().removeIf(filter);
   }
 
   @Override

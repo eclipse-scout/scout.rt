@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.Bean;
@@ -62,6 +63,12 @@ public interface IDoEntity extends IDataObject {
    * Removes {@link DoValue} or {@link DoList} attribute from attributes map.
    */
   void remove(String attributeName);
+
+  /**
+   * Removes all {@link DoValue} or {@link DoList} attribute from attributes map that satisfy the given predicate.
+   * Errors or runtime exceptions thrown during iteration or by the predicate are relayed to the caller.
+   */
+  void removeIf(Predicate<? super DoNode<?>> filter);
 
   /**
    * @return the map of all attributes as (key, unwrapped value)

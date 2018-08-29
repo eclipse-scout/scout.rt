@@ -16,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
@@ -80,6 +81,11 @@ public class TestCustomImplementedEntityDo implements IDoEntity {
   @Override
   public void remove(String attributeName) {
     m_attributes.remove(attributeName);
+  }
+
+  @Override
+  public void removeIf(Predicate<? super DoNode<?>> filter) {
+    m_attributes.values().removeIf(filter);
   }
 
   @Override

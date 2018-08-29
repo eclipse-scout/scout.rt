@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -27,6 +28,7 @@ import java.util.function.Function;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.dataobject.fixture.EntityFixtureDo;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.junit.Test;
 
@@ -169,6 +171,23 @@ public class DoEntityTest {
     entity.putList("foo", Arrays.asList("value2"));
     assertEquals("value2", entity.getList("foo", String.class).get(0));
     assertSame(attribute, entity.getNode("foo"));
+  }
+
+  @Test
+  public void testRemoveIf() {
+    DoEntity entity = new DoEntity();
+    entity.putList("foo", Arrays.asList("value1"));
+    entity.put("foo2", "value2");
+    entity.put("foo3", null);
+    entity.put("foo4", "value2");
+
+    assertEquals(CollectionUtility.hashSet("foo", "foo2", "foo3", "foo4"), entity.allNodes().keySet());
+    entity.removeIf(n -> "value2".equals(n.get()));
+    assertEquals(CollectionUtility.hashSet("foo", "foo3"), entity.allNodes().keySet());
+    entity.removeIf(n -> n.get() == null);
+    assertEquals(CollectionUtility.hashSet("foo"), entity.allNodes().keySet());
+    entity.removeIf(n -> n.getAttributeName().equals("foo"));
+    assertEquals(Collections.emptySet(), entity.allNodes().keySet());
   }
 
   @Test(expected = UnsupportedOperationException.class)
