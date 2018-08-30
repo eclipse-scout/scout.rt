@@ -27,6 +27,7 @@ scout.Form = function() {
   this.views = [];
   this.messageBoxes = [];
   this.fileChoosers = [];
+  this.focusedElement;
   this.closable = true;
   this.cacheBounds = false;
   this.resizable = true;
@@ -105,6 +106,7 @@ scout.Form.prototype._postRender = function() {
   if (this.renderInitialFocusEnabled) {
     this.renderInitialFocus();
   }
+  this._renderFocusedElement();
 
   // Render attached forms, message boxes and file choosers.
   this.formController.render();
@@ -159,6 +161,11 @@ scout.Form.prototype._renderForm = function() {
     // Attach to capture phase to activate focus context before regular mouse down handlers may set the focus.
     // E.g. clicking a check box label on another dialog executes mouse down handler of the check box which will focus the box. This only works if the focus context of the dialog is active.
     this.$container[0].addEventListener('mousedown', this._onDialogMouseDown.bind(this), true);
+    // restore focus
+    this.one('removing', function() {
+      this.focusedElement = scout.widget(this.session.focusManager._findFocusContext(this.$container).focusedElement);
+    }.bind(this));
+
   } else {
     layout = new scout.FormLayout(this);
   }
@@ -168,6 +175,12 @@ scout.Form.prototype._renderForm = function() {
 
   if (this.isDialog()) {
     this.$container.addClassForAnimation('animate-open');
+  }
+};
+
+scout.Form.prototype._renderFocusedElement = function() {
+  if (this.focusedElement) {
+    this.focusedElement.focus();
   }
 };
 

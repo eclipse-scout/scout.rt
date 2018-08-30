@@ -317,7 +317,7 @@ scout.FormController.prototype._activateDialog = function(dialog) {
  */
 scout.FormController.prototype.attachDialogs = function() {
   this.displayParent.dialogs.forEach(function(dialog) {
-    dialog.attach();
+    dialog.render();
   }, this);
 };
 
@@ -329,7 +329,7 @@ scout.FormController.prototype.attachDialogs = function() {
  */
 scout.FormController.prototype.detachDialogs = function() {
   this.displayParent.dialogs.forEach(function(dialog) {
-    dialog.detach();
+    dialog.remove();
   }, this);
 };
 
