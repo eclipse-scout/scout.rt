@@ -188,6 +188,7 @@ scout.GroupBox.prototype._remove = function() {
 };
 
 scout.GroupBox.prototype._renderProperties = function() {
+  this._renderScrollable(); // Need to be before renderExpanded in order to have the scrollbars when the fields are rendered. The status tooltips require a scrollable parent to move when scrolling.
   this._renderExpanded(); // Need to be before renderVisible is executed, otherwise controls might be rendered if group box is invisible which breaks some widgets (e.g. Tree and Table)
   scout.GroupBox.parent.prototype._renderProperties.call(this);
 
@@ -197,7 +198,6 @@ scout.GroupBox.prototype._renderProperties = function() {
   this._renderExpandable();
   this._renderMenuBarPosition();
   this._renderMenuBarVisible();
-  this._renderScrollable();
   this._renderSubLabel();
 };
 
