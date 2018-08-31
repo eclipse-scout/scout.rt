@@ -263,7 +263,7 @@ public final class HTML {
   }
 
   /**
-   * Create a html element with encoded text for a link &lt;a href="url"&gt;text&lt;/a&gt;.
+   * Create a html element with encoded text for a link &lt;a href="url" rel="noreferrer noopener"&gt;text&lt;/a&gt;.
    * <p>
    * Example:<br>
    * String encodedHtml = HTML.link("http://xyz.com","text").toHtml(); <br>
@@ -273,7 +273,27 @@ public final class HTML {
    *          text as bind
    */
   public static IHtmlElement link(CharSequence url, CharSequence text) {
-    return new HtmlLinkBuilder(url, text);
+    return link(url, text, false);
+  }
+
+  /**
+   * Create a html element with encoded text for a link &lt;a href="url"&gt;text&lt;/a&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.link("http://xyz.com","text").toHtml(); <br>
+   * </p>
+   *
+   * @param text
+   *          text as bind
+   * @param preserveOpener
+   *          Specifies if the opener and referrer should be available to the target browser window. Because of security
+   *          reasons this should be disabled ({@code false}) in most cases. If disabled, the attribute
+   *          {@code rel="noreferrer noopener"} is added to the link element.
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Link_types
+   * @see https://mathiasbynens.github.io/rel-noopener/
+   */
+  public static IHtmlElement link(CharSequence url, CharSequence text, boolean preserveOpener) {
+    return new HtmlLinkBuilder(url, text, preserveOpener);
   }
 
   /**

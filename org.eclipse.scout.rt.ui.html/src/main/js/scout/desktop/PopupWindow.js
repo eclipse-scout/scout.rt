@@ -56,10 +56,10 @@ scout.PopupWindow.prototype._onReady = function() {
   // resize browser-window before layout?
   if (this.resizeToPrefSize) {
     var prefSize = this.htmlComp.prefSize(),
-    // we cannot simply set the pref. size of the component as window size,
-    // since the window "chrome" (window-border, -title and location bar)
-    // occupies some space. That's why we measure the difference between
-    // the current document size and the window size first.
+      // we cannot simply set the pref. size of the component as window size,
+      // since the window "chrome" (window-border, -title and location bar)
+      // occupies some space. That's why we measure the difference between
+      // the current document size and the window size first.
       myWindowSize = new scout.Dimension(this.myWindow.outerWidth, this.myWindow.outerHeight),
       myDocumentSize = new scout.Dimension($myDocument.width(), $myDocument.height()),
       windowChromeHoriz = myWindowSize.width - myDocumentSize.width,
@@ -82,7 +82,9 @@ scout.PopupWindow.prototype._onReady = function() {
     .on('resize', this._onResize.bind(this));
 
   // Delegate uncaught JavaScript errors in the popup-window to the main-window
-  this.myWindow.onerror = this.myWindow.opener.onerror;
+  if (this.myWindow.opener) {
+    this.myWindow.onerror = this.myWindow.opener.onerror;
+  }
 
   // Finally set initialized flag to true, at this point the PopupWindow is fully initialized
   this.initialized = true;
@@ -120,4 +122,3 @@ scout.PopupWindow.prototype.close = function() {
 scout.PopupWindow.prototype.title = function(title) {
   this.myWindow.document.title = title;
 };
-

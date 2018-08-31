@@ -212,26 +212,14 @@ scout.BrowserField.prototype._openPopupWindow = function(reopenIfClosed) {
       'height=' + popupBounds.height
     );
     var location = this.location || 'about:blank';
-    this._popupWindow = popupBlockerHandler.openWindow(location,
-      undefined,
-      windowSpecs);
-    if (this._popupWindow) {
-      this._popupWindowOpen();
-    } else {
-      $.log.warn('Popup-blocker detected! Show link to open window manually');
-      popupBlockerHandler.showNotification(function() {
-        this._popupWindow = window.open(location,
-          undefined,
-          windowSpecs);
-        this._popupWindowOpen();
-      }.bind(this));
-    }
+    popupBlockerHandler.openWindow(location, undefined, windowSpecs, this._popupWindowOpen.bind(this));
   } else if (reopenIfClosed) {
     this._popupWindow.focus();
   }
 };
 
-scout.BrowserField.prototype._popupWindowOpen = function() {
+scout.BrowserField.prototype._popupWindowOpen = function(popup) {
+  this._popupWindow = popup;
   if (this._popupWindow && !this._popupWindow.closed) {
     this.trigger('externalWindowStateChange', {
       windowState: scout.BrowserField.windowStates.WINDOW_OPEN

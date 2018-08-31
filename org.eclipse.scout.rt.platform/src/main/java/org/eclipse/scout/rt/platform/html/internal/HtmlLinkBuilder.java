@@ -19,8 +19,11 @@ public class HtmlLinkBuilder extends HtmlNodeBuilder implements IHtmlElement {
 
   private static final long serialVersionUID = 1L;
 
-  public HtmlLinkBuilder(CharSequence url, CharSequence text) {
+  public HtmlLinkBuilder(CharSequence url, CharSequence text, boolean preserveOpener) {
     super("a", text);
     addAttribute("href", url);
+    if (!preserveOpener) {
+      addAttribute("rel", "noreferrer noopener");
+    }
   }
 }

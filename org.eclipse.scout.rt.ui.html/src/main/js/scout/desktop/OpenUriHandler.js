@@ -101,10 +101,6 @@ scout.OpenUriHandler.prototype.openUriInIFrame = function(uri) {
 };
 
 scout.OpenUriHandler.prototype.openUriAsNewWindow = function(uri) {
-  var popupBlockerHandler = new scout.PopupBlockerHandler(this.session),
-    popup = popupBlockerHandler.openWindow(uri);
-
-  if (!popup) {
-    popupBlockerHandler.showNotification(uri);
-  }
+  var popupBlockerHandler = new scout.PopupBlockerHandler(this.session);
+  popupBlockerHandler.openWindow(uri);
 };

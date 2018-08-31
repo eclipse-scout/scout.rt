@@ -2,6 +2,7 @@ scout.PopupBlockerDesktopNotification = function() {
   scout.PopupBlockerDesktopNotification.parent.call(this);
   this.duration = scout.DesktopNotification.INFINITE;
   this.linkUrl;
+  this.preserveOpener = false;
 };
 scout.inherits(scout.PopupBlockerDesktopNotification, scout.DesktopNotification);
 
@@ -30,8 +31,12 @@ scout.PopupBlockerDesktopNotification.prototype._renderProperties = function() {
 
 scout.PopupBlockerDesktopNotification.prototype._renderLinkUrl = function() {
   if (this.linkUrl) {
-    this.$link.attr('href', this.linkUrl)
+    this.$link
+      .attr('href', this.linkUrl)
       .attr('target', '_blank');
+    if (!this.preserveOpener) {
+      this.$link.attr('rel', 'noreferrer noopener');
+    }
   } else {
     this.$link.removeAttr('href')
       .removeAttr('target');

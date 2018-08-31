@@ -8,33 +8,49 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.PopupBlockerHandler = function(session) {
+
+/**
+ * @param {optional boolean} preserveOpener A boolean indicating if the popup-window should have a back reference to the origin window. By default this parameter is false because of security reasons. Only trusted sites may be allowed to access the opener window and potentially modify the origin web application! See https://mathiasbynens.github.io/rel-noopener/ for more details.
+ */
+scout.PopupBlockerHandler = function(session, preserveOpener) {
   this.session = session;
+  this.preserveOpener = preserveOpener;
 };
 
-scout.PopupBlockerHandler.prototype.openWindow = function(uri, windowName, windowSpecs) {
-  var popup;
-
+/**
+ * @param {String} uri The URI for the window to open
+ * @param {optional String} windowName An optional string name for the new window. The name can be used as the target of links and forms using the target attribute of an 'a' or 'form' element. The name should not contain any blank space. Note that the window name does not specify the title of the new window.
+ * @param {optional String} windowSpecs Optional parameter listing the features (size, position, scrollbars, etc.) of the new window. The string must not contain any blank space, each feature name and value must be separated by a comma.
+ * @param {optional function} onWindowOpened Optional function to call when the window has been successfully opened. Due to popup-blockers this may not necessarily be directly after the call to this method but may be later when the popup-blocker-notification-link is manually activated by the user.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/open
+ */
+scout.PopupBlockerHandler.prototype.openWindow = function(uri, windowName, windowSpecs, onWindowOpened) {
   windowSpecs = windowSpecs || 'location=no,toolbar=no,menubar=no,resizable=yes,scrollbars=yes';
   windowName = windowName || 'scout_' + new Date().getTime();
 
-  if (scout.device.isInternetExplorer()) {
-    // Workaround for IE: When in "protected mode", window.open() returns null for external URLs, even when
-    // the popup was successfully opened! To check if a popup blocker is active, we first open an empty
-    // popup with no URL, which will return null when the popup was blocked. If the popup was successful,
-    // we change the location to the target URI.
-    popup = window.open('', windowName, windowSpecs);
-    if (popup) {
-      popup.window.location.href = uri;
+  var popup = window.open('', windowName, windowSpecs);
+  if (popup) {
+    if (!this.preserveOpener) {
+      popup.opener = null;
+    }
+    popup.window.location.href = uri;
+    if (onWindowOpened) {
+      onWindowOpened(popup);
     }
   } else {
-    // Chrome returns undefined, FF null when popup is blocked
-    popup = window.open(uri, windowName, windowSpecs);
+    $.log.warn('Popup-blocker detected! Show link to open window manually');
+    if (onWindowOpened) {
+      this.showNotification(function() {
+        this.openWindow(uri, windowName, windowSpecs, onWindowOpened);
+      }.bind(this));
+    } else {
+      this.showNotification(uri);
+    }
   }
-  return popup;
 };
 
-// Shows a notfication when popup blocker has been detected
+// Shows a notification when popup-blocker has been detected
 scout.PopupBlockerHandler.prototype.showNotification = function(vararg) {
   var notification, linkUrl,
     desktop = this.session.desktop;
@@ -45,7 +61,8 @@ scout.PopupBlockerHandler.prototype.showNotification = function(vararg) {
 
   notification = scout.create('DesktopNotification:PopupBlocker', {
     parent: desktop,
-    linkUrl: linkUrl
+    linkUrl: linkUrl,
+    preserveOpener: this.preserveOpener
   });
 
   if (!linkUrl && $.isFunction(vararg)) {
