@@ -154,8 +154,8 @@ scout.TableField.prototype.markAsSaved = function() {
   this._checkedRows = scout.objects.createMap();
 };
 
-scout.TableField.prototype.validate = function() {
-  var desc = scout.TableField.parent.prototype.validate.call(this);
+scout.TableField.prototype.getValidationResult = function() {
+  var desc = scout.TableField.parent.prototype.getValidationResult.call(this);
   if (desc && !desc.valid) {
     return desc;
   }
