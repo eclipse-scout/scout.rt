@@ -73,21 +73,14 @@ scout.DesktopFormController.prototype._renderPopupWindow = function(form) {
   // See: https://developer.mozilla.org/en-US/docs/Web/API/Window/open#Position_and_size_features
   windowSpecs += ',location=no,toolbar=no,menubar=no,resizable=yes';
 
-  var popupBlockerHandler = new scout.PopupBlockerHandler(this.session),
+  var popupBlockerHandler = new scout.PopupBlockerHandler(this.session, true /* no external untrusted URI: Can keep the opener for callback. */),
     // form ID in URL is required for 'reload window' support
-    url = 'popup-window.html?formId=' + form.id,
-    // we must use '_blank' as window-name so browser-windows are never reused
-    newWindow = popupBlockerHandler.openWindow(url, '_blank', windowSpecs);
+    url = 'popup-window.html?formId=' + form.id;
 
-  if (newWindow) {
-    this._addPopupWindow(newWindow, form, resizeToPrefSize);
-  } else {
-    $.log.warn('Popup-blocker detected! Show link to open window manually');
-    popupBlockerHandler.showNotification(function() {
-      newWindow = window.open(url, '_blank', windowSpecs);
-      this._addPopupWindow(newWindow, form, resizeToPrefSize);
-    }.bind(this));
-  }
+  // use '_blank' as window-name so browser-windows are never reused
+  popupBlockerHandler.openWindow(url, '_blank', windowSpecs, function(popup) {
+    this._addPopupWindow(popup, form, resizeToPrefSize);
+  }.bind(this));
 };
 
 scout.DesktopFormController.prototype._addPopupWindow = function(newWindow, form, resizeToPrefSize) {

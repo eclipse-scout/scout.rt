@@ -64,9 +64,18 @@ public class HTMLTest {
    * Tests a link with URL and encoded text.
    */
   @Test
+  public void testLinkNoRel() {
+    String html = HTML.link(TEST_URL, HTML_TEXT, true).toHtml();
+    assertEquals("<a href=\"" + TEST_URL.replace("\"", "&quot;") + "\">" + escape(HTML_TEXT) + "</a>", html);
+  }
+
+  /**
+   * Tests a link with URL and encoded text.
+   */
+  @Test
   public void testLinkNoBinds() {
     String html = HTML.link(TEST_URL, HTML_TEXT).toHtml();
-    assertEquals("<a href=\"" + TEST_URL.replace("\"", "&quot;") + "\">" + escape(HTML_TEXT) + "</a>", html);
+    assertEquals("<a href=\"" + TEST_URL.replace("\"", "&quot;") + "\" rel=\"noreferrer noopener\">" + escape(HTML_TEXT) + "</a>", html);
   }
 
   /**
@@ -80,8 +89,8 @@ public class HTMLTest {
 
   @Test
   public void testNullAttribute() {
-    assertEquals("<a href=\"\"></a>", HTML.link(null, null).toHtml());
-    assertEquals("<a href=\"\">&lt;a&gt;badlink&lt;&#47;a&gt;</a>", HTML.link(null, "<a>badlink</a>").toHtml());
+    assertEquals("<a href=\"\" rel=\"noreferrer noopener\"></a>", HTML.link(null, null).toHtml());
+    assertEquals("<a href=\"\" rel=\"noreferrer noopener\">&lt;a&gt;badlink&lt;&#47;a&gt;</a>", HTML.link(null, "<a>badlink</a>").toHtml());
   }
 
   /**
@@ -141,7 +150,7 @@ public class HTMLTest {
   @Test
   public void testLinkWithBoldNoBinds() {
     final IHtmlElement html = HTML.bold(HTML_TEXT, link(TEST_URL, HTML_TEXT));
-    assertEquals("<b>Test Last Name&amp;<a href=\"http://SCOUTBLABLA.com&quot;\">Test Last Name&amp;</a></b>", html.toHtml());
+    assertEquals("<b>Test Last Name&amp;<a href=\"http://SCOUTBLABLA.com&quot;\" rel=\"noreferrer noopener\">Test Last Name&amp;</a></b>", html.toHtml());
   }
 
   private String escape(String text) {
@@ -207,7 +216,7 @@ public class HTMLTest {
   @Test
   public void testComplexHtml() {
     final IHtmlElement html = HTML.div(link(TEST_URL, HTML_TEXT), HTML.table(tr(td(HTML_TEXT), td(HTML_TEXT), td(HTML_TEXT))));
-    String expected = "<div><a href=\"http://SCOUTBLABLA.com&quot;\">Test Last Name&amp;</a><table><tr><td>Test Last Name&amp;</td><td>Test Last Name&amp;</td><td>Test Last Name&amp;</td></tr></table></div>";
+    String expected = "<div><a href=\"http://SCOUTBLABLA.com&quot;\" rel=\"noreferrer noopener\">Test Last Name&amp;</a><table><tr><td>Test Last Name&amp;</td><td>Test Last Name&amp;</td><td>Test Last Name&amp;</td></tr></table></div>";
     assertEquals(expected, html.toHtml());
   }
 
