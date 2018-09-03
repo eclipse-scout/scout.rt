@@ -153,6 +153,12 @@ public class JsonTileGrid<T extends ITileGrid<? extends ITile>> extends Abstract
         return new JsonTileGridLayoutConfig((TileGridLayoutConfig) value).toJson();
       }
     });
+    putJsonProperty(new JsonProperty<T>(ITileGrid.PROP_VIRTUAL, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isVirtual();
+      }
+    });
   }
 
   @Override

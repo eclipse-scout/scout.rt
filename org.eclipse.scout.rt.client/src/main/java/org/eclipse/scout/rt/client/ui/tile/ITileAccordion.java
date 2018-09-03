@@ -26,6 +26,7 @@ public interface ITileAccordion<T extends ITile> extends IAccordion, IExtensible
   String PROP_MULTI_SELECT = "multiSelect";
   String PROP_GRID_COLUMN_COUNT = "gridColumnCount";
   String PROP_WITH_PLACEHOLDERS = "withPlaceholders";
+  String PROP_VIRTUAL = "virtual";
   String PROP_TILE_GRID_LAYOUT_CONFIG = "tileGridLayoutConfig";
   String PROP_TILE_COMPARATOR = "tileComparator";
   String PROP_SELECTED_TILES = "selectedTiles";
@@ -109,42 +110,26 @@ public interface ITileAccordion<T extends ITile> extends IAccordion, IExtensible
 
   void setGridColumnCount(int gridColumnCount);
 
-  /**
-   * @return the value of {@link ITileGrid#getGridColumnCount()} of the first tile grid assuming that all tile grids use
-   *         the same column count
-   */
   int getGridColumnCount();
 
   void setSelectable(boolean selectable);
 
-  /**
-   * @return the value of {@link ITileGrid#isSelectable()} of the first tile grid assuming that all tile grids use the
-   *         same value
-   */
   boolean isSelectable();
 
   void setMultiSelect(boolean multiSelect);
 
-  /**
-   * @return the value of {@link ITileGrid#isMultiSelect()} of the first tile grid assuming that all tile grids use the
-   *         same value
-   */
   boolean isMultiSelect();
 
   void setWithPlaceholders(boolean withPlaceholders);
 
-  /**
-   * @return the value of {@link ITileGrid#isWithPlaceholders()} of the first tile grid assuming that all tile grids use
-   *         the same value
-   */
   boolean isWithPlaceholders();
+
+  void setVirtual(boolean virtual);
+
+  boolean isVirtual();
 
   void setTileGridLayoutConfig(TileGridLayoutConfig layoutConfig);
 
-  /**
-   * @return the value of {@link ITileGrid#getLayoutConfig()} of the first tile grid assuming that all tile grids use
-   *         the same value
-   */
   TileGridLayoutConfig getTileGridLayoutConfig();
 
   IFastListenerList<TileGridListener> tileGridListeners();

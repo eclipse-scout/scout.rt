@@ -32,8 +32,7 @@ scout.inherits(scout.LogicalGridLayout, scout.AbstractLayout);
 
 scout.LogicalGridLayout.prototype.validateLayout = function($container, options) {
   var visibleComps = [],
-    visibleCons = [],
-    cons;
+    visibleCons = [];
 
   // If there is a logical grid, validate it (= recalculate if it is dirty) and use the grid config to get the grid relevant widgets (Scout JS).
   // If there is no logical grid the grid relevant widgets are found using DOM by selecting the children with a html component (Scout classic).
@@ -44,7 +43,6 @@ scout.LogicalGridLayout.prototype.validateLayout = function($container, options)
     this.widget.logicalGrid.gridConfig.getGridWidgets().forEach(function(widget) {
       if (!widget.rendered) {
         // getGridWidgets may return non rendered widgets, but grid should be calculated nevertheless
-        // XXX cgu is grid calculation important? should we use tileGrid.renderedWidgets here instead of gridWidgets (performance)?
         return;
       }
       if (!widget.htmlComp) {

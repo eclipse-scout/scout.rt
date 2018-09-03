@@ -90,6 +90,7 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
     setSelectable(defaultGrid.isSelectable());
     setMultiSelect(defaultGrid.isMultiSelect());
     setWithPlaceholders(defaultGrid.isWithPlaceholders());
+    setVirtual(defaultGrid.isVirtual());
     setGridColumnCount(defaultGrid.getGridColumnCount());
     setTileGridLayoutConfig(defaultGrid.getLayoutConfig());
     setTileComparator(defaultGrid.getComparator());
@@ -327,6 +328,7 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
     tileGrid.setMultiSelect(isMultiSelect());
     tileGrid.setGridColumnCount(getGridColumnCount());
     tileGrid.setWithPlaceholders(isWithPlaceholders());
+    tileGrid.setVirtual(isVirtual());
     tileGrid.setLayoutConfig(getTileGridLayoutConfig());
     tileGrid.setComparator(getTileComparator());
     for (ITileFilter<T> filter : m_tileFilters) {
@@ -590,6 +592,17 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
   @Override
   public TileGridLayoutConfig getTileGridLayoutConfig() {
     return (TileGridLayoutConfig) propertySupport.getProperty(PROP_TILE_GRID_LAYOUT_CONFIG);
+  }
+
+  @Override
+  public void setVirtual(boolean virtual) {
+    propertySupport.setPropertyBool(PROP_VIRTUAL, virtual);
+    getTileGrids().forEach(tileGrid -> tileGrid.setVirtual(virtual));
+  }
+
+  @Override
+  public boolean isVirtual() {
+    return propertySupport.getPropertyBool(PROP_VIRTUAL);
   }
 
   protected void handleSelectedTilesChange(IGroup changedGroup, PropertyChangeEvent event) {

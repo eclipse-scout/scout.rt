@@ -40,6 +40,7 @@ public interface ITileGrid<T extends ITile> extends IWidget, ITypeWithClassId, I
   String PROP_LAYOUT_CONFIG = "layoutConfig";
   String PROP_CONTAINER = "container";
   String PROP_CONTEXT_MENU = "contextMenus";
+  String PROP_VIRTUAL = "virtual";
 
   String PROP_ASYNC_LOAD_JOBNAME_PREFIX = "tileAsyncDataLoadJob";
   String PROP_ASYNC_LOAD_IDENTIFIER_PREFIX = "tileAsyncDataLoadIdentifier";
@@ -102,6 +103,10 @@ public interface ITileGrid<T extends ITile> extends IWidget, ITypeWithClassId, I
   void setLayoutConfig(TileGridLayoutConfig config);
 
   TileGridLayoutConfig getLayoutConfig();
+
+  boolean isVirtual();
+
+  void setVirtual(boolean virtual);
 
   void addTiles(List<T> tiles);
 

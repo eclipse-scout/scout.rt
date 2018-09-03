@@ -46,11 +46,8 @@ scout.VirtualScrolling.prototype.setViewRangeSize = function(viewRangeSize, upda
  * The view range size is this value * 2.
  */
 scout.VirtualScrolling.prototype.calculateViewRangeSize = function() {
-  if (!this.enabled) {
+  if (!this.enabled || this.$scrollable.length === 0) {
     return this.rowCount();
-  }
-  if (this.$scrollable.length === 0) {
-    return this.maxViewRange();
   }
   if (this.minRowHeight === 0) {
     throw new Error('Cannot calculate view range with rowHeight = 0');
@@ -81,7 +78,7 @@ scout.VirtualScrolling.prototype.calculateCurrentViewRange = function() {
 
   if (maxScrollTop === 0) {
     // no scrollbars visible
-    rowIndex = 0; // XXX cgu why not return max range?
+    rowIndex = 0;
   } else {
     rowIndex = this._rowIndexAtScrollTop(scrollTop);
   }
@@ -132,7 +129,6 @@ scout.VirtualScrolling.prototype._rowIndexAtScrollTop = function(scrollTop) {
     height = scrollTop + (this.widget.$container.offset().top - this.$scrollable.offset().top);
   }
 
-  // XXX CGU replace with fake rows which store the row height per row (maybe use  this.layout.info.cellBounds() + margins to not force browser relayout when accessing height?)
   for (var row = 0; row < rowCount; row++) {
     height += this.rowHeight(row);
     if (scrollTop < height) {
