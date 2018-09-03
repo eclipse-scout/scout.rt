@@ -48,10 +48,12 @@ scout.FileChooserController.prototype.remove = function() {
  * Renders all file choosers registered with this controller.
  */
 scout.FileChooserController.prototype.render = function() {
-  this.displayParent.fileChoosers.forEach(function(chooser) {
-    chooser.setDisplayParent(this.displayParent);
-    this._render(chooser);
-  }.bind(this));
+  if (this.displayParent.inFront()) {
+    this.displayParent.fileChoosers.forEach(function(chooser) {
+      chooser.setDisplayParent(this.displayParent);
+      this._render(chooser);
+    }.bind(this));
+  }
 };
 
 scout.FileChooserController.prototype._render = function(fileChooser) {
@@ -77,39 +79,10 @@ scout.FileChooserController.prototype._render = function(fileChooser) {
     $parent = this.session.desktop.$container;
   }
   fileChooser.render($parent);
-
-  // Only display the file chooser if its 'displayParent' is visible to the user.
-  if (!this.displayParent.inFront()) {
-    fileChooser.detach();
-  }
 };
 
 scout.FileChooserController.prototype._remove = function(fileChooser) {
   fileChooser.remove();
-};
-
-/**
- * Attaches all file choosers to their original DOM parents.
- * In contrast to 'render', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
- *
- * This method has no effect if already attached.
- */
-scout.FileChooserController.prototype.attach = function() {
-  this.displayParent.fileChoosers.forEach(function(fileChooser) {
-    fileChooser.attach();
-  }, this);
-};
-
-/**
- * Detaches all file choosers from their DOM parents. Thereby, modality glassPanes are not detached.
- * In contrast to 'remove', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
- *
- * This method has no effect if already detached.
- */
-scout.FileChooserController.prototype.detach = function() {
-  this.displayParent.fileChoosers.forEach(function(fileChooser) {
-    fileChooser.detach();
-  }, this);
 };
 
 scout.FileChooserController.prototype.acceptView = function(view) {

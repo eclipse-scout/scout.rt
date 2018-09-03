@@ -24,7 +24,7 @@ scout.MessageBoxController = function(displayParent, session) {
 scout.MessageBoxController.prototype.registerAndRender = function(messageBox) {
   scout.assertProperty(messageBox, 'displayParent');
   this.displayParent.messageBoxes.push(messageBox);
-  this._render(messageBox);
+  this._renderMessageBox(messageBox);
 };
 
 /**
@@ -48,13 +48,15 @@ scout.MessageBoxController.prototype.remove = function() {
  * Renders all message boxes registered with this controller.
  */
 scout.MessageBoxController.prototype.render = function() {
-  this.displayParent.messageBoxes.forEach(function(msgBox) {
-    msgBox.setDisplayParent(this.displayParent);
-    this._render(msgBox);
-  }.bind(this));
+  if (this.displayParent.inFront()) {
+    this.displayParent.messageBoxes.forEach(function(msgBox) {
+      msgBox.setDisplayParent(this.displayParent);
+      this._renderMessageBox(msgBox);
+    }.bind(this));
+  }
 };
 
-scout.MessageBoxController.prototype._render = function(messageBox) {
+scout.MessageBoxController.prototype._renderMessageBox = function(messageBox) {
   // Use parent's function or (if not implemented) our own.
   if (this.displayParent.acceptView) {
     if (!this.displayParent.acceptView(messageBox)) {
@@ -78,39 +80,10 @@ scout.MessageBoxController.prototype._render = function(messageBox) {
     $mbParent = this.session.desktop.$container;
   }
   messageBox.render($mbParent);
-
-  // Only display the message box if its 'displayParent' is visible to the user.
-  if (!this.displayParent.inFront()) {
-    messageBox.detach();
-  }
 };
 
 scout.MessageBoxController.prototype._remove = function(messageBox) {
   messageBox.remove();
-};
-
-/**
- * Attaches all message boxes to their original DOM parents.
- * In contrast to 'render', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
- *
- * This method has no effect if already attached.
- */
-scout.MessageBoxController.prototype.attach = function() {
-  this.displayParent.messageBoxes.forEach(function(messageBox) {
-    messageBox.attach();
-  }, this);
-};
-
-/**
- * Detaches all message boxes from their DOM parents. Thereby, modality glassPanes are not detached.
- * In contrast to 'remove', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
- *
- * This method has no effect if already detached.
- */
-scout.MessageBoxController.prototype.detach = function() {
-  this.displayParent.messageBoxes.forEach(function(messageBox) {
-    messageBox.detach();
-  }, this);
 };
 
 scout.MessageBoxController.prototype.acceptView = function(view) {
