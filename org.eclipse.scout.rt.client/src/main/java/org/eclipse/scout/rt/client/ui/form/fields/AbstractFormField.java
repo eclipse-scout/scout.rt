@@ -1643,8 +1643,9 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    *          The enabled state of the root field.
    */
   protected void fireEnabledComputetChangedRec() {
+    final boolean thisEnabled = isEnabled();
     visit(field -> {
-      boolean b = (isEnabled() ? field.isEnabledIncludingParents() : false);
+      boolean b = thisEnabled && field.isEnabledIncludingParents();
       field.propertySupport.firePropertyChange(PROP_ENABLED_COMPUTED, !b, b);
     }, AbstractFormField.class);
   }
