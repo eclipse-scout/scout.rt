@@ -20,11 +20,11 @@ scout.inherits(scout.TileGridLayout, scout.LogicalGridLayout);
 scout.TileGridLayout.prototype.layout = function($container) {
   var htmlComp = this.widget.htmlComp;
   if (this.widget.scrolling) {
-    // Try to layout only as much as needed while scrolling
-    // XXX cgu _layout will call prefSize each time while scrolling... set htmlComp.valid so that prefSize can be read from cache.
-    // What could go wrong when doing this? It should be faster... What happens, if tile is added right before scrolling with useUiHeight = true? probably, pref size will be wrong
-//    htmlComp.valid = true;
-    this.widget._renderViewPort();
+    // Try to layout only as much as needed while scrolling in virtual mode
+    // Scroll top may be dirty when layout is validated before scrolling to a specific tile (see tileGrid.scrollTo)
+    if (!this.widget.scrollTopDirty) {
+      this.widget._renderViewPort();
+    }
     this._layout($container);
     return;
   }
@@ -32,6 +32,9 @@ scout.TileGridLayout.prototype.layout = function($container) {
   // Animate only once on startup (if enabled) but animate every time on resize
   var animated = htmlComp.layouted || (this.widget.startupAnimationEnabled && !this.widget.startupAnimationDone) || this.widget.renderAnimationEnabled;
   this.tiles = this.widget.renderedTiles();
+
+  // Make them invisible otherwise the influence scrollHeight (e.g. if grid is scrolled to the very bottom and tiles are filtered, scrollbar would still increase scroll height)
+  scout.scrollbars.setVisible($container, false);
 
   // Store the current position of the tiles
   if (animated) {
@@ -70,10 +73,10 @@ scout.TileGridLayout.prototype.layout = function($container) {
   if (!htmlComp.layouted) {
     this.widget._renderScrollTop();
   }
-  if (this.widget.virtual && (!htmlComp.layouted || this._sizeChanged(htmlComp))) {
+  if (this.widget.virtual && (!htmlComp.layouted || this._sizeChanged(htmlComp) || this.widget.withPlaceholders)) {
     // When changing size of the container, more or less tiles might be shown and some tiles might even change rows due to a new gridColumnCount -> ensure correct tiles are rendered in the range
     this.widget.setViewRangeSize(this.widget.calculateViewRangeSize(), false);
-    var newTiles = this.widget._renderTileDelta(this.tiles);
+    var newTiles = this.widget._renderTileDelta();
     // Make sure newly rendered tiles are animated (if enabled) and layouted as well
     this._storeBounds(newTiles);
     scout.arrays.pushAll(this.tiles, newTiles);
@@ -133,6 +136,7 @@ scout.TileGridLayout.prototype._animateTiles = function() {
   this.containerScrollTop = $container.scrollTop();
 
   // Hide scrollbar before the animation (does not look good if scrollbar is hidden after the animation)
+  scout.scrollbars.setVisible($container, true);
   scout.scrollbars.opacity($container, 0);
 
   // Animate the position change of the tiles
@@ -179,7 +183,7 @@ scout.TileGridLayout.prototype._animateTile = function(tile) {
 
   var bounds = scout.graphics.cssBounds(tile.$container);
   var fromBounds = tile.$container.data('oldBounds');
-  if (tile instanceof scout.PlaceholderTile && !fromBounds) {
+  if (tile instanceof scout.PlaceholderTile && !tile.$container.data('was-layouted')) {
     // Placeholders may not have fromBounds because they are added while layouting
     // Just let them appear at the correct position
     fromBounds = bounds.clone();
@@ -255,6 +259,7 @@ scout.TileGridLayout.prototype._animateTileBounds = function(tile, fromBounds, b
 };
 
 scout.TileGridLayout.prototype._updateScrollbar = function() {
+  scout.scrollbars.setVisible(this.widget.$container, true);
   scout.scrollbars.opacity(this.widget.$container, 1);
 
   // Update first scrollable parent (if widget itself is not scrollable, maybe a parent is)
@@ -301,25 +306,52 @@ scout.TileGridLayout.prototype._resetGridColumnCount = function() {
 
 scout.TileGridLayout.prototype.preferredLayoutSize = function($container, options) {
   options = $.extend({}, options);
+
+  if (this.widget.virtual) {
+    return this.virtualPrefSize($container, options);
+  }
   if (options.widthHint) {
     return this.prefSizeForWidth(options.widthHint);
   }
-  var prefSize = scout.TileGridLayout.parent.prototype.preferredLayoutSize.call(this, $container, options);
+  return scout.TileGridLayout.parent.prototype.preferredLayoutSize.call(this, $container, options);
+};
 
-  if (this.widget.virtual) {
-    // XXX CGU always render some tiles (initial viewRangeSize > 0) like table or always calculate? FillerHeight won't be correct if prefSizeForWidth is used, filler would need to be recalculated every time
-//    var fillerHeight = this.widget.$fillBefore.outerHeight(true) + this.widget.$fillAfter.outerHeight(true);
-//    prefSize.height += fillerHeight;
+/**
+ * Calculates the preferred size only based on the grid column count, row count and layout config. Does not use rendered elements.
+ * Therefore only works if all tiles are of the same size (which is a precondition for the virtual scrolling anyway).
+ */
+scout.TileGridLayout.prototype.virtualPrefSize = function($container, options) {
+  var rowCount, columnCount;
+  var insets = scout.HtmlComponent.get($container).insets();
+  var prefSize = new scout.Dimension();
+  var columnWidth = this.widget.layoutConfig.columnWidth;
+  var rowHeight = this.widget.layoutConfig.rowHeight;
+  var hgap = this.widget.layoutConfig.hgap;
+  var vgap = this.widget.layoutConfig.vgap;
 
-    prefSize.height = this.widget.rowCount() * this.widget.layoutConfig.rowHeight + (this.widget.rowCount() - 1) * this.widget.layoutConfig.vgap;
-    // XXX CGU use case: outline overview reads pref size, but there are no tiles yet... what about other grid settings (width in px etc...) which logical grid layout would consider
-    // And what if a tile uses useUiWidth?
-    // The filler height is actually the same as this calculation
-    prefSize.width = this.widget.gridColumnCount * this.widget.layoutConfig.columnWidth + (this.widget.gridColumnCount - 1) * this.widget.layoutConfig.hgap;
-    var insets = scout.HtmlComponent.get($container).insets();
+  if (options.widthHint) {
+    columnCount = Math.floor(options.widthHint / (columnWidth + hgap));
+    var width = columnCount * (columnWidth + hgap);
+    if (options.widthHint - width > columnWidth) {
+      // The last column does not have a hgap -> Correct the grid column count if another column would fit in
+      columnCount++;
+    }
+    columnCount = Math.min(this.widget.prefGridColumnCount, columnCount);
+
+    rowCount = this.widget.rowCount(columnCount);
+    prefSize.width = options.widthHint;
+    prefSize.height = Math.max(rowCount * rowHeight + (rowCount - 1) * vgap, 0);
     prefSize.width += insets.horizontal();
     prefSize.height += insets.vertical();
+    return prefSize;
   }
+
+  columnCount = this.widget.gridColumnCount;
+  rowCount = this.widget.rowCount();
+  prefSize.width = Math.max(columnCount * columnWidth + (columnCount - 1) * hgap, 0);
+  prefSize.height = Math.max(rowCount * rowHeight + (rowCount - 1) * vgap, 0);
+  prefSize.width += insets.horizontal();
+  prefSize.height += insets.vertical();
   return prefSize;
 };
 

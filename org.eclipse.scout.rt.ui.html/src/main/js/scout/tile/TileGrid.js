@@ -32,6 +32,7 @@ scout.TileGrid = function() {
   this.selectionHandler = new scout.TileGridSelectionHandler(this);
   this.scrollable = true;
   this.scrolling = false;
+  this.scrollTopDirty = false;
   this.startupAnimationDone = false;
   this.startupAnimationEnabled = false;
   this.tiles = [];
@@ -242,14 +243,13 @@ scout.TileGrid.prototype.setTiles = function(tiles, appendPlaceholders) {
 
   this._sort(tiles);
   this.filteredTilesDirty = this.filteredTilesDirty || tilesToDelete.length > 0 || tilesToInsert.length > 0 || !scout.arrays.equals(this.tiles, tiles); // last check necessary if sorting changed
-  var currentTilesInRange = this.findTilesInRange(this.viewRangeRendered);
   var currentTiles = this.tiles;
   this._setProperty('tiles', tiles);
   this._updateFilteredTiles();
 
   if (this.rendered) {
     // XXX cgu how to handle collapse case with tile accordion? it may happen for other widgets as well, e.g. use group boxes instead of accordion. We would need a position listener to detect whether the container is moved into viewport
-    this._renderTileDelta(currentTilesInRange);
+    this._renderTileDelta();
     this._renderTileOrder(currentTiles);
     this._renderInsertTiles(tilesToInsert);
   }
@@ -400,7 +400,6 @@ scout.TileGrid.prototype.sort = function() {
     // Check is needed anyway to determine whether filteredTilesDirty needs to be set, so we can use it here as well to early return if nothing changed
     return;
   }
-  var currentTilesInRange = this.findTilesInRange(this.viewRangeRendered);
   var currentTiles = this.tiles;
   this._setProperty('tiles', tiles);
 
@@ -409,7 +408,7 @@ scout.TileGrid.prototype.sort = function() {
   this._updateFilteredTiles();
 
   if (this.rendered) {
-    this._renderTileDelta(currentTilesInRange);
+    this._renderTileDelta();
     this._renderTileOrder(currentTiles);
     this.validateLayoutTree(); // prevent flickering in virtual mode
   }
@@ -552,7 +551,6 @@ scout.TileGrid.prototype._onScroll = function() {
   var scrollLeft = this.$container[0].scrollLeft;
   if (this.scrollTop !== scrollTop && this.virtual) {
     this.scrolling = true;
-    // XXX CGU layouting while srolling is expensive, don't invalidate parents in that case. Question is: if tiles have pref height, does view port need to grow?
     this.revalidateLayout();
     this.scrolling = false;
   }
@@ -911,9 +909,11 @@ scout.TileGrid.prototype.scrollTo = function(tile) {
   // If tile was not rendered it is not yet positioned correctly -> make sure layout is valid before trying to scroll
   // Layout must not render the viewport because scroll position is not correct yet -> just make sure tiles are at the correct position
   this.scrolling = true;
+  this.scrollTopDirty = true;
   this.validateLayoutTree();
   this.scrolling = false;
   tile.reveal();
+  this.scrollTopDirty = false;
 };
 
 scout.TileGrid.prototype.revealSelection = function() {
@@ -965,7 +965,6 @@ scout.TileGrid.prototype.setFilters = function(filters) {
 };
 
 scout.TileGrid.prototype.filter = function() {
-  var currentTilesInRange = this.findTilesInRange(this.viewRangeRendered);
   var currentTiles = this.tiles;
   // Full reset is set to true to loop through every tile and make sure tile.filterAccepted is correctly set
   var filterResult = this._applyFilters(this.tiles, true);
@@ -973,7 +972,7 @@ scout.TileGrid.prototype.filter = function() {
   if (this.rendered) {
     // Not all tiles may be rendered yet (e.g. if filter is active before grid is rendered and removed after grid is rendered)
     // But updating the view range is necessary anyway (fillers, scrollbars, viewRangeRendered etc.)
-    this._renderTileDelta(currentTilesInRange, filterResult);
+    this._renderTileDelta(filterResult);
     this._renderTileOrder(currentTiles);
   }
 };
@@ -1194,15 +1193,11 @@ scout.TileGrid.prototype.setViewRangeSize = function(viewRangeSize, updateViewPo
 scout.TileGrid.prototype._heightForRow = function(row) {
   var height = 0;
 
-  //  if (row.height) {
-  //    height = row.height;
-  //  } else {
   height = this.layoutConfig.rowHeight;
   if (row !== this.rowCount() - 1) {
     // Add row gap unless it is the last row
     height += this.layoutConfig.vgap;
   }
-  //  }
 
   if (!scout.numbers.isNumber(height)) {
     throw new Error('Calculated height is not a number: ' + height);
@@ -1210,8 +1205,9 @@ scout.TileGrid.prototype._heightForRow = function(row) {
   return height;
 };
 
-scout.TileGrid.prototype.rowCount = function() {
-  return Math.ceil(this.filteredTiles.length / this.gridColumnCount);
+scout.TileGrid.prototype.rowCount = function(gridColumnCount) {
+  gridColumnCount = scout.nvl(gridColumnCount, this.gridColumnCount);
+  return Math.ceil(this.filteredTiles.length / gridColumnCount);
 };
 
 /**
@@ -1275,34 +1271,32 @@ scout.TileGrid.prototype._renderTilesInRange = function(range) {
   this.viewRangeRendered = newRange[0];
 
   for (var row = range.from; row < range.to; row++) {
-    this.eachTileInRow(row, function(tile) { // jshint ignore:line
-      if (tile.rendered) {
-        return;
-      }
-      this._renderTile(tile);
-      tilesRendered++;
-    }.bind(this));
+    this.eachTileInRow(row, renderTile.bind(this));
     numRowsRendered++;
   }
-
-  //  if (tilesRendered > 0) {
-  //    // XXX CGU layouting while srolling is expensive, don't invalidate parents in that case. Question is: if tiles have pref height, does view port need to grow?
-  //    this.invalidateLayoutTree(false);
-  //  }
 
   if ($.log.isTraceEnabled()) {
     $.log.trace(numRowsRendered + ' new rows rendered from ' + range);
     $.log.trace(this._rowsRenderedInfo());
+  }
+
+  function renderTile(tile) {
+    if (tile.rendered) {
+      return;
+    }
+    this._renderTile(tile);
+    tilesRendered++;
   }
 };
 
 /**
  * @returns the newly rendered tiles
  */
-scout.TileGrid.prototype._renderTileDelta = function(prevTiles, filterResult) {
+scout.TileGrid.prototype._renderTileDelta = function(filterResult) {
   if (!this.virtual) {
     return;
   }
+  var prevTiles = this.renderedTiles();
   var newViewRange = this.virtualScrolling.calculateCurrentViewRange();
   var newTiles = this.findTilesInRange(newViewRange);
 
@@ -1369,7 +1363,6 @@ scout.TileGrid.prototype._renderTileVisibleForFilter = function(tile) {
     return;
   }
   // Start filter animation (at the time setFilterAccepted was set the tile was not rendered)
-  // XXX CGU maybe check for animate-visible in case it was rendered (fast filter toggle?)
   tile.$container.setVisible(false);
   tile._renderVisible();
 };

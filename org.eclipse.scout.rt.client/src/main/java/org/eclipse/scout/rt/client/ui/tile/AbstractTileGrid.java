@@ -91,6 +91,7 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
     setSelectable(getConfiguredSelectable());
     setScrollable(getConfiguredScrollable());
     setWithPlaceholders(getConfiguredWithPlaceholders());
+    setVirtual(getConfiguredVirtual());
 
     OrderedCollection<T> tiles = new OrderedCollection<>();
     injectTilesInternal(tiles);
@@ -247,6 +248,12 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   @Order(60)
   protected boolean getConfiguredScrollable() {
     return true;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(37)
+  protected boolean getConfiguredVirtual() {
+    return false;
   }
 
   @Override
@@ -465,6 +472,16 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   @Override
   public void setLayoutConfig(TileGridLayoutConfig layoutConfig) {
     propertySupport.setProperty(PROP_LAYOUT_CONFIG, layoutConfig);
+  }
+
+  @Override
+  public boolean isVirtual() {
+    return propertySupport.getPropertyBool(PROP_VIRTUAL);
+  }
+
+  @Override
+  public void setVirtual(boolean virtual) {
+    propertySupport.setPropertyBool(PROP_VIRTUAL, virtual);
   }
 
   /**
