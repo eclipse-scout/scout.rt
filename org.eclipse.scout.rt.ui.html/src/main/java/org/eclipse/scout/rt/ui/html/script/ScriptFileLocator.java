@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.html.script;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.eclipse.scout.rt.ui.html.script.ScriptSource.NodeType;
@@ -21,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ScriptFileLocator {
+
   private static final Logger LOG = LoggerFactory.getLogger(ScriptFileLocator.class);
 
   private final IWebContentService m_resourceLocator;
@@ -29,11 +29,11 @@ public class ScriptFileLocator {
     m_resourceLocator = resourceLocator;
   }
 
-  protected ScriptSource locateFile(String requestPath, Matcher mat, boolean minified, boolean lenient) {
-    // group(3) = fingerprint (not used here)
-    String parent = mat.group(1);
-    String fileName = mat.group(2);
-    String fileExtension = mat.group(4);
+  protected ScriptSource locateFile(ScriptRequest req, boolean minified, boolean lenient) {
+    String parent = req.path();
+    String fileName = req.baseName();
+    String fileExtension = req.fileExtension();
+    String requestPath = req.fullPath();
 
     // macros are loaded with and without suffix -macro
     FileLookup macro = getMacroFileLookup(parent, fileName, fileExtension);

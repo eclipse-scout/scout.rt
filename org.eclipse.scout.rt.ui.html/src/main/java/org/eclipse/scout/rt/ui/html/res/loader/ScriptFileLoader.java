@@ -20,37 +20,87 @@ import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
 import org.eclipse.scout.rt.ui.html.script.ScriptOutput;
+import org.eclipse.scout.rt.ui.html.script.ScriptRequest;
 import org.eclipse.scout.rt.ui.html.script.ScriptSource.FileType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class loads and parses CSS and JS files from WebContent/ folder.
  */
 public class ScriptFileLoader extends AbstractResourceLoader {
 
-  private static final String THEME_KEY = "ui.theme";
+  private static final Logger LOG = LoggerFactory.getLogger(ScriptFileLoader.class);
+
+  public static final String THEME_KEY = "ui.theme";
 
   private final String m_theme;
   private final boolean m_minify;
 
   public ScriptFileLoader(String theme, boolean minify) {
-    super();
     m_theme = theme;
     m_minify = minify;
   }
 
   @Override
   public HttpCacheKey createCacheKey(String resourcePath) {
-    if (FileType.JS == FileType.resolveFromFilename(resourcePath)) {
+    // remove the fingerprint from the cache key so that requests with randomly generated fingerprints result in the same cached item (there is only one anyway).
+    // this prevents cache (memory) pollution and high load on the server due to script re-generation.
+    String lookupPath = ScriptRequest.tryParse(resourcePath)
+        .map(this::requestWithoutFingerprint)
+        .orElse(resourcePath);
+
+    if (FileType.JS == FileType.resolveFromFilename(lookupPath)) {
       // JavaScript files are always the same, no matter what the theme or the locale is
-      return super.createCacheKey(resourcePath);
+      return super.createCacheKey(lookupPath);
     }
-    else {
-      // CSS files are different for depending on the current theme (but don't depend on the locale)
-      return new HttpCacheKey(resourcePath, Collections.singletonMap(THEME_KEY, m_theme));
+
+    // CSS files are different for depending on the current theme (but don't depend on the locale)
+    return new HttpCacheKey(lookupPath, Collections.singletonMap(THEME_KEY, m_theme));
+  }
+
+  protected String requestWithoutFingerprint(ScriptRequest req) {
+    return req.toString(false, true);
+  }
+
+  @Override
+  public boolean validateResource(String requestedExternalPath, HttpCacheObject cachedObject) {
+    boolean valid = super.validateResource(requestedExternalPath, cachedObject);
+    if (!valid) {
+      return false;
     }
+
+    return ScriptRequest.tryParse(requestedExternalPath)
+        .map(sr -> validateResource(sr, cachedObject.getResource()))
+        .orElse(Boolean.FALSE);
+  }
+
+  /**
+   * validates if the given {@link BinaryResource} is a valid response for the {@link ScriptRequest} given.
+   *
+   * @param request
+   *          is never {@code null}.
+   * @param responseCandidate
+   *          is never {@code null}.
+   */
+  protected boolean validateResource(ScriptRequest request, BinaryResource responseCandidate) {
+    String requestedFingerprint = request.fingerprint();
+    if (!StringUtility.hasText(requestedFingerprint)) {
+      // no specific fingerprint was requested (e.g. in dev mode)
+      return true;
+    }
+
+    String responseFingerprint = responseCandidate.getFingerprintAsHexString();
+    if (requestedFingerprint.equals(responseFingerprint)) {
+      return true;
+    }
+
+    LOG.debug("Resource '{}' having fingerprint '{}' could not be found. A resource was found but would have a different fingerprint '{}'.", request, requestedFingerprint, responseFingerprint);
+    return false;
   }
 
   @Override
@@ -82,10 +132,6 @@ public class ScriptFileLoader extends AbstractResourceLoader {
   }
 
   public static boolean acceptFile(String file) {
-    if (StringUtility.isNullOrEmpty(file)) {
-      return false;
-    }
-    return file.endsWith(".js") || file.endsWith(".css") || file.endsWith(".less");
+    return ScriptRequest.tryParse(file).isPresent();
   }
-
 }

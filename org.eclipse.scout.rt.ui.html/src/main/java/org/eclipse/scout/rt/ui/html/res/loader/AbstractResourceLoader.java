@@ -40,6 +40,14 @@ public abstract class AbstractResourceLoader implements IResourceLoader {
   }
 
   @Override
+  public boolean validateResource(String requestedExternalPath, HttpCacheObject cachedObject) {
+    // ignore resources without content, to prevent invalid "content-length" header and NPE in write() method
+    return cachedObject != null
+        && cachedObject.getResource() != null
+        && cachedObject.getResource().getContent() != null;
+  }
+
+  @Override
   public HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException {
     String pathInfo = cacheKey.getResourcePath();
     BinaryResource content = loadResource(pathInfo);
