@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
+import org.eclipse.scout.rt.ui.html.script.ScriptRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,26 +112,9 @@ public class HtmlDocumentParser {
       scriptAndFingerprint = getScriptAndFingerprint(internalPath);
     }
 
-    // append path to file
-    StringBuilder externalPathSb = new StringBuilder();
-
-    // append file name (including path, if present) without file-extension
-    externalPathSb.append(getScriptFileName(filenameParts[0]));
-
-    // append fingerprint
-    if (scriptAndFingerprint != null) {
-      String fingerprint = scriptAndFingerprint.getRight();
-      externalPathSb.append("-").append(fingerprint);
-    }
-
-    // append 'min'
-    if (m_params.isMinify()) {
-      externalPathSb.append(".min");
-    }
-
-    // append file-extension
-    externalPathSb.append(".").append(getScriptFileExtension(filenameParts[1]));
-    String externalPath = externalPathSb.toString();
+    String extension = getScriptFileExtension(filenameParts[1]);
+    String pathAndBaseName = getScriptFileName(filenameParts[0]);
+    String externalPath = ScriptRequest.toFullPath(null, pathAndBaseName, scriptAndFingerprint == null ? null : scriptAndFingerprint.getRight(), m_params.isMinify(), extension);
 
     // we must put the same resource into the cache with two different cache keys:
     // 1. the 'internal' cache key is the path as it is used when the HTML file is parsed by the HtmlDocumenParser. Example: '/res/scout-all-macro.js'
@@ -171,8 +155,7 @@ public class HtmlDocumentParser {
       LOG.warn("Failed to locate script referenced in html file '{}': {}", m_params.getHtmlPath(), internalPath);
       return null;
     }
-    String fingerprint = Long.toHexString(script.getResource().getFingerprint());
-    return new ImmutablePair<>(script, fingerprint);
+    return new ImmutablePair<>(script, script.getResource().getFingerprintAsHexString());
   }
 
   /**
@@ -194,7 +177,7 @@ public class HtmlDocumentParser {
   /**
    * Returns the external extension for the given file extension.
    */
-  protected Object getScriptFileExtension(String extension) {
+  protected String getScriptFileExtension(String extension) {
     if ("less".equals(extension)) {
       return "css";
     }

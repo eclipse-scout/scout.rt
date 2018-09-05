@@ -70,26 +70,6 @@ public class ScriptFileBuilder {
    */
   private static final Pattern STYLESHEET_IMPORT_PATTERN = Pattern.compile("^\\s*@import\\s+\"(.*?)\".*$", Pattern.MULTILINE);
 
-  /**
-   * Pattern for a script url that is not a {@link NodeType#SRC_FRAGMENT}
-   * <p>
-   * <b>Regex groups:</b> <code>$1$2[-$4][.min].$5</code><br>
-   * <ul>
-   * <li><code>$1</code> = path
-   * <li><code>$2</code> = basename
-   * <li><code>$3</code> = fingerprint (optiona)
-   * <li><code>$4</code> = <code>"js"</code>, <code>"css"</code> or <code>"less"</code>
-   * </ul>
-   * Examples:
-   *
-   * <pre>
-   * path/basename.js
-   * path/basename.min.js
-   * path/basename-34fce3bc.min.js
-   * </pre>
-   */
-  public static final Pattern SCRIPT_URL_PATTERN = Pattern.compile("([^\"']*/)([-_\\.\\w\\d]+?)(?:\\-([a-f0-9]+))?(?:\\.min)?\\.(js|css|less)");
-
   private final IWebContentService m_resourceLocator;
   private final ScriptFileLocator m_scriptLocator;
   private final boolean m_minify;
@@ -104,10 +84,11 @@ public class ScriptFileBuilder {
 
   public ScriptOutput buildScript(String pathInfo) throws IOException {
     ScriptSource script = locateNonFragmentScript(pathInfo, true);
-    LOG.info("Building script {} theme={} m_minify={}", script, m_theme, m_minify);
     if (script == null) {
       return null; // not found
     }
+
+    LOG.info("Building script {} theme={} m_minify={}", script, m_theme, m_minify);
     switch (script.getNodeType()) {
       case LIBRARY:
       case LIBRARY_MINIFIED: {
@@ -132,14 +113,13 @@ public class ScriptFileBuilder {
    *          file instead.
    */
   protected ScriptSource locateNonFragmentScript(String requestPath, boolean lenient) {
-    Matcher mat = SCRIPT_URL_PATTERN.matcher(requestPath);
-    if (mat.matches()) {
-      return m_scriptLocator.locateFile(requestPath, mat, m_minify, lenient);
-    }
-    else {
-      LOG.warn("locate {}: does not match SCRIPT_URL_PATTERN {}", requestPath, SCRIPT_URL_PATTERN.pattern());
-      return null;
-    }
+    return ScriptRequest
+        .tryParse(requestPath)
+        .map(req -> m_scriptLocator.locateFile(req, m_minify, lenient))
+        .orElseGet(() -> {
+          LOG.warn("locate {}: does not match SCRIPT_URL_PATTERN {}", requestPath, ScriptRequest.SCRIPT_URL_PATTERN.pattern());
+          return null;
+        });
   }
 
   protected ScriptSource locateFragmentScript(String fragmentPath, FileType fileType) {

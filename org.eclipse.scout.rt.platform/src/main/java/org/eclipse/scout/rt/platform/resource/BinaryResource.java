@@ -186,6 +186,14 @@ public final class BinaryResource implements Serializable {
     return m_fingerprint;
   }
 
+  /**
+   * @return The fingerprint of this {@link BinaryResource} (see {@link #getFingerprint()}) as a hex {@link String}.
+   * @see Long#toHexString(long)
+   */
+  public String getFingerprintAsHexString() {
+    return Long.toHexString(m_fingerprint);
+  }
+
   public boolean isCachingAllowed() {
     return m_cachingAllowed;
   }

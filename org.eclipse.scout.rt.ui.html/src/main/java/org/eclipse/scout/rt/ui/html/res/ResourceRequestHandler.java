@@ -55,50 +55,60 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
   public boolean handleGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String pathInfoEx = resolvePathInfoEx(req);
 
-    // Create loader for the requested resource type
-    IResourceLoader resourceLoader = null;
-    for (ResourceLoaders f : m_resourceLoaders) {
-      resourceLoader = f.create(req, pathInfoEx);
-      if (resourceLoader != null) {
-        break;
-      }
-    }
-
+    IResourceLoader resourceLoader = createLoaderFor(req, pathInfoEx);
     if (resourceLoader == null) {
-      return false;
+      return false; // no loader for this resource request
     }
 
-    // Clear global cache (only allowed in development mode) this allows to work with ?cache=true
-    // by default and clear the cache only when required --> rebuilds script/less files.
-    if (Platform.get().inDevelopmentMode() && req.getParameter(URL_PARAM_CLEAR_CACHE) != null) {
-      BEANS.get(GlobalHttpResourceCache.class).clear();
-      LOG.info("Resource cache has been cleared, requested by URL parameter {}", URL_PARAM_CLEAR_CACHE);
-    }
+    clearCacheIfNecessary(req);
 
-    HttpCacheObject resource = resolveResourceFromCache(req, pathInfoEx, resourceLoader);
-
-    // check resource existence (also ignore resources without content, to prevent invalid "content-length" header and NPE in write() method)
-    if (resource == null || resource.getResource() == null || resource.getResource().getContent() == null) {
-      return false;
+    HttpCacheObject cachedObject = resolveResourceFromCache(req, pathInfoEx, resourceLoader);
+    boolean valid = resourceLoader.validateResource(pathInfoEx, cachedObject);
+    if (!valid) {
+      return false; // not valid
     }
 
     // cached in browser? -> returns 304 if the resource has not been modified
-    if (m_httpCacheControl.checkAndSetCacheHeaders(req, resp, resource)) {
+    if (m_httpCacheControl.checkAndSetCacheHeaders(req, resp, cachedObject)) {
       return true;
     }
 
-    BinaryResource binaryResource = resource.getResource();
-
     // set the resp headers only if no 304 (according to spec: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.5)
+    writeResourceToResponse(req, resp, cachedObject);
+    return true;
+  }
+
+  protected void writeResourceToResponse(HttpServletRequest req, HttpServletResponse resp, HttpCacheObject cachedObject) throws IOException {
+    BinaryResource binaryResource = cachedObject.getResource();
     setHttpResponseHeaders(resp, binaryResource);
 
     // Apply response interceptors
-    resource.applyHttpResponseInterceptors(req, resp);
+    cachedObject.applyHttpResponseInterceptors(req, resp);
 
     if (!"HEAD".equals(req.getMethod())) {
       resp.getOutputStream().write(binaryResource.getContent());
     }
-    return true;
+  }
+
+  /**
+   * Clear global cache (only allowed in development mode). This allows to work with ?cache=true and clears the cache
+   * only when required --> rebuilds script/less files.
+   */
+  protected void clearCacheIfNecessary(HttpServletRequest req) {
+    if (Platform.get().inDevelopmentMode() && req.getParameter(URL_PARAM_CLEAR_CACHE) != null) {
+      BEANS.get(GlobalHttpResourceCache.class).clear();
+      LOG.info("Resource cache has been cleared, requested by URL parameter {}", URL_PARAM_CLEAR_CACHE);
+    }
+  }
+
+  protected IResourceLoader createLoaderFor(HttpServletRequest req, String requestedExternalPath) {
+    for (ResourceLoaders loaderFactory : m_resourceLoaders) {
+      IResourceLoader loader = loaderFactory.create(req, requestedExternalPath);
+      if (loader != null) {
+        return loader;
+      }
+    }
+    return null;
   }
 
   protected HttpCacheObject resolveResourceFromCache(HttpServletRequest req, String pathInfoEx, IResourceLoader resourceLoader) throws IOException {

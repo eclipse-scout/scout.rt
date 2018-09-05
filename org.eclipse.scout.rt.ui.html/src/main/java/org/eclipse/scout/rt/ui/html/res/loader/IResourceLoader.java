@@ -37,7 +37,24 @@ public interface IResourceLoader {
    */
   HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException;
 
+  /**
+   * Tries to find the {@link BinaryResource} of the requested path.
+   *
+   * @return the result if it could be found or {@code null} otherwise.
+   */
   BinaryResource loadResource(String pathInfo) throws IOException;
+
+  /**
+   * Checks if the specified {@link HttpCacheObject} is a valid response for the requested resource path.
+   *
+   * @param requestedExternalPath
+   *          The requested path.
+   * @param cachedObject
+   *          The response candidate to validate. May be {@code null}.
+   * @return {@code true} if the {@link HttpCacheObject} is valid and can be processed further. {@code false} if the
+   *         candidate is not valid (e.g. because it is {@code null} or contains not the expected content).
+   */
+  boolean validateResource(String requestedExternalPath, HttpCacheObject cachedObject);
 
   /**
    * Gets the {@link IHttpResourceCache} to be used for this loader.
