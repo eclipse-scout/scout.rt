@@ -125,6 +125,9 @@ scout.FormField.prototype._createLoadingSupport = function() {
 
 scout.FormField.prototype._init = function(model) {
   scout.FormField.parent.prototype._init.call(this, model);
+  this.resolveConsts([{
+    property: 'labelPosition',
+    constType: scout.FormField.LabelPosition}]);
   this.resolveTextKeys(['label', 'tooltipText']);
   this._setKeyStrokes(this.keyStrokes);
   this._setMenus(this.menus);

@@ -10,6 +10,8 @@
  ******************************************************************************/
 scout.objects = {
 
+  CONST_REGEX: /\$\{const\:([^\}]*)\}/,
+
   /**
    * Uses Object.create(null) to create an object without a prototype. This is different to use the literal {} which links the object to Object.prototype.
    * <p>
@@ -493,6 +495,45 @@ scout.objects = {
         }
       }
       return '';
+    }
+  },
+
+  /**
+   * @param value text which contains a constant reference like '${const:scout.FormField.LabelPosition.RIGHT}'.
+   * @return the resolved constant value or the unchanged input value if the constant could not be resolved.
+   */
+  resolveConst: function(value, constType) {
+    if (!scout.objects.isString(value)) {
+      return value;
+    }
+
+    var result = this.CONST_REGEX.exec(value);
+    if (result && result.length === 2) {
+      // go down the object hierarchy starting on the given constType-object or on 'window'
+      var objectHierarchy = result[1].split('.');
+      var obj = constType || window;
+      for (var i = 0; i < objectHierarchy.length; i++) {
+        obj = obj[objectHierarchy[i]];
+        if (obj === undefined) {
+          window.console.log('Failed to resolve constant \'' + result[1] + '\', object is undefined');
+          return value;
+        }
+      }
+      return obj;
+    }
+    return value;
+  },
+
+  /**
+   * @param object config An object with 2 properties: property, constType
+   */
+  resolveConstProperty: function(object, config) {
+    scout.assertProperty(config, 'property');
+    scout.assertProperty(config, 'constType');
+    var value = object[config.property];
+    var resolvedValue = this.resolveConst(value, config.constType);
+    if (value !== resolvedValue) {
+      object[config.property] = resolvedValue;
     }
   }
 

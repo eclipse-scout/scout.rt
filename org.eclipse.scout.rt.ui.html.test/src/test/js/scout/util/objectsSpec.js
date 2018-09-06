@@ -417,4 +417,48 @@ describe("scout.objects", function() {
 
   });
 
+  describe('Constant resolving from plain object / JSON model', function() {
+
+    beforeEach(function() {
+      window.myConst = 6;
+    });
+
+    afterEach(function() {
+      delete window.myConst;
+    });
+
+    it('resolveConst', function() {
+      expect(scout.objects.resolveConst('${const:scout.FormField.LabelPosition.RIGHT}')).toBe(scout.FormField.LabelPosition.RIGHT);
+      expect(scout.objects.resolveConst('${const:myConst}')).toBe(6);
+      expect(scout.objects.resolveConst(3)).toBe(3); // everything that is not a string, should be returned unchanged
+      expect(scout.objects.resolveConst("foo")).toBe("foo"); // a string that is not a constant should be returned unchanged too
+
+      // resolve a constant that does not exist, this will also write a warning in the output
+      expect(scout.objects.resolveConst("${const:scout.FormField.LabelPosition.XXX}")).toBe("${const:scout.FormField.LabelPosition.XXX}");
+    });
+
+    it('resolveConstProperty', function() {
+      // case 1: provide the 'enum' object as constType - resolver takes that object as starting point
+      var model = {
+        labelPosition: "${const:RIGHT}"
+      };
+      scout.objects.resolveConstProperty(model, {
+        property: 'labelPosition',
+        constType: scout.FormField.LabelPosition
+      });
+      expect(model.labelPosition).toBe(scout.FormField.LabelPosition.RIGHT);
+
+      // case 2: provide the 'Window' object as constType - resolver takes that object as starting point
+      model = {
+        labelPosition: "${const:scout.FormField.LabelPosition.RIGHT}"
+      };
+      scout.objects.resolveConstProperty(model, {
+        property: 'labelPosition',
+        constType: window
+      });
+      expect(model.labelPosition).toBe(scout.FormField.LabelPosition.RIGHT);
+    });
+
+  });
+
 });

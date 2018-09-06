@@ -1343,6 +1343,12 @@ scout.Widget.prototype.resolveIconIds = function(properties) {
   }, this);
 };
 
+scout.Widget.prototype.resolveConsts = function(configs) {
+  configs.forEach(function(config) {
+    scout.objects.resolveConstProperty(this, config);
+  }, this);
+};
+
 scout.Widget.prototype._addWidgetProperties = function(properties) {
   this._addProperties('_widgetProperties', properties);
 };
