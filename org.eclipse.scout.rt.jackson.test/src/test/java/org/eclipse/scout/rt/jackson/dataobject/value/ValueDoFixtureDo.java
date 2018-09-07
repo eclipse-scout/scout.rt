@@ -106,7 +106,7 @@ public class ValueDoFixtureDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public ValueDoFixtureDo withTypedList(Collection<IValueDo<?>> typedList) {
+  public ValueDoFixtureDo withTypedList(Collection<? extends IValueDo<?>> typedList) {
     typedList().clear();
     typedList().get().addAll(typedList);
     return this;

@@ -99,7 +99,7 @@ public class TestDateDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestDateDo withDateOnlyDoList(Collection<Date> dateOnlyDoList) {
+  public TestDateDo withDateOnlyDoList(Collection<? extends Date> dateOnlyDoList) {
     dateOnlyDoList().clear();
     dateOnlyDoList().get().addAll(dateOnlyDoList);
     return this;
@@ -182,7 +182,7 @@ public class TestDateDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestDateDo withCustomDateDoList(Collection<Date> customDateDoList) {
+  public TestDateDo withCustomDateDoList(Collection<? extends Date> customDateDoList) {
     customDateDoList().clear();
     customDateDoList().get().addAll(customDateDoList);
     return this;

@@ -42,7 +42,7 @@ public class EntityFixtureDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public EntityFixtureDo withOtherEntities(Collection<OtherEntityFixtureDo> otherEntities) {
+  public EntityFixtureDo withOtherEntities(Collection<? extends OtherEntityFixtureDo> otherEntities) {
     otherEntities().clear();
     otherEntities().get().addAll(otherEntities);
     return this;
