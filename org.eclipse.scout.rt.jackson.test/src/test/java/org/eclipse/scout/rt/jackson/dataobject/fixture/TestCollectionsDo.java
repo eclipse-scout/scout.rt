@@ -136,7 +136,7 @@ public class TestCollectionsDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestCollectionsDo withItemDoListAttribute(Collection<TestItemDo> itemDoListAttribute) {
+  public TestCollectionsDo withItemDoListAttribute(Collection<? extends TestItemDo> itemDoListAttribute) {
     itemDoListAttribute().clear();
     itemDoListAttribute().get().addAll(itemDoListAttribute);
     return this;
@@ -153,7 +153,7 @@ public class TestCollectionsDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestCollectionsDo withItemPojoDoListAttribute(Collection<TestItemPojo> itemPojoDoListAttribute) {
+  public TestCollectionsDo withItemPojoDoListAttribute(Collection<? extends TestItemPojo> itemPojoDoListAttribute) {
     itemPojoDoListAttribute().clear();
     itemPojoDoListAttribute().get().addAll(itemPojoDoListAttribute);
     return this;
@@ -170,7 +170,7 @@ public class TestCollectionsDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestCollectionsDo withItemPojo2DoListAttribute(Collection<TestItemPojo2> itemPojo2DoListAttribute) {
+  public TestCollectionsDo withItemPojo2DoListAttribute(Collection<? extends TestItemPojo2> itemPojo2DoListAttribute) {
     itemPojo2DoListAttribute().clear();
     itemPojo2DoListAttribute().get().addAll(itemPojo2DoListAttribute);
     return this;

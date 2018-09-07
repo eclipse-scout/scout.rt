@@ -54,7 +54,7 @@ public class DateFixtureDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public DateFixtureDo with_list(Collection<Integer> _list) {
+  public DateFixtureDo with_list(Collection<? extends Integer> _list) {
     _list().clear();
     _list().get().addAll(_list);
     return this;

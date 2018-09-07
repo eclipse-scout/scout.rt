@@ -96,7 +96,7 @@ public class TestEntityWithInterface2Do extends DoEntity implements ITestBaseEnt
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestEntityWithInterface2Do withStringListAttribute(Collection<String> stringListAttribute) {
+  public TestEntityWithInterface2Do withStringListAttribute(Collection<? extends String> stringListAttribute) {
     stringListAttribute().clear();
     stringListAttribute().get().addAll(stringListAttribute);
     return this;
@@ -113,7 +113,7 @@ public class TestEntityWithInterface2Do extends DoEntity implements ITestBaseEnt
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestEntityWithInterface2Do withDoubleListAttribute(Collection<Double> doubleListAttribute) {
+  public TestEntityWithInterface2Do withDoubleListAttribute(Collection<? extends Double> doubleListAttribute) {
     doubleListAttribute().clear();
     doubleListAttribute().get().addAll(doubleListAttribute);
     return this;
@@ -130,7 +130,7 @@ public class TestEntityWithInterface2Do extends DoEntity implements ITestBaseEnt
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestEntityWithInterface2Do withItemDoListAttribute(Collection<TestItemDo> itemDoListAttribute) {
+  public TestEntityWithInterface2Do withItemDoListAttribute(Collection<? extends TestItemDo> itemDoListAttribute) {
     itemDoListAttribute().clear();
     itemDoListAttribute().get().addAll(itemDoListAttribute);
     return this;

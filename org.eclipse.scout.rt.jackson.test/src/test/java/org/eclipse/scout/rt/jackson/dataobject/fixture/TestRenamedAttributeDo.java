@@ -147,7 +147,7 @@ public class TestRenamedAttributeDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestRenamedAttributeDo withCloneAttribute(Collection<BigDecimal> cloneAttribute) {
+  public TestRenamedAttributeDo withCloneAttribute(Collection<? extends BigDecimal> cloneAttribute) {
     cloneAttribute().clear();
     cloneAttribute().get().addAll(cloneAttribute);
     return this;

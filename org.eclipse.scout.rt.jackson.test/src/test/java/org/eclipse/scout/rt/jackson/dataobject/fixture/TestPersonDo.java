@@ -58,7 +58,7 @@ public class TestPersonDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestPersonDo withAddresses(Collection<AbstractTestAddressDo> addresses) {
+  public TestPersonDo withAddresses(Collection<? extends AbstractTestAddressDo> addresses) {
     addresses().clear();
     addresses().get().addAll(addresses);
     return this;

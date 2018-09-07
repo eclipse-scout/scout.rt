@@ -45,7 +45,7 @@ public class TestEntityWithGenericValuesDo extends DoEntity {
    * *************************************************************************/
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestEntityWithGenericValuesDo withGenericListAttribute(Collection<TestGenericDo<?>> genericListAttribute) {
+  public TestEntityWithGenericValuesDo withGenericListAttribute(Collection<? extends TestGenericDo<?>> genericListAttribute) {
     genericListAttribute().clear();
     genericListAttribute().get().addAll(genericListAttribute);
     return this;

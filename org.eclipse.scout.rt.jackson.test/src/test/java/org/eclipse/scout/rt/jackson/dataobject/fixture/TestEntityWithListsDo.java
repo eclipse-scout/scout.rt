@@ -57,7 +57,7 @@ public class TestEntityWithListsDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestEntityWithListsDo withItemsDoListAttribute(Collection<TestItemDo> itemsDoListAttribute) {
+  public TestEntityWithListsDo withItemsDoListAttribute(Collection<? extends TestItemDo> itemsDoListAttribute) {
     itemsDoListAttribute().clear();
     itemsDoListAttribute().get().addAll(itemsDoListAttribute);
     return this;
@@ -74,7 +74,7 @@ public class TestEntityWithListsDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestEntityWithListsDo withStringDoListAttribute(Collection<String> stringDoListAttribute) {
+  public TestEntityWithListsDo withStringDoListAttribute(Collection<? extends String> stringDoListAttribute) {
     stringDoListAttribute().clear();
     stringDoListAttribute().get().addAll(stringDoListAttribute);
     return this;

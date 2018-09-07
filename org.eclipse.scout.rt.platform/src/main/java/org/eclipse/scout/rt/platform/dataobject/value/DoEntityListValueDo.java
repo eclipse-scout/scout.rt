@@ -29,7 +29,7 @@ public class DoEntityListValueDo extends DoEntity implements IValueDo<List<IDoEn
    * *************************************************************************/
 
   @Generated("DoConvenienceMethodsGenerator")
-  public DoEntityListValueDo withValue(Collection<IDoEntity> value) {
+  public DoEntityListValueDo withValue(Collection<? extends IDoEntity> value) {
     value().clear();
     value().get().addAll(value);
     return this;

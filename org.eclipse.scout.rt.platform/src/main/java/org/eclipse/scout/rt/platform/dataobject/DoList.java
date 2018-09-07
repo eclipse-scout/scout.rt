@@ -73,7 +73,7 @@ public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Ite
    * Appends all of the elements in the specified collection to the end of this list, in the order that they are
    * returned by the specified collection's iterator.
    */
-  public void addAll(Collection<V> items) {
+  public void addAll(Collection<? extends V> items) {
     get().addAll(items);
   }
 
