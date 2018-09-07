@@ -57,6 +57,13 @@ scout.Action.prototype._createKeyStrokeContext = function() {
 scout.Action.prototype._init = function(model) {
   scout.Action.parent.prototype._init.call(this, model);
   this.actionKeyStroke = this._createActionKeyStroke();
+  this.resolveConsts([{
+    property: 'actionStyle',
+    constType: scout.Action.ActionStyle
+  }, {
+    property: 'keyStrokeFirePolicy',
+    constType: scout.Action.KeyStrokeFirePolicy
+  }]);
   this.resolveTextKeys(['text', 'tooltipText']);
   this.resolveIconIds(['iconId']);
   this._setKeyStroke(this.keyStroke);
