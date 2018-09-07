@@ -259,11 +259,11 @@ scout.Accordion.prototype.setCollapseStyle = function(collapseStyle) {
 };
 
 scout.Accordion.prototype._collapseOthers = function(expandedGroup) {
-  if (!expandedGroup) {
+  if (!expandedGroup || !expandedGroup.collapsible) {
     return;
   }
   this.groups.forEach(function(group) {
-    if (group !== expandedGroup) {
+    if (group !== expandedGroup && group.collapsible) {
       group.setCollapsed(true);
     }
   });

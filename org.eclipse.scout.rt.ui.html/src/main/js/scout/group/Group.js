@@ -13,6 +13,7 @@ scout.Group = function() {
   scout.Group.parent.call(this);
   this.bodyAnimating = false;
   this.collapsed = false;
+  this.collapsible = true;
   this.title = null;
   this.titleSuffix = null;
   this.header = null;
@@ -98,6 +99,7 @@ scout.Group.prototype._renderProperties = function() {
   this._renderBodyVisible();
   this._renderCollapsed();
   this._renderCollapseStyle();
+  this._renderCollapsible();
 };
 
 scout.Group.prototype._remove = function() {
@@ -289,7 +291,7 @@ scout.Group.prototype.getFocusableElement = function() {
 };
 
 scout.Group.prototype.toggleCollapse = function() {
-  this.setCollapsed(!this.collapsed);
+  this.setCollapsed(!this.collapsed && this.collapsible);
 };
 
 scout.Group.prototype.setCollapsed = function(collapsed) {
@@ -309,6 +311,15 @@ scout.Group.prototype._renderCollapsed = function() {
     this.body.remove();
   }
   this.invalidateLayoutTree();
+};
+
+scout.Group.prototype.setCollapsible = function(collapsible) {
+  this.setProperty('collapsible', collapsible);
+};
+
+scout.Group.prototype._renderCollapsible = function() {
+  this.$header.toggleClass('disabled', !this.collapsible);
+  this.$collapseIcon.toggleClass('hidden', !this.collapsible);
 };
 
 scout.Group.prototype.setCollapseStyle = function(collapseStyle) {
@@ -344,13 +355,13 @@ scout.Group.prototype._updateFooterVisible = function() {
 
 scout.Group.prototype._onHeaderMouseDown = function(event) {
   if (this.bodyVisible && this.collapseStyle !== scout.Group.CollapseStyle.BOTTOM) {
-    this.setCollapsed(!this.collapsed);
+    this.setCollapsed(!this.collapsed && this.collapsible);
   }
 };
 
 scout.Group.prototype._onFooterMouseDown = function(event) {
   if (this.bodyVisible) {
-    this.setCollapsed(!this.collapsed);
+    this.setCollapsed(!this.collapsed && this.collapsible);
   }
 };
 
