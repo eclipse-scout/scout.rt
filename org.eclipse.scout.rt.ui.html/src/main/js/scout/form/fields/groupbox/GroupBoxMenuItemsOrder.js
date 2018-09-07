@@ -10,6 +10,17 @@
  ******************************************************************************/
 scout.GroupBoxMenuItemsOrder = function() {};
 
+/**
+ * Sorts the given menus item by horizontal alignment and divides the items in two groups for each alignment.
+ * The result looks as follows:
+ *
+ * <em>
+ * [horizontalAlignment=-1|0]    [horizontalAlignment=1]
+ * [  buttons  ]  [  menus  ]    [ menus ]   [ buttons ]
+ * </em>
+ *
+ * The buttons are always on the outer side of the group-box, the menus are on the inner side.
+ */
 scout.GroupBoxMenuItemsOrder.prototype.order = function(items) {
   var leftButtons = [],
     leftMenus = [],
@@ -39,7 +50,7 @@ scout.GroupBoxMenuItemsOrder.prototype.order = function(items) {
 
   return {
     left: leftButtons.concat(leftMenus),
-    right: rightButtons.concat(rightMenus),
-    all: leftButtons.concat(leftMenus).concat(rightButtons.concat(rightMenus))
+    right: rightMenus.concat(rightButtons),
+    all: leftButtons.concat(leftMenus).concat(rightMenus).concat(rightButtons)
   };
 };
