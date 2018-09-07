@@ -32,7 +32,7 @@ public class PersonResponse extends DoEntity {
     return this;
   }
 
-  public PersonResponse withItems(Collection<PersonDo> persons) {
+  public PersonResponse withItems(Collection<? extends PersonDo> persons) {
     items().clear();
     items().get().addAll(persons);
     return this;
