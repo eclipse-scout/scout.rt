@@ -80,7 +80,7 @@ scout.TileGrid.prototype._createVirtualScrolling = function() {
     widget: this,
     enabled: this.virtual,
     viewRangeSize: this.viewRangeSize,
-    minRowHeight: this.layoutConfig.rowHeight,
+    minRowHeight: this._minRowHeight(),
     rowHeight: this._heightForRow.bind(this),
     rowCount: this.rowCount.bind(this),
     _renderViewRange: this._renderViewRange.bind(this)
@@ -248,7 +248,6 @@ scout.TileGrid.prototype.setTiles = function(tiles, appendPlaceholders) {
   this._updateFilteredTiles();
 
   if (this.rendered) {
-    // XXX cgu how to handle collapse case with tile accordion? it may happen for other widgets as well, e.g. use group boxes instead of accordion. We would need a position listener to detect whether the container is moved into viewport
     this._renderTileDelta();
     this._renderTileOrder(currentTiles);
     this._renderInsertTiles(tilesToInsert);
@@ -289,7 +288,9 @@ scout.TileGrid.prototype._renderTile = function(tile) {
       }
       this._renderTile(tile);
       this._renderTileVisibleForFilter(tile);
-      this.invalidateLayoutTree();
+      if (this.tileRemovalPendingCount === 0) {
+        this.invalidateLayoutTree();
+      }
     }.bind(this));
     return;
   }
@@ -456,7 +457,7 @@ scout.TileGrid.prototype._setLayoutConfig = function(layoutConfig) {
   }
   this._setProperty('layoutConfig', scout.TileGridLayoutConfig.ensure(layoutConfig));
   if (this.virtualScrolling) {
-    this.virtualScrolling.setMinRowHeight(this.layoutConfig.rowHeight);
+    this.virtualScrolling.setMinRowHeight(this._minRowHeight());
     this.setViewRangeSize(this.virtualScrolling.viewRangeSize, false);
   }
 };
@@ -902,9 +903,6 @@ scout.TileGrid.prototype._selectTileOnMouseDown = function(event) {
 };
 
 scout.TileGrid.prototype.scrollTo = function(tile) {
-  if (this.viewRangeRendered.size() === 0) {
-    return;
-  }
   this.ensureTileRendered(tile);
   // If tile was not rendered it is not yet positioned correctly -> make sure layout is valid before trying to scroll
   // Layout must not render the viewport because scroll position is not correct yet -> just make sure tiles are at the correct position
@@ -1205,6 +1203,14 @@ scout.TileGrid.prototype._heightForRow = function(row) {
   return height;
 };
 
+/**
+ * Used for virtual scrolling to calculate the view range size.
+ * @returns the configured rowHeight + vgap / 2. Reason: the gaps are only between rows, the first and last row therefore only have 1 gap.
+ */
+scout.TileGrid.prototype._minRowHeight = function() {
+  return this.layoutConfig.rowHeight + this.layoutConfig.vgap / 2;
+};
+
 scout.TileGrid.prototype.rowCount = function(gridColumnCount) {
   gridColumnCount = scout.nvl(gridColumnCount, this.gridColumnCount);
   return Math.ceil(this.filteredTiles.length / gridColumnCount);
@@ -1302,7 +1308,6 @@ scout.TileGrid.prototype._renderTileDelta = function(filterResult) {
 
   var tilesToRemove = scout.arrays.diff(prevTiles, newTiles);
   var tilesToRender = scout.arrays.diff(newTiles, prevTiles);
-
   if (filterResult) {
     filterResult.newlyHiddenTiles.forEach(function(tile) {
       if (tile.rendered) {
@@ -1320,11 +1325,15 @@ scout.TileGrid.prototype._renderTileDelta = function(filterResult) {
   }, this);
 
   if (filterResult) {
+    // Suppress because Tile.js would invalidate which leads to poor performance if grid is used in a Group.js and group is being expanded while tiles are shown
+    // invalidating will be done afterwards anyway so no need to do it for each tile
+    this.htmlComp.suppressInvalidate = true;
     filterResult.newlyShownTiles.forEach(function(tile) {
       if (tile.rendered) {
         this._renderTileVisibleForFilter(tile);
       }
     }, this);
+    this.htmlComp.suppressInvalidate = false;
   }
 
   this.viewRangeRendered = newViewRange;
@@ -1348,7 +1357,7 @@ scout.TileGrid.prototype._removeTileByFilter = function(tile) {
   tile.remove();
   this._onAnimatedTileRemove(tile);
   tile.animateRemoval = false;
-  //Remove animation is started by a set timeout -> use set timeout as well to come after
+  // Remove animation is started by a set timeout -> use set timeout as well to come after
   setTimeout(function() {
    // Reset to default
    tile.animateRemovalClass = 'animate-remove';
@@ -1484,7 +1493,12 @@ scout.TileGrid.prototype.renderedTiles = function() {
   }
   var tiles = [];
   this.$container.children('.tile').each(function(i, elem) {
-    tiles.push(scout.widget(elem));
+    var tile = scout.widget(elem);
+    if (!tile.removalPending) {
+      // Don't return the tiles which are being removed
+      // Otherwise delta could be wrong if called while removing. Example: filter is added and removed right after while the tiles are still being removed -> RenderTileDelta has to render the tiles being removed
+      tiles.push(tile);
+    }
   });
   return tiles;
 };

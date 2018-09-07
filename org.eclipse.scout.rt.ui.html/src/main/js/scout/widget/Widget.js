@@ -421,6 +421,11 @@ scout.Widget.prototype._removeAnimated = function() {
     if (!this.animateRemovalClass) {
       throw new Error('Missing animate removal class. Cannot remove animated.');
     }
+    if (!this.$container.isVisible() || !this.$container.isEveryParentVisible()) {
+      // If element is not visible, animationEnd would never fire -> remove it immediately
+      this._removeInternal();
+      return;
+    }
     this.$container.addClass(this.animateRemovalClass);
     this.$container.oneAnimationEnd(function() {
       this._removeInternal();

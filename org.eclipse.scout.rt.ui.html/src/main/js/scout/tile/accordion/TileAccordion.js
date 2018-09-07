@@ -23,6 +23,7 @@ scout.TileAccordion = function() {
   this.virtual = null;
   this._selectionUpdateLocked = false;
   this._tileGridPropertyChangeHandler = this._onTileGridPropertyChange.bind(this);
+  this._groupBodyHeightChangeHandler = this._onGroupBodyHeightChange.bind(this);
 };
 scout.inherits(scout.TileAccordion, scout.Accordion);
 
@@ -581,4 +582,27 @@ scout.TileAccordion.prototype._handleCollapsed = function(group) {
     // Deselect tiles of a collapsed group (this will also set focusedTile to null) -> actions on invisible elements is confusing, and key strokes only operate on visible elements, too
     group.body.deselectAllTiles();
   }
+  if (group.rendered) {
+    group.on('bodyHeightChange', this._groupBodyHeightChangeHandler);
+    group.one('bodyHeightChangeDone', this._onGroupBodyHeightChangeDone.bind(this));
+  }
+};
+
+scout.TileAccordion.prototype._onGroupBodyHeightChange = function(event) {
+  this.groups.forEach(function(group) {
+    if (event.source === group || group.bodyAnimating) {
+      // No need to layout body for the group which is already expanding / collapsing since it does it anyway
+      // Btw: another group may be doing it as well at the same time (e.g. because of exclusiveExpand)
+      return;
+    }
+    if (group.body.virtual) {
+      group.body.scrolling = true;
+      group.body.revalidateLayout();
+      group.body.scrolling = false;
+    }
+  });
+};
+
+scout.TileAccordion.prototype._onGroupBodyHeightChangeDone = function(event) {
+  event.source.off('bodyHeightChange', this._groupBodyHeightChangeHandler);
 };

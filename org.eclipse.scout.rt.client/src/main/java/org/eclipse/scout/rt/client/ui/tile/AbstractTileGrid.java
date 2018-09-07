@@ -260,6 +260,18 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
     return true;
   }
 
+  /**
+   * Virtual relates to the term "Virtual Scrolling". This means, only the tiles in the view port and some more will be
+   * rendered. The others will be rendered as soon as they will be moved into the view port, either by scrolling or by
+   * any other action like sorting, filtering etc. This can lead to a big performance boost when having many tiles,
+   * especially on Internet Explorer, but other browsers benefit as well.
+   * <p>
+   * To make Virtual Scrolling work, the real width and height needs to be known so that scroll bar position can be
+   * calculated correctly. This means Virtual Scrolling does only work if all tiles have the same size, so the following
+   * grid properties cannot be used: useUiWidth, useUiHeight, widthInPixel, heightInPixel, w, h.
+   * <p>
+   * If these preconditions are given, you can use the virtual mode and your grid will be able to handle a lot of tiles.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(37)
   protected boolean getConfiguredVirtual() {
