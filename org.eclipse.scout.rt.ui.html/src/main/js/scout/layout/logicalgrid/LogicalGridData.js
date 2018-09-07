@@ -28,7 +28,7 @@ scout.LogicalGridData = function(vararg) {
   this.verticalAlignment = -1;
   this.fillHorizontal = true;
   this.fillVertical = true;
-  this.topInset = 0; // XXX CGU remove this
+  this.topInset = 0; // TODO [9.0] CGU remove, does not seem to be used
 
   if (vararg instanceof scout.LogicalGridData) {
     // copy properties from LGD template

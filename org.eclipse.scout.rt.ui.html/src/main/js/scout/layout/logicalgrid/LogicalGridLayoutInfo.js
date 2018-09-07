@@ -457,7 +457,7 @@ scout.LogicalGridLayoutInfo.prototype.layoutSizes = function(targetSize, sizes, 
     var accWeight = scout.arrays.init(tmpWeight.length, 0.0);
     var hasTargets;
     if (deltaInt > 0) {
-      // expand
+      // expand, if delta is > 0
       hasTargets = true;
       while (deltaInt > 0 && hasTargets) {
         hasTargets = false;
@@ -473,8 +473,8 @@ scout.LogicalGridLayoutInfo.prototype.layoutSizes = function(targetSize, sizes, 
           }
         }
       }
-    } else { // delta<0
-      // shrink
+    } else {
+      // shrink, if delta is <= 0
       hasTargets = true;
       while (deltaInt < 0 && hasTargets) {
         hasTargets = false;

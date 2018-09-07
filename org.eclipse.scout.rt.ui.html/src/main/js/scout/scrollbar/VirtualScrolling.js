@@ -52,7 +52,7 @@ scout.VirtualScrolling.prototype.calculateViewRangeSize = function() {
   if (this.minRowHeight === 0) {
     throw new Error('Cannot calculate view range with rowHeight = 0');
   }
-  return Math.ceil(this.$scrollable.outerHeight() / this.minRowHeight) * 2;
+  return Math.ceil(this.$scrollable.height() / this.minRowHeight) * 2;
 };
 
 scout.VirtualScrolling.prototype.calculateCurrentViewRange = function() {
@@ -111,7 +111,6 @@ scout.VirtualScrolling.prototype.calculateViewRangeForRowIndex = function(rowInd
   diff = this.viewRangeSize - viewRange.size();
   if (diff > 0) {
     viewRange.from = Math.max(viewRange.to - this.viewRangeSize, 0);
-    // XXX CGU this is actually only relevant if container is scrollable, if a parent is scrollable it makes too many tiles to be rendered
   }
   return viewRange;
 };
