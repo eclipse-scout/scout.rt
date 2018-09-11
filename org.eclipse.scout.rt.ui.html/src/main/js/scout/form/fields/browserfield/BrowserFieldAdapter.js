@@ -35,3 +35,10 @@ scout.BrowserFieldAdapter.prototype._onWidgetEvent = function(event) {
     scout.BrowserFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }
 };
+
+scout.BrowserFieldAdapter.prototype._orderPropertyNamesOnSync = function(newProperties) {
+  // IE won't show scrollbars if the location is set before scrollBarEnabled is set to true.
+  // Rendering the location again after setting the scrollBarEnabled property as done in IFrame.js doesn't seem to work.
+  // It looks like the scrollBarEnabled property cannot be changed anymore once the location is set, even if location is unset and set again.
+  return Object.keys(newProperties).sort(this._createPropertySortFunc(['scrollBarEnabled', 'location']));
+};
