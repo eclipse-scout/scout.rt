@@ -10,6 +10,10 @@
  ******************************************************************************/
 describe('GroupBoxMenuItemsOrder', function() {
 
+  beforeEach(function() {
+    setFixtures(sandbox());
+  });
+
   function createMenu(label, horizontalAlignment, isButton) {
     return scout.create('Menu', {
       parent: new scout.NullWidget(),
