@@ -86,7 +86,7 @@
   </modules>
 
   <properties>
-    <scout.base.version>8.1.0</scout.base.version>
+    <scout.base.version>9.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
     <org.eclipse.scout.rt.version>${project.version}</org.eclipse.scout.rt.version>
     <jetty.version>9.4.3.v20170317</jetty.version>
@@ -100,7 +100,7 @@
 
     <master_coverage_jacoco_destFile>${basedir}/../org.eclipse.scout.rt/target/jacoco-all.exec</master_coverage_jacoco_destFile>
     <!-- Sonar properties -->
-    <sonar.branch>releases_8.1.x</sonar.branch>
+    <sonar.branch>releases_9.0.x</sonar.branch>
     <sonar.jacoco.reportPath>${master_coverage_jacoco_destFile}</sonar.jacoco.reportPath>
     <sonar.exclusions>**/resources/WebContent/**</sonar.exclusions>
     <sonar.coverage.exclusions>*.test/**,
@@ -792,7 +792,7 @@
   <scm>
     <connection>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git</connection>
     <developerConnection>scm:git:ssh://${eclipse_gerrit_username}@git.eclipse.org:29418/scout/org.eclipse.scout.rt</developerConnection>
-    <tag>releases/8.1.x</tag>
+    <tag>releases/9.0.x</tag>
     <url>http://git.eclipse.org/c/scout/org.eclipse.scout.rt.git/</url>
   </scm>
 
