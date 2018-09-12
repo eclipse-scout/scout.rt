@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -154,14 +153,14 @@ public class TestRenamedAttributeDo extends DoEntity {
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestRenamedAttributeDo withCloneAttribute(Collection<? extends BigDecimal> cloneAttribute) {
-    cloneAttribute().clear();
-    cloneAttribute().get().addAll(cloneAttribute);
+    cloneAttribute().updateAll(cloneAttribute);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestRenamedAttributeDo withCloneAttribute(BigDecimal... cloneAttribute) {
-    return withCloneAttribute(Arrays.asList(cloneAttribute));
+    cloneAttribute().updateAll(cloneAttribute);
+    return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")

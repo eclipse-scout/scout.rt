@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -93,14 +92,14 @@ public class TestEntityWithInterface1Do extends DoEntity implements ITestBaseEnt
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestEntityWithInterface1Do withStringListAttribute(Collection<? extends String> stringListAttribute) {
-    stringListAttribute().clear();
-    stringListAttribute().get().addAll(stringListAttribute);
+    stringListAttribute().updateAll(stringListAttribute);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestEntityWithInterface1Do withStringListAttribute(String... stringListAttribute) {
-    return withStringListAttribute(Arrays.asList(stringListAttribute));
+    stringListAttribute().updateAll(stringListAttribute);
+    return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
@@ -110,14 +109,14 @@ public class TestEntityWithInterface1Do extends DoEntity implements ITestBaseEnt
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestEntityWithInterface1Do withDoubleListAttribute(Collection<? extends Double> doubleListAttribute) {
-    doubleListAttribute().clear();
-    doubleListAttribute().get().addAll(doubleListAttribute);
+    doubleListAttribute().updateAll(doubleListAttribute);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestEntityWithInterface1Do withDoubleListAttribute(Double... doubleListAttribute) {
-    return withDoubleListAttribute(Arrays.asList(doubleListAttribute));
+    doubleListAttribute().updateAll(doubleListAttribute);
+    return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
@@ -127,14 +126,14 @@ public class TestEntityWithInterface1Do extends DoEntity implements ITestBaseEnt
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestEntityWithInterface1Do withItemDoListAttribute(Collection<? extends TestItemDo> itemDoListAttribute) {
-    itemDoListAttribute().clear();
-    itemDoListAttribute().get().addAll(itemDoListAttribute);
+    itemDoListAttribute().updateAll(itemDoListAttribute);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestEntityWithInterface1Do withItemDoListAttribute(TestItemDo... itemDoListAttribute) {
-    return withItemDoListAttribute(Arrays.asList(itemDoListAttribute));
+    itemDoListAttribute().updateAll(itemDoListAttribute);
+    return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.dataobject.fixture;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -49,14 +48,14 @@ public class EntityFixtureDo extends DoEntity {
 
   @Generated("DoConvenienceMethodsGenerator")
   public EntityFixtureDo withOtherEntities(Collection<? extends OtherEntityFixtureDo> otherEntities) {
-    otherEntities().clear();
-    otherEntities().get().addAll(otherEntities);
+    otherEntities().updateAll(otherEntities);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
   public EntityFixtureDo withOtherEntities(OtherEntityFixtureDo... otherEntities) {
-    return withOtherEntities(Arrays.asList(otherEntities));
+    otherEntities().updateAll(otherEntities);
+    return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")

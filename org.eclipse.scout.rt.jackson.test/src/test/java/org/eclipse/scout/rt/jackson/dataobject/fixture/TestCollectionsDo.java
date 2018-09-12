@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -143,14 +142,14 @@ public class TestCollectionsDo extends DoEntity {
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestCollectionsDo withItemDoListAttribute(Collection<? extends TestItemDo> itemDoListAttribute) {
-    itemDoListAttribute().clear();
-    itemDoListAttribute().get().addAll(itemDoListAttribute);
+    itemDoListAttribute().updateAll(itemDoListAttribute);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestCollectionsDo withItemDoListAttribute(TestItemDo... itemDoListAttribute) {
-    return withItemDoListAttribute(Arrays.asList(itemDoListAttribute));
+    itemDoListAttribute().updateAll(itemDoListAttribute);
+    return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
@@ -160,14 +159,14 @@ public class TestCollectionsDo extends DoEntity {
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestCollectionsDo withItemPojoDoListAttribute(Collection<? extends TestItemPojo> itemPojoDoListAttribute) {
-    itemPojoDoListAttribute().clear();
-    itemPojoDoListAttribute().get().addAll(itemPojoDoListAttribute);
+    itemPojoDoListAttribute().updateAll(itemPojoDoListAttribute);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestCollectionsDo withItemPojoDoListAttribute(TestItemPojo... itemPojoDoListAttribute) {
-    return withItemPojoDoListAttribute(Arrays.asList(itemPojoDoListAttribute));
+    itemPojoDoListAttribute().updateAll(itemPojoDoListAttribute);
+    return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
@@ -177,14 +176,14 @@ public class TestCollectionsDo extends DoEntity {
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestCollectionsDo withItemPojo2DoListAttribute(Collection<? extends TestItemPojo2> itemPojo2DoListAttribute) {
-    itemPojo2DoListAttribute().clear();
-    itemPojo2DoListAttribute().get().addAll(itemPojo2DoListAttribute);
+    itemPojo2DoListAttribute().updateAll(itemPojo2DoListAttribute);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestCollectionsDo withItemPojo2DoListAttribute(TestItemPojo2... itemPojo2DoListAttribute) {
-    return withItemPojo2DoListAttribute(Arrays.asList(itemPojo2DoListAttribute));
+    itemPojo2DoListAttribute().updateAll(itemPojo2DoListAttribute);
+    return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
