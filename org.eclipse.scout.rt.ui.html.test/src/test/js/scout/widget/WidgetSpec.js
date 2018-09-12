@@ -826,6 +826,7 @@ describe('Widget', function() {
       });
       widget.focus();
       widget.render(session.$entryPoint);
+      widget.validateLayoutTree(); // <-- this triggers the focus to be set
       expect(document.activeElement).toBe(widget.$container[0]);
     });
   });
