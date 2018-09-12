@@ -196,7 +196,7 @@ scout.TabBox.prototype.getTabItem = function(tabId) {
  */
 scout.TabBox.prototype.focus = function() {
   if (!this.rendered) {
-    this._postRenderActions.push(this.focus.bind(this));
+    this.session.layoutValidator.schedulePostValidateFunction(this.focus.bind(this));
     return false;
   }
   if (this.selectedTab) {

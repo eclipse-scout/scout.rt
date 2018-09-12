@@ -1661,7 +1661,7 @@ scout.Widget.prototype.findParent = function(func) {
  */
 scout.Widget.prototype.focus = function() {
   if (!this.rendered) {
-    this._postRenderActions.push(this.focus.bind(this));
+    this.session.layoutValidator.schedulePostValidateFunction(this.focus.bind(this));
     return false;
   }
 
