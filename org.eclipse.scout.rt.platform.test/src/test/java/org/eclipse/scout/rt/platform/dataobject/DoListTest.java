@@ -128,10 +128,24 @@ public class DoListTest {
   }
 
   @Test
+  public void testAddAllCollectionNull() {
+    Collection<String> collection = null;
+    m_testDoList.addAll(collection);
+    assertEquals(3, m_testDoList.size());
+  }
+
+  @Test
   public void testAddAllArray() {
     m_testDoList.addAll("qux", "quux");
     assertEquals("qux", m_testDoList.get(3));
     assertEquals("quux", m_testDoList.get(4));
+  }
+
+  @Test
+  public void testAddAllArrayNull() {
+    String[] strings = null;
+    m_testDoList.addAll(strings);
+    assertEquals(3, m_testDoList.size());
   }
 
   @Test
@@ -197,6 +211,24 @@ public class DoListTest {
   }
 
   @Test
+  public void testRemoveAllWildcardCollection() {
+    // text removeAll using "Collection<? extends String>"
+    m_testDoList.clear();
+    m_testDoList.add("foo");
+    assertEquals(Arrays.asList("foo"), m_testDoList.get());
+    Collection<? extends String> elementsToRemove = new ArrayList<>(Arrays.asList("foo"));
+    m_testDoList.removeAll(elementsToRemove);
+    assertEquals(Arrays.asList(), m_testDoList.get());
+  }
+
+  @Test
+  public void testRemoveAllCollectionNull() {
+    Collection<String> collection = null;
+    assertFalse(m_testDoList.removeAll(collection));
+    assertEquals(3, m_testDoList.size());
+  }
+
+  @Test
   public void testRemoveAllArray() {
     assertTrue(m_testDoList.removeAll("bar"));
     assertEquals(Arrays.asList("foo", "baz"), m_testDoList.get());
@@ -206,6 +238,47 @@ public class DoListTest {
 
     assertFalse(m_testDoList.removeAll("abc", "def"));
     assertEquals(Arrays.asList(), m_testDoList.get());
+  }
+
+  @Test
+  public void testRemoveAllArrayNull() {
+    String[] strings = null;
+    assertFalse(m_testDoList.removeAll(strings));
+    assertEquals(3, m_testDoList.size());
+  }
+
+  @Test
+  public void testUpdateAllCollection() {
+    m_testDoList.updateAll(Arrays.asList("a", "b"));
+    assertEquals(Arrays.asList("a", "b"), m_testDoList.get());
+
+    m_testDoList.updateAll(Collections.emptyList());
+    assertEquals(Arrays.asList(), m_testDoList.get());
+    assertTrue(m_testDoList.isEmpty());
+
+    m_testDoList.updateAll(Arrays.asList("a", "b"));
+    m_testDoList.updateAll((Collection<String>) null);
+    assertEquals(Arrays.asList(), m_testDoList.get());
+    assertTrue(m_testDoList.isEmpty());
+
+    Collection<? extends String> newValues = new ArrayList<>(Arrays.asList("foo"));
+    m_testDoList.updateAll(newValues);
+    assertEquals(Arrays.asList("foo"), m_testDoList.get());
+  }
+
+  @Test
+  public void testUpdateAllArray() {
+    m_testDoList.updateAll("a", "b");
+    assertEquals(Arrays.asList("a", "b"), m_testDoList.get());
+
+    m_testDoList.updateAll(Collections.emptyList());
+    assertEquals(Arrays.asList(), m_testDoList.get());
+    assertTrue(m_testDoList.isEmpty());
+
+    m_testDoList.updateAll("a", "b");
+    m_testDoList.updateAll((String[]) null);
+    assertEquals(Arrays.asList(), m_testDoList.get());
+    assertTrue(m_testDoList.isEmpty());
   }
 
   @Test
