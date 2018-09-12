@@ -525,7 +525,7 @@ scout.Widget.prototype.setParent = function(parent) {
   this.parent = parent;
   this.parent._addChild(this);
   if (this.initialized) {
-    this.recomputeEnabled(this.parent.enabledComputed);
+    this.parent.recomputeEnabled();
   }
   this.parent.one('destroy', this._parentDestroyHandler);
 };
@@ -653,13 +653,21 @@ scout.Widget.prototype.recomputeEnabled = function(parentEnabled) {
     this._renderEnabled(); // refresh
   }
 
-  this.children.forEach(function(child) {
-    child.recomputeEnabled(enabledComputed);
-  });
+  // Propagate to children
+  if (this.children.length) {
+    var enabledComputedForChildren = this._computeEnabledForChildren(enabledComputed, parentEnabled);
+    this.children.forEach(function(child) {
+      child.recomputeEnabled(enabledComputedForChildren);
+    });
+  }
 };
 
 scout.Widget.prototype._computeEnabled = function(inheritAccessibility, parentEnabled) {
   return this.enabled && (inheritAccessibility ? parentEnabled : true);
+};
+
+scout.Widget.prototype._computeEnabledForChildren = function(enabledComputed, parentEnabled) {
+  return enabledComputed;
 };
 
 scout.Widget.prototype._renderEnabled = function() {

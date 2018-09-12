@@ -54,3 +54,9 @@ scout.EllipsisMenu.prototype._renderHidden = function() {
 scout.EllipsisMenu.prototype.isTabTarget = function() {
   return scout.Menu.prototype.isTabTarget.call(this) && !this.hidden;
 };
+
+scout.EllipsisMenu.prototype._computeEnabledForChildren = function(enabledComputed, parentEnabled) {
+  // Ellipsis menu should always pass the "parentEnabled" value to its children
+  // (because it should be enabled even when everything else is disabled).
+  return parentEnabled;
+};

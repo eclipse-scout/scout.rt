@@ -74,7 +74,12 @@ scout.ButtonAdapterMenu.prototype._onButtonDestroy = function(event) {
  * @override Widget.js
  */
 scout.ButtonAdapterMenu.prototype._computeEnabled = function(inheritAccessibility, parentEnabled) {
-  return this.button._computeEnabled(inheritAccessibility, parentEnabled);
+  // Use buttons "parentEnabled" value (because the adapter menu might be in an enabled popup, while the button's real parent is disabled)
+  var buttonParentEnabled = true;
+  if (this.button.parent && this.button.parent.initialized && this.button.parent.enabledComputed !== undefined) {
+    buttonParentEnabled = this.button.parent.enabledComputed;
+  }
+  return this.button._computeEnabled(inheritAccessibility, buttonParentEnabled);
 };
 
 /**
