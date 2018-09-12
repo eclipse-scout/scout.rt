@@ -777,7 +777,7 @@ scout.FormField.prototype._renderPreventInitialFocus = function() {
  */
 scout.FormField.prototype.focus = function() {
   if (!this.rendered) {
-    this._postRenderActions.push(this.focus.bind(this));
+    this.session.layoutValidator.schedulePostValidateFunction(this.focus.bind(this));
     return false;
   }
 
