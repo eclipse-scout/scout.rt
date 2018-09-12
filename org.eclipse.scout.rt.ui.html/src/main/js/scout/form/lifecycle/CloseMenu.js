@@ -14,6 +14,7 @@ scout.CloseMenu = function() {
   this.actionStyle = scout.Action.ActionStyle.BUTTON;
   this.keyStroke = 'esc';
   this.systemType = scout.Button.SystemType.CLOSE;
+  this.inheritAccessibility = false;
 };
 scout.inherits(scout.CloseMenu, scout.Menu);
 
