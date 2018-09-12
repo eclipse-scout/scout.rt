@@ -4,7 +4,6 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -100,14 +99,14 @@ public class TestDateDo extends DoEntity {
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestDateDo withDateOnlyDoList(Collection<? extends Date> dateOnlyDoList) {
-    dateOnlyDoList().clear();
-    dateOnlyDoList().get().addAll(dateOnlyDoList);
+    dateOnlyDoList().updateAll(dateOnlyDoList);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestDateDo withDateOnlyDoList(Date... dateOnlyDoList) {
-    return withDateOnlyDoList(Arrays.asList(dateOnlyDoList));
+    dateOnlyDoList().updateAll(dateOnlyDoList);
+    return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
@@ -183,14 +182,14 @@ public class TestDateDo extends DoEntity {
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestDateDo withCustomDateDoList(Collection<? extends Date> customDateDoList) {
-    customDateDoList().clear();
-    customDateDoList().get().addAll(customDateDoList);
+    customDateDoList().updateAll(customDateDoList);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestDateDo withCustomDateDoList(Date... customDateDoList) {
-    return withCustomDateDoList(Arrays.asList(customDateDoList));
+    customDateDoList().updateAll(customDateDoList);
+    return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")

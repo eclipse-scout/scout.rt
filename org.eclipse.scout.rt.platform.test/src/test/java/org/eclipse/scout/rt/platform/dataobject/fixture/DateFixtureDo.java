@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.dataobject.fixture;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -55,14 +54,14 @@ public class DateFixtureDo extends DoEntity {
 
   @Generated("DoConvenienceMethodsGenerator")
   public DateFixtureDo with_list(Collection<? extends Integer> _list) {
-    _list().clear();
-    _list().get().addAll(_list);
+    _list().updateAll(_list);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
   public DateFixtureDo with_list(Integer... _list) {
-    return with_list(Arrays.asList(_list));
+    _list().updateAll(_list);
+    return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")

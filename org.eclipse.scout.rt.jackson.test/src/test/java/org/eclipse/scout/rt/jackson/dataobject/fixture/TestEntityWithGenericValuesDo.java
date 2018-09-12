@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -46,14 +45,14 @@ public class TestEntityWithGenericValuesDo extends DoEntity {
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestEntityWithGenericValuesDo withGenericListAttribute(Collection<? extends TestGenericDo<?>> genericListAttribute) {
-    genericListAttribute().clear();
-    genericListAttribute().get().addAll(genericListAttribute);
+    genericListAttribute().updateAll(genericListAttribute);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestEntityWithGenericValuesDo withGenericListAttribute(TestGenericDo<?>... genericListAttribute) {
-    return withGenericListAttribute(Arrays.asList(genericListAttribute));
+    genericListAttribute().updateAll(genericListAttribute);
+    return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")

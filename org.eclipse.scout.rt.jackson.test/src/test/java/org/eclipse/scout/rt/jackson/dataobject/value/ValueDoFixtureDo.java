@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.jackson.dataobject.value;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -107,14 +106,14 @@ public class ValueDoFixtureDo extends DoEntity {
 
   @Generated("DoConvenienceMethodsGenerator")
   public ValueDoFixtureDo withTypedList(Collection<? extends IValueDo<?>> typedList) {
-    typedList().clear();
-    typedList().get().addAll(typedList);
+    typedList().updateAll(typedList);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
   public ValueDoFixtureDo withTypedList(IValueDo<?>... typedList) {
-    return withTypedList(Arrays.asList(typedList));
+    typedList().updateAll(typedList);
+    return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")

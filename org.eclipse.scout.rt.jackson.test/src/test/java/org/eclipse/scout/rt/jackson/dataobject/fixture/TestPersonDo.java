@@ -4,7 +4,6 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -59,14 +58,14 @@ public class TestPersonDo extends DoEntity {
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestPersonDo withAddresses(Collection<? extends AbstractTestAddressDo> addresses) {
-    addresses().clear();
-    addresses().get().addAll(addresses);
+    addresses().updateAll(addresses);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestPersonDo withAddresses(AbstractTestAddressDo... addresses) {
-    return withAddresses(Arrays.asList(addresses));
+    addresses().updateAll(addresses);
+    return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")

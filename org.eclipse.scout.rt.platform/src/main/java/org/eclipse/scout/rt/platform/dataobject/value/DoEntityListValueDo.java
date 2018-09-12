@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.platform.dataobject.value;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -30,14 +29,14 @@ public class DoEntityListValueDo extends DoEntity implements IValueDo<List<IDoEn
 
   @Generated("DoConvenienceMethodsGenerator")
   public DoEntityListValueDo withValue(Collection<? extends IDoEntity> value) {
-    value().clear();
-    value().get().addAll(value);
+    value().updateAll(value);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
   public DoEntityListValueDo withValue(IDoEntity... value) {
-    return withValue(Arrays.asList(value));
+    value().updateAll(value);
+    return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")

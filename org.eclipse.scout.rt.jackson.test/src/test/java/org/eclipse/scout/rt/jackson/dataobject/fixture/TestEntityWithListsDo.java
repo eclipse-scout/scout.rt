@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -58,14 +57,14 @@ public class TestEntityWithListsDo extends DoEntity {
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestEntityWithListsDo withItemsDoListAttribute(Collection<? extends TestItemDo> itemsDoListAttribute) {
-    itemsDoListAttribute().clear();
-    itemsDoListAttribute().get().addAll(itemsDoListAttribute);
+    itemsDoListAttribute().updateAll(itemsDoListAttribute);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestEntityWithListsDo withItemsDoListAttribute(TestItemDo... itemsDoListAttribute) {
-    return withItemsDoListAttribute(Arrays.asList(itemsDoListAttribute));
+    itemsDoListAttribute().updateAll(itemsDoListAttribute);
+    return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
@@ -75,14 +74,14 @@ public class TestEntityWithListsDo extends DoEntity {
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestEntityWithListsDo withStringDoListAttribute(Collection<? extends String> stringDoListAttribute) {
-    stringDoListAttribute().clear();
-    stringDoListAttribute().get().addAll(stringDoListAttribute);
+    stringDoListAttribute().updateAll(stringDoListAttribute);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
   public TestEntityWithListsDo withStringDoListAttribute(String... stringDoListAttribute) {
-    return withStringDoListAttribute(Arrays.asList(stringDoListAttribute));
+    stringDoListAttribute().updateAll(stringDoListAttribute);
+    return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
