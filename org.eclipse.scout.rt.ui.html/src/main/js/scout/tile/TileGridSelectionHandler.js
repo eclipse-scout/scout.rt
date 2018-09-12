@@ -38,10 +38,10 @@ scout.TileGridSelectionHandler.prototype.selectTileOnMouseDown = function(event)
   if (event.ctrlKey && this.isMultiSelect()) {
     if (selected) {
       this.addTilesToSelection(tile);
-      this.setFocusedTile(tile);
+      this._checkAndSetFocusedTile(event, tile);
     } else {
       this.deselectTile(tile);
-      this.setFocusedTile(null);
+      this._checkAndSetFocusedTile(event, null);
     }
     return;
   }
@@ -59,7 +59,7 @@ scout.TileGridSelectionHandler.prototype.selectTileOnMouseDown = function(event)
     var result = this.computeSelectionBetween(tiles.indexOf(focusedTile), tiles.indexOf(tile), true);
     if (result) {
       this.selectTiles(result.selectedTiles);
-      this.setFocusedTile(result.focusedTile);
+      this._checkAndSetFocusedTile(event, result.focusedTile);
     }
     return;
   }
@@ -67,10 +67,10 @@ scout.TileGridSelectionHandler.prototype.selectTileOnMouseDown = function(event)
   // If multi selection is disabled or no CTRL key is pressed, only the clicked tile may be selected
   if (selected) {
     this.selectTile(tile);
-    this.setFocusedTile(tile);
+    this._checkAndSetFocusedTile(event, tile);
   } else {
     this.deselectAllTiles();
-    this.setFocusedTile(null);
+    this._checkAndSetFocusedTile(event, null);
   }
 };
 
@@ -148,6 +148,16 @@ scout.TileGridSelectionHandler.prototype.toggleSelection = function() {
 
 scout.TileGridSelectionHandler.prototype.getFocusedTile = function() {
   return this.tileGrid.focusedTile;
+};
+
+/**
+ * Only sets the focus if event does not prevent default.
+ */
+scout.TileGridSelectionHandler.prototype._checkAndSetFocusedTile = function(event, tile) {
+  if (event.isDefaultPrevented()) {
+    return;
+  }
+  this.setFocusedTile(tile);
 };
 
 scout.TileGridSelectionHandler.prototype.setFocusedTile = function(tile) {
