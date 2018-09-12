@@ -81,18 +81,22 @@ public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Ite
 
   /**
    * Appends all of the elements in the specified collection to the end of this list, in the order that they are
-   * returned by the specified collection's iterator.
+   * returned by the specified collection's iterator. Does not append any values if {@code items} is null.
    */
   public void addAll(Collection<? extends V> items) {
-    get().addAll(items);
+    if (items != null) {
+      get().addAll(items);
+    }
   }
 
   /**
    * Appends all of the elements in the specified array to the end of this list, in the order that they are contained in
-   * the array.
+   * the array. Does not append any values if {@code items} is null.
    */
   public void addAll(@SuppressWarnings("unchecked") V... items) {
-    addAll(Arrays.asList(items));
+    if (items != null) {
+      addAll(Arrays.asList(items));
+    }
   }
 
   /**
@@ -114,21 +118,47 @@ public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Ite
   }
 
   /**
-   * Removes from this list all of its elements that are contained in the specified collection.
+   * Removes from this list all of its elements that are contained in the specified collection. Does not remove any
+   * values if {@code items} is null.
    *
    * @return {@code true} if this list changed as a result of the call
    */
-  public boolean removeAll(Collection<V> items) {
-    return get().removeAll(items);
+  public boolean removeAll(Collection<? extends V> items) {
+    if (items != null) {
+      return get().removeAll(items);
+    }
+    return false;
   }
 
   /**
-   * Removes from this list all of its elements that are contained in the specified array.
+   * Removes from this list all of its elements that are contained in the specified array. Does not remove any values if
+   * {@code items} is null.
    *
    * @return {@code true} if this list changed as a result of the call
    */
   public boolean removeAll(@SuppressWarnings("unchecked") V... items) {
-    return removeAll(Arrays.asList(items));
+    if (items != null) {
+      return removeAll(Arrays.asList(items));
+    }
+    return false;
+  }
+
+  /**
+   * Replaces all items in this list with the given collection of new {@code items}. If {@code items} is {@code null},
+   * the list is cleared without adding any items.
+   */
+  public void updateAll(Collection<? extends V> items) {
+    clear();
+    addAll(items);
+  }
+
+  /**
+   * Replaces all items in this list with the given array of new {@code items}. If {@code items} is {@code null}, the
+   * list is cleared without adding any items.
+   */
+  public void updateAll(@SuppressWarnings("unchecked") V... items) {
+    clear();
+    addAll(items);
   }
 
   /**
