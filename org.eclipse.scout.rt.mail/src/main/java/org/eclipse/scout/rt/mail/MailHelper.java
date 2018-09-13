@@ -46,6 +46,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.MimePart;
 import javax.mail.internet.MimeUtility;
 import javax.mail.internet.ParseException;
 import javax.mail.util.ByteArrayDataSource;
@@ -372,31 +373,79 @@ public class MailHelper {
    *          Definition of mime message properties.
    * @return Mime message
    */
+  // See methods testCreateMimeMessage*Structure within MailHelperCreateMimeMessageTest for the various content structures created by this method.
   public CharsetSafeMimeMessage createMimeMessage(MailMessage mailMessage) {
     if (mailMessage == null) {
       throw new IllegalArgumentException("Mail message is missing");
     }
 
+    List<? extends MailAttachment> inlineAttachments = mailMessage.getInlineAttachments();
+    List<? extends MailAttachment> attachments = mailMessage.getAttachments();
+
+    boolean hasPlainText = !StringUtility.isNullOrEmpty(mailMessage.getBodyPlainText());
+    boolean hasHtml = !StringUtility.isNullOrEmpty(mailMessage.getBodyHtml());
+    boolean hasInlineAttachments = !inlineAttachments.isEmpty();
+    boolean hasAttachments = !attachments.isEmpty();
+
+    if (!hasPlainText && !hasHtml) {
+      // No content for email
+      return null;
+    }
+
     try {
       CharsetSafeMimeMessage m = new CharsetSafeMimeMessage();
-      MimeMultipart multiPart = new MimeMultipart();
-      BodyPart bodyPart = createBodyPart(mailMessage.getBodyPlainText(), mailMessage.getBodyHtml());
-      if (bodyPart == null) {
-        return null;
+
+      if (!hasAttachments && !hasInlineAttachments) {
+        // Use message as part for plain/html directly
+        setPlainHtmlBodyPart(m, mailMessage.getBodyPlainText(), mailMessage.getBodyHtml());
       }
-      multiPart.addBodyPart(bodyPart);
-      // attachments
-      for (MailAttachment attachment : mailMessage.getAttachments()) {
-        MimeBodyPart part = new MimeBodyPart();
-        DataHandler handler = new DataHandler(attachment.getDataSource());
-        part.setDataHandler(handler);
-        part.setFileName(attachment.getDataSource().getName());
-        if (StringUtility.hasText(attachment.getContentId())) {
-          part.setContentID("<" + attachment.getContentId() + ">");
+      else {
+        // Attachments or inline attachments available
+
+        // Create own body part for plain/html part
+        MimeBodyPart plainHtmlPart = new MimeBodyPart();
+        setPlainHtmlBodyPart(plainHtmlPart, mailMessage.getBodyPlainText(), mailMessage.getBodyHtml());
+
+        // If inline attachments are available, "repack" plainHtmlPart into a related part with the inline attachments
+        MimeMultipart relatedPart = null;
+        if (!inlineAttachments.isEmpty()) {
+          relatedPart = new MimeMultipart("related");
+          relatedPart.addBodyPart(plainHtmlPart);
+
+          for (MailAttachment attachment : inlineAttachments) {
+            relatedPart.addBodyPart(createAttachmentPart(attachment, true));
+          }
+
+          m.setContent(relatedPart);
         }
-        multiPart.addBodyPart(part);
+
+        if (attachments.isEmpty()) {
+          // No attachments inline attachments were available, thus related part is set
+          Assertions.assertNotNull(relatedPart, "Invalid state because related part is null");
+          m.setContent(relatedPart);
+        }
+        else {
+          // create multipart/mixed part for attachments
+          MimeMultipart multiPart = new MimeMultipart();
+
+          if (relatedPart != null) {
+            // Inline attachments were available and a related part was created
+            MimeBodyPart relatedBodyPart = new MimeBodyPart();
+            relatedBodyPart.setContent(relatedPart);
+            multiPart.addBodyPart(relatedBodyPart);
+          }
+          else {
+            // No online attachments, thus use plainHtmlPart directly
+            multiPart.addBodyPart(plainHtmlPart);
+          }
+
+          for (MailAttachment attachment : attachments) {
+            multiPart.addBodyPart(createAttachmentPart(attachment, false));
+          }
+
+          m.setContent(multiPart);
+        }
       }
-      m.setContent(multiPart);
 
       if (mailMessage.getSender() != null && StringUtility.hasText(mailMessage.getSender().getEmail())) {
         InternetAddress addrSender = createInternetAddress(mailMessage.getSender());
@@ -418,6 +467,9 @@ public class MailHelper {
       if (!CollectionUtility.isEmpty(mailMessage.getBccRecipients())) {
         m.setRecipients(RecipientType.BCC, createInternetAddresses(mailMessage.getBccRecipients()));
       }
+
+      m.saveChanges();
+
       return m;
     }
     catch (Exception e) {
@@ -425,26 +477,45 @@ public class MailHelper {
     }
   }
 
-  protected BodyPart createBodyPart(String bodyTextPlain, String bodyTextHtml) throws MessagingException {
+  /**
+   * @param inline
+   *          <code>true</code> if it's an inline attachment, <code>false</code> otherwise.
+   */
+  protected MimeBodyPart createAttachmentPart(MailAttachment attachment, boolean inline) throws MessagingException {
+    MimeBodyPart part = new MimeBodyPart();
+    DataHandler handler = new DataHandler(attachment.getDataSource());
+    part.setDataHandler(handler);
+    part.setFileName(attachment.getDataSource().getName());
+    if (StringUtility.hasText(attachment.getContentId())) {
+      part.setContentID("<" + attachment.getContentId() + ">");
+    }
+    if (inline) {
+      part.setDisposition(MimeBodyPart.INLINE);
+    }
+    return part;
+  }
+
+  protected void setPlainHtmlBodyPart(MimePart part, String bodyTextPlain, String bodyTextHtml) throws MessagingException {
     if (!StringUtility.isNullOrEmpty(bodyTextPlain) && !StringUtility.isNullOrEmpty(bodyTextHtml)) {
       // multipart
-      MimeBodyPart plainPart = createSingleBodyPart(bodyTextPlain, CONTENT_TYPE_TEXT_PLAIN);
-      MimeBodyPart htmlPart = createSingleBodyPart(bodyTextHtml, CONTENT_TYPE_TEXT_HTML);
+      MimeBodyPart plainPart = new MimeBodyPart();
+      MimeBodyPart htmlPart = new MimeBodyPart();
 
-      Multipart multiPart = new MimeMultipart("alternative");
-      multiPart.addBodyPart(plainPart);
-      multiPart.addBodyPart(htmlPart);
-      MimeBodyPart multiBodyPart = new MimeBodyPart();
-      multiBodyPart.setContent(multiPart);
-      return multiBodyPart;
+      setSingleBodyPart(plainPart, bodyTextPlain, CONTENT_TYPE_TEXT_PLAIN);
+      setSingleBodyPart(htmlPart, bodyTextHtml, CONTENT_TYPE_TEXT_HTML);
+
+      Multipart alternativePart = new MimeMultipart("alternative");
+      alternativePart.addBodyPart(plainPart);
+      alternativePart.addBodyPart(htmlPart);
+
+      part.setContent(alternativePart);
     }
     else if (!StringUtility.isNullOrEmpty(bodyTextPlain)) {
-      return createSingleBodyPart(bodyTextPlain, CONTENT_TYPE_TEXT_PLAIN);
+      setSingleBodyPart(part, bodyTextPlain, CONTENT_TYPE_TEXT_PLAIN);
     }
     else if (!StringUtility.isNullOrEmpty(bodyTextHtml)) {
-      return createSingleBodyPart(bodyTextHtml, CONTENT_TYPE_TEXT_HTML);
+      setSingleBodyPart(part, bodyTextHtml, CONTENT_TYPE_TEXT_HTML);
     }
-    return null;
   }
 
   /**
@@ -457,11 +528,9 @@ public class MailHelper {
    * @return Crated mime body part
    * @throws MessagingException
    */
-  protected MimeBodyPart createSingleBodyPart(String bodyText, String contentType) throws MessagingException {
-    MimeBodyPart part = new MimeBodyPart();
+  protected void setSingleBodyPart(MimePart part, String bodyText, String contentType) throws MessagingException {
     part.setText(bodyText, StandardCharsets.UTF_8.name());
     part.addHeader(CONTENT_TYPE_ID, contentType);
-    return part;
   }
 
   public MimeMessage createMessageFromBytes(byte[] bytes) {
