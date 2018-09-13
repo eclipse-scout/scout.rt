@@ -29,12 +29,16 @@ public class MailMessage {
   private final List<MailParticipant> m_toRecipients = new ArrayList<>();
   private final List<MailParticipant> m_ccRecipients = new ArrayList<>();
   private final List<MailParticipant> m_bccRecipients = new ArrayList<>();
+
   private MailParticipant m_sender;
   private final List<MailParticipant> m_replyTos = new ArrayList<>();
+
   private String m_subject;
   private String m_bodyPlainText;
   private String m_bodyHtml;
+
   private final List<MailAttachment> m_attachments = new ArrayList<>();
+  private final List<MailAttachment> m_inlineAttachments = new ArrayList<>();
 
   /**
    * @return an unmodifiable list of TO recipients.
@@ -269,6 +273,41 @@ public class MailMessage {
    */
   public MailMessage clearAttachments() {
     m_attachments.clear();
+    return this;
+  }
+
+  /**
+   * @return an unmodifiable list of inline attachments.
+   */
+  public List<? extends MailAttachment> getInlineAttachments() {
+    return Collections.unmodifiableList(m_inlineAttachments);
+  }
+
+  /**
+   * Adds the attachment.
+   *
+   * @param inlineAttachment
+   */
+  public MailMessage withInlineAttachment(MailAttachment inlineAttachment) {
+    m_inlineAttachments.add(inlineAttachment);
+    return this;
+  }
+
+  /**
+   * Adds the inline attachments.
+   *
+   * @param inlineAttachments
+   */
+  public MailMessage withInlineAttachments(Collection<? extends MailAttachment> inlineAttachments) {
+    m_inlineAttachments.addAll(inlineAttachments);
+    return this;
+  }
+
+  /**
+   * Clears the inline attachment list.
+   */
+  public MailMessage clearInlineAttachments() {
+    m_inlineAttachments.clear();
     return this;
   }
 }
