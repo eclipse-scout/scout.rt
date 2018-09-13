@@ -52,19 +52,19 @@ scout.TabAreaLayout.prototype.layout = function($container) {
   ellipsis.setText(this.overflowTabs.length + '');
 
   // set childActions to empty array to prevent the menuItems from calling remove.
-  ellipsis.setChildActions(this.overflowTabs.map(function(tabItem) {
+  ellipsis.setChildActions(this.overflowTabs.map(function(tab) {
     var menu = scout.create('Menu', {
       parent: ellipsis,
-      text: tabItem.label,
-      tabItem: tabItem,
-      visible: tabItem.visible
+      text: tab.label,
+      tab: tab,
+      visible: tab.visible
     });
     menu.on('action', function(event) {
-      $.log.isDebugEnabled() && $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + tabItem);
+      $.log.isDebugEnabled() && $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + tab);
       // first close popup to ensure the focus is handled in the correct focus context.
       ellipsis.popup.close();
-      this.tabArea.setSelectedTab(tabItem);
-      tabItem.focusTab();
+      tab.select();
+      tab.focus();
     }.bind(this));
     return menu;
   }, this));
@@ -79,7 +79,7 @@ scout.TabAreaLayout.prototype._layoutSelectionMarker = function() {
 
   if (selectedTab) {
     $selectionMarker.setVisible(true);
-    selectedItemBounds = scout.graphics.bounds(selectedTab.$tabContainer);
+    selectedItemBounds = scout.graphics.bounds(selectedTab.$container);
     $selectionMarker.cssLeft(selectedItemBounds.x);
     $selectionMarker.cssWidth(selectedItemBounds.width);
   } else {
@@ -91,11 +91,11 @@ scout.TabAreaLayout.prototype.preferredLayoutSize = function($container, options
   var htmlComp = scout.HtmlComponent.get($container),
     prefSize = new scout.Dimension(0, 0),
     prefWidth = Number.MAX_VALUE,
-    visibleTabItems = this.tabArea.tabItems.filter(function(tabItem) {
+    visibleTabItems = this.tabArea.tabs.filter(function(tabItem) {
       return tabItem.isVisible();
     }),
     overflowableIndexes = visibleTabItems.map(function(tabItem, index) {
-      if (tabItem._tabActive) {
+      if (tabItem.selected) {
         return -1;
       }
       return index;
@@ -134,7 +134,7 @@ scout.TabAreaLayout.prototype._minSize = function(tabItems) {
   var visibleTabItems = [],
     prefSize;
   this.overflowTabs = tabItems.filter(function(tabItem) {
-    if (tabItem._tabActive) {
+    if (tabItem.selected) {
       visibleTabItems.push(tabItem);
       return false;
     }
@@ -150,7 +150,7 @@ scout.TabAreaLayout.prototype._minSize = function(tabItems) {
 
 scout.TabAreaLayout.prototype._prefSize = function(tabItems, considerEllipsis) {
   var prefSize = tabItems.map(function(tabItem) {
-      return this._tabItemSize(tabItem.tabHtmlComp);
+      return this._tabItemSize(tabItem.htmlComp);
     }, this).reduce(function(prefSize, itemSize) {
       prefSize.height = Math.max(prefSize.height, itemSize.height);
       prefSize.width += itemSize.width;
@@ -171,18 +171,18 @@ scout.TabAreaLayout.prototype._setFirstLastMarker = function(tabItems, considerE
   considerEllipsis = scout.nvl(considerEllipsis, this.overflowTabs.length > 0);
 
   // reset
-  this.tabArea.tabItems.forEach(function(tabItem) {
-    tabItem.tabHtmlComp.$comp.removeClass('first last');
+  this.tabArea.tabs.forEach(function(tabItem) {
+    tabItem.htmlComp.$comp.removeClass('first last');
   });
   this.tabArea.ellipsis.$container.removeClass('first last');
 
   // set first and last
   if (tabItems.length > 0) {
-    tabItems[0].tabHtmlComp.$comp.addClass('first');
+    tabItems[0].$container.addClass('first');
     if (considerEllipsis) {
       this.tabArea.ellipsis.$container.addClass('last');
     } else {
-      tabItems[tabItems.length - 1].tabHtmlComp.$comp.addClass('last');
+      tabItems[tabItems.length - 1].$container.addClass('last');
     }
   }
 };

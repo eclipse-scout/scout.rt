@@ -22,6 +22,7 @@ scout.TabBoxLayout.prototype.layout = function($container) {
     htmlTabArea = scout.HtmlComponent.get(this._tabBox.header.$container),
     tabAreaWidthHint = 0,
     tabAreaSize = new scout.Dimension(),
+    tooltip = this._tabBox._tooltip(),
     $status = this._tabBox.$status,
     statusPosition = this._tabBox.statusPosition;
 
@@ -53,6 +54,11 @@ scout.TabBoxLayout.prototype.layout = function($container) {
   tabContentSize = containerSize.subtract(htmlTabContent.margins());
   tabContentSize.height -= tabAreaSize.height;
   htmlTabContent.setSize(tabContentSize);
+
+  // Make sure tooltip is at correct position after layouting, if there is one
+  if (tooltip) {
+    tooltip.position();
+  }
 };
 
 scout.TabBoxLayout.prototype._layoutStatus = function(height) {

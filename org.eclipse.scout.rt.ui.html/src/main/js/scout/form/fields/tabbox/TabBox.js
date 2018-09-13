@@ -23,6 +23,8 @@ scout.TabBox = function() {
   this._addWidgetProperties(['tabItems', 'selectedTab']);
   this._addPreserveOnPropertyChangeProperties(['selectedTab']); // TODO [7.0] awe: do this in Calendar too, for selectedComponent
   this._$tabContent = null;
+
+  this._tabBoxHeaderPropertyChangeHander = this._onTabBoxHeaderPropertyChange.bind(this);
 };
 scout.inherits(scout.TabBox, scout.CompositeField);
 
@@ -31,13 +33,23 @@ scout.inherits(scout.TabBox, scout.CompositeField);
  */
 scout.TabBox.prototype._init = function(model) {
   scout.TabBox.parent.prototype._init.call(this, model);
-  if (this.selectedTab) {
-    this.selectedTab.setTabActive(true);
-  }
   this.header = scout.create('TabBoxHeader', {
     parent: this,
     tabBox: this
   });
+
+  this._initProperties(model);
+  this.header.on('propertyChange', this._tabBoxHeaderPropertyChangeHander);
+};
+
+scout.TabBox.prototype._initProperties = function(model) {
+  this._setTabItems(this.tabItems);
+  this._setSelectedTab(this.selectedTab);
+};
+
+scout.TabBox.prototype._destroy = function() {
+  scout.TabBox.parent.prototype._destroy.call(this);
+  this.header.off('propertyChange', this._tabBoxHeaderPropertyChangeHander);
 };
 
 scout.TabBox.prototype._render = function() {
@@ -104,8 +116,9 @@ scout.TabBox.prototype._setTabItems = function(tabItems) {
   });
 
   this._setProperty('tabItems', tabItems);
+  this.header.setTabItems(this.tabItems);
+  // if no tab is selected select first
   if (this.tabItems.indexOf(this.selectedTab) < 0) {
-    // select first
     this.setSelectedTab(this.tabItems[0]);
   }
 };
@@ -131,31 +144,22 @@ scout.TabBox.prototype.selectTabById = function(tabId) {
   this.setSelectedTab(tab);
 };
 
-scout.TabBox.prototype.setSelectedTab = function(selectedTab) {
-  this.setProperty('selectedTab', selectedTab);
+scout.TabBox.prototype.setSelectedTab = function(tabItem) {
+  this.setProperty('selectedTab', tabItem);
 };
 
-scout.TabBox.prototype._setSelectedTab = function(tab) {
-  $.log.isDebugEnabled() && $.log.debug('(TabBox#_selectTab) tab=' + tab);
-  if (this.selectedTab) {
-    this.selectedTab.setTabActive(false);
+scout.TabBox.prototype._setSelectedTab = function(tabItem) {
+  $.log.isDebugEnabled() && $.log.debug('(TabBox#_selectTab) tab=' + tabItem);
+  if (this.selectedTab && this.selectedTab.rendered) {
+    this.selectedTab.remove();
   }
-  if (this.rendered) {
-    this._removeSelectedTab();
-  }
-  if (tab) {
-    tab.setTabActive(true);
-  }
-  this._setProperty('selectedTab', tab);
+  this._setProperty('selectedTab', tabItem);
+  this.header.setSelectedTabItem(this.selectedTab);
 };
 
 scout.TabBox.prototype._renderSelectedTab = function() {
   if (this.selectedTab) {
-    if (this.selectedTab.rendered && !this.selectedTab.attached) {
-      this.selectedTab.attach();
-    } else {
-      this.selectedTab.render(this._$tabContent);
-    }
+    this.selectedTab.render(this._$tabContent);
   }
   if (this.rendered) {
     scout.HtmlComponent.get(this._$tabContent).revalidateLayoutTree();
@@ -163,12 +167,17 @@ scout.TabBox.prototype._renderSelectedTab = function() {
 };
 
 scout.TabBox.prototype._removeSelectedTab = function() {
-  if (this.selectedTab) {
-    this.selectedTab.detach();
-  }
+  this.selectedTab.remove();
 };
 
+/**
+ * @override FormField.js
+ */
 scout.TabBox.prototype._renderStatusPosition = function() {
+  scout.TabBox.parent.prototype._renderStatusPosition.call(this);
+  if (!this.fieldStatus) {
+    return;
+  }
   if (this.statusPosition === scout.FormField.StatusPosition.TOP) {
     // move into title
     this.$status.appendTo(this.header.$container);
@@ -212,4 +221,17 @@ scout.TabBox.prototype.getFocusableElement = function() {
     return this.selectedTab.getFocusableElement();
   }
   return null;
+};
+
+scout.TabBox.prototype.focusTab = function(tab) {
+  if (this.selectedTab !== tab) {
+    this.selectTab(tab);
+  }
+  this.header.focusTabItem(tab);
+};
+
+scout.TabBox.prototype._onTabBoxHeaderPropertyChange = function(event) {
+  if (event.propertyName === 'selectedTabItem') {
+    this.setSelectedTab(event.newValue);
+  }
 };

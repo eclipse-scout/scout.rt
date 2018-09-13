@@ -557,18 +557,6 @@ scout.ValueField.prototype.addField = function($field) {
   this.$field.data('valuefield', this);
 };
 
-scout.ValueField.prototype._onStatusMouseDown = function(event) {
-  if (this.menus && this.menus.length > 0) {
-    var $activeElement = this.$container.activeElement();
-    if ($activeElement.data('valuefield') === this ||
-      $activeElement.parent().data('valuefield') === this) {
-      this.acceptInput();
-    }
-  }
-
-  scout.ValueField.parent.prototype._onStatusMouseDown.call(this, event);
-};
-
 scout.ValueField.prototype._getCurrentMenus = function() {
   if (this.currentMenuTypes) {
     var menuTypes = this.currentMenuTypes.map(function(elem) {

@@ -350,6 +350,7 @@
   // Basics for form fields
   __include("scout/form/fields/fields.js");
   __include("scout/form/fields/AppLinkKeyStroke.js");
+  __include("scout/form/fields/FieldStatus.js");
   __include("scout/form/fields/FormField.js");
   __include("scout/form/fields/FormFieldAdapter.js");
   __include("scout/form/fields/FormFieldLayout.js");
@@ -473,6 +474,7 @@
   __include("scout/form/fields/tabbox/TabBoxAdapter.js");
   __include("scout/form/fields/tabbox/TabBoxHeaderLayout.js");
   __include("scout/form/fields/tabbox/TabBoxHeader.js");
+  __include("scout/form/fields/tabbox/Tab.js");
   __include("scout/form/fields/tabbox/TabArea.js");
   __include("scout/form/fields/tabbox/TabAreaLayout.js");
   __include("scout/form/fields/tabbox/TabBoxLayout.js");

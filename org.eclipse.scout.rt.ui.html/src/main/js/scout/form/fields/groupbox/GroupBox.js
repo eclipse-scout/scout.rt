@@ -344,7 +344,19 @@ scout.GroupBox.prototype._renderLabel = function() {
   }
 };
 
+scout.GroupBox.prototype.addStatus = function() {
+  scout.TabBox.parent.prototype.addStatus.call(this);
+  this._updateStatusPosition();
+};
+
 scout.GroupBox.prototype._renderStatusPosition = function() {
+  this._updateStatusPosition();
+};
+
+scout.GroupBox.prototype._updateStatusPosition = function() {
+  if (!this.fieldStatus) {
+    return;
+  }
   if (this.statusPosition === scout.FormField.StatusPosition.TOP) {
     // move into title
     this.$status.appendTo(this.$title);
@@ -602,19 +614,12 @@ scout.GroupBox.prototype._setLogicalGrid = function(logicalGrid) {
  */
 scout.GroupBox.prototype._renderLabelVisible = function(labelVisible) {
   this.$title.setVisible(this._computeTitleVisible(labelVisible));
-  this._updateStatusVisible();
+  this._updateFieldStatus();
 };
 
 scout.GroupBox.prototype._computeTitleVisible = function(labelVisible) {
   labelVisible = scout.nvl(labelVisible, this.labelVisible);
   return !!(labelVisible && this.label && !this.mainBox);
-};
-
-/**
- * @override FormField.js
- */
-scout.GroupBox.prototype._updateStatusVisible = function() {
-  this._renderStatusVisible();
 };
 
 /**

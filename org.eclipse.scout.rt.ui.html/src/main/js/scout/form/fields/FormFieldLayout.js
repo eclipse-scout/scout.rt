@@ -30,6 +30,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   var containerPadding, fieldOffset, fieldSize, fieldBounds, htmlField, labelHasFieldWidth, top, bottom, left, right,
     htmlContainer = scout.HtmlComponent.get($container),
     formField = this.formField,
+    tooltip = formField._tooltip(),
     labelWidth = this.labelWidth(),
     statusWidth = this.statusWidth;
 
@@ -160,8 +161,8 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   }
 
   // Make sure tooltip is at correct position after layouting, if there is one
-  if (formField.tooltip && formField.tooltip.rendered) {
-    formField.tooltip.position();
+  if (tooltip && formField.rendered) {
+    tooltip.position();
   }
 
   // Check for scrollbars, update them if necessary

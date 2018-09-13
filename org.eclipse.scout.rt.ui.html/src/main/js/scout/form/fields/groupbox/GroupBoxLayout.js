@@ -23,6 +23,7 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
     htmlContainer = this.groupBox.htmlComp,
     htmlGbBody = this._htmlGbBody(),
     htmlMenuBar = this._htmlMenuBar(),
+    tooltip = this.groupBox._tooltip(),
     $groupBoxTitle = this.groupBox.$title,
     $label = this.groupBox.$label,
     $status = this.groupBox.$status,
@@ -60,8 +61,8 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
   htmlGbBody.setSize(gbBodySize);
 
   // Make sure tooltip is at correct position after layouting, if there is one
-  if (this.groupBox.tooltip && this.groupBox.tooltip.rendered) {
-    this.groupBox.tooltip.position();
+  if (tooltip && tooltip.rendered) {
+    tooltip.position();
   }
 
    if (htmlGbBody.scrollable || this.groupBox.bodyLayoutConfig.minWidth > 0 ) {

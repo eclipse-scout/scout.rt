@@ -11,9 +11,11 @@
 scout.TabArea = function() {
   scout.TabArea.parent.call(this);
   this.tabBox = null;
-  this.tabItems = [];
+  this.tabs = [];
 
+  this._tabItemPropertyChangeHandler = this._onTabItemPropertyChange.bind(this);
   this._tabPropertyChangeHandler = this._onTabPropertyChange.bind(this);
+  this._tabSelectionHandler = this._onTabSelect.bind(this);
   this.ellipsis = null;
 
   this.$selectionMarker = null;
@@ -61,21 +63,9 @@ scout.TabArea.prototype._render = function() {
 
 scout.TabArea.prototype._renderProperties = function() {
   scout.TabArea.parent.prototype._renderProperties.call(this);
-  this._renderTabItems();
+  this._renderTabs();
+  this._renderSelectedTab();
   this._renderHasSubLabel();
-};
-
-scout.TabArea.prototype.setSelectedTab = function(tabItem) {
-  this.tabBox.setSelectedTab(tabItem);
-  this.setProperty('selectedTab', tabItem);
-  this._setTabbableItem(tabItem);
-};
-
-scout.TabArea.prototype._renderSelectedTab = function() {
-  // force a relayout in case the selected tab is overflown. The layout will ensure the selected tab is visible.
-  if (this.selectedTab && this.selectedTab.tabOverflown) {
-    this.invalidateLayoutTree();
-  }
 };
 
 /**
@@ -86,40 +76,93 @@ scout.TabArea.prototype._remove = function() {
   this._removeTabs();
 };
 
-scout.TabArea.prototype._removeTabs = function() {
-  this.tabItems.forEach(function(tabItem) {
-    tabItem.removeTab();
-  }, this);
+scout.TabArea.prototype.setSelectedTabItem = function(tabItem) {
+  this.setSelectedTab(scout.arrays.find(this.tabs, function(tab) {
+    return tab.tabItem === tabItem;
+  }, this));
 };
 
-scout.TabArea.prototype._removeTabHandlers = function() {
-  if (this.tabItems) {
-    this.tabItems.forEach(function(item) {
-      item.off('propertyChange', this._tabPropertyChangeHandler);
-    }.bind(this));
+scout.TabArea.prototype.setSelectedTab = function(tab) {
+  this.setProperty('selectedTab', tab);
+};
+
+scout.TabArea.prototype._setSelectedTab = function(tab) {
+  if (this.selectedTab) {
+    this.selectedTab.setSelected(false);
   }
+  if (tab) {
+    tab.setSelected(true);
+  }
+  this._setProperty('selectedTab', tab);
+  this._setTabbableItem(tab);
+};
+
+scout.TabArea.prototype._renderSelectedTab = function() {
+  // force a relayout in case the selected tab is overflown. The layout will ensure the selected tab is visible.
+  if (this.selectedTab && this.selectedTab.tabOverflown) {
+    this.invalidateLayoutTree();
+  }
+};
+
+scout.TabArea.prototype.focusTabItem = function(tabItem) {
+  this.focusTab(scout.arrays.find(this.tabs, function(tab) {
+    return tab.tabItem === tabItem;
+  }, this));
+};
+
+scout.TabArea.prototype.focusTab = function(tabItem) {
+  tabItem.focus();
 };
 
 scout.TabArea.prototype.setTabItems = function(tabItems) {
-  this._removeTabHandlers();
-  if (this.rendered) {
-    this._removeTabItems();
-  }
-  tabItems.forEach(function(item) {
-    item.on('propertyChange', this._tabPropertyChangeHandler);
-  }, this);
-
-  this.setProperty('tabItems', tabItems);
+  this.setProperty('tabs', tabItems);
   this._updateHasSubLabel();
   this.invalidateLayoutTree();
 };
 
-scout.TabArea.prototype._renderTabItems = function() {
-  this.tabItems.slice().reverse().forEach(function(tabItem, index, items) {
-    tabItem.renderTab(this.$container);
-    tabItem.$tabContainer.prependTo(this.$container);
-    tabItem.$tabContainer.on('blur', this._onTabItemBlur.bind(this))
+scout.TabArea.prototype._setTabs = function(tabItems) {
+  var tabsToRemove = this.tabs.slice(),
+    tabs = tabItems.map(function(tabItem) {
+      var tab = scout.arrays.find(this.tabs, function(tab) {
+        return tab.tabItem === tabItem;
+      });
+      if (!tab) {
+        tab = scout.create('Tab', {
+          parent: this,
+          tabItem: tabItem
+        });
+        tabItem.on('propertyChange', this._tabItemPropertyChangeHandler);
+        tab.on('propertyChange', this._tabPropertyChangeHandler);
+      } else {
+        scout.arrays.remove(tabsToRemove, tab);
+      }
+      return tab;
+    }, this);
+
+  this._removeTabs(tabsToRemove);
+
+  this._setProperty('tabs', tabs);
+};
+
+scout.TabArea.prototype._renderTabs = function() {
+  this.tabs.slice().reverse().forEach(function(tab, index, items) {
+    if (!tab.rendered) {
+      tab.render();
+    }
+    tab.$container.on('blur', this._onTabItemBlur.bind(this))
       .on('focus', this._onTabItemFocus.bind(this));
+    tab.$container.prependTo(this.$container);
+    tab.$container.on('blur', this._onTabItemBlur.bind(this))
+      .on('focus', this._onTabItemFocus.bind(this));
+  }, this);
+};
+
+scout.TabArea.prototype._removeTabs = function(tabs) {
+  tabs = tabs || this.tabs;
+  tabs.forEach(function(tab) {
+    tab.tabItem.off('propertyChange', this._tabItemPropertyChangeHandler);
+    tab.off('select', this._tabSelectionHandler);
+    tab.remove();
   }, this);
 };
 
@@ -131,14 +174,8 @@ scout.TabArea.prototype._onTabItemBlur = function() {
   this.setFocused(false);
 };
 
-scout.TabArea.prototype._removeTabItems = function() {
-  this.tabItems.forEach(function(tabItem) {
-    tabItem.removeTab();
-  }, this);
-};
-
 scout.TabArea.prototype._updateHasSubLabel = function() {
-  var items = this.tabItems || [];
+  var items = this.tabs || [];
   this._setHasSubLabel(items.some(function(item) {
     return scout.strings.hasText(item.subLabel);
   }));
@@ -160,20 +197,20 @@ scout.TabArea.prototype._renderHasSubLabel = function() {
 };
 
 scout.TabArea.prototype.selectNextTab = function() {
-  var currentIndex = this.tabItems.indexOf(this.selectedTab),
+  var currentIndex = this.tabs.indexOf(this.selectedTab),
     nextTab;
-  if (this.tabItems.length > currentIndex + 1) {
-    nextTab = this.tabItems[currentIndex + 1];
+  if (this.tabss.length > currentIndex + 1) {
+    nextTab = this.tabs[currentIndex + 1];
     this.setSelectedTab(nextTab);
     nextTab.focus();
   }
 };
 
 scout.TabArea.prototype.selectPreviousTab = function() {
-  var currentIndex = this.tabItems.indexOf(this.selectedTab),
+  var currentIndex = this.tabs.indexOf(this.selectedTab),
     previousTab;
   if (currentIndex - 1 > -1) {
-    previousTab = this.tabItems[currentIndex - 1];
+    previousTab = this.tabs[currentIndex - 1];
     this.setSelectedTab(previousTab);
     previousTab.focus();
   }
@@ -187,7 +224,7 @@ scout.TabArea.prototype.selectPreviousTab = function(focusTab) {
 };
 
 scout.TabArea.prototype._moveSelectionHorizontal = function(directionRight, focusTab) {
-  var tabItems = this.tabItems.slice(),
+  var tabItems = this.tabs.slice(),
     $focusedElement = this.$container.activeElement(),
     selectNext = false;
   if (!directionRight) {
@@ -200,12 +237,12 @@ scout.TabArea.prototype._moveSelectionHorizontal = function(directionRight, focu
       this.setSelectedTab(item);
       this._setTabbableItem(item);
       if (focusTab) {
-        item.focusTab();
+        item.focus();
       }
       selectNext = false;
       return;
     }
-    if ($focusedElement[0] === item.$tabContainer[0]) {
+    if ($focusedElement[0] === item.$container[0]) {
       selectNext = true;
     }
   }, this);
@@ -219,7 +256,7 @@ scout.TabArea.prototype._moveSelectionHorizontal = function(directionRight, focu
 };
 
 scout.TabArea.prototype._setTabbableItem = function(tabItem) {
-  var tabItems = this.tabItems;
+  var tabItems = this.tabs;
   if (tabItem) {
     // clear old tabbable
     this.ellipsis.setTabbable(false);
@@ -230,7 +267,20 @@ scout.TabArea.prototype._setTabbableItem = function(tabItem) {
   }
 };
 
+scout.TabArea.prototype._onTabSelect = function(event) {
+  // translate tab into tabItem
+  this.trigger('tabItemSelect', {
+    tabItem: event.tab.tabItem
+  });
+};
+
 scout.TabArea.prototype._onTabPropertyChange = function(event) {
+  if (event.propertyName === 'selected') {
+    this.setSelectedTab(event.source);
+  }
+};
+
+scout.TabArea.prototype._onTabItemPropertyChange = function(event) {
   if (event.propertyName === 'visible') {
     this.invalidateLayoutTree();
   }

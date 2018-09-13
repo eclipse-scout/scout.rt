@@ -40,8 +40,6 @@ scout.TabBoxHeader.prototype._init = function(options) {
   this.tabBox.on('propertyChange', this._tabBoxPropertyChangeHandler);
 
   this.menuBar.setMenuItems(this.tabBox.menus);
-  this.tabArea.setTabItems(this.tabBox.tabItems);
-  this.tabArea.setSelectedTab(this.tabBox.selectedTab);
 };
 
 scout.TabBoxHeader.prototype._render = function() {
@@ -60,18 +58,38 @@ scout.TabBoxHeader.prototype._destroy = function() {
   scout.TabBoxHeader.parent.prototype._destroy.call(this);
 };
 
+scout.TabBoxHeader.prototype.setTabItems = function(tabItems) {
+  this.tabArea.setTabItems(tabItems);
+};
+
+scout.TabBoxHeader.prototype._setSelectedTab = function(tab) {
+  if (tab) {
+    this.setSelectedTabItem(tab.tabItem);
+  } else {
+    this.setSelectedTabItem(null);
+  }
+};
+
+scout.TabBoxHeader.prototype.setSelectedTabItem = function(tabItem) {
+  this.setProperty('selectedTabItem', tabItem);
+};
+scout.TabBoxHeader.prototype._setSelectedTabItem = function(tabItem) {
+  this._setProperty('selectedTabItem', tabItem);
+  this.tabArea.setSelectedTabItem(tabItem);
+};
+
+scout.TabBoxHeader.prototype.focusTabItem = function(tabItem) {
+  this.tabArea.focusTabItem(tabItem);
+};
+
 scout.TabBoxHeader.prototype._onTabBoxPropertyChange = function(event) {
   if (event.propertyName === 'menus') {
     this.menuBar.setMenuItems(this.tabBox.menus);
-  } else if (event.propertyName === 'tabItems') {
-    this.tabArea.setTabItems(this.tabBox.tabItems);
-  } else if (event.propertyName === 'selectedTab') {
-    this.tabArea.setSelectedTab(this.tabBox.selectedTab);
   }
 };
 
 scout.TabBoxHeader.prototype._onTabAreaPropertyChange = function(event) {
   if (event.propertyName === 'selectedTab') {
-    this.tabBox.setSelectedTab(this.tabArea.selectedTab);
+    this._setSelectedTab(event.newValue);
   }
 };

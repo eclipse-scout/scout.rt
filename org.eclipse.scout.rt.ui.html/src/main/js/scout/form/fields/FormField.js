@@ -274,12 +274,9 @@ scout.FormField.prototype._renderErrorStatus = function() {
     statusClass = hasStatus ? 'has-' + status.cssClass() : '';
 
   this._updateErrorStatusClasses(statusClass, hasStatus);
-  this._updateStatusVisible();
-  if (hasStatus && this.visible) {
-    this._showStatusMessage();
-  } else {
-    this._hideStatusMessage();
-  }
+
+  this._updateFieldStatus();
+
 };
 
 scout.FormField.prototype._updateErrorStatusClasses = function(statusClass, hasStatus) {
@@ -302,7 +299,7 @@ scout.FormField.prototype._renderTooltipText = function() {
   if (this.$field) {
     this.$field.toggleClass('has-tooltip', hasTooltipText);
   }
-  this._updateStatusVisible();
+  this._updateFieldStatus();
 };
 
 /**
@@ -387,36 +384,68 @@ scout.FormField.prototype.setStatusVisible = function(visible) {
 };
 
 scout.FormField.prototype._renderStatusVisible = function() {
-  var statusVisible = this.statusVisible;
-  this._renderChildVisible(this.$status, this._computeStatusVisible());
-  // Pseudo status is only for layouting purpose, therefore tooltip, errorStatus etc. must not influence its visibility -> not necessary to use _computeStatusVisible
-  this._renderChildVisible(this.$pseudoStatus, statusVisible);
-
-  // Make sure tooltip gets destroyed if there is no status anymore (tooltip points to the status)
-  if (this.$status && !this.$status.isVisible() && this.tooltip) {
-    this.tooltip.destroy();
-  }
+  this._updateFieldStatus();
 };
 
 scout.FormField.prototype.setStatusPosition = function(statusPosition) {
   this.setProperty('statusPosition', statusPosition);
 };
 
-scout.FormField.prototype._renderStatusPosition = function() {
-  if (this.$status) {
-    this.$status.toggleClass('top', this.statusPosition === scout.FormField.StatusPosition.TOP);
-  }
-  this.invalidateLayoutTree();
+scout.FormField.prototype._renderStatusPosition = function(statusPosition) {
+  this._updateFieldStatus();
 };
 
-/**
- * Visibility of the status not only depends on this.statusVisible but on other attributes as well, computed by _computeStatusVisible.
- * Call this method if any of the conditions change to recompute the status visibility.
- */
-scout.FormField.prototype._updateStatusVisible = function() {
-  if (!this.statusVisible) {
-    this._renderStatusVisible();
+scout.FormField.prototype._tooltip = function() {
+  if (this.fieldStatus) {
+    return this.fieldStatus.tooltip;
   }
+  return null;
+};
+
+scout.FormField.prototype._updateFieldStatus = function() {
+  if (!this.fieldStatus) {
+    return;
+  }
+  // compute status
+  var menus,
+    errorStatus = this._errorStatus(),
+    status = null,
+    statusVisible = this._computeStatusVisible(),
+    autoRemove = false,
+    showStatus = false;
+
+  this.fieldStatus.setPosition(this.statusPosition);
+  this.fieldStatus.setVisible(statusVisible);
+  if (!statusVisible) {
+    return;
+  }
+
+  if (errorStatus) {
+    // If the field is used as a cell editor in a editable table, then no validation errors should be shown.
+    // (parsing and validation will be handled by the cell/column itself)
+    if (this.mode === scout.FormField.Mode.CELLEDITOR) {
+      return;
+    }
+    status = errorStatus;
+    autoRemove = !status.isError();
+    menus = this._getMenusForStatus(errorStatus);
+    showStatus = true;
+  } else if (!scout.strings.empty(this.tooltipText)) {
+    status = scout.create('Status', {
+      message: this.tooltipText,
+      severity: scout.Status.Severity.OK
+    });
+    // If there are menus, show them in the tooltip. But only if there is a tooltipText, don't do it if there is an error status.
+    // Menus make most likely no sense if an error status is displayed
+    menus = this._getCurrentMenus();
+
+  } else {
+    // If there are menus, show them in the tooltip. But only if there is a tooltipText, don't do it if there is an error status.
+    // Menus make most likely no sense if an error status is displayed
+    menus = this._getCurrentMenus();
+  }
+
+  this.fieldStatus.update(status, menus, autoRemove, showStatus);
 };
 
 /**
@@ -595,8 +624,8 @@ scout.FormField.prototype._hasMenus = function() {
 };
 
 scout.FormField.prototype._updateMenus = function() {
-  this._updateStatusVisible();
   this.$container.toggleClass('has-menus', this._hasMenus() && this.menusVisible);
+  this._updateFieldStatus();
 };
 
 scout.FormField.prototype._renderMenus = function() {
@@ -614,8 +643,16 @@ scout.FormField.prototype.setMenusVisible = function(menusVisible) {
   this.setProperty('menusVisible', menusVisible);
 };
 
+/**
+ * override by TabItem
+ **/
+scout.FormField.prototype._setMenusVisible = function(menusVisible) {
+  this._setProperty('menusVisible', menusVisible);
+};
+
 scout.FormField.prototype._renderMenusVisible = function() {
   this._updateMenus();
+
 };
 
 scout.FormField.prototype._setKeyStrokes = function(keyStrokes) {
@@ -934,21 +971,24 @@ scout.FormField.prototype._removeField = function() {
  * Appends a SPAN element for form-field status to this.$container and sets the this.$status property.
  */
 scout.FormField.prototype.addStatus = function() {
-  if (this.$status) {
+  if (this.fieldStatus) {
     return;
   }
-  this.$status = this.$container
-    .appendSpan('status')
-    .on('mousedown', this._onStatusMouseDown.bind(this));
+  this.fieldStatus = scout.create('FieldStatus', {
+    parent: this
+  });
+  this.fieldStatus.render();
+  this.$status = this.fieldStatus.$container;
+  this._updateFieldStatus();
 };
 
 scout.FormField.prototype._removeStatus = function() {
-  this._hideStatusMessage();
-  if (!this.$status) {
+  if (!this.fieldStatus) {
     return;
   }
-  this.$status.remove();
+  this.fieldStatus.remove();
   this.$status = null;
+  this.fieldStatus = null;
 };
 
 /**
