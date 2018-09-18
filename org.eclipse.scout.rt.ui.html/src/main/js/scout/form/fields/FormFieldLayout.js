@@ -243,7 +243,7 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container, optio
 
     if (scout.isOneOf(formField.labelPosition, scout.FormField.LabelPosition.DEFAULT, scout.FormField.LabelPosition.LEFT)) {
       widthHint -= prefSizeLabel.width;
-    } else if (formField.labelPosition === scout.FormField.LABEL_POSITION_TOP) {
+    } else if (formField.labelPosition === scout.FormField.LabelPosition.TOP) {
       heightHint -= prefSizeLabel.height;
     }
   }
