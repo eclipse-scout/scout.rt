@@ -618,9 +618,9 @@ scout.Outline.prototype.sendToBack = function() {
   this._renderInBackground();
 
   // Detach child dialogs, message boxes and file choosers, not views.
-  this.formController.removeDialogs();
-  this.messageBoxController.remove();
-  this.fileChooserController.remove();
+  this.formController.detachDialogs();
+  this.messageBoxController.detach();
+  this.fileChooserController.detach();
 };
 
 scout.Outline.prototype.bringToFront = function() {
@@ -628,9 +628,9 @@ scout.Outline.prototype.bringToFront = function() {
   this._renderInBackground();
 
   // Attach child dialogs, message boxes and file choosers.
-  this.formController._renderDialogs();
-  this.messageBoxController.render();
-  this.fileChooserController.render();
+  this.formController.attachDialogs();
+  this.messageBoxController.attach();
+  this.fileChooserController.attach();
 };
 
 scout.Outline.prototype._renderInBackground = function() {

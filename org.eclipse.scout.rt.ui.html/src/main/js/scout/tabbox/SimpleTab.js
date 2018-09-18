@@ -36,6 +36,7 @@ scout.SimpleTab = function() {
   this._statusIconDivs = [];
 
   this._viewPropertyChangeListener = this._onViewPropertyChange.bind(this);
+  this._viewRemoveListener = this._onViewRemove.bind(this);
 };
 scout.inherits(scout.SimpleTab, scout.Widget);
 
@@ -371,29 +372,51 @@ scout.SimpleTab.prototype.getMenuText = function() {
 
 scout.SimpleTab.prototype._installViewListeners = function() {
   this.view.on('propertyChange', this._viewPropertyChangeListener);
+  this.view.on('remove', this._viewRemoveListener);
 };
 
 scout.SimpleTab.prototype._uninstallViewListeners = function() {
   this.view.off('propertyChange', this._viewPropertyChangeListener);
+  this.view.off('remove', this._viewRemoveListener);
 };
 
 scout.SimpleTab.prototype._onViewPropertyChange = function(event) {
   if (event.propertyName === 'title') {
     this.setTitle(this.view.title);
-  } else if (event.propertyName === 'subTitle') {
+  }
+  else if (event.propertyName === 'subTitle') {
     this.setSubTitle(this.view.subTitle);
-  } else if (event.propertyName === 'iconId') {
+  }
+  else if (event.propertyName === 'iconId') {
     this.setIconId(this.view.iconId);
-  } else if (event.propertyName === 'cssClass') {
+  }
+  else if (event.propertyName === 'cssClass') {
     this.setCssClass(event.newValue);
-  } else if (event.propertyName === 'saveNeeded') {
+  }
+  else if (event.propertyName === 'saveNeeded') {
     this.setSaveNeeded(event.newValue);
-  } else if (event.propertyName === 'saveNeededVisible') {
+  }
+  else if (event.propertyName === 'saveNeededVisible') {
     this.setSaveNeededVisible(event.newValue);
-  } else if (event.propertyName === 'closable') {
+  }
+  else if (event.propertyName === 'closable') {
     this.setClosable(event.newValue);
-  } else if (event.propertyName === 'status') {
+  }
+  else if (event.propertyName === 'status') {
     this.setStatus(event.newValue);
   }
 };
 
+/**
+ * We cannot not bind the 'remove' event of the view to the remove function
+ * of the this tab, because in bench-mode the tab is never rendered
+ * and thus the _remove function is never called.
+ */
+scout.SimpleTab.prototype._onViewRemove = function() {
+  this._uninstallViewListeners();
+  if (this.rendered) {
+    this.remove();
+  } else {
+    this.trigger('remove');
+  }
+};

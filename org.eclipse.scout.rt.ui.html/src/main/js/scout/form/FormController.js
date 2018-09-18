@@ -64,9 +64,8 @@ scout.FormController.prototype._removePopupWindow = function(form) {
  */
 scout.FormController.prototype.render = function() {
   this._renderViews();
-  if (this.displayParent.inFront()) {
-    this._renderDialogs();
-  }
+
+  this._renderDialogs();
 };
 
 scout.FormController.prototype._renderViews = function() {
@@ -201,6 +200,11 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
     dialog.render(desktop.$container);
     this._layoutDialog(dialog);
     desktop._setFormActivated(dialog);
+
+    // Only display the dialog if its 'displayParent' is visible to the user.
+    if (!this.displayParent.inFront()) {
+      dialog.detach();
+    }
   }
 };
 
@@ -306,9 +310,24 @@ scout.FormController.prototype._activateDialog = function(dialog) {
 };
 
 /**
- * Remvoes all dialogs.
+ * Attaches all dialogs to their original DOM parents.
+ * In contrast to 'render', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ *
+ * This method has no effect if already attached.
  */
-scout.FormController.prototype.removeDialogs = function() {
+scout.FormController.prototype.attachDialogs = function() {
+  this.displayParent.dialogs.forEach(function(dialog) {
+    dialog.render();
+  }, this);
+};
+
+/**
+ * Detaches all dialogs from their DOM parents. Thereby, modality glassPanes are not detached.
+ * In contrast to 'remove', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ *
+ * This method has no effect if already detached.
+ */
+scout.FormController.prototype.detachDialogs = function() {
   this.displayParent.dialogs.forEach(function(dialog) {
     dialog.remove();
   }, this);

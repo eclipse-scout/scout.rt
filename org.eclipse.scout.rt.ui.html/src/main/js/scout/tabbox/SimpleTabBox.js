@@ -104,7 +104,7 @@ scout.SimpleTabBox.prototype.activateView = function(view) {
   }
 
   if (this.currentView) {
-    this.currentView.remove();
+    this.currentView.detach();
     this.trigger('viewDeactivate', {
       view: this.currentView
     });
@@ -113,6 +113,9 @@ scout.SimpleTabBox.prototype.activateView = function(view) {
   // ensure rendered
   if (this.rendered) {
     this._renderView(view);
+  }
+  if (!view.attached) {
+    view.attach();
   }
   this.currentView = view;
 

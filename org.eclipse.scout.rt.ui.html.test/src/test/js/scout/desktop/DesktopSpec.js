@@ -221,24 +221,42 @@ describe('Desktop', function() {
       expect(detailForm.$container.parent()[0]).toBe(desktop.bench.getTabBox('C').$viewContent[0]);
     });
 
-    it('does not remove dialogs with display parent outline', function(done) {
+    it('does not remove dialogs, message boxes and file choosers with display parent outline', function(done) {
       session._renderDesktop();
       var outline = outlineHelper.createOutline();
       desktop.setOutline(outline);
-
+      var msgBox = scout.create('MessageBox', {
+        parent: outline,
+        displayParent: outline
+      });
+      msgBox.open();
+      var fileChooser = scout.create('FileChooser', {
+        parent: outline,
+        displayParent: outline
+      });
+      fileChooser.open();
       var dialog = formHelper.createFormWithOneField({
         parent: outline,
         displayParent: outline
       });
       var promises = [];
       promises.push(dialog.open());
-
+      var view = formHelper.createFormWithOneField({
+        parent: outline,
+        displayHint: scout.Form.DisplayHint.VIEW,
+        displayParent: outline,
+        modal: true
+      });
+      promises.push(view.open());
       $.promiseAll(promises).then(function() {
           expect(desktop.navigationVisible).toBe(true);
           expect(desktop.navigation.rendered).toBe(true);
-          expect(desktop.navigation.$body.children('.glasspane').length).toBe(1); // Every glass pane renderer added one
-          expect(session.focusManager._glassPaneTargets.length).toBe(2); // Every glass pane renderer added one for navigation and bench
+          expect(desktop.navigation.$body.children('.glasspane').length).toBe(4); // Every glass pane renderer added one
+          expect(session.focusManager._glassPaneTargets.length).toBe(8); // Every glass pane renderer added one for navigation and bench
           expect(dialog.rendered).toBe(true);
+          expect(view.rendered).toBe(true);
+          expect(msgBox.rendered).toBe(true);
+          expect(fileChooser.rendered).toBe(true);
 
           // Outline is not visible anymore, but form, msg box and file chooser still are
           desktop.setNavigationVisible(false);
@@ -248,16 +266,22 @@ describe('Desktop', function() {
           expect(desktop.navigation).toBeFalsy();
           expect(outline.rendered).toBe(false);
           expect(dialog.rendered).toBe(true);
+          expect(view.rendered).toBe(true);
+          expect(msgBox.rendered).toBe(true);
+          expect(fileChooser.rendered).toBe(true);
 
           // Make it visible again and expect that glass pane is correctly reverted
           desktop.setNavigationVisible(true);
           desktop.onLayoutAnimationComplete();
           expect(desktop.navigationVisible).toBe(true);
           expect(desktop.navigation.rendered).toBe(true);
-          expect(desktop.navigation.$body.children('.glasspane').length).toBe(1);
-          expect(session.focusManager._glassPaneTargets.length).toBe(2);
+          expect(desktop.navigation.$body.children('.glasspane').length).toBe(4);
+          expect(session.focusManager._glassPaneTargets.length).toBe(8);
 
           dialog.close();
+          view.close();
+          msgBox.close();
+          fileChooser.close();
           expect(desktop.navigation.$body.children('.glasspane').length).toBe(0);
           expect(session.focusManager._glassPaneTargets.length).toBe(0);
         })
@@ -265,93 +289,16 @@ describe('Desktop', function() {
         .always(done);
     });
 
-    it('does not remove message boxes with display parent outline', function() {
-      session._renderDesktop();
-      var outline = outlineHelper.createOutline();
-      desktop.setOutline(outline);
-
-      var msgBox = scout.create('MessageBox', {
-        parent: outline,
-        displayParent: outline
-      });
-      msgBox.open();
-      expect(desktop.navigationVisible).toBe(true);
-      expect(desktop.navigation.rendered).toBe(true);
-      expect(desktop.navigation.$body.children('.glasspane').length).toBe(1); // Every glass pane renderer added one
-      expect(session.focusManager._glassPaneTargets.length).toBe(2); // Every glass pane renderer added one for navigation and bench
-      expect(msgBox.rendered).toBe(true);
-
-      // Outline is not visible anymore, but form, msg box and file chooser still are
-      desktop.setNavigationVisible(false);
-      // Force removal of navigation
-      desktop.onLayoutAnimationComplete();
-      expect(desktop.navigationVisible).toBe(false);
-      expect(desktop.navigation).toBeFalsy();
-      expect(outline.rendered).toBe(false);
-      expect(msgBox.rendered).toBe(true);
-
-      // Make it visible again and expect that glass pane is correctly reverted
-      desktop.setNavigationVisible(true);
-      desktop.onLayoutAnimationComplete();
-      expect(desktop.navigationVisible).toBe(true);
-      expect(desktop.navigation.rendered).toBe(true);
-      expect(desktop.navigation.$body.children('.glasspane').length).toBe(1);
-      expect(session.focusManager._glassPaneTargets.length).toBe(2);
-
-      msgBox.close();
-      expect(desktop.navigation.$body.children('.glasspane').length).toBe(0);
-      expect(session.focusManager._glassPaneTargets.length).toBe(0);
-    });
-
-    it('does not remove file choosers with display parent outline', function() {
-      session._renderDesktop();
-      var outline = outlineHelper.createOutline();
-      desktop.setOutline(outline);
-      var fileChooser = scout.create('FileChooser', {
-        parent: outline,
-        displayParent: outline
-      });
-      fileChooser.open();
-      expect(desktop.navigationVisible).toBe(true);
-      expect(desktop.navigation.rendered).toBe(true);
-      expect(desktop.navigation.$body.children('.glasspane').length).toBe(1); // Every glass pane renderer added one
-      expect(session.focusManager._glassPaneTargets.length).toBe(2); // Every glass pane renderer added one for navigation and bench
-      expect(fileChooser.rendered).toBe(true);
-
-      // Outline is not visible anymore, but form, msg box and file chooser still are
-      desktop.setNavigationVisible(false);
-      // Force removal of navigation
-      desktop.onLayoutAnimationComplete();
-      expect(desktop.navigationVisible).toBe(false);
-      expect(desktop.navigation).toBeFalsy();
-      expect(outline.rendered).toBe(false);
-      expect(fileChooser.rendered).toBe(true);
-
-      // Make it visible again and expect that glass pane is correctly reverted
-      desktop.setNavigationVisible(true);
-      desktop.onLayoutAnimationComplete();
-      expect(desktop.navigationVisible).toBe(true);
-      expect(desktop.navigation.rendered).toBe(true);
-      expect(desktop.navigation.$body.children('.glasspane').length).toBe(1);
-      expect(session.focusManager._glassPaneTargets.length).toBe(2);
-
-      fileChooser.close();
-      expect(desktop.navigation.$body.children('.glasspane').length).toBe(0);
-      expect(session.focusManager._glassPaneTargets.length).toBe(0);
-    });
-
-    it('does not remove dialogs with display parent outline even when rendered along with the outline', function() {
+    it('does not remove dialogs, message boxes and file choosers with display parent outline even when rendered along with the outline', function() {
       // Simulate startup / reload case
       session = sandboxSession({
         desktop: {
           navigationVisible: true,
           headerVisible: true,
           benchVisible: true,
+          activeForm: 'myView', // Actually a workaround because a modal view should always be active
           outline: {
             objectType: 'Outline',
-            modelClass: 'a.cbdke',
-            title: 'Title',
-            id: '123',
             dialogs: [{
               objectType: 'Form',
               displayHint: scout.Form.DisplayHint.DIALOG,
@@ -359,78 +306,19 @@ describe('Desktop', function() {
               rootGroupBox: {
                 objectType: 'GroupBox'
               }
-            }]
-          }
-        }
-      });
-      desktop = session.desktop;
-      var outline = desktop.outline;
-      var dialog = outline.dialogs[0];
-      expect(desktop.navigationVisible).toBe(true);
-      expect(desktop.navigation.rendered).toBe(true);
-      expect(dialog.rendered).toBe(true);
-
-      // Outline is not visible anymore, but form, msg box and file chooser still are
-      desktop.setNavigationVisible(false);
-      // Force removal of navigation
-      desktop.onLayoutAnimationComplete();
-      expect(desktop.navigationVisible).toBe(false);
-      expect(desktop.navigation).toBeFalsy();
-      expect(outline.rendered).toBe(false);
-      expect(dialog.rendered).toBe(true);
-
-      dialog.close();
-    });
-
-    it('does not remove message boxes with display parent outline even when rendered along with the outline', function() {
-      // Simulate startup / reload case
-      session = sandboxSession({
-        desktop: {
-          navigationVisible: true,
-          headerVisible: true,
-          benchVisible: true,
-          outline: {
-            objectType: 'Outline',
-            modelClass: 'a.cbdke',
-            title: 'Title',
-            id: '123',
+            }],
+            views: [{
+              id: 'myView',
+              objectType: 'Form',
+              displayHint: scout.Form.DisplayHint.VIEW,
+              modal: true,
+              rootGroupBox: {
+                objectType: 'GroupBox'
+              }
+            }],
             messageBoxes: [{
               objectType: 'MessageBox'
-            }]
-          }
-        }
-      });
-      desktop = session.desktop;
-      var outline = desktop.outline;
-      var msgBox = outline.messageBoxes[0];
-      expect(desktop.navigationVisible).toBe(true);
-      expect(desktop.navigation.rendered).toBe(true);
-      expect(msgBox.rendered).toBe(true);
-
-      // Outline is not visible anymore, but form, msg box and file chooser still are
-      desktop.setNavigationVisible(false);
-      // Force removal of navigation
-      desktop.onLayoutAnimationComplete();
-      expect(desktop.navigationVisible).toBe(false);
-      expect(desktop.navigation).toBeFalsy();
-      expect(outline.rendered).toBe(false);
-      expect(msgBox.rendered).toBe(true);
-
-      msgBox.close();
-    });
-
-    it('does not remove file choosers with display parent outline even when rendered along with the outline', function() {
-      // Simulate startup / reload case
-      session = sandboxSession({
-        desktop: {
-          navigationVisible: true,
-          headerVisible: true,
-          benchVisible: true,
-          outline: {
-            objectType: 'Outline',
-            modelClass: 'a.cbdke',
-            title: 'Title',
-            id: '123',
+            }],
             fileChoosers: [{
               objectType: 'FileChooser'
             }]
@@ -439,9 +327,15 @@ describe('Desktop', function() {
       });
       desktop = session.desktop;
       var outline = desktop.outline;
+      var dialog = outline.dialogs[0];
+      var view = outline.views[0];
+      var msgBox = outline.messageBoxes[0];
       var fileChooser = outline.fileChoosers[0];
       expect(desktop.navigationVisible).toBe(true);
       expect(desktop.navigation.rendered).toBe(true);
+      expect(dialog.rendered).toBe(true);
+      expect(view.rendered).toBe(true);
+      expect(msgBox.rendered).toBe(true);
       expect(fileChooser.rendered).toBe(true);
 
       // Outline is not visible anymore, but form, msg box and file chooser still are
@@ -451,8 +345,14 @@ describe('Desktop', function() {
       expect(desktop.navigationVisible).toBe(false);
       expect(desktop.navigation).toBeFalsy();
       expect(outline.rendered).toBe(false);
+      expect(dialog.rendered).toBe(true);
+      expect(view.rendered).toBe(true);
+      expect(msgBox.rendered).toBe(true);
       expect(fileChooser.rendered).toBe(true);
 
+      dialog.close();
+      view.close();
+      msgBox.close();
       fileChooser.close();
     });
 
@@ -653,7 +553,7 @@ describe('Desktop', function() {
       dialog2.setCssClass('DIALOG2');
       dialog2.modal = false;
       dialog2.parent = dialog1;
-      dialog2.displayParent = dialog1;
+      dialog2.displayParent= dialog1;
       desktop.showForm(dialog2);
 
       // expect dialogs to be in the same order as opened
@@ -681,14 +581,14 @@ describe('Desktop', function() {
       dialog1.setCssClass('DIALOG1');
       dialog1.modal = false;
       dialog1.parent = outline1;
-      dialog1.displayParent = outline1;
+      dialog1.displayParent= outline1;
       desktop.showForm(dialog1);
 
       var dialog2 = formHelper.createFormWithOneField();
       dialog2.setCssClass('DIALOG2');
       dialog2.modal = false;
       dialog2.parent = dialog1;
-      dialog2.displayParent = dialog1;
+      dialog2.displayParent= dialog1;
       desktop.showForm(dialog2);
 
       // expect dialogs to be in the same order as opened
@@ -1293,7 +1193,7 @@ describe('Desktop', function() {
 
         // open second form, bench is still shown
         desktop.showForm(form2);
-        expect(form1.rendered).toBe(false);
+        expect(form1.rendered).toBe(true);
         expect(form2.rendered).toBe(true);
         expect(desktop.navigationVisible).toBe(false);
         expect(desktop.benchVisible).toBe(true);
@@ -1335,13 +1235,15 @@ describe('Desktop', function() {
         expect(dialog.displayParent).toBe(desktop.outline);
         expect(view.rendered).toBe(false);
         expect(dialog.rendered).toBe(true);
+        expect(dialog.attached).toBe(true);
         expect(desktop.navigationVisible).toBe(true);
         expect(desktop.benchVisible).toBe(false);
 
         // Show view -> switch to bench
         view.show();
         expect(view.rendered).toBe(true);
-        expect(dialog.rendered).toBe(false);
+        expect(dialog.rendered).toBe(true);
+        expect(dialog.attached).toBe(false);
         expect(desktop.navigationVisible).toBe(false);
         expect(desktop.benchVisible).toBe(true);
 
@@ -1352,6 +1254,7 @@ describe('Desktop', function() {
         view.close();
         expect(view.rendered).toBe(false);
         expect(dialog.rendered).toBe(true);
+        expect(dialog.attached).toBe(true);
         expect(desktop.navigationVisible).toBe(true);
         expect(desktop.benchVisible).toBe(false);
       });

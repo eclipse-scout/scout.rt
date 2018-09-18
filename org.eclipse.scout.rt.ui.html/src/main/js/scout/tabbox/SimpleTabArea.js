@@ -11,10 +11,15 @@
 scout.SimpleTabArea = function() {
   scout.SimpleTabArea.parent.call(this);
   this.tabs = [];
-  this._selectedViewTab = null;
-  this._tabClickHandler = this._onTabClick.bind(this);
 };
 scout.inherits(scout.SimpleTabArea, scout.Widget);
+
+scout.SimpleTabArea.prototype._init = function(model) {
+  scout.SimpleTabArea.parent.prototype._init.call(this, model);
+  this._selectedViewTab;
+
+  this._tabClickHandler = this._onTabClick.bind(this);
+};
 
 scout.SimpleTabArea.prototype._render = function() {
   this.$container = this.$parent.appendDiv('simple-tab-area');
@@ -38,19 +43,15 @@ scout.SimpleTabArea.prototype._renderTabs = function() {
 
 scout.SimpleTabArea.prototype._renderTab = function(tab) {
   tab.renderAfter(this.$container);
-  this._updateVisibility();
-};
-
-scout.SimpleTabArea.prototype._updateVisibility = function() {
-  if (!this.$container) {
-    return;
-  }
-  this.$container.setVisible(this.isVisible() && this.tabs.length > 0);
-  this.invalidateParentLogicalGrid();
 };
 
 scout.SimpleTabArea.prototype._renderVisible = function() {
-  this._updateVisibility();
+  if (this.visible && this.tabs.length > 0) {
+    this.attach();
+  } else {
+    this.detach();
+  }
+  this.invalidateLayoutTree();
 };
 
 scout.SimpleTabArea.prototype._attach = function() {
