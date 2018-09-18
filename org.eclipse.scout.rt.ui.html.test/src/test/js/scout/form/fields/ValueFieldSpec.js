@@ -749,8 +749,8 @@ describe('ValueField', function() {
       formField.$status.triggerContextMenu();
 
       // open again and change current menu types
-      formField.displayText = 'abc';
-      formField.currentMenuTypes = ['NotNull'];
+      formField.setValue('abc');
+      formField.setCurrentMenuTypes(['NotNull']);
       formField.$status.triggerContextMenu();
 
       $menu = $('body').find('.popup-body');

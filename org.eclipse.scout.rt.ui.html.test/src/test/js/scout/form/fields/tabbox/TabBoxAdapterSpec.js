@@ -33,8 +33,8 @@ describe('TabBoxAdapter', function() {
         linkWidgetAndAdapter(tabBox, 'TabBoxAdapter');
         linkWidgetAndAdapter(tabBox.tabItems[0], 'TabItemAdapter');
         linkWidgetAndAdapter(tabBox.tabItems[1], 'TabItemAdapter');
-        tabBox.setSelectedTab(tabBox.tabItems[0]);
-        expect(tabBox.selectedTab).toBe(tabBox.tabItems[0]);
+        tabBox.setSelectedTab(tabBox.tabItems[1]);
+        expect(tabBox.selectedTab).toBe(tabBox.tabItems[1]);
         sendQueuedAjaxCalls();
         expect(jasmine.Ajax.requests.count()).toBe(1);
 

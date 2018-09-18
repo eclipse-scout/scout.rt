@@ -270,12 +270,12 @@ describe('SmartField', function() {
       jasmine.clock().tick(500);
       field.$field.triggerClick();
       jasmine.clock().tick(500);
-      expect(field.tooltip.rendered).toBe(false);
-      expect(field.popup._field.tooltip.rendered).toBe(true);
+      expect(field._tooltip().rendered).toBe(false);
+      expect(field.popup._field._tooltip().rendered).toBe(true);
 
       field.popup.close();
       expect(field.popup).toBe(null);
-      expect(field.tooltip.rendered).toBe(true);
+      expect(field._tooltip().rendered).toBe(true);
     });
 
     it('does not draw glass pane over tooltip', function() {
@@ -290,8 +290,8 @@ describe('SmartField', function() {
       jasmine.clock().tick(500);
       field.$field.triggerClick();
       jasmine.clock().tick(500);
-      expect(field.popup._field.tooltip.rendered).toBe(true);
-      expect(field.popup._field.tooltip.$container.find('.glasspane').length).toBe(0);
+      expect(field.popup._field._tooltip().rendered).toBe(true);
+      expect(field.popup._field._tooltip().$container.find('.glasspane').length).toBe(0);
     });
 
   });

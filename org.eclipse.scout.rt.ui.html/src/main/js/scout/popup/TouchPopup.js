@@ -30,9 +30,9 @@ scout.inherits(scout.TouchPopup, scout.Popup);
 scout.TouchPopup.prototype._init = function(options) {
   scout.TouchPopup.parent.prototype._init.call(this, options);
   this._touchField = options.field;
-  if (this._touchField.tooltip && this._touchField.tooltip.rendered) {
+  if (this._touchField._tooltip() && this._touchField._tooltip().rendered) {
     // Hide existing tooltip to not show it twice (it will be shown on the popup too). It may even throw an exception if the tooltip contains a (not cloned) menu
-    this._touchFieldTooltip = this._touchField.tooltip;
+    this._touchFieldTooltip = this._touchField._tooltip();
     this._touchFieldTooltip.remove();
   }
 

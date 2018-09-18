@@ -79,6 +79,11 @@ scout.FormField.FieldStyle = {
 /** Global variable to make it easier to adjust the default field style for all fields */
 scout.FormField.DEFAULT_FIELD_STYLE = scout.FormField.FieldStyle.ALTERNATIVE;
 
+scout.FormField.StatusPosition = {
+  DEFAULT: 'default',
+  TOP: 'top'
+};
+
 scout.FormField.LabelPosition = {
   DEFAULT: 0,
   LEFT: 1,
@@ -90,11 +95,6 @@ scout.FormField.LabelPosition = {
 scout.FormField.LabelWidth = {
   DEFAULT: 0,
   UI: -1
-};
-
-scout.FormField.StatusPosition = {
-  DEFAULT: 'default',
-  TOP: 'top'
 };
 
 // see org.eclipse.scout.rt.client.ui.form.fields.IFormField.FULL_WIDTH
@@ -458,7 +458,7 @@ scout.FormField.prototype._computeStatusVisible = function() {
     hasStatus = !!status,
     hasTooltip = !!this.tooltipText;
 
-  return !this.suppressStatus && (statusVisible || hasStatus || hasTooltip || (this._hasMenus() && this.menusVisible));
+  return !this.suppressStatus && this.visible && (statusVisible || hasStatus || hasTooltip || (this._hasMenus() && this.menusVisible));
 };
 
 scout.FormField.prototype._renderChildVisible = function($child, visible) {
@@ -633,7 +633,7 @@ scout.FormField.prototype._renderMenus = function() {
 };
 
 scout.FormField.prototype._renderStatusMenuMappings = function() {
-  if (this.tooltip) {
+  if (this._tooltip()) {
     // If tooltip is visible call showStatusMessage to update the menus
     this._showStatusMessage();
   }
@@ -658,37 +658,6 @@ scout.FormField.prototype._renderMenusVisible = function() {
 scout.FormField.prototype._setKeyStrokes = function(keyStrokes) {
   this.updateKeyStrokes(keyStrokes, this.keyStrokes);
   this._setProperty('keyStrokes', keyStrokes);
-};
-
-scout.FormField.prototype._onStatusMouseDown = function(event) {
-  var hasStatus = !!this._errorStatus(),
-    hasTooltip = !!this.tooltipText,
-    hasMenus = this.menusVisible && this._hasMenus();
-
-  // Either show the tooltip or a context menu
-  // If the field has both, a tooltip and menus, the tooltip will be shown and the menus rendered into the tooltip
-  if (hasStatus || hasTooltip) {
-    // Toggle tooltip
-    if (this.tooltip) {
-      this._hideStatusMessage();
-    } else {
-      this._showStatusMessage();
-    }
-  } else if (hasMenus) {
-    var func = function func(event) {
-      if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
-        return;
-      }
-      // Toggle menu
-      if (this.contextPopup && this.contextPopup.rendered) {
-        this._hideContextMenu();
-      } else {
-        this._showContextMenu();
-      }
-    }.bind(this);
-
-    this.session.onRequestsDone(func, event);
-  }
 };
 
 scout.FormField.prototype._showStatusMessage = function() {

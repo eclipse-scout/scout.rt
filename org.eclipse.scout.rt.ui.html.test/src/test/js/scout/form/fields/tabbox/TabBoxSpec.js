@@ -112,8 +112,8 @@ describe('TabBox', function() {
     it('is added to the first tab item', function() {
       tabBox.render();
       tabBox.validateLayout();
-      expect(tabBox.tabItems[0].$tabContainer).toHaveClass('first');
-      expect(tabBox.tabItems[1].$tabContainer).not.toHaveClass('first');
+      expect(tabBox.header.tabArea.tabs[0].$container).toHaveClass('first');
+      expect(tabBox.header.tabArea.tabs[1].$container).not.toHaveClass('first');
     });
 
     it('is added to the first visible tab item', function() {
@@ -133,9 +133,9 @@ describe('TabBox', function() {
       });
       tabBox.render();
       tabBox.validateLayout();
-      expect(tabBox.tabItems[0].$tabContainer.isVisible()).toBe(false);
-      expect(tabBox.tabItems[1].$tabContainer).toHaveClass('first');
-      expect(tabBox.tabItems[2].$tabContainer).not.toHaveClass('first');
+      expect(tabBox.header.tabArea.tabs[0].$container.isVisible()).toBe(false);
+      expect(tabBox.header.tabArea.tabs[1].$container).toHaveClass('first');
+      expect(tabBox.header.tabArea.tabs[2].$container).not.toHaveClass('first');
     });
 
     it('is correctly updated when visibility changes', function() {
@@ -143,8 +143,8 @@ describe('TabBox', function() {
       tabBox.validateLayout();
       tabBox.tabItems[0].setVisible(false);
       tabBox.validateLayout();
-      expect(tabBox.tabItems[0].$tabContainer.isVisible()).toBe(false);
-      expect(tabBox.tabItems[1].$tabContainer).toHaveClass('first');
+      expect(tabBox.header.tabArea.tabs[0].$container.isVisible()).toBe(false);
+      expect(tabBox.header.tabArea.tabs[1].$container).toHaveClass('first');
     });
 
   });

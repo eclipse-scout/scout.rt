@@ -557,6 +557,18 @@ scout.ValueField.prototype.addField = function($field) {
   this.$field.data('valuefield', this);
 };
 
+scout.ValueField.prototype.setCurrentMenuTypes = function(currentMenuTypes) {
+  this.setProperty('currentMenuTypes', currentMenuTypes);
+};
+
+scout.ValueField.prototype._renderCurrentMenuTypes = function() {
+  // If a tooltip is shown, update it with the new menus
+//  if (this._tooltip()) {
+//    this._showStatusMessage();
+//  }
+  this._updateFieldStatus();
+};
+
 scout.ValueField.prototype._getCurrentMenus = function() {
   if (this.currentMenuTypes) {
     var menuTypes = this.currentMenuTypes.map(function(elem) {
@@ -565,13 +577,6 @@ scout.ValueField.prototype._getCurrentMenus = function() {
     return scout.menus.filter(this.menus, menuTypes);
   }
   return scout.ValueField.parent.prototype._getCurrentMenus.call(this);
-};
-
-scout.ValueField.prototype._renderCurrentMenuTypes = function() {
-  // If a tooltip is shown, update it with the new menus
-  if (this.tooltip) {
-    this._showStatusMessage();
-  }
 };
 
 // ==== static helper methods ==== //

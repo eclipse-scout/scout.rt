@@ -10,18 +10,14 @@
  ******************************************************************************/
 scout.FieldStatus = function() {
   scout.FieldStatus.parent.call(this);
-  this.tooltip;
-  this.contextMenu;
+  this.tooltip = null;
+  this.contextMenu = null;
   this.status;
   this.updating = false;
   this.autoRemove = true;
+  this.position = scout.FormField.StatusPosition.DEFAULT;
 };
 scout.inherits(scout.FieldStatus, scout.Widget);
-
-scout.FieldStatus.StatusPosition = {
-  DEFAULT: 'default',
-  TOP: 'top'
-};
 
 scout.FieldStatus.prototype._render = function() {
   this.$container = this.$parent.appendSpan('status')
@@ -89,8 +85,11 @@ scout.FieldStatus.prototype.setPosition = function(position) {
 };
 
 scout.FieldStatus.prototype._renderPosition = function() {
-  this.$container.toggleClass('top', this.position === scout.FieldStatus.StatusPosition.TOP);
-  this.invalidateLayoutTree();
+  this.$container.toggleClass('top', this.position === scout.FormField.StatusPosition.TOP);
+  // avoid invalidating during rendering
+  if (this.rendered) {
+    this.invalidateLayoutTree();
+  }
 };
 
 scout.FieldStatus.prototype._renderVisible = function() {

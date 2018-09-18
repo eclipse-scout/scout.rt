@@ -14,8 +14,6 @@ scout.TabItem = function() {
   this.tabOverflown = false;
   this.selectionKeystroke;
   this.$tabContainer;
-  this._tabRendered = false;
-  this._tabActive = false;
 };
 scout.inherits(scout.TabItem, scout.GroupBox);
 
@@ -35,9 +33,16 @@ scout.TabItem.prototype._createLayout = function() {
  */
 scout.TabItem.prototype._computeTitleVisible = function(labelVisible) {
   return false;
-}
+};
 
-;
+/**
+ * @override GroupBox.js
+ *
+ * handled by Tab.js
+ */
+scout.TabItem.prototype.addStatus = function() {
+  // void
+};
 /**
  * @override GroupBox.js
  *

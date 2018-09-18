@@ -187,13 +187,12 @@ scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container)
     htmlComp = this._proposalChooser.htmlComp,
     $status = this._proposalChooser.$status,
     filter = this._proposalChooser.activeFilterGroup,
-    detachHelper = this._proposalChooser.session.detachHelper,
     $parent = $container.parent();
 
   this._typeHandler.prepare($container, this);
   modelSize = this._proposalChooser.model.htmlComp.prefSize();
   prefSize = modelSize;
-  detachHelper._storeScrollPositions($container);
+  scout.scrollbars.storeScrollPositions($container, this._proposalChooser.session);
 
   // pref size of table and tree don't return accurate values for width -> measure width
   pcWidth = $container.css('width');
@@ -217,7 +216,7 @@ scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container)
     .css('width', pcWidth)
     .css('height', pcHeight);
   $parent.append($container);
-  detachHelper._restoreScrollPositions($container);
+  scout.scrollbars.restoreScrollPositions($container, this._proposalChooser.session);
 
   if ($status && $status.isVisible()) {
     oldDisplay = $status.css('display');

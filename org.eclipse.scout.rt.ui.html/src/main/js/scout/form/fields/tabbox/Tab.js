@@ -25,13 +25,15 @@ scout.inherits(scout.Tab, scout.Widget);
 
 scout.Tab.prototype._init = function(options) {
   scout.Tab.parent.prototype._init.call(this, options);
+  this.visible = this.tabItem.visible;
   this.label = this.tabItem.label;
   this.subLabel = this.tabItem.subLabel;
   this.cssClass = this.tabItem.cssClass;
   this.marked = this.tabItem.marked;
 
   this.fieldStatus = scout.create('FieldStatus', {
-    parent: this
+    parent: this,
+    visible: false
   });
   this.fieldStatus.on('statusMouseDown', this._statusMouseDownHandler);
 
@@ -66,6 +68,7 @@ scout.Tab.prototype._render = function() {
 
 scout.Tab.prototype._renderProperties = function() {
   scout.Tab.parent.prototype._renderProperties.call(this);
+  this._renderVisible();
   this._renderLabel();
   this._renderSubLabel();
   this._renderTabbable();
@@ -124,7 +127,7 @@ scout.Tab.prototype._updateErrorStatusClasses = function(statusClass, hasStatus)
 };
 
 scout.Tab.prototype._updateStatus = function() {
-  var visible = this.visible && !this.tabOverflown && (this.errorStatus || scout.strings.hasText(this.tooltipText)),
+  var visible = this._computeVisible(),
     status = null,
     autoRemove = true,
     initialShow = false;
@@ -144,6 +147,10 @@ scout.Tab.prototype._updateStatus = function() {
   }
   this.fieldStatus.update(status, null, autoRemove, initialShow);
 };
+
+scout.Tab.prototype._computeVisible = function() {
+  return this.visible && !this.tabOverflown && (this.errorStatus || scout.strings.hasText(this.tooltipText));
+}
 
 scout.Tab.prototype.setTabbable = function(tabbable) {
   this.setProperty('tabbable', tabbable);
