@@ -15,10 +15,17 @@ scout.objects = {
   /**
    * Uses Object.create(null) to create an object without a prototype. This is different to use the literal {} which links the object to Object.prototype.
    * <p>
-   * Not using the literal has the advantage that the object does not contain any inherited properties like `toString` so it is not necessary to use `o.hasOwnProperty(p)` instead of `p in o` to check for the existence.
+   * Not using the literal has the advantage that the object does not contain any inherited properties like `toString` so it is not necessary to use `o.hasOwnProperty(p)`
+   * instead of `p in o` to check for the existence.
+   *
+   * @param [object] properties optional initial properties to be set on the new created object
    */
-  createMap: function() {
-    return Object.create(null);
+  createMap: function(properties) {
+    var map = Object.create(null);
+    if (properties) {
+      $.extend(map, properties);
+    }
+    return map;
   },
 
   /**
@@ -57,9 +64,16 @@ scout.objects = {
   },
 
   /**
-   * Counts and returns the properties of a given object.
+   * Counts and returns the properties of a given object or map (see #createMap).
    */
   countOwnProperties: function(obj) {
+    // map objects don't have a prototype
+    if (!Object.getPrototypeOf(obj)) {
+      return Object.keys(obj).length;
+    }
+
+    // regular objects may inherit a property through their prototype
+    // we're only interested in own properties
     var count = 0;
     for (var prop in obj) {
       if (obj.hasOwnProperty(prop)) {

@@ -129,6 +129,13 @@ describe("scout.objects", function() {
       expect(scout.objects.countOwnProperties(y)).toBe(4); // foo, bar, anotherProp, qux (because copyProperties also copies properties from prototype)
     });
 
+    it("works for objects created with createMap() function", function() {
+      var map = scout.objects.createMap();
+      expect(scout.objects.countOwnProperties(map)).toBe(0);
+      map = scout.objects.createMap({foo: 1});
+      expect(scout.objects.countOwnProperties(map)).toBe(1);
+    });
+
   });
 
   describe("valueCopy", function() {
@@ -255,6 +262,17 @@ describe("scout.objects", function() {
       expect(scout.objects.values(map2).length).toBe(2);
       expect(scout.objects.values(map2)).toContain('y');
       expect(scout.objects.values(map2)).toContain(7);
+    });
+
+    it('createMap with optional properties', function() {
+      var the = scout.objects.createMap({world: 1});
+      expect(scout.objects.countOwnProperties(the)).toBe(1);
+      expect(the.world).toBe(1);
+    });
+
+    it('createMap should not have a prototype', function() {
+      var map = scout.objects.createMap();
+      expect(Object.getPrototypeOf(map)).toBe(null);
     });
   });
 
