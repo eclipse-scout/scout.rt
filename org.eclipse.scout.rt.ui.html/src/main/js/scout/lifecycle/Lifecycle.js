@@ -225,11 +225,23 @@ scout.Lifecycle.prototype._whenInvalid = function(func) {
       return this._showStatusMessageBox(status);
     }.bind(this))
     .catch(function(error) {
-      var status = scout.Status.error({
+      return this._showStatusMessageBox(errorToStatus(error));
+    }.bind(this));
+
+    // See ValueField#_createInvalidValueStatus, has similar code to transfor error to status
+    function errorToStatus(error) {
+      if (error instanceof scout.Status) {
+        return error;
+      }
+      if (typeof error === 'string') {
+        return scout.Status.error({
+          message: error
+        });
+      }
+      return scout.Status.error({
         message: error.message
       });
-      return this._showStatusMessageBox(status);
-    }.bind(this));
+    }
 };
 
 scout.Lifecycle.prototype._showYesNoCancelMessageBox = function(message, yesAction, noAction) {
@@ -271,6 +283,19 @@ scout.Lifecycle.prototype._showStatusMessageBox = function(status) {
  * @returns {Promise}
  */
 scout.Lifecycle.prototype._validate = function() {
+  var status = this._validateElements();
+  if (status.isValid()) {
+    status = this._validateWidget();
+  }
+  return $.resolvedPromise(status);
+};
+
+/**
+ * Validates all elements (i.e form-fields) covered by the lifecycle and checks for missing or invalid elements.
+ *
+ * @return scout.Status
+ */
+scout.Lifecycle.prototype._validateElements = function() {
   var elements = this._invalidElements();
   var status = new scout.Status();
   if (elements.missingElements.length === 0 && elements.invalidElements.length === 0) {
@@ -279,8 +304,19 @@ scout.Lifecycle.prototype._validate = function() {
     status.severity = scout.Status.Severity.ERROR;
     status.message = this._createInvalidElementsMessageHtml(elements.missingElements, elements.invalidElements);
   }
+  return status;
+};
 
-  return $.resolvedPromise(status);
+/**
+ * Validates the widget (i.e. form) associated with this lifecycle. This function is only called when there are
+ * no missing or invalid elements. It is used to implement an overall-validate logic which has nothing to do
+ * with a specific element or field. For instance you could validate if an internal member variable of a Lifecycle
+ * or Form is set.
+ *
+ * @return scout.Status
+ */
+scout.Lifecycle.prototype._validateWidget = function() {
+  return scout.Status.ok();
 };
 
 /**
