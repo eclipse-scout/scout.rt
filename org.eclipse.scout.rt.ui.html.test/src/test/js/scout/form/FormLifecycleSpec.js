@@ -131,6 +131,29 @@ describe('FormLifecycle', function() {
       expect(lifecycleComplete).toBe(true);
     });
 
+    it('should call _validate function on form', function() {
+      // validate should always be called, even when there is not a single touched field in the form
+      var form2 = helper.createFormWithOneField();
+      form2.lifecycle = scout.create('FormLifecycle', {
+        widget: form2
+      });
+      var validateCalled = false;
+      Object.getPrototypeOf(form2)._validate = function() {
+        validateCalled = true;
+        return scout.Status.ok();
+      };
+      form2.ok();
+      expect(validateCalled).toBe(true);
+
+      // validate should not be called when there is an invalid field (field is mandatory but empty in this case)
+      validateCalled = false;
+      var formField = form2.rootGroupBox.fields[0];
+      formField.touch();
+      formField.setMandatory(true);
+      form2.ok();
+      expect(validateCalled).toBe(false);
+    });
+
   });
 
   describe('validation error message', function() {

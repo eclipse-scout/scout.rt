@@ -326,6 +326,21 @@ scout.Form.prototype._onLifecycleSave = function() {
   }.bind(this));
 };
 
+/**
+ * This function is called by the lifecycle, for instance when the 'ok' function is called.
+ * The function is called every time the 'ok' function is called, which means it runs even when
+ * there is not a single touched field. The function should be used to implement an overall validate
+ * logic which is not related to a specific field. For instance you could validate the state of an
+ * internal member variable.
+ * <p>
+ * You should return a Status object with severity ERROR in case the validation fails.
+ *
+ * @return scout.Status
+ */
+scout.Form.prototype._validate = function() {
+  return scout.Status.ok();
+};
+
 scout.Form.prototype._save = function(data) {
   return $.resolvedPromise();
 };
@@ -863,9 +878,9 @@ scout.Form.prototype.touch = function() {
 };
 
 /**
- * === Method required for objects that act as 'displayParent' ===
+ * Function required for objects that act as 'displayParent'.
  *
- * Returns 'true' if this Form is currently accessible to the user.
+ * @return 'true' if this Form is currently accessible to the user
  */
 scout.Form.prototype.inFront = function() {
   return this.rendered && this.attached;

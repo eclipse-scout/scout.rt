@@ -64,6 +64,10 @@ scout.FormLifecycle.prototype._missingElementText = function(element) {
   return element.label;
 };
 
+scout.FormLifecycle.prototype._validateWidget = function() {
+  return this.widget._validate();
+};
+
 scout.FormLifecycle.prototype.markAsSaved = function() {
   this.widget.visitFields(function(field) {
     field.markAsSaved();
