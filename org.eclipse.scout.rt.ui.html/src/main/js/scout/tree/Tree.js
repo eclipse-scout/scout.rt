@@ -280,12 +280,13 @@ scout.Tree.prototype._initTreeNodeInternal = function(node, parentNode) {
 scout.Tree.prototype._destroy = function() {
   scout.Tree.parent.prototype._destroy.call(this);
   this.visitNodes(this._destroyTreeNode.bind(this));
+  this.nodes = []; // finally, clear array with root tree-nodes
 };
 
 scout.Tree.prototype._destroyTreeNode = function(node, parentNode) {
   delete this.nodesMap[node.id];
   scout.arrays.remove(this.selectedNodes, node); // ensure deleted node is not in selection list anymore (in case the model does not update the selection)
-  this._removeFromFlatList(node, false); //ensure node is not longer in visible nodes list.
+  this._removeFromFlatList(node, false); // ensure node is not longer in visible nodes list.
   node.destroy();
 
   if (this._onNodeDeleted) { // Necessary for subclasses
