@@ -2335,7 +2335,7 @@ describe("Tree", function() {
         expect(node.destroyed).toBe(true);
       });
       expect(scout.objects.countOwnProperties(tree.nodesMap)).toBe(0);
-      expect(scout.objects.countOwnProperties(tree.nodes.length)).toBe(0);
+      expect(tree.nodes.length).toBe(0);
     });
 
   });
