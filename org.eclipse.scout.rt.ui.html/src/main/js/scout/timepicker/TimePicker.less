@@ -10,7 +10,7 @@
  ******************************************************************************/
 .time-picker-popup {
   position: absolute;
-  border: 1px solid @popup-border-color;
+  border: 1px solid @control-popup-border-color;
   border-radius: @control-popup-border-radius;
   #scout.focus-border();
   overflow: hidden;
@@ -83,26 +83,27 @@
       &.hours {
         background-color: @time-picker-hours-background-color;
         border-right: 1px solid @border-color;
+
         &:active:not(.disabled),
         .time-picker:not(.touch) &:hover:not(.disabled) {
           + .minutes {
             & > .text {
               border-color: @item-selection-border-color;
-              background-color: @palette-blue-0;
+              background-color: @item-selection-background-color;
             }
 
             &.now > .text {
-              border-color: @highlight-color;
-              background-color: @palette-orange-0;
+              border-color: @time-picker-now-hover-border-color;
+              background-color: @time-picker-now-hover-background-color;
             }
 
             &.selected {
               & > .text {
-                background-color: @palette-blue-4;
+                background-color: @time-picker-hover-selected-background-color;
               }
 
               &.now > .text {
-                background-color: @palette-orange-3;
+                background-color: @time-picker-now-hover-selected-background-color;
               }
             }
           }
@@ -112,22 +113,22 @@
       &.minutes {
 
         &.now {
-          color: @highlight-color;
+          color: @time-picker-now-color;
           font-weight: bold;
         }
 
         &.selected {
-          color: @palette-white;
+          color: @time-picker-selected-color;
 
-          & > .text{
-            background-color: @item-selection-border-color;
+          & > .text {
+            background-color: @time-picker-selected-background-color;
           }
 
           &.now {
-            color: @palette-white;
+            color: @time-picker-now-selected-color;
 
             & > .text {
-              background-color: @highlight-color;
+              background-color: @time-picker-now-selected-background-color;
             }
           }
         }
@@ -139,7 +140,7 @@
           }
 
           &.now > .text {
-            border-color: @highlight-color;
+            border-color: @time-picker-now-preselected-border-color;
           }
         }
 
@@ -148,21 +149,21 @@
         .time-picker:not(.touch) &:hover:not(.disabled) {
           & > .text {
             border-color: @item-selection-border-color;
-            background-color: @palette-blue-0;
+            background-color: @item-selection-background-color;;
           }
 
           &.now > .text {
-            border-color: @highlight-color;
-            background-color: @palette-orange-0;
+            border-color: @time-picker-now-hover-border-color;
+            background-color: @time-picker-now-hover-background-color;
           }
 
           &.selected {
             & > .text {
-              background-color: @palette-blue-4;
+              background-color: @time-picker-hover-selected-background-color;
             }
 
             &.now > .text {
-              background-color: @palette-orange-3;
+              background-color: @time-picker-now-hover-selected-background-color;
             }
           }
         }

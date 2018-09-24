@@ -148,7 +148,7 @@
   top: 4px;
   font-weight: normal;
   font-size: 10px;
-  color: #666;
+  color: @table-header-item-state-color;
   display: table-row;
 
   & > .left {
@@ -164,7 +164,7 @@
 
   & > .right {
     display: table-cell;
-    color: @palette-gray-7;
+    color: @table-header-sort-color;
     font-size: 16px;
     padding-left: 3px;
     padding-right: 3px;
@@ -188,12 +188,16 @@
   width: 17px;
   padding: 8px 8px;
   margin-left: -8px;
-  background-color: @border-color;
+  background-color: @table-header-resize-color;
   background-clip: content-box;
   z-index: 1;
 
   &:not(.disabled) {
     cursor: col-resize;
+
+    &:hover {
+      background-color: @table-header-resize-hover-color;
+    }
   }
 
   .table-header.moving > & {

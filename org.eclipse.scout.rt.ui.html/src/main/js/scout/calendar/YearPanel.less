@@ -12,7 +12,6 @@
   display: inline-block;
   vertical-align: top;
   width: 0;
-  background-color: @palette-white;
   overflow: hidden;
 }
 
@@ -27,7 +26,7 @@
     display: inline-block;
     padding-right: 15px;
     line-height: @calendar-title-height;
-    color: @palette-gray-6;
+    color: @year-panel-title-item-color;
     cursor: pointer;
     font-weight: bold;
 
@@ -41,14 +40,14 @@
     }
   }
 
-   &::after{
+   &::after {
     position: absolute;
     height: 1px;
     width: 100%;
     left: 0;
     bottom: -1px;
     content: '';
-    background-color: @palette-gray-5;
+    background-color: @border-color;
   }
 }
 
@@ -56,7 +55,6 @@
   position: relative;
   width: 180px;
   margin-left: 10px;
-
   height: calc(~'100%' -  @calendar-title-height);
   overflow: hidden;
 
@@ -80,27 +78,27 @@
       line-height: @year-panel-day-line-height;
       cursor: pointer;
 
-      &.year-range{
-        background-color: @item-selection-background-color;
+      &.year-hover {
+        background-color: @year-panel-range-hover-background-color;
       }
 
-      &.year-hover{
-        background-color: @item-selection-background-color;
+      &.year-range {
+        background-color: @year-panel-range-background-color;
       }
 
-      &.year-range-day{
-        background-color: @item-selection-border-color;
-        color: @palette-white;
+      &.year-range-day {
+        background-color: @year-panel-range-day-background-color;
+        color: @active-inverted-color;
       }
 
-      &.year-hover-day{
-        background-color: @item-selection-border-color;
-        color: @palette-white;
+      &.year-hover-day {
+        background-color: @year-panel-range-day-background-color;
+        color: @active-inverted-color;
       }
     }
   }
 
-  & > .year-month::before{
+  & > .year-month::before {
     position: absolute;
     left: 0;
     top: 0;
@@ -110,14 +108,14 @@
     color: @text-color;
   }
 
-  & > .year-month::after{
+  & > .year-month::after {
     position: absolute;
     bottom: 0;
     right: 19px;
     height: calc(~'100%' -  20px);
     width: 26%;
     content: '';
-    background-color: @palette-gray-7;
+    background-color: @year-panel-weekend-background-color;
     opacity: 0.10;
     pointer-events: none;
   }

@@ -117,13 +117,13 @@
     margin-right: 5px;
   }
 
-  &.selected {
-    color: @planner-mode-active-text-color;
-    background-color: @item-selection-background-color;
+  &:hover {
+    color: @hover-color;
   }
 
-  &:hover {
-    color: @planner-mode-active-text-color;
+  &.selected {
+    color: @planner-mode-selected-color;
+    background-color: @planner-mode-selected-background-color;
   }
 }
 
@@ -132,7 +132,7 @@
   margin-left: 5px;
 
   &:hover::before{
-    color: @planner-mode-active-text-color;
+    color: @hover-color;
   }
 }
 

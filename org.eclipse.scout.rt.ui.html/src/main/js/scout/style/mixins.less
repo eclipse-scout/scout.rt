@@ -26,12 +26,12 @@
     box-shadow: inset 0 0 @radius @color;
   }
 
-  .drop-shadow(@x: 2px, @y: 6px, @blur: 14px, @spread: -6px, @alpha: 0.2) {
+  .drop-shadow(@x: 2px, @y: 6px, @blur: 14px, @spread: -6px, @alpha: @drop-shadow-alpha) {
     box-shadow: @x @y @blur @spread rgba(0, 0, 0, @alpha);
   }
 
   .drop-shadow-large() {
-    #scout.drop-shadow(@x: 4px, @y: 10px, @blur: 18px, @alpha: 0.5);
+    #scout.drop-shadow(@x: 4px, @y: 10px, @blur: 18px, @alpha: @drop-shadow-large-alpha);
   }
 
   .focus-border(@bordersize: 1px) {
@@ -429,10 +429,10 @@
   /* Mixin for chooser popups as used in smart-field */
   .chooser-popup {
     position: absolute;
-    border: solid 1px @popup-border-color;
+    border: solid 1px @control-popup-border-color;
     border-radius: @control-popup-border-radius;
     overflow: hidden;
-    background-color: @palette-white;
+    background-color: @control-popup-background-color;
     #scout.focus-border();
 
     &.down {

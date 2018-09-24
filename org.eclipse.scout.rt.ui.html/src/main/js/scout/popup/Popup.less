@@ -21,8 +21,8 @@
   position: absolute;
   padding: 0 13px;
   white-space: nowrap;
-  background-color: @palette-white;
-  border: 1px solid @border-color;
+  background-color: @popup-background-color;
+  border: 1px solid @popup-border-color;
   border-top-width: 0;
   border-bottom-width: 0;
   color: @active-color;
@@ -62,13 +62,13 @@
   position: absolute;
   height: 1px;
   left: 1px;
-  background-color: @palette-white;
+  background-color: @popup-background-color;
 }
 
 .popup-body {
   position: relative;
-  border: 1px solid @border-color;
-  background-color: @palette-white;
+  border: 1px solid @popup-border-color;
+  background-color: @popup-background-color;
 
   &.down  {
     #scout.drop-shadow();

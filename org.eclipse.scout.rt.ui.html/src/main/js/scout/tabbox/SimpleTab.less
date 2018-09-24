@@ -15,7 +15,7 @@
   /* 1px smaller than the header because of the bottom border (see .selected rule below) */
   height: calc(~'100% - 1px');
   padding: 5px;
-  background-color: @view-tab-background-color;
+  background-color: @simple-tab-background-color;
   color: @text-color;
   border-right: 1px solid @border-color;
 
@@ -46,12 +46,12 @@
 
   &.selected {
     cursor: default;
-    background-color: @view-tab-active-background-color;
+    background-color: @simple-tab-active-background-color;
     /* full size of header to draw over the border-bottom */
     height: 100%;
 
     & > .title {
-      color: @view-tab-active-color;
+      color: @simple-tab-active-color;
     }
   }
 

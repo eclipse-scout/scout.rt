@@ -845,8 +845,11 @@ scout.Planner.prototype._buildActivityHtml = function(activity) {
     activityStyle += ' color: ' + foregroundColor + ';';
   }
 
-  // the background-color represents the fill level and not the image. This makes it easier to change the color using a css class
-  activityStyle += ' background-image: ' + 'linear-gradient(to bottom, #fff 0%, #fff ' + level + '%, transparent ' + level + '%, transparent 100% );';
+  // The background-color represents the fill level and not the image. This makes it easier to change the color using a css class
+  // In order to change the background rather than the fill, use the planner-activity-level css class
+  var activityLevelCssClass = 'planner-activity-level' + (activity.cssClass ? (' ' + activity.cssClass) : '');
+  var activityEmptyColor = scout.styles.get(activityLevelCssClass, 'background-color').backgroundColor;
+  activityStyle += ' background-image: ' + 'linear-gradient(to bottom, ' + activityEmptyColor + ' 0%, ' + activityEmptyColor + ' ' + level + '%, transparent ' + level + '%, transparent 100% );';
 
   var activityHtml = '<div';
   activityHtml += ' class="' + activityCssClass + '"';

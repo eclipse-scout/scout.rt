@@ -133,7 +133,7 @@
         /* cut off. We should find a better solution for this. */
         /*white-space: nowrap;*/
 
-        &:not(.disabled):not(.default-menu):hover {
+        &:hover {
           color: @button-hover-color;
 
           & > .font-icon {
@@ -141,7 +141,7 @@
           }
         }
 
-        &:not(.disabled):active {
+        &:active {
           color: @button-active-color;
           background-color: @menubar-button-active-background-color;
 
@@ -150,7 +150,7 @@
           }
         }
 
-        &:focus:not(.disabled)::after {
+        &:focus::after {
           #scout.button-focus();
         }
 

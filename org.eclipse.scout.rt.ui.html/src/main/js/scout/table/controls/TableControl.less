@@ -32,7 +32,7 @@
   }
 
   &:active > .font-icon {
-    color: @text-color;
+    color: @table-control-active-color;
   }
 
   &.disabled:hover,
@@ -43,13 +43,13 @@
   }
 
   &.selected > .font-icon {
-    color: @table-control-active-color;
+    color: @table-control-selected-color;
   }
 
   &.selected {
     border-left-color: @border-color;
     border-right-color: @border-color;
-    background-color: @table-control-active-background-color;
+    background-color: @table-control-selected-background-color;
 
     &:first-child {
       border-left-color: transparent;

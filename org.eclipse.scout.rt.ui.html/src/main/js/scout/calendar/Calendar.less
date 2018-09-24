@@ -92,6 +92,7 @@
 .calendar-title {
   display: table-cell;
   vertical-align: middle;
+  color: @calendar-title-color;
 
   .calendar-header-row.last > & {
     text-align: center;
@@ -158,13 +159,13 @@
     margin-right: 5px;
   }
 
-  &.selected {
-    color: @planner-mode-active-text-color;
-    background-color: @item-selection-background-color;
+  &:hover {
+    color: @hover-color;
   }
 
-  &:hover {
-    color: @calendar-mode-active-text-color;
+  &.selected {
+    color: @calendar-mode-selected-color;
+    background-color: @calendar-mode-selected-background-color;
   }
 }
 
@@ -179,7 +180,7 @@
   margin-left: 5px;
 
   &:hover::before{
-    color: @calendar-mode-active-text-color;
+    color: @hover-color;
   }
 }
 
@@ -202,6 +203,7 @@
   width: calc(~'100%' - @calendar-component-margin-left);
   border-left: 4px solid;
   text-align: left;
+  color: @calendar-component-color;
 
   /* Default colors used when component has no specific class */
   background-color: @palette-blue-0;
@@ -256,7 +258,7 @@
 
 .calendar-component-intro {
   font-size: 11px;
-  color: @palette-gray-7;
+  color: @calendar-component-intro-color;
 }
 
 .calendar-list-container {
@@ -278,6 +280,7 @@
     width: calc(~'100%' - 10px);
     background-color: transparent !important; /* NOSONAR (required to override original component background color) */
     margin-top: 12px;
+    color: @text-color;
   }
 }
 
@@ -296,7 +299,7 @@
     left: 0;
     bottom: -1px;
     content: '';
-    background-color: @palette-gray-5;
+    background-color: @border-color;
   }
 }
 
@@ -335,10 +338,6 @@
   overflow: hidden;
   height: 100%;
   z-index: 1; /* draw over grid */
-
-  &.ui-selected {
-    background-color: @palette-cyan-0;
-  }
 }
 
 .calendar-day {
@@ -371,9 +370,9 @@
     left: 4px;
     top: 3px;
     font-weight: normal;
-    border: solid 4px @highlight-color;
+    border: solid 4px @highlight-inverted-background-color;
     border-radius: 50%;
-    background-color: @highlight-color;
+    background-color: @highlight-inverted-background-color;
     color: @palette-white;
   }
 
@@ -383,10 +382,10 @@
     top: 3px;
     width: @calendar-day-selected-circle-size;
     height: @calendar-day-selected-circle-size;
-    border: solid 4px @item-selection-border-color;
+    border: solid 4px @calendar-day-selected-background-color;
     border-radius: 50%;
-    background-color: @item-selection-border-color;
-    color: @palette-white;
+    background-color: @calendar-day-selected-background-color;
+    color: @calendar-day-selected-color;
   }
 
   /* helps to center days between 10 and 19 nicer */
@@ -466,7 +465,7 @@
   left: 0;
   top: 0;
   content: '';
-  background-color: @palette-gray-5;
+  background-color: @border-color;
 }
 
 .calendar-week::after {
@@ -476,7 +475,7 @@
   left: 0;
   top: 0;
   content: '';
-  background-color: @palette-gray-5;
+  background-color: @border-color;
 }
 
 .calendar-day-name::before {
@@ -532,7 +531,7 @@
   height: 1px;
   width: 100%;
   content: '';
-  background-color: @palette-gray-5;
+  background-color: @border-color;
 }
 
 .calendar-week-task::before {

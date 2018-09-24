@@ -12,7 +12,7 @@
 
   &.in-background > .tree-data > .tree-node.selected {
     background-color: @outline-in-background-selection-background-color;
-    color: @palette-white;
+    color: @outline-in-background-selection-color;
   }
 
   & > .tree-data  {
@@ -23,12 +23,12 @@
       }
 
       & > .scrollbar-thumb {
-        background-color: fade(@scrollbar-thumb-inverted-color, 20%);
+        background-color: @outline-scrollbar-thumb-color;
       }
 
       & > .scrollbar-thumb-move,
       & > .scrollbar-thumb:hover {
-        background-color: fade(@scrollbar-thumb-inverted-color, 40%);
+        background-color: @outline-scrollbar-thumb-hover-color;
       }
     }
 

@@ -127,19 +127,21 @@
     margin-right: 0;
   }
 
-  &:not(.disabled):hover {
+  &:hover {
     color: @hover-color;
     border-color: @hover-color;
   }
 
-  &:active:not(.disabled) {
+  &:active {
     color: @button-active-color;
     background-color: @button-active-background-color;
+    border-color: @table-header-menu-cmd-active-border-color;
   }
 
   &.disabled {
+    background-color: @control-background-color;
     border-color: @palette-gray-4;
-    color: @palette-gray-5;
+    color: @table-header-menu-cmd-disabled-color;
     cursor: default;
   }
 
@@ -151,12 +153,12 @@
   }
 
   &.selected {
-    background-color: @table-header-menu-cmd-active-background-color;
-    border: 1px solid @table-header-menu-cmd-active-border-color;
+    background-color: @table-header-menu-cmd-selected-background-color;
+    border: 1px solid @table-header-menu-cmd-selected-border-color;
 
     & > .icon::before,
     & > .icon::after {
-      color: @table-header-menu-cmd-active-color;
+      color: @table-header-menu-cmd-selected-color;
     }
 
     &:focus {
@@ -169,8 +171,8 @@
     }
 
     &:active:not(.disabled) {
-      background-color: darken(@table-header-menu-cmd-active-background-color, 10%);
-      border-color: darken(@table-header-menu-cmd-active-border-color, 10%);
+      background-color: darken(@table-header-menu-cmd-selected-background-color, 10%);
+      border-color: darken(@table-header-menu-cmd-selected-border-color, 10%);
     }
   }
 
@@ -307,7 +309,7 @@
       border-width: 2px;
 
       &.togglable:hover {
-        background-color: @table-header-menu-cmd-active-background-color;
+        background-color: @table-header-menu-cmd-selected-background-color;
         background-image: none;
       }
     }
@@ -341,9 +343,9 @@
   }
 
   &.selected {
-    background-color: @table-header-menu-cmd-active-background-color;
-    border-top-color: @table-header-menu-cmd-active-border-color;
-    color: @table-header-menu-cmd-active-color;
+    background-color: @table-header-menu-cmd-selected-background-color;
+    border-top-color: @table-header-menu-cmd-selected-border-color;
+    color: @table-header-menu-cmd-selected-color;
   }
 
   &.selected + .table-header-menu-filter {
@@ -351,7 +353,7 @@
   }
 
   &.selected:last-child {
-    border-bottom-color: @table-header-menu-cmd-active-border-color;
+    border-bottom-color: @table-header-menu-cmd-selected-border-color;
   }
 }
 

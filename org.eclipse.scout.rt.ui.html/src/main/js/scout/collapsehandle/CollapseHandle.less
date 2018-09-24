@@ -38,8 +38,8 @@
   display: table-cell;
   padding: 8px 6px;
   background-color: @collapse-handle-background-color;
-  color: fade(@collapse-handle-color, 75%);
-  border: 1px solid fade(@collapse-handle-border-color, 75%);
+  color: @collapse-handle-color;
+  border: 1px solid @collapse-handle-border-color;
   border-radius: @button-border-radius;
   cursor: pointer;
 
@@ -71,7 +71,8 @@
     }
   }
 
-  &:active {
+  .collapse-handle:active > & {
+    color: @collapse-handle-active-color;
     background-color: @collapse-handle-active-background-color;
   }
 }

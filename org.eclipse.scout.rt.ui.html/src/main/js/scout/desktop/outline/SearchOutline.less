@@ -27,14 +27,14 @@
 }
 
 .search-outline-field {
-  border: 1px solid @navigation-background-color;
+  border: 1px solid @search-outline-field-border-color;
   height: 35px;
   border-radius: 5px;
   width: 100%;
 
   &:focus {
-    border-color: @navigation-background-color;
-    #scout.glow(@palette-white);
+    border-color: @search-outline-field-focus-border-color;
+    #scout.glow(@search-outline-field-focus-glow-color);
   }
 
   &.has-text {
@@ -75,6 +75,7 @@
   margin-left: 0;
   margin-right: 0;
   margin-bottom: 0;
+  border-bottom-color: @outline-breadcrumb-border-color;
 
   .node-selected& {
     border-bottom-color: @outline-breadcrumb-ancestor-border-color;

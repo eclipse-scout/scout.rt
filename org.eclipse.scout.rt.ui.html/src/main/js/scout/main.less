@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 body {
+  background-color: @body-background-color;
   #scout.font-text-normal();
   height: 100%;
   width: 100%;
@@ -185,7 +186,7 @@ input.alternative,
   &.disabled {
     color: @disabled-color;
     border-bottom-style: dashed;
-    border-bottom-color: @palette-gray-5;
+    border-bottom-color: @text-field-alternative-disabled-border-color;
   }
 
   &:focus,
@@ -280,6 +281,55 @@ button {
   /* Note: no vertical align helper here! this is very dependent on the content of the button */
   /* (only text or other DOM nodes), therefore it has to be added manually when desired. */
 
+  & > .button-label,
+  & > .submenu-icon,
+  & > .icon {
+    vertical-align: middle;
+    display: inline-block;
+  }
+
+  & > .button-label {
+    margin-top: 1px; /* SUPER HACK */
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  & > .icon {
+    /* Padding only relevant for icons larger than the container */
+    padding-top: 2px;
+    padding-bottom: 2px;
+
+    &.with-label {
+      margin-right: 8px;
+    }
+
+    &.loading,
+    &.broken {
+      .hidden();
+    }
+
+    &.font-icon {
+      color: @button-font-icon-color;
+      font-size: @button-font-icon-size;
+    }
+
+    &.image-icon {
+      max-height: 100%;
+    }
+  }
+
+  & > .submenu-icon {
+    #scout.submenu-icon();
+    padding-left: 8px;
+  }
+
+  & > .button-label,
+  & > .icon,
+  & > .submenu-icon {
+    opacity: 1;
+    transition: opacity @loading-fade-duration;
+  }
+
   &:hover {
     color: @button-hover-color;
   }
@@ -336,55 +386,6 @@ button {
     & > .font-icon {
       color: @button-font-icon-disabled-color;
     }
-  }
-
-  & > .button-label,
-  & > .submenu-icon,
-  & > .icon {
-    vertical-align: middle;
-    display: inline-block;
-  }
-
-  & > .button-label {
-    margin-top: 1px; /* SUPER HACK */
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  & > .icon {
-    /* Padding only relevant for icons larger than the container */
-    padding-top: 2px;
-    padding-bottom: 2px;
-
-    &.with-label {
-      margin-right: 8px;
-    }
-
-    &.loading,
-    &.broken {
-      .hidden();
-    }
-
-    &.font-icon {
-      color: @button-font-icon-color;
-      font-size: @button-font-icon-size;
-    }
-
-    &.image-icon {
-      max-height: 100%;
-    }
-  }
-
-  & > .submenu-icon {
-    #scout.submenu-icon();
-    padding-left: 8px;
-  }
-
-  & > .button-label,
-  & > .icon,
-  & > .submenu-icon {
-    opacity: 1;
-    transition: opacity @loading-fade-duration;
   }
 
   &.loading {
@@ -476,7 +477,7 @@ button::-moz-focus-inner {
   #scout.font-icon();
   font-size: 17px;
   cursor: pointer;
-  color: @icon-light-color;
+  color: @closer-color;
 
   &::before {
     content: @icon-remove-bold;
@@ -494,7 +495,7 @@ button::-moz-focus-inner {
 .save-needer {
   #scout.font-icon();
   font-size: 12px;
-  color: @icon-light-color;
+  color: @save-needer-color;
 
   &::before {
     content: @icon-pencil-solid;
@@ -516,7 +517,7 @@ button::-moz-focus-inner {
   margin: 0;
   padding: 0;
   border: 0;
-  background-color: @palette-white;
+  background-color: @application-loading-background-color;
   pointer-events: none;
 }
 
@@ -538,7 +539,7 @@ button::-moz-focus-inner {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    box-shadow: 0 0 6px 3px fade(@palette-blue-5, 90%);
+    box-shadow: 0 0 6px 3px @application-loading01-color;
     #scout.animation(pulsate 2s ease-out infinite);
   }
 }
@@ -557,7 +558,7 @@ button::-moz-focus-inner {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    box-shadow: inset 0 0 4px 2px @palette-cyan-4;
+    box-shadow: inset 0 0 4px 2px @application-loading02-color;
     #scout.animation(pulsate 2.84s ease-out infinite);
   }
 }

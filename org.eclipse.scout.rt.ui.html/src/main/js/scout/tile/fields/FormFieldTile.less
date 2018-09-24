@@ -82,6 +82,14 @@
   &.tile-attributes-field .app-link {
     text-decoration: none;
     color: @tile-default-link-color;
+
+    &:hover {
+      color: @tile-default-link-hover-color;
+    }
+
+    &:active {
+      color: @tile-default-link-active-color;
+    }
   }
 
   &.inverted {
@@ -98,6 +106,14 @@
     & .app-link {
       color: @tile-default-inverted-color;
       text-decoration: underline;
+
+      &:hover {
+        color: @tile-default-inverted-link-hover-color;
+      }
+
+      &:active {
+        color: @tile-default-inverted-link-active-color;
+      }
     }
 
     &.has-tooltip > .status,
@@ -126,12 +142,12 @@
     /* scrollbars on dark background */
 
     & .scrollbar-thumb {
-      background-color: fade(@palette-white, 30%);
+      background-color: @scrollbar-thumb-inverted-color;
     }
 
     & .scrollbar-thumb-move,
     & .scrollbar-thumb:hover {
-      background-color: fade(@palette-white, 60%);
+      background-color: @scrollbar-thumb-inverted-hover-color;
     }
   }
 
@@ -146,6 +162,14 @@
 
     & .app-link {
       color: @tile-alternative-link-color;
+
+      &:hover {
+        color: @tile-alternative-link-hover-color;
+      }
+
+      &:active {
+        color: @tile-alternative-link-active-color;
+      }
     }
   }
 
@@ -160,6 +184,14 @@
 
     & .app-link {
       color: @tile-alternative-inverted-color;
+
+      &:hover {
+        color: @tile-alternative-inverted-link-hover-color;
+      }
+
+      &:active {
+        color: @tile-alternative-inverted-link-active-color;
+      }
     }
 
     &.has-tooltip > .status,

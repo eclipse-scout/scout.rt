@@ -1,0 +1,230 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+/* -------------------------------- */
+/* Scout dark theme                 */
+/* extends: Scout default theme     */
+/* -------------------------------- */
+@import "scout/style/colors.less";
+
+/* -------------------------------- */
+/* Color palette                    */
+/* -------------------------------- */
+
+/* These are new gray colors used only in dark theme */
+@palette-gray-1: #e4e4e6;
+@palette-gray-2: #999999;
+@palette-gray-2-1: #79818d;
+@palette-gray-3: #495465;
+@palette-gray-4: #394051;
+@palette-gray-5: #2d3748;
+@palette-gray-6: #262d3b;
+@palette-gray-7: #1d222b;
+@palette-gray-8: #1a1d28;
+@palette-gray-9: #11151d;
+
+
+/* This is a new blue color used only in dark theme.
+   It replaces palette-blue-6 mostly, especially if blue-6 is used as border or foreground color.
+   Palette-blue-6 is still used as background-color, though. */
+@palette-blue-1-1: #4bbbff;
+
+/* These are slightly darker variants of the original colors since the original ones would be too shiny when used as background in dark mode*/
+@palette-blue-0: #b7dafc;
+@palette-blue-1: #98c4ec;
+@palette-red-0: #ffb3b1;
+@palette-red-1: #fd9d9b;
+@palette-red-2: #fa8784;
+@palette-green-0: #a2eac9;
+@palette-green-1: #85e0b6;
+@palette-green-2: #53cf95;
+@palette-cyan-0: #cefff5;
+@palette-cyan-1: #aaf8ea;
+@palette-cyan-2: #7ff2dd;
+@palette-orange-0: #ffe8bf;
+@palette-orange-1: #ffdda0;
+@palette-orange-2: #ffd07e;
+
+/* This is a new orange color used only in dark theme.
+   If orange-4 is used as background it is extremely shiny, this new darker color has better contrast. */
+@palette-orange-5: #cd6906;
+
+/* -------------------------------- */
+/* Global colors                    */
+/* -------------------------------- */
+
+@active-color: @palette-blue-1-1;
+@application-loading-background-color: @body-background-color;
+@application-loading01-color: @palette-blue-1-1;
+@application-loading02-color: @palette-cyan-3;
+@background-color: @palette-gray-6;
+@body-background-color: @palette-gray-4;
+@border-color: @palette-gray-3;
+@busyindicator-active-color: @palette-blue-1-1;
+@control-background-color: @background-color;
+@control-disabled-background-color: inherit;
+@control-disabled-color: @disabled-color;
+@disabled-color: @palette-gray-2;
+@drop-shadow-alpha: 0.7;
+@drop-shadow-large-alpha: 0.8;
+@error-background-color: @background-color;
+@focus-border-color: @focus-color;
+@focus-color: @palette-blue-1-1;
+@highlight-inverted-background-color: @palette-orange-5;
+@hover-color: @active-color;
+@icon-light-color: @text-color;
+@item-active-background-color: @item-selection-background-color;
+@item-selection-background-color: @palette-gray-4;
+@item-selection-border-color: @palette-blue-1-1;
+@item-selection-nonfocus-background-color: @item-selection-background-color;
+@item-selection-nonfocus-border-color: @border-color;
+@panel-background-color: @palette-gray-8;
+@popup-background-color: @background-color;
+@text-color-dark: @palette-black;
+@text-color: @palette-gray-1;
+@text-disabled-color: @disabled-color;
+@text-field-alternative-disabled-border-color: @disabled-color;
+@text-field-icon-color: @palette-gray-2-1;
+@text-field-placeholder-color: @palette-gray-2-1;
+@text-selection-background-color: @palette-blue-1-1;
+@text-selection-color: @text-color;
+@title-color: @palette-blue-1-1;
+@warning-color: @palette-orange-3;
+@warning-hover-color: @palette-orange-4;
+
+/* -------------------------------- */
+/* Component specific colors        */
+/* -------------------------------- */
+
+@boxbutton-background-color: @palette-gray-8;
+@button-active-background-color: @active-inverted-background-color;
+@button-active-color: @palette-white;
+@button-background-color: inherit;
+@button-border-color: @palette-blue-4;
+@button-color: @palette-blue-1-1;
+@button-disabled-border-color: @disabled-color;
+@calendar-component-intro-color: @palette-gray-2;
+@calendar-day-color: @text-color;
+@calendar-mode-selected-background-color: @border-color;
+@calendar-mode-selected-color: @text-color;
+@calendar-out-color: @palette-gray-2;
+@calendar-week-axis-color: @palette-gray-2;
+@calendar-weekend-color: @palette-blue-1-1;
+@check-box-checked-color: @palette-blue-1-1;
+@closer-color: @text-color;
+@collapse-handle-border-color: @button-border-color;
+@collapse-handle-color: @button-color;
+@date-picker-now-hover-background-color: @date-picker-day-hover-background-color;
+@date-picker-out-color: @calendar-out-color;
+@date-picker-out-weekend-color: @calendar-weekend-out-color;
+@date-picker-weekend-color: @calendar-weekend-color;
+@default-button-background-color: @active-inverted-background-color;
+@desktop-header-background-color: @palette-gray-4;
+@desktop-header-border-color: @palette-gray-8;
+@desktop-notification-background-color: @palette-gray-4;
+@desktop-toolbox-in-navigation-background-color: @view-button-tab-background-color;
+@detail-table-header-background-color: @palette-gray-5;
+@link-active-color: @link-hover-color;
+@link-color: @palette-blue-1-1;
+@link-hover-color: darken(@link-color, 10%);
+@menubar-background-color: @palette-gray-8;
+@menubar-button-disabled-border-color: @button-disabled-border-color;
+@navigation-background-color: @palette-gray-9;
+@navigation-color: @text-color;
+@notification-error-background-color: @notification-ok-background-color;
+@notification-error-border-color: @error-color;
+@notification-info-background-color: @notification-ok-background-color;
+@notification-info-border-color: @palette-blue-1-1;
+@notification-ok-background-color: @palette-gray-4;
+@notification-ok-border-color: @palette-green-3;
+@notification-warning-background-color: @notification-ok-background-color;
+@notification-warning-border-color: @warning-color;
+@outline-breadcrumb-border-color: @border-color;
+@outline-group-background-color: @palette-gray-7;
+@outline-in-background-selection-background-color: darken(@outline-selection-background-color, 2%);
+@outline-scrollbar-thumb-color: @scrollbar-thumb-color;
+@outline-scrollbar-thumb-hover-color: @scrollbar-thumb-hover-color;
+@outline-selection-color: @navigation-color;
+@outline-title-border-color: @navigation-color;
+@planner-activity-color: @text-color-dark;
+@planner-large-scale-item-line-color: fade(@palette-white, 20%);
+@planner-resource-title-color: @text-color;
+@planner-small-scale-item-line-color: fade(@palette-white, 7%);
+@radio-button-checked-color: @palette-blue-1-1;
+@resizable-grip-color: @palette-gray-2;
+@save-needer-color: @palette-gray-2;
+@scrollbar-thumb-color: fade(@scrollbar-thumb-inverted-main-color, 20%);
+@scrollbar-thumb-hover-color: fade(@scrollbar-thumb-inverted-main-color, 30%);
+@scrollbar-thumb-inverted-color: @scrollbar-thumb-color;
+@scrollbar-thumb-inverted-hover-color: @scrollbar-thumb-hover-color;
+@scrollbar-thumb-inverted-small-color: @scrollbar-thumb-small-color;
+@scrollbar-thumb-inverted-small-hover-color: @scrollbar-thumb-small-hover-color;
+@scrollbar-thumb-small-color: fade(@scrollbar-thumb-inverted-main-color, 15%);
+@scrollbar-thumb-small-hover-color: fade(@scrollbar-thumb-inverted-main-color, 15%);
+@search-outline-field-border-color: @border-color;
+@search-outline-field-focus-border-color: @focus-border-color;
+@search-outline-field-focus-glow-color: @focus-glow-color;
+@simple-tab-background-color: @desktop-header-background-color;
+@status-info-color: @text-color;
+@status-menu-color: @text-color;
+@status-warning-color: @warning-color;
+@status-warning-hover-color: @warning-hover-color;
+@tab-item-color: @text-color;
+@tab-item-focus-color: lighten(@tab-item-active-color, 10%);
+@tab-item-marked-border-color: @text-color;
+@table-aggregate-row-background-color: @palette-gray-8;
+@table-control-active-color: @link-active-color;
+@table-control-color: @link-color;
+@table-control-container-background-color: @palette-gray-5;
+@table-control-disabled-color: @disabled-color;
+@table-header-item-state-color: @text-color;
+@table-header-menu-cmd-active-border-color: @button-active-background-color;
+@table-header-menu-cmd-disabled-color: @disabled-color;
+@table-header-resize-color: @palette-gray-2-1;
+@table-header-resize-hover-color: @palette-gray-1;
+@table-header-sort-color: @table-header-item-state-color;
+@table-info-hover-color: @hover-color;
+@table-info-warning-color: @status-warning-color;
+@table-info-warning-hover-color: @status-warning-hover-color;
+@tag-element-background-color-hover: @palette-cyan-2;
+@tag-element-background-color: @palette-cyan-3;
+@tile-alternative-inverted-background-color: @tile-default-inverted-background-color;
+@tile-alternative-inverted-link-active-color: @link-active-color;
+@tile-alternative-inverted-link-hover-color: @link-hover-color;
+@tile-background-color: @palette-gray-4;
+@tile-button-alternative-inverted-active-background-color: @tile-button-default-inverted-active-background-color;
+@tile-button-default-active-background-color: @palette-gray-9;
+@tile-button-default-inverted-active-background-color: @palette-gray-9;
+@tile-default-background-color: @palette-gray-4;
+@tile-default-border-color: @border-color;
+@tile-default-color: @text-color;
+@tile-default-inverted-background-color: @palette-gray-8;
+@tile-default-inverted-link-active-color: @link-active-color;
+@tile-default-inverted-link-hover-color: @link-hover-color;
+@tile-default-label-color: @palette-blue-1-1;
+@tile-default-link-active-color: @link-active-color;
+@tile-default-link-color: @link-color;
+@tile-default-link-hover-color: @link-hover-color;
+@tile-outline-overview-color: @palette-blue-1-1;
+@tile-placeholder-background-color: @palette-gray-5;
+@tooltip-background-color: @background-color;
+@tooltip-border-color: @palette-blue-1-1;
+@tooltip-error-background-color: @tooltip-background-color;
+@tooltip-error-border-color: @error-color;
+@tooltip-warning-background-color: @tooltip-background-color;
+@tooltip-warning-border-color: @warning-color;
+@view-button-tab-background-color: @desktop-header-background-color;
+@view-button-tab-color: @text-color;
+@wizard-step-after-active-background-color: @background-color;
+@wizard-step-before-active-background-color: @palette-gray-4;
+@year-panel-range-background-color: @palette-gray-3;
+@year-panel-range-hover-background-color: @palette-gray-4;
+@year-panel-title-item-color: @palette-gray-2;
+@year-panel-weekend-background-color: @palette-white;
