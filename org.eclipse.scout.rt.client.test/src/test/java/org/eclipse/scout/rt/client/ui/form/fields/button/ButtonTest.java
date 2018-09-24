@@ -42,10 +42,6 @@ public class ButtonTest {
 
   public static class TestForm extends AbstractForm {
 
-    public TestForm() {
-      super();
-    }
-
     @Override
     protected String getConfiguredTitle() {
       return "Test Form";
@@ -67,10 +63,6 @@ public class ButtonTest {
     public class MainBox extends AbstractGroupBox {
       @Order(10)
       public class PushButton1 extends AbstractButton {
-
-        @Override
-        protected void execClickAction() {
-        }
 
         @Order(10)
         public class TestMenu1 extends AbstractMenu {
@@ -138,20 +130,35 @@ public class ButtonTest {
     Assert.assertTrue(button1.isEnabled());
     Assert.assertTrue(button1.isEnabledIncludingParents());
 
+    // test that enabledGranted=false on form is ignored by close & cancel buttons
     m_form.setEnabledGranted(false);
     Assert.assertTrue(button1.isEnabled());
     Assert.assertTrue(button1.isEnabledIncludingParents());
-
     m_form.setEnabledGranted(true);
+
+    // test that enabled=false on MainBox is ignored by close & cancel buttons
     m_form.getRootGroupBox().setEnabled(false);
     Assert.assertTrue(button1.isEnabled());
+    Assert.assertTrue(button1.isEnabledIncludingParents());
+    m_form.getRootGroupBox().setEnabled(true);
+
+    // test that explicitly disabling a close- or cancel-button works
+    button1.setEnabled(false);
+    Assert.assertFalse(button1.isEnabled());
     Assert.assertFalse(button1.isEnabledIncludingParents());
+    button1.setEnabled(true);
+    Assert.assertTrue(button1.isEnabled());
+    Assert.assertTrue(button1.isEnabledIncludingParents());
+    button1.setEnabledGranted(false);
+    Assert.assertFalse(button1.isEnabled());
+    Assert.assertFalse(button1.isEnabledIncludingParents());
+    button1.setEnabledGranted(true);
 
     m_form.setEnabledGranted(false);
-    m_form.getRootGroupBox().setEnabled(true);
     button1.setSystemType(IButton.SYSTEM_TYPE_NONE);
     Assert.assertTrue(button1.isEnabled());
     Assert.assertFalse(button1.isEnabledIncludingParents());
+    m_form.setEnabledGranted(true);
   }
 
   @After

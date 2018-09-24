@@ -346,25 +346,32 @@ public class FormFieldEnabledTest {
     P_BoxWithCancelButton field = new P_BoxWithCancelButton();
     InnerBox inner = field.getFieldByClass(InnerBox.class);
     CancelButton button = inner.getFieldByClass(CancelButton.class);
-
     Assert.assertTrue(field.isEnabled());
     Assert.assertTrue(inner.isEnabled());
     Assert.assertTrue(button.isEnabled());
 
+    // test disable propagation to children: all children disabled
     field.setEnabledGranted(false, false, true);
     Assert.assertFalse(field.isEnabled());
     Assert.assertFalse(inner.isEnabled());
-    Assert.assertTrue(button.isEnabled());
+    Assert.assertFalse(button.isEnabled());
+    field.setEnabledGranted(true, false, true); // revert
 
-    field.setEnabledGranted(true, false, true);
+    // test disable without propagation: children stay enabled but enabledIncludingParents=false. But: cancel button also stays enabledIncludingParents=true (special)
+    field.setEnabledGranted(false, false, false);
+    Assert.assertFalse(field.isEnabled());
+    Assert.assertTrue(inner.isEnabled());
+    Assert.assertFalse(inner.isEnabledIncludingParents());
+    Assert.assertTrue(button.isEnabled());
+    Assert.assertTrue(button.isEnabledIncludingParents());
+    field.setEnabledGranted(true, false, true); // revert
+
+    // test explicitly disabling a cancel button has an effect
+    button.setEnabledGranted(false, true /* has no effect: disabling is never propagated to parents */, false);
     Assert.assertTrue(field.isEnabled());
     Assert.assertTrue(inner.isEnabled());
-    Assert.assertTrue(button.isEnabled());
-
-    button.setEnabledGranted(false, true, false);
-    Assert.assertTrue(field.isEnabled());
-    Assert.assertTrue(inner.isEnabled());
-    Assert.assertTrue(button.isEnabled());
+    Assert.assertFalse(button.isEnabled());
+    Assert.assertFalse(button.isEnabledIncludingParents());
   }
 
   public static class P_InnerForm extends AbstractForm {

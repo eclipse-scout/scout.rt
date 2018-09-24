@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -41,7 +40,6 @@ import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
-import org.eclipse.scout.rt.shared.dimension.IDimensions;
 
 @ClassId("998788cf-df0f-480b-bd5a-5037805610c9")
 public abstract class AbstractButton extends AbstractFormField implements IButton {
@@ -289,32 +287,13 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   @Override
-  public void setEnabled(final boolean enabled, final boolean updateParents, final boolean updateChildren, final String dimension) {
-    if (isIgnoreEnabledChange(enabled, dimension)) {
-      // no need to do any propagation: no children available and parents are not disabled by propagation. See AbstractFormField#setEnabled()
-      return;
-    }
-
-    super.setEnabled(enabled, updateParents, updateChildren, dimension);
-  }
-
-  protected boolean isIgnoreEnabledChange(final boolean enabled, final String dimension) {
-    // cannot set the enabled_granted to false if this is a cancel or close button
-    return isFormCloseButtonType() && !enabled && IDimensions.ENABLED_GRANTED.equals(dimension);
-  }
-
-  protected boolean isFormCloseButtonType() {
-    return getSystemType() == IButton.SYSTEM_TYPE_CANCEL || getSystemType() == IButton.SYSTEM_TYPE_CLOSE;
-  }
-
-  @Override
   public boolean isEnabledIncludingParents() {
-    if (!isFormCloseButtonType()) {
-      return super.isEnabledIncludingParents();
+    boolean isFormCloseButtonType = getSystemType() == IButton.SYSTEM_TYPE_CANCEL || getSystemType() == IButton.SYSTEM_TYPE_CLOSE;
+    if (isFormCloseButtonType) {
+      // for close & cancel buttons: ignore the enabled state of the parent form fields.
+      return isEnabled();
     }
-
-    Predicate<IFormField> visitor = f -> f.isEnabled() || f.isEnabled(dim -> !IDimensions.ENABLED_GRANTED.equals(dim));
-    return visitParents(visitor);
+    return super.isEnabledIncludingParents();
   }
 
   /*
