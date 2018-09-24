@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.platform.util.date;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import org.eclipse.scout.rt.platform.IBeanManager;
@@ -63,5 +64,17 @@ public class FixedDateProvider extends DateProvider {
    */
   public void setDate(Date newDate) {
     m_date = newDate;
+  }
+
+  /**
+   * Set calendar time to the fixed date.
+   *
+   * @return the calendar instance with the fixed date set
+   */
+  @Override
+  public Calendar currentCalendar() {
+    Calendar currentCalendar = Calendar.getInstance();
+    currentCalendar.setTime(m_date);
+    return currentCalendar;
   }
 }
