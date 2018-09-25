@@ -21,6 +21,26 @@ scout.cookies = {
       }
     }
     return null;
-  }
+  },
 
+  /**
+   * Sets a cookie.
+   *
+   * @param maxAge If specified the cookie will be persistent, otherwise it will be a session cookie.
+   */
+  set: function(name, value, maxAge, path) {
+    value = scout.nvl(value, '');
+    maxAge = scout.nvl(maxAge, -1);
+
+    var cookie = name + '=' + value;
+    if (maxAge > -1) {
+      var expires = new Date();
+      expires.setTime(expires.getTime() + maxAge*1000);
+      cookie += ';max-age=' + maxAge + ';expires=' + expires;
+    }
+    if (path) {
+      cookie += ';path=' + path;
+    }
+    document.cookie = cookie; // Does not override existing cookies with a different name
+  }
 };

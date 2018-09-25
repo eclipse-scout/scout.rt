@@ -23,19 +23,20 @@ scout.Desktop = function() {
   this.viewButtons = [];
   this.messageBoxes = [];
   this.fileChoosers = [];
-  this.navigation;
-  this.header;
-  this.bench;
-  this.splitter;
-  this.formController;
-  this.messageBoxController;
-  this.fileChooserController;
+  this.navigation = null;
+  this.header = null;
+  this.bench = null;
+  this.splitter = null;
+  this.formController = null;
+  this.messageBoxController = null;
+  this.fileChooserController = null;
   this.initialFormRendering = false;
   this.offline = false;
   this.notifications = [];
   this.inBackground = false;
   this.geolocationServiceAvailable = scout.device.supportsGeolocation();
-  this.openUriHandler;
+  this.openUriHandler = null;
+  this.theme = null;
 
   this._addWidgetProperties(['viewButtons', 'menus', 'views', 'selectedViewTabs', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes', 'activeForm']);
 
@@ -59,11 +60,12 @@ scout.Desktop.UriAction = {
 
 scout.Desktop.prototype._init = function(model) {
   scout.Desktop.parent.prototype._init.call(this, model);
+
+  this._initTheme();
   this.formController = scout.create('DesktopFormController', {
     displayParent: this,
     session: this.session
   });
-
   this.messageBoxController = new scout.MessageBoxController(this, this.session);
   this.fileChooserController = new scout.FileChooserController(this, this.session);
   this._resizeHandler = this.onResize.bind(this);
@@ -1066,4 +1068,43 @@ scout.Desktop.prototype.onReconnectingFailed = function() {
 
 scout.Desktop.prototype.dataChange = function(dataType) {
   this.events.trigger('dataChange', dataType);
+};
+
+scout.Desktop.prototype._activeTheme = function() {
+  return scout.cookies.get('scout.ui.theme') || 'default';
+};
+
+scout.Desktop.prototype._initTheme = function() {
+  var theme = this.theme;
+  if (theme === null) {
+    theme = this._activeTheme();
+  }
+  this.setTheme(theme);
+};
+
+/**
+ * Changes the current theme.
+ * <p>
+ * The theme name is stored in a persistent cookie called scout.ui.theme.
+ * In order to activate it, the browser is reloaded so that the CSS files for the new theme can be downloaded.
+ * <p>
+ * Since it is a persistent cookie, the theme will be activated again the next time the app is started, unless the cookie is deleted.
+ */
+scout.Desktop.prototype.setTheme = function(theme) {
+  this.setProperty('theme', theme);
+  if (this.theme !== this._activeTheme()) {
+    this._switchTheme(theme);
+  }
+};
+
+scout.Desktop.prototype._switchTheme = function(theme) {
+  // Add a persistent cookie which expires in 30 days
+  scout.cookies.set('scout.ui.theme', theme, 30 * 24 * 3600);
+
+  // Reload page in order to download the CSS files for the new theme
+  // Don't remove body but make it invisible, otherwise JS exceptions might be thrown if body is removed while an action executed
+  $('body').setVisible(false);
+  scout.reloadPage({
+    clearBody: false
+  });
 };
