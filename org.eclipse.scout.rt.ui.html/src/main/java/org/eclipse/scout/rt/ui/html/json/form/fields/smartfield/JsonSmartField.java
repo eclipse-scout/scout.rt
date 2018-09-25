@@ -443,6 +443,7 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
     JSONObject json = new JSONObject();
     json.put("propertyName", descriptor.getPropertyName());
     json.put("text", descriptor.getText());
+    json.put("cssClass", descriptor.getCssClass());
     json.put("width", descriptor.getWidth());
     json.put("fixedWidth", descriptor.isFixedWidth());
     json.put("horizontalAlignment", descriptor.getHorizontalAlignment());

@@ -20,6 +20,7 @@ public class ColumnDescriptor {
 
   private String m_propertyName;
   private String m_text;
+  private String m_cssClass;
   private int m_width;
   private boolean m_fixedWidth;
   private int m_horizontalAlignment = -1;
@@ -70,6 +71,15 @@ public class ColumnDescriptor {
    */
   public ColumnDescriptor withText(String text) {
     m_text = text;
+    return this;
+  }
+
+  public String getCssClass() {
+    return m_cssClass;
+  }
+
+  public ColumnDescriptor withCssClass(String cssClass) {
+    m_cssClass = cssClass;
     return this;
   }
 
