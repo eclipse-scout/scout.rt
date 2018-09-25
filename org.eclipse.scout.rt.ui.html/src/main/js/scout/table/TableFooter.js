@@ -113,6 +113,10 @@ scout.TableFooter.prototype._render = function() {
   this.session.keyStrokeManager.installKeyStrokeContext(this.searchFieldKeyStrokeContext);
 };
 
+scout.TableFooter.prototype.getFocusableElement = function() {
+  return this._$textFilter;
+};
+
 scout.TableFooter.prototype._renderProperties = function() {
   this._updateHasFilterText();
 };
@@ -295,14 +299,13 @@ scout.TableFooter.prototype._renderInfoSelection = function() {
   if (!this._compactStyle) {
     if (numRowsSelected <= 1) {
       $info.appendSpan().text(this.session.text('ui.NumRowSelected', this.computeCountInfo(numRowsSelected)));
-    }
-    else {
+    } else {
       $info.appendSpan().text(this.session.text('ui.NumRowsSelected', this.computeCountInfo(numRowsSelected)));
     }
     $info.appendBr();
     $info.appendSpan('table-info-button').text(this.session.text(all ? 'ui.SelectNone' : 'ui.SelectAll')).appendTo($info);
   } else {
-    if(numRowsSelected <= 1) {
+    if (numRowsSelected <= 1) {
       $info.appendSpan().text(this.session.text('ui.NumRowSelectedMin'));
     } else {
       $info.appendSpan().text(this.session.text('ui.NumRowsSelectedMin'));

@@ -71,6 +71,7 @@ scout.Widget = function() {
   this.eventDelegators = [];
   this._preserveOnPropertyChangeProperties = [];
   this._postRenderActions = [];
+  this._focusInListener = this._onFocusIn.bind(this);
   this._parentDestroyHandler = this._onParentDestroy.bind(this);
   this._parentRemovingWhileAnimatingHandler = this._onParentRemovingWhileAnimating.bind(this);
   this._scrollHandler = this._onScroll.bind(this);
@@ -79,6 +80,11 @@ scout.Widget = function() {
   this.keyStrokeContext = this._createKeyStrokeContext();
   // Widgets using scout.LogicalGridLayout may have a grid to calculate the grid data of the children
   this.logicalGrid;
+
+  // focus tracking
+  this.trackFocus = false;
+  this._$lastFocusedElement = null;
+  this._storedFocusedWidget = null;
 };
 
 /**
@@ -292,6 +298,7 @@ scout.Widget.prototype.render = function($parent) {
   this.attached = true;
   this.trigger('render');
   this._postRender();
+  this.restoreFocus();
 };
 
 /**
@@ -309,6 +316,7 @@ scout.Widget.prototype._render = function() {
  * Here values of the model are applied to the DOM / UI.
  */
 scout.Widget.prototype._renderProperties = function() {
+  this._renderTrackFocus();
   this._renderEnabled();
   this._renderVisible();
   this._renderFocused();
@@ -380,7 +388,11 @@ scout.Widget.prototype._removeInternal = function() {
   this.removing = true;
   this.removalPending = false;
   this.trigger('removing');
-
+  // transform last focused element into a scout widget
+  if (this._$lastFocusedElement) {
+    this._storedFocusedWidget = scout.widget(this._$lastFocusedElement);
+    this._$lastFocusedElement = null;
+  }
   // remove children in reverse order.
   this.children.slice().reverse().forEach(function(child) {
     // Only remove the child if this widget is the current parent (if that is not the case this widget is the owner)
@@ -470,6 +482,7 @@ scout.Widget.prototype._cleanup = function() {
   }
   this._uninstallScrollbars();
   if (this.$container) {
+    this.$container.off('focusin', this._focusInListener);
     this.session.layoutValidator.cleanupInvalidComponents(this.$container);
   }
 };
@@ -1651,6 +1664,40 @@ scout.Widget.prototype.findParent = function(func) {
     parent = parent.parent;
   }
   return parent;
+};
+
+scout.Widget.prototype.setTrackFocus = function(trackFocus) {
+  this.setProperty('trackFocus', trackFocus);
+};
+
+scout.Widget.prototype._renderTrackFocus = function() {
+  if (this.$container) {
+    if (this.trackFocus) {
+      this.$container.on('focusin', this._focusInListener);
+    } else {
+      this.$container.off('focusin', this._focusInListener);
+      this._$lastFocusedElement = null;
+      this._storedFocusedWidget = null;
+
+    }
+  }
+};
+
+scout.Widget.prototype.restoreFocus = function() {
+  if (this._storedFocusedWidget) {
+    this._storedFocusedWidget.focus();
+    this._storedFocusedWidget = null;
+  }
+};
+
+/**
+ * Method invoked once a 'focusin' event is fired by this context's $container or one of its child controls.
+ */
+scout.Widget.prototype._onFocusIn = function(event) {
+  var $target = $(event.target);
+  if (this.$container.has($target)) {
+    this._$lastFocusedElement = $target;
+  }
 };
 
 /**

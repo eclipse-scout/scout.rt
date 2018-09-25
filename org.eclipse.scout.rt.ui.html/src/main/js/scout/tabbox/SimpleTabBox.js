@@ -59,6 +59,9 @@ scout.SimpleTabBox.prototype._render = function() {
   this.htmlComp.setLayout(new scout.SimpleTabBoxLayout(this));
   this.htmlComp.layoutData = this.layoutData;
 
+  this.tabArea.render();
+  this.$tabArea = this.tabArea.$container;
+
   // render content
   this.$viewContent = this.$container.appendDiv('tab-content');
   this.viewContent = scout.HtmlComponent.install(this.$viewContent, this.session);
@@ -67,17 +70,7 @@ scout.SimpleTabBox.prototype._render = function() {
 
 scout.SimpleTabBox.prototype._renderProperties = function() {
   scout.SimpleTabBox.parent.prototype._renderProperties.call(this);
-  // render tabArea
-  this._renderTabArea();
   this._renderView(this.currentView);
-};
-
-scout.SimpleTabBox.prototype._renderTabArea = function() {
-  this.tabArea.render();
-  this.$tabArea = this.tabArea.$container;
-  if (this.tabArea.attached) {
-    this.$tabArea.insertBefore(this.$viewContent);
-  }
 };
 
 scout.SimpleTabBox.prototype._renderView = function(view) {
@@ -87,7 +80,11 @@ scout.SimpleTabBox.prototype._renderView = function(view) {
   if (view.rendered) {
     return;
   }
-  view.render(this.$viewContent);
+  if (view.tabActivated) {
+    view.tabActivated(this.$viewContent);
+  } else {
+    view.render(this.$viewContent);
+  }
   view.$container.addClass('view');
   view.validateRoot = true;
 };
@@ -104,7 +101,11 @@ scout.SimpleTabBox.prototype.activateView = function(view) {
   }
 
   if (this.currentView) {
-    this.currentView.detach();
+    if (this.currentView.tabDeactivated) {
+      this.currentView.tabDeactivated();
+    } else {
+      this.currentView.remove();
+    }
     this.trigger('viewDeactivate', {
       view: this.currentView
     });
@@ -114,9 +115,7 @@ scout.SimpleTabBox.prototype.activateView = function(view) {
   if (this.rendered) {
     this._renderView(view);
   }
-  if (!view.attached) {
-    view.attach();
-  }
+
   this.currentView = view;
 
   this.trigger('viewActivate', {
@@ -153,6 +152,8 @@ scout.SimpleTabBox.prototype.addView = function(view, bringToTop) {
   var activate = scout.nvl(bringToTop, true);
   // add to view stack
   var siblingView = this._addToViewStack(view, activate);
+  // track focus when a view gets removed ond rerendered.
+  view.setTrackFocus(true);
   view.setParent(this);
   this.trigger('viewAdd', {
     view: view,
@@ -218,6 +219,8 @@ scout.SimpleTabBox.prototype.removeView = function(view, showSiblingView) {
   if (!view) {
     return;
   }
+  // track focus when a view gets removed ond rerendered.
+  view.setTrackFocus(false);
   showSiblingView = scout.nvl(showSiblingView, true);
   var index = this.viewStack.indexOf(view);
   var viewToActivate;

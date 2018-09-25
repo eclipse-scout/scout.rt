@@ -64,8 +64,9 @@ scout.FormController.prototype._removePopupWindow = function(form) {
  */
 scout.FormController.prototype.render = function() {
   this._renderViews();
-
-  this._renderDialogs();
+  if (this.displayParent.inFront()) {
+    this._renderDialogs();
+  }
 };
 
 scout.FormController.prototype._renderViews = function() {
@@ -185,7 +186,7 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
     return false;
   }
 
-  dialog.on('remove', function() {
+  dialog.one('remove', function() {
     var formToActivate = this._findFormToActivateAfterDialogRemove();
     if (formToActivate) {
       desktop._setFormActivated(formToActivate);
@@ -197,14 +198,11 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
   if (dialog.isPopupWindow()) {
     this._renderPopupWindow(dialog);
   } else {
+    // start focus tracking if not already started.
+    dialog.setTrackFocus(true);
     dialog.render(desktop.$container);
     this._layoutDialog(dialog);
     desktop._setFormActivated(dialog);
-
-    // Only display the dialog if its 'displayParent' is visible to the user.
-    if (!this.displayParent.inFront()) {
-      dialog.detach();
-    }
   }
 };
 
@@ -317,7 +315,7 @@ scout.FormController.prototype._activateDialog = function(dialog) {
  */
 scout.FormController.prototype.attachDialogs = function() {
   this.displayParent.dialogs.forEach(function(dialog) {
-    dialog.render();
+    this._renderDialog(dialog, false);
   }, this);
 };
 
@@ -329,7 +327,7 @@ scout.FormController.prototype.attachDialogs = function() {
  */
 scout.FormController.prototype.detachDialogs = function() {
   this.displayParent.dialogs.forEach(function(dialog) {
-    dialog.remove();
+    this._removeDialog(dialog, false);
   }, this);
 };
 

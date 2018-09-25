@@ -38,7 +38,7 @@ scout.SmartField = function() {
   this.lookupStatus = null;
   this._currentLookupCall = null;
   this.lookupSeqNo = 0; // used to detect if the proposal chooser contains the results of the latest lookup, or an out-dated result.
-                        // only when the result is up-to-date, we can use the selected lookup row
+  // only when the result is up-to-date, we can use the selected lookup row
 
   this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilter', 'activeFilterEnabled', 'activeFilterLabels',
     'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental', 'searchRequired', 'columnDescriptors'
@@ -221,7 +221,7 @@ scout.SmartField.prototype.acceptInput = function(sync) {
 scout.SmartField.prototype._getSelectedLookupRow = function(searchTextChanged) {
   // don't use selected lookup row if...
   if (!this.isPopupOpen() || // 1. popup has been closed
-     (searchTextChanged && this._userWasTyping)) { // 2. search text has changed and user was typing
+    (searchTextChanged && this._userWasTyping)) { // 2. search text has changed and user was typing
     return null;
   }
   // 3. if the result row is from an out-dated result
@@ -362,7 +362,6 @@ scout.SmartField.prototype._acceptByText = function(sync, searchText) {
     .done(this._acceptByTextDone.bind(this));
   this._triggerAcceptByText(searchText);
 };
-
 
 scout.SmartField.prototype._inputAccepted = function(triggerEvent, acceptByLookupRow) {
   triggerEvent = scout.nvl(triggerEvent, true);
@@ -1406,12 +1405,12 @@ scout.SmartField.prototype._createLoadingSupport = function() {
 /**
  * @override FormField.js
  */
-scout.SmartField.prototype._showStatusMessage = function() {
+scout.SmartField.prototype._isInitialShowStatus = function() {
   if (this.touchMode && (this._pendingOpenPopup || this.isPopupOpen())) {
     // Do not display a tooltip if the touch popup is open, the tooltip will be displayed there
-    return;
+    return false;
   }
-  scout.SmartField.parent.prototype._showStatusMessage.call(this);
+  return scout.SmartField.parent.prototype._isInitialShowStatus.call(this);
 };
 
 /**

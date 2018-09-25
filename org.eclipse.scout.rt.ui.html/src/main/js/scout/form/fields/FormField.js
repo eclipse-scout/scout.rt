@@ -411,8 +411,7 @@ scout.FormField.prototype._updateFieldStatus = function() {
     errorStatus = this._errorStatus(),
     status = null,
     statusVisible = this._computeStatusVisible(),
-    autoRemove = false,
-    showStatus = false;
+    autoRemove = false;
 
   this.fieldStatus.setPosition(this.statusPosition);
   this.fieldStatus.setVisible(statusVisible);
@@ -429,7 +428,6 @@ scout.FormField.prototype._updateFieldStatus = function() {
     status = errorStatus;
     autoRemove = !status.isError();
     menus = this._getMenusForStatus(errorStatus);
-    showStatus = true;
   } else if (!scout.strings.empty(this.tooltipText)) {
     status = scout.create('Status', {
       message: this.tooltipText,
@@ -445,7 +443,11 @@ scout.FormField.prototype._updateFieldStatus = function() {
     menus = this._getCurrentMenus();
   }
 
-  this.fieldStatus.update(status, menus, autoRemove, showStatus);
+  this.fieldStatus.update(status, menus, autoRemove, this._isInitialShowStatus());
+};
+
+scout.FormField.prototype._isInitialShowStatus = function() {
+  return !!this._errorStatus();
 };
 
 /**
@@ -633,10 +635,7 @@ scout.FormField.prototype._renderMenus = function() {
 };
 
 scout.FormField.prototype._renderStatusMenuMappings = function() {
-  if (this._tooltip()) {
-    // If tooltip is visible call showStatusMessage to update the menus
-    this._showStatusMessage();
-  }
+  this._updateMenus();
 };
 
 scout.FormField.prototype.setMenusVisible = function(menusVisible) {
@@ -658,77 +657,6 @@ scout.FormField.prototype._renderMenusVisible = function() {
 scout.FormField.prototype._setKeyStrokes = function(keyStrokes) {
   this.updateKeyStrokes(keyStrokes, this.keyStrokes);
   this._setProperty('keyStrokes', keyStrokes);
-};
-
-scout.FormField.prototype._showStatusMessage = function() {
-  // Don't show a tooltip if there is no visible $status (tooltip points to the status)
-  if (!this.$status || !this.$status.isVisible()) {
-    return;
-  }
-
-  var status = this._errorStatus(),
-    text = this.tooltipText,
-    severity = scout.Status.OK,
-    autoRemove = true,
-    menus = [];
-
-  if (status) {
-    text = status.message;
-    severity = status.severity;
-    autoRemove = !status.isError();
-    if (this.tooltip && this.tooltip.autoRemove !== autoRemove) {
-      // AutoRemove may not be changed dynamically -> Remove and reopen tooltip
-      this.tooltip.destroy();
-    }
-
-    // If the field is used as a cell editor in a editable table, then no validation errors should be shown.
-    // (parsing and validation will be handled by the cell/column itself)
-    if (this.mode === scout.FormField.Mode.CELLEDITOR) {
-      return;
-    }
-  }
-
-  if (status) {
-    // There may be menus which should be displayed in the tooltip
-    menus = this._getMenusForStatus(status);
-  } else if (this.menusVisible && this._hasMenus()) {
-    // If there are menus, show them in the tooltip. But only if there is a tooltipText, don't do it if there is an error status.
-    // Menus make most likely no sense if an error status is displayed
-    menus = this._getCurrentMenus();
-  }
-
-  if (scout.strings.empty(text) && menus.length === 0) {
-    // Refuse to show empty tooltip
-    return;
-  }
-
-  // If a context menu is open, close it first
-  this._hideContextMenu();
-
-  if (this.tooltip) {
-    // update existing tooltip
-    this.tooltip.setText(text);
-    this.tooltip.setSeverity(severity);
-    this.tooltip.setMenus(menus);
-  } else {
-    // create new tooltip
-    this.tooltip = this._createTooltip({
-      parent: this,
-      text: text,
-      severity: severity,
-      autoRemove: autoRemove,
-      $anchor: this.$status,
-      menus: menus
-    });
-    this.tooltip.one('destroy', function() {
-      this.tooltip = null;
-    }.bind(this));
-    this.tooltip.render(this._$tooltipParent());
-  }
-};
-
-scout.FormField.prototype._createTooltip = function(model) {
-  return scout.create('Tooltip', model);
 };
 
 /**

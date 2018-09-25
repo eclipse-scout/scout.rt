@@ -27,7 +27,7 @@ scout.Form = function() {
   this.views = [];
   this.messageBoxes = [];
   this.fileChoosers = [];
-  this.focusedElement;
+  this.focusedElement = null;
   this.closable = true;
   this.cacheBounds = false;
   this.resizable = true;
@@ -38,6 +38,9 @@ scout.Form = function() {
   this.messageBoxController = null;
   this.fileChooserController = null;
   this._glassPaneRenderer = null;
+  this._attaching = false;
+  this._detaching = false;
+  this._tabDeactivated = false;
   /**
    * Whether this form should render its initial focus
    */
@@ -106,18 +109,25 @@ scout.Form.prototype._postRender = function() {
   if (this.renderInitialFocusEnabled) {
     this.renderInitialFocus();
   }
-  this._renderFocusedElement();
 
-  // Render attached forms, message boxes and file choosers.
-  this.formController.render();
-  this.messageBoxController.render();
-  this.fileChooserController.render();
+  // restore focus
+  this.restoreFocus();
+
+  if (!this._attaching) {
+    // Render attached forms, message boxes and file choosers.
+    this.formController.render();
+    this.messageBoxController.render();
+    this.fileChooserController.render();
+  }
+
 };
 
 scout.Form.prototype._remove = function() {
-  this.formController.remove();
-  this.messageBoxController.remove();
-  this.fileChooserController.remove();
+  if (!this._detaching) {
+    this.formController.remove();
+    this.messageBoxController.remove();
+    this.fileChooserController.remove();
+  }
   if (this._glassPaneRenderer) {
     this._glassPaneRenderer.removeGlassPanes();
     this._glassPaneRenderer = null;
@@ -161,11 +171,6 @@ scout.Form.prototype._renderForm = function() {
     // Attach to capture phase to activate focus context before regular mouse down handlers may set the focus.
     // E.g. clicking a check box label on another dialog executes mouse down handler of the check box which will focus the box. This only works if the focus context of the dialog is active.
     this.$container[0].addEventListener('mousedown', this._onDialogMouseDown.bind(this), true);
-    // restore focus
-    this.one('removing', function() {
-      this.focusedElement = scout.widget(this.session.focusManager._findFocusContext(this.$container).focusedElement);
-    }.bind(this));
-
   } else {
     layout = new scout.FormLayout(this);
   }
@@ -181,6 +186,7 @@ scout.Form.prototype._renderForm = function() {
 scout.Form.prototype._renderFocusedElement = function() {
   if (this.focusedElement) {
     this.focusedElement.focus();
+    this.focusedElement = null;
   }
 };
 
@@ -796,51 +802,43 @@ scout.Form.prototype._setDisplayParent = function(displayParent) {
 };
 
 /**
- * Method invoked when:
- *  - this is a 'detailForm' and the outline content is displayed;
- *  - this is a 'view' and the view tab is selected;
- *  - this is a child 'dialog' or 'view' and its 'displayParent' is attached;
- * @override Widget.js
+ * This method is invoked when:
+ *  - A view tab is selected to render the form.
  */
-scout.Form.prototype._attach = function() {
-  this.$parent.append(this.$container);
+scout.Form.prototype.tabActivated = function($parent) {
+  if (this._tabDeactivated) {
+    this._attaching = true;
+    this.render($parent);
 
-  // If the parent was resized while this view was detached, the view has a wrong size.
-  if (this.isView()) {
-    this.invalidateLayoutTree(false);
+    //form is attached even if children are not yet
+    if ((this.isView() || this.isDialog()) && !this.detailForm) {
+      //notify model this form is active
+      this.session.desktop._setFormActivated(this);
+    }
+    // Attach child dialogs, message boxes and file choosers.
+    this.formController.attachDialogs();
+    this.messageBoxController.attach();
+    this.fileChooserController.attach();
+
+    this._attaching = false;
+    this._tabDeactivated = false;
+  } else {
+    this.render($parent);
   }
-
-  this.session.detachHelper.afterAttach(this.$container);
-
-  // form is attached even if children are not yet
-  if ((this.isView() || this.isDialog()) && !this.detailForm) {
-    //notify model this form is active
-    this.session.desktop._setFormActivated(this);
-  }
-
-  // Attach child dialogs, message boxes and file choosers.
-  this.formController.attachDialogs();
-  this.messageBoxController.attach();
-  this.fileChooserController.attach();
-  scout.Form.parent.prototype._attach.call(this);
 };
 
-/**
- * Method invoked when:
- *  - this is a 'detailForm' and the outline content is hidden;
- *  - this is a 'view' and the view tab is deselected;
- *  - this is a child 'dialog' or 'view' and its 'displayParent' is detached;
- * @override Widget.js
- */
-scout.Form.prototype._detach = function() {
+scout.Form.prototype.tabDeactivated = function() {
+  if (this._tabDeactivated) {
+    return;
+  }
+  this._detaching = true;
   // Detach child dialogs, message boxes and file choosers, not views.
   this.formController.detachDialogs();
   this.messageBoxController.detach();
   this.fileChooserController.detach();
-
-  this.session.detachHelper.beforeDetach(this.$container);
-  this.$container.detach();
-  scout.Form.parent.prototype._detach.call(this);
+  this.remove();
+  this._detaching = false;
+  this._tabDeactivated = true;
 };
 
 scout.Form.prototype.renderInitialFocus = function() {

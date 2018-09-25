@@ -45,31 +45,13 @@ scout.SimpleTabArea.prototype._renderTab = function(tab) {
   tab.renderAfter(this.$container);
 };
 
+scout.SimpleTabArea.prototype.setVisible = function(visible) {
+  scout.SimpleTabArea.parent.prototype.setVisible.call(this, visible);
+};
+
 scout.SimpleTabArea.prototype._renderVisible = function() {
-  if (this.visible && this.tabs.length > 0) {
-    this.attach();
-  } else {
-    this.detach();
-  }
+  scout.SimpleTabArea.parent.prototype._renderVisible.call(this);
   this.invalidateLayoutTree();
-};
-
-scout.SimpleTabArea.prototype._attach = function() {
-  this.$parent.prepend(this.$container);
-  this.session.detachHelper.afterAttach(this.$container);
-  // If the parent was resized while this view was detached, the view has a wrong size.
-  this.invalidateLayoutTree(false);
-  scout.SimpleTabArea.parent.prototype._attach.call(this);
-};
-
-/**
- * @override Widget.js
- */
-scout.SimpleTabArea.prototype._detach = function() {
-  this.session.detachHelper.beforeDetach(this.$container);
-  this.$container.detach();
-  scout.SimpleTabArea.parent.prototype._detach.call(this);
-  this.invalidateLayoutTree(false);
 };
 
 scout.SimpleTabArea.prototype._onTabClick = function(event) {

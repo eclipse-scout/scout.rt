@@ -563,9 +563,6 @@ scout.ValueField.prototype.setCurrentMenuTypes = function(currentMenuTypes) {
 
 scout.ValueField.prototype._renderCurrentMenuTypes = function() {
   // If a tooltip is shown, update it with the new menus
-//  if (this._tooltip()) {
-//    this._showStatusMessage();
-//  }
   this._updateFieldStatus();
 };
 
