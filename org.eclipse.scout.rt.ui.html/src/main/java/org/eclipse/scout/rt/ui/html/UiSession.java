@@ -397,6 +397,13 @@ public class UiSession implements IUiSession {
     String modelTheme = m_clientSession.getDesktop().getTheme();
     String currentTheme = uiThemeUtility.getTheme(req);
 
+    // Ensure the model theme is valid, otherwise it could result in a endless reload loop
+    String validTheme = UiThemeHelper.get().validateTheme(modelTheme);
+    if (!ObjectUtility.equals(validTheme, modelTheme)) {
+      LOG.info("Model theme ({}) is not valid, switching to a valid one ({})", modelTheme, validTheme);
+      modelTheme = validTheme;
+    }
+
     if (modelTheme == null) {
       modelTheme = ObjectUtility.nvl(currentTheme, uiThemeUtility.getConfiguredTheme());
       m_clientSession.getDesktop().setTheme(currentTheme);
