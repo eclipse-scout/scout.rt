@@ -108,6 +108,8 @@
 
     &.alternative,
     &.read-only {
+      border-bottom-color: @border-color;
+
       &.has-error {
         border-bottom-color: @error-border-color;
       }
@@ -119,6 +121,10 @@
 
       &:focus {
         border-bottom-color: @focus-color;
+      }
+
+      &.has-error {
+        border-bottom-color: @error-border-color;
       }
     }
   }
