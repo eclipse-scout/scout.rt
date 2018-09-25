@@ -21,6 +21,10 @@ scout.TableHeaderMenu = function() {
   this._onColumnMovedHandler = this._onColumnMoved.bind(this);
   this._tableHeaderScrollHandler = this._onAnchorScroll.bind(this);
   this.on('locationChange', this._onLocationChange.bind(this));
+
+  // Make sure the actions are not disabled even if the table is disabled
+  // To disable the menu use headerEnabled or headerMenusEnabled
+  this.inheritAccessibility = false;
 };
 scout.inherits(scout.TableHeaderMenu, scout.Popup);
 
