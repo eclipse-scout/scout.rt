@@ -209,12 +209,12 @@ public final class UiHtmlConfigProperties {
     @Override
     public String description() {
       return "Number of seconds before the housekeeping job starts after a UI session has been unregistered from the store.\n"
-          + "By default this property is set to 20 seconds.";
+          + "By default this property is set to 30 seconds.";
     }
 
     @Override
     public Integer getDefaultValue() {
-      return 20;
+      return 30;
     }
   }
 
