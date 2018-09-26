@@ -27,6 +27,8 @@ scout.OpenUriHandler.prototype.openUri = function(uri, action) {
     this.handleUriActionOpen(uri);
   } else if (action === scout.Desktop.UriAction.NEW_WINDOW) {
     this.handleUriActionNewWindow(uri);
+  } else if (action === scout.Desktop.UriAction.POPUP_WINDOW) {
+    this.handleUriActionPopupWindow(uri);
   } else if (action === scout.Desktop.UriAction.SAME_WINDOW) {
     this.handleUriActionSameWindow(uri);
   }
@@ -80,6 +82,10 @@ scout.OpenUriHandler.prototype.handleUriActionNewWindow = function(uri) {
   this.openUriAsNewWindow(uri);
 };
 
+scout.OpenUriHandler.prototype.handleUriActionPopupWindow = function(uri) {
+  this.openUriAsPopupWindow(uri);
+};
+
 scout.OpenUriHandler.prototype.handleUriActionSameWindow = function(uri) {
   this.openUriInSameWindow(uri);
 };
@@ -102,5 +108,14 @@ scout.OpenUriHandler.prototype.openUriInIFrame = function(uri) {
 
 scout.OpenUriHandler.prototype.openUriAsNewWindow = function(uri) {
   var popupBlockerHandler = new scout.PopupBlockerHandler(this.session);
-  popupBlockerHandler.openWindow(uri);
+  if (scout.device.isInternetExplorer()) {
+    popupBlockerHandler.openWindow(uri, null, 'location=yes,toolbar=yes,menubar=yes,resizable=yes,scrollbars=yes');
+  } else {
+    popupBlockerHandler.openWindow(uri);
+  }
+};
+
+scout.OpenUriHandler.prototype.openUriAsPopupWindow = function(uri) {
+  var popupBlockerHandler = new scout.PopupBlockerHandler(this.session);
+  popupBlockerHandler.openWindow(uri, null, 'location=no,toolbar=no,menubar=no,resizable=yes,scrollbars=yes');
 };

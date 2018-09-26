@@ -55,6 +55,7 @@ scout.Desktop.UriAction = {
   DOWNLOAD: 'download',
   OPEN: 'open',
   NEW_WINDOW: 'newWindow',
+  POPUP_WINDOW: 'popupWindow',
   SAME_WINDOW: 'sameWindow'
 };
 

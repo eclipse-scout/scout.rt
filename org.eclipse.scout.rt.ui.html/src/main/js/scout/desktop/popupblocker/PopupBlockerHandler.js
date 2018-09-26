@@ -25,7 +25,6 @@ scout.PopupBlockerHandler = function(session, preserveOpener) {
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/open
  */
 scout.PopupBlockerHandler.prototype.openWindow = function(uri, windowName, windowSpecs, onWindowOpened) {
-  windowSpecs = windowSpecs || 'location=no,toolbar=no,menubar=no,resizable=yes,scrollbars=yes';
   windowName = windowName || 'scout_' + new Date().getTime();
 
   var popup = window.open('', windowName, windowSpecs);
@@ -39,13 +38,9 @@ scout.PopupBlockerHandler.prototype.openWindow = function(uri, windowName, windo
     }
   } else {
     $.log.warn('Popup-blocker detected! Show link to open window manually');
-    if (onWindowOpened) {
-      this.showNotification(function() {
-        this.openWindow(uri, windowName, windowSpecs, onWindowOpened);
-      }.bind(this));
-    } else {
-      this.showNotification(uri);
-    }
+    this.showNotification(function() {
+      this.openWindow(uri, windowName, windowSpecs, onWindowOpened);
+    }.bind(this));
   }
 };
 
