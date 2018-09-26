@@ -10,10 +10,6 @@
 
   <name>${displayName} ROOT Module</name>
 
-  <prerequisites>
-    <maven>3.2.2</maven>
-  </prerequisites>
-
   <build>
     <plugins>
       <plugin>
