@@ -489,6 +489,11 @@ scout.Column.prototype.setCellValue = function(row, value) {
   // value may have the wrong type (e.g. text instead of date) -> ensure type
   value = this._parseValue(value);
 
+  // do not trigger value change when value did not change
+  if (cell.value === value) {
+    return;
+  }
+
   cell.setValue(value);
   this._updateCellText(row, cell);
 };

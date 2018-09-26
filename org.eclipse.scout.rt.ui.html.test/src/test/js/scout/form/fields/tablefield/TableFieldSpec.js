@@ -171,5 +171,32 @@ describe("TableField", function() {
       expect(tableField.requiresSave).toBe(false);
     });
 
+    it('should require save after a cell edit.', function(){
+      tableField.render();
+      tableField.table.columns[0].setEditable(true);
+      tableField.markAsSaved();
+      tableField.updateRequiresSave();
+      expect(tableField.requiresSave).toBe(false);
+      tableField.table.prepareCellEdit(tableField.table.columns[0], tableField.table.rows[0]);
+      jasmine.clock().tick();
+      tableField.table.cellEditorPopup.cell.field.setValue('my new value');
+      tableField.table.completeCellEdit();
+      tableField.updateRequiresSave();
+      expect(tableField.requiresSave).toBe(true);
+    });
+
+    it('should NOT require save open and close cell editor without any text change.', function(){
+      tableField.render();
+      tableField.table.columns[0].setEditable(true);
+      tableField.markAsSaved();
+      tableField.updateRequiresSave();
+      expect(tableField.requiresSave).toBe(false);
+      tableField.table.prepareCellEdit(tableField.table.columns[0], tableField.table.rows[0]);
+      jasmine.clock().tick();
+      tableField.table.completeCellEdit();
+      tableField.updateRequiresSave();
+      expect(tableField.requiresSave).toBe(false);
+    });
+
   });
 });
