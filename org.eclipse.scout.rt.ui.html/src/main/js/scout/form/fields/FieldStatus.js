@@ -228,7 +228,7 @@ scout.FieldStatus.prototype.togglePopup = function() {
   if (!scout.arrays.empty(this.menus)) {
     this.hideTooltip();
     var func = function func(event) {
-      if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
+      if (!this.rendered) { // check needed because function is called asynchronously
         return;
       }
       // Toggle menu

@@ -810,15 +810,14 @@ scout.Form.prototype.tabActivated = function($parent) {
     this._attaching = true;
     this.render($parent);
 
-    //form is attached even if children are not yet
     if ((this.isView() || this.isDialog()) && !this.detailForm) {
       //notify model this form is active
       this.session.desktop._setFormActivated(this);
     }
-    // Attach child dialogs, message boxes and file choosers.
-    this.formController.attachDialogs();
-    this.messageBoxController.attach();
-    this.fileChooserController.attach();
+    // Render child dialogs, message boxes and file choosers.
+    this.formController.renderDialogs();
+    this.messageBoxController.render();
+    this.fileChooserController.render();
 
     this._attaching = false;
     this._tabDeactivated = false;
@@ -833,9 +832,9 @@ scout.Form.prototype.tabDeactivated = function() {
   }
   this._detaching = true;
   // Detach child dialogs, message boxes and file choosers, not views.
-  this.formController.detachDialogs();
-  this.messageBoxController.detach();
-  this.fileChooserController.detach();
+  this.formController.removeDialogs();
+  this.messageBoxController.remove();
+  this.fileChooserController.remove();
   this.remove();
   this._detaching = false;
   this._tabDeactivated = true;
@@ -894,7 +893,7 @@ scout.Form.prototype.touch = function() {
  * @return 'true' if this Form is currently accessible to the user
  */
 scout.Form.prototype.inFront = function() {
-  return this.rendered && this.attached;
+  return this.rendered;
 };
 
 /**

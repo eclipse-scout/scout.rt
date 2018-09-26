@@ -269,20 +269,3 @@ scout.BrowserField.prototype.setScrollBarEnabled = function(scrollBarEnabled) {
   this.setProperty('scrollBarEnabled', scrollBarEnabled);
   this.iframe.setScrollBarEnabled(scrollBarEnabled);
 };
-
-/**
- * @override Widget.js
- */
-scout.BrowserField.prototype._afterAttach = function() {
-  // the security=restricted attribute prevents browsers (IE 9 and below) from
-  // sending any cookies a second time
-  // as a workaround for IFRAMEs to work, we have to recreate the whole field in that case
-  if (!this.showInExternalWindow && scout.device.requiresIframeSecurityAttribute()) {
-    this.iframe.remove();
-    this._removeField();
-    this.iframe.render();
-    this.addFieldContainer(this.iframe.$container);
-    this.addField(this.iframe.$iframe);
-    this.htmlComp.revalidateLayout();
-  }
-};

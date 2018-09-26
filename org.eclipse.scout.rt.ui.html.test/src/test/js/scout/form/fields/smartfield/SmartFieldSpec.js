@@ -270,10 +270,11 @@ describe('SmartField', function() {
       jasmine.clock().tick(500);
       field.$field.triggerClick();
       jasmine.clock().tick(500);
-      expect(field._tooltip().rendered).toBe(false);
+      expect(field._tooltip()).toBeNull();
       expect(field.popup._field._tooltip().rendered).toBe(true);
 
       field.popup.close();
+      jasmine.clock().tick(500);
       expect(field.popup).toBe(null);
       expect(field._tooltip().rendered).toBe(true);
     });

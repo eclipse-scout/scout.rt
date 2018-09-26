@@ -758,31 +758,6 @@ describe('ValueField', function() {
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
     });
 
-    it('context menu triggers a display text changed event', function() {
-      linkWidgetAndAdapter(formField, 'ValueFieldAdapter');
-
-      var menuModel1 = menuHelper.createModel('menu'),
-        menu1 = menuHelper.createMenu(menuModel1);
-      menu1.menuTypes = ['ValueField.Null', 'ValueField.NotNull'];
-      formField.menus = [menu1];
-      formField.menusVisible = true;
-      formField.render();
-
-      formField.$field.focus();
-      formField.$field.val('abc123contextmenu');
-      formField.$status.triggerContextMenu();
-      sendQueuedAjaxCalls();
-
-      expect(jasmine.Ajax.requests.count()).toBe(1);
-
-      var event = new scout.RemoteEvent(formField.id, 'acceptInput', {
-        displayText: 'abc123contextmenu',
-        whileTyping: false
-      });
-      event.showBusyIndicator = true;
-      expect(mostRecentJsonRequest()).toContainEvents(event);
-    });
-
   });
 
 });

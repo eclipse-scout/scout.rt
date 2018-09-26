@@ -25,12 +25,21 @@ scout.FormController = function(model) {
  */
 scout.FormController.prototype.registerAndRender = function(form, position, selectView) {
   scout.assertProperty(form, 'displayParent');
-  if (form.isPopupWindow()) {
-    this._renderPopupWindow(form);
-  } else if (form.isView()) {
-    this._renderView(form, true, position, selectView);
+  if (form.isView()) {
+    // register
+    if (position !== undefined) {
+      scout.arrays.insert(this.displayParent.views, form, position);
+    } else {
+      this.displayParent.views.push(form);
+    }
+    this._renderView(form, selectView);
   } else {
-    this._renderDialog(form, true);
+    if (!form.isPopupWindow()) {
+      // register
+      this.displayParent.dialogs.push(form);
+    }
+    this._renderDialog(form);
+
   }
 };
 
@@ -45,12 +54,13 @@ scout.FormController.prototype.unregisterAndRemove = function(form) {
   if (!form) {
     return;
   }
-
-  if (form.isPopupWindow()) {
-    this._removePopupWindow(form);
-  } else if (form.isView()) {
+  if (form.isView()) {
+    scout.arrays.remove(this.displayParent.views, form);
     this._removeView(form);
   } else {
+    if (!form.isPopupWindow()) {
+      scout.arrays.remove(this.displayParent.dialogs, form);
+    }
     this._removeDialog(form);
   }
 };
@@ -64,22 +74,32 @@ scout.FormController.prototype._removePopupWindow = function(form) {
  */
 scout.FormController.prototype.render = function() {
   this._renderViews();
-  if (this.displayParent.inFront()) {
-    this._renderDialogs();
-  }
+  this.renderDialogs();
 };
 
 scout.FormController.prototype._renderViews = function() {
   this.displayParent.views.forEach(function(view, position) {
     view.setDisplayParent(this.displayParent);
-    this._renderView(view, false, position, false);
+    this._renderView(view, false);
   }.bind(this));
 };
 
-scout.FormController.prototype._renderDialogs = function() {
+scout.FormController.prototype.removeViews = function() {
+  this.displayParent.views.forEach(function(view, position) {
+    this._removeView(view);
+  }.bind(this));
+};
+
+scout.FormController.prototype.renderDialogs = function() {
   this.displayParent.dialogs.forEach(function(dialog) {
     dialog.setDisplayParent(this.displayParent);
-    this._renderDialog(dialog, false);
+    this._renderDialog(dialog);
+  }.bind(this));
+};
+
+scout.FormController.prototype.removeDialogs = function() {
+  this.displayParent.dialogs.forEach(function(dialog) {
+    this._removeDialog(dialog);
   }.bind(this));
 };
 
@@ -87,12 +107,8 @@ scout.FormController.prototype._renderDialogs = function() {
  * Removes all dialogs and views registered with this controller.
  */
 scout.FormController.prototype.remove = function() {
-  this.displayParent.dialogs.forEach(function(dialog) {
-    this._removeDialog(dialog, false);
-  }.bind(this));
-  this.displayParent.views.forEach(function(view, position) {
-    this._removeView(view, false);
-  }.bind(this));
+  this.removeDialogs();
+  this.removeViews();
 };
 
 /**
@@ -116,7 +132,7 @@ scout.FormController.prototype.activateForm = function(form) {
   }
 };
 
-scout.FormController.prototype.acceptView = function(view, register, position, selectView) {
+scout.FormController.prototype.acceptView = function(view) {
   // Only render view if 'displayParent' is rendered yet; if not, the view will be rendered once 'displayParent' is rendered.
   if (!this.displayParent.rendered) {
     return false;
@@ -124,15 +140,7 @@ scout.FormController.prototype.acceptView = function(view, register, position, s
   return true;
 };
 
-scout.FormController.prototype._renderView = function(view, register, position, selectView) {
-  if (register) {
-    if (position !== undefined) {
-      scout.arrays.insert(this.displayParent.views, view, position);
-    } else {
-      this.displayParent.views.push(view);
-    }
-  }
-
+scout.FormController.prototype._renderView = function(view, selectView) {
   // Display parent may implement acceptView, if not implemented -> use default
   if (this.displayParent.acceptView) {
     if (!this.displayParent.acceptView(view)) {
@@ -152,7 +160,7 @@ scout.FormController.prototype._renderView = function(view, register, position, 
     this.session.desktop.switchToBench();
   } else if (this.session.desktop.bench.removalPending) {
     // If a new form should be shown while the bench is being removed because the last form was closed, schedule the rendering to make sure the bench and the new form will be opened right after the bench has been removed
-    setTimeout(this._renderView.bind(this, view, register, position, selectView));
+    setTimeout(this._renderView.bind(this, view, selectView));
     return;
   }
   this.session.desktop.bench.addView(view, selectView);
@@ -166,10 +174,10 @@ scout.FormController.prototype.acceptDialog = function(dialog) {
   return true;
 };
 
-scout.FormController.prototype._renderDialog = function(dialog, register) {
+scout.FormController.prototype._renderDialog = function(dialog) {
   var desktop = this.session.desktop;
-  if (register) {
-    this.displayParent.dialogs.push(dialog);
+  if (!this.displayParent.inFront() && !dialog.isPopupWindow()) {
+    return;
   }
 
   // Display parent may implement acceptDialog, if not implemented -> use default
@@ -223,23 +231,17 @@ scout.FormController.prototype._findFormToActivateAfterDialogRemove = function()
   }
 };
 
-scout.FormController.prototype._removeView = function(view, unregister) {
-  unregister = scout.nvl(unregister, true);
-  if (unregister) {
-    scout.arrays.remove(this.displayParent.views, view);
-  }
+scout.FormController.prototype._removeView = function(view) {
   // in COMPACT case views are already removed.
   if (this.session.desktop.bench) {
     this.session.desktop.bench.removeView(view);
   }
 };
 
-scout.FormController.prototype._removeDialog = function(dialog, unregister) {
-  unregister = scout.nvl(unregister, true);
-  if (unregister) {
-    scout.arrays.remove(this.displayParent.dialogs, dialog);
-  }
-  if (dialog.rendered) {
+scout.FormController.prototype._removeDialog = function(dialog) {
+  if (dialog.isPopupWindow()) {
+    this._removePopupWindow(dialog);
+  } else if (dialog.rendered) {
     dialog.remove();
   }
 };
@@ -305,30 +307,6 @@ scout.FormController.prototype._activateDialog = function(dialog) {
 
   // Activate the focus context of the form (will restore the previously focused field)
   this.session.focusManager.activateFocusContext(dialog.$container);
-};
-
-/**
- * Attaches all dialogs to their original DOM parents.
- * In contrast to 'render', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
- *
- * This method has no effect if already attached.
- */
-scout.FormController.prototype.attachDialogs = function() {
-  this.displayParent.dialogs.forEach(function(dialog) {
-    this._renderDialog(dialog, false);
-  }, this);
-};
-
-/**
- * Detaches all dialogs from their DOM parents. Thereby, modality glassPanes are not detached.
- * In contrast to 'remove', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
- *
- * This method has no effect if already detached.
- */
-scout.FormController.prototype.detachDialogs = function() {
-  this.displayParent.dialogs.forEach(function(dialog) {
-    this._removeDialog(dialog, false);
-  }, this);
 };
 
 scout.FormController.prototype._layoutDialog = function(dialog) {

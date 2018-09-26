@@ -486,7 +486,7 @@ scout.TileGrid.prototype.showContextMenu = function(options) {
 
 scout.TileGrid.prototype._showContextMenu = function(options) {
   options = options || {};
-  if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
+  if (!this.rendered) { // check needed because function is called asynchronously
     return;
   }
   if (this.selectedTiles.length === 0) {

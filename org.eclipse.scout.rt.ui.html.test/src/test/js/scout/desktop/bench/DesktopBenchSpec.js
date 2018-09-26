@@ -102,9 +102,9 @@ describe("DesktopBench", function() {
 
       // test that replace view is called once
 
-      expect(form.attached).toBeTruthy();
+      expect(form.rendered).toBeTruthy();
       expect(bench.outlineContent === outline.nodes[0].detailForm).toBeTruthy();
-      expect(bench.outlineContent.attached).toBeFalsy();
+      expect(bench.outlineContent.rendered).toBeFalsy();
       expect(desktop.inBackground).toBeTruthy();
     });
 
@@ -131,9 +131,9 @@ describe("DesktopBench", function() {
 
       // test that replace view is called once
 
-      expect(form.attached).toBeTruthy();
+      expect(form.rendered).toBeTruthy();
       expect(bench.outlineContent === outline.nodes[1].detailForm).toBeTruthy();
-      expect(bench.outlineContent.attached).toBeFalsy();
+      expect(bench.outlineContent.rendered).toBeFalsy();
 
       expect(desktop.inBackground).toBeTruthy();
     });

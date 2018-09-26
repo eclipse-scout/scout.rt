@@ -33,7 +33,6 @@
   __include("scout/util/dates.js");
   __include("scout/util/defaultValues.js");
   __include("scout/util/events.js");
-  __include("scout/util/DetachHelper.js");
   __include("scout/util/Device.js");
   __include("scout/util/DoubleClickSupport.js");
   __include("scout/util/dragAndDrop.js");

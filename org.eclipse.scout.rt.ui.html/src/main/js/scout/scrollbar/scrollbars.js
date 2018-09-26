@@ -150,7 +150,6 @@ scout.scrollbars = {
 
   /**
    * Removes the js scrollbars for the $container, if there are any.<p>
-   * Also removes the scrollable from the detachhelper.
    */
   uninstall: function($container, session) {
     if (!$container.data('scrollable')) {

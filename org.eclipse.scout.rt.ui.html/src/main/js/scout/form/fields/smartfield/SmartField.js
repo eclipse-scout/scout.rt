@@ -828,6 +828,7 @@ scout.SmartField.prototype._renderPopup = function(result, status) {
     if (this.rendered) {
       this.$container.removeClass('popup-open');
       this.$field.removeClass('focused');
+      this._renderErrorStatus();
     }
   }.bind(this));
 };

@@ -788,7 +788,7 @@ scout.Calendar.prototype._showContextMenu = function(event, allowedType) {
   event.stopPropagation();
 
   var func = function func(event, allowedType) {
-    if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
+    if (!this.rendered) { // check needed because function is called asynchronously
       return;
     }
     var filteredMenus = scout.menus.filter(this.menus, [allowedType], true),

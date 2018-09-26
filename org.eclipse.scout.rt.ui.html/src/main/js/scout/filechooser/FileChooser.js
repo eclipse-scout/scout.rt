@@ -335,21 +335,3 @@ scout.FileChooser.prototype._onMouseDown = function(event, option) {
     parent.activate();
   }
 };
-
-/**
- * @override Widget.js
- */
-scout.FileChooser.prototype._attach = function() {
-  this.$parent.append(this.$container);
-  this.session.detachHelper.afterAttach(this.$container);
-  scout.FileChooser.parent.prototype._attach.call(this);
-};
-
-/**
- * @override Widget.js
- */
-scout.FileChooser.prototype._detach = function() {
-  this.session.detachHelper.beforeDetach(this.$container);
-  this.$container.detach();
-  scout.FileChooser.parent.prototype._detach.call(this);
-};

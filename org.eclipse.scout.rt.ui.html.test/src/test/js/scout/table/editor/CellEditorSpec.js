@@ -436,13 +436,13 @@ describe("CellEditor", function() {
       expect(table.cancelCellEdit).toHaveBeenCalled();
     });
 
-    it("closes popup (before) table is detached", function() {
+    it("closes popup (before) table is removed", function() {
       row0.cells[0].editable = true;
       table.render();
       table.prepareCellEdit(table.columns[0], row0);
       jasmine.clock().tick();
       expect(table.cellEditorPopup).toBeTruthy();
-      table._beforeDetach(); // called by parent.detach();
+      table.remove(); // called by parent.detach();
       expect(table.cellEditorPopup).toBe(null);
     });
 

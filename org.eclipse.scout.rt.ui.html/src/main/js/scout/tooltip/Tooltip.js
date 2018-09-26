@@ -38,32 +38,13 @@ scout.Tooltip = function() {
   this.$content;
   this.menus = [];
   this._addWidgetProperties(['menus']);
-  this._renderLater = false;
-  this.renderLaterPredicate = this._shouldRenderLater.bind(this); // allow replacing the predicate by the creator of the tooltip
 };
 scout.inherits(scout.Tooltip, scout.Widget);
 
-/**
- * We override the public render function here because we must also execute postRender
- * (for tooltip positioning) when we render the tooltip 'later'. Basically all this is
- * required because this.entryPoint() cannot be called while a parent of the tooltip is
- * detached. So we must wait until the parent is attached again before we can render
- * our tooltip.
- */
 scout.Tooltip.prototype.render = function($parent) {
-  // when the parent of the tooltip is detached,
-  // or the tooltip-anchor is detached
-  if (this.renderLaterPredicate()) {
-    this._renderLater = true;
-    return;
-  }
   // Use entry point by default
   $parent = $parent || this.entryPoint();
   scout.Tooltip.parent.prototype.render.call(this, $parent);
-};
-
-scout.Tooltip.prototype._shouldRenderLater = function() {
-  return !this.parent.isAttachedAndRendered() || this.$anchor && !this.$anchor.isAttached();
 };
 
 scout.Tooltip.prototype._render = function() {
@@ -112,13 +93,6 @@ scout.Tooltip.prototype._render = function() {
   if (this.dialog) {
     this._moveHandler = this.position.bind(this);
     this.dialog.on('move', this._moveHandler);
-  }
-};
-
-scout.Tooltip.prototype._afterAttach = function() {
-  if (this._renderLater && !this.rendered) {
-    this.render();
-    this._renderLater = false;
   }
 };
 

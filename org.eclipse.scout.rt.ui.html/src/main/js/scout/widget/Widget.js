@@ -39,7 +39,6 @@ scout.Widget = function() {
    * The 'rendered' flag is set the true when initial rendering of the widget is completed.
    */
   this.rendered = false;
-  this.attached = false;
   this.destroyed = false;
   this.destroying = false;
 
@@ -295,7 +294,6 @@ scout.Widget.prototype.render = function($parent) {
   this.session.keyStrokeManager.installKeyStrokeContext(this.keyStrokeContext);
   this.rendering = false;
   this.rendered = true;
-  this.attached = true;
   this.trigger('render');
   this._postRender();
   this.restoreFocus();
@@ -404,7 +402,6 @@ scout.Widget.prototype._removeInternal = function() {
   this._remove();
   this.$parent = null;
   this.rendered = false;
-  this.attached = false;
   this.removing = false;
   this.trigger('remove');
 };
@@ -1051,83 +1048,6 @@ scout.Widget.prototype.window = function(domElement) {
 scout.Widget.prototype.document = function(domElement) {
   var $el = this.$container || this.$parent;
   return $el ? $el.document(domElement) : (domElement ? null : $(null));
-};
-
-/**
- * This method attaches the detached $container to the DOM.
- */
-scout.Widget.prototype.attach = function() {
-  if (this.attached || !this.rendered) {
-    return;
-  }
-  this._attach();
-  this._afterAttach();
-  this._triggerChildrenAfterAttach(this);
-};
-
-scout.Widget.prototype._triggerChildrenAfterAttach = function(parent) {
-  this.children.forEach(function(child) {
-    child._afterAttach();
-    child._triggerChildrenAfterAttach(parent);
-  });
-};
-
-scout.Widget.prototype._afterAttach = function() {
-  // NOP
-};
-
-/**
- * Override this method to do something when Widget is attached again. Typically
- * you will append this.$container to this.$parent. The default implementation
- * sets this.attached to true.
- *
- * @param the event.target property is used to decide if a Widget must attach
- *   its $container. When the parent of the Widget already attaches, the Widget
- *   itself must _not_ attach its own $container. That's why we should only
- *   attach when event.target is === this.
- */
-scout.Widget.prototype._attach = function() {
-  this.attached = true;
-};
-
-/**
- * This method calls detach() on all child-widgets. It is used to store some data
- * before a DOM element is detached and propagate the detach "event" to all child-
- * widgets, because when a DOM element is detached - child elements are not notified
- */
-scout.Widget.prototype.detach = function() {
-  if (this.rendering) {
-    // Defer the execution of detach. If it was detached while rendering the attached flag would be wrong.
-    this._postRenderActions.push(this.detach.bind(this));
-  }
-  if (!this.attached || !this.rendered || this._isRemovalPending()) {
-    return;
-  }
-
-  this._triggerChildrenBeforeDetach(this);
-  this._beforeDetach();
-  this._detach();
-};
-
-/**
- * Override this method to do something when Widget is detached. Typically you
- * will call this.$container.detach() here and use the DetachHelper to store
- * additional state (focus, scrollbars) for the detached element. The default
- * implementation sets this.attached to false.
- */
-scout.Widget.prototype._detach = function() {
-  this.attached = false;
-};
-
-scout.Widget.prototype._triggerChildrenBeforeDetach = function() {
-  this.children.forEach(function(child) {
-    child._beforeDetach();
-    child._triggerChildrenBeforeDetach(parent);
-  });
-};
-
-scout.Widget.prototype._beforeDetach = function(parent) {
-  // NOP
 };
 
 /**
@@ -1942,13 +1862,6 @@ scout.Widget.prototype.visitChildren = function(visitor) {
       child.visitChildren(visitor);
     }
   }, this);
-};
-
-/**
- * @returns {boolean} Whether or not the widget is rendered (or rendering) and the DOM $container isAttached()
- */
-scout.Widget.prototype.isAttachedAndRendered = function() {
-  return (this.rendered || this.rendering) && this.$container.isAttached();
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

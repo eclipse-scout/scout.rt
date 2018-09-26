@@ -29,7 +29,6 @@ scout.Session = function() {
   this.persistent = false;
   this.desktop;
   this.layoutValidator = new scout.LayoutValidator();
-  this.detachHelper = new scout.DetachHelper(this);
   this.focusManager;
   this.keyStrokeManager;
 

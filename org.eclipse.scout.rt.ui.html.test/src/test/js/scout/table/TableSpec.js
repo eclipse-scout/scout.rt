@@ -2456,54 +2456,6 @@ describe("Table", function() {
 
   });
 
-  describe("View range markers", function() {
-
-    // Test case for ticket #216194
-    it("Must not throw an error when called in detached state", function() {
-
-      // delete second row (which has never been rendered, row.$row is not set)
-      // this was the first bug corrected in ticket #216194 and was solved
-      // in _removeRows by only doing consistency checks when table is attached
-      runTest(1);
-
-      // delete first row
-      // this was the second bug corrected in ticket #216194 and was solved
-      // when render/removeRangeMarker handled a row that was never rendered
-      // add/removeClass calls failed with an error
-      runTest(0);
-
-      // Simply expect no error was thrown (can be replaced with expect().nothing()
-      // in newer Jasmine versions). This is just to avoid the 'no expectations'
-      // warning in the console.
-      expect(true).toBeTruthy();
-
-      function runTest(rowToDeleteIndex) {
-        var model = helper.createModelFixture(1, 1);
-        model.viewRangeSize = 3;
-        var table = helper.createTable(model);
-        table.render();
-        table.detach();
-
-        // Add rows while we're in detached state
-        var rows = [];
-        for (var i = 0; i < 4; i++) {
-          rows.push(helper.createModelRow(i));
-        }
-        table.insertRows(rows);
-        // Show rows 0, 1 and 2 - row 3 is out of view range
-        // this is normally set by the TableLayout
-        table.viewRangeRendered = new scout.Range(0, 2);
-
-        setTimeout(function() {
-          table.deleteRow(table.filteredRows()[rowToDeleteIndex]);
-        });
-
-        jasmine.clock().tick();
-      }
-    });
-
-  });
-
   describe("Column visibility", function() {
 
     it("update headers and rows when visibility of a column changes", function() {
