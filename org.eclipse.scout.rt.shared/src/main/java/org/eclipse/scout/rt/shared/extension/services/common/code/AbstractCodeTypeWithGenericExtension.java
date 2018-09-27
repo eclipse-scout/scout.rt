@@ -26,9 +26,6 @@ public abstract class AbstractCodeTypeWithGenericExtension<CODE_TYPE_ID, CODE_ID
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * @param owner
-   */
   public AbstractCodeTypeWithGenericExtension(OWNER owner) {
     super(owner);
   }

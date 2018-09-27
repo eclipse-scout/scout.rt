@@ -18,11 +18,7 @@ public abstract class AbstractCodeTypeExtension<CODE_TYPE_ID, CODE_ID, OWNER ext
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * @param owner
-   */
   public AbstractCodeTypeExtension(OWNER owner) {
     super(owner);
   }
-
 }
