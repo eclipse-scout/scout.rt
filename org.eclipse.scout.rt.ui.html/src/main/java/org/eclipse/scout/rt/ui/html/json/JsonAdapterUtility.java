@@ -10,9 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -80,32 +78,14 @@ public final class JsonAdapterUtility {
    * hierarchy of the given parent, <code>null</code> is returned.
    */
   public static IJsonAdapter<?> findChildAdapter(IJsonAdapter<?> parentJsonAdapter, IFormField formField) {
-    // Find all parent model fields of the given formField (ordered from top to bottom)
-    List<IFormField> fieldHierarchy = getFieldHierarchy(formField);
-
-    // Starting from the given parent adapter, resolve the corresponding adapters for all fields in
-    // the hierarchy. Eventually, we should find the adapter that corresponds to the given formField.
-    IJsonAdapter<?> formFieldAdapter = parentJsonAdapter;
-    for (IFormField field : fieldHierarchy) {
-      if (formFieldAdapter != null) {
-        formFieldAdapter = formFieldAdapter.getAdapter(field);
+    if (parentJsonAdapter != null) {
+      for (IJsonAdapter<?> potential : parentJsonAdapter.getUiSession().getJsonAdapters(formField)) {
+        if (potential.hasAncestor(parentJsonAdapter)) {
+          return potential;
+        }
       }
     }
-    return formFieldAdapter;
-  }
-
-  /**
-   * Returns an ordered list with the given formField as last element and the top-most parent field as first element.
-   * <p>
-   * Example: StringField -> [ GroupBox, GroupBox, TabBox, GroupBox, SequenceBox, StringField ].
-   */
-  private static List<IFormField> getFieldHierarchy(IFormField formField) {
-    List<IFormField> fieldHierarchy = new ArrayList<>();
-    while (formField != null) {
-      fieldHierarchy.add(0, formField);
-      formField = formField.getParentField();
-    }
-    return fieldHierarchy;
+    return null;
   }
 
   /**
