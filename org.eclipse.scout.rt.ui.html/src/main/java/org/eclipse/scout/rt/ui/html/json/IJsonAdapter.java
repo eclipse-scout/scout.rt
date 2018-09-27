@@ -84,6 +84,8 @@ public interface IJsonAdapter<T> extends IJsonObject {
 
   IJsonAdapter<?> getParent();
 
+  boolean hasAncestor(IJsonAdapter<?> ancestor);
+
   /**
    * Consumes all buffered model events, if there are any. The buffer will be empty afterwards.
    */

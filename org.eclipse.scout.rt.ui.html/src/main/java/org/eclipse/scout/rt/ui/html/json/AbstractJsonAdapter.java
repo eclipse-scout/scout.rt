@@ -60,6 +60,18 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   @Override
+  public boolean hasAncestor(IJsonAdapter<?> ancestor) {
+    IJsonAdapter<?> parent = getParent();
+    if (parent == null) {
+      return false;
+    }
+    if (parent == ancestor) {
+      return true;
+    }
+    return parent.hasAncestor(ancestor);
+  }
+
+  @Override
   public T getModel() {
     return m_model;
   }
