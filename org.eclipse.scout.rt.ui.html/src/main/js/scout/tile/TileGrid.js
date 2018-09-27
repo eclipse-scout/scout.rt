@@ -43,7 +43,6 @@ scout.TileGrid = function() {
   this.virtualScrolling = null;
   this.withPlaceholders = false;
   this._filterMenusHandler = this._filterMenus.bind(this);
-  this._renderViewPortAfterAttach = false;
   this._scrollParentScrollHandler = this._onScrollParentScroll.bind(this);
   this._addWidgetProperties(['tiles', 'selectedTiles', 'menus']);
   this._addPreserveOnPropertyChangeProperties(['selectedTiles']);
@@ -158,16 +157,6 @@ scout.TileGrid.prototype._remove = function() {
   this.viewRangeRendered = new scout.Range(0, 0);
   this._updateVirtualScrollable();
   scout.TileGrid.parent.prototype._remove.call(this);
-};
-
-/**
- * @override
- */
-scout.TileGrid.prototype._afterAttach = function() {
-  if (this._renderViewPortAfterAttach) {
-    this._renderViewPort();
-    this._renderViewPortAfterAttach = false;
-  }
 };
 
 scout.TileGrid.prototype._renderEnabled = function() {
@@ -1220,11 +1209,6 @@ scout.TileGrid.prototype.rowCount = function(gridColumnCount) {
  * Calculates and renders the rows which should be visible in the current viewport based on scroll top.
  */
 scout.TileGrid.prototype._renderViewPort = function() {
-  if (!this.isAttachedAndRendered()) {
-    // if grid is not attached the correct viewPort can not be evaluated. Mark for render after attach.
-    this._renderViewPortAfterAttach = true;
-    return;
-  }
   if (!this.virtual) {
     return;
   }
@@ -1359,8 +1343,8 @@ scout.TileGrid.prototype._removeTileByFilter = function(tile) {
   tile.animateRemoval = false;
   // Remove animation is started by a set timeout -> use set timeout as well to come after
   setTimeout(function() {
-   // Reset to default
-   tile.animateRemovalClass = 'animate-remove';
+    // Reset to default
+    tile.animateRemovalClass = 'animate-remove';
   });
 };
 
