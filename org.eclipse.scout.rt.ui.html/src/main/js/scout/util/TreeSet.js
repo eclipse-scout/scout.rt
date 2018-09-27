@@ -13,7 +13,7 @@
  */
 scout.TreeSet = function() {
   this.array = [];
-  this.properties = {};
+  this.properties = scout.objects.createMap();
 };
 
 scout.TreeSet.prototype.add = function(value) {
