@@ -87,6 +87,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   private ITree m_tree;
   private Element m_initValue;
   private IDataModel m_dataModel;
+  private boolean m_rootNodeInstalled = false;
 
   public AbstractComposerField() {
     this(true);
@@ -328,10 +329,6 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     }
 
     if (m_tree != null) {
-      RootNode rootNode = interceptCreateRootNode();
-      rootNode.getCellForUpdate().setText(getLabel());
-      m_tree.setRootNode(rootNode);
-      m_tree.setNodeExpanded(rootNode, true);
       m_tree.setEnabled(isEnabled());
       m_tree.addTreeListener(
           new TreeAdapter() {
@@ -374,6 +371,13 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   @Override
   protected void initFieldInternal() {
     getTree().initTree();
+    if (!m_rootNodeInstalled) {
+      RootNode rootNode = interceptCreateRootNode();
+      rootNode.getCellForUpdate().setText(getLabel());
+      m_tree.setRootNode(rootNode);
+      m_tree.setNodeExpanded(rootNode, true);
+      m_rootNodeInstalled = true;
+    }
     super.initFieldInternal();
   }
 

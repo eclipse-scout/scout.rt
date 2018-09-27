@@ -20,6 +20,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EitherOrNode;
+import org.eclipse.scout.rt.client.ui.form.fields.composer.node.RootNode;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerEitherOrNodeData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.TreeNodeData;
@@ -135,6 +136,26 @@ public class ComposerFieldTest {
     assertTrue(or2Node instanceof EitherOrNode);
     assertFalse(((EitherOrNode) or2Node).isBeginOfEitherOr());
     assertFalse(((EitherOrNode) or2Node).isNegative());
+  }
+
+  /**
+   * Expects that root node has to be created during init and not during initConfig.
+   * <p>
+   * Reason: AbstractTreeNode executes execInit while constructor runs (and not during init as for every other widget).
+   * Since the entity nodes create actions which add listeners to the data model during that time, the listeners might
+   * never get removed, because execDipose might never be called. This can happen if a form is created, but never
+   * started and thus init never called. If it is not started, calling close won't call dispose. This behavior of the
+   * form is correct, because dispose() is the counterpart to init(), so if init() is not called, dispose() won't be
+   * called as well.
+   */
+  @Test
+  public void testCreateNodeOnInit() throws Exception {
+    ComposerField composerField = new ComposerField();
+    assertFalse(composerField.getTree().getRootNode() instanceof RootNode);
+
+    composerField.initField();
+    assertTrue(composerField.getTree().getRootNode() instanceof RootNode);
+    assertFalse(composerField.isSaveNeeded()); // Assert that inserting the root node did not accidentally changed the state
   }
 
   /* --------------------------------------------------------------------------
