@@ -248,12 +248,16 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   @ConfigOperation
   @Order(110)
   protected EntityNode execCreateEntityNode(ITreeNode parentNode, IDataModelEntity e, boolean negated, List<?> values, List<String> texts) {
-    EntityNode node = new EntityNode(this, e);
+    EntityNode node = createEntityNode(e);
     node.setValues(values);
     node.setTexts(texts);
     node.setNegative(negated);
     node.setStatus(ITreeNode.STATUS_INSERTED);
     return node;
+  }
+
+  protected EntityNode createEntityNode(IDataModelEntity entity) {
+    return new EntityNode(this, entity);
   }
 
   /**
@@ -270,13 +274,17 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     if (aggregationType != null && aggregationType == DataModelConstants.AGGREGATION_NONE) {
       aggregationType = null;
     }
-    AttributeNode node = new AttributeNode(this, a);
+    AttributeNode node = createAttributeNode(a);
     node.setAggregationType(aggregationType);
     node.setOp(op);
     node.setValues(values);
     node.setTexts(texts);
     node.setStatus(ITreeNode.STATUS_INSERTED);
     return node;
+  }
+
+  protected AttributeNode createAttributeNode(IDataModelAttribute attribute) {
+    return new AttributeNode(this, attribute);
   }
 
   /**
@@ -289,10 +297,14 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   @ConfigOperation
   @Order(130)
   protected EitherOrNode execCreateEitherNode(ITreeNode parentNode, boolean negated) {
-    EitherOrNode node = new EitherOrNode(this, true);
+    EitherOrNode node = createEitherOrNode(true);
     node.setNegative(negated);
     node.setStatus(ITreeNode.STATUS_INSERTED);
     return node;
+  }
+
+  protected EitherOrNode createEitherOrNode(boolean beginEitherOr) {
+    return new EitherOrNode(this, beginEitherOr);
   }
 
   /**
@@ -305,7 +317,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   @ConfigOperation
   @Order(140)
   protected EitherOrNode execCreateAdditionalOrNode(ITreeNode eitherOrNode, boolean negated) {
-    EitherOrNode node = new EitherOrNode(this, false);
+    EitherOrNode node = createEitherOrNode(false);
     node.setNegative(negated);
     node.setStatus(ITreeNode.STATUS_INSERTED);
     return node;
