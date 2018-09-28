@@ -13,7 +13,8 @@ scout.Scrollbar = function() {
 
   // jQuery Elements
   this.$container; // Scrollbar <div>
-  this.$thumb; // Scrollbar Thumb <div> ("handle")
+  this.$thumb; // thumb body for layout purposes <div>
+  this.$thumbHandle; // thumb handle <div>
 
   // Defaults
   this.axis = 'y';
@@ -53,6 +54,9 @@ scout.Scrollbar.prototype._render = function() {
     .addClass(this.axis + '-axis');
   this._$thumb = this.$container
     .appendDiv('scrollbar-thumb')
+    .addClass(this.axis + '-axis');
+  this._$thumbHandle = this._$thumb
+    .appendDiv('scrollbar-thumb-handle')
     .addClass(this.axis + '-axis');
 
   if (this.borderless) {

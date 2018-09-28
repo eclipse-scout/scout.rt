@@ -16,10 +16,14 @@
   cursor: pointer;
   overflow: hidden;
 
+  #scout.scrollbar-y-padding();
+  #scout.scrollbar-x-padding();
+
   &.y-axis {
     height: calc(~'100%' - 2 * @scrollbar-margin);
     width: @scrollbar-size;
-    margin: @scrollbar-margin @scrollbar-side-margin;
+    margin-top: @scrollbar-margin;
+    margin-bottom: @scrollbar-margin;
 
     &.borderless {
       margin-left: 0;
@@ -30,7 +34,8 @@
   &.x-axis {
     width: calc(~'100%' - 2 * @scrollbar-margin);
     height: @scrollbar-size;
-    margin: @scrollbar-side-margin @scrollbar-margin;
+    margin-left: @scrollbar-margin;
+    margin-right: @scrollbar-margin;
 
     &.borderless {
       margin-top: 0;
@@ -39,9 +44,8 @@
   }
 }
 
-.scrollbar-thumb {
-  position: absolute;
-  cursor: pointer;
+.scrollbar-thumb-handle {
+  height: 100%;
   border-radius: 4px;
   background-color: @scrollbar-thumb-color;
 
@@ -68,41 +72,54 @@
   &.y-axis {
     width: @scrollbar-thumb-size;
     top: 0;
-    right: @scrollbar-size / 2 - @scrollbar-thumb-size / 2;
-    transition: width @scrollbar-size-transition-speed, right @scrollbar-size-transition-speed;
+    transition: width @scrollbar-size-transition-speed;
 
-    .scrollbar:hover > &,
-    &.scrollbar-thumb-move {
+    .scrollbar:hover > .scrollbar-thumb > &,
+    .scrollbar-thumb-move > & {
       width: @scrollbar-thumb-hover-size;
-      right: 0;
     }
   }
 
   &.x-axis {
     height: @scrollbar-thumb-size;
     left: 0;
-    bottom: @scrollbar-size / 2 - @scrollbar-thumb-size / 2;
-    transition: height @scrollbar-size-transition-speed, bottom @scrollbar-size-transition-speed;
+    transition: height @scrollbar-size-transition-speed;
 
-    .scrollbar:hover > &,
-    &.scrollbar-thumb-move {
+    .scrollbar:hover > .scrollbar-thumb > &,
+    .scrollbar-thumb-move > & {
       height: @scrollbar-thumb-hover-size;
-      bottom: 0;
     }
   }
 }
 
-.scrollbar-thumb-move,
-.scrollbar-thumb:hover {
+.scrollbar-thumb {
+  cursor: pointer;
+  position: absolute;
+
+  &.y-axis {
+    width: @scrollbar-size;
+    top: 0;
+    transition: padding-left @scrollbar-size-transition-speed;
+  }
+
+  &.x-axis {
+    height: @scrollbar-size;
+    left: 0;
+    transition: padding-top @scrollbar-size-transition-speed;
+  }
+}
+
+.scrollbar-thumb.scrollbar-thumb-move > .scrollbar-thumb-handle,
+.scrollbar-thumb:hover > .scrollbar-thumb-handle {
   background-color: @scrollbar-thumb-hover-color;
 }
 
-.container-too-small-for-thumb {
+.container-too-small-for-thumb > .scrollbar-thumb-handle {
   border-radius: 0;
   background-color: @scrollbar-thumb-small-color;
 }
 
-.container-too-small-for-thumb.scrollbar-thumb-move,
-.container-too-small-for-thumb.scrollbar-thumb:hover {
+.container-too-small-for-thumb.scrollbar-thumb-move > .scrollbar-thumb-handle,
+.container-too-small-for-thumb.scrollbar-thumb:hover > .scrollbar-thumb-handle {
   background-color: @scrollbar-thumb-small-hover-color;
 }

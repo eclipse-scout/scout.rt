@@ -452,4 +452,27 @@
       border-radius: @control-alternative-border-radius;
     }
   }
+
+  /* Mixin for scrollbar positioning */
+  .scrollbar-y-padding(@padding: @scrollbar-side-padding, @padding-hover: @scrollbar-side-padding-hover) {
+    & > .scrollbar-thumb.y-axis {
+      padding-left: @padding;
+    }
+
+    &:hover.y-axis > .scrollbar-thumb.y-axis,
+    &.y-axis > .scrollbar-thumb.y-axis.scrollbar-thumb-move {
+      padding-left: @padding-hover;
+    }
+  }
+
+  .scrollbar-x-padding(@padding: @scrollbar-side-padding, @padding-hover: @scrollbar-side-padding-hover) {
+    & > .scrollbar-thumb.x-axis {
+      padding-top: @padding;
+    }
+
+    &:hover.x-axis > .scrollbar-thumb.x-axis,
+    &.x-axis > .scrollbar-thumb.x-axis.scrollbar-thumb-move {
+      padding-top: @padding-hover;
+    }
+  }
 }

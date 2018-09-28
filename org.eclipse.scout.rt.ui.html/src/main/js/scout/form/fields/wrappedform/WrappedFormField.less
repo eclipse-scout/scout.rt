@@ -23,9 +23,9 @@
     overflow: visible; /* allow overflow for the root-group-box for wrapped forms */
 
     & > .group-box-body {
-      & > .scrollbar.y-axis {
+      & > .scrollbar {
         /* position scrollbar as right as possible to prevent overlapping field parts. */
-        margin-right: 0;
+        #scout.scrollbar-y-padding(6px, 4px);
       }
     }
   }

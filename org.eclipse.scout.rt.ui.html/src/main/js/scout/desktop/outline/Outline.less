@@ -18,16 +18,19 @@
   & > .tree-data  {
 
     & > .scrollbar {
+
+      #scout.scrollbar-y-padding(2px, 0px);
+
       &.y-axis {
-        margin-right: 6px;
+        width: 14px;
       }
 
-      & > .scrollbar-thumb {
+      & > .scrollbar-thumb > .scrollbar-thumb-handle {
         background-color: @outline-scrollbar-thumb-color;
       }
 
-      & > .scrollbar-thumb-move,
-      & > .scrollbar-thumb:hover {
+      & > .scrollbar-thumb-move > .scrollbar-thumb-handle,
+      & > .scrollbar-thumb:hover > .scrollbar-thumb-handle {
         background-color: @outline-scrollbar-thumb-hover-color;
       }
     }
