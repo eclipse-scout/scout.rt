@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -46,6 +47,7 @@ import org.eclipse.scout.rt.ui.html.json.desktop.bench.layout.JsonBenchLayoutDat
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +64,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
   private static final String EVENT_REMOVE_NOTIFICATION = "removeNotification";
   private static final String EVENT_OPEN_URI = "openUri";
   private static final String EVENT_FORM_ACTIVATE = "formActivate";
+  private static final String EVENT_CLOSE_FORMS = "closeForms";
 
   public static final String PROP_OUTLINE = "outline";
   public static final String PROP_DISPLAY_PARENT = "displayParent";
@@ -118,6 +121,9 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
     else if (EVENT_GEOLOCATION_DETERMINED.equals(event.getType())) {
       handleUiGeolocationDetermined(event);
     }
+    else if (EVENT_CLOSE_FORMS.equals(event.getType())) {
+      handleCloseAllForms(event);
+    }
     else {
       super.handleUiEvent(event);
     }
@@ -159,6 +165,22 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
     else {
       super.handleUiPropertyChange(propertyName, data);
     }
+  }
+
+  protected void handleCloseAllForms(JsonEvent event) {
+    JSONArray formIds = event.getData().optJSONArray("formIds");
+    HashSet<IForm> formSet = new HashSet<>();
+    if (formIds != null) {
+      for (int i = 0; i < formIds.length(); i++) {
+        String formId = formIds.optString(i, null);
+        IJsonAdapter<?> jsonAdapter = getUiSession().getJsonAdapter(formId);
+        if (jsonAdapter == null) {
+          continue;
+        }
+        formSet.add((IForm) jsonAdapter.getModel());
+      }
+    }
+    getModel().closeForms(formSet);
   }
 
   protected void handleUiGeolocationDetermined(JsonEvent event) {

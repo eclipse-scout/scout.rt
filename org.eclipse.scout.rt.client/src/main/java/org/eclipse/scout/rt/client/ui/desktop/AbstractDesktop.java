@@ -1963,6 +1963,9 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       showedForms.add(form);
     }
 
+    // close open forms
+    closeFormsInternal(showedForms);
+
     //extensions
     for (IDesktopExtension ext : getDesktopExtensions()) {
       try {
@@ -1976,11 +1979,11 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       }
     }
 
-    // close messageboxes
+    // close potential remaining messageboxes
     for (IMessageBox m : getMessageBoxes()) {
       if (m != null) {
         try {
-          m.getUIFacade().setResultFromUI(IMessageBox.CANCEL_OPTION);
+          m.doClose();
         }
         catch (RuntimeException | PlatformError e) {
           LOG.error("Exception while closing messagebox", e);
@@ -1988,11 +1991,11 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       }
     }
 
-    // close filechoosers
+    // close potential remaining filechoosers
     for (IFileChooser f : getFileChoosers()) {
       if (f != null) {
         try {
-          f.getUIFacade().setResultFromUI(Collections.emptyList());
+          f.doClose();
         }
         catch (RuntimeException | PlatformError e) {
           LOG.error("Exception while closing filechooser", e);
@@ -2013,19 +2016,24 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       }
     }
 
-    // close open forms
-    for (IForm form : showedForms) {
+    fireDesktopClosed();
+  }
+
+  protected boolean closeFormsInternal(Collection<IForm> forms) {
+    for (IForm form : forms) {
       if (form != null) {
         try {
+          // close potential open MessageBoxes and FileChoosers, otherwise blocking threads will remain
+          getMessageBoxes(form).forEach(msgBox -> msgBox.doClose());
+          getFileChoosers(form).forEach(fileChooser -> fileChooser.doClose());
           form.doClose();
         }
         catch (RuntimeException | PlatformError e) {
-          LOG.error("Exception while closing form", e);
+          LOG.error("Exception while closing forms", e);
         }
       }
     }
-
-    fireDesktopClosed();
+    return true;
   }
 
   private void attachGui() {
@@ -2512,14 +2520,13 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
    */
   @Override
   public boolean doBeforeClosingInternal() {
-    return isForcedClosing() || (continueClosingInDesktopExtensions() && continueClosingConsideringUnsavedForms());
+    return isForcedClosing() || (continueClosingInDesktopExtensions() && continueClosingConsideringUnsavedForms(getUnsavedForms(), true));
   }
 
-  protected boolean continueClosingConsideringUnsavedForms() {
-    List<IForm> forms = getUnsavedForms();
+  protected boolean continueClosingConsideringUnsavedForms(List<IForm> forms, boolean isStopSession) {
     if (!forms.isEmpty()) {
       try {
-        UnsavedFormChangesForm f = new UnsavedFormChangesForm(forms);
+        UnsavedFormChangesForm f = new UnsavedFormChangesForm(forms, isStopSession);
         f.startNew();
         f.waitFor();
         if (f.getCloseSystemType() == IButton.SYSTEM_TYPE_CANCEL) {
@@ -2557,16 +2564,43 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   @Override
   public List<IForm> getUnsavedForms() {
+    return getUnsavedForms(null);
+  }
+
+  /**
+   * Open dialogs or views that need to be saved within the given {@link Set} of {@link IForm}s, or within all open
+   * forms when <code>formSet</code> is null.
+   */
+  protected List<IForm> getUnsavedForms(Set<IForm> formSet) {
     List<IForm> saveNeededForms = new ArrayList<>();
     List<IForm> showedForms = m_formStore.values();
+
+    if (formSet != null) {
+      // identify (by displayParent) and add relevant open forms to the formSet
+      // formStore guarantees the order of insertion, therefore nested forms should be collected correctly
+      for (IForm form : showedForms) {
+        if (formSet.contains(form.getDisplayParent())) {
+          formSet.add(form);
+        }
+      }
+    }
+
     // last element on the stack is the first that needs to be saved: iterate from end to start
     for (int i = showedForms.size() - 1; i >= 0; i--) {
       IForm f = showedForms.get(i);
-      if (f.isAskIfNeedSave() && f.isSaveNeeded()) {
+      if ((formSet == null || formSet.contains(f)) && f.isAskIfNeedSave() && f.isSaveNeeded()) {
         saveNeededForms.add(f);
       }
     }
     return saveNeededForms;
+  }
+
+  @Override
+  public boolean closeForms(Set<IForm> formSet) {
+    if (formSet == null || formSet.isEmpty()) {
+      return true;
+    }
+    return continueClosingConsideringUnsavedForms(getUnsavedForms(formSet), false) && closeFormsInternal(formSet);
   }
 
   @Override

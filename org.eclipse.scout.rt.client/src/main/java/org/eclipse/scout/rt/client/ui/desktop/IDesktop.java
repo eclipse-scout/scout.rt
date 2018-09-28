@@ -887,4 +887,17 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * @since 6.1
    */
   Future<Coordinates> requestGeolocation();
+
+  /**
+   * Closes all forms contained in the given {@link Set}. For unsaved forms the user will be asked if they should be
+   * saved or not with a specific dialog (see @link UnsavedFormChangesFrom).
+   *
+   * @param formSet
+   *          {@link Set} of {@link IForm}s that should be closed. Can be null or empty.
+   * @return <code>true</code> if all forms were closed (and saved) successfully or false if the saving dialog was
+   *         cancelled.
+   * @since 9.0
+   */
+  boolean closeForms(Set<IForm> formSet);
+
 }

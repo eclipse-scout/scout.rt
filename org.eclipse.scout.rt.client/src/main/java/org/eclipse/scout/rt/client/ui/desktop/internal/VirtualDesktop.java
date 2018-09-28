@@ -771,4 +771,9 @@ public class VirtualDesktop implements IDesktop {
   public Future<Coordinates> requestGeolocation() {
     throw createUnsupportedOperationException();
   }
+
+  @Override
+  public boolean closeForms(Set<IForm> formSet) {
+    throw createUnsupportedOperationException();
+  }
 }

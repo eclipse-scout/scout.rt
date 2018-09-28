@@ -360,6 +360,23 @@ public class MessageBox extends AbstractWidget implements IMessageBox {
     m_blockingCondition.setBlocking(false);
   }
 
+  @Override
+  public void doClose() {
+    if (!m_answerSet) {
+      m_answerSet = true;
+      if (StringUtility.hasText(m_yesButtonText)) {
+        m_answer = YES_OPTION;
+      }
+      else if (StringUtility.hasText(m_noButtonText)) {
+        m_answer = NO_OPTION;
+      }
+      else if (StringUtility.hasText(m_cancelButtonText)) {
+        m_answer = CANCEL_OPTION;
+      }
+    }
+    closeMessageBox();
+  }
+
   protected class P_UIFacade implements IMessageBoxUIFacade {
 
     @Override

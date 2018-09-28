@@ -136,6 +136,11 @@ public class FileChooser implements IFileChooser {
   }
 
   @Override
+  public void doClose() {
+    setFiles(null);
+  }
+
+  @Override
   public List<BinaryResource> getFiles() {
     return CollectionUtility.arrayList(m_files);
   }

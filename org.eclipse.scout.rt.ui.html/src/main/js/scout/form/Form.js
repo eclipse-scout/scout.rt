@@ -904,6 +904,29 @@ scout.Form.prototype.visitFields = function(visitor) {
   this.rootGroupBox.visitFields(visitor);
 };
 
+/**
+ * Visits all dialogs, messageBoxes and fileChoosers of this form in pre-order (top-down).
+ * filter is an optional parameter.
+ */
+scout.Form.prototype.visitDisplayChildren = function(visitor, filter) {
+  if (!filter) {
+    filter = function(displayChild) {
+      return true;
+    };
+  }
+
+  var visitorFunc = function(child) {
+    visitor(child);
+    // only forms provide a deeper hierarchy
+    if (child instanceof scout.Form) {
+      child.visitDisplayChildren(visitor, filter);
+    }
+  };
+  this.dialogs.filter(filter).forEach(visitorFunc, this);
+  this.messageBoxes.filter(filter).forEach(visitorFunc, this);
+  this.fileChoosers.filter(filter).forEach(visitorFunc, this);
+};
+
 scout.Form.prototype.storeCacheBounds = function(bounds) {
   if (this.cacheBounds) {
     var storageKey = 'scout:formBounds:' + this.cacheBoundsKey;

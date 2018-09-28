@@ -962,6 +962,69 @@ scout.Desktop.prototype.triggerFormActivate = function(form) {
   });
 };
 
+scout.Desktop.prototype.closeViews = function(forms) {
+  var event = new scout.Event();
+  event.forms = forms;
+  this.trigger('closeForms', event);
+  if (!event.defaultPrevented) {
+    this._closeViews(forms);
+  }
+};
+
+scout.Desktop.prototype._closeViews = function(forms) {
+  var formFilter = function(displayChild) {
+    return displayChild instanceof scout.Form;
+  };
+  var unsavedForms = forms.filter(function(form) {
+    var requiresSaveChildDialogs = false;
+    form.visitDisplayChildren(function(dialog) {
+      if (dialog.lifecycle.requiresSave()) {
+        requiresSaveChildDialogs = true;
+      }
+    }, formFilter);
+    return form.lifecycle.requiresSave() || requiresSaveChildDialogs;
+  });
+
+  var waitFor = $.resolvedPromise();
+  if (unsavedForms.length > 0) {
+    var unsavedFormChangesForm = scout.create('scout.UnsavedFormChangesForm', {
+      parent: this.parent,
+      session: this.session,
+      displayParent: this,
+      unsavedForms: unsavedForms
+    });
+    unsavedFormChangesForm.open();
+    waitFor = unsavedFormChangesForm.whenSave().then(function() {
+      var formsToSave = unsavedFormChangesForm.openFormsField.value;
+      formsToSave.forEach(function(form) {
+        form.visitDisplayChildren(function(dialog) {
+          // forms should be stored with ok(). Other display children can simply be closed.
+          if (dialog instanceof scout.Form) {
+            dialog.ok();
+          } else {
+            dialog.close();
+          }
+        });
+        form.ok();
+      });
+      return formsToSave;
+    });
+  }
+  waitFor.then(function(formsToSave) {
+    if (formsToSave) {
+      scout.arrays.removeAll(forms, formsToSave);
+    }
+    forms.forEach(function(form) {
+      form.visitDisplayChildren(function(dialog) {
+        dialog.close();
+      });
+      form.close();
+    });
+  });
+};
+
+
+
 /**
  * Called when the animation triggered by animationLayoutChange is complete (e.g. navigation or bench got visible/invisible)
  */

@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -45,8 +47,11 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 public class UnsavedFormChangesForm extends AbstractForm {
   private final List<IForm> m_forms;
 
-  public UnsavedFormChangesForm(List<IForm> forms) {
+  private boolean m_isStopSession;
+
+  public UnsavedFormChangesForm(List<IForm> forms, boolean isStopSession) {
     m_forms = forms;
+    m_isStopSession = isStopSession;
   }
 
   @Override
@@ -114,7 +119,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
 
       @Order(20)
       @ClassId("84f2a9cf-bce5-4379-aede-11d07b21d3fb")
-      public class OpenFormsField extends AbstractListBox<IForm> {
+      public class OpenFormsField extends AbstractListBox<ArrayDeque<IForm>> {
 
         @Override
         protected void execInitField() {
@@ -123,24 +128,26 @@ public class UnsavedFormChangesForm extends AbstractForm {
 
         public List<IForm> getInvalidForms() {
           LinkedList<IForm> invalidForms = new LinkedList<>();
-          for (IForm f : getValue()) {
-            try {
-              f.validateForm();
-            }
-            catch (RuntimeException e) { // NOSONAR
-              invalidForms.add(f);
+          for (ArrayDeque<IForm> deque : getValue()) {
+            for (IForm f : deque) {
+              try {
+                f.validateForm();
+              }
+              catch (RuntimeException e) { // NOSONAR
+                invalidForms.add(f);
+              }
             }
           }
           return invalidForms;
         }
 
         @Override
-        protected Class<? extends ILookupCall<IForm>> getConfiguredLookupCall() {
+        protected Class<? extends ILookupCall<ArrayDeque<IForm>>> getConfiguredLookupCall() {
           return UnsavedFormsLookupCall.class;
         }
 
         @Override
-        protected void execPrepareLookup(ILookupCall<IForm> call) {
+        protected void execPrepareLookup(ILookupCall<ArrayDeque<IForm>> call) {
           UnsavedFormsLookupCall unsavedFormsLookupCall = (UnsavedFormsLookupCall) call;
           unsavedFormsLookupCall.setUnsavedForms(getUnsavedForms());
         }
@@ -203,18 +210,26 @@ public class UnsavedFormChangesForm extends AbstractForm {
     @Order(20)
     @ClassId("caca3d68-b8cc-4cb0-a35c-5b8ccbcc3745")
     public class OkButton extends AbstractOkButton {
+
       @Override
       protected String getConfiguredTooltipText() {
-        return TEXTS.get("SaveCheckedFormsAndShutdown");
+        if (m_isStopSession) {
+          return TEXTS.get("SaveCheckedFormsAndShutdown");
+        }
+        return null;
       }
     }
 
     @Order(30)
     @ClassId("50c8526a-333f-4878-9876-b48f2b583d88")
     public class CancelButton extends AbstractCancelButton {
+
       @Override
       protected String getConfiguredTooltipText() {
-        return TEXTS.get("CancelShutdownAndReturnToTheApplication");
+        if (m_isStopSession) {
+          return TEXTS.get("CancelShutdownAndReturnToTheApplication");
+        }
+        return null;
       }
     }
   }
@@ -242,36 +257,57 @@ public class UnsavedFormChangesForm extends AbstractForm {
 
     @Override
     protected void execStore() {
-      for (IForm f : getOpenFormsField().getValue()) {
-        if (f instanceof IWizardContainerForm) {
-          ((IWizardContainerForm) f).getWizard().doFinish();
-        }
-        else {
-          f.doOk();
+      for (ArrayDeque<IForm> deque : getOpenFormsField().getValue()) {
+        for (IForm f : deque) {
+          if (f instanceof IWizardContainerForm) {
+            ((IWizardContainerForm) f).getWizard().doFinish();
+          }
+          else {
+            f.doOk();
+          }
         }
       }
     }
   }
 
-  private static String getFormDisplayName(IForm f) {
+  protected static String getFormDisplayName(IForm f) {
     return StringUtility.join(" - ", ObjectUtility.nvl(f.getTitle(), f.getClass().getName()), f.getSubTitle());
+  }
+
+  protected static IForm getTopDisplayParent(IForm f) {
+    if (!(f.getDisplayParent() instanceof IDesktop) && (f.getDisplayParent() instanceof IForm)) {
+      return getTopDisplayParent((IForm) f.getDisplayParent());
+    }
+    return f;
   }
 
   @SuppressWarnings({"serial", "squid:S2057"})
   @ClassId("70052229-e6e5-43f3-bac5-cabe6e4525d3")
-  public static class UnsavedFormsLookupCall extends LocalLookupCall<IForm> {
+  public static class UnsavedFormsLookupCall extends LocalLookupCall<ArrayDeque<IForm>> {
     private List<IForm> m_unsavedForms;
+    private HashMap<IForm, ArrayDeque<IForm>> m_unsavedFormsStructured;
 
     public void setUnsavedForms(List<IForm> unsavedForms) {
       m_unsavedForms = unsavedForms;
+
+      m_unsavedFormsStructured = new HashMap<>();
+      for (IForm f : unsavedForms) {
+        IForm topDisplayParent = getTopDisplayParent(f);
+        ArrayDeque<IForm> deque = m_unsavedFormsStructured.get(topDisplayParent);
+        if (deque == null) {
+          deque = new ArrayDeque<>();
+        }
+        deque.add(f);
+        m_unsavedFormsStructured.put(topDisplayParent, deque);
+      }
     }
 
     @Override
-    protected List<? extends ILookupRow<IForm>> execCreateLookupRows() {
-      List<ILookupRow<IForm>> formRows = new ArrayList<>();
-      for (IForm f : m_unsavedForms) {
+    protected List<? extends ILookupRow<ArrayDeque<IForm>>> execCreateLookupRows() {
+      List<ILookupRow<ArrayDeque<IForm>>> formRows = new ArrayList<>();
+      for (IForm f : m_unsavedFormsStructured.keySet()) {
         String text = getFormDisplayName(f);
-        formRows.add(new LookupRow<>(f, text).withTooltipText(text));
+        formRows.add(new LookupRow<>(m_unsavedFormsStructured.get(f), text).withTooltipText(text));
       }
       return formRows;
     }

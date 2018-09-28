@@ -1372,4 +1372,384 @@ describe('Desktop', function() {
     });
   });
 
+  describe('closeViewsMenu', function() {
+
+    var view1, view2, view3, promises;
+
+    beforeEach(function() {
+      session._renderDesktop();
+
+      promises = [];
+
+      view1 = formHelper.createViewWithOneField();
+      view2 = formHelper.createViewWithOneField();
+      view3 = formHelper.createViewWithOneField();
+
+      desktop.showForm(view1);
+      desktop.showForm(view2);
+      desktop.showForm(view3);
+
+      spyOn(view1, 'close').and.callThrough();
+      spyOn(view2, 'close').and.callThrough();
+      spyOn(view3, 'close').and.callThrough();
+
+      spyOn(view1, 'ok').and.callThrough();
+      spyOn(view2, 'ok').and.callThrough();
+      spyOn(view3, 'ok').and.callThrough();
+    });
+
+    afterEach(function() {
+      view1.close();
+      view2.close();
+      view3.close();
+    });
+
+    it('check open tabs', function() {
+      expect(desktop.bench.getViews()).toEqual([view3, view2, view1]);
+    });
+
+    it('close all open tabs on desktop', function(done) {
+      promises.push(view1.whenClose());
+      promises.push(view2.whenClose());
+      promises.push(view3.whenClose());
+
+      desktop.closeViews([view1, view2, view3]);
+
+      $.promiseAll(promises).then(function() {
+          expect(view1.close).toHaveBeenCalled();
+          expect(view2.close).toHaveBeenCalled();
+          expect(view3.close).toHaveBeenCalled();
+          expect(desktop.views).toEqual([]);
+        })
+        .catch(fail)
+        .always(done);
+    });
+
+    it('close some open tabs on desktop', function(done) {
+      promises.push(view1.whenClose());
+      promises.push(view2.whenClose());
+
+      desktop.closeViews([view1, view2]);
+
+      $.promiseAll(promises).then(function() {
+          expect(view1.close).toHaveBeenCalled();
+          expect(view2.close).toHaveBeenCalled();
+          expect(view3.close).not.toHaveBeenCalled();
+          expect(desktop.bench.getViews()).toEqual([view3]);
+        })
+        .catch(fail)
+        .always(done);
+    });
+
+    it('close tabs and save unsaved changes', function(done) {
+      view2.rootGroupBox.fields[0].setValue('Foo');
+
+      promises.push(view1.whenClose());
+      promises.push(view2.whenSave());
+      promises.push(view2.whenClose());
+
+      desktop.closeViews([view1, view2]);
+      // UnsavedFormChangesForm should be the last child
+      var unsavedFormChangesForm = scout.arrays.last(desktop.children);
+      expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
+      unsavedFormChangesForm.whenPostLoad().then(function() {
+        var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+        expect(openFormsField.id).toBe('OpenFormsField');
+        // default is all selected, view2 should be saved
+        expect(openFormsField.value.length).toBe(1);
+        expect(openFormsField.value[0]).toEqual(view2);
+        unsavedFormChangesForm.ok();
+      });
+
+      $.promiseAll(promises).then(function() {
+          expect(view1.close).toHaveBeenCalled();
+          expect(view2.ok).toHaveBeenCalled();
+          expect(desktop.bench.getViews()).toEqual([view3]);
+        })
+        .catch(fail)
+        .always(done);
+    });
+
+    it('close tabs and cancel UnsavedFormChangesForm', function(done) {
+      view2.rootGroupBox.fields[0].setValue('Foo');
+
+      desktop.closeViews([view1, view2]);
+      // UnsavedFormChangesForm should be the last child
+      var unsavedFormChangesForm = scout.arrays.last(desktop.children);
+      expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
+      unsavedFormChangesForm.whenPostLoad().then(function() {
+        unsavedFormChangesForm.close();
+      });
+
+      unsavedFormChangesForm.whenClose().then(function() {
+          expect(desktop.bench.getViews()).toEqual([view3, view2, view1]);
+        })
+        .catch(fail)
+        .always(done);
+    });
+
+    it('close tabs and dont save unsaved changes', function(done) {
+      view2.rootGroupBox.fields[0].setValue('Foo');
+
+      promises.push(view1.whenClose());
+      promises.push(view2.whenClose());
+
+      desktop.closeViews([view1, view2]);
+      // UnsavedFormChangesForm should be the last child
+      var unsavedFormChangesForm = scout.arrays.last(desktop.children);
+      expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
+      unsavedFormChangesForm.whenPostLoad().then(function() {
+        var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+        expect(openFormsField.id).toBe('OpenFormsField');
+        expect(openFormsField.value.length).toBe(1);
+        openFormsField.setValue(null);
+        unsavedFormChangesForm.ok();
+      });
+      promises.push(unsavedFormChangesForm.whenClose());
+
+      $.promiseAll(promises).then(function() {
+          expect(view1.close).toHaveBeenCalled();
+          expect(view2.ok).not.toHaveBeenCalled();
+          expect(view2.close).toHaveBeenCalled();
+          expect(desktop.bench.getViews()).toEqual([view3]);
+        })
+        .catch(fail)
+        .always(done);
+    });
+
+    it('close tabs when one tab has an open message box', function() {
+      var msgBox = scout.create('MessageBox', {
+        parent: view3,
+        displayParent: view3
+      });
+      msgBox.open();
+      spyOn(msgBox, 'close').and.callThrough();
+      expect(msgBox.rendered).toBe(true);
+
+      jasmine.clock().install();
+
+      desktop.closeViews([view2, view3]);
+
+      jasmine.clock().tick(10);
+
+      expect(msgBox.close).toHaveBeenCalled();
+      expect(view3.close).toHaveBeenCalled();
+      expect(view2.close).toHaveBeenCalled();
+      expect(desktop.bench.getViews()).toEqual([view1]);
+      jasmine.clock().uninstall();
+    });
+
+    it('close tabs with open file chooser and save unsaved changes', function(done) {
+      desktop.showForm(view2);
+      view2.rootGroupBox.fields[0].setValue('Foo');
+
+      var fileChooser = scout.create('FileChooser', {
+        parent: view2,
+        displayParent: view2
+      });
+      fileChooser.open();
+      expect(fileChooser.rendered).toBe(true);
+
+      spyOn(fileChooser, 'close').and.callThrough();
+
+      promises.push(view1.whenClose());
+      promises.push(view2.whenClose());
+
+      desktop.closeViews([view1, view2]);
+      // UnsavedFormChangesForm should be the last child
+      var unsavedFormChangesForm = scout.arrays.last(desktop.children);
+      expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
+      unsavedFormChangesForm.whenPostLoad().then(function() {
+        var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+        expect(openFormsField.id).toBe('OpenFormsField');
+        // default is all selected, view2 should be saved
+        expect(openFormsField.value.length).toBe(1);
+        expect(openFormsField.value[0]).toEqual(view2);
+        unsavedFormChangesForm.ok();
+      });
+
+      $.promiseAll(promises).then(function() {
+          expect(view1.close).toHaveBeenCalled();
+          expect(view2.ok).toHaveBeenCalled();
+          expect(fileChooser.close).toHaveBeenCalled();
+          expect(desktop.bench.getViews()).toEqual([view3]);
+        })
+        .catch(fail)
+        .always(done);
+    });
+
+    it('close tabs when one tab has an open modal dialog with unsaved changes', function(done) {
+      var modalDialog = formHelper.createFormWithOneField({
+        parent: view2,
+        displayParent: view2
+      });
+      desktop.showForm(view2);
+      expect(view2.rendered).toBe(true);
+      desktop.showForm(modalDialog);
+      expect(modalDialog.rendered).toBe(true);
+
+      modalDialog.rootGroupBox.fields[0].setValue('Foo');
+
+      promises.push(view1.whenClose());
+      promises.push(view2.whenClose());
+      promises.push(modalDialog.whenSave());
+      promises.push(modalDialog.whenClose());
+
+      spyOn(modalDialog, 'ok').and.callThrough();
+
+      desktop.closeViews([view1, view2]);
+      // UnsavedFormChangesForm should be the last child
+      var unsavedFormChangesForm = scout.arrays.last(desktop.children);
+      expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
+      unsavedFormChangesForm.whenPostLoad().then(function() {
+        var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+        expect(openFormsField.id).toBe('OpenFormsField');
+        expect(openFormsField.value.length).toBe(1);
+        // the sub-form has unsaved changes (modalDialg), in the unsavedFormChangesForm the parent-view should be displayed
+        expect(openFormsField.value[0]).toEqual(view2);
+        unsavedFormChangesForm.ok();
+      });
+
+      $.promiseAll(promises).then(function() {
+          expect(view1.close).toHaveBeenCalled();
+          expect(view2.ok).toHaveBeenCalled();
+          expect(modalDialog.ok).toHaveBeenCalled();
+          expect(desktop.bench.getViews()).toEqual([view3]);
+        })
+        .catch(fail)
+        .always(done);
+    });
+
+    it('close tabs when one tab has an open modal dialog without unsaved changes', function(done) {
+      var modalDialog = formHelper.createFormWithOneField({
+        parent: view2,
+        displayParent: view2,
+        modal: true
+      });
+      desktop.showForm(view2);
+      expect(view2.rendered).toBe(true);
+      desktop.showForm(modalDialog);
+      expect(modalDialog.rendered).toBe(true);
+
+      promises.push(view1.whenClose());
+      promises.push(view2.whenClose());
+      promises.push(modalDialog.whenClose());
+
+      spyOn(modalDialog, 'close').and.callThrough();
+      spyOn(modalDialog, 'ok').and.callThrough();
+
+      desktop.closeViews([view1, view2]);
+
+      $.promiseAll(promises).then(function() {
+          expect(view1.close).toHaveBeenCalled();
+          expect(view2.close).toHaveBeenCalled();
+          expect(view2.ok).not.toHaveBeenCalled();
+          expect(modalDialog.close).toHaveBeenCalled();
+          expect(modalDialog.ok).not.toHaveBeenCalled();
+          expect(desktop.bench.getViews()).toEqual([view3]);
+        })
+        .catch(fail)
+        .always(done);
+    });
+
+    it('close tabs when one tab has invalid unsaved changes', function() {
+      view2.rootGroupBox.fields[0].setValidator(function(value) {
+        if (scout.strings.equalsIgnoreCase(value, 'Foo')) {
+          throw new Error('Validation failed');
+        }
+        return value;
+      });
+      view2.rootGroupBox.fields[0].touch();
+      view2.rootGroupBox.fields[0].setValue('Foo');
+
+      jasmine.clock().install();
+      desktop.closeViews([view1, view2]);
+      // UnsavedFormChangesForm should be the last child
+      var unsavedFormChangesForm = scout.arrays.last(desktop.children);
+      expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
+      unsavedFormChangesForm.whenPostLoad().then(function() {
+        var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+        expect(openFormsField.id).toBe('OpenFormsField');
+        expect(openFormsField.value.length).toBe(1);
+        expect(openFormsField.value[0]).toEqual(view2);
+        unsavedFormChangesForm.ok();
+        jasmine.clock().tick();
+        // validation message should be displayed since view2 is in invalid state
+        expect(session.$entryPoint.find('.messagebox').length).toBe(1);
+        desktop.messageBoxes[0].$yesButton.click();
+        jasmine.clock().tick();
+        // untick all entries to not save the unsaved changes
+        openFormsField.setValue(null);
+        unsavedFormChangesForm.ok();
+      });
+
+      jasmine.clock().tick(10);
+
+      expect(view1.ok).not.toHaveBeenCalled();
+      expect(view1.close).toHaveBeenCalled();
+      expect(view2.ok).not.toHaveBeenCalled();
+      expect(view2.close).toHaveBeenCalled();
+      expect(desktop.bench.getViews()).toEqual([view3]);
+      jasmine.clock().uninstall();
+    });
+
+    it('close tabs when one tab has a child with invalid unsaved changes', function() {
+      var modalDialog = formHelper.createFormWithOneField({
+        parent: view2,
+        displayParent: view2,
+        modal: true
+      });
+      desktop.showForm(view2);
+      expect(view2.rendered).toBe(true);
+      desktop.showForm(modalDialog);
+      expect(modalDialog.rendered).toBe(true);
+
+      spyOn(modalDialog, 'close').and.callThrough();
+      spyOn(modalDialog, 'ok').and.callThrough();
+
+
+      modalDialog.rootGroupBox.fields[0].setValidator(function(value) {
+        if (scout.strings.equalsIgnoreCase(value, 'Foo')) {
+          throw new Error('Validation failed');
+        }
+        return value;
+      });
+      modalDialog.rootGroupBox.fields[0].touch();
+      modalDialog.rootGroupBox.fields[0].setValue('Foo');
+
+      jasmine.clock().install();
+      desktop.closeViews([view1, view2]);
+      // UnsavedFormChangesForm should be the last child
+      var unsavedFormChangesForm = scout.arrays.last(desktop.children);
+      expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
+      unsavedFormChangesForm.whenPostLoad().then(function() {
+        var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+        expect(openFormsField.id).toBe('OpenFormsField');
+        expect(openFormsField.value.length).toBe(1);
+        expect(openFormsField.value[0]).toEqual(view2);
+        unsavedFormChangesForm.ok();
+        jasmine.clock().tick();
+        // validation message should be displayed since view2 is in invalid state
+        expect(session.$entryPoint.find('.messagebox').length).toBe(1);
+        desktop.messageBoxes[0].$yesButton.click();
+        jasmine.clock().tick();
+        // untick all entries to not save the unsaved changes
+        openFormsField.setValue(null);
+        unsavedFormChangesForm.ok();
+      });
+
+      jasmine.clock().tick(10);
+
+      expect(modalDialog.ok).not.toHaveBeenCalled();
+      expect(modalDialog.close).toHaveBeenCalled();
+      expect(view1.ok).not.toHaveBeenCalled();
+      expect(view1.close).toHaveBeenCalled();
+      expect(view2.ok).not.toHaveBeenCalled();
+      expect(view2.close).toHaveBeenCalled();
+      expect(desktop.bench.getViews()).toEqual([view3]);
+      jasmine.clock().uninstall();
+    });
+
+  });
+
 });

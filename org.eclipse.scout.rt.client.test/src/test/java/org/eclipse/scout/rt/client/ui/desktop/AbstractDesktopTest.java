@@ -289,6 +289,94 @@ public class AbstractDesktopTest {
   }
 
   @Test
+  public void testUnsavedFormsWithFormSet() {
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
+
+    P_CheckSaveTestForm form_0 = new P_CheckSaveTestForm();
+    P_CheckSaveTestForm form_1 = new P_CheckSaveTestForm();
+    P_CheckSaveTestForm form_1_1 = new P_CheckSaveTestForm();
+    P_CheckSaveTestForm form_1_2 = new P_CheckSaveTestForm();
+    P_CheckSaveTestForm form_2 = new P_CheckSaveTestForm();
+    P_CheckSaveTestForm form_2_1 = new P_CheckSaveTestForm();
+    try {
+      form_0.startNew();
+      form_0.getMessageField().setValue("test");
+      assertTrue(desktop.getUnsavedForms().contains(form_0));
+
+      form_1.startNew();
+      assertTrue(desktop.getUnsavedForms(CollectionUtility.hashSet(form_1)).isEmpty());
+      form_1.getMessageField().setValue("test");
+      assertTrue(desktop.getUnsavedForms(CollectionUtility.hashSet(form_1)).contains(form_1));
+
+      form_2.startNew();
+      assertTrue(desktop.getUnsavedForms(CollectionUtility.hashSet(form_1, form_2)).contains(form_1));
+
+      form_2_1.setDisplayParent(form_2);
+      form_2_1.startNew();
+      assertTrue(desktop.getUnsavedForms(CollectionUtility.hashSet(form_1, form_2)).contains(form_1));
+      form_2_1.getMessageField().setValue("test");
+      assertTrue(desktop.getUnsavedForms(CollectionUtility.hashSet(form_1, form_2)).containsAll(CollectionUtility.hashSet(form_1, form_2_1)));
+
+      form_1_1.setDisplayParent(form_1);
+      form_1_1.startNew();
+      assertTrue(desktop.getUnsavedForms(CollectionUtility.hashSet(form_1, form_2)).containsAll(CollectionUtility.hashSet(form_1, form_2_1)));
+      form_1_1.getMessageField().setValue("test");
+      assertTrue(desktop.getUnsavedForms(CollectionUtility.hashSet(form_1, form_2)).containsAll(CollectionUtility.hashSet(form_1, form_2_1, form_1_1)));
+
+      form_1_2.setDisplayParent(form_1);
+      form_1_2.startNew();
+      assertTrue(desktop.getUnsavedForms(CollectionUtility.hashSet(form_1, form_2)).containsAll(CollectionUtility.hashSet(form_1, form_2_1, form_1_1)));
+      form_1_2.getMessageField().setValue("test");
+      assertTrue(desktop.getUnsavedForms(CollectionUtility.hashSet(form_1, form_2)).containsAll(CollectionUtility.hashSet(form_1, form_2_1, form_1_1, form_1_2)));
+    }
+    finally {
+      form_0.doClose();
+      form_1.doClose();
+      form_1_1.doClose();
+      form_1_2.doClose();
+      form_2.doClose();
+      form_2_1.doClose();
+    }
+  }
+
+  @Test
+  public void testUnsavedFormsChangesForm() {
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
+
+    P_CheckSaveTestForm form_1 = new P_CheckSaveTestForm();
+    P_CheckSaveTestForm form_1_1 = new P_CheckSaveTestForm();
+    P_CheckSaveTestForm form_1_1_1 = new P_CheckSaveTestForm();
+
+    try {
+      form_1.startNew();
+      form_1.getMessageField().setValue("test");
+      form_1_1.setDisplayParent(form_1);
+      form_1_1.startNew();
+      form_1_1.getMessageField().setValue("test");
+      form_1_1_1.setDisplayParent(form_1_1);
+      form_1_1_1.startNew();
+      form_1_1_1.getMessageField().setValue("test");
+
+      List<IForm> unsavedForms = desktop.getUnsavedForms(CollectionUtility.hashSet(form_1));
+      assertTrue(unsavedForms.containsAll(CollectionUtility.hashSet(form_1, form_1_1, form_1_1_1)));
+      UnsavedFormChangesForm f = new UnsavedFormChangesForm(unsavedForms, false);
+      f.setHandler(f.new NewHandler());
+      f.start();
+
+      // the openForms listBox should only have one (checked) entry for the top form (form_1)
+      assertEquals(f.getOpenFormsField().getValue().size(), 1);
+      assertEquals(f.getOpenFormsField().getCheckedKeyCount(), 1);
+      // the value of that single entry should be all the forms in the displayParent hierarchy with unsaved changes
+      assertTrue(CollectionUtility.firstElement(f.getOpenFormsField().getValue()).containsAll(CollectionUtility.hashSet(form_1, form_1_1, form_1_1_1)));
+    }
+    finally {
+      form_1.doClose();
+      form_1_1.doClose();
+      form_1_1_1.doClose();
+    }
+  }
+
+  @Test
   public void testDataChangedSimple() {
     TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
 

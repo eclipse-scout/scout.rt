@@ -103,4 +103,9 @@ public interface IFileChooser {
    * @return maximum size for upload in bytes
    */
   long getMaximumUploadSize();
+
+  /**
+   * Closes the file chooser (with no result) and resolves the blocking condition held by {@link #startChooser()}.
+   */
+  void doClose();
 }

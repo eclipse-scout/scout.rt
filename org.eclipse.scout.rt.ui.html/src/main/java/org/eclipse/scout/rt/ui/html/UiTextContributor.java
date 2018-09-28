@@ -52,6 +52,10 @@ public class UiTextContributor implements IUiTextContributor {
         "NumberTooLargeMessageX",
         "NumberTooSmallMessageXY",
         "NumberTooSmallMessageX",
+        "UnsavedChangesTitle",
+        "SaveChangesOfSelectedItems",
+        "FormsCannotBeSaved",
+        "NotAllCheckedFormsCanBeSaved",
         // From org.eclipse.scout.rt.ui.html
         "ui.CodeUndefined",
         "ui.CalendarToday",
@@ -179,6 +183,8 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.LoadingPopupWindow",
         "ui.Active",
         "ui.Inactive",
-        "ui.All"));
+        "ui.All",
+        "ui.CloseAllTabs",
+        "ui.CloseOtherTabs"));
   }
 }
