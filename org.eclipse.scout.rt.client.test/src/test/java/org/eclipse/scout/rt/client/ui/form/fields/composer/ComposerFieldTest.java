@@ -19,10 +19,14 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.form.fields.composer.node.AddEntityMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EitherOrNode;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerEitherOrNodeData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.TreeNodeData;
+import org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute;
+import org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -137,12 +141,68 @@ public class ComposerFieldTest {
     assertFalse(((EitherOrNode) or2Node).isNegative());
   }
 
+  /**
+   * Expects that add entity menu is initialized during init() of the composer rather than during creating time of the
+   * node.
+   * <p>
+   * Reason: AbstractTreeNode executes execInit while constructor runs (and not during init as for every other widget).
+   * Since the entity nodes create actions which add listeners to the data model during that time, the listeners might
+   * never get removed, because execDipose might never be called. This can happen if a form is created, but never
+   * started and thus init never called. If it is not started, calling close won't call dispose. This behavior of the
+   * form is correct, because dispose() is the counterpart to init(), so if init() is not called, dispose() won't be
+   * called as well.
+   */
+  @Test
+  public void testInitMenusLater() throws Exception {
+    ComposerWithDataModelField composerField = new ComposerWithDataModelField();
+    ITreeNode rootNode = composerField.getTree().getRootNode();
+    assertFalse(rootNode.getMenuByClass(AddEntityMenu.class).isInitDone());
+
+    composerField.init();
+    assertTrue(rootNode.getMenuByClass(AddEntityMenu.class).isInitDone());
+
+    // Ensure init is called if nodes are created later
+    ITreeNode eitherOrNode = composerField.addEitherNode(rootNode, false);
+    composerField.addAdditionalOrNode(eitherOrNode, false);
+    assertTrue(eitherOrNode.getMenuByClass(AddEntityMenu.class).isInitDone());
+  }
+
   /* --------------------------------------------------------------------------
    * fixture
    * --------------------------------------------------------------------------
    */
 
   public static class ComposerField extends AbstractComposerField {
+  }
+
+  public static class ComposerWithDataModelField extends AbstractComposerField {
+
+    @Order(10)
+    public class TimesheetEntry extends AbstractDataModelEntity {
+
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      protected String getConfiguredText() {
+        return "Timesheet";
+      }
+
+      @Order(20)
+      public class PlannedEndAttribute extends AbstractDataModelAttribute {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected String getConfiguredText() {
+          return "Planned end";
+        }
+
+        @Override
+        protected int getConfiguredType() {
+          return TYPE_DATE;
+        }
+      }
+    }
   }
 
   public static class ComposerFieldData extends AbstractTreeFieldData {
