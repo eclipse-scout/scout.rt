@@ -386,6 +386,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
    */
   @Override
   protected void initFieldInternal() {
+    getTree().initTree();
     super.initFieldInternal();
     // Init menus of the nodes.
     // This must not be done during the creation of the nodes, see ComposerFieldTest for the reason.
