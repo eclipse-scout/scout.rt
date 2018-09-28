@@ -49,7 +49,7 @@ public class PageFieldTest {
     };
 
     PageField pageField = new PageField();
-    pageField.initField();
+    pageField.init();
     pageField.setPage(page);
     Mockito.verify(searchFormMock, Mockito.times(0)).disposeFormInternal();
     assertEquals(0, pageDisposedCount.getValue().intValue());
