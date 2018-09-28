@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFie
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFieldChains.ComposerFieldResolveRootPathForTopLevelEntityChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.IComposerFieldExtension;
 import org.eclipse.scout.rt.client.ui.IWidget;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
@@ -375,6 +376,27 @@ public abstract class AbstractComposerField extends AbstractFormField implements
    */
 
   @Override
+  protected void initFieldInternal() {
+    super.initFieldInternal();
+    // Init menus of the nodes.
+    // This must not be done during the creation of the nodes, see ComposerFieldTest for the reason.
+    IDepthFirstTreeVisitor<ITreeNode> visitor = new DepthFirstTreeVisitor<ITreeNode>() {
+      @Override
+      public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
+        initNodeMenus(element);
+        return TreeVisitResult.CONTINUE;
+      }
+    };
+    getTree().visitTree(visitor);
+  }
+
+  protected void initNodeMenus(ITreeNode node) {
+    for (IMenu menu : node.getMenus()) {
+      menu.init();
+    }
+  }
+
+  @Override
   public List<? extends IWidget> getChildren() {
     return CollectionUtility.flatten(super.getChildren(), Collections.singletonList(getTree()));
   }
@@ -643,6 +665,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   public EntityNode addEntityNode(ITreeNode parentNode, IDataModelEntity e, boolean negated, List<?> values, List<String> texts) {
     EntityNode node = interceptCreateEntityNode(parentNode, e, negated, values, texts);
     if (node != null) {
+      initNodeMenus(node);
       getTree().addChildNode(parentNode, node);
       getTree().setNodeExpanded(node, true);
     }
@@ -653,6 +676,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   public EitherOrNode addEitherNode(ITreeNode parentNode, boolean negated) {
     EitherOrNode node = interceptCreateEitherNode(parentNode, negated);
     if (node != null) {
+      initNodeMenus(node);
       getTree().addChildNode(parentNode, node);
       getTree().setNodeExpanded(node, true);
     }
@@ -663,6 +687,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   public EitherOrNode addAdditionalOrNode(ITreeNode eitherOrNode, boolean negated) {
     EitherOrNode node = interceptCreateAdditionalOrNode(eitherOrNode, negated);
     if (node != null) {
+      initNodeMenus(node);
       getTree().addChildNode(eitherOrNode.getChildNodeIndex() + 1, eitherOrNode.getParentNode(), node);
       getTree().setNodeExpanded(node, true);
     }
@@ -673,6 +698,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   public AttributeNode addAttributeNode(ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<?> values, List<String> texts) {
     AttributeNode node = interceptCreateAttributeNode(parentNode, a, aggregationType, op, values, texts);
     if (node != null) {
+      initNodeMenus(node);
       getTree().addChildNode(parentNode, node);
     }
     return node;
