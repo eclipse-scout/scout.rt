@@ -16,7 +16,7 @@ ${rootArtifactId}.App.prototype._createSession = function(options) {
 };
 
 ${rootArtifactId}.App.prototype._createDesktop = function(parent) {
-  this.desktop = scout.create('Desktop', scout.models.getModel('${rootArtifactId}.Desktop', parent));
+  this.desktop = scout.create('${rootArtifactId}.Desktop', scout.models.getModel('${rootArtifactId}.Desktop', parent));
 
   var myDataOutline = this._createMyDataOutline();
   var myDataViewButton = scout.create('scout.OutlineViewButton', {

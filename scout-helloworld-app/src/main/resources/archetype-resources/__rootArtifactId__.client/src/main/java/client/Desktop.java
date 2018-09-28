@@ -3,6 +3,7 @@
 #set( $symbol_escape = '\' )
 package ${package}.client;
 
+import java.beans.PropertyChangeEvent;
 import java.security.AccessController;
 import java.security.Principal;
 import java.util.List;
@@ -12,6 +13,7 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -21,6 +23,8 @@ import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
+import ${package}.client.Desktop.UserProfileMenu.ThemeMenu.DarkThemeMenu;
+import ${package}.client.Desktop.UserProfileMenu.ThemeMenu.DefaultThemeMenu;
 import ${package}.client.search.SearchOutline;
 import ${package}.client.settings.SettingsOutline;
 import ${package}.client.work.WorkOutline;
@@ -30,6 +34,11 @@ import ${package}.shared.Icons;
  * @author ${userName}
  */
 public class Desktop extends AbstractDesktop {
+
+  public Desktop() {
+    addPropertyChangeListener(PROP_THEME, this::onThemeChanged);
+  }
+
   @Override
   protected String getConfiguredTitle() {
     return TEXTS.get("ApplicationTitle");
@@ -57,6 +66,19 @@ public class Desktop extends AbstractDesktop {
         setOutline(outline.getClass());
         return;
       }
+    }
+  }
+
+  protected void onThemeChanged(PropertyChangeEvent evt) {
+    IMenu darkMenu = getMenu(DarkThemeMenu.class);
+    IMenu defaultMenu = getMenu(DefaultThemeMenu.class);
+    String newThemeName = (String) evt.getNewValue();
+    if (DarkThemeMenu.DARK_THEME.equalsIgnoreCase(newThemeName)) {
+      darkMenu.setIconId(Icons.CheckedBold);
+      defaultMenu.setIconId(null);
+    } else {
+      darkMenu.setIconId(null);
+      defaultMenu.setIconId(Icons.CheckedBold);
     }
   }
 
@@ -96,6 +118,47 @@ public class Desktop extends AbstractDesktop {
     }
 
     @Order(2000)
+    public class ThemeMenu extends AbstractMenu {
+
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("Theme");
+      }
+
+      @Order(1000)
+      public class DefaultThemeMenu extends AbstractMenu {
+
+        private static final String DEFAULT_THEME = "Default";
+
+        @Override
+        protected String getConfiguredText() {
+          return DEFAULT_THEME;
+        }
+
+        @Override
+        protected void execAction() {
+          setTheme(DEFAULT_THEME.toLowerCase());
+        }
+      }
+
+      @Order(2000)
+      public class DarkThemeMenu extends AbstractMenu {
+
+        private static final String DARK_THEME = "Dark";
+
+        @Override
+        protected String getConfiguredText() {
+          return DARK_THEME;
+        }
+
+        @Override
+        protected void execAction() {
+          setTheme(DARK_THEME.toLowerCase());
+        }
+      }
+    }
+
+    @Order(3000)
     public class LogoutMenu extends AbstractMenu {
 
       @Override
