@@ -19,14 +19,18 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.form.fields.composer.node.AddEntityMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EitherOrNode;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.node.RootNode;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerEitherOrNodeData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.TreeNodeData;
+import org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute;
+import org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -139,7 +143,8 @@ public class ComposerFieldTest {
   }
 
   /**
-   * Expects that root node has to be created during init and not during initConfig.
+   * Expects that add entity menu is initialized during init() of the composer rather than during creating time of the
+   * node.
    * <p>
    * Reason: AbstractTreeNode executes execInit while constructor runs (and not during init as for every other widget).
    * Since the entity nodes create actions which add listeners to the data model during that time, the listeners might
@@ -149,13 +154,18 @@ public class ComposerFieldTest {
    * called as well.
    */
   @Test
-  public void testCreateNodeOnInit() throws Exception {
-    ComposerField composerField = new ComposerField();
-    assertFalse(composerField.getTree().getRootNode() instanceof RootNode);
+  public void testInitMenusLater() throws Exception {
+    ComposerWithDataModelField composerField = new ComposerWithDataModelField();
+    ITreeNode rootNode = composerField.getTree().getRootNode();
+    Assert.assertNull(rootNode.getMenu(AddEntityMenu.class).getIconId()); // ExecInitAction sets an icon id -> test to check whether execInitAction ran
 
     composerField.initField();
-    assertTrue(composerField.getTree().getRootNode() instanceof RootNode);
-    assertFalse(composerField.isSaveNeeded()); // Assert that inserting the root node did not accidentally changed the state
+    Assert.assertNotNull(rootNode.getMenu(AddEntityMenu.class).getIconId());
+
+    // Ensure init is called if nodes are created later
+    ITreeNode eitherOrNode = composerField.addEitherNode(rootNode, false);
+    composerField.addAdditionalOrNode(eitherOrNode, false);
+    Assert.assertNotNull(rootNode.getMenu(AddEntityMenu.class).getIconId());
   }
 
   /* --------------------------------------------------------------------------
@@ -164,6 +174,41 @@ public class ComposerFieldTest {
    */
 
   public static class ComposerField extends AbstractComposerField {
+  }
+
+  public static class ComposerWithDataModelField extends AbstractComposerField {
+
+    @Order(10)
+    public class TimesheetEntry extends AbstractDataModelEntity {
+
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      protected String getConfiguredText() {
+        return "Timesheet";
+      }
+
+      @Override
+      public String getIconId() {
+        return "TimesheetIcon";
+      }
+
+      @Order(20)
+      public class PlannedEndAttribute extends AbstractDataModelAttribute {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected String getConfiguredText() {
+          return "Planned end";
+        }
+
+        @Override
+        protected int getConfiguredType() {
+          return TYPE_DATE;
+        }
+      }
+    }
   }
 
   public static class ComposerFieldData extends AbstractTreeFieldData {
