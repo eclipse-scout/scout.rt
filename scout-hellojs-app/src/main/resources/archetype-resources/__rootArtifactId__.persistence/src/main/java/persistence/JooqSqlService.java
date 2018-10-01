@@ -4,12 +4,13 @@
 package ${package}.persistence;
 
 import java.sql.Connection;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.server.jdbc.derby.AbstractDerbySqlService;
 import org.jooq.Configuration;
 import org.jooq.ConnectionProvider;
@@ -17,7 +18,6 @@ import org.jooq.DSLContext;
 import org.jooq.conf.MappedSchema;
 import org.jooq.conf.RenderMapping;
 import org.jooq.conf.Settings;
-import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultConfiguration;
 
@@ -42,11 +42,9 @@ public class JooqSqlService extends AbstractDerbySqlService implements IJooqServ
     Configuration configuration = new DefaultConfiguration();
     configuration.set(CONFIG.getPropertyValue(DialectProperty.class));
     Settings s = configuration.settings();
-    s.withRenderMapping(new RenderMapping()
-        .withSchemata(
-            new MappedSchema()
-			    .withInputExpression(Pattern.compile(CONFIG.getPropertyValue(SchemaProperty.class)))
-                .withOutput(CONFIG.getPropertyValue(SchemaProperty.class))));
+    s.withRenderMapping(new RenderMapping().withSchemata(
+        new MappedSchema().withInputExpression(Pattern.compile(CONFIG.getPropertyValue(SchemaProperty.class)))
+            .withOutput(CONFIG.getPropertyValue(SchemaProperty.class))));
 
     configuration.set(s);
     return configuration;
@@ -72,30 +70,46 @@ public class JooqSqlService extends AbstractDerbySqlService implements IJooqServ
     return CONFIG.getPropertyValue(JdbcMappingNameProperty.class);
   }
 
-  @Override
-  public <T> T apply(Function<DSLContext, T> task) {
-    try (DSLContext ctx = DSL.using(m_configuration.derive(m_connectionProvider))) {
-      return task.apply(ctx);
-    }
+  public static DSLContext jooq() {
+    return BEANS.get(IJooqService.class).getContext();
   }
 
-  @Override
-  public void accept(Consumer<DSLContext> task) {
-    apply(c -> {
-      task.accept(c);
-      return null;
-    });
+  public DSLContext getContext() {
+    return ITransaction.CURRENT.get().registerMemberIfAbsent(JooqContextMember.JOOQ_CONTEXT, JooqContextMember::new)
+        .getContext();
+  }
+
+  public class JooqContextMember extends AbstractTransactionMember {
+
+    private static final String JOOQ_CONTEXT = "jooq_context";
+
+    private DSLContext m_context;
+
+    public JooqContextMember(String memberId) {
+      super(memberId);
+      m_context = DSL.using(m_configuration.derive(m_connectionProvider));
+    }
+
+    @Override
+    public void release() {
+      m_context = null;
+      super.release();
+    }
+
+    private DSLContext getContext() {
+      return m_context;
+    }
   }
 
   private class ScoutConnectionProvider implements ConnectionProvider {
 
     @Override
-    public Connection acquire() throws DataAccessException {
+    public Connection acquire() {
       return getConnection();
     }
 
     @Override
-    public void release(Connection connection) throws DataAccessException {
+    public void release(Connection connection) {
       // NOP
     }
   }

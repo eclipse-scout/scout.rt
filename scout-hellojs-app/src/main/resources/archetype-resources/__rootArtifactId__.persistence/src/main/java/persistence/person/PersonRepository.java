@@ -55,8 +55,8 @@ public class PersonRepository extends AbstractRepository<Person, PersonRecord, P
     return fromRecordToDo(newPersonRecord, person);
   }
 
-  protected PersonDo recToDo(PersonRecord PersonRecord) {
-    return fromRecordToDo(PersonRecord, BEANS.get(PersonDo.class));
+  protected PersonDo recToDo(PersonRecord personRecord) {
+    return fromRecordToDo(personRecord, BEANS.get(PersonDo.class));
   }
 
   protected PersonRecord doToRec(PersonDo person) {
