@@ -214,7 +214,7 @@ scout.KeyStrokeManager.prototype._onKeyEvent = function(keyStrokeContext, event)
   if (this.session.focusManager.isElementCovertByGlassPane(keyStrokeContext.$getScopeTarget())) {
     // check if any action with 'keyStrokeFirePolicy=IAction.KeyStrokeFirePolicy.ALWAYS' is in keyStrokeContext
     var keyStrokeFirePolicyAlways = $.grep(keyStrokeContext.keyStrokes, function(k) { // (will at least return an empty array)
-      return k.field && k.field.keyStrokeFirePolicy === scout.Action.KeyStrokeFirePolicy.ALWAYS;
+      return k.keyStrokeFirePolicy === scout.Action.KeyStrokeFirePolicy.ALWAYS;
     });
     if (keyStrokeFirePolicyAlways.length === 0) {
       return;

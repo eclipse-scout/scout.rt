@@ -21,6 +21,7 @@ scout.KeyStroke = function() {
   this.keyStrokeMode = scout.KeyStrokeMode.DOWN;
   this.repeatable = false; // whether or not the handle method is called multiple times while a key is pressed
   this._handleExecuted = false; // internal flag to remember whether or not the handle method has been executed (reset on keyup)
+  this.keyStrokeFirePolicy = scout.Action.KeyStrokeFirePolicy.ACCESSIBLE_ONLY;
 
   // Hints to control rendering of the key(s).
   this.renderingHints = {

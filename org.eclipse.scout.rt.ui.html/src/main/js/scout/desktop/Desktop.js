@@ -119,9 +119,10 @@ scout.Desktop.prototype._initKeyStrokeContext = function() {
   scout.Desktop.parent.prototype._initKeyStrokeContext.call(this);
 
   this.keyStrokeContext.invokeAcceptInputOnActiveValueField = true;
-  // Keystroke on the top-level DOM element which works as a catch-all when the busy indicator is active
-  this.keyStrokeContext.registerKeyStroke(new scout.DesktopKeyStroke(this.session));
-  this.keyStrokeContext.registerKeyStroke(new scout.DisableBrowserTabSwitchingKeyStroke(this));
+  this.keyStrokeContext.registerKeyStroke([
+    new scout.DisableBrowserF5ReloadKeyStroke(this),
+    new scout.DisableBrowserTabSwitchingKeyStroke(this)
+  ]);
 };
 
 scout.Desktop.prototype._onBenchActivateViewChanged = function(event) {
