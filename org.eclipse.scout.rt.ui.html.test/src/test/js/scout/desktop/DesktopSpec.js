@@ -439,7 +439,7 @@ describe('Desktop', function() {
     });
 
     it('shows and activates the form', function() {
-      expect(desktop.activeForm).toBeUndefined();
+      expect(desktop.activeForm).toBe(null);
 
       var form = formHelper.createFormWithOneField();
       desktop.showForm(form);
@@ -487,7 +487,7 @@ describe('Desktop', function() {
     };
 
     it('brings non-modal dialog in front upon activation', function() {
-      expect(desktop.activeForm).toBeUndefined();
+      expect(desktop.activeForm).toBe(null);
 
       var dialog0 = formHelper.createFormWithOneField();
       dialog0.modal = false;
@@ -512,7 +512,7 @@ describe('Desktop', function() {
     });
 
     it('keeps the order of other non-modal dialogs even when one of them is the display-parent of the dialog to activate', function() {
-      expect(desktop.activeForm).toBeUndefined();
+      expect(desktop.activeForm).toBe(null);
 
       var dialog0 = formHelper.createFormWithOneField();
       dialog0.setCssClass('DIALOG0');
@@ -564,7 +564,7 @@ describe('Desktop', function() {
       desktop.setOutline(outline2);
       // expect all dialogs hidden
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([]));
-      expect(desktop.activeForm).toBe(undefined);
+      expect(desktop.activeForm).toBe(null);
 
       desktop.activateForm(dialog1);
       // expect outline 1 to be activated
@@ -599,7 +599,7 @@ describe('Desktop', function() {
       desktop.setOutline(outline2);
       // expect all dialogs hidden
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([]));
-      expect(desktop.activeForm).toBe(undefined);
+      expect(desktop.activeForm).toBe(null);
 
       desktop.activateForm(dialog2);
       // expect outline 1 to be activated
@@ -608,7 +608,7 @@ describe('Desktop', function() {
     });
 
     it('does not bring non-modal dialog in front of desktop-modal dialog', function() {
-      expect(desktop.activeForm).toBeUndefined();
+      expect(desktop.activeForm).toBe(null);
 
       var dialog0 = formHelper.createFormWithOneField();
       dialog0.modal = false;
@@ -631,7 +631,7 @@ describe('Desktop', function() {
     });
 
     it('brings non-modal dialog in front of other non-modal dialog and it\'s modal child-dialog', function() {
-      expect(desktop.activeForm).toBeUndefined();
+      expect(desktop.activeForm).toBe(null);
 
       var dialog0 = formHelper.createFormWithOneField();
       dialog0.modal = false;
@@ -657,7 +657,7 @@ describe('Desktop', function() {
     });
 
     it('brings complete hierarchy of a non-modal dialog with 2-levels of modal child dialogs in front', function() {
-      expect(desktop.activeForm).toBeUndefined();
+      expect(desktop.activeForm).toBe(null);
 
       var dialog0 = formHelper.createFormWithOneField();
       dialog0.modal = false;
@@ -724,7 +724,7 @@ describe('Desktop', function() {
     });
 
     it('keeps position of dialog\'s messagebox relative to it\'s parent dialog while reordering dialogs', function() {
-      expect(desktop.activeForm).toBeUndefined();
+      expect(desktop.activeForm).toBe(null);
 
       var dialog0 = formHelper.createFormWithOneField();
       dialog0.modal = false;
@@ -769,7 +769,7 @@ describe('Desktop', function() {
     });
 
     it('brings dialog with messagebox on top upon mousedown on messagebox', function() {
-      expect(desktop.activeForm).toBeUndefined();
+      expect(desktop.activeForm).toBe(null);
 
       var dialog0 = formHelper.createFormWithOneField();
       dialog0.modal = false;
@@ -804,7 +804,7 @@ describe('Desktop', function() {
     });
 
     it('keeps desktop\'s messagebox on top while reordering dialogs', function() {
-      expect(desktop.activeForm).toBeUndefined();
+      expect(desktop.activeForm).toBe(null);
 
       var dialog0 = formHelper.createFormWithOneField();
       dialog0.modal = false;
@@ -849,7 +849,7 @@ describe('Desktop', function() {
     });
 
     it('keeps position of dialog\'s fileChooser relative to it\'s parent dialog while reordering dialogs', function() {
-      expect(desktop.activeForm).toBeUndefined();
+      expect(desktop.activeForm).toBe(null);
 
       var dialog0 = formHelper.createFormWithOneField();
       dialog0.modal = false;
@@ -890,7 +890,7 @@ describe('Desktop', function() {
     });
 
     it('brings dialog with filechooser on top upon mousedown on filechooser', function() {
-      expect(desktop.activeForm).toBeUndefined();
+      expect(desktop.activeForm).toBe(null);
 
       var dialog0 = formHelper.createFormWithOneField();
       dialog0.modal = false;
@@ -921,7 +921,7 @@ describe('Desktop', function() {
     });
 
     it('does not change position of desktop\'s fileChooser while reordering dialogs', function() {
-      expect(desktop.activeForm).toBeUndefined();
+      expect(desktop.activeForm).toBe(null);
 
       var dialog0 = formHelper.createFormWithOneField();
       dialog0.modal = false;
@@ -962,7 +962,7 @@ describe('Desktop', function() {
     });
 
     it('activates parent view upon activation of child dialog', function() {
-      expect(desktop.activeForm).toBeUndefined();
+      expect(desktop.activeForm).toBe(null);
 
       var tabBox = desktop.bench.getTabBox('C');
 
@@ -1055,7 +1055,7 @@ describe('Desktop', function() {
           expect(desktop.activeForm).toBe(dialog);
 
           dialog.close();
-          expect(desktop.activeForm).toBeUndefined();
+          expect(desktop.activeForm).toBe(null);
         })
         .catch(fail)
         .always(done);
@@ -1074,7 +1074,7 @@ describe('Desktop', function() {
           expect(desktop.activeForm).toBe(dialog);
 
           dialog.close();
-          expect(desktop.activeForm).toBeUndefined();
+          expect(desktop.activeForm).toBe(null);
         })
         .catch(fail)
         .always(done);
@@ -1094,7 +1094,7 @@ describe('Desktop', function() {
           expect(desktop.activeForm).toBe(dialog);
 
           dialog.close();
-          expect(desktop.activeForm).toBeUndefined();
+          expect(desktop.activeForm).toBe(null);
         })
         .catch(fail)
         .always(done);
@@ -1112,7 +1112,7 @@ describe('Desktop', function() {
           expect(desktop.activeForm).toBe(dialog);
 
           dialog.close();
-          expect(desktop.activeForm).toBeUndefined();
+          expect(desktop.activeForm).toBe(null);
         })
         .catch(fail)
         .always(done);

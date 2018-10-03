@@ -12,17 +12,33 @@ scout.Desktop = function() {
   scout.Desktop.parent.call(this);
 
   this.desktopStyle = scout.Desktop.DisplayStyle.DEFAULT;
-  this.benchVisible = true;
-  this.headerVisible = true;
+
+  this.title = null;
+  this.selectViewTabsKeyStrokesEnabled = true;
+  this.selectViewTabsKeyStrokeModifier = 'control';
+  this.cacheSplitterPosition = true;
+  this.browserHistoryEntry = null;
+  this.logoId = null;
   this.navigationVisible = true;
   this.navigationHandleVisible = true;
+  this.benchVisible = true;
+  this.headerVisible = true;
+  this.geolocationServiceAvailable = scout.device.supportsGeolocation();
+  this.benchLayoutData = null;
+
   this.menus = [];
   this.addOns = [];
   this.dialogs = [];
   this.views = [];
+  this.keyStrokes = [];
   this.viewButtons = [];
   this.messageBoxes = [];
   this.fileChoosers = [];
+  this.outline = null;
+  this.activeForm = null;
+  this.selectedViewTabs = [];
+  this.notifications = [];
+
   this.navigation = null;
   this.header = null;
   this.bench = null;
@@ -32,9 +48,7 @@ scout.Desktop = function() {
   this.fileChooserController = null;
   this.initialFormRendering = false;
   this.offline = false;
-  this.notifications = [];
   this.inBackground = false;
-  this.geolocationServiceAvailable = scout.device.supportsGeolocation();
   this.openUriHandler = null;
   this.theme = null;
 
@@ -921,7 +935,7 @@ scout.Desktop.prototype.activateForm = function(form) {
 };
 
 scout.Desktop.prototype._setOutlineActivated = function() {
-  this._setFormActivated();
+  this._setFormActivated(null);
   if (this.outline) {
     this.outline.activateCurrentPage();
   }
