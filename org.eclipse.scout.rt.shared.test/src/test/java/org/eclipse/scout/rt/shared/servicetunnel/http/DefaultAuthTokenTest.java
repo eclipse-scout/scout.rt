@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2018 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.servicetunnel.http;
 
-import java.nio.charset.StandardCharsets;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,7 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.security.KeyPairBytes;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
-import org.eclipse.scout.rt.platform.util.HexUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPublicKeyProperty;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -66,56 +67,53 @@ public class DefaultAuthTokenTest {
   }
 
   @Test
-  public void testSimple() {
-    Assert.assertTrue(DefaultAuthToken.isEnabled());
+  public void testEnabled() throws Exception {
+    assertTrue(BEANS.get(DefaultAuthTokenSigner.class).isEnabled());
+    assertTrue(BEANS.get(DefaultAuthTokenVerifier.class).isEnabled());
+  }
 
-    DefaultAuthToken t = BEANS.get(DefaultAuthToken.class);
-    t.init("foo");
+  @Test
+  public void testSimple() {
+    DefaultAuthTokenVerifier verifier = BEANS.get(DefaultAuthTokenVerifier.class);
+
+    DefaultAuthToken t = BEANS.get(DefaultAuthTokenSigner.class).sign(BEANS.get(DefaultAuthToken.class).withUserId("foo"));
     Assert.assertEquals("foo", t.getUserId());
-    Assert.assertEquals(0, t.getCustomArgCount());
+    Assert.assertTrue(CollectionUtility.isEmpty(t.getCustomArgs()));
     Assert.assertTrue(t.getValidUntil() - System.currentTimeMillis() > 0);
     Assert.assertNotNull(t.getSignature());
-    Assert.assertTrue(t.isValid());
-    Assert.assertEquals(toUtf8Hex("foo") + ";" + Long.toHexString(t.getValidUntil()), new String(t.createUnsignedData()));
+    Assert.assertTrue(verifier.verify(t));
 
     String encoded = t.toString();
 
-    DefaultAuthToken t2 = BEANS.get(DefaultAuthToken.class);
-    Assert.assertTrue(t2.parse(encoded));
+    DefaultAuthToken t2 = BEANS.get(DefaultAuthToken.class).read(encoded);
     Assert.assertEquals(t.getUserId(), t2.getUserId());
     Assert.assertEquals(t.getValidUntil(), t2.getValidUntil());
-    Assert.assertTrue(t2.isValid());
+    Assert.assertTrue(verifier.verify(t2));
 
-    String encodedAndTampered = new String(t.createUnsignedData()) + ";" + toUtf8Hex("abc");
-    DefaultAuthToken t3 = BEANS.get(DefaultAuthToken.class);
-    Assert.assertTrue(t3.parse(encodedAndTampered));
+    String encodedAndTampered = encoded.substring(0, encoded.length() - 3);
+    DefaultAuthToken t3 = BEANS.get(DefaultAuthToken.class).read(encodedAndTampered);
     Assert.assertEquals(t.getUserId(), t3.getUserId());
     Assert.assertEquals(t.getValidUntil(), t3.getValidUntil());
-    Assert.assertFalse(t3.isValid());
+    Assert.assertFalse(verifier.verify(t3));
   }
 
   @Test
   public void testWithCustomToken() {
-    Assert.assertTrue(DefaultAuthToken.isEnabled());
+    DefaultAuthTokenVerifier verifier = BEANS.get(DefaultAuthTokenVerifier.class);
 
-    DefaultAuthToken t = BEANS.get(DefaultAuthToken.class);
-    t.init("foo", "bar");
+    DefaultAuthToken t = BEANS.get(DefaultAuthTokenSigner.class).sign(BEANS.get(DefaultAuthToken.class).withUserId("foo").withCustomArgs("bar"));
     Assert.assertEquals("foo", t.getUserId());
-    Assert.assertEquals(1, t.getCustomArgCount());
-    Assert.assertTrue(t.isValid());
-    Assert.assertEquals(toUtf8Hex("foo") + ";" + Long.toHexString(t.getValidUntil()) + ";" + toUtf8Hex("bar"), new String(t.createUnsignedData()));
+    Assert.assertFalse(CollectionUtility.isEmpty(t.getCustomArgs()));
+    Assert.assertEquals(1, t.getCustomArgs().size());
+    Assert.assertEquals("bar", t.getCustomArgs().get(0));
+    Assert.assertTrue(verifier.verify(t));
 
     String encoded = t.toString();
 
-    DefaultAuthToken t2 = BEANS.get(DefaultAuthToken.class);
-    Assert.assertTrue(t2.parse(encoded));
+    DefaultAuthToken t2 = BEANS.get(DefaultAuthToken.class).read(encoded);
     Assert.assertEquals(t.getUserId(), t2.getUserId());
     Assert.assertEquals(t.getValidUntil(), t2.getValidUntil());
-    Assert.assertEquals(t.getCustomArg(0), t2.getCustomArg(0));
-    Assert.assertTrue(t2.isValid());
-  }
-
-  private static String toUtf8Hex(String s) {
-    return HexUtility.encode(s.getBytes(StandardCharsets.UTF_8));
+    Assert.assertEquals(t.getCustomArgs().get(0), t2.getCustomArgs().get(0));
+    Assert.assertTrue(verifier.verify(t2));
   }
 }
