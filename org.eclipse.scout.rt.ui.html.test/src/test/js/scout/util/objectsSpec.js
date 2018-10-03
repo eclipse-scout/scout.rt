@@ -479,4 +479,37 @@ describe("scout.objects", function() {
 
   });
 
+  describe('optProperty', function() {
+
+    it('should return the last property in the object chain', function() {
+      var obj = {};
+      expect(scout.objects.optProperty(obj)).toBe(obj);
+      expect(scout.objects.optProperty(null)).toBe(null);
+      expect(scout.objects.optProperty(obj, 'foo')).toBe(undefined);
+      expect(scout.objects.optProperty(null, 'foo')).toBe(null);
+
+      obj = {
+        foo: 1
+      };
+      expect(scout.objects.optProperty(obj, 'foo')).toBe(1);
+
+      obj = {
+        foo: {
+          bar: 1
+        }
+      };
+      expect(scout.objects.optProperty(obj, 'foo', 'bar')).toBe(1);
+
+      obj = {
+        foo: {
+          bar: {
+            baz: 1
+          }
+        }
+      };
+      expect(scout.objects.optProperty(obj, 'foo', 'bar', 'baz')).toBe(1);
+    });
+
+  });
+
 });
