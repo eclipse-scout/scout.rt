@@ -272,7 +272,7 @@ scout.RadioButtonGroup.prototype._validateValue = function(value) {
   // only show error if value is not null or undefined
   var buttonToSelect = this.getButtonForRadioValue(value);
   if (!buttonToSelect && value !== null && value !== undefined && !this._lookupInProgress) {
-    throw this.session.text("InvalidValueMessageX", value);
+    throw this.session.text('InvalidValueMessageX', value);
   }
   return value;
 };
@@ -282,8 +282,26 @@ scout.RadioButtonGroup.prototype._valueChanged = function() {
 
   // Don't select button during initialization if value is null to not override selected state of a button
   if (this.value !== null || this.initialized) {
-    this.selectButton(this.getButtonForRadioValue(this.value));
+    this.selectButtonByValue(this.value);
   }
+};
+
+scout.RadioButtonGroup.prototype.selectFirstButton = function() {
+  this.selectButtonByIndex(0);
+};
+
+scout.RadioButtonGroup.prototype.selectLastButton = function() {
+  this.selectButtonByIndex(this.radioButtons.length - 1);
+};
+
+scout.RadioButtonGroup.prototype.selectButtonByIndex = function(index) {
+  if (this.radioButtons.length && index >= 0 && index < this.radioButtons.length) {
+    this.selectButton(this.radioButtons[index]);
+  }
+};
+
+scout.RadioButtonGroup.prototype.selectButtonByValue = function(value) {
+  this.selectButton(this.getButtonForRadioValue(value));
 };
 
 scout.RadioButtonGroup.prototype.selectButton = function(radioButton) {
