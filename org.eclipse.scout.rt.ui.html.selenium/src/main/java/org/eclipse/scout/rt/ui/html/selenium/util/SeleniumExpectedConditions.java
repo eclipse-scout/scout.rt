@@ -49,6 +49,29 @@ public final class SeleniumExpectedConditions {
   }
 
   /**
+   * Used to wait until the given element is focused.
+   */
+  public static ExpectedCondition<Boolean> elementToBeFocused(final WebElement element) {
+    return new ExpectedCondition<Boolean>() {
+      @Override
+      public Boolean apply(WebDriver driver) {
+        try {
+          WebElement activeElement = driver.switchTo().activeElement();
+          return activeElement.equals(element);
+        }
+        catch (StaleElementReferenceException e) { // NOSONAR
+          return null;
+        }
+      }
+
+      @Override
+      public String toString() {
+        return String.format("element '%s' is not focused, but should be", element);
+      }
+    };
+  }
+
+  /**
    * Used to wait until the given element is <em>not</em> focused anymore.
    */
   public static ExpectedCondition<Boolean> elementNotToBeFocused(final WebElement element) {
@@ -73,8 +96,6 @@ public final class SeleniumExpectedConditions {
 
   /**
    * Used to wait until a radio-button with the given text inside the given group is checked.
-   *
-   * @return
    */
   public static ExpectedCondition<WebElement> radioButtonToBeChecked(final WebElement radioButtonGroup, final String radioButtonText) {
     return driver -> {

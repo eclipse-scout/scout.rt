@@ -15,7 +15,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.ui.html.selenium.util.SeleniumExpectedConditions;
-import org.eclipse.scout.rt.ui.html.selenium.util.SeleniumUtil;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -72,12 +71,8 @@ public final class SeleniumAssert {
     }
   }
 
-  public static void assertActiveElement(AbstractSeleniumTest test, WebElement expectedElement) {
-    WebElement actualActiveElement = test.getDriver().switchTo().activeElement();
-    if (!actualActiveElement.equals(expectedElement)) {
-      throw new AssertionError(String.format("expected element=%s to be focused, but active element was=%s",
-          SeleniumUtil.debugElement(expectedElement), SeleniumUtil.debugElement(actualActiveElement)));
-    }
+  public static void assertActiveElement(AbstractSeleniumTest test, WebElement element) {
+    test.waitUntil(SeleniumExpectedConditions.elementToBeFocused(element));
   }
 
   public static void assertElementStaleness(AbstractSeleniumTest test, WebElement element) {
