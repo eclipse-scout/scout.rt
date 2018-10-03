@@ -137,7 +137,7 @@ describe("RadioButtonGroup", function() {
     it('creates a radio button for each lookup row', function(){
       var radioButtonGroup = scout.create('RadioButtonGroup', {
         parent: session.desktop,
-        lookupCall: "DummyLookupCall"
+        lookupCall: 'DummyLookupCall'
       });
       expect(radioButtonGroup.isLoading()).toBe(true);
       jasmine.clock().tick(300);
@@ -150,7 +150,7 @@ describe("RadioButtonGroup", function() {
     it('selects correct radio button', function(){
       var radioButtonGroup = scout.create('RadioButtonGroup', {
         parent: session.desktop,
-        lookupCall: "DummyLookupCall",
+        lookupCall: 'DummyLookupCall',
         value: 1
       });
 
@@ -160,12 +160,24 @@ describe("RadioButtonGroup", function() {
       expect(radioButtonGroup.lookupCall).not.toBe(null);
       expect(radioButtonGroup.value).toBe(1);
       expect(radioButtonGroup.selectedButton.radioValue).toBe(1);
+
+      // select last
+      radioButtonGroup.selectLastButton();
+      expect(radioButtonGroup.value).toBe(3);
+
+      // select first
+      radioButtonGroup.selectFirstButton();
+      expect(radioButtonGroup.value).toBe(1);
+
+      // select by value
+      radioButtonGroup.setValue(2);
+      expect(radioButtonGroup.value).toBe(2);
     });
 
     it('lookupRow lives on the radioButton', function(){
       var radioButtonGroup = scout.create('RadioButtonGroup', {
         parent: session.desktop,
-        lookupCall: "DummyLookupCall"
+        lookupCall: 'DummyLookupCall'
       });
 
       jasmine.clock().tick(300);
