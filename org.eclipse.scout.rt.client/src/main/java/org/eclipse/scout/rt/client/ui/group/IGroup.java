@@ -22,6 +22,8 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
   String PROP_COLLAPSED = "collapsed";
   String PROP_COLLAPSE_STYLE = "collapseStyle";
   String PROP_TITLE = "title";
+  String PROP_HEADER = "header";
+  String PROP_HEADER_FOCUSABLE = "headerFocusable";
   String PROP_HEADER_VISIBLE = "headerVisible";
   String PROP_BODY = "body";
   String PROP_GROUP_ID = "groupId";
@@ -30,6 +32,7 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
 
   String COLLAPSE_STYLE_LEFT = "left";
   String COLLAPSE_STYLE_RIGHT = "right";
+  String COLLAPSE_STYLE_BOTTOM = "bottom";
 
   ITypeWithClassId getContainer();
 
@@ -57,6 +60,14 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
 
   void setHeaderVisible(boolean headerVisible);
 
+  boolean isHeaderFocusable();
+
+  void setHeaderFocusable(boolean headerFocusable);
+
+  IWidget getHeader();
+
+  void setHeader(IWidget widget);
+
   IWidget getBody();
 
   void setBody(IWidget widget);
@@ -70,4 +81,5 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
   String getIconId();
 
   void setIconId(String iconId);
+
 }

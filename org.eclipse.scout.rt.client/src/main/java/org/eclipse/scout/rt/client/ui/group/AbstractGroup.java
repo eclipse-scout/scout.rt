@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.group;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
@@ -68,6 +68,8 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
     setCollapsed(getConfiguredCollapsed());
     setCollapseStyle(getConfiguredCollapseStyle());
     setTitle(getConfiguredTitle());
+    setHeader(createHeader());
+    setHeaderFocusable(getConfiguredHeaderFocusable());
     setHeaderVisible(getConfiguredHeaderVisible());
     setBody(createBody());
   }
@@ -218,6 +220,44 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
     return propertySupport.getPropertyString(PROP_TITLE_SUFFIX);
   }
 
+  protected IWidget createHeader() {
+    Class<? extends IWidget> configuredHeader = getConfiguredHeader();
+    if (configuredHeader != null) {
+      return ConfigurationUtility.newInnerInstance(this, configuredHeader);
+    }
+    return null;
+  }
+
+  protected Class<? extends IWidget> getConfiguredHeader() {
+    return null;
+  }
+
+  @Override
+  public void setHeader(IWidget header) {
+    propertySupport.setProperty(PROP_HEADER, header);
+  }
+
+  @Override
+  public IWidget getHeader() {
+    return (IWidget) propertySupport.getProperty(PROP_HEADER);
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(110)
+  protected boolean getConfiguredHeaderFocusable() {
+    return false;
+  }
+
+  @Override
+  public void setHeaderFocusable(boolean headerFocusable) {
+    propertySupport.setPropertyBool(PROP_HEADER_FOCUSABLE, headerFocusable);
+  }
+
+  @Override
+  public boolean isHeaderFocusable() {
+    return propertySupport.getPropertyBool(PROP_HEADER_FOCUSABLE);
+  }
+
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
   protected boolean getConfiguredHeaderVisible() {
@@ -236,7 +276,7 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
 
   @Override
   public List<? extends IWidget> getChildren() {
-    return CollectionUtility.flatten(super.getChildren(), Collections.singletonList(getBody()));
+    return CollectionUtility.flatten(super.getChildren(), Arrays.asList(getHeader(), getBody()));
   }
 
   protected IWidget createBody() {
@@ -253,7 +293,7 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
     return null;
   }
 
-  private Class<? extends IWidget> getConfiguredBody() {
+  protected Class<? extends IWidget> getConfiguredBody() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     return ConfigurationUtility.filterClass(dca, IWidget.class);
   }

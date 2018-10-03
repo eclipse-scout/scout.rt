@@ -15,21 +15,46 @@ scout.GroupLayout = function(group) {
 scout.inherits(scout.GroupLayout, scout.AbstractLayout);
 
 scout.GroupLayout.prototype.layout = function($container) {
-  // Set size only if group is expande
+  var htmlComp = this.group.htmlComp;
+  var containerSize = htmlComp.availableSize();
+  containerSize.subtract(htmlComp.insets());
+
+  var htmlHeader = this.group.htmlHeader;
+  var headerSize = htmlHeader.prefSize(false);
+  headerSize.width = containerSize.width;
+  headerSize = headerSize.subtract(htmlHeader.margins());
+  htmlHeader.setSize(headerSize);
+
+  var htmlFooter = this.group.htmlFooter;
+  if (htmlFooter.isVisible()) {
+    var footerSize = htmlFooter.prefSize({
+      includeMargin: false,
+      useCssSize: true
+    });
+    footerSize.width = containerSize.width;
+    footerSize = footerSize.subtract(htmlFooter.margins());
+    htmlFooter.setSize(footerSize);
+  }
+
+  // Set size only if group is expanded
   // Also there is no need to update it during the expand animation (the body will be layouted correctly before the animation starts)
   if (this.group.collapsed || this.group.bodyAnimating) {
     return;
   }
   var bodySize;
-  var htmlComp = this.group.htmlComp;
-  var htmlHeader = this.group.htmlHeader;
   var htmlBody = this.group.body.htmlComp;
-  var containerSize = htmlComp.availableSize();
-  containerSize.subtract(htmlComp.insets());
 
-  bodySize = containerSize.subtract(htmlBody.margins());
-  bodySize.height -= htmlHeader.prefSize(true).height;
-  htmlBody.setSize(bodySize);
+  var hasBody = htmlBody.prefSize(false).height > 0 && this.group.body.isVisible();
+  if (hasBody) {
+    bodySize = containerSize.subtract(htmlBody.margins());
+    bodySize.height -= headerSize.height;
+    if (htmlFooter.isVisible()) {
+      bodySize.height -= htmlFooter.prefSize(true).height;
+    }
+    htmlBody.setSize(bodySize);
+  }
+
+  this.group.$collapseIcon.setVisible(hasBody);
 };
 
 scout.GroupLayout.prototype.invalidate = function(htmlSource) {
@@ -51,6 +76,7 @@ scout.GroupLayout.prototype.preferredLayoutSize = function($container, options) 
   var htmlComp = this.group.htmlComp;
   var htmlHeader = this.group.htmlHeader;
   var htmlBody = this.group.body.htmlComp;
+  var htmlFooter = this.group.htmlFooter;
 
   // HeightHint not supported
   options.heightHint = null;
@@ -67,7 +93,14 @@ scout.GroupLayout.prototype.preferredLayoutSize = function($container, options) 
     prefSize = htmlBody.prefSize(options)
       .add(htmlBody.margins());
   }
-  prefSize = prefSize.add(htmlComp.insets());
+  prefSize = prefSize.add(htmlComp.insets({
+    includeMargin: true
+  }));
   prefSize.height += htmlHeader.prefSize(true).height;
+  if (htmlFooter.isVisible()) {
+    prefSize.height += htmlFooter.prefSize({
+      useCssSize: true
+    }).height;
+  }
   return prefSize;
 };

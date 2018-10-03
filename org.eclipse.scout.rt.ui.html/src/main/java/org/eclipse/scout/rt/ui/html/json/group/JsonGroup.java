@@ -58,6 +58,18 @@ public class JsonGroup<T extends IGroup> extends AbstractJsonWidget<T> {
         return getModel().getTitleSuffix();
       }
     });
+    putJsonProperty(new JsonAdapterProperty<T>(IGroup.PROP_HEADER, model, getUiSession()) {
+      @Override
+      protected IWidget modelValue() {
+        return getModel().getHeader();
+      }
+    });
+    putJsonProperty(new JsonProperty<T>(IGroup.PROP_HEADER_FOCUSABLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isHeaderFocusable();
+      }
+    });
     putJsonProperty(new JsonProperty<T>(IGroup.PROP_HEADER_VISIBLE, model) {
       @Override
       protected Boolean modelValue() {

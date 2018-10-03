@@ -8,38 +8,45 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+
 scout.Group = function() {
   scout.Group.parent.call(this);
   this.bodyAnimating = false;
   this.collapsed = false;
   this.title = null;
   this.titleSuffix = null;
+  this.header = null;
+  this.headerFocusable = false;
   this.headerVisible = true;
   this.body = null;
 
   this.$container = null;
   this.$header = null;
-  this.$title = null;
+  this.$footer = null;
   this.$collapseIcon = null;
+  this.$collapseBorder = null;
   this.collapseStyle = scout.Group.CollapseStyle.LEFT;
   this.htmlComp = null;
   this.htmlHeader = null;
-  this.htmlBody = null;
+  this.htmlFooter = null;
   this.iconId = null;
   this.icon = null;
+  this._addWidgetProperties(['header']);
   this._addWidgetProperties(['body']);
 };
 scout.inherits(scout.Group, scout.Widget);
 
 scout.Group.CollapseStyle = {
   LEFT: 'left',
-  RIGHT: 'right'
+  RIGHT: 'right',
+  BOTTOM: 'bottom'
 };
 
 scout.Group.prototype._init = function(model) {
   scout.Group.parent.prototype._init.call(this, model);
   this.resolveIconIds(['iconId']);
   this._setBody(this.body);
+  this._setHeader(this.header);
 };
 
 /**
@@ -69,18 +76,14 @@ scout.Group.prototype._render = function() {
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.GroupLayout(this));
 
-  this.$header = this.$container.prependDiv('group-header')
-    .on('mousedown', this._onHeaderMouseDown.bind(this))
-    .unfocusable()
-    .addClass('prevent-initial-focus');
-  this.htmlHeader = scout.HtmlComponent.install(this.$header, this.session);
-  this.$title = this.$header.appendDiv('group-title');
-  this.$titleSuffix = this.$header.appendDiv('group-title-suffix');
-  this.$collapseIcon = this.$header.appendDiv('group-collapse-icon');
+  this._renderHeaderOnly();
 
-  scout.tooltips.installForEllipsis(this.$title, {
-    parent: this
-  });
+  this.$collapseIcon = this.$header.appendDiv('group-collapse-icon');
+  this.$footer = this.$container.appendDiv('group-footer');
+  this.$collapseBorder = this.$footer.appendDiv('group-collapse-border');
+  this.htmlFooter = scout.HtmlComponent.install(this.$footer, this.session);
+
+  this.$footer.on('mousedown', this._onFooterMouseDown.bind(this));
 };
 
 scout.Group.prototype._renderProperties = function() {
@@ -89,6 +92,7 @@ scout.Group.prototype._renderProperties = function() {
   this._renderTitle();
   this._renderTitleSuffix();
   this._renderHeaderVisible();
+  this._renderHeaderFocusable();
   this._renderCollapsed();
   this._renderCollapseStyle();
 };
@@ -97,14 +101,15 @@ scout.Group.prototype._remove = function() {
   this.$header = null;
   this.$title = null;
   this.$titleSuffix = null;
+  this.$footer = null;
   this.$collapseIcon = null;
+  this.$collapseBorder = null;
   this._removeIconId();
   scout.Group.parent.prototype._remove.call(this);
 };
 
 scout.Group.prototype._renderEnabled = function() {
   scout.Group.parent.prototype._renderEnabled.call(this);
-
   this.$header.setTabbable(this.enabled);
 };
 
@@ -160,13 +165,31 @@ scout.Group.prototype._removeIconId = function() {
   }
 };
 
+scout.Group.prototype.setHeader = function(header) {
+  this.setProperty('header', header);
+};
+
+scout.Group.prototype._setHeader = function(header) {
+  this._setProperty('header', header);
+};
+
+scout.Group.prototype.setHeaderFocusable = function(headerFocusable) {
+  this.setProperty('headerFocusable', headerFocusable);
+};
+
+scout.Group.prototype._renderHeaderFocusable = function() {
+  this.$header.toggleClass('unfocusable', !this.headerFocusable);
+};
+
 scout.Group.prototype.setTitle = function(title) {
   this.setProperty('title', title);
 };
 
 scout.Group.prototype._renderTitle = function() {
-  this.$title.textOrNbsp(this.title);
-  this._updateIconStyle();
+  if (this.$title) {
+    this.$title.textOrNbsp(this.title);
+    this._updateIconStyle();
+  }
 };
 
 scout.Group.prototype.setTitleSuffix = function(titleSuffix) {
@@ -174,7 +197,9 @@ scout.Group.prototype.setTitleSuffix = function(titleSuffix) {
 };
 
 scout.Group.prototype._renderTitleSuffix = function() {
-  this.$titleSuffix.text(this.titleSuffix || '');
+  if (this.$titleSuffix) {
+    this.$titleSuffix.text(this.titleSuffix || '');
+  }
 };
 
 scout.Group.prototype.setHeaderVisible = function(headerVisible) {
@@ -204,11 +229,47 @@ scout.Group.prototype._setBody = function(body) {
   this._setProperty('body', body);
 };
 
+scout.Group.prototype._renderHeader = function() {
+  this._renderHeaderOnly();
+  this._renderHeaderVisible();
+  this._renderHeaderFocusable();
+  this._renderTitle();
+  this._renderTitleSuffix();
+  this._renderCollapseStyle();
+};
+
+scout.Group.prototype._renderHeaderOnly = function() {
+  if (this.$header) {
+    this.$header.remove();
+  }
+  if (this.header) {
+    this.header.render();
+    this.$header = this.header.$container
+      .addClass('group-header')
+      .prependTo(this.$container);
+    this.htmlHeader =  this.header.htmlComp;
+  } else {
+    this.$header = this.$container
+      .prependDiv('group-header')
+      .addClass('prevent-initial-focus');
+    this.$title = this.$header.appendDiv('group-title');
+    this.$titleSuffix = this.$header.appendDiv('group-title-suffix');
+    scout.tooltips.installForEllipsis(this.$title, {
+      parent: this
+    });
+    this.htmlHeader = scout.HtmlComponent.install(this.$header, this.session);
+  }
+  this.$header.on('mousedown', this._onHeaderMouseDown.bind(this));
+  this.invalidateLayoutTree();
+};
+
 scout.Group.prototype._renderBody = function() {
   this.body.render();
+  this.body.$container.insertAfter(this.$header);
   this.body.$container.addClass('group-body');
   this.body.invalidateLayoutTree();
 };
+
 
 /**
  * @override
@@ -240,6 +301,7 @@ scout.Group.prototype._renderCollapsed = function() {
     // Body will be removed after the animation, if there is no animation, remove it now
     this.body.remove();
   }
+  this.invalidateLayoutTree();
 };
 
 scout.Group.prototype.setCollapseStyle = function(collapseStyle) {
@@ -248,14 +310,29 @@ scout.Group.prototype.setCollapseStyle = function(collapseStyle) {
 
 scout.Group.prototype._renderCollapseStyle = function() {
   this.$header.toggleClass('collapse-right', this.collapseStyle === scout.Group.CollapseStyle.RIGHT);
-  if (this.collapseStyle === scout.Group.CollapseStyle.RIGHT) {
+  this.$container.toggleClass('collapse-bottom', this.collapseStyle === scout.Group.CollapseStyle.BOTTOM);
+  this.$footer.setVisible(this.collapseStyle === scout.Group.CollapseStyle.BOTTOM && this.$header.isVisible());
+
+  if (this.collapseStyle === scout.Group.CollapseStyle.RIGHT && !this.header) {
     this.$collapseIcon.appendTo(this.$header);
-  } else {
+  } else if (this.collapseStyle === scout.Group.CollapseStyle.LEFT && !this.header) {
     this.$collapseIcon.prependTo(this.$header);
+  } else if (this.collapseStyle === scout.Group.CollapseStyle.BOTTOM) {
+    var sibling = this.body.$container ? this.body.$container : this.$header;
+    this.$footer.insertAfter(sibling);
+    this.$collapseIcon.appendTo(this.$footer);
   }
+  this.invalidateLayoutTree();
 };
 
 scout.Group.prototype._onHeaderMouseDown = function(event) {
+  if (this.collapseStyle === scout.Group.CollapseStyle.BOTTOM) {
+    return;
+  }
+  this.setCollapsed(!this.collapsed);
+};
+
+scout.Group.prototype._onFooterMouseDown = function(event) {
   this.setCollapsed(!this.collapsed);
 };
 
