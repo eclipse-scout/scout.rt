@@ -541,10 +541,10 @@
   // Desktop
   __include("scout/desktop/Desktop.js");
   __include("scout/desktop/DesktopAdapter.js");
-  __include("scout/desktop/DesktopKeyStroke.js");
   __include("scout/desktop/DesktopLogo.js");
   __include("scout/desktop/DesktopLayout.js");
   __include("scout/desktop/DesktopTabBoxController.js");
+  __include("scout/desktop/DisableBrowserF5ReloadKeyStroke.js");
   __include("scout/desktop/PopupWindow.js");
   __include("scout/desktop/OpenUriHandler.js");
   __include("scout/desktop/bench/DesktopBench.js");

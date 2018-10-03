@@ -12,6 +12,8 @@ scout.ActionKeyStroke = function(action) {
   scout.ActionKeyStroke.parent.call(this);
   this.field = action;
   this.parseAndSetKeyStroke(action.keyStroke);
+  this.keyStrokeFirePolicy = action.keyStrokeFirePolicy;
+
   // If one action is executed, don't execute other actions by default
   this.stopPropagation = true;
   this.stopImmediatePropagation = true;
