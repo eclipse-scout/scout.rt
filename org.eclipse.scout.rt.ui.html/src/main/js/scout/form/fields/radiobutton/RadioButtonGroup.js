@@ -282,7 +282,7 @@ scout.RadioButtonGroup.prototype._valueChanged = function() {
 
   // Don't select button during initialization if value is null to not override selected state of a button
   if (this.value !== null || this.initialized) {
-    this.selectButtonByValue(this.value);
+    this.selectButton(this.getButtonForRadioValue(this.value));
   }
 };
 
@@ -298,10 +298,6 @@ scout.RadioButtonGroup.prototype.selectButtonByIndex = function(index) {
   if (this.radioButtons.length && index >= 0 && index < this.radioButtons.length) {
     this.selectButton(this.radioButtons[index]);
   }
-};
-
-scout.RadioButtonGroup.prototype.selectButtonByValue = function(value) {
-  this.selectButton(this.getButtonForRadioValue(value));
 };
 
 scout.RadioButtonGroup.prototype.selectButton = function(radioButton) {

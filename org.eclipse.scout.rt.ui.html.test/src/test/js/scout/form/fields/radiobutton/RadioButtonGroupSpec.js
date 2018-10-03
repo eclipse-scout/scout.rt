@@ -170,7 +170,7 @@ describe("RadioButtonGroup", function() {
       expect(radioButtonGroup.value).toBe(1);
 
       // select by value
-      radioButtonGroup.selectButtonByValue(2);
+      radioButtonGroup.setValue(2);
       expect(radioButtonGroup.value).toBe(2);
     });
 
