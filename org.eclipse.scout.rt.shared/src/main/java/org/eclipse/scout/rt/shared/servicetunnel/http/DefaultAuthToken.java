@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2018 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.security.auth.Subject;
@@ -23,24 +25,165 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.HexUtility;
 import org.eclipse.scout.rt.platform.util.HexUtility.HexOutputStream;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPublicKeyProperty;
-import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenTimeToLiveProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Authentication Token used in {@link HttpServiceTunnel} to tell the backend which user is making a request.
+ * Authentication token which can be used within a chain of trust.
  */
 @Bean
 public class DefaultAuthToken {
+
   private static final Logger LOG = LoggerFactory.getLogger(DefaultAuthToken.class);
 
+  private String m_userId;
+  private long m_validUntil;
+  private List<String> m_customArgs;
+
+  private byte[] m_signature;
+
+  public String getUserId() {
+    return m_userId;
+  }
+
+  public String getUserIdOrAnonymous() {
+    return StringUtility.hasText(m_userId) ? m_userId : "anonymous";
+  }
+
+  public DefaultAuthToken withUserId(String userId) {
+    m_userId = userId;
+    return this;
+  }
+
+  public long getValidUntil() {
+    return m_validUntil;
+  }
+
+  public DefaultAuthToken withValidUntil(long validUntil) {
+    m_validUntil = validUntil;
+    return this;
+  }
+
+  protected boolean verifyUser(DefaultAuthToken token) {
+    return StringUtility.hasText(token.getUserId());
+  }
+
+  protected boolean verifyValidUntil(DefaultAuthToken token) {
+    return System.currentTimeMillis() < token.getValidUntil();
+  }
+
+  public List<String> getCustomArgs() {
+    return m_customArgs;
+  }
+
+  public DefaultAuthToken withCustomArgs(List<String> customArgs) {
+    m_customArgs = customArgs;
+    return this;
+  }
+
+  public DefaultAuthToken withCustomArgs(String... customArgs) {
+    if (customArgs != null && customArgs.length > 0) {
+      m_customArgs = new ArrayList<>(Arrays.asList(customArgs));
+    }
+    return this;
+  }
+
+  public byte[] getSignature() {
+    return m_signature;
+  }
+
+  public DefaultAuthToken withSignature(byte[] signature) {
+    m_signature = signature;
+    return this;
+  }
+
+  /**
+   * According to HTTP spec
+   *
+   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html">rfc2616</a>
+   */
+  protected char partsDelimiter() {
+    return ';';
+  }
+
+  /**
+   * @param token
+   *          possible null token to be parsed
+   * @return this
+   */
+  public DefaultAuthToken read(String token) {
+    if (!StringUtility.hasText(token)) {
+      return this;
+    }
+    String[] parts = token.split(Pattern.quote("" + partsDelimiter()));
+    if (parts == null || parts.length < 3) {
+      return this;
+    }
+
+    try {
+      withUserId(new String(HexUtility.decode(parts[0]), StandardCharsets.UTF_8));
+      withValidUntil(Long.parseLong(parts[1], 16));
+      if (parts.length > 3) {
+        int numberOfCustomArgs = parts.length - 1;
+        List<String> customArgs = new ArrayList<String>(numberOfCustomArgs);
+        for (int i = 2; i < numberOfCustomArgs; i++) {
+          customArgs.add(new String(HexUtility.decode(parts[i]), StandardCharsets.UTF_8));
+        }
+        withCustomArgs(customArgs);
+      }
+      try { // NOSONAR
+        withSignature(HexUtility.decode(parts[parts.length - 1]));
+      }
+      catch (RuntimeException e) {
+        LOG.debug("Could not decode hex string", e);
+      }
+    }
+    catch (Exception ex) {
+      throw new PlatformException("unexpected behaviour", ex);
+    }
+    return this;
+  }
+
+  public String write(boolean withSignature) {
+    char partsDelimiter = partsDelimiter();
+    try (ByteArrayOutputStream bytes = new ByteArrayOutputStream(); HexOutputStream hex = new HexOutputStream(bytes)) {
+      hex.write(getUserIdOrAnonymous().getBytes(StandardCharsets.UTF_8));
+      bytes.write(partsDelimiter);
+      bytes.write(Long.toHexString(getValidUntil()).getBytes());
+      if (getCustomArgs() != null) {
+        for (String arg : getCustomArgs()) {
+          bytes.write(partsDelimiter);
+          hex.write(arg.getBytes(StandardCharsets.UTF_8));
+        }
+      }
+      byte[] signature = getSignature();
+      if (withSignature && signature != null && signature.length > 0) {
+        bytes.write(partsDelimiter);
+        hex.write(signature);
+      }
+      return bytes.toString(StandardCharsets.UTF_8.name());
+    }
+    catch (IOException ex) {
+      throw new PlatformException("unexpected behaviour", ex);
+    }
+  }
+
+  @Override
+  public String toString() {
+    return write(true);
+  }
+
+  /**
+   * @deprecated replaced by {@link DefaultAuthTokenSigner#isEnabled()} or {@link DefaultAuthTokenVerifier#isEnabled()}.
+   *             This method will be removed in Scout 9.0.
+   */
+  @Deprecated
   public static boolean isEnabled() {
     byte[] privateKey = CONFIG.getPropertyValue(AuthTokenPrivateKeyProperty.class);
     byte[] publicKey = CONFIG.getPropertyValue(AuthTokenPublicKeyProperty.class);
@@ -48,9 +191,10 @@ public class DefaultAuthToken {
   }
 
   /**
-   * @return a new {@link DefaultAuthToken} for the running {@link Subject}. Does return null if there is no subject or
-   *         if {@link #isEnabled()} returns false.
+   * @deprecated replaced by {@link DefaultAuthTokenSigner#createDefaultSignedToken(Class)}. This method will be removed
+   *             in Scout 9.0.
    */
+  @Deprecated
   public static DefaultAuthToken create() {
     if (!isEnabled()) {
       return null;
@@ -64,157 +208,35 @@ public class DefaultAuthToken {
 
     String userId = CollectionUtility.firstElement(subject.getPrincipals()).getName();
     DefaultAuthToken token = BEANS.get(DefaultAuthToken.class);
-    token.init(userId);
+    token.withUserId(userId);
     return token;
   }
 
-  private String m_userId;
-  private long m_validUntil;
-  private String[] m_customArgs;
-  private byte[] m_signature;
-
+  /**
+   * @deprecated replaced by {@link #read(String)}. This method will be removed in Scout 9.0.
+   */
+  @Deprecated
   public boolean parse(String token) {
-    if (!StringUtility.hasText(token)) {
-      return false;
-    }
-
-    String[] parts = token.split(Pattern.quote("" + partsDelimiter()));
-    if (parts == null || parts.length < 3) {
-      return false;
-    }
-
-    try {
-      String userId = new String(HexUtility.decode(parts[0]), StandardCharsets.UTF_8);
-      long validUntil = Long.parseLong(parts[1], 16);
-      String[] customArgs = null;
-      if (parts.length > 3) {
-        customArgs = Arrays.copyOfRange(parts, 2, parts.length - 1);
-        for (int i = 0; i < customArgs.length; i++) {
-          customArgs[i] = new String(HexUtility.decode(customArgs[i]), StandardCharsets.UTF_8);
-        }
-      }
-      if (customArgs != null && customArgs.length == 0) {
-        customArgs = null;
-      }
-      byte[] signature;
-      try { // NOSONAR
-        signature = HexUtility.decode(parts[parts.length - 1]);
-      }
-      catch (RuntimeException e) {
-        LOG.debug("Could not decode hex string", e);
-        signature = new byte[0];
-      }
-      m_userId = userId;
-      m_validUntil = validUntil;
-      m_customArgs = (customArgs == null ? null : Arrays.copyOf(customArgs, customArgs.length));
-      m_signature = signature;
-      return true;
-    }
-    catch (Exception ex) {
-      throw new PlatformException("unexpected behaviour", ex);
-    }
+    read(token);
+    return StringUtility.hasText(getUserId());
   }
 
   /**
-   * Init this auth-token with explicit values
-   *
-   * @param userId
-   * @param customArgs
+   * @deprecated replaced by {@link #withUserId(String)} and {@link #withCustomArgs(String...)}. This method will be
+   *             removed in Scout 9.0.
    */
+  @Deprecated
   public void init(String userId, String... customArgs) {
-    long tokenTTL = CONFIG.getPropertyValue(AuthTokenTimeToLiveProperty.class);
-    m_userId = userId;
-    m_validUntil = System.currentTimeMillis() + tokenTTL;
-    if (customArgs != null && customArgs.length == 0) {
-      customArgs = null;
-    }
-    m_customArgs = (customArgs == null ? null : Arrays.copyOf(customArgs, customArgs.length));
-    try {
-      m_signature = sign();
-    }
-    catch (Exception e) {
-      throw new PlatformException("Invalid signature setup", e);
-    }
-  }
-
-  public byte[] getSignature() {
-    return m_signature;
-  }
-
-  public String getUserId() {
-    return m_userId;
-  }
-
-  public long getValidUntil() {
-    return m_validUntil;
-  }
-
-  public int getCustomArgCount() {
-    return m_customArgs == null ? 0 : m_customArgs.length;
-  }
-
-  public String getCustomArg(int index) {
-    return m_customArgs[index];
+    withUserId(userId);
+    withCustomArgs(customArgs);
   }
 
   /**
-   * According to HTTP spec
-   *
-   * @see <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html">rfc2616</a>
+   * @deprecated replaced by {@link DefaultAuthTokenVerifier#verify(DefaultAuthToken)}. This method will be removed in
+   *             Scout 9.0.
    */
-  protected char partsDelimiter() {
-    return ';';
-  }
-
-  protected byte[] createUnsignedData() {
-    try (ByteArrayOutputStream bytes = new ByteArrayOutputStream(); HexOutputStream hex = new HexOutputStream(bytes)) {
-      hex.write(m_userId.getBytes(StandardCharsets.UTF_8));
-      bytes.write(partsDelimiter());
-      bytes.write(Long.toHexString(m_validUntil).getBytes());
-      if (m_customArgs != null) {
-        for (String arg : m_customArgs) {
-          bytes.write(partsDelimiter());
-          hex.write(arg.getBytes(StandardCharsets.UTF_8));
-        }
-      }
-      return bytes.toByteArray();
-    }
-    catch (IOException ex) {
-      throw new PlatformException("unexpected behaviour", ex);
-    }
-  }
-
-  protected byte[] sign() {
-    byte[] privateKey = CONFIG.getPropertyValue(AuthTokenPrivateKeyProperty.class);
-    return SecurityUtility.createSignature(privateKey, createUnsignedData());
-  }
-
-  protected boolean verify() {
-    byte[] publicKey = CONFIG.getPropertyValue(AuthTokenPublicKeyProperty.class);
-    return SecurityUtility.verifySignature(publicKey, createUnsignedData(), getSignature());
-  }
-
+  @Deprecated
   public boolean isValid() {
-    if (!isEnabled()) {
-      return false;
-    }
-    if (getSignature() == null) {
-      return false;
-    }
-    try {
-      return verify();
-    }
-    catch (RuntimeException e) { // NOSONAR
-      return false;
-    }
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder buf = new StringBuilder();
-    buf.append(new String(createUnsignedData()));
-    buf.append(partsDelimiter());
-    buf.append(HexUtility.encode(m_signature));
-    return buf.toString();
+    return BEANS.get(DefaultAuthTokenVerifier.class).verify(this);
   }
 }

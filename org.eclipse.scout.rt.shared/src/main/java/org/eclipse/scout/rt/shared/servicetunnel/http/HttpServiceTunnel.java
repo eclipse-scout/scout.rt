@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.text.TEXTS;
-import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.UriUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
@@ -146,9 +145,9 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
 
   protected void addSignatureHeader(HttpRequest httpRequest, byte[] callData) throws IOException {
     try {
-      String token = createAuthToken(httpRequest, callData);
-      if (StringUtility.hasText(token)) {
-        httpRequest.getHeaders().put(TOKEN_AUTH_HTTP_HEADER, token);
+      DefaultAuthToken token = BEANS.get(DefaultAuthTokenSigner.class).createDefaultSignedToken(DefaultAuthToken.class);
+      if (token != null) {
+        httpRequest.getHeaders().put(TOKEN_AUTH_HTTP_HEADER, token.toString());
       }
     }
     catch (RuntimeException e) {
@@ -164,14 +163,6 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
     if (cid != null) {
       httpRequest.getHeaders().put(CorrelationId.HTTP_HEADER_NAME, cid);
     }
-  }
-
-  protected String createAuthToken(HttpRequest httpRequest, byte[] callData) {
-    DefaultAuthToken token = DefaultAuthToken.create();
-    if (token == null) {
-      return null;
-    }
-    return token.toString();
   }
 
   /**

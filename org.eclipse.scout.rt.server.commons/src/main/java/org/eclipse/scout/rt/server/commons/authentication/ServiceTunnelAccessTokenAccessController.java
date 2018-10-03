@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.platform.security.IPrincipalProducer;
 import org.eclipse.scout.rt.platform.security.SimplePrincipalProducer;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthToken;
+import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthTokenVerifier;
 import org.eclipse.scout.rt.shared.servicetunnel.http.HttpServiceTunnel;
 
 /**
@@ -38,56 +39,39 @@ import org.eclipse.scout.rt.shared.servicetunnel.http.HttpServiceTunnel;
 public class ServiceTunnelAccessTokenAccessController implements IAccessController {
 
   private ServiceTunnelAccessTokenAuthConfig m_config;
+  private boolean m_enabled;
 
-  public ServiceTunnelAccessTokenAccessController init() throws ServletException {
+  public ServiceTunnelAccessTokenAccessController init() {
     init(new ServiceTunnelAccessTokenAuthConfig());
     return this;
   }
 
-  public ServiceTunnelAccessTokenAccessController init(final ServiceTunnelAccessTokenAuthConfig config) {
+  public ServiceTunnelAccessTokenAccessController init(ServiceTunnelAccessTokenAuthConfig config) {
     m_config = config;
+    m_enabled = config.isEnabled() && config.getTokenClazz() != null && config.getTokenVerifier() != null && config.getTokenVerifier().isEnabled() && config.getPrincipalProducer() != null;
     return this;
   }
 
   @Override
-  public boolean handle(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain) throws IOException, ServletException {
-    if (!m_config.isEnabled()) {
+  public boolean handle(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+    if (!m_enabled) {
       return false;
     }
 
-    final String tokenString = request.getHeader(HttpServiceTunnel.TOKEN_AUTH_HTTP_HEADER);
-    if (tokenString == null) {
+    String tokenString = request.getHeader(HttpServiceTunnel.TOKEN_AUTH_HTTP_HEADER);
+    if (StringUtility.isNullOrEmpty(tokenString)) {
       return false;
     }
-
-    final DefaultAuthToken token = BEANS.get(DefaultAuthToken.class);
-    if (!token.parse(tokenString)) {
-      return false;
-    }
-
-    // check subject
-    if (!StringUtility.hasText(token.getUserId())) {
+    DefaultAuthToken token = BEANS.get(m_config.getTokenClazz()).read(tokenString);
+    if (!m_config.getTokenVerifier().verify(token)) {
       fail(response);
       return true;
     }
 
-    // check TTL
-    if (System.currentTimeMillis() > token.getValidUntil()) {
-      fail(response);
-      return true;
-    }
-
-    // check signature
-    if (!token.isValid()) {
-      fail(response);
-      return true;
-    }
-
-    final ServletFilterHelper helper = BEANS.get(ServletFilterHelper.class);
-    final Principal principal = m_config.getPrincipalProducer().produce(token.getUserId());
+    Principal principal = m_config.getPrincipalProducer().produce(token.getUserId());
 
     // By design: do not cache principal on session. Otherwise, TrivialAccessController would skip this access controller for subsequent requests.
-    helper.continueChainAsSubject(principal, request, response, chain);
+    BEANS.get(ServletFilterHelper.class).continueChainAsSubject(principal, request, response, chain);
     return true;
   }
 
@@ -96,7 +80,7 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
     // NOOP
   }
 
-  protected void fail(final HttpServletResponse resp) throws IOException {
+  protected void fail(HttpServletResponse resp) throws IOException {
     resp.sendError(HttpServletResponse.SC_FORBIDDEN);
   }
 
@@ -105,14 +89,34 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
    */
   public static class ServiceTunnelAccessTokenAuthConfig {
 
-    private boolean m_enabled = DefaultAuthToken.isEnabled();
+    private Class<? extends DefaultAuthToken> m_tokenClazz = DefaultAuthToken.class;
+    private DefaultAuthTokenVerifier m_tokenVerifier = BEANS.get(DefaultAuthTokenVerifier.class);
+    private boolean m_enabled = true;
     private IPrincipalProducer m_principalProducer = BEANS.get(SimplePrincipalProducer.class);
+
+    public Class<? extends DefaultAuthToken> getTokenClazz() {
+      return m_tokenClazz;
+    }
+
+    public ServiceTunnelAccessTokenAuthConfig withTokenClazz(Class<? extends DefaultAuthToken> tokenClazz) {
+      m_tokenClazz = tokenClazz;
+      return this;
+    }
+
+    public DefaultAuthTokenVerifier getTokenVerifier() {
+      return m_tokenVerifier;
+    }
+
+    public ServiceTunnelAccessTokenAuthConfig withTokenVerifier(DefaultAuthTokenVerifier tokenVerifier) {
+      m_tokenVerifier = tokenVerifier;
+      return this;
+    }
 
     public boolean isEnabled() {
       return m_enabled;
     }
 
-    public ServiceTunnelAccessTokenAuthConfig withEnabled(final boolean enabled) {
+    public ServiceTunnelAccessTokenAuthConfig withEnabled(boolean enabled) {
       m_enabled = enabled;
       return this;
     }
@@ -121,7 +125,7 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
       return m_principalProducer;
     }
 
-    public ServiceTunnelAccessTokenAuthConfig withPrincipalProducer(final IPrincipalProducer principalProducer) {
+    public ServiceTunnelAccessTokenAuthConfig withPrincipalProducer(IPrincipalProducer principalProducer) {
       m_principalProducer = principalProducer;
       return this;
     }
