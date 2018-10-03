@@ -196,13 +196,34 @@ scout.objects = {
   },
 
   /**
-   * Returns the given property if the object is truthy.
+   * Null-safe access the property of an objects. Examples:
+   * <ul>
+   * <li><code>optProperty(obj, 'value');</code> try to access and return obj.value</li>
+   * <li><code>optProperty(obj, 'foo', 'bar');</code> try to access and return obj.foo.bar</li>
+   * </ul>
+   *
+   * @returns the value of the requested property or undefined if the property does not exist on the object
    */
-  optProperty: function(obj, property) {
-    if (obj) {
-      return obj[property];
+  optProperty: function(obj) {
+    if (!obj) {
+      return null;
     }
-    return null;
+
+    var numArgs = arguments.length;
+    if (numArgs < 2) {
+      return obj;
+    }
+    if (numArgs === 2) {
+      return obj[arguments[1]];
+    }
+
+    for (var i = 1; i < numArgs - 1; i++) {
+      obj = obj[arguments[i]];
+      if (!obj) {
+        return null;
+      }
+    }
+    return obj[arguments[numArgs - 1]];
   },
 
   /**
