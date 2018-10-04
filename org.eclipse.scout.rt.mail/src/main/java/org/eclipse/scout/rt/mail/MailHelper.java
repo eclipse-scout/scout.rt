@@ -141,7 +141,7 @@ public class MailHelper {
       return;
     }
     try {
-      String disp = part.getDisposition();
+      String disp = getDispositionSafely(part);
       if (disp != null && disp.equalsIgnoreCase(Part.ATTACHMENT)) {
         if (attachmentCollector != null) {
           attachmentCollector.add(part);
@@ -212,6 +212,17 @@ public class MailHelper {
     }
     catch (MessagingException | IOException e) {
       throw new ProcessingException("Unexpected: ", e);
+    }
+  }
+
+  protected String getDispositionSafely(Part part) {
+    try {
+      return part.getDisposition();
+    }
+    catch (MessagingException e) {
+      // Rare cases where content disposition header is set but empty, assuming no disposition at all.
+      LOG.info("Unable to get disposition", e);
+      return null;
     }
   }
 

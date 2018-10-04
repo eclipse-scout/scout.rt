@@ -712,6 +712,23 @@ public class MailHelperTest {
     assertEquals(null, mailHelper.guessAttachmentFileExtension("lorem/ipsum")); // unknown
   }
 
+  @Test
+  public void testEmptyContentDisposition() throws MessagingException {
+    String eml = ""
+        + "To: lorem@exampleorg\n"
+        + "From: ipsum@example.org\n"
+        + "MIME-Version: 1.0\n"
+        + "Content-Type: text/plain; charset=utf-8\n"
+        + "Content-Disposition: \n"
+        + "Content-Transfer-Encoding: 7bit\n"
+        + "\n"
+        + "Lorem";
+
+    MailHelper helper = BEANS.get(MailHelper.class);
+    MimeMessage message = helper.createMessageFromBytes(eml.getBytes(StandardCharsets.UTF_8));
+    assertEquals("Lorem", helper.getPlainText(message)); // failed with javax.mail.internet.ParseException: Expected disposition, got null
+  }
+
   protected void verifyAddPrefixToSubject(String messageSubject, String subjectPrefix, String expectedSubject) throws MessagingException {
     MailMessage mailMessage = BEANS.get(MailMessage.class)
         .withSubject(messageSubject)
