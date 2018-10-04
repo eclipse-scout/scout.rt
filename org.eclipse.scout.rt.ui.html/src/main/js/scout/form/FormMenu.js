@@ -110,8 +110,8 @@ scout.FormMenu.prototype._createPopup = function() {
   return scout.create('FormMenuPopup', {
     parent: this,
     formMenu: this,
-    openingDirectionX: this.popupOpeningDirectionX,
-    openingDirectionY: this.popupOpeningDirectionY
+    horizontalAlignment: this.popupHorizontalAlignment,
+    verticalAlignment: this.popupVerticalAlignment
   });
 };
 

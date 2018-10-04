@@ -12,7 +12,9 @@ scout.DesktopNavigation = function() {
   scout.DesktopNavigation.parent.call(this);
   this.$container;
   this.$body;
-  this.viewButtonBox;
+  this.layoutData = {};
+  this.toolBoxVisible = false;
+  this.viewButtonBox = null;
   this._outlinePropertyChangeHandler = this._onOutlinePropertyChange.bind(this);
   this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
   this._viewButtonBoxPropertyChangeHandler = this._onViewButtonBoxPropertyChange.bind(this);
@@ -29,8 +31,6 @@ scout.DesktopNavigation.prototype._init = function(model) {
   scout.DesktopNavigation.DEFAULT_STYLE_WIDTH = scout.styles.getSize('desktop-navigation', 'width', 'width', 290);
   scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH = scout.styles.getSize('desktop-navigation-breadcrumb', 'width', 'width', 240);
   this.desktop = this.parent;
-  this.layoutData = model.layoutData || {};
-  this.toolBoxVisible = scout.nvl(model.toolBoxVisible, false);
   this.updateHandleVisibility();
   this._setOutline(model.outline);
   this.viewButtonBox = scout.create('ViewButtonBox', {

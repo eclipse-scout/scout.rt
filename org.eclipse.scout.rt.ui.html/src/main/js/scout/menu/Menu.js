@@ -291,8 +291,8 @@ scout.Menu.prototype._createPopup = function(event) {
     parent: this,
     menu: this,
     ignoreEvent: event,
-    openingDirectionX: this.popupOpeningDirectionX,
-    openingDirectionY: this.popupOpeningDirectionY
+    horizontalAlignment: this.popupHorizontalAlignment,
+    verticalAlignment: this.popupVerticalAlignment
   };
 
   if (this.parent.menuFilter) {

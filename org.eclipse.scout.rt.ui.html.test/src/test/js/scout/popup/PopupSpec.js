@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 describe("Popup", function() {
-
-  var helper, session;
+  var helper, session, $desktop;
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -19,7 +18,55 @@ describe("Popup", function() {
         navigationVisible: true
       }
     });
+    $desktop = session.desktop.$container;
+    $('<style>' +
+        '.desktop {position: absolute; left: 0; top: 0; width: 220px; height: 220px; background-color: blue;}' +
+        '.popup {position: absolute; min-width: 50px; min-height: 50px; max-width: 50px; max-height: 50px; background-color: white;}' +
+        '.popup.with-margin {margin: 10px;}' +
+        '.popup.with-dyn-margin.top {margin-bottom: 5px;}' +
+        '.popup.with-dyn-margin.bottom {margin-top: 5px;}' +
+        '.popup.scalable {margin: 10px; min-width: 0; min-height: 0; max-width: 500px; max-height: 500px;}' +
+        '.anchor {position: absolute; left: 70px; top: 70px; width: 80px; height: 80px; background-color: red;}' +
+        '.wrapping-block {display: inline-block; vertical-align: middle; width: 25px; height: 50px; background-color: green;}' +
+        '.large-block {display: block; width: 25px; height: 25px; background-color: green;}' +
+        '</style>').appendTo($('#sandbox'));
   });
+
+
+  var WrappingContent = function() {
+    WrappingContent.parent.call(this);
+    this.numBlocks = 2;
+  };
+  scout.inherits(WrappingContent, scout.Widget);
+
+  WrappingContent.prototype._render = function() {
+    this.$container = this.$parent.appendDiv();
+    this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+    for (var i = 0; i < this.numBlocks; i++) {
+      this.$container.appendDiv('wrapping-block');
+    }
+  };
+  window.scouttests = window.scouttests || {};
+  window.scouttests.WrappingContent = WrappingContent;
+
+  var LargeContent = function() {
+    LargeContent.parent.call(this);
+    this.numBlocks = 2;
+  };
+  scout.inherits(LargeContent, scout.Widget);
+
+  LargeContent.prototype._render = function() {
+    this.$container = this.$parent.appendDiv();
+    this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+    for (var i = 0; i < this.numBlocks; i++) {
+      this.$container.appendDiv('large-block');
+    }
+  };
+  window.scouttests.LargeContent = LargeContent;
+
+  var entryPointSizeFunc = function() {
+    return new scout.Dimension($desktop.width(), $desktop.height());
+  };
 
   afterEach(function() {
     removePopups(session);
@@ -46,4 +93,554 @@ describe("Popup", function() {
     });
   });
 
+  describe('horizontalAlignment', function() {
+    describe('RIGHT', function() {
+      it('opens on the right of the anchor', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          horizontalAlignment: scout.Popup.Alignment.RIGHT,
+          $anchor: $anchor,
+          windowPaddingX: 0
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssLeft()).toBe(70 + 80);
+        expect(popup.$container.cssWidth()).toBe(50);
+      });
+
+      it('opens on the right of the anchor considering margin', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          cssClass: 'with-margin',
+          horizontalAlignment: scout.Popup.Alignment.RIGHT,
+          $anchor: $anchor,
+          windowPaddingX: 0
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssLeft()).toBe(70 + 80);
+        expect(popup.$container.cssWidth()).toBe(50);
+        expect(popup.$container.cssMarginX()).toBe(20);
+      });
+
+      it('moves to left when overlapping right window border', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          horizontalAlignment: scout.Popup.Alignment.RIGHT,
+          $anchor: $anchor,
+          windowPaddingX: 0
+        });
+        $desktop.cssWidth(70 + 80 + 25);
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssLeft()).toBe(70 + 80 - 25);
+        expect(popup.$container.cssWidth()).toBe(50);
+      });
+
+      it('moves to left when overlapping right window border considering margin', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          horizontalAlignment: scout.Popup.Alignment.RIGHT,
+          $anchor: $anchor,
+          cssClass: 'with-margin',
+          windowPaddingX: 0
+        });
+        $desktop.cssWidth(70 + 80 + 25);
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssLeft()).toBe(70 + 80 - 25 - 20);
+        expect(popup.$container.cssWidth()).toBe(50);
+        expect(popup.$container.cssMarginX()).toBe(20);
+      });
+    });
+
+    describe('LEFT', function() {
+      it('opens on the left of the anchor', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          horizontalAlignment: scout.Popup.Alignment.LEFT,
+          $anchor: $anchor,
+          windowPaddingX: 0
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssLeft()).toBe(70 - 50);
+        expect(popup.$container.cssWidth()).toBe(50);
+      });
+
+      it('opens on the left of the anchor considering margin', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          cssClass: 'with-margin',
+          horizontalAlignment: scout.Popup.Alignment.LEFT,
+          $anchor: $anchor,
+          windowPaddingX: 0
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssLeft()).toBe(70 - 50 - 20);
+        expect(popup.$container.cssWidth()).toBe(50);
+        expect(popup.$container.cssMarginX()).toBe(20);
+      });
+    });
+
+    describe('LEFTEDGE', function() {
+      it('opens on the left edge of the anchor', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          horizontalAlignment: scout.Popup.Alignment.LEFTEDGE,
+          $anchor: $anchor,
+          windowPaddingX: 0
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssLeft()).toBe(70);
+        expect(popup.$container.cssWidth()).toBe(50);
+      });
+
+      it('opens on the left edge of the anchor considering margin', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          cssClass: 'with-margin',
+          horizontalAlignment: scout.Popup.Alignment.LEFTEDGE,
+          $anchor: $anchor,
+          windowPaddingX: 0
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssLeft()).toBe(70 - 10);
+        expect(popup.$container.cssWidth()).toBe(50);
+        expect(popup.$container.cssMarginX()).toBe(20);
+      });
+    });
+
+    describe('RIGHTEDGE', function() {
+      it('opens on the right edge of the anchor', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          horizontalAlignment: scout.Popup.Alignment.RIGHTEDGE,
+          $anchor: $anchor,
+          windowPaddingX: 0
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssLeft()).toBe(70 + 80 - 50);
+        expect(popup.$container.cssWidth()).toBe(50);
+      });
+
+      it('opens on the left edge of the anchor considering margin', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          cssClass: 'with-margin',
+          horizontalAlignment: scout.Popup.Alignment.RIGHTEDGE,
+          $anchor: $anchor,
+          windowPaddingX: 0
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssLeft()).toBe(70 + 80 - 50 - 10);
+        expect(popup.$container.cssWidth()).toBe(50);
+        expect(popup.$container.cssMarginX()).toBe(20);
+      });
+    });
+
+    describe('CENTER', function() {
+      it('opens on the center of the anchor', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          horizontalAlignment: scout.Popup.Alignment.CENTER,
+          $anchor: $anchor
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssLeft()).toBe(70 + 80 / 2 - 50 / 2);
+        expect(popup.$container.cssWidth()).toBe(50);
+      });
+
+      it('opens on the center of the anchor considering margin', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          cssClass: 'with-margin',
+          horizontalAlignment: scout.Popup.Alignment.CENTER,
+          $anchor: $anchor,
+          windowPaddingY: 0
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssLeft()).toBe(70 + 80 / 2 - 50 / 2 - 10);
+        expect(popup.$container.cssWidth()).toBe(50);
+        expect(popup.$container.cssMarginX()).toBe(20);
+      });
+    });
+  });
+
+  describe('verticalAlignment', function() {
+    describe('BOTTOM', function() {
+      it('opens on the bottom of the anchor', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          $anchor: $anchor,
+          windowPaddingY: 0
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssTop()).toBe(70 + 80);
+        expect(popup.$container.cssHeight()).toBe(50);
+      });
+
+      it('opens on the bottom of the anchor considering margin', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          cssClass: 'with-margin',
+          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          $anchor: $anchor,
+          windowPaddingY: 0
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssTop()).toBe(70 + 80);
+        expect(popup.$container.cssHeight()).toBe(50);
+        expect(popup.$container.cssMarginY()).toBe(20);
+      });
+    });
+
+    describe('TOP', function() {
+      it('opens on the top of the anchor', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          verticalAlignment: scout.Popup.Alignment.TOP,
+          $anchor: $anchor
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssTop()).toBe(70 - 50);
+        expect(popup.$container.cssHeight()).toBe(50);
+      });
+
+      it('opens on the top of the anchor considering margin', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          cssClass: 'with-margin',
+          verticalAlignment: scout.Popup.Alignment.TOP,
+          $anchor: $anchor
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssTop()).toBe(70 - 50 - 20);
+        expect(popup.$container.cssHeight()).toBe(50);
+        expect(popup.$container.cssMarginY()).toBe(20);
+      });
+    });
+
+    describe('TOPEDGE', function() {
+      it('opens on the top edge of the anchor', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          verticalAlignment: scout.Popup.Alignment.TOPEDGE,
+          $anchor: $anchor
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssTop()).toBe(70);
+        expect(popup.$container.cssHeight()).toBe(50);
+      });
+
+      it('opens on the left edge of the anchor considering margin', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          cssClass: 'with-margin',
+          verticalAlignment: scout.Popup.Alignment.TOPEDGE,
+          $anchor: $anchor
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssTop()).toBe(70 - 10);
+        expect(popup.$container.cssHeight()).toBe(50);
+        expect(popup.$container.cssMarginY()).toBe(20);
+      });
+    });
+
+    describe('BOTTOMEDGE', function() {
+      it('opens on the bottom edge of the anchor', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          verticalAlignment: scout.Popup.Alignment.BOTTOMEDGE,
+          $anchor: $anchor
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssTop()).toBe(70 + 80 - 50);
+        expect(popup.$container.cssHeight()).toBe(50);
+      });
+
+      it('opens on the bottom edge of the anchor considering margin', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          cssClass: 'with-margin',
+          verticalAlignment: scout.Popup.Alignment.BOTTOMEDGE,
+          $anchor: $anchor
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssTop()).toBe(70 + 80 - 50 - 10);
+        expect(popup.$container.cssHeight()).toBe(50);
+        expect(popup.$container.cssMarginY()).toBe(20);
+      });
+    });
+
+    describe('CENTER', function() {
+      it('opens on the center of the anchor', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          verticalAlignment: scout.Popup.Alignment.CENTER,
+          $anchor: $anchor
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssTop()).toBe(70 + 80 / 2 - 50 / 2);
+        expect(popup.$container.cssHeight()).toBe(50);
+      });
+
+      it('opens on the center of the anchor considering margin', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          cssClass: 'with-margin',
+          verticalAlignment: scout.Popup.Alignment.CENTER,
+          $anchor: $anchor,
+          windowPaddingX: 0
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssTop()).toBe(70 + 80 / 2 - 50 / 2 - 10);
+        expect(popup.$container.cssHeight()).toBe(50);
+        expect(popup.$container.cssMarginX()).toBe(20);
+      });
+    });
+  });
+
+  describe('trimWidth', function() {
+    describe('reduces width if there is not enough space', function() {
+      it('on the left', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('WidgetPopup', {
+          parent: session.desktop,
+          cssClass: 'scalable',
+          horizontalAlignment: scout.Popup.Alignment.LEFT,
+          verticalAlignment: scout.Popup.Alignment.CENTER,
+          trimWidth: true,
+          $anchor: $anchor,
+          windowPaddingX: 0,
+          widget: {
+            objectType: "window.scouttests.WrappingContent",
+            numBlocks: 3
+          }
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssLeft()).toBe(0);
+        expect(popup.$container.cssWidth()).toBe(50);
+        expect(popup.$container.cssHeight()).toBe(100);
+      });
+
+      it('on the right', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('WidgetPopup', {
+          parent: session.desktop,
+          cssClass: 'scalable',
+          horizontalAlignment: scout.Popup.Alignment.RIGHT,
+          verticalAlignment: scout.Popup.Alignment.CENTER,
+          trimWidth: true,
+          $anchor: $anchor,
+          windowPaddingX: 0,
+          widget: {
+            objectType: "window.scouttests.WrappingContent",
+            numBlocks: 3
+          }
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssLeft()).toBe(70 + 80);
+        expect(popup.$container.cssWidth()).toBe(50);
+        expect(popup.$container.cssHeight()).toBe(100);
+      });
+    });
+  });
+
+  describe('trimHeight', function() {
+    describe('reduces height if there is not enough space', function() {
+      it('on the bottom', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('WidgetPopup', {
+          parent: session.desktop,
+          cssClass: 'scalable',
+          horizontalAlignment: scout.Popup.Alignment.CENTER,
+          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          trimHeight: true,
+          $anchor: $anchor,
+          windowPaddingY: 0,
+          widget: {
+            objectType: "window.scouttests.LargeContent",
+            numBlocks: 3
+          }
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssTop()).toBe(70 + 80);
+        expect(popup.$container.cssHeight()).toBe(50);
+      });
+
+      it('on the top', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('WidgetPopup', {
+          parent: session.desktop,
+          cssClass: 'scalable',
+          horizontalAlignment: scout.Popup.Alignment.CENTER,
+          verticalAlignment: scout.Popup.Alignment.TOP,
+          trimHeight: true,
+          $anchor: $anchor,
+          windowPaddingY: 0,
+          widget: {
+            objectType: "window.scouttests.LargeContent",
+            numBlocks: 3
+          }
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssTop()).toBe(0);
+        expect(popup.$container.cssHeight()).toBe(50);
+      });
+    });
+  });
+
+  describe('verticalSwitch', function() {
+    describe('with verticalAlign = bottom', function() {
+      it('switches to top when overlapping bottom window border', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          $anchor: $anchor,
+          windowPaddingY: 0
+        });
+        $desktop.cssHeight(70 + 80 + 25);
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssTop()).toBe(70 - 50);
+        expect(popup.$container.cssHeight()).toBe(50);
+      });
+
+      it('switches to top when overlapping bottom window border considering margin', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          $anchor: $anchor,
+          cssClass: 'with-margin',
+          windowPaddingY: 0
+        });
+        $desktop.cssHeight(70 + 80 + 25);
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssTop()).toBe(70 - 50 - 20);
+        expect(popup.$container.cssHeight()).toBe(50);
+        expect(popup.$container.cssMarginY()).toBe(20);
+      });
+
+      it('switches to top when overlapping bottom window border with dynamic margins', function() {
+        // Don't switch
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          $anchor: $anchor,
+          cssClass: 'with-dyn-margin',
+          windowPaddingY: 0
+        });
+        $desktop.cssHeight(70 + 80 + 5 + 50);
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssTop()).toBe(70 + 80);
+        expect(popup.$container.cssHeight()).toBe(50);
+        expect(popup.$container.cssMarginY()).toBe(5);
+        popup.close();
+
+        // Switch
+        $anchor = $desktop.appendDiv('anchor');
+        popup = scout.create('Popup', {
+          parent: session.desktop,
+          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          $anchor: $anchor,
+          cssClass: 'with-dyn-margin',
+          windowPaddingY: 0
+        });
+        $desktop.cssHeight(70 + 80 + 5 + 50 - 1); // -> switch because 1px overlap
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssTop()).toBe(70 - 50 - 5);
+        expect(popup.$container.cssHeight()).toBe(50);
+        expect(popup.$container.cssMarginY()).toBe(5);
+      });
+    });
+  });
+
+  describe('horizontalSwitch', function() {
+    describe('with horizontalAlign = right', function() {
+      it('switches to left when overlapping right window border', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          horizontalAlignment: scout.Popup.Alignment.RIGHT,
+          horizontalSwitch: true,
+          $anchor: $anchor,
+          windowPaddingX: 0
+        });
+        $desktop.cssWidth(70 + 80 + 25);
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssLeft()).toBe(70 - 50);
+        expect(popup.$container.cssWidth()).toBe(50);
+      });
+
+      it('switches to left when overlapping right window border considering margin', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          cssClass: 'with-margin',
+          horizontalAlignment: scout.Popup.Alignment.RIGHT,
+          horizontalSwitch: true,
+          $anchor: $anchor,
+          windowPaddingX: 0
+        });
+        $desktop.cssWidth(70 + 80 + 25);
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssLeft()).toBe(70 - 50 - 20);
+        expect(popup.$container.cssWidth()).toBe(50);
+        expect(popup.$container.cssMarginX()).toBe(20);
+      });
+    });
+  });
 });

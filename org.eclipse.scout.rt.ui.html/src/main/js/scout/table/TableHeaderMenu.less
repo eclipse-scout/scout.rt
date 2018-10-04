@@ -19,11 +19,11 @@
     outline: 0;
   }
 
-  &.down {
+  &.bottom {
     #scout.drop-shadow();
   }
 
-  &.up {
+  &.top {
     #scout.drop-shadow(@y: -3px);
   }
 }
@@ -64,11 +64,11 @@
   left: 0;
   background-color: @table-header-menu-background-color;
 
-  .table-header-menu.down & {
+  .table-header-menu.bottom & {
     top: -1px;
   }
 
-  .table-header-menu.up & {
+  .table-header-menu.top & {
     bottom: -1px;
   }
 }

@@ -38,6 +38,13 @@ scout.PopupWithHeadLayout.prototype.layout = function($container) {
 /**
  * @override
  */
+scout.PopupWithHeadLayout.prototype._adjustSize = function(prefSize) {
+  return this._adjustSizeWithAnchor(prefSize);
+};
+
+/**
+ * @override
+ */
 scout.PopupWithHeadLayout.prototype._calcMaxSizeAroundAnchor = function() {
   if (!this.popup._headVisible) {
     return scout.PopupWithHeadLayout.parent.prototype._calcMaxSizeAroundAnchor.call(this);
@@ -55,8 +62,7 @@ scout.PopupWithHeadLayout.prototype._calcMaxSizeAroundAnchor = function() {
     popupBounds = scout.graphics.offsetBounds(htmlComp.$comp),
     popupHeadBounds = scout.graphics.offsetBounds(this.popup.$head),
     popupMargins = htmlComp.margins(),
-    $window = this.popup.$container.window(),
-    windowSize = new scout.Dimension($window.width(), $window.height());
+    windowSize = this.popup.getWindowSize();
 
   maxWidthRight = windowSize.width - popupHeadBounds.x - windowPaddingRight;
   maxWidthLeft = popupHeadBounds.x + popupHeadBounds.width - windowPaddingLeft;

@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.TouchPopupLayout = function(popup) {
   scout.TouchPopupLayout.parent.call(this, popup);
+  this.doubleCalcPrefSize = false;
 };
 scout.inherits(scout.TouchPopupLayout, scout.PopupLayout);
 

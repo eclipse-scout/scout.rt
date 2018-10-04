@@ -53,6 +53,9 @@ describe('PopupWindow', function() {
     });
     expect(popupWindow.initialized).toBe(false);
     popupWindow._onReady();
+    popupWindow._onResize = function() {
+      // Don't execute during spec
+    };
     expect(called).toBe(true);
     expect(popupWindow.initialized).toBe(true);
     expect(myWindow.onerror).toBe(myErrorHandler);

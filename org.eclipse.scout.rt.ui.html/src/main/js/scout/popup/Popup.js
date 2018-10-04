@@ -15,8 +15,8 @@ scout.Popup = function() {
   this._anchorScrollHandler = null;
   this._popupOpenHandler = null;
   this._glassPaneRenderer = null;
-  this.anchorBounds;
-  this.$anchor;
+  this.anchorBounds = null;
+  this.$anchor = null;
   this.windowPaddingX = 10;
   this.windowPaddingY = 5;
   this.withGlassPane = false;
@@ -25,21 +25,55 @@ scout.Popup = function() {
     return scout.focusRule.AUTO;
   };
   this.focusableContainer = false;
-  this.openingDirectionX = 'right';
-  this.openingDirectionY = 'down';
-  this.scrollType = 'remove';
-  // hints for the layout to control whether the size should be adjusted if the popup does not fit into the window
-  // Popup is getting moved if it overlaps a border (and not switched as done for y axis) -> do not adjust its size
+
+  // The alignment defines how the popup is positioned around the anchor.
+  // If there is no anchor or anchor bounds the alignment has no effect.
+  this.horizontalAlignment = scout.Popup.Alignment.LEFTEDGE;
+  this.verticalAlignment = scout.Popup.Alignment.BOTTOM;
+
+   // If switch is enabled, the alignment will be changed if the popup overlaps a window border.
+   // Currently only switching form right to left and bottom to top is supported.
+  this.horizontalSwitch = false;
+  this.verticalSwitch = true;
+
+  // Hints for the layout to control whether the size should be adjusted if the popup does not fit into the window.
+  // Before trimming is applied the popup will be switched, if the switch option is enabled.
+  // If neither switch nor trim is enabled, the popup will be moved from right to left until its right border is visible.
+  // This moving is currently only supported for the right window border. If it overlaps any other border it won't be moved.
   this.trimWidth = false;
   this.trimHeight = true;
-  // If true, anchor is considered when computing the position and size of the popup
+
+  // Defines what should happen when the scroll parent is scrolled
+  this.scrollType = 'remove';
+
+  // If true, the anchor is considered when computing the position and size of the popup
   this.boundToAnchor = true;
-  // If true, the attached mouse down handler will NOT close the popup if the anchor was clicked, the anchor is responsible to close it.
+
+  // If false, the attached mouse down handler will NOT close the popup if the anchor was clicked, the anchor is responsible to close it.
   // This is necessary because the mousedown listener is attached to the capture phase and therefore executed before any other.
   // If anchor was clicked, popup would already be closed and then opened again -> popup could never be closed by clicking the anchor
   this.closeOnAnchorMouseDown = true;
+
+  // Defines whether the popup should be closed on a mouse click outside of the popup
+  this.closeOnMouseDownOutside = true;
+
+  // Defines whether the popup should be closed whenever another popup opens.
+  this.closeOnOtherPopupOpen = true;
 };
 scout.inherits(scout.Popup, scout.Widget);
+
+// Note that these strings are also used as CSS classes
+scout.Popup.Alignment = {
+  LEFT: 'left',
+  LEFTEDGE: 'leftedge',
+  TOP: 'top',
+  TOPEDGE: 'topedge',
+  CENTER: 'center',
+  RIGHT: 'right',
+  RIGHTEDGE: 'rightedge',
+  BOTTOM: 'bottom',
+  BOTTOMEDGE: 'bottomedge'
+};
 
 /**
  * @param options:
@@ -172,12 +206,16 @@ scout.Popup.prototype.close = function() {
 scout.Popup.prototype._attachCloseHandler = function() {
   // Install mouse close handler
   // The listener needs to be executed in the capturing phase -> prevents that _onMouseDown will be executed right after the popup gets opened using mouse down, otherwise the popup would be closed immediately
-  this._mouseDownHandler = this._onMouseDown.bind(this);
-  this.$container.document(true).addEventListener('mousedown', this._mouseDownHandler, true); // true=the event handler is executed in the capturing phase
+  if (this.closeOnMouseDownOutside) {
+    this._mouseDownHandler = this._onMouseDown.bind(this);
+    this.$container.document(true).addEventListener('mousedown', this._mouseDownHandler, true); // true=the event handler is executed in the capturing phase
+  }
 
   // Install popup open close handler
-  this._popupOpenHandler = this._onPopupOpen.bind(this);
-  this.session.desktop.on('popupOpen', this._popupOpenHandler);
+  if (this.closeOnOtherPopupOpen) {
+    this._popupOpenHandler = this._onPopupOpen.bind(this);
+    this.session.desktop.on('popupOpen', this._popupOpenHandler);
+  }
 
   // Install scroll close handler
   if (this.$anchor && this.boundToAnchor && this.scrollType) {
@@ -286,25 +324,57 @@ scout.Popup.prototype._onPopupOpen = function(event) {
   }
 };
 
-scout.Popup.prototype.prefLocation = function(openingDirectionY) {
-  var x, y, anchorBounds, height, openingDirectionX;
-  var $container = this.$container;
+scout.Popup.prototype.prefLocation = function(verticalAlignment, horizontalAlignment) {
   if (!this.boundToAnchor || (!this.anchorBounds && !this.$anchor)) {
-    return;
+    return this._prefLocationWithoutAnchor();
   }
-  openingDirectionX = 'right'; // always use right at the moment
-  openingDirectionY = openingDirectionY || this.openingDirectionY;
-  $container.removeClass('up down left right');
-  $container.addClass(openingDirectionY + ' ' + openingDirectionX);
-  height = $container.outerHeight(true);
+  return this._prefLocationWithAnchor(verticalAlignment, horizontalAlignment);
+};
 
-  anchorBounds = this.getAnchorBounds();
-  x = anchorBounds.x;
-  y = anchorBounds.y;
-  if (openingDirectionY === 'up') {
-    y -= height;
-  } else if (openingDirectionY === 'down') {
+scout.Popup.prototype._prefLocationWithoutAnchor = function() {
+  return scout.DialogLayout.positionContainerInWindow(this.$container);
+};
+
+scout.Popup.prototype._prefLocationWithAnchor = function(verticalAlignment, horizontalAlignment) {
+  var $container = this.$container;
+  horizontalAlignment = horizontalAlignment || this.horizontalAlignment;
+  verticalAlignment = verticalAlignment || this.verticalAlignment;
+  var anchorBounds = this.getAnchorBounds();
+  var size = scout.graphics.size($container);
+  var margins = scout.graphics.margins($container);
+  var Alignment = scout.Popup.Alignment;
+
+  $container.removeClass(this._alignClasses());
+  $container.addClass(verticalAlignment + ' ' + horizontalAlignment);
+
+  var widthWithMargin = size.width + margins.horizontal();
+  var width = size.width;
+  var x = anchorBounds.x;
+  if (horizontalAlignment === Alignment.LEFT) {
+    x -= widthWithMargin;
+  } else if (horizontalAlignment === Alignment.LEFTEDGE) {
+    x = anchorBounds.x - margins.left;
+  } else if (horizontalAlignment === Alignment.CENTER) {
+    x += anchorBounds.width / 2 - width / 2 - margins.left;
+  } else if (horizontalAlignment === Alignment.RIGHT) {
+    x += anchorBounds.width;
+  } else if (horizontalAlignment === Alignment.RIGHTEDGE) {
+    x = anchorBounds.x + anchorBounds.width - width - margins.right;
+  }
+
+  var heightWithMargin = size.height + margins.vertical();
+  var height = size.height;
+  var y = anchorBounds.y;
+  if (verticalAlignment === Alignment.TOP) {
+    y -= heightWithMargin;
+  } else if (verticalAlignment === Alignment.TOPEDGE) {
+    y = anchorBounds.y - margins.top;
+  } else if (verticalAlignment === Alignment.CENTER) {
+    y += anchorBounds.height / 2 - height / 2 - margins.top;
+  } else if (verticalAlignment === Alignment.BOTTOM) {
     y += anchorBounds.height;
+  } else if (verticalAlignment === Alignment.BOTTOMEDGE) {
+    y = anchorBounds.y + anchorBounds.height - height - margins.bottom;
   }
 
   // this.$parent might not be at (0,0) of the document
@@ -312,10 +382,13 @@ scout.Popup.prototype.prefLocation = function(openingDirectionY) {
   x -= parentOffset.left;
   y -= parentOffset.top;
 
-  return {
-    x: x,
-    y: y
-  };
+  return new scout.Point(x,y);
+};
+
+scout.Popup.prototype._alignClasses = function() {
+  var Alignment = scout.Popup.Alignment;
+  return scout.strings.join(' ', Alignment.LEFT, Alignment.LEFTEDGE, Alignment.CENTER, Alignment.RIGHT, Alignment.RIGHTEDGE,
+    Alignment.TOP, Alignment.TOPEDGE, Alignment.CENTER, Alignment.BOTTOM, Alignment.BOTTOMEDGE);
 };
 
 scout.Popup.prototype.getAnchorBounds = function() {
@@ -328,45 +401,52 @@ scout.Popup.prototype.getAnchorBounds = function() {
   return anchorBounds;
 };
 
-scout.Popup.prototype.overlap = function(location) {
+scout.Popup.prototype.getWindowSize = function() {
+  var $window = this.$parent.window();
+  return new scout.Dimension($window.width(), $window.height());
+};
+
+scout.Popup.prototype.overlap = function(location, includeMargin) {
   var $container = this.$container;
   if (!$container || !location) {
     return;
   }
+  includeMargin = scout.nvl(includeMargin, true);
   var overlapX, overlapY,
-    height = $container.outerHeight(),
-    width = $container.outerWidth(),
+    height = $container.outerHeight(includeMargin),
+    width = $container.outerWidth(includeMargin),
     left = location.x,
     top = location.y;
 
   overlapX = left + width + this.windowPaddingX - $container.entryPoint().outerWidth(true);
   overlapY = top + height + this.windowPaddingY - $container.entryPoint().outerHeight(true);
-  return {
-    x: overlapX,
-    y: overlapY
-  };
+  return new scout.Point(overlapX, overlapY);
 };
 
 scout.Popup.prototype.adjustLocation = function(location, switchIfNecessary) {
-  var openingDirection, left, top,
+  var verticalAlignment = this.verticalAlignment,
+    horizontalAlignment = this.horizontalAlignment,
     overlap = this.overlap(location);
 
-  switchIfNecessary = scout.nvl(switchIfNecessary, true);
-  if (overlap.y > 0 && switchIfNecessary) {
-    // switch opening direction
-    openingDirection = 'up';
-    location = this.prefLocation(openingDirection);
+  location = location.clone();
+  var verticalSwitch = scout.nvl(switchIfNecessary, this.verticalSwitch);
+  if (verticalSwitch && verticalAlignment === scout.Popup.Alignment.BOTTOM && overlap.y > 0) {
+    // switch vertical alignment
+    verticalAlignment = scout.Popup.Alignment.TOP;
+    location = this.prefLocation(verticalAlignment);
   }
-  left = location.x;
-  top = location.y;
   if (overlap.x > 0) {
-    // Move popup to the left until it gets fully visible
-    left -= overlap.x;
+    var horizontalSwitch = scout.nvl(switchIfNecessary, this.horizontalSwitch);
+    if (horizontalSwitch && horizontalAlignment === scout.Popup.Alignment.RIGHT && overlap.x > 0) {
+      // switch horizontal alignment
+      horizontalAlignment = scout.Popup.Alignment.LEFT;
+      location = this.prefLocation(verticalAlignment, horizontalAlignment);
+    } else {
+      // Move popup to the left until it gets fully visible (if switch is disabled)
+      location.x -= overlap.x;
+    }
   }
-  return {
-    x: left,
-    y: top
-  };
+  return location;
 };
 
 scout.Popup.prototype.size = function() {

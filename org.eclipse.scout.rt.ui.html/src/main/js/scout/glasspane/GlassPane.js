@@ -15,7 +15,7 @@ scout.inherits(scout.GlassPane, scout.Widget);
 
 scout.GlassPane.prototype._render = function() {
   this.$container = this.$parent
-    .appendDiv('glasspane') // TODO CGU requires parent to have position: relative or absolute, add it automatically?
+    .appendDiv('glasspane')
     .on('mousedown', this._onMouseDown.bind(this));
 
   // This is required in touch mode, because FastClick messes up the order

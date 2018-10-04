@@ -11,6 +11,7 @@
 scout.DatePickerPopupLayout = function(popup) {
   scout.DatePickerPopupLayout.parent.call(this);
   this.popup = popup;
+  this.doubleCalcPrefSize = false;
 };
 scout.inherits(scout.DatePickerPopupLayout, scout.PopupLayout);
 

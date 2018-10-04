@@ -10,7 +10,10 @@
  ******************************************************************************/
 scout.DesktopHeader = function() {
   scout.DesktopHeader.parent.call(this);
-  this.tabArea;
+  this.tabArea = null;
+  this.toolBoxVisible = true;
+  this.viewButtonBox = null;
+  this.viewButtonBoxVisible = false;
   this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
   this._desktopAnimationEndHandler = this._onDesktopAnimationEnd.bind(this);
   this._outlineContentMenuBarPropertyChangeHandler = this._onOutlineContentMenuBarPropertyChange.bind(this);
@@ -21,8 +24,6 @@ scout.inherits(scout.DesktopHeader, scout.Widget);
 scout.DesktopHeader.prototype._init = function(model) {
   scout.DesktopHeader.parent.prototype._init.call(this, model);
   this.desktop = this.session.desktop;
-  this.toolBoxVisible = scout.nvl(model.toolBoxVisible, true);
-  this.viewButtonBoxVisible = scout.nvl(model.viewButtonBoxVisible, false);
   this.updateViewButtonBoxVisibility();
   // create view tab box
   this.tabArea = scout.create('SimpleTabArea', {

@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.TagChooserPopupLayout = function(popup) {
   scout.TagChooserPopupLayout.parent.call(this, popup);
+  this.doubleCalcPrefSize = false;
 };
 scout.inherits(scout.TagChooserPopupLayout, scout.PopupLayout);
 

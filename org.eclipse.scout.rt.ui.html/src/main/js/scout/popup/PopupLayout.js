@@ -11,23 +11,37 @@
 scout.PopupLayout = function(popup) {
   scout.PopupLayout.parent.call(this);
   this.popup = popup;
+  this.doubleCalcPrefSize = true; // enables popups with a height which depends on the width (= popups with wrapping content)
 };
 scout.inherits(scout.PopupLayout, scout.AbstractLayout);
 
 scout.PopupLayout.prototype.layout = function($container) {
-  var popupSize,
-    htmlComp = this.popup.htmlComp,
+  var htmlComp = this.popup.htmlComp,
     prefSize = this.preferredLayoutSize($container, {
       exact: true
     });
 
-  if (this.popup.boundToAnchor) {
-    popupSize = this._adjustSizeWithAnchor(prefSize);
-  } else {
-    popupSize = this._adjustSize(prefSize);
+  prefSize = this.adjustSize(prefSize);
+  if (this.doubleCalcPrefSize) {
+    prefSize = this.preferredLayoutSize($container, {
+      exact: true,
+      widthHint: prefSize.width - htmlComp.insets().horizontal()
+    });
+    prefSize = this.adjustSize(prefSize);
   }
 
-  scout.graphics.setSize(htmlComp.$comp, popupSize);
+  scout.graphics.setSize(htmlComp.$comp, prefSize);
+};
+
+scout.PopupLayout.prototype.adjustSize = function(prefSize) {
+  // Consider CSS min/max rules
+  this.popup.htmlComp._adjustPrefSizeWithMinMaxSize(prefSize);
+
+  // Consider window boundaries
+  if (this.popup.boundToAnchor && (this.popup.anchorBounds || this.popup.$anchor)) {
+    return this._adjustSizeWithAnchor(prefSize);
+  }
+  return this._adjustSize(prefSize);
 };
 
 scout.PopupLayout.prototype._adjustSize = function(prefSize) {
@@ -56,8 +70,7 @@ scout.PopupLayout.prototype._calcMaxSize = function() {
     windowPaddingY = this.popup.windowPaddingY,
     popupMargins = htmlComp.margins(),
     popupPosition = htmlComp.location(),
-    $window = this.popup.$container.window(),
-    windowSize = new scout.Dimension($window.width(), $window.height());
+    windowSize = this.popup.getWindowSize();
 
   maxWidth = (windowSize.width - popupMargins.horizontal() - popupPosition.x - windowPaddingX);
   maxHeight = (windowSize.height - popupMargins.vertical() - popupPosition.y - windowPaddingY);
@@ -67,7 +80,10 @@ scout.PopupLayout.prototype._calcMaxSize = function() {
 
 scout.PopupLayout.prototype._adjustSizeWithAnchor = function(prefSize) {
   var popupSize = new scout.Dimension(),
-    maxSize = this._calcMaxSizeAroundAnchor();
+    maxSize = this._calcMaxSizeAroundAnchor(),
+    Alignment = scout.Popup.Alignment,
+    horizontalAlignment = this.popup.horizontalAlignment,
+    verticalAlignment = this.popup.verticalAlignment;
 
   // Compared to $comp.height() and width(), $comp.offset() may return fractional values. This means the maxSizes may be fractional as well.
   // The popup sizes must be integers, otherwise reading the height/width later on might result in wrong calculations.
@@ -86,16 +102,44 @@ scout.PopupLayout.prototype._adjustSizeWithAnchor = function(prefSize) {
   // The same happens for y direction if there is not enough space on the bottom
   popupSize.width = prefSize.width;
   if (this.popup.trimWidth) {
-    if (prefSize.width > maxSize.right && prefSize.width > maxSize.left) {
-      popupSize.width = Math.max(maxSize.right, maxSize.left);
+    if (this.popup.horizontalSwitch) {
+      if (prefSize.width > maxSize.right && prefSize.width > maxSize.left) {
+        popupSize.width = Math.max(maxSize.right, maxSize.left);
+      }
+    } else {
+      if (horizontalAlignment === Alignment.RIGHT) {
+        popupSize.width = Math.min(popupSize.width, maxSize.right);
+      } else if (horizontalAlignment === Alignment.LEFT) {
+        popupSize.width = Math.min(popupSize.width, maxSize.left);
+      }
     }
   }
   popupSize.height = prefSize.height;
   if (this.popup.trimHeight) {
-    if (prefSize.height > maxSize.bottom && prefSize.height > maxSize.top) {
-      popupSize.height = Math.max(maxSize.bottom, maxSize.top);
+    if (this.popup.verticalSwitch) {
+      if (prefSize.height > maxSize.bottom && prefSize.height > maxSize.top) {
+        popupSize.height = Math.max(maxSize.bottom, maxSize.top);
+      }
+    } else {
+      if (verticalAlignment === Alignment.BOTTOM) {
+        popupSize.height = Math.min(popupSize.height, maxSize.bottom);
+      } else if (verticalAlignment === Alignment.TOP) {
+        popupSize.height = Math.min(popupSize.height, maxSize.top);
+      }
     }
   }
+
+  // On CENTER alignment, the anchor must ne be considered. Instead make sure the popup does not exceed window boundaries (same as in adjustSize)
+  if (verticalAlignment === Alignment.CENTER || horizontalAlignment === Alignment.CENTER) {
+    var windowSize = this._calcMaxSize();
+    if (horizontalAlignment === Alignment.CENTER) {
+      popupSize.width = Math.min(windowSize.width, prefSize.width);
+    }
+    if (verticalAlignment === Alignment.CENTER) {
+      popupSize.height = Math.min(windowSize.height, prefSize.height);
+    }
+  }
+
   return popupSize;
 };
 
@@ -105,14 +149,16 @@ scout.PopupLayout.prototype._adjustSizeWithAnchor = function(prefSize) {
  * @returns {scout.Dimension}
  */
 scout.PopupLayout.prototype._calcMaxSizeAroundAnchor = function() {
+  // Position the popup at the desired location before doing any calculations because positioning adds CSS classes which might change margins
+  this.popup.position(false);
+
   var maxWidthLeft, maxWidthRight, maxHeightDown, maxHeightUp,
     htmlComp = this.popup.htmlComp,
     windowPaddingX = this.popup.windowPaddingX,
     windowPaddingY = this.popup.windowPaddingY,
     popupMargins = htmlComp.margins(),
     anchorBounds = this.popup.getAnchorBounds(),
-    $window = this.popup.$container.window(),
-    windowSize = new scout.Dimension($window.width(), $window.height());
+    windowSize = this.popup.getWindowSize();
 
   maxWidthRight = (windowSize.width - (anchorBounds.x + anchorBounds.width) - popupMargins.horizontal() - windowPaddingX);
   maxWidthLeft = (anchorBounds.x - popupMargins.horizontal() - windowPaddingX);

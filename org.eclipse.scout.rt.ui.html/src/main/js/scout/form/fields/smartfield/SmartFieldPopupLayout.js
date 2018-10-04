@@ -21,6 +21,7 @@ scout.SmartFieldPopupLayout = function(popup) {
   scout.SmartFieldPopupLayout.parent.call(this, popup);
 
   this.animating = false;
+  this.doubleCalcPrefSize = false;
 };
 scout.inherits(scout.SmartFieldPopupLayout, scout.PopupLayout);
 

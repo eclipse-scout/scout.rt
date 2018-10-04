@@ -29,7 +29,7 @@ scout.MobilePopup.prototype._createLayout = function() {
 /**
  * @override Popup.js
  */
-scout.MobilePopup.prototype.prefLocation = function(openingDirectionY) {
+scout.MobilePopup.prototype.prefLocation = function(verticalAlignment, horizontalAlignment) {
   var popupSize = this.htmlComp.prefSize(),
     windowHeight = this.$container.window().height(),
     y = Math.max(windowHeight - popupSize.height, 0);

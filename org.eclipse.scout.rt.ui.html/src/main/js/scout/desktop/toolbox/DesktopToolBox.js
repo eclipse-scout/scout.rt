@@ -23,7 +23,7 @@ scout.DesktopToolBox.prototype._init = function(options) {
  */
 scout.DesktopToolBox.prototype._initMenu = function(menu) {
   scout.DesktopToolBox.parent.prototype._initMenu.call(this, menu);
-  menu.popupOpeningDirectionX = 'left';
+  menu.popupHorizontalAlignment = scout.Popup.Alignment.RIGHTEDGE;
 };
 
 /**

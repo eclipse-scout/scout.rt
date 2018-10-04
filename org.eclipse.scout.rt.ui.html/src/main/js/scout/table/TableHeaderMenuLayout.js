@@ -11,6 +11,7 @@
 scout.TableHeaderMenuLayout = function(popup) {
   scout.TableHeaderMenuLayout.parent.call(this, popup);
   this.popup = popup;
+  this.doubleCalcPrefSize = false;
 };
 scout.inherits(scout.TableHeaderMenuLayout, scout.PopupLayout);
 

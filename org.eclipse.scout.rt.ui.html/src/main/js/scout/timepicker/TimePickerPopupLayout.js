@@ -11,6 +11,7 @@
 scout.TimePickerPopupLayout = function(popup) {
   scout.TimePickerPopupLayout.parent.call(this);
   this.popup = popup;
+  this.doubleCalcPrefSize = false;
 };
 scout.inherits(scout.TimePickerPopupLayout, scout.PopupLayout);
 
