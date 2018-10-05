@@ -238,8 +238,22 @@ scout.fonts = {
   autoDetectFonts: function() {
     var fonts = [];
     // Implementation note: "styleSheets" and "cssRules" are not arrays (they only look like arrays)
-    for (var i = 0; i < document.styleSheets.length; i++) {
-      var styleSheet = document.styleSheets[i];
+    var styleSheets = document.styleSheets;
+    for (var i = 0; i < styleSheets.length; i++) {
+      var styleSheet = styleSheets[i];
+      var cssRules;
+      try {
+        cssRules = styleSheet.cssRules;
+      } catch (error) {
+        // In some browsers, access to style sheets of other origins is blocked:
+        // https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet#Notes
+        var msg = '[Scout] INFO: Skipped automatic font detection for style sheet ' + styleSheet.href + ' (access blocked by browser). Use the bootstrap argument "fonts" to manually list fonts to pre-load.';
+        $.log.info(msg);
+        if (window && window.console) {
+          (window.console.info || window.console.log)(msg);
+        }
+        continue;
+      }
       for (var j = 0; j < styleSheet.cssRules.length; j++) {
         var cssRule = styleSheet.cssRules[j];
         if (cssRule.type === window.CSSRule.FONT_FACE_RULE) {
