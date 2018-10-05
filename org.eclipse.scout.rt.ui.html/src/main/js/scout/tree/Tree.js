@@ -1425,6 +1425,10 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
   if (this.rendered && scout.nvl(opts.renderExpansion, true)) {
     this._renderExpansion(node, renderExpansionOpts);
   }
+
+  if (this.rendered) {
+    this.ensureExpansionVisible(node);
+  }
 };
 
 scout.Tree.prototype.setNodeExpandedRecursive = function(nodes, expanded, opts) {
@@ -1920,6 +1924,25 @@ scout.Tree.prototype.revealSelection = function() {
   }
 };
 
+scout.Tree.prototype.ensureExpansionVisible = function(node) {
+  // only scroll if treenode is in dom and the current node is selected (user triggered expansion change)
+  if (!node || !node.$node || this.selectedNodes[0] !== node) {
+    return;
+  }
+  scout.scrollbars.ensureExpansionVisible({
+    element: node,
+    $element: node.$node,
+    $scrollable: this.get$Scrollable(),
+    isExpanded: function(element) {
+      return element.expanded;
+    },
+    getChildren: function(parent) {
+      return parent.childNodes;
+    },
+    nodePaddingLevel: this.nodePaddingLevel
+  });
+};
+
 scout.Tree.prototype.deselectAll = function() {
   this.selectNodes([]);
 };
@@ -2135,6 +2158,7 @@ scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
         expansionChanged: true
       };
       this._renderExpansion(parentNode, opts);
+      this.ensureExpansionVisible(parentNode);
     }
   } else {
     if (this.nodes && this.nodes.length > 0) {

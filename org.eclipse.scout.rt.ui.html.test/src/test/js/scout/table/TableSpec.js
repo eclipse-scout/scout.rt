@@ -2793,4 +2793,68 @@ describe("Table", function() {
       expect(table.rows[6].cells[0].text).toBe('G');
     });
   });
+
+  describe("ensureExpansionVisible", function() {
+    var model, table, rows, $scrollable, nodeHeight;
+
+    beforeEach(function() {
+      $('<style>' +
+        '.table-row {height: 28px;}' +
+        '.table {height: 170px; overflow: hidden;}' +
+        '.table-data {height: 150px; overflow: hidden;}' +
+        '</style>').appendTo($('#sandbox'));
+
+      model = helper.createModelFixture(1, 0);
+      table = helper.createTable(model);
+      table.insertRows([
+        helper.createModelRow(1, ['A']),
+        helper.createModelRow(2, ['B']),
+        helper.createModelRow(3, ['C']),
+        helper.createModelRow(4, ['D']),
+        helper.createModelRow(5, ['E']),
+        helper.createModelRow(6, ['F']),
+        helper.createModelRow(7, ['G'])
+      ]);
+      table.insertRows(helper.createModelRows(1, 2, 1));
+      table.insertRows(helper.createModelRows(1, 2, 2));
+      table.insertRows(helper.createModelRows(1, 2, 3));
+      table.insertRows(helper.createModelRows(1, 5, 4));
+      table.insertRows(helper.createModelRows(1, 2, 5));
+      table.insertRows(helper.createModelRows(1, 2, 6));
+      table.insertRows(helper.createModelRows(1, 2, 7));
+      rows = table.rows;
+
+      table.render();
+      expect(table.rowHeight).toBe(28);
+      $scrollable = table.get$Scrollable();
+    });
+
+    it("scrolls current row to the top when expanding a large child set", function() {
+      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(1).$row), $scrollable)).toBe(true);
+      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(7).$row), $scrollable)).toBe(false);
+      expect(table._rowById(4).expanded).toBe(false);
+      table.expandRow(table._rowById(4), true);
+      expect(table._rowById(4).expanded).toBe(true);
+      // first visible row should be row3 (one above the expanded node)
+      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(2).$row), $scrollable)).toBe(false);
+      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(3).$row), $scrollable)).toBe(true);
+      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(4).$row), $scrollable)).toBe(true);
+      // node5 isn't visible anymore since node4's children use up all the space
+      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(5).$row), $scrollable)).toBe(false);
+    });
+
+    it("scrolls current row up so that the full expansion is visible plus half a row at the bottom", function() {
+      expect(table._rowById(5).expanded).toBe(false);
+      table.expandRow(table._rowById(5), true);
+      expect(table._rowById(5).expanded).toBe(true);
+      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(4).$row), $scrollable)).toBe(true);
+      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(5).$row), $scrollable)).toBe(true);
+      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(5).childRows[0].$row), $scrollable)).toBe(true);
+      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(5).childRows[1].$row), $scrollable)).toBe(true);
+      // half of row6 should still be visible after the expansion
+      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(6).$row), $scrollable)).toBe(true);
+      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(7).$row), $scrollable)).toBe(false);
+    });
+
+  });
 });

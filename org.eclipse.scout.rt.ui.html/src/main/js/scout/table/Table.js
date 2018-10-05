@@ -2402,6 +2402,20 @@ scout.Table.prototype.expandRowsInternal = function(rows, expanded, recursive) {
     rowsForAnimation.forEach(function(row) {
       row.animateExpansion();
     });
+
+    if (rows[0].$row) {
+      scout.scrollbars.ensureExpansionVisible({
+        element: rows[0],
+        $element: rows[0].$row,
+        $scrollable: this.get$Scrollable(),
+        isExpanded: function(element) {
+          return element.expanded;
+        },
+        getChildren: function(parent) {
+          return parent.childRows;
+        }
+      });
+    }
   }
 };
 
@@ -2821,13 +2835,13 @@ scout.Table.prototype.cancelCellEdit = function() {
   }
 };
 
-scout.Table.prototype.scrollTo = function(row) {
+scout.Table.prototype.scrollTo = function(row, options) {
   if (this.viewRangeRendered.size() === 0) {
     // Cannot scroll to a row no row is rendered
     return;
   }
   this.ensureRowRendered(row);
-  scout.scrollbars.scrollTo(this.$data, row.$row);
+  scout.scrollbars.scrollTo(this.$data, row.$row, options);
 };
 
 scout.Table.prototype.scrollPageUp = function() {

@@ -64,7 +64,7 @@ scout.scrollbars = {
   },
 
   install: function($container, options) {
-    options = options || {};
+    options = this._createDefaultScrollToOptions(options);
     options.axis = options.axis || 'both';
 
     // Don't use native as variable name because it will break minifying (reserved keyword)
@@ -279,6 +279,7 @@ scout.scrollbars = {
    *                                          - If the element is already in the visible area no scrolling is done.
    *
    * animate                  false           If true, the scroll position will be animated so that the element moves smoothly to its new position
+   * stop                     true            If true, all running animations are stopped before executing the current scroll request.
    *
    * @param {$} $scrollable
    *          the scrollable object
@@ -305,7 +306,7 @@ scout.scrollbars = {
         align: options
       };
     } else {
-      options = options || {};
+      options = this._createDefaultScrollToOptions(options);
     }
 
     var align = options.align;
@@ -345,6 +346,14 @@ scout.scrollbars = {
     }
   },
 
+  _createDefaultScrollToOptions: function(options) {
+    var defaults = {
+      anmiate: false,
+      stop: true
+    };
+    return $.extend({}, defaults, options);
+  },
+
   /**
    * Horizontally scrolls the $scrollable to the given $element (must be a child of $scrollable)
    */
@@ -365,7 +374,7 @@ scout.scrollbars = {
   },
 
   scrollTop: function($scrollable, scrollTop, options) {
-    options = options || {};
+    options = this._createDefaultScrollToOptions(options);
     var scrollbar = scout.scrollbars.scrollbar($scrollable, 'y');
     if (scrollbar) {
       scrollbar.notifyBeforeScroll();
@@ -373,9 +382,10 @@ scout.scrollbars = {
 
     // Not animated
     if (!options.animate) {
-      $scrollable
-        .stop('scroll')
-        .scrollTop(scrollTop);
+      if (options.stop) {
+        $scrollable.stop('scroll');
+      }
+      $scrollable.scrollTop(scrollTop);
       if (scrollbar) {
         scrollbar.notifyAfterScroll();
       }
@@ -383,7 +393,7 @@ scout.scrollbars = {
     }
 
     // Animated
-    this.animateScrollTop($scrollable, scrollTop);
+    this.animateScrollTop($scrollable, scrollTop, options);
     $scrollable.promise('scroll').always(function() {
       if (scrollbar) {
         scrollbar.notifyAfterScroll();
@@ -392,7 +402,7 @@ scout.scrollbars = {
   },
 
   scrollLeft: function($scrollable, scrollLeft, options) {
-    options = options || {};
+    options = this._createDefaultScrollToOptions(options);
     var scrollbar = scout.scrollbars.scrollbar($scrollable, 'x');
     if (scrollbar) {
       scrollbar.notifyBeforeScroll();
@@ -400,9 +410,10 @@ scout.scrollbars = {
 
     // Not animated
     if (!options.animate) {
-      $scrollable
-        .stop('scroll')
-        .scrollLeft(scrollLeft);
+      if (options.stop) {
+        $scrollable.stop('scroll');
+      }
+      $scrollable.scrollLeft(scrollLeft);
       if (scrollbar) {
         scrollbar.notifyAfterScroll();
       }
@@ -410,7 +421,7 @@ scout.scrollbars = {
     }
 
     // Animated
-    this.animateScrollLeft($scrollable, scrollLeft);
+    this.animateScrollLeft($scrollable, scrollLeft, options);
     $scrollable.promise('scroll').always(function() {
       if (scrollbar) {
         scrollbar.notifyAfterScroll();
@@ -418,10 +429,11 @@ scout.scrollbars = {
     });
   },
 
-  animateScrollTop: function($scrollable, scrollTop) {
-    $scrollable
-      .stop('scroll')
-      .animate({
+  animateScrollTop: function($scrollable, scrollTop, options) {
+    if (options.stop) {
+      $scrollable.stop('scroll');
+    }
+    $scrollable.animate({
         scrollTop: scrollTop
       }, {
         queue: 'scroll'
@@ -429,10 +441,11 @@ scout.scrollbars = {
       .dequeue('scroll');
   },
 
-  animateScrollLeft: function($scrollable, scrollLeft) {
-    $scrollable
-      .stop('scroll')
-      .animate({
+  animateScrollLeft: function($scrollable, scrollLeft, options) {
+    if (options.stop) {
+      $scrollable.stop('scroll');
+    }
+    $scrollable.animate({
         scrollLeft: scrollLeft
       }, {
         queue: 'scroll'
@@ -616,5 +629,63 @@ scout.scrollbars = {
         scrollbar.$container.css('opacity', opacity);
       }
     });
+  },
+
+  _getCompleteChildRowsHeightRecursive: function(children, getChildren, isExpanded) {
+    var height = 0;
+    children.forEach(function(child) {
+      height += child.height;
+      if (isExpanded(child) && getChildren(child).length > 0) {
+        height += this._getCompleteChildRowsHeightRecursive(getChildren(child), getChildren, isExpanded);
+      }
+    }.bind(this));
+    return height;
+  },
+
+  ensureExpansionVisible: function(parent) {
+    var isParentExpanded = parent.isExpanded(parent.element);
+    var children = parent.getChildren(parent.element);
+    var parentPositionTop = parent.$element.position().top;
+    var parentHeight = parent.element.height;
+    var scrollTop = parent.$scrollable.scrollTop();
+
+    // vertical scrolling
+    if (!isParentExpanded) {
+      // parent is not expanded, make sure that at least one node above the parent is visible
+      if (parentPositionTop < parentHeight) {
+        var minScrollTop = Math.max(scrollTop - (parentHeight - parentPositionTop), 0);
+        this.scrollTop(parent.$scrollable, minScrollTop, {
+          animate: true
+        });
+      }
+    } else if (isParentExpanded && children.length > 0) {
+      // parent is expanded and has children, best effort approach to show the expansion
+      var fullDataHeight = parent.$scrollable.height();
+
+      // get childRowCount considering already expanded rows
+      var childRowsHeight = this._getCompleteChildRowsHeightRecursive(children, parent.getChildren, parent.isExpanded);
+
+      // + 1.5 since its the parent's top position and we want to scroll half a row further to show that there's something after the expansion
+      var additionalHeight = childRowsHeight + (1.5 * parentHeight);
+      var scrollTo = parentPositionTop + additionalHeight;
+      // scroll as much as needed to show the expansion but make sure that the parent row (plus one more) is still visible
+      var newScrollTop = scrollTop + Math.min(scrollTo - fullDataHeight, parentPositionTop - parentHeight);
+      // only scroll down
+      if (newScrollTop > scrollTop) {
+        this.scrollTop(parent.$scrollable, newScrollTop, {
+          animate: true,
+          stop: false
+        });
+      }
+    }
+
+    if (children.length > 0) {
+      // horizontal scrolling: at least 3 levels of hierarchy should be visible (only relevant for small fields)
+      var minLevelLeft = Math.max(parent.element.level - 3, 0) * parent.nodePaddingLevel;
+      this.scrollLeft(parent.$scrollable, minLevelLeft, {
+        animate: true,
+        stop: false
+      });
+    }
   }
 };

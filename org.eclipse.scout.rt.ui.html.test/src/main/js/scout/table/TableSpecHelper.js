@@ -28,11 +28,12 @@ scout.TableSpecHelper.prototype.createModel = function(columns, rows) {
   return model;
 };
 
-scout.TableSpecHelper.prototype.createModelRow = function(id, cells) {
+scout.TableSpecHelper.prototype.createModelRow = function(id, cells, parentRow) {
   return {
     id: scout.nvl(id, scout.objectFactory.createUniqueId()),
     cells: cells,
-    enabled: true
+    enabled: true,
+    parentRow: parentRow
   };
 };
 
@@ -161,14 +162,14 @@ scout.TableSpecHelper.prototype.createModelCells = function(columns, rowId) {
  * Creates #rowCount rows where columns is either the column count or the column objects.
  * Passing the column objects allows to consider the column type for cell creation.
  */
-scout.TableSpecHelper.prototype.createModelRows = function(columns, rowCount) {
+scout.TableSpecHelper.prototype.createModelRows = function(columns, rowCount, parentRow) {
   if (!rowCount) {
     return;
   }
 
   var rows = [];
   for (var i = 0; i < rowCount; i++) {
-    rows[i] = this.createModelRow(null, this.createModelCells(columns, i));
+    rows[i] = this.createModelRow(null, this.createModelCells(columns, i), parentRow);
   }
   return rows;
 };
