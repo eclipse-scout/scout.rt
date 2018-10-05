@@ -18,6 +18,7 @@ scout.ViewMenuTab = function() {
 
   this.viewButtons = [];
   this.selected = false;
+  this.selectedButton = null;
   this.viewTabVisible = true;
   this.defaultIconId = scout.icons.FOLDER;
   this._addWidgetProperties(['selectedButton']);

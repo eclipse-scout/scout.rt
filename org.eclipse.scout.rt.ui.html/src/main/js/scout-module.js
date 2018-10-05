@@ -145,6 +145,7 @@
   __include("scout/focus/FocusContext.js");
   __include("scout/focus/focusUtils.js");
   __include("scout/focus/focusRule.js");
+  __include("scout/glasspane/GlassPane.js");
   __include("scout/glasspane/DeferredGlassPaneTarget.js");
   __include("scout/glasspane/GlassPaneRenderer.js");
   __include("scout/iframe/IFrame.js");

@@ -39,19 +39,21 @@ scout.SingleLayout.prototype.preferredLayoutSize = function($container, options)
   }
   if (htmlChild) {
     return htmlChild.prefSize(options).add(scout.graphics.insets($container));
-  } else {
-    return new scout.Dimension(1, 1);
   }
+  return new scout.Dimension(1, 1);
 };
 
 /**
- * @returns a HtmlComponent instance for the first child of the given container or null if the container has no children.
+ * @returns the first child html component of the given container or null if the container has no child with a html component or no children at all.
  */
 scout.SingleLayout.prototype._getHtmlSingleChild = function($container) {
-  var $firstChild = $container.children().first();
-  if ($firstChild.length) {
-    return scout.HtmlComponent.get($firstChild);
-  } else {
-    return null;
-  }
+  var htmlComp = null;
+  $container.children().each(function(i, child) {
+    var htmlChild = scout.HtmlComponent.optGet($(child));
+    if (htmlChild) {
+      htmlComp = htmlChild;
+      return false;
+    }
+  });
+  return htmlComp;
 };
