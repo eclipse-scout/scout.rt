@@ -146,7 +146,7 @@ scout.models = {
    *     "groupWithTarget": true
    *   }
    * This will group the properties together. future extensions which use "before": "somObjectIDInPropertyArray"
-   * will insert new elements before the grouped items.
+   * will insert new elements before the grouped items. (Works the same with "after".)
    *
    * The extension property can be an object or an array of objects.
    *
@@ -182,7 +182,7 @@ scout.models = {
         targetObject[target.property] = targetObject[target.property] || [];
         var targetArray = targetObject[target.property];
         var extensionArray = scout.arrays.ensure(extensionConfig.extension);
-        this._bindExtensionsToBefore(target, extensionArray);
+        this._bindExtensionsToBeforeOrAfter(target, extensionArray);
         var insertAt = this._findExtensionIndex(target, targetArray);
         scout.arrays.insertAll(targetArray, extensionArray, insertAt);
       }
@@ -195,7 +195,7 @@ scout.models = {
    * Finds the index in the target array which is given through the target.
    *
    * @param target
-   *          target information to search the index (either fixed index or a "before" tag).
+   *          target information to search the index (either fixed index or a "before" or "after" tag).
    * @param targetArray
    *          array to search the extension index in.
    * @returns extension index between 0 and targetArray.length or targetArray.length if no index is found.
@@ -210,6 +210,16 @@ scout.models = {
         insertAt = targetArray.length;
       }
     }
+    else if (target.after) {
+      insertAt = scout.arrays.findIndex(targetArray, function(element) {
+        return element.id === target.after || element.groupedWith === target.after;
+      });
+      if (insertAt === -1) {
+        insertAt = targetArray.length;
+      } else {
+        insertAt++;
+      }
+    }
     if ($.isNumeric(target.index)) {
       insertAt = target.index;
     }
@@ -217,17 +227,18 @@ scout.models = {
   },
 
   /**
-   * Adds the boundTo tag to all given extensions.
+   * Adds the groupedWith tag to all given extensions.
    *
    * @param target
    *          target to bind the extensions to.
    * @param extensionsArray
    *          extensions to bind
    */
-  _bindExtensionsToBefore: function(target, extensionsArray) {
-    if (target.before && target.groupWithTarget) {
+  _bindExtensionsToBeforeOrAfter: function(target, extensionsArray) {
+    var beforeOrAfter = target.before || target.after;
+    if (beforeOrAfter && target.groupWithTarget) {
       extensionsArray.forEach(function(element) {
-        element.groupedWith = target.before;
+        element.groupedWith = beforeOrAfter;
       });
     }
   }
