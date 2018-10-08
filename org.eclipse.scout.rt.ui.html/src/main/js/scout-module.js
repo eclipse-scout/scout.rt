@@ -19,6 +19,7 @@
   __include("scout/ObjectFactory.js");
   __include("scout/objectFactories.js");
   __include("scout/widget/LoadingSupport.js");
+  __include("scout/widget/SimpleLoadingSupport.js");
   __include("scout/session/ModelAdapter.js");
   __include("scout/widget/Widget.js");
   __include("scout/widget/widgets.js");
@@ -352,7 +353,6 @@
   __include("scout/form/fields/FormField.js");
   __include("scout/form/fields/FormFieldAdapter.js");
   __include("scout/form/fields/FormFieldLayout.js");
-  __include("scout/form/fields/SimpleLoadingSupport.js");
   __include("scout/form/fields/StatusMenuMapping.js");
   __include("scout/form/fields/StatusMenuMappingAdapter.js");
   __include("scout/form/fields/GridData.js");
