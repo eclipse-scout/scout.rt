@@ -53,7 +53,7 @@ public class ImapAdapter implements IImapAdapter {
   private Map<String, Folder> m_cachedFolders;
 
   public ImapAdapter() {
-    m_cachedFolders = new HashMap<String, Folder>();
+    setCachedFolders(new HashMap<String, Folder>());
   }
 
   public ImapAdapter(String host, int port, String username, String password) {
@@ -236,7 +236,7 @@ public class ImapAdapter implements IImapAdapter {
   @Override
   public void connect() {
     if (!isConnected()) {
-      m_cachedFolders.clear();
+      getCachedFolders().clear();
       Properties props = new Properties();
       props.put("mail.transport.protocol", "imap");
       if (getHost() != null) {
@@ -293,7 +293,7 @@ public class ImapAdapter implements IImapAdapter {
 
   protected Folder findFolder(String name, boolean createNonExisting) {
     connect();
-    Folder folder = m_cachedFolders.get(name);
+    Folder folder = getCachedFolders().get(name);
     if (folder == null) {
       try {
         Folder f = m_store.getFolder(name);
@@ -305,7 +305,7 @@ public class ImapAdapter implements IImapAdapter {
           folder = f;
         }
         if (folder != null) {
-          m_cachedFolders.put(name, folder);
+          getCachedFolders().put(name, folder);
         }
       }
       catch (MessagingException e) {
@@ -327,7 +327,7 @@ public class ImapAdapter implements IImapAdapter {
   public void closeConnection() {
     if (isConnected()) {
       List<MessagingException> exceptions = new ArrayList<MessagingException>();
-      for (Folder folder : m_cachedFolders.values()) {
+      for (Folder folder : getCachedFolders().values()) {
         try {
           if (folder.isOpen()) {
             folder.close(true);
@@ -355,7 +355,7 @@ public class ImapAdapter implements IImapAdapter {
       catch (MessagingException e) {
         exceptions.add(e);
       }
-      m_cachedFolders.clear();
+      getCachedFolders().clear();
       if (!exceptions.isEmpty()) {
         throw new ProcessingException(exceptions.get(0).getMessage());
       }
@@ -449,5 +449,13 @@ public class ImapAdapter implements IImapAdapter {
     else {
       m_sslProtocols = Arrays.copyOf(sslProtocols, sslProtocols.length);
     }
+  }
+
+  protected Map<String, Folder> getCachedFolders() {
+    return m_cachedFolders;
+  }
+
+  protected void setCachedFolders(Map<String, Folder> cachedFolders) {
+    m_cachedFolders = cachedFolders;
   }
 }
