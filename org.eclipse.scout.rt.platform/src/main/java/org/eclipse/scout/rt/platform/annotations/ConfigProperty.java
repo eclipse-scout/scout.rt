@@ -85,6 +85,10 @@ public @interface ConfigProperty {
    * Class&lt;? extends LookupCall&gt;
    */
   String GROUP_BOX_BODY_GRID = "GROUP_BOX_BODY_GRID";
+  /**
+   * String
+   */
+  String GROUP_BOX_MENU_BAR_POSITION = "GROUP_BOX_MENU_BAR_POSITION";
 
   /**
    * Class&lt;? extends ICodeType&gt;

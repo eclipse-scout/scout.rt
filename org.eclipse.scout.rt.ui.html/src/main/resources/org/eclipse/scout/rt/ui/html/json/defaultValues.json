@@ -103,6 +103,7 @@
       "expanded": true,
       "fields": [],
       "gridColumnCount": -1,
+      "menuBarPosition": "auto",
       "bodyLayoutConfig": {
         "hgap": -1,
         "vgap": -1,

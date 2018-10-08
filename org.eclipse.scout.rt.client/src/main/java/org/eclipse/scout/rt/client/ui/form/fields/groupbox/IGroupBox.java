@@ -100,6 +100,26 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
    */
   String PROP_NOTIFICATION = "notification";
 
+  /**
+   * {@link String}
+   */
+  String PROP_MENU_BAR_POSITION = "menuBarPosition";
+
+  /**
+   * Default position of the menubar of the {@link IGroupBox}.
+   */
+  String MENU_BAR_POSITION_AUTO = "auto";
+
+  /**
+   * Render an {@link IGroupBox} with the menubar at the top.
+   */
+  String MENU_BAR_POSITION_TOP = "top";
+
+  /**
+   * Render an {@link IGroupBox} with the menuBar at the bottom.
+   */
+  String MENU_BAR_POSITION_BOTTOM = "bottom";
+
   /*
    * Runtime
    */
@@ -252,5 +272,23 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
   void setMinWidthInPixel(int minWidthInPixel);
 
   IGroupBoxUIFacade getUIFacade();
+
+  /**
+   * @return the value to control the menuBar position of this {@link IGroupBox}.
+   * @see #MENU_BAR_POSITION_AUTO
+   * @see #MENU_BAR_POSITION_TOP
+   * @see #MENU_BAR_POSITION_BOTTOM
+   */
+  String getMenuBarPosition();
+
+  /**
+   * Set the given value to control the menuBar position of this {@link IGroupBox}.
+   * <ul>
+   * <li>{@link #MENU_BAR_POSITION_AUTO}</li>
+   * <li>{@link #MENU_BAR_POSITION_TOP}</li>
+   * <li>{@link #MENU_BAR_POSITION_BOTTOM}</li>
+   * </ul>
+   */
+  void setMenuBarPosition(String menuBarPosition);
 
 }

@@ -36,6 +36,7 @@ scout.GroupBox = function() {
   this.processButtons = [];
   this.processMenus = [];
   this.staticMenus = [];
+  this.menuBarPosition = scout.GroupBox.MenuBarPosition.AUTO;
 
   this.$body;
   this.$title;
@@ -47,6 +48,12 @@ scout.GroupBox.BorderDecoration = {
   AUTO: 'auto',
   EMPTY: 'empty',
   LINE: 'line'
+};
+
+scout.GroupBox.MenuBarPosition = {
+  AUTO: 'auto',
+  TOP: 'top',
+  BOTTOM: 'bottom'
 };
 
 scout.GroupBox.prototype._init = function(model) {
@@ -188,6 +195,7 @@ scout.GroupBox.prototype._renderProperties = function() {
   this._renderNotification();
   this._renderBorderVisible();
   this._renderExpandable();
+  this._renderMenuBarPosition();
   this._renderMenuBarVisible();
   this._renderScrollable();
   this._renderSubLabel();
@@ -468,6 +476,23 @@ scout.GroupBox.prototype._renderMenuBar = function() {
   if (this.menuBar.position === 'top') {
     // move after title
     this.menuBar.$container.insertAfter(this.$title);
+  }
+};
+
+scout.GroupBox.prototype.setMenuBarPosition = function(menuBarPosition) {
+  this.setProperty('menuBarPosition', menuBarPosition);
+};
+
+scout.GroupBox.prototype._renderMenuBarPosition = function() {
+  if (this.menuBarPosition === scout.GroupBox.MenuBarPosition.BOTTOM) {
+    this.menuBar.bottom();
+  } else if (this.menuBarPosition === scout.GroupBox.MenuBarPosition.TOP){
+    this.menuBar.top();
+  }
+
+  if (this.rendered) {
+    this.menuBar.remove();
+    this._renderMenuBarVisible();
   }
 };
 

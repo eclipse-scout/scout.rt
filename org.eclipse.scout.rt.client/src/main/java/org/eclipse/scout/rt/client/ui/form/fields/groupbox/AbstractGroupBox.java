@@ -295,6 +295,21 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     return 0;
   }
 
+  /**
+   * Overwrite to set the menuBar position for this {@link IGroupBox}. By default, {@link #MENU_BAR_POSITION_AUTO} is
+   * configured.
+   * <ul>
+   * <li>{@link #MENU_BAR_POSITION_AUTO}</li>
+   * <li>{@link #MENU_BAR_POSITION_TOP}</li>
+   * <li>{@link #MENU_BAR_POSITION_BOTTOM}</li>
+   * </ul>
+   */
+  @ConfigProperty(ConfigProperty.GROUP_BOX_MENU_BAR_POSITION)
+  @Order(210)
+  protected String getConfiguredMenuBarPosition() {
+    return MENU_BAR_POSITION_AUTO;
+  }
+
   @Override
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
@@ -326,6 +341,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     setScrollable(getConfiguredScrollable());
     setSelectionKeyStroke(getConfiguredSelectionKeyStroke());
     setBodyLayoutConfig(getConfiguredBodyLayoutConfig());
+    setMenuBarPosition(getConfiguredMenuBarPosition());
     initMenus();
   }
 
@@ -712,6 +728,16 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   public int getBackgroundImageHorizontalAlignment() {
     return propertySupport.getPropertyInt(PROP_BACKGROUND_IMAGE_HORIZONTAL_ALIGNMENT);
+  }
+
+  @Override
+  public String getMenuBarPosition() {
+    return propertySupport.getPropertyString(PROP_MENU_BAR_POSITION);
+  }
+
+  @Override
+  public void setMenuBarPosition(String menuBarPosition) {
+    propertySupport.setPropertyString(PROP_MENU_BAR_POSITION, menuBarPosition);
   }
 
   protected class P_UIFacade implements IGroupBoxUIFacade {

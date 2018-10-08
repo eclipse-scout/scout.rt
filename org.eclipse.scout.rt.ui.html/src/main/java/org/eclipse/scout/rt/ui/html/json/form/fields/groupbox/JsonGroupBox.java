@@ -118,6 +118,12 @@ public class JsonGroupBox<GROUP_BOX extends IGroupBox> extends JsonCompositeFiel
         return new JsonLogicalGridLayoutConfig((LogicalGridLayoutConfig) value).toJson();
       }
     });
+    putJsonProperty(new JsonProperty<GROUP_BOX>(IGroupBox.PROP_MENU_BAR_POSITION, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getMenuBarPosition();
+      }
+    });
   }
 
   @Override
