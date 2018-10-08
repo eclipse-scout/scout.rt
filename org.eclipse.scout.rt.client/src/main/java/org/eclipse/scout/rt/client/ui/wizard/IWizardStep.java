@@ -30,6 +30,7 @@ public interface IWizardStep<FORM extends IForm> extends IPropertyObserver, ITyp
   String PROP_VISIBLE = "visible";
   String PROP_ORDER = "order";
   String PROP_ACTION_ENABLED = "actionEnabled";
+  String PROP_FINISHED = "finished";
 
   /**
    * The step was activated by a "next" operation
@@ -74,6 +75,10 @@ public interface IWizardStep<FORM extends IForm> extends IPropertyObserver, ITyp
   boolean isActionEnabled();
 
   void setActionEnabled(boolean actionEnabled);
+
+  boolean isFinished();
+
+  void setFinished(boolean isFinished);
 
   /**
    * @return the cached for this step or null

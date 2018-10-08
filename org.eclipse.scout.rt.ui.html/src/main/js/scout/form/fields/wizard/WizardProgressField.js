@@ -62,7 +62,7 @@ scout.WizardProgressField.prototype._renderSteps = function() {
     // Tooltips are only uninstalled if user clicked outside container. However, the steps
     // may be updated by clicking inside the container. Therefore, manually make sure all
     // tooltips are uninstalled before destroying the DOM elements.
-    scout.tooltips.uninstall($(this));
+    scout.tooltips.uninstall($(this).children('.wizard-step-content'));
   });
   this.$wizardStepsBody.empty();
 
@@ -73,18 +73,11 @@ scout.WizardProgressField.prototype._renderSteps = function() {
       .addClass(step.cssClass)
       .data('wizard-step', step);
     step.$step = $step;
-    if (this.enabledComputed && step.enabled && step.actionEnabled) {
+    if (this.enabledComputed && step.enabled && step.actionEnabled &&  this.steps.indexOf(step) !== this.activeStepIndex) {
       $step.addClass('action-enabled');
       $step.on('click', this._onStepClick.bind(this));
     } else if (!this.enabledComputed || !step.enabled) {
       $step.addClass('disabled');
-    }
-    if (scout.strings.hasText(step.tooltipText)) {
-      scout.tooltips.install($step, {
-        parent: this,
-        text: step.tooltipText,
-        tooltipPosition: 'bottom'
-      });
     }
     this._updateStepClasses(step);
 
@@ -96,10 +89,22 @@ scout.WizardProgressField.prototype._renderSteps = function() {
 
     // Content
     var $content = $step.appendDiv('wizard-step-content');
+    if (scout.strings.hasText(step.tooltipText)) {
+      scout.tooltips.install($content, {
+        parent: this,
+        text: step.tooltipText,
+        tooltipPosition: 'bottom'
+      });
+    }
+
     // Icon
+    var $icon = $content.appendDiv('wizard-step-content-icon-container').appendDiv('wizard-step-content-icon');
     if (step.iconId) {
-      var $icon = $content.appendDiv('wizard-step-content-icon');
       $icon.icon(step.iconId);
+    } else if (step.finished) {
+      $icon.icon(scout.icons.CHECKED_BOLD);
+    } else {
+      $icon.text(index + 1);
     }
     // Text
     var $text = $content.appendDiv('wizard-step-content-text');
@@ -110,7 +115,9 @@ scout.WizardProgressField.prototype._renderSteps = function() {
 
     // Separator
     if (index < this.steps.length - 1) {
-      $step.appendDiv('wizard-step-separator');
+      this.$wizardStepsBody
+        .appendDiv('wizard-step-separator')
+        .icon(scout.icons.ANGLE_RIGHT);
     }
   }.bind(this));
 
@@ -134,7 +141,7 @@ scout.WizardProgressField.prototype._renderActiveStepIndex = function() {
 
 scout.WizardProgressField.prototype._updateStepClasses = function(step) {
   var $step = step.$step;
-  $step.removeClass('active before-active after-active left-of-active right-of-active first last');
+  $step.removeClass('active before-active after-active first last');
 
   // Important: those indices correspond to the UI's data structures (this.steps) and are not necessarily
   // consistent with the server indices (because the server does not send invisible steps).
@@ -145,14 +152,8 @@ scout.WizardProgressField.prototype._updateStepClasses = function(step) {
     // Active
     if (stepIndex < activeStepIndex) {
       $step.addClass('before-active');
-      if (stepIndex === activeStepIndex - 1) {
-        $step.addClass('left-of-active');
-      }
     } else if (stepIndex > activeStepIndex) {
       $step.addClass('after-active');
-      if (stepIndex === activeStepIndex + 1) {
-        $step.addClass('right-of-active');
-      }
     } else {
       $step.addClass('active');
     }

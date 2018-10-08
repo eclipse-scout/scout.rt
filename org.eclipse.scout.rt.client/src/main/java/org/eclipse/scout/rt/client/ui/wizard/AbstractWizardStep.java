@@ -175,6 +175,12 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
     return false;
   }
 
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(100)
+  protected boolean getConfiguredFinished() {
+    return false;
+  }
+
   /**
    * @param stepKind
    *          any of the STEP_* constants activate this step normally creates a form, calls
@@ -298,6 +304,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
     setCssClass((getConfiguredCssClass()));
     setOrder(calculateViewOrder());
     setActionEnabled(getConfiguredActionEnabled());
+    setFinished(getConfiguredFinished());
   }
 
   protected IWizardStepExtension<FORM, ? extends AbstractWizardStep<FORM>> createLocalExtension() {
@@ -501,6 +508,16 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   @Override
   public void setOrder(double order) {
     propertySupport.setPropertyDouble(PROP_ORDER, order);
+  }
+
+  @Override
+  public boolean isFinished() {
+    return propertySupport.getPropertyBool(PROP_FINISHED);
+  }
+
+  @Override
+  public void setFinished(boolean isFinished) {
+    propertySupport.setPropertyBool(PROP_FINISHED, isFinished);
   }
 
   @Override
