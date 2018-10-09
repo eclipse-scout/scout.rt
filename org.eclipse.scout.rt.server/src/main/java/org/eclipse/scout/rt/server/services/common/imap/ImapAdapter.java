@@ -53,7 +53,7 @@ public class ImapAdapter implements IImapAdapter {
   private Map<String, Folder> m_cachedFolders;
 
   public ImapAdapter() {
-    setCachedFolders(new HashMap<String, Folder>());
+    m_cachedFolders = new HashMap<String, Folder>();
   }
 
   public ImapAdapter(String host, int port, String username, String password) {
@@ -453,9 +453,5 @@ public class ImapAdapter implements IImapAdapter {
 
   protected Map<String, Folder> getCachedFolders() {
     return m_cachedFolders;
-  }
-
-  protected void setCachedFolders(Map<String, Folder> cachedFolders) {
-    m_cachedFolders = cachedFolders;
   }
 }
