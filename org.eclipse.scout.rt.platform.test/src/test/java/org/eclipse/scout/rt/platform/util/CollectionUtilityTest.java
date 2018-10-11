@@ -394,6 +394,22 @@ public class CollectionUtilityTest {
   }
 
   @Test
+  public void testHashMap() {
+    // test that it is null safe
+    assertEquals(1, CollectionUtility.hashMap(null, new ImmutablePair<Integer, String>(2, "test")).size());
+    HashMap<Integer, String> map = CollectionUtility.hashMap();
+    assertNotNull(map);
+    assertTrue(map.isEmpty());
+    // test that it is a mutable map
+    map.put(1, "test");
+    assertEquals(1, map.size());
+
+    // test that it inserts null keys / values
+    assertEquals("test", CollectionUtility.hashMap(new ImmutablePair<Integer, String>(null, "test")).get(null));
+    assertEquals(null, CollectionUtility.hashMap(new ImmutablePair<String, String>("test", null)).get("test"));
+  }
+
+  @Test
   public void testIsEmpty() {
     assertTrue(CollectionUtility.isEmpty((Map<?, ?>) null));
     assertTrue(CollectionUtility.isEmpty((Collection<?>) null));
@@ -420,6 +436,16 @@ public class CollectionUtilityTest {
     assertEquals(s1.hashCode(), s2.hashCode());
     assertEquals(CollectionUtility.hashCode(s1), CollectionUtility.hashCode(s2));
     assertEquals(s1, s2);
+  }
+
+  @Test
+  public void testHasElementsMap() {
+    assertFalse(CollectionUtility.hasElements((Map<?, ?>) null));
+
+    HashMap<Integer, String> hashMap = new HashMap<>();
+    assertFalse(CollectionUtility.hasElements(hashMap));
+    hashMap.put(1, "I love Scout");
+    assertTrue(CollectionUtility.hasElements(hashMap));
   }
 
   private List<Object> createList(Object... elements) {

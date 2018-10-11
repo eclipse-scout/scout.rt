@@ -670,6 +670,22 @@ public final class CollectionUtility {
     return new HashMap<>(0);
   }
 
+  @SafeVarargs
+  public static <T, U> HashMap<T, U> hashMap(Pair<T, U>... entries) {
+    if (entries == null || entries.length < 1) {
+      return emptyHashMap();
+    }
+
+    HashMap<T, U> hashMap = new HashMap<>();
+    for (Pair<T, U> entry : entries) {
+      if (entry == null) {
+        continue;
+      }
+      hashMap.put(entry.getLeft(), entry.getRight());
+    }
+    return hashMap;
+  }
+
   public static <T, U> U lastElement(SortedMap<T, U> m) {
     if (m == null || m.isEmpty()) {
       return null;
@@ -784,6 +800,10 @@ public final class CollectionUtility {
 
   public static boolean isEmpty(Collection<?> c) {
     return c == null || c.isEmpty();
+  }
+
+  public static boolean hasElements(Map<?, ?> m) {
+    return !isEmpty(m);
   }
 
   public static boolean hasElements(Collection<?> c) {
