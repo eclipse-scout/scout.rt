@@ -124,6 +124,12 @@ public class JsonGroupBox<GROUP_BOX extends IGroupBox> extends JsonCompositeFiel
         return getModel().getMenuBarPosition();
       }
     });
+    putJsonProperty(new JsonProperty<GROUP_BOX>(IGroupBox.PROP_MENU_BAR_ELLIPSIS_POSITION, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getMenuBarEllipsisPosition();
+      }
+    });
   }
 
   @Override

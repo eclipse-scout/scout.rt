@@ -24,6 +24,8 @@ scout.MenuBarLayout.prototype.layout = function($container) {
     htmlContainer = scout.HtmlComponent.get($container),
     ellipsis;
 
+  this.undoShrink(menuItems);
+
   ellipsis = scout.arrays.find(menuItems, function(menuItem) {
     return menuItem.ellipsis;
   });
@@ -103,6 +105,11 @@ scout.MenuBarLayout.prototype.preferredLayoutSize = function($container, options
     return this._minSize(visibleMenuItems);
   }
 
+  prefSize = this._prefSize(visibleMenuItems);
+  if (prefSize.width > prefWidth) {
+    this.shrink(visibleMenuItems);
+  }
+
   // fill overflowable indexes
   visibleMenuItems.forEach(function(menuItem, index) {
     if (menuItem.stackable) {
@@ -114,7 +121,11 @@ scout.MenuBarLayout.prototype.preferredLayoutSize = function($container, options
   this._setFirstLastMenuMarker(visibleMenuItems);
   prefSize = this._prefSize(visibleMenuItems);
   while (prefSize.width > prefWidth && overflowableIndexes.length > 0) {
-    overflowIndex = overflowableIndexes.splice(-1)[0];
+    if (this._menuBar.ellipsisMenuPosition === scout.MenuBar.EllipsisPosition.RIGHT) {
+      overflowIndex = overflowableIndexes.splice(-1)[0];
+    } else {
+      overflowIndex = overflowableIndexes.splice(0, 1)[0] - this._overflowMenuItems.length;
+    }
     this._overflowMenuItems.splice(0, 0, visibleMenuItems[overflowIndex]);
     visibleMenuItems.splice(overflowIndex, 1);
     this._setFirstLastMenuMarker(visibleMenuItems);
@@ -170,6 +181,7 @@ scout.MenuBarLayout.prototype._menuItemSize = function(menuItem) {
     useCssSize: true,
     exact: true
   }).add(scout.graphics.margins(menuItem.$container));
+  prefSize.width = menuItem.$container.outerWidth(true);
 
   menuItem.$container.attrOrRemove('class', classList);
   return prefSize;
@@ -195,6 +207,37 @@ scout.MenuBarLayout.prototype._setFirstLastMenuMarker = function(visibleMenuItem
     menuItems[0].$container.addClass('first');
     menuItems[menuItems.length - 1].$container.addClass('last');
   }
+};
+
+/**
+ * Makes the text invisible of all shrinkable menus with an icon
+ */
+scout.MenuBarLayout.prototype.shrink = function(menus) {
+  menus.forEach(function(menu) {
+    if (menu.textVisibleOrig !== undefined) {
+      // already done
+      return;
+    }
+    if (menu.shrinkable && menu.icon) {
+      menu.textVisibleOrig = menu.textVisible;
+      menu.htmlComp.suppressInvalidate = true;
+      menu.setTextVisible(false);
+      menu.htmlComp.suppressInvalidate = false;
+    }
+  }, this);
+};
+
+scout.MenuBarLayout.prototype.undoShrink = function(menus) {
+  menus.forEach(function(menu) {
+    if (menu.textVisibleOrig === undefined) {
+      return;
+    }
+    // Restore old text visible state
+    menu.htmlComp.suppressInvalidate = true;
+    menu.setTextVisible(menu.textVisibleOrig);
+    menu.htmlComp.suppressInvalidate = false;
+    menu.textVisibleOrig = undefined;
+  }, this);
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

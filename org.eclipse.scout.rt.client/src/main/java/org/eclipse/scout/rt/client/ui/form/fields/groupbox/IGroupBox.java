@@ -120,6 +120,21 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
    */
   String MENU_BAR_POSITION_BOTTOM = "bottom";
 
+  /**
+   * {@link String}
+   */
+  String PROP_MENU_BAR_ELLIPSIS_POSITION = "menuBarEllipsisPosition";
+
+  /**
+   * Render an {@link IGroupBox} with the ellipsis in the menubar on the left side.
+   */
+  String MENU_BAR_ELLIPSIS_POSITION_LEFT = "left";
+
+  /**
+   * Render an {@link IGroupBox} with the ellipsis in the menubar on the right side.
+   */
+  String MENU_BAR_ELLIPSIS_POSITION_RIGHT = "right";
+
   /*
    * Runtime
    */
@@ -290,5 +305,21 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
    * </ul>
    */
   void setMenuBarPosition(String menuBarPosition);
+
+  /**
+   * @return the value to control the menuBar ellipsis position of this {@link IGroupBox}.
+   * @see #MENU_BAR_ELLIPSIS_POSITION_LEFT
+   * @see #MENU_BAR_ELLIPSIS_POSITION_RIGHT
+   */
+  String getMenuBarEllipsisPosition();
+
+  /**
+   * Set the given value to control the menuBar ellipsis position of this {@link IGroupBox}.
+   * <ul>
+   * <li>{@link #MENU_BAR_ELLIPSIS_POSITION_LEFT}</li>
+   * <li>{@link #MENU_BAR_ELLIPSIS_POSITION_RIGHT}</li>
+   * </ul>
+   */
+  void setMenuBarEllipsisPosition(String menuBarEllipsisPosition);
 
 }

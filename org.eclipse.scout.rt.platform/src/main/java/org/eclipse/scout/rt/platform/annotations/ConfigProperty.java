@@ -88,6 +88,10 @@ public @interface ConfigProperty {
   /**
    * String
    */
+  String GROUP_BOX_MENU_BAR_ELLIPSIS_POSITION = "GROUP_BOX_MENU_BAR_ELLIPSIS_POSITION";
+  /**
+   * String
+   */
   String GROUP_BOX_MENU_BAR_POSITION = "GROUP_BOX_MENU_BAR_POSITION";
 
   /**

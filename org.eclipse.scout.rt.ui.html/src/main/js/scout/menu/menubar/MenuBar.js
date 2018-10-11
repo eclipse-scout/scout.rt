@@ -25,12 +25,18 @@ scout.MenuBar = function() {
   };
   this.defaultMenu = null;
   this.visible = false;
+  this.ellipsisMenuPosition = scout.MenuBar.EllipsisPosition.RIGHT;
 
   this._menuItemPropertyChangeHandler = this._onMenuItemPropertyChange.bind(this);
 
   this._addWidgetProperties('menuItems');
 };
 scout.inherits(scout.MenuBar, scout.Widget);
+
+scout.MenuBar.EllipsisPosition = {
+  LEFT: 'left',
+  RIGHT: 'right'
+};
 
 scout.MenuBar.prototype._init = function(options) {
   scout.MenuBar.parent.prototype._init.call(this, options);
@@ -120,6 +126,14 @@ scout.MenuBar.prototype.large = function() {
   this.size = 'large';
 };
 
+scout.MenuBar.prototype.ellipsisRight = function() {
+  this.ellipsisMenuPosition = scout.MenuBar.EllipsisPosition.RIGHT;
+};
+
+scout.MenuBar.prototype.ellipsisLeft = function() {
+  this.ellipsisMenuPosition = scout.MenuBar.EllipsisPosition.LEFT;
+};
+
 /**
  * This function can be called multiple times. The function attaches the menu handlers only if they are not yet added.
  */
@@ -194,36 +208,51 @@ scout.MenuBar.prototype._createOrderedMenus = function(menuItems) {
     this._ellipsis = ellipsis;
 
     // add ellipsis to the correct position
-    // try right
-    orderedMenuItems.right.slice().reverse().some(function(menu, index) {
-      if (menu.stackable) {
-        ellipsisIndex = orderedMenuItems.right.length - index;
-        return true;
+    if (this.ellipsisMenuPosition === scout.MenuBar.EllipsisPosition.RIGHT) {
+      // try right
+      var reverseIndexPosition = this._getFirstStackableIndexPosition(orderedMenuItems.right.slice().reverse());
+      if (reverseIndexPosition > -1) {
+        ellipsisIndex = orderedMenuItems.right.length - reverseIndexPosition;
+        ellipsis.rightAligned = true;
+        orderedMenuItems.right.splice(ellipsisIndex, 0, ellipsis);
+      } else {
+        // try left
+        reverseIndexPosition = this._getFirstStackableIndexPosition(orderedMenuItems.left.slice().reverse());
+        if (reverseIndexPosition > -1) {
+          ellipsisIndex = orderedMenuItems.left.length - reverseIndexPosition;
+          orderedMenuItems.left.splice(ellipsisIndex, 0, ellipsis);
+        }
       }
-      return false;
-    }, this);
-
-    if (ellipsisIndex > -1) {
-      ellipsis.rightAligned = true;
-      orderedMenuItems.right.splice(ellipsisIndex, 0, ellipsis);
-      orderedMenuItems.all = orderedMenuItems.left.concat(orderedMenuItems.right);
-      return orderedMenuItems;
-    }
-    // try left
-    orderedMenuItems.left.slice().reverse().some(function(menu, index) {
-      if (menu.stackable) {
-        ellipsisIndex = orderedMenuItems.left.length - index;
-        return true;
+    } else {
+      // try left
+      ellipsisIndex = this._getFirstStackableIndexPosition(orderedMenuItems.left);
+      if (ellipsisIndex > -1) {
+        orderedMenuItems.left.splice(ellipsisIndex, 0, ellipsis);
+      } else {
+        // try right
+        ellipsisIndex = this._getFirstStackableIndexPosition(orderedMenuItems.right);
+        if (ellipsisIndex > -1) {
+          ellipsis.rightAligned = true;
+          orderedMenuItems.right.splice(ellipsisIndex, 0, ellipsis);
+        }
       }
-      return false;
-    }, this);
-    if (ellipsisIndex > -1) {
-      orderedMenuItems.left.splice(ellipsisIndex, 0, ellipsis);
-      orderedMenuItems.all = orderedMenuItems.left.concat(orderedMenuItems.right);
-      return orderedMenuItems;
     }
+    orderedMenuItems.all = orderedMenuItems.left.concat(orderedMenuItems.right);
   }
   return orderedMenuItems;
+};
+
+scout.MenuBar.prototype._getFirstStackableIndexPosition = function(menuList) {
+  var foundIndex = -1;
+  menuList.some(function(menu, index) {
+    if (menu.stackable) {
+      foundIndex = index;
+      return true;
+    }
+    return false;
+  }, this);
+
+  return foundIndex;
 };
 
 scout.MenuBar.prototype._updateTabbableMenu = function() {
@@ -363,7 +392,6 @@ scout.MenuBar.prototype._updateLeftOfButtonMarker = function(items) {
 };
 
 scout.MenuBar.prototype._onMenuItemPropertyChange = function(event) {
-  var menuItems;
   // We do not update the items directly, because this listener may be fired many times in one
   // user request (because many menus change one or more properties). Therefore, we just invalidate
   // the MenuBarLayout. It will be updated automatically after the user request has finished,
@@ -380,11 +408,7 @@ scout.MenuBar.prototype._onMenuItemPropertyChange = function(event) {
   }
   if (event.propertyName === 'horizontalAlignment') {
     // reorder
-    menuItems = this.menuItems;
-    if (this.rendered) {
-      this._removeMenuItems();
-    }
-    this._setMenuItems(menuItems, event.newValue <= 0);
+    this.reorderMenus(event.newValue <= 0);
   }
   if (event.propertyName === 'visible') {
     var oldVisible = this.visible;
@@ -400,4 +424,12 @@ scout.MenuBar.prototype._onMenuItemPropertyChange = function(event) {
   if (event.propertyName === 'keyStroke' || event.propertyName === 'enabled' || event.propertyName === 'defaultMenu' || event.propertyName === 'visible') {
     this.updateDefaultMenu();
   }
+};
+
+scout.MenuBar.prototype.reorderMenus = function(rightFirst) {
+  var menuItems = this.menuItems;
+  if (this.rendered) {
+    this._removeMenuItems();
+  }
+  this._setMenuItems(menuItems, rightFirst);
 };

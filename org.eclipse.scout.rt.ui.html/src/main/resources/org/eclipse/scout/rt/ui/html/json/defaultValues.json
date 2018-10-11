@@ -64,6 +64,8 @@
       "defaultMenu": null,
       "separator": false,
       "outlineMenuWrapper": false,
+      "stackable": true,
+      "shrinkable": false,
       "childActions": [],
       "menuTypes": ["Table.EmptySpace"],
       "preventDoubleClick": false
@@ -76,7 +78,9 @@
       "displayStyle": 0,
       "keyStroke": null,
       "statusVisible": false,
-      "preventDoubleClick": false
+      "preventDoubleClick": false,
+      "stackable": true,
+      "shrinkable": false
     },
     "RadioButtonGroup": {
       "clearable": "never",
@@ -104,6 +108,7 @@
       "fields": [],
       "gridColumnCount": -1,
       "menuBarPosition": "auto",
+      "menuBarEllipsisPosition": "right",
       "bodyLayoutConfig": {
         "hgap": -1,
         "vgap": -1,

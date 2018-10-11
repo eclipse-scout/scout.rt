@@ -98,6 +98,16 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     return true;
   }
 
+  /**
+   * Configures if the menu is shrinkable. A shrinkable menu will be displayed without text but only with its configured
+   * icon if there is not enough space in the menubar.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(58)
+  protected boolean getConfiguredShrinkable() {
+    return false;
+  }
+
   @Override
   public Object getOwnerValue() {
     return m_ownerValue;
@@ -188,6 +198,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     setMenuTypes(getConfiguredMenuTypes());
     setPreventDoubleClick(getConfiguredPreventDoubleClick());
     setStackable(getConfiguredStackable());
+    setShrinkable(getConfiguredShrinkable());
   }
 
   @Override
@@ -252,6 +263,16 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   @Override
   public void setStackable(boolean stackable) {
     propertySupport.setPropertyBool(PROP_STACKABLE, stackable);
+  }
+
+  @Override
+  public boolean isShrinkable() {
+    return propertySupport.getPropertyBool(PROP_SHRINKABLE);
+  }
+
+  @Override
+  public void setShrinkable(boolean shrinkable) {
+    propertySupport.setPropertyBool(PROP_SHRINKABLE, shrinkable);
   }
 
   protected final void interceptOwnerValueChanged(Object newOwnerValue) {

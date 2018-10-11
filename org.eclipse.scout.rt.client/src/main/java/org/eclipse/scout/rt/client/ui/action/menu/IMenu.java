@@ -25,6 +25,7 @@ public interface IMenu extends IActionNode<IMenu> {
   String PROP_MENU_TYPES = "menuTypes";
   String PROP_PREVENT_DOUBLE_CLICK = "preventDoubleClick";
   String PROP_STACKABLE = "stackable";
+  String PROP_SHRINKABLE = "shrinkable";
 
   /**
    * A menu can have several {@link IMenuType}s each menu type describes a certain usage in a specific context (e.g.
@@ -45,6 +46,14 @@ public interface IMenu extends IActionNode<IMenu> {
    * usually set to false for right aligned menus with only an icon.
    */
   void setStackable(boolean stackable);
+
+  boolean isShrinkable();
+
+  /**
+   * A shrinkable menu will be displayed without text but only with its configured icon if there is not enough space in
+   * the menubar.
+   */
+  void setShrinkable(boolean shrinkable);
 
   Object getOwnerValue();
 

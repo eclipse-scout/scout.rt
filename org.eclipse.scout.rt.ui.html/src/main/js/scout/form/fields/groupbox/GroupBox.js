@@ -37,6 +37,7 @@ scout.GroupBox = function() {
   this.processMenus = [];
   this.staticMenus = [];
   this.menuBarPosition = scout.GroupBox.MenuBarPosition.AUTO;
+  this.menuBarEllipsisPosition = scout.MenuBar.EllipsisPosition.RIGHT;
 
   this.$body;
   this.$title;
@@ -197,6 +198,7 @@ scout.GroupBox.prototype._renderProperties = function() {
   this._renderBorderVisible();
   this._renderExpandable();
   this._renderMenuBarPosition();
+  this._renderMenuBarEllipsisPosition();
   this._renderMenuBarVisible();
   this._renderSubLabel();
 };
@@ -502,6 +504,24 @@ scout.GroupBox.prototype._renderMenuBarPosition = function() {
     this.menuBar.top();
   }
 
+  if (this.rendered) {
+    this.menuBar.remove();
+    this._renderMenuBarVisible();
+  }
+};
+
+scout.GroupBox.prototype.setMenuBarEllipsisPosition = function(menuBarEllipsisPosition) {
+  this.setProperty('menuBarEllipsisPosition', menuBarEllipsisPosition);
+};
+
+scout.GroupBox.prototype._renderMenuBarEllipsisPosition = function() {
+  if (this.menuBarEllipsisPosition === scout.MenuBar.EllipsisPosition.RIGHT) {
+    this.menuBar.ellipsisRight();
+  } else if (this.menuBarEllipsisPosition === scout.MenuBar.EllipsisPosition.LEFT){
+    this.menuBar.ellipsisLeft();
+  }
+
+  this.menuBar.reorderMenus();
   if (this.rendered) {
     this.menuBar.remove();
     this._renderMenuBarVisible();

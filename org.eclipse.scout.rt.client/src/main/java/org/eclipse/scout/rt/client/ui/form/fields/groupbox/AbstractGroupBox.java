@@ -296,7 +296,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   }
 
   /**
-   * Overwrite to set the menuBar position for this {@link IGroupBox}. By default, {@link #MENU_BAR_POSITION_AUTO} is
+   * Override to set the menuBar position for this {@link IGroupBox}. By default, {@link #MENU_BAR_POSITION_AUTO} is
    * configured.
    * <ul>
    * <li>{@link #MENU_BAR_POSITION_AUTO}</li>
@@ -305,9 +305,23 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    * </ul>
    */
   @ConfigProperty(ConfigProperty.GROUP_BOX_MENU_BAR_POSITION)
-  @Order(210)
+  @Order(300)
   protected String getConfiguredMenuBarPosition() {
     return MENU_BAR_POSITION_AUTO;
+  }
+
+  /**
+   * Override to set the menuBar ellipsis position for this {@link IGroupBox}. By default,
+   * {@link #MENU_BAR_ELLIPSIS_POSITION_RIGHT} is configured.
+   * <ul>
+   * <li>{@link #MENU_BAR_ELLIPSIS_POSITION_LEFT}</li>
+   * <li>{@link #MENU_BAR_ELLIPSIS_POSITION_RIGHT}</li>
+   * </ul>
+   */
+  @ConfigProperty(ConfigProperty.GROUP_BOX_MENU_BAR_ELLIPSIS_POSITION)
+  @Order(310)
+  protected String getConfiguredMenuBarEllipsisPosition() {
+    return MENU_BAR_ELLIPSIS_POSITION_RIGHT;
   }
 
   @Override
@@ -342,6 +356,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     setSelectionKeyStroke(getConfiguredSelectionKeyStroke());
     setBodyLayoutConfig(getConfiguredBodyLayoutConfig());
     setMenuBarPosition(getConfiguredMenuBarPosition());
+    setMenuBarEllipsisPosition(getConfiguredMenuBarEllipsisPosition());
     initMenus();
   }
 
@@ -738,6 +753,16 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   public void setMenuBarPosition(String menuBarPosition) {
     propertySupport.setPropertyString(PROP_MENU_BAR_POSITION, menuBarPosition);
+  }
+
+  @Override
+  public String getMenuBarEllipsisPosition() {
+    return propertySupport.getPropertyString(PROP_MENU_BAR_ELLIPSIS_POSITION);
+  }
+
+  @Override
+  public void setMenuBarEllipsisPosition(String menuBarEllipsisPosition) {
+    propertySupport.setPropertyString(PROP_MENU_BAR_ELLIPSIS_POSITION, menuBarEllipsisPosition);
   }
 
   protected class P_UIFacade implements IGroupBoxUIFacade {

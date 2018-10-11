@@ -213,6 +213,26 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   /**
+   * Configures if the button is stackable. A stackable button will be stacked in a dropdown menu if there is not enough
+   * space in the menubar.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(210)
+  protected boolean getConfiguredStackable() {
+    return true;
+  }
+
+  /**
+   * Configures if the button is shrinkable. A shrinkable button will be displayed without label but only with its
+   * configured icon if there is not enough space in the menubar.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(220)
+  protected boolean getConfiguredShrinkable() {
+    return false;
+  }
+
+  /**
    * Called whenever this button is clicked. This button is disabled and cannot be clicked again until this method
    * returns.
    * <p>
@@ -252,6 +272,8 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     setKeyStroke(getConfiguredKeyStroke());
     setKeyStrokeScopeClass(getConfiguredKeyStrokeScopeClass());
     setPreventDoubleClick(getConfiguredPreventDoubleClick());
+    setStackable(getConfiguredStackable());
+    setShrinkable(getConfiguredShrinkable());
 
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
@@ -426,6 +448,26 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   @Override
   public void setPreventDoubleClick(boolean preventDoubleClick) {
     propertySupport.setPropertyBool(PROP_PREVENT_DOUBLE_CLICK, preventDoubleClick);
+  }
+
+  @Override
+  public boolean isStackable() {
+    return propertySupport.getPropertyBool(PROP_STACKABLE);
+  }
+
+  @Override
+  public void setStackable(boolean stackable) {
+    propertySupport.setPropertyBool(PROP_STACKABLE, stackable);
+  }
+
+  @Override
+  public boolean isShrinkable() {
+    return propertySupport.getPropertyBool(PROP_SHRINKABLE);
+  }
+
+  @Override
+  public void setShrinkable(boolean shrinkable) {
+    propertySupport.setPropertyBool(PROP_SHRINKABLE, shrinkable);
   }
 
   @Override

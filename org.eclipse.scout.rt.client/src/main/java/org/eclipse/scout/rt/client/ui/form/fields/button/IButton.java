@@ -36,6 +36,8 @@ public interface IButton extends IFormField, IContextMenuOwner {
   String PROP_KEY_STROKE_SCOPE = "keyStrokeScope";
   String PROP_PREVENT_DOUBLE_CLICK = "preventDoubleClick";
   String PROP_DEFAULT_BUTTON = "defaultButton";
+  String PROP_STACKABLE = "stackable";
+  String PROP_SHRINKABLE = "shrinkable";
 
   /*
    * System Types
@@ -116,6 +118,21 @@ public interface IButton extends IFormField, IContextMenuOwner {
   boolean isPreventDoubleClick();
 
   void setPreventDoubleClick(boolean preventDoubleClick);
+
+  boolean isStackable();
+
+  /**
+   * A stackable button will be stacked in a dropdown menu if there is not enough space in the menubar.
+   */
+  void setStackable(boolean stackable);
+
+  boolean isShrinkable();
+
+  /**
+   * A shrinkable button will be displayed without label but only with its configured icon if there is not enough space
+   * in the menubar.
+   */
+  void setShrinkable(boolean shrinkable);
 
   /**
    * request showing the (dropdown) menu popup

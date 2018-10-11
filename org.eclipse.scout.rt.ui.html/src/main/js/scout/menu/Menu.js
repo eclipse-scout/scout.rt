@@ -30,8 +30,9 @@ scout.Menu = function() {
   this.preventDoubleClick = false;
   this.stackable = true;
   this.separator = false;
+  this.shrinkable = false;
 
-  this._addCloneProperties(['defaultMenu', 'menuTypes', 'overflow', 'stackable', 'separator']);
+  this._addCloneProperties(['defaultMenu', 'menuTypes', 'overflow', 'stackable', 'separator', 'shrinkable']);
   this._addWidgetProperties('childActions');
 };
 scout.inherits(scout.Menu, scout.Action);
@@ -346,6 +347,10 @@ scout.Menu.prototype._handleSelectedInEllipsis = function() {
 
 scout.Menu.prototype.setStackable = function(stackable) {
   this.setProperty('stackable', stackable);
+};
+
+scout.Menu.prototype.setShrinkable = function(shrinkable) {
+  this.setProperty('shrinkable', shrinkable);
 };
 
 /**

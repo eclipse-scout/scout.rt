@@ -21,10 +21,12 @@ scout.Button = function() {
   this.statusVisible = false;
   this.systemType = scout.Button.SystemType.NONE;
   this.preventDoubleClick = false;
+  this.stackable = true;
+  this.shrinkable = false;
 
   this.$buttonLabel = null;
   this.buttonKeyStroke = new scout.ButtonKeyStroke(this, null);
-  this._addCloneProperties(['defaultButton', 'displayStyle', 'iconId', 'keyStroke', 'processButton', 'selected', 'systemType', 'preventDoubleClick']);
+  this._addCloneProperties(['defaultButton', 'displayStyle', 'iconId', 'keyStroke', 'processButton', 'selected', 'systemType', 'preventDoubleClick', 'stackable', 'shrinkable']);
 };
 scout.inherits(scout.Button, scout.FormField);
 
@@ -394,6 +396,14 @@ scout.Button.prototype._onClick = function(event) {
   if (this.enabledComputed) {
     this.doAction();
   }
+};
+
+scout.Button.prototype.setStackable = function(stackable) {
+  this.setProperty('stackable', stackable);
+};
+
+scout.Button.prototype.setShrinkable = function(shrinkable) {
+  this.setProperty('shrinkable', shrinkable);
 };
 
 /**

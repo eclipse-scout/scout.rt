@@ -79,5 +79,11 @@ public class JsonMenu<MENU extends IMenu> extends JsonAction<MENU> {
         return getModel().isStackable();
       }
     });
+    putJsonProperty(new JsonProperty<MENU>(IMenu.PROP_SHRINKABLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isShrinkable();
+      }
+    });
   }
 }

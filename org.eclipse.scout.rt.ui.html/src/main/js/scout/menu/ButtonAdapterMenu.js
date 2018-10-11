@@ -119,7 +119,7 @@ scout.ButtonAdapterMenu.adaptButtonProperties = function(buttonProperties, menuP
   menuProperties = menuProperties || {};
 
   // Plain properties: simply copy, no translation required
-  ['visible', 'selected', 'tooltipText', 'keyStroke', 'keyStrokes', 'cssClass', 'modelClass', 'classId', 'iconId', 'preventDoubleClick', 'enabled', 'inheritAccessibility'].forEach(function(prop) {
+  ['visible', 'selected', 'tooltipText', 'keyStroke', 'keyStrokes', 'cssClass', 'modelClass', 'classId', 'iconId', 'preventDoubleClick', 'enabled', 'inheritAccessibility', 'stackable', 'shrinkable'].forEach(function(prop) {
     menuProperties[prop] = buttonProperties[prop];
   });
 

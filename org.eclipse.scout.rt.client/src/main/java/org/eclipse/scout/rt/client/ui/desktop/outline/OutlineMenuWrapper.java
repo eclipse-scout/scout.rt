@@ -531,6 +531,16 @@ public class OutlineMenuWrapper extends AbstractWidget implements IMenu, IReadOn
   }
 
   @Override
+  public boolean isShrinkable() {
+    return m_wrappedMenu.isShrinkable();
+  }
+
+  @Override
+  public void setShrinkable(boolean shrinkable) {
+    unsupported();
+  }
+
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(getClass().getSimpleName());
     sb.append("[wrappedMenu=").append(m_wrappedMenu.getClass().getSimpleName());

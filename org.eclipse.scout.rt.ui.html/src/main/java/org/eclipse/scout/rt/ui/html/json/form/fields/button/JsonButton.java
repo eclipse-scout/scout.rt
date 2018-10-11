@@ -99,6 +99,18 @@ public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> im
         return getModel().isPreventDoubleClick();
       }
     });
+    putJsonProperty(new JsonProperty<IButton>(IButton.PROP_STACKABLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isStackable();
+      }
+    });
+    putJsonProperty(new JsonProperty<IButton>(IButton.PROP_SHRINKABLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isShrinkable();
+      }
+    });
   }
 
   @Override
