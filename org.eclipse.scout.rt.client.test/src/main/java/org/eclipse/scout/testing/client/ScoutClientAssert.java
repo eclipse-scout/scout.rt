@@ -111,6 +111,9 @@ public final class ScoutClientAssert {
     if ((field.isVisible() != visible) || (field.isEnabled() != enabled) || (field.isMandatory() != mandatory)) {
       StringBuilder builder = new StringBuilder();
       builder.append(field.getFieldId());
+      builder.append(" (");
+      builder.append(formatFormFieldHierarchy(field));
+      builder.append(")");
       builder.append(" is expected ");
       builder.append(visible ? "visible" : "invisible");
       builder.append(", ");
@@ -265,6 +268,23 @@ public final class ScoutClientAssert {
       }
       Assert.fail(builder.toString());
     }
+  }
+
+  private static String formatFormFieldHierarchy(IFormField field) {
+    StringBuilder builder = new StringBuilder();
+    builder.append(field.getFieldId());
+    IFormField parent = field.getParentField();
+    while (parent != null) {
+      builder.insert(0, ".");
+      builder.insert(0, parent.getFieldId());
+      parent = parent.getParentField();
+    }
+    IForm form = field.getForm();
+    if (form != null) {
+      builder.insert(0, ".");
+      builder.insert(0, form.getFormId());
+    }
+    return builder.toString();
   }
 
   private static String formatFieldNames(Collection<IFormField> fields) {
