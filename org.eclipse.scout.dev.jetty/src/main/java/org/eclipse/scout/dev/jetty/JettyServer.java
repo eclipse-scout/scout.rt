@@ -93,10 +93,12 @@ public class JettyServer {
     Server server = new Server(port);
     server.setHandler(serverHandler);
     server.start();
-    startConsoleHandler(server);
+
+    startConsoleInputHandler(server);
+
     if (LOG.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder();
-      sb.append("Server ready. To run the application, open one of the following addresses in a web browser:\n");
+      sb.append("Server ready. The application is available on the following addresses:\n");
       sb.append("---------------------------------------------------------------------\n");
       sb.append("  http://localhost:").append(port).append(contextPath).append("\n");
       String hostname = InetAddress.getLocalHost().getHostName().toLowerCase();
@@ -111,8 +113,8 @@ public class JettyServer {
     }
   }
 
-  protected void startConsoleHandler(final Server server) {
-    Thread t = new Thread("Console input handler") {
+  protected void startConsoleInputHandler(final Server server) {
+    final Thread t = new Thread("Console input handler") {
       @Override
       public void run() {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -121,21 +123,22 @@ public class JettyServer {
             String command = StringUtility.trim(br.readLine());
             if ("shutdown".equalsIgnoreCase(command)) {
               try { // NOSONAR
-                LOG.warn("Shutting down...");
+                LOG.info("Shutting down application...");
                 server.stop();
+                LOG.info("Shutdown complete");
                 return;
               }
               catch (Exception e) {
-                LOG.error("Shutdown error.", e);
+                LOG.error("Shutdown error", e);
               }
             }
             else if (StringUtility.hasText(command)) {
-              LOG.warn("Unknown command entered on console: {}", command);
+              LOG.warn("Unknown command: {}", command);
             }
           }
         }
         catch (IOException e1) {
-          LOG.error("Unable to wait for console command.", e1);
+          LOG.error("Unexpected error while waiting for console command", e1);
         }
       }
     };
