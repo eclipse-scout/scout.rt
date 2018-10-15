@@ -68,47 +68,9 @@ scout.TagChooserPopup.prototype.setLookupResult = function(result) {
 
   this.table.deleteAllRows();
   lookupRows.forEach(function(lookupRow) {
-    tableRows.push(this._createTableRow(lookupRow, false));
+    tableRows.push(scout.lookupField.createTableRow(lookupRow));
   }, this);
   this.table.insertRows(tableRows);
-};
-
-scout.TagChooserPopup.prototype._createTableRow = function(lookupRow, multipleColumns) { // FIXME [awe] share code with TableProposalChooser.js
-  var
-    cell = scout.create('Cell', {
-      text: lookupRow.text
-    }),
-    cells = [cell],
-    row = {
-      cells: cells,
-      lookupRow: lookupRow
-    };
-
-  if (lookupRow.iconId) {
-    cell.iconId = lookupRow.iconId;
-  }
-  if (lookupRow.tooltipText) {
-    cell.tooltipText = lookupRow.tooltipText;
-  }
-  if (lookupRow.backgroundColor) {
-    cell.backgroundColor = lookupRow.backgroundColor;
-  }
-  if (lookupRow.foregroundColor) {
-    cell.foregroundColor = lookupRow.foregroundColor;
-  }
-  if (lookupRow.font) {
-    cell.font = lookupRow.font;
-  }
-  if (lookupRow.enabled === false) {
-    row.enabled = false;
-  }
-  if (lookupRow.active === false) {
-    row.active = false;
-  }
-  if (lookupRow.cssClass) {
-    row.cssClass = lookupRow.cssClass;
-  }
-  return row;
 };
 
 scout.TagChooserPopup.prototype._onRowClick = function(event) {

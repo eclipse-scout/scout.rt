@@ -417,6 +417,8 @@
   __include("scout/form/fields/listbox/ListBox.js");
   __include("scout/form/fields/listbox/ListBoxAdapter.js");
   __include("scout/form/fields/listbox/ListBoxLayout.js");
+  __include("scout/form/fields/lookupfield/lookupField.js");
+  __include("scout/form/fields/lookupfield/LookupFieldAdapter.js");
   __include("scout/form/fields/numberfield/NumberField.js");
   __include("scout/form/fields/numberfield/NumberFieldAdapter.js");
   __include("scout/form/fields/numberfield/Calculator.js");

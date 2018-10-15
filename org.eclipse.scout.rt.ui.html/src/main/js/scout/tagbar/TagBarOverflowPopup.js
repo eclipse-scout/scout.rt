@@ -32,7 +32,7 @@ scout.TagBarOverflowPopup.prototype._init = function(options) {
 scout.TagBarOverflowPopup.prototype._initKeyStrokeContext = function() {
   scout.TagBarOverflowPopup.parent.prototype._initKeyStrokeContext.call(this);
   this.keyStrokeContext.registerKeyStroke([
-    new scout.TagFieldNavigationKeyStroke(this), // FIXME [awe] check key strokes
+    new scout.TagFieldNavigationKeyStroke(this),
     new scout.TagFieldDeleteKeyStroke(this)
   ]);
 };
@@ -60,7 +60,6 @@ scout.TagBarOverflowPopup.prototype._renderTags = function() {
   var clickHandler = tagBar._onTagClick.bind(tagBar);
   var removeHandler = tagBar._onTagRemoveClick.bind(tagBar);
   scout.TagBar.renderTags(this.$body, overflowTags, tagBar.enabledComputed, clickHandler, removeHandler);
-  // FIXME [awe] flag machen, um die eigenschaften vom original zu übernehmen? popup schliessen nach klick
 
   if (!this.rendering) {
     this.revalidateLayout();

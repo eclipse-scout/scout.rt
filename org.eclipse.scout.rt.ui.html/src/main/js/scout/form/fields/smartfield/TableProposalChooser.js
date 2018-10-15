@@ -137,48 +137,14 @@ scout.TableProposalChooser.prototype.clearLookupRows = function() {
 
 /**
  * Creates a table-row for the given lookup-row.
+ *
  * @returns {object} table-row model
  */
 scout.TableProposalChooser.prototype._createTableRow = function(lookupRow, multipleColumns) {
-  var
-    cell = scout.create('Cell', {
-      text: lookupRow.text
-    }),
-    cells = [cell],
-    row = {
-      cells: cells,
-      lookupRow: lookupRow
-    };
-
-  if (lookupRow.iconId) {
-    cell.iconId = lookupRow.iconId;
-  }
-  if (lookupRow.tooltipText) {
-    cell.tooltipText = lookupRow.tooltipText;
-  }
-  if (lookupRow.backgroundColor) {
-    cell.backgroundColor = lookupRow.backgroundColor;
-  }
-  if (lookupRow.foregroundColor) {
-    cell.foregroundColor = lookupRow.foregroundColor;
-  }
-  if (lookupRow.font) {
-    cell.font = lookupRow.font;
-  }
-  if (lookupRow.enabled === false) {
-    row.enabled = false;
-  }
-  if (lookupRow.active === false) {
-    row.active = false;
-  }
-  if (lookupRow.cssClass) {
-    row.cssClass = lookupRow.cssClass;
-  }
-
+  var row = scout.lookupField.createTableRow(lookupRow);
   if (multipleColumns && lookupRow.additionalTableRowData) {
-    scout.arrays.pushAll(cells, this._transformTableRowData(lookupRow.additionalTableRowData));
+    scout.arrays.pushAll(row.cells, this._transformTableRowData(lookupRow.additionalTableRowData));
   }
-
   return row;
 };
 
