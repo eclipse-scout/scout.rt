@@ -13,7 +13,7 @@ scout.SmartFieldAdapter = function() {
 
   this._addRemoteProperties(['activeFilter']);
 };
-scout.inherits(scout.SmartFieldAdapter, scout.ValueFieldAdapter);
+scout.inherits(scout.SmartFieldAdapter, scout.LookupFieldAdapter);
 
 /**
  * Property lookup-row must be handled before value, since the smart-field has either a lookup-row
@@ -41,22 +41,6 @@ scout.SmartFieldAdapter.prototype._syncResult = function(result) {
 // When displayText comes from the server we must not call parseAndSetValue here.
 scout.SmartFieldAdapter.prototype._syncDisplayText = function(displayText) {
   this.widget.setDisplayText(displayText);
-};
-
-/**
- * @param {scout.QueryBy} queryBy
- * @param {object} [queryData] optional data (text, key, rec)
- */
-scout.SmartFieldAdapter.prototype.sendLookup = function(queryBy, queryData) {
-  var propertyName = queryBy.toLowerCase(),
-    requestType = 'lookupBy' + scout.strings.toUpperCaseFirstLetter(propertyName),
-    requestData = {
-      showBusyIndicator: false
-    };
-  if (!scout.objects.isNullOrUndefined(queryData)) {
-    requestData[propertyName] = queryData;
-  }
-  this._send(requestType, requestData);
 };
 
 scout.SmartFieldAdapter.prototype._orderPropertyNamesOnSync = function(newProperties) {
