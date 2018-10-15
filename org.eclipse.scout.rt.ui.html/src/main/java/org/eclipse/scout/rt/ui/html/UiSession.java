@@ -10,9 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html;
 
-import java.math.BigInteger;
 import java.security.AccessController;
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -53,7 +51,6 @@ import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.LazyValue;
@@ -67,6 +64,7 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResourceCache;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 import org.eclipse.scout.rt.shared.job.filter.event.SessionJobEventFilter;
+import org.eclipse.scout.rt.shared.session.Sessions;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UiSystem;
@@ -106,7 +104,6 @@ public class UiSession implements IUiSession {
   // the following beans must be set lazily. See the corresponding static getters.
   private static final LazyValue<HttpSessionHelper> HTTP_SESSION_HELPER = new LazyValue<>(HttpSessionHelper.class);
   private static final LazyValue<JsonRequestHelper> JSON_REQUEST_HELPER = new LazyValue<>(JsonRequestHelper.class);
-  private static final LazyValue<SecureRandom> SECURE_RANDOM = new LazyValue<>(SecurityUtility::createSecureRandom);
 
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
   private final JsonEventProcessor m_jsonEventProcessor;
@@ -209,8 +206,8 @@ public class UiSession implements IUiSession {
       m_currentJsonResponse = createJsonStartupResponse();
 
       // Assign uiSessionId (https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern)
-      m_uiSessionId = createUiSessionId(jsonStartupReq);
-      m_currentJsonResponse.getStartupData().put("uiSessionId", m_uiSessionId);
+      setUiSessionIdInternal(createUiSessionId(jsonStartupReq));
+      m_currentJsonResponse.getStartupData().put("uiSessionId", getUiSessionId());
 
       // Remember the store here, because getting it from an invalidated httpSession does not work (there might even be dead locks!)
       m_sessionStore = getHttpSessionHelper().getSessionStore(httpSession);
@@ -231,7 +228,7 @@ public class UiSession implements IUiSession {
       // When theme changes, stop initialization (UI session will not be used anyway) and instruct the client to reload the page
       if (reloadPage) {
         putReloadPageStartupData();
-        LOG.info("Requested page reload for new UiSession with ID {}", m_uiSessionId);
+        LOG.info("Requested page reload for new UiSession with ID {}", getUiSessionId());
         return;
       }
 
@@ -267,8 +264,7 @@ public class UiSession implements IUiSession {
   }
 
   protected String createUiSessionId(JsonStartupRequest jsonStartupReq) {
-    String id = new BigInteger(130, getSecureRandom()).toString(32); // http://stackoverflow.com/questions/29183818/why-use-tostring32-and-not-tostring36
-    return jsonStartupReq.getPartId() + ":" + id;
+    return jsonStartupReq.getPartId() + ':' + Sessions.randomSessionId();
   }
 
   protected IClientSession getOrCreateClientSession(HttpSession httpSession, HttpServletRequest req, JsonStartupRequest jsonStartupReq) {
@@ -554,9 +550,9 @@ public class UiSession implements IUiSession {
       return;
     }
 
-    LOG.info("Disposing UI session with ID {}...", m_uiSessionId);
+    LOG.info("Disposing UI session with ID {}...", getUiSessionId());
     if (m_disposed) {
-      LOG.trace("UI session with ID {} already disposed.", m_uiSessionId);
+      LOG.trace("UI session with ID {} already disposed.", getUiSessionId());
       return;
     }
     m_disposed = true;
@@ -857,7 +853,7 @@ public class UiSession implements IUiSession {
 
   @Override
   public void logout() {
-    LOG.info("Logging out from UI session with ID {} [clientSessionId={}, processingJsonRequest={}]", m_uiSessionId, getClientSessionId(), isProcessingJsonRequest());
+    LOG.info("Logging out from UI session with ID {} [clientSessionId={}, processingJsonRequest={}]", getUiSessionId(), getClientSessionId(), isProcessingJsonRequest());
 
     // Redirect client to "you are now logged out" screen
     if (isProcessingJsonRequest()) {
@@ -869,7 +865,7 @@ public class UiSession implements IUiSession {
 
     // Dispose UI session. This will also remove the client session from the session store.
     dispose();
-    LOG.info("Logged out successfully from UI session with ID {}", m_uiSessionId);
+    LOG.info("Logged out successfully from UI session with ID {}", getUiSessionId());
   }
 
   protected JSONObject createLogoutEventData() {
@@ -1175,10 +1171,6 @@ public class UiSession implements IUiSession {
 
   protected static JsonRequestHelper getJsonRequestHelper() {
     return JSON_REQUEST_HELPER.get();
-  }
-
-  protected static SecureRandom getSecureRandom() {
-    return SECURE_RANDOM.get();
   }
 
   /**

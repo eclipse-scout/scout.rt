@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.session;
 
-import java.util.UUID;
+import java.math.BigInteger;
 
+import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.shared.ISession;
 import org.slf4j.Logger;
@@ -52,6 +53,10 @@ public final class Sessions {
    * Returns a random session ID to be used when creating a session.
    */
   public static String randomSessionId() {
-    return UUID.randomUUID().toString();
+    // see https://www.owasp.org/index.php/Session_Management_Cheat_Sheet
+    BigInteger randomId = new BigInteger(SecurityUtility.createRandomBytes());
+
+    // use Base32 encoding because it is shorter than hex and does not include special characters and is case-insensitive (compared to Base64).
+    return randomId.toString(32);
   }
 }

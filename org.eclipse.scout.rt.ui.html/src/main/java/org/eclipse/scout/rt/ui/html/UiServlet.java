@@ -229,8 +229,7 @@ public class UiServlet extends AbstractHttpServlet {
    * @return <code>true</code> if request was handled, <code>false</code> otherwise.
    */
   protected boolean handleRequestInternal(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    String method = req.getMethod();
-    if ("GET".equals(method)) {
+    if ("GET".equals(req.getMethod())) {
       // To make relative URLs work, we need to make sure the request URL has a trailing '/'.
       // It is not possible to just check for an empty pathInfo because the container returns "/" even if the user has not entered a '/' at the end.
       String path = req.getServletContext().getContextPath() + req.getServletPath();
@@ -246,6 +245,7 @@ public class UiServlet extends AbstractHttpServlet {
         LOG.debug("Request started");
       }
       if (!PathValidator.isValid(req.getPathInfo())) {
+        LOG.info("Request with invalid path detected: '{}'. Parent paths are not allowed by default. To change this behavior replace {}.", req.getPathInfo(), PathValidator.class);
         resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
         return true;
       }
