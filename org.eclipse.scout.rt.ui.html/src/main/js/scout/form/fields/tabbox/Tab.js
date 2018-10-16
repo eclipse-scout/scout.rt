@@ -150,7 +150,7 @@ scout.Tab.prototype._updateStatus = function() {
 
 scout.Tab.prototype._computeVisible = function() {
   return this.visible && !this.tabOverflown && (this.errorStatus || scout.strings.hasText(this.tooltipText));
-}
+};
 
 scout.Tab.prototype.setTabbable = function(tabbable) {
   this.setProperty('tabbable', tabbable);
