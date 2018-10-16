@@ -61,7 +61,8 @@ scout.Device.Browser = {
 scout.Device.System = {
   UNKNOWN: 'Unknown',
   IOS: 'IOS',
-  ANDROID: 'ANDROID'
+  ANDROID: 'ANDROID',
+  WINDOWS: 'WINDOWS'
 };
 
 scout.Device.Type = {
@@ -143,7 +144,7 @@ scout.Device.prototype._installActiveHandler = function() {
 
 scout.Device.prototype.hasOnScreenKeyboard = function() {
   return this.supportsFeature('_onScreenKeyboard', function() {
-    return this.isIos() || this.isAndroid() || this.isWindowsTablet();
+    return this.isIos() || this.isAndroid() || this.isWindowsTabletMode();
   }.bind(this));
 };
 
@@ -199,8 +200,8 @@ scout.Device.prototype.isAndroid = function() {
  * The best way we have to detect a Microsoft Surface Tablet in table mode is to check if
  * the scrollbar width is 0 pixel. In desktop mode the scrollbar width is > 0 pixel.
  */
-scout.Device.prototype.isWindowsTablet = function() {
-  return scout.Device.Browser.EDGE === this.browser && this.scrollbarWidth === 0;
+scout.Device.prototype.isWindowsTabletMode = function() {
+  return scout.Device.System.WINDOWS === this.system && this.systemVersion >= 10 && this.scrollbarWidth === 0;
 };
 
 /**
@@ -244,7 +245,7 @@ scout.Device.prototype._detectType = function(userAgent) {
     } else {
       return scout.Device.Type.MOBILE;
     }
-  } else if (this.isWindowsTablet()) {
+  } else if (this.isWindowsTabletMode()) {
     return scout.Device.Type.TABLET;
   }
   return scout.Device.Type.DESKTOP;
@@ -256,6 +257,8 @@ scout.Device.prototype._parseSystem = function() {
     this.system = scout.Device.System.IOS;
   } else if (userAgent.indexOf('Android') > -1) {
     this.system = scout.Device.System.ANDROID;
+  } else if (userAgent.indexOf('Windows') > -1) {
+    this.system = scout.Device.System.WINDOWS;
   }
 };
 
@@ -271,7 +274,10 @@ scout.Device.prototype._parseSystemVersion = function() {
     versionRegex = / OS ([0-9]+\.?[0-9]*)/;
     // replace all _ with .
     userAgent = userAgent.replace(/_/g, '.');
+  } else if (this.system === System.WINDOWS) {
+    versionRegex = /Windows NT ([0-9]+\.?[0-9]*)/;
   }
+
   if (versionRegex) {
     this.systemVersion = this._parseVersion(userAgent, versionRegex);
   }
@@ -411,6 +417,13 @@ scout.Device.prototype.hasPrettyScrollbars = function() {
   }.bind(this));
 };
 
+scout.Device.prototype.canHideScrollbars = function() {
+  return this.supportsFeature('_canHideScrollbars', function check(property) {
+    // Check if scrollbar is vanished if class hybrid-scrollable is applied which hides the scrollbar, see also scrollbars.js and Scrollbar.less
+    return this._detectScrollbarWidth('hybrid-scrollable') === 0;
+  }.bind(this));
+};
+
 scout.Device.prototype.supportsCopyFromDisabledInputFields = function() {
   return scout.Device.Browser.FIREFOX !== this.browser;
 };
@@ -524,9 +537,9 @@ scout.Device.prototype.requiresIframeSecurityAttribute = function() {
   }.bind(this));
 };
 
-scout.Device.prototype._detectScrollbarWidth = function(userAgent) {
+scout.Device.prototype._detectScrollbarWidth = function(cssClass) {
   var $measure = $('body')
-    .appendDiv()
+    .appendDiv(cssClass)
     .attr('id', 'MeasureScrollbar')
     .css('width', 50)
     .css('height', 50)
