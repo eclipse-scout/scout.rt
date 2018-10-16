@@ -50,12 +50,13 @@ describe('Device', function() {
 
   });
 
-  describe('isWindowsTablet', function() {
+  describe('isWindowsTabletMode', function() {
 
-    it('returns true when browser is Edge and scrollbarWidth is 0', function() {
+    it('returns true if system is windows and scrollbarWidth is 0', function() {
       scout.device.scrollbarWidth = 0;
-      scout.device.browser = scout.Device.Browser.EDGE;
-      expect(scout.device.isWindowsTablet()).toBe(true);
+      scout.device.system = scout.Device.System.WINDOWS;
+      scout.device.systemVersion = 10.0;
+      expect(scout.device.isWindowsTabletMode()).toBe(true);
     });
 
   });
@@ -109,10 +110,17 @@ describe('Device', function() {
       });
     });
 
-    it('recognizes normal Windows PCs', function() {
+    it('recognizes Windows devices', function() {
       // Windows with Firefox browser
       test('Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36', {
-        system: scout.Device.System.UNKNOWN,
+        system: scout.Device.System.WINDOWS,
+        systemVersion: 6.1, // -> Windows 7
+        type: scout.Device.Type.DESKTOP
+      });
+
+      test('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393', {
+        system: scout.Device.System.WINDOWS,
+        systemVersion: 10.0,
         type: scout.Device.Type.DESKTOP
       });
     });

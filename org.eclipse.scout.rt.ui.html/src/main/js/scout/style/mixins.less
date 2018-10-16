@@ -452,4 +452,14 @@
       border-radius: @control-alternative-border-radius;
     }
   }
+
+  /*
+  * Hides the scrollbars but lets the user still scroll (e.g. using mousewheel or touch). Does not work for Firefox.
+  */
+  .hide-scrollbars {
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    -ms-overflow-style: none;
+  }
 }

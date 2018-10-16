@@ -64,88 +64,92 @@ scout.scrollbars = {
   },
 
   install: function($container, options) {
-    var scrollbars, scrollbar, nativeScrollbars,
-      htmlContainer = scout.HtmlComponent.optGet($container),
-      session = options.session || options.parent.session;
-
     options = options || {};
     options.axis = options.axis || 'both';
 
-    if (options.nativeScrollbars !== undefined) {
-      nativeScrollbars = options.nativeScrollbars;
+    var native = scout.nvl(options.nativeScrollbars, scout.device.hasPrettyScrollbars());
+    var hybrid = scout.nvl(options.hybrid, scout.device.canHideScrollbars());
+    if (native) {
+      this._installNative($container, options);
+    } else if (hybrid) {
+      $container.addClass('hybrid-scrollable');
+      this._installNative($container, options);
+      this._installJs($container, options);
     } else {
-      nativeScrollbars = scout.device.hasPrettyScrollbars();
+      $container.css('overflow', 'hidden');
+      this._installJs($container, options);
     }
-    if (nativeScrollbars) {
-      if (scout.device.isIos()) {
-        // On ios, container sometimes is not scrollable when installing too early
-        // Happens often with nested scrollable containers (e.g. scrollable table inside a form inside a scrollable tree data)
-        setTimeout(installNativeScrollbars);
-      } else {
-        installNativeScrollbars();
-      }
-    } else {
-      installJsScrollbars();
-    }
+    var htmlContainer = scout.HtmlComponent.optGet($container);
     if (htmlContainer) {
       htmlContainer.scrollable = true;
     }
     $container.data('scrollable', true);
+    var session = options.session || options.parent.session;
     this.pushScrollable(session, $container);
     return $container;
+  },
 
-    function installNativeScrollbars() {
-      $.log.isTraceEnabled() && $.log.trace('use native scrollbars for container ' + scout.graphics.debugOutput($container));
-      if (options.axis === 'x') {
-        $container
-          .css('overflow-x', 'auto')
-          .css('overflow-y', 'hidden');
-      } else if (options.axis === 'y') {
-        $container
-          .css('overflow-x', 'hidden')
-          .css('overflow-y', 'auto');
-      } else {
-        $container.css('overflow', 'auto');
-      }
-      $container.css('-webkit-overflow-scrolling', 'touch');
+  _installNative: function($container, options) {
+    if (scout.device.isIos()) {
+      // On ios, container sometimes is not scrollable when installing too early
+      // Happens often with nested scrollable containers (e.g. scrollable table inside a form inside a scrollable tree data)
+      setTimeout(this._installNativeInternal.bind(this, $container, options));
+    } else {
+      this._installNativeInternal($container, options);
+    }
+  },
+
+  _installNativeInternal: function($container, options) {
+    $.log.isTraceEnabled() && $.log.trace('use native scrollbars for container ' + scout.graphics.debugOutput($container));
+    if (options.axis === 'x') {
+      $container
+        .css('overflow-x', 'auto')
+        .css('overflow-y', 'hidden');
+    } else if (options.axis === 'y') {
+      $container
+        .css('overflow-x', 'hidden')
+        .css('overflow-y', 'auto');
+    } else {
+      $container.css('overflow', 'auto');
+    }
+    $container.css('-webkit-overflow-scrolling', 'touch');
+  },
+
+  _installJs: function($container, options) {
+    $.log.isTraceEnabled() && $.log.trace('installing JS-scrollbars for container ' + scout.graphics.debugOutput($container));
+    var scrollbars = scout.arrays.ensure($container.data('scrollbars'));
+    scrollbars.forEach(function(scrollbar) {
+      scrollbar.destroy();
+    });
+    scrollbars = [];
+    var scrollbar;
+    if (options.axis === 'both') {
+      var scrollOptions = $.extend({}, options);
+      scrollOptions.axis = 'y';
+      scrollbar = scout.create('Scrollbar', $.extend({}, scrollOptions));
+      scrollbars.push(scrollbar);
+
+      scrollOptions.axis = 'x';
+      scrollOptions.mouseWheelNeedsShift = true;
+      scrollbar = scout.create('Scrollbar', $.extend({}, scrollOptions));
+      scrollbars.push(scrollbar);
+    } else {
+      scrollbar = scout.create('Scrollbar', $.extend({}, options));
+      scrollbars.push(scrollbar);
+    }
+    $container.data('scrollbars', scrollbars);
+
+    // Container with JS scrollbars must have either relative or absolute position
+    // otherwise we cannot determine the correct dimension of the scrollbars
+    var cssPosition = $container.css('position');
+    if (!scout.isOneOf(cssPosition, 'relative', 'absolute')) {
+      $container.css('position', 'relative');
     }
 
-    function installJsScrollbars() {
-      $.log.isTraceEnabled() && $.log.trace('installing JS-scrollbars for container ' + scout.graphics.debugOutput($container));
-      scrollbars = scout.arrays.ensure($container.data('scrollbars'));
-      scrollbars.forEach(function(scrollbar) {
-        scrollbar.destroy();
-      });
-      scrollbars = [];
-      if (options.axis === 'both') {
-        var scrollOptions = $.extend({}, options);
-        scrollOptions.axis = 'y';
-        scrollbar = scout.create('Scrollbar', $.extend({}, scrollOptions));
-        scrollbars.push(scrollbar);
-
-        scrollOptions.axis = 'x';
-        scrollOptions.mouseWheelNeedsShift = true;
-        scrollbar = scout.create('Scrollbar', $.extend({}, scrollOptions));
-        scrollbars.push(scrollbar);
-      } else {
-        scrollbar = scout.create('Scrollbar', $.extend({}, options));
-        scrollbars.push(scrollbar);
-      }
-      $container.css('overflow', 'hidden');
-      $container.data('scrollbars', scrollbars);
-
-      // Container with JS scrollbars must have either relative or absolute position
-      // otherwise we cannot determine the correct dimension of the scrollbars
-      var cssPosition = $container.css('position');
-      if (!scout.isOneOf(cssPosition, 'relative', 'absolute')) {
-        $container.css('position', 'relative');
-      }
-
-      scrollbars.forEach(function(scrollbar) {
-        scrollbar.render($container);
-        scrollbar.update();
-      });
-    }
+    scrollbars.forEach(function(scrollbar) {
+      scrollbar.render($container);
+      scrollbar.update();
+    });
   },
 
   /**
