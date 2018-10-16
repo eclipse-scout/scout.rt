@@ -10,6 +10,9 @@ import java.util.Set;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
+import org.junit.runner.manipulation.Filter;
+import org.junit.runner.manipulation.Filterable;
+import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
@@ -92,6 +95,16 @@ public class InteractiveTestSuite extends Runner {
           return;
         }
         lastLine = line;
+        String testCaseFilter = null;
+        int hashIndex = line.indexOf("#");
+        if (hashIndex > -1 && line.length() > hashIndex) {
+          testCaseFilter = line.substring(hashIndex + 1);
+          line = line.substring(0, hashIndex);
+        }
+        else if (line.endsWith("()") && line.contains(".")) {
+          testCaseFilter = line.substring(line.lastIndexOf(".") + 1, line.length() - 2);
+          line = line.substring(0, line.lastIndexOf("."));
+        }
         Method runMethod;
         try { // NOSONAR
           runMethod = m_annotatedClass.getMethod("run", Runner.class, RunNotifier.class);
@@ -101,6 +114,9 @@ public class InteractiveTestSuite extends Runner {
         }
         Class<?> testClass = Class.forName(line, true, m_annotatedClass.getClassLoader());
         Runner runner = m_builder.safeRunnerForClass(testClass);
+        if (testCaseFilter != null && runner instanceof Filterable) {
+          applyMethodNameFilter(testCaseFilter, (Filterable) runner);
+        }
         if (Modifier.isStatic(runMethod.getModifiers())) {
           runMethod.invoke(null, runner, notifier);
         }
@@ -112,6 +128,28 @@ public class InteractiveTestSuite extends Runner {
         System.out.println("Cannot load test " + lastLine);
         ex.printStackTrace(System.out);
       }
+    }
+  }
+
+  @SuppressWarnings({"squid:S1166"})
+  protected void applyMethodNameFilter(final String filterMethodName, Filterable runner) {
+    try {
+      runner.filter(new Filter() {
+
+        @Override
+        public boolean shouldRun(Description description) {
+          return description.getMethodName().equals(filterMethodName);
+        }
+
+        @Override
+        public String describe() {
+          return "filter by method name " + filterMethodName;
+        }
+      });
+    }
+    catch (NoTestsRemainException ex) {
+      System.out.println("Cannot filter by test " + filterMethodName);
+      ex.printStackTrace(System.out);
     }
   }
 
