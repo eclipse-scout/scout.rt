@@ -459,6 +459,25 @@ scout.Device.prototype.supportsGeolocation = function() {
   return false;
 };
 
+scout.Device.prototype.supportsPassiveEventListener = function() {
+  return this.supportsFeature('_passiveEventListener', function check(property) {
+    // Code from MDN https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Safely_detecting_option_support
+    var passiveSupported = false;
+    try {
+      var options = Object.defineProperty({}, "passive", {
+        get: function() {
+          passiveSupported = true;
+        }
+      });
+      window.addEventListener("test", options, options);
+      window.removeEventListener("test", options, options);
+    } catch(err) {
+      passiveSupported = false;
+    }
+    return passiveSupported;
+  }.bind(this));
+};
+
 scout.Device.prototype.checkCssValue = function(property, value, checkFunc) {
   // Check if property is supported at all, otherwise div.style[property] would just add it and checkFunc would always return true
   if (document.body.style[property] === undefined) {

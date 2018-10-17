@@ -1806,6 +1806,18 @@ $.fn.onSingleOrDoubleClick = function(singleClickFunc, doubleClickFunc, timeout)
   });
 };
 
+$.fn.onPassive = function(eventType, handler) {
+  var options = scout.events.passiveOptions();
+  this[0].addEventListener(eventType, handler, options);
+  return this;
+};
+
+$.fn.offPassive = function(eventType, handler) {
+  var options = scout.events.passiveOptions();
+  this[0].removeEventListener(eventType, handler, options);
+  return this;
+};
+
 /**
  * jquery.binarytransport.js
  *
