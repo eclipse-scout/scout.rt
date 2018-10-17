@@ -64,5 +64,4 @@ public class DateProvider implements IDateProvider {
   public Calendar currentCalendar() {
     return Calendar.getInstance();
   }
-
 }
