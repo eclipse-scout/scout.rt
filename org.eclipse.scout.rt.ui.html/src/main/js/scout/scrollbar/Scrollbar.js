@@ -36,6 +36,7 @@ scout.Scrollbar = function() {
   this._onScrollHandler = this._onScroll.bind(this);
   this._onScrollWheelHandler = this._onScrollWheel.bind(this);
   this._onScrollbarMouseDownHandler = this._onScrollbarMouseDown.bind(this);
+  this._onTouchStartHandler = this._onTouchStart.bind(this);
   this._onThumbMouseDownHandler = this._onThumbMouseDown.bind(this);
   this._onDocumentMousemoveHandler = this._onDocumentMousemove.bind(this);
   this._onDocumentMouseUpHandler = this._onDocumentMouseUp.bind(this);
@@ -76,7 +77,8 @@ scout.Scrollbar.prototype._render = function() {
   }
   this.$parent
     .on('DOMMouseScroll mousewheel', this._onScrollWheelHandler)
-    .on('scroll', this._onScrollHandler);
+    .on('scroll', this._onScrollHandler)
+    .onPassive('touchstart', this._onTouchStartHandler);
   scrollbars.forEach(function(scrollbar) {
     scrollbar.on('scrollStart', this._fixScrollbarHandler);
     scrollbar.on('scrollEnd', this._unfixScrollbarHandler);
@@ -94,7 +96,8 @@ scout.Scrollbar.prototype._remove = function() {
   var scrollbars = this.$parent.data('scrollbars');
   this.$parent
     .off('DOMMouseScroll mousewheel', this._onScrollWheelHandler)
-    .off('scroll', this._onScrollHandler);
+    .off('scroll', this._onScrollHandler)
+    .offPassive('touchstart', this._onTouchStartHandler);
   scrollbars.forEach(function(scrollbar) {
     scrollbar.off('scrollStart', this._fixScrollbarHandler);
     scrollbar.off('scrollEnd', this._unfixScrollbarHandler);
@@ -298,6 +301,24 @@ scout.Scrollbar.prototype.reset = function() {
 
 scout.Scrollbar.prototype._onScroll = function(event) {
   this.update();
+};
+
+scout.Scrollbar.prototype._onTouchStart = function(event) {
+  // In hybrid mode scroll bar is moved by the scroll event.
+  // On a mobile device scroll events are fired delayed so the update will be delayed as well.
+  // This will lead to flickering and could be prevented by calling fixScrollbar. But unfortunately calling fix will stop the scroll pane from scrolling immediately, at least in Edge.
+  // In order to reduce the flickering the current approach is to hide the scrollbars while scrolling (only in this specific hybrid touch scrolling)
+  scout.events.onScrollStartEndDuringTouch(this.$parent, function() {
+    if (!this.rendered) {
+      return;
+    }
+    this.$container.css('opacity', 0);
+  }.bind(this), function() {
+    if (!this.rendered) {
+      return;
+    }
+    this.$container.css('opacity', '');
+  }.bind(this));
 };
 
 scout.Scrollbar.prototype._onScrollWheel = function(event) {

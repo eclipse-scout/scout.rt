@@ -493,7 +493,7 @@ scout.scrollbars = {
    * This is necessary to prevent flickering in IE.
    */
   fix: function($elem) {
-    if (!$elem.isVisible()) {
+    if (!$elem.isVisible() || $elem.css('position') === 'fixed') {
       return;
     }
 
