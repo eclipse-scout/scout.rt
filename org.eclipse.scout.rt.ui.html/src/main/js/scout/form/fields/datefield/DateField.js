@@ -438,6 +438,10 @@ scout.DateField.prototype._validateValue = function(value) {
   return value;
 };
 
+scout.DateField.prototype._valueEquals = function(valueA, valueB) {
+  return scout.dates.equals(valueA, valueB);
+};
+
 scout.DateField.prototype.setAutoDate = function(autoDate) {
   this.setProperty('autoDate', autoDate);
 };
