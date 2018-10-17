@@ -353,7 +353,7 @@ scout.ValueField.prototype._setValue = function(value) {
   }
 
   this._updateDisplayText();
-  if (scout.objects.equals(oldValue, this.value)) {
+  if (this._valueEquals(oldValue, this.value)) {
     return;
   }
 
@@ -361,6 +361,10 @@ scout.ValueField.prototype._setValue = function(value) {
   this._updateTouched();
   this._updateEmpty();
   this.triggerPropertyChange('value', oldValue, this.value);
+};
+
+scout.ValueField.prototype._valueEquals = function(valueA, valueB) {
+  return scout.objects.equals(valueA, valueB);
 };
 
 /**
@@ -536,7 +540,7 @@ scout.ValueField.prototype._formatValue = function(value) {
 };
 
 scout.ValueField.prototype._updateTouched = function() {
-  this.touched = !scout.objects.equals(this.value, this.initialValue);
+  this.touched = !this._valueEquals(this.value, this.initialValue);
 };
 
 scout.ValueField.prototype.addClearIcon = function($parent) {
