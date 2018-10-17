@@ -20,8 +20,15 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
  * A provider of the current date and time.
  * <p>
  * Consistently using a date provider enables to test code which uses the current system time in its operations. Use
- * Scout TestingUtility to mock this interface and provide a fixed date.
- * </p>
+ * Scout's <i>TestingUtility</i> to mock this interface and provide a fixed date.
+ * <p>
+ * <b>Usage:</b>
+ *
+ * <pre>
+ * Date now = BEANS.get(IDateProvider).currentMillis();
+ * data.setTitle("New entry @ " + DateUtility.formatDateTime(now));
+ * data.setCreateDate(now);
+ * </pre>
  *
  * @since 5.2
  */
@@ -30,58 +37,41 @@ public interface IDateProvider {
 
   /**
    * Provides the current date and time in the default locale, not truncated (as much precision as available).
-   *
-   * @return current date and time
    */
   Date currentMillis();
 
   /**
    * Provides the current date and time in the default locale, the time truncated to second precision.
-   *
-   * @return current date and time
    */
   Date currentSeconds();
 
   /**
    * Provides the current date and time in the default locale, the time truncated to midnight (00:00:00.000)
-   *
-   * @return current date
    */
   Date currentDay();
 
   /**
    * Provides the current date and time in the default locale, the time truncated to the current week
-   *
-   * @return current date
    */
   Date currentWeek();
 
   /**
    * Provides the current date and time in the default locale, the time truncated to the current month
-   *
-   * @return current date
    */
   Date currentMonth();
 
   /**
    * Provides the current date and time in the default locale, the time truncated to the current year
-   *
-   * @return current date
    */
   Date currentYear();
 
   /**
    * Provides the current time zone
-   *
-   * @return Current time zone
    */
   TimeZone currentTimeZone();
 
   /**
    * Provides the current calendar
-   *
-   * @return Current calendar
    */
   Calendar currentCalendar();
-
 }
