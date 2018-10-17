@@ -1412,6 +1412,21 @@ describe("Tree", function() {
         expect(node1.childNodes[1].$node[0]).toBe($nodes[2]);
         expect(node1.childNodes[2].$node[0]).toBe($nodes[3]);
       });
+
+      it("ensures top level nodes are rendered", function() {
+        tree.render(session.$entryPoint);
+
+        var node0 = tree.nodes[0];
+        var node1 = tree.nodes[1];
+        tree.selectNode(node1);
+        tree.deleteNodes([node1]);
+        tree.expandNode(node0);
+        tree.selectNode(node0);
+
+        expect(tree.visibleNodesMap[node0.id]).toBe(true);
+        expect(node0.rendered).toBe(true);
+        expect(node0.attached).toBe(true);
+      });
     });
   });
 

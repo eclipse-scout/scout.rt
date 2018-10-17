@@ -1393,6 +1393,12 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
       if (node.parentNode) {
         // ensure node is visible under the parent node if there is a parent.
         this._rebuildParent(node.parentNode, opts);
+      } else {
+        if (node.filterAccepted) {
+          this._addToVisibleFlatList(node, false);
+        } else {
+          this._removeFromFlatList(node, false);
+        }
       }
     } else if (renderExpansionOpts.expandLazyChanged) {
       node.childNodes.forEach(function(child) {
