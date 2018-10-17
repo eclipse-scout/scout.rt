@@ -89,7 +89,7 @@ public class InteractiveTestSuite extends Runner {
     while (true) {
       try {
         System.out.println("********");
-        System.out.println("[Enter fully qualified test class name, enter to repeat last test, '.' to exit]");
+        System.out.println("[Enter fully qualified test class or method name, enter to repeat last test, [0-9]+ to repeat last test multiple times, '.' to exit]");
         if (!checkIfHumanInterface()) {
           return;
         }
