@@ -185,6 +185,16 @@ scout.arrays = {
     return arr;
   },
 
+  /**
+   * @returns true if the given argument is an array and has a length > 0, false in any other case.
+   */
+  hasElements: function(arr) {
+    return !this.empty(arr);
+  },
+
+  /**
+   * @returns true if the given argument is not an array or the length of the array is 0, false in any other case.
+   */
   empty: function(arr) {
     if (Array.isArray(arr)) {
       return arr.length === 0;
