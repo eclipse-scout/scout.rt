@@ -34,7 +34,8 @@ import org.eclipse.scout.rt.platform.html.internal.HtmlTableRowBuilder;
 import org.eclipse.scout.rt.platform.html.internal.StyleElementBuilder;
 
 /**
- * Convenience for building a html document or parts of it with encoded binds. <br>
+ * Convenience for building a HTML document or parts of it with encoded text.
+ * <p>
  * Only the most common cases are supported, not intended to be complete.
  * <p>
  * Because {@link IHtmlContent} extends {@link Serializable}, all {@link CharSequence} provided as arguments must be
@@ -52,242 +53,180 @@ public final class HTML {
   }
 
   /**
-   * Create a html element with encoded text for &lt;head&gt;text&lt;/head&gt;.
+   * Create a <code>&lt;head&gt...&lt;/head&gt</code> element with encoded content.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.head("text").toHtml(); <br>
-   * </p>
-   *
-   * @param elements
-   *          text as bind
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.head("text").toHtml();</code>
    */
   public static IHtmlContent head(CharSequence... elements) {
     return new HtmlNodeBuilder("head", elements);
   }
 
   /**
-   * Create a html element with encoded text for &lt;body&gt;text&lt;/body&gt;.
+   * Create a <code>&lt;body&gt...&lt;/body&gt</code> element with encoded content.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.body("text").toHtml(); <br>
-   * </p>
-   *
-   * @param elements
-   *          text as bind
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.body("text").toHtml();</code>
    */
   public static IHtmlContent body(CharSequence... elements) {
     return new HtmlNodeBuilder("body", elements);
   }
 
   /**
-   * Create a html element with encoded text for &lt;b&gt;text&lt;/b&gt;.
+   * Create a <code>&lt;b&gt...&lt;/b&gt</code> element with encoded content.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.bold("text").toHtml(); <br>
-   * </p>
-   *
-   * @param text
-   *          text as bind
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.bold("text").toHtml();</code>
    */
   public static IHtmlElement bold(CharSequence... text) {
     return new HtmlNodeBuilder("b", text);
   }
 
   /**
-   * Create a html element with encoded text for &lt;i&gt;text&lt;/i&gt;.
+   * Create a <code>&lt;i&gt...&lt;/i&gt</code> element with encoded content.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.italic("text").toHtml(); <br>
-   * </p>
-   *
-   * @param text
-   *          text as bind
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.italic("text").toHtml();</code>
    */
   public static IHtmlElement italic(CharSequence... text) {
     return new HtmlNodeBuilder("i", text);
   }
 
   /**
-   * Create a html element with encoded text for &lt;p&gt;text&lt;/p&gt;.
+   * Create a <code>&lt;p&gt...&lt;/p&gt</code> element with encoded content.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.p("text").toHtml(); <br>
-   * </p>
-   *
-   * @param text
-   *          text as bind
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.p("text").toHtml();</code>
    */
   public static IHtmlElement p(CharSequence... text) {
     return new HtmlNodeBuilder("p", text);
   }
 
   /**
-   * Create a html element for &lt;br&gt;.
+   * Create a <code>&lt;br&gt</code> element without content.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.br().toHtml(); <br>
-   * </p>
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.br().toHtml();</code>
    */
   public static IHtmlElement br() {
     return new EmptyHtmlNodeBuilder("br");
   }
 
   /**
-   * Create a html element for &lt;hr&gt;.
+   * Create a <code>&lt;hr&gt</code> element without content.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.hr().toHtml(); <br>
-   * </p>
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.hr().toHtml();</code>
    */
   public static IHtmlElement hr() {
     return new EmptyHtmlNodeBuilder("hr");
   }
 
   /**
-   * Create a html element with encoded text for &lt;h1&gt;text&lt;/h1&gt;.
+   * Create a <code>&lt;h1&gt...&lt;/h1&gt</code> element with encoded content.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.h1("text").toHtml(); <br>
-   * </p>
-   *
-   * @param text
-   *          text as bind
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.h1("text").toHtml();</code>
    */
   public static IHtmlElement h1(CharSequence... text) {
     return new HtmlNodeBuilder("h1", text);
   }
 
   /**
-   * Create a html element with encoded text for &lt;h2&gt;text&lt;/h2&gt;.
+   * Create a <code>&lt;h2&gt...&lt;/h2&gt</code> element with encoded content.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.h2("text").toHtml(); <br>
-   * </p>
-   *
-   * @param text
-   *          text as bind
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.h2("text").toHtml();</code>
    */
   public static IHtmlElement h2(CharSequence... text) {
     return new HtmlNodeBuilder("h2", text);
   }
 
   /**
-   * Create a html element with encoded text for &lt;h3&gt;text&lt;/h3&gt;.
+   * Create a <code>&lt;h3&gt...&lt;/h3&gt</code> element with encoded content.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.h3("text").toHtml(); <br>
-   * </p>
-   *
-   * @param text
-   *          text as bind
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.h3("text").toHtml();</code>
    */
   public static IHtmlElement h3(CharSequence... text) {
     return new HtmlNodeBuilder("h3", text);
   }
 
   /**
-   * Create a html element with encoded text for &lt;h4&gt;text&lt;/h4&gt;.
+   * Create a <code>&lt;h4&gt...&lt;/h4&gt</code> element with encoded content.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.h4("text").toHtml(); <br>
-   * </p>
-   *
-   * @param text
-   *          text as bind
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.h4("text").toHtml();</code>
    */
   public static IHtmlElement h4(CharSequence... text) {
     return new HtmlNodeBuilder("h4", text);
   }
 
   /**
-   * Create a html element with encoded text for &lt;h5&gt;text&lt;/h5&gt;.
+   * Create a <code>&lt;h5&gt...&lt;/h5&gt</code> element with encoded content.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.h5("text").toHtml(); <br>
-   * </p>
-   *
-   * @param text
-   *          text as bind
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.h5("text").toHtml();</code>
    */
   public static IHtmlElement h5(CharSequence... text) {
     return new HtmlNodeBuilder("h5", text);
   }
 
   /**
-   * Create a html element with encoded text for &lt;h6&gt;text&lt;/h6&gt;.
+   * Create a <code>&lt;h6&gt...&lt;/h6&gt</code> element with encoded content.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.h6("text").toHtml(); <br>
-   * </p>
-   *
-   * @param text
-   *          text as bind
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.h6("text").toHtml();</code>
    */
   public static IHtmlElement h6(CharSequence... text) {
     return new HtmlNodeBuilder("h6", text);
   }
 
   /**
-   * Create a html element with encoded text for &lt;div&gt;content&lt;/div&gt;.
+   * Create a <code>&lt;div&gt...&lt;/div&gt</code> element with encoded content.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.div("text").toHtml(); <br>
-   * </p>
-   *
-   * @param content
-   *          content as bind
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.div("text").toHtml();</code>
    */
   public static IHtmlElement div(CharSequence... content) {
     return div(Arrays.asList(content));
   }
 
   /**
-   * Create a html element with encoded text for &lt;div&gt;content&lt;/div&gt;.
-   *
-   * @param contents
-   *          content as bind
+   * Create a <code>&lt;div&gt...&lt;/div&gt</code> element with encoded content.
    */
   public static IHtmlElement div(List<CharSequence> contents) {
     return new HtmlNodeBuilder("div", contents);
   }
 
   /**
-   * Create a html element with encoded text for &lt;span&gt;content&lt;/span&gt;.
+   * Create a <code>&lt;span&gt...&lt;/span&gt</code> element with encoded content.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.span("text").toHtml(); <br>
-   * </p>
-   *
-   * @param text
-   *          text as bind
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.span("text").toHtml();</code>
    */
   public static IHtmlElement span(CharSequence... text) {
     return new HtmlNodeBuilder("span", text);
   }
 
   /**
-   * Create a html element with encoded text for a link &lt;a href="url" rel="noreferrer noopener"&gt;text&lt;/a&gt;.
+   * Create a <code>&lt;a&gt...&lt;/a&gt</code> element with encoded text and attribute
+   * <code>rel="noreferrer noopener"</code>.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.link("http://xyz.com","text").toHtml(); <br>
-   * </p>
-   *
-   * @param text
-   *          text as bind
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.link("http://xyz.com","text").toHtml();</code>
    */
   public static IHtmlElement link(CharSequence url, CharSequence text) {
     return link(url, text, false);
   }
 
   /**
-   * Create a html element with encoded text for a link &lt;a href="url"&gt;text&lt;/a&gt;.
+   * Create a <code>&lt;a&gt...&lt;/a&gt</code> element with encoded text.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.link("http://xyz.com","text").toHtml(); <br>
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.link("http://xyz.com","text").toHtml();</code>
    * </p>
    *
-   * @param text
-   *          text as bind
    * @param preserveOpener
    *          Specifies if the opener and referrer should be available to the target browser window. Because of security
    *          reasons this should be disabled ({@code false}) in most cases. If disabled, the attribute
@@ -300,50 +239,47 @@ public final class HTML {
   }
 
   /**
-   * Create a html element for an image: &lt;img src="path"&gt;&lt;/img&gt;.
+   * Create a <code>&lt;img src="..."&gt</code> element.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.img("image.png").toHtml(); <br>
-   * </p>
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.img("image.png").toHtml();</code>
    *
    * @param src
-   *          image source path as bind
+   *          image source path
    */
   public static IHtmlElement img(CharSequence src) {
     return new HtmlImageBuilder(src);
   }
 
   /**
-   * Create a html element for an image: &lt;img src="binaryResource:resourceName"&gt;&lt;/img&gt;.
+   * Create a <code>&lt;img src="binaryResource:..."&gt</code> element.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.imgByBinaryResource("resourceName").toHtml(); <br>
-   * </p>
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.imgByBinaryResource("resourceName").toHtml();</code>
    *
    * @param binaryResource
-   *          image source path as bind
+   *          image source path
    */
   public static IHtmlElement imgByBinaryResource(CharSequence binaryResource) {
     return new HtmlImageBuilder("binaryResource:" + binaryResource);
   }
 
   /**
-   * Create a html element for an image: &lt;img src="iconid:icon_name"&gt;&lt;/img&gt;.
+   * Create a <code>&lt;img src="iconId:..."&gt</code> element.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.imgByIconId("icon_name").toHtml(); <br>
-   * </p>
-   *
-   * @param iconId
-   *          image source path as bind
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.imgByIconId("icon_name").toHtml();</code>
    */
   public static IHtmlElement imgByIconId(CharSequence iconId) {
     return new HtmlImageBuilder("iconId:" + iconId);
   }
 
   /**
-   * Creates a HTML representation for the given icon. For a font icon, a 'span' element is returned, or an 'img'
-   * element otherwise.
+   * Creates an appropriate element for the given icon:
+   * <ul>
+   * <li>For a font icon, a <code>span</code> element is returned.
+   * <li>For all other icons, an <code>img</code> element is returned.
+   * </ul>
    *
    * @param icon
    *          icon like {@link AbstractIcons#Info}
@@ -366,51 +302,48 @@ public final class HTML {
   }
 
   /**
-   * Create a html list element with encoded text: &lt;li&gt;text&lt;/li&gt;.
+   * Create a <code>&lt;li&gt...&lt;/li&gt</code> element with encoded content.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.li("text").toHtml(); <br>
-   * </p>
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.li("text").toHtml();</code>
    */
   public static IHtmlListElement li(CharSequence text) {
     return new HtmlListElement(text);
   }
 
   /**
-   * Create an unordered html list element with encoded text: &lt;ul&gt;...&lt;/ul&gt;.
+   * Create a <code>&lt;ul&gt...&lt;/ul&gt</code> element with the given list elements.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.ul(HTML.li("text"),...).toHtml(); <br>
-   * </p>
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.ul(HTML.li("text"),...).toHtml();</code>
    */
   public static IHtmlElement ul(IHtmlListElement... li) {
     return ul(Arrays.asList(li));
   }
 
   /**
-   * Create an unordered html list element with encoded text: &lt;ul&gt;...&lt;/ul&gt;.
+   * Create a <code>&lt;ul&gt...&lt;/ul&gt</code> element with the given list elements.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.ul(HTML.li("text"),...).toHtml(); <br>
-   * </p>
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.ul(HTML.li("text"),...).toHtml();</code>
    */
   public static IHtmlElement ul(List<IHtmlListElement> li) {
     return new HtmlNodeBuilder("ul", li);
   }
 
   /**
-   * Create an ordered html list element with encoded text: &lt;ul&gt;...&lt;/ul&gt;.
+   * Create a <code>&lt;ol&gt...&lt;/ol&gt</code> element with the given list elements.
    * <p>
-   * Example:<br>
-   * String encodedHtml = HTML.ol(HTML.li("text"),...).toHtml(); <br>
-   * </p>
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.ol(HTML.li("text"),...).toHtml();</code>
    */
   public static IHtmlContent ol(IHtmlListElement... li) {
     return new HtmlNodeBuilder("ol", li);
   }
 
   /**
-   * Creates a html element for a colgroup.<br>
+   * Create a <code>&lt;colgroup&gt...&lt;/colgroup&gt</code> element with the given <code>col</code> elements
+   * <p>
    * Example see {@link #table(IHtmlTableColgroup, List)}.
    */
   public static IHtmlTableColgroup colgroup(IHtmlTableColgroupCol... cols) {
@@ -418,7 +351,8 @@ public final class HTML {
   }
 
   /**
-   * Creates a html element for a colgroup.<br>
+   * Create a <code>&lt;colgroup&gt...&lt;/colgroup&gt</code> element with the given <code>col</code> elements
+   * <p>
    * Example see {@link #table(IHtmlTableColgroup, List)}.
    */
   public static IHtmlTableColgroup colgroup(List<IHtmlTableColgroupCol> cols) {
@@ -426,7 +360,8 @@ public final class HTML {
   }
 
   /**
-   * Creates a html element for a colgroup col.<br>
+   * Create a <code>&lt;col&gt</code> element.
+   * <p>
    * Example see {@link #table(IHtmlTableColgroup, List)}.
    */
   public static IHtmlTableColgroupCol col() {
@@ -434,181 +369,114 @@ public final class HTML {
   }
 
   /**
-   * Create a html element with encoded text for table data: &lt;th&gt;text&lt;/th&gt;.
+   * Create a <code>&lt;th&gt...&lt;/th&gt</code> element with encoded content.
    * <p>
-   * Example:<br>
-   * <code>
-   * HTML.table(<br>
-   *     &nbsp;HTML.tr(<br>
-   *     &nbsp;&nbsp;HTML.th("cell1"),<br>
-   *     &nbsp;&nbsp;HTML.th("cell2")<br>
-   *     &nbsp;),<br>
-   *     &nbsp;HTML.tr(<br>
-   *     &nbsp;&nbsp;HTML.td("cell3"),<br>
-   *     &nbsp;&nbsp;HTML.td("cell4")<br>
-   *     )<br>
-   *     ).cellspacing(1).cellpadding(2)<br>
-   * </code>
-   * </p>
-   *
-   * @param text
-   *          text with binds
+   * Example see {@link #table(IHtmlTableRow...)}.
    */
   public static IHtmlTableCell th(CharSequence... text) {
     return new HtmlTableHeadBuilder(Arrays.asList(text));
   }
 
   /**
-   * Create a html element with encoded text for table data: &lt;td&gt;text&lt;/td&gt;.
+   * Create a <code>&lt;td&gt...&lt;/td&gt</code> element with encoded content.
    * <p>
-   * Example:<br>
-   * <code>
-   * HTML.table(<br>
-   *     &nbsp;HTML.tr(<br>
-   *     &nbsp;&nbsp;HTML.td("cell1"),<br>
-   *     &nbsp;&nbsp;HTML.td("cell2")<br>
-   *     &nbsp;),<br>
-   *     &nbsp;HTML.tr(<br>
-   *     &nbsp;&nbsp;HTML.td("cell3"),<br>
-   *     &nbsp;&nbsp;HTML.td("cell4")<br>
-   *     )<br>
-   *     ).cellspacing(1).cellpadding(2)<br>
-   * </code>
-   * </p>
-   *
-   * @param text
-   *          text with binds
+   * Example see {@link #table(IHtmlTableRow...)}.
    */
   public static IHtmlTableCell td(CharSequence... text) {
     return new HtmlTableDataBuilder(Arrays.asList(text));
   }
 
   /**
-   * Create a html element with encoded text for a table row: &lt;tr&gt;...&lt;/tr&gt;. Example:<br>
-   * <code>
-   * HTML.table(<br>
-   *     &nbsp;HTML.tr(<br>
-   *     &nbsp;&nbsp;HTML.td("cell1"),<br>
-   *     &nbsp;&nbsp;HTML.td("cell2")<br>
-   *     &nbsp;),<br>
-   *     &nbsp;HTML.tr(<br>
-   *     &nbsp;&nbsp;HTML.td("cell3"),<br>
-   *     &nbsp;&nbsp;HTML.td("cell4")<br>
-   *     )<br>
-   *     ).cellspacing(1).cellpadding(2)<br>
-   * </code>
-   *
-   * @param td
-   *          table data within row
+   * Create a <code>&lt;tr&gt...&lt;/tr&gt</code> element with encoded content.
+   * <p>
+   * Example see {@link #table(IHtmlTableRow...)}.
    */
   public static IHtmlTableRow tr(IHtmlTableCell... td) {
     return tr(Arrays.asList(td));
   }
 
   /**
-   * Create a html element with encoded text for a table row: &lt;tr&gt;...&lt;/tr&gt;. Example:<br>
-   * <code>
-   * HTML.table(<br>
-   *     &nbsp;HTML.tr(<br>
-   *     &nbsp;&nbsp;HTML.td("cell1"),<br>
-   *     &nbsp;&nbsp;HTML.td("cell2")<br>
-   *     &nbsp;),<br>
-   *     &nbsp;HTML.tr(<br>
-   *     &nbsp;&nbsp;HTML.td("cell3"),<br>
-   *     &nbsp;&nbsp;HTML.td("cell4")<br>
-   *     )<br>
-   *     ).cellspacing(1).cellpadding(2)<br>
-   * </code>
-   *
-   * @param td
-   *          table data within row
+   * Create a <code>&lt;tr&gt...&lt;/tr&gt</code> element with encoded content.
+   * <p>
+   * Example see {@link #table(IHtmlTableRow...)}.
    */
   public static IHtmlTableRow tr(List<IHtmlTableCell> td) {
     return new HtmlTableRowBuilder(td);
   }
 
   /**
-   * Create a html element with encoded text for a table. Example:<br>
-   * <code>
-   * HTML.table(<br>
-   *     &nbsp;HTML.tr(<br>
-   *     &nbsp;&nbsp;HTML.td("cell1"),<br>
-   *     &nbsp;&nbsp;HTML.td("cell2")<br>
-   *     &nbsp;),<br>
-   *     &nbsp;HTML.tr(<br>
-   *     &nbsp;&nbsp;HTML.td("cell3"),<br>
-   *     &nbsp;&nbsp;HTML.td("cell4")<br>
-   *     )
-   * </code>
+   * Create a <code>&lt;table&gt...&lt;/table&gt</code> element with encoded content.
+   * <p>
+   * <i>Example:</i><br>
+   *
+   * <pre>
+   * HTML.table(
+   *   HTML.tr(
+   *     HTML.th("header1"),
+   *     HTML.th("header2")
+   *   ),
+   *   HTML.tr(
+   *     HTML.td("cell1"),
+   *     HTML.td("cell2")
+   *   ),
+   *   HTML.tr(
+   *     HTML.td("cell3"),
+   *     HTML.td("cell4")
+   * )
+   * </pre>
    */
   public static IHtmlTable table(IHtmlTableRow... rows) {
     return new HtmlTableBuilder(Arrays.asList(rows));
   }
 
   /**
-   * Create a html element with encoded text for a table. Example:<br>
-   * <code>
-   * HTML.table(<br>
-   *     &nbsp;HTML.tr(<br>
-   *     &nbsp;&nbsp;HTML.td("cell1"),<br>
-   *     &nbsp;&nbsp;HTML.td("cell2")<br>
-   *     &nbsp;),<br>
-   *     &nbsp;HTML.tr(<br>
-   *     &nbsp;&nbsp;HTML.td("cell3"),<br>
-   *     &nbsp;&nbsp;HTML.td("cell4")<br>
-   *     )
-   * </code>
+   * Create a <code>&lt;table&gt...&lt;/table&gt</code> element with encoded content.
+   * <p>
+   * Example see {@link #table(IHtmlTableRow...)}.
    */
   public static IHtmlTable table(List<IHtmlTableRow> rows) {
     return new HtmlTableBuilder(rows);
   }
 
   /**
-   * Create a html element with encoded text for a table. Example:<br>
-   * <code>
-   * HTML.table(<br>
-   *     &nbsp;HTML.colgroup(<br>
-   *     &nbsp;&nbsp;HTML.col(),<br>
-   *     &nbsp;&nbsp;HTML.col()<br>
-   *     &nbsp;),<br>
-   *     &nbsp;HTML.tr(<br>
-   *     &nbsp;&nbsp;HTML.td("cell1"),<br>
-   *     &nbsp;&nbsp;HTML.td("cell2")<br>
-   *     &nbsp;),<br>
-   *     &nbsp;HTML.tr(<br>
-   *     &nbsp;&nbsp;HTML.td("cell3"),<br>
-   *     &nbsp;&nbsp;HTML.td("cell4")<br>
-   *     )
-   * </code>
+   * Create a <code>&lt;table&gt...&lt;/table&gt</code> element with encoded content.
+   * <p>
+   * <i>Example:</i><br>
+   *
+   * <pre>
+   * HTML.table(
+   *   HTML.colgroup(
+   *     HTML.col(),
+   *     HTML.col()
+   *   ),
+   *   HTML.tr(
+   *     HTML.td("cell1"),
+   *     HTML.td("cell2")
+   *   ),
+   *   HTML.tr(
+   *     HTML.td("cell3"),
+   *     HTML.td("cell4")
+   * )
+   * </pre>
    */
   public static IHtmlTable table(IHtmlTableColgroup colgroup, IHtmlTableRow... rows) {
     return new HtmlTableBuilder(colgroup, Arrays.asList(rows));
   }
 
   /**
-   * Create a html element with encoded text for a table. Example:<br>
-   * <code>
-   * HTML.table(<br>
-   *     &nbsp;HTML.colgroup(<br>
-   *     &nbsp;&nbsp;HTML.col(),<br>
-   *     &nbsp;&nbsp;HTML.col()<br>
-   *     &nbsp;),<br>
-   *     &nbsp;HTML.tr(<br>
-   *     &nbsp;&nbsp;HTML.td("cell1"),<br>
-   *     &nbsp;&nbsp;HTML.td("cell2")<br>
-   *     &nbsp;),<br>
-   *     &nbsp;HTML.tr(<br>
-   *     &nbsp;&nbsp;HTML.td("cell3"),<br>
-   *     &nbsp;&nbsp;HTML.td("cell4")<br>
-   *     )
-   * </code>
+   * Create a <code>&lt;table&gt...&lt;/table&gt</code> element with encoded content.
+   * <p>
+   * Example see {@link #table(IHtmlTableColgroup, IHtmlTableRow...)}.
    */
   public static IHtmlTable table(IHtmlTableColgroup colgroup, List<IHtmlTableRow> rows) {
     return new HtmlTableBuilder(colgroup, rows);
   }
 
   /**
-   * Creates an application local link String encodedHtml = HTML.appLink("path","text").toHtml(); <br>
+   * Creates an application local link with encoded text.
+   * <p>
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.appLink("path","text").toHtml();</code>
    *
    * @param ref
    *          what the link is referring to
@@ -620,36 +488,61 @@ public final class HTML {
   }
 
   /**
-   * Creates HTML content from multiple elements. e.g. <b>Bold Text</b> Text <b> More bold text </b>
+   * Creates HTML content from multiple elements (concatenation). The fragment element itself has no representation in
+   * the resulting HTML document.
+   * <p>
+   * <i>Example:</i><br>
+   *
+   * <pre>
+   * String encodedHtml = HTML.fragment(
+   *     HTML.bold("Attention: "),
+   *     "This message is ",
+   *     HTML.italic("not important.")).toHtml();
+   *
+   * // Result:
+   * // &lt;b&gt;Attention: &lt;/b&gt; This message is &lt;i&gt;not important.&lt;i&gt;</code>
+   * </pre>
    */
   public static IHtmlContent fragment(CharSequence... elements) {
     return new HtmlContentBuilder(elements);
   }
 
   /**
-   * Creates HTML content from multiple elements. e.g. <b>Bold Text</b> Text <b> More bold text </b>
+   * Creates HTML content from multiple elements (concatenation). The fragment element itself has no representation in
+   * the resulting HTML document.
+   * <p>
+   * <i>Example:</i><br>
+   *
+   * <pre>
+   * String encodedHtml = HTML.fragment(
+   *     HTML.bold("Attention: "),
+   *     "This message is ",
+   *     HTML.italic("not important.")).toHtml();
+   *
+   * // Result:
+   * // &lt;b&gt;Attention: &lt;/b&gt; This message is &lt;i&gt;not important.&lt;i&gt;</code>
+   * </pre>
    */
   public static IHtmlContent fragment(List<? extends CharSequence> elements) {
     return new HtmlContentBuilder(elements);
   }
 
   /**
-   * Creates HTML content with &lt;style type="text/css"&gt; cssStype &lt;style&gt;
+   * Create a <code>&lt;style type="text/css"&gt...&lt;/style&gt</code> element with encoded content.
    */
   public static IHtmlElement cssStyle(CharSequence... cssContent) {
     return new StyleElementBuilder(cssContent).type("text/css");
   }
 
   /**
-   * Creates HTML content with HTML 5 doctype: &lt;!DOCTYPE
-   * html&gt;&lt;html&gt;&lt;head&gt;...&lt;/head&gt;body&gt;...&lt;/body&gt;&lt;html&gt;.
+   * Create a <code>&lt;html&gt...&lt;/html&gt</code> with HTML5 doctype.
    */
   public static IHtmlDocument html5(CharSequence head, CharSequence body) {
     return new HtmlDocumentBuilder(head(head), body(body)).doctype();
   }
 
   /**
-   * Creates HTML content with binds: &lt;html&gt;&lt;head&gt;...&lt;/head&gt;body&gt;...&lt;/body&gt;&lt;/html&gt;.
+   * Create a <code>&lt;html&gt...&lt;/html&gt</code> without doctype.
    */
   public static IHtmlDocument html(CharSequence head, CharSequence body) {
     return new HtmlDocumentBuilder(head(head), body(body));
@@ -663,9 +556,21 @@ public final class HTML {
   }
 
   /**
-   * Creates a html input field.
+   * Create a <code>&lt;input&gt</code> element without content.
    */
   public static IHtmlInput input() {
     return new HtmlInputBuilder();
+  }
+
+  /**
+   * Creates a HTML element for the given tag name with encoded content.
+   * <p>
+   * Use this method, if no specific method is available.
+   * <p>
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.tag("my-special-tag").toHtml();</code>
+   */
+  public static IHtmlElement tag(String tag, CharSequence... text) {
+    return new HtmlNodeBuilder(tag, text);
   }
 }
