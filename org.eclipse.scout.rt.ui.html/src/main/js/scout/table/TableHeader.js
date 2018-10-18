@@ -130,14 +130,7 @@ scout.TableHeader.prototype._renderColumn = function(column, index) {
 
   column.$header = $header;
 
-  scout.tooltips.install($header, {
-    parent: this,
-    text: this._headerItemTooltipText.bind(this),
-    arrowPosition: 50,
-    arrowPositionUnit: '%',
-    nativeTooltip: !scout.device.isCustomEllipsisTooltipPossible()
-  });
-
+  this._installHeaderItemTooltip(column);
   this._decorateHeader(column);
   $header.addClass('halign-' + scout.Table.parseHorizontalAlignment(column.horizontalAlignment));
 
@@ -261,6 +254,28 @@ scout.TableHeader.prototype._arrangeHeaderItems = function($headers) {
         }
       });
   });
+};
+
+scout.TableHeader.prototype._installHeaderItemTooltip = function(column) {
+  scout.tooltips.install(column.$header, {
+    parent: this,
+    text: this._headerItemTooltipText.bind(this),
+    arrowPosition: 50,
+    arrowPositionUnit: '%',
+    nativeTooltip: !scout.device.isCustomEllipsisTooltipPossible()
+  });
+};
+
+scout.TableHeader.prototype._installHeaderItemTooltips = function() {
+  this._visibleColumns().forEach(this._installHeaderItemTooltip, this);
+};
+
+scout.TableHeader.prototype._uninstallHeaderItemTooltip = function(column) {
+  scout.tooltips.uninstall(column.$header);
+};
+
+scout.TableHeader.prototype._uninstallHeaderItemTooltips = function() {
+  this._visibleColumns().forEach(this._uninstallHeaderItemTooltip, this);
 };
 
 scout.TableHeader.prototype._headerItemTooltipText = function($col) {
@@ -632,6 +647,9 @@ scout.TableHeader.prototype._onHeaderItemMouseDown = function(event) {
       that._tableHeaderMenu.destroy();
       that._tableHeaderMenu = null;
     }
+
+    // Don't show tooltips while dragging
+    that._uninstallHeaderItemTooltips();
   }
 
   function realWidth($div) {
@@ -685,6 +703,9 @@ scout.TableHeader.prototype._onHeaderItemMouseDown = function(event) {
 
     $header.removeClass('moving');
     that.$container.removeClass('moving');
+
+    // Reinstall tooltips
+    that._installHeaderItemTooltips();
   }
 };
 
