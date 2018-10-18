@@ -29,14 +29,15 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Tests for {@link HtmlBinds}
+ * Tests for {@link HTML}
  */
 public class HTMLTest {
+
   private static final String HTML_TEXT = "Test Last Name&";
   private static final String ESCAPED_HTML_TEXT = "Test Last Name&amp;";
   private static final String TEST_URL = "http://SCOUTBLABLA.com\"";
 
-  private static final String sampleCSS = "p {"
+  private static final String SAMPLE_CSS = "p {"
       + "    text-align: center;"
       + "    color: red;"
       + "}";
@@ -240,21 +241,21 @@ public class HTMLTest {
 
   @Test
   public void testHtmlCssStyle() {
-    IHtmlContent head = HTML.head(HTML.cssStyle(sampleCSS));
-    assertEquals("<head><style type=\"text/css\">" + sampleCSS + "</style></head>", head.toHtml());
+    IHtmlContent head = HTML.head(HTML.cssStyle(SAMPLE_CSS));
+    assertEquals("<head><style type=\"text/css\">" + SAMPLE_CSS + "</style></head>", head.toHtml());
   }
 
   @Test
   public void testFullHtml() {
-    IHtmlDocument html = HTML.html(HTML.cssStyle(sampleCSS), HTML_TEXT);
-    String expected = "<html><head><style type=\"text/css\">" + sampleCSS + "</style>" + "</head><body>" + ESCAPED_HTML_TEXT + "</body></html>";
+    IHtmlDocument html = HTML.html(HTML.cssStyle(SAMPLE_CSS), HTML_TEXT);
+    String expected = "<html><head><style type=\"text/css\">" + SAMPLE_CSS + "</style>" + "</head><body>" + ESCAPED_HTML_TEXT + "</body></html>";
     assertEquals(expected, html.toHtml());
   }
 
   @Test
   public void testFullHtmlDocType() {
-    IHtmlDocument html = HTML.html5(HTML.cssStyle(sampleCSS), HTML_TEXT);
-    String expected = "<!DOCTYPE html><html><head><style type=\"text/css\">" + sampleCSS + "</style>" + "</head><body>" + ESCAPED_HTML_TEXT + "</body></html>";
+    IHtmlDocument html = HTML.html5(HTML.cssStyle(SAMPLE_CSS), HTML_TEXT);
+    String expected = "<!DOCTYPE html><html><head><style type=\"text/css\">" + SAMPLE_CSS + "</style>" + "</head><body>" + ESCAPED_HTML_TEXT + "</body></html>";
     assertEquals(expected, html.toHtml());
   }
 
@@ -314,6 +315,14 @@ public class HTMLTest {
   @Test
   public void testIconFromImage() {
     assertEquals("<img src=\"iconId:logo\">", HTML.icon("logo").toHtml());
+  }
+
+  @Test
+  public void testTag() {
+    assertEquals("<asdf></asdf>", HTML.tag("asdf").toHtml());
+    assertEquals("<asdf>&lt;&#47;asdf&gt;</asdf>", HTML.tag("asdf", "</asdf>").toHtml());
+    assertEquals("<asdf><p>test</p><b>important</b></asdf>", HTML.tag("asdf", HTML.p("test"), HTML.bold("important")).toHtml());
+    assertEquals("<head><title lang=\"de\">xyz äöü </title></head>", HTML.head(HTML.tag("title", "xyz äöü ").addAttribute("lang", "de")).toHtml());
   }
 
   private String createTableString(String prefix) {
