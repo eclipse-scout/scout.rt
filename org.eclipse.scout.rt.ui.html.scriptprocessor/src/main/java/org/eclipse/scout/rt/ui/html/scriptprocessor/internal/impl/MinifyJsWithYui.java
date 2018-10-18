@@ -35,18 +35,18 @@ public class MinifyJsWithYui {
 
         @Override
         public void warning(String message, String sourceName, int line, String lineSource, int lineOffset) {
-          System.out.println(MinifyJsWithYui.class.getSimpleName() + " warning: " + message);
+          System.out.println(MinifyJsWithYui.class.getSimpleName() + " [warning] " + message + " sourceName:" + sourceName + " line:" + line + "|" + lineOffset);
         }
 
         @Override
         public EvaluatorException runtimeError(String message, String sourceName, int line, String lineSource, int lineOffset) {
-          System.out.println(MinifyJsWithYui.class.getSimpleName() + " error: " + message);
+          System.out.println(MinifyJsWithYui.class.getSimpleName() + " [runtime-error] " + message + " sourceName:" + sourceName + " line:" + line + "|" + lineOffset);
           throw new EvaluatorException(message, sourceName, line, lineSource, lineOffset);
         }
 
         @Override
         public void error(String message, String sourceName, int line, String lineSource, int lineOffset) {
-          System.out.println(MinifyJsWithYui.class.getSimpleName() + " error: " + message);
+          System.out.println(MinifyJsWithYui.class.getSimpleName() + " [error] " + message + " sourceName:" + sourceName + " line:" + line + "|" + lineOffset);
         }
       };
       JavaScriptCompressor compressor = new JavaScriptCompressor(reader, errorReporter);
