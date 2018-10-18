@@ -1161,7 +1161,8 @@ scout.FormField.prototype._createCopyContextMenu = function(event) {
   var field = this;
   var menu = scout.create('Menu', {
     parent: this,
-    text: this.session.text('ui.Copy')
+    text: this.session.text('ui.Copy'),
+    inheritAccessibility: false
   });
   menu.on('action', function(event) {
     if (field instanceof scout.ValueField) {
