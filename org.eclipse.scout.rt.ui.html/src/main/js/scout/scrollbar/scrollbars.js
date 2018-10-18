@@ -67,11 +67,12 @@ scout.scrollbars = {
     options = options || {};
     options.axis = options.axis || 'both';
 
-    var native = scout.nvl(options.nativeScrollbars, scout.device.hasPrettyScrollbars());
-    var hybrid = scout.nvl(options.hybrid, scout.device.canHideScrollbars());
-    if (native) {
+    // Don't use native as variable name because it will break minifying (reserved keyword)
+    var nativeScrollbars = scout.nvl(options.nativeScrollbars, scout.device.hasPrettyScrollbars());
+    var hybridScrollbars = scout.nvl(options.hybridScrollbars, scout.device.canHideScrollbars());
+    if (nativeScrollbars) {
       this._installNative($container, options);
-    } else if (hybrid) {
+    } else if (hybridScrollbars) {
       $container.addClass('hybrid-scrollable');
       this._installNative($container, options);
       this._installJs($container, options);
