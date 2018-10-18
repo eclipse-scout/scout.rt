@@ -17,8 +17,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeFieldGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Grid (model) layout of radio button group only visible process-buttons are used. This class distributes all buttons
@@ -27,8 +25,6 @@ import org.slf4j.LoggerFactory;
  * field.
  */
 public class RadioButtonGroupGrid implements ICompositeFieldGrid<ICompositeField> {
-
-  private static final Logger LOG = LoggerFactory.getLogger(RadioButtonGroupGrid.class);
 
   private ICompositeField m_group = null;
   private IFormField[] m_fields;
@@ -61,12 +57,7 @@ public class RadioButtonGroupGrid implements ICompositeFieldGrid<ICompositeField
    */
   protected void applyGridData() {
     GridData parentData = m_group.getGridData();
-    if (parentData.h <= 0) {
-      LOG.error("{} has gridData.h={}; expected value>0", m_group.getClass().getName(), parentData.h);
-      m_gridRows = 1;
-    }
-    else if (m_fields.length <= 0) {
-      LOG.error("{} has fieldCount={}; expected value>0", m_group.getClass().getName(), m_fields.length);
+    if (parentData.h <= 0 || m_fields.length <= 0) {
       m_gridRows = 1;
     }
     else {
