@@ -1407,51 +1407,120 @@ scout.Table.prototype.moveRowToBottom = function(row) {
  * Moves the row one up, disregarding filtered rows.
  */
 scout.Table.prototype.moveRowUp = function(row) {
-  var rowIndex = this.rows.indexOf(row);
-  this.moveRow(rowIndex, rowIndex - 1);
+  var rowIndex = this.rows.indexOf(row),
+    targetIndex = rowIndex - 1;
+  if (this.hierarchical) {
+    // find index with same parent
+    var siblings = this.rows.filter(function(candidate) {
+        return row.parentRow === candidate.parentRow;
+      }, this),
+      rowIndexSiblings = siblings.indexOf(row),
+      sibling = siblings[rowIndexSiblings - 1];
+    if (sibling) {
+      targetIndex = this.rows.indexOf(sibling);
+    } else {
+      targetIndex = 0;
+    }
+  }
+
+  this.moveRow(rowIndex, targetIndex);
 };
 
 /**
  * Moves the row one down, disregarding filtered rows.
  */
 scout.Table.prototype.moveRowDown = function(row) {
-  var rowIndex = this.rows.indexOf(row);
-  this.moveRow(rowIndex, rowIndex + 1);
+  var rowIndex = this.rows.indexOf(row),
+    targetIndex = rowIndex + 1;
+  if (this.hierarchical) {
+    // find index with same parent
+    var siblings = this.rows.filter(function(candidate) {
+        return row.parentRow === candidate.parentRow;
+      }, this),
+      rowIndexSiblings = siblings.indexOf(row),
+      sibling = siblings[rowIndexSiblings + 1];
+    if (sibling) {
+      targetIndex = this.rows.indexOf(sibling);
+    } else {
+      targetIndex = this.rows.length;
+    }
+  }
+  this.moveRow(rowIndex, targetIndex);
 };
 
 /**
  * Moves the row one up with respected to filtered rows. Row must be one of the filtered rows.
+ * @deprecated use moveVisibleRowUp instead
  */
 scout.Table.prototype.moveFilteredRowUp = function(row) {
-  var filteredRowIndex = this._filteredRows.indexOf(row);
-  this.moveFilteredRow(filteredRowIndex, filteredRowIndex - 1);
+  this.moveVisibleRowUp(row);
+};
+
+scout.Table.prototype.moveVisibleRowUp = function(row) {
+  var rowIndex = this.rows.indexOf(row),
+    visibleIndex = this.visibleRows.indexOf(row),
+    sibling,
+    targetIndex;
+
+  if (this.hierarchical) {
+    var siblings = this.visibleRows.filter(function(candidate) {
+        return row.parentRow === candidate.parentRow;
+      }, this);
+      sibling = siblings[siblings.indexOf(row) - 1];
+    if (sibling) {
+      targetIndex = this.rows.indexOf(sibling);
+    } else {
+      // no previous sibling
+      return;
+    }
+
+  } else {
+    sibling = this.visibleRows[visibleIndex - 1];
+    if(!sibling){
+      // no previous sibling
+      return;
+    }
+    targetIndex = this.rows.indexOf(sibling);
+  }
+  this.moveRow(rowIndex, targetIndex);
 };
 
 /**
  * Moves the row one down with respected to filtered rows. Row must be one of the filtered rows.
+ * @deprecated use moveVisibleRowDown instead
  */
 scout.Table.prototype.moveFilteredRowDown = function(row) {
-  var filteredRowIndex = this._filteredRows.indexOf(row);
-  this.moveFilteredRow(filteredRowIndex, filteredRowIndex + 1);
+  this.moveVisibleRowDown(row);
 };
 
-scout.Table.prototype.moveFilteredRow = function(filteredSourceIndex, filteredTargetIndex) {
-  var rowCount = this._filteredRows.length;
-  filteredSourceIndex = Math.max(filteredSourceIndex, 0);
-  filteredSourceIndex = Math.min(filteredSourceIndex, rowCount - 1);
-  filteredTargetIndex = Math.max(filteredTargetIndex, 0);
-  filteredTargetIndex = Math.min(filteredTargetIndex, rowCount - 1);
 
-  if (filteredSourceIndex === filteredTargetIndex) {
-    return;
+scout.Table.prototype.moveVisibleRowDown = function(row) {
+  var rowIndex = this.rows.indexOf(row),
+    visibleIndex = this.visibleRows.indexOf(row),
+    sibling,
+    targetIndex;
+
+  if (this.hierarchical) {
+    var siblings = this.visibleRows.filter(function(candidate) {
+        return row.parentRow === candidate.parentRow;
+      }, this);
+      sibling = siblings[siblings.indexOf(row) + 1];
+    if (sibling) {
+      targetIndex = this.rows.indexOf(sibling);
+    } else {
+      // no following sibling
+      return;
+    }
+
+  } else {
+    sibling = this.visibleRows[visibleIndex + 1];
+    if(!sibling){
+      // no following sibling
+      return;
+    }
+    targetIndex = this.rows.indexOf(sibling);
   }
-
-  var sourceRow = this._filteredRows[filteredSourceIndex];
-  var targetRow = this._filteredRows[filteredTargetIndex];
-  var sourceIndex = this.rows.indexOf(sourceRow);
-  var targetIndex = this.rows.indexOf(targetRow);
-
-  this.moveRow(sourceIndex, targetIndex);
+  this.moveRow(rowIndex, targetIndex);
 };
 
 scout.Table.prototype.moveRow = function(sourceIndex, targetIndex) {
