@@ -741,4 +741,141 @@ describe("HierarchicalTableSpec", function() {
 
   });
 
+  describe("move", function() {
+    var table, rowIds, rows;
+    /**
+     * initial table
+     * -------------
+     * 0
+     * 1
+     * |-- 2
+     * |-- 3
+     * 4
+     * 5
+     **/
+    beforeEach(function() {
+      rowIds = [0, 1, 2, 3, 4, 5];
+      rows = rowIds.map(function(id) {
+        var rowData = helper.createModelRow(id, ['row' + id]);
+        rowData.expanded = true;
+        return rowData;
+      });
+      var model = helper.createModel(helper.createModelColumns(1), rows);
+      table = helper.createTable(model),
+        rows = table.rows;
+      // create hierarchie
+
+      rows[2].parentRow = rows[1].id;
+      rows[3].parentRow = rows[1].id;
+      table.updateRows(rows);
+      table.render();
+    });
+
+    it("row down and expect to be moved after the next sibling on the same level.", function() {
+      expectRowIds(table.rows, [0, 1, 2, 3, 4, 5]);
+      table.moveRowDown(rows[0]);
+      expectRowIds(table.rows, [1, 2, 3, 0, 4, 5]);
+    });
+
+    it("row up and expect to be moved before the next sibling on the same level.", function() {
+      expectRowIds(table.rows, [0, 1, 2, 3, 4, 5]);
+      table.moveRowUp(rows[4]);
+      expectRowIds(table.rows, [0, 4, 1, 2, 3, 5]);
+    });
+
+    it("child row down and expect it will not be moved away of its siblings.", function() {
+      expectRowIds(table.rows, [0, 1, 2, 3, 4, 5]);
+      table.moveRowDown(rows[2]);
+      expectRowIds(table.rows, [0, 1, 3, 2, 4, 5]);
+      // expect to not move away of its parent
+      table.moveRowDown(rows[2]);
+      expectRowIds(table.rows, [0, 1, 3, 2, 4, 5]);
+    });
+
+    it("child row up and expect it will not be moved away of its siblings.", function() {
+      expectRowIds(table.rows, [0, 1, 2, 3, 4, 5]);
+      table.moveRowUp(rows[3]);
+      expectRowIds(table.rows, [0, 1, 3, 2, 4, 5]);
+      // expect to not move away of its parent
+      table.moveRowUp(rows[3]);
+      expectRowIds(table.rows, [0, 1, 3, 2, 4, 5]);
+    });
+
+  });
+
+  describe("move visible row", function() {
+    var table, rowIds, rows;
+    /**
+     * initial table
+     * -------------
+     * 0 (b)
+     * 1 (a)
+     * 2 (b)
+     * |-- 3 (a)
+     * |-- 4 (b)
+     * 5 (b)
+     * 6 (a)
+     * 7 (b)
+     **/
+    beforeEach(function() {
+      rowIds = [0, 1, 2, 3, 4, 5, 6, 7];
+      var rowTexts = ['b', 'a', 'b', 'a', 'b', 'b', 'a', 'b'];
+      rows = rowIds.map(function(id) {
+        var rowData = helper.createModelRow(id, [rowTexts[id]]);
+        rowData.expanded = true;
+        return rowData;
+      }, this);
+      var model = helper.createModel(helper.createModelColumns(1), rows);
+      table = helper.createTable(model),
+        rows = table.rows;
+      // create hierarchie
+
+      rows[3].parentRow = rows[2].id;
+      rows[4].parentRow = rows[2].id;
+      table.updateRows(rows);
+      table.render();
+    });
+
+    it("up - expect the row gets moved above the previous visible row", function() {
+      createAndRegisterColumnFilter(table, table.columns[0], ['a']);
+      table.filter();
+      expectRowIds(table.visibleRows, [1, 2, 3, 6]);
+      table.moveVisibleRowUp(rows[6]);
+      expectRowIds(table.rows, [0, 1, 6, 2, 3, 4, 5, 7]);
+      expectRowIds(table.visibleRows, [1, 6, 2, 3]);
+
+      // once again expect to be moved before 1
+      table.moveVisibleRowUp(rows[6]);
+      expectRowIds(table.rows, [0, 6, 1, 2, 3, 4, 5, 7]);
+      expectRowIds(table.visibleRows, [6, 1, 2, 3]);
+
+      // once again expect to move nothing since node 0 is invisible
+      table.moveVisibleRowUp(rows[6]);
+      expectRowIds(table.rows, [0, 6, 1, 2, 3, 4, 5, 7]);
+      expectRowIds(table.visibleRows, [6, 1, 2, 3]);
+
+    });
+
+    it("down - expect the row gets moved below the next visible row", function() {
+      createAndRegisterColumnFilter(table, table.columns[0], ['a']);
+      table.filter();
+      expectRowIds(table.visibleRows, [1, 2, 3, 6]);
+
+      table.moveVisibleRowDown(rows[1]);
+      expectRowIds(table.rows, [0, 2, 3, 4, 1, 5, 6, 7]);
+      expectRowIds(table.visibleRows, [2, 3, 1, 6]);
+
+      // once again expect to be moved after 6
+      table.moveVisibleRowDown(rows[1]);
+      expectRowIds(table.rows, [0, 2, 3, 4, 5, 6, 1, 7]);
+      expectRowIds(table.visibleRows, [2, 3, 6, 1]);
+
+      // once again expect to move nothing since node 7 is invisible
+      table.moveVisibleRowDown(rows[1]);
+      expectRowIds(table.rows, [0, 2, 3, 4, 5, 6, 1, 7]);
+      expectRowIds(table.visibleRows, [2, 3, 6, 1]);
+    });
+
+  });
+
 });

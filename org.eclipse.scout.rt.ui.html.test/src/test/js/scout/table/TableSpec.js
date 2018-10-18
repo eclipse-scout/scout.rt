@@ -2656,7 +2656,7 @@ describe("Table", function() {
     });
   });
 
-  describe("moveFilteredRowUp", function() {
+  describe("moveVisibleRowUp", function() {
 
     it("moves row one up regarding filtered rows", function() {
       var model = helper.createModelFixture(1, 0);
@@ -2683,7 +2683,7 @@ describe("Table", function() {
 
       // Move row D one up
       var rowD = table.rows[3];
-      table.moveFilteredRowUp(rowD);
+      table.moveVisibleRowUp(rowD);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('D-filtered');
       expect(table.rows[2].cells[0].text).toBe('B-filtered');
@@ -2693,7 +2693,7 @@ describe("Table", function() {
       expect(table.rows[6].cells[0].text).toBe('G');
 
       // Move row D one up again (no effect)
-      table.moveFilteredRowUp(rowD);
+      table.moveVisibleRowUp(rowD);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('D-filtered');
       expect(table.rows[2].cells[0].text).toBe('B-filtered');
@@ -2704,7 +2704,7 @@ describe("Table", function() {
 
       // Move row F one up
       var rowF = table.rows[5];
-      table.moveFilteredRowUp(rowF);
+      table.moveVisibleRowUp(rowF);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('D-filtered');
       expect(table.rows[2].cells[0].text).toBe('F-filtered');
@@ -2714,7 +2714,7 @@ describe("Table", function() {
       expect(table.rows[6].cells[0].text).toBe('G');
 
       // Move row F one up again
-      table.moveFilteredRowUp(rowF);
+      table.moveVisibleRowUp(rowF);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('F-filtered');
       expect(table.rows[2].cells[0].text).toBe('D-filtered');
@@ -2725,7 +2725,7 @@ describe("Table", function() {
     });
   });
 
-  describe("moveFilteredRowDown", function() {
+  describe("moveVisibleRowDown", function() {
 
     it("moves row one up regarding filtered rows", function() {
       var model = helper.createModelFixture(1, 0);
@@ -2752,7 +2752,7 @@ describe("Table", function() {
 
       // Move row D one down
       var rowD = table.rows[3];
-      table.moveFilteredRowDown(rowD);
+      table.moveVisibleRowDown(rowD);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('B-filtered');
       expect(table.rows[2].cells[0].text).toBe('C');
@@ -2762,7 +2762,7 @@ describe("Table", function() {
       expect(table.rows[6].cells[0].text).toBe('G');
 
       // Move row D one down again (no effect)
-      table.moveFilteredRowDown(rowD);
+      table.moveVisibleRowDown(rowD);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('B-filtered');
       expect(table.rows[2].cells[0].text).toBe('C');
@@ -2773,7 +2773,7 @@ describe("Table", function() {
 
       // Move row B one down
       var rowB = table.rows[1];
-      table.moveFilteredRowDown(rowB);
+      table.moveVisibleRowDown(rowB);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('C');
       expect(table.rows[2].cells[0].text).toBe('E');
@@ -2783,7 +2783,7 @@ describe("Table", function() {
       expect(table.rows[6].cells[0].text).toBe('G');
 
       // Move row B one down again
-      table.moveFilteredRowDown(rowB);
+      table.moveVisibleRowDown(rowB);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('C');
       expect(table.rows[2].cells[0].text).toBe('E');
