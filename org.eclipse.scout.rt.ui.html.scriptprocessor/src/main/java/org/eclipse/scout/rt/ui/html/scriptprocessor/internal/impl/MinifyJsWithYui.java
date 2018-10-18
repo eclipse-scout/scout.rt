@@ -41,7 +41,7 @@ public class MinifyJsWithYui {
         @Override
         public EvaluatorException runtimeError(String message, String sourceName, int line, String lineSource, int lineOffset) {
           System.out.println(MinifyJsWithYui.class.getSimpleName() + " error: " + message);
-          return null;
+          throw new EvaluatorException(message, sourceName, line, lineSource, lineOffset);
         }
 
         @Override
