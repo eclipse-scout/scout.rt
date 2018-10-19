@@ -942,13 +942,13 @@ scout.Widget.prototype._prepareWidgetProperty = function(propertyName, widgets) 
     scout.arrays.removeAll(oldWidgets, widgets);
   }
 
-  // Destroy old child widget(s)
   if (!this._isPreserveOnPropertyChangeProperty(propertyName)) {
+    // Destroy old child widget(s)
     this._destroyChildren(oldWidgets);
-  }
 
-  // Link to new parent
-  this.link(widgets);
+    // Link to new parent
+    this.link(widgets);    
+  }
 
   return widgets;
 };
