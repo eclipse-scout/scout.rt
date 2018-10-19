@@ -11,6 +11,7 @@
 scout.Form = function() {
   scout.Form.parent.call(this);
   this._addWidgetProperties(['rootGroupBox', 'views', 'dialogs', 'initialFocus', 'messageBoxes', 'fileChoosers']);
+  this._addPreserveOnPropertyChangeProperties(['initialFocus']);
 
   this.askIfNeedSave = true;
   this.data = {};

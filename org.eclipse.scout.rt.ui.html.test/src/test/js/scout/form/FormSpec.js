@@ -325,4 +325,34 @@ describe('Form', function() {
     });
   });
 
+  describe('initialFocus', function() {
+    it('references the widget which should gain focus after the form is displayed', function() {
+      var form = scout.create('Form', {
+        parent: session.desktop,
+        initialFocus: 'tabItem1',
+        rootGroupBox: {
+          objectType: 'GroupBox',
+          fields: [{
+            objectType: 'TabBox',
+            id: 'tabBox',
+            tabItems: [{
+              objectType: 'TabItem',
+              id: 'tabItem1'
+            }, {
+              objectType: 'TabItem',
+              id: 'tabItem2'
+            }]
+          }]
+        }
+      });
+      form.render();
+      form.validateLayoutTree();
+      expect(form.widget('tabItem1').isFocused());
+
+      // InitialFocus property must not modify parent of tab items
+      expect(form.widget('tabItem1').parent).toBe(form.widget('tabBox'));
+      expect(form.widget('tabItem2').parent).toBe(form.widget('tabBox'));
+    });
+  });
+
 });
