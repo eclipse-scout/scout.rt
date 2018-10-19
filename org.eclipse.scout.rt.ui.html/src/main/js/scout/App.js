@@ -265,6 +265,7 @@ scout.App.prototype._ajaxDefaults = function() {
  */
 scout.App.prototype._beforeAjaxCall = function(request) {
   request.setRequestHeader('X-Scout-Correlation-Id', scout.numbers.correlationId());
+  request.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // explicitly add here because jQuery only adds it automatically if it is no crossDomain request
 };
 
 scout.App.prototype._loadSessions = function(options) {
