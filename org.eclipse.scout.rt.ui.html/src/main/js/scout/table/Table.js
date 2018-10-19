@@ -692,7 +692,7 @@ scout.Table.prototype._cellTooltipText = function($cell) {
   if (tooltipText) {
     return tooltipText;
   } else if (this._isTruncatedCellTooltipEnabled(column) && $cell.isContentTruncated()) {
-    return $cell.text();
+    return scout.strings.plainText($cell.html());
   }
 };
 
