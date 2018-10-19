@@ -53,7 +53,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;head&gt...&lt;/head&gt</code> element with encoded content.
+   * Creates a <code>&lt;head&gt...&lt;/head&gt</code> element with encoded content.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.head("text").toHtml();</code>
@@ -63,7 +63,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;body&gt...&lt;/body&gt</code> element with encoded content.
+   * Creates a <code>&lt;body&gt...&lt;/body&gt</code> element with encoded content.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.body("text").toHtml();</code>
@@ -73,7 +73,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;b&gt...&lt;/b&gt</code> element with encoded content.
+   * Creates a <code>&lt;b&gt...&lt;/b&gt</code> element with encoded content.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.bold("text").toHtml();</code>
@@ -83,7 +83,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;i&gt...&lt;/i&gt</code> element with encoded content.
+   * Creates a <code>&lt;i&gt...&lt;/i&gt</code> element with encoded content.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.italic("text").toHtml();</code>
@@ -93,7 +93,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;p&gt...&lt;/p&gt</code> element with encoded content.
+   * Creates a <code>&lt;p&gt...&lt;/p&gt</code> element with encoded content.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.p("text").toHtml();</code>
@@ -103,7 +103,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;br&gt</code> element without content.
+   * Creates a <code>&lt;br&gt</code> element without content.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.br().toHtml();</code>
@@ -113,7 +113,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;hr&gt</code> element without content.
+   * Creates a <code>&lt;hr&gt</code> element without content.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.hr().toHtml();</code>
@@ -123,7 +123,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;h1&gt...&lt;/h1&gt</code> element with encoded content.
+   * Creates a <code>&lt;h1&gt...&lt;/h1&gt</code> element with encoded content.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.h1("text").toHtml();</code>
@@ -133,7 +133,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;h2&gt...&lt;/h2&gt</code> element with encoded content.
+   * Creates a <code>&lt;h2&gt...&lt;/h2&gt</code> element with encoded content.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.h2("text").toHtml();</code>
@@ -143,7 +143,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;h3&gt...&lt;/h3&gt</code> element with encoded content.
+   * Creates a <code>&lt;h3&gt...&lt;/h3&gt</code> element with encoded content.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.h3("text").toHtml();</code>
@@ -153,7 +153,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;h4&gt...&lt;/h4&gt</code> element with encoded content.
+   * Creates a <code>&lt;h4&gt...&lt;/h4&gt</code> element with encoded content.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.h4("text").toHtml();</code>
@@ -163,7 +163,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;h5&gt...&lt;/h5&gt</code> element with encoded content.
+   * Creates a <code>&lt;h5&gt...&lt;/h5&gt</code> element with encoded content.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.h5("text").toHtml();</code>
@@ -173,7 +173,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;h6&gt...&lt;/h6&gt</code> element with encoded content.
+   * Creates a <code>&lt;h6&gt...&lt;/h6&gt</code> element with encoded content.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.h6("text").toHtml();</code>
@@ -183,7 +183,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;div&gt...&lt;/div&gt</code> element with encoded content.
+   * Creates a <code>&lt;div&gt...&lt;/div&gt</code> element with encoded content.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.div("text").toHtml();</code>
@@ -193,14 +193,14 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;div&gt...&lt;/div&gt</code> element with encoded content.
+   * Creates a <code>&lt;div&gt...&lt;/div&gt</code> element with encoded content.
    */
   public static IHtmlElement div(List<CharSequence> contents) {
     return new HtmlNodeBuilder("div", contents);
   }
 
   /**
-   * Create a <code>&lt;span&gt...&lt;/span&gt</code> element with encoded content.
+   * Creates a <code>&lt;span&gt...&lt;/span&gt</code> element with encoded content.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.span("text").toHtml();</code>
@@ -210,7 +210,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;a&gt...&lt;/a&gt</code> element with encoded text and attribute
+   * Creates a <code>&lt;a&gt...&lt;/a&gt</code> element with encoded text and attribute
    * <code>rel="noreferrer noopener"</code>.
    * <p>
    * <i>Example:</i><br>
@@ -221,7 +221,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;a&gt...&lt;/a&gt</code> element with encoded text.
+   * Creates a <code>&lt;a&gt...&lt;/a&gt</code> element with encoded text.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.link("http://xyz.com","text").toHtml();</code>
@@ -239,7 +239,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;img src="..."&gt</code> element.
+   * Creates a <code>&lt;img src="..."&gt</code> element.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.img("image.png").toHtml();</code>
@@ -252,7 +252,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;img src="binaryResource:..."&gt</code> element.
+   * Creates a <code>&lt;img src="binaryResource:..."&gt</code> element.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.imgByBinaryResource("resourceName").toHtml();</code>
@@ -265,7 +265,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;img src="iconId:..."&gt</code> element.
+   * Creates a <code>&lt;img src="iconId:..."&gt</code> element.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.imgByIconId("icon_name").toHtml();</code>
@@ -302,7 +302,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;li&gt...&lt;/li&gt</code> element with encoded content.
+   * Creates a <code>&lt;li&gt...&lt;/li&gt</code> element with encoded content.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.li("text").toHtml();</code>
@@ -312,7 +312,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;ul&gt...&lt;/ul&gt</code> element with the given list elements.
+   * Creates a <code>&lt;ul&gt...&lt;/ul&gt</code> element with the given list elements.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.ul(HTML.li("text"),...).toHtml();</code>
@@ -322,7 +322,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;ul&gt...&lt;/ul&gt</code> element with the given list elements.
+   * Creates a <code>&lt;ul&gt...&lt;/ul&gt</code> element with the given list elements.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.ul(HTML.li("text"),...).toHtml();</code>
@@ -332,7 +332,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;ol&gt...&lt;/ol&gt</code> element with the given list elements.
+   * Creates a <code>&lt;ol&gt...&lt;/ol&gt</code> element with the given list elements.
    * <p>
    * <i>Example:</i><br>
    * <code>String encodedHtml = HTML.ol(HTML.li("text"),...).toHtml();</code>
@@ -342,7 +342,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;colgroup&gt...&lt;/colgroup&gt</code> element with the given <code>col</code> elements
+   * Creates a <code>&lt;colgroup&gt...&lt;/colgroup&gt</code> element with the given <code>col</code> elements
    * <p>
    * Example see {@link #table(IHtmlTableColgroup, List)}.
    */
@@ -351,7 +351,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;colgroup&gt...&lt;/colgroup&gt</code> element with the given <code>col</code> elements
+   * Creates a <code>&lt;colgroup&gt...&lt;/colgroup&gt</code> element with the given <code>col</code> elements
    * <p>
    * Example see {@link #table(IHtmlTableColgroup, List)}.
    */
@@ -360,7 +360,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;col&gt</code> element.
+   * Creates a <code>&lt;col&gt</code> element.
    * <p>
    * Example see {@link #table(IHtmlTableColgroup, List)}.
    */
@@ -369,7 +369,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;th&gt...&lt;/th&gt</code> element with encoded content.
+   * Creates a <code>&lt;th&gt...&lt;/th&gt</code> element with encoded content.
    * <p>
    * Example see {@link #table(IHtmlTableRow...)}.
    */
@@ -378,7 +378,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;td&gt...&lt;/td&gt</code> element with encoded content.
+   * Creates a <code>&lt;td&gt...&lt;/td&gt</code> element with encoded content.
    * <p>
    * Example see {@link #table(IHtmlTableRow...)}.
    */
@@ -387,7 +387,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;tr&gt...&lt;/tr&gt</code> element with encoded content.
+   * Creates a <code>&lt;tr&gt...&lt;/tr&gt</code> element with encoded content.
    * <p>
    * Example see {@link #table(IHtmlTableRow...)}.
    */
@@ -396,7 +396,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;tr&gt...&lt;/tr&gt</code> element with encoded content.
+   * Creates a <code>&lt;tr&gt...&lt;/tr&gt</code> element with encoded content.
    * <p>
    * Example see {@link #table(IHtmlTableRow...)}.
    */
@@ -405,7 +405,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;table&gt...&lt;/table&gt</code> element with encoded content.
+   * Creates a <code>&lt;table&gt...&lt;/table&gt</code> element with encoded content.
    * <p>
    * <i>Example:</i><br>
    *
@@ -430,7 +430,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;table&gt...&lt;/table&gt</code> element with encoded content.
+   * Creates a <code>&lt;table&gt...&lt;/table&gt</code> element with encoded content.
    * <p>
    * Example see {@link #table(IHtmlTableRow...)}.
    */
@@ -439,7 +439,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;table&gt...&lt;/table&gt</code> element with encoded content.
+   * Creates a <code>&lt;table&gt...&lt;/table&gt</code> element with encoded content.
    * <p>
    * <i>Example:</i><br>
    *
@@ -464,7 +464,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;table&gt...&lt;/table&gt</code> element with encoded content.
+   * Creates a <code>&lt;table&gt...&lt;/table&gt</code> element with encoded content.
    * <p>
    * Example see {@link #table(IHtmlTableColgroup, IHtmlTableRow...)}.
    */
@@ -528,21 +528,21 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;style type="text/css"&gt...&lt;/style&gt</code> element with encoded content.
+   * Creates a <code>&lt;style type="text/css"&gt...&lt;/style&gt</code> element with encoded content.
    */
   public static IHtmlElement cssStyle(CharSequence... cssContent) {
     return new StyleElementBuilder(cssContent).type("text/css");
   }
 
   /**
-   * Create a <code>&lt;html&gt...&lt;/html&gt</code> with HTML5 doctype.
+   * Creates a <code>&lt;html&gt...&lt;/html&gt</code> with HTML5 doctype.
    */
   public static IHtmlDocument html5(CharSequence head, CharSequence body) {
     return new HtmlDocumentBuilder(head(head), body(body)).doctype();
   }
 
   /**
-   * Create a <code>&lt;html&gt...&lt;/html&gt</code> without doctype.
+   * Creates a <code>&lt;html&gt...&lt;/html&gt</code> without doctype.
    */
   public static IHtmlDocument html(CharSequence head, CharSequence body) {
     return new HtmlDocumentBuilder(head(head), body(body));
@@ -556,7 +556,7 @@ public final class HTML {
   }
 
   /**
-   * Create a <code>&lt;input&gt</code> element without content.
+   * Creates a <code>&lt;input&gt</code> element without content.
    */
   public static IHtmlInput input() {
     return new HtmlInputBuilder();
