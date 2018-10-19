@@ -5,11 +5,12 @@
 package org.eclipse.scout.rt.rest;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.ParamConverterProvider;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
@@ -34,46 +35,39 @@ public class RestApplication extends Application {
     Set<Class<?>> classes = new HashSet<>();
     registerObjectMapperResolver(classes);
     registerExceptionMappers(classes);
+    registerParamConverterProviders(classes);
     registerRestResources(classes);
     registerContainerRequestFilters(classes);
     return classes;
   }
 
   protected void registerContainerRequestFilters(Set<Class<?>> classes) {
-    for (IBean<IRestContainerRequestFilter> bean : BEANS.getBeanManager().getBeans(IRestContainerRequestFilter.class)) {
-      classes.add(bean.getBeanClazz());
-      LOG.info("{} registered as REST container request filter", bean.getBeanClazz());
-    }
+    registerClasses(classes, IRestContainerRequestFilter.class);
   }
 
   protected void registerObjectMapperResolver(Set<Class<?>> classes) {
-    classes.add(ObjectMapperResolver.class);
+    registerClasses(classes, ObjectMapperResolver.class);
   }
 
   protected void registerExceptionMappers(Set<Class<?>> classes) {
-    for (@SuppressWarnings("rawtypes")
-    IBean<ExceptionMapper> bean : BEANS.getBeanManager().getBeans(ExceptionMapper.class)) {
-      classes.add(bean.getBeanClazz());
-      LOG.info("{} registered as REST exception mapper", bean.getBeanClazz());
-    }
+    registerClasses(classes, ExceptionMapper.class);
   }
 
   protected void registerRestResources(Set<Class<?>> classes) {
-    for (IBean<IRestResource> bean : BEANS.getBeanManager().getBeans(IRestResource.class)) {
-      classes.add(bean.getBeanClazz());
-      LOG.info("{} registered as REST resource on path=/{}", bean.getBeanClazz(), getContextPath(bean));
-    }
+    registerClasses(classes, IRestResource.class);
   }
 
-  /**
-   * @return context path based on {@link Path} annotation.
-   */
-  protected String getContextPath(IBean<IRestResource> bean) {
-    Path path = bean.getBeanAnnotation(Path.class);
-    if (path != null) {
-      return path.value();
+  protected void registerParamConverterProviders(Set<Class<?>> classes) {
+    registerClasses(classes, ParamConverterProvider.class);
+  }
+
+  protected <T> void registerClasses(Set<Class<?>> classes, Class<T> lookupBeanClazz) {
+    List<IBean<T>> beans = BEANS.getBeanManager().getBeans(lookupBeanClazz);
+    for (IBean<?> bean : beans) {
+      classes.add(bean.getBeanClazz());
+      LOG.debug("{} registered as REST {}", bean.getBeanClazz(), lookupBeanClazz.getSimpleName());
     }
-    return null;
+    LOG.info("Registered {} classes as REST {}", beans.size(), lookupBeanClazz.getSimpleName());
   }
 
   @Override
