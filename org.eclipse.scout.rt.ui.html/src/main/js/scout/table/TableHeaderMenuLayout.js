@@ -14,12 +14,6 @@ scout.TableHeaderMenuLayout = function(popup) {
 };
 scout.inherits(scout.TableHeaderMenuLayout, scout.PopupLayout);
 
-/**
- * Don't use scout.HtmlEnvironment.formRowHeight here intentionally (field looks to large)
- * Now it has the same height as the buttons in the left column.
- */
-scout.TableHeaderMenuLayout.TEXT_FIELD_HEIGHT = 29;
-
 scout.TableHeaderMenuLayout.TABLE_MAX_HEIGHT = 330;
 
 /**
@@ -76,7 +70,7 @@ scout.TableHeaderMenuLayout.prototype.layout = function($container) {
       filterTableContainerInsets = scout.graphics.insets($filterTableGroup),
       filterTableHtmlComp = this.popup.filterTable.htmlComp;
 
-    filterTableContainerHeight = filterColumnSize.height;
+    filterTableContainerHeight = filterColumnSize.height - filterColumnInsets.vertical();
     // subtract height of filter-fields container
     filterTableContainerHeight -= filterFieldGroupSize.height;
     // subtract group-title height
@@ -97,6 +91,10 @@ scout.TableHeaderMenuLayout.prototype.layout = function($container) {
   this._setMaxWidth();
   actionColumnSize = scout.graphics.size(this.popup.$columnActions);
   this._setMaxWidth(actionColumnSize.width);
+
+  // IE hack: IE adds some invisible space to the left box which causes unecessary scrollbars to appear. Setting the vertical align flags the following way seems to fix it...
+  this.popup.$columnActions.css('vertical-align', actionColumnSize.height >= filterColumnSize.height ? 'middle' : 'top');
+  $filterColumn.css('vertical-align', 'middle');
 };
 
 scout.TableHeaderMenuLayout.prototype._adjustSizeWithAnchor = function(prefSize) {
@@ -134,7 +132,7 @@ scout.TableHeaderMenuLayout.prototype._filterFieldsGroupBoxHeight = function() {
  * + paddings of surrounding containers
  */
 scout.TableHeaderMenuLayout.prototype.preferredLayoutSize = function($container) {
-  var prefSize, filterColumnMargins,
+  var prefSize, filterColumnMargins, filterColumnInsets,
     rightColumnHeight = 0,
     leftColumnHeight = 0,
     containerInsets = scout.graphics.insets($container),
@@ -182,7 +180,9 @@ scout.TableHeaderMenuLayout.prototype.preferredLayoutSize = function($container)
 
   if (this.popup.hasFilterFields || this.popup.hasFilterTable) {
     filterColumnMargins = scout.graphics.margins(this.popup.$columnFilters);
+    filterColumnInsets = scout.graphics.insets(this.popup.$columnFilters);
     rightColumnHeight += filterColumnMargins.vertical();
+    rightColumnHeight += filterColumnInsets.vertical();
   }
 
   // Use height of left or right column as preferred size (and add insets of container)
