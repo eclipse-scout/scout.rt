@@ -8,6 +8,7 @@ import javax.ws.rs.ext.ContextResolver;
 
 import org.eclipse.scout.rt.jackson.databind.ObjectMapperFactory;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Bean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -15,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Provides an {@link ObjectMapper} instance produced by {@link ObjectMapperFactory}. This class is intended to be
  * registered in a REST application.
  */
+@Bean
 public class ObjectMapperResolver implements ContextResolver<ObjectMapper> {
 
   @Override

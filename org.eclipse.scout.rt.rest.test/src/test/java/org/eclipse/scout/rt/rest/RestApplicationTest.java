@@ -7,6 +7,8 @@ import java.util.Set;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
+import org.eclipse.scout.rt.rest.container.AntiCsrfContainerFilter;
+import org.eclipse.scout.rt.rest.container.PathValidationFilter;
 import org.eclipse.scout.rt.rest.exception.DefaultExceptionMapper;
 import org.eclipse.scout.rt.rest.exception.VetoExceptionMapper;
 import org.eclipse.scout.rt.rest.exception.WebApplicationExceptionMapper;
@@ -45,6 +47,8 @@ public class RestApplicationTest {
     assertTrue(classes.contains(WebApplicationExceptionMapper.class));
     assertTrue(classes.contains(ObjectMapperResolver.class));
     assertTrue(classes.contains(FixtureResource.class));
+    assertTrue(classes.contains(AntiCsrfContainerFilter.class));
+    assertTrue(classes.contains(PathValidationFilter.class));
   }
 
 }
