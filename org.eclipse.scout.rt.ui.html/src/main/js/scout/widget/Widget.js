@@ -1212,13 +1212,13 @@ scout.Widget.prototype._prepareWidgetProperty = function(propertyName, widgets) 
     oldWidgets = scout.arrays.diff(oldWidgets, widgets);
   }
 
-  // Destroy old child widget(s)
   if (!this.isPreserveOnPropertyChangeProperty(propertyName)) {
+    // Destroy old child widget(s)
     this._destroyChildren(oldWidgets);
-  }
 
-  // Link to new parent
-  this.link(widgets);
+    // Link to new parent
+    this.link(widgets);
+  }
 
   return widgets;
 };
@@ -1358,6 +1358,14 @@ scout.Widget.prototype.resolveConsts = function(configs) {
   }, this);
 };
 
+/**
+ * A so called widget property is a property with a widget as value incl. automatic resolution of that widget.
+ * This means the property not only accepts the actual widget, but also a widget model or a widget reference (id)
+ * and then either creates a new widget based on the model or resolves the id and uses the referenced widget as value.
+ * Furthermore it will take care of its lifecycle which means, the widget will automatically be removed and destroyed (as long as the parent is also the owner).
+ * <p>
+ * If only the resolve operations without the lifecycle actions should be performed, you need to add the property to the list _preserveOnPropertyChangeProperties as well.
+ */
 scout.Widget.prototype._addWidgetProperties = function(properties) {
   this._addProperties('_widgetProperties', properties);
 };
@@ -1374,6 +1382,13 @@ scout.Widget.prototype.isCloneProperty = function(propertyName) {
   return this._cloneProperties.indexOf(propertyName) > -1;
 };
 
+/**
+ * Properties in this list won't be affected by the automatic lifecycle actions performed for regular widget properties.
+ * This means, the widget won't be removed, destroyed and also not linked, which means the parent stays the same.
+ * But the resolve operations are still applied, as for regular widget properties.
+ * <p>
+ * The typical use case for such properties is referencing another widget without taking care of that widget.
+ */
 scout.Widget.prototype._addPreserveOnPropertyChangeProperties = function(properties) {
   this._addProperties('_preserveOnPropertyChangeProperties', properties);
 };
