@@ -55,6 +55,32 @@ describe('ProposalField', function() {
       expect(field.errorStatus).toBe(null);
     });
 
+    it('is empty when text is empty', function() {
+      expect(field.value).toBe(null);
+      expect(field.displayText).toBe('');
+      expect(field.empty).toBe(true);
+
+      field.setValue('Foo');
+      expect(field.value).toBe('Foo');
+      expect(field.displayText).toBe('Foo');
+      expect(field.empty).toBe(false);
+
+      field.setValue('');
+      expect(field.value).toBe('');
+      expect(field.displayText).toBe('');
+      expect(field.empty).toBe(true);
+
+      field.setValue('Xyz');
+      expect(field.value).toBe('Xyz');
+      expect(field.displayText).toBe('Xyz');
+      expect(field.empty).toBe(false);
+
+      field.setValue(null);
+      expect(field.value).toBe(null);
+      expect(field.displayText).toBe('');
+      expect(field.empty).toBe(true);
+    });
+
     it('setLookupRow should set value too', function() {
       var lookupRow = {
         key: 123,

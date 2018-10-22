@@ -184,3 +184,10 @@ scout.ProposalField.prototype.setTrimText = function(trimText) {
 scout.ProposalField.prototype.setMaxLength = function(maxLength) {
   this.setProperty('maxLength', maxLength);
 };
+
+/**
+ * @override ValueField.js
+ */
+scout.ProposalField.prototype._updateEmpty = function() {
+  this.empty = scout.strings.empty(this.value);
+};
