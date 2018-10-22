@@ -472,6 +472,14 @@ scout.GroupBox.prototype._renderBorderDecoration = function() {
   this._renderBorderVisible();
 };
 
+scout.GroupBox.prototype._getCurrentMenus = function() {
+  if (this.menuBarVisible) {
+    return [];
+  } else {
+    return scout.GroupBox.parent.prototype._getCurrentMenus.call(this);
+  }
+};
+
 scout.GroupBox.prototype.setMenuBarVisible = function(visible) {
   this.setProperty('menuBarVisible', visible);
 };
@@ -482,6 +490,7 @@ scout.GroupBox.prototype._renderMenuBarVisible = function() {
   } else {
     this.menuBar.remove();
   }
+  this._updateMenus();
   this.invalidateLayoutTree();
 };
 
@@ -500,7 +509,7 @@ scout.GroupBox.prototype.setMenuBarPosition = function(menuBarPosition) {
 scout.GroupBox.prototype._renderMenuBarPosition = function() {
   if (this.menuBarPosition === scout.GroupBox.MenuBarPosition.BOTTOM) {
     this.menuBar.bottom();
-  } else if (this.menuBarPosition === scout.GroupBox.MenuBarPosition.TOP){
+  } else if (this.menuBarPosition === scout.GroupBox.MenuBarPosition.TOP) {
     this.menuBar.top();
   }
 
@@ -517,7 +526,7 @@ scout.GroupBox.prototype.setMenuBarEllipsisPosition = function(menuBarEllipsisPo
 scout.GroupBox.prototype._renderMenuBarEllipsisPosition = function() {
   if (this.menuBarEllipsisPosition === scout.MenuBar.EllipsisPosition.RIGHT) {
     this.menuBar.ellipsisRight();
-  } else if (this.menuBarEllipsisPosition === scout.MenuBar.EllipsisPosition.LEFT){
+  } else if (this.menuBarEllipsisPosition === scout.MenuBar.EllipsisPosition.LEFT) {
     this.menuBar.ellipsisLeft();
   }
 
