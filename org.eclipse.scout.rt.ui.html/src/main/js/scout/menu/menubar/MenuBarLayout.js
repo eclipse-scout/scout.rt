@@ -177,11 +177,11 @@ scout.MenuBarLayout.prototype._menuItemSize = function(menuItem) {
   menuItem.$container.removeClass('overflown');
   menuItem.$container.removeClass('hidden');
 
+  menuItem.htmlComp.invalidateLayout();
   prefSize = menuItem.htmlComp.prefSize({
     useCssSize: true,
     exact: true
   }).add(scout.graphics.margins(menuItem.$container));
-  prefSize.width = menuItem.$container.outerWidth(true);
 
   menuItem.$container.attrOrRemove('class', classList);
   return prefSize;
