@@ -255,7 +255,7 @@ scout.HtmlComponent.prototype.prefSize = function(options) {
   if (this.valid && !scout.objects.isNullOrUndefined(prefSizeCached)) {
     $.log.isTraceEnabled() && $.log.trace('(HtmlComponent#prefSize) ' + this.debug() + ' widthHint=' + options.widthHint + ' heightHint=' + options.heightHint + ' prefSizeCached=' + prefSizeCached);
     if (includeMargin) {
-      prefSizeCached.add(this.margins());
+      prefSizeCached = prefSizeCached.add(this.margins());
     }
     return prefSizeCached;
   }
