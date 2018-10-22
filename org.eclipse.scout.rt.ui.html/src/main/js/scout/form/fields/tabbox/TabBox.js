@@ -79,6 +79,11 @@ scout.TabBox.prototype._remove = function() {
   this._removeSelectedTab();
 };
 
+scout.TabBox.prototype._getCurrentMenus = function() {
+  // handled by the menubar
+  return [];
+};
+
 scout.TabBox.prototype._removeMenus = function() {
   // menubar takes care about removal
 };
