@@ -116,7 +116,7 @@ scout.events = {
         if (touchend) {
           // Only stop processing if user released the finger
           removeHandlers();
-          endHandler(event);
+          endHandler();
         }
       }, 50);
     }
