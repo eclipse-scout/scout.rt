@@ -347,7 +347,7 @@ scout.GroupBox.prototype._renderLabel = function() {
 };
 
 scout.GroupBox.prototype.addStatus = function() {
-  scout.TabBox.parent.prototype.addStatus.call(this);
+  scout.GroupBox.parent.prototype.addStatus.call(this);
   this._updateStatusPosition();
 };
 
