@@ -29,6 +29,17 @@ import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 public interface ITransaction extends ICancellable {
 
   /**
+   * @throws TransactionCancelledError
+   *           if {@link #isCancelled()}
+   * @since 9.0
+   */
+  default void checkCancelled() {
+    if (isCancelled()) {
+      throw new TransactionCancelledError();
+    }
+  }
+
+  /**
    * The {@link ITransaction} which is currently associated with the current thread.
    */
   ThreadLocal<ITransaction> CURRENT = new ThreadLocal<>();

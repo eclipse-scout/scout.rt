@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.exception;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.transaction.TransactionCancelledError;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
@@ -31,7 +32,10 @@ public class ExceptionHandler {
    * This method must not throw an exception.
    */
   public void handle(final Throwable t) {
-    if (t instanceof ThreadInterruptedError) {
+    if (t instanceof TransactionCancelledError) {
+      handleTransactionCancelledException((TransactionCancelledError) t);
+    }
+    else if (t instanceof ThreadInterruptedError) {
       handleInterruptedException((ThreadInterruptedError) t);
     }
     else if (t instanceof FutureCancelledError) {
@@ -51,6 +55,16 @@ public class ExceptionHandler {
     else {
       handleThrowable(t);
     }
+  }
+
+  /**
+   * Method invoked to handle a {@link TransactionCancelledError}. Typically, such an exception is thrown when accessing
+   * an already cancelled transaction.
+   * <p>
+   * The default implementation logs it with debug level.
+   */
+  protected void handleTransactionCancelledException(final TransactionCancelledError e) {
+    LOG.debug("Transaction cancelled", e);
   }
 
   /**
