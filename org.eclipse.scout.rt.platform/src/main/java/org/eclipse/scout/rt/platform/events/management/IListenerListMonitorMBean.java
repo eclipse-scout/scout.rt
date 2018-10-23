@@ -15,8 +15,6 @@ import java.util.Arrays;
 
 import javax.management.MXBean;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.events.IListenerListWithManagement;
 
 /**
@@ -25,9 +23,7 @@ import org.eclipse.scout.rt.platform.events.IListenerListWithManagement;
  * @since 8.0
  */
 @MXBean
-@ApplicationScoped
-@CreateImmediately
-public interface IListenerListMonitor {
+public interface IListenerListMonitorMBean {
 
   /**
    * @return the count of registered event listener lists

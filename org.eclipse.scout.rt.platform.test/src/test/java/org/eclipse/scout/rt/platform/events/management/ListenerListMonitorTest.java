@@ -16,7 +16,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.events.management.IListenerListMonitor.ListenerListInfo;
+import org.eclipse.scout.rt.platform.events.management.IListenerListMonitorMBean.ListenerListInfo;
 import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -33,7 +33,7 @@ public class ListenerListMonitorTest {
     prop2.addPropertyChangeListener("Bar", new Listener2a());
     prop2.addPropertyChangeListener("Foo", new Listener2b());
 
-    IListenerListMonitor mon = BEANS.get(IListenerListMonitor.class);
+    IListenerListMonitorMBean mon = BEANS.get(ListenerListMonitorMBean.class);
 
     assertEquals(2, mon.getListenerListCount());
     ListenerListInfo[] listenerLists = mon.getListenerListInfos();

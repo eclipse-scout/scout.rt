@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatform.State;
+import org.eclipse.scout.rt.platform.context.PlatformIdentifier;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.PlatformEvent;
@@ -38,6 +39,8 @@ public class WebappEventListener implements ServletContextListener {
   public void contextInitialized(ServletContextEvent sce) {
     ServletContext servletContext = sce.getServletContext();
     ServletContextRegistration.servletContext = servletContext;
+
+    PlatformIdentifier.set(servletContext.getContextPath());
 
     // Accessing the class activates the platform if it is not yet initialized
     IPlatform platform = Platform.get();

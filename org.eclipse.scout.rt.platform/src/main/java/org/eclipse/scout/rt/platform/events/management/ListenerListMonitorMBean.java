@@ -20,11 +20,24 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.management.ObjectName;
 
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.CreateImmediately;
+import org.eclipse.scout.rt.platform.context.PlatformIdentifier;
 import org.eclipse.scout.rt.platform.events.ListenerListRegistry;
 import org.eclipse.scout.rt.platform.events.ListenerListSnapshot;
 import org.eclipse.scout.rt.platform.jmx.MBeanUtility;
 
-public class ListenerListMonitor implements IListenerListMonitor {
+@ApplicationScoped
+@CreateImmediately
+public class ListenerListMonitorMBean implements IListenerListMonitorMBean {
+
+  /*
+   * JMX registration
+   */
+
+  protected ObjectName jmxObjectName() {
+    return MBeanUtility.toJmxName("org.eclipse.scout.rt.platform", PlatformIdentifier.get(), "EventListeners");
+  }
 
   @PostConstruct
   protected void postConstruct() {
@@ -36,9 +49,9 @@ public class ListenerListMonitor implements IListenerListMonitor {
     MBeanUtility.unregister(jmxObjectName());
   }
 
-  protected ObjectName jmxObjectName() {
-    return MBeanUtility.toJmxName("org.eclipse.scout.rt.platform", "Application", "EventListeners");
-  }
+  /*
+   * MBean implementation
+   */
 
   @Override
   public int getListenerListCount() {
