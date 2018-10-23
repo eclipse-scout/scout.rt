@@ -102,7 +102,7 @@ public final class HttpConfigurationProperties {
     @Override
     public Boolean getDefaultValue() {
       String prop = System.getProperty(SUN_NET_HTTP_RETRY_POST);
-      return prop != null ? Boolean.valueOf(prop) : true;
+      return prop != null && Boolean.valueOf(prop);
     }
 
     @Override

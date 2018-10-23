@@ -88,7 +88,7 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
     });
 
     final boolean retryPostProp = CONFIG.getPropertyValue(ApacheHttpTransportRetryPostProperty.class);
-    builder.setRetryHandler(new DefaultHttpRequestRetryHandler(1, true) {
+    builder.setRetryHandler(new DefaultHttpRequestRetryHandler(1, false) {
 
       @Override
       protected boolean handleAsIdempotent(HttpRequest request) {
