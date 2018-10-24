@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.html.json;
 import java.util.Collection;
 import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -73,13 +73,13 @@ public final class JsonAdapterUtility {
   }
 
   /**
-   * Resolves the adapter for the given formField, even when it is not a direct child adapter of the given
-   * parentJsonAdapter (but the child adapter of a child adapter). If the formField does not belong to the adapter/field
+   * Resolves the adapter for the given widget, even when it is not a direct child adapter of the given
+   * parentJsonAdapter (but the child adapter of a child adapter). If the widget does not belong to the adapter/widget
    * hierarchy of the given parent, <code>null</code> is returned.
    */
-  public static IJsonAdapter<?> findChildAdapter(IJsonAdapter<?> parentJsonAdapter, IFormField formField) {
+  public static IJsonAdapter<?> findChildAdapter(IJsonAdapter<?> parentJsonAdapter, IWidget widget) {
     if (parentJsonAdapter != null) {
-      for (IJsonAdapter<?> potential : parentJsonAdapter.getUiSession().getJsonAdapters(formField)) {
+      for (IJsonAdapter<?> potential : parentJsonAdapter.getUiSession().getJsonAdapters(widget)) {
         if (potential.hasAncestor(parentJsonAdapter)) {
           return potential;
         }

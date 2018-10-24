@@ -794,7 +794,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
    * @throws UiException
    *           when no nodeId is found for the given node
    */
-  protected String getNodeId(ITreeNode node) {
+  public String getNodeId(ITreeNode node) {
     if (node == null) {
       return null;
     }
