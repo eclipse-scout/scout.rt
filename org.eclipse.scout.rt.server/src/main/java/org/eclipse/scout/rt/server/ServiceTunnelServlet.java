@@ -33,6 +33,8 @@ import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestore
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
+import org.eclipse.scout.rt.server.commons.idempotent.DuplicateRequestException;
+import org.eclipse.scout.rt.server.commons.idempotent.SequenceNumberDuplicateDetector;
 import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
 import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
@@ -61,6 +63,7 @@ import org.slf4j.LoggerFactory;
 public class ServiceTunnelServlet extends AbstractHttpServlet {
 
   private static final String ADMIN_SESSION_KEY = AdminSession.class.getName();
+  private static final String DUPLICATE_REQUEST_DETECTOR_SESSION_KEY = "DuplicateRequestDetector";
 
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(ServiceTunnelServlet.class);
@@ -100,6 +103,7 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
 
   // === HTTP-POST ===
 
+  @SuppressWarnings("deprecation")
   @Override
   protected void doPost(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws ServletException, IOException {
     if (Subject.getSubject(AccessController.getContext()) == null) {
@@ -125,14 +129,18 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
         }
       }, DefaultExceptionTranslator.class);
     }
+    catch (DuplicateRequestException e) {
+      LOG.warn("Duplicate Request", e);
+      servletResponse.sendError(HttpServletResponse.SC_CONFLICT, "Request is a duplicate");
+    }
     catch (Throwable e) {//NOSONAR
       if (isConnectionError(e)) {
         // Ignore disconnect errors: we do not want to throw an exception, if the client closed the connection.
-        LOG.debug("Connection Error: ", e);
+        LOG.debug("Connection Error", e);
       }
       else if (isInterruption(e)) {
-        LOG.info("Interruption: ", e);
-        servletResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        LOG.info("Interruption", e);
+        servletResponse.setStatus(HttpServletResponse.SC_ACCEPTED, "Request processing was interrupted");
       }
       else {
         LOG.error("Client={}@{}/{}", servletRequest.getRemoteUser(), servletRequest.getRemoteAddr(), servletRequest.getRemoteHost(), e);
@@ -149,8 +157,15 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
         .withClientNotificationCollector(collector)
         .withClientNodeId(serviceRequest.getClientNodeId());
 
+    IServerSession session;
     if (serviceRequest.getSessionId() != null) {
-      serverRunContext.withSession(lookupServerSessionOnHttpSession(serviceRequest.getSessionId(), serverRunContext));
+      session = lookupServerSessionOnHttpSession(serviceRequest.getSessionId(), serverRunContext);
+      SequenceNumberDuplicateDetector duplicateRequestDetector = (SequenceNumberDuplicateDetector) session
+          .computeDataIfAbsent(DUPLICATE_REQUEST_DETECTOR_SESSION_KEY, () -> new SequenceNumberDuplicateDetector());
+      if (!duplicateRequestDetector.accept(serviceRequest.getRequestSequence())) {
+        throw DuplicateRequestException.create(serviceRequest.getSessionId(), serviceRequest.getRequestSequence());
+      }
+      serverRunContext.withSession(session);
     }
 
     final IRegistrationHandle registrationHandle = registerForCancellation(serverRunContext, serviceRequest);

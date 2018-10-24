@@ -19,10 +19,12 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.events.management.IListenerListMonitorMBean.ListenerListInfo;
 import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
+@RunWithNewPlatform
 public class ListenerListMonitorTest {
 
   @Test

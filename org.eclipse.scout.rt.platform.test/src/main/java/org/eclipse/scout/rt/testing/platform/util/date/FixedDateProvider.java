@@ -15,6 +15,7 @@ import java.util.Date;
 
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.IgnoreBean;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.date.DateProvider;
 
 /**
@@ -25,7 +26,6 @@ import org.eclipse.scout.rt.platform.util.date.DateProvider;
  */
 @IgnoreBean
 public class FixedDateProvider extends DateProvider {
-
   private volatile Date m_date;
 
   /**
@@ -47,6 +47,17 @@ public class FixedDateProvider extends DateProvider {
   }
 
   /**
+   * Change the date and time returned by the provider
+   *
+   * @param newTimeMillis
+   *          new date and time to return as provider value
+   */
+  public void setTimeMillis(long newTimeMillis) {
+    setDate(new Date(newTimeMillis));
+    Assertions.assertEquals(newTimeMillis, currentUTCMillis());
+  }
+
+  /**
    * Retrieve the date/time of this provider
    *
    * @return the date/time returned by this provider
@@ -57,23 +68,23 @@ public class FixedDateProvider extends DateProvider {
   }
 
   /**
-   * Change the date returned by the provider
+   * Change the date and time returned by the provider
    *
    * @param newDate
-   *          new date to return as provider value
+   *          new date and time to return as provider value
    */
   public void setDate(Date newDate) {
     m_date = newDate;
   }
 
   /**
-   * Set calendar time to the fixed date.
+   * Calendar with fixed date.
    *
    * @return the calendar instance with the fixed date set
    */
   @Override
   public Calendar currentCalendar() {
-    Calendar currentCalendar = Calendar.getInstance();
+    Calendar currentCalendar = super.currentCalendar();
     currentCalendar.setTime(m_date);
     return currentCalendar;
   }

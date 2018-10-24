@@ -36,6 +36,13 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 public interface IDateProvider {
 
   /**
+   * Provides the current time (UTC timezone) in milliseconds.
+   *
+   * @since 9.0
+   */
+  long currentUTCMillis();
+
+  /**
    * Provides the current date and time in the default locale, not truncated (as much precision as available).
    */
   Date currentMillis();

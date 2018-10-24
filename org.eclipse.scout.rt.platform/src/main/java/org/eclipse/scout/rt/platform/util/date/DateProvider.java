@@ -26,6 +26,11 @@ public class DateProvider implements IDateProvider {
   }
 
   @Override
+  public long currentUTCMillis() {
+    return getDate().getTime();
+  }
+
+  @Override
   public Date currentMillis() {
     return getDate();
   }
