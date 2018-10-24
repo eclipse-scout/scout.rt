@@ -34,8 +34,17 @@ public class JsonBeanColumn<T extends IColumn<?>> extends JsonColumn<T> {
   @Override
   public Object cellValueToJson(Object value) {
     IJsonObject jsonObject = MainJsonObjectFactory.get().createJsonObject(value);
-    JsonBean jsonBean = (JsonBean) jsonObject;
-    jsonBean.setBinaryResourceMediator(getJsonTable().getBinaryResourceMediator());
+    handleBinaryResource(jsonObject);
     return jsonObject.toJson();
   }
+
+  /**
+   * Not every IJsonObject is a JsonBean, but we must handle binary resources if we have a JsonBean.
+   */
+  protected void handleBinaryResource(IJsonObject jsonObject) {
+    if (jsonObject instanceof JsonBean) {
+      ((JsonBean) jsonObject).setBinaryResourceMediator(getJsonTable().getBinaryResourceMediator());
+    }
+  }
+
 }
