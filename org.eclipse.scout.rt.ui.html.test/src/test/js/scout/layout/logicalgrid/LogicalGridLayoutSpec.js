@@ -264,10 +264,77 @@ describe("LogicalGridLayout", function() {
       var prefSize = lglContainer.htmlComp.prefSize({
         widthHint: 400
       });
-      // First column has a fixed width -> pref size must not be calle
+      // First column has a fixed width -> pref size must not be called
       expect(prefSize1Called).toBe(false);
       expect(widthHint2).toBe(400 - containerPadding * 2 - hgap - childMargin * 2 - 300);
       expect(prefSize.height).toBe(50 + childMargin * 2 + containerPadding * 2); // First component does not use uiHeight -> will be cut
+    });
+
+    it("uses preferred width as widthHint if fill horizontal is false", function() {
+      var widthHint;
+      var lglChild = createLglChild({
+        parent: lglContainer,
+      });
+      lglChild.gridData.x = 0;
+      lglChild.gridData.y = 0;
+      lglChild.gridData.fillHorizontal = false;
+      lglChild.gridData.useUiHeight = true;
+      lglChild.htmlComp.layout.prefSize = new scout.Dimension(120, 50);
+      lglChild.htmlComp.layout.preferredLayoutSize = function($container, options) {
+        widthHint = options.widthHint;
+        return this.prefSize;
+      };
+
+      var prefSize = lglContainer.htmlComp.prefSize({
+        widthHint: 400
+      });
+      expect(widthHint).toBe(120); // Needs to use pref width as width hint (cell bounds are larger than the child)
+      expect(prefSize.height).toBe(50 + childMargin * 2 + containerPadding * 2);
+    });
+
+    it("uses container width as widthHint if fill horizontal is false and pref width is bigger", function() {
+      var widthHint;
+      var lglChild = createLglChild({
+        parent: lglContainer,
+      });
+      lglChild.gridData.x = 0;
+      lglChild.gridData.y = 0;
+      lglChild.gridData.fillHorizontal = false;
+      lglChild.gridData.useUiHeight = true;
+      lglChild.htmlComp.layout.prefSize = new scout.Dimension(500, 50);
+      lglChild.htmlComp.layout.preferredLayoutSize = function($container, options) {
+        widthHint = options.widthHint;
+        return this.prefSize;
+      };
+
+      var prefSize = lglContainer.htmlComp.prefSize({
+        widthHint: 400
+      });
+      expect(widthHint).toBe(400 - containerPadding * 2 - childMargin * 2);
+      expect(prefSize.height).toBe(50 + childMargin * 2 + containerPadding * 2);
+    });
+
+    it("does not mess comp size up if fill horizontal and fill vertical are false", function() {
+      var widthHint;
+      var lglChild = createLglChild({
+        parent: lglContainer,
+      });
+      lglChild.gridData.x = 0;
+      lglChild.gridData.y = 0;
+      lglChild.gridData.fillHorizontal = false;
+      lglChild.gridData.fillVertical = false;
+      lglChild.htmlComp.layout.prefSize = new scout.Dimension(120, 50);
+      lglChild.htmlComp.layout.preferredLayoutSize = function($container, options) {
+        widthHint = options.widthHint;
+        return this.prefSize;
+      };
+
+      var prefSize = lglContainer.htmlComp.prefSize({
+        widthHint: 400
+      });
+      expect(widthHint).toBe(120);
+      expect(lglContainer.htmlComp.layout.info.compSize[0].width).toBe(120 + childMargin * 2);
+      expect(lglContainer.htmlComp.layout.info.compSize[0].height).toBe(50 + childMargin * 2);
     });
   });
 });

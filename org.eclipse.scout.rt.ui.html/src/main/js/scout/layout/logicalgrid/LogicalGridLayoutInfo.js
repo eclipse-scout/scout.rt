@@ -169,8 +169,12 @@ scout.LogicalGridLayoutInfo.prototype._initializeInfo = function() {
   uiHeightElements.forEach(function(elem) {
     var $comp = elem.$comp;
     var cons = elem.cons;
+    var widthHint = this.widthHintForGridData(cons);
+    if (!cons.fillHorizontal) {
+      widthHint = Math.min(widthHint, this.compSize[elem.index].width);
+    }
     var size = this.uiSizeInPixel($comp, cons, {
-      widthHint: this.widthHintForGridData(cons)
+      widthHint: widthHint
     });
     this.compSize[elem.index] = size;
   }, this);
