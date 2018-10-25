@@ -79,7 +79,7 @@ public final class HttpConfigurationProperties {
     @Override
     public Boolean getDefaultValue() {
       String prop = System.getProperty(HTTP_KEEP_ALIVE);
-      return prop != null ? Boolean.valueOf(prop) : true;
+      return prop != null ? Boolean.valueOf(prop) : Boolean.TRUE;
     }
 
     @Override
@@ -92,29 +92,6 @@ public final class HttpConfigurationProperties {
     @Override
     public String getKey() {
       return "scout.http.keepAlive";
-    }
-  }
-
-  public static class ApacheHttpTransportRetryPostProperty extends AbstractBooleanConfigProperty {
-
-    public static final String SUN_NET_HTTP_RETRY_POST = "sun.net.http.retryPost";
-
-    @Override
-    public Boolean getDefaultValue() {
-      String prop = System.getProperty(SUN_NET_HTTP_RETRY_POST);
-      return prop != null && Boolean.valueOf(prop);
-    }
-
-    @Override
-    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
-    public String description() {
-      return String.format("Enable or disable one retry for non-idempotent POST requests.\n"
-          + "The default value is defined by the system property '%s' or true if the system property is undefined.", SUN_NET_HTTP_RETRY_POST);
-    }
-
-    @Override
-    public String getKey() {
-      return "scout.http.retryPost";
     }
   }
 }
