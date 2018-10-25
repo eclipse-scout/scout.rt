@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLSocketFactory;
 
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.HttpClientConnectionManager;
@@ -37,7 +36,6 @@ import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTr
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportKeepAliveProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportMaxConnectionsPerRouteProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportMaxConnectionsTotalProperty;
-import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportRetryPostProperty;
 import org.eclipse.scout.rt.shared.http.proxy.ConfigurableProxySelector;
 import org.eclipse.scout.rt.shared.http.transport.ApacheHttpTransport;
 import org.eclipse.scout.rt.shared.servicetunnel.http.MultiSessionCookieStore;
@@ -87,15 +85,7 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
 
     });
 
-    final boolean retryPostProp = CONFIG.getPropertyValue(ApacheHttpTransportRetryPostProperty.class);
-    builder.setRetryHandler(new DefaultHttpRequestRetryHandler(1, false) {
-
-      @Override
-      protected boolean handleAsIdempotent(HttpRequest request) {
-        return retryPostProp || super.handleAsIdempotent(request);
-      }
-
-    });
+    builder.setRetryHandler(new DefaultHttpRequestRetryHandler(1, false));
   }
 
   /**
