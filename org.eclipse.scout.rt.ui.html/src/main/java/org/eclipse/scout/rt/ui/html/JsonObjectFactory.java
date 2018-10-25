@@ -70,6 +70,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
 import org.eclipse.scout.rt.client.ui.form.fields.imagefield.IImageField;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
+import org.eclipse.scout.rt.client.ui.form.fields.mode.IMode;
+import org.eclipse.scout.rt.client.ui.form.fields.modeselector.IModeSelectorField;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
@@ -140,6 +142,8 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.htmlfield.JsonHtmlField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.imagefield.JsonImageField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.labelfield.JsonLabelField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.listbox.JsonListBox;
+import org.eclipse.scout.rt.ui.html.json.form.fields.mode.JsonMode;
+import org.eclipse.scout.rt.ui.html.json.form.fields.modeselector.JsonModeSelectorField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.numberfield.JsonNumberField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.placeholder.JsonPlaceholderField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.plannerfield.JsonPlannerField;
@@ -312,6 +316,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     if (model instanceof ITagField) {
       return new JsonTagField((ITagField) model, session, id, parent);
     }
+    if (model instanceof IModeSelectorField<?>) {
+      return new JsonModeSelectorField<IModeSelectorField<?>>((IModeSelectorField<?>) model, session, id, parent);
+    }
 
     // --- other model objects ---
     if (model instanceof IDesktop) {
@@ -423,6 +430,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof ILabel) {
       return new JsonLabel<>((ILabel) model, session, id, parent);
+    }
+    if (model instanceof IMode<?>) {
+      return new JsonMode<IMode<?>>((IMode<?>) model, session, id, parent);
     }
     return null;
   }

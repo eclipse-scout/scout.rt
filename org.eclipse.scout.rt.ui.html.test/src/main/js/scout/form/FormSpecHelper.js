@@ -91,3 +91,19 @@ scout.FormSpecHelper.prototype.createField = function(objectType, parent, modelP
   parent = parent || this.session.desktop;
   return scout.create(objectType, this.createFieldModel(objectType, parent, modelProperties));
 };
+
+scout.FormSpecHelper.prototype.createModeSelector = function(parent, numModes) {
+  parent = scout.nvl(parent, this.session.desktop);
+  numModes = scout.nvl(numModes, 2);
+  var modes = [];
+  for (var i = 0; i < numModes; i++) {
+    modes.push({
+      objectType: 'Mode'
+    });
+  }
+  var modeSelector = scout.create('ModeSelector', {
+    parent: parent,
+    modes: modes
+  });
+  return modeSelector;
+};
