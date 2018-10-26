@@ -157,8 +157,13 @@ scout.strings = {
    * Returns the plain text of the given html string using simple tag replacement.<p>
    * Tries to preserve the new lines. Since it does not consider the style, it won't be right in any cases.
    * A div for example always generates a new line, even if display style is not set to block.
+   *
+   * Options:
+   * - compact: Multiple consecutive empty lines are reduced to a single empty line
+   * - trim: Calls string.trim(). White space at the beginning and the end of the text gets removed.
    */
-  plainText: function(text) {
+  plainText: function(text, options) {
+    options = options || {};
     if (!text) {
       return text;
     }
@@ -180,6 +185,14 @@ scout.strings = {
     // Remove spaces at the beginning and end of each line
     text = text.replace(/^[ ]+/gm, '');
     text = text.replace(/[ ]+$/gm, '');
+
+    if (options.compact){
+      // Compact consecutive empty lines. One is enough
+      text = text.replace(/\n{3,}/gm, '\n\n');
+    }
+    if (options.trim){
+      text = text.trim();
+    }
 
     // Replace character html entities (e.g. &nbsp;, &gt;, ...)
     var textarea = scout.strings.plainTextElement;
