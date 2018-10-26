@@ -690,7 +690,9 @@ scout.Table.prototype._cellTooltipText = function($cell) {
   if (tooltipText) {
     return tooltipText;
   } else if (this._isTruncatedCellTooltipEnabled(column) && $cell.isContentTruncated()) {
-    return scout.strings.plainText($cell.html());
+    return scout.strings.plainText($cell.html(), {
+      trim: true
+    });
   }
 };
 
@@ -1462,9 +1464,9 @@ scout.Table.prototype.moveVisibleRowUp = function(row) {
 
   if (this.hierarchical) {
     var siblings = this.visibleRows.filter(function(candidate) {
-        return row.parentRow === candidate.parentRow;
-      }, this);
-      sibling = siblings[siblings.indexOf(row) - 1];
+      return row.parentRow === candidate.parentRow;
+    }, this);
+    sibling = siblings[siblings.indexOf(row) - 1];
     if (sibling) {
       targetIndex = this.rows.indexOf(sibling);
     } else {
@@ -1474,7 +1476,7 @@ scout.Table.prototype.moveVisibleRowUp = function(row) {
 
   } else {
     sibling = this.visibleRows[visibleIndex - 1];
-    if(!sibling){
+    if (!sibling) {
       // no previous sibling
       return;
     }
@@ -1491,7 +1493,6 @@ scout.Table.prototype.moveFilteredRowDown = function(row) {
   this.moveVisibleRowDown(row);
 };
 
-
 scout.Table.prototype.moveVisibleRowDown = function(row) {
   var rowIndex = this.rows.indexOf(row),
     visibleIndex = this.visibleRows.indexOf(row),
@@ -1500,9 +1501,9 @@ scout.Table.prototype.moveVisibleRowDown = function(row) {
 
   if (this.hierarchical) {
     var siblings = this.visibleRows.filter(function(candidate) {
-        return row.parentRow === candidate.parentRow;
-      }, this);
-      sibling = siblings[siblings.indexOf(row) + 1];
+      return row.parentRow === candidate.parentRow;
+    }, this);
+    sibling = siblings[siblings.indexOf(row) + 1];
     if (sibling) {
       targetIndex = this.rows.indexOf(sibling);
     } else {
@@ -1512,7 +1513,7 @@ scout.Table.prototype.moveVisibleRowDown = function(row) {
 
   } else {
     sibling = this.visibleRows[visibleIndex + 1];
-    if(!sibling){
+    if (!sibling) {
       // no following sibling
       return;
     }
@@ -4522,7 +4523,6 @@ scout.Table.prototype._destroyCellEditorPopup = function() {
     this.cellEditorPopup = null;
   }
 };
-
 
 scout.Table.prototype.setVirtual = function(virtual) {
   this._setProperty('virtual', virtual);
