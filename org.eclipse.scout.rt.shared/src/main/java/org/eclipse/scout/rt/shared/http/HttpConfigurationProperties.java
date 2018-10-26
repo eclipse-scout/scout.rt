@@ -109,13 +109,11 @@ public final class HttpConfigurationProperties {
   }
 
   /**
+   * This property is not used anymore.
    * <p>
-   * Configuration property to enable/disable one retry for non-idempotent <i>POST</i> requests.
-   * </p>
+   * https://git.eclipse.org/r/#/c/131382/
    * <p>
-   * As default setting the <i>sun.net.http.retryPost</i> system property is used, if this property is not set
-   * <code>true</code> is used as default (similar to java.net client implementation).
-   * </p>
+   * https://git.eclipse.org/r/#/c/131452/
    */
   public static class ApacheHttpTransportRetryPostProperty extends AbstractBooleanConfigProperty {
 
