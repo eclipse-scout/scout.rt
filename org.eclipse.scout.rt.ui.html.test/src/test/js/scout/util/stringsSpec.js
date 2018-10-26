@@ -367,6 +367,19 @@ describe("scout.strings", function() {
       expect(scout.strings.plainText(htmlText)).toBe('\t\t');
     });
 
+    it("removes leading and trailing newlines if configured", function() {
+      var htmlText = '\n\nHello!\n\n';
+      expect(scout.strings.plainText(htmlText, {trim:true})).toBe('Hello!');
+    });
+
+    it("leaves multiple newlines alone unless configured", function() {
+      var htmlText = 'Hello!\n\n\nI like coding!';
+      expect(scout.strings.plainText(htmlText)).toBe('Hello!\n\n\nI like coding!');
+      expect(scout.strings.plainText(htmlText, {compact:false})).toBe('Hello!\n\n\nI like coding!');
+      expect(scout.strings.plainText(htmlText, {compact:true})).toBe('Hello!\n\nI like coding!');
+    });
+
+
   });
 
   describe("insertAt", function() {
