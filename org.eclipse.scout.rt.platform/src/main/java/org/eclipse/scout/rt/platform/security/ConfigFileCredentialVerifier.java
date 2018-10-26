@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +68,7 @@ public class ConfigFileCredentialVerifier implements ICredentialVerifier {
    */
   @PostConstruct
   protected void init() {
-    loadCredentials(BEANS.get(CredentialsProperty.class));
+    loadCredentials(BEANS.get(getCredentialPropertyClass()));
   }
 
   /**
@@ -131,12 +132,33 @@ public class ConfigFileCredentialVerifier implements ICredentialVerifier {
    * Method invoked to create the {@link IPassword} for a password from config.properties.
    */
   protected IPassword createPassword(final String password) {
-    if (CONFIG.getPropertyValue(CredentialPlainTextProperty.class)) {
+    if (getCredentialPlainTextPropertyValue()) {
       return new PlainTextPassword(password.toCharArray());
     }
-    else {
-      return new HashedPassword(password);
+    return new HashedPassword(password);
+  }
+
+  protected boolean getCredentialPlainTextPropertyValue() {
+    Class<? extends AbstractBooleanConfigProperty> propertyClass = getCredentialPlainTextPropertyClass();
+    if (propertyClass == null) {
+      return false;
     }
+    return BooleanUtility.nvl(CONFIG.getPropertyValue(propertyClass));
+  }
+
+  /**
+   * Returns the class of the property that stores the credentials.
+   */
+  protected Class<? extends AbstractStringConfigProperty> getCredentialPropertyClass() {
+    return CredentialsProperty.class;
+  }
+
+  /**
+   * Returns the class of the property which indicates whether the password stored in the property returned by
+   * {@link #getCredentialPropertyClass()} is in plain text, or in hashed form.
+   */
+  protected Class<? extends AbstractBooleanConfigProperty> getCredentialPlainTextPropertyClass() {
+    return CredentialPlainTextProperty.class;
   }
 
   // ==== Config Properties ==== //
