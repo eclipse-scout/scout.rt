@@ -12,6 +12,7 @@ scout.ColumnLayout = function(options) {
   scout.ColumnLayout.parent.call(this);
   options = options || {};
   this.stretch = scout.nvl(options.stretch, true);
+  this.useCssWidth = scout.nvl(options.useCssWidth, false);
 };
 scout.inherits(scout.ColumnLayout, scout.AbstractLayout);
 
@@ -40,7 +41,12 @@ scout.ColumnLayout.prototype.layout = function($container) {
     if (htmlChild.layoutData && htmlChild.layoutData.widthHint) {
       childPrefSize.width = htmlChild.layoutData.widthHint;
     }
-    htmlChild.setSize(childPrefSize);
+    if (this.useCssWidth) {
+      htmlChild.$comp.cssHeight(childPrefSize.height);
+      htmlChild.revalidateLayout();
+    } else {
+      htmlChild.setSize(childPrefSize);
+    }
   }.bind(this));
 };
 
