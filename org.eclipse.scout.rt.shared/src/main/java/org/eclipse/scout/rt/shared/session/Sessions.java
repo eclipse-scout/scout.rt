@@ -54,7 +54,7 @@ public final class Sessions {
    */
   public static String randomSessionId() {
     // see https://www.owasp.org/index.php/Session_Management_Cheat_Sheet
-    BigInteger randomId = new BigInteger(SecurityUtility.createRandomBytes());
+    BigInteger randomId = new BigInteger(1, SecurityUtility.createRandomBytes());
 
     // use Base32 encoding because it is shorter than hex and does not include special characters and is case-insensitive (compared to Base64).
     return randomId.toString(32);
