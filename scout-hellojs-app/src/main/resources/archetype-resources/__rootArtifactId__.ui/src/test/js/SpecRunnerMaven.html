@@ -42,7 +42,7 @@
   <script type="text/javascript">loadDynamicScript('ext/scout-module.js');</script>
   <script type="text/javascript">loadDynamicScript('ext/scout-login-module.js');</script>
   <script type="text/javascript">loadDynamicScript('ext/scout-test-module.js');</script>
-  <script type="text/javascript">loadDynamicScript('src/main/js/${rootArtifactId}-module.js');</script>
+  <script type="text/javascript">loadDynamicScript('src/main/js/${simpleArtifactName}-module.js');</script>
 
 </head>
 <body>
@@ -53,9 +53,9 @@
   scout.models.bootstrap = function(url) {
     return loadJsonModule(url).then(this.init.bind(this));
   };
-  new ${rootArtifactId}.App().init({
+  new ${simpleArtifactName}.App().init({
     bootstrap: {
-      modelsUrl: 'src/main/js/${rootArtifactId}-module.json'
+      modelsUrl: 'src/main/js/${simpleArtifactName}-module.json'
     }
   });
   jasmine.clock().tick(1000);

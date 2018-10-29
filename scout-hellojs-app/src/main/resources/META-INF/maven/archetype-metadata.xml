@@ -16,6 +16,9 @@
     <requiredProperty key="displayName">
       <defaultValue>My JS Application</defaultValue>
     </requiredProperty>
+    <requiredProperty key="simpleArtifactName">
+      <defaultValue>Artifact Simple Name</defaultValue>
+    </requiredProperty>
     <requiredProperty key="scoutAuthPublicKeyDev">
       <defaultValue>changeme_database_password</defaultValue>
     </requiredProperty>

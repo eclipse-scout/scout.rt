@@ -7,7 +7,7 @@
   "curly": true,
   "globals": {
     "__include": false,
-    "${rootArtifactId}": false,
+    "${simpleArtifactName}": false,
     "scout": false,
     "JSON": false,
     "jQuery": false,

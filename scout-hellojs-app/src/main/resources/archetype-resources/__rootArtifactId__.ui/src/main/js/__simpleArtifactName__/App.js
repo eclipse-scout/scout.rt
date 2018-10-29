@@ -1,22 +1,22 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-${rootArtifactId}.App = function() {
-  ${rootArtifactId}.App.parent.call(this);
+  ${simpleArtifactName}.App = function() {
+  ${simpleArtifactName}.App.parent.call(this);
   this.apiUrl = '../api/';
-  this.appPrefix = '${rootArtifactId}.';
+  this.appPrefix = '${simpleArtifactName}.';
   this.desktop = null;
 };
-scout.inherits(${rootArtifactId}.App, scout.App);
+scout.inherits(${simpleArtifactName}.App, scout.App);
 
-${rootArtifactId}.App.prototype._createSession = function(options) {
-  var session = ${rootArtifactId}.App.parent.prototype._createSession.call(this, options);
+${simpleArtifactName}.App.prototype._createSession = function(options) {
+  var session = ${simpleArtifactName}.App.parent.prototype._createSession.call(this, options);
   session.on('localeSwitch', this._onLocaleSwitch.bind(this));
   return session;
 };
 
-${rootArtifactId}.App.prototype._createDesktop = function(parent) {
-  this.desktop = scout.create('${rootArtifactId}.Desktop', scout.models.getModel('${rootArtifactId}.Desktop', parent));
+${simpleArtifactName}.App.prototype._createDesktop = function(parent) {
+  this.desktop = scout.create('${simpleArtifactName}.Desktop', scout.models.getModel('${simpleArtifactName}.Desktop', parent));
 
   var myDataOutline = this._createMyDataOutline();
   var myDataViewButton = scout.create('scout.OutlineViewButton', {
@@ -32,13 +32,13 @@ ${rootArtifactId}.App.prototype._createDesktop = function(parent) {
   return this.desktop;
 };
 
-${rootArtifactId}.App.prototype._createMyDataOutline = function() {
+${simpleArtifactName}.App.prototype._createMyDataOutline = function() {
   var myDataOutline = scout.create('scout.Outline', {
     parent: this.desktop,
     title: '${symbol_dollar}{textKey:MyDataOutlineTitle}'
   });
 
-  var personTablePage = scout.create('${rootArtifactId}.PersonTablePage', {
+  var personTablePage = scout.create('${simpleArtifactName}.PersonTablePage', {
     parent: myDataOutline
   });
 
@@ -47,7 +47,7 @@ ${rootArtifactId}.App.prototype._createMyDataOutline = function() {
   return myDataOutline;
 };
 
-${rootArtifactId}.App.prototype._loadLocale = function() {
+${simpleArtifactName}.App.prototype._loadLocale = function() {
   var localeTag = scout.webstorage.getItem(sessionStorage, "locale");
   if (scout.strings.hasText(localeTag)) {
     var locale = scout.locales.get(localeTag);
@@ -61,7 +61,7 @@ ${rootArtifactId}.App.prototype._loadLocale = function() {
   return scout.locales.getNavigatorLocale();
 };
 
-${rootArtifactId}.App.prototype._onLocaleSwitch = function(event) {
+${simpleArtifactName}.App.prototype._onLocaleSwitch = function(event) {
   scout.webstorage.setItem(sessionStorage, "locale", event.locale.languageTag);
   var session = event.source;
   var busyIndicator = scout.create('BusyIndicator', {

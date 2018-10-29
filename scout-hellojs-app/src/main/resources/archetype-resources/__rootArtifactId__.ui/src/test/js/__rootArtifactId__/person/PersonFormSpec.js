@@ -15,11 +15,11 @@ describe('PersonForm', function() {
   describe('open with person', function() {
 
     it('shows firstName and LastName', function(done) {
-      var personForm = scout.create('${rootArtifactId}.PersonForm', {
+      var personForm = scout.create('${simpleArtifactName}.PersonForm', {
         parent: session.desktop
       });
 
-      var person = scout.create('${rootArtifactId}.Person', {
+      var person = scout.create('${simpleArtifactName}.Person', {
         firstName: 'first',
         lastName: 'last'
       });

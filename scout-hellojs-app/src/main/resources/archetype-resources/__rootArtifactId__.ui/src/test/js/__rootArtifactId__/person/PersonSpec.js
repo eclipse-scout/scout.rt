@@ -1,7 +1,7 @@
 describe('Person', function() {
 
   it('stores values correctly', function() {
-    var person = scout.create('${rootArtifactId}.Person');
+    var person = scout.create('${simpleArtifactName}.Person');
     var values = ['first', 'last', 'id'];
     person.setFirstName(values[0]);
     person.setLastName(values[1]);
@@ -20,7 +20,7 @@ describe('Person', function() {
       firstName: values[0],
       lastName: values[1]
     };
-    var person = scout.create('${rootArtifactId}.Person', model);
+    var person = scout.create('${simpleArtifactName}.Person', model);
 
     expect(person.firstName).toBe(values[0]);
     expect(person.lastName).toBe(values[1]);

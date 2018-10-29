@@ -2,10 +2,10 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 ${symbol_dollar}(document).ready(function() {
-  var app = new ${rootArtifactId}.App();
+  var app = new ${simpleArtifactName}.App();
   app.init({
     bootstrap: {
-      modelsUrl: 'res/${rootArtifactId}-all-macro.json',
+      modelsUrl: 'res/${simpleArtifactName}-all-macro.json',
       textsUrl: 'res/texts.json',
       localesUrl: 'res/locales.json'
     }

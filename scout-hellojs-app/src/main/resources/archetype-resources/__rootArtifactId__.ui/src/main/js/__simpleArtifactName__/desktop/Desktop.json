@@ -2,7 +2,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 {
-  "id": "${rootArtifactId}.Desktop",
+  "id": "${simpleArtifactName}.Desktop",
   "title": "${symbol_dollar}{textKey:ApplicationTitle}",
   "objectType": "Desktop",
   "type": "model",

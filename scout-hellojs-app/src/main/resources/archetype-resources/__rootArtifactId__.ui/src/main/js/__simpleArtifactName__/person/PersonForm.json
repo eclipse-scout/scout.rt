@@ -2,7 +2,7 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 {
-  "id": "${rootArtifactId}.PersonForm",
+  "id": "${simpleArtifactName}.PersonForm",
   "type": "model",
   "displayHint": "view",
   "rootGroupBox": {

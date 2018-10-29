@@ -3,6 +3,6 @@
 #set( $symbol_escape = '\' )
 {
   "files": [
-    "${rootArtifactId}-module.json"
+    "${simpleArtifactName}-module.json"
   ]
 }

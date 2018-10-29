@@ -1,16 +1,16 @@
-${rootArtifactId}.PersonRepository = function() {
-  ${rootArtifactId}.PersonRepository.parent.call(this);
+${simpleArtifactName}.PersonRepository = function() {
+  ${simpleArtifactName}.PersonRepository.parent.call(this);
   this.entityType = 'Person';
   this.targetUrl = scout.app.apiUrl + 'persons/';
 };
-scout.inherits(${rootArtifactId}.PersonRepository, ${rootArtifactId}.Repository);
+scout.inherits(${simpleArtifactName}.PersonRepository, ${simpleArtifactName}.Repository);
 
 /**
  * Loads a single person
  * @param personId The id of the person to fetch. Must not be null.
  * @returns Person
  */
-${rootArtifactId}.PersonRepository.prototype.load = function(personId) {
+${simpleArtifactName}.PersonRepository.prototype.load = function(personId) {
   return this.getJson(this.targetUrl + personId)
     .then(this._first.bind(this));
 };
@@ -19,7 +19,7 @@ ${rootArtifactId}.PersonRepository.prototype.load = function(personId) {
  * get all persons
  * @returns promise with person array
  */
-${rootArtifactId}.PersonRepository.prototype.list = function() {
+${simpleArtifactName}.PersonRepository.prototype.list = function() {
   return this.getJson(this.targetUrl);
 };
 
@@ -28,7 +28,7 @@ ${rootArtifactId}.PersonRepository.prototype.list = function() {
  * @param person The person to update
  * @returns The updated person
  */
-${rootArtifactId}.PersonRepository.prototype.store = function(person) {
+${simpleArtifactName}.PersonRepository.prototype.store = function(person) {
   return this.putJson(this.targetUrl + person.personId, JSON.stringify(person))
     .then(this._first.bind(this));
 };
@@ -38,7 +38,7 @@ ${rootArtifactId}.PersonRepository.prototype.store = function(person) {
  * @param personId The id of the person to delete.
  * @returns nothing
  */
-${rootArtifactId}.PersonRepository.prototype.remove = function(personId) {
+${simpleArtifactName}.PersonRepository.prototype.remove = function(personId) {
   return this.removeJson(this.targetUrl + personId);
 };
 
@@ -47,10 +47,10 @@ ${rootArtifactId}.PersonRepository.prototype.remove = function(personId) {
  * @param person The person to create
  * @returns the created person
  */
-${rootArtifactId}.PersonRepository.prototype.create = function(person) {
+${simpleArtifactName}.PersonRepository.prototype.create = function(person) {
   return this.postJson(this.targetUrl, JSON.stringify(person));
 };
 
 scout.addAppListener('bootstrap', function() {
-  ${rootArtifactId}.persons = ${rootArtifactId}.Repository.register('${rootArtifactId}.PersonRepository');
+  ${simpleArtifactName}.persons = ${simpleArtifactName}.Repository.register('${simpleArtifactName}.PersonRepository');
 });

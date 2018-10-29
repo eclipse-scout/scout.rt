@@ -2,13 +2,13 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
 {
-  "id": "${rootArtifactId}.PersonTablePage",
+  "id": "${simpleArtifactName}.PersonTablePage",
   "objectType": "PageWithTable",
   "type": "model",
   "leaf": true,
   "text": "${symbol_dollar}{textKey:Persons}",
   "detailTable": {
-    "id": "${rootArtifactId}.PersonTablePage.Table",
+    "id": "${simpleArtifactName}.PersonTablePage.Table",
     "objectType": "Table",
     "autoResizeColumns": true,
     "columns": [

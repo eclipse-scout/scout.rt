@@ -1,17 +1,17 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-${rootArtifactId}.Desktop = function() {
-  ${rootArtifactId}.Desktop.parent.call(this);
+${simpleArtifactName}.Desktop = function() {
+  ${simpleArtifactName}.Desktop.parent.call(this);
 };
-scout.inherits(${rootArtifactId}.Desktop, scout.Desktop);
+scout.inherits(${simpleArtifactName}.Desktop, scout.Desktop);
 
-${rootArtifactId}.Desktop.prototype._jsonModel = function() {
-  return scout.models.getModel('${rootArtifactId}.Desktop');
+${simpleArtifactName}.Desktop.prototype._jsonModel = function() {
+  return scout.models.getModel('${simpleArtifactName}.Desktop');
 };
 
-${rootArtifactId}.Desktop.prototype._init = function(model) {
-  ${rootArtifactId}.Desktop.parent.prototype._init.call(this, model);
+${simpleArtifactName}.Desktop.prototype._init = function(model) {
+  ${simpleArtifactName}.Desktop.parent.prototype._init.call(this, model);
 
   var aboutMenu = this.widget('AboutMenu');
   aboutMenu.on('action', this._onAboutMenuAction.bind(this));
@@ -29,15 +29,15 @@ ${rootArtifactId}.Desktop.prototype._init = function(model) {
   }
 };
 
-${rootArtifactId}.Desktop.prototype._onDefaultThemeMenuAction = function(event) {
+${simpleArtifactName}.Desktop.prototype._onDefaultThemeMenuAction = function(event) {
   this.setTheme('default');
 };
 
-${rootArtifactId}.Desktop.prototype._onDarkThemeMenuAction = function(event) {
+${simpleArtifactName}.Desktop.prototype._onDarkThemeMenuAction = function(event) {
   this.setTheme('dark');
 };
 
-${rootArtifactId}.Desktop.prototype._onAboutMenuAction = function(event) {
+${simpleArtifactName}.Desktop.prototype._onAboutMenuAction = function(event) {
   var form = scout.create('Form', {
     parent: this,
     resizable: false,

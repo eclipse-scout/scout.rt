@@ -1,7 +1,0 @@
-{
-  "files": [
-    "${rootArtifactId}/desktop/Desktop.json",
-    "${rootArtifactId}/person/PersonForm.json",
-    "${rootArtifactId}/person/PersonTablePage.json"
-  ]
-}
