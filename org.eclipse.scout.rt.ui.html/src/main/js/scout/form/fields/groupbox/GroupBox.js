@@ -450,6 +450,14 @@ scout.GroupBox.prototype._renderBorderDecoration = function() {
   this._renderBorderVisible();
 };
 
+scout.GroupBox.prototype._getCurrentMenus = function() {
+  if (this.menuBarVisible) {
+    return [];
+  } else {
+    return scout.GroupBox.parent.prototype._getCurrentMenus.call(this);
+  }
+};
+
 scout.GroupBox.prototype.setMenuBarVisible = function(visible) {
   this.setProperty('menuBarVisible', visible);
 };
@@ -460,6 +468,7 @@ scout.GroupBox.prototype._renderMenuBarVisible = function() {
   } else {
     this.menuBar.remove();
   }
+  this._updateMenus();
   this.invalidateLayoutTree();
 };
 
