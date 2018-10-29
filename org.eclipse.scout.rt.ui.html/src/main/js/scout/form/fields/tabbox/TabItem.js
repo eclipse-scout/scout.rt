@@ -83,12 +83,14 @@ scout.TabItem.prototype._onTabMouseDown = function(event) {
     this._preventTabActivation = false;
     return;
   }
+
+  //ensure to focus the selected tab before selecting the new tab.
+  // The selection of a tab will remove the content of the previous selected tab.
+  // Problem: If the previous is the focus owner the focus will be transfered to body what ends in a scroll top.
+  this.setTabbable(true);
+  this.$tabContainer.focus();
+
   this.parent.setSelectedTab(this);
-  // Focus tab on mouse down, normally done when the tab get selected, but not if focus manger is deactivated.
-  // -> If user explicitly clicks a tab it needs to get the focus otherwise keystrokes to switch tabs would not work.
-  if (!this.session.focusManager.active) {
-    this.$tabContainer.focus();
-  }
 
   // When the tab is clicked the user wants to execute the action and not see the tooltip
   if (this.$label) {
