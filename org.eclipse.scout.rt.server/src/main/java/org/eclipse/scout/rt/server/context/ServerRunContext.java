@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.context;
 
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
+import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
@@ -115,8 +117,20 @@ public class ServerRunContext extends RunContext {
   }
 
   @Override
-  public <THREAD_LOCAL> RunContext withThreadLocal(final ThreadLocal<THREAD_LOCAL> threadLocal, final THREAD_LOCAL value) {
+  public <THREAD_LOCAL> ServerRunContext withThreadLocal(final ThreadLocal<THREAD_LOCAL> threadLocal, final THREAD_LOCAL value) {
     super.withThreadLocal(threadLocal, value);
+    return this;
+  }
+
+  @Override
+  public ServerRunContext withDiagnostic(IDiagnosticContextValueProvider provider) {
+    super.withDiagnostic(provider);
+    return this;
+  }
+
+  @Override
+  public ServerRunContext withDiagnostics(Collection<? extends IDiagnosticContextValueProvider> diagnosticContextValueProviders) {
+    super.withDiagnostics(diagnosticContextValueProviders);
     return this;
   }
 

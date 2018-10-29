@@ -24,28 +24,50 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.CorrelationId;
-import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.context.RunContextProducer;
-import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
-import org.eclipse.scout.rt.server.commons.servlet.logging.ServletDiagnosticsProviderFactory;
+import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.ServerConfigProperties.ServerSessionCacheExpirationProperty;
+import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
+import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
 /**
  * Filter which creates a {@link ServerRunContext} using the current {@link Subject} and calls the next filter inside
- * it. This ensures a proper {@link RunContext} for the subsequent filters and servlet.
+ * it. This ensures a proper {@link ServerRunContext} for the subsequent filters and servlet.
+ * <p>
+ * <b>Important: </b>If no session is associated with the current subject yet, it is obtained by
+ * {@link ServerSessionProviderWithCache}. This means the session is cached by userId (see
+ * {@link IAccessControlService#getUserId(Subject)}) and only removed from the cache if the TTL expires (see
+ * {@link ServerSessionCacheExpirationProperty})! The {@link IServerSession} is not bound to the HTTP session and
+ * therefore survives the HTTP session timeouts!
  *
  * @since 6.1
  */
 public class ServerRunContextFilter implements Filter {
-  private RunContextProducer m_runContextProducer;
+
+  private ServerRunContextProducer m_sessionContextProducer;
+  private HttpServerRunContextProducer m_httpServerRunContextProducer;
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
-    m_runContextProducer = getRunContextProducer();
+    m_sessionContextProducer = createSessionRunContextProducer();
+    m_httpServerRunContextProducer = createHttpServerRunContextProducer();
   }
 
-  protected RunContextProducer getRunContextProducer() {
+  protected HttpServerRunContextProducer createHttpServerRunContextProducer() {
+    return BEANS.get(HttpServerRunContextProducer.class)
+        .withSessionSupport(false); // session is provided by #getSessionContextProducer()
+  }
+
+  protected HttpServerRunContextProducer getHttpServerRunContextProducer() {
+    return m_httpServerRunContextProducer;
+  }
+
+  protected ServerRunContextProducer createSessionRunContextProducer() {
+    // this producer uses ServerSessionProviderWithCache which is a TTL based cache. Not bound to the HTTP session!
     return BEANS.get(ServerRunContextProducer.class);
+  }
+
+  protected ServerRunContextProducer getSessionContextProducer() {
+    return m_sessionContextProducer;
   }
 
   @Override
@@ -55,21 +77,14 @@ public class ServerRunContextFilter implements Filter {
     lookupRunContext(req, resp).run(() -> chain.doFilter(request, response));
   }
 
+  protected ServerRunContext lookupRunContext(HttpServletRequest req, HttpServletResponse resp) {
+    final ServerRunContext sessionContext = getSessionContextProducer().produce(Subject.getSubject(AccessController.getContext()));
+    return getHttpServerRunContextProducer().produce(req, resp, null, sessionContext);
+  }
+
   @Override
   public void destroy() {
-    // NOP
+    m_sessionContextProducer = null;
+    m_httpServerRunContextProducer = null;
   }
-
-  public RunContext lookupRunContext(HttpServletRequest req, HttpServletResponse resp) {
-    final String cid = req.getHeader(CorrelationId.HTTP_HEADER_NAME);
-
-    return m_runContextProducer
-        .produce(Subject.getSubject(AccessController.getContext()))
-        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, req)
-        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, resp)
-        .withDiagnostics(BEANS.get(ServletDiagnosticsProviderFactory.class).getProviders(req, resp))
-        .withLocale(req.getLocale())
-        .withCorrelationId(cid != null ? cid : BEANS.get(CorrelationId.class).newCorrelationId());
-  }
-
 }

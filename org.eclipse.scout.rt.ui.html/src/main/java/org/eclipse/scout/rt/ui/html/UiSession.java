@@ -294,13 +294,7 @@ public class UiSession implements IUiSession {
 
   protected UserAgent createUserAgent(JsonStartupRequest jsonStartupReq) {
     HttpClientInfo httpClientInfo = HttpClientInfo.get(currentHttpRequest());
-    UserAgents userAgentBuilder = UserAgents
-        .create()
-        .withUiLayer(UiLayer.HTML)
-        .withUiDeviceType(UiDeviceType.DESKTOP)
-        .withUiEngineType(httpClientInfo.getEngineType())
-        .withUiSystem(httpClientInfo.getSystem())
-        .withDeviceId(httpClientInfo.getUserAgent());
+    UserAgents userAgentBuilder = httpClientInfo.toUserAgents();
 
     JSONObject userAgent = jsonStartupReq.getUserAgent();
     if (userAgent != null) {

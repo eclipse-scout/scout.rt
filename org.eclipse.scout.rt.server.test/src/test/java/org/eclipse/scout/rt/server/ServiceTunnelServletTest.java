@@ -45,17 +45,18 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.server.commons.cache.ICacheEntry;
-import org.eclipse.scout.rt.server.commons.cache.StickySessionCacheService;
+import org.eclipse.scout.rt.server.commons.context.HttpRunContextProducer;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.logging.ServletDiagnosticsProviderFactory;
+import org.eclipse.scout.rt.server.context.HttpServerRunContextProducer;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
+import org.eclipse.scout.rt.server.session.ServerSessionCache;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
@@ -78,7 +79,6 @@ public class ServiceTunnelServletTest {
 
   private List<IBean<?>> m_beans;
 
-  private ServiceTunnelServlet m_testServiceTunnelServlet;
   private HttpServletRequest m_requestMock;
   private HttpServletResponse m_responseMock;
   private HttpSession m_testHttpSession;
@@ -90,14 +90,10 @@ public class ServiceTunnelServletTest {
     m_serverSessionProviderSpy = spy(BEANS.get(ServerSessionProvider.class));
 
     m_beans = TestingUtility.registerBeans(
-        new BeanMetaData(StickySessionCacheService.class)
-            .withApplicationScoped(true),
         new BeanMetaData(ServerSessionProvider.class)
             .withInitialInstance(m_serverSessionProviderSpy)
             .withApplicationScoped(true));
 
-    m_testServiceTunnelServlet = new ServiceTunnelServlet();
-    m_testServiceTunnelServlet.lazyInit(null, null);
     m_requestMock = mock(HttpServletRequest.class);
     m_responseMock = mock(HttpServletResponse.class);
     m_testHttpSession = mock(HttpSession.class);
@@ -112,14 +108,10 @@ public class ServiceTunnelServletTest {
 
   @Test
   public void testNewSessionCreatedOnLookupHttpSession() throws ServletException {
-    createServletRunContext(m_requestMock, m_responseMock).run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        final ServerRunContext runcontext = ServerRunContexts.copyCurrent().withClientNodeId("testNodeId");
-        IServerSession session = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession("testid", runcontext);
-        assertNotNull(session);
-      }
+    createServletRunContext(m_requestMock, m_responseMock).run(() -> {
+      final ServerRunContext runcontext = ServerRunContexts.copyCurrent().withClientNodeId("testNodeId");
+      IServerSession session = BEANS.get(HttpServerRunContextProducer.class).getOrCreateScoutSession(m_requestMock, runcontext, "testid");
+      assertNotNull(session);
     });
   }
 
@@ -130,24 +122,18 @@ public class ServiceTunnelServletTest {
   public void testNoNewServerSessionOnLookup() throws ServletException {
     RunContexts
         .empty()
-        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, m_requestMock)
-        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, m_responseMock)
-        .run(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            IServerSession session1 = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession("id1", ServerRunContexts.empty());
-            IServerSession session2 = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession("id1", ServerRunContexts.empty());
-            assertNotNull(session1);
-            assertSame(session1, session2);
-          }
+        .run(() -> {
+          IServerSession session1 = BEANS.get(HttpServerRunContextProducer.class).getOrCreateScoutSession(m_requestMock, ServerRunContexts.empty(), "id1");
+          IServerSession session2 = BEANS.get(HttpServerRunContextProducer.class).getOrCreateScoutSession(m_requestMock, ServerRunContexts.empty(), "id1");
+          assertNotNull(session1);
+          assertSame(session1, session2);
         });
   }
 
   /**
-   * Calls {@link ServiceTunnelServlet#lookupServerSessionOnHttpSession(ServerRunContext) in 4 different threads within
-   * the same HTTP session. Test ensures that the same server session is returned in all threads and that
-   * {@link ServerSessionProvider#provide(ServerRunContext)}} is called only once.
+   * Calls {@link HttpRunContextProducer#getOrCreateScoutSession(HttpServletRequest, ServerRunContext, String) in 4
+   * different threads within the same HTTP session. Test ensures that the same server session is returned in all
+   * threads and that {@link ServerSessionProvider#provide(ServerRunContext)}} is called only once.
    */
   @Test
   public void testLookupScoutServerSessionOnHttpSessionMultipleThreads() throws ServletException {
@@ -162,17 +148,13 @@ public class ServiceTunnelServletTest {
     when(requestMock.getSession()).thenReturn(testHttpSession);
     when(requestMock.getSession(true)).thenReturn(testHttpSession);
 
-    ICacheEntry cacheEntryMock = mock(ICacheEntry.class);
-    when(cacheEntryMock.getValue()).thenReturn(testServerSession);
-    when(cacheEntryMock.isActive()).thenReturn(true);
+    doAnswer(putValueInCache(cache)).when(testHttpSession).setAttribute(ArgumentMatchers.eq(ServerSessionCache.SERVER_SESSION_KEY), ArgumentMatchers.any());
+    when(testHttpSession.getAttribute(ServerSessionCache.SERVER_SESSION_KEY)).thenAnswer(getCachedValue(cache));
 
-    doAnswer(putValueInCache(cache)).when(testHttpSession).setAttribute(ArgumentMatchers.eq(IServerSession.class.getName()), ArgumentMatchers.any());
-    when(testHttpSession.getAttribute(IServerSession.class.getName())).thenAnswer(getCachedValue(cache));
-
-    doAnswer(slowCreateTestsession(testServerSession)).when(m_serverSessionProviderSpy).provide(ArgumentMatchers.anyString(), ArgumentMatchers.any(ServerRunContext.class));
+    doAnswer(slowCreateTestsession(testServerSession)).when(m_serverSessionProviderSpy).opt(ArgumentMatchers.anyString(), ArgumentMatchers.any(ServerRunContext.class));
     List<HttpSessionLookupCallable> jobs = new ArrayList<>();
     for (int i = 0; i < 4; i++) {
-      jobs.add(new HttpSessionLookupCallable(m_testServiceTunnelServlet, requestMock, m_responseMock));
+      jobs.add(new HttpSessionLookupCallable(requestMock, m_responseMock));
     }
 
     List<IFuture<?>> futures = scheduleAndJoinJobs(jobs);
@@ -184,7 +166,7 @@ public class ServiceTunnelServletTest {
 
     assertEquals(CollectionUtility.hashSet(testServerSession), serverSessions);
 
-    verify(m_serverSessionProviderSpy, times(1)).provide(ArgumentMatchers.anyString(), ArgumentMatchers.any(ServerRunContext.class));
+    verify(m_serverSessionProviderSpy, times(1)).opt(ArgumentMatchers.anyString(), ArgumentMatchers.any(ServerRunContext.class));
   }
 
   @Test
@@ -193,6 +175,7 @@ public class ServiceTunnelServletTest {
     Class[] parameterTypes = new Class[]{String.class};
     Object[] args = new Object[]{"test"};
     ServiceTunnelRequest req = new ServiceTunnelRequest(IPingService.class.getName(), "ping", parameterTypes, args);
+    req.setUserAgent(UserAgents.createDefault().createIdentifier());
     ServiceTunnelResponse res = s.doPost(req);
     assertEquals("test", res.getData());
     assertNull(res.getException());
@@ -249,25 +232,18 @@ public class ServiceTunnelServletTest {
   }
 
   private static class HttpSessionLookupCallable implements Callable<IServerSession> {
-    private final ServiceTunnelServlet m_serviceTunnelServlet;
     private final HttpServletRequest m_request;
     private final HttpServletResponse m_response;
 
-    public HttpSessionLookupCallable(ServiceTunnelServlet serviceTunnelServlet, HttpServletRequest request, HttpServletResponse response) {
-      m_serviceTunnelServlet = serviceTunnelServlet;
+    public HttpSessionLookupCallable(HttpServletRequest request, HttpServletResponse response) {
       m_request = request;
       m_response = response;
     }
 
     @Override
     public IServerSession call() throws Exception {
-      return createServletRunContext(m_request, m_response).call(new Callable<IServerSession>() {
-
-        @Override
-        public IServerSession call() throws Exception {
-          return m_serviceTunnelServlet.lookupServerSessionOnHttpSession("testSessionId", ServerRunContexts.empty().withClientNodeId("testNodeId"));
-        }
-      });
+      return createServletRunContext(m_request, m_response).call(() -> BEANS.get(HttpServerRunContextProducer.class)
+          .getOrCreateScoutSession(m_request, ServerRunContexts.empty().withClientNodeId("testNodeId"), "testSessionId"));
     }
   }
 

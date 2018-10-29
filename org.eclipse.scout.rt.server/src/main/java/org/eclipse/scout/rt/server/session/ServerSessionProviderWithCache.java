@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.session;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+
 import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
@@ -103,6 +105,27 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
     return serverSession;
   }
 
+  /**
+   * Removes all entries with the specified {@link IServerSession} from this cache instance.
+   *
+   * @param session
+   *          The server session to remove. Must not be {@code null}.
+   */
+  public void remove(IServerSession session) {
+    remove(assertNotNull(session).getId());
+  }
+
+  /**
+   * Removes all entries with the specified {@link IServerSession} from this cache instance.
+   * 
+   * @param sessionId
+   *          The id of the server session to remove. Must not be {@code null}.
+   */
+  public void remove(String sessionId) {
+    assertNotNull(sessionId);
+    m_cache.values().removeIf(sess -> sess.getId().equals(sessionId));
+  }
+
   protected ConcurrentExpiringMap<CompositeObject, IServerSession> createSessionCache(final long ttl) {
     return new ConcurrentExpiringMap<>(ttl, TimeUnit.MILLISECONDS, 1_000);
   }
@@ -111,11 +134,9 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
     if (sessionId != null) {
       return new CompositeObject(sessionId);
     }
-    else if (subject != null) {
+    if (subject != null) {
       return new CompositeObject(BEANS.get(IAccessControlService.class).getUserId(subject));
     }
-    else {
-      return null;
-    }
+    return null;
   }
 }

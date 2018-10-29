@@ -21,6 +21,8 @@ import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
 import javax.servlet.http.HttpSessionContext;
 
+import org.eclipse.scout.rt.platform.util.StringUtility;
+
 /**
  * Test session recording attributes
  */
@@ -28,6 +30,20 @@ import javax.servlet.http.HttpSessionContext;
 public class TestHttpSession implements HttpSession {
 
   private final Map<String, Object> m_sessionAttributes = new HashMap<>();
+  private final String m_id;
+
+  public TestHttpSession() {
+    this(null);
+  }
+
+  public TestHttpSession(String id) {
+    if (!StringUtility.hasText(id)) {
+      m_id = TestHttpSession.class.getName();
+    }
+    else {
+      m_id = id;
+    }
+  }
 
   @Override
   public long getCreationTime() {
@@ -36,7 +52,7 @@ public class TestHttpSession implements HttpSession {
 
   @Override
   public String getId() {
-    return TestHttpSession.class.getName();
+    return m_id;
   }
 
   @Override

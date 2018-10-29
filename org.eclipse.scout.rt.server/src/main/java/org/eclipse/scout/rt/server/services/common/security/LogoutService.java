@@ -10,14 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.security;
 
-import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
@@ -29,24 +25,22 @@ public class LogoutService implements ILogoutService {
 
   @Override
   public void logout() {
-    try {
-      BEANS.get(IAccessControlService.class).clearCacheOfCurrentUser();
+    BEANS.get(IAccessControlService.class).clearCacheOfCurrentUser();
 
-      HttpServletRequest httpRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
-      HttpServletResponse httpResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
-
-      BEANS.get(IHttpSessionCacheService.class).remove(IServerSession.class.getName(), httpRequest, httpResponse);
-      BEANS.get(IHttpSessionCacheService.class).remove(Subject.class.getName(), httpRequest, httpResponse);
-      HttpSession session = httpRequest.getSession(false);
-      if (session != null) {
-        session.invalidate();
+    HttpServletRequest httpRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
+    if (httpRequest != null) {
+      try {
+        HttpSession session = httpRequest.getSession(false);
+        if (session != null) {
+          session.invalidate();
+        }
       }
-    }
-    catch (IllegalStateException e) { // NOSONAR
-      //already invalid
-    }
-    catch (Exception e) {
-      LOG.warn("Failed to invalidate HTTP session.", e);
+      catch (IllegalStateException e) {
+        LOG.debug("Tried to invalidate an already invalidated session.", e);
+      }
+      catch (Exception e) {
+        LOG.warn("Failed to invalidate HTTP session.", e);
+      }
     }
   }
 }

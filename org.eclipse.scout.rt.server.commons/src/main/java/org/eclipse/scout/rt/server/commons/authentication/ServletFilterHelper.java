@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 public class ServletFilterHelper {
   private static final Logger LOG = LoggerFactory.getLogger(ServletFilterHelper.class);
 
-  public static final String SESSION_ATTRIBUTE_FOR_PRINCIPAL = Principal.class.getName();
+  public static final String SESSION_ATTRIBUTE_FOR_PRINCIPAL = ServletFilterHelper.class.getName() + ".PRINCIPAL";
   public static final String HTTP_HEADER_WWW_AUTHENTICATE = "WWW-Authenticate";
   public static final String HTTP_HEADER_AUTHORIZATION = "Authorization";
   public static final String HTTP_HEADER_AUTHORIZED = "Authorized";

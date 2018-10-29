@@ -74,12 +74,6 @@ public interface IClientSession extends ISession, IPropertyObserver {
 
   void stop(int exitCode);
 
-  /**
-   * @return <code>true</code> if session shutdown is in progress (i.g. {@link #stop()} was called). While shutting
-   *         down, the session is still considered "active".
-   */
-  boolean isStopping();
-
   int getExitCode();
 
   /**

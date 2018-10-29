@@ -19,14 +19,21 @@ import org.eclipse.scout.rt.platform.context.RunContextProducer;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.ServerConfigProperties.ServerSessionCacheExpirationProperty;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
+import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
 /**
- * Producer for {@link ServerRunContext} objects.
+ * Producer for {@link ServerRunContext} objects having a userId based {@link IServerSession} cache that is <i>NOT</i>
+ * bound to the HTTP session.
  * <p>
  * The default implementation creates a copy of the current calling {@link ServerRunContext} with transaction scope
- * {@link TransactionScope#REQUIRES_NEW}. If no session is associated yet, it is obtained by
- * {@link ServerSessionProviderWithCache}.
+ * {@link TransactionScope#REQUIRES_NEW}.
+ * <p>
+ * <b>Important: </b>If no session is associated yet, it is obtained by {@link ServerSessionProviderWithCache}. This
+ * means the session is cached by userId (see {@link IAccessControlService#getUserId(Subject)}) and only removed from
+ * the cache if the TTL expires (see {@link ServerSessionCacheExpirationProperty})! The {@link IServerSession} is not
+ * bound to the HTTP session and therefore survives the HTTP session timeouts!
  *
  * @since 5.1
  */

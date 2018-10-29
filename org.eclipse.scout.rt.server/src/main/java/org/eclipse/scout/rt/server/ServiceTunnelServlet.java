@@ -14,25 +14,20 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.SocketException;
 import java.security.AccessController;
-import java.util.Locale;
 
 import javax.security.auth.Subject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.CorrelationId;
-import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
-import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.concurrent.AbstractInterruptionError;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
-import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
-import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.idempotent.DuplicateRequestException;
 import org.eclipse.scout.rt.server.commons.idempotent.SequenceNumberDuplicateDetector;
 import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
@@ -40,18 +35,14 @@ import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.ServletExceptionTranslator;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
-import org.eclipse.scout.rt.server.commons.servlet.logging.ServletDiagnosticsProviderFactory;
+import org.eclipse.scout.rt.server.context.HttpServerRunContextProducer;
 import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry;
 import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry.IRegistrationHandle;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.session.IServerSessionLifecycleHandler;
-import org.eclipse.scout.rt.server.session.ServerSessionCache;
-import org.eclipse.scout.rt.server.session.ServerSessionLifecycleHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
-import org.eclipse.scout.rt.shared.session.Sessions;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,18 +60,11 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
   private static final Logger LOG = LoggerFactory.getLogger(ServiceTunnelServlet.class);
 
   private transient IServiceTunnelContentHandler m_contentHandler;
-
-  protected RunContext createServletRunContext(final HttpServletRequest req, final HttpServletResponse resp) {
-    final String cid = req.getHeader(CorrelationId.HTTP_HEADER_NAME);
-
-    return RunContexts.copyCurrent(true)
-        .withSubject(Subject.getSubject(AccessController.getContext()))
-        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, req)
-        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, resp)
-        .withDiagnostics(BEANS.get(ServletDiagnosticsProviderFactory.class).getProviders(req, resp))
-        .withLocale(Locale.getDefault())
-        .withCorrelationId(cid != null ? cid : BEANS.get(CorrelationId.class).newCorrelationId());
-  }
+  private transient LazyValue<HttpServerRunContextProducer> m_serverRunContextProducer = new LazyValue<>(HttpServerRunContextProducer.class);
+  private transient LazyValue<HttpServletControl> m_httpServletControl = new LazyValue<>(HttpServletControl.class);
+  private transient LazyValue<HttpCacheControl> m_httpCacheControl = new LazyValue<>(HttpCacheControl.class);
+  private transient LazyValue<ServiceOperationInvoker> m_svcInvoker = new LazyValue<>(ServiceOperationInvoker.class);
+  private transient LazyValue<RunMonitorCancelRegistry> m_runMonCancelRegistry = new LazyValue<>(RunMonitorCancelRegistry.class);
 
   // === HTTP-GET ===
 
@@ -93,17 +77,39 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
 
     lazyInit(servletRequest, servletResponse);
 
-    createServletRunContext(servletRequest, servletResponse).run(() -> {
-      ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
-      serverRunContext.withUserAgent(UserAgents.createDefault());
-      serverRunContext.withSession(lookupServerSessionOnHttpSession(Sessions.randomSessionId(), serverRunContext));
-      invokeAdminService(serverRunContext);
-    }, ServletExceptionTranslator.class);
+    BEANS.get(HttpServerRunContextProducer.class)
+        .withSessionSupport(false)
+        .produce(servletRequest, servletResponse)
+        .run(() -> invokeAdminService(ServerRunContexts.copyCurrent()), ServletExceptionTranslator.class);
+  }
+
+  /**
+   * Method invoked to delegate the HTTP request to the 'admin service'.
+   */
+  @SuppressWarnings("squid:S00112")
+  protected void invokeAdminService(final ServerRunContext serverRunContext) throws Exception {
+    serverRunContext.run(() -> {
+      final HttpServletRequest servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
+      final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
+
+      m_httpServletControl.get().doDefaults(ServiceTunnelServlet.this, servletRequest, servletResponse);
+
+      getAdminSession(servletRequest).serviceRequest(servletRequest, servletResponse);
+    }, DefaultExceptionTranslator.class);
+  }
+
+  protected AdminSession getAdminSession(HttpServletRequest servletRequest) {
+    HttpSession httpSession = servletRequest.getSession();
+    AdminSession adminSession = (AdminSession) httpSession.getAttribute(ADMIN_SESSION_KEY);
+    if (adminSession == null) {
+      adminSession = new AdminSession();
+      httpSession.setAttribute(ADMIN_SESSION_KEY, adminSession);
+    }
+    return adminSession;
   }
 
   // === HTTP-POST ===
 
-  @SuppressWarnings("deprecation")
   @Override
   protected void doPost(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws ServletException, IOException {
     if (Subject.getSubject(AccessController.getContext()) == null) {
@@ -114,20 +120,23 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
     lazyInit(servletRequest, servletResponse);
 
     try {
-      createServletRunContext(servletRequest, servletResponse).run(() -> {
-        ServiceTunnelRequest serviceRequest = deserializeServiceRequest();
-        ServiceTunnelResponse serviceResponse = doPost(serviceRequest);
+      m_serverRunContextProducer.get()
+          .getInnerRunContextProducer()
+          .produce(servletRequest, servletResponse)
+          .run(() -> {
+            ServiceTunnelRequest serviceRequest = deserializeServiceRequest();
+            ServiceTunnelResponse serviceResponse = doPost(serviceRequest);
 
-        // Clear the current thread's interruption status before writing the response to the output stream.
-        // Otherwise, the stream gets silently corrupted, which triggers  a repetition of the current request by Java connection mechanism.
-        IRestorer interruption = ThreadInterruption.clear();
-        try {
-          serializeServiceResponse(serviceResponse);
-        }
-        finally {
-          interruption.restore();
-        }
-      }, DefaultExceptionTranslator.class);
+            // Clear the current thread's interruption status before writing the response to the output stream.
+            // Otherwise, the stream gets silently corrupted, which triggers  a repetition of the current request by Java connection mechanism.
+            IRestorer interruption = ThreadInterruption.clear();
+            try {
+              serializeServiceResponse(serviceResponse);
+            }
+            finally {
+              interruption.restore();
+            }
+          }, DefaultExceptionTranslator.class);
     }
     catch (DuplicateRequestException e) {
       LOG.warn("Duplicate Request", e);
@@ -140,7 +149,7 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
       }
       else if (isInterruption(e)) {
         LOG.info("Interruption", e);
-        servletResponse.setStatus(HttpServletResponse.SC_ACCEPTED, "Request processing was interrupted");
+        servletResponse.sendError(HttpServletResponse.SC_ACCEPTED, "Request processing was interrupted");
       }
       else {
         LOG.error("Client={}@{}/{}", servletRequest.getRemoteUser(), servletRequest.getRemoteAddr(), servletRequest.getRemoteHost(), e);
@@ -150,29 +159,12 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
   }
 
   protected ServiceTunnelResponse doPost(ServiceTunnelRequest serviceRequest) {
-    ClientNotificationCollector collector = new ClientNotificationCollector();
-    ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
-        .withLocale(serviceRequest.getLocale())
-        .withUserAgent(UserAgents.createByIdentifier(serviceRequest.getUserAgent()))
-        .withClientNotificationCollector(collector)
-        .withClientNodeId(serviceRequest.getClientNodeId());
-
-    IServerSession session;
-    if (serviceRequest.getSessionId() != null) {
-      session = lookupServerSessionOnHttpSession(serviceRequest.getSessionId(), serverRunContext);
-      SequenceNumberDuplicateDetector duplicateRequestDetector = (SequenceNumberDuplicateDetector) session
-          .computeDataIfAbsent(DUPLICATE_REQUEST_DETECTOR_SESSION_KEY, () -> new SequenceNumberDuplicateDetector());
-      if (!duplicateRequestDetector.accept(serviceRequest.getRequestSequence())) {
-        throw DuplicateRequestException.create(serviceRequest.getSessionId(), serviceRequest.getRequestSequence());
-      }
-      serverRunContext.withSession(session);
-    }
-
+    final ServerRunContext serverRunContext = createServiceTunnelRunContext(serviceRequest);
     final IRegistrationHandle registrationHandle = registerForCancellation(serverRunContext, serviceRequest);
     try {
       ServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
       // include client notifications in response (piggyback)
-      serviceResponse.setNotifications(collector.consume());
+      serviceResponse.setNotifications(serverRunContext.getClientNotificationCollector().consume());
       return serviceResponse;
     }
     finally {
@@ -180,38 +172,40 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
     }
   }
 
+  protected ServerRunContext createServiceTunnelRunContext(ServiceTunnelRequest serviceRequest) {
+    // overwrite default settings from HTTP request with values from ServiceTunnelRequest
+    final ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
+        .withLocale(serviceRequest.getLocale())
+        .withUserAgent(UserAgents.createByIdentifier(serviceRequest.getUserAgent()))
+        .withClientNodeId(serviceRequest.getClientNodeId());
+
+    if (serviceRequest.getSessionId() != null) {
+      final HttpServletRequest req = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
+      final IServerSession session = m_serverRunContextProducer.get().getOrCreateScoutSession(req, serverRunContext, serviceRequest.getSessionId());
+      serverRunContext.withSession(session);
+
+      // duplicate detection
+      SequenceNumberDuplicateDetector duplicateRequestDetector = (SequenceNumberDuplicateDetector) session
+          .computeDataIfAbsent(DUPLICATE_REQUEST_DETECTOR_SESSION_KEY, SequenceNumberDuplicateDetector::new);
+      if (!duplicateRequestDetector.accept(serviceRequest.getRequestSequence())) {
+        throw DuplicateRequestException.create(serviceRequest.getSessionId(), serviceRequest.getRequestSequence());
+      }
+    }
+    return serverRunContext;
+  }
+
   protected IRegistrationHandle registerForCancellation(ServerRunContext runContext, ServiceTunnelRequest req) {
     String sessionId = runContext.getSession() != null ? runContext.getSession().getId() : null;
-    return BEANS.get(RunMonitorCancelRegistry.class).register(runContext.getRunMonitor(), sessionId, req.getRequestSequence());
+    return m_runMonCancelRegistry.get().register(runContext.getRunMonitor(), sessionId, req.getRequestSequence());
   }
 
   // === SERVICE INVOCATION ===
 
   /**
-   * Method invoked to delegate the HTTP request to the 'admin service'.
-   */
-  @SuppressWarnings("squid:S00112")
-  protected void invokeAdminService(final ServerRunContext serverRunContext) throws Exception {
-    serverRunContext.run(() -> {
-      final HttpServletRequest servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
-      final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
-
-      BEANS.get(HttpServletControl.class).doDefaults(ServiceTunnelServlet.this, servletRequest, servletResponse);
-
-      AdminSession adminSession = (AdminSession) BEANS.get(IHttpSessionCacheService.class).getAndTouch(ADMIN_SESSION_KEY, servletRequest, servletResponse);
-      if (adminSession == null) {
-        adminSession = new AdminSession();
-        BEANS.get(IHttpSessionCacheService.class).put(ADMIN_SESSION_KEY, adminSession, servletRequest, servletResponse);
-      }
-      adminSession.serviceRequest(servletRequest, servletResponse);
-    }, DefaultExceptionTranslator.class);
-  }
-
-  /**
    * Method invoked to delegate the HTTP request to the 'process service'.
    */
   protected ServiceTunnelResponse invokeService(final ServerRunContext serverRunContext, final ServiceTunnelRequest serviceTunnelRequest) {
-    return BEANS.get(ServiceOperationInvoker.class).invoke(serverRunContext, serviceTunnelRequest);
+    return m_svcInvoker.get().invoke(serverRunContext, serviceTunnelRequest);
   }
 
   // === MESSAGE UNMARSHALLING / MARSHALLING ===
@@ -230,9 +224,9 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
     HttpServletRequest req = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
     HttpServletResponse resp = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
 
-    BEANS.get(HttpServletControl.class).doDefaults(this, req, resp);
+    m_httpServletControl.get().doDefaults(this, req, resp);
 
-    BEANS.get(HttpCacheControl.class).checkAndSetCacheHeaders(req, resp, null);
+    m_httpCacheControl.get().checkAndSetCacheHeaders(req, resp, null);
     resp.setContentType(m_contentHandler.getContentType());
     m_contentHandler.writeResponse(resp.getOutputStream(), serviceResponse);
   }
@@ -244,6 +238,9 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
    * for serialization/deserialization.
    */
   protected void lazyInit(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+    if (m_contentHandler != null) {
+      return;
+    }
     m_contentHandler = createContentHandler();
   }
 
@@ -258,33 +255,16 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
     return e;
   }
 
-  // === SESSION LOOKUP ===
-
-  protected IServerSession lookupServerSessionOnHttpSession(final String sessionId, final ServerRunContext serverRunContext) {
-    //create, only, if no serverSession available for sessionId
-    Assertions.assertNotNull(sessionId, "sessionId must not be null");
-    Assertions.assertNotNull(serverRunContext, "serverRunContext must not be null");
-    final HttpServletRequest req = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
-    final String clientNodeId = serverRunContext.getClientNodeId();
-
-    //create and register new session
-    IServerSessionLifecycleHandler lifecycleHandler = new ServerSessionLifecycleHandler(sessionId, clientNodeId, serverRunContext);
-
-    return BEANS.get(ServerSessionCache.class).getOrCreate(lifecycleHandler, req.getSession());
-  }
-
-  // === Helper methods ===
-
   protected boolean isConnectionError(Throwable e) {
     Throwable cause = e;
     while (cause != null) {
       if (cause instanceof SocketException) {
         return true;
       }
-      else if ("EofException".equalsIgnoreCase(cause.getClass().getSimpleName())) {
+      if ("EofException".equalsIgnoreCase(cause.getClass().getSimpleName())) {
         return true;
       }
-      else if (cause instanceof InterruptedIOException) {
+      if (cause instanceof InterruptedIOException) {
         return true;
       }
       // next

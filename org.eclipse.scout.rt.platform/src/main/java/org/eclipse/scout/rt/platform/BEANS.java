@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -57,6 +58,20 @@ public final class BEANS {
       return bean.getInstance();
     }
     return null;
+  }
+
+  /**
+   * Gets the single instance of the given bean class with respect to {@link Order} and {@link Replace}.<br>
+   * See {@link IBeanManager#getBean(Class)} for details.
+   *
+   * @param beanClass
+   *          The query {@link Class}.
+   * @return An {@link Optional} holding the bean instance or an empty {@link Optional} if no instance could be found.
+   * @throws AssertionException
+   *           if multiple instances are registered
+   */
+  public static <T> Optional<T> optional(Class<T> beanClass) {
+    return Optional.ofNullable(opt(beanClass));
   }
 
   /**

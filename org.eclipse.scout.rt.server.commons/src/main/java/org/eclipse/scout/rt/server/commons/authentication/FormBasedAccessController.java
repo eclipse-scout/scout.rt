@@ -87,6 +87,7 @@ public class FormBasedAccessController implements IAccessController {
    * @return <code>true</code> if the request was handled (caller should exit chain), or <code>false</code> if nothing
    *         was done (caller should continue by invoking subsequent authenticators).
    */
+  @SuppressWarnings("squid:RedundantThrowsDeclarationCheck") // required so that overriding subclasses can throw ServletExceptions
   protected boolean handleAuthRequest(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
     // Never cache authentication requests.
     response.setHeader("Cache-Control", "private, no-store, no-cache, max-age=0"); // HTTP 1.1

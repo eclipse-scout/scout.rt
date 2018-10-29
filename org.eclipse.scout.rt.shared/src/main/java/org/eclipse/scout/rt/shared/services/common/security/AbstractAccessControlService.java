@@ -204,9 +204,7 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
       // only an active session has a valid userId
       return session.getUserId();
     }
-    else {
-      return getUserIdOfCurrentSubject();
-    }
+    return getUserIdOfCurrentSubject();
   }
 
   @Override
@@ -284,8 +282,13 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
   }
 
   protected void clearCache(Collection<? extends K> cacheKeys) {
-    if (cacheKeys != null && !cacheKeys.isEmpty()) {
-      getCache().invalidate(new KeyCacheEntryFilter<>(cacheKeys), true);
+    if (cacheKeys == null) {
+      return;
     }
+    KeyCacheEntryFilter<K, PermissionCollection> filter = new KeyCacheEntryFilter<>(cacheKeys);
+    if (filter.getKeys().isEmpty()) {
+      return;
+    }
+    getCache().invalidate(filter, true);
   }
 }

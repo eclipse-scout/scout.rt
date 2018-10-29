@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertFalse;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +23,6 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
@@ -30,6 +32,7 @@ import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
 import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry;
 import org.eclipse.scout.rt.server.extension.IServerSessionExtension;
 import org.eclipse.scout.rt.server.extension.ServerSessionChains.ServerSessionLoadSessionChain;
+import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -38,6 +41,7 @@ import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
 import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
 import org.eclipse.scout.rt.shared.session.SessionData;
@@ -54,8 +58,9 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   private final transient FastListenerList<ISessionListener> m_eventListeners;
 
   private String m_id;
-  private boolean m_initialized;
-  private boolean m_active;
+  private volatile boolean m_initialized;
+  private volatile boolean m_active;
+  private volatile boolean m_stopping;
   private final SessionData m_sessionData;
   private final SharedVariableMap m_sharedVariableMap;
   private final ObjectExtensions<AbstractServerSession, IServerSessionExtension<? extends AbstractServerSession>> m_objectExtensions;
@@ -105,6 +110,11 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   }
 
   @Override
+  public boolean isStopping() {
+    return m_stopping;
+  }
+
+  @Override
   public final String getUserId() {
     return getSharedContextVariable("userId", String.class);
   }
@@ -133,6 +143,10 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   }
 
   protected void initConfig() {
+    if (m_initialized) {
+      return;
+    }
+
     m_sharedVariableMap.addPropertyChangeListener(e -> {
       if (IClientNodeId.CURRENT.get() != null) {
         String sessionId = getId();
@@ -145,9 +159,6 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
         }
       }
     });
-    if (m_initialized) {
-      return;
-    }
     m_initialized = true;
   }
 
@@ -167,9 +178,10 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
 
   @Override
   public final void start(String sessionId) {
-    Assertions.assertNotNull(sessionId, "Session id must not be null");
-    m_id = sessionId;
-    Assertions.assertFalse(isActive(), "Session already started");
+    assertFalse(isActive(), "Session already started");
+    assertFalse(isStopping(), "Session cannot be started because it is currently stopping.");
+    m_id = assertNotNull(sessionId, "Session id must not be null");
+
     assignUserId();
     interceptLoadSession();
 
@@ -223,11 +235,25 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
 
   @Override
   public void stop() {
-    fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STOPPING));
+    if (isStopping() || !isActive()) {
+      return; // already stopping or stopped
+    }
 
-    m_active = false;
-    fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STOPPED));
+    try {
+      m_stopping = true;
+      fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STOPPING));
 
+      // remove from cache so that no stopped sessions remain in the cache even if the TTL is not expired
+      BEANS.get(ServerSessionProviderWithCache.class).remove(this);
+
+      cancelRunningJobs();
+    }
+    finally {
+      inactivateSession();
+    }
+  }
+
+  protected void cancelRunningJobs() {
     // Cancel globally registered RunMonitors of this session.
     BEANS.get(RunMonitorCancelRegistry.class).cancelAllBySessionId(getId());
 
@@ -236,8 +262,20 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
         .andMatch(new SessionFutureFilter(this))
         .andMatchNotFuture(IFuture.CURRENT.get())
         .toFilter(), true);
+  }
 
-    LOG.info("Server session stopped [session={}, user={}]", this, getUserId());
+  protected void inactivateSession() {
+    try {
+      BEANS
+          .optional(ILogoutService.class)
+          .ifPresent(ILogoutService::logout);
+    }
+    finally {
+      m_active = false;
+      m_stopping = false;
+      fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STOPPED));
+      LOG.info("Server session stopped [session={}, user={}]", this, getUserId());
+    }
   }
 
   @Override

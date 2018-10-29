@@ -49,6 +49,12 @@ public interface ISession {
    */
   boolean isActive();
 
+  /**
+   * @return <code>true</code> if session shutdown is in progress (i.g. {@link #stop()} was called). While shutting
+   *         down, the session is still considered "active".
+   */
+  boolean isStopping();
+
   Object getData(String key);
 
   void setData(String key, Object value);

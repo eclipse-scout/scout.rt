@@ -42,7 +42,7 @@ public class SessionInspector {
 
     HttpServletRequest httpReq = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
     if (httpReq != null) {
-      HttpSession httpSession = httpReq.getSession();
+      HttpSession httpSession = httpReq.getSession(false);
       if (httpSession != null) {
         m_info.setCreationTime(httpSession.getCreationTime());
         m_info.setLastAccessedTime(httpSession.getLastAccessedTime());

@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.session;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 
 /**
  * Cache Entry for {@link IServerSession} and meta data: HttpSessions using this {@link IServerSession} and lifecycle
@@ -21,38 +23,61 @@ import org.eclipse.scout.rt.server.IServerSession;
  */
 public class ServerSessionEntry {
 
-  private final List<String> m_httpSessionList = new ArrayList<>(1);
+  // must be a set. in case multiple parallel requests from the same client arrive at the same time. then the same HTTP session id may be added several times. But it is only removed once, when the session is invalidated by the container.
+  private final Set<String> m_httpSessionList = new HashSet<>(1);
   private final IServerSessionLifecycleHandler m_sessionLifecycleHandler;
+  private final FinalValue<IServerSession> m_serverSession;
 
-  private IServerSession m_serverSession;
-
-  public ServerSessionEntry(IServerSessionLifecycleHandler sessionLifecycleHandler) {
+  protected ServerSessionEntry(IServerSessionLifecycleHandler sessionLifecycleHandler) {
+    m_serverSession = new FinalValue<>();
     m_sessionLifecycleHandler = sessionLifecycleHandler;
   }
 
-  public IServerSession getOrCreateScoutSession() {
-    if (m_serverSession == null) {
-      m_serverSession = m_sessionLifecycleHandler.create();
-    }
-    return m_serverSession;
+  protected IServerSession getOrCreateScoutSession() {
+    return m_serverSession.setIfAbsentAndGet(m_sessionLifecycleHandler::create);
   }
 
-  public void addHttpSessionId(String httpSessionId) {
+  /**
+   * @return The {@link IServerSession} of this entry or {@code null} if no session has been created yet.
+   */
+  public IServerSession getScoutSession() {
+    return m_serverSession.get();
+  }
+
+  protected IServerSessionLifecycleHandler getServerSessionLifecycleHandler() {
+    return m_sessionLifecycleHandler;
+  }
+
+  protected void addHttpSessionId(String httpSessionId) {
     m_httpSessionList.add(httpSessionId);
   }
 
-  public void removeHttpSession(String httpSessionId) {
+  protected void removeHttpSessionId(String httpSessionId) {
     m_httpSessionList.remove(httpSessionId);
   }
 
-  public boolean hasNoMoreHttpSessions() {
-    return m_httpSessionList.isEmpty();
+  /**
+   * @return the number of HTTP sessions that use the {@link IServerSession} of this entry.
+   */
+  public int httpSessionCount() {
+    return m_httpSessionList.size();
   }
 
-  public void destroy() {
-    if (m_serverSession != null) {
-      m_sessionLifecycleHandler.destroy(m_serverSession);
+  protected void destroy() {
+    IServerSession session = getScoutSession();
+    if (session == null) {
+      return;
+    }
+
+    if (ServerSessionProvider.currentSession() == session) {
+      m_sessionLifecycleHandler.destroy(session);
+    }
+    else {
+      // in case the destroy is called by the servlet container when invalidating the HTTP session: ensure the session is on the context
+      ServerRunContexts
+          .copyCurrent(true)
+          .withSession(session)
+          .run(() -> m_sessionLifecycleHandler.destroy(session));
     }
   }
-
 }

@@ -10,11 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.session;
 
-import java.util.UUID;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -48,14 +49,31 @@ public class ServerSessionProvider {
    * Creates and initializes a new {@link IServerSession} with data as specified by the given {@link ServerRunContext}.
    *
    * @param sessionId
-   *          unique session ID, or <code>null</code> to use a random {@link UUID}.
+   *          unique session ID, or <code>null</code> to use a random id (see {@link Sessions#randomSessionId()}).
    * @param serverRunContext
    *          applied during session start.
    * @return the new session, is not <code>null</code>.
    * @throws RuntimeException
    *           if session creation failed.
+   * @throws AssertionException
+   *           if no server session class could be found on the class-path.
    */
   public <SESSION extends IServerSession> SESSION provide(final String sessionId, final ServerRunContext serverRunContext) {
+    return assertNotNull(opt(sessionId, serverRunContext), "No session class implementing {} could be found on the classpath.", IServerSession.class.getName());
+  }
+
+  /**
+   * Creates and initializes a new {@link IServerSession} with data as specified by the given {@link ServerRunContext}.
+   *
+   * @param sessionId
+   *          unique session ID, or <code>null</code> to use a random id (see {@link Sessions#randomSessionId()}).
+   * @param serverRunContext
+   *          applied during session start.
+   * @return the new session or {@code null} if no session class could be found.
+   * @throws RuntimeException
+   *           if session creation failed.
+   */
+  public <SESSION extends IServerSession> SESSION opt(final String sessionId, final ServerRunContext serverRunContext) {
     final String sid = sessionId != null ? sessionId : Sessions.randomSessionId();
 
     // Create the session with the given context applied.
@@ -65,7 +83,10 @@ public class ServerSessionProvider {
         .call(() -> {
           // 1. Create an empty session instance.
           @SuppressWarnings("unchecked")
-          final SESSION session = (SESSION) BEANS.get(IServerSession.class);
+          final SESSION session = (SESSION) BEANS.opt(IServerSession.class);
+          if (session == null) {
+            return null;
+          }
 
           // 2. Start the session.
           return ServerRunContexts.copyCurrent()

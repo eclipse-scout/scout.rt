@@ -23,8 +23,11 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiEngineType;
+import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UiSystem;
+import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,7 +129,7 @@ public class HttpClientInfo {
     }
   }
 
-  protected static final String HTTP_CLIENT_INFO_ATTRIBUTE_NAME = "scout.htmlui.httpsession.httpclientinfo";
+  protected static final String HTTP_CLIENT_INFO_ATTRIBUTE_NAME = HttpClientInfo.class.getName();
 
   private final FinalValue<String> m_userAgent = new FinalValue<>();
 
@@ -490,6 +493,31 @@ public class HttpClientInfo {
     sb.append(" / EngineVersion: ").append(getEngineVersion());
     sb.append(" / UserAgent: ").append(m_userAgent.get());
     return sb.toString();
+  }
+
+  public UserAgents toUserAgents() {
+    return UserAgents
+        .create()
+        .withUiLayer(UiLayer.HTML)
+        .withUiDeviceType(getDeviceType())
+        .withUiEngineType(getEngineType())
+        .withUiSystem(getSystem())
+        .withStandalone(isStandalone())
+        .withTouch(isMobile() || isTablet())
+        .withDeviceId(getUserAgent());
+  }
+
+  protected UiDeviceType getDeviceType() {
+    if (isMobile()) {
+      return UiDeviceType.MOBILE;
+    }
+    if (isTablet()) {
+      return UiDeviceType.TABLET;
+    }
+    if (isDesktop()) {
+      return UiDeviceType.DESKTOP;
+    }
+    return UiDeviceType.UNKNOWN;
   }
 
   /**

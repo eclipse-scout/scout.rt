@@ -21,17 +21,15 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.server.ServiceTunnelServlet;
-import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.ServletExceptionTranslator;
+import org.eclipse.scout.rt.server.context.HttpServerRunContextProducer;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.shared.session.Sessions;
-import org.eclipse.scout.rt.shared.ui.UserAgents;
 
 public class DiagnosticServlet extends ServiceTunnelServlet {
+
   private static final long serialVersionUID = 1L;
-  private static final String DIAGNOSTIC_SESSION_KEY = DiagnosticSession.class.getName();
 
   @Override
   protected void doPost(final HttpServletRequest req, final HttpServletResponse res) throws ServletException, IOException {
@@ -47,13 +45,10 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
 
     lazyInit(servletRequest, servletResponse);
 
-    createServletRunContext(servletRequest, servletResponse).run(() -> {
-      ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
-      serverRunContext.withUserAgent(UserAgents.createDefault());
-      serverRunContext.withSession(lookupServerSessionOnHttpSession(Sessions.randomSessionId(), serverRunContext.copy()));
-
-      invokeDiagnosticService(serverRunContext);
-    }, ServletExceptionTranslator.class);
+    BEANS.get(HttpServerRunContextProducer.class)
+        .withSessionSupport(false)
+        .produce(servletRequest, servletResponse)
+        .run(() -> invokeDiagnosticService(ServerRunContexts.copyCurrent()), ServletExceptionTranslator.class);
   }
 
   /**
@@ -65,12 +60,7 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
       final HttpServletRequest servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
       final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
 
-      DiagnosticSession diagnosticSession = (DiagnosticSession) BEANS.get(IHttpSessionCacheService.class).getAndTouch(DIAGNOSTIC_SESSION_KEY, servletRequest, servletResponse);
-      if (diagnosticSession == null) {
-        diagnosticSession = new DiagnosticSession();
-        BEANS.get(IHttpSessionCacheService.class).put(DIAGNOSTIC_SESSION_KEY, diagnosticSession, servletRequest, servletResponse);
-      }
-      diagnosticSession.serviceRequest(servletRequest, servletResponse);
+      new DiagnosticSession().serviceRequest(servletRequest, servletResponse);
     }, DefaultExceptionTranslator.class);
   }
 }

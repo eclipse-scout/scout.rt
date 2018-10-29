@@ -67,7 +67,7 @@ public class GeneralView extends DefaultView {
       p.print("Session Created: " + new Date(session.getCreationTime()));
     }
     else {
-      p.print("There is no HTTP-Session needed ");
+      p.print("There is no HTTP-Session ");
     }
     p.br();
     IServerSession serverSession = ServerSessionProvider.currentSession();
@@ -75,7 +75,7 @@ public class GeneralView extends DefaultView {
       p.print("Session ID (ThreadContext): " + serverSession.getId());
     }
     else {
-      p.print("There is no Session found");
+      p.print("There is no Scout Session ");
     }
 
     p.br();

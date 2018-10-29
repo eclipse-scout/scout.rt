@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.session;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
@@ -21,6 +22,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpSession;
@@ -61,6 +63,9 @@ public class ServerSessionCacheTest {
    */
   @Before
   public void before() {
+    if (!m_testScoutSession.isActive()) {
+      m_testScoutSession.start(testSessionId);
+    }
     m_registrations.add(TestingUtility.registerBean(
         new BeanMetaData(ServerSessionCache.class)
             .withInitialInstance(new ServerSessionCache())
@@ -114,8 +119,8 @@ public class ServerSessionCacheTest {
    */
   @Test
   public void testMultipleHttpSessions() {
-    TestHttpSession httpSession1 = new TestHttpSession();
-    TestHttpSession httpSession2 = new TestHttpSession();
+    TestHttpSession httpSession1 = new TestHttpSession("id1");
+    TestHttpSession httpSession2 = new TestHttpSession("id2");
     IServerSessionLifecycleHandler handler = new TestServerSessionLifecycleHandler();
     IServerSession session1 = BEANS.get(ServerSessionCache.class).getOrCreate(handler, httpSession1);
     IServerSession session2 = BEANS.get(ServerSessionCache.class).getOrCreate(handler, httpSession2);
@@ -141,8 +146,8 @@ public class ServerSessionCacheTest {
    */
   @Test
   public void testDestroyWithMultipleHttpSessions() {
-    TestHttpSession httpSession1 = new TestHttpSession();
-    TestHttpSession httpSession2 = new TestHttpSession();
+    TestHttpSession httpSession1 = new TestHttpSession("id1");
+    TestHttpSession httpSession2 = new TestHttpSession("id2");
     ServerSessionCache cache = BEANS.get(ServerSessionCache.class);
     IServerSessionLifecycleHandler lifecycleSpy = spy(new FixedServerSessionLifecycleHandler());
     cache.getOrCreate(lifecycleSpy, httpSession1);
@@ -196,6 +201,46 @@ public class ServerSessionCacheTest {
     assertNotNull(session2);
     assertNotNull(session1);
     assertNotSame(session1, session2);
+  }
+
+  @Test(timeout = 30000)
+  public void testSessionsOfDifferentClientsCanStartInParallel() throws InterruptedException {
+    ServerSessionCache cache = new ServerSessionCache();
+
+    HttpSession httpSession1 = new TestHttpSession();
+    HttpSession httpSession2 = new TestHttpSession();
+
+    CountDownLatch session1IsStarting = new CountDownLatch(1);
+    CountDownLatch session2Started = new CountDownLatch(1);
+
+    String sessionId1 = "session1";
+    IServerSessionLifecycleHandler handler1 = mock(IServerSessionLifecycleHandler.class);
+    when(handler1.getId()).thenReturn("handler1");
+    when(handler1.create()).then(invocation -> {
+      session1IsStarting.countDown();
+      IServerSession scoutSession = mock(IServerSession.class);
+      when(scoutSession.getId()).thenReturn(sessionId1);
+      session2Started.await(1, TimeUnit.MINUTES);
+      return scoutSession;
+    });
+
+    String sessionId2 = "session2";
+    IServerSessionLifecycleHandler handler2 = mock(IServerSessionLifecycleHandler.class);
+    when(handler2.getId()).thenReturn("handler2");
+    when(handler2.create()).then(invocation -> {
+      IServerSession scoutSession = mock(IServerSession.class);
+      when(scoutSession.getId()).thenReturn(sessionId2);
+      return scoutSession;
+    });
+
+    IFuture<IServerSession> sess1 = Jobs.schedule(() -> cache.getOrCreate(handler1, httpSession1), Jobs.newInput());
+    session1IsStarting.await(1, TimeUnit.MINUTES);
+
+    IServerSession sess2 = Jobs.schedule(() -> cache.getOrCreate(handler2, httpSession2), Jobs.newInput()).awaitDoneAndGet();
+    session2Started.countDown();
+    assertEquals(sessionId1, sess1.awaitDoneAndGet().getId());
+    assertEquals(sessionId2, sess2.getId());
+    assertEquals(2, cache.size());
   }
 
   @Test
