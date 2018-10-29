@@ -2745,6 +2745,11 @@ scout.Table.prototype.startCellEdit = function(column, row, field) {
     return;
   }
 
+  this.trigger('startCellEdit', {
+    column: column,
+    row: row,
+    field: field
+  });
   this.ensureRowRendered(row);
   var popup = column.startCellEdit(row, field);
   this.cellEditorPopup = popup;

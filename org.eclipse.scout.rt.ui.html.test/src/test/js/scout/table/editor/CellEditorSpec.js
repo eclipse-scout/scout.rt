@@ -206,6 +206,19 @@ describe("CellEditor", function() {
       expect(table.cellEditorPopup.cell.field).toBe(field);
     });
 
+    it('triggers startCellEdit event', function() {
+      var triggeredEvent;
+      table.columns[0].setEditable(true);
+      table.on('startCellEdit', function(event) {
+        triggeredEvent = event;
+      });
+      table.prepareCellEdit(table.columns[0], table.rows[0]);
+      jasmine.clock().tick();
+      expect(triggeredEvent.row).toBe(table.rows[0]);
+      expect(triggeredEvent.column).toBe(table.columns[0]);
+      expect(triggeredEvent.field instanceof scout.Widget).toBe(true);
+    });
+
   });
 
   describe("completeCellEdit", function() {
