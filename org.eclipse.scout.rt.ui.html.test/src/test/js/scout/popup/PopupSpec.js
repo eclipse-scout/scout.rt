@@ -643,4 +643,86 @@ describe("Popup", function() {
       });
     });
   });
+
+  describe('withArrow', function() {
+    describe('and hAlign LEFT, vAlign CENTER', function() {
+      it('opens popup to the left, arrow points to the right into the center of the anchor', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          horizontalAlignment: scout.Popup.Alignment.LEFT,
+          verticalAlignment: scout.Popup.Alignment.CENTER,
+          $anchor: $anchor,
+          windowPaddingX: 0,
+          withArrow: true
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssLeft()).toBe(70 - 50);
+        expect(popup.$container.cssWidth()).toBe(50);
+        expect(popup.$container.cssTop()).toBe(70 + 80 / 2 - 50 / 2);
+        expect(popup.$container.cssHeight()).toBe(50);
+      });
+    });
+
+    describe('and hAlign RIGHT, vAlign CENTER', function() {
+      it('opens popup to the right, arrow points to the left into the center of the anchor', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          horizontalAlignment: scout.Popup.Alignment.RIGHT,
+          verticalAlignment: scout.Popup.Alignment.CENTER,
+          $anchor: $anchor,
+          windowPaddingX: 0,
+          withArrow: true
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssLeft()).toBe(70 + 80);
+        expect(popup.$container.cssWidth()).toBe(50);
+        expect(popup.$container.cssTop()).toBe(70 + 80 / 2 - 50 / 2);
+        expect(popup.$container.cssHeight()).toBe(50);
+      });
+    });
+
+    describe('and hAlign CENTER, vAlign TOP', function() {
+      it('opens popup to the top, arrow points to the bottom into the center of the anchor', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          horizontalAlignment: scout.Popup.Alignment.CENTER,
+          verticalAlignment: scout.Popup.Alignment.TOP,
+          $anchor: $anchor,
+          windowPaddingY: 0,
+          withArrow: true
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssLeft()).toBe(70 + 80 / 2 - 50 / 2);
+        expect(popup.$container.cssWidth()).toBe(50);
+        expect(popup.$container.cssTop()).toBe(70 - 50);
+        expect(popup.$container.cssHeight()).toBe(50);
+      });
+    });
+
+    describe('and hAlign CENTER, vAlign BOTTOM', function() {
+      it('opens popup to the bottom, arrow points to the top into the center of the anchor', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('Popup', {
+          parent: session.desktop,
+          horizontalAlignment: scout.Popup.Alignment.CENTER,
+          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          $anchor: $anchor,
+          windowPaddingY: 0,
+          withArrow: true
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssLeft()).toBe(70 + 80 / 2 - 50 / 2);
+        expect(popup.$container.cssWidth()).toBe(50);
+        expect(popup.$container.cssTop()).toBe(70 + 80);
+        expect(popup.$container.cssHeight()).toBe(50);
+      });
+    });
+  });
 });

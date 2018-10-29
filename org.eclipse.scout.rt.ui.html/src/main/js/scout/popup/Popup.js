@@ -49,6 +49,10 @@ scout.Popup = function() {
   // If true, the anchor is considered when computing the position and size of the popup
   this.boundToAnchor = true;
 
+  // If true, an arrow is shown pointing to the anchor. If there is no anchor, no arrow will be visible.
+  // Please note: some alignment combinations are not supported, which are: LEFT or RIGHT + BOTTOM or TOP
+  this.withArrow = false;
+
   // If false, the attached mouse down handler will NOT close the popup if the anchor was clicked, the anchor is responsible to close it.
   // This is necessary because the mousedown listener is attached to the capture phase and therefore executed before any other.
   // If anchor was clicked, popup would already be closed and then opened again -> popup could never be closed by clicking the anchor
@@ -59,6 +63,8 @@ scout.Popup = function() {
 
   // Defines whether the popup should be closed whenever another popup opens.
   this.closeOnOtherPopupOpen = true;
+
+  this.$arrow = null;
 };
 scout.inherits(scout.Popup, scout.Widget);
 
@@ -153,6 +159,7 @@ scout.Popup.prototype._render = function() {
 
 scout.Popup.prototype._renderProperties = function() {
   scout.Popup.parent.prototype._renderProperties.call(this);
+  this._renderWithArrow();
   this._renderWithFocusContext();
   this._renderWithGlassPane();
 };
@@ -171,6 +178,10 @@ scout.Popup.prototype._remove = function() {
   if (this.withFocusContext) {
     this.session.focusManager.uninstallFocusContext(this.$container);
   }
+  if (this.$arrow) {
+    this.$arrow.remove();
+    this.$arrow = null;
+  }
   // remove all clean-up handlers
   this._detachCloseHandler();
   scout.Popup.parent.prototype._remove.call(this);
@@ -187,6 +198,58 @@ scout.Popup.prototype._renderWithGlassPane = function() {
   if (this._glassPaneRenderer) {
     this._glassPaneRenderer.renderGlassPanes();
   }
+};
+
+scout.Popup.prototype.setWithArrow = function(withArrow) {
+  this.setProperty('withArrow', withArrow);
+};
+
+scout.Popup.prototype._renderWithArrow = function() {
+  if (this.$arrow) {
+    this.$arrow.remove();
+    this.$arrow = null;
+  }
+  if (this.withArrow) {
+    this.$arrow = this.$container.prependDiv('popup-arrow');
+    this._updateArrowClass();
+  }
+  this.invalidateLayoutTree();
+};
+
+scout.Popup.prototype._updateArrowClass = function() {
+  if (this.$arrow) {
+    this.$arrow.removeClass(this._alignClasses());
+    this.$arrow.addClass(this._computeArrowPositionClass());
+  }
+};
+
+scout.Popup.prototype._computeArrowPositionClass = function() {
+  var Alignment = scout.Popup.Alignment;
+  var cssClass = '';
+  switch (this.horizontalAlignment) {
+    case Alignment.LEFT:
+      cssClass = Alignment.RIGHT;
+      break;
+    case Alignment.RIGHT:
+      cssClass = Alignment.LEFT;
+      break;
+    default:
+      cssClass = this.horizontalAlignment;
+      break;
+  }
+
+  switch (this.verticalAlignment) {
+    case Alignment.BOTTOM:
+      cssClass += ' ' + Alignment.TOP;
+      break;
+    case Alignment.TOP:
+      cssClass += ' ' + Alignment.BOTTOM;
+      break;
+    default:
+      cssClass += ' ' + this.verticalAlignment;
+      break;
+  }
+  return cssClass;
 };
 
 scout.Popup.prototype._isRemovalPrevented = function() {
@@ -324,6 +387,56 @@ scout.Popup.prototype._onPopupOpen = function(event) {
   }
 };
 
+scout.Popup.prototype.setHorizontalAlignment = function(horizontalAlignment) {
+  this.setProperty('horizontalAlignment', horizontalAlignment);
+};
+
+scout.Popup.prototype._renderHorizontalAlignment = function() {
+  this._updateArrowClass();
+  this.invalidateLayoutTree();
+};
+
+scout.Popup.prototype.setVerticalAlignment = function(verticalAlignment) {
+  this.setProperty('verticalAlignment', verticalAlignment);
+};
+
+scout.Popup.prototype._renderVerticalAlignment = function() {
+  this._updateArrowClass();
+  this.invalidateLayoutTree();
+};
+
+scout.Popup.prototype.setHorizontalSwitch = function(horizontalSwitch) {
+  this.setProperty('horizontalSwitch', horizontalSwitch);
+};
+
+scout.Popup.prototype._renderHorizontalSwitch = function() {
+  this.invalidateLayoutTree();
+};
+
+scout.Popup.prototype.setVerticalSwitch = function(verticalSwitch) {
+  this.setProperty('verticalSwitch', verticalSwitch);
+};
+
+scout.Popup.prototype._renderVerticalSwitch = function() {
+  this.invalidateLayoutTree();
+};
+
+scout.Popup.prototype.setTrimWidth = function(trimWidth) {
+  this.setProperty('trimWidth', trimWidth);
+};
+
+scout.Popup.prototype._renderTrimWidth = function() {
+  this.invalidateLayoutTree();
+};
+
+scout.Popup.prototype.setTrimHeight = function(trimHeight) {
+  this.setProperty('trimHeight', trimHeight);
+};
+
+scout.Popup.prototype._renderTrimHeight = function() {
+  this.invalidateLayoutTree();
+};
+
 scout.Popup.prototype.prefLocation = function(verticalAlignment, horizontalAlignment) {
   if (!this.boundToAnchor || (!this.anchorBounds && !this.$anchor)) {
     return this._prefLocationWithoutAnchor();
@@ -343,6 +456,7 @@ scout.Popup.prototype._prefLocationWithAnchor = function(verticalAlignment, hori
   var size = scout.graphics.size($container);
   var margins = scout.graphics.margins($container);
   var Alignment = scout.Popup.Alignment;
+  var arrowBounds = this.$arrow ? scout.graphics.bounds(this.$arrow) : null;
 
   $container.removeClass(this._alignClasses());
   $container.addClass(verticalAlignment + ' ' + horizontalAlignment);
@@ -353,13 +467,21 @@ scout.Popup.prototype._prefLocationWithAnchor = function(verticalAlignment, hori
   if (horizontalAlignment === Alignment.LEFT) {
     x -= widthWithMargin;
   } else if (horizontalAlignment === Alignment.LEFTEDGE) {
-    x = anchorBounds.x - margins.left;
+    if (this.withArrow) {
+      x += anchorBounds.width / 2 - arrowBounds.center().x - margins.left;
+    } else {
+      x = anchorBounds.x - margins.left;
+    }
   } else if (horizontalAlignment === Alignment.CENTER) {
     x += anchorBounds.width / 2 - width / 2 - margins.left;
   } else if (horizontalAlignment === Alignment.RIGHT) {
     x += anchorBounds.width;
   } else if (horizontalAlignment === Alignment.RIGHTEDGE) {
-    x = anchorBounds.x + anchorBounds.width - width - margins.right;
+    if (this.withArrow) {
+      x += anchorBounds.width / 2 - arrowBounds.center().x - margins.right;
+    } else {
+      x = anchorBounds.x + anchorBounds.width - width - margins.right;
+    }
   }
 
   var heightWithMargin = size.height + margins.vertical();
@@ -368,13 +490,21 @@ scout.Popup.prototype._prefLocationWithAnchor = function(verticalAlignment, hori
   if (verticalAlignment === Alignment.TOP) {
     y -= heightWithMargin;
   } else if (verticalAlignment === Alignment.TOPEDGE) {
-    y = anchorBounds.y - margins.top;
+    if (this.withArrow) {
+      y += anchorBounds.height / 2 - arrowBounds.center().y - margins.top;
+    } else {
+      y = anchorBounds.y - margins.top;
+    }
   } else if (verticalAlignment === Alignment.CENTER) {
     y += anchorBounds.height / 2 - height / 2 - margins.top;
   } else if (verticalAlignment === Alignment.BOTTOM) {
     y += anchorBounds.height;
   } else if (verticalAlignment === Alignment.BOTTOMEDGE) {
-    y = anchorBounds.y + anchorBounds.height - height - margins.bottom;
+    if (this.withArrow) {
+      y += anchorBounds.height / 2 - arrowBounds.center().y - margins.bottom;
+    } else {
+      y = anchorBounds.y + anchorBounds.height - height - margins.bottom;
+    }
   }
 
   // this.$parent might not be at (0,0) of the document
@@ -444,6 +574,11 @@ scout.Popup.prototype.adjustLocation = function(location, switchIfNecessary) {
     } else {
       // Move popup to the left until it gets fully visible (if switch is disabled)
       location.x -= overlap.x;
+
+      // Also move arrow so that it still points to the center of the anchor
+      if (this.$arrow) {
+        this.$arrow.cssMarginLeft(overlap.x);
+      }
     }
   }
   return location;

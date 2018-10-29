@@ -30,8 +30,8 @@
     box-shadow: @x @y @blur @spread rgba(0, 0, 0, @alpha);
   }
 
-  .drop-shadow-large() {
-    #scout.drop-shadow(@x: 4px, @y: 10px, @blur: 18px, @alpha: @drop-shadow-large-alpha);
+  .drop-shadow-large(@x: 4px, @y: 10px, @blur: 18px, @spread: -6px, @alpha: @drop-shadow-large-alpha) {
+    #scout.drop-shadow(@x, @y, @blur, @spread, @alpha);
   }
 
   .focus-border(@bordersize: 1px) {
@@ -475,7 +475,7 @@
       padding-top: @padding-hover;
     }
   }
-  
+
   /*
   * Hides the scrollbars but lets the user still scroll (e.g. using mousewheel or touch). Does not work for Firefox.
   */
