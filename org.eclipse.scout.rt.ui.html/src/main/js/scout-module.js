@@ -164,6 +164,8 @@
   __include("scout/action/ActionAdapter.js");
   __include("scout/action/ActionKeyStroke.js");
   __include("scout/box/Box.js");
+  __include("scout/label/Label.js");
+  __include("scout/label/LabelAdapter.js");
   __include("scout/popup/Popup.js");
   __include("scout/popup/PopupLayout.js");
   __include("scout/popup/PopupWithHead.js");

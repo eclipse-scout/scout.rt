@@ -88,6 +88,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
 import org.eclipse.scout.rt.client.ui.form.fields.wizard.IWizardProgressField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.client.ui.group.IGroup;
+import org.eclipse.scout.rt.client.ui.label.ILabel;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.notification.INotification;
 import org.eclipse.scout.rt.client.ui.tile.IFormFieldTile;
@@ -159,6 +160,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.treefield.JsonTreeField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.wizard.JsonWizardProgressField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.wrappedform.JsonWrappedFormField;
 import org.eclipse.scout.rt.ui.html.json.group.JsonGroup;
+import org.eclipse.scout.rt.ui.html.json.label.JsonLabel;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.form.field.JsonFormFieldMenu;
 import org.eclipse.scout.rt.ui.html.json.messagebox.JsonMessageBox;
@@ -418,6 +420,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof IStatusMenuMapping) {
       return new JsonStatusMenuMapping<>((IStatusMenuMapping) model, session, id, parent);
+    }
+    if (model instanceof ILabel) {
+      return new JsonLabel<>((ILabel) model, session, id, parent);
     }
     return null;
   }

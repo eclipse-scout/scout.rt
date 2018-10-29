@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.htmlfield;
+package org.eclipse.scout.rt.client.ui.label;
 
-public interface IHtmlFieldUIFacade {
+public interface ILabelUIFacade {
 
   void fireAppLinkActionFromUI(String ref);
 }
