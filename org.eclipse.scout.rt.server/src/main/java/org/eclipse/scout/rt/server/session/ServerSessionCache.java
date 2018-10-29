@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.session;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.util.concurrent.GroupedSynchronizer;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ public class ServerSessionCache {
   public static final String SERVER_SESSION_KEY = IServerSession.class.getName();
   public static final String UNBIND_LISTENER_KEY = ScoutSessionBindingListener.class.getName();
 
-  private final ConcurrentMap<String, ServerSessionEntry> m_sessionContexts = new ConcurrentHashMap<>();
+  private final GroupedSynchronizer<String, ServerSessionEntry> m_lockBySessionId = new GroupedSynchronizer<>(true);
 
   /**
    * Lookup the Scout session on the given {@link HttpSession}. Creates a new scout session using the given
@@ -56,31 +56,25 @@ public class ServerSessionCache {
     if (scoutSession instanceof IServerSession) {
       return (IServerSession) scoutSession;
     }
-
-    // lock by scout sessionId to prevent creation of scout session more than once per scoutSessionId
-    ServerSessionEntry sessionContext = getSessionContext(sessionLifecycleHandler.getId(), sessionLifecycleHandler);
-    synchronized (sessionContext) {
-      final IServerSession session = sessionContext.getOrCreateScoutSession();
-      if (session == null) {
-        removeHttpSession(sessionContext.getServerSessionLifecycleHandler().getId(), httpSession);
-        return null;
-      }
-
-      sessionContext.addHttpSessionId(httpSession.getId());
-      httpSession.setAttribute(SERVER_SESSION_KEY, session);
-      httpSession.setAttribute(UNBIND_LISTENER_KEY, new ScoutSessionBindingListener(session.getId()));
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Scout ServerSession Session added to HttpSession [scoutSessionId={}, httpSessionId={}]", session.getId(), httpSession.getId());
-      }
-      return session;
-    }
+    return m_lockBySessionId.applyInGroupLock(sessionLifecycleHandler.getId(),
+        sessionContext -> getOrCreate(sessionContext, httpSession),
+        sessionId -> new ServerSessionEntry(sessionLifecycleHandler));
   }
 
-  /**
-   * Only one ScoutServerSessionContext object per sessionId must exist
-   */
-  protected ServerSessionEntry getSessionContext(String sessionId, IServerSessionLifecycleHandler sessionLifecycleHandle) {
-    return m_sessionContexts.computeIfAbsent(sessionId, id -> new ServerSessionEntry(sessionLifecycleHandle));
+  protected IServerSession getOrCreate(final ServerSessionEntry sessionContext, HttpSession httpSession) {
+    final IServerSession session = sessionContext.getOrCreateScoutSession();
+    if (session == null) {
+      removeHttpSession(sessionContext.getServerSessionLifecycleHandler().getId(), httpSession);
+      return null;
+    }
+
+    sessionContext.addHttpSessionId(httpSession.getId());
+    httpSession.setAttribute(SERVER_SESSION_KEY, session);
+    httpSession.setAttribute(UNBIND_LISTENER_KEY, new ScoutSessionBindingListener(session.getId()));
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Scout ServerSession Session added to HttpSession [scoutSessionId={}, httpSessionId={}]", session.getId(), httpSession.getId());
+    }
+    return session;
   }
 
   /**
@@ -92,37 +86,46 @@ public class ServerSessionCache {
    *          May not be {@code null}.
    */
   public void removeHttpSession(String scoutSessionId, HttpSession httpSession) {
-    ServerSessionEntry scoutSessionContext = m_sessionContexts.get(scoutSessionId);
-    if (scoutSessionContext == null) {
+    final ServerSessionEntry removedEntry = m_lockBySessionId.remove(scoutSessionId, entry -> removeEntry(entry, httpSession));
+    if (removedEntry == null) {
       LOG.warn("Unknown sessionContext [scoutSessionId={}, httpSessionId={}]", scoutSessionId, httpSession.getId());
-      return;
     }
-
-    synchronized (scoutSessionContext) {
-      scoutSessionContext.removeHttpSessionId(httpSession.getId());
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Scout ServerSession removed from HttpSession [scoutSessionId={}, httpSessionId={}]", scoutSessionId, httpSession.getId());
-      }
-
-      // destroy scout session, if there is no httpsession with this scout session
-      if (scoutSessionContext.httpSessionCount() < 1) {
-        try {
-          scoutSessionContext.destroy();
-        }
-        finally {
-          m_sessionContexts.remove(scoutSessionId);
-          if (LOG.isDebugEnabled()) {
-            LOG.debug("Removed Scout server session from cache [scoutSessionId={}, httpSessionId={}].", scoutSessionId, httpSession.getId());
-          }
-        }
-      }
+    else {
+      LOG.debug("Removed Scout server session from cache [scoutSessionId={}, httpSessionId={}].", scoutSessionId, httpSession.getId());
+      // destroy entry that was removed from the cache.
+      // execute it outside the lock so that new sessions may be created again while the old one is still stopping.
+      // no try necessary. Throw any exceptions while stopping up to the caller. The caches are in sync already anyway.
+      removedEntry.destroy();
     }
+  }
+
+  protected boolean removeEntry(ServerSessionEntry scoutSessionContext, HttpSession httpSession) {
+    httpSession.removeAttribute(SERVER_SESSION_KEY);
+    LOG.debug("Removed Scout server session from HttpSession [scoutSessionId={}, httpSessionId={}]", scoutSessionContext.getServerSessionLifecycleHandler().getId(), httpSession.getId());
+
+    scoutSessionContext.removeHttpSessionId(httpSession.getId());
+    return scoutSessionContext.httpSessionCount() < 1;
+  }
+
+  /**
+   * Read-only view on the internal cache map. Key is the Scout session id, value the associated cached entry.
+   */
+  public Map<String, ServerSessionEntry> cacheMap() {
+    return m_lockBySessionId.toMap();
+  }
+
+  public int numRootLocks() {
+    return m_lockBySessionId.numRootLocks();
+  }
+
+  public int numLockedRootLocks() {
+    return m_lockBySessionId.numLockedRootLocks();
   }
 
   /**
    * @return number of cached items.
    */
   public int size() {
-    return m_sessionContexts.size();
+    return m_lockBySessionId.size();
   }
 }

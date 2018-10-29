@@ -14,6 +14,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -241,6 +243,53 @@ public class ServerSessionCacheTest {
     assertEquals(sessionId1, sess1.awaitDoneAndGet().getId());
     assertEquals(sessionId2, sess2.getId());
     assertEquals(2, cache.size());
+  }
+
+  /**
+   * Tests that a new Server session can be obtained if an old one has been removed from the cache but is still stopping
+   * (no deadlocks)
+   *
+   * @throws InterruptedException
+   */
+  @Test(timeout = 30000)
+  public void testNewSessionWhileOldSessionIsStoppingVerySlowly() throws InterruptedException {
+    ServerSessionCache cache = new ServerSessionCache();
+
+    HttpSession httpSession1 = new TestHttpSession("testHttpSessionId1");
+
+    // LifecycleHandler
+    String scoutSessionId = "testScoutSessionId";
+    CountDownLatch firstSessionIsDestroying = new CountDownLatch(1);
+    CountDownLatch secondSessionCreated = new CountDownLatch(1);
+    IServerSessionLifecycleHandler handler = mock(IServerSessionLifecycleHandler.class);
+    when(handler.getId()).thenReturn(scoutSessionId);
+    when(handler.create()).then(invocation -> {
+      IServerSession scoutSession = mock(IServerSession.class);
+      when(scoutSession.getId()).thenReturn(scoutSessionId);
+      return scoutSession;
+    });
+    doAnswer(invocation -> {
+      firstSessionIsDestroying.countDown();
+      secondSessionCreated.await(1, TimeUnit.MINUTES); // wait until the second session has been obtained. will timeout in deadlock case
+      return null;
+    }).when(handler).destroy(any());
+
+    IServerSession createdSession1 = cache.getOrCreate(handler, httpSession1);
+    assertEquals(scoutSessionId, createdSession1.getId());
+
+    // asynchronously stop the first session (waits until second one is created)
+    IFuture<Void> sessionStopTask = Jobs.schedule(() -> cache.removeHttpSession(createdSession1.getId(), httpSession1), Jobs.newInput());
+
+    firstSessionIsDestroying.await(1, TimeUnit.MINUTES);
+    HttpSession httpSession2 = new TestHttpSession("testHttpSessionId2");
+    IServerSession createdSession2 = cache.getOrCreate(handler, httpSession2); // this must be successful: the fact that an old session is still stopping may not keep the cache from creating a new one.
+    assertNotSame(createdSession1, createdSession2);
+    assertEquals(scoutSessionId, createdSession2.getId());
+    secondSessionCreated.countDown();
+
+    sessionStopTask.awaitDoneAndGet();
+
+    assertEquals(1, cache.size()); // the second one must remain in the cache.
   }
 
   @Test
