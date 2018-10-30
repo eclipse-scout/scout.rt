@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.concurrent.AbstractInterruptionError;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
@@ -103,6 +104,7 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
 
   // === HTTP-POST ===
 
+  @SuppressWarnings("deprecation")
   @Override
   protected void doPost(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws ServletException, IOException {
     if (Subject.getSubject(AccessController.getContext()) == null) {
@@ -131,10 +133,14 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
         }
       }, DefaultExceptionTranslator.class);
     }
-    catch (Exception e) {
+    catch (Throwable e) {//NOSONAR
       if (isConnectionError(e)) {
         // Ignore disconnect errors: we do not want to throw an exception, if the client closed the connection.
         LOG.debug("Connection Error: ", e);
+      }
+      else if (isInterruption(e)) {
+        LOG.info("Interruption", e);
+        servletResponse.setStatus(HttpServletResponse.SC_ACCEPTED, "Request processing was interrupted");
       }
       else {
         LOG.error("Client={}@{}/{}", servletRequest.getRemoteUser(), servletRequest.getRemoteAddr(), servletRequest.getRemoteHost(), e);
@@ -266,7 +272,7 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
 
   // === Helper methods ===
 
-  protected boolean isConnectionError(Exception e) {
+  protected boolean isConnectionError(Throwable e) {
     Throwable cause = e;
     while (cause != null) {
       if (cause instanceof SocketException) {
@@ -276,6 +282,18 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
         return true;
       }
       else if (cause instanceof InterruptedIOException) {
+        return true;
+      }
+      // next
+      cause = cause.getCause();
+    }
+    return false;
+  }
+
+  private boolean isInterruption(Throwable e) {
+    Throwable cause = e;
+    while (cause != null) {
+      if (cause instanceof AbstractInterruptionError) {
         return true;
       }
       // next
