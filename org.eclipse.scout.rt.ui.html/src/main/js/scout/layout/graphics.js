@@ -561,6 +561,14 @@ scout.Rectangle.prototype.center = function() {
   return new scout.Point(this.x + this.width / 2, this.y + this.height / 2);
 };
 
+scout.Rectangle.prototype.right = function() {
+  return this.x + this.width;
+};
+
+scout.Rectangle.prototype.bottom = function() {
+  return this.y + this.height;
+};
+
 scout.Rectangle.prototype.contains = function(x, y) {
   return y >= this.y && y < this.y + this.height && x >= this.x && x < this.x + this.width;
 };

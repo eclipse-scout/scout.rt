@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 
-public class AbstractLabel extends AbstractWidget implements ILabel {
+public abstract class AbstractLabel extends AbstractWidget implements ILabel {
   private final ObjectExtensions<AbstractLabel, ILabelExtension<? extends AbstractLabel>> m_objectExtensions;
   private ILabelUIFacade m_uiFacade;
   private Map<String, BinaryResource> m_attachments;

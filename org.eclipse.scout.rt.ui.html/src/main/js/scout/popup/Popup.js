@@ -31,8 +31,9 @@ scout.Popup = function() {
   this.horizontalAlignment = scout.Popup.Alignment.LEFTEDGE;
   this.verticalAlignment = scout.Popup.Alignment.BOTTOM;
 
-   // If switch is enabled, the alignment will be changed if the popup overlaps a window border.
-   // Currently only switching form right to left and bottom to top is supported.
+  // If switch is enabled, the alignment will be changed if the popup overlaps a window border.
+  // Currently only switching form right to left and bottom to top is supported.
+  // Switching from leftedge to rightedge and topedge to bottomedge does not work if withArrow is true
   this.horizontalSwitch = false;
   this.verticalSwitch = true;
 
@@ -80,6 +81,22 @@ scout.Popup.Alignment = {
   BOTTOM: 'bottom',
   BOTTOMEDGE: 'bottomedge'
 };
+
+scout.Popup.SwitchRule = {};
+(function() {
+  // Initialize switch rules (wrapped in IIFE to have local function scope for the variables)
+  var SwitchRule = scout.Popup.SwitchRule;
+  var Alignment = scout.Popup.Alignment;
+  SwitchRule[Alignment.LEFT] = Alignment.RIGHT;
+  SwitchRule[Alignment.LEFTEDGE] = Alignment.RIGHTEDGE;
+  SwitchRule[Alignment.TOP] = Alignment.BOTTOM;
+  SwitchRule[Alignment.TOPEDGE] = Alignment.BOTTOMEDGE;
+  SwitchRule[Alignment.CENTER] = Alignment.CENTER;
+  SwitchRule[Alignment.RIGHT] = Alignment.LEFT;
+  SwitchRule[Alignment.RIGHTEDGE] = Alignment.LEFTEDGE;
+  SwitchRule[Alignment.BOTTOM] = Alignment.TOP;
+  SwitchRule[Alignment.BOTTOMEDGE] = Alignment.TOPEDGE;
+}());
 
 /**
  * @param options:
@@ -216,17 +233,19 @@ scout.Popup.prototype._renderWithArrow = function() {
   this.invalidateLayoutTree();
 };
 
-scout.Popup.prototype._updateArrowClass = function() {
+scout.Popup.prototype._updateArrowClass = function(verticalAlignment, horizontalAlignment) {
   if (this.$arrow) {
     this.$arrow.removeClass(this._alignClasses());
-    this.$arrow.addClass(this._computeArrowPositionClass());
+    this.$arrow.addClass(this._computeArrowPositionClass(verticalAlignment, horizontalAlignment));
   }
 };
 
-scout.Popup.prototype._computeArrowPositionClass = function() {
+scout.Popup.prototype._computeArrowPositionClass = function(verticalAlignment, horizontalAlignment) {
   var Alignment = scout.Popup.Alignment;
   var cssClass = '';
-  switch (this.horizontalAlignment) {
+  horizontalAlignment = horizontalAlignment || this.horizontalAlignment;
+  verticalAlignment = verticalAlignment || this.verticalAlignment;
+  switch (horizontalAlignment) {
     case Alignment.LEFT:
       cssClass = Alignment.RIGHT;
       break;
@@ -234,11 +253,11 @@ scout.Popup.prototype._computeArrowPositionClass = function() {
       cssClass = Alignment.LEFT;
       break;
     default:
-      cssClass = this.horizontalAlignment;
+      cssClass = horizontalAlignment;
       break;
   }
 
-  switch (this.verticalAlignment) {
+  switch (verticalAlignment) {
     case Alignment.BOTTOM:
       cssClass += ' ' + Alignment.TOP;
       break;
@@ -246,7 +265,7 @@ scout.Popup.prototype._computeArrowPositionClass = function() {
       cssClass += ' ' + Alignment.BOTTOM;
       break;
     default:
-      cssClass += ' ' + this.verticalAlignment;
+      cssClass += ' ' + verticalAlignment;
       break;
   }
   return cssClass;
@@ -559,24 +578,48 @@ scout.Popup.prototype.adjustLocation = function(location, switchIfNecessary) {
     overlap = this.overlap(location);
 
   location = location.clone();
-  var verticalSwitch = scout.nvl(switchIfNecessary, this.verticalSwitch);
-  if (verticalSwitch && verticalAlignment === scout.Popup.Alignment.BOTTOM && overlap.y > 0) {
-    // switch vertical alignment
-    verticalAlignment = scout.Popup.Alignment.TOP;
-    location = this.prefLocation(verticalAlignment);
+  if (overlap.y > 0) {
+    var verticalSwitch = scout.nvl(switchIfNecessary, this.verticalSwitch);
+    if (verticalSwitch) {
+      // Switch vertical alignment
+      verticalAlignment = scout.Popup.SwitchRule[verticalAlignment];
+
+      // Ensure arrow has correct class and margin added by moving logic is removed
+      this._updateArrowClass(verticalAlignment);
+      if (this.$arrow) {
+        this.$arrow.cssMarginTop(null);
+      }
+
+      location = this.prefLocation(verticalAlignment);
+    } else {
+      // Move popup to the top until it gets fully visible (if switch is disabled)
+      location.y -= overlap.y;
+
+      // Also move arrow so that it still points to the center of the anchor
+      if (this.$arrow && (this.$arrow.hasClass(scout.Popup.Alignment.LEFT) || this.$arrow.hasClass(scout.Popup.Alignment.RIGHT))) {
+        this.$arrow.cssMarginTop(overlap.y);
+      }
+    }
   }
   if (overlap.x > 0) {
     var horizontalSwitch = scout.nvl(switchIfNecessary, this.horizontalSwitch);
-    if (horizontalSwitch && horizontalAlignment === scout.Popup.Alignment.RIGHT && overlap.x > 0) {
-      // switch horizontal alignment
-      horizontalAlignment = scout.Popup.Alignment.LEFT;
+    if (horizontalSwitch) {
+      // Switch horizontal alignment
+      horizontalAlignment = scout.Popup.SwitchRule[horizontalAlignment];
+
+      // Ensure arrow has correct class and margin added by moving logic is removed
+      this._updateArrowClass(verticalAlignment, horizontalAlignment);
+      if (this.$arrow) {
+        this.$arrow.cssMarginLeft(null);
+      }
+
       location = this.prefLocation(verticalAlignment, horizontalAlignment);
     } else {
       // Move popup to the left until it gets fully visible (if switch is disabled)
       location.x -= overlap.x;
 
       // Also move arrow so that it still points to the center of the anchor
-      if (this.$arrow) {
+      if (this.$arrow && (this.$arrow.hasClass(scout.Popup.Alignment.TOP) || this.$arrow.hasClass(scout.Popup.Alignment.BOTTOM))) {
         this.$arrow.cssMarginLeft(overlap.x);
       }
     }

@@ -69,11 +69,10 @@ scout.PopupLayout.prototype._calcMaxSize = function() {
     windowPaddingX = this.popup.windowPaddingX,
     windowPaddingY = this.popup.windowPaddingY,
     popupMargins = htmlComp.margins(),
-    popupPosition = htmlComp.location(),
     windowSize = this.popup.getWindowSize();
 
-  maxWidth = (windowSize.width - popupMargins.horizontal() - popupPosition.x - windowPaddingX);
-  maxHeight = (windowSize.height - popupMargins.vertical() - popupPosition.y - windowPaddingY);
+  maxWidth = (windowSize.width - popupMargins.horizontal() - windowPaddingX);
+  maxHeight = (windowSize.height - popupMargins.vertical() - windowPaddingY);
 
   return new scout.Dimension(maxWidth, maxHeight);
 };
@@ -94,7 +93,7 @@ scout.PopupLayout.prototype._adjustSizeWithAnchor = function(prefSize) {
 
   // Decide whether the prefSize can be used or the popup needs to be shrinked so that it fits into the viewport
   // The decision is based on the preferred opening direction
-  // Example: The popup would like to be opened right and down
+  // Example: The popup would like to be opened leftedge and bottom
   // If there is enough space on the right and on the bottom -> pref size is used
   // If there is not enough space on the right it checks whether there is enough space on the left
   // If there is enough space on the left -> use preferred width -> The opening direction will be switched using position() at the end
@@ -158,12 +157,26 @@ scout.PopupLayout.prototype._calcMaxSizeAroundAnchor = function() {
     windowPaddingY = this.popup.windowPaddingY,
     popupMargins = htmlComp.margins(),
     anchorBounds = this.popup.getAnchorBounds(),
-    windowSize = this.popup.getWindowSize();
+    windowSize = this.popup.getWindowSize(),
+    horizontalAlignment = this.popup.horizontalAlignment,
+    verticalAlignment = this.popup.verticalAlignment,
+    Alignment = scout.Popup.Alignment;
 
-  maxWidthRight = (windowSize.width - (anchorBounds.x + anchorBounds.width) - popupMargins.horizontal() - windowPaddingX);
-  maxWidthLeft = (anchorBounds.x - popupMargins.horizontal() - windowPaddingX);
-  maxHeightDown = (windowSize.height - (anchorBounds.y + anchorBounds.height) - popupMargins.vertical() - windowPaddingY);
-  maxHeightUp = (anchorBounds.y - popupMargins.vertical() - windowPaddingY);
+  if (scout.isOneOf(horizontalAlignment, Alignment.LEFTEDGE, Alignment.RIGHTEDGE)) {
+    maxWidthRight = windowSize.width - anchorBounds.x - popupMargins.horizontal() - windowPaddingX;
+    maxWidthLeft = anchorBounds.right() - popupMargins.horizontal() - windowPaddingX;
+  } else { // LEFT or RIGHT
+    maxWidthRight = windowSize.width - anchorBounds.right() - popupMargins.horizontal() - windowPaddingX;
+    maxWidthLeft = anchorBounds.x - popupMargins.horizontal() - windowPaddingX;
+  }
+
+  if (scout.isOneOf(verticalAlignment, Alignment.BOTTOMEDGE, Alignment.TOPEDGE)) {
+    maxHeightDown = windowSize.height - anchorBounds.y - popupMargins.vertical() - windowPaddingY;
+    maxHeightUp = anchorBounds.bottom() - popupMargins.vertical() - windowPaddingY;
+  } else { // BOTTOM or TOP
+    maxHeightDown = windowSize.height - anchorBounds.bottom() - popupMargins.vertical() - windowPaddingY;
+    maxHeightUp = anchorBounds.y - popupMargins.vertical() - windowPaddingY;
+  }
 
   return new scout.Insets(maxHeightUp, maxWidthRight, maxHeightDown, maxWidthLeft);
 };
