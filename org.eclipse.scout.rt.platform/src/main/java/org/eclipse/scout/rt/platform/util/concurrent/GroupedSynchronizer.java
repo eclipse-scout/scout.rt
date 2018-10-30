@@ -208,8 +208,10 @@ public final class GroupedSynchronizer<K, V> {
   /**
    * Removes the group having the given group key from this {@link GroupedSynchronizer}.
    * <p>
+   * <b>Important:</b><br>
    * If the group is currently used by a task running under that group lock, this method blocks until the group is ready
-   * to be removed.
+   * to be removed. This also means that within a group lock task this remove method must not be called (possibility for
+   * deadlock)!
    *
    * @param groupKey
    *          The key object that identifies the group. Must not be {@code null}.
@@ -222,8 +224,10 @@ public final class GroupedSynchronizer<K, V> {
   /**
    * Removes the group having the given group key from this {@link GroupedSynchronizer}.
    * <p>
+   * <b>Important:</b><br>
    * If the group is currently used by a task running under that group lock, this method blocks until the group is ready
-   * to be removed.
+   * to be removed. This also means that within a group lock task this remove method must not be called (possibility for
+   * deadlock)!
    *
    * @param groupKey
    *          The key object that identifies the group. Must not be {@code null}.

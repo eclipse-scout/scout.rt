@@ -64,7 +64,10 @@ public class ServerSessionCache {
   protected IServerSession getOrCreate(final ServerSessionEntry sessionContext, HttpSession httpSession) {
     final IServerSession session = sessionContext.getOrCreateScoutSession();
     if (session == null) {
-      removeHttpSession(sessionContext.getServerSessionLifecycleHandler().getId(), httpSession);
+      // do not remove the entry here. Possibility for deadlock (see GroupedSynchronizer#remove).
+      // it makes no sense to use a ServerSessionCache if there is no session available anyway.
+      LOG.warn("No class implementing {} could be found. If no server session class is available, using a {} is not necessary. Please fix your configuration to skip the {} creation.",
+          IServerSession.class.getName(), ServerSessionCache.class.getName(), IServerSession.class.getName());
       return null;
     }
 
