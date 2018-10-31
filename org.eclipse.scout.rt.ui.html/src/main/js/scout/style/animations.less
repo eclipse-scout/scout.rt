@@ -100,23 +100,20 @@
 
   /*** Fade with Short Drop ***/
 
-  .keyframes-fade-short-drop() {
+  .keyframes-short-drop() {
     00% { /* see comment on top */
       #scout.transform(translateY(-40px));
-      opacity: 0;
     }
     40% {
       #scout.transform(translateY(7px));
-      opacity: 0.9;
     }
     100% {
       #scout.transform(translateY(0));
-      opacity: 1;
     }
   }
 
-  @-webkit-keyframes fade-short-drop { .keyframes-fade-short-drop(); }
-  @keyframes fade-short-drop { .keyframes-fade-short-drop(); }
+  @-webkit-keyframes short-drop { .keyframes-short-drop(); }
+  @keyframes short-drop { .keyframes-short-drop(); }
 
   /*** Fade out and shrink with blur ***/
 
