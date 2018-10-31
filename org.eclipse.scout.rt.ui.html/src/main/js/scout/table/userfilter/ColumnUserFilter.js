@@ -87,6 +87,8 @@ scout.ColumnUserFilter.prototype.calculate = function() {
       key: displayKey,
       text: text,
       iconId: iconId,
+      htmlEnabled: false,
+      cssClass: null,
       count: cubeValue ? cubeValue[0] : 0
     });
   }, this);

@@ -704,7 +704,9 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
       cells: [
         scout.create('Cell', {
           value: filterValue.text,
-          iconId: filterValue.iconId
+          iconId: filterValue.iconId,
+          htmlEnabled: filterValue.htmlEnabled,
+          cssClass: filterValue.cssClass
         }),
         filterValue.count,
         filterValue.key === null ? 1 : 0 // empty cell should always be at the bottom
