@@ -71,7 +71,7 @@ public class ListenerListMonitorMBean implements IListenerListMonitorMBean {
         .forEach(
             (listenerList, types) -> {
               String className = listenerList.getClass().getName();
-              listenerListCount.put(className, listenerListCount.getOrDefault(className, 0));
+              listenerListCount.put(className, listenerListCount.getOrDefault(className, 0) + 1);
               Map<String, List<String>> mergedTypes = listenerListTypes.computeIfAbsent(className, className2 -> new TreeMap<>());
               types.forEach((type, listeners) -> {
                 listeners.forEach(listener -> {
@@ -85,7 +85,7 @@ public class ListenerListMonitorMBean implements IListenerListMonitorMBean {
         .entrySet()
         .stream()
         .map(e -> createListenerListInfo(e.getKey(), listenerListCount.get(e.getKey()), e.getValue()))
-        .toArray(n -> new ListenerListInfo[n]);
+        .toArray(ListenerListInfo[]::new);
   }
 
   protected ListenerListInfo createListenerListInfo(String listenerListClassName, int listenerListInstanceCount, Map<String, List<String>> listenerTypes) {
@@ -96,7 +96,7 @@ public class ListenerListMonitorMBean implements IListenerListMonitorMBean {
             .entrySet()
             .stream()
             .map(e -> createListenerType(e.getKey(), e.getValue()))
-            .toArray(n -> new EventType[n]));
+            .toArray(EventType[]::new));
   }
 
   protected EventType createListenerType(String listenerType, List<String> listeners) {
@@ -107,7 +107,7 @@ public class ListenerListMonitorMBean implements IListenerListMonitorMBean {
             .entrySet()
             .stream()
             .map(e -> createListenerInfo(e.getKey(), e.getValue().size()))
-            .toArray(n -> new ListenerInfo[n]));
+            .toArray(ListenerInfo[]::new));
   }
 
   protected ListenerInfo createListenerInfo(String listenerClassName, int listenerInstanceCount) {

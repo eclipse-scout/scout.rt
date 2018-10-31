@@ -11,56 +11,69 @@
 package org.eclipse.scout.rt.platform.events.management;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.events.IListenerListWithManagement;
+import org.eclipse.scout.rt.platform.events.ListenerListRegistry;
+import org.eclipse.scout.rt.platform.events.ListenerListSnapshot;
+import org.eclipse.scout.rt.platform.events.management.IListenerListMonitorMBean.EventType;
+import org.eclipse.scout.rt.platform.events.management.IListenerListMonitorMBean.ListenerInfo;
 import org.eclipse.scout.rt.platform.events.management.IListenerListMonitorMBean.ListenerListInfo;
 import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith(PlatformTestRunner.class)
 @RunWithNewPlatform
+@RunWith(PlatformTestRunner.class)
 public class ListenerListMonitorTest {
 
   @Test
   public void testMBean() {
     BasicPropertySupport prop1 = new BasicPropertySupport(new Object());
     prop1.addPropertyChangeListener(new Listener1());
+    prop1.addPropertyChangeListener(new Listener1());
+
     BasicPropertySupport prop2 = new BasicPropertySupport(new Object());
     prop2.addPropertyChangeListener("Bar", new Listener2a());
     prop2.addPropertyChangeListener("Foo", new Listener2b());
 
     IListenerListMonitorMBean mon = BEANS.get(ListenerListMonitorMBean.class);
 
-    assertEquals(2, mon.getListenerListCount());
     ListenerListInfo[] listenerLists = mon.getListenerListInfos();
+    assertEquals("[" + ListenerListInfo.class.getSimpleName() + " [className=" + BasicPropertySupport.class.getName() + ", numInstances=2, listenerTypes=\n" +
+        "  " + EventType.class.getSimpleName() + "[type=*, listeners=[" + ListenerInfo.class.getSimpleName() + "[className=" + Listener1.class.getName() + ", count=2]]]\n" +
+        "  " + EventType.class.getSimpleName() + "[type=Bar, listeners=[" + ListenerInfo.class.getSimpleName() + "[className=" + Listener2a.class.getName() + ", count=1]]]\n" +
+        "  " + EventType.class.getSimpleName() + "[type=Foo, listeners=[" + ListenerInfo.class.getSimpleName() + "[className=" + Listener2b.class.getName() + ", count=1]]]\n" +
+        "]]", Arrays.toString(listenerLists));
+    assertContainsExactly(BasicPropertySupport.class, BasicPropertySupport.class);
+  }
 
-    assertEquals(1, listenerLists.length);
-    assertEquals(BasicPropertySupport.class.getName(), listenerLists[0].getListenerListClassName());
-
-    assertEquals(3, listenerLists[0].getListenerTypes().length);
-    assertEquals("*", listenerLists[0].getListenerTypes()[0].getEventType());
-    assertEquals("Bar", listenerLists[0].getListenerTypes()[1].getEventType());
-    assertEquals("Foo", listenerLists[0].getListenerTypes()[2].getEventType());
-
-    assertEquals(3, listenerLists[0].getListenerCount());
-    assertEquals(1, listenerLists[0].getListenerTypes()[0].getListenerCount());
-    assertEquals(1, listenerLists[0].getListenerTypes()[1].getListenerCount());
-    assertEquals(1, listenerLists[0].getListenerTypes()[2].getListenerCount());
-
-    assertEquals(Listener1.class.getName(), listenerLists[0].getListenerTypes()[0].getListenerInfos()[0].getListenerClassName());
-    assertEquals(1, listenerLists[0].getListenerTypes()[0].getListenerInfos()[0].getListenerCount());
-
-    assertEquals(Listener2a.class.getName(), listenerLists[0].getListenerTypes()[1].getListenerInfos()[0].getListenerClassName());
-    assertEquals(1, listenerLists[0].getListenerTypes()[1].getListenerInfos()[0].getListenerCount());
-
-    assertEquals(Listener2b.class.getName(), listenerLists[0].getListenerTypes()[2].getListenerInfos()[0].getListenerClassName());
-    assertEquals(1, listenerLists[0].getListenerTypes()[2].getListenerInfos()[0].getListenerCount());
+  private static void assertContainsExactly(Class<?>... expectedClasses) {
+    ListenerListSnapshot snapshot = ListenerListRegistry.globalInstance().createSnapshot();
+    Set<IListenerListWithManagement> listenerLists = snapshot.getData().keySet();
+    List<Class<?>> expected = CollectionUtility.arrayList(expectedClasses);
+    for (IListenerListWithManagement list : listenerLists) {
+      Class<? extends IListenerListWithManagement> actual = list.getClass();
+      boolean removed = expected.remove(actual);
+      if (!removed) {
+        fail(actual + " found in list but should not be present.");
+      }
+    }
+    if (expected.isEmpty()) {
+      return;
+    }
+    fail("The following items are expected but could not be found in the list: " + StringUtility.join(", ", expected.toArray()));
   }
 
   private static class Listener1 implements PropertyChangeListener {

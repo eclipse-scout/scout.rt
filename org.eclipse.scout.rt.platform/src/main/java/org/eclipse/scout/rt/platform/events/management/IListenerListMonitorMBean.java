@@ -16,6 +16,7 @@ import java.util.Arrays;
 import javax.management.MXBean;
 
 import org.eclipse.scout.rt.platform.events.IListenerListWithManagement;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * Jmx control for event listeners of all implementations of {@link IListenerListWithManagement}
@@ -62,6 +63,11 @@ public interface IListenerListMonitorMBean {
           .sum();
     }
 
+    @Override
+    public String toString() {
+      return String.format("%s [className=%s, numInstances=%s, listenerTypes=\n%s\n]",
+          ListenerListInfo.class.getSimpleName(), m_listenerListClassName, m_listenerListInstances, StringUtility.join("\n", Arrays.asList(m_listenerTypes)));
+    }
   }
 
   public class EventType {
@@ -87,6 +93,11 @@ public interface IListenerListMonitorMBean {
           .mapToInt(l -> l.getListenerCount())
           .sum();
     }
+
+    @Override
+    public String toString() {
+      return String.format("  %s[type=%s, listeners=%s]", EventType.class.getSimpleName(), m_eventType, Arrays.toString(m_listenerInfos));
+    }
   }
 
   public class ListenerInfo {
@@ -105,6 +116,11 @@ public interface IListenerListMonitorMBean {
 
     public int getListenerCount() {
       return m_listenerCount;
+    }
+
+    @Override
+    public String toString() {
+      return String.format("%s[className=%s, count=%s]", ListenerInfo.class.getSimpleName(), m_listenerClassName, m_listenerCount);
     }
   }
 }
