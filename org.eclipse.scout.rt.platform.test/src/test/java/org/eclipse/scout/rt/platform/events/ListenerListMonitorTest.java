@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.events.management;
+package org.eclipse.scout.rt.platform.events;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -20,23 +20,35 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.events.IListenerListWithManagement;
-import org.eclipse.scout.rt.platform.events.ListenerListRegistry;
-import org.eclipse.scout.rt.platform.events.ListenerListSnapshot;
+import org.eclipse.scout.rt.platform.events.management.IListenerListMonitorMBean;
 import org.eclipse.scout.rt.platform.events.management.IListenerListMonitorMBean.EventType;
 import org.eclipse.scout.rt.platform.events.management.IListenerListMonitorMBean.ListenerInfo;
 import org.eclipse.scout.rt.platform.events.management.IListenerListMonitorMBean.ListenerListInfo;
+import org.eclipse.scout.rt.platform.events.management.ListenerListMonitorMBean;
 import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWithNewPlatform
 @RunWith(PlatformTestRunner.class)
 public class ListenerListMonitorTest {
+
+  private ListenerListRegistry m_originalListenerListRegistry;
+
+  @Before
+  public void runWithPrivateListenerListRegistry() {
+    m_originalListenerListRegistry = ListenerListRegistry.globalInstance();
+    ListenerListRegistry.setGlobalInstance(new ListenerListRegistry());
+  }
+
+  @After
+  public void restoreOriginalListenerListRegistry() {
+    ListenerListRegistry.setGlobalInstance(m_originalListenerListRegistry);
+  }
 
   @Test
   public void testMBean() {
@@ -56,10 +68,10 @@ public class ListenerListMonitorTest {
         "  " + EventType.class.getSimpleName() + "[type=Bar, listeners=[" + ListenerInfo.class.getSimpleName() + "[className=" + Listener2a.class.getName() + ", count=1]]]\n" +
         "  " + EventType.class.getSimpleName() + "[type=Foo, listeners=[" + ListenerInfo.class.getSimpleName() + "[className=" + Listener2b.class.getName() + ", count=1]]]\n" +
         "]]", Arrays.toString(listenerLists));
-    assertContainsExactly(BasicPropertySupport.class, BasicPropertySupport.class);
+    assertListenerListRegistryContainsExactly(BasicPropertySupport.class, BasicPropertySupport.class);
   }
 
-  private static void assertContainsExactly(Class<?>... expectedClasses) {
+  private static void assertListenerListRegistryContainsExactly(Class<?>... expectedClasses) {
     ListenerListSnapshot snapshot = ListenerListRegistry.globalInstance().createSnapshot();
     Set<IListenerListWithManagement> listenerLists = snapshot.getData().keySet();
     List<Class<?>> expected = CollectionUtility.arrayList(expectedClasses);

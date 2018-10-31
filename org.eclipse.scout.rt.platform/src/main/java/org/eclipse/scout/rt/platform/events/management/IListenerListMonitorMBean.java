@@ -64,6 +64,7 @@ public interface IListenerListMonitorMBean {
     }
 
     @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String toString() {
       return String.format("%s [className=%s, numInstances=%s, listenerTypes=\n%s\n]",
           ListenerListInfo.class.getSimpleName(), m_listenerListClassName, m_listenerListInstances, StringUtility.join("\n", Arrays.asList(m_listenerTypes)));

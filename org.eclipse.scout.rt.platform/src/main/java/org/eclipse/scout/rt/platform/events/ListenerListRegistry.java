@@ -10,22 +10,30 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.events;
 
+import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
  * This class is Thread safe
  */
 public final class ListenerListRegistry {
-  private static final ListenerListRegistry INSTANCE = new ListenerListRegistry();
-  private static final Object DUMMY_VALUE = null;
+
+  private static ListenerListRegistry globalInstance = new ListenerListRegistry();
 
   public static ListenerListRegistry globalInstance() {
-    return INSTANCE;
+    return globalInstance;
   }
 
-  private final WeakHashMap<IListenerListWithManagement, Object> m_set = new WeakHashMap<>();
+  /**
+   * This method is intended for unit testing only
+   */
+  static void setGlobalInstance(ListenerListRegistry newInstance) {
+    globalInstance = newInstance;
+  }
 
-  private ListenerListRegistry() {
+  private final Map<IListenerListWithManagement, Object> m_set = new WeakHashMap<>();
+
+  ListenerListRegistry() {
     //singleton
   }
 
@@ -37,7 +45,7 @@ public final class ListenerListRegistry {
    */
   public void registerAsWeakReference(IListenerListWithManagement eventListenerList) {
     synchronized (m_set) {
-      m_set.put(eventListenerList, DUMMY_VALUE);
+      m_set.put(eventListenerList, null);
     }
   }
 
