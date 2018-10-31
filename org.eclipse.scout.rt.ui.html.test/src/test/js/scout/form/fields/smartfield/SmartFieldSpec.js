@@ -900,4 +900,58 @@ describe('SmartField', function() {
 
   });
 
+  describe('column descriptors', function(){
+    it('with default lookup column at first position renders lookup row column at first position', function(){
+      var field = createFieldWithLookupCall({}, {
+        objectType: 'ColumnDescriptorDummyLookupCall'
+      });
+
+      field.columnDescriptors = [{
+        // First column (for lookup row text) is not visible
+      }, {
+        propertyName: 'column1',
+        width: 120
+      }, {
+        propertyName: 'column2',
+        width: 100
+      }];
+
+      field.render();
+      field.$field.focus(); // must be focused, otherwise popup will not open
+      field.$field.val('Bar');
+      field._onFieldKeyUp({});
+      jasmine.clock().tick(500);
+      expect(field.popup.proposalChooser.model.rows[0].cells[0].text).toBe("Bar");
+      expect(field.popup.proposalChooser.model.rows[0].cells[1].text).toBe("Bar column1");
+      expect(field.popup.proposalChooser.model.rows[0].cells[2].text).toBe("Bar column2");
+    });
+
+    it('with default lookup column in the middle renders lookup row column in the middle', function(){
+      var field = createFieldWithLookupCall({}, {
+        objectType: 'ColumnDescriptorDummyLookupCall'
+      });
+
+      field.columnDescriptors = [{
+        propertyName: 'column1',
+        width: 120
+      }, {
+        // First column (for lookup row text) is not visible
+      }, {
+        propertyName: 'column2',
+        width: 100,
+        cssClass: 'css-column2'
+      }];
+
+      field.render();
+      field.$field.focus(); // must be focused, otherwise popup will not open
+      field.$field.val('Bar');
+      field._onFieldKeyUp({});
+      jasmine.clock().tick(500);
+      expect(field.popup.proposalChooser.model.rows[0].cells[0].text).toBe("Bar column1");
+      expect(field.popup.proposalChooser.model.rows[0].cells[1].text).toBe("Bar");
+      expect(field.popup.proposalChooser.model.rows[0].cells[2].text).toBe("Bar column2");
+      expect(field.popup.proposalChooser.model.rows[0].cells[2].cssClass).toBe("css-column2");
+    });
+  });
+
 });

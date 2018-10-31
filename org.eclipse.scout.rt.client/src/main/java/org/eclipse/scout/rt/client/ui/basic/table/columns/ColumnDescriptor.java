@@ -25,6 +25,7 @@ public class ColumnDescriptor {
   private boolean m_fixedWidth;
   private int m_horizontalAlignment = -1;
   private boolean m_visible = true;
+  private boolean m_htmlEnabled = false;
 
   /**
    * @param propertyName
@@ -116,6 +117,15 @@ public class ColumnDescriptor {
 
   public ColumnDescriptor withVisible(boolean visible) {
     m_visible = visible;
+    return this;
+  }
+
+  public boolean isHtmlEnabled() {
+    return m_htmlEnabled;
+  }
+
+  public ColumnDescriptor withHtmlEnabled(boolean htmlEnabled) {
+    m_htmlEnabled = htmlEnabled;
     return this;
   }
 }

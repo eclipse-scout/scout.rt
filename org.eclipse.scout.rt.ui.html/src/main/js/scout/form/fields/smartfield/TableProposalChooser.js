@@ -55,7 +55,8 @@ scout.TableProposalChooser.prototype._createColumnForDescriptor = function(descr
     fixedWidth: scout.nvl(descriptor.fixedWidth, false),
     fixedPosition: scout.nvl(descriptor.fixedPosition, false),
     horizontalAlignment: scout.nvl(descriptor.horizontalAlignment, this.smartField.gridData.horizontalAlignment),
-    visible: scout.nvl(descriptor.visible, true)
+    visible: scout.nvl(descriptor.visible, true),
+    htmlEnabled: scout.nvl(descriptor.htmlEnabled, false)
   });
   return column;
 };
@@ -130,7 +131,6 @@ scout.TableProposalChooser.prototype.clearSelection = function() {
   this.model.deselectAll();
 };
 
-
 scout.TableProposalChooser.prototype.clearLookupRows = function() {
   this.model.removeAllRows();
 };
@@ -141,9 +141,9 @@ scout.TableProposalChooser.prototype.clearLookupRows = function() {
  * @returns {object} table-row model
  */
 scout.TableProposalChooser.prototype._createTableRow = function(lookupRow, multipleColumns) {
-  var row = scout.lookupField.createTableRow(lookupRow);
-  if (multipleColumns && lookupRow.additionalTableRowData) {
-    scout.arrays.pushAll(row.cells, this._transformTableRowData(lookupRow.additionalTableRowData));
+  var row = scout.lookupField.createTableRow(lookupRow, multipleColumns);
+  if (multipleColumns) {
+    scout.arrays.pushAll(row.cells, this._transformTableRowData(lookupRow, lookupRow.additionalTableRowData));
   }
   return row;
 };
@@ -169,15 +169,11 @@ scout.TableProposalChooser.prototype.getSelectedLookupRow = function() {
  * Takes the TableRowData bean and the infos provided by the column descriptors to create an
  * array of additional values in the correct order, as defined by the descriptors.
  */
-scout.TableProposalChooser.prototype._transformTableRowData = function(tableRowData) {
+scout.TableProposalChooser.prototype._transformTableRowData = function(lookupRow, tableRowData) {
   var descriptors = this.smartField.columnDescriptors;
   var cells = [];
   descriptors.forEach(function(desc) {
-    if (desc.propertyName) { // default column descriptor (first column) has propertyName null
-      cells.push(scout.create('Cell', {
-        text: tableRowData[desc.propertyName]
-      }));
-    }
+    cells.push(scout.lookupField.createTableCell(lookupRow, desc, tableRowData));
   });
   return cells;
 };
