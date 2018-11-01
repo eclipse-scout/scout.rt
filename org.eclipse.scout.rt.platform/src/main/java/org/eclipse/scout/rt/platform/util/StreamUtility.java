@@ -359,4 +359,18 @@ public final class StreamUtility {
       throw new IllegalStateException(String.format("Duplicate key %s", u));
     };
   }
+
+  /**
+   * Returns a merge function which always uses the existing element (<i>first-come-first-serve</i>).
+   */
+  public static <T> BinaryOperator<T> ignoringMerger() {
+    return (u, v) -> u;
+  }
+
+  /**
+   * Returns a merge function which always overrides the existing element (<i>last-wins</i>).
+   */
+  public static <T> BinaryOperator<T> replacingMerger() {
+    return (u, v) -> v;
+  }
 }
