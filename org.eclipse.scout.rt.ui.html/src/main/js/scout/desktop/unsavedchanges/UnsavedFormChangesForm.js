@@ -16,7 +16,38 @@ scout.UnsavedFormChangesForm = function() {
 scout.inherits(scout.UnsavedFormChangesForm, scout.Form);
 
 scout.UnsavedFormChangesForm.prototype._jsonModel = function() {
-  return scout.models.getModel('scout.UnsavedFormChangesForm');
+  return {
+    id: 'scout.UnsavedFormChangesForm',
+    objectType: 'Form',
+    type: 'model',
+    title: '${textKey:UnsavedChangesTitle}',
+    askIfNeedSave: false,
+    rootGroupBox: {
+      id: 'MainBox',
+      objectType: 'GroupBox',
+      menus: [{
+        id: 'OkMenu',
+        objectType: 'OkMenu'
+      }, {
+        id: 'CancelMenu',
+        objectType: 'CancelMenu'
+      }],
+      fields: [{
+        id: 'UnsavedChangesBox',
+        objectType: 'GroupBox',
+        label: '${textKey:SaveChangesOfSelectedItems}',
+        gridColumnCount: 1,
+        fields: [{
+          id: 'OpenFormsField',
+          objectType: 'ListBox',
+          gridDataHints: {
+            h: 5
+          },
+          labelVisible: false
+        }]
+      }]
+    }
+  };
 };
 
 scout.UnsavedFormChangesForm.prototype._init = function(model) {
