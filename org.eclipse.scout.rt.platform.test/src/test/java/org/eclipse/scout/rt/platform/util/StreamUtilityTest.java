@@ -22,7 +22,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -299,5 +301,50 @@ public class StreamUtilityTest {
     assertEquals(new Integer(3), map.get("one"));
     assertEquals(new Integer(3), map.get("two"));
     assertEquals(new Integer(5), map.get("three"));
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testThrowingMerger() {
+    // Test list: Two items have the key "a"
+    List<ImmutablePair<String, String>> items = Arrays.asList(
+        new ImmutablePair<>("a", "1"),
+        new ImmutablePair<>("b", "2"),
+        new ImmutablePair<>("a", "3"));
+    items.stream().collect(Collectors.toMap(
+        i -> i.getLeft(),
+        Function.identity(),
+        StreamUtility.throwingMerger()));
+  }
+
+  @Test
+  public void testIgnoringMerger() {
+    // Test list: Two items have the key "a"
+    List<ImmutablePair<String, String>> items = Arrays.asList(
+        new ImmutablePair<>("a", "1"),
+        new ImmutablePair<>("b", "2"),
+        new ImmutablePair<>("a", "3"));
+    Map<Object, ImmutablePair<String, String>> map = items.stream().collect(Collectors.toMap(
+        i -> i.getLeft(),
+        Function.identity(),
+        StreamUtility.ignoringMerger()));
+    assertEquals(2, map.size());
+    assertEquals("1", map.get("a").getRight()); // <--
+    assertEquals("2", map.get("b").getRight());
+  }
+
+  @Test
+  public void testReplacingMerger() {
+    // Test list: Two items have the key "a"
+    List<ImmutablePair<String, String>> items = Arrays.asList(
+        new ImmutablePair<>("a", "1"),
+        new ImmutablePair<>("b", "2"),
+        new ImmutablePair<>("a", "3"));
+    Map<Object, ImmutablePair<String, String>> map = items.stream().collect(Collectors.toMap(
+        i -> i.getLeft(),
+        Function.identity(),
+        StreamUtility.replacingMerger()));
+    assertEquals(2, map.size());
+    assertEquals("3", map.get("a").getRight()); // <--
+    assertEquals("2", map.get("b").getRight());
   }
 }
