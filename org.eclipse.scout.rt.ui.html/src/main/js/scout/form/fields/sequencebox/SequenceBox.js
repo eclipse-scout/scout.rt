@@ -22,6 +22,27 @@ scout.SequenceBox.prototype._init = function(model) {
   scout.SequenceBox.parent.prototype._init.call(this, model);
 
   this._setLayoutConfig(this.layoutConfig);
+
+  this._initDateFields();
+};
+
+/**
+ * Initialize all DateFields in this SequenceBox with a meaningful autoDate, except fields which already have an autoDate provided by the model.
+ */
+scout.SequenceBox.prototype._initDateFields = function() {
+  var dateFields = this._getDateFields();
+  var newAutoDate = null;
+  for (var i = 0; i < dateFields.length; i++) {
+    var currField = dateFields[i];
+    if (currField.autoDate) {
+      // is the autoDate already set by the field's model remember to not change this value.
+      currField.hasModelAutoDateSet = true;
+    }
+    if (!currField.hasModelAutoDateSet) {
+      currField.setAutoDate(newAutoDate);
+    }
+    newAutoDate = this._getAutoDateProposal(currField);
+  }
 };
 
 scout.SequenceBox.prototype._render = function() {
@@ -97,6 +118,9 @@ scout.SequenceBox.prototype._onFieldPropertyChange = function(event) {
   if (scout.isOneOf(event.propertyName, ['errorStatus', 'tooltipText', 'visible', 'menus', 'menusVisible'])) {
     this._handleStatus(visibiltyChanged);
   }
+  if (event.propertyName === 'value') {
+    this._onFieldValueChange(event);
+  }
 };
 
 /**
@@ -141,6 +165,50 @@ scout.SequenceBox.prototype._getLastVisibleField = function() {
   }
 
   return visibleFields[visibleFields.length - 1];
+};
+
+
+scout.SequenceBox.prototype._onFieldValueChange = function(event) {
+  if (event.source instanceof scout.DateField) {
+    this._onDateFieldValueChange(event);
+  }
+};
+
+scout.SequenceBox.prototype._onDateFieldValueChange = function(event) {
+  // For a better user experience preselect a meaningful date on all following DateFields in the sequence box.
+  var field = event.source;
+  var dateFields = this._getDateFields();
+  var newAutoDate = this._getAutoDateProposal(field);
+  for (var i = dateFields.indexOf(field) + 1; i < dateFields.length; i++) {
+    var currField = dateFields[i];
+    if (!currField.hasModelAutoDateSet) {
+      currField.setAutoDate(newAutoDate);
+    }
+    if (currField.value) {
+      // only update fields in between the current field and the next field with a value set. Otherwise already set autoDates would be overwritten.
+      break;
+    }
+  }
+};
+
+scout.SequenceBox.prototype._getDateFields = function() {
+  var dateFields = this.fields.filter(function(field) {
+    return field instanceof scout.DateField;
+  });
+  return dateFields;
+};
+
+scout.SequenceBox.prototype._getAutoDateProposal = function(field) {
+  var newAutoDate = null;
+  // if it's only a time field, add one hour, otherwise add one day
+  if (field && field.value) {
+    if (!field.hasDate && field.hasTime) {
+      newAutoDate = scout.dates.shiftTime(field.value, 1, 0, 0);
+    } else {
+      newAutoDate = scout.dates.shift(field.value, 0, 0, 1);
+    }
+  }
+  return newAutoDate;
 };
 
 // TODO [7.0] awe: (scout, sequence-box) remove _modifyLabel when CheckboxForm uses SequenceBox5

@@ -361,4 +361,162 @@ describe('SequenceBox', function() {
       expect(box.fields[1].$field).toBeFocused();
     });
   });
+
+  describe('autoDate on datefields', function() {
+    it('is set on following date fields if the date changes in a date field', function() {
+      var box = scout.create('SequenceBox', {
+        parent: session.desktop,
+        fields: [{
+          objectType: 'DateField'
+        }, {
+          objectType: 'DateField'
+        }]
+      });
+      box.render();
+      expect(box.fields[0].autoDate).toBe(null);
+      expect(box.fields[1].autoDate).toBe(null);
+
+      var date = scout.dates.create('2017-05-23 12:30:00.000');
+
+      box.fields[0].setValue(date);
+
+      expect(box.fields[0].value.toISOString()).toBe(date.toISOString());
+      expect(box.fields[0].autoDate).toBe(null);
+      expect(box.fields[1].autoDate.toISOString()).toBe(scout.dates.shift(date, 0, 0, 1).toISOString());
+    });
+
+    it('is set only on following fields in the sequence box', function() {
+      var box = scout.create('SequenceBox', {
+        parent: session.desktop,
+        fields: [{
+          objectType: 'DateField'
+        }, {
+          objectType: 'DateField'
+        }, {
+          objectType: 'DateField'
+        }, {
+          objectType: 'DateField'
+        }]
+      });
+      box.render();
+      expect(box.fields[0].autoDate).toBe(null);
+      expect(box.fields[1].autoDate).toBe(null);
+      expect(box.fields[2].autoDate).toBe(null);
+      expect(box.fields[3].autoDate).toBe(null);
+
+      var date = scout.dates.create('2017-05-23 12:30:00.000');
+
+      box.fields[1].setValue(date);
+
+      expect(box.fields[0].autoDate).toBe(null);
+      expect(box.fields[1].autoDate).toBe(null);
+      expect(box.fields[1].value.toISOString()).toBe(date.toISOString());
+      expect(box.fields[2].autoDate.toISOString()).toBe(scout.dates.shift(date, 0, 0, 1).toISOString());
+      expect(box.fields[3].autoDate.toISOString()).toBe(scout.dates.shift(date, 0, 0, 1).toISOString());
+
+      var date2 = scout.dates.create('2017-05-26 12:30:00.000');
+      box.fields[2].setValue(date2);
+
+      expect(box.fields[2].value.toISOString()).toBe(date2.toISOString());
+      expect(box.fields[3].autoDate.toISOString()).toBe(scout.dates.shift(date2, 0, 0, 1).toISOString());
+    });
+
+    it('is correctly removed again after a date field value is removed', function() {
+      var box = scout.create('SequenceBox', {
+        parent: session.desktop,
+        fields: [{
+          objectType: 'DateField'
+        }, {
+          objectType: 'DateField'
+        }, {
+          objectType: 'DateField'
+        }, {
+          objectType: 'DateField'
+        }]
+      });
+      box.render();
+      expect(box.fields[0].autoDate).toBe(null);
+      expect(box.fields[1].autoDate).toBe(null);
+      expect(box.fields[2].autoDate).toBe(null);
+      expect(box.fields[3].autoDate).toBe(null);
+
+      var date = scout.dates.create('2017-05-23 12:30:00.000');
+      var date2 = scout.dates.create('2017-05-26 12:30:00.000');
+
+      box.fields[0].setValue(date);
+      box.fields[2].setValue(date2);
+
+      expect(box.fields[0].value.toISOString()).toBe(date.toISOString());
+      expect(box.fields[1].autoDate.toISOString()).toBe(scout.dates.shift(date, 0, 0, 1).toISOString());
+      expect(box.fields[2].value.toISOString()).toBe(date2.toISOString());
+      expect(box.fields[3].autoDate.toISOString()).toBe(scout.dates.shift(date2, 0, 0, 1).toISOString());
+
+      box.fields[0].setValue(null);
+      expect(box.fields[0].value).toBe(null);
+      expect(box.fields[1].autoDate).toBe(null);
+      expect(box.fields[2].autoDate).toBe(null);
+      // field3.autoDate shouldn't be touched by field0's value change
+      expect(box.fields[3].autoDate.toISOString()).toBe(scout.dates.shift(date2, 0, 0, 1).toISOString());
+    });
+
+    it('is correctly set within sequence boxes containing other fields as well', function() {
+      var box = scout.create('SequenceBox', {
+        parent: session.desktop,
+        fields: [{
+          objectType: 'DateField'
+        }, {
+          objectType: 'StringField'
+        }, {
+          objectType: 'DateField'
+        }, {
+          objectType: 'StringField'
+        }]
+      });
+      box.render();
+      expect(box.fields[0].autoDate).toBe(null);
+      expect(box.fields[2].autoDate).toBe(null);
+
+      var date = scout.dates.create('2017-05-23 12:30:00.000');
+
+      box.fields[0].setValue(date);
+
+      expect(box.fields[0].value.toISOString()).toBe(date.toISOString());
+      expect(box.fields[2].autoDate.toISOString()).toBe(scout.dates.shift(date, 0, 0, 1).toISOString());
+    });
+
+    it('works correctly with values already set on the datefield model', function() {
+      var date = scout.dates.create('2017-05-23 12:30:00.000');
+      var box = scout.create('SequenceBox', {
+        parent: session.desktop,
+        fields: [{
+          objectType: 'DateField',
+          value: date
+        }, {
+          objectType: 'DateField'
+        }]
+      });
+      box.render();
+      expect(box.fields[0].autoDate).toBe(null);
+      expect(box.fields[1].autoDate.toISOString()).toBe(scout.dates.shift(date, 0, 0, 1).toISOString());
+    });
+
+    it('dont conflict with already set/programmed autoDates', function() {
+      var date = scout.dates.create('2017-05-23 12:30:00.000');
+      var date2 = scout.dates.create('2017-05-27 12:30:00.000');
+      var box = scout.create('SequenceBox', {
+        parent: session.desktop,
+        fields: [{
+          objectType: 'DateField',
+          autoDate: date
+        }, {
+          objectType: 'DateField',
+          autoDate: date
+        }]
+      });
+      box.render();
+      box.fields[0].setValue(date2);
+      expect(box.fields[0].autoDate.toISOString()).toBe(date.toISOString());
+      expect(box.fields[1].autoDate.toISOString()).toBe(date.toISOString());
+    });
+  });
 });
