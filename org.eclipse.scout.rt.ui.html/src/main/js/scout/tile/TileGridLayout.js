@@ -218,7 +218,7 @@ scout.TileGridLayout.prototype._inViewport = function(bounds) {
   bounds = bounds.translate(this.containerPos.x, this.containerPos.y).translate(0, -this.containerScrollTop);
   var topLeftPos = new scout.Point(bounds.x, bounds.y);
   var bottomRightPos = new scout.Point(bounds.x + bounds.width, bounds.y + bounds.height);
-  var $scrollable = this.widget.$container;
+  var $scrollable = this.widget.$container.scrollParent();
   return scout.scrollbars.isLocationInView(topLeftPos, $scrollable) || scout.scrollbars.isLocationInView(bottomRightPos, $scrollable);
 };
 
