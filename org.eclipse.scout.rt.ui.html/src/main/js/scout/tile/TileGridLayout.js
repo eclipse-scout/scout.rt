@@ -336,7 +336,7 @@ scout.TileGridLayout.prototype.virtualPrefSize = function($container, options) {
       // The last column does not have a hgap -> Correct the grid column count if another column would fit in
       columnCount++;
     }
-    columnCount = Math.min(this.widget.prefGridColumnCount, columnCount);
+    columnCount = Math.max(Math.min(this.widget.prefGridColumnCount, columnCount), 1);
 
     rowCount = this.widget.rowCount(columnCount);
     prefSize.width = options.widthHint;
