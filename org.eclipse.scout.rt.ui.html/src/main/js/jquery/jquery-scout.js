@@ -936,7 +936,7 @@ $.fn.isAttached = function() {
 };
 
 /**
- * Returns the first parent which is scrollable
+ * @returns the current element if it is scrollable, otherwise the first parent which is scrollable
  */
 $.fn.scrollParent = function() {
   var $elem = this;
