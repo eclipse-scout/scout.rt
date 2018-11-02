@@ -21,7 +21,6 @@ scout.NavigateButton = function() {
 
   this.node = null;
   this.outline = null;
-  this._onClickFunc = null;
   this.actionStyle = scout.Action.ActionStyle.BUTTON;
   /**
    * Additional CSS class to be applied in _render method.
@@ -36,11 +35,6 @@ scout.inherits(scout.NavigateButton, scout.Menu);
  * @override
  */
 scout.NavigateButton.prototype._render = function() {
-  if (this._isDetail()) {
-    this._onClickFunc = this._setDetailVisible.bind(this);
-  } else {
-    this._onClickFunc = this._drill.bind(this);
-  }
   if (this.overflow) {
     this.text = this.session.text(this._defaultText);
     this.iconId = null;
@@ -72,12 +66,13 @@ scout.NavigateButton.prototype._setDetailVisible = function() {
 /**
  * @override Menu.js
  */
-scout.NavigateButton.prototype.doAction = function() {
-  if (!this.prepareDoAction()) {
-    return false;
+scout.NavigateButton.prototype._doAction = function() {
+  scout.NavigateButton.parent.prototype._doAction.call(this);
+  if (this._isDetail()) {
+    this._setDetailVisible();
+  } else {
+    this._drill();
   }
-  this._onClickFunc();
-  return true;
 };
 
 /**
