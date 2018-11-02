@@ -36,9 +36,10 @@ scout.GroupLayout.prototype.layout = function($container) {
     htmlFooter.setSize(footerSize);
   }
 
-  // Set size only if group is expanded
-  // Also there is no need to update it during the expand animation (the body will be layouted correctly before the animation starts)
-  if (this.group.collapsed || this.group.bodyAnimating) {
+  // 1st condition: Set size only if group is expanded
+  // 2nd condition: There is no need to update it during the expand animation (the body will be layouted correctly before the animation starts)
+  // 3rd condition: When Group.setCollapsed(false) has been called an event is triggered that might causes invalidating layout on other all groups (inclusive currently expanding group). The body of the currently expanding group is not rendered at this time.
+  if (this.group.collapsed || this.group.bodyAnimating || !this.group.body.rendered) {
     return;
   }
   var bodySize;
