@@ -2436,7 +2436,7 @@ scout.Tree.prototype._triggerNodesSelected = function(debounce) {
 
 scout.Tree.prototype._showContextMenu = function(event) {
   var func = function(event) {
-    if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
+    if (!this.rendered) { // check needed because function is called asynchronously
       return;
     }
     var filteredMenus = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true),
