@@ -11,11 +11,10 @@
 package org.eclipse.scout.rt.testing.platform.dataobject;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -24,8 +23,8 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.dataobject.DoNode;
-import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
+import org.junit.ComparisonFailure;
 
 /**
  * Helper for unit tests dealing with {@link DoEntity}.
@@ -44,14 +43,13 @@ public class DataObjectTestHelper {
   /**
    * Asserts (deep) equality for specified {@link DoEntity} objects.
    *
-   * @param if
-   *          {@code true} concrete class of both {@link DoEntity} must be the identical
+   * @param assertClassEquals
+   *          if {@code true} concrete class of both {@link DoEntity} must be the identical
    */
   public void assertDoEntityEquals(IDoEntity expected, IDoEntity actual, boolean assertClassEquals) {
-    if (assertClassEquals) {
-      assertEquals(expected.getClass(), actual.getClass());
+    if (!equalsObject(expected, actual, assertClassEquals)) {
+      assertFail(expected, actual);
     }
-    assertObjectEquals(expected.allNodes(), actual.allNodes(), assertClassEquals);
 
     // assert all attribute names are set correctly to be equals to the corresponding map key
     assertMapKeyEqualsAttributeName(actual);
@@ -69,12 +67,13 @@ public class DataObjectTestHelper {
   /**
    * Asserts (deep) equality for specified {@link DoList} objects.
    *
-   * @param if
-   *          {@code true} concrete class of all nested {@link DoEntity}'s must be the identical
+   * @param assertClassEquals
+   *          if {@code true} concrete class of all nested {@link DoEntity}'s must be the identical
    */
   public void assertDoListEquals(DoList<?> expected, DoList<?> actual, boolean assertClassEquals) {
-    assertEquals(expected.getClass(), actual.getClass());
-    assertObjectEquals(expected.get(), actual.get(), assertClassEquals);
+    if (!equalsObject(expected, actual, assertClassEquals)) {
+      assertFail(expected, actual);
+    }
   }
 
   protected void assertMapKeyEqualsAttributeName(IDoEntity actual) {
@@ -86,54 +85,88 @@ public class DataObjectTestHelper {
   /**
    * Asserts (deep) equality of two {@link Object}, taking into account nested {@link DoNode} elements which requires
    * custom equality check.
+   */
+  public void assertObjectEquals(Object expected, Object actual, boolean assertClassEquals) {
+    if (!equalsObject(expected, actual, assertClassEquals)) {
+      assertFail(expected, actual);
+    }
+  }
+
+  protected void assertFail(Object expected, Object actual) {
+    throw new ComparisonFailure("Objects not equal", Objects.toString(expected), Objects.toString(actual));
+  }
+
+  /**
+   * Check equality of two {@link Object}, taking into account nested {@link DoNode} elements which requires custom
+   * equality check.
    * <p>
    * TODO [8.0] pbz: Add assert-param object instead of 'boolean assertClassEquals', e.g. allow BigDecimal == double for
    * raw DO's
+   *
+   * @return {@code true} if equal
    */
-  public void assertObjectEquals(Object expected, Object actual, boolean assertClassEquals) {
+  public boolean equalsObject(Object expected, Object actual, boolean assertClassEquals) {
     if (expected == null) {
-      assertNull(actual);
+      return actual == null;
     }
     else if (expected instanceof IDoEntity) {
-      assertDoEntityEquals((IDoEntity) expected, (IDoEntity) actual, assertClassEquals);
+      if (assertClassEquals && expected.getClass() != actual.getClass()) {
+        return false;
+      }
+      return equalsObject(((IDoEntity) expected).allNodes(), ((IDoEntity) actual).allNodes(), assertClassEquals);
     }
-    else if (expected instanceof DoValue) {
-      assertEquals(expected.getClass(), actual.getClass());
-      assertObjectEquals(((DoValue<?>) expected).get(), ((DoValue<?>) actual).get(), assertClassEquals);
-    }
-    else if (expected instanceof DoList) {
-      assertEquals(expected.getClass(), actual.getClass());
-      assertDoListEquals(DoList.class.cast(expected), DoList.class.cast(actual), assertClassEquals);
+    else if (expected instanceof DoNode) {
+      return expected.getClass() == actual.getClass() && equalsObject(((DoNode<?>) expected).get(), ((DoNode<?>) actual).get(), assertClassEquals);
     }
     else if (expected instanceof Collection) {
       Collection<?> expectedCollection = (Collection<?>) expected;
       Collection<?> actualCollection = (Collection<?>) actual;
-      assertEquals("size of collection does not match", expectedCollection.size(), actualCollection.size());
-      Iterator<?> expectedIter = expectedCollection.iterator();
-      Iterator<?> actualIter = actualCollection.iterator();
-      while (expectedIter.hasNext()) {
-        assertObjectEquals(expectedIter.next(), actualIter.next(), assertClassEquals);
+      if (expectedCollection.size() != actualCollection.size()) {
+        return false;
+      }
+      if (expected instanceof List) {
+        Iterator<?> expectedIter = expectedCollection.iterator();
+        Iterator<?> actualIter = actualCollection.iterator();
+        while (expectedIter.hasNext()) {
+          if (!equalsObject(expectedIter.next(), actualIter.next(), assertClassEquals)) {
+            return false;
+          }
+        }
+        return true;
+      }
+      else {
+        for (Object expectedElement : expectedCollection) {
+          boolean found = false;
+          Iterator<?> actualIter = actualCollection.iterator();
+          while (actualIter.hasNext() && !found) {
+            found = equalsObject(expectedElement, actualIter.next(), assertClassEquals);
+          }
+          if (!found) {
+            return false;
+          }
+        }
+        return true;
       }
     }
     else if (expected instanceof Map) {
       Map<?, ?> expectedMap = (Map<?, ?>) expected;
       Map<?, ?> actualMap = (Map<?, ?>) actual;
-      assertEquals("size of map does not match", expectedMap.size(), actualMap.size());
+      if (expectedMap.size() != actualMap.size()) {
+        return false;
+      }
 
       for (Entry<?, ?> expectedEntry : expectedMap.entrySet()) {
-        assertTrue("actual map does not contain expected key " + expectedEntry.getKey(), actualMap.containsKey(expectedEntry.getKey()));
-        assertObjectEquals(expectedEntry.getValue(), actualMap.get(expectedEntry.getKey()), assertClassEquals);
+        if (!equalsObject(expectedEntry.getValue(), actualMap.get(expectedEntry.getKey()), assertClassEquals)) {
+          return false;
+        }
       }
-      for (Entry<?, ?> actualEntry : actualMap.entrySet()) {
-        assertTrue("expected map does not contain actual key " + actualEntry.getKey(), expectedMap.containsKey(actualEntry.getKey()));
-        assertObjectEquals(expectedMap.get(actualEntry.getKey()), actualEntry.getValue(), assertClassEquals);
-      }
+      return true;
     }
     else if (expected.getClass().isArray()) {
-      assertTrue(Objects.deepEquals(expected, actual)); // delegates to Arrays.deepEquals0()
+      return Objects.deepEquals(expected, actual);// delegates to Arrays.deepEquals0()
     }
     else {
-      assertEquals(expected, actual);
+      return expected.equals(actual);
     }
   }
 }

@@ -11,23 +11,40 @@
 package org.eclipse.scout.rt.testing.platform.dataobject;
 
 import java.util.Objects;
+import java.util.function.Function;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.dataobject.DataObjectHelper;
 import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
+import org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 
 @Order(10000) // see also TestingUtility.TESTING_RESOURSE_ORDER
 @Replace
 public class TestingDataObjectHelper extends DataObjectHelper {
 
   /**
-   * In a test setup there is usually no [configured] {@link IDataObjectMapper}. Therefore usual {@code toString} method
-   * is used on values map.
+   * In a test setup there might be no [configured] {@link IDataObjectMapper}. Therefore usual {@code toString} method
+   * is used in such cases.
    */
+  private final LazyValue<Function<IDoEntity, String>> m_toStringFunction = new LazyValue<>(() -> {
+    IPrettyPrintDataObjectMapper prettyPrinter = BEANS.opt(IPrettyPrintDataObjectMapper.class);
+    if (prettyPrinter != null) {
+      return prettyPrinter::writeValue;
+    }
+    else {
+      return entity -> Objects.toString(entity.all());
+    }
+  });
+
   @Override
   public String toString(IDoEntity entity) {
-    return Objects.toString(entity != null ? entity.all() : null);
+    if (entity == null) {
+      return Objects.toString(entity);
+    }
+    return m_toStringFunction.get().apply(entity);
   }
 }

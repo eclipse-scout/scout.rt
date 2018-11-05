@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.fixture.EntityFixtureDo;
 import org.eclipse.scout.rt.platform.dataobject.fixture.OtherEntityFixtureDo;
 import org.junit.Before;
+import org.junit.ComparisonFailure;
 import org.junit.Test;
 
 public class DataObjectTestHelperTest {
@@ -70,14 +71,14 @@ public class DataObjectTestHelperTest {
     s_dataObjectTestHelper.assertDoEntityEquals(actualFixture, m_expectedEntityFixture);
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = ComparisonFailure.class)
   public void testAssertDoEntityEquals_missingAttribute() {
     DoEntity actual = new DoEntity();
     actual.put("foo", "bar");
     s_dataObjectTestHelper.assertDoEntityEquals(actual, m_expectedDoEntity);
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = ComparisonFailure.class)
   public void testAssertDoEntityEquals_wrongAttribute() {
     DoEntity actual = new DoEntity();
     actual.put("foo", "bar");
@@ -85,7 +86,7 @@ public class DataObjectTestHelperTest {
     s_dataObjectTestHelper.assertDoEntityEquals(actual, m_expectedDoEntity);
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = ComparisonFailure.class)
   public void testAssertDoEntityEquals_wrongListItem() {
     EntityFixtureDo actual = createEntityFixture();
     actual.getOtherEntities().add(BEANS.get(OtherEntityFixtureDo.class));
@@ -98,7 +99,7 @@ public class DataObjectTestHelperTest {
     s_dataObjectTestHelper.assertDoEntityEquals(entity, m_expectedEntityFixture, false);
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = ComparisonFailure.class)
   public void testAssertDoEntityEquals_classesMustBeEquals() {
     DoEntity entity = createEntityFixtureRaw();
     s_dataObjectTestHelper.assertDoEntityEquals(entity, m_expectedEntityFixture, true);
