@@ -554,6 +554,9 @@ scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
     this.$container.append($headerResize);
   }, this);
 
+  // ensure filler is at the end
+  this.$container.append(this.$filler);
+
   this._arrangeHeaderItems($headers);
 };
 
