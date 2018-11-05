@@ -227,7 +227,7 @@ scout.FieldStatus.prototype.togglePopup = function() {
   }
   if (!scout.arrays.empty(this.menus)) {
     this.hideTooltip();
-    var func = function func(event) {
+    var func = function func() {
       if (!this.rendered) { // check needed because function is called asynchronously
         return;
       }
@@ -239,7 +239,7 @@ scout.FieldStatus.prototype.togglePopup = function() {
       }
     }.bind(this);
 
-    this.session.onRequestsDone(func, event);
+    this.session.onRequestsDone(func);
 
   } else {
     // close all
