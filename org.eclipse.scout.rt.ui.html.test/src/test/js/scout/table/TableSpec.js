@@ -697,6 +697,30 @@ describe("Table", function() {
       expect(table.columns.length).toBe(1);
     });
 
+    it("checkablestyle.checbox_table_row checks row with click event", function() {
+      var model = helper.createModelFixture(2, 5);
+      model.checkableStyle = scout.Table.CheckableStyle.CHECKBOX_TABLE_ROW;
+      model.checkable = true;
+      model.multiCheck = true;
+      var table = helper.createTable(model);
+      table.render();
+
+      var rows = table.rows;
+      var checkedRows = findCheckedRows(rows);
+      expect(checkedRows.length).toBe(0);
+
+      table.$rows().eq(1).triggerClick();
+      table.$rows().eq(4).triggerClick();
+
+      checkedRows = findCheckedRows(rows);
+      expect(checkedRows.length).toBe(2);
+
+      table.$rows().eq(4).triggerClick();
+
+      checkedRows = findCheckedRows(rows);
+      expect(checkedRows.length).toBe(1);
+    });
+
   });
 
   describe("selectRows", function() {

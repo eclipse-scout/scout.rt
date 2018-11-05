@@ -27,6 +27,13 @@ scout.TreeBox.prototype._initStructure = function(value) {
   }
 };
 
+scout.TreeBox.prototype._initValue = function(value) {
+  if (!this.tree) {
+    this.tree = this._createDefaultTreeBoxTree();
+  }
+  scout.TreeBox.parent.prototype._initValue.call(this, value);
+};
+
 scout.TreeBox.prototype._render = function() {
   scout.TreeBox.parent.prototype._render.call(this);
   this.$container.addClass('tree-box');
@@ -191,6 +198,12 @@ scout.TreeBox.prototype._createDefaultTreeBoxTree = function() {
   return scout.create('Tree', {
     parent: this,
     checkable: true
+  });
+};
+
+scout.TreeBox.prototype._createDefaultTreeBoxTree = function() {
+  return scout.create('Tree', {
+    parent: this
   });
 };
 

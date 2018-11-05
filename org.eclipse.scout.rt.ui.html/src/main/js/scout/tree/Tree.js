@@ -18,6 +18,7 @@ scout.Tree = function() {
   this.toggleBreadcrumbStyleEnabled = false;
   this.autoCheckChildren = false;
   this.checkable = false;
+  this.checkableStyle = scout.Tree.CheckableStyle.CHECKBOX_TREE_NODE;
   this.displayStyle = scout.Tree.DisplayStyle.DEFAULT;
   this.dropType = 0;
   this.dropMaximumSize = scout.dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
@@ -90,6 +91,17 @@ scout.inherits(scout.Tree, scout.Widget);
 scout.Tree.DisplayStyle = {
   DEFAULT: 'default',
   BREADCRUMB: 'breadcrumb'
+};
+
+scout.Tree.CheckableStyle = {
+  /**
+   * Node check is only possible by checking the checkbox.
+   */
+  CHECKBOX: 'checkbox',
+  /**
+   * Node check is possible by clicking anywhere on the node.
+   */
+  CHECKBOX_TREE_NODE: 'checkbox_tree_node'
 };
 
 scout.Tree.prototype._init = function(model) {
@@ -940,6 +952,10 @@ scout.Tree.prototype._setCheckable = function(checkable) {
   } else {
     this.nodePaddingLevel = this.nodePaddingLevelNotCheckable;
   }
+};
+
+scout.Tree.prototype.setCheckableStyle = function(checkableStyle) {
+  this.setProperty('checkableStyle', checkableStyle);
 };
 
 scout.Tree.prototype._renderCheckable = function() {
@@ -2558,6 +2574,10 @@ scout.Tree.prototype._onNodeMouseUp = function(event) {
 };
 
 scout.Tree.prototype._isCheckboxClicked = function(event) {
+  // with CheckableStyle.CHECKBOX_TREE_NODE a click anywhere on the node should trigger the check
+  if (this.checkableStyle === scout.Tree.CheckableStyle.CHECKBOX_TREE_NODE) {
+    return true;
+  }
   return $(event.target).is('.check-box');
 };
 
@@ -2959,9 +2979,12 @@ scout.Tree.prototype._onNodeDoubleClick = function(event) {
     node: node
   });
 
-  this.setNodeExpanded(node, expanded, {
-    lazy: false // always show all nodes on node double click
-  });
+  // For CheckableStyle.CHECKBOX_TREE_NODE expand on double click is only enabled for disabled nodes. Otherwise it would conflict with the "check on node click" behavior.
+  if (!(this.checkable === true && this.checkableStyle === scout.Tree.CheckableStyle.CHECKBOX_TREE_NODE && node.enabled)) {
+    this.setNodeExpanded(node, expanded, {
+      lazy: false // always show all nodes on node double click
+    });
+  }
 };
 
 scout.Tree.prototype._onNodeControlMouseDown = function(event) {

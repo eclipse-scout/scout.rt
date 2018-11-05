@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
+import org.eclipse.scout.rt.client.ui.basic.tree.CheckableStyle;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
@@ -227,6 +228,17 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
       @Override
       protected Boolean modelValue() {
         return getModel().isToggleBreadcrumbStyleEnabled();
+      }
+    });
+    putJsonProperty(new JsonProperty<ITree>(ITree.PROP_CHECKABLE_STYLE, model) {
+      @Override
+      protected CheckableStyle modelValue() {
+        return getModel().getCheckableStyle();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return ((CheckableStyle) value).name().toLowerCase();
       }
     });
   }

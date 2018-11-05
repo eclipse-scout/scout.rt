@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTableRowBuilder;
+import org.eclipse.scout.rt.client.ui.basic.table.CheckableStyle;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
@@ -953,6 +954,11 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     @Override
     protected boolean getConfiguredCheckable() {
       return true;
+    }
+
+    @Override
+    protected CheckableStyle getConfiguredCheckableStyle() {
+      return CheckableStyle.CHECKBOX_TABLE_ROW;
     }
 
     @SuppressWarnings("unchecked")

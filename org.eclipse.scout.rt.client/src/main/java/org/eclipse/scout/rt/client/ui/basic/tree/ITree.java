@@ -55,6 +55,13 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   String PROP_DISPLAY_STYLE = "displayStyle";
   String PROP_TOGGLE_BREADCRUMB_STYLE_ENABLED = "toggleBreadcrumbStyleEnabled";
 
+  /**
+   * The strategy how rows can be checked.
+   *
+   * @since 9.0
+   */
+  String PROP_CHECKABLE_STYLE = "checkableStyle";
+
   String DISPLAY_STYLE_DEFAULT = "default";
   String DISPLAY_STYLE_BREADCRUMB = "breadcrumb";
 
@@ -371,6 +378,10 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   boolean isCheckable();
 
   void setCheckable(boolean b);
+
+  CheckableStyle getCheckableStyle();
+
+  void setCheckableStyle(CheckableStyle checkableStyle);
 
   /**
    * This is a hint for the UI if it is not capable of having variable node height based on node contents (such as

@@ -410,6 +410,12 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     return false;
   }
 
+  @ConfigProperty(ConfigProperty.OBJECT)
+  @Order(155)
+  protected CheckableStyle getConfiguredCheckableStyle() {
+    return CheckableStyle.CHECKBOX_TREE_NODE;
+  }
+
   private List<Class<? extends IKeyStroke>> getConfiguredKeyStrokes() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IKeyStroke>> fca = ConfigurationUtility.filterClasses(dca, IKeyStroke.class);
@@ -565,6 +571,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     setCssClass(getConfiguredCssClass());
     setAutoTitle(getConfiguredAutoTitle());
     setCheckable(getConfiguredCheckable());
+    setCheckableStyle(getConfiguredCheckableStyle());
     setNodeHeightHint(getConfiguredNodeHeightHint());
     setMultiCheck(getConfiguredMultiCheck());
     setMultiSelect(getConfiguredMultiSelect());
@@ -1083,6 +1090,16 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   @Override
   public void setToggleBreadcrumbStyleEnabled(boolean b) {
     propertySupport.setPropertyBool(PROP_TOGGLE_BREADCRUMB_STYLE_ENABLED, b);
+  }
+
+  @Override
+  public CheckableStyle getCheckableStyle() {
+    return (CheckableStyle) propertySupport.getProperty(PROP_CHECKABLE_STYLE);
+  }
+
+  @Override
+  public void setCheckableStyle(CheckableStyle checkableStyle) {
+    propertySupport.setProperty(PROP_CHECKABLE_STYLE, checkableStyle);
   }
 
   @Override

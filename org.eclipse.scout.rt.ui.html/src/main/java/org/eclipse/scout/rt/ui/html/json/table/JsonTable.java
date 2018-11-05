@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
+import org.eclipse.scout.rt.client.ui.basic.table.CheckableStyle;
 import org.eclipse.scout.rt.client.ui.basic.table.GroupingStyle;
 import org.eclipse.scout.rt.client.ui.basic.table.HierarchicalStyle;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -383,6 +384,18 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
           return null;
         }
         return m_jsonColumns.get(value).getId();
+      }
+    });
+
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_CHECKABLE_STYLE, model) {
+      @Override
+      protected CheckableStyle modelValue() {
+        return getModel().getCheckableStyle();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return ((CheckableStyle) value).name().toLowerCase();
       }
     });
   }

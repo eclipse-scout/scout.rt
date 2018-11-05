@@ -119,7 +119,11 @@ scout.Table.CheckableStyle = {
    * When a row is checked the table-row is marked as checked. By default a background
    * color is set on the table-row when the row is checked.
    */
-  TABLE_ROW: 'tableRow'
+  TABLE_ROW: 'tableRow',
+  /**
+   * Like the CHECKBOX Style but a click anywhere on the row triggers the check.
+   */
+  CHECKBOX_TABLE_ROW: 'checkbox_table_row'
 };
 
 scout.Table.SELECTION_CLASSES = 'select-middle select-top select-bottom select-single selected';
@@ -505,8 +509,10 @@ scout.Table.prototype._onRowMouseDown = function(event) {
   var isRightClick = event.which === 3;
   var row = this._$mouseDownRow.data('row');
 
-  // For checkableStyle TableRow only: check row if left click OR clicked row was not checked yet
-  if (this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW && (!isRightClick || !row.checked)) {
+  // For checkableStyle TABLE_ROW & CHECKBOX_TABLE_ROW only: check row if left click OR clicked row was not checked yet
+  if (scout.isOneOf(this.checkableStyle, scout.Table.CheckableStyle.TABLE_ROW, scout.Table.CheckableStyle.CHECKBOX_TABLE_ROW) &&
+    (!isRightClick || !row.checked) &&
+    !$(event.target).is('.table-row-control')) {
     this.checkRow(row, !row.checked);
   }
   if (isRightClick) {
@@ -3952,7 +3958,7 @@ scout.Table.prototype._setCheckable = function(checkable) {
 
 scout.Table.prototype._updateCheckableColumn = function() {
   var column = this.checkableColumn;
-  var showCheckBoxes = this.checkable && this.checkableStyle === scout.Table.CheckableStyle.CHECKBOX;
+  var showCheckBoxes = this.checkable && scout.isOneOf(this.checkableStyle, scout.Table.CheckableStyle.CHECKBOX, scout.Table.CheckableStyle.CHECKBOX_TABLE_ROW);
   if (showCheckBoxes && !column) {
     this._insertBooleanColumn();
     this._calculateTableNodeColumn();

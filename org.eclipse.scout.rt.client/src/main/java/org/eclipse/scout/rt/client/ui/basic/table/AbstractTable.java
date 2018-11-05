@@ -600,6 +600,12 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     return HierarchicalStyle.DEFAULT;
   }
 
+  @ConfigProperty(ConfigProperty.OBJECT)
+  @Order(260)
+  protected CheckableStyle getConfiguredCheckableStyle() {
+    return CheckableStyle.CHECKBOX;
+  }
+
   /**
    * Called after a drag operation was executed on one or several table rows.
    * <p>
@@ -885,6 +891,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     setLoading(false);
     setGroupingStyle(getConfiguredGroupingStyle());
     setHierarchicalStyle(getConfiguredHierarchicalStyle());
+    setCheckableStyle(getConfiguredCheckableStyle());
     setTitle(getConfiguredTitle());
     setAutoDiscardOnDelete(getConfiguredAutoDiscardOnDelete());
     setSortEnabled(getConfiguredSortEnabled());
@@ -5092,6 +5099,16 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   @Override
   public void setHierarchicalStyle(HierarchicalStyle hierarchicalStyle) {
     propertySupport.setProperty(PROP_HIERARCHICAL_STYLE, hierarchicalStyle);
+  }
+  
+  @Override
+  public CheckableStyle getCheckableStyle() {
+    return (CheckableStyle) propertySupport.getProperty(PROP_CHECKABLE_STYLE);
+  }
+
+  @Override
+  public void setCheckableStyle(CheckableStyle checkableStyle) {
+    propertySupport.setProperty(PROP_CHECKABLE_STYLE, checkableStyle);
   }
 
   @Override

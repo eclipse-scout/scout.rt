@@ -808,6 +808,16 @@ describe("Tree", function() {
 
   describe("checkNodes", function() {
 
+    function findCheckedNodes(nodes) {
+      var checkedNodes = [];
+      for (var j = 0; j < nodes.length; j++) {
+        if (nodes[j].checked) {
+          checkedNodes.push(nodes[j]);
+        }
+      }
+      return checkedNodes;
+    }
+
     it("checks a subnode -> mark upper nodes ", function() {
       var model = helper.createModelFixture(4, 4);
       var tree = helper.createTree(model);
@@ -954,12 +964,7 @@ describe("Tree", function() {
         tree.checkNode(nodeTwo, true);
       }
 
-      var checkedNodes = [];
-      for (var j = 0; j < tree.nodes.length; j++) {
-        if (tree.nodes[j].checked) {
-          checkedNodes.push(tree.nodes[j]);
-        }
-      }
+      var checkedNodes = findCheckedNodes(tree.nodes);
       expect(checkedNodes.length).toBe(1);
     });
 
@@ -1014,6 +1019,33 @@ describe("Tree", function() {
         }
       }
       expect(checkedNodes.length).toBe(0);
+    });
+
+    it("checkablestyle.checkbox_tree_node checks row with click event", function() {
+      var model = helper.createModelFixture(5, 0);
+      model.checkableStyle = scout.Tree.CheckableStyle.CHECKBOX_TREE_NODE;
+      model.checkable = true;
+      var tree = helper.createTree(model);
+      tree.render();
+
+      var nodes = tree.nodes;
+
+      var checkedNodes = findCheckedNodes(nodes);
+      expect(checkedNodes.length).toBe(0);
+
+      var node = tree.$nodes;
+
+      tree.$nodes().eq(2).triggerClick();
+      tree.$nodes().eq(1).triggerClick();
+
+      checkedNodes = findCheckedNodes(nodes);
+      expect(checkedNodes.length).toBe(2);
+
+      // unchecking node 1 wouldn't work since then the tree's doubleClick handler would detect the second click as a double click
+      tree.$nodes().eq(2).triggerClick();
+
+      checkedNodes = findCheckedNodes(nodes);
+      expect(checkedNodes.length).toBe(1);
     });
 
   });
@@ -1082,6 +1114,38 @@ describe("Tree", function() {
       tree._doubleClickSupport._lastTimestamp -= 5000; // simulate last click 5 seconds ago
 
       $nodeControl.triggerDoubleClick();
+      expect($node).not.toHaveClass('expanded');
+    });
+  });
+
+  describe("checkable node double click", function() {
+    it("doesn't expands/collapses the node with checkable style checkbox_tree_node (default)", function() {
+      var model = helper.createModelFixture(1, 1, false);
+      model.checkable = true;
+      var tree = helper.createTree(model);
+      tree.render();
+
+      var $node = tree.$container.find('.tree-node:first');
+      expect($node).not.toHaveClass('expanded');
+
+      $node.triggerDoubleClick();
+      expect($node).not.toHaveClass('expanded');
+    });
+
+    it("expands/collapses the node with checkable style checkbox", function() {
+      var model = helper.createModelFixture(1, 1, false);
+      model.checkableStyle = scout.Tree.CheckableStyle.CHECKBOX;
+      model.checkable = true;
+      var tree = helper.createTree(model);
+      tree.render();
+
+      var $node = tree.$container.find('.tree-node:first');
+      expect($node).not.toHaveClass('expanded');
+
+      $node.triggerDoubleClick();
+      expect($node).toHaveClass('expanded');
+
+      $node.triggerDoubleClick();
       expect($node).not.toHaveClass('expanded');
     });
   });

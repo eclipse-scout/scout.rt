@@ -210,6 +210,13 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
    * @since 8.0
    */
   String PROP_HIERARCHICAL_ROWS = "hierarchicalRows";
+  
+  /**
+   * The strategy how rows can be checked.
+   *
+   * @since 9.0
+   */
+  String PROP_CHECKABLE_STYLE = "checkableStyle";
 
   /**
    * type long
@@ -1225,6 +1232,10 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
   void setHierarchicalStyle(HierarchicalStyle hierarchicalStyle);
 
   boolean isHierarchical();
+  
+  CheckableStyle getCheckableStyle();
+
+  void setCheckableStyle(CheckableStyle checkableStyle);
 
   /**
    * Indicator for the estimated total available row count, optional
