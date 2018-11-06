@@ -16,6 +16,7 @@ scout.Popup = function() {
   this._popupOpenHandler = null;
   this._glassPaneRenderer = null;
   this.anchorBounds = null;
+  this.animateOpening = false;
   this.$anchor = null;
   this.windowPaddingX = 10;
   this.windowPaddingY = 5;
@@ -153,6 +154,9 @@ scout.Popup.prototype.open = function($parent) {
   // be shifted for a few pixels.
   if (this.withFocusContext) {
     this.session.focusManager.installFocusContext(this.$container, this.initialFocus());
+  }
+  if (this.animateOpening) {
+    this.$container.addClassForAnimation('animate-open');
   }
 };
 
@@ -300,18 +304,26 @@ scout.Popup.prototype._attachCloseHandler = function() {
   }
 
   // Install scroll close handler
+  this._attachAnchorScrollHandler();
+};
+
+scout.Popup.prototype._attachAnchorScrollHandler = function() {
   if (this.$anchor && this.boundToAnchor && this.scrollType) {
     this._anchorScrollHandler = this._onAnchorScroll.bind(this);
     scout.scrollbars.onScroll(this.$anchor, this._anchorScrollHandler);
   }
 };
 
-scout.Popup.prototype._detachCloseHandler = function() {
-  // Uninstall scroll close handler
+scout.Popup.prototype._detachAnchorScrollHandler = function() {
   if (this._anchorScrollHandler) {
     scout.scrollbars.offScroll(this._anchorScrollHandler);
     this._anchorScrollHandler = null;
   }
+};
+
+scout.Popup.prototype._detachCloseHandler = function() {
+  // Uninstall scroll close handler
+  this._detachAnchorScrollHandler();
 
   // Uninstall popup open close handler
   if (this._popupOpenHandler) {
@@ -698,6 +710,18 @@ scout.Popup.prototype._triggerPopupOpenEvent = function() {
 
 scout.Popup.prototype.belongsTo = function($anchor) {
   return this.$anchor[0] === $anchor[0];
+};
+
+scout.Popup.prototype.set$Anchor = function($anchor) {
+  if (this.$anchor) {
+    this._detachAnchorScrollHandler();
+  }
+  this.$anchor = $anchor;
+  if (this.rendered) {
+    this._attachAnchorScrollHandler();
+    this.revalidateLayout();
+    this.position();
+  }
 };
 
 scout.Popup.prototype.isOpen = function() {

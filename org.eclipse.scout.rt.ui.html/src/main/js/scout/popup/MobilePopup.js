@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.MobilePopup = function() {
   scout.MobilePopup.parent.call(this);
+  this.animateOpening = true;
   this.boundToAnchor = false;
   this.windowPaddingX = 0;
   this.windowPaddingY = 0;
