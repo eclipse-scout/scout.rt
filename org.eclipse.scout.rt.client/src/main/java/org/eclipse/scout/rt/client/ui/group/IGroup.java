@@ -18,8 +18,10 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 
 public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject, IContributionOwner, ITypeWithClassId {
+
   String PROP_ORDER = "order";
   String PROP_COLLAPSED = "collapsed";
+  String PROP_COLLAPSIBLE = "collapsible";
   String PROP_COLLAPSE_STYLE = "collapseStyle";
   String PROP_TITLE = "title";
   String PROP_HEADER_VISIBLE = "headerVisible";
@@ -40,6 +42,10 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
   void setCollapsed(boolean collapsed);
 
   void toggleCollapse();
+
+  boolean isCollapsible();
+
+  void setCollapsible(boolean collapsible);
 
   String getCollapseStyle();
 

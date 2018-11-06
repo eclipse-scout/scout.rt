@@ -66,6 +66,7 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
     m_contributionHolder = new ContributionComposite(this);
     setOrder(calculateViewOrder());
     setCollapsed(getConfiguredCollapsed());
+    setCollapsible(getConfiguredCollapsible());
     setCollapseStyle(getConfiguredCollapseStyle());
     setTitle(getConfiguredTitle());
     setHeaderVisible(getConfiguredHeaderVisible());
@@ -174,6 +175,22 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
   @Override
   public void toggleCollapse() {
     setCollapsed(!isCollapsed());
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(82)
+  protected boolean getConfiguredCollapsible() {
+    return true;
+  }
+
+  @Override
+  public void setCollapsible(boolean collapsible) {
+    propertySupport.setPropertyBool(PROP_COLLAPSIBLE, collapsible);
+  }
+
+  @Override
+  public boolean isCollapsible() {
+    return propertySupport.getPropertyBool(PROP_COLLAPSIBLE);
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
