@@ -507,6 +507,9 @@ scout.Widget.prototype.setOwner = function(owner) {
 
 scout.Widget.prototype.setParent = function(parent) {
   scout.assertParameter('parent', parent);
+  if (this.rendered && !parent.rendered) {
+    throw new Error('rendered child ' + this + ' is added to not rendered parent ' + parent);
+  }
   if (parent === this.parent) {
     return;
   }
