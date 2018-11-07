@@ -43,10 +43,8 @@ describe("scout.models", function() {
       scout.models.init(models);
     });
 
-    it('load object without type', function() {
-      expect(function() {
-        scout.models._get('object', 'model');
-      }).toThrow(new Error('Model \'object\' is not of type \'model\''));
+    it('load object without type possible', function() {
+      expect(scout.models._get('object', 'model').value).toBe('objectValue');
     });
 
     it('ensure the object is a copy', function() {

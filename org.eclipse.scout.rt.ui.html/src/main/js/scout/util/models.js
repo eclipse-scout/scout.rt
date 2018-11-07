@@ -78,7 +78,7 @@ scout.models = {
     if (!model) {
       throw new Error('No model map entry found for id \'' + id + '\'');
     }
-    if (model.type !== type) {
+    if (scout.nvl(model.type, 'model') !== type) {
       throw new Error('Model \'' + id + '\' is not of type \'' + type + '\'');
     }
     return $.extend(true, {}, model);
@@ -209,8 +209,7 @@ scout.models = {
       if (insertAt === -1) {
         insertAt = targetArray.length;
       }
-    }
-    else if (target.after) {
+    } else if (target.after) {
       insertAt = scout.arrays.findIndex(targetArray, function(element) {
         return element.id === target.after || element.groupedWith === target.after;
       });
