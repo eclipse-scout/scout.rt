@@ -31,6 +31,7 @@ scout.Form = function() {
   this.focusedElement = null;
   this.closable = true;
   this.cacheBounds = false;
+  this.cacheBoundsKey = null;
   this.resizable = true;
   this.rootGroupBox = null;
   this.saveNeeded = false;
@@ -81,6 +82,7 @@ scout.Form.prototype._init = function(model) {
 
   this._setRootGroupBox(this.rootGroupBox);
   this._setStatus(this.status);
+  this.cacheBoundsKey = scout.nvl(model.cacheBoundsKey, this.objectType);
   this._installLifecycle();
 };
 
