@@ -596,6 +596,10 @@ scout.Form.prototype.setAskIfNeedSave = function(askIfNeedSave) {
   }
 };
 
+scout.Form.prototype.setDisplayHint = function(displayHint) {
+  this.setProperty('displayHint', displayHint);
+};
+
 scout.Form.prototype.setSaveNeededVisible = function(visible) {
   this.setProperty('saveNeededVisible', visible);
 };

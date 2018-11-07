@@ -76,6 +76,9 @@ scout.FormTableControl.prototype._setForm = function(form) {
 
 scout.FormTableControl.prototype._adaptForm = function(form) {
   form.rootGroupBox.menuBar.bottom();
+  form.setDisplayHint(scout.Form.DisplayHint.VIEW);
+  form.setModal(false);
+  form.setAskIfNeedSave(false);
   if (this.session.userAgent.deviceType !== scout.Device.Type.MOBILE && form.rootGroupBox.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE) {
     // Use default style because alternative style does not look as good with a background color
     form.rootGroupBox.setFieldStyle(scout.FormField.FieldStyle.CLASSIC);
