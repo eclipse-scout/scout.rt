@@ -18,7 +18,8 @@ scout.inherits(scout.PopupLayout, scout.AbstractLayout);
 scout.PopupLayout.prototype.layout = function($container) {
   var htmlComp = this.popup.htmlComp,
     prefSize = this.preferredLayoutSize($container, {
-      exact: true
+      exact: true,
+      onlyWidth: this.doubleCalcPrefSize
     });
 
   prefSize = this.adjustSize(prefSize);

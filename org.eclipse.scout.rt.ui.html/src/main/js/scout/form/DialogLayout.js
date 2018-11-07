@@ -20,21 +20,18 @@ scout.DialogLayout.prototype.layout = function($container) {
     return;
   }
 
-  var dialogSize, currentBounds,
+  var currentBounds,
     htmlComp = this.form.htmlComp,
+    cacheBounds = this.form.readCacheBounds(),
     dialogMargins = htmlComp.margins(),
-    windowSize = $container.windowSize(),
-    cacheBounds = this.form.readCacheBounds();
+    windowSize = $container.windowSize();
 
   if (cacheBounds) {
-    dialogSize = cacheBounds.dimension();
     currentBounds = cacheBounds;
   } else {
-    dialogSize = this.preferredLayoutSize($container);
     currentBounds = htmlComp.offsetBounds(true);
   }
-
-  dialogSize = scout.DialogLayout.fitContainerInWindow(windowSize, currentBounds.point(), dialogSize, dialogMargins);
+  var dialogSize = this._calcSize($container, currentBounds, cacheBounds);
 
   // Add markers to be able to style the dialog in a different way when it uses the full width or height
   $container
@@ -51,6 +48,36 @@ scout.DialogLayout.prototype.layout = function($container) {
 
   scout.graphics.setSize($container, dialogSize);
   scout.DialogLayout.parent.prototype.layout.call(this, $container);
+};
+
+scout.DialogLayout.prototype._calcSize = function($container, currentBounds, cacheBounds) {
+  var dialogSize,
+    htmlComp = this.form.htmlComp,
+    dialogMargins = htmlComp.margins(),
+    windowSize = $container.windowSize();
+
+  if (cacheBounds) {
+    dialogSize = cacheBounds.dimension();
+    currentBounds = cacheBounds;
+    dialogSize = scout.DialogLayout.fitContainerInWindow(windowSize, currentBounds.point(), dialogSize, dialogMargins);
+    if (cacheBounds.dimension().width === dialogSize.width) {
+      // If width is still the same (=fitContainerInWindow did not reduce the width), then just return it. Otherwise read pref size again
+      return dialogSize;
+    }
+  }
+
+  // Calculate preferred width first...
+  dialogSize = this.preferredLayoutSize($container, {
+    widthOnly: true
+  });
+  dialogSize = scout.DialogLayout.fitContainerInWindow(windowSize, currentBounds.point(), dialogSize, dialogMargins);
+
+  // ...then calculate the actual preferred size based on the width. This is necessary because the dialog may contain fields with wrapping content. Without a width hint the height would not be correct.
+  dialogSize = this.preferredLayoutSize($container, {
+    widthHint: dialogSize.width
+  });
+  dialogSize = scout.DialogLayout.fitContainerInWindow(windowSize, currentBounds.point(), dialogSize, dialogMargins);
+  return dialogSize;
 };
 
 /**
