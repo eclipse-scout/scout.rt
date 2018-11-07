@@ -133,6 +133,9 @@ scout.Scrollbar.prototype._scrollToAbsolutePoint = function(absolutePoint) {
  * do not use this internal method (triggered by scroll event)
  */
 scout.Scrollbar.prototype.update = function() {
+  if (!this.rendered) {
+    return;
+  }
   var margin = this.$container['cssMargin' + this.axis.toUpperCase()]();
   var scrollPos = this.$parent[this._scrollDir]();
   var scrollLeft = this.$parent.scrollLeft();
