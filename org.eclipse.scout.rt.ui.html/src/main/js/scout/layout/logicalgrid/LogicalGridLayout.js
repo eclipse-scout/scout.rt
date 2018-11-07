@@ -78,7 +78,8 @@ scout.LogicalGridLayout.prototype.validateLayout = function($container, options)
     rowHeight: this.rowHeight,
     columnWidth: this.columnWidth,
     widthHint: options.widthHint,
-    heightHint: options.heightHint
+    heightHint: options.heightHint,
+    widthOnly: options.widthOnly
   });
   $.log.isTraceEnabled() && $.log.trace('(LogicalGridLayout#validateLayout) $container=' + scout.HtmlComponent.get($container).debug());
 };

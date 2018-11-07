@@ -112,8 +112,8 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container, option
       .add(htmlContainer.insets());
     return prefSize;
   }
-  // Use explicit width as hint if set (overrides existing hint)
-  if (widthInPixel) {
+  // Use explicit width as hint if set
+  if (!options.widthHint && widthInPixel) {
     options.widthHint = widthInPixel;
   }
   // HeightHint not supported

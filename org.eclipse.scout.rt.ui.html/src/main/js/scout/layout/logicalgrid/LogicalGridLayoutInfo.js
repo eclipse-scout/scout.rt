@@ -28,6 +28,7 @@ scout.LogicalGridLayoutInfo = function(model) {
   this.columnWidth = 0;
   this.cellBounds = [];
   this.widthHint = null;
+  this.widthOnly = false;
   $.extend(this, model);
 
   // create a modifiable copy of the grid datas
@@ -160,6 +161,12 @@ scout.LogicalGridLayoutInfo.prototype._initializeInfo = function() {
 
   // Calculate this.width and this.weightX
   this._initializeColumns();
+
+  if (this.widthOnly) {
+    // Abort here if only width is of interest
+    this.height = scout.arrays.init(this.rows, [0, 0, 0]);
+    return;
+  }
 
   // Calculate preferred heights using the width hints
   if (this.widthHint && uiHeightElements.length > 0) {
