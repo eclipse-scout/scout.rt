@@ -90,6 +90,6 @@ scout.PageWithNodes.prototype.loadChildren = function() {
  * @return {$.Deferred}
  */
 scout.PageWithNodes.prototype._createChildPages = function() {
-  return $.resolvedDeferred();
+  return $.resolvedDeferred(this.childNodes);
 };
 

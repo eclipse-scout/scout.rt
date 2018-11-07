@@ -105,9 +105,10 @@ scout.Outline.prototype._createMediator = function() {
  * @override Tree.js
  */
 scout.Outline.prototype._createTreeNode = function(nodeModel) {
-  nodeModel = scout.nvl(nodeModel, {});
-  nodeModel.parent = this;
-  return scout.create('Page', nodeModel);
+  var model = $.extend({
+    objectType: 'Page'
+  }, nodeModel);
+  return this._createChild(model);
 };
 
 scout.Outline.prototype._applyNodeDefaultValues = function(node) {

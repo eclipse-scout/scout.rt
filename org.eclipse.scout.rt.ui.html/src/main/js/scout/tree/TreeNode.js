@@ -44,6 +44,10 @@ scout.TreeNode = function(tree) {
 };
 
 scout.TreeNode.prototype.init = function(model) {
+  var staticModel = this._jsonModel();
+  if (staticModel) {
+    model = $.extend({}, staticModel, model);
+  }
   this._init(model);
   if (model.initialExpanded === undefined) {
     this.initialExpanded = this.expanded;
@@ -85,6 +89,8 @@ scout.TreeNode.prototype._init = function(model) {
     this.getTree()._ensureTreeNodes(this.childNodes);
   }
 };
+
+scout.TreeNode.prototype._jsonModel = function() {};
 
 scout.TreeNode.prototype.hasChildNodes = function() {
   return this.childNodes.length > 0;

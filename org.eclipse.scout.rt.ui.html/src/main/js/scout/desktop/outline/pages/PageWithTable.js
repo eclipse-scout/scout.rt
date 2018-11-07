@@ -30,6 +30,8 @@ scout.PageWithTable.prototype._initTable = function(table) {
   table.on('rowsUpdated', this._onTableRowsUpdated.bind(this));
   table.on('rowAction', this._onTableRowAction.bind(this));
   table.on('rowOrderChanged', this._onTableRowOrderChanged.bind(this));
+  table.on('reload', this.loadTableData.bind(this));
+  table.hasReloadHandler = true;
 };
 
 scout.PageWithTable.prototype._onTableRowsDeleted = function(event) {
@@ -114,6 +116,16 @@ scout.PageWithTable.prototype.loadChildren = function() {
   return this.loadTableData();
 };
 
+scout.PageWithTable.prototype._createSearchFilter = function() {
+  var firstFormTableControl = scout.arrays.find(this.detailTable.tableControls, function(tableControl) {
+    return tableControl.form;
+  });
+  if (firstFormTableControl) {
+    return firstFormTableControl.form.exportData();
+  }
+  return null;
+};
+
 /**
  * see Java: AbstractPageWithTable#loadChildren that's where the table is reloaded and the tree is rebuilt, called by AbstractTree#P_UIFacade
  * @returns {$.Deferred}
@@ -121,7 +133,7 @@ scout.PageWithTable.prototype.loadChildren = function() {
 scout.PageWithTable.prototype.loadTableData = function() {
   this.detailTable.deleteAllRows();
   this.detailTable.setLoading(true);
-  return this._loadTableData()
+  return this._loadTableData(this._createSearchFilter())
     .done(this._onLoadTableDataDone.bind(this))
     .fail(this._onLoadTableDataFail.bind(this))
     .always(this._onLoadTableDataAlways.bind(this));
@@ -130,8 +142,8 @@ scout.PageWithTable.prototype.loadTableData = function() {
 /**
  * Override this method to load table data (rows to be added to table).
  * This is an asynchronous operation working with a Deferred. When table data load is successful
- * <code>_onLoadTableData(data)</code> will be called. When a failure occurs while loading table
- * data <code>_onLoadTableFail(data)</code> will be called.
+ * <code>_onLoadTableDataDone(data)</code> will be called. When a failure occurs while loading table
+ * data <code>_onLoadTableDataFail(data)</code> will be called.
  * <p>
  * When you want to return static data you still need a deferred. But you can resolve it
  * immediately. Example code:
@@ -141,9 +153,11 @@ scout.PageWithTable.prototype.loadTableData = function() {
  *   return deferred;
  * </code>
  *
+ * @param searchFilter The search filter as exported by the search form or null.
+ *
  * @return {$.Deferred}
  */
-scout.PageWithTable.prototype._loadTableData = function() {
+scout.PageWithTable.prototype._loadTableData = function(searchFilter) {
   return $.resolvedDeferred();
 };
 
