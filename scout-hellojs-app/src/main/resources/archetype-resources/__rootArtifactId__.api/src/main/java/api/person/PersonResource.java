@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.rest.IRestResource;
 import ${package}.core.person.PersonService;
 import ${package}.data.person.PersonDo;
 import ${package}.data.person.PersonResponse;
+import ${package}.data.person.PersonRestrictionDo;
 
 @Path("persons")
 public class PersonResource implements IRestResource {
@@ -33,11 +34,13 @@ public class PersonResource implements IRestResource {
         .orElseGet(PersonResponse::new);
   }
 
-  @GET
+  @POST
+  @Path("list")
   @Produces(MediaType.APPLICATION_JSON)
-  public PersonResponse list() {
+  @Consumes(MediaType.APPLICATION_JSON)
+  public PersonResponse list(PersonRestrictionDo restrictions) {
     return BEANS.get(PersonResponse.class)
-        .withItems(BEANS.get(PersonService.class).list());
+        .withItems(BEANS.get(PersonService.class).list(restrictions));
   }
 
   @PUT

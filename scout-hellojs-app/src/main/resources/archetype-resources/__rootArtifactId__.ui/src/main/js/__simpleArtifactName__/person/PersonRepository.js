@@ -1,3 +1,6 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
 ${simpleArtifactName}.PersonRepository = function() {
   ${simpleArtifactName}.PersonRepository.parent.call(this);
   this.entityType = 'Person';
@@ -17,10 +20,11 @@ ${simpleArtifactName}.PersonRepository.prototype.load = function(personId) {
 
 /**
  * get all persons
+ * @param restrictions list restrictions object of type PersonRestriction
  * @returns promise with person array
  */
-${simpleArtifactName}.PersonRepository.prototype.list = function() {
-  return this.getJson(this.targetUrl);
+${simpleArtifactName}.PersonRepository.prototype.list = function(restrictions) {
+  return this.postJson(this.targetUrl + 'list', JSON.stringify(restrictions));
 };
 
 /**

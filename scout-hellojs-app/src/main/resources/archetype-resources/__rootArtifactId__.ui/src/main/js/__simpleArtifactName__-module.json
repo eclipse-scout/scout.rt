@@ -1,7 +1,10 @@
 {
   "files": [
     "${simpleArtifactName}/desktop/Desktop.json",
+    "${simpleArtifactName}/desktop/DataOutline.json",
+
     "${simpleArtifactName}/person/PersonForm.json",
+    "${simpleArtifactName}/person/PersonSearchForm.json",
     "${simpleArtifactName}/person/PersonTablePage.json"
   ]
 }

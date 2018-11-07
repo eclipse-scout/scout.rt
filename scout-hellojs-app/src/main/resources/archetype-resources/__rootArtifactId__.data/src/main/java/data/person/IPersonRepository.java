@@ -13,7 +13,9 @@ public interface IPersonRepository {
 
   void store(String id, PersonDo person);
 
-  Stream<PersonDo> list();
+  Stream<PersonDo> all();
+
+  Stream<PersonDo> list(PersonRestrictionDo restrictions);
 
   Optional<PersonDo> getById(String id);
 

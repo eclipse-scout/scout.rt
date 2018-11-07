@@ -48,16 +48,29 @@ public class PersonDo extends DoEntity {
     return personId().get();
   }
 
-  public DoValue<String> sex() {
-    return doValue("sex");
+  public DoValue<Integer> salary() {
+    return doValue("salary");
   }
 
-  public PersonDo withSex(String sex) {
-    personId().set(sex);
+  public PersonDo withSalary(Integer salary) {
+    salary().set(salary);
     return this;
   }
 
-  public String getSex() {
-    return sex().get();
+  public Integer getSalary() {
+    return salary().get();
+  }
+
+  public DoValue<Boolean> external() {
+    return doValue("external");
+  }
+
+  public PersonDo withExternal(boolean external) {
+    external().set(external);
+    return this;
+  }
+
+  public Boolean getExternal() {
+    return external().get();
   }
 }

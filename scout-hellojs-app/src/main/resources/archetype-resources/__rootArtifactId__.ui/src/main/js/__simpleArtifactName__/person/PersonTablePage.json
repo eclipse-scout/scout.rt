@@ -4,7 +4,6 @@
 {
   "id": "${simpleArtifactName}.PersonTablePage",
   "objectType": "PageWithTable",
-  "type": "model",
   "leaf": true,
   "text": "${symbol_dollar}{textKey:Persons}",
   "detailTable": {
@@ -12,7 +11,7 @@
     "objectType": "Table",
     "autoResizeColumns": true,
     "columns": [
-     {
+      {
         "id": "PersonIdColumn",
         "objectType": "Column",
         "visible": false
@@ -21,13 +20,25 @@
         "id": "FirstNameColumn",
         "objectType": "Column",
         "text": "${symbol_dollar}{textKey:FirstName}",
-        "width": 200
+        "width": 300
       },
       {
         "id": "LastNameColumn",
         "objectType": "Column",
         "text": "${symbol_dollar}{textKey:LastName}",
-        "width": 250
+        "width": 300
+      },
+      {
+        "id": "SalaryColumn",
+        "objectType": "NumberColumn",
+        "text": "${symbol_dollar}{textKey:Salary}",
+        "width": 200
+      },
+      {
+        "id": "ExternColumn",
+        "objectType": "BooleanColumn",
+        "text": "${symbol_dollar}{textKey:External}",
+        "width": 150
       }
     ],
     "menus": [
@@ -40,7 +51,7 @@
           "Table.SingleSelection"
         ]
       },
-       {
+      {
         "id": "CreatePersonMenu",
         "objectType": "Menu",
         "text": "${symbol_dollar}{textKey:CreatePerson}",
@@ -49,7 +60,7 @@
           "Table.EmptySpace"
         ]
       },
-       {
+      {
         "id": "DeletePersonMenu",
         "objectType": "Menu",
         "text": "${symbol_dollar}{textKey:DeletePerson}",
@@ -57,6 +68,21 @@
         "menuTypes": [
           "Table.SingleSelection"
         ]
+      }
+    ],
+    "tableControls": [
+      {
+        "id": "SearchFormTableControl",
+        "objectType": "FormTableControl",
+        "iconId": "${symbol_dollar}{iconId:SEARCH}",
+        "form": {
+          "id": "SearchForm",
+          "objectType": "${simpleArtifactName}.PersonSearchForm"
+        }
+      },
+      {
+        "id": "AggregateTableControl",
+        "objectType": "AggregateTableControl"
       }
     ]
   }

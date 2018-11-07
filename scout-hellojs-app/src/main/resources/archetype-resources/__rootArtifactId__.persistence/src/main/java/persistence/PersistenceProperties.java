@@ -110,7 +110,7 @@ public final class PersistenceProperties {
 
     @Override
     public String getDefaultValue() {
-      return "SCOUTAPP";
+      return "Schema";
     }
 
     @Override

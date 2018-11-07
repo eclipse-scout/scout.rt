@@ -3,15 +3,20 @@
 #set( $symbol_escape = '\' )
 package ${package}.persistence.person;
 
+import static ${package}.persistence.JooqSqlService.jooq;
+import static org.jooq.impl.DSL.noCondition;
+
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.jooq.Field;
 
 import ${package}.data.person.IPersonRepository;
 import ${package}.data.person.PersonDo;
+import ${package}.data.person.PersonRestrictionDo;
 import ${package}.persistence.common.AbstractRepository;
 import ${package}.persistence.common.DoEntityBeanMappings;
 import ${package}.persistence.tables.Person;
@@ -35,8 +40,22 @@ public class PersonRepository extends AbstractRepository<Person, PersonRecord, P
   }
 
   @Override
-  public Stream<PersonDo> list() {
+  public Stream<PersonDo> all() {
     return getAll().map(this::recToDo);
+  }
+
+  @Override
+  public Stream<PersonDo> list(PersonRestrictionDo restrictions) {
+    Person personTab = Person.PERSON.as("p");
+    return jooq()
+        .select()
+        .from(personTab)
+        .where(StringUtility.hasText(restrictions.getFirstName()) ? personTab.FIRST_NAME.likeIgnoreCase('%' + restrictions.getFirstName() + '%') : noCondition(),
+            StringUtility.hasText(restrictions.getLastName()) ? personTab.LAST_NAME.likeIgnoreCase('%' + restrictions.getLastName() + '%') : noCondition())
+        .limit(100)
+        .fetchStream()
+        .map(r -> r.into(personTab))
+        .map(this::recToDo);
   }
 
   @Override
@@ -65,9 +84,10 @@ public class PersonRepository extends AbstractRepository<Person, PersonRecord, P
 
   @Override
   protected DoEntityBeanMappings<PersonDo, PersonRecord> mappings() {
-    return new DoEntityBeanMappings<PersonDo, PersonRecord>()
-        .with(PersonDo::personId, PersonRecord::getPersonId) // read-only (primary key)
+    return new DoEntityBeanMappings<PersonDo, PersonRecord>().with(PersonDo::personId, PersonRecord::getPersonId)
         .with(PersonDo::lastName, PersonRecord::getLastName, PersonRecord::setLastName)
-        .with(PersonDo::firstName, PersonRecord::getFirstName, PersonRecord::setFirstName);
+        .with(PersonDo::firstName, PersonRecord::getFirstName, PersonRecord::setFirstName)
+        .with(PersonDo::salary, PersonRecord::getSalary, PersonRecord::setSalary)
+        .with(PersonDo::external, PersonRecord::getExternal, PersonRecord::setExternal);
   }
 }

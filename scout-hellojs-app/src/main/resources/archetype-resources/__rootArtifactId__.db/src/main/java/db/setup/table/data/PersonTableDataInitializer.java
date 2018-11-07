@@ -17,7 +17,7 @@ public class PersonTableDataInitializer implements IDataInitializer {
 
   @Override
   public void addSamples(DSLContext context) {
-    context.executeInsert(new PersonRecord(UUID.randomUUID().toString(), "Alice", "Miller"));
-    context.executeInsert(new PersonRecord(UUID.randomUUID().toString(), "Bob", "Smith"));
+    context.executeInsert(new PersonRecord(UUID.randomUUID().toString(), "Alice", "Miller", 4000, true));
+    context.executeInsert(new PersonRecord(UUID.randomUUID().toString(), "Bob", "Smith", 3000, false));
   }
 }

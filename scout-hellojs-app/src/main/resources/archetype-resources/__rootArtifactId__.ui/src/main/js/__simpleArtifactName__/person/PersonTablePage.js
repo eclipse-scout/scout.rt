@@ -46,8 +46,11 @@ ${simpleArtifactName}.PersonTablePage.prototype._onDataChange = function(event) 
   }
 };
 
-${simpleArtifactName}.PersonTablePage.prototype._loadTableData = function() {
-  return ${simpleArtifactName}.persons.list();
+${simpleArtifactName}.PersonTablePage.prototype._loadTableData = function(searchFilter) {
+  var restriction = scout.create('${simpleArtifactName}.PersonRestriction', searchFilter, {
+    ensureUniqueId: false
+  });
+  return ${simpleArtifactName}.persons.list(restriction);
 };
 
 ${simpleArtifactName}.PersonTablePage.prototype._transformTableDataToTableRows = function(tableData) {
@@ -58,7 +61,9 @@ ${simpleArtifactName}.PersonTablePage.prototype._transformTableDataToTableRows =
         cells: [
           person.personId,
           person.firstName,
-          person.lastName
+          person.lastName,
+          person.salary,
+          person.external
         ]
       };
     });

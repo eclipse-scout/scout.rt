@@ -6,6 +6,8 @@ ${simpleArtifactName}.PersonForm = function() {
 
   this.firstNameField = null;
   this.lastNameField = null;
+  this.salaryField = null;
+  this.externalField = null;
 };
 scout.inherits(${simpleArtifactName}.PersonForm, scout.Form);
 
@@ -25,12 +27,16 @@ ${simpleArtifactName}.PersonForm.prototype._init = function(model) {
 ${simpleArtifactName}.PersonForm.prototype._initFields = function() {
   this.firstNameField = this.widget('FirstNameField');
   this.lastNameField = this.widget('LastNameField');
+  this.salaryField = this.widget('SalaryField');
+  this.externalField = this.widget('ExternalField');
 };
 
 ${simpleArtifactName}.PersonForm.prototype.exportData = function() {
   var person = this.data;
   person.setFirstName(this.firstNameField.value);
   person.setLastName(this.lastNameField.value);
+  person.setSalary(this.salaryField.value);
+  person.setExternal(this.externalField.value);
   return person;
 };
 
@@ -38,6 +44,8 @@ ${simpleArtifactName}.PersonForm.prototype.importData = function() {
   var person = this.data;
   this.firstNameField.setValue(person.firstName);
   this.lastNameField.setValue(person.lastName);
+  this.salaryField.setValue(person.salary);
+  this.externalField.setValue(person.external);
 };
 
 ${simpleArtifactName}.PersonForm.prototype._save = function(data) {

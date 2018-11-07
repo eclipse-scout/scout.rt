@@ -6,6 +6,8 @@ ${simpleArtifactName}.Person = function() {
   this.personId = null;
   this.firstName = null;
   this.lastName = null;
+  this.salary = null;
+  this.external = null;
 };
 
 ${simpleArtifactName}.Person.EVENT_TYPE = 'person';
@@ -24,4 +26,13 @@ ${simpleArtifactName}.Person.prototype.setLastName = function(lastName) {
 
 ${simpleArtifactName}.Person.prototype.setPersonId = function(id) {
   this.personId = id;
+};
+
+
+${simpleArtifactName}.Person.prototype.setSalary = function(salary) {
+  this.salary = salary;
+};
+
+${simpleArtifactName}.Person.prototype.setExternal = function(external) {
+  this.external = external;
 };

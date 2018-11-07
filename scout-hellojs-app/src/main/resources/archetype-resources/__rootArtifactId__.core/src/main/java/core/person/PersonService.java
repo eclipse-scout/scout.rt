@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.platform.service.IService;
 
 import ${package}.data.person.IPersonRepository;
 import ${package}.data.person.PersonDo;
+import ${package}.data.person.PersonRestrictionDo;
 
 public class PersonService implements IService {
 
@@ -39,9 +40,9 @@ public class PersonService implements IService {
     return BEANS.get(IPersonRepository.class).remove(id);
   }
 
-  public Stream<PersonDo> list() {
+  public Stream<PersonDo> list(PersonRestrictionDo restrictions) {
     //TODO add validation and business logic here
-    return BEANS.get(IPersonRepository.class).list();
+    return BEANS.get(IPersonRepository.class).list(restrictions);
   }
 
   protected PersonDo assertPersonDo(PersonDo person) {

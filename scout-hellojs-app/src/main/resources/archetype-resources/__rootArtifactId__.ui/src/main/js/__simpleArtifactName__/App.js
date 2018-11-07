@@ -17,34 +17,7 @@ ${simpleArtifactName}.App.prototype._createSession = function(options) {
 
 ${simpleArtifactName}.App.prototype._createDesktop = function(parent) {
   this.desktop = scout.create('${simpleArtifactName}.Desktop', scout.models.getModel('${simpleArtifactName}.Desktop', parent));
-
-  var myDataOutline = this._createMyDataOutline();
-  var myDataViewButton = scout.create('scout.OutlineViewButton', {
-    parent: this.desktop,
-    text: '${symbol_dollar}{textKey:MyDataOutlineTitle}',
-    outline: myDataOutline,
-    displayStyle: 'TAB',
-    iconId: scout.icons.PERSON_SOLID
-  });
-  this.desktop._setViewButtons([myDataViewButton]);
-  this.desktop.setOutline(myDataOutline);
-
   return this.desktop;
-};
-
-${simpleArtifactName}.App.prototype._createMyDataOutline = function() {
-  var myDataOutline = scout.create('scout.Outline', {
-    parent: this.desktop,
-    title: '${symbol_dollar}{textKey:MyDataOutlineTitle}'
-  });
-
-  var personTablePage = scout.create('${simpleArtifactName}.PersonTablePage', {
-    parent: myDataOutline
-  });
-
-  myDataOutline.insertNodes([personTablePage]);
-  myDataOutline.selectNode(personTablePage);
-  return myDataOutline;
 };
 
 ${simpleArtifactName}.App.prototype._loadLocale = function() {
