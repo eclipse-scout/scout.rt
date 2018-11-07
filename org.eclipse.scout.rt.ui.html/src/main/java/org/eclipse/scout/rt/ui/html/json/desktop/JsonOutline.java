@@ -150,6 +150,12 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   }
 
   protected boolean acceptModelTreeEvent(TreeEvent event) {
+    // this is a HACK due to the hack to handle initial expansion of nodes (see org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode.setTreeInternal(ITree, boolean))
+    // where the node expansion is set to the tree to enforce a expansion event. Both of the hacks are obsolete once the JS Tree refactoring is done to calculate after every
+    // change the new visible node list.
+    if (event.getType() == OutlineEvent.TYPE_PAGE_CHANGED && !event.getNode().isVisible()) {
+      return false;
+    }
     // Don't fill the event buffer with events that are currently not relevant for the UI
     if (event instanceof OutlineEvent && ObjectUtility.isOneOf(event.getType(),
         OutlineEvent.TYPE_PAGE_BEFORE_DATA_LOADED,
