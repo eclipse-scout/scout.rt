@@ -91,6 +91,11 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
   /**
    * type boolean
    */
+  String PROP_NODE_COLUMN_CANDIDATE = "nodeColumnCandidate";
+
+  /**
+   * type boolean
+   */
   String PROP_UI_SORT_POSSIBLE = "uiSortPossible";
 
   int MIN_WIDTH = 60;
@@ -475,5 +480,17 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    * Delegates to {@link ITableOrganizer#isColumnModifiable(IColumn)}.
    */
   boolean isModifiable();
+
+  /**
+   * true: When the column can be considered as candidate while looking for the node column of a table.
+   * <p>
+   * The node column is used to display the control to expand and collapse rows in a hierarchical table.
+   */
+  boolean isNodeColumnCandidate();
+
+  /**
+   * see {@link #isNodeColumnCandidate()}
+   */
+  void setNodeColumnCandidate(boolean nodeColumnCandidate);
 
 }

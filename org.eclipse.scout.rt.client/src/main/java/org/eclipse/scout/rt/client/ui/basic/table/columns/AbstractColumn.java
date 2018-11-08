@@ -621,6 +621,23 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
+   * Configures whether the column can be considered as node column candidate.
+   * <p>
+   * The node column is used to display the control to expand and collapse rows in a hierarchical table. If
+   * {@code false}: The column will be skipped when scanning for the node column and the next suitable column will be
+   * chosen as node column.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   *
+   * @return {@code true} if this column is considered as node column candidate, {@code false} otherwise.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(230)
+  protected boolean getConfiguredNodeColumnCandidate() {
+    return true;
+  }
+
+  /**
    * Called after this column has been added to the column set of the surrounding table. This method may execute
    * additional initialization for this column (e.g. register listeners).
    * <p>
@@ -952,6 +969,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     }
     setHtmlEnabled(getConfiguredHtmlEnabled());
     setUiSortPossible(getConfiguredUiSortPossible());
+    setNodeColumnCandidate(getConfiguredNodeColumnCandidate());
   }
 
   /**
@@ -2050,6 +2068,16 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public boolean isModifiable() {
     return getTable().getTableOrganizer().isColumnModifiable(this);
+  }
+
+  @Override
+  public boolean isNodeColumnCandidate() {
+    return propertySupport.getPropertyBool(PROP_NODE_COLUMN_CANDIDATE);
+  }
+
+  @Override
+  public void setNodeColumnCandidate(boolean nodeColumnCandidate) {
+    propertySupport.setPropertyBool(PROP_NODE_COLUMN_CANDIDATE, nodeColumnCandidate);
   }
 
   /**

@@ -102,6 +102,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     json.put(PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_END, getColumn().isInitialAlwaysIncludeSortAtEnd());
     json.put(PROP_REMOVABLE, getColumn().isRemovable());
     json.put(PROP_MODIFIABLE, getColumn().isModifiable());
+    json.put(IColumn.PROP_NODE_COLUMN_CANDIDATE, getColumn().isNodeColumnCandidate());
 
     return json;
   }

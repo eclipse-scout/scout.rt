@@ -213,7 +213,11 @@ scout.Table.prototype._destroyColumns = function() {
 };
 
 scout.Table.prototype._calculateTableNodeColumn = function() {
-  var tableNodeColumn = scout.arrays.first(this.visibleColumns(false));
+  var candidateColumns = this.visibleColumns().filter(function(column) {
+    return column.nodeColumnCandidate;
+  });
+
+  var tableNodeColumn = scout.arrays.first(candidateColumns);
   if (this.tableNodeColumn && this.tableNodeColumn !== tableNodeColumn) {
     // restore
     this.tableNodeColumn.minWidth = this.tableNodeColumn._initialMinWidth;
@@ -304,6 +308,7 @@ scout.Table.prototype._insertBooleanColumn = function() {
     fixedWidth: true,
     fixedPosition: true,
     guiOnly: true,
+    nodeColumnCandidate: false,
     headerMenuEnabled: false,
     showSeparator: false,
     width: scout.Column.NARROW_MIN_WIDTH,
@@ -321,6 +326,7 @@ scout.Table.prototype._insertRowIconColumn = function() {
       fixedWidth: true,
       fixedPosition: true,
       guiOnly: true,
+      nodeColumnCandidate: false,
       headerMenuEnabled: false,
       showSeparator: false,
       width: this.rowIconColumnWidth,

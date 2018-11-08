@@ -47,6 +47,7 @@ scout.Column = function() {
   this.headerMenuEnabled = true;
   this.tableNodeLevel0CellPadding = 28;
   this.expandableIconLevel0CellPadding = 13;
+  this.nodeColumnCandidate = true;
 
   this.events = this._createEventSupport();
 
