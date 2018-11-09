@@ -716,7 +716,7 @@ scout.Popup.prototype.set$Anchor = function($anchor) {
   if (this.$anchor) {
     this._detachAnchorScrollHandler();
   }
-  this.$anchor = $anchor;
+  this.setProperty('$anchor', $anchor);
   if (this.rendered) {
     this._attachAnchorScrollHandler();
     this.revalidateLayout();
