@@ -102,6 +102,10 @@ scout.MenuBarLayout.prototype.preferredLayoutSize = function($container, options
   }
   // shortcut for minimum size.
   if (prefWidth <= 0) {
+    //reset overflown
+    overflowMenuItems.forEach(function(menuItem) {
+      menuItem._setOverflown(true);
+    });
     return this._minSize(visibleMenuItems);
   }
 
