@@ -76,6 +76,8 @@ scout.icons = {
   STRIKETHROUGH: 'font:\uE054',
   LIST_UL: 'font:\uE055',
   LIST_OL: 'font:\uE056',
+  LIGHTBULB_OFF: 'font:\uE057',
+  LIGHTBULB_ON: 'font:\uE058',
 
   /* font awesome icons */
   ROTATE_LEFT_BOLD: 'font:\uF0E2',
