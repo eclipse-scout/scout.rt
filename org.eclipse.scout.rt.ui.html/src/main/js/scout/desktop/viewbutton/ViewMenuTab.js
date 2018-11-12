@@ -96,10 +96,6 @@ scout.ViewMenuTab.prototype.setSelectedButton = function(viewButton) {
 };
 
 scout.ViewMenuTab.prototype._setSelectedButton = function(viewButton) {
-  var outlineParent = null;
-  if (viewButton.outline) {
-    outlineParent = viewButton.outline.parent;
-  }
   viewButton = viewButton.clone({
     parent: this,
     displayStyle: 'TAB'
@@ -109,9 +105,7 @@ scout.ViewMenuTab.prototype._setSelectedButton = function(viewButton) {
     delegateAllPropertiesToOriginal: true,
     excludePropertiesToOriginal: ['selected']
   });
-  if (outlineParent) {
-    viewButton.outline.setParent(outlineParent);
-  }
+
   // use default icon if outline does not define one.
   viewButton.iconId = viewButton.iconId || this.defaultIconId;
   this._setProperty('selectedButton', viewButton);

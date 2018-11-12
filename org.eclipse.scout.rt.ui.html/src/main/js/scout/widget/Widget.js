@@ -507,12 +507,11 @@ scout.Widget.prototype.setOwner = function(owner) {
 
 scout.Widget.prototype.setParent = function(parent) {
   scout.assertParameter('parent', parent);
-  // FIXME causes too many errors, add again when source issue is solved
-//  if (this.rendered && !parent.rendered) {
-//    throw new Error('rendered child ' + this + ' is added to not rendered parent ' + parent);
-//  }
   if (parent === this.parent) {
     return;
+  }
+  if (this.rendered && !parent.rendered) {
+    throw new Error('rendered child ' + this + ' is added to not rendered parent ' + parent);
   }
 
   if (this.parent) {

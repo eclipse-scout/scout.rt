@@ -11,6 +11,7 @@
 scout.OutlineViewButton = function() {
   scout.OutlineViewButton.parent.call(this);
   this._addWidgetProperties('outline');
+  this._addPreserveOnPropertyChangeProperties(['outline']);
   this._addCloneProperties(['outline']);
 };
 scout.inherits(scout.OutlineViewButton, scout.ViewButton);
