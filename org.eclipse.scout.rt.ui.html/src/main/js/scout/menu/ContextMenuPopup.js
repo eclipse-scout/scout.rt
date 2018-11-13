@@ -313,7 +313,7 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
       menu = menu.clone({
         parent: this
       }, {
-        delegateEventsToOriginal: ['acceptInput', 'action'],
+        delegateEventsToOriginal: ['acceptInput', 'action', 'click'],
         delegateAllPropertiesToClone: true,
         delegateAllPropertiesToOriginal: true,
         excludePropertiesToOriginal: ['selected', 'logicalGrid']
