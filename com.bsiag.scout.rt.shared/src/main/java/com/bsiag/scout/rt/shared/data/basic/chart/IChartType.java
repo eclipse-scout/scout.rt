@@ -37,4 +37,9 @@ public interface IChartType {
   String PROP_SALESFUNNEL_CALC_CONVERSION_RATE = "calcConversionRate";
 
   String PROP_VENN_NUMBER_OF_CIRCLES = "NumberOfCircles";
+
+  /**
+   * Indicates the value from which the animation should be started. If not set, the animation starts from 0.
+   */
+  String PROP_FULFILLMENT_START_VALUE = "startValue";
 }
