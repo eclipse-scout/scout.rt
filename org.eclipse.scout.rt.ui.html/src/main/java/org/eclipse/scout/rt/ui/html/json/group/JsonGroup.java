@@ -64,6 +64,12 @@ public class JsonGroup<T extends IGroup> extends AbstractJsonWidget<T> {
         return getModel().getTitleSuffix();
       }
     });
+    putJsonProperty(new JsonProperty<T>(IGroup.PROP_VISIBLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isVisible();
+      }
+    });
     putJsonProperty(new JsonProperty<T>(IGroup.PROP_HEADER_VISIBLE, model) {
       @Override
       protected Boolean modelValue() {

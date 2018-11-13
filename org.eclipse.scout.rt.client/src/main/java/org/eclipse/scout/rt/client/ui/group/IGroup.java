@@ -24,6 +24,7 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
   String PROP_COLLAPSIBLE = "collapsible";
   String PROP_COLLAPSE_STYLE = "collapseStyle";
   String PROP_TITLE = "title";
+  String PROP_VISIBLE = "visible";
   String PROP_HEADER_VISIBLE = "headerVisible";
   String PROP_BODY = "body";
   String PROP_GROUP_ID = "groupId";
@@ -58,6 +59,10 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
   String getTitleSuffix();
 
   void setTitleSuffix(String suffix);
+
+  boolean isVisible();
+
+  void setVisible(boolean visible);
 
   boolean isHeaderVisible();
 
