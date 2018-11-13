@@ -237,6 +237,22 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
     return propertySupport.getPropertyString(PROP_TITLE_SUFFIX);
   }
 
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(95)
+  protected boolean getConfiguredVisible() {
+    return true;
+  }
+
+  @Override
+  public void setVisible(boolean visible) {
+    propertySupport.setPropertyBool(PROP_VISIBLE, visible);
+  }
+
+  @Override
+  public boolean isVisible() {
+    return propertySupport.getPropertyBool(PROP_VISIBLE);
+  }
+
   protected IWidget createHeader() {
     Class<? extends IWidget> configuredHeader = getConfiguredHeader();
     if (configuredHeader != null) {
