@@ -511,7 +511,8 @@ scout.Widget.prototype.setParent = function(parent) {
     return;
   }
   if (this.rendered && !parent.rendered) {
-    throw new Error('rendered child ' + this + ' is added to not rendered parent ' + parent);
+    $.log.isInfoEnabled() && $.log.info('rendered child ' + this + ' is added to not rendered parent ' + parent + '. Removing child.', new Error('origin'));
+    this.remove();
   }
 
   if (this.parent) {
