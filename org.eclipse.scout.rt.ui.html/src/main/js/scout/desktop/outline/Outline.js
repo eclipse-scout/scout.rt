@@ -712,6 +712,9 @@ scout.Outline.prototype.setDetailContent = function(content) {
   if (this.detailContent) {
     this.detailContent.off('destroy', this._detailContentDestroyHandler);
   }
+  if (this.detailContent instanceof scout.TableRowDetail) {
+    this.detailContent.destroy();
+  }
   this._setProperty('detailContent', content);
   if (content) {
     content.on('destroy', this._detailContentDestroyHandler);
@@ -769,7 +772,7 @@ scout.Outline.prototype._computeDetailContent = function() {
     return scout.create('TableRowDetail', {
       parent: this,
       table: selectedPage.parentNode.detailTable,
-      row: selectedPage.row
+      page: selectedPage
     });
   }
   return null;

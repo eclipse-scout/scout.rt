@@ -10,15 +10,26 @@
  ******************************************************************************/
 scout.TableRowDetail = function() {
   scout.TableRowDetail.parent.call(this);
-  this.table;
-  this.row;
+  this.table = null;
+  this.page = null;
+  this.row = null;
+  this._tableRowsUpdatedHandler = this._onTableRowsUpdated.bind(this);
+  this._tableRowsInsertedHandler = this._onTableRowsInserted.bind(this);
 };
 scout.inherits(scout.TableRowDetail, scout.Widget);
 
 scout.TableRowDetail.prototype._init = function(model) {
   scout.TableRowDetail.parent.prototype._init.call(this, model);
-  this.table = model.table;
-  this.row = model.row;
+  this.row = this.page.row;
+
+  this.table.on('rowsUpdated', this._tableRowsUpdatedHandler);
+  this.table.on('rowsInserted', this._tableRowsInsertedHandler);
+};
+
+scout.TableRowDetail.prototype._destroy = function() {
+  this.table.off('rowsUpdated', this._tableRowsUpdatedHandler);
+  this.table.off('rowsInserted', this._tableRowsInsertedHandler);
+  scout.TableRowDetail.parent.prototype._destroy.call(this);
 };
 
 scout.TableRowDetail.prototype._render = function() {
@@ -29,6 +40,7 @@ scout.TableRowDetail.prototype._render = function() {
 
 scout.TableRowDetail.prototype._renderRow = function() {
   this.table.visibleColumns().forEach(this._renderCell.bind(this));
+  this.invalidateLayoutTree();
 };
 
 scout.TableRowDetail.prototype._renderCell = function(column) {
@@ -69,4 +81,41 @@ scout.TableRowDetail.prototype._renderCell = function(column) {
   if (hasCellText) {
     $field.appendSpan('table-row-detail-value').text(cellText);
   }
+};
+
+scout.TableRowDetail.prototype._refreshRow = function() {
+  this.$container.empty();
+  this._renderRow();
+};
+
+scout.TableRowDetail.prototype._onTableRowsUpdated = function(event) {
+  if (!this.rendered) {
+    return;
+  }
+
+  var row = scout.arrays.find(event.rows, function(row) {
+    return row.id === this.row.id;
+  }.bind(this));
+
+  if (!row) {
+    return;
+  }
+
+  this.row = row;
+
+  this._refreshRow();
+};
+
+/**
+ * If the table is reloaded without reloading the corresponding nodes,
+ * the insert events need to be handled to refresh the table row detail.
+ */
+scout.TableRowDetail.prototype._onTableRowsInserted = function(event) {
+  if (!this.rendered) {
+    return;
+  }
+
+  this.row = this.page.row;
+
+  this._refreshRow();
 };
