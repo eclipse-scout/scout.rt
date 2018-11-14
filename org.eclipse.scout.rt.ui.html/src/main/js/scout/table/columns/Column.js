@@ -215,19 +215,14 @@ scout.Column.prototype.buildCellForAggregateRow = function(aggregateRow) {
 scout.Column.prototype.buildCell = function(cell, row) {
   scout.assertParameter('cell', cell, scout.Cell);
 
-  var text = cell.text || '',
-    tableNodeColumn = this.table.isTableNodeColumn(this),
+  var tableNodeColumn = this.table.isTableNodeColumn(this),
     rowPadding = 0;
 
   if (tableNodeColumn) {
     rowPadding = this.table._calcRowLevelPadding(row);
   }
-  if (!cell.htmlEnabled) {
-    text = cell.encodedText() || '';
-    if (this.table.multilineText) {
-      text = scout.strings.nl2br(text, false);
-    }
-  }
+
+  var text = this._text(cell);
   var iconId = cell.iconId;
   var icon = this._icon(iconId, !!text) || '';
   var cssClass = this._cellCssClass(cell, tableNodeColumn);
@@ -299,6 +294,19 @@ scout.Column.prototype._icon = function(iconId, hasText) {
     cssClass += ' image-icon';
     return '<img class="' + cssClass + '" src="' + icon.iconUrl + '">';
   }
+};
+
+scout.Column.prototype._text = function(cell) {
+  var text = cell.text || '';
+
+  if (!cell.htmlEnabled) {
+    text = cell.encodedText() || '';
+    if (this.table.multilineText) {
+      text = scout.strings.nl2br(text, false);
+    }
+  }
+
+  return text;
 };
 
 scout.Column.prototype._cellCssClass = function(cell, tableNode) {
@@ -461,6 +469,17 @@ scout.Column.prototype.cellTextForTextFilter = function(row) {
 scout.Column.prototype._preprocessTextForTextFilter = function(text, htmlEnabled) {
   return this._preprocessText(text, {
     removeHtmlTags: htmlEnabled
+  });
+};
+
+/**
+ * @returns the cell text to be used for the table row detail.
+ */
+scout.Column.prototype.cellTextForRowDetail = function(row) {
+  var cell = this.cell(row);
+
+  return this._preprocessText(this._text(cell), {
+    removeHtmlTags: cell.htmlEnabled
   });
 };
 

@@ -60,12 +60,7 @@ scout.TableRowDetail.prototype._renderCell = function(column) {
     headerText = column.headerTooltipText;
   }
 
-  var cellText;
-  if (cell.htmlEnabled) {
-    cellText = scout.strings.plainText(cell.text);
-  } else {
-    cellText = cell.text;
-  }
+  var cellText = column.cellTextForRowDetail(this.row);
 
   var $field = this.$container.appendDiv('table-row-detail-field');
   if (!scout.strings.empty(headerText)) {
@@ -79,7 +74,7 @@ scout.TableRowDetail.prototype._renderCell = function(column) {
     $icon.toggleClass('with-text', hasCellText);
   }
   if (hasCellText) {
-    $field.appendSpan('table-row-detail-value').text(cellText);
+    $field.appendSpan('table-row-detail-value').html(cellText);
   }
 };
 
