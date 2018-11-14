@@ -67,16 +67,15 @@ scout.RadioButtonGroup.prototype._initKeyStrokeContext = function() {
 
 scout.RadioButtonGroup.prototype._initButtons = function() {
   this.radioButtons = this.fields.filter(function(formField) {
-      return formField instanceof scout.RadioButton;
-    }, this)
-    .map(function(radioButton) {
-      this._initButton(radioButton);
-      return radioButton;
-    }, this);
+    return formField instanceof scout.RadioButton;
+  });
+  this.radioButtons.forEach(this._initButton.bind(this));
 };
 
 scout.RadioButtonGroup.prototype._initButton = function(button) {
-  button.on('propertyChange', this._buttonPropertyChangeHandler);
+  if (button.events.count('propertyChange', this._buttonPropertyChangeHandler) === 0) {
+    button.on('propertyChange', this._buttonPropertyChangeHandler);
+  }
   if (button.selected) {
     this.setValue(button.radioValue);
     this.selectButton(button);
@@ -207,7 +206,6 @@ scout.RadioButtonGroup.prototype._renderEnabled = function() {
   scout.RadioButtonGroup.parent.prototype._renderEnabled.call(this);
   this._provideTabIndex();
 };
-
 
 /**
  * Set the selected (or first if none is selected) to tabbable
