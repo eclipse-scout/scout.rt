@@ -84,6 +84,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PropertiesHelper {
 
+  private static final char ENVIRONMENT_VARIABLE_DOT_REPLACEMENT = '_';
   private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\$\\{([^\\}]+)\\}");
   public static final String CLASSPATH_PROTOCOL_NAME = "classpath";
   public static final char PROTOCOL_DELIMITER = ':';
@@ -213,19 +214,78 @@ public class PropertiesHelper {
       return resolve(value, PLACEHOLDER_PATTERN);
     }
 
+    // environment config
+    String envValue = lookupEnvironmentVariableValue(propKey);
+    if (StringUtility.hasText(envValue)) {
+      return resolve(envValue, PLACEHOLDER_PATTERN);
+    }
+
     // properties file
     value = m_configProperties.get(propKey);
     if (StringUtility.hasText(value)) {
       return value;
     }
 
-    // environment config
-    value = System.getenv(propKey);
-    if (StringUtility.hasText(value)) {
-      return resolve(value, PLACEHOLDER_PATTERN);
+    return defaultValue;
+  }
+
+  /**
+   * Returns the environment variable value corresponding to the property specified by the key, or <code>null</code>.
+   * <p>
+   * Attempts to find them by resolving the property name in the following order:
+   * <ol>
+   * <li>Original: <code>my.property</code></li>
+   * <li>Periods replaced: <code>my_property</code></li>
+   * <li>Original in uppercase: <code>MY.PROPERTY</code></li>
+   * <li>Periods replaced, in uppercase: <code>MY_PROPERTY</code></li>
+   * </ol>
+   */
+  protected String lookupEnvironmentVariableValue(String propKey) {
+    // 1. Original
+    String value = getEnvironmentVariable(propKey);
+    if (value != null) {
+      return value;
     }
 
-    return defaultValue;
+    // Periods in environment variable names are not POSIX compliant (See IEEE Standard 1003.1-2017, Chapter 8.1 "Environment Variable Definition"),
+    // but supported by some shells. To allow overriding via environment variables (Bugzilla 541099) in any shell, convert them to underscores.
+    // 2. With periods replaced
+    String keyWithoutDots = propKey.replace('.', ENVIRONMENT_VARIABLE_DOT_REPLACEMENT);
+    value = getEnvironmentVariable(keyWithoutDots);
+    if (value != null) {
+      logInexactEnvNameMatch(propKey, keyWithoutDots);
+      return value;
+    }
+
+    // Applications may define environment variable names with lower case, but only upper case is POSIX compliant for the environment.
+    // To override from a shell, we should also check for upper case.
+    // 3. In Uppercase, original periods
+    String uppercasedKey = propKey.toUpperCase();
+    value = getEnvironmentVariable(uppercasedKey);
+    if (value != null) {
+      logInexactEnvNameMatch(propKey, uppercasedKey);
+      return value;
+    }
+
+    // 4. In Uppercase, with periods replaced
+    String keyWithoutDotsUppercased = keyWithoutDots.toUpperCase();
+    value = getEnvironmentVariable(keyWithoutDotsUppercased);
+    if (value != null) {
+      logInexactEnvNameMatch(propKey, keyWithoutDotsUppercased);
+      return value;
+    }
+
+    return null;
+  }
+
+  protected String getEnvironmentVariable(String propKey) {
+    return System.getenv(propKey);
+  }
+
+  protected void logInexactEnvNameMatch(String propKey, String actualEnvVariableName) {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Property '{}' resolved to environment variable '{}' by inexact match.", propKey, actualEnvVariableName);
+    }
   }
 
   /**

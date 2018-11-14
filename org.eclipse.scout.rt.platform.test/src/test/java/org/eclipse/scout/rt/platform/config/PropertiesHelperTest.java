@@ -10,6 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -24,12 +30,7 @@ import java.util.Map;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.junit.Assert;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.mockito.Mockito;
 
 /**
  * Tests for class {@link PropertiesHelper}.
@@ -44,6 +45,7 @@ public class PropertiesHelperTest {
   private static final String LOOP_IMPORT_PROPS = "org/eclipse/scout/rt/platform/config/imp1.properties";
   private static final String PLACEHOLDER_IMPORT_PROPS = "org/eclipse/scout/rt/platform/config/placeholder-imp.properties";
   private static final String LIST_PROPS = "org/eclipse/scout/rt/platform/config/list-test.properties";
+  private static final String DOTPROPERTY_PROPS = "org/eclipse/scout/rt/platform/config/dotproperty-test.properties";
 
   private static final String USER_HOME_KEY = "user.home";
   private static final String USER_HOME_VALUE = System.getProperty("user.home");
@@ -447,4 +449,72 @@ public class PropertiesHelperTest {
       System.clearProperty(attrOtherSystemPropertyKey);
     }
   }
+
+  /**
+   * Only some shells support environment variables with dots. Test that these override properties in the config file
+   * correctly.
+   */
+  @Test
+  public void testEnvironmentOverrideWithDotSupport() {
+    final String overridableProperty = "overridable.with.dotproperty";
+
+    // Since Environment variables with dots (.) are not posix-compliant,
+    PropertiesHelper realInstance = new PropertiesHelper(DOTPROPERTY_PROPS);
+    PropertiesHelper spiedInstance = Mockito.spy(realInstance);
+    Mockito.when(spiedInstance.getEnvironmentVariable(overridableProperty)).thenReturn("2");
+
+    assertEquals("2", spiedInstance.getProperty(overridableProperty));
+  }
+
+  /**
+   * Only some shells support environment variables with dots. Test the alternative override using underscores.
+   */
+  @Test
+  public void testEnvironmentOverrideWithoutDotSupport() {
+    // Replaced with underscore.
+    final String overridableProperty = "overridable_with_dotproperty";
+
+    // Mock environment variables
+    PropertiesHelper realInstance = new PropertiesHelper(DOTPROPERTY_PROPS);
+    PropertiesHelper spiedInstance = Mockito.spy(realInstance);
+    Mockito.when(spiedInstance.getEnvironmentVariable(overridableProperty)).thenReturn("2");
+
+    final String originalProperty = "overridable.with.dotproperty";
+    assertEquals("2", spiedInstance.getProperty(originalProperty));
+  }
+
+  /**
+   * Test override using uppercase
+   */
+  @Test
+  public void testEnvironmentOverrideWithUppercase() {
+    // Replaced with underscore.
+    final String overridableProperty = "OVERRIDABLE.WITH.DOTPROPERTY";
+
+    // Since Environment variables with dots (.) are not posix-compliant,
+    PropertiesHelper realInstance = new PropertiesHelper(DOTPROPERTY_PROPS);
+    PropertiesHelper spiedInstance = Mockito.spy(realInstance);
+    Mockito.when(spiedInstance.getEnvironmentVariable(overridableProperty)).thenReturn("2");
+
+    final String originalProperty = "overridable.with.dotproperty";
+    assertEquals("2", spiedInstance.getProperty(originalProperty));
+  }
+
+  /**
+   * Test override using uppercase
+   */
+  @Test
+  public void testEnvironmentOverrideWithUppercaseWithoutDotSupport() {
+    // Replaced with underscore.
+    final String overridableProperty = "OVERRIDABLE_WITH_DOTPROPERTY";
+
+    // Since Environment variables with dots (.) are not posix-compliant,
+    PropertiesHelper realInstance = new PropertiesHelper(DOTPROPERTY_PROPS);
+    PropertiesHelper spiedInstance = Mockito.spy(realInstance);
+    Mockito.when(spiedInstance.getEnvironmentVariable(overridableProperty)).thenReturn("2");
+
+    final String originalProperty = "overridable.with.dotproperty";
+    assertEquals("2", spiedInstance.getProperty(originalProperty));
+  }
+
 }
