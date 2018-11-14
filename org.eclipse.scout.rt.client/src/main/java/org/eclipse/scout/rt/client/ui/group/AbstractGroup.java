@@ -69,6 +69,7 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
     setCollapsible(getConfiguredCollapsible());
     setCollapseStyle(getConfiguredCollapseStyle());
     setTitle(getConfiguredTitle());
+    setVisible(getConfiguredVisible());
     setHeader(createHeader());
     setHeaderFocusable(getConfiguredHeaderFocusable());
     setHeaderVisible(getConfiguredHeaderVisible());
