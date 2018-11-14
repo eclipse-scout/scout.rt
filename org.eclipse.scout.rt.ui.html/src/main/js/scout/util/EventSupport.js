@@ -96,10 +96,13 @@ scout.EventSupport.prototype.removeListener = function(listener) {
   scout.arrays.remove(this._eventListeners, listener);
 };
 
-scout.EventSupport.prototype.count = function(type) {
+scout.EventSupport.prototype.count = function(type, func) {
   var count = 0;
   this._eventListeners.forEach(function(listener) {
     if (type && type !== listener.type) {
+      return;
+    }
+    if (func && func !== listener.func) {
       return;
     }
     count++;
