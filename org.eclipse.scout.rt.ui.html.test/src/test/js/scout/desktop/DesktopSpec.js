@@ -1449,12 +1449,13 @@ describe('Desktop', function() {
       promises.push(view2.whenClose());
 
       desktop.closeViews([view1, view2]);
+
       // UnsavedFormChangesForm should be the last child
       var unsavedFormChangesForm = scout.arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
-      unsavedFormChangesForm.whenPostLoad().then(function() {
-        var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
-        expect(openFormsField.id).toBe('OpenFormsField');
+      var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+      expect(openFormsField.id).toBe('OpenFormsField');
+      openFormsField.when('lookupCallDone').then(function() {
         // default is all selected, view2 should be saved
         expect(openFormsField.value.length).toBe(1);
         expect(openFormsField.value[0]).toEqual(view2);
@@ -1495,16 +1496,18 @@ describe('Desktop', function() {
       promises.push(view2.whenClose());
 
       desktop.closeViews([view1, view2]);
+
       // UnsavedFormChangesForm should be the last child
       var unsavedFormChangesForm = scout.arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
-      unsavedFormChangesForm.whenPostLoad().then(function() {
-        var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
-        expect(openFormsField.id).toBe('OpenFormsField');
+      var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+      expect(openFormsField.id).toBe('OpenFormsField');
+      openFormsField.when('lookupCallDone').then(function() {
         expect(openFormsField.value.length).toBe(1);
         openFormsField.setValue(null);
         unsavedFormChangesForm.ok();
       });
+
       promises.push(unsavedFormChangesForm.whenClose());
 
       $.promiseAll(promises).then(function() {
@@ -1556,12 +1559,13 @@ describe('Desktop', function() {
       promises.push(view2.whenClose());
 
       desktop.closeViews([view1, view2]);
+
       // UnsavedFormChangesForm should be the last child
       var unsavedFormChangesForm = scout.arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
-      unsavedFormChangesForm.whenPostLoad().then(function() {
-        var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
-        expect(openFormsField.id).toBe('OpenFormsField');
+      var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+      expect(openFormsField.id).toBe('OpenFormsField');
+      openFormsField.when('lookupCallDone').then(function() {
         // default is all selected, view2 should be saved
         expect(openFormsField.value.length).toBe(1);
         expect(openFormsField.value[0]).toEqual(view2);
@@ -1598,12 +1602,13 @@ describe('Desktop', function() {
       spyOn(modalDialog, 'ok').and.callThrough();
 
       desktop.closeViews([view1, view2]);
+
       // UnsavedFormChangesForm should be the last child
       var unsavedFormChangesForm = scout.arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
-      unsavedFormChangesForm.whenPostLoad().then(function() {
-        var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
-        expect(openFormsField.id).toBe('OpenFormsField');
+      var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+      expect(openFormsField.id).toBe('OpenFormsField');
+      openFormsField.when('lookupCallDone').then(function() {
         expect(openFormsField.value.length).toBe(1);
         // the sub-form has unsaved changes (modalDialg), in the unsavedFormChangesForm the parent-view should be displayed
         expect(openFormsField.value[0]).toEqual(view2);
@@ -1664,12 +1669,13 @@ describe('Desktop', function() {
 
       jasmine.clock().install();
       desktop.closeViews([view1, view2]);
+
       // UnsavedFormChangesForm should be the last child
       var unsavedFormChangesForm = scout.arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
-      unsavedFormChangesForm.whenPostLoad().then(function() {
-        var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
-        expect(openFormsField.id).toBe('OpenFormsField');
+      var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+      expect(openFormsField.id).toBe('OpenFormsField');
+      openFormsField.when('lookupCallDone').then(function() {
         expect(openFormsField.value.length).toBe(1);
         expect(openFormsField.value[0]).toEqual(view2);
         unsavedFormChangesForm.ok();
@@ -1707,7 +1713,6 @@ describe('Desktop', function() {
       spyOn(modalDialog, 'close').and.callThrough();
       spyOn(modalDialog, 'ok').and.callThrough();
 
-
       modalDialog.rootGroupBox.fields[0].setValidator(function(value) {
         if (scout.strings.equalsIgnoreCase(value, 'Foo')) {
           throw new Error('Validation failed');
@@ -1722,9 +1727,9 @@ describe('Desktop', function() {
       // UnsavedFormChangesForm should be the last child
       var unsavedFormChangesForm = scout.arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
-      unsavedFormChangesForm.whenPostLoad().then(function() {
-        var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
-        expect(openFormsField.id).toBe('OpenFormsField');
+      var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+      expect(openFormsField.id).toBe('OpenFormsField');
+      openFormsField.when('lookupCallDone').then(function() {
         expect(openFormsField.value.length).toBe(1);
         expect(openFormsField.value[0]).toEqual(view2);
         unsavedFormChangesForm.ok();

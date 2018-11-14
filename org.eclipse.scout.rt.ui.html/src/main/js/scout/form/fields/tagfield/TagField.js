@@ -14,6 +14,7 @@ scout.TagField = function() {
   this.$field = null;
   this.fieldHtmlComp = null;
   this.chooser = null;
+  this.lookupCall = null;
   this._currentLookupCall = null;
   this.tagBar = null;
 };
@@ -280,13 +281,19 @@ scout.TagField.prototype._lookupByText = function(text) {
 };
 
 scout.TagField.prototype._onLookupDone = function(result) {
-  if (!this.rendered || !this.isFocused() || result.lookupRows.length === 0) {
-    this.closeChooserPopup();
-    return;
-  }
+  try {
+    if (!this.rendered || !this.isFocused() || result.lookupRows.length === 0) {
+      this.closeChooserPopup();
+      return;
+    }
 
-  this.openChooserPopup();
-  this.chooser.setLookupResult(result);
+    this.openChooserPopup();
+    this.chooser.setLookupResult(result);
+  } finally {
+    this.trigger('lookupCallDone', {
+      result: result
+    });
+  }
 };
 
 scout.TagField.prototype.openChooserPopup = function() {

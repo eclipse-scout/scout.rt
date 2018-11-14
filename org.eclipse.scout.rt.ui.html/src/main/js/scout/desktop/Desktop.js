@@ -989,7 +989,7 @@ scout.Desktop.prototype._closeViews = function(forms) {
   var waitFor = $.resolvedPromise();
   if (unsavedForms.length > 0) {
     var unsavedFormChangesForm = scout.create('scout.UnsavedFormChangesForm', {
-      parent: this.parent,
+      parent: this,
       session: this.session,
       displayParent: this,
       unsavedForms: unsavedForms

@@ -134,14 +134,54 @@ describe("RadioButtonGroup", function() {
 
   describe('lookupCall', function(){
 
+    it('can be prepared with initial value', function(done) {
+      var group = scout.create('RadioButtonGroup', {
+        parent: session.desktop,
+        lookupCall: 'DummyLookupCall',
+        value: 2
+      });
+
+      var lookupPrepared = group.when('prepareLookupCall');
+      var lookupDone = group.when('lookupCallDone');
+      group.render(); // triggers the execution of the lookup call
+      jasmine.clock().tick(500);
+
+      $.promiseAll([lookupPrepared, lookupDone]).then(function(event) {
+          expect(event.lookupCall.objectType).toBe('DummyLookupCall');
+          expect(group.radioButtons.length).toBe(3);
+        })
+        .catch(fail)
+        .always(done);
+      jasmine.clock().tick(500);
+    });
+
+    it('can be prepared with explicit value', function(done) {
+      var group = scout.create('RadioButtonGroup', {
+        parent: session.desktop,
+        lookupCall: 'DummyLookupCall'
+      });
+
+      var lookupPrepared = group.when('prepareLookupCall');
+      var lookupDone = group.when('lookupCallDone');
+      group.setValue(2);
+      jasmine.clock().tick(500);
+
+      $.promiseAll([lookupPrepared, lookupDone]).then(function(event) {
+          expect(event.lookupCall.objectType).toBe('DummyLookupCall');
+          expect(group.radioButtons.length).toBe(3);
+        })
+        .catch(fail)
+        .always(done);
+      jasmine.clock().tick(500);
+    });
+
     it('creates a radio button for each lookup row', function(){
       var radioButtonGroup = scout.create('RadioButtonGroup', {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall'
       });
-      expect(radioButtonGroup.isLoading()).toBe(true);
+      radioButtonGroup.render();
       jasmine.clock().tick(300);
-      expect(radioButtonGroup.isLoading()).toBe(false);
       expect(radioButtonGroup.radioButtons.length).toBe(3);
       expect(radioButtonGroup.lookupCall).not.toBe(null);
       expect(radioButtonGroup.errorStatus).toBe(null);
@@ -153,7 +193,7 @@ describe("RadioButtonGroup", function() {
         lookupCall: 'DummyLookupCall',
         value: 1
       });
-
+      radioButtonGroup.render(); // triggers the execution of the lookup call
       jasmine.clock().tick(300);
       expect(radioButtonGroup.radioButtons.length).toBe(3);
       expect(radioButtonGroup.errorStatus).toBe(null);
@@ -179,6 +219,7 @@ describe("RadioButtonGroup", function() {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall'
       });
+      radioButtonGroup.render(); // triggers the execution of the lookup call
 
       jasmine.clock().tick(300);
       radioButtonGroup.setValue(2);

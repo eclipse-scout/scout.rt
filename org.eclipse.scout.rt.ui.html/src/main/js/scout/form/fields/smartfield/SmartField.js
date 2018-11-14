@@ -359,7 +359,8 @@ scout.SmartField.prototype._acceptByText = function(sync, searchText) {
   // async
   this._lastSearchText = searchText;
   this._executeLookup(this.lookupCall.cloneForText(searchText), true)
-    .done(this._acceptByTextDone.bind(this));
+    .done(this._acceptByTextDone.bind(this))
+    .done(this._triggerLookupCallDone.bind(this));
   this._triggerAcceptByText(searchText);
 };
 
@@ -502,7 +503,8 @@ scout.SmartField.prototype.lookupByRec = function(rec) {
       if (this.isPopupOpen()) {
         this.popup.setLookupResult(result);
       }
-    }.bind(this));
+    }.bind(this))
+    .then(this._triggerLookupCallDone.bind(this));
 };
 
 /**
@@ -570,7 +572,8 @@ scout.SmartField.prototype._formatValue = function(value) {
   // Note: this has a side-effect as it sets the property lookupRow on the smart field
   this._lastSearchText = null;
   return this._executeLookup(this.lookupCall.cloneForKey(value), true)
-    .then(this._lookupByKeyDone.bind(this));
+    .then(this._lookupByKeyDone.bind(this))
+    .then(this._triggerLookupCallDone.bind(this));
 };
 
 scout.SmartField.prototype._lookupByKeyDone = function(result) {
@@ -678,7 +681,8 @@ scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText) {
       }));
     } else {
       this._executeLookup(this.lookupCall.cloneForAll(), true)
-        .done(doneHandler);
+        .done(doneHandler)
+        .done(this._triggerLookupCallDone.bind(this));
     }
   } else {
     // execute lookup byText with a debounce/delay
@@ -686,7 +690,8 @@ scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText) {
       $.log.isDebugEnabled() && $.log.debug('(SmartField#_lookupByTextOrAll) lookup byText searchText=' + searchText);
       this._lastSearchText = searchText;
       this._executeLookup(this.lookupCall.cloneForText(searchText), true)
-        .done(doneHandler);
+        .done(doneHandler)
+        .done(this._triggerLookupCallDone.bind(this));
     }.bind(this), scout.SmartField.DEBOUNCE_DELAY);
   }
 
@@ -1351,6 +1356,13 @@ scout.SmartField.prototype._showSelection = function() {
  */
 scout.SmartField.prototype.isClearable = function() {
   return scout.SmartField.parent.prototype.isClearable.call(this) && !this.isDropdown() && !this.touchMode;
+};
+
+scout.SmartField.prototype._triggerLookupCallDone = function(result) {
+  this.trigger('lookupCallDone', {
+    result: result
+  });
+  return result;
 };
 
 scout.SmartField.prototype._triggerAcceptInputFail = function() {

@@ -20,6 +20,7 @@ scout.RadioButtonGroup = function() {
   this.lookupStatus = null;
   this.lookupCall = null;
 
+  this._lookupExecuted = false;
   this._selectButtonLocked = false;
   this._pendingLookup = null;
   this._lookupInProgress = false;
@@ -186,6 +187,7 @@ scout.RadioButtonGroup.prototype._setFields = function(fields) {
 };
 
 scout.RadioButtonGroup.prototype._renderFields = function() {
+  this._ensureLookupCallExecuted();
   this.fields.forEach(function(formField) {
     formField.render(this.$body);
 
@@ -267,6 +269,19 @@ scout.RadioButtonGroup.prototype.getButtonForRadioValue = function(radioValue) {
 scout.RadioButtonGroup.prototype._validateValue = function(value) {
   scout.RadioButtonGroup.parent.prototype._validateValue.call(this, value);
 
+  if (!this.initialized && this.lookupCall) {
+    // lookup call may not be started during field initialization. otherwise lookup prepare listeners cannot be attached.
+    // do not validate now (as there are no buttons yet, because the lookup call has not yet been executed).
+    // validation will be done later again when the lookup call is executed.
+    return value;
+  }
+
+  var lookupScheduled = this._ensureLookupCallExecuted();
+  if (lookupScheduled) {
+    // the first lookup was scheduled now: buttons are not yet available, not possible to select one. will be done later as soon as the lookup call is finished.
+    return value;
+  }
+
   // only show error if value is not null or undefined
   var buttonToSelect = this.getButtonForRadioValue(value);
   if (!buttonToSelect && value !== null && value !== undefined && !this._lookupInProgress) {
@@ -277,7 +292,6 @@ scout.RadioButtonGroup.prototype._validateValue = function(value) {
 
 scout.RadioButtonGroup.prototype._valueChanged = function() {
   scout.RadioButtonGroup.parent.prototype._valueChanged.call(this);
-
   // Don't select button during initialization if value is null to not override selected state of a button
   if (this.value !== null || this.initialized) {
     this.selectButton(this.getButtonForRadioValue(this.value));
@@ -365,7 +379,24 @@ scout.RadioButtonGroup.prototype._onButtonPropertyChange = function(event) {
 
 scout.RadioButtonGroup.prototype._setLookupCall = function(lookupCall) {
   this._setProperty('lookupCall', scout.LookupCall.ensure(lookupCall, this.session));
+  this._lookupExecuted = false;
+  if (this.rendered) {
+    this._ensureLookupCallExecuted();
+  }
+};
+
+/**
+ * @return true if a lookup call execution has been scheduled now. false otherwise.
+ */
+scout.RadioButtonGroup.prototype._ensureLookupCallExecuted = function() {
+  if (!this.lookupCall) {
+    return false;
+  }
+  if (this._lookupExecuted) {
+    return false;
+  }
   this._lookupByAll();
+  return true;
 };
 
 /**
@@ -386,7 +417,6 @@ scout.RadioButtonGroup.prototype._lookupByAll = function() {
   }
 
   this._clearPendingLookup();
-  this.setLoading(true);
 
   var deferred = $.Deferred();
   var doneHandler = function(result) {
@@ -426,6 +456,7 @@ scout.RadioButtonGroup.prototype._executeLookup = function(lookupCall, abortExis
     .execute()
     .always(function() {
       this._lookupInProgress = false;
+      this._lookupExecuted = true;
       this._currentLookupCall = null;
       this.setLoading(false);
       this._clearLookupStatus();
@@ -433,24 +464,32 @@ scout.RadioButtonGroup.prototype._executeLookup = function(lookupCall, abortExis
 };
 
 scout.RadioButtonGroup.prototype._lookupByAllDone = function(result) {
-  // Oops! Something went wrong while the lookup has been processed.
-  if (result.exception) {
-    this.setErrorStatus(scout.Status.error({
-      message: result.exception
-    }));
-    return;
-  }
+  try {
 
-  // 'No data' case
-  if (result.lookupRows.length === 0) {
-    this.setLookupStatus(scout.Status.warning({
-      message: this.session.text('SmartFieldNoDataFound'),
-      code: scout.RadioButtonGroup.ErrorCode.NO_DATA
-    }));
-    return;
-  }
+    if (result.exception) {
+      // Oops! Something went wrong while the lookup has been processed.
+      this.setErrorStatus(scout.Status.error({
+        message: result.exception
+      }));
+      return;
+    }
 
-  this._populateRadioButtonGroup(result);
+    // 'No data' case
+    if (result.lookupRows.length === 0) {
+      this.setLookupStatus(scout.Status.warning({
+        message: this.session.text('SmartFieldNoDataFound'),
+        code: scout.RadioButtonGroup.ErrorCode.NO_DATA
+      }));
+      return;
+    }
+
+    this._populateRadioButtonGroup(result);
+
+  } finally {
+    this.trigger('lookupCallDone', {
+      result: result
+    });
+  }
 };
 
 scout.RadioButtonGroup.prototype._populateRadioButtonGroup = function(result) {

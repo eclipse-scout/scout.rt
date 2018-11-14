@@ -22,6 +22,7 @@ scout.ListBox = function() {
   this._pendingLookup = null;
   this._currentLookupCall = null;
   this._pendingLookup = null;
+  this._lookupExecuted = false;
   this._valueSyncing = false; // true when value is either syncing to table or table to value
 
   this._addWidgetProperties(['table', 'filterBox']);
@@ -104,34 +105,35 @@ scout.ListBox.prototype._valueChanged = function() {
 };
 
 scout.ListBox.prototype._syncValueToTable = function(newValue) {
-  if (!this.lookupCall || this._valueSyncing) {
+  if (!this.lookupCall || this._valueSyncing || !this.initialized) {
     return;
   }
 
   this._valueSyncing = true;
-  if (scout.arrays.empty(newValue)) {
-    this.table.uncheckRows(this.table.rows);
-  } else {
-    // if table is empty and lookup was not executed yet. do it now.
-    if (scout.arrays.empty(this.table.rows)) {
-      this._valueSyncing = false;
-      this._lookupByAll();
-      return;
+  try {
+    if (scout.arrays.empty(newValue)) {
+      this.table.uncheckRows(this.table.rows);
+    } else {
+      // if lookup was not executed yet: do it now.
+      var lookupScheduled = this._ensureLookupCallExecuted();
+      if (lookupScheduled) {
+        return; // was the first lookup: table has no rows yet. cancel sync. Will be executed again after lookup execution.
+      }
+
+      var rowsToCheck = [];
+      this.table.uncheckRows(this.table.rows);
+      this.table.rows.forEach(function(row) {
+        if (scout.arrays.containsAny(newValue, row.lookupRow.key)) {
+          rowsToCheck.push(row);
+        }
+      }, this);
+      this.table.checkRows(rowsToCheck);
     }
 
-    var rowsToCheck = [];
-
-    this.table.uncheckRows(this.table.rows);
-    this.table.rows.forEach(function(row) {
-      if (scout.arrays.containsAny(newValue, row.lookupRow.key)) {
-        rowsToCheck.push(row);
-      }
-    }, this);
-    this.table.checkRows(rowsToCheck);
+    this._updateDisplayText();
+  } finally {
+    this._valueSyncing = false;
   }
-
-  this._updateDisplayText();
-  this._valueSyncing = false;
 };
 
 scout.ListBox.prototype._lookupByAll = function() {
@@ -174,30 +176,39 @@ scout.ListBox.prototype._executeLookup = function(lookupCall, abortExisting) {
     .execute()
     .always(function() {
       this._currentLookupCall = null;
+      this._lookupExecuted = true;
       this.setLoading(false);
       this._clearLookupStatus();
     }.bind(this));
 };
 
 scout.ListBox.prototype._lookupByAllDone = function(result) {
-  // Oops! Something went wrong while the lookup has been processed.
-  if (result.exception) {
-    this.setErrorStatus(scout.Status.error({
-      message: result.exception
-    }));
-    return;
-  }
+  try {
 
-  // 'No data' case
-  if (result.lookupRows.length === 0) {
-    this.setLookupStatus(scout.Status.warning({
-      message: this.session.text('SmartFieldNoDataFound'),
-      code: scout.ListBox.ErrorCode.NO_DATA
-    }));
-    return;
-  }
+    if (result.exception) {
+      // Oops! Something went wrong while the lookup has been processed.
+      this.setErrorStatus(scout.Status.error({
+        message: result.exception
+      }));
+      return;
+    }
 
-  this._populateTable(result);
+    // 'No data' case
+    if (result.lookupRows.length === 0) {
+      this.setLookupStatus(scout.Status.warning({
+        message: this.session.text('SmartFieldNoDataFound'),
+        code: scout.ListBox.ErrorCode.NO_DATA
+      }));
+      return;
+    }
+
+    this._populateTable(result);
+
+  } finally {
+    this.trigger('lookupCallDone', {
+      result: result
+    });
+  }
 };
 
 scout.ListBox.prototype._populateTable = function(result) {
@@ -302,10 +313,30 @@ scout.ListBox.prototype.setLookupCall = function(lookupCall) {
 
 scout.ListBox.prototype._setLookupCall = function(lookupCall) {
   this._setProperty('lookupCall', scout.LookupCall.ensure(lookupCall, this.session));
+  this._lookupExecuted = false;
+  if (this.rendered) {
+    this._ensureLookupCallExecuted();
+  }
+};
+
+scout.ListBox.prototype.refreshLookup = function() {
+  this._lookupExecuted = false;
+  this._ensureLookupCallExecuted();
+};
+
+/**
+ * @return true if a lookup call execution has been scheduled now. false otherwise.
+ */
+scout.ListBox.prototype._ensureLookupCallExecuted = function() {
+  if (this._lookupExecuted) {
+    return false;
+  }
   this._lookupByAll();
+  return true;
 };
 
 scout.ListBox.prototype._renderTable = function() {
+  this._ensureLookupCallExecuted();
   this.table.render(this.$fieldContainer);
   this.addField(this.table.$container);
   this.$field.addDeviceClass();

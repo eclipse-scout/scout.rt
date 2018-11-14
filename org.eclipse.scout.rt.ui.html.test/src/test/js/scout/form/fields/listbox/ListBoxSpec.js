@@ -32,7 +32,9 @@ describe("ListBox", function() {
       parent: session.desktop,
       lookupCall: lookupCallModel
     }, model);
-    return scout.create('ListBox', model);
+    var box = scout.create('ListBox', model);
+    box.render();
+    return box;
   }
 
   function createListBoxWithAdapter() {
@@ -53,6 +55,46 @@ describe("ListBox", function() {
     it('init LookupCall when configured as string', function() {
       field = createFieldWithLookupCall();
       expect(field.lookupCall instanceof scout.DummyLookupCall).toBe(true);
+    });
+
+    it('LookupCall can be prepared if value is set explicitly', function(done) {
+      var box = scout.create('ListBox', {
+        parent: session.desktop,
+        lookupCall: 'DummyLookupCall'
+      });
+
+      var lookupPrepared = box.when('prepareLookupCall');
+      var lookupDone = box.when('lookupCallDone');
+      box.refreshLookup();
+      jasmine.clock().tick(500);
+
+      $.promiseAll([lookupPrepared, lookupDone]).then(function(event) {
+          expect(event.lookupCall.objectType).toBe('DummyLookupCall');
+        })
+        .catch(fail)
+        .always(done);
+      jasmine.clock().tick(500);
+    });
+
+    it('LookupCall can be prepared if value is configured', function(done) {
+      var box = scout.create('ListBox', {
+        parent: session.desktop,
+        lookupCall: 'DummyLookupCall',
+        value: 3
+      });
+
+      var lookupPrepared = box.when('prepareLookupCall');
+      var lookupDone = box.when('lookupCallDone');
+      box.render();
+      jasmine.clock().tick(500);
+
+      $.promiseAll([lookupPrepared, lookupDone]).then(function(event) {
+          expect(event.lookupCall.objectType).toBe('DummyLookupCall');
+          expect(box.getCheckedLookupRows().length).toBe(1);
+        })
+        .catch(fail)
+        .always(done);
+      jasmine.clock().tick(500);
     });
 
     it('when setValue is called, load and set the correct lookup rows', function() {
@@ -105,7 +147,6 @@ describe("ListBox", function() {
     it('uncheck all rows', function() {
       var field = createFieldWithLookupCall();
       jasmine.clock().tick(500);
-      field.render();
 
       field.setValue([1, 2, 3]);
       jasmine.clock().tick(500);
@@ -121,8 +162,8 @@ describe("ListBox", function() {
     });
   });
 
-  describe('setEnabled', function(){
-    it('should disable check rows', function(){
+  describe('setEnabled', function() {
+    it('should disable check rows', function() {
       var field = createFieldWithLookupCall();
       jasmine.clock().tick(500);
 
@@ -138,7 +179,7 @@ describe("ListBox", function() {
 
   describe('lookupCall', function() {
 
-    it('switching should refill table', function(){
+    it('switching should refill table', function() {
       var field = createFieldWithLookupCall({}, {
         objectType: 'AnotherDummyLookupCall'
       });
@@ -149,7 +190,6 @@ describe("ListBox", function() {
       expect(field.displayText).toBe('English, Swiss-German');
       expect(field.table.rows.length).toBe(5);
       expect(field.table.checkedRows().length).toBe(2);
-
 
       var newLookupCall = scout.create('DummyLookupCall', {
         session: session
@@ -162,7 +202,6 @@ describe("ListBox", function() {
       expect(field.table.checkedRows().length).toBe(0);
       expect(field.table.rows.length).toBe(3);
     });
-
 
     it('should be cloned and prepared for each lookup', function() {
       var templatePropertyValue = 11;

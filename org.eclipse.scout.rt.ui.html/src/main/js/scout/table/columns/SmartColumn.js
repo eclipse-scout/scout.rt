@@ -102,6 +102,11 @@ scout.SmartColumn.prototype._createEditor = function() {
       lookupCall: event.lookupCall
     });
   }.bind(this));
+  field.on('lookupCallDone', function(event) {
+    this.trigger('lookupCallDone', {
+      result: event.result
+    });
+  }.bind(this));
 
   return field;
 };
