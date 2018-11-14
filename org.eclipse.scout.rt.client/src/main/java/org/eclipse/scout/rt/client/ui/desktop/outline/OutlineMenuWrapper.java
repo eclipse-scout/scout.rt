@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.IReadOnlyMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
+import org.eclipse.scout.rt.client.ui.form.IFormMenu;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -68,11 +69,28 @@ public class OutlineMenuWrapper extends AbstractWidget implements IMenu, IReadOn
    * Returns a wrapper for the given menu, or if the menu is already a wrapper instance, the same menu-instance.
    */
   public static IMenu wrapMenu(IMenu menu) {
+    return wrapMenu(menu, AUTO_MENU_TYPE_MAPPER, ACCEPT_ALL_FILTER);
+  }
+
+  /**
+   * Returns a wrapper for the given menu, or if the menu is already a wrapper instance, the same menu-instance.
+   */
+  public static IMenu wrapMenu(IMenu menu, IMenuTypeMapper menuTypeMapper) {
+    return wrapMenu(menu, menuTypeMapper, ACCEPT_ALL_FILTER);
+  }
+
+  /**
+   * Returns a wrapper for the given menu, or if the menu is already a wrapper instance, the same menu-instance.
+   */
+  public static IMenu wrapMenu(IMenu menu, IMenuTypeMapper menuTypeMapper, Predicate<IAction> menuFilter) {
     if (menu instanceof OutlineMenuWrapper) {
       return menu; // already wrapped - don't wrap again
     }
+    else if (menu instanceof IFormMenu<?>) {
+      return new OutlineFormMenuWrapper((IFormMenu<?>) menu, menuTypeMapper, menuFilter);
+    }
     else {
-      return new OutlineMenuWrapper(menu);
+      return new OutlineMenuWrapper(menu, menuTypeMapper, menuFilter);
     }
   }
 
@@ -105,11 +123,17 @@ public class OutlineMenuWrapper extends AbstractWidget implements IMenu, IReadOn
    * in the original
    *
    * @param wrappedMenu
+   * @deprecated Use {@link OutlineMenuWrapper#wrapMenu(IMenu)} instead
    */
+  @Deprecated
   protected OutlineMenuWrapper(IMenu wrappedMenu) {
     this(wrappedMenu, AUTO_MENU_TYPE_MAPPER, ACCEPT_ALL_FILTER);
   }
 
+  /**
+   * @deprecated Use {@link OutlineMenuWrapper#wrapMenu(IMenu, IMenuTypeMapper)} instead
+   */
+  @Deprecated
   public OutlineMenuWrapper(IMenu wrappedMenu, IMenuTypeMapper mapper) {
     this(wrappedMenu, mapper, ACCEPT_ALL_FILTER);
   }
@@ -120,7 +144,9 @@ public class OutlineMenuWrapper extends AbstractWidget implements IMenu, IReadOn
    * @param menuTypeMapper
    *          the menuTypes for the menu and for each menu in the sub-hierarchy are individually computed with this
    *          mapper
+   * @deprecated Use {@link OutlineMenuWrapper#wrapMenu(IMenu, IMenuTypeMapper, Predicate)} instead
    */
+  @Deprecated
   public OutlineMenuWrapper(IMenu menu, IMenuTypeMapper menuTypeMapper, Predicate<IAction> menuFilter) {
     m_wrappedMenu = menu;
     m_menuTypeMapper = menuTypeMapper;

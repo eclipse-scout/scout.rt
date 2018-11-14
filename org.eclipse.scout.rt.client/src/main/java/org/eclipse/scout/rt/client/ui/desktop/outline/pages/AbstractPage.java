@@ -824,7 +824,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       for (IMenu menu : getOutline().getContextMenu().getChildActions()) {
         if (!OutlineMenuWrapper.containsWrappedMenu(table.getMenus(), menu)) {
           // mapping from TreeMenuType to TableMenuType
-          menus.add(new OutlineMenuWrapper(menu, TREE_MENU_TYPE_MAPPER));
+          menus.add(OutlineMenuWrapper.wrapMenu(menu, TREE_MENU_TYPE_MAPPER));
         }
       }
       if (!CollectionUtility.equalsCollection(menus, contextMenu.getChildActions())) {

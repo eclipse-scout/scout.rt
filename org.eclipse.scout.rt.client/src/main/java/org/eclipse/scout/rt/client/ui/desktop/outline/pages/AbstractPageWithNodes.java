@@ -315,7 +315,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
         Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TreeMenuType.SingleSelection), false);
         List<IMenu> menus = ActionUtility.getActions(pageWithNodes.getMenus(), filter);
         for (IMenu m : menus) {
-          pageMenus.add(new OutlineMenuWrapper(m, TREE_MENU_TYPE_MAPPER, filter));
+          pageMenus.add(OutlineMenuWrapper.wrapMenu(m, TREE_MENU_TYPE_MAPPER, filter));
         }
       }
     }
