@@ -33,7 +33,6 @@ import org.eclipse.scout.rt.client.ui.accordion.AbstractAccordion;
 import org.eclipse.scout.rt.client.ui.group.IGroup;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
-import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -98,12 +97,6 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
 
   @Override
   protected boolean getConfiguredExclusiveExpand() {
-    return false;
-  }
-
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(10)
-  protected boolean getConfiguredShowFilterCount() {
     return false;
   }
 
