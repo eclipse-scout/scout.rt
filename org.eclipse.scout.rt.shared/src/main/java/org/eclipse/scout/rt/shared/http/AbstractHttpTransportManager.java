@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 
 import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpIOExceptionHandler;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpRequestInitializer;
@@ -161,7 +162,7 @@ public abstract class AbstractHttpTransportManager implements IHttpTransportMana
    * Example {@link HttpRequestInitializer} (see {@link HttpRequestInitializer}) to disable read timeout and do not
    * throw exceptions in case of non 2xx responses.
    */
-  public static class DefaultHttpRequestInitializer implements HttpRequestInitializer {
+  public static class DefaultHttpRequestInitializer implements HttpRequestInitializer, HttpIOExceptionHandler {
     @Override
     public void initialize(HttpRequest request) throws IOException {
       // There may be requests that take longer than the default (20sec). Allow indefinite (similar to default UrlConnection behavior).
@@ -169,6 +170,14 @@ public abstract class AbstractHttpTransportManager implements IHttpTransportMana
 
       // Do not throw an exception on execute error (similar to default UrlConnection behavior).
       request.setThrowExceptionOnExecuteError(false);
+
+      // The request asks this handler in case a request failed; the supportsRetry flag is based on the HttpContent.retrySupported() callback flag.
+      request.setIOExceptionHandler(this);
+    }
+
+    @Override
+    public boolean handleIOException(HttpRequest request, boolean supportsRetry) throws IOException {
+      return true;
     }
   }
 }
