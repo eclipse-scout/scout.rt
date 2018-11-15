@@ -89,7 +89,6 @@
 }
 
 .group.collapse-bottom {
-
   & > .group-header {
     cursor: default;
   }
@@ -99,26 +98,28 @@
   }
 
   & > .group-footer {
-    cursor: pointer;
+    display: flex;
+
+    .has-body& {
+      cursor: pointer;
+    }
 
     & > .group-collapse-border {
-      padding-top: 10px;
+      flex-grow: 1;
+      margin-top: 8px;
+      margin-bottom: 8px;
       border-style: solid;
       border-width: 0 0 1px 0;
-      border-color: @palette-gray-5;
+      border-color: @border-color;
     }
 
     & > .group-collapse-icon {
       transition: transform 0s;
-      margin-top: -8px;
-      margin-right: 0;
-      margin-bottom: 0;
-      text-align: center;
+      margin: 0;
 
       &::before {
         content: @icon-angle-up;
         padding: 0 4px;
-        background-color: @control-background-color;
       }
 
       &.collapsed {

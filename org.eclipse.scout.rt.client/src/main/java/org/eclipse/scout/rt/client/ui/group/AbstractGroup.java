@@ -29,6 +29,8 @@ import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
+import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -37,10 +39,19 @@ import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 @ClassId("634c5f32-ca74-40a8-87cf-571e93ae3f64")
 public abstract class AbstractGroup extends AbstractWidget implements IGroup {
 
+  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper(IDimensions.VISIBLE, IDimensions.VISIBLE_GRANTED);
+
   private IGroupUIFacade m_uiFacade;
   private final ObjectExtensions<AbstractGroup, IGroupExtension<? extends AbstractGroup>> m_objectExtensions;
   protected ContributionComposite m_contributionHolder;
   private ITypeWithClassId m_container;
+
+  /**
+   * Provides 8 dimensions for visibility.<br>
+   * Internally used: {@link IDimensions#VISIBLE}, {@link IDimensions#VISIBLE_GRANTED}.<br>
+   * 6 dimensions remain for custom use. This FormField is visible, if all dimensions are visible (all bits set).
+   */
+  private byte m_visible;
 
   public AbstractGroup() {
     this(true);
@@ -48,6 +59,7 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
 
   public AbstractGroup(boolean callInitializer) {
     super(false);
+    m_visible = NamedBitMaskHelper.ALL_BITS_SET; // default visible
     m_objectExtensions = new ObjectExtensions<>(this, false);
     if (callInitializer) {
       callInitializer();
@@ -73,6 +85,7 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
     setHeader(createHeader());
     setHeaderFocusable(getConfiguredHeaderFocusable());
     setHeaderVisible(getConfiguredHeaderVisible());
+    setBodyVisible(getConfiguredBodyVisible());
     setBody(createBody());
   }
 
@@ -245,13 +258,38 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
   }
 
   @Override
-  public void setVisible(boolean visible) {
-    propertySupport.setPropertyBool(PROP_VISIBLE, visible);
+  public boolean isVisibleGranted() {
+    return isVisible(IDimensions.VISIBLE_GRANTED);
+  }
+
+  @Override
+  public void setVisibleGranted(boolean visible) {
+    setVisible(visible, IDimensions.VISIBLE_GRANTED);
   }
 
   @Override
   public boolean isVisible() {
     return propertySupport.getPropertyBool(PROP_VISIBLE);
+  }
+
+  @Override
+  public void setVisible(boolean b) {
+    setVisible(b, IDimensions.VISIBLE);
+  }
+
+  @Override
+  public void setVisible(boolean visible, String dimension) {
+    m_visible = VISIBLE_BIT_HELPER.changeBit(dimension, visible, m_visible);
+    calculateVisible();
+  }
+
+  @Override
+  public boolean isVisible(String dimension) {
+    return VISIBLE_BIT_HELPER.isBitSet(dimension, m_visible);
+  }
+
+  private void calculateVisible() {
+    propertySupport.setPropertyBool(PROP_VISIBLE, NamedBitMaskHelper.allBitsSet(m_visible));
   }
 
   protected IWidget createHeader() {
@@ -340,6 +378,22 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
   @Override
   public IWidget getBody() {
     return (IWidget) propertySupport.getProperty(PROP_BODY);
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(120)
+  protected boolean getConfiguredBodyVisible() {
+    return true;
+  }
+
+  @Override
+  public void setBodyVisible(boolean bodyVisible) {
+    propertySupport.setPropertyBool(PROP_BODY_VISIBLE, bodyVisible);
+  }
+
+  @Override
+  public boolean isBodyVisible() {
+    return propertySupport.getPropertyBool(PROP_BODY_VISIBLE);
   }
 
   @Override

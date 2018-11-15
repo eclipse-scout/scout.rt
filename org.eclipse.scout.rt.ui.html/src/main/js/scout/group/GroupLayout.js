@@ -32,30 +32,24 @@ scout.GroupLayout.prototype.layout = function($container) {
       useCssSize: true
     });
     footerSize.width = containerSize.width;
-    footerSize = footerSize.subtract(htmlFooter.margins());
-    htmlFooter.setSize(footerSize);
+    htmlFooter.setSize(footerSize.subtract(htmlFooter.margins()));
   }
 
   // 1st condition: Set size only if group is expanded
   // 2nd condition: There is no need to update it during the expand animation (the body will be layouted correctly before the animation starts)
   // 3rd condition: When Group.setCollapsed(false) has been called an event is triggered that might causes invalidating layout on other all groups (inclusive currently expanding group). The body of the currently expanding group is not rendered at this time.
-  if (this.group.collapsed || this.group.bodyAnimating || !this.group.body.rendered) {
+  // 4th condition: When body is invisible by property (bodyVisible)
+  if (this.group.collapsed || this.group.bodyAnimating || !this.group.body.rendered || !this.group.body.isVisible()) {
     return;
   }
-  var bodySize;
+
   var htmlBody = this.group.body.htmlComp;
-
-  var hasBody = htmlBody.prefSize(false).height > 0 && this.group.body.isVisible();
-  if (hasBody) {
-    bodySize = containerSize.subtract(htmlBody.margins());
-    bodySize.height -= headerSize.height;
-    if (htmlFooter.isVisible()) {
-      bodySize.height -= htmlFooter.prefSize(true).height;
-    }
-    htmlBody.setSize(bodySize);
+  var bodySize = containerSize.subtract(htmlBody.margins());
+  bodySize.height -= headerSize.height;
+  if (htmlFooter.isVisible()) {
+    bodySize.height -= htmlFooter.prefSize(true).height;
   }
-
-  this.group.$collapseIcon.setVisible(hasBody);
+  htmlBody.setSize(bodySize);
 };
 
 scout.GroupLayout.prototype.invalidate = function(htmlSource) {
@@ -86,7 +80,7 @@ scout.GroupLayout.prototype.preferredLayoutSize = function($container, options) 
     // Return the current size when the body is collapsing or expanding
     // so that the widgets on the bottom and on top move smoothly with the animation
     prefSize = htmlBody.size(true);
-  } else if (this.group.collapsed || !this.group.body.rendered) {
+  } else if (this.group.collapsed || !this.group.body.rendered || !this.group.body.isVisible()) {
     // Body may not be rendered even if collapsed is false if property has changed but _renderCollapse not called yet
     // (if revalidateLayoutTree is called during collapsed property event)
     prefSize = new scout.Dimension(0, 0);
@@ -100,6 +94,7 @@ scout.GroupLayout.prototype.preferredLayoutSize = function($container, options) 
   prefSize.height += htmlHeader.prefSize(true).height;
   if (htmlFooter.isVisible()) {
     prefSize.height += htmlFooter.prefSize({
+      includeMargin: true,
       useCssSize: true
     }).height;
   }
