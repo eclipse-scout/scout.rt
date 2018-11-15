@@ -16,7 +16,6 @@ import static org.eclipse.scout.rt.ui.html.selenium.util.SeleniumUtil.variablePa
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
@@ -37,6 +36,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import com.google.common.base.Function;
 
 public abstract class AbstractSeleniumTest {
 
