@@ -28,6 +28,14 @@ public class DoEntityListValueDo extends DoEntity implements IValueDo<List<IDoEn
     return BEANS.get(DoEntityListValueDo.class).withValue(value);
   }
 
+  public static DoEntityListValueDo of(IDoEntity... values) {
+    return BEANS.get(DoEntityListValueDo.class).withValue(values);
+  }
+
+  public static DoEntityListValueDo of(Collection<? extends IDoEntity> values) {
+    return BEANS.get(DoEntityListValueDo.class).withValue(values);
+  }
+
   @Override
   public DoList<IDoEntity> value() {
     return doList(VALUE_ATTRIBUTE);
