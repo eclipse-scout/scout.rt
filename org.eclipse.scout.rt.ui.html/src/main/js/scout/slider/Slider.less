@@ -40,3 +40,8 @@
   padding-top: @borderless-field-padding-y;
   padding-bottom: @borderless-field-padding-y;
 }
+
+.slider.field {
+  /* Slider input/value have the container's height (see SliderLayout), therefore they shouldn't wrap, otherwise the layout breaks. */
+  white-space: nowrap;
+}
