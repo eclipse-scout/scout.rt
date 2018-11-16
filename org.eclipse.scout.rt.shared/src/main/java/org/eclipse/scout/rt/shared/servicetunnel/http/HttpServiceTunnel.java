@@ -37,7 +37,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
-import com.google.api.client.http.ByteArrayContent;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
@@ -113,7 +112,7 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
     }
 
     HttpRequestFactory requestFactory = getHttpTransportManager().getHttpRequestFactory();
-    HttpRequest request = requestFactory.buildPostRequest(getGenericUrl(), new ByteArrayContent(null, callData));
+    HttpRequest request = requestFactory.buildPostRequest(getGenericUrl(), new ByteArrayContentEx(null, callData, false));
     HttpHeaders headers = request.getHeaders();
     headers.setCacheControl("no-cache");
     headers.setContentType("text/xml");
