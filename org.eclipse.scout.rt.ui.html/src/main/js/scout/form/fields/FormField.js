@@ -68,6 +68,8 @@ scout.FormField = function() {
 
   this._addWidgetProperties(['keyStrokes', 'menus', 'statusMenuMappings']);
   this._addCloneProperties(['dropType', 'dropMaximumSize', 'errorStatus', 'fieldStyle', 'gridDataHints', 'gridData', 'label', 'labelVisible', 'labelPosition', 'labelWidthInPixel', 'mandatory', 'mode', 'preventInitialFocus', 'requiresSave', 'touched', 'statusVisible', 'statusPosition', 'statusMenuMappings', 'tooltipText']);
+
+  this._menuPropertyChangeHandler = this.onMenuPropertyChange.bind(this);
 };
 scout.inherits(scout.FormField, scout.Widget);
 
@@ -567,8 +569,18 @@ scout.FormField.prototype.setMenus = function(menus) {
 };
 
 scout.FormField.prototype._setMenus = function(menus) {
+  menus = scout.arrays.ensure(menus);
+
+  this.menus.forEach(function(menu) {
+    menu.off('propertyChange', this._menuPropertyChangeHandler);
+  }, this);
+
   this.updateKeyStrokes(menus, this.menus);
   this._setProperty('menus', menus);
+
+  this.menus.forEach(function(menu) {
+    menu.on('propertyChange', this._menuPropertyChangeHandler);
+  }, this);
 };
 
 scout.FormField.prototype._getCurrentMenus = function() {
@@ -1260,4 +1272,10 @@ scout.FormField.prototype.clone = function(model, options) {
   var clone = scout.FormField.parent.prototype.clone.call(this, model, options);
   this._deepCloneProperties(clone, 'menus', options);
   return clone;
+};
+
+scout.FormField.prototype.onMenuPropertyChange = function(event) {
+  if (event.propertyName === 'visible' && this.rendered) {
+    this._updateMenus();
+  }
 };
