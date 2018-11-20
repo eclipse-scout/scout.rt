@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app
+  metadata-complete="true"
+  xmlns="http://java.sun.com/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+  version="3.0">
+
+  <servlet>
+    <servlet-name>servlet</servlet-name>
+    <servlet-class>org.eclipse.scout.rt.server.commons.http.HttpSimpleTest$Servlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>servlet</servlet-name>
+    <url-pattern>/simple</url-pattern>
+  </servlet-mapping>
+
+  <session-config>
+    <!-- Session timeout in minutes -->
+    <session-timeout>60</session-timeout>
+  </session-config>
+</web-app>
