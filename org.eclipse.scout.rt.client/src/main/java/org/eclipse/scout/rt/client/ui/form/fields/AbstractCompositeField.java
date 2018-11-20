@@ -36,7 +36,6 @@ import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
-import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 
 @ClassId("4a641cd4-801f-45d2-9f08-5798e20b03c4")
 public abstract class AbstractCompositeField extends AbstractFormField implements ICompositeField {
@@ -394,9 +393,11 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   protected boolean calcHasVisibleFieldsInternal() {
-    for (IWidget w : getChildren()) {
-      boolean hasVisibleChildren = w.visit(field -> field.isVisible() ? TreeVisitResult.TERMINATE : TreeVisitResult.CONTINUE, IFormField.class) == TreeVisitResult.TERMINATE;
-      if (hasVisibleChildren) {
+    if (CollectionUtility.isEmpty(getFieldsInternal())) {
+      return false;
+    }
+    for (IFormField field : getFieldsInternal()) {
+      if (field.isVisible()) {
         return true;
       }
     }
