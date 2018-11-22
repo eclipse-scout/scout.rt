@@ -16,6 +16,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
@@ -32,7 +33,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
@@ -96,7 +96,10 @@ public class HttpRetryTest {
     HttpRequest req = reqFactory.buildGetRequest(new GenericUrl(m_server.getContextUrl() + "retry?foo=bar"));
     req.getHeaders().set(CORRELATION_ID, "01");
     HttpResponse resp = req.execute();
-    byte[] bytes = IOUtility.readBytes(resp.getContent(), ObjectUtility.nvl(resp.getHeaders().getContentLength(), -1L).intValue());
+    byte[] bytes;
+    try (InputStream in = resp.getContent()) {
+      bytes = IOUtility.readBytes(in);
+    }
     String text = new String(bytes, StandardCharsets.UTF_8).trim();
     assertEquals(text, "Hello bar");
     assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
@@ -143,7 +146,10 @@ public class HttpRetryTest {
     });
     req.getHeaders().set(CORRELATION_ID, "02");
     HttpResponse resp = req.execute();
-    byte[] bytes = IOUtility.readBytes(resp.getContent(), ObjectUtility.nvl(resp.getHeaders().getContentLength(), -1L).intValue());
+    byte[] bytes;
+    try (InputStream in = resp.getContent()) {
+      bytes = IOUtility.readBytes(in);
+    }
     String text = new String(bytes, StandardCharsets.UTF_8).trim();
     assertEquals(text, "Post bar");
     assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
@@ -293,7 +299,10 @@ public class HttpRetryTest {
     });
     req.getHeaders().set(CORRELATION_ID, "05");
     HttpResponse resp = req.execute();
-    byte[] bytes = IOUtility.readBytes(resp.getContent(), ObjectUtility.nvl(resp.getHeaders().getContentLength(), -1L).intValue());
+    byte[] bytes;
+    try (InputStream in = resp.getContent()) {
+      bytes = IOUtility.readBytes(in);
+    }
     String text = new String(bytes, StandardCharsets.UTF_8).trim();
     assertEquals(text, "Post bar");
     assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
