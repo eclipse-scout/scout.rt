@@ -38,12 +38,12 @@ public class DefaultBookmarkAdapter implements IBookmarkAdapter {
 
   @Override
   public String getTitle() {
-    return m_page.getCell().getText();
+    return m_page.getCell().toPlainText();
   }
 
   @Override
   public String getText() {
-    return m_page.getCell().getText();
+    return m_page.getCell().toPlainText();
   }
 
   @Override

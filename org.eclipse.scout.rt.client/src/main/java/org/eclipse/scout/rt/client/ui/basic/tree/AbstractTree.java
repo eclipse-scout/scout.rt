@@ -1101,7 +1101,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
         if (pathStr.length() != 0) {
           pathStr.insert(0, delimiter);
         }
-        pathStr.insert(0, node.getCell().getText());
+        pathStr.insert(0, node.getCell().toPlainText());
       }
       // next
       node = node.getParentNode();
@@ -2833,7 +2833,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
         StringBuilder msg = new StringBuilder();
         for (ITreeNode node : nodes) {
           msg.append("[");
-          msg.append(node.getCell().getText());
+          msg.append(node.getCell().toPlainText());
           msg.append("]");
         }
         throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
@@ -2865,7 +2865,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
       catch (RuntimeException e) {
         if (node != null) {
           throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
-              .withContextInfo("node", node.getCell().getText());
+              .withContextInfo("node", node.getCell().toPlainText());
         }
         throw e;
       }
@@ -2899,7 +2899,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
       catch (RuntimeException e) {
         if (node != null) {
           throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
-              .withContextInfo("cell", node.getCell().getText());
+              .withContextInfo("cell", node.getCell().toPlainText());
         }
         throw e;
       }

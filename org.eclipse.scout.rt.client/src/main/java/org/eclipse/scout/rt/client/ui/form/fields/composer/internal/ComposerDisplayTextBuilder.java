@@ -64,7 +64,7 @@ public class ComposerDisplayTextBuilder {
   private void visitOrNodes(List<? extends EitherOrNode> nodes, StringBuilder buf, String prefix) {
     for (EitherOrNode node : nodes) {
       buf.append(prefix);
-      buf.append(node.getCell().getText());
+      buf.append(node.getCell().toPlainText());
       buf.append("\n");
       // add children
       visitAndNodes(node.getChildNodes(), buf, prefix + " ");
@@ -73,7 +73,7 @@ public class ComposerDisplayTextBuilder {
 
   private void visitEntityNode(EntityNode node, StringBuilder buf, String prefix) {
     buf.append(prefix);
-    buf.append(node.getCell().getText());
+    buf.append(node.getCell().toPlainText());
     buf.append("\n");
     // add children
     visitAndNodes(node.getChildNodes(), buf, prefix + " ");
@@ -81,7 +81,7 @@ public class ComposerDisplayTextBuilder {
 
   private void visitAttributeNode(AttributeNode node, StringBuilder buf, String prefix) {
     buf.append(prefix);
-    buf.append(node.getCell().getText());
+    buf.append(node.getCell().toPlainText());
     buf.append("\n");
     // add children
     visitAndNodes(node.getChildNodes(), buf, prefix + " ");

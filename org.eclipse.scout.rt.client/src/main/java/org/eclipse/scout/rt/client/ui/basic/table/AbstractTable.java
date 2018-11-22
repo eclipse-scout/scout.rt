@@ -1538,7 +1538,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         if (b.length() > 0) {
           b.append(" ");
         }
-        b.append(getCell(row, c).getText());
+        b.append(getCell(row, c).toPlainText());
       }
       cell.setText(b.toString());
       return cell;

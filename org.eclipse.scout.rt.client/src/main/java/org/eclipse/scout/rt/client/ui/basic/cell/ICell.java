@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.cell;
 
+import org.eclipse.scout.rt.platform.html.HTML;
+import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
@@ -31,7 +33,29 @@ public interface ICell {
 
   Object getValue();
 
+  /**
+   * @return the cell text
+   *         <p>
+   *         This can be plain text or html text depending on {@link #isHtmlEnabled()}
+   *         <p>
+   *         In order to get human readable plain text call {@link #toPlainText()}
+   */
   String getText();
+
+  /**
+   * @return the cell text in plain text format
+   *         <p>
+   *         If {@link #isHtmlEnabled()} is set to false then this is the same as {@link #getText()}. Else
+   *         {@link HtmlHelper#toPlainText(String)} is called by {@link HTML}{@link #toPlainText()}.
+   * @since 9.0
+   */
+  default String toPlainText() {
+    String text = getText();
+    if (text != null && isHtmlEnabled()) {
+      text = HTML.raw(text).toPlainText();
+    }
+    return text;
+  }
 
   String getCssClass();
 

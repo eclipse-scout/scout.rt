@@ -848,7 +848,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
         ITree tree = getTree();
         for (ITreeNode node : tree.getSelectedNodes()) {
           if (isBookmarkNode(node)) {
-            items.add(node.getCell().getText());
+            items.add(node.getCell().toPlainText());
             filteredNodes.add(node);
           }
         }
