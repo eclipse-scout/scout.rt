@@ -66,6 +66,7 @@ public abstract class AbstractIcons implements Serializable {
   public static final String World = "font:\uE021";
   public static final String Chart = "font:\uE022";
   public static final String GraphBold = "font:\uE023";
+  public static final String Category = "font:\uE059";
   public static final String CategoryBold = "font:\uE024";
   public static final String Gear = "font:\uE031";
   public static final String Star = "font:\uE02D";

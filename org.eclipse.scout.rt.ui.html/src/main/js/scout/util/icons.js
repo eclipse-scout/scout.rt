@@ -42,6 +42,7 @@ scout.icons = {
   WORLD: 'font:\uE021',
   CHART: 'font:\uE022',
   GRAPH_SOLID: 'font:\uE023',
+  CATEGORY: 'font:\uE059',
   CATEGORY_SOLID: 'font:\uE024',
   GEAR: 'font:\uE031',
   STAR: 'font:\uE02D',
