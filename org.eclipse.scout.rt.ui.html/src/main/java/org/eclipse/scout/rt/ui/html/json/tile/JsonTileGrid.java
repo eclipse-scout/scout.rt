@@ -241,7 +241,7 @@ public class JsonTileGrid<T extends ITileGrid<? extends ITile>> extends Abstract
     return optTile(json.getString("tile"));
   }
 
-  private ITile getTile(String tileId) {
+  protected ITile getTile(String tileId) {
     Object model = getUiSession().getJsonAdapter(tileId).getModel();
     if (!(model instanceof ITile)) {
       throw new IllegalStateException("Id does not belong to a tile. Id: " + tileId);
@@ -249,8 +249,12 @@ public class JsonTileGrid<T extends ITileGrid<? extends ITile>> extends Abstract
     return (ITile) model;
   }
 
-  private ITile optTile(String tileId) {
-    Object model = getUiSession().getJsonAdapter(tileId).getModel();
+  protected ITile optTile(String tileId) {
+    IJsonAdapter<?> adapter = getUiSession().getJsonAdapter(tileId);
+    if (adapter == null) {
+      return null;
+    }
+    Object model = adapter.getModel();
     if (model == null) {
       return null;
     }
