@@ -1418,11 +1418,11 @@ scout.Session.prototype._onLocaleChanged = function(event) {
  */
 scout.Session.prototype.switchLocale = function(locale, textMap) {
   scout.assertParameter('locale', locale, scout.Locale);
-  if (!textMap) {
-    textMap = scout.texts.get(locale.languageTag);
-  }
   this.locale = locale;
-  this.textMap = textMap;
+  this.textMap = scout.texts.get(locale.languageTag);
+  if (textMap) {
+    scout.objects.copyOwnProperties(textMap, this.textMap);
+  }
   // TODO [7.0] bsh: inform components to reformat display text? also check Collator in scout.comparators.TEXT
 
   this.trigger('localeSwitch', {
