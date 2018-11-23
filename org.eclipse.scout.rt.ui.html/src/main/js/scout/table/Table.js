@@ -27,6 +27,7 @@ scout.Table = function() {
   this.headerVisible = true;
   this.headerMenusEnabled = true;
   this.hasReloadHandler = false;
+  this.hierarchical = false;
   this.hierarchicalStyle = scout.Table.HierarchicalStyle.DEFAULT;
   this.keyStrokes = [];
   this.keyboardNavigation = true;
@@ -124,6 +125,9 @@ scout.Table.SELECTION_CLASSES = 'select-middle select-top select-bottom select-s
 
 scout.Table.prototype._init = function(model) {
   scout.Table.parent.prototype._init.call(this, model);
+  this.resolveConsts([{
+    property: 'hierarchicalStyle',
+    constType: scout.Table.HierarchicalStyle}]);
   this._initColumns();
 
   this.rows.forEach(function(row, i) {

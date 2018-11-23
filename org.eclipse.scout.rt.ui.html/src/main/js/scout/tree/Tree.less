@@ -147,7 +147,10 @@
     font-size: @font-size-normal;
     #scout.checkbox();
 
-    &.disabled {
+    &.disabled,
+    .tree.disabled > .tree-data > .tree-node > &,
+    .tree.disabled > .tree-data > .animation-wrapper > .tree-node > & {
+
       cursor: default;
     }
 
@@ -159,8 +162,11 @@
       #scout.checkbox-before-checked();
     }
 
-    &.disabled {
+    &.disabled,
+    .tree.disabled > .tree-data > .tree-node > &,
+    .tree.disabled > .tree-data > .animation-wrapper > .tree-node > & {
       #scout.checkbox-disabled();
+
       &::before {
         #scout.checkbox-before-disabled();
       }
