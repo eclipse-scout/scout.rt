@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,62 +11,39 @@
 scout.ListBox = function() {
   scout.ListBox.parent.call(this);
 
-  this.gridDataHints.weightY = 1.0;
-  this.gridDataHints.h = 2;
-  this.lookupCall = null;
   this.table = null;
   this.lookupStatus = null;
-  this.value = [];
   this.clearable = scout.ValueField.Clearable.NEVER;
 
-  this._pendingLookup = null;
-  this._currentLookupCall = null;
-  this._pendingLookup = null;
-  this._lookupExecuted = false;
-  this._valueSyncing = false; // true when value is either syncing to table or table to value
-
   this._addWidgetProperties(['table', 'filterBox']);
-  this._addCloneProperties(['lookupCall']);
 };
-scout.inherits(scout.ListBox, scout.ValueField);
-
-scout.ListBox.ErrorCode = {
-  NO_DATA: 1
-};
+scout.inherits(scout.ListBox, scout.LookupBox);
 
 scout.ListBox.prototype._init = function(model) {
   scout.ListBox.parent.prototype._init.call(this, model);
-  if (this.filterBox) {
-    this.filterBox.enabledComputed = true; // filter is always enabled
-    this.filterBox.recomputeEnabled(true);
-  }
   this.table.on('rowsChecked', this._onTableRowsChecked.bind(this));
   this.table.setScrollTop(this.scrollTop);
 };
 
-scout.ListBox.prototype._initValue = function(value) {
-  if (this.lookupCall) {
-    this._setLookupCall(this.lookupCall);
-  }
+scout.ListBox.prototype._initStructure = function(value) {
   if (!this.table) {
     this.table = this._createDefaultListBoxTable();
   }
-  scout.ListBox.parent.prototype._initValue.call(this, value);
 };
 
 scout.ListBox.prototype._render = function() {
-  this.addContainer(this.$parent, 'list-box');
-  this.addLabel();
-  this.addMandatoryIndicator();
-  this.addStatus();
+  scout.ListBox.parent.prototype._render.call(this);
+  this.$container.addClass('list-box');
+};
 
-  this.addFieldContainer(this.$parent.makeDiv());
-  var htmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
-  htmlComp.setLayout(new scout.ListBoxLayout(this, this.table, this.filterBox));
+scout.ListBox.prototype._createLayout = function() {
+  return new scout.ListBoxLayout(this, this.table, this.filterBox);
+};
 
-  this._renderTable();
+scout.ListBox.prototype._renderStructure = function() {
+  this.table.render(this.$fieldContainer);
+  this.addField(this.table.$container);
   if (this.filterBox) {
-    this._renderFilterBox();
     this.table.htmlComp.pixelBasedSizing = true;
   }
 };
@@ -91,14 +68,6 @@ scout.ListBox.prototype._syncTableToValue = function() {
   this._valueSyncing = false;
 };
 
-scout.ListBox.prototype._ensureValue = function(value) {
-  return scout.arrays.ensure(value);
-};
-
-scout.ListBox.prototype._updateEmpty = function() {
-  this.empty = scout.arrays.empty(this.value);
-};
-
 scout.ListBox.prototype._valueChanged = function() {
   scout.ListBox.parent.prototype._valueChanged.call(this);
   this._syncValueToTable(this.value);
@@ -121,6 +90,7 @@ scout.ListBox.prototype._syncValueToTable = function(newValue) {
       }
 
       var rowsToCheck = [];
+
       this.table.uncheckRows(this.table.rows);
       this.table.rows.forEach(function(row) {
         if (scout.arrays.containsAny(newValue, row.lookupRow.key)) {
@@ -136,78 +106,9 @@ scout.ListBox.prototype._syncValueToTable = function(newValue) {
   }
 };
 
-scout.ListBox.prototype._lookupByAll = function() {
-  if (!this.lookupCall) {
-    return;
-  }
-  this._clearPendingLookup();
-
-  var deferred = $.Deferred();
-  var doneHandler = function(result) {
-    this._lookupByAllDone(result);
-    deferred.resolve(result);
-  }.bind(this);
-
-  this._executeLookup(this.lookupCall.cloneForAll(), true)
-    .done(doneHandler);
-
-  return deferred.promise();
-};
-
-scout.ListBox.prototype._clearPendingLookup = function() {
-  if (this._pendingLookup) {
-    clearTimeout(this._pendingLookup);
-    this._pendingLookup = null;
-  }
-};
-
-scout.ListBox.prototype._executeLookup = function(lookupCall, abortExisting) {
-  this.setLoading(true);
-
-  if (abortExisting && this._currentLookupCall) {
-    this._currentLookupCall.abort();
-  }
-  this._currentLookupCall = lookupCall;
-  this.trigger('prepareLookupCall', {
-    lookupCall: lookupCall
-  });
-
-  return lookupCall
-    .execute()
-    .always(function() {
-      this._currentLookupCall = null;
-      this._lookupExecuted = true;
-      this.setLoading(false);
-      this._clearLookupStatus();
-    }.bind(this));
-};
-
 scout.ListBox.prototype._lookupByAllDone = function(result) {
-  try {
-
-    if (result.exception) {
-      // Oops! Something went wrong while the lookup has been processed.
-      this.setErrorStatus(scout.Status.error({
-        message: result.exception
-      }));
-      return;
-    }
-
-    // 'No data' case
-    if (result.lookupRows.length === 0) {
-      this.setLookupStatus(scout.Status.warning({
-        message: this.session.text('SmartFieldNoDataFound'),
-        code: scout.ListBox.ErrorCode.NO_DATA
-      }));
-      return;
-    }
-
+  if (scout.ListBox.parent.prototype._lookupByAllDone.call(this, result)) {
     this._populateTable(result);
-
-  } finally {
-    this.trigger('lookupCallDone', {
-      result: result
-    });
   }
 };
 
@@ -234,38 +135,11 @@ scout.ListBox.prototype.getCheckedLookupRows = function() {
     return [];
   }
 
-  var lookupRows = [];
-  this.table.rows.forEach(function(row) {
-    if (row.checked) {
-      lookupRows.push(row.lookupRow);
-    }
-  }, this);
-
-  return lookupRows;
-};
-
-scout.ListBox.prototype._clearLookupStatus = function() {
-  this.setLookupStatus(null);
-};
-
-scout.ListBox.prototype._errorStatus = function() {
-  return this.lookupStatus || this.errorStatus;
-};
-
-scout.ListBox.prototype.setLookupStatus = function(lookupStatus) {
-  this.setProperty('lookupStatus', lookupStatus);
-  if (this.rendered) {
-    this._renderErrorStatus();
-  }
-};
-
-scout.ListBox.prototype.clearErrorStatus = function() {
-  this.setErrorStatus(null);
-  this._clearLookupStatus();
-};
-
-scout.ListBox.prototype._clearLookupStatus = function() {
-  this.setLookupStatus(null);
+  return this.table.rows.filter(function(row) {
+    return row.checked;
+  }).map(function(row) {
+    return row.lookupRow;
+  });
 };
 
 scout.ListBox.prototype._createTableRow = function(lookupRow) {
@@ -305,74 +179,6 @@ scout.ListBox.prototype._createTableRow = function(lookupRow) {
   }
 
   return row;
-};
-
-scout.ListBox.prototype.setLookupCall = function(lookupCall) {
-  this.setProperty('lookupCall', lookupCall);
-};
-
-scout.ListBox.prototype._setLookupCall = function(lookupCall) {
-  this._setProperty('lookupCall', scout.LookupCall.ensure(lookupCall, this.session));
-  this._lookupExecuted = false;
-  if (this.rendered) {
-    this._ensureLookupCallExecuted();
-  }
-};
-
-scout.ListBox.prototype.refreshLookup = function() {
-  this._lookupExecuted = false;
-  this._ensureLookupCallExecuted();
-};
-
-/**
- * @return true if a lookup call execution has been scheduled now. false otherwise.
- */
-scout.ListBox.prototype._ensureLookupCallExecuted = function() {
-  if (this._lookupExecuted) {
-    return false;
-  }
-  this._lookupByAll();
-  return true;
-};
-
-scout.ListBox.prototype._renderTable = function() {
-  this._ensureLookupCallExecuted();
-  this.table.render(this.$fieldContainer);
-  this.addField(this.table.$container);
-  this.$field.addDeviceClass();
-};
-
-scout.ListBox.prototype._renderFilterBox = function() {
-  this.filterBox.render(this.$fieldContainer);
-};
-
-scout.ListBox.prototype._formatValue = function(value) {
-  if (scout.objects.isNullOrUndefined(value)) {
-    return '';
-  }
-
-  return this._formatLookupRows(this.getCheckedLookupRows());
-};
-
-scout.ListBox.prototype._formatLookupRows = function(lookupRows) {
-  lookupRows = scout.arrays.ensure(lookupRows);
-  if (lookupRows.length === 0) {
-    return '';
-  }
-
-  var formatted = [];
-  lookupRows.forEach(function(row) {
-    formatted.push(row.text);
-  });
-  return scout.strings.join(', ', formatted);
-};
-
-scout.ListBox.prototype._readDisplayText = function() {
-  return this.displayText;
-};
-
-scout.ListBox.prototype._clear = function() {
-  this.setValue(null);
 };
 
 scout.ListBox.prototype._createDefaultListBoxTable = function() {

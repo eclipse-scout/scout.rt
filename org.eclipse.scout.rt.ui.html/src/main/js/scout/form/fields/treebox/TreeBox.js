@@ -10,52 +10,188 @@
  ******************************************************************************/
 scout.TreeBox = function() {
   scout.TreeBox.parent.call(this);
-  this.filterBox = null;
-  this.gridDataHints.weightY = 1.0;
-  this.gridDataHints.h = 2;
   this.tree = null;
   this._addWidgetProperties(['tree', 'filterBox']);
 };
-scout.inherits(scout.TreeBox, scout.ValueField);
+scout.inherits(scout.TreeBox, scout.LookupBox);
 
 scout.TreeBox.prototype._init = function(model) {
   scout.TreeBox.parent.prototype._init.call(this, model);
-  if (this.filterBox) {
-    this.filterBox.enabledComputed = true; // filter is always enabled
-    this.filterBox.recomputeEnabled(true);
-  }
-  if (this.tree) {
-    this.tree.setScrollTop(this.scrollTop);
+  this.tree.on('nodesChecked', this._onTreeNodesChecked.bind(this));
+  this.tree.setScrollTop(this.scrollTop);
+};
+
+scout.TreeBox.prototype._initStructure = function(value) {
+  if (!this.tree) {
+    this.tree = this._createDefaultTreeBoxTree();
   }
 };
 
 scout.TreeBox.prototype._render = function() {
-  this.addContainer(this.$parent, 'tree-box');
-  this.addLabel();
-  this.addMandatoryIndicator();
-  this.addStatus();
+  scout.TreeBox.parent.prototype._render.call(this);
+  this.$container.addClass('tree-box');
+};
 
-  this.addFieldContainer(this.$parent.makeDiv());
-  var htmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
-  htmlComp.setLayout(new scout.TreeBoxLayout(this, this.tree, this.filterBox));
+scout.TreeBox.prototype._createLayout = function() {
+  return new scout.TreeBoxLayout(this, this.tree, this.filterBox);
+};
 
-  if (this.tree) {
-    this._renderTree();
-  }
+scout.TreeBox.prototype._renderStructure = function($fieldContainer) {
+  this.tree.render(this.$fieldContainer);
+  this.addField(this.tree.$container);
   if (this.filterBox) {
-    this._renderFilterBox();
     this.tree.htmlComp.pixelBasedSizing = true;
   }
 };
 
-scout.TreeBox.prototype._renderTree = function($fieldContainer) {
-  this.tree.render(this.$fieldContainer);
-  this.addField(this.tree.$container);
-  this.$field.addDeviceClass();
+scout.TreeBox.prototype._onTreeNodesChecked = function(event) {
+  this._syncTreeToValue();
 };
 
-scout.TreeBox.prototype._renderFilterBox = function($fieldContainer) {
-  this.filterBox.render(this.$fieldContainer);
+scout.TreeBox.prototype._syncTreeToValue = function() {
+  if (!this.lookupCall || this._valueSyncing) {
+    return;
+  }
+  this._valueSyncing = true;
+  var valueArray = scout.objects.values(this.tree.nodesMap).filter(function(node) {
+    return node.checked;
+  }).map(function(node) {
+    return node.id;
+  });
+
+  this.setValue(valueArray);
+  this._valueSyncing = false;
+};
+
+scout.TreeBox.prototype._valueChanged = function() {
+  scout.TreeBox.parent.prototype._valueChanged.call(this);
+  this._syncValueToTree(this.value);
+};
+
+scout.TreeBox.prototype._syncValueToTree = function(newValue) {
+  if (!this.lookupCall || this._valueSyncing || !this.initialized) {
+    return;
+  }
+
+  this._valueSyncing = true;
+  try {
+    if (scout.arrays.empty(newValue)) {
+      this.uncheckAll();
+    } else {
+      // if lookup was not executed yet: do it now.
+      var lookupScheduled = this._ensureLookupCallExecuted();
+      if (lookupScheduled) {
+        return; // was the first lookup: tree has no nodes yet. cancel sync. Will be executed again after lookup execution.
+      }
+
+      this.uncheckAll();
+      scout.objects.values(this.tree.nodesMap).forEach(function(node) {
+        if (scout.arrays.containsAny(newValue, node.id)) {
+          this.tree.checkNode(node);
+        }
+      }, this);
+    }
+
+    this._updateDisplayText();
+  } finally {
+    this._valueSyncing = false;
+  }
+};
+
+scout.TreeBox.prototype.uncheckAll = function() {
+  for (var nodeId in this.tree.nodesMap) {
+    if (this.tree.nodesMap.hasOwnProperty(nodeId)) {
+      this.tree.uncheckNode(this.tree.nodesMap[nodeId]);
+    }
+  }
+};
+
+scout.TreeBox.prototype._lookupByAllDone = function(result) {
+  if (scout.TreeBox.parent.prototype._lookupByAllDone.call(this, result)) {
+    this._populateTree(result);
+  }
+};
+
+scout.TreeBox.prototype._populateTree = function(result) {
+  var topLevelNodes = [];
+
+  this._poulateTreeRecursive(null, topLevelNodes, result.lookupRows);
+
+  this.tree.deleteAllNodes();
+  this.tree.insertNodes(topLevelNodes);
+
+  this._syncValueToTree(this.value);
+};
+
+scout.TreeBox.prototype._poulateTreeRecursive = function(parentKey, nodesArray, lookupRows) {
+  var node;
+  lookupRows.forEach(function(lookupRow) {
+    if (lookupRow.parentKey === parentKey) {
+      node = this._createNode(lookupRow);
+      this._poulateTreeRecursive(node.id, node.childNodes, lookupRows);
+      node.leaf = !node.childNodes.length;
+      nodesArray.push(node);
+    }
+  }, this);
+};
+
+/**
+ * Returns a lookup row for each node currently checked.
+ */
+scout.TreeBox.prototype.getCheckedLookupRows = function() {
+  if (this.value === null || scout.arrays.empty(this.value) || this.tree.nodes.length === 0) {
+    return [];
+  }
+
+  return scout.objects.values(this.tree.nodesMap).filter(function(node) {
+    return node.checked;
+  }).map(function(node) {
+    return node.lookupRow;
+  });
+};
+
+scout.TreeBox.prototype._createNode = function(lookupRow) {
+  var
+    node = scout.create('TreeNode', {
+      parent: this.tree,
+      id: lookupRow.key,
+      text: lookupRow.text,
+      lookupRow: lookupRow
+    });
+
+  if (lookupRow.iconId) {
+    node.iconId = lookupRow.iconId;
+  }
+  if (lookupRow.tooltipText) {
+    node.tooltipText = lookupRow.tooltipText;
+  }
+  if (lookupRow.backgroundColor) {
+    node.backgroundColor = lookupRow.backgroundColor;
+  }
+  if (lookupRow.foregroundColor) {
+    node.foregroundColor = lookupRow.foregroundColor;
+  }
+  if (lookupRow.font) {
+    node.font = lookupRow.font;
+  }
+  if (lookupRow.enabled === false) {
+    node.enabled = false;
+  }
+  if (lookupRow.active === false) {
+    node.active = false;
+  }
+  if (lookupRow.cssClass) {
+    node.cssClass = lookupRow.cssClass;
+  }
+
+  return node;
+};
+
+scout.TreeBox.prototype._createDefaultTreeBoxTree = function() {
+  return scout.create('Tree', {
+    parent: this,
+    checkable: true
+  });
 };
 
 /**

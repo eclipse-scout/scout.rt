@@ -899,9 +899,11 @@ scout.Tree.prototype._filterMenus = function(menus, destination, onlyVisible, en
 };
 
 /**
- * @override
+ * @override Widget.js
  */
 scout.Tree.prototype._renderEnabled = function() {
+  scout.Tree.parent.prototype._renderEnabled.call(this);
+
   var enabled = this.enabled;
   this.$data.setEnabled(enabled);
   this.$container.setTabbable(enabled);
@@ -917,6 +919,14 @@ scout.Tree.prototype._renderEnabled = function() {
         .toggleClass('disabled', !(enabled && node.enabled));
     });
   }
+};
+
+/**
+ * @override Widget.js
+ */
+scout.Tree.prototype._renderDisabledStyle = function() {
+  scout.Tree.parent.prototype._renderDisabledStyle.call(this);
+  this._renderDisabledStyleInternal(this.$data);
 };
 
 scout.Tree.prototype.setCheckable = function(checkable) {
@@ -2400,7 +2410,8 @@ scout.Tree.prototype.checkNodes = function(nodes, options) {
   };
   $.extend(opts, options);
   var updatedNodes = [];
-  if (!this.checkable || (!this.enabled && opts.checkOnlyEnabled)) {
+  // use enabled computed because when the parent of the table is disabled, it should not be allowed to check rows
+  if (!this.checkable || (!this.enabledComputed && opts.checkOnlyEnabled)) {
     return;
   }
   nodes = scout.arrays.ensure(nodes);
@@ -2454,8 +2465,11 @@ scout.Tree.prototype.uncheckNode = function(node) {
 };
 
 scout.Tree.prototype.uncheckNodes = function(nodes, options) {
-  options.checked = false;
-  this.checkNodes(nodes, options);
+  var opts = {
+    checked: false,
+  };
+  $.extend(opts, options);
+  this.checkNodes(nodes, opts);
 };
 
 scout.Tree.prototype._triggerNodesSelected = function(debounce) {

@@ -17,10 +17,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.json.JSONObject;
 
-public class JsonTreeBox<TREE_BOX extends ITreeBox> extends JsonValueField<TREE_BOX> {
+public class JsonTreeBox<TREE_BOX extends ITreeBox> extends JsonFormField<TREE_BOX> {
 
   public JsonTreeBox(TREE_BOX model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
