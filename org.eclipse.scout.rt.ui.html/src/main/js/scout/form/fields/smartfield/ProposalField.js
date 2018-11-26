@@ -77,8 +77,12 @@ scout.ProposalField.prototype._ensureValue = function(value) {
  */
 scout.ProposalField.prototype._acceptByText = function(sync, searchText) {
   $.log.isDebugEnabled() && $.log.debug('(ProposalField#_acceptByText) searchText=', searchText);
-  if (this.lookupOnAcceptByText && scout.strings.hasText(searchText)) {
-    scout.ProposalField.parent.prototype._acceptByText.call(this, sync, searchText);
+  var async = !sync;
+
+  // In case sync=true we cannot wait for the results of the lookup-call,
+  // that's why we simply accept the text that's already in the field
+  if (async && this.lookupOnAcceptByText && scout.strings.hasText(searchText)) {
+    scout.ProposalField.parent.prototype._acceptByTextAsync.call(this, searchText);
   } else {
     this._customTextAccepted(searchText);
   }
