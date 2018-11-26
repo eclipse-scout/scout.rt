@@ -60,11 +60,10 @@ scout.LookupBox.prototype._render = function() {
   this.$field.addClass('structure');
   if (this.filterBox) {
     this._renderFilterBox();
-    this.table.htmlComp.pixelBasedSizing = true;
   }
 };
 
-scout.LookupBox.prototype._renderFilterBox = function($fieldContainer) {
+scout.LookupBox.prototype._renderFilterBox = function() {
   this.filterBox.render(this.$fieldContainer);
 };
 
