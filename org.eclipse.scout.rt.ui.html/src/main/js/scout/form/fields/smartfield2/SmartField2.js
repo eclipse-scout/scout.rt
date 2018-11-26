@@ -337,15 +337,21 @@ scout.SmartField2.prototype._acceptByText = function(sync, searchText) {
   $.log.isDebugEnabled() && $.log.debug('(SmartField2#_acceptByText) sync=' + sync + ' searchText=', searchText);
 
   if (sync) {
-    this._lastSearchText = null;
-    this._inputAccepted();
-    if (!this._hasUiError()) {
-      this.resetDisplayText();
-    }
-    return;
+    this._acceptByTextSync(searchText);
+  } else {
+    this._acceptByTextAsync(searchText);
   }
+};
 
-  // async
+scout.SmartField2.prototype._acceptByTextSync = function(searchText) {
+  this._lastSearchText = null;
+  this._inputAccepted();
+  if (!this._hasUiError()) {
+    this.resetDisplayText();
+  }
+};
+
+scout.SmartField2.prototype._acceptByTextAsync = function(searchText) {
   this._lastSearchText = searchText;
   this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText))
     .done(this._acceptByTextDone.bind(this));

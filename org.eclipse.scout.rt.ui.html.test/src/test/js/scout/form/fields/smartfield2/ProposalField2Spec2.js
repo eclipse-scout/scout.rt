@@ -86,6 +86,24 @@ describe('ProposalField2', function() {
       expect(acceptInputCalled).toBe(true);
     });
 
+    /**
+     * When aboutToBlurByMouseDown is called, the value of the proposal field
+     * should not be deleted, regardless of the value of
+     * this.lookupOnAcceptByText.
+     * # 2345061
+     */
+    it('when lookupOnAcceptByText=true the value is not deleted when aboutToBlurByMouseDown is called', function() {
+      field.render();
+      field.lookupOnAcceptByText = true;
+
+      field.$field.focus();
+      field.$field.val('Foo');
+      field._userWasTyping = true;
+      field.aboutToBlurByMouseDown();
+      jasmine.clock().tick(300);
+      expect(field.displayText).toBe('Foo');
+      expect(field.$field.val()).toBe('Foo');
+    });
   });
 
 });
