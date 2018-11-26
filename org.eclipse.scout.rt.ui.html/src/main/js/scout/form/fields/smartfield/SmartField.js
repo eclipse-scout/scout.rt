@@ -348,21 +348,26 @@ scout.SmartField.prototype._acceptByText = function(sync, searchText) {
   $.log.isDebugEnabled() && $.log.debug('(SmartField#_acceptByText) sync=' + sync + ' searchText=', searchText);
 
   if (sync) {
-    this._lastSearchText = null;
-    this._inputAccepted();
-    if (!this._hasUiError()) {
-      this.resetDisplayText();
-    }
-    return;
+    this._acceptByTextSync(searchText);
+  } else {
+    this._acceptByTextAsync(searchText);
   }
+};
 
-  // async
+scout.SmartField.prototype._acceptByTextSync = function(searchText) {
+  this._lastSearchText = null;
+  this._inputAccepted();
+  if (!this._hasUiError()) {
+    this.resetDisplayText();
+  }
+};
+
+scout.SmartField.prototype._acceptByTextAsync = function(searchText) {
   this._lastSearchText = searchText;
   this._executeLookup(this.lookupCall.cloneForText(searchText), true)
     .done(this._acceptByTextDone.bind(this));
   this._triggerAcceptByText(searchText);
 };
-
 
 scout.SmartField.prototype._inputAccepted = function(triggerEvent, acceptByLookupRow) {
   triggerEvent = scout.nvl(triggerEvent, true);
