@@ -69,7 +69,7 @@ public class TableRowDataMapper implements ITableRowDataMapper {
         m_propertyDescriptorByColumn.put(column, rowDataPropertyDesc);
       }
       else {
-        LOG.warn("No column found for property [{}#{}]", rowDataPropertyDesc.getBeanClass().getName(), rowDataPropertyDesc.getName());
+        LOG.debug("No column found for property [{}#{}]", rowDataPropertyDesc.getBeanClass().getName(), rowDataPropertyDesc.getName());
       }
     }
     // compute ignored columns
