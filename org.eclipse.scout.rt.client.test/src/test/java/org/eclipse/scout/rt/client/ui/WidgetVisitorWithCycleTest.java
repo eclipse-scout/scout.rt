@@ -17,30 +17,49 @@ import java.util.function.Consumer;
 
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.junit.Test;
 
 public class WidgetVisitorWithCycleTest {
 
   @Test
-  public void testDepthFirst() {
+  public void testDepthFirstWithCycle() {
     AtomicInteger counter = new AtomicInteger();
     Consumer<IWidget> visitor = widget -> counter.getAndIncrement();
-    createFixture().visit(visitor);
+    createFixtureWithCycle().visit(visitor);
     assertEquals(6, counter.intValue());
   }
 
   @Test
-  public void testBreadthFirst() {
+  public void testBreadthFirstWithCycle() {
     AtomicInteger counter = new AtomicInteger();
-    createFixture().visit((widget, level, index) -> {
+    createFixtureWithCycle().visit((widget, level, index) -> {
       counter.getAndIncrement();
       return TreeVisitResult.CONTINUE;
     });
     assertEquals(6, counter.intValue());
   }
 
-  private IMenu createFixture() {
+  @Test
+  public void testDepthFirstWithMenuWithTwoParents() {
+    AtomicInteger counter = new AtomicInteger();
+    Consumer<IWidget> visitor = widget -> counter.getAndIncrement();
+    createFixtureWithMenuAddedAtTwoParents().visit(visitor);
+    assertEquals(7, counter.intValue());
+  }
+
+  @Test
+  public void testBreadthFirstWithMenuWithTwoParents() {
+    AtomicInteger counter = new AtomicInteger();
+    createFixtureWithMenuAddedAtTwoParents().visit((widget, level, index) -> {
+      counter.getAndIncrement();
+      return TreeVisitResult.CONTINUE;
+    });
+    assertEquals(7, counter.intValue());
+  }
+
+  private IMenu createFixtureWithCycle() {
     IMenu root = new P_Menu();
     IMenu m1 = new P_Menu();
     IMenu m2 = new P_Menu();
@@ -54,8 +73,25 @@ public class WidgetVisitorWithCycleTest {
     m1.addChildAction(m1_2);
     m1.addChildAction(m1_3);
 
-    root.addChildAction(m1_3); // menu that is added at two places
     m1_3.addChildAction(root); // creates a cycle
+    return root;
+  }
+
+  private IMenu createFixtureWithMenuAddedAtTwoParents() {
+    IMenu root = new P_Menu();
+    IMenu m1 = new P_Menu();
+    IMenu m2 = new P_Menu();
+    IMenu m1_1 = new P_Menu();
+    IMenu m1_2 = new P_Menu();
+    IMenu m1_3 = new P_Menu();
+
+    root.addChildAction(m1);
+    root.addChildAction(m2);
+    m1.addChildAction(m1_1);
+    m1.addChildAction(m1_2);
+    m1.addChildAction(m1_3);
+
+    root.addChildAction(OutlineMenuWrapper.wrapMenu(m1_3)); // menu that is added at two places
     return root;
   }
 

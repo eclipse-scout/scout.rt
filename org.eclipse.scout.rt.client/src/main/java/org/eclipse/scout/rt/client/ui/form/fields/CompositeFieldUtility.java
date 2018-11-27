@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.client.ui.form.FormUtility;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.OrderedComparator;
 import org.eclipse.scout.rt.platform.holders.Holder;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 
 public final class CompositeFieldUtility {
@@ -36,8 +35,7 @@ public final class CompositeFieldUtility {
     assertNotNull(compositeField);
     assertNotNull(fields);
     assertNull(f.getParentField(), "field is already contained in '{}'.", f.getParentField());
-
-    Assertions.assertTrue(f.getForm() == null || f.getForm() == compositeField.getForm(),
+    assertTrue(f.getForm() == null || f.getForm() == compositeField.getForm(),
         "field is part of a different form,  '{}' instead of '{}'", f.getForm(), compositeField.getForm());
 
     fields.add(f);
@@ -60,6 +58,7 @@ public final class CompositeFieldUtility {
   public static void connectFields(IFormField child, ICompositeField parent) {
     if (parent == null) {
       child.setParentFieldInternal(null);
+      // do not clear form here so that a form field cannot be added to a different form later on
       return;
     }
 

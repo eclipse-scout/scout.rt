@@ -31,7 +31,7 @@ public final class MenuUtility {
   /**
    * @param menu
    * @return true if the menu is a visible leaf in the menu tree or the menu is a menu group (has child menus) and at
-   *         least one of the recursive child menus is a visisble leaf.
+   *         least one of the recursive child menus is a visible leaf.
    */
   public static <T extends IActionNode<?>> boolean isVisible(T menu) {
     if (!menu.isVisible()) {

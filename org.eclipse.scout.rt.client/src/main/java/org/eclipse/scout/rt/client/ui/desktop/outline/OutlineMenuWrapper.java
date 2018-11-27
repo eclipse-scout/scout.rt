@@ -174,7 +174,7 @@ public class OutlineMenuWrapper extends AbstractWidget implements IMenu, IReadOn
     List<IMenu> childActions = m_wrappedMenu.getChildActions();
     List<IMenu> wrappedChildActions = new ArrayList<>(childActions.size());
     // create child wrappers
-    for (IAction a : ActionUtility.getActions(m_wrappedMenu.getChildActions(), m_menuFilter)) {
+    for (IAction a : ActionUtility.getActions(childActions, m_menuFilter)) {
       if (a instanceof IMenu) {
         wrappedChildActions.add(new OutlineMenuWrapper((IMenu) a, m_menuTypeMapper, m_menuFilter));
       }

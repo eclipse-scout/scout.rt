@@ -85,15 +85,8 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
 
     SubPageWithTable subTablePage = outline.findPage(SubPageWithTable.class);
     requiredMenus.addAll(resolveMenusOfPageWithTable(subTablePage, SubPageWithTableEmptySpaceMenu.class));
-    for (IMenu iMenu : requiredMenus) {
-      System.out.println(" r- " + iMenu);
-    }
-
     ITreeNode selectedNode = outline.getSelectedNode();
     List<IMenu> menus = selectedNode.getTree().getMenus();
-    for (IMenu iMenu : menus) {
-      System.out.println(" m- " + iMenu);
-    }
     assertTrue(containsAllMenus(menus, requiredMenus));
 
     assertEquals(sizeMenuListWithoutSeparators(menus), requiredMenus.size()); // + 1 stands for menu separator
