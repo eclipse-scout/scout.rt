@@ -2471,12 +2471,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void loadFromXml(Element root) {
-    String formId = getFormId();
-    String xmlId = root.getAttribute("formId");
-    if (!formId.equals(xmlId)) {
-      throw new ProcessingException("xml id='{}' does not match form id='{}'", xmlId, formId);
-    }
-
     // load properties
     Element xProps = XmlUtility.getFirstChildElement(root, "properties");
     if (xProps != null) {
