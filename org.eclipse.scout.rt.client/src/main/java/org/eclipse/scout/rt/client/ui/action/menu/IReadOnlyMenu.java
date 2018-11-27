@@ -11,8 +11,15 @@
 package org.eclipse.scout.rt.client.ui.action.menu;
 
 /**
- * Marker interface to check whether or not write operations are allowed to be called.
+ * Represents a read-only menu that wraps an existing normal menu.
+ * <p>
+ * All write operations on such a menu have either no effect or throw {@link UnsupportedOperationException}s.
  */
-public interface IReadOnlyMenu {
+public interface IReadOnlyMenu extends IMenu {
+
+  /**
+   * @return The wrapped original menu.
+   */
+  IMenu getWrappedMenu();
 
 }

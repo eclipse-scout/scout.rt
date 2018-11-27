@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
+import org.eclipse.scout.rt.client.ui.desktop.outline.MenuWrapper;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.OutlineTreeContextMenuNestedPageWithTablesTest.PageWithTable.Table.PageWithTableRowMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.OutlineTreeContextMenuNestedPageWithTablesTest.SubPageWithTable.Table.SubPageWithTableEmptySpaceMenu;
 import org.eclipse.scout.rt.platform.Order;
@@ -96,11 +96,11 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
     // normalize reference
     List<IMenu> refNormalized = new ArrayList<IMenu>(reference.size());
     for (IMenu m : reference) {
-      refNormalized.add(OutlineMenuWrapper.unwrapMenu(m));
+      refNormalized.add(MenuWrapper.unwrapMenu(m));
     }
     List<IMenu> menusNormalized = new ArrayList<IMenu>(menus.size());
     for (IMenu m : menus) {
-      menusNormalized.add(OutlineMenuWrapper.unwrapMenu(m));
+      menusNormalized.add(MenuWrapper.unwrapMenu(m));
     }
     return refNormalized.containsAll(menusNormalized);
   }

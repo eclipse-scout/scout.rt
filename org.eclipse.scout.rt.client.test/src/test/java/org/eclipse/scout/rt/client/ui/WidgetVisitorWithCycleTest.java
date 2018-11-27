@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
+import org.eclipse.scout.rt.client.ui.desktop.outline.MenuWrapper;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.junit.Test;
 
@@ -91,7 +91,7 @@ public class WidgetVisitorWithCycleTest {
     m1.addChildAction(m1_2);
     m1.addChildAction(m1_3);
 
-    root.addChildAction(OutlineMenuWrapper.wrapMenu(m1_3)); // menu that is added at two places
+    root.addChildAction(MenuWrapper.wrapMenu(m1_3)); // menu that is added at two places
     return root;
   }
 

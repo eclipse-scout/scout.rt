@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuListener;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
+import org.eclipse.scout.rt.client.ui.desktop.outline.MenuWrapper;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
 
 /**
@@ -63,7 +64,7 @@ public class MenuMediator {
 
     List<IMenu> sourceMenus = getSource().getMenus();
     for (IMenu menu : sourceMenus) {
-      m_menus.add(OutlineMenuWrapper.wrapMenu(menu));
+      m_menus.add(MenuWrapper.wrapMenu(menu));
     }
     getDestination().getContextMenu().addChildActions(m_menus);
   }

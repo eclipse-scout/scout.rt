@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.controls.SearchFormTableContro
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.MenuWrapper;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -170,7 +171,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   }
 
   protected static IMenu unwrapOutlineWrapperMenu(IMenu menu) {
-    return OutlineMenuWrapper.unwrapMenu(menu);
+    return MenuWrapper.unwrapMenu(menu);
   }
 
   @Override

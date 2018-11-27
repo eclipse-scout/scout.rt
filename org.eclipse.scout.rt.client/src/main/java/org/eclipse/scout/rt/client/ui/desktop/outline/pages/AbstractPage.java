@@ -55,7 +55,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
+import org.eclipse.scout.rt.client.ui.desktop.outline.MenuWrapper;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper.IMenuTypeMapper;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -822,9 +822,9 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       ITableContextMenu contextMenu = table.getContextMenu();
       List<IMenu> menus = contextMenu.getChildActions();
       for (IMenu menu : getOutline().getContextMenu().getChildActions()) {
-        if (!OutlineMenuWrapper.containsWrappedMenu(table.getMenus(), menu)) {
+        if (!MenuWrapper.containsWrappedMenu(table.getMenus(), menu)) {
           // mapping from TreeMenuType to TableMenuType
-          menus.add(OutlineMenuWrapper.wrapMenu(menu, TREE_MENU_TYPE_MAPPER));
+          menus.add(MenuWrapper.wrapMenu(menu, TREE_MENU_TYPE_MAPPER));
         }
       }
       if (!CollectionUtility.equalsCollection(menus, contextMenu.getChildActions())) {

@@ -31,13 +31,12 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 @ClassId("19966ccc-1ead-420b-8bad-bb97480230d6")
 public class OutlineFormMenuWrapper extends OutlineMenuWrapper implements IFormMenu<IForm> {
 
-  @SuppressWarnings("deprecation")
   protected OutlineFormMenuWrapper(IFormMenu<? extends IForm> menu, IMenuTypeMapper menuTypeMapper, Predicate<IAction> menuFilter) {
     super(menu, menuTypeMapper, menuFilter);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
+  @SuppressWarnings("unchecked")
   public IFormMenu<IForm> getWrappedMenu() {
     return (IFormMenu<IForm>) super.getWrappedMenu();
   }
