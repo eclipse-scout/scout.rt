@@ -392,9 +392,9 @@ scout.TableMatrix.prototype.calculate = function() {
   return cube;
 };
 
-scout.TableMatrix.prototype.columnCount = function() {
+scout.TableMatrix.prototype.columnCount = function(filterNumberColumns) {
   var c, column, r, row, cellValue,
-    columns = this.columns(),
+    columns = this.columns(filterNumberColumns),
     colCount = [],
     count = 0;
 
