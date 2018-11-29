@@ -125,18 +125,22 @@ public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableContro
   }
 
   protected void handleUiChartGroup1Change(String propertyName, JSONObject data) {
-    JSONObject chartGroup1 = data.getJSONObject(propertyName);
+    JSONObject chartGroup1 = data.optJSONObject(propertyName);
     addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_GROUP_1, chartGroup1);
     getModel().setGroup1(createColumnParam(chartGroup1));
   }
 
   protected void handleUiChartGroup2Change(String propertyName, JSONObject data) {
-    JSONObject chartGroup2 = data.getJSONObject(propertyName);
+    JSONObject chartGroup2 = data.optJSONObject(propertyName);
     addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_GROUP_2, chartGroup2);
     getModel().setGroup2(createColumnParam(chartGroup2));
   }
 
   private ChartColumnParam createColumnParam(JSONObject jsonValue) {
+    if (jsonValue == null) {
+      return null;
+    }
+
     String id = jsonValue.optString("id");
     int modifier = jsonValue.optInt("modifier");
     IColumn column = getTableAdapter().optColumn(id);
