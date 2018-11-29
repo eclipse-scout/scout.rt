@@ -2124,7 +2124,7 @@ scout.Tree.prototype.insertNode = function(node, parentNode) {
 };
 
 scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
-  nodes = scout.arrays.ensure(nodes);
+  nodes = scout.arrays.ensure(nodes).slice();
   this._ensureTreeNodes(nodes);
   if (parentNode && !(parentNode instanceof scout.TreeNode)) {
     throw new Error('parent has to be a tree node: ' + parentNode);
@@ -2139,7 +2139,10 @@ scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
   if (parentNode) {
     if (parentNode.childNodes && parentNode.childNodes.length > 0) {
       nodes.forEach(function(entry) {
-        scout.arrays.insert(parentNode.childNodes, entry, entry.childNodeIndex);
+        // only insert node if not already existing
+        if (parentNode.childNodes.indexOf(entry) < 0) {
+          scout.arrays.insert(parentNode.childNodes, entry, entry.childNodeIndex);
+        }
       }.bind(this));
       this._updateChildNodeIndex(parentNode.childNodes, nodes[0].childNodeIndex);
     } else {
@@ -2163,7 +2166,10 @@ scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
   } else {
     if (this.nodes && this.nodes.length > 0) {
       nodes.forEach(function(entry) {
-        scout.arrays.insert(this.nodes, entry, entry.childNodeIndex);
+        // only insert node if not already existing
+        if (this.nodes.indexOf(entry) < 0) {
+          scout.arrays.insert(this.nodes, entry, entry.childNodeIndex);
+        }
       }.bind(this));
       this._updateChildNodeIndex(this.nodes, nodes[0].childNodeIndex);
     } else {
