@@ -51,7 +51,7 @@ scout.SimpleTabBox.prototype._keyStrokeBindTarget = function() {
 };
 
 scout.SimpleTabBox.prototype._render = function() {
-  this.$container = this.$parent.appendDiv('view-tab-box');
+  this.$container = this.$parent.appendDiv('simple-tab-box');
   if (this.cssClass) {
     this.$container.addClass(this.cssClass);
   }
