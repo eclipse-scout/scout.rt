@@ -4302,6 +4302,9 @@ scout.Table.prototype._renderViewport = function() {
   if (this._renderViewportBlocked) {
     return;
   }
+  if (this.visibleColumns().length === 0) {
+    return;
+  }
   var viewRange = this._calculateCurrentViewRange();
   this._renderViewRange(viewRange);
 };
