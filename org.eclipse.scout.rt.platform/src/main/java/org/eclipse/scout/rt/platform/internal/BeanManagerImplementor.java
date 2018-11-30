@@ -59,9 +59,14 @@ public class BeanManagerImplementor implements IBeanManager {
     return m_lock;
   }
 
+  protected void checkAccess() {
+    //subclasses may limit access
+  }
+
   protected <T> List<IBean<T>> querySingle(Class<T> beanClazz) {
     m_lock.readLock().lock();
     try {
+      checkAccess();
       @SuppressWarnings("unchecked")
       BeanHierarchy<T> h = m_beanHierarchies.get(beanClazz);
       if (h == null) {
@@ -80,6 +85,7 @@ public class BeanManagerImplementor implements IBeanManager {
   protected <T> List<IBean<T>> queryAll(Class<T> beanClazz) {
     m_lock.readLock().lock();
     try {
+      checkAccess();
       @SuppressWarnings("unchecked")
       BeanHierarchy<T> h = m_beanHierarchies.get(beanClazz);
       if (h == null) {
@@ -231,7 +237,6 @@ public class BeanManagerImplementor implements IBeanManager {
     if (list.size() == 1) {
       return list.get(0);
     }
-
     if (list.isEmpty()) {
       return null;
     }

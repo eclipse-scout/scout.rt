@@ -33,7 +33,11 @@ public final class Platform {
   }
 
   /**
-   * @return the active platform, fully initialized and started
+   * @return the active platform, fully initialized and in state {@link IPlatform.State#BeanManagerValid}. However there
+   *         may be some {@link IPlatformListener} still running.
+   *         <p>
+   *         Callers of this method should make sure if their code requires the platform to have finished running all
+   *         {@link IPlatformListener}s by calling {@link IPlatform#awaitPlatformStarted()}
    *         <p>
    *         If {@link #platform} is null, then it is automatically located and started prior to returning from this
    *         method.

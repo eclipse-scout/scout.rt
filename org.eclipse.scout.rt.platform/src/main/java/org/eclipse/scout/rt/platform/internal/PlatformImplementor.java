@@ -206,8 +206,12 @@ public class PlatformImplementor implements IPlatform {
     return false;
   }
 
+  protected BeanManagerImplementor newBeanManagerImplementor() {
+    return new BeanManagerImplementor();
+  }
+
   protected BeanManagerImplementor createBeanManager() {
-    BeanManagerImplementor beanManager = new BeanManagerImplementor();
+    BeanManagerImplementor beanManager = newBeanManagerImplementor();
     IClassInventory inv = ClassInventory.get();
     long t0 = System.nanoTime();
     Set<Class> allBeans = new BeanFilter().collect(inv);
