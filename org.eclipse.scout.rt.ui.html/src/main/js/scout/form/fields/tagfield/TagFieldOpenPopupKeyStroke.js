@@ -26,5 +26,5 @@ scout.TagFieldOpenPopupKeyStroke.prototype._accept = function(event) {
 };
 
 scout.TagFieldOpenPopupKeyStroke.prototype.handle = function(event) {
-  this.field.openOverflowPopup();
+  this.field.tagBar.openOverflowPopup();
 };

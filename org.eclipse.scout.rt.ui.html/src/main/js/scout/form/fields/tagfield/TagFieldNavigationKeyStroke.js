@@ -8,9 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.TagFieldNavigationKeyStroke = function(fieldOrPopup) {
+
+/**
+ * @param fieldAdapter acts as an interface so we can use the same key-stroke for TagField and TagFieldPopup.
+ *
+ */
+scout.TagFieldNavigationKeyStroke = function(fieldAdapter) {
   scout.TagFieldNavigationKeyStroke.parent.call(this);
-  this.field = new scout._TagFieldAdapter(fieldOrPopup);
+  this.fieldAdapter = fieldAdapter;
   this.which = [scout.keys.LEFT, scout.keys.RIGHT];
   this.preventDefault = false;
   this.preventInvokeAcceptInputOnActiveValueField = true;
@@ -22,7 +27,7 @@ scout.TagFieldNavigationKeyStroke.prototype._accept = function(event) {
   if (!accepted) {
     return false;
   }
-  return this.field.enabled();
+  return this.fieldAdapter.enabled();
 };
 
 scout.TagFieldNavigationKeyStroke.prototype.handle = function(event) {
@@ -38,7 +43,7 @@ scout.TagFieldNavigationKeyStroke.prototype._focusTagElement = function(directio
   var INPUT = -2;
 
   // find overflow-icon and all tag-elements
-  var $focusTargets = scout.TagBar.findFocusableTagElements(this.field.$container());
+  var $focusTargets = scout.TagBar.findFocusableTagElements(this.fieldAdapter.$container());
   var numTargets = $focusTargets.length;
   if (numTargets === 0) {
     return;
@@ -73,54 +78,8 @@ scout.TagFieldNavigationKeyStroke.prototype._focusTagElement = function(directio
   if (focusIndex === UNDEFINED) {
     // leave focus untouched
   } else if (focusIndex === INPUT) {
-    this.field.focus();
+    this.fieldAdapter.focus();
   } else {
     scout.TagBar.focusTagElement($focusTargets.eq(focusIndex));
-  }
-};
-
-
-/**
- * This adapter class acts as an interface so we can use the same key-stroke for TagField and TagFieldPopup.
- */
-scout._TagFieldAdapter = function(adapted) {
-  this.adapted = adapted;
-};
-
-scout._TagFieldAdapter.prototype.$container = function() {
-  if (this.adapted instanceof scout.TagField) {
-    return this.adapted.$fieldContainer;
-  } else {
-    return this.adapted.$body;
-  }
-};
-
-scout._TagFieldAdapter.prototype.enabled = function() {
-  if (this.adapted instanceof scout.TagField) {
-    return scout.strings.empty(this.adapted._readDisplayText());
-  } else {
-    return true;
-  }
-};
-
-scout._TagFieldAdapter.prototype.focus = function() {
-  if (this.adapted instanceof scout.TagField) {
-    this.adapted.$field.focus();
-  }
-};
-
-scout._TagFieldAdapter.prototype.one = function(p1, p2) {
-  this.adapted.one(p1, p2);
-};
-
-scout._TagFieldAdapter.prototype.off = function(p1, p2) {
-  this.adapted.off(p1, p2);
-};
-
-scout._TagFieldAdapter.prototype.removeTag = function(tag) {
-  if (this.adapted instanceof scout.TagField) {
-    this.adapted.removeTag(tag);
-  } else {
-    this.adapted.parent.removeTag(tag);
   }
 };

@@ -32,8 +32,8 @@ scout.TagBarOverflowPopup.prototype._init = function(options) {
 scout.TagBarOverflowPopup.prototype._initKeyStrokeContext = function() {
   scout.TagBarOverflowPopup.parent.prototype._initKeyStrokeContext.call(this);
   this.keyStrokeContext.registerKeyStroke([
-    new scout.TagFieldNavigationKeyStroke(this),
-    new scout.TagFieldDeleteKeyStroke(this)
+    new scout.TagFieldNavigationKeyStroke(this._createFieldAdapter()),
+    new scout.TagFieldDeleteKeyStroke(this._createFieldAdapter())
   ]);
 };
 
@@ -97,4 +97,34 @@ scout.TagBarOverflowPopup.prototype._onTagBarPropertyChange = function(event) {
       this._focusFirstTagElement();
     }
   }
+};
+
+scout.TagBarOverflowPopup.prototype._createFieldAdapter = function() {
+  return scout.TagBarOverflowPopup.createFieldAdapter(this);
+};
+
+scout.TagBarOverflowPopup.createFieldAdapter = function(field) {
+  return {
+    $container: function() {
+      return field.$body;
+    },
+
+    enabled: function() {
+      return true;
+    },
+
+    focus: function() {},
+
+    one: function(p1, p2) {
+      field.one(p1, p2);
+    },
+
+    off: function(p1, p2) {
+      field.off(p1, p2);
+    },
+
+    removeTag: function(tag) {
+      field.parent.parent.removeTag(tag);
+    }
+  };
 };

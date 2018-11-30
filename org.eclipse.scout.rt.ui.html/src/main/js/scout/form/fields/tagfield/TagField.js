@@ -40,8 +40,8 @@ scout.TagField.prototype._initKeyStrokeContext = function() {
   this.keyStrokeContext.registerKeyStroke([
     new scout.TagFieldCancelKeyStroke(this),
     new scout.TagFieldEnterKeyStroke(this),
-    new scout.TagFieldNavigationKeyStroke(this),
-    new scout.TagFieldDeleteKeyStroke(this),
+    new scout.TagFieldNavigationKeyStroke(this._createFieldAdapter()),
+    new scout.TagFieldDeleteKeyStroke(this._createFieldAdapter()),
     new scout.TagFieldOpenPopupKeyStroke(this)
   ]);
 };
@@ -219,6 +219,8 @@ scout.TagField.prototype.removeTag = function(tag) {
   scout.arrays.remove(tags, tag);
   this.setValue(tags);
   this._triggerAcceptInput();
+  // focus was previously on the removed tag, restore focus on the field.
+  this.focus();
 };
 
 scout.TagField.prototype._onInputKeydown = function(event) {
@@ -342,4 +344,36 @@ scout.TagField.prototype._renderPlaceholder = function($field) {
   if ($field) {
     $field.placeholder(hasTags ? '' : this.label);
   }
+};
+
+scout.TagField.prototype._createFieldAdapter = function() {
+  return scout.TagField.createFieldAdapter(this);
+};
+
+scout.TagField.createFieldAdapter = function(field) {
+  return {
+    $container: function() {
+      return field.$fieldContainer;
+    },
+
+    enabled: function() {
+      return scout.strings.empty(field._readDisplayText());
+    },
+
+    focus: function() {
+      field.$field.focus();
+    },
+
+    one: function(p1, p2) {
+      field.one(p1, p2);
+    },
+
+    off: function(p1, p2) {
+      field.off(p1, p2);
+    },
+
+    removeTag: function(tag) {
+      field.removeTag(tag);
+    }
+  };
 };
