@@ -16,6 +16,7 @@ describe('TagField', function() {
     setFixtures(sandbox());
     session = sandboxSession();
     field = new scout.TagField();
+    field.session = session;
     lookupRow = scout.create('LookupRow', {
       key: 123,
       data: 'Foo'

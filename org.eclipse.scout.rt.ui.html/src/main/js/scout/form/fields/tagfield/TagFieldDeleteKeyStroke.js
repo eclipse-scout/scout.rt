@@ -8,9 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.TagFieldDeleteKeyStroke = function(fieldOrPopup) {
+
+/**
+ * @param fieldAdapter acts as an interface so we can use the same key-stroke for TagField and TagFieldPopup.
+ *
+ */
+scout.TagFieldDeleteKeyStroke = function(fieldAdapter) {
   scout.TagFieldDeleteKeyStroke.parent.call(this);
-  this.field = new scout._TagFieldAdapter(fieldOrPopup);
+  this.fieldAdapter = fieldAdapter;
   this.which = [scout.keys.DELETE];
   this.renderingHints.render = false;
   this.preventDefault = false;
@@ -28,9 +33,9 @@ scout.TagFieldDeleteKeyStroke.prototype._accept = function(event) {
 scout.TagFieldDeleteKeyStroke.prototype.handle = function(event) {
   var $tag = this._$focusedTag();
   var tag = scout.TagBar.getTagData($tag);
-  this.field.removeTag(tag);
+  this.fieldAdapter.removeTag(tag);
 };
 
 scout.TagFieldDeleteKeyStroke.prototype._$focusedTag = function() {
-  return scout.TagBar.findFocusedTagElement(this.field.$container());
+  return scout.TagBar.findFocusedTagElement(this.fieldAdapter.$container());
 };
