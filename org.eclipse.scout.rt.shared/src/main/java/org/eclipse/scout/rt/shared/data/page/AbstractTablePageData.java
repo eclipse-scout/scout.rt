@@ -16,20 +16,20 @@ import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFiel
 /**
  * Table-based page data. This class extends {@link AbstractTableFieldBeanData} and uses {@link AbstractTableRowData}
  * for holding the contents of a table page.
- * 
+ *
  * @see AbstractTableFieldBeanData
  * @since 3.10.0-M1
  */
 public abstract class AbstractTablePageData extends AbstractTableFieldBeanData {
-
   private static final long serialVersionUID = 1L;
 
   private boolean m_limitedResult;
+  private long m_estimatedRowCount;
 
   /**
    * Optional property may be used by the data provider to signal, that the data returned by this instance has been
    * limited.
-   * 
+   *
    * @return Returns <code>true</code> if the rows of this table page data contain only a subset of the records
    *         available in the data source. Otherwise <code>false</code>.
    */
@@ -39,10 +39,31 @@ public abstract class AbstractTablePageData extends AbstractTableFieldBeanData {
 
   /**
    * Sets whether the data in this bean has been limited (i.e. there exist more records in the data source).
-   * 
+   *
    * @param limitedResult
    */
   public void setLimitedResult(boolean limitedResult) {
     m_limitedResult = limitedResult;
+  }
+
+  /**
+   * Optional property may be used by the data provider to report the estimated available row count in case data in this
+   * bean has been limited.
+   *
+   * @return an estimation of the total available row count, 0 by default (not set)
+   * @since 9.0
+   */
+  public long getEstimatedRowCount() {
+    return m_estimatedRowCount;
+  }
+
+  /**
+   * Sets the estimated available row count in case data in this bean has been limited.
+   *
+   * @param estimatedRowCount
+   * @since 9.0
+   */
+  public void setEstimatedRowCount(long estimatedRowCount) {
+    m_estimatedRowCount = estimatedRowCount;
   }
 }

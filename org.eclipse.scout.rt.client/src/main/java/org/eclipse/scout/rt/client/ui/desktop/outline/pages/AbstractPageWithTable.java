@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -58,6 +59,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
@@ -84,6 +86,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
   private ISearchForm m_searchForm;
   private FormListener m_searchFormListener;
+  private long m_estimatedRowCount;
 
   public AbstractPageWithTable() {
     this(true, null);
@@ -275,14 +278,45 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     else {
       setTableStatus(null);
     }
-    T table = getTable();
-    if (isLimitedResult() && table != null) {
-      String maxOutlineWarningKey = "MaxOutlineRowWarning";
-      if (UserAgentUtility.isTouchDevice()) {
-        maxOutlineWarningKey = "MaxOutlineRowWarningMobile";
-      }
-      setTableStatus(new Status(TEXTS.get(maxOutlineWarningKey, "" + table.getRowCount()), IStatus.WARNING));
+    Status status = createPopulateTableStatus();
+    if (status != null) {
+      setTableStatus(status);
     }
+  }
+
+  /**
+   * @since 9.0
+   */
+  protected Status createPopulateTableStatus() {
+    boolean limited = isLimitedResult();
+    long estimatedRowCount = getEstimatedRowCount();
+    if (!limited) {
+      return null;
+    }
+    T table = getTable();
+    if (table == null) {
+      return null;
+    }
+    String showingRowCountText = NumberFormat.getIntegerInstance(NlsLocale.get()).format(table.getRowCount());
+    String estimatedRowCountText = NumberFormat.getIntegerInstance(NlsLocale.get()).format(estimatedRowCount);
+    String message;
+    if (UserAgentUtility.isTouchDevice()) {
+      if (estimatedRowCount > 0L) {
+        message = TEXTS.get("MaxOutlineRowWarningMobileWithEstimatedRowCount", showingRowCountText, estimatedRowCountText);
+      }
+      else {
+        message = TEXTS.get("MaxOutlineRowWarningMobile", showingRowCountText);
+      }
+    }
+    else {
+      if (estimatedRowCount > 0L) {
+        message = TEXTS.get("MaxOutlineRowWarningWithEstimatedRowCount", showingRowCountText, estimatedRowCountText);
+      }
+      else {
+        message = TEXTS.get("MaxOutlineRowWarning", showingRowCountText);
+      }
+    }
+    return new Status(message, IStatus.WARNING);
   }
 
   /**
@@ -661,6 +695,19 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     return FLAGS_BIT_HELPER.isBitSet(LIMITED_RESULT, m_flags);
   }
 
+  /**
+   * When using {@link #isLimitedResult()} this optional property reports the estimated total available row count.
+   *
+   * @since 9.0
+   */
+  protected long getEstimatedRowCount() {
+    return m_estimatedRowCount;
+  }
+
+  protected void setEstimatedRowCount(long estimatedRowCount) {
+    m_estimatedRowCount = estimatedRowCount;
+  }
+
   @Override
   public boolean isAlwaysCreateChildPage() {
     return FLAGS_BIT_HELPER.isBitSet(ALWAYS_CREATE_CHILD_PAGE, m_flags);
@@ -704,6 +751,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
     table.importFromTableBeanData(tablePageData);
     m_flags = FLAGS_BIT_HELPER.changeBit(LIMITED_RESULT, tablePageData.isLimitedResult(), m_flags);
+    setEstimatedRowCount(tablePageData.getEstimatedRowCount());
   }
 
   /**
