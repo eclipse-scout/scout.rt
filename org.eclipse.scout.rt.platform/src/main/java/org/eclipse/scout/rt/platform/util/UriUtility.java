@@ -84,10 +84,6 @@ public final class UriUtility {
     if (uri == null || uri.getQuery() == null) {
       return new HashMap<>(0);
     }
-    if (encoding == null) {
-      encoding = DEFAULT_ENCODING;
-    }
-
     String[] params = getQueryString(uri).split("&");
     Map<String, String> result = new HashMap<>(params.length);
     for (String param : params) {
@@ -95,16 +91,11 @@ public final class UriUtility {
       if (parts.length != 2) {
         throw new ProcessingException("invalid query parameter: '" + param + "'");
       }
-      try {
-        String key = URLDecoder.decode(parts[0], encoding);
-        String value = URLDecoder.decode(parts[1], encoding);
-        String existingMapping = result.put(key, value);
-        if (existingMapping != null) {
-          LOG.warn("parameter key is used multiple times [key='{}', oldValue='{}', newValue='{}'", key, existingMapping, value);
-        }
-      }
-      catch (UnsupportedEncodingException e) {
-        throw new ProcessingException("unsupported encoding '" + encoding + "'", e);
+      String key = decode(parts[0], encoding);
+      String value = decode(parts[1], encoding);
+      String existingMapping = result.put(key, value);
+      if (existingMapping != null) {
+        LOG.warn("parameter key is used multiple times [key='{}', oldValue='{}', newValue='{}'", key, existingMapping, value);
       }
     }
     return result;
@@ -211,6 +202,32 @@ public final class UriUtility {
     }
     catch (MalformedURLException e) {
       throw new ProcessingException("Exception while parsing URL", e);
+    }
+  }
+
+  /**
+   * Delegates to {@link URLDecoder#decode(String, String)} using default encoding.
+   *
+   * @return the newly decoded String
+   */
+  public static String decode(String uri) {
+    return decode(uri, DEFAULT_ENCODING);
+  }
+
+  /**
+   * Delegates to {@link URLDecoder#decode(String, String)} using the given encoding.
+   *
+   * @return the newly decoded String
+   */
+  public static String decode(String uri, String encoding) {
+    if (encoding == null) {
+      encoding = DEFAULT_ENCODING;
+    }
+    try {
+      return URLDecoder.decode(uri, encoding);
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new ProcessingException("unsupported encoding '" + encoding + "'", e);
     }
   }
 

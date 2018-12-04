@@ -110,6 +110,13 @@ public class UriBuilder {
     return this;
   }
 
+  /**
+   * Adds the given path to the builder. Note: the path will be URL encoded when you call the {@link #createURI()}
+   * method. If the path string passed to this method is already URL encoded you should decode it first to avoid double
+   * encoded characters.
+   *
+   * @see UriUtility#decode(String)
+   */
   public UriBuilder addPath(String path) {
     if (StringUtility.hasText(path)) {
       m_path = StringUtility.join("/", removeTrailingSlash(m_path), path);
