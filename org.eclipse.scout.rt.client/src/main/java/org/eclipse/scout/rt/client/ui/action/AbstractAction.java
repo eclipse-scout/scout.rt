@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IOrdered;
@@ -626,7 +627,7 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
       if (temp == null) {
         return true;
       }
-      if (!temp.isVisible()) {
+      if (!temp.isVisible() && !(temp instanceof IContextMenu)) {
         return false;
       }
     }
