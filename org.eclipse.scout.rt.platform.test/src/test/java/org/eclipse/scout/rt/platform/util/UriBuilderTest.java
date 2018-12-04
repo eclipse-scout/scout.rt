@@ -93,6 +93,26 @@ public class UriBuilderTest {
     assertEquals(uri, new UriBuilder(uri).createURI());
   }
 
+  /**
+   * This test is just here to demonstrate that an added path will always URL encoded. This means, when the string
+   * passed to the addPath method is already URL encoded you have to decode it first, otherwise you'll end with double
+   * encoded characters which is probably not exactly what you expect.
+   */
+  @Test
+  public void testEncodedInputString() throws URISyntaxException {
+    String path = "leer%20zeichen.png";
+
+    // When you know your path is already URL encoded, decode it first
+    String decodedPath = UriUtility.decode(path);
+    String result = new UriBuilder("root").addPath(decodedPath).createURI().toString();
+    assertEquals("root/leer%20zeichen.png", result);
+
+    // if someone passes an already encoded URI the % character will be encoded too.
+    // that's not an error, just the behavior of that method
+    result = new UriBuilder("root").addPath(path).createURI().toString();
+    assertEquals("root/leer%2520zeichen.png", result);
+  }
+
   @Test
   public void testAddPathToSimpleUrl2() throws URISyntaxException {
     UriBuilder builder = new UriBuilder(new URI(SIMPLE_URL + "/"))
