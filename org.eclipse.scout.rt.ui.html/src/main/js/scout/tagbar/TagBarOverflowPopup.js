@@ -31,7 +31,7 @@ scout.TagBarOverflowPopup.prototype._init = function(options) {
 
 scout.TagBarOverflowPopup.prototype._initKeyStrokeContext = function() {
   scout.TagBarOverflowPopup.parent.prototype._initKeyStrokeContext.call(this);
-  this.keyStrokeContext.registerKeyStroke([
+  this.keyStrokeContext.registerKeyStrokes([
     new scout.TagFieldNavigationKeyStroke(this._createFieldAdapter()),
     new scout.TagFieldDeleteKeyStroke(this._createFieldAdapter())
   ]);
