@@ -334,10 +334,6 @@ scout.TagField.prototype.isInputFocused = function() {
   return this.$field.is(ae);
 };
 
-scout.TagField.prototype.isOverflowIconFocused = function() {
-  return this.tagBar.isOverflowIconFocused();
-};
-
 scout.TagField.prototype._onValueChange = function(event) {
   if ('value' === event.propertyName) {
     this._renderLabel();

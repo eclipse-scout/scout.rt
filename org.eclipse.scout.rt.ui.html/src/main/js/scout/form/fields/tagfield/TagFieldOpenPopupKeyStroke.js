@@ -22,7 +22,7 @@ scout.TagFieldOpenPopupKeyStroke.prototype._accept = function(event) {
   if (!accepted) {
     return false;
   }
-  return this.field.isOverflowIconFocused();
+  return this.field.tagBar && this.field.tagBar.isOverflowIconFocused();
 };
 
 scout.TagFieldOpenPopupKeyStroke.prototype.handle = function(event) {
