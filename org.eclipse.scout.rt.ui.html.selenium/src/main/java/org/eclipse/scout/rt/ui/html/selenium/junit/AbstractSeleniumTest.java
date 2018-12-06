@@ -179,7 +179,7 @@ public abstract class AbstractSeleniumTest {
   }
 
   /**
-   * Finds the first <code>texst area</code> {@link WebElement} that represents the given model class.
+   * Finds the first <code>text area</code> {@link WebElement} that represents the given model class.
    */
   public WebElement findTextArea(Class<?> modelClass) {
     return findTextArea(null, modelClass);
@@ -236,6 +236,10 @@ public abstract class AbstractSeleniumTest {
     waitUntilDataRequestPendingDone();
 
     return inputField;
+  }
+
+  public void waitUntilScoutSession() {
+    waitUntil(SeleniumExpectedConditions.scriptToReturnTrue("return !!(scout && scout.sessions && scout.sessions.length && scout.sessions[0])"));
   }
 
   /**
