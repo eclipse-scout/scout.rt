@@ -18,11 +18,14 @@ scout.selenium = {
 
   /* Functions */
   delayCancelRequest: function(delayMs) {
-    var origFunc = this.origSendCancelRequest,
-      scoutSession = scout.sessions[0];
+    var scoutSession = scout.sessions[0];
+    if (!scoutSession) {
+      throw new Error('Scout session not available');
+    }
+    var func = this.origSendCancelRequest.bind(scoutSession);
 
     scout.Session.prototype._sendCancelRequest = function() {
-      setTimeout(origFunc.bind(scoutSession), delayMs);
+      setTimeout(func, delayMs);
     };
   },
 

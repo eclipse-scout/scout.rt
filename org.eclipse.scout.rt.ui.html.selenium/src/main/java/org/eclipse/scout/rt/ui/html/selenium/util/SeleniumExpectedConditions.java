@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.ui.html.selenium.util.TextComparator.Contains;
 import org.eclipse.scout.rt.ui.html.selenium.util.TextComparator.Equals;
 import org.eclipse.scout.rt.ui.html.selenium.util.TextComparator.EqualsIgnoreCase;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -282,6 +283,24 @@ public final class SeleniumExpectedConditions {
       @Override
       public String toString() {
         return String.format("table should have %d rows with text '%s'", numRows, rowText);
+      }
+    };
+  }
+
+  public static ExpectedCondition<Boolean> scriptToReturnTrue(final String script, final Object... args) {
+    return new ExpectedCondition<Boolean>() {
+      @Override
+      public Boolean apply(WebDriver driver) {
+        if (!(driver instanceof JavascriptExecutor)) {
+          throw new UnsupportedOperationException();
+        }
+        Object o = ((JavascriptExecutor) driver).executeScript(script, args);
+        return o instanceof Boolean && ((Boolean) o).booleanValue();
+      }
+
+      @Override
+      public String toString() {
+        return "script should 'true': " + script;
       }
     };
   }

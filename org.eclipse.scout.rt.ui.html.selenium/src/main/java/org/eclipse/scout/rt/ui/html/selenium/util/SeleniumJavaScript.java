@@ -41,6 +41,7 @@ public final class SeleniumJavaScript {
    */
   @SuppressWarnings("bsiRulesDefinition:htmlInString")
   public static void injectSeleniumScript(AbstractSeleniumTest test) {
+    test.waitUntilScoutSession();
     try (InputStream is = test.getClass().getClassLoader().getResourceAsStream("selenium.js")) {
       String js = IOUtility.readStringUTF8(is);
       String scriptAsJsString = "'" + js
