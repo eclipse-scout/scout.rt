@@ -39,6 +39,11 @@ scout.TileField.prototype._render = function() {
   }
 };
 
+scout.TileField.prototype._renderProperties = function() {
+  scout.TileField.parent.prototype._renderProperties.call(this);
+  this._renderDropType();
+};
+
 scout.TileField.prototype.setTileGrid = function(tileGrid) {
   this.setProperty('tileGrid', tileGrid);
 };
