@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.TypeName;
 
-@TypeName("ErrorResponse")
+@TypeName("scout.ErrorResponse")
 public class ErrorResponse extends DoEntity {
 
   public DoValue<ErrorDo> error() {

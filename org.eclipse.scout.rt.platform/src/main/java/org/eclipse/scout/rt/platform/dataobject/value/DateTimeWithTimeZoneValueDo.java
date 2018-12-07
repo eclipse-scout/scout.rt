@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.platform.dataobject.ValueFormat;
  * <li>Use {@link DateTimeValueDo} if time zone is irrelevant.
  * </ul>
  */
-@TypeName("DateTimeWithTimeZoneValue")
+@TypeName("scout.DateTimeWithTimeZoneValue")
 public class DateTimeWithTimeZoneValueDo extends DoEntity implements IValueDo<Date> {
 
   public static DateTimeWithTimeZoneValueDo of(Date value) {

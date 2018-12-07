@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.TypeName;
 
-@TypeName("BooleanValue")
+@TypeName("scout.BooleanValue")
 public class BooleanValueDo extends DoEntity implements IValueDo<Boolean> {
 
   public static BooleanValueDo of(Boolean value) {

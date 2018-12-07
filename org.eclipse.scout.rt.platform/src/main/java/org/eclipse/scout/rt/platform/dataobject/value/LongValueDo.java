@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.TypeName;
 
-@TypeName("LongValue")
+@TypeName("scout.LongValue")
 public class LongValueDo extends DoEntity implements IValueDo<Long> {
 
   public static LongValueDo of(Long value) {

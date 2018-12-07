@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.platform.dataobject.ValueFormat;
  * <p>
  * Use {@link DateTimeValueDo} if time is relevant.
  */
-@TypeName("DateValue")
+@TypeName("scout.DateValue")
 public class DateValueDo extends DoEntity implements IValueDo<Date> {
 
   public static DateValueDo of(Date value) {

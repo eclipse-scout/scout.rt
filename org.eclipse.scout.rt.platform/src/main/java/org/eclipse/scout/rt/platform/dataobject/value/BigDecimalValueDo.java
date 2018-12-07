@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.TypeName;
 
-@TypeName("BigDecimalValue")
+@TypeName("scout.BigDecimalValue")
 public class BigDecimalValueDo extends DoEntity implements IValueDo<BigDecimal> {
 
   public static BigDecimalValueDo of(BigDecimal value) {

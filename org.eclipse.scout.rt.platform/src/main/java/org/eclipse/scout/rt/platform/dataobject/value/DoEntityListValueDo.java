@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.dataobject.TypeName;
 
-@TypeName("DoEntityListValue")
+@TypeName("scout.DoEntityListValue")
 public class DoEntityListValueDo extends DoEntity implements IValueDo<List<IDoEntity>> {
 
   public static DoEntityListValueDo of(IDoEntity value) {

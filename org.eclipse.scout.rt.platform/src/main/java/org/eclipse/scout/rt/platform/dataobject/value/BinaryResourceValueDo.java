@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 /**
  * @see org.eclipse.scout.rt.jackson.dataobject.DataObjectSerializers
  */
-@TypeName("BinaryResourceValue")
+@TypeName("scout.BinaryResourceValue")
 public class BinaryResourceValueDo extends DoEntity implements IValueDo<BinaryResource> {
 
   public static BinaryResourceValueDo of(BinaryResource value) {

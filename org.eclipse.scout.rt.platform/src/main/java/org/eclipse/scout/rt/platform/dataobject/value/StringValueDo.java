@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.TypeName;
 
-@TypeName("StringValue")
+@TypeName("scout.StringValue")
 public class StringValueDo extends DoEntity implements IValueDo<String> {
 
   public static StringValueDo of(String value) {

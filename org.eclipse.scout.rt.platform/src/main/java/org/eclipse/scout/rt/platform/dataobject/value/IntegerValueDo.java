@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.TypeName;
 
-@TypeName("IntegerValue")
+@TypeName("scout.IntegerValue")
 public class IntegerValueDo extends DoEntity implements IValueDo<Integer> {
 
   public static IntegerValueDo of(Integer value) {

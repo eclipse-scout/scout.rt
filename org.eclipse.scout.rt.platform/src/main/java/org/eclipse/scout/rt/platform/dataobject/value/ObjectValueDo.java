@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.dataobject.TypeName;
 /**
  * Note: value has to be (de-)serializable without additional type information.
  */
-@TypeName("ObjectValue")
+@TypeName("scout.ObjectValue")
 public class ObjectValueDo extends DoEntity implements IValueDo<Object> {
 
   public static ObjectValueDo of(Object value) {

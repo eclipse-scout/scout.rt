@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.TypeName;
 
-@TypeName("ByteArrayValue")
+@TypeName("scout.ByteArrayValue")
 public class ByteArrayValueDo extends DoEntity implements IValueDo<byte[]> {
 
   public static ByteArrayValueDo of(byte[] value) {

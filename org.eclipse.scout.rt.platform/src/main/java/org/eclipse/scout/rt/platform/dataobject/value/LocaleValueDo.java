@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.TypeName;
 
-@TypeName("LocaleValue")
+@TypeName("scout.LocaleValue")
 public class LocaleValueDo extends DoEntity implements IValueDo<Locale> {
 
   public static LocaleValueDo of(Locale value) {
