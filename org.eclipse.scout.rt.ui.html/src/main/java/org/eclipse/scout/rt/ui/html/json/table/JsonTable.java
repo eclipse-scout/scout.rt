@@ -330,6 +330,24 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
         return ((GroupingStyle) value).name().toLowerCase();
       }
     });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_ESTIMATED_ROW_COUNT, model) {
+      @Override
+      protected Long modelValue() {
+        return getModel().getEstimatedRowCount();
+      }
+    });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_MAX_ROW_COUNT, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getMaxRowCount();
+      }
+    });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_REQUESTED_ROW_COUNT, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getRequestedRowCount();
+      }
+    });
 
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_HIERARCHICAL_STYLE, model) {
       @Override
@@ -571,6 +589,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       IColumn column = optColumn(contextColumnId);
       addPropertyEventFilterCondition(propertyName, column);
       getModel().getUIFacade().setContextColumnFromUI(column);
+    }
+    else if (ITable.PROP_REQUESTED_ROW_COUNT.equals(propertyName)) {
+      getModel().setRequestedRowCount(data.getInt(propertyName));
     }
     else {
       super.handleUiPropertyChange(propertyName, data);

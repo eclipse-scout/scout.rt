@@ -5093,4 +5093,34 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   public void setHierarchicalStyle(HierarchicalStyle hierarchicalStyle) {
     propertySupport.setProperty(PROP_HIERARCHICAL_STYLE, hierarchicalStyle);
   }
+
+  @Override
+  public long getEstimatedRowCount() {
+    return propertySupport.getPropertyLong(PROP_ESTIMATED_ROW_COUNT);
+  }
+
+  @Override
+  public void setEstimatedRowCount(long estimatedRowCount) {
+    propertySupport.setPropertyLong(PROP_ESTIMATED_ROW_COUNT, estimatedRowCount);
+  }
+
+  @Override
+  public int getMaxRowCount() {
+    return propertySupport.getPropertyInt(PROP_MAX_ROW_COUNT);
+  }
+
+  @Override
+  public void setMaxRowCount(int maxRowCount) {
+    propertySupport.setPropertyInt(PROP_MAX_ROW_COUNT, maxRowCount);
+  }
+
+  @Override
+  public int getRequestedRowCount() {
+    return propertySupport.getPropertyInt(PROP_REQUESTED_ROW_COUNT);
+  }
+
+  @Override
+  public void setRequestedRowCount(int requestedRowCount) {
+    propertySupport.setPropertyInt(PROP_REQUESTED_ROW_COUNT, requestedRowCount);
+  }
 }

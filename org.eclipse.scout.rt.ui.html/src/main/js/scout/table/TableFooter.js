@@ -223,18 +223,26 @@ scout.TableFooter.prototype._renderInfo = function() {
 
 scout.TableFooter.prototype._renderInfoLoad = function() {
   var $info = this._$infoLoad,
-    numRows = this.table.rows.length;
+    numRows = this.table.rows.length,
+    estRows = this.table.estimatedRowCount,
+    maxRows = this.table.maxRowCount;
 
   $info.empty();
   if (!this._compactStyle) {
     if (numRows <= 1) {
       $info.appendSpan().text(this.session.text('ui.NumRowLoaded', this.computeCountInfo(numRows)));
+    } else if (estRows && estRows>numRows) {
+      $info.appendSpan().text(this.session.text('ui.NumRowsLoaded', this.computeCountInfo(numRows, estRows)));
     } else {
       $info.appendSpan().text(this.session.text('ui.NumRowsLoaded', this.computeCountInfo(numRows)));
     }
     if (this.table.hasReloadHandler) {
       $info.appendBr();
-      $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadData')).appendTo($info);
+      if (estRows && maxRows && numRows<estRows && numRows<maxRows) {
+        $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadAllData')).appendTo($info);
+      } else {
+        $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadData')).appendTo($info);
+      }
     }
   } else {
     if (numRows <= 1) {
@@ -434,8 +442,18 @@ scout.TableFooter.prototype._toggleTableInfoTooltip = function($info, tooltipTyp
   }
 };
 
-scout.TableFooter.prototype.computeCountInfo = function(n) {
-  if (scout.nvl(n, 0) === 0) {
+//n: row count
+//m: total count, optional. Meaning is '3 of 10 rows'
+scout.TableFooter.prototype.computeCountInfo = function(n, m) {
+  n = scout.nvl(n, 0);
+  if (m) {
+    return this.session.text('ui.TableRowCount',
+      this.session.text('ui.CountOfApproxTotal',
+        this.session.locale.decimalFormat.format(n),
+        this.session.locale.decimalFormat.format(m)));
+  }
+
+  if (n === 0) {
     if (this._compactStyle) {
       return this.session.text('ui.TableRowCount', 0);
     } else {
@@ -444,7 +462,7 @@ scout.TableFooter.prototype.computeCountInfo = function(n) {
   } else if (n === 1) {
     return this.session.text('ui.TableRowCount1');
   } else {
-    return this.session.text('ui.TableRowCount', n);
+    return this.session.text('ui.TableRowCount', this.session.locale.decimalFormat.format(n));
   }
 };
 
@@ -610,7 +628,7 @@ scout.TableFooter.prototype._showTableStatusTooltip = function() {
 
   // Auto-hide unimportant messages
   clearTimeout(this._autoHideTableStatusTooltipTimeoutId);
-  if (!tableStatus.isError() && !this.table.tableStatus.uiState) {
+  if (!tableStatus.isError() && !tableStatus.isWarning() && !tableStatus.uiState) {
     // Already set status to 'auto-hidden', in case the user changes outline before timeout elapses
     this.table.tableStatus.uiState = 'auto-hidden';
     this._autoHideTableStatusTooltipTimeoutId = setTimeout(function() {

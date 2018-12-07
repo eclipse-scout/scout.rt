@@ -49,6 +49,9 @@ scout.Table = function() {
   this.rows = [];
   this.rootRows = [];
   this.visibleRows = [];
+  this.estimatedRowCount=0;
+  this.maxRowCount=0;
+  this.requestedRowCount=0;
   this.visibleRowsMap = {}; // visible rows by id
   this.rowLevelPadding;
   this.rowsMap = {}; // rows by id
@@ -716,6 +719,9 @@ scout.Table.prototype._isTruncatedCellTooltipEnabled = function(column) {
 scout.Table.prototype.reload = function() {
   if (!this.hasReloadHandler) {
     return;
+  }
+  if (this.estimatedRowCount) {
+    this.setRequestedRowCount(this.maxRowCount);
   }
   this._removeRows();
   this._renderFiller();
@@ -2924,6 +2930,10 @@ scout.Table.prototype._rowsToIds = function(rows) {
   return rows.map(function(row) {
     return row.id;
   });
+};
+
+scout.Table.prototype.setRequestedRowCount = function(requestedRowCount) {
+  this._setProperty('requestedRowCount', requestedRowCount);
 };
 
 /**

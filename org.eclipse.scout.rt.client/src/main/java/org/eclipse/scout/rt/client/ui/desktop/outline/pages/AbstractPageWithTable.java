@@ -86,7 +86,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
   private ISearchForm m_searchForm;
   private FormListener m_searchFormListener;
-  private long m_estimatedRowCount;
 
   public AbstractPageWithTable() {
     this(true, null);
@@ -288,15 +287,15 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * @since 9.0
    */
   protected Status createPopulateTableStatus() {
-    boolean limited = isLimitedResult();
-    long estimatedRowCount = getEstimatedRowCount();
-    if (!limited) {
-      return null;
-    }
     T table = getTable();
     if (table == null) {
       return null;
     }
+    boolean limited = isLimitedResult();
+    if (!limited) {
+      return null;
+    }
+    long estimatedRowCount = table.getEstimatedRowCount();
     String showingRowCountText = NumberFormat.getIntegerInstance(NlsLocale.get()).format(table.getRowCount());
     String estimatedRowCountText = NumberFormat.getIntegerInstance(NlsLocale.get()).format(estimatedRowCount);
     String message;
@@ -695,19 +694,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     return FLAGS_BIT_HELPER.isBitSet(LIMITED_RESULT, m_flags);
   }
 
-  /**
-   * When using {@link #isLimitedResult()} this optional property reports the estimated total available row count.
-   *
-   * @since 9.0
-   */
-  protected long getEstimatedRowCount() {
-    return m_estimatedRowCount;
-  }
-
-  protected void setEstimatedRowCount(long estimatedRowCount) {
-    m_estimatedRowCount = estimatedRowCount;
-  }
-
   @Override
   public boolean isAlwaysCreateChildPage() {
     return FLAGS_BIT_HELPER.isBitSet(ALWAYS_CREATE_CHILD_PAGE, m_flags);
@@ -751,7 +737,9 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
     table.importFromTableBeanData(tablePageData);
     m_flags = FLAGS_BIT_HELPER.changeBit(LIMITED_RESULT, tablePageData.isLimitedResult(), m_flags);
-    setEstimatedRowCount(tablePageData.getEstimatedRowCount());
+    table.setEstimatedRowCount(tablePageData.getEstimatedRowCount());
+    table.setMaxRowCount(tablePageData.getMaxRowCount());
+    table.setRequestedRowCount(tablePageData.getRequestedRowCount());
   }
 
   /**

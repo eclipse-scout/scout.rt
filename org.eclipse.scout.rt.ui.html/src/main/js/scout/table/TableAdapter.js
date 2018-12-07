@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.TableAdapter = function() {
   scout.TableAdapter.parent.call(this);
-  this._addRemoteProperties(['contextColumn']);
+  this._addRemoteProperties(['contextColumn', 'requestedRowCount']);
 };
 scout.inherits(scout.TableAdapter, scout.ModelAdapter);
 

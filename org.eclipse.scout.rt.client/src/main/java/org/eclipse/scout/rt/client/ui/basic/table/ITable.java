@@ -212,6 +212,26 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
   String PROP_HIERARCHICAL_ROWS = "hierarchicalRows";
 
   /**
+   * type long
+   *
+   * @since 9.0
+   */
+  String PROP_ESTIMATED_ROW_COUNT = "estimatedRowCount";
+
+  /**
+   * type int
+   *
+   * @since 9.0
+   */
+  String PROP_MAX_ROW_COUNT = "maxRowCount";
+  /**
+   * type int
+   *
+   * @since 9.0
+   */
+  String PROP_REQUESTED_ROW_COUNT = "requestedRowCount";
+
+  /**
    * @deprecated will be removed with 8.0, use {@link #init()} or {@link #reinit()} instead
    */
   @Deprecated
@@ -1206,4 +1226,45 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
 
   boolean isHierarchical();
 
+  /**
+   * Indicator for the estimated total available row count, optional
+   *
+   * @since 9.0
+   */
+  long getEstimatedRowCount();
+
+  /**
+   * Indicator for the estimated total available row count, optional
+   *
+   * @since 9.0
+   */
+  void setEstimatedRowCount(long estimatedRowCount);
+
+  /**
+   * Maximum row count the user is allowed to load into this table, maximal capacity, optional.
+   * 
+   * @since 9.0
+   */
+  int getMaxRowCount();
+
+  /**
+   * Maximum row count the used is allowed to load into this table, maximal capacity, optional.
+   *
+   * @since 9.0
+   */
+  void setMaxRowCount(int maxRowCount);
+
+  /**
+   * Number of rows the user requests to be loaded into this table upon reload
+   * 
+   * @since 9.0
+   */
+  int getRequestedRowCount();
+
+  /**
+   * Number of rows the user requests to be loaded into this table upon reload
+   * 
+   * @since 9.0
+   */
+  void setRequestedRowCount(int requestedRowCount);
 }
