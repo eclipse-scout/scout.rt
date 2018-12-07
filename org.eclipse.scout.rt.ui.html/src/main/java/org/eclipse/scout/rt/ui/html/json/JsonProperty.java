@@ -113,7 +113,7 @@ public abstract class JsonProperty<MODEL_ELEMENT> {
 
   /**
    * This method is called when the property value changes. Subclasses of JsonProperty may do something in that case.
-   * The default implementation does nothing. Note: this method must be always executed, event when the event itself is
+   * The default implementation does nothing. Note: this method must be always executed, even when the event itself is
    * filtered (which means, it isn't sent to the browser - however, the method may still have an impact on JsonAdapter
    * instances on the client side).
    */
