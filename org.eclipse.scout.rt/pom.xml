@@ -62,6 +62,7 @@
     <module>../org.eclipse.scout.rt.jackson.test</module>
     <module>../org.eclipse.scout.rt.rest.jackson</module>
     <module>../org.eclipse.scout.rt.rest.jersey.client</module>
+    <module>../org.eclipse.scout.rt.rest.jersey.test</module>
 
     <module>../org.eclipse.scout.jaxws.apt</module>
 
@@ -303,6 +304,12 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.rest.jersey.client</artifactId>
+        <version>8.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.rest.jersey.test</artifactId>
         <version>8.0.0-SNAPSHOT</version>
       </dependency>
 

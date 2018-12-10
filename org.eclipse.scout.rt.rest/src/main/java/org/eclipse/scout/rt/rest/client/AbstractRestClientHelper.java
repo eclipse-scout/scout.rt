@@ -15,30 +15,27 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Configurable;
+import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.ext.ContextResolver;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.util.UriBuilder;
-import org.eclipse.scout.rt.rest.error.ErrorDo;
-import org.eclipse.scout.rt.rest.error.ErrorResponse;
-import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
-import org.glassfish.jersey.client.ClientConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.eclipse.scout.rt.rest.client.proxy.IRestClientExceptionTransformer;
+import org.eclipse.scout.rt.rest.client.proxy.RestClientProxyFactory;
 
 /**
  * Abstract implementation of a REST client helper dealing with REST requests to a API server.
+ * <p>
+ * {@link Client} and its derived objects are proxied to provide cancellation and exception transformation support (see
+ * {@link #transformException(RuntimeException, Response)}).
  * <p>
  * This class may be reused for subsequent REST requests to the same API server.
  * <p>
@@ -46,8 +43,6 @@ import org.slf4j.LoggerFactory;
  * {@link #getBaseUri()} method.
  */
 public abstract class AbstractRestClientHelper implements IRestClientHelper {
-
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractRestClientHelper.class);
 
   private final Supplier<Client> m_clientSupplier = createClientSupplier();
 
@@ -60,26 +55,36 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
     return () -> client;
   }
 
-  protected Client createClient() {
-    // Prepare client config
-    // IMPORTANT: This must happen _before_ calling initClientBuilder() because "withConfig()" replaces the entire configuration!
-    ClientConfig clientConfig = new ClientConfig();
-    // TODO [8.0] pbz: Temporary workaround, this code line and the direct dependency to the Apache connector will be removed as soon as the jersey issue is resolved.
-    // See Jersey Issue 3771: https://github.com/jersey/jersey/pull/3771 (see also TO DO in pom.xml)
-    clientConfig.connectorProvider(new ApacheConnectorProvider());
-    initClientConfig(clientConfig);
+  /**
+   * @return the unproxied {@link Client}.
+   */
+  protected Client internalClient() {
+    return m_clientSupplier.get();
+  }
 
+  /**
+   * Creates a new JAX-RS {@link Client} instance. Global customization should be done by an
+   * {@link IRestClientConfigFactory}, system-specific settings should be applied in
+   * {@link #configureClientBuilder(ClientBuilder)} and REST service-specific ones by configuring one of the REST client
+   * objects, i.e. {@link WebTarget} and {@link Invocation.Builder}.
+   */
+  protected Client createClient() {
+    Configuration clientConfig = createClientConfig();
     ClientBuilder clientBuilder = ClientBuilder.newBuilder()
         .withConfig(clientConfig);
+
+    // IMPORTANT: initClientBuilder must happen _after_ calling clientBuilder.withConfig() because "withConfig()" replaces the entire configuration!
     initClientBuilder(clientBuilder);
     return clientBuilder.build();
   }
 
   /**
-   * @return the {@link Client} used by {@link #target(String)}
+   * Creates and sets-up a JAX-RS client configuration with any custom properties.
+   * <p>
+   * This default implementation delegates to {@link IRestClientConfigFactory#createClientConfig()}
    */
-  protected Client client() {
-    return m_clientSupplier.get();
+  protected Configuration createClientConfig() {
+    return BEANS.get(IRestClientConfigFactory.class).createClientConfig();
   }
 
   protected void initClientBuilder(ClientBuilder clientBuilder) {
@@ -109,16 +114,35 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
   }
 
   /**
-   * Override this method to setup the JAX-RS client configuration with any custom properties. <br>
-   * The default implementation doesn't setup any properties.
+   * @return proxied {@link Client} instance that delegates {@link WebApplicationException}s and
+   *         {@link javax.ws.rs.ProcessingException}s to {@link #transformException(RuntimeException, Response)}.
    */
-  protected void initClientConfig(Configurable<?> clientConfig) {
-    // NOP
+  public Client client() {
+    return client(this::transformException);
+  }
+
+  /**
+   * @return proxied {@link Client} instance that delegates {@link WebApplicationException}s and
+   *         {@link javax.ws.rs.ProcessingException}s to the given {@link IRestClientExceptionTransformer}. The
+   *         {@code null}-transformer returns the passed exception unchanged.
+   */
+  public Client client(IRestClientExceptionTransformer exceptionTransformer) {
+    return getProxyFactory().createClientProxy(m_clientSupplier.get(), exceptionTransformer);
   }
 
   @Override
   public WebTarget target(String resourcePath) {
-    return client().target(buildUri(resourcePath));
+    return target(resourcePath, this::transformException);
+  }
+
+  @Override
+  public WebTarget target(String resourcePath, IRestClientExceptionTransformer exceptionTransformer) {
+    WebTarget target = internalClient().target(buildUri(resourcePath));
+    return getProxyFactory().createWebTargetProxy(target, exceptionTransformer);
+  }
+
+  protected RestClientProxyFactory getProxyFactory() {
+    return BEANS.get(RestClientProxyFactory.class);
   }
 
   @Override
@@ -140,45 +164,14 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
    */
   protected abstract String getBaseUri();
 
-  @Override
-  public void throwOnResponseError(WebTarget target, Response response) {
-    // TODO [8.0] pbz,abr: Remove special handling and exception wrapping, throw WebApplicationException with nested response, leave reading ErrorDo from response to caller
-    if (response.getStatus() == Response.Status.FORBIDDEN.getStatusCode()) {
-      handleForbiddenResponse(target, response);
-    }
-    if (response.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
-      handleErrorResponse(target, response);
-    }
-  }
-
-  protected void handleForbiddenResponse(WebTarget target, Response response) {
-    try {
-      ErrorDo error = response.readEntity(ErrorResponse.class).getError();
-      throw new VetoException(error.getMessage()).withTitle(error.getTitle()); // add other errordo attributes
-    }
-    catch (@SuppressWarnings("squid:S1166") javax.ws.rs.ProcessingException | IllegalStateException e) {
-      StatusType statusInfo = response.getStatusInfo();
-      LOG.debug("REST call to '{}' returned forbidden {} {} without error response object.", target.getUri(), statusInfo.getStatusCode(), statusInfo.getReasonPhrase());
-
-      VetoException vetoException = new VetoException(response.getStatusInfo().getReasonPhrase());
-      vetoException.addSuppressed(e);
-      throw vetoException;
-    }
-  }
-
-  protected void handleErrorResponse(WebTarget target, Response response) {
-    try {
-      ErrorDo error = response.readEntity(ErrorResponse.class).getError();
-      throw new PlatformException(error.getMessage());
-    }
-    catch (@SuppressWarnings("squid:S1166") javax.ws.rs.ProcessingException | IllegalStateException e) {
-      StatusType statusInfo = response.getStatusInfo();
-      LOG.debug("REST call to '{}' returned error {} {} without error response object.", target.getUri(), statusInfo.getStatusCode(), statusInfo.getReasonPhrase());
-
-      ProcessingException processingException = new ProcessingException("REST call to '{}' failed: {} {}", target.getUri(), statusInfo.getStatusCode(), statusInfo.getReasonPhrase());
-      processingException.addSuppressed(e);
-      throw processingException;
-    }
+  /**
+   * Call-back method for transforming {@link WebApplicationException} and {@link javax.ws.rs.ProcessingException}
+   * thrown during a REST service invocation. Subclasses may extract service-specific error objects.
+   * <p>
+   * This default implementation just returns the passed exception.
+   */
+  protected RuntimeException transformException(RuntimeException e, Response response) {
+    return e;
   }
 
   @Override
