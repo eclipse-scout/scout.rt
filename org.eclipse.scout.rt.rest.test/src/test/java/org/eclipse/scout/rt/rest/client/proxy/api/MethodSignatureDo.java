@@ -1,0 +1,95 @@
+/*******************************************************************************
+ * Copyright (c) 2018 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.rest.client.proxy.api;
+
+import java.util.Collection;
+import java.util.List;
+
+import javax.annotation.Generated;
+
+import org.eclipse.scout.rt.platform.dataobject.DoEntity;
+import org.eclipse.scout.rt.platform.dataobject.DoList;
+import org.eclipse.scout.rt.platform.dataobject.DoValue;
+import org.eclipse.scout.rt.platform.dataobject.TypeName;
+
+@TypeName("scout.MethodSignature")
+public class MethodSignatureDo extends DoEntity {
+
+  public DoValue<String> name() {
+    return doValue("name");
+  }
+
+  public DoValue<Integer> modifiers() {
+    return doValue("modifiers");
+  }
+
+  public DoValue<String> returnType() {
+    return doValue("returnType");
+  }
+
+  public DoList<String> parameterTypes() {
+    return doList("parameterTypes");
+  }
+
+  /* **************************************************************************
+   * GENERATED CONVENIENCE METHODS
+   * *************************************************************************/
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public MethodSignatureDo withName(String name) {
+    name().set(name);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public String getName() {
+    return name().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public MethodSignatureDo withModifiers(Integer modifiers) {
+    modifiers().set(modifiers);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Integer getModifiers() {
+    return modifiers().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public MethodSignatureDo withReturnType(String returnType) {
+    returnType().set(returnType);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public String getReturnType() {
+    return returnType().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public MethodSignatureDo withParameterTypes(Collection<? extends String> parameterTypes) {
+    parameterTypes().updateAll(parameterTypes);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public MethodSignatureDo withParameterTypes(String... parameterTypes) {
+    parameterTypes().updateAll(parameterTypes);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public List<String> getParameterTypes() {
+    return parameterTypes().get();
+  }
+}

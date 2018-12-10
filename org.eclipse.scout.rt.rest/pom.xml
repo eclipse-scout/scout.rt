@@ -36,18 +36,9 @@
       <artifactId>javax.ws.rs-api</artifactId>
     </dependency>
 
-    <!-- JAX-RS Jersey Client Apache Connector -->
-    <!-- FIXME 8.0 pbz: Temporary workaround, see Jersey Issue 3771: https://github.com/jersey/jersey/pull/3771 -->
-   <dependency>
-      <groupId>org.glassfish.jersey.connectors</groupId>
-      <artifactId>jersey-apache-connector</artifactId>
-      <optional>true</optional>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>javax.annotation-api</artifactId>
     </dependency>
   </dependencies>
 </project>
