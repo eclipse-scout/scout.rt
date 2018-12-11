@@ -4,39 +4,39 @@
   "dateTime" : "2018-08-23 13:30:25.000",
   "dynamicDate" : "2018-08-23 13:30:25.000",
   "dynamicTypedDate" : {
-    "_type" : "DateValue",
+    "_type" : "scout.DateValue",
     "value" : "2018-08-23"
   },
   "dynamicTypedDateTime" : {
-    "_type" : "DateTimeValue",
+    "_type" : "scout.DateTimeValue",
     "value" : "2018-08-23 13:30:25.000"
   },
   "partlyTypedDate" : {
-    "_type" : "DateTimeValue",
+    "_type" : "scout.DateTimeValue",
     "value" : "2018-08-23 13:30:25.000"
   },
   "typedDate" : {
-    "_type" : "DateValue",
+    "_type" : "scout.DateValue",
     "value" : "2018-08-23"
   },
   "typedDateTime" : {
-    "_type" : "DateTimeValue",
+    "_type" : "scout.DateTimeValue",
     "value" : "2018-08-23 13:30:25.000"
   },
   "typedList" : [ {
-    "_type" : "DateValue",
+    "_type" : "scout.DateValue",
     "value" : "2018-08-23"
   }, {
-    "_type" : "DateTimeValue",
+    "_type" : "scout.DateTimeValue",
     "value" : "2018-08-23 13:30:25.000"
   }, {
-    "_type" : "StringValue",
+    "_type" : "scout.StringValue",
     "value" : "aaabbbccc"
   }, {
-    "_type" : "BooleanValue",
+    "_type" : "scout.BooleanValue",
     "value" : true
   }, {
-    "_type" : "BigDecimalValue",
+    "_type" : "scout.BigDecimalValue",
     "value" : 0.1
   } ]
 }
