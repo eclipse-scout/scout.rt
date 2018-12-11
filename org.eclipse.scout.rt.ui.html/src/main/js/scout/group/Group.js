@@ -254,7 +254,7 @@ scout.Group.prototype._renderHeader = function() {
     this.$header = this.header.$container
       .addClass('group-header')
       .prependTo(this.$container);
-    this.htmlHeader =  this.header.htmlComp;
+    this.htmlHeader = this.header.htmlComp;
   } else {
     this.$header = this.$container
       .prependDiv('group-header')
@@ -277,7 +277,6 @@ scout.Group.prototype._renderBody = function() {
   this.body.$container.addClass('group-body');
   this.body.invalidateLayoutTree();
 };
-
 
 /**
  * @override
@@ -375,7 +374,7 @@ scout.Group.prototype.resizeBody = function() {
  * @returns {Promise}
  */
 scout.Group.prototype.animateToggleCollapse = function(options) {
-  var currentHeight = this.body.$container.cssHeight();
+  var currentSize = scout.graphics.cssSize(this.body.$container);
   var currentMargins = scout.graphics.margins(this.body.$container);
   var currentPaddings = scout.graphics.paddings(this.body.$container);
   var targetHeight, targetMargins, targetPaddings;
@@ -389,7 +388,9 @@ scout.Group.prototype.animateToggleCollapse = function(options) {
   } else {
     // Expanding
     // Expand to preferred size of the body
-    targetHeight = this.body.htmlComp.prefSize().height;
+    targetHeight = this.body.htmlComp.prefSize({
+      widthHint: currentSize.width
+    }).height;
 
     // Make sure body is layouted correctly before starting the animation (with the target size)
     // Use setSize to explicitly call its layout (this might even be necessary during the animation, see GroupLayout.invalidate)
@@ -407,7 +408,7 @@ scout.Group.prototype.animateToggleCollapse = function(options) {
       targetPaddings = scout.graphics.paddings(this.body.$container);
     } else {
       // If toggling is not already in progress, start expanding from 0
-      currentHeight = 0;
+      currentSize.height = 0;
       currentMargins = new scout.Insets();
       currentPaddings = new scout.Insets();
       targetMargins = scout.graphics.margins(this.body.$container);
@@ -421,7 +422,7 @@ scout.Group.prototype.animateToggleCollapse = function(options) {
   }
   return this.body.$container
     .stop(true)
-    .cssHeight(currentHeight)
+    .cssHeight(currentSize.height)
     .cssMarginTop(currentMargins.top)
     .cssMarginBottom(currentMargins.bottom)
     .cssPaddingTop(currentPaddings.top)

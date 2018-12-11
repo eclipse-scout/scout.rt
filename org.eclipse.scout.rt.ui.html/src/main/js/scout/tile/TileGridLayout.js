@@ -14,6 +14,7 @@ scout.TileGridLayout = function(tiles) {
   this.containerPos = null;
   this.containerScrollTop = null;
   this.tiles = [];
+  this._calculatingPrimitivePrefSize = false;
 };
 scout.inherits(scout.TileGridLayout, scout.LogicalGridLayout);
 
@@ -310,10 +311,7 @@ scout.TileGridLayout.prototype.preferredLayoutSize = function($container, option
   if (this.widget.virtual) {
     return this.virtualPrefSize($container, options);
   }
-  if (options.widthHint) {
-    return this.prefSizeForWidth(options.widthHint);
-  }
-  return scout.TileGridLayout.parent.prototype.preferredLayoutSize.call(this, $container, options);
+  return this.primitivePrefSize($container, options);
 };
 
 /**
@@ -355,18 +353,29 @@ scout.TileGridLayout.prototype.virtualPrefSize = function($container, options) {
   return prefSize;
 };
 
-scout.TileGridLayout.prototype.prefSizeForWidth = function(width) {
+scout.TileGridLayout.prototype.primitivePrefSize = function($container, options) {
+  if (!options.widthHint || this._calculatingPrimitivePrefSize) {
+    return scout.TileGridLayout.parent.prototype.preferredLayoutSize.call(this, $container, options);
+  }
+  this._calculatingPrimitivePrefSize = true;
+  var prefSize = this._primitivePrefSize(options);
+  this._calculatingPrimitivePrefSize = false;
+  return prefSize;
+};
+
+scout.TileGridLayout.prototype._primitivePrefSize = function(options) {
   var prefSize,
     htmlComp = this.widget.htmlComp,
     contentFits = false,
-    gridColumnCount = this.widget.gridColumnCount;
+    gridColumnCount = this.widget.gridColumnCount,
+    width = options.widthHint;
 
   width += htmlComp.insets().horizontal();
   this._resetGridColumnCount();
 
   this.widget.invalidateLayout();
   this.widget.invalidateLogicalGrid(false);
-  prefSize = htmlComp.prefSize();
+  prefSize = htmlComp.prefSize(options);
   if (prefSize.width <= width) {
     contentFits = true;
   }
@@ -375,7 +384,7 @@ scout.TileGridLayout.prototype.prefSizeForWidth = function(width) {
     this.widget.gridColumnCount--;
     this.widget.invalidateLayout();
     this.widget.invalidateLogicalGrid(false);
-    prefSize = htmlComp.prefSize();
+    prefSize = htmlComp.prefSize(options);
     if (prefSize.width <= width) {
       contentFits = true;
     }
