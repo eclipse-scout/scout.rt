@@ -391,6 +391,22 @@ scout.strings = {
 
   equalsIgnoreCase: function(a, b) {
     return this.equals(a, b, true);
+  },
+
+  removePrefix: function(string, prefix) {
+    var s = string;
+    if (this.startsWith(string, prefix)) {
+      s = string.substring(prefix.length);
+    }
+    return s;
+  },
+
+  removeSuffix: function(string, suffix) {
+    var s = string;
+    if (this.endsWith(string, suffix)) {
+      s = string.substring(0, string.length - suffix.length);
+    }
+    return s;
   }
 
 };

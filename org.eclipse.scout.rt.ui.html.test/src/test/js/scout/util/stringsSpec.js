@@ -438,4 +438,18 @@ describe("scout.strings", function() {
 
   });
 
+  describe("removePrefix and removeSuffix", function() {
+
+    it ("removePrefix", function() {
+      expect(scout.strings.removePrefix('crm.CodeType', 'crm.')).toBe('CodeType');
+      expect(scout.strings.removePrefix('crm.CodeType', 'foo.')).toBe('crm.CodeType');
+    });
+
+    it ("removeSuffix", function() {
+      expect(scout.strings.removeSuffix('avatar.gif', '.gif')).toBe('avatar');
+      expect(scout.strings.removeSuffix('avatar.gif', '.exe')).toBe('avatar.gif');
+    });
+
+  });
+
 });
