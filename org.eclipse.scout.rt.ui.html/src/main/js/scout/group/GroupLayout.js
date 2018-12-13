@@ -16,11 +16,13 @@ scout.inherits(scout.GroupLayout, scout.AbstractLayout);
 
 scout.GroupLayout.prototype.layout = function($container) {
   var htmlComp = this.group.htmlComp;
-  var containerSize = htmlComp.availableSize();
-  containerSize.subtract(htmlComp.insets());
+  var containerSize = htmlComp.availableSize()
+    .subtract(htmlComp.insets());
 
   var htmlHeader = this.group.htmlHeader;
-  var headerSize = htmlHeader.prefSize(false);
+  var headerSize = htmlHeader.prefSize({
+    widthHint: containerSize.width
+  });
   headerSize.width = containerSize.width;
   headerSize = headerSize.subtract(htmlHeader.margins());
   htmlHeader.setSize(headerSize);
@@ -91,7 +93,8 @@ scout.GroupLayout.prototype.preferredLayoutSize = function($container, options) 
   prefSize = prefSize.add(htmlComp.insets({
     includeMargin: true
   }));
-  prefSize.height += htmlHeader.prefSize(true).height;
+  prefSize.height += htmlHeader.prefSize(options)
+    .add(htmlHeader.margins()).height;
   if (htmlFooter.isVisible()) {
     prefSize.height += htmlFooter.prefSize({
       includeMargin: true,
