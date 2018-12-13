@@ -513,6 +513,10 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
   }
 
   protected void handleModelFormShow(IForm form) {
+    if (!form.isShowing()) {
+      // If a form has already been closed again (e.g. by another form listener), make sure it won't be displayed
+      return;
+    }
     IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(form);
     // if form is dialog form.getViews(getDisplayParent()).indexOf(form) returns -1 -> position is not sent to UI
     addActionEventForEachDisplayParentAdapter("formShow", PROP_FORM, jsonAdapter, form.getDisplayParent(), getModel().getViews(form.getDisplayParent()).indexOf(form));
