@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.exception;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.security.acl.AclNotFoundException;
@@ -31,6 +32,11 @@ public class PlaceholderExceptionTest {
 
   private static final String TITLE = "title";
   private static final String MESSAGE = "message";
+
+  @Test
+  public void testNull() {
+    assertNull(PlaceholderException.transformException(null));
+  }
 
   @Test
   public void testDefaultConstructorPkgJava() {
