@@ -21,6 +21,7 @@ public enum UiEngineType implements IUiEngineType {
   IE,
   OPERA,
   KONQUEROR,
+  EDGE,
   UNKNOWN;
 
   @Override
