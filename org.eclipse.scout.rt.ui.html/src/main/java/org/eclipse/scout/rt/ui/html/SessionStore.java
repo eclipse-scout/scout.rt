@@ -225,6 +225,11 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
       // Link to client session
       Set<IUiSession> map = m_uiSessionsByClientSession.computeIfAbsent(clientSession, k -> new HashSet<>());
       map.add(uiSession);
+
+      if (!m_httpSessionValid) {
+        LOG.info("Tried to register UI session {} on invalid HTTP session with ID {}. All sessions will be destroyed. (clientSessionId={})", uiSession.getUiSessionId(), m_httpSessionId, clientSession.getId());
+        uiSession.dispose();
+      }
     }
     finally {
       m_writeLock.unlock();
@@ -302,7 +307,8 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
   protected void doHousekeeping(final IClientSession clientSession) {
     m_writeLock.lock();
     try {
-      if (IFuture.CURRENT.get().isCancelled()) {
+      IFuture<?> hkFuture = IFuture.CURRENT.get();
+      if (hkFuture != null && hkFuture.isCancelled()) {
         return;
       }
       m_housekeepingFutures.remove(clientSession.getId());

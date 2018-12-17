@@ -212,7 +212,7 @@ public final class TestingUtility {
 
       SleepUtil.sleepSafe(50, TimeUnit.MILLISECONDS);
     }
-    Assert.fail("Potential memory leak, object " + ref.get() + "still exists after gc");
+    Assert.fail("Potential memory leak, object " + ref.get() + " still exists after gc");
   }
 
   public static <T> IBean<?> mockConfigProperty(Class<? extends IConfigProperty<T>> propertyClass, T value) {

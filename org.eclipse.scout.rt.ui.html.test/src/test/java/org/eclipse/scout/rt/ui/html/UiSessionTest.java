@@ -14,6 +14,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -341,5 +342,28 @@ public class UiSessionTest {
 
     assertTrue(uiSession.isDisposed());
     assertEquals(expectSessionActiveAfterwards, clientSession.isActive());
+  }
+
+  @Test
+  public void testInvalidationWhileCreation() throws InterruptedException {
+    // create new UI session along with client client and HTTP sessions
+    UiSession uiSession = (UiSession) JsonTestUtility.createAndInitializeUiSession();
+    HttpSession httpSession = UiSessionTestUtility.getHttpSession(uiSession);
+    assertFalse(uiSession.isDisposed());
+
+    httpSession.invalidate();
+
+    // register ui session in session store
+    final ISessionStore sessionStore = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
+    sessionStore.registerUiSession(uiSession);
+
+    WeakReference<IClientSession> clientSessionRef = new WeakReference<>(uiSession.getClientSession());
+    assertNotNull(clientSessionRef.get());
+
+    // Forget all references to the session --> client session should be gone, because it must not be referenced by the session store
+    httpSession = null;
+    uiSession = null;
+    TestingUtility.assertGC(clientSessionRef);
+    assertTrue(sessionStore.isEmpty());
   }
 }
