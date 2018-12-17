@@ -179,6 +179,15 @@ public class HttpClientInfo {
       return;
     }
 
+    // Edge
+    regex = "Edge\\/([^ ]+)$";
+    boolean isEdge = StringUtility.containsRegEx(userAgent, regex);
+    if (isEdge) {
+      setEngineType(UiEngineType.EDGE);
+      setEngineVersion(parseEdgeVersion(userAgent));
+      return;
+    }
+
     // Webkit Browsers
     regex = "AppleWebKit\\/([^ ]+)";
     boolean isWebkit = (userAgent.indexOf("AppleWebKit") != -1) && StringUtility.containsRegEx(userAgent, regex);
@@ -554,6 +563,10 @@ public class HttpClientInfo {
 
   protected static Version parseWindowsVersion(String userAgent) {
     return extractVersion(userAgent, "Windows\\sNT\\s([^\\s;]+)");
+  }
+
+  protected static Version parseEdgeVersion(String userAgent) {
+    return extractVersion(userAgent, "Edge\\/([^\\s;]+)$");
   }
 
   protected static Version createVersion(String versionString) {

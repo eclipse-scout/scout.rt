@@ -1130,6 +1130,17 @@ public class HttpClientInfoTest {
     httpClientInfo.setMobile(true);
     httpClientInfo.setSystemVersion(new HttpClientInfo.Version(8, 0, 0));
     testMap.put(userAgent, httpClientInfo);
+
+    // Edge
+    userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/18.17763";
+    httpClientInfo = newHttpClientInfo(userAgent);
+    httpClientInfo.setEngineType(UiEngineType.EDGE);
+    httpClientInfo.setEngineVersion(new HttpClientInfo.Version(18, 17763, 0));
+    httpClientInfo.setSystem(UiSystem.WINDOWS);
+    httpClientInfo.setMshtml(false);
+    httpClientInfo.setMobile(false);
+    httpClientInfo.setSystemVersion(new HttpClientInfo.Version(10, 0, 0));
+    testMap.put(userAgent, httpClientInfo);
   }
 
   protected HttpClientInfo newHttpClientInfo(String userAgent) {
