@@ -356,7 +356,16 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     }
     LOG.debug("Creating new UI session....");
     IUiSession uiSession = BEANS.get(IUiSession.class);
-    uiSession.init(req, resp, jsonStartupReq);
+    try {
+      uiSession.init(req, resp, jsonStartupReq);
+    }
+    catch (RuntimeException e) {
+      // Something unexpected happened! Ensure the new session(s) are disposed properly. Otherwise
+      // they might stay in memory forever, because they are not managed by the session store.
+      LOG.info("Disposing newly created UI session due to unexpected initialization error... (uiSessionId={}, clientSessionid={})", uiSession.getUiSessionId(), uiSession.getClientSessionId());
+      uiSession.dispose();
+      throw e;
+    }
     sessionStore.registerUiSession(uiSession);
 
     LOG.info("Created new UI session with ID {} in {} ms [maxIdleTime={}s, httpSession.maxInactiveInterval={}s]",
