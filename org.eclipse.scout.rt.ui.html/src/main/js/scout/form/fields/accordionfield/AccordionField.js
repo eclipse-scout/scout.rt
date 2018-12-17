@@ -39,6 +39,11 @@ scout.AccordionField.prototype._render = function() {
   }
 };
 
+scout.AccordionField.prototype._renderProperties = function() {
+  scout.AccordionField.parent.prototype._renderProperties.call(this);
+  this._renderDropType();
+};
+
 scout.AccordionField.prototype.setAccordion = function(accordion) {
   this.setProperty('accordion', accordion);
 };
