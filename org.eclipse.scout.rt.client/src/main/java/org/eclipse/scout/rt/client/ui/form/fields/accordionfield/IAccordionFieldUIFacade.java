@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2018 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,19 +11,11 @@
 package org.eclipse.scout.rt.client.ui.form.fields.accordionfield;
 
 import org.eclipse.scout.rt.client.ui.accordion.IAccordion;
-import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 
-public interface IAccordionField<T extends IAccordion> extends IFormField, IDNDSupport {
+public interface IAccordionFieldUIFacade<T extends IAccordion> {
 
-  /**
-   * {@link IAccordion}
-   */
-  String PROP_ACCORDION = "accordion";
+  TransferObject fireDragRequestFromUI();
 
-  void setAccordion(T accordion);
-
-  T getAccordion();
-
-  IAccordionFieldUIFacade<T> getUIFacade();
+  void fireDropActionFromUI(TransferObject transferObject);
 }
