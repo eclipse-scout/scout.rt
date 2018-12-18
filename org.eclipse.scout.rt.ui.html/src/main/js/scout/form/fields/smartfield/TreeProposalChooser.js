@@ -27,14 +27,8 @@ scout.TreeProposalChooser.prototype._onNodeClick = function(event) {
   this.triggerLookupRowSelected(event.node);
 };
 
-scout.TreeProposalChooser.prototype.triggerLookupRowSelected = function(node) {
-  node = node || this.model.selectedNode();
-  if (!node || !node.enabled) {
-    return;
-  }
-  this.trigger('lookupRowSelected', {
-    lookupRow: node.lookupRow
-  });
+scout.TreeProposalChooser.prototype.selectedRow = function() {
+  return this.model.selectedNode();
 };
 
 scout.TreeProposalChooser.prototype.isBrowseLoadIncremental = function() {

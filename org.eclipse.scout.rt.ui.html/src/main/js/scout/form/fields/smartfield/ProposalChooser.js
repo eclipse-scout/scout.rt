@@ -54,8 +54,25 @@ scout.ProposalChooser.prototype.clearLookupRows = function() {
   throw new Error('clearLookupRows() not implemented');
 };
 
-scout.ProposalChooser.prototype.triggerLookupRowSelected = function() {
-  throw new Error('triggerLookupRowSelected() not implemented');
+/**
+ * @param row TableRow or TreeNode (both have the same properties)
+ */
+scout.ProposalChooser.prototype.triggerLookupRowSelected = function(row) {
+  row = row || this.selectedRow();
+  if (!row || !row.enabled) {
+    return;
+  }
+  this.trigger('lookupRowSelected', {
+    lookupRow: row.lookupRow
+  });
+};
+
+/**
+ * Implement this function to get the selected row or node from the proposal chooser.
+ * The implementation depends on the widget used by the chooser (Table or Tree).
+ */
+scout.ProposalChooser.prototype.selectedRow = function() {
+  throw new Error('selectedRow() not implemented');
 };
 
 scout.ProposalChooser.prototype._render = function() {
