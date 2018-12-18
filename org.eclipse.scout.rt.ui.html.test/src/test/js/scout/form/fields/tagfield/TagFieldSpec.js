@@ -30,6 +30,15 @@ describe('TagField', function() {
     removePopups(session);
   });
 
+  function typeProposal(field, text, keyCode) {
+    var $input = field.$container.find('input');
+    $input.val(text);
+    $input.focus();
+    $input.trigger(jQuery.Event('keyup', {
+      keyCode: keyCode
+    }));
+  }
+
   describe('model', function() {
 
     it('add tag', function() {
@@ -71,6 +80,46 @@ describe('TagField', function() {
 
   });
 
+  /**
+   * Ticket #230409
+   */
+  describe('key-strokes', function() {
+
+    it('ENTER', function() {
+      field = scout.create('TagField', {
+        parent: session.desktop,
+        lookupCall: {
+          objectType: 'DummyLookupCall'
+        }
+      });
+
+      // type a proposal that yields exactly 1 result, but do NOT
+      // select the returned lookup row
+      field.render();
+      typeProposal(field, 'fo', scout.keys.O);
+      jasmine.clock().tick(500);
+
+      expect(field.chooser instanceof scout.TagChooserPopup).toBe(true);
+
+      // trigger a keydown event, all the flags are required  to pass
+      // the accept-checks in KeyStroke.js
+      var $input = field.$container.find('input');
+      $input.trigger(jQuery.Event('keydown', {
+        keyCode: scout.keys.ENTER,
+        which: scout.keys.ENTER,
+        altKey: false,
+        shiftKey: false,
+        ctrlKey: false,
+        metaKey: false
+      }));
+
+      // expect the value to be accepted and the chooser to be closed
+      expect(field.chooser).toBe(null);
+      expect(field.value).toEqual(['fo']);
+    });
+
+  });
+
   describe('tag lookup', function() {
 
     it('start and prepare a lookup call clone when typing', function() {
@@ -96,13 +145,7 @@ describe('TagField', function() {
       expect(field.lookupCall instanceof scout.DummyLookupCall).toBe(true);
 
       field.render();
-      var $input = field.$container.find('input');
-      $input.val('ba');
-      $input.focus();
-      $input.trigger(jQuery.Event('keyup', {
-        keyCode: scout.keys.A
-      }));
-
+      typeProposal(field, 'ba', scout.keys.A);
       jasmine.clock().tick(500);
 
       // expect popup is open and has 2 lookup rows (Bar, Baz)

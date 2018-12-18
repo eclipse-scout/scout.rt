@@ -162,7 +162,11 @@ scout.TagField.prototype._clear = function() {
  */
 scout.TagField.prototype.acceptInput = function(whileTyping) {
   if (this.chooser) {
-    this.chooser.triggerLookupRowSelected();
+    if (this.chooser.selectedRow()) {
+      this.chooser.triggerLookupRowSelected();
+    } else {
+      this.closeChooserPopup();
+    }
     return;
   }
   scout.TagField.parent.prototype.acceptInput.call(this, false);
@@ -225,11 +229,6 @@ scout.TagField.prototype.removeTag = function(tag) {
 };
 
 scout.TagField.prototype._onInputKeydown = function(event) {
-  if (event.which === scout.keys.ENTER) {
-    this._handleEnterKey(event);
-    return;
-  }
-
   if (this._isNavigationKey(event) && this.chooser) {
     this.chooser.delegateKeyEvent(event);
   }
@@ -252,13 +251,6 @@ scout.TagField.prototype._onInputKeyup = function(event) {
 
   if (!this._isNavigationKey(event)) {
     this._lookupByText(this.$field.val());
-  }
-};
-
-scout.TagField.prototype._handleEnterKey = function(event) {
-  if (this.chooser) {
-    this.chooser.triggerLookupRowSelected();
-    event.stopPropagation();
   }
 };
 
@@ -321,6 +313,7 @@ scout.TagField.prototype.closeChooserPopup = function() {
 
 scout.TagField.prototype._onLookupRowSelected = function(event) {
   this._clear();
+  this._updateHasText();
   this.addTag(event.lookupRow.key);
   this.closeChooserPopup();
 };

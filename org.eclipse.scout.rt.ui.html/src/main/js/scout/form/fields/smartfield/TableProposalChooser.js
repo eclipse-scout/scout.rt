@@ -83,14 +83,8 @@ scout.TableProposalChooser.prototype._onRowClick = function(event) {
   this.triggerLookupRowSelected(row);
 };
 
-scout.TableProposalChooser.prototype.triggerLookupRowSelected = function(row) {
-  row = row || this.model.selectedRow();
-  if (!row || !row.enabled) {
-    return;
-  }
-  this.trigger('lookupRowSelected', {
-    lookupRow: row.lookupRow
-  });
+scout.TableProposalChooser.prototype.selectedRow = function() {
+  return this.model.selectedRow();
 };
 
 scout.TableProposalChooser.prototype.setLookupResult = function(result) {
