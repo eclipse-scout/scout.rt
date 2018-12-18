@@ -23,15 +23,21 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 @ApplicationScoped
 public class CollatorProvider {
 
+  /**
+   * Delegates to {@link #getInstance(Locale)} with {@link NlsLocale#get()} as argument.
+   *
+   * @return a collator for the current locale
+   */
   public Collator getInstance() {
     return getInstance(NlsLocale.get());
   }
 
   /**
-   * @param desiredLocale
-   * @return a collator for the desired locale
+   * Subclasses can override this method to change the default behavior.
+   *
+   * @return a collator for the given locale
    */
-  public Collator getInstance(Locale desiredLocale) {
-    return Collator.getInstance(desiredLocale);
+  public Collator getInstance(Locale locale) {
+    return Collator.getInstance(locale);
   }
 }

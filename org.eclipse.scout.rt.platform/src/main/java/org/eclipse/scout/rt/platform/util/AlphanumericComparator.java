@@ -59,7 +59,7 @@ public class AlphanumericComparator implements Comparator<String>, Serializable 
     return m_ignoreCase;
   }
 
-  private static final Pattern NUN_OR_TEXT_PATTERN = Pattern.compile("(?:([0-9]+)|([^0-9]+))", Pattern.DOTALL);
+  private static final Pattern NUM_OR_TEXT_PATTERN = Pattern.compile("(?:([0-9]+)|([^0-9]+))", Pattern.DOTALL);
 
   @Override
   public int compare(String s1, String s2) {
@@ -72,8 +72,8 @@ public class AlphanumericComparator implements Comparator<String>, Serializable 
     if (s2 == null) {
       return 1;
     }
-    Matcher m1 = NUN_OR_TEXT_PATTERN.matcher(s1);
-    Matcher m2 = NUN_OR_TEXT_PATTERN.matcher(s2);
+    Matcher m1 = NUM_OR_TEXT_PATTERN.matcher(s1);
+    Matcher m2 = NUM_OR_TEXT_PATTERN.matcher(s2);
     boolean found1 = m1.find();
     boolean found2 = m2.find();
     int result;
