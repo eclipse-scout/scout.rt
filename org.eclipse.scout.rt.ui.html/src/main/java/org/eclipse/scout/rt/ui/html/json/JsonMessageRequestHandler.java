@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.servlet.ServletResponse;
@@ -27,6 +28,9 @@ import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.Application
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore;
 import org.eclipse.scout.rt.platform.resource.MimeType;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -42,6 +46,7 @@ import org.eclipse.scout.rt.ui.html.UiSession;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest.RequestType;
 import org.eclipse.scout.rt.ui.html.logging.IUiRunContextDiagnostics;
 import org.json.JSONObject;
+import org.quartz.SimpleScheduleBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -367,10 +372,31 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
       throw e;
     }
     sessionStore.registerUiSession(uiSession);
+    startValidationJob(uiSession);
 
     LOG.info("Created new UI session with ID {} in {} ms [maxIdleTime={}s, httpSession.maxInactiveInterval={}s]",
         uiSession.getUiSessionId(), StringUtility.formatNanos(System.nanoTime() - startNanos), m_maxUserIdleTime, req.getSession().getMaxInactiveInterval());
     return uiSession;
+  }
+
+  protected void startValidationJob(final IUiSession uiSession) {
+    LOG.info("Started validation job for UI session with ID {}", uiSession.getUiSessionId());
+    Jobs.schedule(() -> {
+      int idleSeconds = (int) ((System.currentTimeMillis() - uiSession.getLastAccessedTime()) / 1000L);
+      int maxIdleSeconds = m_maxUserIdleTime;
+      LOG.info("Idle time for UI session with ID {}: {} s (maxUserIdleTime={})", uiSession.getUiSessionId(), idleSeconds, maxIdleSeconds);
+      if (idleSeconds > maxIdleSeconds) {
+        LOG.info("UI session with ID {} seems to be idle for {} seconds (maxUserIdleTime={}) -> disposing this session", uiSession.getUiSessionId(), idleSeconds, maxIdleSeconds);
+        IFuture.CURRENT.get().cancel(false);
+        uiSession.dispose();
+      }
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.empty())
+        .withName("UI session validator [id={}]", uiSession.getUiSessionId())
+        .withExecutionSemaphore(BEANS.get(ExecutionSemaphore.class).withPermits(1))
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(1, TimeUnit.MINUTES)
+            .withSchedule(SimpleScheduleBuilder.repeatMinutelyForever())));
   }
 
   /**
