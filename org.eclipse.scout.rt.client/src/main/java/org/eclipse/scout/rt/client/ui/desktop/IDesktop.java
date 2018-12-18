@@ -754,6 +754,17 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   Collection<Object> getAddOns();
 
   /**
+   * Returns the add-on instance or <code>null</code> if add-on is not available. If multiple add-ons match the given
+   * class any one is returned (nondeterministic, see {@link java.util.stream.Stream#findAny}).
+   *
+   * @param addOnClass
+   *          The add-on class or a super-class/interface of the add-on
+   * @return The add-on instance
+   * @since 9.0
+   */
+  <T> T getAddOn(Class<T> addOnClass);
+
+  /**
    * Adds an untyped add-on to the Desktop. Add-ons are required when you want to extend your Desktop with something
    * that needs to add elements to the DOM of the user interface. Typically these DOM elements are not visible, so the
    * add-ons are not meant for clickable UI-elements but rather for technical features, like interfaces built with

@@ -81,6 +81,7 @@ import org.eclipse.scout.rt.client.ui.form.IFormMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
+import org.eclipse.scout.rt.client.ui.popup.PopupManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.OrderedComparator;
@@ -639,6 +640,8 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     List<IKeyStroke> ksList = new ActionFinder().findActions(actionList, IKeyStroke.class, true);
     addKeyStrokes(ksList.toArray(new IKeyStroke[ksList.size()]));
     addPropertyChangeListener(new P_LocalPropertyChangeListener());
+
+    addAddOn(BEANS.get(PopupManager.class));
   }
 
   protected final void interceptInit() {
@@ -2191,6 +2194,14 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   @Override
   public Collection<Object> getAddOns() {
     return Collections.unmodifiableCollection(m_addOns);
+  }
+
+  @Override
+  public <T> T getAddOn(Class<T> addOnClass) {
+    return m_addOns.stream()
+        .filter(a -> addOnClass.isAssignableFrom(a.getClass()))
+        .map(a -> addOnClass.cast(a))
+        .findAny().orElse(null);
   }
 
   @Override

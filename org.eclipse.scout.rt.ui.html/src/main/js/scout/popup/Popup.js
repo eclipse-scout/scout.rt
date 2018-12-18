@@ -17,6 +17,7 @@ scout.Popup = function() {
   this._glassPaneRenderer = null;
   this.anchorBounds = null;
   this.animateOpening = false;
+  this.anchor = null;
   this.$anchor = null;
   this.windowPaddingX = 10;
   this.windowPaddingY = 5;
@@ -67,6 +68,9 @@ scout.Popup = function() {
   this.closeOnOtherPopupOpen = true;
 
   this.$arrow = null;
+
+  this._addWidgetProperties(['anchor']);
+  this._addPreserveOnPropertyChangeProperties(['anchor']);
 };
 scout.inherits(scout.Popup, scout.Widget);
 
@@ -180,6 +184,7 @@ scout.Popup.prototype._render = function() {
 
 scout.Popup.prototype._renderProperties = function() {
   scout.Popup.parent.prototype._renderProperties.call(this);
+  this._renderAnchor();
   this._renderWithArrow();
   this._renderWithFocusContext();
   this._renderWithGlassPane();
@@ -281,8 +286,11 @@ scout.Popup.prototype._isRemovalPrevented = function() {
 };
 
 scout.Popup.prototype.close = function() {
-  this.trigger('close');
-  this.destroy();
+  var event = new scout.Event();
+  this.trigger('close', event);
+  if (!event.defaultPrevented) {
+    this.destroy();
+  }
 };
 
 /**
@@ -733,3 +741,14 @@ scout.Popup.prototype.ensureOpen = function() {
     this.open();
   }
 };
+
+scout.Popup.prototype.setAnchor = function(anchor) {
+  this.setProperty('anchor', anchor);
+};
+
+scout.Popup.prototype._renderAnchor = function() {
+  if (this.anchor) {
+    this.set$Anchor(this.anchor.$container);
+  }
+};
+

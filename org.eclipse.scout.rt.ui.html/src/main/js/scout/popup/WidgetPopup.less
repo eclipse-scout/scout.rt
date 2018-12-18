@@ -1,0 +1,35 @@
+/*******************************************************************************
+ * Copyright (c) 2018 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+
+.widget-popup {
+  background-color: @popup-background-color;
+  border: 1px solid @border-color;
+  border-radius: @border-radius;
+  #scout.drop-shadow-large();
+  margin: 10px; /* minimum padding to window */
+
+  &.animate-open {
+    #scout.animation-name(fadein-zoom-bounce);
+    #scout.animation-duration(0.4s);
+  }
+
+  &.animate-remove {
+    #scout.animation-name(fadeout-shrink-blur);
+    #scout.animation-duration(0.15s);
+  }
+
+  & > .popup-arrow {
+    &.bottom,
+    &.right {
+      #scout.drop-shadow-large(@y: 4px, @spread: -2px);
+    }
+  }
+}

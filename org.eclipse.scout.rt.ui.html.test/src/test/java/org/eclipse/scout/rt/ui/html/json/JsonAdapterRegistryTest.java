@@ -64,6 +64,8 @@ public class JsonAdapterRegistryTest {
 
   public static void testFormOpenedAndClosedInSameRequest(UiSession uiSession) throws JSONException {
     JsonDesktop<IDesktop> jsonDesktop = UiSessionTestUtility.newJsonAdapter(uiSession, uiSession.getClientSession().getDesktop(), null);
+    int adaptersBeforeTest = uiSession.currentJsonResponse().adapterMap().size();
+
     FormWithOneField form = new FormWithOneField();
 
     form.start();
@@ -76,12 +78,14 @@ public class JsonAdapterRegistryTest {
     assertEquals(1, uiSession.currentJsonResponse().eventList().size());
     assertEquals(uiSession.getUiSessionId(), uiSession.currentJsonResponse().eventList().get(0).getTarget());
     assertEquals("disposeAdapter", uiSession.currentJsonResponse().eventList().get(0).getType());
-    assertEquals(0, uiSession.currentJsonResponse().adapterMap().size());
+    assertEquals(adaptersBeforeTest, uiSession.currentJsonResponse().adapterMap().size());
   }
 
   public static void testFormOpenedAndClosedInListener(UiSession uiSession) throws JSONException {
     IDesktop desktop = uiSession.getClientSession().getDesktop();
     JsonDesktop<IDesktop> jsonDesktop = UiSessionTestUtility.newJsonAdapter(uiSession, desktop, null);
+    int adaptersBeforeTest = uiSession.currentJsonResponse().adapterMap().size();
+
     FormWithOneField form = new FormWithOneField();
 
     DesktopListener listener = event -> {
@@ -93,7 +97,7 @@ public class JsonAdapterRegistryTest {
     JsonForm formAdapter = (JsonForm) jsonDesktop.getAdapter(form);
     assertNull(formAdapter);
     assertEquals(0, uiSession.currentJsonResponse().eventList().size());
-    assertEquals(0, uiSession.currentJsonResponse().adapterMap().size());
+    assertEquals(adaptersBeforeTest, uiSession.currentJsonResponse().adapterMap().size());
 
     desktop.removeDesktopListener(listener, DesktopEvent.TYPE_FORM_SHOW);
   }

@@ -167,7 +167,10 @@
   __include("scout/label/Label.js");
   __include("scout/label/LabelAdapter.js");
   __include("scout/popup/Popup.js");
+  __include("scout/popup/PopupAdapter.js");
   __include("scout/popup/PopupLayout.js");
+  __include("scout/popup/PopupManager.js");
+  __include("scout/popup/PopupManagerAdapter.js");
   __include("scout/popup/PopupWithHead.js");
   __include("scout/popup/PopupWithHeadLayout.js");
   __include("scout/popup/MobilePopup.js");
@@ -175,6 +178,7 @@
   __include("scout/popup/TouchPopup.js");
   __include("scout/popup/TouchPopupLayout.js");
   __include("scout/popup/WidgetPopup.js");
+  __include("scout/popup/WidgetPopupAdapter.js");
   __include("scout/popup/WidgetPopupLayout.js");
   __include("scout/datepicker/DatePicker.js");
   __include("scout/datepicker/DatePickerPopup.js");

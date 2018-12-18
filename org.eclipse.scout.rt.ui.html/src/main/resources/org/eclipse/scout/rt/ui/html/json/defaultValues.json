@@ -466,6 +466,24 @@
       "collapsed": false,
       "collapseStyle": "left",
       "headerVisible": true
+    },
+    "Popup": {
+      "animateOpening": false,
+      "withGlassPane": false,
+      "horizontalAlignment": "leftedge",
+      "verticalAlignment": "bottom",
+      "horizontalSwitch": false,
+      "verticalSwitch": true,
+      "trimWidth": false,
+      "trimHeight": true,
+      "scrollType": "remove",
+      "withArrow": false,
+      "closeOnAnchorMouseDown": true,
+      "closeOnMouseDownOutside": true,
+      "closeOnOtherPopupOpen": true
+    },
+    "WidgetPopup": {
+      "animateOpening": true
     }
   },
 
@@ -547,7 +565,12 @@
       "Accordion": {
         "TileAccordion": null
       },
-      "Group": null
+      "Group": null,
+      "Popup": {
+        "WidgetPopup": {
+          "FormPopup": null
+        }
+      }
     },
     "Column": {
       "BeanColumn": null,

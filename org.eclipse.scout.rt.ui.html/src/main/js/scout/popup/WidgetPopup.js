@@ -10,13 +10,22 @@
  ******************************************************************************/
 scout.WidgetPopup = function() {
   scout.WidgetPopup.parent.call(this);
+  this.animateOpening = true;
+  this.animateRemoval = true;
   this.widget = null;
+  this.windowPaddingX = 0;
+  this.windowPaddingY = 0;
   this._addWidgetProperties(['widget']);
 };
 scout.inherits(scout.WidgetPopup, scout.Popup);
 
 scout.WidgetPopup.prototype._createLayout = function() {
   return new scout.WidgetPopupLayout(this);
+};
+
+scout.WidgetPopup.prototype._render = function() {
+  scout.WidgetPopup.parent.prototype._render.call(this);
+  this.$container.addClass('widget-popup');
 };
 
 scout.WidgetPopup.prototype._renderProperties = function() {

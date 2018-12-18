@@ -642,6 +642,11 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public <T> T getAddOn(Class<T> addOnClass) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
   public boolean isOutlineChanging() {
     throw createUnsupportedOperationException();
   }
