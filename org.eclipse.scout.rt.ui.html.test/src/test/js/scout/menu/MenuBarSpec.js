@@ -397,4 +397,87 @@ describe("MenuBar", function() {
     });
   });
 
+  describe('ellipsis position', function() {
+    it('is calculated correctly for ellipsisPosition RIGHT', function() {
+      var rightMenu1 = helper.createMenu(createModel('foo')),
+        rightMenu2 = helper.createMenu(createModel('bar')),
+        leftMenu1 = helper.createMenu(createModel('foo')),
+        leftMenu2 = helper.createMenu(createModel('bar')),
+        menuBar = createMenuBar(),
+        menus = [rightMenu1, rightMenu2, leftMenu1, leftMenu2];
+
+      rightMenu1.visible = true;
+      rightMenu1.horizontalAlignment = 1;
+      rightMenu2.visible = false;
+      rightMenu2.horizontalAlignment = 1;
+      leftMenu1.visible = true;
+      leftMenu1.horizontalAlignment = -1;
+      leftMenu2.visible = true;
+      leftMenu2.horizontalAlignment = -1;
+      menuBar.ellipsisRight();
+      menuBar.setMenuItems(menus);
+      menuBar.render();
+
+      expect(menuBar._ellipsis.rightAligned).toBe(true);
+      expect(menuBar.orderedMenuItems.right[0]).toBe(rightMenu1);
+      expect(menuBar.orderedMenuItems.right[1]).toBe(menuBar._ellipsis);
+      expect(menuBar.orderedMenuItems.right[2]).toBe(rightMenu2);
+
+      rightMenu2.setProperty('visible', true);
+
+      expect(menuBar._ellipsis.rightAligned).toBe(true);
+      expect(menuBar.orderedMenuItems.right[0]).toBe(rightMenu1);
+      expect(menuBar.orderedMenuItems.right[1]).toBe(rightMenu2);
+      expect(menuBar.orderedMenuItems.right[2]).toBe(menuBar._ellipsis);
+
+      rightMenu1.setProperty('visible', false);
+      rightMenu2.setProperty('visible', false);
+
+      expect(menuBar._ellipsis.rightAligned).toBe(false);
+      expect(menuBar.orderedMenuItems.left[0]).toBe(leftMenu1);
+      expect(menuBar.orderedMenuItems.left[1]).toBe(leftMenu2);
+      expect(menuBar.orderedMenuItems.left[2]).toBe(menuBar._ellipsis);
+    });
+
+    it('is calculated correctly for ellipsisPosition LEFT', function() {
+      var rightMenu1 = helper.createMenu(createModel('foo')),
+        rightMenu2 = helper.createMenu(createModel('bar')),
+        leftMenu1 = helper.createMenu(createModel('foo')),
+        leftMenu2 = helper.createMenu(createModel('bar')),
+        menuBar = createMenuBar(),
+        menus = [rightMenu1, rightMenu2, leftMenu1, leftMenu2];
+
+      rightMenu1.visible = true;
+      rightMenu1.horizontalAlignment = 1;
+      rightMenu2.visible = true;
+      rightMenu2.horizontalAlignment = 1;
+      leftMenu1.visible = false;
+      leftMenu1.horizontalAlignment = -1;
+      leftMenu2.visible = true;
+      leftMenu2.horizontalAlignment = -1;
+      menuBar.ellipsisLeft();
+      menuBar.setMenuItems(menus);
+      menuBar.render();
+
+      expect(menuBar._ellipsis.rightAligned).toBe(false);
+      expect(menuBar.orderedMenuItems.left[0]).toBe(leftMenu1);
+      expect(menuBar.orderedMenuItems.left[1]).toBe(menuBar._ellipsis);
+      expect(menuBar.orderedMenuItems.left[2]).toBe(leftMenu2);
+
+      leftMenu1.setProperty('visible', true);
+
+      expect(menuBar._ellipsis.rightAligned).toBe(false);
+      expect(menuBar.orderedMenuItems.left[0]).toBe(menuBar._ellipsis);
+      expect(menuBar.orderedMenuItems.left[1]).toBe(leftMenu1);
+      expect(menuBar.orderedMenuItems.left[2]).toBe(leftMenu2);
+
+      leftMenu1.setProperty('visible', false);
+      leftMenu2.setProperty('visible', false);
+
+      expect(menuBar._ellipsis.rightAligned).toBe(true);
+      expect(menuBar.orderedMenuItems.right[0]).toBe(menuBar._ellipsis);
+      expect(menuBar.orderedMenuItems.right[1]).toBe(rightMenu1);
+      expect(menuBar.orderedMenuItems.right[2]).toBe(rightMenu2);
+    });
+  });
 });

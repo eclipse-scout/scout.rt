@@ -245,7 +245,7 @@ scout.MenuBar.prototype._createOrderedMenus = function(menuItems) {
 scout.MenuBar.prototype._getFirstStackableIndexPosition = function(menuList) {
   var foundIndex = -1;
   menuList.some(function(menu, index) {
-    if (menu.stackable) {
+    if (menu.stackable && menu.visible) {
       foundIndex = index;
       return true;
     }
@@ -420,6 +420,8 @@ scout.MenuBar.prototype._onMenuItemPropertyChange = function(event) {
       // return the wrong value (even if the menubar itself is visible).
       this.revalidateLayout();
     }
+    // recalculate position of ellipsis
+    this.reorderMenus();
   }
   if (event.propertyName === 'keyStroke' || event.propertyName === 'enabled' || event.propertyName === 'defaultMenu' || event.propertyName === 'visible') {
     this.updateDefaultMenu();
