@@ -109,7 +109,11 @@ public class DataObjectTestHelper {
     if (expected == null) {
       return actual == null;
     }
-    else if (expected instanceof IDoEntity) {
+    if (actual == null) {
+      return expected == null;
+    }
+
+    if (expected instanceof IDoEntity) {
       if (assertClassEquals && expected.getClass() != actual.getClass()) {
         return false;
       }
