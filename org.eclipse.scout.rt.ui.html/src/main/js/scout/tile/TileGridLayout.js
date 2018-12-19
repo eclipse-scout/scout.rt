@@ -27,6 +27,7 @@ scout.TileGridLayout.prototype.layout = function($container) {
       this.widget._renderViewPort();
     }
     this._layout($container);
+    this.widget.trigger('layoutAnimationDone');
     return;
   }
 
