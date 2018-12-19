@@ -21,6 +21,6 @@ public class DefaultLookupCallProvisioningService implements ILookupCallProvisio
 
   @Override
   public <T> ILookupCall<T> newClonedInstance(ILookupCall<T> templateCall, IProvisioningContext context) {
-    return templateCall != null ? templateCall.clone() : null;
+    return templateCall != null ? templateCall.copy() : null;
   }
 }

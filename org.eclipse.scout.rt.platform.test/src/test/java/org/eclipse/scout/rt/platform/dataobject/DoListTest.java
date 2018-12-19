@@ -202,7 +202,7 @@ public class DoListTest {
     intList.add(3);
     intList.remove(1);
     assertEquals(Arrays.asList(1, 3), intList.get());
-    intList.remove(new Integer(3));
+    intList.remove(Integer.valueOf(3));
     assertEquals(Arrays.asList(1), intList.get());
     intList.remove(Integer.valueOf(1));
     assertTrue(intList.isEmpty());

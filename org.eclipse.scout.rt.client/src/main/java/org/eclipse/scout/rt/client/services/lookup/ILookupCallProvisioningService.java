@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
  * This service creates lookup call instances from lookup call templates.
  * <p>
  * Callers are fields and components that deal with getConfiguredLookupCall and getConfiguredCodeType and create new
- * instances usign clone().
+ * instances usign copy().
  * <p>
  * Known are {@link ISmartField}, {@link IListBox}, {@link ITreeBox}, {@link IRadioButtonGroup}, {@link ISmartColumn}
  * <p>

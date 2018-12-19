@@ -127,7 +127,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     ISqlStyle style = null;
     if (styleClass != null) {
       try {
-        style = styleClass.newInstance();
+        style = styleClass.getConstructor().newInstance();
       }
       catch (Exception e) {
         BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Failed to create instance of class '{}'.", new Object[]{styleClass.getName(), e}));
@@ -382,7 +382,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     }
   }
 
-  private Object tryGetPermissionLevel(Class permissionClass, String levelField, IAccessControlService accessControlService) {
+  private Object tryGetPermissionLevel(Class<?> permissionClass, String levelField, IAccessControlService accessControlService) {
     if (permissionClass == null) {
       return null;
     }
@@ -391,7 +391,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
         return permissionClass.getField(levelField).get(null);
       }
       else {
-        Permission p = (Permission) permissionClass.newInstance();
+        Permission p = (Permission) permissionClass.getConstructor().newInstance();
         return accessControlService.getPermissionLevel(p);
       }
     }

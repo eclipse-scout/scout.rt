@@ -14,7 +14,6 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.client.context.ClientRunContext;
@@ -437,7 +436,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
     try {
       return createDisplayParentRunContext()
-          .call((Callable<ISearchForm>) configuredSearchForm::newInstance);
+          .call(() -> configuredSearchForm.getConstructor().newInstance());
     }
     catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + configuredSearchForm.getName() + "'.", e));

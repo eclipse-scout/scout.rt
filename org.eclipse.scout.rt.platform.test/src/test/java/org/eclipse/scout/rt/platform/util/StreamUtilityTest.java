@@ -298,9 +298,9 @@ public class StreamUtilityTest {
   public void testToMapParallelStream() {
     String[] values = new String[]{"one", "two", "three"};
     Map<String, Integer> map = Stream.of(values).parallel().collect(StreamUtility.toMap(t -> t, StringUtility::length));
-    assertEquals(new Integer(3), map.get("one"));
-    assertEquals(new Integer(3), map.get("two"));
-    assertEquals(new Integer(5), map.get("three"));
+    assertEquals(Integer.valueOf(3), map.get("one"));
+    assertEquals(Integer.valueOf(3), map.get("two"));
+    assertEquals(Integer.valueOf(5), map.get("three"));
   }
 
   @Test(expected = IllegalStateException.class)

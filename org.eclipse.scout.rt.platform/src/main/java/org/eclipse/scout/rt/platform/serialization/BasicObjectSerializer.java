@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.platform.serialization;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamClass;
-import java.lang.reflect.Field;
 
 /**
  * This {@link IObjectSerializer} implementation is designed to be used outside an OSGi environment. All classes are
@@ -31,23 +29,9 @@ public class BasicObjectSerializer extends AbstractObjectSerializer {
   @Override
   protected ObjectInputStream createObjectInputStream(InputStream in, IObjectReplacer objectReplacer) throws IOException {
     if (objectReplacer == null) {
-      return new NonReplaceObjectInputStream(in);
+      return new ObjectInputStream(in);
     }
     return new ResolvingObjectInputStream(in, objectReplacer);
-  }
-
-  public static class NonReplaceObjectInputStream extends ObjectInputStream {
-
-    public NonReplaceObjectInputStream(InputStream in) throws IOException {
-      super(in);
-    }
-
-    @Override
-    protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
-      Class<?> c = super.resolveClass(desc);
-      checkSuid(c, desc);
-      return c;
-    }
   }
 
   public static class ResolvingObjectInputStream extends ObjectInputStream {
@@ -61,42 +45,8 @@ public class BasicObjectSerializer extends AbstractObjectSerializer {
     }
 
     @Override
-    protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
-      Class<?> c = super.resolveClass(desc);
-      checkSuid(c, desc);
-      return c;
-    }
-
-    @Override
     protected Object resolveObject(Object obj) throws IOException {
       return m_objectReplacer.resolveObject(obj);
     }
   }
-
-  /**
-   * Since java 8 interfaces may have default methods. When using jacoco or cglib this can have the effect that the
-   * default serialVersionUID for interfaces can be different with or without instrumentation.
-   * <p>
-   * This affects only interface literals such as IFoo.class, Bar.class, etc.
-   * <p>
-   * This fix makes sure that interface literals ignore the serialVersionUID
-   */
-  protected static void checkSuid(Class<?> c, ObjectStreamClass desc) throws IOException {
-    if (c != null && c.isInterface()) {
-      long expectedSuid = ObjectStreamClass.lookupAny(c).getSerialVersionUID();
-      long actualSuid = desc.getSerialVersionUID();
-      if (expectedSuid != actualSuid) {
-        //replace the input object serialVersionUID by the target class serialVersionUID
-        try {
-          Field suidField = ObjectStreamClass.class.getDeclaredField("suid");
-          suidField.setAccessible(true);
-          suidField.set(desc, expectedSuid);
-        }
-        catch (Exception e) {
-          throw new IOException(e);
-        }
-      }
-    }
-  }
-
 }

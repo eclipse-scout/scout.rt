@@ -341,7 +341,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
       text = "";
     }
     else {
-      text = text.trim();
+      text = StringUtility.replace(text.trim(), "٪", "%");
     }
     if (!text.isEmpty()) {
       text = ensureSuffix(text);

@@ -19,7 +19,6 @@ import java.net.URI;
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.eclipse.scout.rt.platform.util.LazyValue;
@@ -48,7 +47,6 @@ public class AntiCsrfContainerFilter implements IRestContainerRequestFilter {
     URI path = uriInfo == null ? null : uriInfo.getRequestUri();
     LOG.info("Request '{}' blocked because no '{}' header was present (possible CSRF attack).", path, AntiCsrfHelper.REQUESTED_WITH_HEADER);
 
-    Response forbiddenResponse = status(FORBIDDEN).build();
-    requestContext.abortWith(forbiddenResponse);
+    requestContext.abortWith(status(FORBIDDEN).build());
   }
 }

@@ -266,7 +266,7 @@ public final class JsonObjectUtility {
     JSONObject jbean = (JSONObject) jval;
     T o;
     try {
-      o = type.newInstance();
+      o = type.getConstructor().newInstance();
     }
     catch (Exception e) {
       throw new IllegalArgumentException("type " + type + " object " + jval, e);

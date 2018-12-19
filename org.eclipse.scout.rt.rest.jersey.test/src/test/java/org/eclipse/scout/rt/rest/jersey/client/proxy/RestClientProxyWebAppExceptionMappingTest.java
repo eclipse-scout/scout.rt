@@ -55,13 +55,14 @@ public class RestClientProxyWebAppExceptionMappingTest {
           .get());
 
       // mock response and convert it into an exception using duplicated converter method
-      Response mockResponse = Response.status(status).build();
-      WebApplicationException convertedException = proxyFactory.convertToWebAppException(mockResponse);
-      assertSame(mockResponse, convertedException.getResponse());
-      assertEquals(status, convertedException.getResponse().getStatus());
+      try (Response mockResponse = Response.status(status).build()) {
+        WebApplicationException convertedException = proxyFactory.convertToWebAppException(mockResponse);
+        assertSame(mockResponse, convertedException.getResponse());
+        assertEquals(status, convertedException.getResponse().getStatus());
 
-      // converted exception must have same type as the one thrown by jersey
-      assertSame("status: " + status, remoteException.getClass(), convertedException.getClass());
+        // converted exception must have same type as the one thrown by jersey
+        assertSame("status: " + status, remoteException.getClass(), convertedException.getClass());
+      }
     }
   }
 

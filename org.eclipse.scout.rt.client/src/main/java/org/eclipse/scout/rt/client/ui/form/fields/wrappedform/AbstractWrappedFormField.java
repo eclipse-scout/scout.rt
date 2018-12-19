@@ -130,7 +130,7 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
     setInitialFocusEnabled(getConfiguredInitialFocusEnabled());
     if (getConfiguredInnerForm() != null) {
       try {
-        setInnerForm((FORM) getConfiguredInnerForm().newInstance(), true);
+        setInnerForm((FORM) getConfiguredInnerForm().getConstructor().newInstance(), true);
       }
       catch (Exception e) {
         BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + getConfiguredInnerForm().getName() + "'.", e));

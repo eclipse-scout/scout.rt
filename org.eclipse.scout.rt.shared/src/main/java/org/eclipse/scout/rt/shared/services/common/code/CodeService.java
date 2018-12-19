@@ -74,7 +74,7 @@ public class CodeService implements ICodeService {
       @Override
       public ICodeType<?, ?> resolve(CodeTypeCacheKey key) {
         try {
-          return key.getCodeTypeClass().newInstance();
+          return key.getCodeTypeClass().getConstructor().newInstance();
         }
         catch (ReflectiveOperationException e) {
           throw BEANS.get(PlatformExceptionTranslator.class)
@@ -201,7 +201,7 @@ public class CodeService implements ICodeService {
     }
     if (declaringCodeTypeClass == null) {
       try {
-        declaringCodeTypeClass = type.newInstance().getCodeType().getClass();
+        declaringCodeTypeClass = type.getConstructor().newInstance().getCodeType().getClass();
       }
       catch (Exception e) {
         BEANS.get(ExceptionHandler.class).handle(e);

@@ -2281,7 +2281,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       if (configuredOutlines != null) {
         for (Class<?> element : configuredOutlines) {
           try {
-            IOutline o = (IOutline) element.newInstance();
+            IOutline o = (IOutline) element.getConstructor().newInstance();
             outlines.addOrdered(o);
           }
           catch (Exception e) {

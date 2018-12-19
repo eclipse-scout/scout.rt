@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * close them).
  * </p>
  */
-public class POP3Adapter {
+public class POP3Adapter implements AutoCloseable {
 
   public static final String TRASH_FOLDER_NAME = "Trash";
   private static final Logger LOG = LoggerFactory.getLogger(POP3Adapter.class);
@@ -65,12 +65,6 @@ public class POP3Adapter {
     m_port = port;
     m_username = username;
     m_password = password;
-  }
-
-  @Override
-  protected void finalize() throws Throwable {
-    closeConnection();
-    super.finalize();
   }
 
   public String[] getUnseenMessageSubjects() {
@@ -144,7 +138,11 @@ public class POP3Adapter {
     }
   }
 
-  protected void connect() {
+  protected synchronized void connect() {
+    if (isConnected()) {
+      return;
+    }
+
     try {
       final Properties props = new Properties();
       props.setProperty("mail.pop3.host", getHost());
@@ -163,6 +161,7 @@ public class POP3Adapter {
 
       m_store = session.getStore("pop3");
       m_store.connect();
+      m_connected = true;
     }
     catch (MessagingException e) {
       throw new ProcessingException(e.getMessage(), e);
@@ -199,37 +198,40 @@ public class POP3Adapter {
     return folder;
   }
 
-  public void closeConnection() {
-    if (isConnected()) {
-      List<MessagingException> exceptions = new ArrayList<>();
-      for (Folder folder : m_cachedFolders.values()) {
-        try {
+  @Override
+  public synchronized void close() {
+    if (!isConnected()) {
+      return;
+    }
 
-          folder.close(true);
-        }
-        catch (MessagingException e) {
-          exceptions.add(e);
-        }
-        finally {
-          try {
-            folder.close(false);
-          }
-          catch (MessagingException e) {
-            LOG.warn("Could not close folder", e);
-          }
-        }
-      }
+    List<MessagingException> exceptions = new ArrayList<>();
+    for (Folder folder : m_cachedFolders.values()) {
       try {
-        m_store.close();
+        folder.close(true);
       }
       catch (MessagingException e) {
         exceptions.add(e);
       }
-      if (!exceptions.isEmpty()) {
-        throw new ProcessingException(exceptions.get(0).getMessage());
+      finally {
+        try {
+          folder.close(false);
+        }
+        catch (MessagingException e) {
+          LOG.warn("Could not close folder", e);
+        }
       }
-      m_cachedFolders.clear();
-      m_connected = false;
+    }
+    m_cachedFolders.clear();
+
+    try {
+      m_store.close();
+    }
+    catch (MessagingException e) {
+      exceptions.add(e);
+    }
+    m_connected = false;
+    if (!exceptions.isEmpty()) {
+      throw new ProcessingException(exceptions.get(0).getMessage());
     }
   }
 
@@ -261,7 +263,7 @@ public class POP3Adapter {
     }
   }
 
-  public boolean isConnected() {
+  public synchronized boolean isConnected() {
     return m_connected;
   }
 

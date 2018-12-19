@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -429,13 +430,17 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
 
   @Test
   public void testDisplayTextSameTextTwiceUnformatted() throws Exception {
+    // read grouping char because it is different in java8 vs. java11
+    DecimalFormat df = (DecimalFormat) NumberFormat.getNumberInstance(NlsLocale.get());
+    char groupChar = df.getDecimalFormatSymbols().getGroupingSeparator();
+
     getUIFacade().parseAndSetValueFromUI("12345");
-    assertEquals("12'345", getDisplayText());
+    assertEquals("12" + groupChar + "345", getDisplayText());
     getUIFacade().parseAndSetValueFromUI("12345"); // input does not match display text
-    assertEquals("12'345", getDisplayText());
+    assertEquals("12" + groupChar + "345", getDisplayText());
 
     assertEquals(2, m_displayTextChangedCounter.get());
-    assertArrayEquals(new String[]{"12'345", "12'345"}, m_displayTextChangedHistory.toArray());
+    assertArrayEquals(new String[]{"12" + groupChar + "345", "12" + groupChar + "345"}, m_displayTextChangedHistory.toArray());
   }
 
   @Test

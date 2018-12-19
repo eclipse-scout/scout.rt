@@ -18,7 +18,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.client.context.ClientRunContext;
@@ -838,7 +837,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       return null;
     }
     return createDisplayParentRunContext()
-        .call((Callable<IForm>) getConfiguredDetailForm()::newInstance);
+        .call(() -> getConfiguredDetailForm().getConstructor().newInstance());
   }
 
   /**

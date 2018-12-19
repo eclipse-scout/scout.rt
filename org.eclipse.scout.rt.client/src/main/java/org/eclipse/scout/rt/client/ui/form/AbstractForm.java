@@ -1485,9 +1485,9 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       return null;
     }
     try {
-      return formDataClass.newInstance();
+      return formDataClass.getConstructor().newInstance();
     }
-    catch (InstantiationException | IllegalAccessException e) {
+    catch (ReflectiveOperationException e) {
       BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + formDataClass.getName() + "'.", e));
       return null;
     }

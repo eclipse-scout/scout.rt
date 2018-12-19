@@ -33,7 +33,6 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 public final class SeleniumDriver {
@@ -79,7 +78,7 @@ public final class SeleniumDriver {
     System.setProperty(ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
     logProperty(ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
 
-    DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+    ChromeOptions opts = new ChromeOptions();
 
     // Prepare options
     ChromeOptions options = new ChromeOptions();
@@ -91,12 +90,12 @@ public final class SeleniumDriver {
     options.addArguments("--lang=en");
     options.addArguments("--verbose");
     options.addArguments("--disable-infobars");
-    capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+    opts.setCapability(ChromeOptions.CAPABILITY, options);
 
     // Set logging preferences (see BrowserLogRule)
     LoggingPreferences logPrefs = new LoggingPreferences();
     logPrefs.enable(LogType.BROWSER, Level.ALL);
-    capabilities.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+    opts.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
 
     // TODO [7.0] bsh: Remove workaround, when Chrome bug is fixed
     // <WORKAROUND> https://bugs.chromium.org/p/chromedriver/issues/detail?id=1552
@@ -108,7 +107,7 @@ public final class SeleniumDriver {
             .usingAnyFreePort()
             .withEnvironment(env) // <--
             .build(),
-        capabilities);
+        opts);
     //RemoteWebDriver driver = new ChromeDriver(options)
     // </WORKAROUND>
 

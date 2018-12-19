@@ -84,7 +84,7 @@ public class ScriptProcessor {
   protected String runInClassLoader(ClassLoader loader, String classname, Class<?>[] types, Object[] args) throws IOException {
     try {
       Class<?> c = loader.loadClass(classname);
-      Object o = c.newInstance();
+      Object o = c.getConstructor().newInstance();
       Method m = c.getMethod("run", types);
       Object result = m.invoke(o, args);
       return (String) result;

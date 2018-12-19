@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.util;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
@@ -44,7 +45,7 @@ public final class NumberUtility {
     }
     if (n instanceof Float) {
       // rounding error workaround
-      return new Double(n.toString());
+      return Double.valueOf(n.toString());
     }
     else {
       return n.doubleValue();
@@ -306,7 +307,7 @@ public final class NumberUtility {
     if (value != null) {
       BigDecimal val = value instanceof BigDecimal ? (BigDecimal) value : new BigDecimal(value.toString());
       BigDecimal prec = BigDecimal.valueOf(precision);
-      return val.divide(prec, BigDecimal.ROUND_HALF_EVEN).setScale(0, BigDecimal.ROUND_HALF_EVEN).multiply(prec);
+      return val.divide(prec, RoundingMode.HALF_EVEN).setScale(0, RoundingMode.HALF_EVEN).multiply(prec);
     }
     return null;
   }

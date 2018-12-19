@@ -102,8 +102,8 @@ public class JsonBeanTest {
   public void testBeanWithMap() {
     BeanWithMap bean = new BeanWithMap();
     Map<Object, Object> map = new HashMap<Object, Object>();
-    map.put("key1", new Integer(2));
-    map.put("key2", new Integer(3));
+    map.put("key1", Integer.valueOf(2));
+    map.put("key2", Integer.valueOf(3));
     bean.setMap(map);
 
     MainJsonObjectFactory factory = new MainJsonObjectFactory();
@@ -118,8 +118,8 @@ public class JsonBeanTest {
   public void testBeanWithMapIllegal() {
     BeanWithMap bean = new BeanWithMap();
     Map<Object, Object> map = new HashMap<Object, Object>();
-    map.put(new Integer(1), new Integer(2));
-    map.put(new Integer(4), new Integer(3));
+    map.put(Integer.valueOf(1), Integer.valueOf(2));
+    map.put(Integer.valueOf(4), Integer.valueOf(3));
     bean.setMap(map);
 
     MainJsonObjectFactory factory = new MainJsonObjectFactory();

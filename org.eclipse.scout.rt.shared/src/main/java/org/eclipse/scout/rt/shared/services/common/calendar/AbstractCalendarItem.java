@@ -53,7 +53,7 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
   public ICalendarItem copy() {
     Class<? extends ICalendarItem> c = getClass();
     try {
-      AbstractCalendarItem a = (AbstractCalendarItem) c.newInstance();
+      AbstractCalendarItem a = (AbstractCalendarItem) c.getConstructor().newInstance();
       a.m_exists = this.m_exists;
       a.m_lastModified = this.m_lastModified;
       a.m_itemId = this.m_itemId;

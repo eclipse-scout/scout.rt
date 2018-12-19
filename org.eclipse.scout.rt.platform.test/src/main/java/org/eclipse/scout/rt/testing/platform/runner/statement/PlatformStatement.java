@@ -78,7 +78,7 @@ public class PlatformStatement extends Statement {
 
   protected void evaluateWithNewPlatform() throws Throwable {
     IPlatform old = Platform.peek();
-    Platform.set(m_runWithNewPlatform.platform().newInstance());
+    Platform.set(m_runWithNewPlatform.platform().getConstructor().newInstance());
     try {
       Platform.get().start();
       Platform.get().awaitPlatformStarted();

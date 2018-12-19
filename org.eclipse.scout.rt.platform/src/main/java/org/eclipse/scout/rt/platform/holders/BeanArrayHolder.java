@@ -43,7 +43,7 @@ public class BeanArrayHolder<T> implements IBeanArrayHolder<T>, Serializable {
   public T addBean() {
     T ret = null;
     try {
-      ret = m_clazz.newInstance();
+      ret = m_clazz.getConstructor().newInstance();
     }
     catch (ReflectiveOperationException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);

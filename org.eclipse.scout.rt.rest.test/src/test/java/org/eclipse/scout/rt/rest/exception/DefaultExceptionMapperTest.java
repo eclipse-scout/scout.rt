@@ -80,6 +80,7 @@ public class DefaultExceptionMapperTest {
     });
   }
 
+  @SuppressWarnings("resource")
   protected static ResponseBuilder addStatus(ResponseBuilder responseBuilder, int statusCode) {
     Response response = mock(Response.class);
     StatusType statusType = mock(StatusType.class);
@@ -98,24 +99,27 @@ public class DefaultExceptionMapperTest {
   @Test
   public void testToResponseInternalServerError() {
     DefaultExceptionMapper mapper = new DefaultExceptionMapper();
-    Response response = mapper.toResponse(new Exception());
-    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+    try (Response response = mapper.toResponse(new Exception())) {
+      assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+    }
   }
 
   @Test
   public void testToResponseWebApplicationException() {
     WebApplicationExceptionMapper mapper = new WebApplicationExceptionMapper();
     WebApplicationException webException = new WebApplicationException(Response.Status.NOT_FOUND.getStatusCode());
-    Response response = mapper.toResponse(webException);
-    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    try (Response response = mapper.toResponse(webException)) {
+      assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    }
   }
 
   @Test
   public void testToResponseIllegalArgumentApplicationException() {
     IllegalArgumentExceptionMapper mapper = new IllegalArgumentExceptionMapper();
     IllegalArgumentException illegalArgException = new IllegalArgumentException("foo");
-    Response response = mapper.toResponse(illegalArgException);
-    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    try (Response response = mapper.toResponse(illegalArgException)) {
+      assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
   }
 
   @Test
@@ -127,12 +131,13 @@ public class DefaultExceptionMapperTest {
 
         DefaultExceptionMapper mapper = new DefaultExceptionMapper();
         Exception exception = new Exception();
-        Response response = mapper.toResponse(exception);
+        try (Response response = mapper.toResponse(exception)) {
 
-        // expect that transaction was notified about failure due to the exception
-        assertEquals(1, ITransaction.CURRENT.get().getFailures().length);
-        assertEquals(exception, ITransaction.CURRENT.get().getFailures()[0]);
-        assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+          // expect that transaction was notified about failure due to the exception
+          assertEquals(1, ITransaction.CURRENT.get().getFailures().length);
+          assertEquals(exception, ITransaction.CURRENT.get().getFailures()[0]);
+          assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+        }
       }
     });
   }

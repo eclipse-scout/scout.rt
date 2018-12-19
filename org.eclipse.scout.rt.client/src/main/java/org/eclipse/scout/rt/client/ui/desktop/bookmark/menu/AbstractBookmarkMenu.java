@@ -82,7 +82,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
       IBookmarkForm form = null;
       if (getConfiguredBookmarkForm() != null) {
         try {
-          form = getConfiguredBookmarkForm().newInstance();
+          form = getConfiguredBookmarkForm().getConstructor().newInstance();
         }
         catch (Exception e) {
           BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + getConfiguredBookmarkForm().getName() + "'.", e));

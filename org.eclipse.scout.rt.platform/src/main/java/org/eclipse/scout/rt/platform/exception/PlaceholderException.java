@@ -174,7 +174,7 @@ public class PlaceholderException extends Exception {
     // 4. default constructor
     if (transformedThrowable == null && cause == null) {
       try {
-        transformedThrowable = clazz.newInstance();
+        transformedThrowable = clazz.getConstructor().newInstance();
       }
       catch (Exception e) { // NOSONAR
         // nop

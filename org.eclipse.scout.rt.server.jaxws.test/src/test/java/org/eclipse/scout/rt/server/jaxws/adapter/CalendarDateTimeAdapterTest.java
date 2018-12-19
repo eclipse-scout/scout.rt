@@ -227,11 +227,11 @@ public class CalendarDateTimeAdapterTest {
       assertDateTime(timeAdapter.unmarshal("2011-11-07"),
           1970, 1, 1, 0, 0, 0, UTC_TIME_ZONE);
 
-      assertDateTime(dateTimeAdapter.unmarshal("2011-11-07T00:00:00.000"),
+      assertDateTime(dateTimeAdapter.unmarshal("2011-11-07T00:00:00.00"),
           2011, 11, 7, 0, 0, 0, UTC_TIME_ZONE);
-      assertDateTime(dateAdapter.unmarshal("2011-11-07T00:00:000"),
+      assertDateTime(dateAdapter.unmarshal("2011-11-07T00:00:00"),
           2011, 11, 7, 0, 0, 0, UTC_TIME_ZONE);
-      assertDateTime(timeAdapter.unmarshal("2011-11-07T00:00:00.000"),
+      assertDateTime(timeAdapter.unmarshal("2011-11-07T00:00:00.00"),
           1970, 1, 1, 0, 0, 0, UTC_TIME_ZONE);
     }
     finally {
@@ -249,11 +249,11 @@ public class CalendarDateTimeAdapterTest {
       assertDateTime(timeAdapter.unmarshal("2011-11-07"),
           1970, 1, 1, 0, 0, 0, UTC_TIME_ZONE);
 
-      assertDateTime(dateTimeAdapter.unmarshal("2011-11-07T00:00:00.000"),
+      assertDateTime(dateTimeAdapter.unmarshal("2011-11-07T00:00:00.00"),
           2011, 11, 7, 0, 0, 0, UTC_TIME_ZONE);
-      assertDateTime(dateAdapter.unmarshal("2011-11-07T00:00:000"),
+      assertDateTime(dateAdapter.unmarshal("2011-11-07T00:00:00"),
           2011, 11, 7, 0, 0, 0, UTC_TIME_ZONE);
-      assertDateTime(timeAdapter.unmarshal("2011-11-07T00:00:00.000"),
+      assertDateTime(timeAdapter.unmarshal("2011-11-07T00:00:00.00"),
           1970, 1, 1, 0, 0, 0, UTC_TIME_ZONE);
     }
     finally {

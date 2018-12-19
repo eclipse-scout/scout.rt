@@ -151,8 +151,8 @@ public class DoEntityTest {
     entity.put("attribute2", 200);
     entity.put("attribute1", 300);
     Map<String, Integer> all = entity.all((value) -> (Integer) value);
-    assertEquals(new Integer(100), all.get("attribute"));
-    assertEquals(new Integer(200), all.get("attribute2"));
+    assertEquals(Integer.valueOf(100), all.get("attribute"));
+    assertEquals(Integer.valueOf(200), all.get("attribute2"));
     // expect same order of attributes
     assertArrayEquals(new String[]{"attribute", "attribute2", "attribute1"}, all.keySet().toArray());
   }

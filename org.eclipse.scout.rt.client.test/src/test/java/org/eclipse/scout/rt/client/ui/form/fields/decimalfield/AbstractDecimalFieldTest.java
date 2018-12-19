@@ -110,6 +110,7 @@ public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
   @Test
   public void testParseValueInternalPercent() {
     for (Locale locale : DecimalFormat.getAvailableLocales()) {
+
       setPercent(false);
       setMultiplier(1);
       DecimalFormat df = (DecimalFormat) DecimalFormat.getInstance(locale);
@@ -119,12 +120,16 @@ public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
           this, TestingUtility.createLocaleSpecificNumberString(locale, false, "59", "88", NumberStringPercentSuffix.JUST_SYMBOL));
 
       setPercent(true);
-      assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal(TestingUtility.createLocaleSpecificNumberString(locale, false, "59", "88", NumberStringPercentSuffix.BLANK_AND_SYMBOL)));
+      if (!locale.toString().startsWith("ar")) { // Arabic locales do not support blanks before percent
+        assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal(TestingUtility.createLocaleSpecificNumberString(locale, false, "59", "88", NumberStringPercentSuffix.BLANK_AND_SYMBOL)));
+      }
       assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal(TestingUtility.createLocaleSpecificNumberString(locale, false, "59", "88", NumberStringPercentSuffix.JUST_SYMBOL)));
       assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal(TestingUtility.createLocaleSpecificNumberString(locale, false, "59", "88", NumberStringPercentSuffix.NONE)));
 
       setMultiplier(100);
-      assertComparableEquals(BigDecimal.valueOf(0.5988), parseValueInternal(TestingUtility.createLocaleSpecificNumberString(locale, false, "59", "88", NumberStringPercentSuffix.BLANK_AND_SYMBOL)));
+      if (!locale.toString().startsWith("ar")) { // Arabic locales do not support blanks before percent
+        assertComparableEquals(BigDecimal.valueOf(0.5988), parseValueInternal(TestingUtility.createLocaleSpecificNumberString(locale, false, "59", "88", NumberStringPercentSuffix.BLANK_AND_SYMBOL)));
+      }
       assertComparableEquals(BigDecimal.valueOf(0.5988), parseValueInternal(TestingUtility.createLocaleSpecificNumberString(locale, false, "59", "88", NumberStringPercentSuffix.JUST_SYMBOL)));
       assertComparableEquals(BigDecimal.valueOf(0.5988), parseValueInternal(TestingUtility.createLocaleSpecificNumberString(locale, false, "59", "88", NumberStringPercentSuffix.NONE)));
     }

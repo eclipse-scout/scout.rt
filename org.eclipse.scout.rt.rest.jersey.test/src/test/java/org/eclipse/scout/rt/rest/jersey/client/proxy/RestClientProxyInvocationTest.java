@@ -98,13 +98,14 @@ public class RestClientProxyInvocationTest {
         .withLocale(locale)
         .withCorrelationId(correlationId)
         .run(() -> {
-          Response response = webTargetGet(Response.Status.OK, Content.DEFAULT, Execution.SYNC);
-          assertNotNull(response);
-          RestClientTestEchoResponse entity = response.readEntity(RestClientTestEchoResponse.class);
-          assertEquals(Integer.valueOf(Response.Status.OK.getStatusCode()), entity.getEcho().getCode());
+          try (Response response = webTargetGet(Response.Status.OK, Content.DEFAULT, Execution.SYNC)) {
+            assertNotNull(response);
+            RestClientTestEchoResponse entity = response.readEntity(RestClientTestEchoResponse.class);
+            assertEquals(Integer.valueOf(Response.Status.OK.getStatusCode()), entity.getEcho().getCode());
 
-          assertEquals(correlationId, response.getHeaderString(CorrelationId.HTTP_HEADER_NAME));
-          assertEquals(locale.toLanguageTag(), response.getHeaderString(HttpHeaders.ACCEPT_LANGUAGE));
+            assertEquals(correlationId, response.getHeaderString(CorrelationId.HTTP_HEADER_NAME));
+            assertEquals(locale.toLanguageTag(), response.getHeaderString(HttpHeaders.ACCEPT_LANGUAGE));
+          }
         });
   }
 
@@ -141,13 +142,14 @@ public class RestClientProxyInvocationTest {
         .withLocale(locale)
         .withCorrelationId(correlationId)
         .run(() -> {
-          Response response = webTargetGet(Response.Status.OK, Content.DEFAULT, Execution.ASYNC);
-          assertNotNull(response);
-          RestClientTestEchoResponse entity = response.readEntity(RestClientTestEchoResponse.class);
-          assertEquals(Integer.valueOf(Response.Status.OK.getStatusCode()), entity.getEcho().getCode());
+          try (Response response = webTargetGet(Response.Status.OK, Content.DEFAULT, Execution.ASYNC)) {
+            assertNotNull(response);
+            RestClientTestEchoResponse entity = response.readEntity(RestClientTestEchoResponse.class);
+            assertEquals(Integer.valueOf(Response.Status.OK.getStatusCode()), entity.getEcho().getCode());
 
-          assertNull(response.getHeaderString(CorrelationId.HTTP_HEADER_NAME));
-          assertEquals(defaultLocale.toLanguageTag(), response.getHeaderString(HttpHeaders.ACCEPT_LANGUAGE));
+            assertNull(response.getHeaderString(CorrelationId.HTTP_HEADER_NAME));
+            assertEquals(defaultLocale.toLanguageTag(), response.getHeaderString(HttpHeaders.ACCEPT_LANGUAGE));
+          }
         });
   }
 

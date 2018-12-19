@@ -76,7 +76,7 @@ public class BatchNormalizerTest {
     BatchLookupCall batchCall = new BatchLookupCall();
     for (int i = 0; i < 1000; i++) {
       FruitLookupCall call = new FruitLookupCall();
-      call.setKey(new Long((i / 100) + 1));
+      call.setKey(Long.valueOf((i / 100) + 1));
       batchCall.addLookupCall((LookupCall) call);
     }
     testInternal(batchCall, 10, 10, 0, 1000);

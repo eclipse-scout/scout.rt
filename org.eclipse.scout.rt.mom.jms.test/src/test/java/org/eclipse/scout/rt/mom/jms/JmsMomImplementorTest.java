@@ -330,8 +330,6 @@ public class JmsMomImplementorTest {
 
     IDestination<Person> queue = MOM.newDestination("test/mom/testPublishObject", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
     m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, BEANS.get(ObjectMarshaller.class)));
-
-    MOM.publish(JmsTestMom.class, queue, person);
     m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<Person>() {
 
       @Override
@@ -339,6 +337,7 @@ public class JmsMomImplementorTest {
         capturer.set(message.getTransferObject());
       }
     }));
+    MOM.publish(JmsTestMom.class, queue, person);
 
     // Verify
     Person testee = capturer.get();
@@ -352,8 +351,6 @@ public class JmsMomImplementorTest {
 
     IDestination<byte[]> queue = MOM.newDestination("test/mom/testPublishBytes", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
     m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, BEANS.get(BytesMarshaller.class)));
-
-    MOM.publish(JmsTestMom.class, queue, "hello world".getBytes(StandardCharsets.UTF_8));
     m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<byte[]>() {
 
       @Override
@@ -361,6 +358,7 @@ public class JmsMomImplementorTest {
         capturer.set(message.getTransferObject());
       }
     }));
+    MOM.publish(JmsTestMom.class, queue, "hello world".getBytes(StandardCharsets.UTF_8));
 
     // Verify
     byte[] testee = capturer.get();
@@ -373,8 +371,6 @@ public class JmsMomImplementorTest {
 
     IDestination<String> queue = MOM.newDestination("test/mom/testPublishText", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
     m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, BEANS.get(TextMarshaller.class)));
-
-    MOM.publish(JmsTestMom.class, queue, "hello world");
     m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<String>() {
 
       @Override
@@ -382,6 +378,7 @@ public class JmsMomImplementorTest {
         capturer.set(message.getTransferObject());
       }
     }));
+    MOM.publish(JmsTestMom.class, queue, "hello world");
 
     // Verify
     String testee = capturer.get();
@@ -418,9 +415,7 @@ public class JmsMomImplementorTest {
     IDestination<String> queue = MOM.newDestination("test/mom/testPublishText", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
     m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, BEANS.get(TextMarshaller.class)));
 
-    MOM.publish(JmsTestMom.class, queue, "hello world");
     final ISubscription subscription = MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<String>() {
-
       @Override
       public void onMessage(IMessage<String> message) {
         capturer.set(message.getTransferObject());
@@ -432,6 +427,7 @@ public class JmsMomImplementorTest {
         }
       }
     }, subscribeInput);
+    MOM.publish(JmsTestMom.class, queue, "hello world");
 
     assertEquals("hello world", capturer.get());
 
@@ -535,7 +531,6 @@ public class JmsMomImplementorTest {
     person.setFirstname("anna");
     person.setLastname("smith");
 
-    MOM.publish(JmsTestMom.class, queue, person);
     m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<Person>() {
 
       @Override
@@ -543,6 +538,7 @@ public class JmsMomImplementorTest {
         capturer.set(message.getTransferObject());
       }
     }));
+    MOM.publish(JmsTestMom.class, queue, person);
 
     // Verify
     Person testee = capturer.get();
@@ -1719,10 +1715,7 @@ public class JmsMomImplementorTest {
     if (marshaller != null) {
       disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, marshaller));
     }
-
-    MOM.publish(JmsTestMom.class, queue, transferObject);
     disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<Object>() {
-
       @Override
       public void onMessage(IMessage<Object> msg) {
         capturer.set(msg.getTransferObject());
@@ -1730,6 +1723,7 @@ public class JmsMomImplementorTest {
     }, MOM.newSubscribeInput()
         // use single threaded in order to block dispose until subscription is completely released
         .withAcknowledgementMode(SubscribeInput.ACKNOWLEDGE_AUTO_SINGLE_THREADED)));
+    MOM.publish(JmsTestMom.class, queue, transferObject);
 
     // Verify
     try {

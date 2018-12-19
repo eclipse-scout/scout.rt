@@ -146,7 +146,7 @@ public class InteractiveTestSuite extends Runner {
           runMethod.invoke(null, runner, notifier);
         }
         else {
-          runMethod.invoke(m_annotatedClass.newInstance(), runner, notifier);
+          runMethod.invoke(m_annotatedClass.getConstructor().newInstance(), runner, notifier);
         }
       }
       catch (Throwable ex) {

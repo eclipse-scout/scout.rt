@@ -331,7 +331,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     if (bodyGridClazz != null) {
       IGroupBoxBodyGrid bodyGrid;
       try {
-        bodyGrid = bodyGridClazz.newInstance();
+        bodyGrid = bodyGridClazz.getConstructor().newInstance();
         setBodyGrid(bodyGrid);
       }
       catch (Exception e) {

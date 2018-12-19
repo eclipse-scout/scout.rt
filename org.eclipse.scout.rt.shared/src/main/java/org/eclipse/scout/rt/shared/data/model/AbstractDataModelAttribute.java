@@ -773,7 +773,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
       call = BEANS.get(ICodeLookupCallFactoryService.class).newInstance((Class<? extends ICodeType<?, Object>>) codeTypeClass);
     }
     else if (lookupCall instanceof LookupCall<?>) {
-      call = ((LookupCall<Object>) lookupCall).clone();
+      call = ((LookupCall<Object>) lookupCall).copy();
     }
     else {
       return null;

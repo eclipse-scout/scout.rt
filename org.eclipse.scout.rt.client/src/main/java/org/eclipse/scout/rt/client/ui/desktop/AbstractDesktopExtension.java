@@ -103,7 +103,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
     }
     for (Class<? extends IOutline> element : contributedOutlines) {
       try {
-        IOutline o = element.newInstance();
+        IOutline o = element.getConstructor().newInstance();
         outlines.addOrdered(o);
       }
       catch (Exception t) {

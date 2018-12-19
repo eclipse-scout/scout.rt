@@ -241,7 +241,7 @@ public class NumberUtilityTest {
   public void testNvlInteger() {
     Integer value = null;
     assertEquals(100, NumberUtility.nvl(value, 100));
-    assertEquals(Integer.valueOf(100), ObjectUtility.nvl(value, new Integer(100)));
+    assertEquals(Integer.valueOf(100), ObjectUtility.nvl(value, Integer.valueOf(100)));
     value = 100;
     assertEquals(100, NumberUtility.nvl(value, 101));
   }
@@ -250,7 +250,7 @@ public class NumberUtilityTest {
   public void testNvlLong() {
     Long value = null;
     assertEquals(100l, NumberUtility.nvl(value, 100));
-    assertEquals(Long.valueOf(100l), ObjectUtility.nvl(value, new Long(100)));
+    assertEquals(Long.valueOf(100l), ObjectUtility.nvl(value, Long.valueOf(100)));
     value = 100l;
     assertEquals(100l, NumberUtility.nvl(value, 101));
   }
@@ -259,7 +259,7 @@ public class NumberUtilityTest {
   public void testNvlFloat() {
     Float value = null;
     assertEquals(100.0f, NumberUtility.nvl(value, 100.0f), 0);
-    assertEquals(Float.valueOf(100.0f), ObjectUtility.nvl(value, new Float(100.0)));
+    assertEquals(Float.valueOf(100.0f), ObjectUtility.nvl(value, Float.valueOf(100.0f)));
     value = 100.0f;
     assertEquals(100.0f, NumberUtility.nvl(value, 101.0f), 0);
   }
@@ -268,7 +268,7 @@ public class NumberUtilityTest {
   public void testNvlDouble() {
     Double value = null;
     assertEquals(100.0, NumberUtility.nvl(value, 100.0), 0);
-    assertEquals(Double.valueOf(100.0), ObjectUtility.nvl(value, new Double(100.0)));
+    assertEquals(Double.valueOf(100.0), ObjectUtility.nvl(value, Double.valueOf(100.0)));
     value = 100.0;
     assertEquals(100.0, NumberUtility.nvl(value, 101.0), 0);
   }

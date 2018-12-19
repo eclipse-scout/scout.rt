@@ -21,6 +21,7 @@ public class PlatformStarter extends Thread {
   private final IPlatform m_platform;
 
   public PlatformStarter(IPlatform platform) {
+    super("scout-platform-starter");
     m_platform = platform;
   }
 

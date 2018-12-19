@@ -18,7 +18,6 @@ import java.io.IOException;
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.eclipse.scout.rt.platform.util.PathValidator;
@@ -45,8 +44,7 @@ public class PathValidationFilter implements IRestContainerRequestFilter {
     if (!PathValidator.isValid(path)) {
       LOG.info("Request with invalid path detected: '{}'. Parent paths are not allowed by default. To change this behavior replace {}.", path, PathValidator.class);
 
-      Response badRequestResponse = status(BAD_REQUEST).build();
-      requestContext.abortWith(badRequestResponse);
+      requestContext.abortWith(status(BAD_REQUEST).build());
     }
   }
 }

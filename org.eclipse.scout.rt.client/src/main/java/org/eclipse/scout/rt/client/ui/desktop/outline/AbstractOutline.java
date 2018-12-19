@@ -810,7 +810,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       return null;
     }
     try {
-      return getConfiguredDefaultDetailForm().newInstance();
+      return getConfiguredDefaultDetailForm().getConstructor().newInstance();
     }
     catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + getConfiguredDefaultDetailForm().getName() + "'.", e));

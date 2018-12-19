@@ -89,6 +89,12 @@
       <groupId>org.apache.activemq</groupId>
       <artifactId>artemis-jms-server</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 </project>

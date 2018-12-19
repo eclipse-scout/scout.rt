@@ -75,7 +75,7 @@ public abstract class AbstractFormTableControl extends AbstractTableControl impl
       return null;
     }
     try {
-      return getConfiguredForm().newInstance();
+      return getConfiguredForm().getConstructor().newInstance();
     }
     catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + getConfiguredForm().getName() + "'.", e));

@@ -782,7 +782,7 @@ public class SqlParser {
           }
           IToken t;
           try {
-            t = tokenType.newInstance();
+            t = tokenType.getConstructor().newInstance();
           }
           catch (Exception e) {
             throw new ProcessingException("Could not create new instance of {}", tokenType, e);

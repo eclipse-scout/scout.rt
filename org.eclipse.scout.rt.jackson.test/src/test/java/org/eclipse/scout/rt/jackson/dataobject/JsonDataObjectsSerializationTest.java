@@ -1637,7 +1637,7 @@ public class JsonDataObjectsSerializationTest {
     assertEquals("foo", marshalled.getGenericListAttribute().get(0).genericAttribute().get());
     assertEquals(1234567890.1234567890, marshalled.getGenericListAttribute().get(1).genericAttribute().get());
     assertEquals("bar", marshalled.getGenericStringAttribute().genericAttribute().get());
-    assertEquals(new Double("789.123"), marshalled.getGenericDoubleAttribute().genericAttribute().get());
+    assertEquals(Double.valueOf("789.123"), marshalled.getGenericDoubleAttribute().genericAttribute().get());
     s_testHelper.assertDoEntityEquals(genericDo, marshalled);
   }
 
@@ -1819,7 +1819,7 @@ public class JsonDataObjectsSerializationTest {
   public void testSerializeDeserialize_CustomImplementedEntity() throws Exception {
     TestCustomImplementedEntityDo entity = BEANS.get(TestCustomImplementedEntityDo.class);
     entity.put("stringAttribute", "foo");
-    entity.put("doubleAttribute", new Double(1234567.89));
+    entity.put("doubleAttribute", Double.valueOf(1234567.89));
     entity.put("itemAttribute", createTestItemDo("id-1", "foo-item-1"));
     entity.dateAttribute().set(DATE_TRUNCATED);
 

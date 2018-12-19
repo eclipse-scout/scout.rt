@@ -198,7 +198,7 @@ public final class ConfigurationUtility {
         return c.newInstance(new Object[]{instance});
       }
       else {
-        return innerClass.newInstance();
+        return innerClass.getConstructor().newInstance();
       }
     }
     catch (ReflectiveOperationException e) {

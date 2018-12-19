@@ -15,7 +15,6 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.security.acl.AclNotFoundException;
 import java.util.Arrays;
 
 import org.eclipse.scout.rt.platform.exception.fixture.CustomProcessingException;
@@ -36,13 +35,6 @@ public class PlaceholderExceptionTest {
   @Test
   public void testNull() {
     assertNull(PlaceholderException.transformException(null));
-  }
-
-  @Test
-  public void testDefaultConstructorPkgJava() {
-    AclNotFoundException e = new AclNotFoundException();
-    Throwable t = PlaceholderException.transformException(e);
-    assertEqualExceptionAndCause(e, t);
   }
 
   @Test

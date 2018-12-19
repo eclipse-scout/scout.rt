@@ -194,8 +194,15 @@ public final class TestingUtility {
     if (fractionPart != null) {
       sb.append(symbols.getDecimalSeparator()).append(fractionPart);
     }
-    sb.append(percentSuffix.getSuffix(symbols));
-    return sb.toString();
+    String suffix = percentSuffix.getSuffix(symbols);
+
+    // special case for some magic Arabic locales in which the percent sign is an invisible character that cannot be displayed
+    byte[] suffixBytes = suffix.getBytes(java.nio.charset.StandardCharsets.UTF_16BE);
+    if (suffixBytes.length == 2 && suffixBytes[0] == 32 && suffixBytes[1] == 14) {
+      return sb.append('%').toString();
+    }
+
+    return sb.append(suffix).toString();
   }
 
   /**

@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
@@ -26,8 +27,6 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.TriState;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * There are 2 variants to use lookup values <br>
@@ -60,7 +59,6 @@ import org.slf4j.LoggerFactory;
 public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, ITypeWithClassId {
 
   private static final long serialVersionUID = 0L;
-  private static final Logger LOG = LoggerFactory.getLogger(LookupCall.class);
 
   private KEY_TYPE m_key;
   private String m_text;
@@ -245,16 +243,14 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, ITypeWithCla
   }
 
   @Override
-  @SuppressWarnings({"unchecked", "squid:S2975"})
-  public LookupCall<KEY_TYPE> clone() {
-    LookupCall<KEY_TYPE> c = null;
+  @SuppressWarnings("unchecked")
+  public LookupCall<KEY_TYPE> copy() {
     try {
-      c = (LookupCall) super.clone();
+      return (LookupCall) super.clone();
     }
     catch (CloneNotSupportedException e) {
-      LOG.warn("Could not clone lookup call instance", e);
+      throw new PlatformException("Could not clone lookup call instance", e);
     }
-    return c;
   }
 
   @Override

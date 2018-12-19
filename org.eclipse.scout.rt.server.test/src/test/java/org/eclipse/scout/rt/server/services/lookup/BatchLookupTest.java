@@ -126,7 +126,7 @@ public class BatchLookupTest {
     m_localInvocations = 0;
     BatchLookupCall batchCall = new BatchLookupCall();
     for (int i = 0; i < 1000; i++) {
-      IFlowerLookupCall call = callClazz.newInstance();
+      IFlowerLookupCall call = callClazz.getConstructor().newInstance();
       call.setKey((i / 100) + 1L);
       call.setLatinId((i / 10) + 1L);
       batchCall.addLookupCall((LookupCall) call);

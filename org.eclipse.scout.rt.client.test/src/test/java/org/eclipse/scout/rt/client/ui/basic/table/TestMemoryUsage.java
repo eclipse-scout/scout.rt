@@ -22,7 +22,7 @@ public final class TestMemoryUsage {
         Cell v = new Cell();
         String s = "Hello World " + r + "," + c;
         v.setText(s);
-        v.setValue(new Long(r * cols + c));
+        v.setValue(Long.valueOf(r * cols + c));
         mv[r * cols + c] = v;
       }
     }

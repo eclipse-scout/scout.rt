@@ -241,9 +241,9 @@ public class DefaultTimezoneDateTimeAdapterTest {
 
       assertDateTime(dateTimeAdapter.unmarshal("2011-11-07T00:00:00.000"),
           2011, 11, 7, 0, 0, 0, TimeZone.getTimeZone("GMT+5:00"));
-      assertDateTime(dateAdapter.unmarshal("2011-11-07T00:00:000"),
+      assertDateTime(dateAdapter.unmarshal("2011-11-07T00:00:00"),
           2011, 11, 7, 0, 0, 0, TimeZone.getTimeZone("GMT+5:00"));
-      assertDateTime(timeAdapter.unmarshal("2011-11-07T00:00:00.000"),
+      assertDateTime(timeAdapter.unmarshal("2011-11-07T00:00:00.00"),
           1970, 1, 1, 0, 0, 0, TimeZone.getTimeZone("GMT+5:00"));
     }
     finally {
@@ -261,11 +261,11 @@ public class DefaultTimezoneDateTimeAdapterTest {
       assertDateTime(timeAdapter.unmarshal("2011-11-07"),
           1970, 1, 1, 0, 0, 0, TimeZone.getTimeZone("GMT-5:00"));
 
-      assertDateTime(dateTimeAdapter.unmarshal("2011-11-07T00:00:00.000"),
+      assertDateTime(dateTimeAdapter.unmarshal("2011-11-07T00:00:00.00"),
           2011, 11, 7, 0, 0, 0, TimeZone.getTimeZone("GMT-5:00"));
-      assertDateTime(dateAdapter.unmarshal("2011-11-07T00:00:000"),
+      assertDateTime(dateAdapter.unmarshal("2011-11-07T00:00:00"),
           2011, 11, 7, 0, 0, 0, TimeZone.getTimeZone("GMT-5:00"));
-      assertDateTime(timeAdapter.unmarshal("2011-11-07T00:00:00.000"),
+      assertDateTime(timeAdapter.unmarshal("2011-11-07T00:00:00.00"),
           1970, 1, 1, 0, 0, 0, TimeZone.getTimeZone("GMT-5:00"));
     }
     finally {

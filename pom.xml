@@ -21,7 +21,7 @@
   <name>Eclipse Scout RT ROOT Module</name>
 
   <prerequisites>
-    <maven>3.2.2</maven>
+    <maven>3.5.3</maven>
   </prerequisites>
 
   <modules>

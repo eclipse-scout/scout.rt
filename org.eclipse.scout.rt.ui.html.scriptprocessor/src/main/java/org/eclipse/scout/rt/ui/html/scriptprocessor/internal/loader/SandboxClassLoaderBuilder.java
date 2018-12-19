@@ -31,9 +31,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
-
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.HexUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -170,7 +169,7 @@ public final class SandboxClassLoaderBuilder {
     while ((n = inputStream.read(buf)) > 0) {
       sha1Digest.update(buf, 0, n);
     }
-    return new HexBinaryAdapter().marshal(sha1Digest.digest());
+    return HexUtility.encode(sha1Digest.digest());
   }
 
   /**

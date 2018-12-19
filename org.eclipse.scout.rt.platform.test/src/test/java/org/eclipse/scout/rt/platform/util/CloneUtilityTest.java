@@ -70,7 +70,7 @@ public class CloneUtilityTest {
   public static void beforeClass() throws Exception {
     s_customClassLoader = new CloneUtilityTestClassLoader();
     s_customClass = s_customClassLoader.defineClass(CUSTOM_TYPE_CLASS_NAME, toByteArray(CUSTOM_TYPE_CLASS_CONTENTS));
-    s_customObject = s_customClass.newInstance();
+    s_customObject = s_customClass.getConstructor().newInstance();
   }
 
   @Test(expected = ClassNotFoundException.class)
