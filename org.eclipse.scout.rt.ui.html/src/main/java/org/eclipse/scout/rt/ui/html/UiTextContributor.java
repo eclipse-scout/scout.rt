@@ -100,7 +100,7 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.NumRowLoadedMin",
         "ui.NumRowsLoadedMin",
         "ui.ReloadData",
-        "ui.ReloadAllData",
+        "ui.ReloadNData",
         "ui.Reload",
         "ui.showEveryDate",
         "ui.groupedByWeekday",

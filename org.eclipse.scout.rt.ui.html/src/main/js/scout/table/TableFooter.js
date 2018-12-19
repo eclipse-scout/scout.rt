@@ -239,7 +239,7 @@ scout.TableFooter.prototype._renderInfoLoad = function() {
     if (this.table.hasReloadHandler) {
       $info.appendBr();
       if (estRows && maxRows && numRows<estRows && numRows<maxRows) {
-        $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadAllData')).appendTo($info);
+        $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadNData',this.computeCountInfo(maxRows))).appendTo($info);
       } else {
         $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadData')).appendTo($info);
       }
