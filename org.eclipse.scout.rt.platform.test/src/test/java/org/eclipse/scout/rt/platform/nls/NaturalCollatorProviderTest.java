@@ -62,4 +62,25 @@ public class NaturalCollatorProviderTest {
 
     assertEquals(expectedResult, actualResult);
   }
+
+  /**
+   * Tests the example from the release notes.
+   */
+  @Test
+  public void testDogs() {
+    List<String> input = Arrays.asList(
+        "The dogs bark",
+        "The dog barks",
+        "The dog sleeps");
+
+    List<String> expectedResult = Arrays.asList(
+        "The dog barks",
+        "The dog sleeps",
+        "The dogs bark");
+
+    List<String> actualResult = new ArrayList<>(input);
+    Collections.sort(actualResult, m_collatorProvider.getInstance(new Locale("en")));
+
+    assertEquals(expectedResult, actualResult);
+  }
 }

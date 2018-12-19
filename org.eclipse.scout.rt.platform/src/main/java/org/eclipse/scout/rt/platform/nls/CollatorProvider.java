@@ -14,6 +14,7 @@ import java.text.Collator;
 import java.util.Locale;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 
 /**
  * A provider for {@link Collator}s to simplify replacements.
@@ -38,6 +39,6 @@ public class CollatorProvider {
    * @return a collator for the given locale
    */
   public Collator getInstance(Locale locale) {
-    return Collator.getInstance(locale);
+    return BEANS.get(NaturalCollatorProvider.class).getInstance(locale);
   }
 }

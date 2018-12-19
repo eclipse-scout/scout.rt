@@ -21,21 +21,21 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  * PQR" is treated as "ABCPQR".
  * <p>
  * <b>Please note:</b> This bean is <i>not</i> activated automatically when comparing Strings using scout (e.g. via
- * {@link StringUtility}). It uses the {@link CollatorProvider} that simply delegates to the JVM. To activate this
- * collator provider, replace the default collator provider in your project and delegate the
- * {@link #getInstance(Locale)} method to this bean.
+ * {@link StringUtility}). It uses the {@link CollatorProvider} that defines whether this bean is used or not. From
+ * Scout 9.0.x onwards, this bean is used by default. Prior versions used the JVM default.
  *
  * <pre>
  * &#64;Replace
  * public class MyCollactorProvider extends CollatorProvider {
  *
  *   &#64;Override
- *   public Collator getInstance(Locale desiredLocale) {
- *     return BEANS.get(NaturalCollatorProvider.class).getInstance(desiredLocale);
+ *   public Collator getInstance(Locale locale) {
+ *     return BEANS.get(NaturalCollatorProvider.class).getInstance(locale);
  *   }
  * }
  * </pre>
  *
+ * @see CollatorProvider
  * @see <a href=
  *      "https://bugs.eclipse.org/bugs/show_bug.cgi?id=390097">https://bugs.eclipse.org/bugs/show_bug.cgi?id=390097</a>
  */
@@ -44,11 +44,11 @@ public class NaturalCollatorProvider {
 
   private final ConcurrentMap<Locale, Collator> m_cache = new ConcurrentHashMap<>();
 
-  public Collator getInstance(Locale desiredLocale) {
-    Collator result = m_cache.get(desiredLocale);
+  public Collator getInstance(Locale locale) {
+    Collator result = m_cache.get(locale);
     if (result == null) {
-      result = create(desiredLocale);
-      Collator tmp = m_cache.putIfAbsent(desiredLocale, result);
+      result = create(locale);
+      Collator tmp = m_cache.putIfAbsent(locale, result);
       if (tmp != null) {
         // always used same shared instance
         result = tmp;
@@ -62,11 +62,11 @@ public class NaturalCollatorProvider {
    * Create a patched collator for a given locale, if the collator is a {@link RuleBasedCollator}. Otherwise the default
    * collator.
    *
-   * @param desiredLocale
+   * @param locale
    * @return {@link Collator} not <code>null</code>
    */
-  protected Collator create(Locale desiredLocale) {
-    Collator c = Collator.getInstance(desiredLocale);
+  protected Collator create(Locale locale) {
+    Collator c = Collator.getInstance(locale);
     if (c instanceof RuleBasedCollator) {
       try {
         String origRules = ((RuleBasedCollator) c).getRules();
