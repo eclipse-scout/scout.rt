@@ -1820,6 +1820,47 @@ describe("Table", function() {
     });
   });
 
+  describe("setMenus", function() {
+
+    it("updates the menubar with the relevant menus", function() {
+      var table = helper.createTable(helper.createModelFixture(2, 2));
+      var menus = [scout.create('Menu', {
+          parent: table,
+          menuTypes: ['Table.EmptySpace']
+        }),
+        scout.create('Menu', {
+          parent: table,
+          menuTypes: ['Table.EmptySpace']
+        })
+      ];
+      expect(menus[0].parent).toBe(table);
+
+      table.setMenus(menus);
+      expect(menus[0]).toBe(table.menuBar.menuItems[0]);
+      expect(menus[1]).toBe(table.menuBar.menuItems[1]);
+      expect(menus[0].parent).toBe(table.menuBar.menuboxLeft);
+      expect(menus[1].parent).toBe(table.menuBar.menuboxLeft);
+
+      // Set the same menus again, expect the menus to still have the menu bar as parent.
+      // Because the menus are actually managed by the table, setting new menus will change the parent.
+      // But the parent should actually point to the menu box because the menus are used in that context.
+      // The concrete use case: Find a clone for a certain menu. Finding the clone is done by finding the menu bar and visiting its children
+      table.setMenus(menus);
+      expect(menus[0].parent).toBe(table.menuBar.menuboxLeft);
+      expect(menus[1].parent).toBe(table.menuBar.menuboxLeft);
+
+      // Create a new menu which is not part of the menu bar -> the menu items of the menu bar are still the same
+      menus = menus.concat([scout.create('Menu', {
+        parent: table,
+        menuTypes: ['Table.Header']
+      })]);
+      table.setMenus(menus);
+      expect(menus[0].parent).toBe(table.menuBar.menuboxLeft);
+      expect(menus[1].parent).toBe(table.menuBar.menuboxLeft);
+      expect(menus[2].parent).toBe(table);
+    });
+  });
+
   describe("row mouse down / move / up", function() {
 
     it("selects multiple rows", function() {

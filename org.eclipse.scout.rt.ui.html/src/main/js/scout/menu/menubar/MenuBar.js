@@ -153,9 +153,13 @@ scout.MenuBar.prototype._detachMenuHandlers = function() {
 
 scout.MenuBar.prototype.setMenuItems = function(menuItems) {
   menuItems = scout.arrays.ensure(menuItems);
-  if (!scout.arrays.equals(this.menuItems, menuItems)) {
-    this.setProperty('menuItems', menuItems);
+  if (scout.arrays.equals(this.menuItems, menuItems)) {
+    // Ensure existing menus are correctly linked even if the given menuItems are the same (see TableSpec for reasons)
+    this.menuboxRight.link(this.menuboxRight.menuItems);
+    this.menuboxLeft.link(this.menuboxLeft.menuItems);
+    return;
   }
+  this.setProperty('menuItems', menuItems);
 };
 
 scout.MenuBar.prototype._setMenuItems = function(menuItems, rightFirst) {
