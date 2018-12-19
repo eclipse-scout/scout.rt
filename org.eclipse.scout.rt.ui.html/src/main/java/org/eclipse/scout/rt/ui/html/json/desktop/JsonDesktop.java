@@ -514,7 +514,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
 
   protected void handleModelFormShow(IForm form) {
     if (!form.isShowing()) {
-      // If a form has already been closed again (e.g. by another form listener), make sure it won't be displayed
+      // If a form has already been closed again (e.g. by another desktop listener), make sure it won't be displayed
       return;
     }
     IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(form);

@@ -55,6 +55,7 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
@@ -99,7 +100,9 @@ public class JsonDesktopTest {
     DesktopWithOneOutline desktop = new DesktopWithOneOutline();
     desktop.init();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
-    FormWithOneField form = new FormWithOneField();
+    FormWithOneField form = Mockito.spy(new FormWithOneField());
+    Mockito.when(form.getDesktop()).thenReturn(desktop);
+
     form.setDisplayParent(desktop);
     form.setShowOnStart(false);
 
@@ -153,11 +156,17 @@ public class JsonDesktopTest {
   }
 
   @Test
+  public void testFormOpenedAndClosedInListener() throws JSONException {
+    JsonAdapterRegistryTest.testFormOpenedAndClosedInListener(m_uiSession);
+  }
+
+  @Test
   public void testFormClosedBeforeRemovedInDifferentRequests() throws Exception {
     DesktopWithOneOutline desktop = new DesktopWithOneOutline();
     desktop.init();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
-    FormWithOneField form = new FormWithOneField();
+    FormWithOneField form = Mockito.spy(new FormWithOneField());
+    Mockito.when(form.getDesktop()).thenReturn(desktop);
     form.setDisplayParent(desktop);
     form.setShowOnStart(false);
 
@@ -183,12 +192,13 @@ public class JsonDesktopTest {
     assertEquals(0, responseEvents.size());
     responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "disposeAdapter");
     assertEquals(1, responseEvents.size());
+    responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formHide");
+    assertEquals(1, responseEvents.size());
 
+    // Hide form has no effect because form is not showing -> still one event
     desktop.hideForm(form);
     responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formHide");
-    // 0 instead of 1, because formClosed includes "formHide" implicitly. The event itself cannot be sent, because
-    // the form adapter is already disposed when the form is closed.
-    assertEquals(0, responseEvents.size());
+    assertEquals(1, responseEvents.size());
   }
 
   @Test
@@ -196,7 +206,8 @@ public class JsonDesktopTest {
     DesktopWithOneOutline desktop = new DesktopWithOneOutline();
     desktop.init();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
-    FormWithOneField form = new FormWithOneField();
+    FormWithOneField form = Mockito.spy(new FormWithOneField());
+    Mockito.when(form.getDesktop()).thenReturn(desktop);
     form.setDisplayParent(desktop);
     form.setShowOnStart(false);
 

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fixtures;
 
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
@@ -29,6 +30,11 @@ public class FormWithOneField extends AbstractForm {
 
   public StringField getStringField() {
     return getFieldByClass(StringField.class);
+  }
+
+  @Override
+  public IDesktop getDesktop() {
+    return super.getDesktop();
   }
 
   @Order(10)

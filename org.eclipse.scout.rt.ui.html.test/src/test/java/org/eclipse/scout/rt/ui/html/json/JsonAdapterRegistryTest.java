@@ -15,6 +15,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
+import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
@@ -75,6 +77,25 @@ public class JsonAdapterRegistryTest {
     assertEquals(uiSession.getUiSessionId(), uiSession.currentJsonResponse().eventList().get(0).getTarget());
     assertEquals("disposeAdapter", uiSession.currentJsonResponse().eventList().get(0).getType());
     assertEquals(0, uiSession.currentJsonResponse().adapterMap().size());
+  }
+
+  public static void testFormOpenedAndClosedInListener(UiSession uiSession) throws JSONException {
+    IDesktop desktop = uiSession.getClientSession().getDesktop();
+    JsonDesktop<IDesktop> jsonDesktop = UiSessionTestUtility.newJsonAdapter(uiSession, desktop, null);
+    FormWithOneField form = new FormWithOneField();
+
+    DesktopListener listener = event -> {
+      form.doClose();
+    };
+    desktop.addDesktopListener(listener, DesktopEvent.TYPE_FORM_SHOW);
+
+    form.start();
+    JsonForm formAdapter = (JsonForm) jsonDesktop.getAdapter(form);
+    assertNull(formAdapter);
+    assertEquals(0, uiSession.currentJsonResponse().eventList().size());
+    assertEquals(0, uiSession.currentJsonResponse().adapterMap().size());
+
+    desktop.removeDesktopListener(listener, DesktopEvent.TYPE_FORM_SHOW);
   }
 
 }
