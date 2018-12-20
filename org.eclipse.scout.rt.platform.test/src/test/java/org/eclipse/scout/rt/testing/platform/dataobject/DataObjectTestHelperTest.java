@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.platform.dataobject;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -103,5 +106,20 @@ public class DataObjectTestHelperTest {
   public void testAssertDoEntityEquals_classesMustBeEquals() {
     DoEntity entity = createEntityFixtureRaw();
     s_dataObjectTestHelper.assertDoEntityEquals(entity, m_expectedEntityFixture, true);
+  }
+
+  @Test
+  public void testEqualsObject() {
+    DoEntity entity = createEntityFixtureRaw();
+    DoEntity equalEntity = createEntityFixtureRaw();
+    DoEntity differentEntity = new DoEntity();
+    differentEntity.put("foo", "bar");
+    differentEntity.put("baz", 43);
+
+    assertTrue(s_dataObjectTestHelper.equalsObject(null, null, false));
+    assertFalse(s_dataObjectTestHelper.equalsObject(entity, null, false));
+    assertFalse(s_dataObjectTestHelper.equalsObject(null, entity, false));
+    assertTrue(s_dataObjectTestHelper.equalsObject(entity, equalEntity, false));
+    assertFalse(s_dataObjectTestHelper.equalsObject(entity, differentEntity, false));
   }
 }
