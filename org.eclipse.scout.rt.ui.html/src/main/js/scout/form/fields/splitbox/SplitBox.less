@@ -8,8 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.split-box {
 
+@split-box-x-splitter-size: @split-box-splitter-line-size + (2 * @split-box-x-splitter-padding) - @mandatory-indicator-width;
+@split-box-y-splitter-size: @split-box-splitter-line-size + (2 * @split-box-y-splitter-padding);
+
+.split-box {
   & > .split-area {
     @temp-splitter-line-size: 1px;
 
@@ -35,7 +38,7 @@
       /* | */
       &.x-axis {
         height: 100%;
-        width: @split-box-splitter-line-size + (2 * @split-box-x-splitter-padding) - @mandatory-indicator-width;
+        width: @split-box-x-splitter-size;
         padding-left: @split-box-x-splitter-padding;
         padding-right: (@split-box-x-splitter-padding - @mandatory-indicator-width);
         cursor: col-resize;
@@ -45,7 +48,7 @@
       &.y-axis {
         margin-left: @mandatory-indicator-width;
         width: calc(~'100%' - @mandatory-indicator-width);
-        height: @split-box-splitter-line-size + (2 * @split-box-y-splitter-padding);
+        height: @split-box-y-splitter-size;
         padding-top: @split-box-y-splitter-padding;
         padding-bottom: @split-box-y-splitter-padding;
         cursor: row-resize;
@@ -104,5 +107,16 @@
   &.right {
     margin-top: 6px;
     margin-left: -4px;
+  }
+}
+
+.split-box:not(.second-field-collapsed) > .split-area > .first-field {
+  /* | */
+  &.x-axis {
+    margin-right: @split-box-x-splitter-size;
+  }
+  /* -- */
+  &.y-axis {
+    margin-bottom: @split-box-y-splitter-size;
   }
 }

@@ -64,15 +64,15 @@ scout.SplitBox.prototype._render = function() {
     this.firstField.on('propertyChange', onInnerFieldPropertyChange.bind(this));
 
     if (this.secondField) {
-      this._$splitter = this._$splitArea.appendDiv('splitter')
-        .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis')
-        .on('mousedown', resizeSplitter.bind(this));
-
       this.secondField.render(this._$splitArea);
       this.secondField.$container
         .addClass('second-field')
         .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis');
       this.secondField.on('propertyChange', onInnerFieldPropertyChange.bind(this));
+
+      this._$splitter = this._$splitArea.appendDiv('splitter')
+        .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis')
+        .on('mousedown', resizeSplitter.bind(this));
     } else {
       // no second field -> no splitter (but special marker class)
       this.$container.addClass('single-field');

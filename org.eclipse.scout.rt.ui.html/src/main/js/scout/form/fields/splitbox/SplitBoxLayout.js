@@ -27,7 +27,6 @@ scout.SplitBoxLayout.prototype.layout = function($container) {
   $splitter.removeClass('hidden');
 
   var firstFieldSize, secondFieldSize, firstFieldBounds, secondFieldBounds,
-    splitterSize = scout.graphics.size($splitter, true),
     availableSize = htmlContainer.availableSize().subtract(htmlContainer.insets()),
     hasFirstField = (htmlFirstField && htmlFirstField.isVisible()),
     hasSecondField = (htmlSecondField && htmlSecondField.isVisible()),
@@ -40,9 +39,9 @@ scout.SplitBoxLayout.prototype.layout = function($container) {
   var availableSizeForFields = new scout.Dimension(availableSize);
   if (hasTwoFields) {
     if (splitXAxis) { // "|"
-      availableSizeForFields.width -= splitterSize.width;
+      availableSizeForFields.width -= htmlFirstField.margins().right;
     } else { // "--"
-      availableSizeForFields.height -= splitterSize.height;
+      availableSizeForFields.height -= htmlFirstField.margins().bottom;
     }
   }
 
@@ -92,18 +91,16 @@ scout.SplitBoxLayout.prototype.layout = function($container) {
         }
       }
     }
-    firstFieldSize = firstFieldSize.subtract(htmlFirstField.margins());
-    secondFieldSize = secondFieldSize.subtract(htmlSecondField.margins());
 
     // Calculate and set bounds (splitter and second field have to be moved)
     firstFieldBounds = new scout.Rectangle(0, 0, firstFieldSize.width, firstFieldSize.height);
     secondFieldBounds = new scout.Rectangle(0, 0, secondFieldSize.width, secondFieldSize.height);
     if (splitXAxis) { // "|"
       $splitter.cssLeft(firstFieldBounds.width);
-      secondFieldBounds.x = firstFieldBounds.width + splitterSize.width;
+      secondFieldBounds.x = firstFieldBounds.width + htmlFirstField.margins().right;
     } else { // "--"
       $splitter.cssTop(firstFieldBounds.height);
-      secondFieldBounds.y = firstFieldBounds.height + splitterSize.height;
+      secondFieldBounds.y = firstFieldBounds.height + htmlFirstField.margins().bottom;
     }
     htmlFirstField.setBounds(firstFieldBounds);
     htmlSecondField.setBounds(secondFieldBounds);
