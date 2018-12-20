@@ -8,12 +8,12 @@
 
   <servlet>
     <servlet-name>servlet</servlet-name>
-    <servlet-class>org.eclipse.scout.rt.server.commons.http.HttpRetryTest$Servlet</servlet-class>
+    <servlet-class>org.eclipse.scout.rt.server.commons.http.TestingHttpServer$FixtureServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
     <servlet-name>servlet</servlet-name>
-    <url-pattern>/retry</url-pattern>
+    <url-pattern>/servlet</url-pattern>
   </servlet-mapping>
 
   <session-config>

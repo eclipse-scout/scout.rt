@@ -35,7 +35,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
-import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
+import org.eclipse.scout.rt.server.commons.http.TestingHttpServer.IServletRequestHandler;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,14 +60,20 @@ public class HttpRetryTest {
 
   private TestingHttpClient m_client;
   private TestingHttpServer m_server;
+  private final List<String> servletGetLog = Collections.synchronizedList(new ArrayList<>());
+  private final List<String> servletPostLog = Collections.synchronizedList(new ArrayList<>());
+  private IServletRequestHandler servletFailOnce;
+  private Exception servletPostError;
 
   @Before
   public void before() {
-    Servlet.doGetLog.clear();
-    Servlet.doPostLog.clear();
-    Servlet.doPostError = null;
+    servletGetLog.clear();
+    servletPostLog.clear();
+    servletPostError = null;
     m_client = new TestingHttpClient();
-    m_server = new TestingHttpServer(TestingHttpPorts.PORT_33000, "/", getClass().getResource("/webapps/" + getClass().getSimpleName()));
+    m_server = new TestingHttpServer(TestingHttpPorts.PORT_33000)
+        .withServletGetHandler(this::fixtureServletGet)
+        .withServletPostHandler(this::fixtureServletPost);
     m_server.start();
   }
 
@@ -77,6 +83,40 @@ public class HttpRetryTest {
     m_server.stop();
   }
 
+  private void fixtureServletGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    servletGetLog.add(req.getHeader(CORRELATION_ID));
+    resp.setContentType("text/plain;charset=UTF-8");
+    resp.getOutputStream().println("Hello " + req.getParameter("foo"));
+  }
+
+  private void fixtureServletPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    servletPostLog.add(req.getHeader(CORRELATION_ID));
+    String arg = null;
+    try {
+      assertEquals("text/plain;charset=UTF-8", req.getContentType());
+      assertEquals("UTF-8", req.getCharacterEncoding());
+      assertEquals(3, req.getContentLength());
+      arg = IOUtility.readString(req.getInputStream(), req.getCharacterEncoding(), req.getContentLength());
+    }
+    catch (Exception e) {
+      servletPostError = e;
+      throw e;
+    }
+
+    if (servletFailOnce != null) {
+      try {
+        servletFailOnce.handle(req, resp);
+        return;
+      }
+      finally {
+        servletFailOnce = null;
+      }
+    }
+
+    resp.setContentType("text/plain;charset=UTF-8");
+    resp.getOutputStream().println("Post " + arg);
+  }
+
   /**
    * Expect retry on apache level
    */
@@ -84,7 +124,7 @@ public class HttpRetryTest {
   public void testGetRetry() throws IOException {
     //emulate a socket close before data is received
     AtomicInteger count = new AtomicInteger(1);
-    m_server.setChannelInterceptor((channel, superCall) -> {
+    m_server.withChannelInterceptor((channel, superCall) -> {
       if (count.getAndIncrement() < 2) {
         channel.getHttpTransport().abort(new SocketException("TEST:cannot write"));
         return;
@@ -93,7 +133,7 @@ public class HttpRetryTest {
     });
 
     HttpRequestFactory reqFactory = m_client.getHttpRequestFactory();
-    HttpRequest req = reqFactory.buildGetRequest(new GenericUrl(m_server.getContextUrl() + "retry?foo=bar"));
+    HttpRequest req = reqFactory.buildGetRequest(new GenericUrl(m_server.getServletUrl() + "?foo=bar"));
     req.getHeaders().set(CORRELATION_ID, "01");
     HttpResponse resp = req.execute();
     byte[] bytes;
@@ -104,7 +144,7 @@ public class HttpRetryTest {
     assertEquals(text, "Hello bar");
     assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
     assertEquals(new String(bytes), 11, bytes.length);//text + CR + LF
-    assertEquals(Arrays.asList("01"), Servlet.doGetLog);
+    assertEquals(Arrays.asList("01"), servletGetLog);
   }
 
   /**
@@ -114,7 +154,7 @@ public class HttpRetryTest {
   public void testPostWithUnsupportedRetryAndFailureWhileHeadersAreSent() throws IOException {
     //emulate a header write error
     AtomicInteger count = new AtomicInteger(1);
-    m_client.setRequestInterceptor(
+    m_client.withRequestInterceptor(
         (request, conn, context, superCall) -> {
           if (count.getAndIncrement() < 2) {
             conn.close();
@@ -123,7 +163,7 @@ public class HttpRetryTest {
         });
 
     HttpRequestFactory reqFactory = m_client.getHttpRequestFactory();
-    HttpRequest req = reqFactory.buildPostRequest(new GenericUrl(m_server.getContextUrl() + "retry"), new HttpContent() {
+    HttpRequest req = reqFactory.buildPostRequest(new GenericUrl(m_server.getServletUrl()), new HttpContent() {
       @Override
       public void writeTo(OutputStream out) throws IOException {
         out.write("bar".getBytes());
@@ -154,8 +194,8 @@ public class HttpRetryTest {
     assertEquals(text, "Post bar");
     assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
     assertEquals(new String(bytes), 10, bytes.length);//text + CR + LF
-    assertEquals(Arrays.asList("02"), Servlet.doPostLog);
-    assertNull(Servlet.doPostError);
+    assertEquals(Arrays.asList("02"), servletPostLog);
+    assertNull(servletPostError);
   }
 
   /**
@@ -167,7 +207,7 @@ public class HttpRetryTest {
     AtomicInteger count = new AtomicInteger(1);
 
     HttpRequestFactory reqFactory = m_client.getHttpRequestFactory();
-    HttpRequest req = reqFactory.buildPostRequest(new GenericUrl(m_server.getContextUrl() + "retry"), new HttpContent() {
+    HttpRequest req = reqFactory.buildPostRequest(new GenericUrl(m_server.getServletUrl()), new HttpContent() {
       @Override
       public void writeTo(OutputStream out) throws IOException {
         if (count.getAndIncrement() < 2) {
@@ -199,13 +239,13 @@ public class HttpRetryTest {
     catch (org.apache.http.client.ClientProtocolException e) {
       //the request was partially sent, resulting in a servlet side org.eclipse.jetty.io.EofException: Early EOF
       // awaiting completion of that exception
-      for (int i = 0; i < 100 && Servlet.doPostError == null; i++) {
+      for (int i = 0; i < 100 && servletPostError == null; i++) {
         SleepUtil.sleepSafe(100, TimeUnit.MILLISECONDS);
       }
-      assertEquals(Arrays.asList("03"), Servlet.doPostLog);
-      assertNotNull(Servlet.doPostError);
-      assertEquals(ProcessingException.class, Servlet.doPostError.getClass());
-      assertEquals(org.eclipse.jetty.io.EofException.class, Servlet.doPostError.getCause().getClass());
+      assertEquals(Arrays.asList("03"), servletPostLog);
+      assertNotNull(servletPostError);
+      assertEquals(ProcessingException.class, servletPostError.getClass());
+      assertEquals(org.eclipse.jetty.io.EofException.class, servletPostError.getCause().getClass());
       return;
     }
     fail("Expected to fail");
@@ -218,7 +258,7 @@ public class HttpRetryTest {
   public void testPostWithUnsupportedRetryAndFailureAfterRequestIsSent() throws IOException {
     //emulate a socket close before data is received
     AtomicInteger count = new AtomicInteger(1);
-    m_server.setChannelInterceptor((channel, superCall) -> {
+    m_server.withChannelInterceptor((channel, superCall) -> {
       if (count.getAndIncrement() < 2) {
         channel.getHttpTransport().abort(new SocketException("TEST:cannot write"));
         return;
@@ -227,7 +267,7 @@ public class HttpRetryTest {
     });
 
     HttpRequestFactory reqFactory = m_client.getHttpRequestFactory();
-    HttpRequest req = reqFactory.buildPostRequest(new GenericUrl(m_server.getContextUrl() + "retry"), new HttpContent() {
+    HttpRequest req = reqFactory.buildPostRequest(new GenericUrl(m_server.getServletUrl()), new HttpContent() {
       @Override
       public void writeTo(OutputStream out) throws IOException {
         out.write("bar".getBytes());
@@ -253,8 +293,8 @@ public class HttpRetryTest {
       req.execute();
     }
     catch (org.apache.http.NoHttpResponseException e) {
-      assertEquals(Arrays.asList(), Servlet.doPostLog);
-      assertNull(Servlet.doPostError);
+      assertEquals(Arrays.asList(), servletPostLog);
+      assertNull(servletPostError);
       return;
     }
     fail("Expected to fail");
@@ -267,7 +307,7 @@ public class HttpRetryTest {
   public void testPostWithSupportedRetryAndFailureAfterRequestIsSent() throws IOException {
     //emulate a socket close before data is received
     AtomicInteger count = new AtomicInteger(1);
-    m_server.setChannelInterceptor((channel, superCall) -> {
+    m_server.withChannelInterceptor((channel, superCall) -> {
       if (count.getAndIncrement() < 2) {
         channel.getHttpTransport().abort(new SocketException("TEST:cannot write"));
         return;
@@ -276,7 +316,7 @@ public class HttpRetryTest {
     });
 
     HttpRequestFactory reqFactory = m_client.getHttpRequestFactory();
-    HttpRequest req = reqFactory.buildPostRequest(new GenericUrl(m_server.getContextUrl() + "retry"), new HttpContent() {
+    HttpRequest req = reqFactory.buildPostRequest(new GenericUrl(m_server.getServletUrl()), new HttpContent() {
       @Override
       public void writeTo(OutputStream out) throws IOException {
         out.write("bar".getBytes());
@@ -307,8 +347,8 @@ public class HttpRetryTest {
     assertEquals(text, "Post bar");
     assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
     assertEquals(new String(bytes), 10, bytes.length);//text + CR + LF
-    assertEquals(Arrays.asList("05"), Servlet.doPostLog);
-    assertNull(Servlet.doPostError);
+    assertEquals(Arrays.asList("05"), servletPostLog);
+    assertNull(servletPostError);
   }
 
   /**
@@ -317,7 +357,7 @@ public class HttpRetryTest {
   @Test
   public void testPostWithSupportedRetryAndFailureWithValidHttpResponseCode() throws IOException {
     HttpRequestFactory reqFactory = m_client.getHttpRequestFactory();
-    HttpRequest req = reqFactory.buildPostRequest(new GenericUrl(m_server.getContextUrl() + "retry"), new HttpContent() {
+    HttpRequest req = reqFactory.buildPostRequest(new GenericUrl(m_server.getServletUrl()), new HttpContent() {
       @Override
       public void writeTo(OutputStream out) throws IOException {
         //emulate a failure in the servlet
@@ -340,14 +380,14 @@ public class HttpRetryTest {
       }
     });
     req.getHeaders().set(CORRELATION_ID, "06");
-    Servlet.failOnce = (hreq, hresp) -> {
+    servletFailOnce = (hreq, hresp) -> {
       hresp.sendError(400);
     };
     req.setThrowExceptionOnExecuteError(false);
     HttpResponse resp = req.execute();
     assertEquals(400, resp.getStatusCode());
-    assertEquals(Arrays.asList("06"), Servlet.doPostLog);
-    assertNull(Servlet.doPostError);
+    assertEquals(Arrays.asList("06"), servletPostLog);
+    assertNull(servletPostError);
   }
 
   /**
@@ -356,7 +396,7 @@ public class HttpRetryTest {
   @Test
   public void testPostWithSupportedRetryAndFailureWithoutHttpResponse() throws IOException {
     HttpRequestFactory reqFactory = m_client.getHttpRequestFactory();
-    HttpRequest req = reqFactory.buildPostRequest(new GenericUrl(m_server.getContextUrl() + "retry"), new HttpContent() {
+    HttpRequest req = reqFactory.buildPostRequest(new GenericUrl(m_server.getServletUrl()), new HttpContent() {
       @Override
       public void writeTo(OutputStream out) throws IOException {
         //emulate a failure in the servlet
@@ -379,64 +419,13 @@ public class HttpRetryTest {
       }
     });
     req.getHeaders().set(CORRELATION_ID, "07");
-    Servlet.failOnce = (hreq, hresp) -> {
+    servletFailOnce = (hreq, hresp) -> {
       throw new FutureCancelledError("TEST");
     };
     req.setThrowExceptionOnExecuteError(false);
     HttpResponse resp = req.execute();
     assertEquals(500, resp.getStatusCode());
-    assertEquals(Arrays.asList("07"), Servlet.doPostLog);
-    assertNull(Servlet.doPostError);
-  }
-
-  interface IFailOnce {
-    void run(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
-  }
-
-  /**
-   * http://172.0.0.1:33xyz/retry
-   */
-  public static class Servlet extends AbstractHttpServlet {
-    private static final long serialVersionUID = 1L;
-    static IFailOnce failOnce;
-    static final List<String> doGetLog = Collections.synchronizedList(new ArrayList<>());
-    static final List<String> doPostLog = Collections.synchronizedList(new ArrayList<>());
-    static Exception doPostError;
-
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      doGetLog.add(req.getHeader(CORRELATION_ID));
-      resp.setContentType("text/plain;charset=UTF-8");
-      resp.getOutputStream().println("Hello " + req.getParameter("foo"));
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      doPostLog.add(req.getHeader(CORRELATION_ID));
-      String arg = null;
-      try {
-        assertEquals("text/plain;charset=UTF-8", req.getContentType());
-        assertEquals("UTF-8", req.getCharacterEncoding());
-        assertEquals(3, req.getContentLength());
-        arg = IOUtility.readString(req.getInputStream(), req.getCharacterEncoding(), req.getContentLength());
-      }
-      catch (Exception e) {
-        doPostError = e;
-        throw e;
-      }
-
-      if (failOnce != null) {
-        try {
-          failOnce.run(req, resp);
-          return;
-        }
-        finally {
-          failOnce = null;
-        }
-      }
-
-      resp.setContentType("text/plain;charset=UTF-8");
-      resp.getOutputStream().println("Post " + arg);
-    }
+    assertEquals(Arrays.asList("07"), servletPostLog);
+    assertNull(servletPostError);
   }
 }

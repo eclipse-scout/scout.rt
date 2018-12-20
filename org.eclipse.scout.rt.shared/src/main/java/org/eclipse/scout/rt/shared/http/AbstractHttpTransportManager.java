@@ -86,7 +86,7 @@ public abstract class AbstractHttpTransportManager implements IHttpTransportMana
    */
   protected void init() {
     if (!m_initialized) {
-      createHttpTransport();
+      initSynchronized();
       m_initialized = true;
     }
   }
@@ -94,19 +94,14 @@ public abstract class AbstractHttpTransportManager implements IHttpTransportMana
   /**
    * Create the {@link HttpTransport} (using factory), fill {@link #m_httpTransport} field.
    */
-  protected synchronized void createHttpTransport() {
+  protected synchronized void initSynchronized() {
     if (m_initialized || !m_active) {
       return;
     }
 
     m_httpRequestInitializer = createHttpRequestInitializer();
-    m_httpTransport = BEANS.get(getHttpTransportFactory()).newHttpTransport(this);
+    m_httpTransport = createHttpTransport();
     m_httpRequestFactory = m_httpTransport.createRequestFactory(getHttpRequestInitializer());
-  }
-
-  @Override
-  public void interceptNewHttpTransport(IHttpTransportBuilder builder) {
-    // nop
   }
 
   /**
@@ -115,6 +110,15 @@ public abstract class AbstractHttpTransportManager implements IHttpTransportMana
    */
   protected HttpRequestInitializer createHttpRequestInitializer() {
     return new DefaultHttpRequestInitializer();
+  }
+
+  protected HttpTransport createHttpTransport() {
+    return BEANS.get(getHttpTransportFactory()).newHttpTransport(this);
+  }
+
+  @Override
+  public void interceptNewHttpTransport(IHttpTransportBuilder builder) {
+    // nop
   }
 
   /**

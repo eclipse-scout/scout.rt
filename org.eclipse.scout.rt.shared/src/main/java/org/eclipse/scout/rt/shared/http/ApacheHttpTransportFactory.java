@@ -56,7 +56,7 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
 
     setConnectionKeepAliveAndRetrySettings(builder);
 
-    HttpClientConnectionManager cm = getConfiguredConnectionManager();
+    HttpClientConnectionManager cm = createHttpClientConnectionManager();
     if (cm != null) {
       builder.setConnectionManager(cm);
     }
@@ -93,18 +93,11 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
    * {@link HttpClientBuilder}. Caution: Returning a custom connection manager overrides several properties of the
    * {@link HttpClientBuilder}.
    */
-  protected HttpClientConnectionManager getConfiguredConnectionManager() {
-    String[] sslProtocols = StringUtility.split(System.getProperty("https.protocols"), "\\s*,\\s*");
-    String[] sslCipherSuites = StringUtility.split(System.getProperty("https.cipherSuites"), "\\s*,\\s*");
-    SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(
-        (SSLSocketFactory) SSLSocketFactory.getDefault(),
-        sslProtocols != null && sslProtocols.length > 0 ? sslProtocols : null,
-        sslCipherSuites != null && sslCipherSuites.length > 0 ? sslCipherSuites : null,
-        new DefaultHostnameVerifier(PublicSuffixMatcherLoader.getDefault()));
+  protected HttpClientConnectionManager createHttpClientConnectionManager() {
     final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(
         RegistryBuilder.<ConnectionSocketFactory> create()
-            .register("http", PlainConnectionSocketFactory.getSocketFactory())
-            .register("https", sslConnectionSocketFactory)
+            .register("http", createPlainSocketFactory())
+            .register("https", createSSLConnectionSocketFactory())
             .build(),
         null, null, null, CONFIG.getPropertyValue(ApacheHttpTransportConnectionTimeToLiveProperty.class), TimeUnit.MILLISECONDS);
     connectionManager.setValidateAfterInactivity(1);
@@ -118,6 +111,20 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
       connectionManager.setDefaultMaxPerRoute(defaultMaxPerRoute);
     }
     return connectionManager;
+  }
+
+  protected SSLConnectionSocketFactory createSSLConnectionSocketFactory() {
+    String[] sslProtocols = StringUtility.split(System.getProperty("https.protocols"), "\\s*,\\s*");
+    String[] sslCipherSuites = StringUtility.split(System.getProperty("https.cipherSuites"), "\\s*,\\s*");
+    return new SSLConnectionSocketFactory(
+        (SSLSocketFactory) SSLSocketFactory.getDefault(),
+        sslProtocols != null && sslProtocols.length > 0 ? sslProtocols : null,
+        sslCipherSuites != null && sslCipherSuites.length > 0 ? sslCipherSuites : null,
+        new DefaultHostnameVerifier(PublicSuffixMatcherLoader.getDefault()));
+  }
+
+  protected PlainConnectionSocketFactory createPlainSocketFactory() {
+    return PlainConnectionSocketFactory.getSocketFactory();
   }
 
   /**

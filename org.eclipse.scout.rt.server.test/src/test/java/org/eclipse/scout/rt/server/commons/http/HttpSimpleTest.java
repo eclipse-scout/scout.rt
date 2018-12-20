@@ -16,15 +16,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,12 +42,21 @@ public class HttpSimpleTest {
   private TestingHttpClient m_client;
   private TestingHttpServer m_server;
 
+  private StringBuffer m_clientRead = new StringBuffer();
+  private StringBuffer m_clientWrite = new StringBuffer();
+
   @Before
   public void before() {
-    Servlet.doGetCount.set(0);
-    Servlet.doPostCount.set(0);
-    m_client = new TestingHttpClient();
-    m_server = new TestingHttpServer(TestingHttpPorts.PORT_33001, "/", getClass().getResource("/webapps/" + getClass().getSimpleName()));
+    m_client = new TestingHttpClient()
+        .withSocketReadInterceptor(b -> {
+          m_clientRead.append((char) b);
+          return b;
+        })
+        .withSocketWriteInterceptor(b -> {
+          m_clientWrite.append((char) b);
+          return b;
+        });
+    m_server = new TestingHttpServer(TestingHttpPorts.PORT_33001);
     m_server.start();
   }
 
@@ -61,12 +64,19 @@ public class HttpSimpleTest {
   public void after() {
     m_client.stop();
     m_server.stop();
+    System.out.println("# HttpClient.write\n" + m_clientWrite);
+    System.out.println("# HttpClient.read\n" + m_clientRead);
   }
 
   @Test
   public void testGet() throws IOException {
+    m_server.withServletGetHandler((req, resp) -> {
+      resp.setContentType("text/plain;charset=UTF-8");
+      resp.getOutputStream().println("Hello " + req.getParameter("foo"));
+    });
+
     HttpRequestFactory reqFactory = m_client.getHttpRequestFactory();
-    HttpRequest req = reqFactory.buildGetRequest(new GenericUrl(m_server.getContextUrl() + "simple?foo=bar"));
+    HttpRequest req = reqFactory.buildGetRequest(new GenericUrl(m_server.getServletUrl() + "?foo=bar"));
     HttpResponse resp = req.execute();
     byte[] bytes;
     try (InputStream in = resp.getContent()) {
@@ -80,8 +90,17 @@ public class HttpSimpleTest {
 
   @Test
   public void testPost() throws IOException {
+    m_server.withServletPostHandler((req, resp) -> {
+      assertEquals("text/plain;charset=UTF-8", req.getContentType());
+      assertEquals("UTF-8", req.getCharacterEncoding());
+      assertEquals(3, req.getContentLength());
+      String arg = IOUtility.readString(req.getInputStream(), req.getCharacterEncoding(), req.getContentLength());
+      resp.setContentType("text/plain;charset=UTF-8");
+      resp.getOutputStream().println("Post " + arg);
+    });
+
     HttpRequestFactory reqFactory = m_client.getHttpRequestFactory();
-    HttpRequest req = reqFactory.buildPostRequest(new GenericUrl(m_server.getContextUrl() + "simple"), new HttpContent() {
+    HttpRequest req = reqFactory.buildPostRequest(new GenericUrl(m_server.getServletUrl()), new HttpContent() {
       @Override
       public void writeTo(OutputStream out) throws IOException {
         out.write("bar".getBytes());
@@ -113,31 +132,22 @@ public class HttpSimpleTest {
     assertEquals(text, "Post bar");
   }
 
-  /**
-   * http://172.0.0.1:33xyz/simple
-   */
-  public static class Servlet extends AbstractHttpServlet {
-    private static final long serialVersionUID = 1L;
-    static final AtomicInteger doGetCount = new AtomicInteger();
-    static final AtomicInteger doPostCount = new AtomicInteger();
-
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      doGetCount.incrementAndGet();
+  @Test
+  public void testGetChunked() throws IOException {
+    m_server.withServletGetHandler((req, resp) -> {
       resp.setContentType("text/plain;charset=UTF-8");
-      resp.getOutputStream().println("Hello " + req.getParameter("foo"));
-    }
+      resp.setHeader("Transfer-Encoding", "chunked");
+      for (int i = 0; i < 100; i++) {
+        resp.getWriter().write("Line of chunked data " + i + "\r\n");
+        resp.getWriter().flush();
+      }
+    });
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      doPostCount.incrementAndGet();
-      assertEquals("text/plain;charset=UTF-8", req.getContentType());
-      assertEquals("UTF-8", req.getCharacterEncoding());
-      assertEquals(3, req.getContentLength());
-      String arg = IOUtility.readString(req.getInputStream(), req.getCharacterEncoding(), req.getContentLength());
-
-      resp.setContentType("text/plain;charset=UTF-8");
-      resp.getOutputStream().println("Post " + arg);
-    }
+    HttpRequestFactory reqFactory = m_client.getHttpRequestFactory();
+    HttpRequest req = reqFactory.buildGetRequest(new GenericUrl(m_server.getServletUrl()));
+    HttpResponse resp = req.execute();
+    assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
+    String content = resp.parseAsString();
+    assertEquals(2490, content.length());
   }
 }

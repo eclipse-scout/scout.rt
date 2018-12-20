@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +46,9 @@ public class HttpHighLoadTest {
   @Before
   public void before() {
     m_client = new TestingHttpClient();
-    m_server = new TestingHttpServer(TestingHttpPorts.PORT_33004, "/", getClass().getResource("/webapps/" + getClass().getSimpleName()));
+    m_server = new TestingHttpServer(TestingHttpPorts.PORT_33004)
+        .withServletGetHandler(this::fixtureServletGet)
+        .withServletPostHandler(this::fixtureServletPost);
     m_server.start();
   }
 
@@ -55,6 +56,20 @@ public class HttpHighLoadTest {
   public void after() {
     m_client.stop();
     m_server.stop();
+  }
+
+  private void fixtureServletGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    String arg = req.getParameter("arg");
+    resp.setContentType("text/plain;charset=UTF-8");
+    resp.getOutputStream().println("Get " + arg);
+  }
+
+  private void fixtureServletPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    assertEquals("text/plain;charset=UTF-8", req.getContentType());
+    assertEquals("UTF-8", req.getCharacterEncoding());
+    String arg = IOUtility.readString(req.getInputStream(), req.getCharacterEncoding(), req.getContentLength());
+    resp.setContentType("text/plain;charset=UTF-8");
+    resp.getOutputStream().println("Post " + arg);
   }
 
   @Test
@@ -66,7 +81,7 @@ public class HttpHighLoadTest {
       String arg = "" + i;
       byte[] reqBytes = arg.getBytes();
       Jobs.schedule(() -> {
-        HttpRequest req = reqFactory.buildPostRequest(new GenericUrl(m_server.getContextUrl() + "hf"), new HttpContent() {
+        HttpRequest req = reqFactory.buildPostRequest(new GenericUrl(m_server.getServletUrl()), new HttpContent() {
           @Override
           public void writeTo(OutputStream out) throws IOException {
             out.write(reqBytes);
@@ -100,30 +115,5 @@ public class HttpHighLoadTest {
     }
     Jobs.getJobManager().awaitFinished(f -> f.containsExecutionHint("testPost"), 10, TimeUnit.MINUTES);
     assertEquals(n, successCount.get());
-  }
-
-  /**
-   * http://172.0.0.1:33xyz/hf
-   */
-  public static class Servlet extends AbstractHttpServlet {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      String arg = req.getParameter("arg");
-
-      resp.setContentType("text/plain;charset=UTF-8");
-      resp.getOutputStream().println("Get " + arg);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      assertEquals("text/plain;charset=UTF-8", req.getContentType());
-      assertEquals("UTF-8", req.getCharacterEncoding());
-      String arg = IOUtility.readString(req.getInputStream(), req.getCharacterEncoding(), req.getContentLength());
-
-      resp.setContentType("text/plain;charset=UTF-8");
-      resp.getOutputStream().println("Post " + arg);
-    }
   }
 }

@@ -15,15 +15,15 @@ import java.io.IOException;
 import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
 import org.junit.Test;
 
-public class HttpServerTest {
+public class TestingHttpServerTest {
 
   /**
    * Test if the {@link TestingHttpServer} can in principle be started twice in parallel
    */
   @Test
   public void testMultipleServerListeners() throws IOException {
-    TestingHttpServer server1 = new TestingHttpServer(TestingHttpPorts.PORT_33002, "/", getClass().getResource("/webapps/" + getClass().getSimpleName()));
-    TestingHttpServer server2 = new TestingHttpServer(TestingHttpPorts.PORT_33003, "/", getClass().getResource("/webapps/" + getClass().getSimpleName()));
+    TestingHttpServer server1 = new TestingHttpServer(TestingHttpPorts.PORT_33002);
+    TestingHttpServer server2 = new TestingHttpServer(TestingHttpPorts.PORT_33003);
     try {
       server1.start();
       server2.start();
