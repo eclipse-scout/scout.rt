@@ -106,11 +106,8 @@ public class DataObjectTestHelper {
    * @return {@code true} if equal
    */
   public boolean equalsObject(Object expected, Object actual, boolean assertClassEquals) {
-    if (expected == null) {
-      return actual == null;
-    }
-    if (actual == null) {
-      return expected == null;
+    if (expected == null || actual == null) {
+      return expected == actual;
     }
 
     if (expected instanceof IDoEntity) {
