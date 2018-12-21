@@ -26,5 +26,6 @@ public interface TestingHttpPorts {
   int PORT_33002 = 33002;
   int PORT_33003 = 33003;
   int PORT_33004 = 33004;
+  int PORT_33005 = 33005;
   //add new ports for every new test class
 }

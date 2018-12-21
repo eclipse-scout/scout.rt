@@ -17,7 +17,10 @@ import org.apache.http.HttpClientConnection;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
+import org.apache.http.config.ConnectionConfig;
+import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestExecutor;
 import org.eclipse.scout.rt.platform.IgnoreBean;
@@ -33,6 +36,7 @@ import com.google.api.client.http.HttpTransport;
  */
 @IgnoreBean
 public class TestingHttpClient extends DefaultHttpTransportManager {
+  public static final int BUFFER_SIZE = 32;
 
   @FunctionalInterface
   public interface IResponseProvider {
@@ -65,11 +69,18 @@ public class TestingHttpClient extends DefaultHttpTransportManager {
         }
       };
     }
-  }
 
-  @Override
-  protected HttpTransport createHttpTransport() {
-    return new ApacheHttpTransportFactoryEx().newHttpTransport(this);
+    @Override
+    protected HttpClientConnectionManager createHttpClientConnectionManager() {
+      PoolingHttpClientConnectionManager connManager = (PoolingHttpClientConnectionManager) super.createHttpClientConnectionManager();
+      connManager.setDefaultConnectionConfig(
+          ConnectionConfig
+              .custom()
+              .setFragmentSizeHint(BUFFER_SIZE)
+              .setBufferSize(BUFFER_SIZE)
+              .build());
+      return connManager;
+    }
   }
 
   private IRequestInterceptor m_requestInterceptor;
@@ -77,6 +88,11 @@ public class TestingHttpClient extends DefaultHttpTransportManager {
 
   private SocketWithInterception.IStreamInterceptor m_socketReadInterceptor;
   private SocketWithInterception.IStreamInterceptor m_socketWriteInterceptor;
+
+  @Override
+  protected HttpTransport createHttpTransport() {
+    return new ApacheHttpTransportFactoryEx().newHttpTransport(this);
+  }
 
   @Override
   public void interceptNewHttpTransport(IHttpTransportBuilder builder) {

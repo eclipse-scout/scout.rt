@@ -43,20 +43,41 @@ public class SocketWithInterception extends Socket {
   @Override
   public InputStream getInputStream() throws IOException {
     return new FilterInputStream(super.getInputStream()) {
+      private boolean m_eof;
+
       @Override
       public int read() throws IOException {
+        if (m_eof) {
+          return -1;
+        }
         int i = super.read();
         if (i >= 0) {
           i = m_readInterceptor.intercept(i);
+        }
+        if (i < 0) {
+          m_eof = true;
         }
         return i;
       }
 
       @Override
       public int read(byte[] b, int off, int len) throws IOException {
+        if (m_eof) {
+          return -1;
+        }
         int n = super.read(b, off, len);
-        for (int i = 0; i < n; i++) {
-          b[off + i] = (byte) m_readInterceptor.intercept(((int) b[off + i]) & 0xff);
+        if (n < 0) {
+          m_eof = true;
+        }
+        for (int k = 0; k < n; k++) {
+          int i = ((int) b[off + k]) & 0xff;
+          i = m_readInterceptor.intercept(i);
+          if (i < 0) {
+            //fixture EOF
+            m_eof = true;
+            return k > 0 ? k : -1;
+          }
+          b[off + k] = (byte) i;
         }
         return n;
       }
