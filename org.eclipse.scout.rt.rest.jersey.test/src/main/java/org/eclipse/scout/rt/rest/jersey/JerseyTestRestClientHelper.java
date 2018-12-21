@@ -65,4 +65,10 @@ public class JerseyTestRestClientHelper extends AbstractRestClientHelper {
     connectionManager.setDefaultMaxPerRoute(1);
     return connectionManager;
   }
+
+  @Override
+  protected void registerRequestFilters(ClientBuilder clientBuilder) {
+    super.registerRequestFilters(clientBuilder);
+    clientBuilder.register(new LanguageAndCorrelationIdRestRequestFilter());
+  }
 }

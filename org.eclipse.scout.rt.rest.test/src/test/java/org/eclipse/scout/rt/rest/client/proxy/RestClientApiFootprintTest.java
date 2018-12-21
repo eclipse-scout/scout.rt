@@ -24,11 +24,19 @@ import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+/**
+ * This test creates an inventory of all JAX-RS client classes and compares it with the one created at the time the
+ * {@link RestClientProxyFactory} has been developed. Some JAX-RS classes are proxied in order to provide additional
+ * features (currently generic exception handling for JAX-RS resources families returning a common error response type).
+ * <p>
+ * <b>If this test fails</b> verify whether new classes and methods are required to be proxied as well and whether
+ * changed methods are still handled correctly.
+ */
 @RunWith(PlatformTestRunner.class)
 public class RestClientApiFootprintTest {
 
   @Test
-  public void collectApiSignatures() throws IOException {
+  public void verifyApiSignatures() throws IOException {
     ApiSignatureDo api = BEANS.get(ApiSignature.class)
         .classFilter(c -> c.getPackage() != null && c.getPackage().getName().startsWith("javax.ws.rs."))
         .methodFilter(m -> !"$jacocoInit".equals(m.getName())) // ignore methods created by code coverage

@@ -16,16 +16,11 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.HashMap;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ClientErrorException;
@@ -45,17 +40,15 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.client.ResponseProcessingException;
-import javax.ws.rs.client.SyncInvoker;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.LazyValue;
-import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,13 +56,16 @@ import org.slf4j.LoggerFactory;
 /**
  * Creates proxy instances around REST client resources which provide the following features:
  * <ul>
- * <li><b>Cancellation:</b> Synchronously invoked REST services cannot be cancelled. Proxies created by this factory
- * perform synchronous invocations asynchronously, allowing to cancel the blocking client-side execution. <b>Note:</b>
- * the server-side invocation cannot be cancelled in general.</li>
  * <li><b>Exception handling:</b> {@link WebApplicationException}s and {@link javax.ws.rs.ProcessingException}s are
  * transformed by an {@link IRestClientExceptionTransformer} which allows to extract additional service-dependent
  * payload.</li>
  * </ul>
+ * <p>
+ * Cancellation is expected to be provided by the JAX-RS-implementation and its HTTP communication sub-system,
+ * respectively.
+ * <p>
+ * <b>Note:</b> Some JAX-RS methods are only partially supported or not supported at all. Their use is not recommended
+ * (see {@link #isDiscouraged(Method)}).
  */
 @ApplicationScoped
 public class RestClientProxyFactory {
@@ -77,10 +73,8 @@ public class RestClientProxyFactory {
   private static final Logger LOG = LoggerFactory.getLogger(RestClientProxyFactory.class);
 
   static final String INVOCATION_SUBMIT_METHOD_NAME = "submit";
-  static final String INVOCATION_INVOKE_METHOD_NAME = "invoke";
 
-  private final LazyValue<Map<Method, Method>> m_syncToAsyncMethods = new LazyValue<>(this::collectSyncToAsyncMethodMappings);
-  private final LazyValue<Set<Method>> m_invocationCallbackMethods = new LazyValue<>(this::collectInvocationCallbackMethods);
+  private final LazyValue<Set<Method>> m_invocationCallbackMethods = new LazyValue<>(this::collectDiscouragedMethods);
 
   public Client createClientProxy(Client client, IRestClientExceptionTransformer exceptionTransformer) {
     assertNotNull(client, "client is required");
@@ -92,11 +86,11 @@ public class RestClientProxyFactory {
   }
 
   public Invocation.Builder createInvocationBuilderProxy(Invocation.Builder builder, IRestClientExceptionTransformer exceptionTransformer) {
-    return createProxy(Invocation.Builder.class, new AsyncInvocationBuilderInvocationHandler(builder, exceptionTransformer));
+    return createProxy(Invocation.Builder.class, new RestProxyInvcationHandler<>(builder, exceptionTransformer));
   }
 
   public Invocation createInvocationProxy(Invocation invocation, IRestClientExceptionTransformer exceptionTransformer) {
-    return createProxy(Invocation.class, new AsyncInvocationInvocationHandler(invocation, exceptionTransformer));
+    return createProxy(Invocation.class, new RestProxyInvcationHandler<>(invocation, exceptionTransformer));
   }
 
   public AsyncInvoker createAsyncInvokerProxy(AsyncInvoker asyncInvoker, IRestClientExceptionTransformer exceptionTransformer) {
@@ -115,84 +109,36 @@ public class RestClientProxyFactory {
   }
 
   /**
-   * Resolves the corresponding async method declared in {@link AsyncInvoker} for the given one declared in
-   * {@link SyncInvoker}.
-   *
-   * @return Returns the the corresponding method of {@link AsyncInvoker} for the requested {@link SyncInvoker} method
-   *         or {@code null} in any other case.
+   * @return {@code true} if the given method is not completely supported by this proxy factory. Otherwise
+   *         {@code false}.
    */
-  protected Method resolveAsyncMethod(Method syncMethod) {
-    return m_syncToAsyncMethods.get().get(syncMethod);
-  }
-
-  /**
-   * @return {@code true} if the given method makes use of an {@link InvocationCallback} which is currently not
-   *         completely covered by cancellation and exception transformation. Otherwise {@code false}.
-   */
-  protected boolean isUsingInvocationCallback(Method method) {
+  protected boolean isDiscouraged(Method method) {
     return m_invocationCallbackMethods.get().contains(method);
   }
 
   /**
-   * Creates the mapping of all {@link SyncInvoker} methods to their corresponding {@link AsyncInvoker} methods.
+   * Collects all REST client methods that are supported only partially (i.e. async methods are not running within a
+   * {@link RunContext} and exceptions are not transformed if an {@link InvocationCallback} is used).
    * <p>
    * <b>Implementation Note:</b>The mapping is computed once, kept in a {@link FinalValue} and used by
-   * {@link #resolveAsyncMethod(Method)}.
+   * {@link #isDiscouraged(Method)}.
    */
-  protected Map<Method, Method> collectSyncToAsyncMethodMappings() {
-    Map<Method, Method> syncToAsyncMethods = new HashMap<>();
-
-    // map SyncInvoker to AsyncInvoker methods
-    for (Method syncMethod : SyncInvoker.class.getDeclaredMethods()) {
-      getMethod(AsyncInvoker.class, syncMethod.getName(), syncMethod.getParameterTypes())
-          .ifPresent(asyncMethod -> syncToAsyncMethods.put(syncMethod, asyncMethod));
-    }
-
-    // map sync methods on Invocation to corresponding async method
-    for (Method method : Invocation.class.getMethods()) {
-      if (INVOCATION_INVOKE_METHOD_NAME.equals(method.getName())) {
-        getMethod(Invocation.class, INVOCATION_SUBMIT_METHOD_NAME, method.getParameterTypes())
-            .ifPresent(asyncMethod -> syncToAsyncMethods.put(method, asyncMethod));
-      }
-    }
-    return syncToAsyncMethods;
-  }
-
-  /**
-   * Collects all REST client methods that are using an {@link InvocationCallback} parameter, which is currently not
-   * completely supported by this factory (exceptions are not transformed).
-   * <p>
-   * <b>Implementation Note:</b>The mapping is computed once, kept in a {@link FinalValue} and used by
-   * {@link #isUsingInvocationCallback(Method)}.
-   */
-  protected Set<Method> collectInvocationCallbackMethods() {
+  protected Set<Method> collectDiscouragedMethods() {
     Set<Method> discouragedMethods = new HashSet<>();
 
-    // collect methods of AsyncInvoker which last parameter is a InvocationCallback
+    // collect methods of AsyncInvoker
     for (Method method : AsyncInvoker.class.getDeclaredMethods()) {
-      Class<?>[] paramTypes = method.getParameterTypes();
-      if (paramTypes.length > 0 && paramTypes[paramTypes.length - 1] == InvocationCallback.class) {
+      discouragedMethods.add(method);
+    }
+
+    // collect methods of Invocation named 'submit'
+    for (Method method : Invocation.class.getDeclaredMethods()) {
+      if (INVOCATION_SUBMIT_METHOD_NAME.equals(method.getName())) {
         discouragedMethods.add(method);
       }
     }
 
-    // add Invocation.submit(InvocationCallback)
-    getMethod(Invocation.class, INVOCATION_SUBMIT_METHOD_NAME, InvocationCallback.class).ifPresent(discouragedMethods::add);
-
     return discouragedMethods;
-  }
-
-  /**
-   * Returns a public method of the given class, that matches the given name and parameter types.
-   */
-  protected Optional<Method> getMethod(Class<?> clazz, String name, Class<?>... parameterTypes) {
-    try {
-      return Optional.of(clazz.getMethod(name, parameterTypes));
-    }
-    catch (NoSuchMethodException | SecurityException e) {
-      LOG.warn("Could not find method {}.{}({})", clazz, name, parameterTypes, e);
-    }
-    return Optional.empty();
   }
 
   /**
@@ -241,15 +187,36 @@ public class RestClientProxyFactory {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-      if (isUsingInvocationCallback(method)) {
-        LOG.warn("Discuraged method invocation: Exceptions handed over to InvocationCallback.failed() are not transformed by this REST client proxy");
+      warnDiscouragedMethodUsage(method);
+      try {
+        Object result = method.invoke(unwrap(), args);
+        return proxyResult(proxy, result);
       }
-      Object result = method.invoke(unwrap(), args);
-      return proxyResult(proxy, result);
+      catch (Exception e) {
+        Throwable t = unwrapException(e);
+
+        // check whether invocation has been cancelled
+        final RunMonitor runMonitor = RunMonitor.CURRENT.get();
+        if (runMonitor != null && runMonitor.isCancelled()) {
+          ThreadInterruptedError tie = new ThreadInterruptedError("Interrupted while invoking REST service");
+          tie.addSuppressed(t);
+          throw tie;
+        }
+
+        throw transformException(t);
+      }
     }
 
+    protected void warnDiscouragedMethodUsage(Method method) {
+      if (isDiscouraged(method)) {
+        LOG.warn("Discuraged method invocation (e.g. running outside a RunContext or exeptions transofrmation not available)");
+      }
+    }
+
+    /**
+     * Proxies JAX-RS invocation related objects.
+     */
     protected Object proxyResult(Object proxy, Object result) {
-      // proxy JAX-RS invocation related objects
       if (result == unwrap()) {
         return proxy;
       }
@@ -283,96 +250,38 @@ public class RestClientProxyFactory {
       return result;
     }
 
-    protected Object invokeRestService(Supplier<Object> asyncObjectSupplier, Method method, Object[] args) {
-      try {
-        final Future<?> future = findAndInvokeAsyncMethod(asyncObjectSupplier, method, args);
-        if (future != null) {
-          return awaitDoneAndGet(future);
-        }
+    protected Throwable transformException(Throwable t) {
+      if (t instanceof WebApplicationException) {
+        WebApplicationException e = (WebApplicationException) t;
+        return getExceptionTransformer().transform(e, e.getResponse());
+      }
 
-        // fall back to sync invocation
-        return invokeSyncMethod(method, args);
+      if (t instanceof ResponseProcessingException) {
+        ResponseProcessingException e = (ResponseProcessingException) t;
+        return getExceptionTransformer().transform(e, e.getResponse());
       }
-      catch (WebApplicationException e) {
-        throw getExceptionTransformer().transform(e, e.getResponse());
+
+      if (t instanceof javax.ws.rs.ProcessingException) {
+        javax.ws.rs.ProcessingException e = (javax.ws.rs.ProcessingException) t;
+        return getExceptionTransformer().transform(e, null);
       }
-      catch (ResponseProcessingException e) {
-        throw getExceptionTransformer().transform(e, e.getResponse());
-      }
-      catch (javax.ws.rs.ProcessingException e) {
-        throw getExceptionTransformer().transform(e, null);
-      }
+
+      return t;
     }
 
-    protected Future<?> findAndInvokeAsyncMethod(Supplier<Object> asyncObjectSupplier, Method syncMethod, Object[] args) {
-      try {
-        Method asyncMethod = resolveAsyncMethod(syncMethod);
-        if (asyncMethod != null) {
-          LOG.debug("transforming sync to async REST invocation");
-          return (Future<?>) asyncMethod.invoke(asyncObjectSupplier.get(), args);
-        }
+    /**
+     * Unwraps {@link UndeclaredThrowableException} and {@link InvocationTargetException}.
+     * <p>
+     * <b>Note:</b> {@link ExecutionException}s are not unwrapped by intention. See
+     * {@link FutureExceptionTransformerInvocationHandler}.
+     */
+    protected Throwable unwrapException(Exception ex) {
+      Throwable current = ex;
+      while (current.getCause() != null
+          && (current instanceof UndeclaredThrowableException || current instanceof InvocationTargetException)) {
+        current = current.getCause();
       }
-      catch (Exception e) {
-        LOG.warn("converting sync to async method failed. Falling back to sync invocation [method='{}']", syncMethod, e);
-      }
-      return null;
-    }
-
-    protected Object invokeSyncMethod(Method syncMethod, Object[] args) {
-      try {
-        return syncMethod.invoke(unwrap(), args);
-      }
-      catch (Exception e) {
-        throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
-      }
-    }
-
-    protected Object awaitDoneAndGet(Future<?> future) {
-      try {
-        return future.get();
-      }
-      catch (CancellationException e) {
-        throw new FutureCancelledError("Async REST invocation has been cancelled", e);
-      }
-      catch (InterruptedException e) {
-        future.cancel(true); // cancel async invocation
-        Thread.currentThread().interrupt(); // restore interrupted flag
-        throw new ThreadInterruptedError("Interrupted while invoking REST service", e);
-      }
-      catch (ExecutionException e) {
-        // unwrap execution exception and make sure it is an unchecked exception
-        throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
-      }
-    }
-  }
-
-  protected class AsyncInvocationBuilderInvocationHandler extends RestProxyInvcationHandler<Invocation.Builder> {
-
-    public AsyncInvocationBuilderInvocationHandler(Invocation.Builder builder, IRestClientExceptionTransformer exceptionTransformer) {
-      super(builder, exceptionTransformer);
-    }
-
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-      if (method.getDeclaringClass() == SyncInvoker.class) {
-        return proxyResult(proxy, invokeRestService(() -> unwrap().async(), method, args));
-      }
-      return super.invoke(proxy, method, args);
-    }
-  }
-
-  protected class AsyncInvocationInvocationHandler extends RestProxyInvcationHandler<Invocation> {
-
-    public AsyncInvocationInvocationHandler(Invocation invocation, IRestClientExceptionTransformer exceptionTransformer) {
-      super(invocation, exceptionTransformer);
-    }
-
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-      if (INVOCATION_INVOKE_METHOD_NAME.equals(method.getName())) {
-        return proxyResult(proxy, invokeRestService(this::unwrap, method, args));
-      }
-      return super.invoke(proxy, method, args);
+      return current;
     }
   }
 
@@ -386,26 +295,12 @@ public class RestClientProxyFactory {
       try {
         return super.invoke(proxy, method, args);
       }
-      catch (@SuppressWarnings("squid:S1166") InvocationTargetException ie) {
-        Throwable cause = ie.getTargetException();
-        if (cause instanceof ExecutionException) {
-          cause = ((ExecutionException) cause).getCause();
+      catch (ExecutionException e) {
+        Throwable transformedException = transformException(e.getCause());
+        if (transformedException == e.getCause()) {
+          throw e;
         }
-
-        BiFunction<RuntimeException, Response, ExecutionException> extractAndTransform = (re, r) -> new ExecutionException(getExceptionTransformer().transform(re, r));
-        if (cause instanceof WebApplicationException) {
-          WebApplicationException we = (WebApplicationException) cause;
-          throw extractAndTransform.apply(we, we.getResponse());
-        }
-        else if (cause instanceof ResponseProcessingException) {
-          ResponseProcessingException rpe = (ResponseProcessingException) cause;
-          throw extractAndTransform.apply(rpe, rpe.getResponse());
-        }
-        else if (cause instanceof javax.ws.rs.ProcessingException) {
-          javax.ws.rs.ProcessingException pe = (javax.ws.rs.ProcessingException) cause;
-          throw extractAndTransform.apply(pe, null);
-        }
-        throw ie.getTargetException();
+        throw new ExecutionException(transformedException);
       }
     }
   }

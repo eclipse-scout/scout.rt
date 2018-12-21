@@ -44,7 +44,9 @@ import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.glassfish.jersey.client.ClientRequest;
 import org.glassfish.jersey.client.ClientResponse;
 import org.glassfish.jersey.message.internal.HeaderUtils;
@@ -76,6 +78,8 @@ class ClosingApacheConnector extends ApacheConnector {
   public ClientResponse apply(final ClientRequest clientRequest) throws ProcessingException {
     final HttpUriRequest request = getUriHttpRequest(clientRequest);
     final Map<String, String> clientHeadersSnapshot = writeOutBoundHeaders(clientRequest.getHeaders(), request);
+
+    registerCancellable(request);
 
     try {
       final CloseableHttpResponse response;
@@ -135,6 +139,30 @@ class ClosingApacheConnector extends ApacheConnector {
     }
     catch (final Exception e) {
       throw new ProcessingException(e);
+    }
+  }
+
+  /**
+   * Registers an {@link ICancellable} if this method is invoked in the context of a {@link RunMonitor} (i.e.
+   * {@link RunMonitor#CURRENT} is not {@code null}).
+   */
+  protected void registerCancellable(final HttpUriRequest request) {
+    RunMonitor runMonitor = RunMonitor.CURRENT.get();
+    if (runMonitor != null) {
+      runMonitor.registerCancellable(new ICancellable() {
+
+        @Override
+        public boolean isCancelled() {
+          return request.isAborted();
+        }
+
+        @Override
+        public boolean cancel(boolean interruptIfRunning) {
+          LOGGER.fine("Aborting HTTP REST request");
+          request.abort();
+          return true;
+        }
+      });
     }
   }
 
