@@ -12,11 +12,10 @@ package org.eclipse.scout.rt.rest.client.proxy;
 
 import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertThrows;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-
-import java.lang.reflect.Method;
 
 import javax.ws.rs.client.AsyncInvoker;
 import javax.ws.rs.client.Client;
@@ -30,43 +29,39 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
-import org.hamcrest.CoreMatchers;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
+import org.mockito.Mockito;
 
-public class RestClientProxyFactoryTest extends AbstractRestClientProxyFactoryTest {
+public class RestClientProxyFactoryTest {
+
+  public static final String URI = "http:://localhost:80/test";
 
   @Rule
   public ErrorCollector m_errorCollector = new ErrorCollector();
 
-  @Test
-  public void testResolveAsyncMethods() throws Exception {
-    for (Method m : SyncInvoker.class.getMethods()) {
-      m_errorCollector.checkThat("Expecting mapping for " + m, getFactory().resolveAsyncMethod(m), CoreMatchers.notNullValue());
-    }
+  private RestClientProxyFactory m_factory;
 
-    for (Method m : Invocation.class.getMethods()) {
-      if (!RestClientProxyFactory.INVOCATION_INVOKE_METHOD_NAME.equals(m.getName())) {
-        continue;
-      }
-      m_errorCollector.checkThat("Expecting mapping for " + m, getFactory().resolveAsyncMethod(m), CoreMatchers.notNullValue());
-    }
+  @Before
+  public void before() {
+    m_factory = new RestClientProxyFactory();
+  }
 
-    assertNull(getFactory().resolveAsyncMethod(null));
-    assertNull(getFactory().resolveAsyncMethod(Object.class.getMethod("toString")));
-
-    // test method of Invocation.Builder, which is a sub-type of SyncInvoker
-    assertNull(getFactory().resolveAsyncMethod(Invocation.Builder.class.getMethod("buildGet")));
+  public RestClientProxyFactory getFactory() {
+    return m_factory;
   }
 
   @Test
-  public void testIsUsingInvocationCallback() throws Exception {
-    assertFalse(getFactory().isUsingInvocationCallback(null));
-    assertFalse(getFactory().isUsingInvocationCallback(Object.class.getDeclaredMethod("equals", Object.class)));
-    assertFalse(getFactory().isUsingInvocationCallback(AsyncInvoker.class.getDeclaredMethod("post", Entity.class, GenericType.class)));
+  public void testIsDiscouraged() throws Exception {
+    assertFalse(getFactory().isDiscouraged(null));
+    assertFalse(getFactory().isDiscouraged(Object.class.getDeclaredMethod("equals", Object.class)));
+    assertFalse(getFactory().isDiscouraged(SyncInvoker.class.getDeclaredMethod("get")));
 
-    assertTrue(getFactory().isUsingInvocationCallback(AsyncInvoker.class.getDeclaredMethod("post", Entity.class, InvocationCallback.class)));
+    assertTrue(getFactory().isDiscouraged(AsyncInvoker.class.getDeclaredMethod("post", Entity.class, GenericType.class)));
+    assertTrue(getFactory().isDiscouraged(AsyncInvoker.class.getDeclaredMethod("post", Entity.class, InvocationCallback.class)));
+    assertTrue(getFactory().isDiscouraged(Invocation.class.getDeclaredMethod("submit")));
   }
 
   @Test
@@ -121,5 +116,17 @@ public class RestClientProxyFactoryTest extends AbstractRestClientProxyFactoryTe
     assertRestProxy(invocationBuilderWithAccept);
 
     invocationBuilderWithAccept.property("", null);
+  }
+
+  /**
+   * Creates a new mock of {@link Client} that creates mocks for return values of invoked methods.
+   */
+  protected Client mockClient() {
+    return Mockito.mock(Client.class, Mockito.RETURNS_MOCKS);
+  }
+
+  protected void assertRestProxy(Object proxy) {
+    assertNotNull(proxy);
+    assertTrue(getFactory().isProxy(proxy));
   }
 }

@@ -10,17 +10,26 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.rest.jersey;
 
+import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.EMPTY_BODY;
+import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.LARGE_MESSAGE;
+import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.REQUEST_ID;
+import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.SLEEP_SEC;
+import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.STATUS;
+
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
@@ -37,13 +46,30 @@ public class RestClientTestEchoServlet extends HttpServlet {
 
   @Override
   protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    final int statusCode = parseStatusCode(req.getParameter("status"));
+    final String requestId = req.getParameter(REQUEST_ID);
+    if (requestId != null) {
+      BEANS.get(RequestSynchronizer.class).notifyRequestArrived(requestId);
+    }
 
-    String sleep = req.getParameter("sleepSec");
+    final int statusCode = parseStatusCode(req.getParameter(STATUS));
+
+    if (LOG.isInfoEnabled()) {
+      StringBuilder sb = new StringBuilder("HTTP Headers:");
+      for (Enumeration<String> headers = req.getHeaderNames(); headers.hasMoreElements();) {
+        String header = headers.nextElement();
+        sb.append(String.format("%n  %s: '%s'", header, req.getHeader(header)));
+      }
+      LOG.info(sb.toString());
+    }
+
+    String sleep = req.getParameter(SLEEP_SEC);
     if (sleep != null) {
       int sleepSeconds = Integer.parseInt(sleep);
       SleepUtil.sleepSafe(sleepSeconds, TimeUnit.SECONDS);
     }
+
+    resp.setHeader(CorrelationId.HTTP_HEADER_NAME, req.getHeader(CorrelationId.HTTP_HEADER_NAME));
+    resp.setHeader(HttpHeaders.ACCEPT_LANGUAGE, req.getHeader(HttpHeaders.ACCEPT_LANGUAGE));
 
     Status status = Status.fromStatusCode(statusCode);
     if (status != null && status.getFamily() == Status.Family.SUCCESSFUL) {
@@ -58,7 +84,7 @@ public class RestClientTestEchoServlet extends HttpServlet {
     resp.setStatus(statusCode);
     resp.setContentType(MediaType.APPLICATION_JSON);
 
-    if (req.getParameter("emptyBody") != null) {
+    if (req.getParameter(EMPTY_BODY) != null) {
       return;
     }
 
@@ -68,7 +94,7 @@ public class RestClientTestEchoServlet extends HttpServlet {
             .withCode(statusCode)
             .withInfo(status == null ? "unknown" : status.getReasonPhrase()));
 
-    if (req.getParameter("largeMessage") != null) {
+    if (req.getParameter(LARGE_MESSAGE) != null) {
       StringBuilder sb = new StringBuilder();
       for (char c = 'a'; c <= 'z'; c++) {
         sb.append(c);
@@ -86,7 +112,7 @@ public class RestClientTestEchoServlet extends HttpServlet {
   protected void sendErrorResponse(HttpServletRequest req, HttpServletResponse resp, int statusCode, Status status) throws IOException {
     resp.setStatus(statusCode);
 
-    if (req.getParameter("emptyBody") != null) {
+    if (req.getParameter(EMPTY_BODY) != null) {
       return;
     }
 

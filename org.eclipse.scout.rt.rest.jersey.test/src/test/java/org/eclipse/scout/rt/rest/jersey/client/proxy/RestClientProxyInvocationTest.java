@@ -11,6 +11,11 @@
 package org.eclipse.scout.rt.rest.jersey.client.proxy;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertInstance;
+import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.EMPTY_BODY;
+import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.LARGE_MESSAGE;
+import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.REQUEST_ID;
+import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.SLEEP_SEC;
+import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.STATUS;
 import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertThrows;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -19,6 +24,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.net.URI;
+import java.util.Locale;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -32,6 +39,7 @@ import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -41,16 +49,20 @@ import org.apache.http.HttpHost;
 import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.CorrelationId;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.UriBuilder;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.rest.jersey.JerseyTestApplication;
 import org.eclipse.scout.rt.rest.jersey.JerseyTestRestClientHelper;
+import org.eclipse.scout.rt.rest.jersey.RequestSynchronizer;
 import org.eclipse.scout.rt.rest.jersey.RestClientTestEchoResponse;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.glassfish.jersey.apache.connector.ApacheClientProperties;
@@ -80,10 +92,20 @@ public class RestClientProxyInvocationTest {
 
   @Test
   public void testSyncGetOk() throws Exception {
-    Response response = webTargetGet(Response.Status.OK, Content.DEFAULT, Execution.SYNC);
-    assertNotNull(response);
-    RestClientTestEchoResponse entity = response.readEntity(RestClientTestEchoResponse.class);
-    assertEquals(Integer.valueOf(Response.Status.OK.getStatusCode()), entity.getEcho().getCode());
+    Locale locale = Locale.GERMANY;
+    String correlationId = UUID.randomUUID().toString();
+    RunContexts.copyCurrent()
+        .withLocale(locale)
+        .withCorrelationId(correlationId)
+        .run(() -> {
+          Response response = webTargetGet(Response.Status.OK, Content.DEFAULT, Execution.SYNC);
+          assertNotNull(response);
+          RestClientTestEchoResponse entity = response.readEntity(RestClientTestEchoResponse.class);
+          assertEquals(Integer.valueOf(Response.Status.OK.getStatusCode()), entity.getEcho().getCode());
+
+          assertEquals(correlationId, response.getHeaderString(CorrelationId.HTTP_HEADER_NAME));
+          assertEquals(locale.toLanguageTag(), response.getHeaderString(HttpHeaders.ACCEPT_LANGUAGE));
+        });
   }
 
   @Test
@@ -112,10 +134,21 @@ public class RestClientProxyInvocationTest {
 
   @Test
   public void testAsyncGetOk() throws Exception {
-    Response response = webTargetGet(Response.Status.OK, Content.DEFAULT, Execution.ASYNC);
-    assertNotNull(response);
-    RestClientTestEchoResponse entity = response.readEntity(RestClientTestEchoResponse.class);
-    assertEquals(Integer.valueOf(Response.Status.OK.getStatusCode()), entity.getEcho().getCode());
+    Locale defaultLocale = NlsLocale.get();
+    Locale locale = Locale.GERMANY;
+    String correlationId = UUID.randomUUID().toString();
+    RunContexts.copyCurrent()
+        .withLocale(locale)
+        .withCorrelationId(correlationId)
+        .run(() -> {
+          Response response = webTargetGet(Response.Status.OK, Content.DEFAULT, Execution.ASYNC);
+          assertNotNull(response);
+          RestClientTestEchoResponse entity = response.readEntity(RestClientTestEchoResponse.class);
+          assertEquals(Integer.valueOf(Response.Status.OK.getStatusCode()), entity.getEcho().getCode());
+
+          assertNull(response.getHeaderString(CorrelationId.HTTP_HEADER_NAME));
+          assertEquals(defaultLocale.toLanguageTag(), response.getHeaderString(HttpHeaders.ACCEPT_LANGUAGE));
+        });
   }
 
   @Test
@@ -171,12 +204,12 @@ public class RestClientProxyInvocationTest {
    * Invoking a REST service starting with a {@link WebTarget}.
    */
   protected Response webTargetGet(Status status, Content content, Execution execution) throws Exception {
-    WebTarget target = m_target.queryParam("status", status.getStatusCode());
+    WebTarget target = m_target.queryParam(STATUS, status.getStatusCode());
     if (content == Content.EMPTY_BODY) {
-      target = target.queryParam("emptyBody", "true");
+      target = target.queryParam(EMPTY_BODY, "true");
     }
     else if (status.getFamily() == Response.Status.Family.SUCCESSFUL && content == Content.LARGE_MESSAGE) {
-      target = target.queryParam("largeMessage", "true");
+      target = target.queryParam(LARGE_MESSAGE, "true");
     }
 
     Builder builder = target
@@ -192,13 +225,17 @@ public class RestClientProxyInvocationTest {
   @Test
   public void testAsyncGetCancel() throws Exception {
     assertConnectionReleased(() -> {
+      RequestSynchronizer requestSynchronizer = BEANS.get(RequestSynchronizer.class);
+      final String requestId = requestSynchronizer.announceRequest();
       Future<Response> future = m_target
-          .queryParam("status", Response.Status.OK.getStatusCode())
-          .queryParam("sleepSec", 2)
+          .queryParam(STATUS, Response.Status.OK.getStatusCode())
+          .queryParam(SLEEP_SEC, 2)
+          .queryParam(REQUEST_ID, requestId)
           .request()
           .accept(MediaType.APPLICATION_JSON)
           .async()
           .get();
+      requestSynchronizer.awaitRequest(requestId, 5);
       assertThrows(TimeoutException.class, () -> future.get(300, TimeUnit.MILLISECONDS));
       future.cancel(true);
     });
@@ -207,13 +244,14 @@ public class RestClientProxyInvocationTest {
   @Test
   public void testSyncGetCancel() throws Exception {
     assertConnectionReleased(() -> {
-      CountDownLatch jobRunningLatch = new CountDownLatch(1);
+      RequestSynchronizer requestSynchronizer = BEANS.get(RequestSynchronizer.class);
+      final String requestId = requestSynchronizer.announceRequest();
       IFuture<Response> future = Jobs.schedule(() -> {
-        jobRunningLatch.countDown();
         try {
           return m_target
-              .queryParam("status", Response.Status.OK.getStatusCode())
-              .queryParam("sleepSec", 2)
+              .queryParam(STATUS, Response.Status.OK.getStatusCode())
+              .queryParam(SLEEP_SEC, 2)
+              .queryParam(REQUEST_ID, requestId)
               .request()
               .accept(MediaType.APPLICATION_JSON)
               .get();
@@ -223,8 +261,8 @@ public class RestClientProxyInvocationTest {
         }
         return null;
       }, Jobs.newInput());
-      jobRunningLatch.await();
-      assertThrows(TimedOutError.class, () -> future.awaitDone(300, TimeUnit.MILLISECONDS));
+      requestSynchronizer.awaitRequest(requestId, 5);
+      assertThrows(TimedOutError.class, () -> future.awaitDone(100, TimeUnit.MILLISECONDS));
       future.cancel(true);
     });
   }
@@ -251,7 +289,7 @@ public class RestClientProxyInvocationTest {
           .rawClient()
           .target(m_helper.getBaseUri())
           .path("echo")
-          .queryParam("status", Response.Status.OK.getStatusCode())
+          .queryParam(STATUS, Response.Status.OK.getStatusCode())
           .request(MediaType.APPLICATION_JSON)
           .async()
           .get(RestClientTestEchoResponse.class)
@@ -272,7 +310,7 @@ public class RestClientProxyInvocationTest {
   public void testSyncGetEntityOk() {
     int scOk = Response.Status.OK.getStatusCode();
     RestClientTestEchoResponse response = m_target
-        .queryParam("status", scOk)
+        .queryParam(STATUS, scOk)
         .request()
         .accept(MediaType.APPLICATION_JSON)
         .get(RestClientTestEchoResponse.class);
@@ -283,7 +321,7 @@ public class RestClientProxyInvocationTest {
   @Test
   public void testSyncGetEntityForbidden() {
     VetoException ve = assertThrows(VetoException.class, () -> m_target
-        .queryParam("status", Response.Status.FORBIDDEN.getStatusCode())
+        .queryParam(STATUS, Response.Status.FORBIDDEN.getStatusCode())
         .request()
         .accept(MediaType.APPLICATION_JSON)
         .get(RestClientTestEchoResponse.class));
@@ -293,8 +331,8 @@ public class RestClientProxyInvocationTest {
   @Test
   public void testSyncGetEntityForbiddenEmptyBody() {
     VetoException ve = assertThrows(VetoException.class, () -> m_target
-        .queryParam("status", Response.Status.FORBIDDEN.getStatusCode())
-        .queryParam("emptyBody", "true")
+        .queryParam(STATUS, Response.Status.FORBIDDEN.getStatusCode())
+        .queryParam(EMPTY_BODY, "true")
         .request()
         .accept(MediaType.APPLICATION_JSON)
         .get(RestClientTestEchoResponse.class));
@@ -304,7 +342,7 @@ public class RestClientProxyInvocationTest {
   @Test
   public void testSyncGetEntityNotFound() {
     ProcessingException pe = assertThrows(ProcessingException.class, () -> m_target
-        .queryParam("status", Response.Status.NOT_FOUND.getStatusCode())
+        .queryParam(STATUS, Response.Status.NOT_FOUND.getStatusCode())
         .request()
         .accept(MediaType.APPLICATION_JSON)
         .get(RestClientTestEchoResponse.class));
@@ -314,8 +352,8 @@ public class RestClientProxyInvocationTest {
   @Test
   public void testSyncGetEntityNotFoundEmptyBody() {
     ProcessingException pe = assertThrows(ProcessingException.class, () -> m_target
-        .queryParam("status", Response.Status.NOT_FOUND.getStatusCode())
-        .queryParam("emptyBody", "true")
+        .queryParam(STATUS, Response.Status.NOT_FOUND.getStatusCode())
+        .queryParam(EMPTY_BODY, "true")
         .request()
         .accept(MediaType.APPLICATION_JSON)
         .get(RestClientTestEchoResponse.class));
@@ -326,7 +364,7 @@ public class RestClientProxyInvocationTest {
   public void testAsyncGetEntityOk() throws Exception {
     int scOk = Response.Status.OK.getStatusCode();
     RestClientTestEchoResponse response = m_target
-        .queryParam("status", scOk)
+        .queryParam(STATUS, scOk)
         .request()
         .accept(MediaType.APPLICATION_JSON)
         .async()
@@ -339,7 +377,7 @@ public class RestClientProxyInvocationTest {
   @Test
   public void testAsyncGetEntityForbidden() throws Exception {
     ExecutionException ee = assertThrows(ExecutionException.class, () -> m_target
-        .queryParam("status", Response.Status.FORBIDDEN.getStatusCode())
+        .queryParam(STATUS, Response.Status.FORBIDDEN.getStatusCode())
         .request()
         .accept(MediaType.APPLICATION_JSON)
         .async()
@@ -352,8 +390,8 @@ public class RestClientProxyInvocationTest {
   @Test
   public void testAsyncGetEntityForbiddenEmptyBody() {
     ExecutionException ee = assertThrows(ExecutionException.class, () -> m_target
-        .queryParam("status", Response.Status.FORBIDDEN.getStatusCode())
-        .queryParam("emptyBody", "true")
+        .queryParam(STATUS, Response.Status.FORBIDDEN.getStatusCode())
+        .queryParam(EMPTY_BODY, "true")
         .request()
         .accept(MediaType.APPLICATION_JSON)
         .async()
@@ -366,7 +404,7 @@ public class RestClientProxyInvocationTest {
   @Test
   public void testAsyncGetEntityNotFound() throws Exception {
     ExecutionException ee = assertThrows(ExecutionException.class, () -> m_target
-        .queryParam("status", Response.Status.NOT_FOUND.getStatusCode())
+        .queryParam(STATUS, Response.Status.NOT_FOUND.getStatusCode())
         .request()
         .accept(MediaType.APPLICATION_JSON)
         .async()
@@ -379,8 +417,8 @@ public class RestClientProxyInvocationTest {
   @Test
   public void testAsyncGetEntityNotFoundEmptyBody() {
     ExecutionException ee = assertThrows(ExecutionException.class, () -> m_target
-        .queryParam("status", Response.Status.NOT_FOUND.getStatusCode())
-        .queryParam("emptyBody", "true")
+        .queryParam(STATUS, Response.Status.NOT_FOUND.getStatusCode())
+        .queryParam(EMPTY_BODY, "true")
         .request()
         .accept(MediaType.APPLICATION_JSON)
         .async()
@@ -432,9 +470,9 @@ public class RestClientProxyInvocationTest {
 
   protected RecordingInvocationCallback webTargetAsyncGetCallback(Response.Status status, Content content) throws Exception {
     RecordingInvocationCallback callback = new RecordingInvocationCallback();
-    WebTarget target = m_target.queryParam("status", status.getStatusCode());
+    WebTarget target = m_target.queryParam(STATUS, status.getStatusCode());
     if (content == Content.EMPTY_BODY) {
-      target.queryParam("emptyBody", "true");
+      target.queryParam(EMPTY_BODY, "true");
     }
     target
         .request()
@@ -516,10 +554,10 @@ public class RestClientProxyInvocationTest {
   protected RestClientTestEchoResponse clientInvocationGetEntity(Status status, Content content, Execution execution) throws Exception {
     UriBuilder uriBuilder = new UriBuilder(m_helper.getBaseUri())
         .addPath("echo")
-        .parameter("status", String.valueOf(status.getStatusCode()));
+        .parameter(STATUS, String.valueOf(status.getStatusCode()));
 
     if (content == Content.EMPTY_BODY) {
-      uriBuilder.parameter("emptyBody", String.valueOf(true));
+      uriBuilder.parameter(EMPTY_BODY, String.valueOf(true));
     }
 
     Builder invocationBuilder = m_helper.client()
@@ -538,7 +576,7 @@ public class RestClientProxyInvocationTest {
   public void testInvocationSyncGetEntityOk() {
     int scOk = Response.Status.OK.getStatusCode();
     Invocation invocation = m_target
-        .queryParam("status", scOk)
+        .queryParam(STATUS, scOk)
         .request()
         .accept(MediaType.APPLICATION_JSON)
         .buildGet();
@@ -551,7 +589,7 @@ public class RestClientProxyInvocationTest {
   @Test
   public void testInvocationSyncGetEntityForbidden() {
     Invocation invocation = m_target
-        .queryParam("status", Response.Status.FORBIDDEN.getStatusCode())
+        .queryParam(STATUS, Response.Status.FORBIDDEN.getStatusCode())
         .request()
         .accept(MediaType.APPLICATION_JSON)
         .buildGet();
@@ -563,8 +601,8 @@ public class RestClientProxyInvocationTest {
   @Test
   public void testInvocationSyncGetEntityForbiddenEmptyBody() {
     Invocation invocation = m_target
-        .queryParam("status", Response.Status.FORBIDDEN.getStatusCode())
-        .queryParam("emptyBody", "true")
+        .queryParam(STATUS, Response.Status.FORBIDDEN.getStatusCode())
+        .queryParam(EMPTY_BODY, "true")
         .request()
         .accept(MediaType.APPLICATION_JSON)
         .buildGet();
@@ -577,7 +615,7 @@ public class RestClientProxyInvocationTest {
   public void testInvocationAsyncGetEntityOk() throws Exception {
     int scOk = Response.Status.OK.getStatusCode();
     Invocation invocation = m_target
-        .queryParam("status", scOk)
+        .queryParam(STATUS, scOk)
         .request()
         .accept(MediaType.APPLICATION_JSON)
         .buildGet();
@@ -590,7 +628,7 @@ public class RestClientProxyInvocationTest {
   @Test
   public void testInvocationAsyncGetEntityForbidden() {
     Invocation invocation = m_target
-        .queryParam("status", Response.Status.FORBIDDEN.getStatusCode())
+        .queryParam(STATUS, Response.Status.FORBIDDEN.getStatusCode())
         .request()
         .accept(MediaType.APPLICATION_JSON)
         .buildGet();
@@ -603,8 +641,8 @@ public class RestClientProxyInvocationTest {
   @Test
   public void testInvocationAsyncGetEntityForbiddenEmptyBody() throws Exception {
     Invocation invocation = m_target
-        .queryParam("status", Response.Status.FORBIDDEN.getStatusCode())
-        .queryParam("emptyBody", "true")
+        .queryParam(STATUS, Response.Status.FORBIDDEN.getStatusCode())
+        .queryParam(EMPTY_BODY, "true")
         .request()
         .accept(MediaType.APPLICATION_JSON)
         .buildGet();
@@ -639,9 +677,9 @@ public class RestClientProxyInvocationTest {
   }
 
   protected RecordingInvocationCallback invocationAsyncGetCallback(Response.Status status, Content content) throws Exception {
-    WebTarget target = m_target.queryParam("status", status.getStatusCode());
+    WebTarget target = m_target.queryParam(STATUS, status.getStatusCode());
     if (content == Content.EMPTY_BODY) {
-      target.queryParam("emptyBody", "true");
+      target.queryParam(EMPTY_BODY, "true");
     }
 
     Invocation invocation = target
