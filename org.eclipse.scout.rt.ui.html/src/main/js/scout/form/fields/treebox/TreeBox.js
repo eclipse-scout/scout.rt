@@ -201,12 +201,6 @@ scout.TreeBox.prototype._createDefaultTreeBoxTree = function() {
   });
 };
 
-scout.TreeBox.prototype._createDefaultTreeBoxTree = function() {
-  return scout.create('Tree', {
-    parent: this
-  });
-};
-
 /**
  * @override
  */
