@@ -31,7 +31,6 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
   String PROP_HEADER_FOCUSABLE = "headerFocusable";
   String PROP_HEADER_VISIBLE = "headerVisible";
   String PROP_BODY = "body";
-  String PROP_BODY_VISIBLE = "bodyVisible";
   String PROP_GROUP_ID = "groupId";
   String PROP_TITLE_SUFFIX = "titleSuffix";
   String PROP_ICON_ID = "iconId";
@@ -108,10 +107,6 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
 
   void setBody(IWidget widget);
 
-  boolean isBodyVisible();
-
-  void setBodyVisible(boolean bodyVisible);
-
   IGroupUIFacade getUIFacade();
 
   Object getGroupId();
@@ -121,5 +116,4 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
   String getIconId();
 
   void setIconId(String iconId);
-
 }

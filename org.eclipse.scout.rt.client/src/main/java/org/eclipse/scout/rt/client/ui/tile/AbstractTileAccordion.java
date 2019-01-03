@@ -21,6 +21,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -638,14 +641,29 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
     IGroup defaultGroup = getDefaultGroup();
     ITileGrid defaultTileGrid = getTileGrid(defaultGroup);
     if (m_groupManager instanceof DefaultGroupManager) {
-      defaultGroup.setHeaderVisible(false);
+      setPropertyPreservingOldValue(defaultGroup, "oldHeaderVisible", defaultGroup::isHeaderVisible, defaultGroup::setHeaderVisible);
+      setPropertyPreservingOldValue(defaultGroup, "oldCollapsible", defaultGroup::isCollapsible, defaultGroup::setCollapsible);
     }
     else {
       // Make default group invisible if it has no tiles
-      defaultGroup.setHeaderVisible(defaultTileGrid.getFilteredTileCount() > 0);
+      boolean hasTiles = defaultTileGrid.getFilteredTileCount() > 0;
+      setPropertyIncludingOldValue(defaultGroup, "oldHeaderVisible", hasTiles, defaultGroup::setHeaderVisible);
+      setPropertyIncludingOldValue(defaultGroup, "oldCollapsible", hasTiles, defaultGroup::setCollapsible);
     }
     // Collapse default group if it has no tiles
     defaultGroup.setCollapsed(defaultTileGrid.getFilteredTileCount() == 0);
+  }
+
+  protected void setPropertyPreservingOldValue(IGroup group, String propertyName, Supplier<Object> supplier, Consumer<Boolean> consumer) {
+    group.setProperty(propertyName, supplier.get());
+    consumer.accept(false);
+  }
+
+  protected void setPropertyIncludingOldValue(IGroup group, String propertyName, boolean hasTiles, Consumer<Boolean> consumer) {
+    Boolean oldValue = Optional.ofNullable(group.getProperty(propertyName))
+        .map(o -> (Boolean) o)
+        .orElse(Boolean.TRUE);
+    consumer.accept(oldValue && hasTiles);
   }
 
   protected void updateGroupTitleSuffix(IGroup group) {

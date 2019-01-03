@@ -85,7 +85,6 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
     setHeader(createHeader());
     setHeaderFocusable(getConfiguredHeaderFocusable());
     setHeaderVisible(getConfiguredHeaderVisible());
-    setBodyVisible(getConfiguredBodyVisible());
     setBody(createBody());
   }
 
@@ -380,22 +379,6 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
     return (IWidget) propertySupport.getProperty(PROP_BODY);
   }
 
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(120)
-  protected boolean getConfiguredBodyVisible() {
-    return true;
-  }
-
-  @Override
-  public void setBodyVisible(boolean bodyVisible) {
-    propertySupport.setPropertyBool(PROP_BODY_VISIBLE, bodyVisible);
-  }
-
-  @Override
-  public boolean isBodyVisible() {
-    return propertySupport.getPropertyBool(PROP_BODY_VISIBLE);
-  }
-
   @Override
   public ITypeWithClassId getContainer() {
     return m_container;
@@ -511,5 +494,4 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
       setCollapsed(collapsed);
     }
   }
-
 }

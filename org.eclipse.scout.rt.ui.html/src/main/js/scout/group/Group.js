@@ -20,7 +20,6 @@ scout.Group = function() {
   this.headerFocusable = false;
   this.headerVisible = true;
   this.body = null;
-  this.bodyVisible = true;
 
   this.$container = null;
   this.$header = null;
@@ -96,7 +95,6 @@ scout.Group.prototype._renderProperties = function() {
   this._renderTitleSuffix();
   this._renderHeaderVisible();
   this._renderHeaderFocusable();
-  this._renderBodyVisible();
   this._renderCollapsed();
   this._renderCollapseStyle();
   this._renderCollapsible();
@@ -214,7 +212,7 @@ scout.Group.prototype.setHeaderVisible = function(headerVisible) {
 
 scout.Group.prototype._renderHeaderVisible = function() {
   this.$header.setVisible(this.headerVisible);
-  this._updateFooterVisible();
+  this._renderCollapsible();
   this.invalidateLayoutTree();
 };
 
@@ -234,17 +232,6 @@ scout.Group.prototype._setBody = function(body) {
     });
   }
   this._setProperty('body', body);
-};
-
-scout.Group.prototype.setBodyVisible = function(bodyVisible) {
-  this.setProperty('bodyVisible', bodyVisible);
-};
-
-scout.Group.prototype._renderBodyVisible = function() {
-  this.body.setVisible(this.bodyVisible);
-  this.$container.toggleClass('has-body', this.bodyVisible);
-  this._updateFooterVisible();
-  this.invalidateLayoutTree();
 };
 
 scout.Group.prototype._renderHeader = function() {
@@ -318,8 +305,12 @@ scout.Group.prototype.setCollapsible = function(collapsible) {
 };
 
 scout.Group.prototype._renderCollapsible = function() {
+  this.$container.toggleClass('collapsible', this.collapsible);
   this.$header.toggleClass('disabled', !this.collapsible);
-  this.$collapseIcon.toggleClass('hidden', !this.collapsible);
+  // footer is visible if collapseStyle is 'bottom' and either header is visible or has a (collapsible) body
+  this.$footer.setVisible(this.collapseStyle === scout.Group.CollapseStyle.BOTTOM && (this.headerVisible || this.collapsible));
+  this.$collapseIcon.setVisible(this.collapsible);
+  this.invalidateLayoutTree();
 };
 
 scout.Group.prototype.setCollapseStyle = function(collapseStyle) {
@@ -340,27 +331,18 @@ scout.Group.prototype._renderCollapseStyle = function() {
     this.$collapseIcon.insertAfter(this.$collapseBorderLeft);
   }
 
-  this._updateFooterVisible();
-  this.invalidateLayoutTree();
-};
-
-scout.Group.prototype._updateFooterVisible = function() {
-  // footer is visible if collapseStyle is 'bottom' and either a body or a header is available
-  var hasBody = this.body.$htmlComp && this.bodyVisible;
-  var hasHeader = this.headerVisible;
-  this.$footer.setVisible(this.collapseStyle === scout.Group.CollapseStyle.BOTTOM && (hasBody || hasHeader));
-  this.$collapseIcon.setVisible(this.bodyVisible);
+  this._renderCollapsible();
   this.invalidateLayoutTree();
 };
 
 scout.Group.prototype._onHeaderMouseDown = function(event) {
-  if (this.bodyVisible && this.collapseStyle !== scout.Group.CollapseStyle.BOTTOM) {
+  if (this.collapsible && this.collapseStyle !== scout.Group.CollapseStyle.BOTTOM) {
     this.setCollapsed(!this.collapsed && this.collapsible);
   }
 };
 
 scout.Group.prototype._onFooterMouseDown = function(event) {
-  if (this.bodyVisible) {
+  if (this.collapsible) {
     this.setCollapsed(!this.collapsed && this.collapsible);
   }
 };
