@@ -613,8 +613,6 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    */
   void setFormStored(boolean b);
 
-  Object getProperty(String name);
-
   /**
    * With this method it's possible to set (custom) properties.
    * <p>
@@ -624,9 +622,8 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    * Example for an unexpected behavior: setVisible() does not only set the property PROP_VISIBLE but also executes
    * additional code. This code would NOT be executed by directly setting the property PROP_VISIBLE with setProperty().
    */
+  @Override
   void setProperty(String name, Object value);
-
-  boolean hasProperty(String name);
 
   /**
    * XML export/import of form state

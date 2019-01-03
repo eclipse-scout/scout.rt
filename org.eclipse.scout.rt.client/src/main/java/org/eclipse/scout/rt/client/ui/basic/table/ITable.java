@@ -210,7 +210,7 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
    * @since 8.0
    */
   String PROP_HIERARCHICAL_ROWS = "hierarchicalRows";
-  
+
   /**
    * The strategy how rows can be checked.
    *
@@ -502,25 +502,6 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
    * Convenience for {@link ICell#isEditable()}
    */
   boolean isCellEditable(ITableRow row, IColumn<?> column);
-
-  /*
-   * Properties observer section
-   */
-
-  Object getProperty(String name);
-
-  /**
-   * With this method it's possible to set (custom) properties.
-   * <p>
-   * <b>Important: </b> Although this method is intended to be used for custom properties, it's actually possible to
-   * change main properties as well. Keep in mind that directly changing main properties may result in unexpected
-   * behavior, so do it only if you really know what you are doing. Rather use the officially provided api instead. <br>
-   * Example for an unexpected behavior: setVisible() does not only set the property PROP_VISIBLE but also executes
-   * additional code. This code would NOT be executed by directly setting the property PROP_VISIBLE with setProperty().
-   */
-  void setProperty(String name, Object value);
-
-  boolean hasProperty(String name);
 
   boolean isCheckable();
 
@@ -1232,7 +1213,7 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
   void setHierarchicalStyle(HierarchicalStyle hierarchicalStyle);
 
   boolean isHierarchical();
-  
+
   CheckableStyle getCheckableStyle();
 
   void setCheckableStyle(CheckableStyle checkableStyle);
@@ -1253,7 +1234,7 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
 
   /**
    * Maximum row count the user is allowed to load into this table, maximal capacity, optional.
-   * 
+   *
    * @since 9.0
    */
   int getMaxRowCount();
@@ -1267,14 +1248,14 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
 
   /**
    * Number of rows the user requests to be loaded into this table upon reload
-   * 
+   *
    * @since 9.0
    */
   int getRequestedRowCount();
 
   /**
    * Number of rows the user requests to be loaded into this table upon reload
-   * 
+   *
    * @since 9.0
    */
   void setRequestedRowCount(int requestedRowCount);

@@ -776,4 +776,19 @@ public class VirtualDesktop implements IDesktop {
   public boolean closeForms(Set<IForm> formSet) {
     throw createUnsupportedOperationException();
   }
+
+  @Override
+  public Object getProperty(String name) {
+    return null;
+  }
+
+  @Override
+  public void setProperty(String name, Object value) {
+    // NOP
+  }
+
+  @Override
+  public boolean hasProperty(String name) {
+    return false;
+  }
 }

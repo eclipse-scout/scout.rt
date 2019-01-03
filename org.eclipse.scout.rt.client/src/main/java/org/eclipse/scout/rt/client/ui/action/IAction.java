@@ -69,8 +69,6 @@ public interface IAction extends IWidget, ITypeWithClassId, IOrdered, IStyleable
    */
   void doAction();
 
-  Object getProperty(String name);
-
   /**
    * With this method it's possible to set (custom) properties.
    * <p>
@@ -80,9 +78,8 @@ public interface IAction extends IWidget, ITypeWithClassId, IOrdered, IStyleable
    * Example for an unexpected behavior: setVisible() does not only set the property PROP_VISIBLE but also executes
    * additional code. This code would NOT be executed by directly setting the property PROP_VISIBLE with setProperty().
    */
+  @Override
   void setProperty(String name, Object value);
-
-  boolean hasProperty(String name);
 
   String getActionId();
 

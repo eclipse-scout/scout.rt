@@ -1194,11 +1194,6 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   @Override
-  public boolean hasProperty(String name) {
-    return propertySupport.hasProperty(name);
-  }
-
-  @Override
   public boolean isFieldChanging() {
     return propertySupport.isPropertiesChanging();
   }
@@ -1456,16 +1451,6 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    */
   protected void calculateLabelVisibleInternal() {
     propertySupport.setPropertyBool(PROP_LABEL_VISIBLE, NamedBitMaskHelper.allBitsSet(m_labelVisible));
-  }
-
-  @Override
-  public Object getProperty(String name) {
-    return propertySupport.getProperty(name);
-  }
-
-  @Override
-  public void setProperty(String name, Object value) {
-    propertySupport.setProperty(name, value);
   }
 
   @Override

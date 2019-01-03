@@ -277,4 +277,19 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
   public void setCssClass(String cssClass) {
     propertySupport.setPropertyString(PROP_CSS_CLASS, cssClass);
   }
+
+  @Override
+  public Object getProperty(String name) {
+    return propertySupport.getProperty(name);
+  }
+
+  @Override
+  public void setProperty(String name, Object value) {
+    propertySupport.setProperty(name, value);
+  }
+
+  @Override
+  public boolean hasProperty(String name) {
+    return propertySupport.hasProperty(name);
+  }
 }

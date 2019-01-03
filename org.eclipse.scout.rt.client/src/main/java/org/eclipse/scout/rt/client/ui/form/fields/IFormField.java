@@ -272,8 +272,6 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
    */
   void applySearch(SearchFilter search);
 
-  boolean hasProperty(String name);
-
   /**
    * marks field as changing all model events and property events are cached until the change is done
    * <p>
@@ -394,17 +392,6 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
    * @return fully qualified label. This is the path in the container tree
    */
   String getFullyQualifiedLabel(String separator);
-
-  Object getProperty(String name);
-
-  /**
-   * With this method it's possible to set (custom) properties.
-   * <p>
-   * <b>Important: </b> Although this method is intended to be used for custom properties, it's actually possible to
-   * change main properties as well. Keep in mind that directly changing main properties may result in unexpected
-   * behavior, so do it only if necessary. Rather use the provided API instead.<br>
-   */
-  void setProperty(String name, Object value);
 
   /**
    * @deprecated will be removed with 8.0, use {@link #isInitConfigDone()} instead
