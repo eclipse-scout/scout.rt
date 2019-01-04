@@ -84,6 +84,17 @@ public class JaxWsImplementorSpecifics {
   }
 
   /**
+   * Returns the HTTP request headers, or an empty <code>Map</code> if not found.
+   */
+  public Map<String, List<String>> getHttpRequestHeaders(final Map<String, Object> ctx) {
+    final Map<String, List<String>> headers = getHttpHeaders(ctx, valueOf(PROP_HTTP_REQUEST_HEADERS));
+    if (headers == null) {
+      return CollectionUtility.emptyHashMap();
+    }
+    return headers;
+  }
+
+  /**
    * Returns the HTTP request header, or an empty <code>List</code> if not found.
    */
   public List<String> getHttpRequestHeader(final Map<String, Object> ctx, final String key) {
@@ -95,6 +106,17 @@ public class JaxWsImplementorSpecifics {
    */
   public void setHttpRequestHeader(final Map<String, Object> ctx, final String key, final String value) {
     setHttpHeader(valueOf(PROP_HTTP_REQUEST_HEADERS), ctx, key, value);
+  }
+
+  /**
+   * Returns the HTTP response headers, or an empty <code>Map</code> if not found.
+   */
+  public Map<String, List<String>> getHttpResponseHeaders(final Map<String, Object> ctx) {
+    final Map<String, List<String>> headers = getHttpHeaders(ctx, valueOf(PROP_HTTP_RESPONSE_HEADERS));
+    if (headers == null) {
+      return CollectionUtility.emptyHashMap();
+    }
+    return headers;
   }
 
   /**
@@ -214,20 +236,22 @@ public class JaxWsImplementorSpecifics {
   }
 
   @SuppressWarnings("unchecked")
+  protected Map<String, List<String>> getHttpHeaders(final Map<String, Object> ctx, final String headerProperty) {
+    return (Map<String, List<String>>) ctx.get(headerProperty);
+  }
+
   protected void setHttpHeader(final String headerProperty, final Map<String, Object> ctx, final String key, final String value) {
-    final Map<String, List<String>> headers = (Map<String, List<String>>) ctx.get(headerProperty);
+    final Map<String, List<String>> headers = getHttpHeaders(ctx, headerProperty);
     ctx.put(headerProperty, CollectionUtility.putObject(headers, key, CollectionUtility.appendList(CollectionUtility.getObject(headers, key), value)));
   }
 
-  @SuppressWarnings("unchecked")
   protected List<String> getHttpHeader(final String headerProperty, final Map<String, Object> ctx, final String key) {
-    final Map<String, List<String>> headers = (Map<String, List<String>>) ctx.get(headerProperty);
+    final Map<String, List<String>> headers = getHttpHeaders(ctx, headerProperty);
     return CollectionUtility.arrayList(CollectionUtility.getObject(headers, key));
   }
 
-  @SuppressWarnings("unchecked")
   protected void removeHttpHeader(final String headerProperty, final Map<String, Object> ctx, final String key) {
-    final Map<String, List<String>> headers = (Map<String, List<String>>) ctx.get(headerProperty);
+    final Map<String, List<String>> headers = getHttpHeaders(ctx, headerProperty);
     if (headers != null) {
       headers.remove(key);
     }
