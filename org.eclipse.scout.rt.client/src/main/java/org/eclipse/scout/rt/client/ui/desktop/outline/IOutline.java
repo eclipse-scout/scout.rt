@@ -91,6 +91,13 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
   <T extends IPage> T findPage(final Class<T> pageType);
 
   /**
+   * Find a specific page by its type in the outline tree, only considering the subtree of the given rootPage.
+   *
+   * @return the first found occurrence of the page in the subtree
+   */
+  <T extends IPage> T findPage(final Class<T> pageType, IPage rootPage);
+
+  /**
    * Call this method to refresh all existing pages in this outline<br>
    * If currently active page(s) are affected they reload their data, otherwise the pages is simply marked dirty and
    * reloaded on next activation

@@ -460,6 +460,11 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   public <T extends IPage> T findPage(final Class<T> pageType) {
+    return findPage(pageType, getRootPage());
+  }
+
+  @Override
+  public <T extends IPage> T findPage(final Class<T> pageType, IPage rootPage) {
     final Holder<T> result = new Holder<>(pageType, null);
     IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
       @Override
@@ -474,7 +479,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
         return TreeVisitResult.CONTINUE;
       }
     };
-    visitNode(getRootNode(), v);
+    visitNode(rootPage, v);
     return result.getValue();
   }
 
