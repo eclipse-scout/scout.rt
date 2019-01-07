@@ -10,13 +10,41 @@
  ******************************************************************************/
 scout.TableHeaderMenu = function() {
   scout.TableHeaderMenu.parent.call(this);
-  this.tableHeader;
-  this.table;
-  this.$headerItem;
-  this.$columnActions;
-  this.$columnFilters;
+  this.column = null;
+  this.tableHeader = null;
+  this.table = null;
+  this.filter = null;
   this.filterCheckedMode = scout.TableHeaderMenu.CheckedMode.ALL;
   this.filterSortMode = scout.TableHeaderMenu.SortMode.ALPHABETICALLY;
+  this.hasFilterTable = false;
+  this.hasFilterFields = false;
+
+  this.leftGroups = [];
+  this.moveGroup = null;
+  this.toBeginButton = null;
+  this.forwardButton = null;
+  this.backwardButton = null;
+  this.toEndButton = null;
+  this.sortingGroup = null;
+  this.sortDescButton = null;
+  this.sortAscAddButton = null;
+  this.sortDescAddButton = null;
+  this.columnActionsGroup = null;
+  this.addColumnButton = null;
+  this.removeColumnButton = null;
+  this.modifyColumnButton = null;
+  this.groupButton = null;
+  this.groupAddButton = null;
+
+  this.$rightGroups = [];
+  this.$headerItem = null;
+  this.$columnActions = null;
+  this.$columnFilters = null;
+  this.$filterTableGroup = null;
+  this.$filterToggleChecked = null;
+  this.$filterTableGroupTitle = null;
+  this.$filterSortOrder = null;
+  this.$filterFieldsGroup = null;
 
   this._onColumnMovedHandler = this._onColumnMoved.bind(this);
   this._tableHeaderScrollHandler = this._onAnchorScroll.bind(this);
@@ -462,7 +490,7 @@ scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
     textKey: 'ui.Grouping'
   });
 
-  var groupButton = scout.create('TableHeaderMenuButton', {
+  this.groupButton = scout.create('TableHeaderMenuButton', {
     parent: group,
     text: '${textKey:ui.groupingApply}',
     cssClass: 'group',
@@ -470,7 +498,7 @@ scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
     toggleAction: true,
     clickHandler: groupColumn
   });
-  var groupAddButton = scout.create('TableHeaderMenuButton', {
+  this.groupAddButton = scout.create('TableHeaderMenuButton', {
     parent: group,
     text: '${textKey:ui.additionally}',
     cssClass: 'group-add',
@@ -480,26 +508,26 @@ scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
   });
 
   if (groupCount === 0) {
-    groupAddButton.setVisible(false);
+    this.groupAddButton.setVisible(false);
   } else if (groupCount === 1 && this.column.grouped) {
-    groupButton.setSelected(true);
-    groupAddButton.setVisible(false);
+    this.groupButton.setSelected(true);
+    this.groupAddButton.setVisible(false);
   } else if (groupCount > 1) {
-    groupAddButton.setVisible(true);
+    this.groupAddButton.setVisible(true);
   }
 
   if (table.hasPermanentHeadOrTailSortColumns() && groupCount > 0) {
     // If table has permanent head columns, other columns may not be grouped exclusively -> only enable add button (equally done for sort buttons)
-    groupButton.setVisible(false);
-    groupAddButton.setVisible(true);
+    this.groupButton.setVisible(false);
+    this.groupAddButton.setVisible(true);
   }
 
   if (this.column.grouped) {
     if (groupCount === 1) {
-      groupAddButton.setSelected(true);
+      this.groupAddButton.setSelected(true);
     } else if (groupCount > 1) {
-      groupAddButton.setSelected(true);
-      groupAddButton.setIconId(this.column.sortIndex + 1);
+      this.groupAddButton.setSelected(true);
+      this.groupAddButton.setIconId(this.column.sortIndex + 1);
     }
   }
 

@@ -37,7 +37,7 @@ describe('TableHeaderMenu', function() {
   }
 
   function find$FilterItems(table) {
-    var $menu = table.header._tableHeaderMenu.$container;
+    var $menu = table.header.tableHeaderMenu.$container;
     return $menu.find('.table-data > .table-row');
   }
 
@@ -217,22 +217,22 @@ describe('TableHeaderMenu', function() {
       });
 
       it('count sorted columns', function() {
-        expect(table.header._tableHeaderMenu._sortColumnCount()).toBe(0);
+        expect(table.header.tableHeaderMenu._sortColumnCount()).toBe(0);
         table.header.closeHeaderMenu();
 
         table.sort(column, 'asc');
         table.header.openHeaderMenu(column);
-        expect(table.header._tableHeaderMenu._sortColumnCount()).toBe(1);
+        expect(table.header.tableHeaderMenu._sortColumnCount()).toBe(1);
         table.header.closeHeaderMenu();
       });
 
       it('count grouped columns', function() {
-        expect(table.header._tableHeaderMenu._groupColumnCount()).toBe(0);
+        expect(table.header.tableHeaderMenu._groupColumnCount()).toBe(0);
         table.header.closeHeaderMenu();
 
         table.groupColumn(column, false, 'asc');
         table.header.openHeaderMenu(column);
-        expect(table.header._tableHeaderMenu._groupColumnCount()).toBe(1);
+        expect(table.header.tableHeaderMenu._groupColumnCount()).toBe(1);
         table.header.closeHeaderMenu();
       });
 
@@ -269,7 +269,7 @@ describe('TableHeaderMenu', function() {
         table.sortEnabled = true;
         table.render();
         table.header.openHeaderMenu(column);
-        var $menu = table.header._tableHeaderMenu.$container;
+        var $menu = table.header.tableHeaderMenu.$container;
         expect($menu.find('.table-header-menu-command.sort-asc').length).toBe(1);
         expect($menu.find('.table-header-menu-command.sort-desc').length).toBe(1);
         table.header.closeHeaderMenu();
@@ -281,7 +281,7 @@ describe('TableHeaderMenu', function() {
         table.sortEnabled = false;
         table.render();
         table.header.openHeaderMenu(column);
-        var $menu = table.header._tableHeaderMenu.$container;
+        var $menu = table.header.tableHeaderMenu.$container;
         expect($menu.find('.table-header-menu-command.sort-asc').length).toBe(0);
         expect($menu.find('.table-header-menu-command.sort-desc').length).toBe(0);
         table.header.closeHeaderMenu();
@@ -296,7 +296,7 @@ describe('TableHeaderMenu', function() {
         var column = table.columns[0];
         table.render();
         table.header.openHeaderMenu(column);
-        var tableHeaderMenu = table.header._tableHeaderMenu;
+        var tableHeaderMenu = table.header.tableHeaderMenu;
         var $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'AValue');
         expectTableRowText($filterItems, 1, 'BValue');
@@ -309,7 +309,7 @@ describe('TableHeaderMenu', function() {
         var column = table.columns[0];
         table.render();
         table.header.openHeaderMenu(column);
-        var tableHeaderMenu = table.header._tableHeaderMenu;
+        var tableHeaderMenu = table.header.tableHeaderMenu;
         tableHeaderMenu._onSortModeClick(); // changes sort mode from 'alphabetically' (default) to 'amount'
         var $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'BValue');

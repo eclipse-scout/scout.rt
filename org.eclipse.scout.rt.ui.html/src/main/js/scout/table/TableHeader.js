@@ -215,8 +215,8 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
     .css('margin-left', marginLeft)
     .css('margin-right', marginRight);
 
-  if (this._tableHeaderMenu && this._tableHeaderMenu.rendered && this._tableHeaderMenu.column === column) {
-    this._tableHeaderMenu.onColumnResized();
+  if (this.tableHeaderMenu && this.tableHeaderMenu.rendered && this.tableHeaderMenu.column === column) {
+    this.tableHeaderMenu.onColumnResized();
   }
 };
 
@@ -248,8 +248,8 @@ scout.TableHeader.prototype._arrangeHeaderItems = function($headers) {
           scout.scrollbars.scrollHorizontalTo(that.table.$data, $headerItem);
 
           // move menu
-          if (that._tableHeaderMenu && that._tableHeaderMenu.rendered) {
-            that._tableHeaderMenu.position();
+          if (that.tableHeaderMenu && that.tableHeaderMenu.rendered) {
+            that.tableHeaderMenu.position();
           }
         }
       });
@@ -305,34 +305,34 @@ scout.TableHeader.prototype._renderHeaderMenusEnabled = function() {
 
 scout.TableHeader.prototype.openHeaderMenu = function(column) {
   var $header = column.$header;
-  this._tableHeaderMenu = scout.create('TableHeaderMenu', {
+  this.tableHeaderMenu = scout.create('TableHeaderMenu', {
     parent: this,
     column: $header.data('column'),
     tableHeader: this,
     $anchor: $header,
     focusableContainer: true
   });
-  this._tableHeaderMenu.open();
+  this.tableHeaderMenu.open();
 
   // Trigger events on column to make it possible to react to the opening of the menu
   column.trigger('headerMenuOpen', {
-    menu: this._tableHeaderMenu
+    menu: this.tableHeaderMenu
   });
-  this._tableHeaderMenu.one('destroy', function() {
+  this.tableHeaderMenu.one('destroy', function() {
     column.trigger('headerMenuClose', {
-      menu: this._tableHeaderMenu
+      menu: this.tableHeaderMenu
     });
   }.bind(this));
 };
 
 scout.TableHeader.prototype.closeHeaderMenu = function() {
-  this._tableHeaderMenu.destroy();
-  this._tableHeaderMenu = null;
+  this.tableHeaderMenu.destroy();
+  this.tableHeaderMenu = null;
 };
 
 scout.TableHeader.prototype.onColumnActionsChanged = function(event) {
-  if (this._tableHeaderMenu) {
-    this._tableHeaderMenu.onColumnActionsChanged(event);
+  if (this.tableHeaderMenu) {
+    this.tableHeaderMenu.onColumnActionsChanged(event);
   }
 };
 
@@ -587,7 +587,7 @@ scout.TableHeader.prototype._onHeaderItemClick = function(event) {
   } else if (this.table.sortEnabled && (event.shiftKey || event.ctrlKey || !this._isHeaderMenuEnabled(column))) {
     this.table.removeColumnGrouping();
     this.table.sort(column, $headerItem.hasClass('sort-asc') ? 'desc' : 'asc', event.shiftKey);
-  } else if (this._tableHeaderMenu && this._tableHeaderMenu.isOpenFor($headerItem)) {
+  } else if (this.tableHeaderMenu && this.tableHeaderMenu.isOpenFor($headerItem)) {
     this.closeHeaderMenu();
   } else if (this._isHeaderMenuEnabled(column)) {
     this.openHeaderMenu(column);
@@ -656,9 +656,9 @@ scout.TableHeader.prototype._onHeaderItemMouseDown = function(event) {
       }
     });
 
-    if (that._tableHeaderMenu) {
-      that._tableHeaderMenu.destroy();
-      that._tableHeaderMenu = null;
+    if (that.tableHeaderMenu) {
+      that.tableHeaderMenu.destroy();
+      that.tableHeaderMenu = null;
     }
 
     // Don't show tooltips while dragging

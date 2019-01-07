@@ -33,6 +33,7 @@ scout.TableHeaderMenuGroup.prototype._render = function() {
   this.children.forEach(function(child) {
     child.render();
   }, this);
+  scout.widgets.updateFirstLastMarker(this.children);
 };
 
 scout.TableHeaderMenuGroup.prototype.appendText = function(text) {
