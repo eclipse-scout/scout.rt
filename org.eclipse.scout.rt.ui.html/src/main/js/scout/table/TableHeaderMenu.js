@@ -254,39 +254,41 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
   this.toBeginButton = scout.create('TableHeaderMenuButton', {
     parent: this.moveGroup,
     text: '${textKey:ui.toBegin}',
-    cssClass: 'move move-top',
-    clickHandler: function() {
-      table.moveColumn(column, pos, 0);
-      pos = table.visibleColumns().indexOf(column);
-    }
+    cssClass: 'move move-top'
   });
+  this.toBeginButton.on('action', function() {
+    table.moveColumn(column, pos, 0);
+    pos = table.visibleColumns().indexOf(column);
+  });
+
   this.forwardButton = scout.create('TableHeaderMenuButton', {
     parent: this.moveGroup,
     text: '${textKey:ui.forward}',
-    cssClass: 'move move-up',
-    clickHandler: function() {
-      table.moveColumn(column, pos, Math.max(pos - 1, 0));
-      pos = table.visibleColumns().indexOf(column);
-    }
+    cssClass: 'move move-up'
   });
+  this.forwardButton.on('action',  function() {
+    table.moveColumn(column, pos, Math.max(pos - 1, 0));
+    pos = table.visibleColumns().indexOf(column);
+  });
+
   this.backwardButton = scout.create('TableHeaderMenuButton', {
     parent: this.moveGroup,
     text: '${textKey:ui.backward}',
-    cssClass: 'move move-down',
-    clickHandler: function() {
-      table.moveColumn(column, pos, Math.min(pos + 1, table.header.findHeaderItems().length - 1));
-      pos = table.visibleColumns().indexOf(column);
-    }
-
+    cssClass: 'move move-down'
   });
+  this.backwardButton.on('action', function() {
+    table.moveColumn(column, pos, Math.min(pos + 1, table.header.findHeaderItems().length - 1));
+    pos = table.visibleColumns().indexOf(column);
+  });
+
   this.toEndButton = scout.create('TableHeaderMenuButton', {
     parent: this.moveGroup,
     text: '${textKey:ui.toEnd}',
-    cssClass: 'move move-bottom',
-    clickHandler: function() {
-      table.moveColumn(column, pos, table.header.findHeaderItems().length - 1);
-      pos = table.visibleColumns().indexOf(column);
-    }
+    cssClass: 'move move-bottom'
+  });
+  this.toEndButton.on('action', function() {
+    table.moveColumn(column, pos, table.header.findHeaderItems().length - 1);
+    pos = table.visibleColumns().indexOf(column);
   });
 
   this.moveGroup.render(this.$columnActions);
@@ -332,23 +334,25 @@ scout.TableHeaderMenu.prototype._renderColumnActionsGroup = function() {
     parent: this.columnActionsGroup,
     text: '${textKey:ui.addColumn}',
     cssClass: 'add-column',
-    visible: this.table.columnAddable,
-    clickHandler: onClick.bind(this, 'add')
+    visible: this.table.columnAddable
   });
+  this.addColumnButton.on('action', onClick.bind(this, 'add'));
+
   this.removeColumnButton = scout.create('TableHeaderMenuButton', {
     parent: this.columnActionsGroup,
     text: '${textKey:ui.removeColumn}',
     cssClass: 'remove-column',
-    visible: this.column.removable,
-    clickHandler: onClick.bind(this, 'remove')
+    visible: this.column.removable
   });
+  this.removeColumnButton.on('action', onClick.bind(this, 'remove'));
+
   this.modifyColumnButton = scout.create('TableHeaderMenuButton', {
     parent: this.columnActionsGroup,
     text: '${textKey:ui.changeColumn}',
     cssClass: 'change-column',
-    visible: this.column.modifiable,
-    clickHandler: onClick.bind(this, 'modify')
+    visible: this.column.modifiable
   });
+  this.modifyColumnButton.on('action', onClick.bind(this, 'modify'));
 
   this.columnActionsGroup.render(this.$columnActions);
   return this.columnActionsGroup;
@@ -388,17 +392,18 @@ scout.TableHeaderMenu.prototype._renderSortingGroup = function() {
       text: '${textKey:ui.ascending}',
       cssClass: 'sort sort-asc',
       direction: 'asc',
-      toggleAction: true,
-      clickHandler: onSortClick
+      toggleAction: true
     });
+    this.sortAscButton.on('action', onSortClick.bind(this.sortAscButton));
+
     this.sortDescButton = scout.create('TableHeaderMenuButton', {
       parent: this.sortingGroup,
       text: '${textKey:ui.descending}',
       cssClass: 'sort sort-desc',
       direction: 'desc',
-      toggleAction: true,
-      clickHandler: onSortClick
+      toggleAction: true
     });
+    this.sortDescButton.on('action', onSortClick.bind(this.sortDescButton));
   }
 
   this.sortAscAddButton = scout.create('TableHeaderMenuButton', {
@@ -406,17 +411,18 @@ scout.TableHeaderMenu.prototype._renderSortingGroup = function() {
     text: '${textKey:ui.ascendingAdditionally}',
     cssClass: 'sort sort-asc-add',
     direction: 'asc',
-    toggleAction: true,
-    clickHandler: onSortAdditionalClick
+    toggleAction: true
   });
+  this.sortAscAddButton.on('action', onSortAdditionalClick.bind(this.sortAscAddButton));
+
   this.sortDescAddButton = scout.create('TableHeaderMenuButton', {
     parent: this.sortingGroup,
     text: '${textKey:ui.descendingAdditionally}',
     cssClass: 'sort sort-desc-add',
     direction: 'desc',
-    toggleAction: true,
-    clickHandler: onSortAdditionalClick
+    toggleAction: true
   });
+  this.sortDescAddButton.on('action', onSortAdditionalClick.bind(this.sortDescAddButton));
 
   this._updateSortingSelectedState();
   this.sortingGroup.render(this.$columnActions);
@@ -424,12 +430,12 @@ scout.TableHeaderMenu.prototype._renderSortingGroup = function() {
 
   function onSortClick() {
     menuPopup.close();
-    sort(this.direction, false, this.selected);
+    sort(this.direction, false, !this.selected);
   }
 
   function onSortAdditionalClick() {
     menuPopup.close();
-    sort(this.direction, true, this.selected);
+    sort(this.direction, true, !this.selected);
   }
 
   function sort(direction, multiSort, remove) {
@@ -495,17 +501,18 @@ scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
     text: '${textKey:ui.groupingApply}',
     cssClass: 'group',
     additional: false,
-    toggleAction: true,
-    clickHandler: groupColumn
+    toggleAction: true
   });
+  this.groupButton.on('action', groupColumn.bind(this.groupButton));
+
   this.groupAddButton = scout.create('TableHeaderMenuButton', {
     parent: group,
     text: '${textKey:ui.additionally}',
     cssClass: 'group-add',
     additional: true,
-    toggleAction: true,
-    clickHandler: groupColumn
+    toggleAction: true
   });
+  this.groupAddButton.on('action', groupColumn.bind(this.groupAddButton));
 
   if (groupCount === 0) {
     this.groupAddButton.setVisible(false);
@@ -535,7 +542,6 @@ scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
   return group;
 
   function groupColumn() {
-    this.toggle();
     var direction = (column.sortIndex >= 0 && !column.sortAscending) ? 'desc' : 'asc';
     menuPopup.close();
     table.groupColumn(column, this.additional, direction, !this.selected);
@@ -551,31 +557,30 @@ scout.TableHeaderMenu.prototype._renderHierarchyGruop = function() {
     visible: this.table.isTableNodeColumn(this.column)
   });
 
-  scout.create('TableHeaderMenuButton', {
+  var collapseAllButton = scout.create('TableHeaderMenuButton', {
     parent: this.hierarchyGroup,
     text: '${textKey:ui.CollapseAll}',
     cssClass: 'hierarchy-collapse-all',
-    clickHandler: function() {
-      menuPopup.close();
-      table.collapseAll();
-    },
-    toggleAction: false,
     enabled: !!scout.arrays.find(table.rows, function(row) {
       return row.expanded && !scout.arrays.empty(row.childRows);
     })
   });
-  scout.create('TableHeaderMenuButton', {
+  collapseAllButton.on('action', function() {
+    menuPopup.close();
+    table.collapseAll();
+  });
+
+  var expandAllButton = scout.create('TableHeaderMenuButton', {
     parent: this.hierarchyGroup,
     text: '${textKey:ui.ExpandAll}',
     cssClass: 'hierarchy-expand-all',
-    clickHandler: function() {
-      menuPopup.close();
-      table.expandAll();
-    },
-    toggleAction: false,
     enabled: !!scout.arrays.find(table.rows, function(row) {
       return !row.expanded && !scout.arrays.empty(row.childRows);
     })
+  });
+  expandAllButton.on('action', function() {
+    menuPopup.close();
+    table.expandAll();
   });
 
   this.hierarchyGroup.render(this.$columnActions);
@@ -607,14 +612,14 @@ scout.TableHeaderMenu.prototype._renderAggregationGroup = function() {
 
   function createHeaderMenuButtonForAggregationFunction(text, aggregation) {
     if (allowedAggregationFunctions.indexOf(aggregation) !== -1) {
-      scout.create('TableHeaderMenuButton', {
+      var aggrButton = scout.create('TableHeaderMenuButton', {
         parent: group,
         text: text,
         cssClass: 'aggregation-function ' + aggregation,
         aggregation: aggregation,
-        clickHandler: onClick,
         toggleAction: isAggregationNoneAllowed
       });
+      aggrButton.on('action', onClick.bind(aggrButton));
     }
   }
 
@@ -634,31 +639,33 @@ scout.TableHeaderMenu.prototype._renderColoringGroup = function() {
       textKey: 'ui.Coloring'
     });
 
-  scout.create('TableHeaderMenuButton', {
+  var colorGradient1Button = scout.create('TableHeaderMenuButton', {
     parent: group,
     text: '${textKey:ui.fromRedToGreen}',
     cssClass: 'color color-gradient1',
     backgroundEffect: 'colorGradient1',
-    toggleAction: true,
-    clickHandler: onClick
+    toggleAction: true
   });
-  scout.create('TableHeaderMenuButton', {
+  colorGradient1Button.on('action', onClick.bind(colorGradient1Button));
+
+  var colorGradient2Button = scout.create('TableHeaderMenuButton', {
     parent: group,
     text: '${textKey:ui.fromGreenToRed}',
     cssClass: 'color color-gradient2',
     backgroundEffect: 'colorGradient2',
-    toggleAction: true,
-    clickHandler: onClick
+    toggleAction: true
   });
+  colorGradient2Button.on('action', onClick.bind(colorGradient2Button));
+
   if (scout.device.supportsCssGradient()) {
-    scout.create('TableHeaderMenuButton', {
+    var barChartButton = scout.create('TableHeaderMenuButton', {
       parent: group,
       text: '${textKey:ui.withBarChart}',
       cssClass: 'color color-bar-chart',
       backgroundEffect: 'barChart',
-      toggleAction: true,
-      clickHandler: onClick
+      toggleAction: true
     });
+    barChartButton.on('action', onClick.bind(barChartButton));
   }
 
   group.children.forEach(function(button) {
@@ -669,8 +676,7 @@ scout.TableHeaderMenu.prototype._renderColoringGroup = function() {
 
   function onClick() {
     menuPopup.close();
-    table.setColumnBackgroundEffect(column, this.selected ? null : this.backgroundEffect);
-    this.toggle(); // toggle selected state of button
+    table.setColumnBackgroundEffect(column, !this.selected ? null : this.backgroundEffect);
   }
 };
 

@@ -24,6 +24,9 @@ scout.ActionAdapter.prototype._goOnline = function() {
 };
 
 scout.ActionAdapter.prototype._onWidgetAction = function(event) {
+  if (this.widget.isToggleAction()) {
+    return;
+  }
   this._send('action');
 };
 

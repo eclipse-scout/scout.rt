@@ -10,7 +10,6 @@
  ******************************************************************************/
 scout.TableHeaderMenuButton = function() {
   scout.TableHeaderMenuButton.parent.call(this);
-  this.clickHandler = null;
   this.textVisible = false;
   this.tabbable = true;
 };
@@ -26,18 +25,12 @@ scout.TableHeaderMenuButton.prototype._initKeyStrokeContext = function() {
 };
 
 scout.TableHeaderMenuButton.prototype._render = function() {
-  this.$container = this.$parent.appendDiv('table-header-menu-command')
+  scout.TableHeaderMenuButton.parent.prototype._render.call(this);
+  this.$container = this.$container.addClass('table-header-menu-command')
     .unfocusable()
-    .on('click', this._onClick.bind(this))
     .on('mouseenter', this._onMouseOver.bind(this))
     .on('mouseleave', this._onMouseOut.bind(this));
   this.$icon = this.$container.appendSpan('icon');
-};
-
-scout.TableHeaderMenuButton.prototype._onClick = function() {
-  if (this.enabled) {
-    this.clickHandler.call(this);
-  }
 };
 
 scout.TableHeaderMenuButton.prototype._renderProperties = function() {

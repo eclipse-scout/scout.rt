@@ -214,9 +214,8 @@ scout.Button.prototype.doAction = function() {
     this.setSelected(!this.selected);
   } else if (this.menus.length > 0) {
     this.togglePopup();
-  } else {
-    this._doAction();
   }
+  this._doAction();
   return true;
 };
 

@@ -96,4 +96,46 @@ describe('Action', function() {
 
   });
 
+  describe('action event', function() {
+
+    it('is triggered when doAction is called', function() {
+      var action = scout.create('Action', {
+        parent: session.desktop
+      });
+      var executed = 0;
+      action.on('action', function(event) {
+        executed++;
+      });
+
+      expect(executed).toBe(0);
+      action.doAction();
+      expect(executed).toBe(1);
+    });
+
+    it('is fired when doAction is called even if it is a toggle action', function() {
+      var action = scout.create('Action', {
+        parent: session.desktop,
+        toggleAction: true
+      });
+      var executed = 0;
+      var selected = null;
+      action.on('action', function(event) {
+        // State is already changed so that listener can react on new state
+        selected = action.selected;
+        executed++;
+      });
+      expect(executed).toBe(0);
+      expect(selected).toBe(null);
+
+      action.doAction();
+      expect(executed).toBe(1);
+      expect(selected).toBe(true);
+
+      action.doAction();
+      expect(executed).toBe(2);
+      expect(selected).toBe(false);
+    });
+
+  });
+
 });

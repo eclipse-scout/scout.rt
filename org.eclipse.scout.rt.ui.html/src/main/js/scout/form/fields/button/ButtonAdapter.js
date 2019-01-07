@@ -15,6 +15,9 @@ scout.ButtonAdapter = function() {
 scout.inherits(scout.ButtonAdapter, scout.FormFieldAdapter);
 
 scout.ButtonAdapter.prototype._onWidgetClick = function(event) {
+  if (this.widget.displayStyle === scout.Button.DisplayStyle.TOGGLE || this.widget.menus.length > 0) {
+    return;
+  }
   this._send('click');
 };
 

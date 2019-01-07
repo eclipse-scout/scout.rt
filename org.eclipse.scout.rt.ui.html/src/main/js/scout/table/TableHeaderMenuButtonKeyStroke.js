@@ -18,5 +18,5 @@ scout.TableHeaderMenuButtonKeyStroke = function(field) {
 scout.inherits(scout.TableHeaderMenuButtonKeyStroke, scout.KeyStroke);
 
 scout.TableHeaderMenuButtonKeyStroke.prototype.handle = function(event) {
-  this.field._onClick();
+  this.field.doAction();
 };

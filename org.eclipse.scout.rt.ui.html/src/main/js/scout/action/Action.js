@@ -232,9 +232,8 @@ scout.Action.prototype.doAction = function() {
 
   if (this.isToggleAction()) {
     this.setSelected(!this.selected);
-  } else {
-    this._doAction();
   }
+  this._doAction();
   return true;
 };
 

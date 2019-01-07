@@ -168,4 +168,46 @@ describe("Button", function() {
     });
   });
 
+  describe('click event', function() {
+
+    it('is triggered when doAction is called', function() {
+      var button = scout.create('Button', {
+        parent: session.desktop
+      });
+      var executed = 0;
+      button.on('click', function(event) {
+        executed++;
+      });
+
+      expect(executed).toBe(0);
+      button.doAction();
+      expect(executed).toBe(1);
+    });
+
+    it('is fired when doAction is called even if it is a toggle button', function() {
+      var button = scout.create('Button', {
+        parent: session.desktop,
+        displayStyle: scout.Button.DisplayStyle.TOGGLE
+      });
+      var executed = 0;
+      var selected = null;
+      button.on('click', function(event) {
+        // State is already changed so that listener can react on new state
+        selected = button.selected;
+        executed++;
+      });
+      expect(executed).toBe(0);
+      expect(selected).toBe(null);
+
+      button.doAction();
+      expect(executed).toBe(1);
+      expect(selected).toBe(true);
+
+      button.doAction();
+      expect(executed).toBe(2);
+      expect(selected).toBe(false);
+    });
+
+  });
+
 });

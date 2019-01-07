@@ -91,9 +91,8 @@ scout.ButtonAdapterMenu.prototype.doAction = function(srcEvent) {
   if (actionExecuted) {
     if (this.isToggleAction()) {
       this.setSelected(!this.selected);
-    } else {
-      this._doAction();
     }
+    this._doAction();
   }
   return actionExecuted;
 };
