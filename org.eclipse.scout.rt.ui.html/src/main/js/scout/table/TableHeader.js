@@ -313,6 +313,16 @@ scout.TableHeader.prototype.openHeaderMenu = function(column) {
     focusableContainer: true
   });
   this._tableHeaderMenu.open();
+
+  // Trigger events on column to make it possible to react to the opening of the menu
+  column.trigger('headerMenuOpen', {
+    menu: this._tableHeaderMenu
+  });
+  this._tableHeaderMenu.one('destroy', function() {
+    column.trigger('headerMenuClose', {
+      menu: this._tableHeaderMenu
+    });
+  }.bind(this));
 };
 
 scout.TableHeader.prototype.closeHeaderMenu = function() {
