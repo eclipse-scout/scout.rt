@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.commons.http;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.function.Supplier;
 
 import org.apache.http.HttpClientConnection;
 import org.apache.http.HttpException;
@@ -60,12 +61,19 @@ public class TestingHttpClient extends DefaultHttpTransportManager {
     @Override
     protected PlainConnectionSocketFactory createPlainSocketFactory() {
       return new PlainConnectionSocketFactory() {
-        @SuppressWarnings("resource")
         @Override
         public Socket createSocket(HttpContext context) throws IOException {
-          return new SocketWithInterception()
-              .withInterceptRead(m_socketReadInterceptor)
-              .withInterceptWrite(m_socketWriteInterceptor);
+          if (m_socketReadInterceptor == null && m_socketWriteInterceptor == null) {
+            return super.createSocket(context);
+          }
+          SocketWithInterception socket = new SocketWithInterception();
+          if (m_socketReadInterceptor != null) {
+            socket.withInterceptRead(m_socketReadInterceptor.get());
+          }
+          if (m_socketWriteInterceptor != null) {
+            socket.withInterceptWrite(m_socketWriteInterceptor.get());
+          }
+          return socket;
         }
       };
     }
@@ -86,8 +94,8 @@ public class TestingHttpClient extends DefaultHttpTransportManager {
   private IRequestInterceptor m_requestInterceptor;
   private IResponseInterceptor m_responseInterceptor;
 
-  private SocketWithInterception.IStreamInterceptor m_socketReadInterceptor;
-  private SocketWithInterception.IStreamInterceptor m_socketWriteInterceptor;
+  private Supplier<SocketWithInterception.IStreamInterceptor> m_socketReadInterceptor;
+  private Supplier<SocketWithInterception.IStreamInterceptor> m_socketWriteInterceptor;
 
   @Override
   protected HttpTransport createHttpTransport() {
@@ -136,12 +144,12 @@ public class TestingHttpClient extends DefaultHttpTransportManager {
     return this;
   }
 
-  public TestingHttpClient withSocketReadInterceptor(SocketWithInterception.IStreamInterceptor socketReadInterceptor) {
+  public TestingHttpClient withSocketReadInterceptor(Supplier<SocketWithInterception.IStreamInterceptor> socketReadInterceptor) {
     m_socketReadInterceptor = socketReadInterceptor;
     return this;
   }
 
-  public TestingHttpClient withSocketWriteInterceptor(SocketWithInterception.IStreamInterceptor socketWriteInterceptor) {
+  public TestingHttpClient withSocketWriteInterceptor(Supplier<SocketWithInterception.IStreamInterceptor> socketWriteInterceptor) {
     m_socketWriteInterceptor = socketWriteInterceptor;
     return this;
   }

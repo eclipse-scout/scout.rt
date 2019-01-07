@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.server.commons.http.SocketWithInterception.IStreamInterceptor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,14 +49,8 @@ public class HttpSimpleTest {
   @Before
   public void before() {
     m_client = new TestingHttpClient()
-        .withSocketReadInterceptor(b -> {
-          m_clientRead.append((char) b);
-          return b;
-        })
-        .withSocketWriteInterceptor(b -> {
-          m_clientWrite.append((char) b);
-          return b;
-        });
+        .withSocketReadInterceptor(this::createClientReadInterceptor)
+        .withSocketWriteInterceptor(this::createClientWriteInterceptor);
     m_server = new TestingHttpServer(TestingHttpPorts.PORT_33001);
     m_server.start();
   }
@@ -66,6 +61,20 @@ public class HttpSimpleTest {
     m_server.stop();
     System.out.println("# HttpClient.write\n" + m_clientWrite);
     System.out.println("# HttpClient.read\n" + m_clientRead);
+  }
+
+  private IStreamInterceptor createClientReadInterceptor() {
+    return b -> {
+      m_clientRead.append((char) b);
+      return b;
+    };
+  }
+
+  private IStreamInterceptor createClientWriteInterceptor() {
+    return b -> {
+      m_clientWrite.append((char) b);
+      return b;
+    };
   }
 
   @Test
