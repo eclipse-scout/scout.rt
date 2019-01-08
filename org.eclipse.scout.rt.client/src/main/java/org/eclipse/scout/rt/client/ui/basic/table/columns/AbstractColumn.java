@@ -1824,6 +1824,11 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     propertySupport.setPropertyInt(PROP_WIDTH, w);
   }
 
+  /**
+   * @deprecated will be removed with Scout 10
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public void setWidthInternal(int w) {
     propertySupport.setPropertyNoFire(PROP_WIDTH, w);

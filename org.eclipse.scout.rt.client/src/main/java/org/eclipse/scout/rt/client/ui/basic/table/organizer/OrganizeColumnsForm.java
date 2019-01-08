@@ -52,7 +52,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.RemoveFilterMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.RemoveMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ProfilesBox.ProfilesTableField;
-import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.JavaTransferObject;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
@@ -1586,22 +1585,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
   }
 
   public void resetAll() {
-    try {
-      m_organizedTable.setTableChanging(true);
-      //
-      m_organizedTable.resetColumns();
-      TableUserFilterManager m = m_organizedTable.getUserFilterManager();
-      if (m != null) {
-        m.reset();
-      }
-      ITableCustomizer cst = m_organizedTable.getTableCustomizer();
-      if (cst != null) {
-        cst.removeAllColumns();
-      }
-    }
-    finally {
-      m_organizedTable.setTableChanging(false);
-    }
+    m_organizedTable.reset(false);
     getColumnsTableField().reloadTableData();
   }
 

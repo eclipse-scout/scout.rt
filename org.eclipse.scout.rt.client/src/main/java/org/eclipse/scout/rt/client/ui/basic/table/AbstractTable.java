@@ -3731,6 +3731,33 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         IResetColumnsOption.FILTERS));
   }
 
+  @Override
+  public void reset() {
+    reset(true);
+  }
+
+  @Override
+  public void reset(boolean store) {
+    try {
+      setTableChanging(true);
+      TableUserFilterManager m = getUserFilterManager();
+      if (m != null) {
+        m.reset();
+      }
+      ITableCustomizer cst = getTableCustomizer();
+      if (cst != null) {
+        cst.removeAllColumns();
+      }
+      resetColumns();
+    }
+    finally {
+      setTableChanging(false);
+    }
+    if (store) {
+      ClientUIPreferences.getInstance().setAllTableColumnPreferences(this);
+    }
+  }
+
   protected void resetColumns(Set<String> options) {
     try {
       setTableChanging(true);
@@ -4435,7 +4462,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         //
         c = getColumnSet().resolveColumn(c);
         if (c != null) {
-          c.setWidthInternal(newWidth);
+          c.setWidth(newWidth);
           ClientUIPreferences.getInstance().setAllTableColumnPreferences(AbstractTable.this);
         }
       }
@@ -4687,21 +4714,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
     @Override
     public void fireTableResetFromUI() {
-      try {
-        setTableChanging(true);
-        resetColumns();
-        TableUserFilterManager m = getUserFilterManager();
-        if (m != null) {
-          m.reset();
-        }
-        ITableCustomizer cst = getTableCustomizer();
-        if (cst != null) {
-          cst.removeAllColumns();
-        }
-      }
-      finally {
-        setTableChanging(false);
-      }
+      reset();
     }
 
     @Override

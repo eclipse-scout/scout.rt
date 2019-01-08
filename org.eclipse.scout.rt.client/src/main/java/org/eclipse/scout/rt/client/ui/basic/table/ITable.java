@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
+import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.IStyleable;
@@ -978,6 +979,26 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
    * visible/invisible, order, sorting, grouping, width, backgroundEffects
    */
   void resetColumns();
+
+  /**
+   * Reset the table configuration to its initial state (the data stays the same).<br>
+   * In addition to resetting the columns (by calling {@link #resetColumns()}), the user filters and custom columns are
+   * removed as well.
+   * <p>
+   * <b>Note: </b>Compared to the other reset function, this function will update the {@link ClientUIPreferences}. If
+   * you don't want that, use the method {@link #reset(boolean)}.
+   */
+  void reset();
+
+  /**
+   * Reset the table configuration to its initial state (the data stays the same).<br>
+   * In addition to resetting the columns (by calling {@link #resetColumns()}), the user filters and custom columns are
+   * removed as well.
+   *
+   * @param store
+   *          true if the settings should be stored in the {@link ClientUIPreferences}, false if not.
+   */
+  void reset(boolean store);
 
   void decorateRow(ITableRow row);
 
