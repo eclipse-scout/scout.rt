@@ -240,6 +240,29 @@ describe("HtmlComponent", function() {
       expect(size.width).toBe(10);
       expect(size.height).toBe(5);
     });
+
+    it("returns zero size for invisible components", function() {
+      htmlComp.validateLayout();
+      spyOn(htmlComp.layout, 'preferredLayoutSize').and.callThrough();
+
+      htmlComp.layout.prefSize = new scout.Dimension(15, 13);
+      var size = htmlComp.prefSize();
+      expect(size.width).toBe(15);
+      expect(size.height).toBe(13);
+      expect(htmlComp.layout.preferredLayoutSize.calls.count()).toEqual(1);
+
+      $comp.setVisible(false);
+      size = htmlComp.prefSize();
+      expect(size.width).toBe(0);
+      expect(size.height).toBe(0);
+      expect(htmlComp.layout.preferredLayoutSize.calls.count()).toEqual(1); // should return (0,0) directly
+
+      $comp.setVisible(true);
+      size = htmlComp.prefSize();
+      expect(size.width).toBe(15);
+      expect(size.height).toBe(13);
+      expect(htmlComp.layout.preferredLayoutSize.calls.count()).toEqual(1); // should return previously cached size
+    });
   });
 
 });
