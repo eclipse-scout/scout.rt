@@ -298,6 +298,8 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
+    setCurrentLookupRow(null); // clear cached lookup row
+    setDisplayText(interceptFormatValue(getValue()));
   }
 
   @Override

@@ -19,4 +19,12 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
  * @param <LOOKUP_KEY>
  */
 public interface IMixedSmartField<VALUE, LOOKUP_KEY> extends IContentAssistField<VALUE, LOOKUP_KEY> {
+
+  /**
+   * Reloads and sets the display text for the current value by performing a key lookup.
+   * <p>
+   * This is useful when the data used to compute the display text changes but the key remains the same.
+   */
+  @Override
+  void refreshDisplayText();
 }
