@@ -236,6 +236,10 @@ scout.HtmlComponent.prototype.setLayout = function(layout) {
  * @exception When component has no layout
  */
 scout.HtmlComponent.prototype.prefSize = function(options) {
+  if (!this.isVisible()) {
+    return new scout.Dimension(0, 0);
+  }
+
   if (typeof options === 'boolean') {
     options = {
       includeMargin: options
