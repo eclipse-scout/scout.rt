@@ -99,8 +99,8 @@ public final class TEXTS {
    *          The fallback is returned when the text for the given key is undefinded.
    * @return
    */
-  public static String getWithFallback(String key, String fallback) {
-    return getWithFallback(null, key, fallback);
+  public static String getWithFallback(String key, String fallback, String... messageArguments) {
+    return getWithFallback(null, key, fallback, messageArguments);
   }
 
   public static String getWithFallback(Locale locale, String key, String fallback, String... messageArguments) {
