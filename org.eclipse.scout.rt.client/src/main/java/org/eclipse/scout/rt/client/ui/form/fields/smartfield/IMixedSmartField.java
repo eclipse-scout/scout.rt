@@ -22,4 +22,12 @@ public interface IMixedSmartField<VALUE, LOOKUP_KEY> extends IContentAssistField
 
   int NOT_UNIQUE_ERROR_CODE = 1;
   int NO_RESULTS_ERROR_CODE = 2;
+
+  /**
+   * Reloads and sets the display text for the current value by performing a key lookup.
+   * <p>
+   * This is useful when the data used to compute the display text changes but the key remains the same.
+   */
+  @Override
+  void refreshDisplayText();
 }

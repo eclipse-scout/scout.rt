@@ -1166,7 +1166,8 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   @Override
   public void refreshDisplayText() {
-    // NOP
+    setLookupRow(null); // clear cached lookup row
+    setDisplayText(interceptFormatValue(getValue()));
   }
 
   @Override
