@@ -18,6 +18,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
@@ -80,7 +81,16 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
         }
 
         try (InputStream in = resp.getContent()) {
-          return m_tunnel.getContentHandler().readResponse(in);
+          ServiceTunnelResponse response = m_tunnel.getContentHandler().readResponse(in);
+          if (response == null) {
+            return new ServiceTunnelResponse(new ProcessingException("Response contains no content")
+                .withContextInfo("http-status", "{} {}", resp.getStatusCode(), resp.getStatusMessage())
+                .withContextInfo("content-charset", resp.getContentCharset())
+                .withContextInfo("content-encoding", resp.getContentEncoding())
+                .withContextInfo("content-type", resp.getContentType())
+                .withContextInfo("http-headers", resp.getHeaders() + ""));
+          }
+          return response;
         }
       }
       finally {
