@@ -61,7 +61,7 @@ scout.AbstractLayout.prototype.preferredLayoutSize = function($container, option
     options.animateClasses = this.animateClasses;
   }
   // Insets have been removed automatically by the html component with the assumption that the layout will pass it to its child elements.
-  // Since this is not the case in this generic layout the insets have to be added again, otherwise the sizes used to measure would too small.
+  // Since this is not the case in this generic layout the insets have to be added again, otherwise the sizes used to measure would be too small.
   this._revertSizeHintsAdjustments($container, options);
   return scout.graphics.prefSize($container, options);
 };

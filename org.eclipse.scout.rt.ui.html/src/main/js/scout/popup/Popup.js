@@ -13,6 +13,7 @@ scout.Popup = function() {
 
   this._mouseDownHandler = null;
   this._anchorScrollHandler = null;
+  this._anchorLocationChangeHandler = null;
   this._popupOpenHandler = null;
   this._glassPaneRenderer = null;
   this.anchorBounds = null;
@@ -46,7 +47,7 @@ scout.Popup = function() {
   this.trimWidth = false;
   this.trimHeight = true;
 
-  // Defines what should happen when the scroll parent is scrolled
+  // Defines what should happen when the scroll parent is scrolled. It is also used if the anchor changes its location (needs to support the locationChange event)
   this.scrollType = 'remove';
 
   // If true, the anchor is considered when computing the position and size of the popup
@@ -194,7 +195,8 @@ scout.Popup.prototype._postRender = function() {
   scout.Popup.parent.prototype._postRender.call(this);
 
   this.size();
-  this._attachCloseHandler();
+  this._attachCloseHandlers();
+  this._attachAnchorHandlers();
 };
 
 scout.Popup.prototype._remove = function() {
@@ -209,7 +211,8 @@ scout.Popup.prototype._remove = function() {
     this.$arrow = null;
   }
   // remove all clean-up handlers
-  this._detachCloseHandler();
+  this._detachAnchorHandlers();
+  this._detachCloseHandlers();
   scout.Popup.parent.prototype._remove.call(this);
 };
 
@@ -297,7 +300,7 @@ scout.Popup.prototype.close = function() {
  * Install listeners to close the popup once clicking outside the popup,
  * or changing the anchor's scroll position, or another popup is opened.
  */
-scout.Popup.prototype._attachCloseHandler = function() {
+scout.Popup.prototype._attachCloseHandlers = function() {
   // Install mouse close handler
   // The listener needs to be executed in the capturing phase -> prevents that _onMouseDown will be executed right after the popup gets opened using mouse down, otherwise the popup would be closed immediately
   if (this.closeOnMouseDownOutside) {
@@ -310,29 +313,39 @@ scout.Popup.prototype._attachCloseHandler = function() {
     this._popupOpenHandler = this._onPopupOpen.bind(this);
     this.session.desktop.on('popupOpen', this._popupOpenHandler);
   }
-
-  // Install scroll close handler
-  this._attachAnchorScrollHandler();
 };
 
-scout.Popup.prototype._attachAnchorScrollHandler = function() {
-  if (this.$anchor && this.boundToAnchor && this.scrollType) {
-    this._anchorScrollHandler = this._onAnchorScroll.bind(this);
-    scout.scrollbars.onScroll(this.$anchor, this._anchorScrollHandler);
+scout.Popup.prototype._attachAnchorHandlers = function() {
+  if (!this.$anchor || !this.boundToAnchor || !this.scrollType) {
+    return;
+  }
+  // Attach a scroll handler to each scrollable parent of the anchor
+  this._anchorScrollHandler = this._onAnchorScroll.bind(this);
+  scout.scrollbars.onScroll(this.$anchor, this._anchorScrollHandler);
+
+  // Attach a location change handler as well (will only work if the anchor is a widget which triggers a locationChange event, e.g. another Popup)
+  var anchor = scout.widget(this.$anchor);
+  if (anchor) {
+    this._anchorLocationChangeHandler = this._onAnchorLocationChange.bind(this);
+    anchor.on('locationChange', this._anchorLocationChangeHandler);
   }
 };
 
-scout.Popup.prototype._detachAnchorScrollHandler = function() {
+scout.Popup.prototype._detachAnchorHandlers = function() {
   if (this._anchorScrollHandler) {
     scout.scrollbars.offScroll(this._anchorScrollHandler);
     this._anchorScrollHandler = null;
   }
+  if (this._anchorLocationChangeHandler) {
+    var anchor = scout.widget(this.$anchor);
+    if (anchor) {
+      anchor.off('locationChange', this._anchorLocationChangeHandler);
+      this._anchorLocationChangeHandler = null;
+    }
+  }
 };
 
-scout.Popup.prototype._detachCloseHandler = function() {
-  // Uninstall scroll close handler
-  this._detachAnchorScrollHandler();
-
+scout.Popup.prototype._detachCloseHandlers = function() {
   // Uninstall popup open close handler
   if (this._popupOpenHandler) {
     this.session.desktop.off('popupOpen', this._popupOpenHandler);
@@ -395,9 +408,19 @@ scout.Popup.prototype._onMouseDownOutside = function(event) {
  */
 scout.Popup.prototype._onAnchorScroll = function(event) {
   if (!this.rendered) {
-    // Scroll events may be fired delayed, even if scroll listener are already removed.
+    // Scroll events may be fired delayed, even if scroll listeners are already removed.
     return;
   }
+  this._handleAnchorPositionChange();
+};
+
+scout.Popup.prototype._handleAnchorPositionChange = function(event) {
+  if (scout.isOneOf(this.scrollType, 'position', 'layoutAndPosition') && this.isOpeningAnimationRunning()) {
+    // If the popup is opened with an animation which transforms the popup the sizes used by prefSize and position will likely be wrong.
+    // In that case it is not possible to layout and position it correctly -> do nothing.
+    return;
+  }
+
   if (this.scrollType === 'position') {
     this.position();
   } else if (this.scrollType === 'layoutAndPosition') {
@@ -406,6 +429,14 @@ scout.Popup.prototype._onAnchorScroll = function(event) {
   } else if (this.scrollType === 'remove') {
     this.close();
   }
+};
+
+scout.Popup.prototype.isOpeningAnimationRunning = function() {
+  return this.rendered && this.animateOpening && this.$container.hasClass('animate-open');
+};
+
+scout.Popup.prototype._onAnchorLocationChange = function(event) {
+  this._handleAnchorPositionChange();
 };
 
 /**
@@ -722,11 +753,11 @@ scout.Popup.prototype.belongsTo = function($anchor) {
 
 scout.Popup.prototype.set$Anchor = function($anchor) {
   if (this.$anchor) {
-    this._detachAnchorScrollHandler();
+    this._detachAnchorHandlers();
   }
   this.setProperty('$anchor', $anchor);
   if (this.rendered) {
-    this._attachAnchorScrollHandler();
+    this._attachAnchorHandlers();
     this.revalidateLayout();
     this.position();
   }
