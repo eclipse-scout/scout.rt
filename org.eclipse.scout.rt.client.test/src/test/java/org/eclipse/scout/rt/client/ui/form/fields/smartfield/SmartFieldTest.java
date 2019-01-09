@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartFieldTest.Test
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.holders.StringHolder;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -41,6 +42,7 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
+import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -480,5 +482,44 @@ public class SmartFieldTest {
       }
     });
     bc.waitFor();
+  }
+
+  @Test
+  public void testRefreshDisplayText() {
+    final StringHolder TEXT_HOLDER = new StringHolder("AAA");
+
+    ISmartField<Long> field = new AbstractSmartField<Long>() {
+    };
+    field.setLookupCall(new LocalLookupCall<Long>() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      protected List<? extends ILookupRow<Long>> execCreateLookupRows() {
+        List<ILookupRow<Long>> rows = new ArrayList<>();
+        rows.add(new LookupRow<>(1001L, "Lalala"));
+        rows.add(new LookupRow<>(1002L, TEXT_HOLDER.getValue()));
+        return rows;
+      }
+    });
+
+    assertEquals(null, field.getValue());
+    assertEquals("", field.getDisplayText());
+
+    field.setValue(1001L);
+    assertEquals("Lalala", field.getDisplayText());
+
+    field.setValue(1002L);
+    assertEquals("AAA", field.getDisplayText());
+
+    // Change holder --> lookup call will return a different text for the same key
+    TEXT_HOLDER.setValue("BBB");
+    field.refreshDisplayText(); // <-- required to reload the display text
+    assertEquals("BBB", field.getDisplayText());
+
+    // Check that it works with null as well
+    field.setValue(null);
+    assertEquals("", field.getDisplayText());
+    field.refreshDisplayText();
+    assertEquals("", field.getDisplayText());
   }
 }

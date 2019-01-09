@@ -313,6 +313,14 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
 
   void setColumnDescriptors(ColumnDescriptor[] columnDescriptors);
 
+  /**
+   * Reloads and sets the display text for the current value by performing a key lookup.
+   * <p>
+   * This is useful when the data used to compute the display text changes but the key remains the same.
+   */
+  @Override
+  void refreshDisplayText();
+
   String getDisplayStyle();
 
   void setDisplayStyle(String displayStyle);
