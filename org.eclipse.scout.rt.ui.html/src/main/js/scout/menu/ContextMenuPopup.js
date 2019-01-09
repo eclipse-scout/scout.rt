@@ -447,6 +447,9 @@ scout.ContextMenuPopup.prototype.updateNextToSelected = function(menuItemClass, 
 };
 
 scout.ContextMenuPopup.prototype._onMenuItemAction = function(event) {
+  if (event.source.isToggleAction()) {
+    return;
+  }
   this.close();
 };
 
