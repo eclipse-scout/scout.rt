@@ -715,13 +715,14 @@ describe("Table", function() {
       var checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
-      table.$rows().eq(1).triggerClick();
-      table.$rows().eq(4).triggerClick();
+      table.$cell(0, table.rows[4].$row).triggerClick();
+      table.$cell(0, table.rows[1].$row).triggerClick();
 
       checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(2);
 
-      table.$rows().eq(4).triggerClick();
+      // click on row1 wouldn't work because of the doubleClickSupport!
+      table.$cell(0, table.rows[4].$row).triggerClick();
 
       checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(1);

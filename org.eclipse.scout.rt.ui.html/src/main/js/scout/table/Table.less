@@ -32,11 +32,16 @@
     padding-right: @table-menubar-padding;
   }
 
-  /* Used for scout.Table.CheckableStyle.TABLE_ROW */
   &.checkable {
-
     & > .table-data > .table-row {
       cursor: pointer;
+    }
+  }
+
+  /* Used for scout.Table.CheckableStyle.TABLE_ROW */
+  &.table-row-check {
+
+    & > .table-data > .table-row {
 
       & > .table-cell.first {
         /* Increase padding of first cell to make room for "selection" marker */

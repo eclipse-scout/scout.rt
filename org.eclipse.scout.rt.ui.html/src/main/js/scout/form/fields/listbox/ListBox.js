@@ -186,6 +186,7 @@ scout.ListBox.prototype._createDefaultListBoxTable = function() {
     parent: this,
     autoResizeColumns: true,
     checkable: true,
+    checkableStyle: scout.Table.CheckableStyle.CHECKBOX_TABLE_ROW,
     headerVisible: false,
     footerVisible: false,
     columns: [{

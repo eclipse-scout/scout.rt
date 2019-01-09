@@ -545,10 +545,14 @@ scout.Table.prototype._onRowMouseDown = function(event) {
   var isRightClick = event.which === 3;
   var row = this._$mouseDownRow.data('row');
 
+  var $target = $(event.target);
+
   // For checkableStyle TABLE_ROW & CHECKBOX_TABLE_ROW only: check row if left click OR clicked row was not checked yet
   if (scout.isOneOf(this.checkableStyle, scout.Table.CheckableStyle.TABLE_ROW, scout.Table.CheckableStyle.CHECKBOX_TABLE_ROW) &&
     (!isRightClick || !row.checked) &&
-    !$(event.target).is('.table-row-control')) {
+    !$(event.target).is('.table-row-control') &&
+    // Click on BooleanColumns should not trigger a row check. The only exception is if the BooleanColumn is the checkableColumn of this table (handled in BooleanColumn.js)
+    !($target.hasClass('checkable') || $target.parent().hasClass('checkable'))) {
     this.checkRow(row, !row.checked);
   }
   if (isRightClick) {
@@ -4026,7 +4030,8 @@ scout.Table.prototype._setCheckableStyle = function(checkableStyle) {
 };
 
 scout.Table.prototype._renderCheckableStyle = function() {
-  this.$container.toggleClass('checkable', this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW);
+  this.$container.toggleClass('checkable', scout.isOneOf(this.checkableStyle, scout.Table.CheckableStyle.TABLE_ROW, scout.Table.CheckableStyle.CHECKBOX_TABLE_ROW));
+  this.$container.toggleClass('table-row-check', this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW);
   if (this.rendered) {
     this._redraw();
   }

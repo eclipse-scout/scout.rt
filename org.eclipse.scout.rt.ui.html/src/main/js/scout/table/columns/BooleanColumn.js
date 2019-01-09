@@ -106,10 +106,7 @@ scout.BooleanColumn.prototype.onMouseUp = function(event, $row) {
   var row = $row.data('row'),
     cell = this.cell(row);
   if (this.table.checkableColumn === this) {
-    // CheckableStyle.CHECKBOX_TABLE_ROW has also a checkableColumn set on the table but the checking is done on table level
-    if (this.table.checkableStyle === scout.Table.CheckableStyle.CHECKBOX) {
-      this.table.checkRow(row, !row.checked);
-    }
+    this.table.checkRow(row, !row.checked);
   } else if (this.isCellEditable(row, cell, event)) {
     this._toggleCellValue(row, cell);
   }

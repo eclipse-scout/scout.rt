@@ -349,6 +349,7 @@ scout.Tree.prototype._render = function() {
   this._renderDisplayStyle();
   this._renderViewport();
   this.session.desktop.on('popupOpen', this._popupOpenHandler);
+  this._renderCheckableStyle();
 };
 
 scout.Tree.prototype._postRender = function() {
@@ -384,6 +385,10 @@ scout.Tree.prototype._renderProperties = function() {
 
 scout.Tree.prototype.isHorizontalScrollingEnabled = function() {
   return this._scrolldirections === 'both' || this._scrolldirections === 'x';
+};
+
+scout.Tree.prototype.isTreeNodeCheckEnabled = function() {
+  return this.checkableStyle === scout.Tree.CheckableStyle.CHECKBOX_TREE_NODE;
 };
 
 /**
@@ -1087,6 +1092,10 @@ scout.Tree.prototype._renderSelection = function() {
   if (this.scrollToSelection) {
     this.revealSelection();
   }
+};
+
+scout.Tree.prototype._renderCheckableStyle = function() {
+  this.$data.toggleClass('checkable', this.isTreeNodeCheckEnabled());
 };
 
 scout.Tree.prototype._highlightPrevSelectedNode = function() {
@@ -2576,7 +2585,7 @@ scout.Tree.prototype._onNodeMouseUp = function(event) {
 
 scout.Tree.prototype._isCheckboxClicked = function(event) {
   // with CheckableStyle.CHECKBOX_TREE_NODE a click anywhere on the node should trigger the check
-  if (this.checkableStyle === scout.Tree.CheckableStyle.CHECKBOX_TREE_NODE) {
+  if (this.isTreeNodeCheckEnabled()) {
     return true;
   }
   return $(event.target).is('.check-box');
@@ -2981,7 +2990,7 @@ scout.Tree.prototype._onNodeDoubleClick = function(event) {
   });
 
   // For CheckableStyle.CHECKBOX_TREE_NODE expand on double click is only enabled for disabled nodes. Otherwise it would conflict with the "check on node click" behavior.
-  if (!(this.checkable === true && this.checkableStyle === scout.Tree.CheckableStyle.CHECKBOX_TREE_NODE && node.enabled)) {
+  if (!(this.checkable === true && this.isTreeNodeCheckEnabled() && node.enabled)) {
     this.setNodeExpanded(node, expanded, {
       lazy: false // always show all nodes on node double click
     });
