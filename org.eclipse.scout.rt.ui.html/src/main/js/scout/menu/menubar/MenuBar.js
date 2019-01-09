@@ -361,13 +361,13 @@ scout.MenuBar.prototype.setDefaultMenu = function(defaultMenu) {
 };
 
 scout.MenuBar.prototype._setDefaultMenu = function(defaultMenu) {
-   if (this.defaultMenu) {
-     this.defaultMenu.setMenuStyle(scout.Menu.MenuStyle.NONE);
-   }
-   if (defaultMenu) {
-     defaultMenu.setMenuStyle(scout.Menu.MenuStyle.DEFAULT);
-   }
-   this._setProperty('defaultMenu', defaultMenu);
+  if (this.defaultMenu) {
+    this.defaultMenu.setMenuStyle(scout.Menu.MenuStyle.NONE);
+  }
+  if (defaultMenu) {
+    defaultMenu.setMenuStyle(scout.Menu.MenuStyle.DEFAULT);
+  }
+  this._setProperty('defaultMenu', defaultMenu);
 };
 
 /**
@@ -424,8 +424,12 @@ scout.MenuBar.prototype._onMenuItemPropertyChange = function(event) {
       // return the wrong value (even if the menubar itself is visible).
       this.revalidateLayout();
     }
-    // recalculate position of ellipsis
-    this.reorderMenus();
+    // recalculate position of ellipsis if any menu item changed visibility.
+    // separators may change visibility during reordering menu items. Since separators do not have any
+    // impact of right/left order of menu items they have not to be considered to enforce a reorder.
+    if (!event.source.separator) {
+      this.reorderMenus();
+    }
   }
   if (event.propertyName === 'keyStroke' || event.propertyName === 'enabled' || event.propertyName === 'defaultMenu' || event.propertyName === 'visible') {
     this.updateDefaultMenu();
@@ -434,8 +438,5 @@ scout.MenuBar.prototype._onMenuItemPropertyChange = function(event) {
 
 scout.MenuBar.prototype.reorderMenus = function(rightFirst) {
   var menuItems = this.menuItems;
-  if (this.rendered) {
-    this._removeMenuItems();
-  }
   this._setMenuItems(menuItems, rightFirst);
 };
