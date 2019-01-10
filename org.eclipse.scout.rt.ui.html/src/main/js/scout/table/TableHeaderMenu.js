@@ -35,6 +35,9 @@ scout.TableHeaderMenu = function() {
   this.modifyColumnButton = null;
   this.groupButton = null;
   this.groupAddButton = null;
+  this.barChartButton = null;
+  this.colorGradient1Button = null;
+  this.colorGradient2Button = null;
 
   this.$rightGroups = [];
   this.$headerItem = null;
@@ -639,33 +642,33 @@ scout.TableHeaderMenu.prototype._renderColoringGroup = function() {
       textKey: 'ui.Coloring'
     });
 
-  var colorGradient1Button = scout.create('TableHeaderMenuButton', {
+  this.colorGradient1Button = scout.create('TableHeaderMenuButton', {
     parent: group,
     text: '${textKey:ui.fromRedToGreen}',
     cssClass: 'color color-gradient1',
     backgroundEffect: 'colorGradient1',
     toggleAction: true
   });
-  colorGradient1Button.on('action', onClick.bind(colorGradient1Button));
+  this.colorGradient1Button.on('action', onClick.bind(this.colorGradient1Button));
 
-  var colorGradient2Button = scout.create('TableHeaderMenuButton', {
+  this.colorGradient2Button = scout.create('TableHeaderMenuButton', {
     parent: group,
     text: '${textKey:ui.fromGreenToRed}',
     cssClass: 'color color-gradient2',
     backgroundEffect: 'colorGradient2',
     toggleAction: true
   });
-  colorGradient2Button.on('action', onClick.bind(colorGradient2Button));
+  this.colorGradient2Button.on('action', onClick.bind(this.colorGradient2Button));
 
   if (scout.device.supportsCssGradient()) {
-    var barChartButton = scout.create('TableHeaderMenuButton', {
+    this.barChartButton = scout.create('TableHeaderMenuButton', {
       parent: group,
       text: '${textKey:ui.withBarChart}',
       cssClass: 'color color-bar-chart',
       backgroundEffect: 'barChart',
       toggleAction: true
     });
-    barChartButton.on('action', onClick.bind(barChartButton));
+    this.barChartButton.on('action', onClick.bind(this.barChartButton));
   }
 
   group.children.forEach(function(button) {

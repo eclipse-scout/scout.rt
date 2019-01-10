@@ -306,6 +306,11 @@ scout.TableHeader.prototype._renderHeaderMenusEnabled = function() {
 };
 
 scout.TableHeader.prototype.openHeaderMenu = function(column) {
+  if (this.tableHeaderMenu) {
+    // Make sure existing header menu is closed first
+    this.closeHeaderMenu();
+  }
+
   var $header = column.$header;
   this.tableHeaderMenu = scout.create('TableHeaderMenu', {
     parent: this,
