@@ -37,8 +37,6 @@ scout.BooleanColumn.prototype._formatValue = function(value) {
 scout.BooleanColumn.prototype.buildCell = function(cell, row) {
   var style,
     content = '',
-    tooltipText,
-    tooltip,
     cssClass,
     checkBoxCssClass,
     enabled = row.enabled,
@@ -60,8 +58,6 @@ scout.BooleanColumn.prototype.buildCell = function(cell, row) {
   if (!enabled) {
     cssClass += ' disabled';
   }
-  tooltipText = cell.tooltipText;
-  tooltip = (scout.strings.empty(tooltipText) ? '' : ' title="' + tooltipText + '"');
 
   checkBoxCssClass = 'check-box';
   if (cell.value === true) {
@@ -83,7 +79,7 @@ scout.BooleanColumn.prototype.buildCell = function(cell, row) {
   }
   content = content + '<div class="' + checkBoxCssClass + '"/>';
 
-  return '<div class="' + cssClass + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute.string + '>' + content + '</div>';
+  return '<div class="' + cssClass + '" style="' + style + '"' + scout.device.unselectableAttribute.string + '>' + content + '</div>';
 };
 
 scout.BooleanColumn.prototype.$checkBox = function($row) {
