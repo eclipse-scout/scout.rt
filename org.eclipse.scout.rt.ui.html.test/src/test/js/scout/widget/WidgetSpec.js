@@ -72,7 +72,7 @@ describe('Widget', function() {
   }
 
   describe('visitChildren', function() {
-    it('should traverse child items', function() {
+    it('visits all descendants', function() {
       widget.init({
         session: session,
         parent: parent
@@ -82,6 +82,141 @@ describe('Widget', function() {
         counter++;
       });
       expect(counter).toBe(1); /* parent itself is not visited, only children */
+    });
+
+    it('can be aborted when returning true', function() {
+      var child1 = new TestWidget();
+      child1.init({
+        id: 'child1',
+        session: session,
+        parent: parent,
+        wasVisited: false
+      });
+      var child2 = new TestWidget();
+      child2.init({
+        id: 'child2',
+        session: session,
+        parent: parent,
+        wasVisited: false
+      });
+      var grandChild1 = new TestWidget();
+      grandChild1.init({
+        id: 'grandChild1',
+        session: session,
+        parent: child1,
+        wasVisited: false
+      });
+      var grandChild2 = new TestWidget();
+      grandChild2.init({
+        id: 'grandChild2',
+        session: session,
+        parent: child1,
+        wasVisited: false
+      });
+      var grandChild2_1 = new TestWidget();
+      grandChild2_1.init({
+        session: session,
+        parent: child2,
+        wasVisited: false
+      });
+
+      // Abort at grandChild1 -> don't visit siblings of grandChild1 and siblings of parent
+      parent.visitChildren(function(child) {
+        child.wasVisited = true;
+        return child === grandChild1;
+      });
+      expect(child1.wasVisited).toBe(true);
+      expect(child2.wasVisited).toBe(false);
+      expect(grandChild1.wasVisited).toBe(true);
+      expect(grandChild2.wasVisited).toBe(false);
+      expect(grandChild2_1.wasVisited).toBe(false);
+
+      // Reset wasVisited flag
+      parent.visitChildren(function(child) {
+        child.wasVisited = false;
+        return false;
+      });
+      expect(child1.wasVisited).toBe(false);
+      expect(child2.wasVisited).toBe(false);
+      expect(grandChild1.wasVisited).toBe(false);
+      expect(grandChild2.wasVisited).toBe(false);
+      expect(grandChild2_1.wasVisited).toBe(false);
+
+      // Abort at child2 -> don't visit children of child2
+      parent.visitChildren(function(child) {
+        child.wasVisited = true;
+        return  child === child2;
+      });
+      expect(child1.wasVisited).toBe(true);
+      expect(child2.wasVisited).toBe(true);
+      expect(grandChild1.wasVisited).toBe(true);
+      expect(grandChild2.wasVisited).toBe(true);
+      expect(grandChild2_1.wasVisited).toBe(false);
+    });
+  });
+
+  describe('widget', function() {
+    it('finds a child with the given widget id', function() {
+      var child1 = new TestWidget();
+      child1.init({
+        id: 'child1',
+        session: session,
+        parent: parent
+      });
+      var child2 = new TestWidget();
+      child2.init({
+        id: 'child2',
+        session: session,
+        parent: parent
+      });
+      var grandChild1 = new TestWidget();
+      grandChild1.init({
+        id: 'grandChild1',
+        session: session,
+        parent: child1
+      });
+      var grandChild2 = new TestWidget();
+      grandChild2.init({
+        id: 'grandChild2',
+        session: session,
+        parent: child1
+      });
+      expect(parent.widget('child1')).toBe(child1);
+      expect(parent.widget('child2')).toBe(child2);
+      expect(parent.widget('grandChild1')).toBe(grandChild1);
+      expect(parent.widget('grandChild2')).toBe(grandChild2);
+    });
+
+    it('does not visit other children if the child has been found', function() {
+      var child1 = new TestWidget();
+      child1.init({
+        id: 'child1',
+        session: session,
+        parent: parent
+      });
+      var child2 = new TestWidget();
+      child2.init({
+        id: 'child2',
+        session: session,
+        parent: parent
+      });
+      var grandChild1 = new TestWidget();
+      grandChild1.init({
+        id: 'grandChild1',
+        session: session,
+        parent: child1
+      });
+      var grandChild2 = new TestWidget();
+      grandChild2.init({
+        id: 'grandChild2',
+        session: session,
+        parent: child1
+      });
+      spyOn(parent, 'visitChildren').and.callThrough();
+      expect(parent.visitChildren.calls.count()).toBe(0);
+
+      expect(parent.widget('child1')).toBe(child1);
+      expect(parent.visitChildren.calls.count()).toBe(1); // Only called once
     });
   });
 

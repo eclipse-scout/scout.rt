@@ -1570,34 +1570,30 @@ scout.Widget.prototype.callSetter = function(propertyName, value) {
 /**
  * Traverses the object-tree (children) of this widget and searches for a widget with the given ID.
  * Returns the widget with the requested ID or null if no widget has been found.
+ *
  * @param widgetId
+ * @returns the found widget for the given id
  */
 scout.Widget.prototype.widget = function(widgetId) {
-  return findWidgetRec(this);
+  if (predicate(this)) {
+    return this;
+  }
+  return this.findChild(predicate);
 
-  // ------ Helper functions -----
-
-  function findWidgetRec(widget) {
+  function predicate(widget) {
     if (widget.id === widgetId) {
       return widget;
     }
-    for (var i = 0; i < widget.children.length; i++) {
-      var result = findWidgetRec(widget.children[i]);
-      if (result) {
-        return result;
-      }
-    }
-    return null; // not found
   }
 };
 
 /**
- * @returns the parent for which the given function returns true.
+ * @returns the first parent for which the given function returns true.
  */
-scout.Widget.prototype.findParent = function(func) {
+scout.Widget.prototype.findParent = function(predicate) {
   var parent = this.parent;
   while (parent) {
-    if (func(parent)) {
+    if (predicate(parent)) {
       return parent;
     }
     parent = parent.parent;
@@ -1605,20 +1601,34 @@ scout.Widget.prototype.findParent = function(func) {
   return parent;
 };
 
+/**
+ * @returns the first child for which the given function returns true.
+ */
+scout.Widget.prototype.findChild = function(predicate) {
+  var foundChild = null;
+  this.visitChildren(function(child) {
+    if (predicate(child)) {
+      foundChild = child;
+      return true;
+    }
+  });
+  return foundChild;
+};
+
 scout.Widget.prototype.setTrackFocus = function(trackFocus) {
   this.setProperty('trackFocus', trackFocus);
 };
 
 scout.Widget.prototype._renderTrackFocus = function() {
-  if (this.$container) {
-    if (this.trackFocus) {
-      this.$container.on('focusin', this._focusInListener);
-    } else {
-      this.$container.off('focusin', this._focusInListener);
-      this._$lastFocusedElement = null;
-      this._storedFocusedWidget = null;
-
-    }
+  if (!this.$container) {
+    return;
+  }
+  if (this.trackFocus) {
+    this.$container.on('focusin', this._focusInListener);
+  } else {
+    this.$container.off('focusin', this._focusInListener);
+    this._$lastFocusedElement = null;
+    this._storedFocusedWidget = null;
   }
 };
 
@@ -1873,12 +1883,18 @@ scout.Widget.prototype.reveal = function() {
  * The children with a different parent are excluded.<br>
  * This makes sure the child is not visited twice if the owner and the parent are not the same
  * (in that case the widget would be in the children list of the owner and of the parent).
+ * <p>
+ * In order to abort visiting, the visitor can return true.
+ * @returns true if the visitor aborted the visiting, false if the visiting completed without aborting
  */
 scout.Widget.prototype.visitChildren = function(visitor) {
-  this.children.forEach(function(child) {
+  return this.children.some(function(child) {
     if (child.parent === this) {
-      visitor(child);
-      child.visitChildren(visitor);
+      if (visitor(child)) {
+        // Visitor wants to abort the visiting
+        return true;
+      }
+      return child.visitChildren(visitor);
     }
   }, this);
 };
