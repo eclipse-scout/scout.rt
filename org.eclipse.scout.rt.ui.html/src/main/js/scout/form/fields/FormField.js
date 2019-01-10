@@ -1123,9 +1123,11 @@ scout.FormField.prototype._createCopyContextMenu = function(event) {
 
 /**
  * Visits this field and all child formfields in pre-order (top-down).
+ *
+ * @returns {string} the TreeVisitResult, or nothing to continue.
  */
 scout.FormField.prototype.visitFields = function(visitor) {
-  visitor(this);
+  return visitor(this);
 };
 
 /**

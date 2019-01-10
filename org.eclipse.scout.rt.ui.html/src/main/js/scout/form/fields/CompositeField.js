@@ -28,10 +28,23 @@ scout.CompositeField.prototype.setFields = function() {
  * @override FormField.js
  */
 scout.CompositeField.prototype.visitFields = function(visitor) {
-  scout.CompositeField.parent.prototype.visitFields.call(this, visitor);
-  this.getFields().forEach(function(field) {
-    field.visitFields(visitor);
-  });
+  var treeVisitResult = scout.CompositeField.parent.prototype.visitFields.call(this, visitor);
+  if(treeVisitResult === scout.TreeVisitResult.TERMINATE){
+    return scout.TreeVisitResult.TERMINATE;
+  }
+
+  if(treeVisitResult === scout.TreeVisitResult.SKIP_SUBTREE){
+    return scout.TreeVisitResult.CONTINUE;
+  }
+
+  var fields = this.getFields();
+  for(var i = 0; i < fields.length; i++){
+    var field = fields[i];
+    treeVisitResult = field.visitFields(visitor);
+    if(treeVisitResult === scout.TreeVisitResult.TERMINATE){
+      return scout.TreeVisitResult.TERMINATE;
+    }
+  }
 };
 
 /**

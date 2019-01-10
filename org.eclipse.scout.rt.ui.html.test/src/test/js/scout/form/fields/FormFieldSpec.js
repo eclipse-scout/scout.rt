@@ -320,4 +320,174 @@ describe('FormField', function() {
 
   });
 
+  function createVisitStructure() {
+    var groupBox = scout.create('GroupBox', {
+      parent: session.desktop,
+      fields: [{
+        objectType: 'StringField',
+      }, {
+        objectType: 'CheckBoxField',
+      }, {
+        objectType: 'GroupBox',
+        toSkip: true,
+        fields: [{
+          objectType: 'StringField',
+        }, {
+          objectType: 'RadioButtonGroup',
+          fields: [{
+            objectType: 'RadioButton'
+          }, {
+            objectType: 'RadioButton',
+            selected: true
+          }]
+        }]
+      }, {
+        objectType: 'GroupBox',
+        fields: [{
+          objectType: 'StringField',
+        }]
+      }],
+      responsive: true
+    });
+    return groupBox;
+  }
+
+  function expectVisited(field) {
+    expect(field.hasBeenVisited).toBeTruthy();
+  }
+
+  function expectNotVisited(field) {
+    expect(field.hasBeenVisited).toBeFalsy();
+  }
+
+  describe('visitFields', function() {
+    it('visits each field', function() {
+      var groupBox = createVisitStructure();
+      groupBox.visitFields(function(field) {
+        field.hasBeenVisited = true;
+      });
+
+      expectVisited(groupBox);
+      expectVisited(groupBox.fields[0]);
+      expectVisited(groupBox.fields[1]);
+      expectVisited(groupBox.fields[2]);
+      expectVisited(groupBox.fields[2].fields[0]);
+      expectVisited(groupBox.fields[2].fields[1]);
+      expectVisited(groupBox.fields[2].fields[1].fields[0]);
+      expectVisited(groupBox.fields[2].fields[1].fields[1]);
+      expectVisited(groupBox.fields[3]);
+      expectVisited(groupBox.fields[3].fields[0]);
+    });
+
+    it('can skip subtree of a group box when returning scout.TreeVisitResult.SKIP_SUBTREE', function() {
+      var groupBox = createVisitStructure();
+      groupBox.visitFields(function(field) {
+        field.hasBeenVisited = true;
+        if (field.toSkip) {
+          return scout.TreeVisitResult.SKIP_SUBTREE;
+        }
+        return scout.TreeVisitResult.CONTINUE;
+      });
+
+      expectVisited(groupBox);
+      expectVisited(groupBox.fields[0]);
+      expectVisited(groupBox.fields[1]);
+      expectVisited(groupBox.fields[2]);
+      expectNotVisited(groupBox.fields[2].fields[0]);
+      expectNotVisited(groupBox.fields[2].fields[1]);
+      expectNotVisited(groupBox.fields[2].fields[1].fields[0]);
+      expectNotVisited(groupBox.fields[2].fields[1].fields[1]);
+      expectVisited(groupBox.fields[3]);
+      expectVisited(groupBox.fields[3].fields[0]);
+    });
+
+    it('can skip subtree of radio button group when returning scout.TreeVisitResult.SKIP_SUBTREE', function() {
+      var groupBox = createVisitStructure();
+      groupBox.visitFields(function(field) {
+        field.hasBeenVisited = true;
+        if (field instanceof scout.RadioButtonGroup) {
+          return scout.TreeVisitResult.SKIP_SUBTREE;
+        }
+        return scout.TreeVisitResult.CONTINUE;
+      });
+
+      expectVisited(groupBox);
+      expectVisited(groupBox.fields[0]);
+      expectVisited(groupBox.fields[1]);
+      expectVisited(groupBox.fields[2]);
+      expectVisited(groupBox.fields[2].fields[0]);
+      expectVisited(groupBox.fields[2].fields[1]);
+      expectNotVisited(groupBox.fields[2].fields[1].fields[0]);
+      expectNotVisited(groupBox.fields[2].fields[1].fields[1]);
+      expectVisited(groupBox.fields[3]);
+      expectVisited(groupBox.fields[3].fields[0]);
+    });
+
+    it('can terminate visiting by returning scout.TreeVisitResult.TERMINATE', function() {
+      var groupBox = createVisitStructure();
+      groupBox.visitFields(function(field) {
+        field.hasBeenVisited = true;
+        if (field.toSkip) {
+          return scout.TreeVisitResult.TERMINATE;
+        }
+        return scout.TreeVisitResult.CONTINUE;
+      });
+
+      expectVisited(groupBox);
+      expectVisited(groupBox.fields[0]);
+      expectVisited(groupBox.fields[1]);
+      expectVisited(groupBox.fields[2]);
+      expectNotVisited(groupBox.fields[2].fields[0]);
+      expectNotVisited(groupBox.fields[2].fields[1]);
+      expectNotVisited(groupBox.fields[2].fields[1].fields[0]);
+      expectNotVisited(groupBox.fields[2].fields[1].fields[1]);
+      expectNotVisited(groupBox.fields[3]);
+      expectNotVisited(groupBox.fields[3].fields[0]);
+
+      // reset visited flag
+      groupBox.visitFields(function(field) {
+        field.hasBeenVisited = false;
+      });
+
+      groupBox.visitFields(function(field) {
+        field.hasBeenVisited = true;
+        if (field instanceof scout.RadioButtonGroup) {
+          return scout.TreeVisitResult.TERMINATE;
+        }
+        return scout.TreeVisitResult.CONTINUE;
+      });
+
+      expectVisited(groupBox);
+      expectVisited(groupBox.fields[0]);
+      expectVisited(groupBox.fields[1]);
+      expectVisited(groupBox.fields[2]);
+      expectVisited(groupBox.fields[2].fields[0]);
+      expectVisited(groupBox.fields[2].fields[1]);
+      expectNotVisited(groupBox.fields[2].fields[1].fields[0]);
+      expectNotVisited(groupBox.fields[2].fields[1].fields[1]);
+      expectNotVisited(groupBox.fields[3]);
+      expectNotVisited(groupBox.fields[3].fields[0]);
+
+      // reset visited flag
+      groupBox.visitFields(function(field) {
+        field.hasBeenVisited = false;
+      });
+
+      groupBox.visitFields(function(field) {
+        field.hasBeenVisited = true;
+        return scout.TreeVisitResult.TERMINATE;
+      });
+
+      expectVisited(groupBox);
+      expectNotVisited(groupBox.fields[0]);
+      expectNotVisited(groupBox.fields[1]);
+      expectNotVisited(groupBox.fields[2]);
+      expectNotVisited(groupBox.fields[2].fields[0]);
+      expectNotVisited(groupBox.fields[2].fields[1]);
+      expectNotVisited(groupBox.fields[2].fields[1].fields[0]);
+      expectNotVisited(groupBox.fields[2].fields[1].fields[1]);
+      expectNotVisited(groupBox.fields[3]);
+      expectNotVisited(groupBox.fields[3].fields[0]);
+    });
+  });
 });

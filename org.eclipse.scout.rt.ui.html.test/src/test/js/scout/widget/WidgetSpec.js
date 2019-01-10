@@ -72,6 +72,45 @@ describe('Widget', function() {
   }
 
   describe('visitChildren', function() {
+    var child1, child2, grandChild1, grandChild2, grandChild2_1;
+
+    function createVisitStructure(){
+      child1 = new TestWidget();
+      child1.init({
+        id: 'child1',
+        session: session,
+        parent: parent,
+        wasVisited: false
+      });
+      child2 = new TestWidget();
+      child2.init({
+        id: 'child2',
+        session: session,
+        parent: parent,
+        wasVisited: false
+      });
+      grandChild1 = new TestWidget();
+      grandChild1.init({
+        id: 'grandChild1',
+        session: session,
+        parent: child1,
+        wasVisited: false
+      });
+      grandChild2 = new TestWidget();
+      grandChild2.init({
+        id: 'grandChild2',
+        session: session,
+        parent: child1,
+        wasVisited: false
+      });
+      grandChild2_1 = new TestWidget();
+      grandChild2_1.init({
+        session: session,
+        parent: child2,
+        wasVisited: false
+      });
+    }
+
     it('visits all descendants', function() {
       widget.init({
         session: session,
@@ -85,40 +124,7 @@ describe('Widget', function() {
     });
 
     it('can be aborted when returning true', function() {
-      var child1 = new TestWidget();
-      child1.init({
-        id: 'child1',
-        session: session,
-        parent: parent,
-        wasVisited: false
-      });
-      var child2 = new TestWidget();
-      child2.init({
-        id: 'child2',
-        session: session,
-        parent: parent,
-        wasVisited: false
-      });
-      var grandChild1 = new TestWidget();
-      grandChild1.init({
-        id: 'grandChild1',
-        session: session,
-        parent: child1,
-        wasVisited: false
-      });
-      var grandChild2 = new TestWidget();
-      grandChild2.init({
-        id: 'grandChild2',
-        session: session,
-        parent: child1,
-        wasVisited: false
-      });
-      var grandChild2_1 = new TestWidget();
-      grandChild2_1.init({
-        session: session,
-        parent: child2,
-        wasVisited: false
-      });
+      createVisitStructure();
 
       // Abort at grandChild1 -> don't visit siblings of grandChild1 and siblings of parent
       parent.visitChildren(function(child) {
@@ -145,7 +151,89 @@ describe('Widget', function() {
       // Abort at child2 -> don't visit children of child2
       parent.visitChildren(function(child) {
         child.wasVisited = true;
-        return  child === child2;
+        return child === child2;
+      });
+      expect(child1.wasVisited).toBe(true);
+      expect(child2.wasVisited).toBe(true);
+      expect(grandChild1.wasVisited).toBe(true);
+      expect(grandChild2.wasVisited).toBe(true);
+      expect(grandChild2_1.wasVisited).toBe(false);
+    });
+
+    it('can be aborted when returning scout.TreeVisitResult.TERMINATE', function() {
+      createVisitStructure();
+
+      // Abort at grandChild1 -> don't visit siblings of grandChild1 and siblings of parent
+      parent.visitChildren(function(child) {
+        child.wasVisited = true;
+        if (child === grandChild1) {
+          return scout.TreeVisitResult.TERMINATE;
+        }
+      });
+      expect(child1.wasVisited).toBe(true);
+      expect(child2.wasVisited).toBe(false);
+      expect(grandChild1.wasVisited).toBe(true);
+      expect(grandChild2.wasVisited).toBe(false);
+      expect(grandChild2_1.wasVisited).toBe(false);
+
+      // Reset wasVisited flag
+      parent.visitChildren(function(child) {
+        child.wasVisited = false;
+        return false;
+      });
+      expect(child1.wasVisited).toBe(false);
+      expect(child2.wasVisited).toBe(false);
+      expect(grandChild1.wasVisited).toBe(false);
+      expect(grandChild2.wasVisited).toBe(false);
+      expect(grandChild2_1.wasVisited).toBe(false);
+
+      // Abort at child2 -> don't visit children of child2
+      parent.visitChildren(function(child) {
+        child.wasVisited = true;
+        if (child === child2) {
+          return scout.TreeVisitResult.TERMINATE;
+        }
+      });
+      expect(child1.wasVisited).toBe(true);
+      expect(child2.wasVisited).toBe(true);
+      expect(grandChild1.wasVisited).toBe(true);
+      expect(grandChild2.wasVisited).toBe(true);
+      expect(grandChild2_1.wasVisited).toBe(false);
+    });
+
+    it('can skip a subtree when returning scout.TreeVisitResult.SKIP_SUBTREE', function() {
+      createVisitStructure();
+
+      // Abort at grandChild1 -> don't visit siblings of grandChild1 and siblings of parent
+      parent.visitChildren(function(child) {
+        child.wasVisited = true;
+        if (child === child1) {
+          return scout.TreeVisitResult.SKIP_SUBTREE;
+        }
+      });
+      expect(child1.wasVisited).toBe(true);
+      expect(child2.wasVisited).toBe(true);
+      expect(grandChild1.wasVisited).toBe(false);
+      expect(grandChild2.wasVisited).toBe(false);
+      expect(grandChild2_1.wasVisited).toBe(true);
+
+      // Reset wasVisited flag
+      parent.visitChildren(function(child) {
+        child.wasVisited = false;
+        return false;
+      });
+      expect(child1.wasVisited).toBe(false);
+      expect(child2.wasVisited).toBe(false);
+      expect(grandChild1.wasVisited).toBe(false);
+      expect(grandChild2.wasVisited).toBe(false);
+      expect(grandChild2_1.wasVisited).toBe(false);
+
+      // Abort at child2 -> don't visit children of child2
+      parent.visitChildren(function(child) {
+        child.wasVisited = true;
+        if (child === child2) {
+          return scout.TreeVisitResult.SKIP_SUBTREE;
+        }
       });
       expect(child1.wasVisited).toBe(true);
       expect(child2.wasVisited).toBe(true);

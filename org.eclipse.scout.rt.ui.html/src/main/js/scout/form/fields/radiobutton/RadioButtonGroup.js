@@ -163,10 +163,23 @@ scout.RadioButtonGroup.prototype.getFields = function() {
  * @override
  */
 scout.RadioButtonGroup.prototype.visitFields = function(visitor) {
-  scout.RadioButtonGroup.parent.prototype.visitFields.call(this, visitor);
-  this.fields.forEach(function(field) {
-    field.visitFields(visitor);
-  });
+  var treeVisitResult = scout.RadioButtonGroup.parent.prototype.visitFields.call(this, visitor);
+  if(treeVisitResult === scout.TreeVisitResult.TERMINATE){
+    return scout.TreeVisitResult.TERMINATE;
+  }
+
+  if(treeVisitResult === scout.TreeVisitResult.SKIP_SUBTREE){
+    return;
+  }
+
+  var fields = this.getFields();
+  for(var i = 0; i < fields.length; i++){
+    var field = fields[i];
+    treeVisitResult = field.visitFields(visitor);
+    if(treeVisitResult === scout.TreeVisitResult.TERMINATE){
+      return scout.TreeVisitResult.TERMINATE;
+    }
+  }
 };
 
 /**

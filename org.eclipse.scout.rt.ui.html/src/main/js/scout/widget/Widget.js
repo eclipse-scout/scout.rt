@@ -1888,15 +1888,21 @@ scout.Widget.prototype.reveal = function() {
  * @returns true if the visitor aborted the visiting, false if the visiting completed without aborting
  */
 scout.Widget.prototype.visitChildren = function(visitor) {
-  return this.children.some(function(child) {
+  for (var i = 0; i < this.children.length; i++){
+    var child = this.children[i];
     if (child.parent === this) {
-      if (visitor(child)) {
+      var treeVisitResult = visitor(child);
+      if (treeVisitResult === true || treeVisitResult === scout.TreeVisitResult.TERMINATE) {
         // Visitor wants to abort the visiting
-        return true;
+        return scout.TreeVisitResult.TERMINATE;
+      } else if (treeVisitResult !== scout.TreeVisitResult.SKIP_SUBTREE) {
+        treeVisitResult = child.visitChildren(visitor);
+        if (treeVisitResult === true || treeVisitResult === scout.TreeVisitResult.TERMINATE) {
+          return scout.TreeVisitResult.TERMINATE;
+        }
       }
-      return child.visitChildren(visitor);
     }
-  }, this);
+  }
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
