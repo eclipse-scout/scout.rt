@@ -268,6 +268,8 @@ describe("Table", function() {
 
     it("updates the html cell texts", function() {
       table.render();
+      table.validateLayout(); // make sure layout is valid
+
       var $rows = table.$rows();
       var $cells0 = table.$cellsForRow($rows.eq(0));
       expect($cells0.eq(0).text()).toBe('cellText0');
@@ -277,7 +279,11 @@ describe("Table", function() {
         id: table.rows[0].id,
         cells: ['newCellText0', 'newCellText1']
       };
+      spyOn(table, 'updateScrollbars').and.callThrough();
       table.updateRows([row]);
+      // simulate layout-validator, we test if invalidateLayoutTree is called in updateRows
+      table.validateLayout();
+      expect(table.updateScrollbars).toHaveBeenCalled();
 
       $rows = table.$rows();
       $cells0 = table.$cellsForRow($rows.eq(0));
