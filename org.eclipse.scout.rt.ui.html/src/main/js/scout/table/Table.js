@@ -2429,7 +2429,8 @@ scout.Table.prototype.expandRowsInternal = function(rows, expanded, recursive) {
         },
         getChildren: function(parent) {
           return parent.childRows;
-        }
+        },
+        defaultChildHeight: this.rowHeight
       });
     }
   }

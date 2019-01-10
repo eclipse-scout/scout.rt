@@ -631,12 +631,17 @@ scout.scrollbars = {
     });
   },
 
-  _getCompleteChildRowsHeightRecursive: function(children, getChildren, isExpanded) {
+  _getCompleteChildRowsHeightRecursive: function(children, getChildren, isExpanded, defaultChildHeight) {
     var height = 0;
     children.forEach(function(child) {
-      height += child.height;
+      if (child.height) {
+        height += child.height;
+      } else {
+        // fallback for children with unset height
+        height += defaultChildHeight;
+      }
       if (isExpanded(child) && getChildren(child).length > 0) {
-        height += this._getCompleteChildRowsHeightRecursive(getChildren(child), getChildren, isExpanded);
+        height += this._getCompleteChildRowsHeightRecursive(getChildren(child), getChildren, isExpanded, defaultChildHeight);
       }
     }.bind(this));
     return height;
@@ -663,7 +668,7 @@ scout.scrollbars = {
       var fullDataHeight = parent.$scrollable.height();
 
       // get childRowCount considering already expanded rows
-      var childRowsHeight = this._getCompleteChildRowsHeightRecursive(children, parent.getChildren, parent.isExpanded);
+      var childRowsHeight = this._getCompleteChildRowsHeightRecursive(children, parent.getChildren, parent.isExpanded, parent.defaultChildHeight);
 
       // + 1.5 since its the parent's top position and we want to scroll half a row further to show that there's something after the expansion
       var additionalHeight = childRowsHeight + (1.5 * parentHeight);

@@ -1965,7 +1965,8 @@ scout.Tree.prototype.ensureExpansionVisible = function(node) {
     getChildren: function(parent) {
       return parent.childNodes;
     },
-    nodePaddingLevel: this.nodePaddingLevel
+    nodePaddingLevel: this.nodePaddingLevel,
+    defaultChildHeight: this.nodeHeight
   });
 };
 
