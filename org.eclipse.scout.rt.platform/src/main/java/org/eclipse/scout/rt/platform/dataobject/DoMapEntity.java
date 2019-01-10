@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.platform.dataobject;
 
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * Base type for data objects with {@link Map}-like structure using key type {@link String} and generic value type
@@ -38,16 +37,18 @@ import java.util.function.Function;
  */
 public class DoMapEntity<T> extends DoEntity {
 
-  @SuppressWarnings("unchecked")
-  protected Function<Object, T> m_valueMapper = t -> (T) t;
-
   @Override
   public T get(String attributeName) {
-    return m_valueMapper.apply(super.get(attributeName));
+    return mapValue(super.get(attributeName));
   }
 
   @Override
   public Map<String, T> all() {
-    return all(m_valueMapper);
+    return all(this::mapValue);
+  }
+
+  @SuppressWarnings("unchecked")
+  protected T mapValue(Object value) {
+    return (T) value;
   }
 }
