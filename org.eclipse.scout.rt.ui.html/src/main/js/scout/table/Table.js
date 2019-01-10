@@ -2687,9 +2687,7 @@ scout.Table.prototype.updateRows = function(rows) {
 
   this._sortAfterUpdate();
   this._updateBackgroundEffect();
-  if (autoOptimizeWidthColumnsDirty) {
-    this.invalidateLayoutTree();
-  }
+  this.invalidateLayoutTree(); // this will also update the scroll-bars
 };
 
 scout.Table.prototype._sortAfterUpdate = function() {
