@@ -662,7 +662,9 @@ scout.Column.prototype.createEditor = function(row) {
 
 scout.Column.prototype._createEditor = function() {
   return scout.create('StringField', {
-    parent: this.table
+    parent: this.table,
+    multilineText: this.table.multilineText,
+    wrapText: this.textWrap
   });
 };
 
