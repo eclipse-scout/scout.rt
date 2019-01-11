@@ -62,7 +62,8 @@ scout.inherits(scout.Desktop, scout.Widget);
 scout.Desktop.DisplayStyle = {
   DEFAULT: 'default',
   BENCH: 'bench',
-  COMPACT: 'compact'
+  COMPACT: 'compact',
+  DENSE: 'dense'
 };
 
 scout.Desktop.UriAction = {
@@ -164,6 +165,7 @@ scout.Desktop.prototype._render = function() {
   this._renderNavigationHandleVisible();
   this._renderNotifications();
   this._renderBrowserHistoryEntry();
+  this._renderDisplayStyle();
   this.addOns.forEach(function(addOn) {
     addOn.render();
   }, this);
@@ -196,9 +198,13 @@ scout.Desktop.prototype._postRender = function() {
   this.initialFormRendering = false;
 };
 
-scout.Desktop.prototype._setDisplayStyle = function() {
-  var DisplayStyle = scout.Desktop.DisplayStyle,
-    isCompact = this.displayStyle === DisplayStyle.COMPACT;
+scout.Desktop.prototype._setDisplayStyle = function(displayStyle) {
+  this._setProperty('displayStyle', displayStyle);
+
+  scout.styles.clearCache();
+  scout.HtmlEnvironment.init(this.isDenseStyleActive() ? scout.Desktop.DisplayStyle.DENSE : null);
+
+  var isCompact = this.displayStyle === scout.Desktop.DisplayStyle.COMPACT;
 
   if (this.header) {
     this.header.setToolBoxVisible(!isCompact);
@@ -679,6 +685,15 @@ scout.Desktop.prototype._renderNotifications = function() {
   this.notifications.forEach(function(notification) {
     this._renderNotification(notification);
   }.bind(this));
+};
+
+scout.Desktop.prototype.isDenseStyleActive = function() {
+  return this.displayStyle === scout.Desktop.DisplayStyle.DENSE;
+};
+
+scout.Desktop.prototype._renderDisplayStyle = function() {
+  this.$container.toggleClass('dense', this.isDenseStyleActive());
+  this.validateLayout();
 };
 
 /**

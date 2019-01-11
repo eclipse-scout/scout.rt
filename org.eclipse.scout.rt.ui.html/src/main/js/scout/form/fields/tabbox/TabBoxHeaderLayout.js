@@ -11,8 +11,21 @@
 scout.TabBoxHeaderLayout = function(tabBoxHeader) {
   scout.TabBoxHeaderLayout.parent.call(this);
   this.tabBoxHeader = tabBoxHeader;
+
+  this._initDefaults();
+
+  scout.HtmlEnvironment.on('propertyChange', this._onHtmlEnvironmenPropertyChange.bind(this));
 };
 scout.inherits(scout.TabBoxHeaderLayout, scout.AbstractLayout);
+
+scout.TabBoxHeaderLayout.prototype._initDefaults = function() {
+  this.fieldStatusWidth = scout.HtmlEnvironment.fieldStatusWidth;
+};
+
+scout.TabBoxHeaderLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
+  this._initDefaults();
+  this.tabBoxHeader.invalidateLayout();
+};
 
 scout.TabBoxHeaderLayout.prototype.layout = function($container) { //
   var htmlContainer = scout.HtmlComponent.get($container),
@@ -37,7 +50,7 @@ scout.TabBoxHeaderLayout.prototype.layout = function($container) { //
 
   if (this.tabBoxHeader.tabBox.statusPosition === scout.FormField.StatusPosition.TOP && $status && $status.isVisible()) {
     statusSizeGross.height = $status.outerHeight(true);
-    statusSizeGross.width = scout.HtmlEnvironment.fieldStatusWidth + scout.graphics.margins($status).horizontal();
+    statusSizeGross.width = this.fieldStatusWidth + scout.graphics.margins($status).horizontal();
   }
 
   tabAreaPrefSize = tabArea.htmlComp.prefSize({
@@ -63,7 +76,7 @@ scout.TabBoxHeaderLayout.prototype.layout = function($container) { //
 
   // layout status
   if (this.tabBoxHeader.tabBox.statusPosition === scout.FormField.StatusPosition.TOP && $status && $status.isVisible()) {
-    $status.cssWidth(scout.HtmlEnvironment.fieldStatusWidth)
+    $status.cssWidth(this.fieldStatusWidth)
       .cssRight(insets.left)
       .cssHeight(clientArea.height - scout.graphics.margins($status).vertical())
       .cssLineHeight(clientArea.height - scout.graphics.margins($status).vertical());
@@ -92,7 +105,7 @@ scout.TabBoxHeaderLayout.prototype.preferredLayoutSize = function($container, op
 
   if (this.tabBoxHeader.tabBox.statusPosition === scout.FormField.StatusPosition.TOP && $status && $status.isVisible()) {
     statusSizeGross.height = $status.outerHeight(true);
-    statusSizeGross.width = scout.HtmlEnvironment.fieldStatusWidth + scout.graphics.margins($status).horizontal();
+    statusSizeGross.width = this.fieldStatusWidth + scout.graphics.margins($status).horizontal();
 
     prefSize.width += statusSizeGross.width;
     prefSize.height = Math.max(prefSize.height, statusSizeGross.height);

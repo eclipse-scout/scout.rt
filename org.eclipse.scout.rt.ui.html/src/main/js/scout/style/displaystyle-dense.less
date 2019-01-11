@@ -1,0 +1,248 @@
+.dense {
+
+  /* FormField.less */
+  .form-field {
+    & > label {
+      padding-top: 4px; /* @borderless-field-padding-y; */
+      padding-bottom: 4px; /* @borderless-field-padding-y; */
+    }
+  }
+
+  /* SmartField.less */
+  .smart-field {
+    & > .field > .multiline-lines {
+      line-height: 15px;
+      padding-top: 2px; /* padding: 3px @text-field-padding-x; */
+      padding-bottom: 2px
+    }
+  }
+
+  .proposal-chooser {
+    & > .active-filter,
+    & > .status {
+      height: @logical-grid-row-height;
+    }
+
+    & > .active-filter > .radiobutton-group {
+      height: @logical-grid-row-height;
+
+      & > .radiobutton-group-body {
+        height: @logical-grid-row-height;
+      }
+    }
+  }
+
+  /* MenuBar.less */
+  .menubar {
+    & > .menubox {
+      & > .menu-item {
+        padding-top: 3px; /* @menubar-item-padding-y; */
+        padding-bottom: 3px; /* @menubar-item-padding-y; */
+
+        /* By making sure menu items are always at least the same height as form fields, it is easier to align them with each other, especially when zoomed */
+        min-height: @logical-grid-row-height-dense; /* @logical-grid-row-height; */
+
+      }
+    }
+  }
+
+  /* GroupBox.less */
+  .group-box-title {
+    margin-top: 2px; /* @group-box-title-margin-top; */
+    padding-top: 4px; /* padding: @group-box-title-padding-top 0 @group-box-title-padding-bottom 0; */
+    padding-bottom: 4px;
+  }
+
+  .group-box-body {
+    padding-top: 8px; /* padding: @group-box-body-padding-top 0 @group-box-body-padding-bottom 0; */
+    padding-bottom: 6px;
+
+    /* redefine */
+    &.y-padding-invisible {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
+
+  /* TabBox.less */
+  .tab-box-header {
+    margin-top: 4px; /* @group-box-title-margin-top; */
+  }
+
+  .tab-item {
+    & > .title {
+      padding-top: 4px; /* padding: @tab-item-title-padding-top 0 @tab-item-title-padding-bottom; */
+      padding-bottom: 4px;
+    }
+  }
+
+  .overflow-tab-item.menu-item {
+    padding-top: 4px; /* padding: @tab-item-title-padding-top - 2px @tab-item-padding-x - 8px @tab-item-title-padding-bottom; */
+    padding-bottom: 4px;
+  }
+
+  /* TableHeader.less */
+  .table-header-item {
+    padding-top: 7px; /* padding: @table-header-padding-y @table-header-padding-right @table-header-padding-y @table-header-padding-left; */
+    padding-bottom: 6px;
+  }
+
+  .table-header-resize {
+    padding-top: 4px; /* 8px 8px; */
+    padding-bottom: 4px;
+  }
+
+  /* Table.less */
+  .table-cell {
+    padding-top: 4px; /* padding: @table-row-padding-y @table-cell-padding-right @table-row-padding-y @table-cell-padding-left; */
+    padding-bottom: 4px;
+
+    &.checkable {
+      padding-top: 4px;   /* @table-row-padding-y - @checkable-cell-padding-adjustment @table-cell-padding-left 0 @table-cell-padding-left; */
+      padding-bottom: 4px;
+      line-height: 0px /* somehow inline-block causes additional height when line-height is not set. (font-size would work) */
+    }
+
+    &.table-node {
+
+      > .table-row-control {
+        /* padding: @table-row-padding-y 8px @table-row-padding-y @table-row-control-padding-left; */
+        padding-top: 6px;
+        padding-bottom: 4px;
+      }
+    }
+  }
+
+  /* DesktopBench.less */
+
+  .detail-table.table {
+    & > .table-header {
+      & > .table-header-item {
+        padding-top: 7px; /* @detail-table-header-padding-y; */
+        padding-bottom: 6px; /* @detail-table-header-padding-y; */
+
+        & > .table-header-item-state {
+          top: 4px; /* top: 9px; */
+        }
+      }
+    }
+
+    & .table-aggregate {
+      & > .table-cell {
+        padding-top: 4px; /* @detail-table-row-padding-y; */
+        padding-bottom: 4px; /* @detail-table-row-padding-y; */
+      }
+    }
+
+    & > .table-data {
+
+      & > .table-row,
+      & > .table-aggregate-row {
+
+        & > .table-cell {
+          padding-top: 3px; /* @detail-table-row-padding-y - 1px; */
+          padding-bottom: 3px; /* @detail-table-row-padding-y - 1px; */
+
+          &.checkable {
+            padding-top: 3px; /* @detail-table-row-padding-y - @checkable-cell-padding-adjustment - 1px; */
+            padding-bottom: 3px;
+          }
+
+          & > .table-row-control {
+            padding-top: 4px; /* @detail-table-row-padding-y - 1px; */
+            padding-bottom: 4px; /* @detail-table-row-padding-y - 1px; */
+          }
+        }
+      }
+    }
+  }
+
+  /* ContextMenuPopup.less */
+  .context-menu {
+    & > .menu-item {
+      padding-top: 6px; /* padding: 11px 15px; */
+      padding-bottom: 6px;
+    }
+  }
+
+  /* CheckBoxField.less */
+  .check-box-field > .field {
+    padding-top: 2px; /* padding: 6px 0; */
+    padding-bottom: 2px;
+  }
+
+/* main.less */
+  .input-field {
+    padding-top: 3px; /* padding: @text-field-padding-y @text-field-padding-x; */
+    padding-bottom: 3px;
+  }
+
+  /* Button */
+  .button {
+    padding-top: 0px; /*   padding: @button-padding-y @button-padding-x; */
+    padding-bottom: 0px;
+
+    & > .button-label {
+      padding: 0px 0;
+    }
+
+    & > .icon {
+      padding-top: 0px; /* padding-top: 2px; */
+      padding-bottom: 0px; /* padding-bottom: 2px; */
+    }
+  }
+
+  /* RadioButton.less */
+  .radio-button > .field {
+    padding-top: 2px; /*   padding: 6px 0; */
+    padding-bottom: 2px;
+
+    & > .label {
+      padding-top: 1px; /* padding-top: @radio-button-label-padding-top; */
+    }
+  }
+
+  /* LabelField.less */
+  .label-field > .field {
+    padding-top: 2px;   /* padding-top: @borderless-field-padding-y; */
+    padding-bottom: 2px;    /* padding-bottom: @borderless-field-padding-y; */
+  }
+
+  /* Tree.less */
+  .tree-node {
+    padding-top: 3px;   /* padding: @tree-node-padding-y @tree-node-padding-right @tree-node-padding-y @tree-node-padding-left; */
+    padding-bottom: 3px;
+  }
+
+  .tree-node-control {
+    padding-top: 4px;
+    padding-bottom: 3px;
+  }
+
+  /* Outline.less */
+  .outline.tree {
+    & > .tree-data {
+      & > .tree-node,
+      & > .animation-wrapper > .tree-node {
+        padding-top: 6px; /* padding-top: @outline-node-padding-y; */
+        padding-bottom: 6px; /* padding-bottom: @outline-node-padding-y; */
+
+        & > .tree-node-control {
+            padding-top: 6px; /* padding-top: @outline-node-control-padding-y; */
+        }
+      }
+    }
+  }
+
+  /* ValueField.less */
+  .value-field {
+    & > input,
+    & > .input-field,
+    & > .field > input,
+    & > .field > .input-field,
+    & > .file-input {
+      /* Mainly necessary if label is invisible or on top and use ui height is set -> Makes sure the status is aligned and inputs are always the same height*/
+      min-height: @logical-grid-row-height-dense;
+    }
+  }
+}

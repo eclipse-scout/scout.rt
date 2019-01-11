@@ -175,6 +175,8 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    */
   String DISPLAY_STYLE_COMPACT = "compact";
 
+  String DISPLAY_STYLE_DENSE = "dense";
+
   /**
    * @deprecated will be removed with 8.0, use {@link #init()} or {@link #reinit()} instead
    */

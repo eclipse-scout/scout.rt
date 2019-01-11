@@ -38,6 +38,8 @@ scout.Tab.prototype._init = function(options) {
   this.fieldStatus.on('statusMouseDown', this._statusMouseDownHandler);
 
   this.tabItem.on('propertyChange', this._tabPropertyChangeHandler);
+
+  this.session.desktop.on('propertyChange', this._onDesktopPropertyChange.bind(this));
 };
 
 scout.Tab.prototype._destroy = function() {
@@ -188,6 +190,13 @@ scout.Tab.prototype.setTabOverflown = function(tabOverflown) {
 scout.Tab.prototype._renderTabOverflown = function() {
   this.$container.toggleClass('overflown', this.tabOverflown);
   this._updateStatus();
+};
+
+scout.Tab.prototype._onDesktopPropertyChange = function(event) {
+  // switching from or to the dense mode requires clearing of the tab's htmlComponent prefSize cache.
+  if (event.propertyName === 'displayStyle' && scout.isOneOf(scout.Desktop.DisplayStyle.DENSE, event.oldValue, event.newValue)) {
+    this.invalidateLayout();
+  }
 };
 
 scout.Tab.prototype._onTabMouseDown = function(event) {

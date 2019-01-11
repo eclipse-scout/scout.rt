@@ -107,7 +107,7 @@ scout.RadioButtonGroup.prototype._renderProperties = function() {
 };
 
 scout.RadioButtonGroup.prototype._createBodyLayout = function() {
-  return new scout.LogicalGridLayout(this, this.layoutConfig);
+  return new scout.RadioButtonGroupLayout(this, this.layoutConfig);
 };
 
 /**
@@ -136,9 +136,9 @@ scout.RadioButtonGroup.prototype.setLayoutConfig = function(layoutConfig) {
 
 scout.RadioButtonGroup.prototype._setLayoutConfig = function(layoutConfig) {
   if (!layoutConfig) {
-    layoutConfig = new scout.RadioButtonGroupLayoutConfig();
+    layoutConfig = new scout.LogicalGridLayoutConfig();
   }
-  this._setProperty('layoutConfig', scout.RadioButtonGroupLayoutConfig.ensure(layoutConfig));
+  this._setProperty('layoutConfig', scout.LogicalGridLayoutConfig.ensure(layoutConfig));
 };
 
 scout.RadioButtonGroup.prototype._renderLayoutConfig = function() {

@@ -20,7 +20,7 @@ scout.styles = {
    * Adds the given css class to that element and returns a style object containing the values for every given property.
    * The style is cached. Subsequent calls with the same css class will return the same style object.
    */
-  get: function(cssClass, properties) {
+  get: function(cssClass, properties, additionalClass) {
     var style = scout.styles.styleMap[cssClass];
     // ensure array
     properties = scout.arrays.ensure(properties);
@@ -57,6 +57,9 @@ scout.styles = {
       scout.styles.element = elem;
     }
     elem.className = cssClass;
+    if(additionalClass) {
+      elem.className += ' ' + additionalClass;
+    }
     var computedStyle = window.getComputedStyle(elem);
     notResolvedProperties.forEach(function(property) {
       style[property.nameCamelCase] = computedStyle[property.name];
@@ -66,8 +69,8 @@ scout.styles = {
     return style;
   },
 
-  getSize: function(cssClass, cssProperty, property, defaultSize) {
-    var size = scout.styles.get(cssClass, cssProperty)[property];
+  getSize: function(cssClass, cssProperty, property, defaultSize, additionalClass) {
+    var size = scout.styles.get(cssClass, cssProperty, additionalClass)[property];
     if ('auto' === size) {
       return defaultSize;
     } else {
@@ -77,6 +80,10 @@ scout.styles = {
 
   put: function(cssClass, style) {
     this.styleMap[cssClass] = style;
+  },
+
+  clearCache: function() {
+    this.styleMap = {};
   },
 
   RGB_BLACK: {

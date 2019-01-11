@@ -72,7 +72,7 @@ scout.SequenceBox.prototype._renderProperties = function() {
 };
 
 scout.SequenceBox.prototype._createBodyLayout = function() {
-  return new scout.LogicalGridLayout(this, this.layoutConfig);
+  return new scout.SequenceBoxLayout(this, this.layoutConfig);
 };
 
 /**
@@ -101,9 +101,9 @@ scout.SequenceBox.prototype.setLayoutConfig = function(layoutConfig) {
 
 scout.SequenceBox.prototype._setLayoutConfig = function(layoutConfig) {
   if (!layoutConfig) {
-    layoutConfig = new scout.SequenceBoxLayoutConfig();
+    layoutConfig = new scout.LogicalGridLayoutConfig();
   }
-  this._setProperty('layoutConfig', scout.SequenceBoxLayoutConfig.ensure(layoutConfig));
+  this._setProperty('layoutConfig', scout.LogicalGridLayoutConfig.ensure(layoutConfig));
 };
 
 scout.SequenceBox.prototype._renderLayoutConfig = function() {

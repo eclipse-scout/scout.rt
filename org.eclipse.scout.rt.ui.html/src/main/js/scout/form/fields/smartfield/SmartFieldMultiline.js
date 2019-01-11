@@ -22,7 +22,7 @@ scout.SmartFieldMultiline.prototype._render = function() {
   this.addLabel();
   this.addFieldContainer(this.$parent.makeDiv('multiline'));
   htmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
-  htmlComp.setLayout(new scout.SmartFieldMultilineLayout());
+  htmlComp.setLayout(new scout.SmartFieldMultilineLayout(this));
 
   $input = scout.fields.makeInputOrDiv(this, 'multiline-input')
     .on('mousedown', this._onFieldMouseDown.bind(this))

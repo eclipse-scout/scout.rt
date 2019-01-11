@@ -9,13 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.LogicalGridLayoutConfig = function(options) {
-  var env = scout.HtmlEnvironment;
-  this.hgap = env.formColumnGap;
-  this.vgap = env.formRowGap;
-  this.columnWidth = env.formColumnWidth;
-  this.rowHeight = env.formRowHeight;
-  this.minWidth = 0;
-
   this._extend(options);
 };
 
@@ -44,11 +37,22 @@ scout.LogicalGridLayoutConfig.prototype.clone = function() {
 };
 
 scout.LogicalGridLayoutConfig.prototype.applyToLayout = function(layout) {
-  layout.hgap = this.hgap;
-  layout.vgap = this.vgap;
-  layout.columnWidth = this.columnWidth;
-  layout.rowHeight = this.rowHeight;
-  layout.minWidth = this.minWidth;
+  layout.layoutConfig = this;
+  if (this.hgap !== null && this.hgap !== undefined) {
+    layout.hgap = this.hgap;
+  }
+  if (this.vgap !== null && this.vgap !== undefined) {
+    layout.vgap = this.vgap;
+  }
+  if (this.columnWidth !== null && this.columnWidth !== undefined) {
+    layout.columnWidth = this.columnWidth;
+  }
+  if (this.rowHeight !== null && this.rowHeight !== undefined) {
+    layout.rowHeight = this.rowHeight;
+  }
+  if (this.minWidth !== null && this.minWidth !== undefined) {
+    layout.minWidth = this.minWidth;
+  }
 };
 
 scout.LogicalGridLayoutConfig.ensure = function(layoutConfig) {

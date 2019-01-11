@@ -11,9 +11,21 @@
 scout.GroupBoxLayout = function(groupBox) {
   scout.GroupBoxLayout.parent.call(this);
   this.groupBox = groupBox;
-  this._statusWidth = scout.HtmlEnvironment.fieldStatusWidth;
+
+  this._initDefaults();
+
+  scout.HtmlEnvironment.on('propertyChange', this._onHtmlEnvironmenPropertyChange.bind(this));
 };
 scout.inherits(scout.GroupBoxLayout, scout.AbstractLayout);
+
+scout.GroupBoxLayout.prototype._initDefaults = function() {
+  this._statusWidth = scout.HtmlEnvironment.fieldStatusWidth;
+};
+
+scout.GroupBoxLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
+  this._initDefaults();
+  this.groupBox.invalidateLayout();
+};
 
 scout.GroupBoxLayout.prototype.layout = function($container) {
   var titleMarginX, menuBarSize, gbBodySize,

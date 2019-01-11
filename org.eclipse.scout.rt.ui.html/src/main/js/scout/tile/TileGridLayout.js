@@ -8,15 +8,37 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.TileGridLayout = function(tiles) {
-  scout.TileGridLayout.parent.call(this, tiles);
-  this.maxWidth = -1;
+scout.TileGridLayout = function(widget, layoutConfig) {
+  scout.TileGridLayout.parent.call(this, widget, layoutConfig);
   this.containerPos = null;
   this.containerScrollTop = null;
   this.tiles = [];
   this._calculatingPrimitivePrefSize = false;
 };
 scout.inherits(scout.TileGridLayout, scout.LogicalGridLayout);
+
+scout.TileGridLayout._DEFAULTSIZE = undefined;
+
+scout.TileGridLayout.getTileDimensions = function() {
+  if (!(scout.TileGridLayout._DEFAULTSIZE instanceof scout.Rectangle)) {
+    var h = scout.styles.getSize('tile-grid-layout-config', 'height', 'height', -1);
+    var w = scout.styles.getSize('tile-grid-layout-config', 'width', 'width', -1);
+    var horizontalGap = scout.styles.getSize('tile-grid-layout-config', 'margin-left', 'marginLeft', -1);
+    var verticalGap = scout.styles.getSize('tile-grid-layout-config', 'margin-top', 'marginTop', -1);
+    scout.TileGridLayout._DEFAULTSIZE = new scout.Rectangle(horizontalGap, verticalGap, w, h);
+  }
+  return scout.TileGridLayout._DEFAULTSIZE;
+};
+
+scout.TileGridLayout.prototype._initDefaults = function() {
+  scout.TileGridLayout.parent.prototype._initDefaults.call(this);
+  var dim = scout.TileGridLayout.getTileDimensions();
+  this.hgap = dim.x;
+  this.vgap = dim.y;
+  this.columnWidth = dim.width;
+  this.rowHeight = dim.height;
+  this.maxWidth = -1;
+};
 
 scout.TileGridLayout.prototype.layout = function($container) {
   var htmlComp = this.widget.htmlComp;
@@ -323,10 +345,10 @@ scout.TileGridLayout.prototype.virtualPrefSize = function($container, options) {
   var rowCount, columnCount;
   var insets = scout.HtmlComponent.get($container).insets();
   var prefSize = new scout.Dimension();
-  var columnWidth = this.widget.layoutConfig.columnWidth;
-  var rowHeight = this.widget.layoutConfig.rowHeight;
-  var hgap = this.widget.layoutConfig.hgap;
-  var vgap = this.widget.layoutConfig.vgap;
+  var columnWidth = this.columnWidth;
+  var rowHeight = this.rowHeight;
+  var hgap = this.hgap;
+  var vgap = this.vgap;
 
   if (options.widthHint) {
     columnCount = Math.floor(options.widthHint / (columnWidth + hgap));

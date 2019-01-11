@@ -354,6 +354,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
       }
 
     });
+    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_DISPLAY_STYLE, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getDisplayStyle();
+      }
+    });
   }
 
   @Override

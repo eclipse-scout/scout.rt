@@ -11,18 +11,32 @@
 /**
  * This layout only layouts the INPUT and DIV part of the multi-line smart-field, not the entire form-field.
  */
-scout.SmartFieldMultilineLayout = function() {
+scout.SmartFieldMultilineLayout = function(smartField) {
   scout.SmartFieldMultilineLayout.parent.call(this);
+  this.smartField = smartField;
+
+  this._initDefaults();
+
+  scout.HtmlEnvironment.on('propertyChange', this._onHtmlEnvironmenPropertyChange.bind(this));
 };
 scout.inherits(scout.SmartFieldMultilineLayout, scout.AbstractLayout);
+
+scout.SmartFieldMultilineLayout.prototype._initDefaults = function() {
+  this.rowHeight = scout.HtmlEnvironment.formRowHeight;
+};
+
+scout.SmartFieldMultilineLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
+  this._initDefaults();
+  this.smartField.invalidateLayout();
+};
 
 scout.SmartFieldMultilineLayout.prototype.layout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container),
     $input = $container.children('.multiline-input'),
     $lines = $container.children('.multiline-lines'),
     innerSize = htmlContainer.availableSize()
-      .subtract(htmlContainer.insets());
+    .subtract(htmlContainer.insets());
 
-  $input.cssHeight(scout.HtmlEnvironment.formRowHeight);
-  $lines.cssHeight(innerSize.height - scout.HtmlEnvironment.formRowHeight);
+  $input.cssHeight(this.rowHeight);
+  $lines.cssHeight(innerSize.height - this.rowHeight);
 };

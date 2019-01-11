@@ -14,21 +14,37 @@
  * @param options available options: hgap, vgap, rowHeight, columnWidth, minWidth
  *
  */
-scout.LogicalGridLayout = function(widget, options) {
+scout.LogicalGridLayout = function(widget, layoutConfig) {
   scout.LogicalGridLayout.parent.call(this);
   this.cssClass = 'logical-grid-layout';
   this.validityBasedOnContainerSize = new scout.Dimension();
   this.valid = false;
   this.widget = widget;
   this.info = null;
-  this.hgap = 0;
-  this.vgap = 0;
-  this.rowHeight = scout.HtmlEnvironment.formRowHeight;
-  this.columnWidth = scout.HtmlEnvironment.formColumnWidth;
-  this.minWidth = 0;
-  $.extend(this, options);
+
+  this._initDefaults();
+  this.layoutConfig = scout.LogicalGridLayoutConfig.ensure(layoutConfig);
+  this.layoutConfig.applyToLayout(this);
+
+  scout.HtmlEnvironment.on('propertyChange', this._onHtmlEnvironmenPropertyChange.bind(this));
 };
 scout.inherits(scout.LogicalGridLayout, scout.AbstractLayout);
+
+scout.LogicalGridLayout.prototype._initDefaults = function() {
+  var env = scout.HtmlEnvironment;
+  this.hgap = env.formColumnGap;
+  this.vgap = env.formRowGap;
+  this.columnWidth = env.formColumnWidth;
+  this.rowHeight = env.formRowHeight;
+  this.minWidth = 0;
+};
+
+scout.LogicalGridLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
+  this._initDefaults();
+  this.layoutConfig.applyToLayout(this);
+  this.widget.invalidateLayout();
+  this.widget.invalidateLogicalGrid();
+};
 
 scout.LogicalGridLayout.prototype.validateLayout = function($container, options) {
   var visibleComps = [],

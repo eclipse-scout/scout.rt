@@ -38,25 +38,29 @@ describe('NumberColumn', function() {
     var imageLevel50 = 'linear-gradient(to left, ' + barChartColor + ' 0%, ' + barChartColor + ' 50%, transparent 50%, transparent 100%)';
     var defaultBackgroundColor;
 
-    scout.styles.put('column-background-effect-gradient1-start', {
-      backgroundColor: rgbLevel0
-    });
-    scout.styles.put('column-background-effect-gradient1-end', {
-      backgroundColor: rgbLevel100
-    });
-    scout.styles.put('column-background-effect-gradient2-start', {
-      backgroundColor: rgbLevel100
-    });
-    scout.styles.put('column-background-effect-gradient2-end', {
-      backgroundColor: rgbLevel0
-    });
-    scout.styles.put('column-background-effect-bar-chart', {
-      backgroundColor: barChartColor
-    });
-
     beforeEach(function() {
+      scout.styles.put('column-background-effect-gradient1-start', {
+        backgroundColor: rgbLevel0
+      });
+      scout.styles.put('column-background-effect-gradient1-end', {
+        backgroundColor: rgbLevel100
+      });
+      scout.styles.put('column-background-effect-gradient2-start', {
+        backgroundColor: rgbLevel100
+      });
+      scout.styles.put('column-background-effect-gradient2-end', {
+        backgroundColor: rgbLevel0
+      });
+      scout.styles.put('column-background-effect-bar-chart', {
+        backgroundColor: barChartColor
+      });
+
       var $div = $('<div>').appendTo(session.$entryPoint);
       defaultBackgroundColor = $div.css('background-color');
+    });
+
+    afterEach(function() {
+      scout.styles.clearCache();
     });
 
     describe('colorGradient1', function() {

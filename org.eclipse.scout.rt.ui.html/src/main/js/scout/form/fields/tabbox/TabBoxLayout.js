@@ -11,9 +11,21 @@
 scout.TabBoxLayout = function(tabBox) {
   scout.TabBoxLayout.parent.call(this);
   this._tabBox = tabBox;
-  this._statusWidth = scout.HtmlEnvironment.fieldStatusWidth;
+
+  this._initDefaults();
+
+  scout.HtmlEnvironment.on('propertyChange', this._onHtmlEnvironmenPropertyChange.bind(this));
 };
 scout.inherits(scout.TabBoxLayout, scout.AbstractLayout);
+
+scout.TabBoxLayout.prototype._initDefaults = function() {
+  this._statusWidth = scout.HtmlEnvironment.fieldStatusWidth;
+};
+
+scout.TabBoxLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
+  this._initDefaults();
+  this._tabBox.invalidateLayout();
+};
 
 scout.TabBoxLayout.prototype.layout = function($container) {
   var containerSize, tabContentSize, tabAreaMargins, innerTabAreaSize,

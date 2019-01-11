@@ -19,7 +19,9 @@
 @control-alternative-border-radius: 0;
 @control-popup-border-radius: @border-radius;
 @logical-grid-row-height: 30px;
+@logical-grid-row-height-dense: 24px;
 @logical-grid-row-gap: 10px;
+@logical-grid-row-gap-dense: 8px;
 @logical-grid-column-width: 420px;
 @logical-grid-column-gap: 40px - @mandatory-indicator-width;
 @logical-grid-small-column-gap: 4px;
@@ -47,6 +49,11 @@
 .html-env-logical-grid-row {
   height: @logical-grid-row-height;
   margin-bottom: @logical-grid-row-gap;
+
+  &.dense {
+    height: @logical-grid-row-height-dense;
+    margin-bottom: @logical-grid-row-gap-dense;
+  }
 }
 
 .html-env-logical-grid-column {

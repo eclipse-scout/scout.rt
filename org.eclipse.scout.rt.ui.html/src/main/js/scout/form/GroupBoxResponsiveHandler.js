@@ -11,7 +11,7 @@
 scout.GroupBoxResponsiveHandler = function() {
   scout.GroupBoxResponsiveHandler.parent.call(this);
 
-  this.compactThreshold = scout.HtmlEnvironment.formColumnWidth;
+  this._initDefaults();
   this.allowedStates = [scout.ResponsiveManager.ResponsiveState.NORMAL, scout.ResponsiveManager.ResponsiveState.CONDENSED, scout.ResponsiveManager.ResponsiveState.COMPACT];
 
   // transform handlers
@@ -29,8 +29,18 @@ scout.GroupBoxResponsiveHandler = function() {
   // Event handlers
   this._formFieldAddedHandler = this._onFormFieldAdded.bind(this);
   this._compositeFields = [];
+
+  scout.HtmlEnvironment.on('propertyChange', this._onHtmlEnvironmenPropertyChange.bind(this));
 };
 scout.inherits(scout.GroupBoxResponsiveHandler, scout.ResponsiveHandler);
+
+scout.GroupBoxResponsiveHandler.prototype._initDefaults = function() {
+  this.compactThreshold = scout.HtmlEnvironment.formColumnWidth;
+};
+
+scout.GroupBoxResponsiveHandler.prototype._onHtmlEnvironmenPropertyChange = function() {
+  this._initDefaults();
+};
 
 /**
  * @Override

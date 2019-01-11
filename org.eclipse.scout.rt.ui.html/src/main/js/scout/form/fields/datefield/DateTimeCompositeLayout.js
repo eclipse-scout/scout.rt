@@ -17,8 +17,21 @@ scout.DateTimeCompositeLayout = function(dateField) {
   this.PREF_DATE_FIELD_WIDTH = 110;
   this.MIN_TIME_FIELD_WIDTH = 60;
   this.PREF_TIME_FIELD_WIDTH = 90;
+
+  this._initDefaults();
+
+  scout.HtmlEnvironment.on('propertyChange', this._onHtmlEnvironmenPropertyChange.bind(this));
 };
 scout.inherits(scout.DateTimeCompositeLayout, scout.AbstractLayout);
+
+scout.DateTimeCompositeLayout.prototype._initDefaults = function() {
+  this.hgap = scout.HtmlEnvironment.smallColumnGap;
+};
+
+scout.DateTimeCompositeLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
+  this._initDefaults();
+  this._dateField.invalidateLayout();
+};
 
 scout.DateTimeCompositeLayout.prototype.layout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container),
@@ -166,7 +179,7 @@ scout.DateTimeCompositeLayout.prototype._hgap = function() {
   if (this._dateField.cellEditor) {
     return 0;
   }
-  return scout.HtmlEnvironment.smallColumnGap;
+  return this.hgap;
 };
 
 scout.DateTimeCompositeLayout.prototype.preferredLayoutSize = function($container) {
