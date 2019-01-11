@@ -71,6 +71,13 @@ public class JmsMessageReader<DTO> {
   }
 
   /**
+   * @return the reader's {@link IMarshaller} used to transform the transfer object (never <code>null</code>).
+   */
+  public IMarshaller getMarshaller() {
+    return m_marshaller;
+  }
+
+  /**
    * Reads the transfer object by using the readers's {@link IMarshaller}.
    *
    * @see JmsMessageWriter#writeTransferObject(Object)

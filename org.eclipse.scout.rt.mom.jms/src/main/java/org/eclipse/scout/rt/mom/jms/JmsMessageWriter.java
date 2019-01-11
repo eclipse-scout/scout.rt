@@ -78,6 +78,13 @@ public class JmsMessageWriter {
   }
 
   /**
+   * @return the writer's {@link IMarshaller} used to transform the transfer object (never <code>null</code>).
+   */
+  public IMarshaller getMarshaller() {
+    return m_marshaller;
+  }
+
+  /**
    * Writes the given transfer object, and uses the writer's {@link IMarshaller} to transform the object into its
    * transport type.
    *
@@ -195,9 +202,18 @@ public class JmsMessageWriter {
 
   /**
    * Finish writing and get the message.
+   * <p>
+   * If the message is a {@link javax.jms.BytesMessage}, the message body is put in read-only mode and repositions the
+   * stream of bytes to the beginning.
+   *
+   * @return the JMS message in read-only mode
+   * @see BytesMessage#reset()
    */
   public Message build() throws JMSException {
     writeContext(JMS_PROP_MARSHALLER_CONTEXT, m_marshallerContext);
+    if (m_message instanceof BytesMessage) {
+      ((BytesMessage) m_message).reset();
+    }
     return m_message;
   }
 

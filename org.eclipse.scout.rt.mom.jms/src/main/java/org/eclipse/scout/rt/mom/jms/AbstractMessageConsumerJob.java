@@ -70,7 +70,7 @@ public abstract class AbstractMessageConsumerJob<DTO> implements IRunnable {
         break;
       }
 
-      LOG.debug("Receiving JMS message [message={}]", message);
+      m_mom.getMessageHandler().handleIncoming(m_destination, message, m_marshaller);
       try {
         onJmsMessage(message);
       }

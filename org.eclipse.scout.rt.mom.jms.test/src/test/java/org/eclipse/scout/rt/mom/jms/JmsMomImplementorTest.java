@@ -21,6 +21,12 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
@@ -41,6 +47,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
+import javax.jms.BytesMessage;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.naming.Context;
@@ -56,6 +63,7 @@ import org.eclipse.scout.rt.mom.api.IDestination.ResolveMethod;
 import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.IMessageListener;
 import org.eclipse.scout.rt.mom.api.IMom;
+import org.eclipse.scout.rt.mom.api.IMom.DefaultMarshallerProperty;
 import org.eclipse.scout.rt.mom.api.IMomImplementor;
 import org.eclipse.scout.rt.mom.api.IRequestListener;
 import org.eclipse.scout.rt.mom.api.ISubscription;
@@ -66,6 +74,7 @@ import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.ObjectMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.TextMarshaller;
+import org.eclipse.scout.rt.platform.AnnotationFactory;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -93,6 +102,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.AbstractScoutTestParameter;
@@ -108,6 +118,7 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
+import org.mockito.ArgumentCaptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,6 +131,7 @@ public class JmsMomImplementorTest {
   public static final ArtemisJmsBrokerTestRule ARTEMIS_RULE = new ArtemisJmsBrokerTestRule();
 
   private IBean<? extends JmsTestMom> m_momBean;
+  private IBean<? extends IJmsMessageHandler> m_messageHandlerBean;
   private List<IDisposable> m_disposables;
 
   private String m_testJobExecutionHint;
@@ -238,9 +250,21 @@ public class JmsMomImplementorTest {
     m_momBean = null;
   }
 
+  protected void installTestMessageHandler() {
+    IJmsMessageHandler messageHandler = mock(IJmsMessageHandler.class);
+    m_messageHandlerBean = BeanTestingHelper.get().registerBean(new BeanMetaData(IJmsMessageHandler.class, messageHandler).withAnnotation(AnnotationFactory.createApplicationScoped()));
+    assertSame(messageHandler, BEANS.get(IJmsMessageHandler.class));
+  }
+
+  protected void uninstallTestMessagehandler() {
+    BeanTestingHelper.get().unregisterBean(m_messageHandlerBean);
+    m_messageHandlerBean = null;
+  }
+
   @Before
   public void before() {
     installTestMom(JmsTestMom.class);
+    installTestMessageHandler();
 
     LOG.info("---------------------------------------------------");
     LOG.info("<{}>", m_testName.getMethodName());
@@ -275,6 +299,7 @@ public class JmsMomImplementorTest {
       }
     }
 
+    uninstallTestMessagehandler();
     uninstallTestMom();
 
     // ensure activeMQ is stopped
@@ -329,7 +354,8 @@ public class JmsMomImplementorTest {
     person.setFirstname("anna");
 
     IDestination<Person> queue = MOM.newDestination("test/mom/testPublishObject", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
-    m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, BEANS.get(ObjectMarshaller.class)));
+    ObjectMarshaller marshaller = BEANS.get(ObjectMarshaller.class);
+    m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, marshaller));
     m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<Person>() {
 
       @Override
@@ -343,6 +369,8 @@ public class JmsMomImplementorTest {
     Person testee = capturer.get();
     assertEquals("smith", testee.getLastname());
     assertEquals("anna", testee.getFirstname());
+    verifyMessageHandlerHandleOutgoingCalled(queue, marshaller, testee);
+    verifyMessageHandlerHandleIncomingCalled(queue, marshaller, person);
   }
 
   @Test
@@ -350,7 +378,8 @@ public class JmsMomImplementorTest {
     final Capturer<byte[]> capturer = new Capturer<>();
 
     IDestination<byte[]> queue = MOM.newDestination("test/mom/testPublishBytes", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
-    m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, BEANS.get(BytesMarshaller.class)));
+    BytesMarshaller marshaller = BEANS.get(BytesMarshaller.class);
+    m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, marshaller));
     m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<byte[]>() {
 
       @Override
@@ -358,11 +387,15 @@ public class JmsMomImplementorTest {
         capturer.set(message.getTransferObject());
       }
     }));
-    MOM.publish(JmsTestMom.class, queue, "hello world".getBytes(StandardCharsets.UTF_8));
+    byte[] bytes = "hello world".getBytes(StandardCharsets.UTF_8);
+    MOM.publish(JmsTestMom.class, queue, bytes);
 
     // Verify
     byte[] testee = capturer.get();
     assertEquals("hello world", new String(testee, StandardCharsets.UTF_8));
+    assertArrayEquals(bytes, testee);
+    verifyMessageHandlerHandleOutgoingCalled(queue, marshaller, bytes);
+    verifyMessageHandlerHandleIncomingCalled(queue, marshaller, testee);
   }
 
   @Test
@@ -370,7 +403,8 @@ public class JmsMomImplementorTest {
     final Capturer<String> capturer = new Capturer<>();
 
     IDestination<String> queue = MOM.newDestination("test/mom/testPublishText", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
-    m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, BEANS.get(TextMarshaller.class)));
+    TextMarshaller marshaller = BEANS.get(TextMarshaller.class);
+    m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, marshaller));
     m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<String>() {
 
       @Override
@@ -378,11 +412,14 @@ public class JmsMomImplementorTest {
         capturer.set(message.getTransferObject());
       }
     }));
-    MOM.publish(JmsTestMom.class, queue, "hello world");
+    String string = "hello world";
+    MOM.publish(JmsTestMom.class, queue, string);
 
     // Verify
     String testee = capturer.get();
-    assertEquals("hello world", testee);
+    assertEquals(string, testee);
+    verifyMessageHandlerHandleOutgoingCalled(queue, marshaller, string);
+    verifyMessageHandlerHandleIncomingCalled(queue, marshaller, testee);
   }
 
   @Test
@@ -525,7 +562,8 @@ public class JmsMomImplementorTest {
     final Capturer<Person> capturer = new Capturer<>();
 
     IDestination<Person> queue = MOM.newDestination("test/mom/testPublishJsonData", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
-    m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, BEANS.get(JsonMarshaller.class)));
+    JsonMarshaller marshaller = BEANS.get(JsonMarshaller.class);
+    m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, marshaller));
 
     Person person = new Person();
     person.setFirstname("anna");
@@ -544,6 +582,8 @@ public class JmsMomImplementorTest {
     Person testee = capturer.get();
     assertEquals("smith", testee.getLastname());
     assertEquals("anna", testee.getFirstname());
+    verifyMessageHandlerHandleOutgoingCalled(queue, marshaller, person);
+    verifyMessageHandlerHandleIncomingCalled(queue, marshaller, testee);
   }
 
   @Test
@@ -728,10 +768,57 @@ public class JmsMomImplementorTest {
     }));
 
     // Initiate 'request-reply' communication
-    String testee = MOM.request(JmsTestMom.class, queue, "hello world");
+    final String request = "hello world";
+    String testee = MOM.request(JmsTestMom.class, queue, request);
 
     // Verify
-    assertEquals("HELLO WORLD", testee);
+    final String expectedReply = "HELLO WORLD";
+    assertEquals(expectedReply, testee);
+    IMarshaller marshaller = BEANS.get(CONFIG.getPropertyValue(DefaultMarshallerProperty.class));
+    verifyRequestReplyMessageHandler(queue, marshaller, request, expectedReply);
+  }
+
+  protected static <DTO> void verifyRequestReplyMessageHandler(IDestination<DTO> expectedDestination, IMarshaller marshaller, DTO expectedRequest, DTO expectedReply) {
+    verify(BEANS.get(IJmsMessageHandler.class), times(2)).handleOutgoing(any(), any(), any());
+    verifyMessageHandlerHandleOutgoingCalled(expectedDestination, marshaller, expectedRequest);
+    verifyMessageHandlerHandleOutgoingCalled(null, marshaller, expectedReply); // "reply" message is sent only with JMS destination (but without a Scout MOM destination)
+    verify(BEANS.get(IJmsMessageHandler.class), times(2)).handleIncoming(eq(expectedDestination), any(), any());
+    verifyMessageHandlerHandleIncomingCalled(expectedDestination, marshaller, expectedRequest, expectedReply);
+  }
+
+  protected static <DTO> void verifyMessageHandlerHandleOutgoingCalled(IDestination<DTO> expectedDestination, IMarshaller marshaller, DTO expectedContent) {
+    ArgumentCaptor<Message> messageCaptor = ArgumentCaptor.forClass(Message.class);
+    verify(BEANS.get(IJmsMessageHandler.class)).handleOutgoing(eq(expectedDestination), messageCaptor.capture(), any(marshaller.getClass()));
+    verifyJmsMessage(messageCaptor.getValue(), marshaller, expectedContent);
+  }
+
+  @SafeVarargs
+  protected static <DTO> void verifyMessageHandlerHandleIncomingCalled(IDestination<DTO> expectedDestination, IMarshaller marshaller, DTO... expectedContents) {
+    ArgumentCaptor<Message> messageCaptor = ArgumentCaptor.forClass(Message.class);
+    verify(BEANS.get(IJmsMessageHandler.class), times(expectedContents.length)).handleIncoming(eq(expectedDestination), messageCaptor.capture(), any(marshaller.getClass()));
+    for (int i = 0; i < expectedContents.length; i++) {
+      verifyJmsMessage(messageCaptor.getAllValues().get(i), marshaller, expectedContents[i]);
+    }
+  }
+
+  protected static <DTO> void verifyJmsMessage(Message message, IMarshaller marshaller, DTO expectedContent) {
+    try {
+      if (message instanceof BytesMessage) {
+        // ensure that the stream of bytes is repositioned to the beginning before start reading the JMS message
+        ((BytesMessage) message).reset();
+      }
+      JmsMessageReader<DTO> reader = JmsMessageReader.newInstance(message, marshaller);
+      DTO readTransferObject = reader.readTransferObject();
+      if (expectedContent != null && expectedContent.getClass() == byte[].class) {
+        assertArrayEquals((byte[]) expectedContent, (byte[]) readTransferObject);
+      }
+      else {
+        assertEquals(expectedContent, readTransferObject);
+      }
+    }
+    catch (JMSException e) {
+      throw new ProcessingException("Exception while reading the message", e);
+    }
   }
 
   @Test(timeout = 200_000)
@@ -812,9 +899,13 @@ public class JmsMomImplementorTest {
 
           @Override
           public void run() throws Exception {
-            String testee = MOM.request(JmsTestMom.class, destination, "hello world");
+            final String request = "hello world";
+            String testee = MOM.request(JmsTestMom.class, destination, request);
             // Verify
-            assertEquals("cid:abc", testee);
+            final String expectedReply = "cid:abc";
+            assertEquals(expectedReply, testee);
+            IMarshaller marshaller = BEANS.get(CONFIG.getPropertyValue(DefaultMarshallerProperty.class));
+            verifyRequestReplyMessageHandler(destination, marshaller, request, expectedReply);
           }
         });
   }
@@ -1386,6 +1477,50 @@ public class JmsMomImplementorTest {
     public void setLastname(String lastname) {
       m_lastname = lastname;
     }
+
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((m_firstname == null) ? 0 : m_firstname.hashCode());
+      result = prime * result + (int) (m_id ^ (m_id >>> 32));
+      result = prime * result + ((m_lastname == null) ? 0 : m_lastname.hashCode());
+      return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (getClass() != obj.getClass()) {
+        return false;
+      }
+      Person other = (Person) obj;
+      if (m_firstname == null) {
+        if (other.m_firstname != null) {
+          return false;
+        }
+      }
+      else if (!m_firstname.equals(other.m_firstname)) {
+        return false;
+      }
+      if (m_id != other.m_id) {
+        return false;
+      }
+      if (m_lastname == null) {
+        if (other.m_lastname != null) {
+          return false;
+        }
+      }
+      else if (!m_lastname.equals(other.m_lastname)) {
+        return false;
+      }
+      return true;
+    }
   }
 
   @Test
@@ -1707,6 +1842,8 @@ public class JmsMomImplementorTest {
   }
 
   private Object testPublishAndConsumeInternal(Object transferObject, IMarshaller marshaller) throws InterruptedException {
+    reset(BEANS.get(IJmsMessageHandler.class));
+
     final Capturer<Object> capturer = new Capturer<>();
 
     IDestination<Object> queue = MOM.newDestination("test/mom/testPublishAndConsumeInternal", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
@@ -1727,7 +1864,10 @@ public class JmsMomImplementorTest {
 
     // Verify
     try {
-      return capturer.get();
+      Object object = capturer.get();
+      verifyMessageHandlerHandleIncomingCalled(queue, marshaller, transferObject);
+      verifyMessageHandlerHandleOutgoingCalled(queue, marshaller, object);
+      return object;
     }
     finally {
       dispose(disposables);
@@ -1735,6 +1875,8 @@ public class JmsMomImplementorTest {
   }
 
   private Object testRequestReplyInternal(Object request, IMarshaller marshaller) throws InterruptedException {
+    reset(BEANS.get(IJmsMessageHandler.class));
+
     IBiDestination<Object, Object> queue = MOM.newBiDestination("test/mom/testRequestReplyInternal", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
 
     List<IDisposable> disposables = new ArrayList<>();
@@ -1753,7 +1895,10 @@ public class JmsMomImplementorTest {
           // use single threaded in order to block dispose until subscription is completely released
           .withAcknowledgementMode(SubscribeInput.ACKNOWLEDGE_AUTO_SINGLE_THREADED)));
 
-      return MOM.request(JmsTestMom.class, queue, request);
+      Object reply = MOM.request(JmsTestMom.class, queue, request);
+      // Verify
+      verifyRequestReplyMessageHandler(queue, marshaller, request, reply);
+      return reply;
     }
     finally {
       dispose(disposables);
@@ -1980,7 +2125,9 @@ public class JmsMomImplementorTest {
 
     @Override
     protected Map<String, String> getConfiguredEnvironment() {
-      return m_parameter.getEnvironment();
+      final Map<String, String> env = m_parameter.getEnvironment();
+      env.put(JmsMomImplementor.JMS_MESSAGE_HANDLER, IJmsMessageHandler.class.getName());
+      return env;
     }
   }
 

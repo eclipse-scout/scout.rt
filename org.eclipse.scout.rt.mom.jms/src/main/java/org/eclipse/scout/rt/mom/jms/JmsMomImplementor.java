@@ -58,6 +58,7 @@ import org.eclipse.scout.rt.mom.api.SubscribeInput;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.TextMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
@@ -103,6 +104,15 @@ public class JmsMomImplementor implements IMomImplementor {
    */
   public static final String JMS_CLIENT_ID = "scout.mom.jms.clientId";
 
+  /**
+   * Property to specify the JMS message handler of a JMS MOM. If the property is not set, the
+   * {@link LogJmsMessageHandler} is used.
+   * <p>
+   * <b>Value type:</b> {@link IJmsMessageHandler} or {@link String} (interpreted as the class name of a {@link Bean} of
+   * type {@link IJmsMessageHandler})
+   */
+  public static final String JMS_MESSAGE_HANDLER = "scout.mom.jms.messageHandler";
+
   protected final String m_momUid = UUID.randomUUID().toString();
 
   // init -> thread-safety: only set in init method
@@ -115,6 +125,7 @@ public class JmsMomImplementor implements IMomImplementor {
   protected boolean m_requestReplyEnabled;
   protected IDestination<?> m_requestReplyCancellationTopic;
   protected IMarshaller m_defaultMarshaller;
+  protected IJmsMessageHandler m_messageHandler;
   // end init
 
   protected ISubscription m_requestCancellationSubscription;
@@ -135,6 +146,8 @@ public class JmsMomImplementor implements IMomImplementor {
       m_connection = createConnection();
 
       m_defaultMarshaller = createDefaultMarshaller(properties);
+      m_messageHandler = createMessageHandler(properties);
+      Assertions.assertNotNull(m_messageHandler);
 
       initRequestReply(properties);
 
@@ -198,6 +211,32 @@ public class JmsMomImplementor implements IMomImplementor {
         marshallerClass = CONFIG.getPropertyValue(DefaultMarshallerProperty.class);
       }
       return BEANS.get(marshallerClass);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected IJmsMessageHandler createMessageHandler(final Map<Object, Object> properties) {
+    Object prop = properties.get(JMS_MESSAGE_HANDLER);
+    if (prop instanceof IJmsMessageHandler) {
+      return (IJmsMessageHandler) prop;
+    }
+    else {
+      Class<? extends IJmsMessageHandler> messageHandlerClass;
+      String messageHandlerClassName = ObjectUtility.toString(prop);
+      if (messageHandlerClassName != null) {
+        try {
+          messageHandlerClass = (Class<? extends IJmsMessageHandler>) Class.forName(messageHandlerClassName);
+        }
+        catch (final ClassNotFoundException | ClassCastException e) {
+          throw new PlatformException("Failed to load class specified by environment property '{}' [value={}]", JMS_MESSAGE_HANDLER, messageHandlerClassName, e);
+        }
+      }
+      else {
+        messageHandlerClass = LogJmsMessageHandler.class;
+      }
+      IJmsMessageHandler handler = BEANS.get(messageHandlerClass);
+      handler.init(properties);
+      return handler;
     }
   }
 
@@ -362,6 +401,8 @@ public class JmsMomImplementor implements IMomImplementor {
 
       // receive response message
       responseMessage = responseQueueConsumer.receive();
+
+      getMessageHandler().handleIncoming(destination, responseMessage, resolveMarshaller(destination));
     }
     catch (JMSException e) {
       if (IFuture.CURRENT.get().isCancelled()) {
@@ -569,7 +610,8 @@ public class JmsMomImplementor implements IMomImplementor {
     Message message = messageWriter
         .writeCorrelationId(CorrelationId.CURRENT.get())
         .build();
-    LOG.debug("Sending JMS message [destination={}, message={}]", destination, message);
+    IDestination<?> momDestination = resolveMomDestination(destination);
+    getMessageHandler().handleOutgoing(momDestination, message, messageWriter.getMarshaller());
     producer.send(destination, message, deliveryMode, priority, timeToLive);
   }
 
@@ -680,6 +722,15 @@ public class JmsMomImplementor implements IMomImplementor {
     throw new AssertionException("Unsupported destination type [{}]", destination);
   }
 
+  protected IDestination<?> resolveMomDestination(final Destination destination) {
+    for (Entry<IDestination, Destination> jmsDestination : m_jmsDestinations.entrySet()) {
+      if (jmsDestination.getValue() == destination) {
+        return jmsDestination.getKey();
+      }
+    }
+    return null;
+  }
+
   public int toJmsPriority(final PublishInput publishInput) {
     return publishInput.getPriority() + Message.DEFAULT_PRIORITY;
   }
@@ -702,6 +753,13 @@ public class JmsMomImplementor implements IMomImplementor {
     }
     final String nodeId = BEANS.get(NodeIdentifier.class).get();
     return StringUtility.join(" ", m_symbolicName, StringUtility.box("(", nodeId, ")"));
+  }
+
+  /**
+   * @return the associated {@link IJmsMessageHandler} for this JMS MOM implementor. It is never <code>null</code>.
+   */
+  public IJmsMessageHandler getMessageHandler() {
+    return m_messageHandler;
   }
 
   /**
