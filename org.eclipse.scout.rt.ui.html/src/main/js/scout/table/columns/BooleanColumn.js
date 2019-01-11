@@ -37,7 +37,6 @@ scout.BooleanColumn.prototype._formatValue = function(value) {
 scout.BooleanColumn.prototype.buildCell = function(cell, row) {
   var style,
     content = '',
-    tooltipText,
     cssClass,
     checkBoxCssClass,
     enabled = row.enabled,
@@ -59,7 +58,6 @@ scout.BooleanColumn.prototype.buildCell = function(cell, row) {
   if (!enabled) {
     cssClass += ' disabled';
   }
-  tooltipText = cell.tooltipText;
 
   checkBoxCssClass = 'check-box';
   if (cell.value === true) {
