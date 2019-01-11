@@ -35,7 +35,7 @@ scout.BooleanColumn.prototype._formatValue = function(value) {
  * @override
  */
 scout.BooleanColumn.prototype.buildCell = function(cell, row) {
-  var style, content, tooltipText, tooltip, cssClass, checkBoxCssClass;
+  var style, content, cssClass, checkBoxCssClass;
   var enabled = row.enabled;
   if (cell.empty) {
     // if cell wants to be really empty (e.g. no checkbox icon, use logic of base class)
@@ -48,9 +48,6 @@ scout.BooleanColumn.prototype.buildCell = function(cell, row) {
   if (!enabled) {
     cssClass += ' disabled';
   }
-  tooltipText = cell.tooltipText;
-  tooltip = (scout.strings.empty(tooltipText) ? '' : ' title="' + tooltipText + '"');
-
   checkBoxCssClass = 'check-box';
   if (cell.value === true) {
     checkBoxCssClass += ' checked';
@@ -63,7 +60,7 @@ scout.BooleanColumn.prototype.buildCell = function(cell, row) {
   }
   content = '<div class="' + checkBoxCssClass + '"/>';
 
-  return '<div class="' + cssClass + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute.string + '>' + content + '</div>';
+  return '<div class="' + cssClass + '" style="' + style + '"' + scout.device.unselectableAttribute.string + '>' + content + '</div>';
 };
 
 scout.BooleanColumn.prototype.$checkBox = function($row) {
