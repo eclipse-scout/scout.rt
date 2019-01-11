@@ -30,6 +30,11 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
     containerSize = htmlContainer.availableSize()
     .subtract(htmlContainer.insets());
 
+  // apply responsive transformations if necessary.
+  if (this.groupBox.responsive) {
+    scout.responsiveManager.handleResponsive(this.groupBox, containerSize.width);
+  }
+
   if ($status && $status.isVisible()) {
     this._layoutStatus();
     statusWidth = $status.outerWidth(true);
@@ -65,7 +70,7 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
     tooltip.position();
   }
 
-   if (htmlGbBody.scrollable || this.groupBox.bodyLayoutConfig.minWidth > 0 ) {
+  if (htmlGbBody.scrollable || this.groupBox.bodyLayoutConfig.minWidth > 0) {
     scout.scrollbars.update(htmlGbBody.$comp);
   }
 };
@@ -101,7 +106,17 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container, option
     prefSize,
     widthInPixel = 0,
     heightInPixel = 0,
-    gridData = this.groupBox.gridData;
+    gridData = this.groupBox.gridData,
+    undoResponsive = false;
+
+  if (!options.skipResponsive &&
+    this.groupBox.responsive &&
+    this.groupBox.responsiveHandler &&
+    options.widthHint) {
+    this.groupBox.responsiveHandler.calculatingPrefSize = true;
+    undoResponsive = scout.responsiveManager.handleResponsive(this.groupBox, options.widthHint);
+    this.groupBox.responsiveHandler.calculatingPrefSize = false;
+  }
 
   if (gridData) {
     widthInPixel = gridData.widthInPixel;
@@ -141,6 +156,10 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container, option
   }
   if (heightInPixel) {
     prefSize.height = heightInPixel;
+  }
+
+  if (undoResponsive) {
+    scout.responsiveManager.reset(this.groupBox);
   }
 
   return prefSize;

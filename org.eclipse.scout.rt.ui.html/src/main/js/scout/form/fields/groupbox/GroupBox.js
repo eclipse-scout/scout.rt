@@ -38,6 +38,8 @@ scout.GroupBox = function() {
   this.staticMenus = [];
   this.menuBarPosition = scout.GroupBox.MenuBarPosition.AUTO;
   this.menuBarEllipsisPosition = scout.MenuBar.EllipsisPosition.RIGHT;
+  this.responsive = null;
+  this.responsiveCompactThreshold = null;
 
   this.$body;
   this.$title;
@@ -67,6 +69,17 @@ scout.GroupBox.prototype._init = function(model) {
   this._setFields(this.fields);
   this._setMainBox(this.mainBox);
   this._updateMenuBar();
+
+  scout.responsiveManager.registerHandler(this, new scout.GroupBoxResponsiveHandler(this, {
+    compactThreshold: this.responsiveCompactThreshold
+  }));
+
+  this._setResponsive(this.responsive);
+};
+
+scout.GroupBox.prototype._destroy = function() {
+  scout.responsiveManager.unregisterHandler(this);
+  scout.GroupBox.parent.prototype._destroy.call(this);
 };
 
 /**
@@ -325,6 +338,9 @@ scout.GroupBox.prototype._setMainBox = function(mainBox) {
     this.menuBar.large();
     if (this.scrollable === null) {
       this.setScrollable(true);
+    }
+    if (this.responsive === null) {
+      this.setResponsive(true);
     }
   }
 };
@@ -693,6 +709,30 @@ scout.GroupBox.prototype._onControlClick = function(event) {
     this.validateLayoutTree();
   }
   $.suppressEvent(event); // otherwise, the event would be triggered twice sometimes (by group-box-control and group-box-title)
+};
+
+scout.GroupBox.prototype.setResponsive = function(responsive) {
+  this.setProperty('responsive', responsive);
+};
+
+scout.GroupBox.prototype._setResponsive = function(responsive) {
+  this._setProperty('responsive', responsive);
+
+  if (!this.initialized) {
+    return;
+  }
+  if (this.responsive) {
+    scout.responsiveManager.reset(this, true);
+  } else {
+    scout.responsiveManager.reset(this, true);
+    if (this.responsive === null) {
+      var parent = this.findParent(function(parent) {
+        return parent instanceof scout.GroupBox && parent.responsive;
+      });
+      scout.responsiveManager.reset(parent, true);
+    }
+  }
+  this.invalidateLayoutTree();
 };
 
 scout.GroupBox.prototype.clone = function(model, options) {

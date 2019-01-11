@@ -324,6 +324,26 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     return MENU_BAR_ELLIPSIS_POSITION_RIGHT;
   }
 
+  /**
+   * Configures whether this group box should be responsive.</br>
+   * If the property is set to {@link TriState#TRUE}, the content of the group box will be adjusted to ensure best
+   * readability, when the width of the group box is less than its preferred size.<br>
+   * If the property is set to {@link TriState#UNDEFINED}, it will be true if the group box is the main box in a form.
+   * Otherwise it will be false.
+   * <p>
+   * By default {@link TriState#UNDEFINED} is returned which means every main box is responsive.
+   * <p>
+   * Subclasses can override this method. Default is {@link TriState#UNDEFINED}.
+   *
+   * @return {@link TriState#TRUE} if the group box should be responsive, {@link TriState#FALSE} if not,
+   *         {@link TriState#UNDEFINED} if default logic should be applied
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(320)
+  protected TriState getConfiguredResponsive() {
+    return TriState.UNDEFINED;
+  }
+
   @Override
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
@@ -357,6 +377,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     setBodyLayoutConfig(getConfiguredBodyLayoutConfig());
     setMenuBarPosition(getConfiguredMenuBarPosition());
     setMenuBarEllipsisPosition(getConfiguredMenuBarEllipsisPosition());
+    setResponsive(getConfiguredResponsive());
     initMenus();
   }
 
@@ -763,6 +784,24 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   public void setMenuBarEllipsisPosition(String menuBarEllipsisPosition) {
     propertySupport.setPropertyString(PROP_MENU_BAR_ELLIPSIS_POSITION, menuBarEllipsisPosition);
+  }
+
+  @Override
+  public TriState isResponsive() {
+    return (TriState) propertySupport.getProperty(PROP_RESPONSIVE);
+  }
+
+  @Override
+  public void setResponsive(TriState responsive) {
+    if (responsive == null) {
+      responsive = TriState.UNDEFINED;
+    }
+    propertySupport.setProperty(PROP_RESPONSIVE, responsive);
+  }
+
+  @Override
+  public void setResponsive(boolean responsive) {
+    setResponsive(TriState.parse(responsive));
   }
 
   protected class P_UIFacade implements IGroupBoxUIFacade {

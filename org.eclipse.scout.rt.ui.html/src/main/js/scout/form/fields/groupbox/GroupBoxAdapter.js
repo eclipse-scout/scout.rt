@@ -21,5 +21,29 @@ scout.GroupBoxAdapter.prototype._initModel = function(model, parent) {
   model = scout.GroupBoxAdapter.parent.prototype._initModel.call(this, model, parent);
   // Set logical grid to null -> Calculation happens on server side
   model.logicalGrid = null;
+
   return model;
+};
+
+// Replace method on responsive handler.
+scout.GroupBoxAdapter.prototype._postCreateWidget = function() {
+  scout.GroupBoxAdapter.parent.prototype._postCreateWidget.call(this);
+
+  if (this.widget.responsiveHandler) {
+    this.widget.responsiveHandler.setAllowedStates([scout.ResponsiveManager.ResponsiveState.NORMAL, scout.ResponsiveManager.ResponsiveState.CONDENSED]);
+    this.widget.responsiveHandler.getGridData = this._getGridData;
+    this.widget.responsiveHandler.setGridData = this._setGridData;
+  }
+};
+
+scout.GroupBoxAdapter.prototype.destroy = function() {
+  scout.GroupBoxAdapter.parent.prototype.destroy.call(this);
+};
+
+scout.GroupBoxAdapter.prototype._getGridData = function(field) {
+  return new scout.GridData(field.gridData);
+};
+
+scout.GroupBoxAdapter.prototype._setGridData = function(field, gridData) {
+  field._setGridData(gridData);
 };

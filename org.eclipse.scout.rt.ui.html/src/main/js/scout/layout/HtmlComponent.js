@@ -187,6 +187,9 @@ scout.HtmlComponent.prototype.validateLayoutTree = function() {
  * Performs invalidateLayoutTree() and validateLayoutTree() subsequently.
  */
 scout.HtmlComponent.prototype.revalidateLayoutTree = function(invalidateParents) {
+  if (this.suppressInvalidate) {
+    return;
+  }
   this.invalidateLayoutTree(invalidateParents);
   this.validateLayoutTree();
 };
@@ -256,7 +259,7 @@ scout.HtmlComponent.prototype.prefSize = function(options) {
 
   var prefSizeCacheKey = this.computePrefSizeKey(options);
   var prefSizeCached = this.prefSizeCached[prefSizeCacheKey];
-  if (this.valid && !scout.objects.isNullOrUndefined(prefSizeCached)) {
+  if (!$.isEmptyObject(prefSizeCached)) {
     $.log.isTraceEnabled() && $.log.trace('(HtmlComponent#prefSize) ' + this.debug() + ' widthHint=' + options.widthHint + ' heightHint=' + options.heightHint + ' prefSizeCached=' + prefSizeCached);
     if (includeMargin) {
       prefSizeCached = prefSizeCached.add(this.margins());

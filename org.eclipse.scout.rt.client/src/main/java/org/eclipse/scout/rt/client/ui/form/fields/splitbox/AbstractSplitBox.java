@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.splitbox.ISplitBoxExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.internal.SplitBoxGrid;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -160,6 +161,12 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     setFirstCollapseKeyStroke(getConfiguredFirstCollapseKeyStroke());
     setSecondCollapseKeyStroke(getConfiguredSecondCollapseKeyStroke());
     setFieldMinimized(getConfiguredFieldMinimized());
+
+    getChildren().stream()
+        .filter(child -> child instanceof IGroupBox)
+        .map(child -> (IGroupBox) child)
+        .filter(groupBox -> groupBox.isResponsive().isUndefined())
+        .forEach(groupBox -> groupBox.setResponsive(true));
   }
 
   @Override

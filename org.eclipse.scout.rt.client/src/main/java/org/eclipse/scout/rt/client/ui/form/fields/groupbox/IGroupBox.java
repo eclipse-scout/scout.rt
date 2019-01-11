@@ -135,6 +135,11 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
    */
   String MENU_BAR_ELLIPSIS_POSITION_RIGHT = "right";
 
+  /**
+   * {@link TriState}
+   */
+  String PROP_RESPONSIVE = "responsive";
+
   /*
    * Runtime
    */
@@ -321,5 +326,17 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
    * </ul>
    */
   void setMenuBarEllipsisPosition(String menuBarEllipsisPosition);
+
+  TriState isResponsive();
+
+  /**
+   * Setter for {@link AbstractGroupBox#getConfiguredResponsive()}
+   */
+  void setResponsive(TriState responsive);
+
+  /**
+   * Calls {@link #setResponsive(TriState)}
+   */
+  void setResponsive(boolean responsive);
 
 }

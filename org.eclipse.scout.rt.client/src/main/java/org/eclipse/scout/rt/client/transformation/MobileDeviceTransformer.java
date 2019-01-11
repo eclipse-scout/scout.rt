@@ -307,6 +307,8 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.REDUCE_GROUPBOX_COLUMNS_TO_ONE, groupBox)) {
       groupBox.setGridColumnCount(1);
     }
+    // Transformations already done.
+    groupBox.setResponsive(false);
   }
 
   /**

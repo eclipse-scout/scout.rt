@@ -688,6 +688,9 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       if (rootBox.isScrollable().isUndefined()) {
         rootBox.setScrollable(true);
       }
+      if (rootBox.isResponsive().isUndefined()) {
+        rootBox.setResponsive(true);
+      }
     }
 
     // move form fields

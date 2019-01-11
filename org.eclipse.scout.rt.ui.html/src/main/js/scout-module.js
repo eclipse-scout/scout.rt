@@ -262,6 +262,10 @@
   __include("scout/form/lifecycle/ResetMenu.js");
   __include("scout/form/lifecycle/SaveMenu.js");
   __include("scout/form/DialogLayout.js");
+  __include("scout/form/ResponsiveManager.js");
+  __include("scout/form/ResponsiveHandler.js");
+  __include("scout/form/GroupBoxResponsiveHandler.js");
+  __include("scout/form/DesktopResponsiveHandler.js");
   // Table
   __include("scout/table/Table.js");
   __include("scout/table/TableAdapter.js");

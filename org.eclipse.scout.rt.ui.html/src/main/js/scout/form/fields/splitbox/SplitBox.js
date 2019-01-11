@@ -41,6 +41,18 @@ scout.SplitBox.prototype._init = function(model) {
   this._setFirstCollapseKeyStroke(this.firstCollapseKeyStroke);
   this._setSecondCollapseKeyStroke(this.secondCollapseKeyStroke);
   this._updateCollapseHandle();
+  this._initResponsive();
+};
+
+/**
+ * Set the group boxes of the split box to responsive if not set otherwise.
+ */
+scout.SplitBox.prototype._initResponsive = function() {
+  this.getFields().forEach(function(field) {
+    if (field instanceof scout.GroupBox && field.responsive === null) {
+      field.setResponsive(true);
+    }
+  });
 };
 
 scout.SplitBox.prototype._render = function() {
@@ -163,9 +175,9 @@ scout.SplitBox.prototype._render = function() {
         // Snap to begin and end
         var tempSplitterOffsetX = splitterOffset;
 
-        if (targetSplitterPositionLeft < (minSplitterPositionLeft + splitterOffset + SNAP_SIZE)) {  // snap left if minimum position is reached (+ snap range)
-          targetSplitterPositionLeft = minSplitterPositionLeft;  // set splitter directly to left minimal bound
-          tempSplitterOffsetX = 0;  // setting splitter to left minimal bound, does not require an additional offset
+        if (targetSplitterPositionLeft < (minSplitterPositionLeft + splitterOffset + SNAP_SIZE)) { // snap left if minimum position is reached (+ snap range)
+          targetSplitterPositionLeft = minSplitterPositionLeft; // set splitter directly to left minimal bound
+          tempSplitterOffsetX = 0; // setting splitter to left minimal bound, does not require an additional offset
         } else if (targetSplitterPositionLeft > (maxSplitterPositionLeft - SNAP_SIZE)) {
           targetSplitterPositionLeft = maxSplitterPositionLeft;
         }
@@ -258,7 +270,7 @@ scout.SplitBox.prototype._setSplitterPosition = function(splitterPosition) {
 };
 
 scout.SplitBox.prototype._renderSplitterPosition = function() {
-  this.newSplitterPosition(this.splitterPosition, false);  // do not update (override) field minimized if new position is set by model
+  this.newSplitterPosition(this.splitterPosition, false); // do not update (override) field minimized if new position is set by model
 };
 
 scout.SplitBox.prototype._setSplitterPositionType = function(splitterPositionType) {
@@ -293,7 +305,7 @@ scout.SplitBox.prototype._renderSplitterPositionType = function() {
     if (oldIsRelative && newIsAbsolute) {
       // From relative to absolute
       if ((this._oldSplitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST && this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) ||
-          (this._oldSplitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND && this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST)) {
+        (this._oldSplitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND && this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST)) {
         splitterPosition = totalSize - (totalSize * splitterPosition); // changed from first to second field or from second to first field, invert splitter position
       } else {
         splitterPosition = totalSize * splitterPosition;
@@ -305,8 +317,8 @@ scout.SplitBox.prototype._renderSplitterPositionType = function() {
     } else if (oldIsAbsolute && newIsRelative) {
       // From absolute to relative
       if ((this._oldSplitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST && this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND) ||
-          (this._oldSplitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND && this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST)) {
-        splitterPosition = (totalSize - splitterPosition) / totalSize;  // changed from first to second field or from second to first field, invert splitter position
+        (this._oldSplitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND && this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST)) {
+        splitterPosition = (totalSize - splitterPosition) / totalSize; // changed from first to second field or from second to first field, invert splitter position
       } else {
         splitterPosition = splitterPosition / totalSize;
       }
@@ -399,10 +411,10 @@ scout.SplitBox.prototype._updateCollapseHandle = function() {
 
     this._updateCollapseHandleButtons();
   } else {
-     if (this._collapseHandle) {
-       this._collapseHandle.destroy();
-       this._collapseHandle = null;
-     }
+    if (this._collapseHandle) {
+      this._collapseHandle.destroy();
+      this._collapseHandle = null;
+    }
   }
 };
 
@@ -417,23 +429,23 @@ scout.SplitBox.prototype._updateCollapseHandleButtons = function() {
     positionTypeFirstField = ((this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) || (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST)),
     positionNotAccordingCollapsibleField = (positionTypeFirstField && this.collapsibleField === this.secondField) || (!positionTypeFirstField && this.collapsibleField === this.firstField);
 
-    if (positionTypeFirstField) {
-      if (positionNotAccordingCollapsibleField) {
-        leftVisible  = (!minimized && minimizable) || collapsed; // left = decrease collapsible field size. Decrease field in this order [minimized <- default <- collapsed]
-        rightVisible = !collapsed; // right = increase collapsible field size. Increase field in this order [minimized -> default -> collapsed]
-      } else {
-        leftVisible  = !collapsed; // left = increase collapsible field size. Increase field in this order [default <- minimized <- collapsed]
-        rightVisible =  collapsed || (minimized && minimizable); // right = decrease collapsible field size. Decrease field in this order [default -> minimized -> collapsed]
-      }
+  if (positionTypeFirstField) {
+    if (positionNotAccordingCollapsibleField) {
+      leftVisible = (!minimized && minimizable) || collapsed; // left = decrease collapsible field size. Decrease field in this order [minimized <- default <- collapsed]
+      rightVisible = !collapsed; // right = increase collapsible field size. Increase field in this order [minimized -> default -> collapsed]
     } else {
-      if (positionNotAccordingCollapsibleField) {
-        leftVisible  = !collapsed; // left = decrease collapsible field size. Decrease field in this order [collapsed <- default <- minimized]
-        rightVisible = (!minimized && minimizable) || collapsed; // right = increase collapsible field size. Increase field in this order [collapsed -> default -> minimized]
-      } else {
-        leftVisible =  collapsed || (minimized && minimizable); // left = decrease collapsible field size. Decrease field in this order [collapsed <- minimized <- default]
-        rightVisible  = !collapsed; // right = increase collapsible field size. Increase field in this order [collapsed -> minimized -> default]
-      }
+      leftVisible = !collapsed; // left = increase collapsible field size. Increase field in this order [default <- minimized <- collapsed]
+      rightVisible = collapsed || (minimized && minimizable); // right = decrease collapsible field size. Decrease field in this order [default -> minimized -> collapsed]
     }
+  } else {
+    if (positionNotAccordingCollapsibleField) {
+      leftVisible = !collapsed; // left = decrease collapsible field size. Decrease field in this order [collapsed <- default <- minimized]
+      rightVisible = (!minimized && minimizable) || collapsed; // right = increase collapsible field size. Increase field in this order [collapsed -> default -> minimized]
+    } else {
+      leftVisible = collapsed || (minimized && minimizable); // left = decrease collapsible field size. Decrease field in this order [collapsed <- minimized <- default]
+      rightVisible = !collapsed; // right = increase collapsible field size. Increase field in this order [collapsed -> minimized -> default]
+    }
+  }
 
   this._collapseHandle.setLeftVisible(leftVisible);
   this._collapseHandle.setRightVisible(rightVisible);

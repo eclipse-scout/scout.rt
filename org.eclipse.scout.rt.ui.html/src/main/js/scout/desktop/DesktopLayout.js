@@ -27,6 +27,8 @@ scout.DesktopLayout.prototype.layout = function($container) {
     containerSize = this.containerSize(),
     fullWidthNavigation = navigation && navigation.htmlComp.layoutData.fullWidth;
 
+  scout.responsiveManager.handleResponsive(desktop, $container.width());
+
   if (navigation) {
     navigationWidth = this.calculateNavigationWidth(containerSize);
     if (desktop.splitter) {
