@@ -3479,6 +3479,7 @@ scout.Table.prototype._resizeToFit = function(column, maxWidth, calculatedSize) 
     this.resizeColumn(column, calculatedSize);
   }
   column.autoOptimizeWidthRequired = false;
+  this._triggerColumnResizedToFit();
 };
 
 /**
@@ -3704,6 +3705,13 @@ scout.Table.prototype._triggerColumnResized = function(column) {
     column: column
   };
   this.trigger('columnResized', event);
+};
+
+scout.Table.prototype._triggerColumnResizedToFit = function(column) {
+  var event = {
+    column: column
+  };
+  this.trigger('columnResizedToFit', event);
 };
 
 scout.Table.prototype._triggerColumnMoved = function(column, oldPos, newPos, dragged) {

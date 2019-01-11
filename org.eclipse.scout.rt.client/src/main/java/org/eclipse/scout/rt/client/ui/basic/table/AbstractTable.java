@@ -4462,7 +4462,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         //
         c = getColumnSet().resolveColumn(c);
         if (c != null) {
-          c.setWidth(newWidth);
+          c.setWidthInternal(newWidth);
           ClientUIPreferences.getInstance().setAllTableColumnPreferences(AbstractTable.this);
         }
       }

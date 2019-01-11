@@ -257,10 +257,7 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
 
   /**
    * set the width of the column without firing events
-   * 
-   * @deprecated will be removed with Scout 10
    */
-  @Deprecated
   void setWidthInternal(int w);
 
   int getMinWidth();
