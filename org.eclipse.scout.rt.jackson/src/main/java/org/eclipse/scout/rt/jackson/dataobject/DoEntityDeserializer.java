@@ -11,14 +11,13 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.dataobject.DataObjectInventory;
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.dataobject.DoMapEntity;
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
-import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -38,17 +37,24 @@ import com.fasterxml.jackson.databind.util.TokenBuffer;
 public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
   private static final long serialVersionUID = 1L;
 
-  protected final LazyValue<DataObjectInventory> m_dataObjectInventory = new LazyValue<>(DataObjectInventory.class);
-
   protected final ScoutDataObjectModuleContext m_moduleContext;
   protected final JavaType m_handledType;
   protected final Class<? extends IDoEntity> m_handledClass;
+  protected final IDoEntityDeserializerTypeResolver m_doEntityDeserializerTypeResolver;
 
   public DoEntityDeserializer(ScoutDataObjectModuleContext moduleContext, JavaType type) {
     super(type);
     m_moduleContext = moduleContext;
     m_handledType = type;
     m_handledClass = type.getRawClass().asSubclass(IDoEntity.class);
+    m_doEntityDeserializerTypeResolver = initDoEntityTypeResolver(moduleContext);
+  }
+
+  protected IDoEntityDeserializerTypeResolver initDoEntityTypeResolver(ScoutDataObjectModuleContext moduleContext) {
+    if (moduleContext.isIgnoreTypeAttribute()) {
+      return BEANS.get(RawDoEntityDeserializerTypeResolver.class);
+    }
+    return BEANS.get(DefaultDoEntityDeserializerTypeResolver.class);
   }
 
   @Override
@@ -144,9 +150,9 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
   protected IDoEntity resolveEntityType(DeserializationContext ctxt, String entityType) throws IOException {
     if (entityType != null) {
       // try to lookup DoEntity with specified entityType
-      Class<? extends IDoEntity> clazz = m_dataObjectInventory.get().fromTypeName(entityType);
-      if (clazz != null) {
-        return newObject(ctxt, clazz);
+      Optional<Class<? extends IDoEntity>> clazz = m_doEntityDeserializerTypeResolver.resolveTypeName(entityType);
+      if (clazz.isPresent()) {
+        return newObject(ctxt, clazz.get());
       }
       else {
         // use generic DoEntity instance with a type attribute to preserve the type information even if correct DoEntity class could not be resolved
@@ -160,9 +166,7 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
   }
 
   protected JavaType findResolvedAttributeType(IDoEntity entityInstance, String attributeName, boolean isObject, boolean isArray) {
-    return m_dataObjectInventory.get().getAttributeDescription(entityInstance.getClass(), attributeName)
-        .map(a -> TypeFactoryUtility.toJavaType(a.getType()))
-        .filter(type -> type.getRawClass() != Object.class) // filter completely unknown types, forcing to use the default behavior for unknown types
+    return m_doEntityDeserializerTypeResolver.resolveAttributeType(entityInstance.getClass(), attributeName)
         .orElseGet(() -> findResolvedFallbackAttributeType(isObject, isArray));
   }
 

@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.dataobject.IDataObject;
 import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.dataobject.IValueFormatConstants;
@@ -34,6 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class JacksonDataObjectMapper implements IDataObjectMapper {
 
   private final LazyValue<ObjectMapper> m_objectMapper = new LazyValue<>(() -> createObjectMapperInstance());
+  private final LazyValue<ObjectMapper> m_rawObjectMapper = new LazyValue<>(() -> createObjectMapperInstance(true));
 
   @Override
   public <T> T readValue(InputStream inputStream, Class<T> valueType) {
@@ -53,6 +55,30 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
     }
     try {
       return m_objectMapper.get().readValue(value, valueType);
+    }
+    catch (IOException e) {
+      throw BEANS.get(PlatformExceptionTranslator.class).translate(e);
+    }
+  }
+
+  @Override
+  public IDataObject readValueRaw(InputStream inputStream) {
+    Assertions.assertNotNull(inputStream, "Input stream must not be null");
+    try {
+      return m_rawObjectMapper.get().readValue(inputStream, IDataObject.class); // use IDataObject as fixed valueType
+    }
+    catch (IOException e) {
+      throw BEANS.get(PlatformExceptionTranslator.class).translate(e);
+    }
+  }
+
+  @Override
+  public IDataObject readValueRaw(String value) {
+    if (value == null) {
+      return null;
+    }
+    try {
+      return m_rawObjectMapper.get().readValue(value, IDataObject.class); // use IDataObject as fixed valueType
     }
     catch (IOException e) {
       throw BEANS.get(PlatformExceptionTranslator.class).translate(e);
@@ -99,12 +125,22 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
   }
 
   /**
+   * TODO [9.1] pbz: [JSON] remove this method
+   *
+   * @deprecated Use {@link #createObjectMapperInstance(boolean)} instead.
+   */
+  @Deprecated
+  protected ObjectMapper createObjectMapperInstance() {
+    return createObjectMapperInstance(false);
+  }
+
+  /**
    * Creates new {@link ObjectMapper} instance configured to be used with {@link IDoEntity}.
    */
-  protected ObjectMapper createObjectMapperInstance() {
+  protected ObjectMapper createObjectMapperInstance(boolean ignoreTypeAttribute) {
     ObjectMapper om = new ObjectMapper();
-    om.registerModule(BEANS.get(ScoutDataObjectModule.class));
-    om.setDateFormat(new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN)); // FIXME [16.0] pbz: [JSON] check if it can be moved to ScoutDataObjectModule
+    om.registerModule(BEANS.get(ScoutDataObjectModule.class).withIgnoreTypeAttribute(ignoreTypeAttribute));
+    om.setDateFormat(new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN)); // FIXME [9.0] pbz: [JSON] check if it can be moved to ScoutDataObjectModule class
     return om;
   }
 }

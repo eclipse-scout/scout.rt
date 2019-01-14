@@ -28,8 +28,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 public class TestingJacksonDataObjectMapper extends JacksonDataObjectMapper {
 
   @Override
-  protected ObjectMapper createObjectMapperInstance() {
-    ObjectMapper om = super.createObjectMapperInstance();
+  protected ObjectMapper createObjectMapperInstance(boolean ignoreTypeAttribute) {
+    ObjectMapper om = super.createObjectMapperInstance(ignoreTypeAttribute);
     om.enable(SerializationFeature.INDENT_OUTPUT);
     return om;
   }

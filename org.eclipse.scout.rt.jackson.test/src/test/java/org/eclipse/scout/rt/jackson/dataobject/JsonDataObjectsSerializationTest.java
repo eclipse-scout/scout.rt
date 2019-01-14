@@ -470,7 +470,7 @@ public class JsonDataObjectsSerializationTest {
   @Test
   public void testSerializeDeserialize_PojoWithJacksonAnnotations() throws Exception {
     // custom DoObjectMapper configured like default object mapper
-    final ObjectMapper customDoObjectMapper = BEANS.get(JacksonDataObjectMapper.class).createObjectMapperInstance()
+    final ObjectMapper customDoObjectMapper = BEANS.get(JacksonDataObjectMapper.class).createObjectMapperInstance(false)
         .enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
         .setDateFormat(new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN));
 
@@ -1925,14 +1925,7 @@ public class JsonDataObjectsSerializationTest {
   @Test
   public void testSerializeDeserialize_CustomTypePropertyName() throws Exception {
     ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new ScoutDataObjectModule() {
-
-      @Override
-      protected void prepareScoutDataModuleContext(ScoutDataObjectModuleContext moduleContext) {
-        super.prepareScoutDataModuleContext(moduleContext);
-        moduleContext.setTypeAttributeName("_customType");
-      }
-    });
+    mapper.registerModule(BEANS.get(ScoutDataObjectModule.class).withTypeAttributeName("_customType"));
 
     TestComplexEntityDo entityDo = BEANS.get(TestComplexEntityDo.class);
     entityDo.withId("foo");
