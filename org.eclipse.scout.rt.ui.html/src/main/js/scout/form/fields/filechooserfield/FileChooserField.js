@@ -120,7 +120,11 @@ scout.FileChooserField.prototype._onIconMouseDown = function(event) {
 };
 
 scout.FileChooserField.prototype._onFileChange = function(event) {
-  this.setValue(scout.arrays.first(event.files));
+  var file = scout.arrays.first(event.files);
+  if (scout.objects.isNullOrUndefined(file)) {
+    this.acceptInput(false);
+  }
+  this.setValue(file);
 };
 
 /**
