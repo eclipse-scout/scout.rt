@@ -10,8 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import javax.annotation.PostConstruct;
+
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.json.PackageVersion;
@@ -34,6 +37,31 @@ public class ScoutDataObjectModule extends Module {
    */
   protected static final String DEFAULT_TYPE_ATTRIBUTE_NAME = "_type";
 
+  protected ScoutDataObjectModuleContext m_moduleContext;
+
+  @PostConstruct
+  protected void init() {
+    m_moduleContext = BEANS.get(ScoutDataObjectModuleContext.class)
+        .withTypeAttributeName(DEFAULT_TYPE_ATTRIBUTE_NAME);
+  }
+
+  /**
+   * Setup {@link ScoutDataObjectModule} to use given {@code typeAttributeName} as type attribute name.
+   */
+  public ScoutDataObjectModule withTypeAttributeName(String typeAttributeName) {
+    m_moduleContext.withTypeAttributeName(typeAttributeName);
+    return this;
+  }
+
+  /**
+   * Setup {@link ScoutDataObjectModule} to ignore type attributes when deserializing JSON document structures and
+   * create raw {@link DoEntity} instances instead.
+   */
+  public ScoutDataObjectModule withIgnoreTypeAttribute(boolean ignoreTypeAttribute) {
+    m_moduleContext.withIgnoreTypeAttribute(ignoreTypeAttribute);
+    return this;
+  }
+
   @Override
   public String getModuleName() {
     return NAME;
@@ -46,24 +74,23 @@ public class ScoutDataObjectModule extends Module {
 
   @Override
   public void setupModule(SetupContext context) {
-    ScoutDataObjectModuleContext moduleContext = new ScoutDataObjectModuleContext();
-    prepareScoutDataModuleContext(moduleContext);
+    prepareScoutDataModuleContext(m_moduleContext);
 
-    context.addSerializers(BEANS.get(DataObjectSerializers.class).withModuleContext(moduleContext));
-    context.addDeserializers(BEANS.get(DataObjectDeserializers.class).withModuleContext(moduleContext));
+    context.addSerializers(BEANS.get(DataObjectSerializers.class).withModuleContext(m_moduleContext));
+    context.addDeserializers(BEANS.get(DataObjectDeserializers.class).withModuleContext(m_moduleContext));
 
-    context.addKeySerializers(BEANS.get(DataObjectMapKeySerializers.class).withModuleContext(moduleContext));
-    context.addKeyDeserializers(BEANS.get(DataObjectMapKeyDeserializers.class).withModuleContext(moduleContext));
+    context.addKeySerializers(BEANS.get(DataObjectMapKeySerializers.class).withModuleContext(m_moduleContext));
+    context.addKeyDeserializers(BEANS.get(DataObjectMapKeyDeserializers.class).withModuleContext(m_moduleContext));
 
-    context.addTypeModifier(BEANS.get(DataObjectTypeModifier.class).withModuleContext(moduleContext));
-    context.insertAnnotationIntrospector(BEANS.get(DataObjectAnnotationIntrospector.class).withModuleContext(moduleContext));
+    context.addTypeModifier(BEANS.get(DataObjectTypeModifier.class).withModuleContext(m_moduleContext));
+    context.insertAnnotationIntrospector(BEANS.get(DataObjectAnnotationIntrospector.class).withModuleContext(m_moduleContext));
   }
 
   /**
    * Override this method to add custom properties to {@code moduleContext}.
    */
   protected void prepareScoutDataModuleContext(ScoutDataObjectModuleContext moduleContext) {
-    moduleContext.setTypeAttributeName(DEFAULT_TYPE_ATTRIBUTE_NAME);
+    // NOP
   }
 
   @Override

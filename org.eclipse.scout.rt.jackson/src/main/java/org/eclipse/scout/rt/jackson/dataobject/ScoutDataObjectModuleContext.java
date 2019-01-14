@@ -13,17 +13,22 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
 
 /**
  * Context object used to carry properties for {@link ScoutDataObjectModule} and its components (e.g. serializers and
  * deserializers).
  */
+@Bean
 public class ScoutDataObjectModuleContext {
 
-  private static final String TYPE_ATTRIBUTE_NAME_KEY = "typeAttributeNameKey";
+  protected static final String TYPE_ATTRIBUTE_NAME_KEY = "typeAttributeNameKey";
+  
+  protected static final String IGNORE_TYPE_ATTRIBUTE_KEY = "ignoreTypeAttributeKey";
 
-  private final Map<String, Object> m_contextMap = new HashMap<>();
+  protected final Map<String, Object> m_contextMap = new HashMap<>();
 
   public void put(String key, Object value) {
     m_contextMap.put(key, value);
@@ -45,7 +50,27 @@ public class ScoutDataObjectModuleContext {
     return get(TYPE_ATTRIBUTE_NAME_KEY, String.class);
   }
 
-  public void setTypeAttributeName(String typeAttributeName) {
+  public ScoutDataObjectModuleContext withTypeAttributeName(String typeAttributeName) {
     put(TYPE_ATTRIBUTE_NAME_KEY, typeAttributeName);
+    return this;
+  }
+
+  public boolean isIgnoreTypeAttribute() {
+    return BooleanUtility.nvl(get(IGNORE_TYPE_ATTRIBUTE_KEY, Boolean.class));
+  }
+
+  public ScoutDataObjectModuleContext withIgnoreTypeAttribute(boolean ignoreTypeAttribute) {
+    put(IGNORE_TYPE_ATTRIBUTE_KEY, ignoreTypeAttribute);
+    return this;
+  }
+
+  /**
+   * TODO [9.1] pbz: remove method
+   *
+   * @deprecated Use {@link #withTypeAttributeName(String)} instead.
+   */
+  @Deprecated
+  public void setTypeAttributeName(String typeAttributeName) {
+    withTypeAttributeName(typeAttributeName);
   }
 }

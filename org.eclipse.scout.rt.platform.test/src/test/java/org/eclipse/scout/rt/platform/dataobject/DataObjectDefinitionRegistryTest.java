@@ -144,9 +144,12 @@ public class DataObjectDefinitionRegistryTest {
   @Test
   public void testGetAttributesDescription() {
     Map<String, DataObjectAttributeDescriptor> attributesDescription = m_inventory.getAttributesDescription(EntityFixtureDo.class);
-    assertEquals(2, attributesDescription.size());
+    assertEquals(5, attributesDescription.size());
     assertEquals("id", attributesDescription.get("id").getName());
+    assertEquals("otherEntity", attributesDescription.get("otherEntity").getName());
     assertEquals("otherEntities", attributesDescription.get("otherEntities").getName());
+    assertEquals("otherEntitiesList", attributesDescription.get("otherEntitiesList").getName());
+    assertEquals("otherEntitiesMap", attributesDescription.get("otherEntitiesMap").getName());
   }
 
   @Test(expected = AssertionException.class)
