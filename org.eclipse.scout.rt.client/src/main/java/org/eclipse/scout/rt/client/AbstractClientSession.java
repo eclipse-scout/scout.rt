@@ -58,7 +58,6 @@ import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
-import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
@@ -474,7 +473,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     // and model jobs. Because the current thread is (or should be) a model job, we cannot wait for other
     // model threads. They are always cancelled.
     IFilter<IFuture<?>> runningJobsFilter = Jobs.newFutureFilterBuilder()
-        .andMatch(new SessionFutureFilter(ISession.CURRENT.get()))
+        .andMatch(new SessionFutureFilter(this))
         .andMatchNotFuture(IFuture.CURRENT.get())
         .andMatchNot(ModelJobFutureFilter.INSTANCE)
         .andMatchNotState(JobState.DONE, JobState.REJECTED)
@@ -505,7 +504,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
     // Now cancel all other model jobs. Because the current thread is a model job, they can never run anyway.
     Set<IFuture<?>> runningModelJobs = Jobs.getJobManager().getFutures(Jobs.newFutureFilterBuilder()
-        .andMatch(new SessionFutureFilter(ISession.CURRENT.get()))
+        .andMatch(new SessionFutureFilter(this))
         .andMatchNotFuture(IFuture.CURRENT.get())
         .andMatch(ModelJobFutureFilter.INSTANCE)
         .andMatchNotState(JobState.DONE, JobState.REJECTED)
