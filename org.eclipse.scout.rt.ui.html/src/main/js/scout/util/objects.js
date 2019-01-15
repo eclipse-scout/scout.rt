@@ -29,7 +29,7 @@ scout.objects = {
   },
 
   /**
-   * Copies all the properties (including the ones from the prototype.) from dest to source
+   * Copies all the properties (including the ones from the prototype.) from source to dest
    * @memberOf scout.objects
    * @param filter an array of property names.
    * @returns the destination object (the destination parameter will be modified as well)
@@ -46,7 +46,7 @@ scout.objects = {
   },
 
   /**
-   * Copies the own properties (excluding the ones from the prototype) from dest to source.
+   * Copies the own properties (excluding the ones from the prototype) from source to dest.
    * If a filter is specified, only the properties matching the ones in the filter are copied.
    * @memberOf scout.objects
    * @param filter an array of property names.
