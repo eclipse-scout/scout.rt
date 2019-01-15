@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +38,7 @@ import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.ResourceListTransferObject;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.visitor.DepthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
@@ -376,16 +378,51 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     JSONArray jsonNodes = new JSONArray();
+    IChildNodeIndexLookup childIndexes = createChildNodeIndexLookup();
     for (ITreeNode childNode : getTopLevelNodes()) {
       if (!isNodeAccepted(childNode)) {
         continue;
       }
-      jsonNodes.put(treeNodeToJson(childNode));
+      jsonNodes.put(treeNodeToJson(childNode, childIndexes));
     }
     putProperty(json, PROP_NODES, jsonNodes);
     putProperty(json, PROP_SELECTED_NODES, nodeIdsToJson(getModel().getSelectedNodes(), true, true));
     putProperty(json, PROP_MENUS, getJsonContextMenu().childActionsToJson());
     return json;
+  }
+
+  /**
+   * If the given node has a parent node, the value for the property "childNodeIndex" is calculated and added to the
+   * given JSON object.
+   * <p>
+   * Note that the calculated value may differ from the model's {@link ITreeNode#getChildNodeIndex()} value! This is
+   * because not all model nodes are sent to the UI. The calculated value only counts nodes sent to the UI, e.g. a node
+   * with childNodeIndex=50 may result in "childNodeIndex: 3" if 47 of the preceding nodes are filtered.
+   */
+  protected IChildNodeIndexLookup createChildNodeIndexLookup() {
+    IdentityHashMap<ITreeNode, Integer> indexMap = new IdentityHashMap<>();
+    return node -> {
+      ITreeNode parentNode = node.getParentNode();
+      if (parentNode == null) {
+        return -1;
+      }
+      //probe cache
+      Integer indexOrNull = indexMap.get(node);
+      if (indexOrNull != null) {
+        return indexOrNull.intValue();
+      }
+      //fill cache
+      int childNodeIndex = 0;
+      // Find the node in the parents childNodes list (skipping non-accepted nodes)
+      for (ITreeNode childNode : parentNode.getChildNodes()) {
+        // Only count accepted nodes
+        if (isNodeAccepted(childNode)) {
+          indexMap.put(childNode, childNodeIndex);
+          childNodeIndex++;
+        }
+      }
+      return ObjectUtility.nvl(indexMap.get(node), -1);
+    };
   }
 
   protected void handleModelTreeEvent(TreeEvent event) {
@@ -558,9 +595,10 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
   protected void handleModelNodesInserted(TreeEvent event) {
     JSONArray jsonNodes = new JSONArray();
     attachNodes(event.getNodes(), true); // TODO [7.0] cgu: why not inside loop? attaching for rejected nodes?
+    IChildNodeIndexLookup childIndexes = createChildNodeIndexLookup();
     for (ITreeNode node : event.getNodes()) {
       if (isNodeAccepted(node)) {
-        jsonNodes.put(treeNodeToJson(node));
+        jsonNodes.put(treeNodeToJson(node, childIndexes));
       }
     }
     if (jsonNodes.length() == 0) {
@@ -861,33 +899,14 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     json.put("htmlEnabled", cell.isHtmlEnabled());
   }
 
-  /**
-   * If the given node has a parent node, the value for the property "childNodeIndex" is calculated and added to the
-   * given JSON object.
-   * <p>
-   * Note that the calculated value may differ from the model's {@link ITreeNode#getChildNodeIndex()} value! This is
-   * because not all model nodes are sent to the UI. The calculated value only counts nodes sent to the UI, e.g. a node
-   * with childNodeIndex=50 may result in "childNodeIndex: 3" if 47 of the preceding nodes are filtered.
-   */
-  protected void putChildNodeIndex(JSONObject json, ITreeNode node) {
-    if (node.getParentNode() != null && node.getParentNode().getChildNodeCount() > 0) {
-      int childNodeIndex = 0;
-      // Find the node in the parents childNodes list (skipping non-accepted nodes)
-      for (ITreeNode childNode : node.getParentNode().getChildNodes()) {
-        // Only count accepted nodes
-        if (isNodeAccepted(childNode)) {
-          if (childNode == node) {
-            // We have found our node!
-            break;
-          }
-          childNodeIndex++;
-        }
-      }
+  protected void putChildNodeIndex(JSONObject json, ITreeNode node, IChildNodeIndexLookup childIndexes) {
+    int childNodeIndex = childIndexes.childNodeIndexOf(node);
+    if (childNodeIndex >= 0) {
       putProperty(json, "childNodeIndex", childNodeIndex);
     }
   }
 
-  protected JSONObject treeNodeToJson(ITreeNode node) {
+  protected JSONObject treeNodeToJson(ITreeNode node, IChildNodeIndexLookup childIndexes) {
     JSONObject json = new JSONObject();
     putProperty(json, "id", getOrCreateNodeId(node));
     putProperty(json, "expanded", node.isExpanded());
@@ -898,7 +917,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     putProperty(json, "enabled", node.isEnabled());
     putProperty(json, "iconId", BinaryResourceUrlUtility.createIconUrl(node.getCell().getIconId()));
     putProperty(json, "initialExpanded", node.isInitialExpanded());
-    putChildNodeIndex(json, node);
+    putChildNodeIndex(json, node, childIndexes);
     putCellProperties(json, node.getCell());
     JSONArray jsonChildNodes = new JSONArray();
     if (node.getChildNodeCount() > 0) {
@@ -906,7 +925,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
         if (!isNodeAccepted(childNode)) {
           continue;
         }
-        jsonChildNodes.put(treeNodeToJson(childNode));
+        jsonChildNodes.put(treeNodeToJson(childNode, childIndexes));
       }
     }
     putProperty(json, "childNodes", jsonChildNodes);

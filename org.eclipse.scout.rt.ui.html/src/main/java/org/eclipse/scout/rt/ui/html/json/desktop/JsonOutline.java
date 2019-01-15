@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBu
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
+import org.eclipse.scout.rt.ui.html.json.tree.IChildNodeIndexLookup;
 import org.json.JSONObject;
 
 public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
@@ -171,12 +172,12 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   }
 
   @Override
-  protected JSONObject treeNodeToJson(ITreeNode node) {
+  protected JSONObject treeNodeToJson(ITreeNode node, IChildNodeIndexLookup childIndexes) {
     if (!(node instanceof IPage)) {
       throw new IllegalArgumentException("Expected node to be a page. " + node);
     }
     IPage page = (IPage) node;
-    JSONObject json = super.treeNodeToJson(node);
+    JSONObject json = super.treeNodeToJson(node, childIndexes);
     putDetailFormAndTable(json, page);
     putNodeType(json, node);
     json.put(PROP_OVERVIEW_ICON_ID, page.getOverviewIconId());
