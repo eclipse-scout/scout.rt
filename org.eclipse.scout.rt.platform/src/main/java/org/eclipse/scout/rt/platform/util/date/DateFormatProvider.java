@@ -91,6 +91,7 @@ public class DateFormatProvider {
    * el       "d/M/yyyy"
    *
    * fa       "yyyy/MM/dd"
+   * ja       "yyyy/MM/dd"
    *
    * hu       "yyyy.MM.dd"
    *
@@ -141,7 +142,7 @@ public class DateFormatProvider {
     if (localeName.startsWith("el")) {
       return "d/M/yyyy";
     }
-    if (localeName.startsWith("fa")) {
+    if (localeName.startsWith("fa") || localeName.startsWith("ja")) {
       return "yyyy/MM/dd";
     }
     if (localeName.startsWith("hu")) {
