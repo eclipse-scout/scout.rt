@@ -469,6 +469,7 @@
     },
     "Popup": {
       "animateOpening": false,
+      "animateResize": false,
       "withGlassPane": false,
       "horizontalAlignment": "leftedge",
       "verticalAlignment": "bottom",
@@ -483,7 +484,8 @@
       "closeOnOtherPopupOpen": true
     },
     "WidgetPopup": {
-      "animateOpening": true
+      "animateOpening": true,
+      "animateResize": true
     }
   },
 

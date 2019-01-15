@@ -13,11 +13,11 @@ scout.PopupWithHeadLayout = function(popup) {
 };
 scout.inherits(scout.PopupWithHeadLayout, scout.PopupLayout);
 
-scout.PopupWithHeadLayout.prototype.layout = function($container) {
-  scout.PopupWithHeadLayout.parent.prototype.layout.call(this, $container);
+scout.PopupWithHeadLayout.prototype._setSize = function(prefSize) {
+  scout.PopupWithHeadLayout.parent.prototype._setSize.call(this, prefSize);
 
   var htmlComp = this.popup.htmlComp,
-    popupSize = htmlComp.size(),
+    popupSize = prefSize,
     htmlBody = scout.HtmlComponent.optGet(this.popup.$body);
 
   // While animating the body animation sets the size

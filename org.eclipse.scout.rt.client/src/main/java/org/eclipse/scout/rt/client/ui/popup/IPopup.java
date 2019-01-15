@@ -21,6 +21,7 @@ public interface IPopup extends IWidget {
 
   String PROP_ANCHOR = "anchor";
   String PROP_ANIMATE_OPENING = "animateOpening";
+  String PROP_ANIMATE_RESIZE = "animateResize";
   String PROP_WITH_GLASS_PANE = "withGlassPane";
   String PROP_SCROLL_TYPE = "scrollType";
   String PROP_HORIZONTAL_ALIGNMENT = "horizontalAlignment";
@@ -54,6 +55,8 @@ public interface IPopup extends IWidget {
   IWidget getAnchor();
 
   boolean isAnimateOpening();
+
+  boolean isAnimateResize();
 
   boolean isWithGlassPane();
 

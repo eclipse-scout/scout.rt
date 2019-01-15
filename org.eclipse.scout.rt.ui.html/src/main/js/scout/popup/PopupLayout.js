@@ -16,6 +16,12 @@ scout.PopupLayout = function(popup) {
 scout.inherits(scout.PopupLayout, scout.AbstractLayout);
 
 scout.PopupLayout.prototype.layout = function($container) {
+  if (this.popup.isOpeningAnimationRunning()) {
+    this.popup.$container.oneAnimationEnd(this.layout.bind(this, $container));
+    return;
+  } else if (this.popup.removalPending || this.popup.removing || !this.popup.rendered){
+    return;
+  }
   var htmlComp = this.popup.htmlComp,
     prefSize = this.preferredLayoutSize($container, {
       exact: true,
@@ -31,7 +37,34 @@ scout.PopupLayout.prototype.layout = function($container) {
     prefSize = this.adjustSize(prefSize);
   }
 
-  scout.graphics.setSize(htmlComp.$comp, prefSize);
+  var currentBounds = scout.graphics.bounds(htmlComp.$comp);
+  this._setSize(prefSize);
+
+  if (htmlComp.layouted && this.popup.animateResize) {
+    this._resizeAnimated(currentBounds, prefSize);
+  }
+};
+
+scout.PopupLayout.prototype._resizeAnimated = function(currentBounds, prefSize) {
+  var htmlComp = this.popup.htmlComp;
+  this.popup.position();
+  var prefPosition = htmlComp.$comp.position();
+  htmlComp.$comp
+    .stop(true)
+    .cssHeight(currentBounds.height)
+    .cssWidth(currentBounds.width)
+    .cssLeft(currentBounds.x)
+    .cssTop(currentBounds.y)
+    .animate({
+      height: prefSize.height,
+      width: prefSize.width,
+      left: prefPosition.left,
+      top: prefPosition.top
+    });
+};
+
+scout.PopupLayout.prototype._setSize = function(prefSize) {
+  scout.graphics.setSize(this.popup.htmlComp.$comp, prefSize);
 };
 
 scout.PopupLayout.prototype.adjustSize = function(prefSize) {

@@ -11,6 +11,7 @@
 scout.WidgetPopup = function() {
   scout.WidgetPopup.parent.call(this);
   this.animateOpening = true;
+  this.animateResize = true;
   this.animateRemoval = true;
   this.widget = null;
   this.windowPaddingX = 0;

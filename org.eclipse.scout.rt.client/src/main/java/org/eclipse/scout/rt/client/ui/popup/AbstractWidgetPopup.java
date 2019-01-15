@@ -70,6 +70,11 @@ public abstract class AbstractWidgetPopup<T extends IWidget> extends AbstractPop
   }
 
   @Override
+  protected boolean getConfiguredAnimateResize() {
+    return true;
+  }
+
+  @Override
   public void open() {
     init();
     super.open();

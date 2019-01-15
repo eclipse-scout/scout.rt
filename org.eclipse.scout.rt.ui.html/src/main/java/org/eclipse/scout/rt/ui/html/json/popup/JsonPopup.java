@@ -51,6 +51,12 @@ public class JsonPopup<T extends IPopup> extends AbstractJsonWidget<T> {
         return getModel().isAnimateOpening();
       }
     });
+    putJsonProperty(new JsonProperty<T>(IPopup.PROP_ANIMATE_RESIZE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isAnimateResize();
+      }
+    });
     putJsonProperty(new JsonProperty<T>(IPopup.PROP_WITH_GLASS_PANE, model) {
       @Override
       protected Boolean modelValue() {

@@ -13,13 +13,12 @@ scout.WidgetPopupLayout = function(popup) {
 };
 scout.inherits(scout.WidgetPopupLayout, scout.PopupLayout);
 
-scout.WidgetPopupLayout.prototype.layout = function($container) {
-  scout.WidgetPopupLayout.parent.prototype.layout.call(this, $container);
+scout.WidgetPopupLayout.prototype._setSize = function(prefSize) {
+  scout.WidgetPopupLayout.parent.prototype._setSize.call(this, prefSize);
 
   var htmlPopup = this.popup.htmlComp;
   var htmlWidget = this.popup.widget.htmlComp;
-  var popupSize = htmlPopup.size();
-  var widgetSize = popupSize.subtract(htmlPopup.insets());
+  var widgetSize = prefSize.subtract(htmlPopup.insets());
   htmlWidget.setSize(widgetSize);
 };
 

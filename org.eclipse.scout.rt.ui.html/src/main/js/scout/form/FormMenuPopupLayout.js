@@ -14,11 +14,11 @@ scout.FormMenuPopupLayout = function(popup) {
 };
 scout.inherits(scout.FormMenuPopupLayout, scout.PopupWithHeadLayout);
 
-scout.FormMenuPopupLayout.prototype.layout = function($container) {
+scout.FormMenuPopupLayout.prototype._setSize = function(prefSize) {
   var popupSize,
     htmlForm = this.popup.form.htmlComp;
 
-  scout.FormMenuPopupLayout.parent.prototype.layout.call(this, $container);
+  scout.FormMenuPopupLayout.parent.prototype._setSize.call(this, prefSize);
 
   popupSize = scout.graphics.size(this.popup.$body);
 

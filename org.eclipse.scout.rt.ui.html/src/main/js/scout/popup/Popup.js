@@ -18,6 +18,7 @@ scout.Popup = function() {
   this._glassPaneRenderer = null;
   this.anchorBounds = null;
   this.animateOpening = false;
+  this.animateResize = false;
   this.anchor = null;
   this.$anchor = null;
   this.windowPaddingX = 10;

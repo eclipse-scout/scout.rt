@@ -58,6 +58,19 @@ public abstract class AbstractPopup extends AbstractWidget implements IPopup {
     propertySupport.setPropertyBool(PROP_ANIMATE_OPENING, animateOpening);
   }
 
+  protected boolean getConfiguredAnimateResize() {
+    return false;
+  }
+
+  @Override
+  public boolean isAnimateResize() {
+    return propertySupport.getPropertyBool(PROP_ANIMATE_RESIZE);
+  }
+
+  public void setAnimateResize(boolean animateResize) {
+    propertySupport.setPropertyBool(PROP_ANIMATE_RESIZE, animateResize);
+  }
+
   protected boolean getConfiguredWithGlassPane() {
     return false;
   }
@@ -221,6 +234,7 @@ public abstract class AbstractPopup extends AbstractWidget implements IPopup {
 
     setAnchor(getConfiguredAnchor());
     setAnimateOpening(getConfiguredAnimateOpening());
+    setAnimateResize(getConfiguredAnimateResize());
     setWithGlassPane(getConfiguredWithGlassPane());
     setScrollType(getConfiguredScrollType());
     setTrimWidth(getConfiguredTrimWidth());
