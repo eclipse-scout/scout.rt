@@ -11,22 +11,20 @@
 package org.eclipse.scout.rt.client.ui.label;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.label.ILabelExtension;
 import org.eclipse.scout.rt.client.extension.ui.label.LabelChains.LabelAppLinkActionChain;
+import org.eclipse.scout.rt.client.res.AttachmentSupport;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
@@ -34,7 +32,7 @@ import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 public abstract class AbstractLabel extends AbstractWidget implements ILabel {
   private final ObjectExtensions<AbstractLabel, ILabelExtension<? extends AbstractLabel>> m_objectExtensions;
   private ILabelUIFacade m_uiFacade;
-  private Map<String, BinaryResource> m_attachments;
+  private AttachmentSupport m_attachmentSupport;
 
   public AbstractLabel() {
     this(true);
@@ -43,6 +41,7 @@ public abstract class AbstractLabel extends AbstractWidget implements ILabel {
   public AbstractLabel(boolean callInitializer) {
     super(false);
     m_objectExtensions = new ObjectExtensions<>(this, false);
+    m_attachmentSupport = BEANS.get(AttachmentSupport.class);
     if (callInitializer) {
       callInitializer();
     }
@@ -51,7 +50,6 @@ public abstract class AbstractLabel extends AbstractWidget implements ILabel {
   @Override
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
-    m_attachments = new HashMap<>();
     super.initConfig();
     setHtmlEnabled(getConfiguredHtmlEnabled());
     setValue(getConfiguredValue());
@@ -107,27 +105,17 @@ public abstract class AbstractLabel extends AbstractWidget implements ILabel {
    */
   @Override
   public Set<BinaryResource> getAttachments() {
-    return CollectionUtility.hashSet(m_attachments.values());
+    return m_attachmentSupport.getAttachments();
   }
 
   @Override
   public BinaryResource getAttachment(String filename) {
-    return m_attachments.get(filename);
+    return m_attachmentSupport.getAttachment(filename);
   }
 
   @Override
   public void setAttachments(Collection<? extends BinaryResource> attachments) {
-    if (attachments == null) {
-      m_attachments = new HashMap<>(0);
-      return;
-    }
-    Map<String, BinaryResource> newMap = new HashMap<>(attachments.size());
-    for (BinaryResource attachment : attachments) {
-      if (attachment != null) {
-        newMap.put(attachment.getFilename(), attachment);
-      }
-    }
-    m_attachments = newMap;
+    m_attachmentSupport.setAttachments(attachments);
   }
 
   @Override

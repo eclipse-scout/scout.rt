@@ -48,6 +48,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRow
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowClickChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowsCheckedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowsSelectedChain;
+import org.eclipse.scout.rt.client.res.AttachmentSupport;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
@@ -158,7 +159,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   private final Map<CompositeObject, ITableRow> m_rowsByKey;
   private final Map<CompositeObject, ITableRow> m_deletedRows;
   private final List<ITableRowFilter> m_rowFilters;
-  private final Map<String, BinaryResource> m_attachments;
+  private final AttachmentSupport m_attachmentSupport;
   private final TableListeners m_listeners;
   private final Object m_cachedFilteredRowsLock;
   private final ObjectExtensions<AbstractTable, ITableExtension<? extends AbstractTable>> m_objectExtensions;
@@ -218,7 +219,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     m_rowsByKey = Collections.synchronizedMap(new HashMap<>());
     m_deletedRows = new HashMap<>();
     m_rowFilters = new ArrayList<>(1);
-    m_attachments = new HashMap<>(0);
+    m_attachmentSupport = BEANS.get(AttachmentSupport.class);
     m_initLock = new OptimisticLock();
     m_objectExtensions = new ObjectExtensions<>(this, false);
     //add single observer listener
@@ -1254,26 +1255,22 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   @Override
   public void addAttachment(BinaryResource attachment) {
-    if (attachment != null) {
-      m_attachments.put(attachment.getFilename(), attachment);
-    }
+    m_attachmentSupport.addAttachment(attachment);
   }
 
   @Override
   public Set<BinaryResource> getAttachments() {
-    return CollectionUtility.hashSet(m_attachments.values());
+    return m_attachmentSupport.getAttachments();
   }
 
   @Override
   public BinaryResource getAttachment(String filename) {
-    return m_attachments.get(filename);
+    return m_attachmentSupport.getAttachment(filename);
   }
 
   @Override
   public void removeAttachment(BinaryResource attachment) {
-    if (attachment != null) {
-      m_attachments.remove(attachment.getFilename());
-    }
+    m_attachmentSupport.removeAttachment(attachment);
   }
 
   @Override

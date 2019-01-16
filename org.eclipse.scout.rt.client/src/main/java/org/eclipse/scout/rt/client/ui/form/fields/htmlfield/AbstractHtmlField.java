@@ -15,9 +15,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
@@ -25,6 +23,7 @@ import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.htmlfield.HtmlFieldChains.HtmlFieldAppLinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.htmlfield.IHtmlFieldExtension;
+import org.eclipse.scout.rt.client.res.AttachmentSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -35,14 +34,13 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 
 @ClassId("99301bfb-cccc-431f-b687-dc0bf73ff789")
 public abstract class AbstractHtmlField extends AbstractValueField<String> implements IHtmlField {
 
   private IHtmlFieldUIFacade m_uiFacade;
-  private Map<String, BinaryResource> m_attachments;
+  private AttachmentSupport m_attachmentSupport;
 
   public AbstractHtmlField() {
     this(true);
@@ -50,6 +48,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
 
   public AbstractHtmlField(boolean callInitializer) {
     super(callInitializer);
+    m_attachmentSupport = BEANS.get(AttachmentSupport.class);
   }
 
   /*
@@ -79,7 +78,6 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   @Override
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
-    m_attachments = new HashMap<>();
     super.initConfig();
     setScrollBarEnabled(getConfiguredScrollBarEnabled());
     setHtmlEnabled(true);
@@ -143,41 +141,27 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
    */
   @Override
   public Set<BinaryResource> getAttachments() {
-    return CollectionUtility.hashSet(m_attachments.values());
+    return m_attachmentSupport.getAttachments();
   }
 
   @Override
   public BinaryResource getAttachment(String filename) {
-    return m_attachments.get(filename);
+    return m_attachmentSupport.getAttachment(filename);
   }
 
   @Override
   public void setAttachments(Collection<? extends BinaryResource> attachments) {
-    if (attachments == null) {
-      m_attachments = new HashMap<>(0);
-      return;
-    }
-    Map<String, BinaryResource> newMap = new HashMap<>(attachments.size());
-    for (BinaryResource attachment : attachments) {
-      if (attachment != null) {
-        newMap.put(attachment.getFilename(), attachment);
-      }
-    }
-    m_attachments = newMap;
+    m_attachmentSupport.setAttachments(attachments);
   }
 
   @Override
   public void addAttachment(BinaryResource attachment) {
-    if (attachment != null) {
-      m_attachments.put(attachment.getFilename(), attachment);
-    }
+    m_attachmentSupport.addAttachment(attachment);
   }
 
   @Override
   public void removeAttachment(BinaryResource attachment) {
-    if (attachment != null) {
-      m_attachments.remove(attachment.getFilename());
-    }
+    m_attachmentSupport.removeAttachment(attachment);
   }
 
   @Override

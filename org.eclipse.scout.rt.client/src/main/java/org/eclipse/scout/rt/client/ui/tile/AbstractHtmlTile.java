@@ -11,25 +11,27 @@
 package org.eclipse.scout.rt.client.ui.tile;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.res.AttachmentSupport;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 @ClassId("22f26922-32e7-49f1-9180-b48fbb5e75cd")
 public abstract class AbstractHtmlTile extends AbstractTile implements IHtmlTile {
-  private Map<String, BinaryResource> m_attachments;
+
+  private AttachmentSupport m_attachmentSupport;
+
+  public AbstractHtmlTile() {
+    m_attachmentSupport = BEANS.get(AttachmentSupport.class);
+  }
 
   @Override
   protected void initConfig() {
     super.initConfig();
-
-    m_attachments = new HashMap<>();
     setContent(getConfiguredContent());
     setHtmlEnabled(true);
   }
@@ -51,42 +53,28 @@ public abstract class AbstractHtmlTile extends AbstractTile implements IHtmlTile
   }
 
   @Override
-  public void setAttachments(Collection<? extends BinaryResource> resources) {
-    if (resources == null) {
-      m_attachments = new HashMap<>(0);
-      return;
-    }
-    Map<String, BinaryResource> newMap = new HashMap<>(resources.size());
-    for (BinaryResource resource : resources) {
-      if (resource != null) {
-        newMap.put(resource.getFilename(), resource);
-      }
-    }
-    m_attachments = newMap;
+  public void setAttachments(Collection<? extends BinaryResource> attachments) {
+    m_attachmentSupport.setAttachments(attachments);
   }
 
   @Override
   public void addAttachment(BinaryResource resource) {
-    if (resource != null) {
-      m_attachments.put(resource.getFilename(), resource);
-    }
+    m_attachmentSupport.addAttachment(resource);
   }
 
   @Override
   public void removeAttachment(BinaryResource resource) {
-    if (resource != null) {
-      m_attachments.remove(resource.getFilename());
-    }
+    m_attachmentSupport.removeAttachment(resource);
   }
 
   @Override
   public Set<BinaryResource> getAttachments() {
-    return CollectionUtility.hashSet(m_attachments.values());
+    return m_attachmentSupport.getAttachments();
   }
 
   @Override
   public BinaryResource getAttachment(String filename) {
-    return m_attachments.get(filename);
+    return m_attachmentSupport.getAttachment(filename);
   }
 
   @Override
