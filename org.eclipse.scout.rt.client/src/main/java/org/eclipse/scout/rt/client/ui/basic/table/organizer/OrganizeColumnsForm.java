@@ -52,6 +52,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.RemoveFilterMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.RemoveMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ProfilesBox.ProfilesTableField;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IReloadReason;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.JavaTransferObject;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
@@ -1571,7 +1572,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
       }
       if (m_organizedTable.getReloadHandler() != null) {
         m_organizedTable.resetColumnConfiguration();
-        m_organizedTable.getReloadHandler().reload();
+        m_organizedTable.getReloadHandler().reload(IReloadReason.ORGANIZE_COLUMNS);
       }
     }
     for (IColumn<?> col : m_organizedTable.getColumnSet().getColumns()) {

@@ -24,11 +24,20 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageActivatedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDataLoadedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDeactivatedChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageReloadPageChain;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IReloadReason;
 
 public interface IPageExtension<OWNER extends AbstractPage> extends ITreeNodeExtension<OWNER> {
+
+  /**
+   * @param reloadReason
+   *          {@link IReloadReason}
+   * @since 16.1
+   */
+  void execReloadPage(PageReloadPageChain chain, String reloadReason);
 
   void execPageDataLoaded(PagePageDataLoadedChain chain);
 

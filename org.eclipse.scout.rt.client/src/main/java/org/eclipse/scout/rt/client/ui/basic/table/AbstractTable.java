@@ -4699,12 +4699,12 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     }
 
     @Override
-    public void fireTableReloadFromUI() {
+    public void fireTableReloadFromUI(String reloadReason) {
       if (m_reloadHandler != null) {
         try {
           pushUIProcessor();
           //
-          m_reloadHandler.reload();
+          m_reloadHandler.reload(reloadReason);
         }
         finally {
           popUIProcessor();
@@ -5127,15 +5127,5 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   @Override
   public void setMaxRowCount(int maxRowCount) {
     propertySupport.setPropertyInt(PROP_MAX_ROW_COUNT, maxRowCount);
-  }
-
-  @Override
-  public int getRequestedRowCount() {
-    return propertySupport.getPropertyInt(PROP_REQUESTED_ROW_COUNT);
-  }
-
-  @Override
-  public void setRequestedRowCount(int requestedRowCount) {
-    propertySupport.setPropertyInt(PROP_REQUESTED_ROW_COUNT, requestedRowCount);
   }
 }

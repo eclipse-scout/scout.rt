@@ -232,12 +232,6 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
    * @since 9.0
    */
   String PROP_MAX_ROW_COUNT = "maxRowCount";
-  /**
-   * type int
-   *
-   * @since 9.0
-   */
-  String PROP_REQUESTED_ROW_COUNT = "requestedRowCount";
 
   /**
    * @deprecated will be removed with 8.0, use {@link #init()} or {@link #reinit()} instead
@@ -1266,18 +1260,4 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
    * @since 9.0
    */
   void setMaxRowCount(int maxRowCount);
-
-  /**
-   * Number of rows the user requests to be loaded into this table upon reload
-   *
-   * @since 9.0
-   */
-  int getRequestedRowCount();
-
-  /**
-   * Number of rows the user requests to be loaded into this table upon reload
-   *
-   * @since 9.0
-   */
-  void setRequestedRowCount(int requestedRowCount);
 }

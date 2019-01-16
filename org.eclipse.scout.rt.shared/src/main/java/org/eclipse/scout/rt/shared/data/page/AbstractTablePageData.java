@@ -26,7 +26,6 @@ public abstract class AbstractTablePageData extends AbstractTableFieldBeanData {
   private boolean m_limitedResult;
   private long m_estimatedRowCount;
   private int m_maxRowCount;
-  private int m_requestedRowCount;
 
   /**
    * Optional property may be used by the data provider to signal, that the data returned by this instance has been
@@ -63,7 +62,8 @@ public abstract class AbstractTablePageData extends AbstractTableFieldBeanData {
    * Optional property may be used by the data provider to report the estimated available row count in case data in this
    * bean has been limited.
    *
-   * @param estimatedRowCount an estimation of the total available row count, 0 by default (not set)
+   * @param estimatedRowCount
+   *          an estimation of the total available row count, 0 by default (not set)
    * @since 9.0
    */
   public void setEstimatedRowCount(long estimatedRowCount) {
@@ -86,23 +86,5 @@ public abstract class AbstractTablePageData extends AbstractTableFieldBeanData {
    */
   public void setMaxRowCount(int maxRowCount) {
     m_maxRowCount = maxRowCount;
-  }
-
-  /**
-   * Number of rows the user has requested to be loaded by this page data
-   *
-   * @since 9.0
-   */
-  public int getRequestedRowCount() {
-    return m_requestedRowCount;
-  }
-
-  /**
-   * Number of rows the user has requested to be loaded by this page data
-   *
-   * @since 9.0
-   */
-  public void setRequestedRowCount(int requestedRowCount) {
-    m_requestedRowCount = requestedRowCount;
   }
 }

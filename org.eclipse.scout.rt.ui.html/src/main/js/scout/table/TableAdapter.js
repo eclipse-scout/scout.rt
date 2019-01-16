@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.TableAdapter = function() {
   scout.TableAdapter.parent.call(this);
-  this._addRemoteProperties(['contextColumn', 'requestedRowCount']);
+  this._addRemoteProperties(['contextColumn']);
 };
 scout.inherits(scout.TableAdapter, scout.ModelAdapter);
 
@@ -294,7 +294,10 @@ scout.TableAdapter.prototype._sendContextColumn = function(contextColumn) {
 };
 
 scout.TableAdapter.prototype._onWidgetReload = function(event) {
-  this._send('reload');
+  var data = {
+      reloadReason : event.reloadReason
+  };
+  this._send('reload', data);
 };
 
 scout.TableAdapter.prototype._onWidgetExportToClipbaord = function(event) {

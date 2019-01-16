@@ -29,8 +29,7 @@ public class TableFieldReloadHandler implements IReloadHandler {
   }
 
   @Override
-  public void reload() {
+  public void reload(String reloadReason) {
     m_tableField.reloadTableData();
   }
-
 }

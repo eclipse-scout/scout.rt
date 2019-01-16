@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IReloadReason;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
@@ -101,7 +102,11 @@ public interface ITableUIFacade {
 
   void fireAppLinkActionFromUI(String ref);
 
-  void fireTableReloadFromUI();
+  /**
+   * @param reloadReason
+   *          see {@link IReloadReason}
+   */
+  void fireTableReloadFromUI(String reloadReason);
 
   void fireTableResetFromUI();
 

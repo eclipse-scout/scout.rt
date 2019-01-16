@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageActivatedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDataLoadedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDeactivatedChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageReloadPageChain;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
@@ -446,7 +447,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       try {
         //TODO [7.0] fko: maybe remove when bookmarks can be done on outline level? (currently only pages)
         if (isRootNode) {
-          this.reloadPage();
+          this.reloadPage(IReloadReason.DATA_CHANGED_TRIGGER);
         }
         /*
          * Ticket 77332 (deleting a node in the tree) also requires a reload So
@@ -477,6 +478,29 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       catch (RuntimeException | PlatformError e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
+    }
+  }
+
+  /**
+   * Called in order to reload the page data. The default calls {@link #loadChildren()} inside a try finally block with
+   * {@link #getTree()} and {@link ITree#setTreeChanging(boolean)}.
+   *
+   * @param reloadReason
+   *          {@link IReloadReason}
+   */
+  @ConfigOperation
+  @Order(58)
+  protected void execReloadPage(String reloadReason) {
+    ITree tree = getTree();
+    if (tree == null) {
+      return;
+    }
+    try {
+      tree.setTreeChanging(true);
+      loadChildren();
+    }
+    finally {
+      tree.setTreeChanging(false);
     }
   }
 
@@ -956,18 +980,8 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   @Override
-  public final void reloadPage() {
-    ITree tree = getTree();
-    if (tree == null) {
-      return;
-    }
-    try {
-      tree.setTreeChanging(true);
-      loadChildren();
-    }
-    finally {
-      tree.setTreeChanging(false);
-    }
+  public final void reloadPage(String reloadReason) {
+    interceptReloadPage(reloadReason);
   }
 
   @Override
@@ -1098,6 +1112,12 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     return null;
   }
 
+  private void interceptReloadPage(String reloadReason) {
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    PageReloadPageChain chain = new PageReloadPageChain(extensions);
+    chain.execReloadPage(reloadReason);
+  }
+
   protected final void interceptPageDataLoaded() {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PagePageDataLoadedChain chain = new PagePageDataLoadedChain(extensions);
@@ -1180,6 +1200,11 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
     public LocalPageExtension(OWNER owner) {
       super(owner);
+    }
+
+    @Override
+    public void execReloadPage(PageReloadPageChain chain, String reloadReason) {
+      getOwner().execReloadPage(reloadReason);
     }
 
     @Override

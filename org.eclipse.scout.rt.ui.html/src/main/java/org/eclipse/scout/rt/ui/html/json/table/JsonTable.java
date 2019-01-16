@@ -38,6 +38,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableTextUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IReloadReason;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.ResourceListTransferObject;
 import org.eclipse.scout.rt.client.ui.dnd.TextTransferObject;
@@ -343,13 +344,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
         return getModel().getMaxRowCount();
       }
     });
-    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_REQUESTED_ROW_COUNT, model) {
-      @Override
-      protected Integer modelValue() {
-        return getModel().getRequestedRowCount();
-      }
-    });
-
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_HIERARCHICAL_STYLE, model) {
       @Override
       protected HierarchicalStyle modelValue() {
@@ -603,9 +597,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       addPropertyEventFilterCondition(propertyName, column);
       getModel().getUIFacade().setContextColumnFromUI(column);
     }
-    else if (ITable.PROP_REQUESTED_ROW_COUNT.equals(propertyName)) {
-      getModel().setRequestedRowCount(data.getInt(propertyName));
-    }
     else {
       super.handleUiPropertyChange(propertyName, data);
     }
@@ -699,7 +690,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   }
 
   protected void handleUiReload(JsonEvent event) {
-    getModel().getUIFacade().fireTableReloadFromUI();
+    String reloadReason = event.getData().optString("reloadReason", IReloadReason.UNSPECIFIED);
+    getModel().getUIFacade().fireTableReloadFromUI(reloadReason);
   }
 
   protected void handleUiResetColumns(JsonEvent event) {

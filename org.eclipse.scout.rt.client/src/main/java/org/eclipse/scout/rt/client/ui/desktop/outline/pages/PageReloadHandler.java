@@ -14,11 +14,10 @@ import org.eclipse.scout.rt.client.ui.basic.table.IReloadHandler;
 
 /**
  * This class triggers the <code>reloadPage()</code> method of a referenced page.
- * 
+ *
  * @since 5.0.0
  */
 public class PageReloadHandler implements IReloadHandler {
-
   private final IPage m_page;
 
   public PageReloadHandler(IPage page) {
@@ -26,8 +25,7 @@ public class PageReloadHandler implements IReloadHandler {
   }
 
   @Override
-  public void reload() {
-    m_page.reloadPage();
+  public void reload(String reloadReason) {
+    m_page.reloadPage(reloadReason);
   }
-
 }

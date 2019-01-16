@@ -51,7 +51,6 @@ scout.Table = function() {
   this.visibleRows = [];
   this.estimatedRowCount=0;
   this.maxRowCount=0;
-  this.requestedRowCount=0;
   this.visibleRowsMap = {}; // visible rows by id
   this.rowLevelPadding;
   this.rowsMap = {}; // rows by id
@@ -722,16 +721,13 @@ scout.Table.prototype._isTruncatedCellTooltipEnabled = function(column) {
   return !this.headerVisible || !this.headerEnabled || column.fixedWidth;
 };
 
-scout.Table.prototype.reload = function() {
+scout.Table.prototype.reload = function(reloadReason) {
   if (!this.hasReloadHandler) {
     return;
   }
-  if (this.estimatedRowCount) {
-    this.setRequestedRowCount(this.maxRowCount);
-  }
   this._removeRows();
   this._renderFiller();
-  this._triggerReload();
+  this._triggerReload(reloadReason);
 };
 
 /**
@@ -2937,10 +2933,6 @@ scout.Table.prototype._rowsToIds = function(rows) {
   });
 };
 
-scout.Table.prototype.setRequestedRowCount = function(requestedRowCount) {
-  this._setProperty('requestedRowCount', requestedRowCount);
-};
-
 /**
  * render borders and selection of row. default select if no argument or false is passed in deselect
  * model has to be updated before calling this method.
@@ -3684,8 +3676,10 @@ scout.Table.prototype._triggerAppLinkAction = function(column, ref) {
   });
 };
 
-scout.Table.prototype._triggerReload = function() {
-  this.trigger('reload');
+scout.Table.prototype._triggerReload = function(reloadReason) {
+  this.trigger('reload', {
+    reloadReason: reloadReason
+  });
 };
 
 scout.Table.prototype._triggerClipboardExport = function() {

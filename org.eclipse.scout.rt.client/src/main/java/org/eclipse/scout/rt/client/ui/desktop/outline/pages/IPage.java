@@ -72,7 +72,19 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
    * Reload this page content.<br>
    * This will first remove all child nodes, add new nodes/table rows and trigger execPageDataLoaded
    */
-  void reloadPage();
+  default void reloadPage() {
+    reloadPage(IReloadReason.UNSPECIFIED);
+  }
+
+  /**
+   * Reload this page content.<br>
+   * This will first remove all child nodes, add new nodes/table rows and trigger execPageDataLoaded
+   *
+   * @param reloadReason
+   *          {@link IReloadReason} that caused this reload
+   * @since 16.1
+   */
+  void reloadPage(String reloadReason);
 
   /**
    * @return the detail form, the detail form is not automatically started<br>

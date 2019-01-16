@@ -712,7 +712,15 @@ scout.TableFooter.prototype._onInfoLoadClick = function() {
   if (this._compactStyle) {
     this._toggleTableInfoTooltip(this._$infoLoad, 'TableInfoLoadTooltip');
   } else {
-    this.table.reload();
+    var numRows = this.table.rows.length;
+    var estRows = this.table.estimatedRowCount;
+    var maxRows = this.table.maxRowCount;
+    if (estRows && maxRows && numRows < estRows && numRows < maxRows) {
+      // reloadReason: overrideRowLimit
+      this.table.reload("overrideRowLimit");
+    } else {
+      this.table.reload();
+    }
   }
 };
 

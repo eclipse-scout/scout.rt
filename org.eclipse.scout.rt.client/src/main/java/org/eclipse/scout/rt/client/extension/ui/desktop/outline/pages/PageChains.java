@@ -31,6 +31,23 @@ public final class PageChains {
     }
   }
 
+  public static class PageReloadPageChain extends AbstractPageChain {
+
+    public PageReloadPageChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
+      super(extensions);
+    }
+
+    public void execReloadPage(String reloadReason) {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IPageExtension<? extends AbstractPage> next) {
+          next.execReloadPage(PageReloadPageChain.this, reloadReason);
+        }
+      };
+      callChain(methodInvocation);
+    }
+  }
+
   public static class PagePageDataLoadedChain extends AbstractPageChain {
 
     public PagePageDataLoadedChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {

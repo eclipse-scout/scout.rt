@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IReloadReason;
+
 /**
  * Interface for classes supporting a reload function.
  *
@@ -18,6 +20,9 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 @FunctionalInterface
 public interface IReloadHandler {
 
-  void reload();
-
+  /**
+   * @param reloadReason
+   *          {@link IReloadReason}
+   */
+  void reload(String reloadReason);
 }

@@ -494,7 +494,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
               }
             }
             else {
-              reloadPage();
+              reloadPage(IReloadReason.SEARCH);
             }
           }
           catch (RuntimeException | PlatformError ex) {
@@ -505,7 +505,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         case FormEvent.TYPE_STORE_AFTER: {
           // do page reload to execute search
           try {
-            reloadPage();
+            reloadPage(IReloadReason.SEARCH);
           }
           catch (RuntimeException | PlatformError ex) {
             BEANS.get(ExceptionHandler.class).handle(ex);
@@ -738,7 +738,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     m_flags = FLAGS_BIT_HELPER.changeBit(LIMITED_RESULT, tablePageData.isLimitedResult(), m_flags);
     table.setEstimatedRowCount(tablePageData.getEstimatedRowCount());
     table.setMaxRowCount(tablePageData.getMaxRowCount());
-    table.setRequestedRowCount(tablePageData.getRequestedRowCount());
   }
 
   /**

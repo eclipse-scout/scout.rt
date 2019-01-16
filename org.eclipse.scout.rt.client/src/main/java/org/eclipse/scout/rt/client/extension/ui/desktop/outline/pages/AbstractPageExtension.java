@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageActivatedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDataLoadedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDeactivatedChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageReloadPageChain;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -32,6 +33,11 @@ public abstract class AbstractPageExtension<OWNER extends AbstractPage> extends 
 
   public AbstractPageExtension(OWNER owner) {
     super(owner);
+  }
+
+  @Override
+  public void execReloadPage(PageReloadPageChain chain, String reloadReason) {
+    chain.execReloadPage(reloadReason);
   }
 
   @Override
