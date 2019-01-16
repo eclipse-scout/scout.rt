@@ -16,6 +16,10 @@
    */
   #scout.vertical-align-helper-after(18px);
 
+  & > .button-label {
+    padding: @text-field-padding-y - @button-padding-y - @button-margin-top 0;
+  }
+
   &.selected {
     border-style: inset;
     border-right-color: @border-color;
