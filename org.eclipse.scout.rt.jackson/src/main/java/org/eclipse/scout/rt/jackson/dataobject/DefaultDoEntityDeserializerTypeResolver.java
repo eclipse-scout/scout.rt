@@ -25,8 +25,13 @@ public class DefaultDoEntityDeserializerTypeResolver implements IDoEntityDeseria
   protected final LazyValue<DataObjectInventory> m_dataObjectInventory = new LazyValue<>(DataObjectInventory.class);
 
   @Override
-  public Optional<Class<? extends IDoEntity>> resolveTypeName(String entityType) {
-    return Optional.ofNullable(m_dataObjectInventory.get().fromTypeName(entityType));
+  public Class<? extends IDoEntity> resolveTypeName(String entityType) {
+    return m_dataObjectInventory.get().fromTypeName(entityType);
+  }
+
+  @Override
+  public String resolveTypeVersion(Class<? extends IDoEntity> entityClass) {
+    return m_dataObjectInventory.get().getTypeVersion(entityClass);
   }
 
   @Override

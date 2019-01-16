@@ -159,9 +159,16 @@ public class DataObjectDefinitionRegistryTest {
   }
 
   @Test
-  public void testGetTypeName() {
-    assertEquals("EntityFixture", m_inventory.getTypeName(EntityFixtureDo.class));
-    assertEquals("TestBaseFixtureEntity", m_inventory.getTypeName(TestFixtureSubclass1Do.class));
-    assertEquals("Object", m_inventory.getTypeName(Object.class));
+  public void testResolveTypeName() {
+    assertEquals("EntityFixture", m_inventory.resolveTypeName(EntityFixtureDo.class));
+    assertEquals("TestBaseFixtureEntity", m_inventory.resolveTypeName(TestFixtureSubclass1Do.class));
+    assertEquals("Object", m_inventory.resolveTypeName(Object.class));
+  }
+
+  @Test
+  public void testResolveTypeVersion() {
+    assertNull(m_inventory.resolveTypeVersion(EntityFixtureDo.class));
+    assertEquals("scout-8.0.0", m_inventory.resolveTypeVersion(OtherEntityFixtureDo.class));
+    assertNull(m_inventory.resolveTypeVersion(Object.class));
   }
 }

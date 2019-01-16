@@ -19,8 +19,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Annotation used to define the unique type name for a data object entity class, used when serializing and
- * deserializing an instance of the annotated class.
+ * Annotation used to define the version of an data object entity class used when serializing and deserializing an
+ * instance of the annotated class.
  * <p>
  * Example:
  *
@@ -31,19 +31,17 @@ import java.lang.annotation.Target;
  *   ...
  * }
  * </pre>
- * 
+ *
  * @see DoEntity
  */
 @Documented
 @Retention(RUNTIME)
 @Target({TYPE})
 @Inherited
-public @interface TypeName {
+public @interface TypeVersion {
 
   /**
-   * Unique type name used when serializing an instance of the annotated class
-   * <p>
-   * If value is left empty then the type name is derived from the simple class name.
+   * Version used when serializing an instance of the annotated class
    */
-  String value() default "";
+  String value();
 }

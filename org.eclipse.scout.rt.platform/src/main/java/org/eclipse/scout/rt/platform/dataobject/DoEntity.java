@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.platform.util.StreamUtility;
  *
  * <pre>
  * &#64;TypeName("ExampleEntity")
+ * &#64;TypeVersion("scout-8.0.0")
  * public class ExampleEntityDo extends DoEntity {
  *
  *   public DoValue&lt;Date&gt; createdOn() {

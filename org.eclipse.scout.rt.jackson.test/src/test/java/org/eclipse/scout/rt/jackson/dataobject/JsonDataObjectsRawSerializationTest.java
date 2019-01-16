@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -19,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestVersionedDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.jackson.testing.TestingJacksonDataObjectMapper;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -136,6 +139,26 @@ public class JsonDataObjectsRawSerializationTest {
   @Test
   public void testMyCustomTypeDo() {
     testRawDataObjectMapper("TestMyCustomTypeDo.json");
+  }
+
+  @Test
+  public void testVersionedDo() {
+    TestVersionedDo versioned = BEANS.get(TestVersionedDo.class).withName("lorem");
+    String json = s_dataObjectMapper.writeValue(versioned);
+    DoEntity rawEntity_8_0_0 = (DoEntity) s_dataObjectMapper.readValueRaw(json);
+    assertEquals("scout-8.0.0", rawEntity_8_0_0.getString(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME));
+
+    DoEntity rawEntity_a_b_c = (DoEntity) s_dataObjectMapper.readValueRaw(readResourceAsString("TestVersionedDoInvalidVersion.json"));
+    assertEquals("scout-a.b.c", rawEntity_a_b_c.getString(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME));
+
+    DoEntity rawEntity_emptyVersion = (DoEntity) s_dataObjectMapper.readValueRaw(readResourceAsString("TestVersionedDoEmptyVersion.json"));
+    assertEquals("", rawEntity_emptyVersion.getString(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME));
+
+    DoEntity rawEntity_nullVersion = (DoEntity) s_dataObjectMapper.readValueRaw(readResourceAsString("TestVersionedDoNullVersion.json"));
+    assertNull(rawEntity_nullVersion.getString(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME));
+
+    DoEntity rawEntity_noVersion = (DoEntity) s_dataObjectMapper.readValueRaw(readResourceAsString("TestVersionedDoNoVersion.json"));
+    assertNull(rawEntity_noVersion.getString(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME));
   }
 
   protected void testRawDataObjectMapper(String jsonFileName) {

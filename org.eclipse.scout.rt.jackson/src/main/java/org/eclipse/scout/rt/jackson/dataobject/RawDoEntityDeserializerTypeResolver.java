@@ -21,8 +21,13 @@ import com.fasterxml.jackson.databind.JavaType;
 public class RawDoEntityDeserializerTypeResolver implements IDoEntityDeserializerTypeResolver {
 
   @Override
-  public Optional<Class<? extends IDoEntity>> resolveTypeName(String entityType) {
-    return Optional.empty();
+  public Class<? extends IDoEntity> resolveTypeName(String entityType) {
+    return null;
+  }
+
+  @Override
+  public String resolveTypeVersion(Class<? extends IDoEntity> entityClass) {
+    return null;
   }
 
   @Override

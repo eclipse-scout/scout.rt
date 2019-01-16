@@ -33,16 +33,24 @@ public class ScoutDataObjectModule extends Module {
   /**
    * Default name of type attribute used for serialization.
    *
-   * @see #getTypeAttributeName()
+   * @see ScoutDataObjectModuleContext#getTypeAttributeName()
    */
   protected static final String DEFAULT_TYPE_ATTRIBUTE_NAME = "_type";
+
+  /**
+   * Default name of type version attribute used for serialization.
+   *
+   * @see ScoutDataObjectModuleContext#getTypeAttributeName()
+   */
+  protected static final String DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME = "_typeVersion";
 
   protected ScoutDataObjectModuleContext m_moduleContext;
 
   @PostConstruct
   protected void init() {
     m_moduleContext = BEANS.get(ScoutDataObjectModuleContext.class)
-        .withTypeAttributeName(DEFAULT_TYPE_ATTRIBUTE_NAME);
+        .withTypeAttributeName(DEFAULT_TYPE_ATTRIBUTE_NAME)
+        .withTypeVersionAttributeName(DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME);
   }
 
   /**
@@ -50,6 +58,14 @@ public class ScoutDataObjectModule extends Module {
    */
   public ScoutDataObjectModule withTypeAttributeName(String typeAttributeName) {
     m_moduleContext.withTypeAttributeName(typeAttributeName);
+    return this;
+  }
+
+  /**
+   * Setup {@link ScoutDataObjectModule} to use given {@code typeVersionAttributeName} as type version attribute name.
+   */
+  public ScoutDataObjectModule withTypeVersionAttributeName(String typeVersionAttributeName) {
+    m_moduleContext.withTypeVersionAttributeName(typeVersionAttributeName);
     return this;
   }
 
