@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import java.util.Optional;
 
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
+import org.eclipse.scout.rt.platform.dataobject.TypeName;
+import org.eclipse.scout.rt.platform.dataobject.TypeVersion;
 
 import com.fasterxml.jackson.databind.JavaType;
 
@@ -23,8 +25,17 @@ public interface IDoEntityDeserializerTypeResolver {
 
   /**
    * Resolves {@link IDoEntity} class for given {@code entityType}
+   *
+   * @see TypeName
    */
-  Optional<Class<? extends IDoEntity>> resolveTypeName(String entityType);
+  Class<? extends IDoEntity> resolveTypeName(String entityType);
+
+  /**
+   * Resolves version for given {@code entityClass}
+   *
+   * @see TypeVersion
+   */
+  String resolveTypeVersion(Class<? extends IDoEntity> entityClass);
 
   /**
    * Resolves attribute type class for given {@code entityClass} and {@code attributeName}

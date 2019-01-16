@@ -35,7 +35,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Inventory (and cache) for all {@link IDoEntity} with a {@link TypeName} annotation, listing all declared attributes for each {@link IDoEntity}.
+ * Inventory (and cache) for all {@link IDoEntity} with a {@link TypeName} annotation, listing all declared attributes
+ * for each {@link IDoEntity}.
  */
 @ApplicationScoped
 public class DataObjectInventory {
@@ -52,6 +53,11 @@ public class DataObjectInventory {
    */
   private final Map<String, Class<? extends IDoEntity>> m_typeNameToClassMap = new HashMap<>();
   private final Map<Class<? extends IDoEntity>, String> m_classToTypeName = new HashMap<>();
+
+  /**
+   * Map of {@link IDoEntity} class to its compile-time annotated type version (see {@link TypeVersion} annotation).
+   */
+  private final Map<Class<? extends IDoEntity>, String> m_classToTypeVersion = new HashMap<>();
 
   /** Map of {@link IDoEntity} class to its attributes map */
   private final Map<Class<? extends IDoEntity>, Map<String, DataObjectAttributeDescriptor>> m_classAttributeMap = new ConcurrentHashMap<>();
@@ -114,6 +120,14 @@ public class DataObjectInventory {
   }
 
   /**
+   * @return Type version for a given {@link IDoEntity} class.
+   * @see TypeVersion
+   */
+  public String getTypeVersion(Class<? extends IDoEntity> clazz) {
+    return m_classToTypeVersion.get(clazz);
+  }
+
+  /**
    * @return Map with all type name to {@link IDoEntity} class mappings
    */
   public Map<String, Class<? extends IDoEntity>> getTypeNameToClassMap() {
@@ -121,7 +135,8 @@ public class DataObjectInventory {
   }
 
   /**
-   * @return Optional of {@link DataObjectAttributeDescriptor} for specified {@code enttiyClass} and {@code attributeName}
+   * @return Optional of {@link DataObjectAttributeDescriptor} for specified {@code enttiyClass} and
+   *         {@code attributeName}
    */
   public Optional<DataObjectAttributeDescriptor> getAttributeDescription(Class<? extends IDoEntity> entityClass, String attributeName) {
     ensureEntityDefinitionLoaded(entityClass);
@@ -146,7 +161,11 @@ public class DataObjectInventory {
   protected void registerClass(Class<?> clazz) {
     if (IDoEntity.class.isAssignableFrom(clazz)) {
       Class<? extends IDoEntity> entityClass = clazz.asSubclass(IDoEntity.class);
-      String name = getTypeName(clazz);
+      String name = resolveTypeName(clazz);
+      String version = resolveTypeVersion(clazz);
+      if (version != null) {
+        m_classToTypeVersion.put(entityClass, version);
+      }
       String registeredName = m_classToTypeName.put(entityClass, name);
       Class<? extends IDoEntity> registeredClass = m_typeNameToClassMap.put(name, entityClass);
       checkDuplicateClassMapping(clazz, name, registeredName, registeredClass);
@@ -195,13 +214,13 @@ public class DataObjectInventory {
   }
 
   protected void addAttribute(Map<String, DataObjectAttributeDescriptor> attributes, ParameterizedType type, Method accessor) {
-    String name = getAttributeName(accessor);
-    Optional<String> formatPattern = getAttributeFormat(accessor);
+    String name = resolveAttributeName(accessor);
+    Optional<String> formatPattern = resolveAttributeFormat(accessor);
     attributes.put(name, new DataObjectAttributeDescriptor(name, type, formatPattern, accessor));
     LOG.debug("Adding attribute '{}' with type {} and format pattern '{}' to registry.", name, type, formatPattern.orElse("null"));
   }
 
-  protected String getTypeName(Class<?> c) {
+  protected String resolveTypeName(Class<?> c) {
     TypeName typeNameAnn = c.getAnnotation(TypeName.class);
     if (typeNameAnn != null && StringUtility.hasText(typeNameAnn.value())) {
       return typeNameAnn.value();
@@ -216,14 +235,22 @@ public class DataObjectInventory {
     return c != null ? c.getSimpleName() : null;
   }
 
-  protected String getAttributeName(Method accessor) {
+  protected String resolveTypeVersion(Class<?> c) {
+    TypeVersion typeVersionAnn = c.getAnnotation(TypeVersion.class);
+    if (typeVersionAnn != null && StringUtility.hasText(typeVersionAnn.value())) {
+      return typeVersionAnn.value();
+    }
+    return null;
+  }
+
+  protected String resolveAttributeName(Method accessor) {
     if (accessor.isAnnotationPresent(AttributeName.class)) {
       return accessor.getAnnotation(AttributeName.class).value();
     }
     return accessor.getName();
   }
 
-  protected Optional<String> getAttributeFormat(Method accessor) {
+  protected Optional<String> resolveAttributeFormat(Method accessor) {
     if (accessor.isAnnotationPresent(ValueFormat.class)) {
       return Optional.ofNullable(accessor.getAnnotation(ValueFormat.class).pattern());
     }

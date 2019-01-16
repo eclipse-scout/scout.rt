@@ -1,0 +1,5 @@
+{
+  "_type" : "TestVersioned",
+  "_typeVersion" : "scout-a.b.c",
+  "name" : "lorem"
+}

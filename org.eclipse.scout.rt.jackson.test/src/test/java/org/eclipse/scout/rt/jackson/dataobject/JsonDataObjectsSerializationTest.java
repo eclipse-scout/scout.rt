@@ -80,6 +80,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestStringHolder;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestStringHolderPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestStringPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestSubPojo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestVersionedDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.jackson.testing.TestingJacksonDataObjectMapper;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -107,6 +108,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -1920,7 +1922,7 @@ public class JsonDataObjectsSerializationTest {
     s_testHelper.assertDoEntityEquals(item2, TestItemDo.class.cast(marshalledList.get(3)));
   }
 
-  // ------------------------------------ tests with custom JSOn type property name ------------------------------------
+  // ------------------------------------ tests with custom JSON type property name ------------------------------------
 
   @Test
   public void testSerializeDeserialize_CustomTypePropertyName() throws Exception {
@@ -1935,6 +1937,76 @@ public class JsonDataObjectsSerializationTest {
     DoEntity marshalled = mapper.readValue(json, DoEntity.class);
     assertEquals(TestComplexEntityDo.class, marshalled.getClass());
     assertEquals("foo", ((TestComplexEntityDo) marshalled).getId());
+  }
+
+  // ------------------------------------ tests with type version ------------------------------------
+
+  @Test
+  public void testSerializeDeserialize_VersionedDo() throws Exception {
+    TestVersionedDo versioned = BEANS.get(TestVersionedDo.class).withName("lorem");
+    String json = s_dataObjectMapper.writeValueAsString(versioned);
+    assertJsonEquals("TestVersionedDo.json", json);
+
+    // deserialized version-annotated data object contains no version attribute node
+    TestVersionedDo entity = s_dataObjectMapper.readValue(json, TestVersionedDo.class);
+    assertNull(entity.getString(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME));
+  }
+
+  @Test
+  public void testSerializeDeserialize_VersionedDoWithoutVersion() throws Exception {
+    runTestVersionedDo("TestVersionedDoNoVersion.json");
+  }
+
+  @Test
+  public void testSerializeDeserialize_VersionedDoInvalidVersion() throws Exception {
+    runTestVersionedDo("TestVersionedDoInvalidVersion.json");
+  }
+
+  @Test
+  public void testSerializeDeserialize_VersionedDoEmptyVersion() throws Exception {
+    runTestVersionedDo("TestVersionedDoEmptyVersion.json");
+  }
+
+  @Test
+  public void testSerializeDeserialize_VersionedDoNullVersion() throws Exception {
+    runTestVersionedDo("TestVersionedDoNullVersion.json");
+  }
+
+  @Test
+  public void testSerializeDeserialize_VersionedDoHigherVersion() throws Exception {
+    TestVersionedDo doMarshalled = runTestVersionedDo("TestVersionedDoHigherVersion.json");
+
+    // serializing data object to JSON causes version to be set to class-file annotated version (override value contained in type version attribute)
+    String serialized = s_dataObjectMapper.writeValueAsString(doMarshalled);
+    JsonNode rawTree = s_defaultJacksonObjectMapper.readTree(serialized);
+    assertEquals("scout-8.0.0", rawTree.get(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME).asText());
+  }
+
+  protected TestVersionedDo runTestVersionedDo(String resourceName) throws Exception {
+    String json = readResourceAsString(resourceName);
+    TestVersionedDo doMarhalled = s_dataObjectMapper.readValue(json, TestVersionedDo.class);
+
+    // deserialized version-annotated data object contains no version attribute node (even when created by a JSON document containing any version data)
+    assertNull(doMarhalled.getString(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME));
+
+    String serialized = s_dataObjectMapper.writeValueAsString(doMarhalled);
+    assertJsonEquals("TestVersionedDo.json", serialized);
+    return doMarhalled;
+  }
+
+  @Test
+  public void testSerializeDeserialize_CustomTypeVersionPropertyName() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(BEANS.get(ScoutDataObjectModule.class).withTypeVersionAttributeName("_customTypeVersion"));
+
+    TestVersionedDo entityDo = BEANS.get(TestVersionedDo.class);
+    entityDo.withName("foo");
+    String json = mapper.writeValueAsString(entityDo);
+    assertEquals("{\"_type\":\"TestVersioned\",\"_customTypeVersion\":\"scout-8.0.0\",\"name\":\"foo\"}", json);
+
+    DoEntity marshalled = mapper.readValue(json, DoEntity.class);
+    assertEquals(TestVersionedDo.class, marshalled.getClass());
+    assertEquals("foo", ((TestVersionedDo) marshalled).getName());
   }
 
   // ------------------------------------ common test helper methods ------------------------------------

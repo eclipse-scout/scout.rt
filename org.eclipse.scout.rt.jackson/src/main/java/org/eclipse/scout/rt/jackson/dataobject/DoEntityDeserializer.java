@@ -11,13 +11,14 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.dataobject.DoMapEntity;
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -36,6 +37,8 @@ import com.fasterxml.jackson.databind.util.TokenBuffer;
  */
 public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
   private static final long serialVersionUID = 1L;
+
+  private static final Logger LOG = LoggerFactory.getLogger(DoEntityDeserializer.class);
 
   protected final ScoutDataObjectModuleContext m_moduleContext;
   protected final JavaType m_handledType;
@@ -141,18 +144,39 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       }
       else {
         Object value = p.getCodec().readValue(p, attributeType);
-        entity.put(attributeName, value);
+
+        // check if reading the 'type version' property
+        if (m_moduleContext.getTypeVersionAttributeName().equals(attributeName)) {
+          deserializeDoEntityVersionAttribute(entity, attributeName, value);
+        }
+        else {
+          entity.put(attributeName, value);
+        }
       }
     }
     return entity;
   }
 
+  protected void deserializeDoEntityVersionAttribute(IDoEntity entity, String attributeName, Object version) {
+    String dataObjectTypeVersion = m_doEntityDeserializerTypeResolver.resolveTypeVersion(entity.getClass());
+    if (dataObjectTypeVersion != null) {
+      // entity class type has a type version, check deserialized type version against entity class type version
+      if (!dataObjectTypeVersion.equals(version)) {
+        LOG.warn("Found version mismatch while deserializing DoEntity '{}'. Data object version (in class file) '{}', deserialized data version '{}'", entity.getClass(), dataObjectTypeVersion, version);
+      }
+    }
+    else {
+      // class type does not have a type version, add deserialized version as additional attribute (raw version support)
+      entity.put(attributeName, version);
+    }
+  }
+
   protected IDoEntity resolveEntityType(DeserializationContext ctxt, String entityType) throws IOException {
     if (entityType != null) {
       // try to lookup DoEntity with specified entityType
-      Optional<Class<? extends IDoEntity>> clazz = m_doEntityDeserializerTypeResolver.resolveTypeName(entityType);
-      if (clazz.isPresent()) {
-        return newObject(ctxt, clazz.get());
+      Class<? extends IDoEntity> clazz = m_doEntityDeserializerTypeResolver.resolveTypeName(entityType);
+      if (clazz != null) {
+        return newObject(ctxt, clazz);
       }
       else {
         // use generic DoEntity instance with a type attribute to preserve the type information even if correct DoEntity class could not be resolved

@@ -50,10 +50,11 @@ public class DataObjectSerializers extends Serializers.Base {
     return super.findReferenceSerializer(config, refType, beanDesc, contentTypeSerializer, contentValueSerializer);
   }
 
+  // TODO [9.1] pbz: Pass m_moduleContext to all Do* serializer 
   @Override
   public JsonSerializer<?> findSerializer(SerializationConfig config, JavaType type, BeanDescription beanDesc) {
     if (IDoEntity.class.isAssignableFrom(type.getRawClass())) {
-      return new DoEntitySerializer(type);
+      return new DoEntitySerializer(m_moduleContext, type);
     }
     else if (DoList.class.isAssignableFrom(type.getRawClass())) {
       return new DoListSerializer(type);

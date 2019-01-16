@@ -25,7 +25,9 @@ import org.eclipse.scout.rt.platform.util.BooleanUtility;
 public class ScoutDataObjectModuleContext {
 
   protected static final String TYPE_ATTRIBUTE_NAME_KEY = "typeAttributeNameKey";
-  
+
+  protected static final String TYPE_VERSION_ATTRIBUTE_NAME_KEY = "typeVersionAttributeNameKey";
+
   protected static final String IGNORE_TYPE_ATTRIBUTE_KEY = "ignoreTypeAttributeKey";
 
   protected final Map<String, Object> m_contextMap = new HashMap<>();
@@ -52,6 +54,15 @@ public class ScoutDataObjectModuleContext {
 
   public ScoutDataObjectModuleContext withTypeAttributeName(String typeAttributeName) {
     put(TYPE_ATTRIBUTE_NAME_KEY, typeAttributeName);
+    return this;
+  }
+
+  public String getTypeVersionAttributeName() {
+    return get(TYPE_VERSION_ATTRIBUTE_NAME_KEY, String.class);
+  }
+
+  public ScoutDataObjectModuleContext withTypeVersionAttributeName(String typeVersionAttributeName) {
+    put(TYPE_VERSION_ATTRIBUTE_NAME_KEY, typeVersionAttributeName);
     return this;
   }
 

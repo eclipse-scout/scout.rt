@@ -40,8 +40,11 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
 
   protected final LazyValue<DataObjectInventory> m_dataObjectInventory = new LazyValue<>(DataObjectInventory.class);
 
-  public DoEntitySerializer(JavaType type) {
+  protected final ScoutDataObjectModuleContext m_context;
+
+  public DoEntitySerializer(ScoutDataObjectModuleContext context, JavaType type) {
     super(type);
+    m_context = context;
   }
 
   @Override
@@ -63,9 +66,18 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
    */
   protected void serializeAttributes(IDoEntity entity, JsonGenerator gen, SerializerProvider provider) throws IOException {
     gen.setCurrentValue(entity);
+    serializeTypeVersion(gen, entity);
     TreeMap<String, DoNode<?>> sortedMap = new TreeMap<>(entity.allNodes());
     for (Map.Entry<String, DoNode<?>> e : sortedMap.entrySet()) {
       serializeAttributes(e.getKey(), e.getValue(), gen, provider);
+    }
+  }
+
+  protected void serializeTypeVersion(JsonGenerator gen, IDoEntity entity) throws IOException {
+    String typeVersion = m_dataObjectInventory.get().getTypeVersion(entity.getClass());
+    if (typeVersion != null) {
+      gen.writeFieldName(m_context.getTypeVersionAttributeName());
+      gen.writeString(typeVersion);
     }
   }
 

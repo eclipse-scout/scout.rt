@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.dataobject.fixture;
+package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
 import javax.annotation.Generated;
 
@@ -17,16 +17,12 @@ import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.TypeName;
 import org.eclipse.scout.rt.platform.dataobject.TypeVersion;
 
-@TypeName("OtherEntityFixture")
+@TypeName("TestVersioned")
 @TypeVersion("scout-8.0.0")
-public class OtherEntityFixtureDo extends DoEntity {
+public class TestVersionedDo extends DoEntity {
 
-  public DoValue<String> id() {
-    return doValue("id");
-  }
-
-  public DoValue<Boolean> active() {
-    return doValue("active");
+  public DoValue<String> name() {
+    return doValue("name");
   }
 
   /* **************************************************************************
@@ -34,24 +30,13 @@ public class OtherEntityFixtureDo extends DoEntity {
    * *************************************************************************/
 
   @Generated("DoConvenienceMethodsGenerator")
-  public OtherEntityFixtureDo withId(String id) {
-    id().set(id);
+  public TestVersionedDo withName(String name) {
+    name().set(name);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public String getId() {
-    return id().get();
-  }
-
-  @Generated("DoConvenienceMethodsGenerator")
-  public OtherEntityFixtureDo withActive(Boolean active) {
-    active().set(active);
-    return this;
-  }
-
-  @Generated("DoConvenienceMethodsGenerator")
-  public Boolean isActive() {
-    return active().get();
+  public String getName() {
+    return name().get();
   }
 }
