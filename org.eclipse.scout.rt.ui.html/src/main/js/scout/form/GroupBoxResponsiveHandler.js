@@ -74,14 +74,8 @@ scout.GroupBoxResponsiveHandler.prototype.getCondensedThreshold = function() {
     return this.condensedThreshold;
   }
 
-  var htmlContainer = this.widget.htmlComp;
-  var containerSize = htmlContainer.availableSize()
-    .subtract(htmlContainer.insets());
-
   return this.widget.htmlComp.prefSize({
-    widthHint: containerSize.width,
-    widthOnly: true,
-    skipResponsive: this.calculatingPrefSize
+    widthOnly: true
   }).width;
 };
 

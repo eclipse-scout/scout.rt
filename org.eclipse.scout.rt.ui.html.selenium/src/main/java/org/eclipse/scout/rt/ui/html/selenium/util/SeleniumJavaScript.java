@@ -98,4 +98,11 @@ public final class SeleniumJavaScript {
     return executeScript(test, "return window.scrollY;");
   }
 
+  /**
+   * Enables/Disables responsive mode.
+   */
+  public static void setResponsiveEnabled(AbstractSeleniumTest test, boolean enabled) {
+    executeScript(test, "scout.responsiveManager.setActive(" + ((enabled) ? "true" : "false") + ");");
+  }
+
 }

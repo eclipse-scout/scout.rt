@@ -44,12 +44,13 @@ describe("GroupBoxResponsiveHandler", function() {
       fields: fields,
       responsive: true
     });
-    scout.responsiveManager.registerHandler(groupBox, new scout.GroupBoxResponsiveHandler(groupBox, {
-      condensedThreshold: 500,
-      compactThreshold: 400
-    }));
+    scout.responsiveManager.registerHandler(groupBox, new scout.GroupBoxResponsiveHandler(groupBox));
     return groupBox;
   }
+
+  var normalWidth = scout.HtmlEnvironment.formColumnWidth * 2 + 10;
+  var condensedWidth = scout.HtmlEnvironment.formColumnWidth  + 10;
+  var compactWidth = scout.HtmlEnvironment.formColumnWidth - 10;
 
   function expectNormal(groupBox) {
     expect(groupBox.fields[0].labelPosition).toBe(scout.FormField.LabelPosition.DEFAULT);
@@ -108,20 +109,20 @@ describe("GroupBoxResponsiveHandler", function() {
     it("switches to condensed mode if width under threshold", function() {
       // normal state
       groupBox.render($('#sandbox'));
-      groupBox.$container.cssWidth(600);
-      groupBox.revalidateLayoutTree();
+      groupBox.$container.cssWidth(normalWidth);
+      groupBox.invalidateLayout();
       groupBox.validateLayout();
       expectNormal(groupBox);
 
       // condensed state
-      groupBox.$container.cssWidth(450);
-      groupBox.revalidateLayoutTree();
+      groupBox.$container.cssWidth(condensedWidth);
+      groupBox.invalidateLayout();
       groupBox.validateLayout();
       expectCondensed(groupBox);
 
       // reset
-      groupBox.$container.cssWidth(600);
-      groupBox.revalidateLayoutTree();
+      groupBox.$container.cssWidth(normalWidth);
+      groupBox.invalidateLayout();
       groupBox.validateLayout();
       scout.responsiveManager.reset(groupBox);
       expectNormal(groupBox);
@@ -131,26 +132,26 @@ describe("GroupBoxResponsiveHandler", function() {
     it("switches to compact mode if width under threshold", function() {
       // normal state
       groupBox.render($('#sandbox'));
-      groupBox.$container.cssWidth(600);
-      groupBox.revalidateLayoutTree();
+      groupBox.$container.cssWidth(normalWidth);
+      groupBox.invalidateLayout();
       groupBox.validateLayout();
       expectNormal(groupBox);
 
       // compact state
-      groupBox.$container.cssWidth(350);
-      groupBox.revalidateLayoutTree();
+      groupBox.$container.cssWidth(compactWidth);
+      groupBox.invalidateLayout();
       groupBox.validateLayout();
       expectCompact(groupBox);
 
       // back to condensed
-      groupBox.$container.cssWidth(450);
-      groupBox.revalidateLayoutTree();
+      groupBox.$container.cssWidth(condensedWidth);
+      groupBox.invalidateLayout();
       groupBox.validateLayout();
       expectCondensed(groupBox);
 
       // back to normal
-      groupBox.$container.cssWidth(650);
-      groupBox.revalidateLayoutTree();
+      groupBox.$container.cssWidth(normalWidth);
+      groupBox.invalidateLayout();
       groupBox.validateLayout();
       expectNormal(groupBox);
     });
@@ -160,20 +161,20 @@ describe("GroupBoxResponsiveHandler", function() {
 
       // normal state
       groupBox.render($('#sandbox'));
-      groupBox.$container.cssWidth(600);
-      groupBox.revalidateLayoutTree();
+      groupBox.$container.cssWidth(normalWidth);
+      groupBox.invalidateLayout();
       groupBox.validateLayout();
       expectNormal(groupBox);
 
       // condensed state
-      groupBox.$container.cssWidth(450);
-      groupBox.revalidateLayoutTree();
+      groupBox.$container.cssWidth(condensedWidth);
+      groupBox.invalidateLayout();
       groupBox.validateLayout();
       expectCondensed(groupBox);
 
       // back to normal
-      groupBox.$container.cssWidth(650);
-      groupBox.revalidateLayoutTree();
+      groupBox.$container.cssWidth(normalWidth);
+      groupBox.invalidateLayout();
       groupBox.validateLayout();
       expectNormal(groupBox);
     });
@@ -183,14 +184,14 @@ describe("GroupBoxResponsiveHandler", function() {
 
       // normal state
       groupBox.render($('#sandbox'));
-      groupBox.$container.cssWidth(600);
-      groupBox.revalidateLayoutTree();
+      groupBox.$container.cssWidth(normalWidth);
+      groupBox.invalidateLayout();
       groupBox.validateLayout();
       expectNormal(groupBox);
 
       // condensed state
-      groupBox.$container.cssWidth(450);
-      groupBox.revalidateLayoutTree();
+      groupBox.$container.cssWidth(condensedWidth);
+      groupBox.invalidateLayout();
       groupBox.validateLayout();
       expectCondensed(groupBox);
 
@@ -202,8 +203,8 @@ describe("GroupBoxResponsiveHandler", function() {
       expect(dynamicField.labelPosition).toBe(scout.FormField.LabelPosition.TOP);
 
       // back to normal
-      groupBox.$container.cssWidth(650);
-      groupBox.revalidateLayoutTree();
+      groupBox.$container.cssWidth(normalWidth);
+      groupBox.invalidateLayout();
       groupBox.validateLayout();
       expectNormal(groupBox);
 
@@ -221,14 +222,14 @@ describe("GroupBoxResponsiveHandler", function() {
     it("switches the responsive state for the inner group box", function() {
       // normal state
       groupBox.render($('#sandbox'));
-      groupBox.$container.cssWidth(600);
-      groupBox.revalidateLayoutTree();
+      groupBox.$container.cssWidth(normalWidth);
+      groupBox.invalidateLayout();
       groupBox.validateLayout();
       expectNormal(groupBox);
 
       // condensed state
-      groupBox.$container.cssWidth(450);
-      groupBox.revalidateLayoutTree();
+      groupBox.$container.cssWidth(condensedWidth);
+      groupBox.invalidateLayout();
       groupBox.validateLayout();
       expectCondensed(groupBox);
 
@@ -237,8 +238,8 @@ describe("GroupBoxResponsiveHandler", function() {
       expectCondensed(groupBox);
 
       // back to normal
-      groupBox.$container.cssWidth(650);
-      groupBox.revalidateLayoutTree();
+      groupBox.$container.cssWidth(normalWidth);
+      groupBox.invalidateLayout();
       groupBox.validateLayout();
       expectNormal(groupBox);
     });

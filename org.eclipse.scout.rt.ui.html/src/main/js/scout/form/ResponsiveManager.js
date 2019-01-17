@@ -30,6 +30,22 @@ scout.ResponsiveManager.prototype.destroy = function() {
 };
 
 /**
+ * Sets the responsive manager to active or inactive globally. Default is active.
+ */
+scout.ResponsiveManager.prototype.setActive = function(active) {
+  this.active = active;
+};
+
+/**
+ * Set a global responsive state. This state will always be set. Resizing will no longer result in a different responsive state.
+ *
+ * @param {string} responsive state (scout.ResponsiveManager.ResponsiveState)
+ */
+scout.ResponsiveManager.prototype.setGlobalState = function(globalState) {
+  this.globalState = globalState;
+};
+
+/**
  * Checks if the form is smaller than the preferred width of the form. If this is reached, the fields will
  * be transformed to ensure better readability.
  */
@@ -42,18 +58,24 @@ scout.ResponsiveManager.prototype.handleResponsive = function(target, width) {
     return false;
   }
 
-  var state;
+  var newState;
+  var state = target.responsiveHandler.state;
   if (this.globalState) {
-    state = this.globalState;
+    newState = this.globalState;
   } else if (width < target.responsiveHandler.getCompactThreshold() && target.responsiveHandler.acceptState(scout.ResponsiveManager.ResponsiveState.COMPACT)) {
-    state = scout.ResponsiveManager.ResponsiveState.COMPACT;
-  } else if (width < target.responsiveHandler.getCondensedThreshold() && target.responsiveHandler.acceptState(scout.ResponsiveManager.ResponsiveState.CONDENSED)) {
-    state = scout.ResponsiveManager.ResponsiveState.CONDENSED;
+    newState = scout.ResponsiveManager.ResponsiveState.COMPACT;
   } else {
-    state = scout.ResponsiveManager.ResponsiveState.NORMAL;
+    if (state === scout.ResponsiveManager.ResponsiveState.COMPACT) {
+      target.responsiveHandler.transform(scout.ResponsiveManager.ResponsiveState.CONDENSED);
+    }
+    if (width < target.responsiveHandler.getCondensedThreshold() && target.responsiveHandler.acceptState(scout.ResponsiveManager.ResponsiveState.CONDENSED)) {
+      newState = scout.ResponsiveManager.ResponsiveState.CONDENSED;
+    } else {
+      newState = scout.ResponsiveManager.ResponsiveState.NORMAL;
+    }
   }
 
-  return target.responsiveHandler.transform(state);
+  return target.responsiveHandler.transform(newState);
 };
 
 scout.ResponsiveManager.prototype.reset = function(target, force) {
@@ -69,7 +91,7 @@ scout.ResponsiveManager.prototype.reset = function(target, force) {
 };
 
 scout.ResponsiveManager.prototype.registerHandler = function(target, handler) {
-  if(target.responsiveHandler){
+  if (target.responsiveHandler) {
     target.responsiveHandler.destroy();
   }
   target.responsiveHandler = handler;

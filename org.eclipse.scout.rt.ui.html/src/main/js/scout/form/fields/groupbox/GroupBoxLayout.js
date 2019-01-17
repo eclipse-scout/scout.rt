@@ -109,13 +109,9 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container, option
     gridData = this.groupBox.gridData,
     undoResponsive = false;
 
-  if (!options.skipResponsive &&
-    this.groupBox.responsive &&
-    this.groupBox.responsiveHandler &&
+  if (this.groupBox.responsive &&
     options.widthHint) {
-    this.groupBox.responsiveHandler.calculatingPrefSize = true;
     undoResponsive = scout.responsiveManager.handleResponsive(this.groupBox, options.widthHint);
-    this.groupBox.responsiveHandler.calculatingPrefSize = false;
   }
 
   if (gridData) {
