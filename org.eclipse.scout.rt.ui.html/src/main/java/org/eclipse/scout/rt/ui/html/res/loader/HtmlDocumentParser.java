@@ -116,7 +116,8 @@ public class HtmlDocumentParser {
     // append path to file
     StringBuilder externalPathSb = new StringBuilder();
     if (srcFile.getParent() != null) {
-      externalPathSb.append(srcFile.getParent()).append("/");
+      // since paths in HTML documents always use forward slashes we must convert the parent path here
+      externalPathSb.append(srcFile.getParent().replace('\\', '/')).append("/");
     }
 
     // append file name without file-extension
