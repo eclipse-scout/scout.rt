@@ -615,6 +615,29 @@ describe("Popup", function() {
         expect(popup.$container.cssHeight()).toBe(200);
         expect(popup.$container.cssMarginY()).toBe(20);
       });
+
+      it('on the edge', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var popup = scout.create('WidgetPopup', {
+          parent: session.desktop,
+          cssClass: 'scalable with-margin',
+          horizontalAlignment: scout.Popup.Alignment.LEFT,
+          verticalAlignment: scout.Popup.Alignment.TOPEDGE,
+          trimHeight: true,
+          verticalSwitch: false,
+          $anchor: $anchor,
+          windowPaddingY: 0,
+          widget: {
+            objectType: "scouttests.LargeContent",
+            numBlocks: 20
+          }
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssTop()).toBe(0);
+        expect(popup.$container.cssHeight()).toBe(200);
+        expect(popup.$container.cssMarginY()).toBe(20);
+      });
     });
 
     describe('with vAlign = TOPEDGE', function() {

@@ -81,6 +81,7 @@ scout.PopupLayout.prototype._calcMaxSize = function() {
 scout.PopupLayout.prototype._adjustSizeWithAnchor = function(prefSize) {
   var popupSize = new scout.Dimension(),
     maxSize = this._calcMaxSizeAroundAnchor(),
+    windowSize = this._calcMaxSize(),
     Alignment = scout.Popup.Alignment,
     horizontalAlignment = this.popup.horizontalAlignment,
     verticalAlignment = this.popup.verticalAlignment;
@@ -111,6 +112,8 @@ scout.PopupLayout.prototype._adjustSizeWithAnchor = function(prefSize) {
         popupSize.width = Math.min(popupSize.width, maxSize.right);
       } else if (horizontalAlignment === Alignment.LEFT) {
         popupSize.width = Math.min(popupSize.width, maxSize.left);
+      } else {
+        popupSize.width = Math.min(popupSize.width, windowSize.width);
       }
     }
   }
@@ -125,13 +128,14 @@ scout.PopupLayout.prototype._adjustSizeWithAnchor = function(prefSize) {
         popupSize.height = Math.min(popupSize.height, maxSize.bottom);
       } else if (verticalAlignment === Alignment.TOP) {
         popupSize.height = Math.min(popupSize.height, maxSize.top);
+      } else {
+        popupSize.height = Math.min(popupSize.height, windowSize.height);
       }
     }
   }
 
   // On CENTER alignment, the anchor must ne be considered. Instead make sure the popup does not exceed window boundaries (same as in adjustSize)
   if (verticalAlignment === Alignment.CENTER || horizontalAlignment === Alignment.CENTER) {
-    var windowSize = this._calcMaxSize();
     if (horizontalAlignment === Alignment.CENTER) {
       popupSize.width = Math.min(windowSize.width, prefSize.width);
     }
