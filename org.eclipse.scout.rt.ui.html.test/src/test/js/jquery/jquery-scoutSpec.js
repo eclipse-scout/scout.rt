@@ -363,7 +363,7 @@ describe('jquery-scout', function() {
       $test.attr('style', 'min-width: invalid');
       expect($test.cssMinWidth()).toBe(0);
       $test.attr('style', 'min-width: 10%');
-      expect($test.cssMinWidth()).toBe(10); // assert the current behavior (not really correct)
+      expect($test.cssMinWidth()).toBe(0);
 
       expect($test.cssMinHeight()).toBe(0);
       $test.attr('style', 'min-height: auto');
@@ -373,7 +373,7 @@ describe('jquery-scout', function() {
       $test.attr('style', 'min-height: invalid');
       expect($test.cssMinHeight()).toBe(0);
       $test.attr('style', 'min-height: 10%');
-      expect($test.cssMinHeight()).toBe(10); // assert the current behavior (not really correct)
+      expect($test.cssMinHeight()).toBe(0);
     });
 
   });
@@ -394,7 +394,7 @@ describe('jquery-scout', function() {
       $test.attr('style', 'max-width: invalid');
       expect($test.cssMaxWidth()).toBeGreaterThan(99999);
       $test.attr('style', 'max-width: 10%');
-      expect($test.cssMaxWidth()).toBe(10); // assert the current behavior (not really correct)
+      expect($test.cssMaxWidth()).toBeGreaterThan(99999);
 
       expect($test.cssMaxHeight()).toBeGreaterThan(99999);
       $test.attr('style', 'max-height: none');
@@ -404,7 +404,7 @@ describe('jquery-scout', function() {
       $test.attr('style', 'max-height: invalid');
       expect($test.cssMaxHeight()).toBeGreaterThan(99999);
       $test.attr('style', 'max-height: 10%');
-      expect($test.cssMaxHeight()).toBe(10); // assert the current behavior (not really correct)
+      expect($test.cssMaxHeight()).toBeGreaterThan(99999);
     });
 
   });
