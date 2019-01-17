@@ -38,46 +38,39 @@
     }
 
     &.has-inner-alignment {
-      & > .icon {
-        position: absolute;
-        margin: auto;
+      display: flex;
+
+      &.halign-left {
+        justify-content: flex-start;
       }
 
-      &.halign-left > .image {
-        left: 0;
-      }
-
-      &.halign-center > .image {
-        /* Workaround when image is larger than container and autoFit is off, see http://stackoverflow.com/a/19414020 */
-        left: -9999px;
-        right: -9999px;
+      &.halign-center {
+        justify-content: center;
       }
 
       &.halign-center > .font-icon {
         text-align: center;
       }
 
-      &.halign-right > .image {
-        right: 0;
+      &.halign-right {
+        justify-content: flex-end;
       }
 
-      &.valign-top > .image {
-        top: 0;
+      &.valign-top {
+        align-items: flex-start;
       }
 
-      &.valign-middle > .image {
-        top: 0;
-        bottom: 0;
+      &.valign-middle {
+        align-items: center;
       }
 
       &.valign-middle > .font-icon {
-        display: flex;
         flex-direction: column;
         justify-content: center;
       }
 
-      &.valign-bottom > .image {
-        bottom: 0;
+      &.valign-bottom {
+        align-items: flex-end;
       }
     }
   }
