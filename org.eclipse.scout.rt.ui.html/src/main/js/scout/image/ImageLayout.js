@@ -17,7 +17,16 @@ scout.inherits(scout.ImageLayout, scout.AbstractLayout);
 scout.ImageLayout.prototype.preferredLayoutSize = function($container, options) {
   var img = $container[0];
   if (img && img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
-    return new scout.Dimension(img.naturalWidth, img.naturalHeight);
+    var prefHeight = img.naturalHeight;
+    var prefWidth = img.naturalWidth;
+    if (options.widthHint > 0 && options.widthHint < img.naturalWidth) {
+      prefHeight = options.widthHint / img.naturalWidth * img.naturalHeight;
+      prefWidth = options.widthHint;
+    } else if (options.heightHint > 0 && options.heightHint < img.naturalHeight) {
+      prefHeight = options.heightHint;
+      prefWidth = options.heightHint / img.naturalHeight * img.naturalWidth;
+    }
+    return new scout.Dimension(prefWidth, prefHeight);
   }
   return scout.ImageLayout.parent.prototype.preferredLayoutSize.call(this, $container, options);
 };
