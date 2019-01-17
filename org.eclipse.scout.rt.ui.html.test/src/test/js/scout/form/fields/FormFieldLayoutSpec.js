@@ -192,6 +192,21 @@ describe('FormFieldLayout', function() {
           expect(formField.htmlComp.prefSize().width).toBe(expectedWidth);
           expect(formField.htmlComp.prefSize().height).toBe(expectedHeight);
         });
+
+        it('does not adjust widthHint or heightHint if container contains an html component', function() {
+          scout.HtmlComponent.install(formField.$fieldContainer, session);
+          readSizes();
+          var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + labelWidth + labelMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
+          var expectedWidthHint = 400 - (expectedWidth - fieldSize.width + fieldMargins.horizontal());
+          var widthHint;
+          spyForWidthHint(function(spiedWidthHint) {
+            widthHint = spiedWidthHint;
+          });
+          var prefSize = formField.htmlComp.prefSize({widthHint: 400});
+          expect(prefSize.width).toBe(400);
+          expect(widthHint).toBe(expectedWidthHint);
+          unspyForWidthHint();
+        });
       });
 
       describe('top', function() {

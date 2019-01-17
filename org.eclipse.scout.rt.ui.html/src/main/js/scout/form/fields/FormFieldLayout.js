@@ -261,15 +261,17 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container, optio
   // Field
   if (formField.$fieldContainer) {
     var fieldMargins = scout.graphics.margins(formField.$fieldContainer);
-    if (options.widthHint) {
+    var htmlField = scout.HtmlComponent.optGet(formField.$fieldContainer);
+    if (!htmlField) {
       widthHint -= fieldMargins.horizontal();
+      heightHint -= fieldMargins.vertical();
+    }
+    if (options.widthHint) {
       options.widthHint = widthHint;
     }
     if (options.heightHint) {
-      heightHint -= fieldMargins.vertical();
       options.heightHint = heightHint;
     }
-    var htmlField = scout.HtmlComponent.optGet(formField.$fieldContainer);
     if (htmlField) {
       prefSizeField = htmlField.prefSize(options)
         .add(fieldMargins);
