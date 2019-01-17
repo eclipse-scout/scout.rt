@@ -49,8 +49,8 @@ scout.Table = function() {
   this.rows = [];
   this.rootRows = [];
   this.visibleRows = [];
-  this.estimatedRowCount=0;
-  this.maxRowCount=0;
+  this.estimatedRowCount = 0;
+  this.maxRowCount = 0;
   this.visibleRowsMap = {}; // visible rows by id
   this.rowLevelPadding;
   this.rowsMap = {}; // rows by id
@@ -125,13 +125,50 @@ scout.Table.CheckableStyle = {
   CHECKBOX_TABLE_ROW: 'checkbox_table_row'
 };
 
+/**
+ * This enum defines the reload reasons for a table reload operation
+ */
+scout.Table.ReloadReason = {
+  /**
+   * No specificv reason, just reload data using the current search settings, the current row limits and the current
+   * filter (Default)
+   */
+  UNSPECIFIED: 'unspecified',
+
+  /**
+   * Some search parameters changed or the search was reset and the search was triggered
+   */
+  SEARCH: 'search',
+
+  /**
+   * The user requested loading more data than his soft limit, up to the application specific hard limit
+   */
+  OVERRIDE_ROW_LIMIT: 'overrideRowLimit',
+
+  /**
+   * The user requested loading no more data than his soft limit;
+   */
+  RESET_ROW_LIMIT: 'resetRowLimit',
+
+  /**
+   * The column structure of the table was changed
+   */
+  ORGANIZE_COLUMNS: 'organizeColumns',
+
+  /**
+   * Any call to IPage#dataChanged
+   */
+  DATA_CHANGED_TRIGGER: 'dataChangedTrigger'
+};
+
 scout.Table.SELECTION_CLASSES = 'select-middle select-top select-bottom select-single selected';
 
 scout.Table.prototype._init = function(model) {
   scout.Table.parent.prototype._init.call(this, model);
   this.resolveConsts([{
     property: 'hierarchicalStyle',
-    constType: scout.Table.HierarchicalStyle}]);
+    constType: scout.Table.HierarchicalStyle
+  }]);
   this._initColumns();
 
   this.rows.forEach(function(row, i) {

@@ -295,7 +295,7 @@ scout.TableAdapter.prototype._sendContextColumn = function(contextColumn) {
 
 scout.TableAdapter.prototype._onWidgetReload = function(event) {
   var data = {
-      reloadReason : event.reloadReason
+    reloadReason: event.reloadReason
   };
   this._send('reload', data);
 };

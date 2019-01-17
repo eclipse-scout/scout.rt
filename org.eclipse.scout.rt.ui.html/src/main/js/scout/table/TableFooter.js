@@ -231,15 +231,15 @@ scout.TableFooter.prototype._renderInfoLoad = function() {
   if (!this._compactStyle) {
     if (numRows <= 1) {
       $info.appendSpan().text(this.session.text('ui.NumRowLoaded', this.computeCountInfo(numRows)));
-    } else if (estRows && estRows>numRows) {
+    } else if (estRows && estRows > numRows) {
       $info.appendSpan().text(this.session.text('ui.NumRowsLoaded', this.computeCountInfo(numRows, estRows)));
     } else {
       $info.appendSpan().text(this.session.text('ui.NumRowsLoaded', this.computeCountInfo(numRows)));
     }
     if (this.table.hasReloadHandler) {
       $info.appendBr();
-      if (estRows && maxRows && numRows<estRows && numRows<maxRows) {
-        $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadNData',this.computeCountInfo(maxRows))).appendTo($info);
+      if (estRows && maxRows && numRows < estRows && numRows < maxRows) {
+        $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadNData', this.computeCountInfo(maxRows))).appendTo($info);
       } else {
         $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadData')).appendTo($info);
       }
@@ -716,8 +716,7 @@ scout.TableFooter.prototype._onInfoLoadClick = function() {
     var estRows = this.table.estimatedRowCount;
     var maxRows = this.table.maxRowCount;
     if (estRows && maxRows && numRows < estRows && numRows < maxRows) {
-      // reloadReason: overrideRowLimit
-      this.table.reload("overrideRowLimit");
+      this.table.reload(scout.Table.ReloadReason.OVERRIDE_ROW_LIMIT);
     } else {
       this.table.reload();
     }
