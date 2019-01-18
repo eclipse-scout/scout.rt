@@ -359,7 +359,7 @@ scout.Column.prototype.onMouseUp = function(event, $row) {
 };
 
 scout.Column.prototype.isCellEditable = function(row, cell, event) {
-  return this.table.enabled && row.enabled && cell.editable && !event.ctrlKey && !event.shiftKey;
+  return this.table.enabledComputed && row.enabled && cell.editable && !event.ctrlKey && !event.shiftKey;
 };
 
 scout.Column.prototype.startCellEdit = function(row, field) {

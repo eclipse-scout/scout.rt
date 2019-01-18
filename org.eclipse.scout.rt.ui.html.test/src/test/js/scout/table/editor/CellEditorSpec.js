@@ -104,6 +104,16 @@ describe("CellEditor", function() {
     it("does not start cell edit if table is disabled", function() {
       table.rows[0].cells[0].editable = true;
       table.enabled = false;
+      table.recomputeEnabled();
+
+      spyOn(table, 'prepareCellEdit');
+      $cell0_0.triggerClick();
+      expect(table.prepareCellEdit).not.toHaveBeenCalled();
+    });
+
+    it("does not start cell edit if form is disabled", function() {
+      table.rows[0].cells[0].editable = true;
+      table.enabledComputed = false;
 
       spyOn(table, 'prepareCellEdit');
       $cell0_0.triggerClick();
