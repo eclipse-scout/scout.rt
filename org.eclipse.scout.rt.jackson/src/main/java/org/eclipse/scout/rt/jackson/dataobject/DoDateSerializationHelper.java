@@ -47,6 +47,6 @@ public class DoDateSerializationHelper {
     String pattern = m_dataObjectInventory.get().getAttributeDescription(entityClass, name)
         .flatMap(DataObjectAttributeDescriptor::getFormatPattern)
         .orElse(IValueFormatConstants.DEFAULT_DATE_PATTERN);
-    return new SimpleDateFormat(pattern);
+    return new StrictSimpleDateFormat(pattern);
   }
 }

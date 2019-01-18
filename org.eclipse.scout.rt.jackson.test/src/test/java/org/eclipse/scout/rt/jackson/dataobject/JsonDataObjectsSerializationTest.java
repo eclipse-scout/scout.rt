@@ -306,6 +306,37 @@ public class JsonDataObjectsSerializationTest {
     s_dataObjectMapper.readValue(expectedJson, TestDateDo.class);
   }
 
+  /**
+   * JSON file with a valid date for TestDateDo attribute "dateOnly", but pattern does not match exactly.
+   * <p>
+   * Requires {@link StrictSimpleDateFormat}
+   */
+  @Test(expected = InvalidFormatException.class)
+  public void testDeserialize_InvalidDate3Do() throws Exception {
+    String expectedJson = readResourceAsString("TestInvalidDate3Do.json");
+    s_dataObjectMapper.readValue(expectedJson, TestDateDo.class);
+  }
+
+  /**
+   * JSON file with an incomplete date for TestDateDo attribute "dateDefault"
+   */
+  @Test(expected = InvalidFormatException.class)
+  public void testDeserialize_InvalidDate4Do() throws Exception {
+    String expectedJson = readResourceAsString("TestInvalidDate4Do.json");
+    s_dataObjectMapper.readValue(expectedJson, TestDateDo.class);
+  }
+
+  /**
+   * JSON file with a valid date for TestDateDo attribute "dateDefault", but pattern does not match exactly.
+   * <p>
+   * Requires {@link StrictSimpleDateFormat}
+   */
+  @Test(expected = InvalidFormatException.class)
+  public void testDeserialize_InvalidDate5Do() throws Exception {
+    String expectedJson = readResourceAsString("TestInvalidDate5Do.json");
+    s_dataObjectMapper.readValue(expectedJson, TestDateDo.class);
+  }
+
   @Test
   public void testSerialize_BinaryResource() throws Exception {
     TestBinaryResourceDo testDo = BEANS.get(TestBinaryResourceDo.class).withBrDefault(BINARY_RESOURCE);
