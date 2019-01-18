@@ -552,6 +552,10 @@ scout.Desktop.prototype._setBenchLayoutData = function(layoutData) {
   this._setProperty('benchLayoutData', layoutData);
 };
 
+scout.Desktop.prototype._setInBackground = function(inBackground) {
+  this._setProperty('inBackground', inBackground);
+};
+
 scout.Desktop.prototype.outlineDisplayStyle = function() {
   if (this.outline) {
     return this.outline.displayStyle;
@@ -706,7 +710,7 @@ scout.Desktop.prototype.bringOutlineToFront = function() {
     return;
   }
 
-  this.inBackground = false;
+  this._setInBackground(false);
   this._setOutlineActivated();
 
   if (this.navigationVisible) {
@@ -726,7 +730,7 @@ scout.Desktop.prototype.sendOutlineToBack = function() {
   if (this.inBackground) {
     return;
   }
-  this.inBackground = true;
+  this._setInBackground(true);
   if (this.navigationVisible) {
     this.navigation.sendToBack();
   }

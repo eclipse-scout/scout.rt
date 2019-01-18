@@ -20,8 +20,23 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
  */
 public class TestEnvironmentDesktop extends AbstractDesktop implements IDesktop {
 
+  private Boolean m_overrideDefereDataChangeEvents; // TODO [9.x] abr: remove this flag
+
   @Override
   protected String getConfiguredTitle() {
     return "Test Environment Application";
+  }
+
+  @Override
+  @SuppressWarnings("deprecation")
+  protected boolean isDefereDataChangedEventsIfDesktopInBackground() {
+    if (m_overrideDefereDataChangeEvents != null) {
+      return m_overrideDefereDataChangeEvents.booleanValue();
+    }
+    return super.isDefereDataChangedEventsIfDesktopInBackground();
+  }
+
+  public void overrideDefereDataChangedEventsIfDesktopInBackground(Boolean b) {
+    m_overrideDefereDataChangeEvents = b;
   }
 }

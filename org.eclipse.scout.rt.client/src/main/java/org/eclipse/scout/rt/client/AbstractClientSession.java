@@ -387,23 +387,31 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
           }
         }
       }
-      for (Map.Entry<Object, EventListenerList> e : m_virtualDesktop.getDataChangeListenerMap().entrySet()) {
-        Object dataType = e.getKey();
-        EventListenerList list = e.getValue();
-        if (dataType == null) {
-          for (DataChangeListener listener : list.getListeners(DataChangeListener.class)) {
-            m_desktop.addDataChangeListener(listener);
-          }
-        }
-        else {
-          for (DataChangeListener listener : list.getListeners(DataChangeListener.class)) {
-            m_desktop.addDataChangeListener(listener, dataType);
-          }
-        }
-      }
+      addDataChangeListeners(m_desktop, false, m_virtualDesktop.getDataChangeListenerMap());
+      addDataChangeListeners(m_desktop, true, m_virtualDesktop.getDataChangeDesktopInForegroundListeners());
       m_virtualDesktop = null;
     }
     m_desktop.initDesktop();
+  }
+
+  private final static Object[] NULL_DATA_TYPES = new Object[0];
+
+  /**
+   * Add data change listeners on the given desktop.
+   */
+  protected void addDataChangeListeners(IDesktop desktop, boolean requiresDesktopInForeground, Map<Object, EventListenerList> dataChangeListenerMap) {
+    for (Map.Entry<Object, EventListenerList> e : dataChangeListenerMap.entrySet()) {
+      Object[] dataTypes = e.getKey() == null ? NULL_DATA_TYPES : new Object[]{e.getKey()};
+      EventListenerList list = e.getValue();
+      for (DataChangeListener listener : list.getListeners(DataChangeListener.class)) {
+        if (requiresDesktopInForeground) {
+          desktop.addDataChangeDesktopInForegroundListener(listener, dataTypes);
+        }
+        else {
+          desktop.addDataChangeListener(listener, dataTypes);
+        }
+      }
+    }
   }
 
   /**
