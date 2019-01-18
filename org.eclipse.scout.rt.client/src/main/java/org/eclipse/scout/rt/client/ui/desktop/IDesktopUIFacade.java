@@ -87,4 +87,5 @@ public interface IDesktopUIFacade {
    */
   void removedNotificationFromUI(IDesktopNotification desktopNotification);
 
+  void setInBackgroundFromUI(boolean inBackground);
 }

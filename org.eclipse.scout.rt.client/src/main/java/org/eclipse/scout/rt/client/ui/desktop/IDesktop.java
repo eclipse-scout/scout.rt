@@ -130,6 +130,8 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   String PROP_HEADER_VISIBLE = "headerVisible";
 
+  String PROP_IN_BACKGROUND = "inBackground";
+
   String PROP_BENCH_VISIBLE = "benchVisible";
 
   String PROP_BENCH_LAYOUT_DATA = "benchLayoutData";
@@ -470,12 +472,24 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   IDataChangeManager dataChangeListeners();
 
+  IDataChangeManager dataChangeDesktopInForegroundListeners();
+
   default void addDataChangeListener(IDataChangeListener listener, Object... dataTypes) {
     dataChangeListeners().add(listener, false, dataTypes);
   }
 
+  /**
+   * Add Data Change Observer that is notified only if this desktop is in foreground (evaluated by the UI-layer, not
+   * controlled by the client model) and if {@link #isDataChanging()} returns {@code false}. Otherwise data change
+   * notifications are deferred until the two conditions are met.
+   */
+  default void addDataChangeDesktopInForegroundListener(IDataChangeListener listener, Object... dataTypes) {
+    dataChangeDesktopInForegroundListeners().add(listener, false, dataTypes);
+  }
+
   default void removeDataChangeListener(IDataChangeListener listener, Object... dataTypes) {
     dataChangeListeners().remove(listener, dataTypes);
+    dataChangeDesktopInForegroundListeners().remove(listener, dataTypes);
   }
 
   /**
@@ -878,6 +892,13 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * @since 6.0
    */
   boolean isHeaderVisible();
+
+  /**
+   * @return {@code true} if the desktop in the UI (i.e. web browser) is in the background. <b>Note:</b> The outline
+   *         tree may still be visible.
+   * @since 6.1
+   */
+  boolean isInBackground();
 
   /**
    * @return the {@link IEventHistory} associated with this desktop (may be <code>null</code>).

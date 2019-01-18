@@ -351,6 +351,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
                 }
               }));
       m_desktop.dataChangeListeners().addAll(m_virtualDesktop.dataChangeListeners());
+      m_desktop.dataChangeDesktopInForegroundListeners().addAll(m_virtualDesktop.dataChangeDesktopInForegroundListeners());
       m_virtualDesktop = null;
     }
     m_desktop.init();

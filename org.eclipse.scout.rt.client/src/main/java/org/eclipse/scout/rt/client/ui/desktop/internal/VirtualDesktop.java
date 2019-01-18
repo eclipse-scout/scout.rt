@@ -66,11 +66,13 @@ public class VirtualDesktop implements IDesktop {
   private final DesktopListeners m_listeners;
   private final BasicPropertySupport m_propertyChangeListeners;
   private final IDataChangeManager m_dataChangeListeners;
+  private final IDataChangeManager m_dataChangeDesktopInForegroundListeners;
 
   public VirtualDesktop() {
     m_listeners = new DesktopListeners();
     m_propertyChangeListeners = new BasicPropertySupport(this);
     m_dataChangeListeners = BEANS.get(IDataChangeManager.class);
+    m_dataChangeDesktopInForegroundListeners = BEANS.get(IDataChangeManager.class);
   }
 
   public Map<String, List<PropertyChangeListener>> getPropertyChangeListenerMap() {
@@ -105,6 +107,11 @@ public class VirtualDesktop implements IDesktop {
   @Override
   public IDataChangeManager dataChangeListeners() {
     return m_dataChangeListeners;
+  }
+
+  @Override
+  public IDataChangeManager dataChangeDesktopInForegroundListeners() {
+    return m_dataChangeDesktopInForegroundListeners;
   }
 
   private UnsupportedOperationException createUnsupportedOperationException() {
@@ -755,6 +762,11 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public boolean isNavigationHandleVisible() {
+    return false;
+  }
+
+  @Override
+  public boolean isInBackground() {
     return false;
   }
 
