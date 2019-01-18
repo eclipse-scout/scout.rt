@@ -944,7 +944,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       };
     }
 
-    IDesktop.CURRENT.get().addDataChangeListener(m_internalDataChangeListener, dataTypes);
+    IDesktop.CURRENT.get().addDataChangeDesktopInForegroundListener(m_internalDataChangeListener, dataTypes);
   }
 
   @Override

@@ -16,9 +16,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -88,6 +85,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.OrderedComparator;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
@@ -101,6 +99,7 @@ import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -108,7 +107,6 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
-import org.eclipse.scout.rt.platform.util.event.SimpleEventListenerList;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
@@ -149,8 +147,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private List<IDesktopExtension> m_desktopExtensions;
   private final EventListenerList m_listenerList;
   private int m_dataChanging;
-  private final List<Object[]> m_dataChangeEventBuffer;
-  private final Map<Object, SimpleEventListenerList<DataChangeListener>> m_dataChangeListenerList;
+  private DataChangeListenerSupport m_dataChangeListeners;
+  private DataChangeListenerSupport m_dataChangeDesktopInForegroundListeners;
   private final IDesktopUIFacade m_uiFacade;
   private List<IOutline> m_availableOutlines;
   private IOutline m_outline;
@@ -176,6 +174,15 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private int m_attachedGuis = 0;
 
   /**
+   * Controls whether deferred data change events are supported in the current environment.
+   *
+   * @deprecated will be removed in 9.x release
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  private final boolean m_defereDataChangedEventsIfDesktopInBackground = BooleanUtility.nvl(CONFIG.getPropertyValue(org.eclipse.scout.rt.client.ClientConfigProperties.DefereDataChangeEventsIfDesktopInBackground.class));
+
+  /**
    * do not instantiate a new desktop<br>
    * get it via {@code ClientScoutSession.getSession().getModelManager()}
    */
@@ -186,8 +193,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   public AbstractDesktop(boolean callInitializer) {
     m_localDesktopExtension = new P_LocalDesktopExtension();
     m_listenerList = new EventListenerList();
-    m_dataChangeListenerList = new HashMap<>();
-    m_dataChangeEventBuffer = new ArrayList<>();
+    m_dataChangeListeners = BEANS.get(DataChangeListenerSupport.class).withName("Immediatley");
+    m_dataChangeDesktopInForegroundListeners = BEANS.get(DataChangeListenerSupport.class).withName("Desktop in foreground");
     m_formStore = BEANS.get(FormStore.class);
     m_selectedViewTabs = new HashMap<String, IForm>();
     m_messageBoxStore = BEANS.get(MessageBoxStore.class);
@@ -767,6 +774,17 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       setHeaderVisible(getConfiguredHeaderVisible());
       setBenchVisible(getConfiguredBenchVisible());
     }
+  }
+
+  /**
+   * Returns <code>true</code> if deferred data change events are supported in the current environment. Otherwise
+   * <code>false</code>.
+   *
+   * @deprecated will be removed in 9.x release
+   */
+  @Deprecated
+  protected boolean isDefereDataChangedEventsIfDesktopInBackground() {
+    return m_defereDataChangedEventsIfDesktopInBackground;
   }
 
   @Override
@@ -1713,52 +1731,23 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void addDataChangeListener(DataChangeListener listener, Object... dataTypes) {
-    if (dataTypes == null || dataTypes.length == 0) {
-      SimpleEventListenerList<DataChangeListener> list = m_dataChangeListenerList.get(null);
-      if (list == null) {
-        list = new SimpleEventListenerList<DataChangeListener>();
-        m_dataChangeListenerList.put(null, list);
-      }
-      list.add(listener);
+    m_dataChangeListeners.addDataChangeListener(listener, dataTypes);
+  }
+
+  @Override
+  public void addDataChangeDesktopInForegroundListener(DataChangeListener listener, Object... dataTypes) {
+    if (isDefereDataChangedEventsIfDesktopInBackground()) {
+      m_dataChangeDesktopInForegroundListeners.addDataChangeListener(listener, dataTypes);
     }
     else {
-      for (Object dataType : dataTypes) {
-        if (dataType != null) {
-          SimpleEventListenerList<DataChangeListener> list = m_dataChangeListenerList.get(dataType);
-          if (list == null) {
-            list = new SimpleEventListenerList<DataChangeListener>();
-            m_dataChangeListenerList.put(dataType, list);
-          }
-          list.add(listener);
-        }
-      }
+      addDataChangeListener(listener, dataTypes);
     }
   }
 
   @Override
   public void removeDataChangeListener(DataChangeListener listener, Object... dataTypes) {
-    if (dataTypes == null || dataTypes.length == 0) {
-      for (Iterator<SimpleEventListenerList<DataChangeListener>> it = m_dataChangeListenerList.values().iterator(); it.hasNext();) {
-        SimpleEventListenerList<DataChangeListener> list = it.next();
-        list.remove(listener);
-        if (list.isEmpty()) {
-          it.remove();
-        }
-      }
-    }
-    else {
-      for (Object dataType : dataTypes) {
-        if (dataType != null) {
-          SimpleEventListenerList<DataChangeListener> list = m_dataChangeListenerList.get(dataType);
-          if (list != null) {
-            list.remove(listener);
-            if (list.isEmpty()) {
-              m_dataChangeListenerList.remove(dataType);
-            }
-          }
-        }
-      }
-    }
+    m_dataChangeListeners.removeDataChangeListener(listener, dataTypes);
+    m_dataChangeDesktopInForegroundListeners.removeDataChangeListener(listener, dataTypes);
   }
 
   @Override
@@ -1771,65 +1760,17 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     if (b) {
       m_dataChanging++;
     }
-    else {
-      if (m_dataChanging > 0) {
-        m_dataChanging--;
-        if (m_dataChanging == 0) {
-          processDataChangeBuffer();
-        }
-      }
+    else if (m_dataChanging > 0) {
+      m_dataChanging--;
     }
+    m_dataChangeListeners.setBuffering(isDataChanging());
+    m_dataChangeDesktopInForegroundListeners.setBuffering(isDataChanging() || isInBackground());
   }
 
   @Override
   public void dataChanged(Object... dataTypes) {
-    if (isDataChanging()) {
-      if (dataTypes != null && dataTypes.length > 0) {
-        m_dataChangeEventBuffer.add(dataTypes);
-      }
-    }
-    else {
-      fireDataChangedImpl(dataTypes);
-    }
-  }
-
-  private void processDataChangeBuffer() {
-    Set<Object> knownEvents = new HashSet<Object>();
-    for (Object[] dataTypes : m_dataChangeEventBuffer) {
-      for (Object dataType : dataTypes) {
-        knownEvents.add(dataType);
-      }
-    }
-    m_dataChangeEventBuffer.clear();
-    fireDataChangedImpl(knownEvents.toArray(new Object[knownEvents.size()]));
-  }
-
-  private void fireDataChangedImpl(Object... dataTypes) {
-    if (dataTypes != null && dataTypes.length > 0) {
-      // Important: Use LinkedHashMaps to make event firing deterministic!
-      // (If listeners would be called in random order, bugs may not be reproduced very well.)
-      HashMap<DataChangeListener, Set<Object>> map = new LinkedHashMap<>();
-      for (Object dataType : dataTypes) {
-        if (dataType != null) {
-          SimpleEventListenerList<DataChangeListener> listenerList = m_dataChangeListenerList.get(dataType);
-          if (listenerList != null) {
-            for (DataChangeListener listener : listenerList.list()) {
-              Set<Object> typeSet = map.get(listener);
-              if (typeSet == null) {
-                typeSet = new LinkedHashSet<Object>();
-                map.put(listener, typeSet);
-              }
-              typeSet.add(dataType);
-            }
-          }
-        }
-      }
-      for (Map.Entry<DataChangeListener, Set<Object>> e : map.entrySet()) {
-        DataChangeListener listener = e.getKey();
-        Set<Object> typeSet = e.getValue();
-        listener.dataChanged(typeSet.toArray());
-      }
-    }
+    m_dataChangeListeners.dataChanged(dataTypes);
+    m_dataChangeDesktopInForegroundListeners.dataChanged(dataTypes);
   }
 
   private void fireDesktopClosed() {
@@ -2391,6 +2332,16 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return (boolean) propertySupport.getProperty(PROP_HEADER_VISIBLE);
   }
 
+  protected void setInBackground(boolean inBackground) {
+    propertySupport.setPropertyBool(PROP_IN_BACKGROUND, inBackground);
+    m_dataChangeDesktopInForegroundListeners.setBuffering(inBackground || isDataChanging());
+  }
+
+  @Override
+  public boolean isInBackground() {
+    return propertySupport.getPropertyBool(PROP_IN_BACKGROUND);
+  }
+
   /**
    * local desktop extension that calls local exec methods and returns local contributions in this class itself
    */
@@ -2580,6 +2531,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     @Override
     public void setBenchVisibleFromUI(boolean visible) {
       setBenchVisible(visible);
+    }
+
+    @Override
+    public void setInBackgroundFromUI(boolean inBackground) {
+      setInBackground(inBackground);
     }
 
     @Override

@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.BrowserHistoryEntry;
+import org.eclipse.scout.rt.client.ui.desktop.DataChangeListenerSupport;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -44,8 +45,10 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.event.SimpleEventListenerList;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 
 /**
@@ -63,20 +66,26 @@ public class VirtualDesktop implements IDesktop {
 
   private final EventListenerList m_listenerList;
   private final Map<String, EventListenerList> m_propertyChangeListenerMap;
-  private final Map<Object, EventListenerList> m_dataChangeListenerMap;
+  private DataChangeListenerSupport m_dataChangeListeners;
+  private DataChangeListenerSupport m_dataChangeDesktopInForegroundListeners;
 
   public VirtualDesktop() {
     m_listenerList = new EventListenerList();
     m_propertyChangeListenerMap = new HashMap<String, EventListenerList>();
-    m_dataChangeListenerMap = new HashMap<Object, EventListenerList>();
+    m_dataChangeListeners = BEANS.get(DataChangeListenerSupport.class).withName("Immediatley");
+    m_dataChangeDesktopInForegroundListeners = BEANS.get(DataChangeListenerSupport.class).withName("Desktop in foreground");
   }
 
   public DesktopListener[] getDesktopListeners() {
     return m_listenerList.getListeners(DesktopListener.class);
   }
 
-  public Map<Object, EventListenerList> getDataChangeListenerMap() {
-    return m_dataChangeListenerMap;
+  public Map<Object, SimpleEventListenerList<DataChangeListener>> getDataChangeListenerMap() {
+    return m_dataChangeListeners.getListenersByDataType();
+  }
+
+  public Map<Object, SimpleEventListenerList<DataChangeListener>> getDataChangeDesktopInForegroundListeners() {
+    return m_dataChangeDesktopInForegroundListeners.getListenersByDataType();
   }
 
   public Map<String, EventListenerList> getPropertyChangeListenerMap() {
@@ -142,52 +151,18 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void addDataChangeListener(DataChangeListener listener, Object... dataTypes) {
-    if (dataTypes == null || dataTypes.length == 0) {
-      EventListenerList list = m_dataChangeListenerMap.get(null);
-      if (list == null) {
-        list = new EventListenerList();
-        m_dataChangeListenerMap.put(null, list);
-      }
-      list.add(DataChangeListener.class, listener);
-    }
-    else {
-      for (Object dataType : dataTypes) {
-        if (dataType != null) {
-          EventListenerList list = m_dataChangeListenerMap.get(dataType);
-          if (list == null) {
-            list = new EventListenerList();
-            m_dataChangeListenerMap.put(dataType, list);
-          }
-          list.add(DataChangeListener.class, listener);
-        }
-      }
-    }
+    m_dataChangeListeners.addDataChangeListener(listener, dataTypes);
+  }
+
+  @Override
+  public void addDataChangeDesktopInForegroundListener(DataChangeListener listener, Object... dataTypes) {
+    m_dataChangeDesktopInForegroundListeners.addDataChangeListener(listener, dataTypes);
   }
 
   @Override
   public void removeDataChangeListener(DataChangeListener listener, Object... dataTypes) {
-    if (dataTypes == null || dataTypes.length == 0) {
-      for (Iterator<EventListenerList> it = m_dataChangeListenerMap.values().iterator(); it.hasNext();) {
-        EventListenerList list = it.next();
-        list.removeAll(DataChangeListener.class, listener);
-        if (list.getListenerCount(DataChangeListener.class) == 0) {
-          it.remove();
-        }
-      }
-    }
-    else {
-      for (Object dataType : dataTypes) {
-        if (dataType != null) {
-          EventListenerList list = m_dataChangeListenerMap.get(dataType);
-          if (list != null) {
-            list.remove(DataChangeListener.class, listener);
-            if (list.getListenerCount(DataChangeListener.class) == 0) {
-              m_dataChangeListenerMap.remove(dataType);
-            }
-          }
-        }
-      }
-    }
+    m_dataChangeListeners.removeDataChangeListener(listener, dataTypes);
+    m_dataChangeDesktopInForegroundListeners.removeDataChangeListener(listener, dataTypes);
   }
 
   private UnsupportedOperationException createUnsupportedOperationException() {
@@ -740,6 +715,11 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public boolean isNavigationHandleVisible() {
+    return false;
+  }
+
+  @Override
+  public boolean isInBackground() {
     return false;
   }
 

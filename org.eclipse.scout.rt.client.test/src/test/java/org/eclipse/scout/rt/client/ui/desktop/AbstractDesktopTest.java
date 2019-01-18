@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.desktop;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -303,6 +304,77 @@ public class AbstractDesktopTest {
   }
 
   @Test
+  public void testDataChangedSimpleDesktopInForeground() {
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
+    // move desktop to background (actually performed by the UI-layer only, but for testing purposes done manually)
+    desktop.setInBackground(true);
+
+    final Holder<Object[]> resultHolder = new Holder<Object[]>(Object[].class);
+    final Holder<Object[]> desktopInForegroundResultHolder = new Holder<Object[]>(Object[].class);
+    desktop.addDataChangeListener(new DataChangeListener() {
+      @Override
+      public void dataChanged(Object... dataTypes) {
+        resultHolder.setValue(dataTypes);
+      }
+    }, TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+    desktop.addDataChangeDesktopInForegroundListener(new DataChangeListener() {
+      @Override
+      public void dataChanged(Object... dataTypes) {
+        desktopInForegroundResultHolder.setValue(dataTypes);
+      }
+    }, TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+
+    desktop.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+    verifyDataChanged(resultHolder);
+    assertNull(desktopInForegroundResultHolder.getValue());
+
+    // move desktop to foreground -> foreground listener is expected to be notified
+    resultHolder.setValue(null);
+    desktop.setInBackground(false);
+    assertNull(resultHolder.getValue());
+    verifyDataChanged(desktopInForegroundResultHolder);
+  }
+
+  @Test
+  public void testDataChangedSimpleDesktopInForegroundLegacyMode() {
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
+    desktop.overrideDefereDataChangedEventsIfDesktopInBackground(false);
+    try {
+      // move desktop to background (actually performed by the UI-layer only, but for testing purposes done manually)
+      desktop.setInBackground(true);
+
+      final Holder<Object[]> resultHolder = new Holder<Object[]>(Object[].class);
+      final Holder<Object[]> desktopInForegroundResultHolder = new Holder<Object[]>(Object[].class);
+      desktop.addDataChangeListener(new DataChangeListener() {
+        @Override
+        public void dataChanged(Object... dataTypes) {
+          resultHolder.setValue(dataTypes);
+        }
+      }, TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+      desktop.addDataChangeDesktopInForegroundListener(new DataChangeListener() {
+        @Override
+        public void dataChanged(Object... dataTypes) {
+          desktopInForegroundResultHolder.setValue(dataTypes);
+        }
+      }, TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+
+      desktop.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+      verifyDataChanged(resultHolder);
+      verifyDataChanged(desktopInForegroundResultHolder);
+
+      // move desktop to foreground -> no more events are expected
+      resultHolder.setValue(null);
+      desktopInForegroundResultHolder.setValue(null);
+      desktop.setInBackground(false);
+      assertNull(resultHolder.getValue());
+      assertNull(desktopInForegroundResultHolder.getValue());
+    }
+    finally {
+      desktop.overrideDefereDataChangedEventsIfDesktopInBackground(null);
+    }
+  }
+
+  @Test
   public void testDataChangedChanging() {
     TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
 
@@ -324,6 +396,91 @@ public class AbstractDesktopTest {
     desktop.dataChanged(TEST_DATA_TYPE_2);
     desktop.setDataChanging(false);
     verifyDataChanged(resultHolder);
+  }
+
+  @Test
+  public void testDataChangedChangingDesktopInForeground() {
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
+    // move desktop to background (actually performed by the UI-layer only, but for testing purposes done manually)
+    desktop.setInBackground(true);
+
+    final Holder<Object[]> resultHolder = new Holder<Object[]>(Object[].class);
+    final Holder<Object[]> desktopInForegroundResultHolder = new Holder<Object[]>(Object[].class);
+    desktop.addDataChangeListener(new DataChangeListener() {
+      @Override
+      public void dataChanged(Object... dataTypes) {
+        resultHolder.setValue(dataTypes);
+      }
+    }, TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+    desktop.addDataChangeDesktopInForegroundListener(new DataChangeListener() {
+      @Override
+      public void dataChanged(Object... dataTypes) {
+        desktopInForegroundResultHolder.setValue(dataTypes);
+      }
+    }, TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+
+    desktop.setDataChanging(true);
+    desktop.dataChanged(TEST_DATA_TYPE_1);
+    desktop.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_1, TEST_DATA_TYPE_1);
+    desktop.dataChanged(TEST_DATA_TYPE_2, TEST_DATA_TYPE_2);
+    desktop.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+    desktop.dataChanged(TEST_DATA_TYPE_1);
+    desktop.dataChanged(TEST_DATA_TYPE_2);
+    desktop.setDataChanging(false);
+    verifyDataChanged(resultHolder);
+    assertNull(desktopInForegroundResultHolder.getValue());
+
+    // move desktop to foreground -> foreground listener is expected to be notified
+    resultHolder.setValue(null);
+    desktop.setInBackground(false);
+    assertNull(resultHolder.getValue());
+    verifyDataChanged(desktopInForegroundResultHolder);
+  }
+
+  @Test
+  public void testDataChangedChangingDesktopInForegroundLegacyMode() {
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
+    desktop.overrideDefereDataChangedEventsIfDesktopInBackground(false);
+    try {
+      // move desktop to background (actually performed by the UI-layer only, but for testing purposes done manually)
+      desktop.setInBackground(true);
+
+      final Holder<Object[]> resultHolder = new Holder<Object[]>(Object[].class);
+      final Holder<Object[]> desktopInForegroundResultHolder = new Holder<Object[]>(Object[].class);
+      desktop.addDataChangeListener(new DataChangeListener() {
+        @Override
+        public void dataChanged(Object... dataTypes) {
+          resultHolder.setValue(dataTypes);
+        }
+      }, TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+      desktop.addDataChangeDesktopInForegroundListener(new DataChangeListener() {
+        @Override
+        public void dataChanged(Object... dataTypes) {
+          desktopInForegroundResultHolder.setValue(dataTypes);
+        }
+      }, TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+
+      desktop.setDataChanging(true);
+      desktop.dataChanged(TEST_DATA_TYPE_1);
+      desktop.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_1, TEST_DATA_TYPE_1);
+      desktop.dataChanged(TEST_DATA_TYPE_2, TEST_DATA_TYPE_2);
+      desktop.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+      desktop.dataChanged(TEST_DATA_TYPE_1);
+      desktop.dataChanged(TEST_DATA_TYPE_2);
+      desktop.setDataChanging(false);
+      verifyDataChanged(resultHolder);
+      verifyDataChanged(desktopInForegroundResultHolder);
+
+      // move desktop to foreground -> no more events are expected
+      resultHolder.setValue(null);
+      desktopInForegroundResultHolder.setValue(null);
+      desktop.setInBackground(false);
+      assertNull(resultHolder.getValue());
+      assertNull(desktopInForegroundResultHolder.getValue());
+    }
+    finally {
+      desktop.overrideDefereDataChangedEventsIfDesktopInBackground(null);
+    }
   }
 
   @Test

@@ -58,6 +58,7 @@ import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
+import org.eclipse.scout.rt.platform.util.event.SimpleEventListenerList;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -386,23 +387,30 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
           }
         }
       }
-      for (Map.Entry<Object, EventListenerList> e : m_virtualDesktop.getDataChangeListenerMap().entrySet()) {
-        Object dataType = e.getKey();
-        EventListenerList list = e.getValue();
-        if (dataType == null) {
-          for (DataChangeListener listener : list.getListeners(DataChangeListener.class)) {
-            m_desktop.addDataChangeListener(listener);
-          }
-        }
-        else {
-          for (DataChangeListener listener : list.getListeners(DataChangeListener.class)) {
-            m_desktop.addDataChangeListener(listener, dataType);
-          }
-        }
-      }
+      addDataChangeListeners(m_desktop, false, m_virtualDesktop.getDataChangeListenerMap());
+      addDataChangeListeners(m_desktop, true, m_virtualDesktop.getDataChangeDesktopInForegroundListeners());
       m_virtualDesktop = null;
     }
     m_desktop.initDesktop();
+  }
+
+  private final static Object[] NULL_DATA_TYPES = new Object[0];
+
+  /**
+   * Add data change listeners on the given desktop.
+   */
+  protected void addDataChangeListeners(IDesktop desktop, boolean requiresDesktopInForeground, Map<Object, SimpleEventListenerList<DataChangeListener>> dataChangeListenerMap) {
+    for (Map.Entry<Object, SimpleEventListenerList<DataChangeListener>> e : dataChangeListenerMap.entrySet()) {
+      Object[] dataTypes = e.getKey() == null ? NULL_DATA_TYPES : new Object[]{e.getKey()};
+      for (DataChangeListener listener : e.getValue().list()) {
+        if (requiresDesktopInForeground) {
+          desktop.addDataChangeDesktopInForegroundListener(listener, dataTypes);
+        }
+        else {
+          desktop.addDataChangeListener(listener, dataTypes);
+        }
+      }
+    }
   }
 
   /**
