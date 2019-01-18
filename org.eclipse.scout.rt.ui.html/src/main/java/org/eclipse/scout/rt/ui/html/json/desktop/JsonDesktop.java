@@ -156,6 +156,11 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
       addPropertyEventFilterCondition(propertyName, available);
       getModel().getUIFacade().setGeoLocationServiceAvailableFromUI(available);
     }
+    else if (IDesktop.PROP_IN_BACKGROUND.equals(propertyName)) {
+      boolean inBackground = data.getBoolean(propertyName);
+      addPropertyEventFilterCondition(propertyName, inBackground);
+      getModel().getUIFacade().setInBackgroundFromUI(inBackground);
+    }
     else {
       super.handleUiPropertyChange(propertyName, data);
     }

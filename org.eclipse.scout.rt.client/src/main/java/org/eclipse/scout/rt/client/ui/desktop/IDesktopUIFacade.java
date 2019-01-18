@@ -84,4 +84,6 @@ public interface IDesktopUIFacade {
    * Called after DesktopNotification was removed from UI
    */
   void removedNotificationFromUI(IDesktopNotification desktopNotification);
+
+  void setInBackgroundFromUI(boolean inBackground);
 }

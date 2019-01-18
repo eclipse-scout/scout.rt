@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop;
 
+import static java.util.Collections.emptySet;
+import static org.eclipse.scout.rt.platform.util.CollectionUtility.hashSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -19,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
@@ -306,6 +309,57 @@ public class AbstractDesktopTest {
   }
 
   @Test
+  public void testDataChangedSimpleDesktopInForeground() {
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
+    // move desktop to background (actually performed by the UI-layer only, but for testing purposes done manually)
+    desktop.setInBackground(true);
+
+    final Set<Object> types = new HashSet<>();
+    final Set<Object> desktopInForegroundTypes = new HashSet<>();
+    desktop.addDataChangeListener(e -> types.add(e.getDataType()), TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+    desktop.addDataChangeDesktopInForegroundListener(e -> desktopInForegroundTypes.add(e.getDataType()), TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+
+    desktop.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+    assertEquals(hashSet(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2), types);
+    assertEquals(emptySet(), desktopInForegroundTypes);
+
+    // move desktop to foreground -> foreground listener is expected to be notified
+    types.clear();
+    desktop.setInBackground(false);
+    assertEquals(emptySet(), types);
+    assertEquals(hashSet(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2), desktopInForegroundTypes);
+  }
+
+  @Test
+  public void testDataChangedSimpleDesktopInForegroundLegacyMode() {
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
+    desktop.overrideDefereDataChangedEventsIfDesktopInBackground(false);
+    try {
+      // move desktop to background (actually performed by the UI-layer only, but for testing purposes done manually)
+      desktop.setInBackground(true);
+
+      final Set<Object> types = new HashSet<>();
+      final Set<Object> desktopInForegroundTypes = new HashSet<>();
+      desktop.addDataChangeListener(e -> types.add(e.getDataType()), TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+      desktop.addDataChangeDesktopInForegroundListener(e -> desktopInForegroundTypes.add(e.getDataType()), TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+
+      desktop.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+      assertEquals(hashSet(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2), types);
+      assertEquals(hashSet(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2), desktopInForegroundTypes);
+
+      // move desktop to foreground -> no more events are expected
+      types.clear();
+      desktopInForegroundTypes.clear();
+      desktop.setInBackground(false);
+      assertEquals(emptySet(), types);
+      assertEquals(emptySet(), desktopInForegroundTypes);
+    }
+    finally {
+      desktop.overrideDefereDataChangedEventsIfDesktopInBackground(null);
+    }
+  }
+
+  @Test
   public void testDataChangedChanging() {
     TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
 
@@ -326,6 +380,71 @@ public class AbstractDesktopTest {
     desktop.dataChanged(TEST_DATA_TYPE_2);
     desktop.setDataChanging(false);
     assertEquals(CollectionUtility.hashSet(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2), resultHolder);
+  }
+
+  @Test
+  public void testDataChangedChangingDesktopInForeground() {
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
+    // move desktop to background (actually performed by the UI-layer only, but for testing purposes done manually)
+    desktop.setInBackground(true);
+
+    final Set<Object> types = new HashSet<>();
+    final Set<Object> desktopInForegroundTypes = new HashSet<>();
+    desktop.addDataChangeListener(e -> types.add(e.getDataType()), TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+    desktop.addDataChangeDesktopInForegroundListener(e -> desktopInForegroundTypes.add(e.getDataType()), TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+
+    desktop.setDataChanging(true);
+    desktop.dataChanged(TEST_DATA_TYPE_1);
+    desktop.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_1, TEST_DATA_TYPE_1);
+    desktop.dataChanged(TEST_DATA_TYPE_2, TEST_DATA_TYPE_2);
+    desktop.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+    desktop.dataChanged(TEST_DATA_TYPE_1);
+    desktop.dataChanged(TEST_DATA_TYPE_2);
+    desktop.setDataChanging(false);
+    assertEquals(hashSet(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2), types);
+    assertEquals(emptySet(), desktopInForegroundTypes);
+
+    // move desktop to foreground -> foreground listener is expected to be notified
+    types.clear();
+    desktop.setInBackground(false);
+    assertEquals(emptySet(), types);
+    assertEquals(hashSet(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2), desktopInForegroundTypes);
+  }
+
+  @Test
+  public void testDataChangedChangingDesktopInForegroundLegacyMode() {
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
+    desktop.overrideDefereDataChangedEventsIfDesktopInBackground(false);
+    try {
+      // move desktop to background (actually performed by the UI-layer only, but for testing purposes done manually)
+      desktop.setInBackground(true);
+
+      final Set<Object> types = new HashSet<>();
+      final Set<Object> desktopInForegroundTypes = new HashSet<>();
+      desktop.addDataChangeListener(e -> types.add(e.getDataType()), TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+      desktop.addDataChangeDesktopInForegroundListener(e -> desktopInForegroundTypes.add(e.getDataType()), TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+
+      desktop.setDataChanging(true);
+      desktop.dataChanged(TEST_DATA_TYPE_1);
+      desktop.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_1, TEST_DATA_TYPE_1);
+      desktop.dataChanged(TEST_DATA_TYPE_2, TEST_DATA_TYPE_2);
+      desktop.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+      desktop.dataChanged(TEST_DATA_TYPE_1);
+      desktop.dataChanged(TEST_DATA_TYPE_2);
+      desktop.setDataChanging(false);
+      assertEquals(hashSet(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2), types);
+      assertEquals(hashSet(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2), desktopInForegroundTypes);
+
+      // move desktop to foreground -> no more events are expected
+      types.clear();
+      desktopInForegroundTypes.clear();
+      desktop.setInBackground(false);
+      assertEquals(emptySet(), types);
+      assertEquals(emptySet(), desktopInForegroundTypes);
+    }
+    finally {
+      desktop.overrideDefereDataChangedEventsIfDesktopInBackground(null);
+    }
   }
 
   @Test

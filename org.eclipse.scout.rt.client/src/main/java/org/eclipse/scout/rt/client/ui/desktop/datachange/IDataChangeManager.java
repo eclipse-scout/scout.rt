@@ -30,4 +30,8 @@ public interface IDataChangeManager {
   void remove(IDataChangeListener listener, Object... dataTypes);
 
   void fireEvent(DataChangeEvent event);
+
+  boolean isBuffering();
+
+  void setBuffering(boolean buffering);
 }

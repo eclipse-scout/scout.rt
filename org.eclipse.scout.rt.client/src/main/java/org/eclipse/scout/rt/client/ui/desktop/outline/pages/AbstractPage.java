@@ -926,7 +926,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     if (m_internalDataChangeListener == null) {
       m_internalDataChangeListener = event -> dataChanged(event.getDataType());
     }
-    IDesktop.CURRENT.get().dataChangeListeners().add(m_internalDataChangeListener, true, dataTypes);
+    IDesktop.CURRENT.get().dataChangeDesktopInForegroundListeners().add(m_internalDataChangeListener, true, dataTypes);
   }
 
   @Override

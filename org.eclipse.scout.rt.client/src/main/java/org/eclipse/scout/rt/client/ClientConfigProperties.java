@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
@@ -76,6 +78,31 @@ public final class ClientConfigProperties {
     @Override
     public Long getDefaultValue() {
       return 10L;
+    }
+  }
+
+  /**
+   * Switch to enable or disable support for deferred data changed events (i.e. to restore legacy behavior). <br>
+   * Note: this affects only those listeners registered by
+   * {@link IDesktop#addDataChangeDesktopInForegroundListener(org.eclipse.scout.rt.client.ui.DataChangeListener, Object...)}
+   *
+   * @deprecated legacy support will be removed in 9.x release
+   */
+  @Deprecated
+  public static class DefereDataChangeEventsIfDesktopInBackground extends AbstractBooleanConfigProperty {
+    @Override
+    public String getKey() {
+      return "scout.dataChange.defereEventsIfDesktopInBackground";
+    }
+
+    @Override
+    public String description() {
+      return "Switch to enable or disable support for deferred data changed events (i.e. to restore legacy behavior).";
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
+      return Boolean.TRUE;
     }
   }
 }
