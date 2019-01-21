@@ -637,11 +637,19 @@ scout.Table.prototype._showContextMenu = function(options) {
   var pageX = scout.nvl(options.pageX, null);
   var pageY = scout.nvl(options.pageY, null);
   if (pageX === null || pageY === null) {
-    var $rowToDisplay = this.selectionHandler.lastActionRow ? this.selectionHandler.lastActionRow.$row : this.selectedRows[this.selectedRows.length - 1].$row;
-    var offset = $rowToDisplay.offset();
-    offset.left += this.$data.scrollLeft();
-    pageX = offset.left + 10;
-    pageY = offset.top + $rowToDisplay.outerHeight() / 2;
+    var rowToDisplay = this.isRowSelectedAndVisible(this.selectionHandler.lastActionRow) ? this.selectionHandler.lastActionRow : this.getLastSelectedAndVisibleRow();
+    if (rowToDisplay !== null) {
+      var $rowToDisplay = rowToDisplay.$row;
+      var offset = $rowToDisplay.offset();
+      var dataOffsetBounds = scout.graphics.offsetBounds(this.$data);
+      offset.left += this.$data.scrollLeft();
+      pageX = offset.left + 10;
+      pageY = offset.top + $rowToDisplay.outerHeight() / 2;
+      pageY = Math.min(Math.max(pageY, dataOffsetBounds.y + 1), dataOffsetBounds.bottom() - 1);
+    } else {
+      pageX = this.$data.offset().left + 10;
+      pageY = this.$data.offset().top + 10;
+    }
   }
   // Prevent firing of 'onClose'-handler during contextMenu.open()
   // (Can lead to null-access when adding a new handler to this.contextMenu)
@@ -659,6 +667,22 @@ scout.Table.prototype._showContextMenu = function(options) {
     menuFilter: this._filterMenusHandler
   });
   this.contextMenu.open();
+};
+
+scout.Table.prototype.isRowSelectedAndVisible = function(row) {
+  if (!this.isRowSelected(row) || !row.$row) {
+    return false;
+  }
+  return scout.graphics.offsetBounds(row.$row).intersects(scout.graphics.offsetBounds(this.$data));
+};
+
+scout.Table.prototype.getLastSelectedAndVisibleRow = function() {
+  for (var i = this.viewRangeRendered.to; i >= this.viewRangeRendered.from; i--) {
+    if (this.isRowSelectedAndVisible(this.rows[i])) {
+      return this.rows[i];
+    }
+  }
+  return null;
 };
 
 scout.Table.prototype.onColumnVisibilityChanged = function(column) {

@@ -123,6 +123,31 @@ describe("graphics", function() {
       expect(r5.equals(r6)).toBe(false);
     });
 
+    it("intersects", function() {
+      var r1 = new scout.Rectangle(0, 0, 10, 5);
+      var r2 = new scout.Rectangle(0, 0, 20, -1);
+      var r3 = new scout.Rectangle(9, 0, 10, 5);
+      var r4 = new scout.Rectangle(10, 0, 10, 5);
+      var r5 = new scout.Rectangle(0, 4, 10, 5);
+      var r6 = new scout.Rectangle(0, 5, 10, 5);
+      var r7 = new scout.Rectangle(4, 7, 10, 5);
+      var r8 = new scout.Rectangle(7, 4, 10, 5);
+      var r9 = new scout.Rectangle(10, 5, 10, 5);
+      var r10 = new scout.Rectangle(12, 8, 10, 5);
+
+      expect(r1.intersects(r1)).toBe(true);
+      expect(r1.intersects(r2)).toBe(false);
+      expect(r2.intersects(r2)).toBe(false);
+      expect(r1.intersects(r5)).toBe(true);
+      expect(r1.intersects(r3)).toBe(true);
+      expect(r1.intersects(r4)).toBe(false);
+      expect(r1.intersects(r6)).toBe(false);
+      expect(r1.intersects(r7)).toBe(false);
+      expect(r1.intersects(r8)).toBe(true);
+      expect(r1.intersects(r9)).toBe(false);
+      expect(r1.intersects(r10)).toBe(false);
+    });
+
   });
 
   describe("Insets", function() {
