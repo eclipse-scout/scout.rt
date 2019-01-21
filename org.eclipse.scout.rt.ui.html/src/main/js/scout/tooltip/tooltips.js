@@ -191,7 +191,7 @@ scout.TooltipSupport.prototype._showTooltip = function($comp) {
   } else {
     // create new tooltip
     var options = $.extend({}, this._options, {
-      $anchor: $comp,
+      $anchor: this._options.$anchor || $comp,
       text: text
     });
     this._tooltip = scout.create('Tooltip', options);
