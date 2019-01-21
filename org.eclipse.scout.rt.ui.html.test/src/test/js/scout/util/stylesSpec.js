@@ -115,4 +115,36 @@ describe('scout.styles', function() {
     expect($el.attr('style')).toBe('background-color: purple;');
   });
 
+  describe('rgb', function() {
+    it('parses an rgb string', function() {
+      expect(scout.styles.rgb('rgb(255,100,200)')).toEqual({
+        red: 255,
+        green: 100,
+        blue: 200,
+        alpha: 1
+      });
+    });
+
+    it('supports alpha', function() {
+      expect(scout.styles.rgb('rgba(255,100,200,0.5)')).toEqual({
+        red: 255,
+        green: 100,
+        blue: 200,
+        alpha: 0.5
+      });
+      expect(scout.styles.rgb('rgba(20,150,50,0.25)')).toEqual({
+        red: 20,
+        green: 150,
+        blue: 50,
+        alpha: 0.25
+      });
+      expect(scout.styles.rgb('rgba(20,150,50,0)')).toEqual({
+        red: 20,
+        green: 150,
+        blue: 50,
+        alpha: 0
+      });
+    });
+  });
+
 });

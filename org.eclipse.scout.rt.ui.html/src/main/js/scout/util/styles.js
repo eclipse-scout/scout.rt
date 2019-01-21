@@ -99,14 +99,15 @@ scout.styles = {
     if (!rgbString) {
       return undefined;
     }
-    var rgb = rgbString.replace(/\s/g, '').match(/^rgba?\(([0-9]+),([0-9]+),([0-9]+)/i);
+    var rgb = rgbString.replace(/\s/g, '').match(/^rgba?\((\d+),(\d+),(\d+),?(\d+(\.\d+)?)?/i);
     if (rgb === null) {
       return undefined;
     }
     return {
       red: parseInt(rgb[1], 10),
       green: parseInt(rgb[2], 10),
-      blue: parseInt(rgb[3], 10)
+      blue: parseInt(rgb[3], 10),
+      alpha: parseFloat(scout.nvl(rgb[4], 1))
     };
   },
 
