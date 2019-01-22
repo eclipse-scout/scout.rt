@@ -431,7 +431,7 @@ scout.FormField.prototype._computeStatusVisible = function() {
     hasStatus = !!status,
     hasTooltip = !!this.tooltipText;
 
-  return !this.suppressStatus && (statusVisible || hasStatus || hasTooltip || (this._hasMenus() && this.menusVisible));
+  return !this.suppressStatus && (statusVisible || hasStatus || hasTooltip || (this.menusVisible && this._hasMenus()));
 };
 
 scout.FormField.prototype._renderChildVisible = function($child, visible) {
@@ -608,7 +608,7 @@ scout.FormField.prototype._hasMenus = function() {
 
 scout.FormField.prototype._updateMenus = function() {
   this._updateStatusVisible();
-  this.$container.toggleClass('has-menus', this._hasMenus() && this.menusVisible);
+  this.$container.toggleClass('has-menus', this.menusVisible && this._hasMenus());
 };
 
 scout.FormField.prototype._renderMenus = function() {
@@ -628,6 +628,10 @@ scout.FormField.prototype.setMenusVisible = function(menusVisible) {
 
 scout.FormField.prototype._renderMenusVisible = function() {
   this._updateMenus();
+};
+
+scout.FormField.prototype._updateMenusVisible = function() {
+  this.setMenusVisible(this._hasMenus());
 };
 
 scout.FormField.prototype._setKeyStrokes = function(keyStrokes) {
@@ -1275,7 +1279,25 @@ scout.FormField.prototype.clone = function(model, options) {
 };
 
 scout.FormField.prototype.onMenuPropertyChange = function(event) {
-  if (event.propertyName === 'visible' && this.rendered) {
-    this._updateMenus();
+  if (event.propertyName === 'visible') {
+    this._updateMenusVisible();
+    //this._updateMenus();
   }
 };
+
+scout.FormField.modifyPrototype = function() {
+  if (!scout.app.remote) {
+    return;
+  }
+
+  scout.objects.replacePrototypeFunction(scout.FormField, '_updateMenusVisible', function() {
+    if (this.modelAdapter) {
+      // Don't do anything -> let server handle it
+      return;
+    } else {
+      return this._updateMenusVisibleOrig();
+    }
+  }, true);
+};
+
+scout.addAppListener('bootstrap', scout.FormField.modifyPrototype);
