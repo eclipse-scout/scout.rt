@@ -38,7 +38,18 @@ scout.fonts = {
     this.loadingComplete = false;
     this.preload({
       fonts: fonts,
-      onComplete: function(success) {
+      onComplete: function(success, badFonts) {
+        if (!success && badFonts && badFonts.length) {
+          var msg = '[Scout] WARNING: Timeout ocurred while pre-loading the following fonts:\n\n- ' + badFonts.join('\n- ') + '\n\n' +
+            'Rendering will now continue, but font measurements may be inaccurate. ' +
+            'To prevent unnecessary startup delays and layout problems, check the @font-face ' +
+            'definitions and the referenced "src" URLs or programmatically add additional font-specific ' +
+            'characters to scout.fonts.TEST_STRING before calling app.init().';
+          $.log.warn(msg);
+          if (window && window.console) {
+            (window.console.warn || window.console.log)(msg);
+          }
+        }
         this.loadingComplete = true;
         this._deferred.resolve();
       }.bind(this)
@@ -57,9 +68,24 @@ scout.fonts = {
     return this._deferred.promise();
   },
 
-  DEFAULT_TEST_FONTS: 'monospace',
+  TEST_FONTS: 'monospace',
 
-  DEFAULT_TEST_STRING: 'ABC abc 123 .,_ LlIi1 oO0 !#@',
+  /**
+   * Test string used for font measurements. Used to detect when a font is fully loaded
+   * and available in the browser.
+   *
+   * Custom characters may be added to this test string if a font is not detected correctly
+   * because it does not contain any of the default characters.
+   *
+   * U+E000 = Start of Unicode private use zone (e.g. scoutIcons)
+   * U+F118 = Font Awesome: "smile"
+   */
+  TEST_STRING: 'ABC abc 123 .,_ LlIi1 oO0 !#@ \uE000\uE001\uE002 \uF118',
+
+  /**
+   * Time in milliseconds to wait for the fonts to be loaded.
+   */
+  TEST_TIMEOUT: 12 * 1000, // 12 sec
 
   /**
    * Loads the specified fonts in a hidden div, forcing the browser to load them.
@@ -82,16 +108,15 @@ scout.fonts = {
    *   [timeout]
    *     Optional timeout in milliseconds. If fonts could not be loaded within this time,
    *     loading is stopped and the onComplete method is called with argument 'false'.
-   *     Default is 30 seconds.
+   *     Defaults to scout.fonts.TEST_TIMEOUT.
    *   [testFonts]
    *     Optional. Test fonts (string separated by commas) to used as baseline when checking
-   *     if the specified fonts have been loaded. Defaults to scout.fonts.DEFAULT_TEST_FONTS.
+   *     if the specified fonts have been loaded. Defaults to scout.fonts.TEST_FONTS.
    *   [testString]
    *     Optional. The test string to use when checking if the specified fonts have been
    *     loaded. Should not be empty, because the empty string has always the width 0.
-   *     The default is scout.fonts.DEFAULT_TEST_STRING. The test string may also be
-   *     specified individually per font
-   *
+   *     The default is scout.fonts.TEST_STRING. The test string may also be specified
+   *     individually per font.
    *
    * Examples:
    *   preload({fonts: 'Sauna Pro'});
@@ -116,9 +141,6 @@ scout.fonts = {
       return;
     }
 
-    // these fonts are compared to the custom fonts, strings separated by comma
-    var testFonts = options.testFonts || scout.fonts.DEFAULT_TEST_FONTS;
-
     // Create a DIV for each font
     var divs = [];
     fonts.forEach(function(font) {
@@ -135,7 +157,10 @@ scout.fonts = {
       }
       font.family = font.family || '';
       font.style = font.style || '';
-      font.testString = font.testString || options.testString || scout.fonts.DEFAULT_TEST_STRING;
+      font.testString = font.testString || options.testString || scout.fonts.TEST_STRING;
+
+      // these fonts are compared to the custom fonts, strings separated by comma
+      var testFonts = font.testFonts || options.testFonts || scout.fonts.TEST_FONTS;
 
       // Create DIV with default fonts
       // (Because preloader functionality should not depend on a CSS style sheet we set the required properties programmatically.)
@@ -159,6 +184,7 @@ scout.fonts = {
       // Remember size, set new font, and then measure again
       var originalWidth = $div.outerWidth();
       $div.data('original-width', originalWidth);
+      $div.data('font-family', font.family);
       $div.css('font-family', '\'' + font.family + '\',' + testFonts);
       if (font.style) {
         var style = ($div.attr('style') || '').trim();
@@ -181,7 +207,7 @@ scout.fonts = {
     }
 
     var onFinished = complete;
-    var timeout = scout.nvl(options.timeout, 30 * 1000); // default timeout is 30 sec
+    var timeout = scout.nvl(options.timeout, scout.fonts.TEST_TIMEOUT);
     var watchTimerId, timeoutTimerId;
     if (timeout && timeout >= 0) {
       // Add timeout
@@ -227,7 +253,9 @@ scout.fonts = {
     }
 
     function complete(success) {
-      options.onComplete(success);
+      options.onComplete(success, divs.map(function($div) {
+        return $div.data('font-family');
+      }));
     }
   },
 
