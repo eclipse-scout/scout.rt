@@ -20,6 +20,12 @@ scout.DesktopTab.prototype._render = function() {
 };
 
 scout.DesktopTab.prototype._onContextMenu = function() {
+  var menuCloseAllTabs = scout.create('Menu', {
+    parent: this,
+    text: this.session.text('ui.CloseAllTabs')
+  });
+  menuCloseAllTabs.on('action', this._onCloseAll.bind(this));
+
   var menuCloseOtherTabs = scout.create('Menu', {
     parent: this,
     text: this.session.text('ui.CloseOtherTabs'),
@@ -27,15 +33,9 @@ scout.DesktopTab.prototype._onContextMenu = function() {
   });
   menuCloseOtherTabs.on('action', this._onCloseOther.bind(this));
 
-  var menuCloseAllTabs = scout.create('Menu', {
-    parent: this,
-    text: this.session.text('ui.CloseAllTabs')
-  });
-  menuCloseAllTabs.on('action', this._onCloseAll.bind(this));
-
   var popup = scout.create('ContextMenuPopup', {
     parent: this,
-    menuItems: [menuCloseOtherTabs, menuCloseAllTabs],
+    menuItems: [menuCloseAllTabs, menuCloseOtherTabs],
     cloneMenuItems: false,
     location: {
       x: event.pageX,
@@ -49,7 +49,11 @@ scout.DesktopTab.prototype._onCloseAll = function() {
   var openViews = this.parent.tabs.map(function(desktopTab) {
     return desktopTab.view;
   });
-  this.session.desktop.closeViews(openViews);
+  if (openViews.length === 1) {
+    openViews[0].cancel();
+  } else {
+    this.session.desktop.closeViews(openViews);
+  }
 };
 
 scout.DesktopTab.prototype._onCloseOther = function() {
@@ -57,6 +61,9 @@ scout.DesktopTab.prototype._onCloseOther = function() {
     return desktopTab.view;
   });
   scout.arrays.remove(openViews, this.view);
-  this.session.desktop.closeViews(openViews);
+  if (openViews.length === 1) {
+    openViews[0].cancel();
+  } else {
+    this.session.desktop.closeViews(openViews);
+  }
 };
-

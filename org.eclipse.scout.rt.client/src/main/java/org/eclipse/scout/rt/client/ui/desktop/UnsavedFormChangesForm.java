@@ -56,7 +56,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
 
   @Override
   protected String getConfiguredTitle() {
-    return TEXTS.get("UnsavedChangesTitle");
+    return TEXTS.get("SaveChangesOfSelectedItems");
   }
 
   @Override
@@ -103,8 +103,8 @@ public class UnsavedFormChangesForm extends AbstractForm {
     public class UnsavedChangesBox extends AbstractGroupBox {
 
       @Override
-      protected String getConfiguredLabel() {
-        return TEXTS.get("SaveChangesOfSelectedItems");
+      protected boolean getConfiguredLabelVisible() {
+        return false;
       }
 
       @Override

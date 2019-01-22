@@ -20,7 +20,7 @@ scout.UnsavedFormChangesForm.prototype._jsonModel = function() {
     id: 'scout.UnsavedFormChangesForm',
     objectType: 'Form',
     type: 'model',
-    title: '${textKey:UnsavedChangesTitle}',
+    title: '${textKey:SaveChangesOfSelectedItems}',
     askIfNeedSave: false,
     rootGroupBox: {
       id: 'MainBox',
@@ -35,7 +35,7 @@ scout.UnsavedFormChangesForm.prototype._jsonModel = function() {
       fields: [{
         id: 'UnsavedChangesBox',
         objectType: 'GroupBox',
-        label: '${textKey:SaveChangesOfSelectedItems}',
+        labelVisible: false,
         gridColumnCount: 1,
         fields: [{
           id: 'OpenFormsField',
