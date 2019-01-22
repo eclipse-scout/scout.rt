@@ -1254,6 +1254,11 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
       lazy = false;
     }
 
+    // Do not allow a lazy expansion/collapse if the node was manually expanded
+    if (lazy && node.isExpanded() && !node.isExpandedLazy()) {
+      return;
+    }
+
     node = resolveNode(node);
     if (node != null && (node.isExpanded() != expand || node.isExpandedLazy() != lazy)) {
       setNodeExpandedInternal(node, expand, lazy);
