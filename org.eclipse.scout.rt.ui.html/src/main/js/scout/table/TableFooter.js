@@ -239,7 +239,11 @@ scout.TableFooter.prototype._renderInfoLoad = function() {
     if (this.table.hasReloadHandler) {
       $info.appendBr();
       if (estRows && maxRows && numRows < estRows && numRows < maxRows) {
-        $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadNData', this.computeCountInfo(maxRows))).appendTo($info);
+        if (estRows < maxRows) {
+          $info.appendSpan('table-info-button').text(this.session.text('ui.LoadAllData')).appendTo($info);
+        } else {
+          $info.appendSpan('table-info-button').text(this.session.text('ui.LoadNData', this.computeCountInfo(maxRows))).appendTo($info);
+        }
       } else {
         $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadData')).appendTo($info);
       }
