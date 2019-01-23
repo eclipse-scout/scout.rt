@@ -104,6 +104,8 @@ public class UiJobs {
 
   /**
    * Cancels all running model jobs for the requested session (interrupt if necessary).
+   * <p>
+   * Exceptions are the calling job and jobs with the hint {@link ModelJobs#EXECUTION_HINT_UI_INTERACTION_REQUIRED}
    */
   public void cancelModelJobs(IClientSession clientSession) {
     Jobs.getJobManager().cancel(ModelJobs.newFutureFilterBuilder()
