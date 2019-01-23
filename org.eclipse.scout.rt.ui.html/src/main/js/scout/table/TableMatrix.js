@@ -404,7 +404,7 @@ scout.TableMatrix.prototype.columnCount = function(filterNumberColumns) {
 
     for (r = 0; r < this._rows.length; r++) {
       row = this._rows[r];
-      cellValue = this._table.cellValue(column, row);
+      cellValue = column.cellValueOrTextForCalculation(row);
       if (colCount[count][1].indexOf(cellValue) === -1) {
         colCount[count][1].push(cellValue);
       }
