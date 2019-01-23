@@ -61,6 +61,9 @@ scout.ColumnOptimalWidthMeasurer.prototype.measure = function(promise) {
 };
 
 scout.ColumnOptimalWidthMeasurer.prototype.remove = function() {
+  if (!this.$measurement) {
+    return;
+  }
   this.$measurement[0].removeEventListener('load', this._imageLoadOrErrorHandler, true);
   this.$measurement[0].removeEventListener('error', this._imageLoadOrErrorHandler, true);
   this.$measurement.remove();
@@ -82,8 +85,10 @@ scout.ColumnOptimalWidthMeasurer.prototype._measure = function() {
 
 scout.ColumnOptimalWidthMeasurer.prototype._resolve = function(optimalWidth) {
   this.remove();
-  this.deferred.resolve(optimalWidth);
-  this.deferred = null;
+  if (this.deferred) {
+    this.deferred.resolve(optimalWidth);
+    this.deferred = null;
+  }
 };
 
 scout.ColumnOptimalWidthMeasurer.prototype._appendElements = function() {
