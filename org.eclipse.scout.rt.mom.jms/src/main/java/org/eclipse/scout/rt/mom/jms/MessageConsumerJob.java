@@ -7,6 +7,8 @@ import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.IMessageListener;
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
@@ -37,15 +39,22 @@ public class MessageConsumerJob<DTO> extends AbstractMessageConsumerJob<DTO> {
   protected void handleMessageInRunContext(final Message jmsMessage) throws JMSException {
     final JmsMessageReader<DTO> messageReader = JmsMessageReader.newInstance(jmsMessage, m_marshaller);
     final IMessage<DTO> message = messageReader.readMessage();
+    final String correlationId = messageReader.readCorrelationId();
 
     createRunContext()
-        .withCorrelationId(messageReader.readCorrelationId())
+        .withCorrelationId(correlationId)
         .withThreadLocal(IMessage.CURRENT, message)
         .run(new IRunnable() {
 
           @Override
           public void run() throws Exception {
-            m_listener.onMessage(message);
+            try {
+              m_listener.onMessage(message);
+            }
+            catch (Exception e) {
+              throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
+                  .withContextInfo("correlationId", correlationId);
+            }
           }
         });
   }

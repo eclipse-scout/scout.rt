@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -61,15 +62,22 @@ public class ReplyMessageConsumerJob<REQUEST, REPLY> extends AbstractMessageCons
     final JmsMessageReader<REQUEST> messageReader = JmsMessageReader.newInstance(jmsRequest, m_marshaller);
     final IMessage<REQUEST> request = messageReader.readMessage();
     final Destination replyTopic = messageReader.readReplyTo();
+    final String correlationId = messageReader.readCorrelationId();
 
     createRunContext()
-        .withCorrelationId(messageReader.readCorrelationId())
+        .withCorrelationId(correlationId)
         .withThreadLocal(IMessage.CURRENT, request)
         .run(new IRunnable() {
 
           @Override
           public void run() throws Exception {
-            handleRequest(jmsRequest, request, replyId, replyTopic);
+            try {
+              handleRequest(jmsRequest, request, replyId, replyTopic);
+            }
+            catch (Exception e) {
+              throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
+                  .withContextInfo("correlationId", correlationId);
+            }
           }
         });
   }
