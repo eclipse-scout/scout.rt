@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.platform.nls;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
@@ -33,50 +31,36 @@ import org.slf4j.LoggerFactory;
 public final class NlsResourceBundle extends PropertyResourceBundle {
 
   private static final Logger LOG = LoggerFactory.getLogger(NlsResourceBundle.class);
+
   public static final String TEXT_RESOURCE_EXTENSION = "properties";
 
   public NlsResourceBundle(InputStream stream) throws IOException {
     super(stream);
   }
 
-  /**
-   * Creates a {@link NlsResourceBundle} for each property file found using the given base name. The created bundles are
-   * linked according to the sub tags of the language tag. To root (most specific) bundle is returned.
-   */
-  public static NlsResourceBundle getBundle(String baseName, Locale locale, ClassLoader cl) {
-    String ls = locale.toString();
-    List<String> suffixes = new LinkedList<>();
-    suffixes.add("_" + ls);
-    int i = ls.lastIndexOf('_');
-    while (i >= 0) {
-      ls = ls.substring(0, i);
-      suffixes.add("_" + ls);
-      // next
-      i = ls.lastIndexOf('_');
-    }
-    suffixes.add("");
+  @SuppressWarnings("squid:S1185")
+  @Override
+  protected void setParent(ResourceBundle parent) {
+    // allow access of this setter in NlsResourceBundleCache
+    super.setParent(parent);
+  }
 
-    NlsResourceBundle root = null;
-    NlsResourceBundle child = null;
-    for (String suffix : suffixes) {
-      try {
-        NlsResourceBundle bundle = getBundle(baseName, suffix, cl);
-        if (bundle == null) {
-          continue;
-        }
-        if (root == null) {
-          root = bundle;
-        }
-        if (child != null) {
-          child.setParent(bundle);
-        }
-        child = bundle;
-      }
-      catch (IOException e) {
-        LOG.warn("Error loading nls resource with base name '{}' and suffix '{}'", baseName, suffix, e);
-      }
+  public static NlsResourceBundle getBundle(String baseName, Locale locale, ClassLoader cl) {
+    String suffix = getLocaleSuffix(locale);
+    try {
+      return NlsResourceBundle.getBundle(baseName, suffix, cl);
     }
-    return root;
+    catch (IOException e) {
+      LOG.warn("Error loading nls resource with base name '{}' and suffix '{}'", baseName, suffix, e);
+      return null;
+    }
+  }
+
+  private static String getLocaleSuffix(Locale locale) {
+    if (locale == null || Locale.ROOT.equals(locale)) {
+      return "";
+    }
+    return "_" + locale.toString();
   }
 
   /**
@@ -93,5 +77,4 @@ public final class NlsResourceBundle extends PropertyResourceBundle {
     }
     return null;
   }
-
 }
