@@ -763,7 +763,7 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   /**
-   * Exception Handler used in MOM.
+   * Exception handler used in MOM.
    */
   public static class MomExceptionHandler extends ExceptionHandler {
   }
