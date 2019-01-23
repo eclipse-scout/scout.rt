@@ -168,7 +168,8 @@ public class HealthCheckerTest {
     verify(test, times(1)).run();
 
     // wait for TTL to expire
-    TimeUnit.SECONDS.sleep(1);
+    // Note: Unit tests with timing is always problematic. Waiting just the TTL of 1 second is not enough in case the unit test system is under high load.
+    TimeUnit.SECONDS.sleep(1 + 2);
 
     // start and validate again
     checker.checkHealth(RunContexts.empty());
