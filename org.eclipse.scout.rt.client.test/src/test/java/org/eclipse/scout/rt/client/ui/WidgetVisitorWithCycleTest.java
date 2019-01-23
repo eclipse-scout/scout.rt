@@ -91,7 +91,7 @@ public class WidgetVisitorWithCycleTest {
     m1.addChildAction(m1_2);
     m1.addChildAction(m1_3);
 
-    root.addChildAction(MenuWrapper.wrapMenu(m1_3)); // menu that is added at two places
+    root.addChildAction(MenuWrapper.wrapMenuIfNotWrapped(m1_3)); // menu that is added at two places
     return root;
   }
 

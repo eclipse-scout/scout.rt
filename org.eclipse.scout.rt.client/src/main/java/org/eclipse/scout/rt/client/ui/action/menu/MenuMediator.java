@@ -64,7 +64,7 @@ public class MenuMediator {
 
     List<IMenu> sourceMenus = getSource().getMenus();
     for (IMenu menu : sourceMenus) {
-      m_menus.add(MenuWrapper.wrapMenu(menu));
+      m_menus.add(MenuWrapper.wrapMenuIfNotWrapped(menu));
     }
     getDestination().getContextMenu().addChildActions(m_menus);
   }

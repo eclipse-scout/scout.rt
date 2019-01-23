@@ -26,29 +26,53 @@ public class MenuWrapper {
 
   /**
    * Returns a wrapper for the given menu, or if the menu is already a wrapper instance, the same menu-instance.
+   *
+   * @param menu
+   *          Menu to wrap
+   * @return Newly wrapped menu if the the menu is not already wrapped, same menu otherwise.
    */
-  public static IMenu wrapMenu(IMenu menu) {
-    return wrapMenu(menu, OutlineMenuWrapper.AUTO_MENU_TYPE_MAPPER, OutlineMenuWrapper.ACCEPT_ALL_FILTER);
+  public static IMenu wrapMenuIfNotWrapped(IMenu menu) {
+    return BEANS.get(MenuWrapper.class).doWrapMenuIfNotWrapped(menu, OutlineMenuWrapper.AUTO_MENU_TYPE_MAPPER, OutlineMenuWrapper.ACCEPT_ALL_FILTER);
   }
 
   /**
-   * Returns a wrapper for the given menu, or if the menu is already a wrapper instance, the same menu-instance.
+   * Returns a wrapper for the given menu. If the menu is already a wrapper instance, the wrapped menu will be wrapped
+   * again.
+   *
+   * @param menu
+   *          Menu to wrap
+   * @param menuTypeMapper
+   *          function to map one menu type to another. The mapper is applied to child menus too.
+   * @return Wrapped menu
    */
   public static IMenu wrapMenu(IMenu menu, IMenuTypeMapper menuTypeMapper) {
     return wrapMenu(menu, menuTypeMapper, OutlineMenuWrapper.ACCEPT_ALL_FILTER);
   }
 
   /**
-   * Returns a wrapper for the given menu, or if the menu is already a wrapper instance, the same menu-instance.
+   * Returns a wrapper for the given menu. If the menu is already a wrapper instance, the wrapped menu will be wrapped
+   * again.
+   *
+   * @param menu
+   *          Menu to wrap
+   * @param menuTypeMapper
+   *          function to map one menu type to another. The mapper is applied to child menus too.
+   * @param menuFilter
+   *          Filter used when wrapping child menus.
+   * @return Wrapped menu
    */
   public static IMenu wrapMenu(IMenu menu, IMenuTypeMapper menuTypeMapper, Predicate<IAction> menuFilter) {
     return BEANS.get(MenuWrapper.class).doWrapMenu(menu, menuTypeMapper, menuFilter);
   }
 
-  protected IReadOnlyMenu doWrapMenu(IMenu menu, IMenuTypeMapper menuTypeMapper, Predicate<IAction> menuFilter) {
+  protected IReadOnlyMenu doWrapMenuIfNotWrapped(IMenu menu, IMenuTypeMapper menuTypeMapper, Predicate<IAction> menuFilter) {
     if (menu instanceof IReadOnlyMenu) {
       return (IReadOnlyMenu) menu; // already wrapped - don't wrap again
     }
+    return doWrapMenu(menu, menuTypeMapper, menuFilter);
+  }
+
+  protected IReadOnlyMenu doWrapMenu(IMenu menu, IMenuTypeMapper menuTypeMapper, Predicate<IAction> menuFilter) {
     if (menu instanceof IFormMenu<?>) {
       return new OutlineFormMenuWrapper((IFormMenu<?>) menu, menuTypeMapper, menuFilter);
     }

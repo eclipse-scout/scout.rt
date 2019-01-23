@@ -344,7 +344,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
         // Don't show TreeMenuType.Header. These menus should only be shown on outline title
         continue;
       }
-      menus.add(MenuWrapper.wrapMenu(menu));
+      menus.add(MenuWrapper.wrapMenuIfNotWrapped(menu));
     }
     if (!CollectionUtility.equalsCollection(menus, mainBoxContextMenu.getChildActions())) {
       mainBoxContextMenu.setChildActions(menus);
