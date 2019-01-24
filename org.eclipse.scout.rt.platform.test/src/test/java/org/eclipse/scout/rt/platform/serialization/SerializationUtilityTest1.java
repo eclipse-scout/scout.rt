@@ -10,13 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.serialization;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InvalidClassException;
-import java.io.ObjectInputStream;
-import java.io.ObjectStreamClass;
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 
 import org.junit.Assert;
@@ -59,11 +54,6 @@ public class SerializationUtilityTest1 {
     catch (InvalidClassException e) {
       //expected failure
     }
-
-    //now use a deserializer that ignores the serialVersionUID by setting it to the value of the target class
-    ser = createSerialVersionIndependentObjectSerializer();
-    FixtureClassWithSerialVersionUID2 deser2x = ser.deserialize(b2x, FixtureClassWithSerialVersionUID2.class);
-    Assert.assertSame(FixtureClassWithSerialVersionUID2.class, deser2x.getClass());
   }
 
   private static byte[] mockSerialData(Class<?> clazz, long serialVersionUID) {
@@ -82,37 +72,5 @@ public class SerializationUtilityTest1 {
     buf.put((byte) 0x78);//TC_ENDBLOCKDATA
     buf.put((byte) 0x70);//TC_NULL
     return buf.array();
-  }
-
-  private static IObjectSerializer createSerialVersionIndependentObjectSerializer() {
-    return new BasicObjectSerializer(null) {
-      @Override
-      protected ObjectInputStream createObjectInputStream(InputStream in, IObjectReplacer objectReplacer) throws IOException {
-        return new ObjectInputStream(in) {
-          @Override
-          protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
-            Class<?> c = super.resolveClass(desc);
-            //check suid
-            if (c != null) {
-              long expectedSuid = ObjectStreamClass.lookupAny(c).getSerialVersionUID();
-              long actualSuid = desc.getSerialVersionUID();
-              System.out.println("expected " + expectedSuid + ", actual " + actualSuid);
-              if (expectedSuid != actualSuid) {
-                //replace the input object serialVersionUID by the target class serialVersionUID
-                try {
-                  Field suidField = ObjectStreamClass.class.getDeclaredField("suid");
-                  suidField.setAccessible(true);
-                  suidField.set(desc, expectedSuid);
-                }
-                catch (Exception e) {
-                  throw new IOException(e);
-                }
-              }
-            }
-            return c;
-          }
-        };
-      }
-    };
   }
 }
