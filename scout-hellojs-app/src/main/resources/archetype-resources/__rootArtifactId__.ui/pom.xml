@@ -18,10 +18,6 @@
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.svg.ui.html</artifactId>
-    </dependency>
 
     <!-- Test dependencies -->
     <dependency>
