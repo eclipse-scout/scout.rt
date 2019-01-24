@@ -1851,6 +1851,74 @@ describe("Table", function() {
     });
   });
 
+  describe("menu bar popup ", function() {
+    var menuBarMenu, singleSelMenu, singleMultiSelMenu, multiSelMenu, bothSelMenu, emptySpaceMenu, headerMenu, table;
+
+    beforeEach(function() {
+      var model = helper.createModelFixture(2, 2);
+      table = helper.createTable(model);
+
+      menuBarMenu = scout.create('Menu', {
+        parent: table,
+        menuTypes: ['Table.EmptySpace'],
+      });
+      singleSelMenu = scout.create('Menu', {
+        parent: table,
+        menuTypes: ['Table.SingleSelection']
+      });
+      singleMultiSelMenu = scout.create('Menu', {
+        parent: table,
+        menuTypes: ['Table.SingleSelection', 'Table.MultiSelection']
+      });
+      multiSelMenu = scout.create('Menu', {
+        parent: table,
+        menuTypes: ['Table.MultiSelection']
+      });
+      emptySpaceMenu = scout.create('Menu', {
+        parent: table,
+        menuTypes: ['Table.EmptySpace']
+      });
+
+      menuBarMenu.setChildActions([singleSelMenu, singleMultiSelMenu, multiSelMenu, emptySpaceMenu]);
+      table.setMenus([menuBarMenu]);
+    });
+
+    it("shows no menus if no row is selected", function() {
+      table.render();
+      table.selectRows([]);
+      var menuBarMenu = table.menuBar.orderedMenuItems.all[0];
+      menuBarMenu.doAction();
+
+      expect(scout.widget(menuBarMenu.popup.$menuItems()[0]).original()).toBe(emptySpaceMenu);
+      expect(menuBarMenu.popup.$menuItems()[1]).toBe(undefined);
+    });
+
+    it("shows single selection and empty space menus if single row is selected", function() {
+      table.render();
+      table.selectRows([table.rows[0]]);
+      var menuBarMenu = table.menuBar.orderedMenuItems.all[0];
+      menuBarMenu.doAction();
+
+      expect(scout.widget(menuBarMenu.popup.$menuItems()[0]).original()).toBe(singleSelMenu);
+      expect(scout.widget(menuBarMenu.popup.$menuItems()[1]).original()).toBe(singleMultiSelMenu);
+      expect(scout.widget(menuBarMenu.popup.$menuItems()[2]).original()).toBe(emptySpaceMenu);
+      expect(menuBarMenu.popup.$menuItems()[3]).toBe(undefined);
+    });
+
+    it("shows multi selection and empty space menus if multiple rows are selected", function() {
+      table.render();
+      table.selectRows([table.rows[0], table.rows[1]]);
+      var menuBarMenu = table.menuBar.orderedMenuItems.all[0];
+      menuBarMenu.doAction();
+
+      expect(scout.widget(menuBarMenu.popup.$menuItems()[0]).original()).toBe(singleMultiSelMenu);
+      expect(scout.widget(menuBarMenu.popup.$menuItems()[1]).original()).toBe(multiSelMenu);
+      expect(scout.widget(menuBarMenu.popup.$menuItems()[2]).original()).toBe(emptySpaceMenu);
+      expect(menuBarMenu.popup.$menuItems()[3]).toBe(undefined);
+    });
+
+  });
+
   describe("setMenus", function() {
 
     it("updates the menubar with the relevant menus", function() {

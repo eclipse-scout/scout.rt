@@ -12,6 +12,7 @@ scout.MenuBar = function() {
   scout.MenuBar.parent.call(this);
 
   this.menuSorter = null;
+  this.menuFilter = null;
   this.position = 'top'; // or 'bottom'
   this.size = 'small'; // or 'large'
   this.tabbable = true;
@@ -43,7 +44,11 @@ scout.MenuBar.prototype._init = function(options) {
 
   this.menuSorter = options.menuOrder || new scout.GroupBoxMenuItemsOrder();
   this.menuSorter.menuBar = this;
-  this.menuFilter = options.menuFilter;
+  if (options.menuFilter) {
+    this.menuFilter = function(menus, destination, onlyVisible, enableDisableKeyStroke) {
+      return options.menuFilter(menus, scout.MenuDestinations.MENU_BAR, onlyVisible, enableDisableKeyStroke);
+    };
+  }
 
   this.menuboxLeft = scout.create('MenubarBox', {
     parent: this,
@@ -135,6 +140,15 @@ scout.MenuBar.prototype.ellipsisLeft = function() {
 };
 
 /**
+ * Set the filter of the menu bar to all the menu items.
+ */
+scout.MenuBar.prototype._setChildMenuFilters = function() {
+  this.orderedMenuItems.all.forEach(function(item) {
+    item.setMenuFilter(this.menuFilter);
+  }, this);
+};
+
+/**
  * This function can be called multiple times. The function attaches the menu handlers only if they are not yet added.
  */
 scout.MenuBar.prototype._attachMenuHandlers = function() {
@@ -177,6 +191,7 @@ scout.MenuBar.prototype._setMenuItems = function(menuItems, rightFirst) {
     this.menuboxRight.setMenuItems(this.orderedMenuItems.right);
   }
 
+  this._setChildMenuFilters();
   this._attachMenuHandlers();
   this.updateVisibility();
   this.updateDefaultMenu();

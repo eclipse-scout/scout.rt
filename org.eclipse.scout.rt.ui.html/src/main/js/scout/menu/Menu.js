@@ -32,6 +32,8 @@ scout.Menu = function() {
   this.separator = false;
   this.shrinkable = false;
 
+  this.menuFilter = null;
+
   this._addCloneProperties(['defaultMenu', 'menuTypes', 'overflow', 'stackable', 'separator', 'shrinkable']);
   this._addWidgetProperties('childActions');
 };
@@ -290,21 +292,12 @@ scout.Menu.prototype._createPopup = function(event) {
   var options = {
     parent: this,
     menu: this,
+    menuFilter: this.menuFilter,
     ignoreEvent: event,
     horizontalAlignment: this.popupHorizontalAlignment,
     verticalAlignment: this.popupVerticalAlignment
   };
 
-  if (this.parent.menuFilter) {
-    options.menuFilter = function(menus, destination, onlyVisible, enableDisableKeyStroke) {
-      return this.parent.menuFilter(menus, scout.MenuDestinations.MENU_BAR, onlyVisible, enableDisableKeyStroke);
-    }.bind(this);
-  }
-  if (this.parent._filterMenusHandler) {
-    options.menuFilter = function(menus, destination, onlyVisible, enableDisableKeyStroke) {
-      return this.parent._filterMenusHandler(menus, scout.MenuDestinations.MENU_BAR, onlyVisible, enableDisableKeyStroke);
-    }.bind(this);
-  }
   return scout.create('MenuBarPopup', options);
 };
 
@@ -382,6 +375,10 @@ scout.Menu.prototype._renderMenuStyle = function() {
 
 scout.Menu.prototype.setDefaultMenu = function(defaultMenu) {
   this.setProperty('defaultMenu', defaultMenu);
+};
+
+scout.Menu.prototype.setMenuFilter = function(menuFilter) {
+  this.setProperty('menuFilter', menuFilter);
 };
 
 scout.Menu.prototype.clone = function(model, options) {
