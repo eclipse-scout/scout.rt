@@ -71,7 +71,8 @@ public final class BlockingTestUtility {
    * @param runnableOnceBlocked
    *          {@code IRunnable} to be executed once the 'runnableGettingBlocked' enters a blocking condition.
    * @param awaitBackgroundJobs
-   *          true waits for background jobs running in the same session to complete before runnableOnceBlocked is called
+   *          true waits for background jobs running in the same session to complete before runnableOnceBlocked is
+   *          called
    */
   public static void runBlockingAction(final IRunnable runnableGettingBlocked, final IRunnable runnableOnceBlocked, final boolean awaitBackgroundJobs) {
     final ClientRunContext runContext = ClientRunContexts.copyCurrent();
@@ -141,7 +142,7 @@ public final class BlockingTestUtility {
     // runnableOnceBlocked may, during its execution,  set the original blocking condition to non-blocking but still execute
     // important code afterwards. Therefore, the original blocking condition that starts runnableOnceBlocked is only used
     // to indicate the start of the runnableOnceBlocked, but this method returns only AFTER runnableOnceBlocked completes execution.
-    onceBlockedDoneCondition.waitForUninterruptibly(120, TimeUnit.SECONDS);
+    onceBlockedDoneCondition.waitFor(120, TimeUnit.SECONDS);
   }
 
   /**
@@ -149,8 +150,8 @@ public final class BlockingTestUtility {
    * <p>
    * Adds a blocking condition timeout listener on {@link IJobManager} for the current {@link IClientSession}
    *
-   * @return the handle for the listener containing the first exception caught. Call {@link IRegistrationHandle#dispose()}
-   *         to remove the listener.
+   * @return the handle for the listener containing the first exception caught. Call
+   *         {@link IRegistrationHandle#dispose()} to remove the listener.
    */
   public static IBlockingConditionTimeoutHandle addBlockingConditionTimeoutListener(long timeout, TimeUnit unit) {
     final BlockingConditionTimeoutListener listener = new BlockingConditionTimeoutListener(IClientSession.CURRENT.get(), timeout, unit);
@@ -172,8 +173,8 @@ public final class BlockingTestUtility {
   }
 
   /**
-   * Runs an action that will be blocked by a message box. All message boxes appearing during the execution of the action
-   * are answered by the specified option.
+   * Runs an action that will be blocked by a message box. All message boxes appearing during the execution of the
+   * action are answered by the specified option.
    * <p>
    * If you need a distinguish multiple message boxes and give different answers, use
    * {@link #runBlockingActionWithMessageBoxHandler(IRunnable, ToIntFunction)} instead.

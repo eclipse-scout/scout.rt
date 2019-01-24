@@ -93,6 +93,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.holders.IHolder;
+import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -105,6 +106,7 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -113,6 +115,7 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
+import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1963,7 +1966,35 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       showedForms.add(form);
     }
 
-    //extensions
+    //release all locks
+    internalInterruptBlockingConditions();
+    internalCloseMessageBoxes();
+    internalCloseFileChoosers();
+
+    internalCloseForms(showedForms);
+    internalCloseDesktopExtensions();
+
+    //again, release all locks that may have created by closing forms and client extensions
+    internalInterruptBlockingConditions();
+    internalCloseMessageBoxes();
+    internalCloseFileChoosers();
+
+    internalCloseClientCallbacks();
+
+    fireDesktopClosed();
+  }
+
+  /**
+   * interrupt blocking MessageBoxes and FileChoosers, calling code must not continue work
+   */
+  protected void internalInterruptBlockingConditions() {
+    Jobs.getJobManager().cancel(ModelJobs.newFutureFilterBuilder()
+        .andMatch(new SessionFutureFilter(ISession.CURRENT.get()))
+        .andMatchState(JobState.WAITING_FOR_BLOCKING_CONDITION)
+        .toFilter(), true);
+  }
+
+  protected void internalCloseDesktopExtensions() {
     for (IDesktopExtension ext : getDesktopExtensions()) {
       try {
         ContributionCommand cc = ext.desktopClosingDelegate();
@@ -1975,8 +2006,9 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
         LOG.error("extension {}", ext, t);
       }
     }
+  }
 
-    // close messageboxes
+  protected void internalCloseMessageBoxes() {
     for (IMessageBox m : getMessageBoxes()) {
       if (m != null) {
         try {
@@ -1987,8 +2019,10 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
         }
       }
     }
+    m_messageBoxStore.clear();
+  }
 
-    // close filechoosers
+  protected void internalCloseFileChoosers() {
     for (IFileChooser f : getFileChoosers()) {
       if (f != null) {
         try {
@@ -1999,8 +2033,10 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
         }
       }
     }
+    m_fileChooserStore.clear();
+  }
 
-    // close client callbacks
+  protected void internalCloseClientCallbacks() {
     for (ClientCallback<?> c : CollectionUtility.arrayList(m_pendingPositionResponses)) {
       if (c != null) {
         try {
@@ -2012,20 +2048,23 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
         }
       }
     }
+  }
 
-    // close open forms
-    for (IForm form : showedForms) {
+  protected boolean internalCloseForms(Collection<IForm> forms) {
+    for (IForm form : forms) {
       if (form != null) {
         try {
+          // close potential open MessageBoxes and FileChoosers, otherwise blocking threads will remain
+          getMessageBoxes(form).forEach(msgBox -> msgBox.getUIFacade().setResultFromUI(IMessageBox.CANCEL_OPTION));
+          getFileChoosers(form).forEach(fileChooser -> fileChooser.getUIFacade().setResultFromUI(Collections.emptyList()));
           form.doClose();
         }
         catch (RuntimeException | PlatformError e) {
-          LOG.error("Exception while closing form", e);
+          LOG.error("Exception while closing forms", e);
         }
       }
     }
-
-    fireDesktopClosed();
+    return true;
   }
 
   private void attachGui() {
