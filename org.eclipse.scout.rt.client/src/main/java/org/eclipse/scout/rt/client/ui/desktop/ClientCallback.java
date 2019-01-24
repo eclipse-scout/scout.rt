@@ -51,14 +51,16 @@ public class ClientCallback<T> implements Future<T> {
 
   @Override
   public T get() throws InterruptedException, ExecutionException {
-    m_blockingCondition.waitForUninterruptibly(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED);
+    // Do not exit upon ui cancel request, as the file chooser would be closed immediately otherwise.
+    m_blockingCondition.waitFor(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED);
     return report();
   }
 
   @Override
   public T get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
     try {
-      m_blockingCondition.waitForUninterruptibly(timeout, unit, ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED);
+      // Do not exit upon ui cancel request, as the file chooser would be closed immediately otherwise.
+      m_blockingCondition.waitFor(timeout, unit, ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED);
     }
     catch (TimedOutError t) { // NOSONAR
       timedOut();

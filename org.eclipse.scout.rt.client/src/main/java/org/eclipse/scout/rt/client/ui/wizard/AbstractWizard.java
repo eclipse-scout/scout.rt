@@ -876,6 +876,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
       throw new ProcessingException("Cannot wait for {}. No desktop found, or the desktop is not opened in the UI yet.", new Object[]{getClass().getName()})
           .withCode(WAIT_FOR_ERROR_CODE);
     }
+    // Do not exit upon ui cancel request, as the file chooser would be closed immediately otherwise.
     m_blockingCondition.waitFor(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED);
   }
 

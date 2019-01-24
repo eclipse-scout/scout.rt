@@ -61,51 +61,10 @@ public class BlockingConditionInterruptionTest {
   }
 
   @Test
-  public void testUninterruptibly_interruptBeforeEntering() {
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
-
-    runTest(protocol, WaitMethod.WAIT_FOR_UNINTERRUPTIBLY, InterruptionAction.INTERRUPT_BEFORE_ENTERING);
-
-    List<String> expectedProtocol = new ArrayList<>();
-    expectedProtocol.add("beforeBlockingCondition");
-    expectedProtocol.add("afterBlockingCondition");
-    expectedProtocol.add("threadInterrupted");
-    assertEquals(expectedProtocol, protocol);
-  }
-
-  @Test
-  public void testUninterruptibly_interruptWhileBlocking() {
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
-
-    runTest(protocol, WaitMethod.WAIT_FOR_UNINTERRUPTIBLY, InterruptionAction.INTERRUPT_WHILE_BLOCKING);
-
-    List<String> expectedProtocol = new ArrayList<>();
-    expectedProtocol.add("beforeBlockingCondition");
-    expectedProtocol.add("afterBlockingCondition");
-    expectedProtocol.add("threadInterrupted");
-    assertEquals(expectedProtocol, protocol);
-  }
-
-  //
-
-  @Test
   public void testInterruptiblyWithTimeout_interruptBeforeEntering() {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     runTest(protocol, WaitMethod.WAIT_FOR_INTERRUPTIBLY_WITH_TIMEOUT, InterruptionAction.INTERRUPT_BEFORE_ENTERING);
-
-    List<String> expectedProtocol = new ArrayList<>();
-    expectedProtocol.add("beforeBlockingCondition");
-    expectedProtocol.add("TimeoutException");
-    expectedProtocol.add("threadInterrupted");
-    assertEquals(expectedProtocol, protocol);
-  }
-
-  @Test
-  public void testUninterruptiblyWithTimeout_interruptBeforeEntering() {
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
-
-    runTest(protocol, WaitMethod.WAIT_FOR_UNINTERRUPTIBLY_WITH_TIMEOUT, InterruptionAction.INTERRUPT_BEFORE_ENTERING);
 
     List<String> expectedProtocol = new ArrayList<>();
     expectedProtocol.add("beforeBlockingCondition");
@@ -140,12 +99,6 @@ public class BlockingConditionInterruptionTest {
               break;
             case WAIT_FOR_INTERRUPTIBLY_WITH_TIMEOUT:
               bc.waitFor(0, TimeUnit.MILLISECONDS, HINT_BLOCKED);
-              break;
-            case WAIT_FOR_UNINTERRUPTIBLY:
-              bc.waitForUninterruptibly(HINT_BLOCKED);
-              break;
-            case WAIT_FOR_UNINTERRUPTIBLY_WITH_TIMEOUT:
-              bc.waitForUninterruptibly(0, TimeUnit.MILLISECONDS, HINT_BLOCKED);
               break;
             default:
               throw new UnsupportedOperationException();
@@ -197,8 +150,6 @@ public class BlockingConditionInterruptionTest {
   private static enum WaitMethod {
     WAIT_INTERRUPTIBLY,
     WAIT_FOR_INTERRUPTIBLY_WITH_TIMEOUT,
-    WAIT_FOR_UNINTERRUPTIBLY,
-    WAIT_FOR_UNINTERRUPTIBLY_WITH_TIMEOUT,
   }
 
   private static enum InterruptionAction {

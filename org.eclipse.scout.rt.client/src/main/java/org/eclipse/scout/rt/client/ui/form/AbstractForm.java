@@ -1060,8 +1060,8 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
   @Override
   public void waitFor() {
-    // Do not exit upon interruption.
-    m_blockingCondition.waitForUninterruptibly(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED);
+    // Do not exit upon ui cancel request, as the file chooser would be closed immediately otherwise.
+    m_blockingCondition.waitFor(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED);
   }
 
   protected static Class<?> getDataAnnotationValue(Class<?> clazz) {

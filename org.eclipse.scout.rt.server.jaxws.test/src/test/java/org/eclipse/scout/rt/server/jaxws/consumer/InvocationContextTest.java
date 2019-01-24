@@ -253,7 +253,7 @@ public class InvocationContextTest {
       @Override
       public Void answer(InvocationOnMock invocation) throws Throwable {
         setupLatch.countDown();
-        processingCondition.waitForUninterruptibly(10, TimeUnit.SECONDS);
+        processingCondition.waitFor(10, TimeUnit.SECONDS);
         return null;
       }
     }).when(m_port).webMethod();
