@@ -16,6 +16,7 @@ scout.WidgetPopup = function() {
   this.widget = null;
   this.windowPaddingX = 0;
   this.windowPaddingY = 0;
+  this.windowResizeType = 'layoutAndPosition';
   this._addWidgetProperties(['widget']);
 };
 scout.inherits(scout.WidgetPopup, scout.Popup);

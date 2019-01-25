@@ -17,7 +17,7 @@ scout.PopupWithHead = function() {
   this.horizontalSwitch = true;
   this.verticalSwitch = true;
   this._headVisible = true;
-  this.resizeHandler = this._onResize.bind(this);
+  this.windowResizeType = 'remove';
 };
 scout.inherits(scout.PopupWithHead, scout.Popup);
 
@@ -35,7 +35,6 @@ scout.PopupWithHead.prototype._init = function(options) {
 
 scout.PopupWithHead.prototype._render = function() {
   scout.PopupWithHead.parent.prototype._render.call(this);
-  this.$parent.window().on('resize', this.resizeHandler);
 
   this._$createBody();
 
@@ -47,20 +46,6 @@ scout.PopupWithHead.prototype._render = function() {
 scout.PopupWithHead.prototype._postRender = function() {
   scout.PopupWithHead.parent.prototype._postRender.call(this);
   scout.scrollbars.update(this.$body);
-};
-
-scout.PopupWithHead.prototype._onResize = function() {
-  if (!this.rendered) {
-    // may already be removed if a parent popup is closed during the resize event
-    return;
-  }
-  this.$parent.window().off('resize', this.resizeHandler);
-  this.close();
-};
-
-scout.PopupWithHead.prototype._remove = function() {
-  this.$parent.window().off('resize', this.resizeHandler);
-  scout.PopupWithHead.parent.prototype._remove.call(this);
 };
 
 scout.PopupWithHead.prototype._$createBody = function() {

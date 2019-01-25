@@ -22,11 +22,13 @@ scout.PopupLayout.prototype.layout = function($container) {
   } else if (this.popup.removalPending || this.popup.removing || !this.popup.rendered){
     return;
   }
-  var htmlComp = this.popup.htmlComp,
-    prefSize = this.preferredLayoutSize($container, {
-      exact: true,
-      onlyWidth: this.doubleCalcPrefSize
-    });
+  var htmlComp = this.popup.htmlComp;
+  // Read current bounds before calling pref size, because pref size may change position (_calcMaxSize)
+  var currentBounds = scout.graphics.bounds(htmlComp.$comp);
+  var prefSize = this.preferredLayoutSize($container, {
+    exact: true,
+    onlyWidth: this.doubleCalcPrefSize
+  });
 
   prefSize = this.adjustSize(prefSize);
   if (this.doubleCalcPrefSize) {
@@ -37,7 +39,6 @@ scout.PopupLayout.prototype.layout = function($container) {
     prefSize = this.adjustSize(prefSize);
   }
 
-  var currentBounds = scout.graphics.bounds(htmlComp.$comp);
   this._setSize(prefSize);
 
   if (htmlComp.layouted && this.popup.animateResize) {
@@ -46,9 +47,16 @@ scout.PopupLayout.prototype.layout = function($container) {
 };
 
 scout.PopupLayout.prototype._resizeAnimated = function(currentBounds, prefSize) {
-  var htmlComp = this.popup.htmlComp;
   this.popup.position();
+  var htmlComp = this.popup.htmlComp;
   var prefPosition = htmlComp.$comp.position();
+
+  // Preferred size are exact, current bounds are rounded -> round preferred size up to make compare work
+  var prefBounds = new scout.Rectangle(prefPosition.left, prefPosition.top, Math.ceil(prefSize.width), Math.ceil(prefSize.height));
+  if (currentBounds.equals(prefBounds)) {
+    // Bounds did not change -> do nothing
+    return;
+  }
   htmlComp.$comp
     .stop(true)
     .cssHeight(currentBounds.height)

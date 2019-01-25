@@ -50,6 +50,7 @@ scout.Popup = function() {
 
   // Defines what should happen when the scroll parent is scrolled. It is also used if the anchor changes its location (needs to support the locationChange event)
   this.scrollType = 'remove';
+  this.windowResizeType = null;
 
   // If true, the anchor is considered when computing the position and size of the popup
   this.boundToAnchor = true;
@@ -70,7 +71,7 @@ scout.Popup = function() {
   this.closeOnOtherPopupOpen = true;
 
   this.$arrow = null;
-
+  this._windowResizeHandler = this._onWindowResize.bind(this);
   this._addWidgetProperties(['anchor']);
   this._addPreserveOnPropertyChangeProperties(['anchor']);
 };
@@ -182,6 +183,7 @@ scout.Popup.prototype._render = function() {
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.validateRoot = true;
   this.htmlComp.setLayout(this._createLayout());
+  this.$container.window().on('resize', this._windowResizeHandler);
 };
 
 scout.Popup.prototype._renderProperties = function() {
@@ -201,6 +203,7 @@ scout.Popup.prototype._postRender = function() {
 };
 
 scout.Popup.prototype._remove = function() {
+  this.$container.window().off('resize', this._windowResizeHandler);
   if (this._glassPaneRenderer) {
     this._glassPaneRenderer.removeGlassPanes();
   }
@@ -583,7 +586,7 @@ scout.Popup.prototype._prefLocationWithAnchor = function(verticalAlignment, hori
   x -= parentOffset.left;
   y -= parentOffset.top;
 
-  return new scout.Point(x,y);
+  return new scout.Point(x, y);
 };
 
 scout.Popup.prototype._alignClasses = function() {
@@ -784,3 +787,17 @@ scout.Popup.prototype._renderAnchor = function() {
   }
 };
 
+scout.Popup.prototype._onWindowResize = function() {
+  if (!this.rendered) {
+    // may already be removed if a parent popup is closed during the resize event
+    return;
+  }
+  if (this.windowResizeType === 'position') {
+    this.position();
+  } else if (this.windowResizeType === 'layoutAndPosition') {
+    this.revalidateLayoutTree(false);
+    this.position();
+  } else if (this.windowResizeType === 'remove') {
+    this.close();
+  }
+};

@@ -146,6 +146,11 @@ scout.Desktop.prototype._render = function() {
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
 
+  // Attach resize listener before other elements can add their own resize listener (e.g. an addon) to make sure it is executed first
+  this.$container.window()
+    .on('resize', this._resizeHandler)
+    .on('popstate', this._popstateHandler);
+
   // Desktop elements are added before this separator, all overlays are opened after (dialogs, popups, tooltips etc.)
   this.$overlaySeparator = this.$container.appendDiv('overlay-separator').setVisible(false);
 
@@ -162,10 +167,6 @@ scout.Desktop.prototype._render = function() {
   this.addOns.forEach(function(addOn) {
     addOn.render();
   }, this);
-
-  this.$container.window()
-    .on('resize', this._resizeHandler)
-    .on('popstate', this._popstateHandler);
 
   // prevent general drag and drop, dropping a file anywhere in the application must not open this file in browser
   this._setupDragAndDrop();

@@ -74,7 +74,10 @@ scout.FormMenuPopup.prototype._onFormMenuPropertyChange = function(event) {
   }.bind(this));
 };
 
-scout.FormMenuPopup.prototype._onResize = function() {
+/**
+ * @override
+ */
+scout.FormMenuPopup.prototype._onWindowResize = function() {
   if (!this.rendered) {
     // may already be removed if a parent popup is closed during the resize event
     return;
