@@ -77,21 +77,24 @@ scout.NumberField.prototype._parseValue = function(displayText) {
     return null;
   }
 
+  return this.decimalFormat.parse(displayText, this._evaluateNumber.bind(this));
+};
+
+scout.NumberField.prototype._evaluateNumber = function(normalizedNumberString) {
   // Convert to JS number format (remove groupingChar, replace decimalSeparatorChar with '.')
   // Only needed for calculator
-  var input = this.decimalFormat.normalize(displayText);
-
   // if only math symbols are in the input string...
-  if (this.calc.isFormula(input)) {
+  if (this.calc.isFormula(normalizedNumberString)) {
     // ...evaluate and return. If the display text changed, ValueField.js will make sure, the new display text is sent to the model.
-    var calculated = this.calc.evalFormula(input);
+    var calculated = this.calc.evalFormula(normalizedNumberString);
     if (isNaN(calculated)) {
       // catch input that is not a valid expression (although it looks like one, e.g. "1.2.3")
-      throw new Error(displayText + ' is not a valid expression');
+      throw new Error(normalizedNumberString + ' is not a valid expression');
     }
     return calculated;
   }
-  return this.decimalFormat.parse(displayText);
+
+  return Number(normalizedNumberString);
 };
 
 /**
@@ -127,5 +130,5 @@ scout.NumberField.prototype._formatValue = function(value) {
     // if setValue() would be called with something other than a number don't try to format it
     return value + '';
   }
-  return this.decimalFormat.format(value, false); // parse does not support multiplier yet -> disable it for the formatting
+  return this.decimalFormat.format(value, true);
 };

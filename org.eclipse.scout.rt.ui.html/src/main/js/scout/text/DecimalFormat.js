@@ -120,14 +120,18 @@ scout.DecimalFormat = function(locale, options) {
  * Returns a number for the given numberString, if the string can be converted into a number.
  * Throws an Error otherwise
  */
-scout.DecimalFormat.prototype.parse = function(numberString) {
+scout.DecimalFormat.prototype.parse = function(numberString, evaluateNumberFunction) {
   if (scout.strings.empty(numberString)) {
     return null;
   }
-  var pureNumber = this.normalize(numberString);
-  var number = Number(pureNumber);
+  var normalizedNumberString = this.normalize(numberString);
+  var number = evaluateNumberFunction ? evaluateNumberFunction(normalizedNumberString) : Number(normalizedNumberString);
+
   if (isNaN(number)) {
     throw new Error(numberString + ' is not a number (NaN)');
+  }
+  if (this.multiplier !== 1) {
+    number /= this.multiplier;
   }
   return number;
 };

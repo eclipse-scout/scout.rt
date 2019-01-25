@@ -132,6 +132,32 @@ describe('NumberField', function() {
       expect(field.displayText).toBe('123.000');
     });
 
+    it('updates the value and the display text if the multiplier changes', function() {
+      field.setValue(123);
+      expect(field.value).toBe(123);
+      expect(field.displayText).toBe('123');
+      expect(field.decimalFormat.multiplier).toBe(1);
+
+      field.setDecimalFormat({
+        pattern: '###0.###',
+        multiplier: 100
+      });
+      expect(field.decimalFormat.multiplier).toBe(100);
+      expect(field.value).toBe(123);
+      expect(field.displayText).toBe('12300');
+
+      field.setValue(0.01);
+      expect(field.value).toBe(0.01);
+      expect(field.displayText).toBe('1');
+
+      field.render();
+      field.resetValue();
+      field.$field.val('111');
+      field.acceptInput();
+      expect(field.value).toBe(1.11);
+      expect(field.displayText).toBe('111');
+    });
+
   });
 
   describe('calculates value', function() {
