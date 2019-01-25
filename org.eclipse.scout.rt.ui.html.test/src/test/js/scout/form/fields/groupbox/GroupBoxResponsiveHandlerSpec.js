@@ -44,7 +44,6 @@ describe("GroupBoxResponsiveHandler", function() {
       fields: fields,
       responsive: true
     });
-    scout.responsiveManager.registerHandler(groupBox, new scout.GroupBoxResponsiveHandler(groupBox));
     return groupBox;
   }
 

@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.GroupBoxResponsiveHandler = function(groupBox, options) {
-  scout.GroupBoxResponsiveHandler.parent.call(this, groupBox, options);
-  options = options || {};
+scout.GroupBoxResponsiveHandler = function() {
+  scout.GroupBoxResponsiveHandler.parent.call(this);
 
-  // default values.
-  this.compactThreshold = scout.nvl(options.compactThreshold, scout.HtmlEnvironment.formColumnWidth);
+  this.compactThreshold = scout.HtmlEnvironment.formColumnWidth;
   this.allowedStates = [scout.ResponsiveManager.ResponsiveState.NORMAL, scout.ResponsiveManager.ResponsiveState.CONDENSED, scout.ResponsiveManager.ResponsiveState.COMPACT];
 
   // transform handlers
@@ -37,8 +35,8 @@ scout.inherits(scout.GroupBoxResponsiveHandler, scout.ResponsiveHandler);
 /**
  * @Override
  */
-scout.GroupBoxResponsiveHandler.prototype.init = function() {
-  scout.GroupBoxResponsiveHandler.parent.prototype.init.call(this);
+scout.GroupBoxResponsiveHandler.prototype.init = function(model) {
+  scout.GroupBoxResponsiveHandler.parent.prototype.init.call(this, model);
 
   this.widget.visitFields(function(field) {
     if (field instanceof scout.CompositeField) {
@@ -201,7 +199,7 @@ scout.GroupBoxResponsiveHandler.prototype._transformStatusVisibility = function(
 scout.GroupBoxResponsiveHandler.prototype._transformVerticalAlignment = function(field) {
   if (!(field instanceof scout.Button && field.displayStyle === scout.Button.DisplayStyle.DEFAULT ||
       field instanceof scout.CheckBoxField) ||
-      !field.gridData) {
+    !field.gridData) {
     return;
   }
 

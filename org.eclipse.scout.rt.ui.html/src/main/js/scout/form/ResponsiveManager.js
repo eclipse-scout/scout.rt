@@ -95,7 +95,6 @@ scout.ResponsiveManager.prototype.registerHandler = function(target, handler) {
     target.responsiveHandler.destroy();
   }
   target.responsiveHandler = handler;
-  handler.init();
 };
 
 scout.ResponsiveManager.prototype.unregisterHandler = function(target) {

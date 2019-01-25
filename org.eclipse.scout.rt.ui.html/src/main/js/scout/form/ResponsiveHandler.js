@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.ResponsiveHandler = function(widget, options) {
-  options = options || {};
-
-  this.widget = widget;
-  this.compactThreshold = scout.nvl(options.compactThreshold, -1);
-  this.condensedThreshold = scout.nvl(options.condensedThreshold, -1);
+scout.ResponsiveHandler = function() {
+  this.widget = null;
+  this.compactThreshold = -1;
+  this.condensedThreshold = -1;
 
   this.oldState = scout.ResponsiveManager.ResponsiveState.NORMAL;
   this.state = scout.ResponsiveManager.ResponsiveState.NORMAL;
@@ -23,7 +21,9 @@ scout.ResponsiveHandler = function(widget, options) {
   this._destroyHandler = this._onDestroy.bind(this);
 };
 
-scout.ResponsiveHandler.prototype.init = function() {
+scout.ResponsiveHandler.prototype.init = function(model) {
+  $.extend(this, model);
+
   this.widget.one('destroy', this._destroyHandler);
 };
 

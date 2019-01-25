@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.DesktopResponsiveHandler = function(desktop, options) {
-  scout.DesktopResponsiveHandler.parent.call(this, desktop, options);
-  options = options || {};
+scout.DesktopResponsiveHandler = function() {
+  scout.DesktopResponsiveHandler.parent.call(this);
 
-  this.compactThreshold = scout.nvl(options.compactThreshold, 500);
-
+  this.compactThreshold = 500;
   this.allowedStates = [scout.ResponsiveManager.ResponsiveState.NORMAL, scout.ResponsiveManager.ResponsiveState.COMPACT];
 };
 scout.inherits(scout.DesktopResponsiveHandler, scout.ResponsiveHandler);

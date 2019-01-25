@@ -39,7 +39,6 @@ scout.GroupBox = function() {
   this.menuBarPosition = scout.GroupBox.MenuBarPosition.AUTO;
   this.menuBarEllipsisPosition = scout.MenuBar.EllipsisPosition.RIGHT;
   this.responsive = null;
-  this.responsiveCompactThreshold = null;
 
   this.$body;
   this.$title;
@@ -70,8 +69,8 @@ scout.GroupBox.prototype._init = function(model) {
   this._setMainBox(this.mainBox);
   this._updateMenuBar();
 
-  scout.responsiveManager.registerHandler(this, new scout.GroupBoxResponsiveHandler(this, {
-    compactThreshold: this.responsiveCompactThreshold
+  scout.responsiveManager.registerHandler(this, scout.create("GroupBoxResponsiveHandler", {
+    widget: this
   }));
 
   this._setResponsive(this.responsive);
