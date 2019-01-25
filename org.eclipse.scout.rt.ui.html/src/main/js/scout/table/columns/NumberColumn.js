@@ -34,12 +34,22 @@ scout.NumberColumn.prototype._init = function(model) {
   this.setAggregationFunction(this.aggregationFunction);
 };
 
+scout.NumberColumn.prototype.setDecimalFormat = function(decimalFormat) {
+  if (this.decimalFormat === decimalFormat) {
+    return;
+  }
+  this._setDecimalFormat(decimalFormat);
+  // if format changes on the fly, just update the cell text
+  this.table.rows.forEach(function(row) {
+    this._updateCellText(row, this.cell(row));
+  }.bind(this));
+};
+
 scout.NumberColumn.prototype._setDecimalFormat = function(format) {
   if (!format) {
     format = this._getDefaultFormat(this.session.locale);
   }
-  format = scout.DecimalFormat.ensure(this.session.locale, format);
-  this.decimalFormat = format;
+  this.decimalFormat = scout.DecimalFormat.ensure(this.session.locale, format);
 };
 
 scout.NumberColumn.prototype._getDefaultFormat = function(locale) {
