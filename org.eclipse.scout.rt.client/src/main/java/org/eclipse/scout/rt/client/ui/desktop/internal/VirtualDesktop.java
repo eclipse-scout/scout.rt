@@ -48,6 +48,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.visitor.IBreadthFirstTreeVisitor;
@@ -770,6 +771,16 @@ public class VirtualDesktop implements IDesktop {
   @Override
   public void setGeolocationServiceAvailable(boolean available) {
     // NOP
+  }
+
+  @Override
+  public PropertyMap getStartupRequestParams() {
+    return null;
+  }
+
+  @Override
+  public <VALUE> VALUE getStartupRequestParam(String propertyName) {
+    return null;
   }
 
   @Override

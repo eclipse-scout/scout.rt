@@ -420,12 +420,18 @@ public class UiSession implements IUiSession {
       IDesktop desktop = m_clientSession.getDesktop();
       IDesktopUIFacade uiFacade = desktop.getUIFacade();
       boolean desktopOpen = desktop.isOpened();
-      if (!desktopOpen) {
+      // Don't handle deep links for persistent sessions, in that case the client state shall be recovered
+      // rather than following the deep link
+      PropertyMap.CURRENT.get().put(DeepLinkUrlParameter.HANDLE_DEEP_LINK, !isPersistent() || !desktopOpen);
+      // When a new desktop has been instantiated the property map has already set by the AbstractDesktop
+      // but when an existing desktop is (-re)attached we still need to update the property map with the
+      // current request parameters.
+      if (desktopOpen) {
+        uiFacade.initStartupRequestParamsFromUI();
+      }
+      else {
         uiFacade.openFromUI();
       }
-      // Don't handle deep links for persistent sessions,
-      // in that case the client state shall be recovered rather than following the deep link
-      PropertyMap.CURRENT.get().put(DeepLinkUrlParameter.HANDLE_DEEP_LINK, !isPersistent() || !desktopOpen);
       uiFacade.fireGuiAttached();
     }, ModelJobs.newInput(
         ClientRunContexts.copyCurrent()

@@ -45,6 +45,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.shared.services.common.bookmark.AbstractPageState;
@@ -132,6 +133,9 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   String PROP_BENCH_VISIBLE = "benchVisible";
 
   String PROP_BENCH_LAYOUT_DATA = "benchLayoutData";
+
+  String PROP_STARTUP_REQUEST_PARAMS = "startupRequestParams";
+
   /**
    * Default style with header, navigation (tree) and bench (forms).
    * <p>
@@ -898,6 +902,19 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * @since 6.1
    */
   Future<Coordinates> requestGeolocation();
+
+  /**
+   * Returns request or URL parameters available at the time the Scout session/desktop has been attached. This map will
+   * be available after the desktop has been created but before the openFromUI and attachedFromUI are called.
+   * <p>
+   * Note: you still need to access <code>PropertyMap.CURRENT.get()</code> when you need a startup parameter in the
+   * constructor of the desktop or in a method that is called by <code>initConfig</code>.
+   *
+   * @return map with request or URL startup parameters
+   */
+  PropertyMap getStartupRequestParams();
+
+  <VALUE> VALUE getStartupRequestParam(String propertyName);
 
   /**
    * Closes all forms contained in the given {@link Set}. For unsaved forms the user will be asked if they should be

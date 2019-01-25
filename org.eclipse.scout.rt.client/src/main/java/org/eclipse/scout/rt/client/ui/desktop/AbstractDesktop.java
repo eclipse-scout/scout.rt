@@ -199,6 +199,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   @Override
   protected void initConfigInternal() {
+    initStartupRequestParams();
     runWithDesktop(this::interceptInitConfig);
   }
 
@@ -1522,6 +1523,29 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     propertySupport.setPropertyString(PROP_SELECT_VIEW_TABS_KEY_STROKE_MODIFIER, selectViewTabsKeyStrokeModifier);
   }
 
+  /**
+   * @return request or URL parameters available at the time the Scout session/desktop has been attached. This map will
+   *         be available after the desktop has been created but before the openFromUI and attachedFromUI are called.
+   */
+  @Override
+  public PropertyMap getStartupRequestParams() {
+    return (PropertyMap) propertySupport.getProperty(PROP_STARTUP_REQUEST_PARAMS);
+  }
+
+  @Override
+  public <VALUE> VALUE getStartupRequestParam(String propertyName) {
+    return getStartupRequestParams().get(propertyName);
+  }
+
+  /**
+   * While the Desktop is initialized, the UiSession class makes sure the PropertyMap contains the startup request
+   * parameters. The desktop keeps a copy of these parameters which does not change until the desktop is re-attached.
+   */
+  protected void initStartupRequestParams() {
+    PropertyMap copy = new PropertyMap(PropertyMap.CURRENT.get());
+    propertySupport.setProperty(PROP_STARTUP_REQUEST_PARAMS, copy);
+  }
+
   @Override
   public void addNotification(final IDesktopNotification notification) {
     if (notification != null && m_notifications.add(notification)) {
@@ -2086,14 +2110,14 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       }
     }
 
-    PropertyMap propertyMap = PropertyMap.CURRENT.get();
-    final String geolocationServiceAvailableStr = propertyMap.get(IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE);
+    PropertyMap params = getStartupRequestParams();
+    final String geolocationServiceAvailableStr = params.get(IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE);
     final boolean geolocationServiceAvailable = TypeCastUtility.castValue(geolocationServiceAvailableStr, boolean.class);
     setGeolocationServiceAvailable(geolocationServiceAvailable);
 
-    boolean handleDeepLink = propertyMap.getOrDefault(DeepLinkUrlParameter.HANDLE_DEEP_LINK, true);
+    boolean handleDeepLink = params.getOrDefault(DeepLinkUrlParameter.HANDLE_DEEP_LINK, true);
     if (handleDeepLink) {
-      final String deepLinkPath = propertyMap.get(DeepLinkUrlParameter.DEEP_LINK);
+      final String deepLinkPath = params.get(DeepLinkUrlParameter.DEEP_LINK);
       activateDefaultView(deepLinkPath);
     }
   }
@@ -2496,6 +2520,11 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     @Override
     public void setGeoLocationServiceAvailableFromUI(boolean available) {
       setGeolocationServiceAvailable(available);
+    }
+
+    @Override
+    public void initStartupRequestParamsFromUI() {
+      initStartupRequestParams();
     }
 
     @Override

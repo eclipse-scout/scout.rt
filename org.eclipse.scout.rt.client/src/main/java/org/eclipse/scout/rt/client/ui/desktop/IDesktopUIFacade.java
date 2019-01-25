@@ -76,6 +76,8 @@ public interface IDesktopUIFacade {
 
   void setGeoLocationServiceAvailableFromUI(boolean available);
 
+  void initStartupRequestParamsFromUI();
+
   void fireGeolocationDetermined(String latitude, String longitude);
 
   void fireGeolocationFailed(String errorCode, String errorMessage);
@@ -84,4 +86,5 @@ public interface IDesktopUIFacade {
    * Called after DesktopNotification was removed from UI
    */
   void removedNotificationFromUI(IDesktopNotification desktopNotification);
+
 }
