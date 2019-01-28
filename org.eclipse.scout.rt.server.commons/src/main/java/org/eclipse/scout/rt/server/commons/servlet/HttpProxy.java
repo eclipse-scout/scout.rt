@@ -20,9 +20,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -62,17 +67,41 @@ public class HttpProxy {
 
   @PostConstruct
   protected void initialize() {
-    // field is set by http client itself
-    m_requestHeaderFilters.add(new HttpHeaderNameFilter("Content-Length"));
+    // -------------------------------------------------------------------------
+    // Remove hop-by-hop headers which are valid for a single transport-level
+    // connection only and must not be forwarded by a proxy.
+    //
+    // See also:
+    //  https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers#hbh
+    //  https://tools.ietf.org/html/rfc7230#section-6.1
+    //  https://www.mnot.net/blog/2011/07/11/what_proxies_must_do
+    Set<String> hopByHopRequestHeaders = CollectionUtility.hashSet(
+        "Connection",
+        "Keep-Alive",
+        "Transfer-Encoding",
+        "Proxy-Authorization",
+        "TE");
+    for (String header : hopByHopRequestHeaders) {
+      m_requestHeaderFilters.add(new HttpHeaderNameFilter(header));
+    }
 
-    // field is set by http client itself
+    Set<String> hopByHopResponseHeaders = CollectionUtility.hashSet(
+        "Connection",
+        "Keep-Alive",
+        "Transfer-Encoding",
+        "Proxy-Authenticate",
+        "Trailer");
+    for (String header : hopByHopResponseHeaders) {
+      m_responseHeaderFilters.add(new HttpHeaderNameFilter(header));
+    }
+
+    // -------------------------------------------------------------------------
+    // remove headers computed by the HTTP client itself
+    m_requestHeaderFilters.add(new HttpHeaderNameFilter("Content-Length"));
     m_requestHeaderFilters.add(new HttpHeaderNameFilter("Host"));
 
     // remove null header from response headers
     m_responseHeaderFilters.add(new HttpHeaderNameFilter(null));
-
-    // remove "Transfer-Encoding: chunked" header, server should decide about response on its own
-    m_responseHeaderFilters.add(new HttpHeaderNameValueFilter("Transfer-Encoding", "chunked"));
   }
 
   /**
@@ -150,9 +179,14 @@ public class HttpProxy {
 
   protected void writeRequestHeaders(HttpServletRequest req, HttpRequest httpReq) {
     Enumeration<String> headerNames = req.getHeaderNames();
+    final Set<String> hopByHopHeaderNames = getConnectionHeaderValues(req);
     while (headerNames.hasMoreElements()) {
       String name = headerNames.nextElement();
       String value = req.getHeader(name);
+      if (name != null && hopByHopHeaderNames.contains(name.toLowerCase(Locale.US))) {
+        LOG.trace("Removed hop-by-hop request header: {} (original value: {})", name, req.getHeader(name));
+        continue;
+      }
       for (IHttpHeaderFilter filter : getRequestHeaderFilters()) {
         value = filter.filter(name, value);
       }
@@ -224,9 +258,14 @@ public class HttpProxy {
   }
 
   protected void writeResponseHeaders(HttpServletResponse resp, HttpResponse httpResp) {
+    final Set<String> hopByHopHeaderNames = getConnectionHeaderValues(httpResp);
     for (Entry<String, Object> entry : httpResp.getHeaders().entrySet()) {
       String name = entry.getKey();
       String value = entry.getValue() instanceof Collection<?> ? CollectionUtility.firstElement(entry.getValue()).toString() : entry.getValue().toString();
+      if (name != null && hopByHopHeaderNames.contains(name.toLowerCase(Locale.US))) {
+        LOG.trace("Removed hop-by-hop response header: {} (original value: {})", name, value);
+        continue;
+      }
       String originalValue = value;
       for (IHttpHeaderFilter filter : getResponseHeaderFilters()) {
         value = filter.filter(name, value);
@@ -239,6 +278,42 @@ public class HttpProxy {
         LOG.trace("Removed response header: {} (original value: {})", name, originalValue);
       }
     }
+  }
+
+  /**
+   * Extracts the different values of the Connection HTTP request header, transformed to lower-case.
+   *
+   * @return set of distinct, non-null connection values in lower-case or an empty set, if the header is not set.
+   */
+  protected Set<String> getConnectionHeaderValues(HttpServletRequest req) {
+    Enumeration<String> enumeration = req.getHeaders("Connection");
+    if (enumeration == null) {
+      return Collections.emptySet();
+    }
+    Set<String> set = new HashSet<>();
+    while (enumeration.hasMoreElements()) {
+      String s = enumeration.nextElement();
+      if (StringUtility.hasText(s)) {
+        set.add(s.toLowerCase(Locale.US));
+      }
+    }
+    return set;
+  }
+
+  /**
+   * Extracts the different values of the Connection HTTP response header, transformed to lower-case.
+   *
+   * @return set of distinct, non-null connection values in lower-case or an empty set, if the header is not set.
+   */
+  protected Set<String> getConnectionHeaderValues(HttpResponse httpResp) {
+    return httpResp.getHeaders()
+        .getHeaderStringValues("Connection")
+        .stream()
+        .flatMap(v -> Stream.of(StringUtility.split(v, ",")))
+        .filter(StringUtility::hasText)
+        .map(StringUtility::trim)
+        .map(s -> s.toLowerCase(Locale.US))
+        .collect(Collectors.toSet());
   }
 
   /**
