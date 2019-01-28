@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
-import org.eclipse.scout.rt.jackson.testing.TestingJacksonDataObjectMapper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -31,6 +30,7 @@ import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.IDataObject;
 import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.platform.dataobject.TypeName;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -52,7 +52,7 @@ public class JsonDataObjectsExtensibilitySerializationTest {
   public static void beforeClass() {
     s_testHelper = BEANS.get(DataObjectSerializationTestHelper.class);
     s_dataObjectHelper = BEANS.get(DataObjectHelper.class);
-    s_dataObjectMapper = BEANS.get(TestingJacksonDataObjectMapper.class);
+    s_dataObjectMapper = BEANS.get(IPrettyPrintDataObjectMapper.class);
   }
 
   /* ------ Test case CoreBean as base, a project template bean and two concrete project bean implementations

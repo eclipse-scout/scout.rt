@@ -19,8 +19,8 @@ import java.net.URL;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.dataobject.DataObjectHelper;
-import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
+import org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.testing.platform.dataobject.DataObjectTestHelper;
@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.testing.platform.dataobject.DataObjectTestHelper;
 @ApplicationScoped
 public class DataObjectSerializationTestHelper extends DataObjectTestHelper {
 
-  protected static final LazyValue<IDataObjectMapper> s_dataObjectMapper = new LazyValue<>(IDataObjectMapper.class);
+  protected static final LazyValue<IPrettyPrintDataObjectMapper> s_dataObjectMapper = new LazyValue<>(IPrettyPrintDataObjectMapper.class);
 
   protected static final LazyValue<DataObjectHelper> s_dataObjectHelper = new LazyValue<>(DataObjectHelper.class);
 

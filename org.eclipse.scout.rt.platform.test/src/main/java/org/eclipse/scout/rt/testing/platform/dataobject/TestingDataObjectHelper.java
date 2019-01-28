@@ -21,9 +21,10 @@ import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.platform.util.LazyValue;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 
-@Order(10000) // see also TestingUtility.TESTING_RESOURSE_ORDER
 @Replace
+@Order(BeanTestingHelper.TESTING_RESOURCE_ORDER)
 public class TestingDataObjectHelper extends DataObjectHelper {
 
   /**

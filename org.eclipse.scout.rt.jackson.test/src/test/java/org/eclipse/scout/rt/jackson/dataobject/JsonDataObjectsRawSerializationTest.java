@@ -23,7 +23,6 @@ import java.util.function.Consumer;
 
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestVersionedDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
-import org.eclipse.scout.rt.jackson.testing.TestingJacksonDataObjectMapper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
@@ -32,6 +31,7 @@ import org.eclipse.scout.rt.platform.dataobject.DoNode;
 import org.eclipse.scout.rt.platform.dataobject.IDataObject;
 import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
+import org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -113,7 +113,7 @@ public class JsonDataObjectsRawSerializationTest {
   @BeforeClass
   public static void beforeClass() {
     s_testHelper = BEANS.get(DataObjectSerializationTestHelper.class);
-    s_dataObjectMapper = BEANS.get(TestingJacksonDataObjectMapper.class);
+    s_dataObjectMapper = BEANS.get(IPrettyPrintDataObjectMapper.class);
   }
 
   @Test
