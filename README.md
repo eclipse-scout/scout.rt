@@ -18,7 +18,7 @@ The easiest way to start with Eclipse Scout is to download _Eclipse for Scout De
 Documentation & Links
 ---------------------
 
-* [Eclipse Scout Wiki] [4]
+* [Eclipse Scout Documentation] [4]
 * [Eclipse Scout Forum] [5]
 * [Eclipse Bugzilla] [6] (Product=Scout; Component=Scout)
 
@@ -46,12 +46,12 @@ License
 [Eclipse Public License (EPL) v1.0] [9]
 
 
-[1]: http://eclipse.org/scout/
-[2]: http://wiki.eclipse.org/Scout/Updatesites
-[3]: http://www.eclipse.org/downloads/
-[4]: http://wiki.eclipse.org/Scout/
-[5]: http://eclipse.org/forums/eclipse.scout
-[6]: http://bugs.eclipse.org/
-[7]: http://wiki.eclipse.org/Scout/Contribution
-[8]: http://dev.eclipse.org/mailman/listinfo/scout-dev
-[9]: http://wiki.eclipse.org/EPL
+[1]: https://www.eclipse.org/scout/
+[2]: https://wiki.eclipse.org/Scout/Updatesites
+[3]: https://www.eclipse.org/downloads/packages/
+[4]: https://eclipsescout.github.io/
+[5]: https://www.eclipse.org/forums/index.php?t=thread&frm_id=174
+[6]: https://bugs.eclipse.org/bugs/
+[7]: https://wiki.eclipse.org/Scout/Contribution
+[8]: https://accounts.eclipse.org/mailing-list/scout-dev
+[9]: https://wiki.eclipse.org/Eclipse_Public_License

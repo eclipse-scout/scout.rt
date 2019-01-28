@@ -21,15 +21,15 @@ Documentation & Links
 ---------------------
 
 * [Project page] [6]
-* [Eclipse Scout Wiki] [7]
+* [Eclipse Scout Documentation] [7]
 * [Eclipse Scout Forum] [3]
 * [Eclipse Bugzilla] [2]
 
 
-[1]: http://wiki.eclipse.org/Scout/Contribution
-[2]: http://bugs.eclipse.org/
-[3]: http://eclipse.org/forums/eclipse.scout
-[4]: http://dev.eclipse.org/mailman/listinfo/scout-dev
-[5]: http://wiki.eclipse.org/EPL
-[6]: http://eclipse.org/scout/
-[7]: http://wiki.eclipse.org/Scout/
+[1]: https://wiki.eclipse.org/Scout/Contribution
+[2]: https://bugs.eclipse.org/bugs/
+[3]: https://www.eclipse.org/forums/index.php?t=thread&frm_id=174
+[4]: https://accounts.eclipse.org/mailing-list/scout-dev
+[5]: https://wiki.eclipse.org/Eclipse_Public_License
+[6]: https://www.eclipse.org/scout/
+[7]: https://eclipsescout.github.io/

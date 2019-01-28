@@ -1,43 +1,47 @@
 # Set default behaviour, in case users don't have core.autocrlf set.
-* text=auto
-
-#
-# The above will handle all files NOT found below
-#
-# These files are text and should be normalized (Convert crlf => lf)
-*.java       text
-*.xml        text
-*.txt        text
-*.js         text
-*.jsp        text
-*.sh         text
-*.cmd        text
-*.bat        text
-*.html       text
-*.htm        text
-*.css        text
-*.wsdl       text
-*.properties text
-*.launch     text
-.project     text
-.classpath   text
+* text eol=lf
 
 # These files are binary and should be left untouched
 # (binary is a macro for -text -diff)
-*.class  binary
-*.jar    binary
-*.so     binary
-*.dll    binary
-*.png    binary
-*.jpg    binary
-*.ai     binary
-*.vsd    binary
-*.gz     binary
-*.tar    binary
-*.exe    binary
-*.zip    binary
-*.exe    binary
-*polite.ini    binary
-*.ise    binary
-*.woff   binary
-*.woff2  binary
+*.7z binary
+*.bmp binary
+*.clx binary
+*.dat binary
+*.der binary
+*.dll binary
+*.doc binary
+*.docx binary
+*.eml binary
+*.eot binary
+*.ER1 binary
+*.exe binary
+*.frx binary
+*.gif binary
+*.icns binary
+*.ico binary
+*.jar binary
+*.jks binary
+*.jpg binary
+*.msg binary
+*.pdf binary
+*.PDF binary
+*.pdn binary
+*.png binary
+*.pptx binary
+*.psd binary
+*.ttf binary
+*.vsd binary
+*.woff binary
+*.woff2 binary
+*.xls binary
+*.xlsm binary
+*.xlsx binary
+*.xlt binary
+*.zip binary
+*.class binary
+*.so binary
+*.ai binary
+*.gz binary
+*.tar binary
+*polite.ini binary
+*.ise binary
