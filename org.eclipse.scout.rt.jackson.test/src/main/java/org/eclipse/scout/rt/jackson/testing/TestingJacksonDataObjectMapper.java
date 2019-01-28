@@ -11,10 +11,9 @@
 package org.eclipse.scout.rt.jackson.testing;
 
 import org.eclipse.scout.rt.jackson.dataobject.JacksonDataObjectMapper;
-import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
+import org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -22,9 +21,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 /**
  * {@link IDataObjectMapper} implementation based on jackson {@link ObjectMapper} with output indentation enabled (e.g.
  * pretty formatted JSON output).
+ *
+ * @deprecated Use {@link IPrettyPrintDataObjectMapper} instance instead // TODO [9.1] pbz: Remove this class
  */
-@Replace
-@Order(TestingUtility.TESTING_BEAN_ORDER)
+@IgnoreBean
+@Deprecated
 public class TestingJacksonDataObjectMapper extends JacksonDataObjectMapper {
 
   @Override

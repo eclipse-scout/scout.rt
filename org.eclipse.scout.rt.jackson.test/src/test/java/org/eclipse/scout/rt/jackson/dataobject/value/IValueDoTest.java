@@ -19,8 +19,9 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
-import org.eclipse.scout.rt.jackson.testing.TestingJacksonDataObjectMapper;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.platform.dataobject.value.BigDecimalValueDo;
 import org.eclipse.scout.rt.platform.dataobject.value.BooleanValueDo;
 import org.eclipse.scout.rt.platform.dataobject.value.DateTimeValueDo;
@@ -29,8 +30,6 @@ import org.eclipse.scout.rt.platform.dataobject.value.IValueDo;
 import org.eclipse.scout.rt.platform.dataobject.value.StringValueDo;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Various low-level tests for {@link IValueDo}
@@ -42,12 +41,12 @@ public class IValueDoTest {
   protected static BigDecimal s_testNumber;
 
   protected static DataObjectSerializationTestHelper s_testHelper;
-  protected static ObjectMapper s_dataObjectMapper;
+  protected static IDataObjectMapper s_dataObjectMapper;
 
   @BeforeClass
   public static void before() {
     s_testHelper = BEANS.get(DataObjectSerializationTestHelper.class);
-    s_dataObjectMapper = BEANS.get(TestingJacksonDataObjectMapper.class).getObjectMapper();
+    s_dataObjectMapper = BEANS.get(IPrettyPrintDataObjectMapper.class);
 
     Calendar c = Calendar.getInstance();
     c.clear();
@@ -58,7 +57,7 @@ public class IValueDoTest {
   }
 
   @Test
-  public void testTypedValueDoSerialization() throws Exception {
+  public void testTypedValueDoSerialization() {
     ValueDoFixtureDo fixture = new ValueDoFixtureDo();
     fixture.withDate(s_testDate);
     fixture.withDateTime(s_testDate);
@@ -70,7 +69,7 @@ public class IValueDoTest {
     fixture.put("dynamicTypedDate", DateValueDo.of(s_testDate));
     fixture.put("dynamicTypedDateTime", DateTimeValueDo.of(s_testDate));
 
-    String json = s_dataObjectMapper.writeValueAsString(fixture);
+    String json = s_dataObjectMapper.writeValue(fixture);
     assertJsonEquals("TestValueDoFixture.json", json);
   }
 

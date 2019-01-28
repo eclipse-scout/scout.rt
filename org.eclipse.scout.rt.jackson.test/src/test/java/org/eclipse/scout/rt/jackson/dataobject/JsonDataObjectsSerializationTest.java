@@ -82,7 +82,6 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestStringPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestSubPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestVersionedDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
-import org.eclipse.scout.rt.jackson.testing.TestingJacksonDataObjectMapper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -143,11 +142,12 @@ public class JsonDataObjectsSerializationTest {
   protected static ObjectMapper s_dataObjectMapper;
   protected static ObjectMapper s_defaultJacksonObjectMapper;
 
+  @SuppressWarnings("deprecation")
   @BeforeClass
   public static void beforeClass() {
     s_testHelper = BEANS.get(DataObjectSerializationTestHelper.class);
     s_dataObjectHelper = BEANS.get(DataObjectHelper.class);
-    s_dataObjectMapper = BEANS.get(TestingJacksonDataObjectMapper.class).getObjectMapper();
+    s_dataObjectMapper = BEANS.get(JacksonPrettyPrintDataObjectMapper.class).getObjectMapper();
 
     s_defaultJacksonObjectMapper = new ObjectMapper()
         .setSerializationInclusion(Include.NON_DEFAULT)
@@ -472,7 +472,7 @@ public class JsonDataObjectsSerializationTest {
   @Test
   public void testSerializeDeserialize_PojoWithJacksonAnnotations() throws Exception {
     // custom DoObjectMapper configured like default object mapper
-    final ObjectMapper customDoObjectMapper = BEANS.get(JacksonDataObjectMapper.class).createObjectMapperInstance(false)
+    final ObjectMapper customDoObjectMapper = BEANS.get(JacksonPrettyPrintDataObjectMapper.class).createObjectMapperInstance(false)
         .enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
         .setDateFormat(new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN));
 
@@ -954,9 +954,8 @@ public class JsonDataObjectsSerializationTest {
     assertJsonEquals("TestComplexEntityDo.json", doJson);
 
     // comparison with plain jackson object mapper and POJO object -> must result in same JSON
-    ObjectMapper defaultOm = s_defaultJacksonObjectMapper;
     TestComplexEntityPojo testPoJo = createTestPoJo();
-    String pojoJson = defaultOm.writeValueAsString(testPoJo);
+    String pojoJson = s_defaultJacksonObjectMapper.writeValueAsString(testPoJo);
     assertJsonEquals("TestComplexEntityDo.json", doJson);
     assertEquals(doJson, pojoJson);
   }
