@@ -24,7 +24,9 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.TableTest.P_Table.FirstColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableRowFilter;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -461,6 +463,129 @@ public class TableTest {
 
     table.resetColumnConfiguration();
     assertNull(table.getContextColumn());
+  }
+
+  @Test
+  public void testUserRowFilter() {
+    P_Table table = new P_Table();
+    table.initTable();
+    fillTable(table);
+
+    assertRowCount(5, 0, table);
+    assertEquals(0, table.getRowFilters().size());
+    assertEquals(5, table.getFilteredRowCount());
+    assertEquals(0, table.getSelectedRowCount());
+
+    table.selectRows(CollectionUtility.arrayList(table.getRow(0), table.getRow(1)));
+
+    assertEquals(2, table.getSelectedRowCount());
+
+    table.addRowFilter(new UserTableRowFilter(CollectionUtility.hashSet(table.getRow(0))));
+
+    assertEquals(1, table.getRowFilters().size());
+    assertEquals(1, table.getFilteredRowCount());
+    assertEquals(1, table.getSelectedRowCount());
+
+    List<ITableRow> rows = new ArrayList<>();
+    rows.add(table.createRow(new Object[]{10, "Lorem", 1}));
+    rows.add(table.createRow(new Object[]{2, "Ipsum", 2}));
+    table.replaceRows(rows);
+
+    assertRowCount(2, 0, table);
+    assertEquals(1, table.getRowFilters().size());
+    assertEquals(1, table.getFilteredRowCount());
+    assertEquals(1, table.getSelectedRowCount());
+
+    table.removeUserRowFilters();
+    table.addRowFilter(new UserTableRowFilter(CollectionUtility.hashSet(table.getRow(0))));
+
+    assertRowCount(2, 0, table);
+    assertEquals(1, table.getRowFilters().size());
+    assertEquals(1, table.getFilteredRowCount());
+    assertEquals(1, table.getSelectedRowCount());
+  }
+
+  @Test
+  public void testUserRowFilter_AutoDiscard() {
+    P_Table table = new P_Table();
+    table.setAutoDiscardOnDelete(true);
+    table.initTable();
+    fillTable(table);
+
+    assertRowCount(5, 0, table);
+    assertEquals(0, table.getRowFilters().size());
+    assertEquals(5, table.getFilteredRowCount());
+    assertEquals(0, table.getSelectedRowCount());
+
+    table.selectRows(CollectionUtility.arrayList(table.getRow(0), table.getRow(1)));
+
+    table.addRowFilter(new UserTableRowFilter(CollectionUtility.hashSet(table.getRow(0))));
+
+    assertEquals(1, table.getRowFilters().size());
+    assertEquals(1, table.getFilteredRowCount());
+    assertEquals(1, table.getSelectedRowCount());
+
+    List<ITableRow> rows = new ArrayList<>();
+    rows.add(table.createRow(new Object[]{10, "Lorem", 1}));
+    rows.add(table.createRow(new Object[]{2, "Ipsum", 2}));
+    table.replaceRows(rows);
+
+    assertRowCount(2, 0, table);
+    assertEquals(0, table.getRowFilters().size());
+    assertEquals(2, table.getFilteredRowCount());
+    assertEquals(1, table.getSelectedRowCount());
+
+    table.removeUserRowFilters();
+    table.addRowFilter(new UserTableRowFilter(CollectionUtility.hashSet(table.getRow(0))));
+
+    assertRowCount(2, 0, table);
+    assertEquals(1, table.getRowFilters().size());
+    assertEquals(1, table.getFilteredRowCount());
+    assertEquals(1, table.getSelectedRowCount());
+  }
+
+  @Test
+  public void testSelectionAfterDelete() {
+    P_Table table = new P_Table();
+    table.setAutoDiscardOnDelete(true);
+    table.initTable();
+    fillTable(table);
+
+    ITableRow r0 = table.getRow(0);
+    ITableRow r1 = table.getRow(1);
+    ITableRow r2 = table.getRow(2);
+    ITableRow r3 = table.getRow(3);
+    ITableRow r4 = table.getRow(4);
+
+    assertRowCount(5, 0, table);
+    assertEquals(0, table.getSelectedRowCount());
+
+    table.selectRows(CollectionUtility.arrayList(r1, r2, r3, r4));
+
+    assertEquals(4, table.getSelectedRowCount());
+    assertEquals(r1, table.getSelectedRows().get(0));
+    assertEquals(r2, table.getSelectedRows().get(1));
+    assertEquals(r3, table.getSelectedRows().get(2));
+    assertEquals(r4, table.getSelectedRows().get(3));
+
+    table.deleteRow(r1);
+
+    assertEquals(3, table.getSelectedRowCount());
+    assertEquals(r2, table.getSelectedRows().get(0));
+    assertEquals(r3, table.getSelectedRows().get(1));
+    assertEquals(r4, table.getSelectedRows().get(2));
+
+    table.deleteRow(r3);
+
+    assertEquals(2, table.getSelectedRowCount());
+    assertEquals(r2, table.getSelectedRows().get(0));
+    assertEquals(r4, table.getSelectedRows().get(1));
+
+    table.deleteRow(r0);
+
+    assertEquals(2, table.getSelectedRowCount());
+    assertEquals(r2, table.getSelectedRows().get(0));
+    assertEquals(r4, table.getSelectedRows().get(1));
   }
 
   private void assertValidTestTable(P_Table table, int status) {
