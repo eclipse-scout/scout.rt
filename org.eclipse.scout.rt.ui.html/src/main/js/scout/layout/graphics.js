@@ -561,8 +561,32 @@ scout.Rectangle.prototype.center = function() {
   return new scout.Point(this.x + this.width / 2, this.y + this.height / 2);
 };
 
+scout.Rectangle.prototype.right = function() {
+  return this.x + this.width;
+};
+
+scout.Rectangle.prototype.bottom = function() {
+  return this.y + this.height;
+};
+
 scout.Rectangle.prototype.contains = function(x, y) {
   return y >= this.y && y < this.y + this.height && x >= this.x && x < this.x + this.width;
+};
+
+/**
+ * Tests whether or not the specified rectangle intersects this rectangle.
+ * This means the two rectangles share at least one internal point.
+ *
+ * @param r the rectangle to test against
+ * @return true if the specified rectangle intersects this one
+ */
+scout.Rectangle.prototype.intersects = function(r) {
+  if (!r) {
+    return false;
+  }
+  return r.width > 0 && r.height > 0 && this.width > 0 && this.height > 0 &&
+    r.x < this.right() && r.right() > this.x &&
+    r.y < this.bottom() && r.bottom() > this.y;
 };
 
 scout.Rectangle.prototype.subtract = function(insets) {
