@@ -3068,75 +3068,73 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     if (rows != existingRows) {
       rows = resolveRows(rows);
     }
-    if (CollectionUtility.hasElements(rows)) {
-      try {
-        setTableChanging(true);
-        //
-        int rowCountBefore = getRowCount();
-        int min = getRowCount();
-        int max = 0;
-        for (ITableRow row : rows) {
-          min = Math.min(min, row.getRowIndex());
-          max = Math.max(max, row.getRowIndex());
+    if (!CollectionUtility.hasElements(rows)) {
+      return;
+    }
+    try {
+      setTableChanging(true);
+      //
+      int rowCountBefore = getRowCount();
+      int min = getRowCount();
+      int max = 0;
+      for (ITableRow row : rows) {
+        min = Math.min(min, row.getRowIndex());
+        max = Math.max(max, row.getRowIndex());
+      }
+      List<ITableRow> deletedRows = new ArrayList<ITableRow>(rows);
+      // remove from selection
+      deselectRows(deletedRows);
+      uncheckRows(deletedRows);
+      //delete impl
+      //peformance quick-check
+      if (rows == existingRows) {
+        //remove all of them
+        synchronized (m_cachedRowsLock) {
+          m_rows.clear();
+          m_cachedRows = null;
         }
-        List<ITableRow> deletedRows = new ArrayList<ITableRow>(rows);
-        // remove from selection
-        deselectRows(deletedRows);
-        uncheckRows(deletedRows);
-        //delete impl
-        //peformance quick-check
-        if (rows == existingRows) {
-          //remove all of them
-          synchronized (m_cachedRowsLock) {
-            m_rows.clear();
-            m_cachedRows = null;
+        for (int i = deletedRows.size() - 1; i >= 0; i--) {
+          ITableRow candidateRow = deletedRows.get(i);
+          if (candidateRow != null) {
+            deleteRowImpl(candidateRow);
           }
-          for (int i = deletedRows.size() - 1; i >= 0; i--) {
-            ITableRow candidateRow = deletedRows.get(i);
-            if (candidateRow != null) {
+        }
+      }
+      else {
+        for (int i = deletedRows.size() - 1; i >= 0; i--) {
+          ITableRow candidateRow = deletedRows.get(i);
+          if (candidateRow != null) {
+            // delete regardless if index is right
+            boolean removed = false;
+            synchronized (m_cachedRowsLock) {
+              removed = m_rows.remove(candidateRow);
+              if (removed) {
+                m_cachedRows = null;
+              }
+            }
+            if (removed) {
               deleteRowImpl(candidateRow);
             }
           }
         }
-        else {
-          for (int i = deletedRows.size() - 1; i >= 0; i--) {
-            ITableRow candidateRow = deletedRows.get(i);
-            if (candidateRow != null) {
-              // delete regardless if index is right
-              boolean removed = false;
-              synchronized (m_cachedRowsLock) {
-                removed = m_rows.remove(candidateRow);
-                if (removed) {
-                  m_cachedRows = null;
-                }
-              }
-              if (removed) {
-                deleteRowImpl(candidateRow);
-              }
-            }
-          }
-        }
-        // get affected rows
-        List<ITableRow> selectionRows = new ArrayList<ITableRow>(getSelectedRows());
-        int minAffectedIndex = Math.max(min - 1, 0);
-        ITableRow[] affectedRows = new ITableRow[getRowCount() - minAffectedIndex];
-        for (int i = minAffectedIndex; i < getRowCount(); i++) {
-          affectedRows[i - minAffectedIndex] = getRow(i);
-          ((InternalTableRow) affectedRows[i - minAffectedIndex]).setRowIndex(i);
-          selectionRows.remove(getRow(i));
-        }
-        if (rowCountBefore == deletedRows.size()) {
-          fireAllRowsDeleted(deletedRows);
-        }
-        else {
-          fireRowsDeleted(deletedRows);
-        }
-        //TODO [7.0] cgu: is this necessary? Deleted rows are deselected above
-        selectRows(selectionRows, false);
       }
-      finally {
-        setTableChanging(false);
+      // update index of rows at the bottom of deleted rows
+      int minAffectedIndex = Math.max(min - 1, 0);
+      ITableRow[] affectedRows = new ITableRow[getRowCount() - minAffectedIndex];
+      for (int i = minAffectedIndex; i < getRowCount(); i++) {
+        affectedRows[i - minAffectedIndex] = getRow(i);
+        ((InternalTableRow) affectedRows[i - minAffectedIndex]).setRowIndex(i);
       }
+      if (rowCountBefore == deletedRows.size()) {
+        removeUserRowFilters(false);
+        fireAllRowsDeleted(deletedRows);
+      }
+      else {
+        fireRowsDeleted(deletedRows);
+      }
+    }
+    finally {
+      setTableChanging(false);
     }
   }
 
