@@ -241,6 +241,12 @@ describe('NumberField', function() {
       field.acceptInput();
       expect(field.value).toBe(1.11);
       expect(field.displayText).toBe('111');
+
+      field.setDecimalFormat({
+        pattern: '###0.###',
+        multiplier: 0
+      });
+      expect(field.decimalFormat.multiplier).toBe(1);
     });
 
   });
