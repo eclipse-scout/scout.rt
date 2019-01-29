@@ -286,4 +286,31 @@ describe('NumberColumn', function() {
       expect(column0.maxValue).toBe(0.01);
     });
   });
+
+  describe('format', function() {
+    it('updates the value and the display text if the multiplier changes', function() {
+      var model = helper.createModelSingleColumnByValues([0.05, 0.06], 'NumberColumn');
+      var table = helper.createTable(model);
+      var column0 = table.columns[0];
+      table.render();
+
+      column0.setDecimalFormat({
+        pattern: '###0.###',
+        multiplier: 100
+      });
+
+      expect(column0.decimalFormat.multiplier).toBe(100);
+      expect(column0.cell(table.rows[0]).text).toBe('5');
+      expect(column0.cell(table.rows[0]).value).toBe(0.05);
+
+      column0.setDecimalFormat({
+        pattern: '###0.###',
+        multiplier: 1
+      });
+
+      expect(column0.decimalFormat.multiplier).toBe(1);
+      expect(column0.cell(table.rows[0]).text).toBe('0.05');
+      expect(column0.cell(table.rows[0]).value).toBe(0.05);
+    });
+  });
 });

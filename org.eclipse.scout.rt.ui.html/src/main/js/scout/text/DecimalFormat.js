@@ -117,15 +117,18 @@ scout.DecimalFormat = function(locale, options) {
 };
 
 /**
- * Returns a number for the given numberString, if the string can be converted into a number.
- * Throws an Error otherwise
+ * Converts the numberString into a number and applies the multiplier.
+ * @param numberString
+ * @param evaluateNumberFunction optional function for custom evaluation. The function gets a normalized string and has to return a Number
+ * @return Returns a number for the given numberString, if the string can be converted into a number. Throws an Error otherwise
  */
 scout.DecimalFormat.prototype.parse = function(numberString, evaluateNumberFunction) {
   if (scout.strings.empty(numberString)) {
     return null;
   }
   var normalizedNumberString = this.normalize(numberString);
-  var number = evaluateNumberFunction ? evaluateNumberFunction(normalizedNumberString) : Number(normalizedNumberString);
+  evaluateNumberFunction = evaluateNumberFunction || Number;
+  var number = evaluateNumberFunction(normalizedNumberString);
 
   if (isNaN(number)) {
     throw new Error(numberString + ' is not a number (NaN)');
