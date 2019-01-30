@@ -1171,6 +1171,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     // If a column got visible it is necessary to resend all rows to inform the gui about the new cells of the new column
     m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_ALL_ROWS_DELETED));
     m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_ROWS_INSERTED, getModel().getRows()));
+
+    // Ensure selection is preserved.
+    if (getModel().getSelectedRowCount() > 0) {
+      m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_ROWS_SELECTED, getModel().getSelectedRows()));
+    }
   }
 
   protected void preprocessBufferedEvents() {
