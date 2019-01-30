@@ -1046,6 +1046,23 @@ scout.Desktop.prototype.onResize = function(event) {
   this.revalidateLayoutTree();
 };
 
+scout.Desktop.prototype.resetPopstateHandler = function() {
+  this.setPopstateHandler(this.onPopstate.bind(this));
+};
+
+scout.Desktop.prototype.setPopstateHandler = function(handler) {
+  if (this.rendered || this.rendering) {
+    var window = this.$container.window();
+    if (this._popstateHandler) {
+      window.off('popstate', this._popstateHandler);
+    }
+    if (handler) {
+      window.on('popstate', handler);
+    }
+  }
+  this._popstateHandler = handler;
+};
+
 scout.Desktop.prototype.onPopstate = function(event) {
   var historyState = event.originalEvent.state;
   if (historyState && historyState.deepLinkPath) {
