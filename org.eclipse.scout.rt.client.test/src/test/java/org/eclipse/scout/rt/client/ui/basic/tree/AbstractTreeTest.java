@@ -311,6 +311,142 @@ public class AbstractTreeTest {
     assertFalse(g.isExpanded());
   }
 
+  @Test
+  public void testLazyExpandCollapse() {
+    // A
+    // +-B
+    // +-C
+    // | +-D
+    ITreeNode a = new P_TreeNode("A");
+    ITreeNode b = new P_TreeNode("B");
+    ITreeNode c = new P_TreeNode("C");
+    ITreeNode d = new P_TreeNode("D");
+    m_tree.addChildNode(m_tree.getRootNode(), a);
+    m_tree.addChildNode(a, b);
+    m_tree.addChildNode(a, c);
+    m_tree.addChildNode(c, d);
+
+    // In the beginning, everything is collapsed
+    assertFalse(a.isExpanded());
+    assertFalse(a.isExpandedLazy());
+    assertFalse(b.isExpanded());
+    assertFalse(b.isExpandedLazy());
+    assertFalse(c.isExpanded());
+    assertFalse(c.isExpandedLazy());
+    assertFalse(d.isExpanded());
+    assertFalse(d.isExpandedLazy());
+
+    // Expand A --> only A should be expanded
+    m_tree.setNodeExpanded(a, true, false);
+    assertTrue(a.isExpanded());
+    assertFalse(a.isExpandedLazy());
+    assertFalse(b.isExpanded());
+    assertFalse(b.isExpandedLazy());
+    assertFalse(c.isExpanded());
+    assertFalse(c.isExpandedLazy());
+    assertFalse(d.isExpanded());
+    assertFalse(d.isExpandedLazy());
+
+    // Lazy-Expand D --> A, C and D should be expanded
+    m_tree.setNodeExpanded(d, true, true);
+    assertTrue(a.isExpanded());
+    assertFalse(a.isExpandedLazy());
+    assertFalse(b.isExpanded());
+    assertFalse(b.isExpandedLazy());
+    assertTrue(c.isExpanded());
+    assertFalse(c.isExpandedLazy());
+    assertTrue(d.isExpanded());
+    assertTrue(d.isExpandedLazy());
+
+    // Lazy-Collapse D --> A, C should be expanded
+    m_tree.setNodeExpanded(d, false, true);
+    assertTrue(a.isExpanded());
+    assertFalse(a.isExpandedLazy());
+    assertFalse(b.isExpanded());
+    assertFalse(b.isExpandedLazy());
+    assertTrue(c.isExpanded());
+    assertFalse(c.isExpandedLazy());
+    assertFalse(d.isExpanded());
+    assertTrue(d.isExpandedLazy());
+
+    // Expand D --> A, C and D should be expanded
+    m_tree.setNodeExpanded(d, true, false);
+    assertTrue(a.isExpanded());
+    assertFalse(a.isExpandedLazy());
+    assertFalse(b.isExpanded());
+    assertFalse(b.isExpandedLazy());
+    assertTrue(c.isExpanded());
+    assertFalse(c.isExpandedLazy());
+    assertTrue(d.isExpanded());
+    assertFalse(d.isExpandedLazy());
+
+    // Lazy-Collapse D --> Collapse of D should be prevented
+    m_tree.setNodeExpanded(d, false, true);
+    assertTrue(a.isExpanded());
+    assertFalse(a.isExpandedLazy());
+    assertFalse(b.isExpanded());
+    assertFalse(b.isExpandedLazy());
+    assertTrue(c.isExpanded());
+    assertFalse(c.isExpandedLazy());
+    assertTrue(d.isExpanded());
+    assertFalse(d.isExpandedLazy());
+
+    // Lazy-Collapse C --> Collapse of C and D should be prevented
+    m_tree.setNodeExpanded(c, false, true);
+    assertTrue(a.isExpanded());
+    assertFalse(a.isExpandedLazy());
+    assertFalse(b.isExpanded());
+    assertFalse(b.isExpandedLazy());
+    assertTrue(c.isExpanded());
+    assertFalse(c.isExpandedLazy());
+    assertTrue(d.isExpanded());
+    assertFalse(d.isExpandedLazy());
+
+    // Collapse C --> C is collapsed
+    m_tree.setNodeExpanded(c, false, false);
+    assertTrue(a.isExpanded());
+    assertFalse(a.isExpandedLazy());
+    assertFalse(b.isExpanded());
+    assertFalse(b.isExpandedLazy());
+    assertFalse(c.isExpanded());
+    assertFalse(c.isExpandedLazy());
+    assertTrue(d.isExpanded());
+    assertFalse(d.isExpandedLazy());
+
+    // Collapse all
+    m_tree.collapseAll(a);
+    assertFalse(a.isExpanded());
+    assertFalse(a.isExpandedLazy());
+    assertFalse(b.isExpanded());
+    assertFalse(b.isExpandedLazy());
+    assertFalse(c.isExpanded());
+    assertFalse(c.isExpandedLazy());
+    assertFalse(d.isExpanded());
+    assertFalse(d.isExpandedLazy());
+
+    // Lazy-Expand B --> A and B are expanded
+    m_tree.setNodeExpanded(b, true, true);
+    assertTrue(a.isExpanded());
+    assertFalse(a.isExpandedLazy());
+    assertTrue(b.isExpanded());
+    assertTrue(b.isExpandedLazy());
+    assertFalse(c.isExpanded());
+    assertFalse(c.isExpandedLazy());
+    assertFalse(d.isExpanded());
+    assertFalse(d.isExpandedLazy());
+
+    // Lazy-Collapse A --> Collapse of A and B should be prevented
+    m_tree.setNodeExpanded(a, false, true);
+    assertTrue(a.isExpanded());
+    assertFalse(a.isExpandedLazy());
+    assertTrue(b.isExpanded());
+    assertTrue(b.isExpandedLazy());
+    assertFalse(c.isExpanded());
+    assertFalse(c.isExpandedLazy());
+    assertFalse(d.isExpanded());
+    assertFalse(d.isExpandedLazy());
+  }
+
   public static class P_Tree extends AbstractTree {
     ITreeNode m_currentDropNode;
     int m_execDropTargetChangedTimesCalled;
