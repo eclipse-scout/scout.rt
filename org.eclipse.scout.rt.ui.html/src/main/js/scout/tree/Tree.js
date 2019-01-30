@@ -1265,6 +1265,11 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
     }
   }
 
+  // Do not allow a lazy expansion/collapse if the node was manually expanded
+  if (lazy && node.expanded && !node.expandedLazy) {
+    return;
+  }
+
   // Optionally collapse all children (recursively)
   if (opts.collapseChildNodes) {
     // Suppress render expansion
