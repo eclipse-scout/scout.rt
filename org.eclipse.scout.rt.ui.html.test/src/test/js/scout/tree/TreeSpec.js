@@ -1476,6 +1476,61 @@ describe("Tree", function() {
 
   });
 
+  describe("lazyExpandCollapse", function() {
+
+    it("manual expand -> manual collapse node", function() {
+      var model = helper.createModelFixture(3, 2);
+      var tree = helper.createTree(model);
+      var node0 = tree.nodes[0];
+      tree.render();
+
+      expect(node0.expanded).toBe(false);
+      tree.expandNode(node0, {lazy: false});
+      expect(node0.expanded).toBe(true);
+      tree.collapseNode(node0, {lazy: false});
+      expect(node0.expanded).toBe(false);
+    });
+
+    it("manual expand -> lazy collapse node", function() {
+      var model = helper.createModelFixture(3, 2);
+      var tree = helper.createTree(model);
+      var node0 = tree.nodes[0];
+      tree.render();
+
+      expect(node0.expanded).toBe(false);
+      tree.expandNode(node0, {lazy: false});
+      expect(node0.expanded).toBe(true);
+      tree.collapseNode(node0, {lazy: true});
+      expect(node0.expanded).toBe(true);
+    });
+
+    it("lazy expand -> manual collapse node", function() {
+      var model = helper.createModelFixture(3, 2);
+      var tree = helper.createTree(model);
+      var node0 = tree.nodes[0];
+      tree.render();
+
+      expect(node0.expanded).toBe(false);
+      tree.expandNode(node0, {lazy: true});
+      expect(node0.expanded).toBe(true);
+      tree.collapseNode(node0, {lazy: false});
+      expect(node0.expanded).toBe(false);
+    });
+
+    it("lazy expand -> lazy collapse node", function() {
+      var model = helper.createModelFixture(3, 2);
+      var tree = helper.createTree(model);
+      var node0 = tree.nodes[0];
+      tree.render();
+
+      expect(node0.expanded).toBe(false);
+      tree.expandNode(node0, {lazy: true});
+      expect(node0.expanded).toBe(true);
+      tree.collapseNode(node0, {lazy: true});
+      expect(node0.expanded).toBe(false);
+    });
+  });
+
   describe("collapseNode", function() {
 
     it("prevents collapsing in bread crumb mode if node is selected", function() {
