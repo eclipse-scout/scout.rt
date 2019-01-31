@@ -14,6 +14,7 @@ scout.KeyStrokeManager = function(session) {
   this._helpRendered = false;
   this._renderedKeys = [];
   this.events = this._createEventSupport();
+  this.filters = [];
 
   this.installTopLevelKeyStrokeHandlers($mainEntryPoint);
 };
@@ -94,6 +95,16 @@ scout.KeyStrokeManager.prototype._renderKeys = function(keyStrokeContext, event)
       return (typeof render === 'function' ? render.call(keyStroke) : render);
     })
     .forEach(function(keyStroke) {
+
+      var filtered = false;
+      for (var i = 0; i < this.filters.length; i++) {
+        if (!this.filters[i].render(keyStroke)) {
+          filtered = true;
+          break;
+        }
+      }
+      keyStroke.filtered = filtered;
+
       var $drawingArea = (keyStroke.field ? keyStroke.field.$container : null) || keyStrokeContext.$getScopeTarget(); // Precedence: keystroke's field container, or the scope target otherwise.
       var keys = keyStroke.keys(); // Get all keys which are handled by the keystroke. Typically, this is a single key.
       keys.forEach(function(key) {
@@ -166,6 +177,14 @@ scout.KeyStrokeManager.prototype._handleKeyStrokeEvent = function(keyStrokeConte
     if (this.invokeAcceptInputOnActiveValueField(keyStroke, keyStrokeContext)) {
       scout.ValueField.invokeValueFieldAcceptInput(event.target);
     }
+
+    // FIXME [awe] tutorial: better use preventDefault?
+    for (var i = 0; i < this.filters.length; i++) {
+      if (!this.filters[i].accept(keyStroke, keyStrokeContext, event)) {
+        return true; // 'some-loop' breaks on true
+      }
+    }
+
     this.trigger('keyStroke', {
       keyStroke: keyStroke,
       keyStrokeContext: keyStrokeContext
@@ -175,7 +194,7 @@ scout.KeyStrokeManager.prototype._handleKeyStrokeEvent = function(keyStrokeConte
     keyStroke.invokeHandle(event);
 
     // Break on 'stopImmediate'.
-    return event.isImmediatePropagationStopped(); // 'some-loop' breaks on true.
+    return event.isImmediatePropagationStopped(); // 'some-loop' breaks on true
   }, this);
 };
 
@@ -234,6 +253,16 @@ scout.KeyStrokeManager.prototype._onKeyEvent = function(keyStrokeContext, event)
   } else {
     this._handleKeyStrokeEvent(keyStrokeContext, event);
   }
+};
+
+scout.KeyStrokeManager.prototype.addFilter = function(filter) {
+  if (filter && this.filters.indexOf(filter) === -1) {
+    this.filters.push(filter);
+  }
+};
+
+scout.KeyStrokeManager.prototype.removeFilter = function(filter) {
+  scout.arrays.remove(this.filters, filter);
 };
 
 //--- Event handling methods ---

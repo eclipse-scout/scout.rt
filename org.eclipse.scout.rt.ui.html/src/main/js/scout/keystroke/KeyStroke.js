@@ -243,12 +243,14 @@ scout.KeyStroke.prototype._renderKeyBox = function($parent, keyCode) {
   if (position === 'absolute' || position === 'relative' || (position === 'static' && $existingKeyBoxes.length > 0)) {
     return $parent.prependDiv('key-box ', text)
       .css(align, offset + 'px')
+      .toggleClass('filtered', this.filtered)
       .addClass(align);
   }
   var pos = $parent.position();
   if (pos) {
     return $parent.prependDiv('key-box ', text)
       .css(align, (pos.left + offset) + 'px')
+      .toggleClass('filtered', this.filtered)
       .addClass(align);
   }
   $.log.warn('(keys#drawSingleKeyBoxItem) pos is undefined. $parent=' + $parent);
