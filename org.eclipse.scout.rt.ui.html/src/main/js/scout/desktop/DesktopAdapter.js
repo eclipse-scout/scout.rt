@@ -55,8 +55,8 @@ scout.DesktopAdapter.prototype._onWidgetEvent = function(event) {
     this._onWidgetFormActivate(event);
   } else if (event.type === 'historyEntryActivate') {
     this._onWidgetHistoryEntryActivate(event);
-  } else if (event.type === 'closeForms') {
-    this._onWidgetCloseAllForms(event);
+  } else if (event.type === 'cancelForms') {
+    this._onWidgetCancelAllForms(event);
   } else {
     scout.DesktopAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }
@@ -92,7 +92,7 @@ scout.DesktopAdapter.prototype._onFormActivate = function(event) {
   this.widget.activateForm(form);
 };
 
-scout.DesktopAdapter.prototype._onWidgetCloseAllForms = function(event) {
+scout.DesktopAdapter.prototype._onWidgetCancelAllForms = function(event) {
   event.preventDefault();
   var formIds = [];
   if (event.forms) {
@@ -100,7 +100,7 @@ scout.DesktopAdapter.prototype._onWidgetCloseAllForms = function(event) {
       return form.modelAdapter.id;
     });
   }
-  this._send('closeForms', {
+  this._send('cancelForms', {
     formIds: formIds
   });
 };

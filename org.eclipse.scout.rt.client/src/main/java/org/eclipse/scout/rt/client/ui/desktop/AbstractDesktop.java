@@ -2667,8 +2667,13 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   @Override
-  public boolean closeForms(Set<IForm> formSet) {
+  public boolean cancelForms(Set<IForm> formSet) {
     if (formSet == null || formSet.isEmpty()) {
+      return true;
+    }
+    // if formSet contains only one element simply call doCancel on that form. Using the UnsavedFormChangesForm is not necessary in this case.
+    if (formSet.size() == 1) {
+      CollectionUtility.firstElement(formSet).doCancel();
       return true;
     }
     return continueClosingConsideringUnsavedForms(getUnsavedForms(formSet), false) && internalCloseForms(formSet);

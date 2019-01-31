@@ -19,7 +19,7 @@ scout.DesktopTab.prototype._render = function() {
   this.$container.on('contextmenu', this._onContextMenu.bind(this));
 };
 
-scout.DesktopTab.prototype._onContextMenu = function() {
+scout.DesktopTab.prototype._onContextMenu = function(event) {
   var menuCloseAllTabs = scout.create('Menu', {
     parent: this,
     text: this.session.text('ui.CloseAllTabs')
@@ -49,11 +49,7 @@ scout.DesktopTab.prototype._onCloseAll = function() {
   var openViews = this.parent.tabs.map(function(desktopTab) {
     return desktopTab.view;
   });
-  if (openViews.length === 1) {
-    openViews[0].cancel();
-  } else {
-    this.session.desktop.closeViews(openViews);
-  }
+  this.session.desktop.cancelViews(openViews);
 };
 
 scout.DesktopTab.prototype._onCloseOther = function() {
@@ -61,9 +57,5 @@ scout.DesktopTab.prototype._onCloseOther = function() {
     return desktopTab.view;
   });
   scout.arrays.remove(openViews, this.view);
-  if (openViews.length === 1) {
-    openViews[0].cancel();
-  } else {
-    this.session.desktop.closeViews(openViews);
-  }
+  this.session.desktop.cancelViews(openViews);
 };

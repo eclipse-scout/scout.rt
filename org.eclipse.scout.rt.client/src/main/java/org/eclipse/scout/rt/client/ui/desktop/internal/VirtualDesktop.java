@@ -789,7 +789,7 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public boolean closeForms(Set<IForm> formSet) {
+  public boolean cancelForms(Set<IForm> formSet) {
     throw createUnsupportedOperationException();
   }
 

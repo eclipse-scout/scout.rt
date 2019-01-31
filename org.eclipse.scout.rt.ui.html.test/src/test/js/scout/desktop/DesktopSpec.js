@@ -1372,7 +1372,7 @@ describe('Desktop', function() {
     });
   });
 
-  describe('closeViewsMenu', function() {
+  describe('cancelViewsMenu', function() {
 
     var view1, view2, view3, promises;
 
@@ -1413,7 +1413,7 @@ describe('Desktop', function() {
       promises.push(view2.whenClose());
       promises.push(view3.whenClose());
 
-      desktop.closeViews([view1, view2, view3]);
+      desktop.cancelViews([view1, view2, view3]);
 
       $.promiseAll(promises).then(function() {
           expect(view1.close).toHaveBeenCalled();
@@ -1429,7 +1429,7 @@ describe('Desktop', function() {
       promises.push(view1.whenClose());
       promises.push(view2.whenClose());
 
-      desktop.closeViews([view1, view2]);
+      desktop.cancelViews([view1, view2]);
 
       $.promiseAll(promises).then(function() {
           expect(view1.close).toHaveBeenCalled();
@@ -1448,7 +1448,7 @@ describe('Desktop', function() {
       promises.push(view2.whenSave());
       promises.push(view2.whenClose());
 
-      desktop.closeViews([view1, view2]);
+      desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
       var unsavedFormChangesForm = scout.arrays.last(desktop.children);
@@ -1474,7 +1474,7 @@ describe('Desktop', function() {
     it('close tabs and cancel UnsavedFormChangesForm', function(done) {
       view2.rootGroupBox.fields[0].setValue('Foo');
 
-      desktop.closeViews([view1, view2]);
+      desktop.cancelViews([view1, view2]);
       // UnsavedFormChangesForm should be the last child
       var unsavedFormChangesForm = scout.arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
@@ -1495,7 +1495,7 @@ describe('Desktop', function() {
       promises.push(view1.whenClose());
       promises.push(view2.whenClose());
 
-      desktop.closeViews([view1, view2]);
+      desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
       var unsavedFormChangesForm = scout.arrays.last(desktop.children);
@@ -1531,7 +1531,7 @@ describe('Desktop', function() {
 
       jasmine.clock().install();
 
-      desktop.closeViews([view2, view3]);
+      desktop.cancelViews([view2, view3]);
 
       jasmine.clock().tick(10);
 
@@ -1558,7 +1558,7 @@ describe('Desktop', function() {
       promises.push(view1.whenClose());
       promises.push(view2.whenClose());
 
-      desktop.closeViews([view1, view2]);
+      desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
       var unsavedFormChangesForm = scout.arrays.last(desktop.children);
@@ -1601,7 +1601,7 @@ describe('Desktop', function() {
 
       spyOn(modalDialog, 'ok').and.callThrough();
 
-      desktop.closeViews([view1, view2]);
+      desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
       var unsavedFormChangesForm = scout.arrays.last(desktop.children);
@@ -1643,7 +1643,7 @@ describe('Desktop', function() {
       spyOn(modalDialog, 'close').and.callThrough();
       spyOn(modalDialog, 'ok').and.callThrough();
 
-      desktop.closeViews([view1, view2]);
+      desktop.cancelViews([view1, view2]);
 
       $.promiseAll(promises).then(function() {
           expect(view1.close).toHaveBeenCalled();
@@ -1668,7 +1668,7 @@ describe('Desktop', function() {
       view2.rootGroupBox.fields[0].setValue('Foo');
 
       jasmine.clock().install();
-      desktop.closeViews([view1, view2]);
+      desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
       var unsavedFormChangesForm = scout.arrays.last(desktop.children);
@@ -1723,7 +1723,7 @@ describe('Desktop', function() {
       modalDialog.rootGroupBox.fields[0].setValue('Foo');
 
       jasmine.clock().install();
-      desktop.closeViews([view1, view2]);
+      desktop.cancelViews([view1, view2]);
       // UnsavedFormChangesForm should be the last child
       var unsavedFormChangesForm = scout.arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');

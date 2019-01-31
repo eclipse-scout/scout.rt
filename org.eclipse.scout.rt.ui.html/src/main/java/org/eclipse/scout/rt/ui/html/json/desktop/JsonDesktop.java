@@ -64,7 +64,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
   private static final String EVENT_REMOVE_NOTIFICATION = "removeNotification";
   private static final String EVENT_OPEN_URI = "openUri";
   private static final String EVENT_FORM_ACTIVATE = "formActivate";
-  private static final String EVENT_CLOSE_FORMS = "closeForms";
+  private static final String EVENT_CANCEL_FORMS = "cancelForms";
 
   public static final String PROP_OUTLINE = "outline";
   public static final String PROP_DISPLAY_PARENT = "displayParent";
@@ -121,8 +121,8 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
     else if (EVENT_GEOLOCATION_DETERMINED.equals(event.getType())) {
       handleUiGeolocationDetermined(event);
     }
-    else if (EVENT_CLOSE_FORMS.equals(event.getType())) {
-      handleCloseAllForms(event);
+    else if (EVENT_CANCEL_FORMS.equals(event.getType())) {
+      handleCancelAllForms(event);
     }
     else {
       super.handleUiEvent(event);
@@ -167,7 +167,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
     }
   }
 
-  protected void handleCloseAllForms(JsonEvent event) {
+  protected void handleCancelAllForms(JsonEvent event) {
     JSONArray formIds = event.getData().optJSONArray("formIds");
     HashSet<IForm> formSet = new HashSet<>();
     if (formIds != null) {
@@ -180,7 +180,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
         formSet.add((IForm) jsonAdapter.getModel());
       }
     }
-    getModel().closeForms(formSet);
+    getModel().cancelForms(formSet);
   }
 
   protected void handleUiGeolocationDetermined(JsonEvent event) {

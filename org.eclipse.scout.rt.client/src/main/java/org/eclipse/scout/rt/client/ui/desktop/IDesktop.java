@@ -917,8 +917,8 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   <VALUE> VALUE getStartupRequestParam(String propertyName);
 
   /**
-   * Closes all forms contained in the given {@link Set}. For unsaved forms the user will be asked if they should be
-   * saved or not with a specific dialog (see @link UnsavedFormChangesFrom).
+   * Cancels all forms contained in the given {@link Set}. For forms with unsaved changes the user will be asked if they
+   * should be saved or not with a specific dialog (see @link UnsavedFormChangesFrom).
    *
    * @param formSet
    *          {@link Set} of {@link IForm}s that should be closed. Can be null or empty.
@@ -926,6 +926,6 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    *         cancelled.
    * @since 9.0
    */
-  boolean closeForms(Set<IForm> formSet);
+  boolean cancelForms(Set<IForm> formSet);
 
 }

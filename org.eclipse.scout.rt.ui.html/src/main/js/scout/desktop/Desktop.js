@@ -964,19 +964,25 @@ scout.Desktop.prototype.triggerFormActivate = function(form) {
   });
 };
 
-scout.Desktop.prototype.closeViews = function(forms) {
+scout.Desktop.prototype.cancelViews = function(forms) {
   var event = new scout.Event();
   event.forms = forms;
-  this.trigger('closeForms', event);
+  this.trigger('cancelForms', event);
   if (!event.defaultPrevented) {
-    this._closeViews(forms);
+    this._cancelViews(forms);
   }
 };
 
-scout.Desktop.prototype._closeViews = function(forms) {
+scout.Desktop.prototype._cancelViews = function(forms) {
+  // if there's only one form simply cancel it directly
+  if (forms.length === 1) {
+    forms[0].cancel();
+    return;
+  }
   var formFilter = function(displayChild) {
     return displayChild instanceof scout.Form;
   };
+  // collect all forms in the display child hierarchy with unsaved changes.
   var unsavedForms = forms.filter(function(form) {
     var requiresSaveChildDialogs = false;
     form.visitDisplayChildren(function(dialog) {
@@ -987,6 +993,7 @@ scout.Desktop.prototype._closeViews = function(forms) {
     return form.lifecycle.requiresSave() || requiresSaveChildDialogs;
   });
 
+  // initialize with a resolved promise in case there are no unsaved forms.
   var waitFor = $.resolvedPromise();
   if (unsavedForms.length > 0) {
     var unsavedFormChangesForm = scout.create('scout.UnsavedFormChangesForm', {
@@ -996,6 +1003,7 @@ scout.Desktop.prototype._closeViews = function(forms) {
       unsavedForms: unsavedForms
     });
     unsavedFormChangesForm.open();
+    // promise that is resolved when the UnsavedFormChangesForm is stored
     waitFor = unsavedFormChangesForm.whenSave().then(function() {
       var formsToSave = unsavedFormChangesForm.openFormsField.value;
       formsToSave.forEach(function(form) {
@@ -1014,8 +1022,10 @@ scout.Desktop.prototype._closeViews = function(forms) {
   }
   waitFor.then(function(formsToSave) {
     if (formsToSave) {
+      // already saved & closed forms (handled by the UnsavedFormChangesForm)
       scout.arrays.removeAll(forms, formsToSave);
     }
+    // close the remaining forms that don't require saving.
     forms.forEach(function(form) {
       form.visitDisplayChildren(function(dialog) {
         dialog.close();
