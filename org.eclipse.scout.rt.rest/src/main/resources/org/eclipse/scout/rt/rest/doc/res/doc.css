@@ -1,0 +1,183 @@
+body {
+  font-family: sans-serif;
+  color: #333;
+  background-color: #fefefe;
+  margin: 2em;
+}
+
+h1 {
+  font-weight: normal;
+  font-size: 2.5em;
+}
+
+h2 {
+  font-weight: normal;
+  font-size: 1.5em;
+  padding-top: 1em;
+  margin-top: 0;
+}
+
+.toc {
+  padding: 2em;
+  background-color: #f0f0f0;
+  column-width: 250px;
+  margin-top: 1em;
+  margin-bottom: 2em;
+  max-width: 1111px;
+}
+
+.toc-title {
+  font-weight: bold;
+  margin-bottom: 1em;
+  column-span: all;
+}
+
+.toc-section {
+  margin-bottom: 0.5em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: monospace;
+  font-weight: bold;
+}
+
+.toc-section:not(.first) {
+  margin-top: 1em;
+}
+
+.toc-item {
+  margin-bottom: 0.5em;
+  margin-left: 1em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.toc-link {
+  color: darkblue;
+}
+
+.title-link {
+  text-decoration: none;
+  color: unset;
+  margin-left: 0.75em;
+  font-size: 0.9em;
+  color: #eee;
+}
+
+.title-link:hover {
+  color: #ccc;
+}
+
+.title-link.first {
+  margin-left: 1.5em;
+}
+
+.resource-description {
+  margin: 1.5em 0;
+}
+
+.operation {
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.http {
+  flex: none;
+  min-width: 3.5em;
+  font-weight: bold;
+  margin-right: 1em;
+  background-color: #333;
+  color: #fff;
+  padding: 6px 10px 4px 10px;
+  text-align: center;
+}
+
+.http.get {
+  background-color: limegreen;
+}
+
+.http.post {
+  background-color: deepskyblue;
+}
+
+.http.put {
+  background-color: darkorange;
+}
+
+.http.delete {
+  background-color: deeppink;
+}
+
+.path {
+  flex: 1;
+  font-family: monospace;
+  white-space: nowrap;
+}
+
+.path>.method {
+  color: tomato;
+}
+
+.body {
+  flex: 0 0 100%;
+  margin-top: 1.5em;
+}
+
+.description {
+}
+
+.signature {
+  margin-top: 1.5em;
+  color: #999;
+}
+
+.consumes-produces {
+  margin-top: 1em;
+  font-size: 12px;
+  color: #999;
+}
+
+.consumes-produces > .line >.v {
+  font-family: monospace;
+}
+
+.footer {
+  margin-top: 1.5em;
+  padding-top: 1.5em;
+  border-top: 1px solid #ccc;
+}
+
+.info {
+  font-style: italic;
+}
+
+/* Print rules */
+
+@page {
+  margin: 1.5cm;
+}
+
+@media print {
+
+  body {
+    -webkit-print-color-adjust: exact;
+  }
+
+  .operation {
+    page-break-inside: avoid;
+  }
+
+  .title-link {
+    display: none;
+  }
+
+  .top-link {
+    display: none;
+  }
+}
