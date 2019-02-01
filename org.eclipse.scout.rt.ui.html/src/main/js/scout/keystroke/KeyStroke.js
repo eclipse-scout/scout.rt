@@ -22,6 +22,7 @@ scout.KeyStroke = function() {
   this.repeatable = false; // whether or not the handle method is called multiple times while a key is pressed
   this._handleExecuted = false; // internal flag to remember whether or not the handle method has been executed (reset on keyup)
   this.keyStrokeFirePolicy = scout.Action.KeyStrokeFirePolicy.ACCESSIBLE_ONLY;
+  this.enabledByFilter = true;
 
   // Hints to control rendering of the key(s).
   this.renderingHints = {
@@ -56,27 +57,12 @@ scout.KeyStroke = function() {
 /**
  * Parses the given keystroke name into the key parts like 'ctrl', 'shift', 'alt' and 'which'.
  */
-scout.KeyStroke.prototype.parseAndSetKeyStroke = function(keyStroke) {
+scout.KeyStroke.prototype.parseAndSetKeyStroke = function(keyStrokeName) {
   this.alt = this.ctrl = this.shift = false;
   this.which = [];
-
-  if (!keyStroke) {
-    return;
+  if (keyStrokeName) {
+    $.extend(this, scout.KeyStroke.parseKeyStroke(keyStrokeName));
   }
-
-  // see org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer
-  keyStroke.split('-').forEach(function(part) {
-    if (part === 'alternate' || part === 'alt') {
-      this.alt = true;
-    } else if (part === 'control' || part === 'ctrl') {
-      this.ctrl = true;
-    } else if (part === 'shift') {
-      this.shift = true;
-    } else {
-      var key = scout.keys[part.toUpperCase()];
-      this.which = key && [key];
-    }
-  }, this);
 };
 
 /**
@@ -241,19 +227,20 @@ scout.KeyStroke.prototype._renderKeyBox = function($parent, keyCode) {
   }
   var position = $parent.css('position');
   if (position === 'absolute' || position === 'relative' || (position === 'static' && $existingKeyBoxes.length > 0)) {
-    return $parent.prependDiv('key-box ', text)
-      .css(align, offset + 'px')
-      .toggleClass('filtered', this.filtered)
-      .addClass(align);
+    return prependKeyBox.call(this, offset);
   }
   var pos = $parent.position();
   if (pos) {
-    return $parent.prependDiv('key-box ', text)
-      .css(align, (pos.left + offset) + 'px')
-      .toggleClass('filtered', this.filtered)
-      .addClass(align);
+    return prependKeyBox.call(this, pos.left + offset);
   }
   $.log.warn('(keys#drawSingleKeyBoxItem) pos is undefined. $parent=' + $parent);
+
+  function prependKeyBox(alignValue) {
+    return $parent.prependDiv('key-box ', text)
+      .css(align, alignValue + 'px')
+      .toggleClass('disabled', !this.enabledByFilter)
+      .addClass(align);
+  }
 };
 
 /**
@@ -274,4 +261,41 @@ scout.KeyStroke.prototype.removeKeyBox = function($drawingArea) {
 scout.KeyStrokeMode = {
   UP: 'keyup',
   DOWN: 'keydown'
+};
+
+// --- Static helpers --- //
+
+/**
+ * Parses the given keystroke name into the key parts like 'ctrl', 'shift', 'alt' and 'which'.
+ *
+ * @returns a plain object with properties ctrl, shift, alt and which - may be used as input
+ *     for Key.js and KeyStroke.js
+ * @see org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer
+ */
+scout.KeyStroke.parseKeyStroke = function(keyStrokeName) {
+  if (!keyStrokeName) {
+    return null;
+  }
+
+  var keyStrokeObj = {
+      alt: false,
+      ctrl: false,
+      shift: false,
+      which: []
+    };
+
+  keyStrokeName.split('-').forEach(function(part) {
+    if (part === 'alternate' || part === 'alt') {
+      keyStrokeObj.alt = true;
+    } else if (part === 'control' || part === 'ctrl') {
+      keyStrokeObj.ctrl = true;
+    } else if (part === 'shift') {
+      keyStrokeObj.shift = true;
+    } else {
+      var key = scout.keys[part.toUpperCase()];
+      keyStrokeObj.which = key && [key];
+    }
+  });
+
+  return keyStrokeObj;
 };
