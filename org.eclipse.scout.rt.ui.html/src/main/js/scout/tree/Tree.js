@@ -1961,6 +1961,7 @@ scout.Tree.prototype.revealSelection = function() {
       this._expandAllParentNodes(this.selectedNodes[0]);
     }
     this.scrollTo(this.selectedNodes[0]);
+    this.ensureExpansionVisible(this.selectedNodes[0]);
   }
 };
 
