@@ -10,20 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.context;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.config.ConfigUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Provides the current node's identification.
@@ -33,7 +27,6 @@ import org.slf4j.LoggerFactory;
 @ApplicationScoped
 public class NodeIdentifier {
 
-  private static final Logger LOG = LoggerFactory.getLogger(NodeIdentifier.class);
   private String m_nodeId;
 
   @PostConstruct
@@ -70,26 +63,8 @@ public class NodeIdentifier {
       return nodeId;
     }
 
-    // Use host name
-    String hostname = null;
-    try {
-      hostname = InetAddress.getLocalHost().getHostName();
-    }
-    catch (final UnknownHostException e) { // NOSONAR
-      LOG.debug("Failed to resolve hostname", e);
-    }
-
-    if (StringUtility.isNullOrEmpty(hostname) || "localhost".equalsIgnoreCase(hostname)) {
-      return UUID.randomUUID().toString(); // use random number
-    }
-
-    // In development mode there might be running multiple instances on different ports.
-    // Therefore, we use the Jetty port as well.
-    if (Platform.get().inDevelopmentMode()) {
-      return StringUtility.join(":", hostname, ConfigUtility.getProperty("scout.jetty.port"));
-    }
-
-    return StringUtility.join(":", hostname, 8080);
+    // Generate random ID
+    return UUID.randomUUID().toString();
   }
 
   public static class NodeIdProperty extends AbstractStringConfigProperty {
