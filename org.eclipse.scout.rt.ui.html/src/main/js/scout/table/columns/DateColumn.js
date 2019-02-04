@@ -27,12 +27,38 @@ scout.DateColumn.prototype._init = function(model) {
   this._setGroupFormat(this.groupFormat);
 };
 
+scout.DateColumn.prototype.setFormat = function(format) {
+  if (this.format === format) {
+    return;
+  }
+  this._setFormat(format);
+  if (this.initialized) {
+    //if format changes on the fly, just update the cell text
+    this.table.rows.forEach(function(row) {
+      this._updateCellText(row, this.cell(row));
+    }.bind(this));
+  }
+};
+
 scout.DateColumn.prototype._setFormat = function(format) {
   if (!format) {
     format = this._getDefaultFormat(this.session.locale);
   }
   format = scout.DateFormat.ensure(this.session.locale, format);
   this.format = format;
+};
+
+scout.DateColumn.prototype.setGroupFormat = function(format) {
+  if (this.groupFormat === format) {
+    return;
+  }
+  this._setGroupFormat(format);
+  if (this.initialized) {
+    //if format changes on the fly, just update the cell text
+    this.table.rows.forEach(function(row) {
+      this._updateCellText(row, this.cell(row));
+    }.bind(this));
+  }
 };
 
 scout.DateColumn.prototype._setGroupFormat = function(format) {

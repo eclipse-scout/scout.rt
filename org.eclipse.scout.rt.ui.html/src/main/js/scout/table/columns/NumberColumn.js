@@ -39,10 +39,12 @@ scout.NumberColumn.prototype.setDecimalFormat = function(decimalFormat) {
     return;
   }
   this._setDecimalFormat(decimalFormat);
-  // if format changes on the fly, just update the cell text
-  this.table.rows.forEach(function(row) {
-    this._updateCellText(row, this.cell(row));
-  }.bind(this));
+  if (this.initialized) {
+    // if format changes on the fly, just update the cell text
+    this.table.rows.forEach(function(row) {
+      this._updateCellText(row, this.cell(row));
+    }.bind(this));
+  }
 };
 
 scout.NumberColumn.prototype._setDecimalFormat = function(format) {
