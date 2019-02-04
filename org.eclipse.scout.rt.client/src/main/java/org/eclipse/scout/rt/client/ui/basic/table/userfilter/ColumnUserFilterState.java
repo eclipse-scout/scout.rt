@@ -16,9 +16,11 @@ import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUti
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.AbstractUserFilterState;
+import org.eclipse.scout.rt.client.ui.basic.userfilter.IColumnAwareUserFilterState;
 import org.eclipse.scout.rt.platform.text.TEXTS;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
-public class ColumnUserFilterState extends AbstractUserFilterState {
+public class ColumnUserFilterState extends AbstractUserFilterState implements IColumnAwareUserFilterState {
   private static final long serialVersionUID = 1L;
   public static final String TYPE = "column";
 
@@ -65,4 +67,10 @@ public class ColumnUserFilterState extends AbstractUserFilterState {
     return m_column != null;
   }
 
+  @Override
+  public void replaceColumn(IColumn<?> col) {
+    if (ObjectUtility.equals(m_columnId, col.getColumnId())) {
+      setColumn(col);
+    }
+  }
 }

@@ -77,9 +77,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.internal.InternalTableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.OrganizeColumnsMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.ITableOrganizer;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.ITableOrganizerProvider;
-import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableRowFilter;
+import org.eclipse.scout.rt.client.ui.basic.userfilter.IColumnAwareUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilter;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
@@ -3685,14 +3685,10 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       return;
     }
     for (IColumn<?> col : getColumns()) {
-      IUserFilterState filter = getUserFilterManager().getFilter(col.getColumnId());
-      if (filter == null) {
-        continue;
-      }
-      if (!(filter instanceof ColumnUserFilterState)) {
-        throw new IllegalStateException("Unexpected filter state" + filter.getClass());
-      }
-      ((ColumnUserFilterState) filter).setColumn(col);
+      getUserFilterManager().getFilters().stream()
+          .filter(IColumnAwareUserFilterState.class::isInstance)
+          .map(IColumnAwareUserFilterState.class::cast)
+          .forEach(filter -> filter.replaceColumn(col));
     }
   }
 

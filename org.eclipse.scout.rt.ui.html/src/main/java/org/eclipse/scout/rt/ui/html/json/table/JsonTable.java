@@ -35,7 +35,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
-import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableTextUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.ResourceListTransferObject;
@@ -70,6 +69,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
+import org.eclipse.scout.rt.ui.html.json.table.userfilter.IUserFilterStateFactory;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTableUserFilter;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceMediator;
@@ -861,15 +861,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   }
 
   protected IUserFilterState createFilterState(JSONObject data) {
-    String filterType = data.getString("filterType");
-    if ("column".equals(filterType)) {
-      IColumn column = extractColumn(data);
-      JsonColumn jsonColumn = m_jsonColumns.get(column);
-      return jsonColumn.createFilterStateFromJson(data);
-    }
-    if ("text".equals(filterType)) {
-      String text = data.getString("text");
-      return new TableTextUserFilterState(text);
+    for (IUserFilterStateFactory factory : BEANS.all(IUserFilterStateFactory.class)) {
+      IUserFilterState userFilterState = factory.createUserFilterState(this, data);
+      if (userFilterState != null) {
+        return userFilterState;
+      }
     }
     return null;
   }
@@ -1032,6 +1028,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     return optColumn(columnId);
   }
 
+  protected JsonColumn extractJsonColumn(JSONObject json) {
+    IColumn column = extractColumn(json);
+    return getJsonColumn(column);
+  }
+
   protected JSONArray columnIdsToJson(Collection<IColumn<?>> columns) {
     JSONArray jsonColumnIds = new JSONArray();
     for (IColumn column : columns) {
@@ -1052,11 +1053,15 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     return column;
   }
 
-  public String getColumnId(IColumn column) {
+  protected JsonColumn getJsonColumn(IColumn column) {
     if (column == null) {
       return null;
     }
-    JsonColumn jsonColumn = m_jsonColumns.get(column);
+    return m_jsonColumns.get(column);
+  }
+
+  public String getColumnId(IColumn column) {
+    JsonColumn jsonColumn = getJsonColumn(column);
     if (jsonColumn == null) {
       return null;
     }
