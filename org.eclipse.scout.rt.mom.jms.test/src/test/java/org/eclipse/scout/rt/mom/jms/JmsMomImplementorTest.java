@@ -1101,6 +1101,9 @@ public class JmsMomImplementorTest {
       @Override
       public String onRequest(IMessage<String> request) {
         try {
+          /*
+           * MARKER
+           */
           setupLatch.countDownAndBlock();
         }
         catch (InterruptedException e) {
@@ -1116,7 +1119,12 @@ public class JmsMomImplementorTest {
     // Initiate 'request-reply' communication
     try {
       MOM.request(JmsTestMom.class, destination, "hello world", MOM.newPublishInput()
-          .withRequestReplyTimeout(1, TimeUnit.SECONDS));
+          /*
+           * wait 5 seconds
+           * 1 second is too low, if the test runner takes 1 second until it enters the MARKER code in onRequest
+           * then some jms implementations cancel the jms request completeley, so MARKER is never called.
+           */
+          .withRequestReplyTimeout(5, TimeUnit.SECONDS));
     }
     catch (TimedOutError e) {
       requestorTimedOut.set(true);
