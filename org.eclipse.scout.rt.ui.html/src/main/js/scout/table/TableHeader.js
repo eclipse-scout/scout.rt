@@ -180,7 +180,6 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
 
   var remainingHeaderSpace, adjustment,
     $header = column.$header,
-    $headerResize,
     columnWidth = column.width,
     marginLeft = '',
     marginRight = '',
@@ -194,11 +193,12 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
   } else if (isLastColumn) {
     marginRight = this.table.rowBorderRightWidth;
     remainingHeaderSpace = this.$container.width() - this.table.rowWidth + scout.graphics.insets(this.table.$data).right;
-    $headerResize = $header.next('.table-header-resize');
 
     if (remainingHeaderSpace < menuBarWidth) {
       adjustment = menuBarWidth;
-      adjustment += $headerResize.width();
+      if (column.$separator) {
+        adjustment += column.$separator.width();
+      }
       if (remainingHeaderSpace > 0) {
         adjustment -= remainingHeaderSpace;
       }
