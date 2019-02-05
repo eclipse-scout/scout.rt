@@ -60,6 +60,26 @@ public interface ISessionStore {
   IUiSession getUiSession(String uiSessionId);
 
   /**
+   * Pre-registration of a new {@link UiSession} that is currently being built. This call ensures that the
+   * {@link HttpSession} is not invalidated due to long {@link IClientSession#start(String)} delays. The effect is in
+   * {@link SessionStore#removeClientSession(IClientSession)}
+   * <p>
+   * This pre-registration queries the session store for a client session with the given ID. If such a client session is
+   * currently registered at the store, it is returned. Otherwise, <code>null</code> is returned.
+   * <p>
+   * <b>Important:</b> Any scheduled housekeeping for this specific client session is cancelled. This method is
+   * therefore only intended to be used while creating and registering a new UI session.
+   *
+   * @param uiSession
+   *          is the new UI session that runs
+   *          {@link UiSession#init(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.eclipse.scout.rt.ui.html.json.JsonStartupRequest)}
+   * @param queryClientSessionId
+   *          is the id of a possibly existing and still valid clientSession
+   * @return the associated and still valid, active {@link IClientSession} or null
+   */
+  IClientSession preregisterUiSession(IUiSession uiSession, String queryClientSessionId);
+
+  /**
    * Registers (adds) the given UI session <b>and</b> the associated client session to the store.
    */
   void registerUiSession(IUiSession uiSession);
@@ -69,15 +89,8 @@ public interface ISessionStore {
    * other UI sessions, housekeeping is started. If the client session is still not used after some time, it is stopped
    * automatically to free up memory. This can also lead to HTTP session invalidation if no other client sessions are
    * active.
+   * <p>
+   * If this uiSession was registered with {@link #preregisterUiSession(String)} then it is handled the same way.
    */
   void unregisterUiSession(IUiSession uiSession);
-
-  /**
-   * Queries the session store for a client session with the given ID. If such a client session is currently registered
-   * at the store, it is returned. Otherwise, <code>null</code> is returned.
-   * <p>
-   * <b>Important:</b> Any scheduled housekeeping for this specific client session is cancelled. This method is
-   * therefore only intended to be used while creating and registering a new UI session.
-   */
-  IClientSession getClientSessionForUse(String clientSessionId);
 }

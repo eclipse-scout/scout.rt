@@ -46,6 +46,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
@@ -136,6 +137,7 @@ public class UiSession implements IUiSession {
   private volatile JsonResponse m_currentJsonResponse;
   private volatile JsonRequest m_currentJsonRequest;
   private volatile boolean m_processingJsonRequest;
+  private volatile boolean m_attachedToDesktop;
   private volatile boolean m_disposing;
   private volatile boolean m_disposed;
   private volatile IRegistrationHandle m_uiDataAvailableListener;
@@ -257,6 +259,11 @@ public class UiSession implements IUiSession {
 
       LOG.info("UiSession with ID {} initialized", m_uiSessionId);
     }
+    catch (RuntimeException | PlatformError e) {
+      //cleanup resources potentially allocated in the partly created UiSession
+      dispose();
+      throw e;
+    }
     finally {
       m_httpContext.clear();
       m_currentJsonRequest = null;
@@ -280,7 +287,7 @@ public class UiSession implements IUiSession {
 
   protected IClientSession getOrCreateClientSession(HttpSession httpSession, HttpServletRequest req, JsonStartupRequest jsonStartupReq) {
     String requestedClientSessionId = jsonStartupReq.getClientSessionId();
-    IClientSession clientSession = sessionStore().getClientSessionForUse(requestedClientSessionId);
+    IClientSession clientSession = sessionStore().preregisterUiSession(this, requestedClientSessionId);
 
     if (clientSession != null) {
       // Found existing client session
@@ -444,6 +451,7 @@ public class UiSession implements IUiSession {
         // in that case the client state shall be recovered rather than following the deep link
         PropertyMap.CURRENT.get().put(DeepLinkUrlParameter.HANDLE_DEEP_LINK, !isPersistent() || !desktopOpen);
         uiFacade.fireGuiAttached();
+        m_attachedToDesktop = true;
       }
     }, ModelJobs.newInput(
         ClientRunContexts.copyCurrent()
@@ -542,22 +550,31 @@ public class UiSession implements IUiSession {
 
   @Override
   public void dispose() {
-
     // Inform the model the UI has been detached. There are different cases we handle here:
     // 1. page reload (unload event) dispose method is called once
     // 2. logout (Session.stop()) dispose method is called _twice_, 1st call sets the disposing flag,
     //    on the 2nd call, the desktop is already gone.
-    if (!m_disposing) {
+    final IClientSession clientSession = getClientSession();
+    if (m_attachedToDesktop && !m_disposing && clientSession != null && clientSession.isActive() && !clientSession.isStopping()) {
+      final Runnable detachGui = new Runnable() {
+        @Override
+        public void run() {
+          if (m_attachedToDesktop && clientSession.isActive() && !clientSession.isStopping() && clientSession.getDesktop() != null) {
+            m_attachedToDesktop = false;
+            clientSession.getDesktop().getUIFacade().fireGuiDetached();
+          }
+        }
+      };
       // Current thread is the model thread if dispose is called by clientSession.stop(), otherwise (e.g. page reload) dispose is called from the UI thread
       if (ModelJobs.isModelThread()) {
-        getClientSession().getDesktop().getUIFacade().fireGuiDetached();
+        detachGui.run();
       }
       else {
-        final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(m_clientSession, true);
+        final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(clientSession, true);
         ModelJobs.schedule(new IRunnable() {
           @Override
           public void run() throws Exception {
-            getClientSession().getDesktop().getUIFacade().fireGuiDetached();
+            detachGui.run();
           }
         }, ModelJobs.newInput(clientRunContext)
             .withName("Detaching Gui")

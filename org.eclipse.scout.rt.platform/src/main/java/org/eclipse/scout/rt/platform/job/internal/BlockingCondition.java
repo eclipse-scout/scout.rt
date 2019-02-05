@@ -112,10 +112,10 @@ public class BlockingCondition implements IBlockingCondition {
   protected void waitFor(final long timeout, final TimeUnit unit, final boolean awaitInterruptibly, final String... executionHints) {
     final IFuture<?> currentFuture = IFuture.CURRENT.get();
     if (currentFuture instanceof JobFutureTask) {
-      blockJobThread((JobFutureTask<?>) currentFuture, timeout, unit, awaitInterruptibly, executionHints);
+      blockJobThread((JobFutureTask<?>) currentFuture, timeout, unit, true, executionHints);
     }
     else {
-      blockRegularThread(timeout, unit, awaitInterruptibly);
+      blockRegularThread(timeout, unit, true);
     }
   }
 
@@ -200,60 +200,45 @@ public class BlockingCondition implements IBlockingCondition {
 
   /**
    * Waits until signaled or the timeout elapses. If <code>awaitInterruptibly</code> is set to <code>true</code>, this
-   * method returns with an {@link ThreadInterruptedError} upon interruption. For either case, when this method
-   * finally returns, the thread's interrupted status will still be set.
+   * method returns with an {@link ThreadInterruptedError} upon interruption. For either case, when this method finally
+   * returns, the thread's interrupted status will still be set.
    */
   protected void awaitUntilSignaledOrTimeout(final long timeout, final TimeUnit unit, final boolean awaitInterruptibly) {
-    boolean interrupted = false;
+    InterruptedException interrupted = null;
     m_lock.lock();
-    try {
-      if (timeout == TIMEOUT_INDEFINITELY) {
-        while (m_blocking) { // while-loop to address spurious wake-ups
-          if (awaitInterruptibly) {
+    try {//lock
+      try {//interruption
+        if (timeout == TIMEOUT_INDEFINITELY) {
+          while (m_blocking) { // while-loop to address spurious wake-ups
             m_unblockedCondition.await();
           }
-          else {
-            m_unblockedCondition.awaitUninterruptibly();
-          }
         }
-      }
-      else {
-        long nanos = unit.toNanos(timeout);
-        while (m_blocking && nanos > 0L) { // while-loop to address spurious wake-ups
-          if (awaitInterruptibly) {
+        else {
+          long nanos = unit.toNanos(timeout);
+          while (m_blocking && nanos > 0L) { // while-loop to address spurious wake-ups
             nanos = m_unblockedCondition.awaitNanos(nanos);
           }
-          else {
-            try { // NOSONAR
-              nanos = m_unblockedCondition.awaitNanos(nanos);
-            }
-            catch (final InterruptedException e) {
-              interrupted = true; // remember interruption
-              Thread.interrupted(); // clear the interrupted status to continue waiting
-            }
+
+          if (nanos <= 0L) {
+            throw new TimedOutError("Timeout elapsed while waiting for a blocking condition to fall")
+                .withContextInfo("blockingCondition", this)
+                .withContextInfo("timeout", "{}ms", unit.toMillis(timeout))
+                .withContextInfo("thread", Thread.currentThread().getName());
           }
         }
-
-        if (nanos <= 0L) {
-          throw new TimedOutError("Timeout elapsed while waiting for a blocking condition to fall")
-              .withContextInfo("blockingCondition", this)
-              .withContextInfo("timeout", "{}ms", unit.toMillis(timeout))
-              .withContextInfo("thread", Thread.currentThread().getName());
-        }
       }
-    }
-    catch (final InterruptedException e) {
-      interrupted = true;
-      throw new ThreadInterruptedError("Interrupted while waiting for a blocking condition to fall")
-          .withContextInfo("blockingCondition", this)
-          .withContextInfo("thread", Thread.currentThread().getName());
+      catch (final InterruptedException e) {
+        interrupted = e;
+        Thread.currentThread().interrupt(); // restore interruption status
+      }
+      if (interrupted != null || Thread.currentThread().isInterrupted()) {
+        throw new ThreadInterruptedError("Interrupted while waiting for a blocking condition to fall", interrupted)
+            .withContextInfo("blockingCondition", this)
+            .withContextInfo("thread", Thread.currentThread().getName());
+      }
     }
     finally {
       m_lock.unlock();
-
-      if (interrupted) {
-        Thread.currentThread().interrupt(); // restore interruption status
-      }
     }
   }
 

@@ -95,6 +95,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.holders.IHolder;
+import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
@@ -107,6 +108,7 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -116,6 +118,7 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
+import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1179,6 +1182,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void showForm(IForm form) {
+    Assertions.assertFalse(ClientSessionProvider.currentSession().isStopping(), "Session is stopping");
     // Let the desktop extensions to intercept the given form.
     final IHolder<IForm> formHolder = new Holder<>(form);
     for (IDesktopExtension extension : getDesktopExtensions()) {
@@ -1237,6 +1241,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void showMessageBox(IMessageBox messageBox) {
+    Assertions.assertFalse(ClientSessionProvider.currentSession().isStopping(), "Session is stopping");
     if (messageBox == null || m_messageBoxStore.contains(messageBox)) {
       return;
     }
@@ -1581,6 +1586,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void showFileChooser(IFileChooser fileChooser) {
+    Assertions.assertFalse(ClientSessionProvider.currentSession().isStopping(), "Session is stopping");
     if (fileChooser == null || m_fileChooserStore.contains(fileChooser)) {
       return;
     }
@@ -1638,16 +1644,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   private void setOpenedInternal(boolean b) {
     propertySupport.setPropertyBool(PROP_OPENED, b);
-  }
-
-  private void setGuiAvailableInternal(boolean guiAvailable) {
-    if (guiAvailable) {
-      m_attachedGuis++;
-    }
-    else {
-      m_attachedGuis--;
-    }
-    propertySupport.setPropertyBool(PROP_GUI_AVAILABLE, m_attachedGuis > 0);
   }
 
   @Override
@@ -1996,7 +1992,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void closeInternal() {
     setOpenedInternal(false);
-    detachGui();
+    while (getAttachedGuiCount() > 0) {
+      detachGui();
+    }
 
     List<IForm> showedForms = new ArrayList<IForm>();
     // Remove showed forms
@@ -2004,67 +2002,21 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       hideForm(form);
       showedForms.add(form);
     }
-    //extensions
-    for (IDesktopExtension ext : getDesktopExtensions()) {
-      try {
-        ContributionCommand cc = ext.desktopClosingDelegate();
-        if (cc == ContributionCommand.Stop) {
-          break;
-        }
-      }
-      catch (RuntimeException | PlatformError t) {
-        LOG.error("extension {}", ext, t);
-      }
-    }
 
-    // close messageboxes
-    for (IMessageBox m : getMessageBoxes()) {
-      if (m != null) {
-        try {
-          m.getUIFacade().setResultFromUI(IMessageBox.CANCEL_OPTION);
-        }
-        catch (RuntimeException | PlatformError e) {
-          LOG.error("Exception while closing messagebox", e);
-        }
-      }
-    }
+    //release all locks
+    internalInterruptBlockingConditions();
+    internalCloseMessageBoxes(getMessageBoxes());
+    internalCloseFileChoosers(getFileChoosers());
 
-    // close filechoosers
-    for (IFileChooser f : getFileChoosers()) {
-      if (f != null) {
-        try {
-          f.getUIFacade().setResultFromUI(Collections.<BinaryResource> emptyList());
-        }
-        catch (RuntimeException | PlatformError e) {
-          LOG.error("Exception while closing filechooser", e);
-        }
-      }
-    }
+    internalCloseForms(showedForms);
+    internalCloseDesktopExtensions();
 
-    // close client callbacks
-    for (ClientCallback<?> c : CollectionUtility.arrayList(m_pendingPositionResponses)) {
-      if (c != null) {
-        try {
-          c.cancel(true);
-          c.failed(new ThreadInterruptedError("desktop is closing"));
-        }
-        catch (RuntimeException | PlatformError e) {
-          LOG.error("Exception while closing client callback", e);
-        }
-      }
-    }
+    //again, release all locks that may have created by closing forms and client extensions
+    internalInterruptBlockingConditions();
+    internalCloseMessageBoxes(getMessageBoxes());
+    internalCloseFileChoosers(getFileChoosers());
 
-    // close open forms
-    for (IForm form : showedForms) {
-      if (form != null) {
-        try {
-          form.doClose();
-        }
-        catch (RuntimeException | PlatformError e) {
-          LOG.error("Exception while closing form", e);
-        }
-      }
-    }
+    internalCloseClientCallbacks();
 
     // dispose outlines
     for (IOutline outline : getAvailableOutlines()) {
@@ -2081,32 +2033,129 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireDesktopClosed();
   }
 
-  private void attachGui() {
-    ensureProposalChoosersClosed();
-    setGuiAvailableInternal(true);
+  /**
+   * interrupt blocking MessageBoxes and FileChoosers, calling code must not continue work
+   */
+  protected void internalInterruptBlockingConditions() {
+    Jobs.getJobManager().cancel(ModelJobs.newFutureFilterBuilder()
+        .andMatch(new SessionFutureFilter(ISession.CURRENT.get()))
+        .andMatchState(JobState.WAITING_FOR_BLOCKING_CONDITION)
+        .toFilter(), true);
+  }
 
-    // extensions
+  protected void internalCloseDesktopExtensions() {
     for (IDesktopExtension ext : getDesktopExtensions()) {
       try {
-        ContributionCommand cc = ext.guiAttachedDelegate();
+        ContributionCommand cc = ext.desktopClosingDelegate();
         if (cc == ContributionCommand.Stop) {
           break;
         }
       }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
+      catch (RuntimeException | PlatformError t) {
+        LOG.error("extension {}", ext, t);
       }
     }
+  }
 
-    PropertyMap propertyMap = PropertyMap.CURRENT.get();
-    final String geolocationServiceAvailableStr = propertyMap.get(IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE);
-    final boolean geolocationServiceAvailable = TypeCastUtility.castValue(geolocationServiceAvailableStr, boolean.class);
-    setGeolocationServiceAvailable(geolocationServiceAvailable);
+  protected void internalCloseMessageBoxes(List<IMessageBox> list) {
+    for (IMessageBox m : list) {
+      if (m != null) {
+        try {
+          m.getUIFacade().setResultFromUI(IMessageBox.CANCEL_OPTION);
+        }
+        catch (RuntimeException | PlatformError e) {
+          LOG.error("Exception while closing messagebox", e);
+        }
+        finally {
+          m_messageBoxStore.remove(m);
+        }
+      }
+    }
+  }
 
-    boolean handleDeepLink = propertyMap.getOrDefault(DeepLinkUrlParameter.HANDLE_DEEP_LINK, true);
-    if (handleDeepLink) {
-      final String deepLinkPath = propertyMap.get(DeepLinkUrlParameter.DEEP_LINK);
-      activateDefaultView(deepLinkPath);
+  protected void internalCloseFileChoosers(List<IFileChooser> list) {
+    for (IFileChooser f : list) {
+      if (f != null) {
+        try {
+          f.getUIFacade().setResultFromUI(Collections.<BinaryResource> emptyList());
+        }
+        catch (RuntimeException | PlatformError e) {
+          LOG.error("Exception while closing filechooser", e);
+        }
+        finally {
+          m_fileChooserStore.remove(f);
+        }
+      }
+    }
+  }
+
+  protected void internalCloseClientCallbacks() {
+    for (ClientCallback<?> c : CollectionUtility.arrayList(m_pendingPositionResponses)) {
+      if (c != null) {
+        try {
+          c.cancel(true);
+          c.failed(new ThreadInterruptedError("desktop is closing"));
+        }
+        catch (RuntimeException | PlatformError e) {
+          LOG.error("Exception while closing client callback", e);
+        }
+      }
+    }
+  }
+
+  protected boolean internalCloseForms(Collection<IForm> forms) {
+    for (IForm form : forms) {
+      if (form != null) {
+        try {
+          // close potential open MessageBoxes and FileChoosers, otherwise blocking threads will remain
+          internalCloseMessageBoxes(getMessageBoxes(form));
+          internalCloseFileChoosers(getFileChoosers(form));
+          form.doClose();
+        }
+        catch (RuntimeException | PlatformError e) {
+          LOG.error("Exception while closing forms", e);
+        }
+      }
+    }
+    return true;
+  }
+
+  private int getAttachedGuiCount() {
+    return m_attachedGuis;
+  }
+
+  private void setAttachedGuiCount(int n) {
+    m_attachedGuis = n;
+    propertySupport.setPropertyBool(PROP_GUI_AVAILABLE, m_attachedGuis > 0);
+  }
+
+  private void attachGui() {
+    ensureProposalChoosersClosed();
+    setAttachedGuiCount(getAttachedGuiCount() + 1);
+
+    if (getAttachedGuiCount() == 1) {
+      //this is the first call to attachGui, call extensions
+      for (IDesktopExtension ext : getDesktopExtensions()) {
+        try {
+          ContributionCommand cc = ext.guiAttachedDelegate();
+          if (cc == ContributionCommand.Stop) {
+            break;
+          }
+        }
+        catch (Exception e) {
+          BEANS.get(ExceptionHandler.class).handle(e);
+        }
+      }
+      PropertyMap propertyMap = PropertyMap.CURRENT.get();
+      final String geolocationServiceAvailableStr = propertyMap.get(IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE);
+      final boolean geolocationServiceAvailable = TypeCastUtility.castValue(geolocationServiceAvailableStr, boolean.class);
+      setGeolocationServiceAvailable(geolocationServiceAvailable);
+
+      boolean handleDeepLink = propertyMap.getOrDefault(DeepLinkUrlParameter.HANDLE_DEEP_LINK, true);
+      if (handleDeepLink) {
+        final String deepLinkPath = propertyMap.get(DeepLinkUrlParameter.DEEP_LINK);
+        activateDefaultView(deepLinkPath);
+      }
     }
   }
 
@@ -2223,18 +2272,19 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   private void detachGui() {
-    setGuiAvailableInternal(false);
-
-    // extensions
-    for (IDesktopExtension ext : getDesktopExtensions()) {
-      try {
-        ContributionCommand cc = ext.guiDetachedDelegate();
-        if (cc == ContributionCommand.Stop) {
-          break;
+    setAttachedGuiCount(getAttachedGuiCount() - 1);
+    if (getAttachedGuiCount() == 0) {
+      //this is the last call to detachGui, call extensions
+      for (IDesktopExtension ext : getDesktopExtensions()) {
+        try {
+          ContributionCommand cc = ext.guiDetachedDelegate();
+          if (cc == ContributionCommand.Stop) {
+            break;
+          }
         }
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
+        catch (Exception e) {
+          BEANS.get(ExceptionHandler.class).handle(e);
+        }
       }
     }
   }
