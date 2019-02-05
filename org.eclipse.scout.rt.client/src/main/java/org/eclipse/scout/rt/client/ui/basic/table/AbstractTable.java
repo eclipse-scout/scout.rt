@@ -22,6 +22,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -198,6 +199,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   private int m_valueChangeTriggerEnabled = 1;// >=1 is true
   private ITableOrganizer m_tableOrganizer;
   private boolean m_treeStructureDirty;
+  private List<? extends IColumn<?>> m_dynamicColumns;
 
   public AbstractTable() {
     this(true);
@@ -1131,6 +1133,10 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     ITableCustomizer c = getTableCustomizer();
     if (c != null) {
       c.injectCustomColumns(columns);
+    }
+    List<? extends IColumn<?>> dynamicColumns = getDynamicColumns();
+    if (dynamicColumns != null) {
+      columns.addAllOrdered(dynamicColumns);
     }
   }
 
@@ -5086,5 +5092,49 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   @Override
   public void setHierarchicalStyle(HierarchicalStyle hierarchicalStyle) {
     propertySupport.setProperty(PROP_HIERARCHICAL_STYLE, hierarchicalStyle);
+  }
+
+  public List<? extends IColumn<?>> getDynamicColumns() {
+    return m_dynamicColumns;
+  }
+
+  protected void setDynamicColumnsInternal(List<? extends IColumn<?>> dynamicColumns) {
+    m_dynamicColumns = dynamicColumns;
+  }
+
+  /**
+   * Adds the given dynamic columns to the table, imports the table data and tries to restore the selected rows.
+   * Previously injected dynamic columns are reset.
+   */
+  public void updateDynamicColumns(List<? extends IColumn<?>> dynamicColumns, Runnable tablePopulator) {
+    try {
+      setTableChanging(true);
+
+      // Normally, the current selection is restored automatically during replacement of
+      // rows (see AbstractTable#replaceRows). Unfortunately, resetColumnConfiguraiton()
+      // discards all rows, causing the current selection to be lost. Therefore, we have
+      // to save and restore it manually.
+      Set<List<Object>> selectedKeys = getSelectedRows().stream()
+          .map(row -> row.getKeyValues())
+          .collect(Collectors.toSet());
+
+      // Update columns
+      setDynamicColumnsInternal(dynamicColumns);
+      resetColumnConfiguration();
+
+      // Insert data (rows)
+      if (tablePopulator != null) {
+        tablePopulator.run();
+      }
+
+      // Restore selection
+      selectRows(selectedKeys.stream()
+          .map(key -> findRowByKey(key))
+          .filter(Objects::nonNull)
+          .collect(Collectors.toList()));
+    }
+    finally {
+      setTableChanging(false);
+    }
   }
 }
