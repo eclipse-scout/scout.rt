@@ -1141,6 +1141,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   @Override
   public void showForm(IForm form) {
+    Assertions.assertFalse(ClientSessionProvider.currentSession().isStopping(), "Session is stopping");
     // Let the desktop extensions to intercept the given form.
     final IHolder<IForm> formHolder = new Holder<>(form);
     for (IDesktopExtension extension : getDesktopExtensions()) {
@@ -1221,6 +1222,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   @Override
   public void showMessageBox(IMessageBox messageBox) {
+    Assertions.assertFalse(ClientSessionProvider.currentSession().isStopping(), "Session is stopping");
     if (messageBox == null || m_messageBoxStore.contains(messageBox)) {
       return;
     }
@@ -1633,16 +1635,6 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     propertySupport.setPropertyBool(PROP_OPENED, b);
   }
 
-  private void setGuiAvailableInternal(boolean guiAvailable) {
-    if (guiAvailable) {
-      m_attachedGuis++;
-    }
-    else {
-      m_attachedGuis--;
-    }
-    propertySupport.setPropertyBool(PROP_GUI_AVAILABLE, m_attachedGuis > 0);
-  }
-
   @Override
   public boolean isGuiAvailable() {
     return propertySupport.getPropertyBool(PROP_GUI_AVAILABLE);
@@ -1957,7 +1949,9 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   @Override
   public void closeInternal() {
     setOpenedInternal(false);
-    detachGui();
+    while (getAttachedGuiCount() > 0) {
+      detachGui();
+    }
 
     List<IForm> showedForms = new ArrayList<>();
     // Remove showed forms
@@ -1968,16 +1962,16 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
     //release all locks
     internalInterruptBlockingConditions();
-    internalCloseMessageBoxes();
-    internalCloseFileChoosers();
+    internalCloseMessageBoxes(getMessageBoxes());
+    internalCloseFileChoosers(getFileChoosers());
 
     internalCloseForms(showedForms);
     internalCloseDesktopExtensions();
 
     //again, release all locks that may have created by closing forms and client extensions
     internalInterruptBlockingConditions();
-    internalCloseMessageBoxes();
-    internalCloseFileChoosers();
+    internalCloseMessageBoxes(getMessageBoxes());
+    internalCloseFileChoosers(getFileChoosers());
 
     internalCloseClientCallbacks();
 
@@ -2008,8 +2002,8 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     }
   }
 
-  protected void internalCloseMessageBoxes() {
-    for (IMessageBox m : getMessageBoxes()) {
+  protected void internalCloseMessageBoxes(List<IMessageBox> list) {
+    for (IMessageBox m : list) {
       if (m != null) {
         try {
           m.getUIFacade().setResultFromUI(IMessageBox.CANCEL_OPTION);
@@ -2017,13 +2011,15 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
         catch (RuntimeException | PlatformError e) {
           LOG.error("Exception while closing messagebox", e);
         }
+        finally {
+          m_messageBoxStore.remove(m);
+        }
       }
     }
-    m_messageBoxStore.clear();
   }
 
-  protected void internalCloseFileChoosers() {
-    for (IFileChooser f : getFileChoosers()) {
+  protected void internalCloseFileChoosers(List<IFileChooser> list) {
+    for (IFileChooser f : list) {
       if (f != null) {
         try {
           f.getUIFacade().setResultFromUI(Collections.emptyList());
@@ -2031,9 +2027,11 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
         catch (RuntimeException | PlatformError e) {
           LOG.error("Exception while closing filechooser", e);
         }
+        finally {
+          m_fileChooserStore.remove(f);
+        }
       }
     }
-    m_fileChooserStore.clear();
   }
 
   protected void internalCloseClientCallbacks() {
@@ -2055,8 +2053,8 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       if (form != null) {
         try {
           // close potential open MessageBoxes and FileChoosers, otherwise blocking threads will remain
-          getMessageBoxes(form).forEach(msgBox -> msgBox.getUIFacade().setResultFromUI(IMessageBox.CANCEL_OPTION));
-          getFileChoosers(form).forEach(fileChooser -> fileChooser.getUIFacade().setResultFromUI(Collections.emptyList()));
+          internalCloseMessageBoxes(getMessageBoxes(form));
+          internalCloseFileChoosers(getFileChoosers(form));
           form.doClose();
         }
         catch (RuntimeException | PlatformError e) {
@@ -2067,31 +2065,42 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     return true;
   }
 
-  private void attachGui() {
-    setGuiAvailableInternal(true);
+  private int getAttachedGuiCount() {
+    return m_attachedGuis;
+  }
 
-    // extensions
-    for (IDesktopExtension ext : getDesktopExtensions()) {
-      try {
-        ContributionCommand cc = ext.guiAttachedDelegate();
-        if (cc == ContributionCommand.Stop) {
-          break;
+  private void setAttachedGuiCount(int n) {
+    m_attachedGuis = n;
+    propertySupport.setPropertyBool(PROP_GUI_AVAILABLE, m_attachedGuis > 0);
+  }
+
+  private void attachGui() {
+    setAttachedGuiCount(getAttachedGuiCount() + 1);
+
+    if (getAttachedGuiCount() == 1) {
+      //this is the first call to attachGui, call extensions
+      for (IDesktopExtension ext : getDesktopExtensions()) {
+        try {
+          ContributionCommand cc = ext.guiAttachedDelegate();
+          if (cc == ContributionCommand.Stop) {
+            break;
+          }
+        }
+        catch (Exception e) {
+          BEANS.get(ExceptionHandler.class).handle(e);
         }
       }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
+
+      PropertyMap propertyMap = PropertyMap.CURRENT.get();
+      final String geolocationServiceAvailableStr = propertyMap.get(IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE);
+      final boolean geolocationServiceAvailable = TypeCastUtility.castValue(geolocationServiceAvailableStr, boolean.class);
+      setGeolocationServiceAvailable(geolocationServiceAvailable);
+
+      boolean handleDeepLink = propertyMap.getOrDefault(DeepLinkUrlParameter.HANDLE_DEEP_LINK, true);
+      if (handleDeepLink) {
+        final String deepLinkPath = propertyMap.get(DeepLinkUrlParameter.DEEP_LINK);
+        activateDefaultView(deepLinkPath);
       }
-    }
-
-    PropertyMap propertyMap = PropertyMap.CURRENT.get();
-    final String geolocationServiceAvailableStr = propertyMap.get(IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE);
-    final boolean geolocationServiceAvailable = TypeCastUtility.castValue(geolocationServiceAvailableStr, boolean.class);
-    setGeolocationServiceAvailable(geolocationServiceAvailable);
-
-    boolean handleDeepLink = propertyMap.getOrDefault(DeepLinkUrlParameter.HANDLE_DEEP_LINK, true);
-    if (handleDeepLink) {
-      final String deepLinkPath = propertyMap.get(DeepLinkUrlParameter.DEEP_LINK);
-      activateDefaultView(deepLinkPath);
     }
   }
 
@@ -2175,18 +2184,19 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   private void detachGui() {
-    setGuiAvailableInternal(false);
-
-    // extensions
-    for (IDesktopExtension ext : getDesktopExtensions()) {
-      try {
-        ContributionCommand cc = ext.guiDetachedDelegate();
-        if (cc == ContributionCommand.Stop) {
-          break;
+    setAttachedGuiCount(getAttachedGuiCount() - 1);
+    if (getAttachedGuiCount() == 0) {
+      //this is the last call to detachGui, call extensions
+      for (IDesktopExtension ext : getDesktopExtensions()) {
+        try {
+          ContributionCommand cc = ext.guiDetachedDelegate();
+          if (cc == ContributionCommand.Stop) {
+            break;
+          }
         }
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
+        catch (Exception e) {
+          BEANS.get(ExceptionHandler.class).handle(e);
+        }
       }
     }
   }

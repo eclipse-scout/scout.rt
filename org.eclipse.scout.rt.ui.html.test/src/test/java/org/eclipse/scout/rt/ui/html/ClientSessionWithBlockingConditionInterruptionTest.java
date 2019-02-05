@@ -8,6 +8,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.ClientConfigProperties.JobCompletionDelayOnSessionShutdown;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -38,7 +41,9 @@ import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeep
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingMaxWaitShutdownProperty;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreMaxWaitAllShutdownProperty;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreMaxWaitWriteLockProperty;
+import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
+import org.eclipse.scout.rt.ui.html.json.testing.TestEnvironmentUiSession;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,9 +51,10 @@ import org.junit.runner.RunWith;
 
 @RunWithNewPlatform()
 @RunWith(PlatformTestRunner.class)
-public class DesktopWithBlockingConditionInterruptionTest {
+public class ClientSessionWithBlockingConditionInterruptionTest {
   private List<IBean<?>> m_beans;
 
+  private SessionBehaviour m_sessionBehaviour;
   private DesktopBehaviour m_desktopBehaviour;
   private List<String> m_protocol = Collections.synchronizedList(new ArrayList<String>());
 
@@ -96,7 +102,19 @@ public class DesktopWithBlockingConditionInterruptionTest {
           }
         }),
 
-        new BeanMetaData(FixtureClientSession.class).withProducer(bean -> new FixtureClientSession()));
+        new BeanMetaData(FixtureUiSession.class).withProducer(new IBeanInstanceProducer<FixtureUiSession>() {
+          @Override
+          public FixtureUiSession produce(IBean<FixtureUiSession> bean) {
+            return new FixtureUiSession();
+          }
+        }),
+
+        new BeanMetaData(FixtureClientSession.class).withProducer(new IBeanInstanceProducer<FixtureClientSession>() {
+          @Override
+          public FixtureClientSession produce(IBean<FixtureClientSession> bean) {
+            return new FixtureClientSession();
+          }
+        }));
   }
 
   @After
@@ -111,8 +129,10 @@ public class DesktopWithBlockingConditionInterruptionTest {
   }
 
   @Test
-  public void testDesktopWithBLockingMessageBoxUponStartup() {
-    m_desktopBehaviour = DesktopBehaviour.OPEN_MESSAGEBOX;
+  public void testDesktopWithMessageBoxInGuiAttached() {
+    m_sessionBehaviour = SessionBehaviour.DO_NOTHING;
+    m_desktopBehaviour = DesktopBehaviour.OPEN_MESSAGEBOX_IN_GUI_ATTACHED;
+
     IUiSession uiSession = JsonTestUtility.createAndInitializeUiSession();
     final FixtureClientSession session = (FixtureClientSession) uiSession.getClientSession();
 
@@ -150,11 +170,12 @@ public class DesktopWithBlockingConditionInterruptionTest {
 
   @Test
   public void testDesktopWithBlockingForm() {
+    m_sessionBehaviour = SessionBehaviour.DO_NOTHING;
     m_desktopBehaviour = DesktopBehaviour.DO_NOTHING;
     IUiSession uiSession = JsonTestUtility.createAndInitializeUiSession();
     final FixtureClientSession session = (FixtureClientSession) uiSession.getClientSession();
 
-    IFuture<?> callingFuture = ModelJobs.schedule(new IRunnable() {
+    final IFuture<?> callingFuture = ModelJobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         FixtureForm f = new FixtureForm();
@@ -208,6 +229,127 @@ public class DesktopWithBlockingConditionInterruptionTest {
     assertEquals(expectedProtocol, m_protocol);
   }
 
+  @Test
+  public void testSessionWithMessageBoxInLoad() {
+    m_sessionBehaviour = SessionBehaviour.OPEN_MESSAGEBOX_IN_LOAD;
+    m_desktopBehaviour = DesktopBehaviour.DO_NOTHING;
+    IUiSession uiSession = JsonTestUtility.createAndInitializeUiSession();
+    final FixtureClientSession session = (FixtureClientSession) uiSession.getClientSession();
+
+    writeToProtocol("Session stopping");
+    ModelJobs.schedule(new IRunnable() {
+      @Override
+      public void run() throws Exception {
+        session.getDesktop().getUIFacade().closeFromUI(true);
+      }
+    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(session, true)))
+        .awaitDone();
+
+    Jobs.getJobManager().awaitFinished(ModelJobs.newFutureFilterBuilder()
+        .andMatch(new SessionFutureFilter(session))
+        .toFilter(), 30, TimeUnit.SECONDS);
+
+    writeToProtocol("All session jobs terminated");
+
+    List<String> expectedProtocol = Arrays.asList(
+        "Before MessageBoxInLoad",
+        "After MessageBoxInLoad " + IMessageBox.CANCEL_OPTION,
+        "Session stopping",
+        "All session jobs terminated");
+    assertEquals(expectedProtocol, m_protocol);
+  }
+
+  @Test
+  public void testSessionWithMessageBoxInStore() {
+    m_sessionBehaviour = SessionBehaviour.OPEN_MESSAGEBOX_IN_STORE;
+    m_desktopBehaviour = DesktopBehaviour.DO_NOTHING;
+    IUiSession uiSession = JsonTestUtility.createAndInitializeUiSession();
+    final FixtureClientSession session = (FixtureClientSession) uiSession.getClientSession();
+
+    writeToProtocol("Session stopping");
+    ModelJobs.schedule(new IRunnable() {
+      @Override
+      public void run() throws Exception {
+        session.getDesktop().getUIFacade().closeFromUI(true);
+      }
+    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(session, true)))
+        .awaitDone();
+
+    Jobs.getJobManager().awaitFinished(ModelJobs.newFutureFilterBuilder()
+        .andMatch(new SessionFutureFilter(session))
+        .toFilter(), 30, TimeUnit.SECONDS);
+
+    writeToProtocol("All session jobs terminated");
+
+    List<String> expectedProtocol = Arrays.asList(
+        "Session stopping",
+        "Before MessageBoxInStore",
+        "After MessageBoxInStore " + IMessageBox.CANCEL_OPTION,
+        "All session jobs terminated");
+    assertEquals(expectedProtocol, m_protocol);
+  }
+
+  @Test(expected = UnsupportedOperationException.class)
+  public void testSessionWithBlockingFormInLoad() {
+    m_sessionBehaviour = SessionBehaviour.OPEN_FORM_IN_LOAD;
+    m_desktopBehaviour = DesktopBehaviour.DO_NOTHING;
+    try {
+      IUiSession uiSession = JsonTestUtility.createAndInitializeUiSession();
+      uiSession.getClientSession();
+    }
+    catch (Exception ex) {
+      throw ex;
+    }
+  }
+
+  @Test
+  public void testSessionWithBlockingFormInStore() {
+    m_sessionBehaviour = SessionBehaviour.OPEN_FORM_IN_STORE;
+    m_desktopBehaviour = DesktopBehaviour.DO_NOTHING;
+    IUiSession uiSession = JsonTestUtility.createAndInitializeUiSession();
+    final FixtureClientSession session = (FixtureClientSession) uiSession.getClientSession();
+
+    writeToProtocol("Session stopping");
+    ModelJobs.schedule(new IRunnable() {
+      @Override
+      public void run() throws Exception {
+        session.getDesktop().getUIFacade().closeFromUI(true);
+      }
+    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(session, true)))
+        .awaitDone();
+
+    Jobs.getJobManager().awaitFinished(ModelJobs.newFutureFilterBuilder()
+        .andMatch(new SessionFutureFilter(session))
+        .toFilter(), 30, TimeUnit.SECONDS);
+
+    writeToProtocol("All session jobs terminated");
+
+    List<String> expectedProtocol = Arrays.asList(
+        "Session stopping",
+        "Before Form.start",
+        "Form.execLoad",
+        "Form error ProcessingException There is no desktop or it is not open in the UI. [severity=ERROR]",
+        "All session jobs terminated");
+    assertEquals(expectedProtocol, m_protocol);
+  }
+
+  private enum SessionBehaviour {
+    DO_NOTHING,
+    OPEN_MESSAGEBOX_IN_LOAD,
+    OPEN_MESSAGEBOX_IN_STORE,
+    OPEN_FORM_IN_LOAD,
+    OPEN_FORM_IN_STORE,
+  }
+
+  @IgnoreBean
+  public class FixtureUiSession extends TestEnvironmentUiSession {
+    @Override
+    public void init(HttpServletRequest req, HttpServletResponse resp, JsonStartupRequest jsonStartupReq) {
+      System.out.println("INIT");
+      super.init(req, resp, jsonStartupReq);
+    }
+  }
+
   @IgnoreBean
   public class FixtureClientSession extends AbstractClientSession {
 
@@ -224,12 +366,70 @@ public class DesktopWithBlockingConditionInterruptionTest {
     protected void execLoadSession() {
       FixtureDesktop desktop = new FixtureDesktop();
       setDesktop(desktop);
+      switch (m_sessionBehaviour) {
+        case OPEN_MESSAGEBOX_IN_LOAD:
+          writeToProtocol("Before MessageBoxInLoad");
+          try {
+            int result = MessageBoxes.createOk().show();
+            writeToProtocol("After MessageBoxInLoad " + result);
+          }
+          catch (ThreadInterruptedError e) {
+            writeToProtocol("Interrupted MessageBoxInLoad");
+            throw e;
+          }
+          break;
+        case OPEN_FORM_IN_LOAD:
+          FixtureForm f = new FixtureForm();
+          writeToProtocol("Before Form.start");
+          f.start();
+          try {
+            writeToProtocol("Before Form.waitFor");
+            f.waitFor();
+            writeToProtocol("After Form.waitFor, interrupted=" + Thread.currentThread().isInterrupted() + ", futureCancelled=" + IFuture.CURRENT.get().isCancelled());
+          }
+          catch (ThreadInterruptedError e) {
+            writeToProtocol("Interrupted Form");
+            throw e;
+          }
+          break;
+      }
+    }
+
+    @Override
+    protected void execStoreSession() {
+      switch (m_sessionBehaviour) {
+        case OPEN_MESSAGEBOX_IN_STORE:
+          writeToProtocol("Before MessageBoxInStore");
+          try {
+            int result = MessageBoxes.createOk().show();
+            writeToProtocol("After MessageBoxInStore " + result);
+          }
+          catch (ThreadInterruptedError e) {
+            writeToProtocol("Interrupted MessageBoxInStore");
+            throw e;
+          }
+          break;
+        case OPEN_FORM_IN_STORE:
+          FixtureForm f = new FixtureForm();
+          writeToProtocol("Before Form.start");
+          try {
+            f.start();
+            writeToProtocol("Before Form.waitFor");
+            f.waitFor();
+            writeToProtocol("After Form.waitFor, interrupted=" + Thread.currentThread().isInterrupted() + ", futureCancelled=" + IFuture.CURRENT.get().isCancelled());
+          }
+          catch (RuntimeException | ThreadInterruptedError e) {
+            writeToProtocol("Form error " + e.getClass().getSimpleName() + " " + e.getMessage());
+            throw e;
+          }
+          break;
+      }
     }
   }
 
   private enum DesktopBehaviour {
     DO_NOTHING,
-    OPEN_MESSAGEBOX,
+    OPEN_MESSAGEBOX_IN_GUI_ATTACHED,
   }
 
   private class FixtureDesktop extends AbstractDesktop {
@@ -243,9 +443,7 @@ public class DesktopWithBlockingConditionInterruptionTest {
     protected void execGuiAttached() {
       desktopFuture = IFuture.CURRENT.get();
       switch (m_desktopBehaviour) {
-        case DO_NOTHING:
-          break;
-        case OPEN_MESSAGEBOX:
+        case OPEN_MESSAGEBOX_IN_GUI_ATTACHED:
           IMessageBox messageBox = MessageBoxes.createOk().withBody("Test MessageBox");
           try {
             writeToProtocol("Before MessageBox");
