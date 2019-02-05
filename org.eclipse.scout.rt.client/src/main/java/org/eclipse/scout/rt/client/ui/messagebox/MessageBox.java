@@ -306,7 +306,7 @@ public class MessageBox extends AbstractWidget implements IMessageBox {
     m_answer = defaultResult;
 
     if (ClientSessionProvider.currentSession() == null) {
-      LOG.warn("outside ScoutSessionThread, default answer is CANCEL");
+      LOG.warn("outside ScoutSessionThread, default answer is CANCEL", new IllegalStateException());
       m_answerSet = true;
       m_answer = CANCEL_OPTION;
       return m_answer;
@@ -317,7 +317,7 @@ public class MessageBox extends AbstractWidget implements IMessageBox {
     try {
       // check if the desktop is observing this process
       if (desktop == null || !desktop.isOpened()) {
-        LOG.warn("there is no desktop or the desktop has not yet been opened in the ui, default answer is CANCEL");
+        LOG.warn("there is no desktop or the desktop has not yet been opened in the ui, default answer is CANCEL", new IllegalStateException());
         m_answerSet = true;
         m_answer = CANCEL_OPTION;
       }

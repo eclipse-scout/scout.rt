@@ -45,6 +45,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
@@ -126,6 +127,7 @@ public class UiSession implements IUiSession {
   private volatile JsonResponse m_currentJsonResponse;
   private volatile JsonRequest m_currentJsonRequest;
   private volatile boolean m_processingJsonRequest;
+  private volatile boolean m_attachedToDesktop;
   private volatile boolean m_disposing;
   private volatile boolean m_disposed;
   private volatile IRegistrationHandle m_uiDataAvailableListener;
@@ -247,6 +249,11 @@ public class UiSession implements IUiSession {
 
       LOG.info("UiSession with ID {} initialized", m_uiSessionId);
     }
+    catch (RuntimeException | PlatformError e) {
+      //cleanup resources potentially allocated in the partly created UiSession
+      dispose();
+      throw e;
+    }
     finally {
       m_httpContext.clear();
       m_currentJsonRequest = null;
@@ -269,7 +276,7 @@ public class UiSession implements IUiSession {
 
   protected IClientSession getOrCreateClientSession(HttpSession httpSession, HttpServletRequest req, JsonStartupRequest jsonStartupReq) {
     String requestedClientSessionId = jsonStartupReq.getClientSessionId();
-    IClientSession clientSession = sessionStore().getClientSessionForUse(requestedClientSessionId);
+    IClientSession clientSession = sessionStore().preregisterUiSession(this, requestedClientSessionId);
 
     if (clientSession != null) {
       // Found existing client session
@@ -432,6 +439,7 @@ public class UiSession implements IUiSession {
       else {
         uiFacade.openFromUI();
       }
+      m_attachedToDesktop = true;
       uiFacade.fireGuiAttached();
     }, ModelJobs.newInput(
         ClientRunContexts.copyCurrent()
@@ -530,16 +538,27 @@ public class UiSession implements IUiSession {
     // 1. page reload (unload event) dispose method is called once
     // 2. logout (Session.stop()) dispose method is called _twice_, 1st call sets the disposing flag,
     //    on the 2nd call, the desktop is already gone.
-    if (!m_disposing) {
+    final IClientSession clientSession = getClientSession();
+    if (m_attachedToDesktop && !m_disposing && clientSession != null && clientSession.isActive() && !clientSession.isStopping()) {
+      final Runnable detachGui = () -> {
+        if (m_attachedToDesktop) {
+          m_attachedToDesktop = false;
+          if (clientSession.isActive() && !clientSession.isStopping() && clientSession.getDesktop() != null) {
+            clientSession.getDesktop().getUIFacade().fireGuiDetached();
+          }
+        }
+      };
       // Current thread is the model thread if dispose is called by clientSession.stop(), otherwise (e.g. page reload) dispose is called from the UI thread
       if (ModelJobs.isModelThread()) {
-        getClientSession().getDesktop().getUIFacade().fireGuiDetached();
+        detachGui.run();
       }
       else {
-        final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(m_clientSession, true);
-        ModelJobs.schedule(getClientSession().getDesktop().getUIFacade()::fireGuiDetached, ModelJobs.newInput(clientRunContext)
-            .withName("Detaching Gui")
-            .withExceptionHandling(null, false)); // Propagate exception to caller (UIServlet)
+        final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(clientSession, true);
+        ModelJobs.schedule(
+            () -> detachGui.run(),
+            ModelJobs.newInput(clientRunContext)
+                .withName("Detaching Gui")
+                .withExceptionHandling(null, false)); // Propagate exception to caller (UIServlet)
       }
     }
 
