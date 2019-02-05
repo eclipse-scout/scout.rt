@@ -62,13 +62,6 @@
     color: @text-color;
   }
 
-  /* see also: .table-cell.last (Table.css) */
-  &.last.halign-left,
-  &.last.halign-center,
-  &.last.halign-right {
-    padding-right: @scrollbar-size + (@scrollbar-side-margin * 2) - 1px; /* -1px because of border-right */
-  }
-
   &.halign-right {
     text-align: right;
     padding-right: @table-cell-padding-left;
