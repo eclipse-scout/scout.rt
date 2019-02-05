@@ -31,7 +31,12 @@ public class CallableChainExceptionHandler<RESULT> implements ICallableIntercept
       throw e;
     }
     catch (Exception | Error err) { // NOSONAR
-      LOG.warn("Exception in callable chain.", err);
+      if (Thread.currentThread().isInterrupted()) {
+        LOG.debug("Exception in callable chain due to interruption.", err);
+      }
+      else {
+        LOG.warn("Exception in callable chain.", err);
+      }
       throw err;
     }
   }

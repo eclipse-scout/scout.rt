@@ -421,14 +421,13 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     }
 
     try {
-      if (!m_desktop.doBeforeClosingInternal()) {
+      if (m_desktop != null && !m_desktop.doBeforeClosingInternal()) {
         m_permitToStop.release();
         return;
       }
     }
     catch (RuntimeException | PlatformError e) {
-      m_permitToStop.release();
-      throw e;
+      LOG.error("Failed to decently handle doBeforeClosingInternal", e);
     }
 
     // --- Point of no return ---
@@ -438,29 +437,32 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     try {
       fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STOPPING));
     }
-    catch (Exception t) {
-      LOG.error("Failed to send STOPPING event.", t);
+    catch (RuntimeException | PlatformError e) {
+      LOG.error("Failed to send STOPPING event.", e);
     }
 
     try {
       interceptStoreSession();
     }
-    catch (Exception t) {
-      LOG.error("Failed to store the client session.", t);
+    catch (RuntimeException | PlatformError e) {
+      LOG.error("Failed to store the client session.", e);
     }
 
     if (m_desktop != null) {
       try {
         m_desktop.closeInternal();
       }
-      catch (Exception t) {
-        LOG.error("Failed to close the desktop.", t);
+      catch (RuntimeException | PlatformError e) {
+        LOG.error("Failed to close the desktop.", e);
       }
       m_desktop = null;
     }
 
     try {
       cancelRunningJobs();
+    }
+    catch (RuntimeException | PlatformError e) {
+      LOG.error("Failed to cancel running jobs.", e);
     }
     finally {
       inactivateSession();

@@ -10,13 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.testing;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionBindingListener;
 
@@ -24,7 +29,10 @@ import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.resource.MimeType;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.server.commons.BufferedServletOutputStream;
 import org.eclipse.scout.rt.server.commons.HttpSessionMutex;
 import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
 import org.eclipse.scout.rt.ui.html.ISessionStore;
@@ -48,16 +56,24 @@ public final class JsonTestUtility {
   private JsonTestUtility() {
   }
 
+  @SuppressWarnings("resource")
   public static IUiSession createAndInitializeUiSession() {
+    final HttpSession httpSession = createHttpSession(new Object());
+    final HttpServletRequest request = createHttpServletRequest(httpSession, "/json", null);
+    final HttpServletResponse response = createHttpServletResponse(new BufferedServletOutputStream());
+
     String clientSessionId = "testClientSession123";
-    HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+    JSONObject jsonReqObj = new JSONObject();
+    jsonReqObj.put(JsonStartupRequest.PROP_CLIENT_SESSION_ID, clientSessionId);
+    jsonReqObj.put("startup", true);
+    JsonStartupRequest jsonStartupRequest = new JsonStartupRequest(new JsonRequest(jsonReqObj));
+    IUiSession uiSession = new TestEnvironmentUiSession();
+    uiSession.init(request, response, jsonStartupRequest);
+    return uiSession;
+  }
+
+  public static HttpSession createHttpSession(Object sessionMutex) {
     final HttpSession httpSession = Mockito.mock(HttpSession.class);
-    final Object sessionMutex = new Object();
-    Mockito.when(request.getLocale()).thenReturn(new Locale("de_CH"));
-    Mockito.when(request.getHeader("User-Agent")).thenReturn("dummy");
-    Mockito.when(request.getSession()).thenReturn(httpSession);
-    Mockito.when(request.getSession(false)).thenReturn(httpSession);
     Mockito.when(httpSession.getAttribute(HttpSessionMutex.SESSION_MUTEX_ATTRIBUTE_NAME)).thenReturn(sessionMutex);
     final ISessionStore sessionStore = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
     Mockito.when(httpSession.getAttribute(HttpSessionHelper.SESSION_STORE_ATTRIBUTE_NAME)).thenReturn(sessionStore);
@@ -68,13 +84,68 @@ public final class JsonTestUtility {
         return null;
       }
     }).when(httpSession).invalidate();
-    JSONObject jsonReqObj = new JSONObject();
-    jsonReqObj.put(JsonStartupRequest.PROP_CLIENT_SESSION_ID, clientSessionId);
-    jsonReqObj.put("startup", true);
-    JsonStartupRequest jsonStartupRequest = new JsonStartupRequest(new JsonRequest(jsonReqObj));
-    IUiSession uiSession = new TestEnvironmentUiSession();
-    uiSession.init(request, response, jsonStartupRequest);
-    return uiSession;
+    return httpSession;
+  }
+
+  public static HttpServletRequest createHttpServletRequest(HttpSession httpSession, String pathInfo, String jsonData) {
+    HttpServletRequest mock = Mockito.mock(HttpServletRequest.class);
+    Mockito.when(mock.getLocale()).thenReturn(new Locale("de_CH"));
+    Mockito.when(mock.getHeader("User-Agent")).thenReturn("dummy");
+    Mockito.when(mock.getPathInfo()).thenReturn(pathInfo);
+    Mockito.when(mock.getContentType()).thenReturn(MimeType.JSON.getType());
+    Mockito.when(mock.getSession()).thenReturn(httpSession);
+    Mockito.when(mock.getSession(false)).thenReturn(httpSession);
+    if (jsonData != null) {
+      try {
+        Mockito.when(mock.getReader()).thenReturn(new BufferedReader(new StringReader(jsonData)));
+      }
+      catch (IOException e) {
+        throw new PlatformException("Cannot create StringReader", e);
+      }
+    }
+    return mock;
+  }
+
+  public static HttpServletResponseWrapper createHttpServletResponse(final ServletOutputStream out) {
+    HttpServletResponse mock = Mockito.mock(HttpServletResponse.class);
+    HttpServletResponseWrapper resp = new HttpServletResponseWrapper(mock) {
+      private String m_contentType;
+      private String m_characterEncoding;
+
+      @Override
+      public String getContentType() {
+        return m_contentType;
+      }
+
+      @Override
+      public void setContentType(String type) {
+        m_contentType = type;
+      }
+
+      @Override
+      public void setContentLength(int len) {
+      }
+
+      @Override
+      public void setContentLengthLong(long len) {
+      }
+
+      @Override
+      public void setCharacterEncoding(String charset) {
+        m_characterEncoding = charset;
+      }
+
+      @Override
+      public String getCharacterEncoding() {
+        return m_characterEncoding;
+      }
+
+      @Override
+      public ServletOutputStream getOutputStream() throws IOException {
+        return out;
+      }
+    };
+    return resp;
   }
 
   /**

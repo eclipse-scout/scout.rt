@@ -60,7 +60,7 @@ public class ClientExceptionHandler extends ExceptionHandler {
       return;
     }
 
-    if (session.getDesktop() == null || !session.getDesktop().isOpened()) {
+    if (session.isStopping() || session.getDesktop() == null || !session.getDesktop().isOpened()) {
       return;
     }
 
