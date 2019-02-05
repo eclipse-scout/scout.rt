@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 public final class Platform {
   private static final Logger LOG = LoggerFactory.getLogger(Platform.class);
 
-  private static IPlatform platform;
+  private static volatile IPlatform platform;
 
   private Platform() {
   }
@@ -39,6 +39,19 @@ public final class Platform {
    * @return the active platform. It is automatically started when accessing this class (static initializer).
    */
   public static IPlatform get() {
+    return platform;
+  }
+
+  /**
+   * @return the active platform, may be null and may be not yet initialized
+   *         <p>
+   *         If {@link #platform} is null when calling this method, then the platform is <em>not</em> automatically
+   *         located and started.
+   *         <p>
+   *         Be careful when using this method. In most cases, replacing the platform should not be necessary. This
+   *         method is sometimes used in unit testing frameworks.
+   */
+  public static IPlatform peek() {
     return platform;
   }
 
@@ -62,12 +75,14 @@ public final class Platform {
       platform = p;
       break;
     }
-    if (platform == null) {
-      platform = new DefaultPlatform();
+    IPlatform platformAccessor = platform;
+    if (platformAccessor == null) {
+      platformAccessor = new DefaultPlatform();
+      platform = platformAccessor;
     }
     PlatformStateLatch platformStateLatch = new PlatformStateLatch();
     // Start platform initialization in separate thread to let class initialization complete
-    new PlatformStarter(platform, platformStateLatch).start();
+    new PlatformStarter(platformAccessor, platformStateLatch).start();
     try {
       platformStateLatch.await();
     }

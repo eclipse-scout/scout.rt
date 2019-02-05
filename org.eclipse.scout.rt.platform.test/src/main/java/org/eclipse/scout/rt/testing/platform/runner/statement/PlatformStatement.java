@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.platform.runner.statement;
 
-import org.eclipse.scout.rt.platform.DefaultPlatform;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -78,11 +77,11 @@ public class PlatformStatement extends Statement {
   }
 
   protected void evaluateWithNewPlatform() throws Throwable {
-    IPlatform old = Platform.get();
-    old.awaitPlatformStarted();
-    Platform.set(new DefaultPlatform());
+    IPlatform old = Platform.peek();
+    Platform.set(m_runWithNewPlatform.platform().getConstructor().newInstance());
     try {
       Platform.get().start();
+      Platform.get().awaitPlatformStarted();
       m_next.evaluate();
     }
     finally {

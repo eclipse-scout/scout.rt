@@ -45,6 +45,7 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPag
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPageDetailTableChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPageSearchFormChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopTablePageLoadedChain;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -88,6 +89,8 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.holders.IHolder;
+import org.eclipse.scout.rt.platform.job.JobState;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -97,6 +100,8 @@ import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -106,6 +111,7 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
+import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -157,6 +163,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private final List<Object> m_addOns;
   private IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractDesktop, org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> m_objectExtensions;
+  private int m_attachedGuis = 0;
 
   /**
    * do not instantiate a new desktop<br>
@@ -1153,6 +1160,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void showForm(IForm form) {
+    Assertions.assertFalse(ClientSessionProvider.currentSession().isStopping(), "Session is stopping");
     // Let the desktop extensions to intercept the given form.
     final IHolder<IForm> formHolder = new Holder<>(form);
     for (IDesktopExtension extension : getDesktopExtensions()) {
@@ -1219,6 +1227,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void showMessageBox(IMessageBox messageBox) {
+    Assertions.assertFalse(ClientSessionProvider.currentSession().isStopping(), "Session is stopping");
     if (messageBox == null || m_messageBoxStore.contains(messageBox)) {
       return;
     }
@@ -1568,6 +1577,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void showFileChooser(IFileChooser fileChooser) {
+    Assertions.assertFalse(ClientSessionProvider.currentSession().isStopping(), "Session is stopping");
     if (fileChooser == null || m_fileChooserStore.contains(fileChooser)) {
       return;
     }
@@ -1625,10 +1635,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   private void setOpenedInternal(boolean b) {
     propertySupport.setPropertyBool(PROP_OPENED, b);
-  }
-
-  private void setGuiAvailableInternal(boolean guiAvailable) {
-    propertySupport.setPropertyBool(PROP_GUI_AVAILABLE, guiAvailable);
   }
 
   @Override
@@ -1928,7 +1934,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void closeInternal() {
     setOpenedInternal(false);
-    detachGui();
+    while (getAttachedGuiCount() > 0) {
+      detachGui();
+    }
 
     List<IForm> showedForms = new ArrayList<IForm>();
     // Remove showed forms
@@ -1936,61 +1944,26 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       hideForm(form);
       showedForms.add(form);
     }
-    //extensions
-    for (IDesktopExtension ext : getDesktopExtensions()) {
-      try {
-        ContributionCommand cc = ext.desktopClosingDelegate();
-        if (cc == ContributionCommand.Stop) {
-          break;
-        }
-      }
-      catch (RuntimeException t) {
-        LOG.error("extension {}", ext, t);
-      }
-    }
 
-    // close messageboxes
-    for (IMessageBox m : getMessageBoxes()) {
-      if (m != null) {
-        try {
-          m.getUIFacade().setResultFromUI(IMessageBox.CANCEL_OPTION);
-        }
-        catch (RuntimeException e) {
-          LOG.error("Exception while closing messagebox", e);
-        }
-      }
-    }
+    //release all locks
+    internalInterruptBlockingConditions();
+    internalCloseMessageBoxes(getMessageBoxes());
+    internalCloseFileChoosers(getFileChoosers());
 
-    // close filechoosers
-    for (IFileChooser f : getFileChoosers()) {
-      if (f != null) {
-        try {
-          f.getUIFacade().setResultFromUI(Collections.<BinaryResource> emptyList());
-        }
-        catch (RuntimeException e) {
-          LOG.error("Exception while closing filechooser", e);
-        }
-      }
-    }
+    internalCloseForms(showedForms);
+    internalCloseDesktopExtensions();
 
-    // close open forms
-    for (IForm form : showedForms) {
-      if (form != null) {
-        try {
-          form.doClose();
-        }
-        catch (RuntimeException e) {
-          LOG.error("Exception while closing form", e);
-        }
-      }
-    }
+    //again, release all locks that may have created by closing forms and client extensions
+    internalInterruptBlockingConditions();
+    internalCloseMessageBoxes(getMessageBoxes());
+    internalCloseFileChoosers(getFileChoosers());
 
     // dispose outlines
     for (IOutline outline : getAvailableOutlines()) {
       try {
         outline.disposeTree();
       }
-      catch (RuntimeException e) {
+      catch (RuntimeException | Error e) {
         LOG.warn("Exception while disposing outline.", e);
       }
     }
@@ -2000,29 +1973,112 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireDesktopClosed();
   }
 
-  private void attachGui(String deepLinkPath) {
-    if (isGuiAvailable()) {
-      return;
-    }
-    setGuiAvailableInternal(true);
+  /**
+   * interrupt blocking MessageBoxes and FileChoosers, calling code must not continue work
+   */
+  protected void internalInterruptBlockingConditions() {
+    Jobs.getJobManager().cancel(ModelJobs.newFutureFilterBuilder()
+        .andMatch(new SessionFutureFilter(ISession.CURRENT.get()))
+        .andMatchState(JobState.WAITING_FOR_BLOCKING_CONDITION)
+        .toFilter(), true);
+  }
 
-    // extensions
+  protected void internalCloseDesktopExtensions() {
     for (IDesktopExtension ext : getDesktopExtensions()) {
       try {
-        ContributionCommand cc = ext.guiAttachedDelegate();
+        ContributionCommand cc = ext.desktopClosingDelegate();
         if (cc == ContributionCommand.Stop) {
           break;
         }
       }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
+      catch (RuntimeException | Error t) {
+        LOG.error("extension {}", ext, t);
       }
     }
+  }
 
-    PropertyMap propertyMap = PropertyMap.CURRENT.get();
-    boolean handleDeepLink = propertyMap.getOrDefault(DeepLinkUrlParameter.HANDLE_DEEP_LINK, true);
-    if (handleDeepLink) {
-      activateDefaultView(deepLinkPath);
+  protected void internalCloseMessageBoxes(List<IMessageBox> list) {
+    for (IMessageBox m : list) {
+      if (m != null) {
+        try {
+          m.getUIFacade().setResultFromUI(IMessageBox.CANCEL_OPTION);
+        }
+        catch (RuntimeException | Error e) {
+          LOG.error("Exception while closing messagebox", e);
+        }
+        finally {
+          m_messageBoxStore.remove(m);
+        }
+      }
+    }
+  }
+
+  protected void internalCloseFileChoosers(List<IFileChooser> list) {
+    for (IFileChooser f : list) {
+      if (f != null) {
+        try {
+          f.getUIFacade().setResultFromUI(Collections.<BinaryResource> emptyList());
+        }
+        catch (RuntimeException | Error e) {
+          LOG.error("Exception while closing filechooser", e);
+        }
+        finally {
+          m_fileChooserStore.remove(f);
+        }
+      }
+    }
+  }
+
+  protected boolean internalCloseForms(Collection<IForm> forms) {
+    for (IForm form : forms) {
+      if (form != null) {
+        try {
+          // close potential open MessageBoxes and FileChoosers, otherwise blocking threads will remain
+          internalCloseMessageBoxes(getMessageBoxes(form));
+          internalCloseFileChoosers(getFileChoosers(form));
+          form.doClose();
+        }
+        catch (RuntimeException | Error e) {
+          LOG.error("Exception while closing forms", e);
+        }
+      }
+    }
+    return true;
+  }
+
+  private int getAttachedGuiCount() {
+    return m_attachedGuis;
+  }
+
+  private void setAttachedGuiCount(int n) {
+    m_attachedGuis = n;
+    propertySupport.setPropertyBool(PROP_GUI_AVAILABLE, m_attachedGuis > 0);
+  }
+
+  private void attachGui(String deepLinkPath) {
+    setAttachedGuiCount(getAttachedGuiCount() + 1);
+
+    if (getAttachedGuiCount() == 1) {
+      //this is the first call to attachGui, call extensions
+      for (IDesktopExtension ext : getDesktopExtensions()) {
+        try {
+          ContributionCommand cc = ext.guiAttachedDelegate();
+          if (cc == ContributionCommand.Stop) {
+            break;
+          }
+        }
+        catch (ThreadInterruptedException e) {
+          throw e;
+        }
+        catch (Exception e) {
+          BEANS.get(ExceptionHandler.class).handle(e);
+        }
+      }
+      PropertyMap propertyMap = PropertyMap.CURRENT.get();
+      boolean handleDeepLink = propertyMap.getOrDefault(DeepLinkUrlParameter.HANDLE_DEEP_LINK, true);
+      if (handleDeepLink) {
+        activateDefaultView(deepLinkPath);
+      }
     }
   }
 
@@ -2106,21 +2162,19 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   private void detachGui() {
-    if (!isGuiAvailable()) {
-      return;
-    }
-    setGuiAvailableInternal(false);
-
-    // extensions
-    for (IDesktopExtension ext : getDesktopExtensions()) {
-      try {
-        ContributionCommand cc = ext.guiDetachedDelegate();
-        if (cc == ContributionCommand.Stop) {
-          break;
+    setAttachedGuiCount(getAttachedGuiCount() - 1);
+    if (getAttachedGuiCount() == 0) {
+      //this is the last call to detachGui, call extensions
+      for (IDesktopExtension ext : getDesktopExtensions()) {
+        try {
+          ContributionCommand cc = ext.guiDetachedDelegate();
+          if (cc == ContributionCommand.Stop) {
+            break;
+          }
         }
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
+        catch (Exception e) {
+          BEANS.get(ExceptionHandler.class).handle(e);
+        }
       }
     }
   }
@@ -2450,7 +2504,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           return false;
         }
       }
-      catch (RuntimeException e) {
+      catch (RuntimeException | Error e) {
         LOG.error("Error closing forms", e);
       }
     }
@@ -2468,10 +2522,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
             break;
           }
         }
-        catch (VetoException e) {
+        catch (VetoException e) { // NOSONAR
           continueClosing = false;
         }
-        catch (RuntimeException e) {
+        catch (RuntimeException | Error e) {
           BEANS.get(ExceptionHandler.class).handle(e);
         }
       }

@@ -3,7 +3,7 @@ package org.eclipse.scout.rt.ui.html;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.server.commons.HttpSessionMutex;
 
 /**
  * Listener that "prepares" every new the HTTP. The preparation consists of the eager creation of some session
@@ -11,15 +11,19 @@ import org.eclipse.scout.rt.platform.BEANS;
  *
  * @see {@link HttpSessionHelper#prepareHttpSession(javax.servlet.http.HttpSession)}
  * @since 5.2
+ * @deprecated use {@link HttpSessionMutex}
  */
+@Deprecated
 public class UiHttpSessionListener implements HttpSessionListener {
+  private final HttpSessionMutex m_delegate = new HttpSessionMutex();
 
   @Override
   public void sessionCreated(HttpSessionEvent event) {
-    BEANS.get(HttpSessionHelper.class).prepareHttpSession(event.getSession());
+    m_delegate.sessionCreated(event);
   }
 
   @Override
   public void sessionDestroyed(HttpSessionEvent event) {
+    m_delegate.sessionDestroyed(event);
   }
 }

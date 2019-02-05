@@ -18,7 +18,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -57,8 +56,8 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -106,9 +105,16 @@ public class UiSession implements IUiSession {
    */
   private static final long ADDITIONAL_POLLING_DELAY = 100;
   private static final int MAX_RESPONSE_HISTORY_SIZE = 10;
-  private static final FinalValue<HttpSessionHelper> HTTP_SESSION_HELPER = new FinalValue<>();
-  private static final FinalValue<JsonRequestHelper> JSON_REQUEST_HELPER = new FinalValue<>();
-  private static final Random RANDOM = new SecureRandom();
+  // Because static fields are initialized before the bean manager is ready (class is initialized by Jandex scan),
+  // the following beans must be set lazily. See the corresponding static getters.
+  private static final LazyValue<HttpSessionHelper> HTTP_SESSION_HELPER = new LazyValue<>(HttpSessionHelper.class);
+  private static final LazyValue<JsonRequestHelper> JSON_REQUEST_HELPER = new LazyValue<>(JsonRequestHelper.class);
+  private static final LazyValue<SecureRandom> SECURE_RANDOM = new LazyValue<>(new Callable<SecureRandom>() {
+    @Override
+    public SecureRandom call() throws Exception {
+      return new SecureRandom();
+    }
+  });
 
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
   private final JsonEventProcessor m_jsonEventProcessor;
@@ -133,6 +139,7 @@ public class UiSession implements IUiSession {
   private volatile JsonResponse m_currentJsonResponse;
   private volatile JsonRequest m_currentJsonRequest;
   private volatile boolean m_processingJsonRequest;
+  private volatile boolean m_attachedToDesktop;
   private volatile boolean m_disposing;
   private volatile boolean m_disposed;
   private volatile IRegistrationHandle m_uiDataAvailableListener;
@@ -253,6 +260,11 @@ public class UiSession implements IUiSession {
 
       LOG.info("UiSession with ID {} initialized", m_uiSessionId);
     }
+    catch (RuntimeException | Error e) {
+      //cleanup resources potentially allocated in the partly created UiSession
+      dispose();
+      throw e;
+    }
     finally {
       m_httpContext.clear();
       m_currentJsonRequest = null;
@@ -270,13 +282,13 @@ public class UiSession implements IUiSession {
   }
 
   protected String createUiSessionId(JsonStartupRequest jsonStartupReq) {
-    String id = new BigInteger(130, RANDOM).toString(32); // http://stackoverflow.com/questions/29183818/why-use-tostring32-and-not-tostring36
+    String id = new BigInteger(130, SECURE_RANDOM.get()).toString(32); // http://stackoverflow.com/questions/29183818/why-use-tostring32-and-not-tostring36
     return jsonStartupReq.getPartId() + ":" + id;
   }
 
   protected IClientSession getOrCreateClientSession(HttpSession httpSession, HttpServletRequest req, JsonStartupRequest jsonStartupReq) {
     String requestedClientSessionId = jsonStartupReq.getClientSessionId();
-    IClientSession clientSession = m_sessionStore.getClientSessionForUse(requestedClientSessionId);
+    IClientSession clientSession = sessionStore().preregisterUiSession(this, requestedClientSessionId);
 
     if (clientSession != null) {
       // Found existing client session
@@ -418,8 +430,9 @@ public class UiSession implements IUiSession {
       public JsonClientSession<?> call() throws Exception {
         return (JsonClientSession<?>) createJsonAdapter(clientSession, m_rootJsonAdapter);
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()
-        .withSession(clientSession, true))
+    }, ModelJobs.newInput(
+        ClientRunContexts.copyCurrent()
+            .withSession(clientSession, true))
         .withName("Starting JsonClientSession")
         .withExceptionHandling(null, false /* propagate */)); // exception handling done by caller
 
@@ -442,6 +455,7 @@ public class UiSession implements IUiSession {
         // in that case the client state shall be recovered rather than following the deep link
         PropertyMap.CURRENT.get().put(DeepLinkUrlParameter.HANDLE_DEEP_LINK, !isPersistent() || !desktopOpen);
         uiFacade.fireGuiAttached(deepLinkPath);
+        m_attachedToDesktop = true;
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()
         .withSession(m_clientSession, true))
@@ -530,22 +544,31 @@ public class UiSession implements IUiSession {
 
   @Override
   public void dispose() {
-
     // Inform the model the UI has been detached. There are different cases we handle here:
     // 1. page reload (unload event) dispose method is called once
     // 2. logout (Session.stop()) dispose method is called _twice_, 1st call sets the disposing flag,
     //    on the 2nd call, the desktop is already gone.
-    if (!m_disposing) {
+    final IClientSession clientSession = getClientSession();
+    if (m_attachedToDesktop && !m_disposing && clientSession != null && clientSession.isActive() && !clientSession.isStopping()) {
+      final Runnable detachGui = new Runnable() {
+        @Override
+        public void run() {
+          if (m_attachedToDesktop && clientSession.isActive() && !clientSession.isStopping() && clientSession.getDesktop() != null) {
+            m_attachedToDesktop = false;
+            clientSession.getDesktop().getUIFacade().fireGuiDetached();
+          }
+        }
+      };
       // Current thread is the model thread if dispose is called by clientSession.stop(), otherwise (e.g. page reload) dispose is called from the UI thread
       if (ModelJobs.isModelThread()) {
-        getClientSession().getDesktop().getUIFacade().fireGuiDetached();
+        detachGui.run();
       }
       else {
-        final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(m_clientSession, true);
+        final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(clientSession, true);
         ModelJobs.schedule(new IRunnable() {
           @Override
           public void run() throws Exception {
-            getClientSession().getDesktop().getUIFacade().fireGuiDetached();
+            detachGui.run();
           }
         }, ModelJobs.newInput(clientRunContext)
             .withName("Detaching Gui")
@@ -594,6 +617,14 @@ public class UiSession implements IUiSession {
 
   protected final void setDisposingInternal(boolean disposing) {
     m_disposing = disposing;
+  }
+
+  protected final boolean isAttachedToDesktop() {
+    return m_attachedToDesktop;
+  }
+
+  protected final void setAttachedToDesktopInternal(boolean attachedToDesktop) {
+    m_attachedToDesktop = attachedToDesktop;
   }
 
   protected Subject currentSubject() {
@@ -1204,21 +1235,11 @@ public class UiSession implements IUiSession {
   }
 
   protected static HttpSessionHelper getHttpSessionHelper() {
-    return HTTP_SESSION_HELPER.setIfAbsent(new Callable<HttpSessionHelper>() {
-      @Override
-      public HttpSessionHelper call() throws Exception {
-        return BEANS.get(HttpSessionHelper.class);
-      }
-    });
+    return HTTP_SESSION_HELPER.get();
   }
 
   protected static JsonRequestHelper getJsonRequestHelper() {
-    return JSON_REQUEST_HELPER.setIfAbsent(new Callable<JsonRequestHelper>() {
-      @Override
-      public JsonRequestHelper call() throws Exception {
-        return BEANS.get(JsonRequestHelper.class);
-      }
-    });
+    return JSON_REQUEST_HELPER.get();
   }
 
   /**

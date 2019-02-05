@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 
 /**
  * The abstract class of all extension delegations from extendible methods.
@@ -120,6 +121,9 @@ public abstract class AbstractExtensionChain<EXTENSION> {
         m_executionStates.put(nextExtension, methodState);
         methodInvocation.callMethod(nextExtension);
         methodState.setReturnValue(methodInvocation.getReturnValue());
+      }
+      catch (ThreadInterruptedException e) {
+        throw e;
       }
       catch (Exception e) {
         methodInvocation.setException(e);

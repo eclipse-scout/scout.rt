@@ -204,12 +204,16 @@ public class PlatformImplementor implements IPlatform {
   }
 
   protected BeanManagerImplementor createBeanManager() {
-    BeanManagerImplementor context = new BeanManagerImplementor();
+    BeanManagerImplementor context = newBeanManagerImplementor();
     Set<Class> allBeans = new BeanFilter().collect(ClassInventory.get());
     for (Class<?> bean : allBeans) {
       context.registerClass(bean);
     }
     return context;
+  }
+
+  protected BeanManagerImplementor newBeanManagerImplementor() {
+    return new BeanManagerImplementor();
   }
 
   protected void initBeanDecorationFactory() {
