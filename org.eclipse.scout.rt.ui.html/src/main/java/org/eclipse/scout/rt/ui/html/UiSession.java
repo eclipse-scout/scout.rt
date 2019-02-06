@@ -594,6 +594,14 @@ public class UiSession implements IUiSession {
     m_disposing = disposing;
   }
 
+  protected final boolean isAttachedToDesktop() {
+    return m_attachedToDesktop;
+  }
+
+  protected final void setAttachedToDesktopInternal(boolean attachedToDesktop) {
+    m_attachedToDesktop = attachedToDesktop;
+  }
+
   protected Subject currentSubject() {
     return Subject.getSubject(AccessController.getContext());
   }
