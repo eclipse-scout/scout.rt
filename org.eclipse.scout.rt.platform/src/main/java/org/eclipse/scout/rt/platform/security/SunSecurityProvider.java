@@ -43,6 +43,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
@@ -155,16 +156,19 @@ public class SunSecurityProvider implements ISecurityProvider {
 
   @Override
   public SecureRandom createSecureRandom() {
-    SecureRandom secureRandom = new SecureRandom();
-    secureRandom.nextBytes(new byte[1]); // force self-seed (required for some implementations)
-    return secureRandom;
+    try {
+      return SecureRandom.getInstanceStrong();
+    }
+    catch (NoSuchAlgorithmException e) {
+      throw new PlatformException("Unable to create strong secure random.", e);
+    }
   }
 
   @Override
   public byte[] createSecureRandomBytes(int numBytes) {
     Assertions.assertGreater(numBytes, 0, "{} is not a valid number for random bytes.", numBytes);
     byte[] rnd = new byte[numBytes];
-    new SecureRandom().nextBytes(rnd); // do not use createSecureRandom() here so that we do not waste one byte.
+    createSecureRandom().nextBytes(rnd);
     return rnd;
   }
 
