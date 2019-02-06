@@ -41,7 +41,7 @@ scout.logging = {
     }
 
     // If log4javascript is not yet installed, dynamically load the library
-    return $.injectScript('res/log4javascript.js')
+    return $.injectScript('res/log4javascript-1.4.9/log4javascript.js')
       .done(this.initLog4Javascript.bind(this, logLevel, showPopup));
   },
 
@@ -56,7 +56,7 @@ scout.logging = {
 
     if (showPopup) {
       // To avoid problems with our CSP rule which prohibits inline scripts we set the useDocumentWrite
-      // flag to false, so the console_uncompressed.html/js is loaded instead.
+      // flag to false, so the console[_uncompressed].html/js is loaded instead.
       defaultLogger.getEffectiveAppenders().forEach(function(appender) {
         appender.setUseDocumentWrite(false);
       });
