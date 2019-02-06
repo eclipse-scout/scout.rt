@@ -1,27 +1,10 @@
-var loggingEnabled = true;
-var logQueuedEventsTimer = null;
-var logEntries = [];
-var logEntriesAndSeparators = [];
-var logItems = [];
-var renderDelay = 100;
-var unrenderedLogItemsExist = false;
-var rootGroup, currentGroup = null;
-var loaded = false;
-var currentLogItem = null;
-var logMainContainer;
+// <BSI change>
 
-// BSI change [AWE]
 // Our CSP rule prohibits inline scripts. That's why we refactored the original console_uncompressed.html
 // from the log4javascript distribution, so it loads a regular script file. Because of this we also changed
 // the IE and "old IE" detection used by log4javascript. We simply ask Scout what browser is used.
 var isIe = window.opener.scout.device.isInternetExplorer();
 var isIePre7 = false; // not supported anymore, flag is always false
-
-function copyProperties(obj, props) {
-  for (var i in props) {
-    obj[i] = props[i];
-  }
-}
 
 // Inline event handlers are not allowed -> attach them here
 $('switch_TRACE').addEventListener('click', function() {
@@ -68,6 +51,27 @@ $('clearButton').addEventListener('click', clearLog);
 $('hideButton').addEventListener('click', hide);
 $('closeButton').addEventListener('click', closeWindow);
 $('evaluateButton').addEventListener('click', evalCommandLine);
+
+// </BSI change>
+
+var loggingEnabled = true;
+var logQueuedEventsTimer = null;
+var logEntries = [];
+var logEntriesAndSeparators = [];
+var logItems = [];
+var renderDelay = 100;
+var unrenderedLogItemsExist = false;
+var rootGroup, currentGroup = null;
+var loaded = false;
+var currentLogItem = null;
+var logMainContainer;
+
+function copyProperties(obj, props) {
+  for (var i in props) {
+    obj[i] = props[i];
+  }
+}
+
 /*----------------------------------------------------------------*/
 
 function LogItem() {
