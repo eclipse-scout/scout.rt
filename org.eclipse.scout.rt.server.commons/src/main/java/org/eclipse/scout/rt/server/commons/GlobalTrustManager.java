@@ -10,12 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.commons;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -25,7 +22,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
@@ -35,8 +32,12 @@ import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.PropertiesHelper;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.CspEnabledProperty.TrustedCertificatesProperty;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.slf4j.Logger;
@@ -75,8 +76,7 @@ public class GlobalTrustManager {
   public void installGlobalTrustManager(String protocol, String tmAlgorithm) {
     X509TrustManager globalTrustManager;
     try {
-      X509Certificate[] trustedCerts = getTrustedCertificates();
-      globalTrustManager = createGlobalTrustManager(tmAlgorithm, trustedCerts);
+      globalTrustManager = createGlobalTrustManager(tmAlgorithm, getAllTrustedCertificates());
 
       SSLContext sslContext = SSLContext.getInstance(protocol);
       sslContext.init(null, new TrustManager[]{globalTrustManager}, SecurityUtility.createSecureRandom());
@@ -87,65 +87,91 @@ public class GlobalTrustManager {
     }
   }
 
-  protected X509Certificate[] getTrustedCertificates() {
-    FilenameFilter certFilter = (file, name) -> (name.toLowerCase().endsWith(".der"));
-    List<X509Certificate> trustedCerts = null;
-    try {
-      RemoteFile[] certRemoteFiles = BEANS.get(IRemoteFileService.class).getRemoteFiles(PATH_CERTS, certFilter, null);
-      if (certRemoteFiles.length == 0) {
-        LOG.warn("No certificates to trust in folder '{}' could be found.", PATH_CERTS);
-      }
-      trustedCerts = installTrustedCertificates(certRemoteFiles);
-    }
-    catch (RuntimeException e) {
-      LOG.error("Could not access folder '{}' to import trusted certificates.", PATH_CERTS, e);
-    }
-
-    return trustedCerts == null ? new X509Certificate[]{} : trustedCerts.toArray(new X509Certificate[trustedCerts.size()]);
+  protected List<X509Certificate> getAllTrustedCertificates() {
+    List<X509Certificate> trustedCerts = new ArrayList<>();
+    trustedCerts.addAll(getTrustedCertificatesInRemoteFiles());
+    trustedCerts.addAll(getConfiguredTrustedCertificates());
+    return trustedCerts;
   }
 
-  protected List<X509Certificate> installTrustedCertificates(RemoteFile[] certRemoteFiles) {
-    List<X509Certificate> trustedCerts = new LinkedList<>();
-    for (RemoteFile certRemoteFile : certRemoteFiles) {
+  protected List<X509Certificate> getConfiguredTrustedCertificates() {
+    List<String> certsNames = CONFIG.getPropertyValue(TrustedCertificatesProperty.class);
+    if (CollectionUtility.isEmpty(certsNames)) {
+      return Collections.emptyList();
+    }
+
+    List<X509Certificate> trustedCerts = new ArrayList<>(certsNames.size());
+    for (String certName : certsNames) {
       try {
-        LOG.info("Trusted certificate '{}' found.", certRemoteFile.getName());
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        certRemoteFile.writeData(os);
-        X509Certificate cert = readX509Cert(new ByteArrayInputStream(os.toByteArray()));
-        trustedCerts.add(cert);
-        LOG.info("Trusted certificate '{}' successfully installed.", certRemoteFile.getName());
+        URL url = PropertiesHelper.getResourceUrl(certName);
+        if (url == null) {
+          LOG.warn("Configured trusted certificate '{}' could not be found.", certName);
+        }
+        else {
+          LOG.info("Trusted certificate '{}' found.", certName);
+          try (InputStream in = url.openStream()) {
+            trustedCerts.add(readX509Cert(in));
+          }
+          LOG.info("Trusted certificate '{}' successfully installed.", certName);
+        }
       }
       catch (Exception e) {
-        LOG.info("Failed to install trusted certificate '{}'.", certRemoteFile.getName(), e);
+        LOG.error("Failed to install trusted certificate '{}'.", certName, e);
       }
     }
     return trustedCerts;
   }
 
-  protected X509TrustManager createGlobalTrustManager(String tmAlgorithm, X509Certificate[] trustedCerts) throws NoSuchAlgorithmException, KeyStoreException {
-    return new P_GlobalTrustManager(trustedCerts, tmAlgorithm);
-  }
-
-  protected X509Certificate readX509Cert(InputStream inputStream) throws CertificateException, IOException {
-    try (BufferedInputStream bis = new BufferedInputStream(inputStream)) {
-      CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
-      return (X509Certificate) certFactory.generateCertificate(bis);
+  protected List<X509Certificate> getTrustedCertificatesInRemoteFiles() {
+    FilenameFilter certFilter = (file, name) -> name.toLowerCase().endsWith(".der");
+    try {
+      RemoteFile[] certRemoteFiles = BEANS.get(IRemoteFileService.class).getRemoteFiles(PATH_CERTS, certFilter, null);
+      if (certRemoteFiles == null || certRemoteFiles.length < 1) {
+        LOG.info("No certificates to trust in folder '{}' could be found.", PATH_CERTS);
+        return Collections.emptyList();
+      }
+      return remoteFilesToCertificates(certRemoteFiles);
+    }
+    catch (RuntimeException e) {
+      LOG.error("Could not access folder '{}' to import trusted certificates.", PATH_CERTS, e);
+      return Collections.emptyList();
     }
   }
 
-  protected class P_GlobalTrustManager implements X509TrustManager {
+  protected List<X509Certificate> remoteFilesToCertificates(RemoteFile[] certRemoteFiles) {
+    List<X509Certificate> trustedCerts = new ArrayList<>(certRemoteFiles.length);
+    for (RemoteFile rf : certRemoteFiles) {
+      try {
+        LOG.info("Trusted certificate '{}' found.", rf.getName());
+        try (InputStream in = rf.getDecompressedInputStream()) {
+          trustedCerts.add(readX509Cert(in));
+        }
+        LOG.info("Trusted certificate '{}' successfully installed.", rf.getName());
+      }
+      catch (Exception e) {
+        LOG.info("Failed to install trusted certificate '{}'.", rf.getName(), e);
+      }
+    }
+    return trustedCerts;
+  }
+
+  protected X509TrustManager createGlobalTrustManager(String tmAlgorithm, List<X509Certificate> trustedCerts) throws NoSuchAlgorithmException, KeyStoreException {
+    return new P_GlobalTrustManager(trustedCerts, tmAlgorithm);
+  }
+
+  protected X509Certificate readX509Cert(InputStream inputStream) throws CertificateException {
+    CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+    return (X509Certificate) certFactory.generateCertificate(inputStream);
+  }
+
+  protected static class P_GlobalTrustManager implements X509TrustManager {
     private static final String CERTIFICATE_NOT_TRUSTED = "certificate not trusted.";
 
     private TrustManager[] m_installedTrustManagers;
-    private final X509Certificate[] m_trustedCerts;
+    private final List<X509Certificate> m_trustedCerts;
 
-    public P_GlobalTrustManager(X509Certificate[] trustedCerts, String tmAlgorithm) throws NoSuchAlgorithmException, KeyStoreException {
-      if (trustedCerts != null) {
-        m_trustedCerts = trustedCerts;
-      }
-      else {
-        m_trustedCerts = new X509Certificate[0];
-      }
+    protected P_GlobalTrustManager(List<X509Certificate> trustedCerts, String tmAlgorithm) throws NoSuchAlgorithmException, KeyStoreException {
+      m_trustedCerts = new ArrayList<>(trustedCerts);
 
       // Get default truststore. As no argument is provided for keystore, the precedence is as follows:
       // 1. evaluation of system property 'javax.net.ssl.trustStore' and check whether a truststore exists at the given location
@@ -222,7 +248,7 @@ public class GlobalTrustManager {
 
     @Override
     public X509Certificate[] getAcceptedIssuers() {
-      List<X509Certificate> trustedCertsAll = new ArrayList<>(Arrays.asList(m_trustedCerts));
+      List<X509Certificate> trustedCertsAll = new ArrayList<>(m_trustedCerts);
 
       // ask default truststore (e.g. cacerts) for trusted certificates. Depending on the authType, different managers are possible.
       for (TrustManager trustManager : m_installedTrustManagers) {
@@ -233,8 +259,7 @@ public class GlobalTrustManager {
           }
         }
       }
-
-      return trustedCertsAll.toArray(new X509Certificate[trustedCertsAll.size()]);
+      return trustedCertsAll.toArray(new X509Certificate[0]);
     }
   }
 }

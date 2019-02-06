@@ -920,20 +920,43 @@ public class PropertiesHelper {
     if (StringUtility.hasText(sysPropFileName)) {
       filePath = sysPropFileName;
     }
+    return getResourceUrl(filePath);
+  }
 
-    if (filePath.indexOf(PROTOCOL_DELIMITER) < 0) {
-      // no protocol specified. Default is class-path
-      filePath = CLASSPATH_PREFIX + filePath;
+  /**
+   * Parses the file path specified to an {@link URL}.
+   * <p>
+   * The method supports the classpath prefix (see {@link #CLASSPATH_PREFIX}) for resources that should be searched on
+   * the classpath. Besides classpath resources also all installed URL schemes and absolute local file paths are
+   * supported.
+   * <p>
+   * <b>Example:</b>
+   * <ul>
+   * <li>classpath:myfolder/myFile.txt</li>
+   * <li>file:/C:/path/to/my/file.ext</li>
+   * </ul>
+   *
+   * @param filePath
+   *          The absolute file path. May be {@code null}.
+   * @return An {@link URL} pointing to the file if it can be found. {@code null} otherwise.
+   */
+  public static URL getResourceUrl(String filePath) {
+    if (!StringUtility.hasText(filePath)) {
+      return null;
     }
 
-    if (filePath.startsWith(CLASSPATH_PREFIX)) {
+    boolean isClasspathUrl = filePath.indexOf(PROTOCOL_DELIMITER) < 0; // if no protocol specified: Default is class-path
+    if (!isClasspathUrl && filePath.startsWith(CLASSPATH_PREFIX)) {
       filePath = filePath.substring(CLASSPATH_PREFIX.length());
       if (!StringUtility.hasText(filePath)) {
         return null;
       }
-      return PropertiesHelper.class.getClassLoader().getResource(filePath);
+      isClasspathUrl = true;
     }
 
+    if (isClasspathUrl) {
+      return PropertiesHelper.class.getClassLoader().getResource(filePath);
+    }
     return toPropertiesFileUrl(filePath);
   }
 

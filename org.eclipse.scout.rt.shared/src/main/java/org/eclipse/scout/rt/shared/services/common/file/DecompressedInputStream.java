@@ -27,7 +27,7 @@ public class DecompressedInputStream extends InputStream {
 
   public DecompressedInputStream(RemoteFile f) throws IOException {
     if (f.getCompressedData() == null) {
-      throw new IOException("" + f + " has no content");
+      throw new IOException(f + " has no content");
     }
     m_remoteFile = f;
     m_buffer = new ByteArrayInputStream(m_remoteFile.getCompressedData());

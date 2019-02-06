@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractMapConfigProperty;
+import org.eclipse.scout.rt.platform.config.AbstractStringListConfigProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDevModeProperty;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.healthcheck.RemoteHealthChecker;
@@ -112,6 +113,19 @@ public final class ServerCommonsConfigProperties {
             + "The value must be provided as a Map.\n"
             + "Example: scout.cspDirective[img-src]='self' data: https: http://localhost:8086",
             ContentSecurityPolicy.class.getName());
+      }
+    }
+
+    public static class TrustedCertificatesProperty extends AbstractStringListConfigProperty {
+
+      @Override
+      public String getKey() {
+        return "scout.trustedCertificates";
+      }
+
+      @Override
+      public String description() {
+        return "URIs to DER (Base64) encoded certificate files that should be trusted. The URI may refer to a local file or a resource on the classpath (use classpath: prefix). The default value is an empty list.";
       }
     }
   }
