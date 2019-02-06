@@ -61,16 +61,31 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
   /**
    * key = uiSessionId
    */
-  protected final Map<String, IUiSession> m_uiSessionPrototypeMap = new HashMap<>();
   protected final Map<String, IUiSession> m_uiSessionMap = new HashMap<>();
+
+  /**
+   * key = uiSessionId
+   * <p>
+   * The preregistered sessions of {@link #preregisterUiSession(IUiSession, String)}
+   */
+  protected final Map<String, IUiSession> m_preregisteredUiSessionMap = new HashMap<>();
 
   /**
    * key = clientSession (<i>not</i> clientSessionId!)<br>
    * value = set of UI sessions (technically there can be multiple UI sessions by client session, although usually there
    * is only one or none).
    */
-  protected final Map<IClientSession, Set<IUiSession>> m_uiSessionPrototypesByClientSession = new HashMap<>();
   protected final Map<IClientSession, Set<IUiSession>> m_uiSessionsByClientSession = new HashMap<>();
+
+  /**
+   * key = clientSession (<i>not</i> clientSessionId!)<br>
+   * value = set of UI sessions (technically there can be multiple UI sessions by client session, although usually there
+   * is only one or none).
+   * <p>
+   * The preregistered sessions of {@link #preregisterUiSession(IUiSession, String)} that are planning to re-use a
+   * currently active {@link IClientSession}
+   */
+  protected final Map<IClientSession, Set<IUiSession>> m_preregisteredUiSessionsByClientSession = new HashMap<>();
 
   /**
    * Map of scheduled housekeeping jobs (key = clientSessionId). Using this map, scheduled but not yet executed
@@ -182,7 +197,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
   public boolean isEmpty() {
     m_readLock.lock();
     try {
-      return m_uiSessionMap.isEmpty() && m_uiSessionPrototypeMap.isEmpty() && m_clientSessionMap.isEmpty() && m_uiSessionsByClientSession.isEmpty();
+      return m_uiSessionMap.isEmpty() && m_preregisteredUiSessionMap.isEmpty() && m_clientSessionMap.isEmpty() && m_uiSessionsByClientSession.isEmpty();
     }
     finally {
       m_readLock.unlock();
@@ -212,7 +227,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
     m_writeLock.lock();
     try {
       Assertions.assertFalse(m_uiSessionMap.containsKey(uiSessionId), "This session store already contaions the uiSessionId '{}'", uiSessionId);
-      m_uiSessionPrototypeMap.put(uiSessionId, uiSession);
+      m_preregisteredUiSessionMap.put(uiSessionId, uiSession);
 
       if (clientSessionId == null) {
         return null;
@@ -230,10 +245,10 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
         return null;
       }
       // Link prototype ui sessions to existing client session
-      Set<IUiSession> map = m_uiSessionPrototypesByClientSession.get(clientSession);
+      Set<IUiSession> map = m_preregisteredUiSessionsByClientSession.get(clientSession);
       if (map == null) {
         map = new HashSet<>();
-        m_uiSessionPrototypesByClientSession.put(clientSession, map);
+        m_preregisteredUiSessionsByClientSession.put(clientSession, map);
       }
       map.add(uiSession);
       return clientSession;
@@ -252,12 +267,12 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
       IClientSession clientSession = uiSession.getClientSession();
 
       // Remove prototype mappings
-      m_uiSessionPrototypeMap.remove(uiSession.getUiSessionId());
-      Set<IUiSession> map = m_uiSessionPrototypesByClientSession.get(clientSession);
+      m_preregisteredUiSessionMap.remove(uiSession.getUiSessionId());
+      Set<IUiSession> map = m_preregisteredUiSessionsByClientSession.get(clientSession);
       if (map != null) {
         map.remove(uiSession);
         if (map.isEmpty()) {
-          m_uiSessionPrototypesByClientSession.remove(clientSession);
+          m_preregisteredUiSessionsByClientSession.remove(clientSession);
         }
       }
 
@@ -289,18 +304,18 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
     m_writeLock.lock();
     try {
       // Remove uiSession
-      m_uiSessionPrototypeMap.remove(uiSession.getUiSessionId());
+      m_preregisteredUiSessionMap.remove(uiSession.getUiSessionId());
       m_uiSessionMap.remove(uiSession.getUiSessionId());
 
       //Note: clientSession may be null if UiSession.init failed
       final IClientSession clientSession = uiSession.getClientSession();
 
       // Unlink uiSession from clientSession
-      Set<IUiSession> prototypeMap = m_uiSessionPrototypesByClientSession.get(clientSession);
+      Set<IUiSession> prototypeMap = m_preregisteredUiSessionsByClientSession.get(clientSession);
       if (prototypeMap != null) {
         prototypeMap.remove(uiSession);
         if (prototypeMap.isEmpty()) {
-          m_uiSessionPrototypesByClientSession.remove(clientSession);
+          m_preregisteredUiSessionsByClientSession.remove(clientSession);
         }
       }
       Set<IUiSession> map = m_uiSessionsByClientSession.get(clientSession);
@@ -384,7 +399,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
 
       // Check if the client session is referenced by any UI session
       Set<IUiSession> uiSessions = m_uiSessionsByClientSession.get(clientSession);
-      Set<IUiSession> uiSessionPrototypes = m_uiSessionPrototypesByClientSession.get(clientSession);
+      Set<IUiSession> uiSessionPrototypes = m_preregisteredUiSessionsByClientSession.get(clientSession);
       LOG.debug("Session housekeeping: Client session {} referenced by {} UI sessions and {} UI session prototypes",
           clientSession.getId(),
           (uiSessions == null ? 0 : uiSessions.size()),
@@ -430,17 +445,17 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
       }
       m_clientSessionMap.remove(clientSession.getId());
       if (LOG.isDebugEnabled()) {
-        HashSet<IClientSession> flatClientSessions = new HashSet<>();
+        Set<IClientSession> flatClientSessions = new HashSet<>();
         flatClientSessions.addAll(m_uiSessionsByClientSession.keySet());
-        flatClientSessions.addAll(m_uiSessionPrototypesByClientSession.keySet());
+        flatClientSessions.addAll(m_preregisteredUiSessionsByClientSession.keySet());
 
-        HashSet<IUiSession> flatUiSessions = new HashSet<>();
+        Set<IUiSession> flatUiSessions = new HashSet<>();
         for (Set<IUiSession> s : m_uiSessionsByClientSession.values()) {
           flatUiSessions.addAll(s);
         }
 
-        HashSet<IUiSession> flatUiSessionPrototypes = new HashSet<>();
-        for (Set<IUiSession> s : m_uiSessionPrototypesByClientSession.values()) {
+        Set<IUiSession> flatUiSessionPrototypes = new HashSet<>();
+        for (Set<IUiSession> s : m_preregisteredUiSessionsByClientSession.values()) {
           flatUiSessionPrototypes.addAll(s);
         }
 
@@ -449,11 +464,11 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
             flatClientSessions.size(),
             m_uiSessionMap.size(),
             flatUiSessions.size(),
-            m_uiSessionPrototypeMap.size(),
+            m_preregisteredUiSessionMap.size(),
             flatUiSessionPrototypes.size());
       }
 
-      if (m_clientSessionMap.isEmpty() && m_uiSessionPrototypeMap.isEmpty() && m_httpSessionValid) {
+      if (m_clientSessionMap.isEmpty() && m_preregisteredUiSessionMap.isEmpty() && m_httpSessionValid) {
         // no more client sessions -> invalidate HTTP session
         try {
           m_httpSession.getCreationTime(); // dummy call to prevent the following log statement when the session is already invalid
