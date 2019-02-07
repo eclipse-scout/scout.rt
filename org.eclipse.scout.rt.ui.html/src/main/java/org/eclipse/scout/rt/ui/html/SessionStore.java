@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
@@ -42,6 +43,7 @@ import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeep
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingMaxWaitShutdownProperty;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreMaxWaitAllShutdownProperty;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreMaxWaitWriteLockProperty;
+import org.eclipse.scout.rt.ui.html.management.SessionMonitorMBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,6 +120,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
     final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     m_readLock = lock.readLock();
     m_writeLock = lock.writeLock();
+    BEANS.get(SessionMonitorMBean.class).weakRegister(httpSession);
   }
 
   @Override
@@ -257,7 +260,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
         // only return active sessions
         return null;
       }
-      // Link prototype ui sessions to existing client session
+      // Link preregistered ui sessions to existing client session
       m_preregisteredUiSessionsByClientSession
           .computeIfAbsent(clientSession, k -> new HashSet<>())
           .add(uiSession);
@@ -276,7 +279,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
     try {
       IClientSession clientSession = uiSession.getClientSession();
 
-      // Remove prototype mappings
+      // Remove preregistered mappings
       m_preregisteredUiSessionMap.remove(uiSession.getUiSessionId());
       Set<IUiSession> map = m_preregisteredUiSessionsByClientSession.get(clientSession);
       if (map != null) {
@@ -318,10 +321,10 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
       final IClientSession clientSession = uiSession.getClientSession();
 
       // Unlink uiSession from clientSession
-      Set<IUiSession> prototypeMap = m_preregisteredUiSessionsByClientSession.get(clientSession);
-      if (prototypeMap != null) {
-        prototypeMap.remove(uiSession);
-        if (prototypeMap.isEmpty()) {
+      Set<IUiSession> preregisteredMap = m_preregisteredUiSessionsByClientSession.get(clientSession);
+      if (preregisteredMap != null) {
+        preregisteredMap.remove(uiSession);
+        if (preregisteredMap.isEmpty()) {
           m_preregisteredUiSessionsByClientSession.remove(clientSession);
         }
       }
@@ -334,11 +337,11 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
       }
 
       // Start housekeeping
-      LOG.debug("{} UI sessions and {} UI session prototypes remaining for client session {}",
+      LOG.debug("{} UI sessions and {} preregistered UI session remaining for client session {}",
           (map == null ? 0 : map.size()),
-          (prototypeMap == null ? 0 : prototypeMap.size()),
+          (preregisteredMap == null ? 0 : preregisteredMap.size()),
           (clientSession == null ? null : clientSession.getId()));
-      if ((map == null || map.isEmpty()) && (prototypeMap == null || prototypeMap.isEmpty())) {
+      if ((map == null || map.isEmpty()) && (preregisteredMap == null || preregisteredMap.isEmpty())) {
         if (uiSession.isPersistent()) {
           // don't start housekeeping for persistent sessions to give the users more time on app switches in ios home screen mode
           return;
@@ -401,14 +404,14 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
 
       // Check if the client session is referenced by any UI session
       Set<IUiSession> uiSessions = m_uiSessionsByClientSession.get(clientSession);
-      Set<IUiSession> uiSessionPrototypes = m_preregisteredUiSessionsByClientSession.get(clientSession);
+      Set<IUiSession> preregisteredUiSessions = m_preregisteredUiSessionsByClientSession.get(clientSession);
       if (LOG.isDebugEnabled()) {
-        LOG.debug("Session housekeeping: Client session {} referenced by {} UI sessions and {} UI session prototypes",
+        LOG.debug("Session housekeeping: Client session {} referenced by {} UI sessions and {} UI session types",
             clientSession.getId(),
             (uiSessions == null ? 0 : uiSessions.size()),
-            (uiSessionPrototypes == null ? 0 : uiSessionPrototypes.size()));
+            (preregisteredUiSessions == null ? 0 : preregisteredUiSessions.size()));
       }
-      if ((uiSessions == null || uiSessions.isEmpty()) && (uiSessionPrototypes == null || uiSessionPrototypes.isEmpty())) {
+      if ((uiSessions == null || uiSessions.isEmpty()) && (preregisteredUiSessions == null || preregisteredUiSessions.isEmpty())) {
         LOG.info("Session housekeeping: Shutting down client session with ID {} because it is not used anymore", clientSession.getId());
         try {
           final IFuture<Void> future = ModelJobs.schedule(() -> forceClientSessionShutdown(clientSession), ModelJobs.newInput(ClientRunContexts.empty().withSession(clientSession, true))
@@ -453,18 +456,18 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
           flatUiSessions.addAll(s);
         }
 
-        Set<IUiSession> flatUiSessionPrototypes = new HashSet<>();
+        Set<IUiSession> flatPreregisteredUiSessions = new HashSet<>();
         for (Set<IUiSession> s : m_preregisteredUiSessionsByClientSession.values()) {
-          flatUiSessionPrototypes.addAll(s);
+          flatPreregisteredUiSessions.addAll(s);
         }
 
-        LOG.debug("clientSessions:{}\tclientSessionFlat:{}\tuiSessions:{}\tuiSessionsFlat:{}\tuiSessionPrototypes:{}\tuiSessionPrototypesFlat:{}",
+        LOG.debug("clientSessions:{}\tclientSessionFlat:{}\tuiSessions:{}\tuiSessionsFlat:{}\tpreregisteredUiSessions:{}\tpreregisteredUiSessionsFlat:{}",
             m_clientSessionMap.size(),
             flatClientSessions.size(),
             m_uiSessionMap.size(),
             flatUiSessions.size(),
             m_preregisteredUiSessionMap.size(),
-            flatUiSessionPrototypes.size());
+            flatPreregisteredUiSessions.size());
       }
 
       if (m_clientSessionMap.isEmpty() && m_preregisteredUiSessionMap.isEmpty() && m_httpSessionValid) {

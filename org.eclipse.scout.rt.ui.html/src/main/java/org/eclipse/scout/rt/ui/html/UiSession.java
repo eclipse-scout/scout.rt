@@ -85,6 +85,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonRequestHelper;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
+import org.eclipse.scout.rt.ui.html.management.SessionMonitorMBean;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -202,6 +203,8 @@ public class UiSession implements IUiSession {
     touch();
 
     try {
+      BEANS.get(SessionMonitorMBean.class).weakRegister(this);
+
       m_httpContext.set(req, resp);
       m_currentJsonRequest = jsonStartupReq;
       HttpSession httpSession = req.getSession();
@@ -285,6 +288,7 @@ public class UiSession implements IUiSession {
     // No client session for the requested ID was found, so create one
     clientSession = createAndStartClientSession(req.getLocale(), createUserAgent(jsonStartupReq), jsonStartupReq.getSessionStartupParams());
     LOG.info("Created new client session [clientSessionId={}, userAgent={}]", clientSession.getId(), clientSession.getUserAgent());
+    BEANS.get(SessionMonitorMBean.class).weakRegister(clientSession);
     // Ensure session is active
     if (!clientSession.isActive()) {
       throw new UiException("ClientSession is not active, there must have been a problem with loading or starting [clientSessionId=" + clientSession.getId() + "]");
@@ -481,6 +485,11 @@ public class UiSession implements IUiSession {
 
   protected final ISessionStore sessionStore() {
     return m_sessionStore;
+  }
+
+  @Override
+  public String getHttpSessionId() {
+    return m_sessionStore != null ? m_sessionStore.getHttpSessionId() : null;
   }
 
   @Override
