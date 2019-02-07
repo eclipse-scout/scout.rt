@@ -61,6 +61,41 @@ describe("BasicField", function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
+    it("updateDisplayTextOnModify = true, with custom delay", function() {
+      field.updateDisplayTextOnModify = true;
+      field.updateDisplayTextOnModifyDelay = 20;
+      field.render();
+      field.$field.val('Test1');
+      field.$field.trigger('input');
+      expect(mostRecentJsonRequest()).toBeUndefined(); // nothing
+
+      jasmine.clock().tick(10);
+      expect(mostRecentJsonRequest()).toBeUndefined(); // not yet...
+
+      jasmine.clock().tick(15);
+      var event = new scout.RemoteEvent(field.id, 'acceptInput', {
+        displayText: 'Test1',
+        whileTyping: true,
+        showBusyIndicator: false
+      });
+      expect(mostRecentJsonRequest()).toContainEvents(event);
+    });
+
+    it("updateDisplayTextOnModify = true, with no delay", function() {
+      field.updateDisplayTextOnModify = true;
+      field.updateDisplayTextOnModifyDelay = 0;
+      field.render();
+      field.$field.val('Test7');
+      field.$field.trigger('input');
+      sendQueuedAjaxCalls();
+      var event = new scout.RemoteEvent(field.id, 'acceptInput', {
+        displayText: 'Test7',
+        whileTyping: true,
+        showBusyIndicator: false
+      });
+      expect(mostRecentJsonRequest()).toContainEvents(event);
+    });
+
     it("updateDisplayTextOnModify = false, with changed text", function() {
       field.updateDisplayTextOnModify = false;
       field.render();

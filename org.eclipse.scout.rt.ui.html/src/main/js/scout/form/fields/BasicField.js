@@ -16,6 +16,7 @@ scout.BasicField = function() {
   this.disabledCopyOverlay = true;
   this._displayTextModifiedTimeoutId = null;
   this.updateDisplayTextOnModify = false;
+  this.updateDisplayTextOnModifyDelay = 250; // in milliseconds
 };
 scout.inherits(scout.BasicField, scout.ValueField);
 
@@ -55,7 +56,11 @@ scout.BasicField.prototype._onFieldInput = function() {
  */
 scout.BasicField.prototype._onDisplayTextModified = function() {
   clearTimeout(this._displayTextModifiedTimeoutId);
-  this._displayTextModifiedTimeoutId = setTimeout(this._acceptInputWhileTyping.bind(this), 250);
+  if (this.updateDisplayTextOnModifyDelay) {
+    this._displayTextModifiedTimeoutId = setTimeout(this._acceptInputWhileTyping.bind(this), this.updateDisplayTextOnModifyDelay);
+  } else {
+    this._acceptInputWhileTyping();
+  }
 };
 
 scout.BasicField.prototype._acceptInputWhileTyping = function() {
