@@ -37,7 +37,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
-import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.dto.Data;
 import org.eclipse.scout.rt.client.dto.FormData;
@@ -196,7 +195,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private IWrappedFormField m_wrappedFormField;
   private ButtonListener m_systemButtonListener;
   private String m_classId;
-  private ClientRunContext m_initialClientRunContext; // ClientRunContext of the calling context during initialization.
+  private ModelContext m_callingModelContext; // ModelContext of the calling context during initialization.
   private IFormHandler m_handler; // never null (ensured by setHandler())
   private SearchFilter m_searchFilter;
 
@@ -265,7 +264,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
 
     // Remember the initial ClientRunContext to not loose the Form from current calling context.
-    m_initialClientRunContext = ClientRunContexts.copyCurrent();
+    m_callingModelContext = ModelContext.copyCurrent();
 
     // Run the initialization on behalf of this Form.
     ClientRunContexts.copyCurrent().withForm(this).run(new IRunnable() {
@@ -3074,13 +3073,17 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   protected IDisplayParent resolveDisplayParent() {
-    return m_initialClientRunContext.call(new Callable<IDisplayParent>() {
-
-      @Override
-      public IDisplayParent call() throws Exception {
-        return BEANS.get(DisplayParentResolver.class).resolve(AbstractForm.this);
-      }
-    });
+    return ClientRunContexts.copyCurrent()
+        .withDesktop(m_callingModelContext.getDesktop())
+        .withOutline(m_callingModelContext.getOutline(), false)
+        .withForm(m_callingModelContext.getForm())
+        .call(
+            new Callable<IDisplayParent>() {
+              @Override
+              public IDisplayParent call() throws Exception {
+                return BEANS.get(DisplayParentResolver.class).resolve(AbstractForm.this);
+              }
+            });
   }
 
   /**
