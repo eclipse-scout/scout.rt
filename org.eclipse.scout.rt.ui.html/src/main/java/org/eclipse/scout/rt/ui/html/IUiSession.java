@@ -68,6 +68,8 @@ public interface IUiSession {
    */
   boolean isPersistent();
 
+  String getHttpSessionId();
+
   String getUiSessionId();
 
   String getClientSessionId();
