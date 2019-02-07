@@ -16,13 +16,11 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Builder for {@link URI} and {@link URL} instances.
@@ -31,15 +29,13 @@ import org.slf4j.LoggerFactory;
  */
 public class UriBuilder {
 
-  private static final Logger LOG = LoggerFactory.getLogger(UriBuilder.class);
-
   private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
 
-  private final Map<String, String> m_parameters = new HashMap<>();
   private String m_scheme;
   private String m_host;
   private int m_port = -1;
   private String m_path;
+  private final Map<String, String> m_parameters = new LinkedHashMap<>(); // retain order of addition
   private String m_fragment;
 
   public UriBuilder() {
@@ -111,9 +107,10 @@ public class UriBuilder {
   }
 
   /**
-   * Adds the given path to the builder. Note: the path will be URL encoded when you call the {@link #createURI()}
-   * method. If the path string passed to this method is already URL encoded you should decode it first to avoid double
-   * encoded characters.
+   * Adds the given path to the builder.
+   * <p>
+   * Note: the path will be URL encoded when you call the {@link #createURI()} method. If the path string passed to this
+   * method is already URL encoded you should decode it first to avoid double encoded characters.
    *
    * @see UriUtility#decode(String)
    */
@@ -140,9 +137,6 @@ public class UriBuilder {
   /**
    * Adds query string parameters. The queryString argument must have the format <code>key1=foo&key2=bar[&...]</code>.
    * Each key/value pair is added as a parameter to the builder.
-   *
-   * @param queryString
-   * @return
    */
   public UriBuilder queryString(String queryString) {
     String[] keyValuePairs = StringUtility.split(queryString, "&");
@@ -227,7 +221,6 @@ public class UriBuilder {
     StringBuilder query = new StringBuilder();
     for (Entry<String, String> param : m_parameters.entrySet()) {
       if (!StringUtility.hasText(param.getKey())) {
-        LOG.warn("ignoring parameter with empty key");
         continue;
       }
       if (query.length() > 0) {
@@ -235,8 +228,10 @@ public class UriBuilder {
       }
       try {
         query.append(URLEncoder.encode(param.getKey(), encoding));
-        query.append("=");
-        query.append(URLEncoder.encode(param.getValue(), encoding));
+        if (!StringUtility.isNullOrEmpty(param.getValue())) {
+          query.append("=");
+          query.append(URLEncoder.encode(param.getValue(), encoding));
+        }
       }
       catch (UnsupportedEncodingException e) {
         throw new ProcessingException("Unsupported encoding '" + encoding + "'", e);
@@ -266,6 +261,6 @@ public class UriBuilder {
   }
 
   public Map<String, String> getParameters() {
-    return CollectionUtility.copyMap(m_parameters);
+    return new LinkedHashMap<>(m_parameters);
   }
 }

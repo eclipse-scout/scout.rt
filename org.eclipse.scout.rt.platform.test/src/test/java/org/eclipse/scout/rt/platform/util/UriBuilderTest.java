@@ -43,6 +43,11 @@ public class UriBuilderTest {
   private static final String SIMPLE_URL_PATH = HTTP + "://" + HOST + PATH;
   private static final String TEST_URI_PATH = "http://acme.com:1234/scout";
 
+  private static final String NAME1 = "name1";
+  private static final String NAME2 = "name2";
+  private static final String VALUE1 = "value1";
+  private static final String VALUE2 = "value2";
+
   @Test
   public void testSimpleUrl() {
     final UriBuilder builder = new UriBuilder(SIMPLE_URL);
@@ -250,11 +255,6 @@ public class UriBuilderTest {
     assertEquals("bottomPart", builder.getFragment());
   }
 
-  static final String NAME1 = "name1";
-  static final String NAME2 = "name2";
-  static final String VALUE1 = "value1";
-  static final String VALUE2 = "value2";
-
   @Test
   public void testParameter() throws Exception {
     UriBuilder builder = new UriBuilder();
@@ -362,6 +362,19 @@ public class UriBuilderTest {
     assertTrue(s.contains("key=value"));
     assertTrue(s.contains("k%26y=%3Dalue"));
     assertTrue(s.contains("ke2=va+ue"));
+  }
+
+  @Test
+  public void testParameter_WithEmptyValue() {
+    UriBuilder builder = new UriBuilder(TEST_URI_PATH)
+        .parameter("one", "x")
+        .parameter("two", null) // should be absent
+        .parameter("three", "") // should be present but without =
+        .parameter("four", " ")
+        .parameter("five", " x ");
+
+    String s = builder.createURL().toString();
+    assertEquals("http://acme.com:1234/scout?one=x&three&four=+&five=+x+", s);
   }
 
   @Test
