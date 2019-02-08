@@ -160,6 +160,8 @@ public class ColumnSet {
 
   protected void initColumns() {
     for (IColumn<?> c : getColumns()) {
+      c.removePropertyChangeListener(m_columnListener);
+      c.addPropertyChangeListener(m_columnListener);
       try {
         c.initColumn();
       }
@@ -168,10 +170,6 @@ public class ColumnSet {
       }
     }
     initialize();
-    for (IColumn<?> c : getColumns()) {
-      c.removePropertyChangeListener(m_columnListener);
-      c.addPropertyChangeListener(m_columnListener);
-    }
   }
 
   protected void disposeColumns() {

@@ -38,6 +38,18 @@ public class TableWith3Cols extends AbstractTable {
   public class Col2Column extends AbstractStringColumn {
 
     @Override
+    public void initColumn() {
+      // this column is first configured visible and set visible during init on purpose
+      // careful: calling resetColumns on table would set it invisible again
+      setVisible(true);
+    }
+
+    @Override
+    protected boolean getConfiguredVisible() {
+      return false;
+    }
+
+    @Override
     protected String getConfiguredHeaderText() {
       return "col2";
     }

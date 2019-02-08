@@ -257,6 +257,7 @@ public class JsonTableTest {
     table.fill(2);
     table.init();
     table.resetColumns();
+    table.getColumns().forEach(c -> c.setVisible(true));
 
     IColumn<?> column0 = table.getColumns().get(0);
     IColumn<?> column1 = table.getColumns().get(1);
@@ -284,7 +285,6 @@ public class JsonTableTest {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
     table.init();
-    table.resetColumns();
 
     IColumn<?> column0 = table.getColumns().get(0);
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
@@ -316,7 +316,6 @@ public class JsonTableTest {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
     table.init();
-    table.resetColumns();
 
     IColumn<?> column = table.getColumns().get(0);
     JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
@@ -401,7 +400,7 @@ public class JsonTableTest {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);
     table.init();
-    table.resetColumns();
+
     IColumn column0 = table.getColumnSet().getColumn(0);
     IColumn column1 = table.getColumnSet().getColumn(1);
     IColumn column2 = table.getColumnSet().getColumn(2);
@@ -1503,6 +1502,27 @@ public class JsonTableTest {
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_uiSession.currentJsonResponse(), JsonTable.EVENT_ROWS_EXPANDED);
     assertTrue(responseEvents.size() == 1);
+  }
+
+  @Test
+  public void testTriggerStructureChangesDuringInitColumn() throws Exception {
+    TableWith3Cols table = new TableWith3Cols();
+    table.fill(1);
+
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+    jsonTable.toJson();
+
+    // init is called after table has been converted to json, for example a wrapped form field might start form
+    // (e.g. call init on table) after the json has already been created
+    table.init();
+
+    assertFalse(jsonTable.eventBuffer().isEmpty());
+    // contains TYPE_COLUMN_STRUCTURE_CHANGED, TYPE_ALL_ROWS_DELETED, TYPE_ROWS_INSERTED, TYPE_ROW_ORDER_CHANGED
+
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    assertTrue(m_uiSession.currentJsonResponse().getEventList()
+        .stream()
+        .anyMatch(p -> "columnStructureChanged".equals(p.getType())));
   }
 
   public static Table createTableFixture(int numRows) {
